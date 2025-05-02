@@ -399,36 +399,36 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00740">740</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  740</span>                                                               {</div>
-<div class="line"><span class="lineno">  741</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  742</span>  <span class="comment">// loop over parameters and set a branch</span></div>
-<div class="line"><span class="lineno">  743</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; ++i) {</div>
-<div class="line"><span class="lineno">  744</span>    tree.Branch(<a class="code hl_variable" href="classcovarianceBase.html#a3e502d80fd2c30a7da4fe75a3e05b0da">_fNames</a>[i].c_str(), &amp;<a class="code hl_variable" href="classcovarianceBase.html#ae70f51df3976975b2dc78fd3bfc28b65">_fCurrVal</a>[i], Form(<span class="stringliteral">&quot;%s/D&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a3e502d80fd2c30a7da4fe75a3e05b0da">_fNames</a>[i].c_str()));</div>
-<div class="line"><span class="lineno">  745</span>  }</div>
-<div class="line"><span class="lineno">  746</span>  <span class="comment">// When running PCA, also save PCA parameters</span></div>
-<div class="line"><span class="lineno">  747</span>  <span class="keywordflow">if</span> (<a class="code hl_variable" href="classcovarianceBase.html#ab4b7f96d3e977a0b3307ceecbd0baeb4">pca</a>) {</div>
-<div class="line"><span class="lineno">  748</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac57285a48d41ef764b4c659959a36c2d">_fNumParPCA</a>; ++i) {</div>
-<div class="line"><span class="lineno">  749</span> </div>
-<div class="line"><span class="lineno">  750</span>      tree.Branch(Form(<span class="stringliteral">&quot;%s_PCA&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a3e502d80fd2c30a7da4fe75a3e05b0da">_fNames</a>[i].c_str()), &amp;<a class="code hl_variable" href="classcovarianceBase.html#acb8262289fb5a37e849def35c04d6165">PCAObj</a>-&gt;fParCurr_PCA.GetMatrixArray()[i], Form(<span class="stringliteral">&quot;%s_PCA/D&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a3e502d80fd2c30a7da4fe75a3e05b0da">_fNames</a>[i].c_str()));</div>
-<div class="line"><span class="lineno">  751</span>    }</div>
-<div class="line"><span class="lineno">  752</span>  }</div>
-<div class="line"><span class="lineno">  753</span> </div>
-<div class="line"><span class="lineno">  754</span>  <span class="keywordflow">if</span>(SaveProposal)</div>
-<div class="line"><span class="lineno">  755</span>  {</div>
-<div class="line"><span class="lineno">  756</span>    <span class="comment">// loop over parameters and set a branch</span></div>
-<div class="line"><span class="lineno">  757</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; ++i) {</div>
-<div class="line"><span class="lineno">  758</span>      tree.Branch(Form(<span class="stringliteral">&quot;%s_Prop&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a3e502d80fd2c30a7da4fe75a3e05b0da">_fNames</a>[i].c_str()), &amp;<a class="code hl_variable" href="classcovarianceBase.html#a12f0eb31a5ef48b014baa11d4ab919e9">_fPropVal</a>[i], Form(<span class="stringliteral">&quot;%s_Prop/D&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a3e502d80fd2c30a7da4fe75a3e05b0da">_fNames</a>[i].c_str()));</div>
-<div class="line"><span class="lineno">  759</span>    }</div>
-<div class="line"><span class="lineno">  760</span>    <span class="comment">// When running PCA, also save PCA parameters</span></div>
-<div class="line"><span class="lineno">  761</span>    <span class="keywordflow">if</span> (<a class="code hl_variable" href="classcovarianceBase.html#ab4b7f96d3e977a0b3307ceecbd0baeb4">pca</a>) {</div>
-<div class="line"><span class="lineno">  762</span>      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac57285a48d41ef764b4c659959a36c2d">_fNumParPCA</a>; ++i) {</div>
-<div class="line"><span class="lineno">  763</span> </div>
-<div class="line"><span class="lineno">  764</span>        tree.Branch(Form(<span class="stringliteral">&quot;%s_PCA_Prop&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a3e502d80fd2c30a7da4fe75a3e05b0da">_fNames</a>[i].c_str()), &amp;<a class="code hl_variable" href="classcovarianceBase.html#acb8262289fb5a37e849def35c04d6165">PCAObj</a>-&gt;fParProp_PCA.GetMatrixArray()[i], Form(<span class="stringliteral">&quot;%s_PCA_Prop/D&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a3e502d80fd2c30a7da4fe75a3e05b0da">_fNames</a>[i].c_str()));</div>
-<div class="line"><span class="lineno">  765</span>      }</div>
-<div class="line"><span class="lineno">  766</span>    }</div>
-<div class="line"><span class="lineno">  767</span>  }</div>
-<div class="line"><span class="lineno">  768</span>}</div>
+<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00745">745</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  745</span>                                                               {</div>
+<div class="line"><span class="lineno">  746</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  747</span>  <span class="comment">// loop over parameters and set a branch</span></div>
+<div class="line"><span class="lineno">  748</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; ++i) {</div>
+<div class="line"><span class="lineno">  749</span>    tree.Branch(<a class="code hl_variable" href="classcovarianceBase.html#a3e502d80fd2c30a7da4fe75a3e05b0da">_fNames</a>[i].c_str(), &amp;<a class="code hl_variable" href="classcovarianceBase.html#ae70f51df3976975b2dc78fd3bfc28b65">_fCurrVal</a>[i], Form(<span class="stringliteral">&quot;%s/D&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a3e502d80fd2c30a7da4fe75a3e05b0da">_fNames</a>[i].c_str()));</div>
+<div class="line"><span class="lineno">  750</span>  }</div>
+<div class="line"><span class="lineno">  751</span>  <span class="comment">// When running PCA, also save PCA parameters</span></div>
+<div class="line"><span class="lineno">  752</span>  <span class="keywordflow">if</span> (<a class="code hl_variable" href="classcovarianceBase.html#ab4b7f96d3e977a0b3307ceecbd0baeb4">pca</a>) {</div>
+<div class="line"><span class="lineno">  753</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac57285a48d41ef764b4c659959a36c2d">_fNumParPCA</a>; ++i) {</div>
+<div class="line"><span class="lineno">  754</span> </div>
+<div class="line"><span class="lineno">  755</span>      tree.Branch(Form(<span class="stringliteral">&quot;%s_PCA&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a3e502d80fd2c30a7da4fe75a3e05b0da">_fNames</a>[i].c_str()), &amp;<a class="code hl_variable" href="classcovarianceBase.html#acb8262289fb5a37e849def35c04d6165">PCAObj</a>-&gt;fParCurr_PCA.GetMatrixArray()[i], Form(<span class="stringliteral">&quot;%s_PCA/D&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a3e502d80fd2c30a7da4fe75a3e05b0da">_fNames</a>[i].c_str()));</div>
+<div class="line"><span class="lineno">  756</span>    }</div>
+<div class="line"><span class="lineno">  757</span>  }</div>
+<div class="line"><span class="lineno">  758</span> </div>
+<div class="line"><span class="lineno">  759</span>  <span class="keywordflow">if</span>(SaveProposal)</div>
+<div class="line"><span class="lineno">  760</span>  {</div>
+<div class="line"><span class="lineno">  761</span>    <span class="comment">// loop over parameters and set a branch</span></div>
+<div class="line"><span class="lineno">  762</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; ++i) {</div>
+<div class="line"><span class="lineno">  763</span>      tree.Branch(Form(<span class="stringliteral">&quot;%s_Prop&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a3e502d80fd2c30a7da4fe75a3e05b0da">_fNames</a>[i].c_str()), &amp;<a class="code hl_variable" href="classcovarianceBase.html#a12f0eb31a5ef48b014baa11d4ab919e9">_fPropVal</a>[i], Form(<span class="stringliteral">&quot;%s_Prop/D&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a3e502d80fd2c30a7da4fe75a3e05b0da">_fNames</a>[i].c_str()));</div>
+<div class="line"><span class="lineno">  764</span>    }</div>
+<div class="line"><span class="lineno">  765</span>    <span class="comment">// When running PCA, also save PCA parameters</span></div>
+<div class="line"><span class="lineno">  766</span>    <span class="keywordflow">if</span> (<a class="code hl_variable" href="classcovarianceBase.html#ab4b7f96d3e977a0b3307ceecbd0baeb4">pca</a>) {</div>
+<div class="line"><span class="lineno">  767</span>      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac57285a48d41ef764b4c659959a36c2d">_fNumParPCA</a>; ++i) {</div>
+<div class="line"><span class="lineno">  768</span> </div>
+<div class="line"><span class="lineno">  769</span>        tree.Branch(Form(<span class="stringliteral">&quot;%s_PCA_Prop&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a3e502d80fd2c30a7da4fe75a3e05b0da">_fNames</a>[i].c_str()), &amp;<a class="code hl_variable" href="classcovarianceBase.html#acb8262289fb5a37e849def35c04d6165">PCAObj</a>-&gt;fParProp_PCA.GetMatrixArray()[i], Form(<span class="stringliteral">&quot;%s_PCA_Prop/D&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a3e502d80fd2c30a7da4fe75a3e05b0da">_fNames</a>[i].c_str()));</div>
+<div class="line"><span class="lineno">  770</span>      }</div>
+<div class="line"><span class="lineno">  771</span>    }</div>
+<div class="line"><span class="lineno">  772</span>  }</div>
+<div class="line"><span class="lineno">  773</span>}</div>
 <div class="ttc" id="aclasscovarianceBase_html_a12f0eb31a5ef48b014baa11d4ab919e9"><div class="ttname"><a href="classcovarianceBase.html#a12f0eb31a5ef48b014baa11d4ab919e9">covarianceBase::_fPropVal</a></div><div class="ttdeci">std::vector&lt; double &gt; _fPropVal</div><div class="ttdoc">Proposed value of the parameter.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00472">covarianceBase.h:472</a></div></div>
 <div class="ttc" id="aclasscovarianceBase_html_ab4b7f96d3e977a0b3307ceecbd0baeb4"><div class="ttname"><a href="classcovarianceBase.html#ab4b7f96d3e977a0b3307ceecbd0baeb4">covarianceBase::pca</a></div><div class="ttdeci">bool pca</div><div class="ttdoc">perform PCA or not</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00489">covarianceBase.h:489</a></div></div>
 <div class="ttc" id="aclasscovarianceBase_html_ac57285a48d41ef764b4c659959a36c2d"><div class="ttname"><a href="classcovarianceBase.html#ac57285a48d41ef764b4c659959a36c2d">covarianceBase::_fNumParPCA</a></div><div class="ttdeci">int _fNumParPCA</div><div class="ttdoc">Number of parameters in PCA base.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00493">covarianceBase.h:493</a></div></div>
@@ -488,7 +488,7 @@ Functions</h2></td></tr>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00013">MaCh3Exception.h:13</a></div></div>
 <div class="ttc" id="aclasscovarianceBase_html_a35c7dc7817eaf4058e9775b6bc792ebc"><div class="ttname"><a href="classcovarianceBase.html#a35c7dc7817eaf4058e9775b6bc792ebc">covarianceBase::invCovMatrix</a></div><div class="ttdeci">TMatrixDSym * invCovMatrix</div><div class="ttdoc">The inverse covariance matrix.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00442">covarianceBase.h:442</a></div></div>
 <div class="ttc" id="aclasscovarianceBase_html_a5973f7f446d6058af9bcd006a6cf562d"><div class="ttname"><a href="classcovarianceBase.html#a5973f7f446d6058af9bcd006a6cf562d">covarianceBase::InvertCovMatrix</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; double &gt; &gt; InvertCovMatrix</div><div class="ttdoc">KS: Same as above but much faster as TMatrixDSym cache miss.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00444">covarianceBase.h:444</a></div></div>
-<div class="ttc" id="aclasscovarianceBase_html_af30ca7861452e1446e55700f4b49b608"><div class="ttname"><a href="classcovarianceBase.html#af30ca7861452e1446e55700f4b49b608">covarianceBase::setThrowMatrix</a></div><div class="ttdeci">void setThrowMatrix(TMatrixDSym *cov)</div><div class="ttdoc">Use new throw matrix, used in adaptive MCMC.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l00989">covarianceBase.cpp:989</a></div></div>
+<div class="ttc" id="aclasscovarianceBase_html_af30ca7861452e1446e55700f4b49b608"><div class="ttname"><a href="classcovarianceBase.html#af30ca7861452e1446e55700f4b49b608">covarianceBase::setThrowMatrix</a></div><div class="ttdeci">void setThrowMatrix(TMatrixDSym *cov)</div><div class="ttdoc">Use new throw matrix, used in adaptive MCMC.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l00994">covarianceBase.cpp:994</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -527,24 +527,24 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00849">849</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  849</span>                                                            {</div>
-<div class="line"><span class="lineno">  850</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  851</span>  <span class="keywordflow">if</span> (i &gt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>) {</div>
-<div class="line"><span class="lineno">  852</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Can&#39;t setEvalLikelihood for Cov={}/Param={} because size of Covariance = {}&quot;</span>, <a class="code hl_function" href="group__Setters.html#gafae8445e4cdef85c27c4863adb9e7fe4">getName</a>(), i, <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>);</div>
-<div class="line"><span class="lineno">  853</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Fix this in your config file please!&quot;</span>);</div>
-<div class="line"><span class="lineno">  854</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><span class="lineno">  855</span>  } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  856</span>    <span class="keywordflow">if</span>(eL){</div>
-<div class="line"><span class="lineno">  857</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Setting {} (parameter {}) to flat prior&quot;</span>, <a class="code hl_function" href="group__Setters.html#gab4ac97e0e881db5ca0f28cdeba39e228">GetParName</a>(i), i);</div>
-<div class="line"><span class="lineno">  858</span>    }</div>
-<div class="line"><span class="lineno">  859</span>    <span class="keywordflow">else</span>{</div>
-<div class="line"><span class="lineno">  860</span>      <span class="comment">// HW :: This is useful</span></div>
-<div class="line"><span class="lineno">  861</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Setting {} (parameter {}) to non-flat prior&quot;</span>, <a class="code hl_function" href="group__Setters.html#gab4ac97e0e881db5ca0f28cdeba39e228">GetParName</a>(i), i);</div>
-<div class="line"><span class="lineno">  862</span>    }</div>
-<div class="line"><span class="lineno">  863</span>    <a class="code hl_variable" href="classcovarianceBase.html#ad9c47deb7009bff81210f666e80012eb">_fFlatPrior</a>[i] = eL;</div>
-<div class="line"><span class="lineno">  864</span>  }</div>
-<div class="line"><span class="lineno">  865</span>}</div>
+<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00854">854</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  854</span>                                                            {</div>
+<div class="line"><span class="lineno">  855</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  856</span>  <span class="keywordflow">if</span> (i &gt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>) {</div>
+<div class="line"><span class="lineno">  857</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Can&#39;t setEvalLikelihood for Cov={}/Param={} because size of Covariance = {}&quot;</span>, <a class="code hl_function" href="group__Setters.html#gafae8445e4cdef85c27c4863adb9e7fe4">getName</a>(), i, <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>);</div>
+<div class="line"><span class="lineno">  858</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Fix this in your config file please!&quot;</span>);</div>
+<div class="line"><span class="lineno">  859</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
+<div class="line"><span class="lineno">  860</span>  } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  861</span>    <span class="keywordflow">if</span>(eL){</div>
+<div class="line"><span class="lineno">  862</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Setting {} (parameter {}) to flat prior&quot;</span>, <a class="code hl_function" href="group__Setters.html#gab4ac97e0e881db5ca0f28cdeba39e228">GetParName</a>(i), i);</div>
+<div class="line"><span class="lineno">  863</span>    }</div>
+<div class="line"><span class="lineno">  864</span>    <span class="keywordflow">else</span>{</div>
+<div class="line"><span class="lineno">  865</span>      <span class="comment">// HW :: This is useful</span></div>
+<div class="line"><span class="lineno">  866</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Setting {} (parameter {}) to non-flat prior&quot;</span>, <a class="code hl_function" href="group__Setters.html#gab4ac97e0e881db5ca0f28cdeba39e228">GetParName</a>(i), i);</div>
+<div class="line"><span class="lineno">  867</span>    }</div>
+<div class="line"><span class="lineno">  868</span>    <a class="code hl_variable" href="classcovarianceBase.html#ad9c47deb7009bff81210f666e80012eb">_fFlatPrior</a>[i] = eL;</div>
+<div class="line"><span class="lineno">  869</span>  }</div>
+<div class="line"><span class="lineno">  870</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00023">MaCh3Logger.h:23</a></div></div>
 <div class="ttc" id="aclasscovarianceBase_html_ad9c47deb7009bff81210f666e80012eb"><div class="ttname"><a href="classcovarianceBase.html#ad9c47deb7009bff81210f666e80012eb">covarianceBase::_fFlatPrior</a></div><div class="ttdeci">std::vector&lt; bool &gt; _fFlatPrior</div><div class="ttdoc">Whether to apply flat prior or not.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00484">covarianceBase.h:484</a></div></div>
 <div class="ttc" id="agroup__Setters_html_gab4ac97e0e881db5ca0f28cdeba39e228"><div class="ttname"><a href="group__Setters.html#gab4ac97e0e881db5ca0f28cdeba39e228">covarianceBase::GetParName</a></div><div class="ttdeci">std::string GetParName(const int i) const</div><div class="ttdoc">Get name of covariance.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00149">covarianceBase.h:149</a></div></div>
@@ -625,24 +625,24 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00902">902</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  902</span>                                                                         {</div>
-<div class="line"><span class="lineno">  903</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  904</span>  <span class="keywordflow">if</span> (<span class="keywordtype">int</span>(stepscale.size()) != <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>)</div>
-<div class="line"><span class="lineno">  905</span>  {</div>
-<div class="line"><span class="lineno">  906</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Stepscale vector not equal to number of parameters. Quitting..&quot;</span>);</div>
-<div class="line"><span class="lineno">  907</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Size of argument vector: {}&quot;</span>, stepscale.size());</div>
-<div class="line"><span class="lineno">  908</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Expected size: {}&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>);</div>
-<div class="line"><span class="lineno">  909</span>    <span class="keywordflow">return</span>;</div>
-<div class="line"><span class="lineno">  910</span>  }</div>
-<div class="line"><span class="lineno">  911</span> </div>
-<div class="line"><span class="lineno">  912</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iParam = 0 ; iParam &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; iParam++) {</div>
-<div class="line"><span class="lineno">  913</span>    <a class="code hl_variable" href="classcovarianceBase.html#a3cda39026e336a49cef482efd4062561">_fIndivStepScale</a>[iParam] = stepscale[iParam];</div>
-<div class="line"><span class="lineno">  914</span>  }</div>
-<div class="line"><span class="lineno">  915</span>  <a class="code hl_function" href="classcovarianceBase.html#ac6666769aa222368338d943826122bb4">printIndivStepScale</a>();</div>
-<div class="line"><span class="lineno">  916</span>}</div>
+<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00907">907</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  907</span>                                                                         {</div>
+<div class="line"><span class="lineno">  908</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  909</span>  <span class="keywordflow">if</span> (<span class="keywordtype">int</span>(stepscale.size()) != <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>)</div>
+<div class="line"><span class="lineno">  910</span>  {</div>
+<div class="line"><span class="lineno">  911</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Stepscale vector not equal to number of parameters. Quitting..&quot;</span>);</div>
+<div class="line"><span class="lineno">  912</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Size of argument vector: {}&quot;</span>, stepscale.size());</div>
+<div class="line"><span class="lineno">  913</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Expected size: {}&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>);</div>
+<div class="line"><span class="lineno">  914</span>    <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  915</span>  }</div>
+<div class="line"><span class="lineno">  916</span> </div>
+<div class="line"><span class="lineno">  917</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iParam = 0 ; iParam &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; iParam++) {</div>
+<div class="line"><span class="lineno">  918</span>    <a class="code hl_variable" href="classcovarianceBase.html#a3cda39026e336a49cef482efd4062561">_fIndivStepScale</a>[iParam] = stepscale[iParam];</div>
+<div class="line"><span class="lineno">  919</span>  }</div>
+<div class="line"><span class="lineno">  920</span>  <a class="code hl_function" href="classcovarianceBase.html#ac6666769aa222368338d943826122bb4">printIndivStepScale</a>();</div>
+<div class="line"><span class="lineno">  921</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_ad5b2eb6377721e3ac95def22c2386bb1"><div class="ttname"><a href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a></div><div class="ttdeci">#define MACH3LOG_WARN</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00024">MaCh3Logger.h:24</a></div></div>
-<div class="ttc" id="aclasscovarianceBase_html_ac6666769aa222368338d943826122bb4"><div class="ttname"><a href="classcovarianceBase.html#ac6666769aa222368338d943826122bb4">covarianceBase::printIndivStepScale</a></div><div class="ttdeci">void printIndivStepScale() const</div><div class="ttdoc">Print step scale for each parameter.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l00919">covarianceBase.cpp:919</a></div></div>
+<div class="ttc" id="aclasscovarianceBase_html_ac6666769aa222368338d943826122bb4"><div class="ttname"><a href="classcovarianceBase.html#ac6666769aa222368338d943826122bb4">covarianceBase::printIndivStepScale</a></div><div class="ttdeci">void printIndivStepScale() const</div><div class="ttdoc">Print step scale for each parameter.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l00924">covarianceBase.cpp:924</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -722,38 +722,38 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00707">707</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  707</span>                                                                {</div>
-<div class="line"><span class="lineno">  708</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  709</span>  <span class="comment">// If empty, set the proposed to prior</span></div>
-<div class="line"><span class="lineno">  710</span>  <span class="keywordflow">if</span> (pars.empty()) {</div>
-<div class="line"><span class="lineno">  711</span>    <span class="comment">// For xsec this means setting to the prior (because prior is the prior)</span></div>
-<div class="line"><span class="lineno">  712</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; i++) {</div>
-<div class="line"><span class="lineno">  713</span>      <a class="code hl_variable" href="classcovarianceBase.html#a12f0eb31a5ef48b014baa11d4ab919e9">_fPropVal</a>[i] = <a class="code hl_variable" href="classcovarianceBase.html#a7578a2cc2e8e9100fad88310a824cb1c">_fPreFitValue</a>[i];</div>
-<div class="line"><span class="lineno">  714</span>    }</div>
-<div class="line"><span class="lineno">  715</span>    <span class="comment">// If not empty, set the parameters to the specified</span></div>
-<div class="line"><span class="lineno">  716</span>  } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  717</span>    <span class="keywordflow">if</span> (pars.size() != <span class="keywordtype">size_t</span>(<a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>)) {</div>
-<div class="line"><span class="lineno">  718</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Warning: parameter arrays of incompatible size! Not changing parameters! {} has size {} but was expecting {}&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a26618d3f5633b33ce20e38ce8261b3ee">matrixName</a>, pars.size(), <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>);</div>
-<div class="line"><span class="lineno">  719</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><span class="lineno">  720</span>    }</div>
-<div class="line"><span class="lineno">  721</span>    <span class="keywordtype">int</span> parsSize = int(pars.size());</div>
-<div class="line"><span class="lineno">  722</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; parsSize; i++) {</div>
-<div class="line"><span class="lineno">  723</span>      <span class="comment">//Make sure that you are actually passing a number to set the parameter to</span></div>
-<div class="line"><span class="lineno">  724</span>      <span class="keywordflow">if</span>(std::isnan(pars[i])) {</div>
-<div class="line"><span class="lineno">  725</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Error: trying to set parameter value to a nan for parameter {} in matrix {}. This will not go well!&quot;</span>, <a class="code hl_function" href="group__Setters.html#gab4ac97e0e881db5ca0f28cdeba39e228">GetParName</a>(i), <a class="code hl_variable" href="classcovarianceBase.html#a26618d3f5633b33ce20e38ce8261b3ee">matrixName</a>);</div>
-<div class="line"><span class="lineno">  726</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><span class="lineno">  727</span>      } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  728</span>        <a class="code hl_variable" href="classcovarianceBase.html#a12f0eb31a5ef48b014baa11d4ab919e9">_fPropVal</a>[i] = pars[i];</div>
-<div class="line"><span class="lineno">  729</span>      }</div>
-<div class="line"><span class="lineno">  730</span>    }</div>
-<div class="line"><span class="lineno">  731</span>  }</div>
-<div class="line"><span class="lineno">  732</span>  <span class="comment">// And if pca make the transfer</span></div>
-<div class="line"><span class="lineno">  733</span>  <span class="keywordflow">if</span> (<a class="code hl_variable" href="classcovarianceBase.html#ab4b7f96d3e977a0b3307ceecbd0baeb4">pca</a>) {</div>
-<div class="line"><span class="lineno">  734</span>    <a class="code hl_variable" href="classcovarianceBase.html#acb8262289fb5a37e849def35c04d6165">PCAObj</a>-&gt;TransferToPCA();</div>
-<div class="line"><span class="lineno">  735</span>    <a class="code hl_variable" href="classcovarianceBase.html#acb8262289fb5a37e849def35c04d6165">PCAObj</a>-&gt;TransferToParam();</div>
+<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00712">712</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  712</span>                                                                {</div>
+<div class="line"><span class="lineno">  713</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  714</span>  <span class="comment">// If empty, set the proposed to prior</span></div>
+<div class="line"><span class="lineno">  715</span>  <span class="keywordflow">if</span> (pars.empty()) {</div>
+<div class="line"><span class="lineno">  716</span>    <span class="comment">// For xsec this means setting to the prior (because prior is the prior)</span></div>
+<div class="line"><span class="lineno">  717</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; i++) {</div>
+<div class="line"><span class="lineno">  718</span>      <a class="code hl_variable" href="classcovarianceBase.html#a12f0eb31a5ef48b014baa11d4ab919e9">_fPropVal</a>[i] = <a class="code hl_variable" href="classcovarianceBase.html#a7578a2cc2e8e9100fad88310a824cb1c">_fPreFitValue</a>[i];</div>
+<div class="line"><span class="lineno">  719</span>    }</div>
+<div class="line"><span class="lineno">  720</span>    <span class="comment">// If not empty, set the parameters to the specified</span></div>
+<div class="line"><span class="lineno">  721</span>  } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  722</span>    <span class="keywordflow">if</span> (pars.size() != <span class="keywordtype">size_t</span>(<a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>)) {</div>
+<div class="line"><span class="lineno">  723</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Warning: parameter arrays of incompatible size! Not changing parameters! {} has size {} but was expecting {}&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a26618d3f5633b33ce20e38ce8261b3ee">matrixName</a>, pars.size(), <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>);</div>
+<div class="line"><span class="lineno">  724</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
+<div class="line"><span class="lineno">  725</span>    }</div>
+<div class="line"><span class="lineno">  726</span>    <span class="keywordtype">int</span> parsSize = int(pars.size());</div>
+<div class="line"><span class="lineno">  727</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; parsSize; i++) {</div>
+<div class="line"><span class="lineno">  728</span>      <span class="comment">//Make sure that you are actually passing a number to set the parameter to</span></div>
+<div class="line"><span class="lineno">  729</span>      <span class="keywordflow">if</span>(std::isnan(pars[i])) {</div>
+<div class="line"><span class="lineno">  730</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Error: trying to set parameter value to a nan for parameter {} in matrix {}. This will not go well!&quot;</span>, <a class="code hl_function" href="group__Setters.html#gab4ac97e0e881db5ca0f28cdeba39e228">GetParName</a>(i), <a class="code hl_variable" href="classcovarianceBase.html#a26618d3f5633b33ce20e38ce8261b3ee">matrixName</a>);</div>
+<div class="line"><span class="lineno">  731</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
+<div class="line"><span class="lineno">  732</span>      } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  733</span>        <a class="code hl_variable" href="classcovarianceBase.html#a12f0eb31a5ef48b014baa11d4ab919e9">_fPropVal</a>[i] = pars[i];</div>
+<div class="line"><span class="lineno">  734</span>      }</div>
+<div class="line"><span class="lineno">  735</span>    }</div>
 <div class="line"><span class="lineno">  736</span>  }</div>
-<div class="line"><span class="lineno">  737</span>}</div>
+<div class="line"><span class="lineno">  737</span>  <span class="comment">// And if pca make the transfer</span></div>
+<div class="line"><span class="lineno">  738</span>  <span class="keywordflow">if</span> (<a class="code hl_variable" href="classcovarianceBase.html#ab4b7f96d3e977a0b3307ceecbd0baeb4">pca</a>) {</div>
+<div class="line"><span class="lineno">  739</span>    <a class="code hl_variable" href="classcovarianceBase.html#acb8262289fb5a37e849def35c04d6165">PCAObj</a>-&gt;TransferToPCA();</div>
+<div class="line"><span class="lineno">  740</span>    <a class="code hl_variable" href="classcovarianceBase.html#acb8262289fb5a37e849def35c04d6165">PCAObj</a>-&gt;TransferToParam();</div>
+<div class="line"><span class="lineno">  741</span>  }</div>
+<div class="line"><span class="lineno">  742</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1045,21 +1045,21 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00771">771</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  771</span>                                                    {</div>
-<div class="line"><span class="lineno">  772</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  773</span>  <span class="keywordflow">if</span>(scale &lt;= 0) {</div>
-<div class="line"><span class="lineno">  774</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;You are trying so set StepScale to 0 or negative this will not work&quot;</span>);</div>
-<div class="line"><span class="lineno">  775</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><span class="lineno">  776</span>  }</div>
-<div class="line"><span class="lineno">  777</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{} setStepScale() = {}&quot;</span>, <a class="code hl_function" href="group__Setters.html#gafae8445e4cdef85c27c4863adb9e7fe4">getName</a>(), scale);</div>
-<div class="line"><span class="lineno">  778</span>  <span class="keyword">const</span> <span class="keywordtype">double</span> SuggestedScale = 2.38*2.38/<a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>;</div>
-<div class="line"><span class="lineno">  779</span>  <span class="keywordflow">if</span>(std::fabs(scale - SuggestedScale)/SuggestedScale &gt; 1) {</div>
-<div class="line"><span class="lineno">  780</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Defined Global StepScale is {}, while suggested suggested {}&quot;</span>, scale, SuggestedScale);</div>
+<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00776">776</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  776</span>                                                    {</div>
+<div class="line"><span class="lineno">  777</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  778</span>  <span class="keywordflow">if</span>(scale &lt;= 0) {</div>
+<div class="line"><span class="lineno">  779</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;You are trying so set StepScale to 0 or negative this will not work&quot;</span>);</div>
+<div class="line"><span class="lineno">  780</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
 <div class="line"><span class="lineno">  781</span>  }</div>
-<div class="line"><span class="lineno">  782</span> </div>
-<div class="line"><span class="lineno">  783</span>  <a class="code hl_variable" href="classcovarianceBase.html#a0088413d6a15d12cd34ec06166302f5c">_fGlobalStepScale</a> = scale;</div>
-<div class="line"><span class="lineno">  784</span>}</div>
+<div class="line"><span class="lineno">  782</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{} setStepScale() = {}&quot;</span>, <a class="code hl_function" href="group__Setters.html#gafae8445e4cdef85c27c4863adb9e7fe4">getName</a>(), scale);</div>
+<div class="line"><span class="lineno">  783</span>  <span class="keyword">const</span> <span class="keywordtype">double</span> SuggestedScale = 2.38*2.38/<a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>;</div>
+<div class="line"><span class="lineno">  784</span>  <span class="keywordflow">if</span>(std::fabs(scale - SuggestedScale)/SuggestedScale &gt; 1) {</div>
+<div class="line"><span class="lineno">  785</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Defined Global StepScale is {}, while suggested suggested {}&quot;</span>, scale, SuggestedScale);</div>
+<div class="line"><span class="lineno">  786</span>  }</div>
+<div class="line"><span class="lineno">  787</span> </div>
+<div class="line"><span class="lineno">  788</span>  <a class="code hl_variable" href="classcovarianceBase.html#a0088413d6a15d12cd34ec06166302f5c">_fGlobalStepScale</a> = scale;</div>
+<div class="line"><span class="lineno">  789</span>}</div>
 <div class="ttc" id="aclasscovarianceBase_html_a0088413d6a15d12cd34ec06166302f5c"><div class="ttname"><a href="classcovarianceBase.html#a0088413d6a15d12cd34ec06166302f5c">covarianceBase::_fGlobalStepScale</a></div><div class="ttdeci">double _fGlobalStepScale</div><div class="ttdoc">Global step scale applied to all params in this class.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00454">covarianceBase.h:454</a></div></div>
 </div><!-- fragment -->
 </div>

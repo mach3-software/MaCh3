@@ -859,37 +859,37 @@ Kamil Skwarczynski </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l01215">1215</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 1215</span>                                                                                           {</div>
-<div class="line"><span class="lineno"> 1216</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno"> 1217</span>  <span class="comment">// Empty means apply to all</span></div>
-<div class="line"><span class="lineno"> 1218</span>  <span class="keywordflow">if</span> (<a class="code hl_variable" href="classcovarianceBase.html#a956f7099f28f05eb9fac8b5be625463c">_fSampleNames</a>[SystIndex].<a class="code hl_variable" href="GetPenaltyTerm_8cpp.html#a439227feff9d7f55384e8780cfc2eb82">size</a>() == 0) <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno"> 1219</span> </div>
-<div class="line"><span class="lineno"> 1220</span>  <span class="comment">// Make a copy and to lower case to not be case sensitive</span></div>
-<div class="line"><span class="lineno"> 1221</span>  std::string SampleNameCopy = SampleName;</div>
-<div class="line"><span class="lineno"> 1222</span>  std::transform(SampleNameCopy.begin(), SampleNameCopy.end(), SampleNameCopy.begin(), ::tolower);</div>
-<div class="line"><span class="lineno"> 1223</span>  <span class="keywordtype">bool</span> Applies = <span class="keyword">false</span>;</div>
+<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l01220">1220</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 1220</span>                                                                                           {</div>
+<div class="line"><span class="lineno"> 1221</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno"> 1222</span>  <span class="comment">// Empty means apply to all</span></div>
+<div class="line"><span class="lineno"> 1223</span>  <span class="keywordflow">if</span> (<a class="code hl_variable" href="classcovarianceBase.html#a956f7099f28f05eb9fac8b5be625463c">_fSampleNames</a>[SystIndex].<a class="code hl_variable" href="GetPenaltyTerm_8cpp.html#a439227feff9d7f55384e8780cfc2eb82">size</a>() == 0) <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno"> 1224</span> </div>
-<div class="line"><span class="lineno"> 1225</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#a956f7099f28f05eb9fac8b5be625463c">_fSampleNames</a>[SystIndex].size(); i++) {</div>
-<div class="line"><span class="lineno"> 1226</span>    <span class="comment">// Convert to low case to not be case sensitive</span></div>
-<div class="line"><span class="lineno"> 1227</span>    std::string pattern = <a class="code hl_variable" href="classcovarianceBase.html#a956f7099f28f05eb9fac8b5be625463c">_fSampleNames</a>[SystIndex][i];</div>
-<div class="line"><span class="lineno"> 1228</span>    std::transform(pattern.begin(), pattern.end(), pattern.begin(), ::tolower);</div>
+<div class="line"><span class="lineno"> 1225</span>  <span class="comment">// Make a copy and to lower case to not be case sensitive</span></div>
+<div class="line"><span class="lineno"> 1226</span>  std::string SampleNameCopy = SampleName;</div>
+<div class="line"><span class="lineno"> 1227</span>  std::transform(SampleNameCopy.begin(), SampleNameCopy.end(), SampleNameCopy.begin(), ::tolower);</div>
+<div class="line"><span class="lineno"> 1228</span>  <span class="keywordtype">bool</span> Applies = <span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno"> 1229</span> </div>
-<div class="line"><span class="lineno"> 1230</span>    <span class="comment">// Replace &#39;*&#39; in the pattern with &#39;.*&#39; for regex matching</span></div>
-<div class="line"><span class="lineno"> 1231</span>    std::string regexPattern = <span class="stringliteral">&quot;^&quot;</span> + std::regex_replace(pattern, std::regex(<span class="stringliteral">&quot;\\*&quot;</span>), <span class="stringliteral">&quot;.*&quot;</span>) + <span class="stringliteral">&quot;$&quot;</span>;</div>
-<div class="line"><span class="lineno"> 1232</span>    <span class="keywordflow">try</span> {</div>
-<div class="line"><span class="lineno"> 1233</span>      std::regex regex(regexPattern);</div>
-<div class="line"><span class="lineno"> 1234</span>      <span class="keywordflow">if</span> (std::regex_match(SampleNameCopy, regex)) {</div>
-<div class="line"><span class="lineno"> 1235</span>        Applies = <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno"> 1236</span>        <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno"> 1237</span>      }</div>
-<div class="line"><span class="lineno"> 1238</span>    } <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::regex_error&amp; e) {</div>
-<div class="line"><span class="lineno"> 1239</span>      <span class="comment">// Handle regex error (for invalid patterns)</span></div>
-<div class="line"><span class="lineno"> 1240</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Regex error: {}&quot;</span>, e.what());</div>
-<div class="line"><span class="lineno"> 1241</span>    }</div>
-<div class="line"><span class="lineno"> 1242</span>  }</div>
-<div class="line"><span class="lineno"> 1243</span>  <span class="keywordflow">return</span> Applies;</div>
-<div class="line"><span class="lineno"> 1244</span>}</div>
+<div class="line"><span class="lineno"> 1230</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#a956f7099f28f05eb9fac8b5be625463c">_fSampleNames</a>[SystIndex].size(); i++) {</div>
+<div class="line"><span class="lineno"> 1231</span>    <span class="comment">// Convert to low case to not be case sensitive</span></div>
+<div class="line"><span class="lineno"> 1232</span>    std::string pattern = <a class="code hl_variable" href="classcovarianceBase.html#a956f7099f28f05eb9fac8b5be625463c">_fSampleNames</a>[SystIndex][i];</div>
+<div class="line"><span class="lineno"> 1233</span>    std::transform(pattern.begin(), pattern.end(), pattern.begin(), ::tolower);</div>
+<div class="line"><span class="lineno"> 1234</span> </div>
+<div class="line"><span class="lineno"> 1235</span>    <span class="comment">// Replace &#39;*&#39; in the pattern with &#39;.*&#39; for regex matching</span></div>
+<div class="line"><span class="lineno"> 1236</span>    std::string regexPattern = <span class="stringliteral">&quot;^&quot;</span> + std::regex_replace(pattern, std::regex(<span class="stringliteral">&quot;\\*&quot;</span>), <span class="stringliteral">&quot;.*&quot;</span>) + <span class="stringliteral">&quot;$&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1237</span>    <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno"> 1238</span>      std::regex regex(regexPattern);</div>
+<div class="line"><span class="lineno"> 1239</span>      <span class="keywordflow">if</span> (std::regex_match(SampleNameCopy, regex)) {</div>
+<div class="line"><span class="lineno"> 1240</span>        Applies = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno"> 1241</span>        <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno"> 1242</span>      }</div>
+<div class="line"><span class="lineno"> 1243</span>    } <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::regex_error&amp; e) {</div>
+<div class="line"><span class="lineno"> 1244</span>      <span class="comment">// Handle regex error (for invalid patterns)</span></div>
+<div class="line"><span class="lineno"> 1245</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Regex error: {}&quot;</span>, e.what());</div>
+<div class="line"><span class="lineno"> 1246</span>    }</div>
+<div class="line"><span class="lineno"> 1247</span>  }</div>
+<div class="line"><span class="lineno"> 1248</span>  <span class="keywordflow">return</span> Applies;</div>
+<div class="line"><span class="lineno"> 1249</span>}</div>
 <div class="ttc" id="aGetPenaltyTerm_8cpp_html_a439227feff9d7f55384e8780cfc2eb82"><div class="ttname"><a href="GetPenaltyTerm_8cpp.html#a439227feff9d7f55384e8780cfc2eb82">size</a></div><div class="ttdeci">int size</div><div class="ttdef"><b>Definition:</b> <a href="GetPenaltyTerm_8cpp_source.html#l00037">GetPenaltyTerm.cpp:37</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00025">MaCh3Logger.h:25</a></div></div>
 <div class="ttc" id="aclasscovarianceBase_html_a956f7099f28f05eb9fac8b5be625463c"><div class="ttname"><a href="classcovarianceBase.html#a956f7099f28f05eb9fac8b5be625463c">covarianceBase::_fSampleNames</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; std::string &gt; &gt; _fSampleNames</div><div class="ttdoc">Tells to which samples object param should be applied.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00486">covarianceBase.h:486</a></div></div>
@@ -921,19 +921,24 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  661</span><span class="preprocessor">  #pragma omp parallel for reduction(+:logL)</span></div>
 <div class="line"><span class="lineno">  662</span><span class="preprocessor">  #endif</span></div>
 <div class="line"><span class="lineno">  663</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; ++i){</div>
-<div class="line"><span class="lineno">  664</span><span class="preprocessor">    #ifdef MULTITHREAD</span></div>
-<div class="line"><span class="lineno">  665</span><span class="preprocessor">    #pragma omp simd</span></div>
-<div class="line"><span class="lineno">  666</span><span class="preprocessor">    #endif</span></div>
-<div class="line"><span class="lineno">  667</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt;= i; ++j) {</div>
-<div class="line"><span class="lineno">  668</span>      <span class="keywordflow">if</span> (!<a class="code hl_variable" href="classcovarianceBase.html#ad9c47deb7009bff81210f666e80012eb">_fFlatPrior</a>[i] &amp;&amp; !<a class="code hl_variable" href="classcovarianceBase.html#ad9c47deb7009bff81210f666e80012eb">_fFlatPrior</a>[j]) {</div>
-<div class="line"><span class="lineno">  669</span>        <span class="comment">//KS: Since matrix is symmetric we can calculate non diagonal elements only once and multiply by 2, can bring up to factor speed decrease.</span></div>
-<div class="line"><span class="lineno">  670</span>        <span class="keywordtype">double</span> scale = (i != j) ? 1. : 0.5;</div>
-<div class="line"><span class="lineno">  671</span>        logL += scale * (<a class="code hl_variable" href="classcovarianceBase.html#a12f0eb31a5ef48b014baa11d4ab919e9">_fPropVal</a>[i] - <a class="code hl_variable" href="classcovarianceBase.html#a7578a2cc2e8e9100fad88310a824cb1c">_fPreFitValue</a>[i])*(<a class="code hl_variable" href="classcovarianceBase.html#a12f0eb31a5ef48b014baa11d4ab919e9">_fPropVal</a>[j] - <a class="code hl_variable" href="classcovarianceBase.html#a7578a2cc2e8e9100fad88310a824cb1c">_fPreFitValue</a>[j])*<a class="code hl_variable" href="classcovarianceBase.html#a5973f7f446d6058af9bcd006a6cf562d">InvertCovMatrix</a>[i][j];</div>
-<div class="line"><span class="lineno">  672</span>      }</div>
-<div class="line"><span class="lineno">  673</span>    }</div>
-<div class="line"><span class="lineno">  674</span>  }</div>
-<div class="line"><span class="lineno">  675</span>  <span class="keywordflow">return</span> logL;</div>
-<div class="line"><span class="lineno">  676</span>}</div>
+<div class="line"><span class="lineno">  664</span>    <span class="keywordflow">if</span>(<a class="code hl_variable" href="classcovarianceBase.html#ad9c47deb7009bff81210f666e80012eb">_fFlatPrior</a>[i]){</div>
+<div class="line"><span class="lineno">  665</span>      <span class="comment">//HW: Flat prior, no need to calculate anything</span></div>
+<div class="line"><span class="lineno">  666</span>      <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno">  667</span>    }</div>
+<div class="line"><span class="lineno">  668</span> </div>
+<div class="line"><span class="lineno">  669</span><span class="preprocessor">    #ifdef MULTITHREAD</span></div>
+<div class="line"><span class="lineno">  670</span><span class="preprocessor">    #pragma omp simd</span></div>
+<div class="line"><span class="lineno">  671</span><span class="preprocessor">    #endif</span></div>
+<div class="line"><span class="lineno">  672</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt;= i; ++j) {</div>
+<div class="line"><span class="lineno">  673</span>      <span class="keywordflow">if</span> (!<a class="code hl_variable" href="classcovarianceBase.html#ad9c47deb7009bff81210f666e80012eb">_fFlatPrior</a>[j]) {</div>
+<div class="line"><span class="lineno">  674</span>        <span class="comment">//KS: Since matrix is symmetric we can calculate non diagonal elements only once and multiply by 2, can bring up to factor speed decrease.</span></div>
+<div class="line"><span class="lineno">  675</span>        <span class="keywordtype">double</span> scale = (i != j) ? 1. : 0.5;</div>
+<div class="line"><span class="lineno">  676</span>        logL += scale * (<a class="code hl_variable" href="classcovarianceBase.html#a12f0eb31a5ef48b014baa11d4ab919e9">_fPropVal</a>[i] - <a class="code hl_variable" href="classcovarianceBase.html#a7578a2cc2e8e9100fad88310a824cb1c">_fPreFitValue</a>[i])*(<a class="code hl_variable" href="classcovarianceBase.html#a12f0eb31a5ef48b014baa11d4ab919e9">_fPropVal</a>[j] - <a class="code hl_variable" href="classcovarianceBase.html#a7578a2cc2e8e9100fad88310a824cb1c">_fPreFitValue</a>[j])*<a class="code hl_variable" href="classcovarianceBase.html#a5973f7f446d6058af9bcd006a6cf562d">InvertCovMatrix</a>[i][j];</div>
+<div class="line"><span class="lineno">  677</span>      }</div>
+<div class="line"><span class="lineno">  678</span>    }</div>
+<div class="line"><span class="lineno">  679</span>  }</div>
+<div class="line"><span class="lineno">  680</span>  <span class="keywordflow">return</span> logL;</div>
+<div class="line"><span class="lineno">  681</span>}</div>
 <div class="ttc" id="aclasscovarianceBase_html_a5973f7f446d6058af9bcd006a6cf562d"><div class="ttname"><a href="classcovarianceBase.html#a5973f7f446d6058af9bcd006a6cf562d">covarianceBase::InvertCovMatrix</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; double &gt; &gt; InvertCovMatrix</div><div class="ttdoc">KS: Same as above but much faster as TMatrixDSym cache miss.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00444">covarianceBase.h:444</a></div></div>
 <div class="ttc" id="aclasscovarianceBase_html_a7578a2cc2e8e9100fad88310a824cb1c"><div class="ttname"><a href="classcovarianceBase.html#a7578a2cc2e8e9100fad88310a824cb1c">covarianceBase::_fPreFitValue</a></div><div class="ttdeci">std::vector&lt; double &gt; _fPreFitValue</div><div class="ttdoc">Parameter value dictated by the prior model. Based on it penalty term is calculated.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00468">covarianceBase.h:468</a></div></div>
 <div class="ttc" id="aclasscovarianceBase_html_ad9c47deb7009bff81210f666e80012eb"><div class="ttname"><a href="classcovarianceBase.html#ad9c47deb7009bff81210f666e80012eb">covarianceBase::_fFlatPrior</a></div><div class="ttdeci">std::vector&lt; bool &gt; _fFlatPrior</div><div class="ttdoc">Whether to apply flat prior or not.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00484">covarianceBase.h:484</a></div></div>
@@ -957,20 +962,20 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Check if parameters were proposed outside physical boundary. </p>
 
-<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00679">679</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  679</span>                                                 {</div>
-<div class="line"><span class="lineno">  680</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  681</span>  <span class="keywordtype">int</span> NOutside = 0;</div>
-<div class="line"><span class="lineno">  682</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
-<div class="line"><span class="lineno">  683</span><span class="preprocessor">  #pragma omp parallel for reduction(+:NOutside)</span></div>
-<div class="line"><span class="lineno">  684</span><span class="preprocessor">  #endif</span></div>
-<div class="line"><span class="lineno">  685</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; ++i){</div>
-<div class="line"><span class="lineno">  686</span>    <span class="keywordflow">if</span>(<a class="code hl_variable" href="classcovarianceBase.html#a12f0eb31a5ef48b014baa11d4ab919e9">_fPropVal</a>[i] &gt; <a class="code hl_variable" href="classcovarianceBase.html#a31e636cb6de871bd0c2c8e7e299df9e7">_fUpBound</a>[i] || <a class="code hl_variable" href="classcovarianceBase.html#a12f0eb31a5ef48b014baa11d4ab919e9">_fPropVal</a>[i] &lt; <a class="code hl_variable" href="classcovarianceBase.html#a8f1d94838f188cc85c4f82557c0b0b66">_fLowBound</a>[i]){</div>
-<div class="line"><span class="lineno">  687</span>      NOutside++;</div>
-<div class="line"><span class="lineno">  688</span>    }</div>
-<div class="line"><span class="lineno">  689</span>  }</div>
-<div class="line"><span class="lineno">  690</span>  <span class="keywordflow">return</span> NOutside;</div>
-<div class="line"><span class="lineno">  691</span>}</div>
+<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00684">684</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  684</span>                                                 {</div>
+<div class="line"><span class="lineno">  685</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  686</span>  <span class="keywordtype">int</span> NOutside = 0;</div>
+<div class="line"><span class="lineno">  687</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
+<div class="line"><span class="lineno">  688</span><span class="preprocessor">  #pragma omp parallel for reduction(+:NOutside)</span></div>
+<div class="line"><span class="lineno">  689</span><span class="preprocessor">  #endif</span></div>
+<div class="line"><span class="lineno">  690</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; ++i){</div>
+<div class="line"><span class="lineno">  691</span>    <span class="keywordflow">if</span>(<a class="code hl_variable" href="classcovarianceBase.html#a12f0eb31a5ef48b014baa11d4ab919e9">_fPropVal</a>[i] &gt; <a class="code hl_variable" href="classcovarianceBase.html#a31e636cb6de871bd0c2c8e7e299df9e7">_fUpBound</a>[i] || <a class="code hl_variable" href="classcovarianceBase.html#a12f0eb31a5ef48b014baa11d4ab919e9">_fPropVal</a>[i] &lt; <a class="code hl_variable" href="classcovarianceBase.html#a8f1d94838f188cc85c4f82557c0b0b66">_fLowBound</a>[i]){</div>
+<div class="line"><span class="lineno">  692</span>      NOutside++;</div>
+<div class="line"><span class="lineno">  693</span>    }</div>
+<div class="line"><span class="lineno">  694</span>  }</div>
+<div class="line"><span class="lineno">  695</span>  <span class="keywordflow">return</span> NOutside;</div>
+<div class="line"><span class="lineno">  696</span>}</div>
 <div class="ttc" id="aclasscovarianceBase_html_a31e636cb6de871bd0c2c8e7e299df9e7"><div class="ttname"><a href="classcovarianceBase.html#a31e636cb6de871bd0c2c8e7e299df9e7">covarianceBase::_fUpBound</a></div><div class="ttdeci">std::vector&lt; double &gt; _fUpBound</div><div class="ttdoc">Upper physical bound, parameter will not be able to go beyond it.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00480">covarianceBase.h:480</a></div></div>
 <div class="ttc" id="aclasscovarianceBase_html_a8f1d94838f188cc85c4f82557c0b0b66"><div class="ttname"><a href="classcovarianceBase.html#a8f1d94838f188cc85c4f82557c0b0b66">covarianceBase::_fLowBound</a></div><div class="ttdeci">std::vector&lt; double &gt; _fLowBound</div><div class="ttdoc">Lowest physical bound, parameter will not be able to go beyond it.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00478">covarianceBase.h:478</a></div></div>
 </div><!-- fragment -->
@@ -1061,7 +1066,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="ttc" id="aclasscovarianceBase_html_a0088413d6a15d12cd34ec06166302f5c"><div class="ttname"><a href="classcovarianceBase.html#a0088413d6a15d12cd34ec06166302f5c">covarianceBase::_fGlobalStepScale</a></div><div class="ttdeci">double _fGlobalStepScale</div><div class="ttdoc">Global step scale applied to all params in this class.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00454">covarianceBase.h:454</a></div></div>
 <div class="ttc" id="aclasscovarianceBase_html_a34f877fc160b4a93a3aab1b3a8977858"><div class="ttname"><a href="classcovarianceBase.html#a34f877fc160b4a93a3aab1b3a8977858">covarianceBase::_fError</a></div><div class="ttdeci">std::vector&lt; double &gt; _fError</div><div class="ttdoc">Prior error on the parameter.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00476">covarianceBase.h:476</a></div></div>
 <div class="ttc" id="aclasscovarianceBase_html_a3cda39026e336a49cef482efd4062561"><div class="ttname"><a href="classcovarianceBase.html#a3cda39026e336a49cef482efd4062561">covarianceBase::_fIndivStepScale</a></div><div class="ttdeci">std::vector&lt; double &gt; _fIndivStepScale</div><div class="ttdoc">Individual step scale used by MCMC algorithm.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00482">covarianceBase.h:482</a></div></div>
-<div class="ttc" id="aclasscovarianceBase_html_a43367db263b2607232077410f27b1146"><div class="ttname"><a href="classcovarianceBase.html#a43367db263b2607232077410f27b1146">covarianceBase::MatrixVectorMulti</a></div><div class="ttdeci">void MatrixVectorMulti(double *_restrict_ VecMulti, double **_restrict_ matrix, const double *_restrict_ vector, const int n) const</div><div class="ttdoc">KS: Custom function to perform multiplication of matrix and vector with multithreading.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l00869">covarianceBase.cpp:869</a></div></div>
+<div class="ttc" id="aclasscovarianceBase_html_a43367db263b2607232077410f27b1146"><div class="ttname"><a href="classcovarianceBase.html#a43367db263b2607232077410f27b1146">covarianceBase::MatrixVectorMulti</a></div><div class="ttdeci">void MatrixVectorMulti(double *_restrict_ VecMulti, double **_restrict_ matrix, const double *_restrict_ vector, const int n) const</div><div class="ttdoc">KS: Custom function to perform multiplication of matrix and vector with multithreading.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l00874">covarianceBase.cpp:874</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1145,32 +1150,32 @@ Kamil Skwarczynski </dd></dl>
 <p>KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plotting. </p>
 <p>This function converts the covariance matrix to a correlation matrix and returns a TH2D object, which can be used for advanced plotting purposes. </p><dl class="section return"><dt>Returns</dt><dd>A pointer to a TH2D object representing the correlation matrix </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l01162">1162</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 1162</span>                                           {</div>
-<div class="line"><span class="lineno"> 1163</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno"> 1164</span>  TH2D* hMatrix = <span class="keyword">new</span> TH2D(<a class="code hl_function" href="group__Setters.html#gafae8445e4cdef85c27c4863adb9e7fe4">getName</a>().c_str(), <a class="code hl_function" href="group__Setters.html#gafae8445e4cdef85c27c4863adb9e7fe4">getName</a>().c_str(), <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>, 0.0, <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>, <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>, 0.0, <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>);</div>
-<div class="line"><span class="lineno"> 1165</span> </div>
-<div class="line"><span class="lineno"> 1166</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; i++)</div>
-<div class="line"><span class="lineno"> 1167</span>  {</div>
-<div class="line"><span class="lineno"> 1168</span>    hMatrix-&gt;SetBinContent(i+1, i+1, 1.);</div>
-<div class="line"><span class="lineno"> 1169</span>    hMatrix-&gt;GetXaxis()-&gt;SetBinLabel(i+1, <a class="code hl_function" href="group__Setters.html#ga295f5fe63911d4c704b73e0b0c8c7971">GetParFancyName</a>(i).c_str());</div>
-<div class="line"><span class="lineno"> 1170</span>    hMatrix-&gt;GetYaxis()-&gt;SetBinLabel(i+1, <a class="code hl_function" href="group__Setters.html#ga295f5fe63911d4c704b73e0b0c8c7971">GetParFancyName</a>(i).c_str());</div>
-<div class="line"><span class="lineno"> 1171</span>  }</div>
-<div class="line"><span class="lineno"> 1172</span> </div>
-<div class="line"><span class="lineno"> 1173</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
-<div class="line"><span class="lineno"> 1174</span><span class="preprocessor">  #pragma omp parallel for</span></div>
-<div class="line"><span class="lineno"> 1175</span><span class="preprocessor">  #endif</span></div>
-<div class="line"><span class="lineno"> 1176</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; i++)</div>
-<div class="line"><span class="lineno"> 1177</span>  {</div>
-<div class="line"><span class="lineno"> 1178</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j = 0; j &lt;= i; j++)</div>
-<div class="line"><span class="lineno"> 1179</span>    {</div>
-<div class="line"><span class="lineno"> 1180</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> Corr = (*covMatrix)(i,j) / ( <a class="code hl_function" href="group__Setters.html#ga279d5470e3f83ec53a6c2dfce77de537">getDiagonalError</a>(i) * <a class="code hl_function" href="group__Setters.html#ga279d5470e3f83ec53a6c2dfce77de537">getDiagonalError</a>(j));</div>
-<div class="line"><span class="lineno"> 1181</span>      hMatrix-&gt;SetBinContent(i+1, j+1, Corr);</div>
-<div class="line"><span class="lineno"> 1182</span>      hMatrix-&gt;SetBinContent(j+1, i+1, Corr);</div>
-<div class="line"><span class="lineno"> 1183</span>    }</div>
-<div class="line"><span class="lineno"> 1184</span>  }</div>
-<div class="line"><span class="lineno"> 1185</span>  <span class="keywordflow">return</span> hMatrix;</div>
-<div class="line"><span class="lineno"> 1186</span>}</div>
+<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l01167">1167</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 1167</span>                                           {</div>
+<div class="line"><span class="lineno"> 1168</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno"> 1169</span>  TH2D* hMatrix = <span class="keyword">new</span> TH2D(<a class="code hl_function" href="group__Setters.html#gafae8445e4cdef85c27c4863adb9e7fe4">getName</a>().c_str(), <a class="code hl_function" href="group__Setters.html#gafae8445e4cdef85c27c4863adb9e7fe4">getName</a>().c_str(), <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>, 0.0, <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>, <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>, 0.0, <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>);</div>
+<div class="line"><span class="lineno"> 1170</span> </div>
+<div class="line"><span class="lineno"> 1171</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; i++)</div>
+<div class="line"><span class="lineno"> 1172</span>  {</div>
+<div class="line"><span class="lineno"> 1173</span>    hMatrix-&gt;SetBinContent(i+1, i+1, 1.);</div>
+<div class="line"><span class="lineno"> 1174</span>    hMatrix-&gt;GetXaxis()-&gt;SetBinLabel(i+1, <a class="code hl_function" href="group__Setters.html#ga295f5fe63911d4c704b73e0b0c8c7971">GetParFancyName</a>(i).c_str());</div>
+<div class="line"><span class="lineno"> 1175</span>    hMatrix-&gt;GetYaxis()-&gt;SetBinLabel(i+1, <a class="code hl_function" href="group__Setters.html#ga295f5fe63911d4c704b73e0b0c8c7971">GetParFancyName</a>(i).c_str());</div>
+<div class="line"><span class="lineno"> 1176</span>  }</div>
+<div class="line"><span class="lineno"> 1177</span> </div>
+<div class="line"><span class="lineno"> 1178</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
+<div class="line"><span class="lineno"> 1179</span><span class="preprocessor">  #pragma omp parallel for</span></div>
+<div class="line"><span class="lineno"> 1180</span><span class="preprocessor">  #endif</span></div>
+<div class="line"><span class="lineno"> 1181</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; i++)</div>
+<div class="line"><span class="lineno"> 1182</span>  {</div>
+<div class="line"><span class="lineno"> 1183</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j = 0; j &lt;= i; j++)</div>
+<div class="line"><span class="lineno"> 1184</span>    {</div>
+<div class="line"><span class="lineno"> 1185</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> Corr = (*covMatrix)(i,j) / ( <a class="code hl_function" href="group__Setters.html#ga279d5470e3f83ec53a6c2dfce77de537">getDiagonalError</a>(i) * <a class="code hl_function" href="group__Setters.html#ga279d5470e3f83ec53a6c2dfce77de537">getDiagonalError</a>(j));</div>
+<div class="line"><span class="lineno"> 1186</span>      hMatrix-&gt;SetBinContent(i+1, j+1, Corr);</div>
+<div class="line"><span class="lineno"> 1187</span>      hMatrix-&gt;SetBinContent(j+1, i+1, Corr);</div>
+<div class="line"><span class="lineno"> 1188</span>    }</div>
+<div class="line"><span class="lineno"> 1189</span>  }</div>
+<div class="line"><span class="lineno"> 1190</span>  <span class="keywordflow">return</span> hMatrix;</div>
+<div class="line"><span class="lineno"> 1191</span>}</div>
 <div class="ttc" id="agroup__Setters_html_ga279d5470e3f83ec53a6c2dfce77de537"><div class="ttname"><a href="group__Setters.html#ga279d5470e3f83ec53a6c2dfce77de537">covarianceBase::getDiagonalError</a></div><div class="ttdeci">double getDiagonalError(const int i) const</div><div class="ttdoc">Get diagonal error for ith parameter.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00161">covarianceBase.h:161</a></div></div>
 <div class="ttc" id="agroup__Setters_html_ga295f5fe63911d4c704b73e0b0c8c7971"><div class="ttname"><a href="group__Setters.html#ga295f5fe63911d4c704b73e0b0c8c7971">covarianceBase::GetParFancyName</a></div><div class="ttdeci">std::string GetParFancyName(const int i) const</div><div class="ttdoc">Get fancy name of the Parameter.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00153">covarianceBase.h:153</a></div></div>
 <div class="ttc" id="agroup__Setters_html_gafae8445e4cdef85c27c4863adb9e7fe4"><div class="ttname"><a href="group__Setters.html#gafae8445e4cdef85c27c4863adb9e7fe4">covarianceBase::getName</a></div><div class="ttdeci">std::string getName() const</div><div class="ttdoc">Get name of covariance.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00145">covarianceBase.h:145</a></div></div>
@@ -1644,19 +1649,19 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Reimplemented in <a class="el" href="classPyCovarianceBase.html#a8be2563cd8f0905deb6109e0c3068ec1">PyCovarianceBase</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00694">694</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  694</span>                                     {</div>
-<div class="line"><span class="lineno">  695</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  696</span>  <span class="comment">// Checkbounds and calclikelihood are virtual</span></div>
-<div class="line"><span class="lineno">  697</span>  <span class="comment">// Default behaviour is to reject negative values + do std llh calculation</span></div>
-<div class="line"><span class="lineno">  698</span>  <span class="keyword">const</span> <span class="keywordtype">int</span> NOutside = <a class="code hl_function" href="classcovarianceBase.html#ab0e457ad3d7acfdc2b29b14a8553eee2">CheckBounds</a>();</div>
-<div class="line"><span class="lineno">  699</span>  </div>
-<div class="line"><span class="lineno">  700</span>  <span class="keywordflow">if</span>(NOutside &gt; 0) <span class="keywordflow">return</span> NOutside*<a class="code hl_variable" href="namespaceM3.html#aaf4ba720c8ab2982beaa3c243aee1b98">M3::_LARGE_LOGL_</a>;</div>
-<div class="line"><span class="lineno">  701</span> </div>
-<div class="line"><span class="lineno">  702</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="classcovarianceBase.html#a5aadbf9d0a50062ae401136dc6e60ffb">CalcLikelihood</a>();</div>
-<div class="line"><span class="lineno">  703</span>}</div>
+<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00699">699</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  699</span>                                     {</div>
+<div class="line"><span class="lineno">  700</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  701</span>  <span class="comment">// Checkbounds and calclikelihood are virtual</span></div>
+<div class="line"><span class="lineno">  702</span>  <span class="comment">// Default behaviour is to reject negative values + do std llh calculation</span></div>
+<div class="line"><span class="lineno">  703</span>  <span class="keyword">const</span> <span class="keywordtype">int</span> NOutside = <a class="code hl_function" href="classcovarianceBase.html#ab0e457ad3d7acfdc2b29b14a8553eee2">CheckBounds</a>();</div>
+<div class="line"><span class="lineno">  704</span>  </div>
+<div class="line"><span class="lineno">  705</span>  <span class="keywordflow">if</span>(NOutside &gt; 0) <span class="keywordflow">return</span> NOutside*<a class="code hl_variable" href="namespaceM3.html#aaf4ba720c8ab2982beaa3c243aee1b98">M3::_LARGE_LOGL_</a>;</div>
+<div class="line"><span class="lineno">  706</span> </div>
+<div class="line"><span class="lineno">  707</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="classcovarianceBase.html#a5aadbf9d0a50062ae401136dc6e60ffb">CalcLikelihood</a>();</div>
+<div class="line"><span class="lineno">  708</span>}</div>
 <div class="ttc" id="aclasscovarianceBase_html_a5aadbf9d0a50062ae401136dc6e60ffb"><div class="ttname"><a href="classcovarianceBase.html#a5aadbf9d0a50062ae401136dc6e60ffb">covarianceBase::CalcLikelihood</a></div><div class="ttdeci">double CalcLikelihood() const _noexcept_</div><div class="ttdoc">Calc penalty term based on inverted covariance matrix.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l00657">covarianceBase.cpp:657</a></div></div>
-<div class="ttc" id="aclasscovarianceBase_html_ab0e457ad3d7acfdc2b29b14a8553eee2"><div class="ttname"><a href="classcovarianceBase.html#ab0e457ad3d7acfdc2b29b14a8553eee2">covarianceBase::CheckBounds</a></div><div class="ttdeci">int CheckBounds() const _noexcept_</div><div class="ttdoc">Check if parameters were proposed outside physical boundary.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l00679">covarianceBase.cpp:679</a></div></div>
+<div class="ttc" id="aclasscovarianceBase_html_ab0e457ad3d7acfdc2b29b14a8553eee2"><div class="ttname"><a href="classcovarianceBase.html#ab0e457ad3d7acfdc2b29b14a8553eee2">covarianceBase::CheckBounds</a></div><div class="ttdeci">int CheckBounds() const _noexcept_</div><div class="ttdoc">Check if parameters were proposed outside physical boundary.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l00684">covarianceBase.cpp:684</a></div></div>
 <div class="ttc" id="anamespaceM3_html_aaf4ba720c8ab2982beaa3c243aee1b98"><div class="ttname"><a href="namespaceM3.html#aaf4ba720c8ab2982beaa3c243aee1b98">M3::_LARGE_LOGL_</a></div><div class="ttdeci">static constexpr const double _LARGE_LOGL_</div><div class="ttdoc">Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such s...</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00057">Core.h:57</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -1765,16 +1770,16 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Reimplemented in <a class="el" href="classcovarianceXsec.html#a98cf4b870e62badc83bcda99ae3574ae">covarianceXsec</a>, and <a class="el" href="classPyCovarianceBase.html#a895c823ae3d9660c1cfa6dcde97886d5">PyCovarianceBase</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l01150">1150</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 1150</span>                                                  {</div>
-<div class="line"><span class="lineno"> 1151</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno"> 1152</span>  std::vector&lt;double&gt; prior(<a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>);</div>
-<div class="line"><span class="lineno"> 1153</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; ++i)</div>
-<div class="line"><span class="lineno"> 1154</span>  {</div>
-<div class="line"><span class="lineno"> 1155</span>    prior[i] = <a class="code hl_variable" href="classcovarianceBase.html#a7578a2cc2e8e9100fad88310a824cb1c">_fPreFitValue</a>[i];</div>
-<div class="line"><span class="lineno"> 1156</span>  }</div>
-<div class="line"><span class="lineno"> 1157</span>  <span class="keywordflow">return</span> prior;</div>
-<div class="line"><span class="lineno"> 1158</span>}</div>
+<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l01155">1155</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 1155</span>                                                  {</div>
+<div class="line"><span class="lineno"> 1156</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno"> 1157</span>  std::vector&lt;double&gt; prior(<a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>);</div>
+<div class="line"><span class="lineno"> 1158</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; ++i)</div>
+<div class="line"><span class="lineno"> 1159</span>  {</div>
+<div class="line"><span class="lineno"> 1160</span>    prior[i] = <a class="code hl_variable" href="classcovarianceBase.html#a7578a2cc2e8e9100fad88310a824cb1c">_fPreFitValue</a>[i];</div>
+<div class="line"><span class="lineno"> 1161</span>  }</div>
+<div class="line"><span class="lineno"> 1162</span>  <span class="keywordflow">return</span> prior;</div>
+<div class="line"><span class="lineno"> 1163</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2564,8 +2569,8 @@ Kamil Skwarczynski </dd></dl>
 <div class="ttc" id="aclasscovarianceBase_html_a75b5553823335bb82026ff46369fb67e"><div class="ttname"><a href="classcovarianceBase.html#a75b5553823335bb82026ff46369fb67e">covarianceBase::ReserveMemory</a></div><div class="ttdeci">void ReserveMemory(const int size)</div><div class="ttdoc">Initialise vectors with parameters information.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l00309">covarianceBase.cpp:309</a></div></div>
 <div class="ttc" id="aclasscovarianceBase_html_a8d821ce805f2426fe95549170866821f"><div class="ttname"><a href="classcovarianceBase.html#a8d821ce805f2426fe95549170866821f">covarianceBase::PrintLength</a></div><div class="ttdeci">int PrintLength</div><div class="ttdoc">KS: This is used when printing parameters, sometimes we have super long parameters name,...</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00457">covarianceBase.h:457</a></div></div>
 <div class="ttc" id="aclasscovarianceBase_html_a973671386a2f8ea924f25f8f5404654c"><div class="ttname"><a href="classcovarianceBase.html#a973671386a2f8ea924f25f8f5404654c">covarianceBase::_fFancyNames</a></div><div class="ttdeci">std::vector&lt; std::string &gt; _fFancyNames</div><div class="ttdoc">Fancy name for example rather than xsec_0 it is MAQE, useful for human reading.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00462">covarianceBase.h:462</a></div></div>
-<div class="ttc" id="aclasscovarianceBase_html_aafbbdc05b87df882dc341e20fe870603"><div class="ttname"><a href="classcovarianceBase.html#aafbbdc05b87df882dc341e20fe870603">covarianceBase::toggleFixParameter</a></div><div class="ttdeci">void toggleFixParameter(const int i)</div><div class="ttdoc">fix parameter at prior values</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l00798">covarianceBase.cpp:798</a></div></div>
-<div class="ttc" id="aclasscovarianceBase_html_ae2850c8e2f2d4acfe322b0ebe65b07cf"><div class="ttname"><a href="classcovarianceBase.html#ae2850c8e2f2d4acfe322b0ebe65b07cf">covarianceBase::MakePosDef</a></div><div class="ttdeci">void MakePosDef(TMatrixDSym *cov=nullptr)</div><div class="ttdoc">Make matrix positive definite by adding small values to diagonal, necessary for inverting matrix.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l00931">covarianceBase.cpp:931</a></div></div>
+<div class="ttc" id="aclasscovarianceBase_html_aafbbdc05b87df882dc341e20fe870603"><div class="ttname"><a href="classcovarianceBase.html#aafbbdc05b87df882dc341e20fe870603">covarianceBase::toggleFixParameter</a></div><div class="ttdeci">void toggleFixParameter(const int i)</div><div class="ttdoc">fix parameter at prior values</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l00803">covarianceBase.cpp:803</a></div></div>
+<div class="ttc" id="aclasscovarianceBase_html_ae2850c8e2f2d4acfe322b0ebe65b07cf"><div class="ttname"><a href="classcovarianceBase.html#ae2850c8e2f2d4acfe322b0ebe65b07cf">covarianceBase::MakePosDef</a></div><div class="ttdeci">void MakePosDef(TMatrixDSym *cov=nullptr)</div><div class="ttdoc">Make matrix positive definite by adding small values to diagonal, necessary for inverting matrix.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l00936">covarianceBase.cpp:936</a></div></div>
 <div class="ttc" id="agroup__Setters_html_ga5f28f7294d25cca6334f7033a63596b9"><div class="ttname"><a href="group__Setters.html#ga5f28f7294d25cca6334f7033a63596b9">covarianceBase::setCovMatrix</a></div><div class="ttdeci">void setCovMatrix(TMatrixDSym *cov)</div><div class="ttdoc">Set covariance matrix.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l00287">covarianceBase.cpp:287</a></div></div>
 <div class="ttc" id="anamespaceM3_html_ad1896bacf74c409a461dd1ea43f8bc99"><div class="ttname"><a href="namespaceM3.html#ad1896bacf74c409a461dd1ea43f8bc99">M3::GetNThreads</a></div><div class="ttdeci">int GetNThreads()</div><div class="ttdoc">number of threads which we need for example for TRandom3</div><div class="ttdef"><b>Definition:</b> <a href="Monitor_8cpp_source.html#l00316">Monitor.cpp:316</a></div></div>
 </div><!-- fragment -->
@@ -2694,33 +2699,33 @@ Kamil Skwarczynski </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l01042">1042</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 1042</span>                                                                    {</div>
-<div class="line"><span class="lineno"> 1043</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno"> 1044</span>  <span class="comment">// Now we read the general settings [these SHOULD be common across all matrices!]</span></div>
-<div class="line"><span class="lineno"> 1045</span>  <span class="keywordtype">bool</span> success = <a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_function" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a192304475bc377ef975ef40d2bd2b254">InitFromConfig</a>(adapt_manager, <a class="code hl_variable" href="classcovarianceBase.html#a26618d3f5633b33ce20e38ce8261b3ee">matrixName</a>, <a class="code hl_function" href="classcovarianceBase.html#a261941a4c06e5d875174d8769a4d02f1">getNpars</a>());</div>
-<div class="line"><span class="lineno"> 1046</span>  <span class="keywordflow">if</span>(!success) <span class="keywordflow">return</span>;</div>
-<div class="line"><span class="lineno"> 1047</span>  <a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_function" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a5997a813faf68d891c62cbaf65984aca">Print</a>();</div>
-<div class="line"><span class="lineno"> 1048</span> </div>
-<div class="line"><span class="lineno"> 1049</span>  <span class="comment">// Next let&quot;s check for external matrices</span></div>
-<div class="line"><span class="lineno"> 1050</span>  <span class="comment">// We&quot;re going to grab this info from the YAML manager</span></div>
-<div class="line"><span class="lineno"> 1051</span>  <span class="keywordflow">if</span>(!GetFromManager&lt;bool&gt;(adapt_manager[<span class="stringliteral">&quot;AdaptionOptions&quot;</span>][<span class="stringliteral">&quot;Covariance&quot;</span>][<a class="code hl_variable" href="classcovarianceBase.html#a26618d3f5633b33ce20e38ce8261b3ee">matrixName</a>][<span class="stringliteral">&quot;UseExternalMatrix&quot;</span>], <span class="keyword">false</span>, __FILE__ , __LINE__)) {</div>
-<div class="line"><span class="lineno"> 1052</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Not using external matrix for {}, initialising adaption from scratch&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a26618d3f5633b33ce20e38ce8261b3ee">matrixName</a>);</div>
-<div class="line"><span class="lineno"> 1053</span>    <span class="comment">// If we don&#39;t have a covariance matrix to start from for adaptive tune we need to make one!</span></div>
-<div class="line"><span class="lineno"> 1054</span>    <a class="code hl_variable" href="classcovarianceBase.html#a838731abd6716940043b484b2b266f86">use_adaptive</a> = <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno"> 1055</span>    <a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_function" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ad7df80045651df99c2d1c375fea4ac74">CreateNewAdaptiveCovariance</a>(<a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>);</div>
-<div class="line"><span class="lineno"> 1056</span>    <span class="keywordflow">return</span>;</div>
-<div class="line"><span class="lineno"> 1057</span>  }</div>
-<div class="line"><span class="lineno"> 1058</span> </div>
-<div class="line"><span class="lineno"> 1059</span>  <span class="comment">// Finally, we accept that we want to read the matrix from a file!</span></div>
-<div class="line"><span class="lineno"> 1060</span>  <span class="keyword">auto</span> external_file_name = GetFromManager&lt;std::string&gt;(adapt_manager[<span class="stringliteral">&quot;AdaptionOptions&quot;</span>][<span class="stringliteral">&quot;Covariance&quot;</span>][<a class="code hl_variable" href="classcovarianceBase.html#a26618d3f5633b33ce20e38ce8261b3ee">matrixName</a>][<span class="stringliteral">&quot;ExternalMatrixFileName&quot;</span>], <span class="stringliteral">&quot;&quot;</span>, __FILE__ , __LINE__);</div>
-<div class="line"><span class="lineno"> 1061</span>  <span class="keyword">auto</span> external_matrix_name = GetFromManager&lt;std::string&gt;(adapt_manager[<span class="stringliteral">&quot;AdaptionOptions&quot;</span>][<span class="stringliteral">&quot;Covariance&quot;</span>][<a class="code hl_variable" href="classcovarianceBase.html#a26618d3f5633b33ce20e38ce8261b3ee">matrixName</a>][<span class="stringliteral">&quot;ExternalMatrixName&quot;</span>], <span class="stringliteral">&quot;&quot;</span>, __FILE__ , __LINE__);</div>
-<div class="line"><span class="lineno"> 1062</span>  <span class="keyword">auto</span> external_mean_name = GetFromManager&lt;std::string&gt;(adapt_manager[<span class="stringliteral">&quot;AdaptionOptions&quot;</span>][<span class="stringliteral">&quot;Covariance&quot;</span>][<a class="code hl_variable" href="classcovarianceBase.html#a26618d3f5633b33ce20e38ce8261b3ee">matrixName</a>][<span class="stringliteral">&quot;ExternalMeansName&quot;</span>], <span class="stringliteral">&quot;&quot;</span>, __FILE__ , __LINE__);</div>
+<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l01047">1047</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 1047</span>                                                                    {</div>
+<div class="line"><span class="lineno"> 1048</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno"> 1049</span>  <span class="comment">// Now we read the general settings [these SHOULD be common across all matrices!]</span></div>
+<div class="line"><span class="lineno"> 1050</span>  <span class="keywordtype">bool</span> success = <a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_function" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a192304475bc377ef975ef40d2bd2b254">InitFromConfig</a>(adapt_manager, <a class="code hl_variable" href="classcovarianceBase.html#a26618d3f5633b33ce20e38ce8261b3ee">matrixName</a>, <a class="code hl_function" href="classcovarianceBase.html#a261941a4c06e5d875174d8769a4d02f1">getNpars</a>());</div>
+<div class="line"><span class="lineno"> 1051</span>  <span class="keywordflow">if</span>(!success) <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno"> 1052</span>  <a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_function" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a5997a813faf68d891c62cbaf65984aca">Print</a>();</div>
+<div class="line"><span class="lineno"> 1053</span> </div>
+<div class="line"><span class="lineno"> 1054</span>  <span class="comment">// Next let&quot;s check for external matrices</span></div>
+<div class="line"><span class="lineno"> 1055</span>  <span class="comment">// We&quot;re going to grab this info from the YAML manager</span></div>
+<div class="line"><span class="lineno"> 1056</span>  <span class="keywordflow">if</span>(!GetFromManager&lt;bool&gt;(adapt_manager[<span class="stringliteral">&quot;AdaptionOptions&quot;</span>][<span class="stringliteral">&quot;Covariance&quot;</span>][<a class="code hl_variable" href="classcovarianceBase.html#a26618d3f5633b33ce20e38ce8261b3ee">matrixName</a>][<span class="stringliteral">&quot;UseExternalMatrix&quot;</span>], <span class="keyword">false</span>, __FILE__ , __LINE__)) {</div>
+<div class="line"><span class="lineno"> 1057</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Not using external matrix for {}, initialising adaption from scratch&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a26618d3f5633b33ce20e38ce8261b3ee">matrixName</a>);</div>
+<div class="line"><span class="lineno"> 1058</span>    <span class="comment">// If we don&#39;t have a covariance matrix to start from for adaptive tune we need to make one!</span></div>
+<div class="line"><span class="lineno"> 1059</span>    <a class="code hl_variable" href="classcovarianceBase.html#a838731abd6716940043b484b2b266f86">use_adaptive</a> = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno"> 1060</span>    <a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_function" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ad7df80045651df99c2d1c375fea4ac74">CreateNewAdaptiveCovariance</a>(<a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>);</div>
+<div class="line"><span class="lineno"> 1061</span>    <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno"> 1062</span>  }</div>
 <div class="line"><span class="lineno"> 1063</span> </div>
-<div class="line"><span class="lineno"> 1064</span>  <a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_function" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#aebd1df26766a9f106fe6ce4255ceb0d9">SetThrowMatrixFromFile</a>(external_file_name, external_matrix_name, external_mean_name, <a class="code hl_variable" href="classcovarianceBase.html#a838731abd6716940043b484b2b266f86">use_adaptive</a>, <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>);</div>
-<div class="line"><span class="lineno"> 1065</span>  <a class="code hl_function" href="classcovarianceBase.html#af30ca7861452e1446e55700f4b49b608">setThrowMatrix</a>(<a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#afd61e64f18f5c25dbbd6bb2bd619a268">adaptive_covariance</a>);</div>
-<div class="line"><span class="lineno"> 1066</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Successfully Set External Throw Matrix Stored in {}&quot;</span>, external_file_name);</div>
-<div class="line"><span class="lineno"> 1067</span>}</div>
+<div class="line"><span class="lineno"> 1064</span>  <span class="comment">// Finally, we accept that we want to read the matrix from a file!</span></div>
+<div class="line"><span class="lineno"> 1065</span>  <span class="keyword">auto</span> external_file_name = GetFromManager&lt;std::string&gt;(adapt_manager[<span class="stringliteral">&quot;AdaptionOptions&quot;</span>][<span class="stringliteral">&quot;Covariance&quot;</span>][<a class="code hl_variable" href="classcovarianceBase.html#a26618d3f5633b33ce20e38ce8261b3ee">matrixName</a>][<span class="stringliteral">&quot;ExternalMatrixFileName&quot;</span>], <span class="stringliteral">&quot;&quot;</span>, __FILE__ , __LINE__);</div>
+<div class="line"><span class="lineno"> 1066</span>  <span class="keyword">auto</span> external_matrix_name = GetFromManager&lt;std::string&gt;(adapt_manager[<span class="stringliteral">&quot;AdaptionOptions&quot;</span>][<span class="stringliteral">&quot;Covariance&quot;</span>][<a class="code hl_variable" href="classcovarianceBase.html#a26618d3f5633b33ce20e38ce8261b3ee">matrixName</a>][<span class="stringliteral">&quot;ExternalMatrixName&quot;</span>], <span class="stringliteral">&quot;&quot;</span>, __FILE__ , __LINE__);</div>
+<div class="line"><span class="lineno"> 1067</span>  <span class="keyword">auto</span> external_mean_name = GetFromManager&lt;std::string&gt;(adapt_manager[<span class="stringliteral">&quot;AdaptionOptions&quot;</span>][<span class="stringliteral">&quot;Covariance&quot;</span>][<a class="code hl_variable" href="classcovarianceBase.html#a26618d3f5633b33ce20e38ce8261b3ee">matrixName</a>][<span class="stringliteral">&quot;ExternalMeansName&quot;</span>], <span class="stringliteral">&quot;&quot;</span>, __FILE__ , __LINE__);</div>
+<div class="line"><span class="lineno"> 1068</span> </div>
+<div class="line"><span class="lineno"> 1069</span>  <a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_function" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#aebd1df26766a9f106fe6ce4255ceb0d9">SetThrowMatrixFromFile</a>(external_file_name, external_matrix_name, external_mean_name, <a class="code hl_variable" href="classcovarianceBase.html#a838731abd6716940043b484b2b266f86">use_adaptive</a>, <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>);</div>
+<div class="line"><span class="lineno"> 1070</span>  <a class="code hl_function" href="classcovarianceBase.html#af30ca7861452e1446e55700f4b49b608">setThrowMatrix</a>(<a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#afd61e64f18f5c25dbbd6bb2bd619a268">adaptive_covariance</a>);</div>
+<div class="line"><span class="lineno"> 1071</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Successfully Set External Throw Matrix Stored in {}&quot;</span>, external_file_name);</div>
+<div class="line"><span class="lineno"> 1072</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_ad5b2eb6377721e3ac95def22c2386bb1"><div class="ttname"><a href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a></div><div class="ttdeci">#define MACH3LOG_WARN</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00024">MaCh3Logger.h:24</a></div></div>
 <div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a192304475bc377ef975ef40d2bd2b254"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a192304475bc377ef975ef40d2bd2b254">adaptive_mcmc::AdaptiveMCMCHandler::InitFromConfig</a></div><div class="ttdeci">bool InitFromConfig(const YAML::Node &amp;adapt_manager, const std::string &amp;matrix_name_str, const int Npars)</div><div class="ttdoc">Read initial values from config file.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8cpp_source.html#l00027">AdaptiveMCMCHandler.cpp:27</a></div></div>
 <div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a5997a813faf68d891c62cbaf65984aca"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a5997a813faf68d891c62cbaf65984aca">adaptive_mcmc::AdaptiveMCMCHandler::Print</a></div><div class="ttdeci">void Print()</div><div class="ttdoc">Print all class members.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8cpp_source.html#l00303">AdaptiveMCMCHandler.cpp:303</a></div></div>
@@ -2728,7 +2733,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_aebd1df26766a9f106fe6ce4255ceb0d9"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#aebd1df26766a9f106fe6ce4255ceb0d9">adaptive_mcmc::AdaptiveMCMCHandler::SetThrowMatrixFromFile</a></div><div class="ttdeci">void SetThrowMatrixFromFile(const std::string &amp;matrix_file_name, const std::string &amp;matrix_name, const std::string &amp;means_name, bool &amp;use_adaptive, const int Npars)</div><div class="ttdoc">sets throw matrix from a file</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8cpp_source.html#l00177">AdaptiveMCMCHandler.cpp:177</a></div></div>
 <div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_afd61e64f18f5c25dbbd6bb2bd619a268"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#afd61e64f18f5c25dbbd6bb2bd619a268">adaptive_mcmc::AdaptiveMCMCHandler::adaptive_covariance</a></div><div class="ttdeci">TMatrixDSym * adaptive_covariance</div><div class="ttdoc">Full adaptive covariance matrix.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00097">AdaptiveMCMCHandler.h:97</a></div></div>
 <div class="ttc" id="aclasscovarianceBase_html_a261941a4c06e5d875174d8769a4d02f1"><div class="ttname"><a href="classcovarianceBase.html#a261941a4c06e5d875174d8769a4d02f1">covarianceBase::getNpars</a></div><div class="ttdeci">int getNpars()</div><div class="ttdoc">Get number of params which will be different depending if using Eigen decomposition or not.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00330">covarianceBase.h:330</a></div></div>
-<div class="ttc" id="aclasscovarianceBase_html_af30ca7861452e1446e55700f4b49b608"><div class="ttname"><a href="classcovarianceBase.html#af30ca7861452e1446e55700f4b49b608">covarianceBase::setThrowMatrix</a></div><div class="ttdeci">void setThrowMatrix(TMatrixDSym *cov)</div><div class="ttdoc">Use new throw matrix, used in adaptive MCMC.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l00989">covarianceBase.cpp:989</a></div></div>
+<div class="ttc" id="aclasscovarianceBase_html_af30ca7861452e1446e55700f4b49b608"><div class="ttname"><a href="classcovarianceBase.html#af30ca7861452e1446e55700f4b49b608">covarianceBase::setThrowMatrix</a></div><div class="ttdeci">void setThrowMatrix(TMatrixDSym *cov)</div><div class="ttdoc">Use new throw matrix, used in adaptive MCMC.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l00994">covarianceBase.cpp:994</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2796,17 +2801,17 @@ Kamil Skwarczynski </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00837">837</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  837</span>                                                                 {</div>
-<div class="line"><span class="lineno">  838</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  839</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt;<a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; ++i) {</div>
-<div class="line"><span class="lineno">  840</span>    <span class="keywordflow">if</span>(name == <a class="code hl_variable" href="classcovarianceBase.html#a973671386a2f8ea924f25f8f5404654c">_fFancyNames</a>[i]) {</div>
-<div class="line"><span class="lineno">  841</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="classcovarianceBase.html#a76cad7ebfd2ca8c4f1a8b69e0153436e">isParameterFixed</a>(i);</div>
-<div class="line"><span class="lineno">  842</span>    }</div>
-<div class="line"><span class="lineno">  843</span>  }</div>
-<div class="line"><span class="lineno">  844</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;I couldn&#39;t find parameter with name {}, therefore will not fix it&quot;</span>, name);</div>
-<div class="line"><span class="lineno">  845</span>  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">  846</span>}</div>
+<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00842">842</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  842</span>                                                                 {</div>
+<div class="line"><span class="lineno">  843</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  844</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt;<a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; ++i) {</div>
+<div class="line"><span class="lineno">  845</span>    <span class="keywordflow">if</span>(name == <a class="code hl_variable" href="classcovarianceBase.html#a973671386a2f8ea924f25f8f5404654c">_fFancyNames</a>[i]) {</div>
+<div class="line"><span class="lineno">  846</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="classcovarianceBase.html#a76cad7ebfd2ca8c4f1a8b69e0153436e">isParameterFixed</a>(i);</div>
+<div class="line"><span class="lineno">  847</span>    }</div>
+<div class="line"><span class="lineno">  848</span>  }</div>
+<div class="line"><span class="lineno">  849</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;I couldn&#39;t find parameter with name {}, therefore will not fix it&quot;</span>, name);</div>
+<div class="line"><span class="lineno">  850</span>  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  851</span>}</div>
 <div class="ttc" id="aclasscovarianceBase_html_a76cad7ebfd2ca8c4f1a8b69e0153436e"><div class="ttname"><a href="classcovarianceBase.html#a76cad7ebfd2ca8c4f1a8b69e0153436e">covarianceBase::isParameterFixed</a></div><div class="ttdeci">bool isParameterFixed(const int i) const</div><div class="ttdoc">Is parameter fixed or not.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00366">covarianceBase.h:366</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -2907,51 +2912,51 @@ Kamil Skwarczynski </dd></dl>
 
 <p>HW: Finds closest possible positive definite matrix in Frobenius Norm ||.||_frob Where ||X||_frob=sqrt[sum_ij(x_ij^2)] (basically just turns an n,n matrix into vector in n^2 space then does Euclidean norm) </p>
 
-<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l01104">1104</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 1104</span>                                                       {</div>
-<div class="line"><span class="lineno"> 1105</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno"> 1106</span>  <span class="comment">// Want to get cov&#39; = (cov_sym+cov_polar)/2</span></div>
-<div class="line"><span class="lineno"> 1107</span>  <span class="comment">// cov_sym=(cov+cov^T)/2</span></div>
-<div class="line"><span class="lineno"> 1108</span>  <span class="comment">// cov_polar-&gt; SVD cov to cov=USV^T then cov_polar=VSV^T</span></div>
-<div class="line"><span class="lineno"> 1109</span> </div>
-<div class="line"><span class="lineno"> 1110</span>  <span class="comment">//Get frob norm of cov</span></div>
-<div class="line"><span class="lineno"> 1111</span>  <span class="comment">//  Double_t cov_norm=cov-&gt;E2Norm();</span></div>
-<div class="line"><span class="lineno"> 1112</span>  </div>
-<div class="line"><span class="lineno"> 1113</span>  TMatrixDSym* cov_trans = cov;</div>
-<div class="line"><span class="lineno"> 1114</span>  cov_trans-&gt;T();</div>
-<div class="line"><span class="lineno"> 1115</span>  TMatrixDSym cov_sym = 0.5*(*cov+*cov_trans); <span class="comment">//If cov is symmetric does nothing, otherwise just ensures symmetry</span></div>
-<div class="line"><span class="lineno"> 1116</span> </div>
-<div class="line"><span class="lineno"> 1117</span>  <span class="comment">//Do SVD to get polar form</span></div>
-<div class="line"><span class="lineno"> 1118</span>  TDecompSVD cov_sym_svd=TDecompSVD(cov_sym);</div>
-<div class="line"><span class="lineno"> 1119</span>  <span class="keywordflow">if</span>(!cov_sym_svd.Decompose()){</div>
-<div class="line"><span class="lineno"> 1120</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Cannot do SVD on input matrix!&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1121</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><span class="lineno"> 1122</span>  }</div>
-<div class="line"><span class="lineno"> 1123</span>  </div>
-<div class="line"><span class="lineno"> 1124</span>  TMatrixD cov_sym_v = cov_sym_svd.GetV();</div>
-<div class="line"><span class="lineno"> 1125</span>  TMatrixD cov_sym_vt = cov_sym_v;</div>
-<div class="line"><span class="lineno"> 1126</span>  cov_sym_vt.T();</div>
-<div class="line"><span class="lineno"> 1127</span>  <span class="comment">//SVD returns as vector (grrr) so need to get into matrix form for multiplying!</span></div>
-<div class="line"><span class="lineno"> 1128</span>  TVectorD cov_sym_sigvect = cov_sym_svd.GetSig();</div>
-<div class="line"><span class="lineno"> 1129</span> </div>
-<div class="line"><span class="lineno"> 1130</span>  <span class="keyword">const</span> Int_t nCols = cov_sym_v.GetNcols(); <span class="comment">//square so only need rows hence lack of cols</span></div>
-<div class="line"><span class="lineno"> 1131</span>  TMatrixDSym cov_sym_sig(nCols);</div>
-<div class="line"><span class="lineno"> 1132</span>  TMatrixDDiag cov_sym_sig_diag(cov_sym_sig);</div>
-<div class="line"><span class="lineno"> 1133</span>  cov_sym_sig_diag=cov_sym_sigvect;</div>
+<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l01109">1109</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 1109</span>                                                       {</div>
+<div class="line"><span class="lineno"> 1110</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno"> 1111</span>  <span class="comment">// Want to get cov&#39; = (cov_sym+cov_polar)/2</span></div>
+<div class="line"><span class="lineno"> 1112</span>  <span class="comment">// cov_sym=(cov+cov^T)/2</span></div>
+<div class="line"><span class="lineno"> 1113</span>  <span class="comment">// cov_polar-&gt; SVD cov to cov=USV^T then cov_polar=VSV^T</span></div>
+<div class="line"><span class="lineno"> 1114</span> </div>
+<div class="line"><span class="lineno"> 1115</span>  <span class="comment">//Get frob norm of cov</span></div>
+<div class="line"><span class="lineno"> 1116</span>  <span class="comment">//  Double_t cov_norm=cov-&gt;E2Norm();</span></div>
+<div class="line"><span class="lineno"> 1117</span>  </div>
+<div class="line"><span class="lineno"> 1118</span>  TMatrixDSym* cov_trans = cov;</div>
+<div class="line"><span class="lineno"> 1119</span>  cov_trans-&gt;T();</div>
+<div class="line"><span class="lineno"> 1120</span>  TMatrixDSym cov_sym = 0.5*(*cov+*cov_trans); <span class="comment">//If cov is symmetric does nothing, otherwise just ensures symmetry</span></div>
+<div class="line"><span class="lineno"> 1121</span> </div>
+<div class="line"><span class="lineno"> 1122</span>  <span class="comment">//Do SVD to get polar form</span></div>
+<div class="line"><span class="lineno"> 1123</span>  TDecompSVD cov_sym_svd=TDecompSVD(cov_sym);</div>
+<div class="line"><span class="lineno"> 1124</span>  <span class="keywordflow">if</span>(!cov_sym_svd.Decompose()){</div>
+<div class="line"><span class="lineno"> 1125</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Cannot do SVD on input matrix!&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1126</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
+<div class="line"><span class="lineno"> 1127</span>  }</div>
+<div class="line"><span class="lineno"> 1128</span>  </div>
+<div class="line"><span class="lineno"> 1129</span>  TMatrixD cov_sym_v = cov_sym_svd.GetV();</div>
+<div class="line"><span class="lineno"> 1130</span>  TMatrixD cov_sym_vt = cov_sym_v;</div>
+<div class="line"><span class="lineno"> 1131</span>  cov_sym_vt.T();</div>
+<div class="line"><span class="lineno"> 1132</span>  <span class="comment">//SVD returns as vector (grrr) so need to get into matrix form for multiplying!</span></div>
+<div class="line"><span class="lineno"> 1133</span>  TVectorD cov_sym_sigvect = cov_sym_svd.GetSig();</div>
 <div class="line"><span class="lineno"> 1134</span> </div>
-<div class="line"><span class="lineno"> 1135</span>  <span class="comment">//Can finally get H=VSV</span></div>
-<div class="line"><span class="lineno"> 1136</span>  TMatrixDSym cov_sym_polar = cov_sym_sig.SimilarityT(cov_sym_vt);<span class="comment">//V*S*V^T (this took forver to find!)</span></div>
-<div class="line"><span class="lineno"> 1137</span>  </div>
-<div class="line"><span class="lineno"> 1138</span>  <span class="comment">//Now we can construct closest approximater Ahat=0.5*(B+H)</span></div>
-<div class="line"><span class="lineno"> 1139</span>  TMatrixDSym cov_closest_approx  = 0.5*(cov_sym+cov_sym_polar);<span class="comment">//Not fully sure why this is even needed since symmetric B -&gt; U=V</span></div>
-<div class="line"><span class="lineno"> 1140</span>  <span class="comment">//Get norm of transformed</span></div>
-<div class="line"><span class="lineno"> 1141</span>  <span class="comment">//  Double_t approx_norm=cov_closest_approx.E2Norm();</span></div>
-<div class="line"><span class="lineno"> 1142</span>  <span class="comment">//MACH3LOG_INFO(&quot;Initial Norm: {:.6f} | Norm after transformation: {:.6f} | Ratio: {:.6f}&quot;, cov_norm, approx_norm, cov_norm / approx_norm);</span></div>
-<div class="line"><span class="lineno"> 1143</span>  </div>
-<div class="line"><span class="lineno"> 1144</span>  *cov = cov_closest_approx;</div>
-<div class="line"><span class="lineno"> 1145</span>  <span class="comment">//Now can just add a makeposdef!</span></div>
-<div class="line"><span class="lineno"> 1146</span>  <a class="code hl_function" href="classcovarianceBase.html#ae2850c8e2f2d4acfe322b0ebe65b07cf">MakePosDef</a>(cov);</div>
-<div class="line"><span class="lineno"> 1147</span>}</div>
+<div class="line"><span class="lineno"> 1135</span>  <span class="keyword">const</span> Int_t nCols = cov_sym_v.GetNcols(); <span class="comment">//square so only need rows hence lack of cols</span></div>
+<div class="line"><span class="lineno"> 1136</span>  TMatrixDSym cov_sym_sig(nCols);</div>
+<div class="line"><span class="lineno"> 1137</span>  TMatrixDDiag cov_sym_sig_diag(cov_sym_sig);</div>
+<div class="line"><span class="lineno"> 1138</span>  cov_sym_sig_diag=cov_sym_sigvect;</div>
+<div class="line"><span class="lineno"> 1139</span> </div>
+<div class="line"><span class="lineno"> 1140</span>  <span class="comment">//Can finally get H=VSV</span></div>
+<div class="line"><span class="lineno"> 1141</span>  TMatrixDSym cov_sym_polar = cov_sym_sig.SimilarityT(cov_sym_vt);<span class="comment">//V*S*V^T (this took forver to find!)</span></div>
+<div class="line"><span class="lineno"> 1142</span>  </div>
+<div class="line"><span class="lineno"> 1143</span>  <span class="comment">//Now we can construct closest approximater Ahat=0.5*(B+H)</span></div>
+<div class="line"><span class="lineno"> 1144</span>  TMatrixDSym cov_closest_approx  = 0.5*(cov_sym+cov_sym_polar);<span class="comment">//Not fully sure why this is even needed since symmetric B -&gt; U=V</span></div>
+<div class="line"><span class="lineno"> 1145</span>  <span class="comment">//Get norm of transformed</span></div>
+<div class="line"><span class="lineno"> 1146</span>  <span class="comment">//  Double_t approx_norm=cov_closest_approx.E2Norm();</span></div>
+<div class="line"><span class="lineno"> 1147</span>  <span class="comment">//MACH3LOG_INFO(&quot;Initial Norm: {:.6f} | Norm after transformation: {:.6f} | Ratio: {:.6f}&quot;, cov_norm, approx_norm, cov_norm / approx_norm);</span></div>
+<div class="line"><span class="lineno"> 1148</span>  </div>
+<div class="line"><span class="lineno"> 1149</span>  *cov = cov_closest_approx;</div>
+<div class="line"><span class="lineno"> 1150</span>  <span class="comment">//Now can just add a makeposdef!</span></div>
+<div class="line"><span class="lineno"> 1151</span>  <a class="code hl_function" href="classcovarianceBase.html#ae2850c8e2f2d4acfe322b0ebe65b07cf">MakePosDef</a>(cov);</div>
+<div class="line"><span class="lineno"> 1152</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2987,51 +2992,51 @@ Kamil Skwarczynski </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00931">931</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  931</span>                                                {</div>
-<div class="line"><span class="lineno">  932</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  933</span>  <span class="keywordflow">if</span>(cov == <span class="keyword">nullptr</span>){</div>
-<div class="line"><span class="lineno">  934</span>    cov = &amp;*<a class="code hl_variable" href="classcovarianceBase.html#a6c3fe8db34c06299fd1633951ac00937">covMatrix</a>;</div>
-<div class="line"><span class="lineno">  935</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Passed nullptr to cov matrix in {}&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a26618d3f5633b33ce20e38ce8261b3ee">matrixName</a>);</div>
-<div class="line"><span class="lineno">  936</span>  }</div>
-<div class="line"><span class="lineno">  937</span> </div>
-<div class="line"><span class="lineno">  938</span>  <span class="comment">//DB Save original warning state and then increase it in this function to suppress &#39;matrix not positive definite&#39; messages</span></div>
-<div class="line"><span class="lineno">  939</span>  <span class="comment">//Means we no longer need to overload</span></div>
-<div class="line"><span class="lineno">  940</span>  <span class="keywordtype">int</span> originalErrorWarning = gErrorIgnoreLevel;</div>
-<div class="line"><span class="lineno">  941</span>  gErrorIgnoreLevel = kFatal;</div>
-<div class="line"><span class="lineno">  942</span>  </div>
-<div class="line"><span class="lineno">  943</span>  <span class="comment">//DB Loop 1000 times adding 1e-9 which tops out at 1e-6 shift on the diagonal before throwing error</span></div>
-<div class="line"><span class="lineno">  944</span>  <span class="keywordtype">int</span> MaxAttempts = 1e5;</div>
-<div class="line"><span class="lineno">  945</span>  <span class="keywordtype">int</span> iAttempt = 0;</div>
-<div class="line"><span class="lineno">  946</span>  <span class="keywordtype">bool</span> CanDecomp = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">  947</span>  TDecompChol chdcmp;</div>
-<div class="line"><span class="lineno">  948</span>  </div>
-<div class="line"><span class="lineno">  949</span>  <span class="keywordflow">for</span> (iAttempt = 0; iAttempt &lt; MaxAttempts; iAttempt++) {</div>
-<div class="line"><span class="lineno">  950</span>    chdcmp = TDecompChol(*cov);</div>
-<div class="line"><span class="lineno">  951</span>    <span class="keywordflow">if</span> (chdcmp.Decompose()) {</div>
-<div class="line"><span class="lineno">  952</span>      CanDecomp = <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno">  953</span>      <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  954</span>    } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  955</span><span class="preprocessor">      #ifdef MULTITHREAD</span></div>
-<div class="line"><span class="lineno">  956</span><span class="preprocessor">      #pragma omp parallel for</span></div>
-<div class="line"><span class="lineno">  957</span><span class="preprocessor">      #endif</span></div>
-<div class="line"><span class="lineno">  958</span>      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iVar = 0 ; iVar &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; iVar++) {</div>
-<div class="line"><span class="lineno">  959</span>        (*cov)(iVar,iVar) += pow(10, -9);</div>
-<div class="line"><span class="lineno">  960</span>      }</div>
-<div class="line"><span class="lineno">  961</span>    }</div>
-<div class="line"><span class="lineno">  962</span>  }</div>
-<div class="line"><span class="lineno">  963</span> </div>
-<div class="line"><span class="lineno">  964</span>  <span class="keywordflow">if</span> (!CanDecomp) {</div>
-<div class="line"><span class="lineno">  965</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Tried {} times to shift diagonal but still can not decompose the matrix&quot;</span>, MaxAttempts);</div>
-<div class="line"><span class="lineno">  966</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;This indicates that something is wrong with the input matrix&quot;</span>);</div>
-<div class="line"><span class="lineno">  967</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><span class="lineno">  968</span>  }</div>
-<div class="line"><span class="lineno">  969</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a> &lt; 2) {</div>
-<div class="line"><span class="lineno">  970</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Had to shift diagonal {} time(s) to allow the covariance matrix to be decomposed&quot;</span>, iAttempt);</div>
-<div class="line"><span class="lineno">  971</span>  }</div>
-<div class="line"><span class="lineno">  972</span>  <span class="comment">//DB Resetting warning level</span></div>
-<div class="line"><span class="lineno">  973</span>  gErrorIgnoreLevel = originalErrorWarning;</div>
-<div class="line"><span class="lineno">  974</span>}</div>
+<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00936">936</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  936</span>                                                {</div>
+<div class="line"><span class="lineno">  937</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  938</span>  <span class="keywordflow">if</span>(cov == <span class="keyword">nullptr</span>){</div>
+<div class="line"><span class="lineno">  939</span>    cov = &amp;*<a class="code hl_variable" href="classcovarianceBase.html#a6c3fe8db34c06299fd1633951ac00937">covMatrix</a>;</div>
+<div class="line"><span class="lineno">  940</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Passed nullptr to cov matrix in {}&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a26618d3f5633b33ce20e38ce8261b3ee">matrixName</a>);</div>
+<div class="line"><span class="lineno">  941</span>  }</div>
+<div class="line"><span class="lineno">  942</span> </div>
+<div class="line"><span class="lineno">  943</span>  <span class="comment">//DB Save original warning state and then increase it in this function to suppress &#39;matrix not positive definite&#39; messages</span></div>
+<div class="line"><span class="lineno">  944</span>  <span class="comment">//Means we no longer need to overload</span></div>
+<div class="line"><span class="lineno">  945</span>  <span class="keywordtype">int</span> originalErrorWarning = gErrorIgnoreLevel;</div>
+<div class="line"><span class="lineno">  946</span>  gErrorIgnoreLevel = kFatal;</div>
+<div class="line"><span class="lineno">  947</span>  </div>
+<div class="line"><span class="lineno">  948</span>  <span class="comment">//DB Loop 1000 times adding 1e-9 which tops out at 1e-6 shift on the diagonal before throwing error</span></div>
+<div class="line"><span class="lineno">  949</span>  <span class="keywordtype">int</span> MaxAttempts = 1e5;</div>
+<div class="line"><span class="lineno">  950</span>  <span class="keywordtype">int</span> iAttempt = 0;</div>
+<div class="line"><span class="lineno">  951</span>  <span class="keywordtype">bool</span> CanDecomp = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  952</span>  TDecompChol chdcmp;</div>
+<div class="line"><span class="lineno">  953</span>  </div>
+<div class="line"><span class="lineno">  954</span>  <span class="keywordflow">for</span> (iAttempt = 0; iAttempt &lt; MaxAttempts; iAttempt++) {</div>
+<div class="line"><span class="lineno">  955</span>    chdcmp = TDecompChol(*cov);</div>
+<div class="line"><span class="lineno">  956</span>    <span class="keywordflow">if</span> (chdcmp.Decompose()) {</div>
+<div class="line"><span class="lineno">  957</span>      CanDecomp = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  958</span>      <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  959</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  960</span><span class="preprocessor">      #ifdef MULTITHREAD</span></div>
+<div class="line"><span class="lineno">  961</span><span class="preprocessor">      #pragma omp parallel for</span></div>
+<div class="line"><span class="lineno">  962</span><span class="preprocessor">      #endif</span></div>
+<div class="line"><span class="lineno">  963</span>      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iVar = 0 ; iVar &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; iVar++) {</div>
+<div class="line"><span class="lineno">  964</span>        (*cov)(iVar,iVar) += pow(10, -9);</div>
+<div class="line"><span class="lineno">  965</span>      }</div>
+<div class="line"><span class="lineno">  966</span>    }</div>
+<div class="line"><span class="lineno">  967</span>  }</div>
+<div class="line"><span class="lineno">  968</span> </div>
+<div class="line"><span class="lineno">  969</span>  <span class="keywordflow">if</span> (!CanDecomp) {</div>
+<div class="line"><span class="lineno">  970</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Tried {} times to shift diagonal but still can not decompose the matrix&quot;</span>, MaxAttempts);</div>
+<div class="line"><span class="lineno">  971</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;This indicates that something is wrong with the input matrix&quot;</span>);</div>
+<div class="line"><span class="lineno">  972</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
+<div class="line"><span class="lineno">  973</span>  }</div>
+<div class="line"><span class="lineno">  974</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a> &lt; 2) {</div>
+<div class="line"><span class="lineno">  975</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Had to shift diagonal {} time(s) to allow the covariance matrix to be decomposed&quot;</span>, iAttempt);</div>
+<div class="line"><span class="lineno">  976</span>  }</div>
+<div class="line"><span class="lineno">  977</span>  <span class="comment">//DB Resetting warning level</span></div>
+<div class="line"><span class="lineno">  978</span>  gErrorIgnoreLevel = originalErrorWarning;</div>
+<div class="line"><span class="lineno">  979</span>}</div>
 <div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_ab2837af4566e2d62db7b76f9527fb6d7"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">adaptive_mcmc::AdaptiveMCMCHandler::total_steps</a></div><div class="ttdeci">int total_steps</div><div class="ttdoc">Total number of MCMC steps.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00100">AdaptiveMCMCHandler.h:100</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -3093,25 +3098,25 @@ Kamil Skwarczynski </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00869">869</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  869</span>                                                                                                                                                  {</div>
-<div class="line"><span class="lineno">  870</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  871</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
-<div class="line"><span class="lineno">  872</span><span class="preprocessor">  #pragma omp parallel for</span></div>
-<div class="line"><span class="lineno">  873</span><span class="preprocessor">  #endif</span></div>
-<div class="line"><span class="lineno">  874</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; n; ++i)</div>
-<div class="line"><span class="lineno">  875</span>  {</div>
-<div class="line"><span class="lineno">  876</span>    <span class="keywordtype">double</span> result = 0.0;</div>
-<div class="line"><span class="lineno">  877</span><span class="preprocessor">    #ifdef MULTITHREAD</span></div>
-<div class="line"><span class="lineno">  878</span><span class="preprocessor">    #pragma omp simd</span></div>
-<div class="line"><span class="lineno">  879</span><span class="preprocessor">    #endif</span></div>
-<div class="line"><span class="lineno">  880</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; n; ++j)</div>
-<div class="line"><span class="lineno">  881</span>    {</div>
-<div class="line"><span class="lineno">  882</span>      result += matrix[i][j]*vector[j];</div>
-<div class="line"><span class="lineno">  883</span>    }</div>
-<div class="line"><span class="lineno">  884</span>    VecMulti[i] = result;</div>
-<div class="line"><span class="lineno">  885</span>  }</div>
-<div class="line"><span class="lineno">  886</span>}</div>
+<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00874">874</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  874</span>                                                                                                                                                  {</div>
+<div class="line"><span class="lineno">  875</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  876</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
+<div class="line"><span class="lineno">  877</span><span class="preprocessor">  #pragma omp parallel for</span></div>
+<div class="line"><span class="lineno">  878</span><span class="preprocessor">  #endif</span></div>
+<div class="line"><span class="lineno">  879</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; n; ++i)</div>
+<div class="line"><span class="lineno">  880</span>  {</div>
+<div class="line"><span class="lineno">  881</span>    <span class="keywordtype">double</span> result = 0.0;</div>
+<div class="line"><span class="lineno">  882</span><span class="preprocessor">    #ifdef MULTITHREAD</span></div>
+<div class="line"><span class="lineno">  883</span><span class="preprocessor">    #pragma omp simd</span></div>
+<div class="line"><span class="lineno">  884</span><span class="preprocessor">    #endif</span></div>
+<div class="line"><span class="lineno">  885</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; n; ++j)</div>
+<div class="line"><span class="lineno">  886</span>    {</div>
+<div class="line"><span class="lineno">  887</span>      result += matrix[i][j]*vector[j];</div>
+<div class="line"><span class="lineno">  888</span>    }</div>
+<div class="line"><span class="lineno">  889</span>    VecMulti[i] = result;</div>
+<div class="line"><span class="lineno">  890</span>  }</div>
+<div class="line"><span class="lineno">  891</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3163,18 +3168,18 @@ Kamil Skwarczynski </dd></dl>
 
 <p>KS: Custom function to perform multiplication of matrix and single element which is thread safe. </p>
 
-<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00889">889</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  889</span>                                                                                                                                               {</div>
-<div class="line"><span class="lineno">  890</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  891</span>  <span class="keywordtype">double</span> Element = 0.0;</div>
-<div class="line"><span class="lineno">  892</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
-<div class="line"><span class="lineno">  893</span><span class="preprocessor">  #pragma omp simd</span></div>
-<div class="line"><span class="lineno">  894</span><span class="preprocessor">  #endif</span></div>
-<div class="line"><span class="lineno">  895</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; Length; ++j) {</div>
-<div class="line"><span class="lineno">  896</span>    Element += matrix[i][j]*vector[j];</div>
-<div class="line"><span class="lineno">  897</span>  }</div>
-<div class="line"><span class="lineno">  898</span>  <span class="keywordflow">return</span> Element;</div>
-<div class="line"><span class="lineno">  899</span>}</div>
+<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00894">894</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  894</span>                                                                                                                                               {</div>
+<div class="line"><span class="lineno">  895</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  896</span>  <span class="keywordtype">double</span> Element = 0.0;</div>
+<div class="line"><span class="lineno">  897</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
+<div class="line"><span class="lineno">  898</span><span class="preprocessor">  #pragma omp simd</span></div>
+<div class="line"><span class="lineno">  899</span><span class="preprocessor">  #endif</span></div>
+<div class="line"><span class="lineno">  900</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; Length; ++j) {</div>
+<div class="line"><span class="lineno">  901</span>    Element += matrix[i][j]*vector[j];</div>
+<div class="line"><span class="lineno">  902</span>  }</div>
+<div class="line"><span class="lineno">  903</span>  <span class="keywordflow">return</span> Element;</div>
+<div class="line"><span class="lineno">  904</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3195,16 +3200,16 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Print step scale for each parameter. </p>
 
-<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00919">919</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  919</span>                                               {</div>
-<div class="line"><span class="lineno">  920</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  921</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;============================================================&quot;</span>);</div>
-<div class="line"><span class="lineno">  922</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{:&lt;{}} | {:&lt;11}&quot;</span>, <span class="stringliteral">&quot;Parameter:&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a8d821ce805f2426fe95549170866821f">PrintLength</a>, <span class="stringliteral">&quot;Step scale:&quot;</span>);</div>
-<div class="line"><span class="lineno">  923</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iParam = 0; iParam &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; iParam++) {</div>
-<div class="line"><span class="lineno">  924</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{:&lt;{}} | {:&lt;11}&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a973671386a2f8ea924f25f8f5404654c">_fFancyNames</a>[iParam].c_str(), <a class="code hl_variable" href="classcovarianceBase.html#a8d821ce805f2426fe95549170866821f">PrintLength</a>, <a class="code hl_variable" href="classcovarianceBase.html#a3cda39026e336a49cef482efd4062561">_fIndivStepScale</a>[iParam]);</div>
-<div class="line"><span class="lineno">  925</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00924">924</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  924</span>                                               {</div>
+<div class="line"><span class="lineno">  925</span><span class="comment">// ********************************************</span></div>
 <div class="line"><span class="lineno">  926</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;============================================================&quot;</span>);</div>
-<div class="line"><span class="lineno">  927</span>}</div>
+<div class="line"><span class="lineno">  927</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{:&lt;{}} | {:&lt;11}&quot;</span>, <span class="stringliteral">&quot;Parameter:&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a8d821ce805f2426fe95549170866821f">PrintLength</a>, <span class="stringliteral">&quot;Step scale:&quot;</span>);</div>
+<div class="line"><span class="lineno">  928</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iParam = 0; iParam &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; iParam++) {</div>
+<div class="line"><span class="lineno">  929</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{:&lt;{}} | {:&lt;11}&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a973671386a2f8ea924f25f8f5404654c">_fFancyNames</a>[iParam].c_str(), <a class="code hl_variable" href="classcovarianceBase.html#a8d821ce805f2426fe95549170866821f">PrintLength</a>, <a class="code hl_variable" href="classcovarianceBase.html#a3cda39026e336a49cef482efd4062561">_fIndivStepScale</a>[iParam]);</div>
+<div class="line"><span class="lineno">  930</span>  }</div>
+<div class="line"><span class="lineno">  931</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;============================================================&quot;</span>);</div>
+<div class="line"><span class="lineno">  932</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3339,7 +3344,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  486</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classcovarianceBase.html#a838731abd6716940043b484b2b266f86">use_adaptive</a>) <a class="code hl_function" href="classcovarianceBase.html#a50ce8ebb96ebd64190dc37e4bf950a9b">updateAdaptiveCovariance</a>();</div>
 <div class="line"><span class="lineno">  487</span>}</div>
 <div class="ttc" id="aclasscovarianceBase_html_a044a1c9e5642d9f2f7e713999898a2f8"><div class="ttname"><a href="classcovarianceBase.html#a044a1c9e5642d9f2f7e713999898a2f8">covarianceBase::CorrelateSteps</a></div><div class="ttdeci">void CorrelateSteps() _noexcept_</div><div class="ttdoc">Use Cholesky throw matrix for better step proposal.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l00529">covarianceBase.cpp:529</a></div></div>
-<div class="ttc" id="aclasscovarianceBase_html_a50ce8ebb96ebd64190dc37e4bf950a9b"><div class="ttname"><a href="classcovarianceBase.html#a50ce8ebb96ebd64190dc37e4bf950a9b">covarianceBase::updateAdaptiveCovariance</a></div><div class="ttdeci">void updateAdaptiveCovariance()</div><div class="ttdoc">Method to update adaptive MCMC .</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l01071">covarianceBase.cpp:1071</a></div></div>
+<div class="ttc" id="aclasscovarianceBase_html_a50ce8ebb96ebd64190dc37e4bf950a9b"><div class="ttname"><a href="classcovarianceBase.html#a50ce8ebb96ebd64190dc37e4bf950a9b">covarianceBase::updateAdaptiveCovariance</a></div><div class="ttdeci">void updateAdaptiveCovariance()</div><div class="ttdoc">Method to update adaptive MCMC .</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l01076">covarianceBase.cpp:1076</a></div></div>
 <div class="ttc" id="aclasscovarianceBase_html_a8d58b8e8ac3b2a8f1c6867e8b6cd7ff8"><div class="ttname"><a href="classcovarianceBase.html#a8d58b8e8ac3b2a8f1c6867e8b6cd7ff8">covarianceBase::randomize</a></div><div class="ttdeci">void randomize() _noexcept_</div><div class="ttdoc">&quot;Randomize&quot; the parameters in the covariance class for the proposed step. Used the proposal kernel an...</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l00493">covarianceBase.cpp:493</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -3544,16 +3549,16 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Adaptive Step Tuning Stuff. </p>
 
-<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00977">977</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  977</span>                                         {</div>
-<div class="line"><span class="lineno">  978</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  979</span>  std::vector&lt;double&gt; stepScales(<a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>);</div>
-<div class="line"><span class="lineno">  980</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt;<a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; i++) {</div>
-<div class="line"><span class="lineno">  981</span>    stepScales[i] = 1.;</div>
-<div class="line"><span class="lineno">  982</span>  }</div>
-<div class="line"><span class="lineno">  983</span>  <a class="code hl_variable" href="classcovarianceBase.html#a0088413d6a15d12cd34ec06166302f5c">_fGlobalStepScale</a> = 1.0;</div>
-<div class="line"><span class="lineno">  984</span>  <a class="code hl_function" href="group__Setters.html#ga21b912b31c888a2bdae9145a0c10a614">setIndivStepScale</a>(stepScales);</div>
-<div class="line"><span class="lineno">  985</span>}</div>
+<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00982">982</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  982</span>                                         {</div>
+<div class="line"><span class="lineno">  983</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  984</span>  std::vector&lt;double&gt; stepScales(<a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>);</div>
+<div class="line"><span class="lineno">  985</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt;<a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; i++) {</div>
+<div class="line"><span class="lineno">  986</span>    stepScales[i] = 1.;</div>
+<div class="line"><span class="lineno">  987</span>  }</div>
+<div class="line"><span class="lineno">  988</span>  <a class="code hl_variable" href="classcovarianceBase.html#a0088413d6a15d12cd34ec06166302f5c">_fGlobalStepScale</a> = 1.0;</div>
+<div class="line"><span class="lineno">  989</span>  <a class="code hl_function" href="group__Setters.html#ga21b912b31c888a2bdae9145a0c10a614">setIndivStepScale</a>(stepScales);</div>
+<div class="line"><span class="lineno">  990</span>}</div>
 <div class="ttc" id="agroup__Setters_html_ga21b912b31c888a2bdae9145a0c10a614"><div class="ttname"><a href="group__Setters.html#ga21b912b31c888a2bdae9145a0c10a614">covarianceBase::setIndivStepScale</a></div><div class="ttdeci">void setIndivStepScale(const int ParameterIndex, const double StepScale)</div><div class="ttdoc">DB Function to set fIndivStepScale from a vector (Can be used from execs and inside covariance constr...</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00099">covarianceBase.h:99</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -3657,30 +3662,30 @@ Kamil Skwarczynski </dd></dl>
 
 <p>KS: After step scale, prefit etc. value were modified save this modified config. </p>
 
-<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l01190">1190</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 1190</span>                                             {</div>
-<div class="line"><span class="lineno"> 1191</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno"> 1192</span>  <span class="keywordflow">if</span> (!<a class="code hl_variable" href="classcovarianceBase.html#a933ff3dc0af99629ba3582a5d9d89d23">_fYAMLDoc</a>)</div>
-<div class="line"><span class="lineno"> 1193</span>  {</div>
-<div class="line"><span class="lineno"> 1194</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a>(<span class="stringliteral">&quot;Yaml node hasn&#39;t been initialised for matrix {}, something is not right&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a26618d3f5633b33ce20e38ce8261b3ee">matrixName</a>);</div>
-<div class="line"><span class="lineno"> 1195</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a>(<span class="stringliteral">&quot;I am not throwing error but should be investigated&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1196</span>    <span class="keywordflow">return</span>;</div>
-<div class="line"><span class="lineno"> 1197</span>  }</div>
-<div class="line"><span class="lineno"> 1198</span> </div>
-<div class="line"><span class="lineno"> 1199</span>  YAML::Node copyNode = <a class="code hl_variable" href="classcovarianceBase.html#a933ff3dc0af99629ba3582a5d9d89d23">_fYAMLDoc</a>;</div>
-<div class="line"><span class="lineno"> 1200</span>  <span class="keywordtype">int</span> i = 0;</div>
-<div class="line"><span class="lineno"> 1201</span> </div>
-<div class="line"><span class="lineno"> 1202</span>  <span class="keywordflow">for</span> (YAML::Node param : copyNode[<span class="stringliteral">&quot;Systematics&quot;</span>])</div>
-<div class="line"><span class="lineno"> 1203</span>  {</div>
-<div class="line"><span class="lineno"> 1204</span>    <span class="comment">//KS: Feel free to update it, if you need updated prefit value etc</span></div>
-<div class="line"><span class="lineno"> 1205</span>    param[<span class="stringliteral">&quot;Systematic&quot;</span>][<span class="stringliteral">&quot;StepScale&quot;</span>][<span class="stringliteral">&quot;MCMC&quot;</span>] = std::round(<a class="code hl_variable" href="classcovarianceBase.html#a3cda39026e336a49cef482efd4062561">_fIndivStepScale</a>[i] * 100.0) / 100.0; <span class="comment">// Round to 2 decimal places</span></div>
-<div class="line"><span class="lineno"> 1206</span>    i++;</div>
-<div class="line"><span class="lineno"> 1207</span>  }</div>
-<div class="line"><span class="lineno"> 1208</span>  <span class="comment">// Save the modified node to a file</span></div>
-<div class="line"><span class="lineno"> 1209</span>  std::ofstream fout(<span class="stringliteral">&quot;Modified_Matrix.yaml&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1210</span>  fout &lt;&lt; copyNode;</div>
-<div class="line"><span class="lineno"> 1211</span>  fout.close();</div>
-<div class="line"><span class="lineno"> 1212</span>}</div>
+<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l01195">1195</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 1195</span>                                             {</div>
+<div class="line"><span class="lineno"> 1196</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno"> 1197</span>  <span class="keywordflow">if</span> (!<a class="code hl_variable" href="classcovarianceBase.html#a933ff3dc0af99629ba3582a5d9d89d23">_fYAMLDoc</a>)</div>
+<div class="line"><span class="lineno"> 1198</span>  {</div>
+<div class="line"><span class="lineno"> 1199</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a>(<span class="stringliteral">&quot;Yaml node hasn&#39;t been initialised for matrix {}, something is not right&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a26618d3f5633b33ce20e38ce8261b3ee">matrixName</a>);</div>
+<div class="line"><span class="lineno"> 1200</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a>(<span class="stringliteral">&quot;I am not throwing error but should be investigated&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1201</span>    <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno"> 1202</span>  }</div>
+<div class="line"><span class="lineno"> 1203</span> </div>
+<div class="line"><span class="lineno"> 1204</span>  YAML::Node copyNode = <a class="code hl_variable" href="classcovarianceBase.html#a933ff3dc0af99629ba3582a5d9d89d23">_fYAMLDoc</a>;</div>
+<div class="line"><span class="lineno"> 1205</span>  <span class="keywordtype">int</span> i = 0;</div>
+<div class="line"><span class="lineno"> 1206</span> </div>
+<div class="line"><span class="lineno"> 1207</span>  <span class="keywordflow">for</span> (YAML::Node param : copyNode[<span class="stringliteral">&quot;Systematics&quot;</span>])</div>
+<div class="line"><span class="lineno"> 1208</span>  {</div>
+<div class="line"><span class="lineno"> 1209</span>    <span class="comment">//KS: Feel free to update it, if you need updated prefit value etc</span></div>
+<div class="line"><span class="lineno"> 1210</span>    param[<span class="stringliteral">&quot;Systematic&quot;</span>][<span class="stringliteral">&quot;StepScale&quot;</span>][<span class="stringliteral">&quot;MCMC&quot;</span>] = std::round(<a class="code hl_variable" href="classcovarianceBase.html#a3cda39026e336a49cef482efd4062561">_fIndivStepScale</a>[i] * 100.0) / 100.0; <span class="comment">// Round to 2 decimal places</span></div>
+<div class="line"><span class="lineno"> 1211</span>    i++;</div>
+<div class="line"><span class="lineno"> 1212</span>  }</div>
+<div class="line"><span class="lineno"> 1213</span>  <span class="comment">// Save the modified node to a file</span></div>
+<div class="line"><span class="lineno"> 1214</span>  std::ofstream fout(<span class="stringliteral">&quot;Modified_Matrix.yaml&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1215</span>  fout &lt;&lt; copyNode;</div>
+<div class="line"><span class="lineno"> 1216</span>  fout.close();</div>
+<div class="line"><span class="lineno"> 1217</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3747,7 +3752,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  185</span>    <span class="keywordflow">if</span>(<a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_function" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a39a099e5712cf605190a53a4355c700c">AdaptionUpdate</a>()) <a class="code hl_function" href="classcovarianceBase.html#a0993a1ea6c5b06ba834e9e70af87ee9e">resetIndivStepScale</a>();</div>
 <div class="line"><span class="lineno">  186</span>  }</div>
 <div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a39a099e5712cf605190a53a4355c700c"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a39a099e5712cf605190a53a4355c700c">adaptive_mcmc::AdaptiveMCMCHandler::AdaptionUpdate</a></div><div class="ttdeci">bool AdaptionUpdate()</div><div class="ttdoc">To be fair not a clue...</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8cpp_source.html#l00296">AdaptiveMCMCHandler.cpp:296</a></div></div>
-<div class="ttc" id="aclasscovarianceBase_html_a0993a1ea6c5b06ba834e9e70af87ee9e"><div class="ttname"><a href="classcovarianceBase.html#a0993a1ea6c5b06ba834e9e70af87ee9e">covarianceBase::resetIndivStepScale</a></div><div class="ttdeci">void resetIndivStepScale()</div><div class="ttdoc">Adaptive Step Tuning Stuff.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l00977">covarianceBase.cpp:977</a></div></div>
+<div class="ttc" id="aclasscovarianceBase_html_a0993a1ea6c5b06ba834e9e70af87ee9e"><div class="ttname"><a href="classcovarianceBase.html#a0993a1ea6c5b06ba834e9e70af87ee9e">covarianceBase::resetIndivStepScale</a></div><div class="ttdeci">void resetIndivStepScale()</div><div class="ttdoc">Adaptive Step Tuning Stuff.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l00982">covarianceBase.cpp:982</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3924,48 +3929,48 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Use new throw matrix, used in adaptive MCMC. </p>
 
-<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00989">989</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  989</span>                                                   {</div>
-<div class="line"><span class="lineno">  990</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  991</span>   <span class="keywordflow">if</span> (cov == <span class="keyword">nullptr</span>) {</div>
-<div class="line"><span class="lineno">  992</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Could not find covariance matrix you provided to setThrowMatrix&quot;</span>);</div>
-<div class="line"><span class="lineno">  993</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><span class="lineno">  994</span>  }</div>
-<div class="line"><span class="lineno">  995</span> </div>
-<div class="line"><span class="lineno">  996</span>  <span class="keywordflow">if</span> (<a class="code hl_variable" href="classcovarianceBase.html#a6c3fe8db34c06299fd1633951ac00937">covMatrix</a>-&gt;GetNrows() != cov-&gt;GetNrows()) {</div>
-<div class="line"><span class="lineno">  997</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Matrix given for throw Matrix is not the same size as the covariance matrix stored in object!&quot;</span>);</div>
-<div class="line"><span class="lineno">  998</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Stored covariance matrix size: {}&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a6c3fe8db34c06299fd1633951ac00937">covMatrix</a>-&gt;GetNrows());</div>
-<div class="line"><span class="lineno">  999</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Given matrix size: {}&quot;</span>, cov-&gt;GetNrows());</div>
-<div class="line"><span class="lineno"> 1000</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><span class="lineno"> 1001</span>  }</div>
-<div class="line"><span class="lineno"> 1002</span> </div>
-<div class="line"><span class="lineno"> 1003</span>  <a class="code hl_variable" href="classcovarianceBase.html#a6cb3d0b4096fbb55b040f70cd5b6e32b">throwMatrix</a> = <span class="keyword">static_cast&lt;</span>TMatrixDSym*<span class="keyword">&gt;</span>(cov-&gt;Clone());</div>
-<div class="line"><span class="lineno"> 1004</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classcovarianceBase.html#a838731abd6716940043b484b2b266f86">use_adaptive</a> &amp;&amp; <a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_function" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a39a099e5712cf605190a53a4355c700c">AdaptionUpdate</a>()) <a class="code hl_function" href="classcovarianceBase.html#a8a709e1c6c58618cf65400eef1741cc7">makeClosestPosDef</a>(<a class="code hl_variable" href="classcovarianceBase.html#a6cb3d0b4096fbb55b040f70cd5b6e32b">throwMatrix</a>);</div>
-<div class="line"><span class="lineno"> 1005</span>  <span class="keywordflow">else</span> <a class="code hl_function" href="classcovarianceBase.html#ae2850c8e2f2d4acfe322b0ebe65b07cf">MakePosDef</a>(<a class="code hl_variable" href="classcovarianceBase.html#a6cb3d0b4096fbb55b040f70cd5b6e32b">throwMatrix</a>);</div>
-<div class="line"><span class="lineno"> 1006</span>  </div>
-<div class="line"><span class="lineno"> 1007</span>  TDecompChol TDecompChol_throwMatrix(*<a class="code hl_variable" href="classcovarianceBase.html#a6cb3d0b4096fbb55b040f70cd5b6e32b">throwMatrix</a>);</div>
-<div class="line"><span class="lineno"> 1008</span>  </div>
-<div class="line"><span class="lineno"> 1009</span>  <span class="keywordflow">if</span>(!TDecompChol_throwMatrix.Decompose()) {</div>
-<div class="line"><span class="lineno"> 1010</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Cholesky decomposition failed for {} trying to make positive definite&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a26618d3f5633b33ce20e38ce8261b3ee">matrixName</a>);</div>
-<div class="line"><span class="lineno"> 1011</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><span class="lineno"> 1012</span>  }</div>
-<div class="line"><span class="lineno"> 1013</span> </div>
-<div class="line"><span class="lineno"> 1014</span>  <a class="code hl_variable" href="classcovarianceBase.html#ab95f5e066c2dfb1d20d120bc6c85dda2">throwMatrix_CholDecomp</a> = <span class="keyword">new</span> TMatrixD(TDecompChol_throwMatrix.GetU());</div>
-<div class="line"><span class="lineno"> 1015</span>  <a class="code hl_variable" href="classcovarianceBase.html#ab95f5e066c2dfb1d20d120bc6c85dda2">throwMatrix_CholDecomp</a>-&gt;T();</div>
-<div class="line"><span class="lineno"> 1016</span> </div>
-<div class="line"><span class="lineno"> 1017</span>  <span class="comment">//KS: ROOT has bad memory management, using standard double means we can decrease most operation by factor 2 simply due to cache hits</span></div>
-<div class="line"><span class="lineno"> 1018</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
-<div class="line"><span class="lineno"> 1019</span><span class="preprocessor">  #pragma omp parallel for collapse(2)</span></div>
-<div class="line"><span class="lineno"> 1020</span><span class="preprocessor">  #endif</span></div>
-<div class="line"><span class="lineno"> 1021</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; ++i)</div>
-<div class="line"><span class="lineno"> 1022</span>  {</div>
-<div class="line"><span class="lineno"> 1023</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; ++j)</div>
-<div class="line"><span class="lineno"> 1024</span>    {</div>
-<div class="line"><span class="lineno"> 1025</span>      <a class="code hl_variable" href="classcovarianceBase.html#aca17e48a5fa8e353317d58c205fb89df">throwMatrixCholDecomp</a>[i][j] = (*throwMatrix_CholDecomp)(i,j);</div>
-<div class="line"><span class="lineno"> 1026</span>    }</div>
-<div class="line"><span class="lineno"> 1027</span>  }</div>
-<div class="line"><span class="lineno"> 1028</span>}</div>
-<div class="ttc" id="aclasscovarianceBase_html_a8a709e1c6c58618cf65400eef1741cc7"><div class="ttname"><a href="classcovarianceBase.html#a8a709e1c6c58618cf65400eef1741cc7">covarianceBase::makeClosestPosDef</a></div><div class="ttdeci">void makeClosestPosDef(TMatrixDSym *cov)</div><div class="ttdoc">HW: Finds closest possible positive definite matrix in Frobenius Norm ||.||_frob Where ||X||_frob=sqr...</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l01104">covarianceBase.cpp:1104</a></div></div>
+<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00994">994</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  994</span>                                                   {</div>
+<div class="line"><span class="lineno">  995</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  996</span>   <span class="keywordflow">if</span> (cov == <span class="keyword">nullptr</span>) {</div>
+<div class="line"><span class="lineno">  997</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Could not find covariance matrix you provided to setThrowMatrix&quot;</span>);</div>
+<div class="line"><span class="lineno">  998</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
+<div class="line"><span class="lineno">  999</span>  }</div>
+<div class="line"><span class="lineno"> 1000</span> </div>
+<div class="line"><span class="lineno"> 1001</span>  <span class="keywordflow">if</span> (<a class="code hl_variable" href="classcovarianceBase.html#a6c3fe8db34c06299fd1633951ac00937">covMatrix</a>-&gt;GetNrows() != cov-&gt;GetNrows()) {</div>
+<div class="line"><span class="lineno"> 1002</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Matrix given for throw Matrix is not the same size as the covariance matrix stored in object!&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1003</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Stored covariance matrix size: {}&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a6c3fe8db34c06299fd1633951ac00937">covMatrix</a>-&gt;GetNrows());</div>
+<div class="line"><span class="lineno"> 1004</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Given matrix size: {}&quot;</span>, cov-&gt;GetNrows());</div>
+<div class="line"><span class="lineno"> 1005</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
+<div class="line"><span class="lineno"> 1006</span>  }</div>
+<div class="line"><span class="lineno"> 1007</span> </div>
+<div class="line"><span class="lineno"> 1008</span>  <a class="code hl_variable" href="classcovarianceBase.html#a6cb3d0b4096fbb55b040f70cd5b6e32b">throwMatrix</a> = <span class="keyword">static_cast&lt;</span>TMatrixDSym*<span class="keyword">&gt;</span>(cov-&gt;Clone());</div>
+<div class="line"><span class="lineno"> 1009</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classcovarianceBase.html#a838731abd6716940043b484b2b266f86">use_adaptive</a> &amp;&amp; <a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_function" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a39a099e5712cf605190a53a4355c700c">AdaptionUpdate</a>()) <a class="code hl_function" href="classcovarianceBase.html#a8a709e1c6c58618cf65400eef1741cc7">makeClosestPosDef</a>(<a class="code hl_variable" href="classcovarianceBase.html#a6cb3d0b4096fbb55b040f70cd5b6e32b">throwMatrix</a>);</div>
+<div class="line"><span class="lineno"> 1010</span>  <span class="keywordflow">else</span> <a class="code hl_function" href="classcovarianceBase.html#ae2850c8e2f2d4acfe322b0ebe65b07cf">MakePosDef</a>(<a class="code hl_variable" href="classcovarianceBase.html#a6cb3d0b4096fbb55b040f70cd5b6e32b">throwMatrix</a>);</div>
+<div class="line"><span class="lineno"> 1011</span>  </div>
+<div class="line"><span class="lineno"> 1012</span>  TDecompChol TDecompChol_throwMatrix(*<a class="code hl_variable" href="classcovarianceBase.html#a6cb3d0b4096fbb55b040f70cd5b6e32b">throwMatrix</a>);</div>
+<div class="line"><span class="lineno"> 1013</span>  </div>
+<div class="line"><span class="lineno"> 1014</span>  <span class="keywordflow">if</span>(!TDecompChol_throwMatrix.Decompose()) {</div>
+<div class="line"><span class="lineno"> 1015</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Cholesky decomposition failed for {} trying to make positive definite&quot;</span>, <a class="code hl_variable" href="classcovarianceBase.html#a26618d3f5633b33ce20e38ce8261b3ee">matrixName</a>);</div>
+<div class="line"><span class="lineno"> 1016</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
+<div class="line"><span class="lineno"> 1017</span>  }</div>
+<div class="line"><span class="lineno"> 1018</span> </div>
+<div class="line"><span class="lineno"> 1019</span>  <a class="code hl_variable" href="classcovarianceBase.html#ab95f5e066c2dfb1d20d120bc6c85dda2">throwMatrix_CholDecomp</a> = <span class="keyword">new</span> TMatrixD(TDecompChol_throwMatrix.GetU());</div>
+<div class="line"><span class="lineno"> 1020</span>  <a class="code hl_variable" href="classcovarianceBase.html#ab95f5e066c2dfb1d20d120bc6c85dda2">throwMatrix_CholDecomp</a>-&gt;T();</div>
+<div class="line"><span class="lineno"> 1021</span> </div>
+<div class="line"><span class="lineno"> 1022</span>  <span class="comment">//KS: ROOT has bad memory management, using standard double means we can decrease most operation by factor 2 simply due to cache hits</span></div>
+<div class="line"><span class="lineno"> 1023</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
+<div class="line"><span class="lineno"> 1024</span><span class="preprocessor">  #pragma omp parallel for collapse(2)</span></div>
+<div class="line"><span class="lineno"> 1025</span><span class="preprocessor">  #endif</span></div>
+<div class="line"><span class="lineno"> 1026</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; ++i)</div>
+<div class="line"><span class="lineno"> 1027</span>  {</div>
+<div class="line"><span class="lineno"> 1028</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; ++j)</div>
+<div class="line"><span class="lineno"> 1029</span>    {</div>
+<div class="line"><span class="lineno"> 1030</span>      <a class="code hl_variable" href="classcovarianceBase.html#aca17e48a5fa8e353317d58c205fb89df">throwMatrixCholDecomp</a>[i][j] = (*throwMatrix_CholDecomp)(i,j);</div>
+<div class="line"><span class="lineno"> 1031</span>    }</div>
+<div class="line"><span class="lineno"> 1032</span>  }</div>
+<div class="line"><span class="lineno"> 1033</span>}</div>
+<div class="ttc" id="aclasscovarianceBase_html_a8a709e1c6c58618cf65400eef1741cc7"><div class="ttname"><a href="classcovarianceBase.html#a8a709e1c6c58618cf65400eef1741cc7">covarianceBase::makeClosestPosDef</a></div><div class="ttdeci">void makeClosestPosDef(TMatrixDSym *cov)</div><div class="ttdoc">HW: Finds closest possible positive definite matrix in Frobenius Norm ||.||_frob Where ||X||_frob=sqr...</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l01109">covarianceBase.cpp:1109</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -4088,7 +4093,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  418</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
 <div class="line"><span class="lineno">  419</span>  }</div>
 <div class="line"><span class="lineno">  420</span>}</div>
-<div class="ttc" id="aclasscovarianceBase_html_a29d3a7af51740c17ae5002b579923446"><div class="ttname"><a href="classcovarianceBase.html#a29d3a7af51740c17ae5002b579923446">covarianceBase::MatrixVectorMultiSingle</a></div><div class="ttdeci">double MatrixVectorMultiSingle(double **_restrict_ matrix, const double *_restrict_ vector, const int Length, const int i) const</div><div class="ttdoc">KS: Custom function to perform multiplication of matrix and single element which is thread safe.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l00889">covarianceBase.cpp:889</a></div></div>
+<div class="ttc" id="aclasscovarianceBase_html_a29d3a7af51740c17ae5002b579923446"><div class="ttname"><a href="classcovarianceBase.html#a29d3a7af51740c17ae5002b579923446">covarianceBase::MatrixVectorMultiSingle</a></div><div class="ttdeci">double MatrixVectorMultiSingle(double **_restrict_ matrix, const double *_restrict_ vector, const int Length, const int i) const</div><div class="ttdoc">KS: Custom function to perform multiplication of matrix and single element which is thread safe.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l00894">covarianceBase.cpp:894</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -4205,16 +4210,16 @@ Kamil Skwarczynski </dd></dl>
 
 <p>fix parameters at prior values </p>
 
-<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00787">787</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  787</span>                                            {</div>
-<div class="line"><span class="lineno">  788</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  789</span>  <span class="comment">// fix or unfix all parameters by multiplying by -1</span></div>
-<div class="line"><span class="lineno">  790</span>  <span class="keywordflow">if</span>(!<a class="code hl_variable" href="classcovarianceBase.html#ab4b7f96d3e977a0b3307ceecbd0baeb4">pca</a>) {</div>
-<div class="line"><span class="lineno">  791</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; i++) <a class="code hl_variable" href="classcovarianceBase.html#a34f877fc160b4a93a3aab1b3a8977858">_fError</a>[i] *= -1.0;</div>
-<div class="line"><span class="lineno">  792</span>  } <span class="keywordflow">else</span>{</div>
-<div class="line"><span class="lineno">  793</span>     <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac57285a48d41ef764b4c659959a36c2d">_fNumParPCA</a>; i++) <a class="code hl_variable" href="classcovarianceBase.html#acb8262289fb5a37e849def35c04d6165">PCAObj</a>-&gt;fParSigma_PCA[i] *= -1.0;</div>
-<div class="line"><span class="lineno">  794</span>  }</div>
-<div class="line"><span class="lineno">  795</span>}</div>
+<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00792">792</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  792</span>                                            {</div>
+<div class="line"><span class="lineno">  793</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  794</span>  <span class="comment">// fix or unfix all parameters by multiplying by -1</span></div>
+<div class="line"><span class="lineno">  795</span>  <span class="keywordflow">if</span>(!<a class="code hl_variable" href="classcovarianceBase.html#ab4b7f96d3e977a0b3307ceecbd0baeb4">pca</a>) {</div>
+<div class="line"><span class="lineno">  796</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; i++) <a class="code hl_variable" href="classcovarianceBase.html#a34f877fc160b4a93a3aab1b3a8977858">_fError</a>[i] *= -1.0;</div>
+<div class="line"><span class="lineno">  797</span>  } <span class="keywordflow">else</span>{</div>
+<div class="line"><span class="lineno">  798</span>     <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac57285a48d41ef764b4c659959a36c2d">_fNumParPCA</a>; i++) <a class="code hl_variable" href="classcovarianceBase.html#acb8262289fb5a37e849def35c04d6165">PCAObj</a>-&gt;fParSigma_PCA[i] *= -1.0;</div>
+<div class="line"><span class="lineno">  799</span>  }</div>
+<div class="line"><span class="lineno">  800</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -4242,32 +4247,32 @@ Kamil Skwarczynski </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00798">798</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  798</span>                                                   {</div>
-<div class="line"><span class="lineno">  799</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  800</span>  <span class="keywordflow">if</span>(!<a class="code hl_variable" href="classcovarianceBase.html#ab4b7f96d3e977a0b3307ceecbd0baeb4">pca</a>) {</div>
-<div class="line"><span class="lineno">  801</span>    <span class="keywordflow">if</span> (i &gt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>) {</div>
-<div class="line"><span class="lineno">  802</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Can&#39;t toggleFixParameter for parameter {} because size of covariance ={}&quot;</span>, i, <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>);</div>
-<div class="line"><span class="lineno">  803</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Fix this in your config file please!&quot;</span>);</div>
-<div class="line"><span class="lineno">  804</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><span class="lineno">  805</span>    } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  806</span>      <a class="code hl_variable" href="classcovarianceBase.html#a34f877fc160b4a93a3aab1b3a8977858">_fError</a>[i] *= -1.0;</div>
-<div class="line"><span class="lineno">  807</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Setting {}(parameter {}) to fixed at {}&quot;</span>, <a class="code hl_function" href="group__Setters.html#ga295f5fe63911d4c704b73e0b0c8c7971">GetParFancyName</a>(i), i, <a class="code hl_variable" href="classcovarianceBase.html#ae70f51df3976975b2dc78fd3bfc28b65">_fCurrVal</a>[i]);</div>
-<div class="line"><span class="lineno">  808</span>    }</div>
-<div class="line"><span class="lineno">  809</span>  } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  810</span>    <span class="keywordtype">int</span> isDecom = -1;</div>
-<div class="line"><span class="lineno">  811</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> im = 0; im &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac57285a48d41ef764b4c659959a36c2d">_fNumParPCA</a>; ++im) {</div>
-<div class="line"><span class="lineno">  812</span>      <span class="keywordflow">if</span>(<a class="code hl_variable" href="classcovarianceBase.html#acb8262289fb5a37e849def35c04d6165">PCAObj</a>-&gt;isDecomposed_PCA[im] == i) {isDecom = im;}</div>
+<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00803">803</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  803</span>                                                   {</div>
+<div class="line"><span class="lineno">  804</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  805</span>  <span class="keywordflow">if</span>(!<a class="code hl_variable" href="classcovarianceBase.html#ab4b7f96d3e977a0b3307ceecbd0baeb4">pca</a>) {</div>
+<div class="line"><span class="lineno">  806</span>    <span class="keywordflow">if</span> (i &gt; <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>) {</div>
+<div class="line"><span class="lineno">  807</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Can&#39;t toggleFixParameter for parameter {} because size of covariance ={}&quot;</span>, i, <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>);</div>
+<div class="line"><span class="lineno">  808</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Fix this in your config file please!&quot;</span>);</div>
+<div class="line"><span class="lineno">  809</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
+<div class="line"><span class="lineno">  810</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  811</span>      <a class="code hl_variable" href="classcovarianceBase.html#a34f877fc160b4a93a3aab1b3a8977858">_fError</a>[i] *= -1.0;</div>
+<div class="line"><span class="lineno">  812</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Setting {}(parameter {}) to fixed at {}&quot;</span>, <a class="code hl_function" href="group__Setters.html#ga295f5fe63911d4c704b73e0b0c8c7971">GetParFancyName</a>(i), i, <a class="code hl_variable" href="classcovarianceBase.html#ae70f51df3976975b2dc78fd3bfc28b65">_fCurrVal</a>[i]);</div>
 <div class="line"><span class="lineno">  813</span>    }</div>
-<div class="line"><span class="lineno">  814</span>    <span class="keywordflow">if</span>(isDecom &lt; 0) {</div>
-<div class="line"><span class="lineno">  815</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Parameter {} is PCA decomposed can&#39;t fix this&quot;</span>, <a class="code hl_function" href="group__Setters.html#gab4ac97e0e881db5ca0f28cdeba39e228">GetParName</a>(i));</div>
-<div class="line"><span class="lineno">  816</span>      <span class="comment">//throw MaCh3Exception(__FILE__ , __LINE__ );</span></div>
-<div class="line"><span class="lineno">  817</span>    } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  818</span>      <a class="code hl_variable" href="classcovarianceBase.html#acb8262289fb5a37e849def35c04d6165">PCAObj</a>-&gt;fParSigma_PCA[isDecom] *= -1.0;</div>
-<div class="line"><span class="lineno">  819</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Setting un-decomposed {}(parameter {}/{} in PCA base) to fixed at {}&quot;</span>, <a class="code hl_function" href="group__Setters.html#gab4ac97e0e881db5ca0f28cdeba39e228">GetParName</a>(i), i, isDecom, <a class="code hl_variable" href="classcovarianceBase.html#ae70f51df3976975b2dc78fd3bfc28b65">_fCurrVal</a>[i]);</div>
-<div class="line"><span class="lineno">  820</span>    }</div>
-<div class="line"><span class="lineno">  821</span>  }</div>
-<div class="line"><span class="lineno">  822</span>}</div>
+<div class="line"><span class="lineno">  814</span>  } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  815</span>    <span class="keywordtype">int</span> isDecom = -1;</div>
+<div class="line"><span class="lineno">  816</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> im = 0; im &lt; <a class="code hl_variable" href="classcovarianceBase.html#ac57285a48d41ef764b4c659959a36c2d">_fNumParPCA</a>; ++im) {</div>
+<div class="line"><span class="lineno">  817</span>      <span class="keywordflow">if</span>(<a class="code hl_variable" href="classcovarianceBase.html#acb8262289fb5a37e849def35c04d6165">PCAObj</a>-&gt;isDecomposed_PCA[im] == i) {isDecom = im;}</div>
+<div class="line"><span class="lineno">  818</span>    }</div>
+<div class="line"><span class="lineno">  819</span>    <span class="keywordflow">if</span>(isDecom &lt; 0) {</div>
+<div class="line"><span class="lineno">  820</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Parameter {} is PCA decomposed can&#39;t fix this&quot;</span>, <a class="code hl_function" href="group__Setters.html#gab4ac97e0e881db5ca0f28cdeba39e228">GetParName</a>(i));</div>
+<div class="line"><span class="lineno">  821</span>      <span class="comment">//throw MaCh3Exception(__FILE__ , __LINE__ );</span></div>
+<div class="line"><span class="lineno">  822</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  823</span>      <a class="code hl_variable" href="classcovarianceBase.html#acb8262289fb5a37e849def35c04d6165">PCAObj</a>-&gt;fParSigma_PCA[isDecom] *= -1.0;</div>
+<div class="line"><span class="lineno">  824</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Setting un-decomposed {}(parameter {}/{} in PCA base) to fixed at {}&quot;</span>, <a class="code hl_function" href="group__Setters.html#gab4ac97e0e881db5ca0f28cdeba39e228">GetParName</a>(i), i, isDecom, <a class="code hl_variable" href="classcovarianceBase.html#ae70f51df3976975b2dc78fd3bfc28b65">_fCurrVal</a>[i]);</div>
+<div class="line"><span class="lineno">  825</span>    }</div>
+<div class="line"><span class="lineno">  826</span>  }</div>
+<div class="line"><span class="lineno">  827</span>}</div>
 <div class="ttc" id="agroup__Setters_html_gab4ac97e0e881db5ca0f28cdeba39e228"><div class="ttname"><a href="group__Setters.html#gab4ac97e0e881db5ca0f28cdeba39e228">covarianceBase::GetParName</a></div><div class="ttdeci">std::string GetParName(const int i) const</div><div class="ttdoc">Get name of covariance.</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8h_source.html#l00149">covarianceBase.h:149</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -4296,17 +4301,17 @@ Kamil Skwarczynski </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00825">825</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  825</span>                                                             {</div>
-<div class="line"><span class="lineno">  826</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  827</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt;<a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; ++i) {</div>
-<div class="line"><span class="lineno">  828</span>    <span class="keywordflow">if</span>(name == <a class="code hl_variable" href="classcovarianceBase.html#a973671386a2f8ea924f25f8f5404654c">_fFancyNames</a>[i]) {</div>
-<div class="line"><span class="lineno">  829</span>      <a class="code hl_function" href="classcovarianceBase.html#aafbbdc05b87df882dc341e20fe870603">toggleFixParameter</a>(i);</div>
-<div class="line"><span class="lineno">  830</span>      <span class="keywordflow">return</span>;</div>
-<div class="line"><span class="lineno">  831</span>    }</div>
-<div class="line"><span class="lineno">  832</span>  }</div>
-<div class="line"><span class="lineno">  833</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;I couldn&#39;t find parameter with name {}, therefore will not fix it&quot;</span>, name);</div>
-<div class="line"><span class="lineno">  834</span>}</div>
+<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l00830">830</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  830</span>                                                             {</div>
+<div class="line"><span class="lineno">  831</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  832</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt;<a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>; ++i) {</div>
+<div class="line"><span class="lineno">  833</span>    <span class="keywordflow">if</span>(name == <a class="code hl_variable" href="classcovarianceBase.html#a973671386a2f8ea924f25f8f5404654c">_fFancyNames</a>[i]) {</div>
+<div class="line"><span class="lineno">  834</span>      <a class="code hl_function" href="classcovarianceBase.html#aafbbdc05b87df882dc341e20fe870603">toggleFixParameter</a>(i);</div>
+<div class="line"><span class="lineno">  835</span>      <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  836</span>    }</div>
+<div class="line"><span class="lineno">  837</span>  }</div>
+<div class="line"><span class="lineno">  838</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;I couldn&#39;t find parameter with name {}, therefore will not fix it&quot;</span>, name);</div>
+<div class="line"><span class="lineno">  839</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -4335,41 +4340,41 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Method to update adaptive MCMC <a class="el" href="citelist.html#CITEREF_haario2001adaptive">[10]</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l01071">1071</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 1071</span>                                             {</div>
-<div class="line"><span class="lineno"> 1072</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno"> 1073</span>  <span class="comment">// Updates adaptive matrix</span></div>
-<div class="line"><span class="lineno"> 1074</span>  <span class="comment">// First we update the total means</span></div>
-<div class="line"><span class="lineno"> 1075</span> </div>
-<div class="line"><span class="lineno"> 1076</span>  <span class="comment">// Skip this if we&#39;re at a large number of steps</span></div>
-<div class="line"><span class="lineno"> 1077</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_function" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#af797ab969eb8c1802afa12df8c2106d8">SkipAdaption</a>()) {</div>
-<div class="line"><span class="lineno"> 1078</span>    <a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a>++;</div>
-<div class="line"><span class="lineno"> 1079</span>    <span class="keywordflow">return</span>;</div>
-<div class="line"><span class="lineno"> 1080</span>  }</div>
-<div class="line"><span class="lineno"> 1081</span> </div>
-<div class="line"><span class="lineno"> 1082</span>  <span class="comment">// Call main adaption function</span></div>
-<div class="line"><span class="lineno"> 1083</span>  <a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_function" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a828e12f4ecb82252341af5f5e54f7ad3">UpdateAdaptiveCovariance</a>(<a class="code hl_variable" href="classcovarianceBase.html#ae70f51df3976975b2dc78fd3bfc28b65">_fCurrVal</a>, <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>);</div>
-<div class="line"><span class="lineno"> 1084</span> </div>
-<div class="line"><span class="lineno"> 1085</span>  <span class="comment">//This is likely going to be the slow bit!</span></div>
-<div class="line"><span class="lineno"> 1086</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_function" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a77726d0255edf32a817339fcbac30bee">IndivStepScaleAdapt</a>()) {</div>
-<div class="line"><span class="lineno"> 1087</span>    <a class="code hl_function" href="classcovarianceBase.html#a0993a1ea6c5b06ba834e9e70af87ee9e">resetIndivStepScale</a>();</div>
-<div class="line"><span class="lineno"> 1088</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l01076">1076</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 1076</span>                                             {</div>
+<div class="line"><span class="lineno"> 1077</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno"> 1078</span>  <span class="comment">// Updates adaptive matrix</span></div>
+<div class="line"><span class="lineno"> 1079</span>  <span class="comment">// First we update the total means</span></div>
+<div class="line"><span class="lineno"> 1080</span> </div>
+<div class="line"><span class="lineno"> 1081</span>  <span class="comment">// Skip this if we&#39;re at a large number of steps</span></div>
+<div class="line"><span class="lineno"> 1082</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_function" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#af797ab969eb8c1802afa12df8c2106d8">SkipAdaption</a>()) {</div>
+<div class="line"><span class="lineno"> 1083</span>    <a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a>++;</div>
+<div class="line"><span class="lineno"> 1084</span>    <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno"> 1085</span>  }</div>
+<div class="line"><span class="lineno"> 1086</span> </div>
+<div class="line"><span class="lineno"> 1087</span>  <span class="comment">// Call main adaption function</span></div>
+<div class="line"><span class="lineno"> 1088</span>  <a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_function" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a828e12f4ecb82252341af5f5e54f7ad3">UpdateAdaptiveCovariance</a>(<a class="code hl_variable" href="classcovarianceBase.html#ae70f51df3976975b2dc78fd3bfc28b65">_fCurrVal</a>, <a class="code hl_variable" href="classcovarianceBase.html#ac5d922f1a4163b38ebc7a3ef21eec376">_fNumPar</a>);</div>
 <div class="line"><span class="lineno"> 1089</span> </div>
-<div class="line"><span class="lineno"> 1090</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_function" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a217c72a492c9d3e1b3a7b14626d19ab2">UpdateMatrixAdapt</a>()) {</div>
-<div class="line"><span class="lineno"> 1091</span>    TMatrixDSym* update_matrix = <span class="keyword">static_cast&lt;</span>TMatrixDSym*<span class="keyword">&gt;</span>(<a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#afd61e64f18f5c25dbbd6bb2bd619a268">adaptive_covariance</a>-&gt;Clone());</div>
-<div class="line"><span class="lineno"> 1092</span>    <a class="code hl_function" href="classcovarianceBase.html#a7e2d3623bbbf3edee558e04737fe2add">updateThrowMatrix</a>(update_matrix); <span class="comment">//Now we update and continue!</span></div>
-<div class="line"><span class="lineno"> 1093</span>    <span class="comment">//Also Save the adaptive to file</span></div>
-<div class="line"><span class="lineno"> 1094</span>    <a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_function" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a4c324072616a7a61b24ea4668e6c57ce">SaveAdaptiveToFile</a>(<a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a3635f63cb8108f58a76b90250894c31c">output_file_name</a>,<a class="code hl_function" href="group__Setters.html#gafae8445e4cdef85c27c4863adb9e7fe4">getName</a>());</div>
-<div class="line"><span class="lineno"> 1095</span>  }</div>
-<div class="line"><span class="lineno"> 1096</span> </div>
-<div class="line"><span class="lineno"> 1097</span>  <a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a>++;</div>
-<div class="line"><span class="lineno"> 1098</span>}</div>
+<div class="line"><span class="lineno"> 1090</span>  <span class="comment">//This is likely going to be the slow bit!</span></div>
+<div class="line"><span class="lineno"> 1091</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_function" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a77726d0255edf32a817339fcbac30bee">IndivStepScaleAdapt</a>()) {</div>
+<div class="line"><span class="lineno"> 1092</span>    <a class="code hl_function" href="classcovarianceBase.html#a0993a1ea6c5b06ba834e9e70af87ee9e">resetIndivStepScale</a>();</div>
+<div class="line"><span class="lineno"> 1093</span>  }</div>
+<div class="line"><span class="lineno"> 1094</span> </div>
+<div class="line"><span class="lineno"> 1095</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_function" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a217c72a492c9d3e1b3a7b14626d19ab2">UpdateMatrixAdapt</a>()) {</div>
+<div class="line"><span class="lineno"> 1096</span>    TMatrixDSym* update_matrix = <span class="keyword">static_cast&lt;</span>TMatrixDSym*<span class="keyword">&gt;</span>(<a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#afd61e64f18f5c25dbbd6bb2bd619a268">adaptive_covariance</a>-&gt;Clone());</div>
+<div class="line"><span class="lineno"> 1097</span>    <a class="code hl_function" href="classcovarianceBase.html#a7e2d3623bbbf3edee558e04737fe2add">updateThrowMatrix</a>(update_matrix); <span class="comment">//Now we update and continue!</span></div>
+<div class="line"><span class="lineno"> 1098</span>    <span class="comment">//Also Save the adaptive to file</span></div>
+<div class="line"><span class="lineno"> 1099</span>    <a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_function" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a4c324072616a7a61b24ea4668e6c57ce">SaveAdaptiveToFile</a>(<a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a3635f63cb8108f58a76b90250894c31c">output_file_name</a>,<a class="code hl_function" href="group__Setters.html#gafae8445e4cdef85c27c4863adb9e7fe4">getName</a>());</div>
+<div class="line"><span class="lineno"> 1100</span>  }</div>
+<div class="line"><span class="lineno"> 1101</span> </div>
+<div class="line"><span class="lineno"> 1102</span>  <a class="code hl_variable" href="classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7">AdaptiveHandler</a>.<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a>++;</div>
+<div class="line"><span class="lineno"> 1103</span>}</div>
 <div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a217c72a492c9d3e1b3a7b14626d19ab2"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a217c72a492c9d3e1b3a7b14626d19ab2">adaptive_mcmc::AdaptiveMCMCHandler::UpdateMatrixAdapt</a></div><div class="ttdeci">bool UpdateMatrixAdapt()</div><div class="ttdoc">Tell whether matrix should be updated.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8cpp_source.html#l00276">AdaptiveMCMCHandler.cpp:276</a></div></div>
 <div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a3635f63cb8108f58a76b90250894c31c"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a3635f63cb8108f58a76b90250894c31c">adaptive_mcmc::AdaptiveMCMCHandler::output_file_name</a></div><div class="ttdeci">std::string output_file_name</div><div class="ttdoc">Name of the file to save the adpative matrices into.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00084">AdaptiveMCMCHandler.h:84</a></div></div>
 <div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a77726d0255edf32a817339fcbac30bee"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a77726d0255edf32a817339fcbac30bee">adaptive_mcmc::AdaptiveMCMCHandler::IndivStepScaleAdapt</a></div><div class="ttdeci">bool IndivStepScaleAdapt()</div><div class="ttdoc">Tell whether we want reset step scale or not.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8cpp_source.html#l00269">AdaptiveMCMCHandler.cpp:269</a></div></div>
 <div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a828e12f4ecb82252341af5f5e54f7ad3"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a828e12f4ecb82252341af5f5e54f7ad3">adaptive_mcmc::AdaptiveMCMCHandler::UpdateAdaptiveCovariance</a></div><div class="ttdeci">void UpdateAdaptiveCovariance(const std::vector&lt; double &gt; &amp;_fCurrVal, const int Npars)</div><div class="ttdoc">Method to update adaptive MCMC .</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8cpp_source.html#l00230">AdaptiveMCMCHandler.cpp:230</a></div></div>
 <div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_af797ab969eb8c1802afa12df8c2106d8"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#af797ab969eb8c1802afa12df8c2106d8">adaptive_mcmc::AdaptiveMCMCHandler::SkipAdaption</a></div><div class="ttdeci">bool SkipAdaption()</div><div class="ttdoc">Tell if we are Skipping Adaption.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8cpp_source.html#l00288">AdaptiveMCMCHandler.cpp:288</a></div></div>
-<div class="ttc" id="aclasscovarianceBase_html_a7e2d3623bbbf3edee558e04737fe2add"><div class="ttname"><a href="classcovarianceBase.html#a7e2d3623bbbf3edee558e04737fe2add">covarianceBase::updateThrowMatrix</a></div><div class="ttdeci">void updateThrowMatrix(TMatrixDSym *cov)</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l01031">covarianceBase.cpp:1031</a></div></div>
+<div class="ttc" id="aclasscovarianceBase_html_a7e2d3623bbbf3edee558e04737fe2add"><div class="ttname"><a href="classcovarianceBase.html#a7e2d3623bbbf3edee558e04737fe2add">covarianceBase::updateThrowMatrix</a></div><div class="ttdeci">void updateThrowMatrix(TMatrixDSym *cov)</div><div class="ttdef"><b>Definition:</b> <a href="covarianceBase_8cpp_source.html#l01036">covarianceBase.cpp:1036</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -4389,15 +4394,15 @@ Kamil Skwarczynski </dd></dl>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l01031">1031</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 1031</span>                                                      {</div>
-<div class="line"><span class="lineno"> 1032</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno"> 1033</span>  <span class="keyword">delete</span> <a class="code hl_variable" href="classcovarianceBase.html#a6cb3d0b4096fbb55b040f70cd5b6e32b">throwMatrix</a>;</div>
-<div class="line"><span class="lineno"> 1034</span>  <a class="code hl_variable" href="classcovarianceBase.html#a6cb3d0b4096fbb55b040f70cd5b6e32b">throwMatrix</a> = <span class="keyword">nullptr</span>;</div>
-<div class="line"><span class="lineno"> 1035</span>  <span class="keyword">delete</span> <a class="code hl_variable" href="classcovarianceBase.html#ab95f5e066c2dfb1d20d120bc6c85dda2">throwMatrix_CholDecomp</a>;</div>
-<div class="line"><span class="lineno"> 1036</span>  <a class="code hl_variable" href="classcovarianceBase.html#ab95f5e066c2dfb1d20d120bc6c85dda2">throwMatrix_CholDecomp</a> = <span class="keyword">nullptr</span>;</div>
-<div class="line"><span class="lineno"> 1037</span>  <a class="code hl_function" href="classcovarianceBase.html#af30ca7861452e1446e55700f4b49b608">setThrowMatrix</a>(cov);</div>
-<div class="line"><span class="lineno"> 1038</span>}</div>
+<p class="definition">Definition at line <a class="el" href="covarianceBase_8cpp_source.html#l01036">1036</a> of file <a class="el" href="covarianceBase_8cpp_source.html">covarianceBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 1036</span>                                                      {</div>
+<div class="line"><span class="lineno"> 1037</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno"> 1038</span>  <span class="keyword">delete</span> <a class="code hl_variable" href="classcovarianceBase.html#a6cb3d0b4096fbb55b040f70cd5b6e32b">throwMatrix</a>;</div>
+<div class="line"><span class="lineno"> 1039</span>  <a class="code hl_variable" href="classcovarianceBase.html#a6cb3d0b4096fbb55b040f70cd5b6e32b">throwMatrix</a> = <span class="keyword">nullptr</span>;</div>
+<div class="line"><span class="lineno"> 1040</span>  <span class="keyword">delete</span> <a class="code hl_variable" href="classcovarianceBase.html#ab95f5e066c2dfb1d20d120bc6c85dda2">throwMatrix_CholDecomp</a>;</div>
+<div class="line"><span class="lineno"> 1041</span>  <a class="code hl_variable" href="classcovarianceBase.html#ab95f5e066c2dfb1d20d120bc6c85dda2">throwMatrix_CholDecomp</a> = <span class="keyword">nullptr</span>;</div>
+<div class="line"><span class="lineno"> 1042</span>  <a class="code hl_function" href="classcovarianceBase.html#af30ca7861452e1446e55700f4b49b608">setThrowMatrix</a>(cov);</div>
+<div class="line"><span class="lineno"> 1043</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
