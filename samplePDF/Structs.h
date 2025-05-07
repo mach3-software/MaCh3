@@ -603,4 +603,14 @@ namespace MaCh3Utils {
     return NuOscillatorFlavour;
   }
   // ***************************
+
+  // ***************************
+  /// @brief Convert double into string for precision, useful for playing with yaml if you don't want to have in config floating point precision...
+  inline std::string FormatDouble(const double value, const int precision) {
+  // ***************************
+    std::ostringstream oss;
+    oss << std::fixed << std::setprecision(precision) << value;
+    return oss.str();
+  }
+
 } // end MaCh3Utils namespace

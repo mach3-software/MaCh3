@@ -102,4 +102,182 @@ namespace M3
     return C;
   }
 
+// *************************************
+/// @brief KS: Add Tune values to YAML covariance matrix
+inline void AddTuneValues(YAML::Node& root,
+                          const std::vector<double>& Values,
+                          const std::string& Tune,
+                          const std::vector<std::string>& FancyNames = {}) {
+// *************************************
+  YAML::Node NodeCopy = YAML::Clone(root);
+  YAML::Node systematics = NodeCopy["Systematics"];
+
+  if (!systematics || !systematics.IsSequence()) {
+    MACH3LOG_ERROR("'Systematics' node is missing or not a sequence in the YAML copy");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  if (!FancyNames.empty() && FancyNames.size() != Values.size()) {
+    MACH3LOG_ERROR("Mismatch in sizes: FancyNames has {}, but Values has {}", FancyNames.size(), Values.size());
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  if (FancyNames.empty() && systematics.size() != Values.size()) {
+    MACH3LOG_ERROR("Mismatch in sizes: Values has {}, but YAML 'Systematics' has {} entries",
+                   Values.size(), systematics.size());
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  if (!FancyNames.empty()) {
+    for (std::size_t i = 0; i < FancyNames.size(); ++i) {
+      bool matched = false;
+      for (std::size_t j = 0; j < systematics.size(); ++j) {
+        YAML::Node systematicNode = systematics[j]["Systematic"];
+        if (!systematicNode) continue;
+        auto nameNode = systematicNode["Names"];
+        if (!nameNode || !nameNode["FancyName"]) continue;
+        if (nameNode["FancyName"].as<std::string>() == FancyNames[i]) {
+          if (!systematicNode["ParameterValues"]) {
+            MACH3LOG_ERROR("Missing 'ParameterValues' for matched FancyName '{}'", FancyNames[i]);
+            throw MaCh3Exception(__FILE__, __LINE__);
+          }
+          systematicNode["ParameterValues"][Tune] = MaCh3Utils::FormatDouble(Values[i], 4);
+          matched = true;
+          break;
+        }
+      }
+      if (!matched) {
+        MACH3LOG_ERROR("Could not find a matching FancyName '{}' in the systematics", FancyNames[i]);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+    }
+  } else {
+    for (std::size_t i = 0; i < systematics.size(); ++i) {
+      YAML::Node systematicNode = systematics[i]["Systematic"];
+      if (!systematicNode || !systematicNode["ParameterValues"]) {
+        MACH3LOG_ERROR("Missing 'Systematic' or 'ParameterValues' entry at index {}", i);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+      systematicNode["ParameterValues"][Tune] = MaCh3Utils::FormatDouble(Values[i], 4);
+    }
+  }
+
+  // Convert updated copy to string
+  std::string YAMLString = YAMLtoSTRING(NodeCopy);
+
+  // Write to output file
+  std::string OutName = "UpdatedMatrixWithTune" + Tune + ".yaml";
+  std::ofstream outFile(OutName);
+  if (!outFile) {
+    MACH3LOG_ERROR("Failed to open file for writing: {}", OutName);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  outFile << YAMLString;
+  outFile.close();
+}
+
+// *************************************
+/// @brief KS: Replace correlation matrix and tune values in YAML covariance matrix
+inline void MakeCorrelationMatrix(YAML::Node& root,
+                                  const std::vector<double>& Values,
+                                  const std::vector<double>& Errors,
+                                  const std::vector<std::vector<double>>& Correlation,
+                                  const std::vector<std::string>& FancyNames = {}) {
+// *************************************
+  if (Values.size() != Errors.size() || Values.size() != Correlation.size()) {
+    MACH3LOG_ERROR("Size mismatch between Values, Errors, and Correlation matrix");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  for (const auto& row : Correlation) {
+    if (row.size() != Correlation.size()) {
+      MACH3LOG_ERROR("Correlation matrix is not square");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+  }
+
+  YAML::Node NodeCopy = YAML::Clone(root);
+  YAML::Node systematics = NodeCopy["Systematics"];
+
+  if (!systematics || !systematics.IsSequence()) {
+    MACH3LOG_ERROR("'Systematics' node is missing or not a sequence");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  if (!FancyNames.empty() && FancyNames.size() != Values.size()) {
+    MACH3LOG_ERROR("FancyNames size ({}) does not match Values size ({})", FancyNames.size(), Values.size());
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  // Map from FancyName to Systematic node
+  std::unordered_map<std::string, YAML::Node> nameToNode;
+  for (std::size_t i = 0; i < systematics.size(); ++i) {
+    YAML::Node syst = systematics[i]["Systematic"];
+    if (!syst || !syst["Names"] || !syst["Names"]["FancyName"]) continue;
+    std::string name = syst["Names"]["FancyName"].as<std::string>();
+    nameToNode[name] = syst;
+  }
+
+  if (!FancyNames.empty()) {
+    for (std::size_t i = 0; i < FancyNames.size(); ++i) {
+      const std::string& name_i = FancyNames[i];
+      auto it_i = nameToNode.find(name_i);
+      if (it_i == nameToNode.end()) {
+        MACH3LOG_ERROR("Could not find FancyName '{}' in YAML", name_i);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+      YAML::Node& syst_i = it_i->second;
+
+      syst_i["ParameterValues"]["PreFitValue"] = MaCh3Utils::FormatDouble(Values[i], 4);
+      syst_i["Error"] = std::round(Errors[i] * 100.0) / 100.0;
+
+      YAML::Node correlationsNode;
+      for (std::size_t j = 0; j < FancyNames.size(); ++j) {
+        if (i == j) continue;
+        const std::string& name_j = FancyNames[j];
+        correlationsNode[name_j] = MaCh3Utils::FormatDouble(Correlation[i][j], 4);
+      }
+      syst_i["Correlations"] = correlationsNode;
+    }
+  } else {
+    if (systematics.size() != Values.size()) {
+      MACH3LOG_ERROR("Mismatch in sizes: Values has {}, but YAML 'Systematics' has {} entries",
+                     Values.size(), systematics.size());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+
+    for (std::size_t i = 0; i < systematics.size(); ++i) {
+      YAML::Node syst = systematics[i]["Systematic"];
+      if (!syst) {
+        MACH3LOG_ERROR("Missing 'Systematic' node at index {}", i);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+
+      syst["ParameterValues"]["PreFitValue"] = MaCh3Utils::FormatDouble(Values[i], 4);
+      syst["Error"] = std::round(Errors[i] * 100.0) / 100.0;
+
+      YAML::Node correlationsNode;
+      for (std::size_t j = 0; j < Correlation[i].size(); ++j) {
+        if (i == j) continue;
+        const std::string& otherName = systematics[j]["Systematic"]["Names"]["FancyName"].as<std::string>();
+        correlationsNode[otherName] = MaCh3Utils::FormatDouble(Correlation[i][j], 4);
+      }
+      syst["Correlations"] = correlationsNode;
+    }
+  }
+
+  // Convert and write
+  std::string YAMLString = YAMLtoSTRING(NodeCopy);
+  std::string OutName = "UpdatedCorrelationMatrix.yaml";
+  std::ofstream outFile(OutName);
+  if (!outFile) {
+    MACH3LOG_ERROR("Failed to open file for writing: {}", OutName);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  outFile << YAMLString;
+  outFile.close();
+}
+
 }

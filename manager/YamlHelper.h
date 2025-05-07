@@ -102,6 +102,7 @@ inline YAML::Node STRINGtoYAML(const std::string& yaml_string){
 /// @brief KS: Convert a YAML node to a string representation.
 /// @param node The YAML node to convert to a string.
 /// @return std::string The string representation of the YAML node.
+/// @warning YAML is weird and drops " " for string so output may not be identical to yaml you provided
 inline std::string YAMLtoSTRING(const YAML::Node& node) {
 // **********************
   YAML::Emitter emitter;
