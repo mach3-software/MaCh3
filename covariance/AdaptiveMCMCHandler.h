@@ -62,33 +62,19 @@ class AdaptiveMCMCHandler{
   /// @brief Tell if we are Skipping Adaption
   bool SkipAdaption();
 
-  /// @brief Set a parameter to be?
-  /// @param par_index Index of parameter
-  void SetIsCircular(int par_index){
-    cyclic_indices.insert(par_index);
-  }
-
-  /// @brief Is the parameter cyclical?
-  bool IsCircular(int par_index){
-    return cyclic_indices.count(par_index) > 0;
-  }
-
-  /// @brief Calculate Mean of Circular parans
-  double CalculateCyclicalMean(int ipar, double curr_val);
-  
-  double CalculateCircularDeviation(double mean, double value);
-/// @brief Set to track errros
-  void SetFixed(std::vector<double>* errs){
-    errors = errs;
-  }
-
   void SetParams(std::vector<double>* params){
     _fCurrVal = params;
+  }
+
+  void SetFixed(std::vector<double>* fix){
+    errors = fix;
   }
 
   int GetNPars(){
     return static_cast<int>(_fCurrVal->size());
   }
+
+  double CurrVal(int par_index);
 
   bool IsFixed(int ipar){
 
@@ -99,7 +85,13 @@ class AdaptiveMCMCHandler{
     return ((*errors)[ipar] < 0);
   }
 
+  void SetScale(double scale){
+    adaption_scale = scale;
+  }
 
+
+  double ModeAdjusted(int par_index);
+  void SetBiModal(int par_index, double midpoint);
 
   /// Meta variables related to adaption run time
   /// When do we start throwing
@@ -137,18 +129,11 @@ class AdaptiveMCMCHandler{
   /// Total number of MCMC steps
   int total_steps;
 
-  /// Scale factor for each adaptive MCMC block
-  std::vector<double> block_scale_factors;
-
-  /// Circular parameter indices
-  std::unordered_set<int> cyclic_indices;
-
-  // Circular nonsense
-  std::vector<double> sum_sin;
-  std::vector<double> sum_cos;
+  double adaption_scale;
 
   std::vector<double>* errors;
   std::vector<double>* _fCurrVal;
+  std::unordered_map<int, double> bimodal_pars;
 
 };
 

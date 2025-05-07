@@ -16,9 +16,19 @@ class covarianceOsc : public covarianceBase
   /// @brief Propose MCMC step, including mass flipping
   void proposeStep() override;
   /// @brief Sets whether to flip delta M23.
-  void setFlipDeltaM23(bool flip){flipdelM = flip;}
+  void setFlipDeltaM23(bool flip){
+    flipdelM = flip;
+    if(use_adaptive && flipdelM){
+      AdaptiveHandler.SetBiModal(kDeltaM23, 0);
+    }
+  }
   /// @brief Sets whether to flip octant.
-  void setFlipOctant(bool flip){flipOctant = flip;}
+  void setFlipOctant(bool flip){
+    flipOctant = flip;
+    if(use_adaptive && flipOctant){
+      AdaptiveHandler.SetBiModal(kSinTheta23, 0.5112);
+    }
+}
   /// @brief Get pointers to Osc params from Sample name
   std::vector<const double*> GetOscParsFromSampleName(const std::string& SampleName);
   /// @brief KS: Print all useful information's after initialization

@@ -25,7 +25,7 @@ class mcmc : public FitterBase {
 
   /// @brief Get name of class
   inline std::string GetName()const {return "MCMC";};
- private:
+  private:
   /// @brief Propose a step
   inline void ProposeStep();
 
@@ -34,6 +34,9 @@ class mcmc : public FitterBase {
 
   /// @brief Print the progress
   inline void PrintProgress();
+
+  /// @brief Set scale used for AMCMC
+  void SetAdaptiveStepScale();
 
   /// Do we reject based on hitting boundaries in systs
   bool reject;

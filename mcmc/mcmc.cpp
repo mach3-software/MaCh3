@@ -73,10 +73,29 @@ void mcmc::CheckStep() {
   outTree->Fill();
 }
 
+void mcmc::SetAdaptiveStepScale(){
+  /// Adaption needs the TOTAL number of parameters as the scale
+  int npars = 0;
+  for (covarianceBase *cov : systematics) {
+    npars += cov->GetNumParams(); //- cov->GetNParsFixed();
+  }
+
+  for(covarianceBase *cov : systematics) {
+    if(cov->getUseAdaptive()){
+      cov->getAdaptiveHandler()->SetScale(2.4*2.4/npars);
+    }
+  }
+
+  }
+
+
 // *******************
 // Run the Markov chain with all the systematic objects added
 void mcmc::runMCMC() {
 // *******************
+
+  // HW: For adaptive MCMC we need to set the step scale using all the systematics
+  SetAdaptiveStepScale();
   // Save the settings into the output file
   SaveSettings();
 

@@ -39,6 +39,13 @@ covarianceOsc::covarianceOsc(const std::vector<std::string>& YAMLFile, std::stri
 
 void covarianceOsc::initialiseAdaption(const YAML::Node& adapt_manager){
   covarianceBase::initialiseAdaption(adapt_manager);
+  if(flipdelM){ 
+    AdaptiveHandler.SetBiModal(kDeltaM23, 0);
+  }
+  if(flipOctant){
+    AdaptiveHandler.SetBiModal(kSinTheta23, 0.5112);
+  }
+
 }
 
 // *************************************

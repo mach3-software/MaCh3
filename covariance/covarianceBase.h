@@ -369,6 +369,15 @@ class covarianceBase {
     if (_fError[i] < 0) { return true; }
     else                { return false; }
   }
+
+  int GetNParsFixed() const {
+    int nFixed = 0;
+    for (int i = 0; i < GetNumParams(); ++i) {
+      if (isParameterFixed(i)) nFixed++;
+    }
+    return nFixed;
+  }
+
   /// @brief Is parameter fixed or not
   /// @param name Name of parameter you want to check if is fixed
   bool isParameterFixed(const std::string& name) const;

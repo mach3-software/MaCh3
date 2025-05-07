@@ -11,7 +11,10 @@ AdaptiveMCMCHandler::AdaptiveMCMCHandler() {
   adaptive_update_step  = 1000;
   total_steps = 0;
 
+  adaption_scale = 1.0;
+
   par_means = {};
+
   adaptive_covariance = nullptr;
 }
 
@@ -71,12 +74,22 @@ bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const 
   adaptive_save_n_iterations  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["SaveNIterations"], 1);
   output_file_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Settings"]["OutputFileName"], "");
 
-  // We also want to check for "blocks" by default all parameters "know" about each other
-  // but we can split the matrix into independent block matrices
+  if(start_adaptive_throw < start_adaptive_update){
+    MACH3LOG_ERROR("Start adaptive throw ({}) must be greater than start adaptive update ({})", start_adaptive_throw, start_adaptive_update);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  if(start_adaptive_update > end_adaptive_update){
+    MACH3LOG_ERROR("Start adaptive update ({}) must be less than end adaptive update ({})", start_adaptive_update, end_adaptive_update);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
 
   SetParams(parameters);
   SetFixed(fixed);
 
+
+  // We also want to check for "blocks" by default all parameters "know" about each other
+  // but we can split the matrix into independent block matrices
   // We"ll set a dummy variable here
   auto matrix_blocks = GetFromManager<std::vector<std::vector<int>>>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["MatrixBlocks"], {{}});
 
@@ -91,10 +104,7 @@ void AdaptiveMCMCHandler::CreateNewAdaptiveCovariance() {
   adaptive_covariance = new TMatrixDSym(GetNPars());
   adaptive_covariance->Zero();
   par_means = std::vector<double>(GetNPars(), 0);
-  sum_sin = std::vector<double>(GetNPars(), 0);
-  sum_cos = std::vector<double>(GetNPars(), 0);
 }
-
 
 // ********************************************
 void AdaptiveMCMCHandler::SetAdaptiveBlocks(std::vector<std::vector<int>> block_indices) {
@@ -113,12 +123,6 @@ void AdaptiveMCMCHandler::SetAdaptiveBlocks(std::vector<std::vector<int>> block_
   adapt_block_sizes[0] = GetNPars();
   
   int block_size = static_cast<int>(block_indices.size());
-
-  block_scale_factors = std::vector<double>(block_size+1, 0);
-
-  if(block_indices.size()==0 || block_indices[0].size()==0){
-    block_scale_factors[0] = 2.38*2.38/GetNPars();
-  }
 
   for(int iblock=0; iblock < block_size; iblock++){
     // Loop over blocks in the block
@@ -139,10 +143,6 @@ void AdaptiveMCMCHandler::SetAdaptiveBlocks(std::vector<std::vector<int>> block_
         adapt_block_sizes[0] -= 1;
       }
     }
-  }
-
-  for(int i=0; i<block_size+1; i++){
-    block_scale_factors[i] = (2.38*2.38/adapt_block_sizes[i]);
   }
 }
 
@@ -244,15 +244,13 @@ void AdaptiveMCMCHandler::SetThrowMatrixFromFile(const std::string& matrix_file_
 void AdaptiveMCMCHandler::UpdateAdaptiveCovariance() {
   std::vector<double> par_means_prev = par_means;
   int steps_post_burn = total_steps - start_adaptive_update;
-  std::vector<double> dev(GetNPars(), 0.0);
 
   // Step 1: Update means and compute deviations
   for (int i = 0; i < GetNPars(); ++i) {
     if (IsFixed(i)) continue;
 
-    par_means[i] =  ((*_fCurrVal)[i] + par_means_prev[i]*steps_post_burn)/(steps_post_burn+1);
+    par_means[i] =  (CurrVal(i) + par_means_prev[i]*steps_post_burn)/(steps_post_burn+1);
     // Left over from cyclic means
-    dev[i] = (*_fCurrVal)[i] - par_means_prev[i];   
   }
 
   // Step 2: Update covariance
@@ -263,7 +261,6 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance() {
     }
 
     int block_i = adapt_block_matrix_indices[i];
-    double scale_factor = block_scale_factors[block_i];
 
     for (int j = 0; j <= i; ++j) {
       if (IsFixed(j) || adapt_block_matrix_indices[j] != block_i) {
@@ -280,9 +277,9 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance() {
         double cov_t = cov_prev * (steps_post_burn - 1) / steps_post_burn;
         double prev_means_t = steps_post_burn * par_means_prev[i] * par_means_prev[j];
         double curr_means_t = (steps_post_burn + 1) * par_means[i] * par_means[j];
-        double curr_step_t = (*_fCurrVal)[i] * (*_fCurrVal)[j];
+        double curr_step_t = CurrVal(i) * CurrVal(j);
 
-        cov_updated = cov_t + scale_factor * (prev_means_t - curr_means_t + curr_step_t) / steps_post_burn;
+        cov_updated = cov_t + adaption_scale * (prev_means_t - curr_means_t + curr_step_t) / steps_post_burn;
       }
 
       (*adaptive_covariance)(i, j) = cov_updated;
@@ -302,12 +299,11 @@ bool AdaptiveMCMCHandler::IndivStepScaleAdapt() {
 bool AdaptiveMCMCHandler::UpdateMatrixAdapt() {
 // ********************************************
   if(total_steps >= start_adaptive_throw &&
-    // Check whether the number of steps is divisible by the adaptive update step
-    // e.g. if adaptive_update_step = 1000 and (total_step - start_adpative_throw) is 5000 then this is true
     (total_steps - start_adaptive_throw)%adaptive_update_step == 0) {
     return true;
   } 
-  else return false;
+  
+  return false;
 }
 
 // ********************************************
@@ -321,8 +317,35 @@ bool AdaptiveMCMCHandler::SkipAdaption() {
 // ********************************************
 bool AdaptiveMCMCHandler::AdaptionUpdate() {
 // ********************************************
-  if(total_steps <= start_adaptive_throw) return true;
-  else return false;
+  if(total_steps <= start_adaptive_throw) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+double AdaptiveMCMCHandler::ModeAdjusted(int par_index){
+  // We assume covariance is in a SINGLE mode
+  if((*_fCurrVal)[par_index] < bimodal_pars[par_index]){
+    // This just flips the parameter about the central axis
+    return 2*bimodal_pars[par_index] - (*_fCurrVal)[par_index]; 
+  }
+
+  return (*_fCurrVal)[par_index];
+}
+
+void AdaptiveMCMCHandler::SetBiModal(int par_index, double midpoint){
+  bimodal_pars[par_index] = midpoint;
+}
+
+double AdaptiveMCMCHandler::CurrVal(int par_index){
+  if(bimodal_pars.count(par_index) > 0){
+    return ModeAdjusted(par_index);
+  }
+  else{
+    return (*_fCurrVal)[par_index];
+  }
 }
 
 // ********************************************
