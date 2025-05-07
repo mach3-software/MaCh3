@@ -201,3 +201,55 @@ Putting it all together might look like:
 
 This allows us to disable the diagnostic just for the relevant line.
 
+## C++ Standard
+As of May 2025, the minimum supported C++ standard for MaCh3 is **C++14**, although the codebase is compatible with newer standards such as **C++17** and beyond.
+These are often referred to collectively as *modern C++*.
+MaCh3 aims to use modern C++ features to encourage safer, cleaner, and more maintainable code.
+
+### Pointers
+Instead of using raw pointer
+```c++
+    Class* example = new Class;
+
+    // ... some code ...
+    delete example;
+```
+Use *std::unique_ptr* to manage memory automatically:
+```c++
+    auto example = std::make_unique<Class>();
+```
+This eliminates the need to manually delete the object and helps prevent memory leaks.
+
+### Dynamic Arrays
+Instead of manually managing dynamic arrays:
+
+```c++
+    double* example = new double[N];
+
+    // ... some code ...
+
+    delete[] example;
+```
+Use a *std::vector* to automatically manage the memory:
+```c++
+    std::vector<double> example(N);
+```
+### Use `nullptr` Instead of `NULL` or `0`
+
+Modern C++ introduces `nullptr` as a type-safe null pointer constant.
+Avoid legacy `NULL` or `0` which can lead to ambiguous or unsafe behavior.
+```c++
+    int* ptr = nullptr;
+
+    if (ptr == nullptr) {
+        std::cout << "Pointer is null." << std::endl;
+    }
+```
+### Casting
+
+Use `static_cast<T>(value)` instead of `(T)value` for type conversions.
+It makes the intent clear and avoids unsafe conversions allowed by C-style casts.
+```c++
+    double x = 3.14;
+    int y = static_cast<int>(x);
+```
