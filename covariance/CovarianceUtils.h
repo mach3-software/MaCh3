@@ -103,6 +103,37 @@ namespace M3
   }
 
 // *************************************
+/// @brief KS: Yaml emitter has problem and drops "", if you have special signs in you like * then there is problem. This bit hacky code adds these ""
+inline void FixSampleNamesQuotes(std::string& yamlStr) {
+// *************************************
+  std::stringstream input(yamlStr);
+  std::string line;
+  std::string fixedYaml;
+  std::regex sampleNamesRegex(R"(SampleNames:\s*\[([^\]]+)\])");
+
+  while (std::getline(input, line)) {
+    std::smatch match;
+    if (std::regex_search(line, match, sampleNamesRegex)) {
+      std::string contents = match[1];  // inside the brackets
+      std::stringstream ss(contents);
+      std::string item;
+      std::vector<std::string> quotedItems;
+
+      while (std::getline(ss, item, ',')) {
+        item = std::regex_replace(item, std::regex(R"(^\s+|\s+$)"), ""); // trim
+        quotedItems.push_back("\"" + item + "\"");
+      }
+
+      std::string replacement = "SampleNames: [" + fmt::format("{}", fmt::join(quotedItems, ", ")) + "]";
+      line = std::regex_replace(line, sampleNamesRegex, replacement);
+    }
+    fixedYaml += line + "\n";
+  }
+
+  yamlStr = fixedYaml;
+}
+
+// *************************************
 /// @brief KS: Add Tune values to YAML covariance matrix
 inline void AddTuneValues(YAML::Node& root,
                           const std::vector<double>& Values,
@@ -164,7 +195,7 @@ inline void AddTuneValues(YAML::Node& root,
 
   // Convert updated copy to string
   std::string YAMLString = YAMLtoSTRING(NodeCopy);
-
+  FixSampleNamesQuotes(YAMLString);
   // Write to output file
   std::string OutName = "UpdatedMatrixWithTune" + Tune + ".yaml";
   std::ofstream outFile(OutName);
@@ -269,6 +300,7 @@ inline void MakeCorrelationMatrix(YAML::Node& root,
 
   // Convert and write
   std::string YAMLString = YAMLtoSTRING(NodeCopy);
+  FixSampleNamesQuotes(YAMLString);
   std::string OutName = "UpdatedCorrelationMatrix.yaml";
   std::ofstream outFile(OutName);
   if (!outFile) {
