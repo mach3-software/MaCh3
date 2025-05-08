@@ -48,10 +48,10 @@ struct FastSplineInfo {
 
 // ***************************************************************************
 /// @brief EM: Apply capping to knot weight for specified spline parameter. param graph needs to have been set in xsecgraph array first
-inline void ApplyKnotWeightCap(TGraph* xsecgraph, int splineParsIndex, covarianceXsec* XsecCov) {
+inline void ApplyKnotWeightCap(TGraph* xsecgraph, const int splineParsIndex, covarianceXsec* XsecCov) {
 // ***************************************************************************
-  if(xsecgraph == NULL){
-    MACH3LOG_ERROR("ERROR: hmmm looks like you're trying to apply capping for spline parameter {} but it hasn't been set in xsecgraph yet", XsecCov->GetParFancyName(splineParsIndex));
+  if(xsecgraph == nullptr){
+    MACH3LOG_ERROR("hmmm looks like you're trying to apply capping for spline parameter {} but it hasn't been set in xsecgraph yet", XsecCov->GetParFancyName(splineParsIndex));
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
@@ -92,6 +92,39 @@ inline void ApplyKnotWeightCap(TGraph* xsecgraph, int splineParsIndex, covarianc
       xsecgraph->Set(1);
       xsecgraph->SetPoint(0, 0.0, 1.0);
     }
+  }
+}
+
+// ***************************************************************************
+/// @brief EM: Apply capping to knot weight for specified spline parameter. param graph needs to have been set in Spline array first
+inline void ApplyKnotWeightCapTSpline3(TSpline3* &Spline, const int splineParsIndex, covarianceXsec* XsecCov) {
+// ***************************************************************************
+  if(Spline == nullptr) {
+    MACH3LOG_ERROR("hmmm looks like you're trying to apply capping for spline parameter {} but it hasn't been set in Spline yet", XsecCov->GetParFancyName(splineParsIndex));
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+
+  std::string oldName = Spline->GetName();
+  // EM: cap the weights of the knots if specified in the config
+  if((XsecCov->GetParSplineKnotUpperBound(splineParsIndex) != 9999) || (XsecCov->GetParSplineKnotLowerBound(splineParsIndex) != -9999))
+  {
+    const int NValues = Spline->GetNp();
+    std::vector<double> XVals(NValues);
+    std::vector<double> YVals(NValues);
+    for(int knotId = 0; knotId < NValues; knotId++){
+      double x,y;
+      // Extract X and Y
+      Spline->GetKnot(knotId, x, y);
+
+      y = std::min(y, XsecCov->GetParSplineKnotUpperBound(splineParsIndex));
+      y = std::max(y, XsecCov->GetParSplineKnotLowerBound(splineParsIndex));
+
+      XVals[knotId] = x;
+      YVals[knotId] = y;
+    }
+    delete Spline;
+    // If we capped we have to make new TSpline3 to recalculate coefficients
+    Spline = new TSpline3(oldName.c_str(), XVals.data(), YVals.data(), NValues);
   }
 }
 

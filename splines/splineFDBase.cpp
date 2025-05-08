@@ -958,6 +958,7 @@ void splineFDBase::FillSampleArray(std::string SampleName, std::vector<std::stri
           splinevec_Monolith.push_back(nullptr);
           delete mySpline;
         } else {
+          ApplyKnotWeightCapTSpline3(mySpline, SystNum, xsec);
           Spline = new TSpline3_red(mySpline, SplineInterpolationTypes[iSample][SystNum]);
           if(mySpline) delete mySpline;
 
