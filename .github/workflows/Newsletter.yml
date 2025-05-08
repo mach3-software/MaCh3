@@ -88,7 +88,7 @@ jobs:
           echo "maCh3Tutorial_most_active_author_count=${COUNT}" >> "$GITHUB_ENV"
           echo "maCh3Tutorial_most_active_author_name=${NAME}" >> "$GITHUB_ENV"
 
-        - name: Get number of PR last week for MaCh3Tutorial
+      - name: Get number of PR last week for MaCh3Tutorial
         run: |
           number_of_PR_tutorial=$(GH_TOKEN=${{ secrets.GITHUB_TOKEN }} gh search prs --repo mach3-software/MaCh3Tutorial --created ">$(date -d '7 days ago' +%Y-%m-%d)" --limit 1000 --json number | jq '. | length')
           echo "number_of_PR_tutorial=${number_of_PR_tutorial}" >> "$GITHUB_ENV"
