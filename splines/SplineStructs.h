@@ -57,8 +57,8 @@ inline void ApplyKnotWeightCap(TGraph* xsecgraph, const int splineParsIndex, cov
 
   // EM: cap the weights of the knots if specified in the config
   if(
-    (XsecCov->GetParSplineKnotUpperBound(splineParsIndex) != 9999)
-    || (XsecCov->GetParSplineKnotLowerBound(splineParsIndex) != -9999))
+    (XsecCov->GetParSplineKnotUpperBound(splineParsIndex) != M3::DefSplineKnotUpBound)
+    || (XsecCov->GetParSplineKnotLowerBound(splineParsIndex) != M3::DefSplineKnotLowBound))
   {
     for(int knotId = 0; knotId < xsecgraph->GetN(); knotId++){
       double x,y;
@@ -106,7 +106,7 @@ inline void ApplyKnotWeightCapTSpline3(TSpline3* &Spline, const int splineParsIn
 
   std::string oldName = Spline->GetName();
   // EM: cap the weights of the knots if specified in the config
-  if((XsecCov->GetParSplineKnotUpperBound(splineParsIndex) != 9999) || (XsecCov->GetParSplineKnotLowerBound(splineParsIndex) != -9999))
+  if((XsecCov->GetParSplineKnotUpperBound(splineParsIndex) != M3::DefSplineKnotUpBound) || (XsecCov->GetParSplineKnotLowerBound(splineParsIndex) != M3::DefSplineKnotLowBound))
   {
     const int NValues = Spline->GetNp();
     std::vector<double> XVals(NValues);

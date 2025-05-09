@@ -256,9 +256,13 @@ XsecSplines1 covarianceXsec::GetXsecSpline(const YAML::Node& param) {
   } else { //KS: By default use TSpline3
     Spline._SplineInterpolationType = kTSpline3;
   }
-  Spline._SplineKnotUpBound = GetFromManager<double>(param["SplineInformation"]["SplineKnotUpBound"], 9999, __FILE__ , __LINE__);
-  Spline._SplineKnotLowBound = GetFromManager<double>(param["SplineInformation"]["SplineKnotLowBound"], -9999, __FILE__ , __LINE__);
+  Spline._SplineKnotUpBound = GetFromManager<double>(param["SplineInformation"]["SplineKnotUpBound"], M3::DefSplineKnotUpBound, __FILE__ , __LINE__);
+  Spline._SplineKnotLowBound = GetFromManager<double>(param["SplineInformation"]["SplineKnotLowBound"], M3::DefSplineKnotLowBound, __FILE__ , __LINE__);
 
+  if(Spline._SplineKnotUpBound != M3::DefSplineKnotUpBound ||  Spline._SplineKnotLowBound != M3::DefSplineKnotLowBound) {
+    MACH3LOG_WARN("Spline knot capping enabled with bounds [{}, {}]. For reliable fits, consider modifying the input generation instead.",
+                  Spline._SplineKnotLowBound, Spline._SplineKnotUpBound);
+  }
   //If there is no mode information given then this will be an empty vector
   Spline._fSplineModes = GetFromManager(param["SplineInformation"]["Mode"], std::vector<int>(), __FILE__ , __LINE__);
 

@@ -55,6 +55,9 @@ namespace M3 {
 
   /// Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such step should be removed
   constexpr static const double _LARGE_LOGL_ = 1234567890.0;
+
+  constexpr static const double DefSplineKnotUpBound = 9999;
+  constexpr static const double DefSplineKnotLowBound = -9999;
 }
 
 /// KS: noexcept can help with performance but is terrible for debugging, this is meant to help easy way of of turning it on or off. In near future move this to struct or other central class.
