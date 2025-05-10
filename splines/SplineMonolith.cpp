@@ -713,7 +713,6 @@ void SMonolith::PrepareSplineFile() {
 
   delete Settings;
   delete Monolith_TF1;
-
   delete XKnots;
   delete EventInfo;
   delete FastSplineInfoTree;
