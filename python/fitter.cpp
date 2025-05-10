@@ -139,13 +139,6 @@ void initFitter(py::module &m){
             "Set how long chain should be.",
             py::arg("length")
         )
-
-        .def(
-            "set_init_step_num", 
-            &mcmc::setInitialStepNumber, 
-            "Set initial step number, used when starting from another chain.",
-            py::arg("step_num")
-        )
     ; // end of MCMC class binding
 
     py::class_<LikelihoodFit, PyLikelihoodFit /* <--- trampoline*/, FitterBase>(m_fitter, "LikelihoodFit")
