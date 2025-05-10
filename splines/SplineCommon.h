@@ -29,6 +29,8 @@ enum SplineSegmentCoeffs
 /// the number of knots per spline, and the number of points per spline on the CPU.
 struct SplineMonoStruct {
 // *******************
+  virtual ~SplineMonoStruct() {};
+
   /// KS: CPU arrays to hold X coefficient
   std::vector<float> coeff_x;
 
@@ -40,6 +42,11 @@ struct SplineMonoStruct {
 
   /// CW: CPU array with the number of points per spline (not per spline point!)
   std::vector<short int> paramNo_arr;
+
+  #ifndef __CUDACC__
+  // Include ClassDef macro for ROOT dictionary generation, but only in C++ code
+  ClassDef(SplineMonoStruct, 1);
+  #endif
 };
 
 

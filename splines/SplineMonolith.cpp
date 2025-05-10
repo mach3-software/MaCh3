@@ -523,12 +523,10 @@ void SMonolith::LoadSplineFile(std::string FileName) {
 
   auto SplineFile = std::make_unique<TFile>(FileName.c_str(), "OPEN");
   TTree *Settings = SplineFile->Get<TTree>("Settings");
-  TTree *Monolith = SplineFile->Get<TTree>("Monolith");
   TTree *Monolith_TF1 = SplineFile->Get<TTree>("Monolith_TF1");
-  TTree *ParamInfo = SplineFile->Get<TTree>("ParamInfo");
-  TTree *XKnots = SplineFile->Get<TTree>("XKnots");
   TTree *EventInfo = SplineFile->Get<TTree>("EventInfo");
   TTree *FastSplineInfoTree = SplineFile->Get<TTree>("FastSplineInfoTree");
+  TTree *SplineTree = SplineFile->Get<TTree>("SplineTree");
 
   unsigned int NEvents_temp;
   short int nParams_temp;
@@ -554,7 +552,6 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   nKnots = nKnots_temp;
   NSplines_valid = NSplines_valid_temp;
   NTF1_valid = nTF1Valid_temp;
-  unsigned int event_size_max = _max_knots * nParams;
   nTF1coeff = nTF1coeff_temp;
 
   //KS: Since we are going to copy it each step use fancy CUDA memory allocation
@@ -568,13 +565,6 @@ void SMonolith::LoadSplineFile(std::string FileName) {
 
   cpu_nParamPerEvent.resize(2*NEvents);
   cpu_nParamPerEvent_tf1.resize(2*NEvents);
-  cpu_spline_handler->paramNo_arr.resize(NSplines_valid);
-  //KS: And array which tells where each spline stars in a big monolith array, sort of knot map
-  cpu_spline_handler->nKnots_arr.resize(NSplines_valid);
-
-  cpu_spline_handler->coeff_many.resize(nKnots*_nCoeff_); // *4 because we store y,b,c,d parameters in this array
-  cpu_spline_handler->coeff_x.resize(event_size_max);
-
   cpu_coeff_TF1_many.resize(nTF1coeff);
 
   //KS: This is tricky as this variable use both by CPU and GPU, however if use CUDA we use cudaMallocHost
@@ -584,13 +574,8 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   cpu_weights_tf1_var = new float[NTF1_valid]();
 #endif
 
-  float coeff = 0.;
-  Monolith->SetBranchAddress("cpu_coeff_many", &coeff);
-  for(unsigned int i = 0; i < nKnots*_nCoeff_; i++)
-  {
-    Monolith->GetEntry(i);
-    cpu_spline_handler->coeff_many[i] = coeff;
-  }
+  SplineTree->SetBranchAddress("SplineObject", &cpu_spline_handler);
+  SplineTree->GetEntry(0);
 
   float coeff_tf1 = 0.;
   Monolith_TF1->SetBranchAddress("cpu_coeff_TF1_many", &coeff_tf1);
@@ -598,25 +583,6 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   {
     Monolith_TF1->GetEntry(i);
     cpu_coeff_TF1_many[i] = coeff_tf1;
-  }
-
-  short int paramNo_arr = 0;
-  unsigned int nKnots_arr = 0;
-  ParamInfo->SetBranchAddress("cpu_paramNo_arr", &paramNo_arr);
-  ParamInfo->SetBranchAddress("cpu_nKnots_arr", &nKnots_arr);
-  for(unsigned int i = 0; i < NSplines_valid; i++)
-  {
-    ParamInfo->GetEntry(i);
-    cpu_spline_handler->paramNo_arr[i] = paramNo_arr;
-    cpu_spline_handler->nKnots_arr[i] = nKnots_arr;
-  }
-
-  float coeff_x = 0.;
-  XKnots->SetBranchAddress("cpu_coeff_x", &coeff_x);
-  for(unsigned int i = 0; i < event_size_max; i++)
-  {
-    XKnots->GetEntry(i);
-    cpu_spline_handler->coeff_x[i] = coeff_x;
   }
 
   unsigned int nParamPerEvent = 0;
@@ -649,7 +615,6 @@ void SMonolith::LoadSplineFile(std::string FileName) {
       SplineInfoArray[i].xPts[k] = xtemp[k];
     }
   }
-
   SplineFile->Close();
 
   // Print some info; could probably make this to a separate function
@@ -669,9 +634,7 @@ void SMonolith::PrepareSplineFile() {
 
   auto SplineFile = std::make_unique<TFile>(FileName.c_str(), "recreate");
   TTree *Settings = new TTree("Settings", "Settings");
-  TTree *Monolith = new TTree("Monolith", "Monolith");
   TTree *Monolith_TF1 = new TTree("Monolith_TF1", "Monolith_TF1");
-  TTree *ParamInfo = new TTree("ParamInfo", "ParamInfo");
   TTree *XKnots = new TTree("XKnots", "XKnots");
   TTree *EventInfo = new TTree("EventInfo", "EventInfo");
   TTree *FastSplineInfoTree = new TTree("FastSplineInfoTree", "FastSplineInfoTree");
@@ -697,16 +660,12 @@ void SMonolith::PrepareSplineFile() {
   SplineFile->cd();
   Settings->Write();
 
-  float coeff = 0.;
-  Monolith->Branch("cpu_coeff_many", &coeff, "cpu_coeff_many/F");
-  for(unsigned int i = 0; i < nKnots*_nCoeff_; i++)
-  {
-    coeff = cpu_spline_handler->coeff_many[i];
-    Monolith->Fill();
-  }
-  SplineFile->cd();
-  Monolith->Write();
-
+  TTree *SplineTree = new TTree("SplineTree", "SplineTree");
+  // Create a branch for the SplineMonoStruct object
+  SplineTree->Branch("SplineObject", &cpu_spline_handler);
+  SplineTree->Fill();
+  SplineTree->Write();
+  delete SplineTree;
 
   float coeff_tf1 = 0.;
   Monolith_TF1->Branch("cpu_coeff_TF1_many", &coeff_tf1, "cpu_coeff_TF1_many/F");
@@ -717,32 +676,6 @@ void SMonolith::PrepareSplineFile() {
   }
   SplineFile->cd();
   Monolith_TF1->Write();
-
-  short int paramNo_arr = 0;
-  unsigned int nKnots_arr = 0;
-  ParamInfo->Branch("cpu_paramNo_arr", &paramNo_arr, "cpu_paramNo_arr/S");
-  ParamInfo->Branch("cpu_nKnots_arr", &nKnots_arr, "cpu_nKnots_arr/i");
-  for(unsigned int i = 0; i < NSplines_valid; i++)
-  {
-    paramNo_arr = cpu_spline_handler->paramNo_arr[i];
-    nKnots_arr = cpu_spline_handler->nKnots_arr[i];
-
-    ParamInfo->Fill();
-  }
-  SplineFile->cd();
-  ParamInfo->Write();
-
-  unsigned int event_size_max = _max_knots * nParams;
-
-  float coeff_x = 0.;
-  XKnots->Branch("cpu_coeff_x", &coeff_x, "cpu_coeff_x/F");
-  for(unsigned int i = 0; i < event_size_max; i++)
-  {
-    coeff_x = cpu_spline_handler->coeff_x[i];
-    XKnots->Fill();
-  }
-  SplineFile->cd();
-  XKnots->Write();
 
   unsigned int nParamPerEvent = 0;
   unsigned int nParamPerEvent_tf1 = 0;
@@ -779,9 +712,8 @@ void SMonolith::PrepareSplineFile() {
   FastSplineInfoTree->Write();
 
   delete Settings;
-  delete Monolith;
   delete Monolith_TF1;
-  delete ParamInfo;
+
   delete XKnots;
   delete EventInfo;
   delete FastSplineInfoTree;
