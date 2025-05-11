@@ -63,7 +63,7 @@ target_link_libraries(blarb MaCh3::All)
 
 Some functionalities rely on setting `Env{MACH3}` which should point to path experiment specific MaCh3. This way MaCh3 can easily find `Env{MACH3}/inputs/SomeInput.root` for example.
 
-## Python
+## Python 🐍
 
 MaCh3 has an optional python interface (pyMaCh3) which provides much of the same functionality as the c++ interface (see [here](https://mach3-software.github.io/MaCh3/pyMaCh3/mainpage.html) for documentation).
 
@@ -157,6 +157,7 @@ Based on several test here are recommended version:
 |-------------|--------|
 | Alma9       | ✅     |
 | Rocky9      | ✅     |
+| Ubi9        | ✅     |
 | Ubuntu22.04 | ✅     |
 | Ubuntu24.10 | ✅     |
 | Fedora32    | ✅     |
