@@ -1,6 +1,6 @@
-#include "mcmc/MCMCProcessor.h"
+#include "Fitters/MCMCProcessor.h"
 
-#include "manager/manager.h"
+#include "Manager/Manager.h"
 
 /// @brief Main function  creating MCMCProcessor and calling MCMC Diagnostic
 /// @param inputFile MCMC Chain

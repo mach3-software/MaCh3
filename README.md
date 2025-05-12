@@ -187,8 +187,8 @@ This is an example how your executable can look like using MaCh3:
   //Manager is responsible for reading from config
   std::unique_ptr<manager> fitMan = MaCh3ManagerFactory(argc, argv);
 
-  std::vector<samplePDFBase*> sample; //vector storing information about sample for different detector
-  std::vector<covarianceBase*> Cov; // vector with systematic implementation
+  std::vector<SampleHandlerBase*> sample; //vector storing information about sample for different detector
+  std::vector<ParameterHandlerBase*> Cov; // vector with systematic implementation
   MakeMaCh3Instance(fitMan.get(), sample, Cov); //Factory like function which initialises everything
 
   // FitterBase class, can be replaced with other fitting method
@@ -196,11 +196,11 @@ This is an example how your executable can look like using MaCh3:
 
   //Adding samples and covariances to the Fitter class could be in the factory
   for(unsigned int i = 0; sample.size(); i++)
-    MarkovChain->addSamplePDF(sample[i]);
+    MarkovChain->AddSampleHandler(sample[i]);
   for(unsigned int i = 0; Cov.size(); i++)
-    MarkovChain->addSystObj(Cov[i]);
+    MarkovChain->AddSystObj(Cov[i]);
 
   MarkovChain->RunLLHScan(); // can run LLH scan
-  MarkovChain->runMCMC(); //or run actual fit
+  MarkovChain->RunMCMC(); //or run actual fit
 ```
 For more see [here](https://github.com/mach3-software/MaCh3Tutorial/blob/main/Tutorial/MCMCTutorial.cpp)
