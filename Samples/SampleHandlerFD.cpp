@@ -419,7 +419,7 @@ void SampleHandlerFD::FillArray() {
 
   for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
     for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
-      ApplyShifts(iSample, iEvent);
+      applyShifts(iSample, iEvent);
       
       if (!IsEventSelected(iSample, iEvent)) { 
         continue;
@@ -886,7 +886,7 @@ void SampleHandlerFD::CalcNormsBins(int iSample) {
 // ************************************************
   FarDetectorCoreInfo *fdobj = &MCSamples[iSample];
   #ifdef DEBUG
-  std::vector<int> VerboseCounter(NormBins.size(), 0);
+  std::vector<int> VerboseCounter(xsec_norms.size(), 0);
   #endif
   for(int iEvent = 0; iEvent < fdobj->nEvents; ++iEvent){
     std::vector< int > NormBins = {};
@@ -957,18 +957,18 @@ void SampleHandlerFD::CalcNormsBins(int iSample) {
         NormBins.push_back(bin);
         MACH3LOG_TRACE("Event {}, will be affected by dial {}", iEvent, (*it).name);
         #ifdef DEBUG
-        VerboseCounter[std::distance(NormBins.begin(), it)]++;
+        VerboseCounter[std::distance(norm_parameters.begin(), it)]++;
         #endif
         //}
-      } // end iteration over NormBins
+      } // end iteration over norm_parameters
     } // end if (ParHandler)
     fdobj->xsec_norms_bins[iEvent] = NormBins;
   }//end loop over events
   #ifdef DEBUG
   MACH3LOG_DEBUG("Channel {}", iSample);
   MACH3LOG_DEBUG("┌──────────────────────────────────────────────────────────┐");
-  for (std::size_t i = 0; i < NormBins.size(); ++i) {
-    const auto& norm = NormBins[i];
+  for (std::size_t i = 0; i < norm_parameters.size(); ++i) {
+    const auto& norm = norm_parameters[i];
     double eventRatio = static_cast<double>(VerboseCounter[i]) / static_cast<double>(fdobj->nEvents);
 
     MACH3LOG_DEBUG("│ Param {:<15}, affects {:<8} events ({:>6.2f}%) │",
