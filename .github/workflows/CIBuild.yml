@@ -42,8 +42,8 @@ jobs:
             file: Doc/MaCh3DockerFiles/Rocky9/Dockerfile
             tag: rocky9latest
             cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DMaCh3_LOW_MEMORY_STRUCTS_ENABLED=ON -DNuFastLinear_ENABLED=ON
-          - os: Rocky9 CUDA NoMultithreading
-            file: Doc/MaCh3DockerFiles/Rocky9/Dockerfile
+          - os: Ubi9 CUDA NoMultithreading
+            file: Doc/MaCh3DockerFiles/Ubi9/Dockerfile
             tag: rocky9latest
             cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DMaCh3_MULTITHREAD_ENABLED=OFF -DNuFastLinear_ENABLED=ON
           - os: Alma9 NoMultithreading
