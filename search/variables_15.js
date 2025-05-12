@@ -5,6 +5,6 @@ var searchData=
   ['w2meanhist_2',['W2MeanHist',['../classSampleSummary.html#a2828111584f80f855b56a9a093987673',1,'SampleSummary']]],
   ['w2modehist_3',['W2ModeHist',['../classSampleSummary.html#adf9b943ba381875b3f2e0c4807a9b8c4',1,'SampleSummary']]],
   ['w2nomhist_4',['W2NomHist',['../classSampleSummary.html#a9c37d8669c0f55f6a4620b4f0d7b6e20',1,'SampleSummary']]],
-  ['weightvec_5fmonolith_5',['weightvec_Monolith',['../classsplineFDBase.html#a107c337ce7053208795747a3223f04e1',1,'splineFDBase']]],
+  ['weightvec_5fmonolith_5',['weightvec_Monolith',['../classBinnedSplineHandler.html#a9e433fb12f9c6759bbf1b0eb61f1f34a',1,'BinnedSplineHandler']]],
   ['weightvector_6',['WeightVector',['../classSampleSummary.html#ad40a0514f4be18ef026ea41bd5965fa3',1,'SampleSummary']]]
 ];

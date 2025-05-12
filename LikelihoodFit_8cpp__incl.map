@@ -1,52 +1,52 @@
-<map id="mcmc/LikelihoodFit.cpp" name="mcmc/LikelihoodFit.cpp">
-<area shape="rect" id="node1" title=" " alt="" coords="455,5,630,31"/>
-<area shape="rect" id="node2" href="$LikelihoodFit_8h.html" title=" " alt="" coords="485,79,601,104"/>
-<area shape="rect" id="node3" href="$FitterBase_8h.html" title=" " alt="" coords="471,152,615,177"/>
-<area shape="rect" id="node4" title=" " alt="" coords="379,739,459,764"/>
-<area shape="rect" id="node5" title=" " alt="" coords="222,592,295,617"/>
-<area shape="rect" id="node6" title=" " alt="" coords="2895,739,2969,764"/>
-<area shape="rect" id="node7" href="$samplePDFBase_8h.html" title=" " alt="" coords="955,299,1173,324"/>
-<area shape="rect" id="node17" href="$manager_8h.html" title=" " alt="" coords="205,372,358,397"/>
-<area shape="rect" id="node29" href="$covarianceBase_8h.html" title=" " alt="" coords="437,225,649,251"/>
-<area shape="rect" id="node35" href="$MCMCProcessor_8h.html" title=" " alt="" coords="1989,225,2171,251"/>
-<area shape="rect" id="node8" title=" " alt="" coords="1028,372,1103,397"/>
-<area shape="rect" id="node9" href="$Structs_8h.html" title=" " alt="" coords="1515,445,1672,471"/>
-<area shape="rect" id="node14" title=" " alt="" coords="1379,519,1445,544"/>
-<area shape="rect" id="node15" href="$HistogramUtils_8h.html" title=" " alt="" coords="2131,372,2341,397"/>
-<area shape="rect" id="node16" title=" " alt="" coords="1696,445,1800,471"/>
-<area shape="rect" id="node20" title=" " alt="" coords="947,519,1016,544"/>
-<area shape="rect" id="node23" href="$MaCh3Modes_8h.html" title=" " alt="" coords="383,372,567,397"/>
-<area shape="rect" id="node24" title=" " alt="" coords="569,445,639,471"/>
-<area shape="rect" id="node25" title=" " alt="" coords="817,445,887,471"/>
-<area shape="rect" id="node26" title=" " alt="" coords="912,445,987,471"/>
-<area shape="rect" id="node27" title=" " alt="" coords="2029,372,2107,397"/>
-<area shape="rect" id="node28" title=" " alt="" coords="1485,372,1565,397"/>
-<area shape="rect" id="node10" title=" " alt="" coords="1520,519,1563,544"/>
-<area shape="rect" id="node11" title=" " alt="" coords="1587,519,1629,544"/>
-<area shape="rect" id="node12" href="$MaCh3Exception_8h.html" title=" " alt="" coords="387,592,592,617"/>
-<area shape="rect" id="node13" href="$MaCh3Logger_8h.html" title="KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/incl..." alt="" coords="515,665,699,691"/>
-<area shape="rect" id="node18" href="$YamlHelper_8h.html" title="Utility functions for handling YAML nodes." alt="" coords="297,519,466,544"/>
-<area shape="rect" id="node19" href="$Monitor_8h.html" title="System and monitoring utilities for printing system information and status updates." alt="" coords="347,445,493,471"/>
-<area shape="rect" id="node21" title=" " alt="" coords="1170,519,1257,544"/>
-<area shape="rect" id="node22" title=" " alt="" coords="667,519,778,544"/>
-<area shape="rect" id="node30" href="$CovarianceUtils_8h.html" title=" " alt="" coords="641,372,853,397"/>
-<area shape="rect" id="node33" href="$AdaptiveMCMCHandler_8h.html" title=" " alt="" coords="536,299,795,324"/>
-<area shape="rect" id="node34" href="$PCAHandler_8h.html" title=" " alt="" coords="326,299,511,324"/>
-<area shape="rect" id="node31" title=" " alt="" coords="1011,445,1104,471"/>
-<area shape="rect" id="node32" title=" " alt="" coords="1230,445,1389,471"/>
-<area shape="rect" id="node36" title=" " alt="" coords="1350,299,1429,324"/>
-<area shape="rect" id="node37" title=" " alt="" coords="1453,299,1515,324"/>
-<area shape="rect" id="node38" href="$StatisticalUtils_8h.html" title="Utility functions for statistical interpretations in MaCh3." alt="" coords="2863,299,3036,324"/>
-<area shape="rect" id="node39" title=" " alt="" coords="2703,372,2793,397"/>
-<area shape="rect" id="node40" title=" " alt="" coords="2969,372,3039,397"/>
-<area shape="rect" id="node41" title=" " alt="" coords="3063,372,3137,397"/>
-<area shape="rect" id="node42" title=" " alt="" coords="1691,299,1781,324"/>
-<area shape="rect" id="node43" title=" " alt="" coords="1805,299,1923,324"/>
-<area shape="rect" id="node44" title=" " alt="" coords="1947,299,2021,324"/>
-<area shape="rect" id="node45" title=" " alt="" coords="2045,299,2115,324"/>
-<area shape="rect" id="node46" title=" " alt="" coords="2139,299,2218,324"/>
-<area shape="rect" id="node47" title=" " alt="" coords="2243,299,2307,324"/>
-<area shape="rect" id="node48" title=" " alt="" coords="2331,299,2445,324"/>
-<area shape="rect" id="node49" title=" " alt="" coords="2469,299,2555,324"/>
-<area shape="rect" id="node50" title=" " alt="" coords="2580,299,2687,324"/>
+<map id="Fitters/LikelihoodFit.cpp" name="Fitters/LikelihoodFit.cpp">
+<area shape="rect" id="node1" title=" " alt="" coords="795,5,971,31"/>
+<area shape="rect" id="node2" href="$LikelihoodFit_8h.html" title=" " alt="" coords="825,79,941,104"/>
+<area shape="rect" id="node3" href="$FitterBase_8h.html" title=" " alt="" coords="810,152,956,177"/>
+<area shape="rect" id="node4" title=" " alt="" coords="320,695,400,720"/>
+<area shape="rect" id="node5" title=" " alt="" coords="161,621,234,647"/>
+<area shape="rect" id="node6" title=" " alt="" coords="1644,394,1719,419"/>
+<area shape="rect" id="node7" href="$SampleHandlerBase_8h.html" title=" " alt="" coords="770,313,996,339"/>
+<area shape="rect" id="node17" href="$Manager_8h.html" title=" " alt="" coords="44,394,194,419"/>
+<area shape="rect" id="node29" href="$ParameterHandlerBase_8h.html" title=" " alt="" coords="432,225,651,265"/>
+<area shape="rect" id="node35" href="$MCMCProcessor_8h.html" title=" " alt="" coords="2010,233,2193,258"/>
+<area shape="rect" id="node8" title=" " alt="" coords="476,394,551,419"/>
+<area shape="rect" id="node9" href="$Structs_8h.html" title=" " alt="" coords="1110,475,1248,500"/>
+<area shape="rect" id="node14" title=" " alt="" coords="1377,548,1442,573"/>
+<area shape="rect" id="node15" href="$HistogramUtils_8h.html" title=" " alt="" coords="1324,394,1516,419"/>
+<area shape="rect" id="node16" title=" " alt="" coords="1491,475,1595,500"/>
+<area shape="rect" id="node20" title=" " alt="" coords="694,548,763,573"/>
+<area shape="rect" id="node23" href="$MaCh3Modes_8h.html" title=" " alt="" coords="218,394,401,419"/>
+<area shape="rect" id="node24" title=" " alt="" coords="618,475,689,500"/>
+<area shape="rect" id="node25" title=" " alt="" coords="713,475,784,500"/>
+<area shape="rect" id="node26" title=" " alt="" coords="910,475,984,500"/>
+<area shape="rect" id="node27" title=" " alt="" coords="1541,394,1620,419"/>
+<area shape="rect" id="node28" title=" " alt="" coords="1896,394,1976,419"/>
+<area shape="rect" id="node10" title=" " alt="" coords="1266,548,1308,573"/>
+<area shape="rect" id="node11" title=" " alt="" coords="1050,548,1092,573"/>
+<area shape="rect" id="node12" title=" " alt="" coords="1117,548,1241,573"/>
+<area shape="rect" id="node13" href="$MaCh3Exception_8h.html" title=" " alt="" coords="258,621,462,647"/>
+<area shape="rect" id="node18" href="$YamlHelper_8h.html" title="Utility functions for handling YAML nodes." alt="" coords="43,548,211,573"/>
+<area shape="rect" id="node19" href="$Monitor_8h.html" title="System and monitoring utilities for printing system information and status updates." alt="" coords="231,475,375,500"/>
+<area shape="rect" id="node21" title=" " alt="" coords="841,548,928,573"/>
+<area shape="rect" id="node22" title=" " alt="" coords="450,548,561,573"/>
+<area shape="rect" id="node30" href="$ParameterHandlerUtils_8h.html" title=" " alt="" coords="727,387,946,427"/>
+<area shape="rect" id="node33" href="$AdaptiveMCMCHandler_8h.html" title=" " alt="" coords="161,313,424,339"/>
+<area shape="rect" id="node34" href="$PCAHandler_8h.html" title=" " alt="" coords="448,313,636,339"/>
+<area shape="rect" id="node31" title=" " alt="" coords="1323,475,1416,500"/>
+<area shape="rect" id="node32" title=" " alt="" coords="1620,475,1778,500"/>
+<area shape="rect" id="node36" title=" " alt="" coords="1224,313,1302,339"/>
+<area shape="rect" id="node37" title=" " alt="" coords="1327,313,1388,339"/>
+<area shape="rect" id="node38" href="$StatisticalUtils_8h.html" title="Utility functions for statistical interpretations in MaCh3." alt="" coords="1514,313,1689,339"/>
+<area shape="rect" id="node39" title=" " alt="" coords="2336,394,2425,419"/>
+<area shape="rect" id="node40" title=" " alt="" coords="2618,394,2687,419"/>
+<area shape="rect" id="node41" title=" " alt="" coords="2795,394,2870,419"/>
+<area shape="rect" id="node42" title=" " alt="" coords="1713,313,1802,339"/>
+<area shape="rect" id="node43" title=" " alt="" coords="1826,313,1945,339"/>
+<area shape="rect" id="node44" title=" " alt="" coords="1968,313,2043,339"/>
+<area shape="rect" id="node45" title=" " alt="" coords="2067,313,2136,339"/>
+<area shape="rect" id="node46" title=" " alt="" coords="2161,313,2240,339"/>
+<area shape="rect" id="node47" title=" " alt="" coords="2264,313,2328,339"/>
+<area shape="rect" id="node48" title=" " alt="" coords="2353,313,2466,339"/>
+<area shape="rect" id="node49" title=" " alt="" coords="2490,313,2577,339"/>
+<area shape="rect" id="node50" title=" " alt="" coords="2602,313,2708,339"/>
 </map>

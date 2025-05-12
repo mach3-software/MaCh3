@@ -1,3 +1,6 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classSampleSummary.html" title="Class to calculate pvalue produce posterior predictive and many fancy Bayesian stuff ." alt="" coords="5,5,140,31"/>
+<area shape="rect" id="node1" href="$classSampleHandlerBase.html" title="Class responsible for handling implementation of samples used in analysis, reweighting and returning ..." alt="" coords="5,31,160,56"/>
+<area shape="rect" id="node2" href="$classPySampleHandlerBase.html" title=" " alt="" coords="208,5,379,31"/>
+<area shape="rect" id="node3" href="$classSampleHandlerFD.html" title="Class responsible for handling implementation of samples used in analysis, reweighting and returning ..." alt="" coords="223,55,363,80"/>
+<area shape="rect" id="node4" href="$classPySampleHandlerFD.html" title=" " alt="" coords="427,55,583,80"/>
 </map>

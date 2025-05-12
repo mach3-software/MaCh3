@@ -30,7 +30,7 @@ MathJax.Hub.Config({
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="mach3logo_small.png"/></td>
   <td id="projectalign">
-   <div id="projectname">MaCh3<span id="projectnumber">&#160;1.5.0</span>
+   <div id="projectname">MaCh3<span id="projectnumber">&#160;2.0.0</span>
    </div>
    <div id="projectbrief">Reference Guide</div>
   </td>
@@ -211,7 +211,7 @@ Additional Inherited Members</h2></td></tr>
 <div class="line"><span class="lineno">   58</span>        );</div>
 <div class="line"><span class="lineno">   59</span>    }</div>
 <div class="ttc" id="aclassPySplineBase_html_a19f9f443bcc72d5d038a822a088bc036"><div class="ttname"><a href="classPySplineBase.html#a19f9f443bcc72d5d038a822a088bc036">PySplineBase::CalcSplineWeights</a></div><div class="ttdeci">void CalcSplineWeights() override</div><div class="ttdoc">CPU based code which eval weight for each spline.</div><div class="ttdef"><b>Definition:</b> <a href="splines_8cpp_source.html#l00052">splines.cpp:52</a></div></div>
-<div class="ttc" id="aclassSplineBase_html"><div class="ttname"><a href="classSplineBase.html">SplineBase</a></div><div class="ttdoc">Base class for calculating weight from spline.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00026">SplineBase.h:26</a></div></div>
+<div class="ttc" id="aclassSplineBase_html"><div class="ttname"><a href="classSplineBase.html">SplineBase</a></div><div class="ttdoc">Base class for calculating weight from spline.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00025">SplineBase.h:25</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -388,16 +388,16 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Constructor. </p>
 
-<p class="definition">Definition at line <a class="el" href="SplineBase_8cpp_source.html#l00029">29</a> of file <a class="el" href="SplineBase_8cpp_source.html">SplineBase.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SplineBase_8cpp_source.html#l00028">28</a> of file <a class="el" href="SplineBase_8cpp_source.html">SplineBase.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">    7</span>                       {</div>
 <div class="line"><span class="lineno">    8</span><span class="comment">// *****************************************</span></div>
 <div class="line"><span class="lineno">    9</span>  <a class="code hl_variable" href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">nParams</a> = 0;</div>
 <div class="line"><span class="lineno">   10</span>  <a class="code hl_variable" href="classSplineBase.html#a938e3a60326137037f868b9930e2a972">SplineSegments</a> = <span class="keyword">nullptr</span>;</div>
 <div class="line"><span class="lineno">   11</span>  <a class="code hl_variable" href="classSplineBase.html#aa0b1d3a1adf7cffa7e74581bc7d58d4c">ParamValues</a> = <span class="keyword">nullptr</span>;</div>
 <div class="line"><span class="lineno">   12</span>}</div>
-<div class="ttc" id="aclassSplineBase_html_a2165b057a0125a28d96f247ca8680b42"><div class="ttname"><a href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">SplineBase::nParams</a></div><div class="ttdeci">short int nParams</div><div class="ttdoc">Number of parameters that have splines.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00065">SplineBase.h:65</a></div></div>
-<div class="ttc" id="aclassSplineBase_html_a938e3a60326137037f868b9930e2a972"><div class="ttname"><a href="classSplineBase.html#a938e3a60326137037f868b9930e2a972">SplineBase::SplineSegments</a></div><div class="ttdeci">short int * SplineSegments</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00061">SplineBase.h:61</a></div></div>
-<div class="ttc" id="aclassSplineBase_html_aa0b1d3a1adf7cffa7e74581bc7d58d4c"><div class="ttname"><a href="classSplineBase.html#aa0b1d3a1adf7cffa7e74581bc7d58d4c">SplineBase::ParamValues</a></div><div class="ttdeci">float * ParamValues</div><div class="ttdoc">Store parameter values they are not in FastSplineInfo as in case of GPU we need to copy paste it to G...</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00063">SplineBase.h:63</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_a2165b057a0125a28d96f247ca8680b42"><div class="ttname"><a href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">SplineBase::nParams</a></div><div class="ttdeci">short int nParams</div><div class="ttdoc">Number of parameters that have splines.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00064">SplineBase.h:64</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_a938e3a60326137037f868b9930e2a972"><div class="ttname"><a href="classSplineBase.html#a938e3a60326137037f868b9930e2a972">SplineBase::SplineSegments</a></div><div class="ttdeci">short int * SplineSegments</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00060">SplineBase.h:60</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_aa0b1d3a1adf7cffa7e74581bc7d58d4c"><div class="ttname"><a href="classSplineBase.html#aa0b1d3a1adf7cffa7e74581bc7d58d4c">SplineBase::ParamValues</a></div><div class="ttdeci">float * ParamValues</div><div class="ttdoc">Store parameter values they are not in FastSplineInfo as in case of GPU we need to copy paste it to G...</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00062">SplineBase.h:62</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.6"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MaCh3: mcmc/mcmc.h Source File</title>
+<title>MaCh3: Fitters/mcmc.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,7 +30,7 @@ MathJax.Hub.Config({
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="mach3logo_small.png"/></td>
   <td id="projectalign">
-   <div id="projectname">MaCh3<span id="projectnumber">&#160;1.5.0</span>
+   <div id="projectname">MaCh3<span id="projectnumber">&#160;2.0.0</span>
    </div>
    <div id="projectbrief">Reference Guide</div>
   </td>
@@ -79,7 +79,7 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_9d1483aea13a0d690c9337bf5d7dafcd.html">mcmc</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_c4587985b869c96ecd5a3e2399525831.html">Fitters</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -88,14 +88,14 @@ $(function() {
 <div class="contents">
 <a href="mcmc_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;<a class="code" href="FitterBase_8h.html">mcmc/FitterBase.h</a>&quot;</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;<a class="code" href="FitterBase_8h.html">Fitters/FitterBase.h</a>&quot;</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno"><a class="line" href="classmcmc.html">    7</a></span><span class="keyword">class </span><a class="code hl_class" href="classmcmc.html">mcmc</a> : <span class="keyword">public</span> <a class="code hl_class" href="classFitterBase.html">FitterBase</a> {</div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span> <span class="keyword">public</span>:</div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>  <a class="code hl_class" href="classmcmc.html">mcmc</a>(<a class="code hl_class" href="classmanager.html">manager</a> * <span class="keyword">const</span> <a class="code hl_variable" href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">fitMan</a>);</div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>  <span class="keyword">virtual</span> <a class="code hl_function" href="classmcmc.html#a6685a5d7fdac30e3676d5076ea26ec92">~mcmc</a>();</div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classmcmc.html#a8a9cc0e0aa65c8573fca703a42b2ee31">runMCMC</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classmcmc.html#a11802611bb93f0ec09e883dc64a27d5c">RunMCMC</a>() <span class="keyword">override</span>;</div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="classmcmc.html#af549f9b0ab4276710bc0d2987ad825a9">   19</a></span>  <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classmcmc.html#af549f9b0ab4276710bc0d2987ad825a9">setChainLength</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> L) { <a class="code hl_variable" href="classmcmc.html#a2b9a5344ea8074fcecdc1ae2f3cfc62a">chainLength</a> = L; };</div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>  </div>
@@ -119,15 +119,15 @@ $(function() {
 <div class="ttc" id="aFitterBase_8h_html"><div class="ttname"><a href="FitterBase_8h.html">FitterBase.h</a></div></div>
 <div class="ttc" id="aclassFitterBase_html"><div class="ttname"><a href="classFitterBase.html">FitterBase</a></div><div class="ttdoc">Base class for implementing fitting algorithms.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00023">FitterBase.h:23</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_a4fceb68f242feeb04a0ddf42a5a37095"><div class="ttname"><a href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">FitterBase::fitMan</a></div><div class="ttdeci">manager * fitMan</div><div class="ttdoc">The manager.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00081">FitterBase.h:81</a></div></div>
-<div class="ttc" id="aclassmanager_html"><div class="ttname"><a href="classmanager.html">manager</a></div><div class="ttdoc">The manager class is responsible for managing configurations and settings.</div><div class="ttdef"><b>Definition:</b> <a href="manager_8h_source.html#l00017">manager.h:17</a></div></div>
+<div class="ttc" id="aclassmanager_html"><div class="ttname"><a href="classmanager.html">manager</a></div><div class="ttdoc">The manager class is responsible for managing configurations and settings.</div><div class="ttdef"><b>Definition:</b> <a href="Manager_8h_source.html#l00016">Manager.h:16</a></div></div>
 <div class="ttc" id="aclassmcmc_html"><div class="ttname"><a href="classmcmc.html">mcmc</a></div><div class="ttdoc">Implementation of MR2T2 algorithm.</div><div class="ttdef"><b>Definition:</b> <a href="mcmc_8h_source.html#l00007">mcmc.h:7</a></div></div>
 <div class="ttc" id="aclassmcmc_html_a0446e3c1f2af2173ffd6f017fdf6f1ba"><div class="ttname"><a href="classmcmc.html#a0446e3c1f2af2173ffd6f017fdf6f1ba">mcmc::GetName</a></div><div class="ttdeci">std::string GetName() const</div><div class="ttdoc">Get name of class.</div><div class="ttdef"><b>Definition:</b> <a href="mcmc_8h_source.html#l00027">mcmc.h:27</a></div></div>
+<div class="ttc" id="aclassmcmc_html_a11802611bb93f0ec09e883dc64a27d5c"><div class="ttname"><a href="classmcmc.html#a11802611bb93f0ec09e883dc64a27d5c">mcmc::RunMCMC</a></div><div class="ttdeci">void RunMCMC() override</div><div class="ttdoc">Actual implementation of MCMC fitting algorithm.</div><div class="ttdef"><b>Definition:</b> <a href="mcmc_8cpp_source.html#l00078">mcmc.cpp:78</a></div></div>
 <div class="ttc" id="aclassmcmc_html_a2b9a5344ea8074fcecdc1ae2f3cfc62a"><div class="ttname"><a href="classmcmc.html#a2b9a5344ea8074fcecdc1ae2f3cfc62a">mcmc::chainLength</a></div><div class="ttdeci">unsigned int chainLength</div><div class="ttdoc">number of steps in chain</div><div class="ttdef"><b>Definition:</b> <a href="mcmc_8h_source.html#l00041">mcmc.h:41</a></div></div>
 <div class="ttc" id="aclassmcmc_html_a3052c9e38107c0070c885a5a3bbbc302"><div class="ttname"><a href="classmcmc.html#a3052c9e38107c0070c885a5a3bbbc302">mcmc::AnnealTemp</a></div><div class="ttdeci">double AnnealTemp</div><div class="ttdoc">simulated annealing temperature</div><div class="ttdef"><b>Definition:</b> <a href="mcmc_8h_source.html#l00046">mcmc.h:46</a></div></div>
 <div class="ttc" id="aclassmcmc_html_a4da3776296d4f06268f240df5eb0bbcc"><div class="ttname"><a href="classmcmc.html#a4da3776296d4f06268f240df5eb0bbcc">mcmc::anneal</a></div><div class="ttdeci">bool anneal</div><div class="ttdoc">simulated annealing</div><div class="ttdef"><b>Definition:</b> <a href="mcmc_8h_source.html#l00044">mcmc.h:44</a></div></div>
 <div class="ttc" id="aclassmcmc_html_a537f7c2411a6a8e65fdf57b81ce6fe4a"><div class="ttname"><a href="classmcmc.html#a537f7c2411a6a8e65fdf57b81ce6fe4a">mcmc::reject</a></div><div class="ttdeci">bool reject</div><div class="ttdoc">Do we reject based on hitting boundaries in systs.</div><div class="ttdef"><b>Definition:</b> <a href="mcmc_8h_source.html#l00039">mcmc.h:39</a></div></div>
 <div class="ttc" id="aclassmcmc_html_a6685a5d7fdac30e3676d5076ea26ec92"><div class="ttname"><a href="classmcmc.html#a6685a5d7fdac30e3676d5076ea26ec92">mcmc::~mcmc</a></div><div class="ttdeci">virtual ~mcmc()</div><div class="ttdoc">Destructor.</div><div class="ttdef"><b>Definition:</b> <a href="mcmc_8cpp_source.html#l00026">mcmc.cpp:26</a></div></div>
-<div class="ttc" id="aclassmcmc_html_a8a9cc0e0aa65c8573fca703a42b2ee31"><div class="ttname"><a href="classmcmc.html#a8a9cc0e0aa65c8573fca703a42b2ee31">mcmc::runMCMC</a></div><div class="ttdeci">void runMCMC() override</div><div class="ttdoc">Actual implementation of MCMC fitting algorithm.</div><div class="ttdef"><b>Definition:</b> <a href="mcmc_8cpp_source.html#l00078">mcmc.cpp:78</a></div></div>
 <div class="ttc" id="aclassmcmc_html_aa2f1c8aa3d951b935bbb3ec637b6b651"><div class="ttname"><a href="classmcmc.html#aa2f1c8aa3d951b935bbb3ec637b6b651">mcmc::CheckStep</a></div><div class="ttdeci">void CheckStep()</div><div class="ttdoc">Do we accept the step.</div><div class="ttdef"><b>Definition:</b> <a href="mcmc_8cpp_source.html#l00033">mcmc.cpp:33</a></div></div>
 <div class="ttc" id="aclassmcmc_html_aaf921343861cec8bb96beb2503b3fe2c"><div class="ttname"><a href="classmcmc.html#aaf921343861cec8bb96beb2503b3fe2c">mcmc::ProposeStep</a></div><div class="ttdeci">void ProposeStep()</div><div class="ttdoc">Propose a step.</div><div class="ttdef"><b>Definition:</b> <a href="mcmc_8cpp_source.html#l00132">mcmc.cpp:132</a></div></div>
 <div class="ttc" id="aclassmcmc_html_adf4c80255288c5396da3b95d609ce4b2"><div class="ttname"><a href="classmcmc.html#adf4c80255288c5396da3b95d609ce4b2">mcmc::StartFromPreviousFit</a></div><div class="ttdeci">void StartFromPreviousFit(const std::string &amp;FitName) override</div><div class="ttdoc">Allow to start from previous fit/chain.</div><div class="ttdef"><b>Definition:</b> <a href="mcmc_8cpp_source.html#l00222">mcmc.cpp:222</a></div></div>

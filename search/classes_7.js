@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['oscprocessor_0',['OscProcessor',['../classOscProcessor.html',1,'']]]
+  ['normparameter_0',['NormParameter',['../structNormParameter.html',1,'']]]
 ];

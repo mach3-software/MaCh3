@@ -30,7 +30,7 @@ MathJax.Hub.Config({
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="mach3logo_small.png"/></td>
   <td id="projectalign">
-   <div id="projectname">MaCh3<span id="projectnumber">&#160;1.5.0</span>
+   <div id="projectname">MaCh3<span id="projectnumber">&#160;2.0.0</span>
    </div>
    <div id="projectbrief">Reference Guide</div>
   </td>
@@ -92,7 +92,7 @@ $(function() {
 <p>Even-by-event class calculating response for spline parameters. It is possible to use GPU acceleration.  
  <a href="classSMonolith.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="SplineMonolith_8h_source.html">splines/SplineMonolith.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="SplineMonolith_8h_source.html">Splines/SplineMonolith.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for SMonolith:</div>
 <div class="dyncontent">
@@ -466,8 +466,8 @@ Kamil Skwarczynski </dd></dl>
 <div class="ttc" id="aclassSMonolith_html_a8614e8ef07431d99f62ab88d9ebdad16"><div class="ttname"><a href="classSMonolith.html#a8614e8ef07431d99f62ab88d9ebdad16">SMonolith::cpu_weights</a></div><div class="ttdeci">float * cpu_weights</div><div class="ttdoc">The returned gpu weights, read by the GPU.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8h_source.html#l00049">SplineMonolith.h:49</a></div></div>
 <div class="ttc" id="aclassSMonolith_html_a870bb2bce61e17162b9425f82cf2a099"><div class="ttname"><a href="classSMonolith.html#a870bb2bce61e17162b9425f82cf2a099">SMonolith::cpu_weights_spline_var</a></div><div class="ttdeci">float * cpu_weights_spline_var</div><div class="ttdoc">CPU arrays to hold weight for each spline.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8h_source.html#l00132">SplineMonolith.h:132</a></div></div>
 <div class="ttc" id="aclassSMonolith_html_ab572dd7e0a46caf44eb925a89cbfb0cf"><div class="ttname"><a href="classSMonolith.html#ab572dd7e0a46caf44eb925a89cbfb0cf">SMonolith::cpu_total_weights</a></div><div class="ttdeci">float * cpu_total_weights</div><div class="ttdoc">KS: This holds the total CPU weights that gets read in samplePDFND.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8h_source.html#l00051">SplineMonolith.h:51</a></div></div>
-<div class="ttc" id="aclassSplineBase_html_a938e3a60326137037f868b9930e2a972"><div class="ttname"><a href="classSplineBase.html#a938e3a60326137037f868b9930e2a972">SplineBase::SplineSegments</a></div><div class="ttdeci">short int * SplineSegments</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00061">SplineBase.h:61</a></div></div>
-<div class="ttc" id="aclassSplineBase_html_aa0b1d3a1adf7cffa7e74581bc7d58d4c"><div class="ttname"><a href="classSplineBase.html#aa0b1d3a1adf7cffa7e74581bc7d58d4c">SplineBase::ParamValues</a></div><div class="ttdeci">float * ParamValues</div><div class="ttdoc">Store parameter values they are not in FastSplineInfo as in case of GPU we need to copy paste it to G...</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00063">SplineBase.h:63</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_a938e3a60326137037f868b9930e2a972"><div class="ttname"><a href="classSplineBase.html#a938e3a60326137037f868b9930e2a972">SplineBase::SplineSegments</a></div><div class="ttdeci">short int * SplineSegments</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00060">SplineBase.h:60</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_aa0b1d3a1adf7cffa7e74581bc7d58d4c"><div class="ttname"><a href="classSplineBase.html#aa0b1d3a1adf7cffa7e74581bc7d58d4c">SplineBase::ParamValues</a></div><div class="ttdeci">float * ParamValues</div><div class="ttdoc">Store parameter values they are not in FastSplineInfo as in case of GPU we need to copy paste it to G...</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00062">SplineBase.h:62</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1008,8 +1008,8 @@ Kamil Skwarczynski </dd></dl>
 <div class="ttc" id="aclassSMonolith_html_a5c374d4505de53ad68d176a5644568e6"><div class="ttname"><a href="classSMonolith.html#a5c374d4505de53ad68d176a5644568e6">SMonolith::PrintInitialsiation</a></div><div class="ttdeci">void PrintInitialsiation()</div><div class="ttdoc">KS: Print info about how much knots etc has been initialised.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8cpp_source.html#l01049">SplineMonolith.cpp:1049</a></div></div>
 <div class="ttc" id="aclassSMonolith_html_a66eecc550dea893c60a435a034e7ebf5"><div class="ttname"><a href="classSMonolith.html#a66eecc550dea893c60a435a034e7ebf5">SMonolith::cpu_nParamPerEvent_tf1</a></div><div class="ttdeci">std::vector&lt; unsigned int &gt; cpu_nParamPerEvent_tf1</div><div class="ttdoc">KS: CPU map keeping track how many parameters applies to each event, we keep two numbers here {number...</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8h_source.html#l00140">SplineMonolith.h:140</a></div></div>
 <div class="ttc" id="aclassSMonolith_html_aac73a1089592c5f22755b7427869827f"><div class="ttname"><a href="classSMonolith.html#aac73a1089592c5f22755b7427869827f">SMonolith::MoveToGPU</a></div><div class="ttdeci">void MoveToGPU()</div><div class="ttdoc">CW: The shared initialiser from constructors of TResponseFunction_red.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8cpp_source.html#l00304">SplineMonolith.cpp:304</a></div></div>
-<div class="ttc" id="aclassSplineBase_html_a2165b057a0125a28d96f247ca8680b42"><div class="ttname"><a href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">SplineBase::nParams</a></div><div class="ttdeci">short int nParams</div><div class="ttdoc">Number of parameters that have splines.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00065">SplineBase.h:65</a></div></div>
-<div class="ttc" id="aclassSplineBase_html_a9452897aecfe016466543dfe19c0628b"><div class="ttname"><a href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineBase::SplineInfoArray</a></div><div class="ttdeci">std::vector&lt; FastSplineInfo &gt; SplineInfoArray</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00058">SplineBase.h:58</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_a2165b057a0125a28d96f247ca8680b42"><div class="ttname"><a href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">SplineBase::nParams</a></div><div class="ttdeci">short int nParams</div><div class="ttdoc">Number of parameters that have splines.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00064">SplineBase.h:64</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_a9452897aecfe016466543dfe19c0628b"><div class="ttname"><a href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineBase::SplineInfoArray</a></div><div class="ttdeci">std::vector&lt; FastSplineInfo &gt; SplineInfoArray</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00057">SplineBase.h:57</a></div></div>
 <div class="ttc" id="anamespaceM3_html_adb59b8ecdc4e1b2d5d4c826a13aa7463"><div class="ttname"><a href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a></div><div class="ttdeci">int int_t</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00029">Core.h:29</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -2628,8 +2628,8 @@ Kamil Skwarczynski </dd></dl>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>splines/<a class="el" href="SplineMonolith_8h_source.html">SplineMonolith.h</a></li>
-<li>splines/<a class="el" href="SplineMonolith_8cpp_source.html">SplineMonolith.cpp</a></li>
+<li>Splines/<a class="el" href="SplineMonolith_8h_source.html">SplineMonolith.h</a></li>
+<li>Splines/<a class="el" href="SplineMonolith_8cpp_source.html">SplineMonolith.cpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

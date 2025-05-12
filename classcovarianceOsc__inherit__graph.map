@@ -1,4 +1,0 @@
-<map id="covarianceOsc" name="covarianceOsc">
-<area shape="rect" id="node1" title="Class responsible for handling of neutrino oscillation parameters." alt="" coords="9,79,127,104"/>
-<area shape="rect" id="node2" href="$classcovarianceBase.html" title="Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada..." alt="" coords="5,5,131,31"/>
-</map>

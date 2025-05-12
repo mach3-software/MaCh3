@@ -30,7 +30,7 @@ MathJax.Hub.Config({
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="mach3logo_small.png"/></td>
   <td id="projectalign">
-   <div id="projectname">MaCh3<span id="projectnumber">&#160;1.5.0</span>
+   <div id="projectname">MaCh3<span id="projectnumber">&#160;2.0.0</span>
    </div>
    <div id="projectbrief">Reference Guide</div>
   </td>
@@ -91,7 +91,7 @@ $(function() {
 <p>Class to calculate pvalue produce posterior predictive and many fancy Bayesian stuff <a class="el" href="citelist.html#CITEREF_gelman1996posterior">[8]</a>.  
  <a href="classSampleSummary.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="SampleSummary_8h_source.html">mcmc/SampleSummary.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="SampleSummary_8h_source.html">Fitters/SampleSummary.h</a>&gt;</code></p>
 <div class="dynheader">
 Collaboration diagram for SampleSummary:</div>
 <div class="dyncontent">
@@ -116,16 +116,16 @@ Collaboration diagram for SampleSummary:</div>
 <area shape="rect" title=" " alt="" coords="1489,1241,1675,1266"/>
 <area shape="rect" title=" " alt="" coords="193,314,332,339"/>
 <area shape="rect" title=" " alt="" coords="1482,1290,1682,1315"/>
-<area shape="rect" href="classsamplePDFBase.html" title="Class responsible for handling implementation of samples used in analysis, reweighting and returning ..." alt="" coords="1518,433,1646,458"/>
+<area shape="rect" href="classSampleHandlerBase.html" title="Class responsible for handling implementation of samples used in analysis, reweighting and returning ..." alt="" coords="1505,433,1659,458"/>
 <area shape="rect" title=" " alt="" coords="860,379,1043,419"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:afa739654e03cce78c48eb99bcd58c99a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleSummary.html#afa739654e03cce78c48eb99bcd58c99a">SampleSummary</a> (const int n_Samples, const std::string &amp;Filename, <a class="el" href="classsamplePDFBase.html">samplePDFBase</a> *const sample, const int nSteps)</td></tr>
-<tr class="memdesc:afa739654e03cce78c48eb99bcd58c99a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <br /></td></tr>
-<tr class="separator:afa739654e03cce78c48eb99bcd58c99a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7d7d56b919d6dffe19dc604aabda9519"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleSummary.html#a7d7d56b919d6dffe19dc604aabda9519">SampleSummary</a> (const int n_Samples, const std::string &amp;Filename, <a class="el" href="classSampleHandlerBase.html">SampleHandlerBase</a> *const sample, const int nSteps)</td></tr>
+<tr class="memdesc:a7d7d56b919d6dffe19dc604aabda9519"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <br /></td></tr>
+<tr class="separator:a7d7d56b919d6dffe19dc604aabda9519"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0ff4ad11cdada6c57e9e525decdfc6a6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleSummary.html#a0ff4ad11cdada6c57e9e525decdfc6a6">~SampleSummary</a> ()</td></tr>
 <tr class="memdesc:a0ff4ad11cdada6c57e9e525decdfc6a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor.  <br /></td></tr>
 <tr class="separator:a0ff4ad11cdada6c57e9e525decdfc6a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -472,9 +472,9 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:aa6cfe4fb92b67f08b0d94f0fe1d8a3a2"><td class="memItemLeft" align="right" valign="top">TH1D ****&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleSummary.html#aa6cfe4fb92b67f08b0d94f0fe1d8a3a2">PosteriorHist_ByMode</a></td></tr>
 <tr class="memdesc:aa6cfe4fb92b67f08b0d94f0fe1d8a3a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Histogram which corresponds to each bin in the sample's th2poly.  <br /></td></tr>
 <tr class="separator:aa6cfe4fb92b67f08b0d94f0fe1d8a3a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abd938805245ca6cfeb8c49363f5ff11c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classsamplePDFBase.html">samplePDFBase</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleSummary.html#abd938805245ca6cfeb8c49363f5ff11c">SamplePDF</a></td></tr>
-<tr class="memdesc:abd938805245ca6cfeb8c49363f5ff11c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to samplePDF object, mostly used to get sample names, binning etc.  <br /></td></tr>
-<tr class="separator:abd938805245ca6cfeb8c49363f5ff11c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e4a3bd85a31c266501190fd229a0e6e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSampleHandlerBase.html">SampleHandlerBase</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleSummary.html#a0e4a3bd85a31c266501190fd229a0e6e">SampleHandler</a></td></tr>
+<tr class="memdesc:a0e4a3bd85a31c266501190fd229a0e6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to SampleHandler object, mostly used to get sample names, binning etc.  <br /></td></tr>
+<tr class="separator:a0e4a3bd85a31c266501190fd229a0e6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6593fed9709673a6910f96adc88fc8f2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classMaCh3Modes.html">MaCh3Modes</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleSummary.html#a6593fed9709673a6910f96adc88fc8f2">Modes</a></td></tr>
 <tr class="memdesc:a6593fed9709673a6910f96adc88fc8f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">MaCh3 Modes.  <br /></td></tr>
 <tr class="separator:a6593fed9709673a6910f96adc88fc8f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -496,8 +496,8 @@ Kamil Skwarczynski </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="SampleSummary_8h_source.html#l00022">22</a> of file <a class="el" href="SampleSummary_8h_source.html">SampleSummary.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="afa739654e03cce78c48eb99bcd58c99a" name="afa739654e03cce78c48eb99bcd58c99a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afa739654e03cce78c48eb99bcd58c99a">&#9670;&#160;</a></span>SampleSummary()</h2>
+<a id="a7d7d56b919d6dffe19dc604aabda9519" name="a7d7d56b919d6dffe19dc604aabda9519"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7d7d56b919d6dffe19dc604aabda9519">&#9670;&#160;</a></span>SampleSummary()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -517,7 +517,7 @@ Kamil Skwarczynski </dd></dl>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classsamplePDFBase.html">samplePDFBase</a> *const&#160;</td>
+          <td class="paramtype"><a class="el" href="classSampleHandlerBase.html">SampleHandlerBase</a> *const&#160;</td>
           <td class="paramname"><em>sample</em>, </td>
         </tr>
         <tr>
@@ -546,7 +546,7 @@ Kamil Skwarczynski </dd></dl>
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="SampleSummary_8cpp_source.html#l00009">9</a> of file <a class="el" href="SampleSummary_8cpp_source.html">SampleSummary.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">    9</span>                                                                                                                          {</div>
+<div class="fragment"><div class="line"><span class="lineno">    9</span>                                                                                                                              {</div>
 <div class="line"><span class="lineno">   10</span><span class="comment">// *******************</span></div>
 <div class="line"><span class="lineno">   11</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Making sample summary class...&quot;</span>);</div>
 <div class="line"><span class="lineno">   12</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
@@ -572,10 +572,10 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">   32</span>  </div>
 <div class="line"><span class="lineno">   33</span>  <a class="code hl_variable" href="classSampleSummary.html#a4463f635de4e83c7ada683768454da82">OutputName</a> = Filename;</div>
 <div class="line"><span class="lineno">   34</span>  <a class="code hl_variable" href="classSampleSummary.html#ab16d22bf65d2a9c15072901161fc160a">nSamples</a> = n_Samples;</div>
-<div class="line"><span class="lineno">   35</span>  <a class="code hl_variable" href="classSampleSummary.html#abd938805245ca6cfeb8c49363f5ff11c">SamplePDF</a> = sample;</div>
+<div class="line"><span class="lineno">   35</span>  <a class="code hl_variable" href="classSampleSummary.html#a0e4a3bd85a31c266501190fd229a0e6e">SampleHandler</a> = sample;</div>
 <div class="line"><span class="lineno">   36</span> </div>
 <div class="line"><span class="lineno">   37</span>  <span class="comment">//Get mach3 modes from manager</span></div>
-<div class="line"><span class="lineno">   38</span>  <a class="code hl_variable" href="classSampleSummary.html#a6593fed9709673a6910f96adc88fc8f2">Modes</a> = <a class="code hl_variable" href="classSampleSummary.html#abd938805245ca6cfeb8c49363f5ff11c">SamplePDF</a>-&gt;<a class="code hl_function" href="classsamplePDFBase.html#ad7ab324d8b7ac73f92ef6a8d74b9dc72">GetMaCh3Modes</a>();</div>
+<div class="line"><span class="lineno">   38</span>  <a class="code hl_variable" href="classSampleSummary.html#a6593fed9709673a6910f96adc88fc8f2">Modes</a> = <a class="code hl_variable" href="classSampleSummary.html#a0e4a3bd85a31c266501190fd229a0e6e">SampleHandler</a>-&gt;<a class="code hl_function" href="classSampleHandlerBase.html#aa20368797948a55ad18848965fa439b6">GetMaCh3Modes</a>();</div>
 <div class="line"><span class="lineno">   39</span> </div>
 <div class="line"><span class="lineno">   40</span>  <a class="code hl_variable" href="classSampleSummary.html#aa5c4055d4bb4dc720a4118032cdb4910">nThrows</a> = 0;</div>
 <div class="line"><span class="lineno">   41</span>  <a class="code hl_variable" href="classSampleSummary.html#a4ade2ccb94981d4483f0b4e6e367b1a0">first_pass</a> = <span class="keyword">true</span>;</div>
@@ -652,8 +652,8 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  112</span>  <span class="comment">//KS: This is silly as it assumes all samples uses same kinematics</span></div>
 <div class="line"><span class="lineno">  113</span>  <a class="code hl_variable" href="classSampleSummary.html#ae509f51ec2d0323e005e05c255bc0c1f">lnLFlucHist_ProjectX</a> = std::make_unique&lt;TH2D&gt;(<span class="stringliteral">&quot;lnLFlucHist_ProjectX&quot;</span>, <span class="stringliteral">&quot;lnLFlucHist_ProjectX&quot;</span>, 50, 1, -1, 50, 1, -1);</div>
 <div class="line"><span class="lineno">  114</span>  <a class="code hl_variable" href="classSampleSummary.html#ae509f51ec2d0323e005e05c255bc0c1f">lnLFlucHist_ProjectX</a>-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
-<div class="line"><span class="lineno">  115</span>  <a class="code hl_variable" href="classSampleSummary.html#ae509f51ec2d0323e005e05c255bc0c1f">lnLFlucHist_ProjectX</a>-&gt;GetXaxis()-&gt;SetTitle((<span class="stringliteral">&quot;-2LLH_{Draw Fluc, Draw} for &quot;</span> + <a class="code hl_variable" href="classSampleSummary.html#abd938805245ca6cfeb8c49363f5ff11c">SamplePDF</a>-&gt;<a class="code hl_function" href="classsamplePDFBase.html#a2c02e6a8107a0fd8b9deed6d98015ba3">GetKinVarLabel</a>(0, 0)).c_str());</div>
-<div class="line"><span class="lineno">  116</span>  <a class="code hl_variable" href="classSampleSummary.html#ae509f51ec2d0323e005e05c255bc0c1f">lnLFlucHist_ProjectX</a>-&gt;GetYaxis()-&gt;SetTitle((<span class="stringliteral">&quot;-2LLH_{Data, Draw} for &quot;</span> + <a class="code hl_variable" href="classSampleSummary.html#abd938805245ca6cfeb8c49363f5ff11c">SamplePDF</a>-&gt;<a class="code hl_function" href="classsamplePDFBase.html#a2c02e6a8107a0fd8b9deed6d98015ba3">GetKinVarLabel</a>(0, 0)).c_str());</div>
+<div class="line"><span class="lineno">  115</span>  <a class="code hl_variable" href="classSampleSummary.html#ae509f51ec2d0323e005e05c255bc0c1f">lnLFlucHist_ProjectX</a>-&gt;GetXaxis()-&gt;SetTitle((<span class="stringliteral">&quot;-2LLH_{Draw Fluc, Draw} for &quot;</span> + <a class="code hl_variable" href="classSampleSummary.html#a0e4a3bd85a31c266501190fd229a0e6e">SampleHandler</a>-&gt;<a class="code hl_function" href="classSampleHandlerBase.html#a9bef25c33bdd8d4c800cb64ae4197911">GetKinVarLabel</a>(0, 0)).c_str());</div>
+<div class="line"><span class="lineno">  116</span>  <a class="code hl_variable" href="classSampleSummary.html#ae509f51ec2d0323e005e05c255bc0c1f">lnLFlucHist_ProjectX</a>-&gt;GetYaxis()-&gt;SetTitle((<span class="stringliteral">&quot;-2LLH_{Data, Draw} for &quot;</span> + <a class="code hl_variable" href="classSampleSummary.html#a0e4a3bd85a31c266501190fd229a0e6e">SampleHandler</a>-&gt;<a class="code hl_function" href="classSampleHandlerBase.html#a9bef25c33bdd8d4c800cb64ae4197911">GetKinVarLabel</a>(0, 0)).c_str());</div>
 <div class="line"><span class="lineno">  117</span>  </div>
 <div class="line"><span class="lineno">  118</span>  <span class="comment">// Holds the hist of random number draws, only works for posterior predictive</span></div>
 <div class="line"><span class="lineno">  119</span>  <span class="keywordflow">if</span>(!<a class="code hl_variable" href="classSampleSummary.html#adb737e335e68edeb14a6ce2ca112dc8c">isPriorPredictive</a>)</div>
@@ -699,7 +699,10 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  159</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a4db4657acad5c79ac4bbb66a9d1c5905"><div class="ttname"><a href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a></div><div class="ttdeci">#define MACH3LOG_DEBUG</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00022">MaCh3Logger.h:22</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00023">MaCh3Logger.h:23</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a9bef25c33bdd8d4c800cb64ae4197911"><div class="ttname"><a href="classSampleHandlerBase.html#a9bef25c33bdd8d4c800cb64ae4197911">SampleHandlerBase::GetKinVarLabel</a></div><div class="ttdeci">virtual std::string GetKinVarLabel(const int sample, const int Dimension)</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00064">SampleHandlerBase.h:64</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_aa20368797948a55ad18848965fa439b6"><div class="ttname"><a href="classSampleHandlerBase.html#aa20368797948a55ad18848965fa439b6">SampleHandlerBase::GetMaCh3Modes</a></div><div class="ttdeci">MaCh3Modes * GetMaCh3Modes() const</div><div class="ttdoc">Return pointer to MaCh3 modes.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00038">SampleHandlerBase.h:38</a></div></div>
 <div class="ttc" id="aclassSampleSummary_html_a03bbc94ee26b66875becf22255a205d2"><div class="ttname"><a href="classSampleSummary.html#a03bbc94ee26b66875becf22255a205d2">SampleSummary::lnLHist_Mode</a></div><div class="ttdeci">std::vector&lt; TH2Poly * &gt; lnLHist_Mode</div><div class="ttdoc">The LLH distribution in pmu cosmu for using the mode in each bin.</div><div class="ttdef"><b>Definition:</b> <a href="SampleSummary_8h_source.html#l00209">SampleSummary.h:209</a></div></div>
+<div class="ttc" id="aclassSampleSummary_html_a0e4a3bd85a31c266501190fd229a0e6e"><div class="ttname"><a href="classSampleSummary.html#a0e4a3bd85a31c266501190fd229a0e6e">SampleSummary::SampleHandler</a></div><div class="ttdeci">SampleHandlerBase * SampleHandler</div><div class="ttdoc">Pointer to SampleHandler object, mostly used to get sample names, binning etc.</div><div class="ttdef"><b>Definition:</b> <a href="SampleSummary_8h_source.html#l00336">SampleSummary.h:336</a></div></div>
 <div class="ttc" id="aclassSampleSummary_html_a154c9bd15825713c48154fab66190d39"><div class="ttname"><a href="classSampleSummary.html#a154c9bd15825713c48154fab66190d39">SampleSummary::lnLHist_Mean</a></div><div class="ttdeci">std::vector&lt; TH2Poly * &gt; lnLHist_Mean</div><div class="ttdoc">The LLH distribution in pmu cosmu for using the mean in each bin.</div><div class="ttdef"><b>Definition:</b> <a href="SampleSummary_8h_source.html#l00207">SampleSummary.h:207</a></div></div>
 <div class="ttc" id="aclassSampleSummary_html_a2828111584f80f855b56a9a093987673"><div class="ttname"><a href="classSampleSummary.html#a2828111584f80f855b56a9a093987673">SampleSummary::W2MeanHist</a></div><div class="ttdeci">std::vector&lt; TH2Poly * &gt; W2MeanHist</div><div class="ttdoc">Pointer to the w2 histograms (for mean values).</div><div class="ttdef"><b>Definition:</b> <a href="SampleSummary_8h_source.html#l00177">SampleSummary.h:177</a></div></div>
 <div class="ttc" id="aclassSampleSummary_html_a2ced5be9bc8ba79530464d53b9c23797"><div class="ttname"><a href="classSampleSummary.html#a2ced5be9bc8ba79530464d53b9c23797">SampleSummary::RandomHist</a></div><div class="ttdeci">std::unique_ptr&lt; TH1D &gt; RandomHist</div><div class="ttdoc">Holds the history of which entries have been drawn in the MCMC file.</div><div class="ttdef"><b>Definition:</b> <a href="SampleSummary_8h_source.html#l00227">SampleSummary.h:227</a></div></div>
@@ -734,7 +737,6 @@ Kamil Skwarczynski </dd></dl>
 <div class="ttc" id="aclassSampleSummary_html_aae188cf135af004d5364e5b4f3b1bb31"><div class="ttname"><a href="classSampleSummary.html#aae188cf135af004d5364e5b4f3b1bb31">SampleSummary::lnLDrawHistRate</a></div><div class="ttdeci">std::unique_ptr&lt; TH2D &gt; lnLDrawHistRate</div><div class="ttdoc">The 2D lnLhist, showing (draw vs data) and (draw vs fluct), using rate, anything above y=x axis is th...</div><div class="ttdef"><b>Definition:</b> <a href="SampleSummary_8h_source.html#l00195">SampleSummary.h:195</a></div></div>
 <div class="ttc" id="aclassSampleSummary_html_aaf23ed9a699d625adc8639a57de801e8"><div class="ttname"><a href="classSampleSummary.html#aaf23ed9a699d625adc8639a57de801e8">SampleSummary::lnLHist_drawdata</a></div><div class="ttdeci">std::unique_ptr&lt; TH1D &gt; lnLHist_drawdata</div><div class="ttdoc">The lnLhist for the draw vs data.</div><div class="ttdef"><b>Definition:</b> <a href="SampleSummary_8h_source.html#l00188">SampleSummary.h:188</a></div></div>
 <div class="ttc" id="aclassSampleSummary_html_ab16d22bf65d2a9c15072901161fc160a"><div class="ttname"><a href="classSampleSummary.html#ab16d22bf65d2a9c15072901161fc160a">SampleSummary::nSamples</a></div><div class="ttdeci">int nSamples</div><div class="ttdoc">Number of samples.</div><div class="ttdef"><b>Definition:</b> <a href="SampleSummary_8h_source.html#l00151">SampleSummary.h:151</a></div></div>
-<div class="ttc" id="aclassSampleSummary_html_abd938805245ca6cfeb8c49363f5ff11c"><div class="ttname"><a href="classSampleSummary.html#abd938805245ca6cfeb8c49363f5ff11c">SampleSummary::SamplePDF</a></div><div class="ttdeci">samplePDFBase * SamplePDF</div><div class="ttdoc">Pointer to samplePDF object, mostly used to get sample names, binning etc.</div><div class="ttdef"><b>Definition:</b> <a href="SampleSummary_8h_source.html#l00336">SampleSummary.h:336</a></div></div>
 <div class="ttc" id="aclassSampleSummary_html_abeaca1195db794d9e660a377d81c1b21"><div class="ttname"><a href="classSampleSummary.html#abeaca1195db794d9e660a377d81c1b21">SampleSummary::DataHist_ProjectX</a></div><div class="ttdeci">std::vector&lt; TH1D * &gt; DataHist_ProjectX</div><div class="ttdoc">The data histogram for the selection X projection.</div><div class="ttdef"><b>Definition:</b> <a href="SampleSummary_8h_source.html#l00169">SampleSummary.h:169</a></div></div>
 <div class="ttc" id="aclassSampleSummary_html_abfeb54f4d95b5b74257a1abf5c98824f"><div class="ttname"><a href="classSampleSummary.html#abfeb54f4d95b5b74257a1abf5c98824f">SampleSummary::DataHist_ProjectY</a></div><div class="ttdeci">std::vector&lt; TH1D * &gt; DataHist_ProjectY</div><div class="ttdoc">The data histogram for the selection Y projection.</div><div class="ttdef"><b>Definition:</b> <a href="SampleSummary_8h_source.html#l00171">SampleSummary.h:171</a></div></div>
 <div class="ttc" id="aclassSampleSummary_html_adb737e335e68edeb14a6ce2ca112dc8c"><div class="ttname"><a href="classSampleSummary.html#adb737e335e68edeb14a6ce2ca112dc8c">SampleSummary::isPriorPredictive</a></div><div class="ttdeci">bool isPriorPredictive</div><div class="ttdoc">bool whether we have Prior or Posterior Predictive</div><div class="ttdef"><b>Definition:</b> <a href="SampleSummary_8h_source.html#l00238">SampleSummary.h:238</a></div></div>
@@ -750,8 +752,6 @@ Kamil Skwarczynski </dd></dl>
 <div class="ttc" id="aclassSampleSummary_html_af4767862e5c1f4e3319d16b861213555"><div class="ttname"><a href="classSampleSummary.html#af4767862e5c1f4e3319d16b861213555">SampleSummary::nChainSteps</a></div><div class="ttdeci">unsigned int nChainSteps</div><div class="ttdoc">Number of throws by user.</div><div class="ttdef"><b>Definition:</b> <a href="SampleSummary_8h_source.html#l00235">SampleSummary.h:235</a></div></div>
 <div class="ttc" id="aclassSampleSummary_html_af5a3139cef917abfddc36dbb8d4ac2fd"><div class="ttname"><a href="classSampleSummary.html#af5a3139cef917abfddc36dbb8d4ac2fd">SampleSummary::maxBins</a></div><div class="ttdeci">std::vector&lt; int &gt; maxBins</div><div class="ttdoc">Max Number of Bins per each sample.</div><div class="ttdef"><b>Definition:</b> <a href="SampleSummary_8h_source.html#l00247">SampleSummary.h:247</a></div></div>
 <div class="ttc" id="aclassSampleSummary_html_afddd2abc0ec07b52dc9004880522ab5a"><div class="ttname"><a href="classSampleSummary.html#afddd2abc0ec07b52dc9004880522ab5a">SampleSummary::lnLHist_Sample_DrawflucDraw</a></div><div class="ttdeci">std::vector&lt; TH1D * &gt; lnLHist_Sample_DrawflucDraw</div><div class="ttdoc">The histogram containing the lnL (draw vs draw fluct) for each throw for each sample.</div><div class="ttdef"><b>Definition:</b> <a href="SampleSummary_8h_source.html#l00202">SampleSummary.h:202</a></div></div>
-<div class="ttc" id="aclasssamplePDFBase_html_a2c02e6a8107a0fd8b9deed6d98015ba3"><div class="ttname"><a href="classsamplePDFBase.html#a2c02e6a8107a0fd8b9deed6d98015ba3">samplePDFBase::GetKinVarLabel</a></div><div class="ttdeci">virtual std::string GetKinVarLabel(const int sample, const int Dimension)</div><div class="ttdef"><b>Definition:</b> <a href="samplePDFBase_8h_source.html#l00064">samplePDFBase.h:64</a></div></div>
-<div class="ttc" id="aclasssamplePDFBase_html_ad7ab324d8b7ac73f92ef6a8d74b9dc72"><div class="ttname"><a href="classsamplePDFBase.html#ad7ab324d8b7ac73f92ef6a8d74b9dc72">samplePDFBase::GetMaCh3Modes</a></div><div class="ttdeci">MaCh3Modes * GetMaCh3Modes() const</div><div class="ttdoc">Return pointer to MaCh3 modes.</div><div class="ttdef"><b>Definition:</b> <a href="samplePDFBase_8h_source.html#l00038">samplePDFBase.h:38</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -876,7 +876,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  251</span>        <a class="code hl_variable" href="classSampleSummary.html#abfeb54f4d95b5b74257a1abf5c98824f">DataHist_ProjectY</a>[i] = <a class="code hl_function" href="classSampleSummary.html#a685a8ef3180d4f6474328b5c806d8b74">ProjectPoly</a>(<a class="code hl_variable" href="classSampleSummary.html#a7e962b36331edb6ff1e9de849cbabee3">DataHist</a>[i], <span class="keyword">false</span>, i);</div>
 <div class="line"><span class="lineno">  252</span>        <a class="code hl_variable" href="classSampleSummary.html#af5a3139cef917abfddc36dbb8d4ac2fd">maxBins</a>[i] = <a class="code hl_variable" href="classSampleSummary.html#a7e962b36331edb6ff1e9de849cbabee3">DataHist</a>[i]-&gt;GetNumberOfBins();</div>
 <div class="line"><span class="lineno">  253</span>      } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  254</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Somehow sample {} doesn&#39;t use TH2Poly&quot;</span>, <a class="code hl_variable" href="classSampleSummary.html#abd938805245ca6cfeb8c49363f5ff11c">SamplePDF</a>-&gt;<a class="code hl_function" href="classsamplePDFBase.html#ade64bb3c79cb0748614f3548dd7edb51">GetSampleName</a>(i));</div>
+<div class="line"><span class="lineno">  254</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Somehow sample {} doesn&#39;t use TH2Poly&quot;</span>, <a class="code hl_variable" href="classSampleSummary.html#a0e4a3bd85a31c266501190fd229a0e6e">SampleHandler</a>-&gt;<a class="code hl_function" href="classSampleHandlerBase.html#a0ed9dd339235b3bdea2680078ab129ab">GetSampleName</a>(i));</div>
 <div class="line"><span class="lineno">  255</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Right now I only support TH2Poly but I am ambitious piece of code and surely will have more support in the future&quot;</span>);</div>
 <div class="line"><span class="lineno">  256</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
 <div class="line"><span class="lineno">  257</span>      }</div>
@@ -886,9 +886,9 @@ Kamil Skwarczynski </dd></dl>
 <div class="ttc" id="aHistogramUtils_8cpp_html_a2fc5d92fb039ba3c886404100876a511"><div class="ttname"><a href="HistogramUtils_8cpp.html#a2fc5d92fb039ba3c886404100876a511">NormaliseTH2Poly</a></div><div class="ttdeci">void NormaliseTH2Poly(TH2Poly *Histogram)</div><div class="ttdoc">Helper to Normalise histograms.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00211">HistogramUtils.cpp:211</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00025">MaCh3Logger.h:25</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00013">MaCh3Exception.h:13</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a0ed9dd339235b3bdea2680078ab129ab"><div class="ttname"><a href="classSampleHandlerBase.html#a0ed9dd339235b3bdea2680078ab129ab">SampleHandlerBase::GetSampleName</a></div><div class="ttdeci">virtual std::string GetSampleName(int Sample) const =0</div></div>
 <div class="ttc" id="aclassSampleSummary_html_a685a8ef3180d4f6474328b5c806d8b74"><div class="ttname"><a href="classSampleSummary.html#a685a8ef3180d4f6474328b5c806d8b74">SampleSummary::ProjectPoly</a></div><div class="ttdeci">TH1D * ProjectPoly(TH2Poly *Histogram, const bool ProjectX, const int selection, const bool MakeErrorHist=false)</div><div class="ttdoc">Helper to project TH2Poly onto axis.</div><div class="ttdef"><b>Definition:</b> <a href="SampleSummary_8cpp_source.html#l02163">SampleSummary.cpp:2163</a></div></div>
 <div class="ttc" id="aclassSampleSummary_html_a8c5a4ed4db695ce5c5820d857c76b4ff"><div class="ttname"><a href="classSampleSummary.html#a8c5a4ed4db695ce5c5820d857c76b4ff">SampleSummary::CheckSamples</a></div><div class="ttdeci">bool CheckSamples(const int Length)</div><div class="ttdoc">Check the length of samples agrees.</div><div class="ttdef"><b>Definition:</b> <a href="SampleSummary_8cpp_source.html#l00217">SampleSummary.cpp:217</a></div></div>
-<div class="ttc" id="aclasssamplePDFBase_html_ade64bb3c79cb0748614f3548dd7edb51"><div class="ttname"><a href="classsamplePDFBase.html#ade64bb3c79cb0748614f3548dd7edb51">samplePDFBase::GetSampleName</a></div><div class="ttdeci">virtual std::string GetSampleName(int Sample) const =0</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1005,7 +1005,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  345</span>      std::vector&lt;double&gt; xbins;</div>
 <div class="line"><span class="lineno">  346</span>      std::vector&lt;double&gt; ybins;</div>
 <div class="line"><span class="lineno">  347</span> </div>
-<div class="line"><span class="lineno">  348</span>      <a class="code hl_variable" href="classSampleSummary.html#abd938805245ca6cfeb8c49363f5ff11c">SamplePDF</a>-&gt;<a class="code hl_function" href="classsamplePDFBase.html#aa3ac45cabba791d5ea5baabcc277384b">SetupBinning</a>(<a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a>(i), xbins, ybins);</div>
+<div class="line"><span class="lineno">  348</span>      <a class="code hl_variable" href="classSampleSummary.html#a0e4a3bd85a31c266501190fd229a0e6e">SampleHandler</a>-&gt;<a class="code hl_function" href="classSampleHandlerBase.html#a0cf61d8f769755c4a0fa549adc575c3e">SetupBinning</a>(<a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a>(i), xbins, ybins);</div>
 <div class="line"><span class="lineno">  349</span>      </div>
 <div class="line"><span class="lineno">  350</span>      <span class="comment">//KS: Y axis is number of events to get estimate of maximal number we use integral</span></div>
 <div class="line"><span class="lineno">  351</span>      <span class="keyword">const</span> <span class="keywordtype">int</span> MaxBinning = <a class="code hl_variable" href="classSampleSummary.html#aebd01b201cf04608b251cd3e272878b7">doShapeOnly</a> ? 1 : int(<a class="code hl_function" href="HistogramUtils_8cpp.html#ab18c6b2408d7b9021bad06d47a06ee8d">NoOverflowIntegral</a>(<a class="code hl_variable" href="classSampleSummary.html#a503b0dc19bb1ad57e7f2560cc64feef9">NominalHist</a>[i])/4);</div>
@@ -1062,7 +1062,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  402</span>  }</div>
 <div class="line"><span class="lineno">  403</span>}</div>
 <div class="ttc" id="aHistogramUtils_8cpp_html_ab18c6b2408d7b9021bad06d47a06ee8d"><div class="ttname"><a href="HistogramUtils_8cpp.html#ab18c6b2408d7b9021bad06d47a06ee8d">NoOverflowIntegral</a></div><div class="ttdeci">double NoOverflowIntegral(TH2Poly *poly)</div><div class="ttdoc">WP: Helper function for calculating binned Integral of TH2Poly i.e not including overflow.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00050">HistogramUtils.cpp:50</a></div></div>
-<div class="ttc" id="aclasssamplePDFBase_html_aa3ac45cabba791d5ea5baabcc277384b"><div class="ttname"><a href="classsamplePDFBase.html#aa3ac45cabba791d5ea5baabcc277384b">samplePDFBase::SetupBinning</a></div><div class="ttdeci">virtual void SetupBinning(const M3::int_t Selection, std::vector&lt; double &gt; &amp;BinningX, std::vector&lt; double &gt; &amp;BinningY)</div><div class="ttdef"><b>Definition:</b> <a href="samplePDFBase_8h_source.html#l00057">samplePDFBase.h:57</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a0cf61d8f769755c4a0fa549adc575c3e"><div class="ttname"><a href="classSampleHandlerBase.html#a0cf61d8f769755c4a0fa549adc575c3e">SampleHandlerBase::SetupBinning</a></div><div class="ttdeci">virtual void SetupBinning(const M3::int_t Selection, std::vector&lt; double &gt; &amp;BinningX, std::vector&lt; double &gt; &amp;BinningY)</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00057">SampleHandlerBase.h:57</a></div></div>
 <div class="ttc" id="anamespaceM3_html_adb59b8ecdc4e1b2d5d4c826a13aa7463"><div class="ttname"><a href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a></div><div class="ttdeci">int int_t</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00029">Core.h:29</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -1516,12 +1516,12 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 1602</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> data = DatHist-&gt;GetBinContent(i);</div>
 <div class="line"><span class="lineno"> 1603</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> mc = MCHist-&gt;GetBinContent(i);</div>
 <div class="line"><span class="lineno"> 1604</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> w2 = W2Hist-&gt;GetBinContent(i);</div>
-<div class="line"><span class="lineno"> 1605</span>    llh += <a class="code hl_variable" href="classSampleSummary.html#abd938805245ca6cfeb8c49363f5ff11c">SamplePDF</a>-&gt;<a class="code hl_function" href="classsamplePDFBase.html#ab2e2eab110efc30a2aee13a5011acb8a">getTestStatLLH</a>(data, mc, w2);</div>
+<div class="line"><span class="lineno"> 1605</span>    llh += <a class="code hl_variable" href="classSampleSummary.html#a0e4a3bd85a31c266501190fd229a0e6e">SampleHandler</a>-&gt;<a class="code hl_function" href="classSampleHandlerBase.html#ac0cfbc3d13eafd3b5687ff739b862b80">GetTestStatLLH</a>(data, mc, w2);</div>
 <div class="line"><span class="lineno"> 1606</span>  }</div>
 <div class="line"><span class="lineno"> 1607</span>  <span class="comment">//KS: do times 2 because banff reports chi2</span></div>
 <div class="line"><span class="lineno"> 1608</span>  <span class="keywordflow">return</span> 2*llh;</div>
 <div class="line"><span class="lineno"> 1609</span>}</div>
-<div class="ttc" id="aclasssamplePDFBase_html_ab2e2eab110efc30a2aee13a5011acb8a"><div class="ttname"><a href="classsamplePDFBase.html#ab2e2eab110efc30a2aee13a5011acb8a">samplePDFBase::getTestStatLLH</a></div><div class="ttdeci">double getTestStatLLH(double data, double mc) const</div><div class="ttdef"><b>Definition:</b> <a href="samplePDFBase_8cpp_source.html#l00099">samplePDFBase.cpp:99</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_ac0cfbc3d13eafd3b5687ff739b862b80"><div class="ttname"><a href="classSampleHandlerBase.html#ac0cfbc3d13eafd3b5687ff739b862b80">SampleHandlerBase::GetTestStatLLH</a></div><div class="ttdeci">double GetTestStatLLH(double data, double mc) const</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8cpp_source.html#l00099">SampleHandlerBase.cpp:99</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1584,7 +1584,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 1587</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> data = DatHist-&gt;GetBinContent(i);</div>
 <div class="line"><span class="lineno"> 1588</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> mc = MCHist-&gt;GetBinContent(i);</div>
 <div class="line"><span class="lineno"> 1589</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> w2 = W2Hist-&gt;GetBinContent(i);</div>
-<div class="line"><span class="lineno"> 1590</span>    llh += <a class="code hl_variable" href="classSampleSummary.html#abd938805245ca6cfeb8c49363f5ff11c">SamplePDF</a>-&gt;<a class="code hl_function" href="classsamplePDFBase.html#ab2e2eab110efc30a2aee13a5011acb8a">getTestStatLLH</a>(data, mc, w2);</div>
+<div class="line"><span class="lineno"> 1590</span>    llh += <a class="code hl_variable" href="classSampleSummary.html#a0e4a3bd85a31c266501190fd229a0e6e">SampleHandler</a>-&gt;<a class="code hl_function" href="classSampleHandlerBase.html#ac0cfbc3d13eafd3b5687ff739b862b80">GetTestStatLLH</a>(data, mc, w2);</div>
 <div class="line"><span class="lineno"> 1591</span>  }</div>
 <div class="line"><span class="lineno"> 1592</span>  <span class="comment">//KS: do times 2 because banff reports chi2</span></div>
 <div class="line"><span class="lineno"> 1593</span>  <span class="keywordflow">return</span> 2*llh;</div>
@@ -1765,12 +1765,12 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 1278</span> </div>
 <div class="line"><span class="lineno"> 1279</span><span class="comment">//Rate Based p-value</span></div>
 <div class="line"><span class="lineno"> 1280</span>      <span class="comment">// Likelihood between the drawn histogram and the data</span></div>
-<div class="line"><span class="lineno"> 1281</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> RateDataDrawLLH = <a class="code hl_variable" href="classSampleSummary.html#abd938805245ca6cfeb8c49363f5ff11c">SamplePDF</a>-&gt;<a class="code hl_function" href="classsamplePDFBase.html#ab2e2eab110efc30a2aee13a5011acb8a">getTestStatLLH</a>(<a class="code hl_function" href="HistogramUtils_8cpp.html#ab18c6b2408d7b9021bad06d47a06ee8d">NoOverflowIntegral</a>(<a class="code hl_variable" href="classSampleSummary.html#a7e962b36331edb6ff1e9de849cbabee3">DataHist</a>[SampleNum]), <a class="code hl_function" href="HistogramUtils_8cpp.html#ab18c6b2408d7b9021bad06d47a06ee8d">NoOverflowIntegral</a>(DrawHist), <a class="code hl_function" href="HistogramUtils_8cpp.html#ab18c6b2408d7b9021bad06d47a06ee8d">NoOverflowIntegral</a>(DrawW2Hist));</div>
+<div class="line"><span class="lineno"> 1281</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> RateDataDrawLLH = <a class="code hl_variable" href="classSampleSummary.html#a0e4a3bd85a31c266501190fd229a0e6e">SampleHandler</a>-&gt;<a class="code hl_function" href="classSampleHandlerBase.html#ac0cfbc3d13eafd3b5687ff739b862b80">GetTestStatLLH</a>(<a class="code hl_function" href="HistogramUtils_8cpp.html#ab18c6b2408d7b9021bad06d47a06ee8d">NoOverflowIntegral</a>(<a class="code hl_variable" href="classSampleSummary.html#a7e962b36331edb6ff1e9de849cbabee3">DataHist</a>[SampleNum]), <a class="code hl_function" href="HistogramUtils_8cpp.html#ab18c6b2408d7b9021bad06d47a06ee8d">NoOverflowIntegral</a>(DrawHist), <a class="code hl_function" href="HistogramUtils_8cpp.html#ab18c6b2408d7b9021bad06d47a06ee8d">NoOverflowIntegral</a>(DrawW2Hist));</div>
 <div class="line"><span class="lineno"> 1282</span>      <a class="code hl_variable" href="classSampleSummary.html#adae47fb3a91f5946c7329c6e3643ae9a">llh_rate_data_draw</a>[SampleNum] += RateDataDrawLLH;</div>
 <div class="line"><span class="lineno"> 1283</span>      total_llh_rate_data_draw_temp += RateDataDrawLLH;</div>
 <div class="line"><span class="lineno"> 1284</span> </div>
 <div class="line"><span class="lineno"> 1285</span>      <span class="comment">// Likelihood between drawn histogram and fluctuated posterior predictive distribution using rate</span></div>
-<div class="line"><span class="lineno"> 1286</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> RatePredFlucDrawLLH = <a class="code hl_variable" href="classSampleSummary.html#abd938805245ca6cfeb8c49363f5ff11c">SamplePDF</a>-&gt;<a class="code hl_function" href="classsamplePDFBase.html#ab2e2eab110efc30a2aee13a5011acb8a">getTestStatLLH</a>(<a class="code hl_function" href="HistogramUtils_8cpp.html#ab18c6b2408d7b9021bad06d47a06ee8d">NoOverflowIntegral</a>(FluctHist[SampleNum]), <a class="code hl_function" href="HistogramUtils_8cpp.html#ab18c6b2408d7b9021bad06d47a06ee8d">NoOverflowIntegral</a>(DrawHist), <a class="code hl_function" href="HistogramUtils_8cpp.html#ab18c6b2408d7b9021bad06d47a06ee8d">NoOverflowIntegral</a>(DrawW2Hist));</div>
+<div class="line"><span class="lineno"> 1286</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> RatePredFlucDrawLLH = <a class="code hl_variable" href="classSampleSummary.html#a0e4a3bd85a31c266501190fd229a0e6e">SampleHandler</a>-&gt;<a class="code hl_function" href="classSampleHandlerBase.html#ac0cfbc3d13eafd3b5687ff739b862b80">GetTestStatLLH</a>(<a class="code hl_function" href="HistogramUtils_8cpp.html#ab18c6b2408d7b9021bad06d47a06ee8d">NoOverflowIntegral</a>(FluctHist[SampleNum]), <a class="code hl_function" href="HistogramUtils_8cpp.html#ab18c6b2408d7b9021bad06d47a06ee8d">NoOverflowIntegral</a>(DrawHist), <a class="code hl_function" href="HistogramUtils_8cpp.html#ab18c6b2408d7b9021bad06d47a06ee8d">NoOverflowIntegral</a>(DrawW2Hist));</div>
 <div class="line"><span class="lineno"> 1287</span>      <a class="code hl_variable" href="classSampleSummary.html#aa27591c1aff4c4e8e25fbf9c13ae37c5">llh_rate_predfluc_draw</a>[SampleNum] += RatePredFlucDrawLLH;</div>
 <div class="line"><span class="lineno"> 1288</span>      total_llh_rate_predfluc_draw_temp += RatePredFlucDrawLLH;</div>
 <div class="line"><span class="lineno"> 1289</span> </div>
@@ -2337,8 +2337,8 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 1016</span>      <span class="keywordtype">double</span> TempLLH_Mode = 0.0;</div>
 <div class="line"><span class="lineno"> 1017</span>      </div>
 <div class="line"><span class="lineno"> 1018</span>      <span class="comment">//KS:Get LLH contribution getTestStatLLH can calculate Barlow Beeston/IceCube or Poisson</span></div>
-<div class="line"><span class="lineno"> 1019</span>      TempLLH_Mean = <a class="code hl_variable" href="classSampleSummary.html#abd938805245ca6cfeb8c49363f5ff11c">SamplePDF</a>-&gt;<a class="code hl_function" href="classsamplePDFBase.html#ab2e2eab110efc30a2aee13a5011acb8a">getTestStatLLH</a>(nData, nMean, nW2Mean);</div>
-<div class="line"><span class="lineno"> 1020</span>      TempLLH_Mode = <a class="code hl_variable" href="classSampleSummary.html#abd938805245ca6cfeb8c49363f5ff11c">SamplePDF</a>-&gt;<a class="code hl_function" href="classsamplePDFBase.html#ab2e2eab110efc30a2aee13a5011acb8a">getTestStatLLH</a>(nData, nMode, nW2Mode);</div>
+<div class="line"><span class="lineno"> 1019</span>      TempLLH_Mean = <a class="code hl_variable" href="classSampleSummary.html#a0e4a3bd85a31c266501190fd229a0e6e">SampleHandler</a>-&gt;<a class="code hl_function" href="classSampleHandlerBase.html#ac0cfbc3d13eafd3b5687ff739b862b80">GetTestStatLLH</a>(nData, nMean, nW2Mean);</div>
+<div class="line"><span class="lineno"> 1020</span>      TempLLH_Mode = <a class="code hl_variable" href="classSampleSummary.html#a0e4a3bd85a31c266501190fd229a0e6e">SampleHandler</a>-&gt;<a class="code hl_function" href="classSampleHandlerBase.html#ac0cfbc3d13eafd3b5687ff739b862b80">GetTestStatLLH</a>(nData, nMode, nW2Mode);</div>
 <div class="line"><span class="lineno"> 1021</span> </div>
 <div class="line"><span class="lineno"> 1022</span>      <span class="comment">// Increment -2LLH</span></div>
 <div class="line"><span class="lineno"> 1023</span>      <span class="comment">//KS: do times 2 because banff reports chi2</span></div>
@@ -2423,7 +2423,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 1102</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> nW2Mean = W2MeanProjectX-&gt;GetBinContent(j);</div>
 <div class="line"><span class="lineno"> 1103</span> </div>
 <div class="line"><span class="lineno"> 1104</span>      <span class="keywordtype">double</span> TempLLH_Mean = 0.0;</div>
-<div class="line"><span class="lineno"> 1105</span>      TempLLH_Mean = <a class="code hl_variable" href="classSampleSummary.html#abd938805245ca6cfeb8c49363f5ff11c">SamplePDF</a>-&gt;<a class="code hl_function" href="classsamplePDFBase.html#ab2e2eab110efc30a2aee13a5011acb8a">getTestStatLLH</a>(nData, nMean, nW2Mean);</div>
+<div class="line"><span class="lineno"> 1105</span>      TempLLH_Mean = <a class="code hl_variable" href="classSampleSummary.html#a0e4a3bd85a31c266501190fd229a0e6e">SampleHandler</a>-&gt;<a class="code hl_function" href="classSampleHandlerBase.html#ac0cfbc3d13eafd3b5687ff739b862b80">GetTestStatLLH</a>(nData, nMean, nW2Mean);</div>
 <div class="line"><span class="lineno"> 1106</span> </div>
 <div class="line"><span class="lineno"> 1107</span>      <span class="comment">//KS: do times 2 because banff reports chi2</span></div>
 <div class="line"><span class="lineno"> 1108</span>      <a class="code hl_variable" href="classSampleSummary.html#a7b1ba5b3b465f78019bb8c36ec5f56d7">lnLHist_Mean_ProjectX</a>[SampleNum]-&gt;SetBinContent(j, 2.0*TempLLH_Mean);</div>
@@ -2631,7 +2631,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  601</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classSampleSummary.html#ab16d22bf65d2a9c15072901161fc160a">nSamples</a>; ++i)</div>
 <div class="line"><span class="lineno">  602</span>  {</div>
 <div class="line"><span class="lineno">  603</span>    <span class="comment">// Get the name</span></div>
-<div class="line"><span class="lineno">  604</span>    std::string SampleName = <a class="code hl_variable" href="classSampleSummary.html#abd938805245ca6cfeb8c49363f5ff11c">SamplePDF</a>-&gt;<a class="code hl_function" href="classsamplePDFBase.html#ade64bb3c79cb0748614f3548dd7edb51">GetSampleName</a>(i);</div>
+<div class="line"><span class="lineno">  604</span>    std::string SampleName = <a class="code hl_variable" href="classSampleSummary.html#a0e4a3bd85a31c266501190fd229a0e6e">SampleHandler</a>-&gt;<a class="code hl_function" href="classSampleHandlerBase.html#a0ed9dd339235b3bdea2680078ab129ab">GetSampleName</a>(i);</div>
 <div class="line"><span class="lineno">  605</span>    <span class="comment">// Strip out spaces</span></div>
 <div class="line"><span class="lineno">  606</span>    <span class="keywordflow">while</span> (SampleName.find(<span class="stringliteral">&quot; &quot;</span>) != std::string::npos) {</div>
 <div class="line"><span class="lineno">  607</span>      SampleName.replace(SampleName.find(<span class="stringliteral">&quot; &quot;</span>), 1, std::string(<span class="stringliteral">&quot;_&quot;</span>));</div>
@@ -2804,7 +2804,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 2165</span>  std::vector&lt;double&gt; xbins;</div>
 <div class="line"><span class="lineno"> 2166</span>  std::vector&lt;double&gt; ybins;</div>
 <div class="line"><span class="lineno"> 2167</span> </div>
-<div class="line"><span class="lineno"> 2168</span>  <a class="code hl_variable" href="classSampleSummary.html#abd938805245ca6cfeb8c49363f5ff11c">SamplePDF</a>-&gt;<a class="code hl_function" href="classsamplePDFBase.html#aa3ac45cabba791d5ea5baabcc277384b">SetupBinning</a>(<a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a>(selection), xbins, ybins);</div>
+<div class="line"><span class="lineno"> 2168</span>  <a class="code hl_variable" href="classSampleSummary.html#a0e4a3bd85a31c266501190fd229a0e6e">SampleHandler</a>-&gt;<a class="code hl_function" href="classSampleHandlerBase.html#a0cf61d8f769755c4a0fa549adc575c3e">SetupBinning</a>(<a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a>(selection), xbins, ybins);</div>
 <div class="line"><span class="lineno"> 2169</span>  TH1D* Projection = <span class="keyword">nullptr</span>;</div>
 <div class="line"><span class="lineno"> 2170</span>  std::string name;</div>
 <div class="line"><span class="lineno"> 2171</span>  <span class="keywordflow">if</span> (ProjectX) {</div>
@@ -3590,7 +3590,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 2305</span>        <span class="keyword">const</span> <span class="keywordtype">double</span> w2 = <a class="code hl_variable" href="classSampleSummary.html#a263b7541545b8b0ba735e0a3ac2d31e7">W2MCVector</a>[s][SampleNum]-&gt;GetBinContent(i);</div>
 <div class="line"><span class="lineno"> 2306</span> </div>
 <div class="line"><span class="lineno"> 2307</span>        <span class="comment">// Get the -log-likelihood for this sample and bin</span></div>
-<div class="line"><span class="lineno"> 2308</span>        <span class="keywordtype">double</span> neg_LLH_temp = <a class="code hl_variable" href="classSampleSummary.html#abd938805245ca6cfeb8c49363f5ff11c">SamplePDF</a>-&gt;<a class="code hl_function" href="classsamplePDFBase.html#ab2e2eab110efc30a2aee13a5011acb8a">getTestStatLLH</a>(data, mc, w2);</div>
+<div class="line"><span class="lineno"> 2308</span>        <span class="keywordtype">double</span> neg_LLH_temp = <a class="code hl_variable" href="classSampleSummary.html#a0e4a3bd85a31c266501190fd229a0e6e">SampleHandler</a>-&gt;<a class="code hl_function" href="classSampleHandlerBase.html#ac0cfbc3d13eafd3b5687ff739b862b80">GetTestStatLLH</a>(data, mc, w2);</div>
 <div class="line"><span class="lineno"> 2309</span> </div>
 <div class="line"><span class="lineno"> 2310</span>        <span class="comment">// Negate the negative log-likelihood to get the actual log-likelihood</span></div>
 <div class="line"><span class="lineno"> 2311</span>        <span class="keywordtype">double</span> LLH_temp = -neg_LLH_temp;</div>
@@ -3766,8 +3766,8 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  791</span>    <span class="comment">// finally p-value for 1D projection</span></div>
 <div class="line"><span class="lineno">  792</span>    <a class="code hl_variable" href="classSampleSummary.html#a78eb4766cc8b4758b909b6ce9113a56e">OutputTree</a>-&gt;Draw((SampleName+<span class="stringliteral">&quot;_data_draw_ProjectX:&quot;</span>+SampleName+<span class="stringliteral">&quot;_drawfluc_draw_ProjectX&gt;&gt;htemp4&quot;</span>).c_str());</div>
 <div class="line"><span class="lineno">  793</span>    TH2D *TempHistogram4 = <span class="keyword">static_cast&lt;</span>TH2D*<span class="keyword">&gt;</span>(gDirectory-&gt;Get(<span class="stringliteral">&quot;htemp4&quot;</span>)-&gt;Clone());</div>
-<div class="line"><span class="lineno">  794</span>    TempHistogram4-&gt;GetXaxis()-&gt;SetTitle((<span class="stringliteral">&quot;-2LLH_{Draw Fluc, Draw} for &quot;</span> + <a class="code hl_variable" href="classSampleSummary.html#abd938805245ca6cfeb8c49363f5ff11c">SamplePDF</a>-&gt;<a class="code hl_function" href="classsamplePDFBase.html#a2c02e6a8107a0fd8b9deed6d98015ba3">GetKinVarLabel</a>(i, 0)).c_str());</div>
-<div class="line"><span class="lineno">  795</span>    TempHistogram4-&gt;GetYaxis()-&gt;SetTitle((<span class="stringliteral">&quot;-2LLH_{Data, Draw} for &quot;</span> + <a class="code hl_variable" href="classSampleSummary.html#abd938805245ca6cfeb8c49363f5ff11c">SamplePDF</a>-&gt;<a class="code hl_function" href="classsamplePDFBase.html#a2c02e6a8107a0fd8b9deed6d98015ba3">GetKinVarLabel</a>(i, 0)).c_str());</div>
+<div class="line"><span class="lineno">  794</span>    TempHistogram4-&gt;GetXaxis()-&gt;SetTitle((<span class="stringliteral">&quot;-2LLH_{Draw Fluc, Draw} for &quot;</span> + <a class="code hl_variable" href="classSampleSummary.html#a0e4a3bd85a31c266501190fd229a0e6e">SampleHandler</a>-&gt;<a class="code hl_function" href="classSampleHandlerBase.html#a9bef25c33bdd8d4c800cb64ae4197911">GetKinVarLabel</a>(i, 0)).c_str());</div>
+<div class="line"><span class="lineno">  795</span>    TempHistogram4-&gt;GetYaxis()-&gt;SetTitle((<span class="stringliteral">&quot;-2LLH_{Data, Draw} for &quot;</span> + <a class="code hl_variable" href="classSampleSummary.html#a0e4a3bd85a31c266501190fd229a0e6e">SampleHandler</a>-&gt;<a class="code hl_function" href="classSampleHandlerBase.html#a9bef25c33bdd8d4c800cb64ae4197911">GetKinVarLabel</a>(i, 0)).c_str());</div>
 <div class="line"><span class="lineno">  796</span>    TempHistogram4-&gt;SetNameTitle((<a class="code hl_variable" href="classSampleSummary.html#a9ba7df41774c45a14c0a97e4accc9cc0">SampleNames</a>[i]+<span class="stringliteral">&quot;_drawfluc_draw_ProjectX&quot;</span>).c_str(), (<a class="code hl_variable" href="classSampleSummary.html#a9ba7df41774c45a14c0a97e4accc9cc0">SampleNames</a>[i]+<span class="stringliteral">&quot;_drawfluc_draw_ProjectX&quot;</span>).c_str());</div>
 <div class="line"><span class="lineno">  797</span>    <a class="code hl_function" href="StatisticalUtils_8cpp.html#a57771836d3d082d24170e24a2f04a4d6">Get2DBayesianpValue</a>(TempHistogram4);</div>
 <div class="line"><span class="lineno">  798</span>    TempHistogram4-&gt;Write();</div>
@@ -5647,6 +5647,32 @@ Kamil Skwarczynski </dd></dl>
 
 </div>
 </div>
+<a id="a0e4a3bd85a31c266501190fd229a0e6e" name="a0e4a3bd85a31c266501190fd229a0e6e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0e4a3bd85a31c266501190fd229a0e6e">&#9670;&#160;</a></span>SampleHandler</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSampleHandlerBase.html">SampleHandlerBase</a>* SampleSummary::SampleHandler</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Pointer to SampleHandler object, mostly used to get sample names, binning etc. </p>
+
+<p class="definition">Definition at line <a class="el" href="SampleSummary_8h_source.html#l00336">336</a> of file <a class="el" href="SampleSummary_8h_source.html">SampleSummary.h</a>.</p>
+
+</div>
+</div>
 <a id="a9ba7df41774c45a14c0a97e4accc9cc0" name="a9ba7df41774c45a14c0a97e4accc9cc0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9ba7df41774c45a14c0a97e4accc9cc0">&#9670;&#160;</a></span>SampleNames</h2>
 
@@ -5670,32 +5696,6 @@ Kamil Skwarczynski </dd></dl>
 <p>name for each sample </p>
 
 <p class="definition">Definition at line <a class="el" href="SampleSummary_8h_source.html#l00154">154</a> of file <a class="el" href="SampleSummary_8h_source.html">SampleSummary.h</a>.</p>
-
-</div>
-</div>
-<a id="abd938805245ca6cfeb8c49363f5ff11c" name="abd938805245ca6cfeb8c49363f5ff11c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abd938805245ca6cfeb8c49363f5ff11c">&#9670;&#160;</a></span>SamplePDF</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classsamplePDFBase.html">samplePDFBase</a>* SampleSummary::SamplePDF</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Pointer to samplePDF object, mostly used to get sample names, binning etc. </p>
-
-<p class="definition">Definition at line <a class="el" href="SampleSummary_8h_source.html#l00336">336</a> of file <a class="el" href="SampleSummary_8h_source.html">SampleSummary.h</a>.</p>
 
 </div>
 </div>
@@ -6298,8 +6298,8 @@ Kamil Skwarczynski </dd></dl>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>mcmc/<a class="el" href="SampleSummary_8h_source.html">SampleSummary.h</a></li>
-<li>mcmc/<a class="el" href="SampleSummary_8cpp_source.html">SampleSummary.cpp</a></li>
+<li>Fitters/<a class="el" href="SampleSummary_8h_source.html">SampleSummary.h</a></li>
+<li>Fitters/<a class="el" href="SampleSummary_8cpp_source.html">SampleSummary.cpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

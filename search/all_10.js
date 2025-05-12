@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['quietplease_0',['QuietPlease',['../classsamplePDFBase.html#abf87aad15a91d4dd84ade64d97cb6ab4',1,'samplePDFBase']]]
+  ['quietplease_0',['QuietPlease',['../classSampleHandlerBase.html#ad1e91b3accfd9269e794f43aa7f9b979',1,'SampleHandlerBase']]]
 ];

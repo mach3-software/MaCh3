@@ -30,7 +30,7 @@ MathJax.Hub.Config({
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="mach3logo_small.png"/></td>
   <td id="projectalign">
-   <div id="projectname">MaCh3<span id="projectnumber">&#160;1.5.0</span>
+   <div id="projectname">MaCh3<span id="projectnumber">&#160;2.0.0</span>
    </div>
    <div id="projectbrief">Reference Guide</div>
   </td>
@@ -88,63 +88,63 @@ $(function() {
   <div class="headertitle"><div class="title">DiagMCMC.cpp File Reference</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;<a class="el" href="MCMCProcessor_8h_source.html">mcmc/MCMCProcessor.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="manager_8h_source.html">manager/manager.h</a>&quot;</code><br />
+<div class="textblock"><code>#include &quot;<a class="el" href="MCMCProcessor_8h_source.html">Fitters/MCMCProcessor.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="Manager_8h_source.html">Manager/Manager.h</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for DiagMCMC.cpp:</div>
 <div class="dyncontent">
 <div class="center"><img src="DiagMCMC_8cpp__incl.png" border="0" usemap="#aDiagnostics_2DiagMCMC_8cpp" alt=""/></div>
 <map name="aDiagnostics_2DiagMCMC_8cpp" id="aDiagnostics_2DiagMCMC_8cpp">
-<area shape="rect" title=" " alt="" coords="1021,5,1223,31"/>
-<area shape="rect" href="MCMCProcessor_8h.html" title=" " alt="" coords="1899,79,2081,104"/>
-<area shape="rect" href="manager_8h.html" title=" " alt="" coords="767,225,920,251"/>
-<area shape="rect" title=" " alt="" coords="2904,152,2983,177"/>
-<area shape="rect" title=" " alt="" coords="3007,152,3069,177"/>
-<area shape="rect" href="StatisticalUtils_8h.html" title="Utility functions for statistical interpretations in MaCh3." alt="" coords="1179,152,1353,177"/>
-<area shape="rect" title=" " alt="" coords="945,372,1011,397"/>
-<area shape="rect" title=" " alt="" coords="555,372,625,397"/>
-<area shape="rect" title=" " alt="" coords="5,372,92,397"/>
-<area shape="rect" title=" " alt="" coords="116,372,227,397"/>
-<area shape="rect" href="HistogramUtils_8h.html" title=" " alt="" coords="1145,225,1355,251"/>
-<area shape="rect" title=" " alt="" coords="1177,299,1281,324"/>
-<area shape="rect" title=" " alt="" coords="2385,225,2475,251"/>
-<area shape="rect" title=" " alt="" coords="2761,225,2830,251"/>
-<area shape="rect" title=" " alt="" coords="2985,225,3064,251"/>
-<area shape="rect" title=" " alt="" coords="3154,225,3229,251"/>
-<area shape="rect" title=" " alt="" coords="1377,152,1467,177"/>
-<area shape="rect" title=" " alt="" coords="1491,152,1571,177"/>
-<area shape="rect" title=" " alt="" coords="1596,152,1715,177"/>
-<area shape="rect" title=" " alt="" coords="1739,152,1833,177"/>
-<area shape="rect" title=" " alt="" coords="1857,152,1931,177"/>
-<area shape="rect" title=" " alt="" coords="1955,152,2025,177"/>
-<area shape="rect" title=" " alt="" coords="2049,152,2128,177"/>
-<area shape="rect" title=" " alt="" coords="2153,152,2217,177"/>
-<area shape="rect" title=" " alt="" coords="2241,152,2355,177"/>
-<area shape="rect" title=" " alt="" coords="2379,152,2465,177"/>
-<area shape="rect" title=" " alt="" coords="2490,152,2565,177"/>
-<area shape="rect" title=" " alt="" coords="2589,152,2748,177"/>
-<area shape="rect" title=" " alt="" coords="2773,152,2879,177"/>
-<area shape="rect" title=" " alt="" coords="477,665,557,691"/>
-<area shape="rect" title=" " alt="" coords="1199,665,1274,691"/>
-<area shape="rect" title=" " alt="" coords="1497,665,1571,691"/>
-<area shape="rect" title=" " alt="" coords="1112,665,1175,691"/>
-<area shape="rect" title=" " alt="" coords="1702,225,1787,251"/>
-<area shape="rect" title=" " alt="" coords="1717,665,1780,691"/>
-<area shape="rect" href="Structs_8h.html" title=" " alt="" coords="995,299,1153,324"/>
-<area shape="rect" title=" " alt="" coords="1235,372,1278,397"/>
-<area shape="rect" title=" " alt="" coords="1302,372,1345,397"/>
-<area shape="rect" title=" " alt="" coords="1087,372,1211,397"/>
-<area shape="rect" href="MaCh3Exception_8h.html" title=" " alt="" coords="622,445,827,471"/>
-<area shape="rect" href="MaCh3Logger_8h.html" title="KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/incl..." alt="" coords="657,519,841,544"/>
-<area shape="rect" href="Core_8h.html" title=" " alt="" coords="1127,592,1253,617"/>
-<area shape="rect" title=" " alt="" coords="1393,445,1496,471"/>
-<area shape="rect" title=" " alt="" coords="505,592,563,617"/>
-<area shape="rect" title=" " alt="" coords="964,592,1051,617"/>
-<area shape="rect" title=" " alt="" coords="705,592,792,617"/>
-<area shape="rect" title=" " alt="" coords="816,592,940,617"/>
-<area shape="rect" href="YamlHelper_8h.html" title="Utility functions for handling YAML nodes." alt="" coords="649,372,819,397"/>
-<area shape="rect" href="Monitor_8h.html" title="System and monitoring utilities for printing system information and status updates." alt="" coords="395,299,540,324"/>
-<area shape="rect" title=" " alt="" coords="1305,299,1475,324"/>
+<area shape="rect" title=" " alt="" coords="1261,5,1462,31"/>
+<area shape="rect" href="MCMCProcessor_8h.html" title=" " alt="" coords="2475,79,2658,104"/>
+<area shape="rect" href="Manager_8h.html" title=" " alt="" coords="395,225,546,251"/>
+<area shape="rect" title=" " alt="" coords="3939,152,4018,177"/>
+<area shape="rect" title=" " alt="" coords="4043,152,4104,177"/>
+<area shape="rect" href="StatisticalUtils_8h.html" title="Utility functions for statistical interpretations in MaCh3." alt="" coords="1911,152,2086,177"/>
+<area shape="rect" title=" " alt="" coords="1663,372,1729,397"/>
+<area shape="rect" title=" " alt="" coords="5,372,75,397"/>
+<area shape="rect" title=" " alt="" coords="99,372,186,397"/>
+<area shape="rect" title=" " alt="" coords="657,372,767,397"/>
+<area shape="rect" href="HistogramUtils_8h.html" title=" " alt="" coords="1548,225,1740,251"/>
+<area shape="rect" title=" " alt="" coords="1431,299,1535,324"/>
+<area shape="rect" title=" " alt="" coords="2127,225,2217,251"/>
+<area shape="rect" title=" " alt="" coords="2241,225,2311,251"/>
+<area shape="rect" title=" " alt="" coords="2335,225,2414,251"/>
+<area shape="rect" title=" " alt="" coords="2439,225,2513,251"/>
+<area shape="rect" title=" " alt="" coords="2413,152,2502,177"/>
+<area shape="rect" title=" " alt="" coords="2527,152,2607,177"/>
+<area shape="rect" title=" " alt="" coords="2631,152,2750,177"/>
+<area shape="rect" title=" " alt="" coords="2775,152,2868,177"/>
+<area shape="rect" title=" " alt="" coords="2892,152,2967,177"/>
+<area shape="rect" title=" " alt="" coords="2991,152,3060,177"/>
+<area shape="rect" title=" " alt="" coords="3085,152,3163,177"/>
+<area shape="rect" title=" " alt="" coords="3188,152,3252,177"/>
+<area shape="rect" title=" " alt="" coords="3277,152,3390,177"/>
+<area shape="rect" title=" " alt="" coords="3414,152,3501,177"/>
+<area shape="rect" title=" " alt="" coords="3525,152,3600,177"/>
+<area shape="rect" title=" " alt="" coords="3625,152,3783,177"/>
+<area shape="rect" title=" " alt="" coords="3808,152,3915,177"/>
+<area shape="rect" title=" " alt="" coords="361,665,441,691"/>
+<area shape="rect" title=" " alt="" coords="1556,665,1631,691"/>
+<area shape="rect" title=" " alt="" coords="1816,665,1891,691"/>
+<area shape="rect" title=" " alt="" coords="1469,665,1531,691"/>
+<area shape="rect" title=" " alt="" coords="1916,225,2001,251"/>
+<area shape="rect" title=" " alt="" coords="2010,665,2073,691"/>
+<area shape="rect" href="Structs_8h.html" title=" " alt="" coords="1268,299,1407,324"/>
+<area shape="rect" title=" " alt="" coords="1545,372,1588,397"/>
+<area shape="rect" title=" " alt="" coords="893,372,936,397"/>
+<area shape="rect" title=" " alt="" coords="961,372,1085,397"/>
+<area shape="rect" href="MaCh3Exception_8h.html" title=" " alt="" coords="446,445,650,471"/>
+<area shape="rect" href="MaCh3Logger_8h.html" title="KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/incl..." alt="" coords="611,519,794,544"/>
+<area shape="rect" href="Core_8h.html" title=" " alt="" coords="1484,592,1609,617"/>
+<area shape="rect" title=" " alt="" coords="1109,372,1192,397"/>
+<area shape="rect" title=" " alt="" coords="1485,445,1587,471"/>
+<area shape="rect" title=" " alt="" coords="1216,372,1275,397"/>
+<area shape="rect" title=" " alt="" coords="1299,372,1386,397"/>
+<area shape="rect" title=" " alt="" coords="1410,372,1470,397"/>
+<area shape="rect" href="YamlHelper_8h.html" title="Utility functions for handling YAML nodes." alt="" coords="464,372,632,397"/>
+<area shape="rect" href="Monitor_8h.html" title="System and monitoring utilities for printing system information and status updates." alt="" coords="249,299,393,324"/>
+<area shape="rect" title=" " alt="" coords="1559,299,1729,324"/>
 </map>
 </div>
 </div>

@@ -9,7 +9,7 @@ var searchData=
   ['adaptive_5fcovariance_6',['adaptive_covariance',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#afd61e64f18f5c25dbbd6bb2bd619a268',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
   ['adaptive_5fsave_5fn_5fiterations_7',['adaptive_save_n_iterations',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a7b9bc927e28230929be740d471fb2b6b',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
   ['adaptive_5fupdate_5fstep_8',['adaptive_update_step',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac29758f6988af2d8271fe9950989baf4',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
-  ['adaptivehandler_9',['AdaptiveHandler',['../classcovarianceBase.html#ab3833dc51a81afc9dca7c3dcbb107af7',1,'covarianceBase']]],
+  ['adaptivehandler_9',['AdaptiveHandler',['../classParameterHandlerBase.html#a28076b9e3f3048b3a979fcad292a5167',1,'ParameterHandlerBase']]],
   ['anneal_10',['anneal',['../classmcmc.html#a4da3776296d4f06268f240df5eb0bbcc',1,'mcmc']]],
   ['annealtemp_11',['AnnealTemp',['../classmcmc.html#a3052c9e38107c0070c885a5a3bbbc302',1,'mcmc']]],
   ['applysmoothing_12',['ApplySmoothing',['../classMCMCProcessor.html#a682c1c47626542f5820d633ba2bc010c',1,'MCMCProcessor']]],

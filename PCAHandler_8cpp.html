@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.6"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MaCh3: covariance/PCAHandler.cpp File Reference</title>
+<title>MaCh3: Parameters/PCAHandler.cpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,7 +30,7 @@ MathJax.Hub.Config({
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="mach3logo_small.png"/></td>
   <td id="projectalign">
-   <div id="projectname">MaCh3<span id="projectnumber">&#160;1.5.0</span>
+   <div id="projectname">MaCh3<span id="projectnumber">&#160;2.0.0</span>
    </div>
    <div id="projectbrief">Reference Guide</div>
   </td>
@@ -79,69 +79,69 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_ad7582af392f69120f12d3a638849ade.html">covariance</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_e05d56c3c81e8a80e8e7fed7226c4d57.html">Parameters</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
   <div class="headertitle"><div class="title">PCAHandler.cpp File Reference</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;<a class="el" href="PCAHandler_8h_source.html">covariance/PCAHandler.h</a>&quot;</code><br />
+<div class="textblock"><code>#include &quot;<a class="el" href="PCAHandler_8h_source.html">Parameters/PCAHandler.h</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for PCAHandler.cpp:</div>
 <div class="dyncontent">
-<div class="center"><img src="PCAHandler_8cpp__incl.png" border="0" usemap="#acovariance_2PCAHandler_8cpp" alt=""/></div>
-<map name="acovariance_2PCAHandler_8cpp" id="acovariance_2PCAHandler_8cpp">
-<area shape="rect" title=" " alt="" coords="1448,5,1648,31"/>
-<area shape="rect" href="PCAHandler_8h.html" title=" " alt="" coords="1455,79,1641,104"/>
-<area shape="rect" href="manager_8h.html" title=" " alt="" coords="1414,152,1567,177"/>
-<area shape="rect" href="CovarianceUtils_8h.html" title=" " alt="" coords="2141,225,2353,251"/>
-<area shape="rect" href="MaCh3Logger_8h.html" title="KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/incl..." alt="" coords="1213,445,1397,471"/>
-<area shape="rect" href="Structs_8h.html" title=" " alt="" coords="1539,299,1696,324"/>
-<area shape="rect" href="MaCh3Exception_8h.html" title=" " alt="" coords="1063,372,1268,397"/>
-<area shape="rect" href="YamlHelper_8h.html" title="Utility functions for handling YAML nodes." alt="" coords="503,299,673,324"/>
-<area shape="rect" href="Monitor_8h.html" title="System and monitoring utilities for printing system information and status updates." alt="" coords="945,225,1090,251"/>
-<area shape="rect" title=" " alt="" coords="1025,592,1105,617"/>
-<area shape="rect" title=" " alt="" coords="1309,592,1384,617"/>
-<area shape="rect" title=" " alt="" coords="1566,519,1653,544"/>
-<area shape="rect" title=" " alt="" coords="919,519,977,544"/>
-<area shape="rect" title=" " alt="" coords="1255,519,1342,544"/>
-<area shape="rect" href="Core_8h.html" title=" " alt="" coords="1002,519,1129,544"/>
-<area shape="rect" title=" " alt="" coords="1366,519,1490,544"/>
-<area shape="rect" title=" " alt="" coords="450,592,523,617"/>
-<area shape="rect" title=" " alt="" coords="826,592,889,617"/>
-<area shape="rect" title=" " alt="" coords="1977,372,2020,397"/>
-<area shape="rect" title=" " alt="" coords="2044,372,2087,397"/>
-<area shape="rect" title=" " alt="" coords="2111,372,2235,397"/>
-<area shape="rect" title=" " alt="" coords="2260,372,2343,397"/>
-<area shape="rect" title=" " alt="" coords="935,372,1038,397"/>
-<area shape="rect" title=" " alt="" coords="2367,372,2433,397"/>
-<area shape="rect" title=" " alt="" coords="1393,372,1452,397"/>
-<area shape="rect" title=" " alt="" coords="1477,372,1563,397"/>
-<area shape="rect" title=" " alt="" coords="1587,372,1647,397"/>
-<area shape="rect" title=" " alt="" coords="1671,372,1902,397"/>
-<area shape="rect" title=" " alt="" coords="43,372,120,397"/>
-<area shape="rect" title=" " alt="" coords="144,372,203,397"/>
-<area shape="rect" title=" " alt="" coords="676,372,759,397"/>
-<area shape="rect" title=" " alt="" coords="227,372,293,397"/>
-<area shape="rect" title=" " alt="" coords="317,372,449,397"/>
-<area shape="rect" title=" " alt="" coords="803,299,869,324"/>
-<area shape="rect" title=" " alt="" coords="1259,299,1328,324"/>
-<area shape="rect" title=" " alt="" coords="893,299,979,324"/>
-<area shape="rect" title=" " alt="" coords="1403,299,1514,324"/>
-<area shape="rect" title=" " alt="" coords="1771,299,1861,324"/>
-<area shape="rect" title=" " alt="" coords="1885,299,2008,324"/>
-<area shape="rect" title=" " alt="" coords="2032,299,2123,324"/>
-<area shape="rect" title=" " alt="" coords="2147,299,2240,324"/>
-<area shape="rect" title=" " alt="" coords="2265,299,2335,324"/>
-<area shape="rect" title=" " alt="" coords="2359,299,2430,324"/>
-<area shape="rect" title=" " alt="" coords="2455,299,2559,324"/>
-<area shape="rect" title=" " alt="" coords="2583,299,2657,324"/>
-<area shape="rect" title=" " alt="" coords="2681,299,2807,324"/>
-<area shape="rect" title=" " alt="" coords="2831,299,2915,324"/>
-<area shape="rect" title=" " alt="" coords="2939,299,3098,324"/>
-<area shape="rect" title=" " alt="" coords="3123,299,3253,324"/>
-<area shape="rect" title=" " alt="" coords="3277,299,3400,324"/>
+<div class="center"><img src="PCAHandler_8cpp__incl.png" border="0" usemap="#aParameters_2PCAHandler_8cpp" alt=""/></div>
+<map name="aParameters_2PCAHandler_8cpp" id="aParameters_2PCAHandler_8cpp">
+<area shape="rect" title=" " alt="" coords="1311,5,1513,31"/>
+<area shape="rect" href="PCAHandler_8h.html" title=" " alt="" coords="1318,79,1506,104"/>
+<area shape="rect" href="Manager_8h.html" title=" " alt="" coords="1281,152,1431,177"/>
+<area shape="rect" href="ParameterHandlerUtils_8h.html" title=" " alt="" coords="2252,225,2471,265"/>
+<area shape="rect" href="Structs_8h.html" title=" " alt="" coords="1623,313,1761,339"/>
+<area shape="rect" href="MaCh3Exception_8h.html" title=" " alt="" coords="1013,387,1217,412"/>
+<area shape="rect" href="YamlHelper_8h.html" title="Utility functions for handling YAML nodes." alt="" coords="504,313,672,339"/>
+<area shape="rect" href="Monitor_8h.html" title="System and monitoring utilities for printing system information and status updates." alt="" coords="1056,233,1200,258"/>
+<area shape="rect" title=" " alt="" coords="1895,387,1937,412"/>
+<area shape="rect" title=" " alt="" coords="1961,387,2004,412"/>
+<area shape="rect" title=" " alt="" coords="2029,387,2153,412"/>
+<area shape="rect" href="MaCh3Logger_8h.html" title="KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/incl..." alt="" coords="1135,460,1318,485"/>
+<area shape="rect" href="Core_8h.html" title=" " alt="" coords="924,533,1049,559"/>
+<area shape="rect" title=" " alt="" coords="2177,387,2260,412"/>
+<area shape="rect" title=" " alt="" coords="834,387,937,412"/>
+<area shape="rect" title=" " alt="" coords="2893,387,2958,412"/>
+<area shape="rect" title=" " alt="" coords="2284,387,2343,412"/>
+<area shape="rect" title=" " alt="" coords="1445,387,1531,412"/>
+<area shape="rect" title=" " alt="" coords="1555,387,1615,412"/>
+<area shape="rect" title=" " alt="" coords="1639,387,1870,412"/>
+<area shape="rect" title=" " alt="" coords="693,607,773,632"/>
+<area shape="rect" title=" " alt="" coords="823,533,881,559"/>
+<area shape="rect" title=" " alt="" coords="1025,460,1111,485"/>
+<area shape="rect" title=" " alt="" coords="1031,607,1105,632"/>
+<area shape="rect" title=" " alt="" coords="1125,533,1211,559"/>
+<area shape="rect" title=" " alt="" coords="19,607,93,632"/>
+<area shape="rect" title=" " alt="" coords="1293,607,1355,632"/>
+<area shape="rect" title=" " alt="" coords="93,387,171,412"/>
+<area shape="rect" title=" " alt="" coords="195,387,253,412"/>
+<area shape="rect" title=" " alt="" coords="676,387,759,412"/>
+<area shape="rect" title=" " alt="" coords="278,387,343,412"/>
+<area shape="rect" title=" " alt="" coords="367,387,499,412"/>
+<area shape="rect" title=" " alt="" coords="786,313,851,339"/>
+<area shape="rect" title=" " alt="" coords="1529,313,1599,339"/>
+<area shape="rect" title=" " alt="" coords="875,313,962,339"/>
+<area shape="rect" title=" " alt="" coords="986,313,1065,339"/>
+<area shape="rect" title=" " alt="" coords="1394,313,1505,339"/>
+<area shape="rect" title=" " alt="" coords="1785,313,1876,339"/>
+<area shape="rect" title=" " alt="" coords="1900,313,2023,339"/>
+<area shape="rect" title=" " alt="" coords="2047,313,2137,339"/>
+<area shape="rect" title=" " alt="" coords="2161,313,2255,339"/>
+<area shape="rect" title=" " alt="" coords="2279,313,2350,339"/>
+<area shape="rect" title=" " alt="" coords="2374,313,2445,339"/>
+<area shape="rect" title=" " alt="" coords="2469,313,2573,339"/>
+<area shape="rect" title=" " alt="" coords="2597,313,2672,339"/>
+<area shape="rect" title=" " alt="" coords="2696,313,2821,339"/>
+<area shape="rect" title=" " alt="" coords="2846,313,2930,339"/>
+<area shape="rect" title=" " alt="" coords="2954,313,3113,339"/>
+<area shape="rect" title=" " alt="" coords="3137,313,3268,339"/>
+<area shape="rect" title=" " alt="" coords="3292,313,3415,339"/>
 </map>
 </div>
 </div>

@@ -30,7 +30,7 @@ MathJax.Hub.Config({
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="mach3logo_small.png"/></td>
   <td id="projectalign">
-   <div id="projectname">MaCh3<span id="projectnumber">&#160;1.5.0</span>
+   <div id="projectname">MaCh3<span id="projectnumber">&#160;2.0.0</span>
    </div>
    <div id="projectbrief">Reference Guide</div>
   </td>
@@ -228,8 +228,8 @@ How To Use</h1>
 <p>This is an example how your executable can look like using MaCh3: </p><div class="fragment"><div class="line"><span class="comment">//Manager is responsible for reading from config</span></div>
 <div class="line">std::unique_ptr&lt;manager&gt; fitMan = <a class="code hl_function" href="MaCh3Factory_8cpp.html#aada46b6630f2f29c34c35354973388b3">MaCh3ManagerFactory</a>(argc, argv);</div>
 <div class="line"> </div>
-<div class="line">std::vector&lt;samplePDFBase*&gt; sample; <span class="comment">//vector storing information about sample for different detector</span></div>
-<div class="line">std::vector&lt;covarianceBase*&gt; Cov; <span class="comment">// vector with systematic implementation</span></div>
+<div class="line">std::vector&lt;SampleHandlerBase*&gt; sample; <span class="comment">//vector storing information about sample for different detector</span></div>
+<div class="line">std::vector&lt;ParameterHandlerBase*&gt; Cov; <span class="comment">// vector with systematic implementation</span></div>
 <div class="line">MakeMaCh3Instance(fitMan.get(), sample, Cov); <span class="comment">//Factory like function which initialises everything</span></div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// FitterBase class, can be replaced with other fitting method</span></div>
@@ -237,12 +237,12 @@ How To Use</h1>
 <div class="line"> </div>
 <div class="line"><span class="comment">//Adding samples and covariances to the Fitter class could be in the factory</span></div>
 <div class="line"><span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; sample.size(); i++)</div>
-<div class="line">  MarkovChain-&gt;addSamplePDF(sample[i]);</div>
+<div class="line">  MarkovChain-&gt;AddSampleHandler(sample[i]);</div>
 <div class="line"><span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; Cov.size(); i++)</div>
-<div class="line">  MarkovChain-&gt;addSystObj(Cov[i]);</div>
+<div class="line">  MarkovChain-&gt;AddSystObj(Cov[i]);</div>
 <div class="line"> </div>
 <div class="line">MarkovChain-&gt;RunLLHScan(); <span class="comment">// can run LLH scan</span></div>
-<div class="line">MarkovChain-&gt;runMCMC(); <span class="comment">//or run actual fit</span></div>
+<div class="line">MarkovChain-&gt;RunMCMC(); <span class="comment">//or run actual fit</span></div>
 <div class="ttc" id="aMaCh3Factory_8cpp_html_a126d15eeabecd1e4ab67422784a9f84a"><div class="ttname"><a href="MaCh3Factory_8cpp.html#a126d15eeabecd1e4ab67422784a9f84a">MaCh3FitterFactory</a></div><div class="ttdeci">std::unique_ptr&lt; FitterBase &gt; MaCh3FitterFactory(manager *fitMan)</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Factory_8cpp_source.html#l00005">MaCh3Factory.cpp:5</a></div></div>
 <div class="ttc" id="aMaCh3Factory_8cpp_html_aada46b6630f2f29c34c35354973388b3"><div class="ttname"><a href="MaCh3Factory_8cpp.html#aada46b6630f2f29c34c35354973388b3">MaCh3ManagerFactory</a></div><div class="ttdeci">std::unique_ptr&lt; manager &gt; MaCh3ManagerFactory(int argc, char **argv)</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Factory_8cpp_source.html#l00030">MaCh3Factory.cpp:30</a></div></div>
 </div><!-- fragment --><p> For more see <a href="https://github.com/mach3-software/MaCh3Tutorial/blob/main/Tutorial/MCMCTutorial.cpp">here</a> </p>

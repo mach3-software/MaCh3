@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.6"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MaCh3: splines/SplineBase.cpp Source File</title>
+<title>MaCh3: Splines/SplineBase.cpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,7 +30,7 @@ MathJax.Hub.Config({
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="mach3logo_small.png"/></td>
   <td id="projectalign">
-   <div id="projectname">MaCh3<span id="projectnumber">&#160;1.5.0</span>
+   <div id="projectname">MaCh3<span id="projectnumber">&#160;2.0.0</span>
    </div>
    <div id="projectbrief">Reference Guide</div>
   </td>
@@ -79,14 +79,14 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_a3857b76c57a33866f3a59ae3b67734b.html">splines</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_c3bec747311fc157fc0efdce3b29893b.html">Splines</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
   <div class="headertitle"><div class="title">SplineBase.cpp</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="SplineBase_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#include &quot;<a class="code" href="SplineBase_8h.html">splines/SplineBase.h</a>&quot;</span></div>
+<a href="SplineBase_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#include &quot;<a class="code" href="SplineBase_8h.html">Splines/SplineBase.h</a>&quot;</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#pragma GCC diagnostic ignored &quot;-Wuseless-cast&quot;</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#pragma GCC diagnostic ignored &quot;-Wfloat-conversion&quot;</span></div>
@@ -113,8 +113,8 @@ $(function() {
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="comment">// *************************</span></div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>  <span class="comment">// Loop over the splines</span></div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>  <span class="comment">//KS: Tried multithreading here with 48 splines and it is faster with one thread, maybe in future multithreading will be worth revisiting</span></div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>  <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> i = 0; i &lt; <a class="code hl_variable" href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">nParams</a>; ++i)</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno"><a class="line" href="classPySplineBase.html#aa6965d1522cc68ecf81ac3bfd2dcd6f1">   29</a></span>  {</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="classPySplineBase.html#aa6965d1522cc68ecf81ac3bfd2dcd6f1">   28</a></span>  <span class="keywordflow">for</span> (<a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> i = 0; i &lt; <a class="code hl_variable" href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">nParams</a>; ++i)</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>  {</div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    <span class="keyword">const</span> <a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> nPoints = <a class="code hl_variable" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].nPts;</div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    <span class="keyword">const</span> std::vector&lt;M3::float_t&gt;&amp; xArray = <a class="code hl_variable" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].xPts;</div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>
@@ -218,11 +218,11 @@ $(function() {
 <div class="ttc" id="aSplineCommon_8h_html_a911160077ffa38727e0494f178ce380a"><div class="ttname"><a href="SplineCommon_8h.html#a911160077ffa38727e0494f178ce380a">_nTF1Coeff_</a></div><div class="ttdeci">#define _nTF1Coeff_</div><div class="ttdoc">KS: For TF1 we store at most 5 coefficients, we could make it more flexible but for now define it her...</div><div class="ttdef"><b>Definition:</b> <a href="SplineCommon_8h_source.html#l00015">SplineCommon.h:15</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00013">MaCh3Exception.h:13</a></div></div>
 <div class="ttc" id="aclassSplineBase_html_a0de19b2322edb4197380506d594456bd"><div class="ttname"><a href="classSplineBase.html#a0de19b2322edb4197380506d594456bd">SplineBase::~SplineBase</a></div><div class="ttdeci">virtual ~SplineBase()</div><div class="ttdoc">Destructor.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8cpp_source.html#l00016">SplineBase.cpp:16</a></div></div>
-<div class="ttc" id="aclassSplineBase_html_a2165b057a0125a28d96f247ca8680b42"><div class="ttname"><a href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">SplineBase::nParams</a></div><div class="ttdeci">short int nParams</div><div class="ttdoc">Number of parameters that have splines.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00065">SplineBase.h:65</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_a2165b057a0125a28d96f247ca8680b42"><div class="ttname"><a href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">SplineBase::nParams</a></div><div class="ttdeci">short int nParams</div><div class="ttdoc">Number of parameters that have splines.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00064">SplineBase.h:64</a></div></div>
 <div class="ttc" id="aclassSplineBase_html_a589011b547ff70262ed43021a016ef30"><div class="ttname"><a href="classSplineBase.html#a589011b547ff70262ed43021a016ef30">SplineBase::FindSplineSegment</a></div><div class="ttdeci">void FindSplineSegment()</div><div class="ttdoc">CW:Code used in step by step reweighting, Find Spline Segment for each param.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8cpp_source.html#l00024">SplineBase.cpp:24</a></div></div>
-<div class="ttc" id="aclassSplineBase_html_a938e3a60326137037f868b9930e2a972"><div class="ttname"><a href="classSplineBase.html#a938e3a60326137037f868b9930e2a972">SplineBase::SplineSegments</a></div><div class="ttdeci">short int * SplineSegments</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00061">SplineBase.h:61</a></div></div>
-<div class="ttc" id="aclassSplineBase_html_a9452897aecfe016466543dfe19c0628b"><div class="ttname"><a href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineBase::SplineInfoArray</a></div><div class="ttdeci">std::vector&lt; FastSplineInfo &gt; SplineInfoArray</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00058">SplineBase.h:58</a></div></div>
-<div class="ttc" id="aclassSplineBase_html_aa0b1d3a1adf7cffa7e74581bc7d58d4c"><div class="ttname"><a href="classSplineBase.html#aa0b1d3a1adf7cffa7e74581bc7d58d4c">SplineBase::ParamValues</a></div><div class="ttdeci">float * ParamValues</div><div class="ttdoc">Store parameter values they are not in FastSplineInfo as in case of GPU we need to copy paste it to G...</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00063">SplineBase.h:63</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_a938e3a60326137037f868b9930e2a972"><div class="ttname"><a href="classSplineBase.html#a938e3a60326137037f868b9930e2a972">SplineBase::SplineSegments</a></div><div class="ttdeci">short int * SplineSegments</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00060">SplineBase.h:60</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_a9452897aecfe016466543dfe19c0628b"><div class="ttname"><a href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineBase::SplineInfoArray</a></div><div class="ttdeci">std::vector&lt; FastSplineInfo &gt; SplineInfoArray</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00057">SplineBase.h:57</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_aa0b1d3a1adf7cffa7e74581bc7d58d4c"><div class="ttname"><a href="classSplineBase.html#aa0b1d3a1adf7cffa7e74581bc7d58d4c">SplineBase::ParamValues</a></div><div class="ttdeci">float * ParamValues</div><div class="ttdoc">Store parameter values they are not in FastSplineInfo as in case of GPU we need to copy paste it to G...</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00062">SplineBase.h:62</a></div></div>
 <div class="ttc" id="aclassSplineBase_html_aa6965d1522cc68ecf81ac3bfd2dcd6f1"><div class="ttname"><a href="classSplineBase.html#aa6965d1522cc68ecf81ac3bfd2dcd6f1">SplineBase::SplineBase</a></div><div class="ttdeci">SplineBase()</div><div class="ttdoc">Constructor.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8cpp_source.html#l00007">SplineBase.cpp:7</a></div></div>
 <div class="ttc" id="aclassSplineBase_html_ac8a5f86ac6f156a7e11ef188b06f425f"><div class="ttname"><a href="classSplineBase.html#ac8a5f86ac6f156a7e11ef188b06f425f">SplineBase::getTF1Coeff</a></div><div class="ttdeci">void getTF1Coeff(TF1_red *&amp;spl, int &amp;nPoints, float *&amp;coeffs)</div><div class="ttdoc">CW: Gets the polynomial coefficients for TF1.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8cpp_source.html#l00106">SplineBase.cpp:106</a></div></div>
 <div class="ttc" id="aclassTF1__red_html"><div class="ttname"><a href="classTF1__red.html">TF1_red</a></div><div class="ttdoc">CW: A reduced TF1 class only. Only saves parameters for each TF1 and how many parameters each paramet...</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00117">SplineStructs.h:117</a></div></div>

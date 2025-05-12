@@ -1,6 +1,24 @@
 var searchData=
 [
-  ['readme_2emd_0',['README.md',['../Diagnostics_2README_8md.html',1,'(Global Namespace)'],['../plotting_2README_8md.html',1,'(Global Namespace)'],['../README_8md.html',1,'(Global Namespace)']]],
-  ['rhat_2ecpp_1',['RHat.cpp',['../RHat_8cpp.html',1,'']]],
-  ['rhat_5fhighmem_2ecpp_2',['RHat_HighMem.cpp',['../RHat__HighMem_8cpp.html',1,'']]]
+  ['parameterhandlerbase_2ecpp_0',['ParameterHandlerBase.cpp',['../ParameterHandlerBase_8cpp.html',1,'']]],
+  ['parameterhandlerbase_2eh_1',['ParameterHandlerBase.h',['../ParameterHandlerBase_8h.html',1,'']]],
+  ['parameterhandlergeneric_2ecpp_2',['ParameterHandlerGeneric.cpp',['../ParameterHandlerGeneric_8cpp.html',1,'']]],
+  ['parameterhandlergeneric_2eh_3',['ParameterHandlerGeneric.h',['../ParameterHandlerGeneric_8h.html',1,'']]],
+  ['parameterhandlerosc_2ecpp_4',['ParameterHandlerOsc.cpp',['../ParameterHandlerOsc_8cpp.html',1,'']]],
+  ['parameterhandlerosc_2eh_5',['ParameterHandlerOsc.h',['../ParameterHandlerOsc_8h.html',1,'']]],
+  ['parameterhandlerutils_2eh_6',['ParameterHandlerUtils.h',['../ParameterHandlerUtils_8h.html',1,'']]],
+  ['parameters_2ecpp_7',['parameters.cpp',['../parameters_8cpp.html',1,'']]],
+  ['pcahandler_2ecpp_8',['PCAHandler.cpp',['../PCAHandler_8cpp.html',1,'']]],
+  ['pcahandler_2eh_9',['PCAHandler.h',['../PCAHandler_8h.html',1,'']]],
+  ['plotllh_2ecpp_10',['PlotLLH.cpp',['../PlotLLH_8cpp.html',1,'']]],
+  ['plotmcmcdiag_2ecpp_11',['PlotMCMCDiag.cpp',['../PlotMCMCDiag_8cpp.html',1,'']]],
+  ['plotting_2ecpp_12',['plotting.cpp',['../plotting_8cpp.html',1,'']]],
+  ['plottingmanager_2ecpp_13',['plottingManager.cpp',['../plottingManager_8cpp.html',1,'']]],
+  ['plottingmanager_2eh_14',['plottingManager.h',['../plottingManager_8h.html',1,'']]],
+  ['plottingutils_2ecpp_15',['plottingUtils.cpp',['../plottingUtils_8cpp.html',1,'']]],
+  ['plottingutils_2eh_16',['plottingUtils.h',['../plottingUtils_8h.html',1,'']]],
+  ['processmcmc_2ecpp_17',['ProcessMCMC.cpp',['../ProcessMCMC_8cpp.html',1,'']]],
+  ['pso_2ecpp_18',['PSO.cpp',['../PSO_8cpp.html',1,'']]],
+  ['pso_2eh_19',['PSO.h',['../PSO_8h.html',1,'']]],
+  ['pymach3_2ecpp_20',['pyMaCh3.cpp',['../pyMaCh3_8cpp.html',1,'']]]
 ];

@@ -30,7 +30,7 @@ MathJax.Hub.Config({
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="mach3logo_small.png"/></td>
   <td id="projectalign">
-   <div id="projectname">MaCh3<span id="projectnumber">&#160;1.5.0</span>
+   <div id="projectname">MaCh3<span id="projectnumber">&#160;2.0.0</span>
    </div>
    <div id="projectbrief">Reference Guide</div>
   </td>
@@ -469,7 +469,7 @@ template&lt;typename T &gt; </div>
 
 <p>CW: Multi-threaded matrix multiplication. </p>
 
-<p class="definition">Definition at line <a class="el" href="CovarianceUtils_8h_source.html#l00061">61</a> of file <a class="el" href="CovarianceUtils_8h_source.html">CovarianceUtils.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerUtils_8h_source.html#l00061">61</a> of file <a class="el" href="ParameterHandlerUtils_8h_source.html">ParameterHandlerUtils.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   61</span>                                                            {</div>
 <div class="line"><span class="lineno">   62</span>    <span class="comment">// First make into monolithic array</span></div>
 <div class="line"><span class="lineno">   63</span>    <span class="keywordtype">double</span> *A_mon = <span class="keyword">new</span> <span class="keywordtype">double</span>[n*n];</div>
@@ -504,7 +504,7 @@ template&lt;typename T &gt; </div>
 <div class="line"><span class="lineno">   92</span> </div>
 <div class="line"><span class="lineno">   93</span>    <span class="keywordflow">return</span> C;</div>
 <div class="line"><span class="lineno">   94</span>  }</div>
-<div class="ttc" id="anamespaceM3_html_ae577be53e3bb2051d10f34fd054c3e5d"><div class="ttname"><a href="namespaceM3.html#ae577be53e3bb2051d10f34fd054c3e5d">M3::MatrixMult</a></div><div class="ttdeci">double * MatrixMult(double *A, double *B, int n)</div><div class="ttdoc">CW: Multi-threaded matrix multiplication.</div><div class="ttdef"><b>Definition:</b> <a href="CovarianceUtils_8h_source.html#l00029">CovarianceUtils.h:29</a></div></div>
+<div class="ttc" id="anamespaceM3_html_ae577be53e3bb2051d10f34fd054c3e5d"><div class="ttname"><a href="namespaceM3.html#ae577be53e3bb2051d10f34fd054c3e5d">M3::MatrixMult</a></div><div class="ttdeci">double * MatrixMult(double *A, double *B, int n)</div><div class="ttdoc">CW: Multi-threaded matrix multiplication.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerUtils_8h_source.html#l00029">ParameterHandlerUtils.h:29</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -550,7 +550,7 @@ template&lt;typename T &gt; </div>
 
 <p>CW: Multi-threaded matrix multiplication. </p>
 
-<p class="definition">Definition at line <a class="el" href="CovarianceUtils_8h_source.html#l00029">29</a> of file <a class="el" href="CovarianceUtils_8h_source.html">CovarianceUtils.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerUtils_8h_source.html#l00029">29</a> of file <a class="el" href="ParameterHandlerUtils_8h_source.html">ParameterHandlerUtils.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   29</span>                                                         {</div>
 <div class="line"><span class="lineno">   30</span>    <span class="comment">//CW: First transpose to increse cache hits</span></div>
 <div class="line"><span class="lineno">   31</span>    <span class="keywordtype">double</span> *BT = <span class="keyword">new</span> <span class="keywordtype">double</span>[n*n];</div>
@@ -620,7 +620,7 @@ template&lt;typename T &gt; </div>
 
 <p>CW: Multi-threaded matrix multiplication. </p>
 
-<p class="definition">Definition at line <a class="el" href="CovarianceUtils_8h_source.html#l00097">97</a> of file <a class="el" href="CovarianceUtils_8h_source.html">CovarianceUtils.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerUtils_8h_source.html#l00097">97</a> of file <a class="el" href="ParameterHandlerUtils_8h_source.html">ParameterHandlerUtils.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   98</span>  {</div>
 <div class="line"><span class="lineno">   99</span>    <span class="keywordtype">double</span> *C_mon = <a class="code hl_function" href="namespaceM3.html#ae577be53e3bb2051d10f34fd054c3e5d">MatrixMult</a>(A.GetMatrixArray(), B.GetMatrixArray(), A.GetNcols());</div>
 <div class="line"><span class="lineno">  100</span>    TMatrixD C;</div>

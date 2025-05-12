@@ -2,7 +2,7 @@ var searchData=
 [
   ['val_5fgpu_0',['val_gpu',['../gpuSplineUtils_8cu.html#ac95f6dd3bc9efb4292a4e3f264492f05',1,'gpuSplineUtils.cu']]],
   ['validpar_1',['ValidPar',['../RHat_8cpp.html#a5217beba3b3cb82269e95bf52c3d62c5',1,'ValidPar():&#160;RHat.cpp'],['../RHat__HighMem_8cpp.html#a5217beba3b3cb82269e95bf52c3d62c5',1,'ValidPar():&#160;RHat_HighMem.cpp']]],
-  ['valueptr_2',['valuePtr',['../structFuncPars.html#a00f023cb5c6539524c037325a23843e5',1,'FuncPars']]],
+  ['valueptr_2',['valuePtr',['../structFunctionalParameter.html#a4be18ce2fe67e89237f74d5e54b04a09',1,'FunctionalParameter']]],
   ['vel_3',['vel',['../classPSO.html#ac361ae70f9487058ff1e02f2a6334998',1,'PSO']]],
   ['velocity_4',['velocity',['../classparticle.html#a7c7a70f520cbcd91e49e17f7b9406044',1,'particle']]],
   ['violin_5',['Violin',['../GetPostfitParamPlots_8cpp.html#a92251598dc4d11508ddb63e3ff2ba4cb',1,'GetPostfitParamPlots.cpp']]],

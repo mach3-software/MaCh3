@@ -3,7 +3,7 @@ var searchData=
   ['gauss_0',['Gauss',['../classMCMCProcessor.html#a92c1d9b0ebdf90951221cdaf2ac4cc2c',1,'MCMCProcessor']]],
   ['generator_1',['Generator',['../classMaCh3Modes.html#a68ccf4c0fcd926574b33ef1dbcad3110',1,'MaCh3Modes']]],
   ['generatormaping_2',['GeneratorMaping',['../structMaCh3ModeInfo.html#a02a4f32a5a65b723a0849539a315cc1a',1,'MaCh3ModeInfo']]],
-  ['globalsystindex_3',['GlobalSystIndex',['../classsplineFDBase.html#af036372a158b4e463683a8d02a20ec3d',1,'splineFDBase']]],
+  ['globalsystindex_3',['GlobalSystIndex',['../classBinnedSplineHandler.html#ad7470dbc245ccb614f6f92159522b1cf',1,'BinnedSplineHandler']]],
   ['gpu_5fcoeff_5fmany_4',['gpu_coeff_many',['../classSMonolithGPU.html#a5a51e7b819a0c8cf786aa8f13dfdc0cc',1,'SMonolithGPU']]],
   ['gpu_5fcoeff_5ftf1_5fmany_5',['gpu_coeff_TF1_many',['../classSMonolithGPU.html#ae58804bb65745dbd8835876bf0debdc7',1,'SMonolithGPU']]],
   ['gpu_5fcoeff_5fx_6',['gpu_coeff_x',['../classSMonolithGPU.html#a871589b8a52dea4ed9a4963a7b05e1af',1,'SMonolithGPU']]],

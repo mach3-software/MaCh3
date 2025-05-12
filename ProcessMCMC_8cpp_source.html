@@ -30,7 +30,7 @@ MathJax.Hub.Config({
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="mach3logo_small.png"/></td>
   <td id="projectalign">
-   <div id="projectname">MaCh3<span id="projectnumber">&#160;1.5.0</span>
+   <div id="projectname">MaCh3<span id="projectnumber">&#160;2.0.0</span>
    </div>
    <div id="projectbrief">Reference Guide</div>
   </td>
@@ -87,8 +87,8 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <a href="ProcessMCMC_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">//MaCh3 includes</span></div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#include &quot;<a class="code" href="MCMCProcessor_8h.html">mcmc/MCMCProcessor.h</a>&quot;</span></div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;<a class="code" href="manager_8h.html">manager/manager.h</a>&quot;</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#include &quot;<a class="code" href="MCMCProcessor_8h.html">Fitters/MCMCProcessor.h</a>&quot;</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;<a class="code" href="Manager_8h.html">Manager/Manager.h</a>&quot;</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code hl_function" href="ProcessMCMC_8cpp.html#a52c48199a4bcad577b88768020a91041">ProcessMCMC</a>(<span class="keyword">const</span> std::string&amp; inputFile);</div>
@@ -852,6 +852,7 @@ $(function() {
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00023">MaCh3Logger.h:23</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_aa603c55ea73cd86d1994901227883e1e"><div class="ttname"><a href="MaCh3Logger_8h.html#aa603c55ea73cd86d1994901227883e1e">SetMaCh3LoggerFormat</a></div><div class="ttdeci">void SetMaCh3LoggerFormat()</div><div class="ttdoc">Set messaging format of the logger.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00030">MaCh3Logger.h:30</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_ad5b2eb6377721e3ac95def22c2386bb1"><div class="ttname"><a href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a></div><div class="ttdeci">#define MACH3LOG_WARN</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00024">MaCh3Logger.h:24</a></div></div>
+<div class="ttc" id="aManager_8h_html"><div class="ttname"><a href="Manager_8h.html">Manager.h</a></div></div>
 <div class="ttc" id="aProcessMCMC_8cpp_html_a0ddf1224851353fc92bfbff6f499fa97"><div class="ttname"><a href="ProcessMCMC_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a></div><div class="ttdeci">int main(int argc, char *argv[])</div><div class="ttdef"><b>Definition:</b> <a href="ProcessMCMC_8cpp_source.html#l00031">ProcessMCMC.cpp:31</a></div></div>
 <div class="ttc" id="aProcessMCMC_8cpp_html_a13056efd080ab16304b6f7be0ebf0a61"><div class="ttname"><a href="ProcessMCMC_8cpp.html#a13056efd080ab16304b6f7be0ebf0a61">config</a></div><div class="ttdeci">std::string config</div><div class="ttdef"><b>Definition:</b> <a href="ProcessMCMC_8cpp_source.html#l00029">ProcessMCMC.cpp:29</a></div></div>
 <div class="ttc" id="aProcessMCMC_8cpp_html_a2052da75bc58457dc290c8cbd06efe30"><div class="ttname"><a href="ProcessMCMC_8cpp.html#a2052da75bc58457dc290c8cbd06efe30">TMatrixIntoTH2D</a></div><div class="ttdeci">TH2D * TMatrixIntoTH2D(TMatrixDSym *Matrix, const std::string &amp;title)</div><div class="ttdoc">KS: Convert TMatrix to TH2D, mostly useful for making fancy plots.</div><div class="ttdef"><b>Definition:</b> <a href="ProcessMCMC_8cpp_source.html#l00620">ProcessMCMC.cpp:620</a></div></div>
@@ -871,7 +872,6 @@ $(function() {
 <div class="ttc" id="aYamlHelper_8h_html_a1247d9088f9521c2758d1d7c21dcfa87"><div class="ttname"><a href="YamlHelper_8h.html#a1247d9088f9521c2758d1d7c21dcfa87">GetFromManager</a></div><div class="ttdeci">Type GetFromManager(const YAML::Node &amp;node, Type defval, const std::string File=&quot;&quot;, const int Line=1)</div><div class="ttdoc">Get content of config file if node is not found take default value specified.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00282">YamlHelper.h:282</a></div></div>
 <div class="ttc" id="aYamlHelper_8h_html_ad802d5a5acdc16a796b21af74f6f5f59"><div class="ttname"><a href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">M3OpenConfig</a></div><div class="ttdeci">#define M3OpenConfig(filename)</div><div class="ttdoc">Macro to simplify calling LoadYaml with file and line info.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00456">YamlHelper.h:456</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00013">MaCh3Exception.h:13</a></div></div>
-<div class="ttc" id="amanager_8h_html"><div class="ttname"><a href="manager_8h.html">manager.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

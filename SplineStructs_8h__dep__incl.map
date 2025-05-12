@@ -1,13 +1,13 @@
-<map id="splines/SplineStructs.h" name="splines/SplineStructs.h">
-<area shape="rect" id="node1" title="Contains structures and helper functions for handling spline representations of systematic parameters..." alt="" coords="29,5,198,31"/>
-<area shape="rect" id="node2" href="$splines_8cpp.html" title=" " alt="" coords="5,225,149,251"/>
-<area shape="rect" id="node3" href="$SplineBase_8h.html" title=" " alt="" coords="122,79,278,104"/>
-<area shape="rect" id="node4" href="$SplineBase_8cpp.html" title=" " alt="" coords="115,152,285,177"/>
-<area shape="rect" id="node5" href="$SplineMonolith_8h.html" title=" " alt="" coords="309,152,491,177"/>
-<area shape="rect" id="node7" href="$splineFDBase_8h.html" title=" " alt="" coords="533,152,707,177"/>
-<area shape="rect" id="node6" href="$SplineMonolith_8cpp.html" title=" " alt="" coords="282,225,478,251"/>
-<area shape="rect" id="node8" href="$samplePDFFDBase_8h.html" title=" " alt="" coords="502,225,738,251"/>
-<area shape="rect" id="node11" href="$splineFDBase_8cpp.html" title=" " alt="" coords="762,225,950,251"/>
-<area shape="rect" id="node9" href="$samplePDF_8cpp.html" title=" " alt="" coords="417,299,588,324"/>
-<area shape="rect" id="node10" href="$samplePDFFDBase_8cpp.html" title=" " alt="" coords="612,299,863,324"/>
+<map id="Splines/SplineStructs.h" name="Splines/SplineStructs.h">
+<area shape="rect" id="node1" title="Contains structures and helper functions for handling spline representations of systematic parameters..." alt="" coords="839,5,1009,31"/>
+<area shape="rect" id="node2" href="$SplineBase_8h.html" title=" " alt="" coords="756,79,913,104"/>
+<area shape="rect" id="node11" href="$splines_8cpp.html" title=" " alt="" coords="917,225,1061,251"/>
+<area shape="rect" id="node3" href="$BinnedSplineHandler_8h.html" title=" " alt="" coords="303,152,523,177"/>
+<area shape="rect" id="node8" href="$SplineBase_8cpp.html" title=" " alt="" coords="547,152,719,177"/>
+<area shape="rect" id="node9" href="$SplineMonolith_8h.html" title=" " alt="" coords="743,152,926,177"/>
+<area shape="rect" id="node4" href="$SampleHandlerFD_8h.html" title=" " alt="" coords="119,225,331,251"/>
+<area shape="rect" id="node7" href="$BinnedSplineHandler_8cpp.html" title=" " alt="" coords="355,225,589,251"/>
+<area shape="rect" id="node5" href="$SampleHandlerFD_8cpp.html" title=" " alt="" coords="5,299,232,324"/>
+<area shape="rect" id="node6" href="$samples_8cpp.html" title=" " alt="" coords="257,299,410,324"/>
+<area shape="rect" id="node10" href="$SplineMonolith_8cpp.html" title=" " alt="" coords="696,225,893,251"/>
 </map>

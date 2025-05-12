@@ -10,8 +10,8 @@ var searchData=
   ['datahist_7',['DataHist',['../classSampleSummary.html#a7e962b36331edb6ff1e9de849cbabee3',1,'SampleSummary']]],
   ['datahist_5fprojectx_8',['DataHist_ProjectX',['../classSampleSummary.html#abeaca1195db794d9e660a377d81c1b21',1,'SampleSummary']]],
   ['datahist_5fprojecty_9',['DataHist_ProjectY',['../classSampleSummary.html#abfeb54f4d95b5b74257a1abf5c98824f',1,'SampleSummary']]],
-  ['dathist_10',['dathist',['../classsamplePDFBase.html#a695ac7419652443240feb046f14ba1bb',1,'samplePDFBase']]],
-  ['dathist2d_11',['dathist2d',['../classsamplePDFBase.html#a22cd9b0e8664b6e0859e34a51731fadc',1,'samplePDFBase']]],
+  ['dathist_10',['dathist',['../classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560',1,'SampleHandlerBase']]],
+  ['dathist2d_11',['dathist2d',['../classSampleHandlerBase.html#aa7ed25798bc8d52dc16b5ea2f6c9d0c3',1,'SampleHandlerBase']]],
   ['debug_12',['Debug',['../classSampleSummary.html#a807e348a85fb460c5ca4a1ce56d08aab',1,'SampleSummary']]],
   ['declarenewmode_13',['DeclareNewMode',['../classMaCh3Modes.html#a180684434c373add20e58ab9fd083a93',1,'MaCh3Modes']]],
   ['default_5fplotting_5fconfig_14',['DEFAULT_PLOTTING_CONFIG',['../classMaCh3Plotting_1_1PlottingManager.html#a1947b4f022707ef6f570787ec62ba90c',1,'MaCh3Plotting::PlottingManager']]],
@@ -24,8 +24,8 @@ var searchData=
   ['diagmcmc_2ecpp_21',['DiagMCMC.cpp',['../DiagMCMC_8cpp.html',1,'']]],
   ['diagnosecovariancematrix_22',['DiagnoseCovarianceMatrix',['../ProcessMCMC_8cpp.html#a721fcdb3001f72ff5e40d6334d56e0d0',1,'ProcessMCMC.cpp']]],
   ['diagnostic_23',['Diagnostic',['../md_Diagnostics_README.html',1,'']]],
-  ['dimensionlabels_24',['DimensionLabels',['../classsplineFDBase.html#a00e1aeea8e9389c41f93469a26c83adc',1,'splineFDBase']]],
-  ['dimensions_25',['Dimensions',['../classsplineFDBase.html#a6c28400605049bdee229885c46463dcd',1,'splineFDBase']]],
+  ['dimensionlabels_24',['DimensionLabels',['../classBinnedSplineHandler.html#aa3db668a55f3d3356f63cb055819b2b0',1,'BinnedSplineHandler']]],
+  ['dimensions_25',['Dimensions',['../classBinnedSplineHandler.html#a8824387f90bd051b370bebd843691b83',1,'BinnedSplineHandler']]],
   ['dir_26',['Dir',['../classSampleSummary.html#aa2064e7455c3164ee5118a5e5162f282',1,'SampleSummary']]],
   ['dobetaparam_27',['DoBetaParam',['../classSampleSummary.html#adf610d698a50c4930d95be320e99a8e8',1,'SampleSummary']]],
   ['dobymodeplots_28',['DoByModePlots',['../classSampleSummary.html#a795ac96bf6958c8a2f38c9de23c3c081',1,'SampleSummary']]],
@@ -42,5 +42,5 @@ var searchData=
   ['drawsfolded_39',['DrawsFolded',['../RHat__HighMem_8cpp.html#a7e7fe290fda4362be54b8cf5d56fea51',1,'RHat_HighMem.cpp']]],
   ['dummyfile_40',['DUMMYFILE',['../PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7',1,'PlotMCMCDiag.cpp']]],
   ['dump_41',['Dump',['../structMaCh3Plotting_1_1InputFile.html#a0897b76fdbfc674ed94da1d2b4adb0a2',1,'MaCh3Plotting::InputFile']]],
-  ['dumpmatrixtofile_42',['DumpMatrixToFile',['../classcovarianceXsec.html#a5cffa7b3221e1a49706ea8a9fe0f826c',1,'covarianceXsec']]]
+  ['dumpmatrixtofile_42',['DumpMatrixToFile',['../classParameterHandlerGeneric.html#aad70f9b7c4c574c09a056693e3ecc0e0',1,'ParameterHandlerGeneric']]]
 ];

@@ -1,3 +1,9 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$structFastSplineInfo.html" title="CW: Add a struct to hold info about the splinified xsec parameters and help with FindSplineSegment." alt="" coords="5,5,119,31"/>
+<area shape="rect" id="node1" href="$classFitterBase.html" title="Base class for implementing fitting algorithms." alt="" coords="5,104,93,129"/>
+<area shape="rect" id="node2" href="$classLikelihoodFit.html" title="Implementation of base Likelihood Fit class, it is mostly responsible for likelihood calculation whil..." alt="" coords="141,55,245,80"/>
+<area shape="rect" id="node6" href="$classPyFitterBase.html" title=" " alt="" coords="141,104,245,129"/>
+<area shape="rect" id="node7" href="$classmcmc.html" title="Implementation of MR2T2 algorithm." alt="" coords="162,153,225,179"/>
+<area shape="rect" id="node3" href="$classMinuitFit.html" title="Implementation of Minuit fitting algorithm ." alt="" coords="314,5,393,31"/>
+<area shape="rect" id="node4" href="$classPSO.html" title="Class PSO, consist of a vector of object Class Particle and global best Takes in the size (number of ..." alt="" coords="329,55,377,80"/>
+<area shape="rect" id="node5" href="$classPyLikelihoodFit.html" title=" " alt="" coords="293,104,413,129"/>
 </map>

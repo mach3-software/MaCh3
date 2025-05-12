@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.6"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MaCh3: mcmc/PSO.h Source File</title>
+<title>MaCh3: Fitters/PSO.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,7 +30,7 @@ MathJax.Hub.Config({
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="mach3logo_small.png"/></td>
   <td id="projectalign">
-   <div id="projectname">MaCh3<span id="projectnumber">&#160;1.5.0</span>
+   <div id="projectname">MaCh3<span id="projectnumber">&#160;2.0.0</span>
    </div>
    <div id="projectbrief">Reference Guide</div>
   </td>
@@ -79,7 +79,7 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_9d1483aea13a0d690c9337bf5d7dafcd.html">mcmc</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_c4587985b869c96ecd5a3e2399525831.html">Fitters</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -94,7 +94,7 @@ $(function() {
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &lt;numeric&gt;</span></div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment">// MaCh3 includes</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &quot;<a class="code" href="LikelihoodFit_8h.html">mcmc/LikelihoodFit.h</a>&quot;</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &quot;<a class="code" href="LikelihoodFit_8h.html">Fitters/LikelihoodFit.h</a>&quot;</span></div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno"><a class="line" href="classparticle.html">   17</a></span><span class="keyword">class </span><a class="code hl_class" href="classparticle.html">particle</a>{</div>
@@ -168,7 +168,7 @@ $(function() {
 <div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classPSO.html#aa347879022c35fcb5018adaeb830ee1c">uncertainty_check</a>(std::vector&lt;double&gt; previous_pos);</div>
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classPSO.html#af09adc84344d8618a37c900b05fd1bd7">run</a>();</div>
 <div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classPSO.html#af2a3d758cc67e9b6b6a9a96499345b5b">WriteOutput</a>();</div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classPSO.html#afcd534dbf737430c8ab1e921e8730b81">runMCMC</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classPSO.html#a0e057598df4829780d0c2d1e8aff9831">RunMCMC</a>() <span class="keyword">override</span>;</div>
 <div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    <span class="keywordtype">double</span> <a class="code hl_function" href="classPSO.html#a42f873a16ad3d3d9809262a01bf68538">CalcChi2</a>(<span class="keyword">const</span> <span class="keywordtype">double</span>* x);</div>
 <div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    <span class="keywordtype">double</span> <a class="code hl_function" href="classPSO.html#afa217959928bddc4afe24e6292448140">rastriginFunc</a>(<span class="keyword">const</span> <span class="keywordtype">double</span>* x);</div>
 <div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    <span class="keywordtype">double</span> <a class="code hl_function" href="classPSO.html#af7b07ec9013e1d6859d7ffa8e54086c7">swarmIterate</a>();</div>
@@ -242,6 +242,7 @@ $(function() {
 <div class="ttc" id="aclassPSO_html"><div class="ttname"><a href="classPSO.html">PSO</a></div><div class="ttdoc">Class PSO, consist of a vector of object Class Particle and global best Takes in the size (number of ...</div><div class="ttdef"><b>Definition:</b> <a href="PSO_8h_source.html#l00077">PSO.h:77</a></div></div>
 <div class="ttc" id="aclassPSO_html_a0ade870a1dde6ec231b508e629ed1ba2"><div class="ttname"><a href="classPSO.html#a0ade870a1dde6ec231b508e629ed1ba2">PSO::vector_add</a></div><div class="ttdeci">std::vector&lt; double &gt; vector_add(std::vector&lt; double &gt; v1, std::vector&lt; double &gt; v2)</div><div class="ttdef"><b>Definition:</b> <a href="PSO_8h_source.html#l00110">PSO.h:110</a></div></div>
 <div class="ttc" id="aclassPSO_html_a0c6dc51dae4c926cf236eb482d000384"><div class="ttname"><a href="classPSO.html#a0c6dc51dae4c926cf236eb482d000384">PSO::kMaxParticles</a></div><div class="ttdeci">static const int kMaxParticles</div><div class="ttdef"><b>Definition:</b> <a href="PSO_8h_source.html#l00157">PSO.h:157</a></div></div>
+<div class="ttc" id="aclassPSO_html_a0e057598df4829780d0c2d1e8aff9831"><div class="ttname"><a href="classPSO.html#a0e057598df4829780d0c2d1e8aff9831">PSO::RunMCMC</a></div><div class="ttdeci">void RunMCMC() override</div><div class="ttdoc">Implementation of fitting algorithm.</div><div class="ttdef"><b>Definition:</b> <a href="PSO_8cpp_source.html#l00025">PSO.cpp:25</a></div></div>
 <div class="ttc" id="aclassPSO_html_a120de7511935d934568360acd1a68d2f"><div class="ttname"><a href="classPSO.html#a120de7511935d934568360acd1a68d2f">PSO::~PSO</a></div><div class="ttdeci">virtual ~PSO()</div><div class="ttdoc">Destructor.</div><div class="ttdef"><b>Definition:</b> <a href="PSO_8h_source.html#l00082">PSO.h:82</a></div></div>
 <div class="ttc" id="aclassPSO_html_a1a67501489c5cea6b871525447f09255"><div class="ttname"><a href="classPSO.html#a1a67501489c5cea6b871525447f09255">PSO::vector_subtract</a></div><div class="ttdeci">std::vector&lt; double &gt; vector_subtract(std::vector&lt; double &gt; v1, std::vector&lt; double &gt; v2)</div><div class="ttdef"><b>Definition:</b> <a href="PSO_8h_source.html#l00115">PSO.h:115</a></div></div>
 <div class="ttc" id="aclassPSO_html_a1c5454d8b4000375138447cada8a46a2"><div class="ttname"><a href="classPSO.html#a1c5454d8b4000375138447cada8a46a2">PSO::ranges_max</a></div><div class="ttdeci">std::vector&lt; double &gt; ranges_max</div><div class="ttdef"><b>Definition:</b> <a href="PSO_8h_source.html#l00145">PSO.h:145</a></div></div>
@@ -279,8 +280,7 @@ $(function() {
 <div class="ttc" id="aclassPSO_html_af7b07ec9013e1d6859d7ffa8e54086c7"><div class="ttname"><a href="classPSO.html#af7b07ec9013e1d6859d7ffa8e54086c7">PSO::swarmIterate</a></div><div class="ttdeci">double swarmIterate()</div><div class="ttdef"><b>Definition:</b> <a href="PSO_8cpp_source.html#l00332">PSO.cpp:332</a></div></div>
 <div class="ttc" id="aclassPSO_html_afa217959928bddc4afe24e6292448140"><div class="ttname"><a href="classPSO.html#afa217959928bddc4afe24e6292448140">PSO::rastriginFunc</a></div><div class="ttdeci">double rastriginFunc(const double *x)</div><div class="ttdef"><b>Definition:</b> <a href="PSO_8cpp_source.html#l00543">PSO.cpp:543</a></div></div>
 <div class="ttc" id="aclassPSO_html_afac1699007d3838da90d466bf4b69b31"><div class="ttname"><a href="classPSO.html#afac1699007d3838da90d466bf4b69b31">PSO::prior</a></div><div class="ttdeci">std::vector&lt; double &gt; prior</div><div class="ttdef"><b>Definition:</b> <a href="PSO_8h_source.html#l00143">PSO.h:143</a></div></div>
-<div class="ttc" id="aclassPSO_html_afcd534dbf737430c8ab1e921e8730b81"><div class="ttname"><a href="classPSO.html#afcd534dbf737430c8ab1e921e8730b81">PSO::runMCMC</a></div><div class="ttdeci">void runMCMC() override</div><div class="ttdoc">Implementation of fitting algorithm.</div><div class="ttdef"><b>Definition:</b> <a href="PSO_8cpp_source.html#l00025">PSO.cpp:25</a></div></div>
-<div class="ttc" id="aclassmanager_html"><div class="ttname"><a href="classmanager.html">manager</a></div><div class="ttdoc">The manager class is responsible for managing configurations and settings.</div><div class="ttdef"><b>Definition:</b> <a href="manager_8h_source.html#l00017">manager.h:17</a></div></div>
+<div class="ttc" id="aclassmanager_html"><div class="ttname"><a href="classmanager.html">manager</a></div><div class="ttdoc">The manager class is responsible for managing configurations and settings.</div><div class="ttdef"><b>Definition:</b> <a href="Manager_8h_source.html#l00016">Manager.h:16</a></div></div>
 <div class="ttc" id="aclassparticle_html"><div class="ttname"><a href="classparticle.html">particle</a></div><div class="ttdoc">Class particle - stores the position, velocity and personal best With functions which move particle a...</div><div class="ttdef"><b>Definition:</b> <a href="PSO_8h_source.html#l00017">PSO.h:17</a></div></div>
 <div class="ttc" id="aclassparticle_html_a16f312fadb1c50e0a45a840f9e393eae"><div class="ttname"><a href="classparticle.html#a16f312fadb1c50e0a45a840f9e393eae">particle::position</a></div><div class="ttdeci">std::vector&lt; double &gt; position</div><div class="ttdef"><b>Definition:</b> <a href="PSO_8h_source.html#l00064">PSO.h:64</a></div></div>
 <div class="ttc" id="aclassparticle_html_a31e82afa2044567396e7357613a1438f"><div class="ttname"><a href="classparticle.html#a31e82afa2044567396e7357613a1438f">particle::particle</a></div><div class="ttdeci">particle()</div><div class="ttdef"><b>Definition:</b> <a href="PSO_8h_source.html#l00019">PSO.h:19</a></div></div>

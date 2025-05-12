@@ -1,8 +1,8 @@
-<map id="manager/gpuUtils.cuh" name="manager/gpuUtils.cuh">
-<area shape="rect" id="node1" title="Common CUDA utilities and definitions for shared GPU functionality." alt="" coords="231,5,396,31"/>
-<area shape="rect" id="node2" href="$gpuUtils_8cu.html" title=" " alt="" coords="5,79,163,104"/>
-<area shape="rect" id="node3" href="$gpuMCMCProcessorUtils_8cuh.html" title=" " alt="" coords="187,79,439,104"/>
-<area shape="rect" id="node5" href="$gpuSplineUtils_8cuh.html" title="MaCh3 event&#45;by&#45;event cross&#45;section spline code." alt="" coords="463,79,657,104"/>
-<area shape="rect" id="node4" href="$gpuMCMCProcessorUtils_8cu.html" title=" " alt="" coords="191,152,435,177"/>
-<area shape="rect" id="node6" href="$gpuSplineUtils_8cu.html" title=" " alt="" coords="467,152,653,177"/>
+<map id="Manager/gpuUtils.cuh" name="Manager/gpuUtils.cuh">
+<area shape="rect" id="node1" title="Common CUDA utilities and definitions for shared GPU functionality." alt="" coords="221,5,385,31"/>
+<area shape="rect" id="node2" href="$gpuMCMCProcessorUtils_8cuh.html" title=" " alt="" coords="5,79,201,119"/>
+<area shape="rect" id="node4" href="$gpuUtils_8cu.html" title=" " alt="" coords="225,86,381,111"/>
+<area shape="rect" id="node5" href="$gpuSplineUtils_8cuh.html" title="MaCh3 event&#45;by&#45;event cross&#45;section spline code." alt="" coords="406,86,601,111"/>
+<area shape="rect" id="node3" href="$gpuMCMCProcessorUtils_8cu.html" title=" " alt="" coords="5,167,201,207"/>
+<area shape="rect" id="node6" href="$gpuSplineUtils_8cu.html" title=" " alt="" coords="410,174,597,199"/>
 </map>

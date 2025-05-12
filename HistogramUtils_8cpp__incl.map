@@ -1,24 +1,24 @@
-<map id="samplePDF/HistogramUtils.cpp" name="samplePDF/HistogramUtils.cpp">
-<area shape="rect" id="node1" title=" " alt="" coords="1222,5,1447,31"/>
-<area shape="rect" id="node2" href="$HistogramUtils_8h.html" title=" " alt="" coords="1068,79,1279,104"/>
-<area shape="rect" id="node31" title=" " alt="" coords="1302,79,1367,104"/>
-<area shape="rect" id="node32" title=" " alt="" coords="1391,79,1489,104"/>
-<area shape="rect" id="node3" href="$Structs_8h.html" title=" " alt="" coords="631,152,788,177"/>
-<area shape="rect" id="node23" title=" " alt="" coords="1349,225,1451,251"/>
-<area shape="rect" id="node29" title=" " alt="" coords="1150,152,1319,177"/>
-<area shape="rect" id="node30" title=" " alt="" coords="1344,152,1448,177"/>
+<map id="Samples/HistogramUtils.cpp" name="Samples/HistogramUtils.cpp">
+<area shape="rect" id="node1" title=" " alt="" coords="1218,5,1425,31"/>
+<area shape="rect" id="node2" href="$HistogramUtils_8h.html" title=" " alt="" coords="1072,79,1264,104"/>
+<area shape="rect" id="node31" title=" " alt="" coords="1289,79,1354,104"/>
+<area shape="rect" id="node32" title=" " alt="" coords="1378,79,1475,104"/>
+<area shape="rect" id="node3" href="$Structs_8h.html" title=" " alt="" coords="639,152,777,177"/>
+<area shape="rect" id="node23" title=" " alt="" coords="1347,225,1450,251"/>
+<area shape="rect" id="node29" title=" " alt="" coords="1145,152,1314,177"/>
+<area shape="rect" id="node30" title=" " alt="" coords="1339,152,1443,177"/>
 <area shape="rect" id="node4" title=" " alt="" coords="5,225,48,251"/>
 <area shape="rect" id="node5" title=" " alt="" coords="72,225,115,251"/>
 <area shape="rect" id="node6" title=" " alt="" coords="139,225,263,251"/>
-<area shape="rect" id="node7" href="$MaCh3Exception_8h.html" title=" " alt="" coords="288,225,493,251"/>
-<area shape="rect" id="node11" href="$MaCh3Logger_8h.html" title="KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/incl..." alt="" coords="309,299,493,324"/>
+<area shape="rect" id="node7" href="$MaCh3Exception_8h.html" title=" " alt="" coords="287,225,491,251"/>
+<area shape="rect" id="node11" href="$MaCh3Logger_8h.html" title="KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/incl..." alt="" coords="309,299,491,324"/>
 <area shape="rect" id="node15" href="$Core_8h.html" title=" " alt="" coords="685,372,811,397"/>
-<area shape="rect" id="node22" title=" " alt="" coords="619,225,701,251"/>
-<area shape="rect" id="node24" title=" " alt="" coords="726,225,791,251"/>
-<area shape="rect" id="node25" title=" " alt="" coords="816,225,875,251"/>
-<area shape="rect" id="node26" title=" " alt="" coords="899,225,986,251"/>
-<area shape="rect" id="node27" title=" " alt="" coords="1010,225,1070,251"/>
-<area shape="rect" id="node28" title=" " alt="" coords="1094,225,1325,251"/>
+<area shape="rect" id="node22" title=" " alt="" coords="617,225,700,251"/>
+<area shape="rect" id="node24" title=" " alt="" coords="725,225,790,251"/>
+<area shape="rect" id="node25" title=" " alt="" coords="815,225,873,251"/>
+<area shape="rect" id="node26" title=" " alt="" coords="898,225,985,251"/>
+<area shape="rect" id="node27" title=" " alt="" coords="1009,225,1069,251"/>
+<area shape="rect" id="node28" title=" " alt="" coords="1093,225,1323,251"/>
 <area shape="rect" id="node8" title=" " alt="" coords="187,445,267,471"/>
 <area shape="rect" id="node9" title=" " alt="" coords="131,372,189,397"/>
 <area shape="rect" id="node10" title=" " alt="" coords="198,299,285,324"/>

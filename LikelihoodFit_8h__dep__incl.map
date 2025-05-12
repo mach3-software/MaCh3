@@ -1,11 +1,11 @@
-<map id="mcmc/LikelihoodFit.h" name="mcmc/LikelihoodFit.h">
-<area shape="rect" id="node1" title=" " alt="" coords="263,5,423,31"/>
-<area shape="rect" id="node2" href="$LikelihoodFit_8cpp.html" title=" " alt="" coords="5,79,180,104"/>
-<area shape="rect" id="node3" href="$MaCh3Factory_8h.html" title="Factory methods for MaCh3 software which streamline initialisation of different objects." alt="" coords="502,152,670,177"/>
-<area shape="rect" id="node5" href="$MinuitFit_8h.html" title=" " alt="" coords="204,79,339,104"/>
-<area shape="rect" id="node8" href="$PSO_8h.html" title=" " alt="" coords="365,79,469,104"/>
-<area shape="rect" id="node4" href="$MaCh3Factory_8cpp.html" title=" " alt="" coords="495,225,677,251"/>
-<area shape="rect" id="node6" href="$MinuitFit_8cpp.html" title=" " alt="" coords="31,152,181,177"/>
-<area shape="rect" id="node7" href="$fitter_8cpp.html" title=" " alt="" coords="206,152,334,177"/>
-<area shape="rect" id="node9" href="$PSO_8cpp.html" title=" " alt="" coords="359,152,477,177"/>
+<map id="Fitters/LikelihoodFit.h" name="Fitters/LikelihoodFit.h">
+<area shape="rect" id="node1" title=" " alt="" coords="266,5,427,31"/>
+<area shape="rect" id="node2" href="$LikelihoodFit_8cpp.html" title=" " alt="" coords="5,79,181,104"/>
+<area shape="rect" id="node3" href="$MaCh3Factory_8h.html" title="Factory methods for MaCh3 software which streamline initialisation of different objects." alt="" coords="507,152,677,177"/>
+<area shape="rect" id="node5" href="$MinuitFit_8h.html" title=" " alt="" coords="205,79,341,104"/>
+<area shape="rect" id="node8" href="$PSO_8h.html" title=" " alt="" coords="369,79,474,104"/>
+<area shape="rect" id="node4" href="$MaCh3Factory_8cpp.html" title=" " alt="" coords="500,225,684,251"/>
+<area shape="rect" id="node6" href="$MinuitFit_8cpp.html" title=" " alt="" coords="27,152,178,177"/>
+<area shape="rect" id="node7" href="$fitters_8cpp.html" title=" " alt="" coords="203,152,339,177"/>
+<area shape="rect" id="node9" href="$PSO_8cpp.html" title=" " alt="" coords="363,152,483,177"/>
 </map>

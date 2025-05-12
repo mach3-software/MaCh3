@@ -30,7 +30,7 @@ MathJax.Hub.Config({
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="mach3logo_small.png"/></td>
   <td id="projectalign">
-   <div id="projectname">MaCh3<span id="projectnumber">&#160;1.5.0</span>
+   <div id="projectname">MaCh3<span id="projectnumber">&#160;2.0.0</span>
    </div>
    <div id="projectbrief">Reference Guide</div>
   </td>
@@ -87,8 +87,8 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <a href="PlotMCMCDiag_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">// MaCh3 includes</span></div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#include &quot;<a class="code" href="MCMCProcessor_8h.html">mcmc/MCMCProcessor.h</a>&quot;</span></div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;<a class="code" href="HistogramUtils_8h.html">samplePDF/HistogramUtils.h</a>&quot;</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#include &quot;<a class="code" href="MCMCProcessor_8h.html">Fitters/MCMCProcessor.h</a>&quot;</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;<a class="code" href="HistogramUtils_8h.html">Samples/HistogramUtils.h</a>&quot;</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno"><a class="line" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">   10</a></span>TString <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a> = <span class="stringliteral">&quot;KillMePlease&quot;</span>;</div>
@@ -109,7 +109,7 @@ $(function() {
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno"><a class="line" href="PlotMCMCDiag_8cpp.html#a70a8847717dd98bb61d4be6af69dbe03">   26</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#a70a8847717dd98bb61d4be6af69dbe03">MakePlot</a>(TString fname1, TString fname2,TString fname3, TString fname4)</div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>{</div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>  TCanvas *c1 = <span class="keyword">new</span> TCanvas(<span class="stringliteral">&quot;c1&quot;</span>,<span class="stringliteral">&quot; &quot;</span>, 0, 0, 800,630);</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>  gStyle-&gt;SetOptStat(0); <span class="comment">//Set 0 to disable statystic box</span></div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>  gStyle-&gt;SetOptStat(0); <span class="comment">//Set 0 to disable statistic box</span></div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>  <span class="comment">//To avoid TCanvas::Print&gt; messages</span></div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>  gErrorIgnoreLevel = kWarning;</div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>

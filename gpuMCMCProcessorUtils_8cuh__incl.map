@@ -1,7 +1,7 @@
-<map id="mcmc/gpuMCMCProcessorUtils.cuh" name="mcmc/gpuMCMCProcessorUtils.cuh">
-<area shape="rect" id="node1" title=" " alt="" coords="5,5,257,31"/>
-<area shape="rect" id="node2" href="$gpuUtils_8cuh.html" title="Common CUDA utilities and definitions for shared GPU functionality." alt="" coords="49,79,214,104"/>
-<area shape="rect" id="node3" title=" " alt="" coords="9,152,75,177"/>
-<area shape="rect" id="node4" title=" " alt="" coords="100,152,163,177"/>
-<area shape="rect" id="node5" title=" " alt="" coords="187,152,310,177"/>
+<map id="Fitters/gpuMCMCProcessorUtils.cuh" name="Fitters/gpuMCMCProcessorUtils.cuh">
+<area shape="rect" id="node1" title=" " alt="" coords="30,5,226,45"/>
+<area shape="rect" id="node2" href="$gpuUtils_8cuh.html" title="Common CUDA utilities and definitions for shared GPU functionality." alt="" coords="46,93,210,119"/>
+<area shape="rect" id="node3" title=" " alt="" coords="5,167,72,192"/>
+<area shape="rect" id="node4" title=" " alt="" coords="97,167,159,192"/>
+<area shape="rect" id="node5" title=" " alt="" coords="184,167,307,192"/>
 </map>

@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['lastpcadpar_0',['LastPCAdpar',['../classPCAHandler.html#a954eeb975f1d7f9528ed7e027a54b21a',1,'PCAHandler::LastPCAdpar()'],['../classcovarianceBase.html#a5ebdc744b733656972a15f1657915a3f',1,'covarianceBase::LastPCAdpar()']]],
+  ['lastpcadpar_0',['LastPCAdpar',['../classPCAHandler.html#a954eeb975f1d7f9528ed7e027a54b21a',1,'PCAHandler::LastPCAdpar()'],['../classParameterHandlerBase.html#a3f192f8800821774f5fc06826f108167',1,'ParameterHandlerBase::LastPCAdpar()']]],
   ['length_1',['length',['../classTF1__red.html#a25a2d24932de29741a6d539328d715a7',1,'TF1_red']]],
   ['likelihood_2',['likelihood',['../classSampleSummary.html#aafb18632bb987ae9a302d95781d5fdba',1,'SampleSummary']]],
   ['linewidth_3',['lineWidth',['../PlotLLH_8cpp.html#a7740e2371b2eb3a71ca8660b26a842e4',1,'PlotLLH.cpp']]],

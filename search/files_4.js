@@ -1,11 +1,7 @@
 var searchData=
 [
-  ['getpenaltyterm_2ecpp_0',['GetPenaltyTerm.cpp',['../GetPenaltyTerm_8cpp.html',1,'']]],
-  ['getpostfitparamplots_2ecpp_1',['GetPostfitParamPlots.cpp',['../GetPostfitParamPlots_8cpp.html',1,'']]],
-  ['gpumcmcprocessorutils_2ecu_2',['gpuMCMCProcessorUtils.cu',['../gpuMCMCProcessorUtils_8cu.html',1,'']]],
-  ['gpumcmcprocessorutils_2ecuh_3',['gpuMCMCProcessorUtils.cuh',['../gpuMCMCProcessorUtils_8cuh.html',1,'']]],
-  ['gpusplineutils_2ecu_4',['gpuSplineUtils.cu',['../gpuSplineUtils_8cu.html',1,'']]],
-  ['gpusplineutils_2ecuh_5',['gpuSplineUtils.cuh',['../gpuSplineUtils_8cuh.html',1,'']]],
-  ['gpuutils_2ecu_6',['gpuUtils.cu',['../gpuUtils_8cu.html',1,'']]],
-  ['gpuutils_2ecuh_7',['gpuUtils.cuh',['../gpuUtils_8cuh.html',1,'']]]
+  ['fardetectorcoreinfostruct_2eh_0',['FarDetectorCoreInfoStruct.h',['../FarDetectorCoreInfoStruct_8h.html',1,'']]],
+  ['fitterbase_2ecpp_1',['FitterBase.cpp',['../FitterBase_8cpp.html',1,'']]],
+  ['fitterbase_2eh_2',['FitterBase.h',['../FitterBase_8h.html',1,'']]],
+  ['fitters_2ecpp_3',['fitters.cpp',['../fitters_8cpp.html',1,'']]]
 ];

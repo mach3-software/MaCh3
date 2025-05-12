@@ -1,0 +1,6 @@
+<map id="ParameterHandlerBase" name="ParameterHandlerBase">
+<area shape="rect" id="node1" title="Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada..." alt="" coords="216,5,388,31"/>
+<area shape="rect" id="node2" href="$classParameterHandlerGeneric.html" title="Class responsible for handling of systematic error parameters with different types defined in the con..." alt="" coords="5,79,196,104"/>
+<area shape="rect" id="node3" href="$classParameterHandlerOsc.html" title="Class responsible for handling of neutrino oscillation parameters." alt="" coords="220,79,384,104"/>
+<area shape="rect" id="node4" href="$classPyParameterHandlerBase.html" title=" " alt="" coords="408,79,596,104"/>
+</map>
