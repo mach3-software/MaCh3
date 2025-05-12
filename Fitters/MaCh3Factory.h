@@ -112,17 +112,17 @@ std::unique_ptr<CovType> MaCh3CovarianceFactory(manager *FitManager, const std::
 }
 
 // ********************************************
-/// @brief Factory function for creating SamplePDF and initialisation with systematic.
+/// @brief Factory function for creating SampleHandler and initialisation with systematic.
 ///
-/// @tparam SampleType The class type of the sample to create, e.g., `samplePDFTutorial`.
+/// @tparam SampleType The class type of the sample to create, e.g., `SampleHandlerTutorial`.
 /// @param SampleConfig Path to sample config.
-/// @param xsec A pointer to a covarianceXsec object for cross-section systematic settings.
-/// @param osc (Optional) A pointer to a covarianceOsc object for oscillation systematic settings.
+/// @param xsec A pointer to a ParameterHandlerGeneric object for cross-section systematic settings.
+/// @param osc (Optional) A pointer to a ParameterHandlerOsc object for oscillation systematic settings.
 /// @return Vector of SampleType object, initialized and ready for use.
 ///
 /// @note Example
 /// ```cpp
-/// auto mySamples = MaCh3SamplePDFFactory<samplePDFTutorial>(SampleConfig, xsec, osc);
+/// auto mySamples = MaCh3SampleHandlerFactory<SampleHandlerTutorial>(SampleConfig, xsec, osc);
 /// ```
 template <typename SampleType>
 std::vector<SampleType*> MaCh3SampleHandlerFactory(const std::vector<std::string>& SampleConfig,

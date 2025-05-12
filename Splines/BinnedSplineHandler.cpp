@@ -39,7 +39,7 @@ BinnedSplineHandler::~BinnedSplineHandler(){
 //****************************************
 void BinnedSplineHandler::cleanUpMemory() {
 //****************************************
-  //Call once everything's been allocated in samplePDFSKBase, cleans up junk from memory!
+  //Call once everything's been allocated in SampleHandlerFDBase, cleans up junk from memory!
   //Not a huge saving but it's better than leaving everything up to the compiler
   MACH3LOG_INFO("Cleaning up spline memory");
   CleanVector(indexvec);

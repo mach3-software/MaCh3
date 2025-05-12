@@ -332,8 +332,8 @@ class SampleSummary {
     /// Histogram which corresponds to each bin in the sample's th2poly
     TH1D ****PosteriorHist_ByMode;
     
-    /// Pointer to samplePDF object, mostly used to get sample names, binning etc.
-    SampleHandlerBase* SamplePDF;
+    /// Pointer to SampleHandler object, mostly used to get sample names, binning etc.
+    SampleHandlerBase* SampleHandler;
 
     /// MaCh3 Modes
     MaCh3Modes* Modes;

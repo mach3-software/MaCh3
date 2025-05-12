@@ -176,7 +176,7 @@ struct NormParameter {
 
   /// Generic vector containing the string of kinematic type
   /// This then needs to be converted to a kinematic type enum
-  /// within a samplePDF daughter class
+  /// within a SampleHandler daughter class
   /// The bounds for each kinematic variable are given in Selection
   std::vector< std::string > KinematicVarStr;
 
@@ -211,7 +211,7 @@ struct FunctionalParameter {
 
   /// Generic vector containing the string of kinematic type
   /// This then needs to be converted to a kinematic type enum
-  /// within a samplePDF daughter class
+  /// within a SampleHandler daughter class
   /// The bounds for each kinematic variable are given in Selection
   std::vector< std::string > KinematicVarStr;
 

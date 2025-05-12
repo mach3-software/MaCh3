@@ -39,7 +39,7 @@ public:
   //===============================================================================
   // DB Reweighting and Likelihood functions
 
-  //ETA - abstract these to samplePDFFDBase
+  //ETA - abstract these to SampleHandlerFDBase
   //DB Require these four functions to allow conversion from TH1(2)D to array for multi-threaded GetLikelihood
   void AddData(TH1D* Data) override;
   void AddData(TH2D* Data) override;
@@ -116,7 +116,7 @@ public:
   virtual void SetupSplines() = 0;
 
   //DB Require all objects to have a function which reads in the MC
-  /// @brief Initialise any variables that your experiment specific samplePDF needs
+  /// @brief Initialise any variables that your experiment specific SampleHandler needs
   virtual void Init() = 0;
 
   /// @brief Experiment specific setup, returns the number of events which were loaded
@@ -243,7 +243,7 @@ public:
 
   //===============================================================================
   //DB Functions required for reweighting functions
-  //DB Replace previous implementation with reading bin contents from samplePDF_array
+  //DB Replace previous implementation with reading bin contents from SampleHandlerFD_array
   /// @brief Fill a 1D histogram with the event-level information used in the fit
   void Fill1DHist() override;
   /// @brief Fill a 2D histogram with the event-level information used in the fit
@@ -251,10 +251,10 @@ public:
 
   /// @brief DB Nice new multi-threaded function which calculates the event weights and fills the relevant bins of an array
 #ifdef MULTITHREAD
-  /// @brief fills the samplePDFFD_array vector with the weight calculated from reweighting but multithreaded
+  /// @brief fills the SampleHandlerFD_array vector with the weight calculated from reweighting but multithreaded
   void FillArray_MP();
 #endif
-  /// @brief fills the samplePDFFD_array vector with the weight calculated from reweighting
+  /// @brief fills the SampleHandlerFD_array vector with the weight calculated from reweighting
   void FillArray();
 
   /// @brief Helper function to reset histograms

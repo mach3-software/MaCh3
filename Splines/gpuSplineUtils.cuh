@@ -7,7 +7,7 @@
 ///
 /// Contains code to run on CUDA GPUs. Essentially we load up stripped TSpline3 objects to the GPU and do the equivalent of TSpline3->Eval(double) for all events
 /// Now also supports TF1 evals
-/// Called from samplePDF/samplePDFND.cpp -> splines/SplineMonolith.cpp -> splines/gpuSplineUtils.cu
+/// Called from Samples/samplePDFND.cpp -> Splines/SplineMonolith.cpp -> Splines/gpuSplineUtils.cu
 
 //MaCh3 included
 #include "Manager/gpuUtils.cuh"

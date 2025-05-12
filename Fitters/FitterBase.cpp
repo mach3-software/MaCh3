@@ -133,9 +133,9 @@ void FitterBase::SaveSettings() {
   MACH3LOG_INFO("Number of covariances: {}", systematics.size());
   for(unsigned int i = 0; i < systematics.size(); ++i)
     MACH3LOG_INFO("{}: Cov name: {}, it has {} params", i, systematics[i]->GetName(), systematics[i]->GetNumParams());
-  MACH3LOG_INFO("Number of SamplePDFs: {}", samples.size());
+  MACH3LOG_INFO("Number of SampleHandlers: {}", samples.size());
   for(unsigned int i = 0; i < samples.size(); ++i)
-    MACH3LOG_INFO("{}: SamplePDF name: {}, it has {} samples",i , samples[i]->GetTitle(), samples[i]->GetNsamples());
+    MACH3LOG_INFO("{}: SampleHandler name: {}, it has {} samples",i , samples[i]->GetTitle(), samples[i]->GetNsamples());
 
   SettingsSaved = true;
 }
@@ -228,13 +228,13 @@ void FitterBase::SaveOutput() {
 }
 
 // *************************
-// Add samplePDF object to the Markov Chain
+// Add SampleHandler object to the Markov Chain
 void FitterBase::AddSampleHandler(SampleHandlerBase * const sample) {
 // *************************
   //Check if the sample has a unique name
   for (const auto &s : samples) {
     if (s->GetTitle() == sample->GetTitle()) {
-      MACH3LOG_ERROR("SamplePDF with name '{}' already exists!", sample->GetTitle());
+      MACH3LOG_ERROR("SampleHandler with name '{}' already exists!", sample->GetTitle());
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   }

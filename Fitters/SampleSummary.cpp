@@ -32,10 +32,10 @@ SampleSummary::SampleSummary(const int n_Samples, const std::string &Filename, S
   
   OutputName = Filename;
   nSamples = n_Samples;
-  SamplePDF = sample;
+  SampleHandler = sample;
 
   //Get mach3 modes from manager
-  Modes = SamplePDF->GetMaCh3Modes();
+  Modes = SampleHandler->GetMaCh3Modes();
 
   nThrows = 0;
   first_pass = true;
@@ -112,8 +112,8 @@ SampleSummary::SampleSummary(const int n_Samples, const std::string &Filename, S
   //KS: This is silly as it assumes all samples uses same kinematics
   lnLFlucHist_ProjectX = std::make_unique<TH2D>("lnLFlucHist_ProjectX", "lnLFlucHist_ProjectX", 50, 1, -1, 50, 1, -1);
   lnLFlucHist_ProjectX->SetDirectory(nullptr);
-  lnLFlucHist_ProjectX->GetXaxis()->SetTitle(("-2LLH_{Draw Fluc, Draw} for " + SamplePDF->GetKinVarLabel(0, 0)).c_str());
-  lnLFlucHist_ProjectX->GetYaxis()->SetTitle(("-2LLH_{Data, Draw} for " + SamplePDF->GetKinVarLabel(0, 0)).c_str());
+  lnLFlucHist_ProjectX->GetXaxis()->SetTitle(("-2LLH_{Draw Fluc, Draw} for " + SampleHandler->GetKinVarLabel(0, 0)).c_str());
+  lnLFlucHist_ProjectX->GetYaxis()->SetTitle(("-2LLH_{Data, Draw} for " + SampleHandler->GetKinVarLabel(0, 0)).c_str());
   
   // Holds the hist of random number draws, only works for posterior predictive
   if(!isPriorPredictive)
@@ -251,7 +251,7 @@ void SampleSummary::AddData(std::vector<TH2Poly*> &Data) {
         DataHist_ProjectY[i] = ProjectPoly(DataHist[i], false, i);
         maxBins[i] = DataHist[i]->GetNumberOfBins();
       } else {
-        MACH3LOG_ERROR("Somehow sample {} doesn't use TH2Poly", SamplePDF->GetSampleName(i));
+        MACH3LOG_ERROR("Somehow sample {} doesn't use TH2Poly", SampleHandler->GetSampleName(i));
         MACH3LOG_ERROR("Right now I only support TH2Poly but I am ambitious piece of code and surely will have more support in the future");
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
@@ -345,7 +345,7 @@ void SampleSummary::AddNominal(std::vector<TH2Poly*> &Nominal, std::vector<TH2Po
       std::vector<double> xbins;
       std::vector<double> ybins;
 
-      SamplePDF->SetupBinning(M3::int_t(i), xbins, ybins);
+      SampleHandler->SetupBinning(M3::int_t(i), xbins, ybins);
       
       //KS: Y axis is number of events to get estimate of maximal number we use integral
       const int MaxBinning = doShapeOnly ? 1 : int(NoOverflowIntegral(NominalHist[i])/4);
@@ -601,7 +601,7 @@ void SampleSummary::PrepareOutput() {
   for (int i = 0; i < nSamples; ++i)
   {
     // Get the name
-    std::string SampleName = SamplePDF->GetSampleName(i);
+    std::string SampleName = SampleHandler->GetSampleName(i);
     // Strip out spaces
     while (SampleName.find(" ") != std::string::npos) {
       SampleName.replace(SampleName.find(" "), 1, std::string("_"));
@@ -791,8 +791,8 @@ void SampleSummary::Write() {
     // finally p-value for 1D projection
     OutputTree->Draw((SampleName+"_data_draw_ProjectX:"+SampleName+"_drawfluc_draw_ProjectX>>htemp4").c_str());
     TH2D *TempHistogram4 = static_cast<TH2D*>(gDirectory->Get("htemp4")->Clone());
-    TempHistogram4->GetXaxis()->SetTitle(("-2LLH_{Draw Fluc, Draw} for " + SamplePDF->GetKinVarLabel(i, 0)).c_str());
-    TempHistogram4->GetYaxis()->SetTitle(("-2LLH_{Data, Draw} for " + SamplePDF->GetKinVarLabel(i, 0)).c_str());
+    TempHistogram4->GetXaxis()->SetTitle(("-2LLH_{Draw Fluc, Draw} for " + SampleHandler->GetKinVarLabel(i, 0)).c_str());
+    TempHistogram4->GetYaxis()->SetTitle(("-2LLH_{Data, Draw} for " + SampleHandler->GetKinVarLabel(i, 0)).c_str());
     TempHistogram4->SetNameTitle((SampleNames[i]+"_drawfluc_draw_ProjectX").c_str(), (SampleNames[i]+"_drawfluc_draw_ProjectX").c_str());
     Get2DBayesianpValue(TempHistogram4);
     TempHistogram4->Write();
@@ -1016,8 +1016,8 @@ void SampleSummary::MakePredictive() {
       double TempLLH_Mode = 0.0;
       
       //KS:Get LLH contribution getTestStatLLH can calculate Barlow Beeston/IceCube or Poisson
-      TempLLH_Mean = SamplePDF->GetTestStatLLH(nData, nMean, nW2Mean);
-      TempLLH_Mode = SamplePDF->GetTestStatLLH(nData, nMode, nW2Mode);
+      TempLLH_Mean = SampleHandler->GetTestStatLLH(nData, nMean, nW2Mean);
+      TempLLH_Mode = SampleHandler->GetTestStatLLH(nData, nMode, nW2Mode);
 
       // Increment -2LLH
       //KS: do times 2 because banff reports chi2
@@ -1102,7 +1102,7 @@ void SampleSummary::MakePredictive() {
       const double nW2Mean = W2MeanProjectX->GetBinContent(j);
 
       double TempLLH_Mean = 0.0;
-      TempLLH_Mean = SamplePDF->GetTestStatLLH(nData, nMean, nW2Mean);
+      TempLLH_Mean = SampleHandler->GetTestStatLLH(nData, nMean, nW2Mean);
 
       //KS: do times 2 because banff reports chi2
       lnLHist_Mean_ProjectX[SampleNum]->SetBinContent(j, 2.0*TempLLH_Mean);
@@ -1278,12 +1278,12 @@ void SampleSummary::MakeChi2Hists() {
 
 //Rate Based p-value
       // Likelihood between the drawn histogram and the data
-      const double RateDataDrawLLH = SamplePDF->GetTestStatLLH(NoOverflowIntegral(DataHist[SampleNum]), NoOverflowIntegral(DrawHist), NoOverflowIntegral(DrawW2Hist));
+      const double RateDataDrawLLH = SampleHandler->GetTestStatLLH(NoOverflowIntegral(DataHist[SampleNum]), NoOverflowIntegral(DrawHist), NoOverflowIntegral(DrawW2Hist));
       llh_rate_data_draw[SampleNum] += RateDataDrawLLH;
       total_llh_rate_data_draw_temp += RateDataDrawLLH;
 
       // Likelihood between drawn histogram and fluctuated posterior predictive distribution using rate
-      const double RatePredFlucDrawLLH = SamplePDF->GetTestStatLLH(NoOverflowIntegral(FluctHist[SampleNum]), NoOverflowIntegral(DrawHist), NoOverflowIntegral(DrawW2Hist));
+      const double RatePredFlucDrawLLH = SampleHandler->GetTestStatLLH(NoOverflowIntegral(FluctHist[SampleNum]), NoOverflowIntegral(DrawHist), NoOverflowIntegral(DrawW2Hist));
       llh_rate_predfluc_draw[SampleNum] += RatePredFlucDrawLLH;
       total_llh_rate_predfluc_draw_temp += RatePredFlucDrawLLH;
 
@@ -1587,7 +1587,7 @@ double SampleSummary::GetLLH(TH2Poly * const & DatHist, TH2Poly * const & MCHist
     const double data = DatHist->GetBinContent(i);
     const double mc = MCHist->GetBinContent(i);
     const double w2 = W2Hist->GetBinContent(i);
-    llh += SamplePDF->GetTestStatLLH(data, mc, w2);
+    llh += SampleHandler->GetTestStatLLH(data, mc, w2);
   }
   //KS: do times 2 because banff reports chi2
   return 2*llh;
@@ -1602,7 +1602,7 @@ double SampleSummary::GetLLH(TH1D * const & DatHist, TH1D * const & MCHist, TH1D
     const double data = DatHist->GetBinContent(i);
     const double mc = MCHist->GetBinContent(i);
     const double w2 = W2Hist->GetBinContent(i);
-    llh += SamplePDF->GetTestStatLLH(data, mc, w2);
+    llh += SampleHandler->GetTestStatLLH(data, mc, w2);
   }
   //KS: do times 2 because banff reports chi2
   return 2*llh;
@@ -2165,7 +2165,7 @@ TH1D* SampleSummary::ProjectPoly(TH2Poly* Histogram, const bool ProjectX, const 
   std::vector<double> xbins;
   std::vector<double> ybins;
 
-  SamplePDF->SetupBinning(M3::int_t(selection), xbins, ybins);
+  SampleHandler->SetupBinning(M3::int_t(selection), xbins, ybins);
   TH1D* Projection = nullptr;
   std::string name;
   if (ProjectX) {
@@ -2305,7 +2305,7 @@ void SampleSummary::StudyWAIC() {
         const double w2 = W2MCVector[s][SampleNum]->GetBinContent(i);
 
         // Get the -log-likelihood for this sample and bin
-        double neg_LLH_temp = SamplePDF->GetTestStatLLH(data, mc, w2);
+        double neg_LLH_temp = SampleHandler->GetTestStatLLH(data, mc, w2);
 
         // Negate the negative log-likelihood to get the actual log-likelihood
         double LLH_temp = -neg_LLH_temp;

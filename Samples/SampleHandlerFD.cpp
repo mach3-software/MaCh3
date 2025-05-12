@@ -15,7 +15,7 @@ _MaCh3_Safe_Include_End_ //}
 SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGeneric* xsec_cov, ParameterHandlerOsc* osc_cov, OscillatorBase* OscillatorObj_) : SampleHandlerBase()
 {
   MACH3LOG_INFO("-------------------------------------------------------------------");
-  MACH3LOG_INFO("Creating SamplePDFFDBase object");
+  MACH3LOG_INFO("Creating SampleHandlerFDBase object");
 
   //ETA - safety feature so you can't pass a NULL xsec_cov
   if(!xsec_cov){
@@ -216,7 +216,7 @@ void SampleHandlerFD::Initialise() {
   if (OscParHandler) {
     MACH3LOG_INFO("Setting up NuOscillator.. ");
     if (NuOscProbCalcers.size() != 0) {
-      MACH3LOG_INFO("You have passed an OscillatorBase object through the constructor of a samplePDFFDBase object - this will be used for all oscillation channels");
+      MACH3LOG_INFO("You have passed an OscillatorBase object through the constructor of a SampleHandlerFDBase object - this will be used for all oscillation channels");
       MACH3LOG_INFO("Overwriting EqualBinningPerOscChannel = true");
       EqualBinningPerOscChannel = true;
     } else {
@@ -411,9 +411,6 @@ void SampleHandlerFD::FillArray() {
 #ifdef MULTITHREAD
   FillArray_MP();
 #else
-  //ETA we should probably store this in samplePDFFDBase
-  size_t nXBins = int(XBinEdges.size()-1);
-  //size_t nYBins = int(YBinEdges.size()-1);
 
   PrepFunctionalParameters();
   if(SplineHandler){
