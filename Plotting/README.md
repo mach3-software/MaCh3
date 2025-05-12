@@ -30,7 +30,7 @@ It will attempt to automatically detect which fitter the file came from based on
 It will read in the data accordingly, storing in a common format which it provides functions to easily obtain.
 
 
-### styleManager 
+### styleManager
 
 This is responsible for the styling of the plots produces. It contains the functionality to apply user specified styles, colour palettes and fancy names for parameters and samples.
 
