@@ -5,6 +5,8 @@ name: MaCh3 Telemetry
 on:
   pull_request:
     types: [opened]
+    branches:
+      - develop
 
 permissions:
   issues: write
