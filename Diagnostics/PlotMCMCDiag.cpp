@@ -1,6 +1,6 @@
 // MaCh3 includes
-#include "mcmc/MCMCProcessor.h"
-#include "samplePDF/HistogramUtils.h"
+#include "Fitters/MCMCProcessor.h"
+#include "Samples/HistogramUtils.h"
 
 /// @file PlotMCMCDiag.cpp
 /// @brief KS: This script is used to analyse output form DiagMCMC.
@@ -26,7 +26,7 @@ double GetMinimumInRange(TH1D *hist, double minRange, double maxRange)
 void MakePlot(TString fname1, TString fname2,TString fname3, TString fname4)
 {
   TCanvas *c1 = new TCanvas("c1"," ", 0, 0, 800,630);
-  gStyle->SetOptStat(0); //Set 0 to disable statystic box
+  gStyle->SetOptStat(0); //Set 0 to disable statistic box
   //To avoid TCanvas::Print> messages
   gErrorIgnoreLevel = kWarning;
 

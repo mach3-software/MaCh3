@@ -2,8 +2,8 @@
 #include <unistd.h>
 
 // MaCh3 includes
-#include "manager/manager.h"
-#include "samplePDF/Structs.h"
+#include "Manager/Manager.h"
+#include "Samples/Structs.h"
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT includes
