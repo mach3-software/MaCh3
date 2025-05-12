@@ -661,11 +661,16 @@ double covarianceBase::CalcLikelihood() const _noexcept_ {
   #pragma omp parallel for reduction(+:logL)
   #endif
   for(int i = 0; i < _fNumPar; ++i){
+    if(_fFlatPrior[i]){
+      //HW: Flat prior, no need to calculate anything
+      continue;
+    }
+
     #ifdef MULTITHREAD
     #pragma omp simd
     #endif
     for (int j = 0; j <= i; ++j) {
-      if (!_fFlatPrior[i] && !_fFlatPrior[j]) {
+      if (!_fFlatPrior[j]) {
         //KS: Since matrix is symmetric we can calculate non diagonal elements only once and multiply by 2, can bring up to factor speed decrease.
         double scale = (i != j) ? 1. : 0.5;
         logL += scale * (_fPropVal[i] - _fPreFitValue[i])*(_fPropVal[j] - _fPreFitValue[j])*InvertCovMatrix[i][j];
