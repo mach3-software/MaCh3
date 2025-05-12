@@ -7,7 +7,7 @@ _MaCh3_Safe_Include_End_ //}
 
 //Only if GPU is enabled
 #ifdef CUDA
-#include "mcmc/gpuMCMCProcessorUtils.cuh"
+#include "Fitters/gpuMCMCProcessorUtils.cuh"
 #endif
 
 //this file has lots of usage of the ROOT plotting interface that only takes floats, turn this warning off for this CU for now

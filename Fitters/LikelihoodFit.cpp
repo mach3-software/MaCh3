@@ -101,7 +101,7 @@ double LikelihoodFit::CalcChi2(const double* x) {
     syst_llh[stdIt] = (*it)->CalcLikelihood();
     llh += syst_llh[stdIt];
     #ifdef DEBUG
-    if (debug) debugFile << "LLH after " << systematics[stdIt]->getName() << " " << llh << std::endl;
+    if (debug) debugFile << "LLH after " << systematics[stdIt]->GetName() << " " << llh << std::endl;
     #endif
   }
   // Could multi-thread this

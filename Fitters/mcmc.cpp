@@ -148,7 +148,7 @@ void mcmc::ProposeStep() {
     llh += syst_llh[s];
 
     #ifdef DEBUG
-    if (debug) debugFile << "LLH after " << systematics[s]->getName() << " " << llh << std::endl;
+    if (debug) debugFile << "LLH after " << systematics[s]->GetName() << " " << llh << std::endl;
     #endif
   }
 
