@@ -135,6 +135,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a8152408c87ebdf1f28204c54f01384d5"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceMaCh3Utils.html#a8152408c87ebdf1f28204c54f01384d5">PDGToNuOscillatorFlavour</a> (int NuPdg)</td></tr>
 <tr class="memdesc:a8152408c87ebdf1f28204c54f01384d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert from PDG flavour to NuOscillator type beware that in the case of anti-neutrinos the NuOscillator type simply gets multiplied by -1.  <br /></td></tr>
 <tr class="separator:a8152408c87ebdf1f28204c54f01384d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a37d0c54de0b83b71393afca143ab1ec0"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceMaCh3Utils.html#a37d0c54de0b83b71393afca143ab1ec0">FormatDouble</a> (const double value, const int precision)</td></tr>
+<tr class="memdesc:a37d0c54de0b83b71393afca143ab1ec0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert double into string for precision, useful for playing with yaml if you don't want to have in config floating point precision...  <br /></td></tr>
+<tr class="separator:a37d0c54de0b83b71393afca143ab1ec0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="afb0be593dc0d5e481b78afa4625c858c" name="afb0be593dc0d5e481b78afa4625c858c"></a>
@@ -181,6 +184,52 @@ Functions</h2></td></tr>
 <div class="line"><span class="lineno">  201</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Data transfer: {} B, rate: {:.2f} MB/s&quot;</span>, bytesProcessed, dataRateMBps);</div>
 <div class="line"><span class="lineno">  202</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00023">MaCh3Logger.h:23</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a37d0c54de0b83b71393afca143ab1ec0" name="a37d0c54de0b83b71393afca143ab1ec0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a37d0c54de0b83b71393afca143ab1ec0">&#9670;&#160;</a></span>FormatDouble()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string MaCh3Utils::FormatDouble </td>
+          <td>(</td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>precision</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Convert double into string for precision, useful for playing with yaml if you don't want to have in config floating point precision... </p>
+
+<p class="definition">Definition at line <a class="el" href="Structs_8h_source.html#l00609">609</a> of file <a class="el" href="Structs_8h_source.html">Structs.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  609</span>                                                                         {</div>
+<div class="line"><span class="lineno">  610</span>  <span class="comment">// ***************************</span></div>
+<div class="line"><span class="lineno">  611</span>    std::ostringstream oss;</div>
+<div class="line"><span class="lineno">  612</span>    oss &lt;&lt; std::fixed &lt;&lt; std::setprecision(precision) &lt;&lt; value;</div>
+<div class="line"><span class="lineno">  613</span>    <span class="keywordflow">return</span> oss.str();</div>
+<div class="line"><span class="lineno">  614</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>

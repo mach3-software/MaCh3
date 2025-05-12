@@ -200,7 +200,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">   13</span> </div>
 <div class="line"><span class="lineno">   14</span>  <a class="code hl_function" href="classmanager.html#ab8bdfebb3f4956f11f4dafbda5b1dcd0">Initialise</a>();</div>
 <div class="line"><span class="lineno">   15</span>}</div>
-<div class="ttc" id="aYamlHelper_8h_html_ad802d5a5acdc16a796b21af74f6f5f59"><div class="ttname"><a href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">M3OpenConfig</a></div><div class="ttdeci">#define M3OpenConfig(filename)</div><div class="ttdoc">Macro to simplify calling LoadYaml with file and line info.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00456">YamlHelper.h:456</a></div></div>
+<div class="ttc" id="aYamlHelper_8h_html_ad802d5a5acdc16a796b21af74f6f5f59"><div class="ttname"><a href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">M3OpenConfig</a></div><div class="ttdeci">#define M3OpenConfig(filename)</div><div class="ttdoc">Macro to simplify calling LoadYaml with file and line info.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00457">YamlHelper.h:457</a></div></div>
 <div class="ttc" id="aclassmanager_html_a1004958d1431ff607c08fa795b5953b7"><div class="ttname"><a href="classmanager.html#a1004958d1431ff607c08fa795b5953b7">manager::FileName</a></div><div class="ttdeci">std::string FileName</div><div class="ttdoc">The name of the configuration file.</div><div class="ttdef"><b>Definition:</b> <a href="Manager_8h_source.html#l00062">Manager.h:62</a></div></div>
 <div class="ttc" id="aclassmanager_html_a7519c9ab5670ae939d18485d31057b46"><div class="ttname"><a href="classmanager.html#a7519c9ab5670ae939d18485d31057b46">manager::config</a></div><div class="ttdeci">YAML::Node config</div><div class="ttdoc">The YAML node containing the configuration data.</div><div class="ttdef"><b>Definition:</b> <a href="Manager_8h_source.html#l00060">Manager.h:60</a></div></div>
 <div class="ttc" id="aclassmanager_html_ab8bdfebb3f4956f11f4dafbda5b1dcd0"><div class="ttname"><a href="classmanager.html#ab8bdfebb3f4956f11f4dafbda5b1dcd0">manager::Initialise</a></div><div class="ttdeci">void Initialise()</div><div class="ttdoc">Common inialiser for both constructors.</div><div class="ttdef"><b>Definition:</b> <a href="Manager_8cpp_source.html#l00027">Manager.cpp:27</a></div></div>
@@ -471,7 +471,7 @@ template&lt;typename... Args&gt; </div>
 <div class="fragment"><div class="line"><span class="lineno">   51</span>                                        {</div>
 <div class="line"><span class="lineno">   52</span>    <a class="code hl_function" href="YamlHelper_8h.html#a269e230f4f26b824c65a4c7a1472e07b">OverrideConfig</a>(<a class="code hl_variable" href="classmanager.html#a7519c9ab5670ae939d18485d31057b46">config</a>, std::forward&lt;Args&gt;(args)...);</div>
 <div class="line"><span class="lineno">   53</span>  }</div>
-<div class="ttc" id="aYamlHelper_8h_html_a269e230f4f26b824c65a4c7a1472e07b"><div class="ttname"><a href="YamlHelper_8h.html#a269e230f4f26b824c65a4c7a1472e07b">OverrideConfig</a></div><div class="ttdeci">void OverrideConfig(YAML::Node node, std::string const &amp;key, TValue val)</div><div class="ttdoc">Overrides the configuration settings based on provided arguments.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00235">YamlHelper.h:235</a></div></div>
+<div class="ttc" id="aYamlHelper_8h_html_a269e230f4f26b824c65a4c7a1472e07b"><div class="ttname"><a href="YamlHelper_8h.html#a269e230f4f26b824c65a4c7a1472e07b">OverrideConfig</a></div><div class="ttdeci">void OverrideConfig(YAML::Node node, std::string const &amp;key, TValue val)</div><div class="ttdoc">Overrides the configuration settings based on provided arguments.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00236">YamlHelper.h:236</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -596,7 +596,7 @@ template&lt;typename... Args&gt; </div>
 <div class="line"><span class="lineno">   85</span> </div>
 <div class="line"><span class="lineno">   86</span>  <span class="keyword">delete</span> SaveBranch;</div>
 <div class="line"><span class="lineno">   87</span>}</div>
-<div class="ttc" id="aYamlHelper_8h_html_a2d4f3247b6e13ef8c127ff66e699d3cb"><div class="ttname"><a href="YamlHelper_8h.html#a2d4f3247b6e13ef8c127ff66e699d3cb">YAMLtoTMacro</a></div><div class="ttdeci">TMacro YAMLtoTMacro(const YAML::Node &amp;yaml_node, const std::string &amp;name)</div><div class="ttdoc">Convert a YAML node to a ROOT TMacro object.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00160">YamlHelper.h:160</a></div></div>
+<div class="ttc" id="aYamlHelper_8h_html_a2d4f3247b6e13ef8c127ff66e699d3cb"><div class="ttname"><a href="YamlHelper_8h.html#a2d4f3247b6e13ef8c127ff66e699d3cb">YAMLtoTMacro</a></div><div class="ttdeci">TMacro YAMLtoTMacro(const YAML::Node &amp;yaml_node, const std::string &amp;name)</div><div class="ttdoc">Convert a YAML node to a ROOT TMacro object.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00161">YamlHelper.h:161</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

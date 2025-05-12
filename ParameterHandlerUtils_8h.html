@@ -217,6 +217,15 @@ Functions</h2></td></tr>
 <tr class="memitem:aa4b0eaa854abea094a8340f46e3d3d9c"><td class="memItemLeft" align="right" valign="top">TMatrixD&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#aa4b0eaa854abea094a8340f46e3d3d9c">M3::MatrixMult</a> (TMatrixD A, TMatrixD B)</td></tr>
 <tr class="memdesc:aa4b0eaa854abea094a8340f46e3d3d9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">CW: Multi-threaded matrix multiplication.  <br /></td></tr>
 <tr class="separator:aa4b0eaa854abea094a8340f46e3d3d9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68ab9b6b3d413a94604c740208c7895d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#a68ab9b6b3d413a94604c740208c7895d">M3::FixSampleNamesQuotes</a> (std::string &amp;yamlStr)</td></tr>
+<tr class="memdesc:a68ab9b6b3d413a94604c740208c7895d"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Yaml emitter has problem and drops "", if you have special signs in you like * then there is problem. This bit hacky code adds these "".  <br /></td></tr>
+<tr class="separator:a68ab9b6b3d413a94604c740208c7895d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a98e6584f7ed16224a221a837551f2c1d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#a98e6584f7ed16224a221a837551f2c1d">M3::AddTuneValues</a> (YAML::Node &amp;root, const std::vector&lt; double &gt; &amp;Values, const std::string &amp;Tune, const std::vector&lt; std::string &gt; &amp;FancyNames={})</td></tr>
+<tr class="memdesc:a98e6584f7ed16224a221a837551f2c1d"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Add Tune values to YAML covariance matrix.  <br /></td></tr>
+<tr class="separator:a98e6584f7ed16224a221a837551f2c1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9253dc67fd53775fd49d2fe47c4a2203"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#a9253dc67fd53775fd49d2fe47c4a2203">M3::MakeCorrelationMatrix</a> (YAML::Node &amp;root, const std::vector&lt; double &gt; &amp;Values, const std::vector&lt; double &gt; &amp;Errors, const std::vector&lt; std::vector&lt; double &gt; &gt; &amp;Correlation, const std::vector&lt; std::string &gt; &amp;FancyNames={})</td></tr>
+<tr class="memdesc:a9253dc67fd53775fd49d2fe47c4a2203"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Replace correlation matrix and tune values in YAML covariance matrix.  <br /></td></tr>
+<tr class="separator:a9253dc67fd53775fd49d2fe47c4a2203"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 <!-- start footer part -->

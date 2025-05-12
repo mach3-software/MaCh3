@@ -31,6 +31,7 @@ var menudata={children:[
 {text:"Namespace Members",url:"namespacemembers.html",children:[
 {text:"All",url:"namespacemembers.html",children:[
 {text:"_",url:"namespacemembers.html#index__5F"},
+{text:"a",url:"namespacemembers.html#index_a"},
 {text:"c",url:"namespacemembers.html#index_c"},
 {text:"e",url:"namespacemembers.html#index_e"},
 {text:"f",url:"namespacemembers.html#index_f"},
