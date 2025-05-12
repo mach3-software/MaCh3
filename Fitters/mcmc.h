@@ -17,9 +17,6 @@ class mcmc : public FitterBase {
 
   /// @brief Set how long chain should be
   inline void setChainLength(unsigned int L) { chainLength = L; };
-
-  /// @brief Set initial step number, used when starting from another chain
-  inline void setInitialStepNumber(const unsigned int stepNum = 0){stepStart = stepNum;};
   
   /// @brief Allow to start from previous fit/chain
   /// @param FitName Name of previous chain

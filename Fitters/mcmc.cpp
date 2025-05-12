@@ -233,6 +233,12 @@ void mcmc::StartFromPreviousFit(const std::string& FitName) {
   posts->GetEntry(posts->GetEntries()-1);
 
   stepStart = step_val + 1;
+  // KS: Also update number of steps if using adaption
+  for(unsigned int i = 0; i < systematics.size(); ++i){
+    if(systematics[i]->getDoAdaption()){
+      systematics[i]->setNumberOfSteps(step_val);
+    }
+  }
   infile->Close();
   delete infile;
 }
