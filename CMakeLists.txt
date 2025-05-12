@@ -3,7 +3,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # CMake version check
 cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
-project(MaCh3 VERSION 1.5.0 LANGUAGES CXX)
+project(MaCh3 VERSION 2.0.0 LANGUAGES CXX)
 set(MaCh3_VERSION ${PROJECT_VERSION})
 
 option(MaCh3_PYTHON_ENABLED "Whether to build MaCh3 python bindings" OFF)
@@ -242,13 +242,13 @@ endforeach()
 ################################# Build MaCh3 ##################################
 
 # Build components
-add_subdirectory(manager)
-add_subdirectory(covariance)
-add_subdirectory(splines)
-add_subdirectory(samplePDF)
-add_subdirectory(mcmc)
+add_subdirectory(Manager)
+add_subdirectory(Parameters)
+add_subdirectory(Splines)
+add_subdirectory(Samples)
+add_subdirectory(Fitters)
 add_subdirectory(Diagnostics)
-add_subdirectory(plotting)
+add_subdirectory(Plotting)
 if (MaCh3_PYTHON_ENABLED)
   set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
   add_subdirectory(python)
@@ -257,7 +257,7 @@ endif()
 #This is to export the target properties of MaCh3
 #Anything that links to "MaCh3" will get all of these target properties
 add_library(MaCh3 INTERFACE)
-target_link_libraries(MaCh3 INTERFACE MCMC SamplePDF Covariance Splines Manager MaCh3CompilerOptions MaCh3GPUCompilerOptions Plotting)
+target_link_libraries(MaCh3 INTERFACE Fitters Samples Parameters Splines Manager MaCh3CompilerOptions MaCh3GPUCompilerOptions Plotting)
 set_target_properties(MaCh3 PROPERTIES EXPORT_NAME All)
 
 install(TARGETS MaCh3
