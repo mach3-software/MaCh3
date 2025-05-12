@@ -125,11 +125,11 @@ std::unique_ptr<CovType> MaCh3CovarianceFactory(manager *FitManager, const std::
 /// auto mySamples = MaCh3SamplePDFFactory<samplePDFTutorial>(SampleConfig, xsec, osc);
 /// ```
 template <typename SampleType>
-std::vector<SampleType*> MaCh3SamplePDFFactory(const std::vector<std::string>& SampleConfig,
+std::vector<SampleType*> MaCh3SampleHandlerFactory(const std::vector<std::string>& SampleConfig,
                                                ParameterHandlerGeneric* xsec,
                                                ParameterHandlerOsc* osc = nullptr) {
 // ********************************************
-  std::vector<SampleType*> PDFs(SampleConfig.size());
+  std::vector<SampleType*> Handlers(SampleConfig.size());
   for (size_t i = 0; i < SampleConfig.size(); ++i)
   {
     // Instantiate the sample using the specified class type
@@ -143,7 +143,7 @@ std::vector<SampleType*> MaCh3SamplePDFFactory(const std::vector<std::string>& S
     // Clone the 1D histogram with a modified name
     TH1D* SampleHistogramPrior = static_cast<TH1D*>(Sample->Get1DHist()->Clone(NameTString + "_Prior"));
     Sample->AddData(SampleHistogramPrior);
-    PDFs[i] = Sample;
+    Handlers[i] = Sample;
   }
-  return PDFs;
+  return Handlers;
 }
