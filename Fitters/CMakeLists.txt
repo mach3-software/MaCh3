@@ -9,7 +9,7 @@ set(HEADERS
     SampleSummary.h
     MaCh3Factory.h
     StatisticalUtils.h
-    $<$<BOOL:${MaCh3_GPU_ENABLED}>:gpuMCMCProcessorUtils.cuh>
+    gpuMCMCProcessorUtils.cuh
 )
 
 add_library(Fitters SHARED
