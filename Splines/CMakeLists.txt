@@ -47,8 +47,19 @@ add_library(MaCh3::Splines ALIAS Splines)
 
 # KS: Now we generate root dictionary, we can't add it to above as ROOT is bit dumb and things will fail due to MaCh3Warnings etc
 add_library(SplineDict SHARED MaCh3SplineDict.cxx)
-target_include_directories(SplineDict PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(SplineDict PUBLIC Splines MaCh3CompilerOptions MaCh3GPUCompilerOptions)
+target_include_directories(SplineDict PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
+    $<INSTALL_INTERFACE:include>
+)
+target_link_libraries(SplineDict PUBLIC Parameters MaCh3CompilerOptions MaCh3GPUCompilerOptions)
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libMaCh3SplineDict_rdict.pcm DESTINATION lib/)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libMaCh3SplineDict.rootmap DESTINATION lib/)
+
+install(TARGETS SplineDict
+        EXPORT MaCh3-targets
+        LIBRARY DESTINATION lib/
+        PUBLIC_HEADER DESTINATION include/splines)
+
+# KS: Make sure Spline links SplineDict this way everything that would like to Spline will link SplineDict.
+target_link_libraries(Splines PUBLIC SplineDict)
