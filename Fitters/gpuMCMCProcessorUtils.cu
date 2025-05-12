@@ -1,4 +1,4 @@
-#include "mcmc/gpuMCMCProcessorUtils.cuh"
+#include "Fitters/gpuMCMCProcessorUtils.cuh"
 
 // ******************************************
 // CONSTANTS
