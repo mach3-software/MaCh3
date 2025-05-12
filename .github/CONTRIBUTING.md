@@ -214,7 +214,7 @@ We want to try to make code more readable in general so please try to stick to u
 - When naming function please capitalise the first letter and use CamelCase.
 - For member variables try to use snake case
 - Don't unnecessarily abbreviate variable names for the sake of saving a few characters
-```
+```c++
 void GetMyFaviouriteVariable();
 int my_name_member_variable;
 int parameter_counter; //Not par_count
