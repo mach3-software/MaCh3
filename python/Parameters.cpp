@@ -56,27 +56,27 @@ public:
 };
 
 
-void initCovariance(py::module &m){
+void initParameters(py::module &m){
 
-    auto m_covariance = m.def_submodule("covariance");
-    m_covariance.doc() = 
-        "This is a Python binding of MaCh3s C++ covariance library.";
+    auto m_parameters = m.def_submodule("parameters");
+    m_parameters.doc() =
+        "This is a Python binding of MaCh3s C++ parameters library.";
 
     
     // Bind the systematic type enum that lets us set different types of systematics
-    py::enum_<SystType>(m_covariance, "SystematicType")
+    py::enum_<SystType>(m_parameters, "SystematicType")
             .value("Normalisation", SystType::kNorm)
             .value("Spline", SystType::kSpline)
             .value("Functional", SystType::kFunc)
             .value("N_Systematic_Types", SystType::kSystTypes);
 
         
-    py::class_<ParameterHandlerBase, PyParameterHandlerBase /* <--- trampoline*/>(m_covariance, "ParameterHandlerBase")
+    py::class_<ParameterHandlerBase, PyParameterHandlerBase /* <--- trampoline*/>(m_parameters, "ParameterHandlerBase")
         .def(
             py::init<const std::vector<std::string>&, const char *, double, int, int>(),
-            "Construct a covariance object from a set of yaml files that define the systematic parameters \n\
+            "Construct a parameters object from a set of yaml files that define the systematic parameters \n\
             :param yaml_files: The name of the yaml file to initialise from. \n\
-            :param name: the name of this covariance object. \n\
+            :param name: the name of this ParameterHandler object. \n\
             :param threshold: threshold PCA threshold from 0 to 1. Default is -1 and means no PCA. \n\
             :param first_PCA_par: FirstPCAdpar First PCA parameter that will be decomposed. \n\
             :param last_PCA_par: LastPCAdpar First PCA parameter that will be decomposed.",
@@ -132,7 +132,7 @@ void initCovariance(py::module &m){
         .def(
             "get_n_pars",
             &ParameterHandlerBase::GetNParameters,
-            "Get the number of parameters that this covariance object knows about."
+            "Get the number of parameters that this ParameterHandler object knows about."
         )
         
         .def(
@@ -151,7 +151,7 @@ void initCovariance(py::module &m){
                     {sizeof(double)} // shape
                 ); 
             },
-            "Bind a python array to the parameter proposal values for this covariance object. \n\
+            "Bind a python array to the parameter proposal values for this ParameterHandler object. \n\
             This allows you to set e.g. a numpy array to 'track' the parameter proposal values. You could either use this to directly set the proposals, or to just read the values proposed by e.g. throw_par_prop() \n\
             :warning: This should be set *AFTER* all of the parameters have been read in from the config file as it resizes the array to fit the number of parameters. \n\
             :param array: This is the array that will be set. Size and contents don't matter as it will be changed to fit the parameters. "
@@ -161,12 +161,12 @@ void initCovariance(py::module &m){
     ; // End of ParameterHandlerBase binding
 
     
-    py::class_<ParameterHandlerGeneric, ParameterHandlerBase /* <--- trampoline*/>(m_covariance, "CovarianceXsec")
+    py::class_<ParameterHandlerGeneric, ParameterHandlerBase /* <--- trampoline*/>(m_parameters, "ParameterHandlerGeneric")
         .def(
             py::init<const std::vector<std::string>&, const char *, double, int, int>(),
-            "Construct a systematic covariance object from a set of yaml files that define the systematic parameters \n\
+            "Construct a systematic ParameterHandler object from a set of yaml files that define the systematic parameters \n\
             :param yaml_files: The name of the yaml file to initialise from. \n\
-            :param name: the name of this covariance object. \n\
+            :param name: the name of this ParameterHandler object. \n\
             :param threshold: threshold PCA threshold from 0 to 1. Default is -1 and means no PCA. \n\
             :param first_PCA_par: FirstPCAdpar First PCA parameter that will be decomposed. \n\
             :param last_PCA_par: LastPCAdpar First PCA parameter that will be decomposed.",
@@ -180,7 +180,7 @@ void initCovariance(py::module &m){
         .def(
             "get_par_type",
             &ParameterHandlerGeneric::GetParamType,
-            "Get what type of systematic this parameters is (see :py:class:`pyMaCh3.covariance.SystematicType` for possible types). \n\
+            "Get what type of systematic this parameters is (see :py:class:`pyMaCh3.m_parameters.SystematicType` for possible types). \n\
             :param index: The global index of the parameter",
             py::arg("index")
         )
@@ -207,14 +207,14 @@ void initCovariance(py::module &m){
             "Get the nominal values of all the parameters as a list. "
         )
 
-    ; // End of CovarianceXsec binding
+    ; // End of ParameterHandlerGeneric binding
     
-    py::class_<ParameterHandlerOsc, ParameterHandlerBase /* <--- trampoline*/>(m_covariance, "ParameterHandlerOsc")
+    py::class_<ParameterHandlerOsc, ParameterHandlerBase /* <--- trampoline*/>(m_parameters, "ParameterHandlerOsc")
         .def(
             py::init<const std::vector<std::string>&, const char *, double, int, int>(),
-            "Construct a oscillation covariance object from a set of yaml files that define the systematic parameters \n\
+            "Construct a oscillation parameter handler object from a set of yaml files that define the systematic parameters \n\
             :param yaml_files: The name of the yaml file to initialise from. \n\
-            :param name: the name of this covariance object. \n\
+            :param name: the name of this parameter handler object. \n\
             :param threshold: threshold PCA threshold from 0 to 1. Default is -1 and means no PCA. \n\
             :param first_PCA_par: FirstPCAdpar First PCA parameter that will be decomposed. \n\
             :param last_PCA_par: LastPCAdpar First PCA parameter that will be decomposed.",
@@ -224,6 +224,6 @@ void initCovariance(py::module &m){
             py::arg("firs_PCA_par") = -999,
             py::arg("last_PCA_par") = -999
         )
-    ; // End of CovarianceXsec binding
+    ; // End of ParameterHandlerOsc binding
 
 }

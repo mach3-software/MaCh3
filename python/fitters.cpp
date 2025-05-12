@@ -52,14 +52,14 @@ public:
     }
 };
 
-void initFitter(py::module &m){
+void initFitters(py::module &m){
 
-    auto m_fitter = m.def_submodule("fitter");
-    m_fitter.doc() = 
-        "This is a Python binding of MaCh3s C++ mcmc library.";
+    auto m_fitters = m.def_submodule("fitters");
+    m_fitters.doc() =
+        "This is a Python binding of MaCh3s C++ fitters library.";
     
     
-    py::class_<FitterBase, PyFitterBase /* <--- trampoline*/>(m_fitter, "FitterBase")
+    py::class_<FitterBase, PyFitterBase /* <--- trampoline*/>(m_fitters, "FitterBase")
         .def(py::init<manager* const>())
         
         .def(
@@ -113,10 +113,10 @@ void initFitter(py::module &m){
         // stuff for registering other objects with the fitter
         
         .def(
-            "add_sample_PDF",
+            "add_sample_handler",
             &FitterBase::AddSampleHandler,
-            " This function adds a sample PDF object to the analysis framework. The sample PDF object will be utilized in fitting procedures or likelihood scans. \n"
-            " :param sample: A sample PDF object derived from SampleHandlerBase. ",
+            " This function adds a sample handler object to the analysis framework. The sample handler object will be utilized in fitting procedures or likelihood scans. \n"
+            " :param sample: A sample handler object derived from SampleHandlerBase. ",
             py::arg("sample")
         )
         
@@ -130,7 +130,7 @@ void initFitter(py::module &m){
 
     ; // End of FitterBase class binding
 
-    py::class_<mcmc, FitterBase>(m_fitter, "MCMC")
+    py::class_<mcmc, FitterBase>(m_fitters, "MCMC")
         .def(py::init<manager* const>())
         
         .def(
@@ -141,7 +141,7 @@ void initFitter(py::module &m){
         )
     ; // end of MCMC class binding
 
-    py::class_<LikelihoodFit, PyLikelihoodFit /* <--- trampoline*/, FitterBase>(m_fitter, "LikelihoodFit")
+    py::class_<LikelihoodFit, PyLikelihoodFit /* <--- trampoline*/, FitterBase>(m_fitters, "LikelihoodFit")
         .def(py::init<manager* const>())
         
         .def(
@@ -162,12 +162,12 @@ void initFitter(py::module &m){
         )
     ; // end of LikelihoodFit class binding
 
-    py::class_<MinuitFit, LikelihoodFit>(m_fitter, "MinuitFit")
+    py::class_<MinuitFit, LikelihoodFit>(m_fitters, "MinuitFit")
         .def(py::init<manager* const>())
         
     ; // end of MinuitFit class binding
 
-    py::class_<PSO, LikelihoodFit>(m_fitter, "PSO")
+    py::class_<PSO, LikelihoodFit>(m_fitters, "PSO")
         .def(py::init<manager* const>())
 
         .def(

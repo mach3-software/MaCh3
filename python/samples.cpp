@@ -62,8 +62,8 @@ public:
 };
 
 
-// As SamplePDFFDBase is an abstract base class we have to do some gymnastics to get it to get it into python
-class PySamplePDFFDBase : public SampleHandlerFD {
+// As SampleHandlerFD is an abstract base class we have to do some gymnastics to get it to get it into python
+class PySampleHandlerFD : public SampleHandlerFD {
 public:
     /* Inherit the constructors */
     using SampleHandlerFD::SampleHandlerFD;
@@ -219,14 +219,14 @@ public:
     }
 };
 
-void initSamplePDF(py::module &m){
+void initSamples(py::module &m){
 
-    auto m_sample_pdf = m.def_submodule("sample_pdf");
-    m_sample_pdf.doc() = 
-        "This is a Python binding of MaCh3s C++ based samplePDF library.";
+    auto m_samples = m.def_submodule("samples");
+    m_samples.doc() =
+        "This is a Python binding of MaCh3s C++ based samples library.";
 
     // Bind the systematic type enum that lets us set different types of systematics
-    py::enum_<TestStatistic>(m_sample_pdf, "TestStatistic")
+    py::enum_<TestStatistic>(m_samples, "TestStatistic")
         .value("Poisson", TestStatistic::kPoisson)
         .value("Barlow_Beeston", TestStatistic::kBarlowBeeston)
         .value("Ice_Cube", TestStatistic::kIceCube)
@@ -234,7 +234,7 @@ void initSamplePDF(py::module &m){
         .value("Dembinski_Abdelmottele", TestStatistic::kDembinskiAbdelmotteleb)
         .value("N_Test_Statistics", TestStatistic::kNTestStatistics);
 
-    py::class_<SampleHandlerBase, PySampleHandlerBase /* <--- trampoline*/>(m_sample_pdf, "SampleHandlerBase")
+    py::class_<SampleHandlerBase, PySampleHandlerBase /* <--- trampoline*/>(m_samples, "SampleHandlerBase")
         .def(py::init())
         
         .def(
@@ -272,7 +272,7 @@ void initSamplePDF(py::module &m){
         .def(
             "get_bin_LLH",
             py::overload_cast<double, double, double>(&SampleHandlerBase::GetTestStatLLH, py::const_),
-            "Get the LLH for a bin by comparing the data and MC. The result depends on having previously set the test statistic using :py:meth:`pyMaCh3.sample_pdf.SamplePDFFDBase.set_test_stat` \n\
+            "Get the LLH for a bin by comparing the data and MC. The result depends on having previously set the test statistic using :py:meth:`pyMaCh3.samples.SampleHandlerBase.set_test_stat` \n\
             :param data: The data content of the bin. \n\
             :param mc: The mc content of the bin \n\
             :param w2: The Sum(w_{i}^2) (sum of weights squared) in the bin, which is sigma^2_{MC stats}",
@@ -282,13 +282,13 @@ void initSamplePDF(py::module &m){
         )
     ; // End of SampleHandlerBase binding
 
-    py::class_<SampleHandlerFD, PySamplePDFFDBase /* <--- trampoline*/, SampleHandlerBase>(m_sample_pdf, "SamplePDFFDBase")
+    py::class_<SampleHandlerFD, PySampleHandlerFD /* <--- trampoline*/, SampleHandlerBase>(m_samples, "SampleHandlerFD")
         .def(
             py::init<std::string, ParameterHandlerGeneric*>(),
             "This should never be called directly as SampleHandlerFD is an abstract base class. \n\
             However when creating a derived class, in the __init__() method, you should call the parent constructor i.e. this one by doing:: \n\
             \n\
-            \tsuper(<your derived samplePDF class>, self).__init__(*args) \n\
+            \tsuper(<your derived SampleHandler class>, self).__init__(*args) \n\
             \n ",
             py::arg("mc_version"),
             py::arg("xsec_cov")
@@ -296,7 +296,7 @@ void initSamplePDF(py::module &m){
     ;
 
     /* Not sure if this will be needed in future versions of MaCh3 so leaving commented for now
-    py::class_<fdmc_base>(m_sample_pdf, "MCstruct")
+    py::class_<fdmc_base>(m_samples, "MCstruct")
         .def(py::init())
         
         // Because a lot of the variables in fdmc_base use c style arrays,
