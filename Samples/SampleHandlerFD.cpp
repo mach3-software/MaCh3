@@ -957,18 +957,18 @@ void SampleHandlerFD::CalcNormsBins(int iSample) {
         NormBins.push_back(bin);
         MACH3LOG_TRACE("Event {}, will be affected by dial {}", iEvent, (*it).name);
         #ifdef DEBUG
-        VerboseCounter[std::distance(xsec_norms.begin(), it)]++;
+        VerboseCounter[std::distance(NormBins.begin(), it)]++;
         #endif
         //}
-      } // end iteration over xsec_norms
+      } // end iteration over NormBins
     } // end if (ParHandler)
     fdobj->xsec_norms_bins[iEvent] = NormBins;
   }//end loop over events
   #ifdef DEBUG
   MACH3LOG_DEBUG("Channel {}", iSample);
   MACH3LOG_DEBUG("┌──────────────────────────────────────────────────────────┐");
-  for (std::size_t i = 0; i < xsec_norms.size(); ++i) {
-    const auto& norm = xsec_norms[i];
+  for (std::size_t i = 0; i < NormBins.size(); ++i) {
+    const auto& norm = NormBins[i];
     double eventRatio = static_cast<double>(VerboseCounter[i]) / static_cast<double>(fdobj->nEvents);
 
     MACH3LOG_DEBUG("│ Param {:<15}, affects {:<8} events ({:>6.2f}%) │",

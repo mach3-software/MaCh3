@@ -9,7 +9,7 @@ set(HEADERS
     SampleSummary.h
     MaCh3Factory.h
     StatisticalUtils.h
-    $<$<BOOL:${MaCh3_GPU_ENABLED}>:gpuFitterProcessorUtils.cuh>
+    $<$<BOOL:${MaCh3_GPU_ENABLED}>:gpuMCMCProcessorUtils.cuh>
 )
 
 add_library(Fitters SHARED
@@ -23,7 +23,7 @@ add_library(Fitters SHARED
     SampleSummary.cpp
     MaCh3Factory.cpp
     StatisticalUtils.cpp
-    $<$<BOOL:${MaCh3_GPU_ENABLED}>:gpuFitterProcessorUtils.cu>
+    $<$<BOOL:${MaCh3_GPU_ENABLED}>:gpuMCMCProcessorUtils.cu>
 )
 
 if(MaCh3_GPU_ENABLED)
