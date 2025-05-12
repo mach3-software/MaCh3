@@ -959,6 +959,7 @@ void BinnedSplineHandler::FillSampleArray(std::string SampleName, std::vector<st
           splinevec_Monolith.push_back(nullptr);
           delete mySpline;
         } else {
+          ApplyKnotWeightCapTSpline3(mySpline, SystNum, xsec);
           Spline = new TSpline3_red(mySpline, SplineInterpolationTypes[iSample][SystNum]);
           if(mySpline) delete mySpline;
 
