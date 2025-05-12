@@ -51,7 +51,7 @@ target_include_directories(SplineDict PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
     $<INSTALL_INTERFACE:include>
 )
-target_link_libraries(SplineDict PUBLIC Covariance MaCh3CompilerOptions MaCh3GPUCompilerOptions)
+target_link_libraries(SplineDict PUBLIC Parameters MaCh3CompilerOptions MaCh3GPUCompilerOptions)
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libMaCh3SplineDict_rdict.pcm DESTINATION lib/)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libMaCh3SplineDict.rootmap DESTINATION lib/)
