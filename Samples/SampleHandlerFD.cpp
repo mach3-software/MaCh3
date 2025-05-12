@@ -419,7 +419,7 @@ void SampleHandlerFD::FillArray() {
 
   for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
     for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
-      applyShifts(iSample, iEvent);
+      ApplyShifts(iSample, iEvent);
       
       if (!IsEventSelected(iSample, iEvent)) { 
         continue;
@@ -886,7 +886,7 @@ void SampleHandlerFD::CalcNormsBins(int iSample) {
 // ************************************************
   FarDetectorCoreInfo *fdobj = &MCSamples[iSample];
   #ifdef DEBUG
-  std::vector<int> VerboseCounter(xsec_norms.size(), 0);
+  std::vector<int> VerboseCounter(NormBins.size(), 0);
   #endif
   for(int iEvent = 0; iEvent < fdobj->nEvents; ++iEvent){
     std::vector< int > NormBins = {};
