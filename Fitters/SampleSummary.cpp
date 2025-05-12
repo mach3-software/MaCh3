@@ -1,4 +1,4 @@
-#include "Fitter/SampleSummary.h"
+#include "Fitters/SampleSummary.h"
 
 //this file is choc full of usage of a root interface that only takes floats, turn this warning off for this CU for now
 #pragma GCC diagnostic ignored "-Wfloat-conversion"

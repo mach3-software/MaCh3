@@ -1,5 +1,5 @@
 // MaCh3 includes
-#include "Fitter/MCMCProcessor.h"
+#include "Fitters/MCMCProcessor.h"
 #include "Samples/HistogramUtils.h"
 
 /// @file PlotMCMCDiag.cpp

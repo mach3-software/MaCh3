@@ -2,8 +2,8 @@
 
 // MaCh3 includes
 #include "Samples/SampleHandlerBase.h"
-#include "Fitter/StatisticalUtils.h"
-#include "Fitter/MCMCProcessor.h"
+#include "Fitters/StatisticalUtils.h"
+#include "Fitters/MCMCProcessor.h"
 
 namespace M3 {
   /// @brief KS: Different Information Criterion tests mostly based Gelman paper

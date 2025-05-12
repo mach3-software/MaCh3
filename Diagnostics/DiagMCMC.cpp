@@ -1,4 +1,4 @@
-#include "Fitter/MCMCProcessor.h"
+#include "Fitters/MCMCProcessor.h"
 
 #include "Manager/Manager.h"
 

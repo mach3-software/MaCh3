@@ -9,7 +9,7 @@
 #include <cstdio>
 
 // MaCh3 includes
-#include "Fitter/StatisticalUtils.h"
+#include "Fitters/StatisticalUtils.h"
 #include "Samples/HistogramUtils.h"
 
 _MaCh3_Safe_Include_Start_ //{
