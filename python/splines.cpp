@@ -158,7 +158,7 @@ void initSplines(py::module &m){
                     for(uint i = 0; i < responseFns[0].size(); i++)
                     {
                         // ** WARNING **
-                        // Right now I'm only pushing back TSpline3_reds as thats all thats supported right now
+                        // Right now I'm only pushing back TSpline3_reds as that's all that's supported right now
                         // In the future there might be more
                         // I think what would be best to do would be to store the interpolation type somehow in the ResponseFunction objects
                         // then just read them here and pass through to the constructor
