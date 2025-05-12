@@ -105,7 +105,7 @@ std::unique_ptr<CovType> MaCh3CovarianceFactory(manager *FitManager, const std::
 
   // Adaptive MCMC stuff
   if (CheckNodeExists(FitManager->raw(), "AdaptionOptions")) {
-    CovObject->initialiseAdaption(FitManager->raw());
+    CovObject->InitialiseAdaption(FitManager->raw());
   }
   
   return CovObject;
