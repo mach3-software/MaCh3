@@ -84,13 +84,13 @@ void initManager(py::module &m){
         
         .def(
             "print", 
-            &manager::Print, 
+            &manager::Print,
             "Print currently used config."
         )
         
         .def(
             "raw", 
-            &manager::raw, 
+            &manager::raw,
             "Get the raw yaml config."
         )
 

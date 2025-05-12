@@ -2,10 +2,10 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 // MaCh3 includes
-#include "mcmc/FitterBase.h"
-#include "mcmc/mcmc.h"
-#include "mcmc/MinuitFit.h"
-#include "mcmc/PSO.h"
+#include "Fitters/FitterBase.h"
+#include "Fitters/mcmc.h"
+#include "Fitters/MinuitFit.h"
+#include "Fitters/PSO.h"
 
 namespace py = pybind11;
 
@@ -16,12 +16,12 @@ public:
     using FitterBase::FitterBase;
 
     /* Trampoline (need one for each virtual function) */
-    void runMCMC() override {
+    void RunMCMC() override {
         PYBIND11_OVERRIDE_PURE_NAME(
             void,        /* Return type */
             FitterBase,  /* Parent class */
             "run",       /* Python name*/
-            runMCMC      /* Name of function in C++ (must match Python name) */
+            RunMCMC      /* Name of function in C++ (must match Python name) */
         );
     }
 
@@ -42,12 +42,12 @@ public:
     using LikelihoodFit::LikelihoodFit;
 
     /* Trampoline (need one for each virtual function) */
-    void runMCMC() override {
+    void RunMCMC() override {
         PYBIND11_OVERRIDE_PURE_NAME(
             void,        /* Return type */
             LikelihoodFit,/* Parent class */
             "run",       /* Python name*/
-            runMCMC      /* Name of function in C++ (must match Python name) */
+            RunMCMC      /* Name of function in C++ (must match Python name) */
         );
     }
 };
@@ -64,7 +64,7 @@ void initFitter(py::module &m){
         
         .def(
             "run", 
-            &FitterBase::runMCMC, 
+            &FitterBase::RunMCMC,
             "The implementation of the fitter, you should override this with your own desired fitting algorithm"
         )
 
@@ -114,17 +114,17 @@ void initFitter(py::module &m){
         
         .def(
             "add_sample_PDF",
-            &FitterBase::addSamplePDF,
+            &FitterBase::AddSampleHandler,
             " This function adds a sample PDF object to the analysis framework. The sample PDF object will be utilized in fitting procedures or likelihood scans. \n"
-            " :param sample: A sample PDF object derived from samplePDFBase. ",
+            " :param sample: A sample PDF object derived from SampleHandlerBase. ",
             py::arg("sample")
         )
         
         .def(
             "add_syst_object",
-            &FitterBase::addSystObj,
+            &FitterBase::AddSystObj,
             " This function adds a Covariance object to the analysis framework. The Covariance object will be utilized in fitting procedures or likelihood scans. \n"
-            " :param cov: A Covariance object derived from covarianceBase. ",
+            " :param cov: A Covariance object derived from ParameterHandlerBase. ",
             py::arg("cov")
         )
 

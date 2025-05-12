@@ -2,60 +2,60 @@
 #include <pybind11/stl.h>
 #include <pybind11/numpy.h>
 
-#include "samplePDF/samplePDFFDBase.h"
+#include "Samples/SampleHandlerFD.h"
 
 namespace py = pybind11;
 
-// As SamplePDFBase is an abstract base class we have to do some gymnastics to get it to get it into python
-class PySamplePDFBase : public samplePDFBase {
+// As SampleHandlerBase is an abstract base class we have to do some gymnastics to get it to get it into python
+class PySampleHandlerBase : public SampleHandlerBase {
 public:
     /* Inherit the constructors */
-    using samplePDFBase::samplePDFBase;
+    using SampleHandlerBase::SampleHandlerBase;
 
     /* Trampoline (need one for each virtual function) */
     std::string GetSampleName(int iSample) const override {
         PYBIND11_OVERRIDE_PURE(
             std::string,          /* Return type */
-            samplePDFBase, /* Parent class */
+            SampleHandlerBase, /* Parent class */
             GetSampleName, /* Name of function in C++ (must match Python name) */
             iSample         /* Argument(s) */
         );
     }
 
     /* Trampoline (need one for each virtual function) */
-    void reweight() override {
+    void Reweight() override {
         PYBIND11_OVERRIDE_PURE(
             void,          /* Return type */
-            samplePDFBase, /* Parent class */
-            reweight       /* Name of function in C++ (must match Python name) */
+            SampleHandlerBase, /* Parent class */
+            Reweight       /* Name of function in C++ (must match Python name) */
         );
     }
 
     double GetLikelihood() override {
         PYBIND11_OVERRIDE_PURE_NAME(
             double,        /* Return type */
-            samplePDFBase, /* Parent class */
+            SampleHandlerBase, /* Parent class */
             "get_likelihood", /* Python name*/
             GetLikelihood  /* Name of function in C++ (must match Python name) */
                            /* Argument(s) */
         );
     }
     
-    void fill1DHist() override {
+    void Fill1DHist() override {
         PYBIND11_OVERRIDE_PURE_NAME(
             void,          /* Return type */
-            samplePDFBase, /* Parent class */
+            SampleHandlerBase, /* Parent class */
             "fill_1d_hist", /* Python Name */
-            fill1DHist     /* Name of function in C++ (must match Python name) */
+            Fill1DHist     /* Name of function in C++ (must match Python name) */
         );
     }
     
-    void fill2DHist() override {
+    void Fill2DHist() override {
         PYBIND11_OVERRIDE_PURE_NAME(
             void,          /* Return type */
-            samplePDFBase, /* Parent class */
+            SampleHandlerBase, /* Parent class */
             "fill_2d_hist",/* Python name*/
-            fill2DHist     /* Name of function in C++ (must match Python name) */
+            Fill2DHist     /* Name of function in C++ (must match Python name) */
                            /* Argument(s) */
         );
     }
@@ -63,16 +63,16 @@ public:
 
 
 // As SamplePDFFDBase is an abstract base class we have to do some gymnastics to get it to get it into python
-class PySamplePDFFDBase : public samplePDFFDBase {
+class PySamplePDFFDBase : public SampleHandlerFD {
 public:
     /* Inherit the constructors */
-    using samplePDFFDBase::samplePDFFDBase;
+    using SampleHandlerFD::SampleHandlerFD;
 
     /* Trampoline (need one for each virtual function) */
     void SetupWeightPointers() override {
         PYBIND11_OVERRIDE_PURE_NAME(
             void,            /* Return type */
-            samplePDFFDBase, /* Parent class */
+            SampleHandlerFD, /* Parent class */
             "setup_weight_pointers", /*python name*/
             SetupWeightPointers,     /* Name of function in C++ */
                              /* Argument(s) */
@@ -83,7 +83,7 @@ public:
     void SetupSplines() override {
         PYBIND11_OVERRIDE_PURE_NAME(
             void,            /* Return type */
-            samplePDFFDBase, /* Parent class */
+            SampleHandlerFD, /* Parent class */
             "setup_splines", /*python name*/
             SetupSplines,     /* Name of function in C++ */
                              /* Argument(s) */
@@ -94,7 +94,7 @@ public:
     void Init() override {
         PYBIND11_OVERRIDE_PURE_NAME(
             void,            /* Return type */
-            samplePDFFDBase, /* Parent class */
+            SampleHandlerFD, /* Parent class */
             "init",          /*python name*/
             Init,            /* Name of function in C++ */
                              /* Argument(s) */
@@ -102,23 +102,23 @@ public:
     }
     
     /* Trampoline (need one for each virtual function) */
-    int setupExperimentMC(int) override {
+    int SetupExperimentMC(int) override {
         PYBIND11_OVERRIDE_PURE_NAME(
             int,             /* Return type */
-            samplePDFFDBase, /* Parent class */
+            SampleHandlerFD, /* Parent class */
             "setup_experiment_MC", /*python name*/
-            setupExperimentMC,     /* Name of function in C++ */
+            SetupExperimentMC,     /* Name of function in C++ */
             py::arg("sample_id")   /* Argument(s) */
         );
     }
 
     /* Trampoline (need one for each virtual function) */
-    void setupFDMC(int) override {
+    void SetupFDMC(int) override {
         PYBIND11_OVERRIDE_PURE_NAME(
             void,            /* Return type */
-            samplePDFFDBase, /* Parent class */
+            SampleHandlerFD, /* Parent class */
             "setup_FD_MC",   /*python name*/
-            setupFDMC,       /* Name of function in C++ */
+            SetupFDMC,       /* Name of function in C++ */
             py::arg("sample_id") /* Argument(s) */
         );
     }
@@ -126,7 +126,7 @@ public:
     int ReturnKinematicParameterFromString(std::string) {
         PYBIND11_OVERRIDE_PURE_NAME(
             int,                     /* Return type */
-            samplePDFFDBase,            /* Parent class */
+            SampleHandlerFD,            /* Parent class */
             "get_kinematic_by_name",    /* python name*/
             ReturnKinematicParameterFromString, /* Name of function in C++ (must match Python name) */
             py::arg("variable_name")
@@ -136,7 +136,7 @@ public:
     std::string ReturnStringFromKinematicParameter(int) {
         PYBIND11_OVERRIDE_PURE_NAME(
             std::string,                /* Return type */
-            samplePDFFDBase,            /* Parent class */
+            SampleHandlerFD,            /* Parent class */
             "get_kinematic_name",       /* python name*/
             ReturnStringFromKinematicParameter, /* Name of function in C++ (must match Python name) */
             py::arg("variable_id")
@@ -146,7 +146,7 @@ public:
     double ReturnKinematicParameter(std::string, int, int) override {
         PYBIND11_OVERRIDE_PURE_NAME(
             double,                     /* Return type */
-            samplePDFFDBase,            /* Parent class */
+            SampleHandlerFD,            /* Parent class */
             "get_event_kinematic_value",/* python name*/
             ReturnKinematicParameter,  /* Name of function in C++ (must match Python name) */
             py::arg("variable"),
@@ -158,7 +158,7 @@ public:
     double ReturnKinematicParameter(int, int, int) override {
         PYBIND11_OVERRIDE_PURE_NAME(
             double,                     /* Return type */
-            samplePDFFDBase,            /* Parent class */
+            SampleHandlerFD,            /* Parent class */
             "get_event_kinematic_value",/* python name*/
             ReturnKinematicParameter,  /* Name of function in C++ (must match Python name) */
             py::arg("variable"),
@@ -170,7 +170,7 @@ public:
     const double *GetPointerToKinematicParameter(std::string, int, int) override {
         PYBIND11_OVERRIDE_PURE_NAME(
             const double *,                   /* Return type */
-            samplePDFFDBase,            /* Parent class */
+            SampleHandlerFD,            /* Parent class */
             "get_event_kinematic_value_reference",/* python name*/
             GetPointerToKinematicParameter, /* Name of function in C++ (must match Python name) */
             py::arg("variable"),
@@ -181,7 +181,7 @@ public:
     const double *GetPointerToKinematicParameter(double, int, int) override {
         PYBIND11_OVERRIDE_PURE_NAME(
             const double *,                   /* Return type */
-            samplePDFFDBase,            /* Parent class */
+            SampleHandlerFD,            /* Parent class */
             "get_event_kinematic_value_reference",/* python name*/
             GetPointerToKinematicParameter, /* Name of function in C++ (must match Python name) */
             py::arg("variable"),
@@ -193,18 +193,18 @@ public:
     std::vector<double> ReturnKinematicParameterBinning(std::string) override {
         PYBIND11_OVERRIDE_PURE_NAME(
             std::vector<double>,          /* Return type */
-            samplePDFFDBase,              /* Parent class */
+            SampleHandlerFD,              /* Parent class */
             "get_event_kinematic_binning",/* python name*/
             ReturnKinematicParameterBinning, /* Name of function in C++ (must match Python name) */
             py::arg("variable")           /* Argument(s) */
         );
     }
     
-    void fill2DHist() override {
+    void Fill2DHist() override {
         PYBIND11_OVERRIDE_PURE(
             void,          /* Return type */
-            samplePDFBase, /* Parent class */
-            fill2DHist     /* Name of function in C++ (must match Python name) */
+            SampleHandlerBase, /* Parent class */
+            Fill2DHist     /* Name of function in C++ (must match Python name) */
                            /* Argument(s) */
         );
     }
@@ -212,7 +212,7 @@ public:
     void RegisterFunctionalParameters() override {
         PYBIND11_OVERRIDE_PURE_NAME(
             void,
-            samplePDFFDBase,
+            SampleHandlerFD,
             "register_functional_parameters",
             RegisterFunctionalParameters
         );
@@ -234,36 +234,36 @@ void initSamplePDF(py::module &m){
         .value("Dembinski_Abdelmottele", TestStatistic::kDembinskiAbdelmotteleb)
         .value("N_Test_Statistics", TestStatistic::kNTestStatistics);
 
-    py::class_<samplePDFBase, PySamplePDFBase /* <--- trampoline*/>(m_sample_pdf, "SamplePDFBase")
+    py::class_<SampleHandlerBase, PySampleHandlerBase /* <--- trampoline*/>(m_sample_pdf, "SampleHandlerBase")
         .def(py::init())
         
         .def(
             "reweight", 
-            &samplePDFBase::reweight, 
+            &SampleHandlerBase::Reweight,
             "reweight the MC events in this sample. You will need to override this."
         )
         
         .def(
             "get_likelihood", 
-            &samplePDFBase::GetLikelihood, 
+            &SampleHandlerBase::GetLikelihood,
             "Get the sample likelihood at the current point in your model space. You will need to override this."
         )
         
         .def(
             "fill_1d_hist", 
-            &samplePDFBase::fill1DHist, 
+            &SampleHandlerBase::Fill1DHist,
             "Do the initial filling of the sample for 1d histogram. You will need to override this."
         )
         
         .def(
             "fill_2d_hist", 
-            &samplePDFBase::fill2DHist, 
+            &SampleHandlerBase::Fill2DHist,
             "Do the initial filling of the sample for 2d histogram. You will need to override this."
         )
 
         .def(
             "set_test_stat",
-            &samplePDFBase::SetTestStatistic,
+            &SampleHandlerBase::SetTestStatistic,
             "Set the test statistic that should be used when calculating likelihoods. \n\
             :param test_stat: The new test statistic to use",
             py::arg("test_stat")
@@ -271,7 +271,7 @@ void initSamplePDF(py::module &m){
 
         .def(
             "get_bin_LLH",
-            py::overload_cast<double, double, double>(&samplePDFBase::getTestStatLLH, py::const_),
+            py::overload_cast<double, double, double>(&SampleHandlerBase::GetTestStatLLH, py::const_),
             "Get the LLH for a bin by comparing the data and MC. The result depends on having previously set the test statistic using :py:meth:`pyMaCh3.sample_pdf.SamplePDFFDBase.set_test_stat` \n\
             :param data: The data content of the bin. \n\
             :param mc: The mc content of the bin \n\
@@ -280,12 +280,12 @@ void initSamplePDF(py::module &m){
             py::arg("mc"), 
             py::arg("w2")
         )
-    ; // End of samplePDFBase binding
+    ; // End of SampleHandlerBase binding
 
-    py::class_<samplePDFFDBase, PySamplePDFFDBase /* <--- trampoline*/, samplePDFBase>(m_sample_pdf, "SamplePDFFDBase")
+    py::class_<SampleHandlerFD, PySamplePDFFDBase /* <--- trampoline*/, SampleHandlerBase>(m_sample_pdf, "SamplePDFFDBase")
         .def(
-            py::init<std::string, covarianceXsec*>(),
-            "This should never be called directly as samplePDFFDBase is an abstract base class. \n\
+            py::init<std::string, ParameterHandlerGeneric*>(),
+            "This should never be called directly as SampleHandlerFD is an abstract base class. \n\
             However when creating a derived class, in the __init__() method, you should call the parent constructor i.e. this one by doing:: \n\
             \n\
             \tsuper(<your derived samplePDF class>, self).__init__(*args) \n\

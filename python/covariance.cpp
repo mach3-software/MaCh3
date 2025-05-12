@@ -3,54 +3,54 @@
 #include <pybind11/stl.h>
 #include <pybind11/numpy.h>
 // MaCh3 includes
-#include "covariance/covarianceBase.h"
-#include "covariance/covarianceXsec.h"
-#include "covariance/covarianceOsc.h"
+#include "Parameters/ParameterHandlerBase.h"
+#include "Parameters/ParameterHandlerGeneric.h"
+#include "Parameters/ParameterHandlerOsc.h"
 
 
 namespace py = pybind11;
 
-// As CovarianceBase is an abstract base class we have to do some gymnastics to get it to get it into python
-class PyCovarianceBase : public covarianceBase {
+// As ParameterHandlerBase is an abstract base class we have to do some gymnastics to get it to get it into python
+class PyParameterHandlerBase : public ParameterHandlerBase {
 public:
     /* Inherit the constructors */
-    using covarianceBase::covarianceBase;
+    using ParameterHandlerBase::ParameterHandlerBase;
 
     /* Trampoline (need one for each virtual function) */
     double GetLikelihood() override {
         PYBIND11_OVERRIDE_NAME(
             double,           /* Return type */
-            covarianceBase,   /* Parent class */
+            ParameterHandlerBase,   /* Parent class */
             "get_likelihood", /* Name in python*/
             GetLikelihood     /* Name of function in C++ (must match Python name) */
         );
     }
     
-    double getNominal(int i) override {
+    double GetNominal(int i) override {
         PYBIND11_OVERRIDE_NAME(
             double,          /* Return type */
-            covarianceBase,  /* Parent class */
+            ParameterHandlerBase,  /* Parent class */
             "get_nominal",   /* Name in python*/
-            getNominal,      /* Name of function in C++ (must match Python name) */
+            GetNominal,      /* Name of function in C++ (must match Python name) */
             i                /* Arguments*/
         );
     }
     
-    void proposeStep() override {
+    void ProposeStep() override {
         PYBIND11_OVERRIDE_NAME(
             void,            /* Return type */
-            covarianceBase,  /* Parent class */
+            ParameterHandlerBase,  /* Parent class */
             "propose_step",  /* Name in python*/
-            proposeStep      /* Name of function in C++ (must match Python name) */
+            ProposeStep      /* Name of function in C++ (must match Python name) */
         );
     }
 
-    std::vector<double> getNominalArray() override {
+    std::vector<double> GetNominalArray() override {
         PYBIND11_OVERRIDE_NAME(
             std::vector<double>, /* Return type */
-            covarianceBase,      /* Parent class */
+            ParameterHandlerBase,      /* Parent class */
             "get_nominal_array", /* Name in python*/
-            getNominalArray      /* Name of function in C++ (must match Python name) */
+            GetNominalArray      /* Name of function in C++ (must match Python name) */
         );
     }
 };
@@ -71,7 +71,7 @@ void initCovariance(py::module &m){
             .value("N_Systematic_Types", SystType::kSystTypes);
 
         
-    py::class_<covarianceBase, PyCovarianceBase /* <--- trampoline*/>(m_covariance, "CovarianceBase")
+    py::class_<ParameterHandlerBase, PyParameterHandlerBase /* <--- trampoline*/>(m_covariance, "ParameterHandlerBase")
         .def(
             py::init<const std::vector<std::string>&, const char *, double, int, int>(),
             "Construct a covariance object from a set of yaml files that define the systematic parameters \n\
@@ -89,13 +89,13 @@ void initCovariance(py::module &m){
         
         .def(
             "calculate_likelihood", 
-            &covarianceBase::CalcLikelihood, 
+            &ParameterHandlerBase::CalcLikelihood,
             "Calculate penalty term based on inverted covariance matrix."
         )
 
         .def(
             "throw_par_prop",
-            &covarianceBase::throwParProp,
+            &ParameterHandlerBase::ThrowParProp,
             "Throw the proposed parameter by magnitude *mag* X sigma. \n\
             :param mag: This value multiplied by the prior value of each parameter will be the width of the distribution that the parameter values are drawn from. ",
             py::arg("mag") = 1.0
@@ -103,7 +103,7 @@ void initCovariance(py::module &m){
 
         .def(
             "get_internal_par_name",
-            [](covarianceBase &self, int index)
+            [](ParameterHandlerBase &self, int index)
             {
                 // do this to disambiguate between the std::string and const char* version of this fn
                 std::string ret;
@@ -117,7 +117,7 @@ void initCovariance(py::module &m){
         
         .def(
             "get_fancy_par_name",
-            [](covarianceBase &self, int index)
+            [](ParameterHandlerBase &self, int index)
             {
                 // do this to disambiguate between the std::string and const char* version of this fn
                 std::string ret;
@@ -131,23 +131,23 @@ void initCovariance(py::module &m){
 
         .def(
             "get_n_pars",
-            &covarianceBase::getNpars,
+            &ParameterHandlerBase::GetNParameters,
             "Get the number of parameters that this covariance object knows about."
         )
         
         .def(
             "propose_step",
-            &covarianceBase::proposeStep,
+            &ParameterHandlerBase::ProposeStep,
             "Propose a step based on the covariances. Also feel free to overwrite if you want something more funky."
         )
 
         .def(
             "get_proposal_array",
-            [](covarianceBase &self)
+            [](ParameterHandlerBase &self)
             {
                 return py::memoryview::from_buffer<double>(
-                    self.getParPropVec().data(), // the data pointer
-                    {self.getNpars()}, // shape
+                    self.GetParPropVec().data(), // the data pointer
+                    {self.GetNParameters()}, // shape
                     {sizeof(double)} // shape
                 ); 
             },
@@ -158,10 +158,10 @@ void initCovariance(py::module &m){
         )
 
 
-    ; // End of CovarianceBase binding
+    ; // End of ParameterHandlerBase binding
 
     
-    py::class_<covarianceXsec, covarianceBase /* <--- trampoline*/>(m_covariance, "CovarianceXsec")
+    py::class_<ParameterHandlerGeneric, ParameterHandlerBase /* <--- trampoline*/>(m_covariance, "CovarianceXsec")
         .def(
             py::init<const std::vector<std::string>&, const char *, double, int, int>(),
             "Construct a systematic covariance object from a set of yaml files that define the systematic parameters \n\
@@ -179,7 +179,7 @@ void initCovariance(py::module &m){
         
         .def(
             "get_par_type",
-            &covarianceXsec::GetParamType,
+            &ParameterHandlerGeneric::GetParamType,
             "Get what type of systematic this parameters is (see :py:class:`pyMaCh3.covariance.SystematicType` for possible types). \n\
             :param index: The global index of the parameter",
             py::arg("index")
@@ -187,7 +187,7 @@ void initCovariance(py::module &m){
         
         .def(
             "get_par_spline_type",
-            &covarianceXsec::GetParSplineInterpolation,
+            &ParameterHandlerGeneric::GetParSplineInterpolation,
             "Get what type of spline this parameter is set to use (assuming that it is a spline type parameter). \n\
             :param index: The index of the spline parameter",
             py::arg("index")
@@ -195,7 +195,7 @@ void initCovariance(py::module &m){
         
         .def(
             "get_par_spline_name",
-            &covarianceXsec::GetParSplineName,
+            &ParameterHandlerGeneric::GetParSplineName,
             "Get the name of the spline associated with a spline parameter. This is generally what it is called in input spline files and can in principle be different to the parameters name. \n\
             :param index: The index of the spline parameter",
             py::arg("index")
@@ -203,13 +203,13 @@ void initCovariance(py::module &m){
         
         .def(
             "get_nominal_par_values",
-            &covarianceXsec::getNominalArray,
+            &ParameterHandlerGeneric::GetNominalArray,
             "Get the nominal values of all the parameters as a list. "
         )
 
     ; // End of CovarianceXsec binding
     
-    py::class_<covarianceOsc, covarianceBase /* <--- trampoline*/>(m_covariance, "CovarianceOsc")
+    py::class_<ParameterHandlerOsc, ParameterHandlerBase /* <--- trampoline*/>(m_covariance, "ParameterHandlerOsc")
         .def(
             py::init<const std::vector<std::string>&, const char *, double, int, int>(),
             "Construct a oscillation covariance object from a set of yaml files that define the systematic parameters \n\

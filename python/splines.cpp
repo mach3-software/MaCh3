@@ -3,10 +3,10 @@
 #include <pybind11/stl.h>
 #include <pybind11/numpy.h>
 // MaCh3 includes
-#include "splines/SplineBase.h"
-#include "splines/SplineMonolith.h"
-#include "splines/SplineStructs.h"
-#include "samplePDF/Structs.h" // <- The spline stuff that's in here should really be moved to splineStructs.h but I ain't doing that right now
+#include "Splines/SplineBase.h"
+#include "Splines/SplineMonolith.h"
+#include "Splines/SplineStructs.h"
+#include "Samples/Structs.h" // <- The spline stuff that's in here should really be moved to splineStructs.h but I ain't doing that right now
 // ROOT includes
 #include "TSpline.h"
 
