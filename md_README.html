@@ -111,7 +111,7 @@ Building against MaCh3</h1>
 </div><!-- fragment --><p>Once you found MaCh3 you might want to link your library against MaCh3. You can do this as follows: </p><div class="fragment"><div class="line">target_link_libraries(blarb MaCh3::All)</div>
 </div><!-- fragment --><p>Some functionalities rely on setting <code>Env{MACH3}</code> which should point to path experiment specific MaCh3. This way MaCh3 can easily find <code>Env{MACH3}/inputs/SomeInput.root</code> for example.</p>
 <h1><a class="anchor" id="autotoc_md5"></a>
-Python</h1>
+Python 🐍</h1>
 <p>MaCh3 has an optional python interface (pyMaCh3) which provides much of the same functionality as the c++ interface (see <a href="https://mach3-software.github.io/MaCh3/pyMaCh3/mainpage.html">here</a> for documentation).</p>
 <p>You can tell the build system to set up the pyMaCh3 interface by specifying</p>
 <div class="fragment"><div class="line">cmake ../ -DMaCh3_PYTHON_ENABLED=ON</div>
@@ -192,16 +192,18 @@ Supported operational systems</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Rocky9   </td><td class="markdownTableBodyNone">✅    </td></tr>
 <tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Ubi9   </td><td class="markdownTableBodyNone">✅    </td></tr>
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Ubuntu22.04   </td><td class="markdownTableBodyNone">✅    </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">Ubuntu24.10   </td><td class="markdownTableBodyNone">✅    </td></tr>
-<tr class="markdownTableRowOdd">
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Fedora32   </td><td class="markdownTableBodyNone">✅    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">CentOS7   </td><td class="markdownTableBodyNone">❔    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Windows   </td><td class="markdownTableBodyNone">❌    </td></tr>
+<td class="markdownTableBodyNone">CentOS7   </td><td class="markdownTableBodyNone">❔    </td></tr>
 <tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Windows   </td><td class="markdownTableBodyNone">❌    </td></tr>
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">MacOS   </td><td class="markdownTableBodyNone">❌   </td></tr>
 </table>
 <p>✅ - Part of CI/CD <br  />
