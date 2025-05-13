@@ -225,7 +225,7 @@ void PCAHandler::SetInitialParameters() {
 // ********************************************
 // Transfer a parameter variation in the eigen basis to the parameter basis
 void PCAHandler::TransferToParam() {
-  // ********************************************
+// ********************************************
   // Make the temporary vectors
   TVectorD fParProp_vec = TransferMat*_fParPropPCA;
   TVectorD fParCurr_vec = TransferMat*_fParCurrPCA;
