@@ -21,7 +21,10 @@ class ParameterHandlerOsc : public ParameterHandlerBase
   std::vector<const double*> GetOscParsFromSampleName(const std::string& SampleName);
   /// @brief KS: Print all useful information's after initialization
   void Print();
-
+  /// @brief KS: Flip parameter around given value, for example mass ordering around 0
+  /// @param index parameter index you want to flip
+  /// @param FlipPoint Value around which flipping is done
+  void FlipParameterValue(const int index, const double FlipPoint);
  protected:
     /// @brief HW :: This method is a tad hacky but modular arithmetic gives me a headache.
     /// @author Henry Wallace

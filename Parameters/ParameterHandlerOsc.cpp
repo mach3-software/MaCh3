@@ -50,17 +50,14 @@ void ParameterHandlerOsc::ProposeStep() {
   // HW It should now automatically set dcp to be with [-pi, pi]
   CircularPrior(kDeltaCP, -TMath::Pi(), TMath::Pi());
 
-  // Okay now we've done the standard steps, we can add in our nice flips
-  // hierarchy flip first
-  if(random_number[0]->Uniform() < 0.5 && flipdelM){
-    _fPropVal[kDeltaM23] *= -1;
+  // Okay now we've done the standard steps, we can add in our nice flips hierarchy flip first
+  if(flipdelM){
+    FlipParameterValue(kDeltaM23, 0.);
   }
-  // now octant flip
-  if(random_number[0]->Uniform() < 0.5) {
-    // flip octant around point of maximal disappearance (0.5112)
-    // this ensures we move to a parameter value which has the same oscillation probability
-    _fPropVal[kSinTheta23] = 0.5112 - (_fPropVal[kSinTheta23] - 0.5112);
-  }
+
+  // flip octant around point of maximal disappearance (0.5112)
+  // this ensures we move to a parameter value which has the same oscillation probability
+  FlipParameterValue(kSinTheta23, 0.5112);
 }
 
 // *************************************
@@ -71,6 +68,14 @@ void ParameterHandlerOsc::CircularPrior(const int index, const double LowBound, 
     _fPropVal[index] = LowBound + std::fmod(_fPropVal[index] - UpBound, UpBound - LowBound);
   } else if (_fPropVal[index] < LowBound) {
     _fPropVal[index] = UpBound - std::fmod(LowBound - _fPropVal[index], UpBound - LowBound);
+  }
+}
+
+// *************************************
+void ParameterHandlerOsc::FlipParameterValue(const int index, const double FlipPoint) {
+// *************************************
+  if(random_number[0]->Uniform() < 0.5) {
+    _fPropVal[index] = FlipPoint - (_fPropVal[index] - FlipPoint);
   }
 }
 
