@@ -387,11 +387,17 @@ void SampleHandlerFD::Reweight() {
     }
   }
   
+  if(SplineHandler) SplineHandler->Evaluate();
+
+  #ifdef MULTITHREAD
+  // Call entirely different routine if we're running with openMP
+  FillArray_MP();
+  #else
   FillArray();
+  #endif
 
   //KS: If you want to not update W2 wights then uncomment this line
   if(!UpdateW2) FirstTimeW2 = false;
-
 }
 
 //************************************************
@@ -407,15 +413,7 @@ void SampleHandlerFD::FillArray() {
   //DB Reset which cuts to apply
   Selection = StoredSelection;
   
-  // Call entirely different routine if we're running with openMP
-#ifdef MULTITHREAD
-  FillArray_MP();
-#else
-
   PrepFunctionalParameters();
-  if(SplineHandler){
-    SplineHandler->Evaluate();
-  }
 
   for (unsigned int iSample=0;iSample<MCSamples.size();iSample++) {
     for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
@@ -501,7 +499,6 @@ void SampleHandlerFD::FillArray() {
       }
     }
   }
-  #endif
 }
 
 #ifdef MULTITHREAD
@@ -513,11 +510,6 @@ void SampleHandlerFD::FillArray_MP()  {
   Selection = StoredSelection;
 
   PrepFunctionalParameters();
-  //==================================================
-  //Calc Weights and fill Array
-  if(SplineHandler){
-    SplineHandler->Evaluate();
-  }
 
   //This is stored as [y][x] due to shifts only occurring in the x variable (Erec/Lep mom) - I believe this will help reduce cache misses
   double** SampleHandlerFD_array_private = nullptr;
@@ -753,18 +745,17 @@ void SampleHandlerFD::SetupFunctionalParameters() {
         // Now check whether within kinematic bounds
         bool IsSelected = true;
         if ((*it).hasKinBounds) {
-          for (std::size_t iKinPar = 0; iKinPar < (*it).KinematicVarStr.size(); ++iKinPar) {
-            // Check lower bound
-            if (ReturnKinematicParameter((*it).KinematicVarStr[iKinPar], static_cast<int>(iSample), static_cast<int>(iEvent)) <= (*it).Selection[iKinPar][0]) {
+          const auto& kinVars = (*it).KinematicVarStr;
+          const auto& selection = (*it).Selection;
+
+          for (std::size_t iKinPar = 0; iKinPar < kinVars.size(); ++iKinPar) {
+            double kinVal = ReturnKinematicParameter(kinVars[iKinPar], static_cast<int>(iSample), static_cast<int>(iEvent));
+
+            if (kinVal <= selection[iKinPar][0] || kinVal > selection[iKinPar][1]) {
+              MACH3LOG_TRACE("Event {}, missed kinematic check ({}) for dial {}",
+                             iEvent, kinVars[iKinPar], (*it).name);
               IsSelected = false;
-              MACH3LOG_TRACE("Event {}, missed Kinematic var check ({}) for dial {}", iEvent, (*it).KinematicVarStr[iKinPar], (*it).name);
-              continue;
-            }
-            // Check upper bound
-            else if (ReturnKinematicParameter((*it).KinematicVarStr[iKinPar], static_cast<int>(iSample), static_cast<int>(iEvent)) > (*it).Selection[iKinPar][1]) {
-              MACH3LOG_TRACE("Event {}, missed Kinematic var check ({}) for dial {}", iEvent, (*it).KinematicVarStr[iKinPar], (*it).name);
-              IsSelected = false;
-              continue;
+              break;
             }
           }
         }
@@ -930,22 +921,24 @@ void SampleHandlerFD::CalcNormsBins(int iSample) {
 
         //Now check whether the norm has kinematic bounds
         //i.e. does it only apply to events in a particular kinematic region?
+        // Now check whether within kinematic bounds
         bool IsSelected = true;
         if ((*it).hasKinBounds) {
-          for (unsigned int iKinematicParameter = 0 ; iKinematicParameter < (*it).KinematicVarStr.size() ; ++iKinematicParameter ) {
-            if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) <= (*it).Selection[iKinematicParameter][0]) {
+          const auto& kinVars = (*it).KinematicVarStr;
+          const auto& selection = (*it).Selection;
+
+          for (std::size_t iKinPar = 0; iKinPar < kinVars.size(); ++iKinPar) {
+            double kinVal = ReturnKinematicParameter(kinVars[iKinPar], static_cast<int>(iSample), static_cast<int>(iEvent));
+
+            if (kinVal <= selection[iKinPar][0] || kinVal > selection[iKinPar][1]) {
+              MACH3LOG_TRACE("Event {}, missed kinematic check ({}) for dial {}",
+                             iEvent, kinVars[iKinPar], (*it).name);
               IsSelected = false;
-              MACH3LOG_TRACE("Event {}, missed Kinematic var check ({}) for dial {}", iEvent, (*it).KinematicVarStr[iKinematicParameter], (*it).name);
-              continue;
+              break;
             }
-            else if (ReturnKinematicParameter((*it).KinematicVarStr[iKinematicParameter], iSample, iEvent) > (*it).Selection[iKinematicParameter][1]) {
-              MACH3LOG_TRACE("Event {}, missed Kinematic var check ({}) for dial {}", iEvent, (*it).KinematicVarStr[iKinematicParameter], (*it).name);
-              IsSelected = false;
-              continue;
-            }
-          } 
+          }
         }
-        //Need to then break the event loop 
+        // Need to then break the event loop
         if(!IsSelected){
           MACH3LOG_TRACE("Event {}, missed Kinematic var check for dial {}", iEvent, (*it).name);
           continue;
