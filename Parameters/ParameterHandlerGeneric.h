@@ -111,7 +111,7 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
 
     /// @brief KS Function to set to prior parameters of a given group
     /// @param Group name of group, like Xsec or Flux
-    /// \ingroup ParameterHandlerSetters
+    /// @ingroup ParameterHandlerSetters
     void SetGroupOnlyParameters(const std::string& Group);
 
     /// @brief Dump Matrix to ROOT file, useful when we need to pass matrix info to another fitting group
