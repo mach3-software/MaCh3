@@ -172,7 +172,7 @@ class ParameterHandlerBase {
   void InitialiseAdaption(const YAML::Node& adapt_manager);
   /// @brief Save adaptive throw matrix to file
   void SaveAdaptiveToFile(const std::string& outFileName, const std::string& systematicName) {
-    AdaptiveHandler.SaveAdaptiveToFile(outFileName, systematicName); }
+    AdaptiveHandler->SaveAdaptiveToFile(outFileName, systematicName); }
 
   /// @brief Do we adapt or not
   bool GetDoAdaption(){return use_adaptive;}
@@ -181,8 +181,8 @@ class ParameterHandlerBase {
   void UpdateThrowMatrix(TMatrixDSym *cov);
   /// @brief Set number of MCMC step, when running adaptive MCMC it is updated with given frequency. We need number of steps to determine frequency.
   inline void SetNumberOfSteps(const int nsteps) {
-    AdaptiveHandler.total_steps = nsteps;
-    if(AdaptiveHandler.AdaptionUpdate()) ResetIndivStepScale();
+    AdaptiveHandler->total_steps = nsteps;
+    if(AdaptiveHandler->AdaptionUpdate()) ResetIndivStepScale();
   }
 
   /// @brief Get matrix used for step proposal
@@ -192,7 +192,7 @@ class ParameterHandlerBase {
   /// @brief Get the Cholesky decomposition of the throw matrix
   inline TMatrixD *GetThrowMatrix_CholDecomp(){return throwMatrix_CholDecomp;}
   /// @brief Get the parameter means used in the adaptive handler
-  inline std::vector<double> GetParameterMeans(){return AdaptiveHandler.par_means;}
+  inline std::vector<double> GetParameterMeans(){return AdaptiveHandler->par_means;}
   /// @brief KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plotting
   /// @details This function converts the covariance matrix to a correlation matrix and
   ///          returns a TH2D object, which can be used for advanced plotting purposes.
@@ -392,7 +392,7 @@ class ParameterHandlerBase {
 
   // HH: Getter for AdaptiveHandler
   /// @brief Get pointer for AdaptiveHandler
-  inline adaptive_mcmc::AdaptiveMCMCHandler* getAdaptiveHandler() { return &AdaptiveHandler; }
+  inline adaptive_mcmc::AdaptiveMCMCHandler* getAdaptiveHandler() { return AdaptiveHandler.get(); }
 
   // HH: Getter for use_adaptive
   /// @brief Get bool for whether we are using adaptive MCMC
@@ -509,5 +509,5 @@ protected:
   /// Struct containing information about PCA
   std::unique_ptr<PCAHandler> PCAObj;
   /// Struct containing information about adaption
-  adaptive_mcmc::AdaptiveMCMCHandler AdaptiveHandler;
+  std::unique_ptr<adaptive_mcmc::AdaptiveMCMCHandler> AdaptiveHandler;
 };
