@@ -214,9 +214,18 @@ void PCAHandler::TransferToPCA() {
 }
 
 // ********************************************
+void PCAHandler::SetInitialParameters() {
+// ********************************************
+  TransferToPCA();
+  for (int i = 0; i < NumParPCA; ++i) {
+    _fPreFitValuePCA[i] = _fParCurrPCA(i);
+  }
+}
+
+// ********************************************
 // Transfer a parameter variation in the eigen basis to the parameter basis
 void PCAHandler::TransferToParam() {
-// ********************************************
+  // ********************************************
   // Make the temporary vectors
   TVectorD fParProp_vec = TransferMat*_fParPropPCA;
   TVectorD fParCurr_vec = TransferMat*_fParCurrPCA;
@@ -228,6 +237,7 @@ void PCAHandler::TransferToParam() {
     (*_pCurrVal)[i] = fParCurr_vec(i);
   }
 }
+
 
 #ifdef DEBUG_PCA
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
