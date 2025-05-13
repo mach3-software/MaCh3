@@ -15,7 +15,7 @@ _MaCh3_Safe_Include_End_ //}
 SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGeneric* xsec_cov, ParameterHandlerOsc* osc_cov, OscillatorBase* OscillatorObj_) : SampleHandlerBase()
 {
   MACH3LOG_INFO("-------------------------------------------------------------------");
-  MACH3LOG_INFO("Creating SampleHandlerFDBase object");
+  MACH3LOG_INFO("Creating SampleHandlerFD object");
 
   //ETA - safety feature so you can't pass a NULL xsec_cov
   if(!xsec_cov){
@@ -51,7 +51,7 @@ SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGen
 
 SampleHandlerFD::~SampleHandlerFD()
 {
-  MACH3LOG_DEBUG("I'm deleting SampleHandlerFDBase");
+  MACH3LOG_DEBUG("I'm deleting SampleHandlerFD");
   
   for (unsigned int yBin=0;yBin<(YBinEdges.size()-1);yBin++) {
     if(SampleHandlerFD_array != nullptr){delete[] SampleHandlerFD_array[yBin];}
@@ -216,7 +216,7 @@ void SampleHandlerFD::Initialise() {
   if (OscParHandler) {
     MACH3LOG_INFO("Setting up NuOscillator.. ");
     if (NuOscProbCalcers.size() != 0) {
-      MACH3LOG_INFO("You have passed an OscillatorBase object through the constructor of a SampleHandlerFDBase object - this will be used for all oscillation channels");
+      MACH3LOG_INFO("You have passed an OscillatorBase object through the constructor of a SampleHandlerFD object - this will be used for all oscillation channels");
       MACH3LOG_INFO("Overwriting EqualBinningPerOscChannel = true");
       EqualBinningPerOscChannel = true;
     } else {
@@ -287,7 +287,7 @@ void SampleHandlerFD::Fill2DHist()
 }
 
 // ************************************************
-/// @function SampleHandlerFDBase::SetupSampleBinning()
+/// @function SampleHandlerFD::SetupSampleBinning()
 /// @brief Function to setup the binning of your sample histograms and the underlying
 /// arrays that get handled in fillArray() and fillArray_MP().
 /// The SampleXBins are filled in the daughter class from the sample config file.
@@ -401,9 +401,9 @@ void SampleHandlerFD::Reweight() {
 }
 
 //************************************************
-/// @function SampleHandlerFDBase::fillArray()
+/// @function SampleHandlerFD::fillArray()
 /// Function which does the core reweighting. This assumes that oscillation weights have 
-/// already been calculated and stored in SampleHandlerFDBase[iSample].osc_w[iEvent]. This 
+/// already been calculated and stored in SampleHandlerFD[iSample].osc_w[iEvent]. This
 /// function takes advantage of most of the things called in setupSKMC to reduce reweighting time.
 /// It also follows the ND code reweighting pretty closely. This function fills the SampleHandlerFD 
 /// array array which is binned to match the sample binning, such that bin[1][1] is the 
