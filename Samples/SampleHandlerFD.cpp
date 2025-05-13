@@ -4,11 +4,6 @@
 #include "Manager/MaCh3Logger.h"
 #include <cstddef>
 
-_MaCh3_Safe_Include_Start_ //{
-#include "Oscillator/OscillatorFactory.h"
-#include "Constants/OscillatorConstants.h"
-_MaCh3_Safe_Include_End_ //}
-
 #include <algorithm>
 #include <memory>
 

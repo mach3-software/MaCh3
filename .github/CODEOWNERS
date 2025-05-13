@@ -24,6 +24,8 @@
 /Fitters/* @kskwarczynski
 
 /Samples/SampleHandlerFD* @edatkin @dbarrow257
+/Samples/OscillationHandler* @dbarrow257
+
 /Splines/BinnedSplineHandler* @edatkin @dbarrow257
 
 /Plotting/* @ewanwm

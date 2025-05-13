@@ -287,22 +287,12 @@ public:
   //===============================================================================
 
   //===============================================================================
-  /// DB Variables required for oscillation
-  std::vector<OscillatorBase*> NuOscProbCalcers;
-  std::string NuOscillatorConfigFile; 
-  //=============================================================================== 
-
-  //===============================================================================
   //DB Covariance Objects
   //ETA - All experiments will need an xsec, det and osc cov
   //these should be added to SampleHandlerBase to be honest
   ParameterHandlerGeneric *ParHandler = nullptr;
   ParameterHandlerOsc *OscParHandler = nullptr;
 
-  /// @brief flag used to define whether all oscillation channels have a probability calculated using the same binning
-  bool EqualBinningPerOscChannel = false;
-  /// If using shared NuOsc
-  bool SharedNuOsc = false;
   //=============================================================================== 
 
   /// @brief Keep track of the dimensions of the sample binning
