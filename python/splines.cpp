@@ -15,7 +15,7 @@
 
 namespace py = pybind11;
 
-// As SplineBase is an abstract base class we have to do some gymnastics to get it to get it into python
+/// @brief EW: As SplineBase is an abstract base class we have to do some gymnastics to get it to get it into python
 class PySplineBase : public SplineBase {
 public:
     /* Inherit the constructors */

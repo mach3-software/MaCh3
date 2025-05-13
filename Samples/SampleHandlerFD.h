@@ -27,11 +27,16 @@ public:
   /// @brief destructor
   virtual ~SampleHandlerFD();
 
+  /// @ingroup SampleHandlerGetters
   int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
+  /// @ingroup SampleHandlerGetters
   std::string GetSampleName(int iSample = 0) const override;
+  /// @ingroup SampleHandlerGetters
   std::string GetTitle() const override {return SampleTitle;}
 
+  /// @ingroup SampleHandlerGetters
   std::string GetXBinVarName() {return XVarStr;}
+  /// @ingroup SampleHandlerGetters
   std::string GetYBinVarName() {return YVarStr;}
 
   void PrintIntegral(TString OutputName="/dev/null", int WeightStyle=0, TString OutputCSVName="/dev/null");
@@ -60,8 +65,10 @@ public:
 
   void ReadSampleConfig();
 
+  /// @ingroup SampleHandlerGetters
   int GetNMCSamples() override {return int(MCSamples.size());}
 
+  /// @ingroup SampleHandlerGetters
   int GetNEventsInSample(int iSample) override {
     if (iSample < 0 || iSample > GetNMCSamples()) {
       MACH3LOG_ERROR("Invalid Sample Requested: {}",iSample);
@@ -70,6 +77,7 @@ public:
     return MCSamples[iSample].nEvents;
   }
   
+  /// @ingroup SampleHandlerGetters
   std::string GetFlavourName(int iSample) {
     if (iSample < 0 || iSample > GetNMCSamples()) {
       MACH3LOG_ERROR("Invalid Sample Requested: {}",iSample);
@@ -78,30 +86,40 @@ public:
     return MCSamples[iSample].flavourName;
   }
 
+  /// @ingroup SampleHandlerGetters
   TH1* Get1DVarHist(const std::string& ProjectionVar, const std::vector< KinematicCut >& SelectionVec = std::vector< KinematicCut >(),
                     int WeightStyle=0, TAxis* Axis=nullptr);
   TH2* Get2DVarHist(const std::string& ProjectionVarX, const std::string& ProjectionVarY,
                     const std::vector< KinematicCut >& SelectionVec = std::vector< KinematicCut >(),
                     int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
-
+  /// @ingroup SampleHandlerGetters
   TH1* Get1DVarHistByModeAndChannel(const std::string& ProjectionVar_Str, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* Axis=nullptr);
+  /// @ingroup SampleHandlerGetters
   TH2* Get2DVarHistByModeAndChannel(const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
 
+  /// @ingroup SampleHandlerGetters
   TH1 *GetModeHist1D(int s, int m, int style = 0) {
     return Get1DVarHistByModeAndChannel(XVarStr,m,s,style);
   }
+  /// @ingroup SampleHandlerGetters
   TH2 *GetModeHist2D(int s, int m, int style = 0) {
     return Get2DVarHistByModeAndChannel(XVarStr,YVarStr,m,s,style);
   }
 
+  /// @ingroup SampleHandlerGetters
   std::vector<TH1*> ReturnHistsBySelection1D(std::string KinematicProjection, int Selection1, int Selection2=-1, int WeightStyle=0, TAxis* Axis=0);
+  /// @ingroup SampleHandlerGetters
   std::vector<TH2*> ReturnHistsBySelection2D(std::string KinematicProjectionX, std::string KinematicProjectionY, int Selection1, int Selection2=-1, int WeightStyle=0, TAxis* XAxis=0, TAxis* YAxis=0);
+  /// @ingroup SampleHandlerGetters
   THStack* ReturnStackedHistBySelection1D(std::string KinematicProjection, int Selection1, int Selection2=-1, int WeightStyle=0, TAxis* Axis=0);
+  /// @ingroup SampleHandlerGetters
   TLegend* ReturnStackHistLegend() {return THStackLeg;}
   
-  /// ETA function to generically convert a string from xsec cov to a kinematic type
+  /// @brief ETA function to generically convert a string from xsec cov to a kinematic type
+  /// @ingroup SampleHandlerGetters
   int ReturnKinematicParameterFromString(const std::string& KinematicStr) const;
-  /// ETA function to generically convert a kinematic type from xsec cov to a string
+  /// @brief ETA function to generically convert a kinematic type from xsec cov to a string
+  /// @ingroup SampleHandlerGetters
   std::string ReturnStringFromKinematicParameter(const int KinematicVariable) const;
 
  protected:

@@ -10,7 +10,7 @@
 
 namespace py = pybind11;
 
-// As ParameterHandlerBase is an abstract base class we have to do some gymnastics to get it to get it into python
+/// @brief EW: As ParameterHandlerBase is an abstract base class we have to do some gymnastics to get it to get it into python
 class PyParameterHandlerBase : public ParameterHandlerBase {
 public:
     /* Inherit the constructors */

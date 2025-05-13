@@ -133,10 +133,10 @@ void SampleHandlerFD::ReadSampleConfig()
   if (!CheckNodeExists(SampleManager->raw(), "InputFiles", "mtupleprefix")){
     MACH3LOG_ERROR("InputFiles:mtupleprefix not given in {}, please add this", SampleManager->GetFileName());
   }
-  std::string mtupleprefix = SampleManager->raw()["InputFiles"]["mtupleprefix"].as<std::string>();
-  std::string mtuplesuffix = SampleManager->raw()["InputFiles"]["mtuplesuffix"].as<std::string>();
-  std::string splineprefix = SampleManager->raw()["InputFiles"]["splineprefix"].as<std::string>();
-  std::string splinesuffix = SampleManager->raw()["InputFiles"]["splinesuffix"].as<std::string>();
+  auto mtupleprefix  = Get<std::string>(SampleManager->raw()["InputFiles"]["mtupleprefix"], __FILE__, __LINE__);
+  auto mtuplesuffix  = Get<std::string>(SampleManager->raw()["InputFiles"]["mtuplesuffix"], __FILE__, __LINE__);
+  auto splineprefix  = Get<std::string>(SampleManager->raw()["InputFiles"]["splineprefix"], __FILE__, __LINE__);
+  auto splinesuffix  = Get<std::string>(SampleManager->raw()["InputFiles"]["splinesuffix"], __FILE__, __LINE__);
   
   nSamples = static_cast<M3::int_t>(SampleManager->raw()["SubSamples"].size());
   MCSamples.resize(nSamples);
@@ -782,8 +782,6 @@ void SampleHandlerFD::ApplyShifts(int iSample, int iEvent) {
     (*fp->funcPtr)(fp->valuePtr, iSample, iEvent);
   }
 }
-// =================================
-
 
 // ***************************************************************************
 // Calculate the spline weight for one event
