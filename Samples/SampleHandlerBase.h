@@ -29,23 +29,41 @@ class SampleHandlerBase
   /// @brief destructor
   virtual ~SampleHandlerBase();
 
+  /// \defgroup SampleHandlerSetters
+  /// Group of functions to set various parameters, names, and values.
+
+  /// \defgroup SampleHandlerGetters
+  /// Group of functions to get various parameters, names, and values.
+
+  /// @ingroup SampleHandlerGetters
   virtual inline M3::int_t GetNsamples(){ return nSamples; };
+  /// @ingroup SampleHandlerGetters
   virtual inline std::string GetTitle()const {return "SampleHandler";};
+  /// @ingroup SampleHandlerGetters
   virtual std::string GetSampleName(int Sample) const = 0;
+  /// @ingroup SampleHandlerGetters
   virtual inline double GetSampleLikelihood(const int isample){(void) isample; return GetLikelihood();};
 
   /// @brief Return pointer to MaCh3 modes
+  /// @ingroup SampleHandlerGetters
   MaCh3Modes* GetMaCh3Modes() const { return Modes; }
 
-  TH1D* Get1DHist();                                               
+  /// @ingroup SampleHandlerGetters
+  TH1D* Get1DHist();
+  /// @ingroup SampleHandlerGetters
   TH2D* Get2DHist();
+  /// @ingroup SampleHandlerGetters
   TH1D* Get1DDataHist(){return dathist;}
+  /// @ingroup SampleHandlerGetters
   TH2D* Get2DDataHist(){return dathist2d;}
       
   virtual void Reweight()=0;
+  /// @ingroup SampleHandlerGetters
   virtual double GetLikelihood() = 0;
 
+  /// @ingroup SampleHandlerGetters
   virtual int GetNEventsInSample(int sample){ (void) sample; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); }
+  /// @ingroup SampleHandlerGetters
   virtual int GetNMCSamples(){ throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); }
 
   virtual void AddData(std::vector<double> &dat);
@@ -64,14 +82,20 @@ class SampleHandlerBase
   virtual inline std::string GetKinVarLabel(const int sample, const int Dimension) {
     (void) sample; (void) Dimension; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");  };
 
+  /// @brief Calculate test statistic for a single bin using Poisson
+  /// @param data is data
+  /// @param mc is mc
+  /// @ingroup SampleHandlerGetters
   double GetTestStatLLH(double data, double mc) const;
   /// @brief Calculate test statistic for a single bin. Calculation depends on setting of fTestStatistic
   /// @param data is data
   /// @param mc is mc
   /// @param w2 is is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
+  /// @ingroup SampleHandlerGetters
   double GetTestStatLLH(const double data, const double mc, const double w2) const;
   /// @brief Set the test statistic to be used when calculating the binned likelihoods
   /// @param testStat The test statistic to use.
+  /// @ingroup SampleHandlerGetters
   inline void SetTestStatistic(TestStatistic testStat){ fTestStatistic = testStat; }
 
   virtual void Fill1DHist()=0;

@@ -6,7 +6,7 @@
 
 namespace py = pybind11;
 
-// As SampleHandlerBase is an abstract base class we have to do some gymnastics to get it to get it into python
+/// @brief EW: As SampleHandlerBase is an abstract base class we have to do some gymnastics to get it to get it into python
 class PySampleHandlerBase : public SampleHandlerBase {
 public:
     /* Inherit the constructors */
@@ -62,7 +62,7 @@ public:
 };
 
 
-// As SampleHandlerFD is an abstract base class we have to do some gymnastics to get it to get it into python
+/// @brief As SampleHandlerFD is an abstract base class we have to do some gymnastics to get it to get it into python
 class PySampleHandlerFD : public SampleHandlerFD {
 public:
     /* Inherit the constructors */
