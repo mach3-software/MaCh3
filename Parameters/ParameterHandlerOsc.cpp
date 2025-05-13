@@ -75,7 +75,7 @@ void ParameterHandlerOsc::CircularPrior(const int index, const double LowBound, 
 void ParameterHandlerOsc::FlipParameterValue(const int index, const double FlipPoint) {
 // *************************************
   if(random_number[0]->Uniform() < 0.5) {
-    _fPropVal[index] = FlipPoint - (_fPropVal[index] - FlipPoint);
+    _fPropVal[index] = 2 * FlipPoint - _fPropVal[index];
   }
 }
 
