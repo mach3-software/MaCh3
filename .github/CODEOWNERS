@@ -23,7 +23,7 @@
 /Parameters/AdaptiveMCMCHandler* @henry-wallace-phys
 /Fitters/* @kskwarczynski
 
-/Samples/SampleHandlerFDBase* @edatkin @dbarrow257
+/Samples/SampleHandlerFD* @edatkin @dbarrow257
 /Splines/BinnedSplineHandler* @edatkin @dbarrow257
 
 /Plotting/* @ewanwm
