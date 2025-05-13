@@ -55,12 +55,12 @@ get_filename_component(MaCh3_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 
 
 find_path(MaCh3_INCLUDE_DIR
-  NAMES mcmc/FitterBase.h
+  NAMES Fitters/FitterBase.h
   PATHS ${MaCh3_CMAKE_DIR}/include/
 )
 
 find_path(MaCh3_LIB_DIR
-  NAMES libMCMC.so
+  NAMES libFitters.so
   PATHS ${MaCh3_CMAKE_DIR}/lib/
 )
 
