@@ -11,20 +11,32 @@ class OscillatorBase;
 class OscillationHandler
 {
  public:
-   OscillationHandler();
-  /// @brief destructor
+  /// @brief Constructor
+  /// @param ConfigFile name/path to NuOscillator Config
+  /// @param EqualBinningPerChannel whether to use same binning per each oscillation channel
+  /// @param OscParams_ Pointers to values of oscillation parameters
+  /// @param SubChannels Number of oscillation channels
+  /// @warning if @EqualBinningPerChannel is true then argument SubChannels make no difference
+  OscillationHandler(const std::string& ConfigFile, bool EqualBinningPerChannel,
+                     std::vector<const double*> OscParams_, const int SubChannels);
+  /// @brief Destructor
   virtual ~OscillationHandler();
+  /// @brief check if same binning is used for multiple oscillation channels
+  bool isEqualBinningPerOscChannel() {return EqualBinningPerOscChannel;}
+  /// @brief DB Evaluate oscillation weights for each defined event/bin
+  void Evaluate();
+  /// @brief Get pointer to oscillation weight
+  const M3::float_t* GetNuOscillatorPointers(int Channel, int InitFlav, int FinalFlav, FLOAT_T TrueEnu, FLOAT_T TrueCosZenith = -999);
 
+  /// @brief Setup binning, arrays correspond to events and their energy bins
+  void SetOscillatorBinning(const int Channel, const std::vector<M3::float_t>& EnergyArray, const std::vector<M3::float_t>& CosineZArray);
+ private:
+  /// flag used to define whether all oscillation channels have a probability calculated using the same binning
+  bool EqualBinningPerOscChannel;
 
-
-  /// @brief flag used to define whether all oscillation channels have a probability calculated using the same binning
-  bool EqualBinningPerOscChannel = false;
-  /// If using shared NuOsc
-  bool SharedNuOsc = false;
-
-  //===============================================================================
   /// DB Variables required for oscillation
-  std::vector<OscillatorBase*> NuOscProbCalcers;
-  std::string NuOscillatorConfigFile;
-  //===============================================================================
+  std::vector<std::unique_ptr<OscillatorBase>> NuOscProbCalcers;
+
+  /// pointer to osc params, since not all params affect every sample, we perform some operations before hand for speed
+  std::vector<const double*> OscParams;
 };

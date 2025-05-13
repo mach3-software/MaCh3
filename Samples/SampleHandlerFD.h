@@ -7,13 +7,11 @@
 #include "Parameters/ParameterHandlerOsc.h"
 
 #include "Samples/SampleHandlerBase.h"
+#include "Samples/OscillationHandler.h"
 #include "Samples/FarDetectorCoreInfoStruct.h"
 
 #include "THStack.h"
 #include "TLegend.h"
-
-//forward declare so we don't bleed NuOscillator headers
-class OscillatorBase;
 
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
 /// @author Dan Barrow
@@ -22,8 +20,10 @@ class SampleHandlerFD :  public SampleHandlerBase
 {
 public:
   //######################################### Functions #########################################
+  /// @brief Constructor
   /// @param ConfigFileName Name of config to initialise the sample object
-  SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGeneric* xsec_cov, ParameterHandlerOsc* osc_cov = nullptr, OscillatorBase* Oscillator_ = nullptr);
+  SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGeneric* xsec_cov,
+                  ParameterHandlerOsc* osc_cov = nullptr, const std::shared_ptr<OscillationHandler>& OscillatorObj_ = nullptr);
   /// @brief destructor
   virtual ~SampleHandlerFD();
 
@@ -148,6 +148,9 @@ public:
   
   /// @brief Contains all your binned splines and handles the setup and the returning of weights from spline evaluations
   std::unique_ptr<BinnedSplineHandler> SplineHandler;
+
+  /// @brief Contains all your binned splines and handles the setup and the returning of weights from spline evaluations
+  std::shared_ptr<OscillationHandler> Oscillator;
   //===============================================================================
   void FillSplineBins();
 
@@ -326,8 +329,6 @@ public:
 
   /// @brief Information to store for normalisation pars
   std::vector<NormParameter> norm_parameters;
-  /// pointer to osc params, since not all params affect every sample, we perform some operations before hand for speed
-  std::vector<const double*> OscParams;
   //===========================================================================
   //DB Vectors to store which kinematic cuts we apply
   //like in XsecNorms but for events in sample. Read in from sample yaml file 
