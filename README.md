@@ -140,6 +140,14 @@ There are several debug modes, to enable more detailed but very heavy specific d
 ```bash
 cmake ../ -DMaCh3_DEBUG_ENABLED=<ON,OFF> -DDEBUG_LEVEL=<1,2,3>
 ```
+## Logger
+Several logging options are available. By default, MaCh3 uses `INFO` level logging.
+You can enable more verbose logging by specifying the desired level during configuration:
+```bash
+cmake ../ -DLOG_LEVEL="TRACE"
+```
+You can find more [here](https://github.com/mach3-software/MaCh3/blob/develop/cmake/Modules/Logger.cmake).
+
 ## System Requirements
 Most of external libraries are being handled through [CPM](https://github.com/cpm-cmake/CPM.cmake). The only external library that is not being handled through [CPM](https://github.com/cpm-cmake/CPM.cmake) and is required is [ROOT](https://root.cern/). Currently used external dependencies include:
 
@@ -169,7 +177,7 @@ Based on several test here are recommended version:
 ❔ - Not part of CI/CD but used by some users/developers so it might work <br>
 ❌ - Not supported and no plans right now <br>
 
-## Help and Guidelines
+## Help and Guidelines 📄
 - [Tutorial](https://github.com/mach3-software/MaCh3Tutorial)
 - [How to contribute](https://github.com/mach3-software/MaCh3/blob/develop/.github/CONTRIBUTING.md)
 - [Wiki](https://github.com/mach3-software/MaCh3/wiki)
@@ -177,7 +185,7 @@ Based on several test here are recommended version:
 - [Discussions](https://github.com/mach3-software/MaCh3/discussions)
 - [Benchmark](https://mach3-software.github.io/MaCh3Tutorial/)
 
-## Plotting and Diagnostic
+## Plotting and Diagnostic 📊
 Example of chain diagnostic utils can be found [here](https://github.com/mach3-software/MaCh3/tree/develop/Diagnostics) with example of config.
 The MaCh3 core plotting library code can be found [here](https://github.com/mach3-software/MaCh3/tree/develop/plotting) along with example config files and some apps for making standard plots.
 
