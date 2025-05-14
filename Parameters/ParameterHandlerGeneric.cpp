@@ -240,7 +240,7 @@ const std::vector<int> ParameterHandlerGeneric::GetGlobalSystIndexFromSampleName
 // ********************************************
 // Grab the global syst index for the relevant SampleName
 // i.e. get a vector of size nSplines where each entry is filled with the global syst number
-const std::vector<int> ParameterHandlerGeneric::GetSystIndexFromSampleName(const std::string& SampleName,  const SystType Type) {
+const std::vector<int> ParameterHandlerGeneric::GetSystIndexFromSampleName(const std::string& SampleName,  const SystType Type) const {
 // ********************************************
   std::vector<int> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
@@ -337,15 +337,15 @@ const std::vector<NormParameter> ParameterHandlerGeneric::GetNormParsFromSampleN
 }
 
 // ********************************************
-// DB Grab the Normalisation parameters for the relevant SampleName
-const std::vector<SplineParameter> ParameterHandlerGeneric::GetNormParsFromSampleName(const std::string& SampleName) const {
+// KS Grab the Spline parameters for the relevant SampleName
+const std::vector<SplineParameter> ParameterHandlerGeneric::GetSplineParsFromSampleName(const std::string& SampleName) const {
 // ********************************************
   return GetTypeParamsFromSampleName(_fSystToGlobalSystIndexMap[SystType::kSpline], SplineParams, SampleName);
 }
 
 // ********************************************
 template<typename ParamT>
-std::vector<ParamT> GetTypeParamsFromSampleName(const std::map<int, int>& indexMap, const std::vector<ParamT>& params, const std::string& SampleName) const {
+std::vector<ParamT> ParameterHandlerGeneric::GetTypeParamsFromSampleName(const std::map<int, int>& indexMap, const std::vector<ParamT>& params, const std::string& SampleName) const {
 // ********************************************
   std::vector<ParamT> returnVec;
   for (const auto& pair : indexMap) {
