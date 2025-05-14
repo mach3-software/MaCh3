@@ -124,14 +124,19 @@ void SampleHandlerFD::ReadSampleConfig()
   
   nSamples = static_cast<M3::int_t>(SampleManager->raw()["SubSamples"].size());
   MCSamples.resize(nSamples);
-  
+  OscChannels.reserve(nSamples);
+
   for (auto const &osc_channel : SampleManager->raw()["SubSamples"]) {
-    oscchan_flavnames.push_back(osc_channel["Name"].as<std::string>());
-    oscchan_flavnames_Latex.push_back(osc_channel["LatexName"].as<std::string>());
+    OscChannelInfo info;
+    info.flavourName       = osc_channel["Name"].as<std::string>();
+    info.flavourName_Latex = osc_channel["LatexName"].as<std::string>();
+    info.InitPDG           = static_cast<NuPDG>(osc_channel["nutype"].as<int>());
+    info.FinalPDG          = static_cast<NuPDG>(osc_channel["oscnutype"].as<int>());
+
+    OscChannels.push_back(std::move(info));
+
     mc_files.push_back(mtupleprefix+osc_channel["mtuplefile"].as<std::string>()+mtuplesuffix);
     spline_files.push_back(splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);
-    sample_nupdgunosc.push_back(static_cast<NuPDG>(osc_channel["nutype"].as<int>()));
-    sample_nupdg.push_back(static_cast<NuPDG>(osc_channel["oscnutype"].as<int>()));
   }
 
   //Now grab the selection cuts from the manager
@@ -164,7 +169,7 @@ void SampleHandlerFD::ReadSampleConfig()
 
   // EM: print em out
   MACH3LOG_INFO("  Nominal mode weights to apply: ");
-  for( int iMode=0; iMode<Modes->GetNModes(); iMode++ ) {
+  for(int iMode=0; iMode<Modes->GetNModes(); iMode++ ) {
     std::string modeStr = Modes->GetMaCh3ModeName(iMode);
     MACH3LOG_INFO("    - {}: {}", modeStr, _modeNomWeightMap.at(modeStr));
   }
@@ -178,16 +183,16 @@ void SampleHandlerFD::Initialise() {
   Init();
 
   int TotalMCEvents = 0;
-  for(M3::int_t iSample=0 ; iSample < nSamples ; iSample++){
+  for(int iChannel = 0 ; iChannel < static_cast<int>(OscChannels.size()); iChannel++){
     MACH3LOG_INFO("=============================================");
-    MACH3LOG_INFO("Initialising sample: {}/{}", iSample, nSamples);
-    MCSamples[iSample].nEvents = SetupExperimentMC(iSample);
-    MACH3LOG_INFO("Number of events processed: {}", MCSamples[iSample].nEvents);
-    TotalMCEvents += MCSamples[iSample].nEvents;
+    MACH3LOG_INFO("Initialising channel: {}/{}", iChannel, OscChannels.size());
+    MCSamples[iChannel].nEvents = SetupExperimentMC(iChannel);
+    MACH3LOG_INFO("Number of events processed: {}", MCSamples[iChannel].nEvents);
+    TotalMCEvents += MCSamples[iChannel].nEvents;
     MACH3LOG_INFO("Initialising FDMC object..");
-    InitialiseSingleFDMCObject(iSample, MCSamples[iSample].nEvents);
-    SetupFDMC(iSample);
-    MACH3LOG_INFO("Initialised sample: {}/{}", iSample, nSamples);
+    InitialiseSingleFDMCObject(iChannel, MCSamples[iChannel].nEvents);
+    SetupFDMC(iChannel);
+    MACH3LOG_INFO("Initialised channel: {}/{}", iChannel, OscChannels.size());
   }
   MACH3LOG_INFO("=============================================");
   MACH3LOG_INFO("Total number of events is: {}", TotalMCEvents);
@@ -1288,7 +1293,7 @@ void SampleHandlerFD::InitialiseNuOscillatorObjects() {
     }
   }
   std::vector<const double*> OscParams = OscParHandler->GetOscParsFromSampleName(SampleName);
-  Oscillator = std::make_shared<OscillationHandler>(NuOscillatorConfigFile, EqualBinningPerOscChannel, OscParams, static_cast<int>(MCSamples.size()));
+  Oscillator = std::make_shared<OscillationHandler>(NuOscillatorConfigFile, EqualBinningPerOscChannel, OscParams, static_cast<int>(OscChannels.size()));
 
   if (!EqualBinningPerOscChannel) {
     for (size_t iSample=0;iSample<MCSamples.size();iSample++) {
@@ -1344,12 +1349,13 @@ void SampleHandlerFD::SetupNuOscillatorPointers() {
           throw MaCh3Exception(__FILE__, __LINE__);
         }
 
+        const int OscIndex = GetOscChannel(OscChannels, (*MCSamples[iSample].nupdgUnosc[iEvent]), (*MCSamples[iSample].nupdg[iEvent]));
         if (MCSamples[iSample].rw_truecz.size() > 0) { //Can only happen if truecz has been initialised within the experiment specific code
           //Atmospherics
-          MCSamples[iSample].osc_w_pointer[iEvent] = Oscillator->GetNuOscillatorPointers(static_cast<int>(iSample), InitFlav, FinalFlav, FLOAT_T(*(MCSamples[iSample].rw_etru[iEvent])), FLOAT_T(*(MCSamples[iSample].rw_truecz[iEvent])));
+          MCSamples[iSample].osc_w_pointer[iEvent] = Oscillator->GetNuOscillatorPointers(OscIndex, InitFlav, FinalFlav, FLOAT_T(*(MCSamples[iSample].rw_etru[iEvent])), FLOAT_T(*(MCSamples[iSample].rw_truecz[iEvent])));
         } else {
           //Beam
-          MCSamples[iSample].osc_w_pointer[iEvent] = Oscillator->GetNuOscillatorPointers(static_cast<int>(iSample), InitFlav, FinalFlav, FLOAT_T(*(MCSamples[iSample].rw_etru[iEvent])));
+          MCSamples[iSample].osc_w_pointer[iEvent] = Oscillator->GetNuOscillatorPointers(OscIndex, InitFlav, FinalFlav, FLOAT_T(*(MCSamples[iSample].rw_etru[iEvent])));
         }
       } // end if NC
     } // end loop over events
@@ -1389,13 +1395,15 @@ void SampleHandlerFD::FillSplineBins() {
   for (int i = 0; i < int(MCSamples.size()); ++i) {
     //Now loop over events and get the spline bin for each event
     for (int j = 0; j < MCSamples[i].nEvents; ++j) {
+      const int OscIndex = GetOscChannel(OscChannels, (*MCSamples[i].nupdgUnosc[j]), (*MCSamples[i].nupdg[j]));
+
       std::vector< std::vector<int> > EventSplines;
       switch(nDimensions){
         case 1:
-          EventSplines = SplineHandler->GetEventSplines(GetSampleName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), 0.);
+          EventSplines = SplineHandler->GetEventSplines(GetSampleName(), OscIndex, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), 0.);
           break;
         case 2:
-          EventSplines = SplineHandler->GetEventSplines(GetSampleName(), i, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), *(MCSamples[i].y_var[j]));
+          EventSplines = SplineHandler->GetEventSplines(GetSampleName(), OscIndex, int(*(MCSamples[i].mode[j])), *(MCSamples[i].rw_etru[j]), *(MCSamples[i].x_var[j]), *(MCSamples[i].y_var[j]));
           break;
         default:
           MACH3LOG_ERROR("Error in assigning spline bins because nDimensions = {}", nDimensions);
@@ -1457,9 +1465,6 @@ void SampleHandlerFD::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   FarDetectorCoreInfo *fdobj = &MCSamples[iSample];
   
   fdobj->nEvents = nEvents_;
-  fdobj->flavourName = oscchan_flavnames[iSample];
-  fdobj->flavourName_Latex = oscchan_flavnames_Latex[iSample];
-  fdobj->ChannelIndex = iSample;
   
   int nEvents = fdobj->nEvents;
   fdobj->x_var.resize(nEvents, &M3::Unity_D);
@@ -1825,11 +1830,11 @@ void SampleHandlerFD::PrintIntegral(TString OutputFileName, int WeightStyle, TSt
 
   std::string table_headings = fmt::format("| {:<8} |", "Mode");
   std::string table_footline = "------------"; //Scalable table horizontal line
-  for (int i=0;i<GetNMCSamples();i++) {
-    table_headings += fmt::format(" {:<17} |", MCSamples[i].flavourName);
+  for (size_t i = 0;i < OscChannels.size(); i++) {
+    table_headings += fmt::format(" {:<17} |", OscChannels[i].flavourName);
     table_footline += "--------------------";
-    if (printToFile) {outfile << "&" << std::setw(space) << MCSamples[i].flavourName_Latex << " ";}
-    if (printToCSV)  {outcsv << MCSamples[i].flavourName << ",";}
+    if (printToFile) {outfile << "&" << std::setw(space) << OscChannels[i].flavourName_Latex << " ";}
+    if (printToCSV)  {outcsv << OscChannels[i].flavourName << ",";}
   }
   if (printToFile) {outfile << "&" << std::setw(space) << "Total:" << "\\\\ \\hline" << std::endl;}
   if (printToCSV)  {outcsv <<"Total\n";}
@@ -1928,7 +1933,7 @@ std::vector<TH1*> SampleHandlerFD::ReturnHistsBySelection1D(std::string Kinemati
     }
     if (Selection1==1) {
       hHistList.push_back(Get1DVarHistByModeAndChannel(KinematicProjection,Selection2,i,WeightStyle,XAxis));
-      THStackLeg->AddEntry(hHistList[i],(MCSamples[i].flavourName+Form(" | %4.2f",hHistList[i]->Integral())).c_str(),"f");
+      THStackLeg->AddEntry(hHistList[i],(OscChannels[i].flavourName+Form(" | %4.2f",hHistList[i]->Integral())).c_str(),"f");
     }
   }
 

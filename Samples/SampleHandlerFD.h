@@ -78,12 +78,12 @@ public:
   }
   
   /// @ingroup SampleHandlerGetters
-  std::string GetFlavourName(int iSample) {
-    if (iSample < 0 || iSample > GetNMCSamples()) {
-      MACH3LOG_ERROR("Invalid Sample Requested: {}",iSample);
+  std::string GetFlavourName(const int iChannel) {
+    if (iChannel < 0 || iChannel > static_cast<int>(OscChannels.size())) {
+      MACH3LOG_ERROR("Invalid Channel Requested: {}", iChannel);
       throw MaCh3Exception(__FILE__ , __LINE__);      
     }
-    return MCSamples[iSample].flavourName;
+    return OscChannels[iChannel].flavourName;
   }
 
   /// @ingroup SampleHandlerGetters
@@ -308,6 +308,7 @@ public:
   //===============================================================================
   //MC variables
   std::vector<FarDetectorCoreInfo> MCSamples;
+  std::vector<OscChannelInfo> OscChannels;
   //===============================================================================
 
   //===============================================================================
@@ -357,12 +358,8 @@ public:
   void InitialiseSingleFDMCObject(int iSample, int nEvents);
   void InitialiseSplineObject();
 
-  std::vector<std::string> oscchan_flavnames;
-  std::vector<std::string> oscchan_flavnames_Latex;
   std::vector<std::string> mc_files;
   std::vector<std::string> spline_files;
-  std::vector<int> sample_nupdg;
-  std::vector<int> sample_nupdgunosc;
 
   std::unordered_map<std::string, double> _modeNomWeightMap;
   

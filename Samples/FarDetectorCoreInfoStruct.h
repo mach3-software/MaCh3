@@ -1,7 +1,37 @@
 #pragma once
 #include <vector>
 #include <string>
+
 #include "Samples/Structs.h"
+
+/// @brief Store info about used osc channels
+struct OscChannelInfo {
+  /// Name of osc channel
+  std::string flavourName;
+  /// Fancy channel name (e.g., LaTeX formatted)
+  std::string flavourName_Latex;
+
+  /// PDG of initial flavour
+  int InitPDG;
+  /// PDG of oscillated/final flavour
+  int FinalPDG;
+};
+
+/// @brief Get Osc Channel Index based on initial and final PDG codes
+/// @param OscChannel The vector of available oscillation channels
+/// @param InitFlav Initial flavour PDG code
+/// @param FinalFlav Final flavour PDG code
+/// @return Index in OscChannel vector
+inline int GetOscChannel(const std::vector<OscChannelInfo>& OscChannel, const int InitFlav, const int FinalFlav) {
+  for (size_t i = 0; i < OscChannel.size(); ++i) {
+    if (InitFlav == OscChannel[i].InitPDG && FinalFlav == OscChannel[i].FinalPDG) {
+      return static_cast<int>(i);
+    }
+  }
+
+  MACH3LOG_ERROR("Didn't find Osc channel for InitFlav = {}, FinalFlav = {}", InitFlav, FinalFlav);
+  throw MaCh3Exception(__FILE__, __LINE__);
+}
 
 /// @brief constructors are same for all three so put in here
 struct FarDetectorCoreInfo {
@@ -15,8 +45,6 @@ struct FarDetectorCoreInfo {
 
   int nEvents; ///< how many MC events are there
   double ChannelIndex;
-  std::string flavourName;
-  std::string flavourName_Latex;
 
   std::vector<int*> Target; ///< target the interaction was on
   std::vector<const int*> nupdg;
