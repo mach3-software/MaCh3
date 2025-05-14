@@ -13,7 +13,7 @@ var searchData=
   ['adaptive_5fmcmc_10',['adaptive_mcmc',['../namespaceadaptive__mcmc.html',1,'']]],
   ['adaptive_5fsave_5fn_5fiterations_11',['adaptive_save_n_iterations',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a7b9bc927e28230929be740d471fb2b6b',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
   ['adaptive_5fupdate_5fstep_12',['adaptive_update_step',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac29758f6988af2d8271fe9950989baf4',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
-  ['adaptivehandler_13',['AdaptiveHandler',['../classParameterHandlerBase.html#a28076b9e3f3048b3a979fcad292a5167',1,'ParameterHandlerBase']]],
+  ['adaptivehandler_13',['AdaptiveHandler',['../classParameterHandlerBase.html#a1ebeda558155dfa06070e67218b9a567',1,'ParameterHandlerBase']]],
   ['adaptivemcmchandler_14',['AdaptiveMCMCHandler',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html',1,'adaptive_mcmc::AdaptiveMCMCHandler'],['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a8c1c9c62865ad7e2a9c9bdfa24ad54be',1,'adaptive_mcmc::AdaptiveMCMCHandler::AdaptiveMCMCHandler()']]],
   ['adaptivemcmchandler_2ecpp_15',['AdaptiveMCMCHandler.cpp',['../AdaptiveMCMCHandler_8cpp.html',1,'']]],
   ['adaptivemcmchandler_2eh_16',['AdaptiveMCMCHandler.h',['../AdaptiveMCMCHandler_8h.html',1,'']]],
