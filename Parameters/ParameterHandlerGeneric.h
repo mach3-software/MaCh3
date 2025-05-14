@@ -73,7 +73,7 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @brief DB Get norm/func parameters depending on given SampleName
     const std::vector<NormParameter> GetNormParsFromSampleName(const std::string& SampleName);
     /// @brief HH Get functional parameters for the relevant SampleName
-    const std::vector<FunctionalParameter> GetFunctionalParametersFromSampleName(const std::string& SampleName);
+    const std::vector<FunctionalParameter> GetFunctionalParametersFromSampleName(const std::string& SampleName) const;
 
     /// @brief KS: For most covariances prior and fparInit (prior) are the same, however for Xsec those can be different
     std::vector<double> GetNominalArray() override
@@ -156,6 +156,9 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @param Index Global parameter index
     /// @param Parameter Object storing info
     inline void GetBaseParameter(const YAML::Node& param, const int Index, TypeParameterBase& Parameter);
+
+    template<typename ParamT>
+    std::vector<ParamT> GetTypeParamsFromSampleName(const std::map<int, int>& indexMap, const std::vector<ParamT>& params, const std::string& SampleName) const
 
     /// Type of parameter like norm, spline etc.
     std::vector<SystType> _fParamType;

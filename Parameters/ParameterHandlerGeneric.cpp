@@ -324,29 +324,35 @@ FunctionalParameter ParameterHandlerGeneric::GetFunctionalParameters(const YAML:
 
 // ********************************************
 // HH: Grab the Functional parameters for the relevant SampleName
-const std::vector<FunctionalParameter> ParameterHandlerGeneric::GetFunctionalParametersFromSampleName(const std::string& SampleName) {
-  // ********************************************
-  std::vector<FunctionalParameter> returnVec;
-  for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kFunc]) {
-    auto &FuncIndex = pair.first;
-    auto &GlobalIndex = pair.second;
-    if (AppliesToSample(GlobalIndex, SampleName)) {
-      returnVec.push_back(FuncParams[FuncIndex]);
-    }
-  }
-  return returnVec;
+const std::vector<FunctionalParameter> ParameterHandlerGeneric::GetFunctionalParametersFromSampleName(const std::string& SampleName) const {
+// ********************************************
+  return GetTypeParamsFromSampleName(_fSystToGlobalSystIndexMap[SystType::kFunc], FuncParams, SampleName);
 }
 
 // ********************************************
 // DB Grab the Normalisation parameters for the relevant SampleName
-const std::vector<NormParameter> ParameterHandlerGeneric::GetNormParsFromSampleName(const std::string& SampleName) {
+const std::vector<NormParameter> ParameterHandlerGeneric::GetNormParsFromSampleName(const std::string& SampleName) const {
 // ********************************************
-  std::vector<NormParameter> returnVec;
-  for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kNorm]) {
-    auto &NormIndex = pair.first;
-    auto &GlobalIndex = pair.second;
-    if (AppliesToSample(GlobalIndex, SampleName)) {
-      returnVec.push_back(NormParams[NormIndex]);
+  return GetTypeParamsFromSampleName(_fSystToGlobalSystIndexMap[SystType::kNorm], NormParams, SampleName);
+}
+
+// ********************************************
+// DB Grab the Normalisation parameters for the relevant SampleName
+const std::vector<SplineParameter> ParameterHandlerGeneric::GetNormParsFromSampleName(const std::string& SampleName) const {
+// ********************************************
+  return GetTypeParamsFromSampleName(_fSystToGlobalSystIndexMap[SystType::kSpline], SplineParams, SampleName);
+}
+
+// ********************************************
+template<typename ParamT>
+std::vector<ParamT> GetTypeParamsFromSampleName(const std::map<int, int>& indexMap, const std::vector<ParamT>& params, const std::string& SampleName) const {
+// ********************************************
+  std::vector<ParamT> returnVec;
+  for (const auto& pair : indexMap) {
+    const auto& localIndex = pair.first;
+    const auto& globalIndex = pair.second;
+    if (AppliesToSample(globalIndex, SampleName)) {
+      returnVec.push_back(params[localIndex]);
     }
   }
   return returnVec;
