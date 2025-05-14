@@ -192,7 +192,7 @@ public:
   /// @brief wrapper to call set binning functions based on sample config info
   void SetupSampleBinning();
   /// @brief Initialise data, MC and W2 histograms
-  void SetupPDF(const size_t numberXBins, const size_t numberYBins);
+  void SetupReweightArrays(const size_t numberXBins, const size_t numberYBins);
 
   /// @brief the strings associated with the variables used for the binning e.g. "RecoNeutrinoEnergy"
   std::string XVarStr, YVarStr;

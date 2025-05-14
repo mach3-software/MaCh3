@@ -935,7 +935,7 @@ void SampleHandlerFD::CalcNormsBins(const int iSample) {
 }
 
 // ************************************************
-void SampleHandlerFD::SetupPDF(const size_t numberXBins, const size_t numberYBins) {
+void SampleHandlerFD::SetupReweightArrays(const size_t numberXBins, const size_t numberYBins) {
 // ************************************************
   //Set the number of X and Y bins now
   nXBins = numberXBins;
@@ -984,7 +984,7 @@ void SampleHandlerFD::Set1DBinning(size_t nbins, double* boundaries)
   dathist2d->SetBins(static_cast<int>(nbins),boundaries,1,YBinEdges_Arr);
 
   //Set the number of X and Y bins now
-  SetupPDF(XBinEdges.size() - 1, YBinEdges.size() - 1);
+  SetupReweightArrays(XBinEdges.size() - 1, YBinEdges.size() - 1);
 
   FindNominalBinAndEdges1D();
 }
@@ -1008,7 +1008,7 @@ void SampleHandlerFD::Set1DBinning(size_t nbins, double low, double high)
   dathist2d->SetBins(static_cast<int>(nbins),low,high,1,YBinEdges[0],YBinEdges[1]);
 
   //Set the number of X and Y bins now
-  SetupPDF(XBinEdges.size() - 1, YBinEdges.size() - 1);
+  SetupReweightArrays(XBinEdges.size() - 1, YBinEdges.size() - 1);
 
   FindNominalBinAndEdges1D();
 }
@@ -1080,7 +1080,7 @@ void SampleHandlerFD::Set2DBinning(size_t nbins1, double* boundaries1, size_t nb
   }
   
   //Set the number of X and Y bins now
-  SetupPDF(XBinEdges.size() - 1, YBinEdges.size() - 1);
+  SetupReweightArrays(XBinEdges.size() - 1, YBinEdges.size() - 1);
 
   FindNominalBinAndEdges2D();
 }
@@ -1105,7 +1105,7 @@ void SampleHandlerFD::Set2DBinning(size_t nbins1, double low1, double high1, siz
   }
 
   //Set the number of X and Y bins now
-  SetupPDF(XBinEdges.size() - 1, YBinEdges.size() - 1);
+  SetupReweightArrays(XBinEdges.size() - 1, YBinEdges.size() - 1);
 
   FindNominalBinAndEdges2D();
 }
