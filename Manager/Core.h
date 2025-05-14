@@ -44,11 +44,20 @@ namespace M3 {
   constexpr static const double _DEFAULT_RETURN_VAL_ = -999999.123456;
 
   /// Some commonly used variables to which we set pointers to
-  constexpr static const double Unity = 1.;
-  constexpr static const double Zero = 0.;
+  constexpr static const double Unity_D = 1.;
   constexpr static const float Unity_F = 1.;
+  #ifdef _LOW_MEMORY_STRUCTS_
+  constexpr static const float_t Unity = Unity_F;
+  #else
+  constexpr static const float_t Unity = Unity_D;
+  #endif
+  constexpr static const double Zero_D = 0.;
   constexpr static const float Zero_F = 0.;
-  constexpr static const int Unity_Int = 1;
+  #ifdef _LOW_MEMORY_STRUCTS_
+  constexpr static const float_t Zero = Zero_F;
+  #else
+  constexpr static const float_t Zero = Zero_D;
+  #endif
 
   constexpr static const double KinematicLowBound = std::numeric_limits<double>::lowest();
   constexpr static const double KinematicUpBound = std::numeric_limits<double>::max();

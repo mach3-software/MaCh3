@@ -1379,25 +1379,12 @@ void SampleHandlerFD::SetupNuOscillatorPointers() {
   for (size_t iSample=0;iSample<MCSamples.size();iSample++) {
 
     for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
-      // KS: Sry but if we use low memory we need to point to float not double...
-#ifdef _LOW_MEMORY_STRUCTS_
-      MCSamples[iSample].osc_w_pointer[iEvent] = &M3::Unity_F;
-#else
       MCSamples[iSample].osc_w_pointer[iEvent] = &M3::Unity;
-#endif
       if (MCSamples[iSample].isNC[iEvent]) {
         if (*MCSamples[iSample].nupdg[iEvent] != *MCSamples[iSample].nupdgUnosc[iEvent]) {
-#ifdef _LOW_MEMORY_STRUCTS_
-          MCSamples[iSample].osc_w_pointer[iEvent] = &M3::Zero_F;
-#else
           MCSamples[iSample].osc_w_pointer[iEvent] = &M3::Zero;
-#endif
         } else {
-#ifdef _LOW_MEMORY_STRUCTS_
-          MCSamples[iSample].osc_w_pointer[iEvent] = &M3::Unity_F;
-#else
           MCSamples[iSample].osc_w_pointer[iEvent] = &M3::Unity;
-#endif
         }
       } else {
         int InitFlav = M3::_BAD_INT_;
@@ -1538,9 +1525,9 @@ void SampleHandlerFD::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   fdobj->ChannelIndex = iSample;
   
   int nEvents = fdobj->nEvents;
-  fdobj->x_var.resize(nEvents, &M3::Unity);
-  fdobj->y_var.resize(nEvents, &M3::Unity);
-  fdobj->rw_etru.resize(nEvents, &M3::Unity);
+  fdobj->x_var.resize(nEvents, &M3::Unity_D);
+  fdobj->y_var.resize(nEvents, &M3::Unity_D);
+  fdobj->rw_etru.resize(nEvents, &M3::Unity_D);
   fdobj->XBin.resize(nEvents, -1);
   fdobj->YBin.resize(nEvents, -1);
   fdobj->NomXBin.resize(nEvents, -1);
@@ -1549,7 +1536,7 @@ void SampleHandlerFD::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   fdobj->rw_lower_lower_xbinedge.resize(nEvents, -1);
   fdobj->rw_upper_xbinedge.resize(nEvents, -1);
   fdobj->rw_upper_upper_xbinedge.resize(nEvents, -1);
-  fdobj->mode.resize(nEvents, &M3::Unity);
+  fdobj->mode.resize(nEvents, &M3::Unity_D);
   fdobj->nxsec_norm_pointers.resize(nEvents);
   fdobj->xsec_norm_pointers.resize(nEvents);
   fdobj->xsec_norms_bins.resize(nEvents);
@@ -1562,11 +1549,7 @@ void SampleHandlerFD::InitialiseSingleFDMCObject(int iSample, int nEvents_) {
   fdobj->ntotal_weight_pointers.resize(nEvents);
   fdobj->total_weight_pointers.resize(nEvents);
   fdobj->Target.resize(nEvents, 0);
-#ifdef _LOW_MEMORY_STRUCTS_
-  fdobj->osc_w_pointer.resize(nEvents, &M3::Unity_F);
-#else
   fdobj->osc_w_pointer.resize(nEvents, &M3::Unity);
-#endif
 
   for(int iEvent = 0 ; iEvent < fdobj->nEvents ; ++iEvent){
     fdobj->isNC[iEvent] = false;
