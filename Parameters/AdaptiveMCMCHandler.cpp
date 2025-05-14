@@ -24,7 +24,8 @@ AdaptiveMCMCHandler::~AdaptiveMCMCHandler() {
 }
 
 // ********************************************
-bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const std::string& matrix_name_str, std::vector<double>* parameters, std::vector<double>* fixed) {
+bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const std::string& matrix_name_str,
+                                        const std::vector<double>* parameters, const std::vector<double>* fixed) {
 // ********************************************
   /*
    * HW: Idea is that adaption can simply read the YAML config
