@@ -1176,17 +1176,17 @@ Functions</h2></td></tr>
 
 <p>Get pointers to Osc params from Sample name. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerOsc_8cpp_source.html#l00105">105</a> of file <a class="el" href="ParameterHandlerOsc_8cpp_source.html">ParameterHandlerOsc.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  105</span>                                                                                                  {</div>
-<div class="line"><span class="lineno">  106</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  107</span>  std::vector&lt;const double*&gt; returnVec;</div>
-<div class="line"><span class="lineno">  108</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>; ++i) {</div>
-<div class="line"><span class="lineno">  109</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd">AppliesToSample</a>(i, SampleName)) {</div>
-<div class="line"><span class="lineno">  110</span>      returnVec.push_back(<a class="code hl_function" href="classParameterHandlerBase.html#a2ed43dcb9347691c753a02d1aee633ab">RetPointer</a>(i));</div>
-<div class="line"><span class="lineno">  111</span>    }</div>
-<div class="line"><span class="lineno">  112</span>  }</div>
-<div class="line"><span class="lineno">  113</span>  <span class="keywordflow">return</span> returnVec;</div>
-<div class="line"><span class="lineno">  114</span>}</div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerOsc_8cpp_source.html#l00108">108</a> of file <a class="el" href="ParameterHandlerOsc_8cpp_source.html">ParameterHandlerOsc.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  108</span>                                                                                                  {</div>
+<div class="line"><span class="lineno">  109</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  110</span>  std::vector&lt;const double*&gt; returnVec;</div>
+<div class="line"><span class="lineno">  111</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>; ++i) {</div>
+<div class="line"><span class="lineno">  112</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd">AppliesToSample</a>(i, SampleName)) {</div>
+<div class="line"><span class="lineno">  113</span>      returnVec.push_back(<a class="code hl_function" href="classParameterHandlerBase.html#a2ed43dcb9347691c753a02d1aee633ab">RetPointer</a>(i));</div>
+<div class="line"><span class="lineno">  114</span>    }</div>
+<div class="line"><span class="lineno">  115</span>  }</div>
+<div class="line"><span class="lineno">  116</span>  <span class="keywordflow">return</span> returnVec;</div>
+<div class="line"><span class="lineno">  117</span>}</div>
 <div class="ttc" id="aclassParameterHandlerBase_html_a2ed43dcb9347691c753a02d1aee633ab"><div class="ttname"><a href="classParameterHandlerBase.html#a2ed43dcb9347691c753a02d1aee633ab">ParameterHandlerBase::RetPointer</a></div><div class="ttdeci">const double * RetPointer(const int iParam)</div><div class="ttdoc">DB Pointer return to param position.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00230">ParameterHandlerBase.h:230</a></div></div>
 <div class="ttc" id="aclassParameterHandlerBase_html_a3c5d92e6b592f18ea4d6bd9afaca7ebd"><div class="ttname"><a href="classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd">ParameterHandlerBase::AppliesToSample</a></div><div class="ttdeci">bool AppliesToSample(const int SystIndex, const std::string &amp;SampleName) const</div><div class="ttdoc">Check if parameter is affecting given sample name.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l01219">ParameterHandlerBase.cpp:1219</a></div></div>
 </div><!-- fragment -->

@@ -127,16 +127,16 @@ $(function() {
 <p class="enddd">Add code to read in Violin plots from the postfit error output files.  </p>
 </dd>
 <dt>Member <a class="el" href="classMaCh3Plotting_1_1InputManager.html#aad778d8694f9b581d09279584733f6ea">MaCh3Plotting::InputManager::fillFileInfo</a>  (<a class="el" href="structMaCh3Plotting_1_1InputFile.html" title="Struct which wraps around the actual input file and also holds general information,...">InputFile</a> &amp;inputFileDef, bool printThoughts=true)</dt>
-<dd><p class="startdd"><a class="anchor" id="_todo000022"></a>Would like to be able to specify what kind of file and what fitter an input is from on the command like: e.g. like `plotApp [options] &lt;fileName1&gt;;&lt;fileType&gt;;&lt;fitterName&gt;... and only try to auto-detect it if its not specified, this would save some time and would also be very helpful in situations where we can't auto-detect e.g. if there is some kind of overlap in the file structure between two fitters </p>
-<p class="enddd"><a class="anchor" id="_todo000023"></a>add a check here to make sure all the scans that are in the file are being picked up by the reader, and warn if any are not being used  </p>
+<dd><p class="startdd"><a class="anchor" id="_todo000023"></a>add a check here to make sure all the scans that are in the file are being picked up by the reader, and warn if any are not being used </p>
+<p class="enddd"><a class="anchor" id="_todo000022"></a>Would like to be able to specify what kind of file and what fitter an input is from on the command like: e.g. like `plotApp [options] &lt;fileName1&gt;;&lt;fileType&gt;;&lt;fitterName&gt;... and only try to auto-detect it if its not specified, this would save some time and would also be very helpful in situations where we can't auto-detect e.g. if there is some kind of overlap in the file structure between two fitters  </p>
 </dd>
 <dt>Member <a class="el" href="classMaCh3Plotting_1_1PlottingManager.html#aeb042d09d55644d8b35632f66f1832b6">MaCh3Plotting::PlottingManager::addUserOption</a>  ()</dt>
-<dd><p class="startdd"><a class="anchor" id="_todo000030"></a>Would be good to add functionality to this to allow user to add their own options. </p>
+<dd><p class="startdd"><a class="anchor" id="_todo000031"></a>Implement this. </p>
+<p class="interdd"><a class="anchor" id="_todo000030"></a>Would be good to add functionality to this to allow user to add their own options. </p>
 <p class="interdd"></p>
 <p class="interdd">The way I can think to do this would be have fn <a class="el" href="classMaCh3Plotting_1_1PlottingManager.html#aeb042d09d55644d8b35632f66f1832b6" title="Describe an option you want to add to the PlottingManager which can be read in from the command line ...">addUserOption()</a> to set the options, defining the cmd line option (e.g. -x), the name of the option, and maybe some description of the option to be used in the help message </p>
 <p class="interdd"></p>
-<p class="interdd">can then store these options in some map or something to be retrieved later by <a class="el" href="classMaCh3Plotting_1_1PlottingManager.html#af9f60a6196a9249d7ad7fee6c7bba89a" title="Retrieve a command line option you specified using addOption.">getUserOption()</a> </p>
-<p class="enddd"><a class="anchor" id="_todo000031"></a>Implement this.  </p>
+<p class="enddd">can then store these options in some map or something to be retrieved later by <a class="el" href="classMaCh3Plotting_1_1PlottingManager.html#af9f60a6196a9249d7ad7fee6c7bba89a" title="Retrieve a command line option you specified using addOption.">getUserOption()</a>  </p>
 </dd>
 <dt>Member <a class="el" href="classMaCh3Plotting_1_1PlottingManager.html#a9c1177794e2fecce4e258ee8446d6569">MaCh3Plotting::PlottingManager::getOutputName</a>  (const std::string &amp;suffix)</dt>
 <dd><a class="anchor" id="_todo000036"></a>Make this support .root files too  </dd>
@@ -147,9 +147,9 @@ $(function() {
 <dt>Member <a class="el" href="classMaCh3Plotting_1_1PlottingManager.html#a6abd05428a9f8827c67a22bd6f8ffce3">MaCh3Plotting::PlottingManager::parseInputs</a>  (int argc, char *const *argv)</dt>
 <dd><a class="anchor" id="_todo000029"></a>make this able to return any un-parsed arguments so that user can specify their own arguments for use in their plotting scripts  </dd>
 <dt>Member <a class="el" href="classMaCh3Plotting_1_1PlottingManager.html#a8910c157ce1ec6698f3bacdf521789ff">MaCh3Plotting::PlottingManager::usage</a>  ()</dt>
-<dd><p class="startdd"><a class="anchor" id="_todo000033"></a>Implement this. </p>
-<p class="interdd"><a class="anchor" id="_todo000034"></a></p>
-<p class="enddd"><a class="anchor" id="_todo000035"></a>could add some function to allow user to specify the help message for their particular script, then auto generate what the cmd line syntax looks like based on user specified options?  </p>
+<dd><p class="startdd"><a class="anchor" id="_todo000034"></a></p>
+<p class="interdd"><a class="anchor" id="_todo000035"></a>could add some function to allow user to specify the help message for their particular script, then auto generate what the cmd line syntax looks like based on user specified options? </p>
+<p class="enddd"><a class="anchor" id="_todo000033"></a>Implement this.  </p>
 </dd>
 <dt>Member <a class="el" href="classmcmc.html#adf4c80255288c5396da3b95d609ce4b2">mcmc::StartFromPreviousFit</a>  (const std::string &amp;FitName) override</dt>
 <dd><a class="anchor" id="_todo000013"></a>implement some check that number of params matches etc  </dd>
@@ -170,8 +170,6 @@ $(function() {
 </dd>
 <dt>Member <a class="el" href="classParameterHandlerBase.html#a216561fe8c8fbcd8e607d857a0559738">ParameterHandlerBase::PrintParameters</a>  () const</dt>
 <dd><a class="anchor" id="_todo000037"></a>remove it  </dd>
-<dt>Member <a class="el" href="classParameterHandlerOsc.html#a2d67b5258e8f026b79ccc3a8a4c8ab14">ParameterHandlerOsc::ParameterHandlerOsc</a>  (const std::vector&lt; std::string &gt; &amp;FileNames, std::string name="osc_cov", double threshold=-1, int FirstPCAdpar=-999, int LastPCAdpar=-999)</dt>
-<dd><a class="anchor" id="_todo000038"></a>KS: Technically if we would like to use PCA we have to initialise parts here...  </dd>
 <dt>File <a class="el" href="PlotMCMCDiag_8cpp.html">PlotMCMCDiag.cpp</a>  </dt>
 <dd><a class="anchor" id="_todo000020"></a>this need serious refactor  </dd>
 <dt>Member <a class="el" href="classSampleHandlerFD.html#a1a984c564107c7207a2611d0bf67d9cc">SampleHandlerFD::SetupSplines</a>  ()=0</dt>
