@@ -4,16 +4,13 @@
 #include "Manager/MaCh3Logger.h"
 #include <cstddef>
 
-_MaCh3_Safe_Include_Start_ //{
-#include "Oscillator/OscillatorFactory.h"
-#include "Constants/OscillatorConstants.h"
-_MaCh3_Safe_Include_End_ //}
-
 #include <algorithm>
 #include <memory>
 
-SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGeneric* xsec_cov, ParameterHandlerOsc* osc_cov, OscillatorBase* OscillatorObj_) : SampleHandlerBase()
-{
+// ************************************************
+SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGeneric* xsec_cov,
+                                 ParameterHandlerOsc* osc_cov, const std::shared_ptr<OscillationHandler>& OscillatorObj_) : SampleHandlerBase() {
+// ************************************************
   MACH3LOG_INFO("-------------------------------------------------------------------");
   MACH3LOG_INFO("Creating SampleHandlerFD object");
 
@@ -30,9 +27,8 @@ SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGen
   OscParHandler = osc_cov;
 
   if (OscillatorObj_ != nullptr) {
-    MACH3LOG_WARN("You have passed an OscillatorBase object through the constructor of a SampleHandlerFD object - this will be used for all oscillation channels");
-    NuOscProbCalcers.push_back(OscillatorObj_);
-    SharedNuOsc = true;
+    MACH3LOG_WARN("You have passed an Oscillator object through the constructor of a SampleHandlerFD object - this will be used for all oscillation channels");
+    Oscillator = OscillatorObj_;
   }
 
   KinematicParameters = nullptr;
@@ -65,13 +61,6 @@ SampleHandlerFD::~SampleHandlerFD()
   //ETA - there is a chance that you haven't added any data...
   if(SampleHandlerFD_data != nullptr){delete[] SampleHandlerFD_data;}
  
-  if(SharedNuOsc == false)
-  {
-    for (unsigned int iCalc=0;iCalc<NuOscProbCalcers.size();iCalc++) {
-      delete NuOscProbCalcers[iCalc];
-    }
-  }
-
   if(THStackLeg != nullptr) delete THStackLeg;
 }
 
@@ -83,16 +72,6 @@ void SampleHandlerFD::ReadSampleConfig()
   SampleTitle = Get<std::string>(SampleManager->raw()["SampleTitle"], __FILE__ , __LINE__);
   //SampleName has to be provided in the sample yaml otherwise this will throw an exception
   SampleName = Get<std::string>(SampleManager->raw()["SampleName"], __FILE__ , __LINE__);
-  NuOscillatorConfigFile = Get<std::string>(SampleManager->raw()["NuOsc"]["NuOscConfigFile"], __FILE__ , __LINE__);
-  EqualBinningPerOscChannel = Get<bool>(SampleManager->raw()["NuOsc"]["EqualBinningPerOscChannel"], __FILE__ , __LINE__);
-
-  // TN override the sample setting if not using binned oscillation
-  if (EqualBinningPerOscChannel) {
-    if (YAML::LoadFile(NuOscillatorConfigFile)["General"]["CalculationType"].as<std::string>() == "Unbinned") {
-      MACH3LOG_WARN("Tried using EqualBinningPerOscChannel while using Unbinned oscillation calculation, changing EqualBinningPerOscChannel to false");
-      EqualBinningPerOscChannel = false;
-    }
-  }
 
   fTestStatistic = static_cast<TestStatistic>(SampleManager->GetMCStatLLH());
   if (CheckNodeExists(SampleManager->raw(), "LikelihoodOptions")) {
@@ -214,16 +193,17 @@ void SampleHandlerFD::Initialise() {
   MACH3LOG_INFO("Total number of events is: {}", TotalMCEvents);
 
   if (OscParHandler) {
-    MACH3LOG_INFO("Setting up NuOscillator.. ");
-    if (NuOscProbCalcers.size() != 0) {
+    MACH3LOG_INFO("Setting up NuOscillator..");
+    if (Oscillator != nullptr) {
       MACH3LOG_INFO("You have passed an OscillatorBase object through the constructor of a SampleHandlerFD object - this will be used for all oscillation channels");
-      MACH3LOG_INFO("Overwriting EqualBinningPerOscChannel = true");
-      EqualBinningPerOscChannel = true;
+      if(Oscillator->isEqualBinningPerOscChannel() != true) {
+        MACH3LOG_ERROR("Trying to run shared NuOscillator without EqualBinningPerOscChannel, this will not work");
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
     } else {
       InitialiseNuOscillatorObjects();
     }
     SetupNuOscillatorPointers();
-    OscParams = OscParHandler->GetOscParsFromSampleName(SampleName);
   }
 
   MACH3LOG_INFO("Setting up Sample Binning..");
@@ -361,31 +341,16 @@ bool SampleHandlerFD::IsEventSelected(const int iSample, const int iEvent) {
 }
 
 //************************************************
-// Reweight function - Depending on Osc Calculator this function uses different CalcOsc functions
+// Reweight function
 void SampleHandlerFD::Reweight() {
 //************************************************
   //KS: Reset the histograms before reweight 
   ResetHistograms();
   
-  //You only need to do these things if OscParHandler has been initialised
+  //You only need to do these things if Oscillator has been initialised
   //if not then you're not considering oscillations
-  if (OscParHandler) {
-    std::vector<M3::float_t> OscVec(OscParams.size());
-    for (size_t iPar = 0; iPar < OscParams.size(); ++iPar) {
-      #pragma GCC diagnostic push
-      #pragma GCC diagnostic ignored "-Wuseless-cast"
-      OscVec[iPar] = M3::float_t(*OscParams[iPar]);
-      #pragma GCC diagnostic pop
-    }
+  if (Oscillator) Oscillator->Evaluate();
 
-    if (EqualBinningPerOscChannel) {
-      NuOscProbCalcers[0]->CalculateProbabilities(OscVec);
-    } else {
-      for (int iSample=0;iSample<int(MCSamples.size());iSample++) {
-        NuOscProbCalcers[iSample]->CalculateProbabilities(OscVec);
-      }
-    }
-  }
   // Calculate weight coming from all splines if we initialised handler
   if(SplineHandler) SplineHandler->Evaluate();
 
@@ -1307,77 +1272,54 @@ void SampleHandlerFD::AddData(TH2D* Data) {
 // ************************************************
 void SampleHandlerFD::InitialiseNuOscillatorObjects() {
 // ************************************************
-  OscillatorFactory* OscillFactory = new OscillatorFactory();
   if (!OscParHandler) {
-    MACH3LOG_WARN("Attempted to setup NuOscillator without ParameterHandler object");
-    return;
+    MACH3LOG_ERROR("Attempted to setup NuOscillator without ParameterHandler object");
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
 
-  //DB's explanation of EqualBinningPerOscChannel:
-  //In the situation where we are applying binning oscillation probabilities to a SampleHandler object, it maybe the case that there is identical binning per oscillation channel
-  //In which case, and remembering that each NuOscillator::Oscillator object calculate the oscillation probabilities for all channels, we just have to create one Oscillator object and use the results from that
-  //This means that we can get upto a factor of 12 reduction in the calculation time of the oscillation probabilities, because we don't need to repeat the operation per oscillation channel
+  auto NuOscillatorConfigFile = Get<std::string>(SampleManager->raw()["NuOsc"]["NuOscConfigFile"], __FILE__ , __LINE__);
+  auto EqualBinningPerOscChannel = Get<bool>(SampleManager->raw()["NuOsc"]["EqualBinningPerOscChannel"], __FILE__ , __LINE__);
 
+  // TN override the sample setting if not using binned oscillation
   if (EqualBinningPerOscChannel) {
-    NuOscProbCalcers = std::vector<OscillatorBase*>(1);
-    LoggerPrint("NuOscillator",
-		[](const std::string& message) { MACH3LOG_INFO("{}", message); },
-		[this, &OscillFactory]() {
-		  this->NuOscProbCalcers[0] = OscillFactory->CreateOscillator(this->NuOscillatorConfigFile);
-		});
-
-    if (!NuOscProbCalcers[0]->EvalPointsSetInConstructor()) {
-      MACH3LOG_ERROR("Attempted to use equal binning per oscillation channel, but not binning has been set in the NuOscillator::Oscillator object");
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-    NuOscProbCalcers[0]->Setup();
-  } else {
-    NuOscProbCalcers = std::vector<OscillatorBase*>(int(MCSamples.size()));
-    for (size_t iSample=0;iSample<MCSamples.size();iSample++) {
-      MACH3LOG_INFO("Setting up NuOscillator::Oscillator object in OscillationChannel: {}/{}", iSample, MCSamples.size());
-      
-      LoggerPrint("NuOscillator",
-		  [](const std::string& message) { MACH3LOG_INFO("{}", message); },
-		  [this, iSample, &OscillFactory]() {
-		    this->NuOscProbCalcers[iSample] = OscillFactory->CreateOscillator(this->NuOscillatorConfigFile);
-		  });
-      
-      if (!NuOscProbCalcers[iSample]->EvalPointsSetInConstructor()) {
-	std::vector<M3::float_t> EnergyArray;
-	for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
-	  //DB Remove NC events from the arrays which are handed to the NuOscillator objects
-	  if (!MCSamples[iSample].isNC[iEvent]) {
-	    EnergyArray.push_back(M3::float_t(*(MCSamples[iSample].rw_etru[iEvent])));
-	  }
-	}
-	std::sort(EnergyArray.begin(),EnergyArray.end());
-	NuOscProbCalcers[iSample]->SetEnergyArrayInCalcer(EnergyArray);
-	
-	//============================================================================
-	//DB Atmospheric only part
-	if (MCSamples[iSample].rw_truecz.size() > 0 && int(MCSamples[iSample].rw_truecz.size()) == MCSamples[iSample].nEvents) { //Can only happen if truecz has been initialised within the experiment specific code
-	  std::vector<M3::float_t> CosineZArray;
-	  for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
-	    //DB Remove NC events from the arrays which are handed to the NuOscillator objects
-	    if (!MCSamples[iSample].isNC[iEvent]) {
-	      CosineZArray.push_back(M3::float_t(*(MCSamples[iSample].rw_truecz[iEvent])));
-	    }
-	  }
-	  std::sort(CosineZArray.begin(),CosineZArray.end());
-	  
-	  NuOscProbCalcers[iSample]->SetCosineZArrayInCalcer(CosineZArray);
-	}
-      }
-      NuOscProbCalcers[iSample]->Setup();
+    if (YAML::LoadFile(NuOscillatorConfigFile)["General"]["CalculationType"].as<std::string>() == "Unbinned") {
+      MACH3LOG_WARN("Tried using EqualBinningPerOscChannel while using Unbinned oscillation calculation, changing EqualBinningPerOscChannel to false");
+      EqualBinningPerOscChannel = false;
     }
   }
+  std::vector<const double*> OscParams = OscParHandler->GetOscParsFromSampleName(SampleName);
+  Oscillator = std::make_shared<OscillationHandler>(NuOscillatorConfigFile, EqualBinningPerOscChannel, OscParams, static_cast<int>(MCSamples.size()));
 
-  delete OscillFactory;
+  if (!EqualBinningPerOscChannel) {
+    for (size_t iSample=0;iSample<MCSamples.size();iSample++) {
+      std::vector<M3::float_t> EnergyArray;
+      std::vector<M3::float_t> CosineZArray;
+
+      for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
+        //DB Remove NC events from the arrays which are handed to the NuOscillator objects
+        if (!MCSamples[iSample].isNC[iEvent]) {
+          EnergyArray.push_back(M3::float_t(*(MCSamples[iSample].rw_etru[iEvent])));
+        }
+      }
+      std::sort(EnergyArray.begin(),EnergyArray.end());
+      //============================================================================
+      //DB Atmospheric only part
+      if (MCSamples[iSample].rw_truecz.size() > 0 && int(MCSamples[iSample].rw_truecz.size()) == MCSamples[iSample].nEvents) { //Can only happen if truecz has been initialised within the experiment specific code
+        for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
+          //DB Remove NC events from the arrays which are handed to the NuOscillator objects
+          if (!MCSamples[iSample].isNC[iEvent]) {
+            CosineZArray.push_back(M3::float_t(*(MCSamples[iSample].rw_truecz[iEvent])));
+          }
+        }
+        std::sort(CosineZArray.begin(),CosineZArray.end());
+      }
+      Oscillator->SetOscillatorBinning(static_cast<int>(iSample), EnergyArray, CosineZArray);
+    } // end loop over channels
+  }
 }
 
 void SampleHandlerFD::SetupNuOscillatorPointers() {
   for (size_t iSample=0;iSample<MCSamples.size();iSample++) {
-
     for (int iEvent=0;iEvent<MCSamples[iSample].nEvents;iEvent++) {
       MCSamples[iSample].osc_w_pointer[iEvent] = &M3::Unity;
       if (MCSamples[iSample].isNC[iEvent]) {
@@ -1402,21 +1344,16 @@ void SampleHandlerFD::SetupNuOscillatorPointers() {
           throw MaCh3Exception(__FILE__, __LINE__);
         }
 
-        int Index = 0;
-        if (!EqualBinningPerOscChannel) {
-          Index = static_cast<int>(iSample);
-        }
         if (MCSamples[iSample].rw_truecz.size() > 0) { //Can only happen if truecz has been initialised within the experiment specific code
           //Atmospherics
-          MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[Index]->ReturnWeightPointer(InitFlav,FinalFlav,FLOAT_T(*(MCSamples[iSample].rw_etru[iEvent])),FLOAT_T(*(MCSamples[iSample].rw_truecz[iEvent])));
+          MCSamples[iSample].osc_w_pointer[iEvent] = Oscillator->GetNuOscillatorPointers(static_cast<int>(iSample), InitFlav, FinalFlav, FLOAT_T(*(MCSamples[iSample].rw_etru[iEvent])), FLOAT_T(*(MCSamples[iSample].rw_truecz[iEvent])));
         } else {
           //Beam
-          MCSamples[iSample].osc_w_pointer[iEvent] = NuOscProbCalcers[Index]->ReturnWeightPointer(InitFlav,FinalFlav,FLOAT_T(*(MCSamples[iSample].rw_etru[iEvent])));
+          MCSamples[iSample].osc_w_pointer[iEvent] = Oscillator->GetNuOscillatorPointers(static_cast<int>(iSample), InitFlav, FinalFlav, FLOAT_T(*(MCSamples[iSample].rw_etru[iEvent])));
         }
       } // end if NC
     } // end loop over events
   }// end loop over channels
-  
 }
 
 std::string SampleHandlerFD::GetSampleName(int iSample) const {
