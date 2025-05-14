@@ -1,5 +1,5 @@
 <map id="MaCh3Plotting::InputFile" name="MaCh3Plotting::InputFile">
-<area shape="rect" id="node1" title=" " alt="" coords="1751,382,1932,407"/>
+<area shape="rect" id="node1" title="Struct which wraps around the actual input file and also holds general information,..." alt="" coords="1751,382,1932,407"/>
 <area shape="rect" id="node2" href="$classMCMCProcessor.html" title="Class responsible for processing MCMC chains, performing diagnostics, generating plots,..." alt="" coords="1476,735,1603,761"/>
 <area shape="rect" id="node3" title=" " alt="" coords="248,414,335,439"/>
 <area shape="rect" id="node6" title=" " alt="" coords="503,1221,689,1246"/>

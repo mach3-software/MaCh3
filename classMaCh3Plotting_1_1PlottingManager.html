@@ -106,7 +106,7 @@ Collaboration diagram for MaCh3Plotting::PlottingManager:</div>
 <area shape="rect" title=" " alt="" coords="503,318,689,343"/>
 <area shape="rect" href="classMaCh3Plotting_1_1InputManager.html" title="This guy talks to the input files and is intended to smooth over the fact that our OA fitters use suc..." alt="" coords="2492,266,2707,291"/>
 <area shape="rect" title=" " alt="" coords="994,311,1167,366"/>
-<area shape="rect" href="structMaCh3Plotting_1_1InputFile.html" title=" " alt="" coords="1819,1522,2001,1547"/>
+<area shape="rect" href="structMaCh3Plotting_1_1InputFile.html" title="Struct which wraps around the actual input file and also holds general information,..." alt="" coords="1819,1522,2001,1547"/>
 <area shape="rect" href="classMCMCProcessor.html" title="Class responsible for processing MCMC chains, performing diagnostics, generating plots,..." alt="" coords="1476,1055,1603,1081"/>
 <area shape="rect" title=" " alt="" coords="519,1489,673,1529"/>
 <area shape="rect" title=" " alt="" coords="713,1531,944,1600"/>
@@ -118,7 +118,7 @@ Collaboration diagram for MaCh3Plotting::PlottingManager:</div>
 <area shape="rect" title=" " alt="" coords="5,1489,144,1529"/>
 <area shape="rect" title=" " alt="" coords="993,691,1168,731"/>
 <area shape="rect" title=" " alt="" coords="2777,195,3007,235"/>
-<area shape="rect" href="classMaCh3Plotting_1_1StyleManager.html" title=" " alt="" coords="2492,202,2707,227"/>
+<area shape="rect" href="classMaCh3Plotting_1_1StyleManager.html" title="EW: provides centralized styling utilities for plots, including name prettification and style applica..." alt="" coords="2492,202,2707,227"/>
 <area shape="rect" title=" " alt="" coords="2777,259,3007,299"/>
 <area shape="rect" title=" " alt="" coords="2188,692,2389,732"/>
 <area shape="rect" title=" " alt="" coords="1006,755,1155,795"/>
@@ -183,7 +183,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a0f218b13bb1490ab1149392af00c9461"><td class="memItemLeft" align="right" valign="top">YAML::Node&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMaCh3Plotting_1_1PlottingManager.html#a0f218b13bb1490ab1149392af00c9461">getOption</a> (std::string option)</td></tr>
 <tr class="separator:a0f218b13bb1490ab1149392af00c9461"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad07460f382733b379d0f122d6b0322c7"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classMaCh3Plotting_1_1StyleManager.html">StyleManager</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMaCh3Plotting_1_1PlottingManager.html#ad07460f382733b379d0f122d6b0322c7">style</a> ()</td></tr>
-<tr class="memdesc:ad07460f382733b379d0f122d6b0322c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the <a class="el" href="classMaCh3Plotting_1_1StyleManager.html">StyleManager</a> contained within this <a class="el" href="classMaCh3Plotting_1_1PlottingManager.html" title="The main class to be used in plotting scripts.">PlottingManager</a>, for doing style related things.  <br /></td></tr>
+<tr class="memdesc:ad07460f382733b379d0f122d6b0322c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the <a class="el" href="classMaCh3Plotting_1_1StyleManager.html" title="EW: provides centralized styling utilities for plots, including name prettification and style applica...">StyleManager</a> contained within this <a class="el" href="classMaCh3Plotting_1_1PlottingManager.html" title="The main class to be used in plotting scripts.">PlottingManager</a>, for doing style related things.  <br /></td></tr>
 <tr class="separator:ad07460f382733b379d0f122d6b0322c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afcde3593be0894c7c1dbef6fa9055dee"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classMaCh3Plotting_1_1InputManager.html">InputManager</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMaCh3Plotting_1_1PlottingManager.html#afcde3593be0894c7c1dbef6fa9055dee">input</a> ()</td></tr>
 <tr class="memdesc:afcde3593be0894c7c1dbef6fa9055dee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the <a class="el" href="classMaCh3Plotting_1_1InputManager.html" title="This guy talks to the input files and is intended to smooth over the fact that our OA fitters use suc...">InputManager</a> contained within this <a class="el" href="classMaCh3Plotting_1_1PlottingManager.html" title="The main class to be used in plotting scripts.">PlottingManager</a>, for doing input related things.  <br /></td></tr>
@@ -254,7 +254,7 @@ Private Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The main class to be used in plotting scripts. </p>
-<p>When it comes to plotting, this guys in charge, the main man, the head honcho, the big cheese. If it's a plot you need, this is the guy you call. You just call him in your scripts and let him and his goons <a class="el" href="classMaCh3Plotting_1_1StyleManager.html">StyleManager</a>, and <a class="el" href="classMaCh3Plotting_1_1InputManager.html" title="This guy talks to the input files and is intended to smooth over the fact that our OA fitters use suc...">InputManager</a> worry about the details, no questions asked. This class handles all the command line inputs and manages the other managers. Intention with this class is that you should be able to create one from your custom plotting script, then from that, be able to get all manner of inputs from the <a class="el" href="classMaCh3Plotting_1_1InputManager.html" title="This guy talks to the input files and is intended to smooth over the fact that our OA fitters use suc...">InputManager</a> contained within, and set any style options you like from the <a class="el" href="classMaCh3Plotting_1_1StyleManager.html">StyleManager</a>. Also a hopefully not too distant dream is to wrap this up in python so it is usable in .py scripts to take advantage of nice existing plotting libraries for e.g. MCMC plotting. </p><dl class="section author"><dt>Author</dt><dd>Ewan Miller </dd></dl>
+<p>When it comes to plotting, this guys in charge, the main man, the head honcho, the big cheese. If it's a plot you need, this is the guy you call. You just call him in your scripts and let him and his goons <a class="el" href="classMaCh3Plotting_1_1StyleManager.html" title="EW: provides centralized styling utilities for plots, including name prettification and style applica...">StyleManager</a>, and <a class="el" href="classMaCh3Plotting_1_1InputManager.html" title="This guy talks to the input files and is intended to smooth over the fact that our OA fitters use suc...">InputManager</a> worry about the details, no questions asked. This class handles all the command line inputs and manages the other managers. Intention with this class is that you should be able to create one from your custom plotting script, then from that, be able to get all manner of inputs from the <a class="el" href="classMaCh3Plotting_1_1InputManager.html" title="This guy talks to the input files and is intended to smooth over the fact that our OA fitters use suc...">InputManager</a> contained within, and set any style options you like from the <a class="el" href="classMaCh3Plotting_1_1StyleManager.html" title="EW: provides centralized styling utilities for plots, including name prettification and style applica...">StyleManager</a>. Also a hopefully not too distant dream is to wrap this up in python so it is usable in .py scripts to take advantage of nice existing plotting libraries for e.g. MCMC plotting. </p><dl class="section author"><dt>Author</dt><dd>Ewan Miller </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="plottingManager_8h_source.html#l00033">33</a> of file <a class="el" href="plottingManager_8h_source.html">plottingManager.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
@@ -836,7 +836,7 @@ template&lt;typename T &gt; </div>
 <p>initalise this <a class="el" href="classMaCh3Plotting_1_1PlottingManager.html" title="The main class to be used in plotting scripts.">PlottingManager</a>. </p>
 <ul>
 <li>Read the plotting config file</li>
-<li>Instantiate a <a class="el" href="classMaCh3Plotting_1_1StyleManager.html">StyleManager</a> using the style config file specified in the plotting config file, or if none was provided, using DEFAULT_STYLE_CONFIG.</li>
+<li>Instantiate a <a class="el" href="classMaCh3Plotting_1_1StyleManager.html" title="EW: provides centralized styling utilities for plots, including name prettification and style applica...">StyleManager</a> using the style config file specified in the plotting config file, or if none was provided, using DEFAULT_STYLE_CONFIG.</li>
 <li>Instantiate an <a class="el" href="classMaCh3Plotting_1_1InputManager.html" title="This guy talks to the input files and is intended to smooth over the fact that our OA fitters use suc...">InputManager</a> using the translation config file specified in the plotting config file, or if none was provided, using DEFAULT_TRANSLATION_CONFIG.</li>
 <li>Add all files specified in this PlottingManagers _fileNames vector to the new <a class="el" href="classMaCh3Plotting_1_1InputManager.html" title="This guy talks to the input files and is intended to smooth over the fact that our OA fitters use suc...">InputManager</a> that was just created <dl class="section warning"><dt>Warning</dt><dd>This should always be called <em>After</em> <a class="el" href="classMaCh3Plotting_1_1PlottingManager.html#a6abd05428a9f8827c67a22bd6f8ffce3" title="Parse command line arguments.">parseInputs()</a> unless you are manually specifying all input file names and config file names in your drawing application. </dd></dl>
 </li>
@@ -1273,7 +1273,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Get the <a class="el" href="classMaCh3Plotting_1_1StyleManager.html">StyleManager</a> contained within this <a class="el" href="classMaCh3Plotting_1_1PlottingManager.html" title="The main class to be used in plotting scripts.">PlottingManager</a>, for doing style related things. </p>
+<p>Get the <a class="el" href="classMaCh3Plotting_1_1StyleManager.html" title="EW: provides centralized styling utilities for plots, including name prettification and style applica...">StyleManager</a> contained within this <a class="el" href="classMaCh3Plotting_1_1PlottingManager.html" title="The main class to be used in plotting scripts.">PlottingManager</a>, for doing style related things. </p>
 
 <p class="definition">Definition at line <a class="el" href="plottingManager_8h_source.html#l00158">158</a> of file <a class="el" href="plottingManager_8h_source.html">plottingManager.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  158</span>{ <span class="keywordflow">return</span> *<a class="code hl_variable" href="classMaCh3Plotting_1_1PlottingManager.html#ad1519621bfc57eace55e228f3d7f9515">_styleMan</a>; }</div>
@@ -1653,7 +1653,7 @@ template&lt;typename T &gt; </div>
 <b>Initial value:</b><div class="fragment"><div class="line">=</div>
 <div class="line">      std::string(std::getenv(<span class="stringliteral">&quot;MACH3&quot;</span>)) +</div>
 <div class="line">      <span class="stringliteral">&quot;/plotting/StyleConfig.yaml&quot;</span></div>
-</div><!-- fragment --><p>The default style config config to be used by <a class="el" href="classMaCh3Plotting_1_1PlottingManager.html" title="The main class to be used in plotting scripts.">PlottingManager</a> instances when instantiating the <a class="el" href="classMaCh3Plotting_1_1StyleManager.html">StyleManager</a>. </p>
+</div><!-- fragment --><p>The default style config config to be used by <a class="el" href="classMaCh3Plotting_1_1PlottingManager.html" title="The main class to be used in plotting scripts.">PlottingManager</a> instances when instantiating the <a class="el" href="classMaCh3Plotting_1_1StyleManager.html" title="EW: provides centralized styling utilities for plots, including name prettification and style applica...">StyleManager</a>. </p>
 
 <p class="definition">Definition at line <a class="el" href="plottingManager_8h_source.html#l00041">41</a> of file <a class="el" href="plottingManager_8h_source.html">plottingManager.h</a>.</p>
 

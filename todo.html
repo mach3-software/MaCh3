@@ -111,7 +111,7 @@ $(function() {
 <dt>Member <a class="el" href="structMaCh3Plotting_1_1InputFile.html#a0897b76fdbfc674ed94da1d2b4adb0a2">MaCh3Plotting::InputFile::Dump</a>  () const</dt>
 <dd><a class="anchor" id="_todo000026"></a>Same as for <a class="el" href="structMaCh3Plotting_1_1InputFile.html#a4b3753ca1fa1a399e519aa15bca8658a" title="Print out a small summary of what is contained in the file.">Summarise()</a>, could add a check that the file info has actually been filled.  </dd>
 <dt>Member <a class="el" href="structMaCh3Plotting_1_1InputFile.html#a7491ea81990748b02402796ee512f518">MaCh3Plotting::InputFile::hasLLHScans</a>  </dt>
-<dd><p class="startdd"><a class="anchor" id="_todo000027"></a>I think it would be nice to store all the <a class="el" href="structMaCh3Plotting_1_1InputFile.html">InputFile</a> data in some non root, maybe custom c++ types, and have separate reader classes for potential different input file formats that can convert to these types. </p>
+<dd><p class="startdd"><a class="anchor" id="_todo000027"></a>I think it would be nice to store all the <a class="el" href="structMaCh3Plotting_1_1InputFile.html" title="Struct which wraps around the actual input file and also holds general information,...">InputFile</a> data in some non root, maybe custom c++ types, and have separate reader classes for potential different input file formats that can convert to these types. </p>
 <p class="interdd"></p>
 <p class="enddd">Currently all fitters use root but maybe some wonderful day in the far far future this wont be the case. Doing things this way we could maintain the possible future option of moving away from root???  </p>
 </dd>
@@ -126,7 +126,7 @@ $(function() {
 <p class="interdd"></p>
 <p class="enddd">Add code to read in Violin plots from the postfit error output files.  </p>
 </dd>
-<dt>Member <a class="el" href="classMaCh3Plotting_1_1InputManager.html#aad778d8694f9b581d09279584733f6ea">MaCh3Plotting::InputManager::fillFileInfo</a>  (<a class="el" href="structMaCh3Plotting_1_1InputFile.html">InputFile</a> &amp;inputFileDef, bool printThoughts=true)</dt>
+<dt>Member <a class="el" href="classMaCh3Plotting_1_1InputManager.html#aad778d8694f9b581d09279584733f6ea">MaCh3Plotting::InputManager::fillFileInfo</a>  (<a class="el" href="structMaCh3Plotting_1_1InputFile.html" title="Struct which wraps around the actual input file and also holds general information,...">InputFile</a> &amp;inputFileDef, bool printThoughts=true)</dt>
 <dd><p class="startdd"><a class="anchor" id="_todo000022"></a>Would like to be able to specify what kind of file and what fitter an input is from on the command like: e.g. like `plotApp [options] &lt;fileName1&gt;;&lt;fileType&gt;;&lt;fitterName&gt;... and only try to auto-detect it if its not specified, this would save some time and would also be very helpful in situations where we can't auto-detect e.g. if there is some kind of overlap in the file structure between two fitters </p>
 <p class="enddd"><a class="anchor" id="_todo000023"></a>add a check here to make sure all the scans that are in the file are being picked up by the reader, and warn if any are not being used  </p>
 </dd>

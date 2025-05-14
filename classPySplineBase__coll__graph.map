@@ -1,5 +1,5 @@
 <map id="PySplineBase" name="PySplineBase">
-<area shape="rect" id="node1" title=" " alt="" coords="56,344,167,369"/>
+<area shape="rect" id="node1" title="EW: As SplineBase is an abstract base class we have to do some gymnastics to get it to get it into py..." alt="" coords="56,344,167,369"/>
 <area shape="rect" id="node2" href="$classSplineBase.html" title="Base class for calculating weight from spline." alt="" coords="64,269,159,295"/>
 <area shape="rect" id="node3" title=" " alt="" coords="5,181,217,207"/>
 <area shape="rect" id="node4" href="$structFastSplineInfo.html" title="CW: Add a struct to hold info about the splinified xsec parameters and help with FindSplineSegment." alt="" coords="55,93,168,119"/>

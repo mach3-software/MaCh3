@@ -33,8 +33,8 @@ var searchData=
   ['ismach3modenc_30',['IsMaCh3ModeNC',['../classMaCh3Modes.html#ae15daa5df6c1bc97847f397233712606',1,'MaCh3Modes']]],
   ['ismode_31',['IsMode',['../structMaCh3ModeInfo.html#a9a89a0394f9f5eb780008253716836fc',1,'MaCh3ModeInfo']]],
   ['isparameterfixed_32',['IsParameterFixed',['../classParameterHandlerBase.html#acfad20049e6c37ef7afa59aca1fd3cf0',1,'ParameterHandlerBase::IsParameterFixed(const std::string &amp;name) const'],['../classParameterHandlerBase.html#a78ffc15979c158c7a3e3eb7bd40a4e79',1,'ParameterHandlerBase::IsParameterFixed(const int i) const']]],
-  ['isparameterfixedpca_33',['IsParameterFixedPCA',['../classParameterHandlerBase.html#ac350cae835e474a1fb327847732b3357',1,'ParameterHandlerBase']]],
-  ['isparfromgroup_34',['IsParFromGroup',['../classParameterHandlerGeneric.html#a9ccf63acb41f3e8e61f2767415bee4c5',1,'ParameterHandlerGeneric']]],
+  ['isparameterfixedpca_33',['IsParameterFixedPCA',['../group__ParameterHandlerGetters.html#gac350cae835e474a1fb327847732b3357',1,'ParameterHandlerBase']]],
+  ['isparfromgroup_34',['IsParFromGroup',['../group__ParameterHandlerSetters.html#ga9ccf63acb41f3e8e61f2767415bee4c5',1,'ParameterHandlerGeneric']]],
   ['ispca_35',['IsPCA',['../classParameterHandlerBase.html#a142a58b178b43e205af4233abc66c3bf',1,'ParameterHandlerBase']]],
   ['isvalidsplineindex_36',['isValidSplineIndex',['../classBinnedSplineHandler.html#af9a948b25fbed9dc3a27642c9118cb5c',1,'BinnedSplineHandler']]],
   ['iterateoverparams_37',['IterateOverParams',['../classParameterHandlerGeneric.html#ae708dcd0bbfac4a5dd599a5c536da62b',1,'ParameterHandlerGeneric']]]

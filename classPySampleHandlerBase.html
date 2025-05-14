@@ -85,12 +85,15 @@ $(function() {
   <div class="headertitle"><div class="title">PySampleHandlerBase Class Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>EW: As <a class="el" href="classSampleHandlerBase.html" title="Class responsible for handling implementation of samples used in analysis, reweighting and returning ...">SampleHandlerBase</a> is an abstract base class we have to do some gymnastics to get it to get it into python.  
+ <a href="classPySampleHandlerBase.html#details">More...</a></p>
 <div class="dynheader">
 Inheritance diagram for PySampleHandlerBase:</div>
 <div class="dyncontent">
 <div class="center"><img src="classPySampleHandlerBase__inherit__graph.png" border="0" usemap="#aPySampleHandlerBase_inherit__map" alt="Inheritance graph"/></div>
 <map name="aPySampleHandlerBase_inherit__map" id="aPySampleHandlerBase_inherit__map">
-<area shape="rect" title=" " alt="" coords="5,79,176,104"/>
+<area shape="rect" title="EW: As SampleHandlerBase is an abstract base class we have to do some gymnastics to get it to get it ..." alt="" coords="5,79,176,104"/>
 <area shape="rect" href="classSampleHandlerBase.html" title="Class responsible for handling implementation of samples used in analysis, reweighting and returning ..." alt="" coords="13,5,168,31"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
@@ -99,7 +102,7 @@ Collaboration diagram for PySampleHandlerBase:</div>
 <div class="dyncontent">
 <div class="center"><img src="classPySampleHandlerBase__coll__graph.png" border="0" usemap="#aPySampleHandlerBase_coll__map" alt="Collaboration graph"/></div>
 <map name="aPySampleHandlerBase_coll__map" id="aPySampleHandlerBase_coll__map">
-<area shape="rect" title=" " alt="" coords="1523,114,1693,139"/>
+<area shape="rect" title="EW: As SampleHandlerBase is an abstract base class we have to do some gymnastics to get it to get it ..." alt="" coords="1523,114,1693,139"/>
 <area shape="rect" href="classSampleHandlerBase.html" title="Class responsible for handling implementation of samples used in analysis, reweighting and returning ..." alt="" coords="1319,114,1473,139"/>
 <area shape="rect" href="classMaCh3Modes.html" title="KS: Class describing MaCh3 modes used in the analysis, it is being initialised from config." alt="" coords="1112,114,1223,139"/>
 <area shape="rect" title=" " alt="" coords="649,187,812,227"/>
@@ -131,33 +134,33 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a07b6726b71241ea71e12cfa78fbc49ed inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a07b6726b71241ea71e12cfa78fbc49ed">~SampleHandlerBase</a> ()</td></tr>
 <tr class="memdesc:a07b6726b71241ea71e12cfa78fbc49ed inherit pub_methods_classSampleHandlerBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">destructor  <br /></td></tr>
 <tr class="separator:a07b6726b71241ea71e12cfa78fbc49ed inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac4b73a8841ff9bab2fb08b578ad4137f inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#ac4b73a8841ff9bab2fb08b578ad4137f">GetNsamples</a> ()</td></tr>
-<tr class="separator:ac4b73a8841ff9bab2fb08b578ad4137f inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a97d4dfa8ea998240fab6c09786c5b7c1 inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a97d4dfa8ea998240fab6c09786c5b7c1">GetTitle</a> () const</td></tr>
-<tr class="separator:a97d4dfa8ea998240fab6c09786c5b7c1 inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0ed9dd339235b3bdea2680078ab129ab inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a0ed9dd339235b3bdea2680078ab129ab">GetSampleName</a> (int Sample) const =0</td></tr>
-<tr class="separator:a0ed9dd339235b3bdea2680078ab129ab inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3f4388fbe27168c5dae8fa722a7c1299 inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a3f4388fbe27168c5dae8fa722a7c1299">GetSampleLikelihood</a> (const int isample)</td></tr>
-<tr class="separator:a3f4388fbe27168c5dae8fa722a7c1299 inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa20368797948a55ad18848965fa439b6 inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classMaCh3Modes.html">MaCh3Modes</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#aa20368797948a55ad18848965fa439b6">GetMaCh3Modes</a> () const</td></tr>
-<tr class="memdesc:aa20368797948a55ad18848965fa439b6 inherit pub_methods_classSampleHandlerBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return pointer to MaCh3 modes.  <br /></td></tr>
-<tr class="separator:aa20368797948a55ad18848965fa439b6 inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad78de3486a4320a687a38ee2248e7167 inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">TH1D *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#ad78de3486a4320a687a38ee2248e7167">Get1DHist</a> ()</td></tr>
-<tr class="separator:ad78de3486a4320a687a38ee2248e7167 inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acb8b0145f4e9342ca670c4202e24d815 inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">TH2D *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#acb8b0145f4e9342ca670c4202e24d815">Get2DHist</a> ()</td></tr>
-<tr class="separator:acb8b0145f4e9342ca670c4202e24d815 inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3513241b52371f669e7534d0efb4ec29 inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">TH1D *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a3513241b52371f669e7534d0efb4ec29">Get1DDataHist</a> ()</td></tr>
-<tr class="separator:a3513241b52371f669e7534d0efb4ec29 inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0ba4d94598c9d03bbbe4ad5059d16cdd inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">TH2D *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a0ba4d94598c9d03bbbe4ad5059d16cdd">Get2DDataHist</a> ()</td></tr>
-<tr class="separator:a0ba4d94598c9d03bbbe4ad5059d16cdd inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac4b73a8841ff9bab2fb08b578ad4137f inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#gac4b73a8841ff9bab2fb08b578ad4137f">GetNsamples</a> ()</td></tr>
+<tr class="separator:gac4b73a8841ff9bab2fb08b578ad4137f inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga97d4dfa8ea998240fab6c09786c5b7c1 inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#ga97d4dfa8ea998240fab6c09786c5b7c1">GetTitle</a> () const</td></tr>
+<tr class="separator:ga97d4dfa8ea998240fab6c09786c5b7c1 inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga0ed9dd339235b3bdea2680078ab129ab inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#ga0ed9dd339235b3bdea2680078ab129ab">GetSampleName</a> (int Sample) const =0</td></tr>
+<tr class="separator:ga0ed9dd339235b3bdea2680078ab129ab inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3f4388fbe27168c5dae8fa722a7c1299 inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#ga3f4388fbe27168c5dae8fa722a7c1299">GetSampleLikelihood</a> (const int isample)</td></tr>
+<tr class="separator:ga3f4388fbe27168c5dae8fa722a7c1299 inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa20368797948a55ad18848965fa439b6 inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classMaCh3Modes.html">MaCh3Modes</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#gaa20368797948a55ad18848965fa439b6">GetMaCh3Modes</a> () const</td></tr>
+<tr class="memdesc:gaa20368797948a55ad18848965fa439b6 inherit pub_methods_classSampleHandlerBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return pointer to MaCh3 modes.  <br /></td></tr>
+<tr class="separator:gaa20368797948a55ad18848965fa439b6 inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad78de3486a4320a687a38ee2248e7167 inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">TH1D *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#gad78de3486a4320a687a38ee2248e7167">Get1DHist</a> ()</td></tr>
+<tr class="separator:gad78de3486a4320a687a38ee2248e7167 inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gacb8b0145f4e9342ca670c4202e24d815 inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">TH2D *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#gacb8b0145f4e9342ca670c4202e24d815">Get2DHist</a> ()</td></tr>
+<tr class="separator:gacb8b0145f4e9342ca670c4202e24d815 inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3513241b52371f669e7534d0efb4ec29 inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">TH1D *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#ga3513241b52371f669e7534d0efb4ec29">Get1DDataHist</a> ()</td></tr>
+<tr class="separator:ga3513241b52371f669e7534d0efb4ec29 inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga0ba4d94598c9d03bbbe4ad5059d16cdd inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">TH2D *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#ga0ba4d94598c9d03bbbe4ad5059d16cdd">Get2DDataHist</a> ()</td></tr>
+<tr class="separator:ga0ba4d94598c9d03bbbe4ad5059d16cdd inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3efb49c2a39d87b71e4dec7c7115fa88 inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a3efb49c2a39d87b71e4dec7c7115fa88">Reweight</a> ()=0</td></tr>
 <tr class="separator:a3efb49c2a39d87b71e4dec7c7115fa88 inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a65bbd8a3084731b4bdb0c4d3fcaf641e inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a65bbd8a3084731b4bdb0c4d3fcaf641e">GetLikelihood</a> ()=0</td></tr>
-<tr class="separator:a65bbd8a3084731b4bdb0c4d3fcaf641e inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a091b542789f278a8485bd14d6dbb739b inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a091b542789f278a8485bd14d6dbb739b">GetNEventsInSample</a> (int sample)</td></tr>
-<tr class="separator:a091b542789f278a8485bd14d6dbb739b inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5bffa47b890458c115dca26dd2fab80f inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a5bffa47b890458c115dca26dd2fab80f">GetNMCSamples</a> ()</td></tr>
-<tr class="separator:a5bffa47b890458c115dca26dd2fab80f inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga65bbd8a3084731b4bdb0c4d3fcaf641e inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#ga65bbd8a3084731b4bdb0c4d3fcaf641e">GetLikelihood</a> ()=0</td></tr>
+<tr class="separator:ga65bbd8a3084731b4bdb0c4d3fcaf641e inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga091b542789f278a8485bd14d6dbb739b inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#ga091b542789f278a8485bd14d6dbb739b">GetNEventsInSample</a> (int sample)</td></tr>
+<tr class="separator:ga091b542789f278a8485bd14d6dbb739b inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5bffa47b890458c115dca26dd2fab80f inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#ga5bffa47b890458c115dca26dd2fab80f">GetNMCSamples</a> ()</td></tr>
+<tr class="separator:ga5bffa47b890458c115dca26dd2fab80f inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c23502c36e51562bf784ebcced54c6c inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a0c23502c36e51562bf784ebcced54c6c">AddData</a> (std::vector&lt; double &gt; &amp;dat)</td></tr>
 <tr class="separator:a0c23502c36e51562bf784ebcced54c6c inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0152cea82b224f36eb5cb4efa247407d inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a0152cea82b224f36eb5cb4efa247407d">AddData</a> (std::vector&lt; std::vector&lt; double &gt; &gt; &amp;dat)</td></tr>
@@ -178,14 +181,15 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a41b7cf662f3f3b62bdb46bc78020dd8b inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9bef25c33bdd8d4c800cb64ae4197911 inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a9bef25c33bdd8d4c800cb64ae4197911">GetKinVarLabel</a> (const int sample, const int Dimension)</td></tr>
 <tr class="separator:a9bef25c33bdd8d4c800cb64ae4197911 inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac0cfbc3d13eafd3b5687ff739b862b80 inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#ac0cfbc3d13eafd3b5687ff739b862b80">GetTestStatLLH</a> (double data, double mc) const</td></tr>
-<tr class="separator:ac0cfbc3d13eafd3b5687ff739b862b80 inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a527307a4186e2eb61475ea975108aa65 inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a527307a4186e2eb61475ea975108aa65">GetTestStatLLH</a> (const double data, const double mc, const double w2) const</td></tr>
-<tr class="memdesc:a527307a4186e2eb61475ea975108aa65 inherit pub_methods_classSampleHandlerBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate test statistic for a single bin. Calculation depends on setting of fTestStatistic.  <br /></td></tr>
-<tr class="separator:a527307a4186e2eb61475ea975108aa65 inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1c81b6b7a7e70b04c6c6ca1c81c70fc5 inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a1c81b6b7a7e70b04c6c6ca1c81c70fc5">SetTestStatistic</a> (<a class="el" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67">TestStatistic</a> testStat)</td></tr>
-<tr class="memdesc:a1c81b6b7a7e70b04c6c6ca1c81c70fc5 inherit pub_methods_classSampleHandlerBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the test statistic to be used when calculating the binned likelihoods.  <br /></td></tr>
-<tr class="separator:a1c81b6b7a7e70b04c6c6ca1c81c70fc5 inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac0cfbc3d13eafd3b5687ff739b862b80 inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#gac0cfbc3d13eafd3b5687ff739b862b80">GetTestStatLLH</a> (double data, double mc) const</td></tr>
+<tr class="memdesc:gac0cfbc3d13eafd3b5687ff739b862b80 inherit pub_methods_classSampleHandlerBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate test statistic for a single bin using Poisson.  <br /></td></tr>
+<tr class="separator:gac0cfbc3d13eafd3b5687ff739b862b80 inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga527307a4186e2eb61475ea975108aa65 inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#ga527307a4186e2eb61475ea975108aa65">GetTestStatLLH</a> (const double data, const double mc, const double w2) const</td></tr>
+<tr class="memdesc:ga527307a4186e2eb61475ea975108aa65 inherit pub_methods_classSampleHandlerBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate test statistic for a single bin. Calculation depends on setting of fTestStatistic.  <br /></td></tr>
+<tr class="separator:ga527307a4186e2eb61475ea975108aa65 inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga1c81b6b7a7e70b04c6c6ca1c81c70fc5 inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#ga1c81b6b7a7e70b04c6c6ca1c81c70fc5">SetTestStatistic</a> (<a class="el" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67">TestStatistic</a> testStat)</td></tr>
+<tr class="memdesc:ga1c81b6b7a7e70b04c6c6ca1c81c70fc5 inherit pub_methods_classSampleHandlerBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the test statistic to be used when calculating the binned likelihoods.  <br /></td></tr>
+<tr class="separator:ga1c81b6b7a7e70b04c6c6ca1c81c70fc5 inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a79bf78796d3e9ebef0a439f91fe7bdad inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a79bf78796d3e9ebef0a439f91fe7bdad">Fill1DHist</a> ()=0</td></tr>
 <tr class="separator:a79bf78796d3e9ebef0a439f91fe7bdad inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3ba05758626b65dc8a74de1d5a143ccd inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a3ba05758626b65dc8a74de1d5a143ccd">Fill2DHist</a> ()=0</td></tr>
@@ -235,7 +239,8 @@ Additional Inherited Members</h2></td></tr>
 <tr class="separator:a271e0af335b0000bb39c4d765ea0b762 inherit pro_attribs_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock">
+<div class="textblock"><p>EW: As <a class="el" href="classSampleHandlerBase.html" title="Class responsible for handling implementation of samples used in analysis, reweighting and returning ...">SampleHandlerBase</a> is an abstract base class we have to do some gymnastics to get it to get it into python. </p>
+
 <p class="definition">Definition at line <a class="el" href="samples_8cpp_source.html#l00010">10</a> of file <a class="el" href="samples_8cpp_source.html">samples.cpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a06cbbd04de01b9e1f1b261f8e8e1a33f" name="a06cbbd04de01b9e1f1b261f8e8e1a33f"></a>
@@ -339,7 +344,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Implements <a class="el" href="classSampleHandlerBase.html#a65bbd8a3084731b4bdb0c4d3fcaf641e">SampleHandlerBase</a>.</p>
+<p>Implements <a class="el" href="group__SampleHandlerGetters.html#ga65bbd8a3084731b4bdb0c4d3fcaf641e">SampleHandlerBase</a>.</p>
 
 <p class="definition">Definition at line <a class="el" href="samples_8cpp_source.html#l00034">34</a> of file <a class="el" href="samples_8cpp_source.html">samples.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   34</span>                                    {</div>
@@ -379,7 +384,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Implements <a class="el" href="classSampleHandlerBase.html#a0ed9dd339235b3bdea2680078ab129ab">SampleHandlerBase</a>.</p>
+<p>Implements <a class="el" href="group__SampleHandlerGetters.html#ga0ed9dd339235b3bdea2680078ab129ab">SampleHandlerBase</a>.</p>
 
 <p class="definition">Definition at line <a class="el" href="samples_8cpp_source.html#l00016">16</a> of file <a class="el" href="samples_8cpp_source.html">samples.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   16</span>                                                        {</div>
@@ -454,11 +459,11 @@ Additional Inherited Members</h2></td></tr>
 <div class="line"><span class="lineno">    8</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#aa7ed25798bc8d52dc16b5ea2f6c9d0c3">dathist2d</a> = NULL;</div>
 <div class="line"><span class="lineno">    9</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#ab9f61ca5c8abb03d4d84947e9bfa7943">Modes</a> = <span class="keyword">nullptr</span>;</div>
 <div class="line"><span class="lineno">   10</span>}</div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a162e3e8fddeef43d1137875b660f897b"><div class="ttname"><a href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">SampleHandlerBase::nDims</a></div><div class="ttdeci">int nDims</div><div class="ttdoc">KS: number of dimension for this sample.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00106">SampleHandlerBase.h:106</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a271e0af335b0000bb39c4d765ea0b762"><div class="ttname"><a href="classSampleHandlerBase.html#a271e0af335b0000bb39c4d765ea0b762">SampleHandlerBase::rnd</a></div><div class="ttdeci">TRandom3 * rnd</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00118">SampleHandlerBase.h:118</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a7938f32b145ce648d3ce4ae33bc9d560"><div class="ttname"><a href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">SampleHandlerBase::dathist</a></div><div class="ttdeci">TH1D * dathist</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00111">SampleHandlerBase.h:111</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_aa7ed25798bc8d52dc16b5ea2f6c9d0c3"><div class="ttname"><a href="classSampleHandlerBase.html#aa7ed25798bc8d52dc16b5ea2f6c9d0c3">SampleHandlerBase::dathist2d</a></div><div class="ttdeci">TH2D * dathist2d</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00112">SampleHandlerBase.h:112</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_ab9f61ca5c8abb03d4d84947e9bfa7943"><div class="ttname"><a href="classSampleHandlerBase.html#ab9f61ca5c8abb03d4d84947e9bfa7943">SampleHandlerBase::Modes</a></div><div class="ttdeci">MaCh3Modes * Modes</div><div class="ttdoc">Holds information about used Generator and MaCh3 modes.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00109">SampleHandlerBase.h:109</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a162e3e8fddeef43d1137875b660f897b"><div class="ttname"><a href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">SampleHandlerBase::nDims</a></div><div class="ttdeci">int nDims</div><div class="ttdoc">KS: number of dimension for this sample.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00130">SampleHandlerBase.h:130</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a271e0af335b0000bb39c4d765ea0b762"><div class="ttname"><a href="classSampleHandlerBase.html#a271e0af335b0000bb39c4d765ea0b762">SampleHandlerBase::rnd</a></div><div class="ttdeci">TRandom3 * rnd</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00142">SampleHandlerBase.h:142</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a7938f32b145ce648d3ce4ae33bc9d560"><div class="ttname"><a href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">SampleHandlerBase::dathist</a></div><div class="ttdeci">TH1D * dathist</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00135">SampleHandlerBase.h:135</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_aa7ed25798bc8d52dc16b5ea2f6c9d0c3"><div class="ttname"><a href="classSampleHandlerBase.html#aa7ed25798bc8d52dc16b5ea2f6c9d0c3">SampleHandlerBase::dathist2d</a></div><div class="ttdeci">TH2D * dathist2d</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00136">SampleHandlerBase.h:136</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_ab9f61ca5c8abb03d4d84947e9bfa7943"><div class="ttname"><a href="classSampleHandlerBase.html#ab9f61ca5c8abb03d4d84947e9bfa7943">SampleHandlerBase::Modes</a></div><div class="ttdeci">MaCh3Modes * Modes</div><div class="ttdoc">Holds information about used Generator and MaCh3 modes.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00133">SampleHandlerBase.h:133</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
