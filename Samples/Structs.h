@@ -152,12 +152,20 @@ constexpr unsigned int str2int(const char* str, int h = 0) {
 }
 
 // *******************
-/// @brief ETA - Normalisations for cross-section parameters
-/// Carrier for whether you want to apply a systematic to an event or not
-struct NormParameter {
+/// @brief Base class storing info for parameters types, helping unify codebase
+struct TypeParameterBase {
 // *******************
   /// Name of parameters
   std::string name;
+
+  /// Parameter number of this normalisation in current systematic model
+  int index = M3::_BAD_INT_;
+};
+
+// *******************
+/// @brief ETA - Normalisations for cross-section parameters
+/// Carrier for whether you want to apply a systematic to an event or not
+struct NormParameter : public TypeParameterBase {
   /// Mode which parameter applies to
   std::vector<int> modes;
   /// Horn currents which parameter applies to
@@ -179,9 +187,6 @@ struct NormParameter {
   /// within a SampleHandler daughter class
   /// The bounds for each kinematic variable are given in Selection
   std::vector< std::string > KinematicVarStr;
-
-  /// Parameter number of this normalisation in current systematic model
-  int index;
 };
 
 // HH - a shorthand type for funcpar functions
@@ -189,10 +194,8 @@ using FuncParFuncType = std::function<void (const double*, std::size_t, std::siz
 // *******************
 /// @brief HH - Functional parameters
 /// Carrier for whether you want to apply a systematic to an event or not
-struct FunctionalParameter {
+struct FunctionalParameter : public TypeParameterBase {
 // *******************
-  /// Name of parameters
-  std::string name;
   /// Mode which parameter applies to
   std::vector<int> modes;
   /// Horn currents which parameter applies to
@@ -214,9 +217,6 @@ struct FunctionalParameter {
   /// within a SampleHandler daughter class
   /// The bounds for each kinematic variable are given in Selection
   std::vector< std::string > KinematicVarStr;
-
-  /// Parameter number of this functional in current systematic model
-  int index;
 
   /// Parameter value pointer
   const double* valuePtr;
@@ -339,7 +339,7 @@ enum SystType {
 
 // *******************
 /// @brief KS: Struct holding info about Spline Systematics
-struct SplineParameter {
+struct SplineParameter : public TypeParameterBase {
 // *******************
   /// Spline interpolation vector
   SplineInterpolation _SplineInterpolationType;

@@ -149,7 +149,13 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     inline FunctionalParameter GetFunctionalParameters(const YAML::Node& param, const int Index);
     /// @brief Get Spline params
     /// @param param Yaml node describing param
-    inline SplineParameter GetSplineParameter(const YAML::Node& param);
+    /// @param Index Global parameter index
+    inline SplineParameter GetSplineParameter(const YAML::Node& param, const int Index);
+    /// @brief Fill base parameters
+    /// @param param Yaml node describing param
+    /// @param Index Global parameter index
+    /// @param Parameter Object storing info
+    inline void GetBaseParameter(const YAML::Node& param, const int Index, TypeParameterBase& Parameter);
 
     /// Type of parameter like norm, spline etc.
     std::vector<SystType> _fParamType;
