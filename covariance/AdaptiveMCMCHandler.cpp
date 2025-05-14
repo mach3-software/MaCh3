@@ -24,7 +24,7 @@ AdaptiveMCMCHandler::~AdaptiveMCMCHandler() {
 }
 
 // ********************************************
-bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const std::string& matrix_name_str, const int Npars) {
+bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const std::string& matrix_name_str, const std::vector<double>* parameters, const std::vector<double>* fixed) {
 // ********************************************
   /*
    * HW: Idea is that adaption can simply read the YAML config
@@ -73,24 +73,28 @@ bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const 
 
   // We also want to check for "blocks" by default all parameters "know" about each other
   // but we can split the matrix into independent block matrices
+  SetParams(parameters);
+  SetFixed(fixed);
+
+  /// HW: This is technically wrong, should be across all systematics but will be addressed in a later PR
+  adaption_scale = 2.38*2.38/GetNumParams();
 
   // We"ll set a dummy variable here
   auto matrix_blocks = GetFromManager<std::vector<std::vector<int>>>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["MatrixBlocks"], {{}});
 
-  SetAdaptiveBlocks(matrix_blocks, Npars);
+  SetAdaptiveBlocks(matrix_blocks);
   return true;
 }
 
 // ********************************************
-void AdaptiveMCMCHandler::CreateNewAdaptiveCovariance(const int Npars) {
+void AdaptiveMCMCHandler::CreateNewAdaptiveCovariance() {
 // ********************************************
-  adaptive_covariance = new TMatrixDSym(Npars);
+  adaptive_covariance = new TMatrixDSym(GetNumParams());
   adaptive_covariance->Zero();
-  par_means = std::vector<double>(Npars, 0);
+  par_means = std::vector<double>(GetNumParams(), 0);
 }
-
 // ********************************************
-void AdaptiveMCMCHandler::SetAdaptiveBlocks(std::vector<std::vector<int>> block_indices, const int Npars) {
+void AdaptiveMCMCHandler::SetAdaptiveBlocks(std::vector<std::vector<int>> block_indices) {
 // ********************************************
   /*
    *   In order to adapt efficient we want to setup our throw matrix to be a serious of block-diagonal (ish) matrices
@@ -99,11 +103,11 @@ void AdaptiveMCMCHandler::SetAdaptiveBlocks(std::vector<std::vector<int>> block_
    *   [[0,4],[4, 6]] in your config will set up two blocks one with all indices 0<=i<4 and the other with 4<=i<6
    */
   // Set up block regions
-  adapt_block_matrix_indices = std::vector<int>(Npars, 0);
+  adapt_block_matrix_indices = std::vector<int>(GetNumParams(), 0);
 
   // Should also make a matrix of block sizes
   adapt_block_sizes = std::vector<int>(block_indices.size()+1, 0);
-  adapt_block_sizes[0] = Npars;
+  adapt_block_sizes[0] = GetNumParams();
 
   if(block_indices.size()==0 || block_indices[0].size()==0) return;
 
@@ -116,9 +120,9 @@ void AdaptiveMCMCHandler::SetAdaptiveBlocks(std::vector<std::vector<int>> block_
       int block_lb = block_indices[iblock][isubblock];
       int block_ub = block_indices[iblock][isubblock+1];
 
-      if(block_lb > Npars || block_ub > Npars){
+      if(block_lb > GetNumParams() || block_ub > GetNumParams()){
         MACH3LOG_ERROR("Cannot set matrix block with edges {}, {} for matrix of size {}",
-                       block_lb, block_ub, Npars);
+                       block_lb, block_ub, GetNumParams());
         throw MaCh3Exception(__FILE__, __LINE__);;
       }
       for(int ipar = block_lb; ipar < block_ub; ipar++){
@@ -177,8 +181,7 @@ void AdaptiveMCMCHandler::SaveAdaptiveToFile(const std::string &outFileName,
 void AdaptiveMCMCHandler::SetThrowMatrixFromFile(const std::string& matrix_file_name,
                                                  const std::string& matrix_name,
                                                  const std::string& means_name,
-                                                 bool& use_adaptive,
-                                                 const int Npars) {
+                                                 bool& use_adaptive) {
 // ********************************************
   // Lets you set the throw matrix externally
   // Open file
@@ -205,12 +208,12 @@ void AdaptiveMCMCHandler::SetThrowMatrixFromFile(const std::string& matrix_file_
     // Yay our vector exists! Let's loop and fill it
     // Should check this is done
     if(means_vector->GetNrows()){
-      MACH3LOG_ERROR("External means vec size ({}) != matrix size ({})", means_vector->GetNrows(), Npars);
+      MACH3LOG_ERROR("External means vec size ({}) != matrix size ({})", means_vector->GetNrows(), GetNumParams());
       throw MaCh3Exception(__FILE__, __LINE__);
     }
 
-    par_means = std::vector<double>(Npars);
-    for(int i = 0; i < Npars; i++){
+    par_means = std::vector<double>(GetNumParams());
+    for(int i = 0; i < GetNumParams(); i++){
       par_means[i] = (*means_vector)(i);
     }
     MACH3LOG_INFO("Found Means in External File, Will be able to adapt");
@@ -227,40 +230,50 @@ void AdaptiveMCMCHandler::SetThrowMatrixFromFile(const std::string& matrix_file_
 }
 
 // ********************************************
-void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const std::vector<double>& _fCurrVal, const int Npars) {
-// ********************************************
+void AdaptiveMCMCHandler::UpdateAdaptiveCovariance() {
+  // ********************************************
   std::vector<double> par_means_prev = par_means;
-
   int steps_post_burn = total_steps - start_adaptive_update;
 
-  #ifdef MULTITHREAD
-  #pragma omp parallel for
-  #endif
-  for(int iRow = 0; iRow < Npars; iRow++) {
-    par_means[iRow] = (_fCurrVal[iRow]+par_means[iRow]*steps_post_burn)/(steps_post_burn+1);
+  // Step 1: Update means and compute deviations
+  for (int i = 0; i < GetNumParams(); ++i) {
+    if (IsFixed(i)) continue;
+
+    par_means[i] =  (CurrVal(i) + par_means_prev[i]*steps_post_burn)/(steps_post_burn+1);
+    // Left over from cyclic means
   }
 
-  //Now we update the covariances using cov(x,y)=E(xy)-E(x)E(y)
-  #ifdef MULTITHREAD
-  #pragma omp parallel for
-  #endif
-  for(int irow = 0; irow < Npars; irow++){
-    int block = adapt_block_matrix_indices[irow];
-    // int scale_factor = 5.76/double(adapt_block_sizes[block]);
-    for(int icol = 0; icol <= irow; icol++){
-      double cov_val=0;
-      // Not in the same blocks
-      if(adapt_block_matrix_indices[icol] == block){
-        // Calculate Covariance for block
-        // https://projecteuclid.org/journals/bernoulli/volume-7/issue-2/An-adaptive-Metropolis-algorithm/bj/1080222083.full
-        cov_val = (*adaptive_covariance)(irow, icol)*Npars/5.6644;
-        cov_val += par_means_prev[irow]*par_means_prev[icol]; //First we remove the current means
-        cov_val = (cov_val*steps_post_burn+_fCurrVal[irow]*_fCurrVal[icol])/(steps_post_burn+1); //Now get mean(iRow*iCol)
-        cov_val -= par_means[icol]*par_means[irow];
-        cov_val*=5.6644/Npars;
+  // Step 2: Update covariance
+  for (int i = 0; i < GetNumParams(); ++i) {
+    if (IsFixed(i)) {
+      (*adaptive_covariance)(i, i) = 1.0;
+      continue;
+    }
+
+    int block_i = adapt_block_matrix_indices[i];
+
+    for (int j = 0; j <= i; ++j) {
+      if (IsFixed(j) || adapt_block_matrix_indices[j] != block_i) {
+        (*adaptive_covariance)(i, j) = 0.0;
+        (*adaptive_covariance)(j, i) = 0.0;
+        continue;
       }
-      (*adaptive_covariance)(icol, irow) = cov_val;
-      (*adaptive_covariance)(irow, icol) = cov_val;
+
+      double cov_prev = (*adaptive_covariance)(i, j);
+      double cov_updated = 0.0;
+
+      if (steps_post_burn > 0) {
+        // Haario-style update
+        double cov_t = cov_prev * (steps_post_burn - 1) / steps_post_burn;
+        double prev_means_t = steps_post_burn * par_means_prev[i] * par_means_prev[j];
+        double curr_means_t = (steps_post_burn + 1) * par_means[i] * par_means[j];
+        double curr_step_t = CurrVal(i) * CurrVal(j);
+
+        cov_updated = cov_t + adaption_scale * (prev_means_t - curr_means_t + curr_step_t) / steps_post_burn;
+      }
+
+      (*adaptive_covariance)(i, j) = cov_updated;
+      (*adaptive_covariance)(j, i) = cov_updated;
     }
   }
 }
@@ -311,4 +324,9 @@ void AdaptiveMCMCHandler::Print() {
   MACH3LOG_INFO("Will only save every {} iterations"     , adaptive_save_n_iterations);
 }
 
+double AdaptiveMCMCHandler::CurrVal(int par_index){
+  /// HW Implemented as its own method to allow for
+  /// different behaviour in the future
+  return (*_fCurrVal)[par_index];
+}
 } //end adaptive_mcmc

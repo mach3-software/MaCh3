@@ -1042,7 +1042,7 @@ void covarianceBase::updateThrowMatrix(TMatrixDSym *cov){
 void covarianceBase::initialiseAdaption(const YAML::Node& adapt_manager){
 // ********************************************
   // Now we read the general settings [these SHOULD be common across all matrices!]
-  bool success = AdaptiveHandler.InitFromConfig(adapt_manager, matrixName, getNpars());
+  bool success = AdaptiveHandler.InitFromConfig(adapt_manager, matrixName, &_fCurrVal, &_fError);
   if(!success) return;
   AdaptiveHandler.Print();
 
@@ -1052,7 +1052,7 @@ void covarianceBase::initialiseAdaption(const YAML::Node& adapt_manager){
     MACH3LOG_WARN("Not using external matrix for {}, initialising adaption from scratch", matrixName);
     // If we don't have a covariance matrix to start from for adaptive tune we need to make one!
     use_adaptive = true;
-    AdaptiveHandler.CreateNewAdaptiveCovariance(_fNumPar);
+    AdaptiveHandler.CreateNewAdaptiveCovariance();
     return;
   }
 
@@ -1061,7 +1061,7 @@ void covarianceBase::initialiseAdaption(const YAML::Node& adapt_manager){
   auto external_matrix_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ExternalMatrixName"], "", __FILE__ , __LINE__);
   auto external_mean_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ExternalMeansName"], "", __FILE__ , __LINE__);
 
-  AdaptiveHandler.SetThrowMatrixFromFile(external_file_name, external_matrix_name, external_mean_name, use_adaptive, _fNumPar);
+  AdaptiveHandler.SetThrowMatrixFromFile(external_file_name, external_matrix_name, external_mean_name, use_adaptive);
   setThrowMatrix(AdaptiveHandler.adaptive_covariance);
   MACH3LOG_INFO("Successfully Set External Throw Matrix Stored in {}", external_file_name);
 }
@@ -1080,7 +1080,7 @@ void covarianceBase::updateAdaptiveCovariance(){
   }
 
   // Call main adaption function
-  AdaptiveHandler.UpdateAdaptiveCovariance(_fCurrVal, _fNumPar);
+  AdaptiveHandler.UpdateAdaptiveCovariance();
 
   //This is likely going to be the slow bit!
   if(AdaptiveHandler.IndivStepScaleAdapt()) {
