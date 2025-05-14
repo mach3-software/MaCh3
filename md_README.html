@@ -173,6 +173,10 @@ Debug</h1>
 </div><!-- fragment --><p> There are several debug modes, to enable more detailed but very heavy specific debug levels. Level 1 is the default debug activated by the above.</p>
 <div class="fragment"><div class="line">cmake ../ -DMaCh3_DEBUG_ENABLED=&lt;ON,OFF&gt; -DDEBUG_LEVEL=&lt;1,2,3&gt;</div>
 </div><!-- fragment --> <h1><a class="anchor" id="autotoc_md12"></a>
+Logger</h1>
+<p>Several logging options are available. By default, MaCh3 uses <code>INFO</code> level logging. You can enable more verbose logging by specifying the desired level during configuration: </p><div class="fragment"><div class="line">cmake ../ -DLOG_LEVEL=&quot;TRACE&quot;</div>
+</div><!-- fragment --><p> You can find more <a href="https://github.com/mach3-software/MaCh3/blob/develop/cmake/Modules/Logger.cmake">here</a>.</p>
+<h1><a class="anchor" id="autotoc_md13"></a>
 System Requirements</h1>
 <p>Most of external libraries are being handled through <a href="https://github.com/cpm-cmake/CPM.cmake">CPM</a>. The only external library that is not being handled through <a href="https://github.com/cpm-cmake/CPM.cmake">CPM</a> and is required is <a href="https://root.cern/">ROOT</a>. Currently used external dependencies include:</p>
 <ol type="1">
@@ -182,7 +186,7 @@ System Requirements</h1>
 <p>Based on several test here are recommended version: </p><div class="fragment"><div class="line">GCC: &gt;= 8.5 [lower versions may work]</div>
 <div class="line">CMake: &gt;= 3.14</div>
 <div class="line">ROOT: &gt;= 6.18</div>
-</div><!-- fragment --> <h2><a class="anchor" id="autotoc_md13"></a>
+</div><!-- fragment --> <h2><a class="anchor" id="autotoc_md14"></a>
 Supported operational systems</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -210,8 +214,8 @@ Supported operational systems</h2>
  ❔ - Not part of CI/CD but used by some users/developers so it might work <br  />
  ❌ - Not supported and no plans right now <br  />
 </p>
-<h1><a class="anchor" id="autotoc_md14"></a>
-Help and Guidelines</h1>
+<h1><a class="anchor" id="autotoc_md15"></a>
+Help and Guidelines 📄</h1>
 <ul>
 <li><a href="https://github.com/mach3-software/MaCh3Tutorial">Tutorial</a></li>
 <li><a href="https://github.com/mach3-software/MaCh3/blob/develop/.github/CONTRIBUTING.md">How to contribute</a></li>
@@ -220,10 +224,10 @@ Help and Guidelines</h1>
 <li><a href="https://github.com/mach3-software/MaCh3/discussions">Discussions</a></li>
 <li><a href="https://mach3-software.github.io/MaCh3Tutorial/">Benchmark</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md15"></a>
-Plotting and Diagnostic</h1>
-<p>Example of chain diagnostic utils can be found <a href="https://github.com/mach3-software/MaCh3/tree/develop/Diagnostics">here</a> with example of config. The MaCh3 core plotting library code can be found <a href="https://github.com/mach3-software/MaCh3/tree/develop/plotting">here</a> along with example config files and some apps for making standard plots.</p>
 <h1><a class="anchor" id="autotoc_md16"></a>
+Plotting and Diagnostic 📊</h1>
+<p>Example of chain diagnostic utils can be found <a href="https://github.com/mach3-software/MaCh3/tree/develop/Diagnostics">here</a> with example of config. The MaCh3 core plotting library code can be found <a href="https://github.com/mach3-software/MaCh3/tree/develop/plotting">here</a> along with example config files and some apps for making standard plots.</p>
+<h1><a class="anchor" id="autotoc_md17"></a>
 How To Use</h1>
 <p>This is an example how your executable can look like using MaCh3: </p><div class="fragment"><div class="line"><span class="comment">//Manager is responsible for reading from config</span></div>
 <div class="line">std::unique_ptr&lt;manager&gt; fitMan = <a class="code hl_function" href="MaCh3Factory_8cpp.html#aada46b6630f2f29c34c35354973388b3">MaCh3ManagerFactory</a>(argc, argv);</div>
