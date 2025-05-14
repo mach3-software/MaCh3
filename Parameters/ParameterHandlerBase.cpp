@@ -751,7 +751,6 @@ void ParameterHandlerBase::SetBranches(TTree &tree, bool SaveProposal) {
   // When running PCA, also save PCA parameters
   if (pca) {
     for (int i = 0; i < _fNumParPCA; ++i) {
-
       tree.Branch(Form("%s_PCA", _fNames[i].c_str()), &PCAObj->_fParCurrPCA.GetMatrixArray()[i], Form("%s_PCA/D", _fNames[i].c_str()));
     }
   }
@@ -765,7 +764,6 @@ void ParameterHandlerBase::SetBranches(TTree &tree, bool SaveProposal) {
     // When running PCA, also save PCA parameters
     if (pca) {
       for (int i = 0; i < _fNumParPCA; ++i) {
-
         tree.Branch(Form("%s_PCA_Prop", _fNames[i].c_str()), &PCAObj->_fParPropPCA.GetMatrixArray()[i], Form("%s_PCA_Prop/D", _fNames[i].c_str()));
       }
     }
@@ -971,7 +969,7 @@ void ParameterHandlerBase::MakePosDef(TMatrixDSym *cov) {
     MACH3LOG_ERROR("This indicates that something is wrong with the input matrix");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-  if(AdaptiveHandler.total_steps < 2) {
+  if(!use_adaptive || AdaptiveHandler->total_steps < 2) {
     MACH3LOG_INFO("Had to shift diagonal {} time(s) to allow the covariance matrix to be decomposed", iAttempt);
   }
   //DB Resetting warning level
@@ -1006,7 +1004,7 @@ void ParameterHandlerBase::SetThrowMatrix(TMatrixDSym *cov){
   }
 
   throwMatrix = static_cast<TMatrixDSym*>(cov->Clone());
-  if(use_adaptive && AdaptiveHandler.AdaptionUpdate()) MakeClosestPosDef(throwMatrix);
+  if(use_adaptive && AdaptiveHandler->AdaptionUpdate()) MakeClosestPosDef(throwMatrix);
   else MakePosDef(throwMatrix);
   
   TDecompChol TDecompChol_throwMatrix(*throwMatrix);
@@ -1046,10 +1044,11 @@ void ParameterHandlerBase::UpdateThrowMatrix(TMatrixDSym *cov){
 // HW : Here be adaption
 void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
 // ********************************************
+  AdaptiveHandler = std::make_unique<adaptive_mcmc::AdaptiveMCMCHandler>();
   // Now we read the general settings [these SHOULD be common across all matrices!]
-  bool success = AdaptiveHandler.InitFromConfig(adapt_manager, matrixName, &_fCurrVal, &_fError);
+  bool success = AdaptiveHandler->InitFromConfig(adapt_manager, matrixName, &_fCurrVal, &_fError);
   if(!success) return;
-  AdaptiveHandler.Print();
+  AdaptiveHandler->Print();
 
   // Next let"s check for external matrices
   // We"re going to grab this info from the YAML manager
@@ -1057,7 +1056,7 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
     MACH3LOG_WARN("Not using external matrix for {}, initialising adaption from scratch", matrixName);
     // If we don't have a covariance matrix to start from for adaptive tune we need to make one!
     use_adaptive = true;
-    AdaptiveHandler.CreateNewAdaptiveCovariance();
+    AdaptiveHandler->CreateNewAdaptiveCovariance();
     return;
   }
 
@@ -1066,8 +1065,9 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
   auto external_matrix_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ExternalMatrixName"], "", __FILE__ , __LINE__);
   auto external_mean_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ExternalMeansName"], "", __FILE__ , __LINE__);
 
-  AdaptiveHandler.SetThrowMatrixFromFile(external_file_name, external_matrix_name, external_mean_name, use_adaptive);
-  SetThrowMatrix(AdaptiveHandler.adaptive_covariance);
+  AdaptiveHandler->SetThrowMatrixFromFile(external_file_name, external_matrix_name, external_mean_name, use_adaptive);
+  SetThrowMatrix(AdaptiveHandler->adaptive_covariance);
+
   MACH3LOG_INFO("Successfully Set External Throw Matrix Stored in {}", external_file_name);
 }
 
@@ -1079,27 +1079,27 @@ void ParameterHandlerBase::UpdateAdaptiveCovariance(){
   // First we update the total means
 
   // Skip this if we're at a large number of steps
-  if(AdaptiveHandler.SkipAdaption()) {
-    AdaptiveHandler.total_steps++;
+  if(AdaptiveHandler->SkipAdaption()) {
+    AdaptiveHandler->total_steps++;
     return;
   }
 
   // Call main adaption function
-  AdaptiveHandler.UpdateAdaptiveCovariance();
+  AdaptiveHandler->UpdateAdaptiveCovariance();
 
   //This is likely going to be the slow bit!
-  if(AdaptiveHandler.IndivStepScaleAdapt()) {
+  if(AdaptiveHandler->IndivStepScaleAdapt()) {
     ResetIndivStepScale();
   }
 
-  if(AdaptiveHandler.UpdateMatrixAdapt()) {
-    TMatrixDSym* update_matrix = static_cast<TMatrixDSym*>(AdaptiveHandler.adaptive_covariance->Clone());
+  if(AdaptiveHandler->UpdateMatrixAdapt()) {
+    TMatrixDSym* update_matrix = static_cast<TMatrixDSym*>(AdaptiveHandler->adaptive_covariance->Clone());
     UpdateThrowMatrix(update_matrix); //Now we update and continue!
     //Also Save the adaptive to file
-    AdaptiveHandler.SaveAdaptiveToFile(AdaptiveHandler.output_file_name,GetName());
+    AdaptiveHandler->SaveAdaptiveToFile(AdaptiveHandler->output_file_name,GetName());
   }
 
-  AdaptiveHandler.total_steps++;
+  AdaptiveHandler->total_steps++;
 }
 
 // ********************************************

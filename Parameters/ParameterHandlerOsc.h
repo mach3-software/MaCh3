@@ -16,12 +16,17 @@ class ParameterHandlerOsc : public ParameterHandlerBase
   /// @brief Propose MCMC step, including mass flipping
   void ProposeStep() override;
   /// @brief Sets whether to flip delta M23.
+  /// \ingroup ParameterHandlerSetters
   void SetFlipDeltaM23(bool flip){flipdelM = flip;}
   /// @brief Get pointers to Osc params from Sample name
+  /// @ingroup ParameterHandlerGetters
   std::vector<const double*> GetOscParsFromSampleName(const std::string& SampleName);
   /// @brief KS: Print all useful information's after initialization
   void Print();
-
+  /// @brief KS: Flip parameter around given value, for example mass ordering around 0
+  /// @param index parameter index you want to flip
+  /// @param FlipPoint Value around which flipping is done
+  void FlipParameterValue(const int index, const double FlipPoint);
  protected:
     /// @brief HW :: This method is a tad hacky but modular arithmetic gives me a headache.
     /// @author Henry Wallace
