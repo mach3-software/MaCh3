@@ -57,6 +57,14 @@ else()
     )
     target_compile_definitions(MaCh3GPUCompilerOptions INTERFACE "$<$<COMPILE_LANGUAGE:CUDA>:CUDA_ERROR_CHECK>")
 endif()
+
+# KS: In newer CUDA nvcc likes to throw billions of billions of "warning: style of line directive is a GCC extension"
+# these aren't very helpfull but hide real problems. Let's turn if off
+if(CUDAToolkit_VERSION VERSION_GREATER_EQUAL "12.0")
+    target_compile_options(MaCh3GPUCompilerOptions INTERFACE
+       "$<$<COMPILE_LANGUAGE:CUDA>:-Xcudafe=--diag_suppress=20012>"
+    )
+endif()
 target_include_directories(MaCh3GPUCompilerOptions INTERFACE ${CUDAToolkit_INCLUDE_DIRS})
 if(MaCh3_DEBUG_ENABLED)
   include(${CMAKE_CURRENT_LIST_DIR}/CUDASamples.cmake)
