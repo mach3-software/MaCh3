@@ -7,7 +7,7 @@ var searchData=
   ['eigen_5fvalues_5fmaster_4',['eigen_values_master',['../classPCAHandler.html#a2924386fef0cf65215c51b4f81cdb0d1',1,'PCAHandler']]],
   ['eigen_5fvectors_5',['eigen_vectors',['../classPCAHandler.html#a3ba9d34343ce0d0eeb4c020fa70486e2',1,'PCAHandler']]],
   ['end_5fadaptive_5fupdate_6',['end_adaptive_update',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#aa7d3703d1de3c3fbf32f37cadf58be08',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
-  ['equalbinningperoscchannel_7',['EqualBinningPerOscChannel',['../classSampleHandlerFD.html#ac74d613fe9da2b3ce2d55977f724a416',1,'SampleHandlerFD']]],
+  ['equalbinningperoscchannel_7',['EqualBinningPerOscChannel',['../classOscillationHandler.html#abc1c77fdf110fdd11c9a878469e2a8e5',1,'OscillationHandler']]],
   ['errbuf_8',['errbuf',['../classSampleHandlerBase.html#a6b884367733c4f3a93c75127ed6e9df9',1,'SampleHandlerBase']]],
   ['errormessage_9',['errorMessage',['../classMaCh3Exception.html#ab556e4d4710fab4c4d75e94c4bab537d',1,'MaCh3Exception']]],
   ['errors_10',['Errors',['../classMCMCProcessor.html#a5174aaa900edf16ddc6e841ea4adae83',1,'MCMCProcessor']]],
