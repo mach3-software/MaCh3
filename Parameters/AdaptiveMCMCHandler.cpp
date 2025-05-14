@@ -78,7 +78,7 @@ bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const 
   SetFixed(fixed);
 
   /// HW: This is technically wrong, should be across all systematics but will be addressed in a later PR
-  adaption_scale = 2.38*2.38/GetNPars(); 
+  adaption_scale = 2.38*2.38/GetNumParams(); 
   
   // We"ll set a dummy variable here
   auto matrix_blocks = GetFromManager<std::vector<std::vector<int>>>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["MatrixBlocks"], {{}});
@@ -90,9 +90,9 @@ bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const 
 // ********************************************
 void AdaptiveMCMCHandler::CreateNewAdaptiveCovariance() {
 // ********************************************
-  adaptive_covariance = new TMatrixDSym(GetNPars());
+  adaptive_covariance = new TMatrixDSym(GetNumParams());
   adaptive_covariance->Zero();
-  par_means = std::vector<double>(GetNPars(), 0);
+  par_means = std::vector<double>(GetNumParams(), 0);
 }
 
 // ********************************************
@@ -105,11 +105,11 @@ void AdaptiveMCMCHandler::SetAdaptiveBlocks(std::vector<std::vector<int>> block_
    *   [[0,4],[4, 6]] in your config will set up two blocks one with all indices 0<=i<4 and the other with 4<=i<6
    */
   // Set up block regions
-  adapt_block_matrix_indices = std::vector<int>(GetNPars(), 0);
+  adapt_block_matrix_indices = std::vector<int>(GetNumParams(), 0);
 
   // Should also make a matrix of block sizes
   adapt_block_sizes = std::vector<int>(block_indices.size()+1, 0);
-  adapt_block_sizes[0] = GetNPars();
+  adapt_block_sizes[0] = GetNumParams();
 
   if(block_indices.size()==0 || block_indices[0].size()==0) return;
 
@@ -122,9 +122,9 @@ void AdaptiveMCMCHandler::SetAdaptiveBlocks(std::vector<std::vector<int>> block_
       int block_lb = block_indices[iblock][isubblock];
       int block_ub = block_indices[iblock][isubblock+1];
 
-      if(block_lb > GetNPars() || block_ub > GetNPars()){
+      if(block_lb > GetNumParams() || block_ub > GetNumParams()){
         MACH3LOG_ERROR("Cannot set matrix block with edges {}, {} for matrix of size {}",
-                       block_lb, block_ub, GetNPars());
+                       block_lb, block_ub, GetNumParams());
         throw MaCh3Exception(__FILE__, __LINE__);;
       }
       for(int ipar = block_lb; ipar < block_ub; ipar++){
@@ -210,12 +210,12 @@ void AdaptiveMCMCHandler::SetThrowMatrixFromFile(const std::string& matrix_file_
     // Yay our vector exists! Let's loop and fill it
     // Should check this is done
     if(means_vector->GetNrows()){
-      MACH3LOG_ERROR("External means vec size ({}) != matrix size ({})", means_vector->GetNrows(), GetNPars());
+      MACH3LOG_ERROR("External means vec size ({}) != matrix size ({})", means_vector->GetNrows(), GetNumParams());
       throw MaCh3Exception(__FILE__, __LINE__);
     }
 
-    par_means = std::vector<double>(GetNPars());
-    for(int i = 0; i < GetNPars(); i++){
+    par_means = std::vector<double>(GetNumParams());
+    for(int i = 0; i < GetNumParams(); i++){
       par_means[i] = (*means_vector)(i);
     }
     MACH3LOG_INFO("Found Means in External File, Will be able to adapt");
@@ -238,7 +238,7 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance() {
   int steps_post_burn = total_steps - start_adaptive_update;
 
   // Step 1: Update means and compute deviations
-  for (int i = 0; i < GetNPars(); ++i) {
+  for (int i = 0; i < GetNumParams(); ++i) {
     if (IsFixed(i)) continue;
 
     par_means[i] =  (CurrVal(i) + par_means_prev[i]*steps_post_burn)/(steps_post_burn+1);
@@ -246,7 +246,7 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance() {
   }
 
   // Step 2: Update covariance
-  for (int i = 0; i < GetNPars(); ++i) {
+  for (int i = 0; i < GetNumParams(); ++i) {
     if (IsFixed(i)) {
       (*adaptive_covariance)(i, i) = 1.0;
       continue;

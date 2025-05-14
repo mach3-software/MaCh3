@@ -74,7 +74,7 @@ class AdaptiveMCMCHandler{
   }
 
   /// @brief Get the current values of the parameters
-  int GetNPars(){
+  int GetNumParams(){
     return static_cast<int>(_fCurrVal->size());
   }
 
@@ -90,7 +90,6 @@ class AdaptiveMCMCHandler{
 
   /// @brief Get Current value of parameter
   double CurrVal(int par_index);
-
 
   /// Meta variables related to adaption run time
   /// When do we start throwing
@@ -133,6 +132,7 @@ class AdaptiveMCMCHandler{
 
   /// Vector of fixed parameters
   const std::vector<double>* _fFixedPars;
+
   /// Current values of parameters
   const std::vector<double>* _fCurrVal;
 
