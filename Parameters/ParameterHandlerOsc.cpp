@@ -29,7 +29,10 @@ ParameterHandlerOsc::ParameterHandlerOsc(const std::vector<std::string>& YAMLFil
   CheckInitialisation("delm2_23", kDeltaM23);
   CheckInitialisation("sin2th_23", kSinTheta23);
 
-  /// @todo KS: Technically if we would like to use PCA we have to initialise parts here...
+  //KS: Transfer the starting parameters to the PCA basis, you don't want to start with zero..
+  if (pca) {
+    PCAObj->SetInitialParameters();
+  }
   flipdelM = true;
 
   Randomize();
