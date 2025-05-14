@@ -64,12 +64,12 @@ class AdaptiveMCMCHandler{
   bool SkipAdaption();
 
   /// @brief Set the current values of the parameters
-  void SetParams(std::vector<double>* params){
+  void SetParams(const std::vector<double>* params){
     _fCurrVal = params;
   }
 
   /// @brief Set the fixed parameters
-  void SetFixed(std::vector<double>* fix){
+  void SetFixed(const std::vector<double>* fix){
     _fFixedPars = fix;
   }
 

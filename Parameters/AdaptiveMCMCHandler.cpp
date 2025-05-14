@@ -250,50 +250,7 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance() {
     if (IsFixed(i)) {
       (*adaptive_covariance)(i, i) = 1.0;
       continue;
-    }  std::vector<double> par_means_prev = par_means;
-  int steps_post_burn = total_steps - start_adaptive_update;
-
-  // Step 1: Update means and compute deviations
-  for (int i = 0; i < GetNPars(); ++i) {
-    if (IsFixed(i)) continue;
-
-    par_means[i] =  (CurrVal(i) + par_means_prev[i]*steps_post_burn)/(steps_post_burn+1);
-    // Left over from cyclic means
-  }
-
-  // Step 2: Update covariance
-  for (int i = 0; i < GetNPars(); ++i) {
-    if (IsFixed(i)) {
-      (*adaptive_covariance)(i, i) = 1.0;
-      continue;
     }
-
-    int block_i = adapt_block_matrix_indices[i];
-
-    for (int j = 0; j <= i; ++j) {
-      if (IsFixed(j) || adapt_block_matrix_indices[j] != block_i) {
-        (*adaptive_covariance)(i, j) = 0.0;
-        (*adaptive_covariance)(j, i) = 0.0;
-        continue;
-      }
-
-      double cov_prev = (*adaptive_covariance)(i, j);
-      double cov_updated = 0.0;
-
-      if (steps_post_burn > 0) {
-      // Haario-style update
-        double cov_t = cov_prev * (steps_post_burn - 1) / steps_post_burn;
-        double prev_means_t = steps_post_burn * par_means_prev[i] * par_means_prev[j];
-        double curr_means_t = (steps_post_burn + 1) * par_means[i] * par_means[j];
-        double curr_step_t = CurrVal(i) * CurrVal(j);
-
-        cov_updated = cov_t + adaption_scale * (prev_means_t - curr_means_t + curr_step_t) / steps_post_burn;
-      }
-
-      (*adaptive_covariance)(i, j) = cov_updated;
-      (*adaptive_covariance)(j, i) = cov_updated;
-    }
-  }
 
     int block_i = adapt_block_matrix_indices[i];
 
