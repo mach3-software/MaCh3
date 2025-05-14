@@ -213,6 +213,60 @@ Functions</h2></td></tr>
 <tr class="memitem:gade58875564157c7c0aad0433498f955d"><td class="memItemLeft" align="right" valign="top">YAML::Node&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#gade58875564157c7c0aad0433498f955d">ParameterHandlerBase::GetConfig</a> () const</td></tr>
 <tr class="memdesc:gade58875564157c7c0aad0433498f955d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Getter to return a copy of the YAML node.  <br /></td></tr>
 <tr class="separator:gade58875564157c7c0aad0433498f955d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf891945da9f0dbfb775177f30483f437"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#gaf891945da9f0dbfb775177f30483f437">ParameterHandlerGeneric::GetParSampleID</a> (const int i) const</td></tr>
+<tr class="memdesc:gaf891945da9f0dbfb775177f30483f437"><td class="mdescLeft">&#160;</td><td class="mdescRight">ETA - just return the int of the SampleName, this can be removed to do a string comp at some point.  <br /></td></tr>
+<tr class="separator:gaf891945da9f0dbfb775177f30483f437"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae03d1182ae636f9017f3dacb626d89ea"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#gae03d1182ae636f9017f3dacb626d89ea">ParameterHandlerGeneric::GetParamTypeString</a> (const int i) const</td></tr>
+<tr class="memdesc:gae03d1182ae636f9017f3dacb626d89ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">ETA - just return a string of "spline", "norm" or "functional".  <br /></td></tr>
+<tr class="separator:gae03d1182ae636f9017f3dacb626d89ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga443f15a70ebeb62613c629b59447c503"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Structs_8h.html#affc27d8b7b82d3713f45af17873fde2f">SystType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#ga443f15a70ebeb62613c629b59447c503">ParameterHandlerGeneric::GetParamType</a> (const int i) const</td></tr>
+<tr class="memdesc:ga443f15a70ebeb62613c629b59447c503"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns enum describing our param type.  <br /></td></tr>
+<tr class="separator:ga443f15a70ebeb62613c629b59447c503"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaedc568e5a86735a4b3d823d204431f99"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; <a class="el" href="Structs_8h.html#a6720d732608767153550aebebcf8fbf4">SplineInterpolation</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#gaedc568e5a86735a4b3d823d204431f99">ParameterHandlerGeneric::GetSplineInterpolationFromSampleName</a> (const std::string &amp;SampleName)</td></tr>
+<tr class="memdesc:gaedc568e5a86735a4b3d823d204431f99"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the interpolation types for splines affecting a particular SampleName.  <br /></td></tr>
+<tr class="separator:gaedc568e5a86735a4b3d823d204431f99"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5656479e90a28c45083434b8157bcdef"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#ga5656479e90a28c45083434b8157bcdef">ParameterHandlerGeneric::GetParSplineName</a> (const int i)</td></tr>
+<tr class="memdesc:ga5656479e90a28c45083434b8157bcdef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the name of the spline associated with the spline at index i.  <br /></td></tr>
+<tr class="separator:ga5656479e90a28c45083434b8157bcdef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga58ccccc2b9a4280021e4663202612038"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#ga58ccccc2b9a4280021e4663202612038">ParameterHandlerGeneric::GetGlobalSystIndexFromSampleName</a> (const std::string &amp;SampleName, const <a class="el" href="Structs_8h.html#affc27d8b7b82d3713f45af17873fde2f">SystType</a> Type)</td></tr>
+<tr class="memdesc:ga58ccccc2b9a4280021e4663202612038"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Get spline parameters depending on given SampleName.  <br /></td></tr>
+<tr class="separator:ga58ccccc2b9a4280021e4663202612038"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8c5429b30a9cab758b6f547e7ad9b08c"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#ga8c5429b30a9cab758b6f547e7ad9b08c">ParameterHandlerGeneric::GetParSplineKnotUpperBound</a> (const int i)</td></tr>
+<tr class="memdesc:ga8c5429b30a9cab758b6f547e7ad9b08c"><td class="mdescLeft">&#160;</td><td class="mdescRight">EM: value at which we cap spline knot weight.  <br /></td></tr>
+<tr class="separator:ga8c5429b30a9cab758b6f547e7ad9b08c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gacf2ff8357abf80b657322310f38d804c"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#gacf2ff8357abf80b657322310f38d804c">ParameterHandlerGeneric::GetParSplineKnotLowerBound</a> (const int i)</td></tr>
+<tr class="memdesc:gacf2ff8357abf80b657322310f38d804c"><td class="mdescLeft">&#160;</td><td class="mdescRight">EM: value at which we cap spline knot weight.  <br /></td></tr>
+<tr class="separator:gacf2ff8357abf80b657322310f38d804c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga9b25b6f2f2d032d086963293eeb981c4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#ga9b25b6f2f2d032d086963293eeb981c4">ParameterHandlerGeneric::GetNumParamsFromSampleName</a> (const std::string &amp;SampleName, const <a class="el" href="Structs_8h.html#affc27d8b7b82d3713f45af17873fde2f">SystType</a> Type)</td></tr>
+<tr class="memdesc:ga9b25b6f2f2d032d086963293eeb981c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Grab the number of parameters for the relevant SampleName.  <br /></td></tr>
+<tr class="separator:ga9b25b6f2f2d032d086963293eeb981c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga9b36c926e52b06b2b49df1deb7630151"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#ga9b36c926e52b06b2b49df1deb7630151">ParameterHandlerGeneric::GetParsNamesFromSampleName</a> (const std::string &amp;SampleName, const <a class="el" href="Structs_8h.html#affc27d8b7b82d3713f45af17873fde2f">SystType</a> Type)</td></tr>
+<tr class="memdesc:ga9b36c926e52b06b2b49df1deb7630151"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Grab the parameter names for the relevant SampleName.  <br /></td></tr>
+<tr class="separator:ga9b36c926e52b06b2b49df1deb7630151"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga7e379966e0b525d3f0fea0f3be669ae5"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#ga7e379966e0b525d3f0fea0f3be669ae5">ParameterHandlerGeneric::GetParsIndexFromSampleName</a> (const std::string &amp;SampleName, const <a class="el" href="Structs_8h.html#affc27d8b7b82d3713f45af17873fde2f">SystType</a> Type)</td></tr>
+<tr class="memdesc:ga7e379966e0b525d3f0fea0f3be669ae5"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Grab the parameter indices for the relevant SampleName.  <br /></td></tr>
+<tr class="separator:ga7e379966e0b525d3f0fea0f3be669ae5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gadc9644bbd41005c36945bc9504ef91fd"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#gadc9644bbd41005c36945bc9504ef91fd">ParameterHandlerGeneric::GetSplineParsNamesFromSampleName</a> (const std::string &amp;SampleName)</td></tr>
+<tr class="memdesc:gadc9644bbd41005c36945bc9504ef91fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Get spline parameters depending on given SampleName.  <br /></td></tr>
+<tr class="separator:gadc9644bbd41005c36945bc9504ef91fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga2cc3651b66bbab393f1a1164adb84b87"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#ga2cc3651b66bbab393f1a1164adb84b87">ParameterHandlerGeneric::GetSplineFileParsNamesFromSampleName</a> (const std::string &amp;SampleName)</td></tr>
+<tr class="memdesc:ga2cc3651b66bbab393f1a1164adb84b87"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Get spline parameters depending on given SampleName.  <br /></td></tr>
+<tr class="separator:ga2cc3651b66bbab393f1a1164adb84b87"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf39a139867ff4837b7c6845636c9dcdc"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; std::vector&lt; int &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#gaf39a139867ff4837b7c6845636c9dcdc">ParameterHandlerGeneric::GetSplineModeVecFromSampleName</a> (const std::string &amp;SampleName)</td></tr>
+<tr class="memdesc:gaf39a139867ff4837b7c6845636c9dcdc"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Grab the Spline Modes for the relevant SampleName.  <br /></td></tr>
+<tr class="separator:gaf39a139867ff4837b7c6845636c9dcdc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga45b0e33d7f1016e2df09419969198e72"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#ga45b0e33d7f1016e2df09419969198e72">ParameterHandlerGeneric::GetSystIndexFromSampleName</a> (const std::string &amp;SampleName, const <a class="el" href="Structs_8h.html#affc27d8b7b82d3713f45af17873fde2f">SystType</a> Type) const</td></tr>
+<tr class="memdesc:ga45b0e33d7f1016e2df09419969198e72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Grab the index of the syst relative to global numbering.  <br /></td></tr>
+<tr class="separator:ga45b0e33d7f1016e2df09419969198e72"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga1564cde885453c57312f769e57d627ac"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; <a class="el" href="structNormParameter.html">NormParameter</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#ga1564cde885453c57312f769e57d627ac">ParameterHandlerGeneric::GetNormParsFromSampleName</a> (const std::string &amp;SampleName) const</td></tr>
+<tr class="memdesc:ga1564cde885453c57312f769e57d627ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Get norm/func parameters depending on given SampleName.  <br /></td></tr>
+<tr class="separator:ga1564cde885453c57312f769e57d627ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8f819bf0ef53544c864649d05479d95c"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; <a class="el" href="structFunctionalParameter.html">FunctionalParameter</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#ga8f819bf0ef53544c864649d05479d95c">ParameterHandlerGeneric::GetFunctionalParametersFromSampleName</a> (const std::string &amp;SampleName) const</td></tr>
+<tr class="memdesc:ga8f819bf0ef53544c864649d05479d95c"><td class="mdescLeft">&#160;</td><td class="mdescRight">HH Get functional parameters for the relevant SampleName.  <br /></td></tr>
+<tr class="separator:ga8f819bf0ef53544c864649d05479d95c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga819070e379db0ddec32c5a87c67d6bdb"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; <a class="el" href="structSplineParameter.html">SplineParameter</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#ga819070e379db0ddec32c5a87c67d6bdb">ParameterHandlerGeneric::GetSplineParsFromSampleName</a> (const std::string &amp;SampleName) const</td></tr>
+<tr class="memdesc:ga819070e379db0ddec32c5a87c67d6bdb"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Grab the Spline parameters for the relevant SampleName.  <br /></td></tr>
+<tr class="separator:ga819070e379db0ddec32c5a87c67d6bdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga91692aaf2ff729781592ff3ab1dfc979"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#ga91692aaf2ff729781592ff3ab1dfc979">ParameterHandlerGeneric::GetNominalArray</a> () override</td></tr>
 <tr class="memdesc:ga91692aaf2ff729781592ff3ab1dfc979"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: For most covariances prior and fparInit (prior) are the same, however for Xsec those can be different.  <br /></td></tr>
 <tr class="separator:ga91692aaf2ff729781592ff3ab1dfc979"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -621,6 +675,35 @@ Functions</h2></td></tr>
 </div><!-- fragment -->
 </div>
 </div>
+<a id="ga8f819bf0ef53544c864649d05479d95c" name="ga8f819bf0ef53544c864649d05479d95c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga8f819bf0ef53544c864649d05479d95c">&#9670;&#160;</a></span>GetFunctionalParametersFromSampleName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::vector&lt; <a class="el" href="structFunctionalParameter.html">FunctionalParameter</a> &gt; ParameterHandlerGeneric::GetFunctionalParametersFromSampleName </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>SampleName</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>HH Get functional parameters for the relevant SampleName. </p>
+
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00327">327</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  327</span>                                                                                                                                     {</div>
+<div class="line"><span class="lineno">  328</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  329</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="classParameterHandlerGeneric.html#a982803878f2f6ee7a28c6b7f3fede8f8">GetTypeParamsFromSampleName</a>(<a class="code hl_variable" href="classParameterHandlerGeneric.html#a67955522a48b4e340981b5ec1ca3b0da">_fSystToGlobalSystIndexMap</a>[SystType::kFunc], <a class="code hl_variable" href="classParameterHandlerGeneric.html#a9c201ce36c40a731f23d9949009835b5">FuncParams</a>, SampleName);</div>
+<div class="line"><span class="lineno">  330</span>}</div>
+<div class="ttc" id="aclassParameterHandlerGeneric_html_a67955522a48b4e340981b5ec1ca3b0da"><div class="ttname"><a href="classParameterHandlerGeneric.html#a67955522a48b4e340981b5ec1ca3b0da">ParameterHandlerGeneric::_fSystToGlobalSystIndexMap</a></div><div class="ttdeci">std::vector&lt; std::map&lt; int, int &gt; &gt; _fSystToGlobalSystIndexMap</div><div class="ttdoc">Map between number of given parameter type with global parameter numbering. For example 2nd norm para...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8h_source.html#l00202">ParameterHandlerGeneric.h:202</a></div></div>
+<div class="ttc" id="aclassParameterHandlerGeneric_html_a982803878f2f6ee7a28c6b7f3fede8f8"><div class="ttname"><a href="classParameterHandlerGeneric.html#a982803878f2f6ee7a28c6b7f3fede8f8">ParameterHandlerGeneric::GetTypeParamsFromSampleName</a></div><div class="ttdeci">std::vector&lt; ParamT &gt; GetTypeParamsFromSampleName(const std::map&lt; int, int &gt; &amp;indexMap, const std::vector&lt; ParamT &gt; &amp;params, const std::string &amp;SampleName) const</div><div class="ttdoc">Retrieve parameters that apply to a given sample name.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8cpp_source.html#l00348">ParameterHandlerGeneric.cpp:348</a></div></div>
+<div class="ttc" id="aclassParameterHandlerGeneric_html_a9c201ce36c40a731f23d9949009835b5"><div class="ttname"><a href="classParameterHandlerGeneric.html#a9c201ce36c40a731f23d9949009835b5">ParameterHandlerGeneric::FuncParams</a></div><div class="ttdeci">std::vector&lt; FunctionalParameter &gt; FuncParams</div><div class="ttdoc">Vector containing info for functional systematics.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8h_source.html#l00211">ParameterHandlerGeneric.h:211</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
 <a id="ga1d6bf8baedde26b654ac5d5a5736f48e" name="ga1d6bf8baedde26b654ac5d5a5736f48e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga1d6bf8baedde26b654ac5d5a5736f48e">&#9670;&#160;</a></span>GetGenerated()</h2>
 
@@ -717,6 +800,50 @@ Functions</h2></td></tr>
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00286">286</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  286</span>{<span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#a4fa06677236f06592d492663254dd253">_fGlobalStepScale</a>; }</div>
 <div class="ttc" id="aclassParameterHandlerBase_html_a4fa06677236f06592d492663254dd253"><div class="ttname"><a href="classParameterHandlerBase.html#a4fa06677236f06592d492663254dd253">ParameterHandlerBase::_fGlobalStepScale</a></div><div class="ttdeci">double _fGlobalStepScale</div><div class="ttdoc">Global step scale applied to all params in this class.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00498">ParameterHandlerBase.h:498</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ga58ccccc2b9a4280021e4663202612038" name="ga58ccccc2b9a4280021e4663202612038"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga58ccccc2b9a4280021e4663202612038">&#9670;&#160;</a></span>GetGlobalSystIndexFromSampleName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::vector&lt; int &gt; ParameterHandlerGeneric::GetGlobalSystIndexFromSampleName </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>SampleName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="Structs_8h.html#affc27d8b7b82d3713f45af17873fde2f">SystType</a>&#160;</td>
+          <td class="paramname"><em>Type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>DB Get spline parameters depending on given SampleName. </p>
+
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00228">228</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  228</span>                                                                                                                               {</div>
+<div class="line"><span class="lineno">  229</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  230</span>  std::vector&lt;int&gt; returnVec;</div>
+<div class="line"><span class="lineno">  231</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;pair : <a class="code hl_variable" href="classParameterHandlerGeneric.html#a67955522a48b4e340981b5ec1ca3b0da">_fSystToGlobalSystIndexMap</a>[Type]) {</div>
+<div class="line"><span class="lineno">  232</span>    <span class="keyword">auto</span> &amp;SystIndex = pair.second;</div>
+<div class="line"><span class="lineno">  233</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd">AppliesToSample</a>(SystIndex, SampleName)) { <span class="comment">//If parameter applies to required SampleID</span></div>
+<div class="line"><span class="lineno">  234</span>      returnVec.push_back(SystIndex);</div>
+<div class="line"><span class="lineno">  235</span>    }</div>
+<div class="line"><span class="lineno">  236</span>  }</div>
+<div class="line"><span class="lineno">  237</span>  <span class="keywordflow">return</span> returnVec;</div>
+<div class="line"><span class="lineno">  238</span>}</div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a3c5d92e6b592f18ea4d6bd9afaca7ebd"><div class="ttname"><a href="classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd">ParameterHandlerBase::AppliesToSample</a></div><div class="ttdeci">bool AppliesToSample(const int SystIndex, const std::string &amp;SampleName) const</div><div class="ttdoc">Check if parameter is affecting given sample name.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l01218">ParameterHandlerBase.cpp:1218</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1083,14 +1210,41 @@ Functions</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="group__ParameterHandlerGetters.html#ga906630799bf6fabb15f4727550247e57">ParameterHandlerBase</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8h_source.html#l00097">97</a> of file <a class="el" href="ParameterHandlerGeneric_8h_source.html">ParameterHandlerGeneric.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   98</span>    {</div>
-<div class="line"><span class="lineno">   99</span>      std::vector&lt;double&gt; prior(<a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>);</div>
-<div class="line"><span class="lineno">  100</span>      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>; i++) {</div>
-<div class="line"><span class="lineno">  101</span>        prior[i] = <a class="code hl_variable" href="classParameterHandlerBase.html#a9f98cdf43f276a271da9a66509063ba6">_fPreFitValue</a>.at(i);</div>
-<div class="line"><span class="lineno">  102</span>      }</div>
-<div class="line"><span class="lineno">  103</span>      <span class="keywordflow">return</span> prior;</div>
-<div class="line"><span class="lineno">  104</span>    }</div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8h_source.html#l00100">100</a> of file <a class="el" href="ParameterHandlerGeneric_8h_source.html">ParameterHandlerGeneric.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  101</span>    {</div>
+<div class="line"><span class="lineno">  102</span>      std::vector&lt;double&gt; prior(<a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>);</div>
+<div class="line"><span class="lineno">  103</span>      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>; i++) {</div>
+<div class="line"><span class="lineno">  104</span>        prior[i] = <a class="code hl_variable" href="classParameterHandlerBase.html#a9f98cdf43f276a271da9a66509063ba6">_fPreFitValue</a>.at(i);</div>
+<div class="line"><span class="lineno">  105</span>      }</div>
+<div class="line"><span class="lineno">  106</span>      <span class="keywordflow">return</span> prior;</div>
+<div class="line"><span class="lineno">  107</span>    }</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ga1564cde885453c57312f769e57d627ac" name="ga1564cde885453c57312f769e57d627ac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga1564cde885453c57312f769e57d627ac">&#9670;&#160;</a></span>GetNormParsFromSampleName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::vector&lt; <a class="el" href="structNormParameter.html">NormParameter</a> &gt; ParameterHandlerGeneric::GetNormParsFromSampleName </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>SampleName</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>DB Get norm/func parameters depending on given SampleName. </p>
+
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00334">334</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  334</span>                                                                                                                   {</div>
+<div class="line"><span class="lineno">  335</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  336</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="classParameterHandlerGeneric.html#a982803878f2f6ee7a28c6b7f3fede8f8">GetTypeParamsFromSampleName</a>(<a class="code hl_variable" href="classParameterHandlerGeneric.html#a67955522a48b4e340981b5ec1ca3b0da">_fSystToGlobalSystIndexMap</a>[SystType::kNorm], <a class="code hl_variable" href="classParameterHandlerGeneric.html#a5c0bc9ff4fd8d08bdbd192f161365220">NormParams</a>, SampleName);</div>
+<div class="line"><span class="lineno">  337</span>}</div>
+<div class="ttc" id="aclassParameterHandlerGeneric_html_a5c0bc9ff4fd8d08bdbd192f161365220"><div class="ttname"><a href="classParameterHandlerGeneric.html#a5c0bc9ff4fd8d08bdbd192f161365220">ParameterHandlerGeneric::NormParams</a></div><div class="ttdeci">std::vector&lt; NormParameter &gt; NormParams</div><div class="ttdoc">Vector containing info for normalisation systematics.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8h_source.html#l00208">ParameterHandlerGeneric.h:208</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1158,6 +1312,55 @@ Functions</h2></td></tr>
 </div><!-- fragment -->
 </div>
 </div>
+<a id="ga9b25b6f2f2d032d086963293eeb981c4" name="ga9b25b6f2f2d032d086963293eeb981c4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga9b25b6f2f2d032d086963293eeb981c4">&#9670;&#160;</a></span>GetNumParamsFromSampleName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int ParameterHandlerGeneric::GetNumParamsFromSampleName </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>SampleName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="Structs_8h.html#affc27d8b7b82d3713f45af17873fde2f">SystType</a>&#160;</td>
+          <td class="paramname"><em>Type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>DB Grab the number of parameters for the relevant SampleName. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Type</td><td>Type of syst, for example kNorm, kSpline etc </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00363">363</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  363</span>                                                                                                        {</div>
+<div class="line"><span class="lineno">  364</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  365</span>  <span class="keywordtype">int</span> returnVal = 0;</div>
+<div class="line"><span class="lineno">  366</span>  <a class="code hl_function" href="classParameterHandlerGeneric.html#ae708dcd0bbfac4a5dd599a5c536da62b">IterateOverParams</a>(SampleName,</div>
+<div class="line"><span class="lineno">  367</span>    [&amp;](<span class="keywordtype">int</span> i) { <span class="keywordflow">return</span> <a class="code hl_function" href="group__ParameterHandlerGetters.html#ga443f15a70ebeb62613c629b59447c503">GetParamType</a>(i) == Type; }, <span class="comment">// Filter condition</span></div>
+<div class="line"><span class="lineno">  368</span>    [&amp;](int) { returnVal += 1; } <span class="comment">// Action to perform if filter passes</span></div>
+<div class="line"><span class="lineno">  369</span>  );</div>
+<div class="line"><span class="lineno">  370</span>  <span class="keywordflow">return</span> returnVal;</div>
+<div class="line"><span class="lineno">  371</span>}</div>
+<div class="ttc" id="aclassParameterHandlerGeneric_html_ae708dcd0bbfac4a5dd599a5c536da62b"><div class="ttname"><a href="classParameterHandlerGeneric.html#ae708dcd0bbfac4a5dd599a5c536da62b">ParameterHandlerGeneric::IterateOverParams</a></div><div class="ttdeci">void IterateOverParams(const std::string &amp;SampleName, FilterFunc filter, ActionFunc action)</div><div class="ttdoc">Iterates over parameters and applies a filter and action function.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8cpp_source.html#l00399">ParameterHandlerGeneric.cpp:399</a></div></div>
+<div class="ttc" id="agroup__ParameterHandlerGetters_html_ga443f15a70ebeb62613c629b59447c503"><div class="ttname"><a href="group__ParameterHandlerGetters.html#ga443f15a70ebeb62613c629b59447c503">ParameterHandlerGeneric::GetParamType</a></div><div class="ttdeci">SystType GetParamType(const int i) const</div><div class="ttdoc">Returns enum describing our param type.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8h_source.html#l00036">ParameterHandlerGeneric.h:36</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
 <a id="gac03f852eed2fd266ac31e7b0188c73bb" name="gac03f852eed2fd266ac31e7b0188c73bb"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#gac03f852eed2fd266ac31e7b0188c73bb">&#9670;&#160;</a></span>GetOscParsFromSampleName()</h2>
 
@@ -1188,7 +1391,6 @@ Functions</h2></td></tr>
 <div class="line"><span class="lineno">  121</span>  <span class="keywordflow">return</span> returnVec;</div>
 <div class="line"><span class="lineno">  122</span>}</div>
 <div class="ttc" id="aclassParameterHandlerBase_html_a2ed43dcb9347691c753a02d1aee633ab"><div class="ttname"><a href="classParameterHandlerBase.html#a2ed43dcb9347691c753a02d1aee633ab">ParameterHandlerBase::RetPointer</a></div><div class="ttdeci">const double * RetPointer(const int iParam)</div><div class="ttdoc">DB Pointer return to param position.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00230">ParameterHandlerBase.h:230</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a3c5d92e6b592f18ea4d6bd9afaca7ebd"><div class="ttname"><a href="classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd">ParameterHandlerBase::AppliesToSample</a></div><div class="ttdeci">bool AppliesToSample(const int SystIndex, const std::string &amp;SampleName) const</div><div class="ttdoc">Check if parameter is affecting given sample name.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l01218">ParameterHandlerBase.cpp:1218</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1220,6 +1422,82 @@ Functions</h2></td></tr>
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00213">213</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  213</span>{<span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#a1ebeda558155dfa06070e67218b9a567">AdaptiveHandler</a>-&gt;par_means;}</div>
 <div class="ttc" id="aclassParameterHandlerBase_html_a1ebeda558155dfa06070e67218b9a567"><div class="ttname"><a href="classParameterHandlerBase.html#a1ebeda558155dfa06070e67218b9a567">ParameterHandlerBase::AdaptiveHandler</a></div><div class="ttdeci">std::unique_ptr&lt; adaptive_mcmc::AdaptiveMCMCHandler &gt; AdaptiveHandler</div><div class="ttdoc">Struct containing information about adaption.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00556">ParameterHandlerBase.h:556</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ga443f15a70ebeb62613c629b59447c503" name="ga443f15a70ebeb62613c629b59447c503"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga443f15a70ebeb62613c629b59447c503">&#9670;&#160;</a></span>GetParamType()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="Structs_8h.html#affc27d8b7b82d3713f45af17873fde2f">SystType</a> ParameterHandlerGeneric::GetParamType </td>
+          <td>(</td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>i</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns enum describing our param type. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i</td><td>parameter index </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8h_source.html#l00036">36</a> of file <a class="el" href="ParameterHandlerGeneric_8h_source.html">ParameterHandlerGeneric.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   36</span>{<span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerGeneric.html#a6e412e6a3e8b954e1efcb97b03520f52">_fParamType</a>[i];}</div>
+<div class="ttc" id="aclassParameterHandlerGeneric_html_a6e412e6a3e8b954e1efcb97b03520f52"><div class="ttname"><a href="classParameterHandlerGeneric.html#a6e412e6a3e8b954e1efcb97b03520f52">ParameterHandlerGeneric::_fParamType</a></div><div class="ttdeci">std::vector&lt; SystType &gt; _fParamType</div><div class="ttdoc">Type of parameter like norm, spline etc.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8h_source.html#l00193">ParameterHandlerGeneric.h:193</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="gae03d1182ae636f9017f3dacb626d89ea" name="gae03d1182ae636f9017f3dacb626d89ea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gae03d1182ae636f9017f3dacb626d89ea">&#9670;&#160;</a></span>GetParamTypeString()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string ParameterHandlerGeneric::GetParamTypeString </td>
+          <td>(</td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>i</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>ETA - just return a string of "spline", "norm" or "functional". </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i</td><td>parameter index </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8h_source.html#l00032">32</a> of file <a class="el" href="ParameterHandlerGeneric_8h_source.html">ParameterHandlerGeneric.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   32</span>{ <span class="keywordflow">return</span> <a class="code hl_function" href="Structs_8h.html#ad39c312dc44177340e2ebccd3d3f2d4c">SystType_ToString</a>(<a class="code hl_variable" href="classParameterHandlerGeneric.html#a6e412e6a3e8b954e1efcb97b03520f52">_fParamType</a>[i]); }</div>
+<div class="ttc" id="aStructs_8h_html_ad39c312dc44177340e2ebccd3d3f2d4c"><div class="ttname"><a href="Structs_8h.html#ad39c312dc44177340e2ebccd3d3f2d4c">SystType_ToString</a></div><div class="ttdeci">std::string SystType_ToString(const SystType i)</div><div class="ttdoc">Convert a Syst type type to a string.</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00358">Structs.h:358</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1492,6 +1770,251 @@ Functions</h2></td></tr>
 </div><!-- fragment -->
 </div>
 </div>
+<a id="gaf891945da9f0dbfb775177f30483f437" name="gaf891945da9f0dbfb775177f30483f437"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf891945da9f0dbfb775177f30483f437">&#9670;&#160;</a></span>GetParSampleID()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt; std::string &gt; ParameterHandlerGeneric::GetParSampleID </td>
+          <td>(</td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>i</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>ETA - just return the int of the SampleName, this can be removed to do a string comp at some point. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i</td><td>parameter index </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8h_source.html#l00028">28</a> of file <a class="el" href="ParameterHandlerGeneric_8h_source.html">ParameterHandlerGeneric.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   28</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#af4ebe6b24b280c5263e6a5385b11a2c9">_fSampleNames</a>[i];};</div>
+<div class="ttc" id="aclassParameterHandlerBase_html_af4ebe6b24b280c5263e6a5385b11a2c9"><div class="ttname"><a href="classParameterHandlerBase.html#af4ebe6b24b280c5263e6a5385b11a2c9">ParameterHandlerBase::_fSampleNames</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; std::string &gt; &gt; _fSampleNames</div><div class="ttdoc">Tells to which samples object param should be applied.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00530">ParameterHandlerBase.h:530</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ga7e379966e0b525d3f0fea0f3be669ae5" name="ga7e379966e0b525d3f0fea0f3be669ae5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga7e379966e0b525d3f0fea0f3be669ae5">&#9670;&#160;</a></span>GetParsIndexFromSampleName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::vector&lt; int &gt; ParameterHandlerGeneric::GetParsIndexFromSampleName </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>SampleName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="Structs_8h.html#affc27d8b7b82d3713f45af17873fde2f">SystType</a>&#160;</td>
+          <td class="paramname"><em>Type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>DB Grab the parameter indices for the relevant SampleName. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Type</td><td>Type of syst, for example kNorm, kSpline etc </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00387">387</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  387</span>                                                                                                                         {</div>
+<div class="line"><span class="lineno">  388</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  389</span>  std::vector&lt;int&gt; returnVec;</div>
+<div class="line"><span class="lineno">  390</span>  <a class="code hl_function" href="classParameterHandlerGeneric.html#ae708dcd0bbfac4a5dd599a5c536da62b">IterateOverParams</a>(SampleName,</div>
+<div class="line"><span class="lineno">  391</span>    [&amp;](<span class="keywordtype">int</span> i) { <span class="keywordflow">return</span> <a class="code hl_function" href="group__ParameterHandlerGetters.html#ga443f15a70ebeb62613c629b59447c503">GetParamType</a>(i) == Type; }, <span class="comment">// Filter condition</span></div>
+<div class="line"><span class="lineno">  392</span>    [&amp;](<span class="keywordtype">int</span> i) { returnVec.push_back(i); } <span class="comment">// Action to perform if filter passes</span></div>
+<div class="line"><span class="lineno">  393</span>  );</div>
+<div class="line"><span class="lineno">  394</span>  <span class="keywordflow">return</span> returnVec;</div>
+<div class="line"><span class="lineno">  395</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ga9b36c926e52b06b2b49df1deb7630151" name="ga9b36c926e52b06b2b49df1deb7630151"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga9b36c926e52b06b2b49df1deb7630151">&#9670;&#160;</a></span>GetParsNamesFromSampleName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::vector&lt; std::string &gt; ParameterHandlerGeneric::GetParsNamesFromSampleName </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>SampleName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="Structs_8h.html#affc27d8b7b82d3713f45af17873fde2f">SystType</a>&#160;</td>
+          <td class="paramname"><em>Type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>DB Grab the parameter names for the relevant SampleName. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Type</td><td>Type of syst, for example kNorm, kSpline etc </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00375">375</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  375</span>                                                                                                                               {</div>
+<div class="line"><span class="lineno">  376</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  377</span>  std::vector&lt;std::string&gt; returnVec;</div>
+<div class="line"><span class="lineno">  378</span>  <a class="code hl_function" href="classParameterHandlerGeneric.html#ae708dcd0bbfac4a5dd599a5c536da62b">IterateOverParams</a>(SampleName,</div>
+<div class="line"><span class="lineno">  379</span>    [&amp;](<span class="keywordtype">int</span> i) { <span class="keywordflow">return</span> <a class="code hl_function" href="group__ParameterHandlerGetters.html#ga443f15a70ebeb62613c629b59447c503">GetParamType</a>(i) == Type; }, <span class="comment">// Filter condition</span></div>
+<div class="line"><span class="lineno">  380</span>    [&amp;](<span class="keywordtype">int</span> i) { returnVec.push_back(<a class="code hl_function" href="group__ParameterHandlerGetters.html#ga65b61ae6c60d4eadbb06fdef9596cc7f">GetParFancyName</a>(i)); } <span class="comment">// Action to perform if filter passes</span></div>
+<div class="line"><span class="lineno">  381</span>  );</div>
+<div class="line"><span class="lineno">  382</span>  <span class="keywordflow">return</span> returnVec;</div>
+<div class="line"><span class="lineno">  383</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="gacf2ff8357abf80b657322310f38d804c" name="gacf2ff8357abf80b657322310f38d804c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gacf2ff8357abf80b657322310f38d804c">&#9670;&#160;</a></span>GetParSplineKnotLowerBound()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double ParameterHandlerGeneric::GetParSplineKnotLowerBound </td>
+          <td>(</td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>i</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>EM: value at which we cap spline knot weight. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i</td><td>spline parameter index, not confuse with global index </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8h_source.html#l00059">59</a> of file <a class="el" href="ParameterHandlerGeneric_8h_source.html">ParameterHandlerGeneric.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   59</span>{<span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerGeneric.html#a0dd46fbd1eb07b54ba48e8fc7a5c03c1">SplineParams</a>.at(i)._SplineKnotLowBound;}</div>
+<div class="ttc" id="aclassParameterHandlerGeneric_html_a0dd46fbd1eb07b54ba48e8fc7a5c03c1"><div class="ttname"><a href="classParameterHandlerGeneric.html#a0dd46fbd1eb07b54ba48e8fc7a5c03c1">ParameterHandlerGeneric::SplineParams</a></div><div class="ttdeci">std::vector&lt; SplineParameter &gt; SplineParams</div><div class="ttdoc">Vector containing info for normalisation systematics.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8h_source.html#l00205">ParameterHandlerGeneric.h:205</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ga8c5429b30a9cab758b6f547e7ad9b08c" name="ga8c5429b30a9cab758b6f547e7ad9b08c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga8c5429b30a9cab758b6f547e7ad9b08c">&#9670;&#160;</a></span>GetParSplineKnotUpperBound()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double ParameterHandlerGeneric::GetParSplineKnotUpperBound </td>
+          <td>(</td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>i</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>EM: value at which we cap spline knot weight. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i</td><td>spline parameter index, not confuse with global index </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8h_source.html#l00055">55</a> of file <a class="el" href="ParameterHandlerGeneric_8h_source.html">ParameterHandlerGeneric.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   55</span>{<span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerGeneric.html#a0dd46fbd1eb07b54ba48e8fc7a5c03c1">SplineParams</a>.at(i)._SplineKnotUpBound;}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ga5656479e90a28c45083434b8157bcdef" name="ga5656479e90a28c45083434b8157bcdef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga5656479e90a28c45083434b8157bcdef">&#9670;&#160;</a></span>GetParSplineName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string ParameterHandlerGeneric::GetParSplineName </td>
+          <td>(</td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>i</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the name of the spline associated with the spline at index i. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i</td><td>spline parameter index, not to be confused with global index </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8h_source.html#l00047">47</a> of file <a class="el" href="ParameterHandlerGeneric_8h_source.html">ParameterHandlerGeneric.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   47</span>{<span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerGeneric.html#a24c0df68d9d476ea304c75310f18de2c">_fSplineNames</a>[i];}</div>
+<div class="ttc" id="aclassParameterHandlerGeneric_html_a24c0df68d9d476ea304c75310f18de2c"><div class="ttname"><a href="classParameterHandlerGeneric.html#a24c0df68d9d476ea304c75310f18de2c">ParameterHandlerGeneric::_fSplineNames</a></div><div class="ttdeci">std::vector&lt; std::string &gt; _fSplineNames</div><div class="ttdoc">Name of spline in TTree (TBranch),.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8h_source.html#l00196">ParameterHandlerGeneric.h:196</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
 <a id="ga80968cb6b8098254de50f7700146713d" name="ga80968cb6b8098254de50f7700146713d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga80968cb6b8098254de50f7700146713d">&#9670;&#160;</a></span>GetPreFitValues()</h2>
 
@@ -1584,6 +2107,208 @@ Functions</h2></td></tr>
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00088">88</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   88</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#a166763aa1cc313512fb502bca6ea8a2c">randParams</a>[i];}</div>
 <div class="ttc" id="aclassParameterHandlerBase_html_a166763aa1cc313512fb502bca6ea8a2c"><div class="ttname"><a href="classParameterHandlerBase.html#a166763aa1cc313512fb502bca6ea8a2c">ParameterHandlerBase::randParams</a></div><div class="ttdeci">double * randParams</div><div class="ttdoc">Random number taken from gaussian around prior error used for corr_throw.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00494">ParameterHandlerBase.h:494</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ga2cc3651b66bbab393f1a1164adb84b87" name="ga2cc3651b66bbab393f1a1164adb84b87"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga2cc3651b66bbab393f1a1164adb84b87">&#9670;&#160;</a></span>GetSplineFileParsNamesFromSampleName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::vector&lt; std::string &gt; ParameterHandlerGeneric::GetSplineFileParsNamesFromSampleName </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>SampleName</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>DB Get spline parameters depending on given SampleName. </p>
+
+</div>
+</div>
+<a id="gaedc568e5a86735a4b3d823d204431f99" name="gaedc568e5a86735a4b3d823d204431f99"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaedc568e5a86735a4b3d823d204431f99">&#9670;&#160;</a></span>GetSplineInterpolationFromSampleName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::vector&lt; <a class="el" href="Structs_8h.html#a6720d732608767153550aebebcf8fbf4">SplineInterpolation</a> &gt; ParameterHandlerGeneric::GetSplineInterpolationFromSampleName </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>SampleName</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the interpolation types for splines affecting a particular SampleName. </p>
+
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00124">124</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  124</span>                                                                                                                              {</div>
+<div class="line"><span class="lineno">  125</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  126</span>  std::vector&lt;SplineInterpolation&gt; returnVec;</div>
+<div class="line"><span class="lineno">  127</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;pair : <a class="code hl_variable" href="classParameterHandlerGeneric.html#a67955522a48b4e340981b5ec1ca3b0da">_fSystToGlobalSystIndexMap</a>[SystType::kSpline]) {</div>
+<div class="line"><span class="lineno">  128</span>    <span class="keyword">auto</span> &amp;SplineIndex = pair.first;</div>
+<div class="line"><span class="lineno">  129</span>    <span class="keyword">auto</span> &amp;SystIndex = pair.second;</div>
+<div class="line"><span class="lineno">  130</span> </div>
+<div class="line"><span class="lineno">  131</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd">AppliesToSample</a>(SystIndex, SampleName)) { <span class="comment">//If parameter applies to required SampleID</span></div>
+<div class="line"><span class="lineno">  132</span>      returnVec.push_back(<a class="code hl_variable" href="classParameterHandlerGeneric.html#a0dd46fbd1eb07b54ba48e8fc7a5c03c1">SplineParams</a>.at(SplineIndex)._SplineInterpolationType);</div>
+<div class="line"><span class="lineno">  133</span>    }</div>
+<div class="line"><span class="lineno">  134</span>  }</div>
+<div class="line"><span class="lineno">  135</span>  <span class="keywordflow">return</span> returnVec;</div>
+<div class="line"><span class="lineno">  136</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="gaf39a139867ff4837b7c6845636c9dcdc" name="gaf39a139867ff4837b7c6845636c9dcdc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf39a139867ff4837b7c6845636c9dcdc">&#9670;&#160;</a></span>GetSplineModeVecFromSampleName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::vector&lt; std::vector&lt; int &gt; &gt; ParameterHandlerGeneric::GetSplineModeVecFromSampleName </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>SampleName</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>DB Grab the Spline Modes for the relevant SampleName. </p>
+
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00140">140</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  140</span>                                                                                                                     {</div>
+<div class="line"><span class="lineno">  141</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  142</span>  std::vector&lt; std::vector&lt;int&gt; &gt; returnVec;</div>
+<div class="line"><span class="lineno">  143</span>  <span class="comment">//Need a counter or something to correctly get the index in _fSplineModes since it&#39;s not of length nPars</span></div>
+<div class="line"><span class="lineno">  144</span>  <span class="comment">//Should probably just make a std::map&lt;std::string, int&gt; for param name to FD spline index</span></div>
+<div class="line"><span class="lineno">  145</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;pair : <a class="code hl_variable" href="classParameterHandlerGeneric.html#a67955522a48b4e340981b5ec1ca3b0da">_fSystToGlobalSystIndexMap</a>[SystType::kSpline]) {</div>
+<div class="line"><span class="lineno">  146</span>    <span class="keyword">auto</span> &amp;SplineIndex = pair.first;</div>
+<div class="line"><span class="lineno">  147</span>    <span class="keyword">auto</span> &amp;SystIndex = pair.second;</div>
+<div class="line"><span class="lineno">  148</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd">AppliesToSample</a>(SystIndex, SampleName)) { <span class="comment">//If parameter applies to required SampleID</span></div>
+<div class="line"><span class="lineno">  149</span>      returnVec.push_back(<a class="code hl_variable" href="classParameterHandlerGeneric.html#a0dd46fbd1eb07b54ba48e8fc7a5c03c1">SplineParams</a>.at(SplineIndex)._fSplineModes);</div>
+<div class="line"><span class="lineno">  150</span>    }</div>
+<div class="line"><span class="lineno">  151</span>  }</div>
+<div class="line"><span class="lineno">  152</span>  <span class="keywordflow">return</span> returnVec;</div>
+<div class="line"><span class="lineno">  153</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ga819070e379db0ddec32c5a87c67d6bdb" name="ga819070e379db0ddec32c5a87c67d6bdb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga819070e379db0ddec32c5a87c67d6bdb">&#9670;&#160;</a></span>GetSplineParsFromSampleName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::vector&lt; <a class="el" href="structSplineParameter.html">SplineParameter</a> &gt; ParameterHandlerGeneric::GetSplineParsFromSampleName </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>SampleName</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>KS: Grab the Spline parameters for the relevant SampleName. </p>
+
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00341">341</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  341</span>                                                                                                                       {</div>
+<div class="line"><span class="lineno">  342</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  343</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="classParameterHandlerGeneric.html#a982803878f2f6ee7a28c6b7f3fede8f8">GetTypeParamsFromSampleName</a>(<a class="code hl_variable" href="classParameterHandlerGeneric.html#a67955522a48b4e340981b5ec1ca3b0da">_fSystToGlobalSystIndexMap</a>[SystType::kSpline], <a class="code hl_variable" href="classParameterHandlerGeneric.html#a0dd46fbd1eb07b54ba48e8fc7a5c03c1">SplineParams</a>, SampleName);</div>
+<div class="line"><span class="lineno">  344</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="gadc9644bbd41005c36945bc9504ef91fd" name="gadc9644bbd41005c36945bc9504ef91fd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gadc9644bbd41005c36945bc9504ef91fd">&#9670;&#160;</a></span>GetSplineParsNamesFromSampleName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::vector&lt; std::string &gt; ParameterHandlerGeneric::GetSplineParsNamesFromSampleName </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>SampleName</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>DB Get spline parameters depending on given SampleName. </p>
+
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00109">109</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  109</span>                                                                                                                {</div>
+<div class="line"><span class="lineno">  110</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  111</span>  std::vector&lt;std::string&gt; returnVec;</div>
+<div class="line"><span class="lineno">  112</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;pair : <a class="code hl_variable" href="classParameterHandlerGeneric.html#a67955522a48b4e340981b5ec1ca3b0da">_fSystToGlobalSystIndexMap</a>[SystType::kSpline]) {</div>
+<div class="line"><span class="lineno">  113</span>    <span class="keyword">auto</span> &amp;SplineIndex = pair.first;</div>
+<div class="line"><span class="lineno">  114</span>    <span class="keyword">auto</span> &amp;SystIndex = pair.second;</div>
+<div class="line"><span class="lineno">  115</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd">AppliesToSample</a>(SystIndex, SampleName)) { <span class="comment">//If parameter applies to required Sample</span></div>
+<div class="line"><span class="lineno">  116</span>      returnVec.push_back(<a class="code hl_variable" href="classParameterHandlerGeneric.html#a24c0df68d9d476ea304c75310f18de2c">_fSplineNames</a>.at(SplineIndex));</div>
+<div class="line"><span class="lineno">  117</span>    }</div>
+<div class="line"><span class="lineno">  118</span> </div>
+<div class="line"><span class="lineno">  119</span>  }</div>
+<div class="line"><span class="lineno">  120</span>  <span class="keywordflow">return</span> returnVec;</div>
+<div class="line"><span class="lineno">  121</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ga45b0e33d7f1016e2df09419969198e72" name="ga45b0e33d7f1016e2df09419969198e72"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga45b0e33d7f1016e2df09419969198e72">&#9670;&#160;</a></span>GetSystIndexFromSampleName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::vector&lt; int &gt; ParameterHandlerGeneric::GetSystIndexFromSampleName </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>SampleName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="Structs_8h.html#affc27d8b7b82d3713f45af17873fde2f">SystType</a>&#160;</td>
+          <td class="paramname"><em>Type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Grab the index of the syst relative to global numbering. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Type</td><td>Type of syst, for example kNorm, kSpline etc </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00243">243</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  243</span>                                                                                                                                {</div>
+<div class="line"><span class="lineno">  244</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  245</span>  std::vector&lt;int&gt; returnVec;</div>
+<div class="line"><span class="lineno">  246</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;pair : <a class="code hl_variable" href="classParameterHandlerGeneric.html#a67955522a48b4e340981b5ec1ca3b0da">_fSystToGlobalSystIndexMap</a>[Type]) {</div>
+<div class="line"><span class="lineno">  247</span>    <span class="keyword">auto</span> &amp;SplineIndex = pair.first;</div>
+<div class="line"><span class="lineno">  248</span>    <span class="keyword">auto</span> &amp;systIndex = pair.second;</div>
+<div class="line"><span class="lineno">  249</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd">AppliesToSample</a>(systIndex, SampleName)) { <span class="comment">//If parameter applies to required SampleID</span></div>
+<div class="line"><span class="lineno">  250</span>      returnVec.push_back(SplineIndex);</div>
+<div class="line"><span class="lineno">  251</span>    }</div>
+<div class="line"><span class="lineno">  252</span>  }</div>
+<div class="line"><span class="lineno">  253</span>  <span class="keywordflow">return</span> returnVec;</div>
+<div class="line"><span class="lineno">  254</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>

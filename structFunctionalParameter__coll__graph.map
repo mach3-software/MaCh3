@@ -1,9 +1,10 @@
 <map id="FunctionalParameter" name="FunctionalParameter">
-<area shape="rect" id="node1" title="HH &#45; Functional parameters Carrier for whether you want to apply a systematic to an event or not." alt="" coords="816,99,972,125"/>
-<area shape="rect" id="node2" title=" " alt="" coords="233,17,319,42"/>
-<area shape="rect" id="node7" title=" " alt="" coords="472,61,659,86"/>
-<area shape="rect" id="node3" title=" " alt="" coords="5,9,144,49"/>
-<area shape="rect" id="node4" title=" " alt="" coords="496,151,635,177"/>
-<area shape="rect" id="node5" title=" " alt="" coords="478,201,653,241"/>
-<area shape="rect" id="node6" title=" " alt="" coords="193,209,359,234"/>
+<area shape="rect" id="node1" title="HH &#45; Functional parameters Carrier for whether you want to apply a systematic to an event or not." alt="" coords="816,103,972,128"/>
+<area shape="rect" id="node2" href="$structTypeParameterBase.html" title="Base class storing info for parameters types, helping unify codebase." alt="" coords="490,5,641,31"/>
+<area shape="rect" id="node3" title=" " alt="" coords="233,31,319,56"/>
+<area shape="rect" id="node8" title=" " alt="" coords="472,55,659,80"/>
+<area shape="rect" id="node4" title=" " alt="" coords="5,23,144,63"/>
+<area shape="rect" id="node5" title=" " alt="" coords="496,155,635,180"/>
+<area shape="rect" id="node6" title=" " alt="" coords="478,205,653,245"/>
+<area shape="rect" id="node7" title=" " alt="" coords="193,212,359,237"/>
 </map>

@@ -1,4 +1,7 @@
 <map id="SplineParameter" name="SplineParameter">
-<area shape="rect" id="node1" title="KS: Struct holding info about Spline Systematics." alt="" coords="10,93,139,119"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,5,144,31"/>
+<area shape="rect" id="node1" title="KS: Struct holding info about Spline Systematics." alt="" coords="100,271,229,296"/>
+<area shape="rect" id="node2" href="$structTypeParameterBase.html" title="Base class storing info for parameters types, helping unify codebase." alt="" coords="5,183,156,208"/>
+<area shape="rect" id="node3" title=" " alt="" coords="37,95,124,120"/>
+<area shape="rect" id="node4" title=" " alt="" coords="11,5,150,45"/>
+<area shape="rect" id="node5" title=" " alt="" coords="181,183,319,208"/>
 </map>
