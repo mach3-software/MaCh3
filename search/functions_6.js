@@ -27,7 +27,8 @@ var searchData=
   ['fishercombinedpvalue_24',['FisherCombinedPValue',['../StatisticalUtils_8cpp.html#a8ba1090ae92f61008a6576c45b4b3b7b',1,'FisherCombinedPValue(const std::vector&lt; double &gt; &amp;pvalues):&#160;StatisticalUtils.cpp'],['../StatisticalUtils_8h.html#a8ba1090ae92f61008a6576c45b4b3b7b',1,'FisherCombinedPValue(const std::vector&lt; double &gt; &amp;pvalues):&#160;StatisticalUtils.cpp']]],
   ['fitterbase_25',['FitterBase',['../classFitterBase.html#ada72ecad038edc97497f9d4067ce77f5',1,'FitterBase::FitterBase()'],['../classPyFitterBase.html#ada72ecad038edc97497f9d4067ce77f5',1,'PyFitterBase::FitterBase()']]],
   ['fixsamplenamesquotes_26',['FixSampleNamesQuotes',['../namespaceM3.html#a68ab9b6b3d413a94604c740208c7895d',1,'M3']]],
-  ['fmaf_5ft_27',['fmaf_t',['../namespaceM3.html#ad501f876b26ca2cef7bb5f434deaffb8',1,'M3']]],
-  ['formatdouble_28',['FormatDouble',['../namespaceMaCh3Utils.html#a37d0c54de0b83b71393afca143ab1ec0',1,'MaCh3Utils']]],
-  ['four_5fvector_5faddition_29',['four_vector_addition',['../classPSO.html#ac6522025d324079b88bc7ea8c5e766d6',1,'PSO']]]
+  ['flipparametervalue_27',['FlipParameterValue',['../classParameterHandlerOsc.html#a2cbf09e9559a62e633406f430c86c964',1,'ParameterHandlerOsc']]],
+  ['fmaf_5ft_28',['fmaf_t',['../namespaceM3.html#ad501f876b26ca2cef7bb5f434deaffb8',1,'M3']]],
+  ['formatdouble_29',['FormatDouble',['../namespaceMaCh3Utils.html#a37d0c54de0b83b71393afca143ab1ec0',1,'MaCh3Utils']]],
+  ['four_5fvector_5faddition_30',['four_vector_addition',['../classPSO.html#ac6522025d324079b88bc7ea8c5e766d6',1,'PSO']]]
 ];

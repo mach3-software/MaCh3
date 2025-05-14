@@ -144,6 +144,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a58ba8ca9d1e079027da81ad258034437"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterHandlerOsc.html#a58ba8ca9d1e079027da81ad258034437">Print</a> ()</td></tr>
 <tr class="memdesc:a58ba8ca9d1e079027da81ad258034437"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Print all useful information's after initialization.  <br /></td></tr>
 <tr class="separator:a58ba8ca9d1e079027da81ad258034437"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2cbf09e9559a62e633406f430c86c964"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterHandlerOsc.html#a2cbf09e9559a62e633406f430c86c964">FlipParameterValue</a> (const int index, const double FlipPoint)</td></tr>
+<tr class="memdesc:a2cbf09e9559a62e633406f430c86c964"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Flip parameter around given value, for example mass ordering around 0.  <br /></td></tr>
+<tr class="separator:a2cbf09e9559a62e633406f430c86c964"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classParameterHandlerBase"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classParameterHandlerBase')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classParameterHandlerBase.html">ParameterHandlerBase</a></td></tr>
 <tr class="memitem:a96feef831858c54e4e7dd30afe581c67 inherit pub_methods_classParameterHandlerBase"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterHandlerBase.html#a96feef831858c54e4e7dd30afe581c67">ParameterHandlerBase</a> (const std::vector&lt; std::string &gt; &amp;YAMLFile, std::string name, double threshold=-1, int <a class="el" href="classParameterHandlerBase.html#a7dcdb94a0438ddb9b83e4cee8673e86d">FirstPCAdpar</a>=-999, int <a class="el" href="classParameterHandlerBase.html#a3f192f8800821774f5fc06826f108167">LastPCAdpar</a>=-999)</td></tr>
 <tr class="memdesc:a96feef831858c54e4e7dd30afe581c67 inherit pub_methods_classParameterHandlerBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">ETA - constructor for a YAML file.  <br /></td></tr>
@@ -689,11 +692,11 @@ Asher Kaboth </dd></dl>
 <div class="ttc" id="aclassParameterHandlerBase_html_aa30828713375ceda767c9631157bd41d"><div class="ttname"><a href="classParameterHandlerBase.html#aa30828713375ceda767c9631157bd41d">ParameterHandlerBase::_fNames</a></div><div class="ttdeci">std::vector&lt; std::string &gt; _fNames</div><div class="ttdoc">ETA _fNames is set automatically in the covariance class to be something like xsec_i,...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00504">ParameterHandlerBase.h:504</a></div></div>
 <div class="ttc" id="aclassParameterHandlerBase_html_ae036dc62d3a3710b78d5d767f280fa4b"><div class="ttname"><a href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">ParameterHandlerBase::pca</a></div><div class="ttdeci">bool pca</div><div class="ttdoc">perform PCA or not</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00533">ParameterHandlerBase.h:533</a></div></div>
 <div class="ttc" id="aclassParameterHandlerBase_html_af1b1a75fbc837d788201ea8062aa6a3b"><div class="ttname"><a href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">ParameterHandlerBase::_fPropVal</a></div><div class="ttdeci">std::vector&lt; double &gt; _fPropVal</div><div class="ttdoc">Proposed value of the parameter.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00516">ParameterHandlerBase.h:516</a></div></div>
-<div class="ttc" id="aclassParameterHandlerOsc_html_a2a7dc1ce23aaa3290d458b245f67966a"><div class="ttname"><a href="classParameterHandlerOsc.html#a2a7dc1ce23aaa3290d458b245f67966a">ParameterHandlerOsc::kSinTheta23</a></div><div class="ttdeci">int kSinTheta23</div><div class="ttdoc">Enum for special treatment of sin(theta23).</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerOsc_8h_source.html#l00038">ParameterHandlerOsc.h:38</a></div></div>
-<div class="ttc" id="aclassParameterHandlerOsc_html_a319c61dd412bb17900c97c39e8169d1d"><div class="ttname"><a href="classParameterHandlerOsc.html#a319c61dd412bb17900c97c39e8169d1d">ParameterHandlerOsc::kDeltaCP</a></div><div class="ttdeci">int kDeltaCP</div><div class="ttdoc">There is special treatment for delta CP, therefore store enum keeping track when to apply special tre...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerOsc_8h_source.html#l00034">ParameterHandlerOsc.h:34</a></div></div>
-<div class="ttc" id="aclassParameterHandlerOsc_html_a58ba8ca9d1e079027da81ad258034437"><div class="ttname"><a href="classParameterHandlerOsc.html#a58ba8ca9d1e079027da81ad258034437">ParameterHandlerOsc::Print</a></div><div class="ttdeci">void Print()</div><div class="ttdoc">KS: Print all useful information's after initialization.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerOsc_8cpp_source.html#l00082">ParameterHandlerOsc.cpp:82</a></div></div>
-<div class="ttc" id="aclassParameterHandlerOsc_html_a6e2feee6ceb6854f5265df0c370b9fab"><div class="ttname"><a href="classParameterHandlerOsc.html#a6e2feee6ceb6854f5265df0c370b9fab">ParameterHandlerOsc::kDeltaM23</a></div><div class="ttdeci">int kDeltaM23</div><div class="ttdoc">There is special treatment for DeltaM23, therefore store enum keeping track when to apply special tre...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerOsc_8h_source.html#l00036">ParameterHandlerOsc.h:36</a></div></div>
-<div class="ttc" id="aclassParameterHandlerOsc_html_ad76cfb074f7b886a1fc24b26127246c4"><div class="ttname"><a href="classParameterHandlerOsc.html#ad76cfb074f7b886a1fc24b26127246c4">ParameterHandlerOsc::flipdelM</a></div><div class="ttdeci">bool flipdelM</div><div class="ttdoc">Do we flip DeltaM23 or not.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerOsc_8h_source.html#l00032">ParameterHandlerOsc.h:32</a></div></div>
+<div class="ttc" id="aclassParameterHandlerOsc_html_a2a7dc1ce23aaa3290d458b245f67966a"><div class="ttname"><a href="classParameterHandlerOsc.html#a2a7dc1ce23aaa3290d458b245f67966a">ParameterHandlerOsc::kSinTheta23</a></div><div class="ttdeci">int kSinTheta23</div><div class="ttdoc">Enum for special treatment of sin(theta23).</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerOsc_8h_source.html#l00041">ParameterHandlerOsc.h:41</a></div></div>
+<div class="ttc" id="aclassParameterHandlerOsc_html_a319c61dd412bb17900c97c39e8169d1d"><div class="ttname"><a href="classParameterHandlerOsc.html#a319c61dd412bb17900c97c39e8169d1d">ParameterHandlerOsc::kDeltaCP</a></div><div class="ttdeci">int kDeltaCP</div><div class="ttdoc">There is special treatment for delta CP, therefore store enum keeping track when to apply special tre...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerOsc_8h_source.html#l00037">ParameterHandlerOsc.h:37</a></div></div>
+<div class="ttc" id="aclassParameterHandlerOsc_html_a58ba8ca9d1e079027da81ad258034437"><div class="ttname"><a href="classParameterHandlerOsc.html#a58ba8ca9d1e079027da81ad258034437">ParameterHandlerOsc::Print</a></div><div class="ttdeci">void Print()</div><div class="ttdoc">KS: Print all useful information's after initialization.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerOsc_8cpp_source.html#l00087">ParameterHandlerOsc.cpp:87</a></div></div>
+<div class="ttc" id="aclassParameterHandlerOsc_html_a6e2feee6ceb6854f5265df0c370b9fab"><div class="ttname"><a href="classParameterHandlerOsc.html#a6e2feee6ceb6854f5265df0c370b9fab">ParameterHandlerOsc::kDeltaM23</a></div><div class="ttdeci">int kDeltaM23</div><div class="ttdoc">There is special treatment for DeltaM23, therefore store enum keeping track when to apply special tre...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerOsc_8h_source.html#l00039">ParameterHandlerOsc.h:39</a></div></div>
+<div class="ttc" id="aclassParameterHandlerOsc_html_ad76cfb074f7b886a1fc24b26127246c4"><div class="ttname"><a href="classParameterHandlerOsc.html#ad76cfb074f7b886a1fc24b26127246c4">ParameterHandlerOsc::flipdelM</a></div><div class="ttdeci">bool flipdelM</div><div class="ttdoc">Do we flip DeltaM23 or not.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerOsc_8h_source.html#l00035">ParameterHandlerOsc.h:35</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -774,15 +777,61 @@ Asher Kaboth </dd></dl>
 <p>HW :: This method is a tad hacky but modular arithmetic gives me a headache. </p>
 <dl class="section author"><dt>Author</dt><dd>Henry Wallace </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerOsc_8cpp_source.html#l00071">71</a> of file <a class="el" href="ParameterHandlerOsc_8cpp_source.html">ParameterHandlerOsc.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   71</span>                                                                                                    {</div>
-<div class="line"><span class="lineno">   72</span><span class="comment">// *************************************</span></div>
-<div class="line"><span class="lineno">   73</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">_fPropVal</a>[index] &gt; UpBound) {</div>
-<div class="line"><span class="lineno">   74</span>    <a class="code hl_variable" href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">_fPropVal</a>[index] = LowBound + std::fmod(<a class="code hl_variable" href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">_fPropVal</a>[index] - UpBound, UpBound - LowBound);</div>
-<div class="line"><span class="lineno">   75</span>  } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (<a class="code hl_variable" href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">_fPropVal</a>[index] &lt; LowBound) {</div>
-<div class="line"><span class="lineno">   76</span>    <a class="code hl_variable" href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">_fPropVal</a>[index] = UpBound - std::fmod(LowBound - <a class="code hl_variable" href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">_fPropVal</a>[index], UpBound - LowBound);</div>
-<div class="line"><span class="lineno">   77</span>  }</div>
-<div class="line"><span class="lineno">   78</span>}</div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerOsc_8cpp_source.html#l00068">68</a> of file <a class="el" href="ParameterHandlerOsc_8cpp_source.html">ParameterHandlerOsc.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   68</span>                                                                                                    {</div>
+<div class="line"><span class="lineno">   69</span><span class="comment">// *************************************</span></div>
+<div class="line"><span class="lineno">   70</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">_fPropVal</a>[index] &gt; UpBound) {</div>
+<div class="line"><span class="lineno">   71</span>    <a class="code hl_variable" href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">_fPropVal</a>[index] = LowBound + std::fmod(<a class="code hl_variable" href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">_fPropVal</a>[index] - UpBound, UpBound - LowBound);</div>
+<div class="line"><span class="lineno">   72</span>  } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (<a class="code hl_variable" href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">_fPropVal</a>[index] &lt; LowBound) {</div>
+<div class="line"><span class="lineno">   73</span>    <a class="code hl_variable" href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">_fPropVal</a>[index] = UpBound - std::fmod(LowBound - <a class="code hl_variable" href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">_fPropVal</a>[index], UpBound - LowBound);</div>
+<div class="line"><span class="lineno">   74</span>  }</div>
+<div class="line"><span class="lineno">   75</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a2cbf09e9559a62e633406f430c86c964" name="a2cbf09e9559a62e633406f430c86c964"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2cbf09e9559a62e633406f430c86c964">&#9670;&#160;</a></span>FlipParameterValue()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ParameterHandlerOsc::FlipParameterValue </td>
+          <td>(</td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>FlipPoint</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>KS: Flip parameter around given value, for example mass ordering around 0. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">index</td><td>parameter index you want to flip </td></tr>
+    <tr><td class="paramname">FlipPoint</td><td>Value around which flipping is done </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerOsc_8cpp_source.html#l00078">78</a> of file <a class="el" href="ParameterHandlerOsc_8cpp_source.html">ParameterHandlerOsc.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   78</span>                                                                                    {</div>
+<div class="line"><span class="lineno">   79</span><span class="comment">// *************************************</span></div>
+<div class="line"><span class="lineno">   80</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classParameterHandlerBase.html#ae1bee9945e7a00d17ee69a3c0d75b622">random_number</a>[0]-&gt;Uniform() &lt; 0.5) {</div>
+<div class="line"><span class="lineno">   81</span>    <a class="code hl_variable" href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">_fPropVal</a>[index] = 2 * FlipPoint - <a class="code hl_variable" href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">_fPropVal</a>[index];</div>
+<div class="line"><span class="lineno">   82</span>  }</div>
+<div class="line"><span class="lineno">   83</span>}</div>
+<div class="ttc" id="aclassParameterHandlerBase_html_ae1bee9945e7a00d17ee69a3c0d75b622"><div class="ttname"><a href="classParameterHandlerBase.html#ae1bee9945e7a00d17ee69a3c0d75b622">ParameterHandlerBase::random_number</a></div><div class="ttdeci">std::vector&lt; std::unique_ptr&lt; TRandom3 &gt; &gt; random_number</div><div class="ttdoc">KS: Set Random numbers for each thread so each thread has different seed.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00491">ParameterHandlerBase.h:491</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -803,30 +852,30 @@ Asher Kaboth </dd></dl>
 
 <p>KS: Print all useful information's after initialization. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerOsc_8cpp_source.html#l00082">82</a> of file <a class="el" href="ParameterHandlerOsc_8cpp_source.html">ParameterHandlerOsc.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   82</span>                                {</div>
-<div class="line"><span class="lineno">   83</span><span class="comment">// *************************************</span></div>
-<div class="line"><span class="lineno">   84</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Number of pars: {}&quot;</span>, <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>);</div>
-<div class="line"><span class="lineno">   85</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Current: {} parameters:&quot;</span>, <a class="code hl_variable" href="classParameterHandlerBase.html#a5e9226aa216252b1ef195c7f91c76df2">matrixName</a>);</div>
-<div class="line"><span class="lineno">   86</span> </div>
-<div class="line"><span class="lineno">   87</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;=================================================================================================================================&quot;</span>);</div>
-<div class="line"><span class="lineno">   88</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{:&lt;5} {:2} {:&lt;25} {:2} {:&lt;10} {:2} {:&lt;15} {:2} {:&lt;15} {:2} {:&lt;10} {:2} {:&lt;10}&quot;</span>,</div>
-<div class="line"><span class="lineno">   89</span>                <span class="stringliteral">&quot;#&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;Name&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;Prior&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;IndivStepScale&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;Error&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;FlatPrior&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;SampleNames&quot;</span>);</div>
-<div class="line"><span class="lineno">   90</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;---------------------------------------------------------------------------------------------------------------------------------&quot;</span>);</div>
-<div class="line"><span class="lineno">   91</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>; i++) {</div>
-<div class="line"><span class="lineno">   92</span>    std::string SampleNameString = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><span class="lineno">   93</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; SampleName : <a class="code hl_variable" href="classParameterHandlerBase.html#af4ebe6b24b280c5263e6a5385b11a2c9">_fSampleNames</a>[i]) {</div>
-<div class="line"><span class="lineno">   94</span>      <span class="keywordflow">if</span> (!SampleNameString.empty()) {</div>
-<div class="line"><span class="lineno">   95</span>        SampleNameString += <span class="stringliteral">&quot;, &quot;</span>;</div>
-<div class="line"><span class="lineno">   96</span>      }</div>
-<div class="line"><span class="lineno">   97</span>      SampleNameString += SampleName;</div>
-<div class="line"><span class="lineno">   98</span>    }</div>
-<div class="line"><span class="lineno">   99</span> </div>
-<div class="line"><span class="lineno">  100</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{:&lt;5} {:2} {:&lt;25} {:2} {:&lt;10.4f} {:2} {:&lt;15.2f} {:2} {:&lt;15.4f} {:2} {:&lt;10} {:2} {:&lt;10}&quot;</span>,</div>
-<div class="line"><span class="lineno">  101</span>                  i, <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classParameterHandlerBase.html#aa30828713375ceda767c9631157bd41d">_fNames</a>[i].c_str(), <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classParameterHandlerBase.html#a9f98cdf43f276a271da9a66509063ba6">_fPreFitValue</a>[i], <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classParameterHandlerBase.html#ae042c1f0f79927b63744d820384ac28e">_fIndivStepScale</a>[i], <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classParameterHandlerBase.html#a65f6056605f718d83a641680aa33fe88">_fError</a>[i], <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classParameterHandlerBase.html#a5b71ff832ba3fc84969a7e3fc9dc0d62">_fFlatPrior</a>[i], <span class="stringliteral">&quot;|&quot;</span>, SampleNameString);</div>
-<div class="line"><span class="lineno">  102</span>  }</div>
-<div class="line"><span class="lineno">  103</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;=================================================================================================================================&quot;</span>);</div>
-<div class="line"><span class="lineno">  104</span>}</div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerOsc_8cpp_source.html#l00087">87</a> of file <a class="el" href="ParameterHandlerOsc_8cpp_source.html">ParameterHandlerOsc.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   87</span>                                {</div>
+<div class="line"><span class="lineno">   88</span><span class="comment">// *************************************</span></div>
+<div class="line"><span class="lineno">   89</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Number of pars: {}&quot;</span>, <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>);</div>
+<div class="line"><span class="lineno">   90</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Current: {} parameters:&quot;</span>, <a class="code hl_variable" href="classParameterHandlerBase.html#a5e9226aa216252b1ef195c7f91c76df2">matrixName</a>);</div>
+<div class="line"><span class="lineno">   91</span> </div>
+<div class="line"><span class="lineno">   92</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;=================================================================================================================================&quot;</span>);</div>
+<div class="line"><span class="lineno">   93</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{:&lt;5} {:2} {:&lt;25} {:2} {:&lt;10} {:2} {:&lt;15} {:2} {:&lt;15} {:2} {:&lt;10} {:2} {:&lt;10}&quot;</span>,</div>
+<div class="line"><span class="lineno">   94</span>                <span class="stringliteral">&quot;#&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;Name&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;Prior&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;IndivStepScale&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;Error&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;FlatPrior&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;SampleNames&quot;</span>);</div>
+<div class="line"><span class="lineno">   95</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;---------------------------------------------------------------------------------------------------------------------------------&quot;</span>);</div>
+<div class="line"><span class="lineno">   96</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>; i++) {</div>
+<div class="line"><span class="lineno">   97</span>    std::string SampleNameString = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><span class="lineno">   98</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; SampleName : <a class="code hl_variable" href="classParameterHandlerBase.html#af4ebe6b24b280c5263e6a5385b11a2c9">_fSampleNames</a>[i]) {</div>
+<div class="line"><span class="lineno">   99</span>      <span class="keywordflow">if</span> (!SampleNameString.empty()) {</div>
+<div class="line"><span class="lineno">  100</span>        SampleNameString += <span class="stringliteral">&quot;, &quot;</span>;</div>
+<div class="line"><span class="lineno">  101</span>      }</div>
+<div class="line"><span class="lineno">  102</span>      SampleNameString += SampleName;</div>
+<div class="line"><span class="lineno">  103</span>    }</div>
+<div class="line"><span class="lineno">  104</span> </div>
+<div class="line"><span class="lineno">  105</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{:&lt;5} {:2} {:&lt;25} {:2} {:&lt;10.4f} {:2} {:&lt;15.2f} {:2} {:&lt;15.4f} {:2} {:&lt;10} {:2} {:&lt;10}&quot;</span>,</div>
+<div class="line"><span class="lineno">  106</span>                  i, <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classParameterHandlerBase.html#aa30828713375ceda767c9631157bd41d">_fNames</a>[i].c_str(), <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classParameterHandlerBase.html#a9f98cdf43f276a271da9a66509063ba6">_fPreFitValue</a>[i], <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classParameterHandlerBase.html#ae042c1f0f79927b63744d820384ac28e">_fIndivStepScale</a>[i], <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classParameterHandlerBase.html#a65f6056605f718d83a641680aa33fe88">_fError</a>[i], <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classParameterHandlerBase.html#a5b71ff832ba3fc84969a7e3fc9dc0d62">_fFlatPrior</a>[i], <span class="stringliteral">&quot;|&quot;</span>, SampleNameString);</div>
+<div class="line"><span class="lineno">  107</span>  }</div>
+<div class="line"><span class="lineno">  108</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;=================================================================================================================================&quot;</span>);</div>
+<div class="line"><span class="lineno">  109</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00023">MaCh3Logger.h:23</a></div></div>
 <div class="ttc" id="aclassParameterHandlerBase_html_a5b71ff832ba3fc84969a7e3fc9dc0d62"><div class="ttname"><a href="classParameterHandlerBase.html#a5b71ff832ba3fc84969a7e3fc9dc0d62">ParameterHandlerBase::_fFlatPrior</a></div><div class="ttdeci">std::vector&lt; bool &gt; _fFlatPrior</div><div class="ttdoc">Whether to apply flat prior or not.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00528">ParameterHandlerBase.h:528</a></div></div>
 <div class="ttc" id="aclassParameterHandlerBase_html_a5e9226aa216252b1ef195c7f91c76df2"><div class="ttname"><a href="classParameterHandlerBase.html#a5e9226aa216252b1ef195c7f91c76df2">ParameterHandlerBase::matrixName</a></div><div class="ttdeci">std::string matrixName</div><div class="ttdoc">Name of cov matrix.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00482">ParameterHandlerBase.h:482</a></div></div>
@@ -871,21 +920,18 @@ Asher Kaboth </dd></dl>
 <div class="line"><span class="lineno">   53</span>  <span class="comment">// HW It should now automatically set dcp to be with [-pi, pi]</span></div>
 <div class="line"><span class="lineno">   54</span>  <a class="code hl_function" href="classParameterHandlerOsc.html#ab71271ca46f1385663a386244f064d9d">CircularPrior</a>(<a class="code hl_variable" href="classParameterHandlerOsc.html#a319c61dd412bb17900c97c39e8169d1d">kDeltaCP</a>, -TMath::Pi(), TMath::Pi());</div>
 <div class="line"><span class="lineno">   55</span> </div>
-<div class="line"><span class="lineno">   56</span>  <span class="comment">// Okay now we&#39;ve done the standard steps, we can add in our nice flips</span></div>
-<div class="line"><span class="lineno">   57</span>  <span class="comment">// hierarchy flip first</span></div>
-<div class="line"><span class="lineno">   58</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classParameterHandlerBase.html#ae1bee9945e7a00d17ee69a3c0d75b622">random_number</a>[0]-&gt;Uniform() &lt; 0.5 &amp;&amp; <a class="code hl_variable" href="classParameterHandlerOsc.html#ad76cfb074f7b886a1fc24b26127246c4">flipdelM</a>){</div>
-<div class="line"><span class="lineno">   59</span>    <a class="code hl_variable" href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">_fPropVal</a>[<a class="code hl_variable" href="classParameterHandlerOsc.html#a6e2feee6ceb6854f5265df0c370b9fab">kDeltaM23</a>] *= -1;</div>
-<div class="line"><span class="lineno">   60</span>  }</div>
-<div class="line"><span class="lineno">   61</span>  <span class="comment">// now octant flip</span></div>
-<div class="line"><span class="lineno">   62</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classParameterHandlerBase.html#ae1bee9945e7a00d17ee69a3c0d75b622">random_number</a>[0]-&gt;Uniform() &lt; 0.5) {</div>
-<div class="line"><span class="lineno">   63</span>    <span class="comment">// flip octant around point of maximal disappearance (0.5112)</span></div>
-<div class="line"><span class="lineno">   64</span>    <span class="comment">// this ensures we move to a parameter value which has the same oscillation probability</span></div>
-<div class="line"><span class="lineno">   65</span>    <a class="code hl_variable" href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">_fPropVal</a>[<a class="code hl_variable" href="classParameterHandlerOsc.html#a2a7dc1ce23aaa3290d458b245f67966a">kSinTheta23</a>] = 0.5112 - (<a class="code hl_variable" href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">_fPropVal</a>[<a class="code hl_variable" href="classParameterHandlerOsc.html#a2a7dc1ce23aaa3290d458b245f67966a">kSinTheta23</a>] - 0.5112);</div>
-<div class="line"><span class="lineno">   66</span>  }</div>
-<div class="line"><span class="lineno">   67</span>}</div>
+<div class="line"><span class="lineno">   56</span>  <span class="comment">// Okay now we&#39;ve done the standard steps, we can add in our nice flips hierarchy flip first</span></div>
+<div class="line"><span class="lineno">   57</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classParameterHandlerOsc.html#ad76cfb074f7b886a1fc24b26127246c4">flipdelM</a>){</div>
+<div class="line"><span class="lineno">   58</span>    <a class="code hl_function" href="classParameterHandlerOsc.html#a2cbf09e9559a62e633406f430c86c964">FlipParameterValue</a>(<a class="code hl_variable" href="classParameterHandlerOsc.html#a6e2feee6ceb6854f5265df0c370b9fab">kDeltaM23</a>, 0.);</div>
+<div class="line"><span class="lineno">   59</span>  }</div>
+<div class="line"><span class="lineno">   60</span> </div>
+<div class="line"><span class="lineno">   61</span>  <span class="comment">// flip octant around point of maximal disappearance (0.5112)</span></div>
+<div class="line"><span class="lineno">   62</span>  <span class="comment">// this ensures we move to a parameter value which has the same oscillation probability</span></div>
+<div class="line"><span class="lineno">   63</span>  <a class="code hl_function" href="classParameterHandlerOsc.html#a2cbf09e9559a62e633406f430c86c964">FlipParameterValue</a>(<a class="code hl_variable" href="classParameterHandlerOsc.html#a2a7dc1ce23aaa3290d458b245f67966a">kSinTheta23</a>, 0.5112);</div>
+<div class="line"><span class="lineno">   64</span>}</div>
 <div class="ttc" id="aclassParameterHandlerBase_html_a0eb4b2dec49723f7ee15cde3e1cd4c69"><div class="ttname"><a href="classParameterHandlerBase.html#a0eb4b2dec49723f7ee15cde3e1cd4c69">ParameterHandlerBase::ProposeStep</a></div><div class="ttdeci">virtual void ProposeStep()</div><div class="ttdoc">Generate a new proposed state.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l00481">ParameterHandlerBase.cpp:481</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_ae1bee9945e7a00d17ee69a3c0d75b622"><div class="ttname"><a href="classParameterHandlerBase.html#ae1bee9945e7a00d17ee69a3c0d75b622">ParameterHandlerBase::random_number</a></div><div class="ttdeci">std::vector&lt; std::unique_ptr&lt; TRandom3 &gt; &gt; random_number</div><div class="ttdoc">KS: Set Random numbers for each thread so each thread has different seed.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00491">ParameterHandlerBase.h:491</a></div></div>
-<div class="ttc" id="aclassParameterHandlerOsc_html_ab71271ca46f1385663a386244f064d9d"><div class="ttname"><a href="classParameterHandlerOsc.html#ab71271ca46f1385663a386244f064d9d">ParameterHandlerOsc::CircularPrior</a></div><div class="ttdeci">void CircularPrior(const int i, const double LowBound, const double UpBound)</div><div class="ttdoc">HW :: This method is a tad hacky but modular arithmetic gives me a headache.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerOsc_8cpp_source.html#l00071">ParameterHandlerOsc.cpp:71</a></div></div>
+<div class="ttc" id="aclassParameterHandlerOsc_html_a2cbf09e9559a62e633406f430c86c964"><div class="ttname"><a href="classParameterHandlerOsc.html#a2cbf09e9559a62e633406f430c86c964">ParameterHandlerOsc::FlipParameterValue</a></div><div class="ttdeci">void FlipParameterValue(const int index, const double FlipPoint)</div><div class="ttdoc">KS: Flip parameter around given value, for example mass ordering around 0.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerOsc_8cpp_source.html#l00078">ParameterHandlerOsc.cpp:78</a></div></div>
+<div class="ttc" id="aclassParameterHandlerOsc_html_ab71271ca46f1385663a386244f064d9d"><div class="ttname"><a href="classParameterHandlerOsc.html#ab71271ca46f1385663a386244f064d9d">ParameterHandlerOsc::CircularPrior</a></div><div class="ttdeci">void CircularPrior(const int i, const double LowBound, const double UpBound)</div><div class="ttdoc">HW :: This method is a tad hacky but modular arithmetic gives me a headache.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerOsc_8cpp_source.html#l00068">ParameterHandlerOsc.cpp:68</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -912,7 +958,7 @@ Asher Kaboth </dd></dl>
 
 <p>Do we flip DeltaM23 or not. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerOsc_8h_source.html#l00032">32</a> of file <a class="el" href="ParameterHandlerOsc_8h_source.html">ParameterHandlerOsc.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerOsc_8h_source.html#l00035">35</a> of file <a class="el" href="ParameterHandlerOsc_8h_source.html">ParameterHandlerOsc.h</a>.</p>
 
 </div>
 </div>
@@ -938,7 +984,7 @@ Asher Kaboth </dd></dl>
 
 <p>There is special treatment for delta CP, therefore store enum keeping track when to apply special treatment. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerOsc_8h_source.html#l00034">34</a> of file <a class="el" href="ParameterHandlerOsc_8h_source.html">ParameterHandlerOsc.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerOsc_8h_source.html#l00037">37</a> of file <a class="el" href="ParameterHandlerOsc_8h_source.html">ParameterHandlerOsc.h</a>.</p>
 
 </div>
 </div>
@@ -964,7 +1010,7 @@ Asher Kaboth </dd></dl>
 
 <p>There is special treatment for DeltaM23, therefore store enum keeping track when to apply special treatment. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerOsc_8h_source.html#l00036">36</a> of file <a class="el" href="ParameterHandlerOsc_8h_source.html">ParameterHandlerOsc.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerOsc_8h_source.html#l00039">39</a> of file <a class="el" href="ParameterHandlerOsc_8h_source.html">ParameterHandlerOsc.h</a>.</p>
 
 </div>
 </div>
@@ -990,7 +1036,7 @@ Asher Kaboth </dd></dl>
 
 <p>Enum for special treatment of sin(theta23). </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerOsc_8h_source.html#l00038">38</a> of file <a class="el" href="ParameterHandlerOsc_8h_source.html">ParameterHandlerOsc.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerOsc_8h_source.html#l00041">41</a> of file <a class="el" href="ParameterHandlerOsc_8h_source.html">ParameterHandlerOsc.h</a>.</p>
 
 </div>
 </div>
