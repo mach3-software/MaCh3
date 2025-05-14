@@ -88,7 +88,9 @@ class AdaptiveMCMCHandler{
     return ((*_fFixedPars)[ipar] < 0);
   }
 
- 
+  /// @brief Get Current value of parameter
+  double CurrVal(int par_index);
+
 
   /// Meta variables related to adaption run time
   /// When do we start throwing
@@ -133,9 +135,6 @@ class AdaptiveMCMCHandler{
   std::vector<double>* _fFixedPars;
   /// Current values of parameters
   std::vector<double>* _fCurrVal;
-
-  /// @brief Get Current value of parameter
-  double CurrVal(int par_index);
 
 };
 
