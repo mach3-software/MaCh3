@@ -108,12 +108,12 @@ Collaboration diagram for ParameterHandlerGeneric:</div>
 <map name="aParameterHandlerGeneric_coll__map" id="aParameterHandlerGeneric_coll__map">
 <area shape="rect" title="Class responsible for handling of systematic error parameters with different types defined in the con..." alt="" coords="1893,762,2084,787"/>
 <area shape="rect" href="classParameterHandlerBase.html" title="Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada..." alt="" coords="1439,371,1611,397"/>
-<area shape="rect" title=" " alt="" coords="233,465,319,490"/>
+<area shape="rect" title=" " alt="" coords="233,469,319,494"/>
 <area shape="rect" title=" " alt="" coords="596,602,783,627"/>
-<area shape="rect" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html" title="Contains information about adaptive covariance matrix ." alt="" coords="547,414,832,439"/>
+<area shape="rect" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html" title="Contains information about adaptive covariance matrix ." alt="" coords="547,417,832,442"/>
 <area shape="rect" href="structTypeParameterBase.html" title="Base class storing info for parameters types, helping unify codebase." alt="" coords="614,826,765,851"/>
-<area shape="rect" title=" " alt="" coords="5,457,144,497"/>
-<area shape="rect" title=" " alt="" coords="602,345,777,385"/>
+<area shape="rect" title=" " alt="" coords="5,461,144,501"/>
+<area shape="rect" title=" " alt="" coords="602,348,777,388"/>
 <area shape="rect" href="structNormParameter.html" title="ETA &#45; Normalisations for cross&#45;section parameters Carrier for whether you want to apply a systematic ..." alt="" coords="1048,811,1173,837"/>
 <area shape="rect" href="structFunctionalParameter.html" title="HH &#45; Functional parameters Carrier for whether you want to apply a systematic to an event or not." alt="" coords="1033,713,1189,738"/>
 <area shape="rect" title=" " alt="" coords="193,242,359,267"/>
@@ -1014,7 +1014,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="ttc" id="aclassParameterHandlerBase_html_ae042c1f0f79927b63744d820384ac28e"><div class="ttname"><a href="classParameterHandlerBase.html#ae042c1f0f79927b63744d820384ac28e">ParameterHandlerBase::_fIndivStepScale</a></div><div class="ttdeci">std::vector&lt; double &gt; _fIndivStepScale</div><div class="ttdoc">Individual step scale used by MCMC algorithm.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00526">ParameterHandlerBase.h:526</a></div></div>
 <div class="ttc" id="aclassParameterHandlerGeneric_html_a0dd46fbd1eb07b54ba48e8fc7a5c03c1"><div class="ttname"><a href="classParameterHandlerGeneric.html#a0dd46fbd1eb07b54ba48e8fc7a5c03c1">ParameterHandlerGeneric::SplineParams</a></div><div class="ttdeci">std::vector&lt; SplineParameter &gt; SplineParams</div><div class="ttdoc">Vector containing info for normalisation systematics.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8h_source.html#l00205">ParameterHandlerGeneric.h:205</a></div></div>
 <div class="ttc" id="aclassParameterHandlerGeneric_html_a67955522a48b4e340981b5ec1ca3b0da"><div class="ttname"><a href="classParameterHandlerGeneric.html#a67955522a48b4e340981b5ec1ca3b0da">ParameterHandlerGeneric::_fSystToGlobalSystIndexMap</a></div><div class="ttdeci">std::vector&lt; std::map&lt; int, int &gt; &gt; _fSystToGlobalSystIndexMap</div><div class="ttdoc">Map between number of given parameter type with global parameter numbering. For example 2nd norm para...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8h_source.html#l00202">ParameterHandlerGeneric.h:202</a></div></div>
-<div class="ttc" id="agroup__ParameterHandlerGetters_html_ga6745aac0b811863722e4030421adee92"><div class="ttname"><a href="group__ParameterHandlerGetters.html#ga6745aac0b811863722e4030421adee92">ParameterHandlerBase::GetCorrelationMatrix</a></div><div class="ttdeci">TH2D * GetCorrelationMatrix()</div><div class="ttdoc">KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plott...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l01166">ParameterHandlerBase.cpp:1166</a></div></div>
+<div class="ttc" id="agroup__ParameterHandlerGetters_html_ga6745aac0b811863722e4030421adee92"><div class="ttname"><a href="group__ParameterHandlerGetters.html#ga6745aac0b811863722e4030421adee92">ParameterHandlerBase::GetCorrelationMatrix</a></div><div class="ttdeci">TH2D * GetCorrelationMatrix()</div><div class="ttdoc">KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plott...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l01167">ParameterHandlerBase.cpp:1167</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1483,7 +1483,7 @@ template&lt;typename ParamT &gt; </div>
 <div class="line"><span class="lineno">  357</span>  }</div>
 <div class="line"><span class="lineno">  358</span>  <span class="keywordflow">return</span> returnVec;</div>
 <div class="line"><span class="lineno">  359</span>}</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a3c5d92e6b592f18ea4d6bd9afaca7ebd"><div class="ttname"><a href="classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd">ParameterHandlerBase::AppliesToSample</a></div><div class="ttdeci">bool AppliesToSample(const int SystIndex, const std::string &amp;SampleName) const</div><div class="ttdoc">Check if parameter is affecting given sample name.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l01218">ParameterHandlerBase.cpp:1218</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a3c5d92e6b592f18ea4d6bd9afaca7ebd"><div class="ttname"><a href="classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd">ParameterHandlerBase::AppliesToSample</a></div><div class="ttdeci">bool AppliesToSample(const int SystIndex, const std::string &amp;SampleName) const</div><div class="ttdoc">Check if parameter is affecting given sample name.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l01219">ParameterHandlerBase.cpp:1219</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

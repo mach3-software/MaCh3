@@ -27,13 +27,13 @@ var searchData=
   ['checkcorrectinitialisation_24',['CheckCorrectInitialisation',['../classParameterHandlerGeneric.html#a7bd990c506d4f8927fcdcb15d7c3d24b',1,'ParameterHandlerGeneric']]],
   ['checkcredibleintervalsorder_25',['CheckCredibleIntervalsOrder',['../classMCMCProcessor.html#ade917a46fb88e77afbfe47aec2aaa839',1,'MCMCProcessor']]],
   ['checkcredibleregionsorder_26',['CheckCredibleRegionsOrder',['../classMCMCProcessor.html#ab11b70175cd1e63722942a063192968a',1,'MCMCProcessor']]],
-  ['checkgpumem_27',['checkGpuMem',['../gpuUtils_8cu.html#a5cfcf006bd817b3cff5da08c7f0ecb5e',1,'checkGpuMem():&#160;gpuUtils.cu'],['../gpuUtils_8cuh.html#a5cfcf006bd817b3cff5da08c7f0ecb5e',1,'checkGpuMem():&#160;gpuUtils.cu']]],
+  ['checkgpumem_27',['checkGpuMem',['../gpuUtils_8cuh.html#a5cfcf006bd817b3cff5da08c7f0ecb5e',1,'checkGpuMem():&#160;gpuUtils.cu'],['../gpuUtils_8cu.html#a5cfcf006bd817b3cff5da08c7f0ecb5e',1,'checkGpuMem():&#160;gpuUtils.cu']]],
   ['checknodeexists_28',['CheckNodeExists',['../YamlHelper_8h.html#ad2340a340fd6649a6d220abc16d4757b',1,'YamlHelper.h']]],
   ['checknodeexistshelper_29',['CheckNodeExistsHelper',['../YamlHelper_8h.html#a5809a38cdc84e79f861c6de8f84ae83e',1,'CheckNodeExistsHelper(const T &amp;node, const std::string &amp;key, Args... args):&#160;YamlHelper.h'],['../YamlHelper_8h.html#a2ec5eac7a7a860300203a9c418e802ee',1,'CheckNodeExistsHelper(const T &amp;node):&#160;YamlHelper.h']]],
   ['checksamples_30',['CheckSamples',['../classSampleSummary.html#a8c5a4ed4db695ce5c5820d857c76b4ff',1,'SampleSummary']]],
   ['checksoftwareversions_31',['checkSoftwareVersions',['../CombineMaCh3Chains_8cpp.html#a8c63010a5ceb234c9583820911562e74',1,'CombineMaCh3Chains.cpp']]],
   ['checkstep_32',['CheckStep',['../classmcmc.html#aa2f1c8aa3d951b935bbb3ec637b6b651',1,'mcmc']]],
-  ['checkth2polyfileversion_33',['CheckTH2PolyFileVersion',['../HistogramUtils_8h.html#a1aa25e8399ca7a229b8aa77c25407832',1,'CheckTH2PolyFileVersion(TFile *file):&#160;HistogramUtils.cpp'],['../HistogramUtils_8cpp.html#aaa7cc8a1bcad91527cbac49c4edd0851',1,'CheckTH2PolyFileVersion(TFile *file):&#160;HistogramUtils.cpp']]],
+  ['checkth2polyfileversion_33',['CheckTH2PolyFileVersion',['../HistogramUtils_8cpp.html#aaa7cc8a1bcad91527cbac49c4edd0851',1,'CheckTH2PolyFileVersion(TFile *file):&#160;HistogramUtils.cpp'],['../HistogramUtils_8h.html#a1aa25e8399ca7a229b8aa77c25407832',1,'CheckTH2PolyFileVersion(TFile *file):&#160;HistogramUtils.cpp']]],
   ['circularprior_34',['CircularPrior',['../classParameterHandlerOsc.html#ab71271ca46f1385663a386244f064d9d',1,'ParameterHandlerOsc']]],
   ['classdef_35',['ClassDef',['../structSplineMonoStruct.html#afd5326055b3426089cf23867f43326e5',1,'SplineMonoStruct']]],
   ['cleancontainer_36',['CleanContainer',['../Structs_8h.html#ae6c2cd427c808007fa2a96f65663b976',1,'CleanContainer(std::vector&lt; T * &gt; &amp;container):&#160;Structs.h'],['../Structs_8h.html#a05c8b05294b2666fccbeba5b35b6dd86',1,'CleanContainer(std::vector&lt; std::vector&lt; std::vector&lt; T * &gt; &gt; &gt; &amp;container):&#160;Structs.h']]],
@@ -41,7 +41,7 @@ var searchData=
   ['cleanupgpu_5fsegments_38',['CleanupGPU_Segments',['../classSMonolithGPU.html#af5ca949ba6d79666b541350d24e3daaf',1,'SMonolithGPU']]],
   ['cleanupgpu_5fsplinemonolith_39',['CleanupGPU_SplineMonolith',['../classSMonolithGPU.html#a1ca23401d8d99412288952a1d44390ea',1,'SMonolithGPU']]],
   ['cleanupmemory_40',['cleanUpMemory',['../classBinnedSplineHandler.html#a2d7fe695a7924712cd9c8bfc262f2ff3',1,'BinnedSplineHandler']]],
-  ['cleanvector_41',['CleanVector',['../Structs_8h.html#a082c084c8e7e4eb7bcc6c6571e3e8051',1,'CleanVector(std::vector&lt; std::vector&lt; T &gt; &gt; &amp;vec):&#160;Structs.h'],['../Structs_8h.html#a85aef80dc0fb38ccb4ff2f7b6a49a5ab',1,'CleanVector(std::vector&lt; T &gt; &amp;vec):&#160;Structs.h'],['../Structs_8h.html#a79cc5c3aaae2d91147524dbed70457e7',1,'CleanVector(std::vector&lt; std::vector&lt; std::vector&lt; T &gt; &gt; &gt; &amp;vec):&#160;Structs.h'],['../Structs_8h.html#a577c6b383a75eba2eef6001eb18c9106',1,'CleanVector(std::vector&lt; std::vector&lt; std::vector&lt; std::vector&lt; std::vector&lt; std::vector&lt; std::vector&lt; T &gt; &gt; &gt; &gt; &gt; &gt; &gt; &amp;vec):&#160;Structs.h']]],
+  ['cleanvector_41',['CleanVector',['../Structs_8h.html#a85aef80dc0fb38ccb4ff2f7b6a49a5ab',1,'CleanVector(std::vector&lt; T &gt; &amp;vec):&#160;Structs.h'],['../Structs_8h.html#a082c084c8e7e4eb7bcc6c6571e3e8051',1,'CleanVector(std::vector&lt; std::vector&lt; T &gt; &gt; &amp;vec):&#160;Structs.h'],['../Structs_8h.html#a79cc5c3aaae2d91147524dbed70457e7',1,'CleanVector(std::vector&lt; std::vector&lt; std::vector&lt; T &gt; &gt; &gt; &amp;vec):&#160;Structs.h'],['../Structs_8h.html#a577c6b383a75eba2eef6001eb18c9106',1,'CleanVector(std::vector&lt; std::vector&lt; std::vector&lt; std::vector&lt; std::vector&lt; std::vector&lt; std::vector&lt; T &gt; &gt; &gt; &gt; &gt; &gt; &gt; &amp;vec):&#160;Structs.h']]],
   ['clone_42',['Clone',['../namespaceM3.html#aa374c88684482cdd66297f6ae828372d',1,'M3']]],
   ['close_43',['Close',['../structMaCh3Plotting_1_1InputFile.html#ab06af1ffed29a57d47eb616b7ece91be',1,'MaCh3Plotting::InputFile']]],
   ['cnode_44',['Cnode',['../YamlHelper_8h.html#a30fc1dad7dde70247024fbb1c8f89bdc',1,'YamlHelper.h']]],
@@ -63,5 +63,6 @@ var searchData=
   ['copyviolintoblock_60',['CopyViolinToBlock',['../GetPostfitParamPlots_8cpp.html#ae93e55fc3ae7cd6f29f3f1a27e091a6c',1,'GetPostfitParamPlots.cpp']]],
   ['correlatesteps_61',['CorrelateSteps',['../classPCAHandler.html#a733d8b6619a657223113f020db1327a7',1,'PCAHandler::CorrelateSteps()'],['../classParameterHandlerBase.html#af027cad51c75db02da32df894fd2ac5b',1,'ParameterHandlerBase::CorrelateSteps()']]],
   ['countnumberofloadedsplines_62',['CountNumberOfLoadedSplines',['../classBinnedSplineHandler.html#a19b93ef716d594de4b0266dd84580cfe',1,'BinnedSplineHandler']]],
-  ['createnewadaptivecovariance_63',['CreateNewAdaptiveCovariance',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ad7df80045651df99c2d1c375fea4ac74',1,'adaptive_mcmc::AdaptiveMCMCHandler']]]
+  ['createnewadaptivecovariance_63',['CreateNewAdaptiveCovariance',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a8ecabda538889e8e66991cff4923bd97',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
+  ['currval_64',['CurrVal',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a3ff4bfbb978d84dee478fd6f22a33a33',1,'adaptive_mcmc::AdaptiveMCMCHandler']]]
 ];

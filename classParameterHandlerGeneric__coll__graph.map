@@ -1,12 +1,12 @@
 <map id="ParameterHandlerGeneric" name="ParameterHandlerGeneric">
 <area shape="rect" id="node1" title="Class responsible for handling of systematic error parameters with different types defined in the con..." alt="" coords="1893,762,2084,787"/>
 <area shape="rect" id="node2" href="$classParameterHandlerBase.html" title="Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada..." alt="" coords="1439,371,1611,397"/>
-<area shape="rect" id="node3" title=" " alt="" coords="233,465,319,490"/>
+<area shape="rect" id="node3" title=" " alt="" coords="233,469,319,494"/>
 <area shape="rect" id="node9" title=" " alt="" coords="596,602,783,627"/>
-<area shape="rect" id="node16" href="$classadaptive__mcmc_1_1AdaptiveMCMCHandler.html" title="Contains information about adaptive covariance matrix ." alt="" coords="547,414,832,439"/>
+<area shape="rect" id="node16" href="$classadaptive__mcmc_1_1AdaptiveMCMCHandler.html" title="Contains information about adaptive covariance matrix ." alt="" coords="547,417,832,442"/>
 <area shape="rect" id="node22" href="$structTypeParameterBase.html" title="Base class storing info for parameters types, helping unify codebase." alt="" coords="614,826,765,851"/>
-<area shape="rect" id="node4" title=" " alt="" coords="5,457,144,497"/>
-<area shape="rect" id="node5" title=" " alt="" coords="602,345,777,385"/>
+<area shape="rect" id="node4" title=" " alt="" coords="5,461,144,501"/>
+<area shape="rect" id="node5" title=" " alt="" coords="602,348,777,388"/>
 <area shape="rect" id="node24" href="$structNormParameter.html" title="ETA &#45; Normalisations for cross&#45;section parameters Carrier for whether you want to apply a systematic ..." alt="" coords="1048,811,1173,837"/>
 <area shape="rect" id="node26" href="$structFunctionalParameter.html" title="HH &#45; Functional parameters Carrier for whether you want to apply a systematic to an event or not." alt="" coords="1033,713,1189,738"/>
 <area shape="rect" id="node6" title=" " alt="" coords="193,242,359,267"/>

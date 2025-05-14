@@ -10,7 +10,7 @@ var searchData=
   ['unity_7',['Unity',['../namespaceM3.html#a71856d3b09903af6696008c3cb8386b0',1,'M3']]],
   ['unity_5fd_8',['Unity_D',['../namespaceM3.html#afade7c2e326a9ce1d3459559d54716e6',1,'M3']]],
   ['unity_5ff_9',['Unity_F',['../namespaceM3.html#a0888fc3177e4a0c3ddbed03a5bd358b0',1,'M3']]],
-  ['updateadaptivecovariance_10',['UpdateAdaptiveCovariance',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a828e12f4ecb82252341af5f5e54f7ad3',1,'adaptive_mcmc::AdaptiveMCMCHandler::UpdateAdaptiveCovariance()'],['../classParameterHandlerBase.html#a6510f0bc0e117fcf337e85eed04b96af',1,'ParameterHandlerBase::UpdateAdaptiveCovariance()']]],
+  ['updateadaptivecovariance_10',['UpdateAdaptiveCovariance',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#abc9c617d9ae20d3f21984ac83fe6ba46',1,'adaptive_mcmc::AdaptiveMCMCHandler::UpdateAdaptiveCovariance()'],['../classParameterHandlerBase.html#a6510f0bc0e117fcf337e85eed04b96af',1,'ParameterHandlerBase::UpdateAdaptiveCovariance()']]],
   ['updatematrixadapt_11',['UpdateMatrixAdapt',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a217c72a492c9d3e1b3a7b14626d19ab2',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
   ['updatethrowmatrix_12',['UpdateThrowMatrix',['../classParameterHandlerBase.html#a82072628057bfd93a0ee4d56253ffe55',1,'ParameterHandlerBase']]],
   ['updatew2_13',['UpdateW2',['../classSampleHandlerFD.html#aa654562842a0da51ff917aaed517310e',1,'SampleHandlerFD']]],
