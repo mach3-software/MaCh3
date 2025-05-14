@@ -24,73 +24,76 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     // General Getter functions not split by detector
     /// @brief ETA - just return the int of the SampleName, this can be removed to do a string comp at some point.
     /// @param i parameter index
-    /// @ingroup ParameterHandlerSetters
+    /// @ingroup ParameterHandlerGetters
     inline std::vector<std::string> GetParSampleID(const int i) const { return _fSampleNames[i];};
     /// @brief ETA - just return a string of "spline", "norm" or "functional"
     /// @param i parameter index
-    /// @ingroup ParameterHandlerSetters
+    /// @ingroup ParameterHandlerGetters
     inline std::string GetParamTypeString(const int i) const { return SystType_ToString(_fParamType[i]); }
     /// @brief Returns enum describing our param type
     /// @param i parameter index
-    /// @ingroup ParameterHandlerSetters
+    /// @ingroup ParameterHandlerGetters
     inline SystType GetParamType(const int i) const {return _fParamType[i];}
 
     /// @brief Get interpolation type for a given parameter
     /// @param i spline parameter index, not confuse with global index
     inline SplineInterpolation GetParSplineInterpolation(const int i) {return SplineParams.at(i)._SplineInterpolationType;}
     /// @brief Get the interpolation types for splines affecting a particular SampleName
-    /// @ingroup ParameterHandlerSetters
+    /// @ingroup ParameterHandlerGetters
     const std::vector<SplineInterpolation> GetSplineInterpolationFromSampleName(const std::string& SampleName);
     /// @brief Get the name of the spline associated with the spline at index i
     /// @param i spline parameter index, not to be confused with global index
-    /// @ingroup ParameterHandlerSetters
+    /// @ingroup ParameterHandlerGetters
     std::string GetParSplineName(const int i) {return _fSplineNames[i];}
 
     /// @brief DB Get spline parameters depending on given SampleName
-    /// @ingroup ParameterHandlerSetters
+    /// @ingroup ParameterHandlerGetters
     const std::vector<int> GetGlobalSystIndexFromSampleName(const std::string& SampleName, const SystType Type);
     /// @brief EM: value at which we cap spline knot weight
     /// @param i spline parameter index, not confuse with global index
-    /// @ingroup ParameterHandlerSetters
+    /// @ingroup ParameterHandlerGetters
     inline double GetParSplineKnotUpperBound(const int i) {return SplineParams.at(i)._SplineKnotUpBound;}
     /// @brief EM: value at which we cap spline knot weight
     /// @param i spline parameter index, not confuse with global index
-    /// @ingroup ParameterHandlerSetters
+    /// @ingroup ParameterHandlerGetters
     inline double GetParSplineKnotLowerBound(const int i) {return SplineParams.at(i)._SplineKnotLowBound;}
 
     /// @brief DB Grab the number of parameters for the relevant SampleName
     /// @param Type Type of syst, for example kNorm, kSpline etc
-    /// @ingroup ParameterHandlerSetters
+    /// @ingroup ParameterHandlerGetters
     int GetNumParamsFromSampleName(const std::string& SampleName, const SystType Type);
     /// @brief DB Grab the parameter names for the relevant SampleName
     /// @param Type Type of syst, for example kNorm, kSpline etc
-    /// @ingroup ParameterHandlerSetters
+    /// @ingroup ParameterHandlerGetters
     const std::vector<std::string> GetParsNamesFromSampleName(const std::string& SampleName, const SystType Type);
     /// @brief DB Grab the parameter indices for the relevant SampleName
     /// @param Type Type of syst, for example kNorm, kSpline etc
-    /// @ingroup ParameterHandlerSetters
+    /// @ingroup ParameterHandlerGetters
     const std::vector<int> GetParsIndexFromSampleName(const std::string& SampleName, const SystType Type);
 
     /// @brief DB Get spline parameters depending on given SampleName
-    /// @ingroup ParameterHandlerSetters
+    /// @ingroup ParameterHandlerGetters
     const std::vector<std::string> GetSplineParsNamesFromSampleName(const std::string& SampleName);
     /// @brief DB Get spline parameters depending on given SampleName
-    /// @ingroup ParameterHandlerSetters
+    /// @ingroup ParameterHandlerGetters
     const std::vector<std::string> GetSplineFileParsNamesFromSampleName(const std::string& SampleName);
 
     /// @brief DB Grab the Spline Modes for the relevant SampleName
-    /// @ingroup ParameterHandlerSetters
+    /// @ingroup ParameterHandlerGetters
     const std::vector< std::vector<int> > GetSplineModeVecFromSampleName(const std::string& SampleName);
     /// @brief Grab the index of the syst relative to global numbering.
     /// @param Type Type of syst, for example kNorm, kSpline etc
-    /// @ingroup ParameterHandlerSetters
-    const std::vector<int> GetSystIndexFromSampleName(const std::string& SampleName, const SystType Type);
+    /// @ingroup ParameterHandlerGetters
+    const std::vector<int> GetSystIndexFromSampleName(const std::string& SampleName, const SystType Type) const;
     /// @brief DB Get norm/func parameters depending on given SampleName
-    /// @ingroup ParameterHandlerSetters
-    const std::vector<NormParameter> GetNormParsFromSampleName(const std::string& SampleName);
+    /// @ingroup ParameterHandlerGetters
+    const std::vector<NormParameter> GetNormParsFromSampleName(const std::string& SampleName) const;
     /// @brief HH Get functional parameters for the relevant SampleName
-    /// @ingroup ParameterHandlerSetters
-    const std::vector<FunctionalParameter> GetFunctionalParametersFromSampleName(const std::string& SampleName);
+    /// @ingroup ParameterHandlerGetters
+    const std::vector<FunctionalParameter> GetFunctionalParametersFromSampleName(const std::string& SampleName) const;
+    /// @brief KS: Grab the Spline parameters for the relevant SampleName
+    /// @ingroup ParameterHandlerGetters
+    const std::vector<SplineParameter> GetSplineParsFromSampleName(const std::string& SampleName) const;
 
     /// @brief KS: For most covariances prior and fparInit (prior) are the same, however for Xsec those can be different
     /// @ingroup ParameterHandlerGetters
@@ -169,7 +172,22 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     inline FunctionalParameter GetFunctionalParameters(const YAML::Node& param, const int Index);
     /// @brief Get Spline params
     /// @param param Yaml node describing param
-    inline SplineParameter GetSplineParameter(const YAML::Node& param);
+    /// @param Index Global parameter index
+    inline SplineParameter GetSplineParameter(const YAML::Node& param, const int Index);
+    /// @brief Fill base parameters
+    /// @param param Yaml node describing param
+    /// @param Index Global parameter index
+    /// @param Parameter Object storing info
+    inline void GetBaseParameter(const YAML::Node& param, const int Index, TypeParameterBase& Parameter);
+
+    /// @brief Retrieve parameters that apply to a given sample name.
+    /// @tparam ParamT Type of parameter (e.g., FunctionalParameter, NormParameter).
+    /// @param indexMap Map from local to global parameter indices.
+    /// @param params Vector of all parameters of the given type.
+    /// @param SampleName The name of the sample to filter applicable parameters for.
+    /// @return Vector of parameters of type ParamT that apply to the specified sample.
+    template<typename ParamT>
+    std::vector<ParamT> GetTypeParamsFromSampleName(const std::map<int, int>& indexMap, const std::vector<ParamT>& params, const std::string& SampleName) const;
 
     /// Type of parameter like norm, spline etc.
     std::vector<SystType> _fParamType;
