@@ -246,6 +246,7 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance() {
   }
 
   // Step 2: Update covariance
+  #pragma omp parallel for
   for (int i = 0; i < GetNumParams(); ++i) {
     if (IsFixed(i)) {
       (*adaptive_covariance)(i, i) = 1.0;
