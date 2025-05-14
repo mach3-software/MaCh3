@@ -1,7 +1,0 @@
-<map id="inheritance1ba4124ca1" name="inheritance1ba4124ca1">
-<area shape="rect" id="node1" href="api/pyMaCh3._pyMaCh3.fitters.FitterBase.html#pyMaCh3._pyMaCh3.fitters.FitterBase" target="_top" title="FitterBase" alt="" coords="183,55,271,80"/>
-<area shape="rect" id="node3" href="api/pyMaCh3._pyMaCh3.fitters.LikelihoodFit.html#pyMaCh3._pyMaCh3.fitters.LikelihoodFit" target="_top" title="LikelihoodFit" alt="" coords="319,29,423,55"/>
-<area shape="rect" id="node4" href="api/pyMaCh3._pyMaCh3.fitters.MCMC.html#pyMaCh3._pyMaCh3.fitters.MCMC" target="_top" title="MCMC" alt="" coords="335,79,407,104"/>
-<area shape="rect" id="node5" href="api/pyMaCh3._pyMaCh3.fitters.MinuitFit.html#pyMaCh3._pyMaCh3.fitters.MinuitFit" target="_top" title="MinuitFit" alt="" coords="471,5,549,31"/>
-<area shape="rect" id="node6" href="api/pyMaCh3._pyMaCh3.fitters.PSO.html#pyMaCh3._pyMaCh3.fitters.PSO" target="_top" title="PSO" alt="" coords="474,55,546,80"/>
-</map>
