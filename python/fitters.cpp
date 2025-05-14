@@ -9,7 +9,7 @@
 
 namespace py = pybind11;
 
-// As FitterBase is an abstract base class we have to do some gymnastics to get it to get it into python
+/// @brief EW: As FitterBase is an abstract base class we have to do some gymnastics to get it to get it into python
 class PyFitterBase : public FitterBase {
 public:
     /* Inherit the constructors */
@@ -35,7 +35,7 @@ public:
     }
 };
 
-// As LikelihoodFit is an abstract base class we have to do some gymnastics to get it to get it into python
+/// @brief EW: As LikelihoodFit is an abstract base class we have to do some gymnastics to get it to get it into python
 class PyLikelihoodFit : public LikelihoodFit {
 public:
     /* Inherit the constructors */

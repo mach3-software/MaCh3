@@ -20,6 +20,8 @@
 
 namespace MaCh3Plotting {
 /// @author Ewan Miller
+
+/// @brief EW: provides centralized styling utilities for plots, including name prettification and style application
 class StyleManager {
 public:
   /// @brief Constructor
