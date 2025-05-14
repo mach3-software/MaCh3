@@ -188,6 +188,9 @@ public:
   void Set2DBinning(std::vector<double> &XVec, std::vector<double> &YVec) {Set2DBinning(XVec.size()-1, XVec.data(), YVec.size()-1, YVec.data());};
   /// @brief wrapper to call set binning functions based on sample config info
   void SetupSampleBinning();
+  /// @brief Initialise data, MC and W2 histograms
+  void SetupReweightArrays(const size_t numberXBins, const size_t numberYBins);
+
   /// @brief the strings associated with the variables used for the binning e.g. "RecoNeutrinoEnergy"
   std::string XVarStr, YVarStr;
   std::vector<std::string> SplineVarNames;
@@ -235,7 +238,7 @@ public:
   std::vector<std::string> funcParsNamesVec = {};
 
   /// @brief Check whether a normalisation systematic affects an event or not
-  void CalcNormsBins(int iSample);
+  void CalcNormsBins(const int iSample);
   /// @brief Calculate the spline weight for a given event
   M3::float_t CalcWeightSpline(const int iSample, const int iEvent) const;
   /// @brief Calculate the norm weight for a given event
