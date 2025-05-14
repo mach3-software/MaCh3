@@ -104,6 +104,24 @@ public:
   /// ETA function to generically convert a kinematic type from xsec cov to a string
   std::string ReturnStringFromKinematicParameter(const int KinematicVariable) const;
 
+  struct GenericBinning {
+    //for each axis tells you how many bins to step to get to the next bin
+    std::vector<int> nbins_per_slice;
+    std::vector<std::vector<double>> BinsEdges;
+    // LP - these are the SamplePDFFDBase subclass KineParameter identifiers
+    std::vector<int> VarEnums;
+    std::vector<TAxis> Axes;
+
+    //the axis bin numbers passed in here do not include the ROOT underflow at bin 0, so bin 0 is the first real bin
+    int GetGlobalBinNumber(std::vector<int> const &axis_bin_numbers) const;
+    int GetGlobalBinNumber(std::vector<double> const &values) const;
+    std::vector<int> DecomposeGlobalBinNumber(int gbi) const;
+    int GetNDimensions() const { return static_cast<int>(Axes.size()); }
+    double GetGlobalBinHyperVolume(int gbi) const;
+  } generic_binning;
+
+  int GetGenericBinningGlobalBinNumber(int iSample, int iEvent);
+
  protected:
   /// @brief DB Function to determine which weights apply to which types of samples pure virtual!!
   virtual void SetupWeightPointers() = 0;

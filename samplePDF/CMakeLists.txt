@@ -3,6 +3,7 @@ set(HEADERS
     samplePDFFDBase.h
     Structs.h
     HistogramUtils.h
+    GenericBinningTools.h
     FarDetectorCoreInfoStruct.h
 )
 
@@ -10,6 +11,7 @@ add_library(SamplePDF SHARED
     samplePDFBase.cpp
     samplePDFFDBase.cpp
     HistogramUtils.cpp
+    GenericBinningTools.cpp
 )
 
 target_link_libraries(SamplePDF PUBLIC Splines NuOscillator)

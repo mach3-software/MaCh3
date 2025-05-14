@@ -74,6 +74,33 @@ samplePDFFDBase::~samplePDFFDBase()
   if(THStackLeg != nullptr) delete THStackLeg;
 }
 
+std::vector<double> get_bin_edges_from_node(YAML::Node const &ax_node) {
+  // builds a uniform binning from an nbins,start,stop type
+  // specification
+  if (ax_node["Uniform"]) {
+
+    auto const &linspacespec = ax_node["Uniform"].as<std::vector<std::string>>();
+
+    int nbins = static_cast<int>(std::stol(linspacespec[0]));
+  double start = std::stod(linspacespec[1]);
+    double stop = std::stod(linspacespec[2]);
+
+    double width = (stop - start) / double(nbins);
+    std::vector<double> bin_edges;
+    bin_edges.push_back(start);
+    for (int i = 0; i < nbins; ++i) {
+      bin_edges.push_back(bin_edges.back() + width);
+    }
+    return bin_edges;
+  } else if (ax_node["VarBins"]) {
+    return ax_node["VarBins"].as<std::vector<double>>();
+  } else {
+    MACH3LOG_ERROR("No valid binning definition found, valid values: Uniform: "
+    "[nbins,lowedge,upedge], VarBins: [edge0, edge1, ....]");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+}
+
 void samplePDFFDBase::ReadSampleConfig() 
 {
   auto ModeName = Get<std::string>(SampleManager->raw()["MaCh3ModeConfig"], __FILE__ , __LINE__);
@@ -97,42 +124,122 @@ void samplePDFFDBase::ReadSampleConfig()
   if (CheckNodeExists(SampleManager->raw(), "LikelihoodOptions")) {
     UpdateW2 = GetFromManager<bool>(SampleManager->raw()["LikelihoodOptions"]["UpdateW2"], false);
   }
+
   //Binning
+  auto const & config_ydoc = SampleManager->raw();
   nDimensions = 0;
-  XVarStr = GetFromManager(SampleManager->raw()["Binning"]["XVarStr"], std::string(""));
-  SampleXBins = GetFromManager(SampleManager->raw()["Binning"]["XVarBins"], std::vector<double>());
-  if(XVarStr.length() > 0){
-    nDimensions++;
-  } else{
-    MACH3LOG_ERROR("Please specify an X-variable string in sample config {}", SampleManager->GetFileName());
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  
-  YVarStr = GetFromManager(SampleManager->raw()["Binning"]["YVarStr"], std::string(""));
-  SampleYBins = GetFromManager(SampleManager->raw()["Binning"]["YVarBins"], std::vector<double>());
-  if(YVarStr.length() > 0){
-    if(XVarStr.length() == 0){
-      MACH3LOG_ERROR("Please specify an Y-variable string in sample config {}", SampleManager->GetFileName());
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-    nDimensions++;
-  }
-  
-  if(nDimensions == 0){
+
+  if (!config_ydoc["Binning"]) {
     MACH3LOG_ERROR("Error setting up the sample binning");
     MACH3LOG_ERROR("Number of dimensions is {}", nDimensions);
     MACH3LOG_ERROR("Check that an XVarStr has been given in the sample config");
     throw MaCh3Exception(__FILE__, __LINE__);
-  } else{
-    MACH3LOG_INFO("Found {} dimensions for sample binning", nDimensions);
   }
-  
-  //Sanity check that some binning has been specified
-  if(SampleXBins.size() == 0 && SampleYBins.size() == 0){
-    MACH3LOG_ERROR("No binning specified for either X or Y of sample binning, please add some binning to the sample config {}", SampleManager->GetFileName());
+
+  auto const &binning_node = config_ydoc["Binning"];
+
+  // try generic binning first
+  if (binning_node["Axes"]) {
+    // allows a single entry sequence or if the writer forgets the '-' sequence
+    // identifier
+    // The ForceGeneric option allows us to force the use of the generic binning
+    // for 1D histograms of calculated variables
+    if (!binning_node["ForceGeneric"].as<bool>(false) &&
+      (binning_node["Axes"].IsScalar() ||
+      (binning_node["Axes"].size() == 1))) {
+      auto const &ax_node = binning_node["Axes"].IsScalar()
+      ? binning_node["Axes"]
+      : binning_node["Axes"][0];
+    XVarStr = ax_node["VarStr"].as<std::string>();
+    SampleXBins = get_bin_edges_from_node(ax_node);
+
+    if (XVarStr.length() > 0) {
+      nDimensions = 1;
+    } else {
+      MACH3LOG_ERROR(
+        "Please specify an X-variable string in sample config {}",
+        SampleManager->GetFileName());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+
+      } else {
+        try {
+          int nglobalbins = 1;
+          generic_binning.nbins_per_slice = {1,};
+          for (auto const &ax : binning_node["Axes"]) {
+            generic_binning.VarEnums.push_back(ReturnKinematicParameterFromString(
+              ax["VarStr"].as<std::string>()));
+
+            auto const &bin_edges = get_bin_edges_from_node(ax);
+
+            // construct a new TAxis in place
+            generic_binning.Axes.emplace_back(bin_edges.size() - 1,
+                                              bin_edges.data());
+            generic_binning.Axes.back().SetTitle(
+              ax["Title"].as<std::string>("").c_str());
+            // note this means our '1D binning' ignores 'flow bins.
+            nglobalbins *= generic_binning.Axes.back().GetNbins();
+            generic_binning.nbins_per_slice.push_back(nglobalbins);
+          }
+          // even though we are tracking multiple dimensions, MaCh3 stats bits
+          // only needs to know about 1
+          nDimensions = 1;
+
+          XVarStr = "global_bin_number";
+          // make the integer value of the global bin number correspond to the
+          // center of a bin
+          SampleXBins = {
+            -0.5,
+          };
+          for (int i = 0; i < nglobalbins; ++i) {
+            SampleXBins.push_back(SampleXBins.back() + 1);
+          }
+        } catch (std::runtime_error const &e) { // try/catch is a bit ugly, but
+          // keeps the parsing failure local
+          MACH3LOG_ERROR("Failed to parse Binning.Axes object with error: {}",
+                         e.what());
+          YAML::Dump(binning_node["Axes"]);
+          throw MaCh3Exception(__FILE__, __LINE__);
+        }
+      }
+  } else { // use explicit XVar/YVar format
+
+    XVarStr =
+    GetFromManager(config_ydoc["Binning"]["XVarStr"], std::string(""));
+    SampleXBins = GetFromManager(config_ydoc["Binning"]["XVarBins"],
+                                 std::vector<double>());
+    if (XVarStr.length() > 0) {
+      nDimensions++;
+    } else {
+      MACH3LOG_ERROR("Please specify an X-variable string in sample config {}",
+                     SampleManager->GetFileName());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+
+    YVarStr =
+    GetFromManager(config_ydoc["Binning"]["YVarStr"], std::string(""));
+    SampleYBins = GetFromManager(config_ydoc["Binning"]["YVarBins"],
+                                 std::vector<double>());
+    if (YVarStr.length() > 0) {
+      if (XVarStr.length() == 0) {
+        MACH3LOG_ERROR(
+          "Please specify an X-variable string in sample config {}",
+          SampleManager->GetFileName());
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+      nDimensions++;
+    }
+  }
+
+  MACH3LOG_INFO("Found {} dimensions for sample binning", nDimensions);
+
+  // Sanity check that some binning has been specified
+  if (SampleXBins.size() == 0 && SampleYBins.size() == 0) {
+    MACH3LOG_ERROR("No binning specified for either X or Y of sample binning, "
+    "please add some binning to the sample config {}",
+    SampleManager->GetFileName());
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-  
   //FD file info
   if (!CheckNodeExists(SampleManager->raw(), "InputFiles", "mtupleprefix")){
     MACH3LOG_ERROR("InputFiles:mtupleprefix not given in {}, please add this", SampleManager->GetFileName());
@@ -2136,4 +2243,96 @@ THStack* samplePDFFDBase::ReturnStackedHistBySelection1D(std::string KinematicPr
     StackHist->Add(HistList[i]);
   }
   return StackHist;
+}
+
+int samplePDFFDBase::GenericBinning::GetGlobalBinNumber(
+  std::vector<int> const &axis_bin_numbers) const {
+    if (axis_bin_numbers.size() != Axes.size()) {
+      MACH3LOG_ERROR("GenericBinning::GetGlobalBinNumber called with axis_bin_numbers: [{}], but the binning has {} axes.",
+                     fmt::join(axis_bin_numbers, ", "), Axes.size());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+
+  int gbin = 0;
+  for (size_t ax_i = 0; ax_i < Axes.size(); ++ax_i) {
+
+    int ax_bin = axis_bin_numbers[ax_i];
+
+    // flow bin on this axis. Since we don't track per-axis flow bins, just
+    // check if the bin number is valid and if not return the global flow bin at
+    // gbin = -1
+    if ((ax_bin < 0) || (ax_bin >= Axes[ax_i].GetNbins())) {
+      return -1;
+    }
+
+    gbin += ax_bin * nbins_per_slice[ax_i];
+  }
+  return gbin;
+}
+
+int samplePDFFDBase::GenericBinning::GetGlobalBinNumber(
+  std::vector<double> const &values) const {
+
+    if (values.size() != Axes.size()) {
+      MACH3LOG_ERROR("GenericBinning::GetGlobalBinNumber called with values: {}, "
+      "but the binning has {} axes.",
+      fmt::join(values.begin(), values.end(), ", "), Axes.size());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+
+    std::vector<int> bin_numbers(values.size());
+
+  for (size_t ax_i = 0; ax_i < Axes.size(); ++ax_i) {
+
+    int ax_bin = Axes[ax_i].FindFixBin(values[ax_i]);
+    // flow bin on this axis. The flow bins here are in ROOT convention
+    if ((ax_bin == 0) || (ax_bin == (Axes[ax_i].GetNbins() + 1))) {
+      return -1;
+    }
+    // get rid of the ROOT underflow along each axis as we have a global
+    // underflow at gbin == -1
+    bin_numbers[ax_i] = ax_bin - 1;
+  }
+  return GetGlobalBinNumber(bin_numbers);
+}
+
+std::vector<int>
+samplePDFFDBase::GenericBinning::DecomposeGlobalBinNumber(int gbi) const {
+  std::vector<int> axis_binning;
+  for (std::size_t ax_i = Axes.size(); ax_i-- > 0;) {
+    int ax_bin = gbi / nbins_per_slice[ax_i];
+    axis_binning.insert(axis_binning.begin(), ax_bin);
+    gbi = gbi % nbins_per_slice[ax_i];
+  }
+  return axis_binning;
+}
+
+double samplePDFFDBase::GenericBinning::GetGlobalBinHyperVolume(int gbi) const {
+  double hv = 1;
+  auto ax_bins = DecomposeGlobalBinNumber(gbi);
+  for (int axi = 0; axi < GetNDimensions(); ++axi) {
+    hv *= Axes[axi].GetBinWidth(ax_bins[axi] +
+    1); // back to ROOT underflow convention
+  }
+  return hv;
+}
+
+int samplePDFFDBase::GetGenericBinningGlobalBinNumber(int iSample, int iEvent) {
+  if (!generic_binning.VarEnums.size()) {
+    MACH3LOG_ERROR(
+      "GetGenericBinningGlobalBinNumber called, but no generic binning was "
+      "set up in this SamplePDFFDBase subclass instance.");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  std::vector<double> values; // this might be slow... depends how often we need
+  // to rebin in a tight loop
+  for (size_t ax_i = 0; ax_i < generic_binning.VarEnums.size(); ++ax_i) {
+
+    // use the non 'ByReference' version so that we can use calculated
+    // variables without providing dummy storage
+    values.push_back(ReturnKinematicParameter(generic_binning.VarEnums[ax_i],
+                                              iSample, iEvent));
+  }
+  return generic_binning.GetGlobalBinNumber(values);
 }
