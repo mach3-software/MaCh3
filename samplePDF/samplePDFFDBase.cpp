@@ -2298,12 +2298,15 @@ int samplePDFFDBase::GenericBinning::GetGlobalBinNumber(
 
 std::vector<int>
 samplePDFFDBase::GenericBinning::DecomposeGlobalBinNumber(int gbi) const {
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wnull-dereference"
   std::vector<int> axis_binning;
   for (std::size_t ax_i = Axes.size(); ax_i-- > 0;) {
     int ax_bin = gbi / nbins_per_slice[ax_i];
     axis_binning.insert(axis_binning.begin(), ax_bin);
     gbi = gbi % nbins_per_slice[ax_i];
   }
+  #pragma GCC diagnostic pop
   return axis_binning;
 }
 
