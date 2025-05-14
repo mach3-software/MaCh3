@@ -425,12 +425,8 @@ void ParameterHandlerGeneric::InitParams() {
   }
   Randomize();
   //KS: Transfer the starting parameters to the PCA basis, you don't want to start with zero..
-  if (pca)
-  {
-    PCAObj->TransferToPCA();
-    for (int i = 0; i < _fNumParPCA; ++i) {
-      PCAObj->_fPreFitValuePCA[i] = PCAObj->_fParCurrPCA(i);
-    }
+  if (pca) {
+    PCAObj->SetInitialParameters();
   }
 }
 

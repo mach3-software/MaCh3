@@ -35,7 +35,7 @@ class PCAHandler{
   /// @brief Destructor
   virtual ~PCAHandler();
 
-  /// @brief KS:
+  /// @brief KS: Setup pointers to current and proposed parameter value which we need to convert them to PCA base each step
   void SetupPointers(std::vector<double>* fCurr_Val,
                      std::vector<double>* fProp_Val);
 
@@ -55,6 +55,9 @@ class PCAHandler{
                       const double GlobalStepScale,
                       const double* _restrict_ randParams,
                       const double* _restrict_ corr_throw) _noexcept_;
+
+  /// @brief KS: Transfer the starting parameters to the PCA basis, you don't want to start with zero..
+  void SetInitialParameters();
 
   #ifdef DEBUG_PCA
   /// @brief KS: Let's dump all useful matrices to properly validate PCA

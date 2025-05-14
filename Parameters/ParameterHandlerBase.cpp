@@ -751,7 +751,6 @@ void ParameterHandlerBase::SetBranches(TTree &tree, bool SaveProposal) {
   // When running PCA, also save PCA parameters
   if (pca) {
     for (int i = 0; i < _fNumParPCA; ++i) {
-
       tree.Branch(Form("%s_PCA", _fNames[i].c_str()), &PCAObj->_fParCurrPCA.GetMatrixArray()[i], Form("%s_PCA/D", _fNames[i].c_str()));
     }
   }
@@ -765,7 +764,6 @@ void ParameterHandlerBase::SetBranches(TTree &tree, bool SaveProposal) {
     // When running PCA, also save PCA parameters
     if (pca) {
       for (int i = 0; i < _fNumParPCA; ++i) {
-
         tree.Branch(Form("%s_PCA_Prop", _fNames[i].c_str()), &PCAObj->_fParPropPCA.GetMatrixArray()[i], Form("%s_PCA_Prop/D", _fNames[i].c_str()));
       }
     }
