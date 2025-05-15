@@ -8,7 +8,7 @@
 ParameterHandlerGeneric::ParameterHandlerGeneric(const std::vector<std::string>& YAMLFile, std::string name, double threshold, int FirstPCA, int LastPCA)
                : ParameterHandlerBase(YAMLFile, name, threshold, FirstPCA, LastPCA){
 // ********************************************
-  InitXsecFromConfig();
+  InitParametersTypeFromConfig();
 
   //ETA - again this really doesn't need to be hear...
   for (int i = 0; i < _fNumPar; i++)
@@ -17,14 +17,14 @@ ParameterHandlerGeneric::ParameterHandlerGeneric(const std::vector<std::string>&
     if(int(_fNames[i].length()) > PrintLength) PrintLength = int(_fNames[i].length());
   } // end the for loop
 
-  MACH3LOG_DEBUG("Constructing instance of covarianceXsec");
+  MACH3LOG_DEBUG("Constructing instance of ParameterHandler");
   InitParams();
   // Print
   Print();
 }
 
 // ********************************************
-void ParameterHandlerGeneric::InitXsecFromConfig() {
+void ParameterHandlerGeneric::InitParametersTypeFromConfig() {
 // ********************************************
   _fSystToGlobalSystIndexMap.resize(SystType::kSystTypes);
 
@@ -101,7 +101,7 @@ void ParameterHandlerGeneric::InitXsecFromConfig() {
 // ********************************************
 ParameterHandlerGeneric::~ParameterHandlerGeneric() {
 // ********************************************
-  MACH3LOG_DEBUG("Deleting covarianceXsec");
+  MACH3LOG_DEBUG("Deleting ParameterHandler");
 }
 
 // ********************************************
@@ -173,8 +173,7 @@ NormParameter ParameterHandlerGeneric::GetNormParameter(const YAML::Node& param,
 
   //ETA - I think this can go in the norm parameters only if statement above
   int NumKinematicCuts = 0;
-  if(param["KinematicCuts"]){
-
+  if(param["KinematicCuts"]) {
     NumKinematicCuts = int(param["KinematicCuts"].size());
 
     std::vector<std::string> TempKinematicStrings;
@@ -187,7 +186,7 @@ NormParameter ParameterHandlerGeneric::GetNormParameter(const YAML::Node& param,
         TempKinematicBounds.push_back(it->second.as<std::vector<double>>());
       }
       if(TempKinematicStrings.size() == 0) {
-        MACH3LOG_ERROR("Recived a KinematicCuts node but couldn't read the contents (it's a list of single-element dictionaries (python) = map of pairs (C++))");
+        MACH3LOG_ERROR("Received a KinematicCuts node but couldn't read the contents (it's a list of single-element dictionaries (python) = map of pairs (C++))");
         MACH3LOG_ERROR("For Param {}", norm.name);
         throw MaCh3Exception(__FILE__, __LINE__);
       }
@@ -310,7 +309,7 @@ FunctionalParameter ParameterHandlerGeneric::GetFunctionalParameters(const YAML:
         TempKinematicBounds.push_back(it->second.as<std::vector<double>>());
       }
       if(TempKinematicStrings.size() == 0) {
-        MACH3LOG_ERROR("Recived a KinematicCuts node but couldn't read the contents (it's a list of single-element dictionaries (python) = map of pairs (C++))");
+        MACH3LOG_ERROR("Received a KinematicCuts node but couldn't read the contents (it's a list of single-element dictionaries (python) = map of pairs (C++))");
         MACH3LOG_ERROR("For Param {}", func.name);
         throw MaCh3Exception(__FILE__, __LINE__);
       }
@@ -435,7 +434,7 @@ void ParameterHandlerGeneric::InitParams() {
 void ParameterHandlerGeneric::Print() {
 // ********************************************
   MACH3LOG_INFO("#################################################");
-  MACH3LOG_INFO("Printing covarianceXsec:");
+  MACH3LOG_INFO("Printing ParameterHandlerGeneric:");
 
   PrintGlobablInfo();
 
@@ -633,7 +632,7 @@ void ParameterHandlerGeneric::SetGroupOnlyParameters(const std::string& Group) {
       if(IsParFromGroup(i, Group)) _fPropVal[i] = _fPreFitValue[i];
     }
   } else {
-    MACH3LOG_ERROR("SetGroupOnlyParameters not implemented for PCA");
+    MACH3LOG_ERROR("{} not implemented for PCA", __func__);
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 }
@@ -746,5 +745,5 @@ void ParameterHandlerGeneric::DumpMatrixToFile(const std::string& Name) {
   outputFile->Close();
   delete outputFile;
 
-  MACH3LOG_INFO("Finished dumping covariance object");
+  MACH3LOG_INFO("Finished dumping ParameterHandler object");
 }

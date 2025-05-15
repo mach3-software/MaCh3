@@ -36,11 +36,19 @@ class PCAHandler{
   virtual ~PCAHandler();
 
   /// @brief KS: Setup pointers to current and proposed parameter value which we need to convert them to PCA base each step
+  /// @param fCurr_Val pointer to current position of parameter
+  /// @param fProp_Val pointer to proposed position of parameter
   void SetupPointers(std::vector<double>* fCurr_Val,
                      std::vector<double>* fProp_Val);
 
   /// @brief CW: Calculate eigen values, prepare transition matrices and remove param based on defined threshold
-  void ConstructPCA(TMatrixDSym * covMatrix, const int firstPCAd, const int lastPCAd,
+  /// @param CovMatrix       Symmetric covariance matrix used for eigen decomposition.
+  /// @param firstPCAd       Index of the first PCA component to include.
+  /// @param lastPCAd        Index of the last PCA component to include.
+  /// @param eigen_thresh    Threshold for eigenvalues below which parameters are discarded.
+  /// @param _fNumParPCA     Output: number of parameters retained in PCA basis.
+  /// @param _fNumPar        Total number of parameters in the original (non-PCA) basis.
+  void ConstructPCA(TMatrixDSym * CovMatrix, const int firstPCAd, const int lastPCAd,
                     const double eigen_thresh, int& _fNumParPCA, const int _fNumPar);
 
   /// @brief Transfer param values from normal base to PCA base

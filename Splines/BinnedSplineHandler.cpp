@@ -13,13 +13,13 @@ _MaCh3_Safe_Include_End_ //}
 BinnedSplineHandler::BinnedSplineHandler(ParameterHandlerGeneric *xsec_, MaCh3Modes *Modes_) : SplineBase() {
 //****************************************
   if (!xsec_) {
-    MACH3LOG_ERROR("Trying to create splineFDBase with uninitialized covariance object");
+    MACH3LOG_ERROR("Trying to create BinnedSplineHandler with uninitialized covariance object");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   xsec = xsec_;
 
   if (!Modes_) {
-    MACH3LOG_ERROR("Trying to create splineFDBase with uninitialized MaCh3Modes object");
+    MACH3LOG_ERROR("Trying to create BinnedSplineHandler with uninitialized MaCh3Modes object");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   Modes = Modes_;
@@ -330,7 +330,7 @@ std::vector<TAxis *> BinnedSplineHandler::FindSplineBinning(const std::string& F
     Obj = File->Get(TemplateName.c_str());
     if (!Obj)
     {
-      MACH3LOG_ERROR("Error: could not find dev_tmp_0_0 in spline file. Spline binning cannot be set!");
+      MACH3LOG_ERROR("Could not find dev_tmp_0_0 in spline file. Spline binning cannot be set!");
       MACH3LOG_ERROR("FileName: {}", FileName);
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
@@ -916,7 +916,7 @@ void BinnedSplineHandler::FillSampleArray(std::string SampleName, std::vector<st
       // If the syst doesn't match any of the spline names then skip it
       if (SystNum == -1){
         MACH3LOG_DEBUG("Couldn't match!!");
-        MACH3LOG_DEBUG("Couldn't Match any systematic name in xsec yaml with spline name: {}" , FullSplineName);
+        MACH3LOG_DEBUG("Couldn't Match any systematic name in ParameterHandler with spline name: {}" , FullSplineName);
         continue;
       }
 

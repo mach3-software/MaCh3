@@ -49,7 +49,7 @@ class MaCh3Modes {
   void Print();
 
   /// @brief KS: Get number of modes, keep in mind actual number is +1 greater due to unknown category
-  inline int GetNModes(){return NModes;}
+  inline int GetNModes() const {return NModes;}
   /// @brief KS: Get mode number based on name, if mode not known you will get UNKNOWN_BAD
   MaCh3Modes_t GetMode(const std::string& name);
   /// @brief KS: Get normal name of mode, if mode not known you will get UNKNOWN_BAD
@@ -65,9 +65,9 @@ class MaCh3Modes {
   /// @brief KS: Get MaCh3 mode from generator mode
   MaCh3Modes_t GetModeFromGenerator(const int Index);
   /// @brief Get class name
-  inline std::string GetName()const {return "MaCh3Modes";};
+  inline std::string GetName() const {return "MaCh3Modes";};
   /// @brief Return count of CC modes
-  inline int GetNCCModes()const {return nCCModes;};
+  inline int GetNCCModes() const {return nCCModes;};
 
  private:
   /// @brief KS: Make sure we don't have two modes with the same name

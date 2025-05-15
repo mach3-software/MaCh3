@@ -47,7 +47,6 @@ MaCh3Modes::MaCh3Modes(std::string const &filename) {
 // *******************
 void MaCh3Modes::Print() {
 // *******************
-
   MACH3LOG_INFO("Printing MaCh3 Modes Called: {}", Title);
 
   MACH3LOG_INFO("========================================================================");
@@ -111,7 +110,6 @@ void MaCh3Modes::DeclareNewMode(std::string const &name,
 // *******************
 void MaCh3Modes::PrepareMap() {
 // *******************
-
   int maxElement = 0;
   for(int i = 0; i < NModes; ++i) {
     for(size_t j = 0; j < fMode[i].GeneratorMaping.size(); j++) {
