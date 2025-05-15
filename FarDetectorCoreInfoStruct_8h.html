@@ -84,7 +84,8 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a>  </div>
+<a href="#nested-classes">Classes</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle"><div class="title">FarDetectorCoreInfoStruct.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -141,10 +142,87 @@ This graph shows which files directly or indirectly include this file:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structOscChannelInfo.html">OscChannelInfo</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Store info about used osc channels.  <a href="structOscChannelInfo.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFarDetectorCoreInfo.html">FarDetectorCoreInfo</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">constructors are same for all three so put in here  <a href="structFarDetectorCoreInfo.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:afc52c63bc2b15ae30444755579f5beb4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="FarDetectorCoreInfoStruct_8h.html#afc52c63bc2b15ae30444755579f5beb4">GetOscChannel</a> (const std::vector&lt; <a class="el" href="structOscChannelInfo.html">OscChannelInfo</a> &gt; &amp;OscChannel, const int InitFlav, const int FinalFlav)</td></tr>
+<tr class="memdesc:afc52c63bc2b15ae30444755579f5beb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Get Osc Channel Index based on initial and final PDG codes.  <br /></td></tr>
+<tr class="separator:afc52c63bc2b15ae30444755579f5beb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="afc52c63bc2b15ae30444755579f5beb4" name="afc52c63bc2b15ae30444755579f5beb4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afc52c63bc2b15ae30444755579f5beb4">&#9670;&#160;</a></span>GetOscChannel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int GetOscChannel </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="structOscChannelInfo.html">OscChannelInfo</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>OscChannel</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>InitFlav</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>FinalFlav</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>KS: Get Osc Channel Index based on initial and final PDG codes. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">OscChannel</td><td>The vector of available oscillation channels </td></tr>
+    <tr><td class="paramname">InitFlav</td><td>Initial flavour PDG code </td></tr>
+    <tr><td class="paramname">FinalFlav</td><td>Final flavour PDG code </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Index in OscChannel vector </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00028">28</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   28</span>                                                                                                               {</div>
+<div class="line"><span class="lineno">   29</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; OscChannel.size(); ++i) {</div>
+<div class="line"><span class="lineno">   30</span>    <span class="keywordflow">if</span> (InitFlav == OscChannel[i].InitPDG &amp;&amp; FinalFlav == OscChannel[i].FinalPDG) {</div>
+<div class="line"><span class="lineno">   31</span>      <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(OscChannel[i].ChannelIndex);</div>
+<div class="line"><span class="lineno">   32</span>    }</div>
+<div class="line"><span class="lineno">   33</span>  }</div>
+<div class="line"><span class="lineno">   34</span> </div>
+<div class="line"><span class="lineno">   35</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Didn&#39;t find Osc channel for InitFlav = {}, FinalFlav = {}&quot;</span>, InitFlav, FinalFlav);</div>
+<div class="line"><span class="lineno">   36</span>  <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><span class="lineno">   37</span>}</div>
+<div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00025">MaCh3Logger.h:25</a></div></div>
+<div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00013">MaCh3Exception.h:13</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

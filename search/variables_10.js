@@ -12,7 +12,7 @@ var searchData=
   ['reversedkinematicparameters_9',['ReversedKinematicParameters',['../classSampleHandlerFD.html#ad7ac675cc4ce81bec42e0700f1ff2620',1,'SampleHandlerFD']]],
   ['rhat_10',['RHat',['../RHat__HighMem_8cpp.html#ab5cfb5e8741283e8d8252aae184004e4',1,'RHat():&#160;RHat_HighMem.cpp'],['../RHat_8cpp.html#ab5cfb5e8741283e8d8252aae184004e4',1,'RHat():&#160;RHat.cpp']]],
   ['rhatfolded_11',['RHatFolded',['../RHat__HighMem_8cpp.html#a754fbe6088f05d880121693722fe6b99',1,'RHat_HighMem.cpp']]],
-  ['rnd_12',['rnd',['../classSampleSummary.html#a364fb16938a26adbe59fdd057f4b9405',1,'SampleSummary::rnd()'],['../classSampleHandlerBase.html#a271e0af335b0000bb39c4d765ea0b762',1,'SampleHandlerBase::rnd()']]],
+  ['rnd_12',['rnd',['../classSampleSummary.html#a364fb16938a26adbe59fdd057f4b9405',1,'SampleSummary']]],
   ['rw_5fetru_13',['rw_etru',['../structFarDetectorCoreInfo.html#a90ac71448d50c0b8db0a4479444779c3',1,'FarDetectorCoreInfo']]],
   ['rw_5flower_5flower_5fxbinedge_14',['rw_lower_lower_xbinedge',['../structFarDetectorCoreInfo.html#a1da2583460c7d5292c97cb44187b9d91',1,'FarDetectorCoreInfo']]],
   ['rw_5flower_5fxbinedge_15',['rw_lower_xbinedge',['../structFarDetectorCoreInfo.html#a0cb33607ebcc5e8ab3dc2e03b61744b0',1,'FarDetectorCoreInfo']]],

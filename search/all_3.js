@@ -28,7 +28,7 @@ var searchData=
   ['central_5fvalue_25',['Central_Value',['../classMCMCProcessor.html#aad661c6d53f9f891e18ff8ccdbd08479',1,'MCMCProcessor']]],
   ['chain_26',['Chain',['../classMCMCProcessor.html#a6be3bbebd4a79fe9814a3da09b3bb820',1,'MCMCProcessor']]],
   ['chainlength_27',['chainLength',['../classmcmc.html#a2b9a5344ea8074fcecdc1ae2f3cfc62a',1,'mcmc']]],
-  ['channelindex_28',['ChannelIndex',['../structFarDetectorCoreInfo.html#a87395547f1572d6dfd5bce3e2352611c',1,'FarDetectorCoreInfo']]],
+  ['channelindex_28',['ChannelIndex',['../structOscChannelInfo.html#a5dd80422976729436a31ffb1c449e936',1,'OscChannelInfo']]],
   ['checkbonferonicorrectedpvalue_29',['CheckBonferoniCorrectedpValue',['../StatisticalUtils_8h.html#adba5abb16555092305a8b459f94a24c1',1,'CheckBonferoniCorrectedpValue(const std::vector&lt; std::string &gt; &amp;SampleNameVec, const std::vector&lt; double &gt; &amp;PValVec, const double Threshold=0.05):&#160;StatisticalUtils.cpp'],['../StatisticalUtils_8cpp.html#ac1d08556f305467a4fbf68adae1d93c9',1,'CheckBonferoniCorrectedpValue(const std::vector&lt; std::string &gt; &amp;SampleNameVec, const std::vector&lt; double &gt; &amp;PValVec, const double Threshold):&#160;StatisticalUtils.cpp']]],
   ['checkbounds_30',['CheckBounds',['../classParameterHandlerBase.html#afbe38e4608749a1081a1ece01855d927',1,'ParameterHandlerBase']]],
   ['checkcorrectinitialisation_31',['CheckCorrectInitialisation',['../classParameterHandlerGeneric.html#a7bd990c506d4f8927fcdcb15d7c3d24b',1,'ParameterHandlerGeneric']]],
@@ -64,7 +64,7 @@ var searchData=
   ['compareyamlnodes_61',['compareYAMLNodes',['../YamlHelper_8h.html#ab06d2acbecc5692cab63bdf679ef0034',1,'YamlHelper.h']]],
   ['computekldivergence_62',['ComputeKLDivergence',['../StatisticalUtils_8h.html#a13aa52c404712954271d7c7faa728334',1,'ComputeKLDivergence(TH2Poly *DataPoly, TH2Poly *PolyMC):&#160;StatisticalUtils.cpp'],['../StatisticalUtils_8cpp.html#a13aa52c404712954271d7c7faa728334',1,'ComputeKLDivergence(TH2Poly *DataPoly, TH2Poly *PolyMC):&#160;StatisticalUtils.cpp']]],
   ['config_63',['config',['../classmanager.html#a7519c9ab5670ae939d18485d31057b46',1,'manager::config()'],['../ProcessMCMC_8cpp.html#a13056efd080ab16304b6f7be0ebf0a61',1,'config():&#160;ProcessMCMC.cpp']]],
-  ['constructpca_64',['ConstructPCA',['../classParameterHandlerBase.html#a5f1941048577f4e8b7a49883c6e04e05',1,'ParameterHandlerBase::ConstructPCA()'],['../classPCAHandler.html#aa7bf38c006498a84857204b87cf5218a',1,'PCAHandler::ConstructPCA()']]],
+  ['constructpca_64',['ConstructPCA',['../classParameterHandlerBase.html#a5f1941048577f4e8b7a49883c6e04e05',1,'ParameterHandlerBase::ConstructPCA()'],['../classPCAHandler.html#ace24bc02519b2f82f181980bda4ba383',1,'PCAHandler::ConstructPCA()']]],
   ['constructtf1_65',['ConstructTF1',['../classTF1__red.html#a06dd51dfd5a00286d99e688a8c0c5d6a',1,'TF1_red']]],
   ['constructtspline3_66',['ConstructTSpline3',['../classTSpline3__red.html#a597509d5b15f84e2ae77f91831e1266d',1,'TSpline3_red']]],
   ['convertfiletypenames_67',['convertFileTypeNames',['../classMaCh3Plotting_1_1InputManager.html#a487b62643d1a5c63415685d662b7118d',1,'MaCh3Plotting::InputManager']]],
@@ -101,5 +101,5 @@ var searchData=
   ['cudasafecall_98',['CudaSafeCall',['../gpuUtils_8cuh.html#a29078d993eacd9e9e6cb4a8ad9d248b8',1,'gpuUtils.cuh']]],
   ['curr_5fvalue_99',['curr_value',['../classparticle.html#a3fa66bc070aa43b66389b8e0b9754f32',1,'particle']]],
   ['currsegment_100',['CurrSegment',['../structFastSplineInfo.html#a80e4c1195099d2c34a1a511e4f749fe4',1,'FastSplineInfo']]],
-  ['currval_101',['CurrVal',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a3ff4bfbb978d84dee478fd6f22a33a33',1,'adaptive_mcmc::AdaptiveMCMCHandler']]]
+  ['currval_101',['CurrVal',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a2af0eae25a363847e8dcd13838e08307',1,'adaptive_mcmc::AdaptiveMCMCHandler']]]
 ];

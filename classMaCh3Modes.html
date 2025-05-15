@@ -118,9 +118,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a53a3e7076a1ed535c9d8ce29505a4256"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMaCh3Modes.html#a53a3e7076a1ed535c9d8ce29505a4256">Print</a> ()</td></tr>
 <tr class="memdesc:a53a3e7076a1ed535c9d8ce29505a4256"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Print info about initialised modes.  <br /></td></tr>
 <tr class="separator:a53a3e7076a1ed535c9d8ce29505a4256"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaa508822590464a0ce36d2fed94e4d03"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMaCh3Modes.html#aaa508822590464a0ce36d2fed94e4d03">GetNModes</a> ()</td></tr>
-<tr class="memdesc:aaa508822590464a0ce36d2fed94e4d03"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Get number of modes, keep in mind actual number is +1 greater due to unknown category.  <br /></td></tr>
-<tr class="separator:aaa508822590464a0ce36d2fed94e4d03"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1996581eab0194698a4ddccf3b189d49"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMaCh3Modes.html#a1996581eab0194698a4ddccf3b189d49">GetNModes</a> () const</td></tr>
+<tr class="memdesc:a1996581eab0194698a4ddccf3b189d49"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Get number of modes, keep in mind actual number is +1 greater due to unknown category.  <br /></td></tr>
+<tr class="separator:a1996581eab0194698a4ddccf3b189d49"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a21af1738d7b145f08d76aa0c163e0486"><td class="memItemLeft" align="right" valign="top"><a class="el" href="MaCh3Modes_8h.html#adf43f6c73c9598abc381855d31ef5682">MaCh3Modes_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMaCh3Modes.html#a21af1738d7b145f08d76aa0c163e0486">GetMode</a> (const std::string &amp;name)</td></tr>
 <tr class="memdesc:a21af1738d7b145f08d76aa0c163e0486"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Get mode number based on name, if mode not known you will get UNKNOWN_BAD.  <br /></td></tr>
 <tr class="separator:a21af1738d7b145f08d76aa0c163e0486"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -258,13 +258,13 @@ Daniel Barrow </dd></dl>
 <div class="ttc" id="aYamlHelper_8h_html_ab5a40370dca062f6b2c87fabece7db27"><div class="ttname"><a href="YamlHelper_8h.html#ab5a40370dca062f6b2c87fabece7db27">Get</a></div><div class="ttdeci">Type Get(const YAML::Node &amp;node, const std::string File, const int Line)</div><div class="ttdoc">Get content of config file.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00261">YamlHelper.h:261</a></div></div>
 <div class="ttc" id="aYamlHelper_8h_html_ad802d5a5acdc16a796b21af74f6f5f59"><div class="ttname"><a href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">M3OpenConfig</a></div><div class="ttdeci">#define M3OpenConfig(filename)</div><div class="ttdoc">Macro to simplify calling LoadYaml with file and line info.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00457">YamlHelper.h:457</a></div></div>
 <div class="ttc" id="aclassMaCh3Modes_html_a0635bbfc95b50bab0b1e036d33360947"><div class="ttname"><a href="classMaCh3Modes.html#a0635bbfc95b50bab0b1e036d33360947">MaCh3Modes::nCCModes</a></div><div class="ttdeci">int nCCModes</div><div class="ttdoc">DB: Number of CC modes.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00101">MaCh3Modes.h:101</a></div></div>
-<div class="ttc" id="aclassMaCh3Modes_html_a180684434c373add20e58ab9fd083a93"><div class="ttname"><a href="classMaCh3Modes.html#a180684434c373add20e58ab9fd083a93">MaCh3Modes::DeclareNewMode</a></div><div class="ttdeci">void DeclareNewMode(std::string const &amp;name, std::string const &amp;fancyname, int PlotColor, std::vector&lt; int &gt; const &amp;GenMap, bool IsNC, std::string SplineSuffix)</div><div class="ttdoc">KS: Add new mode.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8cpp_source.html#l00090">MaCh3Modes.cpp:90</a></div></div>
+<div class="ttc" id="aclassMaCh3Modes_html_a180684434c373add20e58ab9fd083a93"><div class="ttname"><a href="classMaCh3Modes.html#a180684434c373add20e58ab9fd083a93">MaCh3Modes::DeclareNewMode</a></div><div class="ttdeci">void DeclareNewMode(std::string const &amp;name, std::string const &amp;fancyname, int PlotColor, std::vector&lt; int &gt; const &amp;GenMap, bool IsNC, std::string SplineSuffix)</div><div class="ttdoc">KS: Add new mode.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8cpp_source.html#l00089">MaCh3Modes.cpp:89</a></div></div>
 <div class="ttc" id="aclassMaCh3Modes_html_a3bde53f0145673d99b9866b3fb5dcbaf"><div class="ttname"><a href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">MaCh3Modes::NModes</a></div><div class="ttdeci">int NModes</div><div class="ttdoc">KS: Number of modes, keep in mind actual number is +1 greater due to unknown category.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00099">MaCh3Modes.h:99</a></div></div>
 <div class="ttc" id="aclassMaCh3Modes_html_a53a3e7076a1ed535c9d8ce29505a4256"><div class="ttname"><a href="classMaCh3Modes.html#a53a3e7076a1ed535c9d8ce29505a4256">MaCh3Modes::Print</a></div><div class="ttdeci">void Print()</div><div class="ttdoc">KS: Print info about initialised modes.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8cpp_source.html#l00048">MaCh3Modes.cpp:48</a></div></div>
 <div class="ttc" id="aclassMaCh3Modes_html_a68ccf4c0fcd926574b33ef1dbcad3110"><div class="ttname"><a href="classMaCh3Modes.html#a68ccf4c0fcd926574b33ef1dbcad3110">MaCh3Modes::Generator</a></div><div class="ttdeci">std::string Generator</div><div class="ttdoc">KS: Name of generator like NEUT, NuWro etc. this is to make stuff fancy.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00097">MaCh3Modes.h:97</a></div></div>
 <div class="ttc" id="aclassMaCh3Modes_html_a96386b84dc8e9a1a378872b7846e407d"><div class="ttname"><a href="classMaCh3Modes.html#a96386b84dc8e9a1a378872b7846e407d">MaCh3Modes::Title</a></div><div class="ttdeci">std::string Title</div><div class="ttdoc">KS: Name of loaded modes.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00095">MaCh3Modes.h:95</a></div></div>
-<div class="ttc" id="aclassMaCh3Modes_html_abf4ac35511787907bc16ae26aa6c2a15"><div class="ttname"><a href="classMaCh3Modes.html#abf4ac35511787907bc16ae26aa6c2a15">MaCh3Modes::GetMaCh3ModeName</a></div><div class="ttdeci">std::string GetMaCh3ModeName(const int Index)</div><div class="ttdoc">KS: Get normal name of mode, if mode not known you will get UNKNOWN_BAD.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8cpp_source.html#l00140">MaCh3Modes.cpp:140</a></div></div>
-<div class="ttc" id="aclassMaCh3Modes_html_aed7bbc836f6b2fe3e8df4c442d65554b"><div class="ttname"><a href="classMaCh3Modes.html#aed7bbc836f6b2fe3e8df4c442d65554b">MaCh3Modes::PrepareMap</a></div><div class="ttdeci">void PrepareMap()</div><div class="ttdoc">KS: Fill ModeMap.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8cpp_source.html#l00112">MaCh3Modes.cpp:112</a></div></div>
+<div class="ttc" id="aclassMaCh3Modes_html_abf4ac35511787907bc16ae26aa6c2a15"><div class="ttname"><a href="classMaCh3Modes.html#abf4ac35511787907bc16ae26aa6c2a15">MaCh3Modes::GetMaCh3ModeName</a></div><div class="ttdeci">std::string GetMaCh3ModeName(const int Index)</div><div class="ttdoc">KS: Get normal name of mode, if mode not known you will get UNKNOWN_BAD.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8cpp_source.html#l00138">MaCh3Modes.cpp:138</a></div></div>
+<div class="ttc" id="aclassMaCh3Modes_html_aed7bbc836f6b2fe3e8df4c442d65554b"><div class="ttname"><a href="classMaCh3Modes.html#aed7bbc836f6b2fe3e8df4c442d65554b">MaCh3Modes::PrepareMap</a></div><div class="ttdeci">void PrepareMap()</div><div class="ttdoc">KS: Fill ModeMap.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8cpp_source.html#l00111">MaCh3Modes.cpp:111</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -359,25 +359,25 @@ Daniel Barrow </dd></dl>
 
 <p>KS: Add new mode. </p>
 
-<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8cpp_source.html#l00090">90</a> of file <a class="el" href="MaCh3Modes_8cpp_source.html">MaCh3Modes.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   95</span>                                        {</div>
-<div class="line"><span class="lineno">   96</span><span class="comment">// *******************</span></div>
-<div class="line"><span class="lineno">   97</span>  <a class="code hl_struct" href="structMaCh3ModeInfo.html">MaCh3ModeInfo</a> newinfo;</div>
-<div class="line"><span class="lineno">   98</span>  newinfo.<a class="code hl_variable" href="structMaCh3ModeInfo.html#a02a4f32a5a65b723a0849539a315cc1a">GeneratorMaping</a> = GenMap;</div>
-<div class="line"><span class="lineno">   99</span>  newinfo.<a class="code hl_variable" href="structMaCh3ModeInfo.html#a676486427e885ed2deab5ffa5f40bfd7">FancyName</a> = fancyname;</div>
-<div class="line"><span class="lineno">  100</span>  newinfo.<a class="code hl_variable" href="structMaCh3ModeInfo.html#af5e5f716ab8512f46455bf35b14a238e">PlotColor</a> = <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ab2b28d9b5fd61ee45bbdfa307b969241">PlotColor</a>;</div>
-<div class="line"><span class="lineno">  101</span>  newinfo.<a class="code hl_variable" href="structMaCh3ModeInfo.html#a8c957d49742a2ad0faa79fbc07427767">Name</a> = name;</div>
-<div class="line"><span class="lineno">  102</span>  newinfo.<a class="code hl_variable" href="structMaCh3ModeInfo.html#ad987766dd95bed2cfcdad169d07a885b">IsNC</a> = IsNC;</div>
-<div class="line"><span class="lineno">  103</span>  newinfo.<a class="code hl_variable" href="structMaCh3ModeInfo.html#a3238e80bbf6a18fc21419a3277406d8d">SplineSuffix</a> = SplineSuffix;</div>
-<div class="line"><span class="lineno">  104</span> </div>
-<div class="line"><span class="lineno">  105</span>  <a class="code hl_typedef" href="MaCh3Modes_8h.html#adf43f6c73c9598abc381855d31ef5682">MaCh3Modes_t</a> index = <a class="code hl_function" href="classMaCh3Modes.html#a989fa0ebe20a1e0113900972e194a543">EnsureModeNameRegistered</a>(name);</div>
-<div class="line"><span class="lineno">  106</span> </div>
-<div class="line"><span class="lineno">  107</span>  <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>.emplace(index, newinfo);</div>
-<div class="line"><span class="lineno">  108</span>  <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>++;</div>
-<div class="line"><span class="lineno">  109</span>}</div>
+<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8cpp_source.html#l00089">89</a> of file <a class="el" href="MaCh3Modes_8cpp_source.html">MaCh3Modes.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   94</span>                                        {</div>
+<div class="line"><span class="lineno">   95</span><span class="comment">// *******************</span></div>
+<div class="line"><span class="lineno">   96</span>  <a class="code hl_struct" href="structMaCh3ModeInfo.html">MaCh3ModeInfo</a> newinfo;</div>
+<div class="line"><span class="lineno">   97</span>  newinfo.<a class="code hl_variable" href="structMaCh3ModeInfo.html#a02a4f32a5a65b723a0849539a315cc1a">GeneratorMaping</a> = GenMap;</div>
+<div class="line"><span class="lineno">   98</span>  newinfo.<a class="code hl_variable" href="structMaCh3ModeInfo.html#a676486427e885ed2deab5ffa5f40bfd7">FancyName</a> = fancyname;</div>
+<div class="line"><span class="lineno">   99</span>  newinfo.<a class="code hl_variable" href="structMaCh3ModeInfo.html#af5e5f716ab8512f46455bf35b14a238e">PlotColor</a> = <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ab2b28d9b5fd61ee45bbdfa307b969241">PlotColor</a>;</div>
+<div class="line"><span class="lineno">  100</span>  newinfo.<a class="code hl_variable" href="structMaCh3ModeInfo.html#a8c957d49742a2ad0faa79fbc07427767">Name</a> = name;</div>
+<div class="line"><span class="lineno">  101</span>  newinfo.<a class="code hl_variable" href="structMaCh3ModeInfo.html#ad987766dd95bed2cfcdad169d07a885b">IsNC</a> = IsNC;</div>
+<div class="line"><span class="lineno">  102</span>  newinfo.<a class="code hl_variable" href="structMaCh3ModeInfo.html#a3238e80bbf6a18fc21419a3277406d8d">SplineSuffix</a> = SplineSuffix;</div>
+<div class="line"><span class="lineno">  103</span> </div>
+<div class="line"><span class="lineno">  104</span>  <a class="code hl_typedef" href="MaCh3Modes_8h.html#adf43f6c73c9598abc381855d31ef5682">MaCh3Modes_t</a> index = <a class="code hl_function" href="classMaCh3Modes.html#a989fa0ebe20a1e0113900972e194a543">EnsureModeNameRegistered</a>(name);</div>
+<div class="line"><span class="lineno">  105</span> </div>
+<div class="line"><span class="lineno">  106</span>  <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>.emplace(index, newinfo);</div>
+<div class="line"><span class="lineno">  107</span>  <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>++;</div>
+<div class="line"><span class="lineno">  108</span>}</div>
 <div class="ttc" id="aGetPostfitParamPlots_8cpp_html_ab2b28d9b5fd61ee45bbdfa307b969241"><div class="ttname"><a href="GetPostfitParamPlots_8cpp.html#ab2b28d9b5fd61ee45bbdfa307b969241">PlotColor</a></div><div class="ttdeci">Color_t PlotColor[]</div><div class="ttdef"><b>Definition:</b> <a href="GetPostfitParamPlots_8cpp_source.html#l00082">GetPostfitParamPlots.cpp:82</a></div></div>
 <div class="ttc" id="aMaCh3Modes_8h_html_adf43f6c73c9598abc381855d31ef5682"><div class="ttname"><a href="MaCh3Modes_8h.html#adf43f6c73c9598abc381855d31ef5682">MaCh3Modes_t</a></div><div class="ttdeci">int MaCh3Modes_t</div><div class="ttdoc">Enumerator of MaCh3Mode.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00014">MaCh3Modes.h:14</a></div></div>
-<div class="ttc" id="aclassMaCh3Modes_html_a989fa0ebe20a1e0113900972e194a543"><div class="ttname"><a href="classMaCh3Modes.html#a989fa0ebe20a1e0113900972e194a543">MaCh3Modes::EnsureModeNameRegistered</a></div><div class="ttdeci">MaCh3Modes_t EnsureModeNameRegistered(std::string const &amp;name)</div><div class="ttdoc">KS: Make sure we don't have two modes with the same name.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8cpp_source.html#l00079">MaCh3Modes.cpp:79</a></div></div>
+<div class="ttc" id="aclassMaCh3Modes_html_a989fa0ebe20a1e0113900972e194a543"><div class="ttname"><a href="classMaCh3Modes.html#a989fa0ebe20a1e0113900972e194a543">MaCh3Modes::EnsureModeNameRegistered</a></div><div class="ttdeci">MaCh3Modes_t EnsureModeNameRegistered(std::string const &amp;name)</div><div class="ttdoc">KS: Make sure we don't have two modes with the same name.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8cpp_source.html#l00078">MaCh3Modes.cpp:78</a></div></div>
 <div class="ttc" id="aclassMaCh3Modes_html_af945fab5dc02790abc84d47e7c84bed8"><div class="ttname"><a href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">MaCh3Modes::fMode</a></div><div class="ttdeci">std::map&lt; MaCh3Modes_t, MaCh3ModeInfo &gt; fMode</div><div class="ttdoc">KS: Main map storing info about used modes.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00090">MaCh3Modes.h:90</a></div></div>
 <div class="ttc" id="astructMaCh3ModeInfo_html"><div class="ttname"><a href="structMaCh3ModeInfo.html">MaCh3ModeInfo</a></div><div class="ttdoc">KS: Class containing information for a single MaCh3Mode.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00017">MaCh3Modes.h:17</a></div></div>
 <div class="ttc" id="astructMaCh3ModeInfo_html_a02a4f32a5a65b723a0849539a315cc1a"><div class="ttname"><a href="structMaCh3ModeInfo.html#a02a4f32a5a65b723a0849539a315cc1a">MaCh3ModeInfo::GeneratorMaping</a></div><div class="ttdeci">std::vector&lt; int &gt; GeneratorMaping</div><div class="ttdoc">Mapping between mode and generator integers.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00025">MaCh3Modes.h:25</a></div></div>
@@ -415,16 +415,16 @@ Daniel Barrow </dd></dl>
 
 <p>KS: Make sure we don't have two modes with the same name. </p>
 
-<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8cpp_source.html#l00079">79</a> of file <a class="el" href="MaCh3Modes_8cpp_source.html">MaCh3Modes.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   79</span>                                                                       {</div>
-<div class="line"><span class="lineno">   80</span><span class="comment">// *******************</span></div>
-<div class="line"><span class="lineno">   81</span>  <span class="keywordflow">if</span> (<a class="code hl_variable" href="classMaCh3Modes.html#a062f961a64e9b6bebf420730f9dad9ff">Mode</a>.count(name)) {</div>
-<div class="line"><span class="lineno">   82</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#a062f961a64e9b6bebf420730f9dad9ff">Mode</a>[name];</div>
-<div class="line"><span class="lineno">   83</span>  }</div>
-<div class="line"><span class="lineno">   84</span>  <a class="code hl_typedef" href="MaCh3Modes_8h.html#adf43f6c73c9598abc381855d31ef5682">MaCh3Modes_t</a> index = <a class="code hl_typedef" href="MaCh3Modes_8h.html#adf43f6c73c9598abc381855d31ef5682">MaCh3Modes_t</a>(<a class="code hl_variable" href="classMaCh3Modes.html#a062f961a64e9b6bebf420730f9dad9ff">Mode</a>.size());</div>
-<div class="line"><span class="lineno">   85</span>  <a class="code hl_variable" href="classMaCh3Modes.html#a062f961a64e9b6bebf420730f9dad9ff">Mode</a>[name] = index;</div>
-<div class="line"><span class="lineno">   86</span>  <span class="keywordflow">return</span> index;</div>
-<div class="line"><span class="lineno">   87</span>}</div>
+<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8cpp_source.html#l00078">78</a> of file <a class="el" href="MaCh3Modes_8cpp_source.html">MaCh3Modes.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   78</span>                                                                       {</div>
+<div class="line"><span class="lineno">   79</span><span class="comment">// *******************</span></div>
+<div class="line"><span class="lineno">   80</span>  <span class="keywordflow">if</span> (<a class="code hl_variable" href="classMaCh3Modes.html#a062f961a64e9b6bebf420730f9dad9ff">Mode</a>.count(name)) {</div>
+<div class="line"><span class="lineno">   81</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#a062f961a64e9b6bebf420730f9dad9ff">Mode</a>[name];</div>
+<div class="line"><span class="lineno">   82</span>  }</div>
+<div class="line"><span class="lineno">   83</span>  <a class="code hl_typedef" href="MaCh3Modes_8h.html#adf43f6c73c9598abc381855d31ef5682">MaCh3Modes_t</a> index = <a class="code hl_typedef" href="MaCh3Modes_8h.html#adf43f6c73c9598abc381855d31ef5682">MaCh3Modes_t</a>(<a class="code hl_variable" href="classMaCh3Modes.html#a062f961a64e9b6bebf420730f9dad9ff">Mode</a>.size());</div>
+<div class="line"><span class="lineno">   84</span>  <a class="code hl_variable" href="classMaCh3Modes.html#a062f961a64e9b6bebf420730f9dad9ff">Mode</a>[name] = index;</div>
+<div class="line"><span class="lineno">   85</span>  <span class="keywordflow">return</span> index;</div>
+<div class="line"><span class="lineno">   86</span>}</div>
 <div class="ttc" id="aclassMaCh3Modes_html_a062f961a64e9b6bebf420730f9dad9ff"><div class="ttname"><a href="classMaCh3Modes.html#a062f961a64e9b6bebf420730f9dad9ff">MaCh3Modes::Mode</a></div><div class="ttdeci">std::map&lt; std::string, MaCh3Modes_t &gt; Mode</div><div class="ttdoc">KS: Handy map which helps find mode number based on string.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00088">MaCh3Modes.h:88</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -447,20 +447,20 @@ Daniel Barrow </dd></dl>
 
 <p>KS: Get fancy name of mode, if mode not known you will get UNKNOWN_BAD. </p>
 
-<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8cpp_source.html#l00171">171</a> of file <a class="el" href="MaCh3Modes_8cpp_source.html">MaCh3Modes.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  171</span>                                                           {</div>
-<div class="line"><span class="lineno">  172</span><span class="comment">// *******************</span></div>
-<div class="line"><span class="lineno">  173</span>  <span class="comment">// return UNKNOWN_BAD if out of boundary</span></div>
-<div class="line"><span class="lineno">  174</span>  <span class="keywordflow">if</span>(Index &lt; 0)</div>
-<div class="line"><span class="lineno">  175</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a>(<span class="stringliteral">&quot;Mode you look for is smaller than 0 and equal to {}&quot;</span>, Index);</div>
-<div class="line"><span class="lineno">  176</span> </div>
-<div class="line"><span class="lineno">  177</span>  <span class="keywordflow">if</span>(Index &gt; <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>)</div>
-<div class="line"><span class="lineno">  178</span>  {</div>
-<div class="line"><span class="lineno">  179</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Asking for mode {}, while I only have {}, returning {} mode&quot;</span>, Index, <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>, <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[<a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>].Name);</div>
-<div class="line"><span class="lineno">  180</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[<a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>].FancyName;</div>
-<div class="line"><span class="lineno">  181</span>  }</div>
-<div class="line"><span class="lineno">  182</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[Index].FancyName;</div>
-<div class="line"><span class="lineno">  183</span>}</div>
+<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8cpp_source.html#l00169">169</a> of file <a class="el" href="MaCh3Modes_8cpp_source.html">MaCh3Modes.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  169</span>                                                           {</div>
+<div class="line"><span class="lineno">  170</span><span class="comment">// *******************</span></div>
+<div class="line"><span class="lineno">  171</span>  <span class="comment">// return UNKNOWN_BAD if out of boundary</span></div>
+<div class="line"><span class="lineno">  172</span>  <span class="keywordflow">if</span>(Index &lt; 0)</div>
+<div class="line"><span class="lineno">  173</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a>(<span class="stringliteral">&quot;Mode you look for is smaller than 0 and equal to {}&quot;</span>, Index);</div>
+<div class="line"><span class="lineno">  174</span> </div>
+<div class="line"><span class="lineno">  175</span>  <span class="keywordflow">if</span>(Index &gt; <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>)</div>
+<div class="line"><span class="lineno">  176</span>  {</div>
+<div class="line"><span class="lineno">  177</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Asking for mode {}, while I only have {}, returning {} mode&quot;</span>, Index, <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>, <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[<a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>].Name);</div>
+<div class="line"><span class="lineno">  178</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[<a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>].FancyName;</div>
+<div class="line"><span class="lineno">  179</span>  }</div>
+<div class="line"><span class="lineno">  180</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[Index].FancyName;</div>
+<div class="line"><span class="lineno">  181</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a07ff6d6a15b24f94afc88a1b89779beb"><div class="ttname"><a href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a></div><div class="ttdeci">#define MACH3LOG_CRITICAL</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00026">MaCh3Logger.h:26</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a4db4657acad5c79ac4bbb66a9d1c5905"><div class="ttname"><a href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a></div><div class="ttdeci">#define MACH3LOG_DEBUG</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00022">MaCh3Logger.h:22</a></div></div>
 </div><!-- fragment -->
@@ -484,20 +484,20 @@ Daniel Barrow </dd></dl>
 
 <p>KS: Get normal name of mode, if mode not known you will get UNKNOWN_BAD. </p>
 
-<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8cpp_source.html#l00140">140</a> of file <a class="el" href="MaCh3Modes_8cpp_source.html">MaCh3Modes.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  140</span>                                                      {</div>
-<div class="line"><span class="lineno">  141</span><span class="comment">// *******************</span></div>
-<div class="line"><span class="lineno">  142</span>  <span class="keywordflow">if</span>(Index &lt; 0)</div>
-<div class="line"><span class="lineno">  143</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a>(<span class="stringliteral">&quot;Mode you look for is smaller than 0 and equal to {}&quot;</span>, Index);</div>
-<div class="line"><span class="lineno">  144</span> </div>
-<div class="line"><span class="lineno">  145</span>  <span class="comment">// return UNKNOWN_BAD if out of boundary</span></div>
-<div class="line"><span class="lineno">  146</span>  <span class="keywordflow">if</span>(Index &gt; <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>)</div>
-<div class="line"><span class="lineno">  147</span>  {</div>
-<div class="line"><span class="lineno">  148</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Asking for mode {}, while I only have {}, returning {} mode&quot;</span>, Index, <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>, <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[<a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>].Name);</div>
-<div class="line"><span class="lineno">  149</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[<a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>].Name;</div>
-<div class="line"><span class="lineno">  150</span>  }</div>
-<div class="line"><span class="lineno">  151</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[Index].Name;</div>
-<div class="line"><span class="lineno">  152</span>}</div>
+<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8cpp_source.html#l00138">138</a> of file <a class="el" href="MaCh3Modes_8cpp_source.html">MaCh3Modes.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  138</span>                                                      {</div>
+<div class="line"><span class="lineno">  139</span><span class="comment">// *******************</span></div>
+<div class="line"><span class="lineno">  140</span>  <span class="keywordflow">if</span>(Index &lt; 0)</div>
+<div class="line"><span class="lineno">  141</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a>(<span class="stringliteral">&quot;Mode you look for is smaller than 0 and equal to {}&quot;</span>, Index);</div>
+<div class="line"><span class="lineno">  142</span> </div>
+<div class="line"><span class="lineno">  143</span>  <span class="comment">// return UNKNOWN_BAD if out of boundary</span></div>
+<div class="line"><span class="lineno">  144</span>  <span class="keywordflow">if</span>(Index &gt; <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>)</div>
+<div class="line"><span class="lineno">  145</span>  {</div>
+<div class="line"><span class="lineno">  146</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Asking for mode {}, while I only have {}, returning {} mode&quot;</span>, Index, <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>, <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[<a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>].Name);</div>
+<div class="line"><span class="lineno">  147</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[<a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>].Name;</div>
+<div class="line"><span class="lineno">  148</span>  }</div>
+<div class="line"><span class="lineno">  149</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[Index].Name;</div>
+<div class="line"><span class="lineno">  150</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -519,20 +519,20 @@ Daniel Barrow </dd></dl>
 
 <p>KS: Get normal name of mode, if mode not known you will get UNKNOWN_BAD. </p>
 
-<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8cpp_source.html#l00213">213</a> of file <a class="el" href="MaCh3Modes_8cpp_source.html">MaCh3Modes.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  213</span>                                                     {</div>
-<div class="line"><span class="lineno">  214</span><span class="comment">// *******************</span></div>
-<div class="line"><span class="lineno">  215</span>  <span class="comment">// return UNKNOWN_BAD if out of boundary</span></div>
-<div class="line"><span class="lineno">  216</span>  <span class="keywordflow">if</span>(Index &lt; 0)</div>
-<div class="line"><span class="lineno">  217</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a>(<span class="stringliteral">&quot;Mode you look for is smaller than 0 and equal to {}&quot;</span>, Index);</div>
-<div class="line"><span class="lineno">  218</span> </div>
-<div class="line"><span class="lineno">  219</span>  <span class="keywordflow">if</span>(Index &gt; <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>)</div>
-<div class="line"><span class="lineno">  220</span>  {</div>
-<div class="line"><span class="lineno">  221</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Asking for mode {}, while I only have {}, returning {} mode&quot;</span>, Index, <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>, <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[<a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>].<a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ab2b28d9b5fd61ee45bbdfa307b969241">PlotColor</a>);</div>
-<div class="line"><span class="lineno">  222</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[<a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>].PlotColor;</div>
-<div class="line"><span class="lineno">  223</span>  }</div>
-<div class="line"><span class="lineno">  224</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[Index].PlotColor;</div>
-<div class="line"><span class="lineno">  225</span>}</div>
+<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8cpp_source.html#l00211">211</a> of file <a class="el" href="MaCh3Modes_8cpp_source.html">MaCh3Modes.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  211</span>                                                     {</div>
+<div class="line"><span class="lineno">  212</span><span class="comment">// *******************</span></div>
+<div class="line"><span class="lineno">  213</span>  <span class="comment">// return UNKNOWN_BAD if out of boundary</span></div>
+<div class="line"><span class="lineno">  214</span>  <span class="keywordflow">if</span>(Index &lt; 0)</div>
+<div class="line"><span class="lineno">  215</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a>(<span class="stringliteral">&quot;Mode you look for is smaller than 0 and equal to {}&quot;</span>, Index);</div>
+<div class="line"><span class="lineno">  216</span> </div>
+<div class="line"><span class="lineno">  217</span>  <span class="keywordflow">if</span>(Index &gt; <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>)</div>
+<div class="line"><span class="lineno">  218</span>  {</div>
+<div class="line"><span class="lineno">  219</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Asking for mode {}, while I only have {}, returning {} mode&quot;</span>, Index, <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>, <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[<a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>].<a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ab2b28d9b5fd61ee45bbdfa307b969241">PlotColor</a>);</div>
+<div class="line"><span class="lineno">  220</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[<a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>].PlotColor;</div>
+<div class="line"><span class="lineno">  221</span>  }</div>
+<div class="line"><span class="lineno">  222</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[Index].PlotColor;</div>
+<div class="line"><span class="lineno">  223</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -554,17 +554,17 @@ Daniel Barrow </dd></dl>
 
 <p>KS: Get mode number based on name, if mode not known you will get UNKNOWN_BAD. </p>
 
-<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8cpp_source.html#l00186">186</a> of file <a class="el" href="MaCh3Modes_8cpp_source.html">MaCh3Modes.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  186</span>                                                      {</div>
-<div class="line"><span class="lineno">  187</span><span class="comment">// *******************</span></div>
-<div class="line"><span class="lineno">  188</span>  <span class="keywordflow">if</span> (<a class="code hl_variable" href="classMaCh3Modes.html#a062f961a64e9b6bebf420730f9dad9ff">Mode</a>.count(name)) {</div>
-<div class="line"><span class="lineno">  189</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#a062f961a64e9b6bebf420730f9dad9ff">Mode</a>[name];</div>
-<div class="line"><span class="lineno">  190</span>  }</div>
-<div class="line"><span class="lineno">  191</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Asking for mode {}, while I only have {}, returning {} mode&quot;</span>, name, <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>, <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[<a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>].Name);</div>
-<div class="line"><span class="lineno">  192</span> </div>
-<div class="line"><span class="lineno">  193</span>  <span class="comment">// return UNKNOWN_BAD</span></div>
-<div class="line"><span class="lineno">  194</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>;</div>
-<div class="line"><span class="lineno">  195</span>}</div>
+<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8cpp_source.html#l00184">184</a> of file <a class="el" href="MaCh3Modes_8cpp_source.html">MaCh3Modes.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  184</span>                                                      {</div>
+<div class="line"><span class="lineno">  185</span><span class="comment">// *******************</span></div>
+<div class="line"><span class="lineno">  186</span>  <span class="keywordflow">if</span> (<a class="code hl_variable" href="classMaCh3Modes.html#a062f961a64e9b6bebf420730f9dad9ff">Mode</a>.count(name)) {</div>
+<div class="line"><span class="lineno">  187</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#a062f961a64e9b6bebf420730f9dad9ff">Mode</a>[name];</div>
+<div class="line"><span class="lineno">  188</span>  }</div>
+<div class="line"><span class="lineno">  189</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Asking for mode {}, while I only have {}, returning {} mode&quot;</span>, name, <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>, <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[<a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>].Name);</div>
+<div class="line"><span class="lineno">  190</span> </div>
+<div class="line"><span class="lineno">  191</span>  <span class="comment">// return UNKNOWN_BAD</span></div>
+<div class="line"><span class="lineno">  192</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>;</div>
+<div class="line"><span class="lineno">  193</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -586,20 +586,20 @@ Daniel Barrow </dd></dl>
 
 <p>KS: Get MaCh3 mode from generator mode. </p>
 
-<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8cpp_source.html#l00198">198</a> of file <a class="el" href="MaCh3Modes_8cpp_source.html">MaCh3Modes.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  198</span>                                                             {</div>
-<div class="line"><span class="lineno">  199</span><span class="comment">// *******************</span></div>
-<div class="line"><span class="lineno">  200</span>  <span class="keywordflow">if</span>(Index &lt; 0)</div>
-<div class="line"><span class="lineno">  201</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a>(<span class="stringliteral">&quot;Mode you look for is smaller than 0 and equal to {}&quot;</span>, Index);</div>
-<div class="line"><span class="lineno">  202</span> </div>
-<div class="line"><span class="lineno">  203</span>  <span class="keywordflow">if</span>(Index &gt;= <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code hl_variable" href="classMaCh3Modes.html#a52a226378736541ece3830f53ac851c3">ModeMap</a>.size()))</div>
-<div class="line"><span class="lineno">  204</span>  {</div>
-<div class="line"><span class="lineno">  205</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Asking for mode {}, while I only have {}, returning {} mode&quot;</span>, Index, <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>, <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[<a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>].Name);</div>
-<div class="line"><span class="lineno">  206</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>;</div>
-<div class="line"><span class="lineno">  207</span>  }</div>
-<div class="line"><span class="lineno">  208</span> </div>
-<div class="line"><span class="lineno">  209</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#a52a226378736541ece3830f53ac851c3">ModeMap</a>[Index];</div>
-<div class="line"><span class="lineno">  210</span>}</div>
+<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8cpp_source.html#l00196">196</a> of file <a class="el" href="MaCh3Modes_8cpp_source.html">MaCh3Modes.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  196</span>                                                             {</div>
+<div class="line"><span class="lineno">  197</span><span class="comment">// *******************</span></div>
+<div class="line"><span class="lineno">  198</span>  <span class="keywordflow">if</span>(Index &lt; 0)</div>
+<div class="line"><span class="lineno">  199</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a>(<span class="stringliteral">&quot;Mode you look for is smaller than 0 and equal to {}&quot;</span>, Index);</div>
+<div class="line"><span class="lineno">  200</span> </div>
+<div class="line"><span class="lineno">  201</span>  <span class="keywordflow">if</span>(Index &gt;= <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code hl_variable" href="classMaCh3Modes.html#a52a226378736541ece3830f53ac851c3">ModeMap</a>.size()))</div>
+<div class="line"><span class="lineno">  202</span>  {</div>
+<div class="line"><span class="lineno">  203</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Asking for mode {}, while I only have {}, returning {} mode&quot;</span>, Index, <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>, <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[<a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>].Name);</div>
+<div class="line"><span class="lineno">  204</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>;</div>
+<div class="line"><span class="lineno">  205</span>  }</div>
+<div class="line"><span class="lineno">  206</span> </div>
+<div class="line"><span class="lineno">  207</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#a52a226378736541ece3830f53ac851c3">ModeMap</a>[Index];</div>
+<div class="line"><span class="lineno">  208</span>}</div>
 <div class="ttc" id="aclassMaCh3Modes_html_a52a226378736541ece3830f53ac851c3"><div class="ttname"><a href="classMaCh3Modes.html#a52a226378736541ece3830f53ac851c3">MaCh3Modes::ModeMap</a></div><div class="ttdeci">std::vector&lt; int &gt; ModeMap</div><div class="ttdoc">KS: Handy map helping us find MaCh3 mode based on Generator mode value.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00092">MaCh3Modes.h:92</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -664,8 +664,8 @@ Daniel Barrow </dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="aaa508822590464a0ce36d2fed94e4d03" name="aaa508822590464a0ce36d2fed94e4d03"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaa508822590464a0ce36d2fed94e4d03">&#9670;&#160;</a></span>GetNModes()</h2>
+<a id="a1996581eab0194698a4ddccf3b189d49" name="a1996581eab0194698a4ddccf3b189d49"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1996581eab0194698a4ddccf3b189d49">&#9670;&#160;</a></span>GetNModes()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -677,7 +677,7 @@ Daniel Barrow </dd></dl>
           <td class="memname">int MaCh3Modes::GetNModes </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
   </td>
@@ -712,20 +712,20 @@ Daniel Barrow </dd></dl>
 
 <p>DB: Get binned spline mode suffic from MaCh3 Mode. </p>
 
-<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8cpp_source.html#l00228">228</a> of file <a class="el" href="MaCh3Modes_8cpp_source.html">MaCh3Modes.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  228</span>                                                                  {</div>
-<div class="line"><span class="lineno">  229</span>  <span class="comment">// *******************</span></div>
-<div class="line"><span class="lineno">  230</span>  <span class="comment">// return UNKNOWN_BAD if out of boundary</span></div>
-<div class="line"><span class="lineno">  231</span>  <span class="keywordflow">if</span>(Index &lt; 0)</div>
-<div class="line"><span class="lineno">  232</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a>(<span class="stringliteral">&quot;Mode you look for is smaller than 0 and equal to {}&quot;</span>, Index);</div>
-<div class="line"><span class="lineno">  233</span> </div>
-<div class="line"><span class="lineno">  234</span>  <span class="keywordflow">if</span>(Index &gt; <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>) {</div>
-<div class="line"><span class="lineno">  235</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Asking for mode {}, while I only have {}, returning {} mode&quot;</span>, Index, <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>, <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[<a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>].SplineSuffix);</div>
-<div class="line"><span class="lineno">  236</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[<a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>].SplineSuffix;</div>
-<div class="line"><span class="lineno">  237</span>  }</div>
-<div class="line"><span class="lineno">  238</span> </div>
-<div class="line"><span class="lineno">  239</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[Index].SplineSuffix;</div>
-<div class="line"><span class="lineno">  240</span>}</div>
+<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8cpp_source.html#l00226">226</a> of file <a class="el" href="MaCh3Modes_8cpp_source.html">MaCh3Modes.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  226</span>                                                                  {</div>
+<div class="line"><span class="lineno">  227</span>  <span class="comment">// *******************</span></div>
+<div class="line"><span class="lineno">  228</span>  <span class="comment">// return UNKNOWN_BAD if out of boundary</span></div>
+<div class="line"><span class="lineno">  229</span>  <span class="keywordflow">if</span>(Index &lt; 0)</div>
+<div class="line"><span class="lineno">  230</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a>(<span class="stringliteral">&quot;Mode you look for is smaller than 0 and equal to {}&quot;</span>, Index);</div>
+<div class="line"><span class="lineno">  231</span> </div>
+<div class="line"><span class="lineno">  232</span>  <span class="keywordflow">if</span>(Index &gt; <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>) {</div>
+<div class="line"><span class="lineno">  233</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Asking for mode {}, while I only have {}, returning {} mode&quot;</span>, Index, <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>, <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[<a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>].SplineSuffix);</div>
+<div class="line"><span class="lineno">  234</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[<a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>].SplineSuffix;</div>
+<div class="line"><span class="lineno">  235</span>  }</div>
+<div class="line"><span class="lineno">  236</span> </div>
+<div class="line"><span class="lineno">  237</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[Index].SplineSuffix;</div>
+<div class="line"><span class="lineno">  238</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -747,20 +747,20 @@ Daniel Barrow </dd></dl>
 
 <p>DB: Get IsNC (a check whether the given MaCh3 corresponds to a Neutral Current mode) </p>
 
-<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8cpp_source.html#l00155">155</a> of file <a class="el" href="MaCh3Modes_8cpp_source.html">MaCh3Modes.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  155</span>                                              {</div>
-<div class="line"><span class="lineno">  156</span>  <span class="keywordflow">if</span>(Index &lt; 0)</div>
-<div class="line"><span class="lineno">  157</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a>(<span class="stringliteral">&quot;Mode you look for is smaller than 0 and equal to {}&quot;</span>, Index);</div>
-<div class="line"><span class="lineno">  158</span>  </div>
-<div class="line"><span class="lineno">  159</span>  <span class="comment">// return UNKNOWN_BAD if out of boundary</span></div>
-<div class="line"><span class="lineno">  160</span>  <span class="keywordflow">if</span>(Index &gt; <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>)</div>
-<div class="line"><span class="lineno">  161</span>  {</div>
-<div class="line"><span class="lineno">  162</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Asking for mode {}, while I only have {}, returning {} mode&quot;</span>, Index, <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>, <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[<a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>].Name);</div>
-<div class="line"><span class="lineno">  163</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[<a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>].IsNC;</div>
-<div class="line"><span class="lineno">  164</span>  }</div>
-<div class="line"><span class="lineno">  165</span> </div>
-<div class="line"><span class="lineno">  166</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[Index].IsNC;</div>
-<div class="line"><span class="lineno">  167</span>}</div>
+<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8cpp_source.html#l00153">153</a> of file <a class="el" href="MaCh3Modes_8cpp_source.html">MaCh3Modes.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  153</span>                                              {</div>
+<div class="line"><span class="lineno">  154</span>  <span class="keywordflow">if</span>(Index &lt; 0)</div>
+<div class="line"><span class="lineno">  155</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a>(<span class="stringliteral">&quot;Mode you look for is smaller than 0 and equal to {}&quot;</span>, Index);</div>
+<div class="line"><span class="lineno">  156</span>  </div>
+<div class="line"><span class="lineno">  157</span>  <span class="comment">// return UNKNOWN_BAD if out of boundary</span></div>
+<div class="line"><span class="lineno">  158</span>  <span class="keywordflow">if</span>(Index &gt; <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>)</div>
+<div class="line"><span class="lineno">  159</span>  {</div>
+<div class="line"><span class="lineno">  160</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Asking for mode {}, while I only have {}, returning {} mode&quot;</span>, Index, <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>, <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[<a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>].Name);</div>
+<div class="line"><span class="lineno">  161</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[<a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>].IsNC;</div>
+<div class="line"><span class="lineno">  162</span>  }</div>
+<div class="line"><span class="lineno">  163</span> </div>
+<div class="line"><span class="lineno">  164</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[Index].IsNC;</div>
+<div class="line"><span class="lineno">  165</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -789,33 +789,32 @@ Daniel Barrow </dd></dl>
 
 <p>KS: Fill ModeMap. </p>
 
-<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8cpp_source.html#l00112">112</a> of file <a class="el" href="MaCh3Modes_8cpp_source.html">MaCh3Modes.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  112</span>                            {</div>
-<div class="line"><span class="lineno">  113</span><span class="comment">// *******************</span></div>
-<div class="line"><span class="lineno">  114</span> </div>
-<div class="line"><span class="lineno">  115</span>  <span class="keywordtype">int</span> maxElement = 0;</div>
-<div class="line"><span class="lineno">  116</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>; ++i) {</div>
-<div class="line"><span class="lineno">  117</span>    <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> j = 0; j &lt; <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[i].GeneratorMaping.size(); j++) {</div>
-<div class="line"><span class="lineno">  118</span>      maxElement = std::max(maxElement, <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[i].GeneratorMaping[j]);</div>
-<div class="line"><span class="lineno">  119</span>    }</div>
-<div class="line"><span class="lineno">  120</span>  }</div>
-<div class="line"><span class="lineno">  121</span>  <a class="code hl_variable" href="classMaCh3Modes.html#a52a226378736541ece3830f53ac851c3">ModeMap</a>.resize(maxElement+1, <a class="code hl_variable" href="classMaCh3Modes.html#a062f961a64e9b6bebf420730f9dad9ff">Mode</a>[<span class="stringliteral">&quot;UNKNOWN_BAD&quot;</span>]);</div>
-<div class="line"><span class="lineno">  122</span> </div>
-<div class="line"><span class="lineno">  123</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> m = 0; m &lt; <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>; ++m) {</div>
-<div class="line"><span class="lineno">  124</span>    <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[m].GeneratorMaping.size(); ++i) {</div>
-<div class="line"><span class="lineno">  125</span>      <span class="keywordflow">if</span>(<a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[m].GeneratorMaping[i] &lt; 0) {</div>
-<div class="line"><span class="lineno">  126</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Negative value of Mode {} for mode {}&quot;</span>, <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[m].GeneratorMaping[i], <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[m].Name);</div>
-<div class="line"><span class="lineno">  127</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><span class="lineno">  128</span>      }</div>
-<div class="line"><span class="lineno">  129</span>      <span class="keywordflow">if</span>(<a class="code hl_variable" href="classMaCh3Modes.html#a52a226378736541ece3830f53ac851c3">ModeMap</a>[<a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[m].GeneratorMaping[i]] != <a class="code hl_variable" href="classMaCh3Modes.html#a062f961a64e9b6bebf420730f9dad9ff">Mode</a>[<span class="stringliteral">&quot;UNKNOWN_BAD&quot;</span>])</div>
-<div class="line"><span class="lineno">  130</span>      {</div>
-<div class="line"><span class="lineno">  131</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Generator mode {} already defined in mode {} can&#39;t do this for mode {}&quot;</span>, <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[m].GeneratorMaping[i], <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[<a class="code hl_variable" href="classMaCh3Modes.html#a52a226378736541ece3830f53ac851c3">ModeMap</a>[<a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[m].GeneratorMaping[i]]].Name, <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[m].Name);</div>
-<div class="line"><span class="lineno">  132</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><span class="lineno">  133</span>      }</div>
-<div class="line"><span class="lineno">  134</span>      <a class="code hl_variable" href="classMaCh3Modes.html#a52a226378736541ece3830f53ac851c3">ModeMap</a>[<a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[m].GeneratorMaping[i]] = m;</div>
-<div class="line"><span class="lineno">  135</span>    }</div>
-<div class="line"><span class="lineno">  136</span>  }</div>
-<div class="line"><span class="lineno">  137</span>}</div>
+<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8cpp_source.html#l00111">111</a> of file <a class="el" href="MaCh3Modes_8cpp_source.html">MaCh3Modes.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  111</span>                            {</div>
+<div class="line"><span class="lineno">  112</span><span class="comment">// *******************</span></div>
+<div class="line"><span class="lineno">  113</span>  <span class="keywordtype">int</span> maxElement = 0;</div>
+<div class="line"><span class="lineno">  114</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>; ++i) {</div>
+<div class="line"><span class="lineno">  115</span>    <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> j = 0; j &lt; <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[i].GeneratorMaping.size(); j++) {</div>
+<div class="line"><span class="lineno">  116</span>      maxElement = std::max(maxElement, <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[i].GeneratorMaping[j]);</div>
+<div class="line"><span class="lineno">  117</span>    }</div>
+<div class="line"><span class="lineno">  118</span>  }</div>
+<div class="line"><span class="lineno">  119</span>  <a class="code hl_variable" href="classMaCh3Modes.html#a52a226378736541ece3830f53ac851c3">ModeMap</a>.resize(maxElement+1, <a class="code hl_variable" href="classMaCh3Modes.html#a062f961a64e9b6bebf420730f9dad9ff">Mode</a>[<span class="stringliteral">&quot;UNKNOWN_BAD&quot;</span>]);</div>
+<div class="line"><span class="lineno">  120</span> </div>
+<div class="line"><span class="lineno">  121</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> m = 0; m &lt; <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>; ++m) {</div>
+<div class="line"><span class="lineno">  122</span>    <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[m].GeneratorMaping.size(); ++i) {</div>
+<div class="line"><span class="lineno">  123</span>      <span class="keywordflow">if</span>(<a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[m].GeneratorMaping[i] &lt; 0) {</div>
+<div class="line"><span class="lineno">  124</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Negative value of Mode {} for mode {}&quot;</span>, <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[m].GeneratorMaping[i], <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[m].Name);</div>
+<div class="line"><span class="lineno">  125</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
+<div class="line"><span class="lineno">  126</span>      }</div>
+<div class="line"><span class="lineno">  127</span>      <span class="keywordflow">if</span>(<a class="code hl_variable" href="classMaCh3Modes.html#a52a226378736541ece3830f53ac851c3">ModeMap</a>[<a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[m].GeneratorMaping[i]] != <a class="code hl_variable" href="classMaCh3Modes.html#a062f961a64e9b6bebf420730f9dad9ff">Mode</a>[<span class="stringliteral">&quot;UNKNOWN_BAD&quot;</span>])</div>
+<div class="line"><span class="lineno">  128</span>      {</div>
+<div class="line"><span class="lineno">  129</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Generator mode {} already defined in mode {} can&#39;t do this for mode {}&quot;</span>, <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[m].GeneratorMaping[i], <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[<a class="code hl_variable" href="classMaCh3Modes.html#a52a226378736541ece3830f53ac851c3">ModeMap</a>[<a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[m].GeneratorMaping[i]]].Name, <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[m].Name);</div>
+<div class="line"><span class="lineno">  130</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
+<div class="line"><span class="lineno">  131</span>      }</div>
+<div class="line"><span class="lineno">  132</span>      <a class="code hl_variable" href="classMaCh3Modes.html#a52a226378736541ece3830f53ac851c3">ModeMap</a>[<a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[m].GeneratorMaping[i]] = m;</div>
+<div class="line"><span class="lineno">  133</span>    }</div>
+<div class="line"><span class="lineno">  134</span>  }</div>
+<div class="line"><span class="lineno">  135</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00025">MaCh3Logger.h:25</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00013">MaCh3Exception.h:13</a></div></div>
 </div><!-- fragment -->
@@ -841,33 +840,32 @@ Daniel Barrow </dd></dl>
 <p class="definition">Definition at line <a class="el" href="MaCh3Modes_8cpp_source.html#l00048">48</a> of file <a class="el" href="MaCh3Modes_8cpp_source.html">MaCh3Modes.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   48</span>                       {</div>
 <div class="line"><span class="lineno">   49</span><span class="comment">// *******************</span></div>
-<div class="line"><span class="lineno">   50</span> </div>
-<div class="line"><span class="lineno">   51</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Printing MaCh3 Modes Called: {}&quot;</span>, <a class="code hl_variable" href="classMaCh3Modes.html#a96386b84dc8e9a1a378872b7846e407d">Title</a>);</div>
-<div class="line"><span class="lineno">   52</span> </div>
-<div class="line"><span class="lineno">   53</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;========================================================================&quot;</span>);</div>
-<div class="line"><span class="lineno">   54</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{:&lt;5} {:2} {:&lt;20} {:2} {:&lt;20} {:2} {:&lt;30}&quot;</span>, <span class="stringliteral">&quot;#&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;Name&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;FancyName&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classMaCh3Modes.html#a68ccf4c0fcd926574b33ef1dbcad3110">Generator</a>+<span class="stringliteral">&quot; Modes&quot;</span>);</div>
-<div class="line"><span class="lineno">   55</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;------------------------------------------------------------------------&quot;</span>);</div>
-<div class="line"><span class="lineno">   56</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>; ++i) {</div>
-<div class="line"><span class="lineno">   57</span>    <span class="keyword">auto</span> Name = <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[i].Name;</div>
-<div class="line"><span class="lineno">   58</span>    <span class="keyword">auto</span> FancyName = <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[i].FancyName;</div>
-<div class="line"><span class="lineno">   59</span>    <span class="keyword">auto</span> Values = <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[i].GeneratorMaping;</div>
-<div class="line"><span class="lineno">   60</span> </div>
-<div class="line"><span class="lineno">   61</span>    std::string generatorModes;</div>
-<div class="line"><span class="lineno">   62</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keywordtype">int</span>&amp; element : Values) {</div>
-<div class="line"><span class="lineno">   63</span>      generatorModes += std::to_string(element) + <span class="stringliteral">&quot; &quot;</span>;</div>
-<div class="line"><span class="lineno">   64</span>    }</div>
-<div class="line"><span class="lineno">   65</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{:&lt;5} {:2} {:&lt;20} {:2} {:&lt;20} {:2} {:&lt;30}&quot;</span>, i, <span class="stringliteral">&quot;|&quot;</span>, Name, <span class="stringliteral">&quot;|&quot;</span>, FancyName, <span class="stringliteral">&quot;|&quot;</span>, generatorModes);</div>
-<div class="line"><span class="lineno">   66</span>  }</div>
-<div class="line"><span class="lineno">   67</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;========================================================================&quot;</span>);</div>
-<div class="line"><span class="lineno">   68</span> </div>
-<div class="line"><span class="lineno">   69</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;==========================&quot;</span>);</div>
-<div class="line"><span class="lineno">   70</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{:&lt;10} {:2} {:&lt;30}&quot;</span>, <a class="code hl_variable" href="classMaCh3Modes.html#a68ccf4c0fcd926574b33ef1dbcad3110">Generator</a> + <span class="stringliteral">&quot; Modes&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;Name&quot;</span>);</div>
-<div class="line"><span class="lineno">   71</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;--------------------------&quot;</span>);</div>
-<div class="line"><span class="lineno">   72</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code hl_variable" href="classMaCh3Modes.html#a52a226378736541ece3830f53ac851c3">ModeMap</a>.size(); ++i) {</div>
-<div class="line"><span class="lineno">   73</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{:&lt;10} {:2} {:&lt;30}&quot;</span>, i, <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[<a class="code hl_variable" href="classMaCh3Modes.html#a52a226378736541ece3830f53ac851c3">ModeMap</a>[i]].Name);</div>
-<div class="line"><span class="lineno">   74</span>  }</div>
-<div class="line"><span class="lineno">   75</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;==========================&quot;</span>);</div>
-<div class="line"><span class="lineno">   76</span>}</div>
+<div class="line"><span class="lineno">   50</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Printing MaCh3 Modes Called: {}&quot;</span>, <a class="code hl_variable" href="classMaCh3Modes.html#a96386b84dc8e9a1a378872b7846e407d">Title</a>);</div>
+<div class="line"><span class="lineno">   51</span> </div>
+<div class="line"><span class="lineno">   52</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;========================================================================&quot;</span>);</div>
+<div class="line"><span class="lineno">   53</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{:&lt;5} {:2} {:&lt;20} {:2} {:&lt;20} {:2} {:&lt;30}&quot;</span>, <span class="stringliteral">&quot;#&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;Name&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;FancyName&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classMaCh3Modes.html#a68ccf4c0fcd926574b33ef1dbcad3110">Generator</a>+<span class="stringliteral">&quot; Modes&quot;</span>);</div>
+<div class="line"><span class="lineno">   54</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;------------------------------------------------------------------------&quot;</span>);</div>
+<div class="line"><span class="lineno">   55</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>; ++i) {</div>
+<div class="line"><span class="lineno">   56</span>    <span class="keyword">auto</span> Name = <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[i].Name;</div>
+<div class="line"><span class="lineno">   57</span>    <span class="keyword">auto</span> FancyName = <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[i].FancyName;</div>
+<div class="line"><span class="lineno">   58</span>    <span class="keyword">auto</span> Values = <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[i].GeneratorMaping;</div>
+<div class="line"><span class="lineno">   59</span> </div>
+<div class="line"><span class="lineno">   60</span>    std::string generatorModes;</div>
+<div class="line"><span class="lineno">   61</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keywordtype">int</span>&amp; element : Values) {</div>
+<div class="line"><span class="lineno">   62</span>      generatorModes += std::to_string(element) + <span class="stringliteral">&quot; &quot;</span>;</div>
+<div class="line"><span class="lineno">   63</span>    }</div>
+<div class="line"><span class="lineno">   64</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{:&lt;5} {:2} {:&lt;20} {:2} {:&lt;20} {:2} {:&lt;30}&quot;</span>, i, <span class="stringliteral">&quot;|&quot;</span>, Name, <span class="stringliteral">&quot;|&quot;</span>, FancyName, <span class="stringliteral">&quot;|&quot;</span>, generatorModes);</div>
+<div class="line"><span class="lineno">   65</span>  }</div>
+<div class="line"><span class="lineno">   66</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;========================================================================&quot;</span>);</div>
+<div class="line"><span class="lineno">   67</span> </div>
+<div class="line"><span class="lineno">   68</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;==========================&quot;</span>);</div>
+<div class="line"><span class="lineno">   69</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{:&lt;10} {:2} {:&lt;30}&quot;</span>, <a class="code hl_variable" href="classMaCh3Modes.html#a68ccf4c0fcd926574b33ef1dbcad3110">Generator</a> + <span class="stringliteral">&quot; Modes&quot;</span>, <span class="stringliteral">&quot;|&quot;</span>, <span class="stringliteral">&quot;Name&quot;</span>);</div>
+<div class="line"><span class="lineno">   70</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;--------------------------&quot;</span>);</div>
+<div class="line"><span class="lineno">   71</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code hl_variable" href="classMaCh3Modes.html#a52a226378736541ece3830f53ac851c3">ModeMap</a>.size(); ++i) {</div>
+<div class="line"><span class="lineno">   72</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{:&lt;10} {:2} {:&lt;30}&quot;</span>, i, <span class="stringliteral">&quot;|&quot;</span>, <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>[<a class="code hl_variable" href="classMaCh3Modes.html#a52a226378736541ece3830f53ac851c3">ModeMap</a>[i]].Name);</div>
+<div class="line"><span class="lineno">   73</span>  }</div>
+<div class="line"><span class="lineno">   74</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;==========================&quot;</span>);</div>
+<div class="line"><span class="lineno">   75</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00023">MaCh3Logger.h:23</a></div></div>
 </div><!-- fragment -->
 </div>
