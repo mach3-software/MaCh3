@@ -183,12 +183,8 @@ void SampleHandlerFD::Initialise() {
   //Now initialise all the variables you will need
   Init();
 
-  int TotalMCEvents = 0;
-  for(int iChannel = 0 ; iChannel < static_cast<int>(OscChannels.size()); iChannel++){
-    MACH3LOG_INFO("=============================================");
-    TotalMCEvents += SetupExperimentMC(iChannel);
-    MACH3LOG_INFO("Initialised channel: {}/{}", iChannel, OscChannels.size());
-  }
+
+  int TotalMCEvents = SetupExperimentMC();
   MCSamples.nEvents = TotalMCEvents;
 
   InitialiseSingleFDMCObject(MCSamples.nEvents);

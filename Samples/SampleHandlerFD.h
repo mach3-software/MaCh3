@@ -131,7 +131,7 @@ public:
   virtual void Init() = 0;
 
   /// @brief Experiment specific setup, returns the number of events which were loaded
-  virtual int SetupExperimentMC(int iSample) = 0;
+  virtual int SetupExperimentMC() = 0;
 
   /// @brief Function which translates experiment struct into core struct
   virtual void SetupFDMC() = 0;
