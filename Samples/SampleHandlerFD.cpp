@@ -907,7 +907,6 @@ void SampleHandlerFD::CalcNormsBins() {
     fdobj->xsec_norms_bins[iEvent] = NormBins;
   }//end loop over events
   #ifdef DEBUG
-  MACH3LOG_DEBUG("Channel {}", iSample);
   MACH3LOG_DEBUG("┌──────────────────────────────────────────────────────────┐");
   for (std::size_t i = 0; i < norm_parameters.size(); ++i) {
     const auto& norm = norm_parameters[i];
