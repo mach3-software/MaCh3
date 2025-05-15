@@ -120,7 +120,6 @@ class MCMCProcessor {
     /// @param CredibleRegions Vector with values of credible intervals, must be in descending order
     /// @param CredibleRegionStyle Style_t telling what line style to use for each Interval line
     /// @param CredibleRegionColor Color_t telling what colour to use for each Interval line
-    /// @param CredibleInSigmas Bool telling whether intervals are in percentage or in sigmas, then special conversions is used
     void MakeTrianglePlot(const std::vector<std::string>& ParNames,
                           // 1D
                           const std::vector<double>& CredibleIntervals = {0.99, 0.90, 0.68 },
@@ -166,7 +165,7 @@ class MCMCProcessor {
                          const std::vector<double>& EvaluationPoint,
                          const std::vector<std::vector<double>>& Bounds);
     /// @brief Reweight Prior by giving new central value and new error
-    /// @param ParName Parameter names for which we do reweighting
+    /// @param Names Parameter names for which we do reweighting
     /// @param NewCentral New central value for which we reweight
     /// @param NewError New error used for calculating weight
     void ReweightPrior(const std::vector<std::string>& Names,
@@ -174,7 +173,7 @@ class MCMCProcessor {
                        const std::vector<double>& NewError);
     
     /// @brief Make .gif of parameter evolution
-    /// @param ParName Parameter names for which we do .gif
+    /// @param Names Parameter names for which we do .gif
     /// @param NIntervals Number of intervals for a gif
     void ParameterEvolution(const std::vector<std::string>& Names,
                             const std::vector<int>& NIntervals);

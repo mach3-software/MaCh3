@@ -9,7 +9,7 @@
 
 #include "Manager/gpuUtils.cuh"
 
-/// @file gpuMCMCProcessorUtils
+/// @file gpuMCMCProcessorUtils.cuh
 /// @author Kamil Skwarczynski
 
 /// @brief KS: Initialiser, here we allocate memory for variables and copy constants
