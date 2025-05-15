@@ -127,14 +127,14 @@ void SampleHandlerFD::ReadSampleConfig()
   OscChannels.reserve(nSamples);
 
   for (auto const &osc_channel : SampleManager->raw()["SubSamples"]) {
-    OscChannelInfo info;
-    info.flavourName       = osc_channel["Name"].as<std::string>();
-    info.flavourName_Latex = osc_channel["LatexName"].as<std::string>();
-    info.InitPDG           = static_cast<NuPDG>(osc_channel["nutype"].as<int>());
-    info.FinalPDG          = static_cast<NuPDG>(osc_channel["oscnutype"].as<int>());
-    info.ChannelIndex      = static_cast<int>(OscChannels.size());
+    OscChannelInfo OscInfo;
+    OscInfo.flavourName       = osc_channel["Name"].as<std::string>();
+    OscInfo.flavourName_Latex = osc_channel["LatexName"].as<std::string>();
+    OscInfo.InitPDG           = static_cast<NuPDG>(osc_channel["nutype"].as<int>());
+    OscInfo.FinalPDG          = static_cast<NuPDG>(osc_channel["oscnutype"].as<int>());
+    OscInfo.ChannelIndex      = static_cast<int>(OscChannels.size());
 
-    OscChannels.push_back(std::move(info));
+    OscChannels.push_back(std::move(OscInfo));
 
     mc_files.push_back(mtupleprefix+osc_channel["mtuplefile"].as<std::string>()+mtuplesuffix);
     spline_files.push_back(splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);

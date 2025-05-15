@@ -28,7 +28,7 @@ struct OscChannelInfo {
 inline int GetOscChannel(const std::vector<OscChannelInfo>& OscChannel, const int InitFlav, const int FinalFlav) {
   for (size_t i = 0; i < OscChannel.size(); ++i) {
     if (InitFlav == OscChannel[i].InitPDG && FinalFlav == OscChannel[i].FinalPDG) {
-      return static_cast<int>(i);
+      return static_cast<int>(OscChannel[i].ChannelIndex);
     }
   }
 
