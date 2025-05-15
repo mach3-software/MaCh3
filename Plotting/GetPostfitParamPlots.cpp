@@ -26,7 +26,7 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TGraphAsymmErrors.h"
 _MaCh3_Safe_Include_End_ //}
 
-/// @file GetPostfitParamPlots
+/// @file GetPostfitParamPlots.cpp
 /// This script generates post-fit parameter plots. The central postfit value is
 /// taken as the Highest Posterior Density (HPD), but can be easily changed to
 /// another method such as Gaussian. Be cautious as parameter names and the number

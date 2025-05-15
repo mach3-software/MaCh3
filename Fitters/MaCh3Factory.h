@@ -18,8 +18,6 @@
 
 /// @brief MaCh3 Factory initiates one of implemented fitting algorithms
 /// @param fitMan pointer to Manager class
-/// @param Samples vector of Sample PDF which will be used in the fits
-/// @param Covariances vector of Systematic objects which will be used in the fits
 ///
 /// @note Example YAML configuration:
 /// @code
@@ -41,8 +39,8 @@ std::unique_ptr<manager> MaCh3ManagerFactory(int argc, char **argv);
 // ********************************************
 /// @brief Factory function for creating a covariance class for systematic handling.
 ///
-/// @param fitMan Pointer to the manager class that holds the configuration settings.
-/// @param name Prefix, for example Xsec, then code will look for XsecCovFile
+/// @param FitManager Pointer to the manager class that holds the configuration settings.
+/// @param PreFix Prefix, for example Xsec, then code will look for XsecCovFile
 /// @return Pointer to the initialized covarianceXsec matrix object.
 ///
 /// @note Example YAML configuration:

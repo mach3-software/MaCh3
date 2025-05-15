@@ -28,10 +28,10 @@ class ParameterHandlerBase {
   /// @brief Destructor
   virtual ~ParameterHandlerBase();
   
-  /// @defgroup ParameterHandlerSetters
+  /// @defgroup ParameterHandlerSetters Parameter Handler Setters
   /// Group of functions to set various parameters, names, and values.
 
-  /// @defgroup ParameterHandlerGetters
+  /// @defgroup ParameterHandlerGetters Parameter Handler Getters
   /// Group of functions to get various parameters, names, and values.
 
   // ETA - maybe need to add checks to index on the setters? i.e. if( i > _fPropVal.size()){throw;}

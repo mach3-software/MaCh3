@@ -111,12 +111,12 @@ void GetCredibleIntervalSig(const std::unique_ptr<TH1D>& hist, std::unique_ptr<T
 
 /// @brief KS: Set 2D contour within some coverage
 /// @param hist2D histograms based on which we calculate credible regions
-/// @param CredibleInSigmas Whether interval is in sigmas or percentage
 /// @param coverage What is defined coverage, by default 0.6827 (1 sigma)
 void GetCredibleRegion(std::unique_ptr<TH2D>& hist2D, const double coverage = 0.6827);
 
 /// @brief KS: Set 2D contour within some coverage
 /// @param hist2D histograms based on which we calculate credible regions
+/// @param CredibleInSigmas Whether interval is in sigmas or percentage
 /// @param coverage What is defined coverage, by default 0.6827 (1 sigma)
 void GetCredibleRegionSig(std::unique_ptr<TH2D>& hist2D, const bool CredibleInSigmas, const double coverage = 0.6827);
 

@@ -29,10 +29,10 @@ class SampleHandlerBase
   /// @brief destructor
   virtual ~SampleHandlerBase();
 
-  /// @defgroup SampleHandlerSetters
+  /// @defgroup SampleHandlerSetters Sample Handler Setters
   /// Group of functions to set various parameters, names, and values.
 
-  /// @defgroup SampleHandlerGetters
+  /// @defgroup SampleHandlerGetters Sample Handler Getters
   /// Group of functions to get various parameters, names, and values.
 
   /// @ingroup SampleHandlerGetters
