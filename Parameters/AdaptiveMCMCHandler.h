@@ -24,14 +24,15 @@ class AdaptiveMCMCHandler{
 
   /// @brief Read initial values from config file
   /// @param adapt_manager Config file from which we update matrix
-  bool InitFromConfig(const YAML::Node& adapt_manager, const std::string& matrix_name_str, const int Npars);
+  bool InitFromConfig(const YAML::Node& adapt_manager, const std::string& matrix_name_str,
+                      const std::vector<double>* parameters, const std::vector<double>* fixed);
 
   /// @brief If we don't have a covariance matrix to start from for adaptive tune we need to make one!
-  void CreateNewAdaptiveCovariance(const int Npars);
+  void CreateNewAdaptiveCovariance();
 
   /// @brief HW: sets adaptive block matrix
   /// @param block_indices Values for sub-matrix blocks
-  void SetAdaptiveBlocks(std::vector<std::vector<int>> block_indices, const int Npars);
+  void SetAdaptiveBlocks(std::vector<std::vector<int>> block_indices);
 
   /// @brief HW: Save adaptive throw matrix to file
   void SaveAdaptiveToFile(const std::string& outFileName, const std::string& systematicName, const bool is_final=false);
@@ -43,13 +44,12 @@ class AdaptiveMCMCHandler{
   void SetThrowMatrixFromFile(const std::string& matrix_file_name,
                               const std::string& matrix_name,
                               const std::string& means_name,
-                              bool& use_adaptive,
-                              const int Npars);
+                              bool& use_adaptive);
 
   /// @brief Method to update adaptive MCMC
   /// @cite haario2001adaptive
   /// @param _fCurrVal Value of each parameter necessary for updating throw matrix
-  void UpdateAdaptiveCovariance(const std::vector<double>& _fCurrVal, const int Npars);
+  void UpdateAdaptiveCovariance();
 
   /// @brief Tell whether we want reset step scale or not
   bool IndivStepScaleAdapt();
@@ -62,6 +62,34 @@ class AdaptiveMCMCHandler{
 
   /// @brief Tell if we are Skipping Adaption
   bool SkipAdaption();
+
+  /// @brief Set the current values of the parameters
+  void SetParams(const std::vector<double>* params){
+    _fCurrVal = params;
+  }
+
+  /// @brief Set the fixed parameters
+  void SetFixed(const std::vector<double>* fix){
+    _fFixedPars = fix;
+  }
+
+  /// @brief Get the current values of the parameters
+  int GetNumParams(){
+    return static_cast<int>(_fCurrVal->size());
+  }
+
+  /// @brief Check if a parameter is fixed
+  bool IsFixed(int ipar){
+
+    if(!_fFixedPars){
+      return false;
+    }
+
+    return ((*_fFixedPars)[ipar] < 0);
+  }
+
+  /// @brief Get Current value of parameter
+  double CurrVal(int par_index);
 
   /// Meta variables related to adaption run time
   /// When do we start throwing
@@ -98,6 +126,16 @@ class AdaptiveMCMCHandler{
 
   /// Total number of MCMC steps
   int total_steps;
+
+  /// Scaling factor
+  double adaption_scale;
+
+  /// Vector of fixed parameters
+  const std::vector<double>* _fFixedPars;
+
+  /// Current values of parameters
+  const std::vector<double>* _fCurrVal;
+
 };
 
 } // adaptive_mcmc namespace

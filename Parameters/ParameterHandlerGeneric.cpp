@@ -53,7 +53,7 @@ void ParameterHandlerGeneric::InitXsecFromConfig() {
       //Set param type
       _fParamType[i] = SystType::kSpline;
       // Fill Spline info
-      SplineParams.push_back(GetSplineParameter(param["Systematic"]));
+      SplineParams.push_back(GetSplineParameter(param["Systematic"], i));
 
       if (param["Systematic"]["SplineInformation"]["SplineName"]) {
         _fSplineNames.push_back(param["Systematic"]["SplineInformation"]["SplineName"].as<std::string>());
@@ -157,7 +157,8 @@ const std::vector< std::vector<int> > ParameterHandlerGeneric::GetSplineModeVecF
 NormParameter ParameterHandlerGeneric::GetNormParameter(const YAML::Node& param, const int Index) {
 // ********************************************
   NormParameter norm;
-  norm.name = GetParFancyName(Index);
+
+  GetBaseParameter(param, Index, norm);
 
   // ETA Empty DummyVector can be used to specify no cut for mode, target and neutrino flavour
   // ETA Has to be of size 0 to mean apply to all
@@ -204,11 +205,22 @@ NormParameter ParameterHandlerGeneric::GetNormParameter(const YAML::Node& param,
   norm.hasKinBounds = HasKinBounds;
   //End of kinematic bound checking
 
-  // Set the global parameter index of the normalisation parameter
-  norm.index = Index;
-
   return norm;
 }
+
+// ********************************************
+// Get Base Param
+void ParameterHandlerGeneric::GetBaseParameter(const YAML::Node& param, const int Index, TypeParameterBase& Parameter) {
+// ********************************************
+  // KS: For now we don't use so avoid compilation error
+  (void) param;
+
+  Parameter.name = GetParFancyName(Index);
+
+  // Set the global parameter index of the normalisation parameter
+  Parameter.index = Index;
+}
+
 
 // ********************************************
 // Grab the global syst index for the relevant SampleName
@@ -228,7 +240,7 @@ const std::vector<int> ParameterHandlerGeneric::GetGlobalSystIndexFromSampleName
 // ********************************************
 // Grab the global syst index for the relevant SampleName
 // i.e. get a vector of size nSplines where each entry is filled with the global syst number
-const std::vector<int> ParameterHandlerGeneric::GetSystIndexFromSampleName(const std::string& SampleName,  const SystType Type) {
+const std::vector<int> ParameterHandlerGeneric::GetSystIndexFromSampleName(const std::string& SampleName,  const SystType Type) const {
 // ********************************************
   std::vector<int> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
@@ -243,10 +255,11 @@ const std::vector<int> ParameterHandlerGeneric::GetSystIndexFromSampleName(const
 
 // ********************************************
 // Get Norm params
-SplineParameter ParameterHandlerGeneric::GetSplineParameter(const YAML::Node& param) {
+SplineParameter ParameterHandlerGeneric::GetSplineParameter(const YAML::Node& param, const int Index) {
 // ********************************************
   SplineParameter Spline;
 
+  GetBaseParameter(param, Index, Spline);
   //Now get the Spline interpolation type
   if (param["SplineInformation"]["InterpolationType"]){
     for(int InterpType = 0; InterpType < kSplineInterpolations ; ++InterpType){
@@ -274,7 +287,8 @@ SplineParameter ParameterHandlerGeneric::GetSplineParameter(const YAML::Node& pa
 FunctionalParameter ParameterHandlerGeneric::GetFunctionalParameters(const YAML::Node& param, const int Index) {
 // ********************************************
   FunctionalParameter func;
-  func.name = GetParFancyName(Index);
+  GetBaseParameter(param, Index, func);
+
   func.pdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavour"], std::vector<int>(), __FILE__ , __LINE__);
   func.targets = GetFromManager<std::vector<int>>(param["TargetNuclei"], std::vector<int>(), __FILE__ , __LINE__);
   func.modes = GetFromManager<std::vector<int>>(param["Mode"], std::vector<int>(), __FILE__ , __LINE__);
@@ -304,36 +318,41 @@ FunctionalParameter ParameterHandlerGeneric::GetFunctionalParameters(const YAML:
     func.KinematicVarStr = TempKinematicStrings;
     func.Selection = TempKinematicBounds;
   }
-  func.index = Index;
   func.valuePtr = RetPointer(Index);
   return func;
 }
 
 // ********************************************
 // HH: Grab the Functional parameters for the relevant SampleName
-const std::vector<FunctionalParameter> ParameterHandlerGeneric::GetFunctionalParametersFromSampleName(const std::string& SampleName) {
-  // ********************************************
-  std::vector<FunctionalParameter> returnVec;
-  for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kFunc]) {
-    auto &FuncIndex = pair.first;
-    auto &GlobalIndex = pair.second;
-    if (AppliesToSample(GlobalIndex, SampleName)) {
-      returnVec.push_back(FuncParams[FuncIndex]);
-    }
-  }
-  return returnVec;
+const std::vector<FunctionalParameter> ParameterHandlerGeneric::GetFunctionalParametersFromSampleName(const std::string& SampleName) const {
+// ********************************************
+  return GetTypeParamsFromSampleName(_fSystToGlobalSystIndexMap[SystType::kFunc], FuncParams, SampleName);
 }
 
 // ********************************************
 // DB Grab the Normalisation parameters for the relevant SampleName
-const std::vector<NormParameter> ParameterHandlerGeneric::GetNormParsFromSampleName(const std::string& SampleName) {
+const std::vector<NormParameter> ParameterHandlerGeneric::GetNormParsFromSampleName(const std::string& SampleName) const {
 // ********************************************
-  std::vector<NormParameter> returnVec;
-  for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kNorm]) {
-    auto &NormIndex = pair.first;
-    auto &GlobalIndex = pair.second;
-    if (AppliesToSample(GlobalIndex, SampleName)) {
-      returnVec.push_back(NormParams[NormIndex]);
+  return GetTypeParamsFromSampleName(_fSystToGlobalSystIndexMap[SystType::kNorm], NormParams, SampleName);
+}
+
+// ********************************************
+// KS Grab the Spline parameters for the relevant SampleName
+const std::vector<SplineParameter> ParameterHandlerGeneric::GetSplineParsFromSampleName(const std::string& SampleName) const {
+// ********************************************
+  return GetTypeParamsFromSampleName(_fSystToGlobalSystIndexMap[SystType::kSpline], SplineParams, SampleName);
+}
+
+// ********************************************
+template<typename ParamT>
+std::vector<ParamT> ParameterHandlerGeneric::GetTypeParamsFromSampleName(const std::map<int, int>& indexMap, const std::vector<ParamT>& params, const std::string& SampleName) const {
+// ********************************************
+  std::vector<ParamT> returnVec;
+  for (const auto& pair : indexMap) {
+    const auto& localIndex = pair.first;
+    const auto& globalIndex = pair.second;
+    if (AppliesToSample(globalIndex, SampleName)) {
+      returnVec.push_back(params[localIndex]);
     }
   }
   return returnVec;
