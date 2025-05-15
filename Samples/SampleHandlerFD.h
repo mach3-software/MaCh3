@@ -263,6 +263,8 @@ public:
   virtual const double* GetPointerToKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0; 
   virtual const double* GetPointerToKinematicParameter(double KinematicVariable, int iSample, int iEvent) = 0;
 
+  const double* GetPointerToOscChannel(int iSample, int iEvent) const;
+
   void SetupNormParameters();
 
   //===============================================================================

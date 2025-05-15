@@ -132,6 +132,7 @@ void SampleHandlerFD::ReadSampleConfig()
     info.flavourName_Latex = osc_channel["LatexName"].as<std::string>();
     info.InitPDG           = static_cast<NuPDG>(osc_channel["nutype"].as<int>());
     info.FinalPDG          = static_cast<NuPDG>(osc_channel["oscnutype"].as<int>());
+    info.ChannelIndex      = static_cast<int>(OscChannels.size());
 
     OscChannels.push_back(std::move(info));
 
@@ -1974,4 +1975,13 @@ THStack* SampleHandlerFD::ReturnStackedHistBySelection1D(std::string KinematicPr
     StackHist->Add(HistList[i]);
   }
   return StackHist;
+}
+
+
+// ************************************************
+const double* SampleHandlerFD::GetPointerToOscChannel(int iSample, int iEvent) const {
+// ************************************************
+  int Channel = GetOscChannel(OscChannels, (*MCSamples[iSample].nupdgUnosc[iEvent]), (*MCSamples[iSample].nupdg[iEvent]));
+
+  return &(OscChannels[Channel].ChannelIndex);
 }

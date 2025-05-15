@@ -4,7 +4,7 @@
 
 #include "Samples/Structs.h"
 
-/// @brief Store info about used osc channels
+/// @brief KS: Store info about used osc channels
 struct OscChannelInfo {
   /// Name of osc channel
   std::string flavourName;
@@ -15,9 +15,12 @@ struct OscChannelInfo {
   int InitPDG;
   /// PDG of oscillated/final flavour
   int FinalPDG;
+
+  /// In case experiment specific would like to have pointer to channel after using @GetOscChannel, they can set pointer to this
+  double ChannelIndex;
 };
 
-/// @brief Get Osc Channel Index based on initial and final PDG codes
+/// @brief KS: Get Osc Channel Index based on initial and final PDG codes
 /// @param OscChannel The vector of available oscillation channels
 /// @param InitFlav Initial flavour PDG code
 /// @param FinalFlav Final flavour PDG code
@@ -44,7 +47,6 @@ struct FarDetectorCoreInfo {
   ~FarDetectorCoreInfo(){if(isNC != nullptr) delete [] isNC;}
 
   int nEvents; ///< how many MC events are there
-  double ChannelIndex;
 
   std::vector<int*> Target; ///< target the interaction was on
   std::vector<const int*> nupdg;
