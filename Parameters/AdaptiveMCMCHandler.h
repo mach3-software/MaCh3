@@ -32,7 +32,7 @@ class AdaptiveMCMCHandler{
 
   /// @brief HW: sets adaptive block matrix
   /// @param block_indices Values for sub-matrix blocks
-  void SetAdaptiveBlocks(std::vector<std::vector<int>> block_indices);
+  void SetAdaptiveBlocks(const std::vector<std::vector<int>>& block_indices);
 
   /// @brief HW: Save adaptive throw matrix to file
   void SaveAdaptiveToFile(const std::string& outFileName, const std::string& systematicName, const bool is_final=false);
@@ -74,13 +74,12 @@ class AdaptiveMCMCHandler{
   }
 
   /// @brief Get the current values of the parameters
-  int GetNumParams(){
+  int GetNumParams() const {
     return static_cast<int>(_fCurrVal->size());
   }
 
   /// @brief Check if a parameter is fixed
-  bool IsFixed(int ipar){
-
+  bool IsFixed(const int ipar) const {
     if(!_fFixedPars){
       return false;
     }
@@ -89,7 +88,7 @@ class AdaptiveMCMCHandler{
   }
 
   /// @brief Get Current value of parameter
-  double CurrVal(int par_index);
+  double CurrVal(const int par_index);
 
   /// Meta variables related to adaption run time
   /// When do we start throwing
@@ -104,11 +103,11 @@ class AdaptiveMCMCHandler{
   /// Steps between changing throw matrix
   int adaptive_update_step;
 
-  /// If you don't want to save every adpation then
+  /// If you don't want to save every adaption then
   /// you can specify this here
   int adaptive_save_n_iterations;
 
-  /// Name of the file to save the adpative matrices into
+  /// Name of the file to save the adaptive matrices into
   std::string output_file_name;
 
   /// Indices for block-matrix adaption
@@ -135,7 +134,6 @@ class AdaptiveMCMCHandler{
 
   /// Current values of parameters
   const std::vector<double>* _fCurrVal;
-
 };
 
 } // adaptive_mcmc namespace

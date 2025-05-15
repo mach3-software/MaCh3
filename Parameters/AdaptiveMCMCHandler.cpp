@@ -96,7 +96,7 @@ void AdaptiveMCMCHandler::CreateNewAdaptiveCovariance() {
 }
 
 // ********************************************
-void AdaptiveMCMCHandler::SetAdaptiveBlocks(std::vector<std::vector<int>> block_indices) {
+void AdaptiveMCMCHandler::SetAdaptiveBlocks(const std::vector<std::vector<int>>& block_indices) {
 // ********************************************
   /*
    *   In order to adapt efficient we want to setup our throw matrix to be a serious of block-diagonal (ish) matrices
@@ -140,8 +140,7 @@ void AdaptiveMCMCHandler::SetAdaptiveBlocks(std::vector<std::vector<int>> block_
 //HW: Truly adaptive MCMC!
 void AdaptiveMCMCHandler::SaveAdaptiveToFile(const std::string &outFileName,
                                              const std::string &systematicName, bool is_final) {
-  // ********************************************
-
+// ********************************************
   if (((total_steps - start_adaptive_throw) / adaptive_update_step) % adaptive_save_n_iterations == 0 || is_final) {
 
     TFile *outFile = new TFile(outFileName.c_str(), "UPDATE");
@@ -330,7 +329,7 @@ void AdaptiveMCMCHandler::Print() {
   MACH3LOG_INFO("Will only save every {} iterations"     , adaptive_save_n_iterations);
 }
 
-double AdaptiveMCMCHandler::CurrVal(int par_index){
+double AdaptiveMCMCHandler::CurrVal(const int par_index){
   /// HW Implemented as its own method to allow for
   /// different behaviour in the future
   return (*_fCurrVal)[par_index];
