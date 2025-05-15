@@ -19,7 +19,7 @@ var searchData=
   ['set_5fposition_16',['set_position',['../classparticle.html#af0b46439a6cba18c4a7f59a26ea405bf',1,'particle']]],
   ['set_5fvalue_17',['set_value',['../classparticle.html#ab0a15a079761b5a4bb1c4bb4ba642411',1,'particle']]],
   ['set_5fvelocity_18',['set_velocity',['../classparticle.html#ad0f119b37e53ba1dfe4345cc0ae3fc8a',1,'particle']]],
-  ['setadaptiveblocks_19',['SetAdaptiveBlocks',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a51a57e5db3b2e9c0c58daa15c6d54032',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
+  ['setadaptiveblocks_19',['SetAdaptiveBlocks',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a7067eff762393986a465620aead95b81',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
   ['setbranches_20',['SetBranches',['../group__ParameterHandlerSetters.html#gaa57d406ce58ffc5fac6707a79c3fcece',1,'ParameterHandlerBase']]],
   ['setchainlength_21',['setChainLength',['../classmcmc.html#af549f9b0ab4276710bc0d2987ad825a9',1,'mcmc']]],
   ['setcovmatrix_22',['SetCovMatrix',['../group__ParameterHandlerSetters.html#ga284a3ed71262b336d0b6470dc51afb3c',1,'ParameterHandlerBase']]],
