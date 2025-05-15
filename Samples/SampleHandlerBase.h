@@ -62,9 +62,11 @@ class SampleHandlerBase
   virtual double GetLikelihood() = 0;
 
   /// @ingroup SampleHandlerGetters
-  virtual int GetNEventsInSample(int sample){ (void) sample; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); }
+  virtual int GetNEvents(){throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");}
   /// @ingroup SampleHandlerGetters
   virtual int GetNMCSamples(){ throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); }
+  /// @ingroup SampleHandlerGetters
+  virtual int GetNOscChannels(){ return 1; }
 
   virtual void AddData(std::vector<double> &dat);
   virtual void AddData(std::vector< std::vector <double> > &dat);
