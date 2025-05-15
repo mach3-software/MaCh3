@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['samplehandlergetters_0',['SampleHandlerGetters',['../group__SampleHandlerGetters.html',1,'']]],
-  ['samplehandlersetters_1',['SampleHandlerSetters',['../group__SampleHandlerSetters.html',1,'']]]
+  ['sample_20handler_20getters_0',['Sample Handler Getters',['../group__SampleHandlerGetters.html',1,'']]],
+  ['sample_20handler_20setters_1',['Sample Handler Setters',['../group__SampleHandlerSetters.html',1,'']]]
 ];

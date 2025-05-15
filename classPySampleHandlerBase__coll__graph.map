@@ -1,11 +1,10 @@
 <map id="PySampleHandlerBase" name="PySampleHandlerBase">
-<area shape="rect" id="node1" title="EW: As SampleHandlerBase is an abstract base class we have to do some gymnastics to get it to get it ..." alt="" coords="1523,114,1693,139"/>
-<area shape="rect" id="node2" href="$classSampleHandlerBase.html" title="Class responsible for handling implementation of samples used in analysis, reweighting and returning ..." alt="" coords="1319,114,1473,139"/>
-<area shape="rect" id="node3" href="$classMaCh3Modes.html" title="KS: Class describing MaCh3 modes used in the analysis, it is being initialised from config." alt="" coords="1112,114,1223,139"/>
-<area shape="rect" id="node4" title=" " alt="" coords="649,187,812,227"/>
-<area shape="rect" id="node5" title=" " alt="" coords="219,143,306,169"/>
-<area shape="rect" id="node8" href="$structMaCh3ModeInfo.html" title="KS: Class containing information for a single MaCh3Mode." alt="" coords="497,83,625,109"/>
-<area shape="rect" id="node6" title=" " alt="" coords="5,136,144,176"/>
-<area shape="rect" id="node7" title=" " alt="" coords="836,77,1019,117"/>
-<area shape="rect" id="node9" title=" " alt="" coords="193,7,332,33"/>
+<area shape="rect" id="node1" title="EW: As SampleHandlerBase is an abstract base class we have to do some gymnastics to get it to get it ..." alt="" coords="904,106,1075,131"/>
+<area shape="rect" id="node2" href="$classSampleHandlerBase.html" title="Class responsible for handling implementation of samples used in analysis, reweighting and returning ..." alt="" coords="700,106,855,131"/>
+<area shape="rect" id="node3" href="$classMaCh3Modes.html" title="KS: Class describing MaCh3 modes used in the analysis, it is being initialised from config." alt="" coords="493,106,604,131"/>
+<area shape="rect" id="node4" title=" " alt="" coords="203,5,366,45"/>
+<area shape="rect" id="node5" title=" " alt="" coords="193,69,376,109"/>
+<area shape="rect" id="node6" title=" " alt="" coords="215,134,354,159"/>
+<area shape="rect" id="node7" title=" " alt="" coords="241,189,328,214"/>
+<area shape="rect" id="node8" title=" " alt="" coords="5,181,144,221"/>
 </map>
