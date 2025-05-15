@@ -138,6 +138,4 @@ protected:
   // binned PDFs
   TH1D*_hPDF1D;
   TH2D*_hPDF2D;
-
-  TRandom3* rnd;
 };

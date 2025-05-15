@@ -23,7 +23,7 @@ void PCAHandler::SetupPointers(std::vector<double>* fCurr_Val,
 }
 
 // ********************************************
-void PCAHandler::ConstructPCA(TMatrixDSym * covMatrix, const int firstPCAd, const int lastPCAd,
+void PCAHandler::ConstructPCA(TMatrixDSym * CovMatrix, const int firstPCAd, const int lastPCAd,
                               const double eigen_thresh, int& _fNumParPCA, const int _fNumPar) {
 // ********************************************
   FirstPCAdpar = firstPCAd;
@@ -31,15 +31,15 @@ void PCAHandler::ConstructPCA(TMatrixDSym * covMatrix, const int firstPCAd, cons
   eigen_threshold = eigen_thresh;
 
   // Check that covariance matrix exists
-  if (covMatrix == NULL) {
+  if (CovMatrix == NULL) {
     MACH3LOG_ERROR("Covariance matrix for has not yet been set");
     MACH3LOG_ERROR("Can not construct PCA until it is set");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
-  if(FirstPCAdpar > covMatrix->GetNrows()-1 || LastPCAdpar>covMatrix->GetNrows()-1) {
+  if(FirstPCAdpar > CovMatrix->GetNrows()-1 || LastPCAdpar>CovMatrix->GetNrows()-1) {
     MACH3LOG_ERROR("FirstPCAdpar and LastPCAdpar are higher than the number of parameters");
-    MACH3LOG_ERROR("first: {} last: {}, params: {}", FirstPCAdpar, LastPCAdpar, covMatrix->GetNrows()-1);
+    MACH3LOG_ERROR("first: {} last: {}, params: {}", FirstPCAdpar, LastPCAdpar, CovMatrix->GetNrows()-1);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   if(FirstPCAdpar < 0 || LastPCAdpar < 0){
@@ -48,9 +48,9 @@ void PCAHandler::ConstructPCA(TMatrixDSym * covMatrix, const int firstPCAd, cons
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   MACH3LOG_INFO("PCAing parameters {} through {} inclusive", FirstPCAdpar, LastPCAdpar);
-  int numunpcadpars = covMatrix->GetNrows()-(LastPCAdpar-FirstPCAdpar+1);
+  int numunpcadpars = CovMatrix->GetNrows()-(LastPCAdpar-FirstPCAdpar+1);
 
-  TMatrixDSym submat(covMatrix->GetSub(FirstPCAdpar,LastPCAdpar,FirstPCAdpar,LastPCAdpar));
+  TMatrixDSym submat(CovMatrix->GetSub(FirstPCAdpar,LastPCAdpar,FirstPCAdpar,LastPCAdpar));
 
   //CW: Calculate how many eigen values this threshold corresponds to
   TMatrixDSymEigen eigen(submat);
@@ -84,18 +84,18 @@ void PCAHandler::ConstructPCA(TMatrixDSym * covMatrix, const int firstPCAd, cons
 
   // Now construct the transfer matrices
   //These matrices will be as big as number of unPCAd pars plus number of eigenvalues kept
-  TransferMat.ResizeTo(covMatrix->GetNrows(), _fNumParPCA);
-  TransferMatT.ResizeTo(covMatrix->GetNrows(), _fNumParPCA);
+  TransferMat.ResizeTo(CovMatrix->GetNrows(), _fNumParPCA);
+  TransferMatT.ResizeTo(CovMatrix->GetNrows(), _fNumParPCA);
 
   // Get a subset of the eigen vector matrix
   TMatrixD temp(eigen_vectors.GetSub(0, eigen_vectors.GetNrows()-1, 0, nKeptPCApars-1));
 
   //Make transfer matrix which is two blocks of identity with a block of the PCA transfer matrix in between
   TMatrixD temp2;
-  temp2.ResizeTo(covMatrix->GetNrows(), _fNumParPCA);
+  temp2.ResizeTo(CovMatrix->GetNrows(), _fNumParPCA);
 
   //First set the whole thing to 0
-  for(int iRow = 0; iRow < covMatrix->GetNrows(); iRow++){
+  for(int iRow = 0; iRow < CovMatrix->GetNrows(); iRow++){
     for(int iCol = 0; iCol < _fNumParPCA; iCol++){
       temp2[iRow][iCol] = 0;
     }
@@ -111,8 +111,8 @@ void PCAHandler::ConstructPCA(TMatrixDSym * covMatrix, const int firstPCAd, cons
   temp2.SetSub(FirstPCAdpar,FirstPCAdpar,temp);
 
   //Set the second identity block
-  if(LastPCAdpar != covMatrix->GetNrows()-1){
-    for(int iRow = 0;iRow < (covMatrix->GetNrows()-1)-LastPCAdpar; iRow++){
+  if(LastPCAdpar != CovMatrix->GetNrows()-1){
+    for(int iRow = 0;iRow < (CovMatrix->GetNrows()-1)-LastPCAdpar; iRow++){
       temp2[LastPCAdpar+1+iRow][FirstPCAdpar+nKeptPCApars+iRow] = 1;
     }
   }
@@ -125,7 +125,7 @@ void PCAHandler::ConstructPCA(TMatrixDSym * covMatrix, const int firstPCAd, cons
 
   #ifdef DEBUG_PCA
   //KS: Let's dump all useful matrices to properly validate PCA
-  DebugPCA(sum, temp, submat, covMatrix->GetNrows());
+  DebugPCA(sum, temp, submat, CovMatrix->GetNrows());
   #endif
 
   // Make the PCA parameter arrays
