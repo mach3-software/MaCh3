@@ -124,7 +124,7 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
   protected:
     /// @brief Print information about the whole object once it is set
     void Print();
-    /// @brief Prints general information about the covarianceXsec object.
+    /// @brief Prints general information about the ParameterHandler object.
     void PrintGlobablInfo();
     /// @brief Prints normalization parameters.
     void PrintNormParams();
@@ -160,7 +160,7 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
 
     /// @brief Parses the YAML configuration to set up cross-section parameters.
     /// The YAML file defines the types of systematic errors, interpolation types, and bounds for splines.
-    inline void InitXsecFromConfig();
+    inline void InitParametersTypeFromConfig();
 
     /// @brief Get Norm params
     /// @param param Yaml node describing param

@@ -85,7 +85,7 @@ class ParameterHandlerBase {
   /// @brief Get random value useful for debugging/CI
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
-  double GetRandomThrow(const int i) { return randParams[i];}
+  double GetRandomThrow(const int i) const { return randParams[i];}
 
   /// @brief set branches for output file
   /// @param tree Tree to which we will save branches
@@ -133,23 +133,23 @@ class ParameterHandlerBase {
 
   /// @brief Return covariance matrix
   /// @ingroup ParameterHandlerGetters
-  TMatrixDSym *GetCovMatrix() { return covMatrix; }
+  TMatrixDSym *GetCovMatrix() const { return covMatrix; }
   /// @brief Return inverted covariance matrix
   /// @ingroup ParameterHandlerGetters
-  TMatrixDSym *GetInvCovMatrix() { return invCovMatrix; }
+  TMatrixDSym *GetInvCovMatrix() const { return invCovMatrix; }
   /// @brief Return inverted covariance matrix
   /// @ingroup ParameterHandlerGetters
-  double GetInvCovMatrix(const int i, const int j) { return InvertCovMatrix[i][j]; }
+  double GetInvCovMatrix(const int i, const int j) const { return InvertCovMatrix[i][j]; }
 
   /// @brief Return correlated throws
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
-  double GetCorrThrows(const int i) { return corr_throw[i]; }
+  double GetCorrThrows(const int i) const { return corr_throw[i]; }
 
   /// @brief Get if param has flat prior or not
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
-  inline bool GetFlatPrior(const int i) { return _fFlatPrior[i]; }
+  inline bool GetFlatPrior(const int i) const { return _fFlatPrior[i]; }
 
   /// @brief Get name of covariance
   /// @ingroup ParameterHandlerGetters
@@ -187,7 +187,7 @@ class ParameterHandlerBase {
 
   /// @brief Do we adapt or not
   /// @ingroup ParameterHandlerGetters
-  bool GetDoAdaption(){return use_adaptive;}
+  bool GetDoAdaption() const {return use_adaptive;}
   /// @brief Use new throw matrix, used in adaptive MCMC
   /// @ingroup ParameterHandlerSetters
   void SetThrowMatrix(TMatrixDSym *cov);
@@ -201,16 +201,16 @@ class ParameterHandlerBase {
 
   /// @brief Get matrix used for step proposal
   /// @ingroup ParameterHandlerGetters
-  inline TMatrixDSym *GetThrowMatrix(){return throwMatrix;}
+  inline TMatrixDSym *GetThrowMatrix() const {return throwMatrix;}
   /// @brief Get matrix used for step proposal
   /// @ingroup ParameterHandlerGetters
-  double GetThrowMatrix(int i, int j) { return throwMatrixCholDecomp[i][j];}
+  double GetThrowMatrix(int i, int j) const { return throwMatrixCholDecomp[i][j];}
   /// @brief Get the Cholesky decomposition of the throw matrix
   /// @ingroup ParameterHandlerGetters
-  inline TMatrixD *GetThrowMatrix_CholDecomp(){return throwMatrix_CholDecomp;}
+  inline TMatrixD *GetThrowMatrix_CholDecomp() const {return throwMatrix_CholDecomp;}
   /// @brief Get the parameter means used in the adaptive handler
   /// @ingroup ParameterHandlerGetters
-  inline std::vector<double> GetParameterMeans(){return AdaptiveHandler->par_means;}
+  inline std::vector<double> GetParameterMeans() const {return AdaptiveHandler->par_means;}
   /// @brief KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plotting
   /// @details This function converts the covariance matrix to a correlation matrix and
   ///          returns a TH2D object, which can be used for advanced plotting purposes.
@@ -264,7 +264,7 @@ class ParameterHandlerBase {
   /// @brief Return generated value, although is virtual so class inheriting might actual get prior not generated.
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
-  virtual double GetNominal(const int i) { return GetParInit(i); }
+  virtual double GetNominal(const int i) const { return GetParInit(i); }
   /// @brief Return generated value for a given parameter
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
@@ -287,7 +287,7 @@ class ParameterHandlerBase {
   /// @brief Get current parameter value using PCA
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
-  inline double GetParPropPCA(const int i)  {
+  inline double GetParPropPCA(const int i) const {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
     return PCAObj->_fParPropPCA(i);
   }
@@ -295,7 +295,7 @@ class ParameterHandlerBase {
   /// @brief Get current parameter value using PCA
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
-  inline double GetParCurrPCA(const int i) {
+  inline double GetParCurrPCA(const int i) const {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
     return PCAObj->_fParCurrPCA(i);
   }
@@ -303,31 +303,31 @@ class ParameterHandlerBase {
   /// @brief Is parameter fixed in PCA base or not
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
-  inline bool IsParameterFixedPCA(const int i) {
+  inline bool IsParameterFixedPCA(const int i) const {
     if (PCAObj->_fParSigmaPCA[i] < 0) { return true;  }
     else                              { return false; }
   }
   /// @brief Get transfer matrix allowing to go from PCA base to normal base
   /// @ingroup ParameterHandlerGetters
-  inline const TMatrixD GetTransferMatrix() {
+  inline const TMatrixD GetTransferMatrix() const {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
     return PCAObj->TransferMat;
   }
   /// @brief Get eigen vectors of covariance matrix, only works with PCA
   /// @ingroup ParameterHandlerGetters
-  inline const TMatrixD GetEigenVectors() {
+  inline const TMatrixD GetEigenVectors() const {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
     return PCAObj->eigen_vectors;
   }
   /// @brief Get eigen values for all parameters, if you want for decomposed only parameters use GetEigenValuesMaster
   /// @ingroup ParameterHandlerGetters
-  inline const TVectorD GetEigenValues() {
+  inline const TVectorD GetEigenValues() const {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
     return PCAObj->eigen_values;
   }
   /// @brief Get eigen value of only decomposed parameters, if you want for all parameters use GetEigenValues
   /// @ingroup ParameterHandlerGetters
-  inline const std::vector<double> GetEigenValuesMaster() {
+  inline const std::vector<double> GetEigenValuesMaster() const {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
     return PCAObj->eigen_values_master;
   }
@@ -357,7 +357,7 @@ class ParameterHandlerBase {
   inline void SetParametersPCA(const std::vector<double> &pars) {
     if (!pca) { MACH3LOG_ERROR("Am not running in PCA mode"); throw MaCh3Exception(__FILE__ , __LINE__ ); }
     if (int(pars.size()) != _fNumParPCA) {
-      MACH3LOG_ERROR("Warning: parameter arrays of incompatible size! Not changing parameters! {} has size {} but was expecting {}", matrixName, pars.size(), _fNumPar);
+      MACH3LOG_ERROR("Parameter arrays of incompatible size! Not changing parameters! {} has size {} but was expecting {}", matrixName, pars.size(), _fNumPar);
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
     int parsSize = int(pars.size());
@@ -370,7 +370,7 @@ class ParameterHandlerBase {
 
   /// @brief Get number of params which will be different depending if using Eigen decomposition or not
   /// @ingroup ParameterHandlerGetters
-  inline int GetNParameters() {
+  inline int GetNParameters() const {
     if (pca) return _fNumParPCA;
     else return _fNumPar;
   }
@@ -419,7 +419,7 @@ class ParameterHandlerBase {
   void ConstructPCA();
 
   /// @brief is PCA, can use to query e.g. LLH scans
-  inline bool IsPCA() { return pca; }
+  inline bool IsPCA() const { return pca; }
 
   /// @brief KS: Custom function to perform multiplication of matrix and vector with multithreading
   /// @param VecMulti Output Vector, VecMulti = matrix x vector
@@ -440,7 +440,7 @@ class ParameterHandlerBase {
 
   // HH: Getter for use_adaptive
   /// @brief Get bool for whether we are using adaptive MCMC
-  inline bool getUseAdaptive() { return use_adaptive; }
+  inline bool getUseAdaptive() const { return use_adaptive; }
 
 
 protected:
