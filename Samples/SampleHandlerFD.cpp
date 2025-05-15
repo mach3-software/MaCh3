@@ -764,7 +764,7 @@ M3::float_t SampleHandlerFD::CalcWeightSpline(const int iEvent) const {
 }
 
 // ***************************************************************************
-// Calculate the normalisation weight for on event
+// Calculate the normalisation weight for an event
 M3::float_t SampleHandlerFD::CalcWeightNorm(const int iEvent) const {
 // ***************************************************************************
   M3::float_t xsecw = 1.0;
