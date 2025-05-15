@@ -5,7 +5,7 @@
 ParameterHandlerBase::ParameterHandlerBase(std::string name, std::string file, double threshold, int FirstPCA, int LastPCA) : inputFile(file), pca(false),
 eigen_threshold(threshold), FirstPCAdpar(FirstPCA), LastPCAdpar(LastPCA) {
 // ********************************************
-  MACH3LOG_INFO("Constructing instance of covarianceBase");
+  MACH3LOG_DEBUG("Constructing instance of ParameterHandler");
   if (threshold < 0 || threshold >= 1) {
     MACH3LOG_INFO("NOTE: {} {}", name, file);
     MACH3LOG_INFO("Principal component analysis but given the threshold for the principal components to be less than 0, or greater than (or equal to) 1. This will not work");
@@ -22,7 +22,7 @@ eigen_threshold(threshold), FirstPCAdpar(FirstPCA), LastPCAdpar(LastPCA) {
 // ********************************************
 ParameterHandlerBase::ParameterHandlerBase(const std::vector<std::string>& YAMLFile, std::string name, double threshold, int FirstPCA, int LastPCA) : inputFile(YAMLFile[0].c_str()), matrixName(name), pca(true), eigen_threshold(threshold), FirstPCAdpar(FirstPCA), LastPCAdpar(LastPCA) {
 // ********************************************
-  MACH3LOG_INFO("Constructing instance of covarianceBase using ");
+  MACH3LOG_INFO("Constructing instance of ParameterHandler using");
   for(unsigned int i = 0; i < YAMLFile.size(); i++)
   {
     MACH3LOG_INFO("{}", YAMLFile[i]);
@@ -144,7 +144,6 @@ void ParameterHandlerBase::Init(std::string name, std::string file) {
 // ********************************************
 // ETA An init function for the YAML constructor
 // All you really need from the YAML file is the number of Systematics
-// Then get all the info from the YAML file in the covarianceXsec::ParseYAML function
 void ParameterHandlerBase::Init(const std::vector<std::string>& YAMLFile) {
 // ********************************************
   _fYAMLDoc["Systematics"] = YAML::Node(YAML::NodeType::Sequence);
@@ -268,7 +267,7 @@ void ParameterHandlerBase::Init(const std::vector<std::string>& YAMLFile) {
   SetCovMatrix(_fCovMatrix);
 
   if (_fNumPar <= 0) {
-    MACH3LOG_ERROR("Covariance object has {} systematics!", _fNumPar);
+    MACH3LOG_ERROR("ParameterHandler object has {} systematics!", _fNumPar);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   _fNumParPCA = _fNumPar;
@@ -287,7 +286,7 @@ void ParameterHandlerBase::Init(const std::vector<std::string>& YAMLFile) {
 void ParameterHandlerBase::SetCovMatrix(TMatrixDSym *cov) {
 // ********************************************
   if (cov == nullptr) {
-    MACH3LOG_ERROR("Could not find covariance matrix you provided to setCovMatrix");
+    MACH3LOG_ERROR("Could not find covariance matrix you provided to {}", __func__ );
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   covMatrix = cov;
@@ -426,8 +425,8 @@ void ParameterHandlerBase::RandomConfiguration() {
 // *************************************
   // Have the 1 sigma for each parameter in each covariance class, sweet!
   // Don't want to change the prior array because that's what determines our likelihood
-  // Want to change the fParProp, fParCurr, fParInit
-  // fParInit and the others will already be set
+  // Want to change the _fPropVal, _fCurrVal, _fPreFitValue
+  // _fPreFitValue and the others will already be set
   for (int i = 0; i < _fNumPar; ++i) {
     // Check if parameter is fixed first: if so don't randomly throw
     if (IsParameterFixed(i)) continue;
@@ -440,7 +439,6 @@ void ParameterHandlerBase::RandomConfiguration() {
 
     _fPropVal[i] = _fPreFitValue[i] + random_number[0]->Gaus(0, 1)*throwrange;
     // Try again if we the initial parameter proposal falls outside of the range of the parameter
-    // Really only relevant for the xsec parameters; the flux and ND280 have -999 and 999 set to the limits!
     int throws = 0;
     while (_fPropVal[i] > _fUpBound[i] || _fPropVal[i] < _fLowBound[i]) {
       if (throws > 1000) {
@@ -625,7 +623,7 @@ void ParameterHandlerBase::ThrowParCurr(const double mag) {
 // Function to print the prior values
 void ParameterHandlerBase::PrintNominal() const {
 // ********************************************
-  MACH3LOG_INFO("Prior values for {} covarianceBase:", GetName());
+  MACH3LOG_INFO("Prior values for {} ParameterHandler:", GetName());
   for (int i = 0; i < _fNumPar; i++) {
     MACH3LOG_INFO("    {}   {} ", GetParFancyName(i), GetParInit(i));
   }
@@ -698,7 +696,6 @@ int ParameterHandlerBase::CheckBounds() const _noexcept_ {
 // ********************************************
 double ParameterHandlerBase::GetLikelihood() {
 // ********************************************
-  // Checkbounds and calclikelihood are virtual
   // Default behaviour is to reject negative values + do std llh calculation
   const int NOutside = CheckBounds();
   
@@ -720,14 +717,14 @@ void ParameterHandlerBase::SetParameters(const std::vector<double>& pars) {
     // If not empty, set the parameters to the specified
   } else {
     if (pars.size() != size_t(_fNumPar)) {
-      MACH3LOG_ERROR("Warning: parameter arrays of incompatible size! Not changing parameters! {} has size {} but was expecting {}", matrixName, pars.size(), _fNumPar);
+      MACH3LOG_ERROR("Parameter arrays of incompatible size! Not changing parameters! {} has size {} but was expecting {}", matrixName, pars.size(), _fNumPar);
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
     int parsSize = int(pars.size());
     for (int i = 0; i < parsSize; i++) {
       //Make sure that you are actually passing a number to set the parameter to
       if(std::isnan(pars[i])) {
-        MACH3LOG_ERROR("Error: trying to set parameter value to a nan for parameter {} in matrix {}. This will not go well!", GetParName(i), matrixName);
+        MACH3LOG_ERROR("Trying to set parameter value to a nan for parameter {} in matrix {}. This will not go well!", GetParName(i), matrixName);
         throw MaCh3Exception(__FILE__ , __LINE__ );
       } else {
         _fPropVal[i] = pars[i];
@@ -802,7 +799,7 @@ void ParameterHandlerBase::ToggleFixParameter(const int i) {
 // ********************************************
   if(!pca) {
     if (i > _fNumPar) {
-      MACH3LOG_ERROR("Can't toggleFixParameter for parameter {} because size of covariance ={}", i, _fNumPar);
+      MACH3LOG_ERROR("Can't {} for parameter {} because size of covariance ={}", __func__, i, _fNumPar);
       MACH3LOG_ERROR("Fix this in your config file please!");
       throw MaCh3Exception(__FILE__ , __LINE__ );
     } else {
@@ -852,7 +849,7 @@ bool ParameterHandlerBase::IsParameterFixed(const std::string& name) const {
 void ParameterHandlerBase::SetFlatPrior(const int i, const bool eL) {
 // ********************************************
   if (i > _fNumPar) {
-    MACH3LOG_INFO("Can't setEvalLikelihood for Cov={}/Param={} because size of Covariance = {}", GetName(), i, _fNumPar);
+    MACH3LOG_INFO("Can't {} for Cov={}/Param={} because size of Covariance = {}", __func__, GetName(), i, _fNumPar);
     MACH3LOG_ERROR("Fix this in your config file please!");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   } else {
@@ -992,7 +989,7 @@ void ParameterHandlerBase::ResetIndivStepScale() {
 void ParameterHandlerBase::SetThrowMatrix(TMatrixDSym *cov){
 // ********************************************
    if (cov == nullptr) {
-    MACH3LOG_ERROR("Could not find covariance matrix you provided to setThrowMatrix");
+    MACH3LOG_ERROR("Could not find covariance matrix you provided to {}", __func__);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
@@ -1216,6 +1213,7 @@ void ParameterHandlerBase::SaveUpdatedMatrixConfig() {
   fout.close();
 }
 
+// ********************************************
 bool ParameterHandlerBase::AppliesToSample(const int SystIndex, const std::string& SampleName) const {
 // ********************************************
   // Empty means apply to all

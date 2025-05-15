@@ -108,7 +108,6 @@ void InputManager::print(const std::string &printLevel) const {
 
 double InputManager::getPostFitError(int fileNum, const std::string &paramName,
                                           std::string errorType) const {
-
   const InputFile &inputFileDef = getFile(fileNum);
 
   // set default type if not specified
@@ -137,7 +136,6 @@ double InputManager::getPostFitError(int fileNum, const std::string &paramName,
 
 double InputManager::getPostFitValue(int fileNum, const std::string &paramName,
                                           std::string errorType) const {
-  
   const InputFile &inputFileDef = getFile(fileNum);
 
   // set default type if not specified
@@ -172,7 +170,6 @@ double InputManager::getPostFitValue(int fileNum, const std::string &paramName,
 std::vector<std::string> InputManager::getTaggedValues(const std::vector<std::string> &values, 
                                                        const std::unordered_map<std::string, std::vector<std::string>> &tagMap, 
                                                        const std::vector<std::string> &tags, std::string checkType) const {
-                                                          
   // check that checkType is valid
   if(
     checkType != "all" &&
@@ -232,7 +229,6 @@ std::vector<std::string> InputManager::getTaggedValues(const std::vector<std::st
 std::vector<std::string> InputManager::parseLocation(const std::string &rawLocationString, std::string &fitter,
                                                      fileTypeEnum fileType, const std::string &parameter,
                                                      const std::string &sample, const std::string &parameter2) const {
-
   std::string locationString(rawLocationString);
   std::vector<std::string> tokens;
 
@@ -290,7 +286,6 @@ std::vector<std::string> InputManager::parseLocation(const std::string &rawLocat
 
 std::shared_ptr<TObject> InputManager::findRootObject(const InputFile &fileDef,
                                       const std::vector<std::string> &locationVec) const {
-
   std::shared_ptr<TObject> object = nullptr;
 
   // if vector only has one element, just interpret it as the absolute path to the object
@@ -401,7 +396,6 @@ bool InputManager::findRawChainSteps(InputFile &inputFileDef, const std::string 
   // make sure that the filedef object has all the necessary stuff to read from the posterior tree
   if ( (inputFileDef.mcmcProc != nullptr) && (inputFileDef.posteriorTree != nullptr) )
   {
-
     const std::vector<TString> branchNames = inputFileDef.mcmcProc->GetBranchNames();
 
     std::string specificName = getFitterSpecificParamName(fitter, kMCMC, parameter);
@@ -539,7 +533,6 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
     // check for all 3 LLH directory types
     for (std::string LLHType : {"sample", "penalty", "total"})
     {
-
       if (printThoughts)
         MACH3LOG_INFO(".... searching for {} LLH scans... ", LLHType);
 
