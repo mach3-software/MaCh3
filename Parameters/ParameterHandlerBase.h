@@ -264,7 +264,7 @@ class ParameterHandlerBase {
   /// @brief Return generated value, although is virtual so class inheriting might actual get prior not generated.
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
-  virtual double GetNominal(const int i) const { return GetParInit(i); }
+  virtual double GetNominal(const int i) { return GetParInit(i); }
   /// @brief Return generated value for a given parameter
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
