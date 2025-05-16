@@ -62,7 +62,7 @@ class SampleHandlerBase
   virtual double GetLikelihood() = 0;
 
   /// @ingroup SampleHandlerGetters
-  virtual int GetNEvents(){throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");}
+  unsigned int GetNEvents(){return nEvents;}
   /// @ingroup SampleHandlerGetters
   virtual int GetNMCSamples(){ throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); }
   /// @ingroup SampleHandlerGetters
@@ -130,6 +130,9 @@ protected:
   M3::int_t nSamples;
   /// KS: number of dimension for this sample
   int nDims;
+
+  /// Number of MC events are there
+  unsigned int nEvents;
 
   /// Holds information about used Generator and MaCh3 modes
   MaCh3Modes* Modes;

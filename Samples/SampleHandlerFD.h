@@ -67,9 +67,7 @@ public:
   int GetNMCSamples() override {return nSamples;}
   /// @ingroup SampleHandlerGetters
   int GetNOscChannels() {return static_cast<int>(OscChannels.size());}
-  /// @ingroup SampleHandlerGetters
-  int GetNEvents() override { return MCSamples.nEvents; }
-  
+
   /// @ingroup SampleHandlerGetters
   std::string GetFlavourName(const int iChannel) {
     if (iChannel < 0 || iChannel > static_cast<int>(OscChannels.size())) {

@@ -183,15 +183,13 @@ void SampleHandlerFD::Initialise() {
   //Now initialise all the variables you will need
   Init();
 
+  nEvents = SetupExperimentMC();
 
-  int TotalMCEvents = SetupExperimentMC();
-  MCSamples.nEvents = TotalMCEvents;
-
-  InitialiseSingleFDMCObject(MCSamples.nEvents);
+  InitialiseSingleFDMCObject(GetNEvents());
   SetupFDMC();
 
   MACH3LOG_INFO("=============================================");
-  MACH3LOG_INFO("Total number of events is: {}", TotalMCEvents);
+  MACH3LOG_INFO("Total number of events is: {}", GetNEvents());
 
   if (OscParHandler) {
     MACH3LOG_INFO("Setting up NuOscillator..");
@@ -381,7 +379,7 @@ void SampleHandlerFD::FillArray() {
   
   PrepFunctionalParameters();
 
-  for (int iEvent=0;iEvent<MCSamples.nEvents;iEvent++) {
+  for (unsigned int iEvent=0;iEvent<GetNEvents();iEvent++) {
     ApplyShifts(iEvent);
 
     if (!IsEventSelected(iEvent)) {
@@ -509,7 +507,7 @@ void SampleHandlerFD::FillArray_MP()  {
     // We will hit <0.1 s/step eventually! :D
     
     #pragma omp for
-    for (int iEvent=0;iEvent<MCSamples.nEvents;iEvent++) {
+    for (unsigned int iEvent=0;iEvent<GetNEvents();iEvent++) {
       //ETA - generic functions to apply shifts to kinematic variables
       // Apply this before IsEventSelected is called.
       ApplyShifts(iEvent);
@@ -672,7 +670,7 @@ void SampleHandlerFD::SetupFunctionalParameters() {
   // which calls RegisterIndividualFuncPar to populate funcParsNamesMap, funcParsNamesVec, and funcParsFuncMap
   RegisterFunctionalParameters();
   funcParsMap.resize(funcParsNamesMap.size());
-  funcParsGrid.resize(MCSamples.nEvents);
+  funcParsGrid.resize(GetNEvents());
 
   // For every functional parameter in XsecCov that matches the name in funcParsNames, add it to the map
   for (FunctionalParameter & fp : funcParsVec) {
@@ -693,7 +691,7 @@ void SampleHandlerFD::SetupFunctionalParameters() {
 
   // Mostly the same as CalcXsecNormsBins
   // For each event, make a vector of pointers to the functional parameters
-  for (std::size_t iEvent = 0; iEvent < static_cast<std::size_t>(MCSamples.nEvents); ++iEvent) {
+  for (std::size_t iEvent = 0; iEvent < static_cast<std::size_t>(GetNEvents()); ++iEvent) {
     // Now loop over the functional parameters and get a vector of enums corresponding to the functional parameters
     for (std::vector<FunctionalParameter>::iterator it = funcParsVec.begin(); it != funcParsVec.end(); ++it) {
       // Check whether the interaction modes match
@@ -802,7 +800,7 @@ void SampleHandlerFD::SetupNormParameters() {
 
   //DB Attempt at reducing impact of SystematicHandlerGeneric::calcReweight()
   int counter;
-  for (int iEvent = 0; iEvent < MCSamples.nEvents; ++iEvent) {
+  for (unsigned int iEvent = 0; iEvent < GetNEvents(); ++iEvent) {
     counter = 0;
 
     MCSamples.nxsec_norm_pointers[iEvent] = int(MCSamples.xsec_norms_bins[iEvent].size());
@@ -828,7 +826,7 @@ void SampleHandlerFD::CalcNormsBins() {
   #ifdef DEBUG
   std::vector<int> VerboseCounter(norm_parameters.size(), 0);
   #endif
-  for(int iEvent = 0; iEvent < fdobj->nEvents; ++iEvent){
+  for(unsigned int iEvent = 0; iEvent < GetNEvents(); ++iEvent){
     std::vector< int > NormBins = {};
     if (ParHandler) {
       // Skip oscillated NC events
@@ -910,7 +908,7 @@ void SampleHandlerFD::CalcNormsBins() {
   MACH3LOG_DEBUG("┌──────────────────────────────────────────────────────────┐");
   for (std::size_t i = 0; i < norm_parameters.size(); ++i) {
     const auto& norm = norm_parameters[i];
-    double eventRatio = static_cast<double>(VerboseCounter[i]) / static_cast<double>(fdobj->nEvents);
+    double eventRatio = static_cast<double>(VerboseCounter[i]) / static_cast<double>(GetNEvents());
 
     MACH3LOG_DEBUG("│ Param {:<15}, affects {:<8} events ({:>6.2f}%) │",
                   ParHandler->GetParFancyName(norm.index), VerboseCounter[i], eventRatio);
@@ -1000,7 +998,7 @@ void SampleHandlerFD::Set1DBinning(size_t nbins, double low, double high)
 
 void SampleHandlerFD::FindNominalBinAndEdges1D() {
   //Set rw_pdf_bin and rw_upper_xbinedge and rw_lower_xbinedge for each skmc_base
-  for(int event_i = 0; event_i < MCSamples.nEvents; event_i++){
+  for(unsigned int event_i = 0; event_i < GetNEvents(); event_i++){
     //Set x_var and y_var values based on XVarStr and YVarStr
     MCSamples.x_var[event_i] = GetPointerToKinematicParameter(XVarStr, event_i);
     //Give y_var M3::_BAD_DOUBLE_ value for the 1D case since this won't be used
@@ -1096,7 +1094,7 @@ void SampleHandlerFD::Set2DBinning(size_t nbins1, double low1, double high1, siz
 void SampleHandlerFD::FindNominalBinAndEdges2D() {
 // ************************************************
   //Set rw_pdf_bin and rw_upper_xbinedge and rw_lower_xbinedge for each skmc_base
-  for(int event_i = 0 ; event_i < MCSamples.nEvents ; event_i++){
+  for(unsigned int event_i = 0 ; event_i < GetNEvents(); event_i++){
     //Set x_var and y_var values based on XVarStr and YVarStr
     MCSamples.x_var[event_i] = GetPointerToKinematicParameter(XVarStr, event_i);
     MCSamples.y_var[event_i] = GetPointerToKinematicParameter(YVarStr, event_i);
@@ -1104,9 +1102,9 @@ void SampleHandlerFD::FindNominalBinAndEdges2D() {
     //Global bin number
     int bin = _hPDF2D->FindBin(*(MCSamples.x_var[event_i]), *(MCSamples.y_var[event_i]));
 
-    int bin_x = -999;
-    int bin_y = -999;
-    int bin_z = -999;
+    int bin_x = M3::_BAD_INT_;
+    int bin_y = M3::_BAD_INT_;
+    int bin_z = M3::_BAD_INT_;
     _hPDF2D->GetBinXYZ(bin, bin_x, bin_y, bin_z);
     //erec is the x-axis so get GetXaxis then find the bin edges using the x bin number
 
@@ -1274,7 +1272,7 @@ void SampleHandlerFD::InitialiseNuOscillatorObjects() {
       std::vector<M3::float_t> EnergyArray;
       std::vector<M3::float_t> CosineZArray;
 
-      for (int iEvent = 0; iEvent< MCSamples.nEvents;iEvent++) {
+      for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
         // KS: This is bit weird but we basically loop over all events and push to vector only these which are part of a given OscChannel
         const int Channel = GetOscChannel(OscChannels, (*MCSamples.nupdgUnosc[iEvent]), (*MCSamples.nupdg[iEvent]));
         //DB Remove NC events from the arrays which are handed to the NuOscillator objects
@@ -1286,8 +1284,8 @@ void SampleHandlerFD::InitialiseNuOscillatorObjects() {
 
       //============================================================================
       //DB Atmospheric only part, can only happen if truecz has been initialised within the experiment specific code
-      if (MCSamples.rw_truecz.size() > 0 && int(MCSamples.rw_truecz.size()) == MCSamples.nEvents) {
-        for (int iEvent = 0; iEvent < MCSamples.nEvents;iEvent++) {
+      if (MCSamples.rw_truecz.size() > 0 && MCSamples.rw_truecz.size() == GetNEvents()) {
+        for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
           // KS: This is bit weird but we basically loop over all events and push to vector only these which are part of a given OscChannel
           const int Channel = GetOscChannel(OscChannels, (*MCSamples.nupdgUnosc[iEvent]), (*MCSamples.nupdg[iEvent]));
           //DB Remove NC events from the arrays which are handed to the NuOscillator objects
@@ -1303,7 +1301,7 @@ void SampleHandlerFD::InitialiseNuOscillatorObjects() {
 }
 
 void SampleHandlerFD::SetupNuOscillatorPointers() {
-  for (int iEvent=0;iEvent<MCSamples.nEvents;iEvent++) {
+  for (unsigned int iEvent=0;iEvent<GetNEvents();iEvent++) {
     MCSamples.osc_w_pointer[iEvent] = &M3::Unity;
     if (MCSamples.isNC[iEvent]) {
       if (*MCSamples.nupdg[iEvent] != *MCSamples.nupdgUnosc[iEvent]) {
@@ -1370,7 +1368,7 @@ M3::float_t SampleHandlerFD::GetEventWeight(const int iEntry) const {
 /// a vector for easy evaluation in the fillArray() function.
 void SampleHandlerFD::FillSplineBins() {
   //Now loop over events and get the spline bin for each event
-  for (int j = 0; j < MCSamples.nEvents; ++j) {
+  for (unsigned int j = 0; j < GetNEvents(); ++j) {
     const int OscIndex = GetOscChannel(OscChannels, (*MCSamples.nupdgUnosc[j]), (*MCSamples.nupdg[j]));
 
     std::vector< std::vector<int> > EventSplines;
@@ -1433,9 +1431,8 @@ double SampleHandlerFD::GetLikelihood() {
 void SampleHandlerFD::InitialiseSingleFDMCObject(const int nEvents_) {
   FarDetectorCoreInfo *fdobj = &MCSamples;
   
-  fdobj->nEvents = nEvents_;
+  nEvents = nEvents_;
   
-  int nEvents = fdobj->nEvents;
   fdobj->x_var.resize(nEvents, &M3::Unity_D);
   fdobj->y_var.resize(nEvents, &M3::Unity_D);
   fdobj->rw_etru.resize(nEvents, &M3::Unity_D);
@@ -1462,7 +1459,7 @@ void SampleHandlerFD::InitialiseSingleFDMCObject(const int nEvents_) {
   fdobj->Target.resize(nEvents, 0);
   fdobj->osc_w_pointer.resize(nEvents, &M3::Unity);
 
-  for(int iEvent = 0 ; iEvent < fdobj->nEvents ; ++iEvent){
+  for(unsigned int iEvent = 0 ; iEvent < GetNEvents(); ++iEvent){
     fdobj->isNC[iEvent] = false;
   }
 }
@@ -1526,7 +1523,7 @@ TH1* SampleHandlerFD::Get1DVarHist(const std::string& ProjectionVar_Str, const s
   }
 
   //DB Loop over all events
-  for (int iEvent = 0; iEvent < MCSamples.nEvents; iEvent++) {
+  for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
     if (IsEventSelected(iEvent)) {
       double Weight = GetEventWeight(iEvent);
       if (WeightStyle == 1) {
@@ -1581,7 +1578,7 @@ TH2* SampleHandlerFD::Get2DVarHist(const std::string& ProjectionVar_StrX, const 
   }
 
   //DB Loop over all events
-  for (int iEvent = 0; iEvent < MCSamples.nEvents; iEvent++) {
+  for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
     if (IsEventSelected(iEvent)) {
       double Weight = GetEventWeight(iEvent);
       if (WeightStyle == 1) {
@@ -1608,7 +1605,7 @@ int SampleHandlerFD::ReturnKinematicParameterFromString(const std::string& Kinem
   MACH3LOG_ERROR("Did not recognise Kinematic Parameter type: {}", KinematicParameterStr);
   throw MaCh3Exception(__FILE__, __LINE__);
 
-  return -999;
+  return M3::_BAD_INT_;
 }
 
 // ************************************************
