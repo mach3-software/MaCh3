@@ -191,7 +191,6 @@ void ParameterHandlerBase::Init(const std::vector<std::string>& YAMLFile) {
   {
     _fFancyNames[i] = Get<std::string>(param["Systematic"]["Names"]["FancyName"], __FILE__ , __LINE__);
     _fPreFitValue[i] = Get<double>(param["Systematic"]["ParameterValues"]["PreFitValue"], __FILE__ , __LINE__);
-    _fGenerated[i] = Get<double>(param["Systematic"]["ParameterValues"]["Generated"], __FILE__ , __LINE__);
     _fIndivStepScale[i] = Get<double>(param["Systematic"]["StepScale"]["MCMC"], __FILE__ , __LINE__);
     _fError[i] = Get<double>(param["Systematic"]["Error"], __FILE__ , __LINE__);
     _fSampleNames[i] = GetFromManager<std::vector<std::string>>(param["Systematic"]["SampleNames"], {}, __FILE__, __LINE__);
@@ -272,6 +271,8 @@ void ParameterHandlerBase::Init(const std::vector<std::string>& YAMLFile) {
   }
   _fNumParPCA = _fNumPar;
 
+  Tunes = std::make_unique<ParameterTunes>(_fYAMLDoc["Systematics"]);
+
   MACH3LOG_INFO("Created covariance matrix from files: ");
   for(const auto &file : YAMLFile){
     MACH3LOG_INFO("{} ", file);
@@ -309,7 +310,6 @@ void ParameterHandlerBase::ReserveMemory(const int SizeVec) {
 // ********************************************
   _fNames = std::vector<std::string>(SizeVec);
   _fFancyNames = std::vector<std::string>(SizeVec);
-  _fGenerated = std::vector<double>(SizeVec);
   _fPreFitValue = std::vector<double>(SizeVec);
   _fError = std::vector<double>(SizeVec);
   _fCurrVal = std::vector<double>(SizeVec);
@@ -326,7 +326,6 @@ void ParameterHandlerBase::ReserveMemory(const int SizeVec) {
 
   // Set the defaults to true
   for(int i = 0; i < SizeVec; i++) {
-    _fGenerated.at(i) = 1.;
     _fPreFitValue.at(i) = 1.;
     _fError.at(i) = 1.;
     _fCurrVal.at(i) = 0.;
@@ -1149,17 +1148,6 @@ void ParameterHandlerBase::MakeClosestPosDef(TMatrixDSym *cov) {
 }
 
 // ********************************************
-std::vector<double> ParameterHandlerBase::GetNominalArray() {
-// ********************************************
-  std::vector<double> prior(_fNumPar);
-  for (int i = 0; i < _fNumPar; ++i)
-  {
-    prior[i] = _fPreFitValue[i];
-  }
-  return prior;
-}
-
-// ********************************************
 // KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plotting
 TH2D* ParameterHandlerBase::GetCorrelationMatrix() {
 // ********************************************
@@ -1243,4 +1231,17 @@ bool ParameterHandlerBase::AppliesToSample(const int SystIndex, const std::strin
     }
   }
   return Applies;
+}
+
+// ********************************************
+// Set proposed parameter values vector to be base on tune values
+void ParameterHandlerBase::SetTune(const std::string& TuneName) {
+// ********************************************
+  if(Tunes == nullptr) {
+    MACH3LOG_ERROR("Tunes haven't been initialised, which are being loaded from YAML, have you used some deprecated constructor");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  auto Values = Tunes->GetTune(TuneName);
+
+  SetParameters(Values);
 }
