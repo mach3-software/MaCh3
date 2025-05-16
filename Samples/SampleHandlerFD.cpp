@@ -1294,6 +1294,11 @@ void SampleHandlerFD::InitialiseNuOscillatorObjects() {
     }
   }
   std::vector<const double*> OscParams = OscParHandler->GetOscParsFromSampleName(SampleName);
+  if (OscParams.empty()) {
+    MACH3LOG_ERROR("OscParams is empty for sample '{}'.", GetTitle());
+    MACH3LOG_ERROR("This likely indicates an error in your oscillation YAML configuration.");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
   Oscillator = std::make_shared<OscillationHandler>(NuOscillatorConfigFile, EqualBinningPerOscChannel, OscParams, static_cast<int>(OscChannels.size()));
 
   if (!EqualBinningPerOscChannel) {
