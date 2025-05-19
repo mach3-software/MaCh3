@@ -46,8 +46,6 @@ struct FarDetectorCoreInfo {
 
   ~FarDetectorCoreInfo(){if(isNC != nullptr) delete [] isNC;}
 
-  int nEvents; ///< how many MC events are there
-
   std::vector<int*> Target; ///< target the interaction was on
   std::vector<const int*> nupdg;
   std::vector<const int*> nupdgUnosc;

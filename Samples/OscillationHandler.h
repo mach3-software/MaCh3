@@ -30,6 +30,9 @@ class OscillationHandler
 
   /// @brief Setup binning, arrays correspond to events and their energy bins
   void SetOscillatorBinning(const int Channel, const std::vector<M3::float_t>& EnergyArray, const std::vector<M3::float_t>& CosineZArray);
+
+  /// @brief return size of oscillation parameter pointer vector
+  unsigned int GetOscParamsSize() const {return static_cast<unsigned int>(OscParams.size());};
  private:
   /// flag used to define whether all oscillation channels have a probability calculated using the same binning
   bool EqualBinningPerOscChannel;
