@@ -295,6 +295,9 @@ class ParameterHandlerBase {
   void Randomize() _noexcept_;
   /// @brief Use Cholesky throw matrix for better step proposal
   void CorrelateSteps() _noexcept_;
+  /// @brief Method to update adaptive MCMC
+  /// @cite haario2001adaptive
+  void UpdateAdaptiveCovariance();
 
   /// @brief Accepted this step
   void AcceptStep() _noexcept_;
@@ -383,10 +386,6 @@ protected:
   /// @param matrix_name name of matrix in file
   /// @param means_name name of means vec in file
   void SetThrowMatrixFromFile(const std::string& matrix_file_name, const std::string& matrix_name, const std::string& means_name);
-
-  /// @brief Method to update adaptive MCMC
-  /// @cite haario2001adaptive
-  void UpdateAdaptiveCovariance();
 
   /// @brief Check if parameter is affecting given sample name
   /// @param SystIndex number of parameter
