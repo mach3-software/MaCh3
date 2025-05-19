@@ -199,6 +199,13 @@ void SampleHandlerFD::Initialise() {
         MACH3LOG_ERROR("Trying to run shared NuOscillator without EqualBinningPerOscChannel, this will not work");
         throw MaCh3Exception(__FILE__, __LINE__);
       }
+      auto OscParams = OscParHandler->GetOscParsFromSampleName(SampleName);
+      if(OscParams.size() != Oscillator->GetOscParamsSize()){
+        MACH3LOG_ERROR("Sample {} with {} has {} osc params, while shared NuOsc has {} osc params", GetTitle(), GetSampleName(),
+                       OscParams.size(), Oscillator->GetOscParamsSize());
+        MACH3LOG_ERROR("This indicate misconfiguration in your Osc yaml");
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
     } else {
       InitialiseNuOscillatorObjects();
     }
