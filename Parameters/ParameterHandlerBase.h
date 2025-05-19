@@ -352,16 +352,14 @@ class ParameterHandlerBase {
   YAML::Node GetConfig() const { return _fYAMLDoc; }
 
   /// @brief Get pointer for AdaptiveHandler
-  inline adaptive_mcmc::AdaptiveMCMCHandler* getAdaptiveHandler() const  {
+  /// @ingroup ParameterHandlerGetters
+  inline adaptive_mcmc::AdaptiveMCMCHandler* GetAdaptiveHandler() const  {
     if (!use_adaptive) {
       MACH3LOG_ERROR("Am not running in Adaptive mode");
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
     return AdaptiveHandler.get();
   }
-
-  /// @brief Get bool for whether we are using adaptive MCMC
-  inline bool getUseAdaptive() const { return use_adaptive; }
 
   /// @brief Get pointer for PCAHandler
   inline PCAHandler* GetPCAHandler() const {
