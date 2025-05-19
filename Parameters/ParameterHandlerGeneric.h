@@ -95,16 +95,6 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @ingroup ParameterHandlerGetters
     const std::vector<SplineParameter> GetSplineParsFromSampleName(const std::string& SampleName) const;
 
-    /// @brief KS: For most covariances prior and fparInit (prior) are the same, however for Xsec those can be different
-    /// @ingroup ParameterHandlerGetters
-    std::vector<double> GetNominalArray() override
-    {
-      std::vector<double> prior(_fNumPar);
-      for (int i = 0; i < _fNumPar; i++) {
-        prior[i] = _fPreFitValue.at(i);
-      }
-      return prior;
-    }
     /// @brief Checks if parameter belongs to a given group
     /// @param i parameter index
     /// @param Group name of group, like Xsec or Flux
