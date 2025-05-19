@@ -95,7 +95,7 @@ void PSO::init(){
           ranges_min.push_back(-100.0);
           ranges_max.push_back(100.0);
           prior.push_back((*it)->GetParInit(i));
-          if((*it)->IsParameterFixedPCA(i)){
+          if((*it)->GetPCAHandler()->IsParameterFixedPCA(i)){
             fixed.push_back(1);
           }
           else{
@@ -494,8 +494,8 @@ void PSO::WriteOutput(){
           ParVals_PCA(i) = minimum[ParCounter];
           ErrorVals_PCA(i) = (uncertainties[ParCounter][0]+uncertainties[ParCounter][1])/2.0;
         }
-        ParVals = ((*it)->GetTransferMatrix())*ParVals_PCA;
-        ErrorVals = ((*it)->GetTransferMatrix())*ErrorVals_PCA;
+        ParVals = ((*it)->GetPCAHandler()->GetTransferMatrix())*ParVals_PCA;
+        ErrorVals = ((*it)->GetPCAHandler()->GetTransferMatrix())*ErrorVals_PCA;
 
         ParCounter = StartVal;
         //KS: Now after going from PCA to normal let';s save it
@@ -505,7 +505,7 @@ void PSO::WriteOutput(){
           (*PSOParError)(ParCounter) = std::fabs(ErrorVals(i));
           //int ParCounterMatrix = StartVal;
           //If fixed take prior
-          if((*it)->IsParameterFixedPCA(i))
+          if((*it)->GetPCAHandler()->IsParameterFixedPCA(i))
           {
             (*PSOParError)(ParCounter) = (*it)->GetDiagonalError(i);
           }

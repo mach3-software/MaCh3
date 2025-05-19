@@ -75,7 +75,7 @@ void ParameterHandlerBase::ConstructPCA() {
     }
   }
 
-  PCAObj->ConstructPCA(covMatrix, FirstPCAdpar, LastPCAdpar, eigen_threshold, _fNumParPCA, _fNumPar);
+  PCAObj->ConstructPCA(covMatrix, FirstPCAdpar, LastPCAdpar, eigen_threshold, _fNumPar);
   PCAObj->SetupPointers(&_fCurrVal, &_fPropVal);
   // Make a note that we have now done PCA
   pca = true;
@@ -130,7 +130,6 @@ void ParameterHandlerBase::Init(std::string name, std::string file) {
     MACH3LOG_CRITICAL("Covariance matrix {} has {} entries!", GetName(), _fNumPar);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-  _fNumParPCA = _fNumPar;
 
   ReserveMemory(_fNumPar);
 
@@ -270,7 +269,6 @@ void ParameterHandlerBase::Init(const std::vector<std::string>& YAMLFile) {
     MACH3LOG_ERROR("ParameterHandler object has {} systematics!", _fNumPar);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-  _fNumParPCA = _fNumPar;
 
   MACH3LOG_INFO("Created covariance matrix from files: ");
   for(const auto &file : YAMLFile){
@@ -512,10 +510,10 @@ void ParameterHandlerBase::Randomize() _noexcept_ {
     #endif
     for (int i = 0; i < _fNumPar; ++i)
     {
-      if (PCAObj->_fParSigmaPCA[i] > 0. && i < _fNumParPCA)
+      if (PCAObj->IsParameterFixedPCA(i) > 0. && i < PCAObj->GetNumberPCAedParameters())
       {
         randParams[i] = random_number[M3::GetThreadIndex()]->Gaus(0,1);
-      } else { // If parameter IS fixed or out od bounds
+      } else { // If parameter IS fixed or out of bounds
         randParams[i] = 0.0;
       }
     }
@@ -576,17 +574,7 @@ void ParameterHandlerBase::ThrowParProp(const double mag) {
         _fPropVal[i] = _fCurrVal[i] + corr_throw[i]*mag;
     }
   } else {
-    for (int i = 0; i < _fNumPar; i++) {
-      PCAObj->_fParPropPCA(i) = PCAObj->_fParCurrPCA(i)+mag*randParams[i];
-    }
-    // And update the fParCurr in the basis
-    // Then update the fParProp in the parameter basis using the transfer matrix, so likelihood is evaluated correctly
-    TVectorD proposed = PCAObj->TransferMat*PCAObj->_fParPropPCA;
-    for (int i = 0; i < _fNumPar; ++i) {
-      if (PCAObj->_fParSigmaPCA[i] > 0.) {
-        _fPropVal[i] = proposed(i);
-      }
-    }
+    PCAObj->ThrowParProp(mag, randParams);
   }
 }
 // ********************************************
@@ -606,17 +594,7 @@ void ParameterHandlerBase::ThrowParCurr(const double mag) {
       }
     }
   } else {
-    for (int i = 0; i < _fNumPar; i++) {
-      PCAObj->_fParPropPCA(i) = mag*randParams[i];
-    }
-    // And update the fParCurr in the basis
-    // Then update the fParProp in the parameter basis using the transfer matrix, so likelihood is evaluated correctly
-    TVectorD current = PCAObj->TransferMat*PCAObj->_fParCurrPCA;
-    for (int i = 0; i < _fNumPar; ++i) {
-      if (PCAObj->_fParSigmaPCA[i] > 0.) {
-        _fCurrVal[i] = current(i);
-      }
-    }
+    PCAObj->ThrowParCurr(mag, randParams);
   }
 }
 // ********************************************
@@ -636,10 +614,7 @@ void ParameterHandlerBase::PrintNominalCurrProp() const {
   MACH3LOG_INFO("Printing parameters for {}", GetName());
   // Dump out the PCA parameters too
   if (pca) {
-    MACH3LOG_INFO("PCA:");
-    for (int i = 0; i < _fNumParPCA; ++i) {
-      MACH3LOG_INFO("PCA {:<2} Current: {:<10.2f} Proposed: {:<10.2f}", i, PCAObj->_fParCurrPCA(i), PCAObj->_fParPropPCA(i));
-    }
+    PCAObj->Print();
   }
   MACH3LOG_INFO("{:<30} {:<10} {:<10} {:<10}", "Name", "Prior", "Current", "Proposed");
   for (int i = 0; i < _fNumPar; ++i) {
@@ -747,22 +722,13 @@ void ParameterHandlerBase::SetBranches(TTree &tree, bool SaveProposal) {
   }
   // When running PCA, also save PCA parameters
   if (pca) {
-    for (int i = 0; i < _fNumParPCA; ++i) {
-      tree.Branch(Form("%s_PCA", _fNames[i].c_str()), &PCAObj->_fParCurrPCA.GetMatrixArray()[i], Form("%s_PCA/D", _fNames[i].c_str()));
-    }
+    PCAObj->SetBranches(tree, SaveProposal, _fNames);
   }
-
   if(SaveProposal)
   {
     // loop over parameters and set a branch
     for (int i = 0; i < _fNumPar; ++i) {
       tree.Branch(Form("%s_Prop", _fNames[i].c_str()), &_fPropVal[i], Form("%s_Prop/D", _fNames[i].c_str()));
-    }
-    // When running PCA, also save PCA parameters
-    if (pca) {
-      for (int i = 0; i < _fNumParPCA; ++i) {
-        tree.Branch(Form("%s_PCA_Prop", _fNames[i].c_str()), &PCAObj->_fParPropPCA.GetMatrixArray()[i], Form("%s_PCA_Prop/D", _fNames[i].c_str()));
-      }
     }
   }
 }
@@ -790,7 +756,7 @@ void ParameterHandlerBase::ToggleFixAllParameters() {
   if(!pca) {
     for (int i = 0; i < _fNumPar; i++) _fError[i] *= -1.0;
   } else{
-     for (int i = 0; i < _fNumParPCA; i++) PCAObj->_fParSigmaPCA[i] *= -1.0;
+    PCAObj->ToggleFixAllParameters();
   }
 }
 
@@ -807,17 +773,7 @@ void ParameterHandlerBase::ToggleFixParameter(const int i) {
       MACH3LOG_INFO("Setting {}(parameter {}) to fixed at {}", GetParFancyName(i), i, _fCurrVal[i]);
     }
   } else {
-    int isDecom = -1;
-    for (int im = 0; im < _fNumParPCA; ++im) {
-      if(PCAObj->isDecomposedPCA[im] == i) {isDecom = im;}
-    }
-    if(isDecom < 0) {
-      MACH3LOG_ERROR("Parameter {} is PCA decomposed can't fix this", GetParName(i));
-      //throw MaCh3Exception(__FILE__ , __LINE__ );
-    } else {
-      PCAObj->_fParSigmaPCA[isDecom] *= -1.0;
-      MACH3LOG_INFO("Setting un-decomposed {}(parameter {}/{} in PCA base) to fixed at {}", GetParName(i), i, isDecom, _fCurrVal[i]);
-    }
+    PCAObj->ToggleFixParameter(i, _fNames);
   }
 }
 
