@@ -280,7 +280,6 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance() {
       (*adaptive_covariance)(j, i) = cov_updated;
     }
   }
-
 }
 
 // ********************************************
@@ -336,5 +335,3 @@ double AdaptiveMCMCHandler::CurrVal(const int par_index){
 }
 
 } //end adaptive_mcmc
-
-

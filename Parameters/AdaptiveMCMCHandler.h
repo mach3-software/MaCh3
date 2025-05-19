@@ -83,7 +83,6 @@ class AdaptiveMCMCHandler{
     if(!_fFixedPars){
       return false;
     }
-
     return ((*_fFixedPars)[ipar] < 0);
   }
 

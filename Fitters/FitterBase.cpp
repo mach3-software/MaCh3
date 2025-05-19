@@ -569,7 +569,7 @@ void FitterBase::RunLLHScan() {
       double upper;
       // Get the parameter priors and bounds
       double prior = cov->GetParInit(i);
-      if (IsPCA) prior = cov->GetParCurrPCA(i);
+      if (IsPCA) prior = cov->GetPCAHandler()->GetParCurrPCA(i);
 
       // Get the covariance matrix and do the +/- nSigma
       // Set lower and upper bounds relative the prior
@@ -577,9 +577,9 @@ void FitterBase::RunLLHScan() {
       upper = prior + nSigma*cov->GetDiagonalError(i);
       // If PCA, transform these parameter values to the PCA basis
       if (IsPCA) {
-        lower = prior - nSigma*std::sqrt((cov->GetEigenValues())(i));
-        upper = prior + nSigma*std::sqrt((cov->GetEigenValues())(i));
-        MACH3LOG_INFO("eval {} = {:.2f}", i, cov->GetEigenValues()(i));
+        lower = prior - nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(i));
+        upper = prior + nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(i));
+        MACH3LOG_INFO("eval {} = {:.2f}", i, cov->GetPCAHandler()->GetEigenValues()(i));
         MACH3LOG_INFO("prior {} = {:.2f}", i, prior);
         MACH3LOG_INFO("lower {} = {:.2f}", i, lower);
         MACH3LOG_INFO("upper {} = {:.2f}", i, upper);
@@ -659,7 +659,7 @@ void FitterBase::RunLLHScan() {
 
         // For PCA we have to do it differently
         if (IsPCA) {
-          cov->SetParPropPCA(i, hScan->GetBinCenter(j+1));
+          cov->GetPCAHandler()->SetParPropPCA(i, hScan->GetBinCenter(j+1));
         } else {
           // Set the parameter
           cov->SetParProp(i, hScan->GetBinCenter(j+1));
@@ -763,7 +763,7 @@ void FitterBase::RunLLHScan() {
 
       // Reset the parameters to their prior central values
       if (IsPCA) {
-        cov->SetParPropPCA(i, prior);
+        cov->GetPCAHandler()->SetParPropPCA(i, prior);
       } else {
         cov->SetParProp(i, prior);
       }
@@ -915,7 +915,7 @@ void FitterBase::Run2DLLHScan() {
 
       // Get the parameter priors and bounds
       double prior_x = cov->GetParInit(i);
-      if (IsPCA) prior_x = cov->GetParCurrPCA(i);
+      if (IsPCA) prior_x = cov->GetPCAHandler()->GetParCurrPCA(i);
 
       // Get the covariance matrix and do the +/- nSigma
       // Set lower and upper bounds relative the prior
@@ -923,9 +923,9 @@ void FitterBase::Run2DLLHScan() {
       double upper_x = prior_x + nSigma*cov->GetDiagonalError(i);
       // If PCA, transform these parameter values to the PCA basis
       if (IsPCA) {
-        lower_x = prior_x - nSigma*std::sqrt((cov->GetEigenValues())(i));
-        upper_x = prior_x + nSigma*std::sqrt((cov->GetEigenValues())(i));
-        MACH3LOG_INFO("eval {} = {:.2f}", i, cov->GetEigenValues()(i));
+        lower_x = prior_x - nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(i));
+        upper_x = prior_x + nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(i));
+        MACH3LOG_INFO("eval {} = {:.2f}", i, cov->GetPCAHandler()->GetEigenValues()(i));
         MACH3LOG_INFO("prior {} = {:.2f}", i, prior_x);
         MACH3LOG_INFO("lower {} = {:.2f}", i, lower_x);
         MACH3LOG_INFO("upper {} = {:.2f}", i, upper_x);
@@ -978,16 +978,16 @@ void FitterBase::Run2DLLHScan() {
 
         // Get the parameter priors and bounds
         double prior_y = cov->GetParInit(j);
-        if (IsPCA) prior_y = cov->GetParCurrPCA(j);
+        if (IsPCA) prior_y = cov->GetPCAHandler()->GetParCurrPCA(j);
 
         // Set lower and upper bounds relative the prior
         double lower_y = prior_y - nSigma*cov->GetDiagonalError(j);
         double upper_y = prior_y + nSigma*cov->GetDiagonalError(j);
         // If PCA, transform these parameter values to the PCA basis
         if (IsPCA) {
-          lower_y = prior_y - nSigma*std::sqrt((cov->GetEigenValues())(j));
-          upper_y = prior_y + nSigma*std::sqrt((cov->GetEigenValues())(j));
-          MACH3LOG_INFO("eval {} = {:.2f}", i, cov->GetEigenValues()(j));
+          lower_y = prior_y - nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(j));
+          upper_y = prior_y + nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(j));
+          MACH3LOG_INFO("eval {} = {:.2f}", i, cov->GetPCAHandler()->GetEigenValues()(j));
           MACH3LOG_INFO("prior {} = {:.2f}", i, prior_y);
           MACH3LOG_INFO("lower {} = {:.2f}", i, lower_y);
           MACH3LOG_INFO("upper {} = {:.2f}", i, upper_y);
@@ -1027,8 +1027,8 @@ void FitterBase::Run2DLLHScan() {
           {
             // For PCA we have to do it differently
             if (IsPCA) {
-              cov->SetParPropPCA(i, hScanSam->GetXaxis()->GetBinCenter(x+1));
-              cov->SetParPropPCA(j, hScanSam->GetYaxis()->GetBinCenter(y+1));
+              cov->GetPCAHandler()->SetParPropPCA(i, hScanSam->GetXaxis()->GetBinCenter(x+1));
+              cov->GetPCAHandler()->SetParPropPCA(j, hScanSam->GetYaxis()->GetBinCenter(y+1));
             } else {
               // Set the parameter
               cov->SetParProp(i, hScanSam->GetXaxis()->GetBinCenter(x+1));
@@ -1054,8 +1054,8 @@ void FitterBase::Run2DLLHScan() {
         hScanSam->Write();
         // Reset the parameters to their prior central values
         if (IsPCA) {
-          cov->SetParPropPCA(i, prior_x);
-          cov->SetParPropPCA(j, prior_y);
+          cov->GetPCAHandler()->SetParPropPCA(i, prior_x);
+          cov->GetPCAHandler()->SetParPropPCA(j, prior_y);
         } else {
           cov->SetParProp(i, prior_x);
           cov->SetParProp(j, prior_y);
