@@ -5,6 +5,7 @@
 #include "Parameters/ParameterHandlerUtils.h"
 #include "Parameters/AdaptiveMCMCHandler.h"
 #include "Parameters/PCAHandler.h"
+#include "Parameters/ParameterTunes.h"
 
 /// @brief Base class responsible for handling of systematic error parameters. Capable of using PCA or using adaptive throw matrix
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/02.-Implementation-of-Systematic).
@@ -237,15 +238,9 @@ class ParameterHandlerBase {
   /// @brief Get total number of parameters
   /// @ingroup ParameterHandlerGetters
   inline int  GetNumParams() const {return _fNumPar;}
-  /// @brief Get the prior array for parameters.
-  /// @ingroup ParameterHandlerGetters
-  virtual std::vector<double> GetNominalArray();
   /// @brief Get the pre-fit values of the parameters.
   /// @ingroup ParameterHandlerGetters
   std::vector<double> GetPreFitValues() const {return _fPreFitValue;}
-  /// @brief Get the generated values of the parameters.
-  /// @ingroup ParameterHandlerGetters
-  std::vector<double> GetGeneratedValues() const {return _fGenerated;}
   /// @brief Get vector of all proposed parameter values
   /// @ingroup ParameterHandlerGetters
   std::vector<double> GetProposed() const;
@@ -261,14 +256,6 @@ class ParameterHandlerBase {
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
   inline double GetParInit(const int i) const { return _fPreFitValue[i]; }
-  /// @brief Return generated value, although is virtual so class inheriting might actual get prior not generated.
-  /// @param i Parameter index
-  /// @ingroup ParameterHandlerGetters
-  virtual double GetNominal(const int i) { return GetParInit(i); }
-  /// @brief Return generated value for a given parameter
-  /// @param i Parameter index
-  /// @ingroup ParameterHandlerGetters
-  inline double GetGenerated(const int i) const { return _fGenerated[i];}
   /// @brief Get upper parameter bound in which it is physically valid
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
@@ -361,6 +348,10 @@ class ParameterHandlerBase {
     return AdaptiveHandler.get();
   }
 
+  /// @brief KS: Set proposed parameter values vector to be base on tune values, for example set proposed values to be of generated or maybe PostND
+  /// @ingroup ParameterHandlerSetters
+  void SetTune(const std::string& TuneName);
+  
   /// @brief Get pointer for PCAHandler
   inline PCAHandler* GetPCAHandler() const {
     if (!pca) {
@@ -441,8 +432,6 @@ protected:
   std::vector<double> _fCurrVal;
   /// Proposed value of the parameter
   std::vector<double> _fPropVal;
-  /// Generated value of the parameter
-  std::vector<double> _fGenerated;
   /// Prior error on the parameter
   std::vector<double> _fError;
   /// Lowest physical bound, parameter will not be able to go beyond it
@@ -479,4 +468,6 @@ protected:
   std::unique_ptr<PCAHandler> PCAObj;
   /// Struct containing information about adaption
   std::unique_ptr<adaptive_mcmc::AdaptiveMCMCHandler> AdaptiveHandler;
+  /// Struct containing information about adaption
+  std::unique_ptr<ParameterTunes> Tunes;
 };

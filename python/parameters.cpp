@@ -25,32 +25,13 @@ public:
             GetLikelihood     /* Name of function in C++ (must match Python name) */
         );
     }
-    
-    double GetNominal(int i) override {
-        PYBIND11_OVERRIDE_NAME(
-            double,          /* Return type */
-            ParameterHandlerBase,  /* Parent class */
-            "get_nominal",   /* Name in python*/
-            GetNominal,      /* Name of function in C++ (must match Python name) */
-            i                /* Arguments*/
-        );
-    }
-    
+
     void ProposeStep() override {
         PYBIND11_OVERRIDE_NAME(
             void,            /* Return type */
             ParameterHandlerBase,  /* Parent class */
             "propose_step",  /* Name in python*/
             ProposeStep      /* Name of function in C++ (must match Python name) */
-        );
-    }
-
-    std::vector<double> GetNominalArray() override {
-        PYBIND11_OVERRIDE_NAME(
-            std::vector<double>, /* Return type */
-            ParameterHandlerBase,      /* Parent class */
-            "get_nominal_array", /* Name in python*/
-            GetNominalArray      /* Name of function in C++ (must match Python name) */
         );
     }
 };
@@ -199,12 +180,6 @@ void initParameters(py::module &m){
             "Get the name of the spline associated with a spline parameter. This is generally what it is called in input spline files and can in principle be different to the parameters name. \n\
             :param index: The index of the spline parameter",
             py::arg("index")
-        )
-        
-        .def(
-            "get_nominal_par_values",
-            &ParameterHandlerGeneric::GetNominalArray,
-            "Get the nominal values of all the parameters as a list. "
         )
 
     ; // End of ParameterHandlerGeneric binding
