@@ -185,7 +185,7 @@ void SampleHandlerFD::Initialise() {
 
   nEvents = SetupExperimentMC();
 
-  InitialiseSingleFDMCObject(GetNEvents());
+  InitialiseSingleFDMCObject();
   SetupFDMC();
 
   MACH3LOG_INFO("=============================================");
@@ -1428,10 +1428,8 @@ double SampleHandlerFD::GetLikelihood() {
   return negLogL;
 }
 
-void SampleHandlerFD::InitialiseSingleFDMCObject(const int nEvents_) {
+void SampleHandlerFD::InitialiseSingleFDMCObject() {
   FarDetectorCoreInfo *fdobj = &MCSamples;
-  
-  nEvents = nEvents_;
   
   fdobj->x_var.resize(nEvents, &M3::Unity_D);
   fdobj->y_var.resize(nEvents, &M3::Unity_D);
