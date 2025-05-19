@@ -486,11 +486,11 @@ Protected Attributes</h2></td></tr>
 <div class="ttc" id="aYamlHelper_8h_html_a2d4f3247b6e13ef8c127ff66e699d3cb"><div class="ttname"><a href="YamlHelper_8h.html#a2d4f3247b6e13ef8c127ff66e699d3cb">YAMLtoTMacro</a></div><div class="ttdeci">TMacro YAMLtoTMacro(const YAML::Node &amp;yaml_node, const std::string &amp;name)</div><div class="ttdoc">Convert a YAML node to a ROOT TMacro object.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00161">YamlHelper.h:161</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_afeffc9d794c973a015aa12ec1a8f79da"><div class="ttname"><a href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">FitterBase::systematics</a></div><div class="ttdeci">std::vector&lt; ParameterHandlerBase * &gt; systematics</div><div class="ttdoc">Systematic holder.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00107">FitterBase.h:107</a></div></div>
 <div class="ttc" id="agroup__ParameterHandlerGetters_html_ga042501dd3e6e0395d48b5d94a60eb7c7"><div class="ttname"><a href="group__ParameterHandlerGetters.html#ga042501dd3e6e0395d48b5d94a60eb7c7">ParameterHandlerBase::GetNumParams</a></div><div class="ttdeci">int GetNumParams() const</div><div class="ttdoc">Get total number of parameters.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00239">ParameterHandlerBase.h:239</a></div></div>
-<div class="ttc" id="agroup__ParameterHandlerGetters_html_ga6745aac0b811863722e4030421adee92"><div class="ttname"><a href="group__ParameterHandlerGetters.html#ga6745aac0b811863722e4030421adee92">ParameterHandlerBase::GetCorrelationMatrix</a></div><div class="ttdeci">TH2D * GetCorrelationMatrix()</div><div class="ttdoc">KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plott...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l01164">ParameterHandlerBase.cpp:1164</a></div></div>
+<div class="ttc" id="agroup__ParameterHandlerGetters_html_ga6745aac0b811863722e4030421adee92"><div class="ttname"><a href="group__ParameterHandlerGetters.html#ga6745aac0b811863722e4030421adee92">ParameterHandlerBase::GetCorrelationMatrix</a></div><div class="ttdeci">TH2D * GetCorrelationMatrix()</div><div class="ttdoc">KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plott...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l01120">ParameterHandlerBase.cpp:1120</a></div></div>
 <div class="ttc" id="agroup__ParameterHandlerGetters_html_ga8d9eed78fef599679f50d3bd707e6eed"><div class="ttname"><a href="group__ParameterHandlerGetters.html#ga8d9eed78fef599679f50d3bd707e6eed">ParameterHandlerBase::GetCovMatrix</a></div><div class="ttdeci">TMatrixDSym * GetCovMatrix() const</div><div class="ttdoc">Return covariance matrix.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00136">ParameterHandlerBase.h:136</a></div></div>
 <div class="ttc" id="agroup__ParameterHandlerGetters_html_gab1ef5c9f3c3eb619752a073590f5fd53"><div class="ttname"><a href="group__ParameterHandlerGetters.html#gab1ef5c9f3c3eb619752a073590f5fd53">ParameterHandlerBase::GetName</a></div><div class="ttdeci">std::string GetName() const</div><div class="ttdoc">Get name of covariance.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00156">ParameterHandlerBase.h:156</a></div></div>
 <div class="ttc" id="agroup__ParameterHandlerGetters_html_gad1397b3bc7853bceefab290fdd0f0fa9"><div class="ttname"><a href="group__ParameterHandlerGetters.html#gad1397b3bc7853bceefab290fdd0f0fa9">ParameterHandlerBase::GetParInit</a></div><div class="ttdeci">double GetParInit(const int i) const</div><div class="ttdoc">Get prior parameter value.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00263">ParameterHandlerBase.h:263</a></div></div>
-<div class="ttc" id="agroup__ParameterHandlerGetters_html_gade58875564157c7c0aad0433498f955d"><div class="ttname"><a href="group__ParameterHandlerGetters.html#gade58875564157c7c0aad0433498f955d">ParameterHandlerBase::GetConfig</a></div><div class="ttdeci">YAML::Node GetConfig() const</div><div class="ttdoc">Getter to return a copy of the YAML node.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00435">ParameterHandlerBase.h:435</a></div></div>
+<div class="ttc" id="agroup__ParameterHandlerGetters_html_gade58875564157c7c0aad0433498f955d"><div class="ttname"><a href="group__ParameterHandlerGetters.html#gade58875564157c7c0aad0433498f955d">ParameterHandlerBase::GetConfig</a></div><div class="ttdeci">YAML::Node GetConfig() const</div><div class="ttdoc">Getter to return a copy of the YAML node.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00352">ParameterHandlerBase.h:352</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -935,7 +935,7 @@ Protected Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  918</span> </div>
 <div class="line"><span class="lineno">  919</span>      <span class="comment">// Get the parameter priors and bounds</span></div>
 <div class="line"><span class="lineno">  920</span>      <span class="keywordtype">double</span> prior_x = cov-&gt;GetParInit(i);</div>
-<div class="line"><span class="lineno">  921</span>      <span class="keywordflow">if</span> (IsPCA) prior_x = cov-&gt;GetParCurrPCA(i);</div>
+<div class="line"><span class="lineno">  921</span>      <span class="keywordflow">if</span> (IsPCA) prior_x = cov-&gt;GetPCAHandler()-&gt;GetParCurrPCA(i);</div>
 <div class="line"><span class="lineno">  922</span> </div>
 <div class="line"><span class="lineno">  923</span>      <span class="comment">// Get the covariance matrix and do the +/- nSigma</span></div>
 <div class="line"><span class="lineno">  924</span>      <span class="comment">// Set lower and upper bounds relative the prior</span></div>
@@ -943,9 +943,9 @@ Protected Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  926</span>      <span class="keywordtype">double</span> upper_x = prior_x + nSigma*cov-&gt;GetDiagonalError(i);</div>
 <div class="line"><span class="lineno">  927</span>      <span class="comment">// If PCA, transform these parameter values to the PCA basis</span></div>
 <div class="line"><span class="lineno">  928</span>      <span class="keywordflow">if</span> (IsPCA) {</div>
-<div class="line"><span class="lineno">  929</span>        lower_x = prior_x - nSigma*std::sqrt((cov-&gt;GetEigenValues())(i));</div>
-<div class="line"><span class="lineno">  930</span>        upper_x = prior_x + nSigma*std::sqrt((cov-&gt;GetEigenValues())(i));</div>
-<div class="line"><span class="lineno">  931</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;eval {} = {:.2f}&quot;</span>, i, cov-&gt;GetEigenValues()(i));</div>
+<div class="line"><span class="lineno">  929</span>        lower_x = prior_x - nSigma*std::sqrt((cov-&gt;GetPCAHandler()-&gt;GetEigenValues())(i));</div>
+<div class="line"><span class="lineno">  930</span>        upper_x = prior_x + nSigma*std::sqrt((cov-&gt;GetPCAHandler()-&gt;GetEigenValues())(i));</div>
+<div class="line"><span class="lineno">  931</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;eval {} = {:.2f}&quot;</span>, i, cov-&gt;GetPCAHandler()-&gt;GetEigenValues()(i));</div>
 <div class="line"><span class="lineno">  932</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;prior {} = {:.2f}&quot;</span>, i, prior_x);</div>
 <div class="line"><span class="lineno">  933</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;lower {} = {:.2f}&quot;</span>, i, lower_x);</div>
 <div class="line"><span class="lineno">  934</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;upper {} = {:.2f}&quot;</span>, i, upper_x);</div>
@@ -998,16 +998,16 @@ Protected Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  981</span> </div>
 <div class="line"><span class="lineno">  982</span>        <span class="comment">// Get the parameter priors and bounds</span></div>
 <div class="line"><span class="lineno">  983</span>        <span class="keywordtype">double</span> prior_y = cov-&gt;GetParInit(j);</div>
-<div class="line"><span class="lineno">  984</span>        <span class="keywordflow">if</span> (IsPCA) prior_y = cov-&gt;GetParCurrPCA(j);</div>
+<div class="line"><span class="lineno">  984</span>        <span class="keywordflow">if</span> (IsPCA) prior_y = cov-&gt;GetPCAHandler()-&gt;GetParCurrPCA(j);</div>
 <div class="line"><span class="lineno">  985</span> </div>
 <div class="line"><span class="lineno">  986</span>        <span class="comment">// Set lower and upper bounds relative the prior</span></div>
 <div class="line"><span class="lineno">  987</span>        <span class="keywordtype">double</span> lower_y = prior_y - nSigma*cov-&gt;GetDiagonalError(j);</div>
 <div class="line"><span class="lineno">  988</span>        <span class="keywordtype">double</span> upper_y = prior_y + nSigma*cov-&gt;GetDiagonalError(j);</div>
 <div class="line"><span class="lineno">  989</span>        <span class="comment">// If PCA, transform these parameter values to the PCA basis</span></div>
 <div class="line"><span class="lineno">  990</span>        <span class="keywordflow">if</span> (IsPCA) {</div>
-<div class="line"><span class="lineno">  991</span>          lower_y = prior_y - nSigma*std::sqrt((cov-&gt;GetEigenValues())(j));</div>
-<div class="line"><span class="lineno">  992</span>          upper_y = prior_y + nSigma*std::sqrt((cov-&gt;GetEigenValues())(j));</div>
-<div class="line"><span class="lineno">  993</span>          <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;eval {} = {:.2f}&quot;</span>, i, cov-&gt;GetEigenValues()(j));</div>
+<div class="line"><span class="lineno">  991</span>          lower_y = prior_y - nSigma*std::sqrt((cov-&gt;GetPCAHandler()-&gt;GetEigenValues())(j));</div>
+<div class="line"><span class="lineno">  992</span>          upper_y = prior_y + nSigma*std::sqrt((cov-&gt;GetPCAHandler()-&gt;GetEigenValues())(j));</div>
+<div class="line"><span class="lineno">  993</span>          <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;eval {} = {:.2f}&quot;</span>, i, cov-&gt;GetPCAHandler()-&gt;GetEigenValues()(j));</div>
 <div class="line"><span class="lineno">  994</span>          <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;prior {} = {:.2f}&quot;</span>, i, prior_y);</div>
 <div class="line"><span class="lineno">  995</span>          <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;lower {} = {:.2f}&quot;</span>, i, lower_y);</div>
 <div class="line"><span class="lineno">  996</span>          <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;upper {} = {:.2f}&quot;</span>, i, upper_y);</div>
@@ -1047,8 +1047,8 @@ Protected Attributes</h2></td></tr>
 <div class="line"><span class="lineno"> 1030</span>          {</div>
 <div class="line"><span class="lineno"> 1031</span>            <span class="comment">// For PCA we have to do it differently</span></div>
 <div class="line"><span class="lineno"> 1032</span>            <span class="keywordflow">if</span> (IsPCA) {</div>
-<div class="line"><span class="lineno"> 1033</span>              cov-&gt;SetParPropPCA(i, hScanSam-&gt;GetXaxis()-&gt;GetBinCenter(x+1));</div>
-<div class="line"><span class="lineno"> 1034</span>              cov-&gt;SetParPropPCA(j, hScanSam-&gt;GetYaxis()-&gt;GetBinCenter(y+1));</div>
+<div class="line"><span class="lineno"> 1033</span>              cov-&gt;GetPCAHandler()-&gt;SetParPropPCA(i, hScanSam-&gt;GetXaxis()-&gt;GetBinCenter(x+1));</div>
+<div class="line"><span class="lineno"> 1034</span>              cov-&gt;GetPCAHandler()-&gt;SetParPropPCA(j, hScanSam-&gt;GetYaxis()-&gt;GetBinCenter(y+1));</div>
 <div class="line"><span class="lineno"> 1035</span>            } <span class="keywordflow">else</span> {</div>
 <div class="line"><span class="lineno"> 1036</span>              <span class="comment">// Set the parameter</span></div>
 <div class="line"><span class="lineno"> 1037</span>              cov-&gt;SetParProp(i, hScanSam-&gt;GetXaxis()-&gt;GetBinCenter(x+1));</div>
@@ -1074,8 +1074,8 @@ Protected Attributes</h2></td></tr>
 <div class="line"><span class="lineno"> 1057</span>        hScanSam-&gt;Write();</div>
 <div class="line"><span class="lineno"> 1058</span>        <span class="comment">// Reset the parameters to their prior central values</span></div>
 <div class="line"><span class="lineno"> 1059</span>        <span class="keywordflow">if</span> (IsPCA) {</div>
-<div class="line"><span class="lineno"> 1060</span>          cov-&gt;SetParPropPCA(i, prior_x);</div>
-<div class="line"><span class="lineno"> 1061</span>          cov-&gt;SetParPropPCA(j, prior_y);</div>
+<div class="line"><span class="lineno"> 1060</span>          cov-&gt;GetPCAHandler()-&gt;SetParPropPCA(i, prior_x);</div>
+<div class="line"><span class="lineno"> 1061</span>          cov-&gt;GetPCAHandler()-&gt;SetParPropPCA(j, prior_y);</div>
 <div class="line"><span class="lineno"> 1062</span>        } <span class="keywordflow">else</span> {</div>
 <div class="line"><span class="lineno"> 1063</span>          cov-&gt;SetParProp(i, prior_x);</div>
 <div class="line"><span class="lineno"> 1064</span>          cov-&gt;SetParProp(j, prior_y);</div>
@@ -1218,7 +1218,7 @@ Protected Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  572</span>      <span class="keywordtype">double</span> upper;</div>
 <div class="line"><span class="lineno">  573</span>      <span class="comment">// Get the parameter priors and bounds</span></div>
 <div class="line"><span class="lineno">  574</span>      <span class="keywordtype">double</span> prior = cov-&gt;GetParInit(i);</div>
-<div class="line"><span class="lineno">  575</span>      <span class="keywordflow">if</span> (IsPCA) prior = cov-&gt;GetParCurrPCA(i);</div>
+<div class="line"><span class="lineno">  575</span>      <span class="keywordflow">if</span> (IsPCA) prior = cov-&gt;GetPCAHandler()-&gt;GetParCurrPCA(i);</div>
 <div class="line"><span class="lineno">  576</span> </div>
 <div class="line"><span class="lineno">  577</span>      <span class="comment">// Get the covariance matrix and do the +/- nSigma</span></div>
 <div class="line"><span class="lineno">  578</span>      <span class="comment">// Set lower and upper bounds relative the prior</span></div>
@@ -1226,9 +1226,9 @@ Protected Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  580</span>      upper = prior + nSigma*cov-&gt;GetDiagonalError(i);</div>
 <div class="line"><span class="lineno">  581</span>      <span class="comment">// If PCA, transform these parameter values to the PCA basis</span></div>
 <div class="line"><span class="lineno">  582</span>      <span class="keywordflow">if</span> (IsPCA) {</div>
-<div class="line"><span class="lineno">  583</span>        lower = prior - nSigma*std::sqrt((cov-&gt;GetEigenValues())(i));</div>
-<div class="line"><span class="lineno">  584</span>        upper = prior + nSigma*std::sqrt((cov-&gt;GetEigenValues())(i));</div>
-<div class="line"><span class="lineno">  585</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;eval {} = {:.2f}&quot;</span>, i, cov-&gt;GetEigenValues()(i));</div>
+<div class="line"><span class="lineno">  583</span>        lower = prior - nSigma*std::sqrt((cov-&gt;GetPCAHandler()-&gt;GetEigenValues())(i));</div>
+<div class="line"><span class="lineno">  584</span>        upper = prior + nSigma*std::sqrt((cov-&gt;GetPCAHandler()-&gt;GetEigenValues())(i));</div>
+<div class="line"><span class="lineno">  585</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;eval {} = {:.2f}&quot;</span>, i, cov-&gt;GetPCAHandler()-&gt;GetEigenValues()(i));</div>
 <div class="line"><span class="lineno">  586</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;prior {} = {:.2f}&quot;</span>, i, prior);</div>
 <div class="line"><span class="lineno">  587</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;lower {} = {:.2f}&quot;</span>, i, lower);</div>
 <div class="line"><span class="lineno">  588</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;upper {} = {:.2f}&quot;</span>, i, upper);</div>
@@ -1308,7 +1308,7 @@ Protected Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  662</span> </div>
 <div class="line"><span class="lineno">  663</span>        <span class="comment">// For PCA we have to do it differently</span></div>
 <div class="line"><span class="lineno">  664</span>        <span class="keywordflow">if</span> (IsPCA) {</div>
-<div class="line"><span class="lineno">  665</span>          cov-&gt;SetParPropPCA(i, hScan-&gt;GetBinCenter(j+1));</div>
+<div class="line"><span class="lineno">  665</span>          cov-&gt;GetPCAHandler()-&gt;SetParPropPCA(i, hScan-&gt;GetBinCenter(j+1));</div>
 <div class="line"><span class="lineno">  666</span>        } <span class="keywordflow">else</span> {</div>
 <div class="line"><span class="lineno">  667</span>          <span class="comment">// Set the parameter</span></div>
 <div class="line"><span class="lineno">  668</span>          cov-&gt;SetParProp(i, hScan-&gt;GetBinCenter(j+1));</div>
@@ -1412,7 +1412,7 @@ Protected Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  766</span> </div>
 <div class="line"><span class="lineno">  767</span>      <span class="comment">// Reset the parameters to their prior central values</span></div>
 <div class="line"><span class="lineno">  768</span>      <span class="keywordflow">if</span> (IsPCA) {</div>
-<div class="line"><span class="lineno">  769</span>        cov-&gt;SetParPropPCA(i, prior);</div>
+<div class="line"><span class="lineno">  769</span>        cov-&gt;GetPCAHandler()-&gt;SetParPropPCA(i, prior);</div>
 <div class="line"><span class="lineno">  770</span>      } <span class="keywordflow">else</span> {</div>
 <div class="line"><span class="lineno">  771</span>        cov-&gt;SetParProp(i, prior);</div>
 <div class="line"><span class="lineno">  772</span>      }</div>

@@ -424,7 +424,7 @@ Protected Attributes</h2></td></tr>
 <div class="line"><span class="lineno">   88</span>        <span class="comment">//KS: Basically apply mirroring for parameters out of bounds</span></div>
 <div class="line"><span class="lineno">   89</span>        pars[i] = ParVal;</div>
 <div class="line"><span class="lineno">   90</span>      }</div>
-<div class="line"><span class="lineno">   91</span>      (*it)-&gt;SetParametersPCA(pars);</div>
+<div class="line"><span class="lineno">   91</span>      (*it)-&gt;GetPCAHandler()-&gt;SetParametersPCA(pars);</div>
 <div class="line"><span class="lineno">   92</span>    }</div>
 <div class="line"><span class="lineno">   93</span>    (*it)-&gt;AcceptStep();</div>
 <div class="line"><span class="lineno">   94</span>  }</div>

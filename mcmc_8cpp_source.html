@@ -206,8 +206,8 @@ $(function() {
 <div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span> </div>
 <div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>  <span class="comment">//Save the Adaptive output</span></div>
 <div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span>&amp; syst : <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>){</div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>    <span class="keywordflow">if</span>(syst-&gt;getUseAdaptive()){</div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>      syst-&gt;getAdaptiveHandler()-&gt;SaveAdaptiveToFile(syst-&gt;getAdaptiveHandler()-&gt;output_file_name, syst-&gt;GetName(), <span class="keyword">true</span>);</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>    <span class="keywordflow">if</span>(syst-&gt;GetDoAdaption()){</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>      syst-&gt;GetAdaptiveHandler()-&gt;SaveAdaptiveToFile(syst-&gt;GetAdaptiveHandler()-&gt;output_file_name, syst-&gt;GetName(), <span class="keyword">true</span>);</div>
 <div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>    }</div>
 <div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>  }</div>
 <div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span> </div>

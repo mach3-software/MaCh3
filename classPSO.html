@@ -937,7 +937,7 @@ Mark Scott </dd></dl>
 <div class="line"><span class="lineno">   95</span>          <a class="code hl_variable" href="classPSO.html#ad9824964649e96ac13d89d47bd5a5174">ranges_min</a>.push_back(-100.0);</div>
 <div class="line"><span class="lineno">   96</span>          <a class="code hl_variable" href="classPSO.html#a1c5454d8b4000375138447cada8a46a2">ranges_max</a>.push_back(100.0);</div>
 <div class="line"><span class="lineno">   97</span>          <a class="code hl_variable" href="classPSO.html#afac1699007d3838da90d466bf4b69b31">prior</a>.push_back((*it)-&gt;GetParInit(i));</div>
-<div class="line"><span class="lineno">   98</span>          <span class="keywordflow">if</span>((*it)-&gt;IsParameterFixedPCA(i)){</div>
+<div class="line"><span class="lineno">   98</span>          <span class="keywordflow">if</span>((*it)-&gt;GetPCAHandler()-&gt;IsParameterFixedPCA(i)){</div>
 <div class="line"><span class="lineno">   99</span>            <a class="code hl_variable" href="classPSO.html#a90cf855167748b488851c559de49283c">fixed</a>.push_back(1);</div>
 <div class="line"><span class="lineno">  100</span>          }</div>
 <div class="line"><span class="lineno">  101</span>          <span class="keywordflow">else</span>{</div>
@@ -1599,8 +1599,8 @@ Mark Scott </dd></dl>
 <div class="line"><span class="lineno">  494</span>          ParVals_PCA(i) = minimum[ParCounter];</div>
 <div class="line"><span class="lineno">  495</span>          ErrorVals_PCA(i) = (<a class="code hl_variable" href="classPSO.html#ad525975ef87127a49f78484366f264df">uncertainties</a>[ParCounter][0]+<a class="code hl_variable" href="classPSO.html#ad525975ef87127a49f78484366f264df">uncertainties</a>[ParCounter][1])/2.0;</div>
 <div class="line"><span class="lineno">  496</span>        }</div>
-<div class="line"><span class="lineno">  497</span>        ParVals = ((*it)-&gt;GetTransferMatrix())*ParVals_PCA;</div>
-<div class="line"><span class="lineno">  498</span>        ErrorVals = ((*it)-&gt;GetTransferMatrix())*ErrorVals_PCA;</div>
+<div class="line"><span class="lineno">  497</span>        ParVals = ((*it)-&gt;GetPCAHandler()-&gt;GetTransferMatrix())*ParVals_PCA;</div>
+<div class="line"><span class="lineno">  498</span>        ErrorVals = ((*it)-&gt;GetPCAHandler()-&gt;GetTransferMatrix())*ErrorVals_PCA;</div>
 <div class="line"><span class="lineno">  499</span> </div>
 <div class="line"><span class="lineno">  500</span>        ParCounter = StartVal;</div>
 <div class="line"><span class="lineno">  501</span>        <span class="comment">//KS: Now after going from PCA to normal let&#39;;s save it</span></div>
@@ -1610,7 +1610,7 @@ Mark Scott </dd></dl>
 <div class="line"><span class="lineno">  505</span>          (*PSOParError)(ParCounter) = std::fabs(ErrorVals(i));</div>
 <div class="line"><span class="lineno">  506</span>          <span class="comment">//int ParCounterMatrix = StartVal;</span></div>
 <div class="line"><span class="lineno">  507</span>          <span class="comment">//If fixed take prior</span></div>
-<div class="line"><span class="lineno">  508</span>          <span class="keywordflow">if</span>((*it)-&gt;IsParameterFixedPCA(i))</div>
+<div class="line"><span class="lineno">  508</span>          <span class="keywordflow">if</span>((*it)-&gt;GetPCAHandler()-&gt;IsParameterFixedPCA(i))</div>
 <div class="line"><span class="lineno">  509</span>          {</div>
 <div class="line"><span class="lineno">  510</span>            (*PSOParError)(ParCounter) = (*it)-&gt;GetDiagonalError(i);</div>
 <div class="line"><span class="lineno">  511</span>          }</div>

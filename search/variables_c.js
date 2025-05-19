@@ -27,12 +27,12 @@ var searchData=
   ['means_5fhpd_24',['Means_HPD',['../classMCMCProcessor.html#a32657dc39a7fc0d04804f6195a3d8c3e',1,'MCMCProcessor']]],
   ['medianarr_25',['MedianArr',['../RHat__HighMem_8cpp.html#a761fd0b4a970686c00ce3e4daefd7f73',1,'RHat_HighMem.cpp']]],
   ['minuit_26',['minuit',['../classMinuitFit.html#a3f5a1b7de36ce6c55821e262b016cb19',1,'MinuitFit']]],
-  ['mode_27',['mode',['../structFarDetectorCoreInfo.html#a8e5ddbda4c271abb29952f7f123fb881',1,'FarDetectorCoreInfo']]],
-  ['mode_28',['Mode',['../classMaCh3Modes.html#a062f961a64e9b6bebf420730f9dad9ff',1,'MaCh3Modes']]],
+  ['mode_27',['Mode',['../classMaCh3Modes.html#a062f961a64e9b6bebf420730f9dad9ff',1,'MaCh3Modes']]],
+  ['mode_28',['mode',['../structFarDetectorCoreInfo.html#a8e5ddbda4c271abb29952f7f123fb881',1,'FarDetectorCoreInfo']]],
   ['modehist_29',['ModeHist',['../classSampleSummary.html#a9b21ff74bb8ebd7c3af2c24e02f3d7dc',1,'SampleSummary']]],
   ['modemap_30',['ModeMap',['../classMaCh3Modes.html#a52a226378736541ece3830f53ac851c3',1,'MaCh3Modes']]],
-  ['modes_31',['modes',['../structFunctionalParameter.html#a443cac0801c6836746927c9e379f4359',1,'FunctionalParameter::modes()'],['../structNormParameter.html#a68a2f690b1226fe6090b18fd0af47057',1,'NormParameter::modes()']]],
-  ['modes_32',['Modes',['../classSampleSummary.html#a6593fed9709673a6910f96adc88fc8f2',1,'SampleSummary::Modes()'],['../classSampleHandlerBase.html#ab9f61ca5c8abb03d4d84947e9bfa7943',1,'SampleHandlerBase::Modes()'],['../classBinnedSplineHandler.html#ad18810d957169226bcd66d4bc8fa274f',1,'BinnedSplineHandler::Modes()']]],
+  ['modes_31',['Modes',['../classSampleSummary.html#a6593fed9709673a6910f96adc88fc8f2',1,'SampleSummary::Modes()'],['../classSampleHandlerBase.html#ab9f61ca5c8abb03d4d84947e9bfa7943',1,'SampleHandlerBase::Modes()'],['../classBinnedSplineHandler.html#ad18810d957169226bcd66d4bc8fa274f',1,'BinnedSplineHandler::Modes()']]],
+  ['modes_32',['modes',['../structFunctionalParameter.html#a443cac0801c6836746927c9e379f4359',1,'FunctionalParameter::modes()'],['../structNormParameter.html#a68a2f690b1226fe6090b18fd0af47057',1,'NormParameter::modes()']]],
   ['monolithindex_33',['MonolithIndex',['../classBinnedSplineHandler.html#a4a0d538654de1ffcdf3e1c4161878bd6',1,'BinnedSplineHandler']]],
   ['monolithsize_34',['MonolithSize',['../classBinnedSplineHandler.html#acb076b2a7c8cdb53d70dfb33ddd344b7',1,'BinnedSplineHandler']]]
 ];

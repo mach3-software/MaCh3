@@ -449,10 +449,10 @@ Additional Inherited Members</h2></td></tr>
 <div class="line"><span class="lineno">   49</span>    {</div>
 <div class="line"><span class="lineno">   50</span>      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; (*it)-&gt;GetNumParams(); ++i, ++ParCounter)</div>
 <div class="line"><span class="lineno">   51</span>      {</div>
-<div class="line"><span class="lineno">   52</span>        <span class="comment">//KS: Index, name, prior, step scale [differrent to MCMC],</span></div>
+<div class="line"><span class="lineno">   52</span>        <span class="comment">//KS: Index, name, prior, step scale [different to MCMC],</span></div>
 <div class="line"><span class="lineno">   53</span>        <a class="code hl_variable" href="classMinuitFit.html#a3f5a1b7de36ce6c55821e262b016cb19">minuit</a>-&gt;SetVariable(ParCounter, ((*it)-&gt;GetParName(i)), (*it)-&gt;GetParInit(i), (*it)-&gt;GetDiagonalError(i)/10);</div>
 <div class="line"><span class="lineno">   54</span>        <a class="code hl_variable" href="classMinuitFit.html#a3f5a1b7de36ce6c55821e262b016cb19">minuit</a>-&gt;SetVariableValue(ParCounter, (*it)-&gt;GetParInit(i));</div>
-<div class="line"><span class="lineno">   55</span>        <span class="comment">//KS: lower bound, upper bound, if Mirroring eneabled then ignore</span></div>
+<div class="line"><span class="lineno">   55</span>        <span class="comment">//KS: lower bound, upper bound, if Mirroring enabled then ignore</span></div>
 <div class="line"><span class="lineno">   56</span>        <span class="keywordflow">if</span>(!<a class="code hl_variable" href="classLikelihoodFit.html#ae1e5d13b373bf73e1b1003f7f9d65f00">fMirroring</a>) <a class="code hl_variable" href="classMinuitFit.html#a3f5a1b7de36ce6c55821e262b016cb19">minuit</a>-&gt;SetVariableLimits(ParCounter, (*it)-&gt;GetLowerBound(i), (*it)-&gt;GetUpperBound(i));</div>
 <div class="line"><span class="lineno">   57</span>        <span class="keywordflow">if</span>((*it)-&gt;IsParameterFixed(i))</div>
 <div class="line"><span class="lineno">   58</span>        {</div>
@@ -464,8 +464,8 @@ Additional Inherited Members</h2></td></tr>
 <div class="line"><span class="lineno">   64</span>    {</div>
 <div class="line"><span class="lineno">   65</span>      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; (*it)-&gt;GetNParameters(); ++i, ++ParCounter)</div>
 <div class="line"><span class="lineno">   66</span>      {</div>
-<div class="line"><span class="lineno">   67</span>        <a class="code hl_variable" href="classMinuitFit.html#a3f5a1b7de36ce6c55821e262b016cb19">minuit</a>-&gt;SetVariable(ParCounter, Form(<span class="stringliteral">&quot;%i_PCA&quot;</span>, i), (*it)-&gt;GetParPropPCA(i), (*it)-&gt;GetEigenValuesMaster()[i]/10);</div>
-<div class="line"><span class="lineno">   68</span>        <span class="keywordflow">if</span>((*it)-&gt;IsParameterFixedPCA(i))</div>
+<div class="line"><span class="lineno">   67</span>        <a class="code hl_variable" href="classMinuitFit.html#a3f5a1b7de36ce6c55821e262b016cb19">minuit</a>-&gt;SetVariable(ParCounter, Form(<span class="stringliteral">&quot;%i_PCA&quot;</span>, i), (*it)-&gt;GetPCAHandler()-&gt;GetParPropPCA(i), (*it)-&gt;GetPCAHandler()-&gt;GetEigenValuesMaster()[i]/10);</div>
+<div class="line"><span class="lineno">   68</span>        <span class="keywordflow">if</span>((*it)-&gt;GetPCAHandler()-&gt;IsParameterFixedPCA(i))</div>
 <div class="line"><span class="lineno">   69</span>        {</div>
 <div class="line"><span class="lineno">   70</span>          <a class="code hl_variable" href="classMinuitFit.html#a3f5a1b7de36ce6c55821e262b016cb19">minuit</a>-&gt;FixVariable(ParCounter);</div>
 <div class="line"><span class="lineno">   71</span>        }</div>
@@ -521,7 +521,7 @@ Additional Inherited Members</h2></td></tr>
 <div class="line"><span class="lineno">  121</span>        }</div>
 <div class="line"><span class="lineno">  122</span>        (*MinuitParValue)(ParCounter) = ParVal;</div>
 <div class="line"><span class="lineno">  123</span>        (*MinuitParError)(ParCounter) = err[ParCounter];</div>
-<div class="line"><span class="lineno">  124</span>        <span class="comment">//KS: For fixed params HESS will not calcuate error so we need to pass prior error</span></div>
+<div class="line"><span class="lineno">  124</span>        <span class="comment">//KS: For fixed params HESS will not calculate error so we need to pass prior error</span></div>
 <div class="line"><span class="lineno">  125</span>        <span class="keywordflow">if</span>((*it)-&gt;IsParameterFixed(i))</div>
 <div class="line"><span class="lineno">  126</span>        {</div>
 <div class="line"><span class="lineno">  127</span>          (*MinuitParError)(ParCounter) = (*it)-&gt;GetDiagonalError(i);</div>
@@ -554,9 +554,9 @@ Additional Inherited Members</h2></td></tr>
 <div class="line"><span class="lineno">  154</span>          MatrixVals_PCA(i,j) = <a class="code hl_variable" href="classMinuitFit.html#a3f5a1b7de36ce6c55821e262b016cb19">minuit</a>-&gt;CovMatrix(ParCounter,ParCounterMatrix);</div>
 <div class="line"><span class="lineno">  155</span>        }</div>
 <div class="line"><span class="lineno">  156</span>      }</div>
-<div class="line"><span class="lineno">  157</span>      ParVals = ((*it)-&gt;GetTransferMatrix())*ParVals_PCA;</div>
-<div class="line"><span class="lineno">  158</span>      ErrorVals = ((*it)-&gt;GetTransferMatrix())*ErrorVals_PCA;</div>
-<div class="line"><span class="lineno">  159</span>      MatrixVals.Mult(((*it)-&gt;GetTransferMatrix()),MatrixVals_PCA);</div>
+<div class="line"><span class="lineno">  157</span>      ParVals = ((*it)-&gt;GetPCAHandler()-&gt;GetTransferMatrix())*ParVals_PCA;</div>
+<div class="line"><span class="lineno">  158</span>      ErrorVals = ((*it)-&gt;GetPCAHandler()-&gt;GetTransferMatrix())*ErrorVals_PCA;</div>
+<div class="line"><span class="lineno">  159</span>      MatrixVals.Mult(((*it)-&gt;GetPCAHandler()-&gt;GetTransferMatrix()),MatrixVals_PCA);</div>
 <div class="line"><span class="lineno">  160</span> </div>
 <div class="line"><span class="lineno">  161</span>      ParCounter = StartVal;</div>
 <div class="line"><span class="lineno">  162</span>      <span class="comment">//KS: Now after going from PCA to normal let&#39;;s save it</span></div>
@@ -570,7 +570,7 @@ Additional Inherited Members</h2></td></tr>
 <div class="line"><span class="lineno">  170</span>          (*Postmatrix)(ParCounter,ParCounterMatrix)  = MatrixVals(i,j);</div>
 <div class="line"><span class="lineno">  171</span>        }</div>
 <div class="line"><span class="lineno">  172</span>        <span class="comment">//If fixed take prior</span></div>
-<div class="line"><span class="lineno">  173</span>        <span class="keywordflow">if</span>((*it)-&gt;IsParameterFixedPCA(i))</div>
+<div class="line"><span class="lineno">  173</span>        <span class="keywordflow">if</span>((*it)-&gt;GetPCAHandler()-&gt;IsParameterFixedPCA(i))</div>
 <div class="line"><span class="lineno">  174</span>        {</div>
 <div class="line"><span class="lineno">  175</span>          (*MinuitParError)(ParCounter) = (*it)-&gt;GetDiagonalError(i);</div>
 <div class="line"><span class="lineno">  176</span>          (*Postmatrix)(ParCounter,ParCounter) = (*MinuitParError)(ParCounter) * (*MinuitParError)(ParCounter);</div>
