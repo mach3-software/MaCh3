@@ -190,7 +190,7 @@ struct NormParameter : public TypeParameterBase {
 };
 
 // HH - a shorthand type for funcpar functions
-using FuncParFuncType = std::function<void (const double*, std::size_t, std::size_t)>;
+using FuncParFuncType = std::function<void (const double*, std::size_t)>;
 // *******************
 /// @brief HH - Functional parameters
 /// Carrier for whether you want to apply a systematic to an event or not
