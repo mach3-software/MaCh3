@@ -55,28 +55,19 @@ public:
   //===============================================================================
 
   void Reweight() override;
-  M3::float_t GetEventWeight(const int iSample, const int iEntry) const;
+  M3::float_t GetEventWeight(const int iEntry) const;
 
   ///  @brief including Dan's magic NuOscillator
   void InitialiseNuOscillatorObjects();
   void SetupNuOscillatorPointers();
 
-  virtual void setupSplines(FarDetectorCoreInfo *, const char *, int , int ){};
-
   void ReadSampleConfig();
 
   /// @ingroup SampleHandlerGetters
-  int GetNMCSamples() override {return int(MCSamples.size());}
-
+  int GetNMCSamples() override {return nSamples;}
   /// @ingroup SampleHandlerGetters
-  int GetNEventsInSample(int iSample) override {
-    if (iSample < 0 || iSample > GetNMCSamples()) {
-      MACH3LOG_ERROR("Invalid Sample Requested: {}",iSample);
-      throw MaCh3Exception(__FILE__ , __LINE__);
-    }
-    return MCSamples[iSample].nEvents;
-  }
-  
+  int GetNOscChannels() {return static_cast<int>(OscChannels.size());}
+
   /// @ingroup SampleHandlerGetters
   std::string GetFlavourName(const int iChannel) {
     if (iChannel < 0 || iChannel > static_cast<int>(OscChannels.size())) {
@@ -138,10 +129,10 @@ public:
   virtual void Init() = 0;
 
   /// @brief Experiment specific setup, returns the number of events which were loaded
-  virtual int SetupExperimentMC(int iSample) = 0;
+  virtual int SetupExperimentMC() = 0;
 
   /// @brief Function which translates experiment struct into core struct
-  virtual void SetupFDMC(int iSample) = 0;
+  virtual void SetupFDMC() = 0;
 
   /// @brief Function which does a lot of the lifting regarding the workflow in creating different MC objects
   void Initialise();
@@ -213,15 +204,12 @@ public:
   /// @brief Update the functional parameter values to the latest propsed values. Needs to be called before every new reweight so is called in fillArray 
   virtual void PrepFunctionalParameters(){};
   /// @brief ETA - generic function applying shifts
-  virtual void ApplyShifts(int iSample, int iEvent);
+  virtual void ApplyShifts(int iEvent);
 
   /// @brief DB Function which determines if an event is selected, where Selection double looks like {{ND280KinematicTypes Var1, douuble LowBound}
-  bool IsEventSelected(const int iSample, const int iEvent);
+  bool IsEventSelected(const int iEvent);
   /// @brief HH - reset the shifted values to the original values
-  virtual void resetShifts(int iSample, int iEvent) {
-    (void)iSample;
-    (void)iEvent;
-  };
+  virtual void resetShifts(int iEvent) {(void)iEvent;};
   /// @brief HH - a vector that stores all the FuncPars struct
   std::vector<FunctionalParameter> funcParsVec;
   /// @brief HH - a map that relates the name of the functional parameter to
@@ -236,34 +224,34 @@ public:
   /// function
   std::unordered_map<int, FuncParFuncType> funcParsFuncMap;
   /// @brief HH - a grid of vectors of enums for each sample and event
-  std::vector<std::vector<std::vector<int>>> funcParsGrid;
+  std::vector<std::vector<int>> funcParsGrid;
   /// @brief HH - a vector of string names for each functional parameter
   std::vector<std::string> funcParsNamesVec = {};
 
   /// @brief Check whether a normalisation systematic affects an event or not
-  void CalcNormsBins(const int iSample);
+  void CalcNormsBins();
   /// @brief Calculate the spline weight for a given event
-  M3::float_t CalcWeightSpline(const int iSample, const int iEvent) const;
+  M3::float_t CalcWeightSpline(const int iEvent) const;
   /// @brief Calculate the norm weight for a given event
-  M3::float_t CalcWeightNorm(const int iSample, const int iEvent) const;
+  M3::float_t CalcWeightNorm(const int iEvent) const;
 
   /// @brief Calculate weights for function parameters
   ///
   /// First you need to setup additional pointers in you experiment code in SetupWeightPointers
   /// Then in this function you can calculate whatever fancy function you want by filling weight to which you have pointer
   /// This way func weight shall be used in GetEventWeight
-  virtual void CalcWeightFunc(int iSample, int iEvent){return; (void)iSample; (void)iEvent;};
+  virtual void CalcWeightFunc(int iEvent){return; (void)iEvent;};
 
   /// @brief Return the value of an assocaited kinematic parameter for an event
-  virtual double ReturnKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0;
-  virtual double ReturnKinematicParameter(int KinematicVariable, int iSample, int iEvent) = 0;
+  virtual double ReturnKinematicParameter(std::string KinematicParamter, int iEvent) = 0;
+  virtual double ReturnKinematicParameter(int KinematicVariable, int iEvent) = 0;
 
   /// @brief Return the binning used to draw a kinematic parameter
   virtual std::vector<double> ReturnKinematicParameterBinning(std::string KinematicParameter) = 0;
-  virtual const double* GetPointerToKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0; 
-  virtual const double* GetPointerToKinematicParameter(double KinematicVariable, int iSample, int iEvent) = 0;
+  virtual const double* GetPointerToKinematicParameter(std::string KinematicParamter, int iEvent) = 0;
+  virtual const double* GetPointerToKinematicParameter(double KinematicVariable, int iEvent) = 0;
 
-  const double* GetPointerToOscChannel(int iSample, int iEvent) const;
+  const double* GetPointerToOscChannel(const int iEvent) const;
 
   void SetupNormParameters();
 
@@ -309,7 +297,7 @@ public:
 
   //===============================================================================
   //MC variables
-  std::vector<FarDetectorCoreInfo> MCSamples;
+  FarDetectorCoreInfo MCSamples;
   std::vector<OscChannelInfo> OscChannels;
   //===============================================================================
 
@@ -357,7 +345,7 @@ public:
   std::unique_ptr<manager> SampleManager;
   /// @brief function to create the member of the FarDetectorInfo struct so
   /// they are the appropriate size.
-  void InitialiseSingleFDMCObject(int iSample, int nEvents);
+  void InitialiseSingleFDMCObject();
   void InitialiseSplineObject();
 
   std::vector<std::string> mc_files;
