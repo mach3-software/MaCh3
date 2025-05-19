@@ -137,6 +137,9 @@ void FitterBase::SaveSettings() {
   for(unsigned int i = 0; i < samples.size(); ++i)
     MACH3LOG_INFO("{}: SampleHandler name: {}, it has {} samples, {} OscChannels",i , samples[i]->GetTitle(), samples[i]->GetNsamples(), samples[i]->GetNOscChannels());
 
+  //TN: Have to close the folder in order to write it to disk before SaveOutput is called in the destructor
+  CovFolder->Close();
+  
   SettingsSaved = true;
 }
 
