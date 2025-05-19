@@ -1,0 +1,27 @@
+SampleHandlerBase
+=================
+
+.. currentmodule:: pyMaCh3._pyMaCh3.samples
+
+.. autoclass:: SampleHandlerBase
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~SampleHandlerBase.fill_1d_hist
+      ~SampleHandlerBase.fill_2d_hist
+      ~SampleHandlerBase.get_bin_LLH
+      ~SampleHandlerBase.get_likelihood
+      ~SampleHandlerBase.reweight
+      ~SampleHandlerBase.set_test_stat
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: fill_1d_hist
+   .. automethod:: fill_2d_hist
+   .. automethod:: get_bin_LLH
+   .. automethod:: get_likelihood
+   .. automethod:: reweight
+   .. automethod:: set_test_stat
