@@ -33,7 +33,7 @@ var searchData=
   ['appliestosample_30',['AppliesToSample',['../classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd',1,'ParameterHandlerBase']]],
   ['applyknotweightcap_31',['ApplyKnotWeightCap',['../SplineStructs_8h.html#a44e8d987559b57d7c329ac56bd57b21f',1,'SplineStructs.h']]],
   ['applyknotweightcaptspline3_32',['ApplyKnotWeightCapTSpline3',['../SplineStructs_8h.html#aa4f388789b6229f3a8a1ef237bf56583',1,'SplineStructs.h']]],
-  ['applyshifts_33',['ApplyShifts',['../classSampleHandlerFD.html#a57c1353782f3073319db825434ca72aa',1,'SampleHandlerFD']]],
+  ['applyshifts_33',['ApplyShifts',['../classSampleHandlerFD.html#ad2894de183f70f36e5af4e12948a8507',1,'SampleHandlerFD']]],
   ['applysmoothing_34',['ApplySmoothing',['../classMCMCProcessor.html#a682c1c47626542f5820d633ba2bc010c',1,'MCMCProcessor']]],
   ['auto_5fsave_35',['auto_save',['../classFitterBase.html#ad955982e63066918cba9c53381608d09',1,'FitterBase']]],
   ['autocorrelation_36',['AutoCorrelation',['../classMCMCProcessor.html#a322bee0c362ba83df8c45769d299ce9f',1,'MCMCProcessor']]],

@@ -12,7 +12,7 @@ var searchData=
   ['mcmcproc_9',['mcmcProc',['../structMaCh3Plotting_1_1InputFile.html#a78420e7a9d73500f257d5a92437556f8',1,'MaCh3Plotting::InputFile']]],
   ['mcmcstepparamsmap_10',['MCMCstepParamsMap',['../structMaCh3Plotting_1_1InputFile.html#ad0366c41862bce9e38ecc8eea890bf05',1,'MaCh3Plotting::InputFile']]],
   ['mcmcsteptreeindicesmap_11',['MCMCstepTreeIndicesMap',['../structMaCh3Plotting_1_1InputFile.html#ab3bf09dd833f8d8a73a2273c0a1cc113',1,'MaCh3Plotting::InputFile']]],
-  ['mcsamples_12',['MCSamples',['../classSampleHandlerFD.html#af779913cecbf20c194010aa540ac78c8',1,'SampleHandlerFD']]],
+  ['mcsamples_12',['MCSamples',['../classSampleHandlerFD.html#a22487f60109c978f25f0f6ad7ace221a',1,'SampleHandlerFD']]],
   ['mcvector_13',['MCVector',['../classSampleSummary.html#a13177305e8fd4b97812b2ca563740bf2',1,'SampleSummary']]],
   ['mcvectorbymode_14',['MCVectorByMode',['../classSampleSummary.html#ab3eeac18b62f7ee3a5c943c3cd0e9b76',1,'SampleSummary']]],
   ['mean_15',['Mean',['../RHat__HighMem_8cpp.html#ab7d224b5fffa9367046f2976bb4972d1',1,'Mean():&#160;RHat_HighMem.cpp'],['../RHat_8cpp.html#ab7d224b5fffa9367046f2976bb4972d1',1,'Mean():&#160;RHat.cpp']]],
@@ -31,8 +31,8 @@ var searchData=
   ['mode_28',['Mode',['../classMaCh3Modes.html#a062f961a64e9b6bebf420730f9dad9ff',1,'MaCh3Modes']]],
   ['modehist_29',['ModeHist',['../classSampleSummary.html#a9b21ff74bb8ebd7c3af2c24e02f3d7dc',1,'SampleSummary']]],
   ['modemap_30',['ModeMap',['../classMaCh3Modes.html#a52a226378736541ece3830f53ac851c3',1,'MaCh3Modes']]],
-  ['modes_31',['Modes',['../classSampleSummary.html#a6593fed9709673a6910f96adc88fc8f2',1,'SampleSummary::Modes()'],['../classSampleHandlerBase.html#ab9f61ca5c8abb03d4d84947e9bfa7943',1,'SampleHandlerBase::Modes()'],['../classBinnedSplineHandler.html#ad18810d957169226bcd66d4bc8fa274f',1,'BinnedSplineHandler::Modes()']]],
-  ['modes_32',['modes',['../structFunctionalParameter.html#a443cac0801c6836746927c9e379f4359',1,'FunctionalParameter::modes()'],['../structNormParameter.html#a68a2f690b1226fe6090b18fd0af47057',1,'NormParameter::modes()']]],
+  ['modes_31',['modes',['../structFunctionalParameter.html#a443cac0801c6836746927c9e379f4359',1,'FunctionalParameter::modes()'],['../structNormParameter.html#a68a2f690b1226fe6090b18fd0af47057',1,'NormParameter::modes()']]],
+  ['modes_32',['Modes',['../classSampleSummary.html#a6593fed9709673a6910f96adc88fc8f2',1,'SampleSummary::Modes()'],['../classSampleHandlerBase.html#ab9f61ca5c8abb03d4d84947e9bfa7943',1,'SampleHandlerBase::Modes()'],['../classBinnedSplineHandler.html#ad18810d957169226bcd66d4bc8fa274f',1,'BinnedSplineHandler::Modes()']]],
   ['monolithindex_33',['MonolithIndex',['../classBinnedSplineHandler.html#a4a0d538654de1ffcdf3e1c4161878bd6',1,'BinnedSplineHandler']]],
   ['monolithsize_34',['MonolithSize',['../classBinnedSplineHandler.html#acb076b2a7c8cdb53d70dfb33ddd344b7',1,'BinnedSplineHandler']]]
 ];

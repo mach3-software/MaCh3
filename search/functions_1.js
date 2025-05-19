@@ -17,7 +17,7 @@ var searchData=
   ['appliestosample_14',['AppliesToSample',['../classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd',1,'ParameterHandlerBase']]],
   ['applyknotweightcap_15',['ApplyKnotWeightCap',['../SplineStructs_8h.html#a44e8d987559b57d7c329ac56bd57b21f',1,'SplineStructs.h']]],
   ['applyknotweightcaptspline3_16',['ApplyKnotWeightCapTSpline3',['../SplineStructs_8h.html#aa4f388789b6229f3a8a1ef237bf56583',1,'SplineStructs.h']]],
-  ['applyshifts_17',['ApplyShifts',['../classSampleHandlerFD.html#a57c1353782f3073319db825434ca72aa',1,'SampleHandlerFD']]],
+  ['applyshifts_17',['ApplyShifts',['../classSampleHandlerFD.html#ad2894de183f70f36e5af4e12948a8507',1,'SampleHandlerFD']]],
   ['autocorrelation_18',['AutoCorrelation',['../classMCMCProcessor.html#a322bee0c362ba83df8c45769d299ce9f',1,'MCMCProcessor']]],
   ['autocorrelation_5ffft_19',['AutoCorrelation_FFT',['../classMCMCProcessor.html#abeb5e115fa9f58ea7872af5cf13c6b79',1,'MCMCProcessor']]]
 ];

@@ -135,10 +135,12 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a3efb49c2a39d87b71e4dec7c7115fa88"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga65bbd8a3084731b4bdb0c4d3fcaf641e"><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#ga65bbd8a3084731b4bdb0c4d3fcaf641e">GetLikelihood</a> ()=0</td></tr>
 <tr class="separator:ga65bbd8a3084731b4bdb0c4d3fcaf641e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga091b542789f278a8485bd14d6dbb739b"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#ga091b542789f278a8485bd14d6dbb739b">GetNEventsInSample</a> (int sample)</td></tr>
-<tr class="separator:ga091b542789f278a8485bd14d6dbb739b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5463cc125470d1f31fbc1ab8f01b60a7"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#ga5463cc125470d1f31fbc1ab8f01b60a7">GetNEvents</a> ()</td></tr>
+<tr class="separator:ga5463cc125470d1f31fbc1ab8f01b60a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga5bffa47b890458c115dca26dd2fab80f"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#ga5bffa47b890458c115dca26dd2fab80f">GetNMCSamples</a> ()</td></tr>
 <tr class="separator:ga5bffa47b890458c115dca26dd2fab80f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaeb7b2ceb1ff0720b5f4976035d5900c7"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#gaeb7b2ceb1ff0720b5f4976035d5900c7">GetNOscChannels</a> ()</td></tr>
+<tr class="separator:gaeb7b2ceb1ff0720b5f4976035d5900c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c23502c36e51562bf784ebcced54c6c"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a0c23502c36e51562bf784ebcced54c6c">AddData</a> (std::vector&lt; double &gt; &amp;dat)</td></tr>
 <tr class="separator:a0c23502c36e51562bf784ebcced54c6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0152cea82b224f36eb5cb4efa247407d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a0152cea82b224f36eb5cb4efa247407d">AddData</a> (std::vector&lt; std::vector&lt; double &gt; &gt; &amp;dat)</td></tr>
@@ -203,6 +205,9 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:a162e3e8fddeef43d1137875b660f897b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a></td></tr>
 <tr class="memdesc:a162e3e8fddeef43d1137875b660f897b"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: number of dimension for this sample.  <br /></td></tr>
 <tr class="separator:a162e3e8fddeef43d1137875b660f897b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab497b52d94868283a8a7cedbd1a4d777"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#ab497b52d94868283a8a7cedbd1a4d777">nEvents</a></td></tr>
+<tr class="memdesc:ab497b52d94868283a8a7cedbd1a4d777"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of MC events are there.  <br /></td></tr>
+<tr class="separator:ab497b52d94868283a8a7cedbd1a4d777"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab9f61ca5c8abb03d4d84947e9bfa7943"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classMaCh3Modes.html">MaCh3Modes</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#ab9f61ca5c8abb03d4d84947e9bfa7943">Modes</a></td></tr>
 <tr class="memdesc:ab9f61ca5c8abb03d4d84947e9bfa7943"><td class="mdescLeft">&#160;</td><td class="mdescRight">Holds information about used Generator and MaCh3 modes.  <br /></td></tr>
 <tr class="separator:ab9f61ca5c8abb03d4d84947e9bfa7943"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -241,11 +246,14 @@ Protected Attributes</h2></td></tr>
 <div class="line"><span class="lineno">    6</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">dathist</a> = NULL;</div>
 <div class="line"><span class="lineno">    7</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#aa7ed25798bc8d52dc16b5ea2f6c9d0c3">dathist2d</a> = NULL;</div>
 <div class="line"><span class="lineno">    8</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#ab9f61ca5c8abb03d4d84947e9bfa7943">Modes</a> = <span class="keyword">nullptr</span>;</div>
-<div class="line"><span class="lineno">    9</span>}</div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a162e3e8fddeef43d1137875b660f897b"><div class="ttname"><a href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">SampleHandlerBase::nDims</a></div><div class="ttdeci">int nDims</div><div class="ttdoc">KS: number of dimension for this sample.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00130">SampleHandlerBase.h:130</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a7938f32b145ce648d3ce4ae33bc9d560"><div class="ttname"><a href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">SampleHandlerBase::dathist</a></div><div class="ttdeci">TH1D * dathist</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00135">SampleHandlerBase.h:135</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_aa7ed25798bc8d52dc16b5ea2f6c9d0c3"><div class="ttname"><a href="classSampleHandlerBase.html#aa7ed25798bc8d52dc16b5ea2f6c9d0c3">SampleHandlerBase::dathist2d</a></div><div class="ttdeci">TH2D * dathist2d</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00136">SampleHandlerBase.h:136</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_ab9f61ca5c8abb03d4d84947e9bfa7943"><div class="ttname"><a href="classSampleHandlerBase.html#ab9f61ca5c8abb03d4d84947e9bfa7943">SampleHandlerBase::Modes</a></div><div class="ttdeci">MaCh3Modes * Modes</div><div class="ttdoc">Holds information about used Generator and MaCh3 modes.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00133">SampleHandlerBase.h:133</a></div></div>
+<div class="line"><span class="lineno">    9</span> </div>
+<div class="line"><span class="lineno">   10</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#ab497b52d94868283a8a7cedbd1a4d777">nEvents</a> = 0;</div>
+<div class="line"><span class="lineno">   11</span>}</div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a162e3e8fddeef43d1137875b660f897b"><div class="ttname"><a href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">SampleHandlerBase::nDims</a></div><div class="ttdeci">int nDims</div><div class="ttdoc">KS: number of dimension for this sample.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00132">SampleHandlerBase.h:132</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a7938f32b145ce648d3ce4ae33bc9d560"><div class="ttname"><a href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">SampleHandlerBase::dathist</a></div><div class="ttdeci">TH1D * dathist</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00140">SampleHandlerBase.h:140</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_aa7ed25798bc8d52dc16b5ea2f6c9d0c3"><div class="ttname"><a href="classSampleHandlerBase.html#aa7ed25798bc8d52dc16b5ea2f6c9d0c3">SampleHandlerBase::dathist2d</a></div><div class="ttdeci">TH2D * dathist2d</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00141">SampleHandlerBase.h:141</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_ab497b52d94868283a8a7cedbd1a4d777"><div class="ttname"><a href="classSampleHandlerBase.html#ab497b52d94868283a8a7cedbd1a4d777">SampleHandlerBase::nEvents</a></div><div class="ttdeci">unsigned int nEvents</div><div class="ttdoc">Number of MC events are there.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00135">SampleHandlerBase.h:135</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_ab9f61ca5c8abb03d4d84947e9bfa7943"><div class="ttname"><a href="classSampleHandlerBase.html#ab9f61ca5c8abb03d4d84947e9bfa7943">SampleHandlerBase::Modes</a></div><div class="ttdeci">MaCh3Modes * Modes</div><div class="ttdoc">Holds information about used Generator and MaCh3 modes.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00138">SampleHandlerBase.h:138</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -274,12 +282,12 @@ Protected Attributes</h2></td></tr>
 
 <p>destructor </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8cpp_source.html#l00011">11</a> of file <a class="el" href="SampleHandlerBase_8cpp_source.html">SampleHandlerBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   12</span>{</div>
-<div class="line"><span class="lineno">   13</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">dathist</a> != NULL) <span class="keyword">delete</span> <a class="code hl_variable" href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">dathist</a>;</div>
-<div class="line"><span class="lineno">   14</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSampleHandlerBase.html#aa7ed25798bc8d52dc16b5ea2f6c9d0c3">dathist2d</a> != NULL) <span class="keyword">delete</span> <a class="code hl_variable" href="classSampleHandlerBase.html#aa7ed25798bc8d52dc16b5ea2f6c9d0c3">dathist2d</a>;</div>
-<div class="line"><span class="lineno">   15</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSampleHandlerBase.html#ab9f61ca5c8abb03d4d84947e9bfa7943">Modes</a> != <span class="keyword">nullptr</span>) <span class="keyword">delete</span> <a class="code hl_variable" href="classSampleHandlerBase.html#ab9f61ca5c8abb03d4d84947e9bfa7943">Modes</a>;</div>
-<div class="line"><span class="lineno">   16</span>}</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8cpp_source.html#l00013">13</a> of file <a class="el" href="SampleHandlerBase_8cpp_source.html">SampleHandlerBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   14</span>{</div>
+<div class="line"><span class="lineno">   15</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">dathist</a> != NULL) <span class="keyword">delete</span> <a class="code hl_variable" href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">dathist</a>;</div>
+<div class="line"><span class="lineno">   16</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSampleHandlerBase.html#aa7ed25798bc8d52dc16b5ea2f6c9d0c3">dathist2d</a> != NULL) <span class="keyword">delete</span> <a class="code hl_variable" href="classSampleHandlerBase.html#aa7ed25798bc8d52dc16b5ea2f6c9d0c3">dathist2d</a>;</div>
+<div class="line"><span class="lineno">   17</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSampleHandlerBase.html#ab9f61ca5c8abb03d4d84947e9bfa7943">Modes</a> != <span class="keyword">nullptr</span>) <span class="keyword">delete</span> <a class="code hl_variable" href="classSampleHandlerBase.html#ab9f61ca5c8abb03d4d84947e9bfa7943">Modes</a>;</div>
+<div class="line"><span class="lineno">   18</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -310,24 +318,24 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classSampleHandlerFD.html#a203041ed33becd131eb3d03277d7d20c">SampleHandlerFD</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8cpp_source.html#l00018">18</a> of file <a class="el" href="SampleHandlerBase_8cpp_source.html">SampleHandlerBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   19</span>{</div>
-<div class="line"><span class="lineno">   20</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a> != 0 &amp;&amp; <a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a> != 1)</div>
-<div class="line"><span class="lineno">   21</span>  {</div>
-<div class="line"><span class="lineno">   22</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;You have initialized this sample with {} dimensions already and now trying to set dimension to 1&quot;</span>, <a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a>);</div>
-<div class="line"><span class="lineno">   23</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><span class="lineno">   24</span>  }</div>
-<div class="line"><span class="lineno">   25</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a> = 1;</div>
-<div class="line"><span class="lineno">   26</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">dathist</a> == NULL)</div>
-<div class="line"><span class="lineno">   27</span>  {</div>
-<div class="line"><span class="lineno">   28</span>    std::cerr&lt;&lt;<span class="stringliteral">&quot;dathist not initialised&quot;</span>&lt;&lt;std::endl;</div>
-<div class="line"><span class="lineno">   29</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><span class="lineno">   30</span>  }</div>
-<div class="line"><span class="lineno">   31</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">dathist</a>-&gt;Reset();                                                         </div>
-<div class="line"><span class="lineno">   32</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; int(data.size()); i++) {</div>
-<div class="line"><span class="lineno">   33</span>    <a class="code hl_variable" href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">dathist</a>-&gt;Fill(data.at(i));</div>
-<div class="line"><span class="lineno">   34</span>  }</div>
-<div class="line"><span class="lineno">   35</span>}</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8cpp_source.html#l00020">20</a> of file <a class="el" href="SampleHandlerBase_8cpp_source.html">SampleHandlerBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   21</span>{</div>
+<div class="line"><span class="lineno">   22</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a> != 0 &amp;&amp; <a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a> != 1)</div>
+<div class="line"><span class="lineno">   23</span>  {</div>
+<div class="line"><span class="lineno">   24</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;You have initialized this sample with {} dimensions already and now trying to set dimension to 1&quot;</span>, <a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a>);</div>
+<div class="line"><span class="lineno">   25</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><span class="lineno">   26</span>  }</div>
+<div class="line"><span class="lineno">   27</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a> = 1;</div>
+<div class="line"><span class="lineno">   28</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">dathist</a> == NULL)</div>
+<div class="line"><span class="lineno">   29</span>  {</div>
+<div class="line"><span class="lineno">   30</span>    std::cerr&lt;&lt;<span class="stringliteral">&quot;dathist not initialised&quot;</span>&lt;&lt;std::endl;</div>
+<div class="line"><span class="lineno">   31</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><span class="lineno">   32</span>  }</div>
+<div class="line"><span class="lineno">   33</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">dathist</a>-&gt;Reset();                                                         </div>
+<div class="line"><span class="lineno">   34</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; int(data.size()); i++) {</div>
+<div class="line"><span class="lineno">   35</span>    <a class="code hl_variable" href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">dathist</a>-&gt;Fill(data.at(i));</div>
+<div class="line"><span class="lineno">   36</span>  }</div>
+<div class="line"><span class="lineno">   37</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00025">MaCh3Logger.h:25</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00013">MaCh3Exception.h:13</a></div></div>
 </div><!-- fragment -->
@@ -359,23 +367,23 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classSampleHandlerFD.html#af2a7215360849e5c681b62bdf56b8ebc">SampleHandlerFD</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8cpp_source.html#l00037">37</a> of file <a class="el" href="SampleHandlerBase_8cpp_source.html">SampleHandlerBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   38</span>{</div>
-<div class="line"><span class="lineno">   39</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a> != 0 &amp;&amp; <a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a> != 2)</div>
-<div class="line"><span class="lineno">   40</span>  {</div>
-<div class="line"><span class="lineno">   41</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;You have initialized this sample with {} dimensions already and now trying to set dimension to 2&quot;</span>, <a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a>);</div>
-<div class="line"><span class="lineno">   42</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><span class="lineno">   43</span>  }</div>
-<div class="line"><span class="lineno">   44</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a> = 2;  </div>
-<div class="line"><span class="lineno">   45</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSampleHandlerBase.html#aa7ed25798bc8d52dc16b5ea2f6c9d0c3">dathist2d</a> == NULL)</div>
-<div class="line"><span class="lineno">   46</span>  {</div>
-<div class="line"><span class="lineno">   47</span>    std::cerr&lt;&lt;<span class="stringliteral">&quot;dathist2d not initialised&quot;</span>&lt;&lt;std::endl;</div>
-<div class="line"><span class="lineno">   48</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><span class="lineno">   49</span>  }</div>
-<div class="line"><span class="lineno">   50</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#aa7ed25798bc8d52dc16b5ea2f6c9d0c3">dathist2d</a>-&gt;Reset();                                                       </div>
-<div class="line"><span class="lineno">   51</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; int(data.size()); i++)</div>
-<div class="line"><span class="lineno">   52</span>    <a class="code hl_variable" href="classSampleHandlerBase.html#aa7ed25798bc8d52dc16b5ea2f6c9d0c3">dathist2d</a>-&gt;Fill(data.at(0)[i], data.at(1)[i]);</div>
-<div class="line"><span class="lineno">   53</span>}</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8cpp_source.html#l00039">39</a> of file <a class="el" href="SampleHandlerBase_8cpp_source.html">SampleHandlerBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   40</span>{</div>
+<div class="line"><span class="lineno">   41</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a> != 0 &amp;&amp; <a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a> != 2)</div>
+<div class="line"><span class="lineno">   42</span>  {</div>
+<div class="line"><span class="lineno">   43</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;You have initialized this sample with {} dimensions already and now trying to set dimension to 2&quot;</span>, <a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a>);</div>
+<div class="line"><span class="lineno">   44</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><span class="lineno">   45</span>  }</div>
+<div class="line"><span class="lineno">   46</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a> = 2;  </div>
+<div class="line"><span class="lineno">   47</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSampleHandlerBase.html#aa7ed25798bc8d52dc16b5ea2f6c9d0c3">dathist2d</a> == NULL)</div>
+<div class="line"><span class="lineno">   48</span>  {</div>
+<div class="line"><span class="lineno">   49</span>    std::cerr&lt;&lt;<span class="stringliteral">&quot;dathist2d not initialised&quot;</span>&lt;&lt;std::endl;</div>
+<div class="line"><span class="lineno">   50</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><span class="lineno">   51</span>  }</div>
+<div class="line"><span class="lineno">   52</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#aa7ed25798bc8d52dc16b5ea2f6c9d0c3">dathist2d</a>-&gt;Reset();                                                       </div>
+<div class="line"><span class="lineno">   53</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; int(data.size()); i++)</div>
+<div class="line"><span class="lineno">   54</span>    <a class="code hl_variable" href="classSampleHandlerBase.html#aa7ed25798bc8d52dc16b5ea2f6c9d0c3">dathist2d</a>-&gt;Fill(data.at(0)[i], data.at(1)[i]);</div>
+<div class="line"><span class="lineno">   55</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -405,19 +413,19 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classSampleHandlerFD.html#afd6a736c3752b05dde1e1e3703bf42a5">SampleHandlerFD</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8cpp_source.html#l00055">55</a> of file <a class="el" href="SampleHandlerBase_8cpp_source.html">SampleHandlerBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   56</span>{</div>
-<div class="line"><span class="lineno">   57</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a> != 0 &amp;&amp; <a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a> != 1)</div>
-<div class="line"><span class="lineno">   58</span>  {</div>
-<div class="line"><span class="lineno">   59</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;You have initialized this sample with {} dimensions already and now trying to set dimension to 1&quot;</span>, <a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a>);</div>
-<div class="line"><span class="lineno">   60</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><span class="lineno">   61</span>  }</div>
-<div class="line"><span class="lineno">   62</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a> = 1;</div>
-<div class="line"><span class="lineno">   63</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Adding 1D data histogram: {} with {} events.&quot;</span>, binneddata-&gt;GetName(), binneddata-&gt;Integral());</div>
-<div class="line"><span class="lineno">   64</span>  <span class="comment">//KS: If exist delete to avoid memory leak</span></div>
-<div class="line"><span class="lineno">   65</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">dathist</a> != NULL) <span class="keyword">delete</span> <a class="code hl_variable" href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">dathist</a>;</div>
-<div class="line"><span class="lineno">   66</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">dathist</a> = binneddata;</div>
-<div class="line"><span class="lineno">   67</span>}</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8cpp_source.html#l00057">57</a> of file <a class="el" href="SampleHandlerBase_8cpp_source.html">SampleHandlerBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   58</span>{</div>
+<div class="line"><span class="lineno">   59</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a> != 0 &amp;&amp; <a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a> != 1)</div>
+<div class="line"><span class="lineno">   60</span>  {</div>
+<div class="line"><span class="lineno">   61</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;You have initialized this sample with {} dimensions already and now trying to set dimension to 1&quot;</span>, <a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a>);</div>
+<div class="line"><span class="lineno">   62</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><span class="lineno">   63</span>  }</div>
+<div class="line"><span class="lineno">   64</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a> = 1;</div>
+<div class="line"><span class="lineno">   65</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Adding 1D data histogram: {} with {} events.&quot;</span>, binneddata-&gt;GetName(), binneddata-&gt;Integral());</div>
+<div class="line"><span class="lineno">   66</span>  <span class="comment">//KS: If exist delete to avoid memory leak</span></div>
+<div class="line"><span class="lineno">   67</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">dathist</a> != NULL) <span class="keyword">delete</span> <a class="code hl_variable" href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">dathist</a>;</div>
+<div class="line"><span class="lineno">   68</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">dathist</a> = binneddata;</div>
+<div class="line"><span class="lineno">   69</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00023">MaCh3Logger.h:23</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -448,19 +456,19 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classSampleHandlerFD.html#a2dea09fa53bc8ec35a38c3a26f000c03">SampleHandlerFD</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8cpp_source.html#l00069">69</a> of file <a class="el" href="SampleHandlerBase_8cpp_source.html">SampleHandlerBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   70</span>{</div>
-<div class="line"><span class="lineno">   71</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a> != 0 &amp;&amp; <a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a> != 2)</div>
-<div class="line"><span class="lineno">   72</span>  {</div>
-<div class="line"><span class="lineno">   73</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;You have initialized this sample with {} dimensions already and now trying to set dimension to 2&quot;</span>, <a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a>);</div>
-<div class="line"><span class="lineno">   74</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><span class="lineno">   75</span>  }</div>
-<div class="line"><span class="lineno">   76</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a> = 2;</div>
-<div class="line"><span class="lineno">   77</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Adding 2D data histogram: {} with {} events.&quot;</span>, binneddata-&gt;GetName(), binneddata-&gt;Integral());</div>
-<div class="line"><span class="lineno">   78</span>  <span class="comment">//KS: If exist delete to avoid memory leak</span></div>
-<div class="line"><span class="lineno">   79</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSampleHandlerBase.html#aa7ed25798bc8d52dc16b5ea2f6c9d0c3">dathist2d</a> != NULL) <span class="keyword">delete</span> <a class="code hl_variable" href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">dathist</a>;</div>
-<div class="line"><span class="lineno">   80</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#aa7ed25798bc8d52dc16b5ea2f6c9d0c3">dathist2d</a> = binneddata;</div>
-<div class="line"><span class="lineno">   81</span>}</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8cpp_source.html#l00071">71</a> of file <a class="el" href="SampleHandlerBase_8cpp_source.html">SampleHandlerBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   72</span>{</div>
+<div class="line"><span class="lineno">   73</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a> != 0 &amp;&amp; <a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a> != 2)</div>
+<div class="line"><span class="lineno">   74</span>  {</div>
+<div class="line"><span class="lineno">   75</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;You have initialized this sample with {} dimensions already and now trying to set dimension to 2&quot;</span>, <a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a>);</div>
+<div class="line"><span class="lineno">   76</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><span class="lineno">   77</span>  }</div>
+<div class="line"><span class="lineno">   78</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a> = 2;</div>
+<div class="line"><span class="lineno">   79</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Adding 2D data histogram: {} with {} events.&quot;</span>, binneddata-&gt;GetName(), binneddata-&gt;Integral());</div>
+<div class="line"><span class="lineno">   80</span>  <span class="comment">//KS: If exist delete to avoid memory leak</span></div>
+<div class="line"><span class="lineno">   81</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSampleHandlerBase.html#aa7ed25798bc8d52dc16b5ea2f6c9d0c3">dathist2d</a> != NULL) <span class="keyword">delete</span> <a class="code hl_variable" href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">dathist</a>;</div>
+<div class="line"><span class="lineno">   82</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#aa7ed25798bc8d52dc16b5ea2f6c9d0c3">dathist2d</a> = binneddata;</div>
+<div class="line"><span class="lineno">   83</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -542,8 +550,8 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00077">77</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   77</span>{ (void) Selection; <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ , <span class="stringliteral">&quot;Not implemented&quot;</span>); }</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00079">79</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   79</span>{ (void) Selection; <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ , <span class="stringliteral">&quot;Not implemented&quot;</span>); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -581,9 +589,9 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00082">82</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   82</span>                                                                                 {</div>
-<div class="line"><span class="lineno">   83</span>    (void) sample; (void) Dimension; <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ , <span class="stringliteral">&quot;Not implemented&quot;</span>);  };</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00084">84</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   84</span>                                                                                 {</div>
+<div class="line"><span class="lineno">   85</span>    (void) sample; (void) Dimension; <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ , <span class="stringliteral">&quot;Not implemented&quot;</span>);  };</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -611,8 +619,8 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00079">79</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   79</span>{ (void) Selection; <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ , <span class="stringliteral">&quot;Not implemented&quot;</span>);}</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00081">81</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   81</span>{ (void) Selection; <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ , <span class="stringliteral">&quot;Not implemented&quot;</span>);}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -650,9 +658,9 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00080">80</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   80</span>                                                                      {</div>
-<div class="line"><span class="lineno">   81</span>    (void) Selection; (void) Mode; <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ , <span class="stringliteral">&quot;Not implemented&quot;</span>); }</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00082">82</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   82</span>                                                                      {</div>
+<div class="line"><span class="lineno">   83</span>    (void) Selection; (void) Mode; <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ , <span class="stringliteral">&quot;Not implemented&quot;</span>); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -680,8 +688,8 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00078">78</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   78</span>{ (void) Selection; <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ , <span class="stringliteral">&quot;Not implemented&quot;</span>);}</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00080">80</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   80</span>{ (void) Selection; <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ , <span class="stringliteral">&quot;Not implemented&quot;</span>);}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -723,13 +731,13 @@ template&lt;typename T &gt; </div>
 
 <p>check if event is affected by following conditions, for example pdg, or modes etc </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00112">112</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  112</span>                                                                         {</div>
-<div class="line"><span class="lineno">  113</span>    <span class="keywordflow">if</span> (allowedValues.empty()) {</div>
-<div class="line"><span class="lineno">  114</span>      <span class="keywordflow">return</span> <span class="keyword">true</span>;  <span class="comment">// Apply to all if no specific values are specified</span></div>
-<div class="line"><span class="lineno">  115</span>    }</div>
-<div class="line"><span class="lineno">  116</span>    <span class="keywordflow">return</span> std::find(allowedValues.begin(), allowedValues.end(), value) != allowedValues.end();</div>
-<div class="line"><span class="lineno">  117</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00114">114</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  114</span>                                                                         {</div>
+<div class="line"><span class="lineno">  115</span>    <span class="keywordflow">if</span> (allowedValues.empty()) {</div>
+<div class="line"><span class="lineno">  116</span>      <span class="keywordflow">return</span> <span class="keyword">true</span>;  <span class="comment">// Apply to all if no specific values are specified</span></div>
+<div class="line"><span class="lineno">  117</span>    }</div>
+<div class="line"><span class="lineno">  118</span>    <span class="keywordflow">return</span> std::find(allowedValues.begin(), allowedValues.end(), value) != allowedValues.end();</div>
+<div class="line"><span class="lineno">  119</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -758,18 +766,18 @@ template&lt;typename T &gt; </div>
 
 <p>CW: Redirect std::cout to silence some experiment specific libraries. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8cpp_source.html#l00269">269</a> of file <a class="el" href="SampleHandlerBase_8cpp_source.html">SampleHandlerBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  269</span>                                {</div>
-<div class="line"><span class="lineno">  270</span><span class="comment">// ***************************************************************************</span></div>
-<div class="line"><span class="lineno">  271</span><span class="preprocessor">  #if DEBUG &gt; 0</span></div>
-<div class="line"><span class="lineno">  272</span>  <span class="keywordflow">return</span>;</div>
-<div class="line"><span class="lineno">  273</span><span class="preprocessor">  #else</span></div>
-<div class="line"><span class="lineno">  274</span>  std::cout.rdbuf(<a class="code hl_variable" href="classSampleHandlerBase.html#a47d291148fa6153a7e05beebde6cfdb9">buf</a>);</div>
-<div class="line"><span class="lineno">  275</span>  std::cerr.rdbuf(<a class="code hl_variable" href="classSampleHandlerBase.html#a6b884367733c4f3a93c75127ed6e9df9">errbuf</a>);</div>
-<div class="line"><span class="lineno">  276</span><span class="preprocessor">  #endif</span></div>
-<div class="line"><span class="lineno">  277</span>}</div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a47d291148fa6153a7e05beebde6cfdb9"><div class="ttname"><a href="classSampleHandlerBase.html#a47d291148fa6153a7e05beebde6cfdb9">SampleHandlerBase::buf</a></div><div class="ttdeci">std::streambuf * buf</div><div class="ttdoc">Keep the cout buffer.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00123">SampleHandlerBase.h:123</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a6b884367733c4f3a93c75127ed6e9df9"><div class="ttname"><a href="classSampleHandlerBase.html#a6b884367733c4f3a93c75127ed6e9df9">SampleHandlerBase::errbuf</a></div><div class="ttdeci">std::streambuf * errbuf</div><div class="ttdoc">Keep the cerr buffer.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00125">SampleHandlerBase.h:125</a></div></div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8cpp_source.html#l00271">271</a> of file <a class="el" href="SampleHandlerBase_8cpp_source.html">SampleHandlerBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  271</span>                                {</div>
+<div class="line"><span class="lineno">  272</span><span class="comment">// ***************************************************************************</span></div>
+<div class="line"><span class="lineno">  273</span><span class="preprocessor">  #if DEBUG &gt; 0</span></div>
+<div class="line"><span class="lineno">  274</span>  <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  275</span><span class="preprocessor">  #else</span></div>
+<div class="line"><span class="lineno">  276</span>  std::cout.rdbuf(<a class="code hl_variable" href="classSampleHandlerBase.html#a47d291148fa6153a7e05beebde6cfdb9">buf</a>);</div>
+<div class="line"><span class="lineno">  277</span>  std::cerr.rdbuf(<a class="code hl_variable" href="classSampleHandlerBase.html#a6b884367733c4f3a93c75127ed6e9df9">errbuf</a>);</div>
+<div class="line"><span class="lineno">  278</span><span class="preprocessor">  #endif</span></div>
+<div class="line"><span class="lineno">  279</span>}</div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a47d291148fa6153a7e05beebde6cfdb9"><div class="ttname"><a href="classSampleHandlerBase.html#a47d291148fa6153a7e05beebde6cfdb9">SampleHandlerBase::buf</a></div><div class="ttdeci">std::streambuf * buf</div><div class="ttdoc">Keep the cout buffer.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00125">SampleHandlerBase.h:125</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a6b884367733c4f3a93c75127ed6e9df9"><div class="ttname"><a href="classSampleHandlerBase.html#a6b884367733c4f3a93c75127ed6e9df9">SampleHandlerBase::errbuf</a></div><div class="ttdeci">std::streambuf * errbuf</div><div class="ttdoc">Keep the cerr buffer.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00127">SampleHandlerBase.h:127</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -798,18 +806,18 @@ template&lt;typename T &gt; </div>
 
 <p>CW: Redirect std::cout to silence some experiment specific libraries. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8cpp_source.html#l00255">255</a> of file <a class="el" href="SampleHandlerBase_8cpp_source.html">SampleHandlerBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  255</span>                                    {</div>
-<div class="line"><span class="lineno">  256</span><span class="comment">// ***************************************************************************</span></div>
-<div class="line"><span class="lineno">  257</span><span class="preprocessor">  #if DEBUG &gt; 0</span></div>
-<div class="line"><span class="lineno">  258</span>  <span class="keywordflow">return</span>;</div>
-<div class="line"><span class="lineno">  259</span><span class="preprocessor">  #else</span></div>
-<div class="line"><span class="lineno">  260</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#a47d291148fa6153a7e05beebde6cfdb9">buf</a> = std::cout.rdbuf();</div>
-<div class="line"><span class="lineno">  261</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#a6b884367733c4f3a93c75127ed6e9df9">errbuf</a> = std::cerr.rdbuf();</div>
-<div class="line"><span class="lineno">  262</span>  std::cout.rdbuf( <span class="keyword">nullptr</span> );</div>
-<div class="line"><span class="lineno">  263</span>  std::cerr.rdbuf( <span class="keyword">nullptr</span> );</div>
-<div class="line"><span class="lineno">  264</span><span class="preprocessor">  #endif</span></div>
-<div class="line"><span class="lineno">  265</span>}</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8cpp_source.html#l00257">257</a> of file <a class="el" href="SampleHandlerBase_8cpp_source.html">SampleHandlerBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  257</span>                                    {</div>
+<div class="line"><span class="lineno">  258</span><span class="comment">// ***************************************************************************</span></div>
+<div class="line"><span class="lineno">  259</span><span class="preprocessor">  #if DEBUG &gt; 0</span></div>
+<div class="line"><span class="lineno">  260</span>  <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  261</span><span class="preprocessor">  #else</span></div>
+<div class="line"><span class="lineno">  262</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#a47d291148fa6153a7e05beebde6cfdb9">buf</a> = std::cout.rdbuf();</div>
+<div class="line"><span class="lineno">  263</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#a6b884367733c4f3a93c75127ed6e9df9">errbuf</a> = std::cerr.rdbuf();</div>
+<div class="line"><span class="lineno">  264</span>  std::cout.rdbuf( <span class="keyword">nullptr</span> );</div>
+<div class="line"><span class="lineno">  265</span>  std::cerr.rdbuf( <span class="keyword">nullptr</span> );</div>
+<div class="line"><span class="lineno">  266</span><span class="preprocessor">  #endif</span></div>
+<div class="line"><span class="lineno">  267</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -880,9 +888,9 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00075">75</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   75</span>                                                                                                              {</div>
-<div class="line"><span class="lineno">   76</span>    (void) Selection; (void) BinningX; (void) BinningY; <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ , <span class="stringliteral">&quot;Not implemented&quot;</span>);}</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00077">77</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   77</span>                                                                                                              {</div>
+<div class="line"><span class="lineno">   78</span>    (void) Selection; (void) BinningX; (void) BinningY; <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ , <span class="stringliteral">&quot;Not implemented&quot;</span>);}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -907,7 +915,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00139">139</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00144">144</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -931,7 +939,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00140">140</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00145">145</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -957,7 +965,7 @@ template&lt;typename T &gt; </div>
 
 <p>Keep the cout buffer. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00123">123</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00125">125</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -981,7 +989,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00135">135</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00140">140</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -1005,7 +1013,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00136">136</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00141">141</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -1031,7 +1039,7 @@ template&lt;typename T &gt; </div>
 
 <p>Keep the cerr buffer. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00125">125</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00127">127</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -1057,7 +1065,7 @@ template&lt;typename T &gt; </div>
 
 <p>Test statistic tells what kind of likelihood sample is using. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00120">120</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00122">122</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -1083,7 +1091,7 @@ template&lt;typename T &gt; </div>
 
 <p>Holds information about used Generator and MaCh3 modes. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00133">133</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00138">138</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -1109,7 +1117,33 @@ template&lt;typename T &gt; </div>
 
 <p>KS: number of dimension for this sample. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00130">130</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00132">132</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+
+</div>
+</div>
+<a id="ab497b52d94868283a8a7cedbd1a4d777" name="ab497b52d94868283a8a7cedbd1a4d777"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab497b52d94868283a8a7cedbd1a4d777">&#9670;&#160;</a></span>nEvents</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned int SampleHandlerBase::nEvents</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Number of MC events are there. </p>
+
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00135">135</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -1135,7 +1169,7 @@ template&lt;typename T &gt; </div>
 
 <p>Contains how many samples we've got. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00128">128</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00130">130</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>

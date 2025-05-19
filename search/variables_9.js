@@ -13,7 +13,7 @@ var searchData=
   ['isdecomposedpca_10',['isDecomposedPCA',['../classPCAHandler.html#a10fecf91a038d034f55a08332dec0f4a',1,'PCAHandler']]],
   ['isflat_11',['isFlat',['../GetPenaltyTerm_8cpp.html#ae7c3a438d4508eba7ac26e26135b2c17',1,'GetPenaltyTerm.cpp']]],
   ['isflatarray_12',['isflatarray',['../classBinnedSplineHandler.html#a13329dc38e92088744a5a49a60c01a83',1,'BinnedSplineHandler']]],
-  ['isnc_13',['isNC',['../structFarDetectorCoreInfo.html#aa747b7b9ef0058fc9362fc48c4a53b7e',1,'FarDetectorCoreInfo']]],
-  ['isnc_14',['IsNC',['../structMaCh3ModeInfo.html#ad987766dd95bed2cfcdad169d07a885b',1,'MaCh3ModeInfo']]],
+  ['isnc_13',['IsNC',['../structMaCh3ModeInfo.html#ad987766dd95bed2cfcdad169d07a885b',1,'MaCh3ModeInfo']]],
+  ['isnc_14',['isNC',['../structFarDetectorCoreInfo.html#aa747b7b9ef0058fc9362fc48c4a53b7e',1,'FarDetectorCoreInfo']]],
   ['ispriorpredictive_15',['isPriorPredictive',['../classSampleSummary.html#adb737e335e68edeb14a6ce2ca112dc8c',1,'SampleSummary']]]
 ];
