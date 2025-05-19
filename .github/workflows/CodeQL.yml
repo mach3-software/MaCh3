@@ -3,7 +3,7 @@
 name: "CodeQL C++ Analysis"
 on:
   schedule:
-    - cron: '0 0 * * 0' # Every Sunday at midnight
+    - cron: '0 0 * * 1' # KS: Every Monday at midnight to not disturb during weekend...
 
 jobs:
   analyze:
@@ -12,8 +12,8 @@ jobs:
     strategy:
       matrix:
         container: [
-          ghcr.io/mach3-software/mach3:alma9latest,
-          ghcr.io/mach3-software/mach3:rocky9cudalatest
+          "ghcr.io/mach3-software/mach3:alma9latest",
+          "ghcr.io/mach3-software/mach3:rocky9cudalatest"
         ]
     container:
       image: ${{ matrix.container }}
@@ -30,7 +30,7 @@ jobs:
         uses: github/codeql-action/init@v3
         with:
           languages: c-cpp
-          build-mode: none
+          build-mode: manual
 
       - name: Build Code
         run: |
