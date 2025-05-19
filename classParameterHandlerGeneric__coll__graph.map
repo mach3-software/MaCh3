@@ -1,19 +1,20 @@
 <map id="ParameterHandlerGeneric" name="ParameterHandlerGeneric">
-<area shape="rect" id="node1" title="Class responsible for handling of systematic error parameters with different types defined in the con..." alt="" coords="1093,326,1284,351"/>
-<area shape="rect" id="node2" href="$classParameterHandlerBase.html" title="Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada..." alt="" coords="639,219,811,245"/>
-<area shape="rect" id="node3" title=" " alt="" coords="271,82,358,107"/>
-<area shape="rect" id="node4" title=" " alt="" coords="5,75,144,115"/>
-<area shape="rect" id="node5" title=" " alt="" coords="227,132,402,172"/>
-<area shape="rect" id="node6" title=" " alt="" coords="225,247,404,287"/>
-<area shape="rect" id="node7" title=" " alt="" coords="221,15,408,41"/>
-<area shape="rect" id="node8" title=" " alt="" coords="232,433,397,458"/>
-<area shape="rect" id="node9" title=" " alt="" coords="240,482,389,507"/>
-<area shape="rect" id="node10" title=" " alt="" coords="227,532,402,572"/>
-<area shape="rect" id="node11" title=" " alt="" coords="201,197,428,222"/>
-<area shape="rect" id="node12" title=" " alt="" coords="193,311,436,351"/>
-<area shape="rect" id="node13" title=" " alt="" coords="635,269,814,294"/>
-<area shape="rect" id="node14" title=" " alt="" coords="643,319,806,359"/>
-<area shape="rect" id="node15" title=" " alt="" coords="611,383,839,409"/>
-<area shape="rect" id="node16" title=" " alt="" coords="613,433,837,458"/>
-<area shape="rect" id="node17" title=" " alt="" coords="597,482,852,507"/>
+<area shape="rect" id="node1" title="Class responsible for handling of systematic error parameters with different types defined in the con..." alt="" coords="1093,349,1284,374"/>
+<area shape="rect" id="node2" href="$classParameterHandlerBase.html" title="Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada..." alt="" coords="639,242,811,267"/>
+<area shape="rect" id="node3" title=" " alt="" coords="271,13,358,38"/>
+<area shape="rect" id="node4" title=" " alt="" coords="5,5,144,45"/>
+<area shape="rect" id="node5" title=" " alt="" coords="227,71,402,111"/>
+<area shape="rect" id="node6" title=" " alt="" coords="225,299,404,339"/>
+<area shape="rect" id="node7" title=" " alt="" coords="221,135,408,161"/>
+<area shape="rect" id="node8" title=" " alt="" coords="232,463,397,489"/>
+<area shape="rect" id="node9" title=" " alt="" coords="240,513,389,538"/>
+<area shape="rect" id="node10" title=" " alt="" coords="227,563,402,603"/>
+<area shape="rect" id="node11" title=" " alt="" coords="201,185,428,210"/>
+<area shape="rect" id="node12" title=" " alt="" coords="193,235,436,275"/>
+<area shape="rect" id="node13" title=" " alt="" coords="214,363,415,403"/>
+<area shape="rect" id="node14" title=" " alt="" coords="635,291,814,317"/>
+<area shape="rect" id="node15" title=" " alt="" coords="643,341,806,381"/>
+<area shape="rect" id="node16" title=" " alt="" coords="611,406,839,431"/>
+<area shape="rect" id="node17" title=" " alt="" coords="613,455,837,481"/>
+<area shape="rect" id="node18" title=" " alt="" coords="597,505,852,530"/>
 </map>

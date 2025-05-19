@@ -59,7 +59,11 @@ var searchData=
   ['transfertoparam_56',['TransferToParam',['../classPCAHandler.html#a93e5548b530c1cc6158e62f497ca3c59',1,'PCAHandler']]],
   ['transfertopca_57',['TransferToPCA',['../classPCAHandler.html#a7782b7f998d5a53ab88d76a41ff73fe4',1,'PCAHandler']]],
   ['translatename_58',['translateName',['../classMaCh3Plotting_1_1InputManager.html#ab4ecb1daf7b700137a15c3cad48cdaa4',1,'MaCh3Plotting::InputManager']]],
-  ['tresponsefunction_5fred_59',['TResponseFunction_red',['../classTResponseFunction__red.html#a50443a78985e0c9b16ffc36ebc1d2e91',1,'TResponseFunction_red::TResponseFunction_red()'],['../classTResponseFunction__red.html',1,'TResponseFunction_red']]],
-  ['tspline3_5fred_60',['TSpline3_red',['../classTSpline3__red.html#a49e4386a4d7870a8f3a9f744d1b3ce7c',1,'TSpline3_red::TSpline3_red(M3::float_t *X, M3::float_t *Y, M3::int_t N, M3::float_t **P)'],['../classTSpline3__red.html#a643d07969140e64bb55e8639552d1209',1,'TSpline3_red::TSpline3_red(TSpline3 *&amp;spline, SplineInterpolation InterPolation=kTSpline3)'],['../classTSpline3__red.html#ae76e72436b20a59ee33eb1d41dbe59eb',1,'TSpline3_red::TSpline3_red()'],['../classTSpline3__red.html',1,'TSpline3_red']]],
-  ['typeparameterbase_61',['TypeParameterBase',['../structTypeParameterBase.html',1,'']]]
+  ['tresponsefunction_5fred_59',['TResponseFunction_red',['../classTResponseFunction__red.html',1,'TResponseFunction_red'],['../classTResponseFunction__red.html#a50443a78985e0c9b16ffc36ebc1d2e91',1,'TResponseFunction_red::TResponseFunction_red()']]],
+  ['tspline3_5fred_60',['TSpline3_red',['../classTSpline3__red.html#a49e4386a4d7870a8f3a9f744d1b3ce7c',1,'TSpline3_red::TSpline3_red()'],['../classTSpline3__red.html',1,'TSpline3_red'],['../classTSpline3__red.html#a643d07969140e64bb55e8639552d1209',1,'TSpline3_red::TSpline3_red(TSpline3 *&amp;spline, SplineInterpolation InterPolation=kTSpline3)'],['../classTSpline3__red.html#ae76e72436b20a59ee33eb1d41dbe59eb',1,'TSpline3_red::TSpline3_red()']]],
+  ['tunemap_61',['TuneMap',['../classParameterTunes.html#ac153c6fe15225e0ec4f1fb2de8d7e0ca',1,'ParameterTunes']]],
+  ['tunenames_62',['TuneNames',['../classParameterTunes.html#a5e61597ff466d83680a44f4a6bc78879',1,'ParameterTunes']]],
+  ['tunes_63',['Tunes',['../classParameterHandlerBase.html#a4aa04c9dfb80f8d25f0712e21eb71054',1,'ParameterHandlerBase']]],
+  ['tunevalues_64',['TuneValues',['../classParameterTunes.html#ac6cb5b976b3896a21cb3bb5a8be6957b',1,'ParameterTunes']]],
+  ['typeparameterbase_65',['TypeParameterBase',['../structTypeParameterBase.html',1,'']]]
 ];

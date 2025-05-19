@@ -33,5 +33,9 @@ var searchData=
   ['totalonsplitplots_30',['totalOnSplitPlots',['../PlotLLH_8cpp.html#a6446498097144fc5f704c241f009d44d',1,'PlotLLH.cpp']]],
   ['tottoys_31',['TotToys',['../RHat_8cpp.html#a8d5589b851b154e9a366017ca14da0f5',1,'RHat.cpp']]],
   ['transfermat_32',['TransferMat',['../classPCAHandler.html#a1d9302633ed96ec57fbe26d25cbcee61',1,'PCAHandler']]],
-  ['transfermatt_33',['TransferMatT',['../classPCAHandler.html#a6f6443a487bb544e6a6e458d86f35f27',1,'PCAHandler']]]
+  ['transfermatt_33',['TransferMatT',['../classPCAHandler.html#a6f6443a487bb544e6a6e458d86f35f27',1,'PCAHandler']]],
+  ['tunemap_34',['TuneMap',['../classParameterTunes.html#ac153c6fe15225e0ec4f1fb2de8d7e0ca',1,'ParameterTunes']]],
+  ['tunenames_35',['TuneNames',['../classParameterTunes.html#a5e61597ff466d83680a44f4a6bc78879',1,'ParameterTunes']]],
+  ['tunes_36',['Tunes',['../classParameterHandlerBase.html#a4aa04c9dfb80f8d25f0712e21eb71054',1,'ParameterHandlerBase']]],
+  ['tunevalues_37',['TuneValues',['../classParameterTunes.html#ac6cb5b976b3896a21cb3bb5a8be6957b',1,'ParameterTunes']]]
 ];
