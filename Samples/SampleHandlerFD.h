@@ -345,7 +345,7 @@ public:
   std::unique_ptr<manager> SampleManager;
   /// @brief function to create the member of the FarDetectorInfo struct so
   /// they are the appropriate size.
-  void InitialiseSingleFDMCObject(const int nEvents);
+  void InitialiseSingleFDMCObject();
   void InitialiseSplineObject();
 
   std::vector<std::string> mc_files;
