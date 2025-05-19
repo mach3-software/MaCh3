@@ -23,8 +23,8 @@ void PCAHandler::SetupPointers(std::vector<double>* fCurr_Val,
 }
 
 // ********************************************
-void PCAHandler::ConstructPCA(TMatrixDSym * CovMatrix, const int firstPCAd, const int lastPCAd,
-                              const double eigen_thresh, int& _fNumParPCA, const int _fNumPar) {
+void PCAHandler::ConstructPCA(TMatrixDSym* CovMatrix, const int firstPCAd, const int lastPCAd,
+                              const double eigen_thresh, const int _fNumPar) {
 // ********************************************
   FirstPCAdpar = firstPCAd;
   LastPCAdpar = lastPCAd;
@@ -74,29 +74,28 @@ void PCAHandler::ConstructPCA(TMatrixDSym * CovMatrix, const int firstPCAd, cons
       break;
     }
   }
-  _fNumParPCA = numunpcadpars+nKeptPCApars;
-  NumParPCA = _fNumParPCA;
-  MACH3LOG_INFO("Threshold of {} on eigen values relative sum of eigen value ({}) generates {} eigen vectors, plus we have {} unpcad pars, for a total of {}", eigen_threshold, sum, nKeptPCApars, numunpcadpars, _fNumParPCA);
+  NumParPCA = numunpcadpars+nKeptPCApars;
+  MACH3LOG_INFO("Threshold of {} on eigen values relative sum of eigen value ({}) generates {} eigen vectors, plus we have {} unpcad pars, for a total of {}", eigen_threshold, sum, nKeptPCApars, numunpcadpars, NumParPCA);
 
   //DB Create array of correct size so eigen_values can be used in CorrelateSteps
-  eigen_values_master = std::vector<double>(_fNumParPCA, 1.0);
+  eigen_values_master = std::vector<double>(NumParPCA, 1.0);
   for (int i = FirstPCAdpar; i < FirstPCAdpar+nKeptPCApars; ++i) {eigen_values_master[i] = eigen_values(i-FirstPCAdpar);}
 
   // Now construct the transfer matrices
   //These matrices will be as big as number of unPCAd pars plus number of eigenvalues kept
-  TransferMat.ResizeTo(CovMatrix->GetNrows(), _fNumParPCA);
-  TransferMatT.ResizeTo(CovMatrix->GetNrows(), _fNumParPCA);
+  TransferMat.ResizeTo(CovMatrix->GetNrows(), NumParPCA);
+  TransferMatT.ResizeTo(CovMatrix->GetNrows(), NumParPCA);
 
   // Get a subset of the eigen vector matrix
   TMatrixD temp(eigen_vectors.GetSub(0, eigen_vectors.GetNrows()-1, 0, nKeptPCApars-1));
 
   //Make transfer matrix which is two blocks of identity with a block of the PCA transfer matrix in between
   TMatrixD temp2;
-  temp2.ResizeTo(CovMatrix->GetNrows(), _fNumParPCA);
+  temp2.ResizeTo(CovMatrix->GetNrows(), NumParPCA);
 
   //First set the whole thing to 0
   for(int iRow = 0; iRow < CovMatrix->GetNrows(); iRow++){
-    for(int iCol = 0; iCol < _fNumParPCA; iCol++){
+    for(int iCol = 0; iCol < NumParPCA; iCol++){
       temp2[iRow][iCol] = 0;
     }
   }
@@ -129,21 +128,21 @@ void PCAHandler::ConstructPCA(TMatrixDSym * CovMatrix, const int firstPCAd, cons
   #endif
 
   // Make the PCA parameter arrays
-  _fParCurrPCA.ResizeTo(_fNumParPCA);
-  _fParPropPCA.ResizeTo(_fNumParPCA);
-  _fPreFitValuePCA.resize(_fNumParPCA);
+  _fParCurrPCA.ResizeTo(NumParPCA);
+  _fParPropPCA.ResizeTo(NumParPCA);
+  _fPreFitValuePCA.resize(NumParPCA);
 
   //KS: make easy map so we could easily find un-decomposed parameters
-  isDecomposedPCA.resize(_fNumParPCA);
-  _fParSigmaPCA.resize(_fNumParPCA);
-  for (int i = 0; i < _fNumParPCA; ++i)
+  isDecomposedPCA.resize(NumParPCA);
+  _fParSigmaPCA.resize(NumParPCA);
+  for (int i = 0; i < NumParPCA; ++i)
   {
     _fParSigmaPCA[i] = 1;
     isDecomposedPCA[i] = -1;
   }
   for (int i = 0; i < FirstPCAdpar; ++i) isDecomposedPCA[i] = i;
 
-  for (int i = FirstPCAdpar+nKeptPCApars+1; i < _fNumParPCA; ++i) isDecomposedPCA[i] = i+(_fNumPar-_fNumParPCA);
+  for (int i = FirstPCAdpar+nKeptPCApars+1; i < NumParPCA; ++i) isDecomposedPCA[i] = i+(_fNumPar-NumParPCA);
 }
 
 // ********************************************
@@ -235,6 +234,78 @@ void PCAHandler::TransferToParam() {
   for(int i = 0; i < static_cast<int>(_pCurrVal->size()); ++i) {
     (*_pPropVal)[i] = fParProp_vec(i);
     (*_pCurrVal)[i] = fParCurr_vec(i);
+  }
+}
+
+// ********************************************
+// Throw the proposed parameter by mag sigma.
+void PCAHandler::ThrowParProp(const double mag, const double* _restrict_ randParams) {
+// ********************************************
+  for (int i = 0; i < NumParPCA; i++) {
+    if (_fParSigmaPCA[i] > 0.) {
+    _fParPropPCA(i) = _fParCurrPCA(i)+mag*randParams[i];
+    }
+  }
+  TransferToParam();
+}
+
+// ********************************************
+// Throw the proposed parameter by mag sigma.
+void PCAHandler::ThrowParCurr(const double mag, const double* _restrict_ randParams) {
+// ********************************************
+  for (int i = 0; i < NumParPCA; i++) {
+    if (_fParSigmaPCA[i] > 0.) {
+    _fParPropPCA(i) = mag*randParams[i];
+    }
+  }
+  TransferToParam();
+}
+
+// ********************************************
+void PCAHandler::Print() {
+// ********************************************
+  MACH3LOG_INFO("PCA:");
+  for (int i = 0; i < NumParPCA; ++i) {
+    MACH3LOG_INFO("PCA {:<2} Current: {:<10.2f} Proposed: {:<10.2f}", i, _fParCurrPCA(i), _fParPropPCA(i));
+  }
+}
+
+// ********************************************
+void PCAHandler::SetBranches(TTree &tree, bool SaveProposal, const std::vector<std::string>& Names) {
+// ********************************************
+  for (int i = 0; i < NumParPCA; ++i) {
+    tree.Branch(Form("%s_PCA", Names[i].c_str()), &_fParCurrPCA.GetMatrixArray()[i], Form("%s_PCA/D", Names[i].c_str()));
+  }
+
+  if(SaveProposal)
+  {
+    for (int i = 0; i < NumParPCA; ++i) {
+      tree.Branch(Form("%s_PCA_Prop", Names[i].c_str()), &_fParPropPCA.GetMatrixArray()[i], Form("%s_PCA_Prop/D", Names[i].c_str()));
+    }
+  }
+}
+
+// ********************************************
+void PCAHandler::ToggleFixAllParameters() {
+// ********************************************
+  for (int i = 0; i < NumParPCA; i++) {
+    _fParSigmaPCA[i] *= -1.0;
+  }
+}
+
+// ********************************************
+void PCAHandler::ToggleFixParameter(const int i, const std::vector<std::string>& Names) {
+// ********************************************
+  int isDecom = -1;
+  for (int im = 0; im < NumParPCA; ++im) {
+    if(isDecomposedPCA[im] == i) {isDecom = im;}
+  }
+  if(isDecom < 0) {
+    MACH3LOG_ERROR("Parameter {} is PCA decomposed can't fix this", Names[i]);
+    //throw MaCh3Exception(__FILE__ , __LINE__ );
+  } else {
+    _fParSigmaPCA[isDecom] *= -1.0;
+    MACH3LOG_INFO("Setting un-decomposed {}(parameter {}/{} in PCA base) to fixed at {}", Names[i], i, isDecom, (*_pCurrVal)[i]);
   }
 }
 
@@ -485,7 +556,7 @@ void PCAHandler::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, i
   leg_Eigen->SetFillStyle(0);
   leg_Eigen->Draw("Same");
 
-  c1->Print( "Debug_PCA.pdf");
+  c1->Print("Debug_PCA.pdf");
   c1->SetLogy(0);
   delete heigen_values_Eigen;
   delete heigen_cumulative_Eigen;
@@ -520,13 +591,13 @@ void PCAHandler::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, i
   else heigen_vectors->GetZaxis()->SetRangeUser(0-fabs(0-minz),0+fabs(0-minz));
   if(PlotText) heigen_vectors->Draw("COLZ TEXT");
   else heigen_vectors->Draw("COLZ");
-  c1->Print( "Debug_PCA.pdf");
+  c1->Print("Debug_PCA.pdf");
   delete heigen_vectors_Eigen;
 
-  #endif
+  #endif // end if Eigen enabled
   delete heigen_vectors;
 
-  c1->Print( "Debug_PCA.pdf]");
+  c1->Print("Debug_PCA.pdf]");
   delete c1;
   PCA_Debug->Close();
   delete PCA_Debug;

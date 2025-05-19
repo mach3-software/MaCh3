@@ -88,7 +88,7 @@ double LikelihoodFit::CalcChi2(const double* x) {
         //KS: Basically apply mirroring for parameters out of bounds
         pars[i] = ParVal;
       }
-      (*it)->SetParametersPCA(pars);
+      (*it)->GetPCAHandler()->SetParametersPCA(pars);
     }
     (*it)->AcceptStep();
   }
