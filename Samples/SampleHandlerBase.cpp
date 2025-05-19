@@ -6,6 +6,8 @@ SampleHandlerBase::SampleHandlerBase()
   dathist = NULL;
   dathist2d = NULL;
   Modes = nullptr;
+
+  nEvents = 0;
 }
 
 SampleHandlerBase::~SampleHandlerBase()
