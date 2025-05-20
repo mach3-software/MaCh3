@@ -393,50 +393,40 @@ void SampleHandlerFD::FillArray() {
       continue;
     }
 
-    M3::float_t splineweight = 1.0;
-    M3::float_t normweight = 1.0;
-    M3::float_t totalweight = 1.0;
-
-    if(SplineHandler){
-      splineweight = CalcWeightSpline(iEvent);
-    }
+    FarDetectorCoreInfo* MCEvent = &MCSamples[iEvent];
+    M3::float_t splineweight = CalcWeightSpline(MCEvent);
     //DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient. Do this on a spline-by-spline basis
     if (splineweight <= 0.){
-      MCSamples[iEvent].xsec_w = 0.;
+      MCEvent->xsec_w = 0.;
       continue;
     }
 
     //Loop over stored normalisation and function pointers
-    normweight = CalcWeightNorm(iEvent);
+    M3::float_t normweight = CalcWeightNorm(MCEvent);
 
-    //DB Catch negative norm weights and skip any event with a negative event. Previously we would set weight to zere and continue but that is inefficient
-    if (normweight <= 0.){
-      MCSamples[iEvent].xsec_w = 0.;
-      continue;
-    }
     // Virtual by default does nothing
     CalcWeightFunc(iEvent);
 
-    MCSamples[iEvent].xsec_w = splineweight*normweight;
+    MCEvent->xsec_w = splineweight*normweight;
 
     //DB Total weight
-    totalweight = GetEventWeight(iEvent);
+    M3::float_t totalweight = GetEventWeight(iEvent);
     //DB Catch negative weights and skip any event with a negative event
     if (totalweight <= 0.){
-      MCSamples[iEvent].xsec_w = 0.;
+      MCEvent->xsec_w = 0.;
       continue;
     }
     //DB Switch on BinningOpt to allow different binning options to be implemented
     //The alternative would be to have inheritance based on BinningOpt
-    double XVar = *(MCSamples[iEvent].x_var);
+    const double XVar = *(MCEvent->x_var);
 
     //DB Find the relevant bin in the PDF for each event
     int XBinToFill = -1;
-    int YBinToFill = MCSamples[iEvent].NomYBin;
+    const int YBinToFill = MCEvent->NomYBin;
 
     //DB - First, check to see if the event is still in the nominal bin
-    if (XVar < MCSamples[iEvent].rw_upper_xbinedge && XVar >= MCSamples[iEvent].rw_lower_xbinedge) {
-      XBinToFill = MCSamples[iEvent].NomXBin;
+    if (XVar < MCEvent->rw_upper_xbinedge && XVar >= MCEvent->rw_lower_xbinedge) {
+      XBinToFill = MCEvent->NomXBin;
     }
     //DB - Second, check to see if the event is outside of the binning range and skip event if it is
     //ETA- note that nXBins is XBinEdges.size() - 1
@@ -445,12 +435,12 @@ void SampleHandlerFD::FillArray() {
     }
     //DB - Thirdly, check the adjacent bins first as Eb+CC+EScale shifts aren't likely to move an Erec more than 1bin width
     //Shifted down one bin from the event bin at nominal
-    else if (XVar < MCSamples[iEvent].rw_lower_xbinedge && XVar >= MCSamples[iEvent].rw_lower_lower_xbinedge) {
-      XBinToFill = MCSamples[iEvent].NomXBin-1;
+    else if (XVar < MCEvent->rw_lower_xbinedge && XVar >= MCEvent->rw_lower_lower_xbinedge) {
+      XBinToFill = MCEvent->NomXBin-1;
     }
     //Shifted up one bin from the event bin at nominal
-    else if (XVar < MCSamples[iEvent].rw_upper_upper_xbinedge && XVar >= MCSamples[iEvent].rw_upper_xbinedge) {
-      XBinToFill = MCSamples[iEvent].NomXBin+1;
+    else if (XVar < MCEvent->rw_upper_upper_xbinedge && XVar >= MCEvent->rw_upper_xbinedge) {
+      XBinToFill = MCEvent->NomXBin+1;
     }
     //DB - If we end up in this loop, the event has been shifted outside of its nominal bin, but is still within the allowed binning range
     else {
@@ -485,13 +475,13 @@ void SampleHandlerFD::FillArray_MP()  {
   double** SampleHandlerFD_array_private_w2 = nullptr;
   // Declare the omp parallel region
   // The parallel region needs to stretch beyond the for loop!
-#pragma omp parallel private(SampleHandlerFD_array_private, SampleHandlerFD_array_private_w2)
+  #pragma omp parallel private(SampleHandlerFD_array_private, SampleHandlerFD_array_private_w2)
   {
     // private to each thread
     // ETA - maybe we can use parallel firstprivate to initialise these?
     SampleHandlerFD_array_private = new double*[nYBins];
     SampleHandlerFD_array_private_w2 = new double*[nYBins];
-    for (size_t yBin=0;yBin<nYBins;yBin++) {
+    for (size_t yBin=0;yBin<nYBins; ++yBin) {
       SampleHandlerFD_array_private[yBin] = new double[nXBins];
       SampleHandlerFD_array_private_w2[yBin] = new double[nXBins];
 
@@ -512,9 +502,10 @@ void SampleHandlerFD::FillArray_MP()  {
     // 1. Order minituples in Y-axis variable as this will *hopefully* reduce cache misses inside SampleHandlerFD_array_class[yBin][xBin]
     //
     // We will hit <0.1 s/step eventually! :D
-    
+
+    const unsigned int NumberOfEvents = GetNEvents();
     #pragma omp for
-    for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
+    for (unsigned int iEvent = 0; iEvent < NumberOfEvents; iEvent++) {
       //ETA - generic functions to apply shifts to kinematic variables
       // Apply this before IsEventSelected is called.
       ApplyShifts(iEvent);
@@ -526,59 +517,48 @@ void SampleHandlerFD::FillArray_MP()  {
         continue;
       }
 
-      M3::float_t splineweight = 1.0;
-      M3::float_t normweight = 1.0;
-      M3::float_t totalweight = 1.0;
-
       //DB SKDet Syst
       //As weights were skdet::fParProp, and we use the non-shifted erec, we might as well cache the corresponding fParProp index for each event and the pointer to it
-
-      if(SplineHandler){
-        splineweight = CalcWeightSpline(iEvent);
-      }
+      FarDetectorCoreInfo* MCEvent = &MCSamples[iEvent];
+      const M3::float_t splineweight = CalcWeightSpline(MCEvent);
       //DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
       if (splineweight <= 0.){
-        MCSamples[iEvent].xsec_w = 0.;
+        MCEvent->xsec_w = 0.;
         continue;
       }
 
-      normweight = CalcWeightNorm(iEvent);
-      //DB Catch negative norm weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
-      if (normweight <= 0.){
-        MCSamples[iEvent].xsec_w = 0.;
-        continue;
-      }
+      const M3::float_t normweight = CalcWeightNorm(MCEvent);
 
       // Virtual by default does nothing
       CalcWeightFunc(iEvent);
 
-      MCSamples[iEvent].xsec_w = splineweight*normweight;
+      MCEvent->xsec_w = splineweight*normweight;
 
-      totalweight = GetEventWeight(iEvent);
+      const M3::float_t totalweight = GetEventWeight(iEvent);
 
       //DB Catch negative weights and skip any event with a negative event
       if (totalweight <= 0.){
-        MCSamples[iEvent].xsec_w = 0.;
+        MCEvent->xsec_w = 0.;
         continue;
       }
 
       //DB Switch on BinningOpt to allow different binning options to be implemented
       //The alternative would be to have inheritance based on BinningOpt
-      double XVar = (*(MCSamples[iEvent].x_var));
+      const double XVar = (*(MCEvent->x_var));
 
       //DB Commented out by default but if we ever want to consider shifts in theta this will be needed
-      //double YVar = MCSamples[iEvent].rw_theta;
-      //ETA - this would actually be with (*(MCSamples[iEvent].y_var)) and done extremely
+      //double YVar = MCEvent->rw_theta;
+      //ETA - this would actually be with (*(MCEvent->y_var)) and done extremely
       //similarly to XVar now
 
       //DB Find the relevant bin in the PDF for each event
       int XBinToFill = -1;
-      int YBinToFill = MCSamples[iEvent].NomYBin;
+      const int YBinToFill = MCEvent->NomYBin;
 
       //DB Check to see if momentum shift has moved bins
       //DB - First, check to see if the event is still in the nominal bin
-      if (XVar < MCSamples[iEvent].rw_upper_xbinedge && XVar >= MCSamples[iEvent].rw_lower_xbinedge) {
-        XBinToFill = MCSamples[iEvent].NomXBin;
+      if (XVar < MCEvent->rw_upper_xbinedge && XVar >= MCEvent->rw_lower_xbinedge) {
+        XBinToFill = MCEvent->NomXBin;
       }
       //DB - Second, check to see if the event is outside of the binning range and skip event if it is
       else if (XVar < XBinEdges[0] || XVar >= XBinEdges[nXBins]) {
@@ -586,12 +566,12 @@ void SampleHandlerFD::FillArray_MP()  {
       }
       //DB - Thirdly, check the adjacent bins first as Eb+CC+EScale shifts aren't likely to move an Erec more than 1bin width
       //Shifted down one bin from the event bin at nominal
-      else if (XVar < MCSamples[iEvent].rw_lower_xbinedge && XVar >= MCSamples[iEvent].rw_lower_lower_xbinedge) {
-        XBinToFill = MCSamples[iEvent].NomXBin-1;
+      else if (XVar < MCEvent->rw_lower_xbinedge && XVar >= MCEvent->rw_lower_lower_xbinedge) {
+        XBinToFill = MCEvent->NomXBin-1;
       }
       //Shifted up one bin from the event bin at nominal
-      else if (XVar < MCSamples[iEvent].rw_upper_upper_xbinedge && XVar >= MCSamples[iEvent].rw_upper_xbinedge) {
-        XBinToFill = MCSamples[iEvent].NomXBin+1;
+      else if (XVar < MCEvent->rw_upper_upper_xbinedge && XVar >= MCEvent->rw_upper_xbinedge) {
+        XBinToFill = MCEvent->NomXBin+1;
       }
       //DB - If we end up in this loop, the event has been shifted outside of its nominal bin, but is still within the allowed binning range
       else {
@@ -754,7 +734,7 @@ void SampleHandlerFD::ApplyShifts(int iEvent) {
 
 // ***************************************************************************
 // Calculate the spline weight for one event
-M3::float_t SampleHandlerFD::CalcWeightSpline(const int iEvent) const {
+M3::float_t SampleHandlerFD::CalcWeightSpline(const FarDetectorCoreInfo* MCEvent) const {
 // ***************************************************************************
   M3::float_t spline_weight = 1.0;
   //DB Xsec syst
@@ -762,26 +742,26 @@ M3::float_t SampleHandlerFD::CalcWeightSpline(const int iEvent) const {
   #ifdef MULTITHREAD
   #pragma omp simd
   #endif
-  for (size_t iSpline = 0; iSpline < MCSamples[iEvent].xsec_spline_pointers.size(); ++iSpline) {
-    spline_weight *= *(MCSamples[iEvent].xsec_spline_pointers[iSpline]);
+  for (size_t iSpline = 0; iSpline < MCEvent->xsec_spline_pointers.size(); ++iSpline) {
+    spline_weight *= *(MCEvent->xsec_spline_pointers[iSpline]);
   }
   return spline_weight;
 }
 
 // ***************************************************************************
 // Calculate the normalisation weight for an event
-M3::float_t SampleHandlerFD::CalcWeightNorm(const int iEvent) const {
+M3::float_t SampleHandlerFD::CalcWeightNorm(const FarDetectorCoreInfo* MCEvent) const {
 // ***************************************************************************
   M3::float_t xsecw = 1.0;
   //Loop over stored normalisation and function pointers
   #ifdef MULTITHREAD
   #pragma omp simd
   #endif
-  for (size_t iParam = 0; iParam < MCSamples[iEvent].xsec_norm_pointers.size(); ++iParam)
+  for (size_t iParam = 0; iParam < MCEvent->xsec_norm_pointers.size(); ++iParam)
   {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
-    xsecw *= static_cast<M3::float_t>(*(MCSamples[iEvent].xsec_norm_pointers[iParam]));
+    xsecw *= static_cast<M3::float_t>(*(MCEvent->xsec_norm_pointers[iParam]));
 #pragma GCC diagnostic pop
     #ifdef DEBUG
     if (TMath::IsNaN(xsecw)) MACH3LOG_WARN("iParam= {} xsecweight=nan from norms", iParam);
