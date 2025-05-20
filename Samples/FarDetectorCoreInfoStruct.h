@@ -38,52 +38,49 @@ inline int GetOscChannel(const std::vector<OscChannelInfo>& OscChannel, const in
 
 /// @brief constructors are same for all three so put in here
 struct FarDetectorCoreInfo {
-  FarDetectorCoreInfo() : isNC{nullptr} {}
+  FarDetectorCoreInfo(){}
   FarDetectorCoreInfo(FarDetectorCoreInfo const &other) = delete;
   FarDetectorCoreInfo(FarDetectorCoreInfo &&other) = default;
   FarDetectorCoreInfo& operator=(FarDetectorCoreInfo const &other) = delete;
   FarDetectorCoreInfo& operator=(FarDetectorCoreInfo &&other) = delete;
 
-  ~FarDetectorCoreInfo(){if(isNC != nullptr) delete [] isNC;}
+  ~FarDetectorCoreInfo(){}
 
-  std::vector<int*> Target; ///< target the interaction was on
-  std::vector<const int*> nupdg;
-  std::vector<const int*> nupdgUnosc;
+  const int* Target = 0; ///< target the interaction was on
+  const int* nupdg  = 0;
+  const int* nupdgUnosc = 0;
 
   //THe x_var and y_vars that you're binning in
-  std::vector<const double*> x_var;
-  std::vector<const double*> y_var;
-  std::vector<const double*> rw_etru;
-  std::vector<const double*> rw_truecz;
+  const double* x_var = &M3::Unity_D;
+  const double* y_var = &M3::Unity_D;
+  const double* rw_etru = &M3::_BAD_DOUBLE_;
+  const double* rw_truecz = &M3::_BAD_DOUBLE_;
 
-  /// xsec bins
-  std::vector< std::vector< int > > xsec_norms_bins;
+  /// Pointers to normalisation weights which are being taken from Parameter Handler
+  std::vector<const double*> xsec_norm_pointers;
+  /// Pointers to spline weights which are being calculated by Splines Handler
+  std::vector<const M3::float_t*> xsec_spline_pointers;
+  /// Total weight of norm and spline parameters
+  M3::float_t xsec_w = 1.;
+  /// pointer to oscillation weight which is being calculated by Oscillation Handler
+  const M3::float_t* osc_w_pointer = &M3::Unity;
+  /// Pointers to @xsec_w, @osc_w_pointer and remaining experiment specific weights
+  std::vector<const M3::float_t*> total_weight_pointers;
 
-  std::vector<int> nxsec_norm_pointers;
-  std::vector<std::vector<const double*>> xsec_norm_pointers;
+  //M3::float_t total_w  = M3::_BAD_INT_;
 
-  std::vector<int> nxsec_spline_pointers;
-  std::vector<std::vector<const M3::float_t*>> xsec_spline_pointers;
+  //std::vector<int> XBin;
+  //std::vector<int> YBin;
+  int NomXBin = -1;
+  int NomYBin = -1;
 
-  std::vector<int> ntotal_weight_pointers;
-  std::vector<std::vector<const M3::float_t*>> total_weight_pointers;
-  std::vector<M3::float_t> total_w;
-
-  std::vector<int> XBin;
-  std::vector<int> YBin;
-  std::vector<int> NomXBin;
-  std::vector<int> NomYBin;
-
-  bool *isNC;
+  bool isNC = false;
 
   // histo pdf bins
-  std::vector<double> rw_lower_xbinedge;       ///< lower to check if Eb has moved the erec bin
-  std::vector<double> rw_lower_lower_xbinedge; ///< lower to check if Eb has moved the erec bin
-  std::vector<double> rw_upper_xbinedge;       ///< upper to check if Eb has moved the erec bin
-  std::vector<double> rw_upper_upper_xbinedge; ///< upper to check if Eb has moved the erec bin
+  double rw_lower_xbinedge = -1;       ///< lower to check if Eb has moved the erec bin
+  double rw_lower_lower_xbinedge = -1; ///< lower to check if Eb has moved the erec bin
+  double rw_upper_xbinedge = -1;       ///< upper to check if Eb has moved the erec bin
+  double rw_upper_upper_xbinedge = -1; ///< upper to check if Eb has moved the erec bin
 
-  std::vector<const double*> mode;
-
-  std::vector<const M3::float_t*> osc_w_pointer;
-  std::vector<M3::float_t> xsec_w;
+  const double* mode = &M3::Unity_D;
 };
