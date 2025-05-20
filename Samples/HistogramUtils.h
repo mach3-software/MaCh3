@@ -2,7 +2,7 @@
 
 // MaCh3 includes
 #include "Samples/SampleStructs.h"
-#include "Parameters/ParameterHandlerUtils.h"
+#include "Parameters/ParameterStructs.h"
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT include
