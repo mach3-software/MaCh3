@@ -1,5 +1,4 @@
 #include "Parameters/ParameterHandlerGeneric.h"
-#include "Samples/Structs.h"
 
 // ********************************************
 // ETA - YAML constructor

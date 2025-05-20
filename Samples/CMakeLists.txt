@@ -1,7 +1,7 @@
 set(HEADERS
     SampleHandlerBase.h
     SampleHandlerFD.h
-    Structs.h
+    SampleStructs.h
     HistogramUtils.h
     FarDetectorCoreInfoStruct.h
     OscillationHandler.h

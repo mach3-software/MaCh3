@@ -2,7 +2,7 @@
 
 // MaCh3  includes
 #include "Parameters/ParameterHandlerGeneric.h"
-#include "Samples/Structs.h"
+#include "Parameters/ParameterStructs.h"
 
 #include <cmath>
 

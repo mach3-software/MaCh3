@@ -1,5 +1,4 @@
 #include "SampleHandlerFD.h"
-#include "Samples/Structs.h"
 #include "Manager/MaCh3Exception.h"
 #include "Manager/MaCh3Logger.h"
 #include <cstddef>

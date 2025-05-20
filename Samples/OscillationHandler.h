@@ -1,7 +1,7 @@
 #pragma once
 
 //MaCh3 includes
-#include "Samples/Structs.h"
+#include "Samples/SampleStructs.h"
 
 //forward declare so we don't bleed NuOscillator headers
 class OscillatorBase;

@@ -6,6 +6,7 @@ set(HEADERS
     AdaptiveMCMCHandler.h
     PCAHandler.h
     ParameterTunes.h
+    ParameterStructs.h
 )
 
 add_library(Parameters SHARED
