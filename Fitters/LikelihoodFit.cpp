@@ -4,9 +4,10 @@
 // Run the Markov chain with all the systematic objects added
 LikelihoodFit::LikelihoodFit(manager *man) : FitterBase(man) {
 // *******************
-    NPars = 0;
-    NParsPCA = 0;
-    fMirroring = GetFromManager<bool>(fitMan->raw()["General"]["Fitter"]["Mirroring"], false);
+  NPars = 0;
+  NParsPCA = 0;
+  fMirroring = GetFromManager<bool>(fitMan->raw()["General"]["Fitter"]["Mirroring"], false);
+  if(fMirroring) MACH3LOG_INFO("Mirroring enabled");
 }
 
 
