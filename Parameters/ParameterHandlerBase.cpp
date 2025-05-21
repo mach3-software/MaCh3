@@ -318,7 +318,7 @@ void ParameterHandlerBase::ReserveMemory(const int SizeVec) {
   _fIndivStepScale = std::vector<double>(SizeVec);
   _fSampleNames = std::vector<std::vector<std::string>>(_fNumPar);
 
-  corr_throw = new double[SizeVec]();
+  corr_throw = new double[SizeVec];
   // set random parameter vector (for correlated steps)
   randParams = new double[SizeVec];
 
@@ -333,6 +333,7 @@ void ParameterHandlerBase::ReserveMemory(const int SizeVec) {
     _fFlatPrior.at(i) = false;
     _fIndivStepScale.at(i) = 1.;
     corr_throw[i] = 0.0;
+    randParams[i] = 0.0;
   }
 
   _fGlobalStepScale = 1.0;
