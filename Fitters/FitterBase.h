@@ -77,6 +77,13 @@ class FitterBase {
   /// @brief Save the settings that the MCMC was run with.
   void SaveSettings();
 
+  /// @brief YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D. Barrow
+  bool GetScaneRange(std::map<std::string, std::vector<double>>& scanRanges);
+
+  /// @brief KS: Check whether we want to skip parameter using skip vector
+  bool CheckSkipParameter(const std::vector<std::string>& SkipVector, const std::string& ParamName) const;
+
+
   /// The manager
   manager *fitMan;
 
