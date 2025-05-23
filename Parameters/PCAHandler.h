@@ -69,7 +69,8 @@ class PCAHandler{
                       const double* _restrict_ corr_throw) _noexcept_;
 
   /// @brief KS: Transfer the starting parameters to the PCA basis, you don't want to start with zero..
-  void SetInitialParameters();
+  /// @param IndStepScale Per parameter step scale, we set so each PCA param uses same step scale [eigen value takes care of size]
+  void SetInitialParameters(std::vector<double>& IndStepScale);
   /// @brief Throw the proposed parameter by mag sigma.
   void ThrowParProp(const double mag, const double* _restrict_ randParams);
   /// @brief Helper function to throw the current parameter by mag sigma.
@@ -104,8 +105,8 @@ class PCAHandler{
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
   bool IsParameterFixedPCA(const int i) const {
-    if (_fParSigmaPCA[i] < 0) { return true;  }
-    else                      { return false; }
+    if (_fErrorPCA[i] < 0) { return true;  }
+    else                   { return false; }
   }
 
   /// @brief Get eigen vectors of covariance matrix, only works with PCA
@@ -178,7 +179,7 @@ class PCAHandler{
   /// CW: Proposed parameter value in PCA base
   TVectorD _fParCurrPCA;
   /// Tells if parameter is fixed in PCA base or not
-  std::vector<double> _fParSigmaPCA;
+  std::vector<double> _fErrorPCA;
   /// If param is decomposed this will return -1, if not this will return enumerator to param in normal base. This way we can map stuff like step scale etc between normal base and undecomposed param in eigen base.
   std::vector<int> isDecomposedPCA;
   /// Number of parameters in PCA base

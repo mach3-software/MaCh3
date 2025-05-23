@@ -31,7 +31,7 @@ ParameterHandlerOsc::ParameterHandlerOsc(const std::vector<std::string>& YAMLFil
 
   //KS: Transfer the starting parameters to the PCA basis, you don't want to start with zero..
   if (pca) {
-    PCAObj->SetInitialParameters();
+    PCAObj->SetInitialParameters(_fIndivStepScale);
   }
   flipdelM = true;
 
