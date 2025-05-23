@@ -416,17 +416,10 @@ void ParameterHandlerGeneric::InitParams() {
     _fCurrVal[i] = _fPreFitValue[i];
     _fPropVal[i] = _fCurrVal[i];
   }
-  //DB Set Individual Step scale for PCA parameters to the LastPCAdpar fIndivStepScale because the step scale for those parameters is set by 'eigen_values[i]' but needs an overall step scale
-  //   However, individual step scale for non-PCA parameters needs to be set correctly
-  if (pca) {
-    for (int i = FirstPCAdpar; i <= LastPCAdpar; i++) {
-      _fIndivStepScale[i] = _fIndivStepScale[LastPCAdpar-1];
-    }
-  }
   Randomize();
   //KS: Transfer the starting parameters to the PCA basis, you don't want to start with zero..
   if (pca) {
-    PCAObj->SetInitialParameters();
+    PCAObj->SetInitialParameters(_fIndivStepScale);
   }
 }
 
