@@ -449,7 +449,7 @@ Functions</h2></td></tr>
 <div class="line"><span class="lineno">  637</span> </div>
 <div class="line"><span class="lineno">  638</span>  std::string Title = Histogram-&gt;GetName();</div>
 <div class="line"><span class="lineno">  639</span>  Title += <span class="stringliteral">&quot;_canv&quot;</span>;</div>
-<div class="line"><span class="lineno">  640</span>  <span class="keyword">auto</span> TempCanvas = std::make_unique&lt;TCanvas&gt;(Title.c_str(), Title.c_str(), 1024, 1024);</div>
+<div class="line"><span class="lineno">  640</span>  TCanvas *TempCanvas = <span class="keyword">new</span> TCanvas(Title.c_str(), Title.c_str(), 1024, 1024);</div>
 <div class="line"><span class="lineno">  641</span>  TempCanvas-&gt;SetGridx();</div>
 <div class="line"><span class="lineno">  642</span>  TempCanvas-&gt;SetGridy();</div>
 <div class="line"><span class="lineno">  643</span>  TempCanvas-&gt;cd();</div>
@@ -459,7 +459,8 @@ Functions</h2></td></tr>
 <div class="line"><span class="lineno">  647</span>  TempLine-&gt;Draw(<span class="stringliteral">&quot;same&quot;</span>);</div>
 <div class="line"><span class="lineno">  648</span> </div>
 <div class="line"><span class="lineno">  649</span>  TempCanvas-&gt;Write();</div>
-<div class="line"><span class="lineno">  650</span>}</div>
+<div class="line"><span class="lineno">  650</span>  <span class="keyword">delete</span> TempCanvas;</div>
+<div class="line"><span class="lineno">  651</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
