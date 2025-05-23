@@ -205,18 +205,18 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>bool telling whether param is part of group </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00642">642</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  642</span>                                                                                {</div>
-<div class="line"><span class="lineno">  643</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  644</span>  std::string groupLower = Group;</div>
-<div class="line"><span class="lineno">  645</span>  std::string paramGroupLower = <a class="code hl_variable" href="classParameterHandlerGeneric.html#aeb3fea66be02cc59ca14af171e7dd746">_ParameterGroup</a>[i];</div>
-<div class="line"><span class="lineno">  646</span> </div>
-<div class="line"><span class="lineno">  647</span>  <span class="comment">// KS: Convert both strings to lowercase, this way comparison will be case insensitive</span></div>
-<div class="line"><span class="lineno">  648</span>  std::transform(groupLower.begin(), groupLower.end(), groupLower.begin(), ::tolower);</div>
-<div class="line"><span class="lineno">  649</span>  std::transform(paramGroupLower.begin(), paramGroupLower.end(), paramGroupLower.begin(), ::tolower);</div>
-<div class="line"><span class="lineno">  650</span> </div>
-<div class="line"><span class="lineno">  651</span>  <span class="keywordflow">return</span> groupLower == paramGroupLower;</div>
-<div class="line"><span class="lineno">  652</span>}</div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00643">643</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  643</span>                                                                                {</div>
+<div class="line"><span class="lineno">  644</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  645</span>  std::string groupLower = Group;</div>
+<div class="line"><span class="lineno">  646</span>  std::string paramGroupLower = <a class="code hl_variable" href="classParameterHandlerGeneric.html#aeb3fea66be02cc59ca14af171e7dd746">_ParameterGroup</a>[i];</div>
+<div class="line"><span class="lineno">  647</span> </div>
+<div class="line"><span class="lineno">  648</span>  <span class="comment">// KS: Convert both strings to lowercase, this way comparison will be case insensitive</span></div>
+<div class="line"><span class="lineno">  649</span>  std::transform(groupLower.begin(), groupLower.end(), groupLower.begin(), ::tolower);</div>
+<div class="line"><span class="lineno">  650</span>  std::transform(paramGroupLower.begin(), paramGroupLower.end(), paramGroupLower.begin(), ::tolower);</div>
+<div class="line"><span class="lineno">  651</span> </div>
+<div class="line"><span class="lineno">  652</span>  <span class="keywordflow">return</span> groupLower == paramGroupLower;</div>
+<div class="line"><span class="lineno">  653</span>}</div>
 <div class="ttc" id="aclassParameterHandlerGeneric_html_aeb3fea66be02cc59ca14af171e7dd746"><div class="ttname"><a href="classParameterHandlerGeneric.html#aeb3fea66be02cc59ca14af171e7dd746">ParameterHandlerGeneric::_ParameterGroup</a></div><div class="ttdeci">std::vector&lt; std::string &gt; _ParameterGroup</div><div class="ttdoc">KS: Allow to group parameters for example to affect only cross-section or only flux etc.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8h_source.html#l00189">ParameterHandlerGeneric.h:189</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -509,20 +509,20 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00628">628</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  628</span>                                                                           {</div>
-<div class="line"><span class="lineno">  629</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  630</span>  <span class="keywordflow">if</span>(!<a class="code hl_variable" href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">pca</a>) {</div>
-<div class="line"><span class="lineno">  631</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>; i++) {</div>
-<div class="line"><span class="lineno">  632</span>      <span class="keywordflow">if</span>(<a class="code hl_function" href="group__ParameterHandlerSetters.html#ga9ccf63acb41f3e8e61f2767415bee4c5">IsParFromGroup</a>(i, Group)) <a class="code hl_variable" href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">_fPropVal</a>[i] = <a class="code hl_variable" href="classParameterHandlerBase.html#a9f98cdf43f276a271da9a66509063ba6">_fPreFitValue</a>[i];</div>
-<div class="line"><span class="lineno">  633</span>    }</div>
-<div class="line"><span class="lineno">  634</span>  } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  635</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;{} not implemented for PCA&quot;</span>, __func__);</div>
-<div class="line"><span class="lineno">  636</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><span class="lineno">  637</span>  }</div>
-<div class="line"><span class="lineno">  638</span>}</div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00629">629</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  629</span>                                                                           {</div>
+<div class="line"><span class="lineno">  630</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  631</span>  <span class="keywordflow">if</span>(!<a class="code hl_variable" href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">pca</a>) {</div>
+<div class="line"><span class="lineno">  632</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>; i++) {</div>
+<div class="line"><span class="lineno">  633</span>      <span class="keywordflow">if</span>(<a class="code hl_function" href="group__ParameterHandlerSetters.html#ga9ccf63acb41f3e8e61f2767415bee4c5">IsParFromGroup</a>(i, Group)) <a class="code hl_variable" href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">_fPropVal</a>[i] = <a class="code hl_variable" href="classParameterHandlerBase.html#a9f98cdf43f276a271da9a66509063ba6">_fPreFitValue</a>[i];</div>
+<div class="line"><span class="lineno">  634</span>    }</div>
+<div class="line"><span class="lineno">  635</span>  } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  636</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;{} not implemented for PCA&quot;</span>, __func__);</div>
+<div class="line"><span class="lineno">  637</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><span class="lineno">  638</span>  }</div>
+<div class="line"><span class="lineno">  639</span>}</div>
 <div class="ttc" id="aclassParameterHandlerBase_html_a9f98cdf43f276a271da9a66509063ba6"><div class="ttname"><a href="classParameterHandlerBase.html#a9f98cdf43f276a271da9a66509063ba6">ParameterHandlerBase::_fPreFitValue</a></div><div class="ttdeci">std::vector&lt; double &gt; _fPreFitValue</div><div class="ttdoc">Parameter value dictated by the prior model. Based on it penalty term is calculated.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00429">ParameterHandlerBase.h:429</a></div></div>
-<div class="ttc" id="agroup__ParameterHandlerSetters_html_ga9ccf63acb41f3e8e61f2767415bee4c5"><div class="ttname"><a href="group__ParameterHandlerSetters.html#ga9ccf63acb41f3e8e61f2767415bee4c5">ParameterHandlerGeneric::IsParFromGroup</a></div><div class="ttdeci">bool IsParFromGroup(const int i, const std::string &amp;Group)</div><div class="ttdoc">Checks if parameter belongs to a given group.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8cpp_source.html#l00642">ParameterHandlerGeneric.cpp:642</a></div></div>
+<div class="ttc" id="agroup__ParameterHandlerSetters_html_ga9ccf63acb41f3e8e61f2767415bee4c5"><div class="ttname"><a href="group__ParameterHandlerSetters.html#ga9ccf63acb41f3e8e61f2767415bee4c5">ParameterHandlerGeneric::IsParFromGroup</a></div><div class="ttdeci">bool IsParFromGroup(const int i, const std::string &amp;Group)</div><div class="ttdoc">Checks if parameter belongs to a given group.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8cpp_source.html#l00643">ParameterHandlerGeneric.cpp:643</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
