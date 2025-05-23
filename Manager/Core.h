@@ -39,7 +39,9 @@ namespace M3 {
     return std::fma(x, y, z);
     #endif
   }
+  /// Default value used for double initialisation
   constexpr static const double _BAD_DOUBLE_ = -999.99;
+  /// Default value used for int initialisation
   constexpr static const int _BAD_INT_ = -999;
   constexpr static const double _DEFAULT_RETURN_VAL_ = -999999.123456;
 
@@ -59,13 +61,17 @@ namespace M3 {
   constexpr static const float_t Zero = Zero_D;
   #endif
 
+  /// When parameter has no bound this serves as it. Lowest possible value the system
   constexpr static const double KinematicLowBound = std::numeric_limits<double>::lowest();
+  /// When parameter has no bound this serves as it. Highest possible value the system
   constexpr static const double KinematicUpBound = std::numeric_limits<double>::max();
 
   /// Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such step should be removed
   constexpr static const double _LARGE_LOGL_ = 1234567890.0;
 
+  /// Default value for spline knot capping, default mean not capping is being applied
   constexpr static const double DefSplineKnotUpBound = 9999;
+  /// Default value for spline knot capping, default mean not capping is being applied
   constexpr static const double DefSplineKnotLowBound = -9999;
 }
 
