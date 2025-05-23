@@ -637,7 +637,7 @@ void Get2DBayesianpValue(TH2D *Histogram) {
 
   std::string Title = Histogram->GetName();
   Title += "_canv";
-  TCanvas *TempCanvas = new TCanvas(Title.c_str(), Title.c_str(), 1024, 1024);
+  auto TempCanvas = std::make_unique<TCanvas>(Title.c_str(), Title.c_str(), 1024, 1024);
   TempCanvas->SetGridx();
   TempCanvas->SetGridy();
   TempCanvas->cd();
@@ -647,5 +647,4 @@ void Get2DBayesianpValue(TH2D *Histogram) {
   TempLine->Draw("same");
 
   TempCanvas->Write();
-  delete TempCanvas;
 }

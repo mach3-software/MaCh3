@@ -462,6 +462,41 @@ void FitterBase::DragRace(const int NLaps) {
 }
 
 // *************************
+bool FitterBase::GetScaneRange(std::map<std::string, std::vector<double>>& scanRanges) {
+// *************************
+  bool isScanRanges = false;
+  // YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D. Barrow
+  if(fitMan->raw()["LLHScan"]["ScanRanges"]){
+    YAML::Node scanRangesList = fitMan->raw()["LLHScan"]["ScanRanges"];
+    for (auto it = scanRangesList.begin(); it != scanRangesList.end(); ++it) {
+      std::string itname = it->first.as<std::string>();
+      std::vector<double> itrange = it->second.as<std::vector<double>>();
+      // Set the mapping as param_name:param_range
+      scanRanges[itname] = itrange;
+    }
+    isScanRanges = true;
+  } else {
+    MACH3LOG_INFO("There are no user-defined parameter ranges, so I'll use default param bounds for LLH Scans");
+  }
+  return isScanRanges;
+}
+
+// *************************
+bool FitterBase::CheckSkipParameter(const std::vector<std::string>& SkipVector, const std::string& ParamName) const {
+// *************************
+  bool skip = false;
+  for(unsigned int is = 0; is < SkipVector.size(); ++is)
+  {
+    if(ParamName.substr(0, SkipVector[is].length()) == SkipVector[is])
+    {
+      skip = true;
+      break;
+    }
+  }
+  return skip;
+}
+
+// *************************
 // Run LLH scan
 void FitterBase::RunLLHScan() {
 // *************************
@@ -471,16 +506,8 @@ void FitterBase::RunLLHScan() {
   MACH3LOG_INFO("Starting LLH Scan");
 
   //KS: Turn it on if you want LLH scan for each ND sample separately, which increase time significantly but can be useful for validating new samples or dials.
-  bool PlotAllNDsamplesLLH = false;
-  if(fitMan->raw()["LLHScan"]["LLHScanBySample"])
-    PlotAllNDsamplesLLH = Get<bool>(fitMan->raw()["LLHScan"]["LLHScanBySample"], __FILE__, __LINE__);
-
-  std::vector<std::string> SkipVector;
-  if(fitMan->raw()["LLHScan"]["LLHScanSkipVector"])
-  {
-    SkipVector = Get<std::vector<std::string>>(fitMan->raw()["LLHScan"]["LLHScanSkipVector"], __FILE__, __LINE__);
-    MACH3LOG_INFO("Found skip vector with {} entries", SkipVector.size());
-  }
+  bool PlotLLHScanBySample = GetFromManager<bool>(fitMan->raw()["LLHScan"]["LLHScanBySample"], false, __FILE__ , __LINE__);;
+  auto SkipVector = GetFromManager<std::vector<std::string>>(fitMan->raw()["LLHScan"]["LLHScanSkipVector"], {}, __FILE__ , __LINE__);;
 
   // Now finally get onto the LLH scan stuff
   // Very similar code to MCMC but never start MCMC; just scan over the parameter space
@@ -503,7 +530,7 @@ void FitterBase::RunLLHScan() {
   TDirectory *Total_LLH = outputFile->mkdir("Total_LLH");
 
   std::vector<TDirectory *>SampleSplit_LLH;
-  if(PlotAllNDsamplesLLH)
+  if(PlotLLHScanBySample)
   {
     SampleSplit_LLH.resize(TotalNSamples);
     int SampleIterator = 0;
@@ -525,19 +552,7 @@ void FitterBase::RunLLHScan() {
 
   // YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D. Barrow
   std::map<std::string, std::vector<double>> scanRanges;
-  bool isScanRanges = false;
-  if(fitMan->raw()["LLHScan"]["ScanRanges"]){
-    YAML::Node scanRangesList = fitMan->raw()["LLHScan"]["ScanRanges"];
-    for (auto it = scanRangesList.begin(); it != scanRangesList.end(); ++it) {
-      std::string itname = it->first.as<std::string>();
-      std::vector<double> itrange = it->second.as<std::vector<double>>();
-      // Set the mapping as param_name:param_range
-      scanRanges[itname] = itrange;
-    }
-    isScanRanges = true;
-  } else {
-    MACH3LOG_INFO("There are no user-defined parameter ranges, so I'll use default param bounds for LLH Scans");
-  }
+  const bool isScanRanges = GetScaneRange(scanRanges);
    
   // Loop over the covariance classes
   for (ParameterHandlerBase *cov : systematics)
@@ -556,28 +571,18 @@ void FitterBase::RunLLHScan() {
       if (IsPCA) name += "_PCA";
       // For xsec we can get the actual name, hurray for being informative
       if (isxsec) name = cov->GetParFancyName(i);
-      bool skip = false;
-      for(unsigned int is = 0; is < SkipVector.size(); ++is)
-      {
-        if(name.substr(0, SkipVector[is].length()) == SkipVector[is])
-        {
-          skip = true;
-          break;
-        }
-      }
-      if(skip) continue;
+      // KS: Check if we want to skip this parameter
+      if(CheckSkipParameter(SkipVector, name)) continue;
 
-      // Set the parameter ranges between which LLH points are scanned  
-      double lower;
-      double upper;
       // Get the parameter priors and bounds
       double prior = cov->GetParInit(i);
       if (IsPCA) prior = cov->GetPCAHandler()->GetParCurrPCA(i);
 
       // Get the covariance matrix and do the +/- nSigma
       // Set lower and upper bounds relative the prior
-      lower = prior - nSigma*cov->GetDiagonalError(i);
-      upper = prior + nSigma*cov->GetDiagonalError(i);
+      // Set the parameter ranges between which LLH points are scanned
+      double lower = prior - nSigma*cov->GetDiagonalError(i);
+      double upper = prior + nSigma*cov->GetDiagonalError(i);
       // If PCA, transform these parameter values to the PCA basis
       if (IsPCA) {
         lower = prior - nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(i));
@@ -610,35 +615,38 @@ void FitterBase::RunLLHScan() {
       // Make the TH1D
       auto hScan = std::make_unique<TH1D>((name + "_full").c_str(), (name + "_full").c_str(), n_points, lower, upper);
       hScan->SetTitle((std::string("2LLH_full, ") + name + ";" + name + "; -2(ln L_{sample} + ln L_{xsec+flux} + ln L_{det})").c_str());
+      hScan->SetDirectory(nullptr);
 
       auto hScanSam = std::make_unique<TH1D>((name + "_sam").c_str(), (name + "_sam").c_str(), n_points, lower, upper);
       hScanSam->SetTitle((std::string("2LLH_sam, ") + name + ";" + name + "; -2(ln L_{sample})").c_str());
+      hScanSam->SetDirectory(nullptr);
 
-      std::vector<TH1D*> hScanSample(samples.size());
+      std::vector<std::unique_ptr<TH1D>> hScanSample(samples.size());
       std::vector<double> nSamLLH(samples.size());
       for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
       {
         std::string NameTemp = samples[ivs]->GetTitle();
-        hScanSample[ivs] = new TH1D((name+"_"+NameTemp).c_str(), (name+"_" + NameTemp).c_str(), n_points, lower, upper);
+        hScanSample[ivs] = std::make_unique<TH1D>((name+"_"+NameTemp).c_str(), (name+"_" + NameTemp).c_str(), n_points, lower, upper);
+        hScanSample[ivs]->SetDirectory(nullptr);
         hScanSample[ivs]->SetTitle(("2LLH_" + NameTemp + ", " + name + ";" + name + "; -2(ln L_{" + NameTemp +"})").c_str());
         nSamLLH[ivs] = 0.;
       }
 
-      std::vector<TH1D*> hScanCov(systematics.size());
+      std::vector<std::unique_ptr<TH1D>> hScanCov(systematics.size());
       std::vector<double> nCovLLH(systematics.size());
       for(unsigned int ivc = 0; ivc < systematics.size(); ++ivc )
       {
         std::string NameTemp = systematics[ivc]->GetName();
         NameTemp = NameTemp.substr(0, NameTemp.find("_cov"));
-
-        hScanCov[ivc] = new TH1D((name+"_"+NameTemp).c_str(), (name+"_" + NameTemp).c_str(), n_points, lower, upper);
+        hScanCov[ivc] = std::make_unique<TH1D>((name + "_" + NameTemp).c_str(), (name + "_" + NameTemp).c_str(), n_points, lower, upper);
+        hScanCov[ivc]->SetDirectory(nullptr);
         hScanCov[ivc]->SetTitle(("2LLH_" + NameTemp + ", " + name + ";" + name + "; -2(ln L_{" + NameTemp +"})").c_str());
         nCovLLH[ivc] = 0.;
       }
 
-      std::vector<TH1D *> hScanSamSplit;
+      std::vector<TH1D*> hScanSamSplit;
       std::vector<double> sampleSplitllh;
-      if(PlotAllNDsamplesLLH)
+      if(PlotLLHScanBySample)
       {
         int SampleIterator = 0;
         for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
@@ -693,7 +701,7 @@ void FitterBase::RunLLHScan() {
 
         totalllh += samplellh;
 
-        if(PlotAllNDsamplesLLH)
+        if(PlotLLHScanBySample)
         {
           int SampleIterator = 0;
           for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
@@ -706,19 +714,17 @@ void FitterBase::RunLLHScan() {
           }
         }
 
-        for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
-        {
+        for(unsigned int ivs = 0; ivs < samples.size(); ++ivs ) {
           hScanSample[ivs]->SetBinContent(j+1, 2*nSamLLH[ivs]);
         }
-        for(unsigned int ivc = 0; ivc < systematics.size(); ++ivc )
-        {
+        for(unsigned int ivc = 0; ivc < systematics.size(); ++ivc ) {
           hScanCov[ivc]->SetBinContent(j+1, 2*nCovLLH[ivc]);
         }
 
         hScanSam->SetBinContent(j+1, 2*samplellh);
         hScan->SetBinContent(j+1, 2*totalllh);
 
-        if(PlotAllNDsamplesLLH)
+        if(PlotLLHScanBySample)
         {
           int SampleIterator = 0;
           for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
@@ -735,21 +741,19 @@ void FitterBase::RunLLHScan() {
       {
         Cov_LLH[ivc]->cd();
         hScanCov[ivc]->Write();
-        delete hScanCov[ivc];
       }
 
       for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
       {
         SampleClass_LLH[ivs]->cd();
         hScanSample[ivs]->Write();
-        delete hScanSample[ivs];
       }
       Sample_LLH->cd();
       hScanSam->Write();
       Total_LLH->cd();
       hScan->Write();
 
-      if(PlotAllNDsamplesLLH)
+      if(PlotLLHScanBySample)
       {
         int SampleIterator = 0;
         for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
@@ -791,7 +795,7 @@ void FitterBase::RunLLHScan() {
   Total_LLH->Write();
   delete Total_LLH;
 
-  if(PlotAllNDsamplesLLH)
+  if(PlotLLHScanBySample)
   {
     int SampleIterator = 0;
     for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
@@ -870,12 +874,7 @@ void FitterBase::Run2DLLHScan() {
   MACH3LOG_INFO("Starting 2D LLH Scan");
 
   TDirectory *Sample_2DLLH = outputFile->mkdir("Sample_2DLLH");
-  std::vector<std::string> SkipVector;
-  if(fitMan->raw()["LLHScan"]["LLHScanSkipVector"])
-  {
-    SkipVector = Get<std::vector<std::string>>(fitMan->raw()["LLHScan"]["LLHScanSkipVector"], __FILE__, __LINE__);
-    MACH3LOG_INFO("Found skip vector with {} entries", SkipVector.size());
-  }
+  auto SkipVector = GetFromManager<std::vector<std::string>>(fitMan->raw()["LLHScan"]["LLHScanSkipVector"], {}, __FILE__ , __LINE__);;
 
   // Number of points we do for each LLH scan
   const int n_points = GetFromManager<int>(fitMan->raw()["LLHScan"]["2DLLHScanPoints"], 20, __FILE__ , __LINE__);
@@ -883,21 +882,9 @@ void FitterBase::Run2DLLHScan() {
   const int countwidth = int(double(n_points)/double(5));
 
   std::map<std::string, std::vector<double>> scanRanges;
-  bool isScanRanges = false;
-  if(fitMan->raw()["LLHScan"]["ScanRanges"]){
-    YAML::Node scanRangesList = fitMan->raw()["LLHScan"]["ScanRanges"];
-    for (auto it = scanRangesList.begin(); it != scanRangesList.end(); ++it) {
-      std::string itname = it->first.as<std::string>();
-      std::vector<double> itrange = it->second.as<std::vector<double>>();
-      // Set the mapping as param_name:param_range
-      scanRanges[itname] = itrange;
-    }
-    isScanRanges = true;
-  } else {
-    MACH3LOG_INFO("There are no user-defined parameter ranges, so I'll use default param bounds for LLH Scans");
-  }
+  const bool isScanRanges = GetScaneRange(scanRanges);
 
-  double nSigma = GetFromManager<int>(fitMan->raw()["LLHScan"]["LLHScanSigma"], 1., __FILE__, __LINE__);
+  const double nSigma = GetFromManager<int>(fitMan->raw()["LLHScan"]["LLHScanSigma"], 1., __FILE__, __LINE__);
 
   // Loop over the covariance classes
   for (ParameterHandlerBase *cov : systematics)
@@ -949,17 +936,8 @@ void FitterBase::Run2DLLHScan() {
       // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables
       lower_x = std::max(lower_x, cov->GetLowerBound(i));
       upper_x = std::min(upper_x, cov->GetUpperBound(i));
-
-      bool skip = false;
-      for(unsigned int is = 0; is < SkipVector.size(); ++is)
-      {
-        if(name_x.substr(0, SkipVector[is].length()) == SkipVector[is])
-        {
-          skip = true;
-          break;
-        }
-      }
-      if(skip) continue;
+      // KS: Check if we want to skip this parameter
+      if(CheckSkipParameter(SkipVector, name_x)) continue;
 
       for (int j = 0; j < i; ++j)
       {
@@ -967,17 +945,8 @@ void FitterBase::Run2DLLHScan() {
         if (IsPCA) name_y += "_PCA";
         // For xsec we can get the actual name, hurray for being informative
         if (isxsec) name_y = cov->GetParFancyName(j);
-
-        skip = false;
-        for(unsigned int is = 0; is < SkipVector.size(); ++is)
-        {
-          if(name_y.substr(0, SkipVector[is].length()) == SkipVector[is])
-          {
-            skip = true;
-            break;
-          }
-        }
-        if(skip) continue;
+        // KS: Check if we want to skip this parameter
+        if(CheckSkipParameter(SkipVector, name_y)) continue;
 
         // Get the parameter priors and bounds
         double prior_y = cov->GetParInit(j);
@@ -1016,6 +985,7 @@ void FitterBase::Run2DLLHScan() {
 
         auto hScanSam = std::make_unique<TH2D>((name_x + "_" + name_y + "_sam").c_str(), (name_x + "_" + name_y + "_sam").c_str(),
                                                 n_points, lower_x, upper_x, n_points, lower_y, upper_y);
+        hScanSam->SetDirectory(nullptr);
         hScanSam->GetXaxis()->SetTitle(name_x.c_str());
         hScanSam->GetYaxis()->SetTitle(name_y.c_str());
         hScanSam->GetZaxis()->SetTitle("2LLH_sam");
@@ -1037,9 +1007,7 @@ void FitterBase::Run2DLLHScan() {
               cov->SetParProp(i, hScanSam->GetXaxis()->GetBinCenter(x+1));
               cov->SetParProp(j, hScanSam->GetYaxis()->GetBinCenter(y+1));
             }
-
             // Reweight the MC
-            //double *fake = 0;
             for(unsigned int ivs = 0; ivs < samples.size(); ++ivs) {
               samples[ivs]->Reweight();
             }
@@ -1093,13 +1061,7 @@ void FitterBase::RunSigmaVar() {
 
   //KS: If true it will make additional plots with LLH sample contribution in each bin, should make it via config file...
   bool PlotLLHperBin = false;
-
-  std::vector<std::string> SkipVector;
-  if(fitMan->raw()["LLHScan"]["LLHScanSkipVector"])
-  {
-    SkipVector = Get<std::vector<std::string>>(fitMan->raw()["LLHScan"]["LLHScanSkipVector"], __FILE__, __LINE__);
-    MACH3LOG_INFO("Found skip vector with {} entries", SkipVector.size());
-  }
+  auto SkipVector = GetFromManager<std::vector<std::string>>(fitMan->raw()["LLHScan"]["LLHScanSkipVector"], {}, __FILE__ , __LINE__);;
 
   bool isxsec = false;
   for (ParameterHandlerBase *cov : systematics)
@@ -1120,16 +1082,8 @@ void FitterBase::RunSigmaVar() {
       std::string name = cov->GetParName(i);
       // For xsec we can get the actual name, hurray for being informative
       if (isxsec) name = cov->GetParFancyName(i);
-      bool skip = false;
-      for(unsigned int is = 0; is < SkipVector.size(); is++)
-      {
-        if(name.substr(0, SkipVector[is].length()) == SkipVector[is])
-        {
-          skip = true;
-          break;
-        }
-      }
-      if(skip) continue;
+      // KS: Check if we want to skip this parameter
+      if(CheckSkipParameter(SkipVector, name)) continue;
 
       outputFile->cd();
       TDirectory* dirArryDial = outputFile->mkdir(name.c_str());
