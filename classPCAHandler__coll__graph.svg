@@ -31,7 +31,7 @@
 <title>Node2&#45;&gt;Node1</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M58,-99.96C55.26,-82.17 54.13,-55.37 67,-37 72.83,-28.68 81.86,-22.95 91.2,-19.01"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="54.59,-100.75 59.85,-109.95 61.47,-99.47 54.59,-100.75"/>
-<text text-anchor="middle" x="119.5" y="-84" font-family="Helvetica,sans-Serif" font-size="10.00"> _fParSigmaPCA</text>
+<text text-anchor="middle" x="119.5" y="-84" font-family="Helvetica,sans-Serif" font-size="10.00"> _fErrorPCA</text>
 <text text-anchor="middle" x="119.5" y="-73" font-family="Helvetica,sans-Serif" font-size="10.00">_fPreFitValuePCA</text>
 <text text-anchor="middle" x="119.5" y="-62" font-family="Helvetica,sans-Serif" font-size="10.00">_pCurrVal</text>
 <text text-anchor="middle" x="119.5" y="-51" font-family="Helvetica,sans-Serif" font-size="10.00">_pPropVal</text>

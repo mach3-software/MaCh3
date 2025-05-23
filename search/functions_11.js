@@ -34,7 +34,7 @@ var searchData=
   ['setfunc_31',['SetFunc',['../classTF1__red.html#a2622a66b8baafd26b66e6544b7de5bfe',1,'TF1_red::SetFunc()'],['../classTSpline3__red.html#a80a5d6ec57e563e8e65c50d67e706057',1,'TSpline3_red::SetFunc()']]],
   ['setgrouponlyparameters_32',['SetGroupOnlyParameters',['../group__ParameterHandlerSetters.html#ga6c767b7b4ef16019610004cbf412c805',1,'ParameterHandlerGeneric']]],
   ['setindivstepscale_33',['SetIndivStepScale',['../group__ParameterHandlerSetters.html#gad67854b2d6b51ae20e8196cdbdaae6d8',1,'ParameterHandlerBase::SetIndivStepScale(const int ParameterIndex, const double StepScale)'],['../group__ParameterHandlerSetters.html#ga29867cd03af938ef472098a24fa16ab5',1,'ParameterHandlerBase::SetIndivStepScale(const std::vector&lt; double &gt; &amp;stepscale)']]],
-  ['setinitialparameters_34',['SetInitialParameters',['../classPCAHandler.html#a6394496144bfd3d5c7c9ff84e088c05c',1,'PCAHandler']]],
+  ['setinitialparameters_34',['SetInitialParameters',['../classPCAHandler.html#a776f093449672692e0d1a86d4d012bd9',1,'PCAHandler']]],
   ['setlegendstyle_35',['SetLegendStyle',['../classMCMCProcessor.html#a704afa8c216722e730be2c2a33b594f0',1,'MCMCProcessor']]],
   ['setlikelihood_36',['SetLikelihood',['../classSampleSummary.html#aec9b5e17c269714496bf717bd7d6ae81',1,'SampleSummary']]],
   ['setmach3loggerformat_37',['SetMaCh3LoggerFormat',['../MaCh3Logger_8h.html#aa603c55ea73cd86d1994901227883e1e',1,'MaCh3Logger.h']]],
