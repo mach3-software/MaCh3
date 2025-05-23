@@ -806,7 +806,7 @@ void GetPostfitParamPlots()
   
   // if we have one MaCh3 nd file then we can get settings from it 
   bool plotNDDet = false;
-  for (int fileId = 0; fileId < man->input().getNInputFiles(); fileId++) {
+  for (size_t fileId = 0; fileId < man->input().getNInputFiles(); fileId++) {
     if(!ReadSettings(man->input().getFile(0).file)) {
       MACH3LOG_INFO("at least one file provided does not have 'settings' tree indicating it is not MaCh3 ND file");
       MACH3LOG_INFO("  sadly this means I cannot plot ND Det parameters as this is only supported for MaCh3 ND files for now... sorry :(");
@@ -856,7 +856,7 @@ void GetPostfitParamPlots()
   MakeFluxPlots();
 
   //KS: By default we don't run ProcessMCMC with PlotDet as this take some time, in case we did let's make fancy plots
-  if(plotNDDet & NDParameters > 0) MakeNDDetPlots();
+  if(plotNDDet & (NDParameters > 0)) MakeNDDetPlots();
   
   //KS: Same as above but for FD parameters,
   if(FDParameters > 0) MakeFDDetPlots();
