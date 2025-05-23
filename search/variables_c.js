@@ -26,7 +26,7 @@ var searchData=
   ['means_5fgauss_23',['Means_Gauss',['../classMCMCProcessor.html#a600fc8c39af2750df91fb7a0ff85ac74',1,'MCMCProcessor']]],
   ['means_5fhpd_24',['Means_HPD',['../classMCMCProcessor.html#a32657dc39a7fc0d04804f6195a3d8c3e',1,'MCMCProcessor']]],
   ['medianarr_25',['MedianArr',['../RHat__HighMem_8cpp.html#a761fd0b4a970686c00ce3e4daefd7f73',1,'RHat_HighMem.cpp']]],
-  ['minuit_26',['minuit',['../classMinuitFit.html#a3f5a1b7de36ce6c55821e262b016cb19',1,'MinuitFit']]],
+  ['minuit_26',['minuit',['../classMinuitFit.html#a35c7ca49a664f741e195413c972522bc',1,'MinuitFit']]],
   ['mode_27',['Mode',['../classMaCh3Modes.html#a062f961a64e9b6bebf420730f9dad9ff',1,'MaCh3Modes']]],
   ['mode_28',['mode',['../structFarDetectorCoreInfo.html#a8e5ddbda4c271abb29952f7f123fb881',1,'FarDetectorCoreInfo']]],
   ['modehist_29',['ModeHist',['../classSampleSummary.html#a9b21ff74bb8ebd7c3af2c24e02f3d7dc',1,'SampleSummary']]],

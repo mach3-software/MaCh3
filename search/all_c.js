@@ -109,7 +109,7 @@ var searchData=
   ['means_5fhpd_106',['Means_HPD',['../classMCMCProcessor.html#a32657dc39a7fc0d04804f6195a3d8c3e',1,'MCMCProcessor']]],
   ['medianarr_107',['MedianArr',['../RHat__HighMem_8cpp.html#a761fd0b4a970686c00ce3e4daefd7f73',1,'RHat_HighMem.cpp']]],
   ['mergenodes_108',['MergeNodes',['../YamlHelper_8h.html#a372c930e488d1e260c1184dc25921fe3',1,'YamlHelper.h']]],
-  ['minuit_109',['minuit',['../classMinuitFit.html#a3f5a1b7de36ce6c55821e262b016cb19',1,'MinuitFit']]],
+  ['minuit_109',['minuit',['../classMinuitFit.html#a35c7ca49a664f741e195413c972522bc',1,'MinuitFit']]],
   ['minuitfit_110',['MinuitFit',['../classMinuitFit.html#a5392a49207148d7b884974db3d3f5eac',1,'MinuitFit::MinuitFit()'],['../classMinuitFit.html',1,'MinuitFit']]],
   ['minuitfit_2ecpp_111',['MinuitFit.cpp',['../MinuitFit_8cpp.html',1,'']]],
   ['minuitfit_2eh_112',['MinuitFit.h',['../MinuitFit_8h.html',1,'']]],

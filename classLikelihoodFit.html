@@ -302,11 +302,13 @@ Protected Attributes</h2></td></tr>
 <p class="definition">Definition at line <a class="el" href="LikelihoodFit_8cpp_source.html#l00005">5</a> of file <a class="el" href="LikelihoodFit_8cpp_source.html">LikelihoodFit.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">    5</span>                                         : <a class="code hl_class" href="classFitterBase.html">FitterBase</a>(<a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>) {</div>
 <div class="line"><span class="lineno">    6</span><span class="comment">// *******************</span></div>
-<div class="line"><span class="lineno">    7</span>    <a class="code hl_variable" href="classLikelihoodFit.html#ac779acfe140500d06e42a1d4ace25385">NPars</a> = 0;</div>
-<div class="line"><span class="lineno">    8</span>    <a class="code hl_variable" href="classLikelihoodFit.html#a0b50b7b607751e80b6c85e9db98631af">NParsPCA</a> = 0;</div>
-<div class="line"><span class="lineno">    9</span>    <a class="code hl_variable" href="classLikelihoodFit.html#ae1e5d13b373bf73e1b1003f7f9d65f00">fMirroring</a> = GetFromManager&lt;bool&gt;(<a class="code hl_variable" href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">fitMan</a>-&gt;<a class="code hl_function" href="classmanager.html#ab3999cc856ede72b37f68bdb28bd5520">raw</a>()[<span class="stringliteral">&quot;General&quot;</span>][<span class="stringliteral">&quot;Fitter&quot;</span>][<span class="stringliteral">&quot;Mirroring&quot;</span>], <span class="keyword">false</span>);</div>
-<div class="line"><span class="lineno">   10</span>}</div>
+<div class="line"><span class="lineno">    7</span>  <a class="code hl_variable" href="classLikelihoodFit.html#ac779acfe140500d06e42a1d4ace25385">NPars</a> = 0;</div>
+<div class="line"><span class="lineno">    8</span>  <a class="code hl_variable" href="classLikelihoodFit.html#a0b50b7b607751e80b6c85e9db98631af">NParsPCA</a> = 0;</div>
+<div class="line"><span class="lineno">    9</span>  <a class="code hl_variable" href="classLikelihoodFit.html#ae1e5d13b373bf73e1b1003f7f9d65f00">fMirroring</a> = GetFromManager&lt;bool&gt;(<a class="code hl_variable" href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">fitMan</a>-&gt;<a class="code hl_function" href="classmanager.html#ab3999cc856ede72b37f68bdb28bd5520">raw</a>()[<span class="stringliteral">&quot;General&quot;</span>][<span class="stringliteral">&quot;Fitter&quot;</span>][<span class="stringliteral">&quot;Mirroring&quot;</span>], <span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   10</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classLikelihoodFit.html#ae1e5d13b373bf73e1b1003f7f9d65f00">fMirroring</a>) <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Mirroring enabled&quot;</span>);</div>
+<div class="line"><span class="lineno">   11</span>}</div>
 <div class="ttc" id="aGetPostfitParamPlots_8cpp_html_aa6f3c9a8cee8f72f6f8ce65b720a2d40"><div class="ttname"><a href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a></div><div class="ttdeci">MaCh3Plotting::PlottingManager * man</div><div class="ttdef"><b>Definition:</b> <a href="GetPostfitParamPlots_8cpp_source.html#l00050">GetPostfitParamPlots.cpp:50</a></div></div>
+<div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00023">MaCh3Logger.h:23</a></div></div>
 <div class="ttc" id="aclassFitterBase_html"><div class="ttname"><a href="classFitterBase.html">FitterBase</a></div><div class="ttdoc">Base class for implementing fitting algorithms.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00023">FitterBase.h:23</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_a4fceb68f242feeb04a0ddf42a5a37095"><div class="ttname"><a href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">FitterBase::fitMan</a></div><div class="ttdeci">manager * fitMan</div><div class="ttdoc">The manager.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00088">FitterBase.h:88</a></div></div>
 <div class="ttc" id="aclassLikelihoodFit_html_a0b50b7b607751e80b6c85e9db98631af"><div class="ttname"><a href="classLikelihoodFit.html#a0b50b7b607751e80b6c85e9db98631af">LikelihoodFit::NParsPCA</a></div><div class="ttdeci">int NParsPCA</div><div class="ttdoc">Number of all parameters from all covariances in PCA base.</div><div class="ttdef"><b>Definition:</b> <a href="LikelihoodFit_8h_source.html#l00029">LikelihoodFit.h:29</a></div></div>
@@ -341,11 +343,11 @@ Protected Attributes</h2></td></tr>
 
 <p>Destructor. </p>
 
-<p class="definition">Definition at line <a class="el" href="LikelihoodFit_8cpp_source.html#l00015">15</a> of file <a class="el" href="LikelihoodFit_8cpp_source.html">LikelihoodFit.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   15</span>                              {</div>
-<div class="line"><span class="lineno">   16</span><span class="comment">// *************************</span></div>
-<div class="line"><span class="lineno">   17</span> </div>
-<div class="line"><span class="lineno">   18</span>}</div>
+<p class="definition">Definition at line <a class="el" href="LikelihoodFit_8cpp_source.html#l00016">16</a> of file <a class="el" href="LikelihoodFit_8cpp_source.html">LikelihoodFit.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   16</span>                              {</div>
+<div class="line"><span class="lineno">   17</span><span class="comment">// *************************</span></div>
+<div class="line"><span class="lineno">   18</span> </div>
+<div class="line"><span class="lineno">   19</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -378,111 +380,110 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classPSO.html#a42f873a16ad3d3d9809262a01bf68538">PSO</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="LikelihoodFit_8cpp_source.html#l00040">40</a> of file <a class="el" href="LikelihoodFit_8cpp_source.html">LikelihoodFit.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   40</span>                                              {</div>
-<div class="line"><span class="lineno">   41</span><span class="comment">// *******************</span></div>
-<div class="line"><span class="lineno">   42</span> </div>
-<div class="line"><span class="lineno">   43</span>  <span class="keywordflow">if</span> (<a class="code hl_variable" href="classFitterBase.html#a50df1bd75b20a953f81ab9c2bab6b42c">step</a> % 10000 == 0)</div>
-<div class="line"><span class="lineno">   44</span>  {</div>
-<div class="line"><span class="lineno">   45</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Iteration {}&quot;</span>, <a class="code hl_variable" href="classFitterBase.html#a50df1bd75b20a953f81ab9c2bab6b42c">step</a>);</div>
-<div class="line"><span class="lineno">   46</span>  }</div>
-<div class="line"><span class="lineno">   47</span> </div>
-<div class="line"><span class="lineno">   48</span>  <a class="code hl_variable" href="classFitterBase.html#a9fe01b2b6f7f0d6a7b04675a099e1a4f">stepClock</a>-&gt;Start();</div>
-<div class="line"><span class="lineno">   49</span> </div>
-<div class="line"><span class="lineno">   50</span>  <span class="keywordtype">int</span> ParCounter = 0;</div>
-<div class="line"><span class="lineno">   51</span>  <span class="keywordtype">double</span> llh = 0;</div>
-<div class="line"><span class="lineno">   52</span>  <span class="keywordflow">for</span> (std::vector&lt;ParameterHandlerBase*&gt;::iterator it = <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.begin(); it != <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.end(); ++it)</div>
-<div class="line"><span class="lineno">   53</span>  {</div>
-<div class="line"><span class="lineno">   54</span>    <span class="keywordflow">if</span>(!(*it)-&gt;IsPCA())</div>
-<div class="line"><span class="lineno">   55</span>    {</div>
-<div class="line"><span class="lineno">   56</span>      std::vector&lt;double&gt; pars;</div>
-<div class="line"><span class="lineno">   57</span>      <span class="keyword">const</span> <span class="keywordtype">int</span> NumPar = (*it)-&gt;GetNumParams();</div>
-<div class="line"><span class="lineno">   58</span>      <span class="comment">//KS: Avoid push back as they are slow</span></div>
-<div class="line"><span class="lineno">   59</span>      pars.resize(NumPar);</div>
-<div class="line"><span class="lineno">   60</span>      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; NumPar; ++i, ++ParCounter)</div>
-<div class="line"><span class="lineno">   61</span>      {</div>
-<div class="line"><span class="lineno">   62</span>        <span class="keywordtype">double</span> ParVal = x[ParCounter];</div>
-<div class="line"><span class="lineno">   63</span>        <span class="comment">//KS: Basically apply mirroring for parameters out of bounds</span></div>
-<div class="line"><span class="lineno">   64</span>        <span class="keywordflow">if</span>(<a class="code hl_variable" href="classLikelihoodFit.html#ae1e5d13b373bf73e1b1003f7f9d65f00">fMirroring</a>)</div>
-<div class="line"><span class="lineno">   65</span>        {</div>
-<div class="line"><span class="lineno">   66</span>          <span class="keywordflow">if</span>(ParVal &lt; (*it)-&gt;GetLowerBound(i))</div>
-<div class="line"><span class="lineno">   67</span>          {</div>
-<div class="line"><span class="lineno">   68</span>            ParVal = (*it)-&gt;GetLowerBound(i) + ((*it)-&gt;GetLowerBound(i) - ParVal);</div>
-<div class="line"><span class="lineno">   69</span>          }</div>
-<div class="line"><span class="lineno">   70</span>          <span class="keywordflow">else</span> <span class="keywordflow">if</span> (ParVal &gt; (*it)-&gt;GetUpperBound(i))</div>
-<div class="line"><span class="lineno">   71</span>          {</div>
-<div class="line"><span class="lineno">   72</span>            ParVal = (*it)-&gt;GetUpperBound(i) - ( ParVal - (*it)-&gt;GetUpperBound(i));</div>
-<div class="line"><span class="lineno">   73</span>          }</div>
-<div class="line"><span class="lineno">   74</span>        }</div>
-<div class="line"><span class="lineno">   75</span>        pars[i] = ParVal;</div>
-<div class="line"><span class="lineno">   76</span>      }</div>
-<div class="line"><span class="lineno">   77</span>      (*it)-&gt;SetParameters(pars);</div>
-<div class="line"><span class="lineno">   78</span>    }</div>
-<div class="line"><span class="lineno">   79</span>    <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">   80</span>    {</div>
-<div class="line"><span class="lineno">   81</span>      std::vector&lt;double&gt; pars;</div>
-<div class="line"><span class="lineno">   82</span>      <span class="keyword">const</span> <span class="keywordtype">int</span> NumPar = (*it)-&gt;GetNParameters();</div>
-<div class="line"><span class="lineno">   83</span>      <span class="comment">//KS: Avoid push back as they are slow</span></div>
-<div class="line"><span class="lineno">   84</span>      pars.resize(NumPar);</div>
-<div class="line"><span class="lineno">   85</span>      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; NumPar; ++i, ++ParCounter)</div>
-<div class="line"><span class="lineno">   86</span>      {</div>
-<div class="line"><span class="lineno">   87</span>        <span class="keywordtype">double</span> ParVal = x[ParCounter];</div>
-<div class="line"><span class="lineno">   88</span>        <span class="comment">//KS: Basically apply mirroring for parameters out of bounds</span></div>
-<div class="line"><span class="lineno">   89</span>        pars[i] = ParVal;</div>
-<div class="line"><span class="lineno">   90</span>      }</div>
-<div class="line"><span class="lineno">   91</span>      (*it)-&gt;GetPCAHandler()-&gt;SetParametersPCA(pars);</div>
-<div class="line"><span class="lineno">   92</span>    }</div>
-<div class="line"><span class="lineno">   93</span>    (*it)-&gt;AcceptStep();</div>
-<div class="line"><span class="lineno">   94</span>  }</div>
-<div class="line"><span class="lineno">   95</span> </div>
-<div class="line"><span class="lineno">   96</span>  <span class="comment">// Loop over the systematics and propose the initial step</span></div>
-<div class="line"><span class="lineno">   97</span>  <span class="keywordtype">int</span> stdIt = 0;</div>
-<div class="line"><span class="lineno">   98</span>  <span class="keywordflow">for</span> (std::vector&lt;ParameterHandlerBase*&gt;::iterator it = <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.begin(); it != <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.end(); ++it, ++stdIt)</div>
-<div class="line"><span class="lineno">   99</span>  {</div>
-<div class="line"><span class="lineno">  100</span>    <span class="comment">//GetLikelihood will return LargeL if out of bounds, for minimizers this is not the problem, while calcLikelihood will return actual likelihood</span></div>
-<div class="line"><span class="lineno">  101</span>    <a class="code hl_variable" href="classFitterBase.html#ace2eeca9829f63200c3f956c600d09ff">syst_llh</a>[stdIt] = (*it)-&gt;CalcLikelihood();</div>
-<div class="line"><span class="lineno">  102</span>    llh += <a class="code hl_variable" href="classFitterBase.html#ace2eeca9829f63200c3f956c600d09ff">syst_llh</a>[stdIt];</div>
-<div class="line"><span class="lineno">  103</span><span class="preprocessor">    #ifdef DEBUG</span></div>
-<div class="line"><span class="lineno">  104</span>    <span class="keywordflow">if</span> (debug) debugFile &lt;&lt; <span class="stringliteral">&quot;LLH after &quot;</span> &lt;&lt; <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[stdIt]-&gt;GetName() &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; llh &lt;&lt; std::endl;</div>
-<div class="line"><span class="lineno">  105</span><span class="preprocessor">    #endif</span></div>
-<div class="line"><span class="lineno">  106</span>  }</div>
-<div class="line"><span class="lineno">  107</span>  <span class="comment">// Could multi-thread this</span></div>
-<div class="line"><span class="lineno">  108</span>  <span class="comment">// But since sample reweight is multi-threaded it&#39;s probably better to do that</span></div>
-<div class="line"><span class="lineno">  109</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>.size(); i++)</div>
-<div class="line"><span class="lineno">  110</span>  {</div>
-<div class="line"><span class="lineno">  111</span>    <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>[i]-&gt;Reweight();</div>
-<div class="line"><span class="lineno">  112</span>  }</div>
-<div class="line"><span class="lineno">  113</span> </div>
-<div class="line"><span class="lineno">  114</span>  <span class="comment">//DB for atmospheric event by event sample migration, need to fully reweight all samples to allow event passing prior to likelihood evaluation</span></div>
-<div class="line"><span class="lineno">  115</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>.size(); i++) {</div>
-<div class="line"><span class="lineno">  116</span>    <span class="comment">// Get the sample likelihoods and add them</span></div>
-<div class="line"><span class="lineno">  117</span>    <a class="code hl_variable" href="classFitterBase.html#a6f435e161c96eea778aba844115428d4">sample_llh</a>[i] = <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>[i]-&gt;GetLikelihood();</div>
-<div class="line"><span class="lineno">  118</span>    llh += <a class="code hl_variable" href="classFitterBase.html#a6f435e161c96eea778aba844115428d4">sample_llh</a>[i];</div>
-<div class="line"><span class="lineno">  119</span><span class="preprocessor">    #ifdef DEBUG</span></div>
-<div class="line"><span class="lineno">  120</span>    <span class="keywordflow">if</span> (debug) debugFile &lt;&lt; <span class="stringliteral">&quot;LLH after sample &quot;</span> &lt;&lt; i &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; llh &lt;&lt; std::endl;</div>
-<div class="line"><span class="lineno">  121</span><span class="preprocessor">    #endif</span></div>
-<div class="line"><span class="lineno">  122</span>  }</div>
-<div class="line"><span class="lineno">  123</span> </div>
-<div class="line"><span class="lineno">  124</span>  <span class="comment">// Save the proposed likelihood (class member)</span></div>
-<div class="line"><span class="lineno">  125</span>  <a class="code hl_variable" href="classFitterBase.html#a187dd22c17f9e96e5a7e2fb2371abace">logLProp</a> = llh;</div>
-<div class="line"><span class="lineno">  126</span>  <a class="code hl_variable" href="classFitterBase.html#abfb6f10720764d8bbbe43754fd5cd976">logLCurr</a> = llh;</div>
-<div class="line"><span class="lineno">  127</span>  <a class="code hl_variable" href="classFitterBase.html#a6319d2ea50984860475bbc6c708b0d90">accProb</a> = 1;</div>
-<div class="line"><span class="lineno">  128</span> </div>
-<div class="line"><span class="lineno">  129</span>  <a class="code hl_variable" href="classFitterBase.html#a9fe01b2b6f7f0d6a7b04675a099e1a4f">stepClock</a>-&gt;Stop();</div>
-<div class="line"><span class="lineno">  130</span>  <a class="code hl_variable" href="classFitterBase.html#a8354e9a7a9cc534277ff76ab37c9a763">stepTime</a> = <a class="code hl_variable" href="classFitterBase.html#a9fe01b2b6f7f0d6a7b04675a099e1a4f">stepClock</a>-&gt;RealTime();</div>
-<div class="line"><span class="lineno">  131</span> </div>
-<div class="line"><span class="lineno">  132</span>  <span class="comment">// Write step to output tree</span></div>
-<div class="line"><span class="lineno">  133</span>  <a class="code hl_variable" href="classFitterBase.html#aed2032b9c4a4f2248abe548f54f8dcc8">outTree</a>-&gt;Fill();</div>
-<div class="line"><span class="lineno">  134</span> </div>
-<div class="line"><span class="lineno">  135</span>  <span class="comment">// Auto save the output</span></div>
-<div class="line"><span class="lineno">  136</span>  <span class="keywordflow">if</span> (<a class="code hl_variable" href="classFitterBase.html#a50df1bd75b20a953f81ab9c2bab6b42c">step</a> % <a class="code hl_variable" href="classFitterBase.html#ad955982e63066918cba9c53381608d09">auto_save</a> == 0) <a class="code hl_variable" href="classFitterBase.html#aed2032b9c4a4f2248abe548f54f8dcc8">outTree</a>-&gt;AutoSave();</div>
-<div class="line"><span class="lineno">  137</span>  <a class="code hl_variable" href="classFitterBase.html#a50df1bd75b20a953f81ab9c2bab6b42c">step</a>++;</div>
-<div class="line"><span class="lineno">  138</span>  <a class="code hl_variable" href="classFitterBase.html#a2774f3a0047c4347ee0db05406425f79">accCount</a>++;</div>
-<div class="line"><span class="lineno">  139</span> </div>
-<div class="line"><span class="lineno">  140</span>  llh = 2.0*llh;</div>
-<div class="line"><span class="lineno">  141</span>  <span class="keywordflow">return</span> llh;</div>
-<div class="line"><span class="lineno">  142</span>}</div>
-<div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00023">MaCh3Logger.h:23</a></div></div>
+<p class="definition">Definition at line <a class="el" href="LikelihoodFit_8cpp_source.html#l00041">41</a> of file <a class="el" href="LikelihoodFit_8cpp_source.html">LikelihoodFit.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   41</span>                                              {</div>
+<div class="line"><span class="lineno">   42</span><span class="comment">// *******************</span></div>
+<div class="line"><span class="lineno">   43</span> </div>
+<div class="line"><span class="lineno">   44</span>  <span class="keywordflow">if</span> (<a class="code hl_variable" href="classFitterBase.html#a50df1bd75b20a953f81ab9c2bab6b42c">step</a> % 10000 == 0)</div>
+<div class="line"><span class="lineno">   45</span>  {</div>
+<div class="line"><span class="lineno">   46</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Iteration {}&quot;</span>, <a class="code hl_variable" href="classFitterBase.html#a50df1bd75b20a953f81ab9c2bab6b42c">step</a>);</div>
+<div class="line"><span class="lineno">   47</span>  }</div>
+<div class="line"><span class="lineno">   48</span> </div>
+<div class="line"><span class="lineno">   49</span>  <a class="code hl_variable" href="classFitterBase.html#a9fe01b2b6f7f0d6a7b04675a099e1a4f">stepClock</a>-&gt;Start();</div>
+<div class="line"><span class="lineno">   50</span> </div>
+<div class="line"><span class="lineno">   51</span>  <span class="keywordtype">int</span> ParCounter = 0;</div>
+<div class="line"><span class="lineno">   52</span>  <span class="keywordtype">double</span> llh = 0;</div>
+<div class="line"><span class="lineno">   53</span>  <span class="keywordflow">for</span> (std::vector&lt;ParameterHandlerBase*&gt;::iterator it = <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.begin(); it != <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.end(); ++it)</div>
+<div class="line"><span class="lineno">   54</span>  {</div>
+<div class="line"><span class="lineno">   55</span>    <span class="keywordflow">if</span>(!(*it)-&gt;IsPCA())</div>
+<div class="line"><span class="lineno">   56</span>    {</div>
+<div class="line"><span class="lineno">   57</span>      std::vector&lt;double&gt; pars;</div>
+<div class="line"><span class="lineno">   58</span>      <span class="keyword">const</span> <span class="keywordtype">int</span> NumPar = (*it)-&gt;GetNumParams();</div>
+<div class="line"><span class="lineno">   59</span>      <span class="comment">//KS: Avoid push back as they are slow</span></div>
+<div class="line"><span class="lineno">   60</span>      pars.resize(NumPar);</div>
+<div class="line"><span class="lineno">   61</span>      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; NumPar; ++i, ++ParCounter)</div>
+<div class="line"><span class="lineno">   62</span>      {</div>
+<div class="line"><span class="lineno">   63</span>        <span class="keywordtype">double</span> ParVal = x[ParCounter];</div>
+<div class="line"><span class="lineno">   64</span>        <span class="comment">//KS: Basically apply mirroring for parameters out of bounds</span></div>
+<div class="line"><span class="lineno">   65</span>        <span class="keywordflow">if</span>(<a class="code hl_variable" href="classLikelihoodFit.html#ae1e5d13b373bf73e1b1003f7f9d65f00">fMirroring</a>)</div>
+<div class="line"><span class="lineno">   66</span>        {</div>
+<div class="line"><span class="lineno">   67</span>          <span class="keywordflow">if</span>(ParVal &lt; (*it)-&gt;GetLowerBound(i))</div>
+<div class="line"><span class="lineno">   68</span>          {</div>
+<div class="line"><span class="lineno">   69</span>            ParVal = (*it)-&gt;GetLowerBound(i) + ((*it)-&gt;GetLowerBound(i) - ParVal);</div>
+<div class="line"><span class="lineno">   70</span>          }</div>
+<div class="line"><span class="lineno">   71</span>          <span class="keywordflow">else</span> <span class="keywordflow">if</span> (ParVal &gt; (*it)-&gt;GetUpperBound(i))</div>
+<div class="line"><span class="lineno">   72</span>          {</div>
+<div class="line"><span class="lineno">   73</span>            ParVal = (*it)-&gt;GetUpperBound(i) - ( ParVal - (*it)-&gt;GetUpperBound(i));</div>
+<div class="line"><span class="lineno">   74</span>          }</div>
+<div class="line"><span class="lineno">   75</span>        }</div>
+<div class="line"><span class="lineno">   76</span>        pars[i] = ParVal;</div>
+<div class="line"><span class="lineno">   77</span>      }</div>
+<div class="line"><span class="lineno">   78</span>      (*it)-&gt;SetParameters(pars);</div>
+<div class="line"><span class="lineno">   79</span>    }</div>
+<div class="line"><span class="lineno">   80</span>    <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">   81</span>    {</div>
+<div class="line"><span class="lineno">   82</span>      std::vector&lt;double&gt; pars;</div>
+<div class="line"><span class="lineno">   83</span>      <span class="keyword">const</span> <span class="keywordtype">int</span> NumPar = (*it)-&gt;GetNParameters();</div>
+<div class="line"><span class="lineno">   84</span>      <span class="comment">//KS: Avoid push back as they are slow</span></div>
+<div class="line"><span class="lineno">   85</span>      pars.resize(NumPar);</div>
+<div class="line"><span class="lineno">   86</span>      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; NumPar; ++i, ++ParCounter)</div>
+<div class="line"><span class="lineno">   87</span>      {</div>
+<div class="line"><span class="lineno">   88</span>        <span class="keywordtype">double</span> ParVal = x[ParCounter];</div>
+<div class="line"><span class="lineno">   89</span>        <span class="comment">//KS: Basically apply mirroring for parameters out of bounds</span></div>
+<div class="line"><span class="lineno">   90</span>        pars[i] = ParVal;</div>
+<div class="line"><span class="lineno">   91</span>      }</div>
+<div class="line"><span class="lineno">   92</span>      (*it)-&gt;GetPCAHandler()-&gt;SetParametersPCA(pars);</div>
+<div class="line"><span class="lineno">   93</span>    }</div>
+<div class="line"><span class="lineno">   94</span>    (*it)-&gt;AcceptStep();</div>
+<div class="line"><span class="lineno">   95</span>  }</div>
+<div class="line"><span class="lineno">   96</span> </div>
+<div class="line"><span class="lineno">   97</span>  <span class="comment">// Loop over the systematics and propose the initial step</span></div>
+<div class="line"><span class="lineno">   98</span>  <span class="keywordtype">int</span> stdIt = 0;</div>
+<div class="line"><span class="lineno">   99</span>  <span class="keywordflow">for</span> (std::vector&lt;ParameterHandlerBase*&gt;::iterator it = <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.begin(); it != <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.end(); ++it, ++stdIt)</div>
+<div class="line"><span class="lineno">  100</span>  {</div>
+<div class="line"><span class="lineno">  101</span>    <span class="comment">//GetLikelihood will return LargeL if out of bounds, for minimizers this is not the problem, while calcLikelihood will return actual likelihood</span></div>
+<div class="line"><span class="lineno">  102</span>    <a class="code hl_variable" href="classFitterBase.html#ace2eeca9829f63200c3f956c600d09ff">syst_llh</a>[stdIt] = (*it)-&gt;CalcLikelihood();</div>
+<div class="line"><span class="lineno">  103</span>    llh += <a class="code hl_variable" href="classFitterBase.html#ace2eeca9829f63200c3f956c600d09ff">syst_llh</a>[stdIt];</div>
+<div class="line"><span class="lineno">  104</span><span class="preprocessor">    #ifdef DEBUG</span></div>
+<div class="line"><span class="lineno">  105</span>    <span class="keywordflow">if</span> (debug) debugFile &lt;&lt; <span class="stringliteral">&quot;LLH after &quot;</span> &lt;&lt; <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[stdIt]-&gt;GetName() &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; llh &lt;&lt; std::endl;</div>
+<div class="line"><span class="lineno">  106</span><span class="preprocessor">    #endif</span></div>
+<div class="line"><span class="lineno">  107</span>  }</div>
+<div class="line"><span class="lineno">  108</span>  <span class="comment">// Could multi-thread this</span></div>
+<div class="line"><span class="lineno">  109</span>  <span class="comment">// But since sample reweight is multi-threaded it&#39;s probably better to do that</span></div>
+<div class="line"><span class="lineno">  110</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>.size(); i++)</div>
+<div class="line"><span class="lineno">  111</span>  {</div>
+<div class="line"><span class="lineno">  112</span>    <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>[i]-&gt;Reweight();</div>
+<div class="line"><span class="lineno">  113</span>  }</div>
+<div class="line"><span class="lineno">  114</span> </div>
+<div class="line"><span class="lineno">  115</span>  <span class="comment">//DB for atmospheric event by event sample migration, need to fully reweight all samples to allow event passing prior to likelihood evaluation</span></div>
+<div class="line"><span class="lineno">  116</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>.size(); i++) {</div>
+<div class="line"><span class="lineno">  117</span>    <span class="comment">// Get the sample likelihoods and add them</span></div>
+<div class="line"><span class="lineno">  118</span>    <a class="code hl_variable" href="classFitterBase.html#a6f435e161c96eea778aba844115428d4">sample_llh</a>[i] = <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>[i]-&gt;GetLikelihood();</div>
+<div class="line"><span class="lineno">  119</span>    llh += <a class="code hl_variable" href="classFitterBase.html#a6f435e161c96eea778aba844115428d4">sample_llh</a>[i];</div>
+<div class="line"><span class="lineno">  120</span><span class="preprocessor">    #ifdef DEBUG</span></div>
+<div class="line"><span class="lineno">  121</span>    <span class="keywordflow">if</span> (debug) debugFile &lt;&lt; <span class="stringliteral">&quot;LLH after sample &quot;</span> &lt;&lt; i &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; llh &lt;&lt; std::endl;</div>
+<div class="line"><span class="lineno">  122</span><span class="preprocessor">    #endif</span></div>
+<div class="line"><span class="lineno">  123</span>  }</div>
+<div class="line"><span class="lineno">  124</span> </div>
+<div class="line"><span class="lineno">  125</span>  <span class="comment">// Save the proposed likelihood (class member)</span></div>
+<div class="line"><span class="lineno">  126</span>  <a class="code hl_variable" href="classFitterBase.html#a187dd22c17f9e96e5a7e2fb2371abace">logLProp</a> = llh;</div>
+<div class="line"><span class="lineno">  127</span>  <a class="code hl_variable" href="classFitterBase.html#abfb6f10720764d8bbbe43754fd5cd976">logLCurr</a> = llh;</div>
+<div class="line"><span class="lineno">  128</span>  <a class="code hl_variable" href="classFitterBase.html#a6319d2ea50984860475bbc6c708b0d90">accProb</a> = 1;</div>
+<div class="line"><span class="lineno">  129</span> </div>
+<div class="line"><span class="lineno">  130</span>  <a class="code hl_variable" href="classFitterBase.html#a9fe01b2b6f7f0d6a7b04675a099e1a4f">stepClock</a>-&gt;Stop();</div>
+<div class="line"><span class="lineno">  131</span>  <a class="code hl_variable" href="classFitterBase.html#a8354e9a7a9cc534277ff76ab37c9a763">stepTime</a> = <a class="code hl_variable" href="classFitterBase.html#a9fe01b2b6f7f0d6a7b04675a099e1a4f">stepClock</a>-&gt;RealTime();</div>
+<div class="line"><span class="lineno">  132</span> </div>
+<div class="line"><span class="lineno">  133</span>  <span class="comment">// Write step to output tree</span></div>
+<div class="line"><span class="lineno">  134</span>  <a class="code hl_variable" href="classFitterBase.html#aed2032b9c4a4f2248abe548f54f8dcc8">outTree</a>-&gt;Fill();</div>
+<div class="line"><span class="lineno">  135</span> </div>
+<div class="line"><span class="lineno">  136</span>  <span class="comment">// Auto save the output</span></div>
+<div class="line"><span class="lineno">  137</span>  <span class="keywordflow">if</span> (<a class="code hl_variable" href="classFitterBase.html#a50df1bd75b20a953f81ab9c2bab6b42c">step</a> % <a class="code hl_variable" href="classFitterBase.html#ad955982e63066918cba9c53381608d09">auto_save</a> == 0) <a class="code hl_variable" href="classFitterBase.html#aed2032b9c4a4f2248abe548f54f8dcc8">outTree</a>-&gt;AutoSave();</div>
+<div class="line"><span class="lineno">  138</span>  <a class="code hl_variable" href="classFitterBase.html#a50df1bd75b20a953f81ab9c2bab6b42c">step</a>++;</div>
+<div class="line"><span class="lineno">  139</span>  <a class="code hl_variable" href="classFitterBase.html#a2774f3a0047c4347ee0db05406425f79">accCount</a>++;</div>
+<div class="line"><span class="lineno">  140</span> </div>
+<div class="line"><span class="lineno">  141</span>  llh = 2.0*llh;</div>
+<div class="line"><span class="lineno">  142</span>  <span class="keywordflow">return</span> llh;</div>
+<div class="line"><span class="lineno">  143</span>}</div>
 <div class="ttc" id="aclassFitterBase_html_a14b43b7f5e5a482da68d0e8c564a1494"><div class="ttname"><a href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">FitterBase::samples</a></div><div class="ttdeci">std::vector&lt; SampleHandlerBase * &gt; samples</div><div class="ttdoc">Sample holder.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00109">FitterBase.h:109</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_a187dd22c17f9e96e5a7e2fb2371abace"><div class="ttname"><a href="classFitterBase.html#a187dd22c17f9e96e5a7e2fb2371abace">FitterBase::logLProp</a></div><div class="ttdeci">double logLProp</div><div class="ttdoc">proposed likelihood</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00095">FitterBase.h:95</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_a2774f3a0047c4347ee0db05406425f79"><div class="ttname"><a href="classFitterBase.html#a2774f3a0047c4347ee0db05406425f79">FitterBase::accCount</a></div><div class="ttdeci">int accCount</div><div class="ttdoc">counts accepted steps</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00099">FitterBase.h:99</a></div></div>
@@ -588,24 +589,24 @@ Protected Attributes</h2></td></tr>
 
 <p>prepare output and perform sanity checks </p>
 
-<p class="definition">Definition at line <a class="el" href="LikelihoodFit_8cpp_source.html#l00021">21</a> of file <a class="el" href="LikelihoodFit_8cpp_source.html">LikelihoodFit.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   21</span>                               {</div>
-<div class="line"><span class="lineno">   22</span><span class="comment">// *******************</span></div>
-<div class="line"><span class="lineno">   23</span> </div>
-<div class="line"><span class="lineno">   24</span>  <span class="comment">// Save the settings into the output file</span></div>
-<div class="line"><span class="lineno">   25</span>  <a class="code hl_function" href="classFitterBase.html#a48f38bfa8996fe00d51f35b05dd16b46">SaveSettings</a>();</div>
-<div class="line"><span class="lineno">   26</span> </div>
-<div class="line"><span class="lineno">   27</span>  <span class="comment">// Prepare the output branches</span></div>
-<div class="line"><span class="lineno">   28</span>  <a class="code hl_function" href="classFitterBase.html#a53715760edd8c7640432f31793fd28f9">PrepareOutput</a>();</div>
-<div class="line"><span class="lineno">   29</span>  </div>
-<div class="line"><span class="lineno">   30</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> s = 0; s &lt; <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.size(); ++s) {</div>
-<div class="line"><span class="lineno">   31</span>    <a class="code hl_variable" href="classLikelihoodFit.html#ac779acfe140500d06e42a1d4ace25385">NPars</a> += <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;GetNumParams();</div>
-<div class="line"><span class="lineno">   32</span>    <a class="code hl_variable" href="classLikelihoodFit.html#a0b50b7b607751e80b6c85e9db98631af">NParsPCA</a> += <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;GetNParameters();</div>
-<div class="line"><span class="lineno">   33</span>  }</div>
-<div class="line"><span class="lineno">   34</span> </div>
-<div class="line"><span class="lineno">   35</span>  <span class="comment">//KS: If PCA is note enabled NParsPCA == NPars</span></div>
-<div class="line"><span class="lineno">   36</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Total number of parameters {}&quot;</span>, <a class="code hl_variable" href="classLikelihoodFit.html#a0b50b7b607751e80b6c85e9db98631af">NParsPCA</a>);</div>
-<div class="line"><span class="lineno">   37</span>}</div>
+<p class="definition">Definition at line <a class="el" href="LikelihoodFit_8cpp_source.html#l00022">22</a> of file <a class="el" href="LikelihoodFit_8cpp_source.html">LikelihoodFit.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   22</span>                               {</div>
+<div class="line"><span class="lineno">   23</span><span class="comment">// *******************</span></div>
+<div class="line"><span class="lineno">   24</span> </div>
+<div class="line"><span class="lineno">   25</span>  <span class="comment">// Save the settings into the output file</span></div>
+<div class="line"><span class="lineno">   26</span>  <a class="code hl_function" href="classFitterBase.html#a48f38bfa8996fe00d51f35b05dd16b46">SaveSettings</a>();</div>
+<div class="line"><span class="lineno">   27</span> </div>
+<div class="line"><span class="lineno">   28</span>  <span class="comment">// Prepare the output branches</span></div>
+<div class="line"><span class="lineno">   29</span>  <a class="code hl_function" href="classFitterBase.html#a53715760edd8c7640432f31793fd28f9">PrepareOutput</a>();</div>
+<div class="line"><span class="lineno">   30</span>  </div>
+<div class="line"><span class="lineno">   31</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> s = 0; s &lt; <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.size(); ++s) {</div>
+<div class="line"><span class="lineno">   32</span>    <a class="code hl_variable" href="classLikelihoodFit.html#ac779acfe140500d06e42a1d4ace25385">NPars</a> += <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;GetNumParams();</div>
+<div class="line"><span class="lineno">   33</span>    <a class="code hl_variable" href="classLikelihoodFit.html#a0b50b7b607751e80b6c85e9db98631af">NParsPCA</a> += <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;GetNParameters();</div>
+<div class="line"><span class="lineno">   34</span>  }</div>
+<div class="line"><span class="lineno">   35</span> </div>
+<div class="line"><span class="lineno">   36</span>  <span class="comment">//KS: If PCA is note enabled NParsPCA == NPars</span></div>
+<div class="line"><span class="lineno">   37</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Total number of parameters {}&quot;</span>, <a class="code hl_variable" href="classLikelihoodFit.html#a0b50b7b607751e80b6c85e9db98631af">NParsPCA</a>);</div>
+<div class="line"><span class="lineno">   38</span>}</div>
 <div class="ttc" id="aclassFitterBase_html_a48f38bfa8996fe00d51f35b05dd16b46"><div class="ttname"><a href="classFitterBase.html#a48f38bfa8996fe00d51f35b05dd16b46">FitterBase::SaveSettings</a></div><div class="ttdeci">void SaveSettings()</div><div class="ttdoc">Save the settings that the MCMC was run with.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8cpp_source.html#l00083">FitterBase.cpp:83</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_a53715760edd8c7640432f31793fd28f9"><div class="ttname"><a href="classFitterBase.html#a53715760edd8c7640432f31793fd28f9">FitterBase::PrepareOutput</a></div><div class="ttdeci">void PrepareOutput()</div><div class="ttdoc">Prepare the output file.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8cpp_source.html#l00148">FitterBase.cpp:148</a></div></div>
 </div><!-- fragment -->
