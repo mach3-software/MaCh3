@@ -719,7 +719,7 @@ $(function() {
 <div class="line"><a id="l00637" name="l00637"></a><span class="lineno">  637</span> </div>
 <div class="line"><a id="l00638" name="l00638"></a><span class="lineno">  638</span>  std::string Title = Histogram-&gt;GetName();</div>
 <div class="line"><a id="l00639" name="l00639"></a><span class="lineno">  639</span>  Title += <span class="stringliteral">&quot;_canv&quot;</span>;</div>
-<div class="line"><a id="l00640" name="l00640"></a><span class="lineno">  640</span>  TCanvas *TempCanvas = <span class="keyword">new</span> TCanvas(Title.c_str(), Title.c_str(), 1024, 1024);</div>
+<div class="line"><a id="l00640" name="l00640"></a><span class="lineno">  640</span>  <span class="keyword">auto</span> TempCanvas = std::make_unique&lt;TCanvas&gt;(Title.c_str(), Title.c_str(), 1024, 1024);</div>
 <div class="line"><a id="l00641" name="l00641"></a><span class="lineno">  641</span>  TempCanvas-&gt;SetGridx();</div>
 <div class="line"><a id="l00642" name="l00642"></a><span class="lineno">  642</span>  TempCanvas-&gt;SetGridy();</div>
 <div class="line"><a id="l00643" name="l00643"></a><span class="lineno">  643</span>  TempCanvas-&gt;cd();</div>
@@ -729,8 +729,7 @@ $(function() {
 <div class="line"><a id="l00647" name="l00647"></a><span class="lineno">  647</span>  TempLine-&gt;Draw(<span class="stringliteral">&quot;same&quot;</span>);</div>
 <div class="line"><a id="l00648" name="l00648"></a><span class="lineno">  648</span> </div>
 <div class="line"><a id="l00649" name="l00649"></a><span class="lineno">  649</span>  TempCanvas-&gt;Write();</div>
-<div class="line"><a id="l00650" name="l00650"></a><span class="lineno">  650</span>  <span class="keyword">delete</span> TempCanvas;</div>
-<div class="line"><a id="l00651" name="l00651"></a><span class="lineno">  651</span>}</div>
+<div class="line"><a id="l00650" name="l00650"></a><span class="lineno">  650</span>}</div>
 <div class="ttc" id="aHistogramUtils_8cpp_html_ab18c6b2408d7b9021bad06d47a06ee8d"><div class="ttname"><a href="HistogramUtils_8cpp.html#ab18c6b2408d7b9021bad06d47a06ee8d">NoOverflowIntegral</a></div><div class="ttdeci">double NoOverflowIntegral(TH2Poly *poly)</div><div class="ttdoc">WP: Helper function for calculating binned Integral of TH2Poly i.e not including overflow.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00050">HistogramUtils.cpp:50</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00025">MaCh3Logger.h:25</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00023">MaCh3Logger.h:23</a></div></div>
