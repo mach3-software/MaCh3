@@ -134,10 +134,10 @@ void PCAHandler::ConstructPCA(TMatrixDSym* CovMatrix, const int firstPCAd, const
 
   //KS: make easy map so we could easily find un-decomposed parameters
   isDecomposedPCA.resize(NumParPCA);
-  _fParSigmaPCA.resize(NumParPCA);
+  _fErrorPCA.resize(NumParPCA);
   for (int i = 0; i < NumParPCA; ++i)
   {
-    _fParSigmaPCA[i] = 1;
+    _fErrorPCA[i] = 1;
     isDecomposedPCA[i] = -1;
   }
   for (int i = 0; i < FirstPCAdpar; ++i) isDecomposedPCA[i] = i;
@@ -173,7 +173,7 @@ void PCAHandler::CorrelateSteps(const std::vector<double>& IndivStepScale,
   #endif
   for (int i = 0; i < NumParPCA; ++i)
   {
-    if (_fParSigmaPCA[i] > 0.)
+    if (_fErrorPCA[i] > 0.)
     {
       double IndStepScale = 1.;
       //KS: If undecomposed parameter apply individual step scale and Cholesky for better acceptance rate
@@ -213,11 +213,16 @@ void PCAHandler::TransferToPCA() {
 }
 
 // ********************************************
-void PCAHandler::SetInitialParameters() {
+void PCAHandler::SetInitialParameters(std::vector<double>& IndStepScale) {
 // ********************************************
   TransferToPCA();
   for (int i = 0; i < NumParPCA; ++i) {
     _fPreFitValuePCA[i] = _fParCurrPCA(i);
+  }
+  //DB Set Individual Step scale for PCA parameters to the LastPCAdpar fIndivStepScale because the step scale for those parameters is set by 'eigen_values[i]' but needs an overall step scale
+  //   However, individual step scale for non-PCA parameters needs to be set correctly
+  for (int i = FirstPCAdpar; i <= LastPCAdpar; i++) {
+    IndStepScale[i] = IndStepScale[LastPCAdpar-1];
   }
 }
 
@@ -242,7 +247,7 @@ void PCAHandler::TransferToParam() {
 void PCAHandler::ThrowParProp(const double mag, const double* _restrict_ randParams) {
 // ********************************************
   for (int i = 0; i < NumParPCA; i++) {
-    if (_fParSigmaPCA[i] > 0.) {
+    if (_fErrorPCA[i] > 0.) {
     _fParPropPCA(i) = _fParCurrPCA(i)+mag*randParams[i];
     }
   }
@@ -254,7 +259,7 @@ void PCAHandler::ThrowParProp(const double mag, const double* _restrict_ randPar
 void PCAHandler::ThrowParCurr(const double mag, const double* _restrict_ randParams) {
 // ********************************************
   for (int i = 0; i < NumParPCA; i++) {
-    if (_fParSigmaPCA[i] > 0.) {
+    if (_fErrorPCA[i] > 0.) {
     _fParPropPCA(i) = mag*randParams[i];
     }
   }
@@ -289,7 +294,7 @@ void PCAHandler::SetBranches(TTree &tree, bool SaveProposal, const std::vector<s
 void PCAHandler::ToggleFixAllParameters() {
 // ********************************************
   for (int i = 0; i < NumParPCA; i++) {
-    _fParSigmaPCA[i] *= -1.0;
+    _fErrorPCA[i] *= -1.0;
   }
 }
 
@@ -304,7 +309,7 @@ void PCAHandler::ToggleFixParameter(const int i, const std::vector<std::string>&
     MACH3LOG_ERROR("Parameter {} is PCA decomposed can't fix this", Names[i]);
     //throw MaCh3Exception(__FILE__ , __LINE__ );
   } else {
-    _fParSigmaPCA[isDecom] *= -1.0;
+    _fErrorPCA[isDecom] *= -1.0;
     MACH3LOG_INFO("Setting un-decomposed {}(parameter {}/{} in PCA base) to fixed at {}", Names[i], i, isDecom, (*_pCurrVal)[i]);
   }
 }

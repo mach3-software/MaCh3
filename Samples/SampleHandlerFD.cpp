@@ -92,7 +92,7 @@ void SampleHandlerFD::ReadSampleConfig()
   SampleYBins = GetFromManager(SampleManager->raw()["Binning"]["YVarBins"], std::vector<double>());
   if(YVarStr.length() > 0){
     if(XVarStr.length() == 0){
-      MACH3LOG_ERROR("Please specify an Y-variable string in sample config {}", SampleManager->GetFileName());
+      MACH3LOG_ERROR("Please specify an X-variable string in sample config {}. I won't work only with a Y-variable", SampleManager->GetFileName());
       throw MaCh3Exception(__FILE__, __LINE__);
     }
     nDimensions++;

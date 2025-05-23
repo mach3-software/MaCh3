@@ -37,14 +37,14 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
 
     /// @brief Get interpolation type for a given parameter
     /// @param i spline parameter index, not confuse with global index
-    inline SplineInterpolation GetParSplineInterpolation(const int i) {return SplineParams.at(i)._SplineInterpolationType;}
+    inline SplineInterpolation GetParSplineInterpolation(const int i) const {return SplineParams.at(i)._SplineInterpolationType;}
     /// @brief Get the interpolation types for splines affecting a particular SampleName
     /// @ingroup ParameterHandlerGetters
     const std::vector<SplineInterpolation> GetSplineInterpolationFromSampleName(const std::string& SampleName);
     /// @brief Get the name of the spline associated with the spline at index i
     /// @param i spline parameter index, not to be confused with global index
     /// @ingroup ParameterHandlerGetters
-    std::string GetParSplineName(const int i) {return _fSplineNames[i];}
+    std::string GetParSplineName(const int i) const {return _fSplineNames[i];}
 
     /// @brief DB Get spline parameters depending on given SampleName
     /// @ingroup ParameterHandlerGetters
@@ -52,11 +52,11 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @brief EM: value at which we cap spline knot weight
     /// @param i spline parameter index, not confuse with global index
     /// @ingroup ParameterHandlerGetters
-    inline double GetParSplineKnotUpperBound(const int i) {return SplineParams.at(i)._SplineKnotUpBound;}
+    inline double GetParSplineKnotUpperBound(const int i) const {return SplineParams.at(i)._SplineKnotUpBound;}
     /// @brief EM: value at which we cap spline knot weight
     /// @param i spline parameter index, not confuse with global index
     /// @ingroup ParameterHandlerGetters
-    inline double GetParSplineKnotLowerBound(const int i) {return SplineParams.at(i)._SplineKnotLowBound;}
+    inline double GetParSplineKnotLowerBound(const int i) const {return SplineParams.at(i)._SplineKnotLowBound;}
 
     /// @brief DB Grab the number of parameters for the relevant SampleName
     /// @param Type Type of syst, for example kNorm, kSpline etc

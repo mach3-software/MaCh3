@@ -26,6 +26,6 @@ class MinuitFit : public LikelihoodFit {
 
  private:
   /// Pointer to minimizer, which most often is Minuit
-  ROOT::Math::Minimizer* minuit;
+  std::unique_ptr<ROOT::Math::Minimizer> minuit;
 };
 

@@ -159,18 +159,19 @@ NormParameter ParameterHandlerGeneric::GetNormParameter(const YAML::Node& param,
 
   GetBaseParameter(param, Index, norm);
 
-  // ETA Empty DummyVector can be used to specify no cut for mode, target and neutrino flavour
-  // ETA Has to be of size 0 to mean apply to all
-  std::vector<int> DummyModeVec;
-  //Ultimately all this information ends up in the NormParams vector
+  /// ETA size 0 to mean apply to all
+  /// Ultimately all this information ends up in the @NormParams vector
+  norm.modes = GetFromManager<std::vector<int>>(param["Mode"], {}, __FILE__ , __LINE__);
+  norm.pdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavour"], {}, __FILE__ , __LINE__);
+  norm.preoscpdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavourUnosc"], {}, __FILE__ , __LINE__);
+  norm.targets = GetFromManager<std::vector<int>>(param["TargetNuclei"], {}, __FILE__ , __LINE__);
 
-  //Copy the mode information into an XsecNorms4 struct
-  norm.modes = GetFromManager<std::vector<int>>(param["Mode"], DummyModeVec, __FILE__ , __LINE__);
-  norm.pdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavour"], DummyModeVec, __FILE__ , __LINE__);
-  norm.preoscpdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavourUnosc"], DummyModeVec, __FILE__ , __LINE__);
-  norm.targets = GetFromManager<std::vector<int>>(param["TargetNuclei"], DummyModeVec, __FILE__ , __LINE__);
-
-  //ETA - I think this can go in the norm parameters only if statement above
+  if(_fLowBound[Index] < 0.) {
+    MACH3LOG_ERROR("Normalisation Parameter {} ({}), has lower parameters bound which can go below 0 and is equal {}",
+                   GetParFancyName(Index), Index, _fLowBound[Index]);
+    MACH3LOG_ERROR("Normalisation parameters can't go bellow 0 as this is unphysical");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
   int NumKinematicCuts = 0;
   if(param["KinematicCuts"]) {
     NumKinematicCuts = int(param["KinematicCuts"].size());
@@ -178,7 +179,7 @@ NormParameter ParameterHandlerGeneric::GetNormParameter(const YAML::Node& param,
     std::vector<std::string> TempKinematicStrings;
     std::vector<std::vector<double>> TempKinematicBounds;
     //First element of TempKinematicBounds is always -999, and size is then 3
-    for(int KinVar_i = 0 ; KinVar_i < NumKinematicCuts ; ++KinVar_i){
+    for(int KinVar_i = 0 ; KinVar_i < NumKinematicCuts ; ++KinVar_i) {
       //ETA: This is a bit messy, Kinematic cuts is a list of maps
       for (YAML::const_iterator it = param["KinematicCuts"][KinVar_i].begin();it!=param["KinematicCuts"][KinVar_i].end();++it) {
         TempKinematicStrings.push_back(it->first.as<std::string>());
@@ -194,7 +195,7 @@ NormParameter ParameterHandlerGeneric::GetNormParameter(const YAML::Node& param,
     norm.Selection = TempKinematicBounds;
   }
 
-  //Next ones are kinematic bounds on where normalisation parameter should apply (at the moment only etrue but hope to add q2
+  //Next ones are kinematic bounds on where normalisation parameter should apply
   //We set a bool to see if any bounds exist so we can short-circuit checking all of them every step
   bool HasKinBounds = false;
 
@@ -410,21 +411,14 @@ void ParameterHandlerGeneric::InitParams() {
     //ETA - set the name to be xsec_% as this is what ProcessorMCMC expects
     _fNames[i] = "xsec_"+std::to_string(i);
 
-    // Set covarianceBase parameters (Curr = current, Prop = proposed, Sigma = step)
+    // Set ParameterHandler parameters (Curr = current, Prop = proposed, Sigma = step)
     _fCurrVal[i] = _fPreFitValue[i];
     _fPropVal[i] = _fCurrVal[i];
-  }
-  //DB Set Individual Step scale for PCA parameters to the LastPCAdpar fIndivStepScale because the step scale for those parameters is set by 'eigen_values[i]' but needs an overall step scale
-  //   However, individual step scale for non-PCA parameters needs to be set correctly
-  if (pca) {
-    for (int i = FirstPCAdpar; i <= LastPCAdpar; i++) {
-      _fIndivStepScale[i] = _fIndivStepScale[LastPCAdpar-1];
-    }
   }
   Randomize();
   //KS: Transfer the starting parameters to the PCA basis, you don't want to start with zero..
   if (pca) {
-    PCAObj->SetInitialParameters();
+    PCAObj->SetInitialParameters(_fIndivStepScale);
   }
 }
 
