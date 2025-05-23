@@ -62,6 +62,11 @@ ParameterHandlerBase::~ParameterHandlerBase(){
 // ********************************************
 void ParameterHandlerBase::ConstructPCA() {
 // ********************************************
+  if(AdaptiveHandler) {
+    MACH3LOG_ERROR("Adaption has been enabled and now trying to enable PCA. Right now both configuration don't work with each other");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+
   PCAObj = std::make_unique<PCAHandler>();
   //Check whether first and last pcadpar are set and if not just PCA everything
   if(FirstPCAdpar == -999 || LastPCAdpar == -999){
@@ -996,6 +1001,10 @@ void ParameterHandlerBase::UpdateThrowMatrix(TMatrixDSym *cov){
 // HW : Here be adaption
 void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
 // ********************************************
+  if(PCAObj){
+    MACH3LOG_ERROR("PCA has been enabled and now trying to enable Adaption. Right now both configuration don't work with each other");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
   AdaptiveHandler = std::make_unique<adaptive_mcmc::AdaptiveMCMCHandler>();
   // Now we read the general settings [these SHOULD be common across all matrices!]
   bool success = AdaptiveHandler->InitFromConfig(adapt_manager, matrixName, &_fCurrVal, &_fError);
