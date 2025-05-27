@@ -4,9 +4,6 @@ name: MaCh3 Valgrind
 on:
   schedule:
     - cron: '0 0 * * 1' # Every Monday at midnight
-  push:
-    branches:
-      - feature/kskwarczynski/CmakeGraph
 
 permissions:
   # Required permissions for GitHub Pages deployment and content updates
