@@ -795,8 +795,11 @@ void MCMCProcessor::MakeViolin() {
   double mini_y = Chain->GetMinimum(BranchNames[0]);
   for (int i = 1; i < nDraw; ++i)
   {
-    if(Chain->GetMaximum(BranchNames[i]) > maxi_y) maxi_y = Chain->GetMaximum(BranchNames[i]);
-    if(Chain->GetMinimum(BranchNames[i]) < mini_y) mini_y = Chain->GetMinimum(BranchNames[i]);
+    const double max_val = Chain->GetMaximum(BranchNames[i]);
+    const double min_val = Chain->GetMinimum(BranchNames[i]);
+  
+    maxi_y = std::max(maxi_y, max_val);
+    mini_y = std::min(mini_y, min_val);
   }
 
   const int vBins = (maxi_y-mini_y)*25;
