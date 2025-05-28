@@ -1,6 +1,8 @@
 // MaCh3 includes
 #include "Fitters/MCMCProcessor.h"
 #include "Samples/HistogramUtils.h"
+#include "THStack.h"
+#include "TGraphAsymmErrors.h"
 
 /// @file PlotMCMCDiag.cpp
 /// @brief KS: This script is used to analyse output form DiagMCMC.
@@ -185,6 +187,141 @@ void PlotAutoCorr(TString fname1, TString fname2, TString fname3, TString fname4
   c1->Print("Auto_Corr_PerFile.pdf]", "pdf");
 }
 
+std::vector<TH1D*> GetAverageFileAC(TFile* infile, Color_t color = kOrange+7){
+  /*
+  Generates the average auto-correlation histogram from a given file.
+  */
+  TDirectoryFile *ac_dir = static_cast<TDirectoryFile*>(infile->Get("Auto_corr"));
+  if(!ac_dir) {
+    MACH3LOG_ERROR("No Auto_corr directory in file {}", infile->GetName());
+    return {nullptr, nullptr, nullptr};
+  }
+
+  TKey *key;
+  TIter next(ac_dir->GetListOfKeys());
+
+  TH1D* auto_hist = nullptr;
+  TH1D* min_hist = nullptr;
+  TH1D* max_hist = nullptr;
+
+  int n_pars = 0;
+  while ((key = static_cast<TKey*>(next()))) {
+    std::string name = std::string(key->GetName());
+    if (std::string(key->GetClassName()) != "TH1D") continue;
+
+    auto plot_hist = static_cast<TH1D*>(ac_dir->Get(name.c_str())->Clone());
+
+    // Lets us get binning info
+    if(!auto_hist){
+      auto_hist = static_cast<TH1D*>(plot_hist->Clone("Average_Auto_Corr"));
+      auto_hist->SetDirectory(0); // Prevent ROOT from deleting it
+      min_hist = static_cast<TH1D*>(plot_hist->Clone("Average_Auto_Corr_Min_Max"));
+      max_hist = static_cast<TH1D*>(plot_hist->Clone("Average_Auto_Corr_Min_Max"));
+      auto_hist->Reset();
+    }
+    // Now we add the hists together
+    auto_hist->Add(plot_hist);
+    
+    // Now now iterate to get min and max hists
+    for(int i = 1; i <= plot_hist->GetNbinsX(); i++) {
+      double bin_content = plot_hist->GetBinContent(i);
+      if(bin_content < min_hist->GetBinContent(i)) {
+        min_hist->SetBinContent(i, bin_content);
+      }
+      if(bin_content > max_hist->GetBinContent(i)) {
+        max_hist->SetBinContent(i, bin_content);
+      }
+    }
+
+    n_pars++;
+  
+  }
+
+  auto_hist->Scale(1.0 / float(n_pars)); // Average the histogram
+
+  // We now want to make things look pretty!
+  auto error_hist = static_cast<TH1D*>(auto_hist->Clone("Average_Auto_Corr_Error"));
+  error_hist->SetDirectory(0); // Prevent ROOT from deleting it
+
+  auto_hist->SetLineColor(color);
+  error_hist->SetFillColorAlpha(color, float(0.3));
+  min_hist->SetFillColorAlpha(color, float(0.1));
+  max_hist->SetFillColorAlpha(color, float(0.1));
+
+
+  return {auto_hist, error_hist, min_hist, max_hist};
+}
+
+void DrawAverageAC(TFile* file, Color_t color = kOrange+7, TCanvas* canvas=nullptr, TLegend* legend = nullptr){
+  auto ac_hists = GetAverageFileAC(file, color);
+
+  if(ac_hists[0]==nullptr){
+    MACH3LOG_ERROR("No auto-correlation histograms found in file {}", file->GetName());
+    return;
+  }
+  
+  canvas->cd();
+
+  ac_hists[1]->SetTitle("Average Auto-Correlation");
+  ac_hists[1]->GetXaxis()->SetTitle("Lag");
+  ac_hists[1]->GetYaxis()->SetTitle("Auto-Correlation");
+
+
+  // First we need to proces the minmnax bbands
+  auto band = new TGraphAsymmErrors(ac_hists[2]->GetNbinsX());
+  for(int i=1; i<=ac_hists[2]->GetNbinsX(); i++){
+    double x = ac_hists[2]->GetBinCenter(i);
+    double y_min = ac_hists[2]->GetBinContent(i);
+    double y_max = ac_hists[3]->GetBinContent(i);
+
+    band->SetPoint(i-1, x, (y_min + y_max) / 2.0);
+    band->SetPointError(i-1, 0.0, 0.0, (y_max-y_min) / 2.0, (y_max-y_min) / 2.0);
+  }
+
+  if(legend){
+    legend->AddEntry(ac_hists[0], TString(file->GetName()), "l");
+  }
+
+  // Now we draw!
+  ac_hists[1]->Draw("SAME E3");
+  band->Draw("SAME");
+  ac_hists[0]->Draw("SAME HIST");
+
+}
+
+
+// TODO [HW]: Make this all a little more generic!
+void PlotAverageAutoCorr(TString fname1, TString fname2, TString fname3, TString fname4)
+{
+  TCanvas *c1 = new TCanvas("c1"," ", 0, 0, 800,630);
+  TLegend* leg = new TLegend(0.7, 0.7, 0.9, 0.9);
+  gStyle->SetOptStat(0); //Set 0 to disable statistic box
+  //To avoid TCanvas::Print> messages
+  gErrorIgnoreLevel = kWarning;
+
+  TFile *infile = TFile::Open(fname1.Data());
+  DrawAverageAC(infile, kRed, c1, leg);
+
+  TFile *infile2 = NULL;
+  if(fname2 != DUMMYFILE){
+    infile2 = TFile::Open(fname2.Data());
+    DrawAverageAC(infile2, kBlue, c1, leg);
+  };
+  TFile *infile3 = NULL;
+  if(fname3 != DUMMYFILE){
+     infile3 = TFile::Open(fname3.Data());
+     DrawAverageAC(infile3, kGreen, c1, leg);
+  }
+  TFile *infile4 = NULL;
+  if(fname4 != DUMMYFILE){
+    infile4 = TFile::Open(fname4.Data());
+    DrawAverageAC(infile4, kOrange, c1, leg);
+  }
+    
+  c1->Print("Average_Auto_Corr.pdf", "pdf");
+  
+}
+
 int main(int argc, char *argv[]) {
   SetMaCh3LoggerFormat();
   if (argc < 2 || argc > 5)
@@ -197,15 +334,19 @@ int main(int argc, char *argv[]) {
   if(argc == 2) {
     MakePlot(argv[1], DUMMYFILE, DUMMYFILE, DUMMYFILE);
     PlotAutoCorr(argv[1], DUMMYFILE, DUMMYFILE, DUMMYFILE);
+    PlotAverageAutoCorr(argv[1], DUMMYFILE, DUMMYFILE, DUMMYFILE);
   } else if(argc == 3) {
     MakePlot(argv[1], argv[2], DUMMYFILE ,DUMMYFILE);
     PlotAutoCorr(argv[1], argv[2], DUMMYFILE, DUMMYFILE);
+    PlotAverageAutoCorr(argv[1], argv[2], DUMMYFILE, DUMMYFILE);
   } else if(argc == 4) {
     MakePlot(argv[1], argv[2], argv[3], DUMMYFILE);
     PlotAutoCorr(argv[1], argv[2], argv[3], DUMMYFILE);
+    PlotAverageAutoCorr(argv[1], argv[2], argv[3], DUMMYFILE);
   } else if(argc == 5) {
     MakePlot(argv[1], argv[2], argv[3], argv[4]);
     PlotAutoCorr(argv[1], argv[2], argv[3], argv[4]);
+    PlotAverageAutoCorr(argv[1], argv[2], argv[3], argv[4]);
   }
   return 0;
 }
