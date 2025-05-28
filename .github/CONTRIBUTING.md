@@ -5,6 +5,10 @@ New features should be developed on branches in this repository with the branch 
 
 Please see [here](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) for more details
 
+We generally discourage fork-based development for anything beyond small changes (e.g., one-liners). This is to avoid situations where contributors develop large features in isolation and miss out on important upstream updates.
+
+If you’d like to contribute more extensively, please consider joining the organization. To request access, contact the [MaCh3 Admins](https://github.com/orgs/mach3-software/teams/mach3admin).
+
 ## Versioning of this package
 
 This package will follow this numbering convention for releases
