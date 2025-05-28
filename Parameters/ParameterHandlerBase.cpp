@@ -2,8 +2,7 @@
 #include "regex"
 
 // ********************************************
-ParameterHandlerBase::ParameterHandlerBase(std::string name, std::string file, double threshold, int FirstPCA, int LastPCA) : inputFile(file), pca(false),
-eigen_threshold(threshold), FirstPCAdpar(FirstPCA), LastPCAdpar(LastPCA) {
+ParameterHandlerBase::ParameterHandlerBase(std::string name, std::string file, double threshold, int FirstPCA, int LastPCA) : inputFile(file), pca(false) {
 // ********************************************
   MACH3LOG_DEBUG("Constructing instance of ParameterHandler");
   if (threshold < 0 || threshold >= 1) {
@@ -17,10 +16,10 @@ eigen_threshold(threshold), FirstPCAdpar(FirstPCA), LastPCAdpar(LastPCA) {
   Init(name, file);
 
   // Call the innocent helper function
-  if (pca) ConstructPCA();
+  if (pca) ConstructPCA(threshold, FirstPCA, LastPCA);
 }
 // ********************************************
-ParameterHandlerBase::ParameterHandlerBase(const std::vector<std::string>& YAMLFile, std::string name, double threshold, int FirstPCA, int LastPCA) : inputFile(YAMLFile[0].c_str()), matrixName(name), pca(true), eigen_threshold(threshold), FirstPCAdpar(FirstPCA), LastPCAdpar(LastPCA) {
+ParameterHandlerBase::ParameterHandlerBase(const std::vector<std::string>& YAMLFile, std::string name, double threshold, int FirstPCA, int LastPCA) : inputFile(YAMLFile[0].c_str()), matrixName(name), pca(true) {
 // ********************************************
   MACH3LOG_INFO("Constructing instance of ParameterHandler using");
   for(unsigned int i = 0; i < YAMLFile.size(); i++)
@@ -39,7 +38,7 @@ ParameterHandlerBase::ParameterHandlerBase(const std::vector<std::string>& YAMLF
 
   Init(YAMLFile);
   // Call the innocent helper function
-  if (pca) ConstructPCA();
+  if (pca) ConstructPCA(threshold, FirstPCA, LastPCA);
 }
 
 // ********************************************
@@ -60,7 +59,7 @@ ParameterHandlerBase::~ParameterHandlerBase(){
 }
 
 // ********************************************
-void ParameterHandlerBase::ConstructPCA() {
+void ParameterHandlerBase::ConstructPCA(const double eigen_threshold, int FirstPCAdpar, int LastPCAdpar) {
 // ********************************************
   if(AdaptiveHandler) {
     MACH3LOG_ERROR("Adaption has been enabled and now trying to enable PCA. Right now both configuration don't work with each other");
