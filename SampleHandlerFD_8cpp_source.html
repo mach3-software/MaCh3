@@ -1283,7 +1283,7 @@ $(function() {
 <div class="line"><a id="l01208" name="l01208"></a><span class="lineno"> 1208</span>}</div>
 <div class="line"><a id="l01209" name="l01209"></a><span class="lineno"> 1209</span> </div>
 <div class="line"><a id="l01210" name="l01210"></a><span class="lineno"><a class="line" href="classSampleHandlerFD.html#afd6a736c3752b05dde1e1e3703bf42a5"> 1210</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classSampleHandlerFD.html#afd6a736c3752b05dde1e1e3703bf42a5">SampleHandlerFD::AddData</a>(TH1D* Data) {</div>
-<div class="line"><a id="l01211" name="l01211"></a><span class="lineno"> 1211</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Adding 1D data histogram: {} with {:.2f} events&quot;</span>, Data-&gt;GetName(), Data-&gt;Integral());</div>
+<div class="line"><a id="l01211" name="l01211"></a><span class="lineno"> 1211</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Adding 1D data histogram: {} with {:.2f} events&quot;</span>, Data-&gt;GetTitle(), Data-&gt;Integral());</div>
 <div class="line"><a id="l01212" name="l01212"></a><span class="lineno"> 1212</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#aa7ed25798bc8d52dc16b5ea2f6c9d0c3">dathist2d</a> = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a id="l01213" name="l01213"></a><span class="lineno"> 1213</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">dathist</a> = Data;</div>
 <div class="line"><a id="l01214" name="l01214"></a><span class="lineno"> 1214</span>  </div>
@@ -1307,7 +1307,7 @@ $(function() {
 <div class="line"><a id="l01232" name="l01232"></a><span class="lineno"> 1232</span>}</div>
 <div class="line"><a id="l01233" name="l01233"></a><span class="lineno"> 1233</span> </div>
 <div class="line"><a id="l01234" name="l01234"></a><span class="lineno"><a class="line" href="classSampleHandlerFD.html#a2dea09fa53bc8ec35a38c3a26f000c03"> 1234</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classSampleHandlerFD.html#afd6a736c3752b05dde1e1e3703bf42a5">SampleHandlerFD::AddData</a>(TH2D* Data) {</div>
-<div class="line"><a id="l01235" name="l01235"></a><span class="lineno"> 1235</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Adding 2D data histogram: {} with {:.2f} events&quot;</span>, Data-&gt;GetName(), Data-&gt;Integral());</div>
+<div class="line"><a id="l01235" name="l01235"></a><span class="lineno"> 1235</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Adding 2D data histogram: {} with {:.2f} events&quot;</span>, Data-&gt;GetTitle(), Data-&gt;Integral());</div>
 <div class="line"><a id="l01236" name="l01236"></a><span class="lineno"> 1236</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#aa7ed25798bc8d52dc16b5ea2f6c9d0c3">dathist2d</a> = Data;</div>
 <div class="line"><a id="l01237" name="l01237"></a><span class="lineno"> 1237</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">dathist</a> = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a id="l01238" name="l01238"></a><span class="lineno"> 1238</span> </div>
