@@ -322,8 +322,11 @@ class ParameterHandlerBase {
   bool IsParameterFixed(const std::string& name) const;
 
   /// @brief CW: Calculate eigen values, prepare transition matrices and remove param based on defined threshold
+  /// @param eigen_threshold PCA threshold from 0 to 1. Default is -1 and means no PCA
+  /// @param FirstPCAdpar First PCA parameter that will be decomposed.
+  /// @param LastPCAdpar First PCA parameter that will be decomposed.
   /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/03.-Eigen-Decomposition-%E2%80%90-PCA).
-  void ConstructPCA();
+  void ConstructPCA(const double eigen_threshold, int FirstPCAdpar, int LastPCAdpar);
 
   /// @brief is PCA, can use to query e.g. LLH scans
   inline bool IsPCA() const { return pca; }
@@ -444,15 +447,6 @@ protected:
   /// Tells to which samples object param should be applied
   std::vector<std::vector<std::string>> _fSampleNames;
 
-  /// perform PCA or not
-  bool pca;
-  /// CW: Threshold based on which we remove parameters in eigen base
-  double eigen_threshold;
-  /// Index of the first param that is being decomposed
-  int FirstPCAdpar;
-  /// Index of the last param that is being decomposed
-  int LastPCAdpar;
-
   /// Matrix which we use for step proposal before Cholesky decomposition (not actually used for step proposal)
   TMatrixDSym* throwMatrix;
   /// Matrix which we use for step proposal after Cholesky decomposition
@@ -460,6 +454,8 @@ protected:
   /// Throw matrix that is being used in the fit, much faster as TMatrixDSym cache miss
   double** throwMatrixCholDecomp;
 
+  /// perform PCA or not
+  bool pca;
   /// Are we using AMCMC?
   bool use_adaptive;
 
