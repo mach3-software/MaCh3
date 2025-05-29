@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['lastpcadpar_0',['LastPCAdpar',['../classParameterHandlerBase.html#a3f192f8800821774f5fc06826f108167',1,'ParameterHandlerBase::LastPCAdpar()'],['../classPCAHandler.html#a954eeb975f1d7f9528ed7e027a54b21a',1,'PCAHandler::LastPCAdpar()']]],
+  ['lastpcadpar_0',['LastPCAdpar',['../classPCAHandler.html#a954eeb975f1d7f9528ed7e027a54b21a',1,'PCAHandler']]],
   ['length_1',['length',['../classTF1__red.html#a25a2d24932de29741a6d539328d715a7',1,'TF1_red']]],
   ['likelihood_2',['likelihood',['../classSampleSummary.html#aafb18632bb987ae9a302d95781d5fdba',1,'SampleSummary']]],
   ['likelihoodfit_3',['LikelihoodFit',['../classLikelihoodFit.html#a1d3cb4fbaa7a0e6e1d7f4804a434e1ea',1,'LikelihoodFit::LikelihoodFit()'],['../classPyLikelihoodFit.html#a1d3cb4fbaa7a0e6e1d7f4804a434e1ea',1,'PyLikelihoodFit::LikelihoodFit()'],['../classLikelihoodFit.html',1,'LikelihoodFit']]],

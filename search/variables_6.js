@@ -16,7 +16,7 @@ var searchData=
   ['finalpdg_13',['FinalPDG',['../structOscChannelInfo.html#a68fbf8d6805b2f6098e13216531e9964',1,'OscChannelInfo']]],
   ['finertia_14',['fInertia',['../classPSO.html#a9b3d14a97a9d838a9f009f9cc54968d3',1,'PSO']]],
   ['first_5fpass_15',['first_pass',['../classSampleSummary.html#a4ade2ccb94981d4483f0b4e6e367b1a0',1,'SampleSummary']]],
-  ['firstpcadpar_16',['FirstPCAdpar',['../classParameterHandlerBase.html#a7dcdb94a0438ddb9b83e4cee8673e86d',1,'ParameterHandlerBase::FirstPCAdpar()'],['../classPCAHandler.html#afc00f628b947fd407d05790f4d0eaaec',1,'PCAHandler::FirstPCAdpar()']]],
+  ['firstpcadpar_16',['FirstPCAdpar',['../classPCAHandler.html#afc00f628b947fd407d05790f4d0eaaec',1,'PCAHandler']]],
   ['firsttimew2_17',['FirstTimeW2',['../classSampleHandlerFD.html#a1ff1ef7d99cee6d6a9fba74296d4d0ea',1,'SampleHandlerFD']]],
   ['fiterations_18',['fIterations',['../classPSO.html#aa2adb0a6985424439c44b8d0c7afec08',1,'PSO']]],
   ['fitman_19',['fitMan',['../classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095',1,'FitterBase']]],

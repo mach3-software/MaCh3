@@ -2,7 +2,7 @@ var searchData=
 [
   ['effectivesamplesize_0',['EffectiveSampleSize',['../RHat_8cpp.html#ae673254e98992bd483de55c6c1d1dcaf',1,'EffectiveSampleSize():&#160;RHat.cpp'],['../RHat__HighMem_8cpp.html#ae673254e98992bd483de55c6c1d1dcaf',1,'EffectiveSampleSize():&#160;RHat_HighMem.cpp']]],
   ['effectivesamplesizefolded_1',['EffectiveSampleSizeFolded',['../RHat__HighMem_8cpp.html#a39a08e7110f564d00239beccded97be8',1,'RHat_HighMem.cpp']]],
-  ['eigen_5fthreshold_2',['eigen_threshold',['../classPCAHandler.html#afdf5f929fe9211a2ce05f6bab2b8633a',1,'PCAHandler::eigen_threshold()'],['../classParameterHandlerBase.html#a3e14fe4c0f4b96fb0492f029355bd736',1,'ParameterHandlerBase::eigen_threshold()']]],
+  ['eigen_5fthreshold_2',['eigen_threshold',['../classPCAHandler.html#afdf5f929fe9211a2ce05f6bab2b8633a',1,'PCAHandler']]],
   ['eigen_5fvalues_3',['eigen_values',['../classPCAHandler.html#a8d95ecb29e091e9b09c5011691516c28',1,'PCAHandler']]],
   ['eigen_5fvalues_5fmaster_4',['eigen_values_master',['../classPCAHandler.html#a2924386fef0cf65215c51b4f81cdb0d1',1,'PCAHandler']]],
   ['eigen_5fvectors_5',['eigen_vectors',['../classPCAHandler.html#a3ba9d34343ce0d0eeb4c020fa70486e2',1,'PCAHandler']]],
