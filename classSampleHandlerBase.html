@@ -421,7 +421,7 @@ Protected Attributes</h2></td></tr>
 <div class="line"><span class="lineno">   62</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
 <div class="line"><span class="lineno">   63</span>  }</div>
 <div class="line"><span class="lineno">   64</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a> = 1;</div>
-<div class="line"><span class="lineno">   65</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Adding 1D data histogram: {} with {} events.&quot;</span>, binneddata-&gt;GetName(), binneddata-&gt;Integral());</div>
+<div class="line"><span class="lineno">   65</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Adding 1D data histogram: {} with {} events.&quot;</span>, binneddata-&gt;GetTitle(), binneddata-&gt;Integral());</div>
 <div class="line"><span class="lineno">   66</span>  <span class="comment">//KS: If exist delete to avoid memory leak</span></div>
 <div class="line"><span class="lineno">   67</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">dathist</a> != NULL) <span class="keyword">delete</span> <a class="code hl_variable" href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">dathist</a>;</div>
 <div class="line"><span class="lineno">   68</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">dathist</a> = binneddata;</div>
@@ -464,7 +464,7 @@ Protected Attributes</h2></td></tr>
 <div class="line"><span class="lineno">   76</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
 <div class="line"><span class="lineno">   77</span>  }</div>
 <div class="line"><span class="lineno">   78</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">nDims</a> = 2;</div>
-<div class="line"><span class="lineno">   79</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Adding 2D data histogram: {} with {} events.&quot;</span>, binneddata-&gt;GetName(), binneddata-&gt;Integral());</div>
+<div class="line"><span class="lineno">   79</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Adding 2D data histogram: {} with {} events.&quot;</span>, binneddata-&gt;GetTitle(), binneddata-&gt;Integral());</div>
 <div class="line"><span class="lineno">   80</span>  <span class="comment">//KS: If exist delete to avoid memory leak</span></div>
 <div class="line"><span class="lineno">   81</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSampleHandlerBase.html#aa7ed25798bc8d52dc16b5ea2f6c9d0c3">dathist2d</a> != NULL) <span class="keyword">delete</span> <a class="code hl_variable" href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">dathist</a>;</div>
 <div class="line"><span class="lineno">   82</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#aa7ed25798bc8d52dc16b5ea2f6c9d0c3">dathist2d</a> = binneddata;</div>
