@@ -41,12 +41,13 @@ class ParameterHandlerBase {
   /// @ingroup ParameterHandlerSetters
   void SetCovMatrix(TMatrixDSym *cov);
   /// @brief Set matrix name
-  void SetName(std::string name) { matrixName = name; }
+  /// @ingroup ParameterHandlerSetters
+  void SetName(const std::string& name) { matrixName = name; }
   /// @brief change parameter name
   /// @param i Parameter index
   /// @param name new name which will be set
   /// @ingroup ParameterHandlerSetters
-  void SetParName(int i, std::string name) { _fNames.at(i) = name; }
+  void SetParName(const int i, const std::string& name) { _fNames.at(i) = name; }
   /// @brief Set value of single param to a given value
   /// @ingroup ParameterHandlerSetters
   void SetSingleParameter(const int parNo, const double parVal);
@@ -92,7 +93,7 @@ class ParameterHandlerBase {
   /// @param tree Tree to which we will save branches
   /// @param SaveProposal Normally we only save parameter after is accepted, for debugging purpose it is helpful to see also proposed values. That's what this variable controls
   /// @ingroup ParameterHandlerSetters
-  void SetBranches(TTree &tree, bool SaveProposal = false);
+  void SetBranches(TTree &tree, const bool SaveProposal = false);
   /// @brief Set global step scale for covariance object
   /// @param scale Value of global step scale
   /// @cite luengo2020survey
@@ -210,7 +211,7 @@ class ParameterHandlerBase {
   inline TMatrixDSym *GetThrowMatrix() const {return throwMatrix;}
   /// @brief Get matrix used for step proposal
   /// @ingroup ParameterHandlerGetters
-  double GetThrowMatrix(int i, int j) const { return throwMatrixCholDecomp[i][j];}
+  double GetThrowMatrix(const int i, const int j) const { return throwMatrixCholDecomp[i][j];}
   /// @brief Get the Cholesky decomposition of the throw matrix
   /// @ingroup ParameterHandlerGetters
   inline TMatrixD *GetThrowMatrix_CholDecomp() const {return throwMatrix_CholDecomp;}
@@ -327,20 +328,14 @@ class ParameterHandlerBase {
   bool IsParameterFixed(const std::string& name) const;
 
   /// @brief CW: Calculate eigen values, prepare transition matrices and remove param based on defined threshold
+  /// @param eigen_threshold PCA threshold from 0 to 1. Default is -1 and means no PCA
+  /// @param FirstPCAdpar First PCA parameter that will be decomposed.
+  /// @param LastPCAdpar First PCA parameter that will be decomposed.
   /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/03.-Eigen-Decomposition-%E2%80%90-PCA).
-  void ConstructPCA();
+  void ConstructPCA(const double eigen_threshold, int FirstPCAdpar, int LastPCAdpar);
 
   /// @brief is PCA, can use to query e.g. LLH scans
   inline bool IsPCA() const { return pca; }
-
-  /// @brief KS: Custom function to perform multiplication of matrix and vector with multithreading
-  /// @param VecMulti Output Vector, VecMulti = matrix x vector
-  /// @param matrix This matrix is used for multiplication VecMulti = matrix x vector
-  /// @param VecMulti This vector is used for multiplication VecMulti = matrix x vector
-  /// @param n this is size of matrix and vector, we assume matrix is symmetric
-  inline void MatrixVectorMulti(double* _restrict_ VecMulti, double** _restrict_ matrix, const double* _restrict_ vector, const int n) const;
-  /// @brief KS: Custom function to perform multiplication of matrix and single element which is thread safe
-  inline double MatrixVectorMultiSingle(double** _restrict_ matrix, const double* _restrict_ vector, const int Length, const int i) const;
 
   /// @brief Getter to return a copy of the YAML node
   /// @ingroup ParameterHandlerGetters
@@ -371,7 +366,7 @@ class ParameterHandlerBase {
 
 protected:
   /// @brief Initialisation of the class using matrix from root file
-  void Init(std::string name, std::string file);
+  void Init(const std::string& name, const std::string& file);
   /// @brief Initialisation of the class using config
   /// @param YAMLFile A vector of strings representing the YAML files used for initialisation of matrix
   void Init(const std::vector<std::string>& YAMLFile);
@@ -449,15 +444,6 @@ protected:
   /// Tells to which samples object param should be applied
   std::vector<std::vector<std::string>> _fSampleNames;
 
-  /// perform PCA or not
-  bool pca;
-  /// CW: Threshold based on which we remove parameters in eigen base
-  double eigen_threshold;
-  /// Index of the first param that is being decomposed
-  int FirstPCAdpar;
-  /// Index of the last param that is being decomposed
-  int LastPCAdpar;
-
   /// Matrix which we use for step proposal before Cholesky decomposition (not actually used for step proposal)
   TMatrixDSym* throwMatrix;
   /// Matrix which we use for step proposal after Cholesky decomposition
@@ -465,6 +451,8 @@ protected:
   /// Throw matrix that is being used in the fit, much faster as TMatrixDSym cache miss
   double** throwMatrixCholDecomp;
 
+  /// perform PCA or not
+  bool pca;
   /// Are we using AMCMC?
   bool use_adaptive;
 

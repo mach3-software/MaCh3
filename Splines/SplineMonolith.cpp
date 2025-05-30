@@ -310,7 +310,7 @@ void SMonolith::MoveToGPU() {
                 double(sizeof(short int) * NSplines_valid)) / 1.E6);
   MACH3LOG_INFO("Total TF1 size = {:.2f} MB memory on CPU to move to GPU",
                 double(sizeof(float) * NTF1_valid * _nTF1Coeff_) / 1.E6);
-  MACH3LOG_INFO("GPU weight array (GPU->CPU every step) = {:.2f} MB", double(sizeof(float) * (NSplines_valid + NTF1_valid) / 1.E6));
+  MACH3LOG_INFO("GPU weight array (GPU->CPU every step) = {:.2f} MB", static_cast<double>(sizeof(float)) * (NSplines_valid + NTF1_valid) / 1.0e6);
   #ifndef Weight_On_SplineBySpline_Basis
   MACH3LOG_INFO("Since you are running Total event weight mode then GPU weight array (GPU->CPU every step) = {:.2f} MB",
                 double(sizeof(float) * NEvents) / 1.E6);
