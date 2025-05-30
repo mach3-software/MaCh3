@@ -1,7 +1,7 @@
 #pragma once
 
 // MaCh3 Includes
-#include "Samples/Structs.h"
+#include "Samples/SampleStructs.h"
 #include "Manager/YamlHelper.h"
 #include "Manager/Monitor.h"
 #include "Manager/MaCh3Exception.h"

@@ -41,6 +41,17 @@ This process ensures that:
 - Breaking changes are properly registered.
 - The [MaCh3 Tutorial](https://github.com/mach3-software/MaCh3Tutorial) remains up-to-date.
 
+### Monitoring Jobs
+Some bots are tasked with weekly or long-term monitoring tasks.
+For example:
+- [Valgrind outputs](https://github.com/mach3-software/MaCh3/tree/gh-profiling) are updated on a weekly basis to track memory-related issues and visualize the CMake dependency graph.
+- [Benchmarking results](https://mach3-software.github.io/MaCh3Tutorial/) are stored and published periodically to monitor performance metrics over time.
+
+These outputs are primarily intended for expert developers. However, they **should still be regularly monitored** to identify:
+- Persistent memory leaks
+- Performance regressions
+- Issues in the CMake linking flow
+
 ## Doxygen
 When making comments try following Doxygen type of comments
 
