@@ -78,15 +78,15 @@ public:
   }
 
   /// @ingroup SampleHandlerGetters
-  TH1* Get1DVarHist(const std::string& ProjectionVar, const std::vector< KinematicCut >& SelectionVec = std::vector< KinematicCut >(),
+  TH1* Get1DVarHist(const std::string& ProjectionVar, bool isParticleHist=0, const std::vector< KinematicCut >& SelectionVec = std::vector< KinematicCut >(),
                     int WeightStyle=0, TAxis* Axis=nullptr);
-  TH2* Get2DVarHist(const std::string& ProjectionVarX, const std::string& ProjectionVarY,
+  TH2* Get2DVarHist(const std::string& ProjectionVarX, const std::string& ProjectionVarY, bool isParticleHist=0,
                     const std::vector< KinematicCut >& SelectionVec = std::vector< KinematicCut >(),
                     int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
   /// @ingroup SampleHandlerGetters
-  TH1* Get1DVarHistByModeAndChannel(const std::string& ProjectionVar_Str, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* Axis=nullptr);
+  TH1* Get1DVarHistByModeAndChannel(const std::string& ProjectionVar_Str, bool isParticleHist=0, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* Axis=nullptr);
   /// @ingroup SampleHandlerGetters
-  TH2* Get2DVarHistByModeAndChannel(const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
+  TH2* Get2DVarHistByModeAndChannel(const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY, bool isParticleHist=0, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
 
   /// @ingroup SampleHandlerGetters
   TH1 *GetModeHist1D(int s, int m, int style = 0) {
@@ -98,11 +98,11 @@ public:
   }
 
   /// @ingroup SampleHandlerGetters
-  std::vector<TH1*> ReturnHistsBySelection1D(std::string KinematicProjection, int Selection1, int Selection2=-1, int WeightStyle=0, TAxis* Axis=0);
+  std::vector<TH1*> ReturnHistsBySelection1D(std::string KinematicProjection, int Selection1, bool isParticleHist=0, int Selection2=-1, int WeightStyle=0, TAxis* Axis=0);
   /// @ingroup SampleHandlerGetters
-  std::vector<TH2*> ReturnHistsBySelection2D(std::string KinematicProjectionX, std::string KinematicProjectionY, int Selection1, int Selection2=-1, int WeightStyle=0, TAxis* XAxis=0, TAxis* YAxis=0);
+  std::vector<TH2*> ReturnHistsBySelection2D(std::string KinematicProjectionX, std::string KinematicProjectionY, int Selection1, bool isParticleHist=0, int Selection2=-1, int WeightStyle=0, TAxis* XAxis=0, TAxis* YAxis=0);
   /// @ingroup SampleHandlerGetters
-  THStack* ReturnStackedHistBySelection1D(std::string KinematicProjection, int Selection1, int Selection2=-1, int WeightStyle=0, TAxis* Axis=0);
+  THStack* ReturnStackedHistBySelection1D(std::string KinematicProjection, int Selection1, bool isParticleHist=0, int Selection2=-1, int WeightStyle=0, TAxis* Axis=0);
   /// @ingroup SampleHandlerGetters
   TLegend* ReturnStackHistLegend() {return THStackLeg;}
   
@@ -112,6 +112,11 @@ public:
   /// @brief ETA function to generically convert a kinematic type from xsec cov to a string
   /// @ingroup SampleHandlerGetters
   std::string ReturnStringFromKinematicParameter(const int KinematicVariable) const;
+
+  // === JM declare the same functions for kinematic vectors ===
+  int ReturnKinematicVectorFromString(const std::string& KinematicStr) const;
+  std::string ReturnStringFromKinematicVector(const int KinematicVariable) const;
+  // ===========================================================
 
  protected:
   /// @brief DB Function to determine which weights apply to which types of samples pure virtual!!
@@ -208,6 +213,8 @@ public:
 
   /// @brief DB Function which determines if an event is selected, where Selection double looks like {{ND280KinematicTypes Var1, douuble LowBound}
   bool IsEventSelected(const int iEvent);
+  /// @brief JM Function which determines if a particle is selected
+  bool IsParticleSelected(const int iEvent, unsigned const int iParticle);
   /// @brief HH - reset the shifted values to the original values
   virtual void resetShifts(int iEvent) {(void)iEvent;};
   /// @brief HH - a vector that stores all the FuncPars struct
@@ -245,9 +252,15 @@ public:
   /// @brief Return the value of an assocaited kinematic parameter for an event
   virtual double ReturnKinematicParameter(std::string KinematicParamter, int iEvent) = 0;
   virtual double ReturnKinematicParameter(int KinematicVariable, int iEvent) = 0;
+  
+  // === JM declare the same functions for kinematic vectors ===
+  virtual std::vector<double> ReturnKinematicVector(std::string KinematicParamter, int iEvent) = 0;
+  virtual std::vector<double> ReturnKinematicVector(int KinematicVariable, int iEvent) = 0;
+  // ===========================================================
 
   /// @brief Return the binning used to draw a kinematic parameter
   virtual std::vector<double> ReturnKinematicParameterBinning(std::string KinematicParameter) = 0;
+  virtual std::vector<double> ReturnKinematicVectorBinning(std::string KinematicVector) = 0;
   virtual const double* GetPointerToKinematicParameter(std::string KinematicParamter, int iEvent) = 0;
   virtual const double* GetPointerToKinematicParameter(double KinematicVariable, int iEvent) = 0;
 
@@ -340,6 +353,11 @@ public:
   const std::unordered_map<std::string, int>* KinematicParameters;
   /// Mapping between kinematic enum and string
   const std::unordered_map<int, std::string>* ReversedKinematicParameters;
+
+  // === JM mapping between string and kinematic vector enum ===
+  const std::unordered_map<std::string, int>* KinematicVectors;
+  const std::unordered_map<int, std::string>* ReversedKinematicVectors;
+  // =========================================================== 
 
   /// The manager object used to read the sample yaml file
   std::unique_ptr<manager> SampleManager;
