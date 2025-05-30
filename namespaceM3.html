@@ -400,7 +400,7 @@ Variables</h2></td></tr>
 <div class="ttc" id="aYamlHelper_8h_html_aae72fb06a391f1073add5eed6c6485dd"><div class="ttname"><a href="YamlHelper_8h.html#aae72fb06a391f1073add5eed6c6485dd">YAMLtoSTRING</a></div><div class="ttdeci">std::string YAMLtoSTRING(const YAML::Node &amp;node)</div><div class="ttdoc">KS: Convert a YAML node to a string representation.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00106">YamlHelper.h:106</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00013">MaCh3Exception.h:13</a></div></div>
 <div class="ttc" id="anamespaceM3_html_a68ab9b6b3d413a94604c740208c7895d"><div class="ttname"><a href="namespaceM3.html#a68ab9b6b3d413a94604c740208c7895d">M3::FixSampleNamesQuotes</a></div><div class="ttdeci">void FixSampleNamesQuotes(std::string &amp;yamlStr)</div><div class="ttdoc">KS: Yaml emitter has problem and drops &quot;&quot;, if you have special signs in you like * then there is prob...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerUtils_8h_source.html#l00149">ParameterHandlerUtils.h:149</a></div></div>
-<div class="ttc" id="anamespaceMaCh3Utils_html_a37d0c54de0b83b71393afca143ab1ec0"><div class="ttname"><a href="namespaceMaCh3Utils.html#a37d0c54de0b83b71393afca143ab1ec0">MaCh3Utils::FormatDouble</a></div><div class="ttdeci">std::string FormatDouble(const double value, const int precision)</div><div class="ttdoc">Convert double into string for precision, useful for playing with yaml if you don't want to have in c...</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00609">Structs.h:609</a></div></div>
+<div class="ttc" id="anamespaceMaCh3Utils_html_a37d0c54de0b83b71393afca143ab1ec0"><div class="ttname"><a href="namespaceMaCh3Utils.html#a37d0c54de0b83b71393afca143ab1ec0">MaCh3Utils::FormatDouble</a></div><div class="ttdeci">std::string FormatDouble(const double value, const int precision)</div><div class="ttdoc">Convert double into string for precision, useful for playing with yaml if you don't want to have in c...</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00269">SampleStructs.h:269</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -447,16 +447,16 @@ template&lt;typename ObjectType &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>std::unique_ptr&lt;ObjectType&gt; Owning pointer to the cloned object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="HistogramUtils_8h_source.html#l00137">137</a> of file <a class="el" href="HistogramUtils_8h_source.html">HistogramUtils.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  137</span>                                                                                   {</div>
-<div class="line"><span class="lineno">  138</span>  std::string cloneName = name.empty() ? obj-&gt;GetName() : name;</div>
-<div class="line"><span class="lineno">  139</span> </div>
-<div class="line"><span class="lineno">  140</span>  std::unique_ptr&lt;ObjectType&gt; Hist(<span class="keyword">static_cast&lt;</span>ObjectType*<span class="keyword">&gt;</span>(obj-&gt;Clone(cloneName.c_str())));</div>
-<div class="line"><span class="lineno">  141</span>  <span class="comment">// Disable ROOT memory management because it causes lot of headache especially as smart pointers are much smarter</span></div>
-<div class="line"><span class="lineno">  142</span>  Hist-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
-<div class="line"><span class="lineno">  143</span> </div>
-<div class="line"><span class="lineno">  144</span>  <span class="keywordflow">return</span> Hist;</div>
-<div class="line"><span class="lineno">  145</span>}</div>
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8h_source.html#l00138">138</a> of file <a class="el" href="HistogramUtils_8h_source.html">HistogramUtils.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  138</span>                                                                                   {</div>
+<div class="line"><span class="lineno">  139</span>  std::string cloneName = name.empty() ? obj-&gt;GetName() : name;</div>
+<div class="line"><span class="lineno">  140</span> </div>
+<div class="line"><span class="lineno">  141</span>  std::unique_ptr&lt;ObjectType&gt; Hist(<span class="keyword">static_cast&lt;</span>ObjectType*<span class="keyword">&gt;</span>(obj-&gt;Clone(cloneName.c_str())));</div>
+<div class="line"><span class="lineno">  142</span>  <span class="comment">// Disable ROOT memory management because it causes lot of headache especially as smart pointers are much smarter</span></div>
+<div class="line"><span class="lineno">  143</span>  Hist-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno">  144</span> </div>
+<div class="line"><span class="lineno">  145</span>  <span class="keywordflow">return</span> Hist;</div>
+<div class="line"><span class="lineno">  146</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>

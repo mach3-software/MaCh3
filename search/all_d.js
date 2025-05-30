@@ -61,7 +61,7 @@ var searchData=
   ['ntoys_5frequested_58',['Ntoys_requested',['../RHat_8cpp.html#a7b48ace8081df9b5f35c17126ee81046',1,'RHat.cpp']]],
   ['numparpca_59',['NumParPCA',['../classPCAHandler.html#a5f08019f3db758953464fb1d0db71ea0',1,'PCAHandler']]],
   ['nuoscprobcalcers_60',['NuOscProbCalcers',['../classOscillationHandler.html#aa246e725c7adc16c0b7516a593173162',1,'OscillationHandler']]],
-  ['nupdg_61',['NuPDG',['../Structs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2',1,'Structs.h']]],
+  ['nupdg_61',['NuPDG',['../SampleStructs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2',1,'SampleStructs.h']]],
   ['nupdg_62',['nupdg',['../structFarDetectorCoreInfo.html#a842fa260a8c80ac96898c5346c5cd4c1',1,'FarDetectorCoreInfo']]],
   ['nupdgunosc_63',['nupdgUnosc',['../structFarDetectorCoreInfo.html#a9bd471445cca30cf6a1b2441adc76804',1,'FarDetectorCoreInfo']]],
   ['nxbins_64',['nXBins',['../classSampleHandlerFD.html#ab933df667fbccf97b3028297ddd8eae2',1,'SampleHandlerFD']]],

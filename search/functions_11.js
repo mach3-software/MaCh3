@@ -98,10 +98,10 @@ var searchData=
   ['smonolith_95',['SMonolith',['../classSMonolith.html#a4fe737f7c948f9ee963d87aac46ddebb',1,'SMonolith::SMonolith(std::vector&lt; std::vector&lt; TResponseFunction_red * &gt; &gt; &amp;MasterSpline, const std::vector&lt; RespFuncType &gt; &amp;SplineType, const bool SaveFlatTree=false)'],['../classSMonolith.html#a2ddb60ccfabbb433c316fde62e93e8df',1,'SMonolith::SMonolith(const std::string &amp;FileName)']]],
   ['smonolithgpu_96',['SMonolithGPU',['../classSMonolithGPU.html#aa19e498d0e762566ee62c7b93de18598',1,'SMonolithGPU']]],
   ['splinebase_97',['SplineBase',['../classSplineBase.html#aa6965d1522cc68ecf81ac3bfd2dcd6f1',1,'SplineBase::SplineBase()'],['../classPySplineBase.html#aa6965d1522cc68ecf81ac3bfd2dcd6f1',1,'PySplineBase::SplineBase()']]],
-  ['splineinterpolation_5ftorespfunctype_98',['SplineInterpolation_ToRespFuncType',['../Structs_8h.html#af1b80b5456f9b1cb847fb56ddcc3c1ab',1,'Structs.h']]],
-  ['splineinterpolation_5ftostring_99',['SplineInterpolation_ToString',['../Structs_8h.html#a2d969ce667e41bd2492cff1775456837',1,'Structs.h']]],
+  ['splineinterpolation_5ftorespfunctype_98',['SplineInterpolation_ToRespFuncType',['../ParameterStructs_8h.html#af1b80b5456f9b1cb847fb56ddcc3c1ab',1,'ParameterStructs.h']]],
+  ['splineinterpolation_5ftostring_99',['SplineInterpolation_ToString',['../ParameterStructs_8h.html#a2d969ce667e41bd2492cff1775456837',1,'ParameterStructs.h']]],
   ['startfrompreviousfit_100',['StartFromPreviousFit',['../classFitterBase.html#a655ccea31627627e2b36745c97e5c0f0',1,'FitterBase::StartFromPreviousFit()'],['../classmcmc.html#adf4c80255288c5396da3b95d609ce4b2',1,'mcmc::StartFromPreviousFit()']]],
-  ['str2int_101',['str2int',['../Structs_8h.html#ab29c200876205c3add1d71f053195658',1,'Structs.h']]],
+  ['str2int_101',['str2int',['../SampleStructs_8h.html#ab29c200876205c3add1d71f053195658',1,'SampleStructs.h']]],
   ['strendswith_102',['strEndsWith',['../classMaCh3Plotting_1_1InputManager.html#a9f98ca215112178b1de36e328424aa35',1,'MaCh3Plotting::InputManager']]],
   ['stringtoyaml_103',['STRINGtoYAML',['../YamlHelper_8h.html#a3ff1f2154c0a70ad5a145fcc5891e7ec',1,'YamlHelper.h']]],
   ['stripduplicatedmodes_104',['StripDuplicatedModes',['../classBinnedSplineHandler.html#a960a64e0a855d797d74d052764f5ea3a',1,'BinnedSplineHandler']]],
@@ -116,5 +116,5 @@ var searchData=
   ['swarmiterate_113',['swarmIterate',['../classPSO.html#af7b07ec9013e1d6859d7ffa8e54086c7',1,'PSO']]],
   ['synchronisememtransfer_114',['SynchroniseMemTransfer',['../classSMonolith.html#a68e18d73ed1ac524ceaea79d2a5460ce',1,'SMonolith']]],
   ['synchronisesplines_115',['SynchroniseSplines',['../gpuSplineUtils_8cu.html#a953e5c5aecebd908f5d8c6ad64de482c',1,'SynchroniseSplines():&#160;gpuSplineUtils.cu'],['../gpuSplineUtils_8cuh.html#a953e5c5aecebd908f5d8c6ad64de482c',1,'SynchroniseSplines():&#160;gpuSplineUtils.cu']]],
-  ['systtype_5ftostring_116',['SystType_ToString',['../Structs_8h.html#ad39c312dc44177340e2ebccd3d3f2d4c',1,'Structs.h']]]
+  ['systtype_5ftostring_116',['SystType_ToString',['../ParameterStructs_8h.html#ad39c312dc44177340e2ebccd3d3f2d4c',1,'ParameterStructs.h']]]
 ];

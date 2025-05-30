@@ -73,7 +73,7 @@ var searchData=
   ['fteststatistic_70',['fTestStatistic',['../classSampleHandlerBase.html#a87670dbcda5d09b09675e8f407fe3a30',1,'SampleHandlerBase']]],
   ['ftwo_71',['fTwo',['../classPSO.html#a56539eb264d11e1c37674ad55504d454',1,'PSO']]],
   ['funcparams_72',['FuncParams',['../classParameterHandlerGeneric.html#a9c201ce36c40a731f23d9949009835b5',1,'ParameterHandlerGeneric']]],
-  ['funcparfunctype_73',['FuncParFuncType',['../Structs_8h.html#a916ddc21f75755739f308b54dd06e0ae',1,'Structs.h']]],
+  ['funcparfunctype_73',['FuncParFuncType',['../ParameterStructs_8h.html#a916ddc21f75755739f308b54dd06e0ae',1,'ParameterStructs.h']]],
   ['funcparsfuncmap_74',['funcParsFuncMap',['../classSampleHandlerFD.html#a577a57992e396a5b34efcd3bb6ed45cf',1,'SampleHandlerFD']]],
   ['funcparsgrid_75',['funcParsGrid',['../classSampleHandlerFD.html#a00060ee2bbc0e3e5528932705ce690e6',1,'SampleHandlerFD']]],
   ['funcparsmap_76',['funcParsMap',['../classSampleHandlerFD.html#a06eab1b725605a68cdb75e3826122c47',1,'SampleHandlerFD']]],

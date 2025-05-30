@@ -122,7 +122,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aacf987756d2024868bf28b9c2c4a5a99"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleSummary.html#aacf987756d2024868bf28b9c2c4a5a99">Write</a> ()</td></tr>
 <tr class="memdesc:aacf987756d2024868bf28b9c2c4a5a99"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Write results into root file.  <br /></td></tr>
 <tr class="separator:aacf987756d2024868bf28b9c2c4a5a99"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aec9b5e17c269714496bf717bd7d6ae81"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleSummary.html#aec9b5e17c269714496bf717bd7d6ae81">SetLikelihood</a> (const <a class="el" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67">TestStatistic</a> TestStat)</td></tr>
+<tr class="memitem:aec9b5e17c269714496bf717bd7d6ae81"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleSummary.html#aec9b5e17c269714496bf717bd7d6ae81">SetLikelihood</a> (const <a class="el" href="SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67">TestStatistic</a> TestStat)</td></tr>
 <tr class="memdesc:aec9b5e17c269714496bf717bd7d6ae81"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Set likelihood type.  <br /></td></tr>
 <tr class="separator:aec9b5e17c269714496bf717bd7d6ae81"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab659605093e8fb68607a0fd5691e0535"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleSummary.html#ab659605093e8fb68607a0fd5691e0535">SetNModelParams</a> (const int nPars)</td></tr>
@@ -456,7 +456,7 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:a6593fed9709673a6910f96adc88fc8f2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classMaCh3Modes.html">MaCh3Modes</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleSummary.html#a6593fed9709673a6910f96adc88fc8f2">Modes</a></td></tr>
 <tr class="memdesc:a6593fed9709673a6910f96adc88fc8f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">MaCh3 Modes.  <br /></td></tr>
 <tr class="separator:a6593fed9709673a6910f96adc88fc8f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aafb18632bb987ae9a302d95781d5fdba"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67">TestStatistic</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleSummary.html#aafb18632bb987ae9a302d95781d5fdba">likelihood</a></td></tr>
+<tr class="memitem:aafb18632bb987ae9a302d95781d5fdba"><td class="memItemLeft" align="right" valign="top"><a class="el" href="SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67">TestStatistic</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleSummary.html#aafb18632bb987ae9a302d95781d5fdba">likelihood</a></td></tr>
 <tr class="memdesc:aafb18632bb987ae9a302d95781d5fdba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of likelihood for example Poisson, Barlow-Beeston or Ice Cube.  <br /></td></tr>
 <tr class="separator:aafb18632bb987ae9a302d95781d5fdba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a49215601479aaa99f9f64d8f7c900385"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleSummary.html#a49215601479aaa99f9f64d8f7c900385">nModelParams</a></td></tr>
@@ -2811,7 +2811,7 @@ Kamil Skwarczynski </dd></dl>
         <tr>
           <td class="memname">void SampleSummary::SetLikelihood </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67">TestStatistic</a>&#160;</td>
+          <td class="paramtype">const <a class="el" href="SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67">TestStatistic</a>&#160;</td>
           <td class="paramname"><em>TestStat</em></td><td>)</td>
           <td></td>
         </tr>
@@ -3597,7 +3597,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 2334</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Effective number of parameters following WAIC formalism is equal to: {:.2f}&quot;</span>, p_WAIC);</div>
 <div class="line"><span class="lineno"> 2335</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;WAIC = {:.2f}&quot;</span>, WAIC);</div>
 <div class="line"><span class="lineno"> 2336</span>}</div>
-<div class="ttc" id="aGetPostfitParamPlots_8cpp_html_ae4842c1619a902b2761696f3849889a1"><div class="ttname"><a href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a></div><div class="ttdeci">int nBins</div><div class="ttdef"><b>Definition:</b> <a href="GetPostfitParamPlots_8cpp_source.html#l00073">GetPostfitParamPlots.cpp:73</a></div></div>
+<div class="ttc" id="aGetPostfitParamPlots_8cpp_html_ae4842c1619a902b2761696f3849889a1"><div class="ttname"><a href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a></div><div class="ttdeci">int nBins</div><div class="ttdef"><b>Definition:</b> <a href="GetPostfitParamPlots_8cpp_source.html#l00072">GetPostfitParamPlots.cpp:72</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -4233,7 +4233,7 @@ Kamil Skwarczynski </dd></dl>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67">TestStatistic</a> SampleSummary::likelihood</td>
+          <td class="memname"><a class="el" href="SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67">TestStatistic</a> SampleSummary::likelihood</td>
         </tr>
       </table>
   </td>

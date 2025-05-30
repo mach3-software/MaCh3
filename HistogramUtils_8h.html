@@ -89,7 +89,8 @@ $(function() {
   <div class="headertitle"><div class="title">HistogramUtils.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;<a class="el" href="Structs_8h_source.html">Samples/Structs.h</a>&quot;</code><br />
+<div class="textblock"><code>#include &quot;<a class="el" href="SampleStructs_8h_source.html">Samples/SampleStructs.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="ParameterStructs_8h_source.html">Parameters/ParameterStructs.h</a>&quot;</code><br />
 <code>#include &quot;TGraphAsymmErrors.h&quot;</code><br />
 <code>#include &quot;TObjString.h&quot;</code><br />
 <code>#include &quot;TRandom3.h&quot;</code><br />
@@ -365,16 +366,16 @@ template&lt;typename Derived , typename Base &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A <code>std::vector</code> of pointers to <code>Base</code> objects. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="HistogramUtils_8h_source.html#l00098">98</a> of file <a class="el" href="HistogramUtils_8h_source.html">HistogramUtils.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   98</span>                                                                 {</div>
-<div class="line"><span class="lineno">   99</span>  std::vector&lt;Base*&gt; outputVec;</div>
-<div class="line"><span class="lineno">  100</span>  <span class="comment">// Reserve space for efficiency</span></div>
-<div class="line"><span class="lineno">  101</span>  outputVec.reserve(inputVec.size());</div>
-<div class="line"><span class="lineno">  102</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span>* ptr : inputVec) {</div>
-<div class="line"><span class="lineno">  103</span>    outputVec.push_back(<span class="keyword">static_cast&lt;</span>Base*<span class="keyword">&gt;</span>(ptr));</div>
-<div class="line"><span class="lineno">  104</span>  }</div>
-<div class="line"><span class="lineno">  105</span>  <span class="keywordflow">return</span> outputVec;</div>
-<div class="line"><span class="lineno">  106</span>}</div>
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8h_source.html#l00099">99</a> of file <a class="el" href="HistogramUtils_8h_source.html">HistogramUtils.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   99</span>                                                                 {</div>
+<div class="line"><span class="lineno">  100</span>  std::vector&lt;Base*&gt; outputVec;</div>
+<div class="line"><span class="lineno">  101</span>  <span class="comment">// Reserve space for efficiency</span></div>
+<div class="line"><span class="lineno">  102</span>  outputVec.reserve(inputVec.size());</div>
+<div class="line"><span class="lineno">  103</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span>* ptr : inputVec) {</div>
+<div class="line"><span class="lineno">  104</span>    outputVec.push_back(<span class="keyword">static_cast&lt;</span>Base*<span class="keyword">&gt;</span>(ptr));</div>
+<div class="line"><span class="lineno">  105</span>  }</div>
+<div class="line"><span class="lineno">  106</span>  <span class="keywordflow">return</span> outputVec;</div>
+<div class="line"><span class="lineno">  107</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -636,18 +637,18 @@ template&lt;typename Derived , typename Base &gt; </div>
 
 <p>Helper to check if files exist or not. </p>
 
-<p class="definition">Definition at line <a class="el" href="HistogramUtils_8h_source.html#l00109">109</a> of file <a class="el" href="HistogramUtils_8h_source.html">HistogramUtils.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  109</span>                                                 {</div>
-<div class="line"><span class="lineno">  110</span>  std::ifstream infile(filename.c_str());</div>
-<div class="line"><span class="lineno">  111</span>  <span class="keywordflow">if</span> (!infile.good()) {</div>
-<div class="line"><span class="lineno">  112</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;*** ERROR ***&quot;</span>);</div>
-<div class="line"><span class="lineno">  113</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;File {} does not exist&quot;</span>, filename);</div>
-<div class="line"><span class="lineno">  114</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Please try again&quot;</span>);</div>
-<div class="line"><span class="lineno">  115</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;*************&quot;</span>);</div>
-<div class="line"><span class="lineno">  116</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><span class="lineno">  117</span>  }</div>
-<div class="line"><span class="lineno">  118</span>  <span class="keywordflow">return</span> filename;</div>
-<div class="line"><span class="lineno">  119</span>}</div>
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8h_source.html#l00110">110</a> of file <a class="el" href="HistogramUtils_8h_source.html">HistogramUtils.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  110</span>                                                 {</div>
+<div class="line"><span class="lineno">  111</span>  std::ifstream infile(filename.c_str());</div>
+<div class="line"><span class="lineno">  112</span>  <span class="keywordflow">if</span> (!infile.good()) {</div>
+<div class="line"><span class="lineno">  113</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;*** ERROR ***&quot;</span>);</div>
+<div class="line"><span class="lineno">  114</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;File {} does not exist&quot;</span>, filename);</div>
+<div class="line"><span class="lineno">  115</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Please try again&quot;</span>);</div>
+<div class="line"><span class="lineno">  116</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;*************&quot;</span>);</div>
+<div class="line"><span class="lineno">  117</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
+<div class="line"><span class="lineno">  118</span>  }</div>
+<div class="line"><span class="lineno">  119</span>  <span class="keywordflow">return</span> filename;</div>
+<div class="line"><span class="lineno">  120</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1676,7 +1677,7 @@ template&lt;class HistType &gt; </div>
 <div class="line"><span class="lineno">  564</span>  <span class="keywordtype">double</span> momentumThreshold = mass/sqrt(refractiveIndex*refractiveIndex-1.);</div>
 <div class="line"><span class="lineno">  565</span>  <span class="keywordflow">return</span> momentumThreshold;</div>
 <div class="line"><span class="lineno">  566</span>}</div>
-<div class="ttc" id="anamespaceMaCh3Utils_html_a1b305c72615a48a89e74a9c3ded69c02"><div class="ttname"><a href="namespaceMaCh3Utils.html#a1b305c72615a48a89e74a9c3ded69c02">MaCh3Utils::GetMassFromPDG</a></div><div class="ttdeci">double GetMassFromPDG(const int PDG)</div><div class="ttdoc">Return mass for given PDG.</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00514">Structs.h:514</a></div></div>
+<div class="ttc" id="anamespaceMaCh3Utils_html_a1b305c72615a48a89e74a9c3ded69c02"><div class="ttname"><a href="namespaceMaCh3Utils.html#a1b305c72615a48a89e74a9c3ded69c02">MaCh3Utils::GetMassFromPDG</a></div><div class="ttdeci">double GetMassFromPDG(const int PDG)</div><div class="ttdoc">Return mass for given PDG.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00174">SampleStructs.h:174</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

@@ -97,7 +97,6 @@ $(function() {
 <code>#include &lt;vector&gt;</code><br />
 <code>#include &lt;algorithm&gt;</code><br />
 <code>#include &lt;cmath&gt;</code><br />
-<code>#include &quot;<a class="el" href="Structs_8h_source.html">Samples/Structs.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="Manager_8h_source.html">Manager/Manager.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="HistogramUtils_8h_source.html">Samples/HistogramUtils.h</a>&quot;</code><br />
 <code>#include &quot;TCanvas.h&quot;</code><br />
@@ -144,7 +143,7 @@ Functions</h2></td></tr>
 <tr class="memitem:ad58f0ddda31283c3598fc09f98046192"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="StatisticalUtils_8h.html#ad58f0ddda31283c3598fc09f98046192">GetNumberOfRuns</a> (const std::vector&lt; int &gt; &amp;GroupClasifier)</td></tr>
 <tr class="memdesc:ad58f0ddda31283c3598fc09f98046192"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: <a href="https://esjeevanand.uccollege.edu.in/wp-content/uploads/sites/114/2020/08/NON-PARAMTERIC-TEST-6.pdf">https://esjeevanand.uccollege.edu.in/wp-content/uploads/sites/114/2020/08/NON-PARAMTERIC-TEST-6.pdf</a>.  <br /></td></tr>
 <tr class="separator:ad58f0ddda31283c3598fc09f98046192"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afecd84c56d6546271c4547192aae31af"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="StatisticalUtils_8h.html#afecd84c56d6546271c4547192aae31af">GetBetaParameter</a> (const double data, const double mc, const double w2, <a class="el" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67">TestStatistic</a> TestStat)</td></tr>
+<tr class="memitem:afecd84c56d6546271c4547192aae31af"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="StatisticalUtils_8h.html#afecd84c56d6546271c4547192aae31af">GetBetaParameter</a> (const double data, const double mc, const double w2, <a class="el" href="SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67">TestStatistic</a> TestStat)</td></tr>
 <tr class="memdesc:afecd84c56d6546271c4547192aae31af"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Calculate Beta parameter which will be different based on specified test statistic.  <br /></td></tr>
 <tr class="separator:afecd84c56d6546271c4547192aae31af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a34d5232bfb12e29ec9d63acaa8744b58"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="StatisticalUtils_8h.html#a34d5232bfb12e29ec9d63acaa8744b58">GetSubOptimality</a> (const std::vector&lt; double &gt; &amp;EigenValues, const int TotalTarameters)</td></tr>
@@ -593,7 +592,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67">TestStatistic</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67">TestStatistic</a>&#160;</td>
           <td class="paramname"><em>TestStat</em>&#160;</td>
         </tr>
         <tr>
@@ -620,7 +619,7 @@ Functions</h2></td></tr>
 <div class="line"><span class="lineno">  155</span><span class="comment">// ****************</span></div>
 <div class="line"><span class="lineno">  156</span>  <span class="keywordtype">double</span> Beta = 0.0;</div>
 <div class="line"><span class="lineno">  157</span> </div>
-<div class="line"><span class="lineno">  158</span>  <span class="keywordflow">if</span> (TestStat == <a class="code hl_enumvalue" href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a7d4e059541c7ec9737f5c884cd6cd0f0">kDembinskiAbdelmotteleb</a>) {</div>
+<div class="line"><span class="lineno">  158</span>  <span class="keywordflow">if</span> (TestStat == <a class="code hl_enumvalue" href="SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a7d4e059541c7ec9737f5c884cd6cd0f0">kDembinskiAbdelmotteleb</a>) {</div>
 <div class="line"><span class="lineno">  159</span>    <span class="comment">//the so-called effective count</span></div>
 <div class="line"><span class="lineno">  160</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> k = mc*mc / w2;</div>
 <div class="line"><span class="lineno">  161</span>    <span class="comment">//Calculate beta which is scaling factor between true and generated MC</span></div>
@@ -643,7 +642,7 @@ Functions</h2></td></tr>
 <div class="line"><span class="lineno">  178</span>  }</div>
 <div class="line"><span class="lineno">  179</span>  <span class="keywordflow">return</span> Beta;</div>
 <div class="line"><span class="lineno">  180</span>}</div>
-<div class="ttc" id="aStructs_8h_html_a960da89e33ac45a56f7bbfac3068dc67a7d4e059541c7ec9737f5c884cd6cd0f0"><div class="ttname"><a href="Structs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a7d4e059541c7ec9737f5c884cd6cd0f0">kDembinskiAbdelmotteleb</a></div><div class="ttdeci">@ kDembinskiAbdelmotteleb</div><div class="ttdoc">Based on .</div><div class="ttdef"><b>Definition:</b> <a href="Structs_8h_source.html#l00458">Structs.h:458</a></div></div>
+<div class="ttc" id="aSampleStructs_8h_html_a960da89e33ac45a56f7bbfac3068dc67a7d4e059541c7ec9737f5c884cd6cd0f0"><div class="ttname"><a href="SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a7d4e059541c7ec9737f5c884cd6cd0f0">kDembinskiAbdelmotteleb</a></div><div class="ttdeci">@ kDembinskiAbdelmotteleb</div><div class="ttdoc">Based on .</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00118">SampleStructs.h:118</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
