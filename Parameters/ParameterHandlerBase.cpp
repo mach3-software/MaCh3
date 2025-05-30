@@ -86,7 +86,7 @@ void ParameterHandlerBase::ConstructPCA(const double eigen_threshold, int FirstP
 }
 
 // ********************************************
-void ParameterHandlerBase::Init(std::string name, std::string file) {
+void ParameterHandlerBase::Init(const std::string& name, const std::string& file) {
 // ********************************************
   // Set the covariance matrix from input ROOT file (e.g. flux, ND280, NIWG)
   TFile *infile = new TFile(file.c_str(), "READ");
@@ -379,7 +379,7 @@ void ParameterHandlerBase::ThrowParameters() {
   // Use __builtin_expect to give compiler a hint which option is more likely, which should help
   // with better optimisation. This isn't critical but more to have example
   if (__builtin_expect(!pca, 1)) {
-    MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
+    M3::MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
 
     #ifdef MULTITHREAD
     #pragma omp parallel for
@@ -393,7 +393,7 @@ void ParameterHandlerBase::ThrowParameters() {
       // Try again if we the initial parameter proposal falls outside of the range of the parameter
       while (_fPropVal[i] > _fUpBound[i] || _fPropVal[i] < _fLowBound[i]) {
         randParams[i] = random_number[M3::GetThreadIndex()]->Gaus(0, 1);
-        const double corr_throw_single = MatrixVectorMultiSingle(throwMatrixCholDecomp, randParams, _fNumPar, i);
+        const double corr_throw_single = M3::MatrixVectorMultiSingle(throwMatrixCholDecomp, randParams, _fNumPar, i);
         _fPropVal[i] = _fPreFitValue[i] + corr_throw_single;
         if (throws > 10000) 
         {
@@ -529,7 +529,7 @@ void ParameterHandlerBase::Randomize() _noexcept_ {
 void ParameterHandlerBase::CorrelateSteps() _noexcept_ {
 // ************************************************
   //KS: Using custom function compared to ROOT one with 8 threads we have almost factor 2 performance increase, by replacing TMatrix with just double we increase it even more
-  MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
+  M3::MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
 
   // If not doing PCA
   if (!pca) {
@@ -571,7 +571,7 @@ void ParameterHandlerBase::ThrowParProp(const double mag) {
   Randomize();
   if (!pca) {
     // Make the correlated throw
-    MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
+    M3::MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
     // Number of sigmas we throw
     for (int i = 0; i < _fNumPar; i++) {
       if (_fError[i] > 0.)
@@ -589,7 +589,7 @@ void ParameterHandlerBase::ThrowParCurr(const double mag) {
   Randomize();
   if (!pca) {
     // Get the correlated throw vector
-    MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
+    M3::MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
     // The number of sigmas to throw
     // Should probably have this as a default parameter input to the function instead
     for (int i = 0; i < _fNumPar; i++) {
@@ -822,40 +822,6 @@ void ParameterHandlerBase::SetFlatPrior(const int i, const bool eL) {
     }
     _fFlatPrior[i] = eL;
   }
-}
-
-// ********************************************
-//KS: Custom function to perform multiplication of matrix and vector with multithreading
-void ParameterHandlerBase::MatrixVectorMulti(double* _restrict_ VecMulti, double** _restrict_ matrix, const double* _restrict_ vector, const int n) const {
-// ********************************************
-  #ifdef MULTITHREAD
-  #pragma omp parallel for
-  #endif
-  for (int i = 0; i < n; ++i)
-  {
-    double result = 0.0;
-    #ifdef MULTITHREAD
-    #pragma omp simd
-    #endif
-    for (int j = 0; j < n; ++j)
-    {
-      result += matrix[i][j]*vector[j];
-    }
-    VecMulti[i] = result;
-  }
-}
-
-// ********************************************
-double ParameterHandlerBase::MatrixVectorMultiSingle(double** _restrict_ matrix, const double* _restrict_ vector, const int Length, const int i) const {
-// ********************************************
-  double Element = 0.0;
-  #ifdef MULTITHREAD
-  #pragma omp simd
-  #endif
-  for (int j = 0; j < Length; ++j) {
-    Element += matrix[i][j]*vector[j];
-  }
-  return Element;
 }
 
 // ********************************************
