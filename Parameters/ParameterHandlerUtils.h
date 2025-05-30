@@ -1,7 +1,7 @@
 #pragma once
 
 // MaCh3 includes
-#include "Samples/Structs.h"
+#include "Parameters/ParameterStructs.h"
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT includes
