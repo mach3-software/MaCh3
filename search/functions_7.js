@@ -224,7 +224,7 @@ var searchData=
   ['gettf1_221',['GetTF1',['../Structs_8h.html#a89a221272ded97bbcea052755f4dc43f',1,'Structs.h']]],
   ['gettf1coeff_222',['getTF1Coeff',['../classSplineBase.html#ac8a5f86ac6f156a7e11ef188b06f425f',1,'SplineBase']]],
   ['getthreadindex_223',['GetThreadIndex',['../namespaceM3.html#a5ed0accdbf66626c16b6c3b00bd5d030',1,'M3']]],
-  ['getthrowmatrix_224',['GetThrowMatrix',['../group__ParameterHandlerGetters.html#ga65094ea9c56d4748e54195b337cfe566',1,'ParameterHandlerBase::GetThrowMatrix() const'],['../group__ParameterHandlerGetters.html#ga482bf0a70e3c33eee238b75116d611c2',1,'ParameterHandlerBase::GetThrowMatrix(int i, int j) const']]],
+  ['getthrowmatrix_224',['GetThrowMatrix',['../group__ParameterHandlerGetters.html#ga65094ea9c56d4748e54195b337cfe566',1,'ParameterHandlerBase::GetThrowMatrix() const'],['../group__ParameterHandlerGetters.html#ga62ac06a7fa3ed717fcc250099c55f02a',1,'ParameterHandlerBase::GetThrowMatrix(const int i, const int j) const']]],
   ['getthrowmatrix_5fcholdecomp_225',['GetThrowMatrix_CholDecomp',['../group__ParameterHandlerGetters.html#ga3f27f4b70a3aef47b106c7dfe48af94f',1,'ParameterHandlerBase']]],
   ['gettitle_226',['GetTitle',['../group__SampleHandlerGetters.html#ga97d4dfa8ea998240fab6c09786c5b7c1',1,'SampleHandlerBase::GetTitle()'],['../group__SampleHandlerGetters.html#ga80a62c0759d4df18e8d641a3cbceea46',1,'SampleHandlerFD::GetTitle()']]],
   ['gettokensfromsplinename_227',['GetTokensFromSplineName',['../classBinnedSplineHandler.html#a4bfc5480cb801da3f834e622950d4b4d',1,'BinnedSplineHandler']]],
