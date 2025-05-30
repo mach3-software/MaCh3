@@ -795,8 +795,11 @@ void MCMCProcessor::MakeViolin() {
   double mini_y = Chain->GetMinimum(BranchNames[0]);
   for (int i = 1; i < nDraw; ++i)
   {
-    if(Chain->GetMaximum(BranchNames[i]) > maxi_y) maxi_y = Chain->GetMaximum(BranchNames[i]);
-    if(Chain->GetMinimum(BranchNames[i]) < mini_y) mini_y = Chain->GetMinimum(BranchNames[i]);
+    const double max_val = Chain->GetMaximum(BranchNames[i]);
+    const double min_val = Chain->GetMinimum(BranchNames[i]);
+  
+    maxi_y = std::max(maxi_y, max_val);
+    mini_y = std::min(mini_y, min_val);
   }
 
   const int vBins = (maxi_y-mini_y)*25;
@@ -1102,27 +1105,32 @@ void MCMCProcessor::CacheSteps() {
   // Set all the branches to on
   Chain->SetBranchStatus("*", true);
   
-  // Cache max and min in chain for covariance matrix
-  for (int i = 0; i < nDraw; ++i) 
+  // KS: Set temporary branch address to allow min/max, otherwise ROOT can segfaults
+  double tempVal = 0.0;
+  std::vector<double> Min_Chain(nDraw);
+  std::vector<double> Max_Chain(nDraw);
+  for (int i = 0; i < nDraw; ++i)
   {
-    const double Min_Chain_i = Chain->GetMinimum(BranchNames[i]);
-    const double Max_Chain_i = Chain->GetMaximum(BranchNames[i]);
-    
+    Chain->SetBranchAddress(BranchNames[i].Data(), &tempVal);
+    Min_Chain[i] = Chain->GetMinimum(BranchNames[i]);
+    Max_Chain[i] = Chain->GetMaximum(BranchNames[i]);
+  }
+
+  // Cache max and min in chain for covariance matrix
+  for (int i = 0; i < nDraw; ++i)
+  {
     TString Title_i = "";
     double Prior_i, PriorError_i;
     GetNthParameter(i, Prior_i, PriorError_i, Title_i);
-    
+
     for (int j = 0; j <= i; ++j)
     {
-      const double Min_Chain_j = Chain->GetMinimum(BranchNames[j]);
-      const double Max_Chain_j = Chain->GetMaximum(BranchNames[j]);
-  
-      // TH2D to hold the Correlation 
-      hpost2D[i][j] = new TH2D(Form("hpost2D_%i_%i",i,j), Form("hpost2D_%i_%i",i,j), nBins, Min_Chain_i, Max_Chain_i, nBins, Min_Chain_j, Max_Chain_j);
+      // TH2D to hold the Correlation
+      hpost2D[i][j] = new TH2D(Form("hpost2D_%i_%i",i,j), Form("hpost2D_%i_%i",i,j), nBins, Min_Chain[i], Max_Chain[i], nBins, Min_Chain[j], Max_Chain[j]);
       TString Title_j = "";
       double Prior_j, PriorError_j;
       GetNthParameter(j, Prior_j, PriorError_j, Title_j);
-  
+
       hpost2D[i][j]->SetMinimum(0);
       hpost2D[i][j]->GetXaxis()->SetTitle(Title_i);
       hpost2D[i][j]->GetYaxis()->SetTitle(Title_j);

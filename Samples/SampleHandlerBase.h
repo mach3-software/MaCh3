@@ -4,7 +4,7 @@
 #include <assert.h>
 
 //MaCh3 includes
-#include "Samples/Structs.h"
+#include "Samples/SampleStructs.h"
 #include "Samples/HistogramUtils.h"
 #include "Manager/Manager.h"
 #include "Manager/MaCh3Modes.h"

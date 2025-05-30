@@ -5,7 +5,7 @@
 #include "Manager/YamlHelper.h"
 #include "Manager/MaCh3Exception.h"
 #include "Fitters/MCMCProcessor.h"
-#include "Samples/Structs.h"
+#include "Samples/SampleStructs.h"
 
 // Other plotting includes
 #include "plottingUtils.h"

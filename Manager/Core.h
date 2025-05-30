@@ -108,8 +108,8 @@ _Pragma("GCC diagnostic ignored \"-Wold-style-cast\"") \
 _Pragma("GCC diagnostic ignored \"-Wformat-nonliteral\"") \
 _Pragma("GCC diagnostic ignored \"-Wswitch-enum\"") \
 _Pragma("GCC diagnostic ignored \"-Wconversion\"") \
-_Pragma("GCC diagnostic ignored \"-Wshadow\"")
-
+_Pragma("GCC diagnostic ignored \"-Wshadow\"") \
+_Pragma("GCC diagnostic ignored \"-Wswitch-enum\"")
 /// @brief KS: Restore warning checking after including external headers
 #define _MaCh3_Safe_Include_End_ \
 _Pragma("GCC diagnostic pop")
@@ -124,8 +124,8 @@ _Pragma("GCC diagnostic pop")
   _Pragma("clang diagnostic ignored \"-Wformat-nonliteral\"") \
   _Pragma("clang diagnostic ignored \"-Wswitch-enum\"") \
   _Pragma("clang diagnostic ignored \"-Wconversion\"") \
-  _Pragma("clang diagnostic ignored \"-Wshadow\"")
-
+  _Pragma("clang diagnostic ignored \"-Wshadow\"") \
+  _Pragma("clang diagnostic ignored \"-Wswitch-enum\"")
   #undef _MaCh3_Safe_Include_End_
   #define _MaCh3_Safe_Include_End_ \
   _Pragma("clang diagnostic pop")

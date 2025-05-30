@@ -2,7 +2,7 @@
 
 // MaCh3 includes
 #include "Parameters/ParameterHandlerBase.h"
-#include "Samples/Structs.h"
+#include "Samples/SampleStructs.h"
 
 /// @brief Class responsible for handling of systematic error parameters with different types defined in the config. Like spline, normalisation parameters etc.
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/02.-Implementation-of-Systematic).
@@ -99,13 +99,23 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @param i parameter index
     /// @param Group name of group, like Xsec or Flux
     /// @return bool telling whether param is part of group
-    /// @ingroup ParameterHandlerSetters
-    bool IsParFromGroup(const int i, const std::string& Group);
+    /// @ingroup ParameterHandlerGetters
+    bool IsParFromGroup(const int i, const std::string& Group) const;
 
-    /// @brief KS Function to set to prior parameters of a given group
+    /// @brief KS: Check how many parameters are associated with given group
+    /// @ingroup ParameterHandlerGetters
+    int GetNumParFromGroup(const std::string& Group) const;
+
+    /// @brief KS Function to set to prior parameters of a given group or values from vector
     /// @param Group name of group, like Xsec or Flux
+    /// @param Pars Values which will overwrite proposed step
     /// @ingroup ParameterHandlerSetters
-    void SetGroupOnlyParameters(const std::string& Group);
+    /// @note this mimic functionality of @ParameterHandlerBase::SetParameters
+    void SetGroupOnlyParameters(const std::string& Group, const std::vector<double>& Pars = {});
+    /// @brief KS Function to set to prior parameters of a given groups or values from vector
+    /// @param Group vector of group names, like Xsec or Flux
+    /// @ingroup ParameterHandlerSetters
+    void SetGroupOnlyParameters(const std::vector<std::string>& Groups);
 
     /// @brief Dump Matrix to ROOT file, useful when we need to pass matrix info to another fitting group
     /// @param Name Name of TFile to which we save stuff
