@@ -618,21 +618,47 @@ void ParameterHandlerGeneric::CheckCorrectInitialisation() {
 
 // ********************************************
 // Function to set to prior parameters of a given group
-void ParameterHandlerGeneric::SetGroupOnlyParameters(const std::string& Group) {
+void ParameterHandlerGeneric::SetGroupOnlyParameters(const std::vector< std::string>& Groups) {
 // ********************************************
-  if(!pca) {
+  for(size_t i = 0; i < Groups.size(); i++){
+    SetGroupOnlyParameters(Groups[i]);
+  }
+}
+
+// ********************************************
+// Function to set to prior parameters of a given group
+void ParameterHandlerGeneric::SetGroupOnlyParameters(const std::string& Group, const std::vector<double>& Pars) {
+// ********************************************
+  // If empty, set the proposed to prior
+  if (Pars.empty()) {
     for (int i = 0; i < _fNumPar; i++) {
       if(IsParFromGroup(i, Group)) _fPropVal[i] = _fPreFitValue[i];
     }
-  } else {
-    MACH3LOG_ERROR("{} not implemented for PCA", __func__);
-    throw MaCh3Exception(__FILE__, __LINE__);
+  } else{
+    const size_t ExpectedSize = static_cast<size_t>(GetNumParFromGroup(Group));
+    if (Pars.size() != ExpectedSize) {
+      MACH3LOG_ERROR("Number of param in group {} is {}, while you passed {}", Group, ExpectedSize, Pars.size());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    int Counter = 0;
+    for (int i = 0; i < _fNumPar; i++) {
+      // If belongs to group set value from parsed vector, otherwise use propose value
+      if(IsParFromGroup(i, Group)){
+        _fPropVal[i] = Pars[Counter];
+        Counter++;
+      }
+    }
+  }
+  // And if pca make the transfer
+  if (pca) {
+    PCAObj->TransferToPCA();
+    PCAObj->TransferToParam();
   }
 }
 
 // ********************************************
 // Checks if parameter belongs to a given group
-bool ParameterHandlerGeneric::IsParFromGroup(const int i, const std::string& Group) {
+bool ParameterHandlerGeneric::IsParFromGroup(const int i, const std::string& Group) const {
 // ********************************************
   std::string groupLower = Group;
   std::string paramGroupLower = _ParameterGroup[i];
@@ -642,6 +668,16 @@ bool ParameterHandlerGeneric::IsParFromGroup(const int i, const std::string& Gro
   std::transform(paramGroupLower.begin(), paramGroupLower.end(), paramGroupLower.begin(), ::tolower);
 
   return groupLower == paramGroupLower;
+}
+
+// ********************************************
+int ParameterHandlerGeneric::GetNumParFromGroup(const std::string& Group) const {
+// ********************************************
+  int Counter = 0;
+  for (int i = 0; i < _fNumPar; i++) {
+    if(IsParFromGroup(i, Group)) Counter++;
+  }
+  return Counter;
 }
 
 // ********************************************
