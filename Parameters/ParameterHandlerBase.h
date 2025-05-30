@@ -41,12 +41,13 @@ class ParameterHandlerBase {
   /// @ingroup ParameterHandlerSetters
   void SetCovMatrix(TMatrixDSym *cov);
   /// @brief Set matrix name
-  void SetName(std::string name) { matrixName = name; }
+  /// @ingroup ParameterHandlerSetters
+  void SetName(const std::string& name) { matrixName = name; }
   /// @brief change parameter name
   /// @param i Parameter index
   /// @param name new name which will be set
   /// @ingroup ParameterHandlerSetters
-  void SetParName(int i, std::string name) { _fNames.at(i) = name; }
+  void SetParName(const int i, const std::string& name) { _fNames.at(i) = name; }
   /// @brief Set value of single param to a given value
   /// @ingroup ParameterHandlerSetters
   void SetSingleParameter(const int parNo, const double parVal);
@@ -92,7 +93,7 @@ class ParameterHandlerBase {
   /// @param tree Tree to which we will save branches
   /// @param SaveProposal Normally we only save parameter after is accepted, for debugging purpose it is helpful to see also proposed values. That's what this variable controls
   /// @ingroup ParameterHandlerSetters
-  void SetBranches(TTree &tree, bool SaveProposal = false);
+  void SetBranches(TTree &tree, const bool SaveProposal = false);
   /// @brief Set global step scale for covariance object
   /// @param scale Value of global step scale
   /// @cite luengo2020survey
@@ -155,10 +156,15 @@ class ParameterHandlerBase {
   /// @brief Get name of covariance
   /// @ingroup ParameterHandlerGetters
   std::string GetName() const { return matrixName; }
-  /// @brief Get name of covariance
+  /// @brief Get name of parameter
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
   std::string GetParName(const int i) const {return _fNames[i];}
+
+  /// @brief Get index based on name
+  /// @ingroup ParameterHandlerGetters
+  int GetParIndex(const std::string& name) const;
+
   /// @brief Get fancy name of the Parameter
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
@@ -205,7 +211,7 @@ class ParameterHandlerBase {
   inline TMatrixDSym *GetThrowMatrix() const {return throwMatrix;}
   /// @brief Get matrix used for step proposal
   /// @ingroup ParameterHandlerGetters
-  double GetThrowMatrix(int i, int j) const { return throwMatrixCholDecomp[i][j];}
+  double GetThrowMatrix(const int i, const int j) const { return throwMatrixCholDecomp[i][j];}
   /// @brief Get the Cholesky decomposition of the throw matrix
   /// @ingroup ParameterHandlerGetters
   inline TMatrixD *GetThrowMatrix_CholDecomp() const {return throwMatrix_CholDecomp;}
@@ -331,15 +337,6 @@ class ParameterHandlerBase {
   /// @brief is PCA, can use to query e.g. LLH scans
   inline bool IsPCA() const { return pca; }
 
-  /// @brief KS: Custom function to perform multiplication of matrix and vector with multithreading
-  /// @param VecMulti Output Vector, VecMulti = matrix x vector
-  /// @param matrix This matrix is used for multiplication VecMulti = matrix x vector
-  /// @param VecMulti This vector is used for multiplication VecMulti = matrix x vector
-  /// @param n this is size of matrix and vector, we assume matrix is symmetric
-  inline void MatrixVectorMulti(double* _restrict_ VecMulti, double** _restrict_ matrix, const double* _restrict_ vector, const int n) const;
-  /// @brief KS: Custom function to perform multiplication of matrix and single element which is thread safe
-  inline double MatrixVectorMultiSingle(double** _restrict_ matrix, const double* _restrict_ vector, const int Length, const int i) const;
-
   /// @brief Getter to return a copy of the YAML node
   /// @ingroup ParameterHandlerGetters
   YAML::Node GetConfig() const { return _fYAMLDoc; }
@@ -369,7 +366,7 @@ class ParameterHandlerBase {
 
 protected:
   /// @brief Initialisation of the class using matrix from root file
-  void Init(std::string name, std::string file);
+  void Init(const std::string& name, const std::string& file);
   /// @brief Initialisation of the class using config
   /// @param YAMLFile A vector of strings representing the YAML files used for initialisation of matrix
   void Init(const std::vector<std::string>& YAMLFile);
