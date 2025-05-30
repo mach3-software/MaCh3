@@ -156,10 +156,15 @@ class ParameterHandlerBase {
   /// @brief Get name of covariance
   /// @ingroup ParameterHandlerGetters
   std::string GetName() const { return matrixName; }
-  /// @brief Get name of covariance
+  /// @brief Get name of parameter
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
   std::string GetParName(const int i) const {return _fNames[i];}
+
+  /// @brief Get index based on name
+  /// @ingroup ParameterHandlerGetters
+  int GetParIndex(const std::string& name) const;
+
   /// @brief Get fancy name of the Parameter
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters

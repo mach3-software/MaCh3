@@ -754,6 +754,19 @@ void ParameterHandlerBase::SetStepScale(const double scale) {
 }
 
 // ********************************************
+int ParameterHandlerBase::GetParIndex(const std::string& name) const {
+// ********************************************
+  int Index = M3::_BAD_INT_;
+  for (int i = 0; i <_fNumPar; ++i) {
+    if(name == _fFancyNames[i]) {
+      Index = i;
+      break;
+    }
+  }
+  return Index;
+}
+
+// ********************************************
 void ParameterHandlerBase::ToggleFixAllParameters() {
 // ********************************************
   // fix or unfix all parameters by multiplying by -1
@@ -784,24 +797,24 @@ void ParameterHandlerBase::ToggleFixParameter(const int i) {
 // ********************************************
 void ParameterHandlerBase::ToggleFixParameter(const std::string& name) {
 // ********************************************
-  for (int i = 0; i <_fNumPar; ++i) {
-    if(name == _fFancyNames[i]) {
-      ToggleFixParameter(i);
-      return;
-    }
+  const int Index = GetParIndex(name);
+  if(Index != M3::_BAD_INT_) {
+    ToggleFixParameter(Index);
+    return;
   }
+
   MACH3LOG_WARN("I couldn't find parameter with name {}, therefore will not fix it", name);
 }
 
 // ********************************************
 bool ParameterHandlerBase::IsParameterFixed(const std::string& name) const {
 // ********************************************
-  for (int i = 0; i <_fNumPar; ++i) {
-    if(name == _fFancyNames[i]) {
-      return IsParameterFixed(i);
-    }
+  const int Index = GetParIndex(name);
+  if(Index != M3::_BAD_INT_) {
+    return IsParameterFixed(Index);
   }
-  MACH3LOG_WARN("I couldn't find parameter with name {}, therefore will not fix it", name);
+
+  MACH3LOG_WARN("I couldn't find parameter with name {}, therefore don't know if it fixed", name);
   return false;
 }
 
