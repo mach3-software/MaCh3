@@ -62,7 +62,7 @@ void SampleHandlerBase::AddData(TH1D* binneddata)
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   nDims = 1;
-  MACH3LOG_INFO("Adding 1D data histogram: {} with {} events.", binneddata->GetName(), binneddata->Integral());
+  MACH3LOG_INFO("Adding 1D data histogram: {} with {} events.", binneddata->GetTitle(), binneddata->Integral());
   //KS: If exist delete to avoid memory leak
   if(dathist != NULL) delete dathist;
   dathist = binneddata;
@@ -76,7 +76,7 @@ void SampleHandlerBase::AddData(TH2D* binneddata)
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   nDims = 2;
-  MACH3LOG_INFO("Adding 2D data histogram: {} with {} events.", binneddata->GetName(), binneddata->Integral());
+  MACH3LOG_INFO("Adding 2D data histogram: {} with {} events.", binneddata->GetTitle(), binneddata->Integral());
   //KS: If exist delete to avoid memory leak
   if(dathist2d != NULL) delete dathist;
   dathist2d = binneddata;

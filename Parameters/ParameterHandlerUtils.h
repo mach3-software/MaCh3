@@ -1,7 +1,7 @@
 #pragma once
 
 // MaCh3 includes
-#include "Samples/Structs.h"
+#include "Parameters/ParameterStructs.h"
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT includes
@@ -25,82 +25,124 @@ _MaCh3_Safe_Include_End_ //}
 
 namespace M3
 {
-  /// @brief CW: Multi-threaded matrix multiplication
-  inline double* MatrixMult(double *A, double *B, int n) {
-    //CW: First transpose to increse cache hits
-    double *BT = new double[n*n];
-    #ifdef MULTITHREAD
-    #pragma omp parallel for
-    #endif
-    for (int i = 0; i < n; i++) {
-      for (int j = 0; j < n; j++) {
-        BT[j*n+i] = B[i*n+j];
-      }
+/// @brief CW: Multi-threaded matrix multiplication
+inline double* MatrixMult(double *A, double *B, int n) {
+  //CW: First transpose to increse cache hits
+  double *BT = new double[n*n];
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+      BT[j*n+i] = B[i*n+j];
     }
-
-    // Now multiply
-    double *C = new double[n*n];
-    #ifdef MULTITHREAD
-    #pragma omp parallel for
-    #endif
-    for (int i = 0; i < n; i++) {
-      for (int j = 0; j < n; j++) {
-        double sum = 0;
-        for (int k = 0; k < n; k++) {
-          sum += A[i*n+k]*BT[j*n+k];
-        }
-        C[i*n+j] = sum;
-      }
-    }
-    delete BT;
-
-    return C;
   }
 
-  /// @brief CW: Multi-threaded matrix multiplication
-  inline double** MatrixMult(double **A, double **B, int n) {
-    // First make into monolithic array
-    double *A_mon = new double[n*n];
-    double *B_mon = new double[n*n];
-
-    #ifdef MULTITHREAD
-    #pragma omp parallel for
-    #endif
-    for (int i = 0; i < n; ++i) {
-      for (int j = 0; j < n; ++j) {
-        A_mon[i*n+j] = A[i][j];
-        B_mon[i*n+j] = B[i][j];
+  // Now multiply
+  double *C = new double[n*n];
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+      double sum = 0;
+      for (int k = 0; k < n; k++) {
+        sum += A[i*n+k]*BT[j*n+k];
       }
+      C[i*n+j] = sum;
     }
-    //CW: Now call the monolithic calculator
-    double *C_mon = MatrixMult(A_mon, B_mon, n);
-    delete A_mon;
-    delete B_mon;
-
-    // Return the double pointer
-    double **C = new double*[n];
-    #ifdef MULTITHREAD
-    #pragma omp parallel for
-    #endif
-    for (int i = 0; i < n; ++i) {
-      C[i] = new double[n];
-      for (int j = 0; j < n; ++j) {
-        C[i][j] = C_mon[i*n+j];
-      }
-    }
-    delete C_mon;
-
-    return C;
   }
+  delete BT;
 
-  /// @brief CW: Multi-threaded matrix multiplication
-  inline TMatrixD MatrixMult(TMatrixD A, TMatrixD B)
+  return C;
+}
+
+/// @brief CW: Multi-threaded matrix multiplication
+inline double** MatrixMult(double **A, double **B, int n) {
+  // First make into monolithic array
+  double *A_mon = new double[n*n];
+  double *B_mon = new double[n*n];
+
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for (int i = 0; i < n; ++i) {
+    for (int j = 0; j < n; ++j) {
+      A_mon[i*n+j] = A[i][j];
+      B_mon[i*n+j] = B[i][j];
+    }
+  }
+  //CW: Now call the monolithic calculator
+  double *C_mon = MatrixMult(A_mon, B_mon, n);
+  delete A_mon;
+  delete B_mon;
+
+  // Return the double pointer
+  double **C = new double*[n];
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for (int i = 0; i < n; ++i) {
+    C[i] = new double[n];
+    for (int j = 0; j < n; ++j) {
+      C[i][j] = C_mon[i*n+j];
+    }
+  }
+  delete C_mon;
+
+  return C;
+}
+
+/// @brief CW: Multi-threaded matrix multiplication
+inline TMatrixD MatrixMult(TMatrixD A, TMatrixD B)
+{
+  double *C_mon = MatrixMult(A.GetMatrixArray(), B.GetMatrixArray(), A.GetNcols());
+  TMatrixD C;
+  C.Use(A.GetNcols(), A.GetNrows(), C_mon);
+  return C;
+}
+
+// ********************************************
+/// @brief KS: Custom function to perform multiplication of matrix and vector with multithreading
+/// @param VecMulti Output Vector, VecMulti = matrix x vector
+/// @param matrix This matrix is used for multiplication VecMulti = matrix x vector
+/// @param VecMulti This vector is used for multiplication VecMulti = matrix x vector
+/// @param n this is size of matrix and vector, we assume matrix is symmetric
+inline void MatrixVectorMulti(double* _restrict_ VecMulti, double** _restrict_ matrix, const double* _restrict_ vector, const int n) {
+// ********************************************
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for (int i = 0; i < n; ++i)
   {
-    double *C_mon = MatrixMult(A.GetMatrixArray(), B.GetMatrixArray(), A.GetNcols());
-    TMatrixD C;
-    C.Use(A.GetNcols(), A.GetNrows(), C_mon);
-    return C;
+    double result = 0.0;
+    #ifdef MULTITHREAD
+    #pragma omp simd
+    #endif
+    for (int j = 0; j < n; ++j)
+    {
+      result += matrix[i][j]*vector[j];
+    }
+    VecMulti[i] = result;
   }
+}
+
+// ********************************************
+/// @brief KS: Custom function to perform multiplication of matrix and single element which is thread safe
+/// @param matrix This matrix is used for multiplication VecMulti = matrix x vector
+/// @param Length this is size of matrix and vector, we assume matrix is symmetric
+/// @param i Element of matrix that we want to multiply
+inline double MatrixVectorMultiSingle(double** _restrict_ matrix, const double* _restrict_ vector, const int Length, const int i) {
+// ********************************************
+  double Element = 0.0;
+  #ifdef MULTITHREAD
+  #pragma omp simd
+  #endif
+  for (int j = 0; j < Length; ++j) {
+    Element += matrix[i][j]*vector[j];
+  }
+  return Element;
+}
 
 // *************************************
 /// @brief KS: Yaml emitter has problem and drops "", if you have special signs in you like * then there is problem. This bit hacky code adds these ""

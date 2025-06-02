@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 
-#include "Samples/Structs.h"
+#include "Samples/SampleStructs.h"
 
 /// @brief KS: Store info about used osc channels
 struct OscChannelInfo {
