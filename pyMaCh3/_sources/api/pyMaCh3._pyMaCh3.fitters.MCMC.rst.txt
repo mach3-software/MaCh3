@@ -1,0 +1,17 @@
+MCMC
+====
+
+.. currentmodule:: pyMaCh3._pyMaCh3.fitters
+
+.. autoclass:: MCMC
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~MCMC.set_chain_length
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: set_chain_length
