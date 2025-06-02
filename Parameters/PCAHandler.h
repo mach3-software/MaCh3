@@ -60,6 +60,16 @@ class PCAHandler{
   /// @brief Transfer param values from PCA base to normal base
   void TransferToParam();
 
+  /// @brief Throw the parameters according to the covariance matrix. This shouldn't be used in MCMC code ase it can break Detailed Balance;
+  void ThrowParameters(const std::vector<std::unique_ptr<TRandom3>>& random_number,
+                       double** throwMatrixCholDecomp,
+                       double* randParams,
+                       double* corr_throw,
+                       const std::vector<double>& fPreFitValue,
+                       const std::vector<double>& fLowBound,
+                       const std::vector<double>& fUpBound,
+                       int _fNumPar);
+
   /// @brief Accepted this step
   void AcceptStep() _noexcept_;
   /// @brief Use Cholesky throw matrix for better step proposal
@@ -144,6 +154,13 @@ class PCAHandler{
   /// @brief Get current parameter value using PCA
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
+  double GetPreFitValuePCA(const int i) const {
+    return _fPreFitValuePCA[i];
+  }
+
+  /// @brief Get current parameter value using PCA
+  /// @param i Parameter index
+  /// @ingroup ParameterHandlerGetters
   double GetParCurrPCA(const int i) const {
     return _fParCurrPCA(i);
   }
@@ -165,6 +182,13 @@ class PCAHandler{
     return eigen_values_master;
   }
 
+  /// @brief Check if parameter in PCA base is decomposed or not
+  /// @param i Parameter index
+  /// @ingroup ParameterHandlerGetters
+  bool IsParameterDecomposed(const int i) const {
+    if(isDecomposedPCA[i] >= 0) return false;
+    else return true;
+  }
 
   #ifdef DEBUG_PCA
   /// @brief KS: Let's dump all useful matrices to properly validate PCA

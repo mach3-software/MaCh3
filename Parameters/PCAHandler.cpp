@@ -315,6 +315,57 @@ void PCAHandler::ToggleFixParameter(const int i, const std::vector<std::string>&
 }
 
 
+// ********************************************
+void PCAHandler::ThrowParameters(const std::vector<std::unique_ptr<TRandom3>>& random_number,
+                                 double** throwMatrixCholDecomp,
+                                 double* randParams,
+                                 double* corr_throw,
+                                 const std::vector<double>& fPreFitValue,
+                                 const std::vector<double>& fLowBound,
+                                 const std::vector<double>& fUpBound,
+                                 const int _fNumPar) {
+// ********************************************
+  //KS: Do not multithread!
+  for (int i = 0; i < NumParPCA; ++i) {
+    // Check if parameter is fixed first: if so don't randomly throw
+    if (IsParameterFixedPCA(i)) continue;
+
+    if(!IsParameterDecomposed(i))
+    {
+      (*_pPropVal)[i] = fPreFitValue[i] + corr_throw[i];
+      int throws = 0;
+      // Try again if we the initial parameter proposal falls outside of the range of the parameter
+      while ((*_pPropVal)[i] > fUpBound[i] || (*_pPropVal)[i] < fLowBound[i]) {
+        randParams[i] = random_number[M3::GetThreadIndex()]->Gaus(0, 1);
+        const double corr_throw_single = M3::MatrixVectorMultiSingle(throwMatrixCholDecomp, randParams, _fNumPar, i);
+        (*_pPropVal)[i] = fPreFitValue[i] + corr_throw_single;
+        if (throws > 10000)
+        {
+          //KS: Since we are multithreading there is danger that those messages
+          //will be all over the place, small price to pay for faster code
+          MACH3LOG_WARN("Tried {} times to throw parameter {} but failed", throws, i);
+          MACH3LOG_WARN("Setting _fPropVal:  {} to {}", (*_pPropVal)[i], fPreFitValue[i]);
+          MACH3LOG_WARN("I live at {}:{}", __FILE__, __LINE__);
+         (*_pPropVal)[i] = fPreFitValue[i];
+        }
+        throws++;
+      }
+      (*_pCurrVal)[i] = (*_pPropVal)[i];
+
+    } else {
+      // KS: We have to multiply by number of parameters in PCA base
+      SetParPropPCA(i, GetPreFitValuePCA(i) + randParams[i] * eigen_values_master[i] * (LastPCAdpar - FirstPCAdpar));
+      SetParCurrPCA(i, GetParPropPCA(i));
+    }
+  } // end of parameter loop
+
+  /// @todo KS: We don't check if param is out of bounds. This is more problematic for PCA params.
+  for (int i = 0; i < _fNumPar; ++i) {
+    (*_pPropVal)[i] = std::max(fLowBound[i], std::min((*_pPropVal)[i], fUpBound[i]));
+    (*_pCurrVal)[i] = (*_pPropVal)[i];
+  }
+}
+
 #ifdef DEBUG_PCA
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
 // ********************************************
