@@ -237,7 +237,7 @@ std::pair<TGraph *, TGraph *> CreateMinMaxBand(TH1D *hist, Color_t color)
     return {minGraph, maxGraph};
 }
 
-std::pair<TGraph *, TGraph *> CalculateMinMaxBand(const std::vector<TH1D *> &histograms, Color_t color)
+TGraph* CalculateMinMaxBand(const std::vector<TH1D *> &histograms, Color_t color)
 {
     if (histograms.empty())
     {
@@ -259,7 +259,6 @@ std::pair<TGraph *, TGraph *> CalculateMinMaxBand(const std::vector<TH1D *> &his
         }
     }
 
-    TGraph *minGraph = new TGraph(nBins, x.data(), ymin.data());
 
     // Create a band using TGraphAsymmErrors for the shaded region
     TGraphAsymmErrors *band = new TGraphAsymmErrors(nBins);
@@ -272,7 +271,7 @@ std::pair<TGraph *, TGraph *> CalculateMinMaxBand(const std::vector<TH1D *> &his
     band->SetFillColorAlpha(color, float(0.2));
     band->SetLineWidth(1);
 
-    return {band, minGraph}; // Return band and min graph (min graph can be used for legend)
+    return band; // Return band and min graph (min graph can be used for legend)
 }
 
 
@@ -414,7 +413,7 @@ void CompareAverageAC(const std::vector<std::vector<TH1D *>> &histograms,
         auto colour = static_cast<Color_t>(TColor::GetColorPalette(static_cast<Int_t>(i*nb/histograms.size())));
 
         {
-          auto [band, min_graph] = CalculateMinMaxBand(histograms[i], colour);
+          auto band = CalculateMinMaxBand(histograms[i], colour);
           band->SetLineWidth(0);
           band->SetTitle("Average Auto Correlation");
           band->GetXaxis()->SetTitle("lag");
