@@ -32,12 +32,13 @@ var searchData=
   ['iseventselected_29',['IsEventSelected',['../classSampleHandlerFD.html#a1ce3d6b9d9f6cce379fe1e8dd404369a',1,'SampleHandlerFD']]],
   ['isfixed_30',['IsFixed',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a1694d2d408b26edb7258d5bfa15a092f',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
   ['isflat_31',['isFlat',['../SplineStructs_8h.html#aee66563def836e531cda07c5efa45d87',1,'SplineStructs.h']]],
-  ['ismach3modenc_32',['IsMaCh3ModeNC',['../classMaCh3Modes.html#ae15daa5df6c1bc97847f397233712606',1,'MaCh3Modes']]],
-  ['ismode_33',['IsMode',['../structMaCh3ModeInfo.html#a9a89a0394f9f5eb780008253716836fc',1,'MaCh3ModeInfo']]],
-  ['isparameterfixed_34',['IsParameterFixed',['../classParameterHandlerBase.html#acfad20049e6c37ef7afa59aca1fd3cf0',1,'ParameterHandlerBase::IsParameterFixed(const std::string &amp;name) const'],['../classParameterHandlerBase.html#a78ffc15979c158c7a3e3eb7bd40a4e79',1,'ParameterHandlerBase::IsParameterFixed(const int i) const']]],
-  ['isparameterfixedpca_35',['IsParameterFixedPCA',['../group__ParameterHandlerGetters.html#ga5087aa5aba191f31170c1108210cdb26',1,'PCAHandler']]],
-  ['isparfromgroup_36',['IsParFromGroup',['../group__ParameterHandlerGetters.html#gae10980fefe473ec6a9875dad17dea334',1,'ParameterHandlerGeneric']]],
-  ['ispca_37',['IsPCA',['../classParameterHandlerBase.html#aaa08790cadd3b3fb9b74f90c2c74ae66',1,'ParameterHandlerBase']]],
-  ['isvalidsplineindex_38',['isValidSplineIndex',['../classBinnedSplineHandler.html#af9a948b25fbed9dc3a27642c9118cb5c',1,'BinnedSplineHandler']]],
-  ['iterateoverparams_39',['IterateOverParams',['../classParameterHandlerGeneric.html#ae708dcd0bbfac4a5dd599a5c536da62b',1,'ParameterHandlerGeneric']]]
+  ['ishistogramallones_32',['IsHistogramAllOnes',['../PlotMCMCDiag_8cpp.html#a47175dd694387a761ab3d199eabca16d',1,'PlotMCMCDiag.cpp']]],
+  ['ismach3modenc_33',['IsMaCh3ModeNC',['../classMaCh3Modes.html#ae15daa5df6c1bc97847f397233712606',1,'MaCh3Modes']]],
+  ['ismode_34',['IsMode',['../structMaCh3ModeInfo.html#a9a89a0394f9f5eb780008253716836fc',1,'MaCh3ModeInfo']]],
+  ['isparameterfixed_35',['IsParameterFixed',['../classParameterHandlerBase.html#acfad20049e6c37ef7afa59aca1fd3cf0',1,'ParameterHandlerBase::IsParameterFixed(const std::string &amp;name) const'],['../classParameterHandlerBase.html#a78ffc15979c158c7a3e3eb7bd40a4e79',1,'ParameterHandlerBase::IsParameterFixed(const int i) const']]],
+  ['isparameterfixedpca_36',['IsParameterFixedPCA',['../group__ParameterHandlerGetters.html#ga5087aa5aba191f31170c1108210cdb26',1,'PCAHandler']]],
+  ['isparfromgroup_37',['IsParFromGroup',['../group__ParameterHandlerGetters.html#gae10980fefe473ec6a9875dad17dea334',1,'ParameterHandlerGeneric']]],
+  ['ispca_38',['IsPCA',['../classParameterHandlerBase.html#aaa08790cadd3b3fb9b74f90c2c74ae66',1,'ParameterHandlerBase']]],
+  ['isvalidsplineindex_39',['isValidSplineIndex',['../classBinnedSplineHandler.html#af9a948b25fbed9dc3a27642c9118cb5c',1,'BinnedSplineHandler']]],
+  ['iterateoverparams_40',['IterateOverParams',['../classParameterHandlerGeneric.html#ae708dcd0bbfac4a5dd599a5c536da62b',1,'ParameterHandlerGeneric']]]
 ];
