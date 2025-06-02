@@ -1,6 +1,9 @@
 // MaCh3 includes
 #include "Fitters/MCMCProcessor.h"
 #include "Samples/HistogramUtils.h"
+#include "THStack.h"
+#include "TGraphAsymmErrors.h"
+#include <TSystem.h>
 
 /// @file PlotMCMCDiag.cpp
 /// @brief KS: This script is used to analyse output form DiagMCMC.
@@ -8,6 +11,8 @@
 /// @todo this need serious refactor
 
 TString DUMMYFILE = "KillMePlease";
+
+// Utilities
 
 /// @brief KS: function which looks for minimum in given range
 double GetMinimumInRange(TH1D *hist, double minRange, double maxRange)
@@ -22,6 +27,27 @@ double GetMinimumInRange(TH1D *hist, double minRange, double maxRange)
   }
   return MinVale;
 }
+
+/// @brief HW: Check if histogram is flat within a given tolerance.
+// Utility functions
+bool IsHistogramAllOnes(TH1D *hist, double tolerance = 0.001, int max_failures = 100)
+{
+    int failure_count = 0;
+
+    for (int bin = 2; bin <= hist->GetNbinsX(); ++bin)
+    {
+        if (fabs(hist->GetBinContent(bin) - 1.0) > tolerance)
+        {
+            if (++failure_count > max_failures)
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+
 
 void MakePlot(TString fname1, TString fname2,TString fname3, TString fname4)
 {
@@ -185,6 +211,296 @@ void PlotAutoCorr(TString fname1, TString fname2, TString fname3, TString fname4
   c1->Print("Auto_Corr_PerFile.pdf]", "pdf");
 }
 
+// HW: Utilities for average Auto Correlation plots
+
+/// @brief HW: Create a band of minimum and maximum values from a histogram.
+std::pair<TGraph *, TGraph *> CreateMinMaxBand(TH1D *hist, Color_t color)
+{
+    int nBins = hist->GetNbinsX();
+    std::vector<double> x(nBins), ymin(nBins), ymax(nBins);
+
+    for (int i = 0; i < nBins; ++i)
+    {
+        x[i] = hist->GetBinCenter(i + 1);
+        ymin[i] = hist->GetBinContent(i + 1);
+        ymax[i] = hist->GetBinContent(i + 1);
+    }
+
+    TGraph *minGraph = new TGraph(nBins, x.data(), ymin.data());
+    TGraph *maxGraph = new TGraph(nBins, x.data(), ymax.data());
+
+    minGraph->SetLineColor(color);
+    maxGraph->SetLineColor(color);
+    minGraph->SetFillColorAlpha(color, float(0.3));
+    maxGraph->SetFillColorAlpha(color, float(0.3));
+
+    return {minGraph, maxGraph};
+}
+
+TGraph* CalculateMinMaxBand(const std::vector<TH1D *> &histograms, Color_t color)
+{
+    if (histograms.empty())
+    {
+        throw std::invalid_argument("Empty histogram vector provided");
+    }
+
+    int nBins = histograms[0]->GetNbinsX();
+    std::vector<double> x(nBins), ymin(nBins, 1e10), ymax(nBins, -1e10);
+
+    for (int bin = 0; bin < nBins; bin++)
+    {
+        x[bin] = histograms[0]->GetBinCenter(bin + 1);
+
+        for (const auto &hist : histograms)
+        {
+            double content = hist->GetBinContent(bin + 1);
+            ymin[bin] = std::min(ymin[bin], content);
+            ymax[bin] = std::max(ymax[bin], content);
+        }
+    }
+
+
+    // Create a band using TGraphAsymmErrors for the shaded region
+    TGraphAsymmErrors *band = new TGraphAsymmErrors(nBins);
+    for (int i = 0; i < nBins; ++i)
+    {
+        band->SetPoint(i, x[i], (ymax[i] + ymin[i]) / 2.0);
+        band->SetPointError(i, 0, 0, (ymax[i] - ymin[i]) / 2.0, (ymax[i] - ymin[i]) / 2.0);
+    }
+
+    band->SetFillColorAlpha(color, float(0.2));
+    band->SetLineWidth(1);
+
+    return band; // Return band and min graph (min graph can be used for legend)
+}
+
+
+std::pair<TH1D *, TH1D *> CalculateMinMaxHistograms(const std::vector<TH1D *> &histograms)
+{
+    if (histograms.empty())
+    {
+        throw std::invalid_argument("Empty histogram vector provided");
+    }
+
+    TH1D *min_hist = static_cast<TH1D *>(histograms[0]->Clone());
+    TH1D *max_hist = static_cast<TH1D *>(histograms[0]->Clone());
+
+    for (const auto &hist : histograms)
+    {
+        for (int bin = 1; bin <= min_hist->GetNbinsX(); ++bin)
+        {
+            double current_min = min_hist->GetBinContent(bin);
+            double current_max = max_hist->GetBinContent(bin);
+            double bin_content = hist->GetBinContent(bin);
+
+            min_hist->SetBinContent(bin, std::min(current_min, bin_content));
+            max_hist->SetBinContent(bin, std::max(current_max, bin_content));
+        }
+    }
+
+    return {min_hist, max_hist};
+}
+
+// File processing functions
+void ProcessAutoCorrelationDirectory(TDirectoryFile *autocor_dir,
+                                      TH1D *&average_hist,
+                                      int &parameter_count,
+                                      std::vector<TH1D *> &histograms)
+{
+    TIter next(autocor_dir->GetListOfKeys());
+    TKey *key;
+
+    while ((key = dynamic_cast<TKey *>(next())))
+    {
+        TH1D *current_hist = nullptr;
+        autocor_dir->GetObject(key->GetName(), current_hist);
+
+        if (!current_hist ||
+            current_hist->GetMaximum() <= 0 ||
+            IsHistogramAllOnes(current_hist))
+        {
+            continue;
+        }
+
+        current_hist->SetDirectory(nullptr); // Detach from file
+        histograms.push_back(current_hist);
+
+        if (!average_hist)
+        {
+            average_hist = static_cast<TH1D *>(current_hist->Clone());
+            average_hist->SetDirectory(nullptr);
+        }
+        else
+        {
+            average_hist->Add(current_hist);
+        }
+        parameter_count++;
+    }
+}
+
+
+void ProcessDiagnosticFile(const TString &file_path,
+                            TH1D *&average_hist,
+                            int &parameter_count,
+                            std::vector<TH1D *> &histograms)
+{
+    std::unique_ptr<TFile> input_file(TFile::Open(file_path));
+    if (!input_file || input_file->IsZombie())
+    {
+        throw std::runtime_error("Could not open file: " + std::string(file_path.Data()));
+    }
+
+    TDirectoryFile *autocor_dir = nullptr;
+    input_file->GetObject("Auto_corr", autocor_dir);
+
+    if (!autocor_dir)
+    {
+        throw MaCh3Exception(__FILE__, __LINE__,
+            "Auto_corr directory not found in file: " + std::string(file_path.Data()));
+    }
+
+    ProcessAutoCorrelationDirectory(autocor_dir, average_hist, parameter_count, histograms);
+}
+
+TH1D* AutocorrProcessInputs(const TString &input_file, std::vector<TH1D *> &histograms)
+{
+
+  TH1D *average_hist = nullptr;
+  int parameter_count = 0;
+
+  try
+  {
+      ProcessDiagnosticFile(input_file, average_hist, parameter_count, histograms);
+  }
+  catch (const std::exception &e)
+  {
+      MACH3LOG_ERROR("Error processing file {} : {}", input_file, e.what());
+  }
+
+  if (average_hist && parameter_count > 0)
+  {
+      MACH3LOG_INFO("Processed {} parameters from {} files", parameter_count, input_file);
+      average_hist->Scale(1.0 / parameter_count);
+  }
+
+  return average_hist;
+}
+
+void CompareAverageAC(const std::vector<std::vector<TH1D *>> &histograms,
+                        const std::vector<TH1D *> &averages,
+                        const std::vector<TString> &hist_labels,
+                        const TString &output_name,
+                        bool draw_min_max = true,
+                        bool draw_all = false,
+                        bool draw_errors = true)
+{
+    TCanvas *canvas = new TCanvas("AverageAC", "Average Auto Correlation", 800, 600);
+    canvas->SetGrid();
+    
+    // Setup colour palette
+    Int_t nb = 255.0;
+    Double_t stops[8] = { 0.0, 0.25, 0.5, 0.75};
+    Double_t red[8] = { 0.83203125, 0.796875, 0.0, 0.9375};
+    Double_t green[8] = {0.3671875, 0.47265625, 0.4453125, 0.890625};
+    Double_t blue[8] = {0.0, 0.65234375, 0.6953125, 0.2578125};
+    TColor::CreateGradientColorTable(8, stops, red, green, blue, nb);
+
+    TLegend* leg = new TLegend(0.5, 0.7, 0.9, 0.9);
+
+    if (draw_min_max){
+      for (size_t i = 0; i < histograms.size(); ++i)
+      {
+        auto colour = static_cast<Color_t>(TColor::GetColorPalette(static_cast<Int_t>(i*nb/histograms.size())));
+
+        {
+          auto band = CalculateMinMaxBand(histograms[i], colour);
+          band->SetLineWidth(0);
+          band->SetTitle("Average Auto Correlation");
+          band->GetXaxis()->SetTitle("lag");
+          band->GetYaxis()->SetTitle("Autocorrelation Function");
+          if(i==0){
+            band->Draw("A3");
+          }
+          else{
+            band->Draw("3 SAME");
+          }
+        }
+      }
+    }
+
+    for (size_t i = 0; i < averages.size(); ++i){
+      auto colour = static_cast<Color_t>(TColor::GetColorPalette(static_cast<Int_t>(i*nb/histograms.size())));
+
+      if(draw_errors){          
+        auto error_hist = static_cast<TH1D *>(averages[i]->Clone());
+        error_hist->SetFillColorAlpha(colour, float(0.3));
+        error_hist->SetLineWidth(0);
+        error_hist->SetTitle("Average Auto Correlation");
+        error_hist->GetXaxis()->SetTitle("lag");
+        error_hist->GetYaxis()->SetTitle("Autocorrelation Function");
+        error_hist->Draw("E3 SAME");
+      }
+      if(draw_all){
+        for (const auto &hist : histograms[i])
+        {
+          hist->SetLineColorAlpha(colour, float(0.05));
+          hist->SetLineWidth(1);
+          hist->Draw("HIST SAME");
+        }
+      }
+
+      averages[i]->SetLineColor(colour);
+      averages[i]->SetLineWidth(2);
+      averages[i]->SetTitle("Average Auto Correlation");
+      averages[i]->GetXaxis()->SetTitle("lag");
+      averages[i]->GetYaxis()->SetTitle("Autocorrelation Function");
+      averages[i]->Draw("HIST SAME");
+
+      leg->AddEntry(averages[i], hist_labels[i], "l");
+
+    }
+    leg->Draw();
+
+    canvas->SaveAs(output_name + ".pdf");
+    delete canvas;
+}
+
+void PlotAverageACMult(std::vector<TString> input_files,
+                            const TString &output_name,
+                            bool draw_min_max = true)
+                            // bool draw_all = false,
+                            // bool draw_errors = true)
+{
+    // Process first folder
+    std::vector<std::vector<TH1D *>> histograms;
+    std::vector<TH1D*> averages;
+
+    for(int i=0; i<static_cast<int>(input_files.size()); i++)
+    {
+        TString folder = input_files[i];
+        if (folder.IsNull() || folder == DUMMYFILE)
+        {
+            MACH3LOG_WARN("Skipping empty or dummy folder: {}", folder.Data());
+            continue;
+        }
+
+        std::vector<TH1D *> histograms_i;
+        averages.push_back((AutocorrProcessInputs(folder, histograms_i)));
+        histograms.push_back(histograms_i);
+    }
+
+    auto hist_labels = input_files;
+    // Remove the file extension from labels
+    for (auto &label : hist_labels)
+    {
+      label = TString(gSystem->BaseName(label.Data()));
+      label.ReplaceAll(".root", "");
+    }
+
+    CompareAverageAC(histograms, averages, hist_labels, output_name, draw_min_max);// draw_all, draw_errors);
+
+}
+
 int main(int argc, char *argv[]) {
   SetMaCh3LoggerFormat();
   if (argc < 2 || argc > 5)
@@ -197,15 +513,20 @@ int main(int argc, char *argv[]) {
   if(argc == 2) {
     MakePlot(argv[1], DUMMYFILE, DUMMYFILE, DUMMYFILE);
     PlotAutoCorr(argv[1], DUMMYFILE, DUMMYFILE, DUMMYFILE);
+    PlotAverageACMult({argv[1]}, "Average_Auto_Corr", true);
+
   } else if(argc == 3) {
     MakePlot(argv[1], argv[2], DUMMYFILE ,DUMMYFILE);
     PlotAutoCorr(argv[1], argv[2], DUMMYFILE, DUMMYFILE);
+    PlotAverageACMult({argv[1], argv[2]}, "Average_Auto_Corr", true);
   } else if(argc == 4) {
     MakePlot(argv[1], argv[2], argv[3], DUMMYFILE);
     PlotAutoCorr(argv[1], argv[2], argv[3], DUMMYFILE);
+    PlotAverageACMult({argv[1], argv[2], argv[3]}, "Average_Auto_Corr", true);
   } else if(argc == 5) {
     MakePlot(argv[1], argv[2], argv[3], argv[4]);
     PlotAutoCorr(argv[1], argv[2], argv[3], argv[4]);
+    PlotAverageACMult({argv[1], argv[2], argv[3], argv[4]}, "Average_Auto_Corr", true);
   }
   return 0;
 }
