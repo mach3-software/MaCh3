@@ -314,6 +314,11 @@ void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const 
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
+  if (!CircEnabled && !FlipEnabled) {
+    MACH3LOG_ERROR("None of Special Proposal were enabled even though param {}, has SpecialProposal entry in Yaml", GetParFancyName(Index));
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
   if (CircEnabled) {
     CircularBoundsIndex.push_back(Index);
     CircularBoundsValues.push_back(Get<std::pair<double, double>>(param["CircularBounds"], __FILE__, __LINE__));

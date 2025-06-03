@@ -606,7 +606,7 @@ void ParameterHandlerGeneric::PrintFunctionalParams() {
 // ********************************************
 void ParameterHandlerGeneric::PrintOscillationParams() {
 // ********************************************
-  MACH3LOG_INFO("Functional parameters: {}", _fSystToGlobalSystIndexMap[SystType::kOsc].size());
+  MACH3LOG_INFO("Oscillation parameters: {}", _fSystToGlobalSystIndexMap[SystType::kOsc].size());
   if(_fSystToGlobalSystIndexMap[SystType::kOsc].size() == 0) return;
   MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┐");
   MACH3LOG_INFO("│{0:4}│{1:10}│{2:40}│", "#", "Global #", "Name");

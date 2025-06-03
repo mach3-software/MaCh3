@@ -5,8 +5,6 @@
 // MaCh3 includes
 #include "Parameters/ParameterHandlerBase.h"
 #include "Parameters/ParameterHandlerGeneric.h"
-#include "Parameters/ParameterHandlerOsc.h"
-
 
 namespace py = pybind11;
 
@@ -183,22 +181,4 @@ void initParameters(py::module &m){
         )
 
     ; // End of ParameterHandlerGeneric binding
-    
-    py::class_<ParameterHandlerOsc, ParameterHandlerBase /* <--- trampoline*/>(m_parameters, "ParameterHandlerOsc")
-        .def(
-            py::init<const std::vector<std::string>&, const char *, double, int, int>(),
-            "Construct a oscillation parameter handler object from a set of yaml files that define the systematic parameters \n\
-            :param yaml_files: The name of the yaml file to initialise from. \n\
-            :param name: the name of this parameter handler object. \n\
-            :param threshold: threshold PCA threshold from 0 to 1. Default is -1 and means no PCA. \n\
-            :param first_PCA_par: FirstPCAdpar First PCA parameter that will be decomposed. \n\
-            :param last_PCA_par: LastPCAdpar First PCA parameter that will be decomposed.",
-            py::arg("yaml_files"),
-            py::arg("name") = "xsec_cov",
-            py::arg("threshold") = -1.0,
-            py::arg("firs_PCA_par") = -999,
-            py::arg("last_PCA_par") = -999
-        )
-    ; // End of ParameterHandlerOsc binding
-
 }
