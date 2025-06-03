@@ -1963,13 +1963,13 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  512</span><span class="preprocessor">    #ifdef MULTITHREAD</span></div>
 <div class="line"><span class="lineno">  513</span><span class="preprocessor">    #pragma omp parallel for</span></div>
 <div class="line"><span class="lineno">  514</span><span class="preprocessor">    #endif</span></div>
-<div class="line"><span class="lineno">  515</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>; ++i)</div>
+<div class="line"><span class="lineno">  515</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classParameterHandlerBase.html#a8d3b05f6bb6ec3f334af6d9891fa031e">PCAObj</a>-&gt;GetNumberPCAedParameters(); ++i)</div>
 <div class="line"><span class="lineno">  516</span>    {</div>
-<div class="line"><span class="lineno">  517</span>      <span class="keywordflow">if</span> (<a class="code hl_variable" href="classParameterHandlerBase.html#a8d3b05f6bb6ec3f334af6d9891fa031e">PCAObj</a>-&gt;IsParameterFixedPCA(i) &gt; 0. &amp;&amp; i &lt; PCAObj-&gt;GetNumberPCAedParameters())</div>
-<div class="line"><span class="lineno">  518</span>      {</div>
-<div class="line"><span class="lineno">  519</span>        <a class="code hl_variable" href="classParameterHandlerBase.html#a166763aa1cc313512fb502bca6ea8a2c">randParams</a>[i] = <a class="code hl_variable" href="classParameterHandlerBase.html#ae1bee9945e7a00d17ee69a3c0d75b622">random_number</a>[<a class="code hl_function" href="namespaceM3.html#a5ed0accdbf66626c16b6c3b00bd5d030">M3::GetThreadIndex</a>()]-&gt;Gaus(0,1);</div>
-<div class="line"><span class="lineno">  520</span>      } <span class="keywordflow">else</span> { <span class="comment">// If parameter IS fixed or out of bounds</span></div>
-<div class="line"><span class="lineno">  521</span>        <a class="code hl_variable" href="classParameterHandlerBase.html#a166763aa1cc313512fb502bca6ea8a2c">randParams</a>[i] = 0.0;</div>
+<div class="line"><span class="lineno">  517</span>      <span class="comment">// If parameter IS fixed or out of bounds</span></div>
+<div class="line"><span class="lineno">  518</span>      <span class="keywordflow">if</span> (<a class="code hl_variable" href="classParameterHandlerBase.html#a8d3b05f6bb6ec3f334af6d9891fa031e">PCAObj</a>-&gt;IsParameterFixedPCA(i)) {</div>
+<div class="line"><span class="lineno">  519</span>        <a class="code hl_variable" href="classParameterHandlerBase.html#a166763aa1cc313512fb502bca6ea8a2c">randParams</a>[i] = 0.0;</div>
+<div class="line"><span class="lineno">  520</span>      } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  521</span>        <a class="code hl_variable" href="classParameterHandlerBase.html#a166763aa1cc313512fb502bca6ea8a2c">randParams</a>[i] = <a class="code hl_variable" href="classParameterHandlerBase.html#ae1bee9945e7a00d17ee69a3c0d75b622">random_number</a>[<a class="code hl_function" href="namespaceM3.html#a5ed0accdbf66626c16b6c3b00bd5d030">M3::GetThreadIndex</a>()]-&gt;Gaus(0,1);</div>
 <div class="line"><span class="lineno">  522</span>      }</div>
 <div class="line"><span class="lineno">  523</span>    }</div>
 <div class="line"><span class="lineno">  524</span>  }</div>
@@ -2280,12 +2280,12 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  375</span>  <span class="comment">// First draw new randParams</span></div>
 <div class="line"><span class="lineno">  376</span>  <a class="code hl_function" href="classParameterHandlerBase.html#aa23c205ca3d033ce22cf2f04ee25324d">Randomize</a>();</div>
 <div class="line"><span class="lineno">  377</span> </div>
-<div class="line"><span class="lineno">  378</span>  <span class="comment">// KS: We use PCA very rarely on top PCA functionality isn&#39;t implemented for this function.</span></div>
-<div class="line"><span class="lineno">  379</span>  <span class="comment">// Use __builtin_expect to give compiler a hint which option is more likely, which should help</span></div>
-<div class="line"><span class="lineno">  380</span>  <span class="comment">// with better optimisation. This isn&#39;t critical but more to have example</span></div>
-<div class="line"><span class="lineno">  381</span>  <span class="keywordflow">if</span> (__builtin_expect(!<a class="code hl_variable" href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">pca</a>, 1)) {</div>
-<div class="line"><span class="lineno">  382</span>    <a class="code hl_function" href="namespaceM3.html#a3718709c681d78c6e28e2eb4c0ac42d3">M3::MatrixVectorMulti</a>(<a class="code hl_variable" href="classParameterHandlerBase.html#aa83a519d3501160d85c74ec9516718c8">corr_throw</a>, <a class="code hl_variable" href="classParameterHandlerBase.html#a1e916de10380d0860d890601fa87c107">throwMatrixCholDecomp</a>, <a class="code hl_variable" href="classParameterHandlerBase.html#a166763aa1cc313512fb502bca6ea8a2c">randParams</a>, <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>);</div>
-<div class="line"><span class="lineno">  383</span> </div>
+<div class="line"><span class="lineno">  378</span>  <a class="code hl_function" href="namespaceM3.html#a3718709c681d78c6e28e2eb4c0ac42d3">M3::MatrixVectorMulti</a>(<a class="code hl_variable" href="classParameterHandlerBase.html#aa83a519d3501160d85c74ec9516718c8">corr_throw</a>, <a class="code hl_variable" href="classParameterHandlerBase.html#a1e916de10380d0860d890601fa87c107">throwMatrixCholDecomp</a>, <a class="code hl_variable" href="classParameterHandlerBase.html#a166763aa1cc313512fb502bca6ea8a2c">randParams</a>, <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>);</div>
+<div class="line"><span class="lineno">  379</span> </div>
+<div class="line"><span class="lineno">  380</span>  <span class="comment">// KS: We use PCA very rarely on top PCA functionality isn&#39;t implemented for this function.</span></div>
+<div class="line"><span class="lineno">  381</span>  <span class="comment">// Use __builtin_expect to give compiler a hint which option is more likely, which should help</span></div>
+<div class="line"><span class="lineno">  382</span>  <span class="comment">// with better optimisation. This isn&#39;t critical but more to have example</span></div>
+<div class="line"><span class="lineno">  383</span>  <span class="keywordflow">if</span> (__builtin_expect(!<a class="code hl_variable" href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">pca</a>, 1)) {</div>
 <div class="line"><span class="lineno">  384</span><span class="preprocessor">    #ifdef MULTITHREAD</span></div>
 <div class="line"><span class="lineno">  385</span><span class="preprocessor">    #pragma omp parallel for</span></div>
 <div class="line"><span class="lineno">  386</span><span class="preprocessor">    #endif</span></div>
@@ -2319,10 +2319,10 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  414</span>  }</div>
 <div class="line"><span class="lineno">  415</span>  <span class="keywordflow">else</span></div>
 <div class="line"><span class="lineno">  416</span>  {</div>
-<div class="line"><span class="lineno">  417</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a>(<span class="stringliteral">&quot;Hold on, you are trying to run Prior Predictive Code with PCA, which is wrong&quot;</span>);</div>
-<div class="line"><span class="lineno">  418</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a>(<span class="stringliteral">&quot;Sorry I have to kill you, I mean your job&quot;</span>);</div>
-<div class="line"><span class="lineno">  419</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><span class="lineno">  420</span>  }</div>
+<div class="line"><span class="lineno">  417</span>    <a class="code hl_variable" href="classParameterHandlerBase.html#a8d3b05f6bb6ec3f334af6d9891fa031e">PCAObj</a>-&gt;ThrowParameters(<a class="code hl_variable" href="classParameterHandlerBase.html#ae1bee9945e7a00d17ee69a3c0d75b622">random_number</a>, <a class="code hl_variable" href="classParameterHandlerBase.html#a1e916de10380d0860d890601fa87c107">throwMatrixCholDecomp</a>,</div>
+<div class="line"><span class="lineno">  418</span>                            <a class="code hl_variable" href="classParameterHandlerBase.html#a166763aa1cc313512fb502bca6ea8a2c">randParams</a>, <a class="code hl_variable" href="classParameterHandlerBase.html#aa83a519d3501160d85c74ec9516718c8">corr_throw</a>,</div>
+<div class="line"><span class="lineno">  419</span>                            <a class="code hl_variable" href="classParameterHandlerBase.html#a9f98cdf43f276a271da9a66509063ba6">_fPreFitValue</a>, <a class="code hl_variable" href="classParameterHandlerBase.html#a92d4696b92db78fd9e3a4549d3ab64a6">_fLowBound</a>, <a class="code hl_variable" href="classParameterHandlerBase.html#aca38e417c05c6fa67a892ee5ddf1c2ac">_fUpBound</a>, <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>);</div>
+<div class="line"><span class="lineno">  420</span>  } <span class="comment">// end if pca</span></div>
 <div class="line"><span class="lineno">  421</span>}</div>
 <div class="ttc" id="anamespaceM3_html_a99622fe57c7a13d75de4d3c3561b530d"><div class="ttname"><a href="namespaceM3.html#a99622fe57c7a13d75de4d3c3561b530d">M3::MatrixVectorMultiSingle</a></div><div class="ttdeci">double MatrixVectorMultiSingle(double **_restrict_ matrix, const double *_restrict_ vector, const int Length, const int i)</div><div class="ttdoc">KS: Custom function to perform multiplication of matrix and single element which is thread safe.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerUtils_8h_source.html#l00135">ParameterHandlerUtils.h:135</a></div></div>
 </div><!-- fragment -->

@@ -129,12 +129,12 @@ $(function() {
 <p class="enddd"><a class="anchor" id="_todo000021"></a>add a check here to make sure all the scans that are in the file are being picked up by the reader, and warn if any are not being used  </p>
 </dd>
 <dt>Member <a class="el" href="classMaCh3Plotting_1_1PlottingManager.html#aeb042d09d55644d8b35632f66f1832b6">MaCh3Plotting::PlottingManager::addUserOption</a>  ()</dt>
-<dd><p class="startdd"><a class="anchor" id="_todo000029"></a>Implement this. </p>
-<p class="interdd"><a class="anchor" id="_todo000028"></a>Would be good to add functionality to this to allow user to add their own options. </p>
+<dd><p class="startdd"><a class="anchor" id="_todo000028"></a>Would be good to add functionality to this to allow user to add their own options. </p>
 <p class="interdd"></p>
 <p class="interdd">The way I can think to do this would be have fn <a class="el" href="classMaCh3Plotting_1_1PlottingManager.html#aeb042d09d55644d8b35632f66f1832b6" title="Describe an option you want to add to the PlottingManager which can be read in from the command line ...">addUserOption()</a> to set the options, defining the cmd line option (e.g. -x), the name of the option, and maybe some description of the option to be used in the help message </p>
 <p class="interdd"></p>
-<p class="enddd">can then store these options in some map or something to be retrieved later by <a class="el" href="classMaCh3Plotting_1_1PlottingManager.html#af9f60a6196a9249d7ad7fee6c7bba89a" title="Retrieve a command line option you specified using addOption.">getUserOption()</a>  </p>
+<p class="interdd">can then store these options in some map or something to be retrieved later by <a class="el" href="classMaCh3Plotting_1_1PlottingManager.html#af9f60a6196a9249d7ad7fee6c7bba89a" title="Retrieve a command line option you specified using addOption.">getUserOption()</a> </p>
+<p class="enddd"><a class="anchor" id="_todo000029"></a>Implement this.  </p>
 </dd>
 <dt>Member <a class="el" href="classMaCh3Plotting_1_1PlottingManager.html#a9c1177794e2fecce4e258ee8446d6569">MaCh3Plotting::PlottingManager::getOutputName</a>  (const std::string &amp;suffix)</dt>
 <dd><a class="anchor" id="_todo000034"></a>Make this support .root files too  </dd>
@@ -170,6 +170,8 @@ $(function() {
 </dd>
 <dt>Member <a class="el" href="classParameterHandlerBase.html#a216561fe8c8fbcd8e607d857a0559738">ParameterHandlerBase::PrintParameters</a>  () const</dt>
 <dd><a class="anchor" id="_todo000035"></a>remove it  </dd>
+<dt>Member <a class="el" href="classPCAHandler.html#a5d95270f4cebb6ac0d0a380401dbd304">PCAHandler::ThrowParameters</a>  (const std::vector&lt; std::unique_ptr&lt; TRandom3 &gt; &gt; &amp;random_number, double **throwMatrixCholDecomp, double *randParams, double *corr_throw, const std::vector&lt; double &gt; &amp;fPreFitValue, const std::vector&lt; double &gt; &amp;fLowBound, const std::vector&lt; double &gt; &amp;fUpBound, int _fNumPar)</dt>
+<dd><a class="anchor" id="_todo000038"></a>KS: We don't check if param is out of bounds. This is more problematic for PCA params.  </dd>
 <dt>File <a class="el" href="PlotMCMCDiag_8cpp.html">PlotMCMCDiag.cpp</a>  </dt>
 <dd><a class="anchor" id="_todo000019"></a>this need serious refactor  </dd>
 <dt>Member <a class="el" href="classSampleHandlerFD.html#a1a984c564107c7207a2611d0bf67d9cc">SampleHandlerFD::SetupSplines</a>  ()=0</dt>
