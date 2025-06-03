@@ -331,11 +331,25 @@ void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const 
                   FlipParameterPoint.back());
   }
 
-
   if (CircEnabled && FlipEnabled) {
     if (FlipParameterPoint.back() < CircularBoundsValues.back().first || FlipParameterPoint.back() > CircularBoundsValues.back().second) {
       MACH3LOG_ERROR("FlipParameter value {} for parameter {} is outside the CircularBounds [{}, {}]",
                      FlipParameterPoint.back(), GetParFancyName(Index), CircularBoundsValues.back().first, CircularBoundsValues.back().second);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+
+    const double low = CircularBoundsValues.back().first;
+    const double high = CircularBoundsValues.back().second;
+
+    // Sanity check: ensure flipping any x in [low, high] keeps the result in [low, high]
+    const double flipped_low = 2 * FlipParameterPoint.back() - low;
+    const double flipped_high = 2 * FlipParameterPoint.back() - high;
+    const double min_flip = std::min(flipped_low, flipped_high);
+    const double max_flip = std::max(flipped_low, flipped_high);
+
+    if (min_flip < low || max_flip > high) {
+      MACH3LOG_ERROR("Flipping about point {} for parameter {} would leave circular bounds [{}, {}]",
+                     FlipParameterPoint.back(), GetParFancyName(Index), low, high);
       throw MaCh3Exception(__FILE__, __LINE__);
     }
   }
