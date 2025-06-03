@@ -19,6 +19,7 @@ likelihoods implemented.
 [![Code - Doxygen](https://img.shields.io/badge/Code-Doxygen-2ea44f)](https://mach3-software.github.io/MaCh3/index.html)
 [![Build CI](https://github.com/mach3-software/MaCh3/actions/workflows/CIBuild.yml/badge.svg)](https://github.com/mach3-software/MaCh3/actions/workflows/CIBuild.yml)
 [![CodeFactor](https://www.codefactor.io/repository/github/mach3-software/mach3/badge/develop)](https://www.codefactor.io/repository/github/mach3-software/mach3/overview/develop)
+
 ## Famous Plots
 Example of plots made using MaCh3 apparent in scientific publications, for more see [here](https://github.com/mach3-software/MaCh3/wiki/14.-MaCh3-in-the-Field)
 <img src="Doc/Plots/delta.png" alt="MaCh3" align="left" width="200"/>
@@ -26,6 +27,14 @@ Example of plots made using MaCh3 apparent in scientific publications, for more 
 
 ## Cite
 When using MaCh3 you must cite our doi from Zenodo. The bibtex file can be found by exporting the citation from this link: [on Zenodo](https://zenodo.org/records/7608367) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7608367.svg)](https://doi.org/10.5281/zenodo.7608367).
+
+## Help and Guidelines 📄
+- [Tutorial](https://github.com/mach3-software/MaCh3Tutorial)
+- [How to contribute](https://github.com/mach3-software/MaCh3/blob/develop/.github/CONTRIBUTING.md)
+- [Wiki](https://github.com/mach3-software/MaCh3/wiki)
+- [Slack](https://t2k-experiment.slack.com/archives/C06EM0C6D7W/p1705599931356889)
+- [Discussions](https://github.com/mach3-software/MaCh3/discussions)
+- [Benchmark](https://mach3-software.github.io/MaCh3Tutorial/)
 
 ## How to Compile
 MaCh3 follows standard cmake pattern. By default you should get most optimal build setting although below we list many configurable options:
@@ -176,14 +185,6 @@ Based on several test here are recommended version:
 ✅ - Part of CI/CD <br>
 ❔ - Not part of CI/CD but used by some users/developers so it might work <br>
 ❌ - Not supported and no plans right now <br>
-
-## Help and Guidelines 📄
-- [Tutorial](https://github.com/mach3-software/MaCh3Tutorial)
-- [How to contribute](https://github.com/mach3-software/MaCh3/blob/develop/.github/CONTRIBUTING.md)
-- [Wiki](https://github.com/mach3-software/MaCh3/wiki)
-- [Slack](https://t2k-experiment.slack.com/archives/C06EM0C6D7W/p1705599931356889)
-- [Discussions](https://github.com/mach3-software/MaCh3/discussions)
-- [Benchmark](https://mach3-software.github.io/MaCh3Tutorial/)
 
 ## Plotting and Diagnostic 📊
 Example of chain diagnostic utils can be found [here](https://github.com/mach3-software/MaCh3/tree/develop/Diagnostics) with example of config.
