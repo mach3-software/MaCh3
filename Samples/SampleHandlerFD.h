@@ -229,11 +229,11 @@ public:
   std::vector<std::string> funcParsNamesVec = {};
 
   /// @brief Check whether a normalisation systematic affects an event or not
-  void CalcNormsBins();
+  void CalcNormsBins(std::vector< std::vector< int > >& xsec_norms_bins);
   /// @brief Calculate the spline weight for a given event
-  M3::float_t CalcWeightSpline(const int iEvent) const;
+  M3::float_t CalcWeightSpline(const FarDetectorCoreInfo* MCEvent) const;
   /// @brief Calculate the norm weight for a given event
-  M3::float_t CalcWeightNorm(const int iEvent) const;
+  M3::float_t CalcWeightNorm(const FarDetectorCoreInfo* MCEvent) const;
 
   /// @brief Calculate weights for function parameters
   ///
@@ -297,7 +297,7 @@ public:
 
   //===============================================================================
   //MC variables
-  FarDetectorCoreInfo MCSamples;
+  std::vector<FarDetectorCoreInfo> MCSamples;
   std::vector<OscChannelInfo> OscChannels;
   //===============================================================================
 
