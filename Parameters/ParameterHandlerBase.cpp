@@ -309,11 +309,6 @@ void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const 
     FlipEnabled = true;
   }
 
-  if (CircEnabled && FlipEnabled) {
-    MACH3LOG_ERROR("Both CircularBounds and Flipping have been enabled for parameter {}", GetParFancyName(Index));
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-
   if (!CircEnabled && !FlipEnabled) {
     MACH3LOG_ERROR("None of Special Proposal were enabled even though param {}, has SpecialProposal entry in Yaml", GetParFancyName(Index));
     throw MaCh3Exception(__FILE__, __LINE__);
@@ -334,6 +329,15 @@ void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const 
     MACH3LOG_INFO("Enabling Flipping for parameter {} with value {}",
                   GetParFancyName(Index),
                   FlipParameterPoint.back());
+  }
+
+
+  if (CircEnabled && FlipEnabled) {
+    if (FlipParameterPoint.back() < CircularBoundsValues.back().first || FlipParameterPoint.back() > CircularBoundsValues.back().second) {
+      MACH3LOG_ERROR("FlipParameter value {} for parameter {} is outside the CircularBounds [{}, {}]",
+                     FlipParameterPoint.back(), GetParFancyName(Index), CircularBoundsValues.back().first, CircularBoundsValues.back().second);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
   }
 }
 
@@ -550,14 +554,14 @@ void ParameterHandlerBase::ProposeStep() {
 // ************************************************
 void ParameterHandlerBase::SpecialStepProposal() {
 // ************************************************
+  /// @warning KS: Following Asher comment we do "Step->Circular Bounds->Flip"
+
   // HW It should now automatically set dcp to be with [-pi, pi]
   for (size_t i = 0; i < CircularBoundsIndex.size(); ++i) {
     CircularParBounds(CircularBoundsIndex[i], CircularBoundsValues[i].first, CircularBoundsValues[i].second);
   }
 
   // Okay now we've done the standard steps, we can add in our nice flips hierarchy flip first
-  // flip octant around point of maximal disappearance (0.5112)
-  // this ensures we move to a parameter value which has the same oscillation probability
   for (size_t i = 0; i < FlipParameterIndex.size(); ++i) {
     FlipParameterValue(FlipParameterIndex[i], FlipParameterPoint[i]);
   }
