@@ -447,6 +447,7 @@ void SampleHandlerFD::FillArray() {
       {
         if (XVar >= XBinEdges[iBin] && XVar < XBinEdges[iBin+1]) {
           XBinToFill = iBin;
+          break; // KS: Once found bin stop looping over remaining
         }
       }
     }
