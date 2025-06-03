@@ -742,54 +742,57 @@ template&lt;typename T &gt; </div>
 <div class="line"><span class="lineno">  305</span>      syst_i[<span class="stringliteral">&quot;ParameterValues&quot;</span>][<span class="stringliteral">&quot;PreFitValue&quot;</span>] = <a class="code hl_function" href="namespaceMaCh3Utils.html#a37d0c54de0b83b71393afca143ab1ec0">MaCh3Utils::FormatDouble</a>(Values[i], 4);</div>
 <div class="line"><span class="lineno">  306</span>      syst_i[<span class="stringliteral">&quot;Error&quot;</span>] = std::round(Errors[i] * 100.0) / 100.0;</div>
 <div class="line"><span class="lineno">  307</span> </div>
-<div class="line"><span class="lineno">  308</span>      YAML::Node correlationsNode;</div>
+<div class="line"><span class="lineno">  308</span>      YAML::Node correlationsNode = YAML::Node(YAML::NodeType::Sequence);</div>
 <div class="line"><span class="lineno">  309</span>      <span class="keywordflow">for</span> (std::size_t j = 0; j &lt; FancyNames.size(); ++j) {</div>
 <div class="line"><span class="lineno">  310</span>        <span class="keywordflow">if</span> (i == j) <span class="keywordflow">continue</span>;</div>
-<div class="line"><span class="lineno">  311</span>        <span class="keyword">const</span> std::string&amp; name_j = FancyNames[j];</div>
-<div class="line"><span class="lineno">  312</span>        correlationsNode[name_j] = <a class="code hl_function" href="namespaceMaCh3Utils.html#a37d0c54de0b83b71393afca143ab1ec0">MaCh3Utils::FormatDouble</a>(Correlation[i][j], 4);</div>
-<div class="line"><span class="lineno">  313</span>      }</div>
-<div class="line"><span class="lineno">  314</span>      syst_i[<span class="stringliteral">&quot;Correlations&quot;</span>] = correlationsNode;</div>
-<div class="line"><span class="lineno">  315</span>    }</div>
-<div class="line"><span class="lineno">  316</span>  } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  317</span>    <span class="keywordflow">if</span> (systematics.size() != Values.size()) {</div>
-<div class="line"><span class="lineno">  318</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Mismatch in sizes: Values has {}, but YAML &#39;Systematics&#39; has {} entries&quot;</span>,</div>
-<div class="line"><span class="lineno">  319</span>                     Values.size(), systematics.size());</div>
-<div class="line"><span class="lineno">  320</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><span class="lineno">  321</span>    }</div>
-<div class="line"><span class="lineno">  322</span> </div>
-<div class="line"><span class="lineno">  323</span>    <span class="keywordflow">for</span> (std::size_t i = 0; i &lt; systematics.size(); ++i) {</div>
-<div class="line"><span class="lineno">  324</span>      YAML::Node syst = systematics[i][<span class="stringliteral">&quot;Systematic&quot;</span>];</div>
-<div class="line"><span class="lineno">  325</span>      <span class="keywordflow">if</span> (!syst) {</div>
-<div class="line"><span class="lineno">  326</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Missing &#39;Systematic&#39; node at index {}&quot;</span>, i);</div>
-<div class="line"><span class="lineno">  327</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><span class="lineno">  328</span>      }</div>
-<div class="line"><span class="lineno">  329</span> </div>
-<div class="line"><span class="lineno">  330</span>      syst[<span class="stringliteral">&quot;ParameterValues&quot;</span>][<span class="stringliteral">&quot;PreFitValue&quot;</span>] = <a class="code hl_function" href="namespaceMaCh3Utils.html#a37d0c54de0b83b71393afca143ab1ec0">MaCh3Utils::FormatDouble</a>(Values[i], 4);</div>
-<div class="line"><span class="lineno">  331</span>      syst[<span class="stringliteral">&quot;Error&quot;</span>] = std::round(Errors[i] * 100.0) / 100.0;</div>
-<div class="line"><span class="lineno">  332</span> </div>
-<div class="line"><span class="lineno">  333</span>      YAML::Node correlationsNode;</div>
-<div class="line"><span class="lineno">  334</span>      <span class="keywordflow">for</span> (std::size_t j = 0; j &lt; Correlation[i].size(); ++j) {</div>
-<div class="line"><span class="lineno">  335</span>        <span class="keywordflow">if</span> (i == j) <span class="keywordflow">continue</span>;</div>
-<div class="line"><span class="lineno">  336</span>        <span class="keyword">const</span> std::string&amp; otherName = systematics[j][<span class="stringliteral">&quot;Systematic&quot;</span>][<span class="stringliteral">&quot;Names&quot;</span>][<span class="stringliteral">&quot;FancyName&quot;</span>].as&lt;std::string&gt;();</div>
-<div class="line"><span class="lineno">  337</span>        correlationsNode[otherName] = <a class="code hl_function" href="namespaceMaCh3Utils.html#a37d0c54de0b83b71393afca143ab1ec0">MaCh3Utils::FormatDouble</a>(Correlation[i][j], 4);</div>
-<div class="line"><span class="lineno">  338</span>      }</div>
-<div class="line"><span class="lineno">  339</span>      syst[<span class="stringliteral">&quot;Correlations&quot;</span>] = correlationsNode;</div>
-<div class="line"><span class="lineno">  340</span>    }</div>
-<div class="line"><span class="lineno">  341</span>  }</div>
-<div class="line"><span class="lineno">  342</span> </div>
-<div class="line"><span class="lineno">  343</span>  <span class="comment">// Convert and write</span></div>
-<div class="line"><span class="lineno">  344</span>  std::string YAMLString = <a class="code hl_function" href="YamlHelper_8h.html#aae72fb06a391f1073add5eed6c6485dd">YAMLtoSTRING</a>(NodeCopy);</div>
-<div class="line"><span class="lineno">  345</span>  <a class="code hl_function" href="namespaceM3.html#a68ab9b6b3d413a94604c740208c7895d">FixSampleNamesQuotes</a>(YAMLString);</div>
-<div class="line"><span class="lineno">  346</span>  std::string OutName = <span class="stringliteral">&quot;UpdatedCorrelationMatrix.yaml&quot;</span>;</div>
-<div class="line"><span class="lineno">  347</span>  std::ofstream outFile(OutName);</div>
-<div class="line"><span class="lineno">  348</span>  <span class="keywordflow">if</span> (!outFile) {</div>
-<div class="line"><span class="lineno">  349</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Failed to open file for writing: {}&quot;</span>, OutName);</div>
-<div class="line"><span class="lineno">  350</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><span class="lineno">  351</span>  }</div>
-<div class="line"><span class="lineno">  352</span> </div>
-<div class="line"><span class="lineno">  353</span>  outFile &lt;&lt; YAMLString;</div>
-<div class="line"><span class="lineno">  354</span>  outFile.close();</div>
-<div class="line"><span class="lineno">  355</span>}</div>
+<div class="line"><span class="lineno">  311</span>        YAML::Node singleEntry;</div>
+<div class="line"><span class="lineno">  312</span>        singleEntry[FancyNames[j]] = <a class="code hl_function" href="namespaceMaCh3Utils.html#a37d0c54de0b83b71393afca143ab1ec0">MaCh3Utils::FormatDouble</a>(Correlation[i][j], 4);</div>
+<div class="line"><span class="lineno">  313</span>        correlationsNode.push_back(singleEntry);</div>
+<div class="line"><span class="lineno">  314</span>      }</div>
+<div class="line"><span class="lineno">  315</span>      syst_i[<span class="stringliteral">&quot;Correlations&quot;</span>] = correlationsNode;</div>
+<div class="line"><span class="lineno">  316</span>    }</div>
+<div class="line"><span class="lineno">  317</span>  } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  318</span>    <span class="keywordflow">if</span> (systematics.size() != Values.size()) {</div>
+<div class="line"><span class="lineno">  319</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Mismatch in sizes: Values has {}, but YAML &#39;Systematics&#39; has {} entries&quot;</span>,</div>
+<div class="line"><span class="lineno">  320</span>                     Values.size(), systematics.size());</div>
+<div class="line"><span class="lineno">  321</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><span class="lineno">  322</span>    }</div>
+<div class="line"><span class="lineno">  323</span> </div>
+<div class="line"><span class="lineno">  324</span>    <span class="keywordflow">for</span> (std::size_t i = 0; i &lt; systematics.size(); ++i) {</div>
+<div class="line"><span class="lineno">  325</span>      YAML::Node syst = systematics[i][<span class="stringliteral">&quot;Systematic&quot;</span>];</div>
+<div class="line"><span class="lineno">  326</span>      <span class="keywordflow">if</span> (!syst) {</div>
+<div class="line"><span class="lineno">  327</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Missing &#39;Systematic&#39; node at index {}&quot;</span>, i);</div>
+<div class="line"><span class="lineno">  328</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><span class="lineno">  329</span>      }</div>
+<div class="line"><span class="lineno">  330</span> </div>
+<div class="line"><span class="lineno">  331</span>      syst[<span class="stringliteral">&quot;ParameterValues&quot;</span>][<span class="stringliteral">&quot;PreFitValue&quot;</span>] = <a class="code hl_function" href="namespaceMaCh3Utils.html#a37d0c54de0b83b71393afca143ab1ec0">MaCh3Utils::FormatDouble</a>(Values[i], 4);</div>
+<div class="line"><span class="lineno">  332</span>      syst[<span class="stringliteral">&quot;Error&quot;</span>] = std::round(Errors[i] * 100.0) / 100.0;</div>
+<div class="line"><span class="lineno">  333</span> </div>
+<div class="line"><span class="lineno">  334</span>      YAML::Node correlationsNode = YAML::Node(YAML::NodeType::Sequence);</div>
+<div class="line"><span class="lineno">  335</span>      <span class="keywordflow">for</span> (std::size_t j = 0; j &lt; Correlation[i].size(); ++j) {</div>
+<div class="line"><span class="lineno">  336</span>        <span class="keywordflow">if</span> (i == j) <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno">  337</span>        YAML::Node singleEntry;</div>
+<div class="line"><span class="lineno">  338</span>        <span class="keyword">const</span> std::string&amp; otherName = systematics[j][<span class="stringliteral">&quot;Systematic&quot;</span>][<span class="stringliteral">&quot;Names&quot;</span>][<span class="stringliteral">&quot;FancyName&quot;</span>].as&lt;std::string&gt;();</div>
+<div class="line"><span class="lineno">  339</span>        singleEntry[otherName] = <a class="code hl_function" href="namespaceMaCh3Utils.html#a37d0c54de0b83b71393afca143ab1ec0">MaCh3Utils::FormatDouble</a>(Correlation[i][j], 4);</div>
+<div class="line"><span class="lineno">  340</span>        correlationsNode.push_back(singleEntry);</div>
+<div class="line"><span class="lineno">  341</span>      }</div>
+<div class="line"><span class="lineno">  342</span>      syst[<span class="stringliteral">&quot;Correlations&quot;</span>] = correlationsNode;</div>
+<div class="line"><span class="lineno">  343</span>    }</div>
+<div class="line"><span class="lineno">  344</span>  }</div>
+<div class="line"><span class="lineno">  345</span> </div>
+<div class="line"><span class="lineno">  346</span>  <span class="comment">// Convert and write</span></div>
+<div class="line"><span class="lineno">  347</span>  std::string YAMLString = <a class="code hl_function" href="YamlHelper_8h.html#aae72fb06a391f1073add5eed6c6485dd">YAMLtoSTRING</a>(NodeCopy);</div>
+<div class="line"><span class="lineno">  348</span>  <a class="code hl_function" href="namespaceM3.html#a68ab9b6b3d413a94604c740208c7895d">FixSampleNamesQuotes</a>(YAMLString);</div>
+<div class="line"><span class="lineno">  349</span>  std::string OutName = <span class="stringliteral">&quot;UpdatedCorrelationMatrix.yaml&quot;</span>;</div>
+<div class="line"><span class="lineno">  350</span>  std::ofstream outFile(OutName);</div>
+<div class="line"><span class="lineno">  351</span>  <span class="keywordflow">if</span> (!outFile) {</div>
+<div class="line"><span class="lineno">  352</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Failed to open file for writing: {}&quot;</span>, OutName);</div>
+<div class="line"><span class="lineno">  353</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><span class="lineno">  354</span>  }</div>
+<div class="line"><span class="lineno">  355</span> </div>
+<div class="line"><span class="lineno">  356</span>  outFile &lt;&lt; YAMLString;</div>
+<div class="line"><span class="lineno">  357</span>  outFile.close();</div>
+<div class="line"><span class="lineno">  358</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
