@@ -1556,8 +1556,7 @@ TH1* SampleHandlerFD::Get1DVarHist(const std::string& ProjectionVar_Str, const s
     _h1DVar = new TH1D("","",Axis->GetNbins(),Axis->GetXbins()->GetArray());
   } else {
     std::vector<double> xBinEdges;
-    if (!isParticleHist) xBinEdges = ReturnKinematicParameterBinning(ProjectionVar_Str);
-    else xBinEdges = ReturnKinematicVectorBinning(ProjectionVar_Str);
+    xBinEdges = ReturnKinematicParameterBinning(ProjectionVar_Str);
     _h1DVar = new TH1D("", "", int(xBinEdges.size())-1, xBinEdges.data());
   }
 
@@ -1638,14 +1637,8 @@ TH2* SampleHandlerFD::Get2DVarHist(const std::string& ProjectionVar_StrX, const 
     _h2DVar = new TH2D("","",AxisX->GetNbins(),AxisX->GetXbins()->GetArray(),AxisY->GetNbins(),AxisY->GetXbins()->GetArray());
   } else {
     std::vector<double> xBinEdges, yBinEdges;
-    if (!isParticleHist) {
-      xBinEdges = ReturnKinematicParameterBinning(ProjectionVar_StrX);
-      yBinEdges = ReturnKinematicParameterBinning(ProjectionVar_StrY);
-    }
-    else {
-      xBinEdges = ReturnKinematicVectorBinning(ProjectionVar_StrX);
-      yBinEdges = ReturnKinematicVectorBinning(ProjectionVar_StrY);
-    }
+    xBinEdges = ReturnKinematicParameterBinning(ProjectionVar_StrX);
+    yBinEdges = ReturnKinematicParameterBinning(ProjectionVar_StrY);
     _h2DVar = new TH2D("", "", int(xBinEdges.size())-1, xBinEdges.data(), int(yBinEdges.size())-1, yBinEdges.data());
   }
 
