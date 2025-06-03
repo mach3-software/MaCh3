@@ -481,10 +481,13 @@ protected:
   /// Struct containing information about adaption
   std::unique_ptr<ParameterTunes> Tunes;
 
+  /// Indices of parameters with flip symmetry
   std::vector<int>    FlipParameterIndex;
+  /// Central points around which parameters are flipped
   std::vector<double> FlipParameterPoint;
-
+  /// Indices of parameters with circular bounds
   std::vector<int>    CircularBoundsIndex;
+  /// Circular bounds for each parameter (lower, upper)
   std::vector<std::pair<double,double>> CircularBoundsValues;
 
 
