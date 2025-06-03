@@ -325,6 +325,7 @@ enum SystType {
   kNorm,      //!< For normalisation parameters
   kSpline,    //!< For splined parameters (1D)
   kFunc,      //!< For functional parameters
+  kOsc,       //!< For oscillation parameters
   kSystTypes  //!< This only enumerates
 };
 
@@ -359,6 +360,9 @@ inline std::string SystType_ToString(const SystType i) {
     case SystType::kFunc:
       name = "Functional";
       break;
+    case SystType::kOsc:
+      name = "Oscillation";
+      break;
     case SystType::kSystTypes:
       MACH3LOG_ERROR("kSystTypes is not a valid SystType!");
       throw MaCh3Exception(__FILE__, __LINE__);
@@ -369,3 +373,11 @@ inline std::string SystType_ToString(const SystType i) {
   }
   return name;
 }
+
+// *******************
+/// @brief KS: Struct holding info about oscillation Systematics
+/// @note right now it is empty
+struct OscillationParameter : public TypeParameterBase {
+// *******************
+
+};

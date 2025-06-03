@@ -10,7 +10,6 @@
 #endif
 
 #include "Parameters/ParameterHandlerGeneric.h"
-#include "Parameters/ParameterHandlerOsc.h"
 
 /// @file MaCh3Factory.h
 /// @brief Factory methods for MaCh3 software which streamline initialisation of different objects
@@ -115,23 +114,21 @@ std::unique_ptr<CovType> MaCh3CovarianceFactory(manager *FitManager, const std::
 /// @tparam SampleType The class type of the sample to create, e.g., `SampleHandlerTutorial`.
 /// @param SampleConfig Path to sample config.
 /// @param xsec A pointer to a ParameterHandlerGeneric object for cross-section systematic settings.
-/// @param osc (Optional) A pointer to a ParameterHandlerOsc object for oscillation systematic settings.
 /// @return Vector of SampleType object, initialized and ready for use.
 ///
 /// @note Example
 /// ```cpp
-/// auto mySamples = MaCh3SampleHandlerFactory<SampleHandlerTutorial>(SampleConfig, xsec, osc);
+/// auto mySamples = MaCh3SampleHandlerFactory<SampleHandlerTutorial>(SampleConfig, xsec);
 /// ```
 template <typename SampleType>
 std::vector<SampleType*> MaCh3SampleHandlerFactory(const std::vector<std::string>& SampleConfig,
-                                               ParameterHandlerGeneric* xsec,
-                                               ParameterHandlerOsc* osc = nullptr) {
+                                               ParameterHandlerGeneric* xsec) {
 // ********************************************
   std::vector<SampleType*> Handlers(SampleConfig.size());
   for (size_t i = 0; i < SampleConfig.size(); ++i)
   {
     // Instantiate the sample using the specified class type
-    SampleType* Sample = new SampleType(SampleConfig[i], xsec, osc);
+    SampleType* Sample = new SampleType(SampleConfig[i], xsec);
     Sample->Reweight();
 
     // Obtain sample name and create a TString version for histogram naming

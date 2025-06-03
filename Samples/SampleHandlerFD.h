@@ -4,7 +4,6 @@
 #include "Splines/BinnedSplineHandler.h"
 
 #include "Parameters/ParameterHandlerGeneric.h"
-#include "Parameters/ParameterHandlerOsc.h"
 
 #include "Samples/SampleHandlerBase.h"
 #include "Samples/OscillationHandler.h"
@@ -23,7 +22,7 @@ public:
   /// @brief Constructor
   /// @param ConfigFileName Name of config to initialise the sample object
   SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGeneric* xsec_cov,
-                  ParameterHandlerOsc* osc_cov = nullptr, const std::shared_ptr<OscillationHandler>& OscillatorObj_ = nullptr);
+                  const std::shared_ptr<OscillationHandler>& OscillatorObj_ = nullptr);
   /// @brief destructor
   virtual ~SampleHandlerFD();
 
@@ -306,7 +305,6 @@ public:
   //ETA - All experiments will need an xsec, det and osc cov
   //these should be added to SampleHandlerBase to be honest
   ParameterHandlerGeneric *ParHandler = nullptr;
-  ParameterHandlerOsc *OscParHandler = nullptr;
 
   //=============================================================================== 
 

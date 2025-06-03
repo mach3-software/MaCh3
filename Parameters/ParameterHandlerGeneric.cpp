@@ -34,6 +34,7 @@ void ParameterHandlerGeneric::InitParametersTypeFromConfig() {
   NormParams.reserve(_fNumPar);
   SplineParams.reserve(_fNumPar);
   FuncParams.reserve(_fNumPar);
+  OscParams.reserve(_fNumPar);
 
   int i = 0;
   unsigned int ParamCounter[SystType::kSystTypes] = {0};
@@ -72,6 +73,11 @@ void ParameterHandlerGeneric::InitParametersTypeFromConfig() {
       FuncParams.push_back(GetFunctionalParameters(param["Systematic"], i));
       _fSystToGlobalSystIndexMap[SystType::kFunc].insert(std::make_pair(ParamCounter[SystType::kFunc], i));
       ParamCounter[SystType::kFunc]++;
+    } else if(param["Systematic"]["Type"].as<std::string>() == SystType_ToString(SystType::kOsc)){
+      _fParamType[i] = SystType::kOsc;
+      OscParams.push_back(GetOscillationParameters(param["Systematic"], i));
+      _fSystToGlobalSystIndexMap[SystType::kOsc].insert(std::make_pair(ParamCounter[SystType::kOsc], i));
+      ParamCounter[SystType::kOsc]++;
     } else{
       MACH3LOG_ERROR("Given unrecognised systematic type: {}", param["Systematic"]["Type"].as<std::string>());
       std::string expectedTypes = "Expecting ";
@@ -95,6 +101,7 @@ void ParameterHandlerGeneric::InitParametersTypeFromConfig() {
   NormParams.shrink_to_fit();
   SplineParams.shrink_to_fit();
   FuncParams.shrink_to_fit();
+  OscParams.shrink_to_fit();
 }
 
 // ********************************************
@@ -114,7 +121,6 @@ const std::vector<std::string> ParameterHandlerGeneric::GetSplineParsNamesFromSa
     if (AppliesToSample(SystIndex, SampleName)) { //If parameter applies to required Sample
       returnVec.push_back(_fSplineNames.at(SplineIndex));
     }
-
   }
   return returnVec;
 }
@@ -322,6 +328,16 @@ FunctionalParameter ParameterHandlerGeneric::GetFunctionalParameters(const YAML:
 }
 
 // ********************************************
+// Get Osc params
+OscillationParameter ParameterHandlerGeneric::GetOscillationParameters(const YAML::Node& param, const int Index) {
+// ********************************************
+  OscillationParameter OscParamInfo;
+  GetBaseParameter(param, Index, OscParamInfo);
+
+  return OscParamInfo;
+}
+
+// ********************************************
 // HH: Grab the Functional parameters for the relevant SampleName
 const std::vector<FunctionalParameter> ParameterHandlerGeneric::GetFunctionalParametersFromSampleName(const std::string& SampleName) const {
 // ********************************************
@@ -411,6 +427,16 @@ void ParameterHandlerGeneric::InitParams() {
     //ETA - set the name to be xsec_% as this is what ProcessorMCMC expects
     _fNames[i] = "xsec_"+std::to_string(i);
 
+    // KS: Plenty
+    if(_fParamType[i] == kOsc){
+      _fNames[i] = _fFancyNames[i];
+
+      if(_ParameterGroup[i] != "Osc"){
+        MACH3LOG_ERROR("Parameter {}, is of type Oscillation but doesn't belong to Osc group", _fFancyNames[i]);
+        MACH3LOG_ERROR("It belongs to {} group", _ParameterGroup[i]);
+        throw MaCh3Exception(__FILE__ , __LINE__ );
+      }
+    }
     // Set ParameterHandler parameters (Curr = current, Prop = proposed, Sigma = step)
     _fCurrVal[i] = _fPreFitValue[i];
     _fPropVal[i] = _fCurrVal[i];
@@ -436,6 +462,8 @@ void ParameterHandlerGeneric::Print() {
   PrintSplineParams();
 
   PrintFunctionalParams();
+
+  PrintOscillationParams();
 
   PrintParameterGroups();
 
@@ -576,6 +604,22 @@ void ParameterHandlerGeneric::PrintFunctionalParams() {
 }
 
 // ********************************************
+void ParameterHandlerGeneric::PrintOscillationParams() {
+// ********************************************
+  MACH3LOG_INFO("Functional parameters: {}", _fSystToGlobalSystIndexMap[SystType::kOsc].size());
+  if(_fSystToGlobalSystIndexMap[SystType::kOsc].size() == 0) return;
+  MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┐");
+  MACH3LOG_INFO("│{0:4}│{1:10}│{2:40}│", "#", "Global #", "Name");
+  MACH3LOG_INFO("├────┼──────────┼────────────────────────────────────────┤");
+  for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kOsc]) {
+    auto &OscIndex = pair.first;
+    auto &GlobalIndex = pair.second;
+    MACH3LOG_INFO("│{0:4}│{1:<10}│{2:40}│", std::to_string(OscIndex), GlobalIndex, GetParFancyName(GlobalIndex));
+  }
+  MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┘");
+}
+
+// ********************************************
 void ParameterHandlerGeneric::PrintParameterGroups() {
 // ********************************************
   // KS: Create a map to store the counts of unique strings, in principle this could be in header file
@@ -678,6 +722,20 @@ int ParameterHandlerGeneric::GetNumParFromGroup(const std::string& Group) const 
     if(IsParFromGroup(i, Group)) Counter++;
   }
   return Counter;
+}
+
+// ********************************************
+// DB Grab the Normalisation parameters for the relevant sample name
+std::vector<const double*> ParameterHandlerGeneric::GetOscParsFromSampleName(const std::string& SampleName) {
+// ********************************************
+  std::vector<const double*> returnVec;
+  for (const auto& pair : _fSystToGlobalSystIndexMap[SystType::kOsc]) {
+    const auto& globalIndex = pair.second;
+    if (AppliesToSample(globalIndex, SampleName)) {
+      returnVec.push_back(RetPointer(globalIndex));
+    }
+  }
+  return returnVec;
 }
 
 // ********************************************

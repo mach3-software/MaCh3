@@ -1,7 +1,6 @@
 set(HEADERS
     ParameterHandlerUtils.h
     ParameterHandlerBase.h
-    ParameterHandlerOsc.h
     ParameterHandlerGeneric.h
     AdaptiveMCMCHandler.h
     PCAHandler.h
@@ -11,7 +10,6 @@ set(HEADERS
 
 add_library(Parameters SHARED
     ParameterHandlerBase.cpp
-    ParameterHandlerOsc.cpp
     ParameterHandlerGeneric.cpp
     AdaptiveMCMCHandler.cpp
     PCAHandler.cpp

@@ -383,11 +383,6 @@ void MCMCProcessor::MakePostfit() {
   int FDParametersStartingPos = ParamTypeStartPos[kFDDetPar];
   SettingsBranch->Branch("FDParametersStartingPos", &FDParametersStartingPos);
   
-  int OscParameters = nParam[kOSCPar];
-  SettingsBranch->Branch("OscParameters", &OscParameters);
-  int OscParametersStartingPos = ParamTypeStartPos[kOSCPar];
-  SettingsBranch->Branch("OscParametersStartingPos", &OscParametersStartingPos);
-  
   SettingsBranch->Branch("NDSamplesBins", &NDSamplesBins);
   SettingsBranch->Branch("NDSamplesNames", &NDSamplesNames);
 
@@ -1969,7 +1964,12 @@ void MCMCProcessor::ScanInput() {
     Chain->SetBranchStatus(bname.Data(), true);
 
     // If we're on beam systematics
-    if(bname.BeginsWith("xsec_")) 
+    if(bname.BeginsWith("xsec_")   ||
+      bname.BeginsWith("sin2th_")  ||
+      bname.BeginsWith("delm2_")   ||
+      bname.BeginsWith("delta_")   ||
+      bname.BeginsWith("baseline") ||
+      bname.BeginsWith("density"))
     {
       BranchNames.push_back(bname);
       ParamType.push_back(kXSecPar);
@@ -1986,16 +1986,6 @@ void MCMCProcessor::ScanInput() {
       BranchNames.push_back(bname);
       ParamType.push_back(kFDDetPar);
       nParam[kFDDetPar]++;
-    }
-    else if (bname.BeginsWith("sin2th_")  ||
-             bname.BeginsWith("delm2_")   ||
-             bname.BeginsWith("delta_")   ||
-             bname.BeginsWith("baseline") ||
-             bname.BeginsWith("density")   )
-    {
-      BranchNames.push_back(bname);
-      ParamType.push_back(kOSCPar);
-      nParam[kOSCPar]++;
     }
 
     //KS: as a bonus get LogL systematic
@@ -2167,7 +2157,6 @@ void MCMCProcessor::ReadInputCov() {
   if(nParam[kXSecPar] > 0)  ReadXSecFile();
   if(nParam[kNDPar] > 0)    ReadNDFile();
   if(nParam[kFDDetPar] > 0) ReadFDFile();
-  if(nParam[kOSCPar] > 0)   ReadOSCFile();
   //KS: Remove parameters which were removed
   RemoveParameters();
 }
@@ -2227,19 +2216,6 @@ void MCMCProcessor::FindInputFiles() {
     InputNotFound = true;
   }
 
-  //CW: And the Osc Covariance matrix
-  CovPos[kOSCPar] = GetFromManager<std::vector<std::string>>(Settings["General"]["Systematics"]["OscCovFile"], {"none"});
-  if(CovPos[kOSCPar].back() == "none") {
-    MACH3LOG_WARN("Couldn't find OscCov branch in output");
-    InputNotFound = true;
-  }
-  TMacro *OscConfig = CovarianceFolder->Get<TMacro>("Config_osc_cov");
-  if (OscConfig == nullptr) {
-    MACH3LOG_WARN("Didn't find Config_osc_cov tree in MCMC file! {}", MCMCFile);
-  } else {
-    CovConfig[kOSCPar] =  TMacroToYAML(*OscConfig);
-  }
-
   if(InputNotFound) MaCh3Utils::PrintConfig(Settings);
 
   if (const char * mach3_env = std::getenv("MACH3"))
@@ -2252,15 +2228,11 @@ void MCMCProcessor::FindInputFiles() {
 
     for(size_t i = 0; i < CovPos[kFDDetPar].size(); i++)
       CovPos[kFDDetPar][i].insert(0, std::string(mach3_env)+"/");
-
-    for(size_t i = 0; i < CovPos[kOSCPar].size(); i++)
-      CovPos[kOSCPar][i].insert(0, std::string(mach3_env)+"/");
   }
 
   // Delete the TTrees and the input file handle since we've now got the settings we need
   delete Config;
   delete XsecConfig;
-  delete OscConfig;
 
   // Delete the MCMCFile pointer we're reading
   CovarianceFolder->Close();
@@ -2381,33 +2353,6 @@ void MCMCProcessor::ReadFDFile() {
   FDdetFile->Close();
   delete FDdetFile;
   delete FDdetMatrix;
-}
-
-// ***************
-// Read the Osc cov file and get the input central values and errors
-void MCMCProcessor::ReadOSCFile() {
-// ***************
-  YAML::Node OscFile = CovConfig[kOSCPar];;
-
-  auto systematics = OscFile["Systematics"];
-  int i = 0;
-  for (auto it = systematics.begin(); it != systematics.end(); ++it, ++i)
-  {
-    auto const &param = *it;
-
-    // Push back the name
-    std::string TempString = (param["Systematic"]["Names"]["FancyName"].as<std::string>());
-
-    ParamNames[kOSCPar].push_back(TempString);
-
-    ParamCentral[kOSCPar].push_back( param["Systematic"]["ParameterValues"]["PreFitValue"].as<double>() );
-    ParamNom[kOSCPar].push_back( param["Systematic"]["ParameterValues"]["Generated"].as<double>() );
-    ParamErrors[kOSCPar].push_back( param["Systematic"]["Error"].as<double>() );
-
-    bool flat = false;
-    if (param["Systematic"]["FlatPrior"]) { flat = param["Systematic"]["FlatPrior"].as<bool>(); }
-    ParamFlat[kOSCPar].push_back( flat );
-  }
 }
 
 // ***************
@@ -4174,7 +4119,6 @@ void MCMCProcessor::PrintInfo() const {
   }
   MACH3LOG_INFO("# ND params:    \033[1;32m {} starting at {} \033[0m ", nParam[kNDPar], ParamTypeStartPos[kNDPar]);
   MACH3LOG_INFO("# FD params:    \033[1;32m {} starting at {} \033[0m ", nParam[kFDDetPar], ParamTypeStartPos[kFDDetPar]);
-  MACH3LOG_INFO("# Osc params:   \033[1;32m {} starting at {} \033[0m ", nParam[kOSCPar], ParamTypeStartPos[kOSCPar]);
   MACH3LOG_INFO("************************************************");
 }
 
