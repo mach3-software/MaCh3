@@ -489,6 +489,4 @@ protected:
   std::vector<int>    CircularBoundsIndex;
   /// Circular bounds for each parameter (lower, upper)
   std::vector<std::pair<double,double>> CircularBoundsValues;
-
-
 };
