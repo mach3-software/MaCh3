@@ -453,13 +453,9 @@ void SampleHandlerFD::FillArray() {
     }
     //DB - If we end up in this loop, the event has been shifted outside of its nominal bin, but is still within the allowed binning range
     else {
-      for (unsigned int iBin=0;iBin<(XBinEdges.size()-1);iBin++)
-      {
-        if (XVar >= XBinEdges[iBin] && XVar < XBinEdges[iBin+1]) {
-          XBinToFill = iBin;
-          break; // KS: Once found bin stop looping over remaining
-        }
-      }
+      // KS: Perform binary search to find correct bin. We already checked if isn't outside of bounds
+      XBinToFill = static_cast<int>(std::distance(XBinEdges.begin(),
+                                                  std::upper_bound(XBinEdges.begin(), XBinEdges.end(), XVar)) - 1);
     }
 
     //DB Fill relevant part of thread array
@@ -595,11 +591,9 @@ void SampleHandlerFD::FillArray_MP()  {
       }
       //DB - If we end up in this loop, the event has been shifted outside of its nominal bin, but is still within the allowed binning range
       else {
-        for(unsigned int iBin=0;iBin<(XBinEdges.size()-1);iBin++) {
-          if (XVar >= XBinEdges[iBin] && XVar < XBinEdges[iBin+1]) {
-            XBinToFill = iBin;
-          }
-        }
+        // KS: Perform binary search to find correct bin. We already checked if isn't outside of bounds
+        XBinToFill = static_cast<int>(std::distance(XBinEdges.begin(),
+                                                    std::upper_bound(XBinEdges.begin(), XBinEdges.end(), XVar)) - 1);
       }
 
       //ETA - we can probably remove this final if check on the -1?
