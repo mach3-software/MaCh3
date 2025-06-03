@@ -102,6 +102,7 @@ target_compile_options(MaCh3Warnings INTERFACE
   -Wformat-security       # Warn on functions that are potentially insecure for formatting
   -Walloca                # Warn if `alloca` is used, as it can lead to stack overflows
   -Wswitch-enum           # Warn if a `switch` statement on an enum does not cover all values
+  -pedantic               # Enforce strict ISO compliance (all versions of GCC, Clang >= 3.2)
   #-Wfloat-equal          # Warn if floating-point values are compared directly
   #-Wpadded               # Warn when padding is added to a structure or class for alignment
 )
@@ -130,7 +131,6 @@ add_library(MaCh3CompilerOptions INTERFACE)
 target_link_libraries(MaCh3CompilerOptions INTERFACE MaCh3CompileDefinitions)
 target_compile_options(MaCh3CompilerOptions INTERFACE
     -g                      # Generate debug information
-    -pedantic               # Enforce strict ISO compliance (all versions of GCC, Clang >= 3.2)
 )
 
 #If DEBUG_LEVEL was defined but MaCh3_DEBUG_ENABLED not, enable debug flag

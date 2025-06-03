@@ -2,7 +2,7 @@
 
 // MaCh3  includes
 #include "Parameters/ParameterHandlerGeneric.h"
-#include "Samples/Structs.h"
+#include "Parameters/ParameterStructs.h"
 
 #include <cmath>
 
@@ -788,6 +788,77 @@ inline std::vector<std::vector<TF1_red*> > ReduceTF1(std::vector<std::vector<TF1
   } // End outer for loop
   // Now have the reduced vector
   return ReducedVector;
+}
+
+// *********************************
+/// @brief KS: Create Response Function using TGraph
+/// @param graph This holds weights for each "spline" knot
+/// @param SplineRespFuncType Type of response function, whether we use Spline or TF1
+/// @param SplineInterpolationType Interpolation type for example Monotonic Akima etc.
+/// @param Title title you want for ROOT object, isn't very useful as in MaCh3 we usually convert later to something light weight to not waste RAM.
+inline TResponseFunction_red* CreateResponseFunction(TGraph* &graph,
+                                                     const RespFuncType SplineRespFuncType,
+                                                     const SplineInterpolation SplineInterpolationType,
+                                                     const std::string& Title) {
+// *********************************
+  TResponseFunction_red* RespFunc = nullptr;
+
+  if (graph && graph->GetN() > 1)
+  {
+    if(SplineRespFuncType == kTSpline3_red)
+    {
+      // Here's the TSpline3
+      TSpline3* spline = nullptr;
+      TSpline3_red *spline_red = nullptr;
+
+      // Create the TSpline3* from the TGraph* and build the coefficients
+      spline = new TSpline3(Title.c_str(), graph);
+      spline->SetNameTitle(Title.c_str(), Title.c_str());
+
+      // Make the reduced TSpline3 format and delete the old spline
+      spline_red = new TSpline3_red(spline, SplineInterpolationType);
+
+      RespFunc = spline_red;
+    }
+    else if(SplineRespFuncType == kTF1_red)
+    {
+      // The TF1 object we build from fitting the TGraph
+      TF1 *Fitter = nullptr;
+      TF1_red *tf1_red = nullptr;
+
+      if(graph->GetN() != 2) {
+        MACH3LOG_ERROR("Trying to make TF1 from more than 2 knots.  Knots = {}", graph->GetN());
+        MACH3LOG_ERROR("Currently support only linear with 2 knots :(");
+        throw MaCh3Exception(__FILE__ , __LINE__ );
+      }
+
+      // Try simple linear function
+      Fitter = new TF1(Title.c_str(), "([1]+[0]*x)", graph->GetX()[0], graph->GetX()[graph->GetN()-1]);
+      //CW: For 2p2h shape C and O we can't fit a polynomial: try a linear combination of two linear functions around 0
+      //Fitter = new TF1(Title.c_str(), "(x<=0)*(1+[0]*x)+(x>0)*([1]*x+1)", graph->GetX()[0], graph->GetX()[graph->GetN()-1]);
+      // Fit 5hd order polynomial for all other parameters
+      //Fitter = new TF1(Title.c_str(), "1+[0]*x+[1]*x*x+[2]*x*x*x+[3]*x*x*x*x+[4]*x*x*x*x*x", graph->GetX()[0], graph->GetX()[graph->GetN()-1]);
+      //Pseudo Heaviside for Pauli Blocking
+      //Fitter = new TF1(Title.c_str(), "(x <= 0)*(1+[0]*x) + (1 >= x)*(x > 0)*(1+[1]*x) + (x > 1)*([3]+[2]*x)", graph->GetX()[0], graph->GetX()[graph->GetN()-1]);
+
+      // Fit the TF1 to the graph
+      graph->Fit(Fitter, "Q0");
+      // Make the reduced TF1 if we want
+      tf1_red = new TF1_red(Fitter);
+
+      RespFunc = tf1_red;
+    }
+    else
+    {
+      MACH3LOG_ERROR("Unsupported response function type");
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
+  }
+  else
+  {
+    RespFunc = nullptr;
+  }
+  return RespFunc;
 }
 
 #pragma GCC diagnostic pop

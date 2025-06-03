@@ -1,5 +1,4 @@
 #include "SampleHandlerFD.h"
-#include "Samples/Structs.h"
 #include "Manager/MaCh3Exception.h"
 #include "Manager/MaCh3Logger.h"
 #include <cstddef>
@@ -476,6 +475,7 @@ void SampleHandlerFD::FillArray() {
       {
         if (XVar >= XBinEdges[iBin] && XVar < XBinEdges[iBin+1]) {
           XBinToFill = iBin;
+          break; // KS: Once found bin stop looping over remaining
         }
       }
     }

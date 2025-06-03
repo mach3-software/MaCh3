@@ -44,6 +44,14 @@ jobs:
           valgrind --suppressions="$ROOTSYS/etc/valgrind-root.supp" --log-file="ValgrindMCMC.txt" --leak-check=yes --track-origins=yes --leak-check=full --show-leak-kinds=all ./bin/MCMCTutorial TutorialConfigs/FitterConfig.yaml General:MCMC:NSteps:10
           valgrind --tool=massif --massif-out-file=MassifMCMC.txt ./bin/MCMCTutorial TutorialConfigs/FitterConfig.yaml General:MCMC:NSteps:10
 
+      - name: Get Dependency Graph
+        run: |
+          cd /opt/
+          git clone --branch main https://github.com/mach3-software/MaCh3.git MaCh3Cmake
+          cd MaCh3Cmake
+          mkdir build && cd build
+          cmake ../ -DMaCh3_DependancyGraph=ON
+          make -j4 install
 
       - name: Checkout different branch and push plot
         run: |
@@ -52,10 +60,12 @@ jobs:
           git checkout gh-profiling
           mv /opt/MaCh3Validations/build/ValgrindMCMC.txt .
           mv /opt/MaCh3Validations/build/MassifMCMC.txt .
+          mv /opt/MaCh3Cmake/build/foo.png ./Graph.png
 
           git config --global user.email "github-actions@github.com"
           git config --global user.name "github-actions"
           git add ValgrindMCMC.txt
           git add MassifMCMC.txt
+          git add Graph.png
           git commit -m "Update Valgrind files"
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/mach3-software/MaCh3.git gh-profiling

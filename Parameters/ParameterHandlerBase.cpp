@@ -2,8 +2,7 @@
 #include "regex"
 
 // ********************************************
-ParameterHandlerBase::ParameterHandlerBase(std::string name, std::string file, double threshold, int FirstPCA, int LastPCA) : inputFile(file), pca(false),
-eigen_threshold(threshold), FirstPCAdpar(FirstPCA), LastPCAdpar(LastPCA) {
+ParameterHandlerBase::ParameterHandlerBase(std::string name, std::string file, double threshold, int FirstPCA, int LastPCA) : inputFile(file), pca(false) {
 // ********************************************
   MACH3LOG_DEBUG("Constructing instance of ParameterHandler");
   if (threshold < 0 || threshold >= 1) {
@@ -17,10 +16,10 @@ eigen_threshold(threshold), FirstPCAdpar(FirstPCA), LastPCAdpar(LastPCA) {
   Init(name, file);
 
   // Call the innocent helper function
-  if (pca) ConstructPCA();
+  if (pca) ConstructPCA(threshold, FirstPCA, LastPCA);
 }
 // ********************************************
-ParameterHandlerBase::ParameterHandlerBase(const std::vector<std::string>& YAMLFile, std::string name, double threshold, int FirstPCA, int LastPCA) : inputFile(YAMLFile[0].c_str()), matrixName(name), pca(true), eigen_threshold(threshold), FirstPCAdpar(FirstPCA), LastPCAdpar(LastPCA) {
+ParameterHandlerBase::ParameterHandlerBase(const std::vector<std::string>& YAMLFile, std::string name, double threshold, int FirstPCA, int LastPCA) : inputFile(YAMLFile[0].c_str()), matrixName(name), pca(true) {
 // ********************************************
   MACH3LOG_INFO("Constructing instance of ParameterHandler using");
   for(unsigned int i = 0; i < YAMLFile.size(); i++)
@@ -39,7 +38,7 @@ ParameterHandlerBase::ParameterHandlerBase(const std::vector<std::string>& YAMLF
 
   Init(YAMLFile);
   // Call the innocent helper function
-  if (pca) ConstructPCA();
+  if (pca) ConstructPCA(threshold, FirstPCA, LastPCA);
 }
 
 // ********************************************
@@ -60,7 +59,7 @@ ParameterHandlerBase::~ParameterHandlerBase(){
 }
 
 // ********************************************
-void ParameterHandlerBase::ConstructPCA() {
+void ParameterHandlerBase::ConstructPCA(const double eigen_threshold, int FirstPCAdpar, int LastPCAdpar) {
 // ********************************************
   if(AdaptiveHandler) {
     MACH3LOG_ERROR("Adaption has been enabled and now trying to enable PCA. Right now both configuration don't work with each other");
@@ -87,7 +86,7 @@ void ParameterHandlerBase::ConstructPCA() {
 }
 
 // ********************************************
-void ParameterHandlerBase::Init(std::string name, std::string file) {
+void ParameterHandlerBase::Init(const std::string& name, const std::string& file) {
 // ********************************************
   // Set the covariance matrix from input ROOT file (e.g. flux, ND280, NIWG)
   TFile *infile = new TFile(file.c_str(), "READ");
@@ -376,12 +375,12 @@ void ParameterHandlerBase::ThrowParameters() {
   // First draw new randParams
   Randomize();
 
+  M3::MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
+
   // KS: We use PCA very rarely on top PCA functionality isn't implemented for this function.
   // Use __builtin_expect to give compiler a hint which option is more likely, which should help
   // with better optimisation. This isn't critical but more to have example
   if (__builtin_expect(!pca, 1)) {
-    MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
-
     #ifdef MULTITHREAD
     #pragma omp parallel for
     #endif
@@ -394,7 +393,7 @@ void ParameterHandlerBase::ThrowParameters() {
       // Try again if we the initial parameter proposal falls outside of the range of the parameter
       while (_fPropVal[i] > _fUpBound[i] || _fPropVal[i] < _fLowBound[i]) {
         randParams[i] = random_number[M3::GetThreadIndex()]->Gaus(0, 1);
-        const double corr_throw_single = MatrixVectorMultiSingle(throwMatrixCholDecomp, randParams, _fNumPar, i);
+        const double corr_throw_single = M3::MatrixVectorMultiSingle(throwMatrixCholDecomp, randParams, _fNumPar, i);
         _fPropVal[i] = _fPreFitValue[i] + corr_throw_single;
         if (throws > 10000) 
         {
@@ -415,10 +414,10 @@ void ParameterHandlerBase::ThrowParameters() {
   }
   else
   {
-    MACH3LOG_CRITICAL("Hold on, you are trying to run Prior Predictive Code with PCA, which is wrong");
-    MACH3LOG_CRITICAL("Sorry I have to kill you, I mean your job");
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
+    PCAObj->ThrowParameters(random_number, throwMatrixCholDecomp,
+                            randParams, corr_throw,
+                            _fPreFitValue, _fLowBound, _fUpBound, _fNumPar);
+  } // end if pca
 }
 
 // *************************************
@@ -513,13 +512,13 @@ void ParameterHandlerBase::Randomize() _noexcept_ {
     #ifdef MULTITHREAD
     #pragma omp parallel for
     #endif
-    for (int i = 0; i < _fNumPar; ++i)
+    for (int i = 0; i < PCAObj->GetNumberPCAedParameters(); ++i)
     {
-      if (PCAObj->IsParameterFixedPCA(i) > 0. && i < PCAObj->GetNumberPCAedParameters())
-      {
-        randParams[i] = random_number[M3::GetThreadIndex()]->Gaus(0,1);
-      } else { // If parameter IS fixed or out of bounds
+      // If parameter IS fixed or out of bounds
+      if (PCAObj->IsParameterFixedPCA(i)) {
         randParams[i] = 0.0;
+      } else {
+        randParams[i] = random_number[M3::GetThreadIndex()]->Gaus(0,1);
       }
     }
   }
@@ -530,7 +529,7 @@ void ParameterHandlerBase::Randomize() _noexcept_ {
 void ParameterHandlerBase::CorrelateSteps() _noexcept_ {
 // ************************************************
   //KS: Using custom function compared to ROOT one with 8 threads we have almost factor 2 performance increase, by replacing TMatrix with just double we increase it even more
-  MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
+  M3::MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
 
   // If not doing PCA
   if (!pca) {
@@ -572,7 +571,7 @@ void ParameterHandlerBase::ThrowParProp(const double mag) {
   Randomize();
   if (!pca) {
     // Make the correlated throw
-    MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
+    M3::MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
     // Number of sigmas we throw
     for (int i = 0; i < _fNumPar; i++) {
       if (_fError[i] > 0.)
@@ -590,7 +589,7 @@ void ParameterHandlerBase::ThrowParCurr(const double mag) {
   Randomize();
   if (!pca) {
     // Get the correlated throw vector
-    MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
+    M3::MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
     // The number of sigmas to throw
     // Should probably have this as a default parameter input to the function instead
     for (int i = 0; i < _fNumPar; i++) {
@@ -755,6 +754,19 @@ void ParameterHandlerBase::SetStepScale(const double scale) {
 }
 
 // ********************************************
+int ParameterHandlerBase::GetParIndex(const std::string& name) const {
+// ********************************************
+  int Index = M3::_BAD_INT_;
+  for (int i = 0; i <_fNumPar; ++i) {
+    if(name == _fFancyNames[i]) {
+      Index = i;
+      break;
+    }
+  }
+  return Index;
+}
+
+// ********************************************
 void ParameterHandlerBase::ToggleFixAllParameters() {
 // ********************************************
   // fix or unfix all parameters by multiplying by -1
@@ -785,24 +797,24 @@ void ParameterHandlerBase::ToggleFixParameter(const int i) {
 // ********************************************
 void ParameterHandlerBase::ToggleFixParameter(const std::string& name) {
 // ********************************************
-  for (int i = 0; i <_fNumPar; ++i) {
-    if(name == _fFancyNames[i]) {
-      ToggleFixParameter(i);
-      return;
-    }
+  const int Index = GetParIndex(name);
+  if(Index != M3::_BAD_INT_) {
+    ToggleFixParameter(Index);
+    return;
   }
+
   MACH3LOG_WARN("I couldn't find parameter with name {}, therefore will not fix it", name);
 }
 
 // ********************************************
 bool ParameterHandlerBase::IsParameterFixed(const std::string& name) const {
 // ********************************************
-  for (int i = 0; i <_fNumPar; ++i) {
-    if(name == _fFancyNames[i]) {
-      return IsParameterFixed(i);
-    }
+  const int Index = GetParIndex(name);
+  if(Index != M3::_BAD_INT_) {
+    return IsParameterFixed(Index);
   }
-  MACH3LOG_WARN("I couldn't find parameter with name {}, therefore will not fix it", name);
+
+  MACH3LOG_WARN("I couldn't find parameter with name {}, therefore don't know if it fixed", name);
   return false;
 }
 
@@ -823,40 +835,6 @@ void ParameterHandlerBase::SetFlatPrior(const int i, const bool eL) {
     }
     _fFlatPrior[i] = eL;
   }
-}
-
-// ********************************************
-//KS: Custom function to perform multiplication of matrix and vector with multithreading
-void ParameterHandlerBase::MatrixVectorMulti(double* _restrict_ VecMulti, double** _restrict_ matrix, const double* _restrict_ vector, const int n) const {
-// ********************************************
-  #ifdef MULTITHREAD
-  #pragma omp parallel for
-  #endif
-  for (int i = 0; i < n; ++i)
-  {
-    double result = 0.0;
-    #ifdef MULTITHREAD
-    #pragma omp simd
-    #endif
-    for (int j = 0; j < n; ++j)
-    {
-      result += matrix[i][j]*vector[j];
-    }
-    VecMulti[i] = result;
-  }
-}
-
-// ********************************************
-double ParameterHandlerBase::MatrixVectorMultiSingle(double** _restrict_ matrix, const double* _restrict_ vector, const int Length, const int i) const {
-// ********************************************
-  double Element = 0.0;
-  #ifdef MULTITHREAD
-  #pragma omp simd
-  #endif
-  for (int j = 0; j < Length; ++j) {
-    Element += matrix[i][j]*vector[j];
-  }
-  return Element;
 }
 
 // ********************************************

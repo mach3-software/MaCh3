@@ -6,7 +6,7 @@
 #include "Splines/SplineBase.h"
 #include "Splines/SplineMonolith.h"
 #include "Splines/SplineStructs.h"
-#include "Samples/Structs.h" // <- The spline stuff that's in here should really be moved to splineStructs.h but I ain't doing that right now
+#include "Samples/SampleStructs.h" // <- The spline stuff that's in here should really be moved to splineStructs.h but I ain't doing that right now
 // ROOT includes
 #include "TSpline.h"
 
