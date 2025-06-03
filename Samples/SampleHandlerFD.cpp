@@ -337,7 +337,6 @@ void SampleHandlerFD::SetupSampleBinning(){
 bool SampleHandlerFD::IsEventSelected(const int iEvent) {
 // ************************************************
   for (unsigned int iSelection=0;iSelection < Selection.size() ;iSelection++) {
-    if (Selection[iSelection].isParticleVar) continue;
     const double Val = ReturnKinematicParameter(Selection[iSelection].ParamToCutOnIt, iEvent);
     if ((Val < Selection[iSelection].LowerBound) || (Val >= Selection[iSelection].UpperBound)) {
       return false;
@@ -348,16 +347,15 @@ bool SampleHandlerFD::IsEventSelected(const int iEvent) {
 }
 
 // === JM Define function to check if particle is selected ===
-bool SampleHandlerFD::IsParticleSelected(const int iEvent, const unsigned int iParticle) {
-  for (unsigned int iSelection=0;iSelection < Selection.size() ;iSelection++) {
-    if (!Selection[iSelection].isParticleVar) continue;
-    std::vector<double> Vec = ReturnKinematicVector(Selection[iSelection].ParamToCutOnIt, iEvent);
-    if (iParticle >= Vec.size()) {
-      MACH3LOG_ERROR("Particle index out of range of kinematic cut");
+bool SampleHandlerFD::IsParticleSelected(const std::vector<KinematicCut> &ParticleCuts, const int iEvent, const unsigned int iParticle, size_t nparticles) {
+  for (unsigned int iSelection=0;iSelection < ParticleCuts.size() ;iSelection++) {
+    std::vector<double> Vec = ReturnKinematicVector(ParticleCuts[iSelection].ParamToCutOnIt, iEvent);
+    if (nparticles != Vec.size()) {
+      MACH3LOG_ERROR("Cannot apply kinematic cut on {} as it is of different size to plotting variable");
       throw MaCh3Exception(__FILE__, __LINE__);
     }
     const double Val = Vec[iParticle];
-    if ((Val < Selection[iSelection].LowerBound) || (Val >= Selection[iSelection].UpperBound)) {
+    if ((Val < ParticleCuts[iSelection].LowerBound) || (Val >= ParticleCuts[iSelection].UpperBound)) {
       return false;
     }
   }
@@ -1522,7 +1520,8 @@ void SampleHandlerFD::InitialiseSplineObject() {
 }
 
 // === JM adjust GetNDVarHist functions to allow for particle-level plotting ===
-TH1* SampleHandlerFD::Get1DVarHist(const std::string& ProjectionVar_Str, bool isParticleHist, const std::vector< KinematicCut >& SelectionVec, int WeightStyle, TAxis* Axis) {
+TH1* SampleHandlerFD::Get1DVarHist(const std::string& ProjectionVar_Str, const std::vector< KinematicCut >& SelectionVec, int WeightStyle, TAxis* Axis) {
+  bool isParticleHist = IsParticleVarString(ProjectionVar_Str);
   //DB Grab the associated enum with the argument string
   int ProjectionVar_Int;
   if (!isParticleHist) ProjectionVar_Int = ReturnKinematicParameterFromString(ProjectionVar_Str);
@@ -1533,6 +1532,9 @@ TH1* SampleHandlerFD::Get1DVarHist(const std::string& ProjectionVar_Str, bool is
   std::vector< KinematicCut > tmp_Selection = Selection;
   std::vector< KinematicCut > SelectionVecToApply;
 
+  //JM Separate vector for particle-level kinematic cuts
+  std::vector< KinematicCut > ParticleCuts;
+
   //DB Add all the predefined selections to the selection vector which will be applied
   for (size_t iSelec=0;iSelec<Selection.size();iSelec++) {
     SelectionVecToApply.emplace_back(Selection[iSelec]);
@@ -1540,7 +1542,9 @@ TH1* SampleHandlerFD::Get1DVarHist(const std::string& ProjectionVar_Str, bool is
 
   //DB Add all requested cuts from the argument to the selection vector which will be applied
   for (size_t iSelec=0;iSelec<SelectionVec.size();iSelec++) {
-    SelectionVecToApply.emplace_back(SelectionVec[iSelec]);
+    //JM If particle-level cut, append to a different vector (avoids checking this in IsEventSelected)
+    if (SelectionVec[iSelec].isParticleVar) ParticleCuts.emplace_back(SelectionVec[iSelec]);
+    else SelectionVecToApply.emplace_back(SelectionVec[iSelec]);
   }
 
   //DB Set the member variable to be the cuts to apply
@@ -1570,9 +1574,10 @@ TH1* SampleHandlerFD::Get1DVarHist(const std::string& ProjectionVar_Str, bool is
       }
       else {
         std::vector<double> Vec = ReturnKinematicVector(ProjectionVar_Int,iEvent);
+        size_t nparticles = Vec.size();
         //JM Loop over all particles in event
-        for (unsigned int iParticle = 0; iParticle < Vec.size(); iParticle++) {
-          if (IsParticleSelected(iEvent, iParticle)) {
+        for (unsigned int iParticle = 0; iParticle < nparticles; iParticle++) {
+          if (IsParticleSelected(ParticleCuts, iEvent, iParticle, nparticles)) {
             double Var = Vec[iParticle];
             _h1DVar->Fill(Var,Weight);
           }
@@ -1588,24 +1593,29 @@ TH1* SampleHandlerFD::Get1DVarHist(const std::string& ProjectionVar_Str, bool is
 }
 
 // ************************************************
-TH2* SampleHandlerFD::Get2DVarHist(const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY, bool isParticleHist,
+TH2* SampleHandlerFD::Get2DVarHist(const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY,
     const std::vector< KinematicCut >& SelectionVec, int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
   // ************************************************
+  bool isParticleXVar = IsParticleVarString(ProjectionVar_StrX);
+  bool isParticleYVar = IsParticleVarString(ProjectionVar_StrY);
+  bool isParticleHist = isParticleXVar || isParticleYVar;
+
   //DB Grab the associated enum with the argument string
   int ProjectionVar_IntX, ProjectionVar_IntY;
-  if (!isParticleHist) {
-    ProjectionVar_IntX = ReturnKinematicParameterFromString(ProjectionVar_StrX);
-    ProjectionVar_IntY = ReturnKinematicParameterFromString(ProjectionVar_StrY);
-  }
-  else {
-    ProjectionVar_IntX = ReturnKinematicVectorFromString(ProjectionVar_StrX);
-    ProjectionVar_IntY = ReturnKinematicVectorFromString(ProjectionVar_StrY);
-  }
+  
+  if (!isParticleXVar) ProjectionVar_IntX = ReturnKinematicParameterFromString(ProjectionVar_StrX);
+  else ProjectionVar_IntX = ReturnKinematicVectorFromString(ProjectionVar_StrX);
+  
+  if (!isParticleYVar) ProjectionVar_IntY = ReturnKinematicParameterFromString(ProjectionVar_StrY);
+  else ProjectionVar_IntY = ReturnKinematicVectorFromString(ProjectionVar_StrY);
 
   //DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.
   //   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset
   std::vector< KinematicCut > tmp_Selection = Selection;
   std::vector< KinematicCut > SelectionVecToApply;
+
+  //JM Separate vector for particle-level kinematic cuts
+  std::vector< KinematicCut > ParticleCuts;
 
   //DB Add all the predefined selections to the selection vector which will be applied
   for (size_t iSelec=0;iSelec<Selection.size();iSelec++) {
@@ -1614,7 +1624,9 @@ TH2* SampleHandlerFD::Get2DVarHist(const std::string& ProjectionVar_StrX, const 
 
   //DB Add all requested cuts from the argument to the selection vector which will be applied
   for (size_t iSelec=0;iSelec<SelectionVec.size();iSelec++) {
-    SelectionVecToApply.emplace_back(SelectionVec[iSelec]);
+    //JM If particle-level cut, append to a different vector (avoids checking this in IsEventSelected)
+    if (SelectionVec[iSelec].isParticleVar) ParticleCuts.emplace_back(SelectionVec[iSelec]);
+    else SelectionVecToApply.emplace_back(SelectionVec[iSelec]);
   }
 
   //DB Set the member variable to be the cuts to apply
@@ -1640,27 +1652,44 @@ TH2* SampleHandlerFD::Get2DVarHist(const std::string& ProjectionVar_StrX, const 
   //DB Loop over all events
   for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
     if (IsEventSelected(iEvent)) {
+      double VarX = M3::_BAD_DOUBLE_, VarY = M3::_BAD_DOUBLE_;
       double Weight = GetEventWeight(iEvent);
       if (WeightStyle == 1) {
         Weight = 1.;
       }
       if (!isParticleHist) {
-        double VarX = ReturnKinematicParameter(ProjectionVar_IntX, iEvent);
-        double VarY = ReturnKinematicParameter(ProjectionVar_IntY, iEvent);
+        VarX = ReturnKinematicParameter(ProjectionVar_IntX, iEvent);
+        VarY = ReturnKinematicParameter(ProjectionVar_IntY, iEvent);
         _h2DVar->Fill(VarX,VarY,Weight);
       }
       else {
-        std::vector<double> VecX = ReturnKinematicVector(ProjectionVar_IntX, iEvent);
-        std::vector<double> VecY = ReturnKinematicVector(ProjectionVar_IntY, iEvent);
-        if (VecX.size() != VecY.size()) {
-          MACH3LOG_ERROR("Cannot plot {} of size {} against {} of size {}", ProjectionVar_StrX, VecX.size(), ProjectionVar_StrY, VecY.size());
-          throw MaCh3Exception(__FILE__, __LINE__);
+        std::vector<double> VecX = {}, VecY = {};
+        size_t nparticles = 0;
+        // JM Three cases: particleX vs eventY || eventX vs particleY || particleX vs particleY
+        if (isParticleXVar && !isParticleYVar) {
+          VecX = ReturnKinematicVector(ProjectionVar_IntX, iEvent);
+          VarY = ReturnKinematicParameter(ProjectionVar_IntY, iEvent);
+          nparticles = VecX.size();
+        }
+        else if (!isParticleXVar && isParticleYVar) {
+          VecY = ReturnKinematicVector(ProjectionVar_IntY, iEvent);
+          VarX = ReturnKinematicParameter(ProjectionVar_IntX, iEvent);
+          nparticles = VecY.size();
+        }
+        else {
+          VecX = ReturnKinematicVector(ProjectionVar_IntX, iEvent);
+          VecY = ReturnKinematicVector(ProjectionVar_IntY, iEvent);
+          if (VecX.size() != VecY.size()) {
+            MACH3LOG_ERROR("Cannot plot {} of size {} against {} of size {}", ProjectionVar_StrX, VecX.size(), ProjectionVar_StrY, VecY.size());
+            throw MaCh3Exception(__FILE__, __LINE__);
+          }
+          nparticles = VecX.size();
         }
         //JM Loop over all particles in event
-        for (unsigned int iParticle = 0; iParticle < VecX.size(); iParticle++) {
-          if (IsParticleSelected(iEvent, iParticle)) {
-            double VarX = VecX[iParticle];
-            double VarY = VecY[iParticle];
+        for (unsigned int iParticle = 0; iParticle < nparticles; iParticle++) {
+          if (IsParticleSelected(ParticleCuts, iEvent, iParticle, nparticles)) {
+            if (isParticleXVar) VarX = VecX[iParticle];
+            if (isParticleYVar) VarY = VecY[iParticle];
             _h2DVar->Fill(VarX,VarY,Weight);
           }
         }
@@ -1708,7 +1737,7 @@ int SampleHandlerFD::ReturnKinematicVectorFromString(const std::string& Kinemati
   auto it = KinematicVectors->find(KinematicVectorStr);
   if (it != KinematicVectors->end()) return it->second;
 
-  MACH3LOG_ERROR("Did not recognise Kinematic Vector type: {}", KinematicVectorStr);
+  MACH3LOG_ERROR("Did not recognise Kinematic Vector: {}", KinematicVectorStr);
   throw MaCh3Exception(__FILE__, __LINE__);
 
   return M3::_BAD_INT_;
@@ -1722,14 +1751,25 @@ std::string SampleHandlerFD::ReturnStringFromKinematicVector(const int Kinematic
     return it->second;
   }
 
-  MACH3LOG_ERROR("Did not recognise Kinematic Vector type: {}", KinematicVector);
+  MACH3LOG_ERROR("Did not recognise Kinematic Vector: {}", KinematicVector);
   throw MaCh3Exception(__FILE__, __LINE__);
 
   return "";
 }
+
+bool SampleHandlerFD::IsParticleVarString(const std::string& VarStr) {
+  if (KinematicVectors->count(VarStr)) {
+    if (!KinematicParameters->count(VarStr)) return true;
+    else {
+      MACH3LOG_ERROR("Attempted to plot kinematic variable {}, but it appears in both KinematicVectors and KinematicParameters");
+      throw MaCh3Exception(__FILE__,__LINE__);
+    }
+  }
+  return false;
+}
 // ===============================================================
 
-TH1* SampleHandlerFD::Get1DVarHistByModeAndChannel(const std::string& ProjectionVar_Str, bool isParticleHist,
+TH1* SampleHandlerFD::Get1DVarHistByModeAndChannel(const std::string& ProjectionVar_Str, 
     int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* Axis) {
   bool fChannel;
   bool fMode;
@@ -1776,10 +1816,10 @@ TH1* SampleHandlerFD::Get1DVarHistByModeAndChannel(const std::string& Projection
     SelectionVec.push_back(SelecChannel);
   }
 
-  return Get1DVarHist(ProjectionVar_Str,isParticleHist,SelectionVec,WeightStyle,Axis);
+  return Get1DVarHist(ProjectionVar_Str,SelectionVec,WeightStyle,Axis);
 }
 
-TH2* SampleHandlerFD::Get2DVarHistByModeAndChannel(const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY, bool isParticleHist,
+TH2* SampleHandlerFD::Get2DVarHistByModeAndChannel(const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY, 
     int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
   bool fChannel;
   bool fMode;
@@ -1826,7 +1866,7 @@ TH2* SampleHandlerFD::Get2DVarHistByModeAndChannel(const std::string& Projection
     SelectionVec.push_back(SelecChannel);
   }
 
-  return Get2DVarHist(ProjectionVar_StrX,ProjectionVar_StrY,isParticleHist,SelectionVec,WeightStyle,AxisX,AxisY);
+  return Get2DVarHist(ProjectionVar_StrX,ProjectionVar_StrY,SelectionVec,WeightStyle,AxisX,AxisY);
 }
 
 void SampleHandlerFD::PrintIntegral(TString OutputFileName, int WeightStyle, TString OutputCSVFileName) {
@@ -1969,7 +2009,7 @@ void SampleHandlerFD::PrintIntegral(TString OutputFileName, int WeightStyle, TSt
   }
 }
 
-std::vector<TH1*> SampleHandlerFD::ReturnHistsBySelection1D(std::string KinematicProjection, int Selection1, bool isParticleHist, int Selection2, int WeightStyle, TAxis* XAxis) {
+std::vector<TH1*> SampleHandlerFD::ReturnHistsBySelection1D(std::string KinematicProjection, int Selection1, int Selection2, int WeightStyle, TAxis* XAxis) {
   std::vector<TH1*> hHistList;
   std::string legendEntry;
 
@@ -1990,14 +2030,14 @@ std::vector<TH1*> SampleHandlerFD::ReturnHistsBySelection1D(std::string Kinemati
 
   for (int i=0;i<iMax;i++) {
     if (Selection1==0) {
-      hHistList.push_back(Get1DVarHistByModeAndChannel(KinematicProjection,isParticleHist,i,Selection2,WeightStyle,XAxis));
+      hHistList.push_back(Get1DVarHistByModeAndChannel(KinematicProjection,i,Selection2,WeightStyle,XAxis));
       THStackLeg->AddEntry(hHistList[i],(Modes->GetMaCh3ModeName(i)+Form(" : (%4.2f)",hHistList[i]->Integral())).c_str(),"f");
 
       hHistList[i]->SetFillColor(static_cast<Color_t>(Modes->GetMaCh3ModePlotColor(i)));
       hHistList[i]->SetLineColor(static_cast<Color_t>(Modes->GetMaCh3ModePlotColor(i)));
     }
     if (Selection1==1) {
-      hHistList.push_back(Get1DVarHistByModeAndChannel(KinematicProjection,isParticleHist,Selection2,i,WeightStyle,XAxis));
+      hHistList.push_back(Get1DVarHistByModeAndChannel(KinematicProjection,Selection2,i,WeightStyle,XAxis));
       THStackLeg->AddEntry(hHistList[i],(OscChannels[i].flavourName+Form(" | %4.2f",hHistList[i]->Integral())).c_str(),"f");
     }
   }
@@ -2006,7 +2046,7 @@ std::vector<TH1*> SampleHandlerFD::ReturnHistsBySelection1D(std::string Kinemati
 }
 
 std::vector<TH2*> SampleHandlerFD::ReturnHistsBySelection2D(std::string KinematicProjectionX, std::string KinematicProjectionY,
-    int Selection1, bool isParticleHist, int Selection2, int WeightStyle, 
+    int Selection1, int Selection2, int WeightStyle, 
     TAxis* XAxis, TAxis* YAxis) {
   std::vector<TH2*> hHistList;
 
@@ -2024,18 +2064,18 @@ std::vector<TH2*> SampleHandlerFD::ReturnHistsBySelection2D(std::string Kinemati
 
   for (int i=0;i<iMax;i++) {
     if (Selection1==0) {
-      hHistList.push_back(Get2DVarHistByModeAndChannel(KinematicProjectionX,KinematicProjectionY,isParticleHist,i,Selection2,WeightStyle,XAxis,YAxis));
+      hHistList.push_back(Get2DVarHistByModeAndChannel(KinematicProjectionX,KinematicProjectionY,i,Selection2,WeightStyle,XAxis,YAxis));
     }
     if (Selection1==1) {
-      hHistList.push_back(Get2DVarHistByModeAndChannel(KinematicProjectionX,KinematicProjectionY,isParticleHist,Selection2,i,WeightStyle,XAxis,YAxis));
+      hHistList.push_back(Get2DVarHistByModeAndChannel(KinematicProjectionX,KinematicProjectionY,Selection2,i,WeightStyle,XAxis,YAxis));
     }
   }
 
   return hHistList;
 }
 
-THStack* SampleHandlerFD::ReturnStackedHistBySelection1D(std::string KinematicProjection, int Selection1, bool isParticleHist, int Selection2, int WeightStyle, TAxis* XAxis) {
-  std::vector<TH1*> HistList = ReturnHistsBySelection1D(KinematicProjection, Selection1, isParticleHist, Selection2, WeightStyle, XAxis);
+THStack* SampleHandlerFD::ReturnStackedHistBySelection1D(std::string KinematicProjection, int Selection1, int Selection2, int WeightStyle, TAxis* XAxis) {
+  std::vector<TH1*> HistList = ReturnHistsBySelection1D(KinematicProjection, Selection1, Selection2, WeightStyle, XAxis);
   THStack* StackHist = new THStack((GetTitle()+"_"+KinematicProjection+"_Stack").c_str(),"");
   for (unsigned int i=0;i<HistList.size();i++) {
     StackHist->Add(HistList[i]);
