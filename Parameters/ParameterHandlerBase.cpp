@@ -375,12 +375,12 @@ void ParameterHandlerBase::ThrowParameters() {
   // First draw new randParams
   Randomize();
 
+  M3::MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
+
   // KS: We use PCA very rarely on top PCA functionality isn't implemented for this function.
   // Use __builtin_expect to give compiler a hint which option is more likely, which should help
   // with better optimisation. This isn't critical but more to have example
   if (__builtin_expect(!pca, 1)) {
-    M3::MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
-
     #ifdef MULTITHREAD
     #pragma omp parallel for
     #endif
@@ -414,10 +414,10 @@ void ParameterHandlerBase::ThrowParameters() {
   }
   else
   {
-    MACH3LOG_CRITICAL("Hold on, you are trying to run Prior Predictive Code with PCA, which is wrong");
-    MACH3LOG_CRITICAL("Sorry I have to kill you, I mean your job");
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
+    PCAObj->ThrowParameters(random_number, throwMatrixCholDecomp,
+                            randParams, corr_throw,
+                            _fPreFitValue, _fLowBound, _fUpBound, _fNumPar);
+  } // end if pca
 }
 
 // *************************************
@@ -512,13 +512,13 @@ void ParameterHandlerBase::Randomize() _noexcept_ {
     #ifdef MULTITHREAD
     #pragma omp parallel for
     #endif
-    for (int i = 0; i < _fNumPar; ++i)
+    for (int i = 0; i < PCAObj->GetNumberPCAedParameters(); ++i)
     {
-      if (PCAObj->IsParameterFixedPCA(i) > 0. && i < PCAObj->GetNumberPCAedParameters())
-      {
-        randParams[i] = random_number[M3::GetThreadIndex()]->Gaus(0,1);
-      } else { // If parameter IS fixed or out of bounds
+      // If parameter IS fixed or out of bounds
+      if (PCAObj->IsParameterFixedPCA(i)) {
         randParams[i] = 0.0;
+      } else {
+        randParams[i] = random_number[M3::GetThreadIndex()]->Gaus(0,1);
       }
     }
   }
