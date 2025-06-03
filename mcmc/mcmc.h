@@ -39,7 +39,10 @@ class mcmc : public FitterBase {
   double GetMulticanonicalWeightGaussian(double kDeltacp);
 
   /// @brief Get the multicanonical weight for a given delta_cp value from a spline
-  double GetMulticanonicalWeightSpline(double kDeltacp, TGraph *dcp_spline);
+  double GetMulticanonicalWeightSpline(double kDeltacp, TSpline3 *dcp_spline);
+
+  /// @brief Get the multicanonical weight for a given delta_cp value from a spline
+  double GetMulticanonicalWeightSpline(double deltacp, TSpline3 *spline_IO, TSpline3 *spline_NO, double delm23);
 
   /// @brief Print the progress
   inline void PrintProgress();
@@ -60,7 +63,8 @@ class mcmc : public FitterBase {
   /// multi-canonical spline toggle on/off
   bool multicanonicalSpline;
   /// multi-canonical spline object
-  TGraph *dcp_spline;
+  TSpline3 *dcp_spline_IO;
+  TSpline3 *dcp_spline_NO;
   /// multi-canonical beta
   double multicanonicalBeta;
   /// multi-canonical sigma
@@ -71,8 +75,12 @@ class mcmc : public FitterBase {
   int oscCovVar;
   /// multi-canonical par number
   int multicanonicalVar;
+  /// multi-canonical par number
+  int multicanonicalVar_dm23;
   /// delta_cp parameter value
   double delta_cp_value;
+  /// dm23 parameter value
+  double delm23_value;
 
 };
 

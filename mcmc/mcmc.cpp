@@ -87,15 +87,24 @@ void mcmc::runMCMC() {
   if (multicanonical) {
 
     if (multicanonicalSpline){
-      std::string splineFile = fitMan->raw()["General"]["MCMC"]["MulticanonicalSplineFile"].as<std::string>();
-      dcp_spline = new TGraph(splineFile.c_str());
+      std::string splineFile = GetFromManager<std::string>(fitMan->raw()["General"]["MCMC"]["MulticanonicalSplineFile"],"nofile");
+      TFile *file = new TFile(splineFile.c_str(), "READ");
+      dcp_spline_IO = static_cast<TSpline3*>(file->Get("dcp_spline_IO"));
       MACH3LOG_INFO("Using multicanonical spline from file {}", splineFile);
-      
-      // check for empty splines
-      if (dcp_spline->GetN() == 0) {
-        MACH3LOG_ERROR("Spline file {} is empty", splineFile);
-        throw std::runtime_error("Spline file is empty");
-      }
+      dcp_spline_IO->Eval(0.0); // check that the spline is valid
+      std::cout << "Spline evaluated at 0.0 gives value " << dcp_spline_IO->Eval(0.0) << std::endl;
+
+      dcp_spline_NO = static_cast<TSpline3*>(file->Get("dcp_spline_NO"));
+      MACH3LOG_INFO("Using multicanonical spline from file {}", splineFile);
+      dcp_spline_NO->Eval(0.0); // check that the spline is valid
+      std::cout << "Spline evaluated at 0.0 gives value " << dcp_spline_NO->Eval(0.0) << std::endl;
+
+      // // check for empty TSpline
+      // if (dcp_spline == nullptr) {
+      //   MACH3LOG_ERROR("Spline not found in file {}", splineFile);
+      //   throw std::runtime_error("Spline not found in file");
+      // }
+
     } else {
       // Get the multicanonical sigma values from the configuration file
       multicanonicalSigma = fitMan->raw()["General"]["MCMC"]["MulticanonicalSigma"].as<double>();
@@ -119,6 +128,11 @@ void mcmc::runMCMC() {
             multicanonicalVar = i;
             MACH3LOG_INFO("Setting multicanonical weight on delta_cp parameter int {}",i);
           }
+          if (systematics[static_cast<int>(s)]->GetParName(i) == "dm23") {
+            multicanonicalVar_dm23 = i;
+            MACH3LOG_INFO("Setting dm23 parameter int {}",i);
+          } else {
+            MACH3LOG_ERROR("No dm23 parameter found in osc_cov systematic");
         }
       }
     }
@@ -167,6 +181,7 @@ void mcmc::runMCMC() {
   // Process MCMC
   ProcessMCMC();
 }
+}
 
 // *******************
 // Do the initial reconfigure of the MCMC
@@ -199,10 +214,11 @@ void mcmc::ProposeStep() {
 
     // get the proposed value of delta_cp and apply the multicanonical pentalty, weighting it using the beta value to increase or decrease the strenght of the penalty
     delta_cp_value = systematics[oscCovVar]->getParProp(multicanonicalVar);
+    delm23_value = systematics[oscCovVar]->getParProp(multicanonicalVar_dm23);
     
     if (multicanonicalSpline) {
       // Get the multicanonical weight from the spline
-      multicanonical_penalty = GetMulticanonicalWeightSpline(delta_cp_value, dcp_spline)*(multicanonicalBeta);
+      multicanonical_penalty = GetMulticanonicalWeightSpline(delta_cp_value, dcp_spline_IO, dcp_spline_NO, delm23_value)*(multicanonicalBeta);
     } else {
       // Get the multicanonical weight from the Gaussian
       multicanonical_penalty = GetMulticanonicalWeightGaussian(delta_cp_value)*(multicanonicalBeta);
@@ -275,14 +291,17 @@ inline double mcmc::GetMulticanonicalWeightGaussian(double deltacp){
   return -std::log(inv_sqrt_2pi * (1/sigma) * (exp1 + exp2 + exp3));
 }
 
-inline double mcmc::GetMulticanonicalWeightSpline(double deltacp, TGraph *dcp_spline){
-  
-  // calculate likelihood from spline at given dcp value
-  double dcp_spline_val = dcp_spline->Eval(deltacp);
+inline double mcmc::GetMulticanonicalWeightSpline(double deltacp, TSpline3 *spline_IO, TSpline3 *spline_NO, double delm23){
+  double dcp_spline_val;
 
-  // return the log likelihood, ie the log of the normalised sum of the gaussians
-  std::cout << "Evaluating spline at delta_cp = " << deltacp << " gives value " << dcp_spline_val << std::endl;
-  return -std::log(dcp_spline_val);
+  if (delm23 < 0){
+    dcp_spline_val = spline_IO->Eval(deltacp);
+    return -(-std::log(dcp_spline_val)+std::log(spline_IO->Eval(-TMath::Pi()/2)));
+  } else {
+    dcp_spline_val = spline_NO->Eval(deltacp);
+    return -(-std::log(dcp_spline_val)+std::log(spline_NO->Eval(-TMath::Pi()/2)));
+  }
+  // std::cout << "Evaluating spline at delta_cp = " << deltacp << " gives value " << dcp_spline_val << "with -log lh of :" << -log(dcp_spline_val) << std::endl;
 }
 
 // *******************
