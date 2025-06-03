@@ -5,13 +5,37 @@ New features should be developed on branches in this repository with the branch 
 
 Please see [here](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) for more details
 
-## PR tittles
+## Versioning of this package
+
+This package will follow this numbering convention for releases
+- Major `X.0.0` for paradigm-shifting breaking changes
+- Minor `0.X.0` for more minor breaking changes (or lots of non-breaking changes + a long time since last release)
+- Patch `0.0.X` for non-breaking changes
+
+## PR titles
 When creating a Pull Request (PR), make sure the title starts with one of the following prefixes to indicate the type of PR:
 
 - **`feat:`**: For new features
 - **`bugfix:`** For fixing bugs
 - **`tidy:`** For minor changes like refactoring or updating dependencies
 - **`breaking:`** For changes that break backward compatibility
+
+## Continuous Integration
+
+MaCh3 undergoes rigorous checks via multiple continuous integration (CI) processes. You can find the full list of CI checks [here](https://github.com/mach3-software/MaCh3/tree/develop/.github/workflows#readme).
+
+CI heavily depends on the setup in the [MaCh3 Tutorial](https://github.com/mach3-software/MaCh3Tutorial).
+
+### PR Merge Requirements
+- **CI Success**: All CI checks must pass before a PR can be merged.
+- **Backward Compatibility**: If a PR introduces breaking changes, it will fail the CI tests. In this case, the following steps are required:
+    1. **Update MaCh3 Tutorial**: A separate PR must be made to update the [MaCh3 Tutorial](https://github.com/mach3-software/MaCh3Tutorial).
+    2. **Merge Tutorial PR**: The tutorial update PR must be merged first.
+    3. **CI Restart**: After merging the tutorial update, restart the CI tests until they pass.
+
+This process ensures that:
+- Breaking changes are properly registered.
+- The [MaCh3 Tutorial](https://github.com/mach3-software/MaCh3Tutorial) remains up-to-date.
 
 ## Doxygen
 When making comments try following Doxygen type of comments
@@ -62,8 +86,19 @@ MACH3LOG_INFO("Some break {:<10.2f}", blarb);
 ```
 
 ## Config Syntax
-MaCh3 currently uses yaml as config handler. To help unify syntax over the code there are several YamlHelper function available [here](https://github.com/mach3-software/MaCh3/blob/develop/manager/YamlHelper.h). Most important is `GetFromManager`. For code below which checks if config entry exist and if doesn't set some default value
+MaCh3 currently uses yaml as config handler. To help unify syntax over the code there are several YamlHelper function available [here](https://github.com/mach3-software/MaCh3/blob/develop/manager/YamlHelper.h).
 
+We suggest instead of using default yaml syntax
+```cpp
+bool AsimovFit = config[AsimovFit].as<bool>();
+```
+is to use `Get`:
+```cpp
+bool AsimovFit = Get<bool>(config[AsimovFit], __FILE__ , __LINE__);
+```
+`Get` has additional protection, checks if node exist, checks conversion and throw proper errors. This allow to troubleshoot code much easier.
+
+Another useful one is `GetFromManager`. For code below which checks if config entry exist and if doesn't set some default value
 ```cpp
 bool AsimovFit = false;
 
@@ -74,7 +109,7 @@ if(config[AsimovFit])
 ```
 This can be replaced with:
 ```cpp
-bool AsimovFit = GetFromManager<bool>(config[AsimovFit], false);
+bool AsimovFit = GetFromManager<bool>(config[AsimovFit], false, __FILE__, __LINE__);
 ```
 
 ## double vs float?
@@ -166,9 +201,76 @@ Putting it all together might look like:
 
 This allows us to disable the diagnostic just for the relevant line.
 
+## C++ Standard
+As of May 2025, the minimum supported C++ standard for MaCh3 is **C++14**, although the codebase is compatible with newer standards such as **C++17** and beyond.
+These are often referred to collectively as *modern C++*.
+MaCh3 aims to use modern C++ features to encourage safer, cleaner, and more maintainable code.
+
+### Pointers
+Instead of using raw pointer
+```c++
+    Class* example = new Class;
+
+    // ... some code ...
+    delete example;
+```
+Use *std::unique_ptr* to manage memory automatically:
+```c++
+    auto example = std::make_unique<Class>();
+```
+This eliminates the need to manually delete the object and helps prevent memory leaks.
+
+### Dynamic Arrays
+Instead of manually managing dynamic arrays:
+
+```c++
+    double* example = new double[N];
+
+    // ... some code ...
+
+    delete[] example;
+```
+Use a *std::vector* to automatically manage the memory:
+```c++
+    std::vector<double> example(N);
+```
+### Use `nullptr` Instead of `NULL` or `0`
+
+Modern C++ introduces `nullptr` as a type-safe null pointer constant.
+Avoid legacy `NULL` or `0` which can lead to ambiguous or unsafe behavior.
+```c++
+    int* ptr = nullptr;
+
+    if (ptr == nullptr) {
+        std::cout << "Pointer is null." << std::endl;
+    }
+```
+### Casting
+
+Use `static_cast<T>(value)` instead of `(T)value` for type conversions.
+It makes the intent clear and avoids unsafe conversions allowed by C-style casts.
+```c++
+    double x = 3.14;
+    int y = static_cast<int>(x);
+```
+
 ## Formatting
 To ensure a unified style in MaCh3 software you can use a clang-format file which has instructions about formatting code.
 ```bash
 clang-format --assume-filename=/path/to/your/.clang-format=${MaCh3_ROOT}/../.clang-format blarb.cpp
 ```
 Please see [here](https://clang.llvm.org/docs/ClangFormat.html) and [here](https://root.cern/contribute/coding_conventions/) for more details.
+
+## Code-style
+We want to try to make code more readable in general so please try to stick to using name style and conventions given in the google style guide [here](https://google.github.io/styleguide/cppguide.html). A few examples are given below:
+
+- When naming function please capitalise the first letter and use CamelCase.
+- For member variables try to use snake case
+- Don't unnecessarily abbreviate variable names for the sake of saving a few characters
+```c++
+void GetMyFaviouriteVariable();
+int my_name_member_variable;
+int parameter_counter; //Not par_count
+```
+
+Please note that a lot of this has not been followed in MaCh3 but we are trying to improve the coding style so please bare this in mind when contributing!

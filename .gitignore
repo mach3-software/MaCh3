@@ -1,11 +1,13 @@
 #ignore any object files
 *.o
 *.sif
+*.idx
 
 build*/
 install/
 Doc/html
 Doc/latex
+.cache/
 
 # Ignore emacs/vim stuff
 *#* 

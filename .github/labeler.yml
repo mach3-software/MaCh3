@@ -2,29 +2,29 @@
 MCMC:
   - changed-files:
       - any-glob-to-any-file: 
-          - mcmc/**
+          - Fitters/**
 
 Plotting:
   - changed-files:
       - any-glob-to-any-file: 
-          - plotting/**
+          - Plotting/**
           - Diagnostics/**
 
 Nu Osc/Xsec:
   - changed-files:
       - any-glob-to-any-file: 
-          - covariance/**
-          - splines/**
+          - Parameters/**
+          - Splines/**
 
 Samples:
   - changed-files:
       - any-glob-to-any-file: 
-          - samplePDF/**
+          - Samples/**
 
 Manager:
   - changed-files:
       - any-glob-to-any-file: 
-          - manager/**
+          - Manager/**
 
 Documentation:
   - changed-files:

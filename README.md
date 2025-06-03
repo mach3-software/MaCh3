@@ -63,7 +63,7 @@ target_link_libraries(blarb MaCh3::All)
 
 Some functionalities rely on setting `Env{MACH3}` which should point to path experiment specific MaCh3. This way MaCh3 can easily find `Env{MACH3}/inputs/SomeInput.root` for example.
 
-## Python
+## Python 🐍
 
 MaCh3 has an optional python interface (pyMaCh3) which provides much of the same functionality as the c++ interface (see [here](https://mach3-software.github.io/MaCh3/pyMaCh3/mainpage.html) for documentation).
 
@@ -157,6 +157,7 @@ Based on several test here are recommended version:
 |-------------|--------|
 | Alma9       | ✅     |
 | Rocky9      | ✅     |
+| Ubi9        | ✅     |
 | Ubuntu22.04 | ✅     |
 | Ubuntu24.10 | ✅     |
 | Fedora32    | ✅     |
@@ -170,9 +171,8 @@ Based on several test here are recommended version:
 
 ## Help and Guidelines
 - [Tutorial](https://github.com/mach3-software/MaCh3Tutorial)
-- [How to contribute](https://github.com/mach3-software/MaCh3/blob/develop/CONTRIBUTING.md)
+- [How to contribute](https://github.com/mach3-software/MaCh3/blob/develop/.github/CONTRIBUTING.md)
 - [Wiki](https://github.com/mach3-software/MaCh3/wiki)
-- [Mailing lists](https://www.jiscmail.ac.uk/cgi-bin/webadmin?A0=MACH3)
 - [Slack](https://t2k-experiment.slack.com/archives/C06EM0C6D7W/p1705599931356889)
 - [Discussions](https://github.com/mach3-software/MaCh3/discussions)
 - [Benchmark](https://mach3-software.github.io/MaCh3Tutorial/)
@@ -187,8 +187,8 @@ This is an example how your executable can look like using MaCh3:
   //Manager is responsible for reading from config
   std::unique_ptr<manager> fitMan = MaCh3ManagerFactory(argc, argv);
 
-  std::vector<samplePDFBase*> sample; //vector storing information about sample for different detector
-  std::vector<covarianceBase*> Cov; // vector with systematic implementation
+  std::vector<SampleHandlerBase*> sample; //vector storing information about sample for different detector
+  std::vector<ParameterHandlerBase*> Cov; // vector with systematic implementation
   MakeMaCh3Instance(fitMan.get(), sample, Cov); //Factory like function which initialises everything
 
   // FitterBase class, can be replaced with other fitting method
@@ -196,11 +196,11 @@ This is an example how your executable can look like using MaCh3:
 
   //Adding samples and covariances to the Fitter class could be in the factory
   for(unsigned int i = 0; sample.size(); i++)
-    MarkovChain->addSamplePDF(sample[i]);
+    MarkovChain->AddSampleHandler(sample[i]);
   for(unsigned int i = 0; Cov.size(); i++)
-    MarkovChain->addSystObj(Cov[i]);
+    MarkovChain->AddSystObj(Cov[i]);
 
   MarkovChain->RunLLHScan(); // can run LLH scan
-  MarkovChain->runMCMC(); //or run actual fit
+  MarkovChain->RunMCMC(); //or run actual fit
 ```
 For more see [here](https://github.com/mach3-software/MaCh3Tutorial/blob/main/Tutorial/MCMCTutorial.cpp)

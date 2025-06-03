@@ -9,7 +9,7 @@ DefineEnabledRequiredSwitch(NuFastLinear_ENABLED FALSE)
 DefineEnabledRequiredSwitch(NuSQUIDSLinear_ENABLED FALSE)
 DefineEnabledRequiredSwitch(OscProb_ENABLED FALSE)
 
-#KS: If all Oscillators are turned off then enable CUDAProb3Linear_ENABLED
+#KS: If all Oscillators are turned off then enable NuFastLinear_ENABLED and CUDAProb3_ENABLED
 if (NOT CUDAProb3Linear_ENABLED AND
     NOT CUDAProb3_ENABLED AND
     NOT ProbGPULinear_ENABLED AND
@@ -18,6 +18,7 @@ if (NOT CUDAProb3Linear_ENABLED AND
     NOT NuSQUIDSLinear_ENABLED AND
     NOT OscProb_ENABLED)
     set(NuFastLinear_ENABLED TRUE)
+    set(CUDAProb3_ENABLED TRUE)
 endif()
 
 #KS: Save which oscillators are being used
@@ -51,6 +52,10 @@ IsTrue(MaCh3_MULTITHREAD_ENABLED DAN_USE_MULTITHREAD)
 IsTrue(MaCh3_LOW_MEMORY_STRUCTS_ENABLED DAN_DOUBLE)
 SwitchLogic(DAN_DOUBLE)
 
+# Diable GPU at NuOsc
+if(NOT MaCh3_NuOsc_GPU_ENABLED)
+  set(DAN_USE_GPU 0)
+endif()
 # Get the CPU compile options for MaCh3CompilerOptions
 get_target_property(cpu_compile_options MaCh3CompilerOptions INTERFACE_COMPILE_OPTIONS)
 
@@ -62,7 +67,7 @@ set(CMAKE_CUDA_ARCHITECTURES_STRING ${CMAKE_CUDA_ARCHITECTURES})
 string(REPLACE " " ";" CMAKE_CUDA_ARCHITECTURES_STRING "${CMAKE_CUDA_ARCHITECTURES}")
 
 if(NOT DEFINED MaCh3_NuOscillatorBranch)
-  set(MaCh3_NuOscillatorBranch "v1.3.0")
+  set(MaCh3_NuOscillatorBranch "v1.3.1")
 endif()
 
 #Try adding Oscillator Class
