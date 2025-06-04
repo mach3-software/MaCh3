@@ -2,8 +2,8 @@ var searchData=
 [
   ['p3_0',['p3',['../GetPostfitParamPlots_8cpp.html#a814cbca1b36d9e3f622031e0e9634ce0',1,'GetPostfitParamPlots.cpp']]],
   ['p4_1',['p4',['../GetPostfitParamPlots_8cpp.html#ac577141e2ab46a432ac74c34d18d0739',1,'GetPostfitParamPlots.cpp']]],
-  ['par_2',['Par',['../classTF1__red.html#a89ff168cd938509a5081a2a39bcb0be8',1,'TF1_red::Par()'],['../classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e',1,'TSpline3_red::Par()']]],
-  ['par_3',['par',['../classPSO.html#ae5eff2b0193e0d7c9c221edbc14118bd',1,'PSO']]],
+  ['par_2',['par',['../classPSO.html#ae5eff2b0193e0d7c9c221edbc14118bd',1,'PSO']]],
+  ['par_3',['Par',['../classTF1__red.html#a89ff168cd938509a5081a2a39bcb0be8',1,'TF1_red::Par()'],['../classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e',1,'TSpline3_red::Par()']]],
   ['par_5fmeans_4',['par_means',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
   ['paramcentral_5',['ParamCentral',['../classMCMCProcessor.html#a3a6614826ae320e462211e38e96d9d02',1,'MCMCProcessor']]],
   ['paramerrors_6',['ParamErrors',['../classMCMCProcessor.html#a3a97e3cb4be3ceb9eb721eac51d82d60',1,'MCMCProcessor']]],

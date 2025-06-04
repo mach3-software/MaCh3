@@ -1,7 +1,0 @@
-ParameterHandlerOsc
-===================
-
-.. currentmodule:: pyMaCh3._pyMaCh3.parameters
-
-.. autoclass:: ParameterHandlerOsc
-   :show-inheritance:

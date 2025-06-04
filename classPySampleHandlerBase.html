@@ -107,6 +107,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a11fa6d8b67b61b75d1f8c1a63dae36f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6e3629f5e902771c7812daf4003958f0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPySampleHandlerBase.html#a6e3629f5e902771c7812daf4003958f0">Reweight</a> () override</td></tr>
 <tr class="separator:a6e3629f5e902771c7812daf4003958f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c795e9eed36782d6193f7f88372153b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPySampleHandlerBase.html#a5c795e9eed36782d6193f7f88372153b">CleanMemoryBeforeFit</a> () override</td></tr>
+<tr class="memdesc:a5c795e9eed36782d6193f7f88372153b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allow to clean not used memory before fit starts.  <br /></td></tr>
+<tr class="separator:a5c795e9eed36782d6193f7f88372153b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8309f7b5490faa56109d2f9cf99b8cd8"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPySampleHandlerBase.html#a8309f7b5490faa56109d2f9cf99b8cd8">GetLikelihood</a> () override</td></tr>
 <tr class="separator:a8309f7b5490faa56109d2f9cf99b8cd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a06cbbd04de01b9e1f1b261f8e8e1a33f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPySampleHandlerBase.html#a06cbbd04de01b9e1f1b261f8e8e1a33f">Fill1DHist</a> () override</td></tr>
@@ -129,6 +132,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ga0ed9dd339235b3bdea2680078ab129ab inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga3f4388fbe27168c5dae8fa722a7c1299 inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#ga3f4388fbe27168c5dae8fa722a7c1299">GetSampleLikelihood</a> (const int isample)</td></tr>
 <tr class="separator:ga3f4388fbe27168c5dae8fa722a7c1299 inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab6e807de9ac80fb9f12722e033c44f7e inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#ab6e807de9ac80fb9f12722e033c44f7e">CleanMemoryBeforeFit</a> ()=0</td></tr>
+<tr class="memdesc:ab6e807de9ac80fb9f12722e033c44f7e inherit pub_methods_classSampleHandlerBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allow to clean not used memory before fit starts.  <br /></td></tr>
+<tr class="separator:ab6e807de9ac80fb9f12722e033c44f7e inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaa20368797948a55ad18848965fa439b6 inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classMaCh3Modes.html">MaCh3Modes</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#gaa20368797948a55ad18848965fa439b6">GetMaCh3Modes</a> () const</td></tr>
 <tr class="memdesc:gaa20368797948a55ad18848965fa439b6 inherit pub_methods_classSampleHandlerBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return pointer to MaCh3 modes.  <br /></td></tr>
 <tr class="separator:gaa20368797948a55ad18848965fa439b6 inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -233,6 +239,46 @@ Additional Inherited Members</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="samples_8cpp_source.html#l00010">10</a> of file <a class="el" href="samples_8cpp_source.html">samples.cpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="a5c795e9eed36782d6193f7f88372153b" name="a5c795e9eed36782d6193f7f88372153b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5c795e9eed36782d6193f7f88372153b">&#9670;&#160;</a></span>CleanMemoryBeforeFit()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PySampleHandlerBase::CleanMemoryBeforeFit </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Allow to clean not used memory before fit starts. </p>
+
+<p>Implements <a class="el" href="classSampleHandlerBase.html#ab6e807de9ac80fb9f12722e033c44f7e">SampleHandlerBase</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="samples_8cpp_source.html#l00035">35</a> of file <a class="el" href="samples_8cpp_source.html">samples.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   35</span>                                         {</div>
+<div class="line"><span class="lineno">   36</span>        PYBIND11_OVERRIDE_PURE(</div>
+<div class="line"><span class="lineno">   37</span>            <span class="keywordtype">void</span>,          <span class="comment">/* Return type */</span></div>
+<div class="line"><span class="lineno">   38</span>            <a class="code hl_class" href="classSampleHandlerBase.html">SampleHandlerBase</a>, <span class="comment">/* Parent class */</span></div>
+<div class="line"><span class="lineno">   39</span>            <a class="code hl_function" href="classPySampleHandlerBase.html#a5c795e9eed36782d6193f7f88372153b">CleanMemoryBeforeFit</a>       <span class="comment">/* Name of function in C++ (must match Python name) */</span></div>
+<div class="line"><span class="lineno">   40</span>        );</div>
+<div class="line"><span class="lineno">   41</span>    }</div>
+<div class="ttc" id="aclassPySampleHandlerBase_html_a5c795e9eed36782d6193f7f88372153b"><div class="ttname"><a href="classPySampleHandlerBase.html#a5c795e9eed36782d6193f7f88372153b">PySampleHandlerBase::CleanMemoryBeforeFit</a></div><div class="ttdeci">void CleanMemoryBeforeFit() override</div><div class="ttdoc">Allow to clean not used memory before fit starts.</div><div class="ttdef"><b>Definition:</b> <a href="samples_8cpp_source.html#l00035">samples.cpp:35</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html"><div class="ttname"><a href="classSampleHandlerBase.html">SampleHandlerBase</a></div><div class="ttdoc">Class responsible for handling implementation of samples used in analysis, reweighting and returning ...</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00025">SampleHandlerBase.h:26</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
 <a id="a06cbbd04de01b9e1f1b261f8e8e1a33f" name="a06cbbd04de01b9e1f1b261f8e8e1a33f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a06cbbd04de01b9e1f1b261f8e8e1a33f">&#9670;&#160;</a></span>Fill1DHist()</h2>
 
@@ -258,17 +304,16 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="classSampleHandlerBase.html#a79bf78796d3e9ebef0a439f91fe7bdad">SampleHandlerBase</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="samples_8cpp_source.html#l00044">44</a> of file <a class="el" href="samples_8cpp_source.html">samples.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   44</span>                               {</div>
-<div class="line"><span class="lineno">   45</span>        PYBIND11_OVERRIDE_PURE_NAME(</div>
-<div class="line"><span class="lineno">   46</span>            <span class="keywordtype">void</span>,          <span class="comment">/* Return type */</span></div>
-<div class="line"><span class="lineno">   47</span>            <a class="code hl_class" href="classSampleHandlerBase.html">SampleHandlerBase</a>, <span class="comment">/* Parent class */</span></div>
-<div class="line"><span class="lineno">   48</span>            <span class="stringliteral">&quot;fill_1d_hist&quot;</span>, <span class="comment">/* Python Name */</span></div>
-<div class="line"><span class="lineno">   49</span>            <a class="code hl_function" href="classPySampleHandlerBase.html#a06cbbd04de01b9e1f1b261f8e8e1a33f">Fill1DHist</a>     <span class="comment">/* Name of function in C++ (must match Python name) */</span></div>
-<div class="line"><span class="lineno">   50</span>        );</div>
-<div class="line"><span class="lineno">   51</span>    }</div>
-<div class="ttc" id="aclassPySampleHandlerBase_html_a06cbbd04de01b9e1f1b261f8e8e1a33f"><div class="ttname"><a href="classPySampleHandlerBase.html#a06cbbd04de01b9e1f1b261f8e8e1a33f">PySampleHandlerBase::Fill1DHist</a></div><div class="ttdeci">void Fill1DHist() override</div><div class="ttdef"><b>Definition:</b> <a href="samples_8cpp_source.html#l00044">samples.cpp:44</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html"><div class="ttname"><a href="classSampleHandlerBase.html">SampleHandlerBase</a></div><div class="ttdoc">Class responsible for handling implementation of samples used in analysis, reweighting and returning ...</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00025">SampleHandlerBase.h:26</a></div></div>
+<p class="definition">Definition at line <a class="el" href="samples_8cpp_source.html#l00053">53</a> of file <a class="el" href="samples_8cpp_source.html">samples.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   53</span>                               {</div>
+<div class="line"><span class="lineno">   54</span>        PYBIND11_OVERRIDE_PURE_NAME(</div>
+<div class="line"><span class="lineno">   55</span>            <span class="keywordtype">void</span>,          <span class="comment">/* Return type */</span></div>
+<div class="line"><span class="lineno">   56</span>            <a class="code hl_class" href="classSampleHandlerBase.html">SampleHandlerBase</a>, <span class="comment">/* Parent class */</span></div>
+<div class="line"><span class="lineno">   57</span>            <span class="stringliteral">&quot;fill_1d_hist&quot;</span>, <span class="comment">/* Python Name */</span></div>
+<div class="line"><span class="lineno">   58</span>            <a class="code hl_function" href="classPySampleHandlerBase.html#a06cbbd04de01b9e1f1b261f8e8e1a33f">Fill1DHist</a>     <span class="comment">/* Name of function in C++ (must match Python name) */</span></div>
+<div class="line"><span class="lineno">   59</span>        );</div>
+<div class="line"><span class="lineno">   60</span>    }</div>
+<div class="ttc" id="aclassPySampleHandlerBase_html_a06cbbd04de01b9e1f1b261f8e8e1a33f"><div class="ttname"><a href="classPySampleHandlerBase.html#a06cbbd04de01b9e1f1b261f8e8e1a33f">PySampleHandlerBase::Fill1DHist</a></div><div class="ttdeci">void Fill1DHist() override</div><div class="ttdef"><b>Definition:</b> <a href="samples_8cpp_source.html#l00053">samples.cpp:53</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -297,17 +342,17 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="classSampleHandlerBase.html#a3ba05758626b65dc8a74de1d5a143ccd">SampleHandlerBase</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="samples_8cpp_source.html#l00053">53</a> of file <a class="el" href="samples_8cpp_source.html">samples.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   53</span>                               {</div>
-<div class="line"><span class="lineno">   54</span>        PYBIND11_OVERRIDE_PURE_NAME(</div>
-<div class="line"><span class="lineno">   55</span>            <span class="keywordtype">void</span>,          <span class="comment">/* Return type */</span></div>
-<div class="line"><span class="lineno">   56</span>            <a class="code hl_class" href="classSampleHandlerBase.html">SampleHandlerBase</a>, <span class="comment">/* Parent class */</span></div>
-<div class="line"><span class="lineno">   57</span>            <span class="stringliteral">&quot;fill_2d_hist&quot;</span>,<span class="comment">/* Python name*/</span></div>
-<div class="line"><span class="lineno">   58</span>            <a class="code hl_function" href="classPySampleHandlerBase.html#a52f0da79d2909f52dc01fc659bb98f93">Fill2DHist</a>     <span class="comment">/* Name of function in C++ (must match Python name) */</span></div>
-<div class="line"><span class="lineno">   59</span>                           <span class="comment">/* Argument(s) */</span></div>
-<div class="line"><span class="lineno">   60</span>        );</div>
-<div class="line"><span class="lineno">   61</span>    }</div>
-<div class="ttc" id="aclassPySampleHandlerBase_html_a52f0da79d2909f52dc01fc659bb98f93"><div class="ttname"><a href="classPySampleHandlerBase.html#a52f0da79d2909f52dc01fc659bb98f93">PySampleHandlerBase::Fill2DHist</a></div><div class="ttdeci">void Fill2DHist() override</div><div class="ttdef"><b>Definition:</b> <a href="samples_8cpp_source.html#l00053">samples.cpp:53</a></div></div>
+<p class="definition">Definition at line <a class="el" href="samples_8cpp_source.html#l00062">62</a> of file <a class="el" href="samples_8cpp_source.html">samples.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   62</span>                               {</div>
+<div class="line"><span class="lineno">   63</span>        PYBIND11_OVERRIDE_PURE_NAME(</div>
+<div class="line"><span class="lineno">   64</span>            <span class="keywordtype">void</span>,          <span class="comment">/* Return type */</span></div>
+<div class="line"><span class="lineno">   65</span>            <a class="code hl_class" href="classSampleHandlerBase.html">SampleHandlerBase</a>, <span class="comment">/* Parent class */</span></div>
+<div class="line"><span class="lineno">   66</span>            <span class="stringliteral">&quot;fill_2d_hist&quot;</span>,<span class="comment">/* Python name*/</span></div>
+<div class="line"><span class="lineno">   67</span>            <a class="code hl_function" href="classPySampleHandlerBase.html#a52f0da79d2909f52dc01fc659bb98f93">Fill2DHist</a>     <span class="comment">/* Name of function in C++ (must match Python name) */</span></div>
+<div class="line"><span class="lineno">   68</span>                           <span class="comment">/* Argument(s) */</span></div>
+<div class="line"><span class="lineno">   69</span>        );</div>
+<div class="line"><span class="lineno">   70</span>    }</div>
+<div class="ttc" id="aclassPySampleHandlerBase_html_a52f0da79d2909f52dc01fc659bb98f93"><div class="ttname"><a href="classPySampleHandlerBase.html#a52f0da79d2909f52dc01fc659bb98f93">PySampleHandlerBase::Fill2DHist</a></div><div class="ttdeci">void Fill2DHist() override</div><div class="ttdef"><b>Definition:</b> <a href="samples_8cpp_source.html#l00062">samples.cpp:62</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -336,17 +381,17 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="group__SampleHandlerGetters.html#ga65bbd8a3084731b4bdb0c4d3fcaf641e">SampleHandlerBase</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="samples_8cpp_source.html#l00034">34</a> of file <a class="el" href="samples_8cpp_source.html">samples.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   34</span>                                    {</div>
-<div class="line"><span class="lineno">   35</span>        PYBIND11_OVERRIDE_PURE_NAME(</div>
-<div class="line"><span class="lineno">   36</span>            <span class="keywordtype">double</span>,        <span class="comment">/* Return type */</span></div>
-<div class="line"><span class="lineno">   37</span>            <a class="code hl_class" href="classSampleHandlerBase.html">SampleHandlerBase</a>, <span class="comment">/* Parent class */</span></div>
-<div class="line"><span class="lineno">   38</span>            <span class="stringliteral">&quot;get_likelihood&quot;</span>, <span class="comment">/* Python name*/</span></div>
-<div class="line"><span class="lineno">   39</span>            <a class="code hl_function" href="classPySampleHandlerBase.html#a8309f7b5490faa56109d2f9cf99b8cd8">GetLikelihood</a>  <span class="comment">/* Name of function in C++ (must match Python name) */</span></div>
-<div class="line"><span class="lineno">   40</span>                           <span class="comment">/* Argument(s) */</span></div>
-<div class="line"><span class="lineno">   41</span>        );</div>
-<div class="line"><span class="lineno">   42</span>    }</div>
-<div class="ttc" id="aclassPySampleHandlerBase_html_a8309f7b5490faa56109d2f9cf99b8cd8"><div class="ttname"><a href="classPySampleHandlerBase.html#a8309f7b5490faa56109d2f9cf99b8cd8">PySampleHandlerBase::GetLikelihood</a></div><div class="ttdeci">double GetLikelihood() override</div><div class="ttdef"><b>Definition:</b> <a href="samples_8cpp_source.html#l00034">samples.cpp:34</a></div></div>
+<p class="definition">Definition at line <a class="el" href="samples_8cpp_source.html#l00043">43</a> of file <a class="el" href="samples_8cpp_source.html">samples.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   43</span>                                    {</div>
+<div class="line"><span class="lineno">   44</span>        PYBIND11_OVERRIDE_PURE_NAME(</div>
+<div class="line"><span class="lineno">   45</span>            <span class="keywordtype">double</span>,        <span class="comment">/* Return type */</span></div>
+<div class="line"><span class="lineno">   46</span>            <a class="code hl_class" href="classSampleHandlerBase.html">SampleHandlerBase</a>, <span class="comment">/* Parent class */</span></div>
+<div class="line"><span class="lineno">   47</span>            <span class="stringliteral">&quot;get_likelihood&quot;</span>, <span class="comment">/* Python name*/</span></div>
+<div class="line"><span class="lineno">   48</span>            <a class="code hl_function" href="classPySampleHandlerBase.html#a8309f7b5490faa56109d2f9cf99b8cd8">GetLikelihood</a>  <span class="comment">/* Name of function in C++ (must match Python name) */</span></div>
+<div class="line"><span class="lineno">   49</span>                           <span class="comment">/* Argument(s) */</span></div>
+<div class="line"><span class="lineno">   50</span>        );</div>
+<div class="line"><span class="lineno">   51</span>    }</div>
+<div class="ttc" id="aclassPySampleHandlerBase_html_a8309f7b5490faa56109d2f9cf99b8cd8"><div class="ttname"><a href="classPySampleHandlerBase.html#a8309f7b5490faa56109d2f9cf99b8cd8">PySampleHandlerBase::GetLikelihood</a></div><div class="ttdeci">double GetLikelihood() override</div><div class="ttdef"><b>Definition:</b> <a href="samples_8cpp_source.html#l00043">samples.cpp:43</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -450,11 +495,11 @@ Additional Inherited Members</h2></td></tr>
 <div class="line"><span class="lineno">    9</span> </div>
 <div class="line"><span class="lineno">   10</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#ab497b52d94868283a8a7cedbd1a4d777">nEvents</a> = 0;</div>
 <div class="line"><span class="lineno">   11</span>}</div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a162e3e8fddeef43d1137875b660f897b"><div class="ttname"><a href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">SampleHandlerBase::nDims</a></div><div class="ttdeci">int nDims</div><div class="ttdoc">KS: number of dimension for this sample.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00132">SampleHandlerBase.h:132</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a7938f32b145ce648d3ce4ae33bc9d560"><div class="ttname"><a href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">SampleHandlerBase::dathist</a></div><div class="ttdeci">TH1D * dathist</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00140">SampleHandlerBase.h:140</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_aa7ed25798bc8d52dc16b5ea2f6c9d0c3"><div class="ttname"><a href="classSampleHandlerBase.html#aa7ed25798bc8d52dc16b5ea2f6c9d0c3">SampleHandlerBase::dathist2d</a></div><div class="ttdeci">TH2D * dathist2d</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00141">SampleHandlerBase.h:141</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_ab497b52d94868283a8a7cedbd1a4d777"><div class="ttname"><a href="classSampleHandlerBase.html#ab497b52d94868283a8a7cedbd1a4d777">SampleHandlerBase::nEvents</a></div><div class="ttdeci">unsigned int nEvents</div><div class="ttdoc">Number of MC events are there.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00135">SampleHandlerBase.h:135</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_ab9f61ca5c8abb03d4d84947e9bfa7943"><div class="ttname"><a href="classSampleHandlerBase.html#ab9f61ca5c8abb03d4d84947e9bfa7943">SampleHandlerBase::Modes</a></div><div class="ttdeci">MaCh3Modes * Modes</div><div class="ttdoc">Holds information about used Generator and MaCh3 modes.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00138">SampleHandlerBase.h:138</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a162e3e8fddeef43d1137875b660f897b"><div class="ttname"><a href="classSampleHandlerBase.html#a162e3e8fddeef43d1137875b660f897b">SampleHandlerBase::nDims</a></div><div class="ttdeci">int nDims</div><div class="ttdoc">KS: number of dimension for this sample.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00134">SampleHandlerBase.h:134</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a7938f32b145ce648d3ce4ae33bc9d560"><div class="ttname"><a href="classSampleHandlerBase.html#a7938f32b145ce648d3ce4ae33bc9d560">SampleHandlerBase::dathist</a></div><div class="ttdeci">TH1D * dathist</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00142">SampleHandlerBase.h:142</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_aa7ed25798bc8d52dc16b5ea2f6c9d0c3"><div class="ttname"><a href="classSampleHandlerBase.html#aa7ed25798bc8d52dc16b5ea2f6c9d0c3">SampleHandlerBase::dathist2d</a></div><div class="ttdeci">TH2D * dathist2d</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00143">SampleHandlerBase.h:143</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_ab497b52d94868283a8a7cedbd1a4d777"><div class="ttname"><a href="classSampleHandlerBase.html#ab497b52d94868283a8a7cedbd1a4d777">SampleHandlerBase::nEvents</a></div><div class="ttdeci">unsigned int nEvents</div><div class="ttdoc">Number of MC events are there.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00137">SampleHandlerBase.h:137</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_ab9f61ca5c8abb03d4d84947e9bfa7943"><div class="ttname"><a href="classSampleHandlerBase.html#ab9f61ca5c8abb03d4d84947e9bfa7943">SampleHandlerBase::Modes</a></div><div class="ttdeci">MaCh3Modes * Modes</div><div class="ttdoc">Holds information about used Generator and MaCh3 modes.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00140">SampleHandlerBase.h:140</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

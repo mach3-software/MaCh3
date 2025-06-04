@@ -197,6 +197,9 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:a418f581b688f035211107ddd83168c08 inherit pro_methods_classFitterBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFitterBase.html#a418f581b688f035211107ddd83168c08">SaveOutput</a> ()</td></tr>
 <tr class="memdesc:a418f581b688f035211107ddd83168c08 inherit pro_methods_classFitterBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save output and close files.  <br /></td></tr>
 <tr class="separator:a418f581b688f035211107ddd83168c08 inherit pro_methods_classFitterBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed21cb87772dcaecb0bc5ccb44b6efd4 inherit pro_methods_classFitterBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFitterBase.html#aed21cb87772dcaecb0bc5ccb44b6efd4">SanitiseInputs</a> ()</td></tr>
+<tr class="memdesc:aed21cb87772dcaecb0bc5ccb44b6efd4 inherit pro_methods_classFitterBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove obsolete memory and make other checks before fit starts.  <br /></td></tr>
+<tr class="separator:aed21cb87772dcaecb0bc5ccb44b6efd4 inherit pro_methods_classFitterBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a48f38bfa8996fe00d51f35b05dd16b46 inherit pro_methods_classFitterBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFitterBase.html#a48f38bfa8996fe00d51f35b05dd16b46">SaveSettings</a> ()</td></tr>
 <tr class="memdesc:a48f38bfa8996fe00d51f35b05dd16b46 inherit pro_methods_classFitterBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save the settings that the MCMC was run with.  <br /></td></tr>
 <tr class="separator:a48f38bfa8996fe00d51f35b05dd16b46 inherit pro_methods_classFitterBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -316,7 +319,7 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Constructor. </p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000015">Todo:</a></b></dt><dd>KS: Make this in future configurable, for more see: <a href="https://root.cern.ch/doc/master/classROOT_1_1Math_1_1Minimizer.html">https://root.cern.ch/doc/master/classROOT_1_1Math_1_1Minimizer.html</a> </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000016">Todo:</a></b></dt><dd>KS: Make this in future configurable, for more see: <a href="https://root.cern.ch/doc/master/classROOT_1_1Math_1_1Minimizer.html">https://root.cern.ch/doc/master/classROOT_1_1Math_1_1Minimizer.html</a> </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="MinuitFit_8cpp_source.html#l00005">5</a> of file <a class="el" href="MinuitFit_8cpp_source.html">MinuitFit.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">    5</span>                                 : <a class="code hl_class" href="classLikelihoodFit.html">LikelihoodFit</a>(<a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>) {</div>
@@ -447,177 +450,181 @@ Additional Inherited Members</h2></td></tr>
 <div class="line"><span class="lineno">   41</span><span class="comment">// *******************</span></div>
 <div class="line"><span class="lineno">   42</span>  <a class="code hl_function" href="classLikelihoodFit.html#adb89956955c043bf37cad04983e4facd">PrepareFit</a>();</div>
 <div class="line"><span class="lineno">   43</span> </div>
-<div class="line"><span class="lineno">   44</span>  <span class="comment">//KS: For none PCA this will be equal to normal parameters</span></div>
-<div class="line"><span class="lineno">   45</span>  <span class="keyword">const</span> <span class="keywordtype">int</span> NparsMinuitFull = <a class="code hl_variable" href="classLikelihoodFit.html#ac779acfe140500d06e42a1d4ace25385">NPars</a>;</div>
-<div class="line"><span class="lineno">   46</span>  <span class="keyword">const</span> <span class="keywordtype">int</span> NparsMinuit = <a class="code hl_variable" href="classLikelihoodFit.html#a0b50b7b607751e80b6c85e9db98631af">NParsPCA</a>;</div>
-<div class="line"><span class="lineno">   47</span> </div>
-<div class="line"><span class="lineno">   48</span>  <span class="comment">//KS: Set SetFunction we will Minimize</span></div>
-<div class="line"><span class="lineno">   49</span>  ROOT::Math::Functor fChi2(<span class="keyword">this</span>, &amp;<a class="code hl_function" href="classLikelihoodFit.html#af7383703e9f93e5aebcf699d80a6fb9e">MinuitFit::CalcChi2</a>, NparsMinuit);</div>
-<div class="line"><span class="lineno">   50</span>  <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;SetFunction(fChi2);</div>
-<div class="line"><span class="lineno">   51</span> </div>
-<div class="line"><span class="lineno">   52</span>  <span class="comment">//KS: add config or something</span></div>
-<div class="line"><span class="lineno">   53</span>  <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;SetPrintLevel(2);</div>
-<div class="line"><span class="lineno">   54</span>  <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;SetTolerance(0.01);</div>
-<div class="line"><span class="lineno">   55</span>  <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;SetMaxFunctionCalls(<a class="code hl_variable" href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">fitMan</a>-&gt;<a class="code hl_function" href="classmanager.html#ab3999cc856ede72b37f68bdb28bd5520">raw</a>()[<span class="stringliteral">&quot;General&quot;</span>][<span class="stringliteral">&quot;Minuit2&quot;</span>][<span class="stringliteral">&quot;NSteps&quot;</span>].as&lt;<span class="keywordtype">unsigned</span>&gt;());</div>
-<div class="line"><span class="lineno">   56</span>  <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;SetMaxIterations(10000);</div>
-<div class="line"><span class="lineno">   57</span> </div>
-<div class="line"><span class="lineno">   58</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Preparing Minuit&quot;</span>);</div>
-<div class="line"><span class="lineno">   59</span>  <span class="keywordtype">int</span> ParCounter = 0;</div>
+<div class="line"><span class="lineno">   44</span>  <span class="comment">// Remove obsolete memory and make other checks before fit starts</span></div>
+<div class="line"><span class="lineno">   45</span>  <a class="code hl_function" href="classFitterBase.html#aed21cb87772dcaecb0bc5ccb44b6efd4">SanitiseInputs</a>();</div>
+<div class="line"><span class="lineno">   46</span> </div>
+<div class="line"><span class="lineno">   47</span>  <span class="comment">//KS: For none PCA this will be equal to normal parameters</span></div>
+<div class="line"><span class="lineno">   48</span>  <span class="keyword">const</span> <span class="keywordtype">int</span> NparsMinuitFull = <a class="code hl_variable" href="classLikelihoodFit.html#ac779acfe140500d06e42a1d4ace25385">NPars</a>;</div>
+<div class="line"><span class="lineno">   49</span>  <span class="keyword">const</span> <span class="keywordtype">int</span> NparsMinuit = <a class="code hl_variable" href="classLikelihoodFit.html#a0b50b7b607751e80b6c85e9db98631af">NParsPCA</a>;</div>
+<div class="line"><span class="lineno">   50</span> </div>
+<div class="line"><span class="lineno">   51</span>  <span class="comment">//KS: Set SetFunction we will Minimize</span></div>
+<div class="line"><span class="lineno">   52</span>  ROOT::Math::Functor fChi2(<span class="keyword">this</span>, &amp;<a class="code hl_function" href="classLikelihoodFit.html#af7383703e9f93e5aebcf699d80a6fb9e">MinuitFit::CalcChi2</a>, NparsMinuit);</div>
+<div class="line"><span class="lineno">   53</span>  <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;SetFunction(fChi2);</div>
+<div class="line"><span class="lineno">   54</span> </div>
+<div class="line"><span class="lineno">   55</span>  <span class="comment">//KS: add config or something</span></div>
+<div class="line"><span class="lineno">   56</span>  <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;SetPrintLevel(2);</div>
+<div class="line"><span class="lineno">   57</span>  <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;SetTolerance(0.01);</div>
+<div class="line"><span class="lineno">   58</span>  <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;SetMaxFunctionCalls(<a class="code hl_variable" href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">fitMan</a>-&gt;<a class="code hl_function" href="classmanager.html#ab3999cc856ede72b37f68bdb28bd5520">raw</a>()[<span class="stringliteral">&quot;General&quot;</span>][<span class="stringliteral">&quot;Minuit2&quot;</span>][<span class="stringliteral">&quot;NSteps&quot;</span>].as&lt;<span class="keywordtype">unsigned</span>&gt;());</div>
+<div class="line"><span class="lineno">   59</span>  <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;SetMaxIterations(10000);</div>
 <div class="line"><span class="lineno">   60</span> </div>
-<div class="line"><span class="lineno">   61</span>  <span class="keywordflow">for</span> (std::vector&lt;ParameterHandlerBase*&gt;::iterator it = <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.begin(); it != <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.end(); ++it)</div>
-<div class="line"><span class="lineno">   62</span>  {</div>
-<div class="line"><span class="lineno">   63</span>    <span class="keywordflow">if</span>(!(*it)-&gt;IsPCA())</div>
-<div class="line"><span class="lineno">   64</span>    {</div>
-<div class="line"><span class="lineno">   65</span>      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; (*it)-&gt;GetNumParams(); ++i, ++ParCounter)</div>
-<div class="line"><span class="lineno">   66</span>      {</div>
-<div class="line"><span class="lineno">   67</span>        <span class="comment">//KS: Index, name, prior, step scale [different to MCMC],</span></div>
-<div class="line"><span class="lineno">   68</span>        <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;SetVariable(ParCounter, ((*it)-&gt;GetParName(i)), (*it)-&gt;GetParInit(i), (*it)-&gt;GetDiagonalError(i)/10);</div>
-<div class="line"><span class="lineno">   69</span>        <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;SetVariableValue(ParCounter, (*it)-&gt;GetParInit(i));</div>
-<div class="line"><span class="lineno">   70</span>        <span class="comment">//KS: lower bound, upper bound, if Mirroring enabled then ignore</span></div>
-<div class="line"><span class="lineno">   71</span>        <span class="keywordflow">if</span>(!<a class="code hl_variable" href="classLikelihoodFit.html#ae1e5d13b373bf73e1b1003f7f9d65f00">fMirroring</a>) <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;SetVariableLimits(ParCounter, (*it)-&gt;GetLowerBound(i), (*it)-&gt;GetUpperBound(i));</div>
-<div class="line"><span class="lineno">   72</span>        <span class="keywordflow">if</span>((*it)-&gt;IsParameterFixed(i))</div>
-<div class="line"><span class="lineno">   73</span>        {</div>
-<div class="line"><span class="lineno">   74</span>          <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;FixVariable(ParCounter);</div>
-<div class="line"><span class="lineno">   75</span>        }</div>
-<div class="line"><span class="lineno">   76</span>      }</div>
-<div class="line"><span class="lineno">   77</span>    }</div>
-<div class="line"><span class="lineno">   78</span>    <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">   79</span>    {</div>
-<div class="line"><span class="lineno">   80</span>      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; (*it)-&gt;GetNParameters(); ++i, ++ParCounter)</div>
-<div class="line"><span class="lineno">   81</span>      {</div>
-<div class="line"><span class="lineno">   82</span>        <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;SetVariable(ParCounter, Form(<span class="stringliteral">&quot;%i_PCA&quot;</span>, i), (*it)-&gt;GetPCAHandler()-&gt;GetParPropPCA(i), (*it)-&gt;GetPCAHandler()-&gt;GetEigenValuesMaster()[i]/10);</div>
-<div class="line"><span class="lineno">   83</span>        <span class="keywordflow">if</span>((*it)-&gt;GetPCAHandler()-&gt;IsParameterFixedPCA(i))</div>
-<div class="line"><span class="lineno">   84</span>        {</div>
-<div class="line"><span class="lineno">   85</span>          <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;FixVariable(ParCounter);</div>
-<div class="line"><span class="lineno">   86</span>        }</div>
-<div class="line"><span class="lineno">   87</span>      }</div>
-<div class="line"><span class="lineno">   88</span>    }</div>
-<div class="line"><span class="lineno">   89</span>  }</div>
-<div class="line"><span class="lineno">   90</span> </div>
-<div class="line"><span class="lineno">   91</span>  <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;SetPrintLevel(2);</div>
-<div class="line"><span class="lineno">   92</span> </div>
-<div class="line"><span class="lineno">   93</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Starting MIGRAD&quot;</span>);</div>
-<div class="line"><span class="lineno">   94</span>  <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;Minimize();</div>
+<div class="line"><span class="lineno">   61</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Preparing Minuit&quot;</span>);</div>
+<div class="line"><span class="lineno">   62</span>  <span class="keywordtype">int</span> ParCounter = 0;</div>
+<div class="line"><span class="lineno">   63</span> </div>
+<div class="line"><span class="lineno">   64</span>  <span class="keywordflow">for</span> (std::vector&lt;ParameterHandlerBase*&gt;::iterator it = <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.begin(); it != <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.end(); ++it)</div>
+<div class="line"><span class="lineno">   65</span>  {</div>
+<div class="line"><span class="lineno">   66</span>    <span class="keywordflow">if</span>(!(*it)-&gt;IsPCA())</div>
+<div class="line"><span class="lineno">   67</span>    {</div>
+<div class="line"><span class="lineno">   68</span>      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; (*it)-&gt;GetNumParams(); ++i, ++ParCounter)</div>
+<div class="line"><span class="lineno">   69</span>      {</div>
+<div class="line"><span class="lineno">   70</span>        <span class="comment">//KS: Index, name, prior, step scale [different to MCMC],</span></div>
+<div class="line"><span class="lineno">   71</span>        <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;SetVariable(ParCounter, ((*it)-&gt;GetParName(i)), (*it)-&gt;GetParInit(i), (*it)-&gt;GetDiagonalError(i)/10);</div>
+<div class="line"><span class="lineno">   72</span>        <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;SetVariableValue(ParCounter, (*it)-&gt;GetParInit(i));</div>
+<div class="line"><span class="lineno">   73</span>        <span class="comment">//KS: lower bound, upper bound, if Mirroring enabled then ignore</span></div>
+<div class="line"><span class="lineno">   74</span>        <span class="keywordflow">if</span>(!<a class="code hl_variable" href="classLikelihoodFit.html#ae1e5d13b373bf73e1b1003f7f9d65f00">fMirroring</a>) <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;SetVariableLimits(ParCounter, (*it)-&gt;GetLowerBound(i), (*it)-&gt;GetUpperBound(i));</div>
+<div class="line"><span class="lineno">   75</span>        <span class="keywordflow">if</span>((*it)-&gt;IsParameterFixed(i))</div>
+<div class="line"><span class="lineno">   76</span>        {</div>
+<div class="line"><span class="lineno">   77</span>          <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;FixVariable(ParCounter);</div>
+<div class="line"><span class="lineno">   78</span>        }</div>
+<div class="line"><span class="lineno">   79</span>      }</div>
+<div class="line"><span class="lineno">   80</span>    }</div>
+<div class="line"><span class="lineno">   81</span>    <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">   82</span>    {</div>
+<div class="line"><span class="lineno">   83</span>      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; (*it)-&gt;GetNParameters(); ++i, ++ParCounter)</div>
+<div class="line"><span class="lineno">   84</span>      {</div>
+<div class="line"><span class="lineno">   85</span>        <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;SetVariable(ParCounter, Form(<span class="stringliteral">&quot;%i_PCA&quot;</span>, i), (*it)-&gt;GetPCAHandler()-&gt;GetParPropPCA(i), (*it)-&gt;GetPCAHandler()-&gt;GetEigenValuesMaster()[i]/10);</div>
+<div class="line"><span class="lineno">   86</span>        <span class="keywordflow">if</span>((*it)-&gt;GetPCAHandler()-&gt;IsParameterFixedPCA(i))</div>
+<div class="line"><span class="lineno">   87</span>        {</div>
+<div class="line"><span class="lineno">   88</span>          <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;FixVariable(ParCounter);</div>
+<div class="line"><span class="lineno">   89</span>        }</div>
+<div class="line"><span class="lineno">   90</span>      }</div>
+<div class="line"><span class="lineno">   91</span>    }</div>
+<div class="line"><span class="lineno">   92</span>  }</div>
+<div class="line"><span class="lineno">   93</span> </div>
+<div class="line"><span class="lineno">   94</span>  <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;SetPrintLevel(2);</div>
 <div class="line"><span class="lineno">   95</span> </div>
-<div class="line"><span class="lineno">   96</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Starting HESSE&quot;</span>);</div>
-<div class="line"><span class="lineno">   97</span>  <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;Hesse();</div>
-<div class="line"><span class="lineno">   98</span>  <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;cd();</div>
-<div class="line"><span class="lineno">   99</span>  </div>
-<div class="line"><span class="lineno">  100</span>  TVectorD* MinuitParValue = <span class="keyword">new</span> TVectorD(NparsMinuitFull);</div>
-<div class="line"><span class="lineno">  101</span>  TVectorD* MinuitParError = <span class="keyword">new</span> TVectorD(NparsMinuitFull);</div>
-<div class="line"><span class="lineno">  102</span>  TMatrixDSym* Postmatrix = <span class="keyword">new</span> TMatrixDSym(NparsMinuitFull);</div>
-<div class="line"><span class="lineno">  103</span> </div>
-<div class="line"><span class="lineno">  104</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; NparsMinuitFull; ++i)</div>
-<div class="line"><span class="lineno">  105</span>  {</div>
-<div class="line"><span class="lineno">  106</span>    (*MinuitParValue)(i) = 0;</div>
-<div class="line"><span class="lineno">  107</span>    (*MinuitParError)(i) = 0;</div>
-<div class="line"><span class="lineno">  108</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j = 0; j &lt; NparsMinuitFull; ++j)</div>
-<div class="line"><span class="lineno">  109</span>    {</div>
-<div class="line"><span class="lineno">  110</span>      (*Postmatrix)(i,j) = 0;</div>
-<div class="line"><span class="lineno">  111</span>      (*Postmatrix)(i,j) = <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;CovMatrix(i,j);</div>
-<div class="line"><span class="lineno">  112</span>    }</div>
-<div class="line"><span class="lineno">  113</span>  }</div>
-<div class="line"><span class="lineno">  114</span> </div>
-<div class="line"><span class="lineno">  115</span>  ParCounter = 0;</div>
-<div class="line"><span class="lineno">  116</span>  <span class="keyword">const</span> <span class="keywordtype">double</span> *X = <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;X();</div>
-<div class="line"><span class="lineno">  117</span>  <span class="keyword">const</span> <span class="keywordtype">double</span> *err = <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;Errors();</div>
-<div class="line"><span class="lineno">  118</span>  <span class="keywordflow">for</span> (std::vector&lt;ParameterHandlerBase*&gt;::iterator it = <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.begin(); it != <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.end(); ++it)</div>
-<div class="line"><span class="lineno">  119</span>  {</div>
-<div class="line"><span class="lineno">  120</span>    <span class="keywordflow">if</span>(!(*it)-&gt;IsPCA())</div>
-<div class="line"><span class="lineno">  121</span>    {</div>
-<div class="line"><span class="lineno">  122</span>      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; (*it)-&gt;GetNumParams(); ++i, ++ParCounter)</div>
-<div class="line"><span class="lineno">  123</span>      {</div>
-<div class="line"><span class="lineno">  124</span>        <span class="keywordtype">double</span> ParVal = X[ParCounter];</div>
-<div class="line"><span class="lineno">  125</span>        <span class="comment">//KS: Basically apply mirroring for parameters out of bounds</span></div>
-<div class="line"><span class="lineno">  126</span>        <span class="keywordflow">if</span>(<a class="code hl_variable" href="classLikelihoodFit.html#ae1e5d13b373bf73e1b1003f7f9d65f00">fMirroring</a>)</div>
-<div class="line"><span class="lineno">  127</span>        {</div>
-<div class="line"><span class="lineno">  128</span>          <span class="keywordflow">if</span>(ParVal &lt; (*it)-&gt;GetLowerBound(i))</div>
-<div class="line"><span class="lineno">  129</span>          {</div>
-<div class="line"><span class="lineno">  130</span>            ParVal = (*it)-&gt;GetLowerBound(i) + ((*it)-&gt;GetLowerBound(i) - ParVal);</div>
-<div class="line"><span class="lineno">  131</span>          }</div>
-<div class="line"><span class="lineno">  132</span>          <span class="keywordflow">else</span> <span class="keywordflow">if</span> (ParVal &gt; (*it)-&gt;GetUpperBound(i))</div>
-<div class="line"><span class="lineno">  133</span>          {</div>
-<div class="line"><span class="lineno">  134</span>            ParVal = (*it)-&gt;GetUpperBound(i) - ( ParVal - (*it)-&gt;GetUpperBound(i));</div>
-<div class="line"><span class="lineno">  135</span>          }</div>
-<div class="line"><span class="lineno">  136</span>        }</div>
-<div class="line"><span class="lineno">  137</span>        (*MinuitParValue)(ParCounter) = ParVal;</div>
-<div class="line"><span class="lineno">  138</span>        (*MinuitParError)(ParCounter) = err[ParCounter];</div>
-<div class="line"><span class="lineno">  139</span>        <span class="comment">//KS: For fixed params HESS will not calculate error so we need to pass prior error</span></div>
-<div class="line"><span class="lineno">  140</span>        <span class="keywordflow">if</span>((*it)-&gt;IsParameterFixed(i))</div>
-<div class="line"><span class="lineno">  141</span>        {</div>
-<div class="line"><span class="lineno">  142</span>          (*MinuitParError)(ParCounter) = (*it)-&gt;GetDiagonalError(i);</div>
-<div class="line"><span class="lineno">  143</span>          (*Postmatrix)(ParCounter,ParCounter) = (*MinuitParError)(ParCounter) * (*MinuitParError)(ParCounter);</div>
-<div class="line"><span class="lineno">  144</span>        }</div>
-<div class="line"><span class="lineno">  145</span>      }</div>
-<div class="line"><span class="lineno">  146</span>    }</div>
-<div class="line"><span class="lineno">  147</span>    <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">  148</span>    {</div>
-<div class="line"><span class="lineno">  149</span>      <span class="comment">//KS: We need to convert parameters from PCA to normal base</span></div>
-<div class="line"><span class="lineno">  150</span>      TVectorD ParVals((*it)-&gt;GetNumParams());</div>
-<div class="line"><span class="lineno">  151</span>      TVectorD ParVals_PCA((*it)-&gt;GetNParameters());</div>
-<div class="line"><span class="lineno">  152</span> </div>
-<div class="line"><span class="lineno">  153</span>      TVectorD ErrorVals((*it)-&gt;GetNumParams());</div>
-<div class="line"><span class="lineno">  154</span>      TVectorD ErrorVals_PCA((*it)-&gt;GetNParameters());</div>
+<div class="line"><span class="lineno">   96</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Starting MIGRAD&quot;</span>);</div>
+<div class="line"><span class="lineno">   97</span>  <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;Minimize();</div>
+<div class="line"><span class="lineno">   98</span> </div>
+<div class="line"><span class="lineno">   99</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Starting HESSE&quot;</span>);</div>
+<div class="line"><span class="lineno">  100</span>  <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;Hesse();</div>
+<div class="line"><span class="lineno">  101</span>  <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;cd();</div>
+<div class="line"><span class="lineno">  102</span>  </div>
+<div class="line"><span class="lineno">  103</span>  TVectorD* MinuitParValue = <span class="keyword">new</span> TVectorD(NparsMinuitFull);</div>
+<div class="line"><span class="lineno">  104</span>  TVectorD* MinuitParError = <span class="keyword">new</span> TVectorD(NparsMinuitFull);</div>
+<div class="line"><span class="lineno">  105</span>  TMatrixDSym* Postmatrix = <span class="keyword">new</span> TMatrixDSym(NparsMinuitFull);</div>
+<div class="line"><span class="lineno">  106</span> </div>
+<div class="line"><span class="lineno">  107</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; NparsMinuitFull; ++i)</div>
+<div class="line"><span class="lineno">  108</span>  {</div>
+<div class="line"><span class="lineno">  109</span>    (*MinuitParValue)(i) = 0;</div>
+<div class="line"><span class="lineno">  110</span>    (*MinuitParError)(i) = 0;</div>
+<div class="line"><span class="lineno">  111</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j = 0; j &lt; NparsMinuitFull; ++j)</div>
+<div class="line"><span class="lineno">  112</span>    {</div>
+<div class="line"><span class="lineno">  113</span>      (*Postmatrix)(i,j) = 0;</div>
+<div class="line"><span class="lineno">  114</span>      (*Postmatrix)(i,j) = <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;CovMatrix(i,j);</div>
+<div class="line"><span class="lineno">  115</span>    }</div>
+<div class="line"><span class="lineno">  116</span>  }</div>
+<div class="line"><span class="lineno">  117</span> </div>
+<div class="line"><span class="lineno">  118</span>  ParCounter = 0;</div>
+<div class="line"><span class="lineno">  119</span>  <span class="keyword">const</span> <span class="keywordtype">double</span> *X = <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;X();</div>
+<div class="line"><span class="lineno">  120</span>  <span class="keyword">const</span> <span class="keywordtype">double</span> *err = <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;Errors();</div>
+<div class="line"><span class="lineno">  121</span>  <span class="keywordflow">for</span> (std::vector&lt;ParameterHandlerBase*&gt;::iterator it = <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.begin(); it != <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.end(); ++it)</div>
+<div class="line"><span class="lineno">  122</span>  {</div>
+<div class="line"><span class="lineno">  123</span>    <span class="keywordflow">if</span>(!(*it)-&gt;IsPCA())</div>
+<div class="line"><span class="lineno">  124</span>    {</div>
+<div class="line"><span class="lineno">  125</span>      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; (*it)-&gt;GetNumParams(); ++i, ++ParCounter)</div>
+<div class="line"><span class="lineno">  126</span>      {</div>
+<div class="line"><span class="lineno">  127</span>        <span class="keywordtype">double</span> ParVal = X[ParCounter];</div>
+<div class="line"><span class="lineno">  128</span>        <span class="comment">//KS: Basically apply mirroring for parameters out of bounds</span></div>
+<div class="line"><span class="lineno">  129</span>        <span class="keywordflow">if</span>(<a class="code hl_variable" href="classLikelihoodFit.html#ae1e5d13b373bf73e1b1003f7f9d65f00">fMirroring</a>)</div>
+<div class="line"><span class="lineno">  130</span>        {</div>
+<div class="line"><span class="lineno">  131</span>          <span class="keywordflow">if</span>(ParVal &lt; (*it)-&gt;GetLowerBound(i))</div>
+<div class="line"><span class="lineno">  132</span>          {</div>
+<div class="line"><span class="lineno">  133</span>            ParVal = (*it)-&gt;GetLowerBound(i) + ((*it)-&gt;GetLowerBound(i) - ParVal);</div>
+<div class="line"><span class="lineno">  134</span>          }</div>
+<div class="line"><span class="lineno">  135</span>          <span class="keywordflow">else</span> <span class="keywordflow">if</span> (ParVal &gt; (*it)-&gt;GetUpperBound(i))</div>
+<div class="line"><span class="lineno">  136</span>          {</div>
+<div class="line"><span class="lineno">  137</span>            ParVal = (*it)-&gt;GetUpperBound(i) - ( ParVal - (*it)-&gt;GetUpperBound(i));</div>
+<div class="line"><span class="lineno">  138</span>          }</div>
+<div class="line"><span class="lineno">  139</span>        }</div>
+<div class="line"><span class="lineno">  140</span>        (*MinuitParValue)(ParCounter) = ParVal;</div>
+<div class="line"><span class="lineno">  141</span>        (*MinuitParError)(ParCounter) = err[ParCounter];</div>
+<div class="line"><span class="lineno">  142</span>        <span class="comment">//KS: For fixed params HESS will not calculate error so we need to pass prior error</span></div>
+<div class="line"><span class="lineno">  143</span>        <span class="keywordflow">if</span>((*it)-&gt;IsParameterFixed(i))</div>
+<div class="line"><span class="lineno">  144</span>        {</div>
+<div class="line"><span class="lineno">  145</span>          (*MinuitParError)(ParCounter) = (*it)-&gt;GetDiagonalError(i);</div>
+<div class="line"><span class="lineno">  146</span>          (*Postmatrix)(ParCounter,ParCounter) = (*MinuitParError)(ParCounter) * (*MinuitParError)(ParCounter);</div>
+<div class="line"><span class="lineno">  147</span>        }</div>
+<div class="line"><span class="lineno">  148</span>      }</div>
+<div class="line"><span class="lineno">  149</span>    }</div>
+<div class="line"><span class="lineno">  150</span>    <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">  151</span>    {</div>
+<div class="line"><span class="lineno">  152</span>      <span class="comment">//KS: We need to convert parameters from PCA to normal base</span></div>
+<div class="line"><span class="lineno">  153</span>      TVectorD ParVals((*it)-&gt;GetNumParams());</div>
+<div class="line"><span class="lineno">  154</span>      TVectorD ParVals_PCA((*it)-&gt;GetNParameters());</div>
 <div class="line"><span class="lineno">  155</span> </div>
-<div class="line"><span class="lineno">  156</span>      TMatrixD MatrixVals((*it)-&gt;GetNumParams(), (*it)-&gt;GetNumParams());</div>
-<div class="line"><span class="lineno">  157</span>      TMatrixD MatrixVals_PCA((*it)-&gt;GetNParameters(), (*it)-&gt;GetNParameters());</div>
+<div class="line"><span class="lineno">  156</span>      TVectorD ErrorVals((*it)-&gt;GetNumParams());</div>
+<div class="line"><span class="lineno">  157</span>      TVectorD ErrorVals_PCA((*it)-&gt;GetNParameters());</div>
 <div class="line"><span class="lineno">  158</span> </div>
-<div class="line"><span class="lineno">  159</span>      <span class="comment">//First save them</span></div>
-<div class="line"><span class="lineno">  160</span>      <span class="comment">//KS: This code is super convoluted as MaCh3 can store separate matrices while Minuit has one matrix. In future this will be simplified, keep it like this for now.</span></div>
-<div class="line"><span class="lineno">  161</span>      <span class="keyword">const</span> <span class="keywordtype">int</span> StartVal = ParCounter;</div>
-<div class="line"><span class="lineno">  162</span>      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; (*it)-&gt;GetNParameters(); ++i, ++ParCounter)</div>
-<div class="line"><span class="lineno">  163</span>      {</div>
-<div class="line"><span class="lineno">  164</span>        ParVals_PCA(i) = X[ParCounter];</div>
-<div class="line"><span class="lineno">  165</span>        ErrorVals_PCA(i) = err[ParCounter];</div>
-<div class="line"><span class="lineno">  166</span>        <span class="keywordtype">int</span> ParCounterMatrix = StartVal;</div>
-<div class="line"><span class="lineno">  167</span>        <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j = 0; j &lt; (*it)-&gt;GetNParameters(); ++j, ++ParCounterMatrix)</div>
-<div class="line"><span class="lineno">  168</span>        {</div>
-<div class="line"><span class="lineno">  169</span>          MatrixVals_PCA(i,j) = <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;CovMatrix(ParCounter,ParCounterMatrix);</div>
-<div class="line"><span class="lineno">  170</span>        }</div>
-<div class="line"><span class="lineno">  171</span>      }</div>
-<div class="line"><span class="lineno">  172</span>      ParVals = ((*it)-&gt;GetPCAHandler()-&gt;GetTransferMatrix())*ParVals_PCA;</div>
-<div class="line"><span class="lineno">  173</span>      ErrorVals = ((*it)-&gt;GetPCAHandler()-&gt;GetTransferMatrix())*ErrorVals_PCA;</div>
-<div class="line"><span class="lineno">  174</span>      MatrixVals.Mult(((*it)-&gt;GetPCAHandler()-&gt;GetTransferMatrix()),MatrixVals_PCA);</div>
-<div class="line"><span class="lineno">  175</span> </div>
-<div class="line"><span class="lineno">  176</span>      ParCounter = StartVal;</div>
-<div class="line"><span class="lineno">  177</span>      <span class="comment">//KS: Now after going from PCA to normal let&#39;;s save it</span></div>
-<div class="line"><span class="lineno">  178</span>      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; (*it)-&gt;GetNumParams(); ++i, ++ParCounter)</div>
-<div class="line"><span class="lineno">  179</span>      {</div>
-<div class="line"><span class="lineno">  180</span>        (*MinuitParValue)(ParCounter) = ParVals(i);</div>
-<div class="line"><span class="lineno">  181</span>        (*MinuitParError)(ParCounter) = std::fabs(ErrorVals(i));</div>
-<div class="line"><span class="lineno">  182</span>        <span class="keywordtype">int</span> ParCounterMatrix = StartVal;</div>
-<div class="line"><span class="lineno">  183</span>        <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j = 0; j &lt; (*it)-&gt;GetNumParams(); ++j, ++ParCounterMatrix)</div>
-<div class="line"><span class="lineno">  184</span>        {</div>
-<div class="line"><span class="lineno">  185</span>          (*Postmatrix)(ParCounter,ParCounterMatrix)  = MatrixVals(i,j);</div>
-<div class="line"><span class="lineno">  186</span>        }</div>
-<div class="line"><span class="lineno">  187</span>        <span class="comment">//If fixed take prior</span></div>
-<div class="line"><span class="lineno">  188</span>        <span class="keywordflow">if</span>((*it)-&gt;GetPCAHandler()-&gt;IsParameterFixedPCA(i))</div>
-<div class="line"><span class="lineno">  189</span>        {</div>
-<div class="line"><span class="lineno">  190</span>          (*MinuitParError)(ParCounter) = (*it)-&gt;GetDiagonalError(i);</div>
-<div class="line"><span class="lineno">  191</span>          (*Postmatrix)(ParCounter,ParCounter) = (*MinuitParError)(ParCounter) * (*MinuitParError)(ParCounter);</div>
-<div class="line"><span class="lineno">  192</span>        }</div>
-<div class="line"><span class="lineno">  193</span>      }</div>
-<div class="line"><span class="lineno">  194</span>    }</div>
-<div class="line"><span class="lineno">  195</span>  }</div>
-<div class="line"><span class="lineno">  196</span> </div>
-<div class="line"><span class="lineno">  197</span>  MinuitParValue-&gt;Write(<span class="stringliteral">&quot;MinuitParValue&quot;</span>);</div>
-<div class="line"><span class="lineno">  198</span>  MinuitParError-&gt;Write(<span class="stringliteral">&quot;MinuitParError&quot;</span>);</div>
-<div class="line"><span class="lineno">  199</span>  Postmatrix-&gt;Write(<span class="stringliteral">&quot;Postmatrix&quot;</span>);</div>
-<div class="line"><span class="lineno">  200</span>  <span class="keyword">delete</span> MinuitParValue;</div>
-<div class="line"><span class="lineno">  201</span>  <span class="keyword">delete</span> MinuitParError;</div>
-<div class="line"><span class="lineno">  202</span>  <span class="keyword">delete</span> Postmatrix;</div>
-<div class="line"><span class="lineno">  203</span>  <span class="comment">// Save all the output</span></div>
-<div class="line"><span class="lineno">  204</span>  <a class="code hl_function" href="classFitterBase.html#a418f581b688f035211107ddd83168c08">SaveOutput</a>();</div>
-<div class="line"><span class="lineno">  205</span>}</div>
-<div class="ttc" id="aclassFitterBase_html_a418f581b688f035211107ddd83168c08"><div class="ttname"><a href="classFitterBase.html#a418f581b688f035211107ddd83168c08">FitterBase::SaveOutput</a></div><div class="ttdeci">void SaveOutput()</div><div class="ttdoc">Save output and close files.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8cpp_source.html#l00210">FitterBase.cpp:210</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_a4260b312e3f35cf01fc73b02239f8990"><div class="ttname"><a href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">FitterBase::outputFile</a></div><div class="ttdeci">TFile * outputFile</div><div class="ttdoc">Output.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00127">FitterBase.h:127</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_a4fceb68f242feeb04a0ddf42a5a37095"><div class="ttname"><a href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">FitterBase::fitMan</a></div><div class="ttdeci">manager * fitMan</div><div class="ttdoc">The manager.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00088">FitterBase.h:88</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_afeffc9d794c973a015aa12ec1a8f79da"><div class="ttname"><a href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">FitterBase::systematics</a></div><div class="ttdeci">std::vector&lt; ParameterHandlerBase * &gt; systematics</div><div class="ttdoc">Systematic holder.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00114">FitterBase.h:114</a></div></div>
-<div class="ttc" id="aclassLikelihoodFit_html_a0b50b7b607751e80b6c85e9db98631af"><div class="ttname"><a href="classLikelihoodFit.html#a0b50b7b607751e80b6c85e9db98631af">LikelihoodFit::NParsPCA</a></div><div class="ttdeci">int NParsPCA</div><div class="ttdoc">Number of all parameters from all covariances in PCA base.</div><div class="ttdef"><b>Definition:</b> <a href="LikelihoodFit_8h_source.html#l00029">LikelihoodFit.h:29</a></div></div>
-<div class="ttc" id="aclassLikelihoodFit_html_ac779acfe140500d06e42a1d4ace25385"><div class="ttname"><a href="classLikelihoodFit.html#ac779acfe140500d06e42a1d4ace25385">LikelihoodFit::NPars</a></div><div class="ttdeci">int NPars</div><div class="ttdoc">Number of all parameters from all covariances.</div><div class="ttdef"><b>Definition:</b> <a href="LikelihoodFit_8h_source.html#l00027">LikelihoodFit.h:27</a></div></div>
+<div class="line"><span class="lineno">  159</span>      TMatrixD MatrixVals((*it)-&gt;GetNumParams(), (*it)-&gt;GetNumParams());</div>
+<div class="line"><span class="lineno">  160</span>      TMatrixD MatrixVals_PCA((*it)-&gt;GetNParameters(), (*it)-&gt;GetNParameters());</div>
+<div class="line"><span class="lineno">  161</span> </div>
+<div class="line"><span class="lineno">  162</span>      <span class="comment">//First save them</span></div>
+<div class="line"><span class="lineno">  163</span>      <span class="comment">//KS: This code is super convoluted as MaCh3 can store separate matrices while Minuit has one matrix. In future this will be simplified, keep it like this for now.</span></div>
+<div class="line"><span class="lineno">  164</span>      <span class="keyword">const</span> <span class="keywordtype">int</span> StartVal = ParCounter;</div>
+<div class="line"><span class="lineno">  165</span>      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; (*it)-&gt;GetNParameters(); ++i, ++ParCounter)</div>
+<div class="line"><span class="lineno">  166</span>      {</div>
+<div class="line"><span class="lineno">  167</span>        ParVals_PCA(i) = X[ParCounter];</div>
+<div class="line"><span class="lineno">  168</span>        ErrorVals_PCA(i) = err[ParCounter];</div>
+<div class="line"><span class="lineno">  169</span>        <span class="keywordtype">int</span> ParCounterMatrix = StartVal;</div>
+<div class="line"><span class="lineno">  170</span>        <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j = 0; j &lt; (*it)-&gt;GetNParameters(); ++j, ++ParCounterMatrix)</div>
+<div class="line"><span class="lineno">  171</span>        {</div>
+<div class="line"><span class="lineno">  172</span>          MatrixVals_PCA(i,j) = <a class="code hl_variable" href="classMinuitFit.html#a35c7ca49a664f741e195413c972522bc">minuit</a>-&gt;CovMatrix(ParCounter,ParCounterMatrix);</div>
+<div class="line"><span class="lineno">  173</span>        }</div>
+<div class="line"><span class="lineno">  174</span>      }</div>
+<div class="line"><span class="lineno">  175</span>      ParVals = ((*it)-&gt;GetPCAHandler()-&gt;GetTransferMatrix())*ParVals_PCA;</div>
+<div class="line"><span class="lineno">  176</span>      ErrorVals = ((*it)-&gt;GetPCAHandler()-&gt;GetTransferMatrix())*ErrorVals_PCA;</div>
+<div class="line"><span class="lineno">  177</span>      MatrixVals.Mult(((*it)-&gt;GetPCAHandler()-&gt;GetTransferMatrix()),MatrixVals_PCA);</div>
+<div class="line"><span class="lineno">  178</span> </div>
+<div class="line"><span class="lineno">  179</span>      ParCounter = StartVal;</div>
+<div class="line"><span class="lineno">  180</span>      <span class="comment">//KS: Now after going from PCA to normal let&#39;;s save it</span></div>
+<div class="line"><span class="lineno">  181</span>      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; (*it)-&gt;GetNumParams(); ++i, ++ParCounter)</div>
+<div class="line"><span class="lineno">  182</span>      {</div>
+<div class="line"><span class="lineno">  183</span>        (*MinuitParValue)(ParCounter) = ParVals(i);</div>
+<div class="line"><span class="lineno">  184</span>        (*MinuitParError)(ParCounter) = std::fabs(ErrorVals(i));</div>
+<div class="line"><span class="lineno">  185</span>        <span class="keywordtype">int</span> ParCounterMatrix = StartVal;</div>
+<div class="line"><span class="lineno">  186</span>        <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j = 0; j &lt; (*it)-&gt;GetNumParams(); ++j, ++ParCounterMatrix)</div>
+<div class="line"><span class="lineno">  187</span>        {</div>
+<div class="line"><span class="lineno">  188</span>          (*Postmatrix)(ParCounter,ParCounterMatrix)  = MatrixVals(i,j);</div>
+<div class="line"><span class="lineno">  189</span>        }</div>
+<div class="line"><span class="lineno">  190</span>        <span class="comment">//If fixed take prior</span></div>
+<div class="line"><span class="lineno">  191</span>        <span class="keywordflow">if</span>((*it)-&gt;GetPCAHandler()-&gt;IsParameterFixedPCA(i))</div>
+<div class="line"><span class="lineno">  192</span>        {</div>
+<div class="line"><span class="lineno">  193</span>          (*MinuitParError)(ParCounter) = (*it)-&gt;GetDiagonalError(i);</div>
+<div class="line"><span class="lineno">  194</span>          (*Postmatrix)(ParCounter,ParCounter) = (*MinuitParError)(ParCounter) * (*MinuitParError)(ParCounter);</div>
+<div class="line"><span class="lineno">  195</span>        }</div>
+<div class="line"><span class="lineno">  196</span>      }</div>
+<div class="line"><span class="lineno">  197</span>    }</div>
+<div class="line"><span class="lineno">  198</span>  }</div>
+<div class="line"><span class="lineno">  199</span> </div>
+<div class="line"><span class="lineno">  200</span>  MinuitParValue-&gt;Write(<span class="stringliteral">&quot;MinuitParValue&quot;</span>);</div>
+<div class="line"><span class="lineno">  201</span>  MinuitParError-&gt;Write(<span class="stringliteral">&quot;MinuitParError&quot;</span>);</div>
+<div class="line"><span class="lineno">  202</span>  Postmatrix-&gt;Write(<span class="stringliteral">&quot;Postmatrix&quot;</span>);</div>
+<div class="line"><span class="lineno">  203</span>  <span class="keyword">delete</span> MinuitParValue;</div>
+<div class="line"><span class="lineno">  204</span>  <span class="keyword">delete</span> MinuitParError;</div>
+<div class="line"><span class="lineno">  205</span>  <span class="keyword">delete</span> Postmatrix;</div>
+<div class="line"><span class="lineno">  206</span>  <span class="comment">// Save all the output</span></div>
+<div class="line"><span class="lineno">  207</span>  <a class="code hl_function" href="classFitterBase.html#a418f581b688f035211107ddd83168c08">SaveOutput</a>();</div>
+<div class="line"><span class="lineno">  208</span>}</div>
+<div class="ttc" id="aclassFitterBase_html_a418f581b688f035211107ddd83168c08"><div class="ttname"><a href="classFitterBase.html#a418f581b688f035211107ddd83168c08">FitterBase::SaveOutput</a></div><div class="ttdeci">void SaveOutput()</div><div class="ttdoc">Save output and close files.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8cpp_source.html#l00218">FitterBase.cpp:218</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_a4260b312e3f35cf01fc73b02239f8990"><div class="ttname"><a href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">FitterBase::outputFile</a></div><div class="ttdeci">TFile * outputFile</div><div class="ttdoc">Output.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00131">FitterBase.h:131</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_a4fceb68f242feeb04a0ddf42a5a37095"><div class="ttname"><a href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">FitterBase::fitMan</a></div><div class="ttdeci">manager * fitMan</div><div class="ttdoc">The manager.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00092">FitterBase.h:92</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_aed21cb87772dcaecb0bc5ccb44b6efd4"><div class="ttname"><a href="classFitterBase.html#aed21cb87772dcaecb0bc5ccb44b6efd4">FitterBase::SanitiseInputs</a></div><div class="ttdeci">void SanitiseInputs()</div><div class="ttdoc">Remove obsolete memory and make other checks before fit starts.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8cpp_source.html#l00210">FitterBase.cpp:210</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_afeffc9d794c973a015aa12ec1a8f79da"><div class="ttname"><a href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">FitterBase::systematics</a></div><div class="ttdeci">std::vector&lt; ParameterHandlerBase * &gt; systematics</div><div class="ttdoc">Systematic holder.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00118">FitterBase.h:118</a></div></div>
+<div class="ttc" id="aclassLikelihoodFit_html_a0b50b7b607751e80b6c85e9db98631af"><div class="ttname"><a href="classLikelihoodFit.html#a0b50b7b607751e80b6c85e9db98631af">LikelihoodFit::NParsPCA</a></div><div class="ttdeci">int NParsPCA</div><div class="ttdoc">Number of all parameters from all covariances in PCA base.</div><div class="ttdef"><b>Definition:</b> <a href="LikelihoodFit_8h_source.html#l00030">LikelihoodFit.h:30</a></div></div>
+<div class="ttc" id="aclassLikelihoodFit_html_ac779acfe140500d06e42a1d4ace25385"><div class="ttname"><a href="classLikelihoodFit.html#ac779acfe140500d06e42a1d4ace25385">LikelihoodFit::NPars</a></div><div class="ttdeci">int NPars</div><div class="ttdoc">Number of all parameters from all covariances.</div><div class="ttdef"><b>Definition:</b> <a href="LikelihoodFit_8h_source.html#l00028">LikelihoodFit.h:28</a></div></div>
 <div class="ttc" id="aclassLikelihoodFit_html_adb89956955c043bf37cad04983e4facd"><div class="ttname"><a href="classLikelihoodFit.html#adb89956955c043bf37cad04983e4facd">LikelihoodFit::PrepareFit</a></div><div class="ttdeci">void PrepareFit()</div><div class="ttdoc">prepare output and perform sanity checks</div><div class="ttdef"><b>Definition:</b> <a href="LikelihoodFit_8cpp_source.html#l00022">LikelihoodFit.cpp:22</a></div></div>
-<div class="ttc" id="aclassLikelihoodFit_html_ae1e5d13b373bf73e1b1003f7f9d65f00"><div class="ttname"><a href="classLikelihoodFit.html#ae1e5d13b373bf73e1b1003f7f9d65f00">LikelihoodFit::fMirroring</a></div><div class="ttdeci">bool fMirroring</div><div class="ttdoc">Flag telling if mirroring is used or not.</div><div class="ttdef"><b>Definition:</b> <a href="LikelihoodFit_8h_source.html#l00031">LikelihoodFit.h:31</a></div></div>
-<div class="ttc" id="aclassLikelihoodFit_html_af7383703e9f93e5aebcf699d80a6fb9e"><div class="ttname"><a href="classLikelihoodFit.html#af7383703e9f93e5aebcf699d80a6fb9e">LikelihoodFit::CalcChi2</a></div><div class="ttdeci">virtual double CalcChi2(const double *x)</div><div class="ttdoc">Chi2 calculation over all included samples and syst objects.</div><div class="ttdef"><b>Definition:</b> <a href="LikelihoodFit_8cpp_source.html#l00041">LikelihoodFit.cpp:41</a></div></div>
+<div class="ttc" id="aclassLikelihoodFit_html_ae1e5d13b373bf73e1b1003f7f9d65f00"><div class="ttname"><a href="classLikelihoodFit.html#ae1e5d13b373bf73e1b1003f7f9d65f00">LikelihoodFit::fMirroring</a></div><div class="ttdeci">bool fMirroring</div><div class="ttdoc">Flag telling if mirroring is used or not.</div><div class="ttdef"><b>Definition:</b> <a href="LikelihoodFit_8h_source.html#l00032">LikelihoodFit.h:32</a></div></div>
+<div class="ttc" id="aclassLikelihoodFit_html_af7383703e9f93e5aebcf699d80a6fb9e"><div class="ttname"><a href="classLikelihoodFit.html#af7383703e9f93e5aebcf699d80a6fb9e">LikelihoodFit::CalcChi2</a></div><div class="ttdeci">virtual double CalcChi2(const double *x)</div><div class="ttdoc">Chi2 calculation over all included samples and syst objects.</div><div class="ttdef"><b>Definition:</b> <a href="LikelihoodFit_8cpp_source.html#l00040">LikelihoodFit.cpp:40</a></div></div>
 <div class="ttc" id="aclassmanager_html_ab3999cc856ede72b37f68bdb28bd5520"><div class="ttname"><a href="classmanager.html#ab3999cc856ede72b37f68bdb28bd5520">manager::raw</a></div><div class="ttdeci">YAML::Node const &amp; raw()</div><div class="ttdoc">Return config.</div><div class="ttdef"><b>Definition:</b> <a href="Manager_8h_source.html#l00041">Manager.h:41</a></div></div>
 </div><!-- fragment -->
 </div>
