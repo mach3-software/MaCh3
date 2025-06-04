@@ -3,7 +3,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # CMake version check
 cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
-project(MaCh3 VERSION 1.4.7 LANGUAGES CXX)
+project(MaCh3 VERSION 1.5.0 LANGUAGES CXX)
 set(MaCh3_VERSION ${PROJECT_VERSION})
 
 option(MaCh3_PYTHON_ENABLED "Whether to build MaCh3 python bindings" OFF)
@@ -15,6 +15,7 @@ option(MaCh3_DependancyGraph "Will produce dependency graph" OFF)
 option(MaCh3_GPU_BENCHMARK "Perform fancy CUDA Benchmarking" OFF)
 option(MaCh3_NATIVE_ENABLED "Enable native CPU optimizations for improved performance during benchmarking)" OFF)
 option(MaCh3_GPU_ENABLED "Use GPU acceleration or not" ON)
+option(MaCh3_NuOsc_GPU_ENABLED "By default MaCh3 will use NuOscillator with GPU if MaCh3 is compiled with GPU, this flag allows disabling GPU for NuOscillator even if MaCh3 has GPU enabled" ON)
 
 #KS: Load cmake function like DefineEnabledRequiredSwitch allowing to write more compact cmake
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/Modules)
@@ -28,7 +29,7 @@ add_library(MaCh3GPUCompilerOptions INTERFACE)
 
 find_package(CUDAToolkit QUIET)
 # Check if CUDA was found
-if(CUDAToolkit_FOUND AND NOT(MaCh3_GPU_ENABLED))
+if(CUDAToolkit_FOUND AND MaCh3_GPU_ENABLED)
   cmessage(STATUS "CUDA found. Adding CUDA support.")
   set(MaCh3_GPU_ENABLED ON)
   enable_language(CUDA)
@@ -146,6 +147,7 @@ endif()
 if(MaCh3_DEBUG_ENABLED)
   target_compile_options(MaCh3CompilerOptions INTERFACE
     -O0                                  # Turn off any optimisation to have best debug experience
+    -mno-avx
   )
   target_compile_definitions(MaCh3CompileDefinitions INTERFACE DEBUG=${DEBUG_LEVEL})
   cmessage(STATUS "Enabling DEBUG with Level: \"${DEBUG_LEVEL}\"")

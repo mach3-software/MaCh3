@@ -50,18 +50,17 @@ void splineFDBase::cleanUpMemory() {
   CleanVector(SplineInterpolationTypes);
   CleanVector(nOscChans);
   CleanVector(nSplineParams);
-  CleanVector(DetIDs);
   CleanVector(DimensionLabels);
   CleanVector(SampleNames);
   CleanVector(Dimensions);
   CleanContainer(splinevec_Monolith);
   CleanContainer(SplineBinning);
+  CleanVector(UniqueSystIndices);
   if(isflatarray) delete [] isflatarray;
 }
 
 //****************************************
 void splineFDBase::AddSample(const std::string& SampleName,
-                             const std::string& DetID,
                              const std::vector<std::string>& OscChanFileNames,
                              const std::vector<std::string>& SplineVarNames)
 //Adds samples to the large array
@@ -70,25 +69,24 @@ void splineFDBase::AddSample(const std::string& SampleName,
   SampleNames.push_back(SampleName);
   Dimensions.push_back(int(SplineVarNames.size()));
   DimensionLabels.push_back(SplineVarNames);
-  DetIDs.push_back(DetID);
 
-  int nSplineParam = xsec->GetNumParamsFromDetID(DetID, SystType::kSpline);
+  int nSplineParam = xsec->GetNumParamsFromSampleName(SampleName, SystType::kSpline);
   nSplineParams.push_back(nSplineParam);
 
   //This holds the global index of the spline i.e. 0 -> _fNumPar
-  std::vector<int> GlobalSystIndex_Sample = xsec->GetGlobalSystIndexFromDetID(DetID, SystType::kSpline);
+  std::vector<int> GlobalSystIndex_Sample = xsec->GetGlobalSystIndexFromSampleName(SampleName, SystType::kSpline);
   //Keep track of this for all the samples
   GlobalSystIndex.push_back(GlobalSystIndex_Sample);
 
-  std::vector<SplineInterpolation> SplineInterpolation_Sample = xsec->GetSplineInterpolationFromDetID(DetID);
+  std::vector<SplineInterpolation> SplineInterpolation_Sample = xsec->GetSplineInterpolationFromSampleName(SampleName);
   // Keep track of this for all samples
   SplineInterpolationTypes.push_back(SplineInterpolation_Sample);
 
-  std::vector<std::string> SplineFileParPrefixNames_Sample = xsec->GetSplineParsNamesFromDetID(DetID);
+  std::vector<std::string> SplineFileParPrefixNames_Sample = xsec->GetSplineParsNamesFromSampleName(SampleName);
   SplineFileParPrefixNames.push_back(SplineFileParPrefixNames_Sample);
 
   MACH3LOG_INFO("Create SplineModeVecs_Sample");
-  std::vector<std::vector<int>> SplineModeVecs_Sample = StripDuplicatedModes(xsec->GetSplineModeVecFromDetID(DetID));
+  std::vector<std::vector<int>> SplineModeVecs_Sample = StripDuplicatedModes(xsec->GetSplineModeVecFromSampleName(SampleName));
   MACH3LOG_INFO("SplineModeVecs_Sample is of size {}", SplineModeVecs_Sample.size());
   SplineModeVecs.push_back(SplineModeVecs_Sample);
 
@@ -299,7 +297,7 @@ void splineFDBase::BuildSampleIndexingArray(const std::string& SampleName)
 }
 
 //****************************************
-std::vector<TAxis *> splineFDBase::FindSplineBinning(std::string FileName, std::string SampleName)
+std::vector<TAxis *> splineFDBase::FindSplineBinning(const std::string& FileName, const std::string& SampleName)
 //****************************************
 {
   std::vector<TAxis *> ReturnVec;
@@ -669,7 +667,6 @@ void splineFDBase::PrintSampleDetails(const std::string& SampleName) const
 
   MACH3LOG_INFO("Details about sample: {:<20}", SampleNames[iSample]);
   MACH3LOG_INFO("\t Dimension: {:<35}", Dimensions[iSample]);
-  MACH3LOG_INFO("\t DetID: {:<35}", DetIDs[iSample]);
   MACH3LOG_INFO("\t nSplineParam: {:<35}", nSplineParams[iSample]);
   MACH3LOG_INFO("\t nOscChan: {:<35}", nOscChans[iSample]);
 }
@@ -752,7 +749,7 @@ void splineFDBase::PrintBinning(TAxis *Axis) const
 }
 
 //****************************************
-std::vector< std::vector<int> > splineFDBase::GetEventSplines(std::string SampleName, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val)
+std::vector< std::vector<int> > splineFDBase::GetEventSplines(const std::string& SampleName, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val)
 //****************************************
 {
   std::vector<std::vector<int>> ReturnVec;
@@ -820,7 +817,7 @@ std::vector< std::vector<int> > splineFDBase::GetEventSplines(std::string Sample
 
 // checks if there are multiple modes with the same SplineSuffix
 // (for example if CCRES and CCCoherent are treated as one spline mode)
-std::vector< std::vector<int> > splineFDBase::StripDuplicatedModes(std::vector< std::vector<int> > InputVector) {
+std::vector< std::vector<int> > splineFDBase::StripDuplicatedModes(const std::vector< std::vector<int> >& InputVector) {
   //ETA - this is of size nPars from the xsec model
   size_t InputVectorSize = InputVector.size();
   std::vector< std::vector<int> > ReturnVec(InputVectorSize);
@@ -865,7 +862,7 @@ void splineFDBase::FillSampleArray(std::string SampleName, std::vector<std::stri
     TSpline3_red* Spline = nullptr;
     TString Syst, Mode;
     int nKnots, SystNum, ModeNum, Var1Bin, Var2Bin, Var3Bin = M3::_BAD_INT_;
-    double x,y, Eval = M3::_BAD_DOUBLE_;
+    double x,y = M3::_BAD_DOUBLE_;
     bool isFlat = true;
 
     std::set<std::string> SplineFileNames;
@@ -889,8 +886,8 @@ void splineFDBase::FillSampleArray(std::string SampleName, std::vector<std::stri
       std::string FullSplineName = std::string(Key->GetName());
 
       if (SplineFileNames.count(FullSplineName) > 0) {
-	MACH3LOG_CRITICAL("Skipping spline - Found a spline whose name has already been encountered before: {}", FullSplineName); 
-	continue;
+        MACH3LOG_CRITICAL("Skipping spline - Found a spline whose name has already been encountered before: {}", FullSplineName);
+        continue;
       }
       SplineFileNames.insert(FullSplineName);
 
@@ -931,10 +928,10 @@ void splineFDBase::FillSampleArray(std::string SampleName, std::vector<std::stri
       }
 
       if (ModeNum == -1) {
-	//DB - If you have splines in the root file that you don't want to use (e.g. removing a mode from a syst), this will cause a throw
-	//     Therefore include as debug warning and continue instead
+      //DB - If you have splines in the root file that you don't want to use (e.g. removing a mode from a syst), this will cause a throw
+      //     Therefore include as debug warning and continue instead
         MACH3LOG_DEBUG("Couldn't find mode for {} in {}. Problem Spline is : {} ", Mode, Syst, FullSplineName);
-	continue;
+        continue;
       }
 
       mySpline = Key->ReadObject<TSpline3>();
@@ -946,9 +943,7 @@ void splineFDBase::FillSampleArray(std::string SampleName, std::vector<std::stri
         isFlat = true;
         for (int iKnot = 0; iKnot < nKnots; iKnot++) {
           mySpline->GetKnot(iKnot, x, y);
-
-          Eval = mySpline->Eval(x);
-          if (Eval < 0.99999 || Eval > 1.00001)
+          if (y < 0.99999 || y > 1.00001)
           {
             isFlat = false;
             break;
@@ -964,7 +959,7 @@ void splineFDBase::FillSampleArray(std::string SampleName, std::vector<std::stri
           delete mySpline;
         } else {
           Spline = new TSpline3_red(mySpline, SplineInterpolationTypes[iSample][SystNum]);
-          delete mySpline;
+          if(mySpline) delete mySpline;
 
           splinevec_Monolith.push_back(Spline);
           uniquecoeffindices.push_back(MonolithIndex); //So we can get the unique coefficients and skip flat splines later on!

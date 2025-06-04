@@ -30,7 +30,6 @@ class splineFDBase : public SplineBase {
 
     /// @brief add oscillation channel to spline monolith
     void AddSample(const std::string& SampleName,
-                   const std::string& DetID,
                    const std::vector<std::string>& OscChanFileNames,
                    const std::vector<std::string>& SplineVarNames);
     /// @brief flatten multidimensional spline array into proper monolith
@@ -43,12 +42,12 @@ class splineFDBase : public SplineBase {
     virtual void FillSampleArray(std::string SampleName, std::vector<std::string> OscChanFileNames);
     /// @brief Check if there are any repeated modes. This is used to reduce the number
     /// of modes in case many interaction modes get averaged into one spline
-    std::vector< std::vector<int> > StripDuplicatedModes(std::vector< std::vector<int> > InputVector);
+    std::vector< std::vector<int> > StripDuplicatedModes(const std::vector< std::vector<int> >& InputVector);
     /// @brief Return the splines which affect a given event
-    std::vector< std::vector<int> > GetEventSplines(std::string SampleName, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val);
+    std::vector< std::vector<int> > GetEventSplines(const std::string& SampleName, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val);
 
     /// @brief Grab histograms with spline binning
-    std::vector<TAxis*> FindSplineBinning(std::string FileName, std::string SampleName);
+    std::vector<TAxis*> FindSplineBinning(const std::string& FileName, const std::string& SampleName);
 
     int CountNumberOfLoadedSplines(bool NonFlat=false, int Verbosity=0);
     std::string getDimLabel(const int BinningOpt, const unsigned int Axis) const;
@@ -61,7 +60,7 @@ class splineFDBase : public SplineBase {
     void PrepForReweight();
     void getSplineCoeff_SepMany(int splineindex, M3::float_t *& xArray, M3::float_t *&manyArray);
     void PrintBinning(TAxis* Axis) const;
-    /// @brief Print info like DetID number of spline params etc.
+    /// @brief Print info like Sample ID of spline params etc.
     void PrintSampleDetails(const std::string& SampleName) const;
     void PrintArrayDetails(const std::string& SampleName) const;
 
@@ -84,7 +83,6 @@ class splineFDBase : public SplineBase {
     std::vector<std::string> SampleNames;
     std::vector<int> Dimensions;
     std::vector<std::vector<std::string>> DimensionLabels;
-    std::vector<std::string> DetIDs;
     std::vector<int> nSplineParams;
     std::vector<int> nOscChans;
 
@@ -99,7 +97,7 @@ class splineFDBase : public SplineBase {
     /// systematics which affect that sample.
     std::vector< std::vector<int> > GlobalSystIndex;
     /// @brief spline interpolation types for each sample. These vectors are from
-    /// a call to GetSplineInterpolationFromDetID()
+    /// a call to GetSplineInterpolationFromSampleID()
     std::vector< std::vector<SplineInterpolation> > SplineInterpolationTypes;
 
     /// name of each spline parameter

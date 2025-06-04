@@ -23,12 +23,13 @@ class samplePDFFDBase :  public samplePDFBase
 public:
   //######################################### Functions #########################################
   /// @param ConfigFileName Name of config to initialise the sample object
-  samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xsec_cov, covarianceOsc* osc_cov = nullptr);
+  samplePDFFDBase(std::string ConfigFileName, covarianceXsec* xsec_cov, covarianceOsc* osc_cov = nullptr, OscillatorBase* Oscillator_ = nullptr);
   /// @brief destructor
   virtual ~samplePDFFDBase();
 
   int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
-  std::string GetName() const {return samplename;}
+  std::string GetSampleName(int iSample = 0) const override;
+  std::string GetTitle() const {return SampleTitle;}
 
   std::string GetXBinVarName() {return XVarStr;}
   std::string GetYBinVarName() {return YVarStr;}
@@ -52,7 +53,8 @@ public:
   M3::float_t GetEventWeight(const int iSample, const int iEntry) const;
 
   ///  @brief including Dan's magic NuOscillator
-  void SetupNuOscillator();
+  void InitialiseNuOscillatorObjects();
+  void SetupNuOscillatorPointers();
 
   virtual void setupSplines(FarDetectorCoreInfo *, const char *, int , int ){};
 
@@ -76,11 +78,14 @@ public:
     return MCSamples[iSample].flavourName;
   }
 
-  TH1* get1DVarHist(std::string ProjectionVar, std::vector< std::vector<double> > SelectionVec = std::vector< std::vector<double> >(), int WeightStyle=0, TAxis* Axis=nullptr);
-  TH2* get2DVarHist(std::string ProjectionVarX, std::string ProjectionVarY, std::vector< std::vector<double> > SelectionVec = std::vector< std::vector<double> >(), int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
+  TH1* get1DVarHist(const std::string& ProjectionVar, const std::vector< KinematicCut >& SelectionVec = std::vector< KinematicCut >(),
+                    int WeightStyle=0, TAxis* Axis=nullptr);
+  TH2* get2DVarHist(const std::string& ProjectionVarX, const std::string& ProjectionVarY,
+                    const std::vector< KinematicCut >& SelectionVec = std::vector< KinematicCut >(),
+                    int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
 
-  TH1* get1DVarHistByModeAndChannel(std::string ProjectionVar_Str, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* Axis=nullptr);
-  TH2* get2DVarHistByModeAndChannel(std::string ProjectionVar_StrX, std::string ProjectionVar_StrY, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
+  TH1* get1DVarHistByModeAndChannel(const std::string& ProjectionVar_Str, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* Axis=nullptr);
+  TH2* get2DVarHistByModeAndChannel(const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
 
   TH1 *getModeHist1D(int s, int m, int style = 0) {
     return get1DVarHistByModeAndChannel(XVarStr,m,s,style);
@@ -147,12 +152,33 @@ public:
   std::vector<double> SampleYBins;
   //===============================================================================
 
+  // ----- Functional Parameters -----
   /// @brief ETA - a function to setup and pass values to functional parameters where you need to pass a value to some custom reweight calc or engine
-  virtual void SetupFunctionalParameters(){};
+  virtual void SetupFunctionalParameters();
+  /// @brief HH - a helper function for RegisterFunctionalParameter
+  void RegisterIndividualFuncPar(const std::string& fpName, int fpEnum, FuncParFuncType fpFunc);
+  /// @brief HH - a experiment-specific function where the maps to actual functions are set up
+  virtual void RegisterFunctionalParameters() = 0;
   /// @brief Update the functional parameter values to the latest propsed values. Needs to be called before every new reweight so is called in fillArray 
   virtual void PrepFunctionalParameters(){};
   /// @brief ETA - generic function applying shifts
-  virtual void applyShifts(int iSample, int iEvent){(void) iSample; (void) iEvent;};
+  virtual void applyShifts(int iSample, int iEvent);
+  /// @brief HH - reset the shifted values to the original values
+  virtual void resetShifts(int iSample, int iEvent){(void) iSample; (void) iEvent;};
+  /// @brief HH - a vector that stores all the FuncPars struct
+  std::vector<FuncPars> funcParsVec;
+  /// @brief HH - a map that relates the name of the functional parameter to funcpar enum
+  std::unordered_map<std::string, int> funcParsNamesMap;
+  /// @brief HH - a map that relates the funcpar enum to pointer of FuncPars struct
+  // HH - Changed to a vector of pointers since it's faster than unordered_map and we are using ints as keys
+  std::vector<FuncPars*> funcParsMap;
+  /// @brief HH - a map that relates the funcpar enum to pointer of the actual function
+  std::unordered_map<int, FuncParFuncType> funcParsFuncMap;
+  /// @brief HH - a grid of vectors of enums for each sample and event
+  std::vector<std::vector<std::vector<int>>> funcParsGrid;
+  /// @brief HH - a vector of string names for each functional parameter
+  std::vector<std::string> funcParsNamesVec = {};
+  // --------------------------------
   /// @brief DB Function which determines if an event is selected, where Selection double looks like {{ND280KinematicTypes Var1, douuble LowBound}
   bool IsEventSelected(const int iSample, const int iEvent);
 
@@ -171,7 +197,7 @@ public:
   virtual void CalcWeightFunc(int iSample, int iEvent){return; (void)iSample; (void)iEvent;};
 
   virtual double ReturnKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0;
-  virtual double ReturnKinematicParameter(double KinematicVariable, int iSample, int iEvent) = 0;
+  virtual double ReturnKinematicParameter(int KinematicVariable, int iSample, int iEvent) = 0;
 
   virtual std::vector<double> ReturnKinematicParameterBinning(std::string KinematicParameter) = 0; //Returns binning for parameter Var
   virtual const double* GetPointerToKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0; 
@@ -231,18 +257,17 @@ public:
 
   /// @brief flag used to define whether all oscillation channels have a probability calculated using the same binning
   bool EqualBinningPerOscChannel = false;
-  
+  /// If using shared NuOsc
+  bool SharedNuOsc = false;
   //=============================================================================== 
 
   /// @brief Keep track of the dimensions of the sample binning
   int nDimensions = M3::_BAD_INT_;
   /// @brief A unique ID for each sample based on powers of two for quick binary operator comparisons 
-  std::string SampleDetID;
-  /// holds "TrueNeutrinoEnergy" and the strings used for the sample binning.
-  std::vector<std::string> SplineBinnedVars;
+  std::string SampleName;
 
   /// @brief the name of this sample e.g."muon-like"
-  std::string samplename;
+  std::string SampleTitle;
 
   /// @brief Information to store for normalisation pars
   std::vector<XsecNorms4> xsec_norms;
@@ -253,19 +278,15 @@ public:
   //like in XsecNorms but for events in sample. Read in from sample yaml file 
   //What gets used in IsEventSelected, which gets set equal to user input plus 
   //all the vectors in StoreSelection
-  /// @brief the Number of selections in the 
-  int NSelections = M3::_BAD_INT_;
   
   /// @brief What gets pulled from config options, these are constant after loading in
   /// this is of length 3: 0th index is the value, 1st is lower bound, 2nd is upper bound
-  std::vector< std::vector<double> > StoredSelection;
+  std::vector< KinematicCut > StoredSelection;
   /// @brief the strings grabbed from the sample config specifying the selections
-  std::vector< std::string > SelectionStr; 
-  /// @brief the bounds for each selection lower and upper
-  std::vector< std::vector<double> > SelectionBounds;
+  std::vector< std::string > SelectionStr;
   /// @brief a way to store selection cuts which you may push back in the get1DVar functions
   /// most of the time this is just the same as StoredSelection
-  std::vector< std::vector<double> > Selection;
+  std::vector< KinematicCut > Selection;
    //===========================================================================
 
   /// Mapping between string and kinematic enum
@@ -290,4 +311,9 @@ public:
   /// DB Miscellaneous Variables
   TLegend* THStackLeg = nullptr;
   //===============================================================================
+
+  /// KS:Super hacky to update W2 or not
+  bool FirstTimeW2;
+  /// KS:Super hacky to update W2 or not
+  bool UpdateW2;
 };

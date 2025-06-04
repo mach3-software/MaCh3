@@ -513,9 +513,9 @@ void MakeFluctuatedHistogramAlternative(TH2Poly *FluctHist, TH2Poly* PolyHist, T
 }
 
 // *************************
-TGraphAsymmErrors* MakeAsymGraph(TH1D* sigmaArrayLeft, TH1D* sigmaArrayCentr, TH1D* sigmaArrayRight, const std::string& title) {
+std::unique_ptr<TGraphAsymmErrors> MakeAsymGraph(TH1* sigmaArrayLeft, TH1* sigmaArrayCentr, TH1* sigmaArrayRight, const std::string& title) {
 // *************************
-  TGraphAsymmErrors *var = new TGraphAsymmErrors(sigmaArrayCentr);
+  auto var = std::make_unique<TGraphAsymmErrors>(sigmaArrayCentr);
   var->SetNameTitle((title).c_str(), (title).c_str());
 
   // Need to draw TGraphs to set axes labels
@@ -595,8 +595,8 @@ double CalculateEnu(double PLep, double costh, double Eb, bool neutrino){
     mNeff = 0.93827203 - Eb / 1000.;
     mNoth = 0.93956536;
   }
-
-  double mLep = 0.10565837;
+  /// @todo WARNING this is hardcoded
+  constexpr double mLep = 0.10565837;
   double eLep = sqrt(PLep * PLep + mLep * mLep);
 
   double Enu = (2 * mNeff * eLep - mLep * mLep + mNoth * mNoth - mNeff * mNeff) /(2 * (mNeff - eLep + PLep * costh));

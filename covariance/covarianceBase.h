@@ -171,7 +171,7 @@ class covarianceBase {
   /// @param adapt_manager Node having from which we load all adaptation options
   void initialiseAdaption(const YAML::Node& adapt_manager);
   /// @brief Save adaptive throw matrix to file
-  void saveAdaptiveToFile(const TString& outFileName, const TString& systematicName) {
+  void saveAdaptiveToFile(const std::string& outFileName, const std::string& systematicName) {
     AdaptiveHandler.SaveAdaptiveToFile(outFileName, systematicName); }
 
   /// @brief Do we adapt or not
@@ -390,6 +390,15 @@ class covarianceBase {
   /// @brief Getter to return a copy of the YAML node
   YAML::Node GetConfig() const { return _fYAMLDoc; }
 
+  // HH: Getter for AdaptiveHandler
+  /// @brief Get pointer for AdaptiveHandler
+  inline adaptive_mcmc::AdaptiveMCMCHandler* getAdaptiveHandler() { return &AdaptiveHandler; }
+
+  // HH: Getter for use_adaptive
+  /// @brief Get bool for whether we are using adaptive MCMC
+  inline bool getUseAdaptive() { return use_adaptive; }
+
+
 protected:
   /// @brief Initialisation of the class using matrix from root file
   void init(std::string name, std::string file);
@@ -417,10 +426,10 @@ protected:
   /// @cite haario2001adaptive
   void updateAdaptiveCovariance();
 
-  /// @brief Check if parameter is affecting given det ID
+  /// @brief Check if parameter is affecting given sample name
   /// @param SystIndex number of parameter
-  /// @param DetID The Detector ID used to filter parameters.
-  bool AppliesToDetID(const int SystIndex, const std::string& DetID) const;
+  /// @param SampleName The Sample name used to filter parameters.
+  bool AppliesToSample(const int SystIndex, const std::string& SampleName) const;
 
   /// The input root file we read in
   const std::string inputFile;
@@ -474,7 +483,7 @@ protected:
   /// Whether to apply flat prior or not
   std::vector<bool> _fFlatPrior;
   /// Tells to which samples object param should be applied
-  std::vector<std::vector<std::string>> _fDetID;
+  std::vector<std::vector<std::string>> _fSampleNames;
 
   /// perform PCA or not
   bool pca;
