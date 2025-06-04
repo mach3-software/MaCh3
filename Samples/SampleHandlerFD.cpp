@@ -1531,9 +1531,6 @@ TH1* SampleHandlerFD::Get1DVarHist(const std::string& ProjectionVar_Str, const s
   std::vector< KinematicCut > tmp_Selection = Selection;
   std::vector< KinematicCut > SelectionVecToApply;
 
-  //JM Separate vector for subevent-level kinematic cuts
-  std::vector< KinematicCut > SubEventCuts;
-
   //DB Add all the predefined selections to the selection vector which will be applied
   for (size_t iSelec=0;iSelec<Selection.size();iSelec++) {
     SelectionVecToApply.emplace_back(Selection[iSelec]);
@@ -1650,9 +1647,6 @@ TH2* SampleHandlerFD::Get2DVarHist(const std::string& ProjectionVar_StrX, const 
   //   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset
   std::vector< KinematicCut > tmp_Selection = Selection;
   std::vector< KinematicCut > SelectionVecToApply;
-
-  //JM Separate vector for subevent-level kinematic cuts
-  std::vector< KinematicCut > SubEventCuts;
 
   //DB Add all the predefined selections to the selection vector which will be applied
   for (size_t iSelec=0;iSelec<Selection.size();iSelec++) {
