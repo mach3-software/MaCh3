@@ -80,7 +80,12 @@ public:
   /// @ingroup SampleHandlerGetters
   TH1* Get1DVarHist(const std::string& ProjectionVar, const std::vector< KinematicCut >& SelectionVec = std::vector< KinematicCut >(),
                     int WeightStyle=0, TAxis* Axis=nullptr);
+  TH1* Get1DSubEventHist(const std::string& ProjectionVar, const std::vector< KinematicCut >& SelectionVec = std::vector< KinematicCut >(),
+                    int WeightStyle=0, TAxis* Axis=nullptr);
   TH2* Get2DVarHist(const std::string& ProjectionVarX, const std::string& ProjectionVarY,
+                    const std::vector< KinematicCut >& SelectionVec = std::vector< KinematicCut >(),
+                    int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
+  TH2* Get2DSubEventHist(const std::string& ProjectionVarX, const std::string& ProjectionVarY,
                     const std::vector< KinematicCut >& SelectionVec = std::vector< KinematicCut >(),
                     int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
   /// @ingroup SampleHandlerGetters
@@ -213,10 +218,10 @@ public:
 
   /// @brief DB Function which determines if an event is selected, where Selection double looks like {{ND280KinematicTypes Var1, douuble LowBound}
   bool IsEventSelected(const int iEvent);
-  /// @brief JM Function which determines if a particle is selected
-  bool IsParticleSelected(const std::vector<KinematicCut> &ParticleCuts, const int iEvent, unsigned const int iParticle, size_t nparticles);
-  /// @brief JM Check if a kinematic parameter string corresponds to a particle-level variable
-  bool IsParticleVarString(const std::string& VarStr);
+  /// @brief JM Function which determines if a subevent is selected
+  bool IsSubEventSelected(const std::vector<KinematicCut> &SubEventCuts, const int iEvent, unsigned const int iSubEvent, size_t nsubevents);
+  /// @brief JM Check if a kinematic parameter string corresponds to a subevent-level variable
+  bool IsSubEventVarString(const std::string& VarStr);
   /// @brief HH - reset the shifted values to the original values
   virtual void resetShifts(int iEvent) {(void)iEvent;};
   /// @brief HH - a vector that stores all the FuncPars struct

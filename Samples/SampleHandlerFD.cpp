@@ -345,16 +345,16 @@ bool SampleHandlerFD::IsEventSelected(const int iEvent) {
   return true;
 }
 
-// === JM Define function to check if particle is selected ===
-bool SampleHandlerFD::IsParticleSelected(const std::vector<KinematicCut> &ParticleCuts, const int iEvent, const unsigned int iParticle, size_t nparticles) {
-  for (unsigned int iSelection=0;iSelection < ParticleCuts.size() ;iSelection++) {
-    std::vector<double> Vec = ReturnKinematicVector(ParticleCuts[iSelection].ParamToCutOnIt, iEvent);
-    if (nparticles != Vec.size()) {
+// === JM Define function to check if sub-event is selected ===
+bool SampleHandlerFD::IsSubEventSelected(const std::vector<KinematicCut> &SubEventCuts, const int iEvent, const unsigned int iSubEvent, size_t nsubevents) {
+  for (unsigned int iSelection=0;iSelection < SubEventCuts.size() ;iSelection++) {
+    std::vector<double> Vec = ReturnKinematicVector(SubEventCuts[iSelection].ParamToCutOnIt, iEvent);
+    if (nsubevents != Vec.size()) {
       MACH3LOG_ERROR("Cannot apply kinematic cut on {} as it is of different size to plotting variable");
       throw MaCh3Exception(__FILE__, __LINE__);
     }
-    const double Val = Vec[iParticle];
-    if ((Val < ParticleCuts[iSelection].LowerBound) || (Val >= ParticleCuts[iSelection].UpperBound)) {
+    const double Val = Vec[iSubEvent];
+    if ((Val < SubEventCuts[iSelection].LowerBound) || (Val >= SubEventCuts[iSelection].UpperBound)) {
       return false;
     }
   }
@@ -1519,21 +1519,20 @@ void SampleHandlerFD::InitialiseSplineObject() {
   SplineHandler->cleanUpMemory();
 }
 
-// === JM adjust GetNDVarHist functions to allow for particle-level plotting ===
+// === JM adjust GetNDVarHist functions to allow for subevent-level plotting ===
 TH1* SampleHandlerFD::Get1DVarHist(const std::string& ProjectionVar_Str, const std::vector< KinematicCut >& SelectionVec, int WeightStyle, TAxis* Axis) {
-  bool isParticleHist = IsParticleVarString(ProjectionVar_Str);
+  if (IsSubEventVarString(ProjectionVar_Str)) return Get1DSubEventHist(ProjectionVar_Str, SelectionVec, WeightStyle, Axis);
+
   //DB Grab the associated enum with the argument string
-  int ProjectionVar_Int;
-  if (!isParticleHist) ProjectionVar_Int = ReturnKinematicParameterFromString(ProjectionVar_Str);
-  else ProjectionVar_Int = ReturnKinematicVectorFromString(ProjectionVar_Str);
+  int ProjectionVar_Int = ReturnKinematicParameterFromString(ProjectionVar_Str);
 
   //DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.
   //   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset
   std::vector< KinematicCut > tmp_Selection = Selection;
   std::vector< KinematicCut > SelectionVecToApply;
 
-  //JM Separate vector for particle-level kinematic cuts
-  std::vector< KinematicCut > ParticleCuts;
+  //JM Separate vector for subevent-level kinematic cuts
+  std::vector< KinematicCut > SubEventCuts;
 
   //DB Add all the predefined selections to the selection vector which will be applied
   for (size_t iSelec=0;iSelec<Selection.size();iSelec++) {
@@ -1542,8 +1541,60 @@ TH1* SampleHandlerFD::Get1DVarHist(const std::string& ProjectionVar_Str, const s
 
   //DB Add all requested cuts from the argument to the selection vector which will be applied
   for (size_t iSelec=0;iSelec<SelectionVec.size();iSelec++) {
-    //JM If particle-level cut, append to a different vector (avoids checking this in IsEventSelected)
-    if (SelectionVec[iSelec].isParticleVar) ParticleCuts.emplace_back(SelectionVec[iSelec]);
+    //JM If sub-event-level cut, ignore for event-level plotting
+    if (!SelectionVec[iSelec].isSubEventVar) SelectionVecToApply.emplace_back(SelectionVec[iSelec]);
+  }
+
+  //DB Set the member variable to be the cuts to apply
+  Selection = SelectionVecToApply;
+
+  //DB Define the histogram which will be returned
+  TH1D* _h1DVar;
+  if (Axis) {
+    _h1DVar = new TH1D("","",Axis->GetNbins(),Axis->GetXbins()->GetArray());
+  } else {
+    std::vector<double> xBinEdges = ReturnKinematicParameterBinning(ProjectionVar_Str);
+    _h1DVar = new TH1D("", "", int(xBinEdges.size())-1, xBinEdges.data());
+  }
+
+  //DB Loop over all events
+  for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
+    if (IsEventSelected(iEvent)) {
+      double Weight = GetEventWeight(iEvent);
+      if (WeightStyle == 1) {
+        Weight = 1.;
+      }
+      double Var = ReturnKinematicParameter(ProjectionVar_Int,iEvent);
+      _h1DVar->Fill(Var,Weight);
+    }
+  }
+
+  //DB Reset the saved selection
+  Selection = tmp_Selection;
+
+  return _h1DVar;
+}
+
+TH1* SampleHandlerFD::Get1DSubEventHist(const std::string& ProjectionVar_Str, const std::vector< KinematicCut >& SelectionVec, int WeightStyle, TAxis* Axis) {
+  int ProjectionVar_Int = ReturnKinematicVectorFromString(ProjectionVar_Str);
+
+  //DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.
+  //   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset
+  std::vector< KinematicCut > tmp_Selection = Selection;
+  std::vector< KinematicCut > SelectionVecToApply;
+
+  //JM Separate vector for subevent-level kinematic cuts
+  std::vector< KinematicCut > SubEventCuts;
+
+  //DB Add all the predefined selections to the selection vector which will be applied
+  for (size_t iSelec=0;iSelec<Selection.size();iSelec++) {
+    SelectionVecToApply.emplace_back(Selection[iSelec]);
+  }
+
+  //DB Add all requested cuts from the argument to the selection vector which will be applied
+  for (size_t iSelec=0;iSelec<SelectionVec.size();iSelec++) {
+    //JM If subevent-level cut, append to a different vector (avoids checking this in IsEventSelected)
+    if (SelectionVec[iSelec].isSubEventVar) SubEventCuts.emplace_back(SelectionVec[iSelec]);
     else SelectionVecToApply.emplace_back(SelectionVec[iSelec]);
   }
 
@@ -1560,31 +1611,24 @@ TH1* SampleHandlerFD::Get1DVarHist(const std::string& ProjectionVar_Str, const s
     _h1DVar = new TH1D("", "", int(xBinEdges.size())-1, xBinEdges.data());
   }
 
-  //DB Loop over all events
+  //JM Loop over all events
   for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
     if (IsEventSelected(iEvent)) {
       double Weight = GetEventWeight(iEvent);
       if (WeightStyle == 1) {
         Weight = 1.;
       }
-      if (!isParticleHist) {
-        double Var = ReturnKinematicParameter(ProjectionVar_Int,iEvent);
-        _h1DVar->Fill(Var,Weight);
-      }
-      else {
-        std::vector<double> Vec = ReturnKinematicVector(ProjectionVar_Int,iEvent);
-        size_t nparticles = Vec.size();
-        //JM Loop over all particles in event
-        for (unsigned int iParticle = 0; iParticle < nparticles; iParticle++) {
-          if (IsParticleSelected(ParticleCuts, iEvent, iParticle, nparticles)) {
-            double Var = Vec[iParticle];
-            _h1DVar->Fill(Var,Weight);
-          }
+      std::vector<double> Vec = ReturnKinematicVector(ProjectionVar_Int,iEvent);
+      size_t nsubevents = Vec.size();
+      //JM Loop over all subevents in event
+      for (unsigned int iSubEvent = 0; iSubEvent < nsubevents; iSubEvent++) {
+        if (IsSubEventSelected(SubEventCuts, iEvent, iSubEvent, nsubevents)) {
+          double Var = Vec[iSubEvent];
+          _h1DVar->Fill(Var,Weight);
         }
       }
     }
   }
-
   //DB Reset the saved selection
   Selection = tmp_Selection;
 
@@ -1595,26 +1639,20 @@ TH1* SampleHandlerFD::Get1DVarHist(const std::string& ProjectionVar_Str, const s
 TH2* SampleHandlerFD::Get2DVarHist(const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY,
     const std::vector< KinematicCut >& SelectionVec, int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
   // ************************************************
-  bool isParticleXVar = IsParticleVarString(ProjectionVar_StrX);
-  bool isParticleYVar = IsParticleVarString(ProjectionVar_StrY);
-  bool isParticleHist = isParticleXVar || isParticleYVar;
+  bool IsSubEventHist = IsSubEventVarString(ProjectionVar_StrX) || IsSubEventVarString(ProjectionVar_StrY);
+  if (IsSubEventHist) return Get2DSubEventHist(ProjectionVar_StrX, ProjectionVar_StrY, SelectionVec, WeightStyle, AxisX, AxisY);
 
   //DB Grab the associated enum with the argument string
-  int ProjectionVar_IntX, ProjectionVar_IntY;
-  
-  if (!isParticleXVar) ProjectionVar_IntX = ReturnKinematicParameterFromString(ProjectionVar_StrX);
-  else ProjectionVar_IntX = ReturnKinematicVectorFromString(ProjectionVar_StrX);
-  
-  if (!isParticleYVar) ProjectionVar_IntY = ReturnKinematicParameterFromString(ProjectionVar_StrY);
-  else ProjectionVar_IntY = ReturnKinematicVectorFromString(ProjectionVar_StrY);
+  int ProjectionVar_IntX = ReturnKinematicParameterFromString(ProjectionVar_StrX);
+  int ProjectionVar_IntY = ReturnKinematicParameterFromString(ProjectionVar_StrY);
 
   //DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.
   //   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset
   std::vector< KinematicCut > tmp_Selection = Selection;
   std::vector< KinematicCut > SelectionVecToApply;
 
-  //JM Separate vector for particle-level kinematic cuts
-  std::vector< KinematicCut > ParticleCuts;
+  //JM Separate vector for subevent-level kinematic cuts
+  std::vector< KinematicCut > SubEventCuts;
 
   //DB Add all the predefined selections to the selection vector which will be applied
   for (size_t iSelec=0;iSelec<Selection.size();iSelec++) {
@@ -1623,8 +1661,69 @@ TH2* SampleHandlerFD::Get2DVarHist(const std::string& ProjectionVar_StrX, const 
 
   //DB Add all requested cuts from the argument to the selection vector which will be applied
   for (size_t iSelec=0;iSelec<SelectionVec.size();iSelec++) {
-    //JM If particle-level cut, append to a different vector (avoids checking this in IsEventSelected)
-    if (SelectionVec[iSelec].isParticleVar) ParticleCuts.emplace_back(SelectionVec[iSelec]);
+    //JM If sub-event-level cut, ignore for event-level plotting
+    if (!SelectionVec[iSelec].isSubEventVar) SelectionVecToApply.emplace_back(SelectionVec[iSelec]);
+  }
+
+  //DB Set the member variable to be the cuts to apply
+  Selection = SelectionVecToApply;
+
+  //DB Define the histogram which will be returned
+  TH2D* _h2DVar;
+  if (AxisX && AxisY) {
+    _h2DVar = new TH2D("","",AxisX->GetNbins(),AxisX->GetXbins()->GetArray(),AxisY->GetNbins(),AxisY->GetXbins()->GetArray());
+  } else {
+    std::vector<double> xBinEdges = ReturnKinematicParameterBinning(ProjectionVar_StrX);
+    std::vector<double> yBinEdges = ReturnKinematicParameterBinning(ProjectionVar_StrY);
+    _h2DVar = new TH2D("", "", int(xBinEdges.size())-1, xBinEdges.data(), int(yBinEdges.size())-1, yBinEdges.data());
+  }
+
+  //DB Loop over all events
+  for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
+    if (IsEventSelected(iEvent)) {
+      double Weight = GetEventWeight(iEvent);
+      if (WeightStyle == 1) {
+        Weight = 1.;
+      }
+      double VarX = ReturnKinematicParameter(ProjectionVar_IntX, iEvent);
+      double VarY = ReturnKinematicParameter(ProjectionVar_IntY, iEvent);
+      _h2DVar->Fill(VarX,VarY,Weight);
+    }
+  }
+  //DB Reset the saved selection
+  Selection = tmp_Selection;
+
+  return _h2DVar;
+}
+
+TH2* SampleHandlerFD::Get2DSubEventHist(const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY,
+    const std::vector< KinematicCut >& SelectionVec, int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
+  bool IsSubEventVarX = IsSubEventVarString(ProjectionVar_StrX);
+  bool IsSubEventVarY = IsSubEventVarString(ProjectionVar_StrY);   
+
+  int ProjectionVar_IntX, ProjectionVar_IntY;
+  if (IsSubEventVarX) ProjectionVar_IntX = ReturnKinematicVectorFromString(ProjectionVar_StrX);
+  else ProjectionVar_IntX = ReturnKinematicParameterFromString(ProjectionVar_StrX);
+  if (IsSubEventVarY) ProjectionVar_IntY = ReturnKinematicVectorFromString(ProjectionVar_StrY);
+  else ProjectionVar_IntY = ReturnKinematicParameterFromString(ProjectionVar_StrY); 
+
+  //DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.
+  //   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset
+  std::vector< KinematicCut > tmp_Selection = Selection;
+  std::vector< KinematicCut > SelectionVecToApply;
+
+  //JM Separate vector for subevent-level kinematic cuts
+  std::vector< KinematicCut > SubEventCuts;
+
+  //DB Add all the predefined selections to the selection vector which will be applied
+  for (size_t iSelec=0;iSelec<Selection.size();iSelec++) {
+    SelectionVecToApply.emplace_back(Selection[iSelec]);
+  }
+
+  //DB Add all requested cuts from the argument to the selection vector which will be applied
+  for (size_t iSelec=0;iSelec<SelectionVec.size();iSelec++) {
+    //JM If subevent-level cut, append to a different vector (avoids checking this in IsEventSelected)
+    if (SelectionVec[iSelec].isSubEventVar) SubEventCuts.emplace_back(SelectionVec[iSelec]);
     else SelectionVecToApply.emplace_back(SelectionVec[iSelec]);
   }
 
@@ -1642,54 +1741,46 @@ TH2* SampleHandlerFD::Get2DVarHist(const std::string& ProjectionVar_StrX, const 
     _h2DVar = new TH2D("", "", int(xBinEdges.size())-1, xBinEdges.data(), int(yBinEdges.size())-1, yBinEdges.data());
   }
 
-  //DB Loop over all events
+  //JM Loop over all events
   for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
     if (IsEventSelected(iEvent)) {
-      double VarX = M3::_BAD_DOUBLE_, VarY = M3::_BAD_DOUBLE_;
       double Weight = GetEventWeight(iEvent);
       if (WeightStyle == 1) {
         Weight = 1.;
       }
-      if (!isParticleHist) {
-        VarX = ReturnKinematicParameter(ProjectionVar_IntX, iEvent);
+      std::vector<double> VecX = {}, VecY = {};
+      double VarX = M3::_BAD_DOUBLE_, VarY = M3::_BAD_DOUBLE_;
+      size_t nsubevents = 0;
+      // JM Three cases: subeventX vs eventY || eventX vs subeventY || subeventX vs subeventY
+      if (IsSubEventVarX && !IsSubEventVarY) {
+        VecX = ReturnKinematicVector(ProjectionVar_IntX, iEvent);
         VarY = ReturnKinematicParameter(ProjectionVar_IntY, iEvent);
-        _h2DVar->Fill(VarX,VarY,Weight);
+        nsubevents = VecX.size();
+      }
+      else if (!IsSubEventVarX && IsSubEventVarY) {
+        VecY = ReturnKinematicVector(ProjectionVar_IntY, iEvent);
+        VarX = ReturnKinematicParameter(ProjectionVar_IntX, iEvent);
+        nsubevents = VecY.size();
       }
       else {
-        std::vector<double> VecX = {}, VecY = {};
-        size_t nparticles = 0;
-        // JM Three cases: particleX vs eventY || eventX vs particleY || particleX vs particleY
-        if (isParticleXVar && !isParticleYVar) {
-          VecX = ReturnKinematicVector(ProjectionVar_IntX, iEvent);
-          VarY = ReturnKinematicParameter(ProjectionVar_IntY, iEvent);
-          nparticles = VecX.size();
+        VecX = ReturnKinematicVector(ProjectionVar_IntX, iEvent);
+        VecY = ReturnKinematicVector(ProjectionVar_IntY, iEvent);
+        if (VecX.size() != VecY.size()) {
+          MACH3LOG_ERROR("Cannot plot {} of size {} against {} of size {}", ProjectionVar_StrX, VecX.size(), ProjectionVar_StrY, VecY.size());
+          throw MaCh3Exception(__FILE__, __LINE__);
         }
-        else if (!isParticleXVar && isParticleYVar) {
-          VecY = ReturnKinematicVector(ProjectionVar_IntY, iEvent);
-          VarX = ReturnKinematicParameter(ProjectionVar_IntX, iEvent);
-          nparticles = VecY.size();
-        }
-        else {
-          VecX = ReturnKinematicVector(ProjectionVar_IntX, iEvent);
-          VecY = ReturnKinematicVector(ProjectionVar_IntY, iEvent);
-          if (VecX.size() != VecY.size()) {
-            MACH3LOG_ERROR("Cannot plot {} of size {} against {} of size {}", ProjectionVar_StrX, VecX.size(), ProjectionVar_StrY, VecY.size());
-            throw MaCh3Exception(__FILE__, __LINE__);
-          }
-          nparticles = VecX.size();
-        }
-        //JM Loop over all particles in event
-        for (unsigned int iParticle = 0; iParticle < nparticles; iParticle++) {
-          if (IsParticleSelected(ParticleCuts, iEvent, iParticle, nparticles)) {
-            if (isParticleXVar) VarX = VecX[iParticle];
-            if (isParticleYVar) VarY = VecY[iParticle];
-            _h2DVar->Fill(VarX,VarY,Weight);
-          }
-        }
+        nsubevents = VecX.size();
       }
+      //JM Loop over all subevents in event
+      for (unsigned int iSubEvent = 0; iSubEvent < nsubevents; iSubEvent++) {
+        if (IsSubEventSelected(SubEventCuts, iEvent, iSubEvent, nsubevents)) {
+          if (IsSubEventVarX) VarX = VecX[iSubEvent];
+          if (IsSubEventVarY) VarY = VecY[iSubEvent];
+          _h2DVar->Fill(VarX,VarY,Weight);
+        }
+      } 
     }
   }
-
   //DB Reset the saved selection
   Selection = tmp_Selection;
 
@@ -1750,7 +1841,7 @@ std::string SampleHandlerFD::ReturnStringFromKinematicVector(const int Kinematic
   return "";
 }
 
-bool SampleHandlerFD::IsParticleVarString(const std::string& VarStr) {
+bool SampleHandlerFD::IsSubEventVarString(const std::string& VarStr) {
   if (KinematicVectors->count(VarStr)) {
     if (!KinematicParameters->count(VarStr)) return true;
     else {

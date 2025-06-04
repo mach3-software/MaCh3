@@ -158,8 +158,8 @@ struct KinematicCut {
 // ***************************
   /// Index or enum value identifying the kinematic variable to cut on.
   int ParamToCutOnIt = M3::_BAD_INT_;
-  /// JM Tag of whether this is a event or particle -level variable (default to event-level)
-  bool isParticleVar = false;
+  /// JM Tag of whether this is a event or sub-event -level variable (default to event-level)
+  bool isSubEventVar = false;
   /// Lower bound on which we apply cut
   double LowerBound = M3::_BAD_DOUBLE_;
   /// Upper bound on which we apply cut
