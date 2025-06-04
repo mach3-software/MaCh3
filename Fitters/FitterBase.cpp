@@ -207,6 +207,14 @@ void FitterBase::PrepareOutput() {
 }
 
 // *******************
+void FitterBase::SanitiseInputs() {
+// *******************
+  for (size_t i = 0; i < samples.size(); ++i) {
+    samples[i]->CleanMemoryBeforeFit();
+  }
+}
+
+// *******************
 void FitterBase::SaveOutput() {
 // *******************
   if(FileSaved) return;

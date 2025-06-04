@@ -31,6 +31,15 @@ public:
         );
     }
 
+    /* Trampoline (need one for each virtual function) */
+    void CleanMemoryBeforeFit() override {
+        PYBIND11_OVERRIDE_PURE(
+            void,          /* Return type */
+            SampleHandlerBase, /* Parent class */
+            CleanMemoryBeforeFit       /* Name of function in C++ (must match Python name) */
+        );
+    }
+
     double GetLikelihood() override {
         PYBIND11_OVERRIDE_PURE_NAME(
             double,        /* Return type */
@@ -76,6 +85,15 @@ public:
             "setup_weight_pointers", /*python name*/
             SetupWeightPointers,     /* Name of function in C++ */
                              /* Argument(s) */
+        );
+    }
+
+    /* Trampoline (need one for each virtual function) */
+    void CleanMemoryBeforeFit() override {
+        PYBIND11_OVERRIDE_PURE(
+            void,          /* Return type */
+            SampleHandlerFD, /* Parent class */
+            CleanMemoryBeforeFit       /* Name of function in C++ (must match Python name) */
         );
     }
 

@@ -26,6 +26,9 @@ void PSO::RunMCMC(){
 // ***************
   PrepareFit();
 
+  // Remove obsolete memory and make other checks before fit starts
+  SanitiseInputs();
+
   if(fTestLikelihood){
     outTree->Branch("nParts", &fParticles, "nParts/I");
     for(int i = 0; i < fDim; ++i){
@@ -46,7 +49,7 @@ void PSO::RunMCMC(){
 // *************************
 void PSO::init(){
 // *************************
-  fBestValue = 1234567890.0;
+  fBestValue = M3::_LARGE_LOGL_;
 
   //KS: For none PCA this will be eqaul to normal parameters
   //const int NparsPSOFull = NPars;
