@@ -43,6 +43,8 @@ class SampleHandlerBase
   virtual std::string GetSampleName(int Sample) const = 0;
   /// @ingroup SampleHandlerGetters
   virtual inline double GetSampleLikelihood(const int isample){(void) isample; return GetLikelihood();};
+  /// @brief Allow to clean not used memory before fit starts
+  virtual void CleanMemoryBeforeFit() = 0;
 
   /// @brief Return pointer to MaCh3 modes
   /// @ingroup SampleHandlerGetters

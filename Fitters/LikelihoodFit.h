@@ -23,6 +23,7 @@ class LikelihoodFit : public FitterBase {
   protected:
     /// @brief prepare output and perform sanity checks
     void PrepareFit();
+
     /// Number of all parameters from all covariances
     int NPars;
     /// Number of all parameters from all covariances in PCA base
