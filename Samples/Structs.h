@@ -511,49 +511,51 @@ namespace MaCh3Utils {
 
   /// @brief Return mass for given PDG
   /// @note Get the mass of a particle from the PDG In GeV, not MeV!
+  /// @cite pdg2024 (particle masses)
+  /// @cite ame2020 (nuclear masses)
   inline double GetMassFromPDG(const int PDG) {
     // *****************************
     switch (abs(PDG)) {
       // Leptons
-      case 11: return 0.00051099895; break; // e⁻
-      case 13: return 0.1056583745; break;  // μ⁻
-      case 15: return 1.77682; break;       // τ⁻
+      case 11: return 0.00051099895; // e
+      case 13: return 0.1056583755;  // mu
+      case 15: return 1.77693;       // tau
       // Neutrinos
       case 12:
       case 14:
       case 16:
-        return 0.; break;
+        return 0.; 
       // Photon
-      case 22: return 0.; break;
+      case 22: return 0.; 
       // Mesons
-      case 211: return 0.13957; break;      // π⁺
-      case 111: return 0.13498; break;      // π⁰
-      case 221: return 0.547862; break;     // η
-      case 311: // K⁰
-      case 130: // K⁰_L
-      case 310: // K⁰_S
-        return 0.497611; break;
-      case 321: return 0.493677; break;     // K⁺
+      case 211: return 0.13957039; // pi_+/-
+      case 111: return 0.1349768;  // pi_0
+      case 221: return 0.547862;   // eta
+      case 311:                    // K_0
+      case 130:                    // K_0_L
+      case 310:                    // K_0_S
+        return 0.497611; 
+      case 321: return 0.493677;   // K_+/-
       // Baryons
-      case 2112: return 0.939565; break;    // Neutron
-      case 2212: return 0.938272; break;    // Proton
-      case 3122: return 1.115683; break;    // Λ
-      case 3222: return 1.118937; break;    // Σ⁺
-      case 3112: return 1.197449; break;    // Σ⁻
-      case 3212: return 1.192642; break;    // Σ⁰
+      case 2112: return 0.939565; // n
+      case 2212: return 0.938272; // p
+      case 3122: return 1.115683; // lambda
+      case 3222: return 1.118937; // sig_+
+      case 3112: return 1.197449; // sig_-
+      case 3212: return 1.192642; // sig_0
       // Nuclei
-      case 1000080160: return 14.899439863; break; // Oxygen-16
-      case 1000180400: return 37.234636197; break; // Argon-40
-      case 1000060120: return 11.996934007; break; // Carbon-12
-      case 1000190390: return 36.336997585; break; // Potassium-39
-      case 1000110230: return 21.435153315; break; // Sodium-23
-      case 1000300640: return 59.591815370; break; // Zinc-64
-      case 1000140280: return 26.172131654; break; // Silicon-28
-      case 1000070140: return 13.000451336; break; // Nitrogen-14
-      case 1000090190: return 17.698285587; break; // Fluorine-19
-      case 1000220480: return 44.663171426; break; // Titanium-48
-      case 1000050110: return 10.250588437; break; // Boron-11
-      case 1000130270: return 25.126451759; break; // Aluminum-27
+      case 1000050110: return 10.255103; // Boron-11
+      case 1000060120: return 11.177929; // Carbon-12
+      case 1000070140: return 13.043781; // Nitrogen-14
+      case 1000080160: return 14.899169; // Oxygen-16
+      case 1000090190: return 17.696901; // Fluorine-19
+      case 1000110230: return 21.414835; // Sodium-23
+      case 1000130270: return 25.133144; // Aluminum-27
+      case 1000140280: return 26.060342; // Silicon-28
+      case 1000190390: return 36.294463; // Potassium-39
+      case 1000180400: return 37.224724; // Argon-40
+      case 1000220480: return 44.663224; // Titanium-48
+      case 1000300640: return 59.549619; // Zinc-64
       default:
         MACH3LOG_ERROR("Haven't got a saved mass for PDG: {}", PDG);
         MACH3LOG_ERROR("Please implement me!");
