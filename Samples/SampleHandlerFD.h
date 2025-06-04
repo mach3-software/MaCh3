@@ -78,16 +78,19 @@ public:
   }
 
   /// @ingroup SampleHandlerGetters
-  TH1* Get1DVarHist(const std::string& ProjectionVar, const std::vector< KinematicCut >& SelectionVec = std::vector< KinematicCut >(),
-                    int WeightStyle=0, TAxis* Axis=nullptr);
-  TH1* Get1DSubEventHist(const std::string& ProjectionVar, const std::vector< KinematicCut >& SelectionVec = std::vector< KinematicCut >(),
-                    int WeightStyle=0, TAxis* Axis=nullptr);
+  TH1* Get1DVarHist(const std::string& ProjectionVar, const std::vector< KinematicCut >& EventSelectionVec = std::vector< KinematicCut >(),
+                    const std::vector< KinematicCut >& SubEventSelectionVec = std::vector< KinematicCut >(),int WeightStyle=0, TAxis* Axis=nullptr);
   TH2* Get2DVarHist(const std::string& ProjectionVarX, const std::string& ProjectionVarY,
-                    const std::vector< KinematicCut >& SelectionVec = std::vector< KinematicCut >(),
+                    const std::vector< KinematicCut >& EventSelectionVec = std::vector< KinematicCut >(),
+                    const std::vector< KinematicCut >& SubEventSelectionVec = std::vector< KinematicCut >(),
                     int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
-  TH2* Get2DSubEventHist(const std::string& ProjectionVarX, const std::string& ProjectionVarY,
-                    const std::vector< KinematicCut >& SelectionVec = std::vector< KinematicCut >(),
-                    int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
+  
+  /// @ingroup SampleHandlerGetters
+  void Fill1DSubEventHist(TH1D* _h1DVar, const std::string& ProjectionVar, const std::vector< KinematicCut >& SubEventSelectionVec = std::vector< KinematicCut >(),
+                    int WeightStyle=0);
+  void Fill2DSubEventHist(TH2D* _h2DVar, const std::string& ProjectionVarX, const std::string& ProjectionVarY,
+                    const std::vector< KinematicCut >& SubEventSelectionVec = std::vector< KinematicCut >(), int WeightStyle=0);
+  
   /// @ingroup SampleHandlerGetters
   TH1* Get1DVarHistByModeAndChannel(const std::string& ProjectionVar_Str, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* Axis=nullptr);
   /// @ingroup SampleHandlerGetters
