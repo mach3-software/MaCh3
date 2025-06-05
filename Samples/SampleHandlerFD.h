@@ -125,6 +125,8 @@ public:
   int ReturnKinematicVectorFromString(const std::string& KinematicStr) const;
   std::string ReturnStringFromKinematicVector(const int KinematicVariable) const;
   // ===========================================================
+  /// @brief JM Check if a kinematic parameter string corresponds to a subevent-level variable
+  bool IsSubEventVarString(const std::string& VarStr);
 
  protected:
   /// @brief DB Function to determine which weights apply to which types of samples pure virtual!!
@@ -223,8 +225,6 @@ public:
   bool IsEventSelected(const int iEvent);
   /// @brief JM Function which determines if a subevent is selected
   bool IsSubEventSelected(const std::vector<KinematicCut> &SubEventCuts, const int iEvent, unsigned const int iSubEvent, size_t nsubevents);
-  /// @brief JM Check if a kinematic parameter string corresponds to a subevent-level variable
-  bool IsSubEventVarString(const std::string& VarStr);
   /// @brief HH - reset the shifted values to the original values
   virtual void resetShifts(int iEvent) {(void)iEvent;};
   /// @brief HH - a vector that stores all the FuncPars struct
