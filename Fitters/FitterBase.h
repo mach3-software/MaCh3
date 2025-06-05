@@ -74,8 +74,19 @@ class FitterBase {
   /// @brief Save output and close files.
   void SaveOutput();
 
+  /// @brief Remove obsolete memory and make other checks before fit starts
+  /// @todo consider expanding into ParmaterHandler and add more sanitisers
+  void SanitiseInputs();
+
   /// @brief Save the settings that the MCMC was run with.
   void SaveSettings();
+
+  /// @brief YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D. Barrow
+  bool GetScaneRange(std::map<std::string, std::vector<double>>& scanRanges);
+
+  /// @brief KS: Check whether we want to skip parameter using skip vector
+  bool CheckSkipParameter(const std::vector<std::string>& SkipVector, const std::string& ParamName) const;
+
 
   /// The manager
   manager *fitMan;

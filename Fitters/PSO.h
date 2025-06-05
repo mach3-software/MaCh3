@@ -16,12 +16,12 @@
 /// @date 24/2/2023
 class particle{
   public:
-      particle(){};
-      particle(std::vector<double> pos, std::vector<double> vel) : position(pos), velocity(vel){};
+      /// @brief Constructor
+      particle(const std::vector<double>& pos, const std::vector<double>& vel) : position(pos), velocity(vel){};
       /// @brief Destructor
       virtual ~particle() {};
 
-      void set_position(std::vector<double> new_position) {
+      void set_position(const std::vector<double>& new_position) {
         position = new_position;
       };
 
@@ -29,7 +29,7 @@ class particle{
         return position;
       };
 
-      void set_personal_best_position(std::vector<double> new_pos){
+      void set_personal_best_position(const std::vector<double>& new_pos){
         personal_best_position = new_pos;
       };
 
@@ -37,7 +37,7 @@ class particle{
         return personal_best_position;
       };
 
-      void set_personal_best_value(double new_val){
+      void set_personal_best_value(const double new_val){
         personal_best_value = new_val;
       };
 
@@ -49,14 +49,14 @@ class particle{
         return velocity;
       };
 
-      void set_velocity(std::vector<double> new_velocity){
+      void set_velocity(const std::vector<double>& new_velocity){
         velocity = new_velocity;
       };
 
       double get_value(){
         return curr_value;
       };
-      void set_value(double val){
+      void set_value(const double val){
         curr_value = val;
       };
 
@@ -88,18 +88,21 @@ class PSO : public LikelihoodFit {
       best_particle = n;
     }
 
-    std::vector<std::vector<double>> bisection(std::vector<double>position,double minimum, double range, double precision);
-    std::vector<std::vector<double>> calc_uncertainty(std::vector<double>position,double minimum);
+    std::vector<std::vector<double>> bisection(const std::vector<double>& position, const double minimum,
+                                               const double range, const double precision);
+    std::vector<std::vector<double>> calc_uncertainty(const std::vector<double>& position, const double minimum);
     void init();
-    void uncertainty_check(std::vector<double> previous_pos);
+    void uncertainty_check(const std::vector<double>& previous_pos);
     void run();
     void WriteOutput();
+    /// @brief Actual implementation of PSO Fit algorithm
     void RunMCMC() override;
     double CalcChi2(const double* x);
+    /// @brief Evaluates the Rastrigin function for a given parameter values.
     double rastriginFunc(const double* x);
     double swarmIterate();
 
-    std::vector<double> vector_multiply(std::vector<double> velocity, double mul){
+    std::vector<double> vector_multiply(std::vector<double> velocity, const double mul){
       // std::bind1st deprecated since C++11, removed in c++17
       // transform(velocity.begin(),velocity.end(),velocity.begin(),std::bind1st(std::multiplies<double>(),mul));
       std::transform(velocity.begin(), velocity.end(), velocity.begin(),
@@ -107,23 +110,26 @@ class PSO : public LikelihoodFit {
       return velocity;
     };
 
-    std::vector<double> vector_add(std::vector<double> v1, std::vector<double> v2){
+    std::vector<double> vector_add(const std::vector<double>& v1, const std::vector<double>& v2){
       std::vector<double> v3;
       transform(v1.begin(), v1.end(), v2.begin(), back_inserter(v3), std::plus<double>());
       return v3;
     };
-    std::vector<double> vector_subtract(std::vector<double> v1, std::vector<double> v2){
+    std::vector<double> vector_subtract(const std::vector<double>& v1, const std::vector<double>& v2){
       std::vector<double> v3 ;
       transform(v1.begin(), v1.end(), v2.begin(), back_inserter(v3), std::minus<double>());
       return v3;
     };
-    std::vector<double> three_vector_addition(std::vector<double> vec1, std::vector<double> vec2,std::vector<double> vec3){
+    std::vector<double> three_vector_addition(std::vector<double> vec1,
+                                              const std::vector<double>& vec2,
+                                              const std::vector<double>& vec3) {
       for (size_t i = 0; i < vec1.size(); ++i) {
         vec1[i] += vec2[i] + vec3[i];
       }
       return vec1;
     };
-    std::vector<double> four_vector_addition(std::vector<double> vec1, std::vector<double> vec2,std::vector<double> vec3,std::vector<double> vec4){
+    std::vector<double> four_vector_addition(std::vector<double> vec1, const std::vector<double>& vec2,
+                                             const std::vector<double>& vec3, const std::vector<double>& vec4){
       for (size_t i = 0; i < vec1.size(); ++i) {
         vec1[i] += vec2[i] + vec3[i] + vec4[i];
       }
@@ -154,8 +160,8 @@ class PSO : public LikelihoodFit {
     std::vector<std::vector<double> > uncertainties;
 
     int fParticles;
-    static const int kMaxParticles = 10000;
     std::vector<double*> paramlist;
+    constexpr static const int kMaxParticles = 10000;
     double vel[kMaxParticles];
     double* par;
 

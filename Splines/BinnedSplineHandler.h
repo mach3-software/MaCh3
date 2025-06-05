@@ -1,7 +1,6 @@
 #pragma once
 
 //MaCh3 includes
-#include "Samples/Structs.h"
 #include "Splines/SplineBase.h"
 #include "Manager/MaCh3Modes.h"
 

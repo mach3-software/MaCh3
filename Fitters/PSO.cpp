@@ -26,6 +26,9 @@ void PSO::RunMCMC(){
 // ***************
   PrepareFit();
 
+  // Remove obsolete memory and make other checks before fit starts
+  SanitiseInputs();
+
   if(fTestLikelihood){
     outTree->Branch("nParts", &fParticles, "nParts/I");
     for(int i = 0; i < fDim; ++i){
@@ -46,7 +49,7 @@ void PSO::RunMCMC(){
 // *************************
 void PSO::init(){
 // *************************
-  fBestValue = 1234567890.0;
+  fBestValue = M3::_LARGE_LOGL_;
 
   //KS: For none PCA this will be eqaul to normal parameters
   //const int NparsPSOFull = NPars;
@@ -95,7 +98,7 @@ void PSO::init(){
           ranges_min.push_back(-100.0);
           ranges_max.push_back(100.0);
           prior.push_back((*it)->GetParInit(i));
-          if((*it)->IsParameterFixedPCA(i)){
+          if((*it)->GetPCAHandler()->IsParameterFixedPCA(i)){
             fixed.push_back(1);
           }
           else{
@@ -145,7 +148,8 @@ void PSO::init(){
 }
 
 // *************************
-std::vector<std::vector<double> > PSO::bisection(std::vector<double>position,double minimum, double range, double precision){
+std::vector<std::vector<double> > PSO::bisection(const std::vector<double>& position, const double minimum,
+                                                 const double range, const double precision) {
 // *************************
   std::vector<std::vector<double>> uncertainties_list;
   for (unsigned int i = 0; i< position.size(); ++i) {
@@ -153,7 +157,7 @@ std::vector<std::vector<double> > PSO::bisection(std::vector<double>position,dou
     //std::vector<double> uncertainties;
     std::vector<double> new_position = position; new_position[i] = position[i]-range;
     double val_1 = CalcChi(new_position)-minimum-1.0;
-    while (val_1*-1.0> 0.0){
+    while (val_1*-1.0 > 0.0){
       new_position[i] -= range;
       val_1 = CalcChi(new_position)-minimum-1.0;
     }
@@ -164,7 +168,8 @@ std::vector<std::vector<double> > PSO::bisection(std::vector<double>position,dou
     double res = 1.0;
     while (res > precision){
       if (value_list[0] * value_list[1] < 0){
-        std::vector<double> new_bisect_position = position_list[0];new_bisect_position[i] =new_bisect_position[i]+ (position_list[1][i]-position_list[0][i])/2;
+        std::vector<double> new_bisect_position = position_list[0];
+        new_bisect_position[i] =new_bisect_position[i]+ (position_list[1][i]-position_list[0][i])/2;
         double new_val = CalcChi(new_bisect_position)-minimum-1.0;
         position_list[2] = position_list[1];
         value_list[2] = value_list[1];
@@ -173,7 +178,8 @@ std::vector<std::vector<double> > PSO::bisection(std::vector<double>position,dou
         res = std::abs(position[2]-position[0]);
       }
       else{
-        std::vector<double> new_bisect_position = position_list[1];new_bisect_position[i] += (position_list[2][i]-position_list[1][i])/2;
+        std::vector<double> new_bisect_position = position_list[1];
+        new_bisect_position[i] += (position_list[2][i]-position_list[1][i])/2;
         double new_val = CalcChi(new_bisect_position)-minimum-1.0;
         position_list[0] = position_list[1];
         value_list[0] = value_list[1];
@@ -227,11 +233,11 @@ std::vector<std::vector<double> > PSO::bisection(std::vector<double>position,dou
 }
 
 // *************************
-std::vector<std::vector<double>> PSO::calc_uncertainty(std::vector<double>position, double minimum) {
+std::vector<std::vector<double>> PSO::calc_uncertainty(const std::vector<double>& position, const double minimum) {
 // *************************
   std::vector<double> pos_uncertainty(position.size());
   std::vector<double> neg_uncertainty(position.size());
-  int num = 200;
+  constexpr int num = 200;
   std::vector<double> pos = position;
   for (unsigned int i = 0; i < position.size(); ++i) {
     double curr_ival = pos[i];
@@ -291,7 +297,7 @@ std::vector<std::vector<double>> PSO::calc_uncertainty(std::vector<double>positi
 }
 
 // *************************
-void PSO::uncertainty_check(std::vector<double> previous_pos){
+void PSO::uncertainty_check(const std::vector<double>& previous_pos){
 // *************************
   std::vector<std::vector<double >> x_list;
   std::vector<std::vector<double >> y_list;
@@ -331,7 +337,6 @@ void PSO::uncertainty_check(std::vector<double> previous_pos){
 // *************************
 double PSO::swarmIterate(){
 // *************************
-
   std::vector<double> total_pos(fDim,0.0);
 
   for (int i = 0; i < fParticles; ++i) {
@@ -437,7 +442,6 @@ void PSO::run() {
 // *************************
 void PSO::WriteOutput(){
 // *************************
-
   outputFile->cd();
 
   TVectorD* PSOParValue = new TVectorD(fDim);
@@ -494,8 +498,8 @@ void PSO::WriteOutput(){
           ParVals_PCA(i) = minimum[ParCounter];
           ErrorVals_PCA(i) = (uncertainties[ParCounter][0]+uncertainties[ParCounter][1])/2.0;
         }
-        ParVals = ((*it)->GetTransferMatrix())*ParVals_PCA;
-        ErrorVals = ((*it)->GetTransferMatrix())*ErrorVals_PCA;
+        ParVals = ((*it)->GetPCAHandler()->GetTransferMatrix())*ParVals_PCA;
+        ErrorVals = ((*it)->GetPCAHandler()->GetTransferMatrix())*ErrorVals_PCA;
 
         ParCounter = StartVal;
         //KS: Now after going from PCA to normal let';s save it
@@ -505,7 +509,7 @@ void PSO::WriteOutput(){
           (*PSOParError)(ParCounter) = std::fabs(ErrorVals(i));
           //int ParCounterMatrix = StartVal;
           //If fixed take prior
-          if((*it)->IsParameterFixedPCA(i))
+          if((*it)->GetPCAHandler()->IsParameterFixedPCA(i))
           {
             (*PSOParError)(ParCounter) = (*it)->GetDiagonalError(i);
           }
@@ -522,31 +526,23 @@ void PSO::WriteOutput(){
   SaveOutput();
 }
 
-
-
 // *******************
 double PSO::CalcChi2(const double* x) {
 // *******************
-
-  if(fTestLikelihood)
-  {
+  if(fTestLikelihood) {
     return rastriginFunc(x);
-  }
-  else
-  {
+  } else {
     return LikelihoodFit::CalcChi2(x);
   }
 }
 
-
 // *************************
 double PSO::rastriginFunc(const double* x) {
 // *************************
-
   stepClock->Start();
 
   //Search range: [-5.12, 5.12]
-  const double A = 10.0;
+  constexpr double A = 10.0;
   double sum = 0.0;
   for (int i = 0; i < fDim; ++i) {
       sum += x[i] * x[i] - A * cos(2.0 * 3.14 * x[i]);

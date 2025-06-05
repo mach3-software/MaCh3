@@ -1,21 +1,37 @@
 #include "MinuitFit.h"
 
 // *******************
-// Run the Markov chain with all the systematic objects added
+// Run the Minuit Fit with all the systematic objects added
 MinuitFit::MinuitFit(manager *man) : LikelihoodFit(man) {
 // *******************
+  /// @todo KS: Make this in future configurable, for more see: https://root.cern.ch/doc/master/classROOT_1_1Math_1_1Minimizer.html
+  // Minimizer type: determines the underlying implementation.
+  // Available types include:
+  //   - "Minuit2" (recommended modern option)
+  //   - "Minuit"  (legacy)
+  //   - "Fumili"
+  //   - "GSLMultiMin" (for gradient-free minimization)
+  //   - "GSLMultiFit"
+  //   - "GSLSimAn" (Simulated Annealing)
+  const std::string MinimizerType = "Minuit2";
+  // Minimizer algorithm (specific to the selected type).
+  // For Minuit2, the following algorithms are available:
+  //   - "Migrad"   : gradient-based minimization (default)
+  //   - "Simplex"  : Nelder-Mead simplex method (derivative-free)
+  //   - "Combined" : combination of Simplex and Migrad
+  //   - "Scan"     : parameter grid scan
+  const std::string MinimizerAlgo = "Migrad";
 
-  MACH3LOG_INFO("Creating instance of Minimizer with Minuit2 and Migrad");
+  MACH3LOG_INFO("Creating instance of Minimizer with {} and {}", MinimizerType, MinimizerAlgo);
 
-  //Other then Migrad available are Simplex,Combined,Scan
-  minuit = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
+  minuit = std::unique_ptr<ROOT::Math::Minimizer>(
+    ROOT::Math::Factory::CreateMinimizer(MinimizerType.c_str(), MinimizerAlgo.c_str()));
 }
 
 // *************************
 // Destructor: close the logger and output file
 MinuitFit::~MinuitFit() {
 // *************************
-  if(minuit != nullptr) delete minuit;
 }
 
 
@@ -23,8 +39,10 @@ MinuitFit::~MinuitFit() {
 // Run the Minuit with all the systematic objects added
 void MinuitFit::RunMCMC() {
 // *******************
-
   PrepareFit();
+
+  // Remove obsolete memory and make other checks before fit starts
+  SanitiseInputs();
 
   //KS: For none PCA this will be equal to normal parameters
   const int NparsMinuitFull = NPars;
@@ -49,10 +67,10 @@ void MinuitFit::RunMCMC() {
     {
       for(int i = 0; i < (*it)->GetNumParams(); ++i, ++ParCounter)
       {
-        //KS: Index, name, prior, step scale [differrent to MCMC],
+        //KS: Index, name, prior, step scale [different to MCMC],
         minuit->SetVariable(ParCounter, ((*it)->GetParName(i)), (*it)->GetParInit(i), (*it)->GetDiagonalError(i)/10);
         minuit->SetVariableValue(ParCounter, (*it)->GetParInit(i));
-        //KS: lower bound, upper bound, if Mirroring eneabled then ignore
+        //KS: lower bound, upper bound, if Mirroring enabled then ignore
         if(!fMirroring) minuit->SetVariableLimits(ParCounter, (*it)->GetLowerBound(i), (*it)->GetUpperBound(i));
         if((*it)->IsParameterFixed(i))
         {
@@ -64,8 +82,8 @@ void MinuitFit::RunMCMC() {
     {
       for(int i = 0; i < (*it)->GetNParameters(); ++i, ++ParCounter)
       {
-        minuit->SetVariable(ParCounter, Form("%i_PCA", i), (*it)->GetParPropPCA(i), (*it)->GetEigenValuesMaster()[i]/10);
-        if((*it)->IsParameterFixedPCA(i))
+        minuit->SetVariable(ParCounter, Form("%i_PCA", i), (*it)->GetPCAHandler()->GetParPropPCA(i), (*it)->GetPCAHandler()->GetEigenValuesMaster()[i]/10);
+        if((*it)->GetPCAHandler()->IsParameterFixedPCA(i))
         {
           minuit->FixVariable(ParCounter);
         }
@@ -121,7 +139,7 @@ void MinuitFit::RunMCMC() {
         }
         (*MinuitParValue)(ParCounter) = ParVal;
         (*MinuitParError)(ParCounter) = err[ParCounter];
-        //KS: For fixed params HESS will not calcuate error so we need to pass prior error
+        //KS: For fixed params HESS will not calculate error so we need to pass prior error
         if((*it)->IsParameterFixed(i))
         {
           (*MinuitParError)(ParCounter) = (*it)->GetDiagonalError(i);
@@ -154,9 +172,9 @@ void MinuitFit::RunMCMC() {
           MatrixVals_PCA(i,j) = minuit->CovMatrix(ParCounter,ParCounterMatrix);
         }
       }
-      ParVals = ((*it)->GetTransferMatrix())*ParVals_PCA;
-      ErrorVals = ((*it)->GetTransferMatrix())*ErrorVals_PCA;
-      MatrixVals.Mult(((*it)->GetTransferMatrix()),MatrixVals_PCA);
+      ParVals = ((*it)->GetPCAHandler()->GetTransferMatrix())*ParVals_PCA;
+      ErrorVals = ((*it)->GetPCAHandler()->GetTransferMatrix())*ErrorVals_PCA;
+      MatrixVals.Mult(((*it)->GetPCAHandler()->GetTransferMatrix()),MatrixVals_PCA);
 
       ParCounter = StartVal;
       //KS: Now after going from PCA to normal let';s save it
@@ -170,7 +188,7 @@ void MinuitFit::RunMCMC() {
           (*Postmatrix)(ParCounter,ParCounterMatrix)  = MatrixVals(i,j);
         }
         //If fixed take prior
-        if((*it)->IsParameterFixedPCA(i))
+        if((*it)->GetPCAHandler()->IsParameterFixedPCA(i))
         {
           (*MinuitParError)(ParCounter) = (*it)->GetDiagonalError(i);
           (*Postmatrix)(ParCounter,ParCounter) = (*MinuitParError)(ParCounter) * (*MinuitParError)(ParCounter);

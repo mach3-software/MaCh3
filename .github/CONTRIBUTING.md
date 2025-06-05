@@ -5,6 +5,10 @@ New features should be developed on branches in this repository with the branch 
 
 Please see [here](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) for more details
 
+We generally discourage fork-based development for anything beyond small changes (e.g., one-liners). This is to avoid situations where contributors develop large features in isolation and miss out on important upstream updates.
+
+If you’d like to contribute more extensively, please consider joining the organization. To request access, contact the [MaCh3 Admins](https://github.com/orgs/mach3-software/teams/mach3admin).
+
 ## Versioning of this package
 
 This package will follow this numbering convention for releases
@@ -36,6 +40,19 @@ CI heavily depends on the setup in the [MaCh3 Tutorial](https://github.com/mach3
 This process ensures that:
 - Breaking changes are properly registered.
 - The [MaCh3 Tutorial](https://github.com/mach3-software/MaCh3Tutorial) remains up-to-date.
+
+### Monitoring Jobs
+Some bots are tasked with weekly or long-term monitoring tasks.
+For example:
+- [Valgrind outputs](https://github.com/mach3-software/MaCh3/tree/gh-profiling) are updated on a weekly basis to track memory-related issues and visualize the CMake dependency graph.
+- [Benchmarking results](https://mach3-software.github.io/MaCh3Tutorial/) are stored and published periodically to monitor performance metrics over time.
+- [Profiling results](https://github.com/mach3-software/MaCh3Tutorial/tree/gh-benchmarks) are updated on a weekly basis to track performance bottlenecks across different execution eras. These tests are run separately for each Sample object, i.e., distinct runs are performed for Beam and ATM samples.
+- [Code-sanning results](https://github.com/mach3-software/MaCh3/security/code-scanning) is run on a weekly schedule to detect potential security vulnerabilities and code quality issues in the MaCh3 codebase. These scans are fully automated and rely on GitHub’s CodeQL engine, which performs static analysis across the repository.
+
+These outputs are primarily intended for expert developers. However, they **should still be regularly monitored** to identify:
+- Persistent memory leaks
+- Performance regressions
+- Issues in the CMake linking flow
 
 ## Doxygen
 When making comments try following Doxygen type of comments

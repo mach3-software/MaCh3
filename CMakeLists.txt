@@ -3,7 +3,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # CMake version check
 cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
-project(MaCh3 VERSION 2.0.0 LANGUAGES CXX)
+project(MaCh3 VERSION 2.1.0 LANGUAGES CXX)
 set(MaCh3_VERSION ${PROJECT_VERSION})
 
 option(MaCh3_PYTHON_ENABLED "Whether to build MaCh3 python bindings" OFF)
@@ -102,6 +102,7 @@ target_compile_options(MaCh3Warnings INTERFACE
   -Wformat-security       # Warn on functions that are potentially insecure for formatting
   -Walloca                # Warn if `alloca` is used, as it can lead to stack overflows
   -Wswitch-enum           # Warn if a `switch` statement on an enum does not cover all values
+  -pedantic               # Enforce strict ISO compliance (all versions of GCC, Clang >= 3.2)
   #-Wfloat-equal          # Warn if floating-point values are compared directly
   #-Wpadded               # Warn when padding is added to a structure or class for alignment
 )
@@ -130,7 +131,6 @@ add_library(MaCh3CompilerOptions INTERFACE)
 target_link_libraries(MaCh3CompilerOptions INTERFACE MaCh3CompileDefinitions)
 target_compile_options(MaCh3CompilerOptions INTERFACE
     -g                      # Generate debug information
-    -pedantic               # Enforce strict ISO compliance (all versions of GCC, Clang >= 3.2)
 )
 
 #If DEBUG_LEVEL was defined but MaCh3_DEBUG_ENABLED not, enable debug flag

@@ -1,15 +1,17 @@
 set(HEADERS
     SampleHandlerBase.h
     SampleHandlerFD.h
-    Structs.h
+    SampleStructs.h
     HistogramUtils.h
     FarDetectorCoreInfoStruct.h
+    OscillationHandler.h
 )
 
 add_library(Samples SHARED
     SampleHandlerBase.cpp
     SampleHandlerFD.cpp
     HistogramUtils.cpp
+    OscillationHandler.cpp
 )
 
 target_link_libraries(Samples PUBLIC Splines NuOscillator)

@@ -46,6 +46,7 @@ if(NOT MaCh3_DEBUG_ENABLED)
         "$<$<COMPILE_LANGUAGE:CUDA>:-prec-sqrt=false;-use_fast_math;-O3;-Werror;cross-execution-space-call;-w>"
         "$<$<COMPILE_LANGUAGE:CUDA>:-Xptxas=-allow-expensive-optimizations=true;-Xptxas=-fmad=true;-Xptxas=-O3;>"
         "$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=-fpic;-Xcompiler=-O3;-Xcompiler=-Wall;-Xcompiler=-Wextra;-Xcompiler=-Werror;-Xcompiler=-Wno-error=unused-parameter>"
+        "$<$<COMPILE_LANGUAGE:CUDA>:-Xcudafe=--display_error_number>"
     )
 else()
 #CW: -g and -G for debug flags to use cuda-gdb; slows stuff A LOT
@@ -54,9 +55,12 @@ else()
         "$<$<COMPILE_LANGUAGE:CUDA>:-prec-sqrt=false;-use_fast_math;-Werror;cross-execution-space-call;-w>"
         "$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=-g;>"
         "$<$<COMPILE_LANGUAGE:CUDA>:-Xptxas=-dlcm=ca;-Xptxas=-warn-lmem-usage;-Xptxas=-warn-spills;-Xptxas=-v;-Xcompiler=-Wall;-Xcompiler=-Wextra;-Xcompiler=-Werror;-Xcompiler=-Wno-error=unused-parameter>"
+        "$<$<COMPILE_LANGUAGE:CUDA>:-Xcudafe=--display_error_number>"
     )
     target_compile_definitions(MaCh3GPUCompilerOptions INTERFACE "$<$<COMPILE_LANGUAGE:CUDA>:CUDA_ERROR_CHECK>")
 endif()
+
+
 target_include_directories(MaCh3GPUCompilerOptions INTERFACE ${CUDAToolkit_INCLUDE_DIRS})
 if(MaCh3_DEBUG_ENABLED)
   include(${CMAKE_CURRENT_LIST_DIR}/CUDASamples.cmake)

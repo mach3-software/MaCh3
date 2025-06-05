@@ -83,6 +83,9 @@ void mcmc::RunMCMC() {
   // Prepare the output branches
   PrepareOutput();
 
+  // Remove obsolete memory and make other checks before fit starts
+  SanitiseInputs();
+
   // Reconfigure the samples, systematics and oscillation for first weight
   // ProposeStep sets logLProp
   ProposeStep();
@@ -118,8 +121,8 @@ void mcmc::RunMCMC() {
 
   //Save the Adaptive output
   for(const auto& syst : systematics){
-    if(syst->getUseAdaptive()){
-      syst->getAdaptiveHandler()->SaveAdaptiveToFile(syst->getAdaptiveHandler()->output_file_name, syst->GetName(), true);
+    if(syst->GetDoAdaption()){
+      syst->GetAdaptiveHandler()->SaveAdaptiveToFile(syst->GetAdaptiveHandler()->output_file_name, syst->GetName(), true);
     }
   }
 

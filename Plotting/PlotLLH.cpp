@@ -9,7 +9,7 @@
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
 #pragma GCC diagnostic ignored "-Wconversion"
 
-/// @file PlotLLH
+/// @file PlotLLH.cpp
 /// @author Ewan Miller
 
 // some options for the plots

@@ -3,7 +3,7 @@
 
 // MaCh3 includes
 #include "Manager/Manager.h"
-#include "Samples/Structs.h"
+#include "Samples/SampleStructs.h"
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT includes
@@ -17,7 +17,7 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TROOT.h"
 _MaCh3_Safe_Include_End_ //}
 
-/// @file CombineMaCh3Chains
+/// @file CombineMaCh3Chains.cpp
 /// @author Ewan Miller
 /// @author Kamil Skwarczynski
 

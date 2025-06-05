@@ -6,7 +6,7 @@
 #include "Splines/SplineBase.h"
 #include "Splines/SplineMonolith.h"
 #include "Splines/SplineStructs.h"
-#include "Samples/Structs.h" // <- The spline stuff that's in here should really be moved to splineStructs.h but I ain't doing that right now
+#include "Samples/SampleStructs.h" // <- The spline stuff that's in here should really be moved to splineStructs.h but I ain't doing that right now
 // ROOT includes
 #include "TSpline.h"
 
@@ -15,7 +15,7 @@
 
 namespace py = pybind11;
 
-// As SplineBase is an abstract base class we have to do some gymnastics to get it to get it into python
+/// @brief EW: As SplineBase is an abstract base class we have to do some gymnastics to get it to get it into python
 class PySplineBase : public SplineBase {
 public:
     /* Inherit the constructors */

@@ -4,9 +4,10 @@
 // Run the Markov chain with all the systematic objects added
 LikelihoodFit::LikelihoodFit(manager *man) : FitterBase(man) {
 // *******************
-    NPars = 0;
-    NParsPCA = 0;
-    fMirroring = GetFromManager<bool>(fitMan->raw()["General"]["Fitter"]["Mirroring"], false);
+  NPars = 0;
+  NParsPCA = 0;
+  fMirroring = GetFromManager<bool>(fitMan->raw()["General"]["Fitter"]["Mirroring"], false);
+  if(fMirroring) MACH3LOG_INFO("Mirroring enabled");
 }
 
 
@@ -20,7 +21,6 @@ LikelihoodFit::~LikelihoodFit() {
 // *******************
 void LikelihoodFit::PrepareFit() {
 // *******************
-
   // Save the settings into the output file
   SaveSettings();
 
@@ -39,9 +39,7 @@ void LikelihoodFit::PrepareFit() {
 // *******************
 double LikelihoodFit::CalcChi2(const double* x) {
 // *******************
-
-  if (step % 10000 == 0)
-  {
+  if (step % 10000 == 0) {
     MACH3LOG_INFO("Iteration {}", step);
   }
 
@@ -88,7 +86,7 @@ double LikelihoodFit::CalcChi2(const double* x) {
         //KS: Basically apply mirroring for parameters out of bounds
         pars[i] = ParVal;
       }
-      (*it)->SetParametersPCA(pars);
+      (*it)->GetPCAHandler()->SetParametersPCA(pars);
     }
     (*it)->AcceptStep();
   }

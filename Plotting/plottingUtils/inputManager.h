@@ -5,7 +5,7 @@
 #include "Manager/YamlHelper.h"
 #include "Manager/MaCh3Exception.h"
 #include "Fitters/MCMCProcessor.h"
-#include "Samples/Structs.h"
+#include "Samples/SampleStructs.h"
 
 // Other plotting includes
 #include "plottingUtils.h"
@@ -22,18 +22,17 @@ enum fileTypeEnum {
   kNFileTypes //!< Number of types of file
 };
 
+/// @brief Struct which wraps around the actual input file and also holds general information, and
+/// data from the file to be used by other classes.
+/// @details This is just a little guy thats
+/// intended to be just a plain old data type which simply holds and organises information and
+/// data read from the underlying input file, just some methods to inspect the contents of the
+/// object. As such it does not implement methods to manipulate such data, which is all done via
+/// the InputManager() class. Reason for this object is to try to smooth over the cracks that come
+/// from very different file structures used by different fitters and provide a common format to
+/// be used for plot making. Intended use of this objects is only via InputManager which contains
+/// the methods to fill and manipulate it.
 struct InputFile {
-  /// @brief Struct which wraps around the actual input file and also holds general information, and
-  /// data from the file to be used by other classes.
-  /// @details This is just a little guy thats
-  /// intended to be just a plain old data type which simply holds and organises information and
-  /// data read from the underlying input file, just some methods to inspect the contents of the
-  /// object. As such it does not implement methods to manipulate such data, which is all done via
-  /// the InputManager() class. Reason for this object is to try to smooth over the cracks that come
-  /// from very different file structures used by different fitters and provide a common format to
-  /// be used for plot making. Intended use of this objects is only via InputManager which contains
-  /// the methods to fill and manipulate it.
-
   /// @brief Create InputFile instance based on a specified file.
   /// @param fName The name of the file to open.
   /// @return The constructed InputFile.

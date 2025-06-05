@@ -5,7 +5,6 @@
 
 #include "plottingUtils/plottingUtils.h"
 #include "plottingUtils/plottingManager.h"
-#include "Samples/Structs.h"
 
 _MaCh3_Safe_Include_Start_ //{
 #include "TROOT.h"
@@ -26,7 +25,7 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TGraphAsymmErrors.h"
 _MaCh3_Safe_Include_End_ //}
 
-/// @file GetPostfitParamPlots
+/// @file GetPostfitParamPlots.cpp
 /// This script generates post-fit parameter plots. The central postfit value is
 /// taken as the Highest Posterior Density (HPD), but can be easily changed to
 /// another method such as Gaussian. Be cautious as parameter names and the number
@@ -171,13 +170,17 @@ void PrettifyTitles(TH2D *Hist) {
   }
 }
 
-void ReadSettings(std::shared_ptr<TFile> File1)
+bool ReadSettings(std::shared_ptr<TFile> File1)
 {
   MACH3LOG_DEBUG("Reading settings for file {}", File1->GetName());
   #ifdef DEBUG
   File1->ls();
   #endif
   TTree *Settings = (File1->Get<TTree>("Settings"));
+
+  // can't find settings tree :(
+  if (!Settings) return false;
+
   MACH3LOG_DEBUG("Got settings tree");
   Settings->Print();
 
@@ -202,7 +205,8 @@ void ReadSettings(std::shared_ptr<TFile> File1)
   NDSamplesNames = *NDSamples_Names;
   NDSamplesBins = *NDSamples_Bins;
 
-  MACH3LOG_DEBUG("Read successfully");
+  MACH3LOG_DEBUG("Read settings tree successfully");
+  return true;
 }
 
 inline TH1D* makeRatio(TH1D *PrefitCopy, TH1D *PostfitCopy, bool setAxes){
@@ -799,7 +803,15 @@ void GetPostfitParamPlots()
     
   MACH3LOG_INFO("Plotting {} errors", plotType);
   
-  ReadSettings(man->input().getFile(0).file);
+  // if we have one MaCh3 nd file then we can get settings from it 
+  bool plotNDDet = false;
+  for (size_t fileId = 0; fileId < man->input().getNInputFiles(); fileId++) {
+    if(!ReadSettings(man->input().getFile(0).file)) {
+      MACH3LOG_INFO("at least one file provided does not have 'settings' tree indicating it is not MaCh3 ND file");
+      MACH3LOG_INFO("  sadly this means I cannot plot ND Det parameters as this is only supported for MaCh3 ND files for now... sorry :(");
+      plotNDDet = false;
+    }
+  }
 
   canv = new TCanvas("canv", "canv", 1024, 1024);
   //gStyle->SetPalette(51);
@@ -832,18 +844,6 @@ void GetPostfitParamPlots()
     postFitHist_tmp->SetLineWidth(man->getOption<int>("plotLineWidth"));
     leg->AddEntry(postFitHist_tmp, man->getFileLabel(fileId).c_str(), "lpf");
   }
-  /// @todo this is temporary hack
-  for(unsigned int fileId = 0; fileId < man->getNFiles(); fileId++)
-  {
-    TH1D *Hist = static_cast<TH1D*>((man->input().getFile(fileId).file->Get( ("param_xsec_"+plotType).c_str()))->Clone());
-
-    Hist->SetMarkerColor(TColor::GetColorPalette(fileId));
-    Hist->SetLineColor(TColor::GetColorPalette(fileId));
-    Hist->SetMarkerStyle(7);
-    Hist->SetLineStyle(1+fileId);
-    Hist->SetLineWidth(man->getOption<int>("plotLineWidth"));
-    PostfitHistVec.push_back(Hist);
-  }
 
   canv->cd();
   canv->Clear();
@@ -855,7 +855,7 @@ void GetPostfitParamPlots()
   MakeFluxPlots();
 
   //KS: By default we don't run ProcessMCMC with PlotDet as this take some time, in case we did let's make fancy plots
-  if(NDParameters > 0) MakeNDDetPlots();
+  if(plotNDDet & (NDParameters > 0)) MakeNDDetPlots();
   
   //KS: Same as above but for FD parameters,
   if(FDParameters > 0) MakeFDDetPlots();
@@ -1102,30 +1102,22 @@ int main(int argc, char *argv[])
 
   GetPostfitParamPlots();
 
-  if (argc != 2 && argc != 3 && argc !=4)
+  if (man->input().getNInputFiles() == 1)
   {
-    MACH3LOG_CRITICAL("Invalid command line options specified");
-    MACH3LOG_CRITICAL("How to use: {} <MCMC_Processor_Output>.root", argv[0]);
-    MACH3LOG_CRITICAL("You can add up to 3 different files");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-
-  if (argc == 2)
-  {
-    std::string filename = argv[1];
+    std::string filename = man->getFileName(0);
     GetViolinPlots(filename);
   }
-  else if (argc == 3)
+  else if (man->input().getNInputFiles() == 2)
   {
-    std::string filename1 = argv[1];
-    std::string filename2 = argv[2];
+    std::string filename1 = man->getFileName(0);
+    std::string filename2 = man->getFileName(1);
     GetViolinPlots(filename1, filename2);
   }
-  else if (argc == 4)
+  else if (man->input().getNInputFiles() == 3)
   {
-    std::string filename1 = argv[1];
-    std::string filename2 = argv[2];
-    std::string filename3 = argv[3];
+    std::string filename1 = man->getFileName(0);
+    std::string filename2 = man->getFileName(1);
+    std::string filename3 = man->getFileName(3);
     //KS: Violin plot currently not supported by three file version although it should be super easy to adapt
   }
 

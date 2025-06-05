@@ -35,18 +35,40 @@ class PCAHandler{
   /// @brief Destructor
   virtual ~PCAHandler();
 
-  /// @brief KS:
+  /// @brief KS: Print info about PCA parameters
+  void Print();
+  /// @brief Retrieve number of parameters in PCA base
+  int GetNumberPCAedParameters() const { return NumParPCA; }
+
+  /// @brief KS: Setup pointers to current and proposed parameter value which we need to convert them to PCA base each step
+  /// @param fCurr_Val pointer to current position of parameter
+  /// @param fProp_Val pointer to proposed position of parameter
   void SetupPointers(std::vector<double>* fCurr_Val,
                      std::vector<double>* fProp_Val);
 
   /// @brief CW: Calculate eigen values, prepare transition matrices and remove param based on defined threshold
-  void ConstructPCA(TMatrixDSym * covMatrix, const int firstPCAd, const int lastPCAd,
-                    const double eigen_thresh, int& _fNumParPCA, const int _fNumPar);
+  /// @param CovMatrix       Symmetric covariance matrix used for eigen decomposition.
+  /// @param firstPCAd       Index of the first PCA component to include.
+  /// @param lastPCAd        Index of the last PCA component to include.
+  /// @param eigen_thresh    Threshold for eigenvalues below which parameters are discarded.
+  /// @param _fNumPar        Total number of parameters in the original (non-PCA) basis.
+  void ConstructPCA(TMatrixDSym * CovMatrix, const int firstPCAd, const int lastPCAd,
+                    const double eigen_thresh, const int _fNumPar);
 
   /// @brief Transfer param values from normal base to PCA base
   void TransferToPCA();
   /// @brief Transfer param values from PCA base to normal base
   void TransferToParam();
+
+  /// @brief Throw the parameters according to the covariance matrix. This shouldn't be used in MCMC code ase it can break Detailed Balance;
+  void ThrowParameters(const std::vector<std::unique_ptr<TRandom3>>& random_number,
+                       double** throwMatrixCholDecomp,
+                       double* randParams,
+                       double* corr_throw,
+                       const std::vector<double>& fPreFitValue,
+                       const std::vector<double>& fLowBound,
+                       const std::vector<double>& fUpBound,
+                       int _fNumPar);
 
   /// @brief Accepted this step
   void AcceptStep() _noexcept_;
@@ -56,11 +78,124 @@ class PCAHandler{
                       const double* _restrict_ randParams,
                       const double* _restrict_ corr_throw) _noexcept_;
 
+  /// @brief KS: Transfer the starting parameters to the PCA basis, you don't want to start with zero..
+  /// @param IndStepScale Per parameter step scale, we set so each PCA param uses same step scale [eigen value takes care of size]
+  void SetInitialParameters(std::vector<double>& IndStepScale);
+  /// @brief Throw the proposed parameter by mag sigma.
+  void ThrowParProp(const double mag, const double* _restrict_ randParams);
+  /// @brief Helper function to throw the current parameter by mag sigma.
+  void ThrowParCurr(const double mag, const double* _restrict_ randParams);
+  /// @brief set branches for output file
+  /// @ingroup ParameterHandlerSetters
+  void SetBranches(TTree &tree, bool SaveProposal, const std::vector<std::string>& Names);
+  /// @brief fix parameters at prior values
+  /// @ingroup ParameterHandlerSetters
+  void ToggleFixAllParameters();
+  /// @brief fix parameters at prior values
+  /// @ingroup ParameterHandlerSetters
+  void ToggleFixParameter(const int i, const std::vector<std::string>& Names);
+
+  /// @brief Set values for PCA parameters in PCA base
+  /// @param pars vector with new values of PCA params
+  /// @ingroup ParameterHandlerSetters
+  void SetParametersPCA(const std::vector<double> &pars) {
+    if (int(pars.size()) != NumParPCA) {
+      MACH3LOG_ERROR("Parameter arrays of incompatible size! Not changing parameters! has size {} but was expecting {}", pars.size(), NumParPCA);
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
+    int parsSize = int(pars.size());
+    for (int i = 0; i < parsSize; i++) {
+      _fParPropPCA(i) = pars[i];
+    }
+    //KS: Transfer to normal base
+    TransferToParam();
+  }
+
+  /// @brief Is parameter fixed in PCA base or not
+  /// @param i Parameter index
+  /// @ingroup ParameterHandlerGetters
+  bool IsParameterFixedPCA(const int i) const {
+    if (_fErrorPCA[i] < 0) { return true;  }
+    else                   { return false; }
+  }
+
+  /// @brief Get eigen vectors of covariance matrix, only works with PCA
+  /// @ingroup ParameterHandlerGetters
+  const TMatrixD GetEigenVectors() const {
+    return eigen_vectors;
+  }
+
+  /// @brief Set proposed value for parameter in PCA base
+  /// @param i Parameter index
+  /// @param value new value
+  /// @ingroup ParameterHandlerSetters
+  void SetParPropPCA(const int i, const double value) {
+    _fParPropPCA(i) = value;
+    // And then transfer back to the parameter basis
+    TransferToParam();
+  }
+  /// @brief Set current value for parameter in PCA base
+  /// @param i Parameter index
+  /// @param value new value
+  /// @ingroup ParameterHandlerSetters
+  void SetParCurrPCA(const int i, const double value) {
+    _fParCurrPCA(i) = value;
+    // And then transfer back to the parameter basis
+    TransferToParam();
+  }
+
+  /// @brief Get current parameter value using PCA
+  /// @param i Parameter index
+  /// @ingroup ParameterHandlerGetters
+  double GetParPropPCA(const int i) const {
+    return _fParPropPCA(i);
+  }
+
+  /// @brief Get current parameter value using PCA
+  /// @param i Parameter index
+  /// @ingroup ParameterHandlerGetters
+  double GetPreFitValuePCA(const int i) const {
+    return _fPreFitValuePCA[i];
+  }
+
+  /// @brief Get current parameter value using PCA
+  /// @param i Parameter index
+  /// @ingroup ParameterHandlerGetters
+  double GetParCurrPCA(const int i) const {
+    return _fParCurrPCA(i);
+  }
+
+  /// @brief Get transfer matrix allowing to go from PCA base to normal base
+  /// @ingroup ParameterHandlerGetters
+  const TMatrixD GetTransferMatrix() const {
+    return TransferMat;
+  }
+
+  /// @brief Get eigen values for all parameters, if you want for decomposed only parameters use GetEigenValuesMaster
+  /// @ingroup ParameterHandlerGetters
+  const TVectorD GetEigenValues() const {
+    return eigen_values;
+  }
+  /// @brief Get eigen value of only decomposed parameters, if you want for all parameters use GetEigenValues
+  /// @ingroup ParameterHandlerGetters
+  const std::vector<double> GetEigenValuesMaster() const {
+    return eigen_values_master;
+  }
+
+  /// @brief Check if parameter in PCA base is decomposed or not
+  /// @param i Parameter index
+  /// @ingroup ParameterHandlerGetters
+  bool IsParameterDecomposed(const int i) const {
+    if(isDecomposedPCA[i] >= 0) return false;
+    else return true;
+  }
+
   #ifdef DEBUG_PCA
   /// @brief KS: Let's dump all useful matrices to properly validate PCA
   void DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, int NumPar);
   #endif
 
+ private:
   /// Prefit value for PCA params
   std::vector<double> _fPreFitValuePCA;
   /// CW: Current parameter value in PCA base
@@ -68,7 +203,7 @@ class PCAHandler{
   /// CW: Proposed parameter value in PCA base
   TVectorD _fParCurrPCA;
   /// Tells if parameter is fixed in PCA base or not
-  std::vector<double> _fParSigmaPCA;
+  std::vector<double> _fErrorPCA;
   /// If param is decomposed this will return -1, if not this will return enumerator to param in normal base. This way we can map stuff like step scale etc between normal base and undecomposed param in eigen base.
   std::vector<int> isDecomposedPCA;
   /// Number of parameters in PCA base

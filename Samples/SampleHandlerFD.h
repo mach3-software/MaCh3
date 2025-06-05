@@ -7,13 +7,11 @@
 #include "Parameters/ParameterHandlerOsc.h"
 
 #include "Samples/SampleHandlerBase.h"
+#include "Samples/OscillationHandler.h"
 #include "Samples/FarDetectorCoreInfoStruct.h"
 
 #include "THStack.h"
 #include "TLegend.h"
-
-//forward declare so we don't bleed NuOscillator headers
-class OscillatorBase;
 
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
 /// @author Dan Barrow
@@ -22,16 +20,23 @@ class SampleHandlerFD :  public SampleHandlerBase
 {
 public:
   //######################################### Functions #########################################
+  /// @brief Constructor
   /// @param ConfigFileName Name of config to initialise the sample object
-  SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGeneric* xsec_cov, ParameterHandlerOsc* osc_cov = nullptr, OscillatorBase* Oscillator_ = nullptr);
+  SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGeneric* xsec_cov,
+                  ParameterHandlerOsc* osc_cov = nullptr, const std::shared_ptr<OscillationHandler>& OscillatorObj_ = nullptr);
   /// @brief destructor
   virtual ~SampleHandlerFD();
 
+  /// @ingroup SampleHandlerGetters
   int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
+  /// @ingroup SampleHandlerGetters
   std::string GetSampleName(int iSample = 0) const override;
+  /// @ingroup SampleHandlerGetters
   std::string GetTitle() const override {return SampleTitle;}
 
+  /// @ingroup SampleHandlerGetters
   std::string GetXBinVarName() {return XVarStr;}
+  /// @ingroup SampleHandlerGetters
   std::string GetYBinVarName() {return YVarStr;}
 
   void PrintIntegral(TString OutputName="/dev/null", int WeightStyle=0, TString OutputCSVName="/dev/null");
@@ -50,58 +55,62 @@ public:
   //===============================================================================
 
   void Reweight() override;
-  M3::float_t GetEventWeight(const int iSample, const int iEntry) const;
+  M3::float_t GetEventWeight(const int iEntry) const;
 
   ///  @brief including Dan's magic NuOscillator
   void InitialiseNuOscillatorObjects();
   void SetupNuOscillatorPointers();
 
-  virtual void setupSplines(FarDetectorCoreInfo *, const char *, int , int ){};
-
   void ReadSampleConfig();
 
-  int GetNMCSamples() override {return int(MCSamples.size());}
+  /// @ingroup SampleHandlerGetters
+  int GetNMCSamples() override {return nSamples;}
+  /// @ingroup SampleHandlerGetters
+  int GetNOscChannels() {return static_cast<int>(OscChannels.size());}
 
-  int GetNEventsInSample(int iSample) override {
-    if (iSample < 0 || iSample > GetNMCSamples()) {
-      MACH3LOG_ERROR("Invalid Sample Requested: {}",iSample);
-      throw MaCh3Exception(__FILE__ , __LINE__);
-    }
-    return MCSamples[iSample].nEvents;
-  }
-  
-  std::string GetFlavourName(int iSample) {
-    if (iSample < 0 || iSample > GetNMCSamples()) {
-      MACH3LOG_ERROR("Invalid Sample Requested: {}",iSample);
+  /// @ingroup SampleHandlerGetters
+  std::string GetFlavourName(const int iChannel) {
+    if (iChannel < 0 || iChannel > static_cast<int>(OscChannels.size())) {
+      MACH3LOG_ERROR("Invalid Channel Requested: {}", iChannel);
       throw MaCh3Exception(__FILE__ , __LINE__);      
     }
-    return MCSamples[iSample].flavourName;
+    return OscChannels[iChannel].flavourName;
   }
 
+  /// @ingroup SampleHandlerGetters
   TH1* Get1DVarHist(const std::string& ProjectionVar, const std::vector< KinematicCut >& SelectionVec = std::vector< KinematicCut >(),
                     int WeightStyle=0, TAxis* Axis=nullptr);
   TH2* Get2DVarHist(const std::string& ProjectionVarX, const std::string& ProjectionVarY,
                     const std::vector< KinematicCut >& SelectionVec = std::vector< KinematicCut >(),
                     int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
-
+  /// @ingroup SampleHandlerGetters
   TH1* Get1DVarHistByModeAndChannel(const std::string& ProjectionVar_Str, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* Axis=nullptr);
+  /// @ingroup SampleHandlerGetters
   TH2* Get2DVarHistByModeAndChannel(const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
 
+  /// @ingroup SampleHandlerGetters
   TH1 *GetModeHist1D(int s, int m, int style = 0) {
     return Get1DVarHistByModeAndChannel(XVarStr,m,s,style);
   }
+  /// @ingroup SampleHandlerGetters
   TH2 *GetModeHist2D(int s, int m, int style = 0) {
     return Get2DVarHistByModeAndChannel(XVarStr,YVarStr,m,s,style);
   }
 
+  /// @ingroup SampleHandlerGetters
   std::vector<TH1*> ReturnHistsBySelection1D(std::string KinematicProjection, int Selection1, int Selection2=-1, int WeightStyle=0, TAxis* Axis=0);
+  /// @ingroup SampleHandlerGetters
   std::vector<TH2*> ReturnHistsBySelection2D(std::string KinematicProjectionX, std::string KinematicProjectionY, int Selection1, int Selection2=-1, int WeightStyle=0, TAxis* XAxis=0, TAxis* YAxis=0);
+  /// @ingroup SampleHandlerGetters
   THStack* ReturnStackedHistBySelection1D(std::string KinematicProjection, int Selection1, int Selection2=-1, int WeightStyle=0, TAxis* Axis=0);
+  /// @ingroup SampleHandlerGetters
   TLegend* ReturnStackHistLegend() {return THStackLeg;}
   
-  /// ETA function to generically convert a string from xsec cov to a kinematic type
+  /// @brief ETA function to generically convert a string from xsec cov to a kinematic type
+  /// @ingroup SampleHandlerGetters
   int ReturnKinematicParameterFromString(const std::string& KinematicStr) const;
-  /// ETA function to generically convert a kinematic type from xsec cov to a string
+  /// @brief ETA function to generically convert a kinematic type from xsec cov to a string
+  /// @ingroup SampleHandlerGetters
   std::string ReturnStringFromKinematicParameter(const int KinematicVariable) const;
 
  protected:
@@ -120,16 +129,19 @@ public:
   virtual void Init() = 0;
 
   /// @brief Experiment specific setup, returns the number of events which were loaded
-  virtual int SetupExperimentMC(int iSample) = 0;
+  virtual int SetupExperimentMC() = 0;
 
   /// @brief Function which translates experiment struct into core struct
-  virtual void SetupFDMC(int iSample) = 0;
+  virtual void SetupFDMC() = 0;
 
   /// @brief Function which does a lot of the lifting regarding the workflow in creating different MC objects
   void Initialise();
   
   /// @brief Contains all your binned splines and handles the setup and the returning of weights from spline evaluations
   std::unique_ptr<BinnedSplineHandler> SplineHandler;
+
+  /// @brief Contains all your binned splines and handles the setup and the returning of weights from spline evaluations
+  std::shared_ptr<OscillationHandler> Oscillator;
   //===============================================================================
   void FillSplineBins();
 
@@ -170,6 +182,9 @@ public:
   void Set2DBinning(std::vector<double> &XVec, std::vector<double> &YVec) {Set2DBinning(XVec.size()-1, XVec.data(), YVec.size()-1, YVec.data());};
   /// @brief wrapper to call set binning functions based on sample config info
   void SetupSampleBinning();
+  /// @brief Initialise data, MC and W2 histograms
+  void SetupReweightArrays(const size_t numberXBins, const size_t numberYBins);
+
   /// @brief the strings associated with the variables used for the binning e.g. "RecoNeutrinoEnergy"
   std::string XVarStr, YVarStr;
   std::vector<std::string> SplineVarNames;
@@ -189,15 +204,12 @@ public:
   /// @brief Update the functional parameter values to the latest propsed values. Needs to be called before every new reweight so is called in fillArray 
   virtual void PrepFunctionalParameters(){};
   /// @brief ETA - generic function applying shifts
-  virtual void ApplyShifts(int iSample, int iEvent);
+  virtual void ApplyShifts(int iEvent);
 
   /// @brief DB Function which determines if an event is selected, where Selection double looks like {{ND280KinematicTypes Var1, douuble LowBound}
-  bool IsEventSelected(const int iSample, const int iEvent);
+  bool IsEventSelected(const int iEvent);
   /// @brief HH - reset the shifted values to the original values
-  virtual void resetShifts(int iSample, int iEvent) {
-    (void)iSample;
-    (void)iEvent;
-  };
+  virtual void resetShifts(int iEvent) {(void)iEvent;};
   /// @brief HH - a vector that stores all the FuncPars struct
   std::vector<FunctionalParameter> funcParsVec;
   /// @brief HH - a map that relates the name of the functional parameter to
@@ -212,32 +224,34 @@ public:
   /// function
   std::unordered_map<int, FuncParFuncType> funcParsFuncMap;
   /// @brief HH - a grid of vectors of enums for each sample and event
-  std::vector<std::vector<std::vector<int>>> funcParsGrid;
+  std::vector<std::vector<int>> funcParsGrid;
   /// @brief HH - a vector of string names for each functional parameter
   std::vector<std::string> funcParsNamesVec = {};
 
   /// @brief Check whether a normalisation systematic affects an event or not
-  void CalcNormsBins(int iSample);
+  void CalcNormsBins(std::vector< std::vector< int > >& xsec_norms_bins);
   /// @brief Calculate the spline weight for a given event
-  M3::float_t CalcWeightSpline(const int iSample, const int iEvent) const;
+  M3::float_t CalcWeightSpline(const FarDetectorCoreInfo* MCEvent) const;
   /// @brief Calculate the norm weight for a given event
-  M3::float_t CalcWeightNorm(const int iSample, const int iEvent) const;
+  M3::float_t CalcWeightNorm(const FarDetectorCoreInfo* MCEvent) const;
 
   /// @brief Calculate weights for function parameters
   ///
   /// First you need to setup additional pointers in you experiment code in SetupWeightPointers
   /// Then in this function you can calculate whatever fancy function you want by filling weight to which you have pointer
   /// This way func weight shall be used in GetEventWeight
-  virtual void CalcWeightFunc(int iSample, int iEvent){return; (void)iSample; (void)iEvent;};
+  virtual void CalcWeightFunc(int iEvent){return; (void)iEvent;};
 
   /// @brief Return the value of an assocaited kinematic parameter for an event
-  virtual double ReturnKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0;
-  virtual double ReturnKinematicParameter(int KinematicVariable, int iSample, int iEvent) = 0;
+  virtual double ReturnKinematicParameter(std::string KinematicParamter, int iEvent) = 0;
+  virtual double ReturnKinematicParameter(int KinematicVariable, int iEvent) = 0;
 
   /// @brief Return the binning used to draw a kinematic parameter
   virtual std::vector<double> ReturnKinematicParameterBinning(std::string KinematicParameter) = 0;
-  virtual const double* GetPointerToKinematicParameter(std::string KinematicParamter, int iSample, int iEvent) = 0; 
-  virtual const double* GetPointerToKinematicParameter(double KinematicVariable, int iSample, int iEvent) = 0;
+  virtual const double* GetPointerToKinematicParameter(std::string KinematicParamter, int iEvent) = 0;
+  virtual const double* GetPointerToKinematicParameter(double KinematicVariable, int iEvent) = 0;
+
+  const double* GetPointerToOscChannel(const int iEvent) const;
 
   void SetupNormParameters();
 
@@ -284,13 +298,8 @@ public:
   //===============================================================================
   //MC variables
   std::vector<FarDetectorCoreInfo> MCSamples;
+  std::vector<OscChannelInfo> OscChannels;
   //===============================================================================
-
-  //===============================================================================
-  /// DB Variables required for oscillation
-  std::vector<OscillatorBase*> NuOscProbCalcers;
-  std::string NuOscillatorConfigFile; 
-  //=============================================================================== 
 
   //===============================================================================
   //DB Covariance Objects
@@ -299,10 +308,6 @@ public:
   ParameterHandlerGeneric *ParHandler = nullptr;
   ParameterHandlerOsc *OscParHandler = nullptr;
 
-  /// @brief flag used to define whether all oscillation channels have a probability calculated using the same binning
-  bool EqualBinningPerOscChannel = false;
-  /// If using shared NuOsc
-  bool SharedNuOsc = false;
   //=============================================================================== 
 
   /// @brief Keep track of the dimensions of the sample binning
@@ -315,8 +320,6 @@ public:
 
   /// @brief Information to store for normalisation pars
   std::vector<NormParameter> norm_parameters;
-  /// pointer to osc params, since not all params affect every sample, we perform some operations before hand for speed
-  std::vector<const double*> OscParams;
   //===========================================================================
   //DB Vectors to store which kinematic cuts we apply
   //like in XsecNorms but for events in sample. Read in from sample yaml file 
@@ -342,15 +345,11 @@ public:
   std::unique_ptr<manager> SampleManager;
   /// @brief function to create the member of the FarDetectorInfo struct so
   /// they are the appropriate size.
-  void InitialiseSingleFDMCObject(int iSample, int nEvents);
+  void InitialiseSingleFDMCObject();
   void InitialiseSplineObject();
 
-  std::vector<std::string> oscchan_flavnames;
-  std::vector<std::string> oscchan_flavnames_Latex;
   std::vector<std::string> mc_files;
   std::vector<std::string> spline_files;
-  std::vector<int> sample_nupdg;
-  std::vector<int> sample_nupdgunosc;
 
   std::unordered_map<std::string, double> _modeNomWeightMap;
   
