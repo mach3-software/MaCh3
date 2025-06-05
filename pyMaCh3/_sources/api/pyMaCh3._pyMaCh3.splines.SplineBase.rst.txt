@@ -1,7 +1,0 @@
-SplineBase
-==========
-
-.. currentmodule:: pyMaCh3._pyMaCh3.splines
-
-.. autoclass:: SplineBase
-   :show-inheritance:
