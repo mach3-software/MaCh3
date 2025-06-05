@@ -46,25 +46,36 @@ public:
 
   //ETA - abstract these to SampleHandlerFDBase
   //DB Require these four functions to allow conversion from TH1(2)D to array for multi-threaded GetLikelihood
-  void AddData(TH1D* Data) override;
-  void AddData(TH2D* Data) override;
-  void AddData(std::vector<double> &data) override;
-  void AddData(std::vector< std::vector <double> > &data) override;
+  void AddData(TH1D* Data);
+  void AddData(TH2D* Data);
+  void AddData(std::vector<double> &data);
+  void AddData(std::vector< std::vector <double> > &data);
+
   /// @brief DB Multi-threaded GetLikelihood
   double GetLikelihood() override;
   //===============================================================================
 
+  /// @brief Get MC histogram
+  /// @ingroup SampleHandlerGetters
+  TH1* GetMCHist(const int Dimension);
+
+  /// @brief Get W2 histogram
+  /// @ingroup SampleHandlerGetters
+  TH1* GetW2Hist(const int Dimension);
+
+  /// @brief Get Data histogram
+  /// @ingroup SampleHandlerGetters
+  TH1* GetDataHist(const int Dimension);
+
   void Reweight() override;
   M3::float_t GetEventWeight(const int iEntry) const;
 
-  ///  @brief including Dan's magic NuOscillator
+  /// @brief including Dan's magic NuOscillator
   void InitialiseNuOscillatorObjects();
   void SetupNuOscillatorPointers();
 
   void ReadSampleConfig();
 
-  /// @ingroup SampleHandlerGetters
-  int GetNMCSamples() override {return nSamples;}
   /// @ingroup SampleHandlerGetters
   int GetNOscChannels() {return static_cast<int>(OscChannels.size());}
 
@@ -259,9 +270,9 @@ public:
   //DB Functions required for reweighting functions
   //DB Replace previous implementation with reading bin contents from SampleHandlerFD_array
   /// @brief Fill a 1D histogram with the event-level information used in the fit
-  void Fill1DHist() override;
+  void Fill1DHist();
   /// @brief Fill a 2D histogram with the event-level information used in the fit
-  void Fill2DHist() override;
+  void Fill2DHist();
 
   /// @brief DB Nice new multi-threaded function which calculates the event weights and fills the relevant bins of an array
 #ifdef MULTITHREAD
@@ -362,4 +373,11 @@ public:
   bool FirstTimeW2;
   /// KS:Super hacky to update W2 or not
   bool UpdateW2;
+
+  TH1D *dathist;
+  TH2D *dathist2d;
+
+  // binned PDFs
+  TH1D* _hPDF1D;
+  TH2D* _hPDF2D;
 };
