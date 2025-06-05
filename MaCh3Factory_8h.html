@@ -330,7 +330,7 @@ template&lt;typename SampleType &gt; </div>
 <div class="line"><span class="lineno">  139</span>    TString NameTString = TString(name.c_str());</div>
 <div class="line"><span class="lineno">  140</span> </div>
 <div class="line"><span class="lineno">  141</span>    <span class="comment">// Clone the 1D histogram with a modified name</span></div>
-<div class="line"><span class="lineno">  142</span>    TH1D* SampleHistogramPrior = <span class="keyword">static_cast&lt;</span>TH1D*<span class="keyword">&gt;</span>(Sample-&gt;Get1DHist()-&gt;Clone(NameTString + <span class="stringliteral">&quot;_Prior&quot;</span>));</div>
+<div class="line"><span class="lineno">  142</span>    TH1D* SampleHistogramPrior = <span class="keyword">static_cast&lt;</span>TH1D*<span class="keyword">&gt;</span>(Sample-&gt;GetMCHist(1)-&gt;Clone(NameTString + <span class="stringliteral">&quot;_Prior&quot;</span>));</div>
 <div class="line"><span class="lineno">  143</span>    Sample-&gt;AddData(SampleHistogramPrior);</div>
 <div class="line"><span class="lineno">  144</span>    Handlers[i] = Sample;</div>
 <div class="line"><span class="lineno">  145</span>  }</div>
