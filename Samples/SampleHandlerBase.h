@@ -25,6 +25,7 @@ _MaCh3_Safe_Include_End_ //}
 class SampleHandlerBase
 {
  public:
+   /// @brief The main constructor
    SampleHandlerBase();
   /// @brief destructor
   virtual ~SampleHandlerBase();
@@ -48,16 +49,7 @@ class SampleHandlerBase
 
   /// @brief Return pointer to MaCh3 modes
   /// @ingroup SampleHandlerGetters
-  MaCh3Modes* GetMaCh3Modes() const { return Modes; }
-
-  /// @ingroup SampleHandlerGetters
-  TH1D* Get1DHist();
-  /// @ingroup SampleHandlerGetters
-  TH2D* Get2DHist();
-  /// @ingroup SampleHandlerGetters
-  TH1D* Get1DDataHist(){return dathist;}
-  /// @ingroup SampleHandlerGetters
-  TH2D* Get2DDataHist(){return dathist2d;}
+  MaCh3Modes* GetMaCh3Modes() const { return Modes.get(); }
       
   virtual void Reweight()=0;
   /// @ingroup SampleHandlerGetters
@@ -66,14 +58,9 @@ class SampleHandlerBase
   /// @ingroup SampleHandlerGetters
   unsigned int GetNEvents(){return nEvents;}
   /// @ingroup SampleHandlerGetters
-  virtual int GetNMCSamples(){ throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); }
+  virtual int GetNMCSamples() { return nSamples; }
   /// @ingroup SampleHandlerGetters
   virtual int GetNOscChannels(){ return 1; }
-
-  virtual void AddData(std::vector<double> &dat);
-  virtual void AddData(std::vector< std::vector <double> > &dat);
-  virtual void AddData(TH1D* binneddata);
-  virtual void AddData(TH2D* binneddata);
 
   // WARNING KS: Needed for sigma var
   virtual void SetupBinning(const M3::int_t Selection, std::vector<double> &BinningX, std::vector<double> &BinningY){
@@ -102,9 +89,6 @@ class SampleHandlerBase
   /// @ingroup SampleHandlerGetters
   inline void SetTestStatistic(TestStatistic testStat){ fTestStatistic = testStat; }
 
-  virtual void Fill1DHist()=0;
-  virtual void Fill2DHist()=0;
-
 protected:
   /// @brief CW: Redirect std::cout to silence some experiment specific libraries
   void QuietPlease();
@@ -130,19 +114,10 @@ protected:
 
   /// Contains how many samples we've got
   M3::int_t nSamples;
-  /// KS: number of dimension for this sample
-  int nDims;
 
   /// Number of MC events are there
   unsigned int nEvents;
 
   /// Holds information about used Generator and MaCh3 modes
-  MaCh3Modes* Modes;
-
-  TH1D *dathist; // tempstore for likelihood calc
-  TH2D *dathist2d;
-
-  // binned PDFs
-  TH1D*_hPDF1D;
-  TH2D*_hPDF2D;
+  std::unique_ptr<MaCh3Modes> Modes;
 };

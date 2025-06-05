@@ -1,97 +1,16 @@
 #include "SampleHandlerBase.h"
 
-SampleHandlerBase::SampleHandlerBase() 
-{
-  nDims = 0;
-  dathist = NULL;
-  dathist2d = NULL;
-  Modes = nullptr;
-
+// ***************************************************************************
+SampleHandlerBase::SampleHandlerBase() {
+// ***************************************************************************
   nEvents = 0;
+  nSamples = 0;
 }
 
-SampleHandlerBase::~SampleHandlerBase()
-{
-  if(dathist != NULL) delete dathist;
-  if(dathist2d != NULL) delete dathist2d;
-  if(Modes != nullptr) delete Modes;
-}
+// ***************************************************************************
+SampleHandlerBase::~SampleHandlerBase() {
+// ***************************************************************************
 
-void SampleHandlerBase::AddData(std::vector<double> &data)
-{
-  if(nDims != 0 && nDims != 1)
-  {
-    MACH3LOG_ERROR("You have initialized this sample with {} dimensions already and now trying to set dimension to 1", nDims);
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  nDims = 1;
-  if(dathist == NULL)
-  {
-    std::cerr<<"dathist not initialised"<<std::endl;
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  dathist->Reset();                                                         
-  for (int i = 0; i < int(data.size()); i++) {
-    dathist->Fill(data.at(i));
-  }
-}
-
-void SampleHandlerBase::AddData(std::vector< std::vector <double> > &data)
-{
-  if(nDims != 0 && nDims != 2)
-  {
-    MACH3LOG_ERROR("You have initialized this sample with {} dimensions already and now trying to set dimension to 2", nDims);
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  nDims = 2;  
-  if(dathist2d == NULL)
-  {
-    std::cerr<<"dathist2d not initialised"<<std::endl;
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  dathist2d->Reset();                                                       
-  for (int i = 0; i < int(data.size()); i++)
-    dathist2d->Fill(data.at(0)[i], data.at(1)[i]);
-}
-
-void SampleHandlerBase::AddData(TH1D* binneddata)
-{
-  if(nDims != 0 && nDims != 1)
-  {
-    MACH3LOG_ERROR("You have initialized this sample with {} dimensions already and now trying to set dimension to 1", nDims);
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  nDims = 1;
-  MACH3LOG_INFO("Adding 1D data histogram: {} with {} events.", binneddata->GetTitle(), binneddata->Integral());
-  //KS: If exist delete to avoid memory leak
-  if(dathist != NULL) delete dathist;
-  dathist = binneddata;
-}
-
-void SampleHandlerBase::AddData(TH2D* binneddata)
-{
-  if(nDims != 0 && nDims != 2)
-  {
-    MACH3LOG_ERROR("You have initialized this sample with {} dimensions already and now trying to set dimension to 2", nDims);
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  nDims = 2;
-  MACH3LOG_INFO("Adding 2D data histogram: {} with {} events.", binneddata->GetTitle(), binneddata->Integral());
-  //KS: If exist delete to avoid memory leak
-  if(dathist2d != NULL) delete dathist;
-  dathist2d = binneddata;
-}
-
-TH1D* SampleHandlerBase::Get1DHist()
-{
-  Fill1DHist();
-  return _hPDF1D;
-}
-
-TH2D* SampleHandlerBase::Get2DHist()
-{
-  Fill2DHist();
-  return _hPDF2D;
 }
 
 // ***************************************************************************
