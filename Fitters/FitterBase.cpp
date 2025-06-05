@@ -1,5 +1,4 @@
 #include "FitterBase.h"
-#include "Parameters/ParameterHandlerGeneric.h"
 
 _MaCh3_Safe_Include_Start_ //{
 #include "TRandom.h"
@@ -566,7 +565,6 @@ void FitterBase::RunLLHScan() {
   // Loop over the covariance classes
   for (ParameterHandlerBase *cov : systematics)
   {
-    bool HasFancyName = (dynamic_cast<ParameterHandlerGeneric*>(cov) != nullptr);
 
     // Scan over all the parameters
     // Get the number of parameters
@@ -576,10 +574,8 @@ void FitterBase::RunLLHScan() {
     for (int i = 0; i < npars; ++i)
     {
       // Get the parameter name
-      std::string name = cov->GetParName(i);
+      std::string name = cov->GetParFancyName(i);
       if (IsPCA) name += "_PCA";
-      // For xsec we can get the actual name, hurray for being informative
-      if (HasFancyName) name = cov->GetParFancyName(i);
       // KS: Check if we want to skip this parameter
       if(CheckSkipParameter(SkipVector, name)) continue;
 
@@ -834,15 +830,11 @@ void FitterBase::GetStepScaleBasedOnLLHScan() {
 
   for (ParameterHandlerBase *cov : systematics)
   {
-    bool HasFancyName = (dynamic_cast<ParameterHandlerGeneric*>(cov) != nullptr);
-
     const int npars = cov->GetNumParams();
     std::vector<double> StepScale(npars);
     for (int i = 0; i < npars; ++i)
     {
-      std::string name = cov->GetParName(i);
-      // For xsec we can get the actual name, hurray for being informative
-      if (HasFancyName) name = cov->GetParFancyName(i);
+      std::string name = cov->GetParFancyName(i);
 
       StepScale[i] = cov->GetIndivStepScale(i);
       TH1D* LLHScan = Sample_LLH->Get<TH1D>((name+"_sam").c_str());
@@ -897,7 +889,6 @@ void FitterBase::Run2DLLHScan() {
   // Loop over the covariance classes
   for (ParameterHandlerBase *cov : systematics)
   {
-    bool HasFancyName = (dynamic_cast<ParameterHandlerGeneric*>(cov) != nullptr);
     // Scan over all the parameters
     // Get the number of parameters
     int npars = cov->GetNumParams();
@@ -906,10 +897,8 @@ void FitterBase::Run2DLLHScan() {
 
     for (int i = 0; i < npars; ++i)
     {
-      std::string name_x = cov->GetParName(i);
+      std::string name_x = cov->GetParFancyName(i);
       if (IsPCA) name_x += "_PCA";
-      // For xsec we can get the actual name, hurray for being informative
-      if (HasFancyName) name_x = cov->GetParFancyName(i);
 
       // Get the parameter priors and bounds
       double prior_x = cov->GetParInit(i);
@@ -949,10 +938,8 @@ void FitterBase::Run2DLLHScan() {
 
       for (int j = 0; j < i; ++j)
       {
-        std::string name_y = cov->GetParName(j);
+        std::string name_y = cov->GetParFancyName(j);
         if (IsPCA) name_y += "_PCA";
-        // For xsec we can get the actual name, hurray for being informative
-        if (HasFancyName) name_y = cov->GetParFancyName(j);
         // KS: Check if we want to skip this parameter
         if(CheckSkipParameter(SkipVector, name_y)) continue;
 
@@ -1071,7 +1058,6 @@ void FitterBase::RunSigmaVar() {
   bool PlotLLHperBin = false;
   auto SkipVector = GetFromManager<std::vector<std::string>>(fitMan->raw()["LLHScan"]["LLHScanSkipVector"], {}, __FILE__ , __LINE__);;
 
-  bool HasFancyName = false;
   for (ParameterHandlerBase *cov : systematics)
   {
     TMatrixDSym *Cov = cov->GetCovMatrix();
@@ -1082,14 +1068,11 @@ void FitterBase::RunSigmaVar() {
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
 
-    HasFancyName = (dynamic_cast<ParameterHandlerGeneric*>(cov) != nullptr);
     // Loop over xsec parameters
     for (int i = 0; i < cov->GetNumParams(); ++i)
     {
       // Get the parameter name
-      std::string name = cov->GetParName(i);
-      // For xsec we can get the actual name, hurray for being informative
-      if (HasFancyName) name = cov->GetParFancyName(i);
+      std::string name = cov->GetParFancyName(i);
       // KS: Check if we want to skip this parameter
       if(CheckSkipParameter(SkipVector, name)) continue;
 
