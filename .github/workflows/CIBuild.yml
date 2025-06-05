@@ -72,5 +72,12 @@ jobs:
       env:
         GITHUB_HEAD_REF: ${{ github.head_ref }}
 
+
     - name: Build the Docker image
-      run: docker build . --file ${{ matrix.file }} --tag ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.tag }} --build-arg MACH3_VERSION="$MACH3_VERSION" --build-arg CMAKE_OPTIONS="${{ matrix.cmakeoptions }}"
+      run: |
+        docker build . \
+          --file ${{ matrix.file }} \
+          --tag ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.tag }} \
+          --build-arg MACH3_VERSION="$MACH3_VERSION" \
+          --build-arg CMAKE_OPTIONS="${{ matrix.cmakeoptions }}" \
+          --build-arg REPOSITORY_URL="https://github.com/${{ github.repository }}"

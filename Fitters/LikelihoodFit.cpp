@@ -21,7 +21,6 @@ LikelihoodFit::~LikelihoodFit() {
 // *******************
 void LikelihoodFit::PrepareFit() {
 // *******************
-
   // Save the settings into the output file
   SaveSettings();
 
@@ -40,9 +39,7 @@ void LikelihoodFit::PrepareFit() {
 // *******************
 double LikelihoodFit::CalcChi2(const double* x) {
 // *******************
-
-  if (step % 10000 == 0)
-  {
+  if (step % 10000 == 0) {
     MACH3LOG_INFO("Iteration {}", step);
   }
 

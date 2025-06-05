@@ -83,6 +83,9 @@ void mcmc::RunMCMC() {
   // Prepare the output branches
   PrepareOutput();
 
+  // Remove obsolete memory and make other checks before fit starts
+  SanitiseInputs();
+
   // Reconfigure the samples, systematics and oscillation for first weight
   // ProposeStep sets logLProp
   ProposeStep();

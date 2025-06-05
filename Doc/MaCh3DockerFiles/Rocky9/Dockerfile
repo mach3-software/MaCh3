@@ -23,11 +23,14 @@ ENV INSTALL_OPTIONS=${INSTALL_OPTIONS:-"VERBOSE=1"}
 ENV MACH3_WORK_DIR=/opt/MaCh3/
 ENV MACH3_INSTALL_DIR=/opt/MaCh3/build/
 
+ARG REPOSITORY_URL
+ENV REPOSITORY_URL=${REPOSITORY_URL:-https://github.com/mach3-software/MaCh3}
+
 RUN mkdir -p ${MACH3_WORK_DIR}
 
 WORKDIR /opt/
 # KS: Let's clone MaCh3
-RUN --mount=type=ssh git clone https://github.com/mach3-software/MaCh3 ${MACH3_WORK_DIR}
+RUN --mount=type=ssh git clone ${REPOSITORY_URL} ${MACH3_WORK_DIR}
 WORKDIR ${MACH3_WORK_DIR}
 RUN git checkout ${MACH3_VERSION}
 

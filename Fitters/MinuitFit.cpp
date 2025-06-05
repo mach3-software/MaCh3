@@ -41,6 +41,9 @@ void MinuitFit::RunMCMC() {
 // *******************
   PrepareFit();
 
+  // Remove obsolete memory and make other checks before fit starts
+  SanitiseInputs();
+
   //KS: For none PCA this will be equal to normal parameters
   const int NparsMinuitFull = NPars;
   const int NparsMinuit = NParsPCA;
