@@ -139,7 +139,7 @@ std::vector<SampleType*> MaCh3SampleHandlerFactory(const std::vector<std::string
     TString NameTString = TString(name.c_str());
 
     // Clone the 1D histogram with a modified name
-    TH1D* SampleHistogramPrior = static_cast<TH1D*>(Sample->Get1DHist()->Clone(NameTString + "_Prior"));
+    TH1D* SampleHistogramPrior = static_cast<TH1D*>(Sample->GetMCHist(1)->Clone(NameTString + "_Prior"));
     Sample->AddData(SampleHistogramPrior);
     Handlers[i] = Sample;
   }
