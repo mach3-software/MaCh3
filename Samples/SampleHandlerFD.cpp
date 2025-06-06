@@ -1700,10 +1700,12 @@ std::string SampleHandlerFD::ReturnStringFromKinematicVector(const int Kinematic
 }
 
 bool SampleHandlerFD::IsSubEventVarString(const std::string& VarStr) {
+  if (KinematicVectors == nullptr) return false;
+
   if (KinematicVectors->count(VarStr)) {
     if (!KinematicParameters->count(VarStr)) return true;
     else {
-      MACH3LOG_ERROR("Attempted to plot kinematic variable {}, but it appears in both KinematicVectors and KinematicParameters");
+      MACH3LOG_ERROR("Attempted to plot kinematic variable {}, but it appears in both KinematicVectors and KinematicParameters", VarStr);
       throw MaCh3Exception(__FILE__,__LINE__);
     }
   }
