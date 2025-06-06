@@ -407,7 +407,7 @@ inline TMacro* GetConfigMacroFromChain(TDirectory* CovarianceFolder) {
 inline TMatrixDSym* GetCovMatrixFromChain(TDirectory* TempFile) {
 // *************************************
   if (!TempFile) {
-    MACH3LOG_ERROR("Null TDirectory passed to GetXSecCovMatrix.");
+    MACH3LOG_ERROR("Null TDirectory passed to {}.", __func__);
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
@@ -429,10 +429,10 @@ inline TMatrixDSym* GetCovMatrixFromChain(TDirectory* TempFile) {
     MACH3LOG_INFO("Found single TMatrixDSym in directory: using it.");
     return foundMatrix;
   } else {
-    MACH3LOG_WARN("Found {} TMatrixDSym objects. Using hardcoded path: CovarianceFolder/xsec_cov.", matrixCount);
-    TMatrixDSym* fallback = TempFile->Get<TMatrixDSym>("CovarianceFolder/xsec_cov");
+    MACH3LOG_WARN("Found {} TMatrixDSym objects. Using hardcoded path: xsec_cov.", matrixCount);
+    TMatrixDSym* fallback = TempFile->Get<TMatrixDSym>("xsec_cov");
     if (!fallback) {
-      MACH3LOG_WARN("Fallback matrix 'CovarianceFolder/xsec_cov' not found.");
+      MACH3LOG_WARN("Fallback matrix 'xsec_cov' not found.");
     }
     return fallback;
   }
