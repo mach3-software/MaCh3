@@ -1,6 +1,7 @@
 // MaCh3 includes
 #include "Manager/Manager.h"
 #include "Samples/SampleStructs.h"
+#include "Parameters/ParameterHandlerUtils.h"
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT includes
@@ -44,7 +45,8 @@ void ReadXSecFile(const std::string& inputFile)
   TFile *TempFile = new TFile(inputFile.c_str(), "open");
 
   // Get the matrix
-  TMatrixDSym *XSecMatrix = TempFile->Get<TMatrixDSym>("CovarianceFolder/xsec_cov");
+  TDirectory* CovarianceFolder = TempFile->Get<TDirectory>("CovarianceFolder");
+  TMatrixDSym *XSecMatrix = M3::GetCovMatrixFromChain(CovarianceFolder);
 
   // Get the settings for the MCMC
   TMacro *Config = TempFile->Get<TMacro>("MaCh3_Config");
