@@ -59,9 +59,6 @@ int NDParametersStartingPos;
 int FDParameters;
 int FDParametersStartingPos;
 
-int OscParameters;
-int OscParametersStartingPos;
-
 int CrossSectionParameters;
 int XsecStartingPos;
 
@@ -192,8 +189,6 @@ bool ReadSettings(std::shared_ptr<TFile> File1)
   Settings->SetBranchAddress("NDParametersStartingPos", &NDParametersStartingPos);
   Settings->SetBranchAddress("FDParameters", &FDParameters);
   Settings->SetBranchAddress("FDParametersStartingPos", &FDParametersStartingPos);
-  Settings->SetBranchAddress("OscParameters", &OscParameters);
-  Settings->SetBranchAddress("OscParametersStartingPos", &OscParametersStartingPos);
 
   std::vector<int> *NDSamples_Bins = 0;
   std::vector<std::string> *NDSamples_Names = 0;
@@ -614,27 +609,6 @@ void MakeFDDetPlots()
    delete pDown;
 }
 
-void MakeOscPlots()
-{
-  // these for named parameters where we need a nice big gap at the bottom to fit the names
-  TPad* pTop = nullptr;
-  TPad* pDown = nullptr;
-  InitializePads(canv, pTop, pDown);
-
-  Prefit->GetYaxis()->SetTitleOffset(Prefit->GetYaxis()->GetTitleOffset()*1.2);
-  
-  canv->cd();
-  Prefit->SetTitle("Oscillation Parameters");
-  Prefit->GetXaxis()->SetRangeUser(OscParametersStartingPos, OscParametersStartingPos+OscParameters);
-
-  Prefit->GetYaxis()->SetRangeUser(man->getOption<double>("oscParYRange_low"), man->getOption<double>("oscParYRange_high"));
-  Prefit->Draw("e2");
-
-  DrawPlots(canv, Prefit, PostfitHistVec, pTop, pDown);
-  delete pTop;
-  delete pDown;
-}
-
 void MakeXsecRidgePlots()
 {  
   gStyle->SetPalette(51);
@@ -860,8 +834,6 @@ void GetPostfitParamPlots()
   //KS: Same as above but for FD parameters,
   if(FDParameters > 0) MakeFDDetPlots();
   
-  if(OscParameters > 0) MakeOscPlots();
-
   canv->Print((SaveName+"]").c_str());
 
   MakeXsecRidgePlots();

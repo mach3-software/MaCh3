@@ -8,7 +8,7 @@
 
 // ************************************************
 SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGeneric* xsec_cov,
-                                 ParameterHandlerOsc* osc_cov, const std::shared_ptr<OscillationHandler>& OscillatorObj_) : SampleHandlerBase() {
+                                 const std::shared_ptr<OscillationHandler>& OscillatorObj_) : SampleHandlerBase() {
 // ************************************************
   MACH3LOG_INFO("-------------------------------------------------------------------");
   MACH3LOG_INFO("Creating SampleHandlerFD object");
@@ -21,15 +21,15 @@ SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGen
   ParHandler = xsec_cov;
 
   nSamples = 1;
-  if(!osc_cov){
-    MACH3LOG_WARN("You have passed a nullptr to a covarianceOsc, this means I will not calculate oscillation weights");
-  }
-  OscParHandler = osc_cov;
 
   if (OscillatorObj_ != nullptr) {
     MACH3LOG_WARN("You have passed an Oscillator object through the constructor of a SampleHandlerFD object - this will be used for all oscillation channels");
     Oscillator = OscillatorObj_;
   }
+  dathist = nullptr;
+  dathist2d = nullptr;
+  _hPDF1D = nullptr;
+  _hPDF2D = nullptr;
 
   KinematicParameters = nullptr;
   ReversedKinematicParameters = nullptr;
@@ -45,8 +45,7 @@ SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGen
   UpdateW2 = false;
 }
 
-SampleHandlerFD::~SampleHandlerFD()
-{
+SampleHandlerFD::~SampleHandlerFD() {
   MACH3LOG_DEBUG("I'm deleting SampleHandlerFD");
   
   for (unsigned int yBin=0;yBin<(YBinEdges.size()-1);yBin++) {
@@ -62,12 +61,17 @@ SampleHandlerFD::~SampleHandlerFD()
   if(SampleHandlerFD_data != nullptr){delete[] SampleHandlerFD_data;}
  
   if(THStackLeg != nullptr) delete THStackLeg;
+
+  if(dathist != nullptr) delete dathist;
+  if(dathist2d != nullptr) delete dathist2d;
+  if(_hPDF1D != nullptr) delete _hPDF1D;
+  if(_hPDF2D != nullptr) delete _hPDF2D;
 }
 
 void SampleHandlerFD::ReadSampleConfig() 
 {
   auto ModeName = Get<std::string>(SampleManager->raw()["MaCh3ModeConfig"], __FILE__ , __LINE__);
-  Modes = new MaCh3Modes(ModeName);
+  Modes = std::make_unique<MaCh3Modes>(ModeName);
   //SampleTitle has to be provided in the sample yaml otherwise this will throw an exception
   SampleTitle = Get<std::string>(SampleManager->raw()["SampleTitle"], __FILE__ , __LINE__);
   //SampleName has to be provided in the sample yaml otherwise this will throw an exception
@@ -190,7 +194,8 @@ void SampleHandlerFD::Initialise() {
   MACH3LOG_INFO("=============================================");
   MACH3LOG_INFO("Total number of events is: {}", GetNEvents());
 
-  if (OscParHandler) {
+  auto OscParams = ParHandler->GetOscParsFromSampleName(SampleName);
+  if (OscParams.size() > 0) {
     MACH3LOG_INFO("Setting up NuOscillator..");
     if (Oscillator != nullptr) {
       MACH3LOG_INFO("You have passed an OscillatorBase object through the constructor of a SampleHandlerFD object - this will be used for all oscillation channels");
@@ -198,7 +203,7 @@ void SampleHandlerFD::Initialise() {
         MACH3LOG_ERROR("Trying to run shared NuOscillator without EqualBinningPerOscChannel, this will not work");
         throw MaCh3Exception(__FILE__, __LINE__);
       }
-      auto OscParams = OscParHandler->GetOscParsFromSampleName(SampleName);
+
       if(OscParams.size() != Oscillator->GetOscParamsSize()){
         MACH3LOG_ERROR("Sample {} with {} has {} osc params, while shared NuOsc has {} osc params", GetTitle(), GetSampleName(),
                        OscParams.size(), Oscillator->GetOscParamsSize());
@@ -209,6 +214,8 @@ void SampleHandlerFD::Initialise() {
       InitialiseNuOscillatorObjects();
     }
     SetupNuOscillatorPointers();
+  } else{
+    MACH3LOG_WARN("Didn't find any oscillation params, thus will not enable oscillations");
   }
 
   MACH3LOG_INFO("Setting up Sample Binning..");
@@ -639,7 +646,7 @@ void SampleHandlerFD::ResetHistograms() {
     #endif
     for (size_t xBin = 0; xBin < nXBins; ++xBin) {
       SampleHandlerFD_array[yBin][xBin] = 0.;
-      SampleHandlerFD_array_w2[yBin][xBin] = 0.;
+      if(FirstTimeW2) SampleHandlerFD_array_w2[yBin][xBin] = 0.;
     }
   }
 } // end function
@@ -1138,6 +1145,61 @@ void SampleHandlerFD::FindNominalBinAndEdges2D() {
   }
 }
 
+// ************************************************
+TH1* SampleHandlerFD::GetW2Hist(const int Dimension) {
+// ************************************************
+  if(Dimension == 1) {
+    TH1D* W2Hist = dynamic_cast<TH1D*>(_hPDF1D->Clone((_hPDF1D->GetName() + std::string("_W2")).c_str()));
+    W2Hist->Reset();
+    for (unsigned int yBin = 0; yBin < (YBinEdges.size()-1); yBin++) {
+      for (unsigned int xBin = 0; xBin < (XBinEdges.size()-1); xBin++) {
+        W2Hist->AddBinContent(xBin+1, SampleHandlerFD_array_w2[yBin][xBin]);
+      }
+    }
+    return W2Hist;
+  } else if(Dimension == 2) {
+    TH2D* W2Hist = dynamic_cast<TH2D*>(_hPDF2D->Clone((_hPDF2D->GetName() + std::string("_W2")).c_str()));
+    W2Hist->Reset();
+    for (unsigned int yBin = 0; yBin < (YBinEdges.size()-1); yBin++) {
+      for (unsigned int xBin = 0; xBin < (XBinEdges.size()-1); xBin++) {
+        W2Hist->SetBinContent(xBin+1, yBin+1, SampleHandlerFD_array_w2[yBin][xBin]);
+      }
+    }
+    return W2Hist;
+  } else{
+    MACH3LOG_ERROR("Asking for {} with N Dimension = {}. This is not implemented", __func__, Dimension);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+}
+
+// ************************************************
+TH1* SampleHandlerFD::GetMCHist(const int Dimension) {
+// ************************************************
+  if(Dimension == 1) {
+    Fill1DHist();
+    return _hPDF1D;
+  } else if(Dimension == 2) {
+    Fill2DHist();
+    return _hPDF2D;
+  } else{
+    MACH3LOG_ERROR("Asdking for {} with N Dimension = {}. This is not implemented", __func__, Dimension);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+}
+
+// ************************************************
+TH1* SampleHandlerFD::GetDataHist(const int Dimension) {
+// ************************************************
+  if(Dimension == 1) {
+    return dathist;
+  } else if(Dimension == 2) {
+    return dathist2d;
+  } else{
+    MACH3LOG_ERROR("Asdking for {} with N Dimension = {}. This is not implemented", __func__, Dimension);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+}
+
 void SampleHandlerFD::AddData(std::vector<double> &data) {
   dathist2d = nullptr;
   dathist->Reset(); 
@@ -1242,11 +1304,6 @@ void SampleHandlerFD::AddData(TH2D* Data) {
 // ************************************************
 void SampleHandlerFD::InitialiseNuOscillatorObjects() {
 // ************************************************
-  if (!OscParHandler) {
-    MACH3LOG_ERROR("Attempted to setup NuOscillator without ParameterHandler object");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-
   auto NuOscillatorConfigFile = Get<std::string>(SampleManager->raw()["NuOsc"]["NuOscConfigFile"], __FILE__ , __LINE__);
   auto EqualBinningPerOscChannel = Get<bool>(SampleManager->raw()["NuOsc"]["EqualBinningPerOscChannel"], __FILE__ , __LINE__);
 
@@ -1257,7 +1314,7 @@ void SampleHandlerFD::InitialiseNuOscillatorObjects() {
       EqualBinningPerOscChannel = false;
     }
   }
-  std::vector<const double*> OscParams = OscParHandler->GetOscParsFromSampleName(SampleName);
+  std::vector<const double*> OscParams = ParHandler->GetOscParsFromSampleName(SampleName);
   if (OscParams.empty()) {
     MACH3LOG_ERROR("OscParams is empty for sample '{}'.", GetTitle());
     MACH3LOG_ERROR("This likely indicates an error in your oscillation YAML configuration.");

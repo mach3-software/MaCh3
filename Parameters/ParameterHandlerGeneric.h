@@ -121,6 +121,11 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @param Name Name of TFile to which we save stuff
     /// @warning This is mostly used for backward compatibility
     void DumpMatrixToFile(const std::string& Name);
+
+    /// @brief Get pointers to Osc params from Sample name
+    /// @ingroup ParameterHandlerGetters
+    std::vector<const double*> GetOscParsFromSampleName(const std::string& SampleName);
+
   protected:
     /// @brief Print information about the whole object once it is set
     void Print();
@@ -132,6 +137,8 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     void PrintSplineParams();
     /// @brief Prints functional parameters.
     void PrintFunctionalParams();
+    /// @brief Prints oscillation parameters.
+    void PrintOscillationParams();
     /// @brief Prints groups of parameters.
     void PrintParameterGroups();
 
@@ -166,6 +173,12 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @param param Yaml node describing param
     /// @param Index Global parameter index
     inline NormParameter GetNormParameter(const YAML::Node& param, const int Index);
+
+    /// @brief Get Osc params
+    /// @param param Yaml node describing param
+    /// @param Index Global parameter index
+    inline OscillationParameter GetOscillationParameters(const YAML::Node& param, const int Index);
+
     /// @brief Get Func params
     /// @param param Yaml node describing param
     /// @param Index Global parameter index
@@ -209,4 +222,7 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
 
     /// Vector containing info for functional systematics
     std::vector<FunctionalParameter> FuncParams;
+
+    /// Vector containing info for functional systematics
+    std::vector<OscillationParameter> OscParams;
 };
