@@ -694,7 +694,7 @@ void samplePDFFDBase::ResetHistograms() {
     #endif
     for (size_t xBin = 0; xBin < nXBins; ++xBin) {
       samplePDFFD_array[yBin][xBin] = 0.;
-      samplePDFFD_array_w2[yBin][xBin] = 0.;
+      if(FirstTimeW2) samplePDFFD_array_w2[yBin][xBin] = 0.;
     }
   }
 } // end function
