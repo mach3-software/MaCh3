@@ -2,9 +2,11 @@
 #include "regex"
 
 // ********************************************
-ParameterHandlerBase::ParameterHandlerBase(std::string name, std::string file, double threshold, int FirstPCA, int LastPCA) : inputFile(file), pca(false) {
+ParameterHandlerBase::ParameterHandlerBase(std::string name, std::string file, double threshold, int FirstPCA, int LastPCA)
+                     : inputFile(file), pca(false) {
 // ********************************************
   MACH3LOG_DEBUG("Constructing instance of ParameterHandler");
+  doSpecialStepProposal = false;
   if (threshold < 0 || threshold >= 1) {
     MACH3LOG_INFO("NOTE: {} {}", name, file);
     MACH3LOG_INFO("Principal component analysis but given the threshold for the principal components to be less than 0, or greater than (or equal to) 1. This will not work");
@@ -19,9 +21,11 @@ ParameterHandlerBase::ParameterHandlerBase(std::string name, std::string file, d
   if (pca) ConstructPCA(threshold, FirstPCA, LastPCA);
 }
 // ********************************************
-ParameterHandlerBase::ParameterHandlerBase(const std::vector<std::string>& YAMLFile, std::string name, double threshold, int FirstPCA, int LastPCA) : inputFile(YAMLFile[0].c_str()), matrixName(name), pca(true) {
+ParameterHandlerBase::ParameterHandlerBase(const std::vector<std::string>& YAMLFile, std::string name, double threshold, int FirstPCA, int LastPCA)
+                     : inputFile(YAMLFile[0].c_str()), matrixName(name), pca(true) {
 // ********************************************
   MACH3LOG_INFO("Constructing instance of ParameterHandler using");
+  doSpecialStepProposal = false;
   for(unsigned int i = 0; i < YAMLFile.size(); i++)
   {
     MACH3LOG_INFO("{}", YAMLFile[i]);
@@ -213,6 +217,11 @@ void ParameterHandlerBase::Init(const std::vector<std::string>& YAMLFile) {
     if(GetFromManager<bool>(param["Systematic"]["FixParam"], false, __FILE__ , __LINE__)) {
       ToggleFixParameter(_fFancyNames[i]);
     }
+
+    if(param["Systematic"]["SpecialProposal"]) {
+      EnableSpecialProposal(param["Systematic"]["SpecialProposal"], i);
+    }
+
     //Fill the map to get the correlations later as well
     CorrNamesMap[param["Systematic"]["Names"]["FancyName"].as<std::string>()]=i;
 
@@ -282,6 +291,68 @@ void ParameterHandlerBase::Init(const std::vector<std::string>& YAMLFile) {
   MACH3LOG_INFO("----------------");
   MACH3LOG_INFO("Found {} systematics parameters in total", _fNumPar);
   MACH3LOG_INFO("----------------");
+}
+
+// ********************************************
+void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const int Index){
+// ********************************************
+  doSpecialStepProposal = true;
+
+  bool CircEnabled = false;
+  bool FlipEnabled = false;
+
+  if (param["CircularBounds"]) {
+    CircEnabled = true;
+  }
+
+  if (param["FlipParameter"]) {
+    FlipEnabled = true;
+  }
+
+  if (!CircEnabled && !FlipEnabled) {
+    MACH3LOG_ERROR("None of Special Proposal were enabled even though param {}, has SpecialProposal entry in Yaml", GetParFancyName(Index));
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  if (CircEnabled) {
+    CircularBoundsIndex.push_back(Index);
+    CircularBoundsValues.push_back(Get<std::pair<double, double>>(param["CircularBounds"], __FILE__, __LINE__));
+    MACH3LOG_INFO("Enabling CircularBounds for parameter {} with range [{}, {}]",
+                  GetParFancyName(Index),
+                  CircularBoundsValues.back().first,
+                  CircularBoundsValues.back().second);
+  }
+
+  if (FlipEnabled) {
+    FlipParameterIndex.push_back(Index);
+    FlipParameterPoint.push_back(Get<double>(param["FlipParameter"], __FILE__, __LINE__));
+    MACH3LOG_INFO("Enabling Flipping for parameter {} with value {}",
+                  GetParFancyName(Index),
+                  FlipParameterPoint.back());
+  }
+
+  if (CircEnabled && FlipEnabled) {
+    if (FlipParameterPoint.back() < CircularBoundsValues.back().first || FlipParameterPoint.back() > CircularBoundsValues.back().second) {
+      MACH3LOG_ERROR("FlipParameter value {} for parameter {} is outside the CircularBounds [{}, {}]",
+                     FlipParameterPoint.back(), GetParFancyName(Index), CircularBoundsValues.back().first, CircularBoundsValues.back().second);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+
+    const double low = CircularBoundsValues.back().first;
+    const double high = CircularBoundsValues.back().second;
+
+    // Sanity check: ensure flipping any x in [low, high] keeps the result in [low, high]
+    const double flipped_low = 2 * FlipParameterPoint.back() - low;
+    const double flipped_high = 2 * FlipParameterPoint.back() - high;
+    const double min_flip = std::min(flipped_low, flipped_high);
+    const double max_flip = std::max(flipped_low, flipped_high);
+
+    if (min_flip < low || max_flip > high) {
+      MACH3LOG_ERROR("Flipping about point {} for parameter {} would leave circular bounds [{}, {}]",
+                     FlipParameterPoint.back(), GetParFancyName(Index), low, high);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+  }
 }
 
 // ********************************************
@@ -467,6 +538,7 @@ void ParameterHandlerBase::SetSingleParameter(const int parNo, const double parV
   MACH3LOG_DEBUG("Setting {} (parameter {}) to {})", GetParName(parNo),  parNo, parVal);
   if (pca) PCAObj->TransferToPCA();
 }
+
 // ********************************************
 void ParameterHandlerBase::SetParCurrProp(const int parNo, const double parVal) {
 // ********************************************
@@ -484,6 +556,29 @@ void ParameterHandlerBase::ProposeStep() {
   Randomize();
   CorrelateSteps();
   if(use_adaptive) UpdateAdaptiveCovariance();
+
+  // KS: According to Dr Wallace we update using previous not proposed step
+  // this way we do special proposal after adaptive after.
+  // This way we can shortcut and skip rest of proposal
+  if(!doSpecialStepProposal) return;
+
+  SpecialStepProposal();
+}
+
+// ************************************************
+void ParameterHandlerBase::SpecialStepProposal() {
+// ************************************************
+  /// @warning KS: Following Asher comment we do "Step->Circular Bounds->Flip"
+
+  // HW It should now automatically set dcp to be with [-pi, pi]
+  for (size_t i = 0; i < CircularBoundsIndex.size(); ++i) {
+    CircularParBounds(CircularBoundsIndex[i], CircularBoundsValues[i].first, CircularBoundsValues[i].second);
+  }
+
+  // Okay now we've done the standard steps, we can add in our nice flips hierarchy flip first
+  for (size_t i = 0; i < FlipParameterIndex.size(); ++i) {
+    FlipParameterValue(FlipParameterIndex[i], FlipParameterPoint[i]);
+  }
 }
 
 // ************************************************
@@ -560,6 +655,25 @@ void ParameterHandlerBase::AcceptStep() _noexcept_ {
     }
   } else {
     PCAObj->AcceptStep();
+  }
+}
+
+// *************************************
+//HW: This method is a tad hacky but modular arithmetic gives me a headache.
+void ParameterHandlerBase::CircularParBounds(const int index, const double LowBound, const double UpBound) {
+// *************************************
+  if(_fPropVal[index] > UpBound) {
+    _fPropVal[index] = LowBound + std::fmod(_fPropVal[index] - UpBound, UpBound - LowBound);
+  } else if (_fPropVal[index] < LowBound) {
+    _fPropVal[index] = UpBound - std::fmod(LowBound - _fPropVal[index], UpBound - LowBound);
+  }
+}
+
+// *************************************
+void ParameterHandlerBase::FlipParameterValue(const int index, const double FlipPoint) {
+// *************************************
+  if(random_number[0]->Uniform() < 0.5) {
+    _fPropVal[index] = 2 * FlipPoint - _fPropVal[index];
   }
 }
 

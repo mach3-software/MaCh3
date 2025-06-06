@@ -392,6 +392,24 @@ protected:
   /// @param SampleName The Sample name used to filter parameters.
   bool AppliesToSample(const int SystIndex, const std::string& SampleName) const;
 
+  /// @brief KS: Flip parameter around given value, for example mass ordering around 0
+  /// @param index parameter index you want to flip
+  /// @param FlipPoint Value around which flipping is done
+  void FlipParameterValue(const int index, const double FlipPoint);
+
+  /// @brief HW :: This method is a tad hacky but modular arithmetic gives me a headache.
+  /// @author Henry Wallace
+  void CircularParBounds(const int i, const double LowBound, const double UpBound);
+
+  /// @brief Enable special proposal
+  void EnableSpecialProposal(const YAML::Node& param, const int Index);
+
+  /// @brief Perform Special Step Proposal
+  void SpecialStepProposal();
+
+  /// Check if any of special step proposal were enabled
+  bool doSpecialStepProposal;
+
   /// The input root file we read in
   const std::string inputFile;
 
@@ -462,4 +480,13 @@ protected:
   std::unique_ptr<adaptive_mcmc::AdaptiveMCMCHandler> AdaptiveHandler;
   /// Struct containing information about adaption
   std::unique_ptr<ParameterTunes> Tunes;
+
+  /// Indices of parameters with flip symmetry
+  std::vector<int>    FlipParameterIndex;
+  /// Central points around which parameters are flipped
+  std::vector<double> FlipParameterPoint;
+  /// Indices of parameters with circular bounds
+  std::vector<int>    CircularBoundsIndex;
+  /// Circular bounds for each parameter (lower, upper)
+  std::vector<std::pair<double,double>> CircularBoundsValues;
 };

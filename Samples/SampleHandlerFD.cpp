@@ -8,7 +8,7 @@
 
 // ************************************************
 SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGeneric* xsec_cov,
-                                 ParameterHandlerOsc* osc_cov, const std::shared_ptr<OscillationHandler>& OscillatorObj_) : SampleHandlerBase() {
+                                 const std::shared_ptr<OscillationHandler>& OscillatorObj_) : SampleHandlerBase() {
 // ************************************************
   MACH3LOG_INFO("-------------------------------------------------------------------");
   MACH3LOG_INFO("Creating SampleHandlerFD object");
@@ -21,10 +21,6 @@ SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGen
   ParHandler = xsec_cov;
 
   nSamples = 1;
-  if(!osc_cov){
-    MACH3LOG_WARN("You have passed a nullptr to a covarianceOsc, this means I will not calculate oscillation weights");
-  }
-  OscParHandler = osc_cov;
 
   if (OscillatorObj_ != nullptr) {
     MACH3LOG_WARN("You have passed an Oscillator object through the constructor of a SampleHandlerFD object - this will be used for all oscillation channels");
@@ -49,8 +45,7 @@ SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGen
   UpdateW2 = false;
 }
 
-SampleHandlerFD::~SampleHandlerFD()
-{
+SampleHandlerFD::~SampleHandlerFD() {
   MACH3LOG_DEBUG("I'm deleting SampleHandlerFD");
   
   for (unsigned int yBin=0;yBin<(YBinEdges.size()-1);yBin++) {
@@ -199,7 +194,8 @@ void SampleHandlerFD::Initialise() {
   MACH3LOG_INFO("=============================================");
   MACH3LOG_INFO("Total number of events is: {}", GetNEvents());
 
-  if (OscParHandler) {
+  auto OscParams = ParHandler->GetOscParsFromSampleName(SampleName);
+  if (OscParams.size() > 0) {
     MACH3LOG_INFO("Setting up NuOscillator..");
     if (Oscillator != nullptr) {
       MACH3LOG_INFO("You have passed an OscillatorBase object through the constructor of a SampleHandlerFD object - this will be used for all oscillation channels");
@@ -207,7 +203,7 @@ void SampleHandlerFD::Initialise() {
         MACH3LOG_ERROR("Trying to run shared NuOscillator without EqualBinningPerOscChannel, this will not work");
         throw MaCh3Exception(__FILE__, __LINE__);
       }
-      auto OscParams = OscParHandler->GetOscParsFromSampleName(SampleName);
+
       if(OscParams.size() != Oscillator->GetOscParamsSize()){
         MACH3LOG_ERROR("Sample {} with {} has {} osc params, while shared NuOsc has {} osc params", GetTitle(), GetSampleName(),
                        OscParams.size(), Oscillator->GetOscParamsSize());
@@ -218,6 +214,8 @@ void SampleHandlerFD::Initialise() {
       InitialiseNuOscillatorObjects();
     }
     SetupNuOscillatorPointers();
+  } else{
+    MACH3LOG_WARN("Didn't find any oscillation params, thus will not enable oscillations");
   }
 
   MACH3LOG_INFO("Setting up Sample Binning..");
@@ -1288,11 +1286,6 @@ void SampleHandlerFD::AddData(TH2D* Data) {
 // ************************************************
 void SampleHandlerFD::InitialiseNuOscillatorObjects() {
 // ************************************************
-  if (!OscParHandler) {
-    MACH3LOG_ERROR("Attempted to setup NuOscillator without ParameterHandler object");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-
   auto NuOscillatorConfigFile = Get<std::string>(SampleManager->raw()["NuOsc"]["NuOscConfigFile"], __FILE__ , __LINE__);
   auto EqualBinningPerOscChannel = Get<bool>(SampleManager->raw()["NuOsc"]["EqualBinningPerOscChannel"], __FILE__ , __LINE__);
 
@@ -1303,7 +1296,7 @@ void SampleHandlerFD::InitialiseNuOscillatorObjects() {
       EqualBinningPerOscChannel = false;
     }
   }
-  std::vector<const double*> OscParams = OscParHandler->GetOscParsFromSampleName(SampleName);
+  std::vector<const double*> OscParams = ParHandler->GetOscParsFromSampleName(SampleName);
   if (OscParams.empty()) {
     MACH3LOG_ERROR("OscParams is empty for sample '{}'.", GetTitle());
     MACH3LOG_ERROR("This likely indicates an error in your oscillation YAML configuration.");

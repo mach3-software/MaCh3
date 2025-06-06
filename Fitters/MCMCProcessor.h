@@ -52,9 +52,8 @@ enum ParameterEnum {
   kXSecPar  = 0,
   kNDPar    = 1,
   kFDDetPar = 2,
-  kOSCPar   = 3,
   
-  kNParameterEnum = 4 //KS: keep it at the end to keep track of all parameters
+  kNParameterEnum = 3 //KS: keep it at the end to keep track of all parameters
 };
 
 /// @brief Class responsible for processing MCMC chains, performing diagnostics, generating plots, and managing Bayesian analysis.
@@ -192,7 +191,6 @@ class MCMCProcessor {
     inline int GetNXSec() { return nParam[kXSecPar]; };
     inline int GetNND() { return nParam[kNDPar]; };
     inline int GetNFD() { return nParam[kFDDetPar]; };
-    inline int GetOSC() { return nParam[kOSCPar]; };
     /// @brief Number of params from a given group, for example flux
     int GetGroup(const std::string& name) const;
 
@@ -212,7 +210,6 @@ class MCMCProcessor {
     inline std::vector<std::string> GetXSecCov()  const { return CovPos[kXSecPar]; };
     inline std::string GetNDCov() const { return CovPos[kNDPar].back(); };
     inline std::string GetFDCov() const { return CovPos[kFDDetPar].back(); };
-    inline std::vector<std::string> GetOscCov()   const { return CovPos[kOSCPar]; };
 
     /// @brief Get the post-fit results (arithmetic and Gaussian)
     void GetPostfit(TVectorD *&Central, TVectorD *&Errors, TVectorD *&Central_Gauss, TVectorD *&Errors_Gauss, TVectorD *&Peaks);
@@ -285,13 +282,11 @@ class MCMCProcessor {
     /// @warning There is bit of hardcoding for names so we should revisit it
     inline void FindInputFiles();
     /// @brief Read the xsec file and get the input central values and errors
-    inline void ReadXSecFile();
+    virtual void ReadXSecFile();
     /// @brief Read the ND cov file and get the input central values and errors
     inline void ReadNDFile();
     /// @brief Read the FD cov file and get the input central values and errors
     inline void ReadFDFile();
-    /// @brief Read the Osc cov file and get the input central values and errors
-    virtual void ReadOSCFile();
     /// @brief Remove parameter specified in config
     inline void RemoveParameters();
     /// @brief Print info like how many params have been loaded etc

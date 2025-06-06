@@ -18,8 +18,11 @@ class OscProcessor : public MCMCProcessor {
   protected:
     /// @brief Read the Osc cov file and get the input central values and errors
     /// Here we allow Jarlskog Shenanigans
-    virtual void ReadOSCFile() override;
+    void ReadXSecFile() override;
 
     /// Will plot Jarlskog Invariant using information in the chain
     bool PlotJarlskog;
+
+    /// Will plot Jarlskog Invariant using information in the chain
+    bool OscEnabled;
 };
