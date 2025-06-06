@@ -1519,7 +1519,7 @@ void SampleHandlerFD::InitialiseSplineObject() {
 
 // === JM adjust GetNDVarHist functions to allow for subevent-level plotting ===
 TH1* SampleHandlerFD::Get1DVarHist(const std::string& ProjectionVar_Str, const std::vector< KinematicCut >& EventSelectionVec, 
-    const std::vector< KinematicCut >& SubEventSelectionVec, int WeightStyle, TAxis* Axis) {
+    int WeightStyle, TAxis* Axis, const std::vector< KinematicCut >& SubEventSelectionVec) {
   //DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.
   //   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset
   std::vector< KinematicCut > tmp_Selection = Selection;
@@ -1595,7 +1595,7 @@ void SampleHandlerFD::Fill1DSubEventHist(TH1D* _h1DVar, const std::string& Proje
 
 // ************************************************
 TH2* SampleHandlerFD::Get2DVarHist(const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY,
-    const std::vector< KinematicCut >& EventSelectionVec, const std::vector< KinematicCut >& SubEventSelectionVec, int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
+    const std::vector< KinematicCut >& EventSelectionVec, int WeightStyle, TAxis* AxisX, TAxis* AxisY, const std::vector< KinematicCut >& SubEventSelectionVec) {
 // ************************************************
   //DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.
   //   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset
@@ -1819,8 +1819,7 @@ TH1* SampleHandlerFD::Get1DVarHistByModeAndChannel(const std::string& Projection
     SelectionVec.push_back(SelecChannel);
   }
 
-  std::vector< KinematicCut > SubEventSelectionVec = {};
-  return Get1DVarHist(ProjectionVar_Str,SelectionVec,SubEventSelectionVec,WeightStyle,Axis);
+  return Get1DVarHist(ProjectionVar_Str,SelectionVec,WeightStyle,Axis);
 }
 
 TH2* SampleHandlerFD::Get2DVarHistByModeAndChannel(const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY, 
@@ -1870,8 +1869,7 @@ TH2* SampleHandlerFD::Get2DVarHistByModeAndChannel(const std::string& Projection
     SelectionVec.push_back(SelecChannel);
   }
 
-  std::vector < KinematicCut > SubEventSelectionVec = {};
-  return Get2DVarHist(ProjectionVar_StrX,ProjectionVar_StrY,SelectionVec,SubEventSelectionVec,WeightStyle,AxisX,AxisY);
+  return Get2DVarHist(ProjectionVar_StrX,ProjectionVar_StrY,SelectionVec,WeightStyle,AxisX,AxisY);
 }
 
 void SampleHandlerFD::PrintIntegral(TString OutputFileName, int WeightStyle, TString OutputCSVFileName) {

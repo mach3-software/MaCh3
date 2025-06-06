@@ -89,11 +89,11 @@ public:
 
   /// @ingroup SampleHandlerGetters
   TH1* Get1DVarHist(const std::string& ProjectionVar, const std::vector< KinematicCut >& EventSelectionVec = std::vector< KinematicCut >(),
-                    const std::vector< KinematicCut >& SubEventSelectionVec = std::vector< KinematicCut >(),int WeightStyle=0, TAxis* Axis=nullptr);
+                    int WeightStyle=0, TAxis* Axis=nullptr, const std::vector< KinematicCut >& SubEventSelectionVec = std::vector< KinematicCut >());
   TH2* Get2DVarHist(const std::string& ProjectionVarX, const std::string& ProjectionVarY,
                     const std::vector< KinematicCut >& EventSelectionVec = std::vector< KinematicCut >(),
-                    const std::vector< KinematicCut >& SubEventSelectionVec = std::vector< KinematicCut >(),
-                    int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
+                    int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr,
+                    const std::vector< KinematicCut >& SubEventSelectionVec = std::vector< KinematicCut >());
   
   /// @ingroup SampleHandlerGetters
   void Fill1DSubEventHist(TH1D* _h1DVar, const std::string& ProjectionVar, const std::vector< KinematicCut >& SubEventSelectionVec = std::vector< KinematicCut >(),
