@@ -376,7 +376,7 @@ inline TMacro* GetConfigMacroFromChain(TDirectory* CovarianceFolder) {
   TIter next(CovarianceFolder->GetListOfKeys());
   TKey* key;
   while ((key = dynamic_cast<TKey*>(next()))) {
-    if (strcmp(key->GetClassName(), "TMacro") == 0) {
+    if (std::string(key->GetClassName()) == "TMacro") {
       ++macroCount;
       if (macroCount == 1) {
         foundMacro = dynamic_cast<TMacro*>(key->ReadObj());
@@ -417,7 +417,8 @@ inline TMatrixDSym* GetCovMatrixFromChain(TDirectory* TempFile) {
   TIter next(TempFile->GetListOfKeys());
   TKey* key;
   while ((key = dynamic_cast<TKey*>(next()))) {
-    if (strcmp(key->GetClassName(), "TMatrixDSym") == 0) {
+    std::string className = key->GetClassName();
+    if (className.find("TMatrix") != std::string::npos) {
       ++matrixCount;
       if (matrixCount == 1) {
         foundMatrix = dynamic_cast<TMatrixDSym*>(key->ReadObj());
