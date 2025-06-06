@@ -630,7 +630,7 @@ void SampleHandlerFD::ResetHistograms() {
     #endif
     for (size_t xBin = 0; xBin < nXBins; ++xBin) {
       SampleHandlerFD_array[yBin][xBin] = 0.;
-      SampleHandlerFD_array_w2[yBin][xBin] = 0.;
+      if(FirstTimeW2) SampleHandlerFD_array_w2[yBin][xBin] = 0.;
     }
   }
 } // end function
