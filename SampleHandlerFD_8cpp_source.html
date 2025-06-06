@@ -705,7 +705,7 @@ $(function() {
 <div class="line"><a id="l00630" name="l00630"></a><span class="lineno">  630</span><span class="preprocessor">    #endif</span></div>
 <div class="line"><a id="l00631" name="l00631"></a><span class="lineno">  631</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> xBin = 0; xBin &lt; <a class="code hl_variable" href="classSampleHandlerFD.html#ab933df667fbccf97b3028297ddd8eae2">nXBins</a>; ++xBin) {</div>
 <div class="line"><a id="l00632" name="l00632"></a><span class="lineno">  632</span>      <a class="code hl_variable" href="classSampleHandlerFD.html#aab040097a0524dd6aa6cad01c991b5ce">SampleHandlerFD_array</a>[yBin][xBin] = 0.;</div>
-<div class="line"><a id="l00633" name="l00633"></a><span class="lineno">  633</span>      <a class="code hl_variable" href="classSampleHandlerFD.html#a3905ae0e2531525dba5d663110f86527">SampleHandlerFD_array_w2</a>[yBin][xBin] = 0.;</div>
+<div class="line"><a id="l00633" name="l00633"></a><span class="lineno">  633</span>      <span class="keywordflow">if</span>(<a class="code hl_variable" href="classSampleHandlerFD.html#a1ff1ef7d99cee6d6a9fba74296d4d0ea">FirstTimeW2</a>) <a class="code hl_variable" href="classSampleHandlerFD.html#a3905ae0e2531525dba5d663110f86527">SampleHandlerFD_array_w2</a>[yBin][xBin] = 0.;</div>
 <div class="line"><a id="l00634" name="l00634"></a><span class="lineno">  634</span>    }</div>
 <div class="line"><a id="l00635" name="l00635"></a><span class="lineno">  635</span>  }</div>
 <div class="line"><a id="l00636" name="l00636"></a><span class="lineno">  636</span>} <span class="comment">// end function</span></div>
