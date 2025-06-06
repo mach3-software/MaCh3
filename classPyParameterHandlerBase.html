@@ -30,7 +30,7 @@ MathJax.Hub.Config({
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="mach3logo_small.png"/></td>
   <td id="projectalign">
-   <div id="projectname">MaCh3<span id="projectnumber">&#160;2.1.0</span>
+   <div id="projectname">MaCh3<span id="projectnumber">&#160;2.2.0</span>
    </div>
    <div id="projectbrief">Reference Guide</div>
   </td>
@@ -391,7 +391,22 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:a3c5d92e6b592f18ea4d6bd9afaca7ebd inherit pro_methods_classParameterHandlerBase"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd">AppliesToSample</a> (const int SystIndex, const std::string &amp;SampleName) const</td></tr>
 <tr class="memdesc:a3c5d92e6b592f18ea4d6bd9afaca7ebd inherit pro_methods_classParameterHandlerBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if parameter is affecting given sample name.  <br /></td></tr>
 <tr class="separator:a3c5d92e6b592f18ea4d6bd9afaca7ebd inherit pro_methods_classParameterHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ed8388f3d07e1a7a1918bae1074ff1d inherit pro_methods_classParameterHandlerBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterHandlerBase.html#a8ed8388f3d07e1a7a1918bae1074ff1d">FlipParameterValue</a> (const int index, const double FlipPoint)</td></tr>
+<tr class="memdesc:a8ed8388f3d07e1a7a1918bae1074ff1d inherit pro_methods_classParameterHandlerBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Flip parameter around given value, for example mass ordering around 0.  <br /></td></tr>
+<tr class="separator:a8ed8388f3d07e1a7a1918bae1074ff1d inherit pro_methods_classParameterHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a824f4ae78215b14c8894e2ced281798e inherit pro_methods_classParameterHandlerBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterHandlerBase.html#a824f4ae78215b14c8894e2ced281798e">CircularParBounds</a> (const int i, const double LowBound, const double UpBound)</td></tr>
+<tr class="memdesc:a824f4ae78215b14c8894e2ced281798e inherit pro_methods_classParameterHandlerBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">HW :: This method is a tad hacky but modular arithmetic gives me a headache.  <br /></td></tr>
+<tr class="separator:a824f4ae78215b14c8894e2ced281798e inherit pro_methods_classParameterHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7b79b03eb1ff91d0c631425e5052f17 inherit pro_methods_classParameterHandlerBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterHandlerBase.html#aa7b79b03eb1ff91d0c631425e5052f17">EnableSpecialProposal</a> (const YAML::Node &amp;param, const int Index)</td></tr>
+<tr class="memdesc:aa7b79b03eb1ff91d0c631425e5052f17 inherit pro_methods_classParameterHandlerBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable special proposal.  <br /></td></tr>
+<tr class="separator:aa7b79b03eb1ff91d0c631425e5052f17 inherit pro_methods_classParameterHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aedd56c5e3dbe17586e6fe05a79728fe5 inherit pro_methods_classParameterHandlerBase"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterHandlerBase.html#aedd56c5e3dbe17586e6fe05a79728fe5">SpecialStepProposal</a> ()</td></tr>
+<tr class="memdesc:aedd56c5e3dbe17586e6fe05a79728fe5 inherit pro_methods_classParameterHandlerBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform Special Step Proposal.  <br /></td></tr>
+<tr class="separator:aedd56c5e3dbe17586e6fe05a79728fe5 inherit pro_methods_classParameterHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_attribs_classParameterHandlerBase"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classParameterHandlerBase')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classParameterHandlerBase.html">ParameterHandlerBase</a></td></tr>
+<tr class="memitem:a5914b4a260b907e5a355e53db7e72466 inherit pro_attribs_classParameterHandlerBase"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterHandlerBase.html#a5914b4a260b907e5a355e53db7e72466">doSpecialStepProposal</a></td></tr>
+<tr class="memdesc:a5914b4a260b907e5a355e53db7e72466 inherit pro_attribs_classParameterHandlerBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if any of special step proposal were enabled.  <br /></td></tr>
+<tr class="separator:a5914b4a260b907e5a355e53db7e72466 inherit pro_attribs_classParameterHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb2f867014619b5c38b67cd981e40dcb inherit pro_attribs_classParameterHandlerBase"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterHandlerBase.html#adb2f867014619b5c38b67cd981e40dcb">inputFile</a></td></tr>
 <tr class="memdesc:adb2f867014619b5c38b67cd981e40dcb inherit pro_attribs_classParameterHandlerBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The input root file we read in.  <br /></td></tr>
 <tr class="separator:adb2f867014619b5c38b67cd981e40dcb inherit pro_attribs_classParameterHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -485,11 +500,23 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:a4aa04c9dfb80f8d25f0712e21eb71054 inherit pro_attribs_classParameterHandlerBase"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classParameterTunes.html">ParameterTunes</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterHandlerBase.html#a4aa04c9dfb80f8d25f0712e21eb71054">Tunes</a></td></tr>
 <tr class="memdesc:a4aa04c9dfb80f8d25f0712e21eb71054 inherit pro_attribs_classParameterHandlerBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Struct containing information about adaption.  <br /></td></tr>
 <tr class="separator:a4aa04c9dfb80f8d25f0712e21eb71054 inherit pro_attribs_classParameterHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36c4d088cad713dcc8e457475707a426 inherit pro_attribs_classParameterHandlerBase"><td class="memItemLeft" align="right" valign="top">std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterHandlerBase.html#a36c4d088cad713dcc8e457475707a426">FlipParameterIndex</a></td></tr>
+<tr class="memdesc:a36c4d088cad713dcc8e457475707a426 inherit pro_attribs_classParameterHandlerBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indices of parameters with flip symmetry.  <br /></td></tr>
+<tr class="separator:a36c4d088cad713dcc8e457475707a426 inherit pro_attribs_classParameterHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a63efdd91c7f4a5afaa0fa24766a29923 inherit pro_attribs_classParameterHandlerBase"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterHandlerBase.html#a63efdd91c7f4a5afaa0fa24766a29923">FlipParameterPoint</a></td></tr>
+<tr class="memdesc:a63efdd91c7f4a5afaa0fa24766a29923 inherit pro_attribs_classParameterHandlerBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Central points around which parameters are flipped.  <br /></td></tr>
+<tr class="separator:a63efdd91c7f4a5afaa0fa24766a29923 inherit pro_attribs_classParameterHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0212314cea270860766c5b100cd56c7e inherit pro_attribs_classParameterHandlerBase"><td class="memItemLeft" align="right" valign="top">std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterHandlerBase.html#a0212314cea270860766c5b100cd56c7e">CircularBoundsIndex</a></td></tr>
+<tr class="memdesc:a0212314cea270860766c5b100cd56c7e inherit pro_attribs_classParameterHandlerBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indices of parameters with circular bounds.  <br /></td></tr>
+<tr class="separator:a0212314cea270860766c5b100cd56c7e inherit pro_attribs_classParameterHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5f1763b5ac621428da4af2681310acf inherit pro_attribs_classParameterHandlerBase"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::pair&lt; double, double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterHandlerBase.html#aa5f1763b5ac621428da4af2681310acf">CircularBoundsValues</a></td></tr>
+<tr class="memdesc:aa5f1763b5ac621428da4af2681310acf inherit pro_attribs_classParameterHandlerBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Circular bounds for each parameter (lower, upper)  <br /></td></tr>
+<tr class="separator:aa5f1763b5ac621428da4af2681310acf inherit pro_attribs_classParameterHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>EW: As <a class="el" href="classParameterHandlerBase.html" title="Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada...">ParameterHandlerBase</a> is an abstract base class we have to do some gymnastics to get it to get it into python. </p>
 
-<p class="definition">Definition at line <a class="el" href="parameters_8cpp_source.html#l00014">14</a> of file <a class="el" href="parameters_8cpp_source.html">parameters.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parameters_8cpp_source.html#l00012">12</a> of file <a class="el" href="parameters_8cpp_source.html">parameters.cpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="ab2fdbb90cb4897a9111c3d1a5051effc" name="ab2fdbb90cb4897a9111c3d1a5051effc"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab2fdbb90cb4897a9111c3d1a5051effc">&#9670;&#160;</a></span>GetLikelihood()</h2>
@@ -518,17 +545,17 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="group__ParameterHandlerGetters.html#ga3fca79be2a7421b9fb716857281654cd">ParameterHandlerBase</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="parameters_8cpp_source.html#l00020">20</a> of file <a class="el" href="parameters_8cpp_source.html">parameters.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   20</span>                                    {</div>
-<div class="line"><span class="lineno">   21</span>        PYBIND11_OVERRIDE_NAME(</div>
-<div class="line"><span class="lineno">   22</span>            <span class="keywordtype">double</span>,           <span class="comment">/* Return type */</span></div>
-<div class="line"><span class="lineno">   23</span>            <a class="code hl_class" href="classParameterHandlerBase.html">ParameterHandlerBase</a>,   <span class="comment">/* Parent class */</span></div>
-<div class="line"><span class="lineno">   24</span>            <span class="stringliteral">&quot;get_likelihood&quot;</span>, <span class="comment">/* Name in python*/</span></div>
-<div class="line"><span class="lineno">   25</span>            <a class="code hl_function" href="classPyParameterHandlerBase.html#ab2fdbb90cb4897a9111c3d1a5051effc">GetLikelihood</a>     <span class="comment">/* Name of function in C++ (must match Python name) */</span></div>
-<div class="line"><span class="lineno">   26</span>        );</div>
-<div class="line"><span class="lineno">   27</span>    }</div>
+<p class="definition">Definition at line <a class="el" href="parameters_8cpp_source.html#l00018">18</a> of file <a class="el" href="parameters_8cpp_source.html">parameters.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   18</span>                                    {</div>
+<div class="line"><span class="lineno">   19</span>        PYBIND11_OVERRIDE_NAME(</div>
+<div class="line"><span class="lineno">   20</span>            <span class="keywordtype">double</span>,           <span class="comment">/* Return type */</span></div>
+<div class="line"><span class="lineno">   21</span>            <a class="code hl_class" href="classParameterHandlerBase.html">ParameterHandlerBase</a>,   <span class="comment">/* Parent class */</span></div>
+<div class="line"><span class="lineno">   22</span>            <span class="stringliteral">&quot;get_likelihood&quot;</span>, <span class="comment">/* Name in python*/</span></div>
+<div class="line"><span class="lineno">   23</span>            <a class="code hl_function" href="classPyParameterHandlerBase.html#ab2fdbb90cb4897a9111c3d1a5051effc">GetLikelihood</a>     <span class="comment">/* Name of function in C++ (must match Python name) */</span></div>
+<div class="line"><span class="lineno">   24</span>        );</div>
+<div class="line"><span class="lineno">   25</span>    }</div>
 <div class="ttc" id="aclassParameterHandlerBase_html"><div class="ttname"><a href="classParameterHandlerBase.html">ParameterHandlerBase</a></div><div class="ttdoc">Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00015">ParameterHandlerBase.h:15</a></div></div>
-<div class="ttc" id="aclassPyParameterHandlerBase_html_ab2fdbb90cb4897a9111c3d1a5051effc"><div class="ttname"><a href="classPyParameterHandlerBase.html#ab2fdbb90cb4897a9111c3d1a5051effc">PyParameterHandlerBase::GetLikelihood</a></div><div class="ttdeci">double GetLikelihood() override</div><div class="ttdoc">Return CalcLikelihood if some params were thrown out of boundary return LARGE_LOGL</div><div class="ttdef"><b>Definition:</b> <a href="parameters_8cpp_source.html#l00020">parameters.cpp:20</a></div></div>
+<div class="ttc" id="aclassPyParameterHandlerBase_html_ab2fdbb90cb4897a9111c3d1a5051effc"><div class="ttname"><a href="classPyParameterHandlerBase.html#ab2fdbb90cb4897a9111c3d1a5051effc">PyParameterHandlerBase::GetLikelihood</a></div><div class="ttdeci">double GetLikelihood() override</div><div class="ttdoc">Return CalcLikelihood if some params were thrown out of boundary return LARGE_LOGL</div><div class="ttdef"><b>Definition:</b> <a href="parameters_8cpp_source.html#l00018">parameters.cpp:18</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -589,33 +616,35 @@ Additional Inherited Members</h2></td></tr>
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8cpp_source.html#l00023">23</a> of file <a class="el" href="ParameterHandlerBase_8cpp_source.html">ParameterHandlerBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   22</span>                                                                                                                                            : <a class="code hl_variable" href="classParameterHandlerBase.html#adb2f867014619b5c38b67cd981e40dcb">inputFile</a>(YAMLFile[0].c_str()), <a class="code hl_variable" href="classParameterHandlerBase.html#a5e9226aa216252b1ef195c7f91c76df2">matrixName</a>(name), <a class="code hl_variable" href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">pca</a>(<span class="keyword">true</span>) {</div>
-<div class="line"><span class="lineno">   23</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">   24</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Constructing instance of ParameterHandler using&quot;</span>);</div>
-<div class="line"><span class="lineno">   25</span>  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; i &lt; YAMLFile.size(); i++)</div>
-<div class="line"><span class="lineno">   26</span>  {</div>
-<div class="line"><span class="lineno">   27</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{}&quot;</span>, YAMLFile[i]);</div>
-<div class="line"><span class="lineno">   28</span>  }</div>
-<div class="line"><span class="lineno">   29</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;as an input&quot;</span>);</div>
-<div class="line"><span class="lineno">   30</span> </div>
-<div class="line"><span class="lineno">   31</span>  <span class="keywordflow">if</span> (threshold &lt; 0 || threshold &gt;= 1) {</div>
-<div class="line"><span class="lineno">   32</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Principal component analysis but given the threshold for the principal components to be less than 0, or greater than (or equal to) 1. This will not work&quot;</span>);</div>
-<div class="line"><span class="lineno">   33</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Please specify a number between 0 and 1&quot;</span>);</div>
-<div class="line"><span class="lineno">   34</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;You specified: &quot;</span>);</div>
-<div class="line"><span class="lineno">   35</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Am instead calling the usual non-PCA constructor...&quot;</span>);</div>
-<div class="line"><span class="lineno">   36</span>    <a class="code hl_variable" href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">pca</a> = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">   37</span>  }</div>
-<div class="line"><span class="lineno">   38</span> </div>
-<div class="line"><span class="lineno">   39</span>  <a class="code hl_function" href="classParameterHandlerBase.html#a5e5bce6f487e7214be680a9b4adf6b6c">Init</a>(YAMLFile);</div>
-<div class="line"><span class="lineno">   40</span>  <span class="comment">// Call the innocent helper function</span></div>
-<div class="line"><span class="lineno">   41</span>  <span class="keywordflow">if</span> (<a class="code hl_variable" href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">pca</a>) <a class="code hl_function" href="classParameterHandlerBase.html#a908856d9a183c32015fb3c3ef7b47cd9">ConstructPCA</a>(threshold, FirstPCA, LastPCA);</div>
-<div class="line"><span class="lineno">   42</span>}</div>
+<div class="fragment"><div class="line"><span class="lineno">   25</span>                     : <a class="code hl_variable" href="classParameterHandlerBase.html#adb2f867014619b5c38b67cd981e40dcb">inputFile</a>(YAMLFile[0].c_str()), <a class="code hl_variable" href="classParameterHandlerBase.html#a5e9226aa216252b1ef195c7f91c76df2">matrixName</a>(name), <a class="code hl_variable" href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">pca</a>(<span class="keyword">true</span>) {</div>
+<div class="line"><span class="lineno">   26</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">   27</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Constructing instance of ParameterHandler using&quot;</span>);</div>
+<div class="line"><span class="lineno">   28</span>  <a class="code hl_variable" href="classParameterHandlerBase.html#a5914b4a260b907e5a355e53db7e72466">doSpecialStepProposal</a> = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">   29</span>  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; i &lt; YAMLFile.size(); i++)</div>
+<div class="line"><span class="lineno">   30</span>  {</div>
+<div class="line"><span class="lineno">   31</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{}&quot;</span>, YAMLFile[i]);</div>
+<div class="line"><span class="lineno">   32</span>  }</div>
+<div class="line"><span class="lineno">   33</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;as an input&quot;</span>);</div>
+<div class="line"><span class="lineno">   34</span> </div>
+<div class="line"><span class="lineno">   35</span>  <span class="keywordflow">if</span> (threshold &lt; 0 || threshold &gt;= 1) {</div>
+<div class="line"><span class="lineno">   36</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Principal component analysis but given the threshold for the principal components to be less than 0, or greater than (or equal to) 1. This will not work&quot;</span>);</div>
+<div class="line"><span class="lineno">   37</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Please specify a number between 0 and 1&quot;</span>);</div>
+<div class="line"><span class="lineno">   38</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;You specified: &quot;</span>);</div>
+<div class="line"><span class="lineno">   39</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Am instead calling the usual non-PCA constructor...&quot;</span>);</div>
+<div class="line"><span class="lineno">   40</span>    <a class="code hl_variable" href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">pca</a> = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">   41</span>  }</div>
+<div class="line"><span class="lineno">   42</span> </div>
+<div class="line"><span class="lineno">   43</span>  <a class="code hl_function" href="classParameterHandlerBase.html#a5e5bce6f487e7214be680a9b4adf6b6c">Init</a>(YAMLFile);</div>
+<div class="line"><span class="lineno">   44</span>  <span class="comment">// Call the innocent helper function</span></div>
+<div class="line"><span class="lineno">   45</span>  <span class="keywordflow">if</span> (<a class="code hl_variable" href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">pca</a>) <a class="code hl_function" href="classParameterHandlerBase.html#a908856d9a183c32015fb3c3ef7b47cd9">ConstructPCA</a>(threshold, FirstPCA, LastPCA);</div>
+<div class="line"><span class="lineno">   46</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00023">MaCh3Logger.h:23</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a5e5bce6f487e7214be680a9b4adf6b6c"><div class="ttname"><a href="classParameterHandlerBase.html#a5e5bce6f487e7214be680a9b4adf6b6c">ParameterHandlerBase::Init</a></div><div class="ttdeci">void Init(const std::string &amp;name, const std::string &amp;file)</div><div class="ttdoc">Initialisation of the class using matrix from root file.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l00089">ParameterHandlerBase.cpp:89</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a5e9226aa216252b1ef195c7f91c76df2"><div class="ttname"><a href="classParameterHandlerBase.html#a5e9226aa216252b1ef195c7f91c76df2">ParameterHandlerBase::matrixName</a></div><div class="ttdeci">std::string matrixName</div><div class="ttdoc">Name of cov matrix.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00399">ParameterHandlerBase.h:399</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a908856d9a183c32015fb3c3ef7b47cd9"><div class="ttname"><a href="classParameterHandlerBase.html#a908856d9a183c32015fb3c3ef7b47cd9">ParameterHandlerBase::ConstructPCA</a></div><div class="ttdeci">void ConstructPCA(const double eigen_threshold, int FirstPCAdpar, int LastPCAdpar)</div><div class="ttdoc">CW: Calculate eigen values, prepare transition matrices and remove param based on defined threshold.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l00062">ParameterHandlerBase.cpp:62</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_adb2f867014619b5c38b67cd981e40dcb"><div class="ttname"><a href="classParameterHandlerBase.html#adb2f867014619b5c38b67cd981e40dcb">ParameterHandlerBase::inputFile</a></div><div class="ttdeci">const std::string inputFile</div><div class="ttdoc">The input root file we read in.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00396">ParameterHandlerBase.h:396</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_ae036dc62d3a3710b78d5d767f280fa4b"><div class="ttname"><a href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">ParameterHandlerBase::pca</a></div><div class="ttdeci">bool pca</div><div class="ttdoc">perform PCA or not</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00455">ParameterHandlerBase.h:455</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a5914b4a260b907e5a355e53db7e72466"><div class="ttname"><a href="classParameterHandlerBase.html#a5914b4a260b907e5a355e53db7e72466">ParameterHandlerBase::doSpecialStepProposal</a></div><div class="ttdeci">bool doSpecialStepProposal</div><div class="ttdoc">Check if any of special step proposal were enabled.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00411">ParameterHandlerBase.h:411</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a5e5bce6f487e7214be680a9b4adf6b6c"><div class="ttname"><a href="classParameterHandlerBase.html#a5e5bce6f487e7214be680a9b4adf6b6c">ParameterHandlerBase::Init</a></div><div class="ttdeci">void Init(const std::string &amp;name, const std::string &amp;file)</div><div class="ttdoc">Initialisation of the class using matrix from root file.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l00093">ParameterHandlerBase.cpp:93</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a5e9226aa216252b1ef195c7f91c76df2"><div class="ttname"><a href="classParameterHandlerBase.html#a5e9226aa216252b1ef195c7f91c76df2">ParameterHandlerBase::matrixName</a></div><div class="ttdeci">std::string matrixName</div><div class="ttdoc">Name of cov matrix.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00417">ParameterHandlerBase.h:417</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a908856d9a183c32015fb3c3ef7b47cd9"><div class="ttname"><a href="classParameterHandlerBase.html#a908856d9a183c32015fb3c3ef7b47cd9">ParameterHandlerBase::ConstructPCA</a></div><div class="ttdeci">void ConstructPCA(const double eigen_threshold, int FirstPCAdpar, int LastPCAdpar)</div><div class="ttdoc">CW: Calculate eigen values, prepare transition matrices and remove param based on defined threshold.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l00066">ParameterHandlerBase.cpp:66</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_adb2f867014619b5c38b67cd981e40dcb"><div class="ttname"><a href="classParameterHandlerBase.html#adb2f867014619b5c38b67cd981e40dcb">ParameterHandlerBase::inputFile</a></div><div class="ttdeci">const std::string inputFile</div><div class="ttdoc">The input root file we read in.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00414">ParameterHandlerBase.h:414</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_ae036dc62d3a3710b78d5d767f280fa4b"><div class="ttname"><a href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">ParameterHandlerBase::pca</a></div><div class="ttdeci">bool pca</div><div class="ttdoc">perform PCA or not</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00473">ParameterHandlerBase.h:473</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -673,22 +702,23 @@ Additional Inherited Members</h2></td></tr>
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8cpp_source.html#l00027">27</a> of file <a class="el" href="ParameterHandlerBase_8cpp_source.html">ParameterHandlerBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">    5</span>                                                                                                                      : <a class="code hl_variable" href="classParameterHandlerBase.html#adb2f867014619b5c38b67cd981e40dcb">inputFile</a>(file), <a class="code hl_variable" href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">pca</a>(<span class="keyword">false</span>) {</div>
-<div class="line"><span class="lineno">    6</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">    7</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Constructing instance of ParameterHandler&quot;</span>);</div>
-<div class="line"><span class="lineno">    8</span>  <span class="keywordflow">if</span> (threshold &lt; 0 || threshold &gt;= 1) {</div>
-<div class="line"><span class="lineno">    9</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;NOTE: {} {}&quot;</span>, name, file);</div>
-<div class="line"><span class="lineno">   10</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Principal component analysis but given the threshold for the principal components to be less than 0, or greater than (or equal to) 1. This will not work&quot;</span>);</div>
-<div class="line"><span class="lineno">   11</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Please specify a number between 0 and 1&quot;</span>);</div>
-<div class="line"><span class="lineno">   12</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;You specified: &quot;</span>);</div>
-<div class="line"><span class="lineno">   13</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Am instead calling the usual non-PCA constructor...&quot;</span>);</div>
-<div class="line"><span class="lineno">   14</span>    <a class="code hl_variable" href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">pca</a> = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">   15</span>  }</div>
-<div class="line"><span class="lineno">   16</span>  <a class="code hl_function" href="classParameterHandlerBase.html#a5e5bce6f487e7214be680a9b4adf6b6c">Init</a>(name, file);</div>
-<div class="line"><span class="lineno">   17</span> </div>
-<div class="line"><span class="lineno">   18</span>  <span class="comment">// Call the innocent helper function</span></div>
-<div class="line"><span class="lineno">   19</span>  <span class="keywordflow">if</span> (<a class="code hl_variable" href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">pca</a>) <a class="code hl_function" href="classParameterHandlerBase.html#a908856d9a183c32015fb3c3ef7b47cd9">ConstructPCA</a>(threshold, FirstPCA, LastPCA);</div>
-<div class="line"><span class="lineno">   20</span>}</div>
+<div class="fragment"><div class="line"><span class="lineno">    6</span>                     : <a class="code hl_variable" href="classParameterHandlerBase.html#adb2f867014619b5c38b67cd981e40dcb">inputFile</a>(file), <a class="code hl_variable" href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">pca</a>(<span class="keyword">false</span>) {</div>
+<div class="line"><span class="lineno">    7</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">    8</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Constructing instance of ParameterHandler&quot;</span>);</div>
+<div class="line"><span class="lineno">    9</span>  <a class="code hl_variable" href="classParameterHandlerBase.html#a5914b4a260b907e5a355e53db7e72466">doSpecialStepProposal</a> = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">   10</span>  <span class="keywordflow">if</span> (threshold &lt; 0 || threshold &gt;= 1) {</div>
+<div class="line"><span class="lineno">   11</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;NOTE: {} {}&quot;</span>, name, file);</div>
+<div class="line"><span class="lineno">   12</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Principal component analysis but given the threshold for the principal components to be less than 0, or greater than (or equal to) 1. This will not work&quot;</span>);</div>
+<div class="line"><span class="lineno">   13</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Please specify a number between 0 and 1&quot;</span>);</div>
+<div class="line"><span class="lineno">   14</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;You specified: &quot;</span>);</div>
+<div class="line"><span class="lineno">   15</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Am instead calling the usual non-PCA constructor...&quot;</span>);</div>
+<div class="line"><span class="lineno">   16</span>    <a class="code hl_variable" href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">pca</a> = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">   17</span>  }</div>
+<div class="line"><span class="lineno">   18</span>  <a class="code hl_function" href="classParameterHandlerBase.html#a5e5bce6f487e7214be680a9b4adf6b6c">Init</a>(name, file);</div>
+<div class="line"><span class="lineno">   19</span> </div>
+<div class="line"><span class="lineno">   20</span>  <span class="comment">// Call the innocent helper function</span></div>
+<div class="line"><span class="lineno">   21</span>  <span class="keywordflow">if</span> (<a class="code hl_variable" href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">pca</a>) <a class="code hl_function" href="classParameterHandlerBase.html#a908856d9a183c32015fb3c3ef7b47cd9">ConstructPCA</a>(threshold, FirstPCA, LastPCA);</div>
+<div class="line"><span class="lineno">   22</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a4db4657acad5c79ac4bbb66a9d1c5905"><div class="ttname"><a href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a></div><div class="ttdeci">#define MACH3LOG_DEBUG</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00022">MaCh3Logger.h:22</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -720,16 +750,16 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classParameterHandlerBase.html#a0eb4b2dec49723f7ee15cde3e1cd4c69">ParameterHandlerBase</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="parameters_8cpp_source.html#l00029">29</a> of file <a class="el" href="parameters_8cpp_source.html">parameters.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   29</span>                                {</div>
-<div class="line"><span class="lineno">   30</span>        PYBIND11_OVERRIDE_NAME(</div>
-<div class="line"><span class="lineno">   31</span>            <span class="keywordtype">void</span>,            <span class="comment">/* Return type */</span></div>
-<div class="line"><span class="lineno">   32</span>            <a class="code hl_class" href="classParameterHandlerBase.html">ParameterHandlerBase</a>,  <span class="comment">/* Parent class */</span></div>
-<div class="line"><span class="lineno">   33</span>            <span class="stringliteral">&quot;propose_step&quot;</span>,  <span class="comment">/* Name in python*/</span></div>
-<div class="line"><span class="lineno">   34</span>            <a class="code hl_function" href="classPyParameterHandlerBase.html#ae5e1f3e43e28aab89877042bd3b6b27e">ProposeStep</a>      <span class="comment">/* Name of function in C++ (must match Python name) */</span></div>
-<div class="line"><span class="lineno">   35</span>        );</div>
-<div class="line"><span class="lineno">   36</span>    }</div>
-<div class="ttc" id="aclassPyParameterHandlerBase_html_ae5e1f3e43e28aab89877042bd3b6b27e"><div class="ttname"><a href="classPyParameterHandlerBase.html#ae5e1f3e43e28aab89877042bd3b6b27e">PyParameterHandlerBase::ProposeStep</a></div><div class="ttdeci">void ProposeStep() override</div><div class="ttdoc">Generate a new proposed state.</div><div class="ttdef"><b>Definition:</b> <a href="parameters_8cpp_source.html#l00029">parameters.cpp:29</a></div></div>
+<p class="definition">Definition at line <a class="el" href="parameters_8cpp_source.html#l00027">27</a> of file <a class="el" href="parameters_8cpp_source.html">parameters.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   27</span>                                {</div>
+<div class="line"><span class="lineno">   28</span>        PYBIND11_OVERRIDE_NAME(</div>
+<div class="line"><span class="lineno">   29</span>            <span class="keywordtype">void</span>,            <span class="comment">/* Return type */</span></div>
+<div class="line"><span class="lineno">   30</span>            <a class="code hl_class" href="classParameterHandlerBase.html">ParameterHandlerBase</a>,  <span class="comment">/* Parent class */</span></div>
+<div class="line"><span class="lineno">   31</span>            <span class="stringliteral">&quot;propose_step&quot;</span>,  <span class="comment">/* Name in python*/</span></div>
+<div class="line"><span class="lineno">   32</span>            <a class="code hl_function" href="classPyParameterHandlerBase.html#ae5e1f3e43e28aab89877042bd3b6b27e">ProposeStep</a>      <span class="comment">/* Name of function in C++ (must match Python name) */</span></div>
+<div class="line"><span class="lineno">   33</span>        );</div>
+<div class="line"><span class="lineno">   34</span>    }</div>
+<div class="ttc" id="aclassPyParameterHandlerBase_html_ae5e1f3e43e28aab89877042bd3b6b27e"><div class="ttname"><a href="classPyParameterHandlerBase.html#ae5e1f3e43e28aab89877042bd3b6b27e">PyParameterHandlerBase::ProposeStep</a></div><div class="ttdeci">void ProposeStep() override</div><div class="ttdoc">Generate a new proposed state.</div><div class="ttdef"><b>Definition:</b> <a href="parameters_8cpp_source.html#l00027">parameters.cpp:27</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

@@ -30,7 +30,7 @@ MathJax.Hub.Config({
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="mach3logo_small.png"/></td>
   <td id="projectalign">
-   <div id="projectname">MaCh3<span id="projectnumber">&#160;2.1.0</span>
+   <div id="projectname">MaCh3<span id="projectnumber">&#160;2.2.0</span>
    </div>
    <div id="projectbrief">Reference Guide</div>
   </td>
@@ -132,6 +132,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSplineParameter.html">SplineParameter</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Struct holding info about Spline Systematics.  <a href="structSplineParameter.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structOscillationParameter.html">OscillationParameter</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Struct holding info about oscillation Systematics.  <a href="structOscillationParameter.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
@@ -158,10 +161,14 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:a6720d732608767153550aebebcf8fbf4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make an enum of the spline interpolation type.  <a href="ParameterStructs_8h.html#a6720d732608767153550aebebcf8fbf4">More...</a><br /></td></tr>
 <tr class="separator:a6720d732608767153550aebebcf8fbf4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:affc27d8b7b82d3713f45af17873fde2f"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2f">SystType</a> { <a class="el" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa085cb29127b1cf7b1ddd429ff4440b17">kNorm</a>
+<tr class="memitem:affc27d8b7b82d3713f45af17873fde2f"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2f">SystType</a> { <br />
+&#160;&#160;<a class="el" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa085cb29127b1cf7b1ddd429ff4440b17">kNorm</a>
 , <a class="el" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa29d6ccf6cf507f6e66c72b1d3c2aed00">kSpline</a>
 , <a class="el" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fad9b1ac76e80f59684cfb7dc996fc870d">kFunc</a>
-, <a class="el" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa32e7da18117f9defb24042a71776e5cb">kSystTypes</a>
+, <a class="el" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa50ac44a09cc05fd1285a88637bdcf789">kOsc</a>
+, <br />
+&#160;&#160;<a class="el" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa32e7da18117f9defb24042a71776e5cb">kSystTypes</a>
+<br />
  }</td></tr>
 <tr class="separator:affc27d8b7b82d3713f45af17873fde2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -339,6 +346,8 @@ Kamil Skwarczynski </dd></dl>
 </td></tr>
 <tr><td class="fieldname"><a id="affc27d8b7b82d3713f45af17873fde2fad9b1ac76e80f59684cfb7dc996fc870d" name="affc27d8b7b82d3713f45af17873fde2fad9b1ac76e80f59684cfb7dc996fc870d"></a>kFunc&#160;</td><td class="fielddoc"><p>For functional parameters. </p>
 </td></tr>
+<tr><td class="fieldname"><a id="affc27d8b7b82d3713f45af17873fde2fa50ac44a09cc05fd1285a88637bdcf789" name="affc27d8b7b82d3713f45af17873fde2fa50ac44a09cc05fd1285a88637bdcf789"></a>kOsc&#160;</td><td class="fielddoc"><p>For oscillation parameters. </p>
+</td></tr>
 <tr><td class="fieldname"><a id="affc27d8b7b82d3713f45af17873fde2fa32e7da18117f9defb24042a71776e5cb" name="affc27d8b7b82d3713f45af17873fde2fa32e7da18117f9defb24042a71776e5cb"></a>kSystTypes&#160;</td><td class="fielddoc"><p>This only enumerates. </p>
 </td></tr>
 </table>
@@ -348,11 +357,13 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  325</span>  <a class="code hl_enumvalue" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa085cb29127b1cf7b1ddd429ff4440b17">kNorm</a>,      </div>
 <div class="line"><span class="lineno">  326</span>  <a class="code hl_enumvalue" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa29d6ccf6cf507f6e66c72b1d3c2aed00">kSpline</a>,    </div>
 <div class="line"><span class="lineno">  327</span>  <a class="code hl_enumvalue" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fad9b1ac76e80f59684cfb7dc996fc870d">kFunc</a>,      </div>
-<div class="line"><span class="lineno">  328</span>  <a class="code hl_enumvalue" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa32e7da18117f9defb24042a71776e5cb">kSystTypes</a>  </div>
-<div class="line"><span class="lineno">  329</span>};</div>
+<div class="line"><span class="lineno">  328</span>  <a class="code hl_enumvalue" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa50ac44a09cc05fd1285a88637bdcf789">kOsc</a>,       </div>
+<div class="line"><span class="lineno">  329</span>  <a class="code hl_enumvalue" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa32e7da18117f9defb24042a71776e5cb">kSystTypes</a>  </div>
+<div class="line"><span class="lineno">  330</span>};</div>
 <div class="ttc" id="aParameterStructs_8h_html_affc27d8b7b82d3713f45af17873fde2fa085cb29127b1cf7b1ddd429ff4440b17"><div class="ttname"><a href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa085cb29127b1cf7b1ddd429ff4440b17">kNorm</a></div><div class="ttdeci">@ kNorm</div><div class="ttdoc">For normalisation parameters.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00325">ParameterStructs.h:325</a></div></div>
 <div class="ttc" id="aParameterStructs_8h_html_affc27d8b7b82d3713f45af17873fde2fa29d6ccf6cf507f6e66c72b1d3c2aed00"><div class="ttname"><a href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa29d6ccf6cf507f6e66c72b1d3c2aed00">kSpline</a></div><div class="ttdeci">@ kSpline</div><div class="ttdoc">For splined parameters (1D)</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00326">ParameterStructs.h:326</a></div></div>
-<div class="ttc" id="aParameterStructs_8h_html_affc27d8b7b82d3713f45af17873fde2fa32e7da18117f9defb24042a71776e5cb"><div class="ttname"><a href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa32e7da18117f9defb24042a71776e5cb">kSystTypes</a></div><div class="ttdeci">@ kSystTypes</div><div class="ttdoc">This only enumerates.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00329">ParameterStructs.h:328</a></div></div>
+<div class="ttc" id="aParameterStructs_8h_html_affc27d8b7b82d3713f45af17873fde2fa32e7da18117f9defb24042a71776e5cb"><div class="ttname"><a href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa32e7da18117f9defb24042a71776e5cb">kSystTypes</a></div><div class="ttdeci">@ kSystTypes</div><div class="ttdoc">This only enumerates.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00330">ParameterStructs.h:329</a></div></div>
+<div class="ttc" id="aParameterStructs_8h_html_affc27d8b7b82d3713f45af17873fde2fa50ac44a09cc05fd1285a88637bdcf789"><div class="ttname"><a href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa50ac44a09cc05fd1285a88637bdcf789">kOsc</a></div><div class="ttdeci">@ kOsc</div><div class="ttdoc">For oscillation parameters.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00328">ParameterStructs.h:328</a></div></div>
 <div class="ttc" id="aParameterStructs_8h_html_affc27d8b7b82d3713f45af17873fde2fad9b1ac76e80f59684cfb7dc996fc870d"><div class="ttname"><a href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fad9b1ac76e80f59684cfb7dc996fc870d">kFunc</a></div><div class="ttdeci">@ kFunc</div><div class="ttdoc">For functional parameters.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00327">ParameterStructs.h:327</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -818,30 +829,33 @@ template&lt;typename T , size_t N&gt; </div>
 
 <p>Convert a Syst type type to a string. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterStructs_8h_source.html#l00349">349</a> of file <a class="el" href="ParameterStructs_8h_source.html">ParameterStructs.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  349</span>                                                     {</div>
-<div class="line"><span class="lineno">  350</span><span class="comment">// **************************************************</span></div>
-<div class="line"><span class="lineno">  351</span>  std::string name = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><span class="lineno">  352</span>  <span class="keywordflow">switch</span>(i) {</div>
-<div class="line"><span class="lineno">  353</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa085cb29127b1cf7b1ddd429ff4440b17">SystType::kNorm</a>:</div>
-<div class="line"><span class="lineno">  354</span>      name = <span class="stringliteral">&quot;Norm&quot;</span>;</div>
-<div class="line"><span class="lineno">  355</span>      <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  356</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa29d6ccf6cf507f6e66c72b1d3c2aed00">SystType::kSpline</a>:</div>
-<div class="line"><span class="lineno">  357</span>      name = <span class="stringliteral">&quot;Spline&quot;</span>;</div>
-<div class="line"><span class="lineno">  358</span>      <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  359</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fad9b1ac76e80f59684cfb7dc996fc870d">SystType::kFunc</a>:</div>
-<div class="line"><span class="lineno">  360</span>      name = <span class="stringliteral">&quot;Functional&quot;</span>;</div>
-<div class="line"><span class="lineno">  361</span>      <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  362</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa32e7da18117f9defb24042a71776e5cb">SystType::kSystTypes</a>:</div>
-<div class="line"><span class="lineno">  363</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;kSystTypes is not a valid SystType!&quot;</span>);</div>
-<div class="line"><span class="lineno">  364</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><span class="lineno">  365</span>    <span class="keywordflow">default</span>:</div>
-<div class="line"><span class="lineno">  366</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;UNKNOWN SYST TYPE SPECIFIED!&quot;</span>);</div>
-<div class="line"><span class="lineno">  367</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;You gave {}&quot;</span>, <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(i));</div>
-<div class="line"><span class="lineno">  368</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><span class="lineno">  369</span>  }</div>
-<div class="line"><span class="lineno">  370</span>  <span class="keywordflow">return</span> name;</div>
-<div class="line"><span class="lineno">  371</span>}</div>
+<p class="definition">Definition at line <a class="el" href="ParameterStructs_8h_source.html#l00350">350</a> of file <a class="el" href="ParameterStructs_8h_source.html">ParameterStructs.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  350</span>                                                     {</div>
+<div class="line"><span class="lineno">  351</span><span class="comment">// **************************************************</span></div>
+<div class="line"><span class="lineno">  352</span>  std::string name = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><span class="lineno">  353</span>  <span class="keywordflow">switch</span>(i) {</div>
+<div class="line"><span class="lineno">  354</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa085cb29127b1cf7b1ddd429ff4440b17">SystType::kNorm</a>:</div>
+<div class="line"><span class="lineno">  355</span>      name = <span class="stringliteral">&quot;Norm&quot;</span>;</div>
+<div class="line"><span class="lineno">  356</span>      <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  357</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa29d6ccf6cf507f6e66c72b1d3c2aed00">SystType::kSpline</a>:</div>
+<div class="line"><span class="lineno">  358</span>      name = <span class="stringliteral">&quot;Spline&quot;</span>;</div>
+<div class="line"><span class="lineno">  359</span>      <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  360</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fad9b1ac76e80f59684cfb7dc996fc870d">SystType::kFunc</a>:</div>
+<div class="line"><span class="lineno">  361</span>      name = <span class="stringliteral">&quot;Functional&quot;</span>;</div>
+<div class="line"><span class="lineno">  362</span>      <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  363</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa50ac44a09cc05fd1285a88637bdcf789">SystType::kOsc</a>:</div>
+<div class="line"><span class="lineno">  364</span>      name = <span class="stringliteral">&quot;Oscillation&quot;</span>;</div>
+<div class="line"><span class="lineno">  365</span>      <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  366</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa32e7da18117f9defb24042a71776e5cb">SystType::kSystTypes</a>:</div>
+<div class="line"><span class="lineno">  367</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;kSystTypes is not a valid SystType!&quot;</span>);</div>
+<div class="line"><span class="lineno">  368</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><span class="lineno">  369</span>    <span class="keywordflow">default</span>:</div>
+<div class="line"><span class="lineno">  370</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;UNKNOWN SYST TYPE SPECIFIED!&quot;</span>);</div>
+<div class="line"><span class="lineno">  371</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;You gave {}&quot;</span>, <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(i));</div>
+<div class="line"><span class="lineno">  372</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
+<div class="line"><span class="lineno">  373</span>  }</div>
+<div class="line"><span class="lineno">  374</span>  <span class="keywordflow">return</span> name;</div>
+<div class="line"><span class="lineno">  375</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>

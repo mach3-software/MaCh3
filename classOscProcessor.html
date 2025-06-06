@@ -30,7 +30,7 @@ MathJax.Hub.Config({
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="mach3logo_small.png"/></td>
   <td id="projectalign">
-   <div id="projectname">MaCh3<span id="projectnumber">&#160;2.1.0</span>
+   <div id="projectname">MaCh3<span id="projectnumber">&#160;2.2.0</span>
    </div>
    <div id="projectbrief">Reference Guide</div>
   </td>
@@ -195,8 +195,6 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:af92fab1bce506912ae00d1aa5d9b7233 inherit pub_methods_classMCMCProcessor"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad376c15dcf60a4284dfa23368e097450 inherit pub_methods_classMCMCProcessor"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#ad376c15dcf60a4284dfa23368e097450">GetNFD</a> ()</td></tr>
 <tr class="separator:ad376c15dcf60a4284dfa23368e097450 inherit pub_methods_classMCMCProcessor"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6aaa70eeca8d40c94f9836b3108cf579 inherit pub_methods_classMCMCProcessor"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#a6aaa70eeca8d40c94f9836b3108cf579">GetOSC</a> ()</td></tr>
-<tr class="separator:a6aaa70eeca8d40c94f9836b3108cf579 inherit pub_methods_classMCMCProcessor"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a43afff108cd7e8942194cb9bd14f41ae inherit pub_methods_classMCMCProcessor"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#a43afff108cd7e8942194cb9bd14f41ae">GetGroup</a> (const std::string &amp;name) const</td></tr>
 <tr class="memdesc:a43afff108cd7e8942194cb9bd14f41ae inherit pub_methods_classMCMCProcessor"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of params from a given group, for example flux.  <br /></td></tr>
 <tr class="separator:a43afff108cd7e8942194cb9bd14f41ae inherit pub_methods_classMCMCProcessor"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -218,8 +216,6 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ad26a853f53f50f5625b1c8043534dbe0 inherit pub_methods_classMCMCProcessor"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab831ff0257b1f3137e1711df115a8b8d inherit pub_methods_classMCMCProcessor"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#ab831ff0257b1f3137e1711df115a8b8d">GetFDCov</a> () const</td></tr>
 <tr class="separator:ab831ff0257b1f3137e1711df115a8b8d inherit pub_methods_classMCMCProcessor"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae1d255f2216d4f4e9bc64c300d396d1e inherit pub_methods_classMCMCProcessor"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#ae1d255f2216d4f4e9bc64c300d396d1e">GetOscCov</a> () const</td></tr>
-<tr class="separator:ae1d255f2216d4f4e9bc64c300d396d1e inherit pub_methods_classMCMCProcessor"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5fc015740496b821648f0e5ca8cffe80 inherit pub_methods_classMCMCProcessor"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#a5fc015740496b821648f0e5ca8cffe80">GetPostfit</a> (TVectorD *&amp;Central, TVectorD *&amp;<a class="el" href="classMCMCProcessor.html#a5174aaa900edf16ddc6e841ea4adae83">Errors</a>, TVectorD *&amp;Central_Gauss, TVectorD *&amp;<a class="el" href="classMCMCProcessor.html#aa78b7ed1bb9966f84f4eaf8cedf5e688">Errors_Gauss</a>, TVectorD *&amp;Peaks)</td></tr>
 <tr class="memdesc:a5fc015740496b821648f0e5ca8cffe80 inherit pub_methods_classMCMCProcessor"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the post-fit results (arithmetic and Gaussian)  <br /></td></tr>
 <tr class="separator:a5fc015740496b821648f0e5ca8cffe80 inherit pub_methods_classMCMCProcessor"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -290,9 +286,9 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:aec813ac3865ff7f5aa9b22c836cf4788"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOscProcessor.html#aec813ac3865ff7f5aa9b22c836cf4788">ReadOSCFile</a> () override</td></tr>
-<tr class="memdesc:aec813ac3865ff7f5aa9b22c836cf4788"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the Osc cov file and get the input central values and errors Here we allow Jarlskog Shenanigans.  <br /></td></tr>
-<tr class="separator:aec813ac3865ff7f5aa9b22c836cf4788"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad698b59349f9bbca8f9c691374758d4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOscProcessor.html#aad698b59349f9bbca8f9c691374758d4">ReadXSecFile</a> () override</td></tr>
+<tr class="memdesc:aad698b59349f9bbca8f9c691374758d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the Osc cov file and get the input central values and errors Here we allow Jarlskog Shenanigans.  <br /></td></tr>
+<tr class="separator:aad698b59349f9bbca8f9c691374758d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_methods_classMCMCProcessor"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classMCMCProcessor')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classMCMCProcessor.html">MCMCProcessor</a></td></tr>
 <tr class="memitem:a7627041b5ea3e1bbe038046ebb71a5dc inherit pro_methods_classMCMCProcessor"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; TH1D &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#a7627041b5ea3e1bbe038046ebb71a5dc">MakePrefit</a> ()</td></tr>
 <tr class="memdesc:a7627041b5ea3e1bbe038046ebb71a5dc inherit pro_methods_classMCMCProcessor"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prepare prefit histogram for parameter overlay plot.  <br /></td></tr>
@@ -309,7 +305,7 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:aea15e730ff77556bb93bc4cff675744c inherit pro_methods_classMCMCProcessor"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#aea15e730ff77556bb93bc4cff675744c">FindInputFiles</a> ()</td></tr>
 <tr class="memdesc:aea15e730ff77556bb93bc4cff675744c inherit pro_methods_classMCMCProcessor"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the output MCMC file and find what inputs were used.  <br /></td></tr>
 <tr class="separator:aea15e730ff77556bb93bc4cff675744c inherit pro_methods_classMCMCProcessor"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2b0b4afbf45adb93357abe96d108170b inherit pro_methods_classMCMCProcessor"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#a2b0b4afbf45adb93357abe96d108170b">ReadXSecFile</a> ()</td></tr>
+<tr class="memitem:a2b0b4afbf45adb93357abe96d108170b inherit pro_methods_classMCMCProcessor"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#a2b0b4afbf45adb93357abe96d108170b">ReadXSecFile</a> ()</td></tr>
 <tr class="memdesc:a2b0b4afbf45adb93357abe96d108170b inherit pro_methods_classMCMCProcessor"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the xsec file and get the input central values and errors.  <br /></td></tr>
 <tr class="separator:a2b0b4afbf45adb93357abe96d108170b inherit pro_methods_classMCMCProcessor"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a66dd0f1f88dbeb2b6a1976d42f77e136 inherit pro_methods_classMCMCProcessor"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#a66dd0f1f88dbeb2b6a1976d42f77e136">ReadNDFile</a> ()</td></tr>
@@ -318,9 +314,6 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:ae5ea421c8dd77ceac2e748008633b573 inherit pro_methods_classMCMCProcessor"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#ae5ea421c8dd77ceac2e748008633b573">ReadFDFile</a> ()</td></tr>
 <tr class="memdesc:ae5ea421c8dd77ceac2e748008633b573 inherit pro_methods_classMCMCProcessor"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the FD cov file and get the input central values and errors.  <br /></td></tr>
 <tr class="separator:ae5ea421c8dd77ceac2e748008633b573 inherit pro_methods_classMCMCProcessor"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3733b3b753c73f79e6846bc92c4da11b inherit pro_methods_classMCMCProcessor"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#a3733b3b753c73f79e6846bc92c4da11b">ReadOSCFile</a> ()</td></tr>
-<tr class="memdesc:a3733b3b753c73f79e6846bc92c4da11b inherit pro_methods_classMCMCProcessor"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the Osc cov file and get the input central values and errors.  <br /></td></tr>
-<tr class="separator:a3733b3b753c73f79e6846bc92c4da11b inherit pro_methods_classMCMCProcessor"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9a29c1cb64589ac136f7f927cafa18aa inherit pro_methods_classMCMCProcessor"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#a9a29c1cb64589ac136f7f927cafa18aa">RemoveParameters</a> ()</td></tr>
 <tr class="memdesc:a9a29c1cb64589ac136f7f927cafa18aa inherit pro_methods_classMCMCProcessor"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove parameter specified in config.  <br /></td></tr>
 <tr class="separator:a9a29c1cb64589ac136f7f927cafa18aa inherit pro_methods_classMCMCProcessor"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -384,6 +377,9 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:a740409b9638f11ee51884a8961a3c9c5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOscProcessor.html#a740409b9638f11ee51884a8961a3c9c5">PlotJarlskog</a></td></tr>
 <tr class="memdesc:a740409b9638f11ee51884a8961a3c9c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Will plot Jarlskog Invariant using information in the chain.  <br /></td></tr>
 <tr class="separator:a740409b9638f11ee51884a8961a3c9c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adbc5f17b83f2854bad4a51abc47c8cf9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOscProcessor.html#adbc5f17b83f2854bad4a51abc47c8cf9">OscEnabled</a></td></tr>
+<tr class="memdesc:adbc5f17b83f2854bad4a51abc47c8cf9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Will plot Jarlskog Invariant using information in the chain.  <br /></td></tr>
+<tr class="separator:adbc5f17b83f2854bad4a51abc47c8cf9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_attribs_classMCMCProcessor"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classMCMCProcessor')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classMCMCProcessor.html">MCMCProcessor</a></td></tr>
 <tr class="memitem:a6d212d77a818304a8674a7b9b18d43b8 inherit pro_attribs_classMCMCProcessor"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#a6d212d77a818304a8674a7b9b18d43b8">MCMCFile</a></td></tr>
 <tr class="memdesc:a6d212d77a818304a8674a7b9b18d43b8 inherit pro_attribs_classMCMCProcessor"><td class="mdescLeft">&#160;</td><td class="mdescRight">Name of MCMC file.  <br /></td></tr>
@@ -642,7 +638,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">    8</span> </div>
 <div class="line"><span class="lineno">   10</span> </div>
 <div class="line"><span class="lineno">   11</span>}</div>
-<div class="ttc" id="aclassMCMCProcessor_html"><div class="ttname"><a href="classMCMCProcessor.html">MCMCProcessor</a></div><div class="ttdoc">Class responsible for processing MCMC chains, performing diagnostics, generating plots,...</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00065">MCMCProcessor.h:65</a></div></div>
+<div class="ttc" id="aclassMCMCProcessor_html"><div class="ttname"><a href="classMCMCProcessor.html">MCMCProcessor</a></div><div class="ttdoc">Class responsible for processing MCMC chains, performing diagnostics, generating plots,...</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00064">MCMCProcessor.h:64</a></div></div>
 <div class="ttc" id="aclassOscProcessor_html_a740409b9638f11ee51884a8961a3c9c5"><div class="ttname"><a href="classOscProcessor.html#a740409b9638f11ee51884a8961a3c9c5">OscProcessor::PlotJarlskog</a></div><div class="ttdeci">bool PlotJarlskog</div><div class="ttdoc">Will plot Jarlskog Invariant using information in the chain.</div><div class="ttdef"><b>Definition:</b> <a href="OscProcessor_8h_source.html#l00024">OscProcessor.h:24</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -681,8 +677,8 @@ Kamil Skwarczynski </dd></dl>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="aec813ac3865ff7f5aa9b22c836cf4788" name="aec813ac3865ff7f5aa9b22c836cf4788"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aec813ac3865ff7f5aa9b22c836cf4788">&#9670;&#160;</a></span>ReadOSCFile()</h2>
+<a id="aad698b59349f9bbca8f9c691374758d4" name="aad698b59349f9bbca8f9c691374758d4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad698b59349f9bbca8f9c691374758d4">&#9670;&#160;</a></span>ReadXSecFile()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -691,7 +687,7 @@ Kamil Skwarczynski </dd></dl>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void OscProcessor::ReadOSCFile </td>
+          <td class="memname">void OscProcessor::ReadXSecFile </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -707,46 +703,87 @@ Kamil Skwarczynski </dd></dl>
 <p>Read the Osc cov file and get the input central values and errors Here we allow Jarlskog Shenanigans. </p>
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000018">Todo:</a></b></dt><dd>we should actually calculate central value and prior error but leave it for now... </dd></dl>
 
-<p>Reimplemented from <a class="el" href="classMCMCProcessor.html#a3733b3b753c73f79e6846bc92c4da11b">MCMCProcessor</a>.</p>
+<p>Reimplemented from <a class="el" href="classMCMCProcessor.html#a2b0b4afbf45adb93357abe96d108170b">MCMCProcessor</a>.</p>
 
 <p class="definition">Definition at line <a class="el" href="OscProcessor_8cpp_source.html#l00022">22</a> of file <a class="el" href="OscProcessor_8cpp_source.html">OscProcessor.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   22</span>                               {</div>
+<div class="fragment"><div class="line"><span class="lineno">   22</span>                                {</div>
 <div class="line"><span class="lineno">   23</span><span class="comment">// ***************</span></div>
 <div class="line"><span class="lineno">   24</span>  <span class="comment">// Call base class function</span></div>
-<div class="line"><span class="lineno">   25</span>  <a class="code hl_function" href="classMCMCProcessor.html#a3733b3b753c73f79e6846bc92c4da11b">MCMCProcessor::ReadOSCFile</a>();</div>
+<div class="line"><span class="lineno">   25</span>  <a class="code hl_function" href="classMCMCProcessor.html#a2b0b4afbf45adb93357abe96d108170b">MCMCProcessor::ReadXSecFile</a>();</div>
 <div class="line"><span class="lineno">   26</span> </div>
-<div class="line"><span class="lineno">   27</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classOscProcessor.html#a740409b9638f11ee51884a8961a3c9c5">PlotJarlskog</a>)</div>
-<div class="line"><span class="lineno">   28</span>  {</div>
-<div class="line"><span class="lineno">   29</span>    <a class="code hl_variable" href="classMCMCProcessor.html#a6be3bbebd4a79fe9814a3da09b3bb820">Chain</a>-&gt;SetAlias(<span class="stringliteral">&quot;J_cp&quot;</span>, <span class="stringliteral">&quot;TMath::Sqrt(sin2th_13)*TMath::Sqrt(1.-sin2th_13)*TMath::Sqrt(1.-sin2th_13)*TMath::Sqrt(sin2th_12)*TMath::Sqrt(1.-sin2th_12)*TMath::Sqrt(sin2th_23)*TMath::Sqrt(1.-sin2th_23)*TMath::Sin(delta_cp)&quot;</span>);</div>
-<div class="line"><span class="lineno">   30</span>    <a class="code hl_variable" href="classMCMCProcessor.html#ad043b6b2c885f47ab9967831bc8d0f5a">BranchNames</a>.push_back(<span class="stringliteral">&quot;J_cp&quot;</span>);</div>
-<div class="line"><span class="lineno">   31</span>    <a class="code hl_variable" href="classMCMCProcessor.html#aaa903949bde8f1a69800c71fe1eb538e">ParamType</a>.push_back(<a class="code hl_enumvalue" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba03865cac80b3eb8f5ef46421eb8dab06">kOSCPar</a>);</div>
-<div class="line"><span class="lineno">   32</span>    <a class="code hl_variable" href="classMCMCProcessor.html#a4200e7cbe1c8f811d3640ebfd648ca85">nParam</a>[<a class="code hl_enumvalue" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba03865cac80b3eb8f5ef46421eb8dab06">kOSCPar</a>]++;</div>
-<div class="line"><span class="lineno">   33</span>    <a class="code hl_variable" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>++;</div>
+<div class="line"><span class="lineno">   27</span>  <span class="comment">// KS: Check if OscParams were enabled, in future we will also get</span></div>
+<div class="line"><span class="lineno">   28</span>  <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code hl_variable" href="classMCMCProcessor.html#ab72dd21faa732ec38e550c37635ee66d">ParameterGroup</a>.size(); i++) {</div>
+<div class="line"><span class="lineno">   29</span>    <span class="keywordflow">if</span>(<a class="code hl_variable" href="classMCMCProcessor.html#ab72dd21faa732ec38e550c37635ee66d">ParameterGroup</a>[i] == <span class="stringliteral">&quot;Osc&quot;</span>){</div>
+<div class="line"><span class="lineno">   30</span>      <a class="code hl_variable" href="classOscProcessor.html#adbc5f17b83f2854bad4a51abc47c8cf9">OscEnabled</a> = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">   31</span>      <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">   32</span>    }</div>
+<div class="line"><span class="lineno">   33</span>  }</div>
 <div class="line"><span class="lineno">   34</span> </div>
-<div class="line"><span class="lineno">   36</span>    <a class="code hl_variable" href="classMCMCProcessor.html#a4c4c6aa4827a2fe54ce37defbb3d0475">ParamNom</a>[<a class="code hl_enumvalue" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba03865cac80b3eb8f5ef46421eb8dab06">kOSCPar</a>].push_back( 0. );</div>
-<div class="line"><span class="lineno">   37</span>    <a class="code hl_variable" href="classMCMCProcessor.html#a3a6614826ae320e462211e38e96d9d02">ParamCentral</a>[<a class="code hl_enumvalue" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba03865cac80b3eb8f5ef46421eb8dab06">kOSCPar</a>].push_back( 0. );</div>
-<div class="line"><span class="lineno">   38</span>    <a class="code hl_variable" href="classMCMCProcessor.html#a3a97e3cb4be3ceb9eb721eac51d82d60">ParamErrors</a>[<a class="code hl_enumvalue" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba03865cac80b3eb8f5ef46421eb8dab06">kOSCPar</a>].push_back( 1. );</div>
-<div class="line"><span class="lineno">   39</span>    <span class="comment">// Push back the name</span></div>
-<div class="line"><span class="lineno">   40</span>    <a class="code hl_variable" href="classMCMCProcessor.html#adecc55689f7d37b9412f8886fe3480dc">ParamNames</a>[<a class="code hl_enumvalue" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba03865cac80b3eb8f5ef46421eb8dab06">kOSCPar</a>].push_back(<span class="stringliteral">&quot;J_cp&quot;</span>);</div>
-<div class="line"><span class="lineno">   41</span>    <a class="code hl_variable" href="classMCMCProcessor.html#a4be1eedb743e4ea410009a4fa45720f7">ParamFlat</a>[<a class="code hl_enumvalue" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba03865cac80b3eb8f5ef46421eb8dab06">kOSCPar</a>].push_back( <span class="keyword">false</span> );</div>
-<div class="line"><span class="lineno">   42</span>  }</div>
-<div class="line"><span class="lineno">   43</span>}</div>
-<div class="ttc" id="aMCMCProcessor_8h_html_acd2848273413543fe14936252942c20ba03865cac80b3eb8f5ef46421eb8dab06"><div class="ttname"><a href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba03865cac80b3eb8f5ef46421eb8dab06">kOSCPar</a></div><div class="ttdeci">@ kOSCPar</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00055">MCMCProcessor.h:55</a></div></div>
-<div class="ttc" id="aclassMCMCProcessor_html_a3733b3b753c73f79e6846bc92c4da11b"><div class="ttname"><a href="classMCMCProcessor.html#a3733b3b753c73f79e6846bc92c4da11b">MCMCProcessor::ReadOSCFile</a></div><div class="ttdeci">virtual void ReadOSCFile()</div><div class="ttdoc">Read the Osc cov file and get the input central values and errors.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l02388">MCMCProcessor.cpp:2388</a></div></div>
-<div class="ttc" id="aclassMCMCProcessor_html_a3a6614826ae320e462211e38e96d9d02"><div class="ttname"><a href="classMCMCProcessor.html#a3a6614826ae320e462211e38e96d9d02">MCMCProcessor::ParamCentral</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; double &gt; &gt; ParamCentral</div><div class="ttdoc">Parameters central values which we are going to analyse.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00402">MCMCProcessor.h:402</a></div></div>
-<div class="ttc" id="aclassMCMCProcessor_html_a3a97e3cb4be3ceb9eb721eac51d82d60"><div class="ttname"><a href="classMCMCProcessor.html#a3a97e3cb4be3ceb9eb721eac51d82d60">MCMCProcessor::ParamErrors</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; double &gt; &gt; ParamErrors</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00404">MCMCProcessor.h:404</a></div></div>
-<div class="ttc" id="aclassMCMCProcessor_html_a4200e7cbe1c8f811d3640ebfd648ca85"><div class="ttname"><a href="classMCMCProcessor.html#a4200e7cbe1c8f811d3640ebfd648ca85">MCMCProcessor::nParam</a></div><div class="ttdeci">std::vector&lt; int &gt; nParam</div><div class="ttdoc">Number of parameters per type.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00407">MCMCProcessor.h:407</a></div></div>
-<div class="ttc" id="aclassMCMCProcessor_html_a4be1eedb743e4ea410009a4fa45720f7"><div class="ttname"><a href="classMCMCProcessor.html#a4be1eedb743e4ea410009a4fa45720f7">MCMCProcessor::ParamFlat</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; bool &gt; &gt; ParamFlat</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00405">MCMCProcessor.h:405</a></div></div>
-<div class="ttc" id="aclassMCMCProcessor_html_a4c4c6aa4827a2fe54ce37defbb3d0475"><div class="ttname"><a href="classMCMCProcessor.html#a4c4c6aa4827a2fe54ce37defbb3d0475">MCMCProcessor::ParamNom</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; double &gt; &gt; ParamNom</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00403">MCMCProcessor.h:403</a></div></div>
-<div class="ttc" id="aclassMCMCProcessor_html_a6be3bbebd4a79fe9814a3da09b3bb820"><div class="ttname"><a href="classMCMCProcessor.html#a6be3bbebd4a79fe9814a3da09b3bb820">MCMCProcessor::Chain</a></div><div class="ttdeci">TChain * Chain</div><div class="ttdoc">Main chain storing all steps etc.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00370">MCMCProcessor.h:370</a></div></div>
-<div class="ttc" id="aclassMCMCProcessor_html_aa30545fedb0af2ad9619d6accf42a10d"><div class="ttname"><a href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">MCMCProcessor::nDraw</a></div><div class="ttdeci">int nDraw</div><div class="ttdoc">Number of all parameters used in the analysis.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00390">MCMCProcessor.h:390</a></div></div>
-<div class="ttc" id="aclassMCMCProcessor_html_aaa903949bde8f1a69800c71fe1eb538e"><div class="ttname"><a href="classMCMCProcessor.html#aaa903949bde8f1a69800c71fe1eb538e">MCMCProcessor::ParamType</a></div><div class="ttdeci">std::vector&lt; ParameterEnum &gt; ParamType</div><div class="ttdoc">Make an enum for which class this parameter belongs to so we don't have to keep string comparing.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00409">MCMCProcessor.h:409</a></div></div>
-<div class="ttc" id="aclassMCMCProcessor_html_ad043b6b2c885f47ab9967831bc8d0f5a"><div class="ttname"><a href="classMCMCProcessor.html#ad043b6b2c885f47ab9967831bc8d0f5a">MCMCProcessor::BranchNames</a></div><div class="ttdeci">std::vector&lt; TString &gt; BranchNames</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00393">MCMCProcessor.h:393</a></div></div>
-<div class="ttc" id="aclassMCMCProcessor_html_adecc55689f7d37b9412f8886fe3480dc"><div class="ttname"><a href="classMCMCProcessor.html#adecc55689f7d37b9412f8886fe3480dc">MCMCProcessor::ParamNames</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; TString &gt; &gt; ParamNames</div><div class="ttdoc">Name of parameters which we are going to analyse.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00400">MCMCProcessor.h:400</a></div></div>
+<div class="line"><span class="lineno">   35</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classOscProcessor.html#a740409b9638f11ee51884a8961a3c9c5">PlotJarlskog</a> &amp;&amp; <a class="code hl_variable" href="classOscProcessor.html#adbc5f17b83f2854bad4a51abc47c8cf9">OscEnabled</a>)</div>
+<div class="line"><span class="lineno">   36</span>  {</div>
+<div class="line"><span class="lineno">   37</span>    <a class="code hl_variable" href="classMCMCProcessor.html#a6be3bbebd4a79fe9814a3da09b3bb820">Chain</a>-&gt;SetAlias(<span class="stringliteral">&quot;J_cp&quot;</span>, <span class="stringliteral">&quot;TMath::Sqrt(sin2th_13)*TMath::Sqrt(1.-sin2th_13)*TMath::Sqrt(1.-sin2th_13)*TMath::Sqrt(sin2th_12)*TMath::Sqrt(1.-sin2th_12)*TMath::Sqrt(sin2th_23)*TMath::Sqrt(1.-sin2th_23)*TMath::Sin(delta_cp)&quot;</span>);</div>
+<div class="line"><span class="lineno">   38</span>    <a class="code hl_variable" href="classMCMCProcessor.html#ad043b6b2c885f47ab9967831bc8d0f5a">BranchNames</a>.push_back(<span class="stringliteral">&quot;J_cp&quot;</span>);</div>
+<div class="line"><span class="lineno">   39</span>    <a class="code hl_variable" href="classMCMCProcessor.html#aaa903949bde8f1a69800c71fe1eb538e">ParamType</a>.push_back(<a class="code hl_enumvalue" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba7386f5611ea4d01b85b9bb92a5ca335f">kXSecPar</a>);</div>
+<div class="line"><span class="lineno">   40</span>    <a class="code hl_variable" href="classMCMCProcessor.html#a4200e7cbe1c8f811d3640ebfd648ca85">nParam</a>[<a class="code hl_enumvalue" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba7386f5611ea4d01b85b9bb92a5ca335f">kXSecPar</a>]++;</div>
+<div class="line"><span class="lineno">   41</span>    <a class="code hl_variable" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>++;</div>
+<div class="line"><span class="lineno">   42</span> </div>
+<div class="line"><span class="lineno">   44</span>    <a class="code hl_variable" href="classMCMCProcessor.html#a4c4c6aa4827a2fe54ce37defbb3d0475">ParamNom</a>[<a class="code hl_enumvalue" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba7386f5611ea4d01b85b9bb92a5ca335f">kXSecPar</a>].push_back( 0. );</div>
+<div class="line"><span class="lineno">   45</span>    <a class="code hl_variable" href="classMCMCProcessor.html#a3a6614826ae320e462211e38e96d9d02">ParamCentral</a>[<a class="code hl_enumvalue" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba7386f5611ea4d01b85b9bb92a5ca335f">kXSecPar</a>].push_back( 0. );</div>
+<div class="line"><span class="lineno">   46</span>    <a class="code hl_variable" href="classMCMCProcessor.html#a3a97e3cb4be3ceb9eb721eac51d82d60">ParamErrors</a>[<a class="code hl_enumvalue" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba7386f5611ea4d01b85b9bb92a5ca335f">kXSecPar</a>].push_back( 1. );</div>
+<div class="line"><span class="lineno">   47</span>    <span class="comment">// Push back the name</span></div>
+<div class="line"><span class="lineno">   48</span>    <a class="code hl_variable" href="classMCMCProcessor.html#adecc55689f7d37b9412f8886fe3480dc">ParamNames</a>[<a class="code hl_enumvalue" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba7386f5611ea4d01b85b9bb92a5ca335f">kXSecPar</a>].push_back(<span class="stringliteral">&quot;J_cp&quot;</span>);</div>
+<div class="line"><span class="lineno">   49</span>    <a class="code hl_variable" href="classMCMCProcessor.html#a4be1eedb743e4ea410009a4fa45720f7">ParamFlat</a>[<a class="code hl_enumvalue" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba7386f5611ea4d01b85b9bb92a5ca335f">kXSecPar</a>].push_back( <span class="keyword">false</span> );</div>
+<div class="line"><span class="lineno">   50</span>  } <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code hl_variable" href="classOscProcessor.html#a740409b9638f11ee51884a8961a3c9c5">PlotJarlskog</a> &amp;&amp; !<a class="code hl_variable" href="classOscProcessor.html#adbc5f17b83f2854bad4a51abc47c8cf9">OscEnabled</a>) {</div>
+<div class="line"><span class="lineno">   51</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Trying to enable Jarlskog without oscillations&quot;</span>);</div>
+<div class="line"><span class="lineno">   52</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__,__LINE__);</div>
+<div class="line"><span class="lineno">   53</span>  }</div>
+<div class="line"><span class="lineno">   54</span>}</div>
+<div class="ttc" id="aMCMCProcessor_8h_html_acd2848273413543fe14936252942c20ba7386f5611ea4d01b85b9bb92a5ca335f"><div class="ttname"><a href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba7386f5611ea4d01b85b9bb92a5ca335f">kXSecPar</a></div><div class="ttdeci">@ kXSecPar</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00052">MCMCProcessor.h:52</a></div></div>
+<div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00025">MaCh3Logger.h:25</a></div></div>
+<div class="ttc" id="aclassMCMCProcessor_html_a2b0b4afbf45adb93357abe96d108170b"><div class="ttname"><a href="classMCMCProcessor.html#a2b0b4afbf45adb93357abe96d108170b">MCMCProcessor::ReadXSecFile</a></div><div class="ttdeci">virtual void ReadXSecFile()</div><div class="ttdoc">Read the xsec file and get the input central values and errors.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l02246">MCMCProcessor.cpp:2246</a></div></div>
+<div class="ttc" id="aclassMCMCProcessor_html_a3a6614826ae320e462211e38e96d9d02"><div class="ttname"><a href="classMCMCProcessor.html#a3a6614826ae320e462211e38e96d9d02">MCMCProcessor::ParamCentral</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; double &gt; &gt; ParamCentral</div><div class="ttdoc">Parameters central values which we are going to analyse.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00397">MCMCProcessor.h:397</a></div></div>
+<div class="ttc" id="aclassMCMCProcessor_html_a3a97e3cb4be3ceb9eb721eac51d82d60"><div class="ttname"><a href="classMCMCProcessor.html#a3a97e3cb4be3ceb9eb721eac51d82d60">MCMCProcessor::ParamErrors</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; double &gt; &gt; ParamErrors</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00399">MCMCProcessor.h:399</a></div></div>
+<div class="ttc" id="aclassMCMCProcessor_html_a4200e7cbe1c8f811d3640ebfd648ca85"><div class="ttname"><a href="classMCMCProcessor.html#a4200e7cbe1c8f811d3640ebfd648ca85">MCMCProcessor::nParam</a></div><div class="ttdeci">std::vector&lt; int &gt; nParam</div><div class="ttdoc">Number of parameters per type.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00402">MCMCProcessor.h:402</a></div></div>
+<div class="ttc" id="aclassMCMCProcessor_html_a4be1eedb743e4ea410009a4fa45720f7"><div class="ttname"><a href="classMCMCProcessor.html#a4be1eedb743e4ea410009a4fa45720f7">MCMCProcessor::ParamFlat</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; bool &gt; &gt; ParamFlat</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00400">MCMCProcessor.h:400</a></div></div>
+<div class="ttc" id="aclassMCMCProcessor_html_a4c4c6aa4827a2fe54ce37defbb3d0475"><div class="ttname"><a href="classMCMCProcessor.html#a4c4c6aa4827a2fe54ce37defbb3d0475">MCMCProcessor::ParamNom</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; double &gt; &gt; ParamNom</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00398">MCMCProcessor.h:398</a></div></div>
+<div class="ttc" id="aclassMCMCProcessor_html_a6be3bbebd4a79fe9814a3da09b3bb820"><div class="ttname"><a href="classMCMCProcessor.html#a6be3bbebd4a79fe9814a3da09b3bb820">MCMCProcessor::Chain</a></div><div class="ttdeci">TChain * Chain</div><div class="ttdoc">Main chain storing all steps etc.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00365">MCMCProcessor.h:365</a></div></div>
+<div class="ttc" id="aclassMCMCProcessor_html_aa30545fedb0af2ad9619d6accf42a10d"><div class="ttname"><a href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">MCMCProcessor::nDraw</a></div><div class="ttdeci">int nDraw</div><div class="ttdoc">Number of all parameters used in the analysis.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00385">MCMCProcessor.h:385</a></div></div>
+<div class="ttc" id="aclassMCMCProcessor_html_aaa903949bde8f1a69800c71fe1eb538e"><div class="ttname"><a href="classMCMCProcessor.html#aaa903949bde8f1a69800c71fe1eb538e">MCMCProcessor::ParamType</a></div><div class="ttdeci">std::vector&lt; ParameterEnum &gt; ParamType</div><div class="ttdoc">Make an enum for which class this parameter belongs to so we don't have to keep string comparing.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00404">MCMCProcessor.h:404</a></div></div>
+<div class="ttc" id="aclassMCMCProcessor_html_ab72dd21faa732ec38e550c37635ee66d"><div class="ttname"><a href="classMCMCProcessor.html#ab72dd21faa732ec38e550c37635ee66d">MCMCProcessor::ParameterGroup</a></div><div class="ttdeci">std::vector&lt; std::string &gt; ParameterGroup</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00409">MCMCProcessor.h:409</a></div></div>
+<div class="ttc" id="aclassMCMCProcessor_html_ad043b6b2c885f47ab9967831bc8d0f5a"><div class="ttname"><a href="classMCMCProcessor.html#ad043b6b2c885f47ab9967831bc8d0f5a">MCMCProcessor::BranchNames</a></div><div class="ttdeci">std::vector&lt; TString &gt; BranchNames</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00388">MCMCProcessor.h:388</a></div></div>
+<div class="ttc" id="aclassMCMCProcessor_html_adecc55689f7d37b9412f8886fe3480dc"><div class="ttname"><a href="classMCMCProcessor.html#adecc55689f7d37b9412f8886fe3480dc">MCMCProcessor::ParamNames</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; TString &gt; &gt; ParamNames</div><div class="ttdoc">Name of parameters which we are going to analyse.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00395">MCMCProcessor.h:395</a></div></div>
+<div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00013">MaCh3Exception.h:13</a></div></div>
+<div class="ttc" id="aclassOscProcessor_html_adbc5f17b83f2854bad4a51abc47c8cf9"><div class="ttname"><a href="classOscProcessor.html#adbc5f17b83f2854bad4a51abc47c8cf9">OscProcessor::OscEnabled</a></div><div class="ttdeci">bool OscEnabled</div><div class="ttdoc">Will plot Jarlskog Invariant using information in the chain.</div><div class="ttdef"><b>Definition:</b> <a href="OscProcessor_8h_source.html#l00027">OscProcessor.h:27</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
+<a id="adbc5f17b83f2854bad4a51abc47c8cf9" name="adbc5f17b83f2854bad4a51abc47c8cf9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adbc5f17b83f2854bad4a51abc47c8cf9">&#9670;&#160;</a></span>OscEnabled</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool OscProcessor::OscEnabled</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Will plot Jarlskog Invariant using information in the chain. </p>
+
+<p class="definition">Definition at line <a class="el" href="OscProcessor_8h_source.html#l00027">27</a> of file <a class="el" href="OscProcessor_8h_source.html">OscProcessor.h</a>.</p>
+
+</div>
+</div>
 <a id="a740409b9638f11ee51884a8961a3c9c5" name="a740409b9638f11ee51884a8961a3c9c5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a740409b9638f11ee51884a8961a3c9c5">&#9670;&#160;</a></span>PlotJarlskog</h2>
 

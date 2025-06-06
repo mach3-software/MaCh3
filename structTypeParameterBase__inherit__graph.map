@@ -1,6 +1,7 @@
 <map id="TypeParameterBase" name="TypeParameterBase">
-<area shape="rect" id="node1" title="Base class storing info for parameters types, helping unify codebase." alt="" coords="173,5,324,31"/>
+<area shape="rect" id="node1" title="Base class storing info for parameters types, helping unify codebase." alt="" coords="256,5,407,31"/>
 <area shape="rect" id="node2" href="$structFunctionalParameter.html" title="HH &#45; Functional parameters Carrier for whether you want to apply a systematic to an event or not." alt="" coords="5,79,161,104"/>
 <area shape="rect" id="node3" href="$structNormParameter.html" title="ETA &#45; Normalisations for cross&#45;section parameters Carrier for whether you want to apply a systematic ..." alt="" coords="186,79,311,104"/>
-<area shape="rect" id="node4" href="$structSplineParameter.html" title="KS: Struct holding info about Spline Systematics." alt="" coords="336,79,465,104"/>
+<area shape="rect" id="node4" href="$structOscillationParameter.html" title="KS: Struct holding info about oscillation Systematics." alt="" coords="336,79,495,104"/>
+<area shape="rect" id="node5" href="$structSplineParameter.html" title="KS: Struct holding info about Spline Systematics." alt="" coords="519,79,648,104"/>
 </map>

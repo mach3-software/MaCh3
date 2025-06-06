@@ -26,8 +26,9 @@ var searchData=
   ['dobymodeplots_23',['DoByModePlots',['../classSampleSummary.html#a795ac96bf6958c8a2f38c9de23c3c081',1,'SampleSummary']]],
   ['dodiagmcmc_24',['doDiagMCMC',['../classMCMCProcessor.html#adf449e50cf358f737fe4a2b65d9668e9',1,'MCMCProcessor']]],
   ['doshapeonly_25',['doShapeOnly',['../classSampleSummary.html#aebd01b201cf04608b251cd3e272878b7',1,'SampleSummary']]],
-  ['drawrange_26',['DrawRange',['../classMCMCProcessor.html#a4abe633b264acd9b0459c7b8ccd8b9df',1,'MCMCProcessor']]],
-  ['draws_27',['Draws',['../RHat__HighMem_8cpp.html#a9adc829d645affbb93eff1775ab7c0c6',1,'RHat_HighMem.cpp']]],
-  ['drawsfolded_28',['DrawsFolded',['../RHat__HighMem_8cpp.html#a7e7fe290fda4362be54b8cf5d56fea51',1,'RHat_HighMem.cpp']]],
-  ['dummyfile_29',['DUMMYFILE',['../PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7',1,'PlotMCMCDiag.cpp']]]
+  ['dospecialstepproposal_26',['doSpecialStepProposal',['../classParameterHandlerBase.html#a5914b4a260b907e5a355e53db7e72466',1,'ParameterHandlerBase']]],
+  ['drawrange_27',['DrawRange',['../classMCMCProcessor.html#a4abe633b264acd9b0459c7b8ccd8b9df',1,'MCMCProcessor']]],
+  ['draws_28',['Draws',['../RHat__HighMem_8cpp.html#a9adc829d645affbb93eff1775ab7c0c6',1,'RHat_HighMem.cpp']]],
+  ['drawsfolded_29',['DrawsFolded',['../RHat__HighMem_8cpp.html#a7e7fe290fda4362be54b8cf5d56fea51',1,'RHat_HighMem.cpp']]],
+  ['dummyfile_30',['DUMMYFILE',['../PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7',1,'PlotMCMCDiag.cpp']]]
 ];

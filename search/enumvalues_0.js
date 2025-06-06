@@ -31,7 +31,7 @@ var searchData=
   ['knumubar_28',['kNumuBar',['../SampleStructs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2a4002f8369785cc180fd411cacc50ad6a',1,'SampleStructs.h']]],
   ['knutau_29',['kNutau',['../SampleStructs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2a3845eaeb2a574c79e40ccb2e7b0c0a21',1,'SampleStructs.h']]],
   ['knutaubar_30',['kNutauBar',['../SampleStructs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2a17308656c7ae2206d971d1a8682c5feb',1,'SampleStructs.h']]],
-  ['koscpar_31',['kOSCPar',['../MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba03865cac80b3eb8f5ef46421eb8dab06',1,'MCMCProcessor.h']]],
+  ['kosc_31',['kOsc',['../ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa50ac44a09cc05fd1285a88637bdcf789',1,'ParameterStructs.h']]],
   ['kpearson_32',['kPearson',['../SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a1ac0c03f07bf2bb9ad083e449d69ffd7',1,'SampleStructs.h']]],
   ['kpoisson_33',['kPoisson',['../SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a82f43d91f1eda213c4b5c486672a32a5',1,'SampleStructs.h']]],
   ['kpostfit_34',['kPostFit',['../namespaceMaCh3Plotting.html#a4152b51a260d6a18f41b3a22aa2a6b75a0dd2e9b7a6fcbfa5724ac5e17ea0eeaf',1,'MaCh3Plotting']]],

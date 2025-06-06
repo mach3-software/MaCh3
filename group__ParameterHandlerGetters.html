@@ -30,7 +30,7 @@ MathJax.Hub.Config({
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="mach3logo_small.png"/></td>
   <td id="projectalign">
-   <div id="projectname">MaCh3<span id="projectnumber">&#160;2.1.0</span>
+   <div id="projectname">MaCh3<span id="projectnumber">&#160;2.2.0</span>
    </div>
    <div id="projectbrief">Reference Guide</div>
   </td>
@@ -246,9 +246,9 @@ Functions</h2></td></tr>
 <tr class="memitem:gaf69c5edfc994fa7c371e92b204ae6ba4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#gaf69c5edfc994fa7c371e92b204ae6ba4">ParameterHandlerGeneric::GetNumParFromGroup</a> (const std::string &amp;Group) const</td></tr>
 <tr class="memdesc:gaf69c5edfc994fa7c371e92b204ae6ba4"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Check how many parameters are associated with given group.  <br /></td></tr>
 <tr class="separator:gaf69c5edfc994fa7c371e92b204ae6ba4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gac03f852eed2fd266ac31e7b0188c73bb"><td class="memItemLeft" align="right" valign="top">std::vector&lt; const double * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#gac03f852eed2fd266ac31e7b0188c73bb">ParameterHandlerOsc::GetOscParsFromSampleName</a> (const std::string &amp;SampleName)</td></tr>
-<tr class="memdesc:gac03f852eed2fd266ac31e7b0188c73bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get pointers to Osc params from Sample name.  <br /></td></tr>
-<tr class="separator:gac03f852eed2fd266ac31e7b0188c73bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf23d9cf44cd74cd00db919880d4ca913"><td class="memItemLeft" align="right" valign="top">std::vector&lt; const double * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#gaf23d9cf44cd74cd00db919880d4ca913">ParameterHandlerGeneric::GetOscParsFromSampleName</a> (const std::string &amp;SampleName)</td></tr>
+<tr class="memdesc:gaf23d9cf44cd74cd00db919880d4ca913"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get pointers to Osc params from Sample name.  <br /></td></tr>
+<tr class="separator:gaf23d9cf44cd74cd00db919880d4ca913"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga5087aa5aba191f31170c1108210cdb26"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#ga5087aa5aba191f31170c1108210cdb26">PCAHandler::IsParameterFixedPCA</a> (const int i) const</td></tr>
 <tr class="memdesc:ga5087aa5aba191f31170c1108210cdb26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is parameter fixed in PCA base or not.  <br /></td></tr>
 <tr class="separator:ga5087aa5aba191f31170c1108210cdb26"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -315,8 +315,8 @@ Functions</h2></td></tr>
 <div class="line"><span class="lineno">  352</span>  }</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00025">MaCh3Logger.h:25</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00013">MaCh3Exception.h:13</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a0919e47e80710af8b9a3f837bba9bf8b"><div class="ttname"><a href="classParameterHandlerBase.html#a0919e47e80710af8b9a3f837bba9bf8b">ParameterHandlerBase::use_adaptive</a></div><div class="ttdeci">bool use_adaptive</div><div class="ttdoc">Are we using AMCMC?</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00457">ParameterHandlerBase.h:457</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a1ebeda558155dfa06070e67218b9a567"><div class="ttname"><a href="classParameterHandlerBase.html#a1ebeda558155dfa06070e67218b9a567">ParameterHandlerBase::AdaptiveHandler</a></div><div class="ttdeci">std::unique_ptr&lt; adaptive_mcmc::AdaptiveMCMCHandler &gt; AdaptiveHandler</div><div class="ttdoc">Struct containing information about adaption.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00462">ParameterHandlerBase.h:462</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a0919e47e80710af8b9a3f837bba9bf8b"><div class="ttname"><a href="classParameterHandlerBase.html#a0919e47e80710af8b9a3f837bba9bf8b">ParameterHandlerBase::use_adaptive</a></div><div class="ttdeci">bool use_adaptive</div><div class="ttdoc">Are we using AMCMC?</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00475">ParameterHandlerBase.h:475</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a1ebeda558155dfa06070e67218b9a567"><div class="ttname"><a href="classParameterHandlerBase.html#a1ebeda558155dfa06070e67218b9a567">ParameterHandlerBase::AdaptiveHandler</a></div><div class="ttdeci">std::unique_ptr&lt; adaptive_mcmc::AdaptiveMCMCHandler &gt; AdaptiveHandler</div><div class="ttdoc">Struct containing information about adaption.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00480">ParameterHandlerBase.h:480</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -347,7 +347,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00342">342</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  342</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#a714a8a85df5986b40dfbdf13bb8a159d">_fYAMLDoc</a>; }</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a714a8a85df5986b40dfbdf13bb8a159d"><div class="ttname"><a href="classParameterHandlerBase.html#a714a8a85df5986b40dfbdf13bb8a159d">ParameterHandlerBase::_fYAMLDoc</a></div><div class="ttdeci">YAML::Node _fYAMLDoc</div><div class="ttdoc">Stores config describing systematics.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00425">ParameterHandlerBase.h:425</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a714a8a85df5986b40dfbdf13bb8a159d"><div class="ttname"><a href="classParameterHandlerBase.html#a714a8a85df5986b40dfbdf13bb8a159d">ParameterHandlerBase::_fYAMLDoc</a></div><div class="ttdeci">YAML::Node _fYAMLDoc</div><div class="ttdoc">Stores config describing systematics.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00443">ParameterHandlerBase.h:443</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -369,33 +369,33 @@ Functions</h2></td></tr>
 <p>KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plotting. </p>
 <p>This function converts the covariance matrix to a correlation matrix and returns a TH2D object, which can be used for advanced plotting purposes. </p><dl class="section return"><dt>Returns</dt><dd>A pointer to a TH2D object representing the correlation matrix </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8cpp_source.html#l01096">1096</a> of file <a class="el" href="ParameterHandlerBase_8cpp_source.html">ParameterHandlerBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 1096</span>                                                 {</div>
-<div class="line"><span class="lineno"> 1097</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno"> 1098</span>  TH2D* hMatrix = <span class="keyword">new</span> TH2D(<a class="code hl_function" href="group__ParameterHandlerGetters.html#gab1ef5c9f3c3eb619752a073590f5fd53">GetName</a>().c_str(), <a class="code hl_function" href="group__ParameterHandlerGetters.html#gab1ef5c9f3c3eb619752a073590f5fd53">GetName</a>().c_str(), <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>, 0.0, <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>, <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>, 0.0, <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>);</div>
-<div class="line"><span class="lineno"> 1099</span> </div>
-<div class="line"><span class="lineno"> 1100</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>; i++)</div>
-<div class="line"><span class="lineno"> 1101</span>  {</div>
-<div class="line"><span class="lineno"> 1102</span>    hMatrix-&gt;SetBinContent(i+1, i+1, 1.);</div>
-<div class="line"><span class="lineno"> 1103</span>    hMatrix-&gt;GetXaxis()-&gt;SetBinLabel(i+1, <a class="code hl_function" href="group__ParameterHandlerGetters.html#ga65b61ae6c60d4eadbb06fdef9596cc7f">GetParFancyName</a>(i).c_str());</div>
-<div class="line"><span class="lineno"> 1104</span>    hMatrix-&gt;GetYaxis()-&gt;SetBinLabel(i+1, <a class="code hl_function" href="group__ParameterHandlerGetters.html#ga65b61ae6c60d4eadbb06fdef9596cc7f">GetParFancyName</a>(i).c_str());</div>
-<div class="line"><span class="lineno"> 1105</span>  }</div>
-<div class="line"><span class="lineno"> 1106</span> </div>
-<div class="line"><span class="lineno"> 1107</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
-<div class="line"><span class="lineno"> 1108</span><span class="preprocessor">  #pragma omp parallel for</span></div>
-<div class="line"><span class="lineno"> 1109</span><span class="preprocessor">  #endif</span></div>
-<div class="line"><span class="lineno"> 1110</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>; i++)</div>
-<div class="line"><span class="lineno"> 1111</span>  {</div>
-<div class="line"><span class="lineno"> 1112</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j = 0; j &lt;= i; j++)</div>
-<div class="line"><span class="lineno"> 1113</span>    {</div>
-<div class="line"><span class="lineno"> 1114</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> Corr = (*covMatrix)(i,j) / ( <a class="code hl_function" href="group__ParameterHandlerGetters.html#gadbc5117b45107ac274689b1708fadf0e">GetDiagonalError</a>(i) * <a class="code hl_function" href="group__ParameterHandlerGetters.html#gadbc5117b45107ac274689b1708fadf0e">GetDiagonalError</a>(j));</div>
-<div class="line"><span class="lineno"> 1115</span>      hMatrix-&gt;SetBinContent(i+1, j+1, Corr);</div>
-<div class="line"><span class="lineno"> 1116</span>      hMatrix-&gt;SetBinContent(j+1, i+1, Corr);</div>
-<div class="line"><span class="lineno"> 1117</span>    }</div>
-<div class="line"><span class="lineno"> 1118</span>  }</div>
-<div class="line"><span class="lineno"> 1119</span>  <span class="keywordflow">return</span> hMatrix;</div>
-<div class="line"><span class="lineno"> 1120</span>}</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a8d9a71d60c526da6b9ef9d276b1a2fad"><div class="ttname"><a href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">ParameterHandlerBase::_fNumPar</a></div><div class="ttdeci">int _fNumPar</div><div class="ttdoc">Number of systematic parameters.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00427">ParameterHandlerBase.h:427</a></div></div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8cpp_source.html#l01210">1210</a> of file <a class="el" href="ParameterHandlerBase_8cpp_source.html">ParameterHandlerBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 1210</span>                                                 {</div>
+<div class="line"><span class="lineno"> 1211</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno"> 1212</span>  TH2D* hMatrix = <span class="keyword">new</span> TH2D(<a class="code hl_function" href="group__ParameterHandlerGetters.html#gab1ef5c9f3c3eb619752a073590f5fd53">GetName</a>().c_str(), <a class="code hl_function" href="group__ParameterHandlerGetters.html#gab1ef5c9f3c3eb619752a073590f5fd53">GetName</a>().c_str(), <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>, 0.0, <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>, <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>, 0.0, <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>);</div>
+<div class="line"><span class="lineno"> 1213</span> </div>
+<div class="line"><span class="lineno"> 1214</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>; i++)</div>
+<div class="line"><span class="lineno"> 1215</span>  {</div>
+<div class="line"><span class="lineno"> 1216</span>    hMatrix-&gt;SetBinContent(i+1, i+1, 1.);</div>
+<div class="line"><span class="lineno"> 1217</span>    hMatrix-&gt;GetXaxis()-&gt;SetBinLabel(i+1, <a class="code hl_function" href="group__ParameterHandlerGetters.html#ga65b61ae6c60d4eadbb06fdef9596cc7f">GetParFancyName</a>(i).c_str());</div>
+<div class="line"><span class="lineno"> 1218</span>    hMatrix-&gt;GetYaxis()-&gt;SetBinLabel(i+1, <a class="code hl_function" href="group__ParameterHandlerGetters.html#ga65b61ae6c60d4eadbb06fdef9596cc7f">GetParFancyName</a>(i).c_str());</div>
+<div class="line"><span class="lineno"> 1219</span>  }</div>
+<div class="line"><span class="lineno"> 1220</span> </div>
+<div class="line"><span class="lineno"> 1221</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
+<div class="line"><span class="lineno"> 1222</span><span class="preprocessor">  #pragma omp parallel for</span></div>
+<div class="line"><span class="lineno"> 1223</span><span class="preprocessor">  #endif</span></div>
+<div class="line"><span class="lineno"> 1224</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>; i++)</div>
+<div class="line"><span class="lineno"> 1225</span>  {</div>
+<div class="line"><span class="lineno"> 1226</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j = 0; j &lt;= i; j++)</div>
+<div class="line"><span class="lineno"> 1227</span>    {</div>
+<div class="line"><span class="lineno"> 1228</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> Corr = (*covMatrix)(i,j) / ( <a class="code hl_function" href="group__ParameterHandlerGetters.html#gadbc5117b45107ac274689b1708fadf0e">GetDiagonalError</a>(i) * <a class="code hl_function" href="group__ParameterHandlerGetters.html#gadbc5117b45107ac274689b1708fadf0e">GetDiagonalError</a>(j));</div>
+<div class="line"><span class="lineno"> 1229</span>      hMatrix-&gt;SetBinContent(i+1, j+1, Corr);</div>
+<div class="line"><span class="lineno"> 1230</span>      hMatrix-&gt;SetBinContent(j+1, i+1, Corr);</div>
+<div class="line"><span class="lineno"> 1231</span>    }</div>
+<div class="line"><span class="lineno"> 1232</span>  }</div>
+<div class="line"><span class="lineno"> 1233</span>  <span class="keywordflow">return</span> hMatrix;</div>
+<div class="line"><span class="lineno"> 1234</span>}</div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a8d9a71d60c526da6b9ef9d276b1a2fad"><div class="ttname"><a href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">ParameterHandlerBase::_fNumPar</a></div><div class="ttdeci">int _fNumPar</div><div class="ttdoc">Number of systematic parameters.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00445">ParameterHandlerBase.h:445</a></div></div>
 <div class="ttc" id="agroup__ParameterHandlerGetters_html_ga65b61ae6c60d4eadbb06fdef9596cc7f"><div class="ttname"><a href="group__ParameterHandlerGetters.html#ga65b61ae6c60d4eadbb06fdef9596cc7f">ParameterHandlerBase::GetParFancyName</a></div><div class="ttdeci">std::string GetParFancyName(const int i) const</div><div class="ttdoc">Get fancy name of the Parameter.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00171">ParameterHandlerBase.h:171</a></div></div>
 <div class="ttc" id="agroup__ParameterHandlerGetters_html_gab1ef5c9f3c3eb619752a073590f5fd53"><div class="ttname"><a href="group__ParameterHandlerGetters.html#gab1ef5c9f3c3eb619752a073590f5fd53">ParameterHandlerBase::GetName</a></div><div class="ttdeci">std::string GetName() const</div><div class="ttdoc">Get name of covariance.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00158">ParameterHandlerBase.h:158</a></div></div>
 <div class="ttc" id="agroup__ParameterHandlerGetters_html_gadbc5117b45107ac274689b1708fadf0e"><div class="ttname"><a href="group__ParameterHandlerGetters.html#gadbc5117b45107ac274689b1708fadf0e">ParameterHandlerBase::GetDiagonalError</a></div><div class="ttdeci">double GetDiagonalError(const int i) const</div><div class="ttdoc">Get diagonal error for ith parameter.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00179">ParameterHandlerBase.h:179</a></div></div>
@@ -436,7 +436,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00149">149</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  149</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#aa83a519d3501160d85c74ec9516718c8">corr_throw</a>[i]; }</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_aa83a519d3501160d85c74ec9516718c8"><div class="ttname"><a href="classParameterHandlerBase.html#aa83a519d3501160d85c74ec9516718c8">ParameterHandlerBase::corr_throw</a></div><div class="ttdeci">double * corr_throw</div><div class="ttdoc">Result of multiplication of Cholesky matrix and randParams.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00413">ParameterHandlerBase.h:413</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_aa83a519d3501160d85c74ec9516718c8"><div class="ttname"><a href="classParameterHandlerBase.html#aa83a519d3501160d85c74ec9516718c8">ParameterHandlerBase::corr_throw</a></div><div class="ttdeci">double * corr_throw</div><div class="ttdoc">Result of multiplication of Cholesky matrix and randParams.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00431">ParameterHandlerBase.h:431</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -467,7 +467,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00138">138</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  138</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#a9d2ef9ea0260dffb1034fd565143ba71">covMatrix</a>; }</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a9d2ef9ea0260dffb1034fd565143ba71"><div class="ttname"><a href="classParameterHandlerBase.html#a9d2ef9ea0260dffb1034fd565143ba71">ParameterHandlerBase::covMatrix</a></div><div class="ttdeci">TMatrixDSym * covMatrix</div><div class="ttdoc">The covariance matrix.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00401">ParameterHandlerBase.h:401</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a9d2ef9ea0260dffb1034fd565143ba71"><div class="ttname"><a href="classParameterHandlerBase.html#a9d2ef9ea0260dffb1034fd565143ba71">ParameterHandlerBase::covMatrix</a></div><div class="ttdeci">TMatrixDSym * covMatrix</div><div class="ttdoc">The covariance matrix.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00419">ParameterHandlerBase.h:419</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -671,7 +671,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00183">183</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  183</span>{<span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#a65f6056605f718d83a641680aa33fe88">_fError</a>[i];}</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a65f6056605f718d83a641680aa33fe88"><div class="ttname"><a href="classParameterHandlerBase.html#a65f6056605f718d83a641680aa33fe88">ParameterHandlerBase::_fError</a></div><div class="ttdeci">std::vector&lt; double &gt; _fError</div><div class="ttdoc">Prior error on the parameter.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00435">ParameterHandlerBase.h:435</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a65f6056605f718d83a641680aa33fe88"><div class="ttname"><a href="classParameterHandlerBase.html#a65f6056605f718d83a641680aa33fe88">ParameterHandlerBase::_fError</a></div><div class="ttdeci">std::vector&lt; double &gt; _fError</div><div class="ttdoc">Prior error on the parameter.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00453">ParameterHandlerBase.h:453</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -709,7 +709,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00154">154</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  154</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#a5b71ff832ba3fc84969a7e3fc9dc0d62">_fFlatPrior</a>[i]; }</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a5b71ff832ba3fc84969a7e3fc9dc0d62"><div class="ttname"><a href="classParameterHandlerBase.html#a5b71ff832ba3fc84969a7e3fc9dc0d62">ParameterHandlerBase::_fFlatPrior</a></div><div class="ttdeci">std::vector&lt; bool &gt; _fFlatPrior</div><div class="ttdoc">Whether to apply flat prior or not.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00443">ParameterHandlerBase.h:443</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a5b71ff832ba3fc84969a7e3fc9dc0d62"><div class="ttname"><a href="classParameterHandlerBase.html#a5b71ff832ba3fc84969a7e3fc9dc0d62">ParameterHandlerBase::_fFlatPrior</a></div><div class="ttdeci">std::vector&lt; bool &gt; _fFlatPrior</div><div class="ttdoc">Whether to apply flat prior or not.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00461">ParameterHandlerBase.h:461</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -731,14 +731,14 @@ Functions</h2></td></tr>
 
 <p>HH Get functional parameters for the relevant SampleName. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00326">326</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  326</span>                                                                                                                                     {</div>
-<div class="line"><span class="lineno">  327</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  328</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="classParameterHandlerGeneric.html#a982803878f2f6ee7a28c6b7f3fede8f8">GetTypeParamsFromSampleName</a>(<a class="code hl_variable" href="classParameterHandlerGeneric.html#a67955522a48b4e340981b5ec1ca3b0da">_fSystToGlobalSystIndexMap</a>[SystType::kFunc], <a class="code hl_variable" href="classParameterHandlerGeneric.html#a9c201ce36c40a731f23d9949009835b5">FuncParams</a>, SampleName);</div>
-<div class="line"><span class="lineno">  329</span>}</div>
-<div class="ttc" id="aclassParameterHandlerGeneric_html_a67955522a48b4e340981b5ec1ca3b0da"><div class="ttname"><a href="classParameterHandlerGeneric.html#a67955522a48b4e340981b5ec1ca3b0da">ParameterHandlerGeneric::_fSystToGlobalSystIndexMap</a></div><div class="ttdeci">std::vector&lt; std::map&lt; int, int &gt; &gt; _fSystToGlobalSystIndexMap</div><div class="ttdoc">Map between number of given parameter type with global parameter numbering. For example 2nd norm para...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8h_source.html#l00202">ParameterHandlerGeneric.h:202</a></div></div>
-<div class="ttc" id="aclassParameterHandlerGeneric_html_a982803878f2f6ee7a28c6b7f3fede8f8"><div class="ttname"><a href="classParameterHandlerGeneric.html#a982803878f2f6ee7a28c6b7f3fede8f8">ParameterHandlerGeneric::GetTypeParamsFromSampleName</a></div><div class="ttdeci">std::vector&lt; ParamT &gt; GetTypeParamsFromSampleName(const std::map&lt; int, int &gt; &amp;indexMap, const std::vector&lt; ParamT &gt; &amp;params, const std::string &amp;SampleName) const</div><div class="ttdoc">Retrieve parameters that apply to a given sample name.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8cpp_source.html#l00347">ParameterHandlerGeneric.cpp:347</a></div></div>
-<div class="ttc" id="aclassParameterHandlerGeneric_html_a9c201ce36c40a731f23d9949009835b5"><div class="ttname"><a href="classParameterHandlerGeneric.html#a9c201ce36c40a731f23d9949009835b5">ParameterHandlerGeneric::FuncParams</a></div><div class="ttdeci">std::vector&lt; FunctionalParameter &gt; FuncParams</div><div class="ttdoc">Vector containing info for functional systematics.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8h_source.html#l00211">ParameterHandlerGeneric.h:211</a></div></div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00342">342</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  342</span>                                                                                                                                     {</div>
+<div class="line"><span class="lineno">  343</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  344</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="classParameterHandlerGeneric.html#a982803878f2f6ee7a28c6b7f3fede8f8">GetTypeParamsFromSampleName</a>(<a class="code hl_variable" href="classParameterHandlerGeneric.html#a67955522a48b4e340981b5ec1ca3b0da">_fSystToGlobalSystIndexMap</a>[SystType::kFunc], <a class="code hl_variable" href="classParameterHandlerGeneric.html#a9c201ce36c40a731f23d9949009835b5">FuncParams</a>, SampleName);</div>
+<div class="line"><span class="lineno">  345</span>}</div>
+<div class="ttc" id="aclassParameterHandlerGeneric_html_a67955522a48b4e340981b5ec1ca3b0da"><div class="ttname"><a href="classParameterHandlerGeneric.html#a67955522a48b4e340981b5ec1ca3b0da">ParameterHandlerGeneric::_fSystToGlobalSystIndexMap</a></div><div class="ttdeci">std::vector&lt; std::map&lt; int, int &gt; &gt; _fSystToGlobalSystIndexMap</div><div class="ttdoc">Map between number of given parameter type with global parameter numbering. For example 2nd norm para...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8h_source.html#l00215">ParameterHandlerGeneric.h:215</a></div></div>
+<div class="ttc" id="aclassParameterHandlerGeneric_html_a982803878f2f6ee7a28c6b7f3fede8f8"><div class="ttname"><a href="classParameterHandlerGeneric.html#a982803878f2f6ee7a28c6b7f3fede8f8">ParameterHandlerGeneric::GetTypeParamsFromSampleName</a></div><div class="ttdeci">std::vector&lt; ParamT &gt; GetTypeParamsFromSampleName(const std::map&lt; int, int &gt; &amp;indexMap, const std::vector&lt; ParamT &gt; &amp;params, const std::string &amp;SampleName) const</div><div class="ttdoc">Retrieve parameters that apply to a given sample name.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8cpp_source.html#l00363">ParameterHandlerGeneric.cpp:363</a></div></div>
+<div class="ttc" id="aclassParameterHandlerGeneric_html_a9c201ce36c40a731f23d9949009835b5"><div class="ttname"><a href="classParameterHandlerGeneric.html#a9c201ce36c40a731f23d9949009835b5">ParameterHandlerGeneric::FuncParams</a></div><div class="ttdeci">std::vector&lt; FunctionalParameter &gt; FuncParams</div><div class="ttdoc">Vector containing info for functional systematics.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8h_source.html#l00224">ParameterHandlerGeneric.h:224</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -769,7 +769,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00279">279</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  279</span>{<span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#a4fa06677236f06592d492663254dd253">_fGlobalStepScale</a>; }</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a4fa06677236f06592d492663254dd253"><div class="ttname"><a href="classParameterHandlerBase.html#a4fa06677236f06592d492663254dd253">ParameterHandlerBase::_fGlobalStepScale</a></div><div class="ttdeci">double _fGlobalStepScale</div><div class="ttdoc">Global step scale applied to all params in this class.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00415">ParameterHandlerBase.h:415</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a4fa06677236f06592d492663254dd253"><div class="ttname"><a href="classParameterHandlerBase.html#a4fa06677236f06592d492663254dd253">ParameterHandlerBase::_fGlobalStepScale</a></div><div class="ttdeci">double _fGlobalStepScale</div><div class="ttdoc">Global step scale applied to all params in this class.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00433">ParameterHandlerBase.h:433</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -801,19 +801,19 @@ Functions</h2></td></tr>
 
 <p>DB Get spline parameters depending on given SampleName. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00227">227</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  227</span>                                                                                                                               {</div>
-<div class="line"><span class="lineno">  228</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  229</span>  std::vector&lt;int&gt; returnVec;</div>
-<div class="line"><span class="lineno">  230</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;pair : <a class="code hl_variable" href="classParameterHandlerGeneric.html#a67955522a48b4e340981b5ec1ca3b0da">_fSystToGlobalSystIndexMap</a>[Type]) {</div>
-<div class="line"><span class="lineno">  231</span>    <span class="keyword">auto</span> &amp;SystIndex = pair.second;</div>
-<div class="line"><span class="lineno">  232</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd">AppliesToSample</a>(SystIndex, SampleName)) { <span class="comment">//If parameter applies to required SampleID</span></div>
-<div class="line"><span class="lineno">  233</span>      returnVec.push_back(SystIndex);</div>
-<div class="line"><span class="lineno">  234</span>    }</div>
-<div class="line"><span class="lineno">  235</span>  }</div>
-<div class="line"><span class="lineno">  236</span>  <span class="keywordflow">return</span> returnVec;</div>
-<div class="line"><span class="lineno">  237</span>}</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a3c5d92e6b592f18ea4d6bd9afaca7ebd"><div class="ttname"><a href="classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd">ParameterHandlerBase::AppliesToSample</a></div><div class="ttdeci">bool AppliesToSample(const int SystIndex, const std::string &amp;SampleName) const</div><div class="ttdoc">Check if parameter is affecting given sample name.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l01149">ParameterHandlerBase.cpp:1149</a></div></div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00233">233</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  233</span>                                                                                                                               {</div>
+<div class="line"><span class="lineno">  234</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  235</span>  std::vector&lt;int&gt; returnVec;</div>
+<div class="line"><span class="lineno">  236</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;pair : <a class="code hl_variable" href="classParameterHandlerGeneric.html#a67955522a48b4e340981b5ec1ca3b0da">_fSystToGlobalSystIndexMap</a>[Type]) {</div>
+<div class="line"><span class="lineno">  237</span>    <span class="keyword">auto</span> &amp;SystIndex = pair.second;</div>
+<div class="line"><span class="lineno">  238</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd">AppliesToSample</a>(SystIndex, SampleName)) { <span class="comment">//If parameter applies to required SampleID</span></div>
+<div class="line"><span class="lineno">  239</span>      returnVec.push_back(SystIndex);</div>
+<div class="line"><span class="lineno">  240</span>    }</div>
+<div class="line"><span class="lineno">  241</span>  }</div>
+<div class="line"><span class="lineno">  242</span>  <span class="keywordflow">return</span> returnVec;</div>
+<div class="line"><span class="lineno">  243</span>}</div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a3c5d92e6b592f18ea4d6bd9afaca7ebd"><div class="ttname"><a href="classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd">ParameterHandlerBase::AppliesToSample</a></div><div class="ttdeci">bool AppliesToSample(const int SystIndex, const std::string &amp;SampleName) const</div><div class="ttdoc">Check if parameter is affecting given sample name.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l01263">ParameterHandlerBase.cpp:1263</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -851,7 +851,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00276">276</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  276</span>{<span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#ae042c1f0f79927b63744d820384ac28e">_fIndivStepScale</a>.at(ParameterIndex); }</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_ae042c1f0f79927b63744d820384ac28e"><div class="ttname"><a href="classParameterHandlerBase.html#ae042c1f0f79927b63744d820384ac28e">ParameterHandlerBase::_fIndivStepScale</a></div><div class="ttdeci">std::vector&lt; double &gt; _fIndivStepScale</div><div class="ttdoc">Individual step scale used by MCMC algorithm.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00441">ParameterHandlerBase.h:441</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_ae042c1f0f79927b63744d820384ac28e"><div class="ttname"><a href="classParameterHandlerBase.html#ae042c1f0f79927b63744d820384ac28e">ParameterHandlerBase::_fIndivStepScale</a></div><div class="ttdeci">std::vector&lt; double &gt; _fIndivStepScale</div><div class="ttdoc">Individual step scale used by MCMC algorithm.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00459">ParameterHandlerBase.h:459</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -882,7 +882,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00174">174</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  174</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#adb2f867014619b5c38b67cd981e40dcb">inputFile</a>; }</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_adb2f867014619b5c38b67cd981e40dcb"><div class="ttname"><a href="classParameterHandlerBase.html#adb2f867014619b5c38b67cd981e40dcb">ParameterHandlerBase::inputFile</a></div><div class="ttdeci">const std::string inputFile</div><div class="ttdoc">The input root file we read in.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00396">ParameterHandlerBase.h:396</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_adb2f867014619b5c38b67cd981e40dcb"><div class="ttname"><a href="classParameterHandlerBase.html#adb2f867014619b5c38b67cd981e40dcb">ParameterHandlerBase::inputFile</a></div><div class="ttdeci">const std::string inputFile</div><div class="ttdoc">The input root file we read in.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00414">ParameterHandlerBase.h:414</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -913,7 +913,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00141">141</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  141</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#a2789064b551742edb5d05331ca8ef7e1">invCovMatrix</a>; }</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a2789064b551742edb5d05331ca8ef7e1"><div class="ttname"><a href="classParameterHandlerBase.html#a2789064b551742edb5d05331ca8ef7e1">ParameterHandlerBase::invCovMatrix</a></div><div class="ttdeci">TMatrixDSym * invCovMatrix</div><div class="ttdoc">The inverse covariance matrix.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00403">ParameterHandlerBase.h:403</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a2789064b551742edb5d05331ca8ef7e1"><div class="ttname"><a href="classParameterHandlerBase.html#a2789064b551742edb5d05331ca8ef7e1">ParameterHandlerBase::invCovMatrix</a></div><div class="ttdeci">TMatrixDSym * invCovMatrix</div><div class="ttdoc">The inverse covariance matrix.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00421">ParameterHandlerBase.h:421</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -955,7 +955,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00144">144</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  144</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#a9806557b3612e29e106a0ac18cc35478">InvertCovMatrix</a>[i][j]; }</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a9806557b3612e29e106a0ac18cc35478"><div class="ttname"><a href="classParameterHandlerBase.html#a9806557b3612e29e106a0ac18cc35478">ParameterHandlerBase::InvertCovMatrix</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; double &gt; &gt; InvertCovMatrix</div><div class="ttdoc">KS: Same as above but much faster as TMatrixDSym cache miss.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00405">ParameterHandlerBase.h:405</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a9806557b3612e29e106a0ac18cc35478"><div class="ttname"><a href="classParameterHandlerBase.html#a9806557b3612e29e106a0ac18cc35478">ParameterHandlerBase::InvertCovMatrix</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; double &gt; &gt; InvertCovMatrix</div><div class="ttdoc">KS: Same as above but much faster as TMatrixDSym cache miss.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00423">ParameterHandlerBase.h:423</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -986,18 +986,18 @@ Functions</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classPyParameterHandlerBase.html#ab2fdbb90cb4897a9111c3d1a5051effc">PyParameterHandlerBase</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8cpp_source.html#l00676">676</a> of file <a class="el" href="ParameterHandlerBase_8cpp_source.html">ParameterHandlerBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  676</span>                                           {</div>
-<div class="line"><span class="lineno">  677</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  678</span>  <span class="comment">// Default behaviour is to reject negative values + do std llh calculation</span></div>
-<div class="line"><span class="lineno">  679</span>  <span class="keyword">const</span> <span class="keywordtype">int</span> NOutside = <a class="code hl_function" href="classParameterHandlerBase.html#afbe38e4608749a1081a1ece01855d927">CheckBounds</a>();</div>
-<div class="line"><span class="lineno">  680</span>  </div>
-<div class="line"><span class="lineno">  681</span>  <span class="keywordflow">if</span>(NOutside &gt; 0) <span class="keywordflow">return</span> NOutside*<a class="code hl_variable" href="namespaceM3.html#aaf4ba720c8ab2982beaa3c243aee1b98">M3::_LARGE_LOGL_</a>;</div>
-<div class="line"><span class="lineno">  682</span> </div>
-<div class="line"><span class="lineno">  683</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="classParameterHandlerBase.html#a8e9248d5db77144e9602cb1e4c7c44ac">CalcLikelihood</a>();</div>
-<div class="line"><span class="lineno">  684</span>}</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a8e9248d5db77144e9602cb1e4c7c44ac"><div class="ttname"><a href="classParameterHandlerBase.html#a8e9248d5db77144e9602cb1e4c7c44ac">ParameterHandlerBase::CalcLikelihood</a></div><div class="ttdeci">double CalcLikelihood() const _noexcept_</div><div class="ttdoc">Calc penalty term based on inverted covariance matrix.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l00634">ParameterHandlerBase.cpp:634</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_afbe38e4608749a1081a1ece01855d927"><div class="ttname"><a href="classParameterHandlerBase.html#afbe38e4608749a1081a1ece01855d927">ParameterHandlerBase::CheckBounds</a></div><div class="ttdeci">int CheckBounds() const _noexcept_</div><div class="ttdoc">Check if parameters were proposed outside physical boundary.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l00661">ParameterHandlerBase.cpp:661</a></div></div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8cpp_source.html#l00790">790</a> of file <a class="el" href="ParameterHandlerBase_8cpp_source.html">ParameterHandlerBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  790</span>                                           {</div>
+<div class="line"><span class="lineno">  791</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  792</span>  <span class="comment">// Default behaviour is to reject negative values + do std llh calculation</span></div>
+<div class="line"><span class="lineno">  793</span>  <span class="keyword">const</span> <span class="keywordtype">int</span> NOutside = <a class="code hl_function" href="classParameterHandlerBase.html#afbe38e4608749a1081a1ece01855d927">CheckBounds</a>();</div>
+<div class="line"><span class="lineno">  794</span>  </div>
+<div class="line"><span class="lineno">  795</span>  <span class="keywordflow">if</span>(NOutside &gt; 0) <span class="keywordflow">return</span> NOutside*<a class="code hl_variable" href="namespaceM3.html#aaf4ba720c8ab2982beaa3c243aee1b98">M3::_LARGE_LOGL_</a>;</div>
+<div class="line"><span class="lineno">  796</span> </div>
+<div class="line"><span class="lineno">  797</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="classParameterHandlerBase.html#a8e9248d5db77144e9602cb1e4c7c44ac">CalcLikelihood</a>();</div>
+<div class="line"><span class="lineno">  798</span>}</div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a8e9248d5db77144e9602cb1e4c7c44ac"><div class="ttname"><a href="classParameterHandlerBase.html#a8e9248d5db77144e9602cb1e4c7c44ac">ParameterHandlerBase::CalcLikelihood</a></div><div class="ttdeci">double CalcLikelihood() const _noexcept_</div><div class="ttdoc">Calc penalty term based on inverted covariance matrix.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l00748">ParameterHandlerBase.cpp:748</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_afbe38e4608749a1081a1ece01855d927"><div class="ttname"><a href="classParameterHandlerBase.html#afbe38e4608749a1081a1ece01855d927">ParameterHandlerBase::CheckBounds</a></div><div class="ttdeci">int CheckBounds() const _noexcept_</div><div class="ttdoc">Check if parameters were proposed outside physical boundary.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l00775">ParameterHandlerBase.cpp:775</a></div></div>
 <div class="ttc" id="anamespaceM3_html_aaf4ba720c8ab2982beaa3c243aee1b98"><div class="ttname"><a href="namespaceM3.html#aaf4ba720c8ab2982beaa3c243aee1b98">M3::_LARGE_LOGL_</a></div><div class="ttdeci">static constexpr const double _LARGE_LOGL_</div><div class="ttdoc">Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such s...</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00070">Core.h:70</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -1036,7 +1036,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00272">272</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  272</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#a92d4696b92db78fd9e3a4549d3ab64a6">_fLowBound</a>[i]; }</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a92d4696b92db78fd9e3a4549d3ab64a6"><div class="ttname"><a href="classParameterHandlerBase.html#a92d4696b92db78fd9e3a4549d3ab64a6">ParameterHandlerBase::_fLowBound</a></div><div class="ttdeci">std::vector&lt; double &gt; _fLowBound</div><div class="ttdoc">Lowest physical bound, parameter will not be able to go beyond it.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00437">ParameterHandlerBase.h:437</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a92d4696b92db78fd9e3a4549d3ab64a6"><div class="ttname"><a href="classParameterHandlerBase.html#a92d4696b92db78fd9e3a4549d3ab64a6">ParameterHandlerBase::_fLowBound</a></div><div class="ttdeci">std::vector&lt; double &gt; _fLowBound</div><div class="ttdoc">Lowest physical bound, parameter will not be able to go beyond it.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00455">ParameterHandlerBase.h:455</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1067,7 +1067,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00158">158</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  158</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#a5e9226aa216252b1ef195c7f91c76df2">matrixName</a>; }</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a5e9226aa216252b1ef195c7f91c76df2"><div class="ttname"><a href="classParameterHandlerBase.html#a5e9226aa216252b1ef195c7f91c76df2">ParameterHandlerBase::matrixName</a></div><div class="ttdeci">std::string matrixName</div><div class="ttdoc">Name of cov matrix.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00399">ParameterHandlerBase.h:399</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a5e9226aa216252b1ef195c7f91c76df2"><div class="ttname"><a href="classParameterHandlerBase.html#a5e9226aa216252b1ef195c7f91c76df2">ParameterHandlerBase::matrixName</a></div><div class="ttdeci">std::string matrixName</div><div class="ttdoc">Name of cov matrix.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00417">ParameterHandlerBase.h:417</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1089,12 +1089,12 @@ Functions</h2></td></tr>
 
 <p>DB Get norm/func parameters depending on given SampleName. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00333">333</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  333</span>                                                                                                                   {</div>
-<div class="line"><span class="lineno">  334</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  335</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="classParameterHandlerGeneric.html#a982803878f2f6ee7a28c6b7f3fede8f8">GetTypeParamsFromSampleName</a>(<a class="code hl_variable" href="classParameterHandlerGeneric.html#a67955522a48b4e340981b5ec1ca3b0da">_fSystToGlobalSystIndexMap</a>[SystType::kNorm], <a class="code hl_variable" href="classParameterHandlerGeneric.html#a5c0bc9ff4fd8d08bdbd192f161365220">NormParams</a>, SampleName);</div>
-<div class="line"><span class="lineno">  336</span>}</div>
-<div class="ttc" id="aclassParameterHandlerGeneric_html_a5c0bc9ff4fd8d08bdbd192f161365220"><div class="ttname"><a href="classParameterHandlerGeneric.html#a5c0bc9ff4fd8d08bdbd192f161365220">ParameterHandlerGeneric::NormParams</a></div><div class="ttdeci">std::vector&lt; NormParameter &gt; NormParams</div><div class="ttdoc">Vector containing info for normalisation systematics.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8h_source.html#l00208">ParameterHandlerGeneric.h:208</a></div></div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00349">349</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  349</span>                                                                                                                   {</div>
+<div class="line"><span class="lineno">  350</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  351</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="classParameterHandlerGeneric.html#a982803878f2f6ee7a28c6b7f3fede8f8">GetTypeParamsFromSampleName</a>(<a class="code hl_variable" href="classParameterHandlerGeneric.html#a67955522a48b4e340981b5ec1ca3b0da">_fSystToGlobalSystIndexMap</a>[SystType::kNorm], <a class="code hl_variable" href="classParameterHandlerGeneric.html#a5c0bc9ff4fd8d08bdbd192f161365220">NormParams</a>, SampleName);</div>
+<div class="line"><span class="lineno">  352</span>}</div>
+<div class="ttc" id="aclassParameterHandlerGeneric_html_a5c0bc9ff4fd8d08bdbd192f161365220"><div class="ttname"><a href="classParameterHandlerGeneric.html#a5c0bc9ff4fd8d08bdbd192f161365220">ParameterHandlerGeneric::NormParams</a></div><div class="ttdeci">std::vector&lt; NormParameter &gt; NormParams</div><div class="ttdoc">Vector containing info for normalisation systematics.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8h_source.html#l00221">ParameterHandlerGeneric.h:221</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1128,8 +1128,8 @@ Functions</h2></td></tr>
 <div class="line"><span class="lineno">  284</span>    <span class="keywordflow">if</span> (<a class="code hl_variable" href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">pca</a>) <span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#a8d3b05f6bb6ec3f334af6d9891fa031e">PCAObj</a>-&gt;GetNumberPCAedParameters();</div>
 <div class="line"><span class="lineno">  285</span>    <span class="keywordflow">else</span> <span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>;</div>
 <div class="line"><span class="lineno">  286</span>  }</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a8d3b05f6bb6ec3f334af6d9891fa031e"><div class="ttname"><a href="classParameterHandlerBase.html#a8d3b05f6bb6ec3f334af6d9891fa031e">ParameterHandlerBase::PCAObj</a></div><div class="ttdeci">std::unique_ptr&lt; PCAHandler &gt; PCAObj</div><div class="ttdoc">Struct containing information about PCA.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00460">ParameterHandlerBase.h:460</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_ae036dc62d3a3710b78d5d767f280fa4b"><div class="ttname"><a href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">ParameterHandlerBase::pca</a></div><div class="ttdeci">bool pca</div><div class="ttdoc">perform PCA or not</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00455">ParameterHandlerBase.h:455</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a8d3b05f6bb6ec3f334af6d9891fa031e"><div class="ttname"><a href="classParameterHandlerBase.html#a8d3b05f6bb6ec3f334af6d9891fa031e">ParameterHandlerBase::PCAObj</a></div><div class="ttdeci">std::unique_ptr&lt; PCAHandler &gt; PCAObj</div><div class="ttdoc">Struct containing information about PCA.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00478">ParameterHandlerBase.h:478</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_ae036dc62d3a3710b78d5d767f280fa4b"><div class="ttname"><a href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">ParameterHandlerBase::pca</a></div><div class="ttdeci">bool pca</div><div class="ttdoc">perform PCA or not</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00473">ParameterHandlerBase.h:473</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1197,17 +1197,17 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00362">362</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  362</span>                                                                                                        {</div>
-<div class="line"><span class="lineno">  363</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  364</span>  <span class="keywordtype">int</span> returnVal = 0;</div>
-<div class="line"><span class="lineno">  365</span>  <a class="code hl_function" href="classParameterHandlerGeneric.html#ae708dcd0bbfac4a5dd599a5c536da62b">IterateOverParams</a>(SampleName,</div>
-<div class="line"><span class="lineno">  366</span>    [&amp;](<span class="keywordtype">int</span> i) { <span class="keywordflow">return</span> <a class="code hl_function" href="group__ParameterHandlerGetters.html#ga443f15a70ebeb62613c629b59447c503">GetParamType</a>(i) == Type; }, <span class="comment">// Filter condition</span></div>
-<div class="line"><span class="lineno">  367</span>    [&amp;](int) { returnVal += 1; } <span class="comment">// Action to perform if filter passes</span></div>
-<div class="line"><span class="lineno">  368</span>  );</div>
-<div class="line"><span class="lineno">  369</span>  <span class="keywordflow">return</span> returnVal;</div>
-<div class="line"><span class="lineno">  370</span>}</div>
-<div class="ttc" id="aclassParameterHandlerGeneric_html_ae708dcd0bbfac4a5dd599a5c536da62b"><div class="ttname"><a href="classParameterHandlerGeneric.html#ae708dcd0bbfac4a5dd599a5c536da62b">ParameterHandlerGeneric::IterateOverParams</a></div><div class="ttdeci">void IterateOverParams(const std::string &amp;SampleName, FilterFunc filter, ActionFunc action)</div><div class="ttdoc">Iterates over parameters and applies a filter and action function.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8cpp_source.html#l00398">ParameterHandlerGeneric.cpp:398</a></div></div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00378">378</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  378</span>                                                                                                        {</div>
+<div class="line"><span class="lineno">  379</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  380</span>  <span class="keywordtype">int</span> returnVal = 0;</div>
+<div class="line"><span class="lineno">  381</span>  <a class="code hl_function" href="classParameterHandlerGeneric.html#ae708dcd0bbfac4a5dd599a5c536da62b">IterateOverParams</a>(SampleName,</div>
+<div class="line"><span class="lineno">  382</span>    [&amp;](<span class="keywordtype">int</span> i) { <span class="keywordflow">return</span> <a class="code hl_function" href="group__ParameterHandlerGetters.html#ga443f15a70ebeb62613c629b59447c503">GetParamType</a>(i) == Type; }, <span class="comment">// Filter condition</span></div>
+<div class="line"><span class="lineno">  383</span>    [&amp;](int) { returnVal += 1; } <span class="comment">// Action to perform if filter passes</span></div>
+<div class="line"><span class="lineno">  384</span>  );</div>
+<div class="line"><span class="lineno">  385</span>  <span class="keywordflow">return</span> returnVal;</div>
+<div class="line"><span class="lineno">  386</span>}</div>
+<div class="ttc" id="aclassParameterHandlerGeneric_html_ae708dcd0bbfac4a5dd599a5c536da62b"><div class="ttname"><a href="classParameterHandlerGeneric.html#ae708dcd0bbfac4a5dd599a5c536da62b">ParameterHandlerGeneric::IterateOverParams</a></div><div class="ttdeci">void IterateOverParams(const std::string &amp;SampleName, FilterFunc filter, ActionFunc action)</div><div class="ttdoc">Iterates over parameters and applies a filter and action function.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8cpp_source.html#l00414">ParameterHandlerGeneric.cpp:414</a></div></div>
 <div class="ttc" id="agroup__ParameterHandlerGetters_html_ga443f15a70ebeb62613c629b59447c503"><div class="ttname"><a href="group__ParameterHandlerGetters.html#ga443f15a70ebeb62613c629b59447c503">ParameterHandlerGeneric::GetParamType</a></div><div class="ttdeci">SystType GetParamType(const int i) const</div><div class="ttdoc">Returns enum describing our param type.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8h_source.html#l00036">ParameterHandlerGeneric.h:36</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -1230,27 +1230,27 @@ Functions</h2></td></tr>
 
 <p>KS: Check how many parameters are associated with given group. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00674">674</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  674</span>                                                                            {</div>
-<div class="line"><span class="lineno">  675</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  676</span>  <span class="keywordtype">int</span> Counter = 0;</div>
-<div class="line"><span class="lineno">  677</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>; i++) {</div>
-<div class="line"><span class="lineno">  678</span>    <span class="keywordflow">if</span>(<a class="code hl_function" href="group__ParameterHandlerGetters.html#gae10980fefe473ec6a9875dad17dea334">IsParFromGroup</a>(i, Group)) Counter++;</div>
-<div class="line"><span class="lineno">  679</span>  }</div>
-<div class="line"><span class="lineno">  680</span>  <span class="keywordflow">return</span> Counter;</div>
-<div class="line"><span class="lineno">  681</span>}</div>
-<div class="ttc" id="agroup__ParameterHandlerGetters_html_gae10980fefe473ec6a9875dad17dea334"><div class="ttname"><a href="group__ParameterHandlerGetters.html#gae10980fefe473ec6a9875dad17dea334">ParameterHandlerGeneric::IsParFromGroup</a></div><div class="ttdeci">bool IsParFromGroup(const int i, const std::string &amp;Group) const</div><div class="ttdoc">Checks if parameter belongs to a given group.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8cpp_source.html#l00661">ParameterHandlerGeneric.cpp:661</a></div></div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00718">718</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  718</span>                                                                            {</div>
+<div class="line"><span class="lineno">  719</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  720</span>  <span class="keywordtype">int</span> Counter = 0;</div>
+<div class="line"><span class="lineno">  721</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>; i++) {</div>
+<div class="line"><span class="lineno">  722</span>    <span class="keywordflow">if</span>(<a class="code hl_function" href="group__ParameterHandlerGetters.html#gae10980fefe473ec6a9875dad17dea334">IsParFromGroup</a>(i, Group)) Counter++;</div>
+<div class="line"><span class="lineno">  723</span>  }</div>
+<div class="line"><span class="lineno">  724</span>  <span class="keywordflow">return</span> Counter;</div>
+<div class="line"><span class="lineno">  725</span>}</div>
+<div class="ttc" id="agroup__ParameterHandlerGetters_html_gae10980fefe473ec6a9875dad17dea334"><div class="ttname"><a href="group__ParameterHandlerGetters.html#gae10980fefe473ec6a9875dad17dea334">ParameterHandlerGeneric::IsParFromGroup</a></div><div class="ttdeci">bool IsParFromGroup(const int i, const std::string &amp;Group) const</div><div class="ttdoc">Checks if parameter belongs to a given group.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8cpp_source.html#l00705">ParameterHandlerGeneric.cpp:705</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="gac03f852eed2fd266ac31e7b0188c73bb" name="gac03f852eed2fd266ac31e7b0188c73bb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gac03f852eed2fd266ac31e7b0188c73bb">&#9670;&#160;</a></span>GetOscParsFromSampleName()</h2>
+<a id="gaf23d9cf44cd74cd00db919880d4ca913" name="gaf23d9cf44cd74cd00db919880d4ca913"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf23d9cf44cd74cd00db919880d4ca913">&#9670;&#160;</a></span>GetOscParsFromSampleName()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt; const double * &gt; ParameterHandlerOsc::GetOscParsFromSampleName </td>
+          <td class="memname">std::vector&lt; const double * &gt; ParameterHandlerGeneric::GetOscParsFromSampleName </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>SampleName</em></td><td>)</td>
@@ -1261,17 +1261,18 @@ Functions</h2></td></tr>
 
 <p>Get pointers to Osc params from Sample name. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerOsc_8cpp_source.html#l00113">113</a> of file <a class="el" href="ParameterHandlerOsc_8cpp_source.html">ParameterHandlerOsc.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  113</span>                                                                                                  {</div>
-<div class="line"><span class="lineno">  114</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  115</span>  std::vector&lt;const double*&gt; returnVec;</div>
-<div class="line"><span class="lineno">  116</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>; ++i) {</div>
-<div class="line"><span class="lineno">  117</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd">AppliesToSample</a>(i, SampleName)) {</div>
-<div class="line"><span class="lineno">  118</span>      returnVec.push_back(<a class="code hl_function" href="classParameterHandlerBase.html#a2ed43dcb9347691c753a02d1aee633ab">RetPointer</a>(i));</div>
-<div class="line"><span class="lineno">  119</span>    }</div>
-<div class="line"><span class="lineno">  120</span>  }</div>
-<div class="line"><span class="lineno">  121</span>  <span class="keywordflow">return</span> returnVec;</div>
-<div class="line"><span class="lineno">  122</span>}</div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00729">729</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  729</span>                                                                                                      {</div>
+<div class="line"><span class="lineno">  730</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  731</span>  std::vector&lt;const double*&gt; returnVec;</div>
+<div class="line"><span class="lineno">  732</span>  <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; pair : <a class="code hl_variable" href="classParameterHandlerGeneric.html#a67955522a48b4e340981b5ec1ca3b0da">_fSystToGlobalSystIndexMap</a>[SystType::kOsc]) {</div>
+<div class="line"><span class="lineno">  733</span>    <span class="keyword">const</span> <span class="keyword">auto</span>&amp; globalIndex = pair.second;</div>
+<div class="line"><span class="lineno">  734</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd">AppliesToSample</a>(globalIndex, SampleName)) {</div>
+<div class="line"><span class="lineno">  735</span>      returnVec.push_back(<a class="code hl_function" href="classParameterHandlerBase.html#a2ed43dcb9347691c753a02d1aee633ab">RetPointer</a>(globalIndex));</div>
+<div class="line"><span class="lineno">  736</span>    }</div>
+<div class="line"><span class="lineno">  737</span>  }</div>
+<div class="line"><span class="lineno">  738</span>  <span class="keywordflow">return</span> returnVec;</div>
+<div class="line"><span class="lineno">  739</span>}</div>
 <div class="ttc" id="aclassParameterHandlerBase_html_a2ed43dcb9347691c753a02d1aee633ab"><div class="ttname"><a href="classParameterHandlerBase.html#a2ed43dcb9347691c753a02d1aee633ab">ParameterHandlerBase::RetPointer</a></div><div class="ttdeci">const double * RetPointer(const int iParam)</div><div class="ttdoc">DB Pointer return to param position.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00237">ParameterHandlerBase.h:237</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -1340,7 +1341,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8h_source.html#l00036">36</a> of file <a class="el" href="ParameterHandlerGeneric_8h_source.html">ParameterHandlerGeneric.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   36</span>{<span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerGeneric.html#a6e412e6a3e8b954e1efcb97b03520f52">_fParamType</a>[i];}</div>
-<div class="ttc" id="aclassParameterHandlerGeneric_html_a6e412e6a3e8b954e1efcb97b03520f52"><div class="ttname"><a href="classParameterHandlerGeneric.html#a6e412e6a3e8b954e1efcb97b03520f52">ParameterHandlerGeneric::_fParamType</a></div><div class="ttdeci">std::vector&lt; SystType &gt; _fParamType</div><div class="ttdoc">Type of parameter like norm, spline etc.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8h_source.html#l00193">ParameterHandlerGeneric.h:193</a></div></div>
+<div class="ttc" id="aclassParameterHandlerGeneric_html_a6e412e6a3e8b954e1efcb97b03520f52"><div class="ttname"><a href="classParameterHandlerGeneric.html#a6e412e6a3e8b954e1efcb97b03520f52">ParameterHandlerGeneric::_fParamType</a></div><div class="ttdeci">std::vector&lt; SystType &gt; _fParamType</div><div class="ttdoc">Type of parameter like norm, spline etc.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8h_source.html#l00206">ParameterHandlerGeneric.h:206</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1378,7 +1379,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8h_source.html#l00032">32</a> of file <a class="el" href="ParameterHandlerGeneric_8h_source.html">ParameterHandlerGeneric.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   32</span>{ <span class="keywordflow">return</span> <a class="code hl_function" href="ParameterStructs_8h.html#ad39c312dc44177340e2ebccd3d3f2d4c">SystType_ToString</a>(<a class="code hl_variable" href="classParameterHandlerGeneric.html#a6e412e6a3e8b954e1efcb97b03520f52">_fParamType</a>[i]); }</div>
-<div class="ttc" id="aParameterStructs_8h_html_ad39c312dc44177340e2ebccd3d3f2d4c"><div class="ttname"><a href="ParameterStructs_8h.html#ad39c312dc44177340e2ebccd3d3f2d4c">SystType_ToString</a></div><div class="ttdeci">std::string SystType_ToString(const SystType i)</div><div class="ttdoc">Convert a Syst type type to a string.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00349">ParameterStructs.h:349</a></div></div>
+<div class="ttc" id="aParameterStructs_8h_html_ad39c312dc44177340e2ebccd3d3f2d4c"><div class="ttname"><a href="ParameterStructs_8h.html#ad39c312dc44177340e2ebccd3d3f2d4c">SystType_ToString</a></div><div class="ttdeci">std::string SystType_ToString(const SystType i)</div><div class="ttdoc">Convert a Syst type type to a string.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00350">ParameterStructs.h:350</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1416,7 +1417,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00260">260</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  260</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#a93c8303daf13df6acb0870ad8eb56891">_fCurrVal</a>[i]; }</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a93c8303daf13df6acb0870ad8eb56891"><div class="ttname"><a href="classParameterHandlerBase.html#a93c8303daf13df6acb0870ad8eb56891">ParameterHandlerBase::_fCurrVal</a></div><div class="ttdeci">std::vector&lt; double &gt; _fCurrVal</div><div class="ttdoc">Current value of the parameter.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00431">ParameterHandlerBase.h:431</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a93c8303daf13df6acb0870ad8eb56891"><div class="ttname"><a href="classParameterHandlerBase.html#a93c8303daf13df6acb0870ad8eb56891">ParameterHandlerBase::_fCurrVal</a></div><div class="ttdeci">std::vector&lt; double &gt; _fCurrVal</div><div class="ttdoc">Current value of the parameter.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00449">ParameterHandlerBase.h:449</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1494,7 +1495,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00171">171</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  171</span>{<span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#a56d40a78f16384b3b6e8ed10c76b899d">_fFancyNames</a>[i];}</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a56d40a78f16384b3b6e8ed10c76b899d"><div class="ttname"><a href="classParameterHandlerBase.html#a56d40a78f16384b3b6e8ed10c76b899d">ParameterHandlerBase::_fFancyNames</a></div><div class="ttdeci">std::vector&lt; std::string &gt; _fFancyNames</div><div class="ttdoc">Fancy name for example rather than xsec_0 it is MAQE, useful for human reading.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00423">ParameterHandlerBase.h:423</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a56d40a78f16384b3b6e8ed10c76b899d"><div class="ttname"><a href="classParameterHandlerBase.html#a56d40a78f16384b3b6e8ed10c76b899d">ParameterHandlerBase::_fFancyNames</a></div><div class="ttdeci">std::vector&lt; std::string &gt; _fFancyNames</div><div class="ttdoc">Fancy name for example rather than xsec_0 it is MAQE, useful for human reading.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00441">ParameterHandlerBase.h:441</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1516,18 +1517,18 @@ Functions</h2></td></tr>
 
 <p>Get index based on name. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8cpp_source.html#l00757">757</a> of file <a class="el" href="ParameterHandlerBase_8cpp_source.html">ParameterHandlerBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  757</span>                                                                 {</div>
-<div class="line"><span class="lineno">  758</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  759</span>  <span class="keywordtype">int</span> Index = <a class="code hl_variable" href="namespaceM3.html#aed6ca6561a78ba6c90a98ddfa22353aa">M3::_BAD_INT_</a>;</div>
-<div class="line"><span class="lineno">  760</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt;<a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>; ++i) {</div>
-<div class="line"><span class="lineno">  761</span>    <span class="keywordflow">if</span>(name == <a class="code hl_variable" href="classParameterHandlerBase.html#a56d40a78f16384b3b6e8ed10c76b899d">_fFancyNames</a>[i]) {</div>
-<div class="line"><span class="lineno">  762</span>      Index = i;</div>
-<div class="line"><span class="lineno">  763</span>      <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  764</span>    }</div>
-<div class="line"><span class="lineno">  765</span>  }</div>
-<div class="line"><span class="lineno">  766</span>  <span class="keywordflow">return</span> Index;</div>
-<div class="line"><span class="lineno">  767</span>}</div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8cpp_source.html#l00871">871</a> of file <a class="el" href="ParameterHandlerBase_8cpp_source.html">ParameterHandlerBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  871</span>                                                                 {</div>
+<div class="line"><span class="lineno">  872</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  873</span>  <span class="keywordtype">int</span> Index = <a class="code hl_variable" href="namespaceM3.html#aed6ca6561a78ba6c90a98ddfa22353aa">M3::_BAD_INT_</a>;</div>
+<div class="line"><span class="lineno">  874</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt;<a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>; ++i) {</div>
+<div class="line"><span class="lineno">  875</span>    <span class="keywordflow">if</span>(name == <a class="code hl_variable" href="classParameterHandlerBase.html#a56d40a78f16384b3b6e8ed10c76b899d">_fFancyNames</a>[i]) {</div>
+<div class="line"><span class="lineno">  876</span>      Index = i;</div>
+<div class="line"><span class="lineno">  877</span>      <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  878</span>    }</div>
+<div class="line"><span class="lineno">  879</span>  }</div>
+<div class="line"><span class="lineno">  880</span>  <span class="keywordflow">return</span> Index;</div>
+<div class="line"><span class="lineno">  881</span>}</div>
 <div class="ttc" id="anamespaceM3_html_aed6ca6561a78ba6c90a98ddfa22353aa"><div class="ttname"><a href="namespaceM3.html#aed6ca6561a78ba6c90a98ddfa22353aa">M3::_BAD_INT_</a></div><div class="ttdeci">static constexpr const int _BAD_INT_</div><div class="ttdoc">Default value used for int initialisation.</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00045">Core.h:45</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -1566,7 +1567,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00264">264</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  264</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#a9f98cdf43f276a271da9a66509063ba6">_fPreFitValue</a>[i]; }</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a9f98cdf43f276a271da9a66509063ba6"><div class="ttname"><a href="classParameterHandlerBase.html#a9f98cdf43f276a271da9a66509063ba6">ParameterHandlerBase::_fPreFitValue</a></div><div class="ttdeci">std::vector&lt; double &gt; _fPreFitValue</div><div class="ttdoc">Parameter value dictated by the prior model. Based on it penalty term is calculated.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00429">ParameterHandlerBase.h:429</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a9f98cdf43f276a271da9a66509063ba6"><div class="ttname"><a href="classParameterHandlerBase.html#a9f98cdf43f276a271da9a66509063ba6">ParameterHandlerBase::_fPreFitValue</a></div><div class="ttdeci">std::vector&lt; double &gt; _fPreFitValue</div><div class="ttdoc">Parameter value dictated by the prior model. Based on it penalty term is calculated.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00447">ParameterHandlerBase.h:447</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1604,7 +1605,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00162">162</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  162</span>{<span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#aa30828713375ceda767c9631157bd41d">_fNames</a>[i];}</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_aa30828713375ceda767c9631157bd41d"><div class="ttname"><a href="classParameterHandlerBase.html#aa30828713375ceda767c9631157bd41d">ParameterHandlerBase::_fNames</a></div><div class="ttdeci">std::vector&lt; std::string &gt; _fNames</div><div class="ttdoc">ETA _fNames is set automatically in the covariance class to be something like xsec_i,...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00421">ParameterHandlerBase.h:421</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_aa30828713375ceda767c9631157bd41d"><div class="ttname"><a href="classParameterHandlerBase.html#aa30828713375ceda767c9631157bd41d">ParameterHandlerBase::_fNames</a></div><div class="ttdeci">std::vector&lt; std::string &gt; _fNames</div><div class="ttdoc">ETA _fNames is set automatically in the covariance class to be something like xsec_i,...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00439">ParameterHandlerBase.h:439</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1642,7 +1643,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00256">256</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  256</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">_fPropVal</a>[i]; }</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_af1b1a75fbc837d788201ea8062aa6a3b"><div class="ttname"><a href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">ParameterHandlerBase::_fPropVal</a></div><div class="ttdeci">std::vector&lt; double &gt; _fPropVal</div><div class="ttdoc">Proposed value of the parameter.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00433">ParameterHandlerBase.h:433</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_af1b1a75fbc837d788201ea8062aa6a3b"><div class="ttname"><a href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">ParameterHandlerBase::_fPropVal</a></div><div class="ttdeci">std::vector&lt; double &gt; _fPropVal</div><div class="ttdoc">Proposed value of the parameter.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00451">ParameterHandlerBase.h:451</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1720,7 +1721,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8h_source.html#l00028">28</a> of file <a class="el" href="ParameterHandlerGeneric_8h_source.html">ParameterHandlerGeneric.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   28</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#af4ebe6b24b280c5263e6a5385b11a2c9">_fSampleNames</a>[i];};</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_af4ebe6b24b280c5263e6a5385b11a2c9"><div class="ttname"><a href="classParameterHandlerBase.html#af4ebe6b24b280c5263e6a5385b11a2c9">ParameterHandlerBase::_fSampleNames</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; std::string &gt; &gt; _fSampleNames</div><div class="ttdoc">Tells to which samples object param should be applied.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00445">ParameterHandlerBase.h:445</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_af4ebe6b24b280c5263e6a5385b11a2c9"><div class="ttname"><a href="classParameterHandlerBase.html#af4ebe6b24b280c5263e6a5385b11a2c9">ParameterHandlerBase::_fSampleNames</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; std::string &gt; &gt; _fSampleNames</div><div class="ttdoc">Tells to which samples object param should be applied.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00463">ParameterHandlerBase.h:463</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1758,16 +1759,16 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00386">386</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  386</span>                                                                                                                         {</div>
-<div class="line"><span class="lineno">  387</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  388</span>  std::vector&lt;int&gt; returnVec;</div>
-<div class="line"><span class="lineno">  389</span>  <a class="code hl_function" href="classParameterHandlerGeneric.html#ae708dcd0bbfac4a5dd599a5c536da62b">IterateOverParams</a>(SampleName,</div>
-<div class="line"><span class="lineno">  390</span>    [&amp;](<span class="keywordtype">int</span> i) { <span class="keywordflow">return</span> <a class="code hl_function" href="group__ParameterHandlerGetters.html#ga443f15a70ebeb62613c629b59447c503">GetParamType</a>(i) == Type; }, <span class="comment">// Filter condition</span></div>
-<div class="line"><span class="lineno">  391</span>    [&amp;](<span class="keywordtype">int</span> i) { returnVec.push_back(i); } <span class="comment">// Action to perform if filter passes</span></div>
-<div class="line"><span class="lineno">  392</span>  );</div>
-<div class="line"><span class="lineno">  393</span>  <span class="keywordflow">return</span> returnVec;</div>
-<div class="line"><span class="lineno">  394</span>}</div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00402">402</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  402</span>                                                                                                                         {</div>
+<div class="line"><span class="lineno">  403</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  404</span>  std::vector&lt;int&gt; returnVec;</div>
+<div class="line"><span class="lineno">  405</span>  <a class="code hl_function" href="classParameterHandlerGeneric.html#ae708dcd0bbfac4a5dd599a5c536da62b">IterateOverParams</a>(SampleName,</div>
+<div class="line"><span class="lineno">  406</span>    [&amp;](<span class="keywordtype">int</span> i) { <span class="keywordflow">return</span> <a class="code hl_function" href="group__ParameterHandlerGetters.html#ga443f15a70ebeb62613c629b59447c503">GetParamType</a>(i) == Type; }, <span class="comment">// Filter condition</span></div>
+<div class="line"><span class="lineno">  407</span>    [&amp;](<span class="keywordtype">int</span> i) { returnVec.push_back(i); } <span class="comment">// Action to perform if filter passes</span></div>
+<div class="line"><span class="lineno">  408</span>  );</div>
+<div class="line"><span class="lineno">  409</span>  <span class="keywordflow">return</span> returnVec;</div>
+<div class="line"><span class="lineno">  410</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1805,16 +1806,16 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00374">374</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  374</span>                                                                                                                               {</div>
-<div class="line"><span class="lineno">  375</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  376</span>  std::vector&lt;std::string&gt; returnVec;</div>
-<div class="line"><span class="lineno">  377</span>  <a class="code hl_function" href="classParameterHandlerGeneric.html#ae708dcd0bbfac4a5dd599a5c536da62b">IterateOverParams</a>(SampleName,</div>
-<div class="line"><span class="lineno">  378</span>    [&amp;](<span class="keywordtype">int</span> i) { <span class="keywordflow">return</span> <a class="code hl_function" href="group__ParameterHandlerGetters.html#ga443f15a70ebeb62613c629b59447c503">GetParamType</a>(i) == Type; }, <span class="comment">// Filter condition</span></div>
-<div class="line"><span class="lineno">  379</span>    [&amp;](<span class="keywordtype">int</span> i) { returnVec.push_back(<a class="code hl_function" href="group__ParameterHandlerGetters.html#ga65b61ae6c60d4eadbb06fdef9596cc7f">GetParFancyName</a>(i)); } <span class="comment">// Action to perform if filter passes</span></div>
-<div class="line"><span class="lineno">  380</span>  );</div>
-<div class="line"><span class="lineno">  381</span>  <span class="keywordflow">return</span> returnVec;</div>
-<div class="line"><span class="lineno">  382</span>}</div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00390">390</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  390</span>                                                                                                                               {</div>
+<div class="line"><span class="lineno">  391</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  392</span>  std::vector&lt;std::string&gt; returnVec;</div>
+<div class="line"><span class="lineno">  393</span>  <a class="code hl_function" href="classParameterHandlerGeneric.html#ae708dcd0bbfac4a5dd599a5c536da62b">IterateOverParams</a>(SampleName,</div>
+<div class="line"><span class="lineno">  394</span>    [&amp;](<span class="keywordtype">int</span> i) { <span class="keywordflow">return</span> <a class="code hl_function" href="group__ParameterHandlerGetters.html#ga443f15a70ebeb62613c629b59447c503">GetParamType</a>(i) == Type; }, <span class="comment">// Filter condition</span></div>
+<div class="line"><span class="lineno">  395</span>    [&amp;](<span class="keywordtype">int</span> i) { returnVec.push_back(<a class="code hl_function" href="group__ParameterHandlerGetters.html#ga65b61ae6c60d4eadbb06fdef9596cc7f">GetParFancyName</a>(i)); } <span class="comment">// Action to perform if filter passes</span></div>
+<div class="line"><span class="lineno">  396</span>  );</div>
+<div class="line"><span class="lineno">  397</span>  <span class="keywordflow">return</span> returnVec;</div>
+<div class="line"><span class="lineno">  398</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1852,7 +1853,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8h_source.html#l00059">59</a> of file <a class="el" href="ParameterHandlerGeneric_8h_source.html">ParameterHandlerGeneric.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   59</span>{<span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerGeneric.html#a0dd46fbd1eb07b54ba48e8fc7a5c03c1">SplineParams</a>.at(i)._SplineKnotLowBound;}</div>
-<div class="ttc" id="aclassParameterHandlerGeneric_html_a0dd46fbd1eb07b54ba48e8fc7a5c03c1"><div class="ttname"><a href="classParameterHandlerGeneric.html#a0dd46fbd1eb07b54ba48e8fc7a5c03c1">ParameterHandlerGeneric::SplineParams</a></div><div class="ttdeci">std::vector&lt; SplineParameter &gt; SplineParams</div><div class="ttdoc">Vector containing info for normalisation systematics.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8h_source.html#l00205">ParameterHandlerGeneric.h:205</a></div></div>
+<div class="ttc" id="aclassParameterHandlerGeneric_html_a0dd46fbd1eb07b54ba48e8fc7a5c03c1"><div class="ttname"><a href="classParameterHandlerGeneric.html#a0dd46fbd1eb07b54ba48e8fc7a5c03c1">ParameterHandlerGeneric::SplineParams</a></div><div class="ttdeci">std::vector&lt; SplineParameter &gt; SplineParams</div><div class="ttdoc">Vector containing info for normalisation systematics.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8h_source.html#l00218">ParameterHandlerGeneric.h:218</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1927,7 +1928,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8h_source.html#l00047">47</a> of file <a class="el" href="ParameterHandlerGeneric_8h_source.html">ParameterHandlerGeneric.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   47</span>{<span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerGeneric.html#a24c0df68d9d476ea304c75310f18de2c">_fSplineNames</a>[i];}</div>
-<div class="ttc" id="aclassParameterHandlerGeneric_html_a24c0df68d9d476ea304c75310f18de2c"><div class="ttname"><a href="classParameterHandlerGeneric.html#a24c0df68d9d476ea304c75310f18de2c">ParameterHandlerGeneric::_fSplineNames</a></div><div class="ttdeci">std::vector&lt; std::string &gt; _fSplineNames</div><div class="ttdoc">Name of spline in TTree (TBranch),.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8h_source.html#l00196">ParameterHandlerGeneric.h:196</a></div></div>
+<div class="ttc" id="aclassParameterHandlerGeneric_html_a24c0df68d9d476ea304c75310f18de2c"><div class="ttname"><a href="classParameterHandlerGeneric.html#a24c0df68d9d476ea304c75310f18de2c">ParameterHandlerGeneric::_fSplineNames</a></div><div class="ttdeci">std::vector&lt; std::string &gt; _fSplineNames</div><div class="ttdoc">Name of spline in TTree (TBranch),.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8h_source.html#l00209">ParameterHandlerGeneric.h:209</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2018,13 +2019,13 @@ Functions</h2></td></tr>
 
 <p>Get vector of all proposed parameter values. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8cpp_source.html#l00363">363</a> of file <a class="el" href="ParameterHandlerBase_8cpp_source.html">ParameterHandlerBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  363</span>                                                          {</div>
-<div class="line"><span class="lineno">  364</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  365</span>  std::vector&lt;double&gt; props(<a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>);</div>
-<div class="line"><span class="lineno">  366</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>; ++i) props[i] = <a class="code hl_variable" href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">_fPropVal</a>[i];</div>
-<div class="line"><span class="lineno">  367</span>  <span class="keywordflow">return</span> props;</div>
-<div class="line"><span class="lineno">  368</span>}</div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8cpp_source.html#l00434">434</a> of file <a class="el" href="ParameterHandlerBase_8cpp_source.html">ParameterHandlerBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  434</span>                                                          {</div>
+<div class="line"><span class="lineno">  435</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  436</span>  std::vector&lt;double&gt; props(<a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>);</div>
+<div class="line"><span class="lineno">  437</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>; ++i) props[i] = <a class="code hl_variable" href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">_fPropVal</a>[i];</div>
+<div class="line"><span class="lineno">  438</span>  <span class="keywordflow">return</span> props;</div>
+<div class="line"><span class="lineno">  439</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2062,7 +2063,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00090">90</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   90</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#a166763aa1cc313512fb502bca6ea8a2c">randParams</a>[i];}</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a166763aa1cc313512fb502bca6ea8a2c"><div class="ttname"><a href="classParameterHandlerBase.html#a166763aa1cc313512fb502bca6ea8a2c">ParameterHandlerBase::randParams</a></div><div class="ttdeci">double * randParams</div><div class="ttdoc">Random number taken from gaussian around prior error used for corr_throw.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00411">ParameterHandlerBase.h:411</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a166763aa1cc313512fb502bca6ea8a2c"><div class="ttname"><a href="classParameterHandlerBase.html#a166763aa1cc313512fb502bca6ea8a2c">ParameterHandlerBase::randParams</a></div><div class="ttdeci">double * randParams</div><div class="ttdoc">Random number taken from gaussian around prior error used for corr_throw.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00429">ParameterHandlerBase.h:429</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2104,20 +2105,20 @@ Functions</h2></td></tr>
 
 <p>Get the interpolation types for splines affecting a particular SampleName. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00123">123</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  123</span>                                                                                                                              {</div>
-<div class="line"><span class="lineno">  124</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  125</span>  std::vector&lt;SplineInterpolation&gt; returnVec;</div>
-<div class="line"><span class="lineno">  126</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;pair : <a class="code hl_variable" href="classParameterHandlerGeneric.html#a67955522a48b4e340981b5ec1ca3b0da">_fSystToGlobalSystIndexMap</a>[SystType::kSpline]) {</div>
-<div class="line"><span class="lineno">  127</span>    <span class="keyword">auto</span> &amp;SplineIndex = pair.first;</div>
-<div class="line"><span class="lineno">  128</span>    <span class="keyword">auto</span> &amp;SystIndex = pair.second;</div>
-<div class="line"><span class="lineno">  129</span> </div>
-<div class="line"><span class="lineno">  130</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd">AppliesToSample</a>(SystIndex, SampleName)) { <span class="comment">//If parameter applies to required SampleID</span></div>
-<div class="line"><span class="lineno">  131</span>      returnVec.push_back(<a class="code hl_variable" href="classParameterHandlerGeneric.html#a0dd46fbd1eb07b54ba48e8fc7a5c03c1">SplineParams</a>.at(SplineIndex)._SplineInterpolationType);</div>
-<div class="line"><span class="lineno">  132</span>    }</div>
-<div class="line"><span class="lineno">  133</span>  }</div>
-<div class="line"><span class="lineno">  134</span>  <span class="keywordflow">return</span> returnVec;</div>
-<div class="line"><span class="lineno">  135</span>}</div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00129">129</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  129</span>                                                                                                                              {</div>
+<div class="line"><span class="lineno">  130</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  131</span>  std::vector&lt;SplineInterpolation&gt; returnVec;</div>
+<div class="line"><span class="lineno">  132</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;pair : <a class="code hl_variable" href="classParameterHandlerGeneric.html#a67955522a48b4e340981b5ec1ca3b0da">_fSystToGlobalSystIndexMap</a>[SystType::kSpline]) {</div>
+<div class="line"><span class="lineno">  133</span>    <span class="keyword">auto</span> &amp;SplineIndex = pair.first;</div>
+<div class="line"><span class="lineno">  134</span>    <span class="keyword">auto</span> &amp;SystIndex = pair.second;</div>
+<div class="line"><span class="lineno">  135</span> </div>
+<div class="line"><span class="lineno">  136</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd">AppliesToSample</a>(SystIndex, SampleName)) { <span class="comment">//If parameter applies to required SampleID</span></div>
+<div class="line"><span class="lineno">  137</span>      returnVec.push_back(<a class="code hl_variable" href="classParameterHandlerGeneric.html#a0dd46fbd1eb07b54ba48e8fc7a5c03c1">SplineParams</a>.at(SplineIndex)._SplineInterpolationType);</div>
+<div class="line"><span class="lineno">  138</span>    }</div>
+<div class="line"><span class="lineno">  139</span>  }</div>
+<div class="line"><span class="lineno">  140</span>  <span class="keywordflow">return</span> returnVec;</div>
+<div class="line"><span class="lineno">  141</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2139,21 +2140,21 @@ Functions</h2></td></tr>
 
 <p>DB Grab the Spline Modes for the relevant SampleName. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00139">139</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  139</span>                                                                                                                     {</div>
-<div class="line"><span class="lineno">  140</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  141</span>  std::vector&lt; std::vector&lt;int&gt; &gt; returnVec;</div>
-<div class="line"><span class="lineno">  142</span>  <span class="comment">//Need a counter or something to correctly get the index in _fSplineModes since it&#39;s not of length nPars</span></div>
-<div class="line"><span class="lineno">  143</span>  <span class="comment">//Should probably just make a std::map&lt;std::string, int&gt; for param name to FD spline index</span></div>
-<div class="line"><span class="lineno">  144</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;pair : <a class="code hl_variable" href="classParameterHandlerGeneric.html#a67955522a48b4e340981b5ec1ca3b0da">_fSystToGlobalSystIndexMap</a>[SystType::kSpline]) {</div>
-<div class="line"><span class="lineno">  145</span>    <span class="keyword">auto</span> &amp;SplineIndex = pair.first;</div>
-<div class="line"><span class="lineno">  146</span>    <span class="keyword">auto</span> &amp;SystIndex = pair.second;</div>
-<div class="line"><span class="lineno">  147</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd">AppliesToSample</a>(SystIndex, SampleName)) { <span class="comment">//If parameter applies to required SampleID</span></div>
-<div class="line"><span class="lineno">  148</span>      returnVec.push_back(<a class="code hl_variable" href="classParameterHandlerGeneric.html#a0dd46fbd1eb07b54ba48e8fc7a5c03c1">SplineParams</a>.at(SplineIndex)._fSplineModes);</div>
-<div class="line"><span class="lineno">  149</span>    }</div>
-<div class="line"><span class="lineno">  150</span>  }</div>
-<div class="line"><span class="lineno">  151</span>  <span class="keywordflow">return</span> returnVec;</div>
-<div class="line"><span class="lineno">  152</span>}</div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00145">145</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  145</span>                                                                                                                     {</div>
+<div class="line"><span class="lineno">  146</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  147</span>  std::vector&lt; std::vector&lt;int&gt; &gt; returnVec;</div>
+<div class="line"><span class="lineno">  148</span>  <span class="comment">//Need a counter or something to correctly get the index in _fSplineModes since it&#39;s not of length nPars</span></div>
+<div class="line"><span class="lineno">  149</span>  <span class="comment">//Should probably just make a std::map&lt;std::string, int&gt; for param name to FD spline index</span></div>
+<div class="line"><span class="lineno">  150</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;pair : <a class="code hl_variable" href="classParameterHandlerGeneric.html#a67955522a48b4e340981b5ec1ca3b0da">_fSystToGlobalSystIndexMap</a>[SystType::kSpline]) {</div>
+<div class="line"><span class="lineno">  151</span>    <span class="keyword">auto</span> &amp;SplineIndex = pair.first;</div>
+<div class="line"><span class="lineno">  152</span>    <span class="keyword">auto</span> &amp;SystIndex = pair.second;</div>
+<div class="line"><span class="lineno">  153</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd">AppliesToSample</a>(SystIndex, SampleName)) { <span class="comment">//If parameter applies to required SampleID</span></div>
+<div class="line"><span class="lineno">  154</span>      returnVec.push_back(<a class="code hl_variable" href="classParameterHandlerGeneric.html#a0dd46fbd1eb07b54ba48e8fc7a5c03c1">SplineParams</a>.at(SplineIndex)._fSplineModes);</div>
+<div class="line"><span class="lineno">  155</span>    }</div>
+<div class="line"><span class="lineno">  156</span>  }</div>
+<div class="line"><span class="lineno">  157</span>  <span class="keywordflow">return</span> returnVec;</div>
+<div class="line"><span class="lineno">  158</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2175,11 +2176,11 @@ Functions</h2></td></tr>
 
 <p>KS: Grab the Spline parameters for the relevant SampleName. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00340">340</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  340</span>                                                                                                                       {</div>
-<div class="line"><span class="lineno">  341</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  342</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="classParameterHandlerGeneric.html#a982803878f2f6ee7a28c6b7f3fede8f8">GetTypeParamsFromSampleName</a>(<a class="code hl_variable" href="classParameterHandlerGeneric.html#a67955522a48b4e340981b5ec1ca3b0da">_fSystToGlobalSystIndexMap</a>[SystType::kSpline], <a class="code hl_variable" href="classParameterHandlerGeneric.html#a0dd46fbd1eb07b54ba48e8fc7a5c03c1">SplineParams</a>, SampleName);</div>
-<div class="line"><span class="lineno">  343</span>}</div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00356">356</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  356</span>                                                                                                                       {</div>
+<div class="line"><span class="lineno">  357</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  358</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="classParameterHandlerGeneric.html#a982803878f2f6ee7a28c6b7f3fede8f8">GetTypeParamsFromSampleName</a>(<a class="code hl_variable" href="classParameterHandlerGeneric.html#a67955522a48b4e340981b5ec1ca3b0da">_fSystToGlobalSystIndexMap</a>[SystType::kSpline], <a class="code hl_variable" href="classParameterHandlerGeneric.html#a0dd46fbd1eb07b54ba48e8fc7a5c03c1">SplineParams</a>, SampleName);</div>
+<div class="line"><span class="lineno">  359</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2201,20 +2202,19 @@ Functions</h2></td></tr>
 
 <p>DB Get spline parameters depending on given SampleName. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00108">108</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  108</span>                                                                                                                {</div>
-<div class="line"><span class="lineno">  109</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  110</span>  std::vector&lt;std::string&gt; returnVec;</div>
-<div class="line"><span class="lineno">  111</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;pair : <a class="code hl_variable" href="classParameterHandlerGeneric.html#a67955522a48b4e340981b5ec1ca3b0da">_fSystToGlobalSystIndexMap</a>[SystType::kSpline]) {</div>
-<div class="line"><span class="lineno">  112</span>    <span class="keyword">auto</span> &amp;SplineIndex = pair.first;</div>
-<div class="line"><span class="lineno">  113</span>    <span class="keyword">auto</span> &amp;SystIndex = pair.second;</div>
-<div class="line"><span class="lineno">  114</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd">AppliesToSample</a>(SystIndex, SampleName)) { <span class="comment">//If parameter applies to required Sample</span></div>
-<div class="line"><span class="lineno">  115</span>      returnVec.push_back(<a class="code hl_variable" href="classParameterHandlerGeneric.html#a24c0df68d9d476ea304c75310f18de2c">_fSplineNames</a>.at(SplineIndex));</div>
-<div class="line"><span class="lineno">  116</span>    }</div>
-<div class="line"><span class="lineno">  117</span> </div>
-<div class="line"><span class="lineno">  118</span>  }</div>
-<div class="line"><span class="lineno">  119</span>  <span class="keywordflow">return</span> returnVec;</div>
-<div class="line"><span class="lineno">  120</span>}</div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00115">115</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  115</span>                                                                                                                {</div>
+<div class="line"><span class="lineno">  116</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  117</span>  std::vector&lt;std::string&gt; returnVec;</div>
+<div class="line"><span class="lineno">  118</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;pair : <a class="code hl_variable" href="classParameterHandlerGeneric.html#a67955522a48b4e340981b5ec1ca3b0da">_fSystToGlobalSystIndexMap</a>[SystType::kSpline]) {</div>
+<div class="line"><span class="lineno">  119</span>    <span class="keyword">auto</span> &amp;SplineIndex = pair.first;</div>
+<div class="line"><span class="lineno">  120</span>    <span class="keyword">auto</span> &amp;SystIndex = pair.second;</div>
+<div class="line"><span class="lineno">  121</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd">AppliesToSample</a>(SystIndex, SampleName)) { <span class="comment">//If parameter applies to required Sample</span></div>
+<div class="line"><span class="lineno">  122</span>      returnVec.push_back(<a class="code hl_variable" href="classParameterHandlerGeneric.html#a24c0df68d9d476ea304c75310f18de2c">_fSplineNames</a>.at(SplineIndex));</div>
+<div class="line"><span class="lineno">  123</span>    }</div>
+<div class="line"><span class="lineno">  124</span>  }</div>
+<div class="line"><span class="lineno">  125</span>  <span class="keywordflow">return</span> returnVec;</div>
+<div class="line"><span class="lineno">  126</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2252,19 +2252,19 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00242">242</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  242</span>                                                                                                                                {</div>
-<div class="line"><span class="lineno">  243</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  244</span>  std::vector&lt;int&gt; returnVec;</div>
-<div class="line"><span class="lineno">  245</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;pair : <a class="code hl_variable" href="classParameterHandlerGeneric.html#a67955522a48b4e340981b5ec1ca3b0da">_fSystToGlobalSystIndexMap</a>[Type]) {</div>
-<div class="line"><span class="lineno">  246</span>    <span class="keyword">auto</span> &amp;SplineIndex = pair.first;</div>
-<div class="line"><span class="lineno">  247</span>    <span class="keyword">auto</span> &amp;systIndex = pair.second;</div>
-<div class="line"><span class="lineno">  248</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd">AppliesToSample</a>(systIndex, SampleName)) { <span class="comment">//If parameter applies to required SampleID</span></div>
-<div class="line"><span class="lineno">  249</span>      returnVec.push_back(SplineIndex);</div>
-<div class="line"><span class="lineno">  250</span>    }</div>
-<div class="line"><span class="lineno">  251</span>  }</div>
-<div class="line"><span class="lineno">  252</span>  <span class="keywordflow">return</span> returnVec;</div>
-<div class="line"><span class="lineno">  253</span>}</div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00248">248</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  248</span>                                                                                                                                {</div>
+<div class="line"><span class="lineno">  249</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  250</span>  std::vector&lt;int&gt; returnVec;</div>
+<div class="line"><span class="lineno">  251</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;pair : <a class="code hl_variable" href="classParameterHandlerGeneric.html#a67955522a48b4e340981b5ec1ca3b0da">_fSystToGlobalSystIndexMap</a>[Type]) {</div>
+<div class="line"><span class="lineno">  252</span>    <span class="keyword">auto</span> &amp;SplineIndex = pair.first;</div>
+<div class="line"><span class="lineno">  253</span>    <span class="keyword">auto</span> &amp;systIndex = pair.second;</div>
+<div class="line"><span class="lineno">  254</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd">AppliesToSample</a>(systIndex, SampleName)) { <span class="comment">//If parameter applies to required SampleID</span></div>
+<div class="line"><span class="lineno">  255</span>      returnVec.push_back(SplineIndex);</div>
+<div class="line"><span class="lineno">  256</span>    }</div>
+<div class="line"><span class="lineno">  257</span>  }</div>
+<div class="line"><span class="lineno">  258</span>  <span class="keywordflow">return</span> returnVec;</div>
+<div class="line"><span class="lineno">  259</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2295,7 +2295,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00211">211</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  211</span>{<span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#a4d8ded766dcf6941bea584b098e45e22">throwMatrix</a>;}</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a4d8ded766dcf6941bea584b098e45e22"><div class="ttname"><a href="classParameterHandlerBase.html#a4d8ded766dcf6941bea584b098e45e22">ParameterHandlerBase::throwMatrix</a></div><div class="ttdeci">TMatrixDSym * throwMatrix</div><div class="ttdoc">Matrix which we use for step proposal before Cholesky decomposition (not actually used for step propo...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00448">ParameterHandlerBase.h:448</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a4d8ded766dcf6941bea584b098e45e22"><div class="ttname"><a href="classParameterHandlerBase.html#a4d8ded766dcf6941bea584b098e45e22">ParameterHandlerBase::throwMatrix</a></div><div class="ttdeci">TMatrixDSym * throwMatrix</div><div class="ttdoc">Matrix which we use for step proposal before Cholesky decomposition (not actually used for step propo...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00466">ParameterHandlerBase.h:466</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2337,7 +2337,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00214">214</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  214</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#a1e916de10380d0860d890601fa87c107">throwMatrixCholDecomp</a>[i][j];}</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a1e916de10380d0860d890601fa87c107"><div class="ttname"><a href="classParameterHandlerBase.html#a1e916de10380d0860d890601fa87c107">ParameterHandlerBase::throwMatrixCholDecomp</a></div><div class="ttdeci">double ** throwMatrixCholDecomp</div><div class="ttdoc">Throw matrix that is being used in the fit, much faster as TMatrixDSym cache miss.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00452">ParameterHandlerBase.h:452</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a1e916de10380d0860d890601fa87c107"><div class="ttname"><a href="classParameterHandlerBase.html#a1e916de10380d0860d890601fa87c107">ParameterHandlerBase::throwMatrixCholDecomp</a></div><div class="ttdeci">double ** throwMatrixCholDecomp</div><div class="ttdoc">Throw matrix that is being used in the fit, much faster as TMatrixDSym cache miss.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00470">ParameterHandlerBase.h:470</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2368,7 +2368,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00217">217</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  217</span>{<span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#a63d70f267b76b2795fa780e73144f6cc">throwMatrix_CholDecomp</a>;}</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a63d70f267b76b2795fa780e73144f6cc"><div class="ttname"><a href="classParameterHandlerBase.html#a63d70f267b76b2795fa780e73144f6cc">ParameterHandlerBase::throwMatrix_CholDecomp</a></div><div class="ttdeci">TMatrixD * throwMatrix_CholDecomp</div><div class="ttdoc">Matrix which we use for step proposal after Cholesky decomposition.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00450">ParameterHandlerBase.h:450</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a63d70f267b76b2795fa780e73144f6cc"><div class="ttname"><a href="classParameterHandlerBase.html#a63d70f267b76b2795fa780e73144f6cc">ParameterHandlerBase::throwMatrix_CholDecomp</a></div><div class="ttdeci">TMatrixD * throwMatrix_CholDecomp</div><div class="ttdoc">Matrix which we use for step proposal after Cholesky decomposition.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00468">ParameterHandlerBase.h:468</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2439,7 +2439,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00268">268</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  268</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#aca38e417c05c6fa67a892ee5ddf1c2ac">_fUpBound</a>[i];}</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_aca38e417c05c6fa67a892ee5ddf1c2ac"><div class="ttname"><a href="classParameterHandlerBase.html#aca38e417c05c6fa67a892ee5ddf1c2ac">ParameterHandlerBase::_fUpBound</a></div><div class="ttdeci">std::vector&lt; double &gt; _fUpBound</div><div class="ttdoc">Upper physical bound, parameter will not be able to go beyond it.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00439">ParameterHandlerBase.h:439</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_aca38e417c05c6fa67a892ee5ddf1c2ac"><div class="ttname"><a href="classParameterHandlerBase.html#aca38e417c05c6fa67a892ee5ddf1c2ac">ParameterHandlerBase::_fUpBound</a></div><div class="ttdeci">std::vector&lt; double &gt; _fUpBound</div><div class="ttdoc">Upper physical bound, parameter will not be able to go beyond it.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00457">ParameterHandlerBase.h:457</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2561,19 +2561,19 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>bool telling whether param is part of group </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00661">661</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  661</span>                                                                                      {</div>
-<div class="line"><span class="lineno">  662</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  663</span>  std::string groupLower = Group;</div>
-<div class="line"><span class="lineno">  664</span>  std::string paramGroupLower = <a class="code hl_variable" href="classParameterHandlerGeneric.html#aeb3fea66be02cc59ca14af171e7dd746">_ParameterGroup</a>[i];</div>
-<div class="line"><span class="lineno">  665</span> </div>
-<div class="line"><span class="lineno">  666</span>  <span class="comment">// KS: Convert both strings to lowercase, this way comparison will be case insensitive</span></div>
-<div class="line"><span class="lineno">  667</span>  std::transform(groupLower.begin(), groupLower.end(), groupLower.begin(), ::tolower);</div>
-<div class="line"><span class="lineno">  668</span>  std::transform(paramGroupLower.begin(), paramGroupLower.end(), paramGroupLower.begin(), ::tolower);</div>
-<div class="line"><span class="lineno">  669</span> </div>
-<div class="line"><span class="lineno">  670</span>  <span class="keywordflow">return</span> groupLower == paramGroupLower;</div>
-<div class="line"><span class="lineno">  671</span>}</div>
-<div class="ttc" id="aclassParameterHandlerGeneric_html_aeb3fea66be02cc59ca14af171e7dd746"><div class="ttname"><a href="classParameterHandlerGeneric.html#aeb3fea66be02cc59ca14af171e7dd746">ParameterHandlerGeneric::_ParameterGroup</a></div><div class="ttdeci">std::vector&lt; std::string &gt; _ParameterGroup</div><div class="ttdoc">KS: Allow to group parameters for example to affect only cross-section or only flux etc.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8h_source.html#l00199">ParameterHandlerGeneric.h:199</a></div></div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerGeneric_8cpp_source.html#l00705">705</a> of file <a class="el" href="ParameterHandlerGeneric_8cpp_source.html">ParameterHandlerGeneric.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  705</span>                                                                                      {</div>
+<div class="line"><span class="lineno">  706</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  707</span>  std::string groupLower = Group;</div>
+<div class="line"><span class="lineno">  708</span>  std::string paramGroupLower = <a class="code hl_variable" href="classParameterHandlerGeneric.html#aeb3fea66be02cc59ca14af171e7dd746">_ParameterGroup</a>[i];</div>
+<div class="line"><span class="lineno">  709</span> </div>
+<div class="line"><span class="lineno">  710</span>  <span class="comment">// KS: Convert both strings to lowercase, this way comparison will be case insensitive</span></div>
+<div class="line"><span class="lineno">  711</span>  std::transform(groupLower.begin(), groupLower.end(), groupLower.begin(), ::tolower);</div>
+<div class="line"><span class="lineno">  712</span>  std::transform(paramGroupLower.begin(), paramGroupLower.end(), paramGroupLower.begin(), ::tolower);</div>
+<div class="line"><span class="lineno">  713</span> </div>
+<div class="line"><span class="lineno">  714</span>  <span class="keywordflow">return</span> groupLower == paramGroupLower;</div>
+<div class="line"><span class="lineno">  715</span>}</div>
+<div class="ttc" id="aclassParameterHandlerGeneric_html_aeb3fea66be02cc59ca14af171e7dd746"><div class="ttname"><a href="classParameterHandlerGeneric.html#aeb3fea66be02cc59ca14af171e7dd746">ParameterHandlerGeneric::_ParameterGroup</a></div><div class="ttdeci">std::vector&lt; std::string &gt; _ParameterGroup</div><div class="ttdoc">KS: Allow to group parameters for example to affect only cross-section or only flux etc.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8h_source.html#l00212">ParameterHandlerGeneric.h:212</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
