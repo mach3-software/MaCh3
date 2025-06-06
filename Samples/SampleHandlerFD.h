@@ -217,6 +217,8 @@ public:
   bool IsEventSelected(const int iEvent);
   /// @brief HH - reset the shifted values to the original values
   virtual void resetShifts(int iEvent) {(void)iEvent;};
+  /// @brief HH - a vector that stores all the FuncPars struct
+  std::vector<FunctionalParameter> funcParsVec;
   /// @brief HH - a map that relates the name of the functional parameter to
   /// funcpar enum
   std::unordered_map<std::string, int> funcParsNamesMap;

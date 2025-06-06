@@ -647,7 +647,7 @@ void SampleHandlerFD::RegisterIndividualFunctionalParameter(const std::string& f
 }
 
 void SampleHandlerFD::SetupFunctionalParameters() {
-  std::vector<FunctionalParameter> funcParsVec = ParHandler->GetFunctionalParametersFromSampleName(SampleName);
+  funcParsVec = ParHandler->GetFunctionalParametersFromSampleName(SampleName);
   // RegisterFunctionalParameters is implemented in experiment-specific code, 
   // which calls RegisterIndividualFuncPar to populate funcParsNamesMap, funcParsNamesVec, and funcParsFuncMap
   RegisterFunctionalParameters();
