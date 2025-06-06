@@ -33,6 +33,8 @@ SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGen
 
   KinematicParameters = nullptr;
   ReversedKinematicParameters = nullptr;
+  KinematicVectors = nullptr;
+  ReversedKinematicVectors = nullptr;
 
   SampleHandlerFD_array = nullptr;
   SampleHandlerFD_data = nullptr;
