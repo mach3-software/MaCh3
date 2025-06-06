@@ -31,31 +31,21 @@ public:
         );
     }
 
+    /* Trampoline (need one for each virtual function) */
+    void CleanMemoryBeforeFit() override {
+        PYBIND11_OVERRIDE_PURE(
+            void,          /* Return type */
+            SampleHandlerBase, /* Parent class */
+            CleanMemoryBeforeFit       /* Name of function in C++ (must match Python name) */
+        );
+    }
+
     double GetLikelihood() override {
         PYBIND11_OVERRIDE_PURE_NAME(
             double,        /* Return type */
             SampleHandlerBase, /* Parent class */
             "get_likelihood", /* Python name*/
             GetLikelihood  /* Name of function in C++ (must match Python name) */
-                           /* Argument(s) */
-        );
-    }
-    
-    void Fill1DHist() override {
-        PYBIND11_OVERRIDE_PURE_NAME(
-            void,          /* Return type */
-            SampleHandlerBase, /* Parent class */
-            "fill_1d_hist", /* Python Name */
-            Fill1DHist     /* Name of function in C++ (must match Python name) */
-        );
-    }
-    
-    void Fill2DHist() override {
-        PYBIND11_OVERRIDE_PURE_NAME(
-            void,          /* Return type */
-            SampleHandlerBase, /* Parent class */
-            "fill_2d_hist",/* Python name*/
-            Fill2DHist     /* Name of function in C++ (must match Python name) */
                            /* Argument(s) */
         );
     }
@@ -76,6 +66,15 @@ public:
             "setup_weight_pointers", /*python name*/
             SetupWeightPointers,     /* Name of function in C++ */
                              /* Argument(s) */
+        );
+    }
+
+    /* Trampoline (need one for each virtual function) */
+    void CleanMemoryBeforeFit() override {
+        PYBIND11_OVERRIDE_PURE(
+            void,          /* Return type */
+            SampleHandlerFD, /* Parent class */
+            CleanMemoryBeforeFit       /* Name of function in C++ (must match Python name) */
         );
     }
 
@@ -193,15 +192,6 @@ public:
             py::arg("variable")           /* Argument(s) */
         );
     }
-    
-    void Fill2DHist() override {
-        PYBIND11_OVERRIDE_PURE(
-            void,          /* Return type */
-            SampleHandlerBase, /* Parent class */
-            Fill2DHist     /* Name of function in C++ (must match Python name) */
-                           /* Argument(s) */
-        );
-    }
 
     void RegisterFunctionalParameters() override {
         PYBIND11_OVERRIDE_PURE_NAME(
@@ -243,18 +233,6 @@ void initSamples(py::module &m){
             "Get the sample likelihood at the current point in your model space. You will need to override this."
         )
         
-        .def(
-            "fill_1d_hist", 
-            &SampleHandlerBase::Fill1DHist,
-            "Do the initial filling of the sample for 1d histogram. You will need to override this."
-        )
-        
-        .def(
-            "fill_2d_hist", 
-            &SampleHandlerBase::Fill2DHist,
-            "Do the initial filling of the sample for 2d histogram. You will need to override this."
-        )
-
         .def(
             "set_test_stat",
             &SampleHandlerBase::SetTestStatistic,

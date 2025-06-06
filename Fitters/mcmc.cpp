@@ -83,6 +83,9 @@ void mcmc::RunMCMC() {
   // Prepare the output branches
   PrepareOutput();
 
+  // Remove obsolete memory and make other checks before fit starts
+  SanitiseInputs();
+
   // Reconfigure the samples, systematics and oscillation for first weight
   // ProposeStep sets logLProp
   ProposeStep();
@@ -205,10 +208,7 @@ void mcmc::PrintProgress() {
   MACH3LOG_INFO("Accepted/Total steps: {}/{} = {:.2f}", accCount, step - stepStart, static_cast<double>(accCount) / static_cast<double>(step - stepStart));
 
   for (ParameterHandlerBase *cov : systematics) {
-    if (cov->GetName() == "xsec_cov") {
-      MACH3LOG_INFO("Cross-section parameters: ");
-      cov->PrintNominalCurrProp();
-    }
+    cov->PrintNominalCurrProp();
   }
   #ifdef DEBUG
   if (debug) {

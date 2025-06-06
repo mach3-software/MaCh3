@@ -136,8 +136,13 @@ std::vector<SampleType*> MaCh3SampleHandlerFactory(const std::vector<std::string
     TString NameTString = TString(name.c_str());
 
     // Clone the 1D histogram with a modified name
-    TH1D* SampleHistogramPrior = static_cast<TH1D*>(Sample->Get1DHist()->Clone(NameTString + "_Prior"));
-    Sample->AddData(SampleHistogramPrior);
+    if (Sample->GetNDim() == 1) {
+      auto hist = static_cast<TH1D*>(Sample->GetMCHist(1)->Clone(NameTString + "_Prior"));
+      Sample->AddData(hist);
+    } else {
+      auto hist = static_cast<TH2D*>(Sample->GetMCHist(2)->Clone(NameTString + "_Prior"));
+      Sample->AddData(hist);
+    }
     Handlers[i] = Sample;
   }
   return Handlers;
