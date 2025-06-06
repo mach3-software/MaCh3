@@ -26,8 +26,9 @@ public:
   /// @brief destructor
   virtual ~SampleHandlerFD();
 
+  /// @brief DB Function to differentiate 1D or 2D binning
   /// @ingroup SampleHandlerGetters
-  int GetNDim(){return nDimensions;} //DB Function to differentiate 1D or 2D binning
+  int GetNDim() const { return nDimensions; }
   /// @ingroup SampleHandlerGetters
   std::string GetSampleName(int iSample = 0) const override;
   /// @ingroup SampleHandlerGetters
@@ -198,10 +199,6 @@ public:
   /// @brief the strings associated with the variables used for the binning e.g. "RecoNeutrinoEnergy"
   std::string XVarStr, YVarStr;
   std::vector<std::string> SplineVarNames;
-  /// @brief vector of the binning used in axis 1 (the x-axis)
-  std::vector<double> SampleXBins;
-  /// @brief vector of the binning used in axis 2 (the y-axis)
-  std::vector<double> SampleYBins;
   //===============================================================================
 
   // ----- Functional Parameters -----
@@ -220,15 +217,13 @@ public:
   bool IsEventSelected(const int iEvent);
   /// @brief HH - reset the shifted values to the original values
   virtual void resetShifts(int iEvent) {(void)iEvent;};
-  /// @brief HH - a vector that stores all the FuncPars struct
-  std::vector<FunctionalParameter> funcParsVec;
   /// @brief HH - a map that relates the name of the functional parameter to
   /// funcpar enum
   std::unordered_map<std::string, int> funcParsNamesMap;
   /// @brief HH - a map that relates the funcpar enum to pointer of FuncPars
   /// struct
-  // HH - Changed to a vector of pointers since it's faster than unordered_map
-  // and we are using ints as keys
+  /// HH - Changed to a vector of pointers since it's faster than unordered_map
+  /// and we are using ints as keys
   std::vector<FunctionalParameter *> funcParsMap;
   /// @brief HH - a map that relates the funcpar enum to pointer of the actual
   /// function
@@ -239,7 +234,7 @@ public:
   std::vector<std::string> funcParsNamesVec = {};
 
   /// @brief Check whether a normalisation systematic affects an event or not
-  void CalcNormsBins(std::vector< std::vector< int > >& xsec_norms_bins);
+  void CalcNormsBins(std::vector<NormParameter>& norm_parameters, std::vector< std::vector< int > >& xsec_norms_bins);
   /// @brief Calculate the spline weight for a given event
   M3::float_t CalcWeightSpline(const FarDetectorCoreInfo* MCEvent) const;
   /// @brief Calculate the norm weight for a given event
@@ -286,16 +281,8 @@ public:
   
   //===============================================================================
   //DB Variables required for GetLikelihood
-  /// Vector to hold x-axis bin-edges
-  std::vector<double> XBinEdges;
-  /// Vector to hold y-axis bin-edges
-  std::vector<double> YBinEdges;
-
-  // ETA: also makes sense to store the number of X and Y bins
-  /// Number of X axis bins in the histogram used for likelihood calculation
-  size_t nXBins;
-  /// Number of Y axis bins in the histogram used for likelihood calculation
-  size_t nYBins;
+  /// KS: This stores binning information, in future could be come vector to store binning for every used sample
+  SampleBinningInfo Binning;
 
   /// DB Array to be filled after reweighting
   double** SampleHandlerFD_array;
@@ -327,8 +314,6 @@ public:
   /// @brief the name of this sample e.g."muon-like"
   std::string SampleTitle;
 
-  /// @brief Information to store for normalisation pars
-  std::vector<NormParameter> norm_parameters;
   //===========================================================================
   //DB Vectors to store which kinematic cuts we apply
   //like in XsecNorms but for events in sample. Read in from sample yaml file 
