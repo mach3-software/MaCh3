@@ -10,13 +10,14 @@ var searchData=
   ['ratioplotsplit_7',['ratioPlotSplit',['../PlotLLH_8cpp.html#a45cc23dd922ece737b1306d357671417',1,'PlotLLH.cpp']]],
   ['reject_8',['reject',['../classmcmc.html#a537f7c2411a6a8e65fdf57b81ce6fe4a',1,'mcmc']]],
   ['reversedkinematicparameters_9',['ReversedKinematicParameters',['../classSampleHandlerFD.html#ad7ac675cc4ce81bec42e0700f1ff2620',1,'SampleHandlerFD']]],
-  ['rhat_10',['RHat',['../RHat__HighMem_8cpp.html#ab5cfb5e8741283e8d8252aae184004e4',1,'RHat():&#160;RHat_HighMem.cpp'],['../RHat_8cpp.html#ab5cfb5e8741283e8d8252aae184004e4',1,'RHat():&#160;RHat.cpp']]],
-  ['rhatfolded_11',['RHatFolded',['../RHat__HighMem_8cpp.html#a754fbe6088f05d880121693722fe6b99',1,'RHat_HighMem.cpp']]],
-  ['rnd_12',['rnd',['../classSampleSummary.html#a364fb16938a26adbe59fdd057f4b9405',1,'SampleSummary']]],
-  ['rw_5fetru_13',['rw_etru',['../structFarDetectorCoreInfo.html#acfc344a4365828d63409fa2c2c5f4633',1,'FarDetectorCoreInfo']]],
-  ['rw_5flower_5flower_5fxbinedge_14',['rw_lower_lower_xbinedge',['../structFarDetectorCoreInfo.html#a42f83854dd48874bd6bc9cc089c74582',1,'FarDetectorCoreInfo']]],
-  ['rw_5flower_5fxbinedge_15',['rw_lower_xbinedge',['../structFarDetectorCoreInfo.html#aab21263dc4a65a848430c7f72af0c44d',1,'FarDetectorCoreInfo']]],
-  ['rw_5ftruecz_16',['rw_truecz',['../structFarDetectorCoreInfo.html#afa3d9bb4acd11164ba41d602330243f2',1,'FarDetectorCoreInfo']]],
-  ['rw_5fupper_5fupper_5fxbinedge_17',['rw_upper_upper_xbinedge',['../structFarDetectorCoreInfo.html#a977f829f8c92853a4ac486158bf4cb17',1,'FarDetectorCoreInfo']]],
-  ['rw_5fupper_5fxbinedge_18',['rw_upper_xbinedge',['../structFarDetectorCoreInfo.html#a1d656ca460baeb8ab149a83a585f2694',1,'FarDetectorCoreInfo']]]
+  ['reversedkinematicvectors_10',['ReversedKinematicVectors',['../classSampleHandlerFD.html#a341f7bf83eb74ba5d27a2c9616202eba',1,'SampleHandlerFD']]],
+  ['rhat_11',['RHat',['../RHat__HighMem_8cpp.html#ab5cfb5e8741283e8d8252aae184004e4',1,'RHat():&#160;RHat_HighMem.cpp'],['../RHat_8cpp.html#ab5cfb5e8741283e8d8252aae184004e4',1,'RHat():&#160;RHat.cpp']]],
+  ['rhatfolded_12',['RHatFolded',['../RHat__HighMem_8cpp.html#a754fbe6088f05d880121693722fe6b99',1,'RHat_HighMem.cpp']]],
+  ['rnd_13',['rnd',['../classSampleSummary.html#a364fb16938a26adbe59fdd057f4b9405',1,'SampleSummary']]],
+  ['rw_5fetru_14',['rw_etru',['../structFarDetectorCoreInfo.html#acfc344a4365828d63409fa2c2c5f4633',1,'FarDetectorCoreInfo']]],
+  ['rw_5flower_5flower_5fxbinedge_15',['rw_lower_lower_xbinedge',['../structFarDetectorCoreInfo.html#a42f83854dd48874bd6bc9cc089c74582',1,'FarDetectorCoreInfo']]],
+  ['rw_5flower_5fxbinedge_16',['rw_lower_xbinedge',['../structFarDetectorCoreInfo.html#aab21263dc4a65a848430c7f72af0c44d',1,'FarDetectorCoreInfo']]],
+  ['rw_5ftruecz_17',['rw_truecz',['../structFarDetectorCoreInfo.html#afa3d9bb4acd11164ba41d602330243f2',1,'FarDetectorCoreInfo']]],
+  ['rw_5fupper_5fupper_5fxbinedge_18',['rw_upper_upper_xbinedge',['../structFarDetectorCoreInfo.html#a977f829f8c92853a4ac486158bf4cb17',1,'FarDetectorCoreInfo']]],
+  ['rw_5fupper_5fxbinedge_19',['rw_upper_xbinedge',['../structFarDetectorCoreInfo.html#a1d656ca460baeb8ab149a83a585f2694',1,'FarDetectorCoreInfo']]]
 ];
