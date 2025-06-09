@@ -321,6 +321,14 @@ void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const 
                   GetParFancyName(Index),
                   CircularBoundsValues.back().first,
                   CircularBoundsValues.back().second);
+    // KS: Make sure circular bounds are within physical bounds. If we are outside of physics bound MCMC will never explore such phase space region
+    if (CircularBoundsValues.back().first < _fLowBound.at(Index) || CircularBoundsValues.back().second > _fUpBound.at(Index)) {
+      MACH3LOG_ERROR("Circular bounds [{}, {}] for parameter {} exceed physical bounds [{}, {}]",
+                     CircularBoundsValues.back().first, CircularBoundsValues.back().second,
+                     GetParFancyName(Index),
+                     _fLowBound.at(Index), _fUpBound.at(Index));
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
   }
 
   if (FlipEnabled) {
