@@ -33,7 +33,7 @@ _MaCh3_Safe_Include_End_ //}
 
 // *******************
 /// @brief KS: This is mad way of converting string to int. Why? To be able to use string with switch
-constexpr unsigned int str2int(const char* str, int h = 0) {
+constexpr unsigned int str2int(const char* str, const int h = 0) {
 // *******************
   return !str[h] ? 5381 : (str2int(str, h+1) * 33) ^ str[h];
 }
@@ -112,10 +112,10 @@ enum NuPDG {
 /// @todo KS: Consider adding BakerCousins based on Baker & Cousins, Nucl.Instrum.Meth.A 221 (1984) 437-442
 enum TestStatistic {
   kPoisson,                 //!< Standard Poisson likelihood
-  kBarlowBeeston,           //!< Barlow-Beeston following Conway \cite Conway:2011in
-  kIceCube,                 //!< Based on \cite Arguelles:2019izp
+  kBarlowBeeston,           //!< Barlow-Beeston following Conway @cite Conway:2011in
+  kIceCube,                 //!< Based on @cite Arguelles:2019izp
   kPearson,                 //!< Standard Pearson likelihood
-  kDembinskiAbdelmotteleb,  //!< Based on \cite Dembinski:2022ios
+  kDembinskiAbdelmotteleb,  //!< Based on @cite Dembinski:2022ios
   kNTestStatistics          //!< Number of test statistics
 };
 
@@ -163,6 +163,22 @@ struct KinematicCut {
   /// Upper bound on which we apply cut
   double UpperBound = M3::_BAD_DOUBLE_;
 };
+
+// ***************************
+/// @brief KS: Small struct storying info about used binning
+struct SampleBinningInfo {
+// ***************************
+  /// Vector to hold x-axis bin-edges
+  std::vector<double> XBinEdges;
+  /// Vector to hold y-axis bin-edges
+  std::vector<double> YBinEdges;
+
+  /// Number of X axis bins in the histogram used for likelihood calculation
+  size_t nXBins = M3::_BAD_INT_;
+  /// Number of Y axis bins in the histogram used for likelihood calculation
+  size_t nYBins = M3::_BAD_INT_;
+};
+
 
 // ***************************
 // A handy namespace for variables extraction
