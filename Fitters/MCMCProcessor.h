@@ -11,6 +11,7 @@
 // MaCh3 includes
 #include "Fitters/StatisticalUtils.h"
 #include "Samples/HistogramUtils.h"
+#include "Parameters/ParameterHandlerUtils.h"
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT includes
