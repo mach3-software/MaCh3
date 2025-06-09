@@ -106,6 +106,7 @@ $(function() {
 <code>#include &quot;TMatrixDSymEigen.h&quot;</code><br />
 <code>#include &quot;TMatrixDEigen.h&quot;</code><br />
 <code>#include &quot;TDecompSVD.h&quot;</code><br />
+<code>#include &quot;TKey.h&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for ParameterHandlerUtils.h:</div>
 <div class="dyncontent">
@@ -152,6 +153,12 @@ Functions</h2></td></tr>
 <tr class="memitem:a9253dc67fd53775fd49d2fe47c4a2203"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#a9253dc67fd53775fd49d2fe47c4a2203">M3::MakeCorrelationMatrix</a> (YAML::Node &amp;root, const std::vector&lt; double &gt; &amp;Values, const std::vector&lt; double &gt; &amp;Errors, const std::vector&lt; std::vector&lt; double &gt; &gt; &amp;Correlation, const std::vector&lt; std::string &gt; &amp;FancyNames={})</td></tr>
 <tr class="memdesc:a9253dc67fd53775fd49d2fe47c4a2203"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Replace correlation matrix and tune values in YAML covariance matrix.  <br /></td></tr>
 <tr class="separator:a9253dc67fd53775fd49d2fe47c4a2203"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1bb16de3a587023bbfa4b46aa214f7e1"><td class="memItemLeft" align="right" valign="top">TMacro *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#a1bb16de3a587023bbfa4b46aa214f7e1">M3::GetConfigMacroFromChain</a> (TDirectory *CovarianceFolder)</td></tr>
+<tr class="memdesc:a1bb16de3a587023bbfa4b46aa214f7e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: We store configuration macros inside the chain. In the past, multiple configs were stored, which required error-prone hardcoding like "Config_xsec_cov". Therefore, this code maintains backward compatibility by checking the number of macros present and using a hardcoded name only if necessary.  <br /></td></tr>
+<tr class="separator:a1bb16de3a587023bbfa4b46aa214f7e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec8607d7c1f73af5e603af5ee7752c4b"><td class="memItemLeft" align="right" valign="top">TMatrixDSym *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#aec8607d7c1f73af5e603af5ee7752c4b">M3::GetCovMatrixFromChain</a> (TDirectory *TempFile)</td></tr>
+<tr class="memdesc:aec8607d7c1f73af5e603af5ee7752c4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Retrieve the cross-section covariance matrix from the given TDirectory. Historically, multiple covariance matrices could be stored, requiring fragile hardcoded paths like "CovarianceFolder/xsec_cov". This function maintains backward compatibility by:  <br /></td></tr>
+<tr class="separator:aec8607d7c1f73af5e603af5ee7752c4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 <!-- start footer part -->
