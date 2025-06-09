@@ -444,9 +444,8 @@ inline std::vector<double> ParseBounds(const YAML::Node& node, const std::string
       throw MaCh3Exception(File, Line);
     } else if (val.IsScalar()) {
       try {
-        double center = val.as<double>();
-        bounds.push_back(center - 0.5);
-        bounds.push_back(center + 0.5);
+        const double center = val.as<double>();
+        bounds = {center - 0.5, center + 0.5};
       } catch (const YAML::BadConversion& e) {
         MACH3LOG_ERROR("Invalid value in Bounds[0]: '{}'. Expected a number.", static_cast<std::string>(val.Scalar()));
         throw MaCh3Exception(File, Line);
