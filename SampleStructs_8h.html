@@ -124,6 +124,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structKinematicCut.html">KinematicCut</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Small struct used for applying kinematic cuts.  <a href="structKinematicCut.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSampleBinningInfo.html">SampleBinningInfo</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Small struct storying info about used binning.  <a href="structSampleBinningInfo.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="namespaces" name="namespaces"></a>
 Namespaces</h2></td></tr>
@@ -174,9 +177,9 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ab29c200876205c3add1d71f053195658"><td class="memItemLeft" align="right" valign="top">constexpr unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="SampleStructs_8h.html#ab29c200876205c3add1d71f053195658">str2int</a> (const char *str, int h=0)</td></tr>
-<tr class="memdesc:ab29c200876205c3add1d71f053195658"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: This is mad way of converting string to int. Why? To be able to use string with switch.  <br /></td></tr>
-<tr class="separator:ab29c200876205c3add1d71f053195658"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab80c33d555b5398d502147226724fa0e"><td class="memItemLeft" align="right" valign="top">constexpr unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="SampleStructs_8h.html#ab80c33d555b5398d502147226724fa0e">str2int</a> (const char *str, const int h=0)</td></tr>
+<tr class="memdesc:ab80c33d555b5398d502147226724fa0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: This is mad way of converting string to int. Why? To be able to use string with switch.  <br /></td></tr>
+<tr class="separator:ab80c33d555b5398d502147226724fa0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a36b7eae1e9918d93ac6912d88c498a24"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="SampleStructs_8h.html#a36b7eae1e9918d93ac6912d88c498a24">TargetMat_ToString</a> (const <a class="el" href="SampleStructs_8h.html#a706416000041de040e97d5dbe0bdb580">TargetMat</a> i)</td></tr>
 <tr class="memdesc:a36b7eae1e9918d93ac6912d88c498a24"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converted the Target Mat to a string.  <br /></td></tr>
 <tr class="separator:a36b7eae1e9918d93ac6912d88c498a24"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -354,8 +357,8 @@ Kamil Skwarczynski </dd></dl>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="ab29c200876205c3add1d71f053195658" name="ab29c200876205c3add1d71f053195658"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab29c200876205c3add1d71f053195658">&#9670;&#160;</a></span>str2int()</h2>
+<a id="ab80c33d555b5398d502147226724fa0e" name="ab80c33d555b5398d502147226724fa0e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab80c33d555b5398d502147226724fa0e">&#9670;&#160;</a></span>str2int()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -372,7 +375,7 @@ Kamil Skwarczynski </dd></dl>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype">const int&#160;</td>
           <td class="paramname"><em>h</em> = <code>0</code>&#160;</td>
         </tr>
         <tr>
@@ -391,11 +394,11 @@ Kamil Skwarczynski </dd></dl>
 <p>KS: This is mad way of converting string to int. Why? To be able to use string with switch. </p>
 
 <p class="definition">Definition at line <a class="el" href="SampleStructs_8h_source.html#l00036">36</a> of file <a class="el" href="SampleStructs_8h_source.html">SampleStructs.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   36</span>                                                           {</div>
+<div class="fragment"><div class="line"><span class="lineno">   36</span>                                                                 {</div>
 <div class="line"><span class="lineno">   37</span><span class="comment">// *******************</span></div>
-<div class="line"><span class="lineno">   38</span>  <span class="keywordflow">return</span> !str[h] ? 5381 : (<a class="code hl_function" href="SampleStructs_8h.html#ab29c200876205c3add1d71f053195658">str2int</a>(str, h+1) * 33) ^ str[h];</div>
+<div class="line"><span class="lineno">   38</span>  <span class="keywordflow">return</span> !str[h] ? 5381 : (<a class="code hl_function" href="SampleStructs_8h.html#ab80c33d555b5398d502147226724fa0e">str2int</a>(str, h+1) * 33) ^ str[h];</div>
 <div class="line"><span class="lineno">   39</span>}</div>
-<div class="ttc" id="aSampleStructs_8h_html_ab29c200876205c3add1d71f053195658"><div class="ttname"><a href="SampleStructs_8h.html#ab29c200876205c3add1d71f053195658">str2int</a></div><div class="ttdeci">constexpr unsigned int str2int(const char *str, int h=0)</div><div class="ttdoc">KS: This is mad way of converting string to int. Why? To be able to use string with switch.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00036">SampleStructs.h:36</a></div></div>
+<div class="ttc" id="aSampleStructs_8h_html_ab80c33d555b5398d502147226724fa0e"><div class="ttname"><a href="SampleStructs_8h.html#ab80c33d555b5398d502147226724fa0e">str2int</a></div><div class="ttdeci">constexpr unsigned int str2int(const char *str, const int h=0)</div><div class="ttdoc">KS: This is mad way of converting string to int. Why? To be able to use string with switch.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00036">SampleStructs.h:36</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

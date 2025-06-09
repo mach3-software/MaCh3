@@ -102,7 +102,7 @@ var searchData=
   ['splineinterpolation_5ftorespfunctype_99',['SplineInterpolation_ToRespFuncType',['../ParameterStructs_8h.html#af1b80b5456f9b1cb847fb56ddcc3c1ab',1,'ParameterStructs.h']]],
   ['splineinterpolation_5ftostring_100',['SplineInterpolation_ToString',['../ParameterStructs_8h.html#a2d969ce667e41bd2492cff1775456837',1,'ParameterStructs.h']]],
   ['startfrompreviousfit_101',['StartFromPreviousFit',['../classFitterBase.html#a655ccea31627627e2b36745c97e5c0f0',1,'FitterBase::StartFromPreviousFit()'],['../classmcmc.html#adf4c80255288c5396da3b95d609ce4b2',1,'mcmc::StartFromPreviousFit()']]],
-  ['str2int_102',['str2int',['../SampleStructs_8h.html#ab29c200876205c3add1d71f053195658',1,'SampleStructs.h']]],
+  ['str2int_102',['str2int',['../SampleStructs_8h.html#ab80c33d555b5398d502147226724fa0e',1,'SampleStructs.h']]],
   ['strendswith_103',['strEndsWith',['../classMaCh3Plotting_1_1InputManager.html#a9f98ca215112178b1de36e328424aa35',1,'MaCh3Plotting::InputManager']]],
   ['stringtoyaml_104',['STRINGtoYAML',['../YamlHelper_8h.html#a3ff1f2154c0a70ad5a145fcc5891e7ec',1,'YamlHelper.h']]],
   ['stripduplicatedmodes_105',['StripDuplicatedModes',['../classBinnedSplineHandler.html#a960a64e0a855d797d74d052764f5ea3a',1,'BinnedSplineHandler']]],

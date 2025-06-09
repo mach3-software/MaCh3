@@ -1,7 +1,7 @@
 var searchData=
 [
   ['x_5fvar_0',['x_var',['../structFarDetectorCoreInfo.html#aec30bcbf46661b421732fa179efcb0d2',1,'FarDetectorCoreInfo']]],
-  ['xbinedges_1',['XBinEdges',['../classSampleHandlerFD.html#a1d79462d4aab26cdb603b45addff173a',1,'SampleHandlerFD']]],
+  ['xbinedges_1',['XBinEdges',['../structSampleBinningInfo.html#ae69c8c4db52dea5025220f6d008cf4f4',1,'SampleBinningInfo']]],
   ['xcoeff_5farr_2',['xcoeff_arr',['../classBinnedSplineHandler.html#a565b03441c146e0a351f9aee09ea0836',1,'BinnedSplineHandler']]],
   ['xpos_3',['XPos',['../classTSpline3__red.html#aa4b35c6ba0d90d3b13b49f99beadbf79',1,'TSpline3_red']]],
   ['xpts_4',['xPts',['../structFastSplineInfo.html#a76813a59f4a6fcef50f55d3c18733fcb',1,'FastSplineInfo']]],
