@@ -157,6 +157,15 @@ cmake ../ -DLOG_LEVEL="TRACE"
 ```
 You can find more [here](https://github.com/mach3-software/MaCh3/blob/develop/cmake/Modules/Logger.cmake).
 
+## Other CMake Options
+
+| Option                               | Meaning                                                                         |
+| ------                               | -------                                                                         |
+| `MaCh3_NATIVE_ENABLED`               | Enables native CPU optimizations for improved performance. Not recommended on clusters with multiple CPU configurations due to potential compatibility issues.   |
+| `MaCh3_NuOsc_GPU_ENABLED`            | By default MaCh3 will use NuOscillator with GPU if MaCh3 is compiled with GPU, this flag allows disabling GPU for NuOscillator even if MaCh3 has GPU enabled     |
+| `MaCh3_LOW_MEMORY_STRUCTS_ENABLED`   | This will use float/short string for many structures |
+
+
 ## System Requirements
 Most of external libraries are being handled through [CPM](https://github.com/cpm-cmake/CPM.cmake). The only external library that is not being handled through [CPM](https://github.com/cpm-cmake/CPM.cmake) and is required is [ROOT](https://root.cern/). Currently used external dependencies include:
 
