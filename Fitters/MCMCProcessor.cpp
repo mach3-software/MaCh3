@@ -2195,8 +2195,7 @@ void MCMCProcessor::FindInputFiles() {
     InputNotFound = true;
   }
 
-
-  TMacro *XsecConfig = CovarianceFolder->Get<TMacro>("Config_xsec_cov");
+  TMacro *XsecConfig = M3::GetConfigMacroFromChain(CovarianceFolder);
   if (XsecConfig == nullptr) {
     MACH3LOG_WARN("Didn't find Config_xsec_cov tree in MCMC file! {}", MCMCFile);
   } else {

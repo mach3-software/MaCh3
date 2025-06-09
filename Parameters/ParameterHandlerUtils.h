@@ -21,6 +21,7 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TMatrixDSymEigen.h"
 #include "TMatrixDEigen.h"
 #include "TDecompSVD.h"
+#include "TKey.h"
 _MaCh3_Safe_Include_End_ //}
 
 namespace M3
@@ -355,6 +356,87 @@ inline void MakeCorrelationMatrix(YAML::Node& root,
 
   outFile << YAMLString;
   outFile.close();
+}
+
+// *************************************
+/// @brief KS: We store configuration macros inside the chain.
+/// In the past, multiple configs were stored, which required error-prone hardcoding like "Config_xsec_cov".
+/// Therefore, this code maintains backward compatibility by checking the number of macros present and
+/// using a hardcoded name only if necessary.
+inline TMacro* GetConfigMacroFromChain(TDirectory* CovarianceFolder) {
+// *************************************
+  if (!CovarianceFolder) {
+    MACH3LOG_ERROR("Null TDirectory passed to {}", __func__);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  TMacro* foundMacro = nullptr;
+  int macroCount = 0;
+
+  TIter next(CovarianceFolder->GetListOfKeys());
+  TKey* key;
+  while ((key = dynamic_cast<TKey*>(next()))) {
+    if (std::string(key->GetClassName()) == "TMacro") {
+      ++macroCount;
+      if (macroCount == 1) {
+        foundMacro = dynamic_cast<TMacro*>(key->ReadObj());
+      }
+    }
+  }
+
+  if (macroCount == 1 && foundMacro) {
+    MACH3LOG_INFO("Found single TMacro in directory: using it.");
+    return foundMacro;
+  } else {
+    MACH3LOG_WARN("Found {} TMacro objects. Using hardcoded macro name: Config_xsec_cov.", macroCount);
+    TMacro* fallback = CovarianceFolder->Get<TMacro>("Config_xsec_cov");
+    if (!fallback) {
+      MACH3LOG_WARN("Fallback macro 'Config_xsec_cov' not found in directory.");
+    }
+    return fallback;
+  }
+}
+
+// *************************************
+/// @brief KS: Retrieve the cross-section covariance matrix from the given TDirectory.
+/// Historically, multiple covariance matrices could be stored, requiring fragile hardcoded paths like "CovarianceFolder/xsec_cov".
+/// This function maintains backward compatibility by:
+/// - Using the single matrix present if only one exists,
+/// - Otherwise falling back to the hardcoded path.
+/// This avoids error-prone assumptions while supporting both old and new formats.
+inline TMatrixDSym* GetCovMatrixFromChain(TDirectory* TempFile) {
+// *************************************
+  if (!TempFile) {
+    MACH3LOG_ERROR("Null TDirectory passed to {}.", __func__);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  TMatrixDSym* foundMatrix = nullptr;
+  int matrixCount = 0;
+
+  TIter next(TempFile->GetListOfKeys());
+  TKey* key;
+  while ((key = dynamic_cast<TKey*>(next()))) {
+    std::string className = key->GetClassName();
+    if (className.find("TMatrix") != std::string::npos) {
+      ++matrixCount;
+      if (matrixCount == 1) {
+        foundMatrix = dynamic_cast<TMatrixDSym*>(key->ReadObj());
+      }
+    }
+  }
+
+  if (matrixCount == 1 && foundMatrix) {
+    MACH3LOG_INFO("Found single TMatrixDSym in directory: using it.");
+    return foundMatrix;
+  } else {
+    MACH3LOG_WARN("Found {} TMatrixDSym objects. Using hardcoded path: xsec_cov.", matrixCount);
+    TMatrixDSym* fallback = TempFile->Get<TMatrixDSym>("xsec_cov");
+    if (!fallback) {
+      MACH3LOG_WARN("Fallback matrix 'xsec_cov' not found.");
+    }
+    return fallback;
+  }
 }
 
 }
