@@ -46,7 +46,8 @@ class SampleHandlerBase
   virtual inline double GetSampleLikelihood(const int isample){(void) isample; return GetLikelihood();};
   /// @brief Allow to clean not used memory before fit starts
   virtual void CleanMemoryBeforeFit() = 0;
-
+  /// @brief Store additional info in a chan
+  virtual void SaveAdditionalInfo(TDirectory* Dir) {(void) Dir;};
   /// @brief Return pointer to MaCh3 modes
   /// @ingroup SampleHandlerGetters
   MaCh3Modes* GetMaCh3Modes() const { return Modes.get(); }

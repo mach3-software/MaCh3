@@ -132,6 +132,9 @@ public:
   /// @ingroup SampleHandlerGetters
   std::string ReturnStringFromKinematicParameter(const int KinematicVariable) const;
 
+  /// @brief Store additional info in a chan
+  void SaveAdditionalInfo(TDirectory* Dir) override;
+
   // === JM declare the same functions for kinematic vectors ===
   int ReturnKinematicVectorFromString(const std::string& KinematicStr) const;
   std::string ReturnStringFromKinematicVector(const int KinematicVariable) const;
