@@ -33,6 +33,8 @@ SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGen
 
   KinematicParameters = nullptr;
   ReversedKinematicParameters = nullptr;
+  KinematicVectors = nullptr;
+  ReversedKinematicVectors = nullptr;
 
   SampleHandlerFD_array = nullptr;
   SampleHandlerFD_data = nullptr;
@@ -342,7 +344,7 @@ void SampleHandlerFD::SetupSampleBinning(){
 // ************************************************
 bool SampleHandlerFD::IsEventSelected(const int iEvent) {
 // ************************************************
-  for (unsigned int iSelection=0;iSelection < Selection.size() ;iSelection++) {  
+  for (unsigned int iSelection=0;iSelection < Selection.size() ;iSelection++) {
     const double Val = ReturnKinematicParameter(Selection[iSelection].ParamToCutOnIt, iEvent);
     if ((Val < Selection[iSelection].LowerBound) || (Val >= Selection[iSelection].UpperBound)) {
       return false;
@@ -351,6 +353,24 @@ bool SampleHandlerFD::IsEventSelected(const int iEvent) {
   //DB To avoid unnecessary checks, now return false rather than setting bool to true and continuing to check
   return true;
 }
+
+// === JM Define function to check if sub-event is selected ===
+bool SampleHandlerFD::IsSubEventSelected(const std::vector<KinematicCut> &SubEventCuts, const int iEvent, const unsigned int iSubEvent, size_t nsubevents) {
+  for (unsigned int iSelection=0;iSelection < SubEventCuts.size() ;iSelection++) {
+    std::vector<double> Vec = ReturnKinematicVector(SubEventCuts[iSelection].ParamToCutOnIt, iEvent);
+    if (nsubevents != Vec.size()) {
+      MACH3LOG_ERROR("Cannot apply kinematic cut on {} as it is of different size to plotting variable");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    const double Val = Vec[iSubEvent];
+    if ((Val < SubEventCuts[iSelection].LowerBound) || (Val >= SubEventCuts[iSelection].UpperBound)) {
+      return false;
+    }
+  }
+  //DB To avoid unnecessary checks, now return false rather than setting bool to true and continuing to check
+  return true;
+}
+// ===========================================================
 
 //************************************************
 // Reweight function
@@ -1497,10 +1517,9 @@ void SampleHandlerFD::InitialiseSplineObject() {
   SplineHandler->cleanUpMemory();
 }
 
-TH1* SampleHandlerFD::Get1DVarHist(const std::string& ProjectionVar_Str, const std::vector< KinematicCut >& SelectionVec, int WeightStyle, TAxis* Axis) {
-  //DB Grab the associated enum with the argument string
-  int ProjectionVar_Int = ReturnKinematicParameterFromString(ProjectionVar_Str);
-
+// === JM adjust GetNDVarHist functions to allow for subevent-level plotting ===
+TH1* SampleHandlerFD::Get1DVarHist(const std::string& ProjectionVar_Str, const std::vector< KinematicCut >& EventSelectionVec, 
+    int WeightStyle, TAxis* Axis, const std::vector< KinematicCut >& SubEventSelectionVec) {
   //DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.
   //   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset
   std::vector< KinematicCut > tmp_Selection = Selection;
@@ -1512,8 +1531,8 @@ TH1* SampleHandlerFD::Get1DVarHist(const std::string& ProjectionVar_Str, const s
   }
 
   //DB Add all requested cuts from the argument to the selection vector which will be applied
-  for (size_t iSelec=0;iSelec<SelectionVec.size();iSelec++) {
-    SelectionVecToApply.emplace_back(SelectionVec[iSelec]);
+  for (size_t iSelec=0;iSelec<EventSelectionVec.size();iSelec++) {
+    SelectionVecToApply.emplace_back(EventSelectionVec[iSelec]);
   }
 
   //DB Set the member variable to be the cuts to apply
@@ -1527,34 +1546,57 @@ TH1* SampleHandlerFD::Get1DVarHist(const std::string& ProjectionVar_Str, const s
     std::vector<double> xBinEdges = ReturnKinematicParameterBinning(ProjectionVar_Str);
     _h1DVar = new TH1D("", "", int(xBinEdges.size())-1, xBinEdges.data());
   }
+  
+  if (IsSubEventVarString(ProjectionVar_Str)) Fill1DSubEventHist(_h1DVar, ProjectionVar_Str, SubEventSelectionVec, WeightStyle);
+  else {
+    //DB Grab the associated enum with the argument string
+    int ProjectionVar_Int = ReturnKinematicParameterFromString(ProjectionVar_Str);
 
-  //DB Loop over all events
-  for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
-    if (IsEventSelected(iEvent)) {
-      double Weight = GetEventWeight(iEvent);
-      if (WeightStyle == 1) {
-        Weight = 1.;
+    //DB Loop over all events
+    for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
+      if (IsEventSelected(iEvent)) {
+        double Weight = GetEventWeight(iEvent);
+        if (WeightStyle == 1) {
+          Weight = 1.;
+        }
+        double Var = ReturnKinematicParameter(ProjectionVar_Int,iEvent);
+        _h1DVar->Fill(Var,Weight);
       }
-      double Var = ReturnKinematicParameter(ProjectionVar_Int,iEvent);
-      _h1DVar->Fill(Var,Weight);
     }
   }
-  
   //DB Reset the saved selection
   Selection = tmp_Selection;
 
   return _h1DVar;
 }
 
+void SampleHandlerFD::Fill1DSubEventHist(TH1D* _h1DVar, const std::string& ProjectionVar_Str, const std::vector< KinematicCut >& SubEventSelectionVec, int WeightStyle) {
+  int ProjectionVar_Int = ReturnKinematicVectorFromString(ProjectionVar_Str);
+
+  //JM Loop over all events
+  for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
+    if (IsEventSelected(iEvent)) {
+      double Weight = GetEventWeight(iEvent);
+      if (WeightStyle == 1) {
+        Weight = 1.;
+      }
+      std::vector<double> Vec = ReturnKinematicVector(ProjectionVar_Int,iEvent);
+      size_t nsubevents = Vec.size();
+      //JM Loop over all subevents in event
+      for (unsigned int iSubEvent = 0; iSubEvent < nsubevents; iSubEvent++) {
+        if (IsSubEventSelected(SubEventSelectionVec, iEvent, iSubEvent, nsubevents)) {
+          double Var = Vec[iSubEvent];
+          _h1DVar->Fill(Var,Weight);
+        }
+      }
+    }
+  }
+}
+
 // ************************************************
 TH2* SampleHandlerFD::Get2DVarHist(const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY,
-                                   const std::vector< KinematicCut >& SelectionVec,
-                                   int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
+    const std::vector< KinematicCut >& EventSelectionVec, int WeightStyle, TAxis* AxisX, TAxis* AxisY, const std::vector< KinematicCut >& SubEventSelectionVec) {
 // ************************************************
-  //DB Grab the associated enum with the argument string
-  int ProjectionVar_IntX = ReturnKinematicParameterFromString(ProjectionVar_StrX);
-  int ProjectionVar_IntY = ReturnKinematicParameterFromString(ProjectionVar_StrY);
-
   //DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.
   //   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset
   std::vector< KinematicCut > tmp_Selection = Selection;
@@ -1566,8 +1608,8 @@ TH2* SampleHandlerFD::Get2DVarHist(const std::string& ProjectionVar_StrX, const 
   }
 
   //DB Add all requested cuts from the argument to the selection vector which will be applied
-  for (size_t iSelec=0;iSelec<SelectionVec.size();iSelec++) {
-    SelectionVecToApply.emplace_back(SelectionVec[iSelec]);
+  for (size_t iSelec=0;iSelec<EventSelectionVec.size();iSelec++) {
+    SelectionVecToApply.emplace_back(EventSelectionVec[iSelec]);
   }
 
   //DB Set the member variable to be the cuts to apply
@@ -1583,28 +1625,89 @@ TH2* SampleHandlerFD::Get2DVarHist(const std::string& ProjectionVar_StrX, const 
     _h2DVar = new TH2D("", "", int(xBinEdges.size())-1, xBinEdges.data(), int(yBinEdges.size())-1, yBinEdges.data());
   }
 
-  //DB Loop over all events
-  for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
-    if (IsEventSelected(iEvent)) {
-      double Weight = GetEventWeight(iEvent);
-      if (WeightStyle == 1) {
-        Weight = 1.;
+  bool IsSubEventHist = IsSubEventVarString(ProjectionVar_StrX) || IsSubEventVarString(ProjectionVar_StrY);
+  if (IsSubEventHist) Fill2DSubEventHist(_h2DVar, ProjectionVar_StrX, ProjectionVar_StrY, SubEventSelectionVec, WeightStyle);
+  else {
+    //DB Grab the associated enum with the argument string
+    int ProjectionVar_IntX = ReturnKinematicParameterFromString(ProjectionVar_StrX);
+    int ProjectionVar_IntY = ReturnKinematicParameterFromString(ProjectionVar_StrY);
+
+    //DB Loop over all events
+    for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
+      if (IsEventSelected(iEvent)) {
+        double Weight = GetEventWeight(iEvent);
+        if (WeightStyle == 1) {
+          Weight = 1.;
+        }
+        double VarX = ReturnKinematicParameter(ProjectionVar_IntX, iEvent);
+        double VarY = ReturnKinematicParameter(ProjectionVar_IntY, iEvent);
+        _h2DVar->Fill(VarX,VarY,Weight);
       }
-      double VarX = ReturnKinematicParameter(ProjectionVar_IntX, iEvent);
-      double VarY = ReturnKinematicParameter(ProjectionVar_IntY, iEvent);
-      _h2DVar->Fill(VarX,VarY,Weight);
     }
   }
-  
   //DB Reset the saved selection
   Selection = tmp_Selection;
 
   return _h2DVar;
 }
 
+void SampleHandlerFD::Fill2DSubEventHist(TH2D* _h2DVar, const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY,
+    const std::vector< KinematicCut >& SubEventSelectionVec, int WeightStyle) {
+  bool IsSubEventVarX = IsSubEventVarString(ProjectionVar_StrX);
+  bool IsSubEventVarY = IsSubEventVarString(ProjectionVar_StrY);   
+
+  int ProjectionVar_IntX, ProjectionVar_IntY;
+  if (IsSubEventVarX) ProjectionVar_IntX = ReturnKinematicVectorFromString(ProjectionVar_StrX);
+  else ProjectionVar_IntX = ReturnKinematicParameterFromString(ProjectionVar_StrX);
+  if (IsSubEventVarY) ProjectionVar_IntY = ReturnKinematicVectorFromString(ProjectionVar_StrY);
+  else ProjectionVar_IntY = ReturnKinematicParameterFromString(ProjectionVar_StrY); 
+
+  //JM Loop over all events
+  for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
+    if (IsEventSelected(iEvent)) {
+      double Weight = GetEventWeight(iEvent);
+      if (WeightStyle == 1) {
+        Weight = 1.;
+      }
+      std::vector<double> VecX = {}, VecY = {};
+      double VarX = M3::_BAD_DOUBLE_, VarY = M3::_BAD_DOUBLE_;
+      size_t nsubevents = 0;
+      // JM Three cases: subeventX vs eventY || eventX vs subeventY || subeventX vs subeventY
+      if (IsSubEventVarX && !IsSubEventVarY) {
+        VecX = ReturnKinematicVector(ProjectionVar_IntX, iEvent);
+        VarY = ReturnKinematicParameter(ProjectionVar_IntY, iEvent);
+        nsubevents = VecX.size();
+      }
+      else if (!IsSubEventVarX && IsSubEventVarY) {
+        VecY = ReturnKinematicVector(ProjectionVar_IntY, iEvent);
+        VarX = ReturnKinematicParameter(ProjectionVar_IntX, iEvent);
+        nsubevents = VecY.size();
+      }
+      else {
+        VecX = ReturnKinematicVector(ProjectionVar_IntX, iEvent);
+        VecY = ReturnKinematicVector(ProjectionVar_IntY, iEvent);
+        if (VecX.size() != VecY.size()) {
+          MACH3LOG_ERROR("Cannot plot {} of size {} against {} of size {}", ProjectionVar_StrX, VecX.size(), ProjectionVar_StrY, VecY.size());
+          throw MaCh3Exception(__FILE__, __LINE__);
+        }
+        nsubevents = VecX.size();
+      }
+      //JM Loop over all subevents in event
+      for (unsigned int iSubEvent = 0; iSubEvent < nsubevents; iSubEvent++) {
+        if (IsSubEventSelected(SubEventSelectionVec, iEvent, iSubEvent, nsubevents)) {
+          if (IsSubEventVarX) VarX = VecX[iSubEvent];
+          if (IsSubEventVarY) VarY = VecY[iSubEvent];
+          _h2DVar->Fill(VarX,VarY,Weight);
+        }
+      } 
+    }
+  }
+}
+// ================================================
+
 // ************************************************
 int SampleHandlerFD::ReturnKinematicParameterFromString(const std::string& KinematicParameterStr) const {
-// ************************************************
+  // ************************************************
   auto it = KinematicParameters->find(KinematicParameterStr);
   if (it != KinematicParameters->end()) return it->second;
 
@@ -1616,7 +1719,7 @@ int SampleHandlerFD::ReturnKinematicParameterFromString(const std::string& Kinem
 
 // ************************************************
 std::string SampleHandlerFD::ReturnStringFromKinematicParameter(const int KinematicParameter) const {
-// ************************************************
+  // ************************************************
   auto it = ReversedKinematicParameters->find(KinematicParameter);
   if (it != ReversedKinematicParameters->end()) {
     return it->second;
@@ -1628,9 +1731,49 @@ std::string SampleHandlerFD::ReturnStringFromKinematicParameter(const int Kinema
   return "";
 }
 
-TH1* SampleHandlerFD::Get1DVarHistByModeAndChannel(const std::string& ProjectionVar_Str,
-                                                   int kModeToFill, int kChannelToFill,
-                                                   int WeightStyle, TAxis* Axis) {
+// === JM define KinematicVector-to-string mapping functions  ===
+// ************************************************
+int SampleHandlerFD::ReturnKinematicVectorFromString(const std::string& KinematicVectorStr) const {
+  // ************************************************
+  auto it = KinematicVectors->find(KinematicVectorStr);
+  if (it != KinematicVectors->end()) return it->second;
+
+  MACH3LOG_ERROR("Did not recognise Kinematic Vector: {}", KinematicVectorStr);
+  throw MaCh3Exception(__FILE__, __LINE__);
+
+  return M3::_BAD_INT_;
+}
+
+// ************************************************
+std::string SampleHandlerFD::ReturnStringFromKinematicVector(const int KinematicVector) const {
+  // ************************************************
+  auto it = ReversedKinematicVectors->find(KinematicVector);
+  if (it != ReversedKinematicVectors->end()) {
+    return it->second;
+  }
+
+  MACH3LOG_ERROR("Did not recognise Kinematic Vector: {}", KinematicVector);
+  throw MaCh3Exception(__FILE__, __LINE__);
+
+  return "";
+}
+
+bool SampleHandlerFD::IsSubEventVarString(const std::string& VarStr) {
+  if (KinematicVectors == nullptr) return false;
+
+  if (KinematicVectors->count(VarStr)) {
+    if (!KinematicParameters->count(VarStr)) return true;
+    else {
+      MACH3LOG_ERROR("Attempted to plot kinematic variable {}, but it appears in both KinematicVectors and KinematicParameters", VarStr);
+      throw MaCh3Exception(__FILE__,__LINE__);
+    }
+  }
+  return false;
+}
+// ===============================================================
+
+TH1* SampleHandlerFD::Get1DVarHistByModeAndChannel(const std::string& ProjectionVar_Str, 
+    int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* Axis) {
   bool fChannel;
   bool fMode;
 
@@ -1679,11 +1822,8 @@ TH1* SampleHandlerFD::Get1DVarHistByModeAndChannel(const std::string& Projection
   return Get1DVarHist(ProjectionVar_Str,SelectionVec,WeightStyle,Axis);
 }
 
-TH2* SampleHandlerFD::Get2DVarHistByModeAndChannel(const std::string& ProjectionVar_StrX,
-                                                   const std::string& ProjectionVar_StrY,
-                                                   int kModeToFill, int kChannelToFill,
-                                                   int WeightStyle, TAxis* AxisX,
-                                                   TAxis* AxisY) {
+TH2* SampleHandlerFD::Get2DVarHistByModeAndChannel(const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY, 
+    int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
   bool fChannel;
   bool fMode;
 
@@ -1740,7 +1880,7 @@ void SampleHandlerFD::PrintIntegral(TString OutputFileName, int WeightStyle, TSt
 
   bool printToCSV=false;
   if(OutputCSVFileName.CompareTo("/dev/null")) printToCSV=true;
-  
+
   std::ofstream outfile;
   if (printToFile) {
     outfile.open(OutputFileName.Data(), std::ios_base::app);
@@ -1761,7 +1901,7 @@ void SampleHandlerFD::PrintIntegral(TString OutputFileName, int WeightStyle, TSt
   std::vector<double> ChannelIntegral;
   ChannelIntegral.resize(GetNOscChannels());
   for (unsigned int i=0;i<ChannelIntegral.size();i++) {ChannelIntegral[i] = 0.;}
-  
+
   for (int i=0;i<Modes->GetNModes();i++) {
     if (GetNDim()==1) {
       IntegralList[i] = ReturnHistsBySelection1D(XVarStr,1,i,WeightStyle);
@@ -1777,7 +1917,7 @@ void SampleHandlerFD::PrintIntegral(TString OutputFileName, int WeightStyle, TSt
     outfile << "\\begin{center}" << std::endl;
     outfile << "\\caption{Integral breakdown for sample: " << GetTitle() << "}" << std::endl;
     outfile << "\\label{" << GetTitle() << "-EventRate}" << std::endl;
-    
+
     TString nColumns;
     for (int i=0;i<GetNOscChannels();i++) {nColumns+="|c";}
     nColumns += "|c|";
@@ -1789,7 +1929,7 @@ void SampleHandlerFD::PrintIntegral(TString OutputFileName, int WeightStyle, TSt
     // HW Probably a better way but oh well, here I go making MaCh3 messy again
     outcsv<<"Integral Breakdown for sample :"<<GetTitle()<<"\n";
   }
-  
+
   MACH3LOG_INFO("Integral breakdown for sample: {}", GetTitle());
   MACH3LOG_INFO("");
 
@@ -1811,7 +1951,7 @@ void SampleHandlerFD::PrintIntegral(TString OutputFileName, int WeightStyle, TSt
 
   MACH3LOG_INFO("{}", table_headings);
   MACH3LOG_INFO("{}", table_footline);
-  
+
   for (unsigned int i=0;i<IntegralList.size();i++) {
     double ModeIntegral = 0;
     if (printToFile) {outfile << std::setw(space) << Modes->GetMaCh3ModeName(i);}
@@ -1827,7 +1967,7 @@ void SampleHandlerFD::PrintIntegral(TString OutputFileName, int WeightStyle, TSt
       ModeIntegral += Integral;
       ChannelIntegral[j] += Integral;
       PDFIntegral += Integral;
-      
+
       if (printToFile) {outfile << "&" << std::setw(space) << Form("%4.5f",Integral) << " ";}
       if (printToCSV)  {outcsv << Form("%4.5f", Integral) << ",";}
 
@@ -1835,9 +1975,9 @@ void SampleHandlerFD::PrintIntegral(TString OutputFileName, int WeightStyle, TSt
     }
     if (printToFile) {outfile << "&" << std::setw(space) << Form("%4.5f",ModeIntegral) <<  " \\\\ \\hline" << std::endl;}
     if (printToCSV)  {outcsv << Form("%4.5f", ModeIntegral) << "\n";}
-    
+
     table_headings += fmt::format(" {:<10.4f} |", ModeIntegral);
-    
+
     MACH3LOG_INFO("{}", table_headings);
   }
 
@@ -1908,7 +2048,9 @@ std::vector<TH1*> SampleHandlerFD::ReturnHistsBySelection1D(std::string Kinemati
   return hHistList;
 }
 
-std::vector<TH2*> SampleHandlerFD::ReturnHistsBySelection2D(std::string KinematicProjectionX, std::string KinematicProjectionY, int Selection1, int Selection2, int WeightStyle, TAxis* XAxis, TAxis* YAxis) {
+std::vector<TH2*> SampleHandlerFD::ReturnHistsBySelection2D(std::string KinematicProjectionX, std::string KinematicProjectionY,
+    int Selection1, int Selection2, int WeightStyle, 
+    TAxis* XAxis, TAxis* YAxis) {
   std::vector<TH2*> hHistList;
 
   int iMax = -1;
