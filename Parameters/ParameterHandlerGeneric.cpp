@@ -183,13 +183,13 @@ NormParameter ParameterHandlerGeneric::GetNormParameter(const YAML::Node& param,
     NumKinematicCuts = int(param["KinematicCuts"].size());
 
     std::vector<std::string> TempKinematicStrings;
-    std::vector<std::vector<double>> TempKinematicBounds;
+    std::vector<std::vector<std::vector<double>>> TempKinematicBounds;
     //First element of TempKinematicBounds is always -999, and size is then 3
     for(int KinVar_i = 0 ; KinVar_i < NumKinematicCuts ; ++KinVar_i) {
       //ETA: This is a bit messy, Kinematic cuts is a list of maps
       for (YAML::const_iterator it = param["KinematicCuts"][KinVar_i].begin();it!=param["KinematicCuts"][KinVar_i].end();++it) {
         TempKinematicStrings.push_back(it->first.as<std::string>());
-        TempKinematicBounds.push_back(it->second.as<std::vector<double>>());
+        TempKinematicBounds.push_back(Get2DBounds(it->second));
       }
       if(TempKinematicStrings.size() == 0) {
         MACH3LOG_ERROR("Received a KinematicCuts node but couldn't read the contents (it's a list of single-element dictionaries (python) = map of pairs (C++))");
@@ -306,13 +306,13 @@ FunctionalParameter ParameterHandlerGeneric::GetFunctionalParameters(const YAML:
     NumKinematicCuts = int(param["KinematicCuts"].size());
 
     std::vector<std::string> TempKinematicStrings;
-    std::vector<std::vector<double>> TempKinematicBounds;
+    std::vector<std::vector<std::vector<double>>> TempKinematicBounds;
     //First element of TempKinematicBounds is always -999, and size is then 3
     for(int KinVar_i = 0 ; KinVar_i < NumKinematicCuts ; ++KinVar_i){
       //ETA: This is a bit messy, Kinematic cuts is a list of maps
       for (YAML::const_iterator it = param["KinematicCuts"][KinVar_i].begin();it!=param["KinematicCuts"][KinVar_i].end();++it) {
         TempKinematicStrings.push_back(it->first.as<std::string>());
-        TempKinematicBounds.push_back(it->second.as<std::vector<double>>());
+        TempKinematicBounds.push_back(Get2DBounds(it->second));
       }
       if(TempKinematicStrings.size() == 0) {
         MACH3LOG_ERROR("Received a KinematicCuts node but couldn't read the contents (it's a list of single-element dictionaries (python) = map of pairs (C++))");
@@ -550,8 +550,9 @@ void ParameterHandlerGeneric::PrintNormParams() {
       for(long unsigned int icut = 0; icut < ncuts; icut++) {
         std::string kinematicCutValueString;
         for(const auto & value : NormParams[i].Selection[icut]) {
-          kinematicCutValueString += std::to_string(value);
-          kinematicCutValueString += " ";
+          for (const auto& v : value) {
+            kinematicCutValueString += fmt::format("{:.2f} ", v);
+          }
         }
         if(icut == 0)
           MACH3LOG_INFO("│{: <4}│{: <10}│{: <40}│{: <20}│{: <40}│", i, NormParams[i].index, NormParams[i].name, NormParams[i].KinematicVarStr[icut], kinematicCutValueString);
