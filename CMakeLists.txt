@@ -26,6 +26,9 @@ add_library(MaCh3CompileDefinitions INTERFACE)
 # this saves a few if statements
 add_library(MaCh3GPUCompilerOptions INTERFACE)
 
+#ETA: Add the MaCh3 library here so it's easier to add any specific options based on say compiler etc.
+add_library(MaCh3 INTERFACE)
+
 find_package(CUDAToolkit QUIET)
 # Check if CUDA was found
 if(CUDAToolkit_FOUND AND MaCh3_GPU_ENABLED AND NOT (USE_CPU OR USE_FPGA))
@@ -240,6 +243,13 @@ if(MaCh3_MULTITHREAD_ENABLED)
   # KS: Not a clue why clang need different...
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_link_libraries(MaCh3CompilerOptions INTERFACE omp)
+  elseif(CMAKE_CXX_COMPILER_ID MATCHES "IntelLLVM")
+    #ETA: intel icpx requires this I believe
+    cmessage(STATUS "CMAKE_CXX_COMPILER_ID is IntelLLVM!!")
+    find_package(OpenMP)
+    if(OpenMP_CXX_FOUND)
+      target_link_libraries(MaCh3 INTERFACE OpenMP::OpenMP_CXX)
+    endif()
   else()
     target_link_libraries(MaCh3CompilerOptions INTERFACE gomp)
   endif()
@@ -324,11 +334,11 @@ endif()
 
 #This is to export the target properties of MaCh3
 #Anything that links to "MaCh3" will get all of these target properties
-add_library(MaCh3 INTERFACE)
+#add_library(MaCh3 INTERFACE)
 if (USE_FPGA)
-  target_link_libraries(MaCh3 INTERFACE MCMC SamplePDF Covariance Splines Manager MaCh3CompilerOptions Plotting)
+  target_link_libraries(MaCh3 INTERFACE MCMC SamplePDF Covariance Splines Manager MaCh3CompilerOptions Plotting spdlog::spdlog)
 else()
-  target_link_libraries(MaCh3 INTERFACE MCMC SamplePDF Covariance Splines Manager MaCh3CompilerOptions MaCh3GPUCompilerOptions Plotting)
+  target_link_libraries(MaCh3 INTERFACE MCMC SamplePDF Covariance Splines Manager MaCh3CompilerOptions MaCh3GPUCompilerOptions Plotting spdlog::spdlog)
 endif()
 set_target_properties(MaCh3 PROPERTIES EXPORT_NAME All)
 
