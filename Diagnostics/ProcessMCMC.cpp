@@ -1,21 +1,22 @@
 //MaCh3 includes
-#include "Fitters/MCMCProcessor.h"
+#include "Fitters/OscProcessor.h"
 #include "Manager/Manager.h"
 
 /// @file ProcessMCMC.cpp
 /// @brief Main exectable responsible for different types of MCMC processing like drawing posteriors, triangle plots etc. Actual implantation of methods is in MCMCProcessor
+/// @author Kamil Skwarczynski
 
 /// @brief Main function processing MCMC and Producing plots
 inline void ProcessMCMC(const std::string& inputFile);
 /// @brief Function producing comparison of posterior and more betwen a few MCMC chains
 inline void MultipleProcessMCMC();
-inline void CalcBayesFactor(const std::unique_ptr<MCMCProcessor>& Processor);
-inline void CalcSavageDickey(const std::unique_ptr<MCMCProcessor>& Processor);
-inline void CalcBipolarPlot(const std::unique_ptr<MCMCProcessor>& Processor);
-inline void CalcParameterEvolution(const std::unique_ptr<MCMCProcessor>& Processor);
-inline void GetTrianglePlot(const std::unique_ptr<MCMCProcessor>& Processor);
-inline void DiagnoseCovarianceMatrix(const std::unique_ptr<MCMCProcessor>& Processor, const std::string& inputFile);
-inline void ReweightPrior(const std::unique_ptr<MCMCProcessor>& Processor);
+inline void CalcBayesFactor(MCMCProcessor* Processor);
+inline void CalcSavageDickey(MCMCProcessor* Processor);
+inline void CalcBipolarPlot(MCMCProcessor* Processor);
+inline void CalcParameterEvolution(MCMCProcessor* Processor);
+inline void GetTrianglePlot(MCMCProcessor* Processor);
+inline void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, const std::string& inputFile);
+inline void ReweightPrior(MCMCProcessor* Processor);
 /// @brief KS: Convert TMatrix to TH2D, mostly useful for making fancy plots
 inline TH2D* TMatrixIntoTH2D(TMatrixDSym* Matrix, const std::string& title);
 /// @brief KS: Perform KS test to check if two posteriors for the same parameter came from the same distribution
@@ -72,7 +73,7 @@ void ProcessMCMC(const std::string& inputFile)
 {
   MACH3LOG_INFO("File for study: {} with config  {}", inputFile, config);
   // Make the processor)
-  auto Processor = std::make_unique<MCMCProcessor>(inputFile);
+  auto Processor = std::make_unique<OscProcessor>(inputFile);
 
   YAML::Node card_yaml = M3OpenConfig(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
@@ -123,10 +124,10 @@ void ProcessMCMC(const std::string& inputFile)
                                      GetFromManager<std::vector<short int>>(Settings["CredibleIntervalsColours"], {436, 430, 422}),
                                      GetFromManager<bool>(Settings["CredibleInSigmas"], false));
   }
-  if(GetFromManager<bool>(Settings["CalcBayesFactor"], true))  CalcBayesFactor(Processor);
-  if(GetFromManager<bool>(Settings["CalcSavageDickey"], true)) CalcSavageDickey(Processor);
-  if(GetFromManager<bool>(Settings["CalcBipolarPlot"], false)) CalcBipolarPlot(Processor);
-  if(GetFromManager<bool>(Settings["CalcParameterEvolution"], false)) CalcParameterEvolution(Processor);
+  if(GetFromManager<bool>(Settings["CalcBayesFactor"], true))  CalcBayesFactor(Processor.get());
+  if(GetFromManager<bool>(Settings["CalcSavageDickey"], true)) CalcSavageDickey(Processor.get());
+  if(GetFromManager<bool>(Settings["CalcBipolarPlot"], false)) CalcBipolarPlot(Processor.get());
+  if(GetFromManager<bool>(Settings["CalcParameterEvolution"], false)) CalcParameterEvolution(Processor.get());
 
   if(PlotCorr)
   {
@@ -153,12 +154,13 @@ void ProcessMCMC(const std::string& inputFile)
                                      GetFromManager<bool>(Settings["CredibleInSigmas"], false)
                                      );
     }
-    if(GetFromManager<bool>(Settings["GetTrianglePlot"], true)) GetTrianglePlot(Processor);
+    if(GetFromManager<bool>(Settings["GetTrianglePlot"], true)) GetTrianglePlot(Processor.get());
 
     //KS: When creating covariance matrix longest time is spend on caching every step, since we already cached we can run some fancy covariance stability diagnostic
-    if(GetFromManager<bool>(Settings["DiagnoseCovarianceMatrix"], false)) DiagnoseCovarianceMatrix(Processor, inputFile);
+    if(GetFromManager<bool>(Settings["DiagnoseCovarianceMatrix"], false)) DiagnoseCovarianceMatrix(Processor.get(), inputFile);
   }
-  if(GetFromManager<bool>(Settings["ReweightPrior"], false)) ReweightPrior(Processor);
+  if(GetFromManager<bool>(Settings["ReweightPrior"], false)) ReweightPrior(Processor.get());
+  if(GetFromManager<bool>(Settings["JarlskogAnalysis"], true)) Processor->PerformJarlskogAnalysis();
 }
 
 void MultipleProcessMCMC()
@@ -342,7 +344,7 @@ void MultipleProcessMCMC()
 }
 
 // KS: Calculate Bayes factor for a given hypothesis, most informative are those related to osc params. However, it make relative easy interpretation for switch dials
-void CalcBayesFactor(const std::unique_ptr<MCMCProcessor>& Processor)
+void CalcBayesFactor(MCMCProcessor* Processor)
 {
   YAML::Node card_yaml = M3OpenConfig(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
@@ -362,7 +364,7 @@ void CalcBayesFactor(const std::unique_ptr<MCMCProcessor>& Processor)
   Processor->GetBayesFactor(ParNames, Model1Bounds, Model2Bounds, ModelNames);
 }
 
-void CalcSavageDickey(const std::unique_ptr<MCMCProcessor>& Processor)
+void CalcSavageDickey(MCMCProcessor* Processor)
 {
   YAML::Node card_yaml = M3OpenConfig(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
@@ -380,7 +382,7 @@ void CalcSavageDickey(const std::unique_ptr<MCMCProcessor>& Processor)
   Processor->GetSavageDickey(ParNames, EvaluationPoint, Bounds);
 }
 
-void CalcParameterEvolution(const std::unique_ptr<MCMCProcessor>& Processor)
+void CalcParameterEvolution(MCMCProcessor* Processor)
 {
   YAML::Node card_yaml = M3OpenConfig(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
@@ -395,7 +397,7 @@ void CalcParameterEvolution(const std::unique_ptr<MCMCProcessor>& Processor)
   Processor->ParameterEvolution(ParNames, Intervals);
 }
 
-void CalcBipolarPlot(const std::unique_ptr<MCMCProcessor>& Processor)
+void CalcBipolarPlot(MCMCProcessor* Processor)
 {
   YAML::Node card_yaml = M3OpenConfig(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
@@ -408,7 +410,7 @@ void CalcBipolarPlot(const std::unique_ptr<MCMCProcessor>& Processor)
   Processor->GetPolarPlot(ParNames);
 }
 
-void GetTrianglePlot(const std::unique_ptr<MCMCProcessor>& Processor) {
+void GetTrianglePlot(MCMCProcessor* Processor) {
   YAML::Node card_yaml = M3OpenConfig(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
 
@@ -428,7 +430,7 @@ void GetTrianglePlot(const std::unique_ptr<MCMCProcessor>& Processor) {
 }
 
 /// @brief KS: You validate stability of posterior covariance matrix, you set burn calc cov matrix increase burn calc again and compare. By performing such operation several hundred times we can check when matrix becomes stable
-void DiagnoseCovarianceMatrix(const std::unique_ptr<MCMCProcessor>& Processor, const std::string& inputFile)
+void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, const std::string& inputFile)
 {
   //Turn of plots from Processor
   Processor->SetPrintToPDF(false);
@@ -603,7 +605,7 @@ void DiagnoseCovarianceMatrix(const std::unique_ptr<MCMCProcessor>& Processor, c
   if(CorrelationHist != nullptr)         delete CorrelationHist;
 }
 
-void ReweightPrior(const std::unique_ptr<MCMCProcessor>& Processor)
+void ReweightPrior(MCMCProcessor* Processor)
 {
   YAML::Node card_yaml = M3OpenConfig(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
