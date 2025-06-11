@@ -119,10 +119,11 @@ void SampleHandlerFD::ReadSampleConfig()
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   
-  //FD file info
-  if (!CheckNodeExists(SampleManager->raw(), "InputFiles", "mtupleprefix")){
-    MACH3LOG_ERROR("InputFiles:mtupleprefix not given in {}, please add this", SampleManager->GetFileName());
+  if (!CheckNodeExists(SampleManager->raw(), "BinningFile")){
+    MACH3LOG_ERROR("BinningFile not given in for sample {}, ReturnKinematicParameterBinning will not work", GetTitle());
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
+
   auto mtupleprefix  = Get<std::string>(SampleManager->raw()["InputFiles"]["mtupleprefix"], __FILE__, __LINE__);
   auto mtuplesuffix  = Get<std::string>(SampleManager->raw()["InputFiles"]["mtuplesuffix"], __FILE__, __LINE__);
   auto splineprefix  = Get<std::string>(SampleManager->raw()["InputFiles"]["splineprefix"], __FILE__, __LINE__);
@@ -1749,6 +1750,40 @@ std::string SampleHandlerFD::ReturnStringFromKinematicVector(const int Kinematic
   throw MaCh3Exception(__FILE__, __LINE__);
 
   return "";
+}
+
+// ************************************************
+std::vector<double> SampleHandlerFD::ReturnKinematicParameterBinning(const std::string& KinematicParameter) {
+// ************************************************
+  // If x or y variable return used binning
+  if(KinematicParameter == XVarStr) {
+    return Binning.XBinEdges;
+  } else if (KinematicParameter == YVarStr) {
+    return Binning.YBinEdges;
+  }
+
+  auto MakeBins = [](int nBins) {
+    std::vector<double> bins(nBins + 1);
+    for (int i = 0; i <= nBins; ++i)
+      bins[i] = static_cast<double>(i) - 0.5;
+    return bins;
+  };
+
+  if (KinematicParameter == "OscillationChannel") {
+    return MakeBins(GetNOscChannels());
+  } else if (KinematicParameter == "Mode") {
+    return MakeBins(Modes->GetNModes());
+  }
+
+  // We first check if binning for a sample has been specified
+  auto BinningConfig = SampleManager->raw()["BinningFile"];
+  if(BinningConfig[GetTitle()] && BinningConfig[GetTitle()][KinematicParameter]){
+    auto BinningVect = Get<std::vector<double>>(BinningConfig[GetTitle()][KinematicParameter], __FILE__, __LINE__);
+    return BinningVect;
+  } else {
+    auto BinningVect = Get<std::vector<double>>(BinningConfig[KinematicParameter], __FILE__, __LINE__);
+    return BinningVect;
+  }
 }
 
 bool SampleHandlerFD::IsSubEventVarString(const std::string& VarStr) {
