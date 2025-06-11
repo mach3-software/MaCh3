@@ -937,7 +937,6 @@ void SampleHandlerFD::Set1DBinning(size_t nbins, double low, double high)
 }
 
 void SampleHandlerFD::FindNominalBinAndEdges1D() {
-  //Set rw_pdf_bin and rw_upper_xbinedge and rw_lower_xbinedge for each skmc_base
   for(unsigned int event_i = 0; event_i < GetNEvents(); event_i++){
     //Set x_var and y_var values based on XVarStr and YVarStr
     MCSamples[event_i].x_var = GetPointerToKinematicParameter(XVarStr, event_i);
@@ -945,38 +944,41 @@ void SampleHandlerFD::FindNominalBinAndEdges1D() {
     MCSamples[event_i].y_var = &(M3::_BAD_DOUBLE_);
     int bin = _hPDF1D->FindBin(*(MCSamples[event_i].x_var));
 
-    double low_lower_edge = M3::_DEFAULT_RETURN_VAL_;
-    if (bin == 0) {
-      low_lower_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin);
-    } else {
-      low_lower_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin-1);
-    }
-
-    double low_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin);
-    double upper_edge = _hPDF1D->GetXaxis()->GetBinUpEdge(bin);
-
-    double upper_upper_edge = M3::_DEFAULT_RETURN_VAL_;
-    if (bin<(_hPDF1D->GetNbinsX()-2)) {
-      upper_upper_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin+2);
-    } else {
-      upper_upper_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin+1);
-    }
-
     if ((bin-1) >= 0 && (bin-1) < int(Binning.XBinEdges.size()-1)) {
       MCSamples[event_i].NomXBin = bin-1;
     } else {
       MCSamples[event_i].NomXBin = -1;
-      low_edge = M3::_DEFAULT_RETURN_VAL_;
-      upper_edge = M3::_DEFAULT_RETURN_VAL_;
-      low_lower_edge = M3::_DEFAULT_RETURN_VAL_;
-      upper_upper_edge = M3::_DEFAULT_RETURN_VAL_;
+    }
+    MCSamples[event_i].NomYBin = 0;
+  }
+
+  Binning.rw_lower_xbinedge.resize(Binning.nXBins);
+  Binning.rw_lower_lower_xbinedge.resize(Binning.nXBins);
+  Binning.rw_upper_xbinedge.resize(Binning.nXBins);
+  Binning.rw_upper_upper_xbinedge.resize(Binning.nXBins);
+  //Set rw_pdf_bin and rw_upper_xbinedge and rw_lower_xbinedge for each skmc_base
+  for(size_t bin_x = 0; bin_x < Binning.nXBins; bin_x++){
+    double low_lower_edge = M3::_DEFAULT_RETURN_VAL_;
+    double low_edge = Binning.XBinEdges[bin_x];
+    double upper_edge = Binning.XBinEdges[bin_x+1];
+    double upper_upper_edge = M3::_DEFAULT_RETURN_VAL_;
+
+    if (bin_x == 0) {
+      low_lower_edge = Binning.XBinEdges[0];
+    } else {
+      low_lower_edge = Binning.XBinEdges[bin_x-1];
     }
 
-    MCSamples[event_i].NomYBin = 0;
-    Binning.rw_lower_xbinedge = low_edge;
-    Binning.rw_upper_xbinedge = upper_edge;
-    Binning.rw_lower_lower_xbinedge = low_lower_edge;
-    Binning.rw_upper_upper_xbinedge = upper_upper_edge;
+    if (bin_x + 2 < Binning.nXBins) {
+      upper_upper_edge = Binning.XBinEdges[bin_x + 2];
+    } else if (bin_x + 1 < Binning.nXBins) {
+      upper_upper_edge = Binning.XBinEdges[bin_x + 1];
+    }
+
+    Binning.rw_lower_xbinedge[bin_x] = low_edge;
+    Binning.rw_upper_xbinedge[bin_x] = upper_edge;
+    Binning.rw_lower_lower_xbinedge[bin_x] = low_lower_edge;
+    Binning.rw_upper_upper_xbinedge[bin_x] = upper_upper_edge;
   }
 }
 
@@ -1033,8 +1035,7 @@ void SampleHandlerFD::Set2DBinning(size_t nbins1, double low1, double high1, siz
 // ************************************************
 void SampleHandlerFD::FindNominalBinAndEdges2D() {
 // ************************************************
-  //Set rw_pdf_bin and rw_upper_xbinedge and rw_lower_xbinedge for each skmc_base
-  for(unsigned int event_i = 0 ; event_i < GetNEvents(); event_i++){
+  for(unsigned int event_i = 0 ; event_i < GetNEvents(); event_i++) {
     //Set x_var and y_var values based on XVarStr and YVarStr
     MCSamples[event_i].x_var = GetPointerToKinematicParameter(XVarStr, event_i);
     MCSamples[event_i].y_var = GetPointerToKinematicParameter(YVarStr, event_i);
@@ -1046,42 +1047,43 @@ void SampleHandlerFD::FindNominalBinAndEdges2D() {
     int bin_y = M3::_BAD_INT_;
     int bin_z = M3::_BAD_INT_;
     _hPDF2D->GetBinXYZ(bin, bin_x, bin_y, bin_z);
-    //erec is the x-axis so get GetXaxis then find the bin edges using the x bin number
-
-    double low_lower_edge = M3::_DEFAULT_RETURN_VAL_;
-    if (bin == 0) {
-      low_lower_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x);
-    } else {
-      low_lower_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x-1);
-    }
-
-    double low_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x);
-    double upper_edge = _hPDF2D->GetXaxis()->GetBinUpEdge(bin_x);
-
-    double upper_upper_edge = M3::_DEFAULT_RETURN_VAL_;
-    if (bin<(_hPDF2D->GetNbinsX()-2)) {
-      upper_upper_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x+2);
-    } else {
-      upper_upper_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x+1);
-    }
 
     if ((bin_x-1) >= 0 && (bin_x-1) < int(Binning.XBinEdges.size()-1)) {
       MCSamples[event_i].NomXBin = bin_x-1;
-    } else {
-      MCSamples[event_i].NomXBin = -1;
-      low_edge = M3::_DEFAULT_RETURN_VAL_;
-      upper_edge = M3::_DEFAULT_RETURN_VAL_;
-      low_lower_edge = M3::_DEFAULT_RETURN_VAL_;
-      upper_upper_edge = M3::_DEFAULT_RETURN_VAL_;
     }
     MCSamples[event_i].NomYBin = bin_y-1;
     if(MCSamples[event_i].NomYBin < 0){
-      MACH3LOG_INFO("Nominal YBin PROBLEM, y-bin is {}", MCSamples[event_i].NomYBin);
+      MACH3LOG_WARN("Nominal YBin PROBLEM, y-bin is {}", MCSamples[event_i].NomYBin);
     }
-    Binning.rw_lower_xbinedge = low_edge;
-    Binning.rw_upper_xbinedge = upper_edge;
-    Binning.rw_lower_lower_xbinedge = low_lower_edge;
-    Binning.rw_upper_upper_xbinedge = upper_upper_edge;
+  }
+
+  Binning.rw_lower_xbinedge.resize(Binning.nXBins);
+  Binning.rw_lower_lower_xbinedge.resize(Binning.nXBins);
+  Binning.rw_upper_xbinedge.resize(Binning.nXBins);
+  Binning.rw_upper_upper_xbinedge.resize(Binning.nXBins);
+  //Set rw_pdf_bin and rw_upper_xbinedge and rw_lower_xbinedge for each skmc_base
+  for(size_t bin_x = 0; bin_x < Binning.nXBins; bin_x++){
+    double low_lower_edge = M3::_DEFAULT_RETURN_VAL_;
+    double low_edge = Binning.XBinEdges[bin_x];
+    double upper_edge = Binning.XBinEdges[bin_x+1];
+    double upper_upper_edge = M3::_DEFAULT_RETURN_VAL_;
+
+    if (bin_x == 0) {
+      low_lower_edge = Binning.XBinEdges[0];
+    } else {
+      low_lower_edge = Binning.XBinEdges[bin_x-1];
+    }
+
+    if (bin_x + 2 < Binning.nXBins) {
+      upper_upper_edge = Binning.XBinEdges[bin_x + 2];
+    } else if (bin_x + 1 < Binning.nXBins) {
+      upper_upper_edge = Binning.XBinEdges[bin_x + 1];
+    }
+
+    Binning.rw_lower_xbinedge[bin_x] = low_edge;
+    Binning.rw_upper_xbinedge[bin_x] = upper_edge;
+    Binning.rw_lower_lower_xbinedge[bin_x] = low_lower_edge;
+    Binning.rw_upper_upper_xbinedge[bin_x] = upper_upper_edge;
   }
 }
 
