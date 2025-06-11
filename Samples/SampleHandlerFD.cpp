@@ -1755,8 +1755,6 @@ std::string SampleHandlerFD::ReturnStringFromKinematicVector(const int Kinematic
 // ************************************************
 std::vector<double> SampleHandlerFD::ReturnKinematicParameterBinning(const std::string& KinematicParameter) {
 // ************************************************
-  if (IsSubEventVarString(KinematicParameterStr)) return ReturnKinematicVectorBinning(KinematicParameterStr);
-
   // If x or y variable return used binning
   if(KinematicParameter == XVarStr) {
     return Binning.XBinEdges;
@@ -1778,7 +1776,7 @@ std::vector<double> SampleHandlerFD::ReturnKinematicParameterBinning(const std::
   }
 
   // We first check if binning for a sample has been specified
-  auto BinningConfig = SampleManager->raw()["BinningFile"];
+  auto BinningConfig = M3OpenConfig(SampleManager->raw()["BinningFile"].as<std::string>());
   if(BinningConfig[GetTitle()] && BinningConfig[GetTitle()][KinematicParameter]){
     auto BinningVect = Get<std::vector<double>>(BinningConfig[GetTitle()][KinematicParameter], __FILE__, __LINE__);
     return BinningVect;
@@ -1787,6 +1785,7 @@ std::vector<double> SampleHandlerFD::ReturnKinematicParameterBinning(const std::
     return BinningVect;
   }
 }
+
 
 bool SampleHandlerFD::IsSubEventVarString(const std::string& VarStr) {
   if (KinematicVectors == nullptr) return false;
