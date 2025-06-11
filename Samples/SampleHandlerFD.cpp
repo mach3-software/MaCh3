@@ -1755,6 +1755,8 @@ std::string SampleHandlerFD::ReturnStringFromKinematicVector(const int Kinematic
 // ************************************************
 std::vector<double> SampleHandlerFD::ReturnKinematicParameterBinning(const std::string& KinematicParameter) {
 // ************************************************
+  if (IsSubEventVarString(KinematicParameterStr)) return ReturnKinematicVectorBinning(KinematicParameterStr);
+
   // If x or y variable return used binning
   if(KinematicParameter == XVarStr) {
     return Binning.XBinEdges;
