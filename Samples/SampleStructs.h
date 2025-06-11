@@ -177,6 +177,42 @@ struct SampleBinningInfo {
   size_t nXBins = M3::_BAD_INT_;
   /// Number of Y axis bins in the histogram used for likelihood calculation
   size_t nYBins = M3::_BAD_INT_;
+
+  /// lower to check if Eb has moved the erec bin
+  double rw_lower_xbinedge = -1;
+  /// lower to check if Eb has moved the erec bin
+  double rw_lower_lower_xbinedge = -1;
+  /// upper to check if Eb has moved the erec bin
+  double rw_upper_xbinedge = -1;
+  /// upper to check if Eb has moved the erec bin
+  double rw_upper_upper_xbinedge = -1;
+
+  /// @brief DB Find the relevant bin in the PDF for each event
+  int FindXBin(const double XVar, const int NomXBin) const {
+    //DB Check to see if momentum shift has moved bins
+    //DB - First, check to see if the event is still in the nominal bin
+    if (XVar < rw_upper_xbinedge && XVar >= rw_lower_xbinedge) {
+      return NomXBin;
+    }
+    //DB - Second, check to see if the event is outside of the binning range and skip event if it is
+    else if (XVar < XBinEdges[0] || XVar >= XBinEdges[nXBins]) {
+      return -1;
+    }
+    //DB - Thirdly, check the adjacent bins first as Eb+CC+EScale shifts aren't likely to move an Erec more than 1bin width
+    //Shifted down one bin from the event bin at nominal
+    else if (XVar < rw_lower_xbinedge && XVar >= rw_lower_lower_xbinedge) {
+      return NomXBin-1;
+    }
+    //Shifted up one bin from the event bin at nominal
+    else if (XVar < rw_upper_upper_xbinedge && XVar >= rw_upper_xbinedge) {
+      return NomXBin+1;
+    }
+    //DB - If we end up in this loop, the event has been shifted outside of its nominal bin, but is still within the allowed binning range
+    else {
+      // KS: Perform binary search to find correct bin. We already checked if isn't outside of bounds
+      return static_cast<int>(std::distance(XBinEdges.begin(), std::upper_bound(XBinEdges.begin(), XBinEdges.end(), XVar)) - 1);
+    }
+  }
 };
 
 

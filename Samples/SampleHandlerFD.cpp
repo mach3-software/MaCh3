@@ -441,33 +441,8 @@ void SampleHandlerFD::FillArray() {
     const double XVar = *(MCEvent->x_var);
 
     //DB Find the relevant bin in the PDF for each event
-    int XBinToFill = -1;
+    const int XBinToFill = Binning.FindXBin(XVar, MCEvent->NomXBin);
     const int YBinToFill = MCEvent->NomYBin;
-
-    //DB - First, check to see if the event is still in the nominal bin
-    if (XVar < MCEvent->rw_upper_xbinedge && XVar >= MCEvent->rw_lower_xbinedge) {
-      XBinToFill = MCEvent->NomXBin;
-    }
-    //DB - Second, check to see if the event is outside of the binning range and skip event if it is
-    //ETA- note that Binning.nXBins is Binning.XBinEdges.size() - 1
-    else if (XVar < Binning.XBinEdges[0] || XVar >= Binning.XBinEdges[Binning.nXBins]) {
-      continue;
-    }
-    //DB - Thirdly, check the adjacent bins first as Eb+CC+EScale shifts aren't likely to move an Erec more than 1bin width
-    //Shifted down one bin from the event bin at nominal
-    else if (XVar < MCEvent->rw_lower_xbinedge && XVar >= MCEvent->rw_lower_lower_xbinedge) {
-      XBinToFill = MCEvent->NomXBin-1;
-    }
-    //Shifted up one bin from the event bin at nominal
-    else if (XVar < MCEvent->rw_upper_upper_xbinedge && XVar >= MCEvent->rw_upper_xbinedge) {
-      XBinToFill = MCEvent->NomXBin+1;
-    }
-    //DB - If we end up in this loop, the event has been shifted outside of its nominal bin, but is still within the allowed binning range
-    else {
-      // KS: Perform binary search to find correct bin. We already checked if isn't outside of bounds
-      XBinToFill = static_cast<int>(std::distance(Binning.XBinEdges.begin(),
-                                    std::upper_bound(Binning.XBinEdges.begin(), Binning.XBinEdges.end(), XVar)) - 1);
-    }
 
     //DB Fill relevant part of thread array
     if (XBinToFill != -1 && YBinToFill != -1) {
@@ -563,39 +538,9 @@ void SampleHandlerFD::FillArray_MP() {
       //The alternative would be to have inheritance based on BinningOpt
       const double XVar = (*(MCEvent->x_var));
 
-      //DB Commented out by default but if we ever want to consider shifts in theta this will be needed
-      //double YVar = MCEvent->rw_theta;
-      //ETA - this would actually be with (*(MCEvent->y_var)) and done extremely
-      //similarly to XVar now
-
       //DB Find the relevant bin in the PDF for each event
-      int XBinToFill = -1;
+      const int XBinToFill = Binning.FindXBin(XVar, MCEvent->NomXBin);
       const int YBinToFill = MCEvent->NomYBin;
-
-      //DB Check to see if momentum shift has moved bins
-      //DB - First, check to see if the event is still in the nominal bin
-      if (XVar < MCEvent->rw_upper_xbinedge && XVar >= MCEvent->rw_lower_xbinedge) {
-        XBinToFill = MCEvent->NomXBin;
-      }
-      //DB - Second, check to see if the event is outside of the binning range and skip event if it is
-      else if (XVar < Binning.XBinEdges[0] || XVar >= Binning.XBinEdges[Binning.nXBins]) {
-        continue;
-      }
-      //DB - Thirdly, check the adjacent bins first as Eb+CC+EScale shifts aren't likely to move an Erec more than 1bin width
-      //Shifted down one bin from the event bin at nominal
-      else if (XVar < MCEvent->rw_lower_xbinedge && XVar >= MCEvent->rw_lower_lower_xbinedge) {
-        XBinToFill = MCEvent->NomXBin-1;
-      }
-      //Shifted up one bin from the event bin at nominal
-      else if (XVar < MCEvent->rw_upper_upper_xbinedge && XVar >= MCEvent->rw_upper_xbinedge) {
-        XBinToFill = MCEvent->NomXBin+1;
-      }
-      //DB - If we end up in this loop, the event has been shifted outside of its nominal bin, but is still within the allowed binning range
-      else {
-        // KS: Perform binary search to find correct bin. We already checked if isn't outside of bounds
-        XBinToFill = static_cast<int>(std::distance(Binning.XBinEdges.begin(),
-                                      std::upper_bound(Binning.XBinEdges.begin(), Binning.XBinEdges.end(), XVar)) - 1);
-      }
 
       //ETA - we can probably remove this final if check on the -1?
       //Maybe we can add an overflow bin to the array and assign any events to this bin?
@@ -1028,10 +973,10 @@ void SampleHandlerFD::FindNominalBinAndEdges1D() {
     }
 
     MCSamples[event_i].NomYBin = 0;
-    MCSamples[event_i].rw_lower_xbinedge = low_edge;
-    MCSamples[event_i].rw_upper_xbinedge = upper_edge;
-    MCSamples[event_i].rw_lower_lower_xbinedge = low_lower_edge;
-    MCSamples[event_i].rw_upper_upper_xbinedge = upper_upper_edge;
+    Binning.rw_lower_xbinedge = low_edge;
+    Binning.rw_upper_xbinedge = upper_edge;
+    Binning.rw_lower_lower_xbinedge = low_lower_edge;
+    Binning.rw_upper_upper_xbinedge = upper_upper_edge;
   }
 }
 
@@ -1133,10 +1078,10 @@ void SampleHandlerFD::FindNominalBinAndEdges2D() {
     if(MCSamples[event_i].NomYBin < 0){
       MACH3LOG_INFO("Nominal YBin PROBLEM, y-bin is {}", MCSamples[event_i].NomYBin);
     }
-    MCSamples[event_i].rw_lower_xbinedge = low_edge;
-    MCSamples[event_i].rw_upper_xbinedge = upper_edge;
-    MCSamples[event_i].rw_lower_lower_xbinedge = low_lower_edge;
-    MCSamples[event_i].rw_upper_upper_xbinedge = upper_upper_edge;
+    Binning.rw_lower_xbinedge = low_edge;
+    Binning.rw_upper_xbinedge = upper_edge;
+    Binning.rw_lower_lower_xbinedge = low_lower_edge;
+    Binning.rw_upper_upper_xbinedge = upper_upper_edge;
   }
 }
 
