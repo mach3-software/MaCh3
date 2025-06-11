@@ -1019,7 +1019,7 @@ void ParameterHandlerBase::MakePosDef(TMatrixDSym *cov) {
     MACH3LOG_ERROR("This indicates that something is wrong with the input matrix");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-  if(!use_adaptive || AdaptiveHandler->total_steps < 2) {
+  if(!use_adaptive || AdaptiveHandler->GetTotalSteps() < 2) {
     MACH3LOG_INFO("Had to shift diagonal {} time(s) to allow the covariance matrix to be decomposed", iAttempt);
   }
   //DB Resetting warning level
@@ -1120,7 +1120,7 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
   auto external_mean_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ExternalMeansName"], "", __FILE__ , __LINE__);
 
   AdaptiveHandler->SetThrowMatrixFromFile(external_file_name, external_matrix_name, external_mean_name, use_adaptive);
-  SetThrowMatrix(AdaptiveHandler->adaptive_covariance);
+  SetThrowMatrix(AdaptiveHandler->GetAdaptiveCovariance());
 
   MACH3LOG_INFO("Successfully Set External Throw Matrix Stored in {}", external_file_name);
 }
@@ -1134,7 +1134,7 @@ void ParameterHandlerBase::UpdateAdaptiveCovariance(){
 
   // Skip this if we're at a large number of steps
   if(AdaptiveHandler->SkipAdaption()) {
-    AdaptiveHandler->total_steps++;
+    AdaptiveHandler->IncrementNSteps();
     return;
   }
 
@@ -1147,13 +1147,13 @@ void ParameterHandlerBase::UpdateAdaptiveCovariance(){
   }
 
   if(AdaptiveHandler->UpdateMatrixAdapt()) {
-    TMatrixDSym* update_matrix = static_cast<TMatrixDSym*>(AdaptiveHandler->adaptive_covariance->Clone());
+    TMatrixDSym* update_matrix = static_cast<TMatrixDSym*>(AdaptiveHandler->GetAdaptiveCovariance()->Clone());
     UpdateThrowMatrix(update_matrix); //Now we update and continue!
     //Also Save the adaptive to file
-    AdaptiveHandler->SaveAdaptiveToFile(AdaptiveHandler->output_file_name,GetName());
+    AdaptiveHandler->SaveAdaptiveToFile(AdaptiveHandler->GetOutFileName(), GetName());
   }
 
-  AdaptiveHandler->total_steps++;
+  AdaptiveHandler->IncrementNSteps();
 }
 
 // ********************************************
