@@ -3,6 +3,7 @@
 // MaCh3 Includes
 #include "Manager/Manager.h"
 #include "Parameters/ParameterHandlerUtils.h"
+#include "unordered_map"
 
 namespace adaptive_mcmc{
 
@@ -68,6 +69,12 @@ class AdaptiveMCMCHandler{
     _fCurrVal = params;
   }
 
+  /// @brief Get flip parameters
+  void AddFlipParameters(const std::unordered_map<int, double>& parameters);
+
+  /// @brief Flip value of parameter
+  double FlipValue(int par_index);
+
   /// @brief Set the fixed parameters
   void SetFixed(const std::vector<double>* fix){
     _fFixedPars = fix;
@@ -85,6 +92,7 @@ class AdaptiveMCMCHandler{
     }
     return ((*_fFixedPars)[ipar] < 0);
   }
+
 
   /// @brief Get Current value of parameter
   double CurrVal(const int par_index);
@@ -133,6 +141,9 @@ class AdaptiveMCMCHandler{
 
   /// Current values of parameters
   const std::vector<double>* _fCurrVal;
+
+  // Bi-Modal params
+  std::unordered_map<int, double> FlipParameterMap;
 };
 
 } // adaptive_mcmc namespace

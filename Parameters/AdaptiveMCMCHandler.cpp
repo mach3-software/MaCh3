@@ -236,6 +236,7 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance() {
   std::vector<double> par_means_prev = par_means;
   int steps_post_burn = total_steps - start_adaptive_update;
 
+
   // Step 1: Update means and compute deviations
   for (int i = 0; i < GetNumParams(); ++i) {
     if (IsFixed(i)) continue;
@@ -289,6 +290,28 @@ bool AdaptiveMCMCHandler::IndivStepScaleAdapt() {
   else return false;
 }
 
+double AdaptiveMCMCHandler::FlipValue(const int par_index) {
+  // We assume covariance is in a SINGLE mode
+
+  // Find the true index of 
+  double flip_point = FlipParameterMap[par_index];
+
+  if ((*_fCurrVal)[par_index] < flip_point)
+  {
+    // This just flips the parameter about the central axis
+    return 2*flip_point - (*_fCurrVal)[par_index];
+  }
+  return (*_fCurrVal)[par_index];
+}
+
+void AdaptiveMCMCHandler::AddFlipParameters(const std::unordered_map<int, double>& parameters) {
+  /// This function adds the flipped parameters to the vector
+  /// It is used to add the flipped parameters to the adaptive covariance matrix
+  FlipParameterMap = parameters;
+}
+
+
+
 // ********************************************
 bool AdaptiveMCMCHandler::UpdateMatrixAdapt() {
 // ********************************************
@@ -300,6 +323,7 @@ bool AdaptiveMCMCHandler::UpdateMatrixAdapt() {
   } 
   else return false;
 }
+
 
 // ********************************************
 bool AdaptiveMCMCHandler::SkipAdaption() {
@@ -331,6 +355,9 @@ void AdaptiveMCMCHandler::Print() {
 double AdaptiveMCMCHandler::CurrVal(const int par_index){
   /// HW Implemented as its own method to allow for
   /// different behaviour in the future
+  if(FlipParameterMap.count(par_index)>0){
+    return FlipValue(par_index);
+  }
   return (*_fCurrVal)[par_index];
 }
 

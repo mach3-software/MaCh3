@@ -315,16 +315,15 @@ void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const 
   }
 
   if (CircEnabled) {
-    CircularBoundsIndex.push_back(Index);
-    CircularBoundsValues.push_back(Get<std::pair<double, double>>(param["CircularBounds"], __FILE__, __LINE__));
+    CircularBoundsMap[Index] = Get<std::pair<double, double>>(param["CircularBounds"], __FILE__, __LINE__);
     MACH3LOG_INFO("Enabling CircularBounds for parameter {} with range [{}, {}]",
                   GetParFancyName(Index),
-                  CircularBoundsValues.back().first,
-                  CircularBoundsValues.back().second);
+                  CircularBoundsMap[Index].first,
+                  CircularBoundsMap[Index].second);
     // KS: Make sure circular bounds are within physical bounds. If we are outside of physics bound MCMC will never explore such phase space region
-    if (CircularBoundsValues.back().first < _fLowBound.at(Index) || CircularBoundsValues.back().second > _fUpBound.at(Index)) {
+    if (CircularBoundsMap[Index].first < _fLowBound.at(Index) || CircularBoundsMap[Index].second > _fUpBound.at(Index)) {
       MACH3LOG_ERROR("Circular bounds [{}, {}] for parameter {} exceed physical bounds [{}, {}]",
-                     CircularBoundsValues.back().first, CircularBoundsValues.back().second,
+                      CircularBoundsMap[Index].first, CircularBoundsMap[Index].second,
                      GetParFancyName(Index),
                      _fLowBound.at(Index), _fUpBound.at(Index));
       throw MaCh3Exception(__FILE__, __LINE__);
@@ -332,32 +331,31 @@ void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const 
   }
 
   if (FlipEnabled) {
-    FlipParameterIndex.push_back(Index);
-    FlipParameterPoint.push_back(Get<double>(param["FlipParameter"], __FILE__, __LINE__));
+    FlipParameterMap[Index] = (Get<double>(param["FlipParameter"], __FILE__, __LINE__));
     MACH3LOG_INFO("Enabling Flipping for parameter {} with value {}",
                   GetParFancyName(Index),
-                  FlipParameterPoint.back());
+                  FlipParameterMap[Index]);
   }
 
   if (CircEnabled && FlipEnabled) {
-    if (FlipParameterPoint.back() < CircularBoundsValues.back().first || FlipParameterPoint.back() > CircularBoundsValues.back().second) {
+    if (FlipParameterMap[Index] < CircularBoundsMap[Index].first || FlipParameterMap[Index] > CircularBoundsMap[Index].second) {
       MACH3LOG_ERROR("FlipParameter value {} for parameter {} is outside the CircularBounds [{}, {}]",
-                     FlipParameterPoint.back(), GetParFancyName(Index), CircularBoundsValues.back().first, CircularBoundsValues.back().second);
+                      FlipParameterMap[Index], GetParFancyName(Index), CircularBoundsMap[Index].first, CircularBoundsMap[Index].second);
       throw MaCh3Exception(__FILE__, __LINE__);
     }
 
-    const double low = CircularBoundsValues.back().first;
-    const double high = CircularBoundsValues.back().second;
+    const double low = CircularBoundsMap[Index].first;
+    const double high = CircularBoundsMap[Index].second;
 
     // Sanity check: ensure flipping any x in [low, high] keeps the result in [low, high]
-    const double flipped_low = 2 * FlipParameterPoint.back() - low;
-    const double flipped_high = 2 * FlipParameterPoint.back() - high;
+    const double flipped_low = 2 * FlipParameterMap[Index] - low;
+    const double flipped_high = 2 * FlipParameterMap[Index] - high;
     const double min_flip = std::min(flipped_low, flipped_high);
     const double max_flip = std::max(flipped_low, flipped_high);
 
     if (min_flip < low || max_flip > high) {
       MACH3LOG_ERROR("Flipping about point {} for parameter {} would leave circular bounds [{}, {}]",
-                     FlipParameterPoint.back(), GetParFancyName(Index), low, high);
+                      FlipParameterMap[Index], GetParFancyName(Index), low, high);
       throw MaCh3Exception(__FILE__, __LINE__);
     }
   }
@@ -579,13 +577,13 @@ void ParameterHandlerBase::SpecialStepProposal() {
   /// @warning KS: Following Asher comment we do "Step->Circular Bounds->Flip"
 
   // HW It should now automatically set dcp to be with [-pi, pi]
-  for (size_t i = 0; i < CircularBoundsIndex.size(); ++i) {
-    CircularParBounds(CircularBoundsIndex[i], CircularBoundsValues[i].first, CircularBoundsValues[i].second);
+  for (auto& [i, bounds] : CircularBoundsMap) {
+    CircularParBounds(i, bounds.first, bounds.second);
   }
 
   // Okay now we've done the standard steps, we can add in our nice flips hierarchy flip first
-  for (size_t i = 0; i < FlipParameterIndex.size(); ++i) {
-    FlipParameterValue(FlipParameterIndex[i], FlipParameterPoint[i]);
+  for (auto& [i, flipPoint] : FlipParameterMap) {
+    FlipParameterValue(i, flipPoint);
   }
 }
 
@@ -1107,8 +1105,10 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   AdaptiveHandler = std::make_unique<adaptive_mcmc::AdaptiveMCMCHandler>();
+  
   // Now we read the general settings [these SHOULD be common across all matrices!]
   bool success = AdaptiveHandler->InitFromConfig(adapt_manager, matrixName, &_fCurrVal, &_fError);
+  AdaptiveHandler->AddFlipParameters(FlipParameterMap);
   if(!success) return;
   AdaptiveHandler->Print();
 

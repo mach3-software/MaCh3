@@ -7,6 +7,8 @@
 #include "Parameters/PCAHandler.h"
 #include "Parameters/ParameterTunes.h"
 
+#include "unordered_map"
+
 /// @brief Base class responsible for handling of systematic error parameters. Capable of using PCA or using adaptive throw matrix
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/02.-Implementation-of-Systematic).
 /// @author Dan Barrow
@@ -489,4 +491,10 @@ protected:
   std::vector<int>    CircularBoundsIndex;
   /// Circular bounds for each parameter (lower, upper)
   std::vector<std::pair<double,double>> CircularBoundsValues;
+
+  /// Circular bounds for parameters, used in Special Step Proposal
+  std::unordered_map<int, std::pair<double, double>> CircularBoundsMap;
+  /// Flipping parameters, used in Special Step Proposal
+  std::unordered_map<int, double> FlipParameterMap;
+
 };
