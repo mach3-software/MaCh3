@@ -69,7 +69,7 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, con
        // With data, test-stat shall return LogL for newMC*beta which includes the low MC bound
       if ( data > 0 ) {
         newmc *= beta;
-        double stat = newmc - data + data * std::log(data/newmc);
+        stat = newmc - data + data * std::log(data/newmc);
       }
 
       // Now, MC stat penalty
