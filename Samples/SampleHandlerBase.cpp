@@ -47,7 +47,7 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, con
       double newmc = mc;
 
       // If MC falls below the low MC bound, use low MC bound for newmc
-      if (mc < M3::_LOW_MC_BOUND_) newmc = M3::_LOW_MC_BOUND_;
+      if ( mc < M3::_LOW_MC_BOUND_ ) newmc = M3::_LOW_MC_BOUND_;
         
       // Barlow-Beeston uses fractional uncertainty on MC, so sqrt(sum[w^2])/mc
       const double fractional = std::sqrt(w2)/newmc;
@@ -57,17 +57,17 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, con
       const double temp = newmc*fractional2-1;
       // b^2 - 4ac in quadratic equation
       const double temp2 = temp*temp + 4*data*fractional2;
-      if (temp2 < 0) {
+      if ( temp2 < 0 ) {
         MACH3LOG_ERROR("Negative square root in Barlow Beeston coefficient calculation!");
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
       // Solve for the positive beta
-      const double beta = (-1*temp+sqrt(temp2))/2.;
+      const double beta = ( -1 * temp + sqrt( temp2 ) ) / 2.;
 
       // If there are no data, test-stat shall return only MC*beta
       double stat = mc*beta;
        // With data, test-stat shall return LogL for newMC*beta which includes the low MC bound
-      if (data > 0) {
+      if ( data > 0 ) {
         newmc *= beta;
         double stat = newmc - data + data * std::log(data/newmc);
       }
@@ -75,7 +75,7 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, con
       // Now, MC stat penalty
       // The penalty from MC statistics using Conways approach (https://cds.cern.ch/record/1333496?)
       double penalty = 0;
-      if (fractional > 0) penalty = (beta-1)*(beta-1)/(2*fractional*fractional);
+      if ( fractional > 0 )  penalty = ( beta - 1 ) * ( beta - 1 ) / ( 2 * fractional * fractional );
 
       // Returns test-stat plus the MC stat penalty 
       return stat+penalty;
@@ -88,13 +88,13 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, con
       //https://github.com/scikit-hep/iminuit/blob/059d06b00cae097ebf340b218b4eb57357111df8/src/iminuit/cost.py#L274-L300
       
       // If w2 == 0 for any reason, return Poisson LogL
-      if (w2 == 0) return getTestStatLLH(data,mc);
+      if ( w2 == 0 ) return getTestStatLLH(data,mc);
       
       // The MC can be changed
       double newmc = mc;
       
       // If MC falls below the low MC bound, use low MC bound for newmc
-      if (mc < M3::_LOW_MC_BOUND_) newmc = M3::_LOW_MC_BOUND_;
+      if ( mc < M3::_LOW_MC_BOUND_ ) newmc = M3::_LOW_MC_BOUND_;
       
       //the so-called effective count
       const double k = newmc*newmc / w2;
@@ -109,7 +109,7 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, con
       double stat = newmc;
       // All likelihood calculations may use the bare Poisson likelihood, so calculate here
       // Only if there are some data
-      if(data > 0) stat = newmc - data + data * std::log( data / newmc );
+      if ( data > 0 ) stat = newmc - data + data * std::log( data / newmc );
 
       // Return the statistical contribution and penalty
       return stat+penalty;
@@ -135,13 +135,16 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, con
       const long double a = mc*b+1;
       
       // Use C99's implementation of log of gamma function to not be C++11 dependent
-      const double stat = double(-1*(a * logl(b) + lgammal(data+a) - lgammal(data+1) - ((data+a)*log1pl(b)) - lgammal(a)));
+      const double stat = double( -1 * ( a * logl( b ) + lgammal( data + a ) - lgammal( data + 1 ) - ( ( data + a ) * log1pl( b ) ) - lgammal( a ) ) );
 
       // Check whether the stat is more than Poisson-like bound for low mc (mc < data)
-      const double poisson = getTestStatLLH_test(data, M3::_LOW_MC_BOUND_);
-      if(mc < data && stat > poisson) return poisson;
+      // TN: I believe there must be a better way to check, whether mc is near its bound
+      if ( mc < data ) {
+        const double poisson = getTestStatLLH_test(data, M3::_LOW_MC_BOUND_);
+        if ( stat > poisson ) return poisson;
+      }
 
-      // Otherwise, return IceCube test stat
+      // Otherwise, return IceCube test-stat
       return stat;
     }
     break;
@@ -149,10 +152,14 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, con
     case (kPearson):
     {
       //KS: 2 is because this function returns -LLH not -2LLH
-      const double stat = (data-mc)*(data-mc)/(2*mc);
+      // With no data return the MC/2.
+      if ( data == 0 ) return mc/2.;
 
-      // Return the statistical
-      return stat;
+      // If MC is lower than the low MC bound, return the test-stat at the bound
+      if ( mc < M3::_LOW_MC_BOUND_ ) return ( data - M3::_LOW_MC_BOUND_ ) * ( data - M3::_LOW_MC_BOUND_ ) / ( 2. * M3::_LOW_MC_BOUND_ ); 
+      
+      // Return the Pearson metric
+      return ( data - mc ) * ( data - mc ) / ( 2 * mc );
     }
     break;
     case (kPoisson):
