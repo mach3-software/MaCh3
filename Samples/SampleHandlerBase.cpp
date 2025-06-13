@@ -17,18 +17,15 @@ SampleHandlerBase::~SampleHandlerBase() {
 // Poisson likelihood calc for data and MC event rates
 double SampleHandlerBase::GetTestStatLLH(const double data, const double mc) const {
 // ***************************************************************************
-  // Need some MC
-  if(mc == 0) return 0.;
+  // Return mc if there are no data, returns 0 for data == 0 && mc == 0  
+  if(data == 0) return mc;
 
-  double negLogL = 0;
-  if(mc > 0 && data > 0)
-  {
-    //http://hyperphysics.phy-astr.gsu.edu/hbase/math/stirling.html
-    negLogL += (mc - data + data * std::log(data/mc));
-  }
-  else if(mc > 0 && data == 0) negLogL += mc;
-  
-  return negLogL; 
+  // If there are some data, but the prediction falls below the mc bound => return Poisson LogL for the low mc bound
+  if(mc < M3::_LOW_MC_BOUND_) return (M3::_LOW_MC_BOUND_ - data + data * std::log(data/M3::_LOW_MC_BOUND_));
+
+  // otherwise just return usual Poisson LogL using Stirling's approximation
+  // http://hyperphysics.phy-astr.gsu.edu/hbase/math/stirling.html
+  return (mc - data + data * std::log(data/mc));
 }
 
 // *************************
