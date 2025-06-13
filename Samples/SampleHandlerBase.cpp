@@ -88,7 +88,7 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, con
       //https://github.com/scikit-hep/iminuit/blob/059d06b00cae097ebf340b218b4eb57357111df8/src/iminuit/cost.py#L274-L300
       
       // If w2 == 0 for any reason, return Poisson LogL
-      if (w2 == 0) return getTestStatLLH_test(data,mc);
+      if (w2 == 0) return getTestStatLLH(data,mc);
       
       // The MC can be changed
       double newmc = mc;
@@ -123,25 +123,25 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, con
     // in eq 3.16, mu is MC, sigma2 is w2, k is data
     case (kIceCube):
     {
-      double stat = 0.0;
+      // IceCube low MC bound is implemented to return Poisson(data, _LOW_MC_BOUND_)
+      // up until the IceCube(data, mc) test-statistic is less than Poisson(data, _LOW_MC_BOUND_)
 
-      // If there for some reason is 0 mc uncertainty, return the Poisson LLH
-      if (w2 == 0)
-      {
-        // Calculate the new Poisson likelihood
-        if (data == 0) stat = newmc;
-        else if (newmc > 0) stat = newmc-data+data*std::log(data/newmc);
-
-        return stat;
-      }
+      // If there is 0 MC uncertainty, or the MC is less than low MC bound while having some data
+      // => Return Poisson(data, mc)
+      if ( w2 == 0 || ( mc < M3::_LOW_MC_BOUND_ && data > 0 ) ) return getTestStatLLH(data,mc);
+      
       // Auxiliary variables
       const long double b = mc/w2;
       const long double a = mc*b+1;
-      const long double k = data;
+      
       // Use C99's implementation of log of gamma function to not be C++11 dependent
-      stat = double(-1*(a * logl(b) + lgammal(k+a) - lgammal(k+1) - ((k+a)*log1pl(b)) - lgammal(a)));
+      const double stat = double(-1*(a * logl(b) + lgammal(data+a) - lgammal(data+1) - ((data+a)*log1pl(b)) - lgammal(a)));
 
-      // Return the statistical contribution and penalty
+      // Check whether the stat is more than Poisson-like bound for low mc (mc < data)
+      const double poisson = getTestStatLLH_test(data, M3::_LOW_MC_BOUND_);
+      if(mc < data && stat > poisson) return poisson;
+
+      // Otherwise, return IceCube test stat
       return stat;
     }
     break;
