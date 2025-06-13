@@ -64,11 +64,13 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, con
       // Solve for the positive beta
       const double beta = (-1*temp+sqrt(temp2))/2.;
 
-      // With data, test-stat shall return LogL for newMC*beta which has the low MC bound
-      newmc *= beta;
-      double stat = newmc - data + data * std::log(data/newmc);
       // If there are no data, test-stat shall return only MC*beta
-      if (data == 0) stat = mc*beta;
+      double stat = mc*beta;
+       // With data, test-stat shall return LogL for newMC*beta which includes the low MC bound
+      if (data > 0) {
+        newmc *= beta;
+        double stat = newmc - data + data * std::log(data/newmc);
+      }
 
       // Now, MC stat penalty
       // The penalty from MC statistics using Conways approach (https://cds.cern.ch/record/1333496?)
