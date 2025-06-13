@@ -86,24 +86,30 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, con
     {
       //KS: code follows authors implementation from:
       //https://github.com/scikit-hep/iminuit/blob/059d06b00cae097ebf340b218b4eb57357111df8/src/iminuit/cost.py#L274-L300
-
+      
+      // If w2 == 0 for any reason, return Poisson LogL
+      if (w2 == 0) return getTestStatLLH_test(data,mc);
+      
+      // The MC can be changed
+      double newmc = mc;
+      
+      // If MC falls below the low MC bound, use low MC bound for newmc
+      if (mc < M3::_LOW_MC_BOUND_) newmc = M3::_LOW_MC_BOUND_;
+      
       //the so-called effective count
-      const double k = mc*mc / w2;
+      const double k = newmc*newmc / w2;
       //Calculate beta which is scaling factor between true and generated MC
-      const double beta = (data + k) / (mc + k);
-
-      newmc = mc*beta;
+      const double beta = (data + k) / (newmc + k);
+      
+      newmc *= beta;
       // And penalise the movement in beta relative the mc uncertainty
-      const double penalty = k*beta-k+k*std::log(k/(k*beta));
+      const double penalty = k * beta - k + k * std::log( k / ( k * beta ) );
 
-      // Calculate the new Poisson likelihood
-      // For Barlow-Beeston newmc is modified, so can only calculate Poisson likelihood after Barlow-Beeston
-      // For the Poisson likelihood, this is just the usual calculation
-      // For IceCube likelihood, we calculate it later
-      double stat = 0;
+      // If there are no data, this shall return newmc
+      double stat = newmc;
       // All likelihood calculations may use the bare Poisson likelihood, so calculate here
-      if (data == 0) stat = newmc;
-      else if (newmc > 0) stat = newmc-data+data*std::log(data/newmc);
+      // Only if there are some data
+      if(data > 0) stat = newmc - data + data * std::log( data / newmc );
 
       // Return the statistical contribution and penalty
       return stat+penalty;
