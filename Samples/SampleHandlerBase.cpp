@@ -88,7 +88,7 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, con
       //https://github.com/scikit-hep/iminuit/blob/059d06b00cae097ebf340b218b4eb57357111df8/src/iminuit/cost.py#L274-L300
       
       // If w2 == 0 for any reason, return Poisson LogL
-      if ( w2 == 0 ) return getTestStatLLH(data,mc);
+      if ( w2 == 0 ) return GetTestStatLLH(data,mc);
       
       // The MC can be changed
       double newmc = mc;
@@ -128,7 +128,7 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, con
 
       // If there is 0 MC uncertainty, or the MC is less than low MC bound while having some data
       // => Return Poisson(data, mc)
-      if ( w2 == 0 || ( mc < M3::_LOW_MC_BOUND_ && data > 0 ) ) return getTestStatLLH(data,mc);
+      if ( w2 == 0 || ( mc < M3::_LOW_MC_BOUND_ && data > 0 ) ) return GetTestStatLLH(data,mc);
       
       // Auxiliary variables
       const long double b = mc/w2;
@@ -140,7 +140,7 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, con
       // Check whether the stat is more than Poisson-like bound for low mc (mc < data)
       // TN: I believe there must be a better way to check, whether mc is near its bound
       if ( mc < data ) {
-        const double poisson = getTestStatLLH(data, M3::_LOW_MC_BOUND_);
+        const double poisson = GetTestStatLLH(data, M3::_LOW_MC_BOUND_);
         if ( stat > poisson ) return poisson;
       }
 
@@ -164,7 +164,7 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, con
     break;
     case (kPoisson):
     {
-      //Just call getTestStatLLH which doesn't take in weights
+      //Just call GetTestStatLLH which doesn't take in weights
       //and is a Poisson likelihood comparison.
       return GetTestStatLLH(data, mc);
     }
