@@ -140,7 +140,7 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, con
       // Check whether the stat is more than Poisson-like bound for low mc (mc < data)
       // TN: I believe there must be a better way to check, whether mc is near its bound
       if ( mc < data ) {
-        const double poisson = getTestStatLLH_test(data, M3::_LOW_MC_BOUND_);
+        const double poisson = getTestStatLLH(data, M3::_LOW_MC_BOUND_);
         if ( stat > poisson ) return poisson;
       }
 
