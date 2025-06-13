@@ -17,13 +17,13 @@ SampleHandlerBase::~SampleHandlerBase() {
 // Poisson likelihood calc for data and MC event rates
 double SampleHandlerBase::GetTestStatLLH(const double data, const double mc) const {
 // ***************************************************************************
-  // Return mc if there are no data, returns 0 for data == 0 && mc == 0  
+  // Return MC if there are no data, returns 0 for data == 0 && mc == 0  
   if(data == 0) return mc;
 
-  // If there are some data, but the prediction falls below the mc bound => return Poisson LogL for the low mc bound
+  // If there are some data, but the prediction falls below the MC bound => return Poisson LogL for the low MC bound
   if(mc < M3::_LOW_MC_BOUND_) return (M3::_LOW_MC_BOUND_ - data + data * std::log(data/M3::_LOW_MC_BOUND_));
 
-  // otherwise just return usual Poisson LogL using Stirling's approximation
+  // Otherwise, just return usual Poisson LogL using Stirling's approximation
   // http://hyperphysics.phy-astr.gsu.edu/hbase/math/stirling.html
   return (mc - data + data * std::log(data/mc));
 }
@@ -32,13 +32,6 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc) con
 // data is data, mc is mc, w2 is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
 double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, const double w2) const {
 // *************************
-  // Need some MC
-  if (mc == 0) return 0.0;
-
-  // The MC used in the likelihood calculation
-  // Is allowed to be changed by Barlow Beeston beta parameters
-  double newmc = mc;
-
   switch (fTestStatistic)
   {
     //CW: Not full Barlow-Beeston or what is referred to as "light": we're not introducing any more parameters
@@ -50,14 +43,18 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, con
     // Essentially solves equation 11
     case (kBarlowBeeston):
     {
-      // The penalty from MC statistics using Conways approach (https://cds.cern.ch/record/1333496?)
-      double penalty = 0;
+      // The MC used in the likelihood calculation is allowed to be changed by Barlow Beeston beta parameters
+      double newmc = mc;
+
+      // If MC falls below the low MC bound, use low MC bound for newmc
+      if (mc < M3::_LOW_MC_BOUND_) newmc = M3::_LOW_MC_BOUND_;
+        
       // Barlow-Beeston uses fractional uncertainty on MC, so sqrt(sum[w^2])/mc
-      const double fractional = std::sqrt(w2)/mc;
+      const double fractional = std::sqrt(w2)/newmc;
       // fractional^2 to avoid doing same operation several times
       const double fractional2 = fractional*fractional;
       // b in quadratic equation
-      const double temp = mc*fractional2-1;
+      const double temp = newmc*fractional2-1;
       // b^2 - 4ac in quadratic equation
       const double temp2 = temp*temp + 4*data*fractional2;
       if (temp2 < 0) {
@@ -66,21 +63,19 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, con
       }
       // Solve for the positive beta
       const double beta = (-1*temp+sqrt(temp2))/2.;
-      newmc = mc*beta;
-      // And penalise the movement in beta relative the mc uncertainty
-      if (fractional > 0) penalty = (beta-1)*(beta-1)/(2*fractional2);
-      else penalty = 0;
 
-      // Calculate the new Poisson likelihood
-      // For Barlow-Beeston newmc is modified, so can only calculate Poisson likelihood after Barlow-Beeston
-      // For the Poisson likelihood, this is just the usual calculation
-      // For IceCube likelihood, we calculate it later
-      double stat = 0;
-      // All likelihood calculations may use the bare Poisson likelihood, so calculate here
-      if (data == 0) stat = newmc;
-      else if (newmc > 0) stat = newmc-data+data*std::log(data/newmc);
+      // With data, test-stat shall return LogL for newMC*beta which has the low MC bound
+      newmc *= beta;
+      double stat = newmc - data + data * std::log(data/newmc);
+      // If there are no data, test-stat shall return only MC*beta
+      if (data == 0) stat = mc*beta;
 
-      // Return the statistical contribution and penalty
+      // Now, MC stat penalty
+      // The penalty from MC statistics using Conways approach (https://cds.cern.ch/record/1333496?)
+      double penalty = 0;
+      if (fractional > 0) penalty = (beta-1)*(beta-1)/(2*fractional*fractional);
+
+      // Returns test-stat plus the MC stat penalty 
       return stat+penalty;
     }
     break;
