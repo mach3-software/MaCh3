@@ -26,15 +26,6 @@ class mcmc : public FitterBase {
   /// @todo implement some check that number of params matches etc
   void StartFromPreviousFit(const std::string& FitName) override;
 
-  /// @brief Get name of class
-  inline std::string GetName()const {return "MCMC";};
- private:
-  /// @brief Propose a step
-  inline void ProposeStep();
-
-  /// @brief Do we accept the step
-  inline void CheckStep();
-
   /// @brief Get the multicanonical weight for a given delta_cp value from a set of Gaussians
   double GetMulticanonicalWeightGaussian(double kDeltacp);
 
@@ -43,6 +34,16 @@ class mcmc : public FitterBase {
 
   /// @brief Get the multicanonical weight for a given delta_cp value from a spline
   double GetMulticanonicalWeightSpline(double deltacp, TSpline3 *spline_IO, TSpline3 *spline_NO, double delm23);
+
+
+  /// @brief Get name of class
+  inline std::string GetName()const {return "MCMC";};
+ private:
+  /// @brief Propose a step
+  inline void ProposeStep();
+
+  /// @brief Do we accept the step
+  inline void CheckStep();
 
   /// @brief Print the progress
   inline void PrintProgress();

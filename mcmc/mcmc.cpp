@@ -128,9 +128,9 @@ void mcmc::runMCMC() {
             multicanonicalVar = i;
             MACH3LOG_INFO("Setting multicanonical weight on delta_cp parameter int {}",i);
           }
-          if (systematics[static_cast<int>(s)]->GetParName(i) == "dm23") {
+          if (systematics[static_cast<int>(s)]->GetParName(i) == "delm2_23") {
             multicanonicalVar_dm23 = i;
-            MACH3LOG_INFO("Setting dm23 parameter int {}",i);
+            MACH3LOG_INFO("Setting delm2_23 parameter int {}",i);
           } else {
             MACH3LOG_ERROR("No dm23 parameter found in osc_cov systematic");
         }
@@ -303,10 +303,10 @@ inline double mcmc::GetMulticanonicalWeightSpline(double deltacp, TSpline3 *spli
 
   if (delm23 < 0){
     dcp_spline_val = spline_IO->Eval(deltacp);
-    return -(-std::log(dcp_spline_val)+std::log(spline_IO->Eval(-TMath::Pi()/2)));
+    return -2*(-std::log(dcp_spline_val)+std::log(spline_IO->Eval(-TMath::Pi()/2)));
   } else {
     dcp_spline_val = spline_NO->Eval(deltacp);
-    return -(-std::log(dcp_spline_val)+std::log(spline_NO->Eval(-TMath::Pi()/2)));
+    return -2*(-std::log(dcp_spline_val)+std::log(spline_NO->Eval(-TMath::Pi()/2)));
   }
   // std::cout << "Evaluating spline at delta_cp = " << deltacp << " gives value " << dcp_spline_val << "with -log lh of :" << -log(dcp_spline_val) << std::endl;
 }
