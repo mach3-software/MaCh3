@@ -94,7 +94,7 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, con
       double newmc = mc;
       
       // If MC falls below the low MC bound, use low MC bound for newmc
-      if ( mc < M3::_LOW_MC_BOUND_ ) newmc = M3::_LOW_MC_BOUND_;
+      if ( mc < M3::_LOW_MC_BOUND_ && data > 0 ) newmc = M3::_LOW_MC_BOUND_;
       
       //the so-called effective count
       const double k = newmc*newmc / w2;
