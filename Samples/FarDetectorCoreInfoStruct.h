@@ -69,18 +69,10 @@ struct FarDetectorCoreInfo {
 
   //M3::float_t total_w  = M3::_BAD_INT_;
 
-  //std::vector<int> XBin;
-  //std::vector<int> YBin;
   int NomXBin = -1;
   int NomYBin = -1;
 
   bool isNC = false;
-
-  // histo pdf bins
-  double rw_lower_xbinedge = -1;       ///< lower to check if Eb has moved the erec bin
-  double rw_lower_lower_xbinedge = -1; ///< lower to check if Eb has moved the erec bin
-  double rw_upper_xbinedge = -1;       ///< upper to check if Eb has moved the erec bin
-  double rw_upper_upper_xbinedge = -1; ///< upper to check if Eb has moved the erec bin
 
   const double* mode = &M3::Unity_D;
 };
