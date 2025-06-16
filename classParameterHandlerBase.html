@@ -253,9 +253,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ga3f27f4b70a3aef47b106c7dfe48af94f"><td class="memItemLeft" align="right" valign="top">TMatrixD *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#ga3f27f4b70a3aef47b106c7dfe48af94f">GetThrowMatrix_CholDecomp</a> () const</td></tr>
 <tr class="memdesc:ga3f27f4b70a3aef47b106c7dfe48af94f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Cholesky decomposition of the throw matrix.  <br /></td></tr>
 <tr class="separator:ga3f27f4b70a3aef47b106c7dfe48af94f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga5caba14eb5aaf01ef419c01e757f9bf2"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#ga5caba14eb5aaf01ef419c01e757f9bf2">GetParameterMeans</a> () const</td></tr>
-<tr class="memdesc:ga5caba14eb5aaf01ef419c01e757f9bf2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the parameter means used in the adaptive handler.  <br /></td></tr>
-<tr class="separator:ga5caba14eb5aaf01ef419c01e757f9bf2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga6745aac0b811863722e4030421adee92"><td class="memItemLeft" align="right" valign="top">TH2D *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#ga6745aac0b811863722e4030421adee92">GetCorrelationMatrix</a> ()</td></tr>
 <tr class="memdesc:ga6745aac0b811863722e4030421adee92"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plotting.  <br /></td></tr>
 <tr class="separator:ga6745aac0b811863722e4030421adee92"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -596,12 +593,12 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">   45</span>  <span class="keywordflow">if</span> (<a class="code hl_variable" href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">pca</a>) <a class="code hl_function" href="classParameterHandlerBase.html#a908856d9a183c32015fb3c3ef7b47cd9">ConstructPCA</a>(threshold, FirstPCA, LastPCA);</div>
 <div class="line"><span class="lineno">   46</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00023">MaCh3Logger.h:23</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a5914b4a260b907e5a355e53db7e72466"><div class="ttname"><a href="classParameterHandlerBase.html#a5914b4a260b907e5a355e53db7e72466">ParameterHandlerBase::doSpecialStepProposal</a></div><div class="ttdeci">bool doSpecialStepProposal</div><div class="ttdoc">Check if any of special step proposal were enabled.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00411">ParameterHandlerBase.h:411</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a5914b4a260b907e5a355e53db7e72466"><div class="ttname"><a href="classParameterHandlerBase.html#a5914b4a260b907e5a355e53db7e72466">ParameterHandlerBase::doSpecialStepProposal</a></div><div class="ttdeci">bool doSpecialStepProposal</div><div class="ttdoc">Check if any of special step proposal were enabled.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00409">ParameterHandlerBase.h:409</a></div></div>
 <div class="ttc" id="aclassParameterHandlerBase_html_a5e5bce6f487e7214be680a9b4adf6b6c"><div class="ttname"><a href="classParameterHandlerBase.html#a5e5bce6f487e7214be680a9b4adf6b6c">ParameterHandlerBase::Init</a></div><div class="ttdeci">void Init(const std::string &amp;name, const std::string &amp;file)</div><div class="ttdoc">Initialisation of the class using matrix from root file.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l00093">ParameterHandlerBase.cpp:93</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a5e9226aa216252b1ef195c7f91c76df2"><div class="ttname"><a href="classParameterHandlerBase.html#a5e9226aa216252b1ef195c7f91c76df2">ParameterHandlerBase::matrixName</a></div><div class="ttdeci">std::string matrixName</div><div class="ttdoc">Name of cov matrix.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00417">ParameterHandlerBase.h:417</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a5e9226aa216252b1ef195c7f91c76df2"><div class="ttname"><a href="classParameterHandlerBase.html#a5e9226aa216252b1ef195c7f91c76df2">ParameterHandlerBase::matrixName</a></div><div class="ttdeci">std::string matrixName</div><div class="ttdoc">Name of cov matrix.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00415">ParameterHandlerBase.h:415</a></div></div>
 <div class="ttc" id="aclassParameterHandlerBase_html_a908856d9a183c32015fb3c3ef7b47cd9"><div class="ttname"><a href="classParameterHandlerBase.html#a908856d9a183c32015fb3c3ef7b47cd9">ParameterHandlerBase::ConstructPCA</a></div><div class="ttdeci">void ConstructPCA(const double eigen_threshold, int FirstPCAdpar, int LastPCAdpar)</div><div class="ttdoc">CW: Calculate eigen values, prepare transition matrices and remove param based on defined threshold.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l00066">ParameterHandlerBase.cpp:66</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_adb2f867014619b5c38b67cd981e40dcb"><div class="ttname"><a href="classParameterHandlerBase.html#adb2f867014619b5c38b67cd981e40dcb">ParameterHandlerBase::inputFile</a></div><div class="ttdeci">const std::string inputFile</div><div class="ttdoc">The input root file we read in.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00414">ParameterHandlerBase.h:414</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_ae036dc62d3a3710b78d5d767f280fa4b"><div class="ttname"><a href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">ParameterHandlerBase::pca</a></div><div class="ttdeci">bool pca</div><div class="ttdoc">perform PCA or not</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00473">ParameterHandlerBase.h:473</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_adb2f867014619b5c38b67cd981e40dcb"><div class="ttname"><a href="classParameterHandlerBase.html#adb2f867014619b5c38b67cd981e40dcb">ParameterHandlerBase::inputFile</a></div><div class="ttdeci">const std::string inputFile</div><div class="ttdoc">The input root file we read in.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00412">ParameterHandlerBase.h:412</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_ae036dc62d3a3710b78d5d767f280fa4b"><div class="ttname"><a href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">ParameterHandlerBase::pca</a></div><div class="ttdeci">bool pca</div><div class="ttdoc">perform PCA or not</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00471">ParameterHandlerBase.h:471</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -720,14 +717,14 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">   61</span>  }</div>
 <div class="line"><span class="lineno">   62</span>  <span class="keyword">delete</span>[] <a class="code hl_variable" href="classParameterHandlerBase.html#a1e916de10380d0860d890601fa87c107">throwMatrixCholDecomp</a>;</div>
 <div class="line"><span class="lineno">   63</span>}</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a166763aa1cc313512fb502bca6ea8a2c"><div class="ttname"><a href="classParameterHandlerBase.html#a166763aa1cc313512fb502bca6ea8a2c">ParameterHandlerBase::randParams</a></div><div class="ttdeci">double * randParams</div><div class="ttdoc">Random number taken from gaussian around prior error used for corr_throw.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00429">ParameterHandlerBase.h:429</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a1e916de10380d0860d890601fa87c107"><div class="ttname"><a href="classParameterHandlerBase.html#a1e916de10380d0860d890601fa87c107">ParameterHandlerBase::throwMatrixCholDecomp</a></div><div class="ttdeci">double ** throwMatrixCholDecomp</div><div class="ttdoc">Throw matrix that is being used in the fit, much faster as TMatrixDSym cache miss.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00470">ParameterHandlerBase.h:470</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a2789064b551742edb5d05331ca8ef7e1"><div class="ttname"><a href="classParameterHandlerBase.html#a2789064b551742edb5d05331ca8ef7e1">ParameterHandlerBase::invCovMatrix</a></div><div class="ttdeci">TMatrixDSym * invCovMatrix</div><div class="ttdoc">The inverse covariance matrix.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00421">ParameterHandlerBase.h:421</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a4d8ded766dcf6941bea584b098e45e22"><div class="ttname"><a href="classParameterHandlerBase.html#a4d8ded766dcf6941bea584b098e45e22">ParameterHandlerBase::throwMatrix</a></div><div class="ttdeci">TMatrixDSym * throwMatrix</div><div class="ttdoc">Matrix which we use for step proposal before Cholesky decomposition (not actually used for step propo...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00466">ParameterHandlerBase.h:466</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a63d70f267b76b2795fa780e73144f6cc"><div class="ttname"><a href="classParameterHandlerBase.html#a63d70f267b76b2795fa780e73144f6cc">ParameterHandlerBase::throwMatrix_CholDecomp</a></div><div class="ttdeci">TMatrixD * throwMatrix_CholDecomp</div><div class="ttdoc">Matrix which we use for step proposal after Cholesky decomposition.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00468">ParameterHandlerBase.h:468</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a8d9a71d60c526da6b9ef9d276b1a2fad"><div class="ttname"><a href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">ParameterHandlerBase::_fNumPar</a></div><div class="ttdeci">int _fNumPar</div><div class="ttdoc">Number of systematic parameters.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00445">ParameterHandlerBase.h:445</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a9d2ef9ea0260dffb1034fd565143ba71"><div class="ttname"><a href="classParameterHandlerBase.html#a9d2ef9ea0260dffb1034fd565143ba71">ParameterHandlerBase::covMatrix</a></div><div class="ttdeci">TMatrixDSym * covMatrix</div><div class="ttdoc">The covariance matrix.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00419">ParameterHandlerBase.h:419</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_aa83a519d3501160d85c74ec9516718c8"><div class="ttname"><a href="classParameterHandlerBase.html#aa83a519d3501160d85c74ec9516718c8">ParameterHandlerBase::corr_throw</a></div><div class="ttdeci">double * corr_throw</div><div class="ttdoc">Result of multiplication of Cholesky matrix and randParams.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00431">ParameterHandlerBase.h:431</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a166763aa1cc313512fb502bca6ea8a2c"><div class="ttname"><a href="classParameterHandlerBase.html#a166763aa1cc313512fb502bca6ea8a2c">ParameterHandlerBase::randParams</a></div><div class="ttdeci">double * randParams</div><div class="ttdoc">Random number taken from gaussian around prior error used for corr_throw.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00427">ParameterHandlerBase.h:427</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a1e916de10380d0860d890601fa87c107"><div class="ttname"><a href="classParameterHandlerBase.html#a1e916de10380d0860d890601fa87c107">ParameterHandlerBase::throwMatrixCholDecomp</a></div><div class="ttdeci">double ** throwMatrixCholDecomp</div><div class="ttdoc">Throw matrix that is being used in the fit, much faster as TMatrixDSym cache miss.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00468">ParameterHandlerBase.h:468</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a2789064b551742edb5d05331ca8ef7e1"><div class="ttname"><a href="classParameterHandlerBase.html#a2789064b551742edb5d05331ca8ef7e1">ParameterHandlerBase::invCovMatrix</a></div><div class="ttdeci">TMatrixDSym * invCovMatrix</div><div class="ttdoc">The inverse covariance matrix.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00419">ParameterHandlerBase.h:419</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a4d8ded766dcf6941bea584b098e45e22"><div class="ttname"><a href="classParameterHandlerBase.html#a4d8ded766dcf6941bea584b098e45e22">ParameterHandlerBase::throwMatrix</a></div><div class="ttdeci">TMatrixDSym * throwMatrix</div><div class="ttdoc">Matrix which we use for step proposal before Cholesky decomposition (not actually used for step propo...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00464">ParameterHandlerBase.h:464</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a63d70f267b76b2795fa780e73144f6cc"><div class="ttname"><a href="classParameterHandlerBase.html#a63d70f267b76b2795fa780e73144f6cc">ParameterHandlerBase::throwMatrix_CholDecomp</a></div><div class="ttdeci">TMatrixD * throwMatrix_CholDecomp</div><div class="ttdoc">Matrix which we use for step proposal after Cholesky decomposition.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00466">ParameterHandlerBase.h:466</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a8d9a71d60c526da6b9ef9d276b1a2fad"><div class="ttname"><a href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">ParameterHandlerBase::_fNumPar</a></div><div class="ttdeci">int _fNumPar</div><div class="ttdoc">Number of systematic parameters.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00443">ParameterHandlerBase.h:443</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a9d2ef9ea0260dffb1034fd565143ba71"><div class="ttname"><a href="classParameterHandlerBase.html#a9d2ef9ea0260dffb1034fd565143ba71">ParameterHandlerBase::covMatrix</a></div><div class="ttdeci">TMatrixDSym * covMatrix</div><div class="ttdoc">The covariance matrix.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00417">ParameterHandlerBase.h:417</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_aa83a519d3501160d85c74ec9516718c8"><div class="ttname"><a href="classParameterHandlerBase.html#aa83a519d3501160d85c74ec9516718c8">ParameterHandlerBase::corr_throw</a></div><div class="ttdeci">double * corr_throw</div><div class="ttdoc">Result of multiplication of Cholesky matrix and randParams.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00429">ParameterHandlerBase.h:429</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -764,9 +761,9 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  665</span>    <a class="code hl_variable" href="classParameterHandlerBase.html#a8d3b05f6bb6ec3f334af6d9891fa031e">PCAObj</a>-&gt;AcceptStep();</div>
 <div class="line"><span class="lineno">  666</span>  }</div>
 <div class="line"><span class="lineno">  667</span>}</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a8d3b05f6bb6ec3f334af6d9891fa031e"><div class="ttname"><a href="classParameterHandlerBase.html#a8d3b05f6bb6ec3f334af6d9891fa031e">ParameterHandlerBase::PCAObj</a></div><div class="ttdeci">std::unique_ptr&lt; PCAHandler &gt; PCAObj</div><div class="ttdoc">Struct containing information about PCA.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00478">ParameterHandlerBase.h:478</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a93c8303daf13df6acb0870ad8eb56891"><div class="ttname"><a href="classParameterHandlerBase.html#a93c8303daf13df6acb0870ad8eb56891">ParameterHandlerBase::_fCurrVal</a></div><div class="ttdeci">std::vector&lt; double &gt; _fCurrVal</div><div class="ttdoc">Current value of the parameter.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00449">ParameterHandlerBase.h:449</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_af1b1a75fbc837d788201ea8062aa6a3b"><div class="ttname"><a href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">ParameterHandlerBase::_fPropVal</a></div><div class="ttdeci">std::vector&lt; double &gt; _fPropVal</div><div class="ttdoc">Proposed value of the parameter.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00451">ParameterHandlerBase.h:451</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a8d3b05f6bb6ec3f334af6d9891fa031e"><div class="ttname"><a href="classParameterHandlerBase.html#a8d3b05f6bb6ec3f334af6d9891fa031e">ParameterHandlerBase::PCAObj</a></div><div class="ttdeci">std::unique_ptr&lt; PCAHandler &gt; PCAObj</div><div class="ttdoc">Struct containing information about PCA.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00476">ParameterHandlerBase.h:476</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a93c8303daf13df6acb0870ad8eb56891"><div class="ttname"><a href="classParameterHandlerBase.html#a93c8303daf13df6acb0870ad8eb56891">ParameterHandlerBase::_fCurrVal</a></div><div class="ttdeci">std::vector&lt; double &gt; _fCurrVal</div><div class="ttdoc">Current value of the parameter.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00447">ParameterHandlerBase.h:447</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_af1b1a75fbc837d788201ea8062aa6a3b"><div class="ttname"><a href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">ParameterHandlerBase::_fPropVal</a></div><div class="ttdeci">std::vector&lt; double &gt; _fPropVal</div><div class="ttdoc">Proposed value of the parameter.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00449">ParameterHandlerBase.h:449</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -846,7 +843,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 1300</span>}</div>
 <div class="ttc" id="aGetPenaltyTerm_8cpp_html_a439227feff9d7f55384e8780cfc2eb82"><div class="ttname"><a href="GetPenaltyTerm_8cpp.html#a439227feff9d7f55384e8780cfc2eb82">size</a></div><div class="ttdeci">int size</div><div class="ttdef"><b>Definition:</b> <a href="GetPenaltyTerm_8cpp_source.html#l00038">GetPenaltyTerm.cpp:38</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00025">MaCh3Logger.h:25</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_af4ebe6b24b280c5263e6a5385b11a2c9"><div class="ttname"><a href="classParameterHandlerBase.html#af4ebe6b24b280c5263e6a5385b11a2c9">ParameterHandlerBase::_fSampleNames</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; std::string &gt; &gt; _fSampleNames</div><div class="ttdoc">Tells to which samples object param should be applied.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00463">ParameterHandlerBase.h:463</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_af4ebe6b24b280c5263e6a5385b11a2c9"><div class="ttname"><a href="classParameterHandlerBase.html#af4ebe6b24b280c5263e6a5385b11a2c9">ParameterHandlerBase::_fSampleNames</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; std::string &gt; &gt; _fSampleNames</div><div class="ttdoc">Tells to which samples object param should be applied.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00461">ParameterHandlerBase.h:461</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -893,9 +890,9 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  778</span>  }</div>
 <div class="line"><span class="lineno">  779</span>  <span class="keywordflow">return</span> logL;</div>
 <div class="line"><span class="lineno">  780</span>}</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a5b71ff832ba3fc84969a7e3fc9dc0d62"><div class="ttname"><a href="classParameterHandlerBase.html#a5b71ff832ba3fc84969a7e3fc9dc0d62">ParameterHandlerBase::_fFlatPrior</a></div><div class="ttdeci">std::vector&lt; bool &gt; _fFlatPrior</div><div class="ttdoc">Whether to apply flat prior or not.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00461">ParameterHandlerBase.h:461</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a9806557b3612e29e106a0ac18cc35478"><div class="ttname"><a href="classParameterHandlerBase.html#a9806557b3612e29e106a0ac18cc35478">ParameterHandlerBase::InvertCovMatrix</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; double &gt; &gt; InvertCovMatrix</div><div class="ttdoc">KS: Same as above but much faster as TMatrixDSym cache miss.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00423">ParameterHandlerBase.h:423</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a9f98cdf43f276a271da9a66509063ba6"><div class="ttname"><a href="classParameterHandlerBase.html#a9f98cdf43f276a271da9a66509063ba6">ParameterHandlerBase::_fPreFitValue</a></div><div class="ttdeci">std::vector&lt; double &gt; _fPreFitValue</div><div class="ttdoc">Parameter value dictated by the prior model. Based on it penalty term is calculated.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00447">ParameterHandlerBase.h:447</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a5b71ff832ba3fc84969a7e3fc9dc0d62"><div class="ttname"><a href="classParameterHandlerBase.html#a5b71ff832ba3fc84969a7e3fc9dc0d62">ParameterHandlerBase::_fFlatPrior</a></div><div class="ttdeci">std::vector&lt; bool &gt; _fFlatPrior</div><div class="ttdoc">Whether to apply flat prior or not.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00459">ParameterHandlerBase.h:459</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a9806557b3612e29e106a0ac18cc35478"><div class="ttname"><a href="classParameterHandlerBase.html#a9806557b3612e29e106a0ac18cc35478">ParameterHandlerBase::InvertCovMatrix</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; double &gt; &gt; InvertCovMatrix</div><div class="ttdoc">KS: Same as above but much faster as TMatrixDSym cache miss.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00421">ParameterHandlerBase.h:421</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a9f98cdf43f276a271da9a66509063ba6"><div class="ttname"><a href="classParameterHandlerBase.html#a9f98cdf43f276a271da9a66509063ba6">ParameterHandlerBase::_fPreFitValue</a></div><div class="ttdeci">std::vector&lt; double &gt; _fPreFitValue</div><div class="ttdoc">Parameter value dictated by the prior model. Based on it penalty term is calculated.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00445">ParameterHandlerBase.h:445</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -930,8 +927,8 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  793</span>  }</div>
 <div class="line"><span class="lineno">  794</span>  <span class="keywordflow">return</span> NOutside;</div>
 <div class="line"><span class="lineno">  795</span>}</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a92d4696b92db78fd9e3a4549d3ab64a6"><div class="ttname"><a href="classParameterHandlerBase.html#a92d4696b92db78fd9e3a4549d3ab64a6">ParameterHandlerBase::_fLowBound</a></div><div class="ttdeci">std::vector&lt; double &gt; _fLowBound</div><div class="ttdoc">Lowest physical bound, parameter will not be able to go beyond it.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00455">ParameterHandlerBase.h:455</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_aca38e417c05c6fa67a892ee5ddf1c2ac"><div class="ttname"><a href="classParameterHandlerBase.html#aca38e417c05c6fa67a892ee5ddf1c2ac">ParameterHandlerBase::_fUpBound</a></div><div class="ttdeci">std::vector&lt; double &gt; _fUpBound</div><div class="ttdoc">Upper physical bound, parameter will not be able to go beyond it.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00457">ParameterHandlerBase.h:457</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a92d4696b92db78fd9e3a4549d3ab64a6"><div class="ttname"><a href="classParameterHandlerBase.html#a92d4696b92db78fd9e3a4549d3ab64a6">ParameterHandlerBase::_fLowBound</a></div><div class="ttdeci">std::vector&lt; double &gt; _fLowBound</div><div class="ttdoc">Lowest physical bound, parameter will not be able to go beyond it.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00453">ParameterHandlerBase.h:453</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_aca38e417c05c6fa67a892ee5ddf1c2ac"><div class="ttname"><a href="classParameterHandlerBase.html#aca38e417c05c6fa67a892ee5ddf1c2ac">ParameterHandlerBase::_fUpBound</a></div><div class="ttdeci">std::vector&lt; double &gt; _fUpBound</div><div class="ttdoc">Upper physical bound, parameter will not be able to go beyond it.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00455">ParameterHandlerBase.h:455</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1060,7 +1057,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">   89</span>  <a class="code hl_variable" href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">pca</a> = <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno">   90</span>}</div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00013">MaCh3Exception.h:13</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a1ebeda558155dfa06070e67218b9a567"><div class="ttname"><a href="classParameterHandlerBase.html#a1ebeda558155dfa06070e67218b9a567">ParameterHandlerBase::AdaptiveHandler</a></div><div class="ttdeci">std::unique_ptr&lt; adaptive_mcmc::AdaptiveMCMCHandler &gt; AdaptiveHandler</div><div class="ttdoc">Struct containing information about adaption.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00480">ParameterHandlerBase.h:480</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a1ebeda558155dfa06070e67218b9a567"><div class="ttname"><a href="classParameterHandlerBase.html#a1ebeda558155dfa06070e67218b9a567">ParameterHandlerBase::AdaptiveHandler</a></div><div class="ttdeci">std::unique_ptr&lt; adaptive_mcmc::AdaptiveMCMCHandler &gt; AdaptiveHandler</div><div class="ttdoc">Struct containing information about adaption.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00478">ParameterHandlerBase.h:478</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1102,9 +1099,9 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  649</span>    <a class="code hl_variable" href="classParameterHandlerBase.html#a8d3b05f6bb6ec3f334af6d9891fa031e">PCAObj</a>-&gt;CorrelateSteps(<a class="code hl_variable" href="classParameterHandlerBase.html#ae042c1f0f79927b63744d820384ac28e">_fIndivStepScale</a>, <a class="code hl_variable" href="classParameterHandlerBase.html#a4fa06677236f06592d492663254dd253">_fGlobalStepScale</a>, <a class="code hl_variable" href="classParameterHandlerBase.html#a166763aa1cc313512fb502bca6ea8a2c">randParams</a>, <a class="code hl_variable" href="classParameterHandlerBase.html#aa83a519d3501160d85c74ec9516718c8">corr_throw</a>);</div>
 <div class="line"><span class="lineno">  650</span>  }</div>
 <div class="line"><span class="lineno">  651</span>}</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a4fa06677236f06592d492663254dd253"><div class="ttname"><a href="classParameterHandlerBase.html#a4fa06677236f06592d492663254dd253">ParameterHandlerBase::_fGlobalStepScale</a></div><div class="ttdeci">double _fGlobalStepScale</div><div class="ttdoc">Global step scale applied to all params in this class.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00433">ParameterHandlerBase.h:433</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a65f6056605f718d83a641680aa33fe88"><div class="ttname"><a href="classParameterHandlerBase.html#a65f6056605f718d83a641680aa33fe88">ParameterHandlerBase::_fError</a></div><div class="ttdeci">std::vector&lt; double &gt; _fError</div><div class="ttdoc">Prior error on the parameter.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00453">ParameterHandlerBase.h:453</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_ae042c1f0f79927b63744d820384ac28e"><div class="ttname"><a href="classParameterHandlerBase.html#ae042c1f0f79927b63744d820384ac28e">ParameterHandlerBase::_fIndivStepScale</a></div><div class="ttdeci">std::vector&lt; double &gt; _fIndivStepScale</div><div class="ttdoc">Individual step scale used by MCMC algorithm.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00459">ParameterHandlerBase.h:459</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a4fa06677236f06592d492663254dd253"><div class="ttname"><a href="classParameterHandlerBase.html#a4fa06677236f06592d492663254dd253">ParameterHandlerBase::_fGlobalStepScale</a></div><div class="ttdeci">double _fGlobalStepScale</div><div class="ttdoc">Global step scale applied to all params in this class.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00431">ParameterHandlerBase.h:431</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a65f6056605f718d83a641680aa33fe88"><div class="ttname"><a href="classParameterHandlerBase.html#a65f6056605f718d83a641680aa33fe88">ParameterHandlerBase::_fError</a></div><div class="ttdeci">std::vector&lt; double &gt; _fError</div><div class="ttdoc">Prior error on the parameter.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00451">ParameterHandlerBase.h:451</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_ae042c1f0f79927b63744d820384ac28e"><div class="ttname"><a href="classParameterHandlerBase.html#ae042c1f0f79927b63744d820384ac28e">ParameterHandlerBase::_fIndivStepScale</a></div><div class="ttdeci">std::vector&lt; double &gt; _fIndivStepScale</div><div class="ttdoc">Individual step scale used by MCMC algorithm.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00457">ParameterHandlerBase.h:457</a></div></div>
 <div class="ttc" id="anamespaceM3_html_a3718709c681d78c6e28e2eb4c0ac42d3"><div class="ttname"><a href="namespaceM3.html#a3718709c681d78c6e28e2eb4c0ac42d3">M3::MatrixVectorMulti</a></div><div class="ttdeci">void MatrixVectorMulti(double *_restrict_ VecMulti, double **_restrict_ matrix, const double *_restrict_ vector, const int n)</div><div class="ttdoc">KS: Custom function to perform multiplication of matrix and vector with multithreading.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerUtils_8h_source.html#l00112">ParameterHandlerUtils.h:112</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -1215,10 +1212,10 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  363</span>  }</div>
 <div class="line"><span class="lineno">  364</span>}</div>
 <div class="ttc" id="aYamlHelper_8h_html_ab5a40370dca062f6b2c87fabece7db27"><div class="ttname"><a href="YamlHelper_8h.html#ab5a40370dca062f6b2c87fabece7db27">Get</a></div><div class="ttdeci">Type Get(const YAML::Node &amp;node, const std::string File, const int Line)</div><div class="ttdoc">Get content of config file.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00265">YamlHelper.h:265</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a0212314cea270860766c5b100cd56c7e"><div class="ttname"><a href="classParameterHandlerBase.html#a0212314cea270860766c5b100cd56c7e">ParameterHandlerBase::CircularBoundsIndex</a></div><div class="ttdeci">std::vector&lt; int &gt; CircularBoundsIndex</div><div class="ttdoc">Indices of parameters with circular bounds.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00489">ParameterHandlerBase.h:489</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a36c4d088cad713dcc8e457475707a426"><div class="ttname"><a href="classParameterHandlerBase.html#a36c4d088cad713dcc8e457475707a426">ParameterHandlerBase::FlipParameterIndex</a></div><div class="ttdeci">std::vector&lt; int &gt; FlipParameterIndex</div><div class="ttdoc">Indices of parameters with flip symmetry.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00485">ParameterHandlerBase.h:485</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a63efdd91c7f4a5afaa0fa24766a29923"><div class="ttname"><a href="classParameterHandlerBase.html#a63efdd91c7f4a5afaa0fa24766a29923">ParameterHandlerBase::FlipParameterPoint</a></div><div class="ttdeci">std::vector&lt; double &gt; FlipParameterPoint</div><div class="ttdoc">Central points around which parameters are flipped.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00487">ParameterHandlerBase.h:487</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_aa5f1763b5ac621428da4af2681310acf"><div class="ttname"><a href="classParameterHandlerBase.html#aa5f1763b5ac621428da4af2681310acf">ParameterHandlerBase::CircularBoundsValues</a></div><div class="ttdeci">std::vector&lt; std::pair&lt; double, double &gt; &gt; CircularBoundsValues</div><div class="ttdoc">Circular bounds for each parameter (lower, upper)</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00491">ParameterHandlerBase.h:491</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a0212314cea270860766c5b100cd56c7e"><div class="ttname"><a href="classParameterHandlerBase.html#a0212314cea270860766c5b100cd56c7e">ParameterHandlerBase::CircularBoundsIndex</a></div><div class="ttdeci">std::vector&lt; int &gt; CircularBoundsIndex</div><div class="ttdoc">Indices of parameters with circular bounds.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00487">ParameterHandlerBase.h:487</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a36c4d088cad713dcc8e457475707a426"><div class="ttname"><a href="classParameterHandlerBase.html#a36c4d088cad713dcc8e457475707a426">ParameterHandlerBase::FlipParameterIndex</a></div><div class="ttdeci">std::vector&lt; int &gt; FlipParameterIndex</div><div class="ttdoc">Indices of parameters with flip symmetry.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00483">ParameterHandlerBase.h:483</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a63efdd91c7f4a5afaa0fa24766a29923"><div class="ttname"><a href="classParameterHandlerBase.html#a63efdd91c7f4a5afaa0fa24766a29923">ParameterHandlerBase::FlipParameterPoint</a></div><div class="ttdeci">std::vector&lt; double &gt; FlipParameterPoint</div><div class="ttdoc">Central points around which parameters are flipped.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00485">ParameterHandlerBase.h:485</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_aa5f1763b5ac621428da4af2681310acf"><div class="ttname"><a href="classParameterHandlerBase.html#aa5f1763b5ac621428da4af2681310acf">ParameterHandlerBase::CircularBoundsValues</a></div><div class="ttdeci">std::vector&lt; std::pair&lt; double, double &gt; &gt; CircularBoundsValues</div><div class="ttdoc">Circular bounds for each parameter (lower, upper)</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00489">ParameterHandlerBase.h:489</a></div></div>
 <div class="ttc" id="agroup__ParameterHandlerGetters_html_ga65b61ae6c60d4eadbb06fdef9596cc7f"><div class="ttname"><a href="group__ParameterHandlerGetters.html#ga65b61ae6c60d4eadbb06fdef9596cc7f">ParameterHandlerBase::GetParFancyName</a></div><div class="ttdeci">std::string GetParFancyName(const int i) const</div><div class="ttdoc">Get fancy name of the Parameter.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00171">ParameterHandlerBase.h:171</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -1273,7 +1270,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  684</span>    <a class="code hl_variable" href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">_fPropVal</a>[index] = 2 * FlipPoint - <a class="code hl_variable" href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">_fPropVal</a>[index];</div>
 <div class="line"><span class="lineno">  685</span>  }</div>
 <div class="line"><span class="lineno">  686</span>}</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_ae1bee9945e7a00d17ee69a3c0d75b622"><div class="ttname"><a href="classParameterHandlerBase.html#ae1bee9945e7a00d17ee69a3c0d75b622">ParameterHandlerBase::random_number</a></div><div class="ttdeci">std::vector&lt; std::unique_ptr&lt; TRandom3 &gt; &gt; random_number</div><div class="ttdoc">KS: Set Random numbers for each thread so each thread has different seed.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00426">ParameterHandlerBase.h:426</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_ae1bee9945e7a00d17ee69a3c0d75b622"><div class="ttname"><a href="classParameterHandlerBase.html#ae1bee9945e7a00d17ee69a3c0d75b622">ParameterHandlerBase::random_number</a></div><div class="ttdeci">std::vector&lt; std::unique_ptr&lt; TRandom3 &gt; &gt; random_number</div><div class="ttdoc">KS: Set Random numbers for each thread so each thread has different seed.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00424">ParameterHandlerBase.h:424</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1302,8 +1299,8 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Get a reference to the proposed parameter values Can be useful if you want to track these without having to copy values using getProposed() </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00241">241</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  241</span>{<span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">_fPropVal</a>;}</div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00239">239</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  239</span>{<span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">_fPropVal</a>;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1332,14 +1329,14 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Get pointer for <a class="el" href="classPCAHandler.html" title="Class responsible for handling Principal Component Analysis (PCA) of covariance matrix.">PCAHandler</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00359">359</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  359</span>                                           {</div>
-<div class="line"><span class="lineno">  360</span>    <span class="keywordflow">if</span> (!<a class="code hl_variable" href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">pca</a>) {</div>
-<div class="line"><span class="lineno">  361</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Am not running in PCA mode&quot;</span>);</div>
-<div class="line"><span class="lineno">  362</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><span class="lineno">  363</span>    }</div>
-<div class="line"><span class="lineno">  364</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#a8d3b05f6bb6ec3f334af6d9891fa031e">PCAObj</a>.get();</div>
-<div class="line"><span class="lineno">  365</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00357">357</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  357</span>                                           {</div>
+<div class="line"><span class="lineno">  358</span>    <span class="keywordflow">if</span> (!<a class="code hl_variable" href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">pca</a>) {</div>
+<div class="line"><span class="lineno">  359</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Am not running in PCA mode&quot;</span>);</div>
+<div class="line"><span class="lineno">  360</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
+<div class="line"><span class="lineno">  361</span>    }</div>
+<div class="line"><span class="lineno">  362</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#a8d3b05f6bb6ec3f334af6d9891fa031e">PCAObj</a>.get();</div>
+<div class="line"><span class="lineno">  363</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1438,10 +1435,10 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  148</span>  <span class="keyword">delete</span> infile;</div>
 <div class="line"><span class="lineno">  149</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a07ff6d6a15b24f94afc88a1b89779beb"><div class="ttname"><a href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a></div><div class="ttdeci">#define MACH3LOG_CRITICAL</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00026">MaCh3Logger.h:26</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a0919e47e80710af8b9a3f837bba9bf8b"><div class="ttname"><a href="classParameterHandlerBase.html#a0919e47e80710af8b9a3f837bba9bf8b">ParameterHandlerBase::use_adaptive</a></div><div class="ttdeci">bool use_adaptive</div><div class="ttdoc">Are we using AMCMC?</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00475">ParameterHandlerBase.h:475</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a0919e47e80710af8b9a3f837bba9bf8b"><div class="ttname"><a href="classParameterHandlerBase.html#a0919e47e80710af8b9a3f837bba9bf8b">ParameterHandlerBase::use_adaptive</a></div><div class="ttdeci">bool use_adaptive</div><div class="ttdoc">Are we using AMCMC?</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00473">ParameterHandlerBase.h:473</a></div></div>
 <div class="ttc" id="aclassParameterHandlerBase_html_a522c0484c99047ef8c0628fd56c535c3"><div class="ttname"><a href="classParameterHandlerBase.html#a522c0484c99047ef8c0628fd56c535c3">ParameterHandlerBase::ReserveMemory</a></div><div class="ttdeci">void ReserveMemory(const int size)</div><div class="ttdoc">Initialise vectors with parameters information.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l00390">ParameterHandlerBase.cpp:390</a></div></div>
 <div class="ttc" id="aclassParameterHandlerBase_html_ae5587a730fd27f38d7838b7c1dca0136"><div class="ttname"><a href="classParameterHandlerBase.html#ae5587a730fd27f38d7838b7c1dca0136">ParameterHandlerBase::MakePosDef</a></div><div class="ttdeci">void MakePosDef(TMatrixDSym *cov=nullptr)</div><div class="ttdoc">Make matrix positive definite by adding small values to diagonal, necessary for inverting matrix.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l00992">ParameterHandlerBase.cpp:992</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_aef9f160c6a95971f743b153bbc0a4a66"><div class="ttname"><a href="classParameterHandlerBase.html#aef9f160c6a95971f743b153bbc0a4a66">ParameterHandlerBase::PrintLength</a></div><div class="ttdeci">int PrintLength</div><div class="ttdoc">KS: This is used when printing parameters, sometimes we have super long parameters name,...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00436">ParameterHandlerBase.h:436</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_aef9f160c6a95971f743b153bbc0a4a66"><div class="ttname"><a href="classParameterHandlerBase.html#aef9f160c6a95971f743b153bbc0a4a66">ParameterHandlerBase::PrintLength</a></div><div class="ttdeci">int PrintLength</div><div class="ttdoc">KS: This is used when printing parameters, sometimes we have super long parameters name,...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00434">ParameterHandlerBase.h:434</a></div></div>
 <div class="ttc" id="agroup__ParameterHandlerGetters_html_gab1ef5c9f3c3eb619752a073590f5fd53"><div class="ttname"><a href="group__ParameterHandlerGetters.html#gab1ef5c9f3c3eb619752a073590f5fd53">ParameterHandlerBase::GetName</a></div><div class="ttdeci">std::string GetName() const</div><div class="ttdoc">Get name of covariance.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00158">ParameterHandlerBase.h:158</a></div></div>
 <div class="ttc" id="agroup__ParameterHandlerSetters_html_ga16a5a4d0c2fa8a480bb41832b950e9cc"><div class="ttname"><a href="group__ParameterHandlerSetters.html#ga16a5a4d0c2fa8a480bb41832b950e9cc">ParameterHandlerBase::SetName</a></div><div class="ttdeci">void SetName(const std::string &amp;name)</div><div class="ttdoc">Set matrix name.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00045">ParameterHandlerBase.h:45</a></div></div>
 <div class="ttc" id="agroup__ParameterHandlerSetters_html_ga284a3ed71262b336d0b6470dc51afb3c"><div class="ttname"><a href="group__ParameterHandlerSetters.html#ga284a3ed71262b336d0b6470dc51afb3c">ParameterHandlerBase::SetCovMatrix</a></div><div class="ttdeci">void SetCovMatrix(TMatrixDSym *cov)</div><div class="ttdoc">Set covariance matrix.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l00368">ParameterHandlerBase.cpp:368</a></div></div>
@@ -1623,12 +1620,12 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  292</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Found {} systematics parameters in total&quot;</span>, <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>);</div>
 <div class="line"><span class="lineno">  293</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;----------------&quot;</span>);</div>
 <div class="line"><span class="lineno">  294</span>}</div>
-<div class="ttc" id="aYamlHelper_8h_html_ad802d5a5acdc16a796b21af74f6f5f59"><div class="ttname"><a href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">M3OpenConfig</a></div><div class="ttdeci">#define M3OpenConfig(filename)</div><div class="ttdoc">Macro to simplify calling LoadYaml with file and line info.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00461">YamlHelper.h:461</a></div></div>
-<div class="ttc" id="aYamlHelper_8h_html_ae828b8f0cb6b6bbd5fd4e7e5aaf9632f"><div class="ttname"><a href="YamlHelper_8h.html#ae828b8f0cb6b6bbd5fd4e7e5aaf9632f">GetBounds</a></div><div class="ttdeci">#define GetBounds(filename)</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00462">YamlHelper.h:462</a></div></div>
+<div class="ttc" id="aYamlHelper_8h_html_ad802d5a5acdc16a796b21af74f6f5f59"><div class="ttname"><a href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">M3OpenConfig</a></div><div class="ttdeci">#define M3OpenConfig(filename)</div><div class="ttdoc">Macro to simplify calling LoadYaml with file and line info.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00532">YamlHelper.h:532</a></div></div>
+<div class="ttc" id="aYamlHelper_8h_html_ae828b8f0cb6b6bbd5fd4e7e5aaf9632f"><div class="ttname"><a href="YamlHelper_8h.html#ae828b8f0cb6b6bbd5fd4e7e5aaf9632f">GetBounds</a></div><div class="ttdeci">#define GetBounds(filename)</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00533">YamlHelper.h:533</a></div></div>
 <div class="ttc" id="aclassParameterHandlerBase_html_a0836c9264400aa1d9254d5aeec3e56af"><div class="ttname"><a href="classParameterHandlerBase.html#a0836c9264400aa1d9254d5aeec3e56af">ParameterHandlerBase::ToggleFixParameter</a></div><div class="ttdeci">void ToggleFixParameter(const int i)</div><div class="ttdoc">fix parameter at prior values</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l00903">ParameterHandlerBase.cpp:903</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a4aa04c9dfb80f8d25f0712e21eb71054"><div class="ttname"><a href="classParameterHandlerBase.html#a4aa04c9dfb80f8d25f0712e21eb71054">ParameterHandlerBase::Tunes</a></div><div class="ttdeci">std::unique_ptr&lt; ParameterTunes &gt; Tunes</div><div class="ttdoc">Struct containing information about adaption.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00482">ParameterHandlerBase.h:482</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a56d40a78f16384b3b6e8ed10c76b899d"><div class="ttname"><a href="classParameterHandlerBase.html#a56d40a78f16384b3b6e8ed10c76b899d">ParameterHandlerBase::_fFancyNames</a></div><div class="ttdeci">std::vector&lt; std::string &gt; _fFancyNames</div><div class="ttdoc">Fancy name for example rather than xsec_0 it is MAQE, useful for human reading.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00441">ParameterHandlerBase.h:441</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a714a8a85df5986b40dfbdf13bb8a159d"><div class="ttname"><a href="classParameterHandlerBase.html#a714a8a85df5986b40dfbdf13bb8a159d">ParameterHandlerBase::_fYAMLDoc</a></div><div class="ttdeci">YAML::Node _fYAMLDoc</div><div class="ttdoc">Stores config describing systematics.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00443">ParameterHandlerBase.h:443</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a4aa04c9dfb80f8d25f0712e21eb71054"><div class="ttname"><a href="classParameterHandlerBase.html#a4aa04c9dfb80f8d25f0712e21eb71054">ParameterHandlerBase::Tunes</a></div><div class="ttdeci">std::unique_ptr&lt; ParameterTunes &gt; Tunes</div><div class="ttdoc">Struct containing information about adaption.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00480">ParameterHandlerBase.h:480</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a56d40a78f16384b3b6e8ed10c76b899d"><div class="ttname"><a href="classParameterHandlerBase.html#a56d40a78f16384b3b6e8ed10c76b899d">ParameterHandlerBase::_fFancyNames</a></div><div class="ttdeci">std::vector&lt; std::string &gt; _fFancyNames</div><div class="ttdoc">Fancy name for example rather than xsec_0 it is MAQE, useful for human reading.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00439">ParameterHandlerBase.h:439</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a714a8a85df5986b40dfbdf13bb8a159d"><div class="ttname"><a href="classParameterHandlerBase.html#a714a8a85df5986b40dfbdf13bb8a159d">ParameterHandlerBase::_fYAMLDoc</a></div><div class="ttdeci">YAML::Node _fYAMLDoc</div><div class="ttdoc">Stores config describing systematics.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00441">ParameterHandlerBase.h:441</a></div></div>
 <div class="ttc" id="aclassParameterHandlerBase_html_aa7b79b03eb1ff91d0c631425e5052f17"><div class="ttname"><a href="classParameterHandlerBase.html#aa7b79b03eb1ff91d0c631425e5052f17">ParameterHandlerBase::EnableSpecialProposal</a></div><div class="ttdeci">void EnableSpecialProposal(const YAML::Node &amp;param, const int Index)</div><div class="ttdoc">Enable special proposal.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l00297">ParameterHandlerBase.cpp:297</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -1686,7 +1683,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 1128</span>  <span class="keyword">auto</span> external_mean_name = GetFromManager&lt;std::string&gt;(adapt_manager[<span class="stringliteral">&quot;AdaptionOptions&quot;</span>][<span class="stringliteral">&quot;Covariance&quot;</span>][<a class="code hl_variable" href="classParameterHandlerBase.html#a5e9226aa216252b1ef195c7f91c76df2">matrixName</a>][<span class="stringliteral">&quot;ExternalMeansName&quot;</span>], <span class="stringliteral">&quot;&quot;</span>, __FILE__ , __LINE__);</div>
 <div class="line"><span class="lineno"> 1129</span> </div>
 <div class="line"><span class="lineno"> 1130</span>  <a class="code hl_variable" href="classParameterHandlerBase.html#a1ebeda558155dfa06070e67218b9a567">AdaptiveHandler</a>-&gt;SetThrowMatrixFromFile(external_file_name, external_matrix_name, external_mean_name, <a class="code hl_variable" href="classParameterHandlerBase.html#a0919e47e80710af8b9a3f837bba9bf8b">use_adaptive</a>);</div>
-<div class="line"><span class="lineno"> 1131</span>  <a class="code hl_function" href="group__ParameterHandlerSetters.html#ga65a6e138ee6eb9e7fafa7e7d4f749f61">SetThrowMatrix</a>(<a class="code hl_variable" href="classParameterHandlerBase.html#a1ebeda558155dfa06070e67218b9a567">AdaptiveHandler</a>-&gt;adaptive_covariance);</div>
+<div class="line"><span class="lineno"> 1131</span>  <a class="code hl_function" href="group__ParameterHandlerSetters.html#ga65a6e138ee6eb9e7fafa7e7d4f749f61">SetThrowMatrix</a>(<a class="code hl_variable" href="classParameterHandlerBase.html#a1ebeda558155dfa06070e67218b9a567">AdaptiveHandler</a>-&gt;GetAdaptiveCovariance());</div>
 <div class="line"><span class="lineno"> 1132</span> </div>
 <div class="line"><span class="lineno"> 1133</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Successfully Set External Throw Matrix Stored in {}&quot;</span>, external_file_name);</div>
 <div class="line"><span class="lineno"> 1134</span>}</div>
@@ -1727,11 +1724,11 @@ Kamil Skwarczynski </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00322">322</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  322</span>                                           {</div>
-<div class="line"><span class="lineno">  323</span>    <span class="keywordflow">if</span> (<a class="code hl_variable" href="classParameterHandlerBase.html#a65f6056605f718d83a641680aa33fe88">_fError</a>[i] &lt; 0) { <span class="keywordflow">return</span> <span class="keyword">true</span>; }</div>
-<div class="line"><span class="lineno">  324</span>    <span class="keywordflow">else</span>                { <span class="keywordflow">return</span> <span class="keyword">false</span>; }</div>
-<div class="line"><span class="lineno">  325</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00320">320</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  320</span>                                           {</div>
+<div class="line"><span class="lineno">  321</span>    <span class="keywordflow">if</span> (<a class="code hl_variable" href="classParameterHandlerBase.html#a65f6056605f718d83a641680aa33fe88">_fError</a>[i] &lt; 0) { <span class="keywordflow">return</span> <span class="keyword">true</span>; }</div>
+<div class="line"><span class="lineno">  322</span>    <span class="keywordflow">else</span>                { <span class="keywordflow">return</span> <span class="keyword">false</span>; }</div>
+<div class="line"><span class="lineno">  323</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1770,7 +1767,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  939</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;I couldn&#39;t find parameter with name {}, therefore don&#39;t know if it fixed&quot;</span>, name);</div>
 <div class="line"><span class="lineno">  940</span>  <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno">  941</span>}</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a78ffc15979c158c7a3e3eb7bd40a4e79"><div class="ttname"><a href="classParameterHandlerBase.html#a78ffc15979c158c7a3e3eb7bd40a4e79">ParameterHandlerBase::IsParameterFixed</a></div><div class="ttdeci">bool IsParameterFixed(const int i) const</div><div class="ttdoc">Is parameter fixed or not.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00322">ParameterHandlerBase.h:322</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a78ffc15979c158c7a3e3eb7bd40a4e79"><div class="ttname"><a href="classParameterHandlerBase.html#a78ffc15979c158c7a3e3eb7bd40a4e79">ParameterHandlerBase::IsParameterFixed</a></div><div class="ttdeci">bool IsParameterFixed(const int i) const</div><div class="ttdoc">Is parameter fixed or not.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00320">ParameterHandlerBase.h:320</a></div></div>
 <div class="ttc" id="agroup__ParameterHandlerGetters_html_ga51c54063c18a8fd3ba469dba705b487d"><div class="ttname"><a href="group__ParameterHandlerGetters.html#ga51c54063c18a8fd3ba469dba705b487d">ParameterHandlerBase::GetParIndex</a></div><div class="ttdeci">int GetParIndex(const std::string &amp;name) const</div><div class="ttdoc">Get index based on name.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l00879">ParameterHandlerBase.cpp:879</a></div></div>
 <div class="ttc" id="anamespaceM3_html_aed6ca6561a78ba6c90a98ddfa22353aa"><div class="ttname"><a href="namespaceM3.html#aed6ca6561a78ba6c90a98ddfa22353aa">M3::_BAD_INT_</a></div><div class="ttdeci">static constexpr const int _BAD_INT_</div><div class="ttdoc">Default value used for int initialisation.</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00045">Core.h:45</a></div></div>
 </div><!-- fragment -->
@@ -1801,8 +1798,8 @@ Kamil Skwarczynski </dd></dl>
 
 <p>is PCA, can use to query e.g. LLH scans </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00338">338</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  338</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">pca</a>; }</div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00336">336</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  336</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">pca</a>; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1951,7 +1948,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 1027</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;This indicates that something is wrong with the input matrix&quot;</span>);</div>
 <div class="line"><span class="lineno"> 1028</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
 <div class="line"><span class="lineno"> 1029</span>  }</div>
-<div class="line"><span class="lineno"> 1030</span>  <span class="keywordflow">if</span>(!<a class="code hl_variable" href="classParameterHandlerBase.html#a0919e47e80710af8b9a3f837bba9bf8b">use_adaptive</a> || <a class="code hl_variable" href="classParameterHandlerBase.html#a1ebeda558155dfa06070e67218b9a567">AdaptiveHandler</a>-&gt;total_steps &lt; 2) {</div>
+<div class="line"><span class="lineno"> 1030</span>  <span class="keywordflow">if</span>(!<a class="code hl_variable" href="classParameterHandlerBase.html#a0919e47e80710af8b9a3f837bba9bf8b">use_adaptive</a> || <a class="code hl_variable" href="classParameterHandlerBase.html#a1ebeda558155dfa06070e67218b9a567">AdaptiveHandler</a>-&gt;GetTotalSteps() &lt; 2) {</div>
 <div class="line"><span class="lineno"> 1031</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Had to shift diagonal {} time(s) to allow the covariance matrix to be decomposed&quot;</span>, iAttempt);</div>
 <div class="line"><span class="lineno"> 1032</span>  }</div>
 <div class="line"><span class="lineno"> 1033</span>  <span class="comment">//DB Resetting warning level</span></div>
@@ -2015,7 +2012,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  732</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;    {}   {} &quot;</span>, <a class="code hl_function" href="group__ParameterHandlerGetters.html#ga65b61ae6c60d4eadbb06fdef9596cc7f">GetParFancyName</a>(i), <a class="code hl_function" href="group__ParameterHandlerGetters.html#gad1397b3bc7853bceefab290fdd0f0fa9">GetParInit</a>(i));</div>
 <div class="line"><span class="lineno">  733</span>  }</div>
 <div class="line"><span class="lineno">  734</span>}</div>
-<div class="ttc" id="agroup__ParameterHandlerGetters_html_gad1397b3bc7853bceefab290fdd0f0fa9"><div class="ttname"><a href="group__ParameterHandlerGetters.html#gad1397b3bc7853bceefab290fdd0f0fa9">ParameterHandlerBase::GetParInit</a></div><div class="ttdeci">double GetParInit(const int i) const</div><div class="ttdoc">Get prior parameter value.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00264">ParameterHandlerBase.h:264</a></div></div>
+<div class="ttc" id="agroup__ParameterHandlerGetters_html_gad1397b3bc7853bceefab290fdd0f0fa9"><div class="ttname"><a href="group__ParameterHandlerGetters.html#gad1397b3bc7853bceefab290fdd0f0fa9">ParameterHandlerBase::GetParInit</a></div><div class="ttdeci">double GetParInit(const int i) const</div><div class="ttdoc">Get prior parameter value.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00262">ParameterHandlerBase.h:262</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2077,8 +2074,8 @@ Kamil Skwarczynski </dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>only for backward compatibility </dd></dl>
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000036">Todo:</a></b></dt><dd>remove it </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00294">294</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  294</span>{<a class="code hl_function" href="classParameterHandlerBase.html#a940bacb32cab3b34ae0ff302d984a471">PrintNominalCurrProp</a>();};</div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00292">292</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  292</span>{<a class="code hl_function" href="classParameterHandlerBase.html#a940bacb32cab3b34ae0ff302d984a471">PrintNominalCurrProp</a>();};</div>
 <div class="ttc" id="aclassParameterHandlerBase_html_a940bacb32cab3b34ae0ff302d984a471"><div class="ttname"><a href="classParameterHandlerBase.html#a940bacb32cab3b34ae0ff302d984a471">ParameterHandlerBase::PrintNominalCurrProp</a></div><div class="ttdeci">void PrintNominalCurrProp() const</div><div class="ttdoc">Print prior, current and proposed value for each parameter.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l00738">ParameterHandlerBase.cpp:738</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -2184,7 +2181,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  536</span>  }</div>
 <div class="line"><span class="lineno">  537</span>  <span class="keywordflow">if</span> (<a class="code hl_variable" href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">pca</a>) <a class="code hl_variable" href="classParameterHandlerBase.html#a8d3b05f6bb6ec3f334af6d9891fa031e">PCAObj</a>-&gt;TransferToPCA();</div>
 <div class="line"><span class="lineno">  538</span>}</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_aa30828713375ceda767c9631157bd41d"><div class="ttname"><a href="classParameterHandlerBase.html#aa30828713375ceda767c9631157bd41d">ParameterHandlerBase::_fNames</a></div><div class="ttdeci">std::vector&lt; std::string &gt; _fNames</div><div class="ttdoc">ETA _fNames is set automatically in the covariance class to be something like xsec_i,...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00439">ParameterHandlerBase.h:439</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_aa30828713375ceda767c9631157bd41d"><div class="ttname"><a href="classParameterHandlerBase.html#aa30828713375ceda767c9631157bd41d">ParameterHandlerBase::_fNames</a></div><div class="ttdeci">std::vector&lt; std::string &gt; _fNames</div><div class="ttdoc">ETA _fNames is set automatically in the covariance class to be something like xsec_i,...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00437">ParameterHandlerBase.h:437</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2378,8 +2375,8 @@ Kamil Skwarczynski </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the parameter value at the specified index.</dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>ETA - This might be a bit squiffy? If the vector gots moved from say a push_back then the pointer is no longer valid... maybe need a better way to deal with this? It was fine before when the return was to an element of a new array. There must be a clever C++ way to be careful </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00237">237</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  237</span>{<span class="keywordflow">return</span> &amp;(<a class="code hl_variable" href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">_fPropVal</a>.data()[iParam]);}</div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00235">235</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  235</span>{<span class="keywordflow">return</span> &amp;(<a class="code hl_variable" href="classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b">_fPropVal</a>.data()[iParam]);}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2850,7 +2847,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 1142</span> </div>
 <div class="line"><span class="lineno"> 1143</span>  <span class="comment">// Skip this if we&#39;re at a large number of steps</span></div>
 <div class="line"><span class="lineno"> 1144</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classParameterHandlerBase.html#a1ebeda558155dfa06070e67218b9a567">AdaptiveHandler</a>-&gt;SkipAdaption()) {</div>
-<div class="line"><span class="lineno"> 1145</span>    <a class="code hl_variable" href="classParameterHandlerBase.html#a1ebeda558155dfa06070e67218b9a567">AdaptiveHandler</a>-&gt;total_steps++;</div>
+<div class="line"><span class="lineno"> 1145</span>    <a class="code hl_variable" href="classParameterHandlerBase.html#a1ebeda558155dfa06070e67218b9a567">AdaptiveHandler</a>-&gt;IncrementNSteps();</div>
 <div class="line"><span class="lineno"> 1146</span>    <span class="keywordflow">return</span>;</div>
 <div class="line"><span class="lineno"> 1147</span>  }</div>
 <div class="line"><span class="lineno"> 1148</span> </div>
@@ -2863,13 +2860,13 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 1155</span>  }</div>
 <div class="line"><span class="lineno"> 1156</span> </div>
 <div class="line"><span class="lineno"> 1157</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classParameterHandlerBase.html#a1ebeda558155dfa06070e67218b9a567">AdaptiveHandler</a>-&gt;UpdateMatrixAdapt()) {</div>
-<div class="line"><span class="lineno"> 1158</span>    TMatrixDSym* update_matrix = <span class="keyword">static_cast&lt;</span>TMatrixDSym*<span class="keyword">&gt;</span>(<a class="code hl_variable" href="classParameterHandlerBase.html#a1ebeda558155dfa06070e67218b9a567">AdaptiveHandler</a>-&gt;adaptive_covariance-&gt;Clone());</div>
+<div class="line"><span class="lineno"> 1158</span>    TMatrixDSym* update_matrix = <span class="keyword">static_cast&lt;</span>TMatrixDSym*<span class="keyword">&gt;</span>(<a class="code hl_variable" href="classParameterHandlerBase.html#a1ebeda558155dfa06070e67218b9a567">AdaptiveHandler</a>-&gt;GetAdaptiveCovariance()-&gt;Clone());</div>
 <div class="line"><span class="lineno"> 1159</span>    <a class="code hl_function" href="classParameterHandlerBase.html#a82072628057bfd93a0ee4d56253ffe55">UpdateThrowMatrix</a>(update_matrix); <span class="comment">//Now we update and continue!</span></div>
 <div class="line"><span class="lineno"> 1160</span>    <span class="comment">//Also Save the adaptive to file</span></div>
-<div class="line"><span class="lineno"> 1161</span>    <a class="code hl_variable" href="classParameterHandlerBase.html#a1ebeda558155dfa06070e67218b9a567">AdaptiveHandler</a>-&gt;SaveAdaptiveToFile(<a class="code hl_variable" href="classParameterHandlerBase.html#a1ebeda558155dfa06070e67218b9a567">AdaptiveHandler</a>-&gt;output_file_name,<a class="code hl_function" href="group__ParameterHandlerGetters.html#gab1ef5c9f3c3eb619752a073590f5fd53">GetName</a>());</div>
+<div class="line"><span class="lineno"> 1161</span>    <a class="code hl_variable" href="classParameterHandlerBase.html#a1ebeda558155dfa06070e67218b9a567">AdaptiveHandler</a>-&gt;SaveAdaptiveToFile(<a class="code hl_variable" href="classParameterHandlerBase.html#a1ebeda558155dfa06070e67218b9a567">AdaptiveHandler</a>-&gt;GetOutFileName(), <a class="code hl_function" href="group__ParameterHandlerGetters.html#gab1ef5c9f3c3eb619752a073590f5fd53">GetName</a>());</div>
 <div class="line"><span class="lineno"> 1162</span>  }</div>
 <div class="line"><span class="lineno"> 1163</span> </div>
-<div class="line"><span class="lineno"> 1164</span>  <a class="code hl_variable" href="classParameterHandlerBase.html#a1ebeda558155dfa06070e67218b9a567">AdaptiveHandler</a>-&gt;total_steps++;</div>
+<div class="line"><span class="lineno"> 1164</span>  <a class="code hl_variable" href="classParameterHandlerBase.html#a1ebeda558155dfa06070e67218b9a567">AdaptiveHandler</a>-&gt;IncrementNSteps();</div>
 <div class="line"><span class="lineno"> 1165</span>}</div>
 <div class="ttc" id="aclassParameterHandlerBase_html_a82072628057bfd93a0ee4d56253ffe55"><div class="ttname"><a href="classParameterHandlerBase.html#a82072628057bfd93a0ee4d56253ffe55">ParameterHandlerBase::UpdateThrowMatrix</a></div><div class="ttdeci">void UpdateThrowMatrix(TMatrixDSym *cov)</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l01092">ParameterHandlerBase.cpp:1092</a></div></div>
 <div class="ttc" id="aclassParameterHandlerBase_html_a8d222a4ff0880de7df89c73ddc942054"><div class="ttname"><a href="classParameterHandlerBase.html#a8d222a4ff0880de7df89c73ddc942054">ParameterHandlerBase::ResetIndivStepScale</a></div><div class="ttdeci">void ResetIndivStepScale()</div><div class="ttdoc">Adaptive Step Tuning Stuff.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l01038">ParameterHandlerBase.cpp:1038</a></div></div>
@@ -2927,7 +2924,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Current value of the parameter. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00449">449</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00447">447</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -2953,7 +2950,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Prior error on the parameter. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00453">453</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00451">451</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -2979,7 +2976,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Fancy name for example rather than xsec_0 it is MAQE, useful for human reading. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00441">441</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00439">439</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3005,7 +3002,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Whether to apply flat prior or not. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00461">461</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00459">459</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3031,7 +3028,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Global step scale applied to all params in this class. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00433">433</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00431">431</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3057,7 +3054,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Individual step scale used by MCMC algorithm. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00459">459</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00457">457</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3083,7 +3080,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Lowest physical bound, parameter will not be able to go beyond it. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00455">455</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00453">453</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3109,7 +3106,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>ETA _fNames is set automatically in the covariance class to be something like xsec_i, this is currently to make things compatible with the Diagnostic tools. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00439">439</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00437">437</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3135,7 +3132,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Number of systematic parameters. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00445">445</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00443">443</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3161,7 +3158,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Parameter value dictated by the prior model. Based on it penalty term is calculated. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00447">447</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00445">445</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3187,7 +3184,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Proposed value of the parameter. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00451">451</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00449">449</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3213,7 +3210,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Tells to which samples object param should be applied. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00463">463</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00461">461</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3239,7 +3236,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Upper physical bound, parameter will not be able to go beyond it. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00457">457</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00455">455</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3265,7 +3262,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Stores config describing systematics. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00443">443</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00441">441</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3291,7 +3288,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Struct containing information about adaption. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00480">480</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00478">478</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3317,7 +3314,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Indices of parameters with circular bounds. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00489">489</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00487">487</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3343,7 +3340,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Circular bounds for each parameter (lower, upper) </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00491">491</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00489">489</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3369,7 +3366,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Result of multiplication of Cholesky matrix and randParams. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00431">431</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00429">429</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3395,7 +3392,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>The covariance matrix. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00419">419</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00417">417</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3421,7 +3418,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Check if any of special step proposal were enabled. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00411">411</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00409">409</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3447,7 +3444,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Indices of parameters with flip symmetry. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00485">485</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00483">483</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3473,7 +3470,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Central points around which parameters are flipped. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00487">487</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00485">485</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3499,7 +3496,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>The input root file we read in. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00414">414</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00412">412</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3525,7 +3522,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>The inverse covariance matrix. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00421">421</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00419">419</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3551,7 +3548,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>KS: Same as above but much faster as TMatrixDSym cache miss. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00423">423</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00421">421</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3577,7 +3574,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Name of cov matrix. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00417">417</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00415">415</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3603,7 +3600,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>perform PCA or not </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00473">473</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00471">471</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3629,7 +3626,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Struct containing information about PCA. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00478">478</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00476">476</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3655,7 +3652,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>KS: This is used when printing parameters, sometimes we have super long parameters name, we want to flexibly adjust couts. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00436">436</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00434">434</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3681,7 +3678,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>KS: Set Random numbers for each thread so each thread has different seed. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00426">426</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00424">424</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3707,7 +3704,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Random number taken from gaussian around prior error used for corr_throw. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00429">429</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00427">427</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3733,7 +3730,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Matrix which we use for step proposal before Cholesky decomposition (not actually used for step proposal) </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00466">466</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00464">464</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3759,7 +3756,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Matrix which we use for step proposal after Cholesky decomposition. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00468">468</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00466">466</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3785,7 +3782,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Throw matrix that is being used in the fit, much faster as TMatrixDSym cache miss. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00470">470</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00468">468</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3811,7 +3808,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Struct containing information about adaption. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00482">482</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00480">480</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -3837,7 +3834,7 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Are we using AMCMC? </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00475">475</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00473">473</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 
 </div>
 </div>
