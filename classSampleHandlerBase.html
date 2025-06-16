@@ -124,6 +124,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ab6e807de9ac80fb9f12722e033c44f7e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#ab6e807de9ac80fb9f12722e033c44f7e">CleanMemoryBeforeFit</a> ()=0</td></tr>
 <tr class="memdesc:ab6e807de9ac80fb9f12722e033c44f7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allow to clean not used memory before fit starts.  <br /></td></tr>
 <tr class="separator:ab6e807de9ac80fb9f12722e033c44f7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abaee29f1c5b8229417a0de3b5a36ddb0"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#abaee29f1c5b8229417a0de3b5a36ddb0">SaveAdditionalInfo</a> (TDirectory *Dir)</td></tr>
+<tr class="memdesc:abaee29f1c5b8229417a0de3b5a36ddb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Store additional info in a chan.  <br /></td></tr>
+<tr class="separator:abaee29f1c5b8229417a0de3b5a36ddb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaa20368797948a55ad18848965fa439b6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classMaCh3Modes.html">MaCh3Modes</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#gaa20368797948a55ad18848965fa439b6">GetMaCh3Modes</a> () const</td></tr>
 <tr class="memdesc:gaa20368797948a55ad18848965fa439b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return pointer to MaCh3 modes.  <br /></td></tr>
 <tr class="separator:gaa20368797948a55ad18848965fa439b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -221,8 +224,8 @@ Protected Attributes</h2></td></tr>
 <div class="line"><span class="lineno">    6</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#ab497b52d94868283a8a7cedbd1a4d777">nEvents</a> = 0;</div>
 <div class="line"><span class="lineno">    7</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#aa7a13af22c2314c718fb6438d493d3d1">nSamples</a> = 0;</div>
 <div class="line"><span class="lineno">    8</span>}</div>
-<div class="ttc" id="aclassSampleHandlerBase_html_aa7a13af22c2314c718fb6438d493d3d1"><div class="ttname"><a href="classSampleHandlerBase.html#aa7a13af22c2314c718fb6438d493d3d1">SampleHandlerBase::nSamples</a></div><div class="ttdeci">M3::int_t nSamples</div><div class="ttdoc">Contains how many samples we've got.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00116">SampleHandlerBase.h:116</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_ab497b52d94868283a8a7cedbd1a4d777"><div class="ttname"><a href="classSampleHandlerBase.html#ab497b52d94868283a8a7cedbd1a4d777">SampleHandlerBase::nEvents</a></div><div class="ttdeci">unsigned int nEvents</div><div class="ttdoc">Number of MC events are there.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00119">SampleHandlerBase.h:119</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_aa7a13af22c2314c718fb6438d493d3d1"><div class="ttname"><a href="classSampleHandlerBase.html#aa7a13af22c2314c718fb6438d493d3d1">SampleHandlerBase::nSamples</a></div><div class="ttdeci">M3::int_t nSamples</div><div class="ttdoc">Contains how many samples we've got.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00117">SampleHandlerBase.h:117</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_ab497b52d94868283a8a7cedbd1a4d777"><div class="ttname"><a href="classSampleHandlerBase.html#ab497b52d94868283a8a7cedbd1a4d777">SampleHandlerBase::nEvents</a></div><div class="ttdeci">unsigned int nEvents</div><div class="ttdoc">Number of MC events are there.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00120">SampleHandlerBase.h:120</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -313,8 +316,8 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00068">68</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   68</span>{ (void) Selection; <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ , <span class="stringliteral">&quot;Not implemented&quot;</span>); }</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00069">69</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   69</span>{ (void) Selection; <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ , <span class="stringliteral">&quot;Not implemented&quot;</span>); }</div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00013">MaCh3Exception.h:13</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -353,9 +356,9 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00073">73</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   73</span>                                                                                 {</div>
-<div class="line"><span class="lineno">   74</span>    (void) sample; (void) Dimension; <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ , <span class="stringliteral">&quot;Not implemented&quot;</span>);  };</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00074">74</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   74</span>                                                                                 {</div>
+<div class="line"><span class="lineno">   75</span>    (void) sample; (void) Dimension; <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ , <span class="stringliteral">&quot;Not implemented&quot;</span>);  };</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -383,8 +386,8 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00070">70</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   70</span>{ (void) Selection; <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ , <span class="stringliteral">&quot;Not implemented&quot;</span>);}</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00071">71</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   71</span>{ (void) Selection; <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ , <span class="stringliteral">&quot;Not implemented&quot;</span>);}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -422,9 +425,9 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00071">71</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   71</span>                                                                      {</div>
-<div class="line"><span class="lineno">   72</span>    (void) Selection; (void) Mode; <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ , <span class="stringliteral">&quot;Not implemented&quot;</span>); }</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00072">72</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   72</span>                                                                      {</div>
+<div class="line"><span class="lineno">   73</span>    (void) Selection; (void) Mode; <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ , <span class="stringliteral">&quot;Not implemented&quot;</span>); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -452,8 +455,8 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00069">69</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   69</span>{ (void) Selection; <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ , <span class="stringliteral">&quot;Not implemented&quot;</span>);}</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00070">70</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   70</span>{ (void) Selection; <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ , <span class="stringliteral">&quot;Not implemented&quot;</span>);}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -495,13 +498,13 @@ template&lt;typename T &gt; </div>
 
 <p>check if event is affected by following conditions, for example pdg, or modes etc </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00100">100</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  100</span>                                                                         {</div>
-<div class="line"><span class="lineno">  101</span>    <span class="keywordflow">if</span> (allowedValues.empty()) {</div>
-<div class="line"><span class="lineno">  102</span>      <span class="keywordflow">return</span> <span class="keyword">true</span>;  <span class="comment">// Apply to all if no specific values are specified</span></div>
-<div class="line"><span class="lineno">  103</span>    }</div>
-<div class="line"><span class="lineno">  104</span>    <span class="keywordflow">return</span> std::find(allowedValues.begin(), allowedValues.end(), value) != allowedValues.end();</div>
-<div class="line"><span class="lineno">  105</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00101">101</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  101</span>                                                                         {</div>
+<div class="line"><span class="lineno">  102</span>    <span class="keywordflow">if</span> (allowedValues.empty()) {</div>
+<div class="line"><span class="lineno">  103</span>      <span class="keywordflow">return</span> <span class="keyword">true</span>;  <span class="comment">// Apply to all if no specific values are specified</span></div>
+<div class="line"><span class="lineno">  104</span>    }</div>
+<div class="line"><span class="lineno">  105</span>    <span class="keywordflow">return</span> std::find(allowedValues.begin(), allowedValues.end(), value) != allowedValues.end();</div>
+<div class="line"><span class="lineno">  106</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -540,8 +543,8 @@ template&lt;typename T &gt; </div>
 <div class="line"><span class="lineno">  196</span>  std::cerr.rdbuf(<a class="code hl_variable" href="classSampleHandlerBase.html#a6b884367733c4f3a93c75127ed6e9df9">errbuf</a>);</div>
 <div class="line"><span class="lineno">  197</span><span class="preprocessor">  #endif</span></div>
 <div class="line"><span class="lineno">  198</span>}</div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a47d291148fa6153a7e05beebde6cfdb9"><div class="ttname"><a href="classSampleHandlerBase.html#a47d291148fa6153a7e05beebde6cfdb9">SampleHandlerBase::buf</a></div><div class="ttdeci">std::streambuf * buf</div><div class="ttdoc">Keep the cout buffer.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00111">SampleHandlerBase.h:111</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a6b884367733c4f3a93c75127ed6e9df9"><div class="ttname"><a href="classSampleHandlerBase.html#a6b884367733c4f3a93c75127ed6e9df9">SampleHandlerBase::errbuf</a></div><div class="ttdeci">std::streambuf * errbuf</div><div class="ttdoc">Keep the cerr buffer.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00113">SampleHandlerBase.h:113</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a47d291148fa6153a7e05beebde6cfdb9"><div class="ttname"><a href="classSampleHandlerBase.html#a47d291148fa6153a7e05beebde6cfdb9">SampleHandlerBase::buf</a></div><div class="ttdeci">std::streambuf * buf</div><div class="ttdoc">Keep the cout buffer.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00112">SampleHandlerBase.h:112</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a6b884367733c4f3a93c75127ed6e9df9"><div class="ttname"><a href="classSampleHandlerBase.html#a6b884367733c4f3a93c75127ed6e9df9">SampleHandlerBase::errbuf</a></div><div class="ttdeci">std::streambuf * errbuf</div><div class="ttdoc">Keep the cerr buffer.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00114">SampleHandlerBase.h:114</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -612,6 +615,39 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
+<a id="abaee29f1c5b8229417a0de3b5a36ddb0" name="abaee29f1c5b8229417a0de3b5a36ddb0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abaee29f1c5b8229417a0de3b5a36ddb0">&#9670;&#160;</a></span>SaveAdditionalInfo()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void SampleHandlerBase::SaveAdditionalInfo </td>
+          <td>(</td>
+          <td class="paramtype">TDirectory *&#160;</td>
+          <td class="paramname"><em>Dir</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Store additional info in a chan. </p>
+
+<p>Reimplemented in <a class="el" href="classSampleHandlerFD.html#a90c390753da5f5561c66450440a19beb">SampleHandlerFD</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00050">50</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   50</span>{(void) Dir;};</div>
+</div><!-- fragment -->
+</div>
+</div>
 <a id="a0cf61d8f769755c4a0fa549adc575c3e" name="a0cf61d8f769755c4a0fa549adc575c3e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0cf61d8f769755c4a0fa549adc575c3e">&#9670;&#160;</a></span>SetupBinning()</h2>
 
@@ -652,9 +688,9 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00066">66</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   66</span>                                                                                                              {</div>
-<div class="line"><span class="lineno">   67</span>    (void) Selection; (void) BinningX; (void) BinningY; <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ , <span class="stringliteral">&quot;Not implemented&quot;</span>);}</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00067">67</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   67</span>                                                                                                              {</div>
+<div class="line"><span class="lineno">   68</span>    (void) Selection; (void) BinningX; (void) BinningY; <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ , <span class="stringliteral">&quot;Not implemented&quot;</span>);}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -681,7 +717,7 @@ template&lt;typename T &gt; </div>
 
 <p>Keep the cout buffer. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00111">111</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00112">112</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -707,7 +743,7 @@ template&lt;typename T &gt; </div>
 
 <p>Keep the cerr buffer. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00113">113</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00114">114</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -733,7 +769,7 @@ template&lt;typename T &gt; </div>
 
 <p>Test statistic tells what kind of likelihood sample is using. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00108">108</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00109">109</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -759,7 +795,7 @@ template&lt;typename T &gt; </div>
 
 <p>Holds information about used Generator and MaCh3 modes. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00122">122</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00123">123</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -785,7 +821,7 @@ template&lt;typename T &gt; </div>
 
 <p>Number of MC events are there. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00119">119</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00120">120</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -811,7 +847,7 @@ template&lt;typename T &gt; </div>
 
 <p>Contains how many samples we've got. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00116">116</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00117">117</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>

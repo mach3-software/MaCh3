@@ -309,7 +309,7 @@
 <!-- Node28 -->
 <g id="node9" class="node">
 <title>Node28</title>
-<g id="a_node9"><a xlink:href="CombineMaCh3Chains_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node9"><a xlink:href="CombineMaCh3Chains_8cpp.html" target="_top" xlink:title="Combine chains files produced by MCMC, enforcing the condition that all the files to combine were mad...">
 <polygon fill="white" stroke="#666666" points="2201,-294 2047,-294 2047,-264 2201,-264 2201,-294"/>
 <text text-anchor="start" x="2055" y="-282" font-family="Helvetica,sans-Serif" font-size="10.00">Diagnostics/CombineMaCh3</text>
 <text text-anchor="middle" x="2124" y="-271" font-family="Helvetica,sans-Serif" font-size="10.00">Chains.cpp</text>

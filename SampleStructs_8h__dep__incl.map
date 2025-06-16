@@ -1,6 +1,6 @@
 <map id="Samples/SampleStructs.h" name="Samples/SampleStructs.h">
 <area shape="rect" id="node1" title=" " alt="" coords="2214,5,2402,31"/>
-<area shape="rect" id="node2" href="$CombineMaCh3Chains_8cpp.html" title=" " alt="" coords="5,167,211,207"/>
+<area shape="rect" id="node2" href="$CombineMaCh3Chains_8cpp.html" title="Combine chains files produced by MCMC, enforcing the condition that all the files to combine were mad..." alt="" coords="5,167,211,207"/>
 <area shape="rect" id="node3" href="$GetPenaltyTerm_8cpp.html" title="KS: This file contains the implementation of the function to extract specific penalty terms from syst..." alt="" coords="235,174,469,199"/>
 <area shape="rect" id="node4" href="$RHat_8cpp.html" title="This executable calculates the &#160;estimator for Markov Chain Monte Carlo (MCMC) convergence." alt="" coords="493,174,654,199"/>
 <area shape="rect" id="node5" href="$RHat__HighMem_8cpp.html" title=" " alt="" coords="678,174,909,199"/>

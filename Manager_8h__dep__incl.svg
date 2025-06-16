@@ -66,7 +66,7 @@ var sectionId = 'dynsection-1';
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="CombineMaCh3Chains_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="CombineMaCh3Chains_8cpp.html" target="_top" xlink:title="Combine chains files produced by MCMC, enforcing the condition that all the files to combine were mad...">
 <polygon fill="white" stroke="#666666" points="176.5,-393 22.5,-393 22.5,-363 176.5,-363 176.5,-393"/>
 <text text-anchor="start" x="30.5" y="-381" font-family="Helvetica,sans-Serif" font-size="10.00">Diagnostics/CombineMaCh3</text>
 <text text-anchor="middle" x="99.5" y="-370" font-family="Helvetica,sans-Serif" font-size="10.00">Chains.cpp</text>
