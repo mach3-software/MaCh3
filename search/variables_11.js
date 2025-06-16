@@ -22,7 +22,7 @@ var searchData=
   ['saveproposal_19',['SaveProposal',['../classFitterBase.html#a490b8614c4089c6db10ff357e7aaab67',1,'FitterBase']]],
   ['savesplinefile_20',['SaveSplineFile',['../classSMonolith.html#ab5692081772ca14bd012eb125e2ccfd4',1,'SMonolith']]],
   ['segment_5fgpu_21',['segment_gpu',['../gpuSplineUtils_8cu.html#ab99f54969e418c0517309fae3f648588',1,'gpuSplineUtils.cu']]],
-  ['selection_22',['Selection',['../classSampleHandlerFD.html#a2b0a7ada3c931e66211eebd91de0c0d0',1,'SampleHandlerFD::Selection()'],['../structNormParameter.html#a376a05a04e63c7dd2bf12e940925223c',1,'NormParameter::Selection()'],['../structFunctionalParameter.html#ab261275fa24252faef37cfb296fcba57',1,'FunctionalParameter::Selection()']]],
+  ['selection_22',['Selection',['../classSampleHandlerFD.html#a2b0a7ada3c931e66211eebd91de0c0d0',1,'SampleHandlerFD::Selection()'],['../structNormParameter.html#aff42708057c4b1e466459b485c8f38fc',1,'NormParameter::Selection()'],['../structFunctionalParameter.html#aa46db4201139e7d7da329e21192d31c7',1,'FunctionalParameter::Selection()']]],
   ['selectionstr_23',['SelectionStr',['../classSampleHandlerFD.html#abe55d06685c38b03a10134019b1aca06',1,'SampleHandlerFD']]],
   ['settingssaved_24',['SettingsSaved',['../classFitterBase.html#a588678c71d816f48ba3c140543dbe916',1,'FitterBase']]],
   ['size_25',['size',['../GetPenaltyTerm_8cpp.html#a439227feff9d7f55384e8780cfc2eb82',1,'GetPenaltyTerm.cpp']]],

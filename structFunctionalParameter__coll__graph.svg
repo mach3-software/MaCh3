@@ -46,7 +46,7 @@ if (edges && edges.length) {
         </defs>
 
 <script type="text/javascript">
-var viewWidth = 674;
+var viewWidth = 656;
 var viewHeight = 184;
 var sectionId = 'dynsection-1';
 </script>
@@ -58,8 +58,8 @@ var sectionId = 'dynsection-1';
 <g id="node1" class="node">
 <title>Node1</title>
 <g id="a_node1"><a xlink:title="HH &#45; Functional parameters Carrier for whether you want to apply a systematic to an event or not.">
-<polygon fill="#999999" stroke="#666666" points="666,-79 549,-79 549,-60 666,-60 666,-79"/>
-<text text-anchor="middle" x="607.5" y="-67" font-family="Helvetica,sans-Serif" font-size="10.00">FunctionalParameter</text>
+<polygon fill="#999999" stroke="#666666" points="648,-79 531,-79 531,-60 648,-60 648,-79"/>
+<text text-anchor="middle" x="589.5" y="-67" font-family="Helvetica,sans-Serif" font-size="10.00">FunctionalParameter</text>
 </a>
 </g>
 </g>
@@ -67,16 +67,16 @@ var sectionId = 'dynsection-1';
 <g id="node2" class="node">
 <title>Node2</title>
 <g id="a_node2"><a xlink:href="structTypeParameterBase.html" target="_top" xlink:title="Base class storing info for parameters types, helping unify codebase.">
-<polygon fill="white" stroke="#666666" points="408.5,-170 295.5,-170 295.5,-151 408.5,-151 408.5,-170"/>
-<text text-anchor="middle" x="352" y="-158" font-family="Helvetica,sans-Serif" font-size="10.00">TypeParameterBase</text>
+<polygon fill="white" stroke="#666666" points="399.5,-170 286.5,-170 286.5,-151 399.5,-151 399.5,-170"/>
+<text text-anchor="middle" x="343" y="-158" font-family="Helvetica,sans-Serif" font-size="10.00">TypeParameterBase</text>
 </a>
 </g>
 </g>
 <!-- Node2&#45;&gt;Node1 -->
 <g id="edge1" class="edge">
 <title>Node2&#45;&gt;Node1</title>
-<path fill="none" stroke="#63b8ff" d="M418.92,-165.08C453.74,-164.96 496.31,-160.66 531,-144.5 562.65,-129.76 588.72,-95.9 600.2,-79.19"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="418.88,-161.58 408.85,-165 418.83,-168.58 418.88,-161.58"/>
+<path fill="none" stroke="#63b8ff" d="M410.02,-164.45C442.42,-163.89 481.21,-159.4 513,-144.5 544.62,-129.68 570.7,-95.86 582.19,-79.18"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="409.73,-160.95 399.75,-164.49 409.76,-167.95 409.73,-160.95"/>
 </g>
 <!-- Node3 -->
 <g id="node3" class="node">
@@ -90,8 +90,8 @@ var sectionId = 'dynsection-1';
 <!-- Node3&#45;&gt;Node2 -->
 <g id="edge2" class="edge">
 <title>Node3&#45;&gt;Node2</title>
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M216.12,-160.5C239.81,-160.5 269.78,-160.5 295.45,-160.5"/>
-<polygon fill="#9a32cd" stroke="#9a32cd" points="216.05,-157 206.05,-160.5 216.05,-164 216.05,-157"/>
+<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M216.27,-160.5C237.42,-160.5 263.39,-160.5 286.22,-160.5"/>
+<polygon fill="#9a32cd" stroke="#9a32cd" points="216.01,-157 206.01,-160.5 216.01,-164 216.01,-157"/>
 <text text-anchor="middle" x="239.5" y="-163.5" font-family="Helvetica,sans-Serif" font-size="10.00"> name</text>
 </g>
 <!-- Node4 -->
@@ -114,54 +114,54 @@ var sectionId = 'dynsection-1';
 <g id="node5" class="node">
 <title>Node5</title>
 <g id="a_node5"><a xlink:title=" ">
-<polygon fill="white" stroke="#666666" points="404,-105 300,-105 300,-86 404,-86 404,-105"/>
-<text text-anchor="middle" x="352" y="-93" font-family="Helvetica,sans-Serif" font-size="10.00">std::vector&lt; int &gt;</text>
+<polygon fill="white" stroke="#666666" points="395,-105 291,-105 291,-86 395,-86 395,-105"/>
+<text text-anchor="middle" x="343" y="-93" font-family="Helvetica,sans-Serif" font-size="10.00">std::vector&lt; int &gt;</text>
 </a>
 </g>
 </g>
 <!-- Node5&#45;&gt;Node1 -->
 <g id="edge4" class="edge">
 <title>Node5&#45;&gt;Node1</title>
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M414.4,-89.2C455.24,-85.01 508.54,-79.55 548.63,-75.43"/>
-<polygon fill="#9a32cd" stroke="#9a32cd" points="413.89,-85.74 404.3,-90.24 414.6,-92.7 413.89,-85.74"/>
-<text text-anchor="middle" x="490" y="-132.5" font-family="Helvetica,sans-Serif" font-size="10.00"> horncurrents</text>
-<text text-anchor="middle" x="490" y="-121.5" font-family="Helvetica,sans-Serif" font-size="10.00">modes</text>
-<text text-anchor="middle" x="490" y="-110.5" font-family="Helvetica,sans-Serif" font-size="10.00">pdgs</text>
-<text text-anchor="middle" x="490" y="-99.5" font-family="Helvetica,sans-Serif" font-size="10.00">preoscpdgs</text>
-<text text-anchor="middle" x="490" y="-88.5" font-family="Helvetica,sans-Serif" font-size="10.00">targets</text>
+<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M405.3,-88.98C443.79,-84.89 493.12,-79.64 530.89,-75.63"/>
+<polygon fill="#9a32cd" stroke="#9a32cd" points="404.83,-85.51 395.26,-90.05 405.57,-92.47 404.83,-85.51"/>
+<text text-anchor="middle" x="472" y="-132.5" font-family="Helvetica,sans-Serif" font-size="10.00"> horncurrents</text>
+<text text-anchor="middle" x="472" y="-121.5" font-family="Helvetica,sans-Serif" font-size="10.00">modes</text>
+<text text-anchor="middle" x="472" y="-110.5" font-family="Helvetica,sans-Serif" font-size="10.00">pdgs</text>
+<text text-anchor="middle" x="472" y="-99.5" font-family="Helvetica,sans-Serif" font-size="10.00">preoscpdgs</text>
+<text text-anchor="middle" x="472" y="-88.5" font-family="Helvetica,sans-Serif" font-size="10.00">targets</text>
 </g>
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
 <g id="a_node6"><a xlink:title=" ">
-<polygon fill="white" stroke="#666666" points="431,-67.5 273,-67.5 273,-37.5 431,-37.5 431,-67.5"/>
-<text text-anchor="start" x="281" y="-55.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::vector&lt; std::vector</text>
-<text text-anchor="middle" x="352" y="-44.5" font-family="Helvetica,sans-Serif" font-size="10.00">&lt; std::vector&lt; double &gt; &gt; &gt;</text>
+<polygon fill="white" stroke="#666666" points="408.5,-67.5 277.5,-67.5 277.5,-37.5 408.5,-37.5 408.5,-67.5"/>
+<text text-anchor="start" x="285.5" y="-55.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::vector&lt; std::vector</text>
+<text text-anchor="middle" x="343" y="-44.5" font-family="Helvetica,sans-Serif" font-size="10.00">&lt; double &gt; &gt;</text>
 </a>
 </g>
 </g>
 <!-- Node6&#45;&gt;Node1 -->
 <g id="edge5" class="edge">
 <title>Node6&#45;&gt;Node1</title>
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M441.12,-52.72C469.83,-53.39 501.81,-54.78 531,-57.5 537.74,-58.13 544.79,-58.98 551.76,-59.95"/>
-<polygon fill="#9a32cd" stroke="#9a32cd" points="441.18,-49.22 431.11,-52.51 441.04,-56.22 441.18,-49.22"/>
-<text text-anchor="middle" x="490" y="-60.5" font-family="Helvetica,sans-Serif" font-size="10.00"> Selection</text>
+<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M418.91,-52.66C448.3,-53.26 482.28,-54.62 513,-57.5 519.74,-58.13 526.79,-58.99 533.76,-59.96"/>
+<polygon fill="#9a32cd" stroke="#9a32cd" points="418.78,-49.16 408.72,-52.48 418.66,-56.15 418.78,-49.16"/>
+<text text-anchor="middle" x="472" y="-60.5" font-family="Helvetica,sans-Serif" font-size="10.00"> Selection</text>
 </g>
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
 <g id="a_node7"><a xlink:title=" ">
-<polygon fill="white" stroke="#666666" points="422,-19 282,-19 282,0 422,0 422,-19"/>
-<text text-anchor="middle" x="352" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">std::vector&lt; std::string &gt;</text>
+<polygon fill="white" stroke="#666666" points="413,-19 273,-19 273,0 413,0 413,-19"/>
+<text text-anchor="middle" x="343" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">std::vector&lt; std::string &gt;</text>
 </a>
 </g>
 </g>
 <!-- Node7&#45;&gt;Node1 -->
 <g id="edge6" class="edge">
 <title>Node7&#45;&gt;Node1</title>
-<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M432.26,-17.74C463.41,-22.07 499.25,-28.42 531,-37.5 550.85,-43.17 572.43,-52.69 587.42,-59.87"/>
-<polygon fill="#9a32cd" stroke="#9a32cd" points="432.7,-14.27 422.32,-16.4 431.76,-21.2 432.7,-14.27"/>
-<text text-anchor="middle" x="490" y="-40.5" font-family="Helvetica,sans-Serif" font-size="10.00"> KinematicVarStr</text>
+<path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M423.05,-18.64C451.71,-22.99 484.13,-29.12 513,-37.5 532.82,-43.26 554.41,-52.76 569.41,-59.91"/>
+<polygon fill="#9a32cd" stroke="#9a32cd" points="423.48,-15.17 413.07,-17.18 422.46,-22.1 423.48,-15.17"/>
+<text text-anchor="middle" x="472" y="-40.5" font-family="Helvetica,sans-Serif" font-size="10.00"> KinematicVarStr</text>
 </g>
 </g>
 </svg>
