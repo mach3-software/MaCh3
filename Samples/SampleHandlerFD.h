@@ -276,7 +276,7 @@ public:
   // ===========================================================
 
   /// @brief Return the binning used to draw a kinematic parameter
-  virtual std::vector<double> ReturnKinematicParameterBinning(std::string KinematicParameter) = 0;
+  std::vector<double> ReturnKinematicParameterBinning(const std::string& KinematicParameter);
   virtual const double* GetPointerToKinematicParameter(std::string KinematicParamter, int iEvent) = 0;
   virtual const double* GetPointerToKinematicParameter(double KinematicVariable, int iEvent) = 0;
 
