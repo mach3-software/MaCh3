@@ -125,6 +125,8 @@ Macros</h2></td></tr>
 <tr class="separator:ad802d5a5acdc16a796b21af74f6f5f59"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae828b8f0cb6b6bbd5fd4e7e5aaf9632f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="YamlHelper_8h.html#ae828b8f0cb6b6bbd5fd4e7e5aaf9632f">GetBounds</a>(filename)&#160;&#160;&#160;<a class="el" href="YamlHelper_8h.html#a3c6595806e439f4ff22e04c22bbe18f9">ParseBounds</a>((filename), __FILE__, __LINE__)</td></tr>
 <tr class="separator:ae828b8f0cb6b6bbd5fd4e7e5aaf9632f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a236f7db41b3514852c36138d94d8015e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="YamlHelper_8h.html#a236f7db41b3514852c36138d94d8015e">Get2DBounds</a>(filename)&#160;&#160;&#160;<a class="el" href="YamlHelper_8h.html#af3f5457963c2e716d78f519b2a59d3c1">Parse2DBounds</a>((filename), __FILE__, __LINE__)</td></tr>
+<tr class="separator:a236f7db41b3514852c36138d94d8015e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -200,6 +202,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a3c6595806e439f4ff22e04c22bbe18f9"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="YamlHelper_8h.html#a3c6595806e439f4ff22e04c22bbe18f9">ParseBounds</a> (const YAML::Node &amp;node, const std::string &amp;File, const int Line)</td></tr>
 <tr class="memdesc:a3c6595806e439f4ff22e04c22bbe18f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Get bounds from YAML for example for selection cuts.  <br /></td></tr>
 <tr class="separator:a3c6595806e439f4ff22e04c22bbe18f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af3f5457963c2e716d78f519b2a59d3c1"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="YamlHelper_8h.html#af3f5457963c2e716d78f519b2a59d3c1">Parse2DBounds</a> (const YAML::Node &amp;node, const std::string &amp;File, const int Line)</td></tr>
+<tr class="memdesc:af3f5457963c2e716d78f519b2a59d3c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Get 2D bounds from YAML for example for selection cuts.  <br /></td></tr>
+<tr class="separator:af3f5457963c2e716d78f519b2a59d3c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Utility functions for handling YAML nodes. </p>
@@ -209,6 +214,26 @@ Luke Pickering </dd></dl>
 
 <p class="definition">Definition in file <a class="el" href="YamlHelper_8h_source.html">YamlHelper.h</a>.</p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="a236f7db41b3514852c36138d94d8015e" name="a236f7db41b3514852c36138d94d8015e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a236f7db41b3514852c36138d94d8015e">&#9670;&#160;</a></span>Get2DBounds</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define Get2DBounds</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">filename</td><td>)</td>
+          <td>&#160;&#160;&#160;<a class="el" href="YamlHelper_8h.html#af3f5457963c2e716d78f519b2a59d3c1">Parse2DBounds</a>((filename), __FILE__, __LINE__)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="YamlHelper_8h_source.html#l00547">547</a> of file <a class="el" href="YamlHelper_8h_source.html">YamlHelper.h</a>.</p>
+
+</div>
+</div>
 <a id="ae828b8f0cb6b6bbd5fd4e7e5aaf9632f" name="ae828b8f0cb6b6bbd5fd4e7e5aaf9632f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae828b8f0cb6b6bbd5fd4e7e5aaf9632f">&#9670;&#160;</a></span>GetBounds</h2>
 
@@ -225,7 +250,7 @@ Luke Pickering </dd></dl>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="YamlHelper_8h_source.html#l00462">462</a> of file <a class="el" href="YamlHelper_8h_source.html">YamlHelper.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="YamlHelper_8h_source.html#l00546">546</a> of file <a class="el" href="YamlHelper_8h_source.html">YamlHelper.h</a>.</p>
 
 </div>
 </div>
@@ -247,7 +272,7 @@ Luke Pickering </dd></dl>
 
 <p>Macro to simplify calling LoadYaml with file and line info. </p>
 
-<p class="definition">Definition at line <a class="el" href="YamlHelper_8h_source.html#l00461">461</a> of file <a class="el" href="YamlHelper_8h_source.html">YamlHelper.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="YamlHelper_8h_source.html#l00545">545</a> of file <a class="el" href="YamlHelper_8h_source.html">YamlHelper.h</a>.</p>
 
 </div>
 </div>
@@ -401,11 +426,11 @@ template&lt;typename T , typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Reference to the same YAML node. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="YamlHelper_8h_source.html#l00365">365</a> of file <a class="el" href="YamlHelper_8h_source.html">YamlHelper.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  365</span>                                                 {</div>
-<div class="line"><span class="lineno">  366</span><span class="comment">// **********************</span></div>
-<div class="line"><span class="lineno">  367</span>  <span class="keywordflow">return</span> n;</div>
-<div class="line"><span class="lineno">  368</span>}</div>
+<p class="definition">Definition at line <a class="el" href="YamlHelper_8h_source.html#l00378">378</a> of file <a class="el" href="YamlHelper_8h_source.html">YamlHelper.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  378</span>                                                 {</div>
+<div class="line"><span class="lineno">  379</span><span class="comment">// **********************</span></div>
+<div class="line"><span class="lineno">  380</span>  <span class="keywordflow">return</span> n;</div>
+<div class="line"><span class="lineno">  381</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -848,9 +873,9 @@ template&lt;typename Type &gt; </div>
 <div class="line"><span class="lineno">  315</span><span class="comment">// **********************</span></div>
 <div class="line"><span class="lineno">  316</span>  <span class="comment">// KS: YAML can be dumb and not throw error if you pass toml for example...</span></div>
 <div class="line"><span class="lineno">  317</span>  <span class="keywordflow">if</span> (!(filename.length() &gt;= 5 &amp;&amp; filename.compare(filename.length() - 5, 5, <span class="stringliteral">&quot;.yaml&quot;</span>) == 0) &amp;&amp;</div>
-<div class="line"><span class="lineno">  318</span>    !(filename.length() &gt;= 4 &amp;&amp; filename.compare(filename.length() - 4, 4, <span class="stringliteral">&quot;.yml&quot;</span>) == 0)) {</div>
-<div class="line"><span class="lineno">  319</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Invalid file extension: {}\n&quot;</span>, filename);</div>
-<div class="line"><span class="lineno">  320</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
+<div class="line"><span class="lineno">  318</span>      !(filename.length() &gt;= 4 &amp;&amp; filename.compare(filename.length() - 4, 4, <span class="stringliteral">&quot;.yml&quot;</span>) == 0)) {</div>
+<div class="line"><span class="lineno">  319</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Invalid file extension: {}\n&quot;</span>, filename);</div>
+<div class="line"><span class="lineno">  320</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
 <div class="line"><span class="lineno">  321</span>  }</div>
 <div class="line"><span class="lineno">  322</span> </div>
 <div class="line"><span class="lineno">  323</span>  <span class="keywordflow">try</span> {</div>
@@ -862,33 +887,47 @@ template&lt;typename Type &gt; </div>
 <div class="line"><span class="lineno">  329</span>    buffer &lt;&lt; fileStream.rdbuf();</div>
 <div class="line"><span class="lineno">  330</span>    std::string fileContent = buffer.str();</div>
 <div class="line"><span class="lineno">  331</span> </div>
-<div class="line"><span class="lineno">  332</span>    <span class="comment">// Use regex to find any line starting with `-` but not followed by space or tab</span></div>
-<div class="line"><span class="lineno">  333</span>    std::regex linePattern(R<span class="stringliteral">&quot;(^\s*-\S.*$)&quot;);</span></div>
-<div class="line"><span class="lineno">  334</span><span class="stringliteral">    std::istringstream contentStream(fileContent);</span></div>
-<div class="line"><span class="lineno">  335</span><span class="stringliteral">    std::string lineconfig;</span></div>
-<div class="line"><span class="lineno">  336</span><span class="stringliteral">    </span><span class="keywordtype">int</span> lineNumber = 1;</div>
-<div class="line"><span class="lineno">  337</span> </div>
-<div class="line"><span class="lineno">  338</span>    <span class="keywordflow">while</span> (std::getline(contentStream, lineconfig)) {</div>
-<div class="line"><span class="lineno">  339</span>      <span class="comment">// Log the line for debugging</span></div>
-<div class="line"><span class="lineno">  340</span>      <span class="comment">// Ignore lines with &#39;---&#39; (YAML document separator)</span></div>
-<div class="line"><span class="lineno">  341</span>      <span class="keywordflow">if</span> (lineconfig.find(<span class="stringliteral">&quot;---&quot;</span>) != std::string::npos) {</div>
-<div class="line"><span class="lineno">  342</span>        <span class="keywordflow">continue</span>;</div>
-<div class="line"><span class="lineno">  343</span>      }</div>
-<div class="line"><span class="lineno">  344</span> </div>
-<div class="line"><span class="lineno">  345</span>      <span class="comment">// Check if the line matches the pattern for missing space after `-`</span></div>
-<div class="line"><span class="lineno">  346</span>      <span class="keywordflow">if</span> (std::regex_match(lineconfig, linePattern)) {</div>
-<div class="line"><span class="lineno">  347</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Warning: Missing space or tab after &#39;-&#39; at line {}: {}\n&quot;</span>, lineNumber, lineconfig);</div>
-<div class="line"><span class="lineno">  348</span>       <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
-<div class="line"><span class="lineno">  349</span>      }</div>
-<div class="line"><span class="lineno">  350</span>      lineNumber++;</div>
-<div class="line"><span class="lineno">  351</span>    }</div>
-<div class="line"><span class="lineno">  352</span>    <span class="keywordflow">return</span> yamlNode;</div>
-<div class="line"><span class="lineno">  353</span>  } <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception&amp; e) {</div>
-<div class="line"><span class="lineno">  354</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;{}\n&quot;</span>, e.what());</div>
-<div class="line"><span class="lineno">  355</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Can&#39;t open file {}\n&quot;</span>, filename);</div>
-<div class="line"><span class="lineno">  356</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
-<div class="line"><span class="lineno">  357</span>  }</div>
-<div class="line"><span class="lineno">  358</span>}</div>
+<div class="line"><span class="lineno">  332</span>    <span class="comment">// Use regex to find any line starting with `-` but not followed by space, digit, or dot</span></div>
+<div class="line"><span class="lineno">  333</span>    <span class="comment">// This excludes valid numeric negative values like -1760.0</span></div>
+<div class="line"><span class="lineno">  334</span>    std::regex linePattern(R<span class="stringliteral">&quot;(^\s*-(?![\d\s\.]).*)&quot;);</span></div>
+<div class="line"><span class="lineno">  335</span><span class="stringliteral"></span> </div>
+<div class="line"><span class="lineno">  336</span><span class="stringliteral">    std::istringstream contentStream(fileContent);</span></div>
+<div class="line"><span class="lineno">  337</span><span class="stringliteral">    std::string lineconfig;</span></div>
+<div class="line"><span class="lineno">  338</span><span class="stringliteral">    </span><span class="keywordtype">int</span> lineNumber = 1;</div>
+<div class="line"><span class="lineno">  339</span> </div>
+<div class="line"><span class="lineno">  340</span>    <span class="comment">// KS: Instead of boolean, track flow-style list nesting depth</span></div>
+<div class="line"><span class="lineno">  341</span>    <span class="keywordtype">int</span> flowListDepth = 0;</div>
+<div class="line"><span class="lineno">  342</span> </div>
+<div class="line"><span class="lineno">  343</span>    <span class="keywordflow">while</span> (std::getline(contentStream, lineconfig)) {</div>
+<div class="line"><span class="lineno">  344</span>      <span class="comment">// Ignore YAML document separator</span></div>
+<div class="line"><span class="lineno">  345</span>      <span class="keywordflow">if</span> (lineconfig.find(<span class="stringliteral">&quot;---&quot;</span>) != std::string::npos) {</div>
+<div class="line"><span class="lineno">  346</span>        lineNumber++;</div>
+<div class="line"><span class="lineno">  347</span>        <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno">  348</span>      }</div>
+<div class="line"><span class="lineno">  349</span> </div>
+<div class="line"><span class="lineno">  350</span>      <span class="comment">// Update flow list depth (increment for each &#39;[&#39; and decrement for each &#39;]&#39;)</span></div>
+<div class="line"><span class="lineno">  351</span>      <span class="keywordflow">for</span> (<span class="keywordtype">char</span> c : lineconfig) {</div>
+<div class="line"><span class="lineno">  352</span>        <span class="keywordflow">if</span> (c == <span class="charliteral">&#39;[&#39;</span>) flowListDepth++;</div>
+<div class="line"><span class="lineno">  353</span>        <span class="keywordflow">else</span> <span class="keywordflow">if</span> (c == <span class="charliteral">&#39;]&#39;</span>) flowListDepth = std::max(0, flowListDepth - 1);</div>
+<div class="line"><span class="lineno">  354</span>      }</div>
+<div class="line"><span class="lineno">  355</span> </div>
+<div class="line"><span class="lineno">  356</span>      <span class="comment">// Check lines only outside flow-style lists</span></div>
+<div class="line"><span class="lineno">  357</span>      <span class="keywordflow">if</span> (flowListDepth == 0 &amp;&amp; std::regex_match(lineconfig, linePattern)) {</div>
+<div class="line"><span class="lineno">  358</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Warning: Missing space or tab after &#39;-&#39; at line {}: {}\n&quot;</span>, lineNumber, lineconfig);</div>
+<div class="line"><span class="lineno">  359</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
+<div class="line"><span class="lineno">  360</span>      }</div>
+<div class="line"><span class="lineno">  361</span> </div>
+<div class="line"><span class="lineno">  362</span>      lineNumber++;</div>
+<div class="line"><span class="lineno">  363</span>    }</div>
+<div class="line"><span class="lineno">  364</span> </div>
+<div class="line"><span class="lineno">  365</span>    <span class="keywordflow">return</span> yamlNode;</div>
+<div class="line"><span class="lineno">  366</span> </div>
+<div class="line"><span class="lineno">  367</span>  } <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception&amp; e) {</div>
+<div class="line"><span class="lineno">  368</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;{}\n&quot;</span>, e.what());</div>
+<div class="line"><span class="lineno">  369</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Can&#39;t open file {}\n&quot;</span>, filename);</div>
+<div class="line"><span class="lineno">  370</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
+<div class="line"><span class="lineno">  371</span>  }</div>
+<div class="line"><span class="lineno">  372</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -938,44 +977,44 @@ template&lt;typename Type &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A new YAML node representing the merged result. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="YamlHelper_8h_source.html#l00381">381</a> of file <a class="el" href="YamlHelper_8h_source.html">YamlHelper.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  381</span>                                                   {</div>
-<div class="line"><span class="lineno">  382</span><span class="comment">// **********************</span></div>
-<div class="line"><span class="lineno">  383</span>  <span class="keywordflow">if</span> (!b.IsMap()) {</div>
-<div class="line"><span class="lineno">  384</span>    <span class="comment">// If b is not a map, merge result is b, unless b is null</span></div>
-<div class="line"><span class="lineno">  385</span>    <span class="keywordflow">return</span> b.IsNull() ? a : b;</div>
-<div class="line"><span class="lineno">  386</span>  }</div>
-<div class="line"><span class="lineno">  387</span>  <span class="keywordflow">if</span> (!a.IsMap()) {</div>
-<div class="line"><span class="lineno">  388</span>    <span class="comment">// If a is not a map, merge result is b</span></div>
-<div class="line"><span class="lineno">  389</span>    <span class="keywordflow">return</span> b;</div>
-<div class="line"><span class="lineno">  390</span>  }</div>
-<div class="line"><span class="lineno">  391</span>  <span class="keywordflow">if</span> (!b.size()) {</div>
-<div class="line"><span class="lineno">  392</span>    <span class="comment">// If a is a map, and b is an empty map, return a</span></div>
-<div class="line"><span class="lineno">  393</span>    <span class="keywordflow">return</span> a;</div>
-<div class="line"><span class="lineno">  394</span>  }</div>
-<div class="line"><span class="lineno">  395</span>  <span class="comment">// Create a new map &#39;c&#39; with the same mappings as a, merged with b</span></div>
-<div class="line"><span class="lineno">  396</span>  <span class="keyword">auto</span> c = YAML::Node(YAML::NodeType::Map);</div>
-<div class="line"><span class="lineno">  397</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span> n : a) {</div>
-<div class="line"><span class="lineno">  398</span>    <span class="keywordflow">if</span> (n.first.IsScalar()) {</div>
-<div class="line"><span class="lineno">  399</span>      <span class="keyword">const</span> std::string &amp; key = n.first.Scalar();</div>
-<div class="line"><span class="lineno">  400</span>      <span class="keyword">auto</span> t = (<a class="code hl_function" href="YamlHelper_8h.html#a30fc1dad7dde70247024fbb1c8f89bdc">Cnode</a>(b)[key]);</div>
-<div class="line"><span class="lineno">  401</span>      <span class="keywordflow">if</span> (t) {</div>
-<div class="line"><span class="lineno">  402</span>        c[n.first] = <a class="code hl_function" href="YamlHelper_8h.html#a372c930e488d1e260c1184dc25921fe3">MergeNodes</a>(n.second, t);</div>
-<div class="line"><span class="lineno">  403</span>        <span class="keywordflow">continue</span>;</div>
-<div class="line"><span class="lineno">  404</span>      }</div>
-<div class="line"><span class="lineno">  405</span>    }</div>
-<div class="line"><span class="lineno">  406</span>    c[n.first] = n.second;</div>
+<p class="definition">Definition at line <a class="el" href="YamlHelper_8h_source.html#l00394">394</a> of file <a class="el" href="YamlHelper_8h_source.html">YamlHelper.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  394</span>                                                   {</div>
+<div class="line"><span class="lineno">  395</span><span class="comment">// **********************</span></div>
+<div class="line"><span class="lineno">  396</span>  <span class="keywordflow">if</span> (!b.IsMap()) {</div>
+<div class="line"><span class="lineno">  397</span>    <span class="comment">// If b is not a map, merge result is b, unless b is null</span></div>
+<div class="line"><span class="lineno">  398</span>    <span class="keywordflow">return</span> b.IsNull() ? a : b;</div>
+<div class="line"><span class="lineno">  399</span>  }</div>
+<div class="line"><span class="lineno">  400</span>  <span class="keywordflow">if</span> (!a.IsMap()) {</div>
+<div class="line"><span class="lineno">  401</span>    <span class="comment">// If a is not a map, merge result is b</span></div>
+<div class="line"><span class="lineno">  402</span>    <span class="keywordflow">return</span> b;</div>
+<div class="line"><span class="lineno">  403</span>  }</div>
+<div class="line"><span class="lineno">  404</span>  <span class="keywordflow">if</span> (!b.size()) {</div>
+<div class="line"><span class="lineno">  405</span>    <span class="comment">// If a is a map, and b is an empty map, return a</span></div>
+<div class="line"><span class="lineno">  406</span>    <span class="keywordflow">return</span> a;</div>
 <div class="line"><span class="lineno">  407</span>  }</div>
-<div class="line"><span class="lineno">  408</span>  <span class="comment">// Add the mappings from &#39;b&#39; not already in &#39;c&#39;</span></div>
-<div class="line"><span class="lineno">  409</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span> n : b) {</div>
-<div class="line"><span class="lineno">  410</span>    <span class="keywordflow">if</span> (!n.first.IsScalar() || !<a class="code hl_function" href="YamlHelper_8h.html#a30fc1dad7dde70247024fbb1c8f89bdc">Cnode</a>(c)[n.first.Scalar()]) {</div>
-<div class="line"><span class="lineno">  411</span>      c[n.first] = n.second;</div>
-<div class="line"><span class="lineno">  412</span>    }</div>
-<div class="line"><span class="lineno">  413</span>  }</div>
-<div class="line"><span class="lineno">  414</span>  <span class="keywordflow">return</span> c;</div>
-<div class="line"><span class="lineno">  415</span>}</div>
-<div class="ttc" id="aYamlHelper_8h_html_a30fc1dad7dde70247024fbb1c8f89bdc"><div class="ttname"><a href="YamlHelper_8h.html#a30fc1dad7dde70247024fbb1c8f89bdc">Cnode</a></div><div class="ttdeci">const YAML::Node &amp; Cnode(const YAML::Node &amp;n)</div><div class="ttdoc">KS: Convenience wrapper to return a YAML node as-is.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00365">YamlHelper.h:365</a></div></div>
-<div class="ttc" id="aYamlHelper_8h_html_a372c930e488d1e260c1184dc25921fe3"><div class="ttname"><a href="YamlHelper_8h.html#a372c930e488d1e260c1184dc25921fe3">MergeNodes</a></div><div class="ttdeci">YAML::Node MergeNodes(YAML::Node a, YAML::Node b)</div><div class="ttdoc">KS: Recursively merges two YAML nodes.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00381">YamlHelper.h:381</a></div></div>
+<div class="line"><span class="lineno">  408</span>  <span class="comment">// Create a new map &#39;c&#39; with the same mappings as a, merged with b</span></div>
+<div class="line"><span class="lineno">  409</span>  <span class="keyword">auto</span> c = YAML::Node(YAML::NodeType::Map);</div>
+<div class="line"><span class="lineno">  410</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span> n : a) {</div>
+<div class="line"><span class="lineno">  411</span>    <span class="keywordflow">if</span> (n.first.IsScalar()) {</div>
+<div class="line"><span class="lineno">  412</span>      <span class="keyword">const</span> std::string &amp; key = n.first.Scalar();</div>
+<div class="line"><span class="lineno">  413</span>      <span class="keyword">auto</span> t = (<a class="code hl_function" href="YamlHelper_8h.html#a30fc1dad7dde70247024fbb1c8f89bdc">Cnode</a>(b)[key]);</div>
+<div class="line"><span class="lineno">  414</span>      <span class="keywordflow">if</span> (t) {</div>
+<div class="line"><span class="lineno">  415</span>        c[n.first] = <a class="code hl_function" href="YamlHelper_8h.html#a372c930e488d1e260c1184dc25921fe3">MergeNodes</a>(n.second, t);</div>
+<div class="line"><span class="lineno">  416</span>        <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno">  417</span>      }</div>
+<div class="line"><span class="lineno">  418</span>    }</div>
+<div class="line"><span class="lineno">  419</span>    c[n.first] = n.second;</div>
+<div class="line"><span class="lineno">  420</span>  }</div>
+<div class="line"><span class="lineno">  421</span>  <span class="comment">// Add the mappings from &#39;b&#39; not already in &#39;c&#39;</span></div>
+<div class="line"><span class="lineno">  422</span>  <span class="keywordflow">for</span> (<span class="keyword">auto</span> n : b) {</div>
+<div class="line"><span class="lineno">  423</span>    <span class="keywordflow">if</span> (!n.first.IsScalar() || !<a class="code hl_function" href="YamlHelper_8h.html#a30fc1dad7dde70247024fbb1c8f89bdc">Cnode</a>(c)[n.first.Scalar()]) {</div>
+<div class="line"><span class="lineno">  424</span>      c[n.first] = n.second;</div>
+<div class="line"><span class="lineno">  425</span>    }</div>
+<div class="line"><span class="lineno">  426</span>  }</div>
+<div class="line"><span class="lineno">  427</span>  <span class="keywordflow">return</span> c;</div>
+<div class="line"><span class="lineno">  428</span>}</div>
+<div class="ttc" id="aYamlHelper_8h_html_a30fc1dad7dde70247024fbb1c8f89bdc"><div class="ttname"><a href="YamlHelper_8h.html#a30fc1dad7dde70247024fbb1c8f89bdc">Cnode</a></div><div class="ttdeci">const YAML::Node &amp; Cnode(const YAML::Node &amp;n)</div><div class="ttdoc">KS: Convenience wrapper to return a YAML node as-is.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00378">YamlHelper.h:378</a></div></div>
+<div class="ttc" id="aYamlHelper_8h_html_a372c930e488d1e260c1184dc25921fe3"><div class="ttname"><a href="YamlHelper_8h.html#a372c930e488d1e260c1184dc25921fe3">MergeNodes</a></div><div class="ttdeci">YAML::Node MergeNodes(YAML::Node a, YAML::Node b)</div><div class="ttdoc">KS: Recursively merges two YAML nodes.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00394">YamlHelper.h:394</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1085,6 +1124,92 @@ template&lt;typename TValue &gt; </div>
 </div><!-- fragment -->
 </div>
 </div>
+<a id="af3f5457963c2e716d78f519b2a59d3c1" name="af3f5457963c2e716d78f519b2a59d3c1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af3f5457963c2e716d78f519b2a59d3c1">&#9670;&#160;</a></span>Parse2DBounds()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt; std::vector&lt; double &gt; &gt; Parse2DBounds </td>
+          <td>(</td>
+          <td class="paramtype">const YAML::Node &amp;&#160;</td>
+          <td class="paramname"><em>node</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>File</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>Line</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>KS: Get 2D bounds from YAML for example for selection cuts. </p>
+<p>Parses a YAML node representing 2D selection bounds. Each element in the node must be a sequence of 1 or 2 scalar values. If a single value is given, it is interpreted as the center of a bin and expanded to [value - 0.5, value + 0.5]. If two values are given, they are used as-is. If an element is empty or null, default bounds are used.</p>
+<p>This function is useful for interpreting kinematic or classification bounds specified in YAML configuration files.</p>
+<p>Example YAML input: </p><div class="fragment"><div class="line">bounds2D:</div>
+<div class="line">  - [1]</div>
+<div class="line">  - [0.2, 0.8]</div>
+<div class="line">  - [&quot;&quot;, &quot;2.0&quot;]</div>
+</div><!-- fragment --><p>Resulting vector: </p><div class="fragment"><div class="line">[ [0.5, 1.5],</div>
+<div class="line">  [0.2, 0.8],</div>
+<div class="line">  [<a class="code hl_variable" href="namespaceM3.html#a889843c4944ea4c89dd03ef2d1000a96">M3::KinematicLowBound</a>, 2.0] ]</div>
+<div class="ttc" id="anamespaceM3_html_a889843c4944ea4c89dd03ef2d1000a96"><div class="ttname"><a href="namespaceM3.html#a889843c4944ea4c89dd03ef2d1000a96">M3::KinematicLowBound</a></div><div class="ttdeci">static constexpr const double KinematicLowBound</div><div class="ttdoc">When parameter has no bound this serves as it. Lowest possible value the system.</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00065">Core.h:65</a></div></div>
+</div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">node</td><td>The YAML node containing a sequence of bounds (each being a 1- or 2-element sequence). </td></tr>
+    <tr><td class="paramname">File</td><td>The name of the file calling this function (for error reporting). </td></tr>
+    <tr><td class="paramname">Line</td><td>The line number in the file calling this function (for error reporting). </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>std::vector&lt;std::vector&lt;double&gt;&gt; A list of bound pairs for each selection region. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="YamlHelper_8h_source.html#l00523">523</a> of file <a class="el" href="YamlHelper_8h_source.html">YamlHelper.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  523</span>                                                                                                               {</div>
+<div class="line"><span class="lineno">  524</span><span class="comment">// **********************</span></div>
+<div class="line"><span class="lineno">  525</span>  std::vector&lt;std::vector&lt;double&gt;&gt; bounds;</div>
+<div class="line"><span class="lineno">  526</span>  <span class="keywordflow">if</span> (!node || !node.IsSequence()) {</div>
+<div class="line"><span class="lineno">  527</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Expected a sequence node for 2D bounds&quot;</span>);</div>
+<div class="line"><span class="lineno">  528</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
+<div class="line"><span class="lineno">  529</span>  }</div>
+<div class="line"><span class="lineno">  530</span> </div>
+<div class="line"><span class="lineno">  531</span>  <span class="comment">// Case 1: Single pair like [0.25, 0.5]</span></div>
+<div class="line"><span class="lineno">  532</span>  <span class="keywordflow">if</span> (node.size() == 2 &amp;&amp; node[0].IsScalar()) {</div>
+<div class="line"><span class="lineno">  533</span>    bounds.push_back(<a class="code hl_function" href="YamlHelper_8h.html#a3c6595806e439f4ff22e04c22bbe18f9">ParseBounds</a>(node, File, Line));</div>
+<div class="line"><span class="lineno">  534</span>  } <span class="keywordflow">else</span> { <span class="comment">// Case 2: List of pairs like [[0.25, 0.5], [0.75, 1.0]]</span></div>
+<div class="line"><span class="lineno">  535</span>    <span class="keywordflow">for</span> (std::size_t i = 0; i &lt; node.size(); ++i) {</div>
+<div class="line"><span class="lineno">  536</span>      <span class="keyword">const</span> YAML::Node&amp; subnode = node[i];</div>
+<div class="line"><span class="lineno">  537</span>      bounds.push_back(<a class="code hl_function" href="YamlHelper_8h.html#a3c6595806e439f4ff22e04c22bbe18f9">ParseBounds</a>(subnode, File, Line));</div>
+<div class="line"><span class="lineno">  538</span>    }</div>
+<div class="line"><span class="lineno">  539</span>  }</div>
+<div class="line"><span class="lineno">  540</span> </div>
+<div class="line"><span class="lineno">  541</span>  <span class="keywordflow">return</span> bounds;</div>
+<div class="line"><span class="lineno">  542</span>}</div>
+<div class="ttc" id="aYamlHelper_8h_html_a3c6595806e439f4ff22e04c22bbe18f9"><div class="ttname"><a href="YamlHelper_8h.html#a3c6595806e439f4ff22e04c22bbe18f9">ParseBounds</a></div><div class="ttdeci">std::vector&lt; double &gt; ParseBounds(const YAML::Node &amp;node, const std::string &amp;File, const int Line)</div><div class="ttdoc">KS: Get bounds from YAML for example for selection cuts.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00443">YamlHelper.h:443</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
 <a id="a3c6595806e439f4ff22e04c22bbe18f9" name="a3c6595806e439f4ff22e04c22bbe18f9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3c6595806e439f4ff22e04c22bbe18f9">&#9670;&#160;</a></span>ParseBounds()</h2>
 
@@ -1137,37 +1262,56 @@ template&lt;typename TValue &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>std::vector&lt;double&gt; A vector of size 2 with the parsed bounds. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="YamlHelper_8h_source.html#l00430">430</a> of file <a class="el" href="YamlHelper_8h_source.html">YamlHelper.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  430</span>                                                                                                  {</div>
-<div class="line"><span class="lineno">  431</span><span class="comment">// **********************</span></div>
-<div class="line"><span class="lineno">  432</span>  std::vector&lt;double&gt; bounds;</div>
-<div class="line"><span class="lineno">  433</span> </div>
-<div class="line"><span class="lineno">  434</span>  <span class="keywordflow">if</span> (!node || !node.IsSequence() || node.size() != 2) {</div>
-<div class="line"><span class="lineno">  435</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Bounds must be a sequence of exactly 2 elements, got size {}&quot;</span>, <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(node.size()));</div>
-<div class="line"><span class="lineno">  436</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
-<div class="line"><span class="lineno">  437</span>  }</div>
-<div class="line"><span class="lineno">  438</span> </div>
-<div class="line"><span class="lineno">  439</span>  <span class="keywordflow">for</span> (std::size_t i = 0; i &lt; 2; ++i) {</div>
-<div class="line"><span class="lineno">  440</span>    <span class="keyword">const</span> YAML::Node&amp; val = node[i];</div>
-<div class="line"><span class="lineno">  441</span> </div>
-<div class="line"><span class="lineno">  442</span>    <span class="keywordflow">if</span> (!val || val.IsNull() || (val.IsScalar() &amp;&amp; val.Scalar().empty())) {</div>
-<div class="line"><span class="lineno">  443</span>      bounds.push_back(i == 0 ? <a class="code hl_variable" href="namespaceM3.html#a889843c4944ea4c89dd03ef2d1000a96">M3::KinematicLowBound</a> : <a class="code hl_variable" href="namespaceM3.html#ae55af9a5eb2878e4c5e4bbe5c2af029d">M3::KinematicUpBound</a>);</div>
-<div class="line"><span class="lineno">  444</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (val.IsScalar()) {</div>
-<div class="line"><span class="lineno">  445</span>      <span class="keywordflow">try</span> {</div>
-<div class="line"><span class="lineno">  446</span>        bounds.push_back(val.as&lt;<span class="keywordtype">double</span>&gt;());</div>
-<div class="line"><span class="lineno">  447</span>      } <span class="keywordflow">catch</span> (<span class="keyword">const</span> YAML::BadConversion&amp; e) {</div>
-<div class="line"><span class="lineno">  448</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Invalid value in Bounds[{}]: &#39;{}&#39;. Expected a number or empty string.&quot;</span>,</div>
-<div class="line"><span class="lineno">  449</span>                       <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(i), <span class="keyword">static_cast&lt;</span>std::string<span class="keyword">&gt;</span>(val.Scalar()));</div>
-<div class="line"><span class="lineno">  450</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
-<div class="line"><span class="lineno">  451</span>      }</div>
-<div class="line"><span class="lineno">  452</span>    } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  453</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Invalid type in Bounds[{}]&quot;</span>, <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(i));</div>
-<div class="line"><span class="lineno">  454</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
-<div class="line"><span class="lineno">  455</span>    }</div>
-<div class="line"><span class="lineno">  456</span>  }</div>
-<div class="line"><span class="lineno">  457</span>  <span class="keywordflow">return</span> bounds;</div>
-<div class="line"><span class="lineno">  458</span>}</div>
-<div class="ttc" id="anamespaceM3_html_a889843c4944ea4c89dd03ef2d1000a96"><div class="ttname"><a href="namespaceM3.html#a889843c4944ea4c89dd03ef2d1000a96">M3::KinematicLowBound</a></div><div class="ttdeci">static constexpr const double KinematicLowBound</div><div class="ttdoc">When parameter has no bound this serves as it. Lowest possible value the system.</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00065">Core.h:65</a></div></div>
+<p class="definition">Definition at line <a class="el" href="YamlHelper_8h_source.html#l00443">443</a> of file <a class="el" href="YamlHelper_8h_source.html">YamlHelper.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  443</span>                                                                                                  {</div>
+<div class="line"><span class="lineno">  444</span><span class="comment">// **********************</span></div>
+<div class="line"><span class="lineno">  445</span>  std::vector&lt;double&gt; bounds;</div>
+<div class="line"><span class="lineno">  446</span> </div>
+<div class="line"><span class="lineno">  447</span>  <span class="keywordflow">if</span> (!node || !node.IsSequence() || (node.size() != 1 &amp;&amp; node.size() != 2)) {</div>
+<div class="line"><span class="lineno">  448</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Bounds must be a sequence of 1 or 2 elements, got size {}&quot;</span>, <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(node.size()));</div>
+<div class="line"><span class="lineno">  449</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
+<div class="line"><span class="lineno">  450</span>  }</div>
+<div class="line"><span class="lineno">  451</span> </div>
+<div class="line"><span class="lineno">  452</span>  <span class="keywordflow">if</span> (node.size() == 1) {</div>
+<div class="line"><span class="lineno">  453</span>    <span class="keyword">const</span> YAML::Node&amp; val = node[0];</div>
+<div class="line"><span class="lineno">  454</span> </div>
+<div class="line"><span class="lineno">  455</span>    <span class="keywordflow">if</span> (!val || val.IsNull() || (val.IsScalar() &amp;&amp; val.Scalar().empty())) {</div>
+<div class="line"><span class="lineno">  456</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Single-element bounds must contain a valid numeric value.&quot;</span>);</div>
+<div class="line"><span class="lineno">  457</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
+<div class="line"><span class="lineno">  458</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (val.IsScalar()) {</div>
+<div class="line"><span class="lineno">  459</span>      <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">  460</span>        <span class="keyword">const</span> <span class="keywordtype">double</span> center = val.as&lt;<span class="keywordtype">double</span>&gt;();</div>
+<div class="line"><span class="lineno">  461</span>        bounds = {center - 0.5, center + 0.5};</div>
+<div class="line"><span class="lineno">  462</span>      } <span class="keywordflow">catch</span> (<span class="keyword">const</span> YAML::BadConversion&amp; e) {</div>
+<div class="line"><span class="lineno">  463</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Invalid value in Bounds[0]: &#39;{}&#39;. Expected a number.&quot;</span>, <span class="keyword">static_cast&lt;</span>std::string<span class="keyword">&gt;</span>(val.Scalar()));</div>
+<div class="line"><span class="lineno">  464</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
+<div class="line"><span class="lineno">  465</span>      }</div>
+<div class="line"><span class="lineno">  466</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  467</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Invalid type in Bounds[0]&quot;</span>);</div>
+<div class="line"><span class="lineno">  468</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
+<div class="line"><span class="lineno">  469</span>    }</div>
+<div class="line"><span class="lineno">  470</span>  } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  471</span>    <span class="keywordflow">for</span> (std::size_t i = 0; i &lt; 2; ++i) {</div>
+<div class="line"><span class="lineno">  472</span>      <span class="keyword">const</span> YAML::Node&amp; val = node[i];</div>
+<div class="line"><span class="lineno">  473</span> </div>
+<div class="line"><span class="lineno">  474</span>      <span class="keywordflow">if</span> (!val || val.IsNull() || (val.IsScalar() &amp;&amp; val.Scalar().empty())) {</div>
+<div class="line"><span class="lineno">  475</span>        bounds.push_back(i == 0 ? <a class="code hl_variable" href="namespaceM3.html#a889843c4944ea4c89dd03ef2d1000a96">M3::KinematicLowBound</a> : <a class="code hl_variable" href="namespaceM3.html#ae55af9a5eb2878e4c5e4bbe5c2af029d">M3::KinematicUpBound</a>);</div>
+<div class="line"><span class="lineno">  476</span>      } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (val.IsScalar()) {</div>
+<div class="line"><span class="lineno">  477</span>        <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">  478</span>          bounds.push_back(val.as&lt;<span class="keywordtype">double</span>&gt;());</div>
+<div class="line"><span class="lineno">  479</span>        } <span class="keywordflow">catch</span> (<span class="keyword">const</span> YAML::BadConversion&amp; e) {</div>
+<div class="line"><span class="lineno">  480</span>          <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Invalid value in Bounds[{}]: &#39;{}&#39;. Expected a number or empty string.&quot;</span>,</div>
+<div class="line"><span class="lineno">  481</span>                         <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(i), <span class="keyword">static_cast&lt;</span>std::string<span class="keyword">&gt;</span>(val.Scalar()));</div>
+<div class="line"><span class="lineno">  482</span>          <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
+<div class="line"><span class="lineno">  483</span>        }</div>
+<div class="line"><span class="lineno">  484</span>      } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  485</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Invalid type in Bounds[{}]&quot;</span>, <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(i));</div>
+<div class="line"><span class="lineno">  486</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
+<div class="line"><span class="lineno">  487</span>      }</div>
+<div class="line"><span class="lineno">  488</span>    }</div>
+<div class="line"><span class="lineno">  489</span>  }</div>
+<div class="line"><span class="lineno">  490</span>  <span class="keywordflow">return</span> bounds;</div>
+<div class="line"><span class="lineno">  491</span>}</div>
 <div class="ttc" id="anamespaceM3_html_ae55af9a5eb2878e4c5e4bbe5c2af029d"><div class="ttname"><a href="namespaceM3.html#ae55af9a5eb2878e4c5e4bbe5c2af029d">M3::KinematicUpBound</a></div><div class="ttdeci">static constexpr const double KinematicUpBound</div><div class="ttdoc">When parameter has no bound this serves as it. Highest possible value the system.</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00067">Core.h:67</a></div></div>
 </div><!-- fragment -->
 </div>
