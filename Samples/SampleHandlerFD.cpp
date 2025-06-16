@@ -1451,6 +1451,41 @@ void SampleHandlerFD::InitialiseSingleFDMCObject() {
   MCSamples.resize(nEvents);
 }
 
+
+// ************************************************
+void SampleHandlerFD::SaveAdditionalInfo(TDirectory* Dir) {
+// ************************************************
+  Dir->cd();
+
+  YAML::Node Config = SampleManager->raw();
+  TMacro ConfigSave = YAMLtoTMacro(Config, (std::string("Config_") + GetTitle()));
+  ConfigSave.Write();
+
+  std::unique_ptr<TH1> data_hist;
+
+  if (GetNDim() == 1) {
+    data_hist = M3::Clone<TH1D>(dynamic_cast<TH1D*>(GetDataHist(1)), "data_" + GetTitle());
+    data_hist->GetXaxis()->SetTitle(XVarStr.c_str());
+    data_hist->GetYaxis()->SetTitle("Number of Events");
+  } else if (GetNDim() == 2) {
+    data_hist = M3::Clone<TH2D>(dynamic_cast<TH2D*>(GetDataHist(2)), "data_" + GetTitle());
+    data_hist->GetXaxis()->SetTitle(XVarStr.c_str());
+    data_hist->GetYaxis()->SetTitle(YVarStr.c_str());
+    data_hist->GetZaxis()->SetTitle("Number of Events");
+  } else {
+    MACH3LOG_ERROR("Not implemented");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  if (!data_hist) {
+    MACH3LOG_ERROR("nullptr data hist :(");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  data_hist->SetTitle(("data_" + GetTitle()).c_str());
+  data_hist->Write();
+}
+
 void SampleHandlerFD::InitialiseSplineObject() {
   std::vector<std::string> spline_filepaths;
   for(unsigned iChannel = 0 ; iChannel < OscChannels.size() ; iChannel++){
@@ -1668,7 +1703,7 @@ void SampleHandlerFD::Fill2DSubEventHist(TH2D* _h2DVar, const std::string& Proje
 
 // ************************************************
 int SampleHandlerFD::ReturnKinematicParameterFromString(const std::string& KinematicParameterStr) const {
-  // ************************************************
+// ************************************************
   auto it = KinematicParameters->find(KinematicParameterStr);
   if (it != KinematicParameters->end()) return it->second;
 
@@ -1680,7 +1715,7 @@ int SampleHandlerFD::ReturnKinematicParameterFromString(const std::string& Kinem
 
 // ************************************************
 std::string SampleHandlerFD::ReturnStringFromKinematicParameter(const int KinematicParameter) const {
-  // ************************************************
+// ************************************************
   auto it = ReversedKinematicParameters->find(KinematicParameter);
   if (it != ReversedKinematicParameters->end()) {
     return it->second;
@@ -1695,7 +1730,7 @@ std::string SampleHandlerFD::ReturnStringFromKinematicParameter(const int Kinema
 // === JM define KinematicVector-to-string mapping functions  ===
 // ************************************************
 int SampleHandlerFD::ReturnKinematicVectorFromString(const std::string& KinematicVectorStr) const {
-  // ************************************************
+// ************************************************
   auto it = KinematicVectors->find(KinematicVectorStr);
   if (it != KinematicVectors->end()) return it->second;
 
@@ -1707,7 +1742,7 @@ int SampleHandlerFD::ReturnKinematicVectorFromString(const std::string& Kinemati
 
 // ************************************************
 std::string SampleHandlerFD::ReturnStringFromKinematicVector(const int KinematicVector) const {
-  // ************************************************
+// ************************************************
   auto it = ReversedKinematicVectors->find(KinematicVector);
   if (it != ReversedKinematicVectors->end()) {
     return it->second;
