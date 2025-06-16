@@ -66,9 +66,9 @@ var searchData=
   ['runmcmc_63',['RunMCMC',['../classLikelihoodFit.html#afab18c1f5f8ac4930c3da1d11df54d45',1,'LikelihoodFit::RunMCMC()'],['../classFitterBase.html#a5d51ba730d25f37b4e4bcdec9854f435',1,'FitterBase::RunMCMC()'],['../classmcmc.html#a11802611bb93f0ec09e883dc64a27d5c',1,'mcmc::RunMCMC()'],['../classMinuitFit.html#a7b454ba6b1659dbc68f515b939a0b569',1,'MinuitFit::RunMCMC()'],['../classPSO.html#a0e057598df4829780d0c2d1e8aff9831',1,'PSO::RunMCMC()'],['../classPyFitterBase.html#aa8d0f4006d990e839838685528ea1d64',1,'PyFitterBase::RunMCMC()'],['../classPyLikelihoodFit.html#ace66ce37877db1f07b3dceb2138dcadc',1,'PyLikelihoodFit::RunMCMC()']]],
   ['runsigmavar_64',['RunSigmaVar',['../classFitterBase.html#a71e43b96395568e54879d9bd1b57c0f8',1,'FitterBase']]],
   ['rw_5fetru_65',['rw_etru',['../structFarDetectorCoreInfo.html#acfc344a4365828d63409fa2c2c5f4633',1,'FarDetectorCoreInfo']]],
-  ['rw_5flower_5flower_5fxbinedge_66',['rw_lower_lower_xbinedge',['../structFarDetectorCoreInfo.html#a42f83854dd48874bd6bc9cc089c74582',1,'FarDetectorCoreInfo']]],
-  ['rw_5flower_5fxbinedge_67',['rw_lower_xbinedge',['../structFarDetectorCoreInfo.html#aab21263dc4a65a848430c7f72af0c44d',1,'FarDetectorCoreInfo']]],
+  ['rw_5flower_5flower_5fxbinedge_66',['rw_lower_lower_xbinedge',['../structSampleBinningInfo.html#a6f6bf0055cb0edeee0f2a713421f35a5',1,'SampleBinningInfo']]],
+  ['rw_5flower_5fxbinedge_67',['rw_lower_xbinedge',['../structSampleBinningInfo.html#a7d1207002d3ebaf3e8594caca23c380b',1,'SampleBinningInfo']]],
   ['rw_5ftruecz_68',['rw_truecz',['../structFarDetectorCoreInfo.html#afa3d9bb4acd11164ba41d602330243f2',1,'FarDetectorCoreInfo']]],
-  ['rw_5fupper_5fupper_5fxbinedge_69',['rw_upper_upper_xbinedge',['../structFarDetectorCoreInfo.html#a977f829f8c92853a4ac486158bf4cb17',1,'FarDetectorCoreInfo']]],
-  ['rw_5fupper_5fxbinedge_70',['rw_upper_xbinedge',['../structFarDetectorCoreInfo.html#a1d656ca460baeb8ab149a83a585f2694',1,'FarDetectorCoreInfo']]]
+  ['rw_5fupper_5fupper_5fxbinedge_69',['rw_upper_upper_xbinedge',['../structSampleBinningInfo.html#ab20455912755bdfa5df5670e8a378035',1,'SampleBinningInfo']]],
+  ['rw_5fupper_5fxbinedge_70',['rw_upper_xbinedge',['../structSampleBinningInfo.html#a38df9115f10c97e64cffa3ac8de869c8',1,'SampleBinningInfo']]]
 ];

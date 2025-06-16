@@ -15,9 +15,9 @@ var searchData=
   ['rhatfolded_12',['RHatFolded',['../RHat__HighMem_8cpp.html#a754fbe6088f05d880121693722fe6b99',1,'RHat_HighMem.cpp']]],
   ['rnd_13',['rnd',['../classSampleSummary.html#a364fb16938a26adbe59fdd057f4b9405',1,'SampleSummary']]],
   ['rw_5fetru_14',['rw_etru',['../structFarDetectorCoreInfo.html#acfc344a4365828d63409fa2c2c5f4633',1,'FarDetectorCoreInfo']]],
-  ['rw_5flower_5flower_5fxbinedge_15',['rw_lower_lower_xbinedge',['../structFarDetectorCoreInfo.html#a42f83854dd48874bd6bc9cc089c74582',1,'FarDetectorCoreInfo']]],
-  ['rw_5flower_5fxbinedge_16',['rw_lower_xbinedge',['../structFarDetectorCoreInfo.html#aab21263dc4a65a848430c7f72af0c44d',1,'FarDetectorCoreInfo']]],
+  ['rw_5flower_5flower_5fxbinedge_15',['rw_lower_lower_xbinedge',['../structSampleBinningInfo.html#a6f6bf0055cb0edeee0f2a713421f35a5',1,'SampleBinningInfo']]],
+  ['rw_5flower_5fxbinedge_16',['rw_lower_xbinedge',['../structSampleBinningInfo.html#a7d1207002d3ebaf3e8594caca23c380b',1,'SampleBinningInfo']]],
   ['rw_5ftruecz_17',['rw_truecz',['../structFarDetectorCoreInfo.html#afa3d9bb4acd11164ba41d602330243f2',1,'FarDetectorCoreInfo']]],
-  ['rw_5fupper_5fupper_5fxbinedge_18',['rw_upper_upper_xbinedge',['../structFarDetectorCoreInfo.html#a977f829f8c92853a4ac486158bf4cb17',1,'FarDetectorCoreInfo']]],
-  ['rw_5fupper_5fxbinedge_19',['rw_upper_xbinedge',['../structFarDetectorCoreInfo.html#a1d656ca460baeb8ab149a83a585f2694',1,'FarDetectorCoreInfo']]]
+  ['rw_5fupper_5fupper_5fxbinedge_18',['rw_upper_upper_xbinedge',['../structSampleBinningInfo.html#ab20455912755bdfa5df5670e8a378035',1,'SampleBinningInfo']]],
+  ['rw_5fupper_5fxbinedge_19',['rw_upper_xbinedge',['../structSampleBinningInfo.html#a38df9115f10c97e64cffa3ac8de869c8',1,'SampleBinningInfo']]]
 ];

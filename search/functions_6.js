@@ -26,11 +26,12 @@ var searchData=
   ['findsplinebinning_23',['FindSplineBinning',['../classBinnedSplineHandler.html#a4c8f7b63ab0957d8e437a49651585118',1,'BinnedSplineHandler']]],
   ['findsplinesegment_24',['FindSplineSegment',['../classPySplineBase.html#a0589f9189764287f84b61b89fc1a4c1f',1,'PySplineBase::FindSplineSegment()'],['../classSplineBase.html#a589011b547ff70262ed43021a016ef30',1,'SplineBase::FindSplineSegment()']]],
   ['findx_25',['FindX',['../classTSpline3__red.html#a39668a1dc14058a1f833e9621ec19caf',1,'TSpline3_red']]],
-  ['fishercombinedpvalue_26',['FisherCombinedPValue',['../StatisticalUtils_8cpp.html#a8ba1090ae92f61008a6576c45b4b3b7b',1,'FisherCombinedPValue(const std::vector&lt; double &gt; &amp;pvalues):&#160;StatisticalUtils.cpp'],['../StatisticalUtils_8h.html#a8ba1090ae92f61008a6576c45b4b3b7b',1,'FisherCombinedPValue(const std::vector&lt; double &gt; &amp;pvalues):&#160;StatisticalUtils.cpp']]],
-  ['fitterbase_27',['FitterBase',['../classPyFitterBase.html#ada72ecad038edc97497f9d4067ce77f5',1,'PyFitterBase::FitterBase()'],['../classFitterBase.html#ada72ecad038edc97497f9d4067ce77f5',1,'FitterBase::FitterBase()']]],
-  ['fixsamplenamesquotes_28',['FixSampleNamesQuotes',['../namespaceM3.html#a68ab9b6b3d413a94604c740208c7895d',1,'M3']]],
-  ['flipparametervalue_29',['FlipParameterValue',['../classParameterHandlerBase.html#a8ed8388f3d07e1a7a1918bae1074ff1d',1,'ParameterHandlerBase']]],
-  ['fmaf_5ft_30',['fmaf_t',['../namespaceM3.html#ad501f876b26ca2cef7bb5f434deaffb8',1,'M3']]],
-  ['formatdouble_31',['FormatDouble',['../namespaceMaCh3Utils.html#a37d0c54de0b83b71393afca143ab1ec0',1,'MaCh3Utils']]],
-  ['four_5fvector_5faddition_32',['four_vector_addition',['../classPSO.html#a5eaf6792f6428085eaf4474f2d6545db',1,'PSO']]]
+  ['findxbin_26',['FindXBin',['../structSampleBinningInfo.html#afbde5f960f500d0a5defa08775aedef5',1,'SampleBinningInfo']]],
+  ['fishercombinedpvalue_27',['FisherCombinedPValue',['../StatisticalUtils_8cpp.html#a8ba1090ae92f61008a6576c45b4b3b7b',1,'FisherCombinedPValue(const std::vector&lt; double &gt; &amp;pvalues):&#160;StatisticalUtils.cpp'],['../StatisticalUtils_8h.html#a8ba1090ae92f61008a6576c45b4b3b7b',1,'FisherCombinedPValue(const std::vector&lt; double &gt; &amp;pvalues):&#160;StatisticalUtils.cpp']]],
+  ['fitterbase_28',['FitterBase',['../classPyFitterBase.html#ada72ecad038edc97497f9d4067ce77f5',1,'PyFitterBase::FitterBase()'],['../classFitterBase.html#ada72ecad038edc97497f9d4067ce77f5',1,'FitterBase::FitterBase()']]],
+  ['fixsamplenamesquotes_29',['FixSampleNamesQuotes',['../namespaceM3.html#a68ab9b6b3d413a94604c740208c7895d',1,'M3']]],
+  ['flipparametervalue_30',['FlipParameterValue',['../classParameterHandlerBase.html#a8ed8388f3d07e1a7a1918bae1074ff1d',1,'ParameterHandlerBase']]],
+  ['fmaf_5ft_31',['fmaf_t',['../namespaceM3.html#ad501f876b26ca2cef7bb5f434deaffb8',1,'M3']]],
+  ['formatdouble_32',['FormatDouble',['../namespaceMaCh3Utils.html#a37d0c54de0b83b71393afca143ab1ec0',1,'MaCh3Utils']]],
+  ['four_5fvector_5faddition_33',['four_vector_addition',['../classPSO.html#a5eaf6792f6428085eaf4474f2d6545db',1,'PSO']]]
 ];

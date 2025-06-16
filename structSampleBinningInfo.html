@@ -80,6 +80,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="structSampleBinningInfo-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">SampleBinningInfo Struct Reference</div></div>
@@ -93,10 +94,16 @@ $(function() {
 <div class="dynheader">
 Collaboration diagram for SampleBinningInfo:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="structSampleBinningInfo__coll__graph.svg" width="176" height="139"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="structSampleBinningInfo__coll__graph.svg" width="266" height="212"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:afbde5f960f500d0a5defa08775aedef5"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSampleBinningInfo.html#afbde5f960f500d0a5defa08775aedef5">FindXBin</a> (const double XVar, const int NomXBin) const</td></tr>
+<tr class="memdesc:afbde5f960f500d0a5defa08775aedef5"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Find the relevant bin in the PDF for each event.  <br /></td></tr>
+<tr class="separator:afbde5f960f500d0a5defa08775aedef5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:ae69c8c4db52dea5025220f6d008cf4f4"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSampleBinningInfo.html#ae69c8c4db52dea5025220f6d008cf4f4">XBinEdges</a></td></tr>
@@ -111,12 +118,96 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a6fde8c8353eceaccfca0bfece5094ead"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSampleBinningInfo.html#a6fde8c8353eceaccfca0bfece5094ead">nYBins</a> = <a class="el" href="namespaceM3.html#aed6ca6561a78ba6c90a98ddfa22353aa">M3::_BAD_INT_</a></td></tr>
 <tr class="memdesc:a6fde8c8353eceaccfca0bfece5094ead"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of Y axis bins in the histogram used for likelihood calculation.  <br /></td></tr>
 <tr class="separator:a6fde8c8353eceaccfca0bfece5094ead"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7d1207002d3ebaf3e8594caca23c380b"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSampleBinningInfo.html#a7d1207002d3ebaf3e8594caca23c380b">rw_lower_xbinedge</a></td></tr>
+<tr class="memdesc:a7d1207002d3ebaf3e8594caca23c380b"><td class="mdescLeft">&#160;</td><td class="mdescRight">lower to check if Eb has moved the erec bin  <br /></td></tr>
+<tr class="separator:a7d1207002d3ebaf3e8594caca23c380b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6f6bf0055cb0edeee0f2a713421f35a5"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSampleBinningInfo.html#a6f6bf0055cb0edeee0f2a713421f35a5">rw_lower_lower_xbinedge</a></td></tr>
+<tr class="memdesc:a6f6bf0055cb0edeee0f2a713421f35a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">lower to check if Eb has moved the erec bin  <br /></td></tr>
+<tr class="separator:a6f6bf0055cb0edeee0f2a713421f35a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a38df9115f10c97e64cffa3ac8de869c8"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSampleBinningInfo.html#a38df9115f10c97e64cffa3ac8de869c8">rw_upper_xbinedge</a></td></tr>
+<tr class="memdesc:a38df9115f10c97e64cffa3ac8de869c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">upper to check if Eb has moved the erec bin  <br /></td></tr>
+<tr class="separator:a38df9115f10c97e64cffa3ac8de869c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab20455912755bdfa5df5670e8a378035"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSampleBinningInfo.html#ab20455912755bdfa5df5670e8a378035">rw_upper_upper_xbinedge</a></td></tr>
+<tr class="memdesc:ab20455912755bdfa5df5670e8a378035"><td class="mdescLeft">&#160;</td><td class="mdescRight">upper to check if Eb has moved the erec bin  <br /></td></tr>
+<tr class="separator:ab20455912755bdfa5df5670e8a378035"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>KS: Small struct storying info about used binning. </p>
 
 <p class="definition">Definition at line <a class="el" href="SampleStructs_8h_source.html#l00169">169</a> of file <a class="el" href="SampleStructs_8h_source.html">SampleStructs.h</a>.</p>
-</div><h2 class="groupheader">Member Data Documentation</h2>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="afbde5f960f500d0a5defa08775aedef5" name="afbde5f960f500d0a5defa08775aedef5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afbde5f960f500d0a5defa08775aedef5">&#9670;&#160;</a></span>FindXBin()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int SampleBinningInfo::FindXBin </td>
+          <td>(</td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>XVar</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>NomXBin</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>DB Find the relevant bin in the PDF for each event. </p>
+
+<p class="definition">Definition at line <a class="el" href="SampleStructs_8h_source.html#l00191">191</a> of file <a class="el" href="SampleStructs_8h_source.html">SampleStructs.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  191</span>                                                           {</div>
+<div class="line"><span class="lineno">  192</span>    <span class="comment">//DB Check to see if momentum shift has moved bins</span></div>
+<div class="line"><span class="lineno">  193</span>    <span class="comment">//DB - First , check to see if the event is outside of the binning range and skip event if it is</span></div>
+<div class="line"><span class="lineno">  194</span>     <span class="keywordflow">if</span> (XVar &lt; <a class="code hl_variable" href="structSampleBinningInfo.html#ae69c8c4db52dea5025220f6d008cf4f4">XBinEdges</a>[0] || XVar &gt;= <a class="code hl_variable" href="structSampleBinningInfo.html#ae69c8c4db52dea5025220f6d008cf4f4">XBinEdges</a>[<a class="code hl_variable" href="structSampleBinningInfo.html#a6db26440b230c9c3ded5882135393422">nXBins</a>]) {</div>
+<div class="line"><span class="lineno">  195</span>      <span class="keywordflow">return</span> -1;</div>
+<div class="line"><span class="lineno">  196</span>    }</div>
+<div class="line"><span class="lineno">  197</span>    <span class="comment">//DB - Second, check to see if the event is still in the nominal bin</span></div>
+<div class="line"><span class="lineno">  198</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (XVar &lt; <a class="code hl_variable" href="structSampleBinningInfo.html#a38df9115f10c97e64cffa3ac8de869c8">rw_upper_xbinedge</a>[NomXBin] &amp;&amp; XVar &gt;= <a class="code hl_variable" href="structSampleBinningInfo.html#a7d1207002d3ebaf3e8594caca23c380b">rw_lower_xbinedge</a>[NomXBin]) {</div>
+<div class="line"><span class="lineno">  199</span>      <span class="keywordflow">return</span> NomXBin;</div>
+<div class="line"><span class="lineno">  200</span>    }</div>
+<div class="line"><span class="lineno">  201</span>    <span class="comment">//DB - Thirdly, check the adjacent bins first as Eb+CC+EScale shifts aren&#39;t likely to move an Erec more than 1bin width</span></div>
+<div class="line"><span class="lineno">  202</span>    <span class="comment">//Shifted down one bin from the event bin at nominal</span></div>
+<div class="line"><span class="lineno">  203</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (XVar &lt; <a class="code hl_variable" href="structSampleBinningInfo.html#a7d1207002d3ebaf3e8594caca23c380b">rw_lower_xbinedge</a>[NomXBin] &amp;&amp; XVar &gt;= <a class="code hl_variable" href="structSampleBinningInfo.html#a6f6bf0055cb0edeee0f2a713421f35a5">rw_lower_lower_xbinedge</a>[NomXBin]) {</div>
+<div class="line"><span class="lineno">  204</span>      <span class="keywordflow">return</span> NomXBin-1;</div>
+<div class="line"><span class="lineno">  205</span>    }</div>
+<div class="line"><span class="lineno">  206</span>    <span class="comment">//Shifted up one bin from the event bin at nominal</span></div>
+<div class="line"><span class="lineno">  207</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (XVar &lt; <a class="code hl_variable" href="structSampleBinningInfo.html#ab20455912755bdfa5df5670e8a378035">rw_upper_upper_xbinedge</a>[NomXBin] &amp;&amp; XVar &gt;= <a class="code hl_variable" href="structSampleBinningInfo.html#a38df9115f10c97e64cffa3ac8de869c8">rw_upper_xbinedge</a>[NomXBin]) {</div>
+<div class="line"><span class="lineno">  208</span>      <span class="keywordflow">return</span> NomXBin+1;</div>
+<div class="line"><span class="lineno">  209</span>    }</div>
+<div class="line"><span class="lineno">  210</span>    <span class="comment">//DB - If we end up in this loop, the event has been shifted outside of its nominal bin, but is still within the allowed binning range</span></div>
+<div class="line"><span class="lineno">  211</span>    <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  212</span>      <span class="comment">// KS: Perform binary search to find correct bin. We already checked if isn&#39;t outside of bounds</span></div>
+<div class="line"><span class="lineno">  213</span>      <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(std::distance(<a class="code hl_variable" href="structSampleBinningInfo.html#ae69c8c4db52dea5025220f6d008cf4f4">XBinEdges</a>.begin(), std::upper_bound(<a class="code hl_variable" href="structSampleBinningInfo.html#ae69c8c4db52dea5025220f6d008cf4f4">XBinEdges</a>.begin(), <a class="code hl_variable" href="structSampleBinningInfo.html#ae69c8c4db52dea5025220f6d008cf4f4">XBinEdges</a>.end(), XVar)) - 1);</div>
+<div class="line"><span class="lineno">  214</span>    }</div>
+<div class="line"><span class="lineno">  215</span>  }</div>
+<div class="ttc" id="astructSampleBinningInfo_html_a38df9115f10c97e64cffa3ac8de869c8"><div class="ttname"><a href="structSampleBinningInfo.html#a38df9115f10c97e64cffa3ac8de869c8">SampleBinningInfo::rw_upper_xbinedge</a></div><div class="ttdeci">std::vector&lt; double &gt; rw_upper_xbinedge</div><div class="ttdoc">upper to check if Eb has moved the erec bin</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00186">SampleStructs.h:186</a></div></div>
+<div class="ttc" id="astructSampleBinningInfo_html_a6db26440b230c9c3ded5882135393422"><div class="ttname"><a href="structSampleBinningInfo.html#a6db26440b230c9c3ded5882135393422">SampleBinningInfo::nXBins</a></div><div class="ttdeci">size_t nXBins</div><div class="ttdoc">Number of X axis bins in the histogram used for likelihood calculation.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00177">SampleStructs.h:177</a></div></div>
+<div class="ttc" id="astructSampleBinningInfo_html_a6f6bf0055cb0edeee0f2a713421f35a5"><div class="ttname"><a href="structSampleBinningInfo.html#a6f6bf0055cb0edeee0f2a713421f35a5">SampleBinningInfo::rw_lower_lower_xbinedge</a></div><div class="ttdeci">std::vector&lt; double &gt; rw_lower_lower_xbinedge</div><div class="ttdoc">lower to check if Eb has moved the erec bin</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00184">SampleStructs.h:184</a></div></div>
+<div class="ttc" id="astructSampleBinningInfo_html_a7d1207002d3ebaf3e8594caca23c380b"><div class="ttname"><a href="structSampleBinningInfo.html#a7d1207002d3ebaf3e8594caca23c380b">SampleBinningInfo::rw_lower_xbinedge</a></div><div class="ttdeci">std::vector&lt; double &gt; rw_lower_xbinedge</div><div class="ttdoc">lower to check if Eb has moved the erec bin</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00182">SampleStructs.h:182</a></div></div>
+<div class="ttc" id="astructSampleBinningInfo_html_ab20455912755bdfa5df5670e8a378035"><div class="ttname"><a href="structSampleBinningInfo.html#ab20455912755bdfa5df5670e8a378035">SampleBinningInfo::rw_upper_upper_xbinedge</a></div><div class="ttdeci">std::vector&lt; double &gt; rw_upper_upper_xbinedge</div><div class="ttdoc">upper to check if Eb has moved the erec bin</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00188">SampleStructs.h:188</a></div></div>
+<div class="ttc" id="astructSampleBinningInfo_html_ae69c8c4db52dea5025220f6d008cf4f4"><div class="ttname"><a href="structSampleBinningInfo.html#ae69c8c4db52dea5025220f6d008cf4f4">SampleBinningInfo::XBinEdges</a></div><div class="ttdeci">std::vector&lt; double &gt; XBinEdges</div><div class="ttdoc">Vector to hold x-axis bin-edges.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00172">SampleStructs.h:172</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
 <a id="a6db26440b230c9c3ded5882135393422" name="a6db26440b230c9c3ded5882135393422"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6db26440b230c9c3ded5882135393422">&#9670;&#160;</a></span>nXBins</h2>
 
@@ -150,6 +241,78 @@ Public Attributes</h2></td></tr>
 <p>Number of Y axis bins in the histogram used for likelihood calculation. </p>
 
 <p class="definition">Definition at line <a class="el" href="SampleStructs_8h_source.html#l00179">179</a> of file <a class="el" href="SampleStructs_8h_source.html">SampleStructs.h</a>.</p>
+
+</div>
+</div>
+<a id="a6f6bf0055cb0edeee0f2a713421f35a5" name="a6f6bf0055cb0edeee0f2a713421f35a5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6f6bf0055cb0edeee0f2a713421f35a5">&#9670;&#160;</a></span>rw_lower_lower_xbinedge</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;double&gt; SampleBinningInfo::rw_lower_lower_xbinedge</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>lower to check if Eb has moved the erec bin </p>
+
+<p class="definition">Definition at line <a class="el" href="SampleStructs_8h_source.html#l00184">184</a> of file <a class="el" href="SampleStructs_8h_source.html">SampleStructs.h</a>.</p>
+
+</div>
+</div>
+<a id="a7d1207002d3ebaf3e8594caca23c380b" name="a7d1207002d3ebaf3e8594caca23c380b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7d1207002d3ebaf3e8594caca23c380b">&#9670;&#160;</a></span>rw_lower_xbinedge</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;double&gt; SampleBinningInfo::rw_lower_xbinedge</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>lower to check if Eb has moved the erec bin </p>
+
+<p class="definition">Definition at line <a class="el" href="SampleStructs_8h_source.html#l00182">182</a> of file <a class="el" href="SampleStructs_8h_source.html">SampleStructs.h</a>.</p>
+
+</div>
+</div>
+<a id="ab20455912755bdfa5df5670e8a378035" name="ab20455912755bdfa5df5670e8a378035"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab20455912755bdfa5df5670e8a378035">&#9670;&#160;</a></span>rw_upper_upper_xbinedge</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;double&gt; SampleBinningInfo::rw_upper_upper_xbinedge</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>upper to check if Eb has moved the erec bin </p>
+
+<p class="definition">Definition at line <a class="el" href="SampleStructs_8h_source.html#l00188">188</a> of file <a class="el" href="SampleStructs_8h_source.html">SampleStructs.h</a>.</p>
+
+</div>
+</div>
+<a id="a38df9115f10c97e64cffa3ac8de869c8" name="a38df9115f10c97e64cffa3ac8de869c8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a38df9115f10c97e64cffa3ac8de869c8">&#9670;&#160;</a></span>rw_upper_xbinedge</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;double&gt; SampleBinningInfo::rw_upper_xbinedge</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>upper to check if Eb has moved the erec bin </p>
+
+<p class="definition">Definition at line <a class="el" href="SampleStructs_8h_source.html#l00186">186</a> of file <a class="el" href="SampleStructs_8h_source.html">SampleStructs.h</a>.</p>
 
 </div>
 </div>
