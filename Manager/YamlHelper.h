@@ -444,32 +444,104 @@ inline std::vector<double> ParseBounds(const YAML::Node& node, const std::string
 // **********************
   std::vector<double> bounds;
 
-  if (!node || !node.IsSequence() || node.size() != 2) {
-    MACH3LOG_ERROR("Bounds must be a sequence of exactly 2 elements, got size {}", static_cast<int>(node.size()));
+  if (!node || !node.IsSequence() || (node.size() != 1 && node.size() != 2)) {
+    MACH3LOG_ERROR("Bounds must be a sequence of 1 or 2 elements, got size {}", static_cast<int>(node.size()));
     throw MaCh3Exception(File, Line);
   }
 
-  for (std::size_t i = 0; i < 2; ++i) {
-    const YAML::Node& val = node[i];
+  if (node.size() == 1) {
+    const YAML::Node& val = node[0];
 
     if (!val || val.IsNull() || (val.IsScalar() && val.Scalar().empty())) {
-      bounds.push_back(i == 0 ? M3::KinematicLowBound : M3::KinematicUpBound);
+      MACH3LOG_ERROR("Single-element bounds must contain a valid numeric value.");
+      throw MaCh3Exception(File, Line);
     } else if (val.IsScalar()) {
       try {
-        bounds.push_back(val.as<double>());
+        const double center = val.as<double>();
+        bounds = {center - 0.5, center + 0.5};
       } catch (const YAML::BadConversion& e) {
-        MACH3LOG_ERROR("Invalid value in Bounds[{}]: '{}'. Expected a number or empty string.",
-                       static_cast<int>(i), static_cast<std::string>(val.Scalar()));
+        MACH3LOG_ERROR("Invalid value in Bounds[0]: '{}'. Expected a number.", static_cast<std::string>(val.Scalar()));
         throw MaCh3Exception(File, Line);
       }
     } else {
-      MACH3LOG_ERROR("Invalid type in Bounds[{}]", static_cast<int>(i));
+      MACH3LOG_ERROR("Invalid type in Bounds[0]");
       throw MaCh3Exception(File, Line);
     }
+  } else {
+    for (std::size_t i = 0; i < 2; ++i) {
+      const YAML::Node& val = node[i];
+
+      if (!val || val.IsNull() || (val.IsScalar() && val.Scalar().empty())) {
+        bounds.push_back(i == 0 ? M3::KinematicLowBound : M3::KinematicUpBound);
+      } else if (val.IsScalar()) {
+        try {
+          bounds.push_back(val.as<double>());
+        } catch (const YAML::BadConversion& e) {
+          MACH3LOG_ERROR("Invalid value in Bounds[{}]: '{}'. Expected a number or empty string.",
+                         static_cast<int>(i), static_cast<std::string>(val.Scalar()));
+          throw MaCh3Exception(File, Line);
+        }
+      } else {
+        MACH3LOG_ERROR("Invalid type in Bounds[{}]", static_cast<int>(i));
+        throw MaCh3Exception(File, Line);
+      }
+    }
   }
+  return bounds;
+}
+
+// **********************
+/// @brief KS: Get 2D bounds from YAML for example for selection cuts
+///
+/// Parses a YAML node representing 2D selection bounds. Each element in the node must be
+/// a sequence of 1 or 2 scalar values. If a single value is given, it is interpreted as the
+/// center of a bin and expanded to [value - 0.5, value + 0.5]. If two values are given, they
+/// are used as-is. If an element is empty or null, default bounds are used.
+///
+/// This function is useful for interpreting kinematic or classification bounds specified in
+/// YAML configuration files.
+///
+/// Example YAML input:
+/// ```yaml
+/// bounds2D:
+///   - [1]
+///   - [0.2, 0.8]
+///   - ["", "2.0"]
+/// ```
+///
+/// Resulting vector:
+/// ```cpp
+/// [ [0.5, 1.5],
+///   [0.2, 0.8],
+///   [M3::KinematicLowBound, 2.0] ]
+/// ```
+///
+/// @param node The YAML node containing a sequence of bounds (each being a 1- or 2-element sequence).
+/// @param File The name of the file calling this function (for error reporting).
+/// @param Line The line number in the file calling this function (for error reporting).
+/// @return std::vector<std::vector<double>> A list of bound pairs for each selection region.
+inline std::vector<std::vector<double>> Parse2DBounds(const YAML::Node& node, const std::string& File, const int Line) {
+// **********************
+  std::vector<std::vector<double>> bounds;
+  if (!node || !node.IsSequence()) {
+    MACH3LOG_ERROR("Expected a sequence node for 2D bounds");
+    throw MaCh3Exception(File, Line);
+  }
+
+  // Case 1: Single pair like [0.25, 0.5]
+  if (node.size() == 2 && node[0].IsScalar()) {
+    bounds.push_back(ParseBounds(node, File, Line));
+  } else { // Case 2: List of pairs like [[0.25, 0.5], [0.75, 1.0]]
+    for (std::size_t i = 0; i < node.size(); ++i) {
+      const YAML::Node& subnode = node[i];
+      bounds.push_back(ParseBounds(subnode, File, Line));
+    }
+  }
+
   return bounds;
 }
 
 /// Macro to simplify calling LoadYaml with file and line info
 #define M3OpenConfig(filename) LoadYamlConfig((filename), __FILE__, __LINE__)
 #define GetBounds(filename) ParseBounds((filename), __FILE__, __LINE__)
+#define Get2DBounds(filename) Parse2DBounds((filename), __FILE__, __LINE__)

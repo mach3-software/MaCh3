@@ -712,9 +712,19 @@ void SampleHandlerFD::SetupFunctionalParameters() {
         for (std::size_t iKinPar = 0; iKinPar < kinVars.size(); ++iKinPar) {
           const double kinVal = ReturnKinematicParameter(kinVars[iKinPar], static_cast<int>(iEvent));
 
-          if (kinVal <= selection[iKinPar][0] || kinVal > selection[iKinPar][1]) {
+          bool passedAnyBound = false;
+          const auto& boundsList = selection[iKinPar];
+
+          for (const auto& bounds : boundsList) {
+            if (kinVal > bounds[0] && kinVal <= bounds[1]) {
+              passedAnyBound = true;
+              break;
+            }
+          }
+
+          if (!passedAnyBound) {
             MACH3LOG_TRACE("Event {}, missed kinematic check ({}) for dial {}",
-                            iEvent, kinVars[iKinPar], (*it).name);
+                           iEvent, kinVars[iKinPar], (*it).name);
             IsSelected = false;
             break;
           }
@@ -871,9 +881,19 @@ void SampleHandlerFD::CalcNormsBins(std::vector<NormParameter>& norm_parameters,
           const auto& selection = (*it).Selection;
 
           for (std::size_t iKinPar = 0; iKinPar < kinVars.size(); ++iKinPar) {
-            const double kinVal = ReturnKinematicParameter(kinVars[iKinPar], iEvent);
+            const double kinVal = ReturnKinematicParameter(kinVars[iKinPar], static_cast<int>(iEvent));
 
-            if (kinVal <= selection[iKinPar][0] || kinVal > selection[iKinPar][1]) {
+            bool passedAnyBound = false;
+            const auto& boundsList = selection[iKinPar];
+
+            for (const auto& bounds : boundsList) {
+              if (kinVal > bounds[0] && kinVal <= bounds[1]) {
+                passedAnyBound = true;
+                break;
+              }
+            }
+
+            if (!passedAnyBound) {
               MACH3LOG_TRACE("Event {}, missed kinematic check ({}) for dial {}",
                              iEvent, kinVars[iKinPar], (*it).name);
               IsSelected = false;
