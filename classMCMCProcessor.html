@@ -221,9 +221,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a3905a8c1e333cb52a192c0cfaf1a0949"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; TString &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#a3905a8c1e333cb52a192c0cfaf1a0949">GetBranchNames</a> () const</td></tr>
 <tr class="memdesc:a3905a8c1e333cb52a192c0cfaf1a0949"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the vector of branch names from root file.  <br /></td></tr>
 <tr class="separator:a3905a8c1e333cb52a192c0cfaf1a0949"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a28dfe42f1bf6fd3a145287be1e63fb0b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#a28dfe42f1bf6fd3a145287be1e63fb0b">GetNthParameter</a> (const int param, double &amp;Prior, double &amp;PriorError, TString &amp;Title)</td></tr>
-<tr class="memdesc:a28dfe42f1bf6fd3a145287be1e63fb0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get properties of parameter by passing it number.  <br /></td></tr>
-<tr class="separator:a28dfe42f1bf6fd3a145287be1e63fb0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a07204936619139b886e9a877bc46d1a4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">GetNthParameter</a> (const int param, double &amp;Prior, double &amp;PriorError, TString &amp;Title) const</td></tr>
+<tr class="memdesc:a07204936619139b886e9a877bc46d1a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get properties of parameter by passing it number.  <br /></td></tr>
+<tr class="separator:a07204936619139b886e9a877bc46d1a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5ab91183fbbf23fff759fefc9954a1a5"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#a5ab91183fbbf23fff759fefc9954a1a5">GetParamIndexFromName</a> (const std::string &amp;Name)</td></tr>
 <tr class="memdesc:a5ab91183fbbf23fff759fefc9954a1a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get parameter number based on name.  <br /></td></tr>
 <tr class="separator:a5ab91183fbbf23fff759fefc9954a1a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -974,7 +974,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 3285</span>    TString Title = <span class="stringliteral">&quot;&quot;</span>;</div>
 <div class="line"><span class="lineno"> 3286</span>    <span class="keywordtype">double</span> Prior = 1.0, PriorError = 1.0;</div>
 <div class="line"><span class="lineno"> 3287</span>    </div>
-<div class="line"><span class="lineno"> 3288</span>    <a class="code hl_function" href="classMCMCProcessor.html#a28dfe42f1bf6fd3a145287be1e63fb0b">GetNthParameter</a>(j, Prior, PriorError, Title);</div>
+<div class="line"><span class="lineno"> 3288</span>    <a class="code hl_function" href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">GetNthParameter</a>(j, Prior, PriorError, Title);</div>
 <div class="line"><span class="lineno"> 3289</span>    std::string HistName = Form(<span class="stringliteral">&quot;%s_%s_Lag&quot;</span>, Title.Data(), <a class="code hl_variable" href="classMCMCProcessor.html#ad043b6b2c885f47ab9967831bc8d0f5a">BranchNames</a>[j].Data());</div>
 <div class="line"><span class="lineno"> 3290</span>    LagKPlots[j] = <span class="keyword">new</span> TH1D(HistName.c_str(), HistName.c_str(), nLags, 0.0, nLags);</div>
 <div class="line"><span class="lineno"> 3291</span>    LagKPlots[j]-&gt;GetXaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Lag&quot;</span>);</div>
@@ -1075,8 +1075,8 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 3386</span>  clock.Stop();</div>
 <div class="line"><span class="lineno"> 3387</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Making auto-correlations took {:.2f}s&quot;</span>, clock.RealTime());</div>
 <div class="line"><span class="lineno"> 3388</span>}</div>
+<div class="ttc" id="aclassMCMCProcessor_html_a07204936619139b886e9a877bc46d1a4"><div class="ttname"><a href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">MCMCProcessor::GetNthParameter</a></div><div class="ttdeci">void GetNthParameter(const int param, double &amp;Prior, double &amp;PriorError, TString &amp;Title) const</div><div class="ttdoc">Get properties of parameter by passing it number.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l02393">MCMCProcessor.cpp:2393</a></div></div>
 <div class="ttc" id="aclassMCMCProcessor_html_a1eb6f27c2fb967326dc14dc3dcdc3957"><div class="ttname"><a href="classMCMCProcessor.html#a1eb6f27c2fb967326dc14dc3dcdc3957">MCMCProcessor::CalculateESS</a></div><div class="ttdeci">void CalculateESS(const int nLags, const std::vector&lt; std::vector&lt; double &gt; &gt; &amp;LagL)</div><div class="ttdoc">KS: calc Effective Sample Size.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l03475">MCMCProcessor.cpp:3475</a></div></div>
-<div class="ttc" id="aclassMCMCProcessor_html_a28dfe42f1bf6fd3a145287be1e63fb0b"><div class="ttname"><a href="classMCMCProcessor.html#a28dfe42f1bf6fd3a145287be1e63fb0b">MCMCProcessor::GetNthParameter</a></div><div class="ttdeci">void GetNthParameter(const int param, double &amp;Prior, double &amp;PriorError, TString &amp;Title)</div><div class="ttdoc">Get properties of parameter by passing it number.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l02393">MCMCProcessor.cpp:2393</a></div></div>
 <div class="ttc" id="aclassMCMCProcessor_html_ad043b6b2c885f47ab9967831bc8d0f5a"><div class="ttname"><a href="classMCMCProcessor.html#ad043b6b2c885f47ab9967831bc8d0f5a">MCMCProcessor::BranchNames</a></div><div class="ttdeci">std::vector&lt; TString &gt; BranchNames</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00389">MCMCProcessor.h:389</a></div></div>
 <div class="ttc" id="agpuMCMCProcessorUtils_8cu_html_a809672193d24a096e6d4865109357070"><div class="ttname"><a href="gpuMCMCProcessorUtils_8cu.html#a809672193d24a096e6d4865109357070">RunGPU_AutoCorr</a></div><div class="ttdeci">__host__ void RunGPU_AutoCorr(float *ParStep_gpu, float *ParamSums_gpu, float *NumeratorSum_gpu, float *DenomSum_gpu, float *NumeratorSum_cpu, float *DenomSum_cpu)</div><div class="ttdoc">KS: This call the main kernel responsible for calculating LagL and later copy results back to CPU.</div><div class="ttdef"><b>Definition:</b> <a href="gpuMCMCProcessorUtils_8cu_source.html#l00163">gpuMCMCProcessorUtils.cu:163</a></div></div>
 <div class="ttc" id="agpuMCMCProcessorUtils_8cu_html_abb46837d774b5be81a6c601c762ab05a"><div class="ttname"><a href="gpuMCMCProcessorUtils_8cu.html#abb46837d774b5be81a6c601c762ab05a">CleanupGPU_AutoCorr</a></div><div class="ttdeci">__host__ void CleanupGPU_AutoCorr(float *ParStep_gpu, float *NumeratorSum_gpu, float *ParamSums_gpu, float *DenomSum_gpu)</div><div class="ttdoc">KS: free memory on gpu.</div><div class="ttdef"><b>Definition:</b> <a href="gpuMCMCProcessorUtils_8cu_source.html#l00201">gpuMCMCProcessorUtils.cu:201</a></div></div>
@@ -1171,7 +1171,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 3218</span>    <span class="comment">// Get plotting info</span></div>
 <div class="line"><span class="lineno"> 3219</span>    TString Title = <span class="stringliteral">&quot;&quot;</span>;</div>
 <div class="line"><span class="lineno"> 3220</span>    <span class="keywordtype">double</span> Prior = 1.0, PriorError = 1.0;</div>
-<div class="line"><span class="lineno"> 3221</span>    <a class="code hl_function" href="classMCMCProcessor.html#a28dfe42f1bf6fd3a145287be1e63fb0b">GetNthParameter</a>(j, Prior, PriorError, Title);</div>
+<div class="line"><span class="lineno"> 3221</span>    <a class="code hl_function" href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">GetNthParameter</a>(j, Prior, PriorError, Title);</div>
 <div class="line"><span class="lineno"> 3222</span>    std::string HistName = Form(<span class="stringliteral">&quot;%s_%s_Lag&quot;</span>, Title.Data(), <a class="code hl_variable" href="classMCMCProcessor.html#ad043b6b2c885f47ab9967831bc8d0f5a">BranchNames</a>[j].Data());</div>
 <div class="line"><span class="lineno"> 3223</span> </div>
 <div class="line"><span class="lineno"> 3224</span>    <span class="comment">// Initialize Lag plot</span></div>
@@ -1384,7 +1384,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 3579</span>    TString Title = <span class="stringliteral">&quot;&quot;</span>;</div>
 <div class="line"><span class="lineno"> 3580</span>    <span class="keywordtype">double</span> Prior = 1.0, PriorError = 1.0;</div>
 <div class="line"><span class="lineno"> 3581</span>    </div>
-<div class="line"><span class="lineno"> 3582</span>    <a class="code hl_function" href="classMCMCProcessor.html#a28dfe42f1bf6fd3a145287be1e63fb0b">GetNthParameter</a>(j, Prior, PriorError, Title);</div>
+<div class="line"><span class="lineno"> 3582</span>    <a class="code hl_function" href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">GetNthParameter</a>(j, Prior, PriorError, Title);</div>
 <div class="line"><span class="lineno"> 3583</span>    </div>
 <div class="line"><span class="lineno"> 3584</span>    std::string HistName = Form(<span class="stringliteral">&quot;%s_%s_batch&quot;</span>, Title.Data(), <a class="code hl_variable" href="classMCMCProcessor.html#ad043b6b2c885f47ab9967831bc8d0f5a">BranchNames</a>[j].Data());</div>
 <div class="line"><span class="lineno"> 3585</span>    BatchedParamPlots[j] = <span class="keyword">new</span> TH1D(HistName.c_str(), HistName.c_str(), <a class="code hl_variable" href="classMCMCProcessor.html#a02c5a3f849cf217705816c650c678d19">nBatches</a>, 0, <a class="code hl_variable" href="classMCMCProcessor.html#a02c5a3f849cf217705816c650c678d19">nBatches</a>);</div>
@@ -1538,7 +1538,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 1116</span>  {</div>
 <div class="line"><span class="lineno"> 1117</span>    TString Title_i = <span class="stringliteral">&quot;&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1118</span>    <span class="keywordtype">double</span> Prior_i, PriorError_i;</div>
-<div class="line"><span class="lineno"> 1119</span>    <a class="code hl_function" href="classMCMCProcessor.html#a28dfe42f1bf6fd3a145287be1e63fb0b">GetNthParameter</a>(i, Prior_i, PriorError_i, Title_i);</div>
+<div class="line"><span class="lineno"> 1119</span>    <a class="code hl_function" href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">GetNthParameter</a>(i, Prior_i, PriorError_i, Title_i);</div>
 <div class="line"><span class="lineno"> 1120</span> </div>
 <div class="line"><span class="lineno"> 1121</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt;= i; ++j)</div>
 <div class="line"><span class="lineno"> 1122</span>    {</div>
@@ -1546,7 +1546,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 1124</span>      <a class="code hl_variable" href="classMCMCProcessor.html#ac924273ef73ef60a5f6e8a166918bb31">hpost2D</a>[i][j] = <span class="keyword">new</span> TH2D(Form(<span class="stringliteral">&quot;hpost2D_%i_%i&quot;</span>,i,j), Form(<span class="stringliteral">&quot;hpost2D_%i_%i&quot;</span>,i,j), <a class="code hl_variable" href="classMCMCProcessor.html#a6b74f8195bcbca0979f9e9fe43468bae">nBins</a>, Min_Chain[i], Max_Chain[i], <a class="code hl_variable" href="classMCMCProcessor.html#a6b74f8195bcbca0979f9e9fe43468bae">nBins</a>, Min_Chain[j], Max_Chain[j]);</div>
 <div class="line"><span class="lineno"> 1125</span>      TString Title_j = <span class="stringliteral">&quot;&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1126</span>      <span class="keywordtype">double</span> Prior_j, PriorError_j;</div>
-<div class="line"><span class="lineno"> 1127</span>      <a class="code hl_function" href="classMCMCProcessor.html#a28dfe42f1bf6fd3a145287be1e63fb0b">GetNthParameter</a>(j, Prior_j, PriorError_j, Title_j);</div>
+<div class="line"><span class="lineno"> 1127</span>      <a class="code hl_function" href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">GetNthParameter</a>(j, Prior_j, PriorError_j, Title_j);</div>
 <div class="line"><span class="lineno"> 1128</span> </div>
 <div class="line"><span class="lineno"> 1129</span>      <a class="code hl_variable" href="classMCMCProcessor.html#ac924273ef73ef60a5f6e8a166918bb31">hpost2D</a>[i][j]-&gt;SetMinimum(0);</div>
 <div class="line"><span class="lineno"> 1130</span>      <a class="code hl_variable" href="classMCMCProcessor.html#ac924273ef73ef60a5f6e8a166918bb31">hpost2D</a>[i][j]-&gt;GetXaxis()-&gt;SetTitle(Title_i);</div>
@@ -1637,7 +1637,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 3502</span>    {</div>
 <div class="line"><span class="lineno"> 3503</span>      TString Title = <span class="stringliteral">&quot;&quot;</span>;</div>
 <div class="line"><span class="lineno"> 3504</span>      <span class="keywordtype">double</span> Prior = 1.0, PriorError = 1.0;</div>
-<div class="line"><span class="lineno"> 3505</span>      <a class="code hl_function" href="classMCMCProcessor.html#a28dfe42f1bf6fd3a145287be1e63fb0b">GetNthParameter</a>(j, Prior, PriorError, Title);</div>
+<div class="line"><span class="lineno"> 3505</span>      <a class="code hl_function" href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">GetNthParameter</a>(j, Prior, PriorError, Title);</div>
 <div class="line"><span class="lineno"> 3506</span>      EffectiveSampleSizeHist[i]-&gt;GetXaxis()-&gt;SetBinLabel(j+1, Title.Data());</div>
 <div class="line"><span class="lineno"> 3507</span>    }</div>
 <div class="line"><span class="lineno"> 3508</span>  }</div>
@@ -1943,7 +1943,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 1434</span>  {</div>
 <div class="line"><span class="lineno"> 1435</span>    TString Title = <span class="stringliteral">&quot;&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1436</span>    <span class="keywordtype">double</span> Prior = 1.0, PriorError = 1.0;</div>
-<div class="line"><span class="lineno"> 1437</span>    <a class="code hl_function" href="classMCMCProcessor.html#a28dfe42f1bf6fd3a145287be1e63fb0b">GetNthParameter</a>(i, Prior, PriorError, Title);</div>
+<div class="line"><span class="lineno"> 1437</span>    <a class="code hl_function" href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">GetNthParameter</a>(i, Prior, PriorError, Title);</div>
 <div class="line"><span class="lineno"> 1438</span> </div>
 <div class="line"><span class="lineno"> 1439</span>    Corr1DHist[i].resize(Nhists);</div>
 <div class="line"><span class="lineno"> 1440</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j = 0; j &lt; Nhists; ++j)</div>
@@ -1959,7 +1959,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 1450</span>        TString Title_y = <span class="stringliteral">&quot;&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1451</span>        <span class="keywordtype">double</span> Prior_y = 1.0;</div>
 <div class="line"><span class="lineno"> 1452</span>        <span class="keywordtype">double</span> PriorError_y = 1.0;</div>
-<div class="line"><span class="lineno"> 1453</span>        <a class="code hl_function" href="classMCMCProcessor.html#a28dfe42f1bf6fd3a145287be1e63fb0b">GetNthParameter</a>(k, Prior_y, PriorError_y, Title_y);</div>
+<div class="line"><span class="lineno"> 1453</span>        <a class="code hl_function" href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">GetNthParameter</a>(k, Prior_y, PriorError_y, Title_y);</div>
 <div class="line"><span class="lineno"> 1454</span>        Corr1DHist[i][j]-&gt;GetXaxis()-&gt;SetBinLabel(k+1, Title_y.Data());</div>
 <div class="line"><span class="lineno"> 1455</span>      }</div>
 <div class="line"><span class="lineno"> 1456</span>    }</div>
@@ -2100,7 +2100,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 1342</span>  {</div>
 <div class="line"><span class="lineno"> 1343</span>    TString titlex = <span class="stringliteral">&quot;&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1344</span>    <span class="keywordtype">double</span> nom, err;</div>
-<div class="line"><span class="lineno"> 1345</span>    <a class="code hl_function" href="classMCMCProcessor.html#a28dfe42f1bf6fd3a145287be1e63fb0b">GetNthParameter</a>(i, nom, err, titlex);</div>
+<div class="line"><span class="lineno"> 1345</span>    <a class="code hl_function" href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">GetNthParameter</a>(i, nom, err, titlex);</div>
 <div class="line"><span class="lineno"> 1346</span>    </div>
 <div class="line"><span class="lineno"> 1347</span>    hCov-&gt;GetXaxis()-&gt;SetBinLabel(i+1, titlex);</div>
 <div class="line"><span class="lineno"> 1348</span>    hCovSq-&gt;GetXaxis()-&gt;SetBinLabel(i+1, titlex);</div>
@@ -2118,7 +2118,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 1360</span> </div>
 <div class="line"><span class="lineno"> 1361</span>      TString titley = <span class="stringliteral">&quot;&quot;</span>;</div>
 <div class="line"><span class="lineno"> 1362</span>      <span class="keywordtype">double</span> nom_j, err_j;</div>
-<div class="line"><span class="lineno"> 1363</span>      <a class="code hl_function" href="classMCMCProcessor.html#a28dfe42f1bf6fd3a145287be1e63fb0b">GetNthParameter</a>(j, nom_j, err_j, titley);</div>
+<div class="line"><span class="lineno"> 1363</span>      <a class="code hl_function" href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">GetNthParameter</a>(j, nom_j, err_j, titley);</div>
 <div class="line"><span class="lineno"> 1364</span> </div>
 <div class="line"><span class="lineno"> 1365</span>      hCov-&gt;GetYaxis()-&gt;SetBinLabel(j+1, titley);</div>
 <div class="line"><span class="lineno"> 1366</span>      hCovSq-&gt;GetYaxis()-&gt;SetBinLabel(j+1, titley);</div>
@@ -3104,8 +3104,8 @@ Kamil Skwarczynski </dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a28dfe42f1bf6fd3a145287be1e63fb0b" name="a28dfe42f1bf6fd3a145287be1e63fb0b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a28dfe42f1bf6fd3a145287be1e63fb0b">&#9670;&#160;</a></span>GetNthParameter()</h2>
+<a id="a07204936619139b886e9a877bc46d1a4" name="a07204936619139b886e9a877bc46d1a4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a07204936619139b886e9a877bc46d1a4">&#9670;&#160;</a></span>GetNthParameter()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3137,7 +3137,7 @@ Kamil Skwarczynski </dd></dl>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td></td>
+          <td></td><td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -3145,7 +3145,7 @@ Kamil Skwarczynski </dd></dl>
 <p>Get properties of parameter by passing it number. </p>
 
 <p class="definition">Definition at line <a class="el" href="MCMCProcessor_8cpp_source.html#l02393">2393</a> of file <a class="el" href="MCMCProcessor_8cpp_source.html">MCMCProcessor.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 2393</span>                                                                                                     {</div>
+<div class="fragment"><div class="line"><span class="lineno"> 2393</span>                                                                                                            {</div>
 <div class="line"><span class="lineno"> 2394</span><span class="comment">// **************************</span></div>
 <div class="line"><span class="lineno"> 2395</span>  <a class="code hl_enumeration" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20b">ParameterEnum</a> ParType = <a class="code hl_variable" href="classMCMCProcessor.html#aaa903949bde8f1a69800c71fe1eb538e">ParamType</a>[param];</div>
 <div class="line"><span class="lineno"> 2396</span>  <span class="keywordtype">int</span> ParamNo = <a class="code hl_define" href="MCMCProcessor_8h.html#a82a6d79039474bc403b627437a7b97ec">_UNDEF_</a>;</div>
@@ -3212,7 +3212,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 2410</span>  {</div>
 <div class="line"><span class="lineno"> 2411</span>    TString Title = <span class="stringliteral">&quot;&quot;</span>;</div>
 <div class="line"><span class="lineno"> 2412</span>    <span class="keywordtype">double</span> Prior = 1.0, PriorError = 1.0;</div>
-<div class="line"><span class="lineno"> 2413</span>    <a class="code hl_function" href="classMCMCProcessor.html#a28dfe42f1bf6fd3a145287be1e63fb0b">GetNthParameter</a>(i, Prior, PriorError, Title);</div>
+<div class="line"><span class="lineno"> 2413</span>    <a class="code hl_function" href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">GetNthParameter</a>(i, Prior, PriorError, Title);</div>
 <div class="line"><span class="lineno"> 2414</span> </div>
 <div class="line"><span class="lineno"> 2415</span>    <span class="keywordflow">if</span>(Name == Title)</div>
 <div class="line"><span class="lineno"> 2416</span>    {</div>
@@ -3278,7 +3278,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 2469</span> </div>
 <div class="line"><span class="lineno"> 2470</span>    TString Title = <span class="stringliteral">&quot;&quot;</span>;</div>
 <div class="line"><span class="lineno"> 2471</span>    <span class="keywordtype">double</span> Prior = 1.0, PriorError = 1.0;</div>
-<div class="line"><span class="lineno"> 2472</span>    <a class="code hl_function" href="classMCMCProcessor.html#a28dfe42f1bf6fd3a145287be1e63fb0b">GetNthParameter</a>(ParamNo, Prior, PriorError, Title);</div>
+<div class="line"><span class="lineno"> 2472</span>    <a class="code hl_function" href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">GetNthParameter</a>(ParamNo, Prior, PriorError, Title);</div>
 <div class="line"><span class="lineno"> 2473</span> </div>
 <div class="line"><span class="lineno"> 2474</span>    std::vector&lt;double&gt; x_val(<a class="code hl_variable" href="classMCMCProcessor.html#a6b74f8195bcbca0979f9e9fe43468bae">nBins</a>);</div>
 <div class="line"><span class="lineno"> 2475</span>    std::vector&lt;double&gt; y_val(<a class="code hl_variable" href="classMCMCProcessor.html#a6b74f8195bcbca0979f9e9fe43468bae">nBins</a>);</div>
@@ -3503,7 +3503,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 2596</span>    TString Title = <span class="stringliteral">&quot;&quot;</span>;</div>
 <div class="line"><span class="lineno"> 2597</span>    <span class="keywordtype">double</span> Prior = 1.0, PriorError = 1.0;</div>
 <div class="line"><span class="lineno"> 2598</span>    <span class="keywordtype">bool</span> FlatPrior = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno"> 2599</span>    <a class="code hl_function" href="classMCMCProcessor.html#a28dfe42f1bf6fd3a145287be1e63fb0b">GetNthParameter</a>(ParamNo, Prior, PriorError, Title);</div>
+<div class="line"><span class="lineno"> 2599</span>    <a class="code hl_function" href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">GetNthParameter</a>(ParamNo, Prior, PriorError, Title);</div>
 <div class="line"><span class="lineno"> 2600</span>    </div>
 <div class="line"><span class="lineno"> 2601</span>    <a class="code hl_enumeration" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20b">ParameterEnum</a> ParType = <a class="code hl_variable" href="classMCMCProcessor.html#aaa903949bde8f1a69800c71fe1eb538e">ParamType</a>[ParamNo];</div>
 <div class="line"><span class="lineno"> 2602</span>    <span class="keywordtype">int</span> ParamTemp = ParamNo - <a class="code hl_variable" href="classMCMCProcessor.html#aeab63979ff36256072c046a15d981875">ParamTypeStartPos</a>[ParType];</div>
@@ -3745,7 +3745,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 3886</span>  {</div>
 <div class="line"><span class="lineno"> 3887</span>    TString Title = <span class="stringliteral">&quot;&quot;</span>;</div>
 <div class="line"><span class="lineno"> 3888</span>    <span class="keywordtype">double</span> Prior = 1.0, PriorError = 1.0;</div>
-<div class="line"><span class="lineno"> 3889</span>    <a class="code hl_function" href="classMCMCProcessor.html#a28dfe42f1bf6fd3a145287be1e63fb0b">GetNthParameter</a>(j, Prior, PriorError, Title);</div>
+<div class="line"><span class="lineno"> 3889</span>    <a class="code hl_function" href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">GetNthParameter</a>(j, Prior, PriorError, Title);</div>
 <div class="line"><span class="lineno"> 3890</span>    std::string HistName = Form(<span class="stringliteral">&quot;%s_%s_Geweke&quot;</span>, Title.Data(), <a class="code hl_variable" href="classMCMCProcessor.html#ad043b6b2c885f47ab9967831bc8d0f5a">BranchNames</a>[j].Data());</div>
 <div class="line"><span class="lineno"> 3891</span>    GewekePlots[j] = std::make_unique&lt;TH1D&gt;(HistName.c_str(), HistName.c_str(), NChecks, 0.0, 100 * UpperThreshold);</div>
 <div class="line"><span class="lineno"> 3892</span>    GewekePlots[j]-&gt;GetXaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Burn-In (%)&quot;</span>);</div>
@@ -3936,7 +3936,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  953</span>    TString Title_i = <span class="stringliteral">&quot;&quot;</span>;</div>
 <div class="line"><span class="lineno">  954</span>    <span class="keywordtype">double</span> Prior_i, PriorError;</div>
 <div class="line"><span class="lineno">  955</span> </div>
-<div class="line"><span class="lineno">  956</span>    <a class="code hl_function" href="classMCMCProcessor.html#a28dfe42f1bf6fd3a145287be1e63fb0b">GetNthParameter</a>(i, Prior_i, PriorError, Title_i);</div>
+<div class="line"><span class="lineno">  956</span>    <a class="code hl_function" href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">GetNthParameter</a>(i, Prior_i, PriorError, Title_i);</div>
 <div class="line"><span class="lineno">  957</span>    </div>
 <div class="line"><span class="lineno">  958</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> min_i = <a class="code hl_variable" href="classMCMCProcessor.html#a6be3bbebd4a79fe9814a3da09b3bb820">Chain</a>-&gt;GetMinimum(<a class="code hl_variable" href="classMCMCProcessor.html#ad043b6b2c885f47ab9967831bc8d0f5a">BranchNames</a>[i]);</div>
 <div class="line"><span class="lineno">  959</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> max_i = <a class="code hl_variable" href="classMCMCProcessor.html#a6be3bbebd4a79fe9814a3da09b3bb820">Chain</a>-&gt;GetMaximum(<a class="code hl_variable" href="classMCMCProcessor.html#ad043b6b2c885f47ab9967831bc8d0f5a">BranchNames</a>[i]);</div>
@@ -3957,7 +3957,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  974</span> </div>
 <div class="line"><span class="lineno">  975</span>      TString Title_j = <span class="stringliteral">&quot;&quot;</span>;</div>
 <div class="line"><span class="lineno">  976</span>      <span class="keywordtype">double</span> Prior_j, PriorError_j;</div>
-<div class="line"><span class="lineno">  977</span>      <a class="code hl_function" href="classMCMCProcessor.html#a28dfe42f1bf6fd3a145287be1e63fb0b">GetNthParameter</a>(j, Prior_j, PriorError_j, Title_j);</div>
+<div class="line"><span class="lineno">  977</span>      <a class="code hl_function" href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">GetNthParameter</a>(j, Prior_j, PriorError_j, Title_j);</div>
 <div class="line"><span class="lineno">  978</span> </div>
 <div class="line"><span class="lineno">  979</span>      <a class="code hl_variable" href="classMCMCProcessor.html#a62035b99df4617ab334cd1abd6ed0346">OutputFile</a>-&gt;cd();</div>
 <div class="line"><span class="lineno">  980</span> </div>
@@ -4251,7 +4251,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  736</span>    <span class="comment">// Now make the TLine for the Asimov</span></div>
 <div class="line"><span class="lineno">  737</span>    TString Title = <span class="stringliteral">&quot;&quot;</span>;</div>
 <div class="line"><span class="lineno">  738</span>    <span class="keywordtype">double</span> Prior = 1.0, PriorError = 1.0;</div>
-<div class="line"><span class="lineno">  739</span>    <a class="code hl_function" href="classMCMCProcessor.html#a28dfe42f1bf6fd3a145287be1e63fb0b">GetNthParameter</a>(i, Prior, PriorError, Title);</div>
+<div class="line"><span class="lineno">  739</span>    <a class="code hl_function" href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">GetNthParameter</a>(i, Prior, PriorError, Title);</div>
 <div class="line"><span class="lineno">  740</span> </div>
 <div class="line"><span class="lineno">  741</span>    <span class="keyword">auto</span> Asimov = std::make_unique&lt;TLine&gt;(Prior, hpost_copy[i]-&gt;GetMinimum(), Prior, hpost_copy[i]-&gt;GetMaximum());</div>
 <div class="line"><span class="lineno">  742</span>    <a class="code hl_function" href="classMCMCProcessor.html#ac0763bc26066a8cf7ea00148eb45af7a">SetTLineStyle</a>(Asimov.get(), kRed-3, 2, kDashed);</div>
@@ -4560,7 +4560,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  262</span>    <a class="code hl_variable" href="classMCMCProcessor.html#a62035b99df4617ab334cd1abd6ed0346">OutputFile</a>-&gt;cd();</div>
 <div class="line"><span class="lineno">  263</span>    TString Title = <span class="stringliteral">&quot;&quot;</span>;</div>
 <div class="line"><span class="lineno">  264</span>    <span class="keywordtype">double</span> Prior = 1.0, PriorError = 1.0;</div>
-<div class="line"><span class="lineno">  265</span>    <a class="code hl_function" href="classMCMCProcessor.html#a28dfe42f1bf6fd3a145287be1e63fb0b">GetNthParameter</a>(i, Prior, PriorError, Title);</div>
+<div class="line"><span class="lineno">  265</span>    <a class="code hl_function" href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">GetNthParameter</a>(i, Prior, PriorError, Title);</div>
 <div class="line"><span class="lineno">  266</span> </div>
 <div class="line"><span class="lineno">  267</span>    <span class="comment">// This holds the posterior density</span></div>
 <div class="line"><span class="lineno">  268</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> maxi = <a class="code hl_variable" href="classMCMCProcessor.html#a6be3bbebd4a79fe9814a3da09b3bb820">Chain</a>-&gt;GetMaximum(<a class="code hl_variable" href="classMCMCProcessor.html#ad043b6b2c885f47ab9967831bc8d0f5a">BranchNames</a>[i]);</div>
@@ -5278,7 +5278,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  815</span>    TString Title;</div>
 <div class="line"><span class="lineno">  816</span>    <span class="keywordtype">double</span> Prior, PriorError;</div>
 <div class="line"><span class="lineno">  817</span> </div>
-<div class="line"><span class="lineno">  818</span>    <a class="code hl_function" href="classMCMCProcessor.html#a28dfe42f1bf6fd3a145287be1e63fb0b">GetNthParameter</a>(x, Prior, PriorError, Title);</div>
+<div class="line"><span class="lineno">  818</span>    <a class="code hl_function" href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">GetNthParameter</a>(x, Prior, PriorError, Title);</div>
 <div class="line"><span class="lineno">  819</span>    <span class="comment">//Set fancy labels</span></div>
 <div class="line"><span class="lineno">  820</span>    <a class="code hl_variable" href="classMCMCProcessor.html#a97a9669445c141d9dddc19f1b3562479">hviolin</a>-&gt;GetXaxis()-&gt;SetBinLabel(x+1, Title);</div>
 <div class="line"><span class="lineno">  821</span>    <a class="code hl_variable" href="classMCMCProcessor.html#a4061fd7eeeee55dd709fe844146ed815">hviolin_prior</a>-&gt;GetXaxis()-&gt;SetBinLabel(x+1, Title);</div>
@@ -5530,7 +5530,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 3078</span>    TString Title = <span class="stringliteral">&quot;&quot;</span>;</div>
 <div class="line"><span class="lineno"> 3079</span>    <span class="keywordtype">double</span> Prior = 1.0, PriorError = 1.0;</div>
 <div class="line"><span class="lineno"> 3080</span>    </div>
-<div class="line"><span class="lineno"> 3081</span>    <a class="code hl_function" href="classMCMCProcessor.html#a28dfe42f1bf6fd3a145287be1e63fb0b">GetNthParameter</a>(j, Prior, PriorError, Title);</div>
+<div class="line"><span class="lineno"> 3081</span>    <a class="code hl_function" href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">GetNthParameter</a>(j, Prior, PriorError, Title);</div>
 <div class="line"><span class="lineno"> 3082</span>    std::string HistName = Form(<span class="stringliteral">&quot;%s_%s_Trace&quot;</span>, Title.Data(), <a class="code hl_variable" href="classMCMCProcessor.html#ad043b6b2c885f47ab9967831bc8d0f5a">BranchNames</a>[j].Data());</div>
 <div class="line"><span class="lineno"> 3083</span>    TraceParamPlots[j] = <span class="keyword">new</span> TH1D(HistName.c_str(), HistName.c_str(), <a class="code hl_variable" href="classMCMCProcessor.html#af3a19b885e9c34e1674aea8cfbe14e1c">nEntries</a>, 0, <a class="code hl_variable" href="classMCMCProcessor.html#af3a19b885e9c34e1674aea8cfbe14e1c">nEntries</a>);</div>
 <div class="line"><span class="lineno"> 3084</span>    TraceParamPlots[j]-&gt;GetXaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Step&quot;</span>);</div>
@@ -5705,7 +5705,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 3810</span> </div>
 <div class="line"><span class="lineno"> 3811</span>    TString Title = <span class="stringliteral">&quot;&quot;</span>;</div>
 <div class="line"><span class="lineno"> 3812</span>    <span class="keywordtype">double</span> Prior = 1.0, PriorError = 1.0;</div>
-<div class="line"><span class="lineno"> 3813</span>    <a class="code hl_function" href="classMCMCProcessor.html#a28dfe42f1bf6fd3a145287be1e63fb0b">GetNthParameter</a>(j, Prior, PriorError, Title);</div>
+<div class="line"><span class="lineno"> 3813</span>    <a class="code hl_function" href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">GetNthParameter</a>(j, Prior, PriorError, Title);</div>
 <div class="line"><span class="lineno"> 3814</span> </div>
 <div class="line"><span class="lineno"> 3815</span>    std::string name = Form(<span class="stringliteral">&quot;Power Spectrum of %s;k;P(k)&quot;</span>, Title.Data());</div>
 <div class="line"><span class="lineno"> 3816</span> </div>
@@ -6384,7 +6384,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 2731</span> </div>
 <div class="line"><span class="lineno"> 2732</span>    TString Title = <span class="stringliteral">&quot;&quot;</span>;</div>
 <div class="line"><span class="lineno"> 2733</span>    <span class="keywordtype">double</span> Prior = 1.0, PriorError = 1.0;</div>
-<div class="line"><span class="lineno"> 2734</span>    <a class="code hl_function" href="classMCMCProcessor.html#a28dfe42f1bf6fd3a145287be1e63fb0b">GetNthParameter</a>(ParamNo, Prior, PriorError, Title);</div>
+<div class="line"><span class="lineno"> 2734</span>    <a class="code hl_function" href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">GetNthParameter</a>(ParamNo, Prior, PriorError, Title);</div>
 <div class="line"><span class="lineno"> 2735</span> </div>
 <div class="line"><span class="lineno"> 2736</span>    Param.push_back(ParamNo);</div>
 <div class="line"><span class="lineno"> 2737</span>    OldCentral.push_back(Prior);</div>
