@@ -2390,7 +2390,7 @@ void MCMCProcessor::SetStepCut(const int Cuts) {
 
 // ***************
 // Pass central value
-void MCMCProcessor::GetNthParameter(const int param, double &Prior, double &PriorError, TString &Title){
+void MCMCProcessor::GetNthParameter(const int param, double &Prior, double &PriorError, TString &Title) const {
 // **************************
   ParameterEnum ParType = ParamType[param];
   int ParamNo = _UNDEF_;

@@ -18,6 +18,7 @@ _MaCh3_Safe_Include_Start_ //{
 _MaCh3_Safe_Include_End_ //}
 
 /// @file CombineMaCh3Chains.cpp
+/// @brief Combine chains files produced by **MCMC**, enforcing the condition that all the files to combine were made using the exact same software versions and config files.
 /// @author Ewan Miller
 /// @author Kamil Skwarczynski
 
@@ -218,10 +219,12 @@ void CombineChain()
   // Get the source directory
   TDirectory *MaCh3EngineDir = prevFile->Get<TDirectory>("MaCh3Engine");
   TDirectory *CovarianceFolderDir = prevFile->Get<TDirectory>("CovarianceFolder");
+  TDirectory *SampleFolderDir = prevFile->Get<TDirectory>("SampleFolder");
 
   outputFile->cd();
   CopyDir(MaCh3EngineDir);
   CopyDir(CovarianceFolderDir);
+  CopyDir(SampleFolderDir);
 
   delete prevFile;
   MACH3LOG_INFO("Done!");

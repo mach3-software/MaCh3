@@ -183,16 +183,6 @@ public:
         );
     }
     
-    std::vector<double> ReturnKinematicParameterBinning(std::string) override {
-        PYBIND11_OVERRIDE_PURE_NAME(
-            std::vector<double>,          /* Return type */
-            SampleHandlerFD,              /* Parent class */
-            "get_event_kinematic_binning",/* python name*/
-            ReturnKinematicParameterBinning, /* Name of function in C++ (must match Python name) */
-            py::arg("variable")           /* Argument(s) */
-        );
-    }
-
     void RegisterFunctionalParameters() override {
         PYBIND11_OVERRIDE_PURE_NAME(
             void,

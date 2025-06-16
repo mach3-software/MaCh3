@@ -12,7 +12,6 @@ namespace adaptive_mcmc{
 /// @details struct encapsulating all adaptive MCMC information
 class AdaptiveMCMCHandler{
  public:
-
   /// @brief Constructor
   AdaptiveMCMCHandler();
 
@@ -89,6 +88,39 @@ class AdaptiveMCMCHandler{
   /// @brief Get Current value of parameter
   double CurrVal(const int par_index);
 
+  /// @brief Get Total Number of Steps
+  int GetTotalSteps() const {
+    return total_steps;
+  }
+
+  /// @brief Change Total Number of Steps to new value
+  void SetTotalSteps(const int nsteps) {
+    total_steps = nsteps;
+  }
+
+  /// @brief Increase by one number of total steps
+  void IncrementNSteps() {
+    total_steps++;
+  }
+
+  /// @brief Increase by one number of total steps
+  TMatrixDSym* GetAdaptiveCovariance() const {
+    return adaptive_covariance;
+  }
+
+  /// @brief Get the parameter means used in the adaptive handler
+  /// @ingroup ParameterHandlerGetters
+  std::vector<double> GetParameterMeans() const {
+    return par_means;
+  }
+
+  /// @brief Get Name of Output File
+  /// @ingroup ParameterHandlerGetters
+  std::string GetOutFileName() const {
+    return output_file_name;
+  }
+
+ private:
   /// Meta variables related to adaption run time
   /// When do we start throwing
   int start_adaptive_throw;

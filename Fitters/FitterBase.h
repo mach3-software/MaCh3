@@ -149,6 +149,8 @@ class FitterBase {
   TFile *outputFile;
   /// Output cov folder
   TDirectory *CovFolder;
+  /// Output sample folder
+  TDirectory *SampleFolder;
   /// Output tree with posteriors
   TTree *outTree;
   /// auto save every N steps
