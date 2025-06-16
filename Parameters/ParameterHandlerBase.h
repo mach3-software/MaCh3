@@ -202,7 +202,7 @@ class ParameterHandlerBase {
   /// @brief Set number of MCMC step, when running adaptive MCMC it is updated with given frequency. We need number of steps to determine frequency.
    /// @ingroup ParameterHandlerSetters
   inline void SetNumberOfSteps(const int nsteps) {
-    AdaptiveHandler->total_steps = nsteps;
+    AdaptiveHandler->SetTotalSteps(nsteps);
     if(AdaptiveHandler->AdaptionUpdate()) ResetIndivStepScale();
   }
 
@@ -215,9 +215,7 @@ class ParameterHandlerBase {
   /// @brief Get the Cholesky decomposition of the throw matrix
   /// @ingroup ParameterHandlerGetters
   inline TMatrixD *GetThrowMatrix_CholDecomp() const {return throwMatrix_CholDecomp;}
-  /// @brief Get the parameter means used in the adaptive handler
-  /// @ingroup ParameterHandlerGetters
-  inline std::vector<double> GetParameterMeans() const {return AdaptiveHandler->par_means;}
+
   /// @brief KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plotting
   /// @details This function converts the covariance matrix to a correlation matrix and
   ///          returns a TH2D object, which can be used for advanced plotting purposes.

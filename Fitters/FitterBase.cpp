@@ -565,7 +565,6 @@ void FitterBase::RunLLHScan() {
   // Loop over the covariance classes
   for (ParameterHandlerBase *cov : systematics)
   {
-
     // Scan over all the parameters
     // Get the number of parameters
     int npars = cov->GetNumParams();
@@ -975,8 +974,8 @@ void FitterBase::Run2DLLHScan() {
         // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables
         lower_y = std::max(lower_y, cov->GetLowerBound(j));
         upper_y = std::min(upper_y, cov->GetUpperBound(j));
-        MACH3LOG_INFO("Scanning X {} with {} steps, from {} - {}, prior = {}", name_x, n_points, lower_x, upper_x, prior_x);
-        MACH3LOG_INFO("Scanning Y {} with {} steps, from {} - {}, prior = {}", name_y, n_points, lower_y, upper_y, prior_y);
+        MACH3LOG_INFO("Scanning X {} with {} steps, from {:.2f} - {:.2f}, prior = {}", name_x, n_points, lower_x, upper_x, prior_x);
+        MACH3LOG_INFO("Scanning Y {} with {} steps, from {:.2f} - {:.2f}, prior = {}", name_y, n_points, lower_y, upper_y, prior_y);
 
         auto hScanSam = std::make_unique<TH2D>((name_x + "_" + name_y + "_sam").c_str(), (name_x + "_" + name_y + "_sam").c_str(),
                                                 n_points, lower_x, upper_x, n_points, lower_y, upper_y);
@@ -1096,10 +1095,10 @@ void FitterBase::RunSigmaVar() {
       // Get the initial value of ith parameter
       double init = cov->GetParInit(i);
 
-      std::vector<std::vector<TH1D*>> sigmaArray_x(numVar);
-      std::vector<std::vector<TH1D*>> sigmaArray_y(numVar);
-      std::vector<std::vector<TH1D*>> sigmaArray_x_norm(numVar);
-      std::vector<std::vector<TH1D*>> sigmaArray_y_norm(numVar);
+      std::vector<std::vector<std::unique_ptr<TH1D>>> sigmaArray_x(numVar);
+      std::vector<std::vector<std::unique_ptr<TH1D>>> sigmaArray_y(numVar);
+      std::vector<std::vector<std::unique_ptr<TH1D>>> sigmaArray_x_norm(numVar);
+      std::vector<std::vector<std::unique_ptr<TH1D>>> sigmaArray_y_norm(numVar);
 
       // Set up for single mode
       TH1D ****sigmaArray_mode_x = nullptr;
@@ -1212,17 +1211,16 @@ void FitterBase::RunSigmaVar() {
             }
 
             // Project down onto x axis
-            sigmaArray_x[j][SampleIterator] = PolyProjectionX(currSamp.get(), (title_long+"_xProj").c_str(), xbins);
+            sigmaArray_x[j][SampleIterator] = std::unique_ptr<TH1D>(PolyProjectionX(currSamp.get(), (title_long+"_xProj").c_str(), xbins));
             sigmaArray_x[j][SampleIterator]->SetDirectory(nullptr);
             sigmaArray_x[j][SampleIterator]->GetXaxis()->SetTitle(currSamp->GetXaxis()->GetTitle());
-            sigmaArray_y[j][SampleIterator] = PolyProjectionY(currSamp.get(), (title_long+"_yProj").c_str(), ybins);
+            sigmaArray_y[j][SampleIterator] = std::unique_ptr<TH1D>(PolyProjectionY(currSamp.get(), (title_long+"_yProj").c_str(), ybins));
             sigmaArray_y[j][SampleIterator]->SetDirectory(nullptr);
             sigmaArray_y[j][SampleIterator]->GetXaxis()->SetTitle(currSamp->GetYaxis()->GetTitle());
 
-            sigmaArray_x_norm[j][SampleIterator] = static_cast<TH1D*>(sigmaArray_x[j][SampleIterator]->Clone());
-            sigmaArray_x_norm[j][SampleIterator]->SetDirectory(nullptr);
+            sigmaArray_x_norm[j][SampleIterator] = M3::Clone<TH1D>(sigmaArray_x[j][SampleIterator].get());
             sigmaArray_x_norm[j][SampleIterator]->Scale(1., "width");
-            sigmaArray_y_norm[j][SampleIterator] = static_cast<TH1D*>(sigmaArray_y[j][SampleIterator]->Clone());
+            sigmaArray_y_norm[j][SampleIterator] = M3::Clone<TH1D>(sigmaArray_y[j][SampleIterator].get());
             sigmaArray_y_norm[j][SampleIterator]->SetDirectory(nullptr);
             sigmaArray_y_norm[j][SampleIterator]->Scale(1., "width");
 
@@ -1247,11 +1245,11 @@ void FitterBase::RunSigmaVar() {
         for (int k = 0; k < samples[ivs]->GetNsamples(); ++k)
         {
           std::string title = std::string(samples[ivs]->GetPDF(k)->GetName()) + "_" + name;
-          auto var_x = MakeAsymGraph(sigmaArray_x[1][SampleIterator], sigmaArray_x[2][SampleIterator], sigmaArray_x[3][SampleIterator], (title+"_X").c_str());
-          auto var_y = MakeAsymGraph(sigmaArray_y[1][SampleIterator], sigmaArray_y[2][SampleIterator], sigmaArray_y[3][SampleIterator], (title+"_Y").c_str());
+          auto var_x = MakeAsymGraph(sigmaArray_x[1][SampleIterator].get(), sigmaArray_x[2][SampleIterator].get(), sigmaArray_x[3][SampleIterator].get(), (title+"_X").c_str());
+          auto var_y = MakeAsymGraph(sigmaArray_y[1][SampleIterator].get(), sigmaArray_y[2][SampleIterator].get(), sigmaArray_y[3][SampleIterator].get(), (title+"_Y").c_str());
 
-          auto var_x_norm = MakeAsymGraph(sigmaArray_x_norm[1][SampleIterator], sigmaArray_x_norm[2][SampleIterator], sigmaArray_x_norm[3][SampleIterator], (title+"_X_norm").c_str());
-          auto var_y_norm = MakeAsymGraph(sigmaArray_y_norm[1][SampleIterator], sigmaArray_y_norm[2][SampleIterator], sigmaArray_y_norm[3][SampleIterator], (title+"_Y_norm").c_str());
+          auto var_x_norm = MakeAsymGraph(sigmaArray_x_norm[1][SampleIterator].get(), sigmaArray_x_norm[2][SampleIterator].get(), sigmaArray_x_norm[3][SampleIterator].get(), (title+"_X_norm").c_str());
+          auto var_y_norm = MakeAsymGraph(sigmaArray_y_norm[1][SampleIterator].get(), sigmaArray_y_norm[2][SampleIterator].get(), sigmaArray_y_norm[3][SampleIterator].get(), (title+"_Y_norm").c_str());
 
           dirArrySample[SampleIterator]->cd();
           var_x->Write();
@@ -1288,22 +1286,6 @@ void FitterBase::RunSigmaVar() {
           dirArrySample[SampleIterator]->Close();
           delete dirArrySample[SampleIterator];
           SampleIterator++;
-        }
-      }
-
-      for (int j = 0; j < numVar; ++j)
-      {
-        SampleIterator = 0;
-        for(unsigned int ivs = 0; ivs < samples.size(); ivs++ )
-        {
-          for (int k = 0; k < samples[ivs]->GetNsamples(); ++k)
-          {
-            delete sigmaArray_x[j][SampleIterator];
-            delete sigmaArray_y[j][SampleIterator];
-            delete sigmaArray_x_norm[j][SampleIterator];
-            delete sigmaArray_y_norm[j][SampleIterator];
-            SampleIterator++;
-          }
         }
       }
 

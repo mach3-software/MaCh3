@@ -122,7 +122,7 @@ void mcmc::RunMCMC() {
   //Save the Adaptive output
   for(const auto& syst : systematics){
     if(syst->GetDoAdaption()){
-      syst->GetAdaptiveHandler()->SaveAdaptiveToFile(syst->GetAdaptiveHandler()->output_file_name, syst->GetName(), true);
+      syst->GetAdaptiveHandler()->SaveAdaptiveToFile(syst->GetAdaptiveHandler()->GetOutFileName(), syst->GetName(), true);
     }
   }
 
