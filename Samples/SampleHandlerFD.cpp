@@ -87,6 +87,12 @@ void SampleHandlerFD::ReadSampleConfig()
   nDimensions = 0;
   XVarStr = GetFromManager(SampleManager->raw()["Binning"]["XVarStr"], std::string(""));
   Binning.XBinEdges = GetFromManager(SampleManager->raw()["Binning"]["XVarBins"], std::vector<double>());
+  const auto& edgesx = Binning.XBinEdges;
+  if (!std::is_sorted(edgesx.begin(), edgesx.end())) {
+    MACH3LOG_ERROR("XVarBins must be in increasing order in sample config {}\n  XVarBins: [{}]",
+                   GetTitle(), fmt::join(edgesx, ", "));
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
   if(XVarStr.length() > 0){
     nDimensions++;
   } else{
@@ -96,6 +102,12 @@ void SampleHandlerFD::ReadSampleConfig()
   
   YVarStr = GetFromManager(SampleManager->raw()["Binning"]["YVarStr"], std::string(""));
   Binning.YBinEdges = GetFromManager(SampleManager->raw()["Binning"]["YVarBins"], std::vector<double>());
+  const auto& edgesy = Binning.YBinEdges;
+  if (!std::is_sorted(edgesy.begin(), edgesy.end())) {
+    MACH3LOG_ERROR("YBinEdges must be in increasing order in sample config {}\n  YBinEdges: [{}]",
+                   GetTitle(), fmt::join(edgesy, ", "));
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
   if(YVarStr.length() > 0){
     if(XVarStr.length() == 0){
       MACH3LOG_ERROR("Please specify an X-variable string in sample config {}. I won't work only with a Y-variable", SampleManager->GetFileName());
@@ -911,10 +923,6 @@ void SampleHandlerFD::Set1DBinning(size_t nbins, double* boundaries)
   _hPDF1D->SetBins(static_cast<int>(nbins),boundaries);
   dathist->SetBins(static_cast<int>(nbins),boundaries);
 
-  Binning.XBinEdges = std::vector<double>(nbins+1);
-  for (size_t i=0;i<nbins+1;i++) {
-    Binning.XBinEdges[i] = _hPDF1D->GetXaxis()->GetBinLowEdge(static_cast<int>(i+1));
-  }
   Binning.YBinEdges = std::vector<double>(2);
   Binning.YBinEdges[0] = -1e8;
   Binning.YBinEdges[1] = 1e8;
@@ -939,10 +947,6 @@ void SampleHandlerFD::Set1DBinning(size_t nbins, double low, double high)
   _hPDF1D->SetBins(static_cast<int>(nbins),low,high);
   dathist->SetBins(static_cast<int>(nbins),low,high);
 
-  Binning.XBinEdges = std::vector<double>(nbins+1);
-  for (size_t i=0;i<nbins+1;i++) {
-    Binning.XBinEdges[i] = _hPDF1D->GetXaxis()->GetBinLowEdge(static_cast<int>(i+1));
-  }
   Binning.YBinEdges = std::vector<double>(2);
   Binning.YBinEdges[0] = -1e8;
   Binning.YBinEdges[1] = 1e8;
@@ -1012,15 +1016,6 @@ void SampleHandlerFD::Set2DBinning(size_t nbins1, double* boundaries1, size_t nb
   _hPDF2D->Reset();
   _hPDF2D->SetBins(static_cast<int>(nbins1),boundaries1,static_cast<int>(nbins2),boundaries2);
   dathist2d->SetBins(static_cast<int>(nbins1),boundaries1,static_cast<int>(nbins2),boundaries2);
-
-  Binning.XBinEdges = std::vector<double>(nbins1+1);
-  for (size_t i=0;i<nbins1+1;i++) {
-    Binning.XBinEdges[i] = _hPDF2D->GetXaxis()->GetBinLowEdge(static_cast<int>(i+1));
-  }
-  Binning.YBinEdges = std::vector<double>(nbins2+1);
-  for (size_t i=0;i<nbins2+1;i++) {
-    Binning.YBinEdges[i] = _hPDF2D->GetYaxis()->GetBinLowEdge(static_cast<int>(i+1));
-  }
   
   //Set the number of X and Y bins now
   SetupReweightArrays(Binning.XBinEdges.size() - 1, Binning.YBinEdges.size() - 1);
@@ -1037,15 +1032,6 @@ void SampleHandlerFD::Set2DBinning(size_t nbins1, double low1, double high1, siz
   _hPDF2D->Reset();
   _hPDF2D->SetBins(static_cast<int>(nbins1),low1,high1,static_cast<int>(nbins2),low2,high2);
   dathist2d->SetBins(static_cast<int>(nbins1),low1,high1,static_cast<int>(nbins2),low2,high2);
-
-  Binning.XBinEdges = std::vector<double>(nbins1+1);
-  for (size_t i=0;i<nbins1+1;i++) {
-    Binning.XBinEdges[i] = _hPDF2D->GetXaxis()->GetBinLowEdge(static_cast<int>(i+1));
-  }
-  Binning.YBinEdges = std::vector<double>(nbins2+1);
-  for (size_t i=0;i<nbins2+1;i++) {
-    Binning.YBinEdges[i] = _hPDF2D->GetYaxis()->GetBinLowEdge(static_cast<int>(i+1));
-  }
 
   //Set the number of X and Y bins now
   SetupReweightArrays(Binning.XBinEdges.size() - 1, Binning.YBinEdges.size() - 1);
