@@ -77,7 +77,7 @@ CPMAddPackage(
     GIT_TAG ${MaCh3_NuOscillatorBranch}
     GIT_SHALLOW YES
     OPTIONS
-    "UseGPU FALSE"
+    "UseGPU 0"
     "UseMultithreading ${DAN_USE_MULTITHREAD}"
     "UseDoubles ${DAN_DOUBLE}"
 
