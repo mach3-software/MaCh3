@@ -23,7 +23,7 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc) con
   // If there are some data, but the prediction falls below the MC bound => return Poisson LogL for the low MC bound
   if ( mc < M3::_LOW_MC_BOUND_ ) {
     if ( data > M3::_LOW_MC_BOUND_ ) return ( M3::_LOW_MC_BOUND_ - data + data * std::log( data/M3::_LOW_MC_BOUND_ ) );
-    else if ( data > mc ) return 0.;
+    else if ( data >= mc ) return 0.;
   }
   
   // Otherwise, just return usual Poisson LogL using Stirling's approximation
@@ -52,7 +52,7 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, con
       // If MC falls below the low MC bound, use low MC bound for newmc
       if ( mc < M3::_LOW_MC_BOUND_ ) {
         if ( data > M3::_LOW_MC_BOUND_ ) newmc = M3::_LOW_MC_BOUND_;
-        else if ( data > mc ) return 0.;
+        else if ( data >= mc ) return 0.;
       }
         
       // Barlow-Beeston uses fractional uncertainty on MC, so sqrt(sum[w^2])/mc
@@ -102,7 +102,7 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, con
       // If MC falls below the low MC bound, use low MC bound for newmc
       if ( mc < M3::_LOW_MC_BOUND_ ) {
         if ( data > M3::_LOW_MC_BOUND_ ) newmc = M3::_LOW_MC_BOUND_;
-        else if ( data > mc ) return 0.;
+        else if ( data >= mc ) return 0.;
       }
       
       //the so-called effective count
@@ -149,8 +149,8 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, con
 
       // Check whether the stat is more than Poisson-like bound for low mc (mc < data)
       // TN: I believe this might get some extra optimization
-      if ( mc < data ) {
-        if ( data < M3::_LOW_MC_BOUND_ ) return 0.;
+      if ( mc <= data ) {
+        if ( data <= M3::_LOW_MC_BOUND_ ) return 0.;
         const double poisson = GetTestStatLLH(data, M3::_LOW_MC_BOUND_);
         if ( stat > poisson ) return poisson;
       }
@@ -169,7 +169,7 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, con
       // If MC is lower than the low MC bound, return the test-stat at the bound
       if ( mc < M3::_LOW_MC_BOUND_ ) {
         if ( data > M3::_LOW_MC_BOUND_ ) return ( data - M3::_LOW_MC_BOUND_ ) * ( data - M3::_LOW_MC_BOUND_ ) / ( 2. * M3::_LOW_MC_BOUND_ ); 
-        else if ( data > mc ) return 0.;
+        else if ( data >= mc ) return 0.;
       }
       
       // Return the Pearson metric
