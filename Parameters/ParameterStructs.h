@@ -171,7 +171,7 @@ struct NormParameter : public TypeParameterBase {
   bool hasKinBounds;
   /// Generic vector contain enum relating to a kinematic variable
   /// and lower and upper bounds. This can then be passed to IsEventSelected
-  std::vector< std::vector<double> > Selection;
+  std::vector< std::vector< std::vector<double> > > Selection;
 
   /// Generic vector containing the string of kinematic type
   /// This then needs to be converted to a kinematic type enum
@@ -201,7 +201,7 @@ struct FunctionalParameter : public TypeParameterBase {
   bool hasKinBounds;
   /// Generic vector contain enum relating to a kinematic variable
   /// and lower and upper bounds. This can then be passed to IsEventSelected
-  std::vector< std::vector<double> > Selection;
+  std::vector< std::vector< std::vector<double> > > Selection;
 
   /// Generic vector containing the string of kinematic type
   /// This then needs to be converted to a kinematic type enum

@@ -119,10 +119,11 @@ void SampleHandlerFD::ReadSampleConfig()
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   
-  //FD file info
-  if (!CheckNodeExists(SampleManager->raw(), "InputFiles", "mtupleprefix")){
-    MACH3LOG_ERROR("InputFiles:mtupleprefix not given in {}, please add this", SampleManager->GetFileName());
+  if (!CheckNodeExists(SampleManager->raw(), "BinningFile")){
+    MACH3LOG_ERROR("BinningFile not given in for sample {}, ReturnKinematicParameterBinning will not work", GetTitle());
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
+
   auto mtupleprefix  = Get<std::string>(SampleManager->raw()["InputFiles"]["mtupleprefix"], __FILE__, __LINE__);
   auto mtuplesuffix  = Get<std::string>(SampleManager->raw()["InputFiles"]["mtuplesuffix"], __FILE__, __LINE__);
   auto splineprefix  = Get<std::string>(SampleManager->raw()["InputFiles"]["splineprefix"], __FILE__, __LINE__);
@@ -441,33 +442,8 @@ void SampleHandlerFD::FillArray() {
     const double XVar = *(MCEvent->x_var);
 
     //DB Find the relevant bin in the PDF for each event
-    int XBinToFill = -1;
+    const int XBinToFill = Binning.FindXBin(XVar, MCEvent->NomXBin);
     const int YBinToFill = MCEvent->NomYBin;
-
-    //DB - First, check to see if the event is still in the nominal bin
-    if (XVar < MCEvent->rw_upper_xbinedge && XVar >= MCEvent->rw_lower_xbinedge) {
-      XBinToFill = MCEvent->NomXBin;
-    }
-    //DB - Second, check to see if the event is outside of the binning range and skip event if it is
-    //ETA- note that Binning.nXBins is Binning.XBinEdges.size() - 1
-    else if (XVar < Binning.XBinEdges[0] || XVar >= Binning.XBinEdges[Binning.nXBins]) {
-      continue;
-    }
-    //DB - Thirdly, check the adjacent bins first as Eb+CC+EScale shifts aren't likely to move an Erec more than 1bin width
-    //Shifted down one bin from the event bin at nominal
-    else if (XVar < MCEvent->rw_lower_xbinedge && XVar >= MCEvent->rw_lower_lower_xbinedge) {
-      XBinToFill = MCEvent->NomXBin-1;
-    }
-    //Shifted up one bin from the event bin at nominal
-    else if (XVar < MCEvent->rw_upper_upper_xbinedge && XVar >= MCEvent->rw_upper_xbinedge) {
-      XBinToFill = MCEvent->NomXBin+1;
-    }
-    //DB - If we end up in this loop, the event has been shifted outside of its nominal bin, but is still within the allowed binning range
-    else {
-      // KS: Perform binary search to find correct bin. We already checked if isn't outside of bounds
-      XBinToFill = static_cast<int>(std::distance(Binning.XBinEdges.begin(),
-                                    std::upper_bound(Binning.XBinEdges.begin(), Binning.XBinEdges.end(), XVar)) - 1);
-    }
 
     //DB Fill relevant part of thread array
     if (XBinToFill != -1 && YBinToFill != -1) {
@@ -563,39 +539,9 @@ void SampleHandlerFD::FillArray_MP() {
       //The alternative would be to have inheritance based on BinningOpt
       const double XVar = (*(MCEvent->x_var));
 
-      //DB Commented out by default but if we ever want to consider shifts in theta this will be needed
-      //double YVar = MCEvent->rw_theta;
-      //ETA - this would actually be with (*(MCEvent->y_var)) and done extremely
-      //similarly to XVar now
-
       //DB Find the relevant bin in the PDF for each event
-      int XBinToFill = -1;
+      const int XBinToFill = Binning.FindXBin(XVar, MCEvent->NomXBin);
       const int YBinToFill = MCEvent->NomYBin;
-
-      //DB Check to see if momentum shift has moved bins
-      //DB - First, check to see if the event is still in the nominal bin
-      if (XVar < MCEvent->rw_upper_xbinedge && XVar >= MCEvent->rw_lower_xbinedge) {
-        XBinToFill = MCEvent->NomXBin;
-      }
-      //DB - Second, check to see if the event is outside of the binning range and skip event if it is
-      else if (XVar < Binning.XBinEdges[0] || XVar >= Binning.XBinEdges[Binning.nXBins]) {
-        continue;
-      }
-      //DB - Thirdly, check the adjacent bins first as Eb+CC+EScale shifts aren't likely to move an Erec more than 1bin width
-      //Shifted down one bin from the event bin at nominal
-      else if (XVar < MCEvent->rw_lower_xbinedge && XVar >= MCEvent->rw_lower_lower_xbinedge) {
-        XBinToFill = MCEvent->NomXBin-1;
-      }
-      //Shifted up one bin from the event bin at nominal
-      else if (XVar < MCEvent->rw_upper_upper_xbinedge && XVar >= MCEvent->rw_upper_xbinedge) {
-        XBinToFill = MCEvent->NomXBin+1;
-      }
-      //DB - If we end up in this loop, the event has been shifted outside of its nominal bin, but is still within the allowed binning range
-      else {
-        // KS: Perform binary search to find correct bin. We already checked if isn't outside of bounds
-        XBinToFill = static_cast<int>(std::distance(Binning.XBinEdges.begin(),
-                                      std::upper_bound(Binning.XBinEdges.begin(), Binning.XBinEdges.end(), XVar)) - 1);
-      }
 
       //ETA - we can probably remove this final if check on the -1?
       //Maybe we can add an overflow bin to the array and assign any events to this bin?
@@ -711,9 +657,19 @@ void SampleHandlerFD::SetupFunctionalParameters() {
         for (std::size_t iKinPar = 0; iKinPar < kinVars.size(); ++iKinPar) {
           const double kinVal = ReturnKinematicParameter(kinVars[iKinPar], static_cast<int>(iEvent));
 
-          if (kinVal <= selection[iKinPar][0] || kinVal > selection[iKinPar][1]) {
+          bool passedAnyBound = false;
+          const auto& boundsList = selection[iKinPar];
+
+          for (const auto& bounds : boundsList) {
+            if (kinVal > bounds[0] && kinVal <= bounds[1]) {
+              passedAnyBound = true;
+              break;
+            }
+          }
+
+          if (!passedAnyBound) {
             MACH3LOG_TRACE("Event {}, missed kinematic check ({}) for dial {}",
-                            iEvent, kinVars[iKinPar], (*it).name);
+                           iEvent, kinVars[iKinPar], (*it).name);
             IsSelected = false;
             break;
           }
@@ -870,9 +826,19 @@ void SampleHandlerFD::CalcNormsBins(std::vector<NormParameter>& norm_parameters,
           const auto& selection = (*it).Selection;
 
           for (std::size_t iKinPar = 0; iKinPar < kinVars.size(); ++iKinPar) {
-            const double kinVal = ReturnKinematicParameter(kinVars[iKinPar], iEvent);
+            const double kinVal = ReturnKinematicParameter(kinVars[iKinPar], static_cast<int>(iEvent));
 
-            if (kinVal <= selection[iKinPar][0] || kinVal > selection[iKinPar][1]) {
+            bool passedAnyBound = false;
+            const auto& boundsList = selection[iKinPar];
+
+            for (const auto& bounds : boundsList) {
+              if (kinVal > bounds[0] && kinVal <= bounds[1]) {
+                passedAnyBound = true;
+                break;
+              }
+            }
+
+            if (!passedAnyBound) {
               MACH3LOG_TRACE("Event {}, missed kinematic check ({}) for dial {}",
                              iEvent, kinVars[iKinPar], (*it).name);
               IsSelected = false;
@@ -992,7 +958,6 @@ void SampleHandlerFD::Set1DBinning(size_t nbins, double low, double high)
 }
 
 void SampleHandlerFD::FindNominalBinAndEdges1D() {
-  //Set rw_pdf_bin and rw_upper_xbinedge and rw_lower_xbinedge for each skmc_base
   for(unsigned int event_i = 0; event_i < GetNEvents(); event_i++){
     //Set x_var and y_var values based on XVarStr and YVarStr
     MCSamples[event_i].x_var = GetPointerToKinematicParameter(XVarStr, event_i);
@@ -1000,38 +965,41 @@ void SampleHandlerFD::FindNominalBinAndEdges1D() {
     MCSamples[event_i].y_var = &(M3::_BAD_DOUBLE_);
     int bin = _hPDF1D->FindBin(*(MCSamples[event_i].x_var));
 
-    double low_lower_edge = M3::_DEFAULT_RETURN_VAL_;
-    if (bin == 0) {
-      low_lower_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin);
-    } else {
-      low_lower_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin-1);
-    }
-
-    double low_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin);
-    double upper_edge = _hPDF1D->GetXaxis()->GetBinUpEdge(bin);
-
-    double upper_upper_edge = M3::_DEFAULT_RETURN_VAL_;
-    if (bin<(_hPDF1D->GetNbinsX()-2)) {
-      upper_upper_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin+2);
-    } else {
-      upper_upper_edge = _hPDF1D->GetXaxis()->GetBinLowEdge(bin+1);
-    }
-
     if ((bin-1) >= 0 && (bin-1) < int(Binning.XBinEdges.size()-1)) {
       MCSamples[event_i].NomXBin = bin-1;
     } else {
       MCSamples[event_i].NomXBin = -1;
-      low_edge = M3::_DEFAULT_RETURN_VAL_;
-      upper_edge = M3::_DEFAULT_RETURN_VAL_;
-      low_lower_edge = M3::_DEFAULT_RETURN_VAL_;
-      upper_upper_edge = M3::_DEFAULT_RETURN_VAL_;
+    }
+    MCSamples[event_i].NomYBin = 0;
+  }
+
+  Binning.rw_lower_xbinedge.resize(Binning.nXBins);
+  Binning.rw_lower_lower_xbinedge.resize(Binning.nXBins);
+  Binning.rw_upper_xbinedge.resize(Binning.nXBins);
+  Binning.rw_upper_upper_xbinedge.resize(Binning.nXBins);
+  //Set rw_pdf_bin and rw_upper_xbinedge and rw_lower_xbinedge for each skmc_base
+  for(size_t bin_x = 0; bin_x < Binning.nXBins; bin_x++){
+    double low_lower_edge = M3::_DEFAULT_RETURN_VAL_;
+    double low_edge = Binning.XBinEdges[bin_x];
+    double upper_edge = Binning.XBinEdges[bin_x+1];
+    double upper_upper_edge = M3::_DEFAULT_RETURN_VAL_;
+
+    if (bin_x == 0) {
+      low_lower_edge = Binning.XBinEdges[0];
+    } else {
+      low_lower_edge = Binning.XBinEdges[bin_x-1];
     }
 
-    MCSamples[event_i].NomYBin = 0;
-    MCSamples[event_i].rw_lower_xbinedge = low_edge;
-    MCSamples[event_i].rw_upper_xbinedge = upper_edge;
-    MCSamples[event_i].rw_lower_lower_xbinedge = low_lower_edge;
-    MCSamples[event_i].rw_upper_upper_xbinedge = upper_upper_edge;
+    if (bin_x + 2 < Binning.nXBins) {
+      upper_upper_edge = Binning.XBinEdges[bin_x + 2];
+    } else if (bin_x + 1 < Binning.nXBins) {
+      upper_upper_edge = Binning.XBinEdges[bin_x + 1];
+    }
+
+    Binning.rw_lower_xbinedge[bin_x] = low_edge;
+    Binning.rw_upper_xbinedge[bin_x] = upper_edge;
+    Binning.rw_lower_lower_xbinedge[bin_x] = low_lower_edge;
+    Binning.rw_upper_upper_xbinedge[bin_x] = upper_upper_edge;
   }
 }
 
@@ -1088,8 +1056,7 @@ void SampleHandlerFD::Set2DBinning(size_t nbins1, double low1, double high1, siz
 // ************************************************
 void SampleHandlerFD::FindNominalBinAndEdges2D() {
 // ************************************************
-  //Set rw_pdf_bin and rw_upper_xbinedge and rw_lower_xbinedge for each skmc_base
-  for(unsigned int event_i = 0 ; event_i < GetNEvents(); event_i++){
+  for(unsigned int event_i = 0 ; event_i < GetNEvents(); event_i++) {
     //Set x_var and y_var values based on XVarStr and YVarStr
     MCSamples[event_i].x_var = GetPointerToKinematicParameter(XVarStr, event_i);
     MCSamples[event_i].y_var = GetPointerToKinematicParameter(YVarStr, event_i);
@@ -1101,42 +1068,43 @@ void SampleHandlerFD::FindNominalBinAndEdges2D() {
     int bin_y = M3::_BAD_INT_;
     int bin_z = M3::_BAD_INT_;
     _hPDF2D->GetBinXYZ(bin, bin_x, bin_y, bin_z);
-    //erec is the x-axis so get GetXaxis then find the bin edges using the x bin number
-
-    double low_lower_edge = M3::_DEFAULT_RETURN_VAL_;
-    if (bin == 0) {
-      low_lower_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x);
-    } else {
-      low_lower_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x-1);
-    }
-
-    double low_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x);
-    double upper_edge = _hPDF2D->GetXaxis()->GetBinUpEdge(bin_x);
-
-    double upper_upper_edge = M3::_DEFAULT_RETURN_VAL_;
-    if (bin<(_hPDF2D->GetNbinsX()-2)) {
-      upper_upper_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x+2);
-    } else {
-      upper_upper_edge = _hPDF2D->GetXaxis()->GetBinLowEdge(bin_x+1);
-    }
 
     if ((bin_x-1) >= 0 && (bin_x-1) < int(Binning.XBinEdges.size()-1)) {
       MCSamples[event_i].NomXBin = bin_x-1;
-    } else {
-      MCSamples[event_i].NomXBin = -1;
-      low_edge = M3::_DEFAULT_RETURN_VAL_;
-      upper_edge = M3::_DEFAULT_RETURN_VAL_;
-      low_lower_edge = M3::_DEFAULT_RETURN_VAL_;
-      upper_upper_edge = M3::_DEFAULT_RETURN_VAL_;
     }
     MCSamples[event_i].NomYBin = bin_y-1;
     if(MCSamples[event_i].NomYBin < 0){
-      MACH3LOG_INFO("Nominal YBin PROBLEM, y-bin is {}", MCSamples[event_i].NomYBin);
+      MACH3LOG_WARN("Nominal YBin PROBLEM, y-bin is {}", MCSamples[event_i].NomYBin);
     }
-    MCSamples[event_i].rw_lower_xbinedge = low_edge;
-    MCSamples[event_i].rw_upper_xbinedge = upper_edge;
-    MCSamples[event_i].rw_lower_lower_xbinedge = low_lower_edge;
-    MCSamples[event_i].rw_upper_upper_xbinedge = upper_upper_edge;
+  }
+
+  Binning.rw_lower_xbinedge.resize(Binning.nXBins);
+  Binning.rw_lower_lower_xbinedge.resize(Binning.nXBins);
+  Binning.rw_upper_xbinedge.resize(Binning.nXBins);
+  Binning.rw_upper_upper_xbinedge.resize(Binning.nXBins);
+  //Set rw_pdf_bin and rw_upper_xbinedge and rw_lower_xbinedge for each skmc_base
+  for(size_t bin_x = 0; bin_x < Binning.nXBins; bin_x++){
+    double low_lower_edge = M3::_DEFAULT_RETURN_VAL_;
+    double low_edge = Binning.XBinEdges[bin_x];
+    double upper_edge = Binning.XBinEdges[bin_x+1];
+    double upper_upper_edge = M3::_DEFAULT_RETURN_VAL_;
+
+    if (bin_x == 0) {
+      low_lower_edge = Binning.XBinEdges[0];
+    } else {
+      low_lower_edge = Binning.XBinEdges[bin_x-1];
+    }
+
+    if (bin_x + 2 < Binning.nXBins) {
+      upper_upper_edge = Binning.XBinEdges[bin_x + 2];
+    } else if (bin_x + 1 < Binning.nXBins) {
+      upper_upper_edge = Binning.XBinEdges[bin_x + 1];
+    }
+
+    Binning.rw_lower_xbinedge[bin_x] = low_edge;
+    Binning.rw_upper_xbinedge[bin_x] = upper_edge;
+    Binning.rw_lower_lower_xbinedge[bin_x] = low_lower_edge;
+    Binning.rw_upper_upper_xbinedge[bin_x] = upper_upper_edge;
   }
 }
 
@@ -1483,6 +1451,41 @@ void SampleHandlerFD::InitialiseSingleFDMCObject() {
   MCSamples.resize(nEvents);
 }
 
+
+// ************************************************
+void SampleHandlerFD::SaveAdditionalInfo(TDirectory* Dir) {
+// ************************************************
+  Dir->cd();
+
+  YAML::Node Config = SampleManager->raw();
+  TMacro ConfigSave = YAMLtoTMacro(Config, (std::string("Config_") + GetTitle()));
+  ConfigSave.Write();
+
+  std::unique_ptr<TH1> data_hist;
+
+  if (GetNDim() == 1) {
+    data_hist = M3::Clone<TH1D>(dynamic_cast<TH1D*>(GetDataHist(1)), "data_" + GetTitle());
+    data_hist->GetXaxis()->SetTitle(XVarStr.c_str());
+    data_hist->GetYaxis()->SetTitle("Number of Events");
+  } else if (GetNDim() == 2) {
+    data_hist = M3::Clone<TH2D>(dynamic_cast<TH2D*>(GetDataHist(2)), "data_" + GetTitle());
+    data_hist->GetXaxis()->SetTitle(XVarStr.c_str());
+    data_hist->GetYaxis()->SetTitle(YVarStr.c_str());
+    data_hist->GetZaxis()->SetTitle("Number of Events");
+  } else {
+    MACH3LOG_ERROR("Not implemented");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  if (!data_hist) {
+    MACH3LOG_ERROR("nullptr data hist :(");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  data_hist->SetTitle(("data_" + GetTitle()).c_str());
+  data_hist->Write();
+}
+
 void SampleHandlerFD::InitialiseSplineObject() {
   std::vector<std::string> spline_filepaths;
   for(unsigned iChannel = 0 ; iChannel < OscChannels.size() ; iChannel++){
@@ -1700,7 +1703,7 @@ void SampleHandlerFD::Fill2DSubEventHist(TH2D* _h2DVar, const std::string& Proje
 
 // ************************************************
 int SampleHandlerFD::ReturnKinematicParameterFromString(const std::string& KinematicParameterStr) const {
-  // ************************************************
+// ************************************************
   auto it = KinematicParameters->find(KinematicParameterStr);
   if (it != KinematicParameters->end()) return it->second;
 
@@ -1712,7 +1715,7 @@ int SampleHandlerFD::ReturnKinematicParameterFromString(const std::string& Kinem
 
 // ************************************************
 std::string SampleHandlerFD::ReturnStringFromKinematicParameter(const int KinematicParameter) const {
-  // ************************************************
+// ************************************************
   auto it = ReversedKinematicParameters->find(KinematicParameter);
   if (it != ReversedKinematicParameters->end()) {
     return it->second;
@@ -1727,7 +1730,7 @@ std::string SampleHandlerFD::ReturnStringFromKinematicParameter(const int Kinema
 // === JM define KinematicVector-to-string mapping functions  ===
 // ************************************************
 int SampleHandlerFD::ReturnKinematicVectorFromString(const std::string& KinematicVectorStr) const {
-  // ************************************************
+// ************************************************
   auto it = KinematicVectors->find(KinematicVectorStr);
   if (it != KinematicVectors->end()) return it->second;
 
@@ -1739,7 +1742,7 @@ int SampleHandlerFD::ReturnKinematicVectorFromString(const std::string& Kinemati
 
 // ************************************************
 std::string SampleHandlerFD::ReturnStringFromKinematicVector(const int KinematicVector) const {
-  // ************************************************
+// ************************************************
   auto it = ReversedKinematicVectors->find(KinematicVector);
   if (it != ReversedKinematicVectors->end()) {
     return it->second;
@@ -1750,6 +1753,41 @@ std::string SampleHandlerFD::ReturnStringFromKinematicVector(const int Kinematic
 
   return "";
 }
+
+// ************************************************
+std::vector<double> SampleHandlerFD::ReturnKinematicParameterBinning(const std::string& KinematicParameter) {
+// ************************************************
+  // If x or y variable return used binning
+  if(KinematicParameter == XVarStr) {
+    return Binning.XBinEdges;
+  } else if (KinematicParameter == YVarStr) {
+    return Binning.YBinEdges;
+  }
+
+  auto MakeBins = [](int nBins) {
+    std::vector<double> bins(nBins + 1);
+    for (int i = 0; i <= nBins; ++i)
+      bins[i] = static_cast<double>(i) - 0.5;
+    return bins;
+  };
+
+  if (KinematicParameter == "OscillationChannel") {
+    return MakeBins(GetNOscChannels());
+  } else if (KinematicParameter == "Mode") {
+    return MakeBins(Modes->GetNModes());
+  }
+
+  // We first check if binning for a sample has been specified
+  auto BinningConfig = M3OpenConfig(SampleManager->raw()["BinningFile"].as<std::string>());
+  if(BinningConfig[GetTitle()] && BinningConfig[GetTitle()][KinematicParameter]){
+    auto BinningVect = Get<std::vector<double>>(BinningConfig[GetTitle()][KinematicParameter], __FILE__, __LINE__);
+    return BinningVect;
+  } else {
+    auto BinningVect = Get<std::vector<double>>(BinningConfig[KinematicParameter], __FILE__, __LINE__);
+    return BinningVect;
+  }
+}
+
 
 bool SampleHandlerFD::IsSubEventVarString(const std::string& VarStr) {
   if (KinematicVectors == nullptr) return false;

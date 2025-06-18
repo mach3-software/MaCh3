@@ -224,7 +224,7 @@ class MCMCProcessor {
     /// @brief Get the vector of branch names from root file
     const std::vector<TString>& GetBranchNames() const { return BranchNames;};
     /// @brief Get properties of parameter by passing it number
-    void GetNthParameter(const int param, double &Prior, double &PriorError, TString &Title);
+    void GetNthParameter(const int param, double &Prior, double &PriorError, TString &Title) const;
     /// @brief Get parameter number based on name
     int GetParamIndexFromName(const std::string& Name);
     /// @brief Get Number of entries that Chain has, for merged chains will not be the same Nsteps

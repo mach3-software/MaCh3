@@ -57,6 +57,8 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   //Create TDirectory
   CovFolder = outputFile->mkdir("CovarianceFolder");
   outputFile->cd();
+  SampleFolder = outputFile->mkdir("SampleFolder");
+  outputFile->cd();
 
   #ifdef DEBUG
   // Prepare the output log file
@@ -139,7 +141,8 @@ void FitterBase::SaveSettings() {
 
   //TN: Have to close the folder in order to write it to disk before SaveOutput is called in the destructor
   CovFolder->Close();
-  
+  SampleFolder->Close();
+
   SettingsSaved = true;
 }
 
@@ -249,10 +252,14 @@ void FitterBase::AddSampleHandler(SampleHandlerBase * const sample) {
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   }
+  // Save additional info from samples
+  SampleFolder->cd();
 
+  sample->SaveAdditionalInfo(SampleFolder);
   TotalNSamples += sample->GetNsamples();
   MACH3LOG_INFO("Adding {} object, with {} samples", sample->GetTitle(), sample->GetNsamples());
   samples.push_back(sample);
+  outputFile->cd();
 }
 
 // *************************
