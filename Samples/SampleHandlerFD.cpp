@@ -157,10 +157,10 @@ void SampleHandlerFD::ReadSampleConfig()
 
     OscChannels.push_back(std::move(OscInfo));
 
-
     FileToInitPDGMap[MTupleFileName] = static_cast<NuPDG>(osc_channel["nutype"].as<int>());
     FileToFinalPDGMap[MTupleFileName] = static_cast<NuPDG>(osc_channel["oscnutype"].as<int>());
 
+    mc_files.push_back(MTupleFileName);
     spline_files.push_back(splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);
   }
 
