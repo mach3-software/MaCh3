@@ -378,9 +378,6 @@ public:
   std::vector<std::string> spline_files;
 
   std::unordered_map<std::string, double> _modeNomWeightMap;
-
-  std::unordered_map<std::string, NuPDG> FileToInitPDGMap;
-  std::unordered_map<std::string, NuPDG> FileToFinalPDGMap;
   
   //===============================================================================
   /// DB Miscellaneous Variables
@@ -398,4 +395,12 @@ public:
   // binned PDFs
   TH1D* _hPDF1D;
   TH2D* _hPDF2D;
+
+  NuPDG GetInitPDGFromFileName(std::string FileName) {return FileToInitPDGMap.at(FileName);}
+  NuPDG GetFinalPDGFromFileName(std::string FileName) {return FileToFinalPDGMap.at(FileName);}
+
+private:
+  std::unordered_map<std::string, NuPDG> FileToInitPDGMap;
+  std::unordered_map<std::string, NuPDG> FileToFinalPDGMap;
+  
 };
