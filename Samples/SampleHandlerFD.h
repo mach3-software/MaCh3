@@ -396,8 +396,8 @@ public:
   TH1D* _hPDF1D;
   TH2D* _hPDF2D;
 
-  NuPDG GetInitPDGFromFileName(std::string FileName) {return FileToInitPDGMap.at(FileName);}
-  NuPDG GetFinalPDGFromFileName(std::string FileName) {return FileToFinalPDGMap.at(FileName);}
+  NuPDG GetInitPDGFromFileName(const std::string& FileName) {return FileToInitPDGMap.at(FileName);}
+  NuPDG GetFinalPDGFromFileName(const std::string& FileName) {return FileToFinalPDGMap.at(FileName);}
 
 private:
   std::unordered_map<std::string, NuPDG> FileToInitPDGMap;
