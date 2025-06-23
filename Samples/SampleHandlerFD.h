@@ -378,6 +378,9 @@ public:
   std::vector<std::string> spline_files;
 
   std::unordered_map<std::string, double> _modeNomWeightMap;
+
+  std::unordered_map<std::string, NuPDG> FileToInitPDGMap;
+  std::unordered_map<std::string, NuPDG> FileToFinalPDGMap;
   
   //===============================================================================
   /// DB Miscellaneous Variables
