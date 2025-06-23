@@ -145,6 +145,8 @@ void SampleHandlerFD::ReadSampleConfig()
   OscChannels.reserve(NChannels);
 
   for (auto const &osc_channel : SampleManager->raw()["SubSamples"]) {
+    std::string MTupleFileName = mtupleprefix+osc_channel["mtuplefile"].as<std::string>()+mtuplesuffix;
+    
     OscChannelInfo OscInfo;
     OscInfo.flavourName       = osc_channel["Name"].as<std::string>();
     OscInfo.flavourName_Latex = osc_channel["LatexName"].as<std::string>();
@@ -152,9 +154,13 @@ void SampleHandlerFD::ReadSampleConfig()
     OscInfo.FinalPDG          = static_cast<NuPDG>(osc_channel["oscnutype"].as<int>());
     OscInfo.ChannelIndex      = static_cast<int>(OscChannels.size());
 
+
     OscChannels.push_back(std::move(OscInfo));
 
-    mc_files.push_back(mtupleprefix+osc_channel["mtuplefile"].as<std::string>()+mtuplesuffix);
+    FileToInitPDGMap[MTupleFileName] = static_cast<NuPDG>(osc_channel["nutype"].as<int>());
+    FileToFinalPDGMap[MTupleFileName] = static_cast<NuPDG>(osc_channel["oscnutype"].as<int>());
+
+    mc_files.push_back(MTupleFileName);
     spline_files.push_back(splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);
   }
 
