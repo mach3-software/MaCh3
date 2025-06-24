@@ -296,6 +296,12 @@ void ParameterHandlerBase::Init(const std::vector<std::string>& YAMLFile) {
 // ********************************************
 void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const int Index){
 // ********************************************
+  // If parameter is fixed do not enable special proposal to avoid situation where we switch mass ordering for example if it is fixed
+  if(IsParameterFixed(Index)) {
+    MACH3LOG_DEBUG("Parameter {} is fixed, therefore will not apply Special proposal", GetParName(Index));
+    return;
+  }
+
   doSpecialStepProposal = true;
 
   bool CircEnabled = false;
