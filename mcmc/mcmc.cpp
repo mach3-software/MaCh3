@@ -82,9 +82,9 @@ void mcmc::runMCMC() {
   multicanonical = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["Multicanonical"],false);
   MACH3LOG_INFO("Multicanonical Method: {}", multicanonical);
 
-  multicanonicalSpline = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["MulticanonicalSpline"],false);
-
   if (multicanonical) {
+
+    multicanonicalSpline = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["MulticanonicalSpline"],false);
 
     if (multicanonicalSpline){
       std::string splineFile = GetFromManager<std::string>(fitMan->raw()["General"]["MCMC"]["MulticanonicalSplineFile"],"nofile");
@@ -138,6 +138,8 @@ void mcmc::runMCMC() {
     }
   }
 
+  }
+  
   // Save the settings into the output file
   SaveSettings();
 
@@ -187,7 +189,6 @@ void mcmc::runMCMC() {
 
   // Process MCMC
   ProcessMCMC();
-}
 }
 
 // *******************
@@ -303,10 +304,10 @@ inline double mcmc::GetMulticanonicalWeightSpline(double deltacp, TSpline3 *spli
 
   if (delm23 < 0){
     dcp_spline_val = spline_IO->Eval(deltacp);
-    return -2*(-std::log(dcp_spline_val)+std::log(spline_IO->Eval(-TMath::Pi()/2)));
+    return -(-std::log(dcp_spline_val)+std::log(spline_IO->Eval(-TMath::Pi()/2))); // do I want this offset?? does it matter?
   } else {
     dcp_spline_val = spline_NO->Eval(deltacp);
-    return -2*(-std::log(dcp_spline_val)+std::log(spline_NO->Eval(-TMath::Pi()/2)));
+    return -(-std::log(dcp_spline_val)+std::log(spline_NO->Eval(-TMath::Pi()/2)));
   }
   // std::cout << "Evaluating spline at delta_cp = " << deltacp << " gives value " << dcp_spline_val << "with -log lh of :" << -log(dcp_spline_val) << std::endl;
 }
