@@ -971,6 +971,11 @@ void SampleHandlerFD::FindNominalBinAndEdges1D() {
   for(unsigned int event_i = 0; event_i < GetNEvents(); event_i++){
     //Set x_var and y_var values based on XVarStr and YVarStr
     MCSamples[event_i].x_var = GetPointerToKinematicParameter(XVarStr, event_i);
+    if (std::isnan(*MCSamples[event_i].x_var) || std::isinf(*MCSamples[event_i].x_var)) {
+      MACH3LOG_ERROR("X var for event {} is ill-defined and equal to {}", event_i, *MCSamples[event_i].x_var);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+
     //Give y_var M3::_BAD_DOUBLE_ value for the 1D case since this won't be used
     MCSamples[event_i].y_var = &(M3::_BAD_DOUBLE_);
     int bin = _hPDF1D->FindBin(*(MCSamples[event_i].x_var));
@@ -1053,6 +1058,14 @@ void SampleHandlerFD::FindNominalBinAndEdges2D() {
     MCSamples[event_i].x_var = GetPointerToKinematicParameter(XVarStr, event_i);
     MCSamples[event_i].y_var = GetPointerToKinematicParameter(YVarStr, event_i);
 
+    if (std::isnan(*MCSamples[event_i].x_var) || std::isinf(*MCSamples[event_i].x_var)) {
+      MACH3LOG_ERROR("X var for event {} is ill-defined and equal to {}", event_i, *MCSamples[event_i].x_var);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    if (std::isnan(*MCSamples[event_i].y_var) || std::isinf(*MCSamples[event_i].y_var)) {
+      MACH3LOG_ERROR("Y var for event {} is ill-defined and equal to {}", event_i, *MCSamples[event_i].y_var);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
     //Global bin number
     int bin = _hPDF2D->FindBin(*(MCSamples[event_i].x_var), *(MCSamples[event_i].y_var));
 
