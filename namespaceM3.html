@@ -186,6 +186,9 @@ Variables</h2></td></tr>
 <tr class="memitem:aaf4ba720c8ab2982beaa3c243aee1b98"><td class="memItemLeft" align="right" valign="top">static constexpr const double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#aaf4ba720c8ab2982beaa3c243aee1b98">_LARGE_LOGL_</a> = 1234567890.0</td></tr>
 <tr class="memdesc:aaf4ba720c8ab2982beaa3c243aee1b98"><td class="mdescLeft">&#160;</td><td class="mdescRight">Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such step should be removed.  <br /></td></tr>
 <tr class="separator:aaf4ba720c8ab2982beaa3c243aee1b98"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a88e0a86bf059e7ced9ec9717dd9da133"><td class="memItemLeft" align="right" valign="top">static constexpr const double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#a88e0a86bf059e7ced9ec9717dd9da133">_LOW_MC_BOUND_</a> = .00001</td></tr>
+<tr class="memdesc:a88e0a86bf059e7ced9ec9717dd9da133"><td class="mdescLeft">&#160;</td><td class="mdescRight">MC prediction lower bound in bin to identify problematic binning definitions and handle LogL calculation.  <br /></td></tr>
+<tr class="separator:a88e0a86bf059e7ced9ec9717dd9da133"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a058de9d83e6afc416781469031c1aba5"><td class="memItemLeft" align="right" valign="top">static constexpr const double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#a058de9d83e6afc416781469031c1aba5">DefSplineKnotUpBound</a> = 9999</td></tr>
 <tr class="memdesc:a058de9d83e6afc416781469031c1aba5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default value for spline knot capping, default mean not capping is being applied.  <br /></td></tr>
 <tr class="separator:a058de9d83e6afc416781469031c1aba5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1391,6 +1394,32 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
+<a id="a88e0a86bf059e7ced9ec9717dd9da133" name="a88e0a86bf059e7ced9ec9717dd9da133"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a88e0a86bf059e7ced9ec9717dd9da133">&#9670;&#160;</a></span>_LOW_MC_BOUND_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr const double M3::_LOW_MC_BOUND_ = .00001</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>MC prediction lower bound in bin to identify problematic binning definitions and handle LogL calculation. </p>
+
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00073">73</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+
+</div>
+</div>
 <a id="a1aeda1bb6057e3f765d6d919246376e0" name="a1aeda1bb6057e3f765d6d919246376e0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1aeda1bb6057e3f765d6d919246376e0">&#9670;&#160;</a></span>DefSplineKnotLowBound</h2>
 
@@ -1413,7 +1442,7 @@ template&lt;typename T &gt; </div>
 
 <p>Default value for spline knot capping, default mean not capping is being applied. </p>
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00075">75</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00078">78</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -1439,7 +1468,7 @@ template&lt;typename T &gt; </div>
 
 <p>Default value for spline knot capping, default mean not capping is being applied. </p>
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00073">73</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00076">76</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>

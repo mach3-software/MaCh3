@@ -110,7 +110,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:gac0cfbc3d13eafd3b5687ff739b862b80"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate test statistic for a single bin using Poisson.  <br /></td></tr>
 <tr class="separator:gac0cfbc3d13eafd3b5687ff739b862b80"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga527307a4186e2eb61475ea975108aa65"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#ga527307a4186e2eb61475ea975108aa65">SampleHandlerBase::GetTestStatLLH</a> (const double data, const double mc, const double w2) const</td></tr>
-<tr class="memdesc:ga527307a4186e2eb61475ea975108aa65"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate test statistic for a single bin. Calculation depends on setting of fTestStatistic.  <br /></td></tr>
+<tr class="memdesc:ga527307a4186e2eb61475ea975108aa65"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate test statistic for a single bin. Calculation depends on setting of fTestStatistic. Data and mc -&gt; 0 cut-offs are defined in <a class="el" href="namespaceM3.html">M3</a>::<em>LOW_MC_BOUND</em>.  <br /></td></tr>
 <tr class="separator:ga527307a4186e2eb61475ea975108aa65"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga1c81b6b7a7e70b04c6c6ca1c81c70fc5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#ga1c81b6b7a7e70b04c6c6ca1c81c70fc5">SampleHandlerBase::SetTestStatistic</a> (<a class="el" href="SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67">TestStatistic</a> testStat)</td></tr>
 <tr class="memdesc:ga1c81b6b7a7e70b04c6c6ca1c81c70fc5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the test statistic to be used when calculating the binned likelihoods.  <br /></td></tr>
@@ -438,7 +438,7 @@ Functions</h2></td></tr>
 <div class="line"><span class="lineno"> 1846</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00025">MaCh3Logger.h:25</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00013">MaCh3Exception.h:13</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a2f86c6158b755b9d2d400415ccac45f2"><div class="ttname"><a href="classSampleHandlerBase.html#a2f86c6158b755b9d2d400415ccac45f2">SampleHandlerBase::Modes</a></div><div class="ttdeci">std::unique_ptr&lt; MaCh3Modes &gt; Modes</div><div class="ttdoc">Holds information about used Generator and MaCh3 modes.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00123">SampleHandlerBase.h:123</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a2f86c6158b755b9d2d400415ccac45f2"><div class="ttname"><a href="classSampleHandlerBase.html#a2f86c6158b755b9d2d400415ccac45f2">SampleHandlerBase::Modes</a></div><div class="ttdeci">std::unique_ptr&lt; MaCh3Modes &gt; Modes</div><div class="ttdoc">Holds information about used Generator and MaCh3 modes.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00131">SampleHandlerBase.h:131</a></div></div>
 <div class="ttc" id="agroup__SampleHandlerGetters_html_ga39870e48ee550ce8902ccd62b2311a57"><div class="ttname"><a href="group__SampleHandlerGetters.html#ga39870e48ee550ce8902ccd62b2311a57">SampleHandlerFD::Get1DVarHist</a></div><div class="ttdeci">TH1 * Get1DVarHist(const std::string &amp;ProjectionVar, const std::vector&lt; KinematicCut &gt; &amp;EventSelectionVec=std::vector&lt; KinematicCut &gt;(), int WeightStyle=0, TAxis *Axis=nullptr, const std::vector&lt; KinematicCut &gt; &amp;SubEventSelectionVec=std::vector&lt; KinematicCut &gt;())</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8cpp_source.html#l01509">SampleHandlerFD.cpp:1509</a></div></div>
 <div class="ttc" id="agroup__SampleHandlerGetters_html_ga72d58e162b82d2fe895087d91c07c0a2"><div class="ttname"><a href="group__SampleHandlerGetters.html#ga72d58e162b82d2fe895087d91c07c0a2">SampleHandlerFD::GetNOscChannels</a></div><div class="ttdeci">int GetNOscChannels()</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00080">SampleHandlerFD.h:80</a></div></div>
 <div class="ttc" id="astructKinematicCut_html"><div class="ttname"><a href="structKinematicCut.html">KinematicCut</a></div><div class="ttdoc">KS: Small struct used for applying kinematic cuts.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00157">SampleStructs.h:157</a></div></div>
@@ -878,7 +878,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00060">60</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   60</span>{<span class="keywordflow">return</span> <a class="code hl_variable" href="classSampleHandlerBase.html#ab497b52d94868283a8a7cedbd1a4d777">nEvents</a>;}</div>
-<div class="ttc" id="aclassSampleHandlerBase_html_ab497b52d94868283a8a7cedbd1a4d777"><div class="ttname"><a href="classSampleHandlerBase.html#ab497b52d94868283a8a7cedbd1a4d777">SampleHandlerBase::nEvents</a></div><div class="ttdeci">unsigned int nEvents</div><div class="ttdoc">Number of MC events are there.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00120">SampleHandlerBase.h:120</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_ab497b52d94868283a8a7cedbd1a4d777"><div class="ttname"><a href="classSampleHandlerBase.html#ab497b52d94868283a8a7cedbd1a4d777">SampleHandlerBase::nEvents</a></div><div class="ttdeci">unsigned int nEvents</div><div class="ttdoc">Number of MC events are there.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00128">SampleHandlerBase.h:128</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -907,7 +907,7 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00062">62</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   62</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classSampleHandlerBase.html#aa7a13af22c2314c718fb6438d493d3d1">nSamples</a>; }</div>
-<div class="ttc" id="aclassSampleHandlerBase_html_aa7a13af22c2314c718fb6438d493d3d1"><div class="ttname"><a href="classSampleHandlerBase.html#aa7a13af22c2314c718fb6438d493d3d1">SampleHandlerBase::nSamples</a></div><div class="ttdeci">M3::int_t nSamples</div><div class="ttdoc">Contains how many samples we've got.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00117">SampleHandlerBase.h:117</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_aa7a13af22c2314c718fb6438d493d3d1"><div class="ttname"><a href="classSampleHandlerBase.html#aa7a13af22c2314c718fb6438d493d3d1">SampleHandlerBase::nSamples</a></div><div class="ttdeci">M3::int_t nSamples</div><div class="ttdoc">Contains how many samples we've got.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00125">SampleHandlerBase.h:125</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1134,8 +1134,8 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Calculate test statistic for a single bin. Calculation depends on setting of fTestStatistic. </p>
-<dl class="params"><dt>Parameters</dt><dd>
+<p>Calculate test statistic for a single bin. Calculation depends on setting of fTestStatistic. Data and mc -&gt; 0 cut-offs are defined in <a class="el" href="namespaceM3.html">M3</a>::<em>LOW_MC_BOUND</em>. </p>
+<p>Implemented fTestStatistic are kPoisson (with Stirling's approx.), kBarlowBeeston (arXiv:1103.0354), kDembinskiAbdelmotteleb (arXiv:2206.12346), kIceCube (arxiv:1901.04645), and kPearson. Test statistics require mc &gt; 0, therefore low mc and data values are treated with cut-offs based on <a class="el" href="namespaceM3.html">M3</a>::<em>LOW_MC_BOUND</em> = .00001 by default. For kPoisson, kBarlowBeeston, kDembinskiAbdelmotteleb, kPearson: data &gt; <em>LOW_MC_BOUND</em> &amp; mc &lt;= <em>LOW_MC_BOUND</em>: returns GetTestStatLLH(data, <em>LOW_MC_BOUND</em>, w2), with Poisson(data,<em>LOW_MC_BOUND</em>) limit for mc-&gt;0, w2-&gt;0. mc &lt; data &lt;= <em>LOW_MC_BOUND</em>: returns 0 (as if any data &lt;= <em>LOW_MC_BOUND</em> were effectively consistent with 0 data count), with a limit of 0 for mc-&gt;0. data = 0: returns mc (or mc/2. for kPearson), with a limit of 0 for mc-&gt;0. For kIceCube: mc &lt; data returns the lower of IceCube(data,mc,w2) and Poisson(data,mc) penalties, with a Poisson(data,<em>LOW_MC_BOUND</em>) limit for mc-&gt;0, w2-&gt;0. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">data</td><td>is data </td></tr>
     <tr><td class="paramname">mc</td><td>is mc </td></tr>
@@ -1147,55 +1147,55 @@ Functions</h2></td></tr>
 <p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8cpp_source.html#l00036">36</a> of file <a class="el" href="SampleHandlerBase_8cpp_source.html">SampleHandlerBase.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   36</span>                                                                                                  {</div>
 <div class="line"><span class="lineno">   37</span><span class="comment">// *************************</span></div>
-<div class="line"><span class="lineno">   38</span>  <span class="comment">// Need some MC</span></div>
-<div class="line"><span class="lineno">   39</span>  <span class="keywordflow">if</span> (mc == 0) <span class="keywordflow">return</span> 0.0;</div>
-<div class="line"><span class="lineno">   40</span> </div>
-<div class="line"><span class="lineno">   41</span>  <span class="comment">// The MC used in the likelihood calculation</span></div>
-<div class="line"><span class="lineno">   42</span>  <span class="comment">// Is allowed to be changed by Barlow Beeston beta parameters</span></div>
-<div class="line"><span class="lineno">   43</span>  <span class="keywordtype">double</span> newmc = mc;</div>
-<div class="line"><span class="lineno">   44</span> </div>
-<div class="line"><span class="lineno">   45</span>  <span class="keywordflow">switch</span> (<a class="code hl_variable" href="classSampleHandlerBase.html#a87670dbcda5d09b09675e8f407fe3a30">fTestStatistic</a>)</div>
-<div class="line"><span class="lineno">   46</span>  {</div>
-<div class="line"><span class="lineno">   47</span>    <span class="comment">//CW: Not full Barlow-Beeston or what is referred to as &quot;light&quot;: we&#39;re not introducing any more parameters</span></div>
-<div class="line"><span class="lineno">   48</span>    <span class="comment">// Assume the MC has a Gaussian distribution around generated</span></div>
-<div class="line"><span class="lineno">   49</span>    <span class="comment">// As in https://arxiv.org/abs/1103.0354 eq 10, 11</span></div>
-<div class="line"><span class="lineno">   50</span>    <span class="comment">//CW: Calculate the Barlow-Beeston likelihood contribution from MC statistics</span></div>
-<div class="line"><span class="lineno">   51</span>    <span class="comment">// Assumes the beta scaling parameters are Gaussian distributed</span></div>
-<div class="line"><span class="lineno">   52</span>    <span class="comment">// Follows arXiv:1103.0354 section 5 and equation 8, 9, 10, 11 on page 4/5</span></div>
-<div class="line"><span class="lineno">   53</span>    <span class="comment">// Essentially solves equation 11</span></div>
-<div class="line"><span class="lineno">   54</span>    <span class="keywordflow">case</span> (<a class="code hl_enumvalue" href="SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a3c9b50397bd37ce679bbdda14f6108c4">kBarlowBeeston</a>):</div>
-<div class="line"><span class="lineno">   55</span>    {</div>
-<div class="line"><span class="lineno">   56</span>      <span class="comment">// The penalty from MC statistics using Conways approach (https://cds.cern.ch/record/1333496?)</span></div>
-<div class="line"><span class="lineno">   57</span>      <span class="keywordtype">double</span> penalty = 0;</div>
+<div class="line"><span class="lineno">   38</span>  <span class="keywordflow">switch</span> (<a class="code hl_variable" href="classSampleHandlerBase.html#a87670dbcda5d09b09675e8f407fe3a30">fTestStatistic</a>)</div>
+<div class="line"><span class="lineno">   39</span>  {</div>
+<div class="line"><span class="lineno">   40</span>    <span class="comment">//CW: Not full Barlow-Beeston or what is referred to as &quot;light&quot;: we&#39;re not introducing any more parameters</span></div>
+<div class="line"><span class="lineno">   41</span>    <span class="comment">// Assume the MC has a Gaussian distribution around generated</span></div>
+<div class="line"><span class="lineno">   42</span>    <span class="comment">// As in https://arxiv.org/abs/1103.0354 eq 10, 11</span></div>
+<div class="line"><span class="lineno">   43</span>    <span class="comment">//CW: Calculate the Barlow-Beeston likelihood contribution from MC statistics</span></div>
+<div class="line"><span class="lineno">   44</span>    <span class="comment">// Assumes the beta scaling parameters are Gaussian distributed</span></div>
+<div class="line"><span class="lineno">   45</span>    <span class="comment">// Follows arXiv:1103.0354 section 5 and equation 8, 9, 10, 11 on page 4/5</span></div>
+<div class="line"><span class="lineno">   46</span>    <span class="comment">// Essentially solves equation 11</span></div>
+<div class="line"><span class="lineno">   47</span>    <span class="keywordflow">case</span> (<a class="code hl_enumvalue" href="SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a3c9b50397bd37ce679bbdda14f6108c4">kBarlowBeeston</a>):</div>
+<div class="line"><span class="lineno">   48</span>    {</div>
+<div class="line"><span class="lineno">   49</span>      <span class="comment">// The MC used in the likelihood calculation is allowed to be changed by Barlow Beeston beta parameters</span></div>
+<div class="line"><span class="lineno">   50</span>      <span class="keywordtype">double</span> newmc = mc;</div>
+<div class="line"><span class="lineno">   51</span> </div>
+<div class="line"><span class="lineno">   52</span>      <span class="comment">// If MC falls below the low MC bound, use low MC bound for newmc</span></div>
+<div class="line"><span class="lineno">   53</span>      <span class="keywordflow">if</span> ( mc &lt; <a class="code hl_variable" href="namespaceM3.html#a88e0a86bf059e7ced9ec9717dd9da133">M3::_LOW_MC_BOUND_</a> ) {</div>
+<div class="line"><span class="lineno">   54</span>        <span class="keywordflow">if</span> ( data &gt; <a class="code hl_variable" href="namespaceM3.html#a88e0a86bf059e7ced9ec9717dd9da133">M3::_LOW_MC_BOUND_</a> ) newmc = <a class="code hl_variable" href="namespaceM3.html#a88e0a86bf059e7ced9ec9717dd9da133">M3::_LOW_MC_BOUND_</a>;</div>
+<div class="line"><span class="lineno">   55</span>        <span class="keywordflow">else</span> <span class="keywordflow">if</span> ( data &gt;= mc ) <span class="keywordflow">return</span> 0.;</div>
+<div class="line"><span class="lineno">   56</span>      }</div>
+<div class="line"><span class="lineno">   57</span>        </div>
 <div class="line"><span class="lineno">   58</span>      <span class="comment">// Barlow-Beeston uses fractional uncertainty on MC, so sqrt(sum[w^2])/mc</span></div>
-<div class="line"><span class="lineno">   59</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> fractional = std::sqrt(w2)/mc;</div>
+<div class="line"><span class="lineno">   59</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> fractional = std::sqrt( w2 ) / newmc;</div>
 <div class="line"><span class="lineno">   60</span>      <span class="comment">// fractional^2 to avoid doing same operation several times</span></div>
-<div class="line"><span class="lineno">   61</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> fractional2 = fractional*fractional;</div>
+<div class="line"><span class="lineno">   61</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> fractional2 = fractional * fractional;</div>
 <div class="line"><span class="lineno">   62</span>      <span class="comment">// b in quadratic equation</span></div>
-<div class="line"><span class="lineno">   63</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> temp = mc*fractional2-1;</div>
+<div class="line"><span class="lineno">   63</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> temp = newmc * fractional2 - 1;</div>
 <div class="line"><span class="lineno">   64</span>      <span class="comment">// b^2 - 4ac in quadratic equation</span></div>
-<div class="line"><span class="lineno">   65</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> temp2 = temp*temp + 4*data*fractional2;</div>
-<div class="line"><span class="lineno">   66</span>      <span class="keywordflow">if</span> (temp2 &lt; 0) {</div>
+<div class="line"><span class="lineno">   65</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> temp2 = temp * temp + 4 * data * fractional2;</div>
+<div class="line"><span class="lineno">   66</span>      <span class="keywordflow">if</span> ( temp2 &lt; 0 ) {</div>
 <div class="line"><span class="lineno">   67</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Negative square root in Barlow Beeston coefficient calculation!&quot;</span>);</div>
 <div class="line"><span class="lineno">   68</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
 <div class="line"><span class="lineno">   69</span>      }</div>
 <div class="line"><span class="lineno">   70</span>      <span class="comment">// Solve for the positive beta</span></div>
-<div class="line"><span class="lineno">   71</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> beta = (-1*temp+sqrt(temp2))/2.;</div>
-<div class="line"><span class="lineno">   72</span>      newmc = mc*beta;</div>
-<div class="line"><span class="lineno">   73</span>      <span class="comment">// And penalise the movement in beta relative the mc uncertainty</span></div>
-<div class="line"><span class="lineno">   74</span>      <span class="keywordflow">if</span> (fractional &gt; 0) penalty = (beta-1)*(beta-1)/(2*fractional2);</div>
-<div class="line"><span class="lineno">   75</span>      <span class="keywordflow">else</span> penalty = 0;</div>
-<div class="line"><span class="lineno">   76</span> </div>
-<div class="line"><span class="lineno">   77</span>      <span class="comment">// Calculate the new Poisson likelihood</span></div>
-<div class="line"><span class="lineno">   78</span>      <span class="comment">// For Barlow-Beeston newmc is modified, so can only calculate Poisson likelihood after Barlow-Beeston</span></div>
-<div class="line"><span class="lineno">   79</span>      <span class="comment">// For the Poisson likelihood, this is just the usual calculation</span></div>
-<div class="line"><span class="lineno">   80</span>      <span class="comment">// For IceCube likelihood, we calculate it later</span></div>
-<div class="line"><span class="lineno">   81</span>      <span class="keywordtype">double</span> stat = 0;</div>
-<div class="line"><span class="lineno">   82</span>      <span class="comment">// All likelihood calculations may use the bare Poisson likelihood, so calculate here</span></div>
-<div class="line"><span class="lineno">   83</span>      <span class="keywordflow">if</span> (data == 0) stat = newmc;</div>
-<div class="line"><span class="lineno">   84</span>      <span class="keywordflow">else</span> <span class="keywordflow">if</span> (newmc &gt; 0) stat = newmc-data+data*std::log(data/newmc);</div>
+<div class="line"><span class="lineno">   71</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> beta = ( -1 * temp + sqrt( temp2 ) ) / 2.;</div>
+<div class="line"><span class="lineno">   72</span> </div>
+<div class="line"><span class="lineno">   73</span>      <span class="comment">// If there is no data, test-stat shall return only MC*beta</span></div>
+<div class="line"><span class="lineno">   74</span>      <span class="keywordtype">double</span> stat = mc * beta;</div>
+<div class="line"><span class="lineno">   75</span>      <span class="comment">// With data, test-stat shall return LogL for newMC*beta which includes the low MC bound</span></div>
+<div class="line"><span class="lineno">   76</span>      <span class="keywordflow">if</span> ( data &gt; 0 ) {</div>
+<div class="line"><span class="lineno">   77</span>        newmc *= beta;</div>
+<div class="line"><span class="lineno">   78</span>        stat = newmc - data + data * std::log( data / newmc );</div>
+<div class="line"><span class="lineno">   79</span>      }</div>
+<div class="line"><span class="lineno">   80</span> </div>
+<div class="line"><span class="lineno">   81</span>      <span class="comment">// Now, MC stat penalty</span></div>
+<div class="line"><span class="lineno">   82</span>      <span class="comment">// The penalty from MC statistics using Conways approach (https://cds.cern.ch/record/1333496?)</span></div>
+<div class="line"><span class="lineno">   83</span>      <span class="keywordtype">double</span> penalty = 0;</div>
+<div class="line"><span class="lineno">   84</span>      <span class="keywordflow">if</span> ( fractional &gt; 0 )  penalty = ( beta - 1 ) * ( beta - 1 ) / ( 2 * fractional * fractional );</div>
 <div class="line"><span class="lineno">   85</span> </div>
-<div class="line"><span class="lineno">   86</span>      <span class="comment">// Return the statistical contribution and penalty</span></div>
+<div class="line"><span class="lineno">   86</span>      <span class="comment">// Returns test-stat plus the MC stat penalty </span></div>
 <div class="line"><span class="lineno">   87</span>      <span class="keywordflow">return</span> stat+penalty;</div>
 <div class="line"><span class="lineno">   88</span>    }</div>
 <div class="line"><span class="lineno">   89</span>    <span class="keywordflow">break</span>;</div>
@@ -1204,91 +1204,113 @@ Functions</h2></td></tr>
 <div class="line"><span class="lineno">   92</span>    {</div>
 <div class="line"><span class="lineno">   93</span>      <span class="comment">//KS: code follows authors implementation from:</span></div>
 <div class="line"><span class="lineno">   94</span>      <span class="comment">//https://github.com/scikit-hep/iminuit/blob/059d06b00cae097ebf340b218b4eb57357111df8/src/iminuit/cost.py#L274-L300</span></div>
-<div class="line"><span class="lineno">   95</span> </div>
-<div class="line"><span class="lineno">   96</span>      <span class="comment">//the so-called effective count</span></div>
-<div class="line"><span class="lineno">   97</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> k = mc*mc / w2;</div>
-<div class="line"><span class="lineno">   98</span>      <span class="comment">//Calculate beta which is scaling factor between true and generated MC</span></div>
-<div class="line"><span class="lineno">   99</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> beta = (data + k) / (mc + k);</div>
-<div class="line"><span class="lineno">  100</span> </div>
-<div class="line"><span class="lineno">  101</span>      newmc = mc*beta;</div>
-<div class="line"><span class="lineno">  102</span>      <span class="comment">// And penalise the movement in beta relative the mc uncertainty</span></div>
-<div class="line"><span class="lineno">  103</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> penalty = k*beta-k+k*std::log(k/(k*beta));</div>
-<div class="line"><span class="lineno">  104</span> </div>
-<div class="line"><span class="lineno">  105</span>      <span class="comment">// Calculate the new Poisson likelihood</span></div>
-<div class="line"><span class="lineno">  106</span>      <span class="comment">// For Barlow-Beeston newmc is modified, so can only calculate Poisson likelihood after Barlow-Beeston</span></div>
-<div class="line"><span class="lineno">  107</span>      <span class="comment">// For the Poisson likelihood, this is just the usual calculation</span></div>
-<div class="line"><span class="lineno">  108</span>      <span class="comment">// For IceCube likelihood, we calculate it later</span></div>
-<div class="line"><span class="lineno">  109</span>      <span class="keywordtype">double</span> stat = 0;</div>
-<div class="line"><span class="lineno">  110</span>      <span class="comment">// All likelihood calculations may use the bare Poisson likelihood, so calculate here</span></div>
-<div class="line"><span class="lineno">  111</span>      <span class="keywordflow">if</span> (data == 0) stat = newmc;</div>
-<div class="line"><span class="lineno">  112</span>      <span class="keywordflow">else</span> <span class="keywordflow">if</span> (newmc &gt; 0) stat = newmc-data+data*std::log(data/newmc);</div>
-<div class="line"><span class="lineno">  113</span> </div>
-<div class="line"><span class="lineno">  114</span>      <span class="comment">// Return the statistical contribution and penalty</span></div>
-<div class="line"><span class="lineno">  115</span>      <span class="keywordflow">return</span> stat+penalty;</div>
-<div class="line"><span class="lineno">  116</span>    }</div>
-<div class="line"><span class="lineno">  117</span>    <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  118</span>    <span class="comment">//CW: Also try the IceCube likelihood</span></div>
-<div class="line"><span class="lineno">  119</span>    <span class="comment">// It does not modify the MC content</span></div>
-<div class="line"><span class="lineno">  120</span>    <span class="comment">// https://arxiv.org/abs/1901.04645</span></div>
-<div class="line"><span class="lineno">  121</span>    <span class="comment">// Argüelles, C.A., Schneider, A. &amp; Yuan, T. J. High Energ. Phys. (2019) 2019: 30. https://doi.org/10.1007/JHEP06(2019)030</span></div>
-<div class="line"><span class="lineno">  122</span>    <span class="comment">// We essentially construct eq 3.16 and take the logarithm</span></div>
-<div class="line"><span class="lineno">  123</span>    <span class="comment">// in eq 3.16, mu is MC, sigma2 is w2, k is data</span></div>
-<div class="line"><span class="lineno">  124</span>    <span class="keywordflow">case</span> (<a class="code hl_enumvalue" href="SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a5a1aedce85942661f297f503d606c472">kIceCube</a>):</div>
-<div class="line"><span class="lineno">  125</span>    {</div>
-<div class="line"><span class="lineno">  126</span>      <span class="keywordtype">double</span> stat = 0.0;</div>
-<div class="line"><span class="lineno">  127</span> </div>
-<div class="line"><span class="lineno">  128</span>      <span class="comment">// If there for some reason is 0 mc uncertainty, return the Poisson LLH</span></div>
-<div class="line"><span class="lineno">  129</span>      <span class="keywordflow">if</span> (w2 == 0)</div>
-<div class="line"><span class="lineno">  130</span>      {</div>
-<div class="line"><span class="lineno">  131</span>        <span class="comment">// Calculate the new Poisson likelihood</span></div>
-<div class="line"><span class="lineno">  132</span>        <span class="keywordflow">if</span> (data == 0) stat = newmc;</div>
-<div class="line"><span class="lineno">  133</span>        <span class="keywordflow">else</span> <span class="keywordflow">if</span> (newmc &gt; 0) stat = newmc-data+data*std::log(data/newmc);</div>
-<div class="line"><span class="lineno">  134</span> </div>
-<div class="line"><span class="lineno">  135</span>        <span class="keywordflow">return</span> stat;</div>
-<div class="line"><span class="lineno">  136</span>      }</div>
-<div class="line"><span class="lineno">  137</span>      <span class="comment">// Auxiliary variables</span></div>
-<div class="line"><span class="lineno">  138</span>      <span class="keyword">const</span> <span class="keywordtype">long</span> <span class="keywordtype">double</span> b = mc/w2;</div>
-<div class="line"><span class="lineno">  139</span>      <span class="keyword">const</span> <span class="keywordtype">long</span> <span class="keywordtype">double</span> a = mc*b+1;</div>
-<div class="line"><span class="lineno">  140</span>      <span class="keyword">const</span> <span class="keywordtype">long</span> <span class="keywordtype">double</span> k = data;</div>
-<div class="line"><span class="lineno">  141</span>      <span class="comment">// Use C99&#39;s implementation of log of gamma function to not be C++11 dependent</span></div>
-<div class="line"><span class="lineno">  142</span>      stat = double(-1*(a * logl(b) + lgammal(k+a) - lgammal(k+1) - ((k+a)*log1pl(b)) - lgammal(a)));</div>
-<div class="line"><span class="lineno">  143</span> </div>
-<div class="line"><span class="lineno">  144</span>      <span class="comment">// Return the statistical contribution and penalty</span></div>
-<div class="line"><span class="lineno">  145</span>      <span class="keywordflow">return</span> stat;</div>
-<div class="line"><span class="lineno">  146</span>    }</div>
-<div class="line"><span class="lineno">  147</span>    <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  148</span>    <span class="comment">//KS: Pearson works on assumption that event distribution in each bin is described by a Gaussian which in our case is not fulfilled for all bins, hence use it at your own risk</span></div>
-<div class="line"><span class="lineno">  149</span>    <span class="keywordflow">case</span> (<a class="code hl_enumvalue" href="SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a1ac0c03f07bf2bb9ad083e449d69ffd7">kPearson</a>):</div>
-<div class="line"><span class="lineno">  150</span>    {</div>
-<div class="line"><span class="lineno">  151</span>      <span class="comment">//KS: 2 is because this function returns -LLH not -2LLH</span></div>
-<div class="line"><span class="lineno">  152</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> stat = (data-mc)*(data-mc)/(2*mc);</div>
-<div class="line"><span class="lineno">  153</span> </div>
-<div class="line"><span class="lineno">  154</span>      <span class="comment">// Return the statistical</span></div>
-<div class="line"><span class="lineno">  155</span>      <span class="keywordflow">return</span> stat;</div>
-<div class="line"><span class="lineno">  156</span>    }</div>
-<div class="line"><span class="lineno">  157</span>    <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  158</span>    <span class="keywordflow">case</span> (<a class="code hl_enumvalue" href="SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a82f43d91f1eda213c4b5c486672a32a5">kPoisson</a>):</div>
-<div class="line"><span class="lineno">  159</span>    {</div>
-<div class="line"><span class="lineno">  160</span>      <span class="comment">//Just call getTestStatLLH which doesn&#39;t take in weights</span></div>
-<div class="line"><span class="lineno">  161</span>      <span class="comment">//and is a Poisson likelihood comparison.</span></div>
-<div class="line"><span class="lineno">  162</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="group__SampleHandlerGetters.html#gac0cfbc3d13eafd3b5687ff739b862b80">GetTestStatLLH</a>(data, mc);</div>
-<div class="line"><span class="lineno">  163</span>    }</div>
-<div class="line"><span class="lineno">  164</span>    <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  165</span>    <span class="keywordflow">case</span> TestStatistic::kNTestStatistics:</div>
-<div class="line"><span class="lineno">  166</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;kNTestStatistics is not a valid TestStatistic!&quot;</span>);</div>
-<div class="line"><span class="lineno">  167</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><span class="lineno">  168</span>    <span class="keywordflow">default</span>:</div>
-<div class="line"><span class="lineno">  169</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Couldn&#39;t find TestStatistic {} exiting!&quot;</span>, <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code hl_variable" href="classSampleHandlerBase.html#a87670dbcda5d09b09675e8f407fe3a30">fTestStatistic</a>));</div>
-<div class="line"><span class="lineno">  170</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><span class="lineno">  171</span>  } <span class="comment">// end switch</span></div>
-<div class="line"><span class="lineno">  172</span>}</div>
+<div class="line"><span class="lineno">   95</span>      </div>
+<div class="line"><span class="lineno">   96</span>      <span class="comment">// If there is no MC stat error for any reason, return Poisson LogL</span></div>
+<div class="line"><span class="lineno">   97</span>      <span class="keywordflow">if</span> ( w2 == 0 ) <span class="keywordflow">return</span> <a class="code hl_function" href="group__SampleHandlerGetters.html#gac0cfbc3d13eafd3b5687ff739b862b80">GetTestStatLLH</a>(data,mc);</div>
+<div class="line"><span class="lineno">   98</span>      </div>
+<div class="line"><span class="lineno">   99</span>      <span class="comment">// The MC can be changed</span></div>
+<div class="line"><span class="lineno">  100</span>      <span class="keywordtype">double</span> newmc = mc;</div>
+<div class="line"><span class="lineno">  101</span>      </div>
+<div class="line"><span class="lineno">  102</span>      <span class="comment">// If MC falls below the low MC bound, use low MC bound for newmc</span></div>
+<div class="line"><span class="lineno">  103</span>      <span class="keywordflow">if</span> ( mc &lt; <a class="code hl_variable" href="namespaceM3.html#a88e0a86bf059e7ced9ec9717dd9da133">M3::_LOW_MC_BOUND_</a> ) {</div>
+<div class="line"><span class="lineno">  104</span>        <span class="keywordflow">if</span> ( data &gt; <a class="code hl_variable" href="namespaceM3.html#a88e0a86bf059e7ced9ec9717dd9da133">M3::_LOW_MC_BOUND_</a> ) newmc = <a class="code hl_variable" href="namespaceM3.html#a88e0a86bf059e7ced9ec9717dd9da133">M3::_LOW_MC_BOUND_</a>;</div>
+<div class="line"><span class="lineno">  105</span>        <span class="keywordflow">else</span> <span class="keywordflow">if</span> ( data &gt;= mc ) <span class="keywordflow">return</span> 0.;</div>
+<div class="line"><span class="lineno">  106</span>      }</div>
+<div class="line"><span class="lineno">  107</span>      </div>
+<div class="line"><span class="lineno">  108</span>      <span class="comment">//the so-called effective count</span></div>
+<div class="line"><span class="lineno">  109</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> k = newmc * newmc / w2;</div>
+<div class="line"><span class="lineno">  110</span>      <span class="comment">//Calculate beta which is scaling factor between true and generated MC</span></div>
+<div class="line"><span class="lineno">  111</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> beta = ( data + k ) / ( newmc + k );</div>
+<div class="line"><span class="lineno">  112</span> </div>
+<div class="line"><span class="lineno">  113</span>      newmc *= beta;</div>
+<div class="line"><span class="lineno">  114</span>      </div>
+<div class="line"><span class="lineno">  115</span>      <span class="comment">// And penalise the movement in beta relative the mc uncertainty</span></div>
+<div class="line"><span class="lineno">  116</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> penalty = k * beta - k + k * std::log( k / ( k * beta ) );</div>
+<div class="line"><span class="lineno">  117</span> </div>
+<div class="line"><span class="lineno">  118</span>      <span class="comment">// If there are no data, this shall return newmc</span></div>
+<div class="line"><span class="lineno">  119</span>      <span class="keywordtype">double</span> stat = newmc;</div>
+<div class="line"><span class="lineno">  120</span>      <span class="comment">// All likelihood calculations may use the bare Poisson likelihood, so calculate here</span></div>
+<div class="line"><span class="lineno">  121</span>      <span class="comment">// Only if there are some data</span></div>
+<div class="line"><span class="lineno">  122</span>      <span class="keywordflow">if</span> ( data &gt; 0 ) stat = newmc - data + data * std::log( data / newmc );</div>
+<div class="line"><span class="lineno">  123</span> </div>
+<div class="line"><span class="lineno">  124</span>      <span class="comment">// Return the statistical contribution and penalty</span></div>
+<div class="line"><span class="lineno">  125</span>      <span class="keywordflow">return</span> stat+penalty;</div>
+<div class="line"><span class="lineno">  126</span>    }</div>
+<div class="line"><span class="lineno">  127</span>    <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  128</span>    <span class="comment">//CW: Also try the IceCube likelihood</span></div>
+<div class="line"><span class="lineno">  129</span>    <span class="comment">// It does not modify the MC content</span></div>
+<div class="line"><span class="lineno">  130</span>    <span class="comment">// https://arxiv.org/abs/1901.04645</span></div>
+<div class="line"><span class="lineno">  131</span>    <span class="comment">// Argüelles, C.A., Schneider, A. &amp; Yuan, T. J. High Energ. Phys. (2019) 2019: 30. https://doi.org/10.1007/JHEP06(2019)030</span></div>
+<div class="line"><span class="lineno">  132</span>    <span class="comment">// We essentially construct eq 3.16 and take the logarithm</span></div>
+<div class="line"><span class="lineno">  133</span>    <span class="comment">// in eq 3.16, mu is MC, sigma2 is w2, k is data</span></div>
+<div class="line"><span class="lineno">  134</span>    <span class="keywordflow">case</span> (<a class="code hl_enumvalue" href="SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a5a1aedce85942661f297f503d606c472">kIceCube</a>):</div>
+<div class="line"><span class="lineno">  135</span>    {</div>
+<div class="line"><span class="lineno">  136</span>      <span class="comment">// IceCube low MC bound is implemented to return Poisson(data, _LOW_MC_BOUND_)</span></div>
+<div class="line"><span class="lineno">  137</span>      <span class="comment">// up until the IceCube(data, mc) test-statistic is less than Poisson(data, _LOW_MC_BOUND_)</span></div>
+<div class="line"><span class="lineno">  138</span>      <span class="comment">// The 0 MC limit is set to Poisson(data, 0.) as there is no way to get a non-diverging and reasonable guess on w2</span></div>
+<div class="line"><span class="lineno">  139</span> </div>
+<div class="line"><span class="lineno">  140</span>      <span class="comment">// If there is 0 MC uncertainty (technically also when MC is 0) =&gt; Return Poisson(data, mc)</span></div>
+<div class="line"><span class="lineno">  141</span>      <span class="keywordflow">if</span> ( w2 == 0 ) <span class="keywordflow">return</span> <a class="code hl_function" href="group__SampleHandlerGetters.html#gac0cfbc3d13eafd3b5687ff739b862b80">GetTestStatLLH</a>(data,mc);</div>
+<div class="line"><span class="lineno">  142</span>      </div>
+<div class="line"><span class="lineno">  143</span>      <span class="comment">// Auxiliary variables</span></div>
+<div class="line"><span class="lineno">  144</span>      <span class="keyword">const</span> <span class="keywordtype">long</span> <span class="keywordtype">double</span> b = mc / w2;</div>
+<div class="line"><span class="lineno">  145</span>      <span class="keyword">const</span> <span class="keywordtype">long</span> <span class="keywordtype">double</span> a = mc * b + 1;</div>
+<div class="line"><span class="lineno">  146</span>      </div>
+<div class="line"><span class="lineno">  147</span>      <span class="comment">// Use C99&#39;s implementation of log of gamma function to not be C++11 dependent</span></div>
+<div class="line"><span class="lineno">  148</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> stat = double( -1 * ( a * logl( b ) + lgammal( data + a ) - lgammal( data + 1 ) - ( ( data + a ) * log1pl( b ) ) - lgammal( a ) ) );</div>
+<div class="line"><span class="lineno">  149</span> </div>
+<div class="line"><span class="lineno">  150</span>      <span class="comment">// Check whether the stat is more than Poisson-like bound for low mc (mc &lt; data)</span></div>
+<div class="line"><span class="lineno">  151</span>      <span class="comment">// TN: I believe this might get some extra optimization</span></div>
+<div class="line"><span class="lineno">  152</span>      <span class="keywordflow">if</span> ( mc &lt;= data ) {</div>
+<div class="line"><span class="lineno">  153</span>        <span class="keywordflow">if</span> ( data &lt;= <a class="code hl_variable" href="namespaceM3.html#a88e0a86bf059e7ced9ec9717dd9da133">M3::_LOW_MC_BOUND_</a> ) <span class="keywordflow">return</span> 0.;</div>
+<div class="line"><span class="lineno">  154</span>        <span class="keyword">const</span> <span class="keywordtype">double</span> poisson = <a class="code hl_function" href="group__SampleHandlerGetters.html#gac0cfbc3d13eafd3b5687ff739b862b80">GetTestStatLLH</a>(data, <a class="code hl_variable" href="namespaceM3.html#a88e0a86bf059e7ced9ec9717dd9da133">M3::_LOW_MC_BOUND_</a>);</div>
+<div class="line"><span class="lineno">  155</span>        <span class="keywordflow">if</span> ( stat &gt; poisson ) <span class="keywordflow">return</span> poisson;</div>
+<div class="line"><span class="lineno">  156</span>      }</div>
+<div class="line"><span class="lineno">  157</span> </div>
+<div class="line"><span class="lineno">  158</span>      <span class="comment">// Otherwise, return IceCube test-stat</span></div>
+<div class="line"><span class="lineno">  159</span>      <span class="keywordflow">return</span> stat;</div>
+<div class="line"><span class="lineno">  160</span>    }</div>
+<div class="line"><span class="lineno">  161</span>    <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  162</span>    <span class="comment">//KS: Pearson works on assumption that event distribution in each bin is described by a Gaussian which in our case is not fulfilled for all bins, hence use it at your own risk</span></div>
+<div class="line"><span class="lineno">  163</span>    <span class="keywordflow">case</span> (<a class="code hl_enumvalue" href="SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a1ac0c03f07bf2bb9ad083e449d69ffd7">kPearson</a>):</div>
+<div class="line"><span class="lineno">  164</span>    {</div>
+<div class="line"><span class="lineno">  165</span>      <span class="comment">//KS: 2 is because this function returns -LLH not -2LLH</span></div>
+<div class="line"><span class="lineno">  166</span>      <span class="comment">// With no data return the MC/2.</span></div>
+<div class="line"><span class="lineno">  167</span>      <span class="keywordflow">if</span> ( data == 0 ) <span class="keywordflow">return</span> mc/2.;</div>
+<div class="line"><span class="lineno">  168</span>      </div>
+<div class="line"><span class="lineno">  169</span>      <span class="comment">// If MC is lower than the low MC bound, return the test-stat at the bound</span></div>
+<div class="line"><span class="lineno">  170</span>      <span class="keywordflow">if</span> ( mc &lt; <a class="code hl_variable" href="namespaceM3.html#a88e0a86bf059e7ced9ec9717dd9da133">M3::_LOW_MC_BOUND_</a> ) {</div>
+<div class="line"><span class="lineno">  171</span>        <span class="keywordflow">if</span> ( data &gt; <a class="code hl_variable" href="namespaceM3.html#a88e0a86bf059e7ced9ec9717dd9da133">M3::_LOW_MC_BOUND_</a> ) <span class="keywordflow">return</span> ( data - <a class="code hl_variable" href="namespaceM3.html#a88e0a86bf059e7ced9ec9717dd9da133">M3::_LOW_MC_BOUND_</a> ) * ( data - <a class="code hl_variable" href="namespaceM3.html#a88e0a86bf059e7ced9ec9717dd9da133">M3::_LOW_MC_BOUND_</a> ) / ( 2. * <a class="code hl_variable" href="namespaceM3.html#a88e0a86bf059e7ced9ec9717dd9da133">M3::_LOW_MC_BOUND_</a> ); </div>
+<div class="line"><span class="lineno">  172</span>        <span class="keywordflow">else</span> <span class="keywordflow">if</span> ( data &gt;= mc ) <span class="keywordflow">return</span> 0.;</div>
+<div class="line"><span class="lineno">  173</span>      }</div>
+<div class="line"><span class="lineno">  174</span>      </div>
+<div class="line"><span class="lineno">  175</span>      <span class="comment">// Return the Pearson metric</span></div>
+<div class="line"><span class="lineno">  176</span>      <span class="keywordflow">return</span> ( data - mc ) * ( data - mc ) / ( 2 * mc );</div>
+<div class="line"><span class="lineno">  177</span>    }</div>
+<div class="line"><span class="lineno">  178</span>    <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  179</span>    <span class="keywordflow">case</span> (<a class="code hl_enumvalue" href="SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a82f43d91f1eda213c4b5c486672a32a5">kPoisson</a>):</div>
+<div class="line"><span class="lineno">  180</span>    {</div>
+<div class="line"><span class="lineno">  181</span>      <span class="comment">//Just call GetTestStatLLH which doesn&#39;t take in weights</span></div>
+<div class="line"><span class="lineno">  182</span>      <span class="comment">//and is a Poisson likelihood comparison.</span></div>
+<div class="line"><span class="lineno">  183</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="group__SampleHandlerGetters.html#gac0cfbc3d13eafd3b5687ff739b862b80">GetTestStatLLH</a>(data, mc);</div>
+<div class="line"><span class="lineno">  184</span>    }</div>
+<div class="line"><span class="lineno">  185</span>    <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  186</span>    <span class="keywordflow">case</span> TestStatistic::kNTestStatistics:</div>
+<div class="line"><span class="lineno">  187</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;kNTestStatistics is not a valid TestStatistic!&quot;</span>);</div>
+<div class="line"><span class="lineno">  188</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><span class="lineno">  189</span>    <span class="keywordflow">default</span>:</div>
+<div class="line"><span class="lineno">  190</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Couldn&#39;t find TestStatistic {} exiting!&quot;</span>, <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code hl_variable" href="classSampleHandlerBase.html#a87670dbcda5d09b09675e8f407fe3a30">fTestStatistic</a>));</div>
+<div class="line"><span class="lineno">  191</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
+<div class="line"><span class="lineno">  192</span>  } <span class="comment">// end switch</span></div>
+<div class="line"><span class="lineno">  193</span>}</div>
 <div class="ttc" id="aSampleStructs_8h_html_a960da89e33ac45a56f7bbfac3068dc67a1ac0c03f07bf2bb9ad083e449d69ffd7"><div class="ttname"><a href="SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a1ac0c03f07bf2bb9ad083e449d69ffd7">kPearson</a></div><div class="ttdeci">@ kPearson</div><div class="ttdoc">Standard Pearson likelihood.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00117">SampleStructs.h:117</a></div></div>
 <div class="ttc" id="aSampleStructs_8h_html_a960da89e33ac45a56f7bbfac3068dc67a3c9b50397bd37ce679bbdda14f6108c4"><div class="ttname"><a href="SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a3c9b50397bd37ce679bbdda14f6108c4">kBarlowBeeston</a></div><div class="ttdeci">@ kBarlowBeeston</div><div class="ttdoc">Barlow-Beeston following Conway .</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00115">SampleStructs.h:115</a></div></div>
 <div class="ttc" id="aSampleStructs_8h_html_a960da89e33ac45a56f7bbfac3068dc67a5a1aedce85942661f297f503d606c472"><div class="ttname"><a href="SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a5a1aedce85942661f297f503d606c472">kIceCube</a></div><div class="ttdeci">@ kIceCube</div><div class="ttdoc">Based on .</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00116">SampleStructs.h:116</a></div></div>
 <div class="ttc" id="aSampleStructs_8h_html_a960da89e33ac45a56f7bbfac3068dc67a7d4e059541c7ec9737f5c884cd6cd0f0"><div class="ttname"><a href="SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a7d4e059541c7ec9737f5c884cd6cd0f0">kDembinskiAbdelmotteleb</a></div><div class="ttdeci">@ kDembinskiAbdelmotteleb</div><div class="ttdoc">Based on .</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00118">SampleStructs.h:118</a></div></div>
 <div class="ttc" id="aSampleStructs_8h_html_a960da89e33ac45a56f7bbfac3068dc67a82f43d91f1eda213c4b5c486672a32a5"><div class="ttname"><a href="SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a82f43d91f1eda213c4b5c486672a32a5">kPoisson</a></div><div class="ttdeci">@ kPoisson</div><div class="ttdoc">Standard Poisson likelihood.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00114">SampleStructs.h:114</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a87670dbcda5d09b09675e8f407fe3a30"><div class="ttname"><a href="classSampleHandlerBase.html#a87670dbcda5d09b09675e8f407fe3a30">SampleHandlerBase::fTestStatistic</a></div><div class="ttdeci">TestStatistic fTestStatistic</div><div class="ttdoc">Test statistic tells what kind of likelihood sample is using.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00109">SampleHandlerBase.h:109</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a87670dbcda5d09b09675e8f407fe3a30"><div class="ttname"><a href="classSampleHandlerBase.html#a87670dbcda5d09b09675e8f407fe3a30">SampleHandlerBase::fTestStatistic</a></div><div class="ttdeci">TestStatistic fTestStatistic</div><div class="ttdoc">Test statistic tells what kind of likelihood sample is using.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00117">SampleHandlerBase.h:117</a></div></div>
 <div class="ttc" id="agroup__SampleHandlerGetters_html_gac0cfbc3d13eafd3b5687ff739b862b80"><div class="ttname"><a href="group__SampleHandlerGetters.html#gac0cfbc3d13eafd3b5687ff739b862b80">SampleHandlerBase::GetTestStatLLH</a></div><div class="ttdeci">double GetTestStatLLH(double data, double mc) const</div><div class="ttdoc">Calculate test statistic for a single bin using Poisson.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8cpp_source.html#l00018">SampleHandlerBase.cpp:18</a></div></div>
+<div class="ttc" id="anamespaceM3_html_a88e0a86bf059e7ced9ec9717dd9da133"><div class="ttname"><a href="namespaceM3.html#a88e0a86bf059e7ced9ec9717dd9da133">M3::_LOW_MC_BOUND_</a></div><div class="ttdeci">static constexpr const double _LOW_MC_BOUND_</div><div class="ttdoc">MC prediction lower bound in bin to identify problematic binning definitions and handle LogL calculat...</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00073">Core.h:73</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1330,18 +1352,18 @@ Functions</h2></td></tr>
 <p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8cpp_source.html#l00018">18</a> of file <a class="el" href="SampleHandlerBase_8cpp_source.html">SampleHandlerBase.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   18</span>                                                                                 {</div>
 <div class="line"><span class="lineno">   19</span><span class="comment">// ***************************************************************************</span></div>
-<div class="line"><span class="lineno">   20</span>  <span class="comment">// Need some MC</span></div>
-<div class="line"><span class="lineno">   21</span>  <span class="keywordflow">if</span>(mc == 0) <span class="keywordflow">return</span> 0.;</div>
+<div class="line"><span class="lineno">   20</span>  <span class="comment">// Return MC if there are no data, returns 0 for data == 0 &amp;&amp; mc == 0  </span></div>
+<div class="line"><span class="lineno">   21</span>  <span class="keywordflow">if</span> ( data == 0 ) <span class="keywordflow">return</span> mc;</div>
 <div class="line"><span class="lineno">   22</span> </div>
-<div class="line"><span class="lineno">   23</span>  <span class="keywordtype">double</span> negLogL = 0;</div>
-<div class="line"><span class="lineno">   24</span>  <span class="keywordflow">if</span>(mc &gt; 0 &amp;&amp; data &gt; 0)</div>
-<div class="line"><span class="lineno">   25</span>  {</div>
-<div class="line"><span class="lineno">   26</span>    <span class="comment">//http://hyperphysics.phy-astr.gsu.edu/hbase/math/stirling.html</span></div>
-<div class="line"><span class="lineno">   27</span>    negLogL += (mc - data + data * std::log(data/mc));</div>
-<div class="line"><span class="lineno">   28</span>  }</div>
-<div class="line"><span class="lineno">   29</span>  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(mc &gt; 0 &amp;&amp; data == 0) negLogL += mc;</div>
-<div class="line"><span class="lineno">   30</span>  </div>
-<div class="line"><span class="lineno">   31</span>  <span class="keywordflow">return</span> negLogL; </div>
+<div class="line"><span class="lineno">   23</span>  <span class="comment">// If there are some data, but the prediction falls below the MC bound =&gt; return Poisson LogL for the low MC bound</span></div>
+<div class="line"><span class="lineno">   24</span>  <span class="keywordflow">if</span> ( mc &lt; <a class="code hl_variable" href="namespaceM3.html#a88e0a86bf059e7ced9ec9717dd9da133">M3::_LOW_MC_BOUND_</a> ) {</div>
+<div class="line"><span class="lineno">   25</span>    <span class="keywordflow">if</span> ( data &gt; <a class="code hl_variable" href="namespaceM3.html#a88e0a86bf059e7ced9ec9717dd9da133">M3::_LOW_MC_BOUND_</a> ) <span class="keywordflow">return</span> ( <a class="code hl_variable" href="namespaceM3.html#a88e0a86bf059e7ced9ec9717dd9da133">M3::_LOW_MC_BOUND_</a> - data + data * std::log( data/<a class="code hl_variable" href="namespaceM3.html#a88e0a86bf059e7ced9ec9717dd9da133">M3::_LOW_MC_BOUND_</a> ) );</div>
+<div class="line"><span class="lineno">   26</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span> ( data &gt;= mc ) <span class="keywordflow">return</span> 0.;</div>
+<div class="line"><span class="lineno">   27</span>  }</div>
+<div class="line"><span class="lineno">   28</span>  </div>
+<div class="line"><span class="lineno">   29</span>  <span class="comment">// Otherwise, just return usual Poisson LogL using Stirling&#39;s approximation</span></div>
+<div class="line"><span class="lineno">   30</span>  <span class="comment">// http://hyperphysics.phy-astr.gsu.edu/hbase/math/stirling.html</span></div>
+<div class="line"><span class="lineno">   31</span>  <span class="keywordflow">return</span> ( mc - data + data * std::log( data / mc ) );</div>
 <div class="line"><span class="lineno">   32</span>}</div>
 </div><!-- fragment -->
 </div>
@@ -1871,8 +1893,8 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00091">91</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   91</span>{ <a class="code hl_variable" href="classSampleHandlerBase.html#a87670dbcda5d09b09675e8f407fe3a30">fTestStatistic</a> = testStat; }</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00099">99</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   99</span>{ <a class="code hl_variable" href="classSampleHandlerBase.html#a87670dbcda5d09b09675e8f407fe3a30">fTestStatistic</a> = testStat; }</div>
 </div><!-- fragment -->
 </div>
 </div>
