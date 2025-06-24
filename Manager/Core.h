@@ -69,6 +69,9 @@ namespace M3 {
   /// Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such step should be removed
   constexpr static const double _LARGE_LOGL_ = 1234567890.0;
 
+  /// MC prediction lower bound in bin to identify problematic binning definitions and handle LogL calculation
+  constexpr static const double _LOW_MC_BOUND_ = .00001;
+
   /// Default value for spline knot capping, default mean not capping is being applied
   constexpr static const double DefSplineKnotUpBound = 9999;
   /// Default value for spline knot capping, default mean not capping is being applied

@@ -79,7 +79,15 @@ class SampleHandlerBase
   /// @param mc is mc
   /// @ingroup SampleHandlerGetters
   double GetTestStatLLH(double data, double mc) const;
-  /// @brief Calculate test statistic for a single bin. Calculation depends on setting of fTestStatistic
+  /// @brief Calculate test statistic for a single bin. Calculation depends on setting of fTestStatistic. Data and mc -> 0 cut-offs are defined in M3::_LOW_MC_BOUND_.
+  /// @details Implemented fTestStatistic are kPoisson (with Stirling's approx.), kBarlowBeeston (arXiv:1103.0354), kDembinskiAbdelmotteleb (arXiv:2206.12346), kIceCube (arxiv:1901.04645), and kPearson.
+  /// Test statistics require mc > 0, therefore low mc and data values are treated with cut-offs based on M3::_LOW_MC_BOUND_ = .00001 by default.
+  /// For kPoisson, kBarlowBeeston, kDembinskiAbdelmotteleb, kPearson:
+  /// data > _LOW_MC_BOUND_ & mc <= _LOW_MC_BOUND_: returns GetTestStatLLH(data, _LOW_MC_BOUND_, w2), with Poisson(data,_LOW_MC_BOUND_) limit for mc->0, w2->0.
+  /// mc < data <= _LOW_MC_BOUND_: returns 0 (as if any data <= _LOW_MC_BOUND_ were effectively consistent with 0 data count), with a limit of 0 for mc->0.
+  /// data = 0: returns mc (or mc/2. for kPearson), with a limit of 0 for mc->0.
+  /// For kIceCube:
+  /// mc < data returns the lower of IceCube(data,mc,w2) and Poisson(data,mc) penalties, with a Poisson(data,_LOW_MC_BOUND_) limit for mc->0, w2->0.
   /// @param data is data
   /// @param mc is mc
   /// @param w2 is is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
