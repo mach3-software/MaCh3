@@ -2305,6 +2305,12 @@ void MCMCProcessor::ReadModelFile() {
     } else {
       BranchNames.push_back("xsec_" + std::to_string(paramIndex));
     }
+
+    // Check that the branch exists before setting address
+    if (!Chain->GetBranch(BranchNames.back())) {
+      MACH3LOG_ERROR("Couldn't find branch '{}'", BranchNames.back());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
   }
 }
 
