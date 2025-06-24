@@ -920,6 +920,36 @@ void ParameterHandlerBase::ToggleFixParameter(const int i) {
   } else {
     PCAObj->ToggleFixParameter(i, _fNames);
   }
+
+  RemoveSpecialProposal(i);
+}
+
+// ********************************************
+// Remove special proposal for fixed parameters
+void ParameterHandlerBase::RemoveSpecialProposal(const int i) {
+// ********************************************
+  /// @todo if me add class or simple struct holding this info it could make this function simplified
+  for (size_t idx = 0; idx < FlipParameterIndex.size(); ++idx) {
+    if (FlipParameterIndex[idx] == i) {
+      FlipParameterIndex.erase(FlipParameterIndex.begin() + idx);
+      FlipParameterPoint.erase(FlipParameterPoint.begin() + idx);
+      MACH3LOG_DEBUG("Removed flip symmetry for parameter {}.", i);
+      break;
+    }
+  }
+
+  for (size_t idx = 0; idx < CircularBoundsIndex.size(); ++idx) {
+    if (CircularBoundsIndex[idx] == i) {
+      CircularBoundsIndex.erase(CircularBoundsIndex.begin() + idx);
+      CircularBoundsValues.erase(CircularBoundsValues.begin() + idx);
+      MACH3LOG_DEBUG("Removed circular bounds for parameter {}.", i);
+      break;
+    }
+  }
+
+  // Sanity check that sizes matter
+  assert(FlipParameterIndex.size() == FlipParameterPoint.size());
+  assert(CircularBoundsIndex.size() == CircularBoundsValues.size());
 }
 
 // ********************************************
