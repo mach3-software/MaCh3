@@ -1,4 +1,6 @@
 #pragma once
+#include "manager/Core.h"
+#include "splines/SplineStructs.h"
 #ifdef USE_FPGA
 #include <sycl/sycl.hpp>
 #include "splines/oneAPIUtils.dp.hpp"
@@ -162,6 +164,12 @@ class SMonolith : public SplineBase {
     /// KS: Store info about Spline monolith, this allow to obtain better step time. As all necessary information for spline weight calculation are here meaning better cache hits.
     SMonolithGPU* gpu_spline_handler;
 
+    /// ETA: Dummy spline to use when spline has no resposne for an event
+    TSpline3* dummy_spline;
+    TGraph* dummy_graph;
+    M3::float_t* dummy_x_points;
+    M3::float_t* dummy_y_points;
+    M3::int_t dummy_nPoints;
 
 
     /// CPU arrays to hold number of points

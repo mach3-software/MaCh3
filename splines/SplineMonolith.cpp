@@ -1,5 +1,11 @@
 #include "SplineMonolith.h"
+#include "manager/Core.h"
 #include "splines/SplineCommon.h"
+#include "splines/SplineStructs.h"
+#include <TSpline.h>
+#include <cstddef>
+#include <new>
+//#include "sycl/ext/oneapi/experimental/builtins.hpp"
 #define STRING2(x) #x
 #define STRING(x) STRING2(x)
 #pragma message "CHECKME: " STRING(USE_FPGA)
@@ -36,6 +42,7 @@ void FPGACalcSplineWeights(int nParams, int NSplines_valid, int *param_n_knots, 
   sycl::ext::intel::host_ptr<const float> coeff_many_host(coeff_many);
   sycl::ext::intel::host_ptr<const float> coeff_x_host(coeff_x);
   sycl::ext::intel::host_ptr<const float> vals_host(ParamValues);
+  sycl::ext::oneapi::experimental::printf("Hello I'm in the kernel")
   // //int _nCoeff_,
   // //int _max_knots, 
   // int *param_n_knots, 
@@ -65,7 +72,6 @@ void FPGACalcSplineWeights(int nParams, int NSplines_valid, int *param_n_knots, 
   [[intel::initiation_interval(1)]]
   for (size_t splineNum = 0; splineNum < NSplines_valid; splineNum++) {
 
-    //ETA - I don't understand this. The parameter index should run from 1 to n_params
     // it is really just used to calculate systematic level constants e.g. the segment, _max_knots, _nCoeff etc
     //ac_int<8, false> Param = param_n_knots_host[2*splineNum]; // Param range 10e2
     ac_int<8, false> Param = param_n_knots_host[2*splineNum];//paramNo_arr_host[splineNum]; // parameters range 10e2
@@ -105,6 +111,8 @@ void FPGACalcSplineWeights(int nParams, int NSplines_valid, int *param_n_knots, 
     float a = dx * fX[3] + fX[2];
     float b = dx * a + fX[1];
     float c = dx * b + fX[0];
+
+    //sycl::ext::oneapi::experimental::printf("Pipe in c: %f\n", c);
     // write to pipe
     PipeAB::write(c);
   }
@@ -119,11 +127,14 @@ void FPGAModifyWeights(int NSplines_valid, float *cpu_total_weights){
 
   [[intel::initiation_interval(1)]]
   for (size_t i = 0; i < NSplines_valid / 4; i++) {
+  //
+  for (size_t i = 0 ; i < n)
 
-    float sum = 1;
+    float sum = 1.;
 
     for (size_t a = 0; a < 4; a++) {
       float tmp = PipeAB::read();
+      sycl::ext::oneapi::experimental::printf("Pipe in c: %f\n", c);
       sum *= tmp;
     }
 
@@ -166,6 +177,19 @@ void SMonolith::Initialise() {
   cpu_weights_tf1_var = nullptr;
 
   cpu_total_weights = nullptr;
+
+  const int n_points = 2;
+  dummy_x_points = new M3::float_t[n_points];
+  dummy_x_points[0] = 0.;
+  dummy_x_points[1] = 1.;
+  dummy_y_points = new M3::float_t[n_points];
+  dummy_y_points[0] = 1.;
+  dummy_y_points[1] = 1.;
+
+  dummy_graph = new TGraph(n_points, dummy_x_points, dummy_y_points);
+  //Initialise a dummy spline
+  dummy_spline = new TSpline3("dummy", dummy_graph);;
+  std::cout << "npoint is " << dummy_spline->GetNp() << std::endl;
 }
 
 // *****************************************
@@ -186,7 +210,6 @@ SMonolith::SMonolith(std::vector<std::vector<TResponseFunction_red*> > &MasterSp
 // The shared initialiser from constructors of TSpline3 and TSpline3_red
 void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > &MasterSpline, const std::vector<RespFuncType> &SplineType) {
 // *****************************************
-
   // Scan for the max number of knots, the number of events (number of splines), and number of parameters
   int maxnSplines = 0;
   ScanMasterSpline(MasterSpline,
@@ -249,6 +272,8 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
   // Number of objects we have in total if each event has *EVERY* spline. Needed for some arrays
   NSplines_total_large = NEvents*nParams;
 
+  // the theoretical largest contiguos block of knots for a single MC events possible
+  // i.e. nParams parameters affect an MC event
   unsigned int event_size_max = _max_knots * nParams;
   // Declare the {x}, {y,b,c,d} arrays for all possible splines which the event has
   // We'll filter off the flat and "disabled" (e.g. CCQE event should not have MARES spline) ones in the next for loop, but need to declare these beasts here
@@ -347,15 +372,24 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
     for(unsigned int ParamNumber = 0; ParamNumber < MasterSpline[EventCounter].size(); ++ParamNumber) {
 
       // If NULL we don't have this spline for the event, so move to next spline
-      if (MasterSpline[EventCounter][ParamNumber] == NULL) continue;
+      // ETA - let's load the NULL ones for now
+      // if (MasterSpline[EventCounter][ParamNumber] == NULL) continue;
 
       if(SplineType[ParamNumber] == kTSpline3_red)
       {
         //KS: how much knots each spline has
         int nPoints_tmp = 0;
         // Get a pointer to the current spline for this event
-        TResponseFunction_red* TespFunc = MasterSpline[EventCounter][ParamNumber];
-        TSpline3_red* CurrSpline = static_cast<TSpline3_red*>(TespFunc);
+
+        // Read in a dummy spline which is saved in the SplineMonolith object 
+        TSpline3_red* CurrSpline = new TSpline3_red(dummy_spline);//static_cast<TSpline3_red*>(TespFunc);
+        MACH3LOG_INFO("Number of points in dummy is {}", CurrSpline->GetNp());
+        //ETA need to add in an explicit check on whether the spline is NULL or not.
+        // If it is then need to add in a dummy flat spline... don't know how this might affect RAM
+        if (MasterSpline[EventCounter][ParamNumber] != NULL) {
+          TResponseFunction_red *TespFunc = MasterSpline[EventCounter][ParamNumber];
+          CurrSpline = static_cast<TSpline3_red *>(TespFunc);
+        }
 
         // If the number of knots are greater than 2 the spline is not a dummy and we should extract coefficients to load onto the GPU
         getSplineCoeff_SepMany(CurrSpline, nPoints_tmp, x_tmp, many_tmp);
@@ -791,10 +825,7 @@ void SMonolith::LoadSplineFile(std::string FileName) {
     cpu_total_weights = new float[NEvents]();
     cpu_weights_spline_var = new float[NSplines_valid]();
     cpu_weights_tf1_var = new float[NTF1_valid]();
-  #endif
-
-  
-  
+  #endif 
 #endif
 
   float coeff = 0.;
