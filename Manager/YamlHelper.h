@@ -458,6 +458,10 @@ inline std::vector<double> ParseBounds(const YAML::Node& node, const std::string
     } else if (val.IsScalar()) {
       try {
         const double center = val.as<double>();
+        if (std::floor(center) != center) {
+          MACH3LOG_ERROR("Invalid center value in Bounds[0]: '{}'. Expected an integer (e.g., 0 or 1).", static_cast<std::string>(val.Scalar()));
+          throw MaCh3Exception(File, Line);
+        }
         bounds = {center - 0.5, center + 0.5};
       } catch (const YAML::BadConversion& e) {
         MACH3LOG_ERROR("Invalid value in Bounds[0]: '{}'. Expected a number.", static_cast<std::string>(val.Scalar()));
