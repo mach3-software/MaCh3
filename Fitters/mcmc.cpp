@@ -38,11 +38,11 @@ void mcmc::CheckStep() {
   accProb = 0.0;
 
   // Calculate acceptance probability
-  if (anneal) accProb = TMath::Min(1.,TMath::Exp( -(logLProp-logLCurr) / (TMath::Exp(-step/AnnealTemp)))); 
-  else accProb = TMath::Min(1., TMath::Exp(logLCurr-logLProp));
+  if (anneal) accProb = std::min(1., std::exp( -(logLProp-logLCurr) / (std::exp(-step/AnnealTemp))));
+  else accProb = std::min(1., std::exp(logLCurr-logLProp));
 
   // Get the random number
-  double fRandom = random->Rndm();
+  const double fRandom = random->Rndm();
 
   // Do the accept/reject
   if (fRandom <= accProb) {
@@ -94,7 +94,8 @@ void mcmc::RunMCMC() {
   logLCurr = logLProp;
 
   // Begin MCMC
-  for (step = stepStart; step < stepStart+chainLength; ++step)
+  const auto StepEnd = stepStart + chainLength;
+  for (step = stepStart; step < StepEnd; ++step)
   {
     stepClock->Start();
     // Set the initial rejection to false

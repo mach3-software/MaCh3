@@ -753,7 +753,7 @@ M3::float_t SampleHandlerFD::CalcWeightNorm(const FarDetectorCoreInfo* MCEvent) 
     xsecw *= static_cast<M3::float_t>(*(MCEvent->xsec_norm_pointers[iParam]));
 #pragma GCC diagnostic pop
     #ifdef DEBUG
-    if (TMath::IsNaN(xsecw)) MACH3LOG_WARN("iParam= {} xsecweight=nan from norms", iParam);
+    if (std::isnan(xsecw)) MACH3LOG_WARN("iParam= {} xsecweight=nan from norms", iParam);
     #endif
   }
   return xsecw;
