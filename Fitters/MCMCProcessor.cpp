@@ -2747,7 +2747,7 @@ void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
     if(ParamNo == _UNDEF_)
     {
       MACH3LOG_WARN("Couldn't find param {}. Can't reweight Prior", Names[k]);
-      continue;
+      return;
     }
 
     TString Title = "";
@@ -2814,6 +2814,18 @@ void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
   post->SetBranchStatus("*",true);
   OutputChain->cd();
   post->Write("posteriors", TObject::kOverwrite);
+
+  // KS: Save reweight metadeta
+  std::ostringstream yaml_stream;
+  yaml_stream << "Weight:\n";
+  for (size_t k = 0; k < Names.size(); ++k) {
+    yaml_stream << "    " << Names[k] << ": [" << NewCentral[k] << ", " << NewError[k] << "]\n";
+  }
+  std::string yaml_string = yaml_stream.str();
+  YAML::Node root = STRINGtoYAML(yaml_string);
+  TMacro ConfigSave = YAMLtoTMacro(root, "Reweight_Config");
+  ConfigSave.Write();
+
   OutputChain->Close();
   delete OutputChain;
 
