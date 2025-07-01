@@ -153,7 +153,7 @@ void PCAHandler::ConstructPCA(TMatrixDSym* CovMatrix, const int firstPCAd, const
 // Make sure decomposed matrix isn't correlated with undecomposed
 void PCAHandler::SanitisePCA(TMatrixDSym* CovMatrix) {
 // ********************************************
-  constexpr double cov_threshold = 1e-6;
+  constexpr double correlation_threshold = 1e-6;
 
   bool found_significant_correlation = false;
 
