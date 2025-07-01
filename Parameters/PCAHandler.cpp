@@ -50,6 +50,9 @@ void PCAHandler::ConstructPCA(TMatrixDSym* CovMatrix, const int firstPCAd, const
   MACH3LOG_INFO("PCAing parameters {} through {} inclusive", FirstPCAdpar, LastPCAdpar);
   int numunpcadpars = CovMatrix->GetNrows()-(LastPCAdpar-FirstPCAdpar+1);
 
+  // KS: Make sure we are not doing anything silly with PCA
+  SanitisePCA(CovMatrix);
+
   TMatrixDSym submat(CovMatrix->GetSub(FirstPCAdpar,LastPCAdpar,FirstPCAdpar,LastPCAdpar));
 
   //CW: Calculate how many eigen values this threshold corresponds to
@@ -143,6 +146,36 @@ void PCAHandler::ConstructPCA(TMatrixDSym* CovMatrix, const int firstPCAd, const
   for (int i = 0; i < FirstPCAdpar; ++i) isDecomposedPCA[i] = i;
 
   for (int i = FirstPCAdpar+nKeptPCApars+1; i < NumParPCA; ++i) isDecomposedPCA[i] = i+(_fNumPar-NumParPCA);
+}
+
+
+// ********************************************
+// Make sure decomposed matrix isn't correlated with undecomposed
+void PCAHandler::SanitisePCA(TMatrixDSym* CovMatrix) {
+// ********************************************
+  constexpr double cov_threshold = 1e-6;
+
+  bool found_significant_correlation = false;
+
+  int N = CovMatrix->GetNrows();
+  for (int i = FirstPCAdpar; i <= LastPCAdpar; ++i) {
+    for (int j = 0; j < N; ++j) {
+      // Skip if j is inside the decomposed range (we only want cross-correlations)
+      if (j >= FirstPCAdpar && j <= LastPCAdpar) continue;
+
+      double corr_val = (*CovMatrix)(i, j);
+      if (std::fabs(corr_val) > correlation_threshold) {
+        found_significant_correlation = true;
+        MACH3LOG_ERROR("Significant correlation detected between decomposed parameter '{}' "
+        "and undecomposed parameter '{}': {:.6e}", i, j, corr_val);
+      }
+    }
+  }
+
+  if (found_significant_correlation) {
+    MACH3LOG_ERROR("There are correlations between undecomposed and decomposed part of matrices, this will not work");
+    throw MaCh3Exception(__FILE__ , __LINE__);
+  }
 }
 
 // ********************************************
