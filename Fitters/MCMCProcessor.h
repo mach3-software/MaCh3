@@ -279,17 +279,20 @@ class MCMCProcessor {
 
     /// @brief CW: Read the input Covariance matrix entries. Get stuff like parameter input errors, names, and so on
     inline void ReadInputCov();
+    /// @warning This will no longer be supported in future
+    inline void ReadInputCovLegacy();
     /// @brief Read the output MCMC file and find what inputs were used
-    /// @warning There is bit of hardcoding for names so we should revisit it
     inline void FindInputFiles();
+    /// @warning This will no longer be supported in future
+    inline void FindInputFilesLegacy();
     /// @brief Read the xsec file and get the input central values and errors
-    virtual void ReadXSecFile();
+    inline void ReadModelFile();
+    /// @brief allow loading additional info for example used for oscillation parameters
+    virtual void LoadAdditionalInfo() {};
     /// @brief Read the ND cov file and get the input central values and errors
     inline void ReadNDFile();
     /// @brief Read the FD cov file and get the input central values and errors
     inline void ReadFDFile();
-    /// @brief Remove parameter specified in config
-    inline void RemoveParameters();
     /// @brief Print info like how many params have been loaded etc
     inline void PrintInfo() const;
 
@@ -397,7 +400,9 @@ class MCMCProcessor {
     /// Parameters central values which we are going to analyse
     std::vector<std::vector<double>>  ParamCentral;
     std::vector<std::vector<double>>  ParamNom;
+    /// Uncertainty on a single parameter
     std::vector<std::vector<double>>  ParamErrors;
+    /// Whether Param has flat prior or not
     std::vector<std::vector<bool>>    ParamFlat;
     /// Number of parameters per type
     std::vector<int> nParam;
@@ -444,7 +449,7 @@ class MCMCProcessor {
     std::vector<std::string> NDSamplesNames;
 
     /// Gaussian fitter
-    TF1 *Gauss;
+    std::unique_ptr<TF1> Gauss;
 
     /// The output file
     TFile *OutputFile;

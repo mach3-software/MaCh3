@@ -110,7 +110,6 @@ MCMCProcessor::~MCMCProcessor() {
   CanvasName += "]";
   if(printToPDF) Posterior->Print(CanvasName);
 
-  delete Gauss;
   delete Covariance;
   delete Correlation;
   delete Central_Value;
@@ -244,14 +243,12 @@ void MCMCProcessor::MakePostfit() {
   
   MACH3LOG_INFO("MCMCProcessor is making post-fit plots...");
 
+  int originalErrorLevel = gErrorIgnoreLevel;
+  gErrorIgnoreLevel = kFatal;
+
   // Directory for posteriors
   TDirectory *PostDir = OutputFile->mkdir("Post");
   TDirectory *PostHistDir = OutputFile->mkdir("Post_1d_hists");
-
-  // We fit with this Gaussian
-  Gauss = new TF1("Gauss","[0]/sqrt(2.0*3.14159)/[2]*TMath::Exp(-0.5*pow(x-[1],2)/[2]/[2])",-5,5);
-  Gauss->SetLineWidth(2);
-  Gauss->SetLineColor(kOrange-5);
   
   // nDraw is number of draws we want to do
   for (int i = 0; i < nDraw; ++i)
@@ -293,7 +290,7 @@ void MCMCProcessor::MakePostfit() {
     (*Means)(i) = Mean;
     (*Errors)(i) = Err;
 
-    GetGaussian(hpost[i], Gauss, Mean, Err);
+    GetGaussian(hpost[i], Gauss.get(), Mean, Err);
     (*Means_Gauss)(i) = Mean;
     (*Errors_Gauss)(i) = Err;
 
@@ -324,14 +321,14 @@ void MCMCProcessor::MakePostfit() {
     auto leg = std::make_unique<TLegend>(0.12, 0.6, 0.6, 0.97);
     SetLegendStyle(leg.get(), 0.04);
     leg->AddEntry(hpost[i], Form("#splitline{PDF}{#mu = %.2f, #sigma = %.2f}", hpost[i]->GetMean(), hpost[i]->GetRMS()), "l");
-    leg->AddEntry(Gauss, Form("#splitline{Gauss}{#mu = %.2f, #sigma = %.2f}", Gauss->GetParameter(1), Gauss->GetParameter(2)), "l");
+    leg->AddEntry(Gauss.get(), Form("#splitline{Gauss}{#mu = %.2f, #sigma = %.2f}", Gauss->GetParameter(1), Gauss->GetParameter(2)), "l");
     leg->AddEntry(hpd.get(), Form("#splitline{HPD}{#mu = %.2f, #sigma = %.2f (+%.2f-%.2f)}", (*Means_HPD)(i), (*Errors_HPD)(i), (*Errors_HPD_Positive)(i), (*Errors_HPD_Negative)(i)), "l");
     leg->AddEntry(Asimov.get(), Form("#splitline{Prior}{x = %.2f , #sigma = %.2f}", Prior, PriorError), "l");
 
     //CW: Don't plot if this is a fixed histogram (i.e. the peak is the whole integral)
     if (hpost[i]->GetMaximum() == hpost[i]->Integral()*DrawRange) 
     {
-      MACH3LOG_WARN("Found fixed parameter, moving on");
+      MACH3LOG_WARN("Found fixed parameter: {} ({}), moving on", Title, i);
       IamVaried[i] = false;
       //KS:Set mean and error to prior for fixed parameters, it looks much better when fixed parameter has mean on prior rather than on 0 with 0 error.
       (*Means_HPD)(i)  = Prior;
@@ -413,6 +410,9 @@ void MCMCProcessor::MakePostfit() {
   delete PostDir;
   PostHistDir->Close();
   delete PostHistDir;
+
+  // restore original warning setting
+  gErrorIgnoreLevel = originalErrorLevel;
 } // Have now written the postfit projections
 
 // *******************
@@ -1923,15 +1923,16 @@ void MCMCProcessor::ScanInput() {
   UpperCut = nEntries+1;
 
   // Get the list of branches
-
   TObjArray* brlis = Chain->GetListOfBranches();
 
   // Get the number of branches
   nBranches = brlis->GetEntries();
 
   BranchNames.reserve(nBranches);
-  IamVaried.reserve(nBranches);
   ParamType.reserve(nBranches);
+
+  // Read the input Covariances
+  ReadInputCov();
 
   // Set all the branches to off
   Chain->SetBranchStatus("*", false);
@@ -1963,19 +1964,7 @@ void MCMCProcessor::ScanInput() {
     // Turn on the branches which we want for parameters
     Chain->SetBranchStatus(bname.Data(), true);
 
-    // If we're on beam systematics
-    if(bname.BeginsWith("xsec_")   ||
-      bname.BeginsWith("sin2th_")  ||
-      bname.BeginsWith("delm2_")   ||
-      bname.BeginsWith("delta_")   ||
-      bname.BeginsWith("baseline") ||
-      bname.BeginsWith("density"))
-    {
-      BranchNames.push_back(bname);
-      ParamType.push_back(kXSecPar);
-      nParam[kXSecPar]++;
-    }
-    else if (bname.BeginsWith("ndd_"))
+    if (bname.BeginsWith("ndd_"))
     {
       BranchNames.push_back(bname);
       ParamType.push_back(kNDPar);
@@ -1999,11 +1988,14 @@ void MCMCProcessor::ScanInput() {
     }
   }
   nDraw = int(BranchNames.size());
+
   // Read the input Covariances
-  ReadInputCov();
+  ReadInputCovLegacy();
   
   // Check order of parameter types
   ScanParameterOrder();
+
+  IamVaried.resize(nDraw, true);
 
   // Print useful Info
   PrintInfo();
@@ -2012,6 +2004,9 @@ void MCMCProcessor::ScanInput() {
   // Set the step cut to be 20%
   int cut = nSteps/5;
   SetStepCut(cut);
+
+  // Basically allow loading oscillation parameters
+  LoadAdditionalInfo();
 }
 
 // ****************************
@@ -2031,7 +2026,9 @@ void MCMCProcessor::SetupOutput() {
   CanvasName.ReplaceAll("[","");
 
   // We fit with this Gaussian
-  Gauss = new TF1("gauss","[0]/sqrt(2.0*3.14159)/[2]*TMath::Exp(-0.5*pow(x-[1],2)/[2]/[2])", -5, 5);
+  Gauss = std::make_unique<TF1>("Gauss", "[0]/sqrt(2.0*3.14159)/[2]*TMath::Exp(-0.5*pow(x-[1],2)/[2]/[2])", -5, 5);
+  Gauss->SetLineWidth(2);
+  Gauss->SetLineColor(kOrange-5);
 
   // Declare the TVectors
   Covariance = new TMatrixDSym(nDraw);
@@ -2154,11 +2151,17 @@ std::unique_ptr<TH1D> MCMCProcessor::MakePrefit() {
 void MCMCProcessor::ReadInputCov() {
 // **************************
   FindInputFiles();
-  if(nParam[kXSecPar] > 0)  ReadXSecFile();
+  if(CovPos[kXSecPar].back() != "none") ReadModelFile();
+}
+
+// **************************
+//CW: Read the input Covariance matrix entries
+// Get stuff like parameter input errors, names, and so on
+void MCMCProcessor::ReadInputCovLegacy() {
+// **************************
+  FindInputFilesLegacy();
   if(nParam[kNDPar] > 0)    ReadNDFile();
   if(nParam[kFDDetPar] > 0) ReadFDFile();
-  //KS: Remove parameters which were removed
-  RemoveParameters();
 }
 
 // **************************
@@ -2201,32 +2204,12 @@ void MCMCProcessor::FindInputFiles() {
   } else {
     CovConfig[kXSecPar] = TMacroToYAML(*XsecConfig);
   }
-  //CW: And the ND Covariance matrix
-  CovPos[kNDPar].push_back(GetFromManager<std::string>(Settings["General"]["Systematics"]["NDCovFile"], "none"));
-  if(CovPos[kNDPar].back() == "none") {
-    MACH3LOG_WARN("Couldn't find NDCov branch in output");
-    InputNotFound = true;
-  }
-
-  //CW: And the FD Covariance matrix
-  CovPos[kFDDetPar].push_back(GetFromManager<std::string>(Settings["General"]["Systematics"]["FDCovFile"], "none"));
-  if(CovPos[kFDDetPar].back() == "none") {
-    MACH3LOG_WARN("Couldn't find FDCov branch in output");
-    InputNotFound = true;
-  }
-
   if(InputNotFound) MaCh3Utils::PrintConfig(Settings);
 
   if (const char * mach3_env = std::getenv("MACH3"))
   {
     for(size_t i = 0; i < CovPos[kXSecPar].size(); i++)
       CovPos[kXSecPar][i].insert(0, std::string(mach3_env)+"/");
-
-    for(size_t i = 0; i < CovPos[kNDPar].size(); i++)
-      CovPos[kNDPar][i].insert(0, std::string(mach3_env)+"/");
-
-    for(size_t i = 0; i < CovPos[kFDDetPar].size(); i++)
-      CovPos[kFDDetPar][i].insert(0, std::string(mach3_env)+"/");
   }
 
   // Delete the TTrees and the input file handle since we've now got the settings we need
@@ -2240,15 +2223,56 @@ void MCMCProcessor::FindInputFiles() {
   delete TempFile;
 }
 
+// **************************
+// Read the output MCMC file and find what inputs were used
+void MCMCProcessor::FindInputFilesLegacy() {
+// **************************
+  // Now read the MCMC file
+  TFile *TempFile = new TFile(MCMCFile.c_str(), "open");
+
+  // Get the settings for the MCMC
+  TMacro *Config = TempFile->Get<TMacro>("MaCh3_Config");
+
+  if (Config == nullptr) {
+    MACH3LOG_ERROR("Didn't find MaCh3_Config tree in MCMC file! {}", MCMCFile);
+    TempFile->ls();
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+  YAML::Node Settings = TMacroToYAML(*Config);
+
+  //CW: And the ND Covariance matrix
+  CovPos[kNDPar].push_back(GetFromManager<std::string>(Settings["General"]["Systematics"]["NDCovFile"], "none"));
+  if(CovPos[kNDPar].back() == "none") {
+    MACH3LOG_WARN("Couldn't find NDCov (legacy) branch in output");
+  }
+
+  //CW: And the FD Covariance matrix
+  CovPos[kFDDetPar].push_back(GetFromManager<std::string>(Settings["General"]["Systematics"]["FDCovFile"], "none"));
+  if(CovPos[kFDDetPar].back() == "none") {
+    MACH3LOG_WARN("Couldn't find FDCov (legacy) branch in output");
+  }
+
+  if (const char * mach3_env = std::getenv("MACH3"))
+  {
+    for(size_t i = 0; i < CovPos[kNDPar].size(); i++)
+      CovPos[kNDPar][i].insert(0, std::string(mach3_env)+"/");
+
+    for(size_t i = 0; i < CovPos[kFDDetPar].size(); i++)
+      CovPos[kFDDetPar][i].insert(0, std::string(mach3_env)+"/");
+  }
+  TempFile->Close();
+  delete TempFile;
+}
+
 // ***************
-// Read the xsec file and get the input central values and errors
-void MCMCProcessor::ReadXSecFile() {
+// Read the model file and get the input central values and errors
+void MCMCProcessor::ReadModelFile() {
 // ***************
   YAML::Node XSecFile = CovConfig[kXSecPar];
 
   auto systematics = XSecFile["Systematics"];
-  int i = 0;
-  for (auto it = systematics.begin(); it != systematics.end(); ++it, ++i)
+  int paramIndex  = 0;
+  for (auto it = systematics.begin(); it != systematics.end(); ++it, ++paramIndex )
   {
     auto const &param = *it;
     // Push back the name
@@ -2259,14 +2283,12 @@ void MCMCProcessor::ReadXSecFile() {
     {
       if (TempString.rfind(ExcludedNames.at(ik), 0) == 0)
       {
-        const int Tracker = ParamTypeStartPos[kXSecPar] + i;
-        BranchNames[Tracker] = "delete";
-        nParam[kXSecPar]--;
         rejected = true;
         break;
       }
     }
     if(rejected) continue;
+
     ParamNames[kXSecPar].push_back(TempString);
     ParamCentral[kXSecPar].push_back(param["Systematic"]["ParameterValues"]["PreFitValue"].as<double>());
     ParamNom[kXSecPar].push_back(param["Systematic"]["ParameterValues"]["Generated"].as<double>());
@@ -2274,6 +2296,21 @@ void MCMCProcessor::ReadXSecFile() {
     ParamFlat[kXSecPar].push_back(GetFromManager<bool>(param["Systematic"]["FlatPrior"], false));
 
     ParameterGroup.push_back(param["Systematic"]["ParameterGroup"].as<std::string>());
+
+    nParam[kXSecPar]++;
+    ParamType.push_back(kXSecPar);
+    // Params from osc group have branch name equal to fancy name while all others are basically xsec_0 for example
+    if(ParameterGroup.back() == "Osc") {
+      BranchNames.push_back(ParamNames[kXSecPar].back());
+    } else {
+      BranchNames.push_back("xsec_" + std::to_string(paramIndex));
+    }
+
+    // Check that the branch exists before setting address
+    if (!Chain->GetBranch(BranchNames.back())) {
+      MACH3LOG_ERROR("Couldn't find branch '{}'", BranchNames.back());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
   }
 }
 
@@ -2352,22 +2389,6 @@ void MCMCProcessor::ReadFDFile() {
   FDdetFile->Close();
   delete FDdetFile;
   delete FDdetMatrix;
-}
-
-// ***************
-//This is bit messy as currently BranchNames is taken from actual Chain.root file while proper parameter name from matrix.root and right now we don't access them at the same time.
-void MCMCProcessor::RemoveParameters() {
-// ***************
-  for(int i = 0; i < nDraw; i++)
-  {
-    if(BranchNames[i] == "delete")
-    {
-      BranchNames.erase(BranchNames.begin() + i);
-      ParamType.erase(ParamType.begin() + i);
-      nDraw--;
-      i = 0;
-    }
-  }
 }
 
 // ***************
@@ -4102,25 +4123,27 @@ void MCMCProcessor::PrintInfo() const {
 // **************************
   // KS: Create a map to store the counts of unique strings
   std::unordered_map<std::string, int> paramCounts;
+  std::vector<std::string> orderedKeys;
 
-  std::for_each(ParameterGroup.begin(), ParameterGroup.end(),
-                [&paramCounts](const std::string& param) {
-                  paramCounts[param]++;
-                });
+  for (const std::string& param : ParameterGroup) {
+    if (paramCounts[param] == 0) {
+      orderedKeys.push_back(param);  // preserve order of first appearance
+    }
+    paramCounts[param]++;
+  }
 
   MACH3LOG_INFO("************************************************");
   MACH3LOG_INFO("Scanning output branches...");
-  MACH3LOG_INFO("# useful entries in tree: \033[1;32m {} \033[0m ", nDraw);
+  MACH3LOG_INFO("# Useful entries in tree: \033[1;32m {} \033[0m ", nDraw);
   MACH3LOG_INFO("# Model params:  \033[1;32m {} starting at {} \033[0m ", nParam[kXSecPar], ParamTypeStartPos[kXSecPar]);
   MACH3LOG_INFO("# With following groups: ");
-  for (const auto& pair : paramCounts) {
-    MACH3LOG_INFO(" # {} params: {}", pair.first, pair.second);
+  for (const std::string& key : orderedKeys) {
+    MACH3LOG_INFO(" # {} params: {}", key, paramCounts[key]);
   }
-  MACH3LOG_INFO("# ND params:    \033[1;32m {} starting at {} \033[0m ", nParam[kNDPar], ParamTypeStartPos[kNDPar]);
-  MACH3LOG_INFO("# FD params:    \033[1;32m {} starting at {} \033[0m ", nParam[kFDDetPar], ParamTypeStartPos[kFDDetPar]);
+  MACH3LOG_INFO("# ND params (legacy):    \033[1;32m {} starting at {} \033[0m ", nParam[kNDPar], ParamTypeStartPos[kNDPar]);
+  MACH3LOG_INFO("# FD params (legacy):    \033[1;32m {} starting at {} \033[0m ", nParam[kFDDetPar], ParamTypeStartPos[kFDDetPar]);
   MACH3LOG_INFO("************************************************");
 }
-
 
 // **************************
 std::vector<double> MCMCProcessor::GetMargins(const std::unique_ptr<TCanvas>& Canv) const {

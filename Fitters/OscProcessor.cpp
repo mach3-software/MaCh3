@@ -30,11 +30,8 @@ OscProcessor::~OscProcessor() {
 
 // ***************
 // Read the Osc cov file and get the input central values and errors
-void OscProcessor::ReadXSecFile() {
+void OscProcessor::LoadAdditionalInfo() {
 // ***************
-  // Call base class function
-  MCMCProcessor::ReadXSecFile();
-
   // KS: Check if OscParams were enabled, in future we will also get
   for(size_t i = 0; i < ParameterGroup.size(); i++) {
     if(ParameterGroup[i] == "Osc"){
@@ -70,6 +67,8 @@ void OscProcessor::ReadXSecFile() {
         DeltaM2_23Name   = CurrentName;
       }
     }
+  } else{
+    MACH3LOG_WARN("Didn't find oscillation parameters");
   }
 
   if(PlotJarlskog && OscEnabled)
@@ -110,7 +109,6 @@ double OscProcessor::CalcJarlskog(const double s2th13, const double s2th23, cons
   return j;
 }
 
-
 // ***************
 double OscProcessor::SamplePriorForParam(const int paramIndex, const std::unique_ptr<TRandom3>& randGen, const std::vector<double>& FlatBounds) const {
 // ***************
@@ -144,7 +142,7 @@ void OscProcessor::PerformJarlskogAnalysis() {
     DeltaCPIndex == M3::_BAD_INT_||
     DeltaM2_23Index == M3::_BAD_INT_)
   {
-    MACH3LOG_INFO("Will nor {}, as oscillation parameters are missing", __func__);
+    MACH3LOG_WARN("Will not {}, as oscillation parameters are missing", __func__);
     return;
   }
   MACH3LOG_INFO("Starting {}", __func__);
