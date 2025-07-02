@@ -192,6 +192,10 @@ class MCMCProcessor {
     inline int GetNXSec() { return nParam[kXSecPar]; };
     inline int GetNND() { return nParam[kNDPar]; };
     inline int GetNFD() { return nParam[kFDDetPar]; };
+
+    /// @brief
+    YAML::Node GetCovConfig(const int i) {return CovConfig.at(i); }
+
     /// @brief Number of params from a given group, for example flux
     int GetGroup(const std::string& name) const;
 
