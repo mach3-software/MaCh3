@@ -1991,7 +1991,12 @@ void MCMCProcessor::ScanInput() {
              bname.BeginsWith("delm2_")   ||
              bname.BeginsWith("delta_")   ||
              bname.BeginsWith("baseline") ||
-             bname.BeginsWith("density")   )
+             bname.BeginsWith("density")  ||
+	     bname.BeginsWith("Eps_")     ||
+	     bname.BeginsWith("Delta_")   ||
+	     bname.BeginsWith("ElecCoup") ||
+	     bname.BeginsWith("UpCoup")   ||
+             bname.BeginsWith("DownCoup"))
     {
       BranchNames.push_back(bname);
       ParamType.push_back(kOSCPar);
