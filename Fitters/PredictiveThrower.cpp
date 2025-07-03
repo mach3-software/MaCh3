@@ -29,7 +29,6 @@ PredictiveThrower::~PredictiveThrower() {
 
 }
 
-
 // *************************
 void PredictiveThrower::SetParamters() {
 // *************************
@@ -351,23 +350,23 @@ std::vector<std::unique_ptr<TH2D>> PredictiveThrower::ProduceSpectra(const std::
   return Spectra;
 }
 
-
-
 // *************************
 std::unique_ptr<TH1D> PredictiveThrower::MakePredictive(const std::vector<std::unique_ptr<TH1D>>& Toys,
                                                         const std::string& Sample_Name,
                                                         const std::string& suffix) {
 // *************************
-  const int nXBins = 500;
+  constexpr int nXBins = 100;
   int nbinsx = Toys[0]->GetNbinsX();
 
-  auto hist1d = std::make_unique<TH1D>((Sample_Name + "_" + suffix + "_hist_1d").c_str(),
-                                       (Sample_Name + "_" + suffix + "_hist_1d").c_str(),
-                                       nbinsx, Toys[0]->GetXaxis()->GetXbins()->GetArray());
-  hist1d->SetDirectory(nullptr);
+  auto PredictiveHist = std::make_unique<TH1D>((Sample_Name + "_" + suffix + "_PostPred").c_str(),
+                                               (Sample_Name + "_" + suffix + "_PostPred").c_str(),
+                                                nbinsx, Toys[0]->GetXaxis()->GetXbins()->GetArray());
+  PredictiveHist->SetDirectory(nullptr);
 
   for (int i = 1; i <= nbinsx; ++i) {
-    TString projName = TString::Format("%s_%s_py%d", Sample_Name.c_str(), suffix.c_str(), i);
+    double x_low  = Toys[0]->GetXaxis()->GetBinLowEdge(i);
+    double x_high = Toys[0]->GetXaxis()->GetBinUpEdge(i);
+    TString projName = TString::Format("%s %s X: [%.3f, %.3f]", Sample_Name.c_str(), suffix.c_str(), x_low, x_high);
     auto PosteriorHist = std::make_unique<TH1D>(projName, projName, nXBins, 1, -1);
     PosteriorHist->SetDirectory(nullptr);
 
@@ -381,110 +380,12 @@ std::unique_ptr<TH1D> PredictiveThrower::MakePredictive(const std::vector<std::u
     const double nMean = PosteriorHist->GetMean();
     const double nMeanError = PosteriorHist->GetRMS();
 
-    hist1d->SetBinContent(i, nMean);
-    hist1d->SetBinError(i, nMeanError);
+    PredictiveHist->SetBinContent(i, nMean);
+    PredictiveHist->SetBinError(i, nMeanError);
   }
 
-  hist1d->Write();
-  return hist1d;
-                                                        }
-
-
-// *************************
-std::unique_ptr<TH1D> PredictiveThrower::MakeSpectra(const std::unique_ptr<TH2D>& Spectra,
-                                                     const std::string& Sample_Name,
-                                                     const std::string& suffix) {
-// *************************
-  int nbinsx = Spectra->GetNbinsX();
-  std::vector<double> x(nbinsx), y(nbinsx), ex(nbinsx), ey(nbinsx);
-  for(int i = 1; i <= nbinsx; i++)
-  {
-    TString projName = TString::Format("%s_%s_py%d", Sample_Name.c_str(), suffix.c_str(), i);
-    TH1D* proj = Spectra->ProjectionY(projName, i, i);
-    double x_low  = Spectra->GetXaxis()->GetBinLowEdge(i);
-    double x_high = Spectra->GetXaxis()->GetBinUpEdge(i);
-
-    proj->SetTitle(TString::Format("%s %s X: [%.3f, %.3f]",
-                                   Sample_Name.c_str(), suffix.c_str(), x_low, x_high));
-    if(proj->GetEntries() > 0)
-    {
-      int first_bin = 99999;
-      int last_bin = 0;
-
-      for(int bin_i = 1 ; bin_i < proj->GetNbinsX() - 1 ; bin_i++){
-        double val = proj->GetBinContent(bin_i);
-        if(val > 0 && bin_i < first_bin){
-          first_bin = bin_i;
-        }
-
-        if(val > 0){
-          last_bin = bin_i;
-        }
-      }
-
-      // ETA - this is an attempt to automate
-      // the bin width in the 1D projections.
-      // Often we fit 1D gaussians to these projections
-      // and for this the number of bins should really be
-      // at least 10 across the range of the projection.
-
-      //Get the range the filled bins cover
-      double diff = proj->GetBinCenter(last_bin) - proj->GetBinCenter(first_bin);
-      double opt_bin_width = diff/10;
-      double current_bin_width = proj->GetBinWidth(last_bin);
-      int rebin = 1;
-
-      if(diff > 0) { rebin = static_cast<int>(opt_bin_width / current_bin_width); }
-      if(rebin==0){rebin+=1;}
-      //If the number of bins in the rebinning isn't a factor
-      //of the total number of bins keep reducing it until it is
-      while((proj->GetNbinsX() % rebin) != 0){
-        rebin--;
-      }
-
-      //Just in case the above loop does a bad job
-      if(rebin > 0){
-        proj->Rebin(rebin);
-      }
-
-      //Get the bin centre array
-      x[i-1] = Spectra->GetXaxis()->GetBinCenter(i);
-      //Set the error on as being half the bin width
-      ex[i-1] = Spectra->GetXaxis()->GetBinWidth(i)/2.0;
-      //Set the centre of the bin to be
-      y[i-1]=proj->GetMean();
-      //Set the error on y to be RMS of the bin
-      ey[i-1]=proj->GetRMS();
-    }
-    proj->Write();
-    delete proj;
-  }
-
-  // Make graph for this sample
-  auto errorbars = std::make_unique<TGraphErrors>(nbinsx, x.data(), y.data(), ex.data(), ey.data());
-  errorbars->SetName((Sample_Name + "_" + suffix + "_MeanRMS").c_str());
-  errorbars->SetTitle("Mean and RMS vs X bin");
-  errorbars->GetXaxis()->SetTitle(Spectra->GetXaxis()->GetTitle());
-  errorbars->GetYaxis()->SetTitle("Mean +/- RMS");
-
-  // Optionally write graph
-  errorbars->Write();
-
-  TAxis* xaxis = Spectra->GetXaxis();
-  std::vector<double> x_edges(nbinsx + 1);
-  for (int i = 0; i <= nbinsx; ++i) {
-    x_edges[i] = xaxis->GetBinLowEdge(i + 1);
-  }
-
-  auto hist1d = std::make_unique<TH1D>((Sample_Name + "_" + suffix + "_hist_1d").c_str(), (Sample_Name + "_" + suffix + "_hist_1d").c_str(), nbinsx, x_edges.data());
-  hist1d->SetDirectory(nullptr);
-  // Fill histogram bin contents and errors (bins start from 1 to nbinsx)
-  for (int bin = 1; bin <= nbinsx; ++bin) {
-    hist1d->SetBinContent(bin, y[bin - 1]);
-    hist1d->SetBinError(bin, ey[bin - 1]);
-  }
-  hist1d->Write();
-  return hist1d;
+  PredictiveHist->Write();
+  return PredictiveHist;
 }
 
 // *************************
@@ -511,10 +412,9 @@ void PredictiveThrower::RunPredictiveAnalysis() {
     SampleDirectories[sample]->cd();
     Spectra_mc[sample]->Write();
     //Spectra_w2[sample]->Write();
-    PostPred_mc[sample] = MakeSpectra(Spectra_mc[sample], SampleNames[sample], "mc");
-    //PostPred_w2[sample] = MakeSpectra(Spectra_w2[sample], SampleNames[sample], "w2");
 
-    MakePredictive(MC_Hist_Toy[sample], SampleNames[sample], "mc");
+    PostPred_mc[sample] = MakePredictive(MC_Hist_Toy[sample], SampleNames[sample], "mc");
+    //PostPred_w2[sample] = MakePredictive(W2_Hist_Toy[sample], SampleNames[sample], "w2");
   }
 
   PosteriorPredictivepValue(PostPred_mc,
@@ -536,14 +436,12 @@ void PredictiveThrower::RunPredictiveAnalysis() {
   MACH3LOG_INFO("{} took {:.2f}s to finish for {} toys", __func__, TempClock.RealTime(), Ntoys);
 }
 
-
-
-// ****************
+// *************************
 double PredictiveThrower::GetLLH(const std::unique_ptr<TH1D>& DatHist,
                                  const std::unique_ptr<TH1D>& MCHist,
                                  const std::unique_ptr<TH1D>& W2Hist,
                                  SampleHandlerBase* SampleHandler) {
-// ****************
+// *************************
   double llh = 0.0;
   for (int i = 1; i <= DatHist->GetXaxis()->GetNbins(); ++i)
   {
@@ -556,7 +454,6 @@ double PredictiveThrower::GetLLH(const std::unique_ptr<TH1D>& DatHist,
   return 2*llh;
 }
 
-
 // *************************
 void PredictiveThrower::PosteriorPredictivepValue(const std::vector<std::unique_ptr<TH1D>>& PostPred_mc,
                                                   //const std::vector<std::unique_ptr<TH1D>>& PostPred_w2,
@@ -568,11 +465,10 @@ void PredictiveThrower::PosteriorPredictivepValue(const std::vector<std::unique_
   std::vector<std::vector<double>> chi2_mc_vec(Ntoys);
   std::vector<std::vector<double>> chi2_pred_vec(Ntoys);
 
-  /// TODO add penalty term!!!
   for(int iToy = 0; iToy < Ntoys; iToy++) {
-    chi2_dat_vec[iToy].resize(TotalNumberOfSamples, 0.0);
-    chi2_mc_vec[iToy].resize(TotalNumberOfSamples, 0.0);
-    chi2_pred_vec[iToy].resize(TotalNumberOfSamples, 0.0);
+    chi2_dat_vec[iToy].resize(TotalNumberOfSamples, Penalty[iToy]);
+    chi2_mc_vec[iToy].resize(TotalNumberOfSamples, Penalty[iToy]);
+    chi2_pred_vec[iToy].resize(TotalNumberOfSamples, Penalty[iToy]);
 
     /// TODO This can be multithreaded
     for (int iSample = 0; iSample < TotalNumberOfSamples; ++iSample) {
@@ -593,8 +489,6 @@ void PredictiveThrower::PosteriorPredictivepValue(const std::vector<std::unique_
   MakeChi2Plots(chi2_mc_vec,   "-2LLH (Draw Fluc, Draw)", chi2_dat_vec, "-2LLH (Data, Draw)", SampleDir, "_drawfluc_draw");
   MakeChi2Plots(chi2_pred_vec, "-2LLH (Pred Fluc, Draw)", chi2_dat_vec, "-2LLH (Data, Draw)", SampleDir, "_predfluc_draw");
 }
-
-
 
 // *************************
 void PredictiveThrower::MakeChi2Plots(const std::vector<std::vector<double>>& Chi2_x,
