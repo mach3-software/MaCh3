@@ -105,6 +105,9 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @brief KS: Check how many parameters are associated with given group
     /// @ingroup ParameterHandlerGetters
     int GetNumParFromGroup(const std::string& Group) const;
+    /// @brief KS: Get names of all unique parameter groups
+    /// @ingroup ParameterHandlerGetters
+    std::vector<std::string> GetUniqueParameterGroups();
 
     /// @brief KS Function to set to prior parameters of a given group or values from vector
     /// @param Group name of group, like Xsec or Flux
