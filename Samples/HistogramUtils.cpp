@@ -603,3 +603,24 @@ double CalculateEnu(double PLep, double costh, double Eb, bool neutrino){
 
   return Enu;
 }
+
+
+namespace M3 {
+// **************************************************************************
+TFile* Open(const std::string& Name, const std::string& Type) {
+// **************************************************************************
+  TFile* OutFile = new TFile(Name.c_str(), Type.c_str());
+
+  // Check if the file is successfully opened and usable
+  if (OutFile->IsZombie()) {
+    MACH3LOG_ERROR("Failed to open file: {}", Name);
+    if (Type == "RECREATE") {
+      MACH3LOG_ERROR("Check if directory exist");
+    }
+    delete OutFile;
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  return OutFile;
+}
+
+} //end M3

@@ -144,4 +144,16 @@ std::unique_ptr<ObjectType> Clone(const ObjectType* obj, const std::string& name
 
   return Hist;
 }
-}
+
+
+/// @brief Opens a ROOT file with the given name and mode.
+///
+/// This function wraps ROOT’s `TFile` constructor and checks whether the file was opened
+/// successfully and give some useful debugging information
+///
+/// @param Name The name or path of the file to open.
+/// @param Type The file open mode (e.g., "READ", "RECREATE", "UPDATE").
+/// @return Pointer to the opened ROOT file.
+TFile* Open(const std::string& Name, const std::string& Type);
+
+} //end M3
