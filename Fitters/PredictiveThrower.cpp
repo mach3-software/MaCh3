@@ -46,9 +46,15 @@ void PredictiveThrower::SetParamters() {
 
   if(ModelSystematic && ParameterGroupsNotVaried.size() > 0) ModelSystematic->SetGroupOnlyParameters(ParameterGroupsNotVaried);
 
-  /// TODO WARNING BLARB Add fixing single param
+  /// Alternatively vary only selected params
+  if (ModelSystematic && !ParameterOnlyToVary.empty()) {
+    for (int i = 0; i < ModelSystematic->GetNumParams(); ++i) {
+      if (ParameterOnlyToVary.find(i) == ParameterOnlyToVary.end()) {
+        ModelSystematic->SetParProp(i, ModelSystematic->GetParInit(i));
+      }
+    }
+  }
 }
-
 
 // *************************
 // Produce MaCh3 toys:
@@ -80,12 +86,23 @@ void PredictiveThrower::SetupToyGeneration() {
   MC_Hist_Toy.resize(TotalNumberOfSamples);
   W2_Hist_Toy.resize(TotalNumberOfSamples);
   Data_Hist.resize(TotalNumberOfSamples);
-  SampleNames.resize(TotalNumberOfSamples);
+  SampleObjectMap.resize(TotalNumberOfSamples);
+  SampleNames.resize(TotalNumberOfSamples+1);
+
+  int currentIndex = 0;
+  for (size_t iPDF = 0; iPDF < samples.size(); ++iPDF) {
+    for (int subSampleIndex = 0; subSampleIndex < samples[iPDF]->GetNsamples(); ++subSampleIndex) {
+      SampleObjectMap[currentIndex] = static_cast<int>(iPDF); // map the current global sample index to this sample object
+      ++currentIndex;
+    }
+  }
+
   for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
     MC_Hist_Toy[sample].resize(Ntoys);
     W2_Hist_Toy[sample].resize(Ntoys);
     SampleNames[sample] = samples[sample]->GetTitle();
   }
+  SampleNames[TotalNumberOfSamples] = "Total";
 
   Is_PriorPredictive = Get<bool>(fitMan->raw()["Predictive"]["PriorPredictive"], __FILE__, __LINE__);
 
@@ -117,26 +134,45 @@ void PredictiveThrower::SetupToyGeneration() {
     NModelParams += systematics[s]->GetNumParams();
   }
 
-
-  if(ModelSystematic) {
+  if (ModelSystematic) {
     auto ThrowParamGroupOnly = GetFromManager<std::vector<std::string>>(fitMan->raw()["Predictive"]["ThrowParamGroupOnly"], {}, __FILE__, __LINE__);
     auto UniqueParamGroup = ModelSystematic->GetUniqueParameterGroups();
+    auto ParameterOnlyToVaryString = GetFromManager<std::vector<std::string>>(fitMan->raw()["Predictive"]["ThrowSinlgeParams"], {}, __FILE__, __LINE__);
 
-    MACH3LOG_INFO("I have following parameter groups: {}", fmt::join(UniqueParamGroup, ", "));
-    if(ThrowParamGroupOnly.size() == 0) {
-      MACH3LOG_INFO("I will vary all");
-    } else {
-      // Compute UniqueParamGroup - ThrowParamGroupOnly
-      std::unordered_set<std::string> throwOnlySet(ThrowParamGroupOnly.begin(), ThrowParamGroupOnly.end());
-      ParameterGroupsNotVaried.clear();
+    if (!ThrowParamGroupOnly.empty() && !ParameterOnlyToVaryString.empty()) {
+      MACH3LOG_ERROR("Can't use ThrowParamGroupOnly and ThrowSinlgeParams at the same time");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
 
-      for (const auto& group : UniqueParamGroup) {
-        if (throwOnlySet.find(group) == throwOnlySet.end()) {
-          ParameterGroupsNotVaried.push_back(group);
+    if (!ParameterOnlyToVaryString.empty()) {
+      MACH3LOG_INFO("I will throw only: {}", fmt::join(ParameterOnlyToVaryString, ", "));
+      std::vector<int> ParameterVary(ParameterOnlyToVaryString.size());
+
+      for (size_t i = 0; i < ParameterOnlyToVaryString.size(); ++i) {
+        ParameterVary[i] = ModelSystematic->GetParIndex(ParameterOnlyToVaryString[i]);
+        if (ParameterVary[i] == M3::_BAD_INT_) {
+          MACH3LOG_ERROR("Can't proceed if param {} is missing", ParameterOnlyToVaryString[i]);
+          throw MaCh3Exception(__FILE__, __LINE__);
         }
       }
-      MACH3LOG_INFO("I will vary: {}", fmt::join(ThrowParamGroupOnly, ", "));
-      MACH3LOG_INFO("Exclude: {}", fmt::join(ParameterGroupsNotVaried, ", "));
+      ParameterOnlyToVary = std::unordered_set<int>(ParameterVary.begin(), ParameterVary.end());
+    } else {
+      MACH3LOG_INFO("I have following parameter groups: {}", fmt::join(UniqueParamGroup, ", "));
+      if (ThrowParamGroupOnly.empty()) {
+        MACH3LOG_INFO("I will vary all");
+      } else {
+        std::unordered_set<std::string> throwOnlySet(ThrowParamGroupOnly.begin(), ThrowParamGroupOnly.end());
+        ParameterGroupsNotVaried.clear();
+
+        for (const auto& group : UniqueParamGroup) {
+          if (throwOnlySet.find(group) == throwOnlySet.end()) {
+            ParameterGroupsNotVaried.push_back(group);
+          }
+        }
+
+        MACH3LOG_INFO("I will vary: {}", fmt::join(ThrowParamGroupOnly, ", "));
+        MACH3LOG_INFO("Exclude: {}", fmt::join(ParameterGroupsNotVaried, ", "));
+      }
     }
   }
 }
@@ -252,7 +288,7 @@ void PredictiveThrower::ProduceToys() {
     SetParamters();
 
     Penalty = 0;
-    if(FullLLH){
+    if(FullLLH) {
       for (size_t s = 0; s < systematics.size(); ++s) {
         //KS: do times 2 because banff reports chi2
         Penalty = 2.0 * systematics[s]->GetLikelihood();
@@ -353,7 +389,8 @@ std::vector<std::unique_ptr<TH2D>> PredictiveThrower::ProduceSpectra(const std::
 // *************************
 std::unique_ptr<TH1D> PredictiveThrower::MakePredictive(const std::vector<std::unique_ptr<TH1D>>& Toys,
                                                         const std::string& Sample_Name,
-                                                        const std::string& suffix) {
+                                                        const std::string& suffix,
+                                                        const bool DebugHistograms) {
 // *************************
   constexpr int nXBins = 100;
   int nbinsx = Toys[0]->GetNbinsX();
@@ -372,10 +409,10 @@ std::unique_ptr<TH1D> PredictiveThrower::MakePredictive(const std::vector<std::u
 
     for (size_t iToy = 0; iToy < Toys.size(); ++iToy) {
       const double Content = Toys[iToy]->GetBinContent(i);
-      PosteriorHist->Fill(Content);
+      PosteriorHist->Fill(Content, ReweightWeight[iToy]);
     }
 
-    PosteriorHist->Write();
+    if(DebugHistograms) PosteriorHist->Write();
 
     const double nMean = PosteriorHist->GetMean();
     const double nMeanError = PosteriorHist->GetRMS();
@@ -396,11 +433,13 @@ void PredictiveThrower::RunPredictiveAnalysis() {
   TStopwatch TempClock;
   TempClock.Start();
 
+  auto DebugHistograms = GetFromManager<bool>(fitMan->raw()["Predictive"]["DebugHistograms"], false, __FILE__, __LINE__);
+
   TDirectory* PredictiveDir = outputFile->mkdir("Predictive");
   std::vector<TDirectory*> SampleDirectories;
-  SampleDirectories.resize(TotalNumberOfSamples);
+  SampleDirectories.resize(TotalNumberOfSamples+1);
 
-  for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
+  for (int sample = 0; sample < TotalNumberOfSamples+1; ++sample) {
     SampleDirectories[sample] = PredictiveDir->mkdir(SampleNames[sample].c_str());
   }
 
@@ -413,8 +452,8 @@ void PredictiveThrower::RunPredictiveAnalysis() {
     Spectra_mc[sample]->Write();
     //Spectra_w2[sample]->Write();
 
-    PostPred_mc[sample] = MakePredictive(MC_Hist_Toy[sample], SampleNames[sample], "mc");
-    //PostPred_w2[sample] = MakePredictive(W2_Hist_Toy[sample], SampleNames[sample], "w2");
+    PostPred_mc[sample] = MakePredictive(MC_Hist_Toy[sample], SampleNames[sample], "mc", DebugHistograms);
+    //PostPred_w2[sample] = MakePredictive(W2_Hist_Toy[sample], SampleNames[sample], "w2", DebugHistograms);
   }
 
   PosteriorPredictivepValue(PostPred_mc,
@@ -422,7 +461,7 @@ void PredictiveThrower::RunPredictiveAnalysis() {
                             SampleDirectories);
 
   // Close directories
-  for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
+  for (int sample = 0; sample < TotalNumberOfSamples+1; ++sample) {
     SampleDirectories[sample]->Close();
     delete SampleDirectories[sample];
   }
@@ -460,15 +499,19 @@ void PredictiveThrower::PosteriorPredictivepValue(const std::vector<std::unique_
                                                   const std::vector<TDirectory*>& SampleDir) {
 // *************************
   //(void) PostPred_w2;
-
+  // [Toys][Sample]
   std::vector<std::vector<double>> chi2_dat_vec(Ntoys);
   std::vector<std::vector<double>> chi2_mc_vec(Ntoys);
   std::vector<std::vector<double>> chi2_pred_vec(Ntoys);
 
   for(int iToy = 0; iToy < Ntoys; iToy++) {
-    chi2_dat_vec[iToy].resize(TotalNumberOfSamples, Penalty[iToy]);
-    chi2_mc_vec[iToy].resize(TotalNumberOfSamples, Penalty[iToy]);
-    chi2_pred_vec[iToy].resize(TotalNumberOfSamples, Penalty[iToy]);
+    chi2_dat_vec[iToy].resize(TotalNumberOfSamples+1, 0);
+    chi2_mc_vec[iToy].resize(TotalNumberOfSamples+1, 0);
+    chi2_pred_vec[iToy].resize(TotalNumberOfSamples+1, 0);
+
+    chi2_dat_vec[iToy].back() = PenaltyTerm[iToy];
+    chi2_mc_vec[iToy].back() = PenaltyTerm[iToy];
+    chi2_pred_vec[iToy].back() = PenaltyTerm[iToy];
 
     /// TODO This can be multithreaded
     for (int iSample = 0; iSample < TotalNumberOfSamples; ++iSample) {
@@ -479,10 +522,13 @@ void PredictiveThrower::PosteriorPredictivepValue(const std::vector<std::unique_
       MakeFluctuatedHistogramAlternative(PredFluctHist.get(), PostPred_mc[iSample].get(), random.get());
 
       // Okay now we can do our chi2 calculation for our sample
-      chi2_dat_vec[iToy][iSample]  = GetLLH(Data_Hist[iSample], MC_Hist_Toy[iSample][iToy], W2_Hist_Toy[iSample][iToy], samples[iSample]);
-      chi2_mc_vec[iToy][iSample]   = GetLLH(DrawFluctHist, MC_Hist_Toy[iSample][iToy], W2_Hist_Toy[iSample][iToy], samples[iSample]);
-      chi2_pred_vec[iToy][iSample] = GetLLH(PredFluctHist, MC_Hist_Toy[iSample][iToy], W2_Hist_Toy[iSample][iToy], samples[iSample]);
+      chi2_dat_vec[iToy][iSample]  = GetLLH(Data_Hist[iSample], MC_Hist_Toy[iSample][iToy], W2_Hist_Toy[iSample][iToy], samples[SampleObjectMap[iSample]]);
+      chi2_mc_vec[iToy][iSample]   = GetLLH(DrawFluctHist, MC_Hist_Toy[iSample][iToy], W2_Hist_Toy[iSample][iToy], samples[SampleObjectMap[iSample]]);
+      chi2_pred_vec[iToy][iSample] = GetLLH(PredFluctHist, MC_Hist_Toy[iSample][iToy], W2_Hist_Toy[iSample][iToy], samples[SampleObjectMap[iSample]]);
 
+      chi2_dat_vec[iToy].back()  += chi2_dat_vec[iToy][iSample];
+      chi2_mc_vec[iToy].back()   += chi2_mc_vec[iToy][iSample];
+      chi2_pred_vec[iToy].back() += chi2_pred_vec[iToy][iSample];
     }
   }
 
@@ -498,7 +544,7 @@ void PredictiveThrower::MakeChi2Plots(const std::vector<std::vector<double>>& Ch
                    const std::vector<TDirectory*>& SampleDir,
                    const std::string Tittle) {
 // *************************
-  for (int iSample = 0; iSample < TotalNumberOfSamples; ++iSample) {
+  for (int iSample = 0; iSample < TotalNumberOfSamples+1; ++iSample) {
     SampleDir[iSample]->cd();
 
     // Transpose to extract chi2 values for a given sample across all toys
