@@ -137,9 +137,11 @@ std::vector<SampleType*> MaCh3SampleHandlerFactory(const std::vector<std::string
 
     // Clone the 1D histogram with a modified name
     if (Sample->GetNDim() == 1) {
-      Sample->AddData(Sample->GetMCHist(1));
+      auto hist = static_cast<TH1D*>(Sample->GetMCHist(1));
+      Sample->AddData(hist);
     } else {
-      Sample->AddData(Sample->GetMCHist(2));
+      auto hist = static_cast<TH2D*>(Sample->GetMCHist(2));
+      Sample->AddData(hist);
     }
     Handlers[i] = Sample;
   }

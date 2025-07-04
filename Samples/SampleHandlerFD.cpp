@@ -1228,7 +1228,7 @@ void SampleHandlerFD::AddData(TH1D* Data) {
   dathist2d = nullptr;
   dathist = static_cast<TH1D*>(Data->Clone());
 
-  if (GetNDim()!=1) {
+  if (GetNDim() != 1) {
     MACH3LOG_ERROR("Trying to set a 1D 'data' histogram in a 2D sample - Quitting"); 
     MACH3LOG_ERROR("The number of dimensions for this sample is {}", GetNDim());
     throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -1252,7 +1252,7 @@ void SampleHandlerFD::AddData(TH2D* Data) {
   dathist2d = static_cast<TH2D*>(Data->Clone());
   dathist = nullptr;
 
-  if (GetNDim()!=2) {
+  if (GetNDim() != 2) {
     MACH3LOG_ERROR("Trying to set a 2D 'data' histogram in a 1D sample - Quitting"); 
     throw MaCh3Exception(__FILE__ , __LINE__ );}
    
