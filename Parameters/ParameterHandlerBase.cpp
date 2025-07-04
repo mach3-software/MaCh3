@@ -1311,3 +1311,31 @@ void ParameterHandlerBase::SetTune(const std::string& TuneName) {
 
   SetParameters(Values);
 }
+
+
+// *************************************
+/// @brief Matches branches in a TTree to parameters in a systematic handler.
+///
+/// @param PosteriorFile Pointer to the ROOT TTree from MaCh3 fit.
+/// @param Systematic Pointer to the systematic parameter handler.
+/// @param[out] BranchValues Vector to store the values of the branches (resized inside).
+/// @param[out] BranchNames Vector to store the names of the branches (resized inside).
+///
+/// @throws MaCh3Exception if any parameter branch is uninitialized.
+void ParameterHandlerBase::MatchMaCh3OutputBranches(TTree *PosteriorFile,
+                              std::vector<double>& BranchValues,
+                              std::vector<std::string>& BranchNames) {
+// *************************************
+  BranchValues.resize(GetNumParams());
+  BranchNames.resize(GetNumParams());
+
+  for (int i = 0; i < GetNumParams(); ++i) {
+    BranchNames[i] = GetParName(i);
+    if (!PosteriorFile->GetBranch(BranchNames[i].c_str())) {
+      MACH3LOG_ERROR("Branch '{}' does not exist in the TTree!", BranchNames[i]);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    PosteriorFile->SetBranchStatus(BranchNames[i].c_str(), true);
+    PosteriorFile->SetBranchAddress(BranchNames[i].c_str(), &BranchValues[i]);
+  }
+}

@@ -328,27 +328,18 @@ void FitterBase::StartFromPreviousFit(const std::string& FitName) {
     CovarianceFolder->Close();
     delete CovarianceFolder;
 
-    std::vector<double> branch_vals(systematics[s]->GetNumParams(), M3::_BAD_DOUBLE_);
-    for (int i = 0; i < systematics[s]->GetNumParams(); ++i) {
-      posts->SetBranchAddress(systematics[s]->GetParName(i).c_str(), &branch_vals[i]);
-    }
+    std::vector<double> branch_vals;
+    std::vector<std::string> branch_name;
+    systematics[s]->MatchMaCh3OutputBranches(posts, branch_vals, branch_name);
     posts->GetEntry(posts->GetEntries()-1);
 
-    for (int i = 0; i < systematics[s]->GetNumParams(); ++i) {
-      if(branch_vals[i] == M3::_BAD_DOUBLE_)
-      {
-        MACH3LOG_ERROR("Parameter {} is unvitalised with value {}", i, branch_vals[i]);
-        MACH3LOG_ERROR("Please check more precisely chain you passed {}", FitName);
-        throw MaCh3Exception(__FILE__ , __LINE__ );
-      }
-    }
     systematics[s]->SetParameters(branch_vals);
     systematics[s]->AcceptStep();
 
     MACH3LOG_INFO("Printing new starting values for: {}", systematics[s]->GetName());
     systematics[s]->PrintNominalCurrProp();
 
-    // Resetting branch adressed to nullptr as we don't want to write into a delected vector out of scope...
+    // Resetting branch addressed to nullptr as we don't want to write into a delected vector out of scope...
     for (int i = 0; i < systematics[s]->GetNumParams(); ++i) {
       posts->SetBranchAddress(systematics[s]->GetParName(i).c_str(), nullptr);
     }

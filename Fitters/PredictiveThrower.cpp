@@ -15,7 +15,7 @@ PredictiveThrower::PredictiveThrower(manager *man) : FitterBase(man) {
   FullLLH = GetFromManager<bool>(fitMan->raw()["Predictive"]["FullLLH"], false, __FILE__, __LINE__ );
   NModelParams = 0;
 
-  Is_PriorPredictive = false;
+  Is_PriorPredictive = Get<bool>(fitMan->raw()["Predictive"]["PriorPredictive"], __FILE__, __LINE__);
   Ntoys = Get<int>(fitMan->raw()["Predictive"]["Ntoy"], __FILE__, __LINE__);
 
   ReweightWeight.resize(Ntoys);
@@ -67,7 +67,7 @@ void PredictiveThrower::SetupToyGeneration() {
   {
     auto* MaCh3Sample = dynamic_cast<SampleHandlerFD*>(samples[iPDF]);
     if (!MaCh3Sample) {
-      MACH3LOG_ERROR(":: Sample {} do not inherit from  SampleHandlerFD this is not implemented::", samples[iPDF]->GetTitle());
+      MACH3LOG_ERROR("Sample {} do not inherit from SampleHandlerFD this is not implemented", samples[iPDF]->GetTitle());
       throw MaCh3Exception(__FILE__, __LINE__);
     }
     TotalNumberOfSamples += samples[iPDF]->GetNsamples();
@@ -103,8 +103,6 @@ void PredictiveThrower::SetupToyGeneration() {
     SampleNames[sample] = samples[sample]->GetTitle();
   }
   SampleNames[TotalNumberOfSamples] = "Total";
-
-  Is_PriorPredictive = Get<bool>(fitMan->raw()["Predictive"]["PriorPredictive"], __FILE__, __LINE__);
 
   if(Is_PriorPredictive) {
     MACH3LOG_INFO("You've chosen to run Prior Predictive Distribution");
@@ -197,7 +195,6 @@ void PredictiveThrower::ProduceToys() {
   ToyTree->Branch("Draw", &Draw, "Draw/I");
   ToyTree->Branch("NModelParams", &NModelParams, "NModelParams/I");
 
-
   TDirectory* ToyDirectory = outputFile->mkdir("Toys");
   ToyDirectory->cd();
 
@@ -234,24 +231,8 @@ void PredictiveThrower::ProduceToys() {
     Weight = 1.0;
   }
 
-  for (size_t s = 0; s < systematics.size(); ++s)
-  {
-    branch_vals[s].resize(systematics[s]->GetNumParams(), M3::_BAD_DOUBLE_);
-    branch_name[s].resize(systematics[s]->GetNumParams());
-    for (int i = 0; i < systematics[s]->GetNumParams(); ++i) {
-      branch_name[s][i] = systematics[s]->GetParName(i);
-      PosteriorFile->SetBranchAddress(branch_name[s][i].c_str(), &branch_vals[s][i]);
-    }
-    PosteriorFile->GetEntry(PosteriorFile->GetEntries()-1);
-
-    for (int i = 0; i < systematics[s]->GetNumParams(); ++i) {
-      if(branch_vals[s][i] == M3::_BAD_DOUBLE_)
-      {
-        MACH3LOG_ERROR("Parameter {} is unvitalised with value {}", i, branch_vals[s][i]);
-        MACH3LOG_ERROR("Please check more precisely chain you passed {}", PosteriorFileName);
-        throw MaCh3Exception(__FILE__ , __LINE__ );
-      }
-    }
+  for (size_t s = 0; s < systematics.size(); ++s) {
+    systematics[s]->MatchMaCh3OutputBranches(PosteriorFile, branch_vals[s], branch_name[s]);
   }
   //Get the burn-in from the config
   auto burn_in = Get<int>(fitMan->raw()["Predictive"]["BurnInSteps"], __FILE__, __LINE__);
