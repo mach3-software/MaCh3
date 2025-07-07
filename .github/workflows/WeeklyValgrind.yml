@@ -42,15 +42,15 @@ jobs:
           #source /opt/MaCh3Validations/build/bin/setup.MaCh3.sh
           #source /opt/MaCh3Validations/build/bin/setup.MaCh3Tutorial.sh
           #source /opt/MaCh3Validations/build/bin/setup.NuOscillator.sh
-          #cd /opt/MaCh3Validations/build/
+          cd /opt/MaCh3Validations/build/
           # Run
-          #valgrind --suppressions="$ROOTSYS/etc/valgrind-root.supp" --log-file="ValgrindMCMC.txt" --leak-check=yes --track-origins=yes --leak-check=full --show-leak-kinds=all ./bin/MCMCTutorial #TutorialConfigs/FitterConfig.yaml General:MCMC:NSteps:10
+          #valgrind --suppressions="$ROOTSYS/etc/valgrind-root.supp" --log-file="ValgrindMCMC.txt" --leak-check=yes --track-origins=yes --leak-check=full --show-leak-kinds=all ./bin/#MCMCTutorial TutorialConfigs/FitterConfig.yaml General:MCMC:NSteps:10
           #valgrind --tool=massif --massif-out-file=MassifMCMC.txt ./bin/MCMCTutorial TutorialConfigs/FitterConfig.yaml General:MCMC:NSteps:10
 
       - name: Get Dependency Graph
         run: |
           cd /opt/
-          git clone --branch main https://github.com/mach3-software/MaCh3.git MaCh3Cmake
+          git clone --branch develop https://github.com/mach3-software/MaCh3.git MaCh3Cmake
           cd MaCh3Cmake
           mkdir build && cd build
           cmake ../ -DMaCh3_DependancyGraph=ON
@@ -61,19 +61,14 @@ jobs:
           git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/mach3-software/MaCh3.git Plot
           cd Plot
           git checkout gh-profiling
-          git config --global user.email "github-actions@github.com"
-          git config --global user.name "github-actions"
-          git rm Graph.png
-          git commit -m "Remove"
           #mv -f /opt/MaCh3Validations/build/ValgrindMCMC.txt .
           #mv -f /opt/MaCh3Validations/build/MassifMCMC.txt .
           mv -f /opt/MaCh3Cmake/build/foo.png Graph.png
-          ls
-          git status
 
-
-          #git add ValgrindMCMC.txt
-          #git add MassifMCMC.txt
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "github-actions"
+          git add ValgrindMCMC.txt
+          git add MassifMCMC.txt
           git add Graph.png
-          git commit --allow-empty -m "Update Valgrind files"
+          git commit -m "Update Valgrind files"
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/mach3-software/MaCh3.git gh-profiling
