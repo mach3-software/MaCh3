@@ -154,6 +154,6 @@ std::unique_ptr<ObjectType> Clone(const ObjectType* obj, const std::string& name
 /// @param Name The name or path of the file to open.
 /// @param Type The file open mode (e.g., "READ", "RECREATE", "UPDATE").
 /// @return Pointer to the opened ROOT file.
-TFile* Open(const std::string& Name, const std::string& Type);
+TFile* Open(const std::string& Name, const std::string& Type, const std::string& File, const int Line);
 
 } //end M3

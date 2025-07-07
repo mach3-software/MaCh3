@@ -607,7 +607,7 @@ double CalculateEnu(double PLep, double costh, double Eb, bool neutrino){
 
 namespace M3 {
 // **************************************************************************
-TFile* Open(const std::string& Name, const std::string& Type) {
+TFile* Open(const std::string& Name, const std::string& Type, const std::string& File, const int Line) {
 // **************************************************************************
   TFile* OutFile = new TFile(Name.c_str(), Type.c_str());
 
@@ -618,7 +618,7 @@ TFile* Open(const std::string& Name, const std::string& Type) {
       MACH3LOG_ERROR("Check if directory exist");
     }
     delete OutFile;
-    throw MaCh3Exception(__FILE__, __LINE__);
+    throw MaCh3Exception(File, Line);
   }
   return OutFile;
 }
