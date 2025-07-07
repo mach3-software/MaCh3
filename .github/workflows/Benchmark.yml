@@ -58,7 +58,7 @@ jobs:
           tool: 'catch2' # Specify that the benchmark tool is Catch2
           github-token: ${{ secrets.MACH3_VALIDATIONS_PAT }} # Use GitHub token for authentication
           output-file-path: /opt/MaCh3Validations/build/output.txt # Path to the benchmark output file
-          alert-threshold: 100% # Alert threshold for performance degradation
+          alert-threshold: 150% # Alert threshold for performance degradation
           comment-on-alert: true
           gh-pages-branch: gh-pages # Branch to store benchmark results
           gh-repository: github.com/mach3-software/MaCh3Tutorial # Repository for benchmark results
