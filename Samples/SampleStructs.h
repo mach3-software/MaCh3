@@ -109,12 +109,11 @@ enum NuPDG {
 };
 
 /// Make an enum of the test statistic that we're using
-/// @todo KS: Consider adding BakerCousins based on Baker & Cousins, Nucl.Instrum.Meth.A 221 (1984) 437-442
 enum TestStatistic {
-  kPoisson,                 //!< Standard Poisson likelihood
-  kBarlowBeeston,           //!< Barlow-Beeston following Conway @cite Conway:2011in
+  kPoisson,                 //!< Standard Poisson likelihood @cite BakerCousins1984
+  kBarlowBeeston,           //!< Barlow-Beeston (@cite Barlow:1993dm) following Conway approximation (@cite Conway:2011in)
   kIceCube,                 //!< Based on @cite Arguelles:2019izp
-  kPearson,                 //!< Standard Pearson likelihood
+  kPearson,                 //!< Standard Pearson likelihood @cite Pearson1900
   kDembinskiAbdelmotteleb,  //!< Based on @cite Dembinski:2022ios
   kNTestStatistics          //!< Number of test statistics
 };
