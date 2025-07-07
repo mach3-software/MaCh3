@@ -35,9 +35,6 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   //you don't want this too often https://root.cern/root/html606/TTree_8cxx_source.html#l01229
   auto_save = Get<int>(fitMan->raw()["General"]["MCMC"]["AutoSave"], __FILE__ , __LINE__);
 
-  // Do we want to save proposal? This will break plotting scripts and is heave for disk space and step time. Only use when debugging
-  SaveProposal = false;
-
   #ifdef MULTITHREAD
   //KS: TODO This should help with performance when saving entries to ROOT file. I didn't have time to validate hence commented out
   //Based on other tests it is really helpful
@@ -160,6 +157,9 @@ void FitterBase::PrepareOutput() {
       MACH3LOG_CRITICAL("No samples Found! Is this really what you wanted?");
       //throw MaCh3Exception(__FILE__ , __LINE__ );
     }
+
+    // Do we want to save proposal? This will break plotting scripts and is heave for disk space and step time. Only use when debugging
+    bool SaveProposal = GetFromManager<bool>(fitMan->raw()["General"]["SaveProposal"], false, __FILE__ , __LINE__);
 
     // Prepare the output trees
     for (ParameterHandlerBase *cov : systematics) {
