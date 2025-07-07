@@ -41,7 +41,7 @@ jobs:
           source /opt/MaCh3Validations/build/bin/setup.NuOscillator.sh
           cd /opt/MaCh3Validations/build/
           # Run
-          valgrind --suppressions="$ROOTSYS/etc/valgrind-root.supp" --log-file="ValgrindMCMC.txt" --leak-check=yes --track-origins=yes --leak-check=full --show-leak-kinds=all ./bin/#MCMCTutorial TutorialConfigs/FitterConfig.yaml General:MCMC:NSteps:10
+          valgrind --suppressions="$ROOTSYS/etc/valgrind-root.supp" --log-file="ValgrindMCMC.txt" --leak-check=yes --track-origins=yes --leak-check=full --show-leak-kinds=all ./bin/MCMCTutorial TutorialConfigs/FitterConfig.yaml General:MCMC:NSteps:10
           valgrind --tool=massif --massif-out-file=MassifMCMC.txt ./bin/MCMCTutorial TutorialConfigs/FitterConfig.yaml General:MCMC:NSteps:10
 
       - name: Get Dependency Graph
