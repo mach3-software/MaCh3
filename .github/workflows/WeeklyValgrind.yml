@@ -4,9 +4,6 @@ name: MaCh3 Valgrind
 on:
   schedule:
     - cron: '0 0 * * 1' # Every Monday at midnight
-  push:
-    branches:
-      - feature/FixGraphBot
 
 permissions:
   # Required permissions for GitHub Pages deployment and content updates
@@ -34,18 +31,18 @@ jobs:
       - name: Build MaCh3 Validations
         run: |
           cd /opt/MaCh3Validations/build
-          #make -j4 install # Build and install the project
+          make -j4 install # Build and install the project
 
       - name: Run Valgrind
         run: |
           # Source environment setup scripts
-          #source /opt/MaCh3Validations/build/bin/setup.MaCh3.sh
-          #source /opt/MaCh3Validations/build/bin/setup.MaCh3Tutorial.sh
-          #source /opt/MaCh3Validations/build/bin/setup.NuOscillator.sh
+          source /opt/MaCh3Validations/build/bin/setup.MaCh3.sh
+          source /opt/MaCh3Validations/build/bin/setup.MaCh3Tutorial.sh
+          source /opt/MaCh3Validations/build/bin/setup.NuOscillator.sh
           cd /opt/MaCh3Validations/build/
           # Run
-          #valgrind --suppressions="$ROOTSYS/etc/valgrind-root.supp" --log-file="ValgrindMCMC.txt" --leak-check=yes --track-origins=yes --leak-check=full --show-leak-kinds=all ./bin/#MCMCTutorial TutorialConfigs/FitterConfig.yaml General:MCMC:NSteps:10
-          #valgrind --tool=massif --massif-out-file=MassifMCMC.txt ./bin/MCMCTutorial TutorialConfigs/FitterConfig.yaml General:MCMC:NSteps:10
+          valgrind --suppressions="$ROOTSYS/etc/valgrind-root.supp" --log-file="ValgrindMCMC.txt" --leak-check=yes --track-origins=yes --leak-check=full --show-leak-kinds=all ./bin/#MCMCTutorial TutorialConfigs/FitterConfig.yaml General:MCMC:NSteps:10
+          valgrind --tool=massif --massif-out-file=MassifMCMC.txt ./bin/MCMCTutorial TutorialConfigs/FitterConfig.yaml General:MCMC:NSteps:10
 
       - name: Get Dependency Graph
         run: |
@@ -61,8 +58,8 @@ jobs:
           git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/mach3-software/MaCh3.git Plot
           cd Plot
           git checkout gh-profiling
-          #mv -f /opt/MaCh3Validations/build/ValgrindMCMC.txt .
-          #mv -f /opt/MaCh3Validations/build/MassifMCMC.txt .
+          mv -f /opt/MaCh3Validations/build/ValgrindMCMC.txt .
+          mv -f /opt/MaCh3Validations/build/MassifMCMC.txt .
           mv -f /opt/MaCh3Cmake/build/foo.png Graph.png
 
           git config --global user.email "github-actions@github.com"
@@ -70,5 +67,5 @@ jobs:
           git add ValgrindMCMC.txt
           git add MassifMCMC.txt
           git add Graph.png
-          git commit -m "Update Valgrind files"
+          git commit --allow-empty -m "Update Valgrind files"
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/mach3-software/MaCh3.git gh-profiling
