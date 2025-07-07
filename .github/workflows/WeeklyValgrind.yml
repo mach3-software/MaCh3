@@ -64,6 +64,7 @@ jobs:
           #mv /opt/MaCh3Validations/build/ValgrindMCMC.txt .
           #mv /opt/MaCh3Validations/build/MassifMCMC.txt .
           mv /opt/MaCh3Cmake/build/foo.png Graph.png
+          touch Graph.png
           ls
 
           git config --global user.email "github-actions@github.com"
