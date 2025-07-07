@@ -236,9 +236,6 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:ada898e35bab22af470f2cd1e28af609b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFitterBase.html#ada898e35bab22af470f2cd1e28af609b">fTestLikelihood</a></td></tr>
 <tr class="memdesc:ada898e35bab22af470f2cd1e28af609b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Necessary for some fitting algorithms like <a class="el" href="classPSO.html" title="Class PSO, consist of a vector of object Class Particle and global best Takes in the size (number of ...">PSO</a>.  <br /></td></tr>
 <tr class="separator:ada898e35bab22af470f2cd1e28af609b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a490b8614c4089c6db10ff357e7aaab67"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFitterBase.html#a490b8614c4089c6db10ff357e7aaab67">SaveProposal</a></td></tr>
-<tr class="memdesc:a490b8614c4089c6db10ff357e7aaab67"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save proposal at each step.  <br /></td></tr>
-<tr class="separator:a490b8614c4089c6db10ff357e7aaab67"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a699abe6a2c89706b54544212152d613a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFitterBase.html#a699abe6a2c89706b54544212152d613a">FileSaved</a></td></tr>
 <tr class="memdesc:a699abe6a2c89706b54544212152d613a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if file saved not repeat some operations.  <br /></td></tr>
 <tr class="separator:a699abe6a2c89706b54544212152d613a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -302,51 +299,47 @@ Protected Attributes</h2></td></tr>
 <div class="line"><span class="lineno">   34</span>  <span class="comment">//you don&#39;t want this too often https://root.cern/root/html606/TTree_8cxx_source.html#l01229</span></div>
 <div class="line"><span class="lineno">   35</span>  <a class="code hl_variable" href="classFitterBase.html#ad955982e63066918cba9c53381608d09">auto_save</a> = Get&lt;int&gt;(<a class="code hl_variable" href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">fitMan</a>-&gt;<a class="code hl_function" href="classmanager.html#ab3999cc856ede72b37f68bdb28bd5520">raw</a>()[<span class="stringliteral">&quot;General&quot;</span>][<span class="stringliteral">&quot;MCMC&quot;</span>][<span class="stringliteral">&quot;AutoSave&quot;</span>], __FILE__ , __LINE__);</div>
 <div class="line"><span class="lineno">   36</span> </div>
-<div class="line"><span class="lineno">   37</span>  <span class="comment">// Do we want to save proposal? This will break plotting scripts and is heave for disk space and step time. Only use when debugging</span></div>
-<div class="line"><span class="lineno">   38</span>  <a class="code hl_variable" href="classFitterBase.html#a490b8614c4089c6db10ff357e7aaab67">SaveProposal</a> = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">   39</span> </div>
-<div class="line"><span class="lineno">   40</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
-<div class="line"><span class="lineno">   41</span>  <span class="comment">//KS: TODO This should help with performance when saving entries to ROOT file. I didn&#39;t have time to validate hence commented out</span></div>
-<div class="line"><span class="lineno">   42</span>  <span class="comment">//Based on other tests it is really helpful</span></div>
-<div class="line"><span class="lineno">   43</span>  <span class="comment">//ROOT::EnableImplicitMT();</span></div>
-<div class="line"><span class="lineno">   44</span><span class="preprocessor">  #endif</span></div>
-<div class="line"><span class="lineno">   45</span>  <span class="comment">// Set the output file</span></div>
-<div class="line"><span class="lineno">   46</span>  <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a> = <span class="keyword">new</span> TFile(outfile.c_str(), <span class="stringliteral">&quot;RECREATE&quot;</span>);</div>
-<div class="line"><span class="lineno">   47</span>  <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;cd();</div>
-<div class="line"><span class="lineno">   48</span>  <span class="comment">// Set output tree</span></div>
-<div class="line"><span class="lineno">   49</span>  <a class="code hl_variable" href="classFitterBase.html#aed2032b9c4a4f2248abe548f54f8dcc8">outTree</a> = <span class="keyword">new</span> TTree(<span class="stringliteral">&quot;posteriors&quot;</span>, <span class="stringliteral">&quot;Posterior_Distributions&quot;</span>);</div>
-<div class="line"><span class="lineno">   50</span>  <span class="comment">// Auto-save every 200MB, the bigger the better https://root.cern/root/html606/TTree_8cxx_source.html#l01229</span></div>
-<div class="line"><span class="lineno">   51</span>  <a class="code hl_variable" href="classFitterBase.html#aed2032b9c4a4f2248abe548f54f8dcc8">outTree</a>-&gt;SetAutoSave(-200E6);</div>
-<div class="line"><span class="lineno">   52</span> </div>
-<div class="line"><span class="lineno">   53</span>  <a class="code hl_variable" href="classFitterBase.html#a699abe6a2c89706b54544212152d613a">FileSaved</a> = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">   54</span>  <a class="code hl_variable" href="classFitterBase.html#a588678c71d816f48ba3c140543dbe916">SettingsSaved</a> = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">   55</span>  <a class="code hl_variable" href="classFitterBase.html#a3bfd8f69df891d03bae0587cd1a1e1b7">OutputPrepared</a> = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">   56</span> </div>
-<div class="line"><span class="lineno">   57</span>  <span class="comment">//Create TDirectory</span></div>
-<div class="line"><span class="lineno">   58</span>  <a class="code hl_variable" href="classFitterBase.html#aacc46437245ba8a9817f2ed2e86a96e0">CovFolder</a> = <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;mkdir(<span class="stringliteral">&quot;CovarianceFolder&quot;</span>);</div>
-<div class="line"><span class="lineno">   59</span>  <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;cd();</div>
-<div class="line"><span class="lineno">   60</span>  <a class="code hl_variable" href="classFitterBase.html#aafa86c7e244e6587a298e1726bd5e835">SampleFolder</a> = <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;mkdir(<span class="stringliteral">&quot;SampleFolder&quot;</span>);</div>
-<div class="line"><span class="lineno">   61</span>  <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;cd();</div>
-<div class="line"><span class="lineno">   62</span> </div>
-<div class="line"><span class="lineno">   63</span><span class="preprocessor">  #ifdef DEBUG</span></div>
-<div class="line"><span class="lineno">   64</span>  <span class="comment">// Prepare the output log file</span></div>
-<div class="line"><span class="lineno">   65</span>  <span class="keywordflow">if</span> (debug) debugFile.open((outfile+<span class="stringliteral">&quot;.log&quot;</span>).c_str());</div>
-<div class="line"><span class="lineno">   66</span><span class="preprocessor">  #endif</span></div>
-<div class="line"><span class="lineno">   67</span> </div>
-<div class="line"><span class="lineno">   68</span>  <a class="code hl_variable" href="classFitterBase.html#abe9814558b8ff1bccdde3b4c894467e6">TotalNSamples</a> = 0;</div>
-<div class="line"><span class="lineno">   69</span>  <a class="code hl_variable" href="classFitterBase.html#ada898e35bab22af470f2cd1e28af609b">fTestLikelihood</a> = GetFromManager&lt;bool&gt;(<a class="code hl_variable" href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">fitMan</a>-&gt;<a class="code hl_function" href="classmanager.html#ab3999cc856ede72b37f68bdb28bd5520">raw</a>()[<span class="stringliteral">&quot;General&quot;</span>][<span class="stringliteral">&quot;Fitter&quot;</span>][<span class="stringliteral">&quot;FitTestLikelihood&quot;</span>], <span class="keyword">false</span>, __FILE__ , __LINE__);</div>
-<div class="line"><span class="lineno">   70</span>}</div>
+<div class="line"><span class="lineno">   37</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
+<div class="line"><span class="lineno">   38</span>  <span class="comment">//KS: TODO This should help with performance when saving entries to ROOT file. I didn&#39;t have time to validate hence commented out</span></div>
+<div class="line"><span class="lineno">   39</span>  <span class="comment">//Based on other tests it is really helpful</span></div>
+<div class="line"><span class="lineno">   40</span>  <span class="comment">//ROOT::EnableImplicitMT();</span></div>
+<div class="line"><span class="lineno">   41</span><span class="preprocessor">  #endif</span></div>
+<div class="line"><span class="lineno">   42</span>  <span class="comment">// Set the output file</span></div>
+<div class="line"><span class="lineno">   43</span>  <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a> = <span class="keyword">new</span> TFile(outfile.c_str(), <span class="stringliteral">&quot;RECREATE&quot;</span>);</div>
+<div class="line"><span class="lineno">   44</span>  <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;cd();</div>
+<div class="line"><span class="lineno">   45</span>  <span class="comment">// Set output tree</span></div>
+<div class="line"><span class="lineno">   46</span>  <a class="code hl_variable" href="classFitterBase.html#aed2032b9c4a4f2248abe548f54f8dcc8">outTree</a> = <span class="keyword">new</span> TTree(<span class="stringliteral">&quot;posteriors&quot;</span>, <span class="stringliteral">&quot;Posterior_Distributions&quot;</span>);</div>
+<div class="line"><span class="lineno">   47</span>  <span class="comment">// Auto-save every 200MB, the bigger the better https://root.cern/root/html606/TTree_8cxx_source.html#l01229</span></div>
+<div class="line"><span class="lineno">   48</span>  <a class="code hl_variable" href="classFitterBase.html#aed2032b9c4a4f2248abe548f54f8dcc8">outTree</a>-&gt;SetAutoSave(-200E6);</div>
+<div class="line"><span class="lineno">   49</span> </div>
+<div class="line"><span class="lineno">   50</span>  <a class="code hl_variable" href="classFitterBase.html#a699abe6a2c89706b54544212152d613a">FileSaved</a> = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">   51</span>  <a class="code hl_variable" href="classFitterBase.html#a588678c71d816f48ba3c140543dbe916">SettingsSaved</a> = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">   52</span>  <a class="code hl_variable" href="classFitterBase.html#a3bfd8f69df891d03bae0587cd1a1e1b7">OutputPrepared</a> = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">   53</span> </div>
+<div class="line"><span class="lineno">   54</span>  <span class="comment">//Create TDirectory</span></div>
+<div class="line"><span class="lineno">   55</span>  <a class="code hl_variable" href="classFitterBase.html#aacc46437245ba8a9817f2ed2e86a96e0">CovFolder</a> = <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;mkdir(<span class="stringliteral">&quot;CovarianceFolder&quot;</span>);</div>
+<div class="line"><span class="lineno">   56</span>  <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;cd();</div>
+<div class="line"><span class="lineno">   57</span>  <a class="code hl_variable" href="classFitterBase.html#aafa86c7e244e6587a298e1726bd5e835">SampleFolder</a> = <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;mkdir(<span class="stringliteral">&quot;SampleFolder&quot;</span>);</div>
+<div class="line"><span class="lineno">   58</span>  <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;cd();</div>
+<div class="line"><span class="lineno">   59</span> </div>
+<div class="line"><span class="lineno">   60</span><span class="preprocessor">  #ifdef DEBUG</span></div>
+<div class="line"><span class="lineno">   61</span>  <span class="comment">// Prepare the output log file</span></div>
+<div class="line"><span class="lineno">   62</span>  <span class="keywordflow">if</span> (debug) debugFile.open((outfile+<span class="stringliteral">&quot;.log&quot;</span>).c_str());</div>
+<div class="line"><span class="lineno">   63</span><span class="preprocessor">  #endif</span></div>
+<div class="line"><span class="lineno">   64</span> </div>
+<div class="line"><span class="lineno">   65</span>  <a class="code hl_variable" href="classFitterBase.html#abe9814558b8ff1bccdde3b4c894467e6">TotalNSamples</a> = 0;</div>
+<div class="line"><span class="lineno">   66</span>  <a class="code hl_variable" href="classFitterBase.html#ada898e35bab22af470f2cd1e28af609b">fTestLikelihood</a> = GetFromManager&lt;bool&gt;(<a class="code hl_variable" href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">fitMan</a>-&gt;<a class="code hl_function" href="classmanager.html#ab3999cc856ede72b37f68bdb28bd5520">raw</a>()[<span class="stringliteral">&quot;General&quot;</span>][<span class="stringliteral">&quot;Fitter&quot;</span>][<span class="stringliteral">&quot;FitTestLikelihood&quot;</span>], <span class="keyword">false</span>, __FILE__ , __LINE__);</div>
+<div class="line"><span class="lineno">   67</span>}</div>
 <div class="ttc" id="aGetPostfitParamPlots_8cpp_html_aa6f3c9a8cee8f72f6f8ce65b720a2d40"><div class="ttname"><a href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a></div><div class="ttdeci">MaCh3Plotting::PlottingManager * man</div><div class="ttdef"><b>Definition:</b> <a href="GetPostfitParamPlots_8cpp_source.html#l00049">GetPostfitParamPlots.cpp:49</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_a138f250d9204a30204e4ca5b973008b2"><div class="ttname"><a href="classFitterBase.html#a138f250d9204a30204e4ca5b973008b2">FitterBase::random</a></div><div class="ttdeci">std::unique_ptr&lt; TRandom3 &gt; random</div><div class="ttdoc">Random number.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00128">FitterBase.h:128</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_a186ecb6d56dc7ff5ff290c2ce712f366"><div class="ttname"><a href="classFitterBase.html#a186ecb6d56dc7ff5ff290c2ce712f366">FitterBase::stepStart</a></div><div class="ttdeci">int stepStart</div><div class="ttdoc">step start if restarting</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00105">FitterBase.h:105</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_a2774f3a0047c4347ee0db05406425f79"><div class="ttname"><a href="classFitterBase.html#a2774f3a0047c4347ee0db05406425f79">FitterBase::accCount</a></div><div class="ttdeci">int accCount</div><div class="ttdoc">counts accepted steps</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00103">FitterBase.h:103</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_a3bfd8f69df891d03bae0587cd1a1e1b7"><div class="ttname"><a href="classFitterBase.html#a3bfd8f69df891d03bae0587cd1a1e1b7">FitterBase::OutputPrepared</a></div><div class="ttdeci">bool OutputPrepared</div><div class="ttdoc">Checks if output prepared not repeat some operations.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00151">FitterBase.h:151</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_a3bfd8f69df891d03bae0587cd1a1e1b7"><div class="ttname"><a href="classFitterBase.html#a3bfd8f69df891d03bae0587cd1a1e1b7">FitterBase::OutputPrepared</a></div><div class="ttdeci">bool OutputPrepared</div><div class="ttdoc">Checks if output prepared not repeat some operations.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00149">FitterBase.h:149</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_a4260b312e3f35cf01fc73b02239f8990"><div class="ttname"><a href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">FitterBase::outputFile</a></div><div class="ttdeci">TFile * outputFile</div><div class="ttdoc">Output.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00131">FitterBase.h:131</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_a490b8614c4089c6db10ff357e7aaab67"><div class="ttname"><a href="classFitterBase.html#a490b8614c4089c6db10ff357e7aaab67">FitterBase::SaveProposal</a></div><div class="ttdeci">bool SaveProposal</div><div class="ttdoc">Save proposal at each step.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00144">FitterBase.h:144</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_a4fceb68f242feeb04a0ddf42a5a37095"><div class="ttname"><a href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">FitterBase::fitMan</a></div><div class="ttdeci">manager * fitMan</div><div class="ttdoc">The manager.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00092">FitterBase.h:92</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_a50df1bd75b20a953f81ab9c2bab6b42c"><div class="ttname"><a href="classFitterBase.html#a50df1bd75b20a953f81ab9c2bab6b42c">FitterBase::step</a></div><div class="ttdeci">unsigned int step</div><div class="ttdoc">current state</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00095">FitterBase.h:95</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_a588678c71d816f48ba3c140543dbe916"><div class="ttname"><a href="classFitterBase.html#a588678c71d816f48ba3c140543dbe916">FitterBase::SettingsSaved</a></div><div class="ttdeci">bool SettingsSaved</div><div class="ttdoc">Checks if setting saved not repeat some operations.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00149">FitterBase.h:149</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_a699abe6a2c89706b54544212152d613a"><div class="ttname"><a href="classFitterBase.html#a699abe6a2c89706b54544212152d613a">FitterBase::FileSaved</a></div><div class="ttdeci">bool FileSaved</div><div class="ttdoc">Checks if file saved not repeat some operations.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00147">FitterBase.h:147</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_a588678c71d816f48ba3c140543dbe916"><div class="ttname"><a href="classFitterBase.html#a588678c71d816f48ba3c140543dbe916">FitterBase::SettingsSaved</a></div><div class="ttdeci">bool SettingsSaved</div><div class="ttdoc">Checks if setting saved not repeat some operations.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00147">FitterBase.h:147</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_a699abe6a2c89706b54544212152d613a"><div class="ttname"><a href="classFitterBase.html#a699abe6a2c89706b54544212152d613a">FitterBase::FileSaved</a></div><div class="ttdeci">bool FileSaved</div><div class="ttdoc">Checks if file saved not repeat some operations.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00145">FitterBase.h:145</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_a858edb45544f690e90b60b9e041394a6"><div class="ttname"><a href="classFitterBase.html#a858edb45544f690e90b60b9e041394a6">FitterBase::clock</a></div><div class="ttdeci">std::unique_ptr&lt; TStopwatch &gt; clock</div><div class="ttdoc">tells global time how long fit took</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00121">FitterBase.h:121</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_a9fe01b2b6f7f0d6a7b04675a099e1a4f"><div class="ttname"><a href="classFitterBase.html#a9fe01b2b6f7f0d6a7b04675a099e1a4f">FitterBase::stepClock</a></div><div class="ttdeci">std::unique_ptr&lt; TStopwatch &gt; stepClock</div><div class="ttdoc">tells how long single step/fit iteration took</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00123">FitterBase.h:123</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_aacc46437245ba8a9817f2ed2e86a96e0"><div class="ttname"><a href="classFitterBase.html#aacc46437245ba8a9817f2ed2e86a96e0">FitterBase::CovFolder</a></div><div class="ttdeci">TDirectory * CovFolder</div><div class="ttdoc">Output cov folder.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00133">FitterBase.h:133</a></div></div>
@@ -384,15 +377,15 @@ Protected Attributes</h2></td></tr>
 
 <p>Destructor for the <a class="el" href="classFitterBase.html" title="Base class for implementing fitting algorithms.">FitterBase</a> class. </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8cpp_source.html#l00074">74</a> of file <a class="el" href="FitterBase_8cpp_source.html">FitterBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   74</span>                        {</div>
-<div class="line"><span class="lineno">   75</span><span class="comment">// *************************</span></div>
-<div class="line"><span class="lineno">   76</span>  <a class="code hl_function" href="classFitterBase.html#a418f581b688f035211107ddd83168c08">SaveOutput</a>();</div>
-<div class="line"><span class="lineno">   77</span> </div>
-<div class="line"><span class="lineno">   78</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a> != <span class="keyword">nullptr</span>) <span class="keyword">delete</span> <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>;</div>
-<div class="line"><span class="lineno">   79</span>  <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a> = <span class="keyword">nullptr</span>;</div>
-<div class="line"><span class="lineno">   80</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Closing MaCh3 Fitter Engine&quot;</span>);</div>
-<div class="line"><span class="lineno">   81</span>}</div>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8cpp_source.html#l00071">71</a> of file <a class="el" href="FitterBase_8cpp_source.html">FitterBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   71</span>                        {</div>
+<div class="line"><span class="lineno">   72</span><span class="comment">// *************************</span></div>
+<div class="line"><span class="lineno">   73</span>  <a class="code hl_function" href="classFitterBase.html#a418f581b688f035211107ddd83168c08">SaveOutput</a>();</div>
+<div class="line"><span class="lineno">   74</span> </div>
+<div class="line"><span class="lineno">   75</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a> != <span class="keyword">nullptr</span>) <span class="keyword">delete</span> <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>;</div>
+<div class="line"><span class="lineno">   76</span>  <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a> = <span class="keyword">nullptr</span>;</div>
+<div class="line"><span class="lineno">   77</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Closing MaCh3 Fitter Engine&quot;</span>);</div>
+<div class="line"><span class="lineno">   78</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a4db4657acad5c79ac4bbb66a9d1c5905"><div class="ttname"><a href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a></div><div class="ttdeci">#define MACH3LOG_DEBUG</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00022">MaCh3Logger.h:22</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_a418f581b688f035211107ddd83168c08"><div class="ttname"><a href="classFitterBase.html#a418f581b688f035211107ddd83168c08">FitterBase::SaveOutput</a></div><div class="ttdeci">void SaveOutput()</div><div class="ttdoc">Save output and close files.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8cpp_source.html#l00221">FitterBase.cpp:221</a></div></div>
 </div><!-- fragment -->
@@ -831,22 +824,25 @@ Protected Attributes</h2></td></tr>
 
 <p>Prepare the output file. </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8cpp_source.html#l00151">151</a> of file <a class="el" href="FitterBase_8cpp_source.html">FitterBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  151</span>                               {</div>
-<div class="line"><span class="lineno">  152</span><span class="comment">// *******************</span></div>
-<div class="line"><span class="lineno">  153</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classFitterBase.html#a3bfd8f69df891d03bae0587cd1a1e1b7">OutputPrepared</a>) <span class="keywordflow">return</span>;</div>
-<div class="line"><span class="lineno">  154</span>  <span class="comment">//MS: Check if we are fitting the test likelihood, rather than T2K likelihood, and only setup T2K output if not</span></div>
-<div class="line"><span class="lineno">  155</span>  <span class="keywordflow">if</span>(!<a class="code hl_variable" href="classFitterBase.html#ada898e35bab22af470f2cd1e28af609b">fTestLikelihood</a>)</div>
-<div class="line"><span class="lineno">  156</span>  {</div>
-<div class="line"><span class="lineno">  157</span>    <span class="comment">// Check that we have added samples</span></div>
-<div class="line"><span class="lineno">  158</span>    <span class="keywordflow">if</span> (!<a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>.size()) {</div>
-<div class="line"><span class="lineno">  159</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a>(<span class="stringliteral">&quot;No samples Found! Is this really what you wanted?&quot;</span>);</div>
-<div class="line"><span class="lineno">  160</span>      <span class="comment">//throw MaCh3Exception(__FILE__ , __LINE__ );</span></div>
-<div class="line"><span class="lineno">  161</span>    }</div>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8cpp_source.html#l00148">148</a> of file <a class="el" href="FitterBase_8cpp_source.html">FitterBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  148</span>                               {</div>
+<div class="line"><span class="lineno">  149</span><span class="comment">// *******************</span></div>
+<div class="line"><span class="lineno">  150</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classFitterBase.html#a3bfd8f69df891d03bae0587cd1a1e1b7">OutputPrepared</a>) <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  151</span>  <span class="comment">//MS: Check if we are fitting the test likelihood, rather than T2K likelihood, and only setup T2K output if not</span></div>
+<div class="line"><span class="lineno">  152</span>  <span class="keywordflow">if</span>(!<a class="code hl_variable" href="classFitterBase.html#ada898e35bab22af470f2cd1e28af609b">fTestLikelihood</a>)</div>
+<div class="line"><span class="lineno">  153</span>  {</div>
+<div class="line"><span class="lineno">  154</span>    <span class="comment">// Check that we have added samples</span></div>
+<div class="line"><span class="lineno">  155</span>    <span class="keywordflow">if</span> (!<a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>.size()) {</div>
+<div class="line"><span class="lineno">  156</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a>(<span class="stringliteral">&quot;No samples Found! Is this really what you wanted?&quot;</span>);</div>
+<div class="line"><span class="lineno">  157</span>      <span class="comment">//throw MaCh3Exception(__FILE__ , __LINE__ );</span></div>
+<div class="line"><span class="lineno">  158</span>    }</div>
+<div class="line"><span class="lineno">  159</span> </div>
+<div class="line"><span class="lineno">  160</span>    <span class="comment">// Do we want to save proposal? This will break plotting scripts and is heave for disk space and step time. Only use when debugging</span></div>
+<div class="line"><span class="lineno">  161</span>    <span class="keywordtype">bool</span> SaveProposal = GetFromManager&lt;bool&gt;(<a class="code hl_variable" href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">fitMan</a>-&gt;<a class="code hl_function" href="classmanager.html#ab3999cc856ede72b37f68bdb28bd5520">raw</a>()[<span class="stringliteral">&quot;General&quot;</span>][<span class="stringliteral">&quot;SaveProposal&quot;</span>], <span class="keyword">false</span>, __FILE__ , __LINE__);</div>
 <div class="line"><span class="lineno">  162</span> </div>
 <div class="line"><span class="lineno">  163</span>    <span class="comment">// Prepare the output trees</span></div>
 <div class="line"><span class="lineno">  164</span>    <span class="keywordflow">for</span> (<a class="code hl_class" href="classParameterHandlerBase.html">ParameterHandlerBase</a> *cov : <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>) {</div>
-<div class="line"><span class="lineno">  165</span>      cov-&gt;SetBranches(*<a class="code hl_variable" href="classFitterBase.html#aed2032b9c4a4f2248abe548f54f8dcc8">outTree</a>, <a class="code hl_variable" href="classFitterBase.html#a490b8614c4089c6db10ff357e7aaab67">SaveProposal</a>);</div>
+<div class="line"><span class="lineno">  165</span>      cov-&gt;SetBranches(*<a class="code hl_variable" href="classFitterBase.html#aed2032b9c4a4f2248abe548f54f8dcc8">outTree</a>, SaveProposal);</div>
 <div class="line"><span class="lineno">  166</span>    }</div>
 <div class="line"><span class="lineno">  167</span> </div>
 <div class="line"><span class="lineno">  168</span>    <a class="code hl_variable" href="classFitterBase.html#aed2032b9c4a4f2248abe548f54f8dcc8">outTree</a>-&gt;Branch(<span class="stringliteral">&quot;LogL&quot;</span>, &amp;<a class="code hl_variable" href="classFitterBase.html#abfb6f10720764d8bbbe43754fd5cd976">logLCurr</a>, <span class="stringliteral">&quot;LogL/D&quot;</span>);</div>
@@ -1162,7 +1158,7 @@ Protected Attributes</h2></td></tr>
 <div class="line"><span class="lineno"> 1039</span>  <span class="keyword">delete</span> Sample_2DLLH;</div>
 <div class="line"><span class="lineno"> 1040</span>}</div>
 <div class="ttc" id="aclassFitterBase_html_a1c4d01c39f70e95eab05dc04d42a6032"><div class="ttname"><a href="classFitterBase.html#a1c4d01c39f70e95eab05dc04d42a6032">FitterBase::CheckSkipParameter</a></div><div class="ttdeci">bool CheckSkipParameter(const std::vector&lt; std::string &gt; &amp;SkipVector, const std::string &amp;ParamName) const</div><div class="ttdoc">KS: Check whether we want to skip parameter using skip vector.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8cpp_source.html#l00500">FitterBase.cpp:500</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_a48f38bfa8996fe00d51f35b05dd16b46"><div class="ttname"><a href="classFitterBase.html#a48f38bfa8996fe00d51f35b05dd16b46">FitterBase::SaveSettings</a></div><div class="ttdeci">void SaveSettings()</div><div class="ttdoc">Save the settings that the MCMC was run with.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8cpp_source.html#l00085">FitterBase.cpp:85</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_a48f38bfa8996fe00d51f35b05dd16b46"><div class="ttname"><a href="classFitterBase.html#a48f38bfa8996fe00d51f35b05dd16b46">FitterBase::SaveSettings</a></div><div class="ttdeci">void SaveSettings()</div><div class="ttdoc">Save the settings that the MCMC was run with.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8cpp_source.html#l00082">FitterBase.cpp:82</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_af24e3d2850a80b1762d1c50da90198e8"><div class="ttname"><a href="classFitterBase.html#af24e3d2850a80b1762d1c50da90198e8">FitterBase::GetScaneRange</a></div><div class="ttdeci">bool GetScaneRange(std::map&lt; std::string, std::vector&lt; double &gt; &gt; &amp;scanRanges)</div><div class="ttdoc">YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D....</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8cpp_source.html#l00480">FitterBase.cpp:480</a></div></div>
 <div class="ttc" id="anamespaceMaCh3Utils_html_a4c8bdeb1d34606aed192e9f1311a72f5"><div class="ttname"><a href="namespaceMaCh3Utils.html#a4c8bdeb1d34606aed192e9f1311a72f5">MaCh3Utils::PrintProgressBar</a></div><div class="ttdeci">void PrintProgressBar(const Long64_t Done, const Long64_t All)</div><div class="ttdoc">KS: Simply print progress bar.</div><div class="ttdef"><b>Definition:</b> <a href="Monitor_8cpp_source.html#l00206">Monitor.cpp:206</a></div></div>
 </div><!-- fragment -->
@@ -1950,70 +1946,70 @@ Protected Attributes</h2></td></tr>
 
 <p>Save the settings that the MCMC was run with. </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8cpp_source.html#l00085">85</a> of file <a class="el" href="FitterBase_8cpp_source.html">FitterBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   85</span>                              {</div>
-<div class="line"><span class="lineno">   86</span><span class="comment">// *******************</span></div>
-<div class="line"><span class="lineno">   87</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classFitterBase.html#a588678c71d816f48ba3c140543dbe916">SettingsSaved</a>) <span class="keywordflow">return</span>;</div>
-<div class="line"><span class="lineno">   88</span> </div>
-<div class="line"><span class="lineno">   89</span>  <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;cd();</div>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8cpp_source.html#l00082">82</a> of file <a class="el" href="FitterBase_8cpp_source.html">FitterBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   82</span>                              {</div>
+<div class="line"><span class="lineno">   83</span><span class="comment">// *******************</span></div>
+<div class="line"><span class="lineno">   84</span>  <span class="keywordflow">if</span>(<a class="code hl_variable" href="classFitterBase.html#a588678c71d816f48ba3c140543dbe916">SettingsSaved</a>) <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">   85</span> </div>
+<div class="line"><span class="lineno">   86</span>  <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;cd();</div>
+<div class="line"><span class="lineno">   87</span> </div>
+<div class="line"><span class="lineno">   88</span>  TDirectory* MaCh3Version = <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;mkdir(<span class="stringliteral">&quot;MaCh3Engine&quot;</span>);</div>
+<div class="line"><span class="lineno">   89</span>  MaCh3Version-&gt;cd();</div>
 <div class="line"><span class="lineno">   90</span> </div>
-<div class="line"><span class="lineno">   91</span>  TDirectory* MaCh3Version = <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;mkdir(<span class="stringliteral">&quot;MaCh3Engine&quot;</span>);</div>
-<div class="line"><span class="lineno">   92</span>  MaCh3Version-&gt;cd();</div>
-<div class="line"><span class="lineno">   93</span> </div>
-<div class="line"><span class="lineno">   94</span>  <span class="keywordflow">if</span> (std::getenv(<span class="stringliteral">&quot;MaCh3_ROOT&quot;</span>) == NULL) {</div>
-<div class="line"><span class="lineno">   95</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Need MaCh3_ROOT environment variable&quot;</span>);</div>
-<div class="line"><span class="lineno">   96</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Please remember about source bin/setup.MaCh3.sh&quot;</span>);</div>
-<div class="line"><span class="lineno">   97</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><span class="lineno">   98</span>  }</div>
-<div class="line"><span class="lineno">   99</span> </div>
-<div class="line"><span class="lineno">  100</span>  <span class="keywordflow">if</span> (std::getenv(<span class="stringliteral">&quot;MACH3&quot;</span>) == NULL) {</div>
-<div class="line"><span class="lineno">  101</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Need MACH3 environment variable&quot;</span>);</div>
-<div class="line"><span class="lineno">  102</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><span class="lineno">  103</span>  }</div>
-<div class="line"><span class="lineno">  104</span> </div>
-<div class="line"><span class="lineno">  105</span>  std::string header_path = std::string(std::getenv(<span class="stringliteral">&quot;MACH3&quot;</span>));</div>
-<div class="line"><span class="lineno">  106</span>  header_path += <span class="stringliteral">&quot;/version.h&quot;</span>;</div>
-<div class="line"><span class="lineno">  107</span>  FILE* file = fopen(header_path.c_str(), <span class="stringliteral">&quot;r&quot;</span>);</div>
-<div class="line"><span class="lineno">  108</span>  <span class="comment">//KS: It is better to use experiment specific header file. If given experiment didn&#39;t provide it we gonna use one given by Core MaCh3.</span></div>
-<div class="line"><span class="lineno">  109</span>  <span class="keywordflow">if</span> (!file) {</div>
-<div class="line"><span class="lineno">  110</span>    header_path = std::string(std::getenv(<span class="stringliteral">&quot;MaCh3_ROOT&quot;</span>));</div>
-<div class="line"><span class="lineno">  111</span>    header_path += <span class="stringliteral">&quot;/version.h&quot;</span>;</div>
-<div class="line"><span class="lineno">  112</span>  } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  113</span>    fclose(file);</div>
-<div class="line"><span class="lineno">  114</span>  }</div>
-<div class="line"><span class="lineno">  115</span> </div>
-<div class="line"><span class="lineno">  116</span>  <span class="comment">// EM: embed the cmake generated version.h file</span></div>
-<div class="line"><span class="lineno">  117</span>  TMacro versionHeader(<span class="stringliteral">&quot;version_header&quot;</span>, <span class="stringliteral">&quot;version_header&quot;</span>);</div>
-<div class="line"><span class="lineno">  118</span>  versionHeader.ReadFile(header_path.c_str());</div>
-<div class="line"><span class="lineno">  119</span>  versionHeader.Write();</div>
+<div class="line"><span class="lineno">   91</span>  <span class="keywordflow">if</span> (std::getenv(<span class="stringliteral">&quot;MaCh3_ROOT&quot;</span>) == NULL) {</div>
+<div class="line"><span class="lineno">   92</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Need MaCh3_ROOT environment variable&quot;</span>);</div>
+<div class="line"><span class="lineno">   93</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Please remember about source bin/setup.MaCh3.sh&quot;</span>);</div>
+<div class="line"><span class="lineno">   94</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
+<div class="line"><span class="lineno">   95</span>  }</div>
+<div class="line"><span class="lineno">   96</span> </div>
+<div class="line"><span class="lineno">   97</span>  <span class="keywordflow">if</span> (std::getenv(<span class="stringliteral">&quot;MACH3&quot;</span>) == NULL) {</div>
+<div class="line"><span class="lineno">   98</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Need MACH3 environment variable&quot;</span>);</div>
+<div class="line"><span class="lineno">   99</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
+<div class="line"><span class="lineno">  100</span>  }</div>
+<div class="line"><span class="lineno">  101</span> </div>
+<div class="line"><span class="lineno">  102</span>  std::string header_path = std::string(std::getenv(<span class="stringliteral">&quot;MACH3&quot;</span>));</div>
+<div class="line"><span class="lineno">  103</span>  header_path += <span class="stringliteral">&quot;/version.h&quot;</span>;</div>
+<div class="line"><span class="lineno">  104</span>  FILE* file = fopen(header_path.c_str(), <span class="stringliteral">&quot;r&quot;</span>);</div>
+<div class="line"><span class="lineno">  105</span>  <span class="comment">//KS: It is better to use experiment specific header file. If given experiment didn&#39;t provide it we gonna use one given by Core MaCh3.</span></div>
+<div class="line"><span class="lineno">  106</span>  <span class="keywordflow">if</span> (!file) {</div>
+<div class="line"><span class="lineno">  107</span>    header_path = std::string(std::getenv(<span class="stringliteral">&quot;MaCh3_ROOT&quot;</span>));</div>
+<div class="line"><span class="lineno">  108</span>    header_path += <span class="stringliteral">&quot;/version.h&quot;</span>;</div>
+<div class="line"><span class="lineno">  109</span>  } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  110</span>    fclose(file);</div>
+<div class="line"><span class="lineno">  111</span>  }</div>
+<div class="line"><span class="lineno">  112</span> </div>
+<div class="line"><span class="lineno">  113</span>  <span class="comment">// EM: embed the cmake generated version.h file</span></div>
+<div class="line"><span class="lineno">  114</span>  TMacro versionHeader(<span class="stringliteral">&quot;version_header&quot;</span>, <span class="stringliteral">&quot;version_header&quot;</span>);</div>
+<div class="line"><span class="lineno">  115</span>  versionHeader.ReadFile(header_path.c_str());</div>
+<div class="line"><span class="lineno">  116</span>  versionHeader.Write();</div>
+<div class="line"><span class="lineno">  117</span> </div>
+<div class="line"><span class="lineno">  118</span>  TNamed Engine(<a class="code hl_function" href="classFitterBase.html#a3706f6d722073b447b3de8c3a6516601">GetName</a>(), <a class="code hl_function" href="classFitterBase.html#a3706f6d722073b447b3de8c3a6516601">GetName</a>());</div>
+<div class="line"><span class="lineno">  119</span>  Engine.Write(<a class="code hl_function" href="classFitterBase.html#a3706f6d722073b447b3de8c3a6516601">GetName</a>().c_str());</div>
 <div class="line"><span class="lineno">  120</span> </div>
-<div class="line"><span class="lineno">  121</span>  TNamed Engine(<a class="code hl_function" href="classFitterBase.html#a3706f6d722073b447b3de8c3a6516601">GetName</a>(), <a class="code hl_function" href="classFitterBase.html#a3706f6d722073b447b3de8c3a6516601">GetName</a>());</div>
-<div class="line"><span class="lineno">  122</span>  Engine.Write(<a class="code hl_function" href="classFitterBase.html#a3706f6d722073b447b3de8c3a6516601">GetName</a>().c_str());</div>
+<div class="line"><span class="lineno">  121</span>  MaCh3Version-&gt;Write();</div>
+<div class="line"><span class="lineno">  122</span>  <span class="keyword">delete</span> MaCh3Version;</div>
 <div class="line"><span class="lineno">  123</span> </div>
-<div class="line"><span class="lineno">  124</span>  MaCh3Version-&gt;Write();</div>
-<div class="line"><span class="lineno">  125</span>  <span class="keyword">delete</span> MaCh3Version;</div>
-<div class="line"><span class="lineno">  126</span> </div>
-<div class="line"><span class="lineno">  127</span>  <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;cd();</div>
-<div class="line"><span class="lineno">  128</span> </div>
-<div class="line"><span class="lineno">  129</span>  <a class="code hl_variable" href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">fitMan</a>-&gt;<a class="code hl_function" href="classmanager.html#a0990af01a220479a19ead5d0231aaf94">SaveSettings</a>(<a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>);</div>
+<div class="line"><span class="lineno">  124</span>  <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;cd();</div>
+<div class="line"><span class="lineno">  125</span> </div>
+<div class="line"><span class="lineno">  126</span>  <a class="code hl_variable" href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">fitMan</a>-&gt;<a class="code hl_function" href="classmanager.html#a0990af01a220479a19ead5d0231aaf94">SaveSettings</a>(<a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>);</div>
+<div class="line"><span class="lineno">  127</span> </div>
+<div class="line"><span class="lineno">  128</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;\033[0;31mCurrent Total RAM usage is {:.2f} GB\033[0m&quot;</span>, <a class="code hl_function" href="namespaceMaCh3Utils.html#aa406fc13341d99d4ca7a4f43bbb38019">MaCh3Utils::getValue</a>(<span class="stringliteral">&quot;VmRSS&quot;</span>) / 1048576.0);</div>
+<div class="line"><span class="lineno">  129</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;\033[0;31mOut of Total available RAM {:.2f} GB\033[0m&quot;</span>, <a class="code hl_function" href="namespaceMaCh3Utils.html#aa406fc13341d99d4ca7a4f43bbb38019">MaCh3Utils::getValue</a>(<span class="stringliteral">&quot;MemTotal&quot;</span>) / 1048576.0);</div>
 <div class="line"><span class="lineno">  130</span> </div>
-<div class="line"><span class="lineno">  131</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;\033[0;31mCurrent Total RAM usage is {:.2f} GB\033[0m&quot;</span>, <a class="code hl_function" href="namespaceMaCh3Utils.html#aa406fc13341d99d4ca7a4f43bbb38019">MaCh3Utils::getValue</a>(<span class="stringliteral">&quot;VmRSS&quot;</span>) / 1048576.0);</div>
-<div class="line"><span class="lineno">  132</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;\033[0;31mOut of Total available RAM {:.2f} GB\033[0m&quot;</span>, <a class="code hl_function" href="namespaceMaCh3Utils.html#aa406fc13341d99d4ca7a4f43bbb38019">MaCh3Utils::getValue</a>(<span class="stringliteral">&quot;MemTotal&quot;</span>) / 1048576.0);</div>
-<div class="line"><span class="lineno">  133</span> </div>
-<div class="line"><span class="lineno">  134</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;#####Current Setup#####&quot;</span>);</div>
-<div class="line"><span class="lineno">  135</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Number of covariances: {}&quot;</span>, <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.size());</div>
-<div class="line"><span class="lineno">  136</span>  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.size(); ++i)</div>
-<div class="line"><span class="lineno">  137</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{}: Cov name: {}, it has {} params&quot;</span>, i, <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[i]-&gt;<a class="code hl_function" href="classFitterBase.html#a3706f6d722073b447b3de8c3a6516601">GetName</a>(), <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[i]-&gt;GetNumParams());</div>
-<div class="line"><span class="lineno">  138</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Number of SampleHandlers: {}&quot;</span>, <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>.size());</div>
-<div class="line"><span class="lineno">  139</span>  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>.size(); ++i)</div>
-<div class="line"><span class="lineno">  140</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{}: SampleHandler name: {}, it has {} samples, {} OscChannels&quot;</span>,i , <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>[i]-&gt;GetTitle(), <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>[i]-&gt;GetNsamples(), <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>[i]-&gt;GetNOscChannels());</div>
-<div class="line"><span class="lineno">  141</span> </div>
-<div class="line"><span class="lineno">  142</span>  <span class="comment">//TN: Have to close the folder in order to write it to disk before SaveOutput is called in the destructor</span></div>
-<div class="line"><span class="lineno">  143</span>  <a class="code hl_variable" href="classFitterBase.html#aacc46437245ba8a9817f2ed2e86a96e0">CovFolder</a>-&gt;Close();</div>
-<div class="line"><span class="lineno">  144</span>  <a class="code hl_variable" href="classFitterBase.html#aafa86c7e244e6587a298e1726bd5e835">SampleFolder</a>-&gt;Close();</div>
-<div class="line"><span class="lineno">  145</span> </div>
-<div class="line"><span class="lineno">  146</span>  <a class="code hl_variable" href="classFitterBase.html#a588678c71d816f48ba3c140543dbe916">SettingsSaved</a> = <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno">  147</span>}</div>
+<div class="line"><span class="lineno">  131</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;#####Current Setup#####&quot;</span>);</div>
+<div class="line"><span class="lineno">  132</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Number of covariances: {}&quot;</span>, <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.size());</div>
+<div class="line"><span class="lineno">  133</span>  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.size(); ++i)</div>
+<div class="line"><span class="lineno">  134</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{}: Cov name: {}, it has {} params&quot;</span>, i, <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[i]-&gt;<a class="code hl_function" href="classFitterBase.html#a3706f6d722073b447b3de8c3a6516601">GetName</a>(), <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[i]-&gt;GetNumParams());</div>
+<div class="line"><span class="lineno">  135</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Number of SampleHandlers: {}&quot;</span>, <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>.size());</div>
+<div class="line"><span class="lineno">  136</span>  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>.size(); ++i)</div>
+<div class="line"><span class="lineno">  137</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{}: SampleHandler name: {}, it has {} samples, {} OscChannels&quot;</span>,i , <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>[i]-&gt;GetTitle(), <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>[i]-&gt;GetNsamples(), <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>[i]-&gt;GetNOscChannels());</div>
+<div class="line"><span class="lineno">  138</span> </div>
+<div class="line"><span class="lineno">  139</span>  <span class="comment">//TN: Have to close the folder in order to write it to disk before SaveOutput is called in the destructor</span></div>
+<div class="line"><span class="lineno">  140</span>  <a class="code hl_variable" href="classFitterBase.html#aacc46437245ba8a9817f2ed2e86a96e0">CovFolder</a>-&gt;Close();</div>
+<div class="line"><span class="lineno">  141</span>  <a class="code hl_variable" href="classFitterBase.html#aafa86c7e244e6587a298e1726bd5e835">SampleFolder</a>-&gt;Close();</div>
+<div class="line"><span class="lineno">  142</span> </div>
+<div class="line"><span class="lineno">  143</span>  <a class="code hl_variable" href="classFitterBase.html#a588678c71d816f48ba3c140543dbe916">SettingsSaved</a> = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  144</span>}</div>
 <div class="ttc" id="aclassmanager_html_a0990af01a220479a19ead5d0231aaf94"><div class="ttname"><a href="classmanager.html#a0990af01a220479a19ead5d0231aaf94">manager::SaveSettings</a></div><div class="ttdeci">void SaveSettings(TFile *const OutputFile)</div><div class="ttdoc">Add manager useful information's to TFile, in most cases to Fitter.</div><div class="ttdef"><b>Definition:</b> <a href="Manager_8cpp_source.html#l00049">Manager.cpp:49</a></div></div>
 <div class="ttc" id="anamespaceMaCh3Utils_html_aa406fc13341d99d4ca7a4f43bbb38019"><div class="ttname"><a href="namespaceMaCh3Utils.html#aa406fc13341d99d4ca7a4f43bbb38019">MaCh3Utils::getValue</a></div><div class="ttdeci">int getValue(const std::string &amp;Type)</div><div class="ttdoc">CW: Get info like RAM.</div><div class="ttdef"><b>Definition:</b> <a href="Monitor_8cpp_source.html#l00229">Monitor.cpp:229</a></div></div>
 </div><!-- fragment -->
@@ -2288,7 +2284,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Checks if file saved not repeat some operations. </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00147">147</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00145">145</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
 
 </div>
 </div>
@@ -2444,7 +2440,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Checks if output prepared not repeat some operations. </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00151">151</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00149">149</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
 
 </div>
 </div>
@@ -2578,32 +2574,6 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a490b8614c4089c6db10ff357e7aaab67" name="a490b8614c4089c6db10ff357e7aaab67"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a490b8614c4089c6db10ff357e7aaab67">&#9670;&#160;</a></span>SaveProposal</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool FitterBase::SaveProposal</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Save proposal at each step. </p>
-
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00144">144</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
-
-</div>
-</div>
 <a id="a588678c71d816f48ba3c140543dbe916" name="a588678c71d816f48ba3c140543dbe916"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a588678c71d816f48ba3c140543dbe916">&#9670;&#160;</a></span>SettingsSaved</h2>
 
@@ -2626,7 +2596,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Checks if setting saved not repeat some operations. </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00149">149</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00147">147</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
 
 </div>
 </div>
