@@ -63,7 +63,11 @@ jobs:
           git checkout gh-profiling
           #mv /opt/MaCh3Validations/build/ValgrindMCMC.txt .
           #mv /opt/MaCh3Validations/build/MassifMCMC.txt .
-          cmp -s /opt/MaCh3Cmake/build/foo.png Graph.png && echo "Identical" || echo "Different"
+          if diff /opt/MaCh3Cmake/build/foo.png Graph.png >/dev/null 2>&1; then
+            echo "Identical"
+          else
+            echo "Different"
+          fi
           rm Graph.png
           mv /opt/MaCh3Cmake/build/foo.png Graph.png
           ls
@@ -73,6 +77,6 @@ jobs:
           git config --global user.name "github-actions"
           #git add ValgrindMCMC.txt
           #git add MassifMCMC.txt
-          git add --allow-empty --force Graph.png
-          git commit -m "Update Valgrind files"
+          git add --force Graph.png
+          git commit --allow-empty -m "Update Valgrind files"
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/mach3-software/MaCh3.git gh-profiling
