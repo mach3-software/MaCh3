@@ -61,15 +61,9 @@ jobs:
           git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/mach3-software/MaCh3.git Plot
           cd Plot
           git checkout gh-profiling
-          #mv /opt/MaCh3Validations/build/ValgrindMCMC.txt .
-          #mv /opt/MaCh3Validations/build/MassifMCMC.txt .
-          if diff /opt/MaCh3Cmake/build/foo.png Graph.png >/dev/null 2>&1; then
-            echo "Identical"
-          else
-            echo "Different"
-          fi
-          rm Graph.png
-          mv /opt/MaCh3Cmake/build/foo.png Graph.png
+          #mv -f /opt/MaCh3Validations/build/ValgrindMCMC.txt .
+          #mv -f /opt/MaCh3Validations/build/MassifMCMC.txt .
+          mv -f /opt/MaCh3Cmake/build/foo.png Graph.png
           ls
           git status
 
