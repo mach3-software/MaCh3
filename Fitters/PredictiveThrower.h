@@ -49,6 +49,11 @@ class PredictiveThrower : public FitterBase {
   /// @brief Setup useful variables etc before stating toy generation
   void SetupToyGeneration();
 
+  /// @brief Load existing toys
+  bool LoadToys();
+
+  /// @brief Setup sample information
+  void SetupSampleInformation();
 
   /// @brief Produce posterior predictive distribution
   std::unique_ptr<TH1D> MakePredictive(const std::vector<std::unique_ptr<TH1D>>& Toys,
@@ -109,6 +114,11 @@ class PredictiveThrower : public FitterBase {
 
   /// Vector of Data histograms
   std::vector<std::unique_ptr<TH1D>> Data_Hist;
+  /// Vector of MC histograms
+  std::vector<std::unique_ptr<TH1D>> MC_Nom_Hist;
+  /// Vector of W2 histograms
+  std::vector<std::unique_ptr<TH1D>> W2_Nom_Hist;
+
   /// Vector of MC histograms per sample and toy experiment.
   /// Indexed as [sample][toy].
   std::vector<std::vector<std::unique_ptr<TH1D>>> MC_Hist_Toy;

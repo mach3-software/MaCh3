@@ -57,12 +57,9 @@ void PredictiveThrower::SetParamters() {
 }
 
 // *************************
-// Produce MaCh3 toys:
-void PredictiveThrower::SetupToyGeneration() {
+void PredictiveThrower::SetupSampleInformation() {
 // *************************
-  int counter = 0;
   TotalNumberOfSamples = 0;
-
   for (size_t iPDF = 0; iPDF < samples.size(); iPDF++)
   {
     auto* MaCh3Sample = dynamic_cast<SampleHandlerFD*>(samples[iPDF]);
@@ -76,16 +73,13 @@ void PredictiveThrower::SetupToyGeneration() {
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   }
-  for (size_t s = 0; s < systematics.size(); ++s) {
-    auto* MaCh3Params = dynamic_cast<ParameterHandlerGeneric*>(systematics[s]);
-    if(MaCh3Params) {
-      ModelSystematic = MaCh3Params;
-      counter++;
-    }
-  }
+
   MC_Hist_Toy.resize(TotalNumberOfSamples);
   W2_Hist_Toy.resize(TotalNumberOfSamples);
   Data_Hist.resize(TotalNumberOfSamples);
+  MC_Nom_Hist.resize(TotalNumberOfSamples);
+  W2_Nom_Hist.resize(TotalNumberOfSamples);
+
   SampleObjectMap.resize(TotalNumberOfSamples);
   SampleNames.resize(TotalNumberOfSamples+1);
 
@@ -103,6 +97,22 @@ void PredictiveThrower::SetupToyGeneration() {
     SampleNames[sample] = samples[sample]->GetTitle();
   }
   SampleNames[TotalNumberOfSamples] = "Total";
+}
+
+// *************************
+// Produce MaCh3 toys:
+void PredictiveThrower::SetupToyGeneration() {
+// *************************
+  int counter = 0;
+  for (size_t s = 0; s < systematics.size(); ++s) {
+    auto* MaCh3Params = dynamic_cast<ParameterHandlerGeneric*>(systematics[s]);
+    if(MaCh3Params) {
+      ModelSystematic = MaCh3Params;
+      counter++;
+    }
+  }
+
+  SetupSampleInformation();
 
   if(Is_PriorPredictive) {
     MACH3LOG_INFO("You've chosen to run Prior Predictive Distribution");
@@ -176,9 +186,103 @@ void PredictiveThrower::SetupToyGeneration() {
 }
 
 // *************************
+// Try loading toys
+bool PredictiveThrower::LoadToys() {
+// *************************
+  auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
+  // Open the ROOT file
+  TFile* file = TFile::Open(PosteriorFileName.c_str(), "READ");
+  TDirectory* ToyDir = nullptr;
+  if (!file || file->IsZombie()) {
+    return false;
+  } else {
+    // Check for the "toys" directory
+    if ((ToyDir = file->GetDirectory("Toys"))) {
+      MACH3LOG_INFO("Found toys in Posterior file will attempt toy reading");
+    } else {
+      file->Close();
+      delete file;
+      return false;
+    }
+  }
+
+  // Finally get the TTree branch with the penalty vectors for each of the toy throws
+  TTree* PenaltyTree = static_cast<TTree*>(file->Get("ToySummary"));
+  if (!PenaltyTree) {
+    MACH3LOG_WARN("ToySummary TTree not found in file.");
+    file->Close();
+    delete file;
+    return false;
+  }
+
+  Ntoys = static_cast<int>(PenaltyTree->GetEntries());
+  int ConfigNtoys = Get<int>(fitMan->raw()["Predictive"]["Ntoy"], __FILE__, __LINE__);;
+  if (Ntoys != ConfigNtoys) {
+    MACH3LOG_WARN("Found different number of toys in saved file than asked to run!");
+    MACH3LOG_INFO("Will read _ALL_ toys in the file");
+    MACH3LOG_INFO("Ntoys in file: {}", Ntoys);
+    MACH3LOG_INFO("Ntoys specified: {}", ConfigNtoys);
+  }
+
+  PenaltyTerm.resize(Ntoys);
+  ReweightWeight.resize(Ntoys);
+
+  double Penalty = 0, Weight = 1;
+  PenaltyTree->SetBranchAddress("Penalty", &Penalty);
+  PenaltyTree->SetBranchAddress("Weight", &Weight);
+  PenaltyTree->SetBranchAddress("NModelParams", &NModelParams);
+
+  for (int i = 0; i < Ntoys; ++i) {
+    PenaltyTree->GetEntry(i);
+    if (FullLLH) {
+      PenaltyTerm[i] = Penalty;
+    } else {
+      PenaltyTerm[i] = 0.0;
+    }
+
+    ReweightWeight[i] = Weight;
+  }
+  // Resize all vectors and get sample names
+  SetupSampleInformation();
+
+  for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
+    TH1D* DataHist1D = static_cast<TH1D*>(ToyDir->Get((SampleNames[sample] + "_data").c_str()));
+    Data_Hist[sample] = M3::Clone(DataHist1D);
+
+    TH1D* MCHist1D = static_cast<TH1D*>(ToyDir->Get((SampleNames[sample] + "_mc").c_str()));
+    MC_Nom_Hist[sample] = M3::Clone(MCHist1D);
+
+    TH1D* W2Hist1D = static_cast<TH1D*>(ToyDir->Get((SampleNames[sample] + "_w2").c_str()));
+    W2_Nom_Hist[sample] = M3::Clone(W2Hist1D);
+  }
+
+
+  for (int iToy = 0; iToy < Ntoys; ++iToy)
+  {
+    if (iToy % 100 == 0) MACH3LOG_INFO("   Loaded toy {}", iToy);
+
+    for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
+      TH1D* MCHist1D = static_cast<TH1D*>(ToyDir->Get((SampleNames[sample] + "_mc_" + std::to_string(iToy)).c_str()));
+      TH1D* W2Hist1D = static_cast<TH1D*>(ToyDir->Get((SampleNames[sample] + "_w2_" + std::to_string(iToy)).c_str()));
+
+      MC_Hist_Toy[sample][iToy] = M3::Clone(MCHist1D);
+      W2_Hist_Toy[sample][iToy] = M3::Clone(W2Hist1D);
+    }
+  }
+
+  file->Close();
+  delete file;
+  return true;
+}
+
+// *************************
 // Produce MaCh3 toys:
 void PredictiveThrower::ProduceToys() {
 // *************************
+  /// If we found toys then skip process of making new toys
+  if(LoadToys()) return;
+
+  /// Setup useful information for toy generation
   SetupToyGeneration();
 
   auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
@@ -207,9 +311,11 @@ void PredictiveThrower::ProduceToys() {
     Data_Hist[iPDF]->Write((MaCh3Sample->GetTitle() + "_data").c_str());
 
     TH1D* MCHist1D = static_cast<TH1D*>(MaCh3Sample->GetMCHist(1));
+    MC_Nom_Hist[iPDF] = M3::Clone(MCHist1D, MaCh3Sample->GetTitle() + "_mc");
     MCHist1D->Write((MaCh3Sample->GetTitle() + "_mc").c_str());
 
     TH1D* W2Hist1D = static_cast<TH1D*>(MaCh3Sample->GetW2Hist(1));
+    W2_Nom_Hist[iPDF] = M3::Clone(W2Hist1D, MaCh3Sample->GetTitle() + "_w2");
     W2Hist1D->Write((MaCh3Sample->GetTitle() + "_w2").c_str());
     delete W2Hist1D;
   }
