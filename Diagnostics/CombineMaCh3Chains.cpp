@@ -28,6 +28,8 @@ std::vector<std::string> inpFileList;
 bool forceOverwrite = false;
 bool forceMerge = false;
 
+
+
 /// @brief KS: This allow us to skip output name etc in config. We expect Output name will be different but this doesn't invalidate chain merging
 bool ShouldSkipLine(const std::string& line, const std::vector<std::string>& SkipVector) {
   // Otherwise, check if the line contains any word from SkipVector
@@ -128,6 +130,75 @@ void CopyDir(TDirectory *source) {
   savdir->cd();
 }
 
+/// @brief Compare two histograms if they are identical
+/// @todo add checks for stuff like bin content etc
+bool CompareHistograms(const TH1* h1, const TH1* h2, const std::string& histName, const std::string& folderName)
+{
+  if (!h1 || !h2) {
+    MACH3LOG_ERROR("Null pointer passed to CompareHistograms for '{}'", histName);
+    return false;
+  }
+
+  const double int1 = h1->Integral();
+  const double int2 = h2->Integral();
+  if (std::abs(int1 - int2) > 1e-6) {
+    MACH3LOG_ERROR("Histogram '{}' in folder '{}' has different integrals: current = {}, previous = {}",
+                   histName, folderName, int1, int2);
+    return false;
+  }
+  return true;
+}
+
+/// @brief Loop through TH1 and TMacro objects in FolderName in 'file' and compare with those in 'prevFile'
+bool CheckFolder(TFile* file, TFile* prevFile, const std::string& FolderName, const std::vector<std::string>& SkipVector = {})
+{
+  bool mismatch = false;
+  TDirectory* dir = file->GetDirectory(FolderName.c_str());
+  TDirectory* prevDir = prevFile->GetDirectory(FolderName.c_str());
+
+  if (!dir || !prevDir) {
+    MACH3LOG_ERROR("Could not find folder '{}' in one or both files", FolderName);
+    return true;
+  }
+
+  TIter nextKey(dir->GetListOfKeys());
+  TKey* key;
+
+  while ((key = static_cast<TKey*>(nextKey()))) {
+    const std::string objName = key->GetName();
+    TObject* obj = key->ReadObj();
+    if (!obj) continue;
+
+    // Handle TH1 comparison
+    if (obj->InheritsFrom("TH1")) {
+      TH1* hist = static_cast<TH1*>(obj);
+      TH1* prevHist = dynamic_cast<TH1*>(prevDir->Get(objName.c_str()));
+      if (!prevHist) {
+        MACH3LOG_ERROR("Missing histogram '{}' in previous file (folder '{}')", objName, FolderName);
+        mismatch = true;
+        continue;
+      }
+      if (!CompareHistograms(hist, prevHist, objName, FolderName)) {
+        mismatch = true;
+      }
+    }
+    // Handle TMacro comparison
+    else if (obj->InheritsFrom("TMacro")) {
+      TMacro* macro = static_cast<TMacro*>(obj);
+      TMacro* prevMacro = dynamic_cast<TMacro*>(prevDir->Get(objName.c_str()));
+      if (!prevMacro) {
+        MACH3LOG_ERROR("Missing TMacro '{}' in previous file (folder '{}')", objName, FolderName);
+        mismatch = true;
+        continue;
+      }
+      if (!CompareTwoConfigs(TMacroToString(*macro), TMacroToString(*prevMacro), SkipVector)) {
+        mismatch = true;
+      }
+    }
+  }
+  return mismatch;
+}
+
 void CombineChain()
 {
   TFileMerger *fileMerger = new TFileMerger();
@@ -176,6 +247,8 @@ void CombineChain()
     bool weirdFile = false;
     if(checkSoftwareVersions(file, prevFile, "MaCh3Engine/version_header")) weirdFile = true;
     if(checkSoftwareVersions(file, prevFile, "MaCh3_Config", {"OutputFile:", "NSteps:"})) weirdFile = true;
+    if(CheckFolder(file, prevFile, "SampleFolder")) weirdFile = true;
+    if(CheckFolder(file, prevFile, "CovarianceFolder")) weirdFile = true;
 
     if(weirdFile && !forceMerge){
       MACH3LOG_ERROR("");
