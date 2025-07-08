@@ -819,30 +819,38 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno"> 1276</span>  <span class="comment">// Make a copy and to lower case to not be case sensitive</span></div>
 <div class="line"><span class="lineno"> 1277</span>  std::string SampleNameCopy = SampleName;</div>
 <div class="line"><span class="lineno"> 1278</span>  std::transform(SampleNameCopy.begin(), SampleNameCopy.end(), SampleNameCopy.begin(), ::tolower);</div>
-<div class="line"><span class="lineno"> 1279</span>  <span class="keywordtype">bool</span> Applies = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno"> 1280</span> </div>
-<div class="line"><span class="lineno"> 1281</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code hl_variable" href="classParameterHandlerBase.html#af4ebe6b24b280c5263e6a5385b11a2c9">_fSampleNames</a>[SystIndex].size(); i++) {</div>
-<div class="line"><span class="lineno"> 1282</span>    <span class="comment">// Convert to low case to not be case sensitive</span></div>
-<div class="line"><span class="lineno"> 1283</span>    std::string pattern = <a class="code hl_variable" href="classParameterHandlerBase.html#af4ebe6b24b280c5263e6a5385b11a2c9">_fSampleNames</a>[SystIndex][i];</div>
-<div class="line"><span class="lineno"> 1284</span>    std::transform(pattern.begin(), pattern.end(), pattern.begin(), ::tolower);</div>
+<div class="line"><span class="lineno"> 1279</span> </div>
+<div class="line"><span class="lineno"> 1280</span>  <span class="comment">// Check for unsupported wildcards in SampleNameCopy</span></div>
+<div class="line"><span class="lineno"> 1281</span>  <span class="keywordflow">if</span> (SampleNameCopy.find(<span class="charliteral">&#39;*&#39;</span>) != std::string::npos) {</div>
+<div class="line"><span class="lineno"> 1282</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Wildcards (&#39;*&#39;) are not supported in sample name: &#39;{}&#39;&quot;</span>, SampleName);</div>
+<div class="line"><span class="lineno"> 1283</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
+<div class="line"><span class="lineno"> 1284</span>  }</div>
 <div class="line"><span class="lineno"> 1285</span> </div>
-<div class="line"><span class="lineno"> 1286</span>    <span class="comment">// Replace &#39;*&#39; in the pattern with &#39;.*&#39; for regex matching</span></div>
-<div class="line"><span class="lineno"> 1287</span>    std::string regexPattern = <span class="stringliteral">&quot;^&quot;</span> + std::regex_replace(pattern, std::regex(<span class="stringliteral">&quot;\\*&quot;</span>), <span class="stringliteral">&quot;.*&quot;</span>) + <span class="stringliteral">&quot;$&quot;</span>;</div>
-<div class="line"><span class="lineno"> 1288</span>    <span class="keywordflow">try</span> {</div>
-<div class="line"><span class="lineno"> 1289</span>      std::regex regex(regexPattern);</div>
-<div class="line"><span class="lineno"> 1290</span>      <span class="keywordflow">if</span> (std::regex_match(SampleNameCopy, regex)) {</div>
-<div class="line"><span class="lineno"> 1291</span>        Applies = <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno"> 1292</span>        <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno"> 1293</span>      }</div>
-<div class="line"><span class="lineno"> 1294</span>    } <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::regex_error&amp; e) {</div>
-<div class="line"><span class="lineno"> 1295</span>      <span class="comment">// Handle regex error (for invalid patterns)</span></div>
-<div class="line"><span class="lineno"> 1296</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Regex error: {}&quot;</span>, e.what());</div>
-<div class="line"><span class="lineno"> 1297</span>    }</div>
-<div class="line"><span class="lineno"> 1298</span>  }</div>
-<div class="line"><span class="lineno"> 1299</span>  <span class="keywordflow">return</span> Applies;</div>
-<div class="line"><span class="lineno"> 1300</span>}</div>
+<div class="line"><span class="lineno"> 1286</span>  <span class="keywordtype">bool</span> Applies = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno"> 1287</span> </div>
+<div class="line"><span class="lineno"> 1288</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code hl_variable" href="classParameterHandlerBase.html#af4ebe6b24b280c5263e6a5385b11a2c9">_fSampleNames</a>[SystIndex].size(); i++) {</div>
+<div class="line"><span class="lineno"> 1289</span>    <span class="comment">// Convert to low case to not be case sensitive</span></div>
+<div class="line"><span class="lineno"> 1290</span>    std::string pattern = <a class="code hl_variable" href="classParameterHandlerBase.html#af4ebe6b24b280c5263e6a5385b11a2c9">_fSampleNames</a>[SystIndex][i];</div>
+<div class="line"><span class="lineno"> 1291</span>    std::transform(pattern.begin(), pattern.end(), pattern.begin(), ::tolower);</div>
+<div class="line"><span class="lineno"> 1292</span> </div>
+<div class="line"><span class="lineno"> 1293</span>    <span class="comment">// Replace &#39;*&#39; in the pattern with &#39;.*&#39; for regex matching</span></div>
+<div class="line"><span class="lineno"> 1294</span>    std::string regexPattern = <span class="stringliteral">&quot;^&quot;</span> + std::regex_replace(pattern, std::regex(<span class="stringliteral">&quot;\\*&quot;</span>), <span class="stringliteral">&quot;.*&quot;</span>) + <span class="stringliteral">&quot;$&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1295</span>    <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno"> 1296</span>      std::regex regex(regexPattern);</div>
+<div class="line"><span class="lineno"> 1297</span>      <span class="keywordflow">if</span> (std::regex_match(SampleNameCopy, regex)) {</div>
+<div class="line"><span class="lineno"> 1298</span>        Applies = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno"> 1299</span>        <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno"> 1300</span>      }</div>
+<div class="line"><span class="lineno"> 1301</span>    } <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::regex_error&amp; e) {</div>
+<div class="line"><span class="lineno"> 1302</span>      <span class="comment">// Handle regex error (for invalid patterns)</span></div>
+<div class="line"><span class="lineno"> 1303</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Regex error: {}&quot;</span>, e.what());</div>
+<div class="line"><span class="lineno"> 1304</span>    }</div>
+<div class="line"><span class="lineno"> 1305</span>  }</div>
+<div class="line"><span class="lineno"> 1306</span>  <span class="keywordflow">return</span> Applies;</div>
+<div class="line"><span class="lineno"> 1307</span>}</div>
 <div class="ttc" id="aGetPenaltyTerm_8cpp_html_a439227feff9d7f55384e8780cfc2eb82"><div class="ttname"><a href="GetPenaltyTerm_8cpp.html#a439227feff9d7f55384e8780cfc2eb82">size</a></div><div class="ttdeci">int size</div><div class="ttdef"><b>Definition:</b> <a href="GetPenaltyTerm_8cpp_source.html#l00038">GetPenaltyTerm.cpp:38</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00025">MaCh3Logger.h:25</a></div></div>
+<div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00013">MaCh3Exception.h:13</a></div></div>
 <div class="ttc" id="aclassParameterHandlerBase_html_af4ebe6b24b280c5263e6a5385b11a2c9"><div class="ttname"><a href="classParameterHandlerBase.html#af4ebe6b24b280c5263e6a5385b11a2c9">ParameterHandlerBase::_fSampleNames</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; std::string &gt; &gt; _fSampleNames</div><div class="ttdoc">Tells to which samples object param should be applied.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00461">ParameterHandlerBase.h:461</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -1056,7 +1064,6 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">   88</span>  <span class="comment">// Make a note that we have now done PCA</span></div>
 <div class="line"><span class="lineno">   89</span>  <a class="code hl_variable" href="classParameterHandlerBase.html#ae036dc62d3a3710b78d5d767f280fa4b">pca</a> = <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno">   90</span>}</div>
-<div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00013">MaCh3Exception.h:13</a></div></div>
 <div class="ttc" id="aclassParameterHandlerBase_html_a1ebeda558155dfa06070e67218b9a567"><div class="ttname"><a href="classParameterHandlerBase.html#a1ebeda558155dfa06070e67218b9a567">ParameterHandlerBase::AdaptiveHandler</a></div><div class="ttdeci">std::unique_ptr&lt; adaptive_mcmc::AdaptiveMCMCHandler &gt; AdaptiveHandler</div><div class="ttdoc">Struct containing information about adaption.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00478">ParameterHandlerBase.h:478</a></div></div>
 </div><!-- fragment -->
 </div>
