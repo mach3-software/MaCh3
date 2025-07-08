@@ -21,7 +21,6 @@ static int h_nEntries = -1;
 // *******************************************
 /// KS: Initialiser, here we allocate memory for variables and copy constants
 __host__ void InitGPU_AutoCorr(
-// *******************************************
                           float **ParStep_gpu,
                           float **NumeratorSum_gpu,
                           float **ParamSums_gpu,
@@ -30,7 +29,7 @@ __host__ void InitGPU_AutoCorr(
                           int n_Entries,
                           int n_Pars,
                           const int n_Lags) {
-
+// *******************************************
   // Write to the global statics (h_* denotes host stored variable)
   h_nDraws = n_Pars;
   h_nLag = n_Lags;
@@ -63,8 +62,8 @@ __host__ void InitGPU_AutoCorr(
   cudaMalloc((void **) ParStep_gpu, h_nDraws*h_nEntries*sizeof(float*));
   CudaCheckError();
 
-  printf(" Allocated in total %f MB for autocorrelations calculations on GPU\n", double(sizeof(float)*(h_nLag*h_nDraws+h_nLag*h_nDraws+h_nDraws+h_nDraws*h_nEntries))/1.E6);
-
+  printf(" Allocated in total %f MB for autocorrelations calculations on GPU\n",
+         static_cast<double>(sizeof(float) * (h_nLag * h_nDraws + h_nLag * h_nDraws + h_nDraws + h_nDraws * h_nEntries)) / 1.0e6);
 }
 
 // ******************************************************
@@ -74,7 +73,6 @@ __host__ void InitGPU_AutoCorr(
 // ******************************************************
 /// KS: Copy necessary variables from CPU to GPU
 __host__ void CopyToGPU_AutoCorr(
-// ******************************************************
                             float *ParStep_cpu,
                             float *NumeratorSum_cpu,
                             float *ParamSums_cpu,
@@ -84,7 +82,7 @@ __host__ void CopyToGPU_AutoCorr(
                             float *NumeratorSum_gpu,
                             float *ParamSums_gpu,
                             float *DenomSum_gpu) {
-
+// ******************************************************
   //store value of parameter for each step
   cudaMemcpy(ParStep_gpu, ParStep_cpu, h_nDraws*h_nEntries*sizeof(float), cudaMemcpyHostToDevice);
   CudaCheckError();
@@ -115,7 +113,6 @@ __global__ void EvalOnGPU_AutoCorr(
     float*  NumeratorSum_gpu,
     float*  DenomSum_gpu) {
 //*********************************************************
-
   const unsigned int CurrentLagNum = (blockIdx.x * blockDim.x + threadIdx.x);
 
   //KS: Accessing shared memory is much much faster than global memory hence we use shared memory for calculation and then write to global memory
@@ -168,7 +165,6 @@ __host__ void RunGPU_AutoCorr(
     float*  NumeratorSum_cpu,
     float*  DenomSum_cpu) {
 // *****************************************
-
   dim3 block_size;
   dim3 grid_size;
 
@@ -210,5 +206,4 @@ __host__ void CleanupGPU_AutoCorr(
   cudaFree(DenomSum_gpu);
 
   printf(" Cleared memory at GPU, I am free \n");
-  return;
 }
