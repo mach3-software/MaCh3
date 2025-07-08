@@ -153,6 +153,12 @@ void GetGPUInfo(){
   MACH3LOG_INFO("Driver Version: {}", TerminalToString("nvidia-smi --query-gpu=driver_version --format=csv,noheader"));
   // Print N GPU thread
   MACH3LOG_INFO("Currently used GPU has: {} threads", GetNumGPUThreads());
+  // Print L2 cache
+  MACH3LOG_INFO("Currently used GPU has: {} KB L2 cache", GetL2CacheSize() / 1024);
+  // Shared memory info
+  MACH3LOG_INFO("Max shared memory per block: {} KB", GetSharedMemoryPerBlock() / 1024);
+  // Print 1D texture size
+  MACH3LOG_INFO("Max 1D texture size: {}", GetMaxTexture1DSize());
 #endif
 }
 
