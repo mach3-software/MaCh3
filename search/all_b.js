@@ -42,10 +42,11 @@ var searchData=
   ['lnlhist_5fsample_5fdrawdata_39',['lnLHist_Sample_DrawData',['../classSampleSummary.html#aa61561a1e3594ac9250aaee26409245e',1,'SampleSummary']]],
   ['lnlhist_5fsample_5fdrawflucdraw_40',['lnLHist_Sample_DrawflucDraw',['../classSampleSummary.html#afddd2abc0ec07b52dc9004880522ab5a',1,'SampleSummary']]],
   ['lnlhist_5fsample_5fpredflucdraw_41',['lnLHist_Sample_PredflucDraw',['../classSampleSummary.html#aecf1c224162e1055e8306d438e1a3761',1,'SampleSummary']]],
-  ['loadsplinefile_42',['LoadSplineFile',['../classSMonolith.html#a6783cdc3c485378ca21852e1a7b02482',1,'SMonolith']]],
-  ['loadyamlconfig_43',['LoadYamlConfig',['../YamlHelper_8h.html#a7d9483510cc8dcf165dc9e13f85a7e3e',1,'YamlHelper.h']]],
-  ['loggerprint_44',['LoggerPrint',['../MaCh3Logger_8h.html#ada930684d7c1ed8916f1fbe6d266ca77',1,'MaCh3Logger.h']]],
-  ['loglcurr_45',['logLCurr',['../classFitterBase.html#abfb6f10720764d8bbbe43754fd5cd976',1,'FitterBase']]],
-  ['loglprop_46',['logLProp',['../classFitterBase.html#a187dd22c17f9e96e5a7e2fb2371abace',1,'FitterBase']]],
-  ['lowerbound_47',['LowerBound',['../structKinematicCut.html#aa654b5f2ef7ca1b57d9238c428fdc11f',1,'KinematicCut']]]
+  ['loadadditionalinfo_42',['LoadAdditionalInfo',['../classMCMCProcessor.html#aabac168d6ff10dc3d57667db532476a2',1,'MCMCProcessor::LoadAdditionalInfo()'],['../classOscProcessor.html#aa5b2ecf52ca107e11ac55bb9721db2c5',1,'OscProcessor::LoadAdditionalInfo()']]],
+  ['loadsplinefile_43',['LoadSplineFile',['../classSMonolith.html#a6783cdc3c485378ca21852e1a7b02482',1,'SMonolith']]],
+  ['loadyamlconfig_44',['LoadYamlConfig',['../YamlHelper_8h.html#a7d9483510cc8dcf165dc9e13f85a7e3e',1,'YamlHelper.h']]],
+  ['loggerprint_45',['LoggerPrint',['../MaCh3Logger_8h.html#ada930684d7c1ed8916f1fbe6d266ca77',1,'MaCh3Logger.h']]],
+  ['loglcurr_46',['logLCurr',['../classFitterBase.html#abfb6f10720764d8bbbe43754fd5cd976',1,'FitterBase']]],
+  ['loglprop_47',['logLProp',['../classFitterBase.html#a187dd22c17f9e96e5a7e2fb2371abace',1,'FitterBase']]],
+  ['lowerbound_48',['LowerBound',['../structKinematicCut.html#aa654b5f2ef7ca1b57d9238c428fdc11f',1,'KinematicCut']]]
 ];

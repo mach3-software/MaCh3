@@ -186,11 +186,11 @@ Variables</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>This executable calculates the \( \hat{R} \) estimator for Markov Chain Monte Carlo (MCMC) convergence. </p>
 <p>KS: This exe is meant to calculate the \( \hat{R} \) estimator. For a well-converged chain, this distribution should be centered at one. The \( \hat{R} \) statistic is used to assess the convergence of MCMC simulations and helps determine whether the chains have reached a stable distribution.</p>
-<p><a class="el" href="citelist.html#CITEREF_gelman2019">[28]</a>.</p>
+<p><a class="el" href="citelist.html#CITEREF_gelman2019">[29]</a>.</p>
 <p>MJR: Update &ndash; Improved memory usage so that whole chains can be quickly loaded without requiring copious amounts of RAM. This comes at the cost of not being able to calculate the Folded RHat since finding the median requires the loading of full chains at a time. The method has been validated to give identical results to the "High Memory" (original) version at a fraction of the runtime and resources.</p>
 <p>The input format is also slightly altered; since we can now load entire chains, there's less need to specify how many toys are desired for a sub-sample, so the Ntoys input has been removed.</p>
 <p>KS: This exe is meant to calculate the \( \hat{R} \) estimator. For a well-converged chain, this distribution should be centered at one. The \( \hat{R} \) statistic is used to assess the convergence of MCMC simulations and helps determine whether the chains have reached a stable distribution.</p>
-<p><a class="el" href="citelist.html#CITEREF_gelman2019">[28]</a>. </p>
+<p><a class="el" href="citelist.html#CITEREF_gelman2019">[29]</a>. </p>
 
 <p class="definition">Definition in file <a class="el" href="RHat_8cpp_source.html">RHat.cpp</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
