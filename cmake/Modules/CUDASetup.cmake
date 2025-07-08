@@ -1,5 +1,5 @@
 enable_language(CUDA)
-add_compile_definitions(CUDA)
+target_compile_definitions(MaCh3GPUCompilerOptions INTERFACE MaCh3_CUDA)
 
 EXECUTE_PROCESS( COMMAND uname -m OUTPUT_VARIABLE OS_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
 

@@ -6,7 +6,7 @@ _MaCh3_Safe_Include_Start_ //{
 _MaCh3_Safe_Include_End_ //}
 
 //Only if GPU is enabled
-#ifdef CUDA
+#ifdef MaCh3_CUDA
 #include "Fitters/gpuMCMCProcessorUtils.cuh"
 #endif
 
@@ -88,7 +88,7 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
     nParam[i] = 0;
   }
   //Only if GPU is enabled
-  #ifdef CUDA
+  #ifdef MaCh3_CUDA
    ParStep_cpu = nullptr;
    NumeratorSum_cpu = nullptr;
    ParamSums_cpu = nullptr;
@@ -3313,7 +3313,7 @@ void MCMCProcessor::AutoCorrelation() {
     LagKPlots[j]->GetYaxis()->SetTitle("Auto-correlation function");
   }
 //KS: If CUDA is not enabled do calculations on CPU
-#ifndef CUDA
+#ifndef MaCh3_CUDA
   // Loop over the lags
   //CW: Each lag is independent so might as well multi-thread them!
   #ifdef MULTITHREAD
@@ -3408,12 +3408,11 @@ void MCMCProcessor::AutoCorrelation() {
   MACH3LOG_INFO("Making auto-correlations took {:.2f}s", clock.RealTime());
 }
 
-#ifdef CUDA
+#ifdef MaCh3_CUDA
 // **************************
 //KS: Allocates memory and copy data from CPU to GPU
 void MCMCProcessor::PrepareGPU_AutoCorr(const int nLags) {
 // **************************
-
   //KS: Create temporary arrays that will communicate with GPU code
   ParStep_cpu = new float[nDraw*nEntries];
   NumeratorSum_cpu = new float[nDraw*nLags];
@@ -3827,7 +3826,7 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
   TVectorD* PowerSpectrumStepSize = new TVectorD(nPrams);
   for (int j = 0; j < nPrams; ++j)
   {
-    TGraph* plot = new TGraph(v_size, k_j[j].data(), P_j[j].data());
+    auto plot = std::make_unique<TGraph>(v_size, k_j[j].data(), P_j[j].data());
 
     TString Title = "";
     double Prior = 1.0, PriorError = 1.0;
@@ -3867,7 +3866,6 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
     //KS: I have no clue what is the reason behind this. Found this in Rick Calland code...
     (*PowerSpectrumStepSize)(j) = std::sqrt(func->GetParameter(0)/float(v_size*0.5));
     delete func;
-    delete plot;
   }
 
   PowerSpectrumStepSize->Write("PowerSpectrumStepSize");
