@@ -296,12 +296,6 @@ void ParameterHandlerBase::Init(const std::vector<std::string>& YAMLFile) {
 // ********************************************
 void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const int Index){
 // ********************************************
-  // If parameter is fixed do not enable special proposal to avoid situation where we switch mass ordering for example if it is fixed
-  if(IsParameterFixed(Index)) {
-    MACH3LOG_DEBUG("Parameter {} is fixed, therefore will not apply Special proposal", GetParName(Index));
-    return;
-  }
-
   doSpecialStepProposal = true;
 
   bool CircEnabled = false;
@@ -586,12 +580,16 @@ void ParameterHandlerBase::SpecialStepProposal() {
 
   // HW It should now automatically set dcp to be with [-pi, pi]
   for (size_t i = 0; i < CircularBoundsIndex.size(); ++i) {
-    CircularParBounds(CircularBoundsIndex[i], CircularBoundsValues[i].first, CircularBoundsValues[i].second);
+    const int index = CircularBoundsIndex[i];
+    if(!IsParameterFixed(index))
+      CircularParBounds(index, CircularBoundsValues[i].first, CircularBoundsValues[i].second);
   }
 
   // Okay now we've done the standard steps, we can add in our nice flips hierarchy flip first
   for (size_t i = 0; i < FlipParameterIndex.size(); ++i) {
-    FlipParameterValue(FlipParameterIndex[i], FlipParameterPoint[i]);
+    const int index = FlipParameterIndex[i];
+    if(!IsParameterFixed(index))
+      FlipParameterValue(FlipParameterIndex[i], FlipParameterPoint[i]);
   }
 }
 
@@ -920,36 +918,6 @@ void ParameterHandlerBase::ToggleFixParameter(const int i) {
   } else {
     PCAObj->ToggleFixParameter(i, _fNames);
   }
-
-  RemoveSpecialProposal(i);
-}
-
-// ********************************************
-// Remove special proposal for fixed parameters
-void ParameterHandlerBase::RemoveSpecialProposal(const int i) {
-// ********************************************
-  /// @todo if me add class or simple struct holding this info it could make this function simplified
-  for (size_t idx = 0; idx < FlipParameterIndex.size(); ++idx) {
-    if (FlipParameterIndex[idx] == i) {
-      FlipParameterIndex.erase(FlipParameterIndex.begin() + idx);
-      FlipParameterPoint.erase(FlipParameterPoint.begin() + idx);
-      MACH3LOG_DEBUG("Removed flip symmetry for parameter {}.", i);
-      break;
-    }
-  }
-
-  for (size_t idx = 0; idx < CircularBoundsIndex.size(); ++idx) {
-    if (CircularBoundsIndex[idx] == i) {
-      CircularBoundsIndex.erase(CircularBoundsIndex.begin() + idx);
-      CircularBoundsValues.erase(CircularBoundsValues.begin() + idx);
-      MACH3LOG_DEBUG("Removed circular bounds for parameter {}.", i);
-      break;
-    }
-  }
-
-  // Sanity check that sizes matter
-  assert(FlipParameterIndex.size() == FlipParameterPoint.size());
-  assert(CircularBoundsIndex.size() == CircularBoundsValues.size());
 }
 
 // ********************************************
