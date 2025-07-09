@@ -319,6 +319,11 @@ void SampleHandlerFD::SetupSampleBinning(){
   _hPDF2D   = new TH2D("h"+histname2d+SampleTitle,histtitle, 1, 0, 1, 1, 0, 1);
   dathist2d = new TH2D("d"+histname2d+SampleTitle,histtitle, 1, 0, 1, 1, 0, 1);
 
+  _hPDF1D->GetXaxis()->SetTitle(XVarStr.c_str());
+  dathist->GetXaxis()->SetTitle(XVarStr.c_str());
+  _hPDF2D->GetXaxis()->SetTitle(XVarStr.c_str());
+  dathist2d->GetXaxis()->SetTitle(XVarStr.c_str());
+
   //A string to store the binning for a nice print out
   std::string XBinEdgesStr = "";
   std::string YBinEdgesStr = "";
@@ -356,7 +361,8 @@ void SampleHandlerFD::SetupSampleBinning(){
 // ************************************************
 bool SampleHandlerFD::IsEventSelected(const int iEvent) {
 // ************************************************
-  for (unsigned int iSelection = 0; iSelection < Selection.size(); ++iSelection) {
+  const int SelectionSize = static_cast<int>(Selection.size());
+  for (int iSelection = 0; iSelection < SelectionSize; ++iSelection) {
     const auto& Cut = Selection[iSelection];
     const double Val = ReturnKinematicParameter(Cut.ParamToCutOnIt, iEvent);
     if ((Val < Cut.LowerBound) || (Val >= Cut.UpperBound)) {
