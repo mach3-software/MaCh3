@@ -47,6 +47,7 @@ if(NOT MaCh3_DEBUG_ENABLED)
         "$<$<COMPILE_LANGUAGE:CUDA>:-Xptxas=-allow-expensive-optimizations=true;-Xptxas=-fmad=true;-Xptxas=-O3;>"
         "$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=-fpic;-Xcompiler=-O3;-Xcompiler=-Wall;-Xcompiler=-Wextra;-Xcompiler=-Werror;-Xcompiler=-Wno-error=unused-parameter>"
         "$<$<COMPILE_LANGUAGE:CUDA>:-Xcudafe=--display_error_number>"
+        "$<$<COMPILE_LANGUAGE:CUDA>:-diag-suppress=1835>"
     )
 else()
 #CW: -g and -G for debug flags to use cuda-gdb; slows stuff A LOT
