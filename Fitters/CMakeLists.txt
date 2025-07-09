@@ -1,6 +1,8 @@
 set(HEADERS
     FitterBase.h
-    mcmc.h
+    MCMCBase.h
+    MRT2T.h
+    DelayedMRT2T.h
     LikelihoodFit.h
     MinuitFit.h
     PSO.h
@@ -14,7 +16,9 @@ set(HEADERS
 
 add_library(Fitters SHARED
     FitterBase.cpp
-    mcmc.cpp
+    MCMCBase.cpp
+    MR2T2.cpp
+    DelayedMR2T2.cpp
     LikelihoodFit.cpp
     $<$<BOOL:${MaCh3_MINUIT2_ENABLED}>:MinuitFit.cpp>
     PSO.cpp
