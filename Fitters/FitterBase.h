@@ -140,8 +140,6 @@ class FitterBase {
 
   /// Necessary for some fitting algorithms like PSO
   bool fTestLikelihood;
-  /// Save proposal at each step
-  bool SaveProposal;
 
   /// Checks if file saved not repeat some operations
   bool FileSaved;

@@ -166,7 +166,6 @@ void SampleHandlerFD::ReadSampleConfig()
 
   //Now grab the selection cuts from the manager
   for ( auto const &SelectionCuts : SampleManager->raw()["SelectionCuts"]) {
-    SelectionStr.push_back(SelectionCuts["KinematicStr"].as<std::string>());
     auto TempBoundsVec = GetBounds(SelectionCuts["Bounds"]);
     KinematicCut CutObj;
     CutObj.LowerBound = TempBoundsVec[0];
@@ -320,6 +319,11 @@ void SampleHandlerFD::SetupSampleBinning(){
   _hPDF2D   = new TH2D("h"+histname2d+SampleTitle,histtitle, 1, 0, 1, 1, 0, 1);
   dathist2d = new TH2D("d"+histname2d+SampleTitle,histtitle, 1, 0, 1, 1, 0, 1);
 
+  _hPDF1D->GetXaxis()->SetTitle(XVarStr.c_str());
+  dathist->GetXaxis()->SetTitle(XVarStr.c_str());
+  _hPDF2D->GetXaxis()->SetTitle(XVarStr.c_str());
+  dathist2d->GetXaxis()->SetTitle(XVarStr.c_str());
+
   //A string to store the binning for a nice print out
   std::string XBinEdgesStr = "";
   std::string YBinEdgesStr = "";
@@ -357,9 +361,11 @@ void SampleHandlerFD::SetupSampleBinning(){
 // ************************************************
 bool SampleHandlerFD::IsEventSelected(const int iEvent) {
 // ************************************************
-  for (unsigned int iSelection=0;iSelection < Selection.size() ;iSelection++) {
-    const double Val = ReturnKinematicParameter(Selection[iSelection].ParamToCutOnIt, iEvent);
-    if ((Val < Selection[iSelection].LowerBound) || (Val >= Selection[iSelection].UpperBound)) {
+  const int SelectionSize = static_cast<int>(Selection.size());
+  for (int iSelection = 0; iSelection < SelectionSize; ++iSelection) {
+    const auto& Cut = Selection[iSelection];
+    const double Val = ReturnKinematicParameter(Cut.ParamToCutOnIt, iEvent);
+    if ((Val < Cut.LowerBound) || (Val >= Cut.UpperBound)) {
       return false;
     }
   }
@@ -516,7 +522,7 @@ void SampleHandlerFD::FillArray_MP() {
 
     const unsigned int NumberOfEvents = GetNEvents();
     #pragma omp for
-    for (unsigned int iEvent = 0; iEvent < NumberOfEvents; iEvent++) {
+    for (unsigned int iEvent = 0; iEvent < NumberOfEvents; ++iEvent) {
       //ETA - generic functions to apply shifts to kinematic variables
       // Apply this before IsEventSelected is called.
       ApplyShifts(iEvent);
@@ -726,12 +732,13 @@ void SampleHandlerFD::ApplyShifts(int iEvent) {
 M3::float_t SampleHandlerFD::CalcWeightSpline(const FarDetectorCoreInfo* MCEvent) const {
 // ***************************************************************************
   M3::float_t spline_weight = 1.0;
+  const int nSplines = static_cast<int>(MCEvent->xsec_spline_pointers.size());
   //DB Xsec syst
   //Loop over stored spline pointers
   #ifdef MULTITHREAD
   #pragma omp simd
   #endif
-  for (size_t iSpline = 0; iSpline < MCEvent->xsec_spline_pointers.size(); ++iSpline) {
+  for (int iSpline = 0; iSpline < nSplines; ++iSpline) {
     spline_weight *= *(MCEvent->xsec_spline_pointers[iSpline]);
   }
   return spline_weight;
@@ -742,18 +749,19 @@ M3::float_t SampleHandlerFD::CalcWeightSpline(const FarDetectorCoreInfo* MCEvent
 M3::float_t SampleHandlerFD::CalcWeightNorm(const FarDetectorCoreInfo* MCEvent) const {
 // ***************************************************************************
   M3::float_t xsecw = 1.0;
+  const int nNorms = static_cast<int>(MCEvent->xsec_norm_pointers.size());
   //Loop over stored normalisation and function pointers
   #ifdef MULTITHREAD
   #pragma omp simd
   #endif
-  for (size_t iParam = 0; iParam < MCEvent->xsec_norm_pointers.size(); ++iParam)
+  for (int iParam = 0; iParam < nNorms; ++iParam)
   {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuseless-cast"
     xsecw *= static_cast<M3::float_t>(*(MCEvent->xsec_norm_pointers[iParam]));
 #pragma GCC diagnostic pop
     #ifdef DEBUG
-    if (TMath::IsNaN(xsecw)) MACH3LOG_WARN("iParam= {} xsecweight=nan from norms", iParam);
+    if (std::isnan(xsecw)) MACH3LOG_WARN("iParam= {} xsecweight=nan from norms", iParam);
     #endif
   }
   return xsecw;
@@ -947,26 +955,6 @@ void SampleHandlerFD::Set1DBinning(size_t nbins, double* boundaries)
   FindNominalBinAndEdges1D();
 }
 
-void SampleHandlerFD::Set1DBinning(size_t nbins, double low, double high)
-{
-  _hPDF1D->Reset();
-  _hPDF1D->SetBins(static_cast<int>(nbins),low,high);
-  dathist->SetBins(static_cast<int>(nbins),low,high);
-
-  Binning.YBinEdges = std::vector<double>(2);
-  Binning.YBinEdges[0] = -1e8;
-  Binning.YBinEdges[1] = 1e8;
-
-  _hPDF2D->Reset();
-  _hPDF2D->SetBins(static_cast<int>(nbins),low,high,1,Binning.YBinEdges[0],Binning.YBinEdges[1]);
-  dathist2d->SetBins(static_cast<int>(nbins),low,high,1,Binning.YBinEdges[0],Binning.YBinEdges[1]);
-
-  //Set the number of X and Y bins now
-  SetupReweightArrays(Binning.XBinEdges.size() - 1, Binning.YBinEdges.size() - 1);
-
-  FindNominalBinAndEdges1D();
-}
-
 void SampleHandlerFD::FindNominalBinAndEdges1D() {
   for(unsigned int event_i = 0; event_i < GetNEvents(); event_i++){
     //Set x_var and y_var values based on XVarStr and YVarStr
@@ -1028,22 +1016,6 @@ void SampleHandlerFD::Set2DBinning(size_t nbins1, double* boundaries1, size_t nb
   _hPDF2D->SetBins(static_cast<int>(nbins1),boundaries1,static_cast<int>(nbins2),boundaries2);
   dathist2d->SetBins(static_cast<int>(nbins1),boundaries1,static_cast<int>(nbins2),boundaries2);
   
-  //Set the number of X and Y bins now
-  SetupReweightArrays(Binning.XBinEdges.size() - 1, Binning.YBinEdges.size() - 1);
-
-  FindNominalBinAndEdges2D();
-}
-
-void SampleHandlerFD::Set2DBinning(size_t nbins1, double low1, double high1, size_t nbins2, double low2, double high2)
-{
-  _hPDF1D->Reset();
-  _hPDF1D->SetBins(static_cast<int>(nbins1),low1,high1);
-  dathist->SetBins(static_cast<int>(nbins1),low1,high1);
-
-  _hPDF2D->Reset();
-  _hPDF2D->SetBins(static_cast<int>(nbins1),low1,high1,static_cast<int>(nbins2),low2,high2);
-  dathist2d->SetBins(static_cast<int>(nbins1),low1,high1,static_cast<int>(nbins2),low2,high2);
-
   //Set the number of X and Y bins now
   SetupReweightArrays(Binning.XBinEdges.size() - 1, Binning.YBinEdges.size() - 1);
 
@@ -1377,13 +1349,14 @@ std::string SampleHandlerFD::GetSampleName(int iSample) const {
 
 M3::float_t SampleHandlerFD::GetEventWeight(const int iEntry) const {
   M3::float_t totalweight = 1.0;
+  const int nParams = static_cast<int>(MCSamples[iEntry].total_weight_pointers.size());
   #ifdef MULTITHREAD
   #pragma omp simd
   #endif
-  for (size_t iParam = 0; iParam < MCSamples[iEntry].total_weight_pointers.size(); ++iParam) {
+  for (int iParam = 0; iParam < nParams; ++iParam) {
     totalweight *= *(MCSamples[iEntry].total_weight_pointers[iParam]);
   }
-  
+
   return totalweight;
 }
 
@@ -1498,7 +1471,7 @@ void SampleHandlerFD::InitialiseSplineObject() {
   }
 
   //Keep a track of the spline variables
-  SplineVarNames.push_back("TrueNeutrinoEnergy");
+  std::vector<std::string> SplineVarNames = {"TrueNeutrinoEnergy"};
   if(XVarStr.length() > 0){
     SplineVarNames.push_back(XVarStr);
   }
@@ -1548,8 +1521,9 @@ TH1* SampleHandlerFD::Get1DVarHist(const std::string& ProjectionVar_Str, const s
     _h1DVar = new TH1D("", "", int(xBinEdges.size())-1, xBinEdges.data());
   }
   
-  if (IsSubEventVarString(ProjectionVar_Str)) Fill1DSubEventHist(_h1DVar, ProjectionVar_Str, SubEventSelectionVec, WeightStyle);
-  else {
+  if (IsSubEventVarString(ProjectionVar_Str)) {
+    Fill1DSubEventHist(_h1DVar, ProjectionVar_Str, SubEventSelectionVec, WeightStyle);
+  } else {
     //DB Grab the associated enum with the argument string
     int ProjectionVar_Int = ReturnKinematicParameterFromString(ProjectionVar_Str);
 
