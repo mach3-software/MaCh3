@@ -111,7 +111,9 @@ class MCMCProcessor {
     void MakeCredibleRegions(const std::vector<double>& CredibleRegions = {0.99, 0.90, 0.68},
                              const std::vector<Style_t>& CredibleRegionStyle = {kDashed, kSolid, kDotted},
                              const std::vector<Color_t>& CredibleRegionColor = {kGreen-3, kGreen-10, kGreen},
-                             const bool CredibleInSigmas = false
+                             const bool CredibleInSigmas = false,
+			     const bool Draw2DPosterior = true,
+			     const bool DrawBestFit = true
                              );
     /// @brief Make fancy triangle plot for selected parameters
     /// @param CredibleIntervals Vector with values of credible intervals, must be in descending order

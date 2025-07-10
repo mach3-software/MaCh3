@@ -1544,7 +1544,9 @@ void MCMCProcessor::DrawCorrelations1D() {
 void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegions,
                                         const std::vector<Style_t>& CredibleRegionStyle,
                                         const std::vector<Color_t>& CredibleRegionColor,
-                                        const bool CredibleInSigmas) {
+                                        const bool CredibleInSigmas, 
+					const bool Draw2DPosterior,
+					const bool DrawBestFit) {
 // *********************
   if(hpost2D.size() == 0) MakeCovariance_MP();
   MACH3LOG_INFO("Making Credible Regions");
@@ -1613,10 +1615,15 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
       bestfitM->SetMarkerStyle(22);
       bestfitM->SetMarkerSize(1);
       bestfitM->SetMarkerColor(kMagenta);
-      legend->AddEntry(bestfitM.get(),"Best Fit","p");
-
+    
       //Plot default 2D posterior
+
+      if(Draw2DPosterior){
       hpost_2D_copy[i][j]->Draw("COLZ");
+      }
+      else{
+      hpost_2D_copy[i][j]->Draw("AXIS");
+      }
 
       //Now credible regions
       for (int k = 0; k < nCredible; ++k)
@@ -1629,7 +1636,11 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
           legend->AddEntry(hpost_2D_cl[i][j][k].get(), Form("%.0f%% Credible Region", CredibleRegions[k]*100), "l");
       }
       legend->Draw("SAME");
+  
+    if(DrawBestFit){
+      legend->AddEntry(bestfitM.get(),"Best Fit","p");
       bestfitM->Draw("SAME.P");
+     }
 
       // Write to file
       Posterior->SetName(hpost2D[i][j]->GetName());

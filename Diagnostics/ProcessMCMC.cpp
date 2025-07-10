@@ -151,8 +151,9 @@ void ProcessMCMC(const std::string& inputFile)
       Processor->MakeCredibleRegions(GetFromManager<std::vector<double>>(Settings["CredibleRegions"], {0.99, 0.90, 0.68}),
                                      GetFromManager<std::vector<short int>>(Settings["CredibleRegionStyle"], {2, 1, 3}),
                                      GetFromManager<std::vector<short int>>(Settings["CredibleRegionColor"], {413, 406, 416}),
-                                     GetFromManager<bool>(Settings["CredibleInSigmas"], false)
-                                     );
+                                     GetFromManager<bool>(Settings["CredibleInSigmas"], false), 
+				     GetFromManager<bool>(Settings["Draw2DPosterior"], true),
+				     GetFromManager<bool>(Settings["DrawBestFit"], true));
     }
     if(GetFromManager<bool>(Settings["GetTrianglePlot"], true)) GetTrianglePlot(Processor.get());
 
