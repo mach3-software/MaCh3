@@ -36,7 +36,7 @@ RUN git checkout ${MACH3_VERSION}
 RUN mkdir -p ${MACH3_INSTALL_DIR}
 WORKDIR ${MACH3_INSTALL_DIR}
 RUN source ${ONEAPI_ROOT}/setvars.sh && cmake ${CMAKE_OPTIONS} ${MACH3_WORK_DIR}
-RUN source ${ONEAPI_ROOT}/setvars.sh && make ${INSTALL_OPTIONS} && make install
+RUN source ${ONEAPI_ROOT}/setvars.sh && make -j4 ${INSTALL_OPTIONS} && make install
 
 # KS: Need to set them here, otherwise container using this container will not be able to find MaCh3
 ENV MaCh3_ROOT=${MACH3_INSTALL_DIR}
