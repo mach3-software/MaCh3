@@ -96,6 +96,7 @@ $(function() {
 <code>#include &quot;<a class="el" href="HistogramUtils_8h_source.html">Samples/HistogramUtils.h</a>&quot;</code><br />
 <code>#include &quot;THStack.h&quot;</code><br />
 <code>#include &quot;TGraphAsymmErrors.h&quot;</code><br />
+<code>#include &quot;TLegend.h&quot;</code><br />
 <code>#include &lt;TSystem.h&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for PlotMCMCDiag.cpp:</div>
@@ -114,10 +115,10 @@ Functions</h2></td></tr>
 <tr class="memitem:a47175dd694387a761ab3d199eabca16d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="PlotMCMCDiag_8cpp.html#a47175dd694387a761ab3d199eabca16d">IsHistogramAllOnes</a> (TH1D *hist, double tolerance=0.001, int max_failures=100)</td></tr>
 <tr class="memdesc:a47175dd694387a761ab3d199eabca16d"><td class="mdescLeft">&#160;</td><td class="mdescRight">HW: Check if histogram is flat within a given tolerance.  <br /></td></tr>
 <tr class="separator:a47175dd694387a761ab3d199eabca16d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a70a8847717dd98bb61d4be6af69dbe03"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="PlotMCMCDiag_8cpp.html#a70a8847717dd98bb61d4be6af69dbe03">MakePlot</a> (TString fname1, TString fname2, TString fname3, TString fname4)</td></tr>
-<tr class="separator:a70a8847717dd98bb61d4be6af69dbe03"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a077cef58096692740b5491f8b1bec715"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="PlotMCMCDiag_8cpp.html#a077cef58096692740b5491f8b1bec715">PlotAutoCorr</a> (TString fname1, TString fname2, TString fname3, TString fname4)</td></tr>
-<tr class="separator:a077cef58096692740b5491f8b1bec715"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a90c4608d3da0a7c10a29902f966ba2d9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="PlotMCMCDiag_8cpp.html#a90c4608d3da0a7c10a29902f966ba2d9">MakePlot</a> (TString fname1, TString flabel1, TString fname2, TString flabel2, TString fname3, TString flabel3, TString fname4, TString flabel4)</td></tr>
+<tr class="separator:a90c4608d3da0a7c10a29902f966ba2d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb34dab2a00b2675057f9860468b0a6b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="PlotMCMCDiag_8cpp.html#adb34dab2a00b2675057f9860468b0a6b">PlotAutoCorr</a> (TString fname1, TString flabel1, TString fname2, TString flabel2, TString fname3, TString flabel3, TString fname4, TString flabel4)</td></tr>
+<tr class="separator:adb34dab2a00b2675057f9860468b0a6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac430c336808f099c5fed0fea58c9d05c"><td class="memItemLeft" align="right" valign="top">std::pair&lt; TGraph *, TGraph * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="PlotMCMCDiag_8cpp.html#ac430c336808f099c5fed0fea58c9d05c">CreateMinMaxBand</a> (TH1D *hist, Color_t color)</td></tr>
 <tr class="memdesc:ac430c336808f099c5fed0fea58c9d05c"><td class="mdescLeft">&#160;</td><td class="mdescRight">HW: Create a band of minimum and maximum values from a histogram.  <br /></td></tr>
 <tr class="separator:ac430c336808f099c5fed0fea58c9d05c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -133,15 +134,17 @@ Functions</h2></td></tr>
 <tr class="separator:aeb9130d30b44773787174096b1032bec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab7866641a568fb6d72fb75c131696768"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="PlotMCMCDiag_8cpp.html#ab7866641a568fb6d72fb75c131696768">CompareAverageAC</a> (const std::vector&lt; std::vector&lt; TH1D * &gt; &gt; &amp;histograms, const std::vector&lt; TH1D * &gt; &amp;averages, const std::vector&lt; TString &gt; &amp;hist_labels, const TString &amp;output_name, bool draw_min_max=true, bool draw_all=false, bool draw_errors=true)</td></tr>
 <tr class="separator:ab7866641a568fb6d72fb75c131696768"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6ef6b0394c9c46c4474553907558098a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="PlotMCMCDiag_8cpp.html#a6ef6b0394c9c46c4474553907558098a">PlotAverageACMult</a> (std::vector&lt; TString &gt; input_files, const TString &amp;output_name, bool draw_min_max=true)</td></tr>
-<tr class="separator:a6ef6b0394c9c46c4474553907558098a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaff1fd9271707426d962ec32b2690f5a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="PlotMCMCDiag_8cpp.html#aaff1fd9271707426d962ec32b2690f5a">PlotAverageACMult</a> (std::vector&lt; TString &gt; input_files, std::vector&lt; TString &gt; hist_labels, const TString &amp;output_name, bool draw_min_max=true)</td></tr>
+<tr class="separator:aaff1fd9271707426d962ec32b2690f5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0ddf1224851353fc92bfbff6f499fa97"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="PlotMCMCDiag_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a> (int argc, char *argv[])</td></tr>
 <tr class="separator:a0ddf1224851353fc92bfbff6f499fa97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:aff052b2c086f67396715402e80de5fd7"><td class="memItemLeft" align="right" valign="top">TString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a> = &quot;KillMePlease&quot;</td></tr>
+<tr class="memitem:aff052b2c086f67396715402e80de5fd7"><td class="memItemLeft" align="right" valign="top">TString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a> = &quot;DummyFile&quot;</td></tr>
 <tr class="separator:aff052b2c086f67396715402e80de5fd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaaaec9d37a764e090607e8f68428a8ed"><td class="memItemLeft" align="right" valign="top">TString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="PlotMCMCDiag_8cpp.html#aaaaec9d37a764e090607e8f68428a8ed">DUMMYNAME</a> = &quot;DummyName&quot;</td></tr>
+<tr class="separator:aaaaec9d37a764e090607e8f68428a8ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>KS: This script is used to analyse output form DiagMCMC. </p>
@@ -176,32 +179,32 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PlotMCMCDiag_8cpp_source.html#l00365">365</a> of file <a class="el" href="PlotMCMCDiag_8cpp_source.html">PlotMCMCDiag.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  366</span>{</div>
-<div class="line"><span class="lineno">  367</span> </div>
-<div class="line"><span class="lineno">  368</span>  TH1D *average_hist = <span class="keyword">nullptr</span>;</div>
-<div class="line"><span class="lineno">  369</span>  <span class="keywordtype">int</span> parameter_count = 0;</div>
-<div class="line"><span class="lineno">  370</span> </div>
-<div class="line"><span class="lineno">  371</span>  <span class="keywordflow">try</span></div>
-<div class="line"><span class="lineno">  372</span>  {</div>
-<div class="line"><span class="lineno">  373</span>      <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#aeeb2558d279a2adb7bfb3f0e0f2ea5c0">ProcessDiagnosticFile</a>(input_file, average_hist, parameter_count, histograms);</div>
-<div class="line"><span class="lineno">  374</span>  }</div>
-<div class="line"><span class="lineno">  375</span>  <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception &amp;e)</div>
-<div class="line"><span class="lineno">  376</span>  {</div>
-<div class="line"><span class="lineno">  377</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Error processing file {} : {}&quot;</span>, input_file, e.what());</div>
-<div class="line"><span class="lineno">  378</span>  }</div>
-<div class="line"><span class="lineno">  379</span> </div>
-<div class="line"><span class="lineno">  380</span>  <span class="keywordflow">if</span> (average_hist &amp;&amp; parameter_count &gt; 0)</div>
-<div class="line"><span class="lineno">  381</span>  {</div>
-<div class="line"><span class="lineno">  382</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Processed {} parameters from {} files&quot;</span>, parameter_count, input_file);</div>
-<div class="line"><span class="lineno">  383</span>      average_hist-&gt;Scale(1.0 / parameter_count);</div>
-<div class="line"><span class="lineno">  384</span>  }</div>
-<div class="line"><span class="lineno">  385</span> </div>
-<div class="line"><span class="lineno">  386</span>  <span class="keywordflow">return</span> average_hist;</div>
-<div class="line"><span class="lineno">  387</span>}</div>
+<p class="definition">Definition at line <a class="el" href="PlotMCMCDiag_8cpp_source.html#l00445">445</a> of file <a class="el" href="PlotMCMCDiag_8cpp_source.html">PlotMCMCDiag.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  446</span>{</div>
+<div class="line"><span class="lineno">  447</span> </div>
+<div class="line"><span class="lineno">  448</span>  TH1D *average_hist = <span class="keyword">nullptr</span>;</div>
+<div class="line"><span class="lineno">  449</span>  <span class="keywordtype">int</span> parameter_count = 0;</div>
+<div class="line"><span class="lineno">  450</span> </div>
+<div class="line"><span class="lineno">  451</span>  <span class="keywordflow">try</span></div>
+<div class="line"><span class="lineno">  452</span>  {</div>
+<div class="line"><span class="lineno">  453</span>    <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#aeeb2558d279a2adb7bfb3f0e0f2ea5c0">ProcessDiagnosticFile</a>(input_file, average_hist, parameter_count, histograms);</div>
+<div class="line"><span class="lineno">  454</span>  }</div>
+<div class="line"><span class="lineno">  455</span>  <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::exception &amp;e)</div>
+<div class="line"><span class="lineno">  456</span>  {</div>
+<div class="line"><span class="lineno">  457</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Error processing file {} : {}&quot;</span>, input_file, e.what());</div>
+<div class="line"><span class="lineno">  458</span>  }</div>
+<div class="line"><span class="lineno">  459</span> </div>
+<div class="line"><span class="lineno">  460</span>  <span class="keywordflow">if</span> (average_hist &amp;&amp; parameter_count &gt; 0)</div>
+<div class="line"><span class="lineno">  461</span>  {</div>
+<div class="line"><span class="lineno">  462</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Processed {} parameters from {} files&quot;</span>, parameter_count, input_file);</div>
+<div class="line"><span class="lineno">  463</span>    average_hist-&gt;Scale(1.0 / parameter_count);</div>
+<div class="line"><span class="lineno">  464</span>  }</div>
+<div class="line"><span class="lineno">  465</span> </div>
+<div class="line"><span class="lineno">  466</span>  <span class="keywordflow">return</span> average_hist;</div>
+<div class="line"><span class="lineno">  467</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00025">MaCh3Logger.h:25</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00023">MaCh3Logger.h:23</a></div></div>
-<div class="ttc" id="aPlotMCMCDiag_8cpp_html_aeeb2558d279a2adb7bfb3f0e0f2ea5c0"><div class="ttname"><a href="PlotMCMCDiag_8cpp.html#aeeb2558d279a2adb7bfb3f0e0f2ea5c0">ProcessDiagnosticFile</a></div><div class="ttdeci">void ProcessDiagnosticFile(const TString &amp;file_path, TH1D *&amp;average_hist, int &amp;parameter_count, std::vector&lt; TH1D * &gt; &amp;histograms)</div><div class="ttdef"><b>Definition:</b> <a href="PlotMCMCDiag_8cpp_source.html#l00342">PlotMCMCDiag.cpp:342</a></div></div>
+<div class="ttc" id="aPlotMCMCDiag_8cpp_html_aeeb2558d279a2adb7bfb3f0e0f2ea5c0"><div class="ttname"><a href="PlotMCMCDiag_8cpp.html#aeeb2558d279a2adb7bfb3f0e0f2ea5c0">ProcessDiagnosticFile</a></div><div class="ttdeci">void ProcessDiagnosticFile(const TString &amp;file_path, TH1D *&amp;average_hist, int &amp;parameter_count, std::vector&lt; TH1D * &gt; &amp;histograms)</div><div class="ttdef"><b>Definition:</b> <a href="PlotMCMCDiag_8cpp_source.html#l00422">PlotMCMCDiag.cpp:422</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -231,42 +234,41 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PlotMCMCDiag_8cpp_source.html#l00240">240</a> of file <a class="el" href="PlotMCMCDiag_8cpp_source.html">PlotMCMCDiag.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  241</span>{</div>
-<div class="line"><span class="lineno">  242</span>    <span class="keywordflow">if</span> (histograms.empty())</div>
-<div class="line"><span class="lineno">  243</span>    {</div>
-<div class="line"><span class="lineno">  244</span>        <span class="keywordflow">throw</span> std::invalid_argument(<span class="stringliteral">&quot;Empty histogram vector provided&quot;</span>);</div>
-<div class="line"><span class="lineno">  245</span>    }</div>
-<div class="line"><span class="lineno">  246</span> </div>
-<div class="line"><span class="lineno">  247</span>    <span class="keywordtype">int</span> <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a> = histograms[0]-&gt;GetNbinsX();</div>
-<div class="line"><span class="lineno">  248</span>    std::vector&lt;double&gt; x(<a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>), ymin(<a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>, 1e10), ymax(<a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>, -1e10);</div>
-<div class="line"><span class="lineno">  249</span> </div>
-<div class="line"><span class="lineno">  250</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> bin = 0; bin &lt; <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>; bin++)</div>
-<div class="line"><span class="lineno">  251</span>    {</div>
-<div class="line"><span class="lineno">  252</span>        x[bin] = histograms[0]-&gt;GetBinCenter(bin + 1);</div>
-<div class="line"><span class="lineno">  253</span> </div>
-<div class="line"><span class="lineno">  254</span>        <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> &amp;hist : histograms)</div>
-<div class="line"><span class="lineno">  255</span>        {</div>
-<div class="line"><span class="lineno">  256</span>            <span class="keywordtype">double</span> content = hist-&gt;GetBinContent(bin + 1);</div>
-<div class="line"><span class="lineno">  257</span>            ymin[bin] = std::min(ymin[bin], content);</div>
-<div class="line"><span class="lineno">  258</span>            ymax[bin] = std::max(ymax[bin], content);</div>
-<div class="line"><span class="lineno">  259</span>        }</div>
-<div class="line"><span class="lineno">  260</span>    }</div>
-<div class="line"><span class="lineno">  261</span> </div>
-<div class="line"><span class="lineno">  262</span> </div>
-<div class="line"><span class="lineno">  263</span>    <span class="comment">// Create a band using TGraphAsymmErrors for the shaded region</span></div>
-<div class="line"><span class="lineno">  264</span>    TGraphAsymmErrors *band = <span class="keyword">new</span> TGraphAsymmErrors(<a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>);</div>
-<div class="line"><span class="lineno">  265</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>; ++i)</div>
-<div class="line"><span class="lineno">  266</span>    {</div>
-<div class="line"><span class="lineno">  267</span>        band-&gt;SetPoint(i, x[i], (ymax[i] + ymin[i]) / 2.0);</div>
-<div class="line"><span class="lineno">  268</span>        band-&gt;SetPointError(i, 0, 0, (ymax[i] - ymin[i]) / 2.0, (ymax[i] - ymin[i]) / 2.0);</div>
-<div class="line"><span class="lineno">  269</span>    }</div>
-<div class="line"><span class="lineno">  270</span> </div>
-<div class="line"><span class="lineno">  271</span>    band-&gt;SetFillColorAlpha(color, <span class="keywordtype">float</span>(0.2));</div>
-<div class="line"><span class="lineno">  272</span>    band-&gt;SetLineWidth(1);</div>
-<div class="line"><span class="lineno">  273</span> </div>
-<div class="line"><span class="lineno">  274</span>    <span class="keywordflow">return</span> band; <span class="comment">// Return band and min graph (min graph can be used for legend)</span></div>
-<div class="line"><span class="lineno">  275</span>}</div>
+<p class="definition">Definition at line <a class="el" href="PlotMCMCDiag_8cpp_source.html#l00323">323</a> of file <a class="el" href="PlotMCMCDiag_8cpp_source.html">PlotMCMCDiag.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  324</span>{</div>
+<div class="line"><span class="lineno">  325</span>  <span class="keywordflow">if</span> (histograms.empty())</div>
+<div class="line"><span class="lineno">  326</span>  {</div>
+<div class="line"><span class="lineno">  327</span>    <span class="keywordflow">throw</span> std::invalid_argument(<span class="stringliteral">&quot;Empty histogram vector provided&quot;</span>);</div>
+<div class="line"><span class="lineno">  328</span>  }</div>
+<div class="line"><span class="lineno">  329</span> </div>
+<div class="line"><span class="lineno">  330</span>  <span class="keywordtype">int</span> <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a> = histograms[0]-&gt;GetNbinsX();</div>
+<div class="line"><span class="lineno">  331</span>  std::vector&lt;double&gt; x(<a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>), ymin(<a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>, 1e10), ymax(<a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>, -1e10);</div>
+<div class="line"><span class="lineno">  332</span> </div>
+<div class="line"><span class="lineno">  333</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> bin = 0; bin &lt; <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>; bin++)</div>
+<div class="line"><span class="lineno">  334</span>  {</div>
+<div class="line"><span class="lineno">  335</span>    x[bin] = histograms[0]-&gt;GetBinCenter(bin + 1);</div>
+<div class="line"><span class="lineno">  336</span> </div>
+<div class="line"><span class="lineno">  337</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> &amp;hist : histograms)</div>
+<div class="line"><span class="lineno">  338</span>    {</div>
+<div class="line"><span class="lineno">  339</span>      <span class="keywordtype">double</span> content = hist-&gt;GetBinContent(bin + 1);</div>
+<div class="line"><span class="lineno">  340</span>      ymin[bin] = std::min(ymin[bin], content);</div>
+<div class="line"><span class="lineno">  341</span>      ymax[bin] = std::max(ymax[bin], content);</div>
+<div class="line"><span class="lineno">  342</span>    }</div>
+<div class="line"><span class="lineno">  343</span>  }</div>
+<div class="line"><span class="lineno">  344</span> </div>
+<div class="line"><span class="lineno">  345</span>  <span class="comment">// Create a band using TGraphAsymmErrors for the shaded region</span></div>
+<div class="line"><span class="lineno">  346</span>  TGraphAsymmErrors *band = <span class="keyword">new</span> TGraphAsymmErrors(<a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>);</div>
+<div class="line"><span class="lineno">  347</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>; ++i)</div>
+<div class="line"><span class="lineno">  348</span>  {</div>
+<div class="line"><span class="lineno">  349</span>    band-&gt;SetPoint(i, x[i], (ymax[i] + ymin[i]) / 2.0);</div>
+<div class="line"><span class="lineno">  350</span>    band-&gt;SetPointError(i, 0, 0, (ymax[i] - ymin[i]) / 2.0, (ymax[i] - ymin[i]) / 2.0);</div>
+<div class="line"><span class="lineno">  351</span>  }</div>
+<div class="line"><span class="lineno">  352</span> </div>
+<div class="line"><span class="lineno">  353</span>  band-&gt;SetFillColorAlpha(color, <span class="keywordtype">float</span>(0.2));</div>
+<div class="line"><span class="lineno">  354</span>  band-&gt;SetLineWidth(1);</div>
+<div class="line"><span class="lineno">  355</span> </div>
+<div class="line"><span class="lineno">  356</span>  <span class="keywordflow">return</span> band; <span class="comment">// Return band and min graph (min graph can be used for legend)</span></div>
+<div class="line"><span class="lineno">  357</span>}</div>
 <div class="ttc" id="aGetPostfitParamPlots_8cpp_html_ae4842c1619a902b2761696f3849889a1"><div class="ttname"><a href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a></div><div class="ttdeci">int nBins</div><div class="ttdef"><b>Definition:</b> <a href="GetPostfitParamPlots_8cpp_source.html#l00069">GetPostfitParamPlots.cpp:69</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -287,31 +289,31 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PlotMCMCDiag_8cpp_source.html#l00278">278</a> of file <a class="el" href="PlotMCMCDiag_8cpp_source.html">PlotMCMCDiag.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  279</span>{</div>
-<div class="line"><span class="lineno">  280</span>    <span class="keywordflow">if</span> (histograms.empty())</div>
-<div class="line"><span class="lineno">  281</span>    {</div>
-<div class="line"><span class="lineno">  282</span>        <span class="keywordflow">throw</span> std::invalid_argument(<span class="stringliteral">&quot;Empty histogram vector provided&quot;</span>);</div>
-<div class="line"><span class="lineno">  283</span>    }</div>
-<div class="line"><span class="lineno">  284</span> </div>
-<div class="line"><span class="lineno">  285</span>    TH1D *min_hist = <span class="keyword">static_cast&lt;</span>TH1D *<span class="keyword">&gt;</span>(histograms[0]-&gt;Clone());</div>
-<div class="line"><span class="lineno">  286</span>    TH1D *max_hist = <span class="keyword">static_cast&lt;</span>TH1D *<span class="keyword">&gt;</span>(histograms[0]-&gt;Clone());</div>
-<div class="line"><span class="lineno">  287</span> </div>
-<div class="line"><span class="lineno">  288</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> &amp;hist : histograms)</div>
-<div class="line"><span class="lineno">  289</span>    {</div>
-<div class="line"><span class="lineno">  290</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> bin = 1; bin &lt;= min_hist-&gt;GetNbinsX(); ++bin)</div>
-<div class="line"><span class="lineno">  291</span>        {</div>
-<div class="line"><span class="lineno">  292</span>            <span class="keywordtype">double</span> current_min = min_hist-&gt;GetBinContent(bin);</div>
-<div class="line"><span class="lineno">  293</span>            <span class="keywordtype">double</span> current_max = max_hist-&gt;GetBinContent(bin);</div>
-<div class="line"><span class="lineno">  294</span>            <span class="keywordtype">double</span> bin_content = hist-&gt;GetBinContent(bin);</div>
-<div class="line"><span class="lineno">  295</span> </div>
-<div class="line"><span class="lineno">  296</span>            min_hist-&gt;SetBinContent(bin, std::min(current_min, bin_content));</div>
-<div class="line"><span class="lineno">  297</span>            max_hist-&gt;SetBinContent(bin, std::max(current_max, bin_content));</div>
-<div class="line"><span class="lineno">  298</span>        }</div>
-<div class="line"><span class="lineno">  299</span>    }</div>
-<div class="line"><span class="lineno">  300</span> </div>
-<div class="line"><span class="lineno">  301</span>    <span class="keywordflow">return</span> {min_hist, max_hist};</div>
-<div class="line"><span class="lineno">  302</span>}</div>
+<p class="definition">Definition at line <a class="el" href="PlotMCMCDiag_8cpp_source.html#l00359">359</a> of file <a class="el" href="PlotMCMCDiag_8cpp_source.html">PlotMCMCDiag.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  360</span>{</div>
+<div class="line"><span class="lineno">  361</span>  <span class="keywordflow">if</span> (histograms.empty())</div>
+<div class="line"><span class="lineno">  362</span>  {</div>
+<div class="line"><span class="lineno">  363</span>    <span class="keywordflow">throw</span> std::invalid_argument(<span class="stringliteral">&quot;Empty histogram vector provided&quot;</span>);</div>
+<div class="line"><span class="lineno">  364</span>  }</div>
+<div class="line"><span class="lineno">  365</span> </div>
+<div class="line"><span class="lineno">  366</span>  TH1D *min_hist = <span class="keyword">static_cast&lt;</span>TH1D *<span class="keyword">&gt;</span>(histograms[0]-&gt;Clone());</div>
+<div class="line"><span class="lineno">  367</span>  TH1D *max_hist = <span class="keyword">static_cast&lt;</span>TH1D *<span class="keyword">&gt;</span>(histograms[0]-&gt;Clone());</div>
+<div class="line"><span class="lineno">  368</span> </div>
+<div class="line"><span class="lineno">  369</span>  <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> &amp;hist : histograms)</div>
+<div class="line"><span class="lineno">  370</span>  {</div>
+<div class="line"><span class="lineno">  371</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> bin = 1; bin &lt;= min_hist-&gt;GetNbinsX(); ++bin)</div>
+<div class="line"><span class="lineno">  372</span>    {</div>
+<div class="line"><span class="lineno">  373</span>      <span class="keywordtype">double</span> current_min = min_hist-&gt;GetBinContent(bin);</div>
+<div class="line"><span class="lineno">  374</span>      <span class="keywordtype">double</span> current_max = max_hist-&gt;GetBinContent(bin);</div>
+<div class="line"><span class="lineno">  375</span>      <span class="keywordtype">double</span> bin_content = hist-&gt;GetBinContent(bin);</div>
+<div class="line"><span class="lineno">  376</span> </div>
+<div class="line"><span class="lineno">  377</span>      min_hist-&gt;SetBinContent(bin, std::min(current_min, bin_content));</div>
+<div class="line"><span class="lineno">  378</span>      max_hist-&gt;SetBinContent(bin, std::max(current_max, bin_content));</div>
+<div class="line"><span class="lineno">  379</span>    }</div>
+<div class="line"><span class="lineno">  380</span>  }</div>
+<div class="line"><span class="lineno">  381</span> </div>
+<div class="line"><span class="lineno">  382</span>  <span class="keywordflow">return</span> {min_hist, max_hist};</div>
+<div class="line"><span class="lineno">  383</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -371,79 +373,91 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PlotMCMCDiag_8cpp_source.html#l00389">389</a> of file <a class="el" href="PlotMCMCDiag_8cpp_source.html">PlotMCMCDiag.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  396</span>{</div>
-<div class="line"><span class="lineno">  397</span>    TCanvas *canvas = <span class="keyword">new</span> TCanvas(<span class="stringliteral">&quot;AverageAC&quot;</span>, <span class="stringliteral">&quot;Average Auto Correlation&quot;</span>, 800, 600);</div>
-<div class="line"><span class="lineno">  398</span>    canvas-&gt;SetGrid();</div>
-<div class="line"><span class="lineno">  399</span>    </div>
-<div class="line"><span class="lineno">  400</span>    <span class="comment">// Setup colour palette</span></div>
-<div class="line"><span class="lineno">  401</span>    Int_t nb = 255.0;</div>
-<div class="line"><span class="lineno">  402</span>    Double_t stops[8] = { 0.0, 0.25, 0.5, 0.75};</div>
-<div class="line"><span class="lineno">  403</span>    Double_t red[8] = { 0.83203125, 0.796875, 0.0, 0.9375};</div>
-<div class="line"><span class="lineno">  404</span>    Double_t green[8] = {0.3671875, 0.47265625, 0.4453125, 0.890625};</div>
-<div class="line"><span class="lineno">  405</span>    Double_t blue[8] = {0.0, 0.65234375, 0.6953125, 0.2578125};</div>
-<div class="line"><span class="lineno">  406</span>    TColor::CreateGradientColorTable(8, stops, red, green, blue, nb);</div>
-<div class="line"><span class="lineno">  407</span> </div>
-<div class="line"><span class="lineno">  408</span>    TLegend* leg = <span class="keyword">new</span> TLegend(0.5, 0.7, 0.9, 0.9);</div>
-<div class="line"><span class="lineno">  409</span> </div>
-<div class="line"><span class="lineno">  410</span>    <span class="keywordflow">if</span> (draw_min_max){</div>
-<div class="line"><span class="lineno">  411</span>      <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; histograms.size(); ++i)</div>
-<div class="line"><span class="lineno">  412</span>      {</div>
-<div class="line"><span class="lineno">  413</span>        <span class="keyword">auto</span> colour = <span class="keyword">static_cast&lt;</span>Color_t<span class="keyword">&gt;</span>(TColor::GetColorPalette(<span class="keyword">static_cast&lt;</span>Int_t<span class="keyword">&gt;</span>(i*nb/histograms.size())));</div>
-<div class="line"><span class="lineno">  414</span> </div>
-<div class="line"><span class="lineno">  415</span>        {</div>
-<div class="line"><span class="lineno">  416</span>          <span class="keyword">auto</span> band = <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#acd88b7a8726c7108ee22994cf36f7794">CalculateMinMaxBand</a>(histograms[i], colour);</div>
-<div class="line"><span class="lineno">  417</span>          band-&gt;SetLineWidth(0);</div>
-<div class="line"><span class="lineno">  418</span>          band-&gt;SetTitle(<span class="stringliteral">&quot;Average Auto Correlation&quot;</span>);</div>
-<div class="line"><span class="lineno">  419</span>          band-&gt;GetXaxis()-&gt;SetTitle(<span class="stringliteral">&quot;lag&quot;</span>);</div>
-<div class="line"><span class="lineno">  420</span>          band-&gt;GetYaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Autocorrelation Function&quot;</span>);</div>
-<div class="line"><span class="lineno">  421</span>          <span class="keywordflow">if</span>(i==0){</div>
-<div class="line"><span class="lineno">  422</span>            band-&gt;Draw(<span class="stringliteral">&quot;A3&quot;</span>);</div>
-<div class="line"><span class="lineno">  423</span>          }</div>
-<div class="line"><span class="lineno">  424</span>          <span class="keywordflow">else</span>{</div>
-<div class="line"><span class="lineno">  425</span>            band-&gt;Draw(<span class="stringliteral">&quot;3 SAME&quot;</span>);</div>
-<div class="line"><span class="lineno">  426</span>          }</div>
-<div class="line"><span class="lineno">  427</span>        }</div>
-<div class="line"><span class="lineno">  428</span>      }</div>
-<div class="line"><span class="lineno">  429</span>    }</div>
-<div class="line"><span class="lineno">  430</span> </div>
-<div class="line"><span class="lineno">  431</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; averages.size(); ++i){</div>
-<div class="line"><span class="lineno">  432</span>      <span class="keyword">auto</span> colour = <span class="keyword">static_cast&lt;</span>Color_t<span class="keyword">&gt;</span>(TColor::GetColorPalette(<span class="keyword">static_cast&lt;</span>Int_t<span class="keyword">&gt;</span>(i*nb/histograms.size())));</div>
-<div class="line"><span class="lineno">  433</span> </div>
-<div class="line"><span class="lineno">  434</span>      <span class="keywordflow">if</span>(draw_errors){          </div>
-<div class="line"><span class="lineno">  435</span>        <span class="keyword">auto</span> error_hist = <span class="keyword">static_cast&lt;</span>TH1D *<span class="keyword">&gt;</span>(averages[i]-&gt;Clone());</div>
-<div class="line"><span class="lineno">  436</span>        error_hist-&gt;SetFillColorAlpha(colour, <span class="keywordtype">float</span>(0.3));</div>
-<div class="line"><span class="lineno">  437</span>        error_hist-&gt;SetLineWidth(0);</div>
-<div class="line"><span class="lineno">  438</span>        error_hist-&gt;SetTitle(<span class="stringliteral">&quot;Average Auto Correlation&quot;</span>);</div>
-<div class="line"><span class="lineno">  439</span>        error_hist-&gt;GetXaxis()-&gt;SetTitle(<span class="stringliteral">&quot;lag&quot;</span>);</div>
-<div class="line"><span class="lineno">  440</span>        error_hist-&gt;GetYaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Autocorrelation Function&quot;</span>);</div>
-<div class="line"><span class="lineno">  441</span>        error_hist-&gt;Draw(<span class="stringliteral">&quot;E3 SAME&quot;</span>);</div>
-<div class="line"><span class="lineno">  442</span>      }</div>
-<div class="line"><span class="lineno">  443</span>      <span class="keywordflow">if</span>(draw_all){</div>
-<div class="line"><span class="lineno">  444</span>        <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> &amp;hist : histograms[i])</div>
-<div class="line"><span class="lineno">  445</span>        {</div>
-<div class="line"><span class="lineno">  446</span>          hist-&gt;SetLineColorAlpha(colour, <span class="keywordtype">float</span>(0.05));</div>
-<div class="line"><span class="lineno">  447</span>          hist-&gt;SetLineWidth(1);</div>
-<div class="line"><span class="lineno">  448</span>          hist-&gt;Draw(<span class="stringliteral">&quot;HIST SAME&quot;</span>);</div>
-<div class="line"><span class="lineno">  449</span>        }</div>
-<div class="line"><span class="lineno">  450</span>      }</div>
-<div class="line"><span class="lineno">  451</span> </div>
-<div class="line"><span class="lineno">  452</span>      averages[i]-&gt;SetLineColor(colour);</div>
-<div class="line"><span class="lineno">  453</span>      averages[i]-&gt;SetLineWidth(2);</div>
-<div class="line"><span class="lineno">  454</span>      averages[i]-&gt;SetTitle(<span class="stringliteral">&quot;Average Auto Correlation&quot;</span>);</div>
-<div class="line"><span class="lineno">  455</span>      averages[i]-&gt;GetXaxis()-&gt;SetTitle(<span class="stringliteral">&quot;lag&quot;</span>);</div>
-<div class="line"><span class="lineno">  456</span>      averages[i]-&gt;GetYaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Autocorrelation Function&quot;</span>);</div>
-<div class="line"><span class="lineno">  457</span>      averages[i]-&gt;Draw(<span class="stringliteral">&quot;HIST SAME&quot;</span>);</div>
-<div class="line"><span class="lineno">  458</span> </div>
-<div class="line"><span class="lineno">  459</span>      leg-&gt;AddEntry(averages[i], hist_labels[i], <span class="stringliteral">&quot;l&quot;</span>);</div>
-<div class="line"><span class="lineno">  460</span> </div>
-<div class="line"><span class="lineno">  461</span>    }</div>
-<div class="line"><span class="lineno">  462</span>    leg-&gt;Draw();</div>
-<div class="line"><span class="lineno">  463</span> </div>
-<div class="line"><span class="lineno">  464</span>    canvas-&gt;SaveAs(output_name + <span class="stringliteral">&quot;.pdf&quot;</span>);</div>
-<div class="line"><span class="lineno">  465</span>    <span class="keyword">delete</span> canvas;</div>
-<div class="line"><span class="lineno">  466</span>}</div>
-<div class="ttc" id="aPlotMCMCDiag_8cpp_html_acd88b7a8726c7108ee22994cf36f7794"><div class="ttname"><a href="PlotMCMCDiag_8cpp.html#acd88b7a8726c7108ee22994cf36f7794">CalculateMinMaxBand</a></div><div class="ttdeci">TGraph * CalculateMinMaxBand(const std::vector&lt; TH1D * &gt; &amp;histograms, Color_t color)</div><div class="ttdef"><b>Definition:</b> <a href="PlotMCMCDiag_8cpp_source.html#l00240">PlotMCMCDiag.cpp:240</a></div></div>
+<p class="definition">Definition at line <a class="el" href="PlotMCMCDiag_8cpp_source.html#l00469">469</a> of file <a class="el" href="PlotMCMCDiag_8cpp_source.html">PlotMCMCDiag.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  476</span>{</div>
+<div class="line"><span class="lineno">  477</span>  TCanvas *canvas = <span class="keyword">new</span> TCanvas(<span class="stringliteral">&quot;AverageAC&quot;</span>, <span class="stringliteral">&quot;Average Auto Correlation&quot;</span>, 800, 600);</div>
+<div class="line"><span class="lineno">  478</span>  canvas-&gt;SetGrid();</div>
+<div class="line"><span class="lineno">  479</span> </div>
+<div class="line"><span class="lineno">  480</span>  <span class="comment">// Setup colour palette</span></div>
+<div class="line"><span class="lineno">  481</span>  Int_t nb = 255.0;</div>
+<div class="line"><span class="lineno">  482</span>  Double_t stops[8] = {0.0, 0.25, 0.5, 0.75};</div>
+<div class="line"><span class="lineno">  483</span>  Double_t red[8] = {0.83203125, 0.796875, 0.0, 0.9375};</div>
+<div class="line"><span class="lineno">  484</span>  Double_t green[8] = {0.3671875, 0.47265625, 0.4453125, 0.890625};</div>
+<div class="line"><span class="lineno">  485</span>  Double_t blue[8] = {0.0, 0.65234375, 0.6953125, 0.2578125};</div>
+<div class="line"><span class="lineno">  486</span>  TColor::CreateGradientColorTable(8, stops, red, green, blue, nb);</div>
+<div class="line"><span class="lineno">  487</span> </div>
+<div class="line"><span class="lineno">  488</span>  TLegend *leg = <span class="keyword">new</span> TLegend(0.5, 0.7, 0.9, 0.9);</div>
+<div class="line"><span class="lineno">  489</span>  leg-&gt;SetFillColorAlpha(kWhite, <span class="keywordtype">float</span>(0.7));</div>
+<div class="line"><span class="lineno">  490</span> </div>
+<div class="line"><span class="lineno">  491</span>  <span class="keywordflow">if</span> (draw_min_max)</div>
+<div class="line"><span class="lineno">  492</span>  {</div>
+<div class="line"><span class="lineno">  493</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; histograms.size(); ++i)</div>
+<div class="line"><span class="lineno">  494</span>    {</div>
+<div class="line"><span class="lineno">  495</span>      <span class="keyword">auto</span> colour = <span class="keyword">static_cast&lt;</span>Color_t<span class="keyword">&gt;</span>(TColor::GetColorPalette(<span class="keyword">static_cast&lt;</span>Int_t<span class="keyword">&gt;</span>(i * nb / histograms.size())));</div>
+<div class="line"><span class="lineno">  496</span> </div>
+<div class="line"><span class="lineno">  497</span>      {</div>
+<div class="line"><span class="lineno">  498</span>        <span class="keyword">auto</span> band = <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#acd88b7a8726c7108ee22994cf36f7794">CalculateMinMaxBand</a>(histograms[i], colour);</div>
+<div class="line"><span class="lineno">  499</span>        band-&gt;SetLineWidth(0);</div>
+<div class="line"><span class="lineno">  500</span>        band-&gt;SetTitle(<span class="stringliteral">&quot;Average Auto Correlation&quot;</span>);</div>
+<div class="line"><span class="lineno">  501</span>        band-&gt;GetXaxis()-&gt;SetTitle(<span class="stringliteral">&quot;lag&quot;</span>);</div>
+<div class="line"><span class="lineno">  502</span>        band-&gt;GetYaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Autocorrelation Function&quot;</span>);</div>
+<div class="line"><span class="lineno">  503</span>        <span class="keywordflow">if</span> (i == 0)</div>
+<div class="line"><span class="lineno">  504</span>        {</div>
+<div class="line"><span class="lineno">  505</span>          band-&gt;Draw(<span class="stringliteral">&quot;A3&quot;</span>);</div>
+<div class="line"><span class="lineno">  506</span>        }</div>
+<div class="line"><span class="lineno">  507</span>        <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">  508</span>        {</div>
+<div class="line"><span class="lineno">  509</span>          band-&gt;Draw(<span class="stringliteral">&quot;3 SAME&quot;</span>);</div>
+<div class="line"><span class="lineno">  510</span>        }</div>
+<div class="line"><span class="lineno">  511</span>      }</div>
+<div class="line"><span class="lineno">  512</span>    }</div>
+<div class="line"><span class="lineno">  513</span>  }</div>
+<div class="line"><span class="lineno">  514</span> </div>
+<div class="line"><span class="lineno">  515</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; averages.size(); ++i)</div>
+<div class="line"><span class="lineno">  516</span>  {</div>
+<div class="line"><span class="lineno">  517</span>    <span class="keyword">auto</span> colour = <span class="keyword">static_cast&lt;</span>Color_t<span class="keyword">&gt;</span>(TColor::GetColorPalette(<span class="keyword">static_cast&lt;</span>Int_t<span class="keyword">&gt;</span>(i * nb / histograms.size())));</div>
+<div class="line"><span class="lineno">  518</span> </div>
+<div class="line"><span class="lineno">  519</span>    <span class="keywordflow">if</span> (draw_errors)</div>
+<div class="line"><span class="lineno">  520</span>    {</div>
+<div class="line"><span class="lineno">  521</span>      <span class="keyword">auto</span> error_hist = <span class="keyword">static_cast&lt;</span>TH1D *<span class="keyword">&gt;</span>(averages[i]-&gt;Clone());</div>
+<div class="line"><span class="lineno">  522</span>      error_hist-&gt;SetFillColorAlpha(colour, <span class="keywordtype">float</span>(0.3));</div>
+<div class="line"><span class="lineno">  523</span>      error_hist-&gt;SetLineWidth(0);</div>
+<div class="line"><span class="lineno">  524</span>      error_hist-&gt;SetTitle(<span class="stringliteral">&quot;Average Auto Correlation&quot;</span>);</div>
+<div class="line"><span class="lineno">  525</span>      error_hist-&gt;GetXaxis()-&gt;SetTitle(<span class="stringliteral">&quot;lag&quot;</span>);</div>
+<div class="line"><span class="lineno">  526</span>      error_hist-&gt;GetYaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Autocorrelation Function&quot;</span>);</div>
+<div class="line"><span class="lineno">  527</span>      error_hist-&gt;Draw(<span class="stringliteral">&quot;E3 SAME&quot;</span>);</div>
+<div class="line"><span class="lineno">  528</span>    }</div>
+<div class="line"><span class="lineno">  529</span>    <span class="keywordflow">if</span> (draw_all)</div>
+<div class="line"><span class="lineno">  530</span>    {</div>
+<div class="line"><span class="lineno">  531</span>      <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> &amp;hist : histograms[i])</div>
+<div class="line"><span class="lineno">  532</span>      {</div>
+<div class="line"><span class="lineno">  533</span>        hist-&gt;SetLineColorAlpha(colour, <span class="keywordtype">float</span>(0.05));</div>
+<div class="line"><span class="lineno">  534</span>        hist-&gt;SetLineWidth(1);</div>
+<div class="line"><span class="lineno">  535</span>        hist-&gt;Draw(<span class="stringliteral">&quot;HIST SAME&quot;</span>);</div>
+<div class="line"><span class="lineno">  536</span>      }</div>
+<div class="line"><span class="lineno">  537</span>    }</div>
+<div class="line"><span class="lineno">  538</span> </div>
+<div class="line"><span class="lineno">  539</span>    averages[i]-&gt;SetLineColor(colour);</div>
+<div class="line"><span class="lineno">  540</span>    averages[i]-&gt;SetLineWidth(2);</div>
+<div class="line"><span class="lineno">  541</span>    averages[i]-&gt;SetTitle(<span class="stringliteral">&quot;Average Auto Correlation&quot;</span>);</div>
+<div class="line"><span class="lineno">  542</span>    averages[i]-&gt;GetXaxis()-&gt;SetTitle(<span class="stringliteral">&quot;lag&quot;</span>);</div>
+<div class="line"><span class="lineno">  543</span>    averages[i]-&gt;GetYaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Autocorrelation Function&quot;</span>);</div>
+<div class="line"><span class="lineno">  544</span>    averages[i]-&gt;Draw(<span class="stringliteral">&quot;HIST SAME&quot;</span>);</div>
+<div class="line"><span class="lineno">  545</span> </div>
+<div class="line"><span class="lineno">  546</span>    TString int_str = TString::Format(<span class="stringliteral">&quot;Average integrated autocorrelation %f&quot;</span>, averages[i]-&gt;Integral());</div>
+<div class="line"><span class="lineno">  547</span> </div>
+<div class="line"><span class="lineno">  548</span>    leg-&gt;AddEntry(averages[i], hist_labels[i] + int_str, <span class="stringliteral">&quot;l&quot;</span>);</div>
+<div class="line"><span class="lineno">  549</span>  }</div>
+<div class="line"><span class="lineno">  550</span> </div>
+<div class="line"><span class="lineno">  551</span>  <span class="keywordflow">if</span> (averages.size() &gt; 1)</div>
+<div class="line"><span class="lineno">  552</span>  {</div>
+<div class="line"><span class="lineno">  553</span>    leg-&gt;Draw();</div>
+<div class="line"><span class="lineno">  554</span>  }</div>
+<div class="line"><span class="lineno">  555</span> </div>
+<div class="line"><span class="lineno">  556</span>  canvas-&gt;SaveAs(output_name + <span class="stringliteral">&quot;.pdf&quot;</span>);</div>
+<div class="line"><span class="lineno">  557</span>  <span class="keyword">delete</span> canvas;</div>
+<div class="line"><span class="lineno">  558</span>}</div>
+<div class="ttc" id="aPlotMCMCDiag_8cpp_html_acd88b7a8726c7108ee22994cf36f7794"><div class="ttname"><a href="PlotMCMCDiag_8cpp.html#acd88b7a8726c7108ee22994cf36f7794">CalculateMinMaxBand</a></div><div class="ttdeci">TGraph * CalculateMinMaxBand(const std::vector&lt; TH1D * &gt; &amp;histograms, Color_t color)</div><div class="ttdef"><b>Definition:</b> <a href="PlotMCMCDiag_8cpp_source.html#l00323">PlotMCMCDiag.cpp:323</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -475,28 +489,28 @@ Variables</h2></td></tr>
 
 <p>HW: Create a band of minimum and maximum values from a histogram. </p>
 
-<p class="definition">Definition at line <a class="el" href="PlotMCMCDiag_8cpp_source.html#l00217">217</a> of file <a class="el" href="PlotMCMCDiag_8cpp_source.html">PlotMCMCDiag.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  218</span>{</div>
-<div class="line"><span class="lineno">  219</span>    <span class="keywordtype">int</span> <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a> = hist-&gt;GetNbinsX();</div>
-<div class="line"><span class="lineno">  220</span>    std::vector&lt;double&gt; x(<a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>), ymin(<a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>), ymax(<a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>);</div>
-<div class="line"><span class="lineno">  221</span> </div>
-<div class="line"><span class="lineno">  222</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>; ++i)</div>
-<div class="line"><span class="lineno">  223</span>    {</div>
-<div class="line"><span class="lineno">  224</span>        x[i] = hist-&gt;GetBinCenter(i + 1);</div>
-<div class="line"><span class="lineno">  225</span>        ymin[i] = hist-&gt;GetBinContent(i + 1);</div>
-<div class="line"><span class="lineno">  226</span>        ymax[i] = hist-&gt;GetBinContent(i + 1);</div>
-<div class="line"><span class="lineno">  227</span>    }</div>
-<div class="line"><span class="lineno">  228</span> </div>
-<div class="line"><span class="lineno">  229</span>    TGraph *minGraph = <span class="keyword">new</span> TGraph(<a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>, x.data(), ymin.data());</div>
-<div class="line"><span class="lineno">  230</span>    TGraph *maxGraph = <span class="keyword">new</span> TGraph(<a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>, x.data(), ymax.data());</div>
-<div class="line"><span class="lineno">  231</span> </div>
-<div class="line"><span class="lineno">  232</span>    minGraph-&gt;SetLineColor(color);</div>
-<div class="line"><span class="lineno">  233</span>    maxGraph-&gt;SetLineColor(color);</div>
-<div class="line"><span class="lineno">  234</span>    minGraph-&gt;SetFillColorAlpha(color, <span class="keywordtype">float</span>(0.3));</div>
-<div class="line"><span class="lineno">  235</span>    maxGraph-&gt;SetFillColorAlpha(color, <span class="keywordtype">float</span>(0.3));</div>
-<div class="line"><span class="lineno">  236</span> </div>
-<div class="line"><span class="lineno">  237</span>    <span class="keywordflow">return</span> {minGraph, maxGraph};</div>
-<div class="line"><span class="lineno">  238</span>}</div>
+<p class="definition">Definition at line <a class="el" href="PlotMCMCDiag_8cpp_source.html#l00300">300</a> of file <a class="el" href="PlotMCMCDiag_8cpp_source.html">PlotMCMCDiag.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  301</span>{</div>
+<div class="line"><span class="lineno">  302</span>  <span class="keywordtype">int</span> <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a> = hist-&gt;GetNbinsX();</div>
+<div class="line"><span class="lineno">  303</span>  std::vector&lt;double&gt; x(<a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>), ymin(<a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>), ymax(<a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>);</div>
+<div class="line"><span class="lineno">  304</span> </div>
+<div class="line"><span class="lineno">  305</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>; ++i)</div>
+<div class="line"><span class="lineno">  306</span>  {</div>
+<div class="line"><span class="lineno">  307</span>    x[i] = hist-&gt;GetBinCenter(i + 1);</div>
+<div class="line"><span class="lineno">  308</span>    ymin[i] = hist-&gt;GetBinContent(i + 1);</div>
+<div class="line"><span class="lineno">  309</span>    ymax[i] = hist-&gt;GetBinContent(i + 1);</div>
+<div class="line"><span class="lineno">  310</span>  }</div>
+<div class="line"><span class="lineno">  311</span> </div>
+<div class="line"><span class="lineno">  312</span>  TGraph *minGraph = <span class="keyword">new</span> TGraph(<a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>, x.data(), ymin.data());</div>
+<div class="line"><span class="lineno">  313</span>  TGraph *maxGraph = <span class="keyword">new</span> TGraph(<a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>, x.data(), ymax.data());</div>
+<div class="line"><span class="lineno">  314</span> </div>
+<div class="line"><span class="lineno">  315</span>  minGraph-&gt;SetLineColor(color);</div>
+<div class="line"><span class="lineno">  316</span>  maxGraph-&gt;SetLineColor(color);</div>
+<div class="line"><span class="lineno">  317</span>  minGraph-&gt;SetFillColorAlpha(color, <span class="keywordtype">float</span>(0.3));</div>
+<div class="line"><span class="lineno">  318</span>  maxGraph-&gt;SetFillColorAlpha(color, <span class="keywordtype">float</span>(0.3));</div>
+<div class="line"><span class="lineno">  319</span> </div>
+<div class="line"><span class="lineno">  320</span>  <span class="keywordflow">return</span> {minGraph, maxGraph};</div>
+<div class="line"><span class="lineno">  321</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -534,18 +548,20 @@ Variables</h2></td></tr>
 
 <p>KS: function which looks for minimum in given range. </p>
 
-<p class="definition">Definition at line <a class="el" href="PlotMCMCDiag_8cpp_source.html#l00018">18</a> of file <a class="el" href="PlotMCMCDiag_8cpp_source.html">PlotMCMCDiag.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   19</span>{</div>
-<div class="line"><span class="lineno">   20</span>  <span class="keywordtype">double</span> MinVale = 1234567890.;</div>
-<div class="line"><span class="lineno">   21</span>  TAxis* xaxis = hist-&gt;GetXaxis();</div>
-<div class="line"><span class="lineno">   22</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> x = 1; x &lt;= hist-&gt;GetNbinsX(); x++)</div>
-<div class="line"><span class="lineno">   23</span>  {</div>
-<div class="line"><span class="lineno">   24</span>    <span class="keywordflow">if</span>(xaxis-&gt;GetBinLowEdge(x)&gt;minRange &amp;&amp; xaxis-&gt;GetBinUpEdge(x)&lt;maxRange){</div>
-<div class="line"><span class="lineno">   25</span>      <span class="keywordflow">if</span>(MinVale &gt; hist-&gt;GetBinContent(x))MinVale = hist-&gt;GetBinContent(x);</div>
-<div class="line"><span class="lineno">   26</span>    }</div>
-<div class="line"><span class="lineno">   27</span>  }</div>
-<div class="line"><span class="lineno">   28</span>  <span class="keywordflow">return</span> MinVale;</div>
-<div class="line"><span class="lineno">   29</span>}</div>
+<p class="definition">Definition at line <a class="el" href="PlotMCMCDiag_8cpp_source.html#l00020">20</a> of file <a class="el" href="PlotMCMCDiag_8cpp_source.html">PlotMCMCDiag.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   21</span>{</div>
+<div class="line"><span class="lineno">   22</span>  <span class="keywordtype">double</span> MinVale = 1234567890.;</div>
+<div class="line"><span class="lineno">   23</span>  TAxis *xaxis = hist-&gt;GetXaxis();</div>
+<div class="line"><span class="lineno">   24</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> x = 1; x &lt;= hist-&gt;GetNbinsX(); x++)</div>
+<div class="line"><span class="lineno">   25</span>  {</div>
+<div class="line"><span class="lineno">   26</span>    <span class="keywordflow">if</span> (xaxis-&gt;GetBinLowEdge(x) &gt; minRange &amp;&amp; xaxis-&gt;GetBinUpEdge(x) &lt; maxRange)</div>
+<div class="line"><span class="lineno">   27</span>    {</div>
+<div class="line"><span class="lineno">   28</span>      <span class="keywordflow">if</span> (MinVale &gt; hist-&gt;GetBinContent(x))</div>
+<div class="line"><span class="lineno">   29</span>        MinVale = hist-&gt;GetBinContent(x);</div>
+<div class="line"><span class="lineno">   30</span>    }</div>
+<div class="line"><span class="lineno">   31</span>  }</div>
+<div class="line"><span class="lineno">   32</span>  <span class="keywordflow">return</span> MinVale;</div>
+<div class="line"><span class="lineno">   33</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -583,22 +599,22 @@ Variables</h2></td></tr>
 
 <p>HW: Check if histogram is flat within a given tolerance. </p>
 
-<p class="definition">Definition at line <a class="el" href="PlotMCMCDiag_8cpp_source.html#l00033">33</a> of file <a class="el" href="PlotMCMCDiag_8cpp_source.html">PlotMCMCDiag.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   34</span>{</div>
-<div class="line"><span class="lineno">   35</span>    <span class="keywordtype">int</span> failure_count = 0;</div>
-<div class="line"><span class="lineno">   36</span> </div>
-<div class="line"><span class="lineno">   37</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> bin = 2; bin &lt;= hist-&gt;GetNbinsX(); ++bin)</div>
-<div class="line"><span class="lineno">   38</span>    {</div>
-<div class="line"><span class="lineno">   39</span>        <span class="keywordflow">if</span> (fabs(hist-&gt;GetBinContent(bin) - 1.0) &gt; tolerance)</div>
-<div class="line"><span class="lineno">   40</span>        {</div>
-<div class="line"><span class="lineno">   41</span>            <span class="keywordflow">if</span> (++failure_count &gt; max_failures)</div>
-<div class="line"><span class="lineno">   42</span>            {</div>
-<div class="line"><span class="lineno">   43</span>                <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">   44</span>            }</div>
-<div class="line"><span class="lineno">   45</span>        }</div>
-<div class="line"><span class="lineno">   46</span>    }</div>
-<div class="line"><span class="lineno">   47</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno">   48</span>}</div>
+<p class="definition">Definition at line <a class="el" href="PlotMCMCDiag_8cpp_source.html#l00037">37</a> of file <a class="el" href="PlotMCMCDiag_8cpp_source.html">PlotMCMCDiag.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   38</span>{</div>
+<div class="line"><span class="lineno">   39</span>  <span class="keywordtype">int</span> failure_count = 0;</div>
+<div class="line"><span class="lineno">   40</span> </div>
+<div class="line"><span class="lineno">   41</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> bin = 2; bin &lt;= hist-&gt;GetNbinsX(); ++bin)</div>
+<div class="line"><span class="lineno">   42</span>  {</div>
+<div class="line"><span class="lineno">   43</span>    <span class="keywordflow">if</span> (fabs(hist-&gt;GetBinContent(bin) - 1.0) &gt; tolerance)</div>
+<div class="line"><span class="lineno">   44</span>    {</div>
+<div class="line"><span class="lineno">   45</span>      <span class="keywordflow">if</span> (++failure_count &gt; max_failures)</div>
+<div class="line"><span class="lineno">   46</span>      {</div>
+<div class="line"><span class="lineno">   47</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">   48</span>      }</div>
+<div class="line"><span class="lineno">   49</span>    }</div>
+<div class="line"><span class="lineno">   50</span>  }</div>
+<div class="line"><span class="lineno">   51</span>  <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">   52</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -628,47 +644,55 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PlotMCMCDiag_8cpp_source.html#l00504">504</a> of file <a class="el" href="PlotMCMCDiag_8cpp_source.html">PlotMCMCDiag.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  504</span>                                 {</div>
-<div class="line"><span class="lineno">  505</span>  <a class="code hl_function" href="MaCh3Logger_8h.html#aa603c55ea73cd86d1994901227883e1e">SetMaCh3LoggerFormat</a>();</div>
-<div class="line"><span class="lineno">  506</span>  <span class="keywordflow">if</span> (argc &lt; 2 || argc &gt; 5)</div>
-<div class="line"><span class="lineno">  507</span>  {</div>
-<div class="line"><span class="lineno">  508</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;How to use: {} DiagMCMC_Output.root&quot;</span>, argv[0]);</div>
-<div class="line"><span class="lineno">  509</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Up to 4 files&quot;</span>);</div>
-<div class="line"><span class="lineno">  510</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__);</div>
-<div class="line"><span class="lineno">  511</span>  }</div>
-<div class="line"><span class="lineno">  512</span> </div>
-<div class="line"><span class="lineno">  513</span>  <span class="keywordflow">if</span>(argc == 2) {</div>
-<div class="line"><span class="lineno">  514</span>    <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#a70a8847717dd98bb61d4be6af69dbe03">MakePlot</a>(argv[1], <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>, <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>, <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>);</div>
-<div class="line"><span class="lineno">  515</span>    <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#a077cef58096692740b5491f8b1bec715">PlotAutoCorr</a>(argv[1], <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>, <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>, <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>);</div>
-<div class="line"><span class="lineno">  516</span>    <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#a6ef6b0394c9c46c4474553907558098a">PlotAverageACMult</a>({argv[1]}, <span class="stringliteral">&quot;Average_Auto_Corr&quot;</span>, <span class="keyword">true</span>);</div>
-<div class="line"><span class="lineno">  517</span> </div>
-<div class="line"><span class="lineno">  518</span>  } <span class="keywordflow">else</span> <span class="keywordflow">if</span>(argc == 3) {</div>
-<div class="line"><span class="lineno">  519</span>    <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#a70a8847717dd98bb61d4be6af69dbe03">MakePlot</a>(argv[1], argv[2], <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a> ,<a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>);</div>
-<div class="line"><span class="lineno">  520</span>    <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#a077cef58096692740b5491f8b1bec715">PlotAutoCorr</a>(argv[1], argv[2], <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>, <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>);</div>
-<div class="line"><span class="lineno">  521</span>    <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#a6ef6b0394c9c46c4474553907558098a">PlotAverageACMult</a>({argv[1], argv[2]}, <span class="stringliteral">&quot;Average_Auto_Corr&quot;</span>, <span class="keyword">true</span>);</div>
-<div class="line"><span class="lineno">  522</span>  } <span class="keywordflow">else</span> <span class="keywordflow">if</span>(argc == 4) {</div>
-<div class="line"><span class="lineno">  523</span>    <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#a70a8847717dd98bb61d4be6af69dbe03">MakePlot</a>(argv[1], argv[2], argv[3], <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>);</div>
-<div class="line"><span class="lineno">  524</span>    <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#a077cef58096692740b5491f8b1bec715">PlotAutoCorr</a>(argv[1], argv[2], argv[3], <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>);</div>
-<div class="line"><span class="lineno">  525</span>    <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#a6ef6b0394c9c46c4474553907558098a">PlotAverageACMult</a>({argv[1], argv[2], argv[3]}, <span class="stringliteral">&quot;Average_Auto_Corr&quot;</span>, <span class="keyword">true</span>);</div>
-<div class="line"><span class="lineno">  526</span>  } <span class="keywordflow">else</span> <span class="keywordflow">if</span>(argc == 5) {</div>
-<div class="line"><span class="lineno">  527</span>    <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#a70a8847717dd98bb61d4be6af69dbe03">MakePlot</a>(argv[1], argv[2], argv[3], argv[4]);</div>
-<div class="line"><span class="lineno">  528</span>    <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#a077cef58096692740b5491f8b1bec715">PlotAutoCorr</a>(argv[1], argv[2], argv[3], argv[4]);</div>
-<div class="line"><span class="lineno">  529</span>    <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#a6ef6b0394c9c46c4474553907558098a">PlotAverageACMult</a>({argv[1], argv[2], argv[3], argv[4]}, <span class="stringliteral">&quot;Average_Auto_Corr&quot;</span>, <span class="keyword">true</span>);</div>
-<div class="line"><span class="lineno">  530</span>  }</div>
-<div class="line"><span class="lineno">  531</span>  <span class="keywordflow">return</span> 0;</div>
-<div class="line"><span class="lineno">  532</span>}</div>
+<p class="definition">Definition at line <a class="el" href="PlotMCMCDiag_8cpp_source.html#l00590">590</a> of file <a class="el" href="PlotMCMCDiag_8cpp_source.html">PlotMCMCDiag.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  591</span>{</div>
+<div class="line"><span class="lineno">  592</span>  <a class="code hl_function" href="MaCh3Logger_8h.html#aa603c55ea73cd86d1994901227883e1e">SetMaCh3LoggerFormat</a>();</div>
+<div class="line"><span class="lineno">  593</span>  <span class="keywordflow">if</span> (argc != 3 &amp;&amp; argc != 5 &amp;&amp; argc != 7 &amp;&amp; argc != 9)</div>
+<div class="line"><span class="lineno">  594</span>  {</div>
+<div class="line"><span class="lineno">  595</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Wrong number of arguments ({}) provided&quot;</span>, argc);</div>
+<div class="line"><span class="lineno">  596</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;How to use: {} DiagMCMC_Output.root Plot Name&quot;</span>, argv[0]);</div>
+<div class="line"><span class="lineno">  597</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Up to 4 files&quot;</span>);</div>
+<div class="line"><span class="lineno">  598</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><span class="lineno">  599</span>  }</div>
+<div class="line"><span class="lineno">  600</span> </div>
+<div class="line"><span class="lineno">  601</span>  <span class="keywordflow">if</span> (argc == 3)</div>
+<div class="line"><span class="lineno">  602</span>  {</div>
+<div class="line"><span class="lineno">  603</span>    <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#a90c4608d3da0a7c10a29902f966ba2d9">MakePlot</a>(argv[1], argv[2], <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>, <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aaaaec9d37a764e090607e8f68428a8ed">DUMMYNAME</a>, <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>, <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aaaaec9d37a764e090607e8f68428a8ed">DUMMYNAME</a>, <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>, <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aaaaec9d37a764e090607e8f68428a8ed">DUMMYNAME</a>);</div>
+<div class="line"><span class="lineno">  604</span>    <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#adb34dab2a00b2675057f9860468b0a6b">PlotAutoCorr</a>(argv[1], argv[2], <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>, <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aaaaec9d37a764e090607e8f68428a8ed">DUMMYNAME</a>, <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>, <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aaaaec9d37a764e090607e8f68428a8ed">DUMMYNAME</a>, <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>, <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aaaaec9d37a764e090607e8f68428a8ed">DUMMYNAME</a>);</div>
+<div class="line"><span class="lineno">  605</span>    <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#aaff1fd9271707426d962ec32b2690f5a">PlotAverageACMult</a>({argv[1]}, {argv[2]}, <span class="stringliteral">&quot;Average_Auto_Corr&quot;</span>, <span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  606</span>  }</div>
+<div class="line"><span class="lineno">  607</span>  <span class="keywordflow">else</span> <span class="keywordflow">if</span> (argc == 5)</div>
+<div class="line"><span class="lineno">  608</span>  {</div>
+<div class="line"><span class="lineno">  609</span>    <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#a90c4608d3da0a7c10a29902f966ba2d9">MakePlot</a>(argv[1], argv[2], argv[3], argv[4], <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>, <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aaaaec9d37a764e090607e8f68428a8ed">DUMMYNAME</a>, <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>, <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aaaaec9d37a764e090607e8f68428a8ed">DUMMYNAME</a>);</div>
+<div class="line"><span class="lineno">  610</span>    <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#adb34dab2a00b2675057f9860468b0a6b">PlotAutoCorr</a>(argv[1], argv[2], argv[3], argv[4], <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>, <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aaaaec9d37a764e090607e8f68428a8ed">DUMMYNAME</a>, <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>, <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aaaaec9d37a764e090607e8f68428a8ed">DUMMYNAME</a>);</div>
+<div class="line"><span class="lineno">  611</span>    <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#aaff1fd9271707426d962ec32b2690f5a">PlotAverageACMult</a>({argv[1], argv[3]}, {argv[2], argv[4]}, <span class="stringliteral">&quot;Average_Auto_Corr&quot;</span>, <span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  612</span>  }</div>
+<div class="line"><span class="lineno">  613</span>  <span class="keywordflow">else</span> <span class="keywordflow">if</span> (argc == 7)</div>
+<div class="line"><span class="lineno">  614</span>  {</div>
+<div class="line"><span class="lineno">  615</span>    <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#a90c4608d3da0a7c10a29902f966ba2d9">MakePlot</a>(argv[1], argv[2], argv[3], argv[4], argv[5], argv[6], <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>, <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aaaaec9d37a764e090607e8f68428a8ed">DUMMYNAME</a>);</div>
+<div class="line"><span class="lineno">  616</span>    <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#adb34dab2a00b2675057f9860468b0a6b">PlotAutoCorr</a>(argv[1], argv[2], argv[3], argv[4], argv[5], argv[6], <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>, <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aaaaec9d37a764e090607e8f68428a8ed">DUMMYNAME</a>);</div>
+<div class="line"><span class="lineno">  617</span>    <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#aaff1fd9271707426d962ec32b2690f5a">PlotAverageACMult</a>({argv[1], argv[3], argv[5]}, {argv[2], argv[4], argv[6]}, <span class="stringliteral">&quot;Average_Auto_Corr&quot;</span>, <span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  618</span>  }</div>
+<div class="line"><span class="lineno">  619</span>  <span class="keywordflow">else</span> <span class="keywordflow">if</span> (argc == 9)</div>
+<div class="line"><span class="lineno">  620</span>  {</div>
+<div class="line"><span class="lineno">  621</span>    <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#a90c4608d3da0a7c10a29902f966ba2d9">MakePlot</a>(argv[1], argv[2], argv[3], argv[4], argv[5], argv[6], argv[7], argv[8]);</div>
+<div class="line"><span class="lineno">  622</span>    <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#adb34dab2a00b2675057f9860468b0a6b">PlotAutoCorr</a>(argv[1], argv[2], argv[3], argv[4], argv[5], argv[6], argv[7], argv[8]);</div>
+<div class="line"><span class="lineno">  623</span>    <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#aaff1fd9271707426d962ec32b2690f5a">PlotAverageACMult</a>({argv[1], argv[3], argv[5], argv[7]}, {argv[2], argv[4], argv[6], argv[8]}, <span class="stringliteral">&quot;Average_Auto_Corr&quot;</span>, <span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  624</span>  }</div>
+<div class="line"><span class="lineno">  625</span>  <span class="keywordflow">return</span> 0;</div>
+<div class="line"><span class="lineno">  626</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_aa603c55ea73cd86d1994901227883e1e"><div class="ttname"><a href="MaCh3Logger_8h.html#aa603c55ea73cd86d1994901227883e1e">SetMaCh3LoggerFormat</a></div><div class="ttdeci">void SetMaCh3LoggerFormat()</div><div class="ttdoc">Set messaging format of the logger.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00030">MaCh3Logger.h:30</a></div></div>
-<div class="ttc" id="aPlotMCMCDiag_8cpp_html_a077cef58096692740b5491f8b1bec715"><div class="ttname"><a href="PlotMCMCDiag_8cpp.html#a077cef58096692740b5491f8b1bec715">PlotAutoCorr</a></div><div class="ttdeci">void PlotAutoCorr(TString fname1, TString fname2, TString fname3, TString fname4)</div><div class="ttdef"><b>Definition:</b> <a href="PlotMCMCDiag_8cpp_source.html#l00139">PlotMCMCDiag.cpp:139</a></div></div>
-<div class="ttc" id="aPlotMCMCDiag_8cpp_html_a6ef6b0394c9c46c4474553907558098a"><div class="ttname"><a href="PlotMCMCDiag_8cpp.html#a6ef6b0394c9c46c4474553907558098a">PlotAverageACMult</a></div><div class="ttdeci">void PlotAverageACMult(std::vector&lt; TString &gt; input_files, const TString &amp;output_name, bool draw_min_max=true)</div><div class="ttdef"><b>Definition:</b> <a href="PlotMCMCDiag_8cpp_source.html#l00468">PlotMCMCDiag.cpp:468</a></div></div>
-<div class="ttc" id="aPlotMCMCDiag_8cpp_html_a70a8847717dd98bb61d4be6af69dbe03"><div class="ttname"><a href="PlotMCMCDiag_8cpp.html#a70a8847717dd98bb61d4be6af69dbe03">MakePlot</a></div><div class="ttdeci">void MakePlot(TString fname1, TString fname2, TString fname3, TString fname4)</div><div class="ttdef"><b>Definition:</b> <a href="PlotMCMCDiag_8cpp_source.html#l00052">PlotMCMCDiag.cpp:52</a></div></div>
-<div class="ttc" id="aPlotMCMCDiag_8cpp_html_aff052b2c086f67396715402e80de5fd7"><div class="ttname"><a href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a></div><div class="ttdeci">TString DUMMYFILE</div><div class="ttdef"><b>Definition:</b> <a href="PlotMCMCDiag_8cpp_source.html#l00013">PlotMCMCDiag.cpp:13</a></div></div>
+<div class="ttc" id="aPlotMCMCDiag_8cpp_html_a90c4608d3da0a7c10a29902f966ba2d9"><div class="ttname"><a href="PlotMCMCDiag_8cpp.html#a90c4608d3da0a7c10a29902f966ba2d9">MakePlot</a></div><div class="ttdeci">void MakePlot(TString fname1, TString flabel1, TString fname2, TString flabel2, TString fname3, TString flabel3, TString fname4, TString flabel4)</div><div class="ttdef"><b>Definition:</b> <a href="PlotMCMCDiag_8cpp_source.html#l00054">PlotMCMCDiag.cpp:54</a></div></div>
+<div class="ttc" id="aPlotMCMCDiag_8cpp_html_aaaaec9d37a764e090607e8f68428a8ed"><div class="ttname"><a href="PlotMCMCDiag_8cpp.html#aaaaec9d37a764e090607e8f68428a8ed">DUMMYNAME</a></div><div class="ttdeci">TString DUMMYNAME</div><div class="ttdef"><b>Definition:</b> <a href="PlotMCMCDiag_8cpp_source.html#l00015">PlotMCMCDiag.cpp:15</a></div></div>
+<div class="ttc" id="aPlotMCMCDiag_8cpp_html_aaff1fd9271707426d962ec32b2690f5a"><div class="ttname"><a href="PlotMCMCDiag_8cpp.html#aaff1fd9271707426d962ec32b2690f5a">PlotAverageACMult</a></div><div class="ttdeci">void PlotAverageACMult(std::vector&lt; TString &gt; input_files, std::vector&lt; TString &gt; hist_labels, const TString &amp;output_name, bool draw_min_max=true)</div><div class="ttdef"><b>Definition:</b> <a href="PlotMCMCDiag_8cpp_source.html#l00560">PlotMCMCDiag.cpp:560</a></div></div>
+<div class="ttc" id="aPlotMCMCDiag_8cpp_html_adb34dab2a00b2675057f9860468b0a6b"><div class="ttname"><a href="PlotMCMCDiag_8cpp.html#adb34dab2a00b2675057f9860468b0a6b">PlotAutoCorr</a></div><div class="ttdeci">void PlotAutoCorr(TString fname1, TString flabel1, TString fname2, TString flabel2, TString fname3, TString flabel3, TString fname4, TString flabel4)</div><div class="ttdef"><b>Definition:</b> <a href="PlotMCMCDiag_8cpp_source.html#l00184">PlotMCMCDiag.cpp:184</a></div></div>
+<div class="ttc" id="aPlotMCMCDiag_8cpp_html_aff052b2c086f67396715402e80de5fd7"><div class="ttname"><a href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a></div><div class="ttdeci">TString DUMMYFILE</div><div class="ttdef"><b>Definition:</b> <a href="PlotMCMCDiag_8cpp_source.html#l00014">PlotMCMCDiag.cpp:14</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00013">MaCh3Exception.h:13</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a70a8847717dd98bb61d4be6af69dbe03" name="a70a8847717dd98bb61d4be6af69dbe03"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a70a8847717dd98bb61d4be6af69dbe03">&#9670;&#160;</a></span>MakePlot()</h2>
+<a id="a90c4608d3da0a7c10a29902f966ba2d9" name="a90c4608d3da0a7c10a29902f966ba2d9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a90c4608d3da0a7c10a29902f966ba2d9">&#9670;&#160;</a></span>MakePlot()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -683,7 +707,19 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">TString&#160;</td>
+          <td class="paramname"><em>flabel1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TString&#160;</td>
           <td class="paramname"><em>fname2</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TString&#160;</td>
+          <td class="paramname"><em>flabel2</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -695,7 +731,19 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">TString&#160;</td>
-          <td class="paramname"><em>fname4</em>&#160;</td>
+          <td class="paramname"><em>flabel3</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TString&#160;</td>
+          <td class="paramname"><em>fname4</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TString&#160;</td>
+          <td class="paramname"><em>flabel4</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -705,99 +753,142 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PlotMCMCDiag_8cpp_source.html#l00052">52</a> of file <a class="el" href="PlotMCMCDiag_8cpp_source.html">PlotMCMCDiag.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   53</span>{</div>
-<div class="line"><span class="lineno">   54</span>  TCanvas *c1 = <span class="keyword">new</span> TCanvas(<span class="stringliteral">&quot;c1&quot;</span>,<span class="stringliteral">&quot; &quot;</span>, 0, 0, 800,630);</div>
-<div class="line"><span class="lineno">   55</span>  gStyle-&gt;SetOptStat(0); <span class="comment">//Set 0 to disable statistic box</span></div>
-<div class="line"><span class="lineno">   56</span>  <span class="comment">//To avoid TCanvas::Print&gt; messages</span></div>
-<div class="line"><span class="lineno">   57</span>  gErrorIgnoreLevel = kWarning;</div>
-<div class="line"><span class="lineno">   58</span> </div>
-<div class="line"><span class="lineno">   59</span>  TKey *key;</div>
-<div class="line"><span class="lineno">   60</span>  TFile *infile = TFile::Open(fname1.Data());</div>
-<div class="line"><span class="lineno">   61</span> </div>
-<div class="line"><span class="lineno">   62</span>  TFile *infile2 = NULL;</div>
-<div class="line"><span class="lineno">   63</span>  <span class="keywordflow">if</span>(fname2 != <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>)infile2 = TFile::Open(fname2.Data());</div>
-<div class="line"><span class="lineno">   64</span>  TFile *infile3 = NULL;</div>
-<div class="line"><span class="lineno">   65</span>  <span class="keywordflow">if</span>(fname3 != <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>) infile3 = TFile::Open(fname3.Data());</div>
-<div class="line"><span class="lineno">   66</span>  TFile *infile4 = NULL;</div>
-<div class="line"><span class="lineno">   67</span>  <span class="keywordflow">if</span>(fname4 != <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>) infile4 = TFile::Open(fname4.Data());</div>
-<div class="line"><span class="lineno">   68</span> </div>
-<div class="line"><span class="lineno">   69</span>  TIter next(infile-&gt;GetListOfKeys());</div>
-<div class="line"><span class="lineno">   70</span>  <span class="keywordflow">while</span> ((key = <span class="keyword">static_cast&lt;</span>TKey*<span class="keyword">&gt;</span>(next()))) {</div>
-<div class="line"><span class="lineno">   71</span>    std::string dirname = std::string(key-&gt;GetName());</div>
-<div class="line"><span class="lineno">   72</span>    <span class="keywordflow">if</span> (std::string(key-&gt;GetClassName()) != <span class="stringliteral">&quot;TDirectoryFile&quot;</span>) <span class="keywordflow">continue</span>;</div>
-<div class="line"><span class="lineno">   73</span>    <span class="comment">//KS: Script will work with LogL and Batched_means, you can comment it if you are interested in it</span></div>
-<div class="line"><span class="lineno">   74</span>    <span class="keywordflow">if</span>( (dirname == <span class="stringliteral">&quot;LogL&quot;</span>) || (dirname == <span class="stringliteral">&quot;Batched_means&quot;</span>) ) <span class="keywordflow">continue</span>;</div>
-<div class="line"><span class="lineno">   75</span>    <span class="comment">//KS: Trace wo longer chains is super big, the way to avoid is to plot as png but I don&#39;t like png,</span></div>
-<div class="line"><span class="lineno">   76</span>    <span class="comment">//keep possibility to skip it</span></div>
-<div class="line"><span class="lineno">   77</span>    <span class="comment">//if( (dirname == &quot;Trace&quot;) ) continue;</span></div>
-<div class="line"><span class="lineno">   78</span>    infile-&gt;cd(dirname.c_str());</div>
-<div class="line"><span class="lineno">   79</span>    TIter nextsub(gDirectory-&gt;GetListOfKeys());</div>
-<div class="line"><span class="lineno">   80</span>    c1-&gt;Print(Form(<span class="stringliteral">&quot;%s.pdf[&quot;</span>,dirname.c_str()), <span class="stringliteral">&quot;pdf&quot;</span>);</div>
-<div class="line"><span class="lineno">   81</span>    TKey *subkey;</div>
-<div class="line"><span class="lineno">   82</span>    <span class="keywordflow">while</span> ((subkey = <span class="keyword">static_cast&lt;</span>TKey*<span class="keyword">&gt;</span>(nextsub())))</div>
-<div class="line"><span class="lineno">   83</span>    {</div>
-<div class="line"><span class="lineno">   84</span>      std::string name = std::string(subkey-&gt;GetName());</div>
-<div class="line"><span class="lineno">   85</span>      name = dirname + <span class="stringliteral">&quot;/&quot;</span> + name;</div>
-<div class="line"><span class="lineno">   86</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{}&quot;</span>, name);</div>
-<div class="line"><span class="lineno">   87</span>      <span class="keywordflow">if</span> (std::string(subkey-&gt;GetClassName()) != <span class="stringliteral">&quot;TH1D&quot;</span>){<span class="keywordflow">continue</span>;}</div>
-<div class="line"><span class="lineno">   88</span>      <span class="keywordflow">else</span>{<a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;continuing along my way for {}&quot;</span>, dirname);}</div>
-<div class="line"><span class="lineno">   89</span> </div>
-<div class="line"><span class="lineno">   90</span>      TH1D* blarb[4];</div>
-<div class="line"><span class="lineno">   91</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Looking for {} from file {}&quot;</span>, name.c_str(), fname1.Data());</div>
-<div class="line"><span class="lineno">   92</span>      blarb[0] = <span class="keyword">static_cast&lt;</span>TH1D*<span class="keyword">&gt;</span>(infile-&gt;Get(name.c_str())-&gt;Clone());</div>
-<div class="line"><span class="lineno">   93</span>      <span class="comment">//KS: Some fixe params can go crazy</span></div>
-<div class="line"><span class="lineno">   94</span>      <span class="keywordflow">if</span>(TMath::IsNaN(blarb[0]-&gt;GetBinContent(1)) ) <span class="keywordflow">continue</span>;</div>
-<div class="line"><span class="lineno">   95</span> </div>
-<div class="line"><span class="lineno">   96</span>      <a class="code hl_function" href="HistogramUtils_8cpp.html#a85463c0c6943e3d544d5fcb3f96bf18a">RemoveFitter</a>(blarb[0], <span class="stringliteral">&quot;Fitter&quot;</span>);</div>
-<div class="line"><span class="lineno">   97</span>      blarb[0]-&gt;SetLineStyle(kSolid);</div>
-<div class="line"><span class="lineno">   98</span>      blarb[0]-&gt;SetLineColor(kRed);</div>
-<div class="line"><span class="lineno">   99</span>      blarb[0]-&gt;Draw();</div>
-<div class="line"><span class="lineno">  100</span>      <span class="keywordflow">if</span>( dirname == <span class="stringliteral">&quot;AccProb&quot;</span>) blarb[0]-&gt;GetYaxis()-&gt;SetRangeUser(0, 1.0);</div>
-<div class="line"><span class="lineno">  101</span>      <span class="keywordflow">if</span>( name == <span class="stringliteral">&quot;AccProb/AcceptanceProbability&quot;</span> ) <span class="keywordflow">continue</span>;</div>
-<div class="line"><span class="lineno">  102</span>      <span class="keywordflow">if</span>(infile2 != NULL)</div>
-<div class="line"><span class="lineno">  103</span>      {</div>
-<div class="line"><span class="lineno">  104</span>        blarb[1] = <span class="keyword">static_cast&lt;</span>TH1D*<span class="keyword">&gt;</span>(infile2-&gt;Get(name.c_str())-&gt;Clone());</div>
-<div class="line"><span class="lineno">  105</span>        <a class="code hl_function" href="HistogramUtils_8cpp.html#a85463c0c6943e3d544d5fcb3f96bf18a">RemoveFitter</a>(blarb[1], <span class="stringliteral">&quot;Fitter&quot;</span>);</div>
-<div class="line"><span class="lineno">  106</span>        blarb[1]-&gt;SetLineStyle(kDashed);</div>
-<div class="line"><span class="lineno">  107</span>        blarb[1]-&gt;SetLineColor(kBlue);</div>
-<div class="line"><span class="lineno">  108</span>        blarb[1]-&gt;Draw(<span class="stringliteral">&quot;same&quot;</span>);</div>
-<div class="line"><span class="lineno">  109</span>      }</div>
-<div class="line"><span class="lineno">  110</span>      <span class="keywordflow">if</span>(infile3 != NULL)</div>
-<div class="line"><span class="lineno">  111</span>      {</div>
-<div class="line"><span class="lineno">  112</span>        blarb[2] = <span class="keyword">static_cast&lt;</span>TH1D*<span class="keyword">&gt;</span>(infile3-&gt;Get(name.c_str())-&gt;Clone());</div>
-<div class="line"><span class="lineno">  113</span>        <a class="code hl_function" href="HistogramUtils_8cpp.html#a85463c0c6943e3d544d5fcb3f96bf18a">RemoveFitter</a>(blarb[2], <span class="stringliteral">&quot;Fitter&quot;</span>);</div>
-<div class="line"><span class="lineno">  114</span>        blarb[2]-&gt;SetLineStyle(kDotted );</div>
-<div class="line"><span class="lineno">  115</span>        blarb[2]-&gt;SetLineColor(kGreen);</div>
-<div class="line"><span class="lineno">  116</span>        blarb[2]-&gt;Draw(<span class="stringliteral">&quot;same&quot;</span>);</div>
-<div class="line"><span class="lineno">  117</span>      }</div>
-<div class="line"><span class="lineno">  118</span>      <span class="keywordflow">if</span>(infile4 != NULL)</div>
-<div class="line"><span class="lineno">  119</span>      {</div>
-<div class="line"><span class="lineno">  120</span>        blarb[3] = <span class="keyword">static_cast&lt;</span>TH1D*<span class="keyword">&gt;</span>(infile4-&gt;Get(name.c_str())-&gt;Clone());</div>
-<div class="line"><span class="lineno">  121</span>        <a class="code hl_function" href="HistogramUtils_8cpp.html#a85463c0c6943e3d544d5fcb3f96bf18a">RemoveFitter</a>(blarb[3], <span class="stringliteral">&quot;Fitter&quot;</span>);</div>
-<div class="line"><span class="lineno">  122</span>        blarb[3]-&gt;SetLineStyle(kDashDotted );</div>
-<div class="line"><span class="lineno">  123</span>        blarb[3]-&gt;SetLineColor(kOrange);</div>
-<div class="line"><span class="lineno">  124</span>        blarb[3]-&gt;Draw(<span class="stringliteral">&quot;same&quot;</span>);</div>
-<div class="line"><span class="lineno">  125</span>      }</div>
-<div class="line"><span class="lineno">  126</span> </div>
-<div class="line"><span class="lineno">  127</span>      c1-&gt;Print(Form(<span class="stringliteral">&quot;%s.pdf&quot;</span>,dirname.c_str()), <span class="stringliteral">&quot;pdf&quot;</span>);</div>
-<div class="line"><span class="lineno">  128</span>    }</div>
-<div class="line"><span class="lineno">  129</span>    gDirectory-&gt;cd(<span class="stringliteral">&quot;..&quot;</span>);</div>
-<div class="line"><span class="lineno">  130</span>    c1-&gt;Print(Form(<span class="stringliteral">&quot;%s.pdf]&quot;</span>,dirname.c_str()), <span class="stringliteral">&quot;pdf&quot;</span>);</div>
-<div class="line"><span class="lineno">  131</span>  }</div>
-<div class="line"><span class="lineno">  132</span> </div>
-<div class="line"><span class="lineno">  133</span>  infile-&gt;Close();</div>
-<div class="line"><span class="lineno">  134</span>  <span class="keywordflow">if</span>(infile2 != NULL)infile2-&gt;Close();</div>
-<div class="line"><span class="lineno">  135</span>  <span class="keywordflow">if</span>(infile3 != NULL)infile3-&gt;Close();</div>
-<div class="line"><span class="lineno">  136</span>  <span class="keywordflow">if</span>(infile4 != NULL)infile4-&gt;Close();</div>
-<div class="line"><span class="lineno">  137</span>}</div>
+<p class="definition">Definition at line <a class="el" href="PlotMCMCDiag_8cpp_source.html#l00054">54</a> of file <a class="el" href="PlotMCMCDiag_8cpp_source.html">PlotMCMCDiag.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   55</span>{</div>
+<div class="line"><span class="lineno">   56</span>  TCanvas *c1 = <span class="keyword">new</span> TCanvas(<span class="stringliteral">&quot;c1&quot;</span>, <span class="stringliteral">&quot; &quot;</span>, 0, 0, 800, 630);</div>
+<div class="line"><span class="lineno">   57</span>  gStyle-&gt;SetOptStat(0); <span class="comment">// Set 0 to disable statistic box</span></div>
+<div class="line"><span class="lineno">   58</span>  <span class="comment">// To avoid TCanvas::Print&gt; messages</span></div>
+<div class="line"><span class="lineno">   59</span>  gErrorIgnoreLevel = kWarning;</div>
+<div class="line"><span class="lineno">   60</span> </div>
+<div class="line"><span class="lineno">   61</span>  TKey *key;</div>
+<div class="line"><span class="lineno">   62</span>  TFile *infile = TFile::Open(fname1.Data());</div>
+<div class="line"><span class="lineno">   63</span> </div>
+<div class="line"><span class="lineno">   64</span>  <span class="keywordtype">bool</span> add_legend = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">   65</span> </div>
+<div class="line"><span class="lineno">   66</span>  TFile *infile2 = NULL;</div>
+<div class="line"><span class="lineno">   67</span>  <span class="keywordflow">if</span> (fname2 != <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>)</div>
+<div class="line"><span class="lineno">   68</span>  {</div>
+<div class="line"><span class="lineno">   69</span>    infile2 = TFile::Open(fname2.Data());</div>
+<div class="line"><span class="lineno">   70</span>    add_legend = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">   71</span>  }</div>
+<div class="line"><span class="lineno">   72</span>  TFile *infile3 = NULL;</div>
+<div class="line"><span class="lineno">   73</span>  <span class="keywordflow">if</span> (fname3 != <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>)</div>
+<div class="line"><span class="lineno">   74</span>  {</div>
+<div class="line"><span class="lineno">   75</span>    infile3 = TFile::Open(fname3.Data());</div>
+<div class="line"><span class="lineno">   76</span>    add_legend = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">   77</span>  }</div>
+<div class="line"><span class="lineno">   78</span>  TFile *infile4 = NULL;</div>
+<div class="line"><span class="lineno">   79</span>  <span class="keywordflow">if</span> (fname4 != <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>)</div>
+<div class="line"><span class="lineno">   80</span>  {</div>
+<div class="line"><span class="lineno">   81</span>    infile4 = TFile::Open(fname4.Data());</div>
+<div class="line"><span class="lineno">   82</span>    add_legend = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">   83</span>  }</div>
+<div class="line"><span class="lineno">   84</span> </div>
+<div class="line"><span class="lineno">   85</span>  TIter next(infile-&gt;GetListOfKeys());</div>
+<div class="line"><span class="lineno">   86</span>  <span class="keywordflow">while</span> ((key = <span class="keyword">static_cast&lt;</span>TKey *<span class="keyword">&gt;</span>(next())))</div>
+<div class="line"><span class="lineno">   87</span>  {</div>
+<div class="line"><span class="lineno">   88</span>    std::string dirname = std::string(key-&gt;GetName());</div>
+<div class="line"><span class="lineno">   89</span>    <span class="keywordflow">if</span> (std::string(key-&gt;GetClassName()) != <span class="stringliteral">&quot;TDirectoryFile&quot;</span>)</div>
+<div class="line"><span class="lineno">   90</span>      <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno">   91</span>    <span class="comment">// KS: Script will work with LogL and Batched_means, you can comment it if you are interested in it</span></div>
+<div class="line"><span class="lineno">   92</span>    <span class="keywordflow">if</span> ((dirname == <span class="stringliteral">&quot;LogL&quot;</span>) || (dirname == <span class="stringliteral">&quot;Batched_means&quot;</span>))</div>
+<div class="line"><span class="lineno">   93</span>      <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno">   94</span>    <span class="comment">// KS: Trace wo longer chains is super big, the way to avoid is to plot as png but I don&#39;t like png,</span></div>
+<div class="line"><span class="lineno">   95</span>    <span class="comment">// keep possibility to skip it</span></div>
+<div class="line"><span class="lineno">   96</span>    <span class="comment">// if( (dirname == &quot;Trace&quot;) ) continue;</span></div>
+<div class="line"><span class="lineno">   97</span>    infile-&gt;cd(dirname.c_str());</div>
+<div class="line"><span class="lineno">   98</span>    TIter nextsub(gDirectory-&gt;GetListOfKeys());</div>
+<div class="line"><span class="lineno">   99</span>    c1-&gt;Print(Form(<span class="stringliteral">&quot;%s.pdf[&quot;</span>, dirname.c_str()), <span class="stringliteral">&quot;pdf&quot;</span>);</div>
+<div class="line"><span class="lineno">  100</span>    TKey *subkey;</div>
+<div class="line"><span class="lineno">  101</span>    <span class="keywordflow">while</span> ((subkey = <span class="keyword">static_cast&lt;</span>TKey *<span class="keyword">&gt;</span>(nextsub())))</div>
+<div class="line"><span class="lineno">  102</span>    {</div>
+<div class="line"><span class="lineno">  103</span> </div>
+<div class="line"><span class="lineno">  104</span>      TLegend *leg = <span class="keyword">new</span> TLegend(0.7, 0.7, 0.9, 0.9);</div>
+<div class="line"><span class="lineno">  105</span>      leg-&gt;SetFillColorAlpha(kWhite, <span class="keywordtype">float</span>(0.7));</div>
+<div class="line"><span class="lineno">  106</span>      std::string name = std::string(subkey-&gt;GetName());</div>
+<div class="line"><span class="lineno">  107</span>      name = dirname + <span class="stringliteral">&quot;/&quot;</span> + name;</div>
+<div class="line"><span class="lineno">  108</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{}&quot;</span>, name);</div>
+<div class="line"><span class="lineno">  109</span>      <span class="keywordflow">if</span> (std::string(subkey-&gt;GetClassName()) != <span class="stringliteral">&quot;TH1D&quot;</span>)</div>
+<div class="line"><span class="lineno">  110</span>      {</div>
+<div class="line"><span class="lineno">  111</span>        <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno">  112</span>      }</div>
+<div class="line"><span class="lineno">  113</span>      <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">  114</span>      {</div>
+<div class="line"><span class="lineno">  115</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;continuing along my way for {}&quot;</span>, dirname);</div>
+<div class="line"><span class="lineno">  116</span>      }</div>
+<div class="line"><span class="lineno">  117</span> </div>
+<div class="line"><span class="lineno">  118</span>      TH1D *blarb[4];</div>
+<div class="line"><span class="lineno">  119</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Looking for {} from file {}&quot;</span>, name.c_str(), fname1.Data());</div>
+<div class="line"><span class="lineno">  120</span>      blarb[0] = <span class="keyword">static_cast&lt;</span>TH1D *<span class="keyword">&gt;</span>(infile-&gt;Get(name.c_str())-&gt;Clone());</div>
+<div class="line"><span class="lineno">  121</span>      <span class="comment">// KS: Some fixe params can go crazy</span></div>
+<div class="line"><span class="lineno">  122</span>      <span class="keywordflow">if</span> (TMath::IsNaN(blarb[0]-&gt;GetBinContent(1)))</div>
+<div class="line"><span class="lineno">  123</span>        <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno">  124</span> </div>
+<div class="line"><span class="lineno">  125</span>      <a class="code hl_function" href="HistogramUtils_8cpp.html#a85463c0c6943e3d544d5fcb3f96bf18a">RemoveFitter</a>(blarb[0], <span class="stringliteral">&quot;Fitter&quot;</span>);</div>
+<div class="line"><span class="lineno">  126</span>      blarb[0]-&gt;SetLineStyle(kSolid);</div>
+<div class="line"><span class="lineno">  127</span>      blarb[0]-&gt;SetLineColor(kRed);</div>
+<div class="line"><span class="lineno">  128</span>      blarb[0]-&gt;Draw();</div>
+<div class="line"><span class="lineno">  129</span> </div>
+<div class="line"><span class="lineno">  130</span>      leg-&gt;AddEntry(blarb[0], flabel1.Data(), <span class="stringliteral">&quot;l&quot;</span>);</div>
+<div class="line"><span class="lineno">  131</span> </div>
+<div class="line"><span class="lineno">  132</span>      <span class="keywordflow">if</span> (dirname == <span class="stringliteral">&quot;AccProb&quot;</span>)</div>
+<div class="line"><span class="lineno">  133</span>        blarb[0]-&gt;GetYaxis()-&gt;SetRangeUser(0, 1.0);</div>
+<div class="line"><span class="lineno">  134</span>      <span class="keywordflow">if</span> (name == <span class="stringliteral">&quot;AccProb/AcceptanceProbability&quot;</span>)</div>
+<div class="line"><span class="lineno">  135</span>        <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno">  136</span>      <span class="keywordflow">if</span> (infile2 != NULL)</div>
+<div class="line"><span class="lineno">  137</span>      {</div>
+<div class="line"><span class="lineno">  138</span>        blarb[1] = <span class="keyword">static_cast&lt;</span>TH1D *<span class="keyword">&gt;</span>(infile2-&gt;Get(name.c_str())-&gt;Clone());</div>
+<div class="line"><span class="lineno">  139</span>        <a class="code hl_function" href="HistogramUtils_8cpp.html#a85463c0c6943e3d544d5fcb3f96bf18a">RemoveFitter</a>(blarb[1], <span class="stringliteral">&quot;Fitter&quot;</span>);</div>
+<div class="line"><span class="lineno">  140</span>        blarb[1]-&gt;SetLineStyle(kDashed);</div>
+<div class="line"><span class="lineno">  141</span>        blarb[1]-&gt;SetLineColor(kBlue);</div>
+<div class="line"><span class="lineno">  142</span>        blarb[1]-&gt;Draw(<span class="stringliteral">&quot;same&quot;</span>);</div>
+<div class="line"><span class="lineno">  143</span>        leg-&gt;AddEntry(blarb[1], flabel2.Data(), <span class="stringliteral">&quot;l&quot;</span>);</div>
+<div class="line"><span class="lineno">  144</span>      }</div>
+<div class="line"><span class="lineno">  145</span>      <span class="keywordflow">if</span> (infile3 != NULL)</div>
+<div class="line"><span class="lineno">  146</span>      {</div>
+<div class="line"><span class="lineno">  147</span>        blarb[2] = <span class="keyword">static_cast&lt;</span>TH1D *<span class="keyword">&gt;</span>(infile3-&gt;Get(name.c_str())-&gt;Clone());</div>
+<div class="line"><span class="lineno">  148</span>        <a class="code hl_function" href="HistogramUtils_8cpp.html#a85463c0c6943e3d544d5fcb3f96bf18a">RemoveFitter</a>(blarb[2], <span class="stringliteral">&quot;Fitter&quot;</span>);</div>
+<div class="line"><span class="lineno">  149</span>        blarb[2]-&gt;SetLineStyle(kDotted);</div>
+<div class="line"><span class="lineno">  150</span>        blarb[2]-&gt;SetLineColor(kGreen);</div>
+<div class="line"><span class="lineno">  151</span>        blarb[2]-&gt;Draw(<span class="stringliteral">&quot;same&quot;</span>);</div>
+<div class="line"><span class="lineno">  152</span>        leg-&gt;AddEntry(blarb[2], flabel3.Data(), <span class="stringliteral">&quot;l&quot;</span>);</div>
+<div class="line"><span class="lineno">  153</span>      }</div>
+<div class="line"><span class="lineno">  154</span>      <span class="keywordflow">if</span> (infile4 != NULL)</div>
+<div class="line"><span class="lineno">  155</span>      {</div>
+<div class="line"><span class="lineno">  156</span>        blarb[3] = <span class="keyword">static_cast&lt;</span>TH1D *<span class="keyword">&gt;</span>(infile4-&gt;Get(name.c_str())-&gt;Clone());</div>
+<div class="line"><span class="lineno">  157</span>        <a class="code hl_function" href="HistogramUtils_8cpp.html#a85463c0c6943e3d544d5fcb3f96bf18a">RemoveFitter</a>(blarb[3], <span class="stringliteral">&quot;Fitter&quot;</span>);</div>
+<div class="line"><span class="lineno">  158</span>        blarb[3]-&gt;SetLineStyle(kDashDotted);</div>
+<div class="line"><span class="lineno">  159</span>        blarb[3]-&gt;SetLineColor(kOrange);</div>
+<div class="line"><span class="lineno">  160</span>        blarb[3]-&gt;Draw(<span class="stringliteral">&quot;same&quot;</span>);</div>
+<div class="line"><span class="lineno">  161</span>        leg-&gt;AddEntry(blarb[3], flabel4.Data(), <span class="stringliteral">&quot;l&quot;</span>);</div>
+<div class="line"><span class="lineno">  162</span>      }</div>
+<div class="line"><span class="lineno">  163</span>      <span class="keywordflow">if</span> (add_legend)</div>
+<div class="line"><span class="lineno">  164</span>      {</div>
+<div class="line"><span class="lineno">  165</span>        leg-&gt;Draw();</div>
+<div class="line"><span class="lineno">  166</span>      }</div>
+<div class="line"><span class="lineno">  167</span> </div>
+<div class="line"><span class="lineno">  168</span>      c1-&gt;Print(Form(<span class="stringliteral">&quot;%s.pdf&quot;</span>, dirname.c_str()), <span class="stringliteral">&quot;pdf&quot;</span>);</div>
+<div class="line"><span class="lineno">  169</span>      <span class="keyword">delete</span> leg;</div>
+<div class="line"><span class="lineno">  170</span>    }</div>
+<div class="line"><span class="lineno">  171</span>    gDirectory-&gt;cd(<span class="stringliteral">&quot;..&quot;</span>);</div>
+<div class="line"><span class="lineno">  172</span>    c1-&gt;Print(Form(<span class="stringliteral">&quot;%s.pdf]&quot;</span>, dirname.c_str()), <span class="stringliteral">&quot;pdf&quot;</span>);</div>
+<div class="line"><span class="lineno">  173</span>  }</div>
+<div class="line"><span class="lineno">  174</span> </div>
+<div class="line"><span class="lineno">  175</span>  infile-&gt;Close();</div>
+<div class="line"><span class="lineno">  176</span>  <span class="keywordflow">if</span> (infile2 != NULL)</div>
+<div class="line"><span class="lineno">  177</span>    infile2-&gt;Close();</div>
+<div class="line"><span class="lineno">  178</span>  <span class="keywordflow">if</span> (infile3 != NULL)</div>
+<div class="line"><span class="lineno">  179</span>    infile3-&gt;Close();</div>
+<div class="line"><span class="lineno">  180</span>  <span class="keywordflow">if</span> (infile4 != NULL)</div>
+<div class="line"><span class="lineno">  181</span>    infile4-&gt;Close();</div>
+<div class="line"><span class="lineno">  182</span>}</div>
 <div class="ttc" id="aHistogramUtils_8cpp_html_a85463c0c6943e3d544d5fcb3f96bf18a"><div class="ttname"><a href="HistogramUtils_8cpp.html#a85463c0c6943e3d544d5fcb3f96bf18a">RemoveFitter</a></div><div class="ttdeci">void RemoveFitter(TH1D *hist, const std::string &amp;name)</div><div class="ttdoc">KS: Remove fitted TF1 from hist to make comparison easier.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00394">HistogramUtils.cpp:394</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_ad5b2eb6377721e3ac95def22c2386bb1"><div class="ttname"><a href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a></div><div class="ttdeci">#define MACH3LOG_WARN</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00024">MaCh3Logger.h:24</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a077cef58096692740b5491f8b1bec715" name="a077cef58096692740b5491f8b1bec715"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a077cef58096692740b5491f8b1bec715">&#9670;&#160;</a></span>PlotAutoCorr()</h2>
+<a id="adb34dab2a00b2675057f9860468b0a6b" name="adb34dab2a00b2675057f9860468b0a6b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adb34dab2a00b2675057f9860468b0a6b">&#9670;&#160;</a></span>PlotAutoCorr()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -812,7 +903,19 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">TString&#160;</td>
+          <td class="paramname"><em>flabel1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TString&#160;</td>
           <td class="paramname"><em>fname2</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TString&#160;</td>
+          <td class="paramname"><em>flabel2</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -824,7 +927,19 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">TString&#160;</td>
-          <td class="paramname"><em>fname4</em>&#160;</td>
+          <td class="paramname"><em>flabel3</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TString&#160;</td>
+          <td class="paramname"><em>fname4</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TString&#160;</td>
+          <td class="paramname"><em>flabel4</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -834,87 +949,125 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PlotMCMCDiag_8cpp_source.html#l00139">139</a> of file <a class="el" href="PlotMCMCDiag_8cpp_source.html">PlotMCMCDiag.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  140</span>{</div>
-<div class="line"><span class="lineno">  141</span>  TString fname[4];</div>
-<div class="line"><span class="lineno">  142</span>  fname[0] = fname1; fname[1] = fname2; fname[2] = fname3; fname[3] = fname4;</div>
-<div class="line"><span class="lineno">  143</span>  <span class="comment">//Color_t PlotColor[4]={kRed, kBlue, kGreen, kOrange};</span></div>
-<div class="line"><span class="lineno">  144</span> </div>
-<div class="line"><span class="lineno">  145</span>  TFile *infile[4];</div>
-<div class="line"><span class="lineno">  146</span>  infile[0] = TFile::Open(fname[0].Data());</div>
-<div class="line"><span class="lineno">  147</span>  <span class="comment">//KS&quot; We need to check number of files to loop over in very lazy way</span></div>
-<div class="line"><span class="lineno">  148</span>  <span class="keywordtype">int</span> Nfiles = 1;</div>
-<div class="line"><span class="lineno">  149</span> </div>
-<div class="line"><span class="lineno">  150</span>  <span class="keywordflow">if</span>(fname[1] != <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>){ infile[1] = TFile::Open(fname[1].Data()); Nfiles++;}</div>
-<div class="line"><span class="lineno">  151</span>  <span class="keywordflow">if</span>(fname[2] != <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>){ infile[2] = TFile::Open(fname[2].Data()); Nfiles++;}</div>
-<div class="line"><span class="lineno">  152</span>  <span class="keywordflow">if</span>(fname[3] != <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>){ infile[3] = TFile::Open(fname[3].Data()); Nfiles++;}</div>
-<div class="line"><span class="lineno">  153</span> </div>
-<div class="line"><span class="lineno">  154</span>  TCanvas *c1 = <span class="keyword">new</span> TCanvas(<span class="stringliteral">&quot;c1&quot;</span>,<span class="stringliteral">&quot; &quot;</span>, 0, 0, 800,630);</div>
-<div class="line"><span class="lineno">  155</span>  gStyle-&gt;SetOptStat(0); <span class="comment">//Set 0 to disable statistic box</span></div>
-<div class="line"><span class="lineno">  156</span>  <span class="comment">//To avoid TCanvas::Print&gt; messages</span></div>
-<div class="line"><span class="lineno">  157</span>  gErrorIgnoreLevel = kWarning;</div>
-<div class="line"><span class="lineno">  158</span> </div>
-<div class="line"><span class="lineno">  159</span>  c1-&gt;Print(<span class="stringliteral">&quot;Auto_Corr_PerFile.pdf[&quot;</span>, <span class="stringliteral">&quot;pdf&quot;</span>);</div>
-<div class="line"><span class="lineno">  160</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> ik = 0; ik &lt; Nfiles; ik++)</div>
-<div class="line"><span class="lineno">  161</span>  {</div>
-<div class="line"><span class="lineno">  162</span>    TIter next(infile[ik]-&gt;GetListOfKeys());</div>
-<div class="line"><span class="lineno">  163</span> </div>
-<div class="line"><span class="lineno">  164</span>    TKey* key;</div>
-<div class="line"><span class="lineno">  165</span>    <span class="keywordflow">while</span> ((key = <span class="keyword">static_cast&lt;</span>TKey*<span class="keyword">&gt;</span>(next())))</div>
-<div class="line"><span class="lineno">  166</span>    {</div>
-<div class="line"><span class="lineno">  167</span>      std::string dirname = std::string(key-&gt;GetName());</div>
-<div class="line"><span class="lineno">  168</span> </div>
-<div class="line"><span class="lineno">  169</span>      <span class="comment">//KS: Script We are only interested in auto corr</span></div>
-<div class="line"><span class="lineno">  170</span>      <span class="keywordflow">if</span>( (dirname != <span class="stringliteral">&quot;Auto_corr&quot;</span>)) <span class="keywordflow">continue</span>;</div>
-<div class="line"><span class="lineno">  171</span> </div>
-<div class="line"><span class="lineno">  172</span>      infile[ik]-&gt;cd(dirname.c_str());</div>
-<div class="line"><span class="lineno">  173</span>      TIter nextsub(gDirectory-&gt;GetListOfKeys());</div>
-<div class="line"><span class="lineno">  174</span> </div>
-<div class="line"><span class="lineno">  175</span>      TKey *subkey;</div>
-<div class="line"><span class="lineno">  176</span>      <span class="keywordtype">bool</span> FirstTime = <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno">  177</span>      <span class="keywordflow">while</span> ((subkey = <span class="keyword">static_cast&lt;</span>TKey*<span class="keyword">&gt;</span>(nextsub())))</div>
-<div class="line"><span class="lineno">  178</span>      {</div>
-<div class="line"><span class="lineno">  179</span>        std::string name = std::string(subkey-&gt;GetName());</div>
-<div class="line"><span class="lineno">  180</span>        name = dirname + <span class="stringliteral">&quot;/&quot;</span> + name;</div>
-<div class="line"><span class="lineno">  181</span> </div>
-<div class="line"><span class="lineno">  182</span>        <span class="keywordflow">if</span> (std::string(subkey-&gt;GetClassName()) != <span class="stringliteral">&quot;TH1D&quot;</span>) <span class="keywordflow">continue</span>;</div>
-<div class="line"><span class="lineno">  183</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;{}&quot;</span>, name.c_str());</div>
-<div class="line"><span class="lineno">  184</span>        TH1D* blarb = <span class="keyword">static_cast&lt;</span>TH1D*<span class="keyword">&gt;</span>(infile[ik]-&gt;Get(name.c_str())-&gt;Clone());</div>
-<div class="line"><span class="lineno">  185</span>        <span class="comment">//KS: Some fixe pramas can go crazy</span></div>
-<div class="line"><span class="lineno">  186</span>        <span class="keywordflow">if</span>(TMath::IsNaN(blarb-&gt;GetBinContent(1))) <span class="keywordflow">continue</span>;</div>
-<div class="line"><span class="lineno">  187</span>        <span class="comment">//KS: This is unfortunately hardcoded, need to find better way to write this</span></div>
-<div class="line"><span class="lineno">  188</span>        <span class="comment">//blarb[0]-&gt;GetListOfFunctions()-&gt;ls();</span></div>
-<div class="line"><span class="lineno">  189</span>        <span class="keyword">delete</span> blarb-&gt;GetListOfFunctions()-&gt;FindObject(<span class="stringliteral">&quot;Fitter&quot;</span>);</div>
-<div class="line"><span class="lineno">  190</span> </div>
-<div class="line"><span class="lineno">  191</span>        <span class="keywordtype">double</span> MinValue = <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#a81b2565c9b974c6f11088cef1c422bb3">GetMinimumInRange</a>(blarb, 0, 24000);</div>
-<div class="line"><span class="lineno">  192</span> </div>
-<div class="line"><span class="lineno">  193</span>        <span class="keywordflow">if</span>(MinValue &gt;= 0.80) blarb-&gt;SetLineColor(kRed);</div>
-<div class="line"><span class="lineno">  194</span>        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(MinValue &gt;= 0.40 &amp;&amp; MinValue &lt; 0.80) blarb-&gt;SetLineColor(kOrange);</div>
-<div class="line"><span class="lineno">  195</span>        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(MinValue &gt; 0.20 &amp;&amp; MinValue &lt; 0.40) blarb-&gt;SetLineColor(kYellow);</div>
-<div class="line"><span class="lineno">  196</span>        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(MinValue &lt;= 0.20) blarb-&gt;SetLineColor(kGreen);</div>
-<div class="line"><span class="lineno">  197</span>        blarb-&gt;GetXaxis()-&gt;UnZoom();</div>
+<p class="definition">Definition at line <a class="el" href="PlotMCMCDiag_8cpp_source.html#l00184">184</a> of file <a class="el" href="PlotMCMCDiag_8cpp_source.html">PlotMCMCDiag.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  185</span>{</div>
+<div class="line"><span class="lineno">  186</span>  TString fname[4];</div>
+<div class="line"><span class="lineno">  187</span>  fname[0] = fname1;</div>
+<div class="line"><span class="lineno">  188</span>  fname[1] = fname2;</div>
+<div class="line"><span class="lineno">  189</span>  fname[2] = fname3;</div>
+<div class="line"><span class="lineno">  190</span>  fname[3] = fname4;</div>
+<div class="line"><span class="lineno">  191</span>  <span class="comment">// Color_t PlotColor[4]={kRed, kBlue, kGreen, kOrange};</span></div>
+<div class="line"><span class="lineno">  192</span>  std::vector&lt;TString&gt; flabel = {flabel1, flabel2, flabel3, flabel4};</div>
+<div class="line"><span class="lineno">  193</span> </div>
+<div class="line"><span class="lineno">  194</span>  TFile *infile[4];</div>
+<div class="line"><span class="lineno">  195</span>  infile[0] = TFile::Open(fname[0].Data());</div>
+<div class="line"><span class="lineno">  196</span>  <span class="comment">// KS&quot; We need to check number of files to loop over in very lazy way</span></div>
+<div class="line"><span class="lineno">  197</span>  <span class="keywordtype">int</span> Nfiles = 1;</div>
 <div class="line"><span class="lineno">  198</span> </div>
-<div class="line"><span class="lineno">  199</span>        <span class="keywordflow">if</span>(FirstTime) blarb-&gt;SetTitle( Form(<span class="stringliteral">&quot;Auto_Corr_%s.pdf&quot;</span>,fname[ik].Data()) );</div>
-<div class="line"><span class="lineno">  200</span> </div>
-<div class="line"><span class="lineno">  201</span>        blarb-&gt;SetLineStyle(kDashed);</div>
-<div class="line"><span class="lineno">  202</span> </div>
-<div class="line"><span class="lineno">  203</span>        <span class="keywordflow">if</span>(FirstTime) blarb-&gt;Draw();</div>
-<div class="line"><span class="lineno">  204</span>        <span class="keywordflow">if</span>(!FirstTime) blarb-&gt;Draw(<span class="stringliteral">&quot;same&quot;</span>);</div>
-<div class="line"><span class="lineno">  205</span>        FirstTime = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">  206</span>      }</div>
-<div class="line"><span class="lineno">  207</span>      gDirectory-&gt;cd(<span class="stringliteral">&quot;..&quot;</span>);</div>
-<div class="line"><span class="lineno">  208</span>    }</div>
-<div class="line"><span class="lineno">  209</span>    c1-&gt;Print(<span class="stringliteral">&quot;Auto_Corr_PerFile.pdf&quot;</span>, <span class="stringliteral">&quot;pdf&quot;</span>);</div>
-<div class="line"><span class="lineno">  210</span>  }</div>
-<div class="line"><span class="lineno">  211</span>  c1-&gt;Print(<span class="stringliteral">&quot;Auto_Corr_PerFile.pdf]&quot;</span>, <span class="stringliteral">&quot;pdf&quot;</span>);</div>
-<div class="line"><span class="lineno">  212</span>}</div>
+<div class="line"><span class="lineno">  199</span>  <span class="keywordflow">if</span> (fname[1] != <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>)</div>
+<div class="line"><span class="lineno">  200</span>  {</div>
+<div class="line"><span class="lineno">  201</span>    infile[1] = TFile::Open(fname[1].Data());</div>
+<div class="line"><span class="lineno">  202</span>    Nfiles++;</div>
+<div class="line"><span class="lineno">  203</span>  }</div>
+<div class="line"><span class="lineno">  204</span>  <span class="keywordflow">if</span> (fname[2] != <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>)</div>
+<div class="line"><span class="lineno">  205</span>  {</div>
+<div class="line"><span class="lineno">  206</span>    infile[2] = TFile::Open(fname[2].Data());</div>
+<div class="line"><span class="lineno">  207</span>    Nfiles++;</div>
+<div class="line"><span class="lineno">  208</span>  }</div>
+<div class="line"><span class="lineno">  209</span>  <span class="keywordflow">if</span> (fname[3] != <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>)</div>
+<div class="line"><span class="lineno">  210</span>  {</div>
+<div class="line"><span class="lineno">  211</span>    infile[3] = TFile::Open(fname[3].Data());</div>
+<div class="line"><span class="lineno">  212</span>    Nfiles++;</div>
+<div class="line"><span class="lineno">  213</span>  }</div>
+<div class="line"><span class="lineno">  214</span> </div>
+<div class="line"><span class="lineno">  215</span>  TCanvas *c1 = <span class="keyword">new</span> TCanvas(<span class="stringliteral">&quot;c1&quot;</span>, <span class="stringliteral">&quot; &quot;</span>, 0, 0, 800, 630);</div>
+<div class="line"><span class="lineno">  216</span>  gStyle-&gt;SetOptStat(0); <span class="comment">// Set 0 to disable statistic box</span></div>
+<div class="line"><span class="lineno">  217</span>  <span class="comment">// To avoid TCanvas::Print&gt; messages</span></div>
+<div class="line"><span class="lineno">  218</span>  gErrorIgnoreLevel = kWarning;</div>
+<div class="line"><span class="lineno">  219</span> </div>
+<div class="line"><span class="lineno">  220</span>  c1-&gt;Print(<span class="stringliteral">&quot;Auto_Corr_PerFile.pdf[&quot;</span>, <span class="stringliteral">&quot;pdf&quot;</span>);</div>
+<div class="line"><span class="lineno">  221</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> ik = 0; ik &lt; Nfiles; ik++)</div>
+<div class="line"><span class="lineno">  222</span>  {</div>
+<div class="line"><span class="lineno">  223</span>    TIter next(infile[ik]-&gt;GetListOfKeys());</div>
+<div class="line"><span class="lineno">  224</span> </div>
+<div class="line"><span class="lineno">  225</span>    TKey *key;</div>
+<div class="line"><span class="lineno">  226</span>    TLegend *leg = <span class="keyword">new</span> TLegend(0.7, 0.7, 0.9, 0.9);</div>
+<div class="line"><span class="lineno">  227</span> </div>
+<div class="line"><span class="lineno">  228</span>    <span class="keywordflow">while</span> ((key = <span class="keyword">static_cast&lt;</span>TKey *<span class="keyword">&gt;</span>(next())))</div>
+<div class="line"><span class="lineno">  229</span>    {</div>
+<div class="line"><span class="lineno">  230</span>      std::string dirname = std::string(key-&gt;GetName());</div>
+<div class="line"><span class="lineno">  231</span> </div>
+<div class="line"><span class="lineno">  232</span>      <span class="comment">// KS: Script We are only interested in auto corr</span></div>
+<div class="line"><span class="lineno">  233</span>      <span class="keywordflow">if</span> ((dirname != <span class="stringliteral">&quot;Auto_corr&quot;</span>))</div>
+<div class="line"><span class="lineno">  234</span>        <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno">  235</span> </div>
+<div class="line"><span class="lineno">  236</span>      infile[ik]-&gt;cd(dirname.c_str());</div>
+<div class="line"><span class="lineno">  237</span>      TIter nextsub(gDirectory-&gt;GetListOfKeys());</div>
+<div class="line"><span class="lineno">  238</span> </div>
+<div class="line"><span class="lineno">  239</span>      TKey *subkey;</div>
+<div class="line"><span class="lineno">  240</span>      <span class="keywordtype">bool</span> FirstTime = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  241</span> </div>
+<div class="line"><span class="lineno">  242</span>      <span class="keywordflow">while</span> ((subkey = <span class="keyword">static_cast&lt;</span>TKey *<span class="keyword">&gt;</span>(nextsub())))</div>
+<div class="line"><span class="lineno">  243</span>      {</div>
+<div class="line"><span class="lineno">  244</span>        std::string name = std::string(subkey-&gt;GetName());</div>
+<div class="line"><span class="lineno">  245</span>        name = dirname + <span class="stringliteral">&quot;/&quot;</span> + name;</div>
+<div class="line"><span class="lineno">  246</span> </div>
+<div class="line"><span class="lineno">  247</span>        <span class="keywordflow">if</span> (std::string(subkey-&gt;GetClassName()) != <span class="stringliteral">&quot;TH1D&quot;</span>)</div>
+<div class="line"><span class="lineno">  248</span>          <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno">  249</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;{}&quot;</span>, name.c_str());</div>
+<div class="line"><span class="lineno">  250</span>        TH1D *blarb = <span class="keyword">static_cast&lt;</span>TH1D *<span class="keyword">&gt;</span>(infile[ik]-&gt;Get(name.c_str())-&gt;Clone());</div>
+<div class="line"><span class="lineno">  251</span>        <span class="comment">// KS: Some fixe pramas can go crazy</span></div>
+<div class="line"><span class="lineno">  252</span>        <span class="keywordflow">if</span> (TMath::IsNaN(blarb-&gt;GetBinContent(1)))</div>
+<div class="line"><span class="lineno">  253</span>          <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno">  254</span>        <span class="comment">// KS: This is unfortunately hardcoded, need to find better way to write this</span></div>
+<div class="line"><span class="lineno">  255</span>        <span class="comment">// blarb[0]-&gt;GetListOfFunctions()-&gt;ls();</span></div>
+<div class="line"><span class="lineno">  256</span>        <span class="keyword">delete</span> blarb-&gt;GetListOfFunctions()-&gt;FindObject(<span class="stringliteral">&quot;Fitter&quot;</span>);</div>
+<div class="line"><span class="lineno">  257</span> </div>
+<div class="line"><span class="lineno">  258</span>        <span class="keywordtype">double</span> MinValue = <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#a81b2565c9b974c6f11088cef1c422bb3">GetMinimumInRange</a>(blarb, 0, 24000);</div>
+<div class="line"><span class="lineno">  259</span> </div>
+<div class="line"><span class="lineno">  260</span>        <span class="keywordflow">if</span> (MinValue &gt;= 0.80)</div>
+<div class="line"><span class="lineno">  261</span>          blarb-&gt;SetLineColor(kRed);</div>
+<div class="line"><span class="lineno">  262</span>        <span class="keywordflow">else</span> <span class="keywordflow">if</span> (MinValue &gt;= 0.40 &amp;&amp; MinValue &lt; 0.80)</div>
+<div class="line"><span class="lineno">  263</span>          blarb-&gt;SetLineColor(kOrange);</div>
+<div class="line"><span class="lineno">  264</span>        <span class="keywordflow">else</span> <span class="keywordflow">if</span> (MinValue &gt; 0.20 &amp;&amp; MinValue &lt; 0.40)</div>
+<div class="line"><span class="lineno">  265</span>          blarb-&gt;SetLineColor(kYellow);</div>
+<div class="line"><span class="lineno">  266</span>        <span class="keywordflow">else</span> <span class="keywordflow">if</span> (MinValue &lt;= 0.20)</div>
+<div class="line"><span class="lineno">  267</span>          blarb-&gt;SetLineColor(kGreen);</div>
+<div class="line"><span class="lineno">  268</span>        blarb-&gt;GetXaxis()-&gt;UnZoom();</div>
+<div class="line"><span class="lineno">  269</span> </div>
+<div class="line"><span class="lineno">  270</span>        <span class="keywordflow">if</span> (FirstTime)</div>
+<div class="line"><span class="lineno">  271</span>          blarb-&gt;SetTitle(Form(<span class="stringliteral">&quot;Auto_Corr_%s.pdf&quot;</span>, fname[ik].Data()));</div>
+<div class="line"><span class="lineno">  272</span> </div>
+<div class="line"><span class="lineno">  273</span>        blarb-&gt;SetLineStyle(kDashed);</div>
+<div class="line"><span class="lineno">  274</span> </div>
+<div class="line"><span class="lineno">  275</span>        <span class="keywordflow">if</span> (FirstTime)</div>
+<div class="line"><span class="lineno">  276</span>          blarb-&gt;Draw();</div>
+<div class="line"><span class="lineno">  277</span> </div>
+<div class="line"><span class="lineno">  278</span>        TString integral = Form(<span class="stringliteral">&quot;Integral: %.2f&quot;</span>, blarb-&gt;Integral());</div>
+<div class="line"><span class="lineno">  279</span> </div>
+<div class="line"><span class="lineno">  280</span>        <span class="keywordflow">if</span> (!FirstTime)</div>
+<div class="line"><span class="lineno">  281</span>          blarb-&gt;Draw(<span class="stringliteral">&quot;same&quot;</span>);</div>
+<div class="line"><span class="lineno">  282</span>        FirstTime = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  283</span>      }</div>
+<div class="line"><span class="lineno">  284</span>      gDirectory-&gt;cd(<span class="stringliteral">&quot;..&quot;</span>);</div>
+<div class="line"><span class="lineno">  285</span>    }</div>
+<div class="line"><span class="lineno">  286</span> </div>
+<div class="line"><span class="lineno">  287</span>    <span class="keywordflow">if</span> (Nfiles &gt; 1)</div>
+<div class="line"><span class="lineno">  288</span>    {</div>
+<div class="line"><span class="lineno">  289</span>      leg-&gt;Draw();</div>
+<div class="line"><span class="lineno">  290</span>    }</div>
+<div class="line"><span class="lineno">  291</span>    c1-&gt;Print(<span class="stringliteral">&quot;Auto_Corr_PerFile.pdf&quot;</span>, <span class="stringliteral">&quot;pdf&quot;</span>);</div>
+<div class="line"><span class="lineno">  292</span>    <span class="keyword">delete</span> leg;</div>
+<div class="line"><span class="lineno">  293</span>  }</div>
+<div class="line"><span class="lineno">  294</span>  c1-&gt;Print(<span class="stringliteral">&quot;Auto_Corr_PerFile.pdf]&quot;</span>, <span class="stringliteral">&quot;pdf&quot;</span>);</div>
+<div class="line"><span class="lineno">  295</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a4db4657acad5c79ac4bbb66a9d1c5905"><div class="ttname"><a href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a></div><div class="ttdeci">#define MACH3LOG_DEBUG</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00022">MaCh3Logger.h:22</a></div></div>
-<div class="ttc" id="aPlotMCMCDiag_8cpp_html_a81b2565c9b974c6f11088cef1c422bb3"><div class="ttname"><a href="PlotMCMCDiag_8cpp.html#a81b2565c9b974c6f11088cef1c422bb3">GetMinimumInRange</a></div><div class="ttdeci">double GetMinimumInRange(TH1D *hist, double minRange, double maxRange)</div><div class="ttdoc">KS: function which looks for minimum in given range.</div><div class="ttdef"><b>Definition:</b> <a href="PlotMCMCDiag_8cpp_source.html#l00018">PlotMCMCDiag.cpp:18</a></div></div>
+<div class="ttc" id="aPlotMCMCDiag_8cpp_html_a81b2565c9b974c6f11088cef1c422bb3"><div class="ttname"><a href="PlotMCMCDiag_8cpp.html#a81b2565c9b974c6f11088cef1c422bb3">GetMinimumInRange</a></div><div class="ttdeci">double GetMinimumInRange(TH1D *hist, double minRange, double maxRange)</div><div class="ttdoc">KS: function which looks for minimum in given range.</div><div class="ttdef"><b>Definition:</b> <a href="PlotMCMCDiag_8cpp_source.html#l00020">PlotMCMCDiag.cpp:20</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a6ef6b0394c9c46c4474553907558098a" name="a6ef6b0394c9c46c4474553907558098a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6ef6b0394c9c46c4474553907558098a">&#9670;&#160;</a></span>PlotAverageACMult()</h2>
+<a id="aaff1fd9271707426d962ec32b2690f5a" name="aaff1fd9271707426d962ec32b2690f5a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaff1fd9271707426d962ec32b2690f5a">&#9670;&#160;</a></span>PlotAverageACMult()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -924,6 +1077,12 @@ Variables</h2></td></tr>
           <td>(</td>
           <td class="paramtype">std::vector&lt; TString &gt;&#160;</td>
           <td class="paramname"><em>input_files</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; TString &gt;&#160;</td>
+          <td class="paramname"><em>hist_labels</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -945,39 +1104,32 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PlotMCMCDiag_8cpp_source.html#l00468">468</a> of file <a class="el" href="PlotMCMCDiag_8cpp_source.html">PlotMCMCDiag.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  473</span>{</div>
-<div class="line"><span class="lineno">  474</span>    <span class="comment">// Process first folder</span></div>
-<div class="line"><span class="lineno">  475</span>    std::vector&lt;std::vector&lt;TH1D *&gt;&gt; histograms;</div>
-<div class="line"><span class="lineno">  476</span>    std::vector&lt;TH1D*&gt; averages;</div>
-<div class="line"><span class="lineno">  477</span> </div>
-<div class="line"><span class="lineno">  478</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i&lt;static_cast&lt;int&gt;(input_files.size()); i++)</div>
-<div class="line"><span class="lineno">  479</span>    {</div>
-<div class="line"><span class="lineno">  480</span>        TString folder = input_files[i];</div>
-<div class="line"><span class="lineno">  481</span>        <span class="keywordflow">if</span> (folder.IsNull() || folder == <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>)</div>
-<div class="line"><span class="lineno">  482</span>        {</div>
-<div class="line"><span class="lineno">  483</span>            <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Skipping empty or dummy folder: {}&quot;</span>, folder.Data());</div>
-<div class="line"><span class="lineno">  484</span>            <span class="keywordflow">continue</span>;</div>
-<div class="line"><span class="lineno">  485</span>        }</div>
-<div class="line"><span class="lineno">  486</span> </div>
-<div class="line"><span class="lineno">  487</span>        std::vector&lt;TH1D *&gt; histograms_i;</div>
-<div class="line"><span class="lineno">  488</span>        averages.push_back((<a class="code hl_function" href="PlotMCMCDiag_8cpp.html#aeb9130d30b44773787174096b1032bec">AutocorrProcessInputs</a>(folder, histograms_i)));</div>
-<div class="line"><span class="lineno">  489</span>        histograms.push_back(histograms_i);</div>
-<div class="line"><span class="lineno">  490</span>    }</div>
-<div class="line"><span class="lineno">  491</span> </div>
-<div class="line"><span class="lineno">  492</span>    <span class="keyword">auto</span> hist_labels = input_files;</div>
-<div class="line"><span class="lineno">  493</span>    <span class="comment">// Remove the file extension from labels</span></div>
-<div class="line"><span class="lineno">  494</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;label : hist_labels)</div>
-<div class="line"><span class="lineno">  495</span>    {</div>
-<div class="line"><span class="lineno">  496</span>      label = TString(gSystem-&gt;BaseName(label.Data()));</div>
-<div class="line"><span class="lineno">  497</span>      label.ReplaceAll(<span class="stringliteral">&quot;.root&quot;</span>, <span class="stringliteral">&quot;&quot;</span>);</div>
-<div class="line"><span class="lineno">  498</span>    }</div>
-<div class="line"><span class="lineno">  499</span> </div>
-<div class="line"><span class="lineno">  500</span>    <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#ab7866641a568fb6d72fb75c131696768">CompareAverageAC</a>(histograms, averages, hist_labels, output_name, draw_min_max);<span class="comment">// draw_all, draw_errors);</span></div>
-<div class="line"><span class="lineno">  501</span> </div>
-<div class="line"><span class="lineno">  502</span>}</div>
-<div class="ttc" id="aPlotMCMCDiag_8cpp_html_ab7866641a568fb6d72fb75c131696768"><div class="ttname"><a href="PlotMCMCDiag_8cpp.html#ab7866641a568fb6d72fb75c131696768">CompareAverageAC</a></div><div class="ttdeci">void CompareAverageAC(const std::vector&lt; std::vector&lt; TH1D * &gt; &gt; &amp;histograms, const std::vector&lt; TH1D * &gt; &amp;averages, const std::vector&lt; TString &gt; &amp;hist_labels, const TString &amp;output_name, bool draw_min_max=true, bool draw_all=false, bool draw_errors=true)</div><div class="ttdef"><b>Definition:</b> <a href="PlotMCMCDiag_8cpp_source.html#l00389">PlotMCMCDiag.cpp:389</a></div></div>
-<div class="ttc" id="aPlotMCMCDiag_8cpp_html_aeb9130d30b44773787174096b1032bec"><div class="ttname"><a href="PlotMCMCDiag_8cpp.html#aeb9130d30b44773787174096b1032bec">AutocorrProcessInputs</a></div><div class="ttdeci">TH1D * AutocorrProcessInputs(const TString &amp;input_file, std::vector&lt; TH1D * &gt; &amp;histograms)</div><div class="ttdef"><b>Definition:</b> <a href="PlotMCMCDiag_8cpp_source.html#l00365">PlotMCMCDiag.cpp:365</a></div></div>
+<p class="definition">Definition at line <a class="el" href="PlotMCMCDiag_8cpp_source.html#l00560">560</a> of file <a class="el" href="PlotMCMCDiag_8cpp_source.html">PlotMCMCDiag.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  566</span>{</div>
+<div class="line"><span class="lineno">  567</span>  <span class="comment">// Process first folder</span></div>
+<div class="line"><span class="lineno">  568</span>  std::vector&lt;std::vector&lt;TH1D *&gt;&gt; histograms;</div>
+<div class="line"><span class="lineno">  569</span>  std::vector&lt;TH1D *&gt; averages;</div>
+<div class="line"><span class="lineno">  570</span> </div>
+<div class="line"><span class="lineno">  571</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; static_cast&lt;int&gt;(input_files.size()); i++)</div>
+<div class="line"><span class="lineno">  572</span>  {</div>
+<div class="line"><span class="lineno">  573</span>    TString folder = input_files[i];</div>
+<div class="line"><span class="lineno">  574</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Folder : {}&quot;</span>, folder);</div>
+<div class="line"><span class="lineno">  575</span> </div>
+<div class="line"><span class="lineno">  576</span>    <span class="keywordflow">if</span> (folder.IsNull() || folder == <a class="code hl_variable" href="PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7">DUMMYFILE</a>)</div>
+<div class="line"><span class="lineno">  577</span>    {</div>
+<div class="line"><span class="lineno">  578</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Skipping empty or dummy folder: {}&quot;</span>, folder.Data());</div>
+<div class="line"><span class="lineno">  579</span>      <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno">  580</span>    }</div>
+<div class="line"><span class="lineno">  581</span> </div>
+<div class="line"><span class="lineno">  582</span>    std::vector&lt;TH1D *&gt; histograms_i;</div>
+<div class="line"><span class="lineno">  583</span>    averages.push_back((<a class="code hl_function" href="PlotMCMCDiag_8cpp.html#aeb9130d30b44773787174096b1032bec">AutocorrProcessInputs</a>(folder, histograms_i)));</div>
+<div class="line"><span class="lineno">  584</span>    histograms.push_back(histograms_i);</div>
+<div class="line"><span class="lineno">  585</span>  }</div>
+<div class="line"><span class="lineno">  586</span> </div>
+<div class="line"><span class="lineno">  587</span>  <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#ab7866641a568fb6d72fb75c131696768">CompareAverageAC</a>(histograms, averages, hist_labels, output_name, draw_min_max); <span class="comment">// draw_all, draw_errors);</span></div>
+<div class="line"><span class="lineno">  588</span>}</div>
+<div class="ttc" id="aPlotMCMCDiag_8cpp_html_ab7866641a568fb6d72fb75c131696768"><div class="ttname"><a href="PlotMCMCDiag_8cpp.html#ab7866641a568fb6d72fb75c131696768">CompareAverageAC</a></div><div class="ttdeci">void CompareAverageAC(const std::vector&lt; std::vector&lt; TH1D * &gt; &gt; &amp;histograms, const std::vector&lt; TH1D * &gt; &amp;averages, const std::vector&lt; TString &gt; &amp;hist_labels, const TString &amp;output_name, bool draw_min_max=true, bool draw_all=false, bool draw_errors=true)</div><div class="ttdef"><b>Definition:</b> <a href="PlotMCMCDiag_8cpp_source.html#l00469">PlotMCMCDiag.cpp:469</a></div></div>
+<div class="ttc" id="aPlotMCMCDiag_8cpp_html_aeb9130d30b44773787174096b1032bec"><div class="ttname"><a href="PlotMCMCDiag_8cpp.html#aeb9130d30b44773787174096b1032bec">AutocorrProcessInputs</a></div><div class="ttdeci">TH1D * AutocorrProcessInputs(const TString &amp;input_file, std::vector&lt; TH1D * &gt; &amp;histograms)</div><div class="ttdef"><b>Definition:</b> <a href="PlotMCMCDiag_8cpp_source.html#l00445">PlotMCMCDiag.cpp:445</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1019,39 +1171,39 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PlotMCMCDiag_8cpp_source.html#l00305">305</a> of file <a class="el" href="PlotMCMCDiag_8cpp_source.html">PlotMCMCDiag.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  309</span>{</div>
-<div class="line"><span class="lineno">  310</span>    TIter next(autocor_dir-&gt;GetListOfKeys());</div>
-<div class="line"><span class="lineno">  311</span>    TKey *key;</div>
-<div class="line"><span class="lineno">  312</span> </div>
-<div class="line"><span class="lineno">  313</span>    <span class="keywordflow">while</span> ((key = <span class="keyword">dynamic_cast&lt;</span>TKey *<span class="keyword">&gt;</span>(next())))</div>
-<div class="line"><span class="lineno">  314</span>    {</div>
-<div class="line"><span class="lineno">  315</span>        TH1D *current_hist = <span class="keyword">nullptr</span>;</div>
-<div class="line"><span class="lineno">  316</span>        autocor_dir-&gt;GetObject(key-&gt;GetName(), current_hist);</div>
-<div class="line"><span class="lineno">  317</span> </div>
-<div class="line"><span class="lineno">  318</span>        <span class="keywordflow">if</span> (!current_hist ||</div>
-<div class="line"><span class="lineno">  319</span>            current_hist-&gt;GetMaximum() &lt;= 0 ||</div>
-<div class="line"><span class="lineno">  320</span>            <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#a47175dd694387a761ab3d199eabca16d">IsHistogramAllOnes</a>(current_hist))</div>
-<div class="line"><span class="lineno">  321</span>        {</div>
-<div class="line"><span class="lineno">  322</span>            <span class="keywordflow">continue</span>;</div>
-<div class="line"><span class="lineno">  323</span>        }</div>
-<div class="line"><span class="lineno">  324</span> </div>
-<div class="line"><span class="lineno">  325</span>        current_hist-&gt;SetDirectory(<span class="keyword">nullptr</span>); <span class="comment">// Detach from file</span></div>
-<div class="line"><span class="lineno">  326</span>        histograms.push_back(current_hist);</div>
-<div class="line"><span class="lineno">  327</span> </div>
-<div class="line"><span class="lineno">  328</span>        <span class="keywordflow">if</span> (!average_hist)</div>
-<div class="line"><span class="lineno">  329</span>        {</div>
-<div class="line"><span class="lineno">  330</span>            average_hist = <span class="keyword">static_cast&lt;</span>TH1D *<span class="keyword">&gt;</span>(current_hist-&gt;Clone());</div>
-<div class="line"><span class="lineno">  331</span>            average_hist-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
-<div class="line"><span class="lineno">  332</span>        }</div>
-<div class="line"><span class="lineno">  333</span>        <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">  334</span>        {</div>
-<div class="line"><span class="lineno">  335</span>            average_hist-&gt;Add(current_hist);</div>
-<div class="line"><span class="lineno">  336</span>        }</div>
-<div class="line"><span class="lineno">  337</span>        parameter_count++;</div>
-<div class="line"><span class="lineno">  338</span>    }</div>
-<div class="line"><span class="lineno">  339</span>}</div>
-<div class="ttc" id="aPlotMCMCDiag_8cpp_html_a47175dd694387a761ab3d199eabca16d"><div class="ttname"><a href="PlotMCMCDiag_8cpp.html#a47175dd694387a761ab3d199eabca16d">IsHistogramAllOnes</a></div><div class="ttdeci">bool IsHistogramAllOnes(TH1D *hist, double tolerance=0.001, int max_failures=100)</div><div class="ttdoc">HW: Check if histogram is flat within a given tolerance.</div><div class="ttdef"><b>Definition:</b> <a href="PlotMCMCDiag_8cpp_source.html#l00033">PlotMCMCDiag.cpp:33</a></div></div>
+<p class="definition">Definition at line <a class="el" href="PlotMCMCDiag_8cpp_source.html#l00386">386</a> of file <a class="el" href="PlotMCMCDiag_8cpp_source.html">PlotMCMCDiag.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  390</span>{</div>
+<div class="line"><span class="lineno">  391</span>  TIter next(autocor_dir-&gt;GetListOfKeys());</div>
+<div class="line"><span class="lineno">  392</span>  TKey *key;</div>
+<div class="line"><span class="lineno">  393</span> </div>
+<div class="line"><span class="lineno">  394</span>  <span class="keywordflow">while</span> ((key = <span class="keyword">dynamic_cast&lt;</span>TKey *<span class="keyword">&gt;</span>(next())))</div>
+<div class="line"><span class="lineno">  395</span>  {</div>
+<div class="line"><span class="lineno">  396</span>    TH1D *current_hist = <span class="keyword">nullptr</span>;</div>
+<div class="line"><span class="lineno">  397</span>    autocor_dir-&gt;GetObject(key-&gt;GetName(), current_hist);</div>
+<div class="line"><span class="lineno">  398</span> </div>
+<div class="line"><span class="lineno">  399</span>    <span class="keywordflow">if</span> (!current_hist ||</div>
+<div class="line"><span class="lineno">  400</span>        current_hist-&gt;GetMaximum() &lt;= 0 ||</div>
+<div class="line"><span class="lineno">  401</span>        <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#a47175dd694387a761ab3d199eabca16d">IsHistogramAllOnes</a>(current_hist))</div>
+<div class="line"><span class="lineno">  402</span>    {</div>
+<div class="line"><span class="lineno">  403</span>      <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno">  404</span>    }</div>
+<div class="line"><span class="lineno">  405</span> </div>
+<div class="line"><span class="lineno">  406</span>    current_hist-&gt;SetDirectory(<span class="keyword">nullptr</span>); <span class="comment">// Detach from file</span></div>
+<div class="line"><span class="lineno">  407</span>    histograms.push_back(current_hist);</div>
+<div class="line"><span class="lineno">  408</span> </div>
+<div class="line"><span class="lineno">  409</span>    <span class="keywordflow">if</span> (!average_hist)</div>
+<div class="line"><span class="lineno">  410</span>    {</div>
+<div class="line"><span class="lineno">  411</span>      average_hist = <span class="keyword">static_cast&lt;</span>TH1D *<span class="keyword">&gt;</span>(current_hist-&gt;Clone());</div>
+<div class="line"><span class="lineno">  412</span>      average_hist-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno">  413</span>    }</div>
+<div class="line"><span class="lineno">  414</span>    <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">  415</span>    {</div>
+<div class="line"><span class="lineno">  416</span>      average_hist-&gt;Add(current_hist);</div>
+<div class="line"><span class="lineno">  417</span>    }</div>
+<div class="line"><span class="lineno">  418</span>    parameter_count++;</div>
+<div class="line"><span class="lineno">  419</span>  }</div>
+<div class="line"><span class="lineno">  420</span>}</div>
+<div class="ttc" id="aPlotMCMCDiag_8cpp_html_a47175dd694387a761ab3d199eabca16d"><div class="ttname"><a href="PlotMCMCDiag_8cpp.html#a47175dd694387a761ab3d199eabca16d">IsHistogramAllOnes</a></div><div class="ttdeci">bool IsHistogramAllOnes(TH1D *hist, double tolerance=0.001, int max_failures=100)</div><div class="ttdoc">HW: Check if histogram is flat within a given tolerance.</div><div class="ttdef"><b>Definition:</b> <a href="PlotMCMCDiag_8cpp_source.html#l00037">PlotMCMCDiag.cpp:37</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1093,26 +1245,26 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PlotMCMCDiag_8cpp_source.html#l00342">342</a> of file <a class="el" href="PlotMCMCDiag_8cpp_source.html">PlotMCMCDiag.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  346</span>{</div>
-<div class="line"><span class="lineno">  347</span>    std::unique_ptr&lt;TFile&gt; input_file(TFile::Open(file_path));</div>
-<div class="line"><span class="lineno">  348</span>    <span class="keywordflow">if</span> (!input_file || input_file-&gt;IsZombie())</div>
-<div class="line"><span class="lineno">  349</span>    {</div>
-<div class="line"><span class="lineno">  350</span>        <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Could not open file: &quot;</span> + std::string(file_path.Data()));</div>
-<div class="line"><span class="lineno">  351</span>    }</div>
-<div class="line"><span class="lineno">  352</span> </div>
-<div class="line"><span class="lineno">  353</span>    TDirectoryFile *autocor_dir = <span class="keyword">nullptr</span>;</div>
-<div class="line"><span class="lineno">  354</span>    input_file-&gt;GetObject(<span class="stringliteral">&quot;Auto_corr&quot;</span>, autocor_dir);</div>
-<div class="line"><span class="lineno">  355</span> </div>
-<div class="line"><span class="lineno">  356</span>    <span class="keywordflow">if</span> (!autocor_dir)</div>
-<div class="line"><span class="lineno">  357</span>    {</div>
-<div class="line"><span class="lineno">  358</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__,</div>
-<div class="line"><span class="lineno">  359</span>            <span class="stringliteral">&quot;Auto_corr directory not found in file: &quot;</span> + std::string(file_path.Data()));</div>
-<div class="line"><span class="lineno">  360</span>    }</div>
-<div class="line"><span class="lineno">  361</span> </div>
-<div class="line"><span class="lineno">  362</span>    <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#a61d2957f82f16103c5b19a7ccd7a896d">ProcessAutoCorrelationDirectory</a>(autocor_dir, average_hist, parameter_count, histograms);</div>
-<div class="line"><span class="lineno">  363</span>}</div>
-<div class="ttc" id="aPlotMCMCDiag_8cpp_html_a61d2957f82f16103c5b19a7ccd7a896d"><div class="ttname"><a href="PlotMCMCDiag_8cpp.html#a61d2957f82f16103c5b19a7ccd7a896d">ProcessAutoCorrelationDirectory</a></div><div class="ttdeci">void ProcessAutoCorrelationDirectory(TDirectoryFile *autocor_dir, TH1D *&amp;average_hist, int &amp;parameter_count, std::vector&lt; TH1D * &gt; &amp;histograms)</div><div class="ttdef"><b>Definition:</b> <a href="PlotMCMCDiag_8cpp_source.html#l00305">PlotMCMCDiag.cpp:305</a></div></div>
+<p class="definition">Definition at line <a class="el" href="PlotMCMCDiag_8cpp_source.html#l00422">422</a> of file <a class="el" href="PlotMCMCDiag_8cpp_source.html">PlotMCMCDiag.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  426</span>{</div>
+<div class="line"><span class="lineno">  427</span>  std::unique_ptr&lt;TFile&gt; input_file(TFile::Open(file_path));</div>
+<div class="line"><span class="lineno">  428</span>  <span class="keywordflow">if</span> (!input_file || input_file-&gt;IsZombie())</div>
+<div class="line"><span class="lineno">  429</span>  {</div>
+<div class="line"><span class="lineno">  430</span>    <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Could not open file: &quot;</span> + std::string(file_path.Data()));</div>
+<div class="line"><span class="lineno">  431</span>  }</div>
+<div class="line"><span class="lineno">  432</span> </div>
+<div class="line"><span class="lineno">  433</span>  TDirectoryFile *autocor_dir = <span class="keyword">nullptr</span>;</div>
+<div class="line"><span class="lineno">  434</span>  input_file-&gt;GetObject(<span class="stringliteral">&quot;Auto_corr&quot;</span>, autocor_dir);</div>
+<div class="line"><span class="lineno">  435</span> </div>
+<div class="line"><span class="lineno">  436</span>  <span class="keywordflow">if</span> (!autocor_dir)</div>
+<div class="line"><span class="lineno">  437</span>  {</div>
+<div class="line"><span class="lineno">  438</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__,</div>
+<div class="line"><span class="lineno">  439</span>                         <span class="stringliteral">&quot;Auto_corr directory not found in file: &quot;</span> + std::string(file_path.Data()));</div>
+<div class="line"><span class="lineno">  440</span>  }</div>
+<div class="line"><span class="lineno">  441</span> </div>
+<div class="line"><span class="lineno">  442</span>  <a class="code hl_function" href="PlotMCMCDiag_8cpp.html#a61d2957f82f16103c5b19a7ccd7a896d">ProcessAutoCorrelationDirectory</a>(autocor_dir, average_hist, parameter_count, histograms);</div>
+<div class="line"><span class="lineno">  443</span>}</div>
+<div class="ttc" id="aPlotMCMCDiag_8cpp_html_a61d2957f82f16103c5b19a7ccd7a896d"><div class="ttname"><a href="PlotMCMCDiag_8cpp.html#a61d2957f82f16103c5b19a7ccd7a896d">ProcessAutoCorrelationDirectory</a></div><div class="ttdeci">void ProcessAutoCorrelationDirectory(TDirectoryFile *autocor_dir, TH1D *&amp;average_hist, int &amp;parameter_count, std::vector&lt; TH1D * &gt; &amp;histograms)</div><div class="ttdef"><b>Definition:</b> <a href="PlotMCMCDiag_8cpp_source.html#l00386">PlotMCMCDiag.cpp:386</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1124,12 +1276,28 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">TString DUMMYFILE = &quot;KillMePlease&quot;</td>
+          <td class="memname">TString DUMMYFILE = &quot;DummyFile&quot;</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PlotMCMCDiag_8cpp_source.html#l00013">13</a> of file <a class="el" href="PlotMCMCDiag_8cpp_source.html">PlotMCMCDiag.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PlotMCMCDiag_8cpp_source.html#l00014">14</a> of file <a class="el" href="PlotMCMCDiag_8cpp_source.html">PlotMCMCDiag.cpp</a>.</p>
+
+</div>
+</div>
+<a id="aaaaec9d37a764e090607e8f68428a8ed" name="aaaaec9d37a764e090607e8f68428a8ed"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaaaec9d37a764e090607e8f68428a8ed">&#9670;&#160;</a></span>DUMMYNAME</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TString DUMMYNAME = &quot;DummyName&quot;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="PlotMCMCDiag_8cpp_source.html#l00015">15</a> of file <a class="el" href="PlotMCMCDiag_8cpp_source.html">PlotMCMCDiag.cpp</a>.</p>
 
 </div>
 </div>

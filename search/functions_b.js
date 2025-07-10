@@ -29,7 +29,7 @@ var searchData=
   ['makellhscancomparisons_26',['makeLLHScanComparisons',['../PlotLLH_8cpp.html#a6af28572d705a78ad83764fcd64bf9a3',1,'PlotLLH.cpp']]],
   ['makenddetplots_27',['MakeNDDetPlots',['../GetPostfitParamPlots_8cpp.html#a537db5b05ce6037e9221b2250d91c688',1,'GetPostfitParamPlots.cpp']]],
   ['makeoutputfile_28',['MakeOutputFile',['../classMCMCProcessor.html#aa5a7761e97cf2e24c7d877a5374b7333',1,'MCMCProcessor']]],
-  ['makeplot_29',['MakePlot',['../PlotMCMCDiag_8cpp.html#a70a8847717dd98bb61d4be6af69dbe03',1,'PlotMCMCDiag.cpp']]],
+  ['makeplot_29',['MakePlot',['../PlotMCMCDiag_8cpp.html#a90c4608d3da0a7c10a29902f966ba2d9',1,'PlotMCMCDiag.cpp']]],
   ['makepolyhist_30',['MakePolyHist',['../HistogramUtils_8cpp.html#a9372bd8295f0ce1759ebf5a35106f4af',1,'MakePolyHist(const std::string &amp;name, const std::vector&lt; double &gt; &amp;BinArray_x, const std::vector&lt; double &gt; &amp;BinArray_y):&#160;HistogramUtils.cpp'],['../HistogramUtils_8h.html#a9372bd8295f0ce1759ebf5a35106f4af',1,'MakePolyHist(const std::string &amp;name, const std::vector&lt; double &gt; &amp;BinArray_x, const std::vector&lt; double &gt; &amp;BinArray_y):&#160;HistogramUtils.cpp']]],
   ['makeposdef_31',['MakePosDef',['../classParameterHandlerBase.html#ae5587a730fd27f38d7838b7c1dca0136',1,'ParameterHandlerBase']]],
   ['makepostfit_32',['MakePostfit',['../classMCMCProcessor.html#a8667510132aa01395520f028287f511b',1,'MCMCProcessor']]],

@@ -48,6 +48,7 @@ var searchData=
   ['draws_45',['Draws',['../RHat__HighMem_8cpp.html#a9adc829d645affbb93eff1775ab7c0c6',1,'RHat_HighMem.cpp']]],
   ['drawsfolded_46',['DrawsFolded',['../RHat__HighMem_8cpp.html#a7e7fe290fda4362be54b8cf5d56fea51',1,'RHat_HighMem.cpp']]],
   ['dummyfile_47',['DUMMYFILE',['../PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7',1,'PlotMCMCDiag.cpp']]],
-  ['dump_48',['Dump',['../structMaCh3Plotting_1_1InputFile.html#a0897b76fdbfc674ed94da1d2b4adb0a2',1,'MaCh3Plotting::InputFile']]],
-  ['dumpmatrixtofile_49',['DumpMatrixToFile',['../classParameterHandlerGeneric.html#aad70f9b7c4c574c09a056693e3ecc0e0',1,'ParameterHandlerGeneric']]]
+  ['dummyname_48',['DUMMYNAME',['../PlotMCMCDiag_8cpp.html#aaaaec9d37a764e090607e8f68428a8ed',1,'PlotMCMCDiag.cpp']]],
+  ['dump_49',['Dump',['../structMaCh3Plotting_1_1InputFile.html#a0897b76fdbfc674ed94da1d2b4adb0a2',1,'MaCh3Plotting::InputFile']]],
+  ['dumpmatrixtofile_50',['DumpMatrixToFile',['../classParameterHandlerGeneric.html#aad70f9b7c4c574c09a056693e3ecc0e0',1,'ParameterHandlerGeneric']]]
 ];

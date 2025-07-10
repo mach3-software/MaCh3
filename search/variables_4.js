@@ -34,5 +34,6 @@ var searchData=
   ['drawrange_31',['DrawRange',['../classMCMCProcessor.html#a4abe633b264acd9b0459c7b8ccd8b9df',1,'MCMCProcessor']]],
   ['draws_32',['Draws',['../RHat__HighMem_8cpp.html#a9adc829d645affbb93eff1775ab7c0c6',1,'RHat_HighMem.cpp']]],
   ['drawsfolded_33',['DrawsFolded',['../RHat__HighMem_8cpp.html#a7e7fe290fda4362be54b8cf5d56fea51',1,'RHat_HighMem.cpp']]],
-  ['dummyfile_34',['DUMMYFILE',['../PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7',1,'PlotMCMCDiag.cpp']]]
+  ['dummyfile_34',['DUMMYFILE',['../PlotMCMCDiag_8cpp.html#aff052b2c086f67396715402e80de5fd7',1,'PlotMCMCDiag.cpp']]],
+  ['dummyname_35',['DUMMYNAME',['../PlotMCMCDiag_8cpp.html#aaaaec9d37a764e090607e8f68428a8ed',1,'PlotMCMCDiag.cpp']]]
 ];
