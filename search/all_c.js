@@ -40,7 +40,7 @@ var searchData=
   ['makecovariance_37',['MakeCovariance',['../classMCMCProcessor.html#afc94f21ffd599b1e2dd7e62f24f6c4de',1,'MCMCProcessor']]],
   ['makecovariance_5fmp_38',['MakeCovariance_MP',['../classMCMCProcessor.html#ab367cb5f56606338bb1fce780f2414e8',1,'MCMCProcessor']]],
   ['makecredibleintervals_39',['MakeCredibleIntervals',['../classMCMCProcessor.html#a17c0f09bfce82d1701a83645f748988a',1,'MCMCProcessor']]],
-  ['makecredibleregions_40',['MakeCredibleRegions',['../classMCMCProcessor.html#a304adbe4407166ec42d76329c4bd17ff',1,'MCMCProcessor']]],
+  ['makecredibleregions_40',['MakeCredibleRegions',['../classMCMCProcessor.html#a570d38cc55c2d75e3313c0e621f0ecab',1,'MCMCProcessor']]],
   ['makecuteventrate_41',['MakeCutEventRate',['../classSampleSummary.html#a0e21a2b9fd429261e378f4e505ba2f75',1,'SampleSummary']]],
   ['makecutllh_42',['MakeCutLLH',['../classSampleSummary.html#ab28f4325f8104ab783fa3094a2fbbc44',1,'SampleSummary']]],
   ['makecutllh1d_43',['MakeCutLLH1D',['../classSampleSummary.html#abf964a8fd459fff903faaea17a98f8b1',1,'SampleSummary']]],
