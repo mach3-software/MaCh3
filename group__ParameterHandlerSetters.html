@@ -203,23 +203,23 @@ Functions</h2></td></tr>
 
 <p>set branches for output file </p>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8cpp_source.html#l00279">279</a> of file <a class="el" href="PCAHandler_8cpp_source.html">PCAHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  279</span>                                                                                              {</div>
-<div class="line"><span class="lineno">  280</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  281</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classPCAHandler.html#a5f08019f3db758953464fb1d0db71ea0">NumParPCA</a>; ++i) {</div>
-<div class="line"><span class="lineno">  282</span>    tree.Branch(Form(<span class="stringliteral">&quot;%s_PCA&quot;</span>, Names[i].c_str()), &amp;<a class="code hl_variable" href="classPCAHandler.html#af1cd7c1c4471d99395efe53610a5357a">_fParCurrPCA</a>.GetMatrixArray()[i], Form(<span class="stringliteral">&quot;%s_PCA/D&quot;</span>, Names[i].c_str()));</div>
-<div class="line"><span class="lineno">  283</span>  }</div>
-<div class="line"><span class="lineno">  284</span> </div>
-<div class="line"><span class="lineno">  285</span>  <span class="keywordflow">if</span>(SaveProposal)</div>
-<div class="line"><span class="lineno">  286</span>  {</div>
-<div class="line"><span class="lineno">  287</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classPCAHandler.html#a5f08019f3db758953464fb1d0db71ea0">NumParPCA</a>; ++i) {</div>
-<div class="line"><span class="lineno">  288</span>      tree.Branch(Form(<span class="stringliteral">&quot;%s_PCA_Prop&quot;</span>, Names[i].c_str()), &amp;<a class="code hl_variable" href="classPCAHandler.html#a407f24e3c76f3651a5f20cc2cab274f8">_fParPropPCA</a>.GetMatrixArray()[i], Form(<span class="stringliteral">&quot;%s_PCA_Prop/D&quot;</span>, Names[i].c_str()));</div>
-<div class="line"><span class="lineno">  289</span>    }</div>
-<div class="line"><span class="lineno">  290</span>  }</div>
-<div class="line"><span class="lineno">  291</span>}</div>
-<div class="ttc" id="aclassPCAHandler_html_a407f24e3c76f3651a5f20cc2cab274f8"><div class="ttname"><a href="classPCAHandler.html#a407f24e3c76f3651a5f20cc2cab274f8">PCAHandler::_fParPropPCA</a></div><div class="ttdeci">TVectorD _fParPropPCA</div><div class="ttdoc">CW: Current parameter value in PCA base.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00202">PCAHandler.h:202</a></div></div>
-<div class="ttc" id="aclassPCAHandler_html_a5f08019f3db758953464fb1d0db71ea0"><div class="ttname"><a href="classPCAHandler.html#a5f08019f3db758953464fb1d0db71ea0">PCAHandler::NumParPCA</a></div><div class="ttdeci">int NumParPCA</div><div class="ttdoc">Number of parameters in PCA base.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00210">PCAHandler.h:210</a></div></div>
-<div class="ttc" id="aclassPCAHandler_html_af1cd7c1c4471d99395efe53610a5357a"><div class="ttname"><a href="classPCAHandler.html#af1cd7c1c4471d99395efe53610a5357a">PCAHandler::_fParCurrPCA</a></div><div class="ttdeci">TVectorD _fParCurrPCA</div><div class="ttdoc">CW: Proposed parameter value in PCA base.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00204">PCAHandler.h:204</a></div></div>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8cpp_source.html#l00312">312</a> of file <a class="el" href="PCAHandler_8cpp_source.html">PCAHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  312</span>                                                                                              {</div>
+<div class="line"><span class="lineno">  313</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  314</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classPCAHandler.html#a5f08019f3db758953464fb1d0db71ea0">NumParPCA</a>; ++i) {</div>
+<div class="line"><span class="lineno">  315</span>    tree.Branch(Form(<span class="stringliteral">&quot;%s_PCA&quot;</span>, Names[i].c_str()), &amp;<a class="code hl_variable" href="classPCAHandler.html#af1cd7c1c4471d99395efe53610a5357a">_fParCurrPCA</a>.GetMatrixArray()[i], Form(<span class="stringliteral">&quot;%s_PCA/D&quot;</span>, Names[i].c_str()));</div>
+<div class="line"><span class="lineno">  316</span>  }</div>
+<div class="line"><span class="lineno">  317</span> </div>
+<div class="line"><span class="lineno">  318</span>  <span class="keywordflow">if</span>(SaveProposal)</div>
+<div class="line"><span class="lineno">  319</span>  {</div>
+<div class="line"><span class="lineno">  320</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classPCAHandler.html#a5f08019f3db758953464fb1d0db71ea0">NumParPCA</a>; ++i) {</div>
+<div class="line"><span class="lineno">  321</span>      tree.Branch(Form(<span class="stringliteral">&quot;%s_PCA_Prop&quot;</span>, Names[i].c_str()), &amp;<a class="code hl_variable" href="classPCAHandler.html#a407f24e3c76f3651a5f20cc2cab274f8">_fParPropPCA</a>.GetMatrixArray()[i], Form(<span class="stringliteral">&quot;%s_PCA_Prop/D&quot;</span>, Names[i].c_str()));</div>
+<div class="line"><span class="lineno">  322</span>    }</div>
+<div class="line"><span class="lineno">  323</span>  }</div>
+<div class="line"><span class="lineno">  324</span>}</div>
+<div class="ttc" id="aclassPCAHandler_html_a407f24e3c76f3651a5f20cc2cab274f8"><div class="ttname"><a href="classPCAHandler.html#a407f24e3c76f3651a5f20cc2cab274f8">PCAHandler::_fParPropPCA</a></div><div class="ttdeci">TVectorD _fParPropPCA</div><div class="ttdoc">CW: Current parameter value in PCA base.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00205">PCAHandler.h:205</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_a5f08019f3db758953464fb1d0db71ea0"><div class="ttname"><a href="classPCAHandler.html#a5f08019f3db758953464fb1d0db71ea0">PCAHandler::NumParPCA</a></div><div class="ttdeci">int NumParPCA</div><div class="ttdoc">Number of parameters in PCA base.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00213">PCAHandler.h:213</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_af1cd7c1c4471d99395efe53610a5357a"><div class="ttname"><a href="classPCAHandler.html#af1cd7c1c4471d99395efe53610a5357a">PCAHandler::_fParCurrPCA</a></div><div class="ttdeci">TVectorD _fParCurrPCA</div><div class="ttdoc">CW: Proposed parameter value in PCA base.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00207">PCAHandler.h:207</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -824,7 +824,7 @@ Functions</h2></td></tr>
 <div class="line"><span class="lineno">  110</span>    <span class="comment">//KS: Transfer to normal base</span></div>
 <div class="line"><span class="lineno">  111</span>    <a class="code hl_function" href="classPCAHandler.html#a93e5548b530c1cc6158e62f497ca3c59">TransferToParam</a>();</div>
 <div class="line"><span class="lineno">  112</span>  }</div>
-<div class="ttc" id="aclassPCAHandler_html_a93e5548b530c1cc6158e62f497ca3c59"><div class="ttname"><a href="classPCAHandler.html#a93e5548b530c1cc6158e62f497ca3c59">PCAHandler::TransferToParam</a></div><div class="ttdeci">void TransferToParam()</div><div class="ttdoc">Transfer param values from PCA base to normal base.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8cpp_source.html#l00231">PCAHandler.cpp:231</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_a93e5548b530c1cc6158e62f497ca3c59"><div class="ttname"><a href="classPCAHandler.html#a93e5548b530c1cc6158e62f497ca3c59">PCAHandler::TransferToParam</a></div><div class="ttdeci">void TransferToParam()</div><div class="ttdoc">Transfer param values from PCA base to normal base.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8cpp_source.html#l00264">PCAHandler.cpp:264</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1360,14 +1360,14 @@ Functions</h2></td></tr>
 
 <p>fix parameters at prior values </p>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8cpp_source.html#l00294">294</a> of file <a class="el" href="PCAHandler_8cpp_source.html">PCAHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  294</span>                                        {</div>
-<div class="line"><span class="lineno">  295</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  296</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classPCAHandler.html#a5f08019f3db758953464fb1d0db71ea0">NumParPCA</a>; i++) {</div>
-<div class="line"><span class="lineno">  297</span>    <a class="code hl_variable" href="classPCAHandler.html#aa9b859239b5e5c8e2bd35ad2118bf2dc">_fErrorPCA</a>[i] *= -1.0;</div>
-<div class="line"><span class="lineno">  298</span>  }</div>
-<div class="line"><span class="lineno">  299</span>}</div>
-<div class="ttc" id="aclassPCAHandler_html_aa9b859239b5e5c8e2bd35ad2118bf2dc"><div class="ttname"><a href="classPCAHandler.html#aa9b859239b5e5c8e2bd35ad2118bf2dc">PCAHandler::_fErrorPCA</a></div><div class="ttdeci">std::vector&lt; double &gt; _fErrorPCA</div><div class="ttdoc">Tells if parameter is fixed in PCA base or not.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00206">PCAHandler.h:206</a></div></div>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8cpp_source.html#l00327">327</a> of file <a class="el" href="PCAHandler_8cpp_source.html">PCAHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  327</span>                                        {</div>
+<div class="line"><span class="lineno">  328</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  329</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classPCAHandler.html#a5f08019f3db758953464fb1d0db71ea0">NumParPCA</a>; i++) {</div>
+<div class="line"><span class="lineno">  330</span>    <a class="code hl_variable" href="classPCAHandler.html#aa9b859239b5e5c8e2bd35ad2118bf2dc">_fErrorPCA</a>[i] *= -1.0;</div>
+<div class="line"><span class="lineno">  331</span>  }</div>
+<div class="line"><span class="lineno">  332</span>}</div>
+<div class="ttc" id="aclassPCAHandler_html_aa9b859239b5e5c8e2bd35ad2118bf2dc"><div class="ttname"><a href="classPCAHandler.html#aa9b859239b5e5c8e2bd35ad2118bf2dc">PCAHandler::_fErrorPCA</a></div><div class="ttdeci">std::vector&lt; double &gt; _fErrorPCA</div><div class="ttdoc">Tells if parameter is fixed in PCA base or not.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00209">PCAHandler.h:209</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1399,23 +1399,23 @@ Functions</h2></td></tr>
 
 <p>fix parameters at prior values </p>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8cpp_source.html#l00302">302</a> of file <a class="el" href="PCAHandler_8cpp_source.html">PCAHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  302</span>                                                                                  {</div>
-<div class="line"><span class="lineno">  303</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno">  304</span>  <span class="keywordtype">int</span> isDecom = -1;</div>
-<div class="line"><span class="lineno">  305</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> im = 0; im &lt; <a class="code hl_variable" href="classPCAHandler.html#a5f08019f3db758953464fb1d0db71ea0">NumParPCA</a>; ++im) {</div>
-<div class="line"><span class="lineno">  306</span>    <span class="keywordflow">if</span>(<a class="code hl_variable" href="classPCAHandler.html#a10fecf91a038d034f55a08332dec0f4a">isDecomposedPCA</a>[im] == i) {isDecom = im;}</div>
-<div class="line"><span class="lineno">  307</span>  }</div>
-<div class="line"><span class="lineno">  308</span>  <span class="keywordflow">if</span>(isDecom &lt; 0) {</div>
-<div class="line"><span class="lineno">  309</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Parameter {} is PCA decomposed can&#39;t fix this&quot;</span>, Names[i]);</div>
-<div class="line"><span class="lineno">  310</span>    <span class="comment">//throw MaCh3Exception(__FILE__ , __LINE__ );</span></div>
-<div class="line"><span class="lineno">  311</span>  } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  312</span>    <a class="code hl_variable" href="classPCAHandler.html#aa9b859239b5e5c8e2bd35ad2118bf2dc">_fErrorPCA</a>[isDecom] *= -1.0;</div>
-<div class="line"><span class="lineno">  313</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Setting un-decomposed {}(parameter {}/{} in PCA base) to fixed at {}&quot;</span>, Names[i], i, isDecom, (*<a class="code hl_variable" href="classPCAHandler.html#a6bea0a66f8f09ec08ee398a377a1f437">_pCurrVal</a>)[i]);</div>
-<div class="line"><span class="lineno">  314</span>  }</div>
-<div class="line"><span class="lineno">  315</span>}</div>
-<div class="ttc" id="aclassPCAHandler_html_a10fecf91a038d034f55a08332dec0f4a"><div class="ttname"><a href="classPCAHandler.html#a10fecf91a038d034f55a08332dec0f4a">PCAHandler::isDecomposedPCA</a></div><div class="ttdeci">std::vector&lt; int &gt; isDecomposedPCA</div><div class="ttdoc">If param is decomposed this will return -1, if not this will return enumerator to param in normal bas...</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00208">PCAHandler.h:208</a></div></div>
-<div class="ttc" id="aclassPCAHandler_html_a6bea0a66f8f09ec08ee398a377a1f437"><div class="ttname"><a href="classPCAHandler.html#a6bea0a66f8f09ec08ee398a377a1f437">PCAHandler::_pCurrVal</a></div><div class="ttdeci">std::vector&lt; double &gt; * _pCurrVal</div><div class="ttdoc">Pointer to current value of the parameter.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00233">PCAHandler.h:233</a></div></div>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8cpp_source.html#l00335">335</a> of file <a class="el" href="PCAHandler_8cpp_source.html">PCAHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  335</span>                                                                                  {</div>
+<div class="line"><span class="lineno">  336</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno">  337</span>  <span class="keywordtype">int</span> isDecom = -1;</div>
+<div class="line"><span class="lineno">  338</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> im = 0; im &lt; <a class="code hl_variable" href="classPCAHandler.html#a5f08019f3db758953464fb1d0db71ea0">NumParPCA</a>; ++im) {</div>
+<div class="line"><span class="lineno">  339</span>    <span class="keywordflow">if</span>(<a class="code hl_variable" href="classPCAHandler.html#a10fecf91a038d034f55a08332dec0f4a">isDecomposedPCA</a>[im] == i) {isDecom = im;}</div>
+<div class="line"><span class="lineno">  340</span>  }</div>
+<div class="line"><span class="lineno">  341</span>  <span class="keywordflow">if</span>(isDecom &lt; 0) {</div>
+<div class="line"><span class="lineno">  342</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Parameter {} is PCA decomposed can&#39;t fix this&quot;</span>, Names[i]);</div>
+<div class="line"><span class="lineno">  343</span>    <span class="comment">//throw MaCh3Exception(__FILE__ , __LINE__ );</span></div>
+<div class="line"><span class="lineno">  344</span>  } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  345</span>    <a class="code hl_variable" href="classPCAHandler.html#aa9b859239b5e5c8e2bd35ad2118bf2dc">_fErrorPCA</a>[isDecom] *= -1.0;</div>
+<div class="line"><span class="lineno">  346</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Setting un-decomposed {}(parameter {}/{} in PCA base) to fixed at {}&quot;</span>, Names[i], i, isDecom, (*<a class="code hl_variable" href="classPCAHandler.html#a6bea0a66f8f09ec08ee398a377a1f437">_pCurrVal</a>)[i]);</div>
+<div class="line"><span class="lineno">  347</span>  }</div>
+<div class="line"><span class="lineno">  348</span>}</div>
+<div class="ttc" id="aclassPCAHandler_html_a10fecf91a038d034f55a08332dec0f4a"><div class="ttname"><a href="classPCAHandler.html#a10fecf91a038d034f55a08332dec0f4a">PCAHandler::isDecomposedPCA</a></div><div class="ttdeci">std::vector&lt; int &gt; isDecomposedPCA</div><div class="ttdoc">If param is decomposed this will return -1, if not this will return enumerator to param in normal bas...</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00211">PCAHandler.h:211</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_a6bea0a66f8f09ec08ee398a377a1f437"><div class="ttname"><a href="classPCAHandler.html#a6bea0a66f8f09ec08ee398a377a1f437">PCAHandler::_pCurrVal</a></div><div class="ttdeci">std::vector&lt; double &gt; * _pCurrVal</div><div class="ttdoc">Pointer to current value of the parameter.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00236">PCAHandler.h:236</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
