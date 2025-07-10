@@ -1,12 +1,12 @@
 #To run use:  docker build -t mach3 .
 # KS: Get glorious container from Kamil which will work as a base
-FROM kamilskwarczynski/nukamil:rocky9intellatest AS mach3_build
+FROM kamilskwarczynski/nukamil:alma9intellatest AS mach3_build
 
 # Add a label for the author
 LABEL maintainer="The MaCh3 Collaboration"
 LABEL website="https://mach3-software.github.io/MaCh3/"
-LABEL compiler="icpx 2024.2.1"
-LABEL root_version="v6.36.04"
+LABEL compiler="icpx 2025.2.1"
+LABEL root_version="v6.26.04"
 LABEL org.opencontainers.image.description="Official MaCh3 container"
 
 # Declare the build argument
@@ -35,8 +35,8 @@ RUN git checkout ${MACH3_VERSION}
 
 RUN mkdir -p ${MACH3_INSTALL_DIR}
 WORKDIR ${MACH3_INSTALL_DIR}
-RUN cmake ${CMAKE_OPTIONS} ${MACH3_WORK_DIR}
-RUN make ${INSTALL_OPTIONS} && make install
+RUN source ${ONEAPI_ROOT}/setvars.sh && cmake ${CMAKE_OPTIONS} ${MACH3_WORK_DIR}
+RUN source ${ONEAPI_ROOT}/setvars.sh && make ${INSTALL_OPTIONS} && make install
 
 # KS: Need to set them here, otherwise container using this container will not be able to find MaCh3
 ENV MaCh3_ROOT=${MACH3_INSTALL_DIR}
