@@ -325,7 +325,7 @@ Functions</h2></td></tr>
 <p class="definition">Definition at line <a class="el" href="Monitor_8cpp_source.html#l00142">142</a> of file <a class="el" href="Monitor_8cpp_source.html">Monitor.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  142</span>                 {</div>
 <div class="line"><span class="lineno">  143</span><span class="comment">// ************************</span></div>
-<div class="line"><span class="lineno">  144</span><span class="preprocessor">#ifdef CUDA</span></div>
+<div class="line"><span class="lineno">  144</span><span class="preprocessor">#ifdef MaCh3_CUDA</span></div>
 <div class="line"><span class="lineno">  145</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Using following GPU:&quot;</span>);</div>
 <div class="line"><span class="lineno">  146</span>  <span class="comment">// Print GPU name</span></div>
 <div class="line"><span class="lineno">  147</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;GPU Name: {}&quot;</span>, <a class="code hl_function" href="namespaceMaCh3Utils.html#a10a037c1bcf48073ae105968128a55c5">TerminalToString</a>(<span class="stringliteral">&quot;nvidia-smi --query-gpu=name --format=csv,noheader&quot;</span>));</div>
@@ -554,7 +554,7 @@ Functions</h2></td></tr>
 <p>This function fetches system information like RAM usage or other hardware details based on the specified type. </p>
 
 <p class="definition">Definition at line <a class="el" href="Monitor_8cpp_source.html#l00235">235</a> of file <a class="el" href="Monitor_8cpp_source.html">Monitor.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  235</span>                                   { <span class="comment">//Note: this value is in KB!</span></div>
+<div class="fragment"><div class="line"><span class="lineno">  235</span>                                    { <span class="comment">//Note: this value is in KB!</span></div>
 <div class="line"><span class="lineno">  236</span><span class="comment">// ***************************************************************************</span></div>
 <div class="line"><span class="lineno">  237</span>  std::ifstream file(<span class="stringliteral">&quot;/proc/self/status&quot;</span>);</div>
 <div class="line"><span class="lineno">  238</span>  <span class="keywordtype">int</span> result = -1;</div>
@@ -641,7 +641,7 @@ Functions</h2></td></tr>
 <p>This function prints a simple usage guide for MaCh3 executables, typically called when incorrect arguments are passed. </p>
 
 <p class="definition">Definition at line <a class="el" href="Monitor_8cpp_source.html#l00309">309</a> of file <a class="el" href="Monitor_8cpp_source.html">Monitor.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  309</span>                                      {</div>
+<div class="fragment"><div class="line"><span class="lineno">  309</span>                                       {</div>
 <div class="line"><span class="lineno">  310</span><span class="comment">// ***************************************************************************</span></div>
 <div class="line"><span class="lineno">  311</span>  <span class="keywordflow">if</span> (argc != 2) {</div>
 <div class="line"><span class="lineno">  312</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Wrong usage of MaCh3 executable!&quot;</span>);</div>
@@ -921,7 +921,7 @@ Functions</h2></td></tr>
 <p>This function prints a progress bar to the terminal, indicating the percentage of tasks completed. </p>
 
 <p class="definition">Definition at line <a class="el" href="Monitor_8cpp_source.html#l00212">212</a> of file <a class="el" href="Monitor_8cpp_source.html">Monitor.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  212</span>                                                              {</div>
+<div class="fragment"><div class="line"><span class="lineno">  212</span>                                                               {</div>
 <div class="line"><span class="lineno">  213</span><span class="comment">// ************************</span></div>
 <div class="line"><span class="lineno">  214</span>  <span class="keywordtype">double</span> progress = double(Done)/double(All);</div>
 <div class="line"><span class="lineno">  215</span>  <span class="keyword">const</span> <span class="keywordtype">int</span> barWidth = 20;</div>

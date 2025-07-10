@@ -88,7 +88,7 @@ $(function() {
 <div class="contents">
 <a href="SplineMonolith_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#include &quot;<a class="code" href="SplineMonolith_8h.html">SplineMonolith.h</a>&quot;</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#ifdef CUDA</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#ifdef MaCh3_CUDA</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;<a class="code" href="gpuSplineUtils_8cuh.html">Splines/gpuSplineUtils.cuh</a>&quot;</span></div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
@@ -99,7 +99,7 @@ $(function() {
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="comment">//Set everything to NULL or 0</span></div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno"><a class="line" href="classSMonolith.html#a45cece9dcbe699e00a7b5fdff4806c1e">   12</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classSMonolith.html#a45cece9dcbe699e00a7b5fdff4806c1e">SMonolith::Initialise</a>() {</div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment">// *****************************************</span></div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#ifdef CUDA</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#ifdef MaCh3_CUDA</span></div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Using GPU version event by event monolith&quot;</span>);</div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>  <a class="code hl_variable" href="classSMonolith.html#a03444cbed8a9d9a7798d0ef2b26bd702">gpu_spline_handler</a> = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="preprocessor">#endif</span></div>
@@ -166,7 +166,7 @@ $(function() {
 <div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>  <span class="comment">// Can pass the spline segments to the GPU instead of the values</span></div>
 <div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>  <span class="comment">// Make these here and only refill them for each loop, avoiding unnecessary new/delete on each reconfigure</span></div>
 <div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>  <span class="comment">//KS: Since we are going to copy it each step use fancy CUDA memory allocation</span></div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span><span class="preprocessor">  #ifdef CUDA</span></div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span><span class="preprocessor">  #ifdef MaCh3_CUDA</span></div>
 <div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>  <a class="code hl_variable" href="classSMonolith.html#a03444cbed8a9d9a7798d0ef2b26bd702">gpu_spline_handler</a>-&gt;<a class="code hl_function" href="classSMonolithGPU.html#ab674ec40c136d89b56b7c25d9337c48a">InitGPU_Segments</a>(&amp;<a class="code hl_variable" href="classSplineBase.html#a938e3a60326137037f868b9930e2a972">SplineSegments</a>);</div>
 <div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>  <a class="code hl_variable" href="classSMonolith.html#a03444cbed8a9d9a7798d0ef2b26bd702">gpu_spline_handler</a>-&gt;<a class="code hl_function" href="classSMonolithGPU.html#a3fbbb94f6db65b73a394ab541f94fba6">InitGPU_Vals</a>(&amp;<a class="code hl_variable" href="classSplineBase.html#aa0b1d3a1adf7cffa7e74581bc7d58d4c">ParamValues</a>);</div>
 <div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span><span class="preprocessor">  #else</span></div>
@@ -372,7 +372,7 @@ $(function() {
 <div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span>  <a class="code hl_variable" href="classSMonolith.html#a4a1d45d273cc40cb4f684400812dcb60">cpu_weights_tf1_var</a> = <span class="keyword">new</span> <span class="keywordtype">float</span>[<a class="code hl_variable" href="classSMonolith.html#a13699796db31517edba3a8009317f779">NTF1_valid</a>]();</div>
 <div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span><span class="preprocessor">  #else</span></div>
 <div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span>    <span class="comment">//KS: This is tricky as this variable use both by CPU and GPU, however if use CUDA we use cudaMallocHost</span></div>
-<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span><span class="preprocessor">    #ifndef CUDA</span></div>
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span><span class="preprocessor">    #ifndef MaCh3_CUDA</span></div>
 <div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span>    <a class="code hl_variable" href="classSMonolith.html#ab572dd7e0a46caf44eb925a89cbfb0cf">cpu_total_weights</a> = <span class="keyword">new</span> <span class="keywordtype">float</span>[<a class="code hl_variable" href="classSMonolith.html#ac86282b04659bae5cccb6073c9edc0a5">NEvents</a>]();</div>
 <div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span>    <a class="code hl_variable" href="classSMonolith.html#a870bb2bce61e17162b9425f82cf2a099">cpu_weights_spline_var</a> = <span class="keyword">new</span> <span class="keywordtype">float</span>[<a class="code hl_variable" href="classSMonolith.html#ab72795333d6f632565b0f7eb0ca8a658">NSplines_valid</a>]();</div>
 <div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span>    <a class="code hl_variable" href="classSMonolith.html#a4a1d45d273cc40cb4f684400812dcb60">cpu_weights_tf1_var</a> = <span class="keyword">new</span> <span class="keywordtype">float</span>[<a class="code hl_variable" href="classSMonolith.html#a13699796db31517edba3a8009317f779">NTF1_valid</a>]();</div>
@@ -391,7 +391,7 @@ $(function() {
 <div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span><span class="comment">// The shared initialiser from constructors of TSpline3 and TSpline3_red</span></div>
 <div class="line"><a id="l00304" name="l00304"></a><span class="lineno"><a class="line" href="classSMonolith.html#aac73a1089592c5f22755b7427869827f">  304</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classSMonolith.html#aac73a1089592c5f22755b7427869827f">SMonolith::MoveToGPU</a>() {</div>
 <div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span><span class="comment">// *****************************************</span></div>
-<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span><span class="preprocessor">  #ifdef CUDA</span></div>
+<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span><span class="preprocessor">  #ifdef MaCh3_CUDA</span></div>
 <div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> event_size_max = <a class="code hl_variable" href="classSMonolith.html#af54ea9c613ef95b36dcf9c194dd38e85">_max_knots</a> * <a class="code hl_variable" href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">nParams</a>;</div>
 <div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Total size = {:.2f} MB memory on CPU to move to GPU&quot;</span>,</div>
 <div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span>                (<span class="keywordtype">double</span>(<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>) * <a class="code hl_variable" href="classSMonolith.html#afc0e3d1eafd575cf7628319a66925d5b">nKnots</a> * <a class="code hl_define" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>) + <span class="keywordtype">double</span>(<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>) * event_size_max) / 1.E6 +</div>
@@ -643,7 +643,7 @@ $(function() {
 <div class="line"><a id="l00555" name="l00555"></a><span class="lineno">  555</span>  <a class="code hl_variable" href="classSMonolith.html#a403e7cf909f98d4c59b5f6c7ff8aac5b">nTF1coeff</a> = nTF1coeff_temp;</div>
 <div class="line"><a id="l00556" name="l00556"></a><span class="lineno">  556</span> </div>
 <div class="line"><a id="l00557" name="l00557"></a><span class="lineno">  557</span>  <span class="comment">//KS: Since we are going to copy it each step use fancy CUDA memory allocation</span></div>
-<div class="line"><a id="l00558" name="l00558"></a><span class="lineno">  558</span><span class="preprocessor">#ifdef CUDA</span></div>
+<div class="line"><a id="l00558" name="l00558"></a><span class="lineno">  558</span><span class="preprocessor">#ifdef MaCh3_CUDA</span></div>
 <div class="line"><a id="l00559" name="l00559"></a><span class="lineno">  559</span>  <a class="code hl_variable" href="classSMonolith.html#a03444cbed8a9d9a7798d0ef2b26bd702">gpu_spline_handler</a>-&gt;<a class="code hl_function" href="classSMonolithGPU.html#ab674ec40c136d89b56b7c25d9337c48a">InitGPU_Segments</a>(&amp;<a class="code hl_variable" href="classSplineBase.html#a938e3a60326137037f868b9930e2a972">SplineSegments</a>);</div>
 <div class="line"><a id="l00560" name="l00560"></a><span class="lineno">  560</span>  <a class="code hl_variable" href="classSMonolith.html#a03444cbed8a9d9a7798d0ef2b26bd702">gpu_spline_handler</a>-&gt;<a class="code hl_function" href="classSMonolithGPU.html#a3fbbb94f6db65b73a394ab541f94fba6">InitGPU_Vals</a>(&amp;<a class="code hl_variable" href="classSplineBase.html#aa0b1d3a1adf7cffa7e74581bc7d58d4c">ParamValues</a>);</div>
 <div class="line"><a id="l00561" name="l00561"></a><span class="lineno">  561</span><span class="preprocessor">#else</span></div>
@@ -656,7 +656,7 @@ $(function() {
 <div class="line"><a id="l00568" name="l00568"></a><span class="lineno">  568</span>  <a class="code hl_variable" href="classSMonolith.html#a456dd14e1693e445ad6dddd5a8b9794f">cpu_coeff_TF1_many</a>.resize(<a class="code hl_variable" href="classSMonolith.html#a403e7cf909f98d4c59b5f6c7ff8aac5b">nTF1coeff</a>);</div>
 <div class="line"><a id="l00569" name="l00569"></a><span class="lineno">  569</span> </div>
 <div class="line"><a id="l00570" name="l00570"></a><span class="lineno">  570</span>  <span class="comment">//KS: This is tricky as this variable use both by CPU and GPU, however if use CUDA we use cudaMallocHost</span></div>
-<div class="line"><a id="l00571" name="l00571"></a><span class="lineno">  571</span><span class="preprocessor">#ifndef CUDA</span></div>
+<div class="line"><a id="l00571" name="l00571"></a><span class="lineno">  571</span><span class="preprocessor">#ifndef MaCh3_CUDA</span></div>
 <div class="line"><a id="l00572" name="l00572"></a><span class="lineno">  572</span>  <a class="code hl_variable" href="classSMonolith.html#ab572dd7e0a46caf44eb925a89cbfb0cf">cpu_total_weights</a> = <span class="keyword">new</span> <span class="keywordtype">float</span>[<a class="code hl_variable" href="classSMonolith.html#ac86282b04659bae5cccb6073c9edc0a5">NEvents</a>]();</div>
 <div class="line"><a id="l00573" name="l00573"></a><span class="lineno">  573</span>  <a class="code hl_variable" href="classSMonolith.html#a870bb2bce61e17162b9425f82cf2a099">cpu_weights_spline_var</a> = <span class="keyword">new</span> <span class="keywordtype">float</span>[<a class="code hl_variable" href="classSMonolith.html#ab72795333d6f632565b0f7eb0ca8a658">NSplines_valid</a>]();</div>
 <div class="line"><a id="l00574" name="l00574"></a><span class="lineno">  574</span>  <a class="code hl_variable" href="classSMonolith.html#a4a1d45d273cc40cb4f684400812dcb60">cpu_weights_tf1_var</a> = <span class="keyword">new</span> <span class="keywordtype">float</span>[<a class="code hl_variable" href="classSMonolith.html#a13699796db31517edba3a8009317f779">NTF1_valid</a>]();</div>
@@ -812,7 +812,7 @@ $(function() {
 <div class="line"><a id="l00724" name="l00724"></a><span class="lineno">  724</span><span class="comment">// Cleans up the allocated GPU memory</span></div>
 <div class="line"><a id="l00725" name="l00725"></a><span class="lineno"><a class="line" href="classSMonolith.html#ac0ae7f110fa4c6e46e808d8c1ae979b6">  725</a></span><a class="code hl_function" href="classSMonolith.html#ac0ae7f110fa4c6e46e808d8c1ae979b6">SMonolith::~SMonolith</a>() {</div>
 <div class="line"><a id="l00726" name="l00726"></a><span class="lineno">  726</span><span class="comment">// *****************************************</span></div>
-<div class="line"><a id="l00727" name="l00727"></a><span class="lineno">  727</span><span class="preprocessor">  #ifdef CUDA</span></div>
+<div class="line"><a id="l00727" name="l00727"></a><span class="lineno">  727</span><span class="preprocessor">  #ifdef MaCh3_CUDA</span></div>
 <div class="line"><a id="l00728" name="l00728"></a><span class="lineno">  728</span>  <a class="code hl_variable" href="classSMonolith.html#a03444cbed8a9d9a7798d0ef2b26bd702">gpu_spline_handler</a>-&gt;<a class="code hl_function" href="classSMonolithGPU.html#a1ca23401d8d99412288952a1d44390ea">CleanupGPU_SplineMonolith</a>(</div>
 <div class="line"><a id="l00729" name="l00729"></a><span class="lineno">  729</span>        #ifndef Weight_On_SplineBySpline_Basis</div>
 <div class="line"><a id="l00730" name="l00730"></a><span class="lineno">  730</span>        <a class="code hl_variable" href="classSMonolith.html#ab572dd7e0a46caf44eb925a89cbfb0cf">cpu_total_weights</a></div>
@@ -885,7 +885,7 @@ $(function() {
 <div class="line"><a id="l00797" name="l00797"></a><span class="lineno">  797</span>  }</div>
 <div class="line"><a id="l00798" name="l00798"></a><span class="lineno">  798</span>}</div>
 <div class="line"><a id="l00799" name="l00799"></a><span class="lineno">  799</span> </div>
-<div class="line"><a id="l00800" name="l00800"></a><span class="lineno">  800</span><span class="preprocessor">#ifdef CUDA</span></div>
+<div class="line"><a id="l00800" name="l00800"></a><span class="lineno">  800</span><span class="preprocessor">#ifdef MaCh3_CUDA</span></div>
 <div class="line"><a id="l00801" name="l00801"></a><span class="lineno">  801</span><span class="comment">// *****************************************</span></div>
 <div class="line"><a id="l00802" name="l00802"></a><span class="lineno">  802</span><span class="comment">// Tell the GPU to evaluate the weights</span></div>
 <div class="line"><a id="l00803" name="l00803"></a><span class="lineno">  803</span><span class="comment">// Load up the two x,{y,b,c,d} arrays into memory and have GPU read them with more coalescence instead of one monolithic array</span></div>
@@ -1084,7 +1084,7 @@ $(function() {
 <div class="line"><a id="l00996" name="l00996"></a><span class="lineno">  996</span><span class="comment">//KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.</span></div>
 <div class="line"><a id="l00997" name="l00997"></a><span class="lineno"><a class="line" href="classSMonolith.html#a68e18d73ed1ac524ceaea79d2a5460ce">  997</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classSMonolith.html#a68e18d73ed1ac524ceaea79d2a5460ce">SMonolith::SynchroniseMemTransfer</a>() {</div>
 <div class="line"><a id="l00998" name="l00998"></a><span class="lineno">  998</span><span class="comment">//*********************************************************</span></div>
-<div class="line"><a id="l00999" name="l00999"></a><span class="lineno">  999</span><span class="preprocessor">  #ifdef CUDA</span></div>
+<div class="line"><a id="l00999" name="l00999"></a><span class="lineno">  999</span><span class="preprocessor">  #ifdef MaCh3_CUDA</span></div>
 <div class="line"><a id="l01000" name="l01000"></a><span class="lineno"> 1000</span>  <a class="code hl_function" href="gpuSplineUtils_8cu.html#a953e5c5aecebd908f5d8c6ad64de482c">SynchroniseSplines</a>();</div>
 <div class="line"><a id="l01001" name="l01001"></a><span class="lineno"> 1001</span><span class="preprocessor">  #endif</span></div>
 <div class="line"><a id="l01002" name="l01002"></a><span class="lineno"> 1002</span>}</div>

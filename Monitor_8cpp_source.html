@@ -89,7 +89,7 @@ $(function() {
 <a href="Monitor_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#include &quot;<a class="code" href="Monitor_8h.html">Manager/Monitor.h</a>&quot;</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment">//Only if GPU is enabled</span></div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#ifdef CUDA</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#ifdef MaCh3_CUDA</span></div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;<a class="code" href="gpuUtils_8cuh.html">Manager/gpuUtils.cuh</a>&quot;</span></div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
@@ -229,7 +229,7 @@ $(function() {
 <div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span><span class="comment">//KS: Simple function retrieving GPU info</span></div>
 <div class="line"><a id="l00142" name="l00142"></a><span class="lineno"><a class="line" href="namespaceMaCh3Utils.html#a9b97c309891603fece844f2579f30928">  142</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="namespaceMaCh3Utils.html#a9b97c309891603fece844f2579f30928">GetGPUInfo</a>(){</div>
 <div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span><span class="comment">// ************************</span></div>
-<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span><span class="preprocessor">#ifdef CUDA</span></div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span><span class="preprocessor">#ifdef MaCh3_CUDA</span></div>
 <div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Using following GPU:&quot;</span>);</div>
 <div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>  <span class="comment">// Print GPU name</span></div>
 <div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;GPU Name: {}&quot;</span>, <a class="code hl_function" href="namespaceMaCh3Utils.html#a10a037c1bcf48073ae105968128a55c5">TerminalToString</a>(<span class="stringliteral">&quot;nvidia-smi --query-gpu=name --format=csv,noheader&quot;</span>));</div>
@@ -297,7 +297,7 @@ $(function() {
 <div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span> </div>
 <div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span><span class="comment">// ************************</span></div>
 <div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span><span class="comment">//KS: Simply print progress bar</span></div>
-<div class="line"><a id="l00212" name="l00212"></a><span class="lineno"><a class="line" href="namespaceMaCh3Utils.html#a4c8bdeb1d34606aed192e9f1311a72f5">  212</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="namespaceMaCh3Utils.html#a4c8bdeb1d34606aed192e9f1311a72f5">PrintProgressBar</a>(<span class="keyword">const</span> Long64_t Done, <span class="keyword">const</span> Long64_t All){</div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno"><a class="line" href="namespaceMaCh3Utils.html#a4c8bdeb1d34606aed192e9f1311a72f5">  212</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="namespaceMaCh3Utils.html#a4c8bdeb1d34606aed192e9f1311a72f5">PrintProgressBar</a>(<span class="keyword">const</span> Long64_t Done, <span class="keyword">const</span> Long64_t All) {</div>
 <div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span><span class="comment">// ************************</span></div>
 <div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>  <span class="keywordtype">double</span> progress = double(Done)/double(All);</div>
 <div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>  <span class="keyword">const</span> <span class="keywordtype">int</span> barWidth = 20;</div>
@@ -320,7 +320,7 @@ $(function() {
 <div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span> </div>
 <div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span><span class="comment">// ***************************************************************************</span></div>
 <div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span><span class="comment">//CW: Get memory, which is probably silly</span></div>
-<div class="line"><a id="l00235" name="l00235"></a><span class="lineno"><a class="line" href="namespaceMaCh3Utils.html#aa406fc13341d99d4ca7a4f43bbb38019">  235</a></span><span class="keywordtype">int</span> <a class="code hl_function" href="namespaceMaCh3Utils.html#aa406fc13341d99d4ca7a4f43bbb38019">getValue</a>(<span class="keyword">const</span> std::string&amp; Type){ <span class="comment">//Note: this value is in KB!</span></div>
+<div class="line"><a id="l00235" name="l00235"></a><span class="lineno"><a class="line" href="namespaceMaCh3Utils.html#aa406fc13341d99d4ca7a4f43bbb38019">  235</a></span><span class="keywordtype">int</span> <a class="code hl_function" href="namespaceMaCh3Utils.html#aa406fc13341d99d4ca7a4f43bbb38019">getValue</a>(<span class="keyword">const</span> std::string&amp; Type) { <span class="comment">//Note: this value is in KB!</span></div>
 <div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span><span class="comment">// ***************************************************************************</span></div>
 <div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>  std::ifstream file(<span class="stringliteral">&quot;/proc/self/status&quot;</span>);</div>
 <div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>  <span class="keywordtype">int</span> result = -1;</div>
@@ -394,7 +394,7 @@ $(function() {
 <div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span> </div>
 <div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span><span class="comment">// ***************************************************************************</span></div>
 <div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span><span class="comment">//KS: Almost all MaCh3 executables have the same usage, prepare simple printer</span></div>
-<div class="line"><a id="l00309" name="l00309"></a><span class="lineno"><a class="line" href="namespaceMaCh3Utils.html#abcecb06e3d26685da80dd1f3a08e3d0c">  309</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="namespaceMaCh3Utils.html#abcecb06e3d26685da80dd1f3a08e3d0c">MaCh3Usage</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> **argv){</div>
+<div class="line"><a id="l00309" name="l00309"></a><span class="lineno"><a class="line" href="namespaceMaCh3Utils.html#abcecb06e3d26685da80dd1f3a08e3d0c">  309</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="namespaceMaCh3Utils.html#abcecb06e3d26685da80dd1f3a08e3d0c">MaCh3Usage</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> **argv) {</div>
 <div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span><span class="comment">// ***************************************************************************</span></div>
 <div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span>  <span class="keywordflow">if</span> (argc != 2) {</div>
 <div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Wrong usage of MaCh3 executable!&quot;</span>);</div>
