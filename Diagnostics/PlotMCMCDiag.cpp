@@ -3,6 +3,7 @@
 #include "Samples/HistogramUtils.h"
 #include "THStack.h"
 #include "TGraphAsymmErrors.h"
+#include "TLegend.h"
 #include <TSystem.h>
 
 /// @file PlotMCMCDiag.cpp
@@ -10,7 +11,8 @@
 /// @warning This script support comparing up to 4 files, there is easy way to expand it up to five or six,
 /// @todo this need serious refactor
 
-TString DUMMYFILE = "KillMePlease";
+TString DUMMYFILE = "DummyFile";
+TString DUMMYNAME = "DummyName";
 
 // Utilities
 
@@ -47,9 +49,7 @@ bool IsHistogramAllOnes(TH1D *hist, double tolerance = 0.001, int max_failures =
     return true;
 }
 
-
-
-void MakePlot(TString fname1, TString fname2,TString fname3, TString fname4)
+void MakePlot(TString fname1, TString flabel1, TString fname2, TString flabel2, TString fname3, TString flabel3, TString fname4, TString flabel4)
 {
   TCanvas *c1 = new TCanvas("c1"," ", 0, 0, 800,630);
   gStyle->SetOptStat(0); //Set 0 to disable statistic box
@@ -58,6 +58,7 @@ void MakePlot(TString fname1, TString fname2,TString fname3, TString fname4)
 
   TKey *key;
   TFile *infile = TFile::Open(fname1.Data());
+
 
   TFile *infile2 = NULL;
   if(fname2 != DUMMYFILE)infile2 = TFile::Open(fname2.Data());
@@ -81,6 +82,8 @@ void MakePlot(TString fname1, TString fname2,TString fname3, TString fname4)
     TKey *subkey;
     while ((subkey = static_cast<TKey*>(nextsub())))
     {
+
+      TLegend* leg = new TLegend(0.7, 0.7, 0.9, 0.9);
       std::string name = std::string(subkey->GetName());
       name = dirname + "/" + name;
       MACH3LOG_INFO("{}", name);
@@ -97,6 +100,9 @@ void MakePlot(TString fname1, TString fname2,TString fname3, TString fname4)
       blarb[0]->SetLineStyle(kSolid);
       blarb[0]->SetLineColor(kRed);
       blarb[0]->Draw();
+
+      leg->AddEntry(blarb[0], flabel1.Data(), "l");
+
       if( dirname == "AccProb") blarb[0]->GetYaxis()->SetRangeUser(0, 1.0);
       if( name == "AccProb/AcceptanceProbability" ) continue;
       if(infile2 != NULL)
@@ -106,6 +112,7 @@ void MakePlot(TString fname1, TString fname2,TString fname3, TString fname4)
         blarb[1]->SetLineStyle(kDashed);
         blarb[1]->SetLineColor(kBlue);
         blarb[1]->Draw("same");
+        leg -> AddEntry(blarb[1], flabel2.Data(), "l");
       }
       if(infile3 != NULL)
       {
@@ -114,6 +121,7 @@ void MakePlot(TString fname1, TString fname2,TString fname3, TString fname4)
         blarb[2]->SetLineStyle(kDotted );
         blarb[2]->SetLineColor(kGreen);
         blarb[2]->Draw("same");
+        leg -> AddEntry(blarb[2], flabel3.Data(), "l");
       }
       if(infile4 != NULL)
       {
@@ -122,9 +130,12 @@ void MakePlot(TString fname1, TString fname2,TString fname3, TString fname4)
         blarb[3]->SetLineStyle(kDashDotted );
         blarb[3]->SetLineColor(kOrange);
         blarb[3]->Draw("same");
+        leg->AddEntry(blarb[3], flabel4.Data(), "l");
       }
+      leg->Draw();
 
       c1->Print(Form("%s.pdf",dirname.c_str()), "pdf");
+      delete leg;
     }
     gDirectory->cd("..");
     c1->Print(Form("%s.pdf]",dirname.c_str()), "pdf");
@@ -136,11 +147,12 @@ void MakePlot(TString fname1, TString fname2,TString fname3, TString fname4)
   if(infile4 != NULL)infile4->Close();
 }
 
-void PlotAutoCorr(TString fname1, TString fname2, TString fname3, TString fname4)
+void PlotAutoCorr(TString fname1, TString flabel1, TString fname2, TString flabel2, TString fname3, TString flabel3, TString fname4, TString flabel4)
 {
   TString fname[4];
   fname[0] = fname1; fname[1] = fname2; fname[2] = fname3; fname[3] = fname4;
   //Color_t PlotColor[4]={kRed, kBlue, kGreen, kOrange};
+  std::vector<TString> flabel = {flabel1, flabel2, flabel3, flabel4};
 
   TFile *infile[4];
   infile[0] = TFile::Open(fname[0].Data());
@@ -162,6 +174,8 @@ void PlotAutoCorr(TString fname1, TString fname2, TString fname3, TString fname4
     TIter next(infile[ik]->GetListOfKeys());
 
     TKey* key;
+    TLegend* leg = new TLegend(0.7, 0.7, 0.9, 0.9);
+
     while ((key = static_cast<TKey*>(next())))
     {
       std::string dirname = std::string(key->GetName());
@@ -174,6 +188,7 @@ void PlotAutoCorr(TString fname1, TString fname2, TString fname3, TString fname4
 
       TKey *subkey;
       bool FirstTime = true;
+
       while ((subkey = static_cast<TKey*>(nextsub())))
       {
         std::string name = std::string(subkey->GetName());
@@ -201,12 +216,19 @@ void PlotAutoCorr(TString fname1, TString fname2, TString fname3, TString fname4
         blarb->SetLineStyle(kDashed);
 
         if(FirstTime) blarb->Draw();
+
+        TString integral = Form("Integral: %.2f", blarb->Integral());
+
+        leg->AddEntry(blarb, Form("%s: %s", flabel[ik].Data(), integral.Data()), "l");
+
         if(!FirstTime) blarb->Draw("same");
         FirstTime = false;
       }
       gDirectory->cd("..");
     }
+    leg->Draw();
     c1->Print("Auto_Corr_PerFile.pdf", "pdf");
+    delete leg;
   }
   c1->Print("Auto_Corr_PerFile.pdf]", "pdf");
 }
@@ -456,7 +478,9 @@ void CompareAverageAC(const std::vector<std::vector<TH1D *>> &histograms,
       averages[i]->GetYaxis()->SetTitle("Autocorrelation Function");
       averages[i]->Draw("HIST SAME");
 
-      leg->AddEntry(averages[i], hist_labels[i], "l");
+      TString int_str = TString::Format("Average integrated autocorrelation %f", averages[i]->Integral());
+
+      leg->AddEntry(averages[i], hist_labels[i]+int_str, "l");
 
     }
     leg->Draw();
@@ -466,6 +490,7 @@ void CompareAverageAC(const std::vector<std::vector<TH1D *>> &histograms,
 }
 
 void PlotAverageACMult(std::vector<TString> input_files,
+                            std::vector<TString> hist_labels,
                             const TString &output_name,
                             bool draw_min_max = true)
                             // bool draw_all = false,
@@ -478,6 +503,8 @@ void PlotAverageACMult(std::vector<TString> input_files,
     for(int i=0; i<static_cast<int>(input_files.size()); i++)
     {
         TString folder = input_files[i];
+        MACH3LOG_INFO("Folder : {}", folder);
+
         if (folder.IsNull() || folder == DUMMYFILE)
         {
             MACH3LOG_WARN("Skipping empty or dummy folder: {}", folder.Data());
@@ -489,44 +516,37 @@ void PlotAverageACMult(std::vector<TString> input_files,
         histograms.push_back(histograms_i);
     }
 
-    auto hist_labels = input_files;
-    // Remove the file extension from labels
-    for (auto &label : hist_labels)
-    {
-      label = TString(gSystem->BaseName(label.Data()));
-      label.ReplaceAll(".root", "");
-    }
-
     CompareAverageAC(histograms, averages, hist_labels, output_name, draw_min_max);// draw_all, draw_errors);
 
 }
 
 int main(int argc, char *argv[]) {
   SetMaCh3LoggerFormat();
-  if (argc < 2 || argc > 5)
+  if (argc != 3 && argc != 5 &&  argc != 7 && argc !=9)
   {
-    MACH3LOG_ERROR("How to use: {} DiagMCMC_Output.root", argv[0]);
+    MACH3LOG_ERROR("Wrong number of arguments ({}) provided", argc);
+    MACH3LOG_ERROR("How to use: {} DiagMCMC_Output.root Plot Name", argv[0]);
     MACH3LOG_ERROR("Up to 4 files");
     throw MaCh3Exception(__FILE__ , __LINE__);
   }
 
-  if(argc == 2) {
-    MakePlot(argv[1], DUMMYFILE, DUMMYFILE, DUMMYFILE);
-    PlotAutoCorr(argv[1], DUMMYFILE, DUMMYFILE, DUMMYFILE);
-    PlotAverageACMult({argv[1]}, "Average_Auto_Corr", true);
+  if(argc == 3) {
+    MakePlot(argv[1], argv[2], DUMMYFILE, DUMMYNAME, DUMMYFILE, DUMMYNAME, DUMMYFILE, DUMMYNAME);
+    PlotAutoCorr(argv[1], argv[2], DUMMYFILE, DUMMYNAME, DUMMYFILE, DUMMYNAME, DUMMYFILE, DUMMYNAME);
+    PlotAverageACMult({argv[1]}, {argv[2]}, "Average_Auto_Corr", true);
 
-  } else if(argc == 3) {
-    MakePlot(argv[1], argv[2], DUMMYFILE ,DUMMYFILE);
-    PlotAutoCorr(argv[1], argv[2], DUMMYFILE, DUMMYFILE);
-    PlotAverageACMult({argv[1], argv[2]}, "Average_Auto_Corr", true);
-  } else if(argc == 4) {
-    MakePlot(argv[1], argv[2], argv[3], DUMMYFILE);
-    PlotAutoCorr(argv[1], argv[2], argv[3], DUMMYFILE);
-    PlotAverageACMult({argv[1], argv[2], argv[3]}, "Average_Auto_Corr", true);
   } else if(argc == 5) {
-    MakePlot(argv[1], argv[2], argv[3], argv[4]);
-    PlotAutoCorr(argv[1], argv[2], argv[3], argv[4]);
-    PlotAverageACMult({argv[1], argv[2], argv[3], argv[4]}, "Average_Auto_Corr", true);
+    MakePlot(argv[1], argv[2], argv[3], argv[4], DUMMYFILE, DUMMYNAME, DUMMYFILE, DUMMYNAME);
+    PlotAutoCorr(argv[1], argv[2], argv[3], argv[4], DUMMYFILE, DUMMYNAME, DUMMYFILE, DUMMYNAME);
+    PlotAverageACMult({argv[1], argv[3]}, {argv[2], argv[4]}, "Average_Auto_Corr", true);
+  } else if(argc == 7) {
+    MakePlot(argv[1], argv[2], argv[3], argv[4], argv[5], argv[6], DUMMYFILE, DUMMYNAME);
+    PlotAutoCorr(argv[1], argv[2], argv[3], argv[4], argv[5], argv[6], DUMMYFILE, DUMMYNAME);
+    PlotAverageACMult({argv[1], argv[3], argv[5]}, {argv[2], argv[4], argv[6]}, "Average_Auto_Corr", true);
+  } else if(argc == 9) {
+    MakePlot(argv[1], argv[2], argv[3], argv[4], argv[5], argv[6], argv[7], argv[8]);
+    PlotAutoCorr(argv[1], argv[2], argv[3], argv[4], argv[5], argv[6], argv[7], argv[8]);
+    PlotAverageACMult({argv[1], argv[3], argv[5], argv[7]}, {argv[2], argv[4], argv[6], argv[8]}, "Average_Auto_Corr", true);
   }
   return 0;
 }
