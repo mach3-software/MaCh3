@@ -530,7 +530,7 @@ class MCMCProcessor {
     double *AccProbBatchedAverages;
     
   //Only if GPU is enabled
-  #ifdef CUDA
+  #ifdef MaCh3_CUDA
     /// @brief Move stuff to GPU to perform auto correlation calculations there
     inline void PrepareGPU_AutoCorr(const int nLags);
 
