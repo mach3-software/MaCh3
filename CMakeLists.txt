@@ -179,7 +179,10 @@ endif()
 #Add Multithread flags
 if(MaCh3_MULTITHREAD_ENABLED)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
+    #ETA: intel icpx requires this I believe
+    find_package(OpenMP REQUIRED)
     target_compile_options(MaCh3CompilerOptions INTERFACE -qopenmp)
+    target_link_libraries(MaCh3CompilerOptions INTERFACE OpenMP::OpenMP_CXX)
   # KS: Not a clue why clang need different...
   elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(MaCh3CompilerOptions INTERFACE -fopenmp)
