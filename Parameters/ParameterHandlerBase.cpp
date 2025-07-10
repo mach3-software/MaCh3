@@ -563,7 +563,6 @@ void ParameterHandlerBase::ProposeStep() {
   // Make the random numbers for the step proposal
   Randomize();
   CorrelateSteps();
-  if(use_adaptive) UpdateAdaptiveCovariance();
 
   // KS: According to Dr Wallace we update using previous not proposed step
   // this way we do special proposal after adaptive after.
@@ -860,18 +859,20 @@ void ParameterHandlerBase::SetBranches(TTree &tree, bool SaveProposal) {
 }
 
 // ********************************************
-void ParameterHandlerBase::SetStepScale(const double scale) {
+void ParameterHandlerBase::SetStepScale(const double scale, const bool verbose) {
 // ********************************************
   if(scale <= 0) {
     MACH3LOG_ERROR("You are trying so set StepScale to 0 or negative this will not work");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-  MACH3LOG_INFO("{} setStepScale() = {}", GetName(), scale);
-  const double SuggestedScale = 2.38*2.38/_fNumPar;
-  if(std::fabs(scale - SuggestedScale)/SuggestedScale > 1) {
-    MACH3LOG_WARN("Defined Global StepScale is {}, while suggested suggested {}", scale, SuggestedScale);
-  }
 
+  if(verbose){
+    MACH3LOG_INFO("{} setStepScale() = {}", GetName(), scale);
+    const double SuggestedScale = 2.38*2.38/_fNumPar;
+    if(std::fabs(scale - SuggestedScale)/SuggestedScale > 1) {
+      MACH3LOG_WARN("Defined Global StepScale is {}, while suggested suggested {}", scale, SuggestedScale);
+    }
+  }
   _fGlobalStepScale = scale;
 }
 
@@ -1074,7 +1075,7 @@ void ParameterHandlerBase::SetThrowMatrix(TMatrixDSym *cov){
 
   throwMatrix_CholDecomp = new TMatrixD(TDecompChol_throwMatrix.GetU());
   throwMatrix_CholDecomp->T();
-
+  
   //KS: ROOT has bad memory management, using standard double means we can decrease most operation by factor 2 simply due to cache hits
   #ifdef MULTITHREAD
   #pragma omp parallel for collapse(2)
@@ -1087,6 +1088,7 @@ void ParameterHandlerBase::SetThrowMatrix(TMatrixDSym *cov){
     }
   }
 }
+
 
 // ********************************************
 void ParameterHandlerBase::UpdateThrowMatrix(TMatrixDSym *cov){

@@ -1,6 +1,4 @@
-#include "MCMCBase.h"
-
-#include "mcmc.h"
+#include "Fitters/MCMCBase.h"
 
 // *************************
 // Initialise the manager and make it an object of mcmc class
@@ -12,7 +10,7 @@ MCMCBase::MCMCBase(manager *man) : FitterBase(man)
     stepStart = 0;
 
     // Starting parameters should be thrown
-    reject = false;
+    out_of_bounds = false;
     chainLength = Get<unsigned>(fitMan->raw()["General"]["MCMC"]["NSteps"], __FILE__, __LINE__);
 
     AnnealTemp = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["AnnealTemp"], -999);
@@ -25,28 +23,6 @@ MCMCBase::MCMCBase(manager *man) : FitterBase(man)
     }
 }
 
-bool MCMCBase::AcceptStep(const double acc_prob){
-    // Get the random number
-    const double fRandom = random->Rndm();
-    // Do the accept/reject
-    if (fRandom > accProb)
-    {
-        // Reject
-        return false;
-    }
-    ++accCount;
-    accept = true;
-
-    logLCurr = logLProp;
-
-    // Loop over systematics and accept
-    for (size_t s = 0; s < systematics.size(); ++s)
-    {
-        systematics[s]->AcceptStep();
-    }
-
-    return accept;
-}
 
 // *******************
 // Run the Markov chain with all the systematic objects added
@@ -73,11 +49,8 @@ void MCMCBase::RunMCMC()
     const auto StepEnd = stepStart + chainLength;
     for (step = stepStart; step < StepEnd; ++step)
     {
-        stepClock->Start();
-        DoMCMCStep()
+        DoMCMCStep();
         // Auto save the output
-        if (step % auto_save == 0)
-            outTree->AutoSave();
     }
 
     // Save all the MCMC output
@@ -89,25 +62,28 @@ void MCMCBase::RunMCMC()
 
 
 void MCMCBase::DoMCMCStep(){
-    // Set the initial rejection to false
-    reject = false;
+    /// Starts step timer, prints progress
+    StartStep();
+    /// Step proposal, acceptance etc
+    DoStep();
+    /// Tree filling etc.
+    EndStep();
+}
+
+void MCMCBase::StartStep()
+{
+    stepClock->Start();
+    out_of_bounds = false;
 
     // Print 10 steps in total
     if ((step - stepStart) % (chainLength / 10) == 0)
     {
         PrintProgress();
     }
+}
 
-    // Propose current step variation and save the systematic likelihood that results in this step being taken
-    // Updates logLProp
-    ProposeStep();
-    // Does the MCMC accept this step?
-    if (!reject)
-    {
-        acc_prob = CheckStep();
-        AcceptStep(acc_prob);
-    }
 
+void MCMCBase::EndStep(){
     stepClock->Stop();
     stepTime = stepClock->RealTime();
 
@@ -115,7 +91,11 @@ void MCMCBase::DoMCMCStep(){
     outTree->Fill();
 
     // Do Adaptive MCMC
-    AdaptiveStep()
+    AdaptiveStep();
+
+    if (step % auto_save == 0){
+        outTree->AutoSave();
+    }
 }
 
 // *******************
@@ -172,9 +152,36 @@ void MCMCBase::AdaptiveStep(){
     // Save the Adaptive output
     for (const auto &syst : systematics)
     {
-        if (syst->GetDoAdaption())
-        {
-            syst->GetAdaptiveHandler()->SaveAdaptiveToFile(syst->GetAdaptiveHandler()->GetOutFileName(), syst->GetName(), true);
+        if (syst->GetDoAdaption()){
+        
+            syst->UpdateAdaptiveCovariance();
+            // syst->GetAdaptiveHandler()->SaveAdaptiveToFile(syst->GetAdaptiveHandler()->GetOutFileName(), syst->GetName(), true);
         }
+    }
+}
+
+bool MCMCBase::IsStepAccepted(const double acc_prob)
+{
+    // Get the random number
+    const double fRandom = random->Rndm();
+    // Do the accept/reject
+    if (fRandom > acc_prob)
+    {
+        // Reject
+        return false;
+    }
+
+    return true;
+
+}
+
+void MCMCBase::AcceptStep(){
+    ++accCount;
+    logLCurr = logLProp;
+
+    // Loop over systematics and accept
+    for (size_t s = 0; s < systematics.size(); ++s)
+    {
+        systematics[s]->AcceptStep();
     }
 }

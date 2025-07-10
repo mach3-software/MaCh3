@@ -32,13 +32,25 @@ class MCMCBase : public FitterBase {
     /// @brief Do a step
     inline void DoMCMCStep();
 
+    inline void MCMCStep();
+
     /// @brief Propose a step
     virtual void ProposeStep()=0;
 
-    /// @brief Do we accept the step
-    virtual double CheckStep()=0;
+    inline void StartStep();
+    inline void EndStep();
 
-    inline bool AcceptStep(double acc_prob);
+    virtual void DoStep()=0;
+
+    /// @brief Step acceptance probability
+    virtual double AcceptanceProbability()=0;
+
+
+    /// @brief Is step accepted?
+    bool IsStepAccepted(const double acc_prob);
+
+    /// @brief Accept a step
+    void AcceptStep();
 
     /// @brief Adaptive MCMC step
     inline void AdaptiveStep();
@@ -47,7 +59,11 @@ class MCMCBase : public FitterBase {
     inline void PrintProgress();
 
     /// Do we reject based on hitting boundaries in systs
-    bool reject;
+    bool out_of_bounds;
+
+    /// Accept
+    bool accept;
+
     /// number of steps in chain
     unsigned int chainLength;
 

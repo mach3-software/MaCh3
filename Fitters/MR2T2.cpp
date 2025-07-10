@@ -1,4 +1,15 @@
-#include "MR2T2.h"
+#include "Fitters/MR2T2.h"
+
+void MR2T2::DoStep(){
+    ProposeStep();
+    // Does the MCMC accept this step?
+    accProb = AcceptanceProbability();
+
+    if (IsStepAccepted(accProb) and !out_of_bounds)
+    {
+        AcceptStep();
+    }
+}
 
 // *******************
 // Do the initial reconfigure of the MCMC
@@ -6,10 +17,10 @@ void MR2T2::ProposeStep()
 {
     // *******************
     // Initial likelihood
-    double llh = 0.0;
 
-    // Initiate to false
-    reject = false;
+    out_of_bounds = false;
+    
+    double llh = 0.0;
 
     // Loop over the systematics and propose the initial step
     for (size_t s = 0; s < systematics.size(); ++s)
@@ -32,7 +43,7 @@ void MR2T2::ProposeStep()
     // In this case we can save time by not having to reconfigure the simulation
     if (llh >= M3::_LARGE_LOGL_)
     {
-        reject = true;
+        out_of_bounds = true;
 #ifdef DEBUG
         if (debug)
             debugFile << "Rejecting based on boundary" << std::endl;
@@ -41,7 +52,7 @@ void MR2T2::ProposeStep()
 
     // Only reweight when we have a good parameter configuration
     // This speeds things up considerably because for every bad parameter configuration we don't have to reweight the MC
-    if (!reject)
+    if (!out_of_bounds)
     {
         // Could multi-thread this
         // But since sample reweight is multi-threaded it's probably better to do that
@@ -76,28 +87,28 @@ void MR2T2::ProposeStep()
 #endif
         }
     }
-        // Save the proposed likelihood (class member)
-        logLProp = llh;
+    // Save the proposed likelihood (class member)
+    logLProp = llh;
 }
 
 // **********************
 // Do we accept the proposed step for all the parameters?
-double MCMCBase::CheckStep()
+double MR2T2::AcceptanceProbability()
 {
     // **********************
     // Set the acceptance probability to zero
-    accProb = 0.0;
+    double acc_prob = 0.0;
 
     // Calculate acceptance probability
     if (anneal)
-        accProb = std::min(1., std::exp(-(logLProp - logLCurr) / (std::exp(-step / AnnealTemp))));
+        acc_prob = std::min(1., std::exp(-(logLProp - logLCurr) / (std::exp(-step / AnnealTemp))));
     else
-        accProb = std::min(1., std::exp(logLCurr - logLProp));
+        acc_prob = std::min(1., std::exp(logLCurr - logLProp));
 
 #ifdef DEBUG
     if (debug)
-        debugFile << " logLProp: " << logLProp << " logLCurr: " << logLCurr << " accProb: " << accProb << " fRandom: " << fRandom << std::endl;
+        debugFile << " logLProp: " << logLProp << " logLCurr: " << logLCurr << " acc_prob: " << acc_prob << " fRandom: " << fRandom << std::endl;
 #endif
 
-    return accProb;
+    return acc_prob;
 }

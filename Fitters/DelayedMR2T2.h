@@ -10,21 +10,30 @@ class DelayedMR2T2 : public MR2T2 {
 
     /// @brief Destructor
     virtual ~DelayedMR2T2() = default;
+    inline std::string GetName() const { return "DelayedMR2T2"; };
 
  protected:
-    // Need to reset stuff
-    void DoMCMCStep();
 
-    void ProposeStep() override;
-    double CheckStep() override;
+   double AcceptanceProbability() override;
 
-    double CalculateLogGaussian(std::vector<double> &vec_1, std::vector<double> &vec_2, std::vector<std::vector<double>> &inv_cov_matrix) const _noexcept_;
+   void DoStep();
 
-    bool rejected_init_step;
+   void StoreCurrentStep();
 
-    double initial_scale;
-    double decay_rate;
+   void ResetSystScale();
+   void ScaleSystematics(double scale);
 
-    double accProbInit; // Rejected Acceptance probability
+   double CalculateLogGaussian(std::vector<double> &vec_1, std::vector<double> &vec_2, std::vector<std::vector<double>> &inv_cov_matrix) const _noexcept_;
+
+   std::vector<std::vector<double>> current_step_vals;
+
+   double initial_scale;
+   double decay_rate;
+   int number_of_iterations;
+
+   double MinLogLikelihood; // Max Likelihood
+
+
+   std::vector<double> step_syst_scale;
 
 };

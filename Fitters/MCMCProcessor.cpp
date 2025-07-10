@@ -2911,7 +2911,7 @@ void MCMCProcessor::DiagMCMC() {
   }
 
   // Calculate Power Spectrum for each param
-  PowerSpectrumAnalysis();
+  // PowerSpectrumAnalysis();
 
   // Get Geweke Z score helping select burn-in
   GewekeDiagnostic();

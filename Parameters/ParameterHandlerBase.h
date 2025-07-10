@@ -96,9 +96,10 @@ class ParameterHandlerBase {
   void SetBranches(TTree &tree, const bool SaveProposal = false);
   /// @brief Set global step scale for covariance object
   /// @param scale Value of global step scale
+  /// @param verbose Print that we've changed scale + use warnings [default: true]
   /// @cite luengo2020survey
   /// @ingroup ParameterHandlerSetters
-  void SetStepScale(const double scale);
+  void SetStepScale(const double scale, const bool verbose=true);
   /// @brief DB Function to set fIndivStepScale from a vector (Can be used from execs and inside covariance constructors)
   /// @param ParameterIndex Parameter Index
   /// @param StepScale Value of individual step scale
@@ -256,6 +257,10 @@ class ParameterHandlerBase {
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
   inline double GetParCurr(const int i) const { return _fCurrVal[i]; }
+  /// @brief Get vector of current parameter values
+  /// @ingroup ParameterHandlerGetters
+  inline const std::vector<double> &GetParCurrVec() const { return _fCurrVal; }
+
   /// @brief Get prior parameter value
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters

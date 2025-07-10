@@ -1,8 +1,8 @@
 set(HEADERS
     FitterBase.h
     MCMCBase.h
-    MRT2T.h
-    DelayedMRT2T.h
+    MR2T2.h
+    DelayedMR2T2.h
     LikelihoodFit.h
     MinuitFit.h
     PSO.h
