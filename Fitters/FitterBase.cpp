@@ -40,7 +40,7 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   //ROOT::EnableImplicitMT();
   #endif
   // Set the output file
-  outputFile = new TFile(outfile.c_str(), "RECREATE");
+  outputFile = M3::Open(outfile, "RECREATE", __FILE__, __LINE__);
   outputFile->cd();
   // Set output tree
   outTree = new TTree("posteriors", "Posterior_Distributions");
