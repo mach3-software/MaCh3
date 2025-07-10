@@ -1147,14 +1147,14 @@ TH1* SampleHandlerFD::GetDataHist(const int Dimension) {
 
 void SampleHandlerFD::AddData(std::vector<double> &data) {
   dathist2d = nullptr;
-  dathist->Reset(); 
-  
+  dathist->Reset();
+
   if (GetNDim()!=1) {
     MACH3LOG_ERROR("Trying to set a 1D 'data' histogram when the number of dimensions for this sample is {}", GetNDim());
     MACH3LOG_ERROR("This won't work, please specify the correct dimensions in your sample config with the X and Y variables");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-  
+
   for (auto const& data_point : data){
     dathist->Fill(data_point);
   }
@@ -1172,7 +1172,7 @@ void SampleHandlerFD::AddData(std::vector<double> &data) {
 
 void SampleHandlerFD::AddData(std::vector< std::vector <double> > &data) {
   dathist = nullptr;
-  dathist2d->Reset();                                                       
+  dathist2d->Reset();
 
   if (GetNDim()!=2) {
     MACH3LOG_ERROR("Trying to set a 2D 'data' histogram when the number of dimensions for this sample is {}", GetNDim());
@@ -1203,9 +1203,9 @@ void SampleHandlerFD::AddData(std::vector< std::vector <double> > &data) {
 void SampleHandlerFD::AddData(TH1D* Data) {
   MACH3LOG_INFO("Adding 1D data histogram: {} with {:.2f} events", Data->GetTitle(), Data->Integral());
   dathist2d = nullptr;
-  dathist = Data;
-  
-  if (GetNDim()!=1) {
+  dathist = static_cast<TH1D*>(Data->Clone());
+
+  if (GetNDim() != 1) {
     MACH3LOG_ERROR("Trying to set a 1D 'data' histogram in a 2D sample - Quitting"); 
     MACH3LOG_ERROR("The number of dimensions for this sample is {}", GetNDim());
     throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -1226,12 +1226,12 @@ void SampleHandlerFD::AddData(TH1D* Data) {
 
 void SampleHandlerFD::AddData(TH2D* Data) {
   MACH3LOG_INFO("Adding 2D data histogram: {} with {:.2f} events", Data->GetTitle(), Data->Integral());
-  dathist2d = Data;
+  dathist2d = static_cast<TH2D*>(Data->Clone());
   dathist = nullptr;
 
-  if (GetNDim()!=2) {
+  if (GetNDim() != 2) {
     MACH3LOG_ERROR("Trying to set a 2D 'data' histogram in a 1D sample - Quitting"); 
-    throw MaCh3Exception(__FILE__ , __LINE__ );}	
+    throw MaCh3Exception(__FILE__ , __LINE__ );}
    
   if(SampleHandlerFD_data == nullptr) {
     MACH3LOG_ERROR("SampleHandlerFD_data haven't been initialised yet");
