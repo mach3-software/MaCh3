@@ -309,15 +309,15 @@ void SampleHandlerFD::SetupSampleBinning(){
   MACH3LOG_INFO("Setting up Sample Binning");
   TString histname1d = (XVarStr).c_str();
   TString histname2d = (XVarStr+"_"+YVarStr).c_str();
-  TString histtitle = "";
+  TString histtitle = GetTitle();
 
   //The binning here is arbitrary, now we get info from cfg so the
   //set1DBinning and set2Dbinning calls below will make the binning
   //to be what we actually want
-  _hPDF1D   = new TH1D("h"+histname1d+SampleTitle,histtitle, 1, 0, 1);
-  dathist   = new TH1D("d"+histname1d+SampleTitle,histtitle, 1, 0, 1);
-  _hPDF2D   = new TH2D("h"+histname2d+SampleTitle,histtitle, 1, 0, 1, 1, 0, 1);
-  dathist2d = new TH2D("d"+histname2d+SampleTitle,histtitle, 1, 0, 1, 1, 0, 1);
+  _hPDF1D   = new TH1D("h" + histname1d + GetTitle(),histtitle, 1, 0, 1);
+  dathist   = new TH1D("d" + histname1d + GetTitle(),histtitle, 1, 0, 1);
+  _hPDF2D   = new TH2D("h" + histname2d + GetTitle(),histtitle, 1, 0, 1, 1, 0, 1);
+  dathist2d = new TH2D("d" + histname2d + GetTitle(),histtitle, 1, 0, 1, 1, 0, 1);
 
   _hPDF1D->GetXaxis()->SetTitle(XVarStr.c_str());
   dathist->GetXaxis()->SetTitle(XVarStr.c_str());
@@ -715,7 +715,12 @@ void SampleHandlerFD::ApplyShifts(int iEvent) {
   // Given a sample and event, apply the shifts to the event based on the vector of functional parameter enums
   // First reset shifted array back to nominal values
   resetShifts(iEvent);
-  for (int fpEnum : funcParsGrid[iEvent]) {
+
+  const std::vector<int>& fpEnums = funcParsGrid[iEvent];
+  const std::size_t nShifts = fpEnums.size();
+
+  for (std::size_t i = 0; i < nShifts; ++i) {
+    const int fpEnum = fpEnums[i];
     FunctionalParameter *fp = funcParsMap[static_cast<std::size_t>(fpEnum)];
     // if (fp->funcPtr) {
     //   (*fp->funcPtr)(fp->valuePtr, iEvent);

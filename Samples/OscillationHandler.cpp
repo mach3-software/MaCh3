@@ -59,7 +59,7 @@ void OscillationHandler::Evaluate() {
   for (size_t iPar = 0; iPar < OscParams.size(); ++iPar) {
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wuseless-cast"
-    OscVec[iPar] = M3::float_t(*OscParams[iPar]);
+    OscVec[iPar] = static_cast<M3::float_t>(*OscParams[iPar]);
     #pragma GCC diagnostic pop
   }
 
