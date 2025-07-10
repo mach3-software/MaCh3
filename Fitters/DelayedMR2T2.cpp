@@ -1,12 +1,12 @@
 #include "Fitters/DelayedMR2T2.h"
 
 DelayedMR2T2::DelayedMR2T2(manager * const manager) : MR2T2(manager) {
-
-    initial_scale = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["InitialStepScale"], 1.0);
+    
     decay_rate = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["DecayRate"], 0.1);
     number_of_iterations = GetFromManager<int>(fitMan->raw()["General"]["MCMC"]["NRejections"], 2);
-
+    
     MinLogLikelihood = M3::_LARGE_LOGL_;
+    MACH3LOG_INFO("Using Delayed MCMC with decay rate: {} and {} allowed rejections", decay_rate, number_of_iterations);
 }
 
 void DelayedMR2T2::ScaleSystematics(double scale)
@@ -24,7 +24,7 @@ void DelayedMR2T2::ResetSystScale()
     // }
     for (int i = 0; i < static_cast<int>(systematics.size()); ++i)
     {
-        systematics[i]->SetStepScale(initial_scale, false);
+        systematics[i]->SetStepScale(start_step_scale[i], false);
     }
 }
 
@@ -37,10 +37,12 @@ void DelayedMR2T2::StoreCurrentStep()
     */
     // Ensure vector is correctly sized
     current_step_vals.resize(systematics.size());
+    start_step_scale.resize(systematics.size());
 
     // Fill with old proposed step, need to copy to avoid using the same step twice
     for(int i=0; i<static_cast<int>(systematics.size()); ++i){
         current_step_vals[i] = std::vector<double>(systematics[i]->GetParCurrVec());
+        start_step_scale[i] = systematics[i]->GetGlobalStepScale();
     }
 }
 
@@ -65,8 +67,7 @@ void DelayedMR2T2::DoStep()
 {
     // Set the initial rejection to false
     StoreCurrentStep();
-    ResetSystScale();
-
+    
     bool accepted = false;
     MinLogLikelihood = M3::_LARGE_LOGL_;
 
@@ -111,4 +112,5 @@ void DelayedMR2T2::DoStep()
             }
         }
     }
+    ResetSystScale();
 }

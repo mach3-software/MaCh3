@@ -26,12 +26,14 @@ class DelayedMR2T2 : public MR2T2 {
    double CalculateLogGaussian(std::vector<double> &vec_1, std::vector<double> &vec_2, std::vector<std::vector<double>> &inv_cov_matrix) const _noexcept_;
 
    std::vector<std::vector<double>> current_step_vals;
+   std::vector<double> start_step_scale;
 
    double initial_scale;
    double decay_rate;
    int number_of_iterations;
 
    double MinLogLikelihood; // Max Likelihood
+
 
 
    std::vector<double> step_syst_scale;
