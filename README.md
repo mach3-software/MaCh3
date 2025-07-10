@@ -195,6 +195,18 @@ Based on several test here are recommended version:
 ❔ - Not part of CI/CD but used by some users/developers so it might work <br>
 ❌ - Not supported and no plans right now <br>
 
+### Supported compilers
+| Name        | Status |
+|-------------|--------|
+| GNU         | ✅     |
+| CLANG       | ❔     |
+| INTELLLVM   | ❔     |
+| MSVC        | ❌     |
+
+✅ - Fully working with every feature fully tested by CI/CD <br>
+❔ - Not every feature may work, only compilation being tested by CI/CD <br>
+❌ - Not supported and no plans right now <br>
+
 ## Plotting and Diagnostic 📊
 Example of chain diagnostic utils can be found [here](https://github.com/mach3-software/MaCh3/tree/develop/Diagnostics) with example of config.
 The MaCh3 core plotting library code can be found [here](https://github.com/mach3-software/MaCh3/tree/develop/plotting) along with example config files and some apps for making standard plots.
