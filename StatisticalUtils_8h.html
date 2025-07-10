@@ -408,57 +408,57 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section warning"><dt>Warning</dt><dd>The canvas is saved to the current ROOT file using <code>TempCanvas-&gt;Write()</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="StatisticalUtils_8cpp_source.html#l00601">601</a> of file <a class="el" href="StatisticalUtils_8cpp_source.html">StatisticalUtils.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  601</span>                                          {</div>
-<div class="line"><span class="lineno">  602</span><span class="comment">// ****************</span></div>
-<div class="line"><span class="lineno">  603</span>  <span class="keyword">const</span> <span class="keywordtype">double</span> TotalIntegral = Histogram-&gt;Integral();</div>
-<div class="line"><span class="lineno">  604</span>  <span class="comment">// Count how many fills are above y=x axis</span></div>
-<div class="line"><span class="lineno">  605</span>  <span class="comment">// This is the 2D p-value</span></div>
-<div class="line"><span class="lineno">  606</span>  <span class="keywordtype">double</span> Above = 0.0;</div>
-<div class="line"><span class="lineno">  607</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; Histogram-&gt;GetXaxis()-&gt;GetNbins(); ++i) {</div>
-<div class="line"><span class="lineno">  608</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> xvalue = Histogram-&gt;GetXaxis()-&gt;GetBinCenter(i+1);</div>
-<div class="line"><span class="lineno">  609</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; Histogram-&gt;GetYaxis()-&gt;GetNbins(); ++j) {</div>
-<div class="line"><span class="lineno">  610</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> yvalue = Histogram-&gt;GetYaxis()-&gt;GetBinCenter(j+1);</div>
-<div class="line"><span class="lineno">  611</span>      <span class="comment">// We&#39;re only interested in being _ABOVE_ the y=x axis</span></div>
-<div class="line"><span class="lineno">  612</span>      <span class="keywordflow">if</span> (xvalue &gt;= yvalue) {</div>
-<div class="line"><span class="lineno">  613</span>        Above += Histogram-&gt;GetBinContent(i+1, j+1);</div>
-<div class="line"><span class="lineno">  614</span>      }</div>
-<div class="line"><span class="lineno">  615</span>    }</div>
-<div class="line"><span class="lineno">  616</span>  }</div>
-<div class="line"><span class="lineno">  617</span>  <span class="keyword">const</span> <span class="keywordtype">double</span> pvalue = Above/TotalIntegral;</div>
-<div class="line"><span class="lineno">  618</span>  std::stringstream ss;</div>
-<div class="line"><span class="lineno">  619</span>  ss &lt;&lt; int(Above) &lt;&lt; <span class="stringliteral">&quot;/&quot;</span> &lt;&lt; int(TotalIntegral) &lt;&lt; <span class="stringliteral">&quot;=&quot;</span> &lt;&lt; pvalue;</div>
-<div class="line"><span class="lineno">  620</span>  Histogram-&gt;SetTitle((std::string(Histogram-&gt;GetTitle())+<span class="stringliteral">&quot;_&quot;</span>+ss.str()).c_str());</div>
-<div class="line"><span class="lineno">  621</span> </div>
-<div class="line"><span class="lineno">  622</span>  <span class="comment">// Now add the TLine going diagonally</span></div>
-<div class="line"><span class="lineno">  623</span>  <span class="keywordtype">double</span> minimum = Histogram-&gt;GetXaxis()-&gt;GetBinLowEdge(1);</div>
-<div class="line"><span class="lineno">  624</span>  <span class="keywordflow">if</span> (Histogram-&gt;GetYaxis()-&gt;GetBinLowEdge(1) &gt; minimum) {</div>
-<div class="line"><span class="lineno">  625</span>    minimum = Histogram-&gt;GetYaxis()-&gt;GetBinLowEdge(1);</div>
-<div class="line"><span class="lineno">  626</span>  }</div>
-<div class="line"><span class="lineno">  627</span>  <span class="keywordtype">double</span> maximum = Histogram-&gt;GetXaxis()-&gt;GetBinLowEdge(Histogram-&gt;GetXaxis()-&gt;GetNbins());</div>
-<div class="line"><span class="lineno">  628</span>  <span class="keywordflow">if</span> (Histogram-&gt;GetYaxis()-&gt;GetBinLowEdge(Histogram-&gt;GetYaxis()-&gt;GetNbins()) &lt; maximum) {</div>
-<div class="line"><span class="lineno">  629</span>    maximum = Histogram-&gt;GetYaxis()-&gt;GetBinLowEdge(Histogram-&gt;GetYaxis()-&gt;GetNbins());</div>
-<div class="line"><span class="lineno">  630</span>    <span class="comment">//KS: Extend by bin width to perfectly fit canvas</span></div>
-<div class="line"><span class="lineno">  631</span>    maximum += Histogram-&gt;GetYaxis()-&gt;GetBinWidth(Histogram-&gt;GetYaxis()-&gt;GetNbins());</div>
-<div class="line"><span class="lineno">  632</span>  }</div>
-<div class="line"><span class="lineno">  633</span>  <span class="keywordflow">else</span> maximum += Histogram-&gt;GetXaxis()-&gt;GetBinWidth(Histogram-&gt;GetXaxis()-&gt;GetNbins());</div>
-<div class="line"><span class="lineno">  634</span>  <span class="keyword">auto</span> TempLine = std::make_unique&lt;TLine&gt;(minimum, minimum, maximum, maximum);</div>
-<div class="line"><span class="lineno">  635</span>  TempLine-&gt;SetLineColor(kRed);</div>
-<div class="line"><span class="lineno">  636</span>  TempLine-&gt;SetLineWidth(2);</div>
-<div class="line"><span class="lineno">  637</span> </div>
-<div class="line"><span class="lineno">  638</span>  std::string Title = Histogram-&gt;GetName();</div>
-<div class="line"><span class="lineno">  639</span>  Title += <span class="stringliteral">&quot;_canv&quot;</span>;</div>
-<div class="line"><span class="lineno">  640</span>  <span class="keyword">auto</span> TempCanvas = std::make_unique&lt;TCanvas&gt;(Title.c_str(), Title.c_str(), 1024, 1024);</div>
-<div class="line"><span class="lineno">  641</span>  TempCanvas-&gt;SetGridx();</div>
-<div class="line"><span class="lineno">  642</span>  TempCanvas-&gt;SetGridy();</div>
-<div class="line"><span class="lineno">  643</span>  TempCanvas-&gt;cd();</div>
-<div class="line"><span class="lineno">  644</span>  gStyle-&gt;SetPalette(81);</div>
-<div class="line"><span class="lineno">  645</span>  Histogram-&gt;SetMinimum(-0.01);</div>
-<div class="line"><span class="lineno">  646</span>  Histogram-&gt;Draw(<span class="stringliteral">&quot;colz&quot;</span>);</div>
-<div class="line"><span class="lineno">  647</span>  TempLine-&gt;Draw(<span class="stringliteral">&quot;same&quot;</span>);</div>
-<div class="line"><span class="lineno">  648</span> </div>
-<div class="line"><span class="lineno">  649</span>  TempCanvas-&gt;Write();</div>
-<div class="line"><span class="lineno">  650</span>}</div>
+<p class="definition">Definition at line <a class="el" href="StatisticalUtils_8cpp_source.html#l00596">596</a> of file <a class="el" href="StatisticalUtils_8cpp_source.html">StatisticalUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  596</span>                                          {</div>
+<div class="line"><span class="lineno">  597</span><span class="comment">// ****************</span></div>
+<div class="line"><span class="lineno">  598</span>  <span class="keyword">const</span> <span class="keywordtype">double</span> TotalIntegral = Histogram-&gt;Integral();</div>
+<div class="line"><span class="lineno">  599</span>  <span class="comment">// Count how many fills are above y=x axis</span></div>
+<div class="line"><span class="lineno">  600</span>  <span class="comment">// This is the 2D p-value</span></div>
+<div class="line"><span class="lineno">  601</span>  <span class="keywordtype">double</span> Above = 0.0;</div>
+<div class="line"><span class="lineno">  602</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; Histogram-&gt;GetXaxis()-&gt;GetNbins(); ++i) {</div>
+<div class="line"><span class="lineno">  603</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> xvalue = Histogram-&gt;GetXaxis()-&gt;GetBinCenter(i+1);</div>
+<div class="line"><span class="lineno">  604</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; Histogram-&gt;GetYaxis()-&gt;GetNbins(); ++j) {</div>
+<div class="line"><span class="lineno">  605</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> yvalue = Histogram-&gt;GetYaxis()-&gt;GetBinCenter(j+1);</div>
+<div class="line"><span class="lineno">  606</span>      <span class="comment">// We&#39;re only interested in being _ABOVE_ the y=x axis</span></div>
+<div class="line"><span class="lineno">  607</span>      <span class="keywordflow">if</span> (xvalue &gt;= yvalue) {</div>
+<div class="line"><span class="lineno">  608</span>        Above += Histogram-&gt;GetBinContent(i+1, j+1);</div>
+<div class="line"><span class="lineno">  609</span>      }</div>
+<div class="line"><span class="lineno">  610</span>    }</div>
+<div class="line"><span class="lineno">  611</span>  }</div>
+<div class="line"><span class="lineno">  612</span>  <span class="keyword">const</span> <span class="keywordtype">double</span> pvalue = Above/TotalIntegral;</div>
+<div class="line"><span class="lineno">  613</span>  std::stringstream ss;</div>
+<div class="line"><span class="lineno">  614</span>  ss &lt;&lt; int(Above) &lt;&lt; <span class="stringliteral">&quot;/&quot;</span> &lt;&lt; int(TotalIntegral) &lt;&lt; <span class="stringliteral">&quot;=&quot;</span> &lt;&lt; pvalue;</div>
+<div class="line"><span class="lineno">  615</span>  Histogram-&gt;SetTitle((std::string(Histogram-&gt;GetTitle())+<span class="stringliteral">&quot;_&quot;</span>+ss.str()).c_str());</div>
+<div class="line"><span class="lineno">  616</span> </div>
+<div class="line"><span class="lineno">  617</span>  <span class="comment">// Now add the TLine going diagonally</span></div>
+<div class="line"><span class="lineno">  618</span>  <span class="keywordtype">double</span> minimum = Histogram-&gt;GetXaxis()-&gt;GetBinLowEdge(1);</div>
+<div class="line"><span class="lineno">  619</span>  <span class="keywordflow">if</span> (Histogram-&gt;GetYaxis()-&gt;GetBinLowEdge(1) &gt; minimum) {</div>
+<div class="line"><span class="lineno">  620</span>    minimum = Histogram-&gt;GetYaxis()-&gt;GetBinLowEdge(1);</div>
+<div class="line"><span class="lineno">  621</span>  }</div>
+<div class="line"><span class="lineno">  622</span>  <span class="keywordtype">double</span> maximum = Histogram-&gt;GetXaxis()-&gt;GetBinLowEdge(Histogram-&gt;GetXaxis()-&gt;GetNbins());</div>
+<div class="line"><span class="lineno">  623</span>  <span class="keywordflow">if</span> (Histogram-&gt;GetYaxis()-&gt;GetBinLowEdge(Histogram-&gt;GetYaxis()-&gt;GetNbins()) &lt; maximum) {</div>
+<div class="line"><span class="lineno">  624</span>    maximum = Histogram-&gt;GetYaxis()-&gt;GetBinLowEdge(Histogram-&gt;GetYaxis()-&gt;GetNbins());</div>
+<div class="line"><span class="lineno">  625</span>    <span class="comment">//KS: Extend by bin width to perfectly fit canvas</span></div>
+<div class="line"><span class="lineno">  626</span>    maximum += Histogram-&gt;GetYaxis()-&gt;GetBinWidth(Histogram-&gt;GetYaxis()-&gt;GetNbins());</div>
+<div class="line"><span class="lineno">  627</span>  }</div>
+<div class="line"><span class="lineno">  628</span>  <span class="keywordflow">else</span> maximum += Histogram-&gt;GetXaxis()-&gt;GetBinWidth(Histogram-&gt;GetXaxis()-&gt;GetNbins());</div>
+<div class="line"><span class="lineno">  629</span>  <span class="keyword">auto</span> TempLine = std::make_unique&lt;TLine&gt;(minimum, minimum, maximum, maximum);</div>
+<div class="line"><span class="lineno">  630</span>  TempLine-&gt;SetLineColor(kRed);</div>
+<div class="line"><span class="lineno">  631</span>  TempLine-&gt;SetLineWidth(2);</div>
+<div class="line"><span class="lineno">  632</span> </div>
+<div class="line"><span class="lineno">  633</span>  std::string Title = Histogram-&gt;GetName();</div>
+<div class="line"><span class="lineno">  634</span>  Title += <span class="stringliteral">&quot;_canv&quot;</span>;</div>
+<div class="line"><span class="lineno">  635</span>  <span class="keyword">auto</span> TempCanvas = std::make_unique&lt;TCanvas&gt;(Title.c_str(), Title.c_str(), 1024, 1024);</div>
+<div class="line"><span class="lineno">  636</span>  TempCanvas-&gt;SetGridx();</div>
+<div class="line"><span class="lineno">  637</span>  TempCanvas-&gt;SetGridy();</div>
+<div class="line"><span class="lineno">  638</span>  TempCanvas-&gt;cd();</div>
+<div class="line"><span class="lineno">  639</span>  gStyle-&gt;SetPalette(81);</div>
+<div class="line"><span class="lineno">  640</span>  Histogram-&gt;SetMinimum(-0.01);</div>
+<div class="line"><span class="lineno">  641</span>  Histogram-&gt;Draw(<span class="stringliteral">&quot;colz&quot;</span>);</div>
+<div class="line"><span class="lineno">  642</span>  TempLine-&gt;Draw(<span class="stringliteral">&quot;same&quot;</span>);</div>
+<div class="line"><span class="lineno">  643</span> </div>
+<div class="line"><span class="lineno">  644</span>  TempCanvas-&gt;Write();</div>
+<div class="line"><span class="lineno">  645</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1369,58 +1369,58 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="StatisticalUtils_8cpp_source.html#l00547">547</a> of file <a class="el" href="StatisticalUtils_8cpp_source.html">StatisticalUtils.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  547</span>                                 {</div>
-<div class="line"><span class="lineno">  548</span><span class="comment">// ****************</span></div>
-<div class="line"><span class="lineno">  549</span>  <span class="comment">// Get the bin which has the largest posterior density</span></div>
-<div class="line"><span class="lineno">  550</span>  <span class="keywordtype">int</span> MaxBin = hpost-&gt;GetMaximumBin();</div>
-<div class="line"><span class="lineno">  551</span> </div>
-<div class="line"><span class="lineno">  552</span>  <span class="comment">// The total integral of the posterior</span></div>
-<div class="line"><span class="lineno">  553</span>  <span class="keyword">const</span> <span class="keywordtype">double</span> Integral = hpost-&gt;Integral();</div>
-<div class="line"><span class="lineno">  554</span> </div>
-<div class="line"><span class="lineno">  555</span>  <span class="keywordtype">int</span> LowBin = MaxBin;</div>
-<div class="line"><span class="lineno">  556</span>  <span class="keywordtype">int</span> HighBin = MaxBin;</div>
-<div class="line"><span class="lineno">  557</span>  <span class="keywordtype">double</span> sum = hpost-&gt;GetBinContent(MaxBin);;</div>
-<div class="line"><span class="lineno">  558</span>  <span class="keywordtype">double</span> LowCon = 0.0;</div>
-<div class="line"><span class="lineno">  559</span>  <span class="keywordtype">double</span> HighCon = 0.0;</div>
-<div class="line"><span class="lineno">  560</span>  <span class="keywordflow">while</span> (sum/Integral &lt; 0.6827 &amp;&amp; (LowBin &gt; 0 || HighBin &lt; hpost-&gt;GetNbinsX()+1) )</div>
-<div class="line"><span class="lineno">  561</span>  {</div>
-<div class="line"><span class="lineno">  562</span>    LowCon = 0.0;</div>
-<div class="line"><span class="lineno">  563</span>    HighCon = 0.0;</div>
-<div class="line"><span class="lineno">  564</span>    <span class="comment">//KS:: Move further only if you haven&#39;t reached histogram end</span></div>
-<div class="line"><span class="lineno">  565</span>    <span class="keywordflow">if</span>(LowBin &gt; 1)</div>
+<p class="definition">Definition at line <a class="el" href="StatisticalUtils_8cpp_source.html#l00542">542</a> of file <a class="el" href="StatisticalUtils_8cpp_source.html">StatisticalUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  542</span>                                 {</div>
+<div class="line"><span class="lineno">  543</span><span class="comment">// ****************</span></div>
+<div class="line"><span class="lineno">  544</span>  <span class="comment">// Get the bin which has the largest posterior density</span></div>
+<div class="line"><span class="lineno">  545</span>  <span class="keywordtype">int</span> MaxBin = hpost-&gt;GetMaximumBin();</div>
+<div class="line"><span class="lineno">  546</span> </div>
+<div class="line"><span class="lineno">  547</span>  <span class="comment">// The total integral of the posterior</span></div>
+<div class="line"><span class="lineno">  548</span>  <span class="keyword">const</span> <span class="keywordtype">double</span> Integral = hpost-&gt;Integral();</div>
+<div class="line"><span class="lineno">  549</span> </div>
+<div class="line"><span class="lineno">  550</span>  <span class="keywordtype">int</span> LowBin = MaxBin;</div>
+<div class="line"><span class="lineno">  551</span>  <span class="keywordtype">int</span> HighBin = MaxBin;</div>
+<div class="line"><span class="lineno">  552</span>  <span class="keywordtype">double</span> sum = hpost-&gt;GetBinContent(MaxBin);;</div>
+<div class="line"><span class="lineno">  553</span>  <span class="keywordtype">double</span> LowCon = 0.0;</div>
+<div class="line"><span class="lineno">  554</span>  <span class="keywordtype">double</span> HighCon = 0.0;</div>
+<div class="line"><span class="lineno">  555</span>  <span class="keywordflow">while</span> (sum/Integral &lt; 0.6827 &amp;&amp; (LowBin &gt; 0 || HighBin &lt; hpost-&gt;GetNbinsX()+1) )</div>
+<div class="line"><span class="lineno">  556</span>  {</div>
+<div class="line"><span class="lineno">  557</span>    LowCon = 0.0;</div>
+<div class="line"><span class="lineno">  558</span>    HighCon = 0.0;</div>
+<div class="line"><span class="lineno">  559</span>    <span class="comment">//KS:: Move further only if you haven&#39;t reached histogram end</span></div>
+<div class="line"><span class="lineno">  560</span>    <span class="keywordflow">if</span>(LowBin &gt; 1)</div>
+<div class="line"><span class="lineno">  561</span>    {</div>
+<div class="line"><span class="lineno">  562</span>      LowBin--;</div>
+<div class="line"><span class="lineno">  563</span>      LowCon = hpost-&gt;GetBinContent(LowBin);</div>
+<div class="line"><span class="lineno">  564</span>    }</div>
+<div class="line"><span class="lineno">  565</span>    <span class="keywordflow">if</span>(HighBin &lt; hpost-&gt;GetNbinsX())</div>
 <div class="line"><span class="lineno">  566</span>    {</div>
-<div class="line"><span class="lineno">  567</span>      LowBin--;</div>
-<div class="line"><span class="lineno">  568</span>      LowCon = hpost-&gt;GetBinContent(LowBin);</div>
+<div class="line"><span class="lineno">  567</span>      HighBin++;</div>
+<div class="line"><span class="lineno">  568</span>      HighCon = hpost-&gt;GetBinContent(HighBin);</div>
 <div class="line"><span class="lineno">  569</span>    }</div>
-<div class="line"><span class="lineno">  570</span>    <span class="keywordflow">if</span>(HighBin &lt; hpost-&gt;GetNbinsX())</div>
-<div class="line"><span class="lineno">  571</span>    {</div>
-<div class="line"><span class="lineno">  572</span>      HighBin++;</div>
-<div class="line"><span class="lineno">  573</span>      HighCon = hpost-&gt;GetBinContent(HighBin);</div>
-<div class="line"><span class="lineno">  574</span>    }</div>
-<div class="line"><span class="lineno">  575</span> </div>
-<div class="line"><span class="lineno">  576</span>    <span class="comment">// If we&#39;re on the last slice and the lower contour is larger than the upper</span></div>
-<div class="line"><span class="lineno">  577</span>    <span class="keywordflow">if</span> ((sum+LowCon+HighCon)/Integral &gt; 0.6827 &amp;&amp; LowCon &gt; HighCon) {</div>
-<div class="line"><span class="lineno">  578</span>      sum += LowCon;</div>
-<div class="line"><span class="lineno">  579</span>      <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  580</span>      <span class="comment">// If we&#39;re on the last slice and the upper contour is larger than the lower</span></div>
-<div class="line"><span class="lineno">  581</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> ((sum+LowCon+HighCon)/Integral &gt; 0.6827 &amp;&amp; HighCon &gt;= LowCon) {</div>
-<div class="line"><span class="lineno">  582</span>      sum += HighCon;</div>
-<div class="line"><span class="lineno">  583</span>      <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  584</span>    } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  585</span>      sum += LowCon + HighCon;</div>
-<div class="line"><span class="lineno">  586</span>    }</div>
-<div class="line"><span class="lineno">  587</span>  }</div>
-<div class="line"><span class="lineno">  588</span> </div>
-<div class="line"><span class="lineno">  589</span>  <span class="keywordtype">double</span> Mode_Error = 0.0;</div>
-<div class="line"><span class="lineno">  590</span>  <span class="keywordflow">if</span> (LowCon &gt; HighCon) {</div>
-<div class="line"><span class="lineno">  591</span>    Mode_Error = std::fabs(hpost-&gt;GetBinCenter(LowBin)-hpost-&gt;GetBinCenter(MaxBin));</div>
-<div class="line"><span class="lineno">  592</span>  } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  593</span>    Mode_Error = std::fabs(hpost-&gt;GetBinCenter(HighBin)-hpost-&gt;GetBinCenter(MaxBin));</div>
-<div class="line"><span class="lineno">  594</span>  }</div>
-<div class="line"><span class="lineno">  595</span> </div>
-<div class="line"><span class="lineno">  596</span>  <span class="keywordflow">return</span> Mode_Error;</div>
-<div class="line"><span class="lineno">  597</span>}</div>
+<div class="line"><span class="lineno">  570</span> </div>
+<div class="line"><span class="lineno">  571</span>    <span class="comment">// If we&#39;re on the last slice and the lower contour is larger than the upper</span></div>
+<div class="line"><span class="lineno">  572</span>    <span class="keywordflow">if</span> ((sum+LowCon+HighCon)/Integral &gt; 0.6827 &amp;&amp; LowCon &gt; HighCon) {</div>
+<div class="line"><span class="lineno">  573</span>      sum += LowCon;</div>
+<div class="line"><span class="lineno">  574</span>      <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  575</span>      <span class="comment">// If we&#39;re on the last slice and the upper contour is larger than the lower</span></div>
+<div class="line"><span class="lineno">  576</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> ((sum+LowCon+HighCon)/Integral &gt; 0.6827 &amp;&amp; HighCon &gt;= LowCon) {</div>
+<div class="line"><span class="lineno">  577</span>      sum += HighCon;</div>
+<div class="line"><span class="lineno">  578</span>      <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  579</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  580</span>      sum += LowCon + HighCon;</div>
+<div class="line"><span class="lineno">  581</span>    }</div>
+<div class="line"><span class="lineno">  582</span>  }</div>
+<div class="line"><span class="lineno">  583</span> </div>
+<div class="line"><span class="lineno">  584</span>  <span class="keywordtype">double</span> Mode_Error = 0.0;</div>
+<div class="line"><span class="lineno">  585</span>  <span class="keywordflow">if</span> (LowCon &gt; HighCon) {</div>
+<div class="line"><span class="lineno">  586</span>    Mode_Error = std::fabs(hpost-&gt;GetBinCenter(LowBin)-hpost-&gt;GetBinCenter(MaxBin));</div>
+<div class="line"><span class="lineno">  587</span>  } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  588</span>    Mode_Error = std::fabs(hpost-&gt;GetBinCenter(HighBin)-hpost-&gt;GetBinCenter(MaxBin));</div>
+<div class="line"><span class="lineno">  589</span>  }</div>
+<div class="line"><span class="lineno">  590</span> </div>
+<div class="line"><span class="lineno">  591</span>  <span class="keywordflow">return</span> Mode_Error;</div>
+<div class="line"><span class="lineno">  592</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1526,11 +1526,11 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The P-value corresponding to the given Z-score. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="StatisticalUtils_8cpp_source.html#l00540">540</a> of file <a class="el" href="StatisticalUtils_8cpp_source.html">StatisticalUtils.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  540</span>                                                {</div>
-<div class="line"><span class="lineno">  541</span><span class="comment">// ********************</span></div>
-<div class="line"><span class="lineno">  542</span>  <span class="keywordflow">return</span> 0.5 * std::erfc(-zScore / std::sqrt(2));</div>
-<div class="line"><span class="lineno">  543</span>}</div>
+<p class="definition">Definition at line <a class="el" href="StatisticalUtils_8cpp_source.html#l00535">535</a> of file <a class="el" href="StatisticalUtils_8cpp_source.html">StatisticalUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  535</span>                                                {</div>
+<div class="line"><span class="lineno">  536</span><span class="comment">// ********************</span></div>
+<div class="line"><span class="lineno">  537</span>  <span class="keywordflow">return</span> 0.5 * std::erfc(-zScore / std::sqrt(2));</div>
+<div class="line"><span class="lineno">  538</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1683,11 +1683,11 @@ Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>The Z-score of the given value. </dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>Ensure that stddev is not zero to avoid division by zero. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="StatisticalUtils_8cpp_source.html#l00534">534</a> of file <a class="el" href="StatisticalUtils_8cpp_source.html">StatisticalUtils.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  534</span>                                                                             {</div>
-<div class="line"><span class="lineno">  535</span><span class="comment">// ********************</span></div>
-<div class="line"><span class="lineno">  536</span>  <span class="keywordflow">return</span> (value - mean) / stddev;</div>
-<div class="line"><span class="lineno">  537</span>}</div>
+<p class="definition">Definition at line <a class="el" href="StatisticalUtils_8cpp_source.html#l00529">529</a> of file <a class="el" href="StatisticalUtils_8cpp_source.html">StatisticalUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  529</span>                                                                             {</div>
+<div class="line"><span class="lineno">  530</span><span class="comment">// ********************</span></div>
+<div class="line"><span class="lineno">  531</span>  <span class="keywordflow">return</span> (value - mean) / stddev;</div>
+<div class="line"><span class="lineno">  532</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1737,42 +1737,38 @@ Functions</h2></td></tr>
 <div class="line"><span class="lineno">  493</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Error: system call to copy file failed with code {}&quot;</span>, ret);</div>
 <div class="line"><span class="lineno">  494</span>  }</div>
 <div class="line"><span class="lineno">  495</span> </div>
-<div class="line"><span class="lineno">  496</span>  TFile *inFile = TFile::Open(TempFilePath.c_str(), <span class="stringliteral">&quot;UPDATE&quot;</span>);</div>
-<div class="line"><span class="lineno">  497</span>  <span class="keywordflow">if</span> (!inFile || inFile-&gt;IsZombie()) {</div>
-<div class="line"><span class="lineno">  498</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Error opening file: {}&quot;</span>, TempFilePath);</div>
-<div class="line"><span class="lineno">  499</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><span class="lineno">  500</span>  }</div>
-<div class="line"><span class="lineno">  501</span> </div>
-<div class="line"><span class="lineno">  502</span>  TTree *inTree = inFile-&gt;Get&lt;TTree&gt;(<span class="stringliteral">&quot;posteriors&quot;</span>);</div>
-<div class="line"><span class="lineno">  503</span>  <span class="keywordflow">if</span> (!inTree) {</div>
-<div class="line"><span class="lineno">  504</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Error: TTree &#39;posteriors&#39; not found in file.&quot;</span>);</div>
-<div class="line"><span class="lineno">  505</span>    inFile-&gt;ls();</div>
-<div class="line"><span class="lineno">  506</span>    inFile-&gt;Close();</div>
-<div class="line"><span class="lineno">  507</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><span class="lineno">  508</span>  }</div>
-<div class="line"><span class="lineno">  509</span> </div>
-<div class="line"><span class="lineno">  510</span>  <span class="comment">// Clone the structure without data</span></div>
-<div class="line"><span class="lineno">  511</span>  TTree *outTree = inTree-&gt;CloneTree(0);</div>
-<div class="line"><span class="lineno">  512</span> </div>
-<div class="line"><span class="lineno">  513</span>  <span class="comment">// Loop over entries and apply thinning</span></div>
-<div class="line"><span class="lineno">  514</span>  Long64_t nEntries = inTree-&gt;GetEntries();</div>
-<div class="line"><span class="lineno">  515</span>  <span class="keywordtype">double</span> retainedPercentage = (double(nEntries) / ThinningCut) / <span class="keywordtype">double</span>(nEntries) * 100;</div>
-<div class="line"><span class="lineno">  516</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Thinning will retain {:.2f}% of chains&quot;</span>, retainedPercentage);</div>
-<div class="line"><span class="lineno">  517</span>  <span class="keywordflow">for</span> (Long64_t i = 0; i &lt; nEntries; i++) {</div>
-<div class="line"><span class="lineno">  518</span>    <span class="keywordflow">if</span> (i % (nEntries/10) == 0) {</div>
-<div class="line"><span class="lineno">  519</span>      <a class="code hl_function" href="namespaceMaCh3Utils.html#a4c8bdeb1d34606aed192e9f1311a72f5">MaCh3Utils::PrintProgressBar</a>(i, nEntries);</div>
-<div class="line"><span class="lineno">  520</span>    }</div>
-<div class="line"><span class="lineno">  521</span>    <span class="keywordflow">if</span> (i % ThinningCut == 0) {</div>
-<div class="line"><span class="lineno">  522</span>      inTree-&gt;GetEntry(i);</div>
-<div class="line"><span class="lineno">  523</span>      outTree-&gt;Fill();</div>
-<div class="line"><span class="lineno">  524</span>    }</div>
-<div class="line"><span class="lineno">  525</span>  }</div>
-<div class="line"><span class="lineno">  526</span>  inFile-&gt;WriteTObject(outTree, <span class="stringliteral">&quot;posteriors&quot;</span>, <span class="stringliteral">&quot;kOverwrite&quot;</span>);</div>
-<div class="line"><span class="lineno">  527</span>  inFile-&gt;Close();</div>
-<div class="line"><span class="lineno">  528</span>  <span class="keyword">delete</span> inFile;</div>
-<div class="line"><span class="lineno">  529</span> </div>
-<div class="line"><span class="lineno">  530</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Thinned TTree saved and overwrote original in: {}&quot;</span>, TempFilePath);</div>
-<div class="line"><span class="lineno">  531</span>}</div>
+<div class="line"><span class="lineno">  496</span>  TFile *inFile = <a class="code hl_function" href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a>(TempFilePath, <span class="stringliteral">&quot;RECREATE&quot;</span>, __FILE__, __LINE__);</div>
+<div class="line"><span class="lineno">  497</span>  TTree *inTree = inFile-&gt;Get&lt;TTree&gt;(<span class="stringliteral">&quot;posteriors&quot;</span>);</div>
+<div class="line"><span class="lineno">  498</span>  <span class="keywordflow">if</span> (!inTree) {</div>
+<div class="line"><span class="lineno">  499</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Error: TTree &#39;posteriors&#39; not found in file.&quot;</span>);</div>
+<div class="line"><span class="lineno">  500</span>    inFile-&gt;ls();</div>
+<div class="line"><span class="lineno">  501</span>    inFile-&gt;Close();</div>
+<div class="line"><span class="lineno">  502</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><span class="lineno">  503</span>  }</div>
+<div class="line"><span class="lineno">  504</span> </div>
+<div class="line"><span class="lineno">  505</span>  <span class="comment">// Clone the structure without data</span></div>
+<div class="line"><span class="lineno">  506</span>  TTree *outTree = inTree-&gt;CloneTree(0);</div>
+<div class="line"><span class="lineno">  507</span> </div>
+<div class="line"><span class="lineno">  508</span>  <span class="comment">// Loop over entries and apply thinning</span></div>
+<div class="line"><span class="lineno">  509</span>  Long64_t nEntries = inTree-&gt;GetEntries();</div>
+<div class="line"><span class="lineno">  510</span>  <span class="keywordtype">double</span> retainedPercentage = (double(nEntries) / ThinningCut) / <span class="keywordtype">double</span>(nEntries) * 100;</div>
+<div class="line"><span class="lineno">  511</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Thinning will retain {:.2f}% of chains&quot;</span>, retainedPercentage);</div>
+<div class="line"><span class="lineno">  512</span>  <span class="keywordflow">for</span> (Long64_t i = 0; i &lt; nEntries; i++) {</div>
+<div class="line"><span class="lineno">  513</span>    <span class="keywordflow">if</span> (i % (nEntries/10) == 0) {</div>
+<div class="line"><span class="lineno">  514</span>      <a class="code hl_function" href="namespaceMaCh3Utils.html#a4c8bdeb1d34606aed192e9f1311a72f5">MaCh3Utils::PrintProgressBar</a>(i, nEntries);</div>
+<div class="line"><span class="lineno">  515</span>    }</div>
+<div class="line"><span class="lineno">  516</span>    <span class="keywordflow">if</span> (i % ThinningCut == 0) {</div>
+<div class="line"><span class="lineno">  517</span>      inTree-&gt;GetEntry(i);</div>
+<div class="line"><span class="lineno">  518</span>      outTree-&gt;Fill();</div>
+<div class="line"><span class="lineno">  519</span>    }</div>
+<div class="line"><span class="lineno">  520</span>  }</div>
+<div class="line"><span class="lineno">  521</span>  inFile-&gt;WriteTObject(outTree, <span class="stringliteral">&quot;posteriors&quot;</span>, <span class="stringliteral">&quot;kOverwrite&quot;</span>);</div>
+<div class="line"><span class="lineno">  522</span>  inFile-&gt;Close();</div>
+<div class="line"><span class="lineno">  523</span>  <span class="keyword">delete</span> inFile;</div>
+<div class="line"><span class="lineno">  524</span> </div>
+<div class="line"><span class="lineno">  525</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Thinned TTree saved and overwrote original in: {}&quot;</span>, TempFilePath);</div>
+<div class="line"><span class="lineno">  526</span>}</div>
+<div class="ttc" id="anamespaceM3_html_a87841bdbf0e0a2a733d9e4ca499f820d"><div class="ttname"><a href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a></div><div class="ttdeci">TFile * Open(const std::string &amp;Name, const std::string &amp;Type, const std::string &amp;File, const int Line)</div><div class="ttdoc">Opens a ROOT file with the given name and mode.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00610">HistogramUtils.cpp:610</a></div></div>
 <div class="ttc" id="anamespaceMaCh3Utils_html_a4c8bdeb1d34606aed192e9f1311a72f5"><div class="ttname"><a href="namespaceMaCh3Utils.html#a4c8bdeb1d34606aed192e9f1311a72f5">MaCh3Utils::PrintProgressBar</a></div><div class="ttdeci">void PrintProgressBar(const Long64_t Done, const Long64_t All)</div><div class="ttdoc">KS: Simply print progress bar.</div><div class="ttdef"><b>Definition:</b> <a href="Monitor_8cpp_source.html#l00212">Monitor.cpp:212</a></div></div>
 </div><!-- fragment -->
 </div>
