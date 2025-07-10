@@ -602,7 +602,7 @@ void ParameterHandlerBase::Randomize() _noexcept_ {
     #endif
     for (int i = 0; i < _fNumPar; ++i) {
       // If parameter isn't fixed
-      if (_fError[i] > 0.0) {
+      if (!IsParameterFixed(i) > 0.0) {
         randParams[i] = random_number[M3::GetThreadIndex()]->Gaus(0, 1);
         // If parameter IS fixed
       } else {
@@ -640,7 +640,7 @@ void ParameterHandlerBase::CorrelateSteps() _noexcept_ {
     #pragma omp parallel for
     #endif
     for (int i = 0; i < _fNumPar; ++i) {
-      if (_fError[i] > 0.) {
+      if (!IsParameterFixed(i) > 0.) {
         _fPropVal[i] = _fCurrVal[i] + corr_throw[i]*_fGlobalStepScale*_fIndivStepScale[i];
       }
     }
@@ -696,7 +696,7 @@ void ParameterHandlerBase::ThrowParProp(const double mag) {
     M3::MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
     // Number of sigmas we throw
     for (int i = 0; i < _fNumPar; i++) {
-      if (_fError[i] > 0.)
+      if (!IsParameterFixed(i) > 0.)
         _fPropVal[i] = _fCurrVal[i] + corr_throw[i]*mag;
     }
   } else {
@@ -715,7 +715,7 @@ void ParameterHandlerBase::ThrowParCurr(const double mag) {
     // The number of sigmas to throw
     // Should probably have this as a default parameter input to the function instead
     for (int i = 0; i < _fNumPar; i++) {
-      if (_fError[i] > 0.){
+      if (!IsParameterFixed(i) > 0.){
         _fCurrVal[i] = corr_throw[i]*mag;
       }
     }
