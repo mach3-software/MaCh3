@@ -297,7 +297,7 @@ Private Attributes</h2></td></tr>
 <div class="line"><span class="lineno">   59</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> iPar = 0; iPar &lt; <a class="code hl_variable" href="classOscillationHandler.html#ab2b1e8e47b95db2652783593f30dcc87">OscParams</a>.size(); ++iPar) {</div>
 <div class="line"><span class="lineno">   60</span><span class="preprocessor">    #pragma GCC diagnostic push</span></div>
 <div class="line"><span class="lineno">   61</span><span class="preprocessor">    #pragma GCC diagnostic ignored &quot;-Wuseless-cast&quot;</span></div>
-<div class="line"><span class="lineno">   62</span>    OscVec[iPar] = <a class="code hl_typedef" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a>(*<a class="code hl_variable" href="classOscillationHandler.html#ab2b1e8e47b95db2652783593f30dcc87">OscParams</a>[iPar]);</div>
+<div class="line"><span class="lineno">   62</span>    OscVec[iPar] = <span class="keyword">static_cast&lt;</span><a class="code hl_typedef" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a><span class="keyword">&gt;</span>(*<a class="code hl_variable" href="classOscillationHandler.html#ab2b1e8e47b95db2652783593f30dcc87">OscParams</a>[iPar]);</div>
 <div class="line"><span class="lineno">   63</span><span class="preprocessor">    #pragma GCC diagnostic pop</span></div>
 <div class="line"><span class="lineno">   64</span>  }</div>
 <div class="line"><span class="lineno">   65</span> </div>
