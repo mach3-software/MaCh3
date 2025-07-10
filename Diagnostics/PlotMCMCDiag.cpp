@@ -61,15 +61,26 @@ void MakePlot(TString fname1, TString flabel1, TString fname2, TString flabel2, 
   TKey *key;
   TFile *infile = TFile::Open(fname1.Data());
 
+  bool add_legend = false;
+
   TFile *infile2 = NULL;
   if (fname2 != DUMMYFILE)
+  {
     infile2 = TFile::Open(fname2.Data());
+    add_legend = true;
+  }
   TFile *infile3 = NULL;
   if (fname3 != DUMMYFILE)
+  {
     infile3 = TFile::Open(fname3.Data());
+    add_legend = true;
+  }
   TFile *infile4 = NULL;
   if (fname4 != DUMMYFILE)
+  {
     infile4 = TFile::Open(fname4.Data());
+    add_legend = true;
+  }
 
   TIter next(infile->GetListOfKeys());
   while ((key = static_cast<TKey *>(next())))
@@ -91,7 +102,7 @@ void MakePlot(TString fname1, TString flabel1, TString fname2, TString flabel2, 
     {
 
       TLegend *leg = new TLegend(0.7, 0.7, 0.9, 0.9);
-      leg->SetFillColorAlpha(kWhite, 0.5);
+      leg->SetFillColorAlpha(kWhite, float(0.7));
       std::string name = std::string(subkey->GetName());
       name = dirname + "/" + name;
       MACH3LOG_INFO("{}", name);
@@ -149,7 +160,10 @@ void MakePlot(TString fname1, TString flabel1, TString fname2, TString flabel2, 
         blarb[3]->Draw("same");
         leg->AddEntry(blarb[3], flabel4.Data(), "l");
       }
-      leg->Draw();
+      if (add_legend)
+      {
+        leg->Draw();
+      }
 
       c1->Print(Form("%s.pdf", dirname.c_str()), "pdf");
       delete leg;
@@ -210,7 +224,6 @@ void PlotAutoCorr(TString fname1, TString flabel1, TString fname2, TString flabe
 
     TKey *key;
     TLegend *leg = new TLegend(0.7, 0.7, 0.9, 0.9);
-    leg->SetFillColorAlpha(kWhite, 0.5);
 
     while ((key = static_cast<TKey *>(next())))
     {
@@ -264,15 +277,17 @@ void PlotAutoCorr(TString fname1, TString flabel1, TString fname2, TString flabe
 
         TString integral = Form("Integral: %.2f", blarb->Integral());
 
-        leg->AddEntry(blarb, Form("%s: %s", flabel[ik].Data(), integral.Data()), "l");
-
         if (!FirstTime)
           blarb->Draw("same");
         FirstTime = false;
       }
       gDirectory->cd("..");
     }
-    leg->Draw();
+
+    if (Nfiles > 1)
+    {
+      leg->Draw();
+    }
     c1->Print("Auto_Corr_PerFile.pdf", "pdf");
     delete leg;
   }
@@ -471,7 +486,7 @@ void CompareAverageAC(const std::vector<std::vector<TH1D *>> &histograms,
   TColor::CreateGradientColorTable(8, stops, red, green, blue, nb);
 
   TLegend *leg = new TLegend(0.5, 0.7, 0.9, 0.9);
-  leg->SetFillColorAlpha(kWhite, 0.5);
+  leg->SetFillColorAlpha(kWhite, float(0.7));
 
   if (draw_min_max)
   {
@@ -532,7 +547,11 @@ void CompareAverageAC(const std::vector<std::vector<TH1D *>> &histograms,
 
     leg->AddEntry(averages[i], hist_labels[i] + int_str, "l");
   }
-  leg->Draw();
+
+  if (averages.size() > 1)
+  {
+    leg->Draw();
+  }
 
   canvas->SaveAs(output_name + ".pdf");
   delete canvas;
