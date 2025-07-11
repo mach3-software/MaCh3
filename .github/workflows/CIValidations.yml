@@ -72,17 +72,19 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Set MACH3_BRANCH
+      run: echo "MACH3_BRANCH=${GITHUB_HEAD_REF}" >> "$GITHUB_ENV"
+      env:
+        GITHUB_HEAD_REF: ${{ github.head_ref }}
 
     - name: Get MaCh3 Validations
-      env:
-        MACH3_BRANCH: ${{ github.head_ref }}
       run: |
-      	cd /opt/
-      	git clone https://github.com/mach3-software/MaCh3Tutorial.git MaCh3Validations
-      	cd MaCh3Validations
-      	mkdir build
-      	cd build
-      	cmake ../ -DMaCh3_Branch=$MACH3_BRANCH -DMaCh3Tutorial_UNITTESTS_ENABLED=TRUE
+        cd /opt/
+        git clone https://github.com/mach3-software/MaCh3Tutorial.git MaCh3Validations
+        cd MaCh3Validations
+        mkdir build
+        cd build
+        cmake ../ -DMaCh3_Branch=$MACH3_BRANCH -DMaCh3Tutorial_UNITTESTS_ENABLED=TRUE
 
     - name: Build MaCh3 Validations
       run: |
