@@ -84,7 +84,7 @@ jobs:
         cd MaCh3Validations
         mkdir build
         cd build
-        cmake ../ -DMaCh3_Branch=$MACH3_BRANCH -DMaCh3Tutorial_UNITTESTS_ENABLED=TRUE
+        cmake ../ -DMaCh3_Branch="$MACH3_BRANCH" -DMaCh3Tutorial_UNITTESTS_ENABLED=TRUE
 
     - name: Build MaCh3 Validations
       run: |
