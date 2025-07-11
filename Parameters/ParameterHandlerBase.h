@@ -314,7 +314,6 @@ class ParameterHandlerBase {
   /// @brief Fix parameter at prior values
   /// @param name Name of parameter you want to fix
   void ToggleFixParameter(const std::string& name);
-
   /// @brief Is parameter fixed or not
   /// @param i Parameter index
   bool IsParameterFixed(const int i) const {

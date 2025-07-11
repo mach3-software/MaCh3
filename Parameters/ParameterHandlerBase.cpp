@@ -580,12 +580,16 @@ void ParameterHandlerBase::SpecialStepProposal() {
 
   // HW It should now automatically set dcp to be with [-pi, pi]
   for (size_t i = 0; i < CircularBoundsIndex.size(); ++i) {
-    CircularParBounds(CircularBoundsIndex[i], CircularBoundsValues[i].first, CircularBoundsValues[i].second);
+    const int index = CircularBoundsIndex[i];
+    if(!IsParameterFixed(index))
+      CircularParBounds(index, CircularBoundsValues[i].first, CircularBoundsValues[i].second);
   }
 
   // Okay now we've done the standard steps, we can add in our nice flips hierarchy flip first
   for (size_t i = 0; i < FlipParameterIndex.size(); ++i) {
-    FlipParameterValue(FlipParameterIndex[i], FlipParameterPoint[i]);
+    const int index = FlipParameterIndex[i];
+    if(!IsParameterFixed(index))
+      FlipParameterValue(FlipParameterIndex[i], FlipParameterPoint[i]);
   }
 }
 
