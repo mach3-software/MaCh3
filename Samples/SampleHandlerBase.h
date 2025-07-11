@@ -57,7 +57,7 @@ class SampleHandlerBase
   virtual double GetLikelihood() = 0;
 
   /// @ingroup SampleHandlerGetters
-  unsigned int GetNEvents(){return nEvents;}
+  unsigned int GetNEvents() const {return nEvents;}
   /// @ingroup SampleHandlerGetters
   virtual int GetNMCSamples() { return nSamples; }
   /// @ingroup SampleHandlerGetters

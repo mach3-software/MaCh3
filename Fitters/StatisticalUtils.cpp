@@ -493,12 +493,7 @@ void ThinningMCMC(const std::string& FilePath, const int ThinningCut) {
     MACH3LOG_WARN("Error: system call to copy file failed with code {}", ret);
   }
 
-  TFile *inFile = TFile::Open(TempFilePath.c_str(), "UPDATE");
-  if (!inFile || inFile->IsZombie()) {
-    MACH3LOG_ERROR("Error opening file: {}", TempFilePath);
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-
+  TFile *inFile = M3::Open(TempFilePath, "RECREATE", __FILE__, __LINE__);
   TTree *inTree = inFile->Get<TTree>("posteriors");
   if (!inTree) {
     MACH3LOG_ERROR("Error: TTree 'posteriors' not found in file.");

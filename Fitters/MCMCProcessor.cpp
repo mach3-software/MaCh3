@@ -6,7 +6,7 @@ _MaCh3_Safe_Include_Start_ //{
 _MaCh3_Safe_Include_End_ //}
 
 //Only if GPU is enabled
-#ifdef CUDA
+#ifdef MaCh3_CUDA
 #include "Fitters/gpuMCMCProcessorUtils.cuh"
 #endif
 
@@ -88,7 +88,7 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
     nParam[i] = 0;
   }
   //Only if GPU is enabled
-  #ifdef CUDA
+  #ifdef MaCh3_CUDA
    ParStep_cpu = nullptr;
    NumeratorSum_cpu = nullptr;
    ParamSums_cpu = nullptr;
@@ -1544,7 +1544,9 @@ void MCMCProcessor::DrawCorrelations1D() {
 void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegions,
                                         const std::vector<Style_t>& CredibleRegionStyle,
                                         const std::vector<Color_t>& CredibleRegionColor,
-                                        const bool CredibleInSigmas) {
+                                        const bool CredibleInSigmas, 
+					const bool Draw2DPosterior,
+					const bool DrawBestFit) {
 // *********************
   if(hpost2D.size() == 0) MakeCovariance_MP();
   MACH3LOG_INFO("Making Credible Regions");
@@ -1613,10 +1615,15 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
       bestfitM->SetMarkerStyle(22);
       bestfitM->SetMarkerSize(1);
       bestfitM->SetMarkerColor(kMagenta);
-      legend->AddEntry(bestfitM.get(),"Best Fit","p");
-
+    
       //Plot default 2D posterior
+
+      if(Draw2DPosterior){
       hpost_2D_copy[i][j]->Draw("COLZ");
+      }
+      else{
+      hpost_2D_copy[i][j]->Draw("AXIS");
+      }
 
       //Now credible regions
       for (int k = 0; k < nCredible; ++k)
@@ -1629,7 +1636,11 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
           legend->AddEntry(hpost_2D_cl[i][j][k].get(), Form("%.0f%% Credible Region", CredibleRegions[k]*100), "l");
       }
       legend->Draw("SAME");
+  
+    if(DrawBestFit){
+      legend->AddEntry(bestfitM.get(),"Best Fit","p");
       bestfitM->Draw("SAME.P");
+     }
 
       // Write to file
       Posterior->SetName(hpost2D[i][j]->GetName());
@@ -2747,7 +2758,7 @@ void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
     if(ParamNo == _UNDEF_)
     {
       MACH3LOG_WARN("Couldn't find param {}. Can't reweight Prior", Names[k]);
-      continue;
+      return;
     }
 
     TString Title = "";
@@ -2814,6 +2825,18 @@ void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
   post->SetBranchStatus("*",true);
   OutputChain->cd();
   post->Write("posteriors", TObject::kOverwrite);
+
+  // KS: Save reweight metadeta
+  std::ostringstream yaml_stream;
+  yaml_stream << "Weight:\n";
+  for (size_t k = 0; k < Names.size(); ++k) {
+    yaml_stream << "    " << Names[k] << ": [" << NewCentral[k] << ", " << NewError[k] << "]\n";
+  }
+  std::string yaml_string = yaml_stream.str();
+  YAML::Node root = STRINGtoYAML(yaml_string);
+  TMacro ConfigSave = YAMLtoTMacro(root, "Reweight_Config");
+  ConfigSave.Write();
+
   OutputChain->Close();
   delete OutputChain;
 
@@ -3313,7 +3336,7 @@ void MCMCProcessor::AutoCorrelation() {
     LagKPlots[j]->GetYaxis()->SetTitle("Auto-correlation function");
   }
 //KS: If CUDA is not enabled do calculations on CPU
-#ifndef CUDA
+#ifndef MaCh3_CUDA
   // Loop over the lags
   //CW: Each lag is independent so might as well multi-thread them!
   #ifdef MULTITHREAD
@@ -3408,12 +3431,11 @@ void MCMCProcessor::AutoCorrelation() {
   MACH3LOG_INFO("Making auto-correlations took {:.2f}s", clock.RealTime());
 }
 
-#ifdef CUDA
+#ifdef MaCh3_CUDA
 // **************************
 //KS: Allocates memory and copy data from CPU to GPU
 void MCMCProcessor::PrepareGPU_AutoCorr(const int nLags) {
 // **************************
-
   //KS: Create temporary arrays that will communicate with GPU code
   ParStep_cpu = new float[nDraw*nEntries];
   NumeratorSum_cpu = new float[nDraw*nLags];
@@ -3827,7 +3849,7 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
   TVectorD* PowerSpectrumStepSize = new TVectorD(nPrams);
   for (int j = 0; j < nPrams; ++j)
   {
-    TGraph* plot = new TGraph(v_size, k_j[j].data(), P_j[j].data());
+    auto plot = std::make_unique<TGraph>(v_size, k_j[j].data(), P_j[j].data());
 
     TString Title = "";
     double Prior = 1.0, PriorError = 1.0;
@@ -3867,7 +3889,6 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
     //KS: I have no clue what is the reason behind this. Found this in Rick Calland code...
     (*PowerSpectrumStepSize)(j) = std::sqrt(func->GetParameter(0)/float(v_size*0.5));
     delete func;
-    delete plot;
   }
 
   PowerSpectrumStepSize->Write("PowerSpectrumStepSize");

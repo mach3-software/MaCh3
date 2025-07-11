@@ -77,7 +77,7 @@ public:
   void ReadSampleConfig();
 
   /// @ingroup SampleHandlerGetters
-  int GetNOscChannels() {return static_cast<int>(OscChannels.size());}
+  int GetNOscChannels() override {return static_cast<int>(OscChannels.size());}
 
   /// @ingroup SampleHandlerGetters
   std::string GetFlavourName(const int iChannel) {
@@ -272,8 +272,9 @@ public:
   virtual const double* GetPointerToKinematicParameter(std::string KinematicParamter, int iEvent) = 0;
   virtual const double* GetPointerToKinematicParameter(double KinematicVariable, int iEvent) = 0;
 
+  /// @brief Get pointer to oscillation channel associated with given event. Osc channel is const
   const double* GetPointerToOscChannel(const int iEvent) const;
-
+  /// @brief Setup the norm parameters by assigning each event with bin
   void SetupNormParameters();
 
   //===============================================================================
@@ -361,7 +362,9 @@ public:
   void InitialiseSingleFDMCObject();
   void InitialiseSplineObject();
 
+  /// names of mc files associated associated with this object
   std::vector<std::string> mc_files;
+  /// names of spline files associated associated with this object
   std::vector<std::string> spline_files;
 
   std::unordered_map<std::string, double> _modeNomWeightMap;
@@ -383,8 +386,10 @@ public:
   TH1D* _hPDF1D;
   TH2D* _hPDF2D;
 
-  NuPDG GetInitPDGFromFileName(const std::string& FileName) {return FileToInitPDGMap.at(FileName);}
-  NuPDG GetFinalPDGFromFileName(const std::string& FileName) {return FileToFinalPDGMap.at(FileName);}
+  /// @brief Retrieve the initial neutrino PDG code associated with a given input file name.
+  NuPDG GetInitPDGFromFileName(const std::string& FileName) const {return FileToInitPDGMap.at(FileName);}
+  /// @brief Retrieve the final neutrino PDG code associated with a given input file name.
+  NuPDG GetFinalPDGFromFileName(const std::string& FileName) const {return FileToFinalPDGMap.at(FileName);}
 
 private:
   std::unordered_map<std::string, NuPDG> FileToInitPDGMap;

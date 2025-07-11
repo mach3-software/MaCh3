@@ -81,7 +81,7 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, con
       // Now, MC stat penalty
       // The penalty from MC statistics using Conways approach (https://cds.cern.ch/record/1333496?)
       double penalty = 0;
-      if ( fractional > 0 )  penalty = ( beta - 1 ) * ( beta - 1 ) / ( 2 * fractional * fractional );
+      if ( fractional > 0 )  penalty = ( beta - 1 ) * ( beta - 1 ) / ( 2 * fractional2 );
 
       // Returns test-stat plus the MC stat penalty 
       return stat+penalty;

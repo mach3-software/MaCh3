@@ -147,13 +147,33 @@ void OscProcessor::PerformJarlskogAnalysis() {
   }
   MACH3LOG_INFO("Starting {}", __func__);
 
-  TDirectory *JarlskogDir = OutputFile->mkdir("Jarlskog");
-  JarlskogDir->cd();
-
   bool DoReweight = false;
 
   double s2th13, s2th23, s2th12, dcp, dm2 = M3::_BAD_DOUBLE_;
-  double weight = 1.;
+  double weight = 1.0;
+  std::pair<double, double> Sin13_NewPrior;
+
+  // Now read the MCMC file
+  TFile *TempFile = new TFile((MCMCFile + ".root").c_str(), "open");
+
+  // Get the settings for the MCMC
+  TMacro *Config = TempFile->Get<TMacro>("Reweight_Config");
+
+  if (Config != nullptr) {
+    YAML::Node Settings = TMacroToYAML(*Config);
+    if(CheckNodeExists(Settings, "Weight", Sin2Theta13Name)) {
+      Sin13_NewPrior = Get<std::pair<double, double>>(Settings["Weight"][Sin2Theta13Name], __FILE__, __LINE__);
+      MACH3LOG_INFO("Found Weight in chain, using RC reweighting with new priors {} +- {}", Sin13_NewPrior.first, Sin13_NewPrior.second);
+      DoReweight = true;
+    }
+  }
+
+  TempFile->Close();
+  delete TempFile;
+
+  TDirectory *JarlskogDir = OutputFile->mkdir("Jarlskog");
+  JarlskogDir->cd();
+
   int step = M3::_BAD_INT_;
   Chain->SetBranchStatus("*", false);
 
@@ -175,15 +195,14 @@ void OscProcessor::PerformJarlskogAnalysis() {
   Chain->SetBranchStatus("step", true);
   Chain->SetBranchAddress("step", &step);
 
-  if (Chain->GetBranch("Weight")) {
-    MACH3LOG_CRITICAL("Found Weight in chain, using terrible hardcoding for RC prior...");
+  if(DoReweight) {
     Chain->SetBranchStatus("Weight", true);
     Chain->SetBranchAddress("Weight", &weight);
-    DoReweight = true;
   } else {
     MACH3LOG_WARN("Not applying reweighting weight");
     weight = 1.0;
   }
+
   // Original histograms
   auto jarl = std::make_unique<TH1D>("jarl", "jarl", 1000, -0.05, 0.05);
   jarl->SetDirectory(nullptr);
@@ -270,8 +289,7 @@ void OscProcessor::PerformJarlskogAnalysis() {
     jarl_prior->Fill(prior_j);
 
     if(DoReweight){
-      /// @todo KS: We need to fix this hardcoding here. As right we do not have a way for storing reweight info in a chain...
-      const double prior_wRC_s2th13 = randGen->Gaus(0.0220,0.0007);
+      const double prior_wRC_s2th13 = randGen->Gaus(Sin13_NewPrior.first, Sin13_NewPrior.second);
       const double prior_wRC_s13 = std::sqrt(prior_wRC_s2th13);
       const double prior_wRC_c13 = std::sqrt(1.-prior_wRC_s2th13);
       const double prior_wRC_j = prior_wRC_s13*prior_wRC_c13*prior_wRC_c13*prior_s12*prior_c12*prior_s23*prior_c23*prior_sdcp;

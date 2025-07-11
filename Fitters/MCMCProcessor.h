@@ -111,7 +111,9 @@ class MCMCProcessor {
     void MakeCredibleRegions(const std::vector<double>& CredibleRegions = {0.99, 0.90, 0.68},
                              const std::vector<Style_t>& CredibleRegionStyle = {kDashed, kSolid, kDotted},
                              const std::vector<Color_t>& CredibleRegionColor = {kGreen-3, kGreen-10, kGreen},
-                             const bool CredibleInSigmas = false
+                             const bool CredibleInSigmas = false,
+			     const bool Draw2DPosterior = true,
+			     const bool DrawBestFit = true
                              );
     /// @brief Make fancy triangle plot for selected parameters
     /// @param CredibleIntervals Vector with values of credible intervals, must be in descending order
@@ -192,6 +194,10 @@ class MCMCProcessor {
     inline int GetNXSec() { return nParam[kXSecPar]; };
     inline int GetNND() { return nParam[kNDPar]; };
     inline int GetNFD() { return nParam[kFDDetPar]; };
+
+    /// @brief Get Yaml config obtained from a Chain
+    YAML::Node GetCovConfig(const int i) {return CovConfig.at(i); }
+
     /// @brief Number of params from a given group, for example flux
     int GetGroup(const std::string& name) const;
 
@@ -528,7 +534,7 @@ class MCMCProcessor {
     double *AccProbBatchedAverages;
     
   //Only if GPU is enabled
-  #ifdef CUDA
+  #ifdef MaCh3_CUDA
     /// @brief Move stuff to GPU to perform auto correlation calculations there
     inline void PrepareGPU_AutoCorr(const int nLags);
 

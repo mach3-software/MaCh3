@@ -309,15 +309,20 @@ void SampleHandlerFD::SetupSampleBinning(){
   MACH3LOG_INFO("Setting up Sample Binning");
   TString histname1d = (XVarStr).c_str();
   TString histname2d = (XVarStr+"_"+YVarStr).c_str();
-  TString histtitle = "";
+  TString histtitle = GetTitle();
 
   //The binning here is arbitrary, now we get info from cfg so the
   //set1DBinning and set2Dbinning calls below will make the binning
   //to be what we actually want
-  _hPDF1D   = new TH1D("h"+histname1d+SampleTitle,histtitle, 1, 0, 1);
-  dathist   = new TH1D("d"+histname1d+SampleTitle,histtitle, 1, 0, 1);
-  _hPDF2D   = new TH2D("h"+histname2d+SampleTitle,histtitle, 1, 0, 1, 1, 0, 1);
-  dathist2d = new TH2D("d"+histname2d+SampleTitle,histtitle, 1, 0, 1, 1, 0, 1);
+  _hPDF1D   = new TH1D("h" + histname1d + GetTitle(),histtitle, 1, 0, 1);
+  dathist   = new TH1D("d" + histname1d + GetTitle(),histtitle, 1, 0, 1);
+  _hPDF2D   = new TH2D("h" + histname2d + GetTitle(),histtitle, 1, 0, 1, 1, 0, 1);
+  dathist2d = new TH2D("d" + histname2d + GetTitle(),histtitle, 1, 0, 1, 1, 0, 1);
+
+  _hPDF1D->GetXaxis()->SetTitle(XVarStr.c_str());
+  dathist->GetXaxis()->SetTitle(XVarStr.c_str());
+  _hPDF2D->GetXaxis()->SetTitle(XVarStr.c_str());
+  dathist2d->GetXaxis()->SetTitle(XVarStr.c_str());
 
   //A string to store the binning for a nice print out
   std::string XBinEdgesStr = "";
@@ -356,7 +361,8 @@ void SampleHandlerFD::SetupSampleBinning(){
 // ************************************************
 bool SampleHandlerFD::IsEventSelected(const int iEvent) {
 // ************************************************
-  for (unsigned int iSelection = 0; iSelection < Selection.size(); ++iSelection) {
+  const int SelectionSize = static_cast<int>(Selection.size());
+  for (int iSelection = 0; iSelection < SelectionSize; ++iSelection) {
     const auto& Cut = Selection[iSelection];
     const double Val = ReturnKinematicParameter(Cut.ParamToCutOnIt, iEvent);
     if ((Val < Cut.LowerBound) || (Val >= Cut.UpperBound)) {
@@ -709,7 +715,12 @@ void SampleHandlerFD::ApplyShifts(int iEvent) {
   // Given a sample and event, apply the shifts to the event based on the vector of functional parameter enums
   // First reset shifted array back to nominal values
   resetShifts(iEvent);
-  for (int fpEnum : funcParsGrid[iEvent]) {
+
+  const std::vector<int>& fpEnums = funcParsGrid[iEvent];
+  const std::size_t nShifts = fpEnums.size();
+
+  for (std::size_t i = 0; i < nShifts; ++i) {
+    const int fpEnum = fpEnums[i];
     FunctionalParameter *fp = funcParsMap[static_cast<std::size_t>(fpEnum)];
     // if (fp->funcPtr) {
     //   (*fp->funcPtr)(fp->valuePtr, iEvent);
@@ -755,7 +766,7 @@ M3::float_t SampleHandlerFD::CalcWeightNorm(const FarDetectorCoreInfo* MCEvent) 
     xsecw *= static_cast<M3::float_t>(*(MCEvent->xsec_norm_pointers[iParam]));
 #pragma GCC diagnostic pop
     #ifdef DEBUG
-    if (TMath::IsNaN(xsecw)) MACH3LOG_WARN("iParam= {} xsecweight=nan from norms", iParam);
+    if (std::isnan(xsecw)) MACH3LOG_WARN("iParam= {} xsecweight=nan from norms", iParam);
     #endif
   }
   return xsecw;
@@ -1136,14 +1147,14 @@ TH1* SampleHandlerFD::GetDataHist(const int Dimension) {
 
 void SampleHandlerFD::AddData(std::vector<double> &data) {
   dathist2d = nullptr;
-  dathist->Reset(); 
-  
+  dathist->Reset();
+
   if (GetNDim()!=1) {
     MACH3LOG_ERROR("Trying to set a 1D 'data' histogram when the number of dimensions for this sample is {}", GetNDim());
     MACH3LOG_ERROR("This won't work, please specify the correct dimensions in your sample config with the X and Y variables");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-  
+
   for (auto const& data_point : data){
     dathist->Fill(data_point);
   }
@@ -1161,7 +1172,7 @@ void SampleHandlerFD::AddData(std::vector<double> &data) {
 
 void SampleHandlerFD::AddData(std::vector< std::vector <double> > &data) {
   dathist = nullptr;
-  dathist2d->Reset();                                                       
+  dathist2d->Reset();
 
   if (GetNDim()!=2) {
     MACH3LOG_ERROR("Trying to set a 2D 'data' histogram when the number of dimensions for this sample is {}", GetNDim());
@@ -1192,9 +1203,9 @@ void SampleHandlerFD::AddData(std::vector< std::vector <double> > &data) {
 void SampleHandlerFD::AddData(TH1D* Data) {
   MACH3LOG_INFO("Adding 1D data histogram: {} with {:.2f} events", Data->GetTitle(), Data->Integral());
   dathist2d = nullptr;
-  dathist = Data;
-  
-  if (GetNDim()!=1) {
+  dathist = static_cast<TH1D*>(Data->Clone());
+
+  if (GetNDim() != 1) {
     MACH3LOG_ERROR("Trying to set a 1D 'data' histogram in a 2D sample - Quitting"); 
     MACH3LOG_ERROR("The number of dimensions for this sample is {}", GetNDim());
     throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -1215,12 +1226,12 @@ void SampleHandlerFD::AddData(TH1D* Data) {
 
 void SampleHandlerFD::AddData(TH2D* Data) {
   MACH3LOG_INFO("Adding 2D data histogram: {} with {:.2f} events", Data->GetTitle(), Data->Integral());
-  dathist2d = Data;
+  dathist2d = static_cast<TH2D*>(Data->Clone());
   dathist = nullptr;
 
-  if (GetNDim()!=2) {
+  if (GetNDim() != 2) {
     MACH3LOG_ERROR("Trying to set a 2D 'data' histogram in a 1D sample - Quitting"); 
-    throw MaCh3Exception(__FILE__ , __LINE__ );}	
+    throw MaCh3Exception(__FILE__ , __LINE__ );}
    
   if(SampleHandlerFD_data == nullptr) {
     MACH3LOG_ERROR("SampleHandlerFD_data haven't been initialised yet");
