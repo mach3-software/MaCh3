@@ -27,7 +27,7 @@ jobs:
             test_3: ./CIValidations/NuOscillatorInterfaceValidations
             test_4: ./CIValidations/LLHValidation
             test_5: ./bin/KinemDistributionTutorial TutorialConfigs/FitterConfig.yaml
-            test_6: empty
+            test_6: ./CIValidations/PredictiveValidations
             test_7: empty
             test_8: empty
             test_9: empty
