@@ -96,7 +96,7 @@ void MakePlot(TString fname1, TString flabel1, TString fname2, TString flabel2, 
     // if( (dirname == "Trace") ) continue;
     infile->cd(dirname.c_str());
     TIter nextsub(gDirectory->GetListOfKeys());
-    c1->Print(Form("%s.pdf[", dirname.c_str()), "pdf");
+    c1->Print(Form("%s_%s.pdf[", flabel1.Data(), dirname.c_str()), "pdf");
     TKey *subkey;
     while ((subkey = static_cast<TKey *>(nextsub())))
     {
@@ -165,11 +165,11 @@ void MakePlot(TString fname1, TString flabel1, TString fname2, TString flabel2, 
         leg->Draw();
       }
 
-      c1->Print(Form("%s.pdf", dirname.c_str()), "pdf");
+      c1->Print(Form("%s_%s.pdf", flabel1.Data(), dirname.c_str()), "pdf");
       delete leg;
     }
     gDirectory->cd("..");
-    c1->Print(Form("%s.pdf]", dirname.c_str()), "pdf");
+    c1->Print(Form("%s_%s.pdf]", flabel1.Data(), dirname.c_str()), "pdf");
   }
 
   infile->Close();
@@ -602,25 +602,25 @@ int main(int argc, char *argv[])
   {
     MakePlot(argv[1], argv[2], DUMMYFILE, DUMMYNAME, DUMMYFILE, DUMMYNAME, DUMMYFILE, DUMMYNAME);
     PlotAutoCorr(argv[1], argv[2], DUMMYFILE, DUMMYNAME, DUMMYFILE, DUMMYNAME, DUMMYFILE, DUMMYNAME);
-    PlotAverageACMult({argv[1]}, {argv[2]}, "Average_Auto_Corr", true);
+    PlotAverageACMult({argv[1]}, {argv[2]}, Form("%s_Average_Auto_Corr", argv[2]), true);
   }
   else if (argc == 5)
   {
     MakePlot(argv[1], argv[2], argv[3], argv[4], DUMMYFILE, DUMMYNAME, DUMMYFILE, DUMMYNAME);
     PlotAutoCorr(argv[1], argv[2], argv[3], argv[4], DUMMYFILE, DUMMYNAME, DUMMYFILE, DUMMYNAME);
-    PlotAverageACMult({argv[1], argv[3]}, {argv[2], argv[4]}, "Average_Auto_Corr", true);
+    PlotAverageACMult({argv[1], argv[3]}, {argv[2], argv[4]}, Form("%s_Average_Auto_Corr", argv[2]), true);
   }
   else if (argc == 7)
   {
     MakePlot(argv[1], argv[2], argv[3], argv[4], argv[5], argv[6], DUMMYFILE, DUMMYNAME);
     PlotAutoCorr(argv[1], argv[2], argv[3], argv[4], argv[5], argv[6], DUMMYFILE, DUMMYNAME);
-    PlotAverageACMult({argv[1], argv[3], argv[5]}, {argv[2], argv[4], argv[6]}, "Average_Auto_Corr", true);
+    PlotAverageACMult({argv[1], argv[3], argv[5]}, {argv[2], argv[4], argv[6]}, Form("%s_Average_Auto_Corr", argv[2]), true);
   }
   else if (argc == 9)
   {
     MakePlot(argv[1], argv[2], argv[3], argv[4], argv[5], argv[6], argv[7], argv[8]);
     PlotAutoCorr(argv[1], argv[2], argv[3], argv[4], argv[5], argv[6], argv[7], argv[8]);
-    PlotAverageACMult({argv[1], argv[3], argv[5], argv[7]}, {argv[2], argv[4], argv[6], argv[8]}, "Average_Auto_Corr", true);
+    PlotAverageACMult({argv[1], argv[3], argv[5], argv[7]}, {argv[2], argv[4], argv[6], argv[8]}, Form("%s_Average_Auto_Corr", argv[2]), true);
   }
   return 0;
 }
