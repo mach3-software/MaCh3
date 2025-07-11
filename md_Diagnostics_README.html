@@ -98,7 +98,8 @@ Study covariance matrix stability  </li>
 </ol>
 <p><b>GetPenaltyTerm</b> - Since xsec and flux and ND spline systematic are treated as the same systematic object we cannot just take log_xsec, hence we need this script, use <code>GetFluxPenaltyTerm MCMCChain.root config</code>. Parameters of relevance are loaded via config, thus you can study any combination you want. Time needed increases with number of sets :(</p>
 <p><b>DiagMCMC</b> - Perform MCMC diagnostic like autocorrelation or trace plots.</p>
-<p><b>PlotMCMCDiag</b> - Plot output of <b>DiagMCMC</b>, can compare multiple files if more than one argument is used</p>
+<p><b>PlotMCMCDiag</b> - Plot output of <b>DiagMCMC</b>, can compare multiple files if more than one argument is used </p><div class="fragment"><div class="line">./PlotMCMCDiag DiagMCMC_file_1.root Label_1, DiagMCMC_file_2.root Label_2 ...</div>
+</div><!-- fragment --><p> Can process up to 4 files</p>
 <p><b>RHat</b> - Performs RHat diagnostic to study if all used chains converged to the same stationary distribution. </p><div class="fragment"><div class="line">./RHat Ntoys MCMCchain_1.root MCMCchain_2.root MCMCchain_3.root ... [how many you like]</div>
 </div><!-- fragment --><p><b>CombineMaCh3Chains</b> - will combine chains files produced by <b>MCMC</b>, enforcing the condition that all the files to combine were made using the exact same software versions and config files </p><div class="fragment"><div class="line">CombineMaCh3Chains [-h] [-c [0-9]] [-f] [-o &lt;output file&gt;] file1.root [file2.root, file3.root ...]</div>
 </div><!-- fragment --><p> <em>fileX.root</em> are the individual spline files to combine, can specify any number, need at least one</p>
