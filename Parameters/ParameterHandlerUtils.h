@@ -438,5 +438,4 @@ inline TMatrixDSym* GetCovMatrixFromChain(TDirectory* TempFile) {
     return fallback;
   }
 }
-
-}
+} // end M3 namespace
