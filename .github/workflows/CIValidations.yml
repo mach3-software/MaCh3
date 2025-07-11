@@ -27,7 +27,7 @@ jobs:
             test_3: ./CIValidations/NuOscillatorInterfaceValidations
             test_4: ./CIValidations/LLHValidation
             test_5: ./bin/KinemDistributionTutorial TutorialConfigs/FitterConfig.yaml
-            test_6: empty
+            test_6: ./CIValidations/PredictiveValidations
             test_7: empty
             test_8: empty
             test_9: empty
@@ -53,7 +53,7 @@ jobs:
             test_7: ./bin/MatrixPlotter bin/TutorialDiagConfig.yaml MCMC_Test_drawCorr.root
             test_8: bin/GetPostfitParamPlots MCMC_Test_drawCorr.root
             test_9: bin/PlotLLH MCMC_Test.root
-            test_10: bin/PlotMCMCDiag MCMC_Test_MCMC_Diag.root MCMC_Test_MCMC_Diag.root
+            test_10: bin/PlotMCMCDiag MCMC_Test_MCMC_Diag.root "test_plot_1" MCMC_Test_MCMC_Diag.root "test_plot_2"
 
           - name: NuMCMC Tools Validations
             test_1: ./CIValidations/NuMCMCvalidations.sh
@@ -72,6 +72,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Set MACH3_BRANCH
+      run: echo "MACH3_BRANCH=${GITHUB_HEAD_REF}" >> "$GITHUB_ENV"
+      env:
+        GITHUB_HEAD_REF: ${{ github.head_ref }}
 
     - name: Get MaCh3 Validations
       run: |
@@ -80,7 +84,7 @@ jobs:
         cd MaCh3Validations
         mkdir build
         cd build
-        cmake ../ -DMaCh3_Branch=${{ github.head_ref }} -DMaCh3Tutorial_UNITTESTS_ENABLED=TRUE
+        cmake ../ -DMaCh3_Branch="$MACH3_BRANCH" -DMaCh3Tutorial_UNITTESTS_ENABLED=TRUE
 
     - name: Build MaCh3 Validations
       run: |
