@@ -639,6 +639,21 @@ void ParameterHandlerGeneric::PrintParameterGroups() {
 }
 
 // ********************************************
+std::vector<std::string> ParameterHandlerGeneric::GetUniqueParameterGroups() {
+// ********************************************
+  std::unordered_set<std::string> uniqueGroups;
+
+  // Fill the set with unique values
+  for (const auto& param : _ParameterGroup) {
+    uniqueGroups.insert(param);
+  }
+
+  // Convert to vector and return
+  std::vector<std::string> result(uniqueGroups.begin(), uniqueGroups.end());
+  return result;
+}
+
+// ********************************************
 // KS: Check if matrix is correctly initialised
 void ParameterHandlerGeneric::CheckCorrectInitialisation() {
 // ********************************************
