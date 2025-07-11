@@ -10,10 +10,11 @@ var searchData=
   ['inputfile_7',['inputFile',['../classParameterHandlerBase.html#adb2f867014619b5c38b67cd981e40dcb',1,'ParameterHandlerBase']]],
   ['invcovmatrix_8',['invCovMatrix',['../classParameterHandlerBase.html#a2789064b551742edb5d05331ca8ef7e1',1,'ParameterHandlerBase::invCovMatrix()'],['../GetPenaltyTerm_8cpp.html#a3fd4dd88b1fa6119298781296ea761c5',1,'invCovMatrix():&#160;GetPenaltyTerm.cpp']]],
   ['invertcovmatrix_9',['InvertCovMatrix',['../classParameterHandlerBase.html#a9806557b3612e29e106a0ac18cc35478',1,'ParameterHandlerBase']]],
-  ['isdecomposedpca_10',['isDecomposedPCA',['../classPCAHandler.html#a10fecf91a038d034f55a08332dec0f4a',1,'PCAHandler']]],
-  ['isflat_11',['isFlat',['../GetPenaltyTerm_8cpp.html#ae7c3a438d4508eba7ac26e26135b2c17',1,'GetPenaltyTerm.cpp']]],
-  ['isflatarray_12',['isflatarray',['../classBinnedSplineHandler.html#a13329dc38e92088744a5a49a60c01a83',1,'BinnedSplineHandler']]],
-  ['isnc_13',['isNC',['../structFarDetectorCoreInfo.html#abdba4588283aa31368e3fab57ac8cd60',1,'FarDetectorCoreInfo']]],
+  ['is_5fpriorpredictive_10',['Is_PriorPredictive',['../classPredictiveThrower.html#a6be5b493541d6f30b3a0d6fd0e7557e9',1,'PredictiveThrower']]],
+  ['isdecomposedpca_11',['isDecomposedPCA',['../classPCAHandler.html#a10fecf91a038d034f55a08332dec0f4a',1,'PCAHandler']]],
+  ['isflat_12',['isFlat',['../GetPenaltyTerm_8cpp.html#ae7c3a438d4508eba7ac26e26135b2c17',1,'GetPenaltyTerm.cpp']]],
+  ['isflatarray_13',['isflatarray',['../classBinnedSplineHandler.html#a13329dc38e92088744a5a49a60c01a83',1,'BinnedSplineHandler']]],
   ['isnc_14',['IsNC',['../structMaCh3ModeInfo.html#ad987766dd95bed2cfcdad169d07a885b',1,'MaCh3ModeInfo']]],
-  ['ispriorpredictive_15',['isPriorPredictive',['../classSampleSummary.html#adb737e335e68edeb14a6ce2ca112dc8c',1,'SampleSummary']]]
+  ['isnc_15',['isNC',['../structFarDetectorCoreInfo.html#abdba4588283aa31368e3fab57ac8cd60',1,'FarDetectorCoreInfo']]],
+  ['ispriorpredictive_16',['isPriorPredictive',['../classSampleSummary.html#adb737e335e68edeb14a6ce2ca112dc8c',1,'SampleSummary']]]
 ];

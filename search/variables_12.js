@@ -29,12 +29,13 @@ var searchData=
   ['total_5fsteps_26',['total_steps',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
   ['total_5fweight_5fpointers_27',['total_weight_pointers',['../structFarDetectorCoreInfo.html#a5f800754db9e9b52a62cef3568451a07',1,'FarDetectorCoreInfo']]],
   ['totalnsamples_28',['TotalNSamples',['../classFitterBase.html#abe9814558b8ff1bccdde3b4c894467e6',1,'FitterBase']]],
-  ['totalonsplitplots_29',['totalOnSplitPlots',['../PlotLLH_8cpp.html#a6446498097144fc5f704c241f009d44d',1,'PlotLLH.cpp']]],
-  ['tottoys_30',['TotToys',['../RHat_8cpp.html#a8d5589b851b154e9a366017ca14da0f5',1,'RHat.cpp']]],
-  ['transfermat_31',['TransferMat',['../classPCAHandler.html#a1d9302633ed96ec57fbe26d25cbcee61',1,'PCAHandler']]],
-  ['transfermatt_32',['TransferMatT',['../classPCAHandler.html#a6f6443a487bb544e6a6e458d86f35f27',1,'PCAHandler']]],
-  ['tunemap_33',['TuneMap',['../classParameterTunes.html#ac153c6fe15225e0ec4f1fb2de8d7e0ca',1,'ParameterTunes']]],
-  ['tunenames_34',['TuneNames',['../classParameterTunes.html#a5e61597ff466d83680a44f4a6bc78879',1,'ParameterTunes']]],
-  ['tunes_35',['Tunes',['../classParameterHandlerBase.html#a4aa04c9dfb80f8d25f0712e21eb71054',1,'ParameterHandlerBase']]],
-  ['tunevalues_36',['TuneValues',['../classParameterTunes.html#ac6cb5b976b3896a21cb3bb5a8be6957b',1,'ParameterTunes']]]
+  ['totalnumberofsamples_29',['TotalNumberOfSamples',['../classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44',1,'PredictiveThrower']]],
+  ['totalonsplitplots_30',['totalOnSplitPlots',['../PlotLLH_8cpp.html#a6446498097144fc5f704c241f009d44d',1,'PlotLLH.cpp']]],
+  ['tottoys_31',['TotToys',['../RHat_8cpp.html#a8d5589b851b154e9a366017ca14da0f5',1,'RHat.cpp']]],
+  ['transfermat_32',['TransferMat',['../classPCAHandler.html#a1d9302633ed96ec57fbe26d25cbcee61',1,'PCAHandler']]],
+  ['transfermatt_33',['TransferMatT',['../classPCAHandler.html#a6f6443a487bb544e6a6e458d86f35f27',1,'PCAHandler']]],
+  ['tunemap_34',['TuneMap',['../classParameterTunes.html#ac153c6fe15225e0ec4f1fb2de8d7e0ca',1,'ParameterTunes']]],
+  ['tunenames_35',['TuneNames',['../classParameterTunes.html#a5e61597ff466d83680a44f4a6bc78879',1,'ParameterTunes']]],
+  ['tunes_36',['Tunes',['../classParameterHandlerBase.html#a4aa04c9dfb80f8d25f0712e21eb71054',1,'ParameterHandlerBase']]],
+  ['tunevalues_37',['TuneValues',['../classParameterTunes.html#ac6cb5b976b3896a21cb3bb5a8be6957b',1,'ParameterTunes']]]
 ];

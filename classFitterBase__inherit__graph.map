@@ -1,8 +1,9 @@
 <map id="FitterBase" name="FitterBase">
-<area shape="rect" id="node1" title="Base class for implementing fitting algorithms." alt="" coords="217,5,305,31"/>
+<area shape="rect" id="node1" title="Base class for implementing fitting algorithms." alt="" coords="309,5,397,31"/>
 <area shape="rect" id="node2" href="$classLikelihoodFit.html" title="Implementation of base Likelihood Fit class, it is mostly responsible for likelihood calculation whil..." alt="" coords="81,79,185,104"/>
-<area shape="rect" id="node6" href="$classPyFitterBase.html" title="EW: As FitterBase is an abstract base class we have to do some gymnastics to get it to get it into py..." alt="" coords="209,79,313,104"/>
-<area shape="rect" id="node7" href="$classmcmc.html" title="Implementation of MR2T2 algorithm." alt="" coords="337,79,400,104"/>
+<area shape="rect" id="node6" href="$classPredictiveThrower.html" title="Implementation of Prior/Posterior Predictive and Bayesian p&#45;Value calculations following the approach..." alt="" coords="209,79,349,104"/>
+<area shape="rect" id="node7" href="$classPyFitterBase.html" title="EW: As FitterBase is an abstract base class we have to do some gymnastics to get it to get it into py..." alt="" coords="374,79,478,104"/>
+<area shape="rect" id="node8" href="$classmcmc.html" title="Implementation of MR2T2 algorithm." alt="" coords="503,79,565,104"/>
 <area shape="rect" id="node3" href="$classMinuitFit.html" title="Implementation of Minuit fitting algorithm ." alt="" coords="5,152,84,177"/>
 <area shape="rect" id="node4" href="$classPSO.html" title="Class PSO, consist of a vector of object Class Particle and global best Takes in the size (number of ..." alt="" coords="109,152,157,177"/>
 <area shape="rect" id="node5" href="$classPyLikelihoodFit.html" title="EW: As LikelihoodFit is an abstract base class we have to do some gymnastics to get it to get it into..." alt="" coords="181,152,301,177"/>

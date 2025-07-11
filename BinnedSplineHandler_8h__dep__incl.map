@@ -1,7 +1,8 @@
 <map id="Splines/BinnedSplineHandler.h" name="Splines/BinnedSplineHandler.h">
-<area shape="rect" id="node1" title=" " alt="" coords="238,5,458,31"/>
-<area shape="rect" id="node2" href="$SampleHandlerFD_8h.html" title=" " alt="" coords="119,79,331,104"/>
-<area shape="rect" id="node5" href="$BinnedSplineHandler_8cpp.html" title=" " alt="" coords="355,79,589,104"/>
-<area shape="rect" id="node3" href="$SampleHandlerFD_8cpp.html" title=" " alt="" coords="5,152,232,177"/>
-<area shape="rect" id="node4" href="$samples_8cpp.html" title=" " alt="" coords="257,152,410,177"/>
+<area shape="rect" id="node1" title=" " alt="" coords="366,5,586,31"/>
+<area shape="rect" id="node2" href="$SampleHandlerFD_8h.html" title=" " alt="" coords="247,79,459,104"/>
+<area shape="rect" id="node6" href="$BinnedSplineHandler_8cpp.html" title=" " alt="" coords="483,79,717,104"/>
+<area shape="rect" id="node3" href="$PredictiveThrower_8cpp.html" title=" " alt="" coords="5,152,216,177"/>
+<area shape="rect" id="node4" href="$SampleHandlerFD_8cpp.html" title=" " alt="" coords="240,152,467,177"/>
+<area shape="rect" id="node5" href="$samples_8cpp.html" title=" " alt="" coords="491,152,645,177"/>
 </map>
