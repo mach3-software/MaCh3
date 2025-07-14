@@ -141,8 +141,12 @@ void AdaptiveMCMCHandler::SetAdaptiveBlocks(const std::vector<std::vector<int>>&
 void AdaptiveMCMCHandler::SaveAdaptiveToFile(const std::string &outFileName,
                                              const std::string &systematicName, bool is_final) {
 // ********************************************
-  if(adaptive_save_n_iterations < 0) return;
-  if (((total_steps - start_adaptive_throw) / adaptive_update_step) % adaptive_save_n_iterations == 0 || is_final) {
+  // Skip saving if adaptive_save_n_iterations is negative,
+  // unless this is the final iteration (is_final overrides the condition)
+  if (adaptive_save_n_iterations < 0 && !is_final) return;
+  if (is_final ||
+    (adaptive_save_n_iterations > 0 &&
+    ((total_steps - start_adaptive_throw) / adaptive_update_step) % adaptive_save_n_iterations == 0)) {
 
     TFile *outFile = new TFile(outFileName.c_str(), "UPDATE");
     if (outFile->IsZombie()) {
