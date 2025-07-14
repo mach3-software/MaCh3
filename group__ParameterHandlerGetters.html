@@ -87,6 +87,15 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:gad53dfcadf98e09ff8d603caeac3466d2"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#gad53dfcadf98e09ff8d603caeac3466d2">adaptive_mcmc::AdaptiveMCMCHandler::GetNumParams</a> () const</td></tr>
+<tr class="memdesc:gad53dfcadf98e09ff8d603caeac3466d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current values of the parameters.  <br /></td></tr>
+<tr class="separator:gad53dfcadf98e09ff8d603caeac3466d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3414c2723fcdd01a7388646eb2b1d778"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#ga3414c2723fcdd01a7388646eb2b1d778">adaptive_mcmc::AdaptiveMCMCHandler::GetTotalSteps</a> () const</td></tr>
+<tr class="memdesc:ga3414c2723fcdd01a7388646eb2b1d778"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get Total Number of Steps.  <br /></td></tr>
+<tr class="separator:ga3414c2723fcdd01a7388646eb2b1d778"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gacefad53a58112e2ec93f65070e5c543f"><td class="memItemLeft" align="right" valign="top">TMatrixDSym *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#gacefad53a58112e2ec93f65070e5c543f">adaptive_mcmc::AdaptiveMCMCHandler::GetAdaptiveCovariance</a> () const</td></tr>
+<tr class="memdesc:gacefad53a58112e2ec93f65070e5c543f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increase by one number of total steps.  <br /></td></tr>
+<tr class="separator:gacefad53a58112e2ec93f65070e5c543f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaa9fb7383cd9b1bba1f3e51bb1820e50a"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ParameterHandlerGetters.html#gaa9fb7383cd9b1bba1f3e51bb1820e50a">adaptive_mcmc::AdaptiveMCMCHandler::GetParameterMeans</a> () const</td></tr>
 <tr class="memdesc:gaa9fb7383cd9b1bba1f3e51bb1820e50a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the parameter means used in the adaptive handler.  <br /></td></tr>
 <tr class="separator:gaa9fb7383cd9b1bba1f3e51bb1820e50a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -286,6 +295,39 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>Group of functions to get various parameters, names, and values. </p>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="gacefad53a58112e2ec93f65070e5c543f" name="gacefad53a58112e2ec93f65070e5c543f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gacefad53a58112e2ec93f65070e5c543f">&#9670;&#160;</a></span>GetAdaptiveCovariance()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">TMatrixDSym * adaptive_mcmc::AdaptiveMCMCHandler::GetAdaptiveCovariance </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Increase by one number of total steps. </p>
+
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00110">110</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  110</span>                                             {</div>
+<div class="line"><span class="lineno">  111</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#afd61e64f18f5c25dbbd6bb2bd619a268">adaptive_covariance</a>;</div>
+<div class="line"><span class="lineno">  112</span>  }</div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_afd61e64f18f5c25dbbd6bb2bd619a268"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#afd61e64f18f5c25dbbd6bb2bd619a268">adaptive_mcmc::AdaptiveMCMCHandler::adaptive_covariance</a></div><div class="ttdeci">TMatrixDSym * adaptive_covariance</div><div class="ttdoc">Full adaptive covariance matrix.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00158">AdaptiveMCMCHandler.h:158</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
 <a id="ga62325ca88bd93cce13a3e46c8e83d74b" name="ga62325ca88bd93cce13a3e46c8e83d74b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga62325ca88bd93cce13a3e46c8e83d74b">&#9670;&#160;</a></span>GetAdaptiveHandler()</h2>
 
@@ -1139,8 +1181,41 @@ Functions</h2></td></tr>
 </div><!-- fragment -->
 </div>
 </div>
+<a id="gad53dfcadf98e09ff8d603caeac3466d2" name="gad53dfcadf98e09ff8d603caeac3466d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gad53dfcadf98e09ff8d603caeac3466d2">&#9670;&#160;</a></span>GetNumParams() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int adaptive_mcmc::AdaptiveMCMCHandler::GetNumParams </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the current values of the parameters. </p>
+
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00077">77</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   77</span>                           {</div>
+<div class="line"><span class="lineno">   78</span>    <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a55330ea7439ca5a3c3065f5205d99e30">_fCurrVal</a>-&gt;size());</div>
+<div class="line"><span class="lineno">   79</span>  }</div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a55330ea7439ca5a3c3065f5205d99e30"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a55330ea7439ca5a3c3065f5205d99e30">adaptive_mcmc::AdaptiveMCMCHandler::_fCurrVal</a></div><div class="ttdeci">const std::vector&lt; double &gt; * _fCurrVal</div><div class="ttdoc">Current values of parameters.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00170">AdaptiveMCMCHandler.h:170</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
 <a id="ga042501dd3e6e0395d48b5d94a60eb7c7" name="ga042501dd3e6e0395d48b5d94a60eb7c7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga042501dd3e6e0395d48b5d94a60eb7c7">&#9670;&#160;</a></span>GetNumParams()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ga042501dd3e6e0395d48b5d94a60eb7c7">&#9670;&#160;</a></span>GetNumParams() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1308,11 +1383,11 @@ Functions</h2></td></tr>
 
 <p>Get Name of Output File. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00119">119</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  119</span>                                   {</div>
-<div class="line"><span class="lineno">  120</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a3635f63cb8108f58a76b90250894c31c">output_file_name</a>;</div>
-<div class="line"><span class="lineno">  121</span>  }</div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a3635f63cb8108f58a76b90250894c31c"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a3635f63cb8108f58a76b90250894c31c">adaptive_mcmc::AdaptiveMCMCHandler::output_file_name</a></div><div class="ttdeci">std::string output_file_name</div><div class="ttdoc">Name of the file to save the adaptive matrices into.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00142">AdaptiveMCMCHandler.h:142</a></div></div>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00122">122</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  122</span>                                   {</div>
+<div class="line"><span class="lineno">  123</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a3635f63cb8108f58a76b90250894c31c">output_file_name</a>;</div>
+<div class="line"><span class="lineno">  124</span>  }</div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a3635f63cb8108f58a76b90250894c31c"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a3635f63cb8108f58a76b90250894c31c">adaptive_mcmc::AdaptiveMCMCHandler::output_file_name</a></div><div class="ttdeci">std::string output_file_name</div><div class="ttdoc">Name of the file to save the adaptive matrices into.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00145">AdaptiveMCMCHandler.h:145</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1341,11 +1416,11 @@ Functions</h2></td></tr>
 
 <p>Get the parameter means used in the adaptive handler. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00113">113</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  113</span>                                              {</div>
-<div class="line"><span class="lineno">  114</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">par_means</a>;</div>
-<div class="line"><span class="lineno">  115</span>  }</div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a066984e9598e073d04edec51511cdf0a"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">adaptive_mcmc::AdaptiveMCMCHandler::par_means</a></div><div class="ttdeci">std::vector&lt; double &gt; par_means</div><div class="ttdoc">Mean values for all parameters.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00152">AdaptiveMCMCHandler.h:152</a></div></div>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00116">116</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  116</span>                                              {</div>
+<div class="line"><span class="lineno">  117</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">par_means</a>;</div>
+<div class="line"><span class="lineno">  118</span>  }</div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a066984e9598e073d04edec51511cdf0a"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">adaptive_mcmc::AdaptiveMCMCHandler::par_means</a></div><div class="ttdeci">std::vector&lt; double &gt; par_means</div><div class="ttdoc">Mean values for all parameters.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00155">AdaptiveMCMCHandler.h:155</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2411,6 +2486,39 @@ Functions</h2></td></tr>
 <p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8h_source.html#l00217">217</a> of file <a class="el" href="ParameterHandlerBase_8h_source.html">ParameterHandlerBase.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  217</span>{<span class="keywordflow">return</span> <a class="code hl_variable" href="classParameterHandlerBase.html#a63d70f267b76b2795fa780e73144f6cc">throwMatrix_CholDecomp</a>;}</div>
 <div class="ttc" id="aclassParameterHandlerBase_html_a63d70f267b76b2795fa780e73144f6cc"><div class="ttname"><a href="classParameterHandlerBase.html#a63d70f267b76b2795fa780e73144f6cc">ParameterHandlerBase::throwMatrix_CholDecomp</a></div><div class="ttdeci">TMatrixD * throwMatrix_CholDecomp</div><div class="ttdoc">Matrix which we use for step proposal after Cholesky decomposition.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00476">ParameterHandlerBase.h:476</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ga3414c2723fcdd01a7388646eb2b1d778" name="ga3414c2723fcdd01a7388646eb2b1d778"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga3414c2723fcdd01a7388646eb2b1d778">&#9670;&#160;</a></span>GetTotalSteps()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int adaptive_mcmc::AdaptiveMCMCHandler::GetTotalSteps </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get Total Number of Steps. </p>
+
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00094">94</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   94</span>                            {</div>
+<div class="line"><span class="lineno">   95</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a>;</div>
+<div class="line"><span class="lineno">   96</span>  }</div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_ab2837af4566e2d62db7b76f9527fb6d7"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">adaptive_mcmc::AdaptiveMCMCHandler::total_steps</a></div><div class="ttdeci">int total_steps</div><div class="ttdoc">Total number of MCMC steps.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00161">AdaptiveMCMCHandler.h:161</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
