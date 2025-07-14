@@ -178,8 +178,8 @@ $(function() {
 <div class="line"><a id="l00117" name="l00117"></a><span class="lineno"><a class="line" href="Core_8h.html#a91209a17295738b34b124b79faa68a1b">  117</a></span><span class="preprocessor">#define _MaCh3_Safe_Include_End_ \</span></div>
 <div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span><span class="preprocessor">_Pragma(&quot;GCC diagnostic pop&quot;</span>)</div>
 <div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span> </div>
-<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span><span class="comment">// clang need slightly different diagnostics</span></div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span><span class="preprocessor">#if defined(__clang__)</span></div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span><span class="comment">// clang and IntelLLVM need slightly different diagnostics</span></div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span><span class="preprocessor">#if defined(__clang__) || defined(__INTEL_LLVM_COMPILER)</span></div>
 <div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span><span class="preprocessor">  #undef _MaCh3_Safe_Include_Start_</span></div>
 <div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span><span class="preprocessor">  #define _MaCh3_Safe_Include_Start_ \</span></div>
 <div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span><span class="preprocessor">  _Pragma(&quot;clang diagnostic push&quot;</span>) \</div>

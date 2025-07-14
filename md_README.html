@@ -236,10 +236,28 @@ Supported operational systems</h2>
  ❔ - Not part of CI/CD but used by some users/developers so it might work <br  />
  ❌ - Not supported and no plans right now <br  />
 </p>
-<h1><a class="anchor" id="autotoc_md17"></a>
+<h2><a class="anchor" id="autotoc_md17"></a>
+Supported compilers</h2>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Name   </th><th class="markdownTableHeadNone">Status    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">GNU   </td><td class="markdownTableBodyNone">✅    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">CLANG   </td><td class="markdownTableBodyNone">❔    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">INTELLLVM   </td><td class="markdownTableBodyNone">❔    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">MSVC   </td><td class="markdownTableBodyNone">❌   </td></tr>
+</table>
+<p>✅ - Fully working with every feature fully tested by CI/CD <br  />
+ ❔ - Not every feature may work, only compilation being tested by CI/CD <br  />
+ ❌ - Not supported and no plans right now <br  />
+</p>
+<h1><a class="anchor" id="autotoc_md18"></a>
 Plotting and Diagnostic 📊</h1>
 <p>Example of chain diagnostic utils can be found <a href="https://github.com/mach3-software/MaCh3/tree/develop/Diagnostics">here</a> with example of config. The MaCh3 core plotting library code can be found <a href="https://github.com/mach3-software/MaCh3/tree/develop/plotting">here</a> along with example config files and some apps for making standard plots.</p>
-<h1><a class="anchor" id="autotoc_md18"></a>
+<h1><a class="anchor" id="autotoc_md19"></a>
 How To Use</h1>
 <p>This is an example how your executable can look like using MaCh3: </p><div class="fragment"><div class="line"><span class="comment">//Manager is responsible for reading from config</span></div>
 <div class="line">std::unique_ptr&lt;manager&gt; fitMan = <a class="code hl_function" href="MaCh3Factory_8cpp.html#aada46b6630f2f29c34c35354973388b3">MaCh3ManagerFactory</a>(argc, argv);</div>
