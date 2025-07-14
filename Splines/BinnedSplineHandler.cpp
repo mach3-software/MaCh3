@@ -67,7 +67,7 @@ void BinnedSplineHandler::AddSample(const std::string& SampleName,
 //****************************************
 {
   SampleNames.push_back(SampleName);
-  Dimensions.push_back(int(SplineVarNames.size()));
+  Dimensions.push_back(static_cast<int>(SplineVarNames.size()));
   DimensionLabels.push_back(SplineVarNames);
 
   int nSplineParam = xsec->GetNumParamsFromSampleName(SampleName, SystType::kSpline);
@@ -134,7 +134,7 @@ void BinnedSplineHandler::TransferToMonolith()
   isflatarray = new bool[MonolithSize];
   
   xcoeff_arr = new M3::float_t[CoeffIndex];
-  manycoeff_arr = new M3::float_t[CoeffIndex*4];
+  manycoeff_arr = new M3::float_t[CoeffIndex*_nCoeff_];
 
   for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++)
   { // Loop over sample
@@ -182,7 +182,7 @@ void BinnedSplineHandler::TransferToMonolith()
 
                   //Now to fill up our coefficient arrayss
                   M3::float_t* tmpXCoeffArr = new M3::float_t[splineKnots];
-                  M3::float_t* tmpManyCoeffArr = new M3::float_t[splineKnots*4];
+                  M3::float_t* tmpManyCoeffArr = new M3::float_t[splineKnots*_nCoeff_];
 
                   int iCoeff=coeffindexvec[splineindex];
                   getSplineCoeff_SepMany(splineindex, tmpXCoeffArr, tmpManyCoeffArr);
@@ -190,8 +190,8 @@ void BinnedSplineHandler::TransferToMonolith()
                   for(int i = 0; i < splineKnots; i++){
                     xcoeff_arr[iCoeff+i]=tmpXCoeffArr[i];
 
-                    for(int j=0; j<4; j++){
-                      manycoeff_arr[(iCoeff+i)*4+j]=tmpManyCoeffArr[i*4+j];
+                    for(int j = 0; j < _nCoeff_; j++){
+                      manycoeff_arr[(iCoeff+i)*_nCoeff_+j]=tmpManyCoeffArr[i*_nCoeff_+j];
                     }
                   }
                   delete[] tmpXCoeffArr;
@@ -237,7 +237,7 @@ void BinnedSplineHandler::CalcSplineWeights()
     const short int currentsegment = short(SplineSegments[uniqueIndex]);
 
     const int segCoeff = coeffindexvec[iSpline]+currentsegment;
-    const int coeffOffset = segCoeff * 4;
+    const int coeffOffset = segCoeff * _nCoeff_;
     // These are what we can extract from the TSpline3
     const M3::float_t y = manycoeff_arr[coeffOffset+kCoeffY];
     const M3::float_t b = manycoeff_arr[coeffOffset+kCoeffB];
@@ -300,12 +300,11 @@ void BinnedSplineHandler::BuildSampleIndexingArray(const std::string& SampleName
 std::vector<TAxis *> BinnedSplineHandler::FindSplineBinning(const std::string& FileName, const std::string& SampleName)
 //****************************************
 {
-  std::vector<TAxis *> ReturnVec;
   int iSample=getSampleIndex(SampleName);
 
   //Try declaring these outside of TFile so they aren't owned by File
-  int nDummyBins = 1;
-  const double DummyEdges[2] = {-1e15, 1e15};
+  constexpr int nDummyBins = 1;
+  constexpr double DummyEdges[2] = {-1e15, 1e15};
   TAxis* DummyAxis = new TAxis(nDummyBins, DummyEdges);
   TH2F* Hist2D = nullptr;
   TH3F* Hist3D = nullptr;
@@ -368,23 +367,26 @@ std::vector<TAxis *> BinnedSplineHandler::FindSplineBinning(const std::string& F
     Hist3D = File->Get<TH3F>(TemplateName.c_str());
   }
 
+  std::vector<TAxis*> ReturnVec;
+  // KS: Resize to reduce impact of push back and memory fragmentation
+  ReturnVec.resize(3);
   if (Dimensions[iSample] == 2) {
-    if(isHist2D){
-      ReturnVec.push_back(static_cast<TAxis*>(Hist2D->GetXaxis()->Clone()));
-      ReturnVec.push_back(static_cast<TAxis*>(Hist2D->GetYaxis()->Clone()));
-      ReturnVec.push_back(static_cast<TAxis*>(DummyAxis->Clone()));
+    if (isHist2D) {
+      ReturnVec[0] = static_cast<TAxis*>(Hist2D->GetXaxis()->Clone());
+      ReturnVec[1] = static_cast<TAxis*>(Hist2D->GetYaxis()->Clone());
+      ReturnVec[2] = static_cast<TAxis*>(DummyAxis->Clone());
     } else if (isHist3D) {
-      ReturnVec.push_back(static_cast<TAxis*>(Hist3D->GetXaxis()->Clone()));
-      ReturnVec.push_back(static_cast<TAxis*>(Hist3D->GetYaxis()->Clone()));
-      ReturnVec.push_back(static_cast<TAxis*>(DummyAxis->Clone()));
+      ReturnVec[0] = static_cast<TAxis*>(Hist3D->GetXaxis()->Clone());
+      ReturnVec[1] = static_cast<TAxis*>(Hist3D->GetYaxis()->Clone());
+      ReturnVec[2] = static_cast<TAxis*>(DummyAxis->Clone());
     }
   } else if (Dimensions[iSample] == 3) {
-    ReturnVec.push_back(static_cast<TAxis*>(Hist3D->GetXaxis()->Clone()));
-    ReturnVec.push_back(static_cast<TAxis*>(Hist3D->GetYaxis()->Clone()));
-    ReturnVec.push_back(static_cast<TAxis*>(Hist3D->GetZaxis()->Clone()));
+    ReturnVec[0] = static_cast<TAxis*>(Hist3D->GetXaxis()->Clone());
+    ReturnVec[1] = static_cast<TAxis*>(Hist3D->GetYaxis()->Clone());
+    ReturnVec[2] = static_cast<TAxis*>(Hist3D->GetZaxis()->Clone());
   } else {
     MACH3LOG_ERROR("Number of dimensions not valid! Given: {}", Dimensions[iSample]);
-    throw MaCh3Exception(__FILE__ , __LINE__ );
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
 
   for (unsigned int iAxis = 0; iAxis < ReturnVec.size(); ++iAxis) {
@@ -606,8 +608,8 @@ void BinnedSplineHandler::getSplineCoeff_SepMany(int splineindex, M3::float_t* &
 
   for (int i = 0; i < nPoints; i++) {
     xArray[i] = 1.0;
-    for (int j = 0; j < 4; j++) {
-      manyArray[i*4+j] = 1.0;
+    for (int j = 0; j < _nCoeff_; j++) {
+      manyArray[i*_nCoeff_+j] = 1.0;
     }
   }
 
@@ -622,10 +624,10 @@ void BinnedSplineHandler::getSplineCoeff_SepMany(int splineindex, M3::float_t* &
     // Store the coefficients for each knot contiguously in memory
     // 4 because manyArray stores y,b,c,d
     xArray[i] = x;
-    manyArray[i*4] = y; 
-    manyArray[i*4+1] = b;
-    manyArray[i*4+2] = c;
-    manyArray[i*4+3] = d;    
+    manyArray[i * _nCoeff_ + kCoeffY] = y;
+    manyArray[i * _nCoeff_ + kCoeffB] = b;
+    manyArray[i * _nCoeff_ + kCoeffC] = c;
+    manyArray[i * _nCoeff_ + kCoeffD] = d;
   }
 
   //We now clean up the splines!
