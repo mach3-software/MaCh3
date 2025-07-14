@@ -787,10 +787,10 @@ void SMonolith::getSplineCoeff_SepMany(TSpline3_red* &spl, int &nPoints, float *
     manyArray[i*_nCoeff_+1] = float(b);
     manyArray[i*_nCoeff_+2] = float(c);
     manyArray[i*_nCoeff_+3] = float(d);
-    if((xArray[i] == -999) || (manyArray[i*_nCoeff_] == -999) || (manyArray[i*4+1] == -999) || (manyArray[i*_nCoeff_+2] == -999) || (manyArray[i*_nCoeff_+3] == -999)){
+    if((xArray[i] == -999) || (manyArray[i*_nCoeff_] == -999) || (manyArray[i*_nCoeff_ +1] == -999) || (manyArray[i*_nCoeff_+2] == -999) || (manyArray[i*_nCoeff_+3] == -999)){
       MACH3LOG_ERROR("*********** Bad params in getSplineCoeff_SepMany() ************");
       MACH3LOG_ERROR("pre cast to float (x, y, b, c, d) = {:.2f}, {:.2f}, {:.2f}, {:.2f}, {:.2f}", x, y, b, c, d);
-      MACH3LOG_ERROR("pre cast to float (x, y, b, c, d) = {:.2f}, {:.2f}, {:.2f}, {:.2f}, {:.2f}", xArray[i], manyArray[i*4], manyArray[i*4+1], manyArray[i*4+2], manyArray[i*_nCoeff_+3]);
+      MACH3LOG_ERROR("pre cast to float (x, y, b, c, d) = {:.2f}, {:.2f}, {:.2f}, {:.2f}, {:.2f}", xArray[i], manyArray[i*_nCoeff_], manyArray[i*_nCoeff_+1], manyArray[i*_nCoeff_+2], manyArray[i*_nCoeff_+3]);
       MACH3LOG_ERROR("This will cause problems when preparing for GPU");
       MACH3LOG_ERROR("***************************************************************");
     }
