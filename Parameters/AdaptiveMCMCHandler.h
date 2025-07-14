@@ -73,6 +73,7 @@ class AdaptiveMCMCHandler{
   }
 
   /// @brief Get the current values of the parameters
+  /// @ingroup ParameterHandlerGetters
   int GetNumParams() const {
     return static_cast<int>(_fCurrVal->size());
   }
@@ -89,6 +90,7 @@ class AdaptiveMCMCHandler{
   double CurrVal(const int par_index);
 
   /// @brief Get Total Number of Steps
+  /// @ingroup ParameterHandlerGetters
   int GetTotalSteps() const {
     return total_steps;
   }
@@ -104,6 +106,7 @@ class AdaptiveMCMCHandler{
   }
 
   /// @brief Increase by one number of total steps
+  /// @ingroup ParameterHandlerGetters
   TMatrixDSym* GetAdaptiveCovariance() const {
     return adaptive_covariance;
   }
