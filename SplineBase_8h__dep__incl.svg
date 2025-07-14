@@ -46,7 +46,7 @@ if (edges && edges.length) {
         </defs>
 
 <script type="text/javascript">
-var viewWidth = 877;
+var viewWidth = 924;
 var viewHeight = 192;
 var sectionId = 'dynsection-1';
 </script>
@@ -58,8 +58,8 @@ var sectionId = 'dynsection-1';
 <g id="node1" class="node">
 <title>Node1</title>
 <g id="a_node1"><a xlink:title=" ">
-<polygon fill="#999999" stroke="#666666" points="701,-184 583,-184 583,-165 701,-165 701,-184"/>
-<text text-anchor="middle" x="642" y="-172" font-family="Helvetica,sans-Serif" font-size="10.00">Splines/SplineBase.h</text>
+<polygon fill="#999999" stroke="#666666" points="748,-184 630,-184 630,-165 748,-165 748,-184"/>
+<text text-anchor="middle" x="689" y="-172" font-family="Helvetica,sans-Serif" font-size="10.00">Splines/SplineBase.h</text>
 </a>
 </g>
 </g>
@@ -67,157 +67,172 @@ var sectionId = 'dynsection-1';
 <g id="node2" class="node">
 <title>Node2</title>
 <g id="a_node2"><a xlink:href="BinnedSplineHandler_8h.html" target="_top" xlink:title=" ">
-<polygon fill="white" stroke="#666666" points="484.5,-129 319.5,-129 319.5,-110 484.5,-110 484.5,-129"/>
-<text text-anchor="middle" x="402" y="-117" font-family="Helvetica,sans-Serif" font-size="10.00">Splines/BinnedSplineHandler.h</text>
+<polygon fill="white" stroke="#666666" points="531.5,-129 366.5,-129 366.5,-110 531.5,-110 531.5,-129"/>
+<text text-anchor="middle" x="449" y="-117" font-family="Helvetica,sans-Serif" font-size="10.00">Splines/BinnedSplineHandler.h</text>
 </a>
 </g>
 </g>
 <!-- Node1&#45;&gt;Node2 -->
 <g id="edge1" class="edge">
 <title>Node1&#45;&gt;Node2</title>
-<path fill="none" stroke="#63b8ff" d="M593.62,-162.82C548.64,-152.88 482.5,-138.28 440.86,-129.08"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="592.92,-166.25 603.44,-164.98 594.43,-159.41 592.92,-166.25"/>
-</g>
-<!-- Node8 -->
-<g id="node8" class="node">
-<title>Node8</title>
-<g id="a_node8"><a xlink:href="SplineBase_8cpp.html" target="_top" xlink:title=" ">
-<polygon fill="white" stroke="#666666" points="631.5,-129 502.5,-129 502.5,-110 631.5,-110 631.5,-129"/>
-<text text-anchor="middle" x="567" y="-117" font-family="Helvetica,sans-Serif" font-size="10.00">Splines/SplineBase.cpp</text>
-</a>
-</g>
-</g>
-<!-- Node1&#45;&gt;Node8 -->
-<g id="edge7" class="edge">
-<title>Node1&#45;&gt;Node8</title>
-<path fill="none" stroke="#63b8ff" d="M621.69,-159.15C608.14,-149.57 590.76,-137.29 579.27,-129.17"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="619.76,-162.07 629.95,-164.98 623.8,-156.36 619.76,-162.07"/>
+<path fill="none" stroke="#63b8ff" d="M640.62,-162.82C595.64,-152.88 529.5,-138.28 487.86,-129.08"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="639.92,-166.25 650.44,-164.98 641.43,-159.41 639.92,-166.25"/>
 </g>
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="SplineMonolith_8h.html" target="_top" xlink:title=" ">
-<polygon fill="white" stroke="#666666" points="786.5,-129 649.5,-129 649.5,-110 786.5,-110 786.5,-129"/>
-<text text-anchor="middle" x="718" y="-117" font-family="Helvetica,sans-Serif" font-size="10.00">Splines/SplineMonolith.h</text>
+<g id="a_node9"><a xlink:href="SplineBase_8cpp.html" target="_top" xlink:title=" ">
+<polygon fill="white" stroke="#666666" points="678.5,-129 549.5,-129 549.5,-110 678.5,-110 678.5,-129"/>
+<text text-anchor="middle" x="614" y="-117" font-family="Helvetica,sans-Serif" font-size="10.00">Splines/SplineBase.cpp</text>
 </a>
 </g>
 </g>
 <!-- Node1&#45;&gt;Node9 -->
 <g id="edge8" class="edge">
 <title>Node1&#45;&gt;Node9</title>
-<path fill="none" stroke="#63b8ff" d="M662.58,-159.15C676.31,-149.57 693.93,-137.29 705.57,-129.17"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="660.41,-156.39 654.21,-164.98 664.42,-162.14 660.41,-156.39"/>
+<path fill="none" stroke="#63b8ff" d="M668.69,-159.15C655.14,-149.57 637.76,-137.29 626.27,-129.17"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="666.76,-162.07 676.95,-164.98 670.8,-156.36 666.76,-162.07"/>
 </g>
-<!-- Node11 -->
-<g id="node11" class="node">
-<title>Node11</title>
-<g id="a_node11"><a xlink:href="splines_8cpp.html" target="_top" xlink:title=" ">
-<polygon fill="white" stroke="#666666" points="869,-74 761,-74 761,-55 869,-55 869,-74"/>
-<text text-anchor="middle" x="815" y="-62" font-family="Helvetica,sans-Serif" font-size="10.00">python/splines.cpp</text>
+<!-- Node10 -->
+<g id="node10" class="node">
+<title>Node10</title>
+<g id="a_node10"><a xlink:href="SplineMonolith_8h.html" target="_top" xlink:title=" ">
+<polygon fill="white" stroke="#666666" points="833.5,-129 696.5,-129 696.5,-110 833.5,-110 833.5,-129"/>
+<text text-anchor="middle" x="765" y="-117" font-family="Helvetica,sans-Serif" font-size="10.00">Splines/SplineMonolith.h</text>
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node11 -->
-<g id="edge11" class="edge">
-<title>Node1&#45;&gt;Node11</title>
-<path fill="none" stroke="#63b8ff" d="M711.05,-168.17C740.66,-162.53 773.53,-151.26 796,-129 811.04,-114.1 814.28,-87.81 814.91,-74.21"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="710.41,-164.73 701.15,-169.88 711.6,-171.63 710.41,-164.73"/>
+<!-- Node1&#45;&gt;Node10 -->
+<g id="edge9" class="edge">
+<title>Node1&#45;&gt;Node10</title>
+<path fill="none" stroke="#63b8ff" d="M709.58,-159.15C723.31,-149.57 740.93,-137.29 752.57,-129.17"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="707.41,-156.39 701.21,-164.98 711.42,-162.14 707.41,-156.39"/>
+</g>
+<!-- Node12 -->
+<g id="node12" class="node">
+<title>Node12</title>
+<g id="a_node12"><a xlink:href="splines_8cpp.html" target="_top" xlink:title=" ">
+<polygon fill="white" stroke="#666666" points="916,-74 808,-74 808,-55 916,-55 916,-74"/>
+<text text-anchor="middle" x="862" y="-62" font-family="Helvetica,sans-Serif" font-size="10.00">python/splines.cpp</text>
+</a>
+</g>
+</g>
+<!-- Node1&#45;&gt;Node12 -->
+<g id="edge12" class="edge">
+<title>Node1&#45;&gt;Node12</title>
+<path fill="none" stroke="#63b8ff" d="M758.05,-168.17C787.66,-162.53 820.53,-151.26 843,-129 858.04,-114.1 861.28,-87.81 861.91,-74.21"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="757.41,-164.73 748.15,-169.88 758.6,-171.63 757.41,-164.73"/>
 </g>
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
 <g id="a_node3"><a xlink:href="SampleHandlerFD_8h.html" target="_top" xlink:title=" ">
-<polygon fill="white" stroke="#666666" points="340.5,-74 181.5,-74 181.5,-55 340.5,-55 340.5,-74"/>
-<text text-anchor="middle" x="261" y="-62" font-family="Helvetica,sans-Serif" font-size="10.00">Samples/SampleHandlerFD.h</text>
+<polygon fill="white" stroke="#666666" points="387.5,-74 228.5,-74 228.5,-55 387.5,-55 387.5,-74"/>
+<text text-anchor="middle" x="308" y="-62" font-family="Helvetica,sans-Serif" font-size="10.00">Samples/SampleHandlerFD.h</text>
 </a>
 </g>
 </g>
 <!-- Node2&#45;&gt;Node3 -->
 <g id="edge2" class="edge">
 <title>Node2&#45;&gt;Node3</title>
-<path fill="none" stroke="#63b8ff" d="M369.86,-106.42C343.71,-96.59 307.41,-82.95 284.07,-74.17"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="368.75,-109.74 379.35,-109.98 371.22,-103.19 368.75,-109.74"/>
+<path fill="none" stroke="#63b8ff" d="M416.86,-106.42C390.71,-96.59 354.41,-82.95 331.07,-74.17"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="415.75,-109.74 426.35,-109.98 418.22,-103.19 415.75,-109.74"/>
 </g>
-<!-- Node7 -->
-<g id="node7" class="node">
-<title>Node7</title>
-<g id="a_node7"><a xlink:href="BinnedSplineHandler_8cpp.html" target="_top" xlink:title=" ">
-<polygon fill="white" stroke="#666666" points="534,-74 358,-74 358,-55 534,-55 534,-74"/>
-<text text-anchor="middle" x="446" y="-62" font-family="Helvetica,sans-Serif" font-size="10.00">Splines/BinnedSplineHandler.cpp</text>
+<!-- Node8 -->
+<g id="node8" class="node">
+<title>Node8</title>
+<g id="a_node8"><a xlink:href="BinnedSplineHandler_8cpp.html" target="_top" xlink:title=" ">
+<polygon fill="white" stroke="#666666" points="581,-74 405,-74 405,-55 581,-55 581,-74"/>
+<text text-anchor="middle" x="493" y="-62" font-family="Helvetica,sans-Serif" font-size="10.00">Splines/BinnedSplineHandler.cpp</text>
 </a>
 </g>
 </g>
-<!-- Node2&#45;&gt;Node7 -->
-<g id="edge6" class="edge">
-<title>Node2&#45;&gt;Node7</title>
-<path fill="none" stroke="#63b8ff" d="M415.73,-101.96C423.4,-92.72 432.63,-81.6 438.87,-74.09"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="412.96,-99.82 409.27,-109.75 418.35,-104.29 412.96,-99.82"/>
+<!-- Node2&#45;&gt;Node8 -->
+<g id="edge7" class="edge">
+<title>Node2&#45;&gt;Node8</title>
+<path fill="none" stroke="#63b8ff" d="M462.73,-101.96C470.4,-92.72 479.63,-81.6 485.87,-74.09"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="459.96,-99.82 456.27,-109.75 465.35,-104.29 459.96,-99.82"/>
 </g>
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="PredictiveThrower_8cpp.html" target="_top" xlink:title=" ">
-<polygon fill="white" stroke="#666666" points="158,-19 0,-19 0,0 158,0 158,-19"/>
-<text text-anchor="middle" x="79" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">Fitters/PredictiveThrower.cpp</text>
+<g id="a_node4"><a xlink:href="FitterBase_8cpp.html" target="_top" xlink:title=" ">
+<polygon fill="white" stroke="#666666" points="120,-19 0,-19 0,0 120,0 120,-19"/>
+<text text-anchor="middle" x="60" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">Fitters/FitterBase.cpp</text>
 </a>
 </g>
 </g>
 <!-- Node3&#45;&gt;Node4 -->
 <g id="edge3" class="edge">
 <title>Node3&#45;&gt;Node4</title>
-<path fill="none" stroke="#63b8ff" d="M222.14,-52.18C188.1,-42.27 139.38,-28.08 108.47,-19.08"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="221.18,-55.55 231.76,-54.98 223.14,-48.83 221.18,-55.55"/>
+<path fill="none" stroke="#63b8ff" d="M258.3,-52.88C211.82,-42.94 143.27,-28.3 100.16,-19.08"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="257.64,-56.32 268.15,-54.98 259.11,-49.47 257.64,-56.32"/>
 </g>
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="SampleHandlerFD_8cpp.html" target="_top" xlink:title=" ">
-<polygon fill="white" stroke="#666666" points="346,-19 176,-19 176,0 346,0 346,-19"/>
-<text text-anchor="middle" x="261" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">Samples/SampleHandlerFD.cpp</text>
+<g id="a_node5"><a xlink:href="PredictiveThrower_8cpp.html" target="_top" xlink:title=" ">
+<polygon fill="white" stroke="#666666" points="296,-19 138,-19 138,0 296,0 296,-19"/>
+<text text-anchor="middle" x="217" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">Fitters/PredictiveThrower.cpp</text>
 </a>
 </g>
 </g>
 <!-- Node3&#45;&gt;Node5 -->
 <g id="edge4" class="edge">
 <title>Node3&#45;&gt;Node5</title>
-<path fill="none" stroke="#63b8ff" d="M261,-44.66C261,-35.93 261,-25.99 261,-19.09"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="257.5,-44.75 261,-54.75 264.5,-44.75 257.5,-44.75"/>
+<path fill="none" stroke="#63b8ff" d="M284.3,-49.7C267.72,-40.04 246.09,-27.44 231.89,-19.17"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="282.98,-52.98 293.38,-54.98 286.5,-46.93 282.98,-52.98"/>
 </g>
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="samples_8cpp.html" target="_top" xlink:title=" ">
-<polygon fill="white" stroke="#666666" points="479.5,-19 364.5,-19 364.5,0 479.5,0 479.5,-19"/>
-<text text-anchor="middle" x="422" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">python/samples.cpp</text>
+<g id="a_node6"><a xlink:href="SampleHandlerFD_8cpp.html" target="_top" xlink:title=" ">
+<polygon fill="white" stroke="#666666" points="484,-19 314,-19 314,0 484,0 484,-19"/>
+<text text-anchor="middle" x="399" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">Samples/SampleHandlerFD.cpp</text>
 </a>
 </g>
 </g>
 <!-- Node3&#45;&gt;Node6 -->
 <g id="edge5" class="edge">
 <title>Node3&#45;&gt;Node6</title>
-<path fill="none" stroke="#63b8ff" d="M296.55,-51.8C326.59,-41.91 368.94,-27.97 395.93,-19.08"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="295.27,-48.53 286.87,-54.98 297.46,-55.18 295.27,-48.53"/>
+<path fill="none" stroke="#63b8ff" d="M331.7,-49.7C348.28,-40.04 369.91,-27.44 384.11,-19.17"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="329.5,-46.93 322.62,-54.98 333.02,-52.98 329.5,-46.93"/>
 </g>
-<!-- Node10 -->
-<g id="node10" class="node">
-<title>Node10</title>
-<g id="a_node10"><a xlink:href="SplineMonolith_8cpp.html" target="_top" xlink:title=" ">
-<polygon fill="white" stroke="#666666" points="743,-74 595,-74 595,-55 743,-55 743,-74"/>
-<text text-anchor="middle" x="669" y="-62" font-family="Helvetica,sans-Serif" font-size="10.00">Splines/SplineMonolith.cpp</text>
+<!-- Node7 -->
+<g id="node7" class="node">
+<title>Node7</title>
+<g id="a_node7"><a xlink:href="samples_8cpp.html" target="_top" xlink:title=" ">
+<polygon fill="white" stroke="#666666" points="617.5,-19 502.5,-19 502.5,0 617.5,0 617.5,-19"/>
+<text text-anchor="middle" x="560" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">python/samples.cpp</text>
 </a>
 </g>
 </g>
-<!-- Node9&#45;&gt;Node10 -->
-<g id="edge9" class="edge">
-<title>Node9&#45;&gt;Node10</title>
-<path fill="none" stroke="#63b8ff" d="M702.97,-102.24C694.38,-92.95 683.96,-81.68 676.94,-74.09"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="700.55,-104.78 709.91,-109.75 705.69,-100.03 700.55,-104.78"/>
+<!-- Node3&#45;&gt;Node7 -->
+<g id="edge6" class="edge">
+<title>Node3&#45;&gt;Node7</title>
+<path fill="none" stroke="#63b8ff" d="M358.5,-52.88C405.74,-42.94 475.39,-28.3 519.19,-19.08"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="357.55,-49.5 348.49,-54.98 358.99,-56.35 357.55,-49.5"/>
 </g>
-<!-- Node9&#45;&gt;Node11 -->
+<!-- Node11 -->
+<g id="node11" class="node">
+<title>Node11</title>
+<g id="a_node11"><a xlink:href="SplineMonolith_8cpp.html" target="_top" xlink:title=" ">
+<polygon fill="white" stroke="#666666" points="790,-74 642,-74 642,-55 790,-55 790,-74"/>
+<text text-anchor="middle" x="716" y="-62" font-family="Helvetica,sans-Serif" font-size="10.00">Splines/SplineMonolith.cpp</text>
+</a>
+</g>
+</g>
+<!-- Node10&#45;&gt;Node11 -->
 <g id="edge10" class="edge">
-<title>Node9&#45;&gt;Node11</title>
-<path fill="none" stroke="#63b8ff" d="M742.77,-104.97C760.5,-95.28 783.85,-82.52 799.13,-74.17"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="740.68,-102.12 733.58,-109.98 744.04,-108.26 740.68,-102.12"/>
+<title>Node10&#45;&gt;Node11</title>
+<path fill="none" stroke="#63b8ff" d="M749.97,-102.24C741.38,-92.95 730.96,-81.68 723.94,-74.09"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="747.55,-104.78 756.91,-109.75 752.69,-100.03 747.55,-104.78"/>
+</g>
+<!-- Node10&#45;&gt;Node12 -->
+<g id="edge11" class="edge">
+<title>Node10&#45;&gt;Node12</title>
+<path fill="none" stroke="#63b8ff" d="M789.77,-104.97C807.5,-95.28 830.85,-82.52 846.13,-74.17"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="787.68,-102.12 780.58,-109.98 791.04,-108.26 787.68,-102.12"/>
 </g>
 </g>
 </svg>
