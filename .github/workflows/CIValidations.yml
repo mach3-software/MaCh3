@@ -22,49 +22,32 @@ jobs:
       matrix:
         include:
           - name: Reweight Validations
-            test_1: ./CIValidations/SplineValidations
-            test_2: ./CIValidations/SamplePDFValidations
-            test_3: ./CIValidations/NuOscillatorInterfaceValidations
-            test_4: ./CIValidations/LLHValidation
-            test_5: ./bin/KinemDistributionTutorial TutorialConfigs/FitterConfig.yaml
-            test_6: ./CIValidations/PredictiveValidations
-            test_7: empty
-            test_8: empty
-            test_9: empty
-
-          - name: Covariance Validations
-            test_1: ./CIValidations/CovarianceValidations
-            test_2: ./CIValidations/MaCh3ModeValidations
-            test_3: ./CIValidations/pValueValidations 
-            test_4: ./CIValidations/SigmaVarValidations
-            test_5: ./CIValidations/UnitTests/manager_tests
-            test_6: ./CIValidations/UnitTests/histogram_tests
-            test_7: ./CIValidations/UnitTests/statistical_tests
-            test_8: empty
-            test_9: empty
-
-          - name: Fitter Validations
-            test_1: ./CIValidations/FitterValidations
-            test_2: ./bin/ProcessMCMC bin/TutorialDiagConfig.yaml MCMC_Test.root
-            test_3: ./bin/DiagMCMC MCMC_Test.root bin/TutorialDiagConfig.yaml
-            test_4: ./bin/RHat 10 MCMC_Test.root MCMC_Test.root MCMC_Test.root MCMC_Test.root
-            test_5: ./bin/CombineMaCh3Chains -o MergedChain.root MCMC_Test.root MCMC_Test.root MCMC_Test.root MCMC_Test.root
-            test_6: ./bin/GetPenaltyTerm MCMC_Test.root bin/TutorialDiagConfig.yaml
-            test_7: ./bin/MatrixPlotter bin/TutorialDiagConfig.yaml MCMC_Test_drawCorr.root
-            test_8: bin/GetPostfitParamPlots MCMC_Test_drawCorr.root
-            test_9: bin/PlotLLH MCMC_Test.root
-            test_10: bin/PlotMCMCDiag MCMC_Test_MCMC_Diag.root "test_plot_1" MCMC_Test_MCMC_Diag.root "test_plot_2"
-
-          - name: NuMCMC Tools Validations
-            test_1: ./CIValidations/NuMCMCvalidations.sh
+            test_1: MaCh3CLI --ReweightValidations
             test_2: empty
             test_3: empty
             test_4: empty
             test_5: empty
-            test_6: empty
-            test_7: empty
-            test_8: empty
-            test_9: empty
+
+          - name: Covariance Validations
+            test_1: MaCh3CLI --CovarianceValidations
+            test_2: empty
+            test_3: empty
+            test_4: empty
+            test_5: empty
+
+          - name: Fitter Validations
+            test_1: MaCh3CLI --FitterValidations
+            test_2: empty
+            test_3: empty
+            test_4: empty
+            test_5: empty
+
+          - name: NuMCMC Tools Validations
+            test_1: MaCh3CLI --NuMCMCToolsValidations
+            test_2: empty
+            test_3: empty
+            test_4: empty
+            test_5: empty
 
     container:
       image: ghcr.io/mach3-software/mach3:alma9latest
@@ -124,34 +107,4 @@ jobs:
             echo " "
             echo "Performing test 5"
             ${{ matrix.test_5 }}
-        fi
-
-        if [[ "${{ matrix.test_6 }}" != "empty" ]]; then
-            echo " "
-            echo "Performing  test 6"
-            ${{ matrix.test_6 }}
-        fi
-
-        if [[ "${{ matrix.test_7 }}" != "empty" ]]; then
-            echo " "
-            echo "Performing  test 7"
-            ${{ matrix.test_7 }}
-        fi
-
-        if [[ "${{ matrix.test_8 }}" != "empty" ]]; then
-            echo " "
-            echo "Performing  test 8"
-            ${{ matrix.test_8 }}
-        fi
-
-        if [[ "${{ matrix.test_9 }}" != "empty" ]]; then
-            echo " "
-            echo "Performing  test 9"
-            ${{ matrix.test_9 }}
-        fi
-
-        if [[ "${{ matrix.test_10 }}" != "empty" ]]; then
-            echo " "
-            echo "Performing  test 10"
-            ${{ matrix.test_10 }}
         fi
