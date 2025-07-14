@@ -35,7 +35,10 @@ int main(int argc, char *argv[])
   nFiles = 0;
   if (argc != 3 && argc !=6 && argc != 8)
   {
-    MACH3LOG_ERROR("How to use: {} <Config> <MCMM_ND_Output.root>", argv[0]);
+    MACH3LOG_ERROR("How to use: ");
+    MACH3LOG_ERROR("  single chain: {} <Config> <MCMM_ND_Output.root>", argv[0]);
+    MACH3LOG_ERROR("  two chain:    {} <Config> <MCMM_ND_Output_1.root> <Title 1> <MCMC_ND_Output_2.root> <Title 2>", argv[0]);
+    MACH3LOG_ERROR("  three chain:  {} <Config> <MCMM_ND_Output_1.root> <Title 1> <MCMC_ND_Output_2.root> <Title 2> <MCMC_ND_Output_3.root> <Title 3>", argv[0]);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
