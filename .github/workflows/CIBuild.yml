@@ -58,6 +58,10 @@ jobs:
             file: Doc/MaCh3DockerFiles/Ubuntu24.10/Dockerfile
             tag: ubuntu24.10latest
             cmakeoptions: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DMaCh3_MULTITHREAD_ENABLED=OFF -DMaCh3_PYTHON_ENABLED=ON -DNuFastLinear_ENABLED=ON
+          - os: Alma9 ICPX NoMultithreading
+            file: Doc/MaCh3DockerFiles/Alma9_icpx/Dockerfile
+            tag: Alma9icpxlatest
+            cmakeoptions: -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx -DMaCh3_MULTITHREAD_ENABLED=OFF  -DMaCh3_PYTHON_ENABLED=ON -DNuFastLinear_ENABLED=ON -DMaCh3_WERROR_ENABLED=FALSE
 
     name: Build CI ${{ matrix.os }}
 

@@ -116,8 +116,8 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   )
 endif()
 
-# KS: Clang is super picky, it is almost impossible to make it work with Werror
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+# KS: Clang and IntelLLVM is super picky, it is almost impossible to make it work with Werror
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "IntelLLVM")
   set(MaCh3_WERROR_ENABLED FALSE)
 endif()
 
@@ -178,11 +178,17 @@ endif()
 
 #Add Multithread flags
 if(MaCh3_MULTITHREAD_ENABLED)
-  target_compile_options(MaCh3CompilerOptions INTERFACE -fopenmp)
+  if(CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
+    #ETA: intel icpx requires this I believe
+    find_package(OpenMP REQUIRED)
+    target_compile_options(MaCh3CompilerOptions INTERFACE -qopenmp)
+    target_link_libraries(MaCh3CompilerOptions INTERFACE OpenMP::OpenMP_CXX)
   # KS: Not a clue why clang need different...
-  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    target_compile_options(MaCh3CompilerOptions INTERFACE -fopenmp)
     target_link_libraries(MaCh3CompilerOptions INTERFACE omp)
   else()
+    target_compile_options(MaCh3CompilerOptions INTERFACE -fopenmp)
     target_link_libraries(MaCh3CompilerOptions INTERFACE gomp)
   endif()
   target_compile_definitions(MaCh3CompileDefinitions INTERFACE MULTITHREAD)
