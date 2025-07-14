@@ -24,7 +24,7 @@ class mcmc : public FitterBase {
   void StartFromPreviousFit(const std::string& FitName) override;
 
   /// @brief Get name of class
-  inline std::string GetName()const {return "MCMC";};
+  inline std::string GetName() const override {return "MCMC";};
  private:
   /// @brief Propose a step
   inline void ProposeStep();

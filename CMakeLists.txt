@@ -113,6 +113,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     -Wduplicated-cond       # Warn if if / else chain has duplicated conditions (only in GCC >= 6.0)
     -Wduplicated-branches   # Warn if if / else branches have duplicated code (only in GCC >= 7.0)
     -Wuseless-cast          # Warn if you perform a cast to the same type (only in GCC >= 4.8)
+    -Wsuggest-override      # Warn if a virtual function override is not marked 'override' (only in GCC >= 5.1)
   )
 endif()
 

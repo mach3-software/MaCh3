@@ -26,7 +26,7 @@ class BinnedSplineHandler : public SplineBase {
     /// @brief CW: This Eval should be used when using two separate x,{y,a,b,c,d} arrays
     /// to store the weights; probably the best one here! Same thing but pass parameter
     /// spline segments instead of variations
-    void Evaluate();
+    void Evaluate() override;
 
     /// @brief add oscillation channel to spline monolith
     void AddSample(const std::string& SampleName,

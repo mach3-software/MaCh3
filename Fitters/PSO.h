@@ -97,7 +97,7 @@ class PSO : public LikelihoodFit {
     void WriteOutput();
     /// @brief Actual implementation of PSO Fit algorithm
     void RunMCMC() override;
-    double CalcChi2(const double* x);
+    double CalcChi2(const double* x) override;
     /// @brief Evaluates the Rastrigin function for a given parameter values.
     double rastriginFunc(const double* x);
     double swarmIterate();
@@ -141,7 +141,7 @@ class PSO : public LikelihoodFit {
       return CalcChi2(a);
     };
 
-  inline std::string GetName()const {return "PSO";};
+  inline std::string GetName() const override {return "PSO";};
 
   private:
     particle* best_particle;

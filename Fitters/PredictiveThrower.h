@@ -41,7 +41,7 @@ class PredictiveThrower : public FitterBase {
   };
 
   /// @brief Get name of class
-  inline std::string GetName()const {return "PredictiveThrower";};
+  inline std::string GetName() const override {return "PredictiveThrower";};
  private:
   /// @brief This set some params to prior value this way you can evaluate errors from subset of errors
   void SetParamters();
