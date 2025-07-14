@@ -86,6 +86,13 @@ void mcmc::runMCMC() {
 
     multicanonicalSpline = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["MulticanonicalSpline"],false);
 
+    multicanonicalSeparate = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["MulticanonicalSeparate"],false);
+
+    if (multicanonicalSpline && multicanonicalSeparate) {
+      MACH3LOG_ERROR("Cannot use both multicanonical spline and separate method at the same time. Please choose one.");
+      throw std::runtime_error("Cannot use both multicanonical spline and separate method at the same time.");
+    }
+    
     if (multicanonicalSpline){
       std::string splineFile = GetFromManager<std::string>(fitMan->raw()["General"]["MCMC"]["MulticanonicalSplineFile"],"nofile");
       TFile *file = new TFile(splineFile.c_str(), "READ");
@@ -105,6 +112,13 @@ void mcmc::runMCMC() {
       //   throw std::runtime_error("Spline not found in file");
       // }
 
+    } else if (multicanonicalSeparate) {
+      // If we are using the multicanonical method in separate chains, we need to get the separate mean and sigma values
+      MACH3LOG_INFO("Using separate multicanonical method");
+      multicanonicalSeparateSigma = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["MulticanonicalSeparateSigma"], 0.1);
+      MACH3LOG_INFO("Setting multicanonical sigma to {}", multicanonicalSeparateSigma);
+      multicanonicalSeparateMean = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["MulticanonicalSeparateMean"], -TMath::Pi());
+      MACH3LOG_INFO("Setting multicanonical mean to {}", multicanonicalSeparateMean);
     } else {
       // Get the multicanonical sigma values from the configuration file
       multicanonicalSigma = fitMan->raw()["General"]["MCMC"]["MulticanonicalSigma"].as<double>();
@@ -227,6 +241,9 @@ void mcmc::ProposeStep() {
     if (multicanonicalSpline) {
       // Get the multicanonical weight from the spline
       multicanonical_penalty = GetMulticanonicalWeightSpline(delta_cp_value, dcp_spline_IO, dcp_spline_NO, delm23_value)*(multicanonicalBeta);
+    } else if (multicanonicalSeparate) {
+      // Get the multicanonical weight for a gaussian with the separate mean and sigma
+      multicanonical_penalty = GetMulticanonicalWeightSeparate(delta_cp_value, multicanonicalSeparateMean, multicanonicalSeparateSigma)*(multicanonicalBeta);
     } else {
       // Get the multicanonical weight from the Gaussian
       multicanonical_penalty = GetMulticanonicalWeightGaussian(delta_cp_value)*(multicanonicalBeta);
@@ -283,12 +300,11 @@ void mcmc::ProposeStep() {
   logLProp = llh;
 }
 
-inline double mcmc::GetMulticanonicalWeightGaussian(double deltacp){
+double mcmc::GetMulticanonicalWeightGaussian(double deltacp){
   // precalculate constants
   constexpr double inv_sqrt_2pi = 0.3989422804014337;
   double sigma = multicanonicalSigma;
-  double neg_half_sigma_sq = -1/(2*sigma*sigma); // sigma = 1 => -0.5; sigma = 0.5 => -2
-
+  const double neg_half_sigma_sq = -1/(2*sigma*sigma);
   // three gaussians centered at -pi, 0, pi with sigma pre-defined above
   double exp1 = std::exp(neg_half_sigma_sq * (deltacp - TMath::Pi()) * (deltacp - TMath::Pi()));
   double exp2 = std::exp(neg_half_sigma_sq * (deltacp) * (deltacp));
@@ -299,17 +315,25 @@ inline double mcmc::GetMulticanonicalWeightGaussian(double deltacp){
   return -std::log(inv_sqrt_2pi * (1/sigma) * (exp1 + exp2 + exp3));
 }
 
-inline double mcmc::GetMulticanonicalWeightSpline(double deltacp, TSpline3 *spline_IO, TSpline3 *spline_NO, double delm23){
+double mcmc::GetMulticanonicalWeightSpline(double deltacp, TSpline3 *spline_IO, TSpline3 *spline_NO, double delm23){
   double dcp_spline_val;
 
   if (delm23 < 0){
     dcp_spline_val = spline_IO->Eval(deltacp);
-    return -(-std::log(dcp_spline_val)+std::log(spline_IO->Eval(-TMath::Pi()/2))); // do I want this offset?? does it matter?
+    return -0.5*(-std::log(dcp_spline_val)+std::log(spline_IO->Eval(-TMath::Pi()/2))); // do I want this offset?? does it matter?
   } else {
     dcp_spline_val = spline_NO->Eval(deltacp);
-    return -(-std::log(dcp_spline_val)+std::log(spline_NO->Eval(-TMath::Pi()/2)));
+    return -0.5*(-std::log(dcp_spline_val)+std::log(spline_NO->Eval(-TMath::Pi()/2)));
   }
   // std::cout << "Evaluating spline at delta_cp = " << deltacp << " gives value " << dcp_spline_val << "with -log lh of :" << -log(dcp_spline_val) << std::endl;
+}
+
+double mcmc::GetMulticanonicalWeightSeparate(double deltacp, double mean, double sigma){
+  // precalculate constants
+  constexpr double inv_sqrt_2pi = 0.3989422804014337;
+  const double neg_half_sigma_sq = -1/(2*sigma*sigma); 
+  // return the log likelihood, ie the log of the normalised gaussian
+  return -std::log(inv_sqrt_2pi * (1/sigma) * std::exp(neg_half_sigma_sq * (deltacp - mean) * (deltacp - mean)));
 }
 
 // *******************

@@ -35,6 +35,8 @@ class mcmc : public FitterBase {
   /// @brief Get the multicanonical weight for a given delta_cp value from a spline
   double GetMulticanonicalWeightSpline(double deltacp, TSpline3 *spline_IO, TSpline3 *spline_NO, double delm23);
 
+  /// @brief Get the multicanonical weight for a given delta_cp value from a separate Gaussian for each chain
+  double GetMulticanonicalWeightSeparate(double deltacp, double mean, double sigma);
 
   /// @brief Get name of class
   inline std::string GetName()const {return "MCMC";};
@@ -63,6 +65,12 @@ class mcmc : public FitterBase {
 
   /// multi-canonical spline toggle on/off
   bool multicanonicalSpline;
+  /// multi-canonical separate toggle on/off
+  bool multicanonicalSeparate;
+  /// multi-canonical separate mean
+  double multicanonicalSeparateMean;
+  /// multi-canonical separate sigma
+  double multicanonicalSeparateSigma;
   /// multi-canonical spline object
   TSpline3 *dcp_spline_IO;
   TSpline3 *dcp_spline_NO;
