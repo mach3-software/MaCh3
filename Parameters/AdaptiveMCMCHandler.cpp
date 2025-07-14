@@ -69,7 +69,7 @@ bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const 
   start_adaptive_update = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["StartUpdate"], 0);
   end_adaptive_update   = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["EndUpdate"], 10000);
   adaptive_update_step  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["UpdateStep"], 100);
-  adaptive_save_n_iterations  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["SaveNIterations"], 1.0e+20);
+  adaptive_save_n_iterations  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["SaveNIterations"], -1);
   output_file_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Settings"]["OutputFileName"], "");
 
   // We also want to check for "blocks" by default all parameters "know" about each other
@@ -141,6 +141,7 @@ void AdaptiveMCMCHandler::SetAdaptiveBlocks(const std::vector<std::vector<int>>&
 void AdaptiveMCMCHandler::SaveAdaptiveToFile(const std::string &outFileName,
                                              const std::string &systematicName, bool is_final) {
 // ********************************************
+  if(adaptive_save_n_iterations < 0) return;
   if (((total_steps - start_adaptive_throw) / adaptive_update_step) % adaptive_save_n_iterations == 0 || is_final) {
 
     TFile *outFile = new TFile(outFileName.c_str(), "UPDATE");
