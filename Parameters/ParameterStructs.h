@@ -125,6 +125,18 @@ void CleanContainer(std::vector<T*>& container) {
 // *******************
 /// @brief Generic cleanup function
 template <typename T>
+void CleanContainer(std::vector<std::vector<T*>>& container) {
+// *******************
+  for (auto& inner : container) {
+    CleanContainer(inner);
+  }
+  container.clear();
+  container.shrink_to_fit();
+}
+
+// *******************
+/// @brief Generic cleanup function
+template <typename T>
 void CleanContainer(std::vector< std::vector< std::vector<T*> > >& container) {
 // *******************
   for (auto& container2D : container) {
