@@ -1146,6 +1146,11 @@ TH1* SampleHandlerFD::GetDataHist(const int Dimension) {
 }
 
 void SampleHandlerFD::AddData(std::vector<double> &data) {
+  if (dathist == nullptr) {
+    MACH3LOG_ERROR("Data hist hasn't been initialised yet");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
   dathist2d = nullptr;
   dathist->Reset();
 
@@ -1171,6 +1176,11 @@ void SampleHandlerFD::AddData(std::vector<double> &data) {
 }
 
 void SampleHandlerFD::AddData(std::vector< std::vector <double> > &data) {
+  if (dathist2d == nullptr) {
+    MACH3LOG_ERROR("Data hist hasn't been initialised yet");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
   dathist = nullptr;
   dathist2d->Reset();
 
@@ -1202,6 +1212,9 @@ void SampleHandlerFD::AddData(std::vector< std::vector <double> > &data) {
 
 void SampleHandlerFD::AddData(TH1D* Data) {
   MACH3LOG_INFO("Adding 1D data histogram: {} with {:.2f} events", Data->GetTitle(), Data->Integral());
+  if (dathist != nullptr) {
+    delete dathist;
+  }
   dathist2d = nullptr;
   dathist = static_cast<TH1D*>(Data->Clone());
 
@@ -1226,6 +1239,9 @@ void SampleHandlerFD::AddData(TH1D* Data) {
 
 void SampleHandlerFD::AddData(TH2D* Data) {
   MACH3LOG_INFO("Adding 2D data histogram: {} with {:.2f} events", Data->GetTitle(), Data->Integral());
+  if (dathist2d != nullptr) {
+    delete dathist2d;
+  }
   dathist2d = static_cast<TH2D*>(Data->Clone());
   dathist = nullptr;
 
