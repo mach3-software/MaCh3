@@ -1222,7 +1222,7 @@ void ParameterHandlerBase::MakeClosestPosDef(TMatrixDSym *cov) {
 TH2D* ParameterHandlerBase::GetCorrelationMatrix() {
 // ********************************************
   TH2D* hMatrix = new TH2D(GetName().c_str(), GetName().c_str(), _fNumPar, 0.0, _fNumPar, _fNumPar, 0.0, _fNumPar);
-
+  hMatrix->SetDirectory(nullptr);
   for(int i = 0; i < _fNumPar; i++)
   {
     hMatrix->SetBinContent(i+1, i+1, 1.);
