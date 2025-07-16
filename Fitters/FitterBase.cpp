@@ -168,7 +168,7 @@ void FitterBase::PrepareOutput() {
     }
 
     outTree->Branch("LogL", &logLCurr, "LogL/D");
-    if(SaveProposal) outTree->Branch("logLProp", &logLProp, "logLProp/D");
+    if(SaveProposal) outTree->Branch("LogLProp", &logLProp, "LogLProp/D");
     outTree->Branch("accProb", &accProb, "accProb/D");
     outTree->Branch("step", &step, "step/I");
     outTree->Branch("stepTime", &stepTime, "stepTime/D");
