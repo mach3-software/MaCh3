@@ -15,11 +15,14 @@ class LikelihoodFit : public FitterBase {
     /// @brief Get total number of params, this sums over all covariance objects
     inline int GetNPars(){return NPars;};
 
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wsuggest-override"
     /// @brief Implementation of fitting algorithm
     virtual void RunMCMC() = 0;
+    #pragma GCC diagnostic pop
 
     /// @brief Get name of class
-    virtual inline std::string GetName()const {return "LikelihoodFit";};
+    virtual inline std::string GetName() const override {return "LikelihoodFit";};
   protected:
     /// @brief prepare output and perform sanity checks
     void PrepareFit();
