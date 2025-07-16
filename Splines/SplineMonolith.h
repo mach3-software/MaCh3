@@ -28,7 +28,7 @@ class SMonolith : public SplineBase {
     void Evaluate() override;
 
     /// @brief Get class name
-    inline std::string GetName() const {return "SplineMonolith";};
+    inline std::string GetName() const override {return "SplineMonolith";};
 
     /// @brief KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.
     void SynchroniseMemTransfer();

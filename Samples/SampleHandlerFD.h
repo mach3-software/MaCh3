@@ -39,7 +39,7 @@ public:
   /// @ingroup SampleHandlerGetters
   std::string GetYBinVarName() {return YVarStr;}
 
-  void PrintIntegral(TString OutputName="/dev/null", int WeightStyle=0, TString OutputCSVName="/dev/null");
+  void PrintIntegral(const TString& OutputName="/dev/null", const int WeightStyle=0, const TString& OutputCSVName="/dev/null");
   
   //===============================================================================
   // DB Reweighting and Likelihood functions
@@ -395,4 +395,8 @@ private:
   std::unordered_map<std::string, NuPDG> FileToInitPDGMap;
   std::unordered_map<std::string, NuPDG> FileToFinalPDGMap;
   
+  enum FDPlotType {
+    kModePlot = 0,
+    kOscChannelPlot = 1
+  };
 };
