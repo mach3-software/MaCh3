@@ -1581,42 +1581,44 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerFD_8cpp_source.html#l02046">2046</a> of file <a class="el" href="SampleHandlerFD_8cpp_source.html">SampleHandlerFD.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 2046</span>                                                                                                                                                      {</div>
-<div class="line"><span class="lineno"> 2047</span>  std::vector&lt;TH1*&gt; hHistList;</div>
-<div class="line"><span class="lineno"> 2048</span>  std::string legendEntry;</div>
-<div class="line"><span class="lineno"> 2049</span> </div>
-<div class="line"><span class="lineno"> 2050</span>  <span class="keywordflow">if</span> (<a class="code hl_variable" href="classSampleHandlerFD.html#af60df24f4eb7954a3297c9841c60624b">THStackLeg</a> != <span class="keyword">nullptr</span>) {<span class="keyword">delete</span> <a class="code hl_variable" href="classSampleHandlerFD.html#af60df24f4eb7954a3297c9841c60624b">THStackLeg</a>;}</div>
-<div class="line"><span class="lineno"> 2051</span>  <a class="code hl_variable" href="classSampleHandlerFD.html#af60df24f4eb7954a3297c9841c60624b">THStackLeg</a> = <span class="keyword">new</span> TLegend(0.1,0.1,0.9,0.9);</div>
-<div class="line"><span class="lineno"> 2052</span> </div>
-<div class="line"><span class="lineno"> 2053</span>  <span class="keywordtype">int</span> iMax = -1;</div>
-<div class="line"><span class="lineno"> 2054</span>  <span class="keywordflow">if</span> (Selection1 == 0) {</div>
-<div class="line"><span class="lineno"> 2055</span>    iMax = <a class="code hl_variable" href="classSampleHandlerBase.html#a2f86c6158b755b9d2d400415ccac45f2">Modes</a>-&gt;GetNModes();</div>
-<div class="line"><span class="lineno"> 2056</span>  }</div>
-<div class="line"><span class="lineno"> 2057</span>  <span class="keywordflow">if</span> (Selection1 == 1) {</div>
-<div class="line"><span class="lineno"> 2058</span>    iMax = <a class="code hl_function" href="group__SampleHandlerGetters.html#gaa619e7779b3faa873dc418da07112a12">GetNOscChannels</a>();</div>
-<div class="line"><span class="lineno"> 2059</span>  }</div>
-<div class="line"><span class="lineno"> 2060</span>  <span class="keywordflow">if</span> (iMax == -1) {</div>
-<div class="line"><span class="lineno"> 2061</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;You&#39;ve passed me a Selection1 which was not implemented in ReturnHistsBySelection1D. Selection1 and Selection2 are counters for different indexable quantities&quot;</span>);</div>
-<div class="line"><span class="lineno"> 2062</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><span class="lineno"> 2063</span>  }</div>
-<div class="line"><span class="lineno"> 2064</span> </div>
-<div class="line"><span class="lineno"> 2065</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0;i&lt;iMax;i++) {</div>
-<div class="line"><span class="lineno"> 2066</span>    <span class="keywordflow">if</span> (Selection1==0) {</div>
-<div class="line"><span class="lineno"> 2067</span>      hHistList.push_back(<a class="code hl_function" href="group__SampleHandlerGetters.html#gaac0dad7d2090250cf8094eb8ceaab932">Get1DVarHistByModeAndChannel</a>(KinematicProjection,i,Selection2,WeightStyle,XAxis));</div>
-<div class="line"><span class="lineno"> 2068</span>      <a class="code hl_variable" href="classSampleHandlerFD.html#af60df24f4eb7954a3297c9841c60624b">THStackLeg</a>-&gt;AddEntry(hHistList[i],(<a class="code hl_variable" href="classSampleHandlerBase.html#a2f86c6158b755b9d2d400415ccac45f2">Modes</a>-&gt;GetMaCh3ModeName(i)+Form(<span class="stringliteral">&quot; : (%4.2f)&quot;</span>,hHistList[i]-&gt;Integral())).c_str(),<span class="stringliteral">&quot;f&quot;</span>);</div>
-<div class="line"><span class="lineno"> 2069</span> </div>
-<div class="line"><span class="lineno"> 2070</span>      hHistList[i]-&gt;SetFillColor(<span class="keyword">static_cast&lt;</span>Color_t<span class="keyword">&gt;</span>(<a class="code hl_variable" href="classSampleHandlerBase.html#a2f86c6158b755b9d2d400415ccac45f2">Modes</a>-&gt;GetMaCh3ModePlotColor(i)));</div>
-<div class="line"><span class="lineno"> 2071</span>      hHistList[i]-&gt;SetLineColor(<span class="keyword">static_cast&lt;</span>Color_t<span class="keyword">&gt;</span>(<a class="code hl_variable" href="classSampleHandlerBase.html#a2f86c6158b755b9d2d400415ccac45f2">Modes</a>-&gt;GetMaCh3ModePlotColor(i)));</div>
-<div class="line"><span class="lineno"> 2072</span>    }</div>
-<div class="line"><span class="lineno"> 2073</span>    <span class="keywordflow">if</span> (Selection1==1) {</div>
-<div class="line"><span class="lineno"> 2074</span>      hHistList.push_back(<a class="code hl_function" href="group__SampleHandlerGetters.html#gaac0dad7d2090250cf8094eb8ceaab932">Get1DVarHistByModeAndChannel</a>(KinematicProjection,Selection2,i,WeightStyle,XAxis));</div>
-<div class="line"><span class="lineno"> 2075</span>      <a class="code hl_variable" href="classSampleHandlerFD.html#af60df24f4eb7954a3297c9841c60624b">THStackLeg</a>-&gt;AddEntry(hHistList[i],(<a class="code hl_variable" href="classSampleHandlerFD.html#a57f378f84f66caa817e52c0bfb5ff0be">OscChannels</a>[i].flavourName+Form(<span class="stringliteral">&quot; | %4.2f&quot;</span>,hHistList[i]-&gt;Integral())).c_str(),<span class="stringliteral">&quot;f&quot;</span>);</div>
-<div class="line"><span class="lineno"> 2076</span>    }</div>
-<div class="line"><span class="lineno"> 2077</span>  }</div>
-<div class="line"><span class="lineno"> 2078</span> </div>
-<div class="line"><span class="lineno"> 2079</span>  <span class="keywordflow">return</span> hHistList;</div>
-<div class="line"><span class="lineno"> 2080</span>}</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerFD_8cpp_source.html#l02048">2048</a> of file <a class="el" href="SampleHandlerFD_8cpp_source.html">SampleHandlerFD.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 2048</span>                                                                                                                                                      {</div>
+<div class="line"><span class="lineno"> 2049</span>  std::vector&lt;TH1*&gt; hHistList;</div>
+<div class="line"><span class="lineno"> 2050</span>  std::string legendEntry;</div>
+<div class="line"><span class="lineno"> 2051</span> </div>
+<div class="line"><span class="lineno"> 2052</span>  <span class="keywordflow">if</span> (<a class="code hl_variable" href="classSampleHandlerFD.html#af60df24f4eb7954a3297c9841c60624b">THStackLeg</a> != <span class="keyword">nullptr</span>) {<span class="keyword">delete</span> <a class="code hl_variable" href="classSampleHandlerFD.html#af60df24f4eb7954a3297c9841c60624b">THStackLeg</a>;}</div>
+<div class="line"><span class="lineno"> 2053</span>  <a class="code hl_variable" href="classSampleHandlerFD.html#af60df24f4eb7954a3297c9841c60624b">THStackLeg</a> = <span class="keyword">new</span> TLegend(0.1,0.1,0.9,0.9);</div>
+<div class="line"><span class="lineno"> 2054</span> </div>
+<div class="line"><span class="lineno"> 2055</span>  <span class="keywordtype">int</span> iMax = -1;</div>
+<div class="line"><span class="lineno"> 2056</span>  <span class="keywordflow">if</span> (Selection1 == <a class="code hl_enumvalue" href="classSampleHandlerFD.html#a275ef31fcf386fcd3c594fc2762f9fdaae986eb261f3bb8175a1160ddca806e84">FDPlotType::kModePlot</a>) {</div>
+<div class="line"><span class="lineno"> 2057</span>    iMax = <a class="code hl_variable" href="classSampleHandlerBase.html#a2f86c6158b755b9d2d400415ccac45f2">Modes</a>-&gt;GetNModes();</div>
+<div class="line"><span class="lineno"> 2058</span>  }</div>
+<div class="line"><span class="lineno"> 2059</span>  <span class="keywordflow">if</span> (Selection1 == <a class="code hl_enumvalue" href="classSampleHandlerFD.html#a275ef31fcf386fcd3c594fc2762f9fdaa41eaf103a2e447ae4c984567ea4f6940">FDPlotType::kOscChannelPlot</a>) {</div>
+<div class="line"><span class="lineno"> 2060</span>    iMax = <a class="code hl_function" href="group__SampleHandlerGetters.html#gaa619e7779b3faa873dc418da07112a12">GetNOscChannels</a>();</div>
+<div class="line"><span class="lineno"> 2061</span>  }</div>
+<div class="line"><span class="lineno"> 2062</span>  <span class="keywordflow">if</span> (iMax == -1) {</div>
+<div class="line"><span class="lineno"> 2063</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;You&#39;ve passed me a Selection1 which was not implemented in ReturnHistsBySelection1D. Selection1 and Selection2 are counters for different indexable quantities&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2064</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><span class="lineno"> 2065</span>  }</div>
+<div class="line"><span class="lineno"> 2066</span> </div>
+<div class="line"><span class="lineno"> 2067</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0;i&lt;iMax;i++) {</div>
+<div class="line"><span class="lineno"> 2068</span>    <span class="keywordflow">if</span> (Selection1==0) {</div>
+<div class="line"><span class="lineno"> 2069</span>      hHistList.push_back(<a class="code hl_function" href="group__SampleHandlerGetters.html#gaac0dad7d2090250cf8094eb8ceaab932">Get1DVarHistByModeAndChannel</a>(KinematicProjection,i,Selection2,WeightStyle,XAxis));</div>
+<div class="line"><span class="lineno"> 2070</span>      <a class="code hl_variable" href="classSampleHandlerFD.html#af60df24f4eb7954a3297c9841c60624b">THStackLeg</a>-&gt;AddEntry(hHistList[i],(<a class="code hl_variable" href="classSampleHandlerBase.html#a2f86c6158b755b9d2d400415ccac45f2">Modes</a>-&gt;GetMaCh3ModeName(i)+Form(<span class="stringliteral">&quot; : (%4.2f)&quot;</span>,hHistList[i]-&gt;Integral())).c_str(),<span class="stringliteral">&quot;f&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2071</span> </div>
+<div class="line"><span class="lineno"> 2072</span>      hHistList[i]-&gt;SetFillColor(<span class="keyword">static_cast&lt;</span>Color_t<span class="keyword">&gt;</span>(<a class="code hl_variable" href="classSampleHandlerBase.html#a2f86c6158b755b9d2d400415ccac45f2">Modes</a>-&gt;GetMaCh3ModePlotColor(i)));</div>
+<div class="line"><span class="lineno"> 2073</span>      hHistList[i]-&gt;SetLineColor(<span class="keyword">static_cast&lt;</span>Color_t<span class="keyword">&gt;</span>(<a class="code hl_variable" href="classSampleHandlerBase.html#a2f86c6158b755b9d2d400415ccac45f2">Modes</a>-&gt;GetMaCh3ModePlotColor(i)));</div>
+<div class="line"><span class="lineno"> 2074</span>    }</div>
+<div class="line"><span class="lineno"> 2075</span>    <span class="keywordflow">if</span> (Selection1==1) {</div>
+<div class="line"><span class="lineno"> 2076</span>      hHistList.push_back(<a class="code hl_function" href="group__SampleHandlerGetters.html#gaac0dad7d2090250cf8094eb8ceaab932">Get1DVarHistByModeAndChannel</a>(KinematicProjection,Selection2,i,WeightStyle,XAxis));</div>
+<div class="line"><span class="lineno"> 2077</span>      <a class="code hl_variable" href="classSampleHandlerFD.html#af60df24f4eb7954a3297c9841c60624b">THStackLeg</a>-&gt;AddEntry(hHistList[i],(<a class="code hl_variable" href="classSampleHandlerFD.html#a57f378f84f66caa817e52c0bfb5ff0be">OscChannels</a>[i].flavourName+Form(<span class="stringliteral">&quot; | %4.2f&quot;</span>,hHistList[i]-&gt;Integral())).c_str(),<span class="stringliteral">&quot;f&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2078</span>    }</div>
+<div class="line"><span class="lineno"> 2079</span>  }</div>
+<div class="line"><span class="lineno"> 2080</span> </div>
+<div class="line"><span class="lineno"> 2081</span>  <span class="keywordflow">return</span> hHistList;</div>
+<div class="line"><span class="lineno"> 2082</span>}</div>
+<div class="ttc" id="aclassSampleHandlerFD_html_a275ef31fcf386fcd3c594fc2762f9fdaa41eaf103a2e447ae4c984567ea4f6940"><div class="ttname"><a href="classSampleHandlerFD.html#a275ef31fcf386fcd3c594fc2762f9fdaa41eaf103a2e447ae4c984567ea4f6940">SampleHandlerFD::kOscChannelPlot</a></div><div class="ttdeci">@ kOscChannelPlot</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00401">SampleHandlerFD.h:400</a></div></div>
+<div class="ttc" id="aclassSampleHandlerFD_html_a275ef31fcf386fcd3c594fc2762f9fdaae986eb261f3bb8175a1160ddca806e84"><div class="ttname"><a href="classSampleHandlerFD.html#a275ef31fcf386fcd3c594fc2762f9fdaae986eb261f3bb8175a1160ddca806e84">SampleHandlerFD::kModePlot</a></div><div class="ttdeci">@ kModePlot</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00399">SampleHandlerFD.h:399</a></div></div>
 <div class="ttc" id="aclassSampleHandlerFD_html_af60df24f4eb7954a3297c9841c60624b"><div class="ttname"><a href="classSampleHandlerFD.html#af60df24f4eb7954a3297c9841c60624b">SampleHandlerFD::THStackLeg</a></div><div class="ttdeci">TLegend * THStackLeg</div><div class="ttdoc">DB Miscellaneous Variables.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00374">SampleHandlerFD.h:374</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -1677,33 +1679,34 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerFD_8cpp_source.html#l02082">2082</a> of file <a class="el" href="SampleHandlerFD_8cpp_source.html">SampleHandlerFD.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 2084</span>                                {</div>
-<div class="line"><span class="lineno"> 2085</span>  std::vector&lt;TH2*&gt; hHistList;</div>
-<div class="line"><span class="lineno"> 2086</span> </div>
-<div class="line"><span class="lineno"> 2087</span>  <span class="keywordtype">int</span> iMax = -1;</div>
-<div class="line"><span class="lineno"> 2088</span>  <span class="keywordflow">if</span> (Selection1 == 0) {</div>
-<div class="line"><span class="lineno"> 2089</span>    iMax = <a class="code hl_variable" href="classSampleHandlerBase.html#a2f86c6158b755b9d2d400415ccac45f2">Modes</a>-&gt;GetNModes();</div>
-<div class="line"><span class="lineno"> 2090</span>  }</div>
-<div class="line"><span class="lineno"> 2091</span>  <span class="keywordflow">if</span> (Selection1 == 1) {</div>
-<div class="line"><span class="lineno"> 2092</span>    iMax = <a class="code hl_function" href="group__SampleHandlerGetters.html#gaa619e7779b3faa873dc418da07112a12">GetNOscChannels</a>();</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerFD_8cpp_source.html#l02084">2084</a> of file <a class="el" href="SampleHandlerFD_8cpp_source.html">SampleHandlerFD.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 2086</span>                                                                                        {</div>
+<div class="line"><span class="lineno"> 2087</span><span class="comment">// ************************************************</span></div>
+<div class="line"><span class="lineno"> 2088</span>  std::vector&lt;TH2*&gt; hHistList;</div>
+<div class="line"><span class="lineno"> 2089</span> </div>
+<div class="line"><span class="lineno"> 2090</span>  <span class="keywordtype">int</span> iMax = -1;</div>
+<div class="line"><span class="lineno"> 2091</span>  <span class="keywordflow">if</span> (Selection1 == <a class="code hl_enumvalue" href="classSampleHandlerFD.html#a275ef31fcf386fcd3c594fc2762f9fdaae986eb261f3bb8175a1160ddca806e84">FDPlotType::kModePlot</a>) {</div>
+<div class="line"><span class="lineno"> 2092</span>    iMax = <a class="code hl_variable" href="classSampleHandlerBase.html#a2f86c6158b755b9d2d400415ccac45f2">Modes</a>-&gt;GetNModes();</div>
 <div class="line"><span class="lineno"> 2093</span>  }</div>
-<div class="line"><span class="lineno"> 2094</span>  <span class="keywordflow">if</span> (iMax == -1) {</div>
-<div class="line"><span class="lineno"> 2095</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;You&#39;ve passed me a Selection1 which was not implemented in ReturnHistsBySelection1D. Selection1 and Selection2 are counters for different indexable quantities&quot;</span>);</div>
-<div class="line"><span class="lineno"> 2096</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><span class="lineno"> 2097</span>  }</div>
-<div class="line"><span class="lineno"> 2098</span> </div>
-<div class="line"><span class="lineno"> 2099</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0;i&lt;iMax;i++) {</div>
-<div class="line"><span class="lineno"> 2100</span>    <span class="keywordflow">if</span> (Selection1==0) {</div>
-<div class="line"><span class="lineno"> 2101</span>      hHistList.push_back(<a class="code hl_function" href="group__SampleHandlerGetters.html#gaa78d7bcfe9377cb7d47d596b39eda84c">Get2DVarHistByModeAndChannel</a>(KinematicProjectionX,KinematicProjectionY,i,Selection2,WeightStyle,XAxis,YAxis));</div>
-<div class="line"><span class="lineno"> 2102</span>    }</div>
-<div class="line"><span class="lineno"> 2103</span>    <span class="keywordflow">if</span> (Selection1==1) {</div>
-<div class="line"><span class="lineno"> 2104</span>      hHistList.push_back(<a class="code hl_function" href="group__SampleHandlerGetters.html#gaa78d7bcfe9377cb7d47d596b39eda84c">Get2DVarHistByModeAndChannel</a>(KinematicProjectionX,KinematicProjectionY,Selection2,i,WeightStyle,XAxis,YAxis));</div>
+<div class="line"><span class="lineno"> 2094</span>  <span class="keywordflow">if</span> (Selection1 == <a class="code hl_enumvalue" href="classSampleHandlerFD.html#a275ef31fcf386fcd3c594fc2762f9fdaa41eaf103a2e447ae4c984567ea4f6940">FDPlotType::kOscChannelPlot</a>) {</div>
+<div class="line"><span class="lineno"> 2095</span>    iMax = <a class="code hl_function" href="group__SampleHandlerGetters.html#gaa619e7779b3faa873dc418da07112a12">GetNOscChannels</a>();</div>
+<div class="line"><span class="lineno"> 2096</span>  }</div>
+<div class="line"><span class="lineno"> 2097</span>  <span class="keywordflow">if</span> (iMax == -1) {</div>
+<div class="line"><span class="lineno"> 2098</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;You&#39;ve passed me a Selection1 which was not implemented in ReturnHistsBySelection1D. Selection1 and Selection2 are counters for different indexable quantities&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2099</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><span class="lineno"> 2100</span>  }</div>
+<div class="line"><span class="lineno"> 2101</span> </div>
+<div class="line"><span class="lineno"> 2102</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i=0;i&lt;iMax;i++) {</div>
+<div class="line"><span class="lineno"> 2103</span>    <span class="keywordflow">if</span> (Selection1 == <a class="code hl_enumvalue" href="classSampleHandlerFD.html#a275ef31fcf386fcd3c594fc2762f9fdaae986eb261f3bb8175a1160ddca806e84">FDPlotType::kModePlot</a>) {</div>
+<div class="line"><span class="lineno"> 2104</span>      hHistList.push_back(<a class="code hl_function" href="group__SampleHandlerGetters.html#gaa78d7bcfe9377cb7d47d596b39eda84c">Get2DVarHistByModeAndChannel</a>(KinematicProjectionX,KinematicProjectionY,i,Selection2,WeightStyle,XAxis,YAxis));</div>
 <div class="line"><span class="lineno"> 2105</span>    }</div>
-<div class="line"><span class="lineno"> 2106</span>  }</div>
-<div class="line"><span class="lineno"> 2107</span> </div>
-<div class="line"><span class="lineno"> 2108</span>  <span class="keywordflow">return</span> hHistList;</div>
-<div class="line"><span class="lineno"> 2109</span>}</div>
+<div class="line"><span class="lineno"> 2106</span>    <span class="keywordflow">if</span> (Selection1 == <a class="code hl_enumvalue" href="classSampleHandlerFD.html#a275ef31fcf386fcd3c594fc2762f9fdaa41eaf103a2e447ae4c984567ea4f6940">FDPlotType::kOscChannelPlot</a>) {</div>
+<div class="line"><span class="lineno"> 2107</span>      hHistList.push_back(<a class="code hl_function" href="group__SampleHandlerGetters.html#gaa78d7bcfe9377cb7d47d596b39eda84c">Get2DVarHistByModeAndChannel</a>(KinematicProjectionX,KinematicProjectionY,Selection2,i,WeightStyle,XAxis,YAxis));</div>
+<div class="line"><span class="lineno"> 2108</span>    }</div>
+<div class="line"><span class="lineno"> 2109</span>  }</div>
+<div class="line"><span class="lineno"> 2110</span> </div>
+<div class="line"><span class="lineno"> 2111</span>  <span class="keywordflow">return</span> hHistList;</div>
+<div class="line"><span class="lineno"> 2112</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1785,17 +1788,17 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerFD_8cpp_source.html#l02111">2111</a> of file <a class="el" href="SampleHandlerFD_8cpp_source.html">SampleHandlerFD.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 2111</span>                                                                                                                                                     {</div>
-<div class="line"><span class="lineno"> 2112</span>  std::vector&lt;TH1*&gt; HistList = <a class="code hl_function" href="group__SampleHandlerGetters.html#gac7f3dd7b022e7c0714ab12db1184eb47">ReturnHistsBySelection1D</a>(KinematicProjection, Selection1, Selection2, WeightStyle, XAxis);</div>
-<div class="line"><span class="lineno"> 2113</span>  THStack* StackHist = <span class="keyword">new</span> THStack((<a class="code hl_function" href="group__SampleHandlerGetters.html#ga80a62c0759d4df18e8d641a3cbceea46">GetTitle</a>()+<span class="stringliteral">&quot;_&quot;</span>+KinematicProjection+<span class="stringliteral">&quot;_Stack&quot;</span>).c_str(),<span class="stringliteral">&quot;&quot;</span>);</div>
-<div class="line"><span class="lineno"> 2114</span>  <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i=0;i&lt;HistList.size();i++) {</div>
-<div class="line"><span class="lineno"> 2115</span>    StackHist-&gt;Add(HistList[i]);</div>
-<div class="line"><span class="lineno"> 2116</span>  }</div>
-<div class="line"><span class="lineno"> 2117</span>  <span class="keywordflow">return</span> StackHist;</div>
-<div class="line"><span class="lineno"> 2118</span>}</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerFD_8cpp_source.html#l02114">2114</a> of file <a class="el" href="SampleHandlerFD_8cpp_source.html">SampleHandlerFD.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 2114</span>                                                                                                                                                     {</div>
+<div class="line"><span class="lineno"> 2115</span>  std::vector&lt;TH1*&gt; HistList = <a class="code hl_function" href="group__SampleHandlerGetters.html#gac7f3dd7b022e7c0714ab12db1184eb47">ReturnHistsBySelection1D</a>(KinematicProjection, Selection1, Selection2, WeightStyle, XAxis);</div>
+<div class="line"><span class="lineno"> 2116</span>  THStack* StackHist = <span class="keyword">new</span> THStack((<a class="code hl_function" href="group__SampleHandlerGetters.html#ga80a62c0759d4df18e8d641a3cbceea46">GetTitle</a>()+<span class="stringliteral">&quot;_&quot;</span>+KinematicProjection+<span class="stringliteral">&quot;_Stack&quot;</span>).c_str(),<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><span class="lineno"> 2117</span>  <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i=0;i&lt;HistList.size();i++) {</div>
+<div class="line"><span class="lineno"> 2118</span>    StackHist-&gt;Add(HistList[i]);</div>
+<div class="line"><span class="lineno"> 2119</span>  }</div>
+<div class="line"><span class="lineno"> 2120</span>  <span class="keywordflow">return</span> StackHist;</div>
+<div class="line"><span class="lineno"> 2121</span>}</div>
 <div class="ttc" id="agroup__SampleHandlerGetters_html_ga80a62c0759d4df18e8d641a3cbceea46"><div class="ttname"><a href="group__SampleHandlerGetters.html#ga80a62c0759d4df18e8d641a3cbceea46">SampleHandlerFD::GetTitle</a></div><div class="ttdeci">std::string GetTitle() const override</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00035">SampleHandlerFD.h:35</a></div></div>
-<div class="ttc" id="agroup__SampleHandlerGetters_html_gac7f3dd7b022e7c0714ab12db1184eb47"><div class="ttname"><a href="group__SampleHandlerGetters.html#gac7f3dd7b022e7c0714ab12db1184eb47">SampleHandlerFD::ReturnHistsBySelection1D</a></div><div class="ttdeci">std::vector&lt; TH1 * &gt; ReturnHistsBySelection1D(std::string KinematicProjection, int Selection1, int Selection2=-1, int WeightStyle=0, TAxis *Axis=0)</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8cpp_source.html#l02046">SampleHandlerFD.cpp:2046</a></div></div>
+<div class="ttc" id="agroup__SampleHandlerGetters_html_gac7f3dd7b022e7c0714ab12db1184eb47"><div class="ttname"><a href="group__SampleHandlerGetters.html#gac7f3dd7b022e7c0714ab12db1184eb47">SampleHandlerFD::ReturnHistsBySelection1D</a></div><div class="ttdeci">std::vector&lt; TH1 * &gt; ReturnHistsBySelection1D(std::string KinematicProjection, int Selection1, int Selection2=-1, int WeightStyle=0, TAxis *Axis=0)</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8cpp_source.html#l02048">SampleHandlerFD.cpp:2048</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

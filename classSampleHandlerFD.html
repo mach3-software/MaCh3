@@ -83,6 +83,7 @@ $(function() {
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
+<a href="#pri-types">Private Types</a> &#124;
 <a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classSampleHandlerFD-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">SampleHandlerFD Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div></div>
@@ -125,8 +126,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ga8c4ed6a59c8e49f6292513c4de315e62"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga1095657cb0d1613333dd90448d3fbc4a"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#ga1095657cb0d1613333dd90448d3fbc4a">GetYBinVarName</a> ()</td></tr>
 <tr class="separator:ga1095657cb0d1613333dd90448d3fbc4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af6873a444da656d651d4ada07345c0ae"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerFD.html#af6873a444da656d651d4ada07345c0ae">PrintIntegral</a> (TString OutputName=&quot;/dev/null&quot;, int WeightStyle=0, TString OutputCSVName=&quot;/dev/null&quot;)</td></tr>
-<tr class="separator:af6873a444da656d651d4ada07345c0ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1a5fc48012d747dddc78680d69b395fb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerFD.html#a1a5fc48012d747dddc78680d69b395fb">PrintIntegral</a> (const TString &amp;OutputName=&quot;/dev/null&quot;, const int WeightStyle=0, const TString &amp;OutputCSVName=&quot;/dev/null&quot;)</td></tr>
+<tr class="separator:a1a5fc48012d747dddc78680d69b395fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a118508d506dfe7a7660600832297b341"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerFD.html#a118508d506dfe7a7660600832297b341">AddData</a> (TH1D *Data)</td></tr>
 <tr class="separator:a118508d506dfe7a7660600832297b341"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab5703d617a9bee2a1c29b132f6481458"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerFD.html#ab5703d617a9bee2a1c29b132f6481458">AddData</a> (TH2D *Data)</td></tr>
@@ -521,6 +522,13 @@ Protected Attributes</h2></td></tr>
 <tr class="memdesc:a2f86c6158b755b9d2d400415ccac45f2 inherit pro_attribs_classSampleHandlerBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Holds information about used Generator and MaCh3 modes.  <br /></td></tr>
 <tr class="separator:a2f86c6158b755b9d2d400415ccac45f2 inherit pro_attribs_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-types" name="pri-types"></a>
+Private Types</h2></td></tr>
+<tr class="memitem:a275ef31fcf386fcd3c594fc2762f9fda"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerFD.html#a275ef31fcf386fcd3c594fc2762f9fda">FDPlotType</a> { <a class="el" href="classSampleHandlerFD.html#a275ef31fcf386fcd3c594fc2762f9fdaae986eb261f3bb8175a1160ddca806e84">kModePlot</a> = 0
+, <a class="el" href="classSampleHandlerFD.html#a275ef31fcf386fcd3c594fc2762f9fdaa41eaf103a2e447ae4c984567ea4f6940">kOscChannelPlot</a> = 1
+ }</td></tr>
+<tr class="separator:a275ef31fcf386fcd3c594fc2762f9fda"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
 <tr class="memitem:a251743beb6b3e6884fef871a8aef9156"><td class="memItemLeft" align="right" valign="top">std::unordered_map&lt; std::string, <a class="el" href="SampleStructs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2">NuPDG</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerFD.html#a251743beb6b3e6884fef871a8aef9156">FileToInitPDGMap</a></td></tr>
@@ -535,7 +543,42 @@ Private Attributes</h2></td></tr>
 Ed Atkin </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="SampleHandlerFD_8h_source.html#l00018">18</a> of file <a class="el" href="SampleHandlerFD_8h_source.html">SampleHandlerFD.h</a>.</p>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+</div><h2 class="groupheader">Member Enumeration Documentation</h2>
+<a id="a275ef31fcf386fcd3c594fc2762f9fda" name="a275ef31fcf386fcd3c594fc2762f9fda"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a275ef31fcf386fcd3c594fc2762f9fda">&#9670;&#160;</a></span>FDPlotType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="classSampleHandlerFD.html#a275ef31fcf386fcd3c594fc2762f9fda">SampleHandlerFD::FDPlotType</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a275ef31fcf386fcd3c594fc2762f9fdaae986eb261f3bb8175a1160ddca806e84" name="a275ef31fcf386fcd3c594fc2762f9fdaae986eb261f3bb8175a1160ddca806e84"></a>kModePlot&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a275ef31fcf386fcd3c594fc2762f9fdaa41eaf103a2e447ae4c984567ea4f6940" name="a275ef31fcf386fcd3c594fc2762f9fdaa41eaf103a2e447ae4c984567ea4f6940"></a>kOscChannelPlot&#160;</td><td class="fielddoc"></td></tr>
+</table>
+
+<p class="definition">Definition at line <a class="el" href="SampleHandlerFD_8h_source.html#l00398">398</a> of file <a class="el" href="SampleHandlerFD_8h_source.html">SampleHandlerFD.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  398</span>                  {</div>
+<div class="line"><span class="lineno">  399</span>    <a class="code hl_enumvalue" href="classSampleHandlerFD.html#a275ef31fcf386fcd3c594fc2762f9fdaae986eb261f3bb8175a1160ddca806e84">kModePlot</a> = 0,</div>
+<div class="line"><span class="lineno">  400</span>    <a class="code hl_enumvalue" href="classSampleHandlerFD.html#a275ef31fcf386fcd3c594fc2762f9fdaa41eaf103a2e447ae4c984567ea4f6940">kOscChannelPlot</a> = 1</div>
+<div class="line"><span class="lineno">  401</span>  };</div>
+<div class="ttc" id="aclassSampleHandlerFD_html_a275ef31fcf386fcd3c594fc2762f9fdaa41eaf103a2e447ae4c984567ea4f6940"><div class="ttname"><a href="classSampleHandlerFD.html#a275ef31fcf386fcd3c594fc2762f9fdaa41eaf103a2e447ae4c984567ea4f6940">SampleHandlerFD::kOscChannelPlot</a></div><div class="ttdeci">@ kOscChannelPlot</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00401">SampleHandlerFD.h:400</a></div></div>
+<div class="ttc" id="aclassSampleHandlerFD_html_a275ef31fcf386fcd3c594fc2762f9fdaae986eb261f3bb8175a1160ddca806e84"><div class="ttname"><a href="classSampleHandlerFD.html#a275ef31fcf386fcd3c594fc2762f9fdaae986eb261f3bb8175a1160ddca806e84">SampleHandlerFD::kModePlot</a></div><div class="ttdeci">@ kModePlot</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00399">SampleHandlerFD.h:399</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a6a0442b8c11f0a83b18fec8c9222b3e8" name="a6a0442b8c11f0a83b18fec8c9222b3e8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6a0442b8c11f0a83b18fec8c9222b3e8">&#9670;&#160;</a></span>SampleHandlerFD()</h2>
 
@@ -944,9 +987,9 @@ Ed Atkin </dd></dl>
 <div class="ttc" id="aclassSampleHandlerFD_html_a00060ee2bbc0e3e5528932705ce690e6"><div class="ttname"><a href="classSampleHandlerFD.html#a00060ee2bbc0e3e5528932705ce690e6">SampleHandlerFD::funcParsGrid</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; int &gt; &gt; funcParsGrid</div><div class="ttdoc">HH - a grid of vectors of enums for each sample and event.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00243">SampleHandlerFD.h:243</a></div></div>
 <div class="ttc" id="aclassSampleHandlerFD_html_a06a5cccd7d178bd999dc1e4f3782e9b7"><div class="ttname"><a href="classSampleHandlerFD.html#a06a5cccd7d178bd999dc1e4f3782e9b7">SampleHandlerFD::resetShifts</a></div><div class="ttdeci">virtual void resetShifts(int iEvent)</div><div class="ttdoc">HH - reset the shifted values to the original values.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00228">SampleHandlerFD.h:228</a></div></div>
 <div class="ttc" id="aclassSampleHandlerFD_html_a06eab1b725605a68cdb75e3826122c47"><div class="ttname"><a href="classSampleHandlerFD.html#a06eab1b725605a68cdb75e3826122c47">SampleHandlerFD::funcParsMap</a></div><div class="ttdeci">std::vector&lt; FunctionalParameter * &gt; funcParsMap</div><div class="ttdoc">HH - a map that relates the funcpar enum to pointer of FuncPars struct HH - Changed to a vector of po...</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00238">SampleHandlerFD.h:238</a></div></div>
-<div class="ttc" id="astructFunctionalParameter_html"><div class="ttname"><a href="structFunctionalParameter.html">FunctionalParameter</a></div><div class="ttdoc">HH - Functional parameters Carrier for whether you want to apply a systematic to an event or not.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00188">ParameterStructs.h:188</a></div></div>
-<div class="ttc" id="astructFunctionalParameter_html_a4be18ce2fe67e89237f74d5e54b04a09"><div class="ttname"><a href="structFunctionalParameter.html#a4be18ce2fe67e89237f74d5e54b04a09">FunctionalParameter::valuePtr</a></div><div class="ttdeci">const double * valuePtr</div><div class="ttdoc">Parameter value pointer.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00213">ParameterStructs.h:213</a></div></div>
-<div class="ttc" id="astructFunctionalParameter_html_a9c6502d6199b3a388998172859cd8031"><div class="ttname"><a href="structFunctionalParameter.html#a9c6502d6199b3a388998172859cd8031">FunctionalParameter::funcPtr</a></div><div class="ttdeci">FuncParFuncType * funcPtr</div><div class="ttdoc">Function pointer.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00216">ParameterStructs.h:216</a></div></div>
+<div class="ttc" id="astructFunctionalParameter_html"><div class="ttname"><a href="structFunctionalParameter.html">FunctionalParameter</a></div><div class="ttdoc">HH - Functional parameters Carrier for whether you want to apply a systematic to an event or not.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00200">ParameterStructs.h:200</a></div></div>
+<div class="ttc" id="astructFunctionalParameter_html_a4be18ce2fe67e89237f74d5e54b04a09"><div class="ttname"><a href="structFunctionalParameter.html#a4be18ce2fe67e89237f74d5e54b04a09">FunctionalParameter::valuePtr</a></div><div class="ttdeci">const double * valuePtr</div><div class="ttdoc">Parameter value pointer.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00225">ParameterStructs.h:225</a></div></div>
+<div class="ttc" id="astructFunctionalParameter_html_a9c6502d6199b3a388998172859cd8031"><div class="ttname"><a href="structFunctionalParameter.html#a9c6502d6199b3a388998172859cd8031">FunctionalParameter::funcPtr</a></div><div class="ttdeci">FuncParFuncType * funcPtr</div><div class="ttdoc">Function pointer.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00228">ParameterStructs.h:228</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2127,13 +2170,13 @@ Ed Atkin </dd></dl>
 
 <p>Get pointer to oscillation channel associated with given event. Osc channel is const. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerFD_8cpp_source.html#l02122">2122</a> of file <a class="el" href="SampleHandlerFD_8cpp_source.html">SampleHandlerFD.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 2122</span>                                                                      {</div>
-<div class="line"><span class="lineno"> 2123</span><span class="comment">// ************************************************</span></div>
-<div class="line"><span class="lineno"> 2124</span>  <span class="keyword">const</span> <span class="keywordtype">int</span> Channel = <a class="code hl_function" href="FarDetectorCoreInfoStruct_8h.html#afc52c63bc2b15ae30444755579f5beb4">GetOscChannel</a>(<a class="code hl_variable" href="classSampleHandlerFD.html#a57f378f84f66caa817e52c0bfb5ff0be">OscChannels</a>, (*<a class="code hl_variable" href="classSampleHandlerFD.html#af779913cecbf20c194010aa540ac78c8">MCSamples</a>[iEvent].nupdgUnosc), (*<a class="code hl_variable" href="classSampleHandlerFD.html#af779913cecbf20c194010aa540ac78c8">MCSamples</a>[iEvent].nupdg));</div>
-<div class="line"><span class="lineno"> 2125</span> </div>
-<div class="line"><span class="lineno"> 2126</span>  <span class="keywordflow">return</span> &amp;(<a class="code hl_variable" href="classSampleHandlerFD.html#a57f378f84f66caa817e52c0bfb5ff0be">OscChannels</a>[Channel].ChannelIndex);</div>
-<div class="line"><span class="lineno"> 2127</span>}</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerFD_8cpp_source.html#l02125">2125</a> of file <a class="el" href="SampleHandlerFD_8cpp_source.html">SampleHandlerFD.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 2125</span>                                                                      {</div>
+<div class="line"><span class="lineno"> 2126</span><span class="comment">// ************************************************</span></div>
+<div class="line"><span class="lineno"> 2127</span>  <span class="keyword">const</span> <span class="keywordtype">int</span> Channel = <a class="code hl_function" href="FarDetectorCoreInfoStruct_8h.html#afc52c63bc2b15ae30444755579f5beb4">GetOscChannel</a>(<a class="code hl_variable" href="classSampleHandlerFD.html#a57f378f84f66caa817e52c0bfb5ff0be">OscChannels</a>, (*<a class="code hl_variable" href="classSampleHandlerFD.html#af779913cecbf20c194010aa540ac78c8">MCSamples</a>[iEvent].nupdgUnosc), (*<a class="code hl_variable" href="classSampleHandlerFD.html#af779913cecbf20c194010aa540ac78c8">MCSamples</a>[iEvent].nupdg));</div>
+<div class="line"><span class="lineno"> 2128</span> </div>
+<div class="line"><span class="lineno"> 2129</span>  <span class="keywordflow">return</span> &amp;(<a class="code hl_variable" href="classSampleHandlerFD.html#a57f378f84f66caa817e52c0bfb5ff0be">OscChannels</a>[Channel].ChannelIndex);</div>
+<div class="line"><span class="lineno"> 2130</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2598,8 +2641,8 @@ Ed Atkin </dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="af6873a444da656d651d4ada07345c0ae" name="af6873a444da656d651d4ada07345c0ae"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af6873a444da656d651d4ada07345c0ae">&#9670;&#160;</a></span>PrintIntegral()</h2>
+<a id="a1a5fc48012d747dddc78680d69b395fb" name="a1a5fc48012d747dddc78680d69b395fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1a5fc48012d747dddc78680d69b395fb">&#9670;&#160;</a></span>PrintIntegral()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2607,19 +2650,19 @@ Ed Atkin </dd></dl>
         <tr>
           <td class="memname">void SampleHandlerFD::PrintIntegral </td>
           <td>(</td>
-          <td class="paramtype">TString&#160;</td>
+          <td class="paramtype">const TString &amp;&#160;</td>
           <td class="paramname"><em>OutputName</em> = <code>&quot;/dev/null&quot;</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype">const int&#160;</td>
           <td class="paramname"><em>WeightStyle</em> = <code>0</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">TString&#160;</td>
+          <td class="paramtype">const TString &amp;&#160;</td>
           <td class="paramname"><em>OutputCSVName</em> = <code>&quot;/dev/null&quot;</code>&#160;</td>
         </tr>
         <tr>
@@ -2631,8 +2674,8 @@ Ed Atkin </dd></dl>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="SampleHandlerFD_8cpp_source.html#l01906">1906</a> of file <a class="el" href="SampleHandlerFD_8cpp_source.html">SampleHandlerFD.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 1906</span>                                                                                                      {</div>
-<div class="line"><span class="lineno"> 1907</span>  <span class="keywordtype">int</span> space = 14;</div>
+<div class="fragment"><div class="line"><span class="lineno"> 1906</span>                                                                                                                          {</div>
+<div class="line"><span class="lineno"> 1907</span>  <span class="keyword">constexpr</span> <span class="keywordtype">int</span> space = 14;</div>
 <div class="line"><span class="lineno"> 1908</span> </div>
 <div class="line"><span class="lineno"> 1909</span>  <span class="keywordtype">bool</span> printToFile=<span class="keyword">false</span>;</div>
 <div class="line"><span class="lineno"> 1910</span>  <span class="keywordflow">if</span> (OutputFileName.CompareTo(<span class="stringliteral">&quot;/dev/null&quot;</span>)) {printToFile = <span class="keyword">true</span>;}</div>
@@ -2769,11 +2812,14 @@ Ed Atkin </dd></dl>
 <div class="line"><span class="lineno"> 2041</span>    outfile &lt;&lt; std::endl;</div>
 <div class="line"><span class="lineno"> 2042</span>    outfile.close();</div>
 <div class="line"><span class="lineno"> 2043</span>  }</div>
-<div class="line"><span class="lineno"> 2044</span>}</div>
+<div class="line"><span class="lineno"> 2044</span>  <span class="comment">// KS: Clean memory we could use smart pointers in future</span></div>
+<div class="line"><span class="lineno"> 2045</span>  <a class="code hl_function" href="ParameterStructs_8h.html#ae6c2cd427c808007fa2a96f65663b976">CleanContainer</a>(IntegralList);</div>
+<div class="line"><span class="lineno"> 2046</span>}</div>
+<div class="ttc" id="aParameterStructs_8h_html_ae6c2cd427c808007fa2a96f65663b976"><div class="ttname"><a href="ParameterStructs_8h.html#ae6c2cd427c808007fa2a96f65663b976">CleanContainer</a></div><div class="ttdeci">void CleanContainer(std::vector&lt; T * &gt; &amp;container)</div><div class="ttdoc">Generic cleanup function.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00115">ParameterStructs.h:115</a></div></div>
 <div class="ttc" id="aclassSampleHandlerBase_html_a2f86c6158b755b9d2d400415ccac45f2"><div class="ttname"><a href="classSampleHandlerBase.html#a2f86c6158b755b9d2d400415ccac45f2">SampleHandlerBase::Modes</a></div><div class="ttdeci">std::unique_ptr&lt; MaCh3Modes &gt; Modes</div><div class="ttdoc">Holds information about used Generator and MaCh3 modes.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00131">SampleHandlerBase.h:131</a></div></div>
-<div class="ttc" id="agroup__SampleHandlerGetters_html_ga7aa8723e32e056e1247341d41378ab60"><div class="ttname"><a href="group__SampleHandlerGetters.html#ga7aa8723e32e056e1247341d41378ab60">SampleHandlerFD::ReturnHistsBySelection2D</a></div><div class="ttdeci">std::vector&lt; TH2 * &gt; ReturnHistsBySelection2D(std::string KinematicProjectionX, std::string KinematicProjectionY, int Selection1, int Selection2=-1, int WeightStyle=0, TAxis *XAxis=0, TAxis *YAxis=0)</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8cpp_source.html#l02082">SampleHandlerFD.cpp:2082</a></div></div>
+<div class="ttc" id="agroup__SampleHandlerGetters_html_ga7aa8723e32e056e1247341d41378ab60"><div class="ttname"><a href="group__SampleHandlerGetters.html#ga7aa8723e32e056e1247341d41378ab60">SampleHandlerFD::ReturnHistsBySelection2D</a></div><div class="ttdeci">std::vector&lt; TH2 * &gt; ReturnHistsBySelection2D(std::string KinematicProjectionX, std::string KinematicProjectionY, int Selection1, int Selection2=-1, int WeightStyle=0, TAxis *XAxis=0, TAxis *YAxis=0)</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8cpp_source.html#l02084">SampleHandlerFD.cpp:2084</a></div></div>
 <div class="ttc" id="agroup__SampleHandlerGetters_html_gaa619e7779b3faa873dc418da07112a12"><div class="ttname"><a href="group__SampleHandlerGetters.html#gaa619e7779b3faa873dc418da07112a12">SampleHandlerFD::GetNOscChannels</a></div><div class="ttdeci">int GetNOscChannels() override</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00080">SampleHandlerFD.h:80</a></div></div>
-<div class="ttc" id="agroup__SampleHandlerGetters_html_gac7f3dd7b022e7c0714ab12db1184eb47"><div class="ttname"><a href="group__SampleHandlerGetters.html#gac7f3dd7b022e7c0714ab12db1184eb47">SampleHandlerFD::ReturnHistsBySelection1D</a></div><div class="ttdeci">std::vector&lt; TH1 * &gt; ReturnHistsBySelection1D(std::string KinematicProjection, int Selection1, int Selection2=-1, int WeightStyle=0, TAxis *Axis=0)</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8cpp_source.html#l02046">SampleHandlerFD.cpp:2046</a></div></div>
+<div class="ttc" id="agroup__SampleHandlerGetters_html_gac7f3dd7b022e7c0714ab12db1184eb47"><div class="ttname"><a href="group__SampleHandlerGetters.html#gac7f3dd7b022e7c0714ab12db1184eb47">SampleHandlerFD::ReturnHistsBySelection1D</a></div><div class="ttdeci">std::vector&lt; TH1 * &gt; ReturnHistsBySelection1D(std::string KinematicProjection, int Selection1, int Selection2=-1, int WeightStyle=0, TAxis *Axis=0)</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8cpp_source.html#l02048">SampleHandlerFD.cpp:2048</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
