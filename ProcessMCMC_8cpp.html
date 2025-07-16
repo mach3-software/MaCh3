@@ -112,6 +112,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:a83be70750a728e4deae518ea3ffaf388"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function producing comparison of posterior and more betwen a few MCMC chains.  <br /></td></tr>
 <tr class="separator:a83be70750a728e4deae518ea3ffaf388"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac5381031738b5fa6481d7ac33d2ad854"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ProcessMCMC_8cpp.html#ac5381031738b5fa6481d7ac33d2ad854">CalcBayesFactor</a> (<a class="el" href="classMCMCProcessor.html">MCMCProcessor</a> *Processor)</td></tr>
+<tr class="memdesc:ac5381031738b5fa6481d7ac33d2ad854"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Calculate Bayes factor for a given hypothesis, most informative are those related to osc params. However, it make relative easy interpretation for switch dials.  <br /></td></tr>
 <tr class="separator:ac5381031738b5fa6481d7ac33d2ad854"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af772f7bdfdba080075141597e9c99f79"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ProcessMCMC_8cpp.html#af772f7bdfdba080075141597e9c99f79">CalcSavageDickey</a> (<a class="el" href="classMCMCProcessor.html">MCMCProcessor</a> *Processor)</td></tr>
 <tr class="separator:af772f7bdfdba080075141597e9c99f79"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -175,6 +176,8 @@ Variables</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>KS: Calculate Bayes factor for a given hypothesis, most informative are those related to osc params. However, it make relative easy interpretation for switch dials. </p>
 
 <p class="definition">Definition at line <a class="el" href="ProcessMCMC_8cpp_source.html#l00351">351</a> of file <a class="el" href="ProcessMCMC_8cpp_source.html">ProcessMCMC.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  352</span>{</div>
@@ -450,13 +453,13 @@ Variables</h2></td></tr>
 <div class="line"><span class="lineno">  520</span>      {</div>
 <div class="line"><span class="lineno">  521</span>        <span class="keywordflow">if</span>( std::fabs (CovarianceDiff-&gt;GetBinContent(j, i)) &lt; 1.e-5 &amp;&amp; std::fabs (CovariancePreviousHist-&gt;GetBinContent(j, i)) &lt; 1.e-5)</div>
 <div class="line"><span class="lineno">  522</span>        {</div>
-<div class="line"><span class="lineno">  523</span>          CovarianceDiff-&gt;SetBinContent(j, i, <a class="code hl_define" href="MCMCProcessor_8h.html#a82a6d79039474bc403b627437a7b97ec">_UNDEF_</a>);</div>
-<div class="line"><span class="lineno">  524</span>          CovariancePreviousHist-&gt;SetBinContent(j, i, <a class="code hl_define" href="MCMCProcessor_8h.html#a82a6d79039474bc403b627437a7b97ec">_UNDEF_</a>);</div>
+<div class="line"><span class="lineno">  523</span>          CovarianceDiff-&gt;SetBinContent(j, i, <a class="code hl_variable" href="namespaceM3.html#a32ef26a222f7341e03dcc42cdd2badd3">M3::_BAD_DOUBLE_</a>);</div>
+<div class="line"><span class="lineno">  524</span>          CovariancePreviousHist-&gt;SetBinContent(j, i, <a class="code hl_variable" href="namespaceM3.html#a32ef26a222f7341e03dcc42cdd2badd3">M3::_BAD_DOUBLE_</a>);</div>
 <div class="line"><span class="lineno">  525</span>        }</div>
 <div class="line"><span class="lineno">  526</span>        <span class="keywordflow">if</span>( std::fabs (CorrelationDiff-&gt;GetBinContent(j, i)) &lt; 1.e-5 &amp;&amp; std::fabs (CorrelationPreviousHist-&gt;GetBinContent(j, i)) &lt; 1.e-5)</div>
 <div class="line"><span class="lineno">  527</span>        {</div>
-<div class="line"><span class="lineno">  528</span>          CorrelationDiff-&gt;SetBinContent(j, i, <a class="code hl_define" href="MCMCProcessor_8h.html#a82a6d79039474bc403b627437a7b97ec">_UNDEF_</a>);</div>
-<div class="line"><span class="lineno">  529</span>          CorrelationPreviousHist-&gt;SetBinContent(j, i, <a class="code hl_define" href="MCMCProcessor_8h.html#a82a6d79039474bc403b627437a7b97ec">_UNDEF_</a>);</div>
+<div class="line"><span class="lineno">  528</span>          CorrelationDiff-&gt;SetBinContent(j, i, <a class="code hl_variable" href="namespaceM3.html#a32ef26a222f7341e03dcc42cdd2badd3">M3::_BAD_DOUBLE_</a>);</div>
+<div class="line"><span class="lineno">  529</span>          CorrelationPreviousHist-&gt;SetBinContent(j, i, <a class="code hl_variable" href="namespaceM3.html#a32ef26a222f7341e03dcc42cdd2badd3">M3::_BAD_DOUBLE_</a>);</div>
 <div class="line"><span class="lineno">  530</span>        }</div>
 <div class="line"><span class="lineno">  531</span>      }</div>
 <div class="line"><span class="lineno">  532</span>    }</div>
@@ -538,15 +541,15 @@ Variables</h2></td></tr>
 <div class="line"><span class="lineno">  608</span>  <span class="keywordflow">if</span>(CovarianceHist != <span class="keyword">nullptr</span>)          <span class="keyword">delete</span> CovarianceHist;</div>
 <div class="line"><span class="lineno">  609</span>  <span class="keywordflow">if</span>(CorrelationHist != <span class="keyword">nullptr</span>)         <span class="keyword">delete</span> CorrelationHist;</div>
 <div class="line"><span class="lineno">  610</span>}</div>
-<div class="ttc" id="aMCMCProcessor_8h_html_a82a6d79039474bc403b627437a7b97ec"><div class="ttname"><a href="MCMCProcessor_8h.html#a82a6d79039474bc403b627437a7b97ec">_UNDEF_</a></div><div class="ttdeci">#define _UNDEF_</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00004">MCMCProcessor.h:4</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00023">MaCh3Logger.h:23</a></div></div>
 <div class="ttc" id="aProcessMCMC_8cpp_html_a2052da75bc58457dc290c8cbd06efe30"><div class="ttname"><a href="ProcessMCMC_8cpp.html#a2052da75bc58457dc290c8cbd06efe30">TMatrixIntoTH2D</a></div><div class="ttdeci">TH2D * TMatrixIntoTH2D(TMatrixDSym *Matrix, const std::string &amp;title)</div><div class="ttdoc">KS: Convert TMatrix to TH2D, mostly useful for making fancy plots.</div><div class="ttdef"><b>Definition:</b> <a href="ProcessMCMC_8cpp_source.html#l00626">ProcessMCMC.cpp:626</a></div></div>
 <div class="ttc" id="aclassMCMCProcessor_html_a07204936619139b886e9a877bc46d1a4"><div class="ttname"><a href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">MCMCProcessor::GetNthParameter</a></div><div class="ttdeci">void GetNthParameter(const int param, double &amp;Prior, double &amp;PriorError, TString &amp;Title) const</div><div class="ttdoc">Get properties of parameter by passing it number.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l02425">MCMCProcessor.cpp:2425</a></div></div>
 <div class="ttc" id="aclassMCMCProcessor_html_a36441ec3d5b0e24e48040282ffcda3eb"><div class="ttname"><a href="classMCMCProcessor.html#a36441ec3d5b0e24e48040282ffcda3eb">MCMCProcessor::ResetHistograms</a></div><div class="ttdeci">void ResetHistograms()</div><div class="ttdoc">Reset 2D posteriors, in case we would like to calculate in again with different BurnInCut.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l02458">MCMCProcessor.cpp:2458</a></div></div>
-<div class="ttc" id="aclassMCMCProcessor_html_a9db87211d9f066011daed18af7f4631e"><div class="ttname"><a href="classMCMCProcessor.html#a9db87211d9f066011daed18af7f4631e">MCMCProcessor::SetPrintToPDF</a></div><div class="ttdeci">void SetPrintToPDF(const bool PlotOrNot)</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00251">MCMCProcessor.h:251</a></div></div>
-<div class="ttc" id="aclassMCMCProcessor_html_aa2ebe9262f7f28778d92148164a54d4b"><div class="ttname"><a href="classMCMCProcessor.html#aa2ebe9262f7f28778d92148164a54d4b">MCMCProcessor::GetnSteps</a></div><div class="ttdeci">Long64_t GetnSteps()</div><div class="ttdoc">Get Number of Steps that Chain has, for merged chains will not be the same nEntries.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00239">MCMCProcessor.h:239</a></div></div>
+<div class="ttc" id="aclassMCMCProcessor_html_a9db87211d9f066011daed18af7f4631e"><div class="ttname"><a href="classMCMCProcessor.html#a9db87211d9f066011daed18af7f4631e">MCMCProcessor::SetPrintToPDF</a></div><div class="ttdeci">void SetPrintToPDF(const bool PlotOrNot)</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00247">MCMCProcessor.h:247</a></div></div>
+<div class="ttc" id="aclassMCMCProcessor_html_aa2ebe9262f7f28778d92148164a54d4b"><div class="ttname"><a href="classMCMCProcessor.html#aa2ebe9262f7f28778d92148164a54d4b">MCMCProcessor::GetnSteps</a></div><div class="ttdeci">Long64_t GetnSteps()</div><div class="ttdoc">Get Number of Steps that Chain has, for merged chains will not be the same nEntries.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00235">MCMCProcessor.h:235</a></div></div>
 <div class="ttc" id="aclassMCMCProcessor_html_ac9e4fdea5d2de92a1abad5b79b7daf88"><div class="ttname"><a href="classMCMCProcessor.html#ac9e4fdea5d2de92a1abad5b79b7daf88">MCMCProcessor::GetCovariance</a></div><div class="ttdeci">void GetCovariance(TMatrixDSym *&amp;Cov, TMatrixDSym *&amp;Corr)</div><div class="ttdoc">Get the post-fit covariances and correlations.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l00192">MCMCProcessor.cpp:192</a></div></div>
 <div class="ttc" id="aclassMCMCProcessor_html_ad610d8e835031872b428e759ef4045f1"><div class="ttname"><a href="classMCMCProcessor.html#ad610d8e835031872b428e759ef4045f1">MCMCProcessor::SetStepCut</a></div><div class="ttdeci">void SetStepCut(const std::string &amp;Cuts)</div><div class="ttdoc">Set the step cutting by string.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l02407">MCMCProcessor.cpp:2407</a></div></div>
+<div class="ttc" id="anamespaceM3_html_a32ef26a222f7341e03dcc42cdd2badd3"><div class="ttname"><a href="namespaceM3.html#a32ef26a222f7341e03dcc42cdd2badd3">M3::_BAD_DOUBLE_</a></div><div class="ttdeci">static constexpr const double _BAD_DOUBLE_</div><div class="ttdoc">Default value used for double initialisation.</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00043">Core.h:43</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -665,7 +668,7 @@ Variables</h2></td></tr>
 <div class="line"><span class="lineno">  665</span>      {</div>
 <div class="line"><span class="lineno">  666</span>        <span class="comment">// KS: If somehow this chain doesn&#39;t given params we skip it</span></div>
 <div class="line"><span class="lineno">  667</span>        Index = Processor[ik]-&gt;GetParamIndexFromName(hpost[0]-&gt;GetTitle());</div>
-<div class="line"><span class="lineno">  668</span>        <span class="keywordflow">if</span>(Index == <a class="code hl_define" href="MCMCProcessor_8h.html#a82a6d79039474bc403b627437a7b97ec">_UNDEF_</a>)</div>
+<div class="line"><span class="lineno">  668</span>        <span class="keywordflow">if</span>(Index == <a class="code hl_variable" href="namespaceM3.html#aed6ca6561a78ba6c90a98ddfa22353aa">M3::_BAD_INT_</a>)</div>
 <div class="line"><span class="lineno">  669</span>        {</div>
 <div class="line"><span class="lineno">  670</span>          Skip = <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno">  671</span>          <span class="keywordflow">break</span>;</div>
@@ -772,6 +775,7 @@ Variables</h2></td></tr>
 <div class="line"><span class="lineno">  772</span>}</div>
 <div class="ttc" id="aProcessMCMC_8cpp_html_a2bff863f66d44b865ce21762802730c8"><div class="ttname"><a href="ProcessMCMC_8cpp.html#a2bff863f66d44b865ce21762802730c8">TitleNames</a></div><div class="ttdeci">std::vector&lt; std::string &gt; TitleNames</div><div class="ttdef"><b>Definition:</b> <a href="ProcessMCMC_8cpp_source.html#l00029">ProcessMCMC.cpp:29</a></div></div>
 <div class="ttc" id="aProcessMCMC_8cpp_html_a6b25bcddaae9b868109dc98a54476e46"><div class="ttname"><a href="ProcessMCMC_8cpp.html#a6b25bcddaae9b868109dc98a54476e46">nFiles</a></div><div class="ttdeci">int nFiles</div><div class="ttdef"><b>Definition:</b> <a href="ProcessMCMC_8cpp_source.html#l00027">ProcessMCMC.cpp:27</a></div></div>
+<div class="ttc" id="anamespaceM3_html_aed6ca6561a78ba6c90a98ddfa22353aa"><div class="ttname"><a href="namespaceM3.html#aed6ca6561a78ba6c90a98ddfa22353aa">M3::_BAD_INT_</a></div><div class="ttdeci">static constexpr const int _BAD_INT_</div><div class="ttdoc">Default value used for int initialisation.</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00045">Core.h:45</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -965,7 +969,7 @@ Variables</h2></td></tr>
 <div class="line"><span class="lineno">  255</span>    {</div>
 <div class="line"><span class="lineno">  256</span>      <span class="comment">// KS: If somehow this chain doesn&#39;t given params we skip it</span></div>
 <div class="line"><span class="lineno">  257</span>      <span class="keyword">const</span> <span class="keywordtype">int</span> Index = Processor[ik]-&gt;GetParamIndexFromName(hpost[0]-&gt;GetTitle());</div>
-<div class="line"><span class="lineno">  258</span>      <span class="keywordflow">if</span>(Index == <a class="code hl_define" href="MCMCProcessor_8h.html#a82a6d79039474bc403b627437a7b97ec">_UNDEF_</a>)</div>
+<div class="line"><span class="lineno">  258</span>      <span class="keywordflow">if</span>(Index == <a class="code hl_variable" href="namespaceM3.html#aed6ca6561a78ba6c90a98ddfa22353aa">M3::_BAD_INT_</a>)</div>
 <div class="line"><span class="lineno">  259</span>      {</div>
 <div class="line"><span class="lineno">  260</span>        Skip = <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno">  261</span>        <span class="keywordflow">break</span>;</div>
@@ -1171,8 +1175,8 @@ Variables</h2></td></tr>
 <div class="line"><span class="lineno">  155</span>                                     <a class="code hl_function" href="YamlHelper_8h.html#a1247d9088f9521c2758d1d7c21dcfa87">GetFromManager</a>&lt;std::vector&lt;short int&gt;&gt;(Settings[<span class="stringliteral">&quot;CredibleRegionStyle&quot;</span>], {2, 1, 3}),</div>
 <div class="line"><span class="lineno">  156</span>                                     <a class="code hl_function" href="YamlHelper_8h.html#a1247d9088f9521c2758d1d7c21dcfa87">GetFromManager</a>&lt;std::vector&lt;short int&gt;&gt;(Settings[<span class="stringliteral">&quot;CredibleRegionColor&quot;</span>], {413, 406, 416}),</div>
 <div class="line"><span class="lineno">  157</span>                                     GetFromManager&lt;bool&gt;(Settings[<span class="stringliteral">&quot;CredibleInSigmas&quot;</span>], <span class="keyword">false</span>), </div>
-<div class="line"><span class="lineno">  158</span>                     GetFromManager&lt;bool&gt;(Settings[<span class="stringliteral">&quot;Draw2DPosterior&quot;</span>], <span class="keyword">true</span>),</div>
-<div class="line"><span class="lineno">  159</span>                     GetFromManager&lt;bool&gt;(Settings[<span class="stringliteral">&quot;DrawBestFit&quot;</span>], <span class="keyword">true</span>));</div>
+<div class="line"><span class="lineno">  158</span>                                     GetFromManager&lt;bool&gt;(Settings[<span class="stringliteral">&quot;Draw2DPosterior&quot;</span>], <span class="keyword">true</span>),</div>
+<div class="line"><span class="lineno">  159</span>                                     GetFromManager&lt;bool&gt;(Settings[<span class="stringliteral">&quot;DrawBestFit&quot;</span>], <span class="keyword">true</span>));</div>
 <div class="line"><span class="lineno">  160</span>    }</div>
 <div class="line"><span class="lineno">  161</span>    <span class="keywordflow">if</span>(GetFromManager&lt;bool&gt;(Settings[<span class="stringliteral">&quot;GetTrianglePlot&quot;</span>], <span class="keyword">true</span>)) <a class="code hl_function" href="ProcessMCMC_8cpp.html#a02c2311b736096adc8525876c0ec1487">GetTrianglePlot</a>(Processor.get());</div>
 <div class="line"><span class="lineno">  162</span> </div>
@@ -1187,7 +1191,7 @@ Variables</h2></td></tr>
 <div class="ttc" id="aProcessMCMC_8cpp_html_a2d9c3cc52d1f5c3cc3e0775ae596e9c7"><div class="ttname"><a href="ProcessMCMC_8cpp.html#a2d9c3cc52d1f5c3cc3e0775ae596e9c7">CalcBipolarPlot</a></div><div class="ttdeci">void CalcBipolarPlot(MCMCProcessor *Processor)</div><div class="ttdef"><b>Definition:</b> <a href="ProcessMCMC_8cpp_source.html#l00404">ProcessMCMC.cpp:404</a></div></div>
 <div class="ttc" id="aProcessMCMC_8cpp_html_a32bb8e776bea9a8b778cfece3200932c"><div class="ttname"><a href="ProcessMCMC_8cpp.html#a32bb8e776bea9a8b778cfece3200932c">CalcParameterEvolution</a></div><div class="ttdeci">void CalcParameterEvolution(MCMCProcessor *Processor)</div><div class="ttdef"><b>Definition:</b> <a href="ProcessMCMC_8cpp_source.html#l00389">ProcessMCMC.cpp:389</a></div></div>
 <div class="ttc" id="aProcessMCMC_8cpp_html_abbd13994de9f24524b06b19aa901d73f"><div class="ttname"><a href="ProcessMCMC_8cpp.html#abbd13994de9f24524b06b19aa901d73f">ReweightPrior</a></div><div class="ttdeci">void ReweightPrior(MCMCProcessor *Processor)</div><div class="ttdef"><b>Definition:</b> <a href="ProcessMCMC_8cpp_source.html#l00612">ProcessMCMC.cpp:612</a></div></div>
-<div class="ttc" id="aProcessMCMC_8cpp_html_ac5381031738b5fa6481d7ac33d2ad854"><div class="ttname"><a href="ProcessMCMC_8cpp.html#ac5381031738b5fa6481d7ac33d2ad854">CalcBayesFactor</a></div><div class="ttdeci">void CalcBayesFactor(MCMCProcessor *Processor)</div><div class="ttdef"><b>Definition:</b> <a href="ProcessMCMC_8cpp_source.html#l00351">ProcessMCMC.cpp:351</a></div></div>
+<div class="ttc" id="aProcessMCMC_8cpp_html_ac5381031738b5fa6481d7ac33d2ad854"><div class="ttname"><a href="ProcessMCMC_8cpp.html#ac5381031738b5fa6481d7ac33d2ad854">CalcBayesFactor</a></div><div class="ttdeci">void CalcBayesFactor(MCMCProcessor *Processor)</div><div class="ttdoc">KS: Calculate Bayes factor for a given hypothesis, most informative are those related to osc params....</div><div class="ttdef"><b>Definition:</b> <a href="ProcessMCMC_8cpp_source.html#l00351">ProcessMCMC.cpp:351</a></div></div>
 <div class="ttc" id="aProcessMCMC_8cpp_html_af772f7bdfdba080075141597e9c99f79"><div class="ttname"><a href="ProcessMCMC_8cpp.html#af772f7bdfdba080075141597e9c99f79">CalcSavageDickey</a></div><div class="ttdeci">void CalcSavageDickey(MCMCProcessor *Processor)</div><div class="ttdef"><b>Definition:</b> <a href="ProcessMCMC_8cpp_source.html#l00371">ProcessMCMC.cpp:371</a></div></div>
 </div><!-- fragment -->
 </div>

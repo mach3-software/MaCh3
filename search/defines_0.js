@@ -8,6 +8,5 @@ var searchData=
   ['_5fnoexcept_5f_5',['_noexcept_',['../Core_8h.html#a2abc3d82639661d84964bed9e2df0e68',1,'Core.h']]],
   ['_5fntf1coeff_5f_6',['_nTF1Coeff_',['../SplineCommon_8h.html#a911160077ffa38727e0494f178ce380a',1,'SplineCommon.h']]],
   ['_5frestrict_5f_7',['_restrict_',['../Core_8h.html#ab6a7e23420f0bcfb04f42f45f8283101',1,'Core.h']]],
-  ['_5fth2polyoverflowbins_5f_8',['_TH2PolyOverflowBins_',['../Core_8h.html#aad677c4443c651001dc4c1f781aef6dc',1,'Core.h']]],
-  ['_5fundef_5f_9',['_UNDEF_',['../MCMCProcessor_8h.html#a82a6d79039474bc403b627437a7b97ec',1,'MCMCProcessor.h']]]
+  ['_5fth2polyoverflowbins_5f_8',['_TH2PolyOverflowBins_',['../Core_8h.html#aad677c4443c651001dc4c1f781aef6dc',1,'Core.h']]]
 ];

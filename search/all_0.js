@@ -72,6 +72,5 @@ var searchData=
   ['_5fstyleconfig_69',['_styleConfig',['../classMaCh3Plotting_1_1StyleManager.html#a904513e793037e503a1595cfe8467561',1,'MaCh3Plotting::StyleManager']]],
   ['_5fstyleman_70',['_styleMan',['../classMaCh3Plotting_1_1PlottingManager.html#ad1519621bfc57eace55e228f3d7f9515',1,'MaCh3Plotting::PlottingManager']]],
   ['_5fth2polyoverflowbins_5f_71',['_TH2PolyOverflowBins_',['../Core_8h.html#aad677c4443c651001dc4c1f781aef6dc',1,'Core.h']]],
-  ['_5ftranslatorconfig_72',['_translatorConfig',['../classMaCh3Plotting_1_1InputManager.html#ad2cec8b2758ffcb661db59f930e8010e',1,'MaCh3Plotting::InputManager']]],
-  ['_5fundef_5f_73',['_UNDEF_',['../MCMCProcessor_8h.html#a82a6d79039474bc403b627437a7b97ec',1,'MCMCProcessor.h']]]
+  ['_5ftranslatorconfig_72',['_translatorConfig',['../classMaCh3Plotting_1_1InputManager.html#ad2cec8b2758ffcb661db59f930e8010e',1,'MaCh3Plotting::InputManager']]]
 ];
