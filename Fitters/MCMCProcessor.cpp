@@ -60,7 +60,7 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
 
   nDraw = 0;
   nEntries = 0;
-  UpperCut = _UNDEF_;
+  UpperCut = M3::_BAD_INT_;
   nSteps = 0;
   nBatches = 0;
   AutoCorrLag = 0;
@@ -931,7 +931,7 @@ void MCMCProcessor::MakeCovariance() {
   // Check that the diagonal entries have been filled
   // i.e. MakePostfit() has been called
   for (int i = 0; i < nDraw; ++i) {
-    if ((*Covariance)(i,i) == _UNDEF_) {
+    if ((*Covariance)(i,i) == M3::_BAD_DOUBLE_) {
       HaveMadeDiagonal = false;
       MACH3LOG_INFO("Have not run diagonal elements in covariance, will do so now by calling MakePostfit()");
       break;
@@ -1148,7 +1148,7 @@ void MCMCProcessor::MakeCovariance_MP(bool Mute) {
   // Check that the diagonal entries have been filled
   // i.e. MakePostfit() has been called
   for (int i = 0; i < nDraw; ++i) {
-    if ((*Covariance)(i,i) == _UNDEF_) {
+    if ((*Covariance)(i,i) == M3::_BAD_DOUBLE_) {
       HaveMadeDiagonal = false;
       MACH3LOG_WARN("Have not run diagonal elements in covariance, will do so now by calling MakePostfit()");
       break;
@@ -1678,7 +1678,7 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
   for(int j = 0; j < nParamPlot; ++j)
   {
     int ParamNo = GetParamIndexFromName(ParNames[j]);
-    if(ParamNo == _UNDEF_)
+    if(ParamNo == M3::_BAD_INT_)
     {
       MACH3LOG_WARN("Couldn't find param {}. Will not plot Triangle plot", ParNames[j]);
       return;
@@ -2060,18 +2060,18 @@ void MCMCProcessor::SetupOutput() {
   #endif
   for (int i = 0; i < nDraw; ++i)
   {
-    (*Central_Value)(i) = _UNDEF_;
-    (*Means)(i) = _UNDEF_;
-    (*Errors)(i) = _UNDEF_;
-    (*Means_Gauss)(i) = _UNDEF_;
-    (*Errors_Gauss)(i) = _UNDEF_;
-    (*Means_HPD)(i) = _UNDEF_;
-    (*Errors_HPD)(i) = _UNDEF_;
-    (*Errors_HPD_Positive)(i) = _UNDEF_;
-    (*Errors_HPD_Negative)(i) = _UNDEF_;
+    (*Central_Value)(i) = M3::_BAD_DOUBLE_;
+    (*Means)(i) = M3::_BAD_DOUBLE_;
+    (*Errors)(i) = M3::_BAD_DOUBLE_;
+    (*Means_Gauss)(i) = M3::_BAD_DOUBLE_;
+    (*Errors_Gauss)(i) = M3::_BAD_DOUBLE_;
+    (*Means_HPD)(i) = M3::_BAD_DOUBLE_;
+    (*Errors_HPD)(i) = M3::_BAD_DOUBLE_;
+    (*Errors_HPD_Positive)(i) = M3::_BAD_DOUBLE_;
+    (*Errors_HPD_Negative)(i) = M3::_BAD_DOUBLE_;
     for (int j = 0; j < nDraw; ++j) {
-      (*Covariance)(i, j) = _UNDEF_;
-      (*Correlation)(i, j) = _UNDEF_;
+      (*Covariance)(i, j) = M3::_BAD_DOUBLE_;
+      (*Correlation)(i, j) = M3::_BAD_DOUBLE_;
     }
   }
   hpost.resize(nDraw);
@@ -2425,7 +2425,7 @@ void MCMCProcessor::SetStepCut(const int Cuts) {
 void MCMCProcessor::GetNthParameter(const int param, double &Prior, double &PriorError, TString &Title) const {
 // **************************
   ParameterEnum ParType = ParamType[param];
-  int ParamNo = _UNDEF_;
+  int ParamNo = M3::_BAD_INT_;
   ParamNo = param - ParamTypeStartPos[ParType];
 
   Prior = ParamCentral[ParType][ParamNo];
@@ -2437,7 +2437,7 @@ void MCMCProcessor::GetNthParameter(const int param, double &Prior, double &Prio
 // Find Param Index based on name
 int MCMCProcessor::GetParamIndexFromName(const std::string& Name){
 // **************************
-  int ParamNo = _UNDEF_;
+  int ParamNo = M3::_BAD_INT_;
   for (int i = 0; i < nDraw; ++i)
   {
     TString Title = "";
@@ -2493,7 +2493,7 @@ void MCMCProcessor::GetPolarPlot(const std::vector<std::string>& ParNames){
   {
     //KS: First we need to find parameter number based on name
     int ParamNo = GetParamIndexFromName(ParNames[k]);
-    if(ParamNo == _UNDEF_)
+    if(ParamNo == M3::_BAD_INT_)
     {
       MACH3LOG_WARN("Couldn't find param {}. Will not calculate Polar Plot", ParNames[k]);
       continue;
@@ -2559,7 +2559,7 @@ void MCMCProcessor::GetBayesFactor(const std::vector<std::string>& ParNames,
   {
     //KS: First we need to find parameter number based on name
     int ParamNo = GetParamIndexFromName(ParNames[k]);
-    if(ParamNo == _UNDEF_)
+    if(ParamNo == M3::_BAD_INT_)
     {
       MACH3LOG_WARN("Couldn't find param {}. Will not calculate Bayes Factor", ParNames[k]);
       continue;
@@ -2619,7 +2619,7 @@ void MCMCProcessor::GetSavageDickey(const std::vector<std::string>& ParNames,
   {
     //KS: First we need to find parameter number based on name
     int ParamNo = GetParamIndexFromName(ParNames[k]);
-    if(ParamNo == _UNDEF_)
+    if(ParamNo == M3::_BAD_INT_)
     {
       MACH3LOG_WARN("Couldn't find param {}. Will not calculate SavageDickey", ParNames[k]);
       continue;
@@ -2755,7 +2755,7 @@ void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
   {
     //KS: First we need to find parameter number based on name
     int ParamNo = GetParamIndexFromName(Names[k]);
-    if(ParamNo == _UNDEF_)
+    if(ParamNo == M3::_BAD_INT_)
     {
       MACH3LOG_WARN("Couldn't find param {}. Can't reweight Prior", Names[k]);
       return;
@@ -2855,7 +2855,7 @@ void MCMCProcessor::ParameterEvolution(const std::vector<std::string>& Names,
   {
     //KS: First we need to find parameter number based on name
     int ParamNo = GetParamIndexFromName(Names[k]);
-    if(ParamNo == _UNDEF_)
+    if(ParamNo == M3::_BAD_INT_)
     {
       MACH3LOG_WARN("Couldn't find param {}. Can't reweight Prior", Names[k]);
       continue;
@@ -3556,8 +3556,8 @@ void MCMCProcessor::CalculateESS(const int nLags, const std::vector<std::vector<
   //KS: Calculate ESS and MCMC efficiency for each parameter
   for (int j = 0; j < nDraw; ++j)
   {
-    (*EffectiveSampleSize)(j) = _UNDEF_;
-    (*SamplingEfficiency)(j) = _UNDEF_;
+    (*EffectiveSampleSize)(j) = M3::_BAD_DOUBLE_;
+    (*SamplingEfficiency)(j) = M3::_BAD_DOUBLE_;
     TempDenominator[j] = 0.;
     //KS: Firs sum over all Calculated autocorrelations
     for (int k = 0; k < nLags; ++k)
