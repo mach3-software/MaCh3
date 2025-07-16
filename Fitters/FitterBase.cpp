@@ -161,7 +161,7 @@ void FitterBase::PrepareOutput() {
     // Do we want to save proposal? This will break plotting scripts and is heave for disk space and step time. Only use when debugging
     bool SaveProposal = GetFromManager<bool>(fitMan->raw()["General"]["SaveProposal"], false, __FILE__ , __LINE__);
 
-    if(SaveProposal) MACH3LOG_INFO("Will save in the chain proposal parameters and LogL")
+    if(SaveProposal) MACH3LOG_INFO("Will save in the chain proposal parameters and LogL");
     // Prepare the output trees
     for (ParameterHandlerBase *cov : systematics) {
       cov->SetBranches(*outTree, SaveProposal);
