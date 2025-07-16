@@ -5,7 +5,7 @@ var searchData=
   ['calcbayesfactor_2',['CalcBayesFactor',['../ProcessMCMC_8cpp.html#ac5381031738b5fa6481d7ac33d2ad854',1,'ProcessMCMC.cpp']]],
   ['calcbipolarplot_3',['CalcBipolarPlot',['../ProcessMCMC_8cpp.html#a2d9c3cc52d1f5c3cc3e0775ae596e9c7',1,'ProcessMCMC.cpp']]],
   ['calcchi_4',['CalcChi',['../classPSO.html#aca234a3a9776e5cbb94bd1ab57f27b01',1,'PSO']]],
-  ['calcchi2_5',['CalcChi2',['../classLikelihoodFit.html#af7383703e9f93e5aebcf699d80a6fb9e',1,'LikelihoodFit::CalcChi2()'],['../classPSO.html#a42f873a16ad3d3d9809262a01bf68538',1,'PSO::CalcChi2()']]],
+  ['calcchi2_5',['CalcChi2',['../classLikelihoodFit.html#af7383703e9f93e5aebcf699d80a6fb9e',1,'LikelihoodFit::CalcChi2()'],['../classPSO.html#a96e38d9b4b8f730d1a7ea199b6d4e675',1,'PSO::CalcChi2()']]],
   ['calcjarlskog_6',['CalcJarlskog',['../classOscProcessor.html#a1867593b1b1c2648b980dfa2e079777b',1,'OscProcessor']]],
   ['calclikelihood_7',['CalcLikelihood',['../classParameterHandlerBase.html#a8e9248d5db77144e9602cb1e4c7c44ac',1,'ParameterHandlerBase']]],
   ['calcllh_8',['CalcLLH',['../classSampleSummary.html#a197d9d30abc14a76d65bd876b28cca32',1,'SampleSummary::CalcLLH(TH2Poly *const &amp;Data, TH2Poly *const &amp;MC, TH2Poly *const &amp;W2)'],['../classSampleSummary.html#a5cd35f899a9f6dce138e6d99561aebdf',1,'SampleSummary::CalcLLH(TH1D *const &amp;Data, TH1D *const &amp;MC, TH1D *const &amp;W2)']]],
