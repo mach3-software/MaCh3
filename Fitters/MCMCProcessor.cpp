@@ -2705,6 +2705,8 @@ void MCMCProcessor::SavageDickeyPlot(std::unique_ptr<TH1D>& PriorHist,
   PosteriorHist->SetFillColorAlpha(kBlue, 0.35);
   PosteriorHist->SetFillStyle(1001);
 
+  if(PosteriorHist->GetMaximum() > PriorHist->GetMaximum()) PriorHist->SetMaximum(PosteriorHist->GetMaximum()*1.1);
+
   PriorHist->Draw("hist");
   PosteriorHist->Draw("hist same");
 
