@@ -162,6 +162,15 @@ class MCMCProcessor {
     void GetSavageDickey(const std::vector<std::string>& ParName,
                          const std::vector<double>& EvaluationPoint,
                          const std::vector<std::vector<double>>& Bounds);
+
+    /// @brief Produce Savage Dickey plot
+    /// @param PriorHist Histogram with prior distribution
+    /// @param PosteriorHist Histogram with posterior distribution
+    void SavageDickeyPlot(std::unique_ptr<TH1D>& PriorHist,
+                          std::unique_ptr<TH1D>& PosteriorHist,
+                          const std::string& Title,
+                          const double EvaluationPoint) const ;
+
     /// @brief Reweight Prior by giving new central value and new error
     /// @param Names Parameter names for which we do reweighting
     /// @param NewCentral New central value for which we reweight
