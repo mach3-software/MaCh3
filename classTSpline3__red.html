@@ -211,10 +211,10 @@ Protected Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  275</span>    <a class="code hl_variable" href="classTSpline3__red.html#af81e778c5cad933f48940e63857b4ffa">YResp</a> = NULL;</div>
 <div class="line"><span class="lineno">  276</span>  }</div>
 <div class="ttc" id="aclassTResponseFunction__red_html_a50443a78985e0c9b16ffc36ebc1d2e91"><div class="ttname"><a href="classTResponseFunction__red.html#a50443a78985e0c9b16ffc36ebc1d2e91">TResponseFunction_red::TResponseFunction_red</a></div><div class="ttdeci">TResponseFunction_red()</div><div class="ttdoc">Empty constructor.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00137">SplineStructs.h:137</a></div></div>
-<div class="ttc" id="aclassTSpline3__red_html_a449ef081c6c2701865e371ab1c2e235e"><div class="ttname"><a href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">TSpline3_red::Par</a></div><div class="ttdeci">M3::float_t ** Par</div><div class="ttdoc">Always uses a third order polynomial, so hard-code the number of coefficients in implementation.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00691">SplineStructs.h:691</a></div></div>
-<div class="ttc" id="aclassTSpline3__red_html_a5ca79646cbc9dce56ed973274f860c0d"><div class="ttname"><a href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">TSpline3_red::nPoints</a></div><div class="ttdeci">M3::int_t nPoints</div><div class="ttdoc">Number of points/knot in TSpline3.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00689">SplineStructs.h:689</a></div></div>
-<div class="ttc" id="aclassTSpline3__red_html_aa4b35c6ba0d90d3b13b49f99beadbf79"><div class="ttname"><a href="classTSpline3__red.html#aa4b35c6ba0d90d3b13b49f99beadbf79">TSpline3_red::XPos</a></div><div class="ttdeci">M3::float_t * XPos</div><div class="ttdoc">Positions of each x for each knot.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00693">SplineStructs.h:693</a></div></div>
-<div class="ttc" id="aclassTSpline3__red_html_af81e778c5cad933f48940e63857b4ffa"><div class="ttname"><a href="classTSpline3__red.html#af81e778c5cad933f48940e63857b4ffa">TSpline3_red::YResp</a></div><div class="ttdeci">M3::float_t * YResp</div><div class="ttdoc">y-value for each knot</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00695">SplineStructs.h:695</a></div></div>
+<div class="ttc" id="aclassTSpline3__red_html_a449ef081c6c2701865e371ab1c2e235e"><div class="ttname"><a href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">TSpline3_red::Par</a></div><div class="ttdeci">M3::float_t ** Par</div><div class="ttdoc">Always uses a third order polynomial, so hard-code the number of coefficients in implementation.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00695">SplineStructs.h:695</a></div></div>
+<div class="ttc" id="aclassTSpline3__red_html_a5ca79646cbc9dce56ed973274f860c0d"><div class="ttname"><a href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">TSpline3_red::nPoints</a></div><div class="ttdeci">M3::int_t nPoints</div><div class="ttdoc">Number of points/knot in TSpline3.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00693">SplineStructs.h:693</a></div></div>
+<div class="ttc" id="aclassTSpline3__red_html_aa4b35c6ba0d90d3b13b49f99beadbf79"><div class="ttname"><a href="classTSpline3__red.html#aa4b35c6ba0d90d3b13b49f99beadbf79">TSpline3_red::XPos</a></div><div class="ttdeci">M3::float_t * XPos</div><div class="ttdoc">Positions of each x for each knot.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00697">SplineStructs.h:697</a></div></div>
+<div class="ttc" id="aclassTSpline3__red_html_af81e778c5cad933f48940e63857b4ffa"><div class="ttname"><a href="classTSpline3__red.html#af81e778c5cad933f48940e63857b4ffa">TSpline3_red::YResp</a></div><div class="ttdeci">M3::float_t * YResp</div><div class="ttdoc">y-value for each knot</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00699">SplineStructs.h:699</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -426,8 +426,12 @@ Protected Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  671</span><span class="preprocessor">    #else</span></div>
 <div class="line"><span class="lineno">  672</span>    TSpline3 *spline = <span class="keyword">new</span> TSpline3(<span class="stringliteral">&quot;Spline&quot;</span>, <a class="code hl_variable" href="classTSpline3__red.html#aa4b35c6ba0d90d3b13b49f99beadbf79">XPos</a>, <a class="code hl_variable" href="classTSpline3__red.html#af81e778c5cad933f48940e63857b4ffa">YResp</a>, <a class="code hl_variable" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>);</div>
 <div class="line"><span class="lineno">  673</span><span class="preprocessor">    #endif</span></div>
-<div class="line"><span class="lineno">  674</span>    <span class="keywordflow">return</span> spline;</div>
-<div class="line"><span class="lineno">  675</span>  }</div>
+<div class="line"><span class="lineno">  674</span>    <span class="keywordflow">for</span> (Int_t i = 0; i &lt; <a class="code hl_variable" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>; ++i) {</div>
+<div class="line"><span class="lineno">  675</span>      spline-&gt;SetPointCoeff(i, <a class="code hl_variable" href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">Par</a>[i][0], <a class="code hl_variable" href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">Par</a>[i][1], <a class="code hl_variable" href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">Par</a>[i][2]);</div>
+<div class="line"><span class="lineno">  676</span>    }</div>
+<div class="line"><span class="lineno">  677</span> </div>
+<div class="line"><span class="lineno">  678</span>    <span class="keywordflow">return</span> spline;</div>
+<div class="line"><span class="lineno">  679</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -716,15 +720,15 @@ Protected Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classTResponseFunction__red.html#abeb53f28dcb53965afba33bad5c89a02">TResponseFunction_red</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00678">678</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  678</span>                               {</div>
-<div class="line"><span class="lineno">  679</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Printing TSpline_red:&quot;</span>);</div>
-<div class="line"><span class="lineno">  680</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot; Nknots = {}&quot;</span>, <a class="code hl_variable" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>);</div>
-<div class="line"><span class="lineno">  681</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>; ++i) {</div>
-<div class="line"><span class="lineno">  682</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;  i = {} x = {} y = {} b = {} c = {} d = {}&quot;</span>,</div>
-<div class="line"><span class="lineno">  683</span>                    i, <a class="code hl_variable" href="classTSpline3__red.html#aa4b35c6ba0d90d3b13b49f99beadbf79">XPos</a>[i], <a class="code hl_variable" href="classTSpline3__red.html#af81e778c5cad933f48940e63857b4ffa">YResp</a>[i], <a class="code hl_variable" href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">Par</a>[i][0], <a class="code hl_variable" href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">Par</a>[i][1], <a class="code hl_variable" href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">Par</a>[i][2]);</div>
-<div class="line"><span class="lineno">  684</span>    }</div>
-<div class="line"><span class="lineno">  685</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00682">682</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  682</span>                               {</div>
+<div class="line"><span class="lineno">  683</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Printing TSpline_red:&quot;</span>);</div>
+<div class="line"><span class="lineno">  684</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot; Nknots = {}&quot;</span>, <a class="code hl_variable" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>);</div>
+<div class="line"><span class="lineno">  685</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>; ++i) {</div>
+<div class="line"><span class="lineno">  686</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;  i = {} x = {} y = {} b = {} c = {} d = {}&quot;</span>,</div>
+<div class="line"><span class="lineno">  687</span>                    i, <a class="code hl_variable" href="classTSpline3__red.html#aa4b35c6ba0d90d3b13b49f99beadbf79">XPos</a>[i], <a class="code hl_variable" href="classTSpline3__red.html#af81e778c5cad933f48940e63857b4ffa">YResp</a>[i], <a class="code hl_variable" href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">Par</a>[i][0], <a class="code hl_variable" href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">Par</a>[i][1], <a class="code hl_variable" href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">Par</a>[i][2]);</div>
+<div class="line"><span class="lineno">  688</span>    }</div>
+<div class="line"><span class="lineno">  689</span>  }</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00023">MaCh3Logger.h:23</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -1066,7 +1070,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Number of points/knot in TSpline3. </p>
 
-<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00689">689</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00693">693</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
 
 </div>
 </div>
@@ -1092,7 +1096,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Always uses a third order polynomial, so hard-code the number of coefficients in implementation. </p>
 
-<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00691">691</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00695">695</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
 
 </div>
 </div>
@@ -1118,7 +1122,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Positions of each x for each knot. </p>
 
-<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00693">693</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00697">697</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
 
 </div>
 </div>
@@ -1144,7 +1148,7 @@ Protected Attributes</h2></td></tr>
 
 <p>y-value for each knot </p>
 
-<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00695">695</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00699">699</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
 
 </div>
 </div>
