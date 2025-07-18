@@ -68,7 +68,7 @@ var searchData=
   ['plotjarlskog_65',['PlotJarlskog',['../classOscProcessor.html#a740409b9638f11ee51884a8961a3c9c5',1,'OscProcessor']]],
   ['plotllh_66',['PlotLLH',['../PlotLLH_8cpp.html#a53c3f8ef6b889ff0c9d2f6b18c7b1f38',1,'PlotLLH.cpp']]],
   ['plotllh_2ecpp_67',['PlotLLH.cpp',['../PlotLLH_8cpp.html',1,'']]],
-  ['plotmatrix_68',['PlotMatrix',['../MatrixPlotter_8cpp.html#a56d1b91d494bea9e60196f362145aa28',1,'MatrixPlotter.cpp']]],
+  ['plotmatrix_68',['PlotMatrix',['../MatrixPlotter_8cpp.html#ad0e6272bb78644580f1890f90fd521f7',1,'MatrixPlotter.cpp']]],
   ['plotmcmcdiag_2ecpp_69',['PlotMCMCDiag.cpp',['../PlotMCMCDiag_8cpp.html',1,'']]],
   ['plotrelativetoprior_70',['plotRelativeToPrior',['../classMCMCProcessor.html#afbac2a114c15ca7db4abe71dd549504c',1,'MCMCProcessor']]],
   ['plotting_71',['Plotting',['../md_Plotting_README.html',1,'']]],
