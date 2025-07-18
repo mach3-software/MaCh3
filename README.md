@@ -174,9 +174,10 @@ Most of external libraries are being handled through [CPM](https://github.com/cp
 
 Based on several test here are recommended version:
 ```bash
-  GCC: >= 8.5 [lower versions may work]
+  GCC:   >= 8.5   [lower versions may work]
+  C++:   >= 14
   CMake: >= 3.14
-  ROOT: >= 6.18
+  ROOT:  >= 6.18
 ```
 ### Supported operational systems
 | Name        | Status |
