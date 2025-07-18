@@ -17,7 +17,7 @@ set_target_properties( Plotting PROPERTIES
     EXPORT_NAME Plotting
 )
 
-target_link_libraries(Plotting PUBLIC MaCh3::Manager MaCh3::Fitters)
+target_link_libraries(Plotting PUBLIC MaCh3::Fitters)
 target_link_libraries(Plotting PRIVATE MaCh3Warnings)
 
 ## to be compiled into python module needs to be compiled as position independent library
