@@ -57,8 +57,9 @@ find_program(CMAKE_CXX_COMPILER NAMES $ENV{CXX} g++ PATHS ENV PATH NO_DEFAULT_PA
 include(MaCh3Dependencies)
 
 ############################  C++ Compiler  ####################################
+set(CXX_MINIMAL_STANDARD 14)
 if (NOT DEFINED CMAKE_CXX_STANDARD OR "${CMAKE_CXX_STANDARD} " STREQUAL " ")
-  set(CMAKE_CXX_STANDARD 14)
+  set(CMAKE_CXX_STANDARD ${CXX_MINIMAL_STANDARD})
   cmessage(STATUS "Set default CXX standard: \"${CMAKE_CXX_STANDARD}\"")
 endif()
 
@@ -67,6 +68,9 @@ if(DEFINED ROOT_CXX_STANDARD AND NOT ROOT_CXX_STANDARD EQUAL CMAKE_CXX_STANDARD)
   cmessage(STATUS "Set CXX standard due to ROOT: \"${ROOT_CXX_STANDARD}\"")
 endif()
 cmessage(STATUS "CMAKE_CXX_STANDARD: \"${CMAKE_CXX_STANDARD}\"")
+if (CMAKE_CXX_STANDARD LESS CXX_MINIMAL_STANDARD)
+  cmessage(FATAL_ERROR "Set CXX standard is lower than the minimal working standard: ${CXX_MINIMAL_STANDARD}")
+endif()
 set(MACH3_CXX_STANDARD ${CMAKE_CXX_STANDARD})
 set_property(GLOBAL PROPERTY MACH3_CXX_STANDARD "${MACH3_CXX_STANDARD}")
 
@@ -113,6 +117,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     -Wduplicated-cond       # Warn if if / else chain has duplicated conditions (only in GCC >= 6.0)
     -Wduplicated-branches   # Warn if if / else branches have duplicated code (only in GCC >= 7.0)
     -Wuseless-cast          # Warn if you perform a cast to the same type (only in GCC >= 4.8)
+    -Wsuggest-override      # Warn if a virtual function override is not marked 'override' (only in GCC >= 5.1)
   )
 endif()
 

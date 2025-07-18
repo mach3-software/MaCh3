@@ -676,6 +676,10 @@ public:
     #else
     TSpline3 *spline = new TSpline3("Spline", XPos, YResp, nPoints);
     #endif
+    for (Int_t i = 0; i < nPoints; ++i) {
+      spline->SetPointCoeff(i, Par[i][0], Par[i][1], Par[i][2]);
+    }
+
     return spline;
   }
 

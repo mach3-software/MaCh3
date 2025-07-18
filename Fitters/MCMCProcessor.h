@@ -1,9 +1,5 @@
 #pragma once
 
-#ifndef _UNDEF_
-#define _UNDEF_ 1234567890
-#endif
-
 // C++ includes
 #include <complex>
 #include <cstdio>
@@ -112,8 +108,8 @@ class MCMCProcessor {
                              const std::vector<Style_t>& CredibleRegionStyle = {kDashed, kSolid, kDotted},
                              const std::vector<Color_t>& CredibleRegionColor = {kGreen-3, kGreen-10, kGreen},
                              const bool CredibleInSigmas = false,
-			     const bool Draw2DPosterior = true,
-			     const bool DrawBestFit = true
+                             const bool Draw2DPosterior = true,
+                             const bool DrawBestFit = true
                              );
     /// @brief Make fancy triangle plot for selected parameters
     /// @param CredibleIntervals Vector with values of credible intervals, must be in descending order
@@ -166,6 +162,15 @@ class MCMCProcessor {
     void GetSavageDickey(const std::vector<std::string>& ParName,
                          const std::vector<double>& EvaluationPoint,
                          const std::vector<std::vector<double>>& Bounds);
+
+    /// @brief Produce Savage Dickey plot
+    /// @param PriorHist Histogram with prior distribution
+    /// @param PosteriorHist Histogram with posterior distribution
+    void SavageDickeyPlot(std::unique_ptr<TH1D>& PriorHist,
+                          std::unique_ptr<TH1D>& PosteriorHist,
+                          const std::string& Title,
+                          const double EvaluationPoint) const ;
+
     /// @brief Reweight Prior by giving new central value and new error
     /// @param Names Parameter names for which we do reweighting
     /// @param NewCentral New central value for which we reweight

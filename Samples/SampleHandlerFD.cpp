@@ -1146,6 +1146,11 @@ TH1* SampleHandlerFD::GetDataHist(const int Dimension) {
 }
 
 void SampleHandlerFD::AddData(std::vector<double> &data) {
+  if (dathist == nullptr) {
+    MACH3LOG_ERROR("Data hist hasn't been initialised yet");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
   dathist2d = nullptr;
   dathist->Reset();
 
@@ -1171,6 +1176,11 @@ void SampleHandlerFD::AddData(std::vector<double> &data) {
 }
 
 void SampleHandlerFD::AddData(std::vector< std::vector <double> > &data) {
+  if (dathist2d == nullptr) {
+    MACH3LOG_ERROR("Data hist hasn't been initialised yet");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
   dathist = nullptr;
   dathist2d->Reset();
 
@@ -1202,6 +1212,9 @@ void SampleHandlerFD::AddData(std::vector< std::vector <double> > &data) {
 
 void SampleHandlerFD::AddData(TH1D* Data) {
   MACH3LOG_INFO("Adding 1D data histogram: {} with {:.2f} events", Data->GetTitle(), Data->Integral());
+  if (dathist != nullptr) {
+    delete dathist;
+  }
   dathist2d = nullptr;
   dathist = static_cast<TH1D*>(Data->Clone());
 
@@ -1226,6 +1239,9 @@ void SampleHandlerFD::AddData(TH1D* Data) {
 
 void SampleHandlerFD::AddData(TH2D* Data) {
   MACH3LOG_INFO("Adding 2D data histogram: {} with {:.2f} events", Data->GetTitle(), Data->Integral());
+  if (dathist2d != nullptr) {
+    delete dathist2d;
+  }
   dathist2d = static_cast<TH2D*>(Data->Clone());
   dathist = nullptr;
 
@@ -1887,8 +1903,8 @@ TH2* SampleHandlerFD::Get2DVarHistByModeAndChannel(const std::string& Projection
   return Get2DVarHist(ProjectionVar_StrX,ProjectionVar_StrY,SelectionVec,WeightStyle,AxisX,AxisY);
 }
 
-void SampleHandlerFD::PrintIntegral(TString OutputFileName, int WeightStyle, TString OutputCSVFileName) {
-  int space = 14;
+void SampleHandlerFD::PrintIntegral(const TString& OutputFileName, const int WeightStyle, const TString& OutputCSVFileName) {
+  constexpr int space = 14;
 
   bool printToFile=false;
   if (OutputFileName.CompareTo("/dev/null")) {printToFile = true;}
@@ -2025,6 +2041,8 @@ void SampleHandlerFD::PrintIntegral(TString OutputFileName, int WeightStyle, TSt
     outfile << std::endl;
     outfile.close();
   }
+  // KS: Clean memory we could use smart pointers in future
+  CleanContainer(IntegralList);
 }
 
 std::vector<TH1*> SampleHandlerFD::ReturnHistsBySelection1D(std::string KinematicProjection, int Selection1, int Selection2, int WeightStyle, TAxis* XAxis) {
@@ -2035,10 +2053,10 @@ std::vector<TH1*> SampleHandlerFD::ReturnHistsBySelection1D(std::string Kinemati
   THStackLeg = new TLegend(0.1,0.1,0.9,0.9);
 
   int iMax = -1;
-  if (Selection1 == 0) {
+  if (Selection1 == FDPlotType::kModePlot) {
     iMax = Modes->GetNModes();
   }
-  if (Selection1 == 1) {
+  if (Selection1 == FDPlotType::kOscChannelPlot) {
     iMax = GetNOscChannels();
   }
   if (iMax == -1) {
@@ -2062,17 +2080,18 @@ std::vector<TH1*> SampleHandlerFD::ReturnHistsBySelection1D(std::string Kinemati
 
   return hHistList;
 }
-
+// ************************************************
 std::vector<TH2*> SampleHandlerFD::ReturnHistsBySelection2D(std::string KinematicProjectionX, std::string KinematicProjectionY,
-    int Selection1, int Selection2, int WeightStyle, 
-    TAxis* XAxis, TAxis* YAxis) {
+                                                            int Selection1, int Selection2, int WeightStyle,
+                                                            TAxis* XAxis, TAxis* YAxis) {
+// ************************************************
   std::vector<TH2*> hHistList;
 
   int iMax = -1;
-  if (Selection1 == 0) {
+  if (Selection1 == FDPlotType::kModePlot) {
     iMax = Modes->GetNModes();
   }
-  if (Selection1 == 1) {
+  if (Selection1 == FDPlotType::kOscChannelPlot) {
     iMax = GetNOscChannels();
   }
   if (iMax == -1) {
@@ -2081,10 +2100,10 @@ std::vector<TH2*> SampleHandlerFD::ReturnHistsBySelection2D(std::string Kinemati
   }
 
   for (int i=0;i<iMax;i++) {
-    if (Selection1==0) {
+    if (Selection1 == FDPlotType::kModePlot) {
       hHistList.push_back(Get2DVarHistByModeAndChannel(KinematicProjectionX,KinematicProjectionY,i,Selection2,WeightStyle,XAxis,YAxis));
     }
-    if (Selection1==1) {
+    if (Selection1 == FDPlotType::kOscChannelPlot) {
       hHistList.push_back(Get2DVarHistByModeAndChannel(KinematicProjectionX,KinematicProjectionY,Selection2,i,WeightStyle,XAxis,YAxis));
     }
   }
