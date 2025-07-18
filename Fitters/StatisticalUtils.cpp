@@ -486,17 +486,20 @@ double FisherCombinedPValue(const std::vector<double>& pvalues) {
 // ********************
 void ThinningMCMC(const std::string& FilePath, const int ThinningCut) {
 // ********************
-  // Define the path for the temporary thinned file
-  std::string TempFilePath = "Thinned_" + FilePath;
+  std::string FilePathNowRoot = FilePath;
+  if (FilePath.size() >= 5 && FilePath.substr(FilePath.size() - 5) == ".root") {
+    FilePathNowRoot = FilePath.substr(0, FilePath.size() - 5);
+  }
+  std::string TempFilePath = FilePathNowRoot + "_thinned.root";
   int ret = system(("cp " + FilePath + " " + TempFilePath).c_str());
   if (ret != 0) {
-    MACH3LOG_WARN("Error: system call to copy file failed with code {}", ret);
+    MACH3LOG_WARN("System call to copy file failed with code {}", ret);
   }
 
   TFile *inFile = M3::Open(TempFilePath, "RECREATE", __FILE__, __LINE__);
   TTree *inTree = inFile->Get<TTree>("posteriors");
   if (!inTree) {
-    MACH3LOG_ERROR("Error: TTree 'posteriors' not found in file.");
+    MACH3LOG_ERROR("TTree 'posteriors' not found in file.");
     inFile->ls();
     inFile->Close();
     throw MaCh3Exception(__FILE__, __LINE__);
