@@ -2634,10 +2634,10 @@ void MCMCProcessor::GetSavageDickey(const std::vector<std::string>& ParNames,
     int ParamTemp = ParamNo - ParamTypeStartPos[ParType];
     FlatPrior = ParamFlat[ParType][ParamTemp];
     
-    TH1D* PosteriorHist = static_cast<TH1D *>(hpost[ParamNo]->Clone(Title));
-    RemoveFitter(PosteriorHist, "Gauss");
+    auto PosteriorHist = M3::Clone<TH1D>(hpost[ParamNo], std::string(Title));
+    RemoveFitter(PosteriorHist.get(), "Gauss");
             
-    TH1D* PriorHist = nullptr;
+    std::unique_ptr<TH1D> PriorHist;
     //KS: If flat prior we need to have well defined bounds otherwise Prior distribution will not make sense
     if(FlatPrior)
     {
@@ -2647,7 +2647,7 @@ void MCMCProcessor::GetSavageDickey(const std::vector<std::string>& ParNames,
         MACH3LOG_ERROR("Lower bound is higher than upper bound");
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
-      PriorHist = new TH1D("PriorHist", Title, NBins, Bounds[k][0], Bounds[k][1]);
+      PriorHist = std::make_unique<TH1D>("PriorHist", Title, NBins, Bounds[k][0], Bounds[k][1]);
       
       double FlatProb = ( Bounds[k][1] - Bounds[k][0]) / NBins;
       for (int g = 0; g < NBins + 1; ++g) 
@@ -2657,7 +2657,7 @@ void MCMCProcessor::GetSavageDickey(const std::vector<std::string>& ParNames,
     }
     else //KS: Otherwise throw from Gaussian
     {
-      PriorHist = static_cast<TH1D*>(PosteriorHist->Clone("Prior"));
+      PriorHist = M3::Clone<TH1D>(PosteriorHist.get(), "Prior");
       PriorHist->Reset("");
       PriorHist->Fill(0.0, 0.0);
       
@@ -2668,68 +2668,75 @@ void MCMCProcessor::GetSavageDickey(const std::vector<std::string>& ParNames,
         PriorHist->Fill(rand->Gaus(Prior, PriorError));
       }
     }
-    // Area normalise the distributions
-    PriorHist->Scale(1./PriorHist->Integral(), "width");
-    PosteriorHist->Scale(1./PosteriorHist->Integral(), "width");
-      
-    PriorHist->SetLineColor(kRed);
-    PriorHist->SetMarkerColor(kRed);
-    PriorHist->SetFillColorAlpha(kRed, 0.35);
-    PriorHist->SetFillStyle(1001);
-    PriorHist->GetXaxis()->SetTitle(Title);
-    PriorHist->GetYaxis()->SetTitle("Posterior Probability");
-    PriorHist->SetMaximum(PosteriorHist->GetMaximum()*1.5);
-    PriorHist->GetYaxis()->SetLabelOffset(999);
-    PriorHist->GetYaxis()->SetLabelSize(0);
-    PriorHist->SetLineWidth(2);
-    PriorHist->SetLineStyle(kSolid);
-    
-    PosteriorHist->SetLineColor(kBlue);
-    PosteriorHist->SetMarkerColor(kBlue);
-    PosteriorHist->SetFillColorAlpha(kBlue, 0.35);
-    PosteriorHist->SetFillStyle(1001);
-   
-    PriorHist->Draw("hist");
-    PosteriorHist->Draw("hist same");
-
-    double ProbPrior = PriorHist->GetBinContent(PriorHist->FindBin(EvaluationPoint[k]));
-    //KS: In case we go so far away that prior is 0, set this to small value to avoid dividing by 0
-    if(ProbPrior < 0) ProbPrior = 0.00001;
-    double ProbPosterior = PosteriorHist->GetBinContent(PosteriorHist->FindBin(EvaluationPoint[k]));
-    double SavageDickey = ProbPosterior/ProbPrior;
-    
-    std::string DunneKabothScale = GetDunneKaboth(SavageDickey);
-    //Get Best point
-    std::unique_ptr<TGraph> PostPoint(new TGraph(1));
-    PostPoint->SetPoint(0, EvaluationPoint[k], ProbPosterior);
-    PostPoint->SetMarkerStyle(20);
-    PostPoint->SetMarkerSize(1);
-    PostPoint->Draw("P same");
-    
-    std::unique_ptr<TGraph> PriorPoint(new TGraph(1));
-    PriorPoint->SetPoint(0, EvaluationPoint[k], ProbPrior);
-    PriorPoint->SetMarkerStyle(20);
-    PriorPoint->SetMarkerSize(1);
-    PriorPoint->Draw("P same");
-    
-    auto legend = std::make_unique<TLegend>(0.12, 0.6, 0.6, 0.97);
-    SetLegendStyle(legend.get(), 0.04);
-    legend->AddEntry(PriorHist, "Prior", "l");
-    legend->AddEntry(PosteriorHist, "Posterior", "l");
-    legend->AddEntry(PostPoint.get(), Form("SavageDickey = %.2f, (%s)", SavageDickey, DunneKabothScale.c_str()),"");
-    legend->Draw("same");
-  
-    Posterior->Print(CanvasName);
-    Posterior->Write(Title);
-    
-    delete PosteriorHist;
-    delete PriorHist;
+    SavageDickeyPlot(PriorHist, PosteriorHist, std::string(Title), EvaluationPoint[k]);
   } //End loop over parameters
 
   SavageDickeyDir->Close();
   delete SavageDickeyDir;
 
   OutputFile->cd();
+}
+
+// **************************
+// KS: Get Savage Dickey point hypothesis test
+void MCMCProcessor::SavageDickeyPlot(std::unique_ptr<TH1D>& PriorHist,
+                                     std::unique_ptr<TH1D>& PosteriorHist,
+                                     const std::string& Title,
+                                     const double EvaluationPoint) const {
+// **************************
+  // Area normalise the distributions
+  PriorHist->Scale(1./PriorHist->Integral(), "width");
+  PosteriorHist->Scale(1./PosteriorHist->Integral(), "width");
+
+  PriorHist->SetLineColor(kRed);
+  PriorHist->SetMarkerColor(kRed);
+  PriorHist->SetFillColorAlpha(kRed, 0.35);
+  PriorHist->SetFillStyle(1001);
+  PriorHist->GetXaxis()->SetTitle(Title.c_str());
+  PriorHist->GetYaxis()->SetTitle("Posterior Probability");
+  PriorHist->SetMaximum(PosteriorHist->GetMaximum()*1.5);
+  PriorHist->GetYaxis()->SetLabelOffset(999);
+  PriorHist->GetYaxis()->SetLabelSize(0);
+  PriorHist->SetLineWidth(2);
+  PriorHist->SetLineStyle(kSolid);
+
+  PosteriorHist->SetLineColor(kBlue);
+  PosteriorHist->SetMarkerColor(kBlue);
+  PosteriorHist->SetFillColorAlpha(kBlue, 0.35);
+  PosteriorHist->SetFillStyle(1001);
+
+  PriorHist->Draw("hist");
+  PosteriorHist->Draw("hist same");
+
+  double ProbPrior = PriorHist->GetBinContent(PriorHist->FindBin(EvaluationPoint));
+  //KS: In case we go so far away that prior is 0, set this to small value to avoid dividing by 0
+  if(ProbPrior < 0) ProbPrior = 0.00001;
+  double ProbPosterior = PosteriorHist->GetBinContent(PosteriorHist->FindBin(EvaluationPoint));
+  double SavageDickey = ProbPosterior/ProbPrior;
+
+  std::string DunneKabothScale = GetDunneKaboth(SavageDickey);
+  //Get Best point
+  std::unique_ptr<TGraph> PostPoint(new TGraph(1));
+  PostPoint->SetPoint(0, EvaluationPoint, ProbPosterior);
+  PostPoint->SetMarkerStyle(20);
+  PostPoint->SetMarkerSize(1);
+  PostPoint->Draw("P same");
+
+  std::unique_ptr<TGraph> PriorPoint(new TGraph(1));
+  PriorPoint->SetPoint(0, EvaluationPoint, ProbPrior);
+  PriorPoint->SetMarkerStyle(20);
+  PriorPoint->SetMarkerSize(1);
+  PriorPoint->Draw("P same");
+
+  auto legend = std::make_unique<TLegend>(0.12, 0.6, 0.6, 0.97);
+  SetLegendStyle(legend.get(), 0.04);
+  legend->AddEntry(PriorHist.get(), "Prior", "l");
+  legend->AddEntry(PosteriorHist.get(), "Posterior", "l");
+  legend->AddEntry(PostPoint.get(), Form("SavageDickey = %.2f, (%s)", SavageDickey, DunneKabothScale.c_str()),"");
+  legend->Draw("same");
+
+  Posterior->Print(CanvasName);
+  Posterior->Write(Title.c_str());
 }
 
 // **************************
@@ -3807,7 +3814,7 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
 
   int nPrams = nDraw;
   /// @todo KS: Code is awfully slow... I know how to make it faster (GPU scream in a distant) but for now just make it for two params, bit hacky sry...
-  nPrams = 2;
+  nPrams = 1;
 
   std::vector<std::vector<float>> k_j(nPrams, std::vector<float>(v_size, 0.0));
   std::vector<std::vector<float>> P_j(nPrams, std::vector<float>(v_size, 0.0));

@@ -233,7 +233,7 @@ void OscProcessor::PerformJarlskogAnalysis() {
   auto jarl_th23_NH_flatsindcp  = M3::Clone(jarl_th23.get(), "jarl_th23_NH_flatsindcp");
 
   auto jarl_prior               = M3::Clone(jarl.get(), "jarl_prior");
-
+  auto jarl_prior_flatsindcp    = M3::Clone(jarl.get(), "jarl_prior_flatsindcp");
   std::unique_ptr<TH1D> jarl_wRC_prior, jarl_wRC_prior_flatsindcp, jarl_wRC_prior_t2kth23;
   // Only use this if chain has reweigh weight [mostly coming from Reactor Constrains]
   if(DoReweight){
@@ -263,58 +263,57 @@ void OscProcessor::PerformJarlskogAnalysis() {
     const double prior_weight = prior3->Eval(dcp);
 
     jarl->Fill(j, weight);
-    jarl_th23->Fill(j, s2th23,weight);
-    jarl_dcp->Fill(j, dcp,weight);
+    jarl_th23->Fill(j, s2th23, weight);
+    jarl_dcp->Fill(j, dcp, weight);
 
     jarl_flatsindcp->Fill(j, prior_weight*weight);
-    jarl_th23_flatsindcp->Fill(j, s2th23,prior_weight*weight);
+    jarl_th23_flatsindcp->Fill(j, s2th23, prior_weight*weight);
 
     const double prior_s2th13 = SamplePriorForParam(Sin2Theta13Index, randGen, {0.,1.});
     const double prior_s2th23 = SamplePriorForParam(Sin2Theta23Index, randGen, {0.,1.});
     const double prior_s2th12 = SamplePriorForParam(Sin2Theta12Index, randGen, {0.,1.});
     const double prior_dcp = SamplePriorForParam(DeltaCPIndex, randGen, {-1.*TMath::Pi(),TMath::Pi()});
     // KS: This is hardcoded but we always assume flat in delta CP so probably fine
-    const double prior_sindcp = randGen->Uniform(-1.,1.);
+    const double prior_sindcp = randGen->Uniform(-1., 1.);
 
-    const double prior_s13 = std::sqrt(prior_s2th13);
-
-    const double prior_s23  = std::sqrt(prior_s2th23);
-    const double prior_s12  = std::sqrt(prior_s2th12);
-    const double prior_sdcp = std::sin(prior_dcp);
-    const double prior_c13  = std::sqrt(1.-prior_s2th13);
-    const double prior_c12  = std::sqrt(1.-prior_s2th12);
-    const double prior_c23  = std::sqrt(1.-prior_s2th23);
-    const double prior_j    = prior_s13*prior_c13*prior_c13*prior_s12*prior_c12*prior_s23*prior_c23*prior_sdcp;
+    const double prior_s13          = std::sqrt(prior_s2th13);
+    const double prior_s23          = std::sqrt(prior_s2th23);
+    const double prior_s12          = std::sqrt(prior_s2th12);
+    const double prior_sdcp         = std::sin(prior_dcp);
+    const double prior_c13          = std::sqrt(1.-prior_s2th13);
+    const double prior_c12          = std::sqrt(1.-prior_s2th12);
+    const double prior_c23          = std::sqrt(1.-prior_s2th23);
+    const double prior_j            = prior_s13*prior_c13*prior_c13*prior_s12*prior_c12*prior_s23*prior_c23*prior_sdcp;
+    const double prior_flatsindcp_j = prior_s13*prior_c13*prior_c13*prior_s12*prior_c12*prior_s23*prior_c23*prior_sindcp;
 
     jarl_prior->Fill(prior_j);
+    jarl_prior_flatsindcp->Fill(prior_flatsindcp_j);
 
-    if(DoReweight){
-      const double prior_wRC_s2th13 = randGen->Gaus(Sin13_NewPrior.first, Sin13_NewPrior.second);
-      const double prior_wRC_s13 = std::sqrt(prior_wRC_s2th13);
-      const double prior_wRC_c13 = std::sqrt(1.-prior_wRC_s2th13);
-      const double prior_wRC_j = prior_wRC_s13*prior_wRC_c13*prior_wRC_c13*prior_s12*prior_c12*prior_s23*prior_c23*prior_sdcp;
+    if(DoReweight) {
+      const double prior_wRC_s2th13       = randGen->Gaus(Sin13_NewPrior.first, Sin13_NewPrior.second);
+      const double prior_wRC_s13          = std::sqrt(prior_wRC_s2th13);
+      const double prior_wRC_c13          = std::sqrt(1.-prior_wRC_s2th13);
+      const double prior_wRC_j            = prior_wRC_s13*prior_wRC_c13*prior_wRC_c13*prior_s12*prior_c12*prior_s23*prior_c23*prior_sdcp;
       const double prior_wRC_flatsindcp_j = prior_wRC_s13*prior_wRC_c13*prior_wRC_c13*prior_s12*prior_c12*prior_s23*prior_c23*prior_sindcp;
-
-      const double s23 = std::sqrt(s2th23);
-      const double c23 = std::sqrt(1.-s2th23);
+      const double s23                    = std::sqrt(s2th23);
+      const double c23                    = std::sqrt(1.-s2th23);
 
       jarl_wRC_prior->Fill(prior_wRC_j);
       jarl_wRC_prior_flatsindcp->Fill(prior_wRC_flatsindcp_j);
       jarl_wRC_prior_t2kth23->Fill(prior_wRC_s13*prior_wRC_c13*prior_wRC_c13*prior_s12*prior_c12*s23*c23*prior_sdcp);
     }
 
-
     if(dm2 > 0.) {
-      jarl_NH->Fill(j,weight);
-      jarl_th23_NH->Fill(j,s2th23,weight);
-      jarl_dcp_NH->Fill(j,dcp,weight);
-      jarl_NH_flatsindcp->Fill(j,prior_weight*weight);
-      jarl_th23_NH_flatsindcp->Fill(j,s2th23,prior_weight*weight);
+      jarl_NH->Fill(j, weight);
+      jarl_th23_NH->Fill(j, s2th23, weight);
+      jarl_dcp_NH->Fill(j, dcp, weight);
+      jarl_NH_flatsindcp->Fill(j, prior_weight*weight);
+      jarl_th23_NH_flatsindcp->Fill(j, s2th23, prior_weight*weight);
     }
     else if(dm2 < 0.) {
-      jarl_IH->Fill(j,weight);
-      jarl_th23_IH->Fill(j,s2th23,weight);
-      jarl_dcp_IH->Fill(j,dcp,weight);
+      jarl_IH->Fill(j, weight);
+      jarl_th23_IH->Fill(j, s2th23, weight);
+      jarl_dcp_IH->Fill(j, dcp, weight);
       jarl_IH_flatsindcp->Fill(j, prior_weight*weight);
       jarl_th23_IH_flatsindcp->Fill(j, s2th23, prior_weight*weight);
     }
@@ -340,7 +339,7 @@ void OscProcessor::PerformJarlskogAnalysis() {
   jarl_th23_IH_flatsindcp->Write("jarlskog_th23_IH_flatsindcp");
 
   jarl_prior->Write("jarl_prior");
-
+  jarl_prior_flatsindcp->Write("jarl_prior_flatsindcp");
   if(DoReweight) {
     jarl_wRC_prior->Write("jarl_wRC_prior");
     jarl_wRC_prior_flatsindcp->Write("jarl_wRC_prior_flatsindcp");
@@ -350,6 +349,15 @@ void OscProcessor::PerformJarlskogAnalysis() {
   MakeJarlskogPlot(jarl, jarl_flatsindcp,
                    jarl_NH, jarl_NH_flatsindcp,
                    jarl_IH, jarl_IH_flatsindcp);
+
+  // Perform Savage Dickey analysis
+  if(DoReweight) {
+    SavageDickeyPlot(jarl, jarl_wRC_prior, "Jarlskog flat #delta_{CP}", 0);
+    SavageDickeyPlot(jarl_flatsindcp, jarl_wRC_prior_flatsindcp, "Jarlskog flat sin#delta_{CP}", 0);
+  } else {
+    SavageDickeyPlot(jarl, jarl_prior, "Jarlskog flat #delta_{CP}", 0);
+    SavageDickeyPlot(jarl_flatsindcp, jarl_prior_flatsindcp, "Jarlskog flat sin#delta_{CP}", 0);
+  }
 
   JarlskogDir->Close();
   delete JarlskogDir;
