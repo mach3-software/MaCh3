@@ -8,7 +8,7 @@
 
 TH2D* GetSubMatrix(TH2D *MatrixFull, const std::string& Title, const std::vector<std::string>& Params)
 {
-  std::vector<int> ParamIndex(Params.size(), -999);
+  std::vector<int> ParamIndex(Params.size(), M3::_BAD_INT_);
 
   for(size_t i = 0; i < Params.size(); i++)
   {
@@ -24,11 +24,11 @@ TH2D* GetSubMatrix(TH2D *MatrixFull, const std::string& Title, const std::vector
 
   for(size_t i = 0; i < Params.size(); i++)
   {
-    if(ParamIndex[i] == -999 )
+    if(ParamIndex[i] == M3::_BAD_INT_)
       MACH3LOG_ERROR("Didn't find param {} in matrix within {} sub-block", Params[i], Title);
   }
 
-  auto new_end = std::remove(ParamIndex.begin(), ParamIndex.end(), -999);
+  auto new_end = std::remove(ParamIndex.begin(), ParamIndex.end(), M3::_BAD_INT_);
   ParamIndex.erase(new_end, ParamIndex.end());
 
   TH2D* Hist = new TH2D(Title.c_str(), Title.c_str(), ParamIndex.size(), 0, ParamIndex.size(), ParamIndex.size(), 0, ParamIndex.size());
@@ -81,15 +81,10 @@ void SetupInfo(const std::string& Config, std::vector<std::string>& Title, std::
   }
 }
 
-void PlotMatrix(std::string Config, std::string File)
+void PlotMatrix(const std::string& Config, const std::string& File)
 {
   // Open the ROOT file
-  TFile *file = TFile::Open(File.c_str());
-  if (!file || file->IsZombie()) {
-    MACH3LOG_ERROR("Error opening file");
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-
+  TFile *file = M3::Open(File, "UPDATE", __FILE__, __LINE__);
   TH2D *MatrixFull = nullptr;
   file->GetObject("Correlation_plot", MatrixFull);
 
@@ -113,7 +108,7 @@ void PlotMatrix(std::string Config, std::string File)
   gStyle->SetPaintTextFormat("4.1f");
 
   // Make pretty Correlation colors (red to blue)
-  const int NRGBs = 5;
+  constexpr int NRGBs = 5;
   TColor::InitializeColors();
   Double_t stops[NRGBs] = { 0.00, 0.25, 0.50, 0.75, 1.00 };
   Double_t red[NRGBs]   = { 0.00, 0.25, 1.00, 1.00, 0.50 };
@@ -152,7 +147,7 @@ void PlotMatrix(std::string Config, std::string File)
 void CompareMatrices(std::string Config, std::string File1, std::string Title1, std::string File2, std::string Title2)
 {
   // Open the ROOT file
-  const int NFiles = 2;
+  constexpr int NFiles = 2;
   TFile *file[NFiles];
   file[0] = TFile::Open(File1.c_str());
   file[1] = TFile::Open(File2.c_str());
@@ -171,10 +166,9 @@ void CompareMatrices(std::string Config, std::string File1, std::string Title1, 
   MatrixPlot->SetTopMargin(0.1);
   MatrixPlot->SetRightMargin(0.15);
   MatrixPlot->SetLeftMargin(0.15);
-
   gStyle->SetOptTitle(1);
 
-  //KS: Fancy colots
+  //KS: Fancy colors
   const int NRGBs = 10;
   TColor::InitializeColors();
   Double_t stops[NRGBs] = { 0.00, 0.10, 0.25, 0.35, 0.50, 0.60, 0.65, 0.75, 0.90, 1.00 };
@@ -228,7 +222,7 @@ int main(int argc, char *argv[])
 
   if (argc != 3 && argc != 6)
   {
-    MACH3LOG_INFO("How to use: {} MCMC_Processor_Output.root config", argv[0]);
+    MACH3LOG_INFO("How to use: {} config.yaml MCMC_Processor_Output.root", argv[0]);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
@@ -246,4 +240,3 @@ int main(int argc, char *argv[])
   MACH3LOG_INFO("Finished plotting matrices");
   return 0;
 }
-
