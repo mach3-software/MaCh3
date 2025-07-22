@@ -320,10 +320,10 @@ double mcmc::GetMulticanonicalWeightSpline(double deltacp, TSpline3 *spline_IO, 
 
   if (delm23 < 0){
     dcp_spline_val = spline_IO->Eval(deltacp);
-    return -0.5*(-std::log(dcp_spline_val)+std::log(spline_IO->Eval(-TMath::Pi()/2))); // do I want this offset?? does it matter?
+    return -(-std::log(dcp_spline_val)+std::log(spline_IO->Eval(-TMath::Pi()/2))); // do I want this offset?? does it matter?
   } else {
     dcp_spline_val = spline_NO->Eval(deltacp);
-    return -0.5*(-std::log(dcp_spline_val)+std::log(spline_NO->Eval(-TMath::Pi()/2)));
+    return -(-std::log(dcp_spline_val)+std::log(spline_NO->Eval(-TMath::Pi()/2)));
   }
   // std::cout << "Evaluating spline at delta_cp = " << deltacp << " gives value " << dcp_spline_val << "with -log lh of :" << -log(dcp_spline_val) << std::endl;
 }
