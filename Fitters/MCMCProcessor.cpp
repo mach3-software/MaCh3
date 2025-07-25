@@ -795,8 +795,11 @@ void MCMCProcessor::MakeViolin() {
   double mini_y = Chain->GetMinimum(BranchNames[0]);
   for (int i = 1; i < nDraw; ++i)
   {
-    if(Chain->GetMaximum(BranchNames[i]) > maxi_y) maxi_y = Chain->GetMaximum(BranchNames[i]);
-    if(Chain->GetMinimum(BranchNames[i]) < mini_y) mini_y = Chain->GetMinimum(BranchNames[i]);
+    const double max_val = Chain->GetMaximum(BranchNames[i]);
+    const double min_val = Chain->GetMinimum(BranchNames[i]);
+  
+    maxi_y = std::max(maxi_y, max_val);
+    mini_y = std::min(mini_y, min_val);
   }
 
   const int vBins = (maxi_y-mini_y)*25;
@@ -1101,12 +1104,21 @@ void MCMCProcessor::CacheSteps() {
 
   // Set all the branches to on
   Chain->SetBranchStatus("*", true);
+
+  // KS: Set temporary branch address to allow min/max, otherwise ROOT can segfaults
+  double tempVal = 0.0;
+  std::vector<double> Min_Chain(nDraw);
+  std::vector<double> Max_Chain(nDraw);
+  for (int i = 0; i < nDraw; ++i)
+  {
+    Chain->SetBranchAddress(BranchNames[i].Data(), &tempVal);
+    Min_Chain[i] = Chain->GetMinimum(BranchNames[i]);
+    Max_Chain[i] = Chain->GetMaximum(BranchNames[i]);
+  }
   
   // Cache max and min in chain for covariance matrix
-  for (int i = 0; i < nDraw; ++i) 
+  for (int i = 0; i < nDraw; ++i)
   {
-    const double Min_Chain_i = Chain->GetMinimum(BranchNames[i]);
-    const double Max_Chain_i = Chain->GetMaximum(BranchNames[i]);
     
     TString Title_i = "";
     double Prior_i, PriorError_i;
@@ -1114,11 +1126,8 @@ void MCMCProcessor::CacheSteps() {
     
     for (int j = 0; j <= i; ++j)
     {
-      const double Min_Chain_j = Chain->GetMinimum(BranchNames[j]);
-      const double Max_Chain_j = Chain->GetMaximum(BranchNames[j]);
-  
       // TH2D to hold the Correlation 
-      hpost2D[i][j] = new TH2D(Form("hpost2D_%i_%i",i,j), Form("hpost2D_%i_%i",i,j), nBins, Min_Chain_i, Max_Chain_i, nBins, Min_Chain_j, Max_Chain_j);
+      hpost2D[i][j] = new TH2D(Form("hpost2D_%i_%i",i,j), Form("hpost2D_%i_%i",i,j), nBins, Min_Chain[i], Max_Chain[i], nBins, Min_Chain[j], Max_Chain[j]);
       TString Title_j = "";
       double Prior_j, PriorError_j;
       GetNthParameter(j, Prior_j, PriorError_j, Title_j);
@@ -1400,6 +1409,36 @@ void MCMCProcessor::DrawCovariance() {
   //Back to normal
   Posterior->SetRightMargin(RightMargin);
   DrawCorrelations1D();
+}
+
+void MCMCProcessor::MakeCovarianceYAML(const std::string OutputYAMLFile) {
+
+  MACH3LOG_INFO("Making covariance matrix YAML file");
+
+  std::vector<double> MeanArray;
+  std::vector<double> ErrorArray;
+  std::vector<std::vector<double>> CorrelationMatrix(nDraw, std::vector<double>(nDraw, 0.0));
+
+  //Make vectors of mean, error, and correlations
+  for (int i = 0; i < nDraw; i++)
+  {
+    MeanArray.push_back((*Means)(i));
+    ErrorArray.push_back((*Errors)(i));
+    for (int j = 0; j <= i; j++)
+    {
+      CorrelationMatrix[i][j] = (*Correlation)(i,j);
+      if(i != j) CorrelationMatrix[j][i] = (*Correlation)(i,j);
+    }
+  }
+
+  //Make std::string param name vector
+  std::vector<std::string> ParamStrings;
+  for (const auto& tstr : ParamNames[kXSecPar]) {
+    ParamStrings.push_back(static_cast<std::string>(tstr));
+}
+
+  YAML::Node XSecFile = CovConfig[kXSecPar];
+  M3::MakeCorrelationMatrix(XSecFile, MeanArray, ErrorArray, CorrelationMatrix, OutputYAMLFile, ParamStrings);
 }
 
 // *********************
