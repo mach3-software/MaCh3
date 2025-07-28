@@ -1411,7 +1411,7 @@ void MCMCProcessor::DrawCovariance() {
   DrawCorrelations1D();
 }
 
-void MCMCProcessor::MakeCovarianceYAML(const std::string OutputYAMLFile) {
+void MCMCProcessor::MakeCovarianceYAML(const std::string OutputYAMLFile, const std::string MeansMethod) {
 
   MACH3LOG_INFO("Making covariance matrix YAML file");
 
@@ -1419,11 +1419,28 @@ void MCMCProcessor::MakeCovarianceYAML(const std::string OutputYAMLFile) {
   std::vector<double> ErrorArray;
   std::vector<std::vector<double>> CorrelationMatrix(nDraw, std::vector<double>(nDraw, 0.0));
 
+  TVectorD* means_vec;
+  TVectorD* errors_vec;
+
+  if (MeansMethod == "Arithmetic") {
+    means_vec = Means;
+    errors_vec = Errors;
+  } else if (MeansMethod == "Gaussian") {
+    means_vec = Means_Gauss;
+    errors_vec = Errors_Gauss;
+  } else if (MeansMethod == "HPD") {
+    means_vec = Means_HPD;
+    errors_vec = Errors_HPD;
+  } else {
+    MACH3LOG_ERROR("Unknown means method: {}, should be either 'Arithmetic', 'Gaussian', or 'HPD'.", MeansMethod);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
   //Make vectors of mean, error, and correlations
   for (int i = 0; i < nDraw; i++)
   {
-    MeanArray.push_back((*Means)(i));
-    ErrorArray.push_back((*Errors)(i));
+    MeanArray.push_back((*means_vec)(i));
+    ErrorArray.push_back((*errors_vec)(i));
     for (int j = 0; j <= i; j++)
     {
       CorrelationMatrix[i][j] = (*Correlation)(i,j);

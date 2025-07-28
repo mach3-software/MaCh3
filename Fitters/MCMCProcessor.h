@@ -105,7 +105,7 @@ class MCMCProcessor {
     /// @brief Draw the post-fit covariances
     void DrawCovariance();
     /// @brief Make YAML file from post-fit covariance
-    void MakeCovarianceYAML(const std::string OutputYAMLFile);
+    void MakeCovarianceYAML(const std::string OutputYAMLFile, const std::string MeansMethod);
     /// @brief Make and Draw Credible Regions
     /// @param CredibleRegions Vector with values of credible intervals, must be in descending order
     /// @param CredibleRegionStyle Style_t telling what line style to use for each Interval line
