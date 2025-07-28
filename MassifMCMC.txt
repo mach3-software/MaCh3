@@ -20,7 +20,7 @@ heap_tree=empty
 #-----------
 snapshot=2
 #-----------
-time=132094245
+time=132094235
 mem_heap_B=1130741
 mem_heap_extra_B=181923
 mem_stacks_B=0
@@ -28,7 +28,7 @@ heap_tree=empty
 #-----------
 snapshot=3
 #-----------
-time=205669102
+time=205667964
 mem_heap_B=9635137
 mem_heap_extra_B=419327
 mem_stacks_B=0
@@ -359,7 +359,7 @@ n15: 9635137 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
 #-----------
 snapshot=4
 #-----------
-time=256694934
+time=256693780
 mem_heap_B=18832118
 mem_heap_extra_B=454130
 mem_stacks_B=0
@@ -367,7 +367,7 @@ heap_tree=empty
 #-----------
 snapshot=5
 #-----------
-time=287453984
+time=287452832
 mem_heap_B=26159489
 mem_heap_extra_B=485071
 mem_stacks_B=0
@@ -681,7 +681,7 @@ n12: 26159489 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
 #-----------
 snapshot=6
 #-----------
-time=335922406
+time=335921491
 mem_heap_B=36251626
 mem_heap_extra_B=533782
 mem_stacks_B=0
@@ -689,15 +689,15 @@ heap_tree=empty
 #-----------
 snapshot=7
 #-----------
-time=373057057
-mem_heap_B=37809694
-mem_heap_extra_B=568026
+time=400542853
+mem_heap_B=56612176
+mem_heap_extra_B=589360
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=8
 #-----------
-time=428670252
+time=428669499
 mem_heap_B=57838324
 mem_heap_extra_B=616068
 mem_stacks_B=0
@@ -705,7 +705,7 @@ heap_tree=empty
 #-----------
 snapshot=9
 #-----------
-time=487826481
+time=487825625
 mem_heap_B=60322636
 mem_heap_extra_B=635140
 mem_stacks_B=0
@@ -713,571 +713,47 @@ heap_tree=empty
 #-----------
 snapshot=10
 #-----------
-time=530350066
-mem_heap_B=61788016
-mem_heap_extra_B=666288
-mem_stacks_B=0
-heap_tree=empty
-#-----------
-snapshot=11
-#-----------
-time=562605515
+time=562604659
 mem_heap_B=63319942
 mem_heap_extra_B=710682
 mem_stacks_B=0
 heap_tree=empty
 #-----------
-snapshot=12
+snapshot=11
 #-----------
-time=621290223
+time=621289619
 mem_heap_B=65157618
 mem_heap_extra_B=760694
 mem_stacks_B=0
 heap_tree=empty
 #-----------
+snapshot=12
+#-----------
+time=667530383
+mem_heap_B=66317338
+mem_heap_extra_B=779886
+mem_stacks_B=0
+heap_tree=empty
+#-----------
 snapshot=13
 #-----------
-time=661178374
-mem_heap_B=66287634
-mem_heap_extra_B=780886
+time=708452337
+mem_heap_B=66972090
+mem_heap_extra_B=801782
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=14
 #-----------
-time=712990155
-mem_heap_B=67434275
-mem_heap_extra_B=828317
+time=767097965
+mem_heap_B=67650511
+mem_heap_extra_B=844345
 mem_stacks_B=0
-heap_tree=detailed
-n11: 67434275 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
- n1: 15090080 0x85FFC4B: clang::ASTReader::ReadASTBlock(clang::serialization::ModuleFile&, unsigned int) (in /opt/root/v6-26-10/lib/libCling.so)
-  n1: 15090080 0x860AF68: clang::ASTReader::ReadAST(llvm::StringRef, clang::serialization::ModuleKind, clang::SourceLocation, unsigned int, llvm::SmallVectorImpl<clang::ASTReader::ImportedSubmodule>*) (in /opt/root/v6-26-10/lib/libCling.so)
-   n2: 15090080 0x82DF56A: clang::CompilerInstance::loadModule(clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >, clang::Module::NameVisibilityKind, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-    n1: 15090080 0x8AD0615: clang::Sema::ActOnModuleImport(clang::SourceLocation, clang::SourceLocation, clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >) (in /opt/root/v6-26-10/lib/libCling.so)
-     n1: 15090080 0x7DDF8D1: cling::Interpreter::loadModule(clang::Module*, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-      n2: 15090080 0x7D0CED6: LoadModule(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-       n1: 15090080 0x7D37E97: RegisterCxxModules(cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-        n1: 15090080 0x7D39E48: TCling::TCling(char const*, char const*, char const* const*) (in /opt/root/v6-26-10/lib/libCling.so)
-         n1: 15090080 0x7D3BD70: CreateInterpreter (in /opt/root/v6-26-10/lib/libCling.so)
-          n1: 15090080 0x6086E49: TROOT::InitInterpreter() (in /opt/root/v6-26-10/lib/libCore.so)
-           n1: 15090080 0x60872FE: ROOT::Internal::GetROOT2() (in /opt/root/v6-26-10/lib/libCore.so)
-            n1: 15090080 0x619CBB8: ROOT::TGenericClassInfo::GetClass() (in /opt/root/v6-26-10/lib/libCore.so)
-             n1: 15090080 0x57282D5: TMatrixTSym<double>::Class() (in /opt/root/v6-26-10/lib/libMatrix.so)
-              n1: 15090080 0x60ACBA1: TDirectory::CloneObject(TObject const*, bool) (in /opt/root/v6-26-10/lib/libCore.so)
-               n1: 15090080 0x4B664FE: ParameterHandlerBase::SetCovMatrix(TMatrixTSym<double>*) (ParameterHandlerBase.cpp:376)
-                n1: 15090080 0x4B68EAE: ParameterHandlerBase::Init(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) (ParameterHandlerBase.cpp:278)
-                 n1: 15090080 0x4B69BC6: ParameterHandlerBase::ParameterHandlerBase(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerBase.cpp:43)
-                  n1: 15090080 0x4BA302D: ParameterHandlerGeneric::ParameterHandlerGeneric(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerGeneric.cpp:8)
-                   n1: 15090080 0x41FC65: make_unique<ParameterHandlerGeneric, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, int&, int&, int&> (unique_ptr.h:962)
-                    n1: 15090080 0x41FC65: std::unique_ptr<ParameterHandlerGeneric, std::default_delete<ParameterHandlerGeneric> > MaCh3CovarianceFactory<ParameterHandlerGeneric>(manager*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (MaCh3Factory.h:80)
-                     n0: 15090080 0x40C86C: main (MCMCTutorial.cpp:10)
-       n0: 0 in 1 place, below massif's threshold (1.00%)
-    n0: 0 in 1 place, below massif's threshold (1.00%)
- n1: 13700608 0x85FFDCA: clang::ASTReader::ReadASTBlock(clang::serialization::ModuleFile&, unsigned int) (in /opt/root/v6-26-10/lib/libCling.so)
-  n1: 13700608 0x860AF68: clang::ASTReader::ReadAST(llvm::StringRef, clang::serialization::ModuleKind, clang::SourceLocation, unsigned int, llvm::SmallVectorImpl<clang::ASTReader::ImportedSubmodule>*) (in /opt/root/v6-26-10/lib/libCling.so)
-   n2: 13700608 0x82DF56A: clang::CompilerInstance::loadModule(clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >, clang::Module::NameVisibilityKind, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-    n1: 13700608 0x8AD0615: clang::Sema::ActOnModuleImport(clang::SourceLocation, clang::SourceLocation, clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >) (in /opt/root/v6-26-10/lib/libCling.so)
-     n1: 13700608 0x7DDF8D1: cling::Interpreter::loadModule(clang::Module*, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-      n2: 13700608 0x7D0CED6: LoadModule(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-       n1: 13700608 0x7D37E97: RegisterCxxModules(cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-        n1: 13700608 0x7D39E48: TCling::TCling(char const*, char const*, char const* const*) (in /opt/root/v6-26-10/lib/libCling.so)
-         n1: 13700608 0x7D3BD70: CreateInterpreter (in /opt/root/v6-26-10/lib/libCling.so)
-          n1: 13700608 0x6086E49: TROOT::InitInterpreter() (in /opt/root/v6-26-10/lib/libCore.so)
-           n1: 13700608 0x60872FE: ROOT::Internal::GetROOT2() (in /opt/root/v6-26-10/lib/libCore.so)
-            n1: 13700608 0x619CBB8: ROOT::TGenericClassInfo::GetClass() (in /opt/root/v6-26-10/lib/libCore.so)
-             n1: 13700608 0x57282D5: TMatrixTSym<double>::Class() (in /opt/root/v6-26-10/lib/libMatrix.so)
-              n1: 13700608 0x60ACBA1: TDirectory::CloneObject(TObject const*, bool) (in /opt/root/v6-26-10/lib/libCore.so)
-               n1: 13700608 0x4B664FE: ParameterHandlerBase::SetCovMatrix(TMatrixTSym<double>*) (ParameterHandlerBase.cpp:376)
-                n1: 13700608 0x4B68EAE: ParameterHandlerBase::Init(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) (ParameterHandlerBase.cpp:278)
-                 n1: 13700608 0x4B69BC6: ParameterHandlerBase::ParameterHandlerBase(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerBase.cpp:43)
-                  n1: 13700608 0x4BA302D: ParameterHandlerGeneric::ParameterHandlerGeneric(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerGeneric.cpp:8)
-                   n1: 13700608 0x41FC65: make_unique<ParameterHandlerGeneric, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, int&, int&, int&> (unique_ptr.h:962)
-                    n1: 13700608 0x41FC65: std::unique_ptr<ParameterHandlerGeneric, std::default_delete<ParameterHandlerGeneric> > MaCh3CovarianceFactory<ParameterHandlerGeneric>(manager*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (MaCh3Factory.h:80)
-                     n0: 13700608 0x40C86C: main (MCMCTutorial.cpp:10)
-       n0: 0 in 1 place, below massif's threshold (1.00%)
-    n0: 0 in 1 place, below massif's threshold (1.00%)
- n0: 12999633 in 3561 places, all below massif's threshold (1.00%)
- n2: 8762544 0xA8C0E8A: llvm::SmallVectorBase::grow_pod(void*, unsigned long, unsigned long) (in /opt/root/v6-26-10/lib/libCling.so)
-  n1: 8319528 0xA58CE9A: clang::SourceManager::AllocateLoadedSLocEntries(unsigned int, unsigned int) (in /opt/root/v6-26-10/lib/libCling.so)
-   n1: 8319528 0x85FDA76: clang::ASTReader::ReadASTBlock(clang::serialization::ModuleFile&, unsigned int) (in /opt/root/v6-26-10/lib/libCling.so)
-    n1: 8319528 0x860AF68: clang::ASTReader::ReadAST(llvm::StringRef, clang::serialization::ModuleKind, clang::SourceLocation, unsigned int, llvm::SmallVectorImpl<clang::ASTReader::ImportedSubmodule>*) (in /opt/root/v6-26-10/lib/libCling.so)
-     n2: 8319528 0x82DF56A: clang::CompilerInstance::loadModule(clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >, clang::Module::NameVisibilityKind, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-      n1: 8319528 0x8AD0615: clang::Sema::ActOnModuleImport(clang::SourceLocation, clang::SourceLocation, clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >) (in /opt/root/v6-26-10/lib/libCling.so)
-       n1: 8319528 0x7DDF8D1: cling::Interpreter::loadModule(clang::Module*, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-        n2: 8319528 0x7D0CED6: LoadModule(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-         n1: 8319528 0x7D37E97: RegisterCxxModules(cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-          n1: 8319528 0x7D39E48: TCling::TCling(char const*, char const*, char const* const*) (in /opt/root/v6-26-10/lib/libCling.so)
-           n1: 8319528 0x7D3BD70: CreateInterpreter (in /opt/root/v6-26-10/lib/libCling.so)
-            n1: 8319528 0x6086E49: TROOT::InitInterpreter() (in /opt/root/v6-26-10/lib/libCore.so)
-             n1: 8319528 0x60872FE: ROOT::Internal::GetROOT2() (in /opt/root/v6-26-10/lib/libCore.so)
-              n1: 8319528 0x619CBB8: ROOT::TGenericClassInfo::GetClass() (in /opt/root/v6-26-10/lib/libCore.so)
-               n1: 8319528 0x57282D5: TMatrixTSym<double>::Class() (in /opt/root/v6-26-10/lib/libMatrix.so)
-                n1: 8319528 0x60ACBA1: TDirectory::CloneObject(TObject const*, bool) (in /opt/root/v6-26-10/lib/libCore.so)
-                 n1: 8319528 0x4B664FE: ParameterHandlerBase::SetCovMatrix(TMatrixTSym<double>*) (ParameterHandlerBase.cpp:376)
-                  n1: 8319528 0x4B68EAE: ParameterHandlerBase::Init(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) (ParameterHandlerBase.cpp:278)
-                   n1: 8319528 0x4B69BC6: ParameterHandlerBase::ParameterHandlerBase(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerBase.cpp:43)
-                    n1: 8319528 0x4BA302D: ParameterHandlerGeneric::ParameterHandlerGeneric(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerGeneric.cpp:8)
-                     n1: 8319528 0x41FC65: make_unique<ParameterHandlerGeneric, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, int&, int&, int&> (unique_ptr.h:962)
-                      n1: 8319528 0x41FC65: std::unique_ptr<ParameterHandlerGeneric, std::default_delete<ParameterHandlerGeneric> > MaCh3CovarianceFactory<ParameterHandlerGeneric>(manager*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (MaCh3Factory.h:80)
-                       n0: 8319528 0x40C86C: main (MCMCTutorial.cpp:10)
-         n0: 0 in 1 place, below massif's threshold (1.00%)
-      n0: 0 in 1 place, below massif's threshold (1.00%)
-  n0: 443016 in 109 places, all below massif's threshold (1.00%)
- n2: 6509850 0xA8B6E91: llvm::WritableMemoryBuffer::getNewUninitMemBuffer(unsigned long, llvm::Twine const&) (in /opt/root/v6-26-10/lib/libCling.so)
-  n2: 6321948 0xA8B7111: llvm::MemoryBuffer::getMemBufferCopy(llvm::StringRef, llvm::Twine const&) (in /opt/root/v6-26-10/lib/libCling.so)
-   n2: 6306613 0x85B9A90: clang::ASTReader::ReadSLocEntry(int)::{lambda(llvm::BitstreamCursor&, llvm::StringRef)#1}::operator()(llvm::BitstreamCursor&, llvm::StringRef) const (in /opt/root/v6-26-10/lib/libCling.so)
-    n1: 4930061 0x85CB2E4: clang::ASTReader::ReadSLocEntry(int) [clone .part.0] (in /opt/root/v6-26-10/lib/libCling.so)
-     n3: 4930061 0xA58D0C5: clang::SourceManager::loadSLocEntry(unsigned int, bool*) const (in /opt/root/v6-26-10/lib/libCling.so)
-      n2: 2647576 0xA58DDFC: clang::SourceManager::getFileIDLoaded(unsigned int) const [clone .part.0] (in /opt/root/v6-26-10/lib/libCling.so)
-       n2: 1913674 0xA58EC30: clang::SourceManager::getFileIDSlow(unsigned int) const (in /opt/root/v6-26-10/lib/libCling.so)
-        n1: 1561044 0x85D44C9: clang::ASTReader::ReadPragmaDiagnosticMappings(clang::DiagnosticsEngine&) (in /opt/root/v6-26-10/lib/libCling.so)
-         n1: 1561044 0x85FB258: clang::ASTReader::InitializeContext() (in /opt/root/v6-26-10/lib/libCling.so)
-          n1: 1561044 0x860B9C6: clang::ASTReader::ReadAST(llvm::StringRef, clang::serialization::ModuleKind, clang::SourceLocation, unsigned int, llvm::SmallVectorImpl<clang::ASTReader::ImportedSubmodule>*) (in /opt/root/v6-26-10/lib/libCling.so)
-           n2: 1561044 0x82DF56A: clang::CompilerInstance::loadModule(clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >, clang::Module::NameVisibilityKind, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-            n1: 918680 0xA510B15: clang::Preprocessor::HandleHeaderIncludeOrImport(clang::SourceLocation, clang::Token&, clang::Token&, clang::SourceLocation, clang::DirectoryLookup const*, clang::FileEntry const*) (in /opt/root/v6-26-10/lib/libCling.so)
-             n1: 918680 0xA511EBF: clang::Preprocessor::HandleIncludeDirective(clang::SourceLocation, clang::Token&, clang::DirectoryLookup const*, clang::FileEntry const*) (in /opt/root/v6-26-10/lib/libCling.so)
-              n1: 918680 0xA514E64: clang::Preprocessor::HandleDirective(clang::Token&) (in /opt/root/v6-26-10/lib/libCling.so)
-               n1: 918680 0xA4E0397: clang::Lexer::LexTokenInternal(clang::Token&, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-                n1: 918680 0xA54863E: clang::Preprocessor::Lex(clang::Token&) (in /opt/root/v6-26-10/lib/libCling.so)
-                 n1: 918680 0x858F9EE: clang::Parser::ParseTopLevelDecl(clang::OpaquePtr<clang::DeclGroupRef>&, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-                  n1: 918680 0x7E64577: cling::IncrementalParser::ParseInternal(llvm::StringRef) (in /opt/root/v6-26-10/lib/libCling.so)
-                   n1: 918680 0x7E64C89: cling::IncrementalParser::Initialize(llvm::SmallVectorImpl<llvm::PointerIntPair<cling::Transaction*, 2u, cling::IncrementalParser::EParseResult, llvm::PointerLikeTypeTraits<cling::Transaction*>, llvm::PointerIntPairInfo<cling::Transaction*, 2u, llvm::PointerLikeTypeTraits<cling::Transaction*> > > >&, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-                    n1: 918680 0x7DE539A: cling::Interpreter::Interpreter(int, char const* const*, char const*, std::vector<std::shared_ptr<clang::ModuleFileExtension>, std::allocator<std::shared_ptr<clang::ModuleFileExtension> > > const&, bool, cling::Interpreter const*) (in /opt/root/v6-26-10/lib/libCling.so)
-                     n1: 918680 0x7D39D59: TCling::TCling(char const*, char const*, char const* const*) (in /opt/root/v6-26-10/lib/libCling.so)
-                      n1: 918680 0x7D3BD70: CreateInterpreter (in /opt/root/v6-26-10/lib/libCling.so)
-                       n1: 918680 0x6086E49: TROOT::InitInterpreter() (in /opt/root/v6-26-10/lib/libCore.so)
-                        n1: 918680 0x60872FE: ROOT::Internal::GetROOT2() (in /opt/root/v6-26-10/lib/libCore.so)
-                         n1: 918680 0x619CBB8: ROOT::TGenericClassInfo::GetClass() (in /opt/root/v6-26-10/lib/libCore.so)
-                          n1: 918680 0x57282D5: TMatrixTSym<double>::Class() (in /opt/root/v6-26-10/lib/libMatrix.so)
-                           n1: 918680 0x60ACBA1: TDirectory::CloneObject(TObject const*, bool) (in /opt/root/v6-26-10/lib/libCore.so)
-                            n1: 918680 0x4B664FE: ParameterHandlerBase::SetCovMatrix(TMatrixTSym<double>*) (ParameterHandlerBase.cpp:376)
-                             n1: 918680 0x4B68EAE: ParameterHandlerBase::Init(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) (ParameterHandlerBase.cpp:278)
-                              n0: 918680 0x4B69BC6: ParameterHandlerBase::ParameterHandlerBase(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerBase.cpp:43)
-            n0: 642364 in 1 place, below massif's threshold (1.00%)
-        n0: 352630 in 3 places, all below massif's threshold (1.00%)
-       n0: 733902 in 2 places, all below massif's threshold (1.00%)
-      n1: 1717359 0xA58DAD8: clang::SourceManager::isOffsetInFileID(clang::FileID, unsigned int) const (in /opt/root/v6-26-10/lib/libCling.so)
-       n2: 1717359 0xA58DE28: clang::SourceManager::getFileIDLoaded(unsigned int) const [clone .part.0] (in /opt/root/v6-26-10/lib/libCling.so)
-        n2: 1164591 0xA58EC30: clang::SourceManager::getFileIDSlow(unsigned int) const (in /opt/root/v6-26-10/lib/libCling.so)
-         n1: 927282 0x85D44C9: clang::ASTReader::ReadPragmaDiagnosticMappings(clang::DiagnosticsEngine&) (in /opt/root/v6-26-10/lib/libCling.so)
-          n1: 927282 0x85FB258: clang::ASTReader::InitializeContext() (in /opt/root/v6-26-10/lib/libCling.so)
-           n1: 927282 0x860B9C6: clang::ASTReader::ReadAST(llvm::StringRef, clang::serialization::ModuleKind, clang::SourceLocation, unsigned int, llvm::SmallVectorImpl<clang::ASTReader::ImportedSubmodule>*) (in /opt/root/v6-26-10/lib/libCling.so)
-            n2: 927282 0x82DF56A: clang::CompilerInstance::loadModule(clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >, clang::Module::NameVisibilityKind, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-             n1: 759390 0xA510B15: clang::Preprocessor::HandleHeaderIncludeOrImport(clang::SourceLocation, clang::Token&, clang::Token&, clang::SourceLocation, clang::DirectoryLookup const*, clang::FileEntry const*) (in /opt/root/v6-26-10/lib/libCling.so)
-              n1: 759390 0xA511EBF: clang::Preprocessor::HandleIncludeDirective(clang::SourceLocation, clang::Token&, clang::DirectoryLookup const*, clang::FileEntry const*) (in /opt/root/v6-26-10/lib/libCling.so)
-               n1: 759390 0xA514E64: clang::Preprocessor::HandleDirective(clang::Token&) (in /opt/root/v6-26-10/lib/libCling.so)
-                n1: 759390 0xA4E0397: clang::Lexer::LexTokenInternal(clang::Token&, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-                 n1: 759390 0xA54863E: clang::Preprocessor::Lex(clang::Token&) (in /opt/root/v6-26-10/lib/libCling.so)
-                  n1: 759390 0x858F9EE: clang::Parser::ParseTopLevelDecl(clang::OpaquePtr<clang::DeclGroupRef>&, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-                   n1: 759390 0x7E64577: cling::IncrementalParser::ParseInternal(llvm::StringRef) (in /opt/root/v6-26-10/lib/libCling.so)
-                    n1: 759390 0x7E64C89: cling::IncrementalParser::Initialize(llvm::SmallVectorImpl<llvm::PointerIntPair<cling::Transaction*, 2u, cling::IncrementalParser::EParseResult, llvm::PointerLikeTypeTraits<cling::Transaction*>, llvm::PointerIntPairInfo<cling::Transaction*, 2u, llvm::PointerLikeTypeTraits<cling::Transaction*> > > >&, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-                     n1: 759390 0x7DE539A: cling::Interpreter::Interpreter(int, char const* const*, char const*, std::vector<std::shared_ptr<clang::ModuleFileExtension>, std::allocator<std::shared_ptr<clang::ModuleFileExtension> > > const&, bool, cling::Interpreter const*) (in /opt/root/v6-26-10/lib/libCling.so)
-                      n1: 759390 0x7D39D59: TCling::TCling(char const*, char const*, char const* const*) (in /opt/root/v6-26-10/lib/libCling.so)
-                       n1: 759390 0x7D3BD70: CreateInterpreter (in /opt/root/v6-26-10/lib/libCling.so)
-                        n1: 759390 0x6086E49: TROOT::InitInterpreter() (in /opt/root/v6-26-10/lib/libCore.so)
-                         n1: 759390 0x60872FE: ROOT::Internal::GetROOT2() (in /opt/root/v6-26-10/lib/libCore.so)
-                          n1: 759390 0x619CBB8: ROOT::TGenericClassInfo::GetClass() (in /opt/root/v6-26-10/lib/libCore.so)
-                           n1: 759390 0x57282D5: TMatrixTSym<double>::Class() (in /opt/root/v6-26-10/lib/libMatrix.so)
-                            n1: 759390 0x60ACBA1: TDirectory::CloneObject(TObject const*, bool) (in /opt/root/v6-26-10/lib/libCore.so)
-                             n1: 759390 0x4B664FE: ParameterHandlerBase::SetCovMatrix(TMatrixTSym<double>*) (ParameterHandlerBase.cpp:376)
-                              n0: 759390 0x4B68EAE: ParameterHandlerBase::Init(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) (ParameterHandlerBase.cpp:278)
-             n0: 167892 in 1 place, below massif's threshold (1.00%)
-         n0: 237309 in 2 places, all below massif's threshold (1.00%)
-        n0: 552768 in 2 places, all below massif's threshold (1.00%)
-      n0: 565126 in 8 places, all below massif's threshold (1.00%)
-    n1: 1376552 0x85CAF9C: clang::ASTReader::ReadSLocEntry(int) [clone .part.0] (in /opt/root/v6-26-10/lib/libCling.so)
-     n2: 1376552 0xA58D0C5: clang::SourceManager::loadSLocEntry(unsigned int, bool*) const (in /opt/root/v6-26-10/lib/libCling.so)
-      n1: 1288644 0x860B083: clang::ASTReader::ReadAST(llvm::StringRef, clang::serialization::ModuleKind, clang::SourceLocation, unsigned int, llvm::SmallVectorImpl<clang::ASTReader::ImportedSubmodule>*) (in /opt/root/v6-26-10/lib/libCling.so)
-       n2: 1288644 0x82DF56A: clang::CompilerInstance::loadModule(clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >, clang::Module::NameVisibilityKind, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-        n1: 1219839 0x8AD0615: clang::Sema::ActOnModuleImport(clang::SourceLocation, clang::SourceLocation, clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >) (in /opt/root/v6-26-10/lib/libCling.so)
-         n1: 1219839 0x7DDF8D1: cling::Interpreter::loadModule(clang::Module*, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-          n2: 1219839 0x7D0CED6: LoadModule(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-           n1: 1014159 0x7D37E97: RegisterCxxModules(cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-            n1: 1014159 0x7D39E48: TCling::TCling(char const*, char const*, char const* const*) (in /opt/root/v6-26-10/lib/libCling.so)
-             n1: 1014159 0x7D3BD70: CreateInterpreter (in /opt/root/v6-26-10/lib/libCling.so)
-              n1: 1014159 0x6086E49: TROOT::InitInterpreter() (in /opt/root/v6-26-10/lib/libCore.so)
-               n1: 1014159 0x60872FE: ROOT::Internal::GetROOT2() (in /opt/root/v6-26-10/lib/libCore.so)
-                n1: 1014159 0x619CBB8: ROOT::TGenericClassInfo::GetClass() (in /opt/root/v6-26-10/lib/libCore.so)
-                 n1: 1014159 0x57282D5: TMatrixTSym<double>::Class() (in /opt/root/v6-26-10/lib/libMatrix.so)
-                  n1: 1014159 0x60ACBA1: TDirectory::CloneObject(TObject const*, bool) (in /opt/root/v6-26-10/lib/libCore.so)
-                   n1: 1014159 0x4B664FE: ParameterHandlerBase::SetCovMatrix(TMatrixTSym<double>*) (ParameterHandlerBase.cpp:376)
-                    n1: 1014159 0x4B68EAE: ParameterHandlerBase::Init(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) (ParameterHandlerBase.cpp:278)
-                     n1: 1014159 0x4B69BC6: ParameterHandlerBase::ParameterHandlerBase(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerBase.cpp:43)
-                      n1: 1014159 0x4BA302D: ParameterHandlerGeneric::ParameterHandlerGeneric(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerGeneric.cpp:8)
-                       n1: 1014159 0x41FC65: make_unique<ParameterHandlerGeneric, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, int&, int&, int&> (unique_ptr.h:962)
-                        n1: 1014159 0x41FC65: std::unique_ptr<ParameterHandlerGeneric, std::default_delete<ParameterHandlerGeneric> > MaCh3CovarianceFactory<ParameterHandlerGeneric>(manager*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (MaCh3Factory.h:80)
-                         n0: 1014159 0x40C86C: main (MCMCTutorial.cpp:10)
-           n0: 205680 in 4 places, all below massif's threshold (1.00%)
-        n0: 68805 in 1 place, below massif's threshold (1.00%)
-      n0: 87908 in 9 places, all below massif's threshold (1.00%)
-   n0: 15335 in 2 places, all below massif's threshold (1.00%)
-  n0: 187902 in 2 places, all below massif's threshold (1.00%)
- n1: 4768440 0xA4F9CFF: clang::ModuleMap::findOrCreateModule(llvm::StringRef, clang::Module*, bool, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-  n2: 4768440 0xA503193: clang::ModuleMapParser::parseModuleDecl() (in /opt/root/v6-26-10/lib/libCling.so)
-   n2: 4578840 0xA502C17: clang::ModuleMapParser::parseModuleDecl() (in /opt/root/v6-26-10/lib/libCling.so)
-    n1: 4546608 0xA50340C: clang::ModuleMapParser::parseModuleMapFile() (in /opt/root/v6-26-10/lib/libCling.so)
-     n1: 4546608 0xA5006C2: clang::ModuleMap::parseModuleMapFile(clang::FileEntry const*, bool, clang::DirectoryEntry const*, clang::FileID, unsigned int*, clang::SourceLocation) (in /opt/root/v6-26-10/lib/libCling.so)
-      n1: 4546608 0xA4CFEA3: clang::HeaderSearch::loadModuleMapFileImpl(clang::FileEntry const*, bool, clang::DirectoryEntry const*, clang::FileID, unsigned int*) (in /opt/root/v6-26-10/lib/libCling.so)
-       n1: 4546608 0xA4D0D17: clang::HeaderSearch::loadModuleMapFile(clang::FileEntry const*, bool, clang::FileID, unsigned int*, llvm::StringRef) (in /opt/root/v6-26-10/lib/libCling.so)
-        n1: 4546608 0x7DA733A: (anonymous namespace)::createCIImpl(std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer> >, cling::CompilerOptions const&, char const*, std::unique_ptr<clang::ASTConsumer, std::default_delete<clang::ASTConsumer> >, std::vector<std::shared_ptr<clang::ModuleFileExtension>, std::allocator<std::shared_ptr<clang::ModuleFileExtension> > > const&, bool, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-         n1: 4546608 0x7DA8B66: cling::CIFactory::createCI(llvm::StringRef, cling::InvocationOptions const&, char const*, std::unique_ptr<clang::ASTConsumer, std::default_delete<clang::ASTConsumer> >, std::vector<std::shared_ptr<clang::ModuleFileExtension>, std::allocator<std::shared_ptr<clang::ModuleFileExtension> > > const&) (in /opt/root/v6-26-10/lib/libCling.so)
-          n1: 4546608 0x7E654D4: cling::IncrementalParser::IncrementalParser(cling::Interpreter*, char const*, std::vector<std::shared_ptr<clang::ModuleFileExtension>, std::allocator<std::shared_ptr<clang::ModuleFileExtension> > > const&) (in /opt/root/v6-26-10/lib/libCling.so)
-           n1: 4546608 0x7DE51EA: cling::Interpreter::Interpreter(int, char const* const*, char const*, std::vector<std::shared_ptr<clang::ModuleFileExtension>, std::allocator<std::shared_ptr<clang::ModuleFileExtension> > > const&, bool, cling::Interpreter const*) (in /opt/root/v6-26-10/lib/libCling.so)
-            n1: 4546608 0x7D39D59: TCling::TCling(char const*, char const*, char const* const*) (in /opt/root/v6-26-10/lib/libCling.so)
-             n1: 4546608 0x7D3BD70: CreateInterpreter (in /opt/root/v6-26-10/lib/libCling.so)
-              n1: 4546608 0x6086E49: TROOT::InitInterpreter() (in /opt/root/v6-26-10/lib/libCore.so)
-               n1: 4546608 0x60872FE: ROOT::Internal::GetROOT2() (in /opt/root/v6-26-10/lib/libCore.so)
-                n1: 4546608 0x619CBB8: ROOT::TGenericClassInfo::GetClass() (in /opt/root/v6-26-10/lib/libCore.so)
-                 n1: 4546608 0x57282D5: TMatrixTSym<double>::Class() (in /opt/root/v6-26-10/lib/libMatrix.so)
-                  n1: 4546608 0x60ACBA1: TDirectory::CloneObject(TObject const*, bool) (in /opt/root/v6-26-10/lib/libCore.so)
-                   n1: 4546608 0x4B664FE: ParameterHandlerBase::SetCovMatrix(TMatrixTSym<double>*) (ParameterHandlerBase.cpp:376)
-                    n1: 4546608 0x4B68EAE: ParameterHandlerBase::Init(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) (ParameterHandlerBase.cpp:278)
-                     n1: 4546608 0x4B69BC6: ParameterHandlerBase::ParameterHandlerBase(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerBase.cpp:43)
-                      n1: 4546608 0x4BA302D: ParameterHandlerGeneric::ParameterHandlerGeneric(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerGeneric.cpp:8)
-                       n1: 4546608 0x41FC65: make_unique<ParameterHandlerGeneric, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, int&, int&, int&> (unique_ptr.h:962)
-                        n1: 4546608 0x41FC65: std::unique_ptr<ParameterHandlerGeneric, std::default_delete<ParameterHandlerGeneric> > MaCh3CovarianceFactory<ParameterHandlerGeneric>(manager*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (MaCh3Factory.h:80)
-                         n0: 4546608 0x40C86C: main (MCMCTutorial.cpp:10)
-    n0: 32232 in 1 place, below massif's threshold (1.00%)
-   n0: 189600 in 1 place, below massif's threshold (1.00%)
- n2: 1733184 0xA10492F: llvm::BitstreamCursor::ReadAbbrevRecord() (in /opt/root/v6-26-10/lib/libCling.so)
-  n2: 869312 0x85B5831: clang::ASTReader::ReadBlockAbbrevs(llvm::BitstreamCursor&, unsigned int) (in /opt/root/v6-26-10/lib/libCling.so)
-   n1: 818176 0x85FBBC9: clang::ASTReader::ReadASTBlock(clang::serialization::ModuleFile&, unsigned int) (in /opt/root/v6-26-10/lib/libCling.so)
-    n1: 818176 0x860AF68: clang::ASTReader::ReadAST(llvm::StringRef, clang::serialization::ModuleKind, clang::SourceLocation, unsigned int, llvm::SmallVectorImpl<clang::ASTReader::ImportedSubmodule>*) (in /opt/root/v6-26-10/lib/libCling.so)
-     n2: 818176 0x82DF56A: clang::CompilerInstance::loadModule(clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >, clang::Module::NameVisibilityKind, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-      n1: 774656 0x8AD0615: clang::Sema::ActOnModuleImport(clang::SourceLocation, clang::SourceLocation, clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >) (in /opt/root/v6-26-10/lib/libCling.so)
-       n1: 774656 0x7DDF8D1: cling::Interpreter::loadModule(clang::Module*, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-        n1: 774656 0x7D0CED6: LoadModule(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-         n0: 774656 in 5 places, all below massif's threshold (1.00%)
-      n0: 43520 in 1 place, below massif's threshold (1.00%)
-   n0: 51136 in 1 place, below massif's threshold (1.00%)
-  n0: 863872 in 5 places, all below massif's threshold (1.00%)
- n1: 1421312 0xA2B7D29: clang::Decl::operator new(unsigned long, clang::ASTContext const&, unsigned int, unsigned long) (in /opt/root/v6-26-10/lib/libCling.so)
-  n0: 1421312 in 19 places, all below massif's threshold (1.00%)
- n1: 917504 0x85C8F81: llvm::DenseMap<unsigned int, llvm::SmallVector<std::pair<clang::serialization::ModuleFile*, unsigned long>, 2u>, llvm::DenseMapInfo<unsigned int>, llvm::detail::DenseMapPair<unsigned int, llvm::SmallVector<std::pair<clang::serialization::ModuleFile*, unsigned long>, 2u> > >::grow(unsigned int) (in /opt/root/v6-26-10/lib/libCling.so)
-  n1: 917504 0x85FF065: clang::ASTReader::ReadASTBlock(clang::serialization::ModuleFile&, unsigned int) (in /opt/root/v6-26-10/lib/libCling.so)
-   n1: 917504 0x860AF68: clang::ASTReader::ReadAST(llvm::StringRef, clang::serialization::ModuleKind, clang::SourceLocation, unsigned int, llvm::SmallVectorImpl<clang::ASTReader::ImportedSubmodule>*) (in /opt/root/v6-26-10/lib/libCling.so)
-    n2: 917504 0x82DF56A: clang::CompilerInstance::loadModule(clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >, clang::Module::NameVisibilityKind, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-     n1: 917504 0x8AD0615: clang::Sema::ActOnModuleImport(clang::SourceLocation, clang::SourceLocation, clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >) (in /opt/root/v6-26-10/lib/libCling.so)
-      n1: 917504 0x7DDF8D1: cling::Interpreter::loadModule(clang::Module*, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-       n1: 917504 0x7D0CED6: LoadModule(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-        n1: 917504 0x7D37E97: RegisterCxxModules(cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-         n1: 917504 0x7D39E48: TCling::TCling(char const*, char const*, char const* const*) (in /opt/root/v6-26-10/lib/libCling.so)
-          n1: 917504 0x7D3BD70: CreateInterpreter (in /opt/root/v6-26-10/lib/libCling.so)
-           n1: 917504 0x6086E49: TROOT::InitInterpreter() (in /opt/root/v6-26-10/lib/libCore.so)
-            n1: 917504 0x60872FE: ROOT::Internal::GetROOT2() (in /opt/root/v6-26-10/lib/libCore.so)
-             n1: 917504 0x619CBB8: ROOT::TGenericClassInfo::GetClass() (in /opt/root/v6-26-10/lib/libCore.so)
-              n1: 917504 0x57282D5: TMatrixTSym<double>::Class() (in /opt/root/v6-26-10/lib/libMatrix.so)
-               n1: 917504 0x60ACBA1: TDirectory::CloneObject(TObject const*, bool) (in /opt/root/v6-26-10/lib/libCore.so)
-                n1: 917504 0x4B664FE: ParameterHandlerBase::SetCovMatrix(TMatrixTSym<double>*) (ParameterHandlerBase.cpp:376)
-                 n1: 917504 0x4B68EAE: ParameterHandlerBase::Init(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) (ParameterHandlerBase.cpp:278)
-                  n1: 917504 0x4B69BC6: ParameterHandlerBase::ParameterHandlerBase(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerBase.cpp:43)
-                   n1: 917504 0x4BA302D: ParameterHandlerGeneric::ParameterHandlerGeneric(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerGeneric.cpp:8)
-                    n1: 917504 0x41FC65: make_unique<ParameterHandlerGeneric, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, int&, int&, int&> (unique_ptr.h:962)
-                     n1: 917504 0x41FC65: std::unique_ptr<ParameterHandlerGeneric, std::default_delete<ParameterHandlerGeneric> > MaCh3CovarianceFactory<ParameterHandlerGeneric>(manager*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (MaCh3Factory.h:80)
-                      n0: 917504 0x40C86C: main (MCMCTutorial.cpp:10)
-     n0: 0 in 1 place, below massif's threshold (1.00%)
- n1: 811520 0x8609139: llvm::SmallDenseMap<clang::Module*, llvm::detail::DenseSetEmpty, 2u, llvm::DenseMapInfo<clang::Module*>, llvm::detail::DenseSetPair<clang::Module*> >::grow(unsigned int) (in /opt/root/v6-26-10/lib/libCling.so)
-  n1: 811520 0x860BE50: clang::ASTReader::ReadAST(llvm::StringRef, clang::serialization::ModuleKind, clang::SourceLocation, unsigned int, llvm::SmallVectorImpl<clang::ASTReader::ImportedSubmodule>*) (in /opt/root/v6-26-10/lib/libCling.so)
-   n2: 811520 0x82DF56A: clang::CompilerInstance::loadModule(clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >, clang::Module::NameVisibilityKind, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-    n1: 781312 0x8AD0615: clang::Sema::ActOnModuleImport(clang::SourceLocation, clang::SourceLocation, clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >) (in /opt/root/v6-26-10/lib/libCling.so)
-     n1: 781312 0x7DDF8D1: cling::Interpreter::loadModule(clang::Module*, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-      n1: 781312 0x7D0CED6: LoadModule(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-       n0: 781312 in 5 places, all below massif's threshold (1.00%)
-    n0: 30208 in 1 place, below massif's threshold (1.00%)
- n1: 719600 0x85FFC8A: clang::ASTReader::ReadASTBlock(clang::serialization::ModuleFile&, unsigned int) (in /opt/root/v6-26-10/lib/libCling.so)
-  n1: 719600 0x860AF68: clang::ASTReader::ReadAST(llvm::StringRef, clang::serialization::ModuleKind, clang::SourceLocation, unsigned int, llvm::SmallVectorImpl<clang::ASTReader::ImportedSubmodule>*) (in /opt/root/v6-26-10/lib/libCling.so)
-   n2: 719600 0x82DF56A: clang::CompilerInstance::loadModule(clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >, clang::Module::NameVisibilityKind, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-    n1: 719600 0x8AD0615: clang::Sema::ActOnModuleImport(clang::SourceLocation, clang::SourceLocation, clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >) (in /opt/root/v6-26-10/lib/libCling.so)
-     n1: 719600 0x7DDF8D1: cling::Interpreter::loadModule(clang::Module*, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-      n2: 719600 0x7D0CED6: LoadModule(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-       n1: 719600 0x7D37E97: RegisterCxxModules(cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-        n1: 719600 0x7D39E48: TCling::TCling(char const*, char const*, char const* const*) (in /opt/root/v6-26-10/lib/libCling.so)
-         n1: 719600 0x7D3BD70: CreateInterpreter (in /opt/root/v6-26-10/lib/libCling.so)
-          n1: 719600 0x6086E49: TROOT::InitInterpreter() (in /opt/root/v6-26-10/lib/libCore.so)
-           n1: 719600 0x60872FE: ROOT::Internal::GetROOT2() (in /opt/root/v6-26-10/lib/libCore.so)
-            n1: 719600 0x619CBB8: ROOT::TGenericClassInfo::GetClass() (in /opt/root/v6-26-10/lib/libCore.so)
-             n1: 719600 0x57282D5: TMatrixTSym<double>::Class() (in /opt/root/v6-26-10/lib/libMatrix.so)
-              n1: 719600 0x60ACBA1: TDirectory::CloneObject(TObject const*, bool) (in /opt/root/v6-26-10/lib/libCore.so)
-               n1: 719600 0x4B664FE: ParameterHandlerBase::SetCovMatrix(TMatrixTSym<double>*) (ParameterHandlerBase.cpp:376)
-                n1: 719600 0x4B68EAE: ParameterHandlerBase::Init(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) (ParameterHandlerBase.cpp:278)
-                 n1: 719600 0x4B69BC6: ParameterHandlerBase::ParameterHandlerBase(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerBase.cpp:43)
-                  n1: 719600 0x4BA302D: ParameterHandlerGeneric::ParameterHandlerGeneric(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerGeneric.cpp:8)
-                   n1: 719600 0x41FC65: make_unique<ParameterHandlerGeneric, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, int&, int&, int&> (unique_ptr.h:962)
-                    n1: 719600 0x41FC65: std::unique_ptr<ParameterHandlerGeneric, std::default_delete<ParameterHandlerGeneric> > MaCh3CovarianceFactory<ParameterHandlerGeneric>(manager*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (MaCh3Factory.h:80)
-                     n0: 719600 0x40C86C: main (MCMCTutorial.cpp:10)
-       n0: 0 in 1 place, below massif's threshold (1.00%)
-    n0: 0 in 1 place, below massif's threshold (1.00%)
+heap_tree=empty
 #-----------
 snapshot=15
 #-----------
-time=786586167
-mem_heap_B=68082937
-mem_heap_extra_B=863391
-mem_stacks_B=0
-heap_tree=detailed
-n11: 68082937 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
- n1: 15090080 0x85FFC4B: clang::ASTReader::ReadASTBlock(clang::serialization::ModuleFile&, unsigned int) (in /opt/root/v6-26-10/lib/libCling.so)
-  n1: 15090080 0x860AF68: clang::ASTReader::ReadAST(llvm::StringRef, clang::serialization::ModuleKind, clang::SourceLocation, unsigned int, llvm::SmallVectorImpl<clang::ASTReader::ImportedSubmodule>*) (in /opt/root/v6-26-10/lib/libCling.so)
-   n2: 15090080 0x82DF56A: clang::CompilerInstance::loadModule(clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >, clang::Module::NameVisibilityKind, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-    n1: 15090080 0x8AD0615: clang::Sema::ActOnModuleImport(clang::SourceLocation, clang::SourceLocation, clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >) (in /opt/root/v6-26-10/lib/libCling.so)
-     n1: 15090080 0x7DDF8D1: cling::Interpreter::loadModule(clang::Module*, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-      n2: 15090080 0x7D0CED6: LoadModule(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-       n1: 15090080 0x7D37E97: RegisterCxxModules(cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-        n1: 15090080 0x7D39E48: TCling::TCling(char const*, char const*, char const* const*) (in /opt/root/v6-26-10/lib/libCling.so)
-         n1: 15090080 0x7D3BD70: CreateInterpreter (in /opt/root/v6-26-10/lib/libCling.so)
-          n1: 15090080 0x6086E49: TROOT::InitInterpreter() (in /opt/root/v6-26-10/lib/libCore.so)
-           n1: 15090080 0x60872FE: ROOT::Internal::GetROOT2() (in /opt/root/v6-26-10/lib/libCore.so)
-            n1: 15090080 0x619CBB8: ROOT::TGenericClassInfo::GetClass() (in /opt/root/v6-26-10/lib/libCore.so)
-             n1: 15090080 0x57282D5: TMatrixTSym<double>::Class() (in /opt/root/v6-26-10/lib/libMatrix.so)
-              n1: 15090080 0x60ACBA1: TDirectory::CloneObject(TObject const*, bool) (in /opt/root/v6-26-10/lib/libCore.so)
-               n1: 15090080 0x4B664FE: ParameterHandlerBase::SetCovMatrix(TMatrixTSym<double>*) (ParameterHandlerBase.cpp:376)
-                n1: 15090080 0x4B68EAE: ParameterHandlerBase::Init(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) (ParameterHandlerBase.cpp:278)
-                 n1: 15090080 0x4B69BC6: ParameterHandlerBase::ParameterHandlerBase(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerBase.cpp:43)
-                  n1: 15090080 0x4BA302D: ParameterHandlerGeneric::ParameterHandlerGeneric(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerGeneric.cpp:8)
-                   n1: 15090080 0x41FC65: make_unique<ParameterHandlerGeneric, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, int&, int&, int&> (unique_ptr.h:962)
-                    n1: 15090080 0x41FC65: std::unique_ptr<ParameterHandlerGeneric, std::default_delete<ParameterHandlerGeneric> > MaCh3CovarianceFactory<ParameterHandlerGeneric>(manager*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (MaCh3Factory.h:80)
-                     n0: 15090080 0x40C86C: main (MCMCTutorial.cpp:10)
-       n0: 0 in 1 place, below massif's threshold (1.00%)
-    n0: 0 in 1 place, below massif's threshold (1.00%)
- n1: 13700608 0x85FFDCA: clang::ASTReader::ReadASTBlock(clang::serialization::ModuleFile&, unsigned int) (in /opt/root/v6-26-10/lib/libCling.so)
-  n1: 13700608 0x860AF68: clang::ASTReader::ReadAST(llvm::StringRef, clang::serialization::ModuleKind, clang::SourceLocation, unsigned int, llvm::SmallVectorImpl<clang::ASTReader::ImportedSubmodule>*) (in /opt/root/v6-26-10/lib/libCling.so)
-   n2: 13700608 0x82DF56A: clang::CompilerInstance::loadModule(clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >, clang::Module::NameVisibilityKind, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-    n1: 13700608 0x8AD0615: clang::Sema::ActOnModuleImport(clang::SourceLocation, clang::SourceLocation, clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >) (in /opt/root/v6-26-10/lib/libCling.so)
-     n1: 13700608 0x7DDF8D1: cling::Interpreter::loadModule(clang::Module*, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-      n2: 13700608 0x7D0CED6: LoadModule(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-       n1: 13700608 0x7D37E97: RegisterCxxModules(cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-        n1: 13700608 0x7D39E48: TCling::TCling(char const*, char const*, char const* const*) (in /opt/root/v6-26-10/lib/libCling.so)
-         n1: 13700608 0x7D3BD70: CreateInterpreter (in /opt/root/v6-26-10/lib/libCling.so)
-          n1: 13700608 0x6086E49: TROOT::InitInterpreter() (in /opt/root/v6-26-10/lib/libCore.so)
-           n1: 13700608 0x60872FE: ROOT::Internal::GetROOT2() (in /opt/root/v6-26-10/lib/libCore.so)
-            n1: 13700608 0x619CBB8: ROOT::TGenericClassInfo::GetClass() (in /opt/root/v6-26-10/lib/libCore.so)
-             n1: 13700608 0x57282D5: TMatrixTSym<double>::Class() (in /opt/root/v6-26-10/lib/libMatrix.so)
-              n1: 13700608 0x60ACBA1: TDirectory::CloneObject(TObject const*, bool) (in /opt/root/v6-26-10/lib/libCore.so)
-               n1: 13700608 0x4B664FE: ParameterHandlerBase::SetCovMatrix(TMatrixTSym<double>*) (ParameterHandlerBase.cpp:376)
-                n1: 13700608 0x4B68EAE: ParameterHandlerBase::Init(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) (ParameterHandlerBase.cpp:278)
-                 n1: 13700608 0x4B69BC6: ParameterHandlerBase::ParameterHandlerBase(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerBase.cpp:43)
-                  n1: 13700608 0x4BA302D: ParameterHandlerGeneric::ParameterHandlerGeneric(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerGeneric.cpp:8)
-                   n1: 13700608 0x41FC65: make_unique<ParameterHandlerGeneric, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, int&, int&, int&> (unique_ptr.h:962)
-                    n1: 13700608 0x41FC65: std::unique_ptr<ParameterHandlerGeneric, std::default_delete<ParameterHandlerGeneric> > MaCh3CovarianceFactory<ParameterHandlerGeneric>(manager*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (MaCh3Factory.h:80)
-                     n0: 13700608 0x40C86C: main (MCMCTutorial.cpp:10)
-       n0: 0 in 1 place, below massif's threshold (1.00%)
-    n0: 0 in 1 place, below massif's threshold (1.00%)
- n0: 13598080 in 3598 places, all below massif's threshold (1.00%)
- n2: 8769421 0xA8C0E8A: llvm::SmallVectorBase::grow_pod(void*, unsigned long, unsigned long) (in /opt/root/v6-26-10/lib/libCling.so)
-  n1: 8319528 0xA58CE9A: clang::SourceManager::AllocateLoadedSLocEntries(unsigned int, unsigned int) (in /opt/root/v6-26-10/lib/libCling.so)
-   n1: 8319528 0x85FDA76: clang::ASTReader::ReadASTBlock(clang::serialization::ModuleFile&, unsigned int) (in /opt/root/v6-26-10/lib/libCling.so)
-    n1: 8319528 0x860AF68: clang::ASTReader::ReadAST(llvm::StringRef, clang::serialization::ModuleKind, clang::SourceLocation, unsigned int, llvm::SmallVectorImpl<clang::ASTReader::ImportedSubmodule>*) (in /opt/root/v6-26-10/lib/libCling.so)
-     n2: 8319528 0x82DF56A: clang::CompilerInstance::loadModule(clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >, clang::Module::NameVisibilityKind, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-      n1: 8319528 0x8AD0615: clang::Sema::ActOnModuleImport(clang::SourceLocation, clang::SourceLocation, clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >) (in /opt/root/v6-26-10/lib/libCling.so)
-       n1: 8319528 0x7DDF8D1: cling::Interpreter::loadModule(clang::Module*, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-        n2: 8319528 0x7D0CED6: LoadModule(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-         n1: 8319528 0x7D37E97: RegisterCxxModules(cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-          n1: 8319528 0x7D39E48: TCling::TCling(char const*, char const*, char const* const*) (in /opt/root/v6-26-10/lib/libCling.so)
-           n1: 8319528 0x7D3BD70: CreateInterpreter (in /opt/root/v6-26-10/lib/libCling.so)
-            n1: 8319528 0x6086E49: TROOT::InitInterpreter() (in /opt/root/v6-26-10/lib/libCore.so)
-             n1: 8319528 0x60872FE: ROOT::Internal::GetROOT2() (in /opt/root/v6-26-10/lib/libCore.so)
-              n1: 8319528 0x619CBB8: ROOT::TGenericClassInfo::GetClass() (in /opt/root/v6-26-10/lib/libCore.so)
-               n1: 8319528 0x57282D5: TMatrixTSym<double>::Class() (in /opt/root/v6-26-10/lib/libMatrix.so)
-                n1: 8319528 0x60ACBA1: TDirectory::CloneObject(TObject const*, bool) (in /opt/root/v6-26-10/lib/libCore.so)
-                 n1: 8319528 0x4B664FE: ParameterHandlerBase::SetCovMatrix(TMatrixTSym<double>*) (ParameterHandlerBase.cpp:376)
-                  n1: 8319528 0x4B68EAE: ParameterHandlerBase::Init(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) (ParameterHandlerBase.cpp:278)
-                   n1: 8319528 0x4B69BC6: ParameterHandlerBase::ParameterHandlerBase(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerBase.cpp:43)
-                    n1: 8319528 0x4BA302D: ParameterHandlerGeneric::ParameterHandlerGeneric(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerGeneric.cpp:8)
-                     n1: 8319528 0x41FC65: make_unique<ParameterHandlerGeneric, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, int&, int&, int&> (unique_ptr.h:962)
-                      n1: 8319528 0x41FC65: std::unique_ptr<ParameterHandlerGeneric, std::default_delete<ParameterHandlerGeneric> > MaCh3CovarianceFactory<ParameterHandlerGeneric>(manager*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (MaCh3Factory.h:80)
-                       n0: 8319528 0x40C86C: main (MCMCTutorial.cpp:10)
-         n0: 0 in 1 place, below massif's threshold (1.00%)
-      n0: 0 in 1 place, below massif's threshold (1.00%)
-  n0: 449893 in 115 places, all below massif's threshold (1.00%)
- n2: 6536804 0xA8B6E91: llvm::WritableMemoryBuffer::getNewUninitMemBuffer(unsigned long, llvm::Twine const&) (in /opt/root/v6-26-10/lib/libCling.so)
-  n2: 6344656 0xA8B7111: llvm::MemoryBuffer::getMemBufferCopy(llvm::StringRef, llvm::Twine const&) (in /opt/root/v6-26-10/lib/libCling.so)
-   n2: 6329321 0x85B9A90: clang::ASTReader::ReadSLocEntry(int)::{lambda(llvm::BitstreamCursor&, llvm::StringRef)#1}::operator()(llvm::BitstreamCursor&, llvm::StringRef) const (in /opt/root/v6-26-10/lib/libCling.so)
-    n1: 4947941 0x85CB2E4: clang::ASTReader::ReadSLocEntry(int) [clone .part.0] (in /opt/root/v6-26-10/lib/libCling.so)
-     n3: 4947941 0xA58D0C5: clang::SourceManager::loadSLocEntry(unsigned int, bool*) const (in /opt/root/v6-26-10/lib/libCling.so)
-      n2: 2657368 0xA58DDFC: clang::SourceManager::getFileIDLoaded(unsigned int) const [clone .part.0] (in /opt/root/v6-26-10/lib/libCling.so)
-       n2: 1923466 0xA58EC30: clang::SourceManager::getFileIDSlow(unsigned int) const (in /opt/root/v6-26-10/lib/libCling.so)
-        n1: 1561044 0x85D44C9: clang::ASTReader::ReadPragmaDiagnosticMappings(clang::DiagnosticsEngine&) (in /opt/root/v6-26-10/lib/libCling.so)
-         n1: 1561044 0x85FB258: clang::ASTReader::InitializeContext() (in /opt/root/v6-26-10/lib/libCling.so)
-          n1: 1561044 0x860B9C6: clang::ASTReader::ReadAST(llvm::StringRef, clang::serialization::ModuleKind, clang::SourceLocation, unsigned int, llvm::SmallVectorImpl<clang::ASTReader::ImportedSubmodule>*) (in /opt/root/v6-26-10/lib/libCling.so)
-           n2: 1561044 0x82DF56A: clang::CompilerInstance::loadModule(clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >, clang::Module::NameVisibilityKind, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-            n1: 918680 0xA510B15: clang::Preprocessor::HandleHeaderIncludeOrImport(clang::SourceLocation, clang::Token&, clang::Token&, clang::SourceLocation, clang::DirectoryLookup const*, clang::FileEntry const*) (in /opt/root/v6-26-10/lib/libCling.so)
-             n1: 918680 0xA511EBF: clang::Preprocessor::HandleIncludeDirective(clang::SourceLocation, clang::Token&, clang::DirectoryLookup const*, clang::FileEntry const*) (in /opt/root/v6-26-10/lib/libCling.so)
-              n1: 918680 0xA514E64: clang::Preprocessor::HandleDirective(clang::Token&) (in /opt/root/v6-26-10/lib/libCling.so)
-               n1: 918680 0xA4E0397: clang::Lexer::LexTokenInternal(clang::Token&, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-                n1: 918680 0xA54863E: clang::Preprocessor::Lex(clang::Token&) (in /opt/root/v6-26-10/lib/libCling.so)
-                 n1: 918680 0x858F9EE: clang::Parser::ParseTopLevelDecl(clang::OpaquePtr<clang::DeclGroupRef>&, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-                  n1: 918680 0x7E64577: cling::IncrementalParser::ParseInternal(llvm::StringRef) (in /opt/root/v6-26-10/lib/libCling.so)
-                   n1: 918680 0x7E64C89: cling::IncrementalParser::Initialize(llvm::SmallVectorImpl<llvm::PointerIntPair<cling::Transaction*, 2u, cling::IncrementalParser::EParseResult, llvm::PointerLikeTypeTraits<cling::Transaction*>, llvm::PointerIntPairInfo<cling::Transaction*, 2u, llvm::PointerLikeTypeTraits<cling::Transaction*> > > >&, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-                    n1: 918680 0x7DE539A: cling::Interpreter::Interpreter(int, char const* const*, char const*, std::vector<std::shared_ptr<clang::ModuleFileExtension>, std::allocator<std::shared_ptr<clang::ModuleFileExtension> > > const&, bool, cling::Interpreter const*) (in /opt/root/v6-26-10/lib/libCling.so)
-                     n1: 918680 0x7D39D59: TCling::TCling(char const*, char const*, char const* const*) (in /opt/root/v6-26-10/lib/libCling.so)
-                      n1: 918680 0x7D3BD70: CreateInterpreter (in /opt/root/v6-26-10/lib/libCling.so)
-                       n1: 918680 0x6086E49: TROOT::InitInterpreter() (in /opt/root/v6-26-10/lib/libCore.so)
-                        n1: 918680 0x60872FE: ROOT::Internal::GetROOT2() (in /opt/root/v6-26-10/lib/libCore.so)
-                         n1: 918680 0x619CBB8: ROOT::TGenericClassInfo::GetClass() (in /opt/root/v6-26-10/lib/libCore.so)
-                          n1: 918680 0x57282D5: TMatrixTSym<double>::Class() (in /opt/root/v6-26-10/lib/libMatrix.so)
-                           n1: 918680 0x60ACBA1: TDirectory::CloneObject(TObject const*, bool) (in /opt/root/v6-26-10/lib/libCore.so)
-                            n1: 918680 0x4B664FE: ParameterHandlerBase::SetCovMatrix(TMatrixTSym<double>*) (ParameterHandlerBase.cpp:376)
-                             n1: 918680 0x4B68EAE: ParameterHandlerBase::Init(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) (ParameterHandlerBase.cpp:278)
-                              n0: 918680 0x4B69BC6: ParameterHandlerBase::ParameterHandlerBase(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerBase.cpp:43)
-            n0: 642364 in 1 place, below massif's threshold (1.00%)
-        n0: 362422 in 3 places, all below massif's threshold (1.00%)
-       n0: 733902 in 2 places, all below massif's threshold (1.00%)
-      n1: 1725447 0xA58DAD8: clang::SourceManager::isOffsetInFileID(clang::FileID, unsigned int) const (in /opt/root/v6-26-10/lib/libCling.so)
-       n2: 1725447 0xA58DE28: clang::SourceManager::getFileIDLoaded(unsigned int) const [clone .part.0] (in /opt/root/v6-26-10/lib/libCling.so)
-        n2: 1172679 0xA58EC30: clang::SourceManager::getFileIDSlow(unsigned int) const (in /opt/root/v6-26-10/lib/libCling.so)
-         n1: 927282 0x85D44C9: clang::ASTReader::ReadPragmaDiagnosticMappings(clang::DiagnosticsEngine&) (in /opt/root/v6-26-10/lib/libCling.so)
-          n1: 927282 0x85FB258: clang::ASTReader::InitializeContext() (in /opt/root/v6-26-10/lib/libCling.so)
-           n1: 927282 0x860B9C6: clang::ASTReader::ReadAST(llvm::StringRef, clang::serialization::ModuleKind, clang::SourceLocation, unsigned int, llvm::SmallVectorImpl<clang::ASTReader::ImportedSubmodule>*) (in /opt/root/v6-26-10/lib/libCling.so)
-            n2: 927282 0x82DF56A: clang::CompilerInstance::loadModule(clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >, clang::Module::NameVisibilityKind, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-             n1: 759390 0xA510B15: clang::Preprocessor::HandleHeaderIncludeOrImport(clang::SourceLocation, clang::Token&, clang::Token&, clang::SourceLocation, clang::DirectoryLookup const*, clang::FileEntry const*) (in /opt/root/v6-26-10/lib/libCling.so)
-              n1: 759390 0xA511EBF: clang::Preprocessor::HandleIncludeDirective(clang::SourceLocation, clang::Token&, clang::DirectoryLookup const*, clang::FileEntry const*) (in /opt/root/v6-26-10/lib/libCling.so)
-               n1: 759390 0xA514E64: clang::Preprocessor::HandleDirective(clang::Token&) (in /opt/root/v6-26-10/lib/libCling.so)
-                n1: 759390 0xA4E0397: clang::Lexer::LexTokenInternal(clang::Token&, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-                 n1: 759390 0xA54863E: clang::Preprocessor::Lex(clang::Token&) (in /opt/root/v6-26-10/lib/libCling.so)
-                  n1: 759390 0x858F9EE: clang::Parser::ParseTopLevelDecl(clang::OpaquePtr<clang::DeclGroupRef>&, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-                   n1: 759390 0x7E64577: cling::IncrementalParser::ParseInternal(llvm::StringRef) (in /opt/root/v6-26-10/lib/libCling.so)
-                    n1: 759390 0x7E64C89: cling::IncrementalParser::Initialize(llvm::SmallVectorImpl<llvm::PointerIntPair<cling::Transaction*, 2u, cling::IncrementalParser::EParseResult, llvm::PointerLikeTypeTraits<cling::Transaction*>, llvm::PointerIntPairInfo<cling::Transaction*, 2u, llvm::PointerLikeTypeTraits<cling::Transaction*> > > >&, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-                     n1: 759390 0x7DE539A: cling::Interpreter::Interpreter(int, char const* const*, char const*, std::vector<std::shared_ptr<clang::ModuleFileExtension>, std::allocator<std::shared_ptr<clang::ModuleFileExtension> > > const&, bool, cling::Interpreter const*) (in /opt/root/v6-26-10/lib/libCling.so)
-                      n1: 759390 0x7D39D59: TCling::TCling(char const*, char const*, char const* const*) (in /opt/root/v6-26-10/lib/libCling.so)
-                       n1: 759390 0x7D3BD70: CreateInterpreter (in /opt/root/v6-26-10/lib/libCling.so)
-                        n1: 759390 0x6086E49: TROOT::InitInterpreter() (in /opt/root/v6-26-10/lib/libCore.so)
-                         n1: 759390 0x60872FE: ROOT::Internal::GetROOT2() (in /opt/root/v6-26-10/lib/libCore.so)
-                          n1: 759390 0x619CBB8: ROOT::TGenericClassInfo::GetClass() (in /opt/root/v6-26-10/lib/libCore.so)
-                           n1: 759390 0x57282D5: TMatrixTSym<double>::Class() (in /opt/root/v6-26-10/lib/libMatrix.so)
-                            n1: 759390 0x60ACBA1: TDirectory::CloneObject(TObject const*, bool) (in /opt/root/v6-26-10/lib/libCore.so)
-                             n1: 759390 0x4B664FE: ParameterHandlerBase::SetCovMatrix(TMatrixTSym<double>*) (ParameterHandlerBase.cpp:376)
-                              n0: 759390 0x4B68EAE: ParameterHandlerBase::Init(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) (ParameterHandlerBase.cpp:278)
-             n0: 167892 in 1 place, below massif's threshold (1.00%)
-         n0: 245397 in 2 places, all below massif's threshold (1.00%)
-        n0: 552768 in 2 places, all below massif's threshold (1.00%)
-      n0: 565126 in 8 places, all below massif's threshold (1.00%)
-    n1: 1381380 0x85CAF9C: clang::ASTReader::ReadSLocEntry(int) [clone .part.0] (in /opt/root/v6-26-10/lib/libCling.so)
-     n2: 1381380 0xA58D0C5: clang::SourceManager::loadSLocEntry(unsigned int, bool*) const (in /opt/root/v6-26-10/lib/libCling.so)
-      n1: 1288644 0x860B083: clang::ASTReader::ReadAST(llvm::StringRef, clang::serialization::ModuleKind, clang::SourceLocation, unsigned int, llvm::SmallVectorImpl<clang::ASTReader::ImportedSubmodule>*) (in /opt/root/v6-26-10/lib/libCling.so)
-       n2: 1288644 0x82DF56A: clang::CompilerInstance::loadModule(clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >, clang::Module::NameVisibilityKind, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-        n1: 1219839 0x8AD0615: clang::Sema::ActOnModuleImport(clang::SourceLocation, clang::SourceLocation, clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >) (in /opt/root/v6-26-10/lib/libCling.so)
-         n1: 1219839 0x7DDF8D1: cling::Interpreter::loadModule(clang::Module*, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-          n2: 1219839 0x7D0CED6: LoadModule(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-           n1: 1014159 0x7D37E97: RegisterCxxModules(cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-            n1: 1014159 0x7D39E48: TCling::TCling(char const*, char const*, char const* const*) (in /opt/root/v6-26-10/lib/libCling.so)
-             n1: 1014159 0x7D3BD70: CreateInterpreter (in /opt/root/v6-26-10/lib/libCling.so)
-              n1: 1014159 0x6086E49: TROOT::InitInterpreter() (in /opt/root/v6-26-10/lib/libCore.so)
-               n1: 1014159 0x60872FE: ROOT::Internal::GetROOT2() (in /opt/root/v6-26-10/lib/libCore.so)
-                n1: 1014159 0x619CBB8: ROOT::TGenericClassInfo::GetClass() (in /opt/root/v6-26-10/lib/libCore.so)
-                 n1: 1014159 0x57282D5: TMatrixTSym<double>::Class() (in /opt/root/v6-26-10/lib/libMatrix.so)
-                  n1: 1014159 0x60ACBA1: TDirectory::CloneObject(TObject const*, bool) (in /opt/root/v6-26-10/lib/libCore.so)
-                   n1: 1014159 0x4B664FE: ParameterHandlerBase::SetCovMatrix(TMatrixTSym<double>*) (ParameterHandlerBase.cpp:376)
-                    n1: 1014159 0x4B68EAE: ParameterHandlerBase::Init(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) (ParameterHandlerBase.cpp:278)
-                     n1: 1014159 0x4B69BC6: ParameterHandlerBase::ParameterHandlerBase(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerBase.cpp:43)
-                      n1: 1014159 0x4BA302D: ParameterHandlerGeneric::ParameterHandlerGeneric(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerGeneric.cpp:8)
-                       n1: 1014159 0x41FC65: make_unique<ParameterHandlerGeneric, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, int&, int&, int&> (unique_ptr.h:962)
-                        n1: 1014159 0x41FC65: std::unique_ptr<ParameterHandlerGeneric, std::default_delete<ParameterHandlerGeneric> > MaCh3CovarianceFactory<ParameterHandlerGeneric>(manager*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (MaCh3Factory.h:80)
-                         n0: 1014159 0x40C86C: main (MCMCTutorial.cpp:10)
-           n0: 205680 in 4 places, all below massif's threshold (1.00%)
-        n0: 68805 in 1 place, below massif's threshold (1.00%)
-      n0: 92736 in 9 places, all below massif's threshold (1.00%)
-   n0: 15335 in 2 places, all below massif's threshold (1.00%)
-  n0: 192148 in 2 places, all below massif's threshold (1.00%)
- n1: 4768440 0xA4F9CFF: clang::ModuleMap::findOrCreateModule(llvm::StringRef, clang::Module*, bool, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-  n2: 4768440 0xA503193: clang::ModuleMapParser::parseModuleDecl() (in /opt/root/v6-26-10/lib/libCling.so)
-   n2: 4578840 0xA502C17: clang::ModuleMapParser::parseModuleDecl() (in /opt/root/v6-26-10/lib/libCling.so)
-    n1: 4546608 0xA50340C: clang::ModuleMapParser::parseModuleMapFile() (in /opt/root/v6-26-10/lib/libCling.so)
-     n1: 4546608 0xA5006C2: clang::ModuleMap::parseModuleMapFile(clang::FileEntry const*, bool, clang::DirectoryEntry const*, clang::FileID, unsigned int*, clang::SourceLocation) (in /opt/root/v6-26-10/lib/libCling.so)
-      n1: 4546608 0xA4CFEA3: clang::HeaderSearch::loadModuleMapFileImpl(clang::FileEntry const*, bool, clang::DirectoryEntry const*, clang::FileID, unsigned int*) (in /opt/root/v6-26-10/lib/libCling.so)
-       n1: 4546608 0xA4D0D17: clang::HeaderSearch::loadModuleMapFile(clang::FileEntry const*, bool, clang::FileID, unsigned int*, llvm::StringRef) (in /opt/root/v6-26-10/lib/libCling.so)
-        n1: 4546608 0x7DA733A: (anonymous namespace)::createCIImpl(std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer> >, cling::CompilerOptions const&, char const*, std::unique_ptr<clang::ASTConsumer, std::default_delete<clang::ASTConsumer> >, std::vector<std::shared_ptr<clang::ModuleFileExtension>, std::allocator<std::shared_ptr<clang::ModuleFileExtension> > > const&, bool, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-         n1: 4546608 0x7DA8B66: cling::CIFactory::createCI(llvm::StringRef, cling::InvocationOptions const&, char const*, std::unique_ptr<clang::ASTConsumer, std::default_delete<clang::ASTConsumer> >, std::vector<std::shared_ptr<clang::ModuleFileExtension>, std::allocator<std::shared_ptr<clang::ModuleFileExtension> > > const&) (in /opt/root/v6-26-10/lib/libCling.so)
-          n1: 4546608 0x7E654D4: cling::IncrementalParser::IncrementalParser(cling::Interpreter*, char const*, std::vector<std::shared_ptr<clang::ModuleFileExtension>, std::allocator<std::shared_ptr<clang::ModuleFileExtension> > > const&) (in /opt/root/v6-26-10/lib/libCling.so)
-           n1: 4546608 0x7DE51EA: cling::Interpreter::Interpreter(int, char const* const*, char const*, std::vector<std::shared_ptr<clang::ModuleFileExtension>, std::allocator<std::shared_ptr<clang::ModuleFileExtension> > > const&, bool, cling::Interpreter const*) (in /opt/root/v6-26-10/lib/libCling.so)
-            n1: 4546608 0x7D39D59: TCling::TCling(char const*, char const*, char const* const*) (in /opt/root/v6-26-10/lib/libCling.so)
-             n1: 4546608 0x7D3BD70: CreateInterpreter (in /opt/root/v6-26-10/lib/libCling.so)
-              n1: 4546608 0x6086E49: TROOT::InitInterpreter() (in /opt/root/v6-26-10/lib/libCore.so)
-               n1: 4546608 0x60872FE: ROOT::Internal::GetROOT2() (in /opt/root/v6-26-10/lib/libCore.so)
-                n1: 4546608 0x619CBB8: ROOT::TGenericClassInfo::GetClass() (in /opt/root/v6-26-10/lib/libCore.so)
-                 n1: 4546608 0x57282D5: TMatrixTSym<double>::Class() (in /opt/root/v6-26-10/lib/libMatrix.so)
-                  n1: 4546608 0x60ACBA1: TDirectory::CloneObject(TObject const*, bool) (in /opt/root/v6-26-10/lib/libCore.so)
-                   n1: 4546608 0x4B664FE: ParameterHandlerBase::SetCovMatrix(TMatrixTSym<double>*) (ParameterHandlerBase.cpp:376)
-                    n1: 4546608 0x4B68EAE: ParameterHandlerBase::Init(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) (ParameterHandlerBase.cpp:278)
-                     n1: 4546608 0x4B69BC6: ParameterHandlerBase::ParameterHandlerBase(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerBase.cpp:43)
-                      n1: 4546608 0x4BA302D: ParameterHandlerGeneric::ParameterHandlerGeneric(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerGeneric.cpp:8)
-                       n1: 4546608 0x41FC65: make_unique<ParameterHandlerGeneric, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, int&, int&, int&> (unique_ptr.h:962)
-                        n1: 4546608 0x41FC65: std::unique_ptr<ParameterHandlerGeneric, std::default_delete<ParameterHandlerGeneric> > MaCh3CovarianceFactory<ParameterHandlerGeneric>(manager*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (MaCh3Factory.h:80)
-                         n0: 4546608 0x40C86C: main (MCMCTutorial.cpp:10)
-    n0: 32232 in 1 place, below massif's threshold (1.00%)
-   n0: 189600 in 1 place, below massif's threshold (1.00%)
- n2: 1733184 0xA10492F: llvm::BitstreamCursor::ReadAbbrevRecord() (in /opt/root/v6-26-10/lib/libCling.so)
-  n2: 869312 0x85B5831: clang::ASTReader::ReadBlockAbbrevs(llvm::BitstreamCursor&, unsigned int) (in /opt/root/v6-26-10/lib/libCling.so)
-   n1: 818176 0x85FBBC9: clang::ASTReader::ReadASTBlock(clang::serialization::ModuleFile&, unsigned int) (in /opt/root/v6-26-10/lib/libCling.so)
-    n1: 818176 0x860AF68: clang::ASTReader::ReadAST(llvm::StringRef, clang::serialization::ModuleKind, clang::SourceLocation, unsigned int, llvm::SmallVectorImpl<clang::ASTReader::ImportedSubmodule>*) (in /opt/root/v6-26-10/lib/libCling.so)
-     n2: 818176 0x82DF56A: clang::CompilerInstance::loadModule(clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >, clang::Module::NameVisibilityKind, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-      n1: 774656 0x8AD0615: clang::Sema::ActOnModuleImport(clang::SourceLocation, clang::SourceLocation, clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >) (in /opt/root/v6-26-10/lib/libCling.so)
-       n1: 774656 0x7DDF8D1: cling::Interpreter::loadModule(clang::Module*, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-        n1: 774656 0x7D0CED6: LoadModule(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-         n0: 774656 in 5 places, all below massif's threshold (1.00%)
-      n0: 43520 in 1 place, below massif's threshold (1.00%)
-   n0: 51136 in 1 place, below massif's threshold (1.00%)
-  n0: 863872 in 5 places, all below massif's threshold (1.00%)
- n1: 1437696 0xA2B7D29: clang::Decl::operator new(unsigned long, clang::ASTContext const&, unsigned int, unsigned long) (in /opt/root/v6-26-10/lib/libCling.so)
-  n0: 1437696 in 19 places, all below massif's threshold (1.00%)
- n1: 917504 0x85C8F81: llvm::DenseMap<unsigned int, llvm::SmallVector<std::pair<clang::serialization::ModuleFile*, unsigned long>, 2u>, llvm::DenseMapInfo<unsigned int>, llvm::detail::DenseMapPair<unsigned int, llvm::SmallVector<std::pair<clang::serialization::ModuleFile*, unsigned long>, 2u> > >::grow(unsigned int) (in /opt/root/v6-26-10/lib/libCling.so)
-  n1: 917504 0x85FF065: clang::ASTReader::ReadASTBlock(clang::serialization::ModuleFile&, unsigned int) (in /opt/root/v6-26-10/lib/libCling.so)
-   n1: 917504 0x860AF68: clang::ASTReader::ReadAST(llvm::StringRef, clang::serialization::ModuleKind, clang::SourceLocation, unsigned int, llvm::SmallVectorImpl<clang::ASTReader::ImportedSubmodule>*) (in /opt/root/v6-26-10/lib/libCling.so)
-    n2: 917504 0x82DF56A: clang::CompilerInstance::loadModule(clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >, clang::Module::NameVisibilityKind, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-     n1: 917504 0x8AD0615: clang::Sema::ActOnModuleImport(clang::SourceLocation, clang::SourceLocation, clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >) (in /opt/root/v6-26-10/lib/libCling.so)
-      n1: 917504 0x7DDF8D1: cling::Interpreter::loadModule(clang::Module*, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-       n1: 917504 0x7D0CED6: LoadModule(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-        n1: 917504 0x7D37E97: RegisterCxxModules(cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-         n1: 917504 0x7D39E48: TCling::TCling(char const*, char const*, char const* const*) (in /opt/root/v6-26-10/lib/libCling.so)
-          n1: 917504 0x7D3BD70: CreateInterpreter (in /opt/root/v6-26-10/lib/libCling.so)
-           n1: 917504 0x6086E49: TROOT::InitInterpreter() (in /opt/root/v6-26-10/lib/libCore.so)
-            n1: 917504 0x60872FE: ROOT::Internal::GetROOT2() (in /opt/root/v6-26-10/lib/libCore.so)
-             n1: 917504 0x619CBB8: ROOT::TGenericClassInfo::GetClass() (in /opt/root/v6-26-10/lib/libCore.so)
-              n1: 917504 0x57282D5: TMatrixTSym<double>::Class() (in /opt/root/v6-26-10/lib/libMatrix.so)
-               n1: 917504 0x60ACBA1: TDirectory::CloneObject(TObject const*, bool) (in /opt/root/v6-26-10/lib/libCore.so)
-                n1: 917504 0x4B664FE: ParameterHandlerBase::SetCovMatrix(TMatrixTSym<double>*) (ParameterHandlerBase.cpp:376)
-                 n1: 917504 0x4B68EAE: ParameterHandlerBase::Init(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) (ParameterHandlerBase.cpp:278)
-                  n1: 917504 0x4B69BC6: ParameterHandlerBase::ParameterHandlerBase(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerBase.cpp:43)
-                   n1: 917504 0x4BA302D: ParameterHandlerGeneric::ParameterHandlerGeneric(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerGeneric.cpp:8)
-                    n1: 917504 0x41FC65: make_unique<ParameterHandlerGeneric, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, int&, int&, int&> (unique_ptr.h:962)
-                     n1: 917504 0x41FC65: std::unique_ptr<ParameterHandlerGeneric, std::default_delete<ParameterHandlerGeneric> > MaCh3CovarianceFactory<ParameterHandlerGeneric>(manager*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (MaCh3Factory.h:80)
-                      n0: 917504 0x40C86C: main (MCMCTutorial.cpp:10)
-     n0: 0 in 1 place, below massif's threshold (1.00%)
- n1: 811520 0x8609139: llvm::SmallDenseMap<clang::Module*, llvm::detail::DenseSetEmpty, 2u, llvm::DenseMapInfo<clang::Module*>, llvm::detail::DenseSetPair<clang::Module*> >::grow(unsigned int) (in /opt/root/v6-26-10/lib/libCling.so)
-  n1: 811520 0x860BE50: clang::ASTReader::ReadAST(llvm::StringRef, clang::serialization::ModuleKind, clang::SourceLocation, unsigned int, llvm::SmallVectorImpl<clang::ASTReader::ImportedSubmodule>*) (in /opt/root/v6-26-10/lib/libCling.so)
-   n2: 811520 0x82DF56A: clang::CompilerInstance::loadModule(clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >, clang::Module::NameVisibilityKind, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-    n1: 781312 0x8AD0615: clang::Sema::ActOnModuleImport(clang::SourceLocation, clang::SourceLocation, clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >) (in /opt/root/v6-26-10/lib/libCling.so)
-     n1: 781312 0x7DDF8D1: cling::Interpreter::loadModule(clang::Module*, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-      n1: 781312 0x7D0CED6: LoadModule(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-       n0: 781312 in 5 places, all below massif's threshold (1.00%)
-    n0: 30208 in 1 place, below massif's threshold (1.00%)
- n1: 719600 0x85FFC8A: clang::ASTReader::ReadASTBlock(clang::serialization::ModuleFile&, unsigned int) (in /opt/root/v6-26-10/lib/libCling.so)
-  n1: 719600 0x860AF68: clang::ASTReader::ReadAST(llvm::StringRef, clang::serialization::ModuleKind, clang::SourceLocation, unsigned int, llvm::SmallVectorImpl<clang::ASTReader::ImportedSubmodule>*) (in /opt/root/v6-26-10/lib/libCling.so)
-   n2: 719600 0x82DF56A: clang::CompilerInstance::loadModule(clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >, clang::Module::NameVisibilityKind, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-    n1: 719600 0x8AD0615: clang::Sema::ActOnModuleImport(clang::SourceLocation, clang::SourceLocation, clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >) (in /opt/root/v6-26-10/lib/libCling.so)
-     n1: 719600 0x7DDF8D1: cling::Interpreter::loadModule(clang::Module*, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-      n2: 719600 0x7D0CED6: LoadModule(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-       n1: 719600 0x7D37E97: RegisterCxxModules(cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-        n1: 719600 0x7D39E48: TCling::TCling(char const*, char const*, char const* const*) (in /opt/root/v6-26-10/lib/libCling.so)
-         n1: 719600 0x7D3BD70: CreateInterpreter (in /opt/root/v6-26-10/lib/libCling.so)
-          n1: 719600 0x6086E49: TROOT::InitInterpreter() (in /opt/root/v6-26-10/lib/libCore.so)
-           n1: 719600 0x60872FE: ROOT::Internal::GetROOT2() (in /opt/root/v6-26-10/lib/libCore.so)
-            n1: 719600 0x619CBB8: ROOT::TGenericClassInfo::GetClass() (in /opt/root/v6-26-10/lib/libCore.so)
-             n1: 719600 0x57282D5: TMatrixTSym<double>::Class() (in /opt/root/v6-26-10/lib/libMatrix.so)
-              n1: 719600 0x60ACBA1: TDirectory::CloneObject(TObject const*, bool) (in /opt/root/v6-26-10/lib/libCore.so)
-               n1: 719600 0x4B664FE: ParameterHandlerBase::SetCovMatrix(TMatrixTSym<double>*) (ParameterHandlerBase.cpp:376)
-                n1: 719600 0x4B68EAE: ParameterHandlerBase::Init(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) (ParameterHandlerBase.cpp:278)
-                 n1: 719600 0x4B69BC6: ParameterHandlerBase::ParameterHandlerBase(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerBase.cpp:43)
-                  n1: 719600 0x4BA302D: ParameterHandlerGeneric::ParameterHandlerGeneric(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerGeneric.cpp:8)
-                   n1: 719600 0x41FC65: make_unique<ParameterHandlerGeneric, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, int&, int&, int&> (unique_ptr.h:962)
-                    n1: 719600 0x41FC65: std::unique_ptr<ParameterHandlerGeneric, std::default_delete<ParameterHandlerGeneric> > MaCh3CovarianceFactory<ParameterHandlerGeneric>(manager*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (MaCh3Factory.h:80)
-                     n0: 719600 0x40C86C: main (MCMCTutorial.cpp:10)
-       n0: 0 in 1 place, below massif's threshold (1.00%)
-    n0: 0 in 1 place, below massif's threshold (1.00%)
-#-----------
-snapshot=16
-#-----------
-time=834336613
+time=837582099
 mem_heap_B=68757322
 mem_heap_extra_B=879982
 mem_stacks_B=0
@@ -1541,230 +1017,73 @@ n11: 68757322 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
        n0: 0 in 1 place, below massif's threshold (1.00%)
     n0: 0 in 1 place, below massif's threshold (1.00%)
 #-----------
+snapshot=16
+#-----------
+time=865466587
+mem_heap_B=68763976
+mem_heap_extra_B=885808
+mem_stacks_B=0
+heap_tree=empty
+#-----------
 snapshot=17
 #-----------
-time=868543646
-mem_heap_B=68804890
-mem_heap_extra_B=892742
+time=923310978
+mem_heap_B=70410022
+mem_heap_extra_B=962074
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=18
 #-----------
-time=939780340
-mem_heap_B=70438068
-mem_heap_extra_B=963596
+time=963250585
+mem_heap_B=71073829
+mem_heap_extra_B=973635
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=19
 #-----------
-time=987177700
-mem_heap_B=72207665
-mem_heap_extra_B=987463
+time=1035002710
+mem_heap_B=134694095
+mem_heap_extra_B=1093009
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=20
 #-----------
-time=1031758319
-mem_heap_B=134693735
-mem_heap_extra_B=1092865
+time=1076245648
+mem_heap_B=135901949
+mem_heap_extra_B=1576075
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=21
 #-----------
-time=1063713405
-mem_heap_B=135576269
-mem_heap_extra_B=1445803
+time=1113392262
+mem_heap_B=137053589
+mem_heap_extra_B=2036731
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=22
 #-----------
-time=1121040755
-mem_heap_B=137409309
-mem_heap_extra_B=2176171
+time=1170722876
+mem_heap_B=138763349
+mem_heap_extra_B=2720635
 mem_stacks_B=0
-heap_tree=detailed
-n12: 137409309 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
- n1: 30000000 0x5BE8136: TFileCacheRead::SetEnablePrefetchingImpl(bool) (in /opt/root/v6-26-10/lib/libRIO.so)
-  n1: 30000000 0x5BE85AD: TFileCacheRead::TFileCacheRead(TFile*, int, TObject*) (in /opt/root/v6-26-10/lib/libRIO.so)
-   n1: 30000000 0x4DADEAA: TTreeCache::TTreeCache(TTree*, int) (in /opt/root/v6-26-10/lib/libTree.so)
-    n1: 30000000 0x4DC4692: TTree::SetCacheSizeAux(bool, long long) (in /opt/root/v6-26-10/lib/libTree.so)
-     n1: 30000000 0x4DC496B: TTree::GetEntry(long long, int) (in /opt/root/v6-26-10/lib/libTree.so)
-      n1: 30000000 0x488696A: SampleHandlerTutorial::SetupExperimentMC() (SampleHandlerTutorial.cpp:194)
-       n1: 30000000 0x4A8558C: SampleHandlerFD::Initialise() (SampleHandlerFD.cpp:209)
-        n1: 30000000 0x4885C8A: SampleHandlerTutorial::SampleHandlerTutorial(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, ParameterHandlerGeneric*, std::shared_ptr<OscillationHandler> const&) (SampleHandlerTutorial.cpp:17)
-         n1: 30000000 0x4205E0: std::vector<SampleHandlerTutorial*, std::allocator<SampleHandlerTutorial*> > MaCh3SampleHandlerFactory<SampleHandlerTutorial>(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, ParameterHandlerGeneric*) (MaCh3Factory.h:131)
-          n0: 30000000 0x40C936: main (MCMCTutorial.cpp:14)
- n0: 20612971 in 3734 places, all below massif's threshold (1.00%)
- n1: 16000000 0x4888FB4: allocate (new_allocator.h:127)
-  n1: 16000000 0x4888FB4: allocate (alloc_traits.h:464)
-   n1: 16000000 0x4888FB4: _M_allocate (stl_vector.h:346)
-    n1: 16000000 0x4888FB4: _M_default_append (vector.tcc:635)
-     n1: 16000000 0x4888FB4: _M_default_append (vector.tcc:611)
-      n1: 16000000 0x4888FB4: std::vector<TutorialMCInfo, std::allocator<TutorialMCInfo> >::resize(unsigned long) (stl_vector.h:940)
-       n1: 16000000 0x4886411: SampleHandlerTutorial::SetupExperimentMC() (SampleHandlerTutorial.cpp:126)
-        n1: 16000000 0x4A8558C: SampleHandlerFD::Initialise() (SampleHandlerFD.cpp:209)
-         n1: 16000000 0x4885C8A: SampleHandlerTutorial::SampleHandlerTutorial(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, ParameterHandlerGeneric*, std::shared_ptr<OscillationHandler> const&) (SampleHandlerTutorial.cpp:17)
-          n1: 16000000 0x4205E0: std::vector<SampleHandlerTutorial*, std::allocator<SampleHandlerTutorial*> > MaCh3SampleHandlerFactory<SampleHandlerTutorial>(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, ParameterHandlerGeneric*) (MaCh3Factory.h:131)
-           n0: 16000000 0x40C936: main (MCMCTutorial.cpp:14)
- n1: 15090080 0x85FFC4B: clang::ASTReader::ReadASTBlock(clang::serialization::ModuleFile&, unsigned int) (in /opt/root/v6-26-10/lib/libCling.so)
-  n1: 15090080 0x860AF68: clang::ASTReader::ReadAST(llvm::StringRef, clang::serialization::ModuleKind, clang::SourceLocation, unsigned int, llvm::SmallVectorImpl<clang::ASTReader::ImportedSubmodule>*) (in /opt/root/v6-26-10/lib/libCling.so)
-   n2: 15090080 0x82DF56A: clang::CompilerInstance::loadModule(clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >, clang::Module::NameVisibilityKind, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-    n1: 15090080 0x8AD0615: clang::Sema::ActOnModuleImport(clang::SourceLocation, clang::SourceLocation, clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >) (in /opt/root/v6-26-10/lib/libCling.so)
-     n1: 15090080 0x7DDF8D1: cling::Interpreter::loadModule(clang::Module*, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-      n2: 15090080 0x7D0CED6: LoadModule(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-       n1: 15090080 0x7D37E97: RegisterCxxModules(cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-        n1: 15090080 0x7D39E48: TCling::TCling(char const*, char const*, char const* const*) (in /opt/root/v6-26-10/lib/libCling.so)
-         n1: 15090080 0x7D3BD70: CreateInterpreter (in /opt/root/v6-26-10/lib/libCling.so)
-          n1: 15090080 0x6086E49: TROOT::InitInterpreter() (in /opt/root/v6-26-10/lib/libCore.so)
-           n1: 15090080 0x60872FE: ROOT::Internal::GetROOT2() (in /opt/root/v6-26-10/lib/libCore.so)
-            n1: 15090080 0x619CBB8: ROOT::TGenericClassInfo::GetClass() (in /opt/root/v6-26-10/lib/libCore.so)
-             n1: 15090080 0x57282D5: TMatrixTSym<double>::Class() (in /opt/root/v6-26-10/lib/libMatrix.so)
-              n1: 15090080 0x60ACBA1: TDirectory::CloneObject(TObject const*, bool) (in /opt/root/v6-26-10/lib/libCore.so)
-               n1: 15090080 0x4B664FE: ParameterHandlerBase::SetCovMatrix(TMatrixTSym<double>*) (ParameterHandlerBase.cpp:376)
-                n1: 15090080 0x4B68EAE: ParameterHandlerBase::Init(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) (ParameterHandlerBase.cpp:278)
-                 n1: 15090080 0x4B69BC6: ParameterHandlerBase::ParameterHandlerBase(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerBase.cpp:43)
-                  n1: 15090080 0x4BA302D: ParameterHandlerGeneric::ParameterHandlerGeneric(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerGeneric.cpp:8)
-                   n1: 15090080 0x41FC65: make_unique<ParameterHandlerGeneric, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, int&, int&, int&> (unique_ptr.h:962)
-                    n1: 15090080 0x41FC65: std::unique_ptr<ParameterHandlerGeneric, std::default_delete<ParameterHandlerGeneric> > MaCh3CovarianceFactory<ParameterHandlerGeneric>(manager*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (MaCh3Factory.h:80)
-                     n0: 15090080 0x40C86C: main (MCMCTutorial.cpp:10)
-       n0: 0 in 1 place, below massif's threshold (1.00%)
-    n0: 0 in 1 place, below massif's threshold (1.00%)
- n1: 14400000 0x488BB75: allocate (new_allocator.h:127)
-  n1: 14400000 0x488BB75: allocate (alloc_traits.h:464)
-   n1: 14400000 0x488BB75: _M_allocate (stl_vector.h:346)
-    n1: 14400000 0x488BB75: _M_default_append (vector.tcc:635)
-     n1: 14400000 0x488BB75: _M_default_append (vector.tcc:611)
-      n1: 14400000 0x488BB75: std::vector<TutorialMCPlottingInfo, std::allocator<TutorialMCPlottingInfo> >::resize(unsigned long) (stl_vector.h:940)
-       n1: 14400000 0x4886420: SampleHandlerTutorial::SetupExperimentMC() (SampleHandlerTutorial.cpp:127)
-        n1: 14400000 0x4A8558C: SampleHandlerFD::Initialise() (SampleHandlerFD.cpp:209)
-         n1: 14400000 0x4885C8A: SampleHandlerTutorial::SampleHandlerTutorial(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, ParameterHandlerGeneric*, std::shared_ptr<OscillationHandler> const&) (SampleHandlerTutorial.cpp:17)
-          n1: 14400000 0x4205E0: std::vector<SampleHandlerTutorial*, std::allocator<SampleHandlerTutorial*> > MaCh3SampleHandlerFactory<SampleHandlerTutorial>(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, ParameterHandlerGeneric*) (MaCh3Factory.h:131)
-           n0: 14400000 0x40C936: main (MCMCTutorial.cpp:14)
- n1: 13700608 0x85FFDCA: clang::ASTReader::ReadASTBlock(clang::serialization::ModuleFile&, unsigned int) (in /opt/root/v6-26-10/lib/libCling.so)
-  n1: 13700608 0x860AF68: clang::ASTReader::ReadAST(llvm::StringRef, clang::serialization::ModuleKind, clang::SourceLocation, unsigned int, llvm::SmallVectorImpl<clang::ASTReader::ImportedSubmodule>*) (in /opt/root/v6-26-10/lib/libCling.so)
-   n2: 13700608 0x82DF56A: clang::CompilerInstance::loadModule(clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >, clang::Module::NameVisibilityKind, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-    n1: 13700608 0x8AD0615: clang::Sema::ActOnModuleImport(clang::SourceLocation, clang::SourceLocation, clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >) (in /opt/root/v6-26-10/lib/libCling.so)
-     n1: 13700608 0x7DDF8D1: cling::Interpreter::loadModule(clang::Module*, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-      n2: 13700608 0x7D0CED6: LoadModule(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-       n1: 13700608 0x7D37E97: RegisterCxxModules(cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-        n1: 13700608 0x7D39E48: TCling::TCling(char const*, char const*, char const* const*) (in /opt/root/v6-26-10/lib/libCling.so)
-         n1: 13700608 0x7D3BD70: CreateInterpreter (in /opt/root/v6-26-10/lib/libCling.so)
-          n1: 13700608 0x6086E49: TROOT::InitInterpreter() (in /opt/root/v6-26-10/lib/libCore.so)
-           n1: 13700608 0x60872FE: ROOT::Internal::GetROOT2() (in /opt/root/v6-26-10/lib/libCore.so)
-            n1: 13700608 0x619CBB8: ROOT::TGenericClassInfo::GetClass() (in /opt/root/v6-26-10/lib/libCore.so)
-             n1: 13700608 0x57282D5: TMatrixTSym<double>::Class() (in /opt/root/v6-26-10/lib/libMatrix.so)
-              n1: 13700608 0x60ACBA1: TDirectory::CloneObject(TObject const*, bool) (in /opt/root/v6-26-10/lib/libCore.so)
-               n1: 13700608 0x4B664FE: ParameterHandlerBase::SetCovMatrix(TMatrixTSym<double>*) (ParameterHandlerBase.cpp:376)
-                n1: 13700608 0x4B68EAE: ParameterHandlerBase::Init(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) (ParameterHandlerBase.cpp:278)
-                 n1: 13700608 0x4B69BC6: ParameterHandlerBase::ParameterHandlerBase(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerBase.cpp:43)
-                  n1: 13700608 0x4BA302D: ParameterHandlerGeneric::ParameterHandlerGeneric(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerGeneric.cpp:8)
-                   n1: 13700608 0x41FC65: make_unique<ParameterHandlerGeneric, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, int&, int&, int&> (unique_ptr.h:962)
-                    n1: 13700608 0x41FC65: std::unique_ptr<ParameterHandlerGeneric, std::default_delete<ParameterHandlerGeneric> > MaCh3CovarianceFactory<ParameterHandlerGeneric>(manager*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (MaCh3Factory.h:80)
-                     n0: 13700608 0x40C86C: main (MCMCTutorial.cpp:10)
-       n0: 0 in 1 place, below massif's threshold (1.00%)
-    n0: 0 in 1 place, below massif's threshold (1.00%)
- n2: 8839280 0xA8C0E8A: llvm::SmallVectorBase::grow_pod(void*, unsigned long, unsigned long) (in /opt/root/v6-26-10/lib/libCling.so)
-  n1: 8319528 0xA58CE9A: clang::SourceManager::AllocateLoadedSLocEntries(unsigned int, unsigned int) (in /opt/root/v6-26-10/lib/libCling.so)
-   n1: 8319528 0x85FDA76: clang::ASTReader::ReadASTBlock(clang::serialization::ModuleFile&, unsigned int) (in /opt/root/v6-26-10/lib/libCling.so)
-    n1: 8319528 0x860AF68: clang::ASTReader::ReadAST(llvm::StringRef, clang::serialization::ModuleKind, clang::SourceLocation, unsigned int, llvm::SmallVectorImpl<clang::ASTReader::ImportedSubmodule>*) (in /opt/root/v6-26-10/lib/libCling.so)
-     n2: 8319528 0x82DF56A: clang::CompilerInstance::loadModule(clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >, clang::Module::NameVisibilityKind, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-      n1: 8319528 0x8AD0615: clang::Sema::ActOnModuleImport(clang::SourceLocation, clang::SourceLocation, clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >) (in /opt/root/v6-26-10/lib/libCling.so)
-       n1: 8319528 0x7DDF8D1: cling::Interpreter::loadModule(clang::Module*, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-        n2: 8319528 0x7D0CED6: LoadModule(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-         n1: 8319528 0x7D37E97: RegisterCxxModules(cling::Interpreter&) (in /opt/root/v6-26-10/lib/libCling.so)
-          n1: 8319528 0x7D39E48: TCling::TCling(char const*, char const*, char const* const*) (in /opt/root/v6-26-10/lib/libCling.so)
-           n1: 8319528 0x7D3BD70: CreateInterpreter (in /opt/root/v6-26-10/lib/libCling.so)
-            n1: 8319528 0x6086E49: TROOT::InitInterpreter() (in /opt/root/v6-26-10/lib/libCore.so)
-             n1: 8319528 0x60872FE: ROOT::Internal::GetROOT2() (in /opt/root/v6-26-10/lib/libCore.so)
-              n1: 8319528 0x619CBB8: ROOT::TGenericClassInfo::GetClass() (in /opt/root/v6-26-10/lib/libCore.so)
-               n1: 8319528 0x57282D5: TMatrixTSym<double>::Class() (in /opt/root/v6-26-10/lib/libMatrix.so)
-                n1: 8319528 0x60ACBA1: TDirectory::CloneObject(TObject const*, bool) (in /opt/root/v6-26-10/lib/libCore.so)
-                 n1: 8319528 0x4B664FE: ParameterHandlerBase::SetCovMatrix(TMatrixTSym<double>*) (ParameterHandlerBase.cpp:376)
-                  n1: 8319528 0x4B68EAE: ParameterHandlerBase::Init(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) (ParameterHandlerBase.cpp:278)
-                   n1: 8319528 0x4B69BC6: ParameterHandlerBase::ParameterHandlerBase(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerBase.cpp:43)
-                    n1: 8319528 0x4BA302D: ParameterHandlerGeneric::ParameterHandlerGeneric(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerGeneric.cpp:8)
-                     n1: 8319528 0x41FC65: make_unique<ParameterHandlerGeneric, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, int&, int&, int&> (unique_ptr.h:962)
-                      n1: 8319528 0x41FC65: std::unique_ptr<ParameterHandlerGeneric, std::default_delete<ParameterHandlerGeneric> > MaCh3CovarianceFactory<ParameterHandlerGeneric>(manager*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (MaCh3Factory.h:80)
-                       n0: 8319528 0x40C86C: main (MCMCTutorial.cpp:10)
-         n0: 0 in 1 place, below massif's threshold (1.00%)
-      n0: 0 in 1 place, below massif's threshold (1.00%)
-  n0: 519752 in 127 places, all below massif's threshold (1.00%)
- n2: 6857242 0xA8B6E91: llvm::WritableMemoryBuffer::getNewUninitMemBuffer(unsigned long, llvm::Twine const&) (in /opt/root/v6-26-10/lib/libCling.so)
-  n2: 6661369 0xA8B7111: llvm::MemoryBuffer::getMemBufferCopy(llvm::StringRef, llvm::Twine const&) (in /opt/root/v6-26-10/lib/libCling.so)
-   n2: 6643140 0x85B9A90: clang::ASTReader::ReadSLocEntry(int)::{lambda(llvm::BitstreamCursor&, llvm::StringRef)#1}::operator()(llvm::BitstreamCursor&, llvm::StringRef) const (in /opt/root/v6-26-10/lib/libCling.so)
-    n1: 5258513 0x85CB2E4: clang::ASTReader::ReadSLocEntry(int) [clone .part.0] (in /opt/root/v6-26-10/lib/libCling.so)
-     n3: 5258513 0xA58D0C5: clang::SourceManager::loadSLocEntry(unsigned int, bool*) const (in /opt/root/v6-26-10/lib/libCling.so)
-      n2: 2901060 0xA58DDFC: clang::SourceManager::getFileIDLoaded(unsigned int) const [clone .part.0] (in /opt/root/v6-26-10/lib/libCling.so)
-       n2: 2106854 0xA58EC30: clang::SourceManager::getFileIDSlow(unsigned int) const (in /opt/root/v6-26-10/lib/libCling.so)
-        n1: 1561044 0x85D44C9: clang::ASTReader::ReadPragmaDiagnosticMappings(clang::DiagnosticsEngine&) (in /opt/root/v6-26-10/lib/libCling.so)
-         n1: 1561044 0x85FB258: clang::ASTReader::InitializeContext() (in /opt/root/v6-26-10/lib/libCling.so)
-          n1: 1561044 0x860B9C6: clang::ASTReader::ReadAST(llvm::StringRef, clang::serialization::ModuleKind, clang::SourceLocation, unsigned int, llvm::SmallVectorImpl<clang::ASTReader::ImportedSubmodule>*) (in /opt/root/v6-26-10/lib/libCling.so)
-           n1: 1561044 0x82DF56A: clang::CompilerInstance::loadModule(clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >, clang::Module::NameVisibilityKind, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-            n0: 1561044 in 2 places, all below massif's threshold (1.00%)
-        n0: 545810 in 3 places, all below massif's threshold (1.00%)
-       n0: 794206 in 3 places, all below massif's threshold (1.00%)
-      n1: 1773088 0xA58DAD8: clang::SourceManager::isOffsetInFileID(clang::FileID, unsigned int) const (in /opt/root/v6-26-10/lib/libCling.so)
-       n1: 1773088 0xA58DE28: clang::SourceManager::getFileIDLoaded(unsigned int) const [clone .part.0] (in /opt/root/v6-26-10/lib/libCling.so)
-        n0: 1773088 in 3 places, all below massif's threshold (1.00%)
-      n0: 584365 in 8 places, all below massif's threshold (1.00%)
-    n0: 1384627 in 1 place, below massif's threshold (1.00%)
-   n0: 18229 in 2 places, all below massif's threshold (1.00%)
-  n0: 195873 in 2 places, all below massif's threshold (1.00%)
- n1: 4768440 0xA4F9CFF: clang::ModuleMap::findOrCreateModule(llvm::StringRef, clang::Module*, bool, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-  n2: 4768440 0xA503193: clang::ModuleMapParser::parseModuleDecl() (in /opt/root/v6-26-10/lib/libCling.so)
-   n2: 4578840 0xA502C17: clang::ModuleMapParser::parseModuleDecl() (in /opt/root/v6-26-10/lib/libCling.so)
-    n1: 4546608 0xA50340C: clang::ModuleMapParser::parseModuleMapFile() (in /opt/root/v6-26-10/lib/libCling.so)
-     n1: 4546608 0xA5006C2: clang::ModuleMap::parseModuleMapFile(clang::FileEntry const*, bool, clang::DirectoryEntry const*, clang::FileID, unsigned int*, clang::SourceLocation) (in /opt/root/v6-26-10/lib/libCling.so)
-      n1: 4546608 0xA4CFEA3: clang::HeaderSearch::loadModuleMapFileImpl(clang::FileEntry const*, bool, clang::DirectoryEntry const*, clang::FileID, unsigned int*) (in /opt/root/v6-26-10/lib/libCling.so)
-       n1: 4546608 0xA4D0D17: clang::HeaderSearch::loadModuleMapFile(clang::FileEntry const*, bool, clang::FileID, unsigned int*, llvm::StringRef) (in /opt/root/v6-26-10/lib/libCling.so)
-        n1: 4546608 0x7DA733A: (anonymous namespace)::createCIImpl(std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer> >, cling::CompilerOptions const&, char const*, std::unique_ptr<clang::ASTConsumer, std::default_delete<clang::ASTConsumer> >, std::vector<std::shared_ptr<clang::ModuleFileExtension>, std::allocator<std::shared_ptr<clang::ModuleFileExtension> > > const&, bool, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-         n1: 4546608 0x7DA8B66: cling::CIFactory::createCI(llvm::StringRef, cling::InvocationOptions const&, char const*, std::unique_ptr<clang::ASTConsumer, std::default_delete<clang::ASTConsumer> >, std::vector<std::shared_ptr<clang::ModuleFileExtension>, std::allocator<std::shared_ptr<clang::ModuleFileExtension> > > const&) (in /opt/root/v6-26-10/lib/libCling.so)
-          n1: 4546608 0x7E654D4: cling::IncrementalParser::IncrementalParser(cling::Interpreter*, char const*, std::vector<std::shared_ptr<clang::ModuleFileExtension>, std::allocator<std::shared_ptr<clang::ModuleFileExtension> > > const&) (in /opt/root/v6-26-10/lib/libCling.so)
-           n1: 4546608 0x7DE51EA: cling::Interpreter::Interpreter(int, char const* const*, char const*, std::vector<std::shared_ptr<clang::ModuleFileExtension>, std::allocator<std::shared_ptr<clang::ModuleFileExtension> > > const&, bool, cling::Interpreter const*) (in /opt/root/v6-26-10/lib/libCling.so)
-            n1: 4546608 0x7D39D59: TCling::TCling(char const*, char const*, char const* const*) (in /opt/root/v6-26-10/lib/libCling.so)
-             n1: 4546608 0x7D3BD70: CreateInterpreter (in /opt/root/v6-26-10/lib/libCling.so)
-              n1: 4546608 0x6086E49: TROOT::InitInterpreter() (in /opt/root/v6-26-10/lib/libCore.so)
-               n1: 4546608 0x60872FE: ROOT::Internal::GetROOT2() (in /opt/root/v6-26-10/lib/libCore.so)
-                n1: 4546608 0x619CBB8: ROOT::TGenericClassInfo::GetClass() (in /opt/root/v6-26-10/lib/libCore.so)
-                 n1: 4546608 0x57282D5: TMatrixTSym<double>::Class() (in /opt/root/v6-26-10/lib/libMatrix.so)
-                  n1: 4546608 0x60ACBA1: TDirectory::CloneObject(TObject const*, bool) (in /opt/root/v6-26-10/lib/libCore.so)
-                   n1: 4546608 0x4B664FE: ParameterHandlerBase::SetCovMatrix(TMatrixTSym<double>*) (ParameterHandlerBase.cpp:376)
-                    n1: 4546608 0x4B68EAE: ParameterHandlerBase::Init(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) (ParameterHandlerBase.cpp:278)
-                     n1: 4546608 0x4B69BC6: ParameterHandlerBase::ParameterHandlerBase(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerBase.cpp:43)
-                      n1: 4546608 0x4BA302D: ParameterHandlerGeneric::ParameterHandlerGeneric(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, double, int, int) (ParameterHandlerGeneric.cpp:8)
-                       n1: 4546608 0x41FC65: make_unique<ParameterHandlerGeneric, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, int&, int&, int&> (unique_ptr.h:962)
-                        n1: 4546608 0x41FC65: std::unique_ptr<ParameterHandlerGeneric, std::default_delete<ParameterHandlerGeneric> > MaCh3CovarianceFactory<ParameterHandlerGeneric>(manager*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (MaCh3Factory.h:80)
-                         n0: 4546608 0x40C86C: main (MCMCTutorial.cpp:10)
-    n0: 32232 in 1 place, below massif's threshold (1.00%)
-   n0: 189600 in 1 place, below massif's threshold (1.00%)
- n1: 2872080 0x488456E: allocate (new_allocator.h:127)
-  n1: 2872080 0x488456E: allocate (alloc_traits.h:464)
-   n1: 2872080 0x488456E: _M_allocate (stl_vector.h:346)
-    n1: 2872080 0x488456E: _M_default_append (vector.tcc:635)
-     n1: 2872080 0x488456E: _M_default_append (vector.tcc:611)
-      n1: 2872080 0x488456E: std::vector<double, std::allocator<double> >::resize(unsigned long) [clone .constprop.0] (stl_vector.h:940)
-       n0: 2872080 in 3 places, all below massif's threshold (1.00%)
- n1: 2535424 0xA2B7D29: clang::Decl::operator new(unsigned long, clang::ASTContext const&, unsigned int, unsigned long) (in /opt/root/v6-26-10/lib/libCling.so)
-  n0: 2535424 in 21 places, all below massif's threshold (1.00%)
- n1: 1733184 0xA10492F: llvm::BitstreamCursor::ReadAbbrevRecord() (in /opt/root/v6-26-10/lib/libCling.so)
-  n0: 1733184 in 6 places, all below massif's threshold (1.00%)
+heap_tree=empty
 #-----------
 snapshot=23
 #-----------
-time=1193596360
-mem_heap_B=139525949
-mem_heap_extra_B=3025675
+time=1215322438
+mem_heap_B=140177549
+mem_heap_extra_B=3286315
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=24
 #-----------
-time=1247562675
+time=1250695248
 mem_heap_B=141238749
 mem_heap_extra_B=3707947
 mem_stacks_B=0
@@ -1951,23 +1270,164 @@ n12: 141238749 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
 #-----------
 snapshot=25
 #-----------
-time=1310793314
-mem_heap_B=143153469
-mem_heap_extra_B=4473835
+time=1328839649
+mem_heap_B=143550749
+mem_heap_extra_B=4635595
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=26
+#-----------
+time=1392085617
+mem_heap_B=145465229
+mem_heap_extra_B=5401387
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=27
+#-----------
+time=1421836989
+mem_heap_B=146356949
+mem_heap_extra_B=5758075
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=28
+#-----------
+time=1485083507
+mem_heap_B=148271309
+mem_heap_extra_B=6523819
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=29
+#-----------
+time=1548349123
+mem_heap_B=150185189
+mem_heap_extra_B=7289371
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=30
+#-----------
+time=1581888105
+mem_heap_B=151209389
+mem_heap_extra_B=7699051
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=31
+#-----------
+time=1626515799
+mem_heap_B=152621069
+mem_heap_extra_B=8263723
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=32
+#-----------
+time=1689815544
+mem_heap_B=154535909
+mem_heap_extra_B=9029659
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=33
+#-----------
+time=1753124920
+mem_heap_B=156451469
+mem_heap_extra_B=9795883
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=34
+#-----------
+time=1801528426
+mem_heap_B=157843949
+mem_heap_extra_B=10352875
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=35
+#-----------
+time=1843461485
+mem_heap_B=161736848
+mem_heap_extra_B=10644376
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=36
+#-----------
+time=2186522629
+mem_heap_B=162269795
+mem_heap_extra_B=10679309
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=37
+#-----------
+time=2260898197
+mem_heap_B=162278132
+mem_heap_extra_B=10679924
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=38
+#-----------
+time=2320586880
+mem_heap_B=163273752
+mem_heap_extra_B=10731640
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=39
+#-----------
+time=2380091301
+mem_heap_B=163321124
+mem_heap_extra_B=10901580
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=40
+#-----------
+time=2454473789
+mem_heap_B=163483460
+mem_heap_extra_B=11226252
 mem_stacks_B=0
 heap_tree=detailed
-n12: 143153469 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
- n1: 30000000 0x5BE8136: TFileCacheRead::SetEnablePrefetchingImpl(bool) (in /opt/root/v6-26-10/lib/libRIO.so)
-  n1: 30000000 0x5BE85AD: TFileCacheRead::TFileCacheRead(TFile*, int, TObject*) (in /opt/root/v6-26-10/lib/libRIO.so)
-   n1: 30000000 0x4DADEAA: TTreeCache::TTreeCache(TTree*, int) (in /opt/root/v6-26-10/lib/libTree.so)
-    n1: 30000000 0x4DC4692: TTree::SetCacheSizeAux(bool, long long) (in /opt/root/v6-26-10/lib/libTree.so)
-     n1: 30000000 0x4DC496B: TTree::GetEntry(long long, int) (in /opt/root/v6-26-10/lib/libTree.so)
-      n1: 30000000 0x488696A: SampleHandlerTutorial::SetupExperimentMC() (SampleHandlerTutorial.cpp:194)
-       n1: 30000000 0x4A8558C: SampleHandlerFD::Initialise() (SampleHandlerFD.cpp:209)
-        n1: 30000000 0x4885C8A: SampleHandlerTutorial::SampleHandlerTutorial(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, ParameterHandlerGeneric*, std::shared_ptr<OscillationHandler> const&) (SampleHandlerTutorial.cpp:17)
-         n1: 30000000 0x4205E0: std::vector<SampleHandlerTutorial*, std::allocator<SampleHandlerTutorial*> > MaCh3SampleHandlerFactory<SampleHandlerTutorial>(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, ParameterHandlerGeneric*) (MaCh3Factory.h:131)
-          n0: 30000000 0x40C936: main (MCMCTutorial.cpp:14)
- n0: 20612971 in 3734 places, all below massif's threshold (1.00%)
+n11: 163483460 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 33600000 0x4A96C67: allocate (new_allocator.h:127)
+  n1: 33600000 0x4A96C67: allocate (alloc_traits.h:464)
+   n1: 33600000 0x4A96C67: _M_allocate (stl_vector.h:346)
+    n1: 33600000 0x4A96C67: _M_default_append (vector.tcc:635)
+     n1: 33600000 0x4A96C67: _M_default_append (vector.tcc:611)
+      n1: 33600000 0x4A96C67: std::vector<FarDetectorCoreInfo, std::allocator<FarDetectorCoreInfo> >::resize(unsigned long) (stl_vector.h:940)
+       n1: 33600000 0x4A85598: SampleHandlerFD::Initialise() (SampleHandlerFD.cpp:211)
+        n1: 33600000 0x4885C8A: SampleHandlerTutorial::SampleHandlerTutorial(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, ParameterHandlerGeneric*, std::shared_ptr<OscillationHandler> const&) (SampleHandlerTutorial.cpp:17)
+         n1: 33600000 0x4205E0: std::vector<SampleHandlerTutorial*, std::allocator<SampleHandlerTutorial*> > MaCh3SampleHandlerFactory<SampleHandlerTutorial>(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, ParameterHandlerGeneric*) (MaCh3Factory.h:131)
+          n0: 33600000 0x40C936: main (MCMCTutorial.cpp:14)
+ n1: 24000000 0x488456E: allocate (new_allocator.h:127)
+  n1: 24000000 0x488456E: allocate (alloc_traits.h:464)
+   n1: 24000000 0x488456E: _M_allocate (stl_vector.h:346)
+    n1: 24000000 0x488456E: _M_default_append (vector.tcc:635)
+     n1: 24000000 0x488456E: _M_default_append (vector.tcc:611)
+      n3: 24000000 0x488456E: std::vector<double, std::allocator<double> >::resize(unsigned long) [clone .constprop.0] (stl_vector.h:940)
+       n1: 8000000 0x4886AB3: SampleHandlerTutorial::SetupExperimentMC() (SampleHandlerTutorial.cpp:210)
+        n1: 8000000 0x4A8558C: SampleHandlerFD::Initialise() (SampleHandlerFD.cpp:209)
+         n1: 8000000 0x4885C8A: SampleHandlerTutorial::SampleHandlerTutorial(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, ParameterHandlerGeneric*, std::shared_ptr<OscillationHandler> const&) (SampleHandlerTutorial.cpp:17)
+          n1: 8000000 0x4205E0: std::vector<SampleHandlerTutorial*, std::allocator<SampleHandlerTutorial*> > MaCh3SampleHandlerFactory<SampleHandlerTutorial>(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, ParameterHandlerGeneric*) (MaCh3Factory.h:131)
+           n0: 8000000 0x40C936: main (MCMCTutorial.cpp:14)
+       n1: 8000000 0x4886AC6: SampleHandlerTutorial::SetupExperimentMC() (SampleHandlerTutorial.cpp:211)
+        n1: 8000000 0x4A8558C: SampleHandlerFD::Initialise() (SampleHandlerFD.cpp:209)
+         n1: 8000000 0x4885C8A: SampleHandlerTutorial::SampleHandlerTutorial(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, ParameterHandlerGeneric*, std::shared_ptr<OscillationHandler> const&) (SampleHandlerTutorial.cpp:17)
+          n1: 8000000 0x4205E0: std::vector<SampleHandlerTutorial*, std::allocator<SampleHandlerTutorial*> > MaCh3SampleHandlerFactory<SampleHandlerTutorial>(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, ParameterHandlerGeneric*) (MaCh3Factory.h:131)
+           n0: 8000000 0x40C936: main (MCMCTutorial.cpp:14)
+       n1: 8000000 0x4886AD9: SampleHandlerTutorial::SetupExperimentMC() (SampleHandlerTutorial.cpp:212)
+        n1: 8000000 0x4A8558C: SampleHandlerFD::Initialise() (SampleHandlerFD.cpp:209)
+         n1: 8000000 0x4885C8A: SampleHandlerTutorial::SampleHandlerTutorial(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, ParameterHandlerGeneric*, std::shared_ptr<OscillationHandler> const&) (SampleHandlerTutorial.cpp:17)
+          n1: 8000000 0x4205E0: std::vector<SampleHandlerTutorial*, std::allocator<SampleHandlerTutorial*> > MaCh3SampleHandlerFactory<SampleHandlerTutorial>(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, ParameterHandlerGeneric*) (MaCh3Factory.h:131)
+           n0: 8000000 0x40C936: main (MCMCTutorial.cpp:14)
+ n0: 23166442 in 3830 places, all below massif's threshold (1.00%)
  n1: 16000000 0x4888FB4: allocate (new_allocator.h:127)
   n1: 16000000 0x4888FB4: allocate (alloc_traits.h:464)
    n1: 16000000 0x4888FB4: _M_allocate (stl_vector.h:346)
@@ -2062,46 +1522,20 @@ n12: 143153469 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
          n0: 0 in 1 place, below massif's threshold (1.00%)
       n0: 0 in 1 place, below massif's threshold (1.00%)
   n0: 519752 in 127 places, all below massif's threshold (1.00%)
- n1: 8616240 0x488456E: allocate (new_allocator.h:127)
-  n1: 8616240 0x488456E: allocate (alloc_traits.h:464)
-   n1: 8616240 0x488456E: _M_allocate (stl_vector.h:346)
-    n1: 8616240 0x488456E: _M_default_append (vector.tcc:635)
-     n1: 8616240 0x488456E: _M_default_append (vector.tcc:611)
-      n3: 8616240 0x488456E: std::vector<double, std::allocator<double> >::resize(unsigned long) [clone .constprop.0] (stl_vector.h:940)
-       n1: 2872080 0x4886AB3: SampleHandlerTutorial::SetupExperimentMC() (SampleHandlerTutorial.cpp:210)
-        n1: 2872080 0x4A8558C: SampleHandlerFD::Initialise() (SampleHandlerFD.cpp:209)
-         n1: 2872080 0x4885C8A: SampleHandlerTutorial::SampleHandlerTutorial(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, ParameterHandlerGeneric*, std::shared_ptr<OscillationHandler> const&) (SampleHandlerTutorial.cpp:17)
-          n1: 2872080 0x4205E0: std::vector<SampleHandlerTutorial*, std::allocator<SampleHandlerTutorial*> > MaCh3SampleHandlerFactory<SampleHandlerTutorial>(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, ParameterHandlerGeneric*) (MaCh3Factory.h:131)
-           n0: 2872080 0x40C936: main (MCMCTutorial.cpp:14)
-       n1: 2872080 0x4886AC6: SampleHandlerTutorial::SetupExperimentMC() (SampleHandlerTutorial.cpp:211)
-        n1: 2872080 0x4A8558C: SampleHandlerFD::Initialise() (SampleHandlerFD.cpp:209)
-         n1: 2872080 0x4885C8A: SampleHandlerTutorial::SampleHandlerTutorial(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, ParameterHandlerGeneric*, std::shared_ptr<OscillationHandler> const&) (SampleHandlerTutorial.cpp:17)
-          n1: 2872080 0x4205E0: std::vector<SampleHandlerTutorial*, std::allocator<SampleHandlerTutorial*> > MaCh3SampleHandlerFactory<SampleHandlerTutorial>(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, ParameterHandlerGeneric*) (MaCh3Factory.h:131)
-           n0: 2872080 0x40C936: main (MCMCTutorial.cpp:14)
-       n1: 2872080 0x4886AD9: SampleHandlerTutorial::SetupExperimentMC() (SampleHandlerTutorial.cpp:212)
-        n1: 2872080 0x4A8558C: SampleHandlerFD::Initialise() (SampleHandlerFD.cpp:209)
-         n1: 2872080 0x4885C8A: SampleHandlerTutorial::SampleHandlerTutorial(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, ParameterHandlerGeneric*, std::shared_ptr<OscillationHandler> const&) (SampleHandlerTutorial.cpp:17)
-          n1: 2872080 0x4205E0: std::vector<SampleHandlerTutorial*, std::allocator<SampleHandlerTutorial*> > MaCh3SampleHandlerFactory<SampleHandlerTutorial>(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, ParameterHandlerGeneric*) (MaCh3Factory.h:131)
-           n0: 2872080 0x40C936: main (MCMCTutorial.cpp:14)
- n2: 6857242 0xA8B6E91: llvm::WritableMemoryBuffer::getNewUninitMemBuffer(unsigned long, llvm::Twine const&) (in /opt/root/v6-26-10/lib/libCling.so)
-  n2: 6661369 0xA8B7111: llvm::MemoryBuffer::getMemBufferCopy(llvm::StringRef, llvm::Twine const&) (in /opt/root/v6-26-10/lib/libCling.so)
-   n2: 6643140 0x85B9A90: clang::ASTReader::ReadSLocEntry(int)::{lambda(llvm::BitstreamCursor&, llvm::StringRef)#1}::operator()(llvm::BitstreamCursor&, llvm::StringRef) const (in /opt/root/v6-26-10/lib/libCling.so)
-    n1: 5258513 0x85CB2E4: clang::ASTReader::ReadSLocEntry(int) [clone .part.0] (in /opt/root/v6-26-10/lib/libCling.so)
-     n3: 5258513 0xA58D0C5: clang::SourceManager::loadSLocEntry(unsigned int, bool*) const (in /opt/root/v6-26-10/lib/libCling.so)
-      n2: 2901060 0xA58DDFC: clang::SourceManager::getFileIDLoaded(unsigned int) const [clone .part.0] (in /opt/root/v6-26-10/lib/libCling.so)
-       n2: 2106854 0xA58EC30: clang::SourceManager::getFileIDSlow(unsigned int) const (in /opt/root/v6-26-10/lib/libCling.so)
-        n1: 1561044 0x85D44C9: clang::ASTReader::ReadPragmaDiagnosticMappings(clang::DiagnosticsEngine&) (in /opt/root/v6-26-10/lib/libCling.so)
-         n1: 1561044 0x85FB258: clang::ASTReader::InitializeContext() (in /opt/root/v6-26-10/lib/libCling.so)
-          n1: 1561044 0x860B9C6: clang::ASTReader::ReadAST(llvm::StringRef, clang::serialization::ModuleKind, clang::SourceLocation, unsigned int, llvm::SmallVectorImpl<clang::ASTReader::ImportedSubmodule>*) (in /opt/root/v6-26-10/lib/libCling.so)
-           n1: 1561044 0x82DF56A: clang::CompilerInstance::loadModule(clang::SourceLocation, llvm::ArrayRef<std::pair<clang::IdentifierInfo*, clang::SourceLocation> >, clang::Module::NameVisibilityKind, bool) (in /opt/root/v6-26-10/lib/libCling.so)
-            n0: 1561044 in 2 places, all below massif's threshold (1.00%)
-        n0: 545810 in 3 places, all below massif's threshold (1.00%)
+ n2: 6957202 0xA8B6E91: llvm::WritableMemoryBuffer::getNewUninitMemBuffer(unsigned long, llvm::Twine const&) (in /opt/root/v6-26-10/lib/libCling.so)
+  n2: 6761329 0xA8B7111: llvm::MemoryBuffer::getMemBufferCopy(llvm::StringRef, llvm::Twine const&) (in /opt/root/v6-26-10/lib/libCling.so)
+   n2: 6743100 0x85B9A90: clang::ASTReader::ReadSLocEntry(int)::{lambda(llvm::BitstreamCursor&, llvm::StringRef)#1}::operator()(llvm::BitstreamCursor&, llvm::StringRef) const (in /opt/root/v6-26-10/lib/libCling.so)
+    n1: 5352126 0x85CB2E4: clang::ASTReader::ReadSLocEntry(int) [clone .part.0] (in /opt/root/v6-26-10/lib/libCling.so)
+     n3: 5352126 0xA58D0C5: clang::SourceManager::loadSLocEntry(unsigned int, bool*) const (in /opt/root/v6-26-10/lib/libCling.so)
+      n2: 2959064 0xA58DDFC: clang::SourceManager::getFileIDLoaded(unsigned int) const [clone .part.0] (in /opt/root/v6-26-10/lib/libCling.so)
+       n1: 2164858 0xA58EC30: clang::SourceManager::getFileIDSlow(unsigned int) const (in /opt/root/v6-26-10/lib/libCling.so)
+        n0: 2164858 in 4 places, all below massif's threshold (1.00%)
        n0: 794206 in 3 places, all below massif's threshold (1.00%)
-      n1: 1773088 0xA58DAD8: clang::SourceManager::isOffsetInFileID(clang::FileID, unsigned int) const (in /opt/root/v6-26-10/lib/libCling.so)
-       n1: 1773088 0xA58DE28: clang::SourceManager::getFileIDLoaded(unsigned int) const [clone .part.0] (in /opt/root/v6-26-10/lib/libCling.so)
-        n0: 1773088 in 3 places, all below massif's threshold (1.00%)
+      n1: 1808697 0xA58DAD8: clang::SourceManager::isOffsetInFileID(clang::FileID, unsigned int) const (in /opt/root/v6-26-10/lib/libCling.so)
+       n1: 1808697 0xA58DE28: clang::SourceManager::getFileIDLoaded(unsigned int) const [clone .part.0] (in /opt/root/v6-26-10/lib/libCling.so)
+        n0: 1808697 in 3 places, all below massif's threshold (1.00%)
       n0: 584365 in 8 places, all below massif's threshold (1.00%)
-    n0: 1384627 in 1 place, below massif's threshold (1.00%)
+    n0: 1390974 in 1 place, below massif's threshold (1.00%)
    n0: 18229 in 2 places, all below massif's threshold (1.00%)
   n0: 195873 in 2 places, all below massif's threshold (1.00%)
  n1: 4768440 0xA4F9CFF: clang::ModuleMap::findOrCreateModule(llvm::StringRef, clang::Module*, bool, bool) (in /opt/root/v6-26-10/lib/libCling.so)
@@ -2131,182 +1565,60 @@ n12: 143153469 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
                          n0: 4546608 0x40C86C: main (MCMCTutorial.cpp:10)
     n0: 32232 in 1 place, below massif's threshold (1.00%)
    n0: 189600 in 1 place, below massif's threshold (1.00%)
- n1: 2535424 0xA2B7D29: clang::Decl::operator new(unsigned long, clang::ASTContext const&, unsigned int, unsigned long) (in /opt/root/v6-26-10/lib/libCling.so)
-  n0: 2535424 in 21 places, all below massif's threshold (1.00%)
- n1: 1733184 0xA10492F: llvm::BitstreamCursor::ReadAbbrevRecord() (in /opt/root/v6-26-10/lib/libCling.so)
-  n0: 1733184 in 6 places, all below massif's threshold (1.00%)
-#-----------
-snapshot=26
-#-----------
-time=1354858629
-mem_heap_B=144421469
-mem_heap_extra_B=4983883
-mem_stacks_B=0
-heap_tree=empty
-#-----------
-snapshot=27
-#-----------
-time=1418150830
-mem_heap_B=146337869
-mem_heap_extra_B=5750443
-mem_stacks_B=0
-heap_tree=empty
-#-----------
-snapshot=28
-#-----------
-time=1466707573
-mem_heap_B=147887549
-mem_heap_extra_B=6370315
-mem_stacks_B=0
-heap_tree=empty
-#-----------
-snapshot=29
-#-----------
-time=1515304694
-mem_heap_B=149287229
-mem_heap_extra_B=6930187
-mem_stacks_B=0
-heap_tree=empty
-#-----------
-snapshot=30
-#-----------
-time=1578605241
-mem_heap_B=151202469
-mem_heap_extra_B=7696283
-mem_stacks_B=0
-heap_tree=empty
-#-----------
-snapshot=31
-#-----------
-time=1607982661
-mem_heap_B=152080589
-mem_heap_extra_B=8047531
-mem_stacks_B=0
-heap_tree=empty
-#-----------
-snapshot=32
-#-----------
-time=1671281531
-mem_heap_B=153995309
-mem_heap_extra_B=8813419
-mem_stacks_B=0
-heap_tree=empty
-#-----------
-snapshot=33
-#-----------
-time=1719881723
-mem_heap_B=155547389
-mem_heap_extra_B=9434251
-mem_stacks_B=0
-heap_tree=empty
-#-----------
-snapshot=34
-#-----------
-time=1783166736
-mem_heap_B=157461709
-mem_heap_extra_B=10199979
-mem_stacks_B=0
-heap_tree=empty
-#-----------
-snapshot=35
-#-----------
-time=1840159031
-mem_heap_B=161727006
-mem_heap_extra_B=10643378
-mem_stacks_B=0
-heap_tree=empty
-#-----------
-snapshot=36
-#-----------
-time=2183408519
-mem_heap_B=162269795
-mem_heap_extra_B=10679309
-mem_stacks_B=0
-heap_tree=empty
-#-----------
-snapshot=37
-#-----------
-time=2256843456
-mem_heap_B=162278151
-mem_heap_extra_B=10679961
-mem_stacks_B=0
-heap_tree=empty
-#-----------
-snapshot=38
-#-----------
-time=2317286231
-mem_heap_B=163291940
-mem_heap_extra_B=10730564
-mem_stacks_B=0
-heap_tree=empty
-#-----------
-snapshot=39
-#-----------
-time=2376038457
-mem_heap_B=163319084
-mem_heap_extra_B=10897500
-mem_stacks_B=0
-heap_tree=empty
-#-----------
-snapshot=40
-#-----------
-time=2420100118
-mem_heap_B=163415164
-mem_heap_extra_B=11089660
-mem_stacks_B=0
-heap_tree=empty
+ n1: 2961408 0xA2B7D29: clang::Decl::operator new(unsigned long, clang::ASTContext const&, unsigned int, unsigned long) (in /opt/root/v6-26-10/lib/libCling.so)
+  n0: 2961408 in 21 places, all below massif's threshold (1.00%)
 #-----------
 snapshot=41
 #-----------
-time=2464162802
-mem_heap_B=163511660
-mem_heap_extra_B=11282652
+time=2513975934
+mem_heap_B=163613728
+mem_heap_extra_B=11486776
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=42
 #-----------
-time=2537601345
-mem_heap_B=163672236
-mem_heap_extra_B=11603804
+time=2589469781
+mem_heap_B=163778004
+mem_heap_extra_B=11815356
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=43
 #-----------
-time=2585789220
-mem_heap_B=163776920
-mem_heap_extra_B=11813176
+time=2648971789
+mem_heap_B=163898688
+mem_heap_extra_B=12056712
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=44
 #-----------
-time=2615165518
-mem_heap_B=163836640
-mem_heap_extra_B=11932584
+time=2678724965
+mem_heap_B=163958484
+mem_heap_extra_B=12176316
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=45
 #-----------
-time=2673916120
-mem_heap_B=163955124
-mem_heap_extra_B=12169596
+time=2738228086
+mem_heap_B=164076300
+mem_heap_extra_B=12411948
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=46
 #-----------
-time=2747353979
-mem_heap_B=164100424
-mem_heap_extra_B=12460120
+time=2767980838
+mem_heap_B=164134980
+mem_heap_extra_B=12529308
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=47
 #-----------
-time=2820905280
+time=2824019390
 mem_heap_B=169033460
 mem_heap_extra_B=12743276
 mem_stacks_B=0
@@ -2494,31 +1806,31 @@ n12: 169033460 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
 #-----------
 snapshot=48
 #-----------
-time=2879697518
-mem_heap_B=169049388
-mem_heap_extra_B=12821396
+time=2883617965
+mem_heap_B=169049600
+mem_heap_extra_B=12822456
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=49
 #-----------
-time=2938454205
-mem_heap_B=169290532
-mem_heap_extra_B=13256828
+time=2928264624
+mem_heap_B=169143480
+mem_heap_extra_B=12962736
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=50
 #-----------
-time=2967830512
-mem_heap_B=169615288
-mem_heap_extra_B=13906352
+time=2956149359
+mem_heap_B=169451704
+mem_heap_extra_B=13579184
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=51
 #-----------
-time=2970027181
+time=2973141291
 mem_heap_B=169639576
 mem_heap_extra_B=13954928
 mem_stacks_B=0
@@ -2706,15 +2018,15 @@ n12: 169639576 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
 #-----------
 snapshot=52
 #-----------
-time=2999403759
-mem_heap_B=169964376
-mem_heap_extra_B=14604528
+time=3001025847
+mem_heap_B=169947880
+mem_heap_extra_B=14571536
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=53
 #-----------
-time=3025379627
+time=3028493737
 mem_heap_B=170251560
 mem_heap_extra_B=15178896
 mem_stacks_B=0
@@ -2902,23 +2214,23 @@ n12: 170251560 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
 #-----------
 snapshot=54
 #-----------
-time=3054755982
-mem_heap_B=170576380
-mem_heap_extra_B=15828524
+time=3056378232
+mem_heap_B=170559884
+mem_heap_extra_B=15795532
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=55
 #-----------
-time=3084132398
-mem_heap_B=172790324
-mem_heap_extra_B=17090068
+time=3084262748
+mem_heap_B=172476244
+mem_heap_extra_B=16933028
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=56
 #-----------
-time=3094483342
+time=3097597452
 mem_heap_B=173879428
 mem_heap_extra_B=17634620
 mem_stacks_B=0
@@ -3118,7 +2430,7 @@ n13: 173879428 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
 #-----------
 snapshot=57
 #-----------
-time=3133048943
+time=3135753538
 mem_heap_B=173879908
 mem_heap_extra_B=17634772
 mem_stacks_B=0
@@ -3126,7 +2438,7 @@ heap_tree=empty
 #-----------
 snapshot=58
 #-----------
-time=3163168344
+time=3164389367
 mem_heap_B=173880340
 mem_heap_extra_B=17634868
 mem_stacks_B=0
@@ -3134,23 +2446,23 @@ heap_tree=empty
 #-----------
 snapshot=59
 #-----------
-time=3192544783
-mem_heap_B=174162366
-mem_heap_extra_B=17656218
+time=3192277243
+mem_heap_B=174162294
+mem_heap_extra_B=17656194
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=60
 #-----------
-time=3221924353
-mem_heap_B=174652087
-mem_heap_extra_B=17658065
+time=3220164868
+mem_heap_B=174508783
+mem_heap_extra_B=17657697
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=61
 #-----------
-time=3245569963
+time=3246422735
 mem_heap_B=175758265
 mem_heap_extra_B=17677775
 mem_stacks_B=0
@@ -3350,84 +2662,84 @@ n13: 175758265 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
 #-----------
 snapshot=62
 #-----------
-time=3274950634
-mem_heap_B=176483890
-mem_heap_extra_B=17685118
+time=3274307313
+mem_heap_B=176485305
+mem_heap_extra_B=17684383
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=63
 #-----------
-time=3304326956
-mem_heap_B=173874993
-mem_heap_extra_B=16555735
+time=3302191804
+mem_heap_B=175868033
+mem_heap_extra_B=17352951
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=64
 #-----------
-time=3333703258
-mem_heap_B=154290793
-mem_heap_extra_B=8722055
+time=3330076324
+mem_heap_B=157278353
+mem_heap_extra_B=9917079
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=65
 #-----------
-time=3363168674
-mem_heap_B=138351761
-mem_heap_extra_B=8104991
-mem_stacks_B=0
-heap_tree=empty
-#-----------
-snapshot=66
-#-----------
-time=3393014671
-mem_heap_B=138352337
-mem_heap_extra_B=8105183
-mem_stacks_B=0
-heap_tree=empty
-#-----------
-snapshot=67
-#-----------
-time=3422557990
-mem_heap_B=138352769
-mem_heap_extra_B=8105327
-mem_stacks_B=0
-heap_tree=empty
-#-----------
-snapshot=68
-#-----------
-time=3463358102
+time=3371339078
 mem_heap_B=138352049
 mem_heap_extra_B=8105087
 mem_stacks_B=0
 heap_tree=empty
 #-----------
-snapshot=69
+snapshot=66
 #-----------
-time=3493757224
+time=3405110534
 mem_heap_B=138352625
 mem_heap_extra_B=8105279
 mem_stacks_B=0
 heap_tree=empty
 #-----------
+snapshot=67
+#-----------
+time=3446145743
+mem_heap_B=138351825
+mem_heap_extra_B=8104975
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=68
+#-----------
+time=3482524149
+mem_heap_B=138352337
+mem_heap_extra_B=8105183
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=69
+#-----------
+time=3513356581
+mem_heap_B=138352769
+mem_heap_extra_B=8105327
+mem_stacks_B=0
+heap_tree=empty
+#-----------
 snapshot=70
 #-----------
-time=3523134389
-mem_heap_B=140190438
-mem_heap_extra_B=8113458
+time=3549123528
+mem_heap_B=140165226
+mem_heap_extra_B=8113014
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=71
 #-----------
-time=3553203555
-mem_heap_B=140165162
-mem_heap_extra_B=8113014
+time=3587985802
+mem_heap_B=140165738
+mem_heap_extra_B=8113158
 mem_stacks_B=0
 heap_tree=detailed
-n14: 140165162 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+n14: 140165738 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
  n1: 33600000 0x4A96C67: allocate (new_allocator.h:127)
   n1: 33600000 0x4A96C67: allocate (alloc_traits.h:464)
    n1: 33600000 0x4A96C67: _M_allocate (stl_vector.h:346)
@@ -3438,7 +2750,7 @@ n14: 140165162 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
         n1: 33600000 0x4885C8A: SampleHandlerTutorial::SampleHandlerTutorial(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, ParameterHandlerGeneric*, std::shared_ptr<OscillationHandler> const&) (SampleHandlerTutorial.cpp:17)
          n1: 33600000 0x4205E0: std::vector<SampleHandlerTutorial*, std::allocator<SampleHandlerTutorial*> > MaCh3SampleHandlerFactory<SampleHandlerTutorial>(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, ParameterHandlerGeneric*) (MaCh3Factory.h:131)
           n0: 33600000 0x40C936: main (MCMCTutorial.cpp:14)
- n0: 23185076 in 3882 places, all below massif's threshold (1.00%)
+ n0: 23185652 in 3882 places, all below massif's threshold (1.00%)
  n1: 16000000 0x4888FB4: allocate (new_allocator.h:127)
   n1: 16000000 0x4888FB4: allocate (alloc_traits.h:464)
    n1: 16000000 0x4888FB4: _M_allocate (stl_vector.h:346)
@@ -3614,71 +2926,71 @@ n14: 140165162 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
 #-----------
 snapshot=72
 #-----------
-time=3583645224
-mem_heap_B=140165738
-mem_heap_extra_B=8113158
-mem_stacks_B=0
-heap_tree=empty
-#-----------
-snapshot=73
-#-----------
-time=3613926771
+time=3618048125
 mem_heap_B=140166170
 mem_heap_extra_B=8113286
 mem_stacks_B=0
 heap_tree=empty
 #-----------
+snapshot=73
+#-----------
+time=3649994624
+mem_heap_B=140165162
+mem_heap_extra_B=8113014
+mem_stacks_B=0
+heap_tree=empty
+#-----------
 snapshot=74
 #-----------
-time=3655468075
-mem_heap_B=140165450
-mem_heap_extra_B=8113094
+time=3680398679
+mem_heap_B=140165738
+mem_heap_extra_B=8113158
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=75
 #-----------
-time=3686431477
-mem_heap_B=140166026
-mem_heap_extra_B=8113238
+time=3711403829
+mem_heap_B=140166170
+mem_heap_extra_B=8113286
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=76
 #-----------
-time=3722836106
-mem_heap_B=140165226
+time=3741235768
+mem_heap_B=140165162
 mem_heap_extra_B=8113014
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=77
 #-----------
-time=3761629749
-mem_heap_B=140165738
-mem_heap_extra_B=8113158
+time=3779950344
+mem_heap_B=140166026
+mem_heap_extra_B=8113238
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=78
 #-----------
-time=3792324986
-mem_heap_B=140166170
-mem_heap_extra_B=8113286
-mem_stacks_B=0
-heap_tree=empty
-#-----------
-snapshot=79
-#-----------
-time=3823596054
+time=3808488823
 mem_heap_B=140165154
 mem_heap_extra_B=8112998
 mem_stacks_B=0
 heap_tree=empty
 #-----------
+snapshot=79
+#-----------
+time=3837595494
+mem_heap_B=140165162
+mem_heap_extra_B=8113014
+mem_stacks_B=0
+heap_tree=empty
+#-----------
 snapshot=80
 #-----------
-time=3857056969
+time=3867757046
 mem_heap_B=140165738
 mem_heap_extra_B=8113158
 mem_stacks_B=0
@@ -3686,7 +2998,7 @@ heap_tree=empty
 #-----------
 snapshot=81
 #-----------
-time=3887886464
+time=3897139072
 mem_heap_B=140166170
 mem_heap_extra_B=8113286
 mem_stacks_B=0
@@ -3878,15 +3190,15 @@ n14: 140166170 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
 #-----------
 snapshot=82
 #-----------
-time=3922044371
-mem_heap_B=140165226
+time=3926650569
+mem_heap_B=140165162
 mem_heap_extra_B=8113014
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=83
 #-----------
-time=3958653996
+time=3956870071
 mem_heap_B=140165738
 mem_heap_extra_B=8113158
 mem_stacks_B=0
@@ -3894,7 +3206,7 @@ heap_tree=empty
 #-----------
 snapshot=84
 #-----------
-time=3988141131
+time=3987252720
 mem_heap_B=140166170
 mem_heap_extra_B=8113286
 mem_stacks_B=0
@@ -3902,15 +3214,15 @@ heap_tree=empty
 #-----------
 snapshot=85
 #-----------
-time=4021036063
-mem_heap_B=140165162
-mem_heap_extra_B=8113014
+time=4016418283
+mem_heap_B=140165154
+mem_heap_extra_B=8112998
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=86
 #-----------
-time=4051321826
+time=4050583935
 mem_heap_B=140165738
 mem_heap_extra_B=8113158
 mem_stacks_B=0
@@ -3918,7 +3230,7 @@ heap_tree=empty
 #-----------
 snapshot=87
 #-----------
-time=4081955789
+time=4079807878
 mem_heap_B=140166170
 mem_heap_extra_B=8113286
 mem_stacks_B=0
@@ -3926,7 +3238,7 @@ heap_tree=empty
 #-----------
 snapshot=88
 #-----------
-time=4112321146
+time=4107708484
 mem_heap_B=140165154
 mem_heap_extra_B=8112998
 mem_stacks_B=0
@@ -3934,7 +3246,7 @@ heap_tree=empty
 #-----------
 snapshot=89
 #-----------
-time=4148748465
+time=4141506366
 mem_heap_B=140165738
 mem_heap_extra_B=8113158
 mem_stacks_B=0
@@ -3942,7 +3254,7 @@ heap_tree=empty
 #-----------
 snapshot=90
 #-----------
-time=4179824015
+time=4171768268
 mem_heap_B=140166170
 mem_heap_extra_B=8113286
 mem_stacks_B=0
@@ -3950,12 +3262,12 @@ heap_tree=empty
 #-----------
 snapshot=91
 #-----------
-time=4209241942
-mem_heap_B=140165162
-mem_heap_extra_B=8113014
+time=4200524979
+mem_heap_B=140165154
+mem_heap_extra_B=8112998
 mem_stacks_B=0
 heap_tree=detailed
-n14: 140165162 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+n14: 140165154 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
  n1: 33600000 0x4A96C67: allocate (new_allocator.h:127)
   n1: 33600000 0x4A96C67: allocate (alloc_traits.h:464)
    n1: 33600000 0x4A96C67: _M_allocate (stl_vector.h:346)
@@ -3966,7 +3278,7 @@ n14: 140165162 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
         n1: 33600000 0x4885C8A: SampleHandlerTutorial::SampleHandlerTutorial(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, ParameterHandlerGeneric*, std::shared_ptr<OscillationHandler> const&) (SampleHandlerTutorial.cpp:17)
          n1: 33600000 0x4205E0: std::vector<SampleHandlerTutorial*, std::allocator<SampleHandlerTutorial*> > MaCh3SampleHandlerFactory<SampleHandlerTutorial>(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&, ParameterHandlerGeneric*) (MaCh3Factory.h:131)
           n0: 33600000 0x40C936: main (MCMCTutorial.cpp:14)
- n0: 23185076 in 3882 places, all below massif's threshold (1.00%)
+ n0: 23185068 in 3882 places, all below massif's threshold (1.00%)
  n1: 16000000 0x4888FB4: allocate (new_allocator.h:127)
   n1: 16000000 0x4888FB4: allocate (alloc_traits.h:464)
    n1: 16000000 0x4888FB4: _M_allocate (stl_vector.h:346)
@@ -4142,7 +3454,7 @@ n14: 140165162 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
 #-----------
 snapshot=92
 #-----------
-time=4239283686
+time=4234375498
 mem_heap_B=140165738
 mem_heap_extra_B=8113158
 mem_stacks_B=0
@@ -4150,7 +3462,7 @@ heap_tree=empty
 #-----------
 snapshot=93
 #-----------
-time=4269056741
+time=4264804152
 mem_heap_B=140166170
 mem_heap_extra_B=8113286
 mem_stacks_B=0
@@ -4158,23 +3470,23 @@ heap_tree=empty
 #-----------
 snapshot=94
 #-----------
-time=4303508927
-mem_heap_B=140165226
-mem_heap_extra_B=8113014
+time=4293396194
+mem_heap_B=140165154
+mem_heap_extra_B=8112998
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=95
 #-----------
-time=4342299188
-mem_heap_B=140165738
-mem_heap_extra_B=8113158
+time=4329491431
+mem_heap_B=140166026
+mem_heap_extra_B=8113238
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=96
 #-----------
-time=4373487163
+time=4357518419
 mem_heap_B=140166170
 mem_heap_extra_B=8113286
 mem_stacks_B=0
@@ -4182,16 +3494,16 @@ heap_tree=empty
 #-----------
 snapshot=97
 #-----------
-time=4402863471
-mem_heap_B=119936965
-mem_heap_extra_B=5921595
+time=4385402933
+mem_heap_B=120218509
+mem_heap_extra_B=6165483
 mem_stacks_B=0
 heap_tree=empty
 #-----------
 snapshot=98
 #-----------
-time=4432350857
-mem_heap_B=50105636
-mem_heap_extra_B=593972
+time=4413287436
+mem_heap_B=75912315
+mem_heap_extra_B=978053
 mem_stacks_B=0
 heap_tree=empty
