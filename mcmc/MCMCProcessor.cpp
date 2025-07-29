@@ -2356,12 +2356,12 @@ void MCMCProcessor::ReadFDFile() {
   // Do the same for the FD
   TFile *FDdetFile = new TFile(CovPos[kFDDetPar].back().c_str(), "open");
   if (FDdetFile->IsZombie()) {
-    MACH3LOG_ERROR("Couldn't find NDdetFile {}", CovPos[kFDDetPar].back());
+    MACH3LOG_ERROR("Couldn't find FDdetFile {}", CovPos[kFDDetPar].back());
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   FDdetFile->cd();
 
-  TMatrixDSym *FDdetMatrix = FDdetFile->Get<TMatrixDSym>("SKJointError_Erec_Total");
+  TMatrixD *FDdetMatrix = FDdetFile->Get<TMatrixD>("Covariance_Matrix_Erec");
 
   for (int i = 0; i < FDdetMatrix->GetNrows(); ++i)
   {
