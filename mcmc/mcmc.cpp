@@ -162,8 +162,12 @@ void mcmc::runMCMC() {
       double stepScale = multicanonicalSeparateSigma / (2.0 * TMath::Pi());
       MACH3LOG_INFO("Setting individual step scale for multicanonical separate to {}", stepScale);
       // Set the individual step scale for the multicanonical variable
-      setIndivStepScale(multicanonicalVar, stepScale);
-      
+      for (auto& syst : systematics) {
+        if (syst->getName() == "osc_cov") {
+          syst->setIndivStepScale(multicanonicalVar, stepScale);
+          MACH3LOG_INFO("Setting individual step scale for osc_cov systematic to {}", stepScale);
+        }
+      }      
     } else {
       MACH3LOG_INFO("Using multicanonical Gaussian umbrellas");
       // Get the multicanonical sigma values from the configuration file
