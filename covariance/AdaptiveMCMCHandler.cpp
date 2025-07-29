@@ -204,7 +204,7 @@ void AdaptiveMCMCHandler::SetThrowMatrixFromFile(const std::string& matrix_file_
   if(means_vector){
     // Yay our vector exists! Let's loop and fill it
     // Should check this is done
-    if(means_vector->GetNrows()){
+    if(means_vector->GetNrows() != Npars){
       MACH3LOG_ERROR("External means vec size ({}) != matrix size ({})", means_vector->GetNrows(), Npars);
       throw MaCh3Exception(__FILE__, __LINE__);
     }
