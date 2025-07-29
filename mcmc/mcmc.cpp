@@ -83,6 +83,29 @@ void mcmc::runMCMC() {
   MACH3LOG_INFO("Multicanonical Method: {}", multicanonical);
 
   if (multicanonical) {
+    
+    MACH3LOG_INFO("Looping over systematics to find delta_cp parameter");
+    // Loop over the systematics and find the osc_cov systematic and the delta_cp parameter number
+    for (size_t s = 0; s < systematics.size(); s++) {
+      MACH3LOG_INFO("Systematic: {}", systematics[static_cast<int>(s)]->getName());
+      if (systematics[static_cast<int>(s)]->getName() == "osc_cov") {
+        oscCovVar = static_cast<int>(s);
+        MACH3LOG_INFO("Found osc_cov systematic saving in variable {}", oscCovVar);
+        for (int i = 0; i < systematics[static_cast<int>(s)]->GetNumParams(); i++) {
+          MACH3LOG_INFO("Parameter: {}", systematics[static_cast<int>(s)]->GetParName(i));
+          if (systematics[static_cast<int>(s)]->GetParName(i) == "delta_cp") {
+            multicanonicalVar = i;
+            MACH3LOG_INFO("Setting multicanonical weight on delta_cp parameter int {}",i);
+          }
+          if (systematics[static_cast<int>(s)]->GetParName(i) == "delm2_23") {
+            multicanonicalVar_dm23 = i;
+            MACH3LOG_INFO("Setting delm2_23 parameter int {}",i);
+          } else {
+            MACH3LOG_ERROR("No dm23 parameter found in osc_cov systematic");
+          }
+        }
+      }
+    }
 
     multicanonicalSpline = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["MulticanonicalSpline"],false);
 
@@ -112,13 +135,20 @@ void mcmc::runMCMC() {
       //   throw std::runtime_error("Spline not found in file");
       // }
 
-    } else if (multicanonicalSeparate) {
+    } else if (multicanonicalSeparate) { 
       // If we are using the multicanonical method in separate chains, we need to get the separate mean and sigma values
       MACH3LOG_INFO("Using separate multicanonical method");
       multicanonicalSeparateSigma = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["MulticanonicalSeparateSigma"], 0.1);
       MACH3LOG_INFO("Setting multicanonical sigma to {}", multicanonicalSeparateSigma);
       multicanonicalSeparateMean = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["MulticanonicalSeparateMean"], -TMath::Pi());
       MACH3LOG_INFO("Setting multicanonical mean to {}", multicanonicalSeparateMean);
+
+      // set individual step scale for dcp, so that the ratio of the step scale to the multicanonical sigma is stepscale/1sigmaerror = 1/2pi 
+      double stepScale = multicanonicalSeparateSigma / (2.0 * TMath::Pi());
+      MACH3LOG_INFO("Setting individual step scale for multicanonical separate to {}", stepScale);
+      // Set the individual step scale for the multicanonical variable
+      setIndivStepScale(multicanonicalVar, stepScale);
+      
     } else {
       // Get the multicanonical sigma values from the configuration file
       multicanonicalSigma = fitMan->raw()["General"]["MCMC"]["MulticanonicalSigma"].as<double>();
@@ -127,31 +157,6 @@ void mcmc::runMCMC() {
     // Get the multicanonical beta value from the configuration file
     multicanonicalBeta = fitMan->raw()["General"]["MCMC"]["MulticanonicalBeta"].as<double>();
     MACH3LOG_INFO("Setting multicanonical beta to {}", multicanonicalBeta);
-
-
-    MACH3LOG_INFO("Looping over systematics to find delta_cp parameter");
-    // Loop over the systematics and find the osc_cov systematic and the delta_cp parameter number
-    for (size_t s = 0; s < systematics.size(); s++) {
-      MACH3LOG_INFO("Systematic: {}", systematics[static_cast<int>(s)]->getName());
-      if (systematics[static_cast<int>(s)]->getName() == "osc_cov") {
-        oscCovVar = static_cast<int>(s);
-        MACH3LOG_INFO("Found osc_cov systematic saving in variable {}", oscCovVar);
-        for (int i = 0; i < systematics[static_cast<int>(s)]->GetNumParams(); i++) {
-          MACH3LOG_INFO("Parameter: {}", systematics[static_cast<int>(s)]->GetParName(i));
-          if (systematics[static_cast<int>(s)]->GetParName(i) == "delta_cp") {
-            multicanonicalVar = i;
-            MACH3LOG_INFO("Setting multicanonical weight on delta_cp parameter int {}",i);
-          }
-          if (systematics[static_cast<int>(s)]->GetParName(i) == "delm2_23") {
-            multicanonicalVar_dm23 = i;
-            MACH3LOG_INFO("Setting delm2_23 parameter int {}",i);
-          } else {
-            MACH3LOG_ERROR("No dm23 parameter found in osc_cov systematic");
-        }
-      }
-    }
-  }
-
   }
   
   // Save the settings into the output file
@@ -163,6 +168,20 @@ void mcmc::runMCMC() {
   // Reconfigure the samples, systematics and oscillation for first weight
   // ProposeStep sets logLProp
   ProposeStep();
+
+  if (multicanonical && multicanonicalSeparate){
+      // set the starting point of the chain to the mean value of the multicanonical umbrella
+      for (auto& syst : systematics) {
+        if (syst->getName() == "osc_cov") {
+          syst->printNominalCurrProp();
+          syst->setParCurrProp(multicanonicalVar, multicanonicalSeparateMean);
+          syst->setParProp(multicanonicalVar, multicanonicalSeparateMean);
+          MACH3LOG_INFO("Setting starting point of chain to mean value for multicanonical separate: {}", multicanonicalSeparateMean);
+          syst->printNominalCurrProp();
+        }
+      }
+  }
+
   // Set the current logL to the proposed logL for the 0th step
   // Accept the first step to set logLCurr: this shouldn't affect the MCMC because we ignore the first N steps in burn-in
   logLCurr = logLProp;
