@@ -203,7 +203,7 @@ Private Attributes</h2></td></tr>
 <p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00154">154</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  154</span>            : <a class="code hl_function" href="classTResponseFunction__red.html#a50443a78985e0c9b16ffc36ebc1d2e91">TResponseFunction_red</a>() {</div>
 <div class="line"><span class="lineno">  155</span>    <a class="code hl_variable" href="classTF1__red.html#a25a2d24932de29741a6d539328d715a7">length</a> = 0;</div>
-<div class="line"><span class="lineno">  156</span>    <a class="code hl_variable" href="classTF1__red.html#a89ff168cd938509a5081a2a39bcb0be8">Par</a> = NULL;</div>
+<div class="line"><span class="lineno">  156</span>    <a class="code hl_variable" href="classTF1__red.html#a89ff168cd938509a5081a2a39bcb0be8">Par</a> = <span class="keyword">nullptr</span>;</div>
 <div class="line"><span class="lineno">  157</span>  }</div>
 <div class="ttc" id="aclassTF1__red_html_a25a2d24932de29741a6d539328d715a7"><div class="ttname"><a href="classTF1__red.html#a25a2d24932de29741a6d539328d715a7">TF1_red::length</a></div><div class="ttdeci">M3::int_t length</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00262">SplineStructs.h:262</a></div></div>
 <div class="ttc" id="aclassTF1__red_html_a89ff168cd938509a5081a2a39bcb0be8"><div class="ttname"><a href="classTF1__red.html#a89ff168cd938509a5081a2a39bcb0be8">TF1_red::Par</a></div><div class="ttdeci">M3::float_t * Par</div><div class="ttdoc">The parameters.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00261">SplineStructs.h:261</a></div></div>
@@ -240,7 +240,7 @@ Private Attributes</h2></td></tr>
 <div class="fragment"><div class="line"><span class="lineno">  160</span>                     {</div>
 <div class="line"><span class="lineno">  161</span>    <span class="keywordflow">if</span> (<a class="code hl_variable" href="classTF1__red.html#a89ff168cd938509a5081a2a39bcb0be8">Par</a> != NULL) {</div>
 <div class="line"><span class="lineno">  162</span>      <span class="keyword">delete</span>[] <a class="code hl_variable" href="classTF1__red.html#a89ff168cd938509a5081a2a39bcb0be8">Par</a>;</div>
-<div class="line"><span class="lineno">  163</span>      <a class="code hl_variable" href="classTF1__red.html#a89ff168cd938509a5081a2a39bcb0be8">Par</a> = NULL;</div>
+<div class="line"><span class="lineno">  163</span>      <a class="code hl_variable" href="classTF1__red.html#a89ff168cd938509a5081a2a39bcb0be8">Par</a> = <span class="keyword">nullptr</span>;</div>
 <div class="line"><span class="lineno">  164</span>    }</div>
 <div class="line"><span class="lineno">  165</span>  }</div>
 </div><!-- fragment -->
@@ -320,7 +320,7 @@ Private Attributes</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00176">176</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  176</span>                          : <a class="code hl_function" href="classTResponseFunction__red.html#a50443a78985e0c9b16ffc36ebc1d2e91">TResponseFunction_red</a>() {</div>
-<div class="line"><span class="lineno">  177</span>    <a class="code hl_variable" href="classTF1__red.html#a89ff168cd938509a5081a2a39bcb0be8">Par</a> = NULL;</div>
+<div class="line"><span class="lineno">  177</span>    <a class="code hl_variable" href="classTF1__red.html#a89ff168cd938509a5081a2a39bcb0be8">Par</a> = <span class="keyword">nullptr</span>;</div>
 <div class="line"><span class="lineno">  178</span>    <a class="code hl_function" href="classTF1__red.html#a2622a66b8baafd26b66e6544b7de5bfe">SetFunc</a>(Function);</div>
 <div class="line"><span class="lineno">  179</span>  }</div>
 <div class="ttc" id="aclassTF1__red_html_a2622a66b8baafd26b66e6544b7de5bfe"><div class="ttname"><a href="classTF1__red.html#a2622a66b8baafd26b66e6544b7de5bfe">TF1_red::SetFunc</a></div><div class="ttdeci">void SetFunc(TF1 *&amp;Func)</div><div class="ttdoc">Set the function.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00182">SplineStructs.h:182</a></div></div>
@@ -604,13 +604,13 @@ Private Attributes</h2></td></tr>
 <p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00182">182</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  182</span>                                  {</div>
 <div class="line"><span class="lineno">  183</span>    <a class="code hl_variable" href="classTF1__red.html#a25a2d24932de29741a6d539328d715a7">length</a> = <a class="code hl_typedef" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a>(Func-&gt;GetNpar());</div>
-<div class="line"><span class="lineno">  184</span>    <span class="keywordflow">if</span> (<a class="code hl_variable" href="classTF1__red.html#a89ff168cd938509a5081a2a39bcb0be8">Par</a> != NULL) <span class="keyword">delete</span>[] <a class="code hl_variable" href="classTF1__red.html#a89ff168cd938509a5081a2a39bcb0be8">Par</a>;</div>
+<div class="line"><span class="lineno">  184</span>    <span class="keywordflow">if</span> (<a class="code hl_variable" href="classTF1__red.html#a89ff168cd938509a5081a2a39bcb0be8">Par</a> != <span class="keyword">nullptr</span>) <span class="keyword">delete</span>[] <a class="code hl_variable" href="classTF1__red.html#a89ff168cd938509a5081a2a39bcb0be8">Par</a>;</div>
 <div class="line"><span class="lineno">  185</span>    <a class="code hl_variable" href="classTF1__red.html#a89ff168cd938509a5081a2a39bcb0be8">Par</a> = <span class="keyword">new</span> <a class="code hl_typedef" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a>[<a class="code hl_variable" href="classTF1__red.html#a25a2d24932de29741a6d539328d715a7">length</a>];</div>
 <div class="line"><span class="lineno">  186</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classTF1__red.html#a25a2d24932de29741a6d539328d715a7">length</a>; ++i) {</div>
 <div class="line"><span class="lineno">  187</span>      <a class="code hl_variable" href="classTF1__red.html#a89ff168cd938509a5081a2a39bcb0be8">Par</a>[i] = <a class="code hl_typedef" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a>(Func-&gt;GetParameter(i));</div>
 <div class="line"><span class="lineno">  188</span>    }</div>
 <div class="line"><span class="lineno">  189</span>    <span class="keyword">delete</span> Func;</div>
-<div class="line"><span class="lineno">  190</span>    Func = NULL;</div>
+<div class="line"><span class="lineno">  190</span>    Func = <span class="keyword">nullptr</span>;</div>
 <div class="line"><span class="lineno">  191</span>  }</div>
 <div class="ttc" id="anamespaceM3_html_a1f95274549f25fc19fe7db343c8a7a68"><div class="ttname"><a href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a></div><div class="ttdeci">double float_t</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00028">Core.h:28</a></div></div>
 <div class="ttc" id="anamespaceM3_html_adb59b8ecdc4e1b2d5d4c826a13aa7463"><div class="ttname"><a href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a></div><div class="ttdeci">int int_t</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00029">Core.h:29</a></div></div>
