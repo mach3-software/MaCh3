@@ -1110,6 +1110,10 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
     MACH3LOG_ERROR("PCA has been enabled and now trying to enable Adaption. Right now both configuration don't work with each other");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
+  if(AdaptiveHandler){
+    MACH3LOG_ERROR("Adaptive Handler has already been initialise can't do it again so skipping.");
+    return;
+  }
   AdaptiveHandler = std::make_unique<adaptive_mcmc::AdaptiveMCMCHandler>();
   // Now we read the general settings [these SHOULD be common across all matrices!]
   bool success = AdaptiveHandler->InitFromConfig(adapt_manager, matrixName, &_fCurrVal, &_fError);
