@@ -302,11 +302,11 @@ public:
   SampleBinningInfo Binning;
 
   /// DB Array to be filled after reweighting
-  double** SampleHandlerFD_array;
+  double* SampleHandlerFD_array;
   /// KS Array used for MC stat
-  double** SampleHandlerFD_array_w2;
+  double* SampleHandlerFD_array_w2;
   /// DB Array to be filled in AddData
-  double** SampleHandlerFD_data;
+  double* SampleHandlerFD_data;
   //===============================================================================
 
   //===============================================================================

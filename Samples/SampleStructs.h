@@ -176,6 +176,8 @@ struct SampleBinningInfo {
   size_t nXBins = M3::_BAD_INT_;
   /// Number of Y axis bins in the histogram used for likelihood calculation
   size_t nYBins = M3::_BAD_INT_;
+  /// Number of total bins
+  size_t nBins = M3::_BAD_INT_;
 
   /// lower to check if Eb has moved the erec bin
   std::vector<double> rw_lower_xbinedge;
@@ -185,6 +187,28 @@ struct SampleBinningInfo {
   std::vector<double> rw_upper_xbinedge;
   /// upper to check if Eb has moved the erec bin
   std::vector<double> rw_upper_upper_xbinedge;
+
+  /// @brief Get linear bin index from 2D bin indices
+  /// @param xBin The bin index along the X axis (0-based)
+  /// @param yBin The bin index along the Y axis (0-based)
+  /// @return The linear bin index corresponding to (xBin, yBin)
+  int GetBin(const int xBin, const int yBin) const {
+    return static_cast<int>(yBin * nXBins + xBin);
+  }
+
+  /// @brief Get linear bin index from 2D bin indices with additional checsk
+  /// @param xBin The bin index along the X axis (0-based)
+  /// @param yBin The bin index along the Y axis (0-based)
+  /// @return The linear bin index corresponding to (xBin, yBin)
+  /// @warning this performs additional checks so do not use in parts of code used during fit
+  int GetBinSafe(const int xBin, const int yBin) const {
+    if (xBin < 0 || yBin < 0 || static_cast<size_t>(xBin) >= nXBins || static_cast<size_t>(yBin) >= nYBins) {
+      MACH3LOG_ERROR("GetBinSafe: Bin indices out of range: xBin={}, yBin={}, max xBin={}, max yBin={}",
+                     xBin, yBin, nXBins - 1, nYBins - 1);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    return GetBin(xBin, yBin);
+  }
 
   /// @brief DB Find the relevant bin in the PDF for each event
   int FindXBin(const double XVar, const int NomXBin) const {
@@ -213,7 +237,6 @@ struct SampleBinningInfo {
     }
   }
 };
-
 
 // ***************************
 // A handy namespace for variables extraction

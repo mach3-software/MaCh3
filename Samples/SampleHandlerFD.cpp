@@ -40,7 +40,7 @@ SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGen
   SampleHandlerFD_data = nullptr;
   SampleHandlerFD_array_w2 = nullptr;
   SampleName = "";
-  SampleManager = std::unique_ptr<manager>(new manager(ConfigFileName.c_str()));
+  SampleManager = std::make_unique<manager>(ConfigFileName.c_str());
 
   // Variables related to MC stat
   FirstTimeW2 = true;
@@ -50,18 +50,11 @@ SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGen
 SampleHandlerFD::~SampleHandlerFD() {
   MACH3LOG_DEBUG("I'm deleting SampleHandlerFD");
   
-  for (unsigned int yBin=0;yBin<(Binning.YBinEdges.size()-1);yBin++) {
-    if(SampleHandlerFD_array != nullptr){delete[] SampleHandlerFD_array[yBin];}
-    delete[] SampleHandlerFD_array_w2[yBin];
-    //ETA - there is a chance that you haven't added any data...
-    if(SampleHandlerFD_data != nullptr){delete[] SampleHandlerFD_data[yBin];}
-  }
-
-  if(SampleHandlerFD_array != nullptr){delete[] SampleHandlerFD_array;}
-  delete[] SampleHandlerFD_array_w2;
+  if (SampleHandlerFD_array != nullptr) delete[] SampleHandlerFD_array;
+  if (SampleHandlerFD_array_w2 != nullptr) delete[] SampleHandlerFD_array_w2;
   //ETA - there is a chance that you haven't added any data...
-  if(SampleHandlerFD_data != nullptr){delete[] SampleHandlerFD_data;}
- 
+  if (SampleHandlerFD_data != nullptr) delete[] SampleHandlerFD_data;
+
   if(THStackLeg != nullptr) delete THStackLeg;
 
   if(dathist != nullptr) delete dathist;
@@ -274,14 +267,17 @@ void SampleHandlerFD::SetupKinematicMap() {
   }
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
 void SampleHandlerFD::Fill1DHist()
 {
   // DB Commented out by default - Code heading towards GetLikelihood using arrays instead of root objects
   // Wouldn't actually need this for GetLikelihood as TH objects wouldn't be filled
   _hPDF1D->Reset();
-  for (unsigned int yBin=0;yBin<(Binning.YBinEdges.size()-1);yBin++) {
-    for (unsigned int xBin=0;xBin<(Binning.XBinEdges.size()-1);xBin++) {
-      _hPDF1D->AddBinContent(xBin+1,SampleHandlerFD_array[yBin][xBin]);
+  for (size_t yBin = 0; yBin < Binning.nYBins; ++yBin) {
+    for (size_t xBin = 0; xBin < Binning.nXBins; ++xBin) {
+      const int idx = Binning.GetBinSafe(xBin, yBin);
+      _hPDF1D->AddBinContent(idx + 1, SampleHandlerFD_array[idx]);
     }
   }
 }
@@ -291,13 +287,14 @@ void SampleHandlerFD::Fill2DHist()
   // DB Commented out by default - Code heading towards GetLikelihood using arrays instead of root objects
   // Wouldn't actually need this for GetLikelihood as TH objects wouldn't be filled
   _hPDF2D->Reset();
-  for (unsigned int yBin=0;yBin<(Binning.YBinEdges.size()-1);yBin++) {
-    for (unsigned int xBin=0;xBin<(Binning.XBinEdges.size()-1);xBin++) {
-      _hPDF2D->SetBinContent(xBin+1,yBin+1,SampleHandlerFD_array[yBin][xBin]);
+  for (size_t yBin = 0; yBin < Binning.nYBins; ++yBin) {
+    for (size_t xBin = 0; xBin < Binning.nXBins; ++xBin) {
+      const int idx = Binning.GetBinSafe(xBin, yBin);
+      _hPDF2D->SetBinContent(static_cast<int>(xBin + 1), static_cast<int>(yBin + 1), SampleHandlerFD_array[idx]);
     }
   }
 }
-
+#pragma GCC diagnostic pop
 // ************************************************
 /// @function SampleHandlerFD::SetupSampleBinning()
 /// @brief Function to setup the binning of your sample histograms and the underlying
@@ -471,8 +468,9 @@ void SampleHandlerFD::FillArray() {
 
     //DB Fill relevant part of thread array
     if (XBinToFill != -1 && YBinToFill != -1) {
-      SampleHandlerFD_array[YBinToFill][XBinToFill] += totalweight;
-      if (FirstTimeW2) SampleHandlerFD_array_w2[YBinToFill][XBinToFill] += totalweight*totalweight;
+      const int GlobalBin = Binning.GetBin(XBinToFill, YBinToFill);
+      SampleHandlerFD_array[GlobalBin] += totalweight;
+      if (FirstTimeW2) SampleHandlerFD_array_w2[GlobalBin] += totalweight*totalweight;
     }
   }
 }
@@ -488,24 +486,20 @@ void SampleHandlerFD::FillArray_MP() {
   PrepFunctionalParameters();
 
   //This is stored as [y][x] due to shifts only occurring in the x variable (Erec/Lep mom) - I believe this will help reduce cache misses
-  double** SampleHandlerFD_array_private = nullptr;
-  double** SampleHandlerFD_array_private_w2 = nullptr;
+  double* SampleHandlerFD_array_private = nullptr;
+  double* SampleHandlerFD_array_private_w2 = nullptr;
   // Declare the omp parallel region
   // The parallel region needs to stretch beyond the for loop!
   #pragma omp parallel private(SampleHandlerFD_array_private, SampleHandlerFD_array_private_w2)
   {
     // private to each thread
     // ETA - maybe we can use parallel firstprivate to initialise these?
-    SampleHandlerFD_array_private = new double*[Binning.nYBins];
-    SampleHandlerFD_array_private_w2 = new double*[Binning.nYBins];
-    for (size_t yBin=0;yBin<Binning.nYBins; ++yBin) {
-      SampleHandlerFD_array_private[yBin] = new double[Binning.nXBins];
-      SampleHandlerFD_array_private_w2[yBin] = new double[Binning.nXBins];
+    SampleHandlerFD_array_private = new double[Binning.nBins];
+    SampleHandlerFD_array_private_w2 = new double[Binning.nBins];
 
-      std::fill_n(SampleHandlerFD_array_private[yBin], Binning.nXBins, 0.0);
-      std::fill_n(SampleHandlerFD_array_private_w2[yBin], Binning.nXBins, 0.0);
-    }
-    
+    std::fill_n(SampleHandlerFD_array_private, Binning.nBins, 0.0);
+    std::fill_n(SampleHandlerFD_array_private_w2, Binning.nBins, 0.0);
+
     //DB - Brain dump of speedup ideas
     //
     //Those relevant to reweighting
@@ -572,28 +566,23 @@ void SampleHandlerFD::FillArray_MP() {
       //Might save us an extra if call?
       //DB Fill relevant part of thread array
       if (XBinToFill != -1 && YBinToFill != -1) {
-        SampleHandlerFD_array_private[YBinToFill][XBinToFill] += totalweight;
-        SampleHandlerFD_array_private_w2[YBinToFill][XBinToFill] += totalweight*totalweight;
+        const int GlobalBin = Binning.GetBin(XBinToFill, YBinToFill);
+        SampleHandlerFD_array_private[GlobalBin] += totalweight;
+        SampleHandlerFD_array_private_w2[GlobalBin] += totalweight*totalweight;
       }
     }
     //End of Calc Weights and fill Array
     //==================================================
     // DB Copy contents of 'SampleHandlerFD_array_private' into 'SampleHandlerFD_array' which can then be used in GetLikelihood
-    for (size_t yBin = 0; yBin < Binning.nYBins; ++yBin) {
-      for (size_t xBin = 0; xBin < Binning.nXBins; ++xBin) {
+    for (size_t idx = 0; idx < Binning.nBins; ++idx) {
+      #pragma omp atomic
+      SampleHandlerFD_array[idx] += SampleHandlerFD_array_private[idx];
+      if (FirstTimeW2) {
         #pragma omp atomic
-        SampleHandlerFD_array[yBin][xBin] += SampleHandlerFD_array_private[yBin][xBin];
-        if(FirstTimeW2) {
-          #pragma omp atomic
-          SampleHandlerFD_array_w2[yBin][xBin] += SampleHandlerFD_array_private_w2[yBin][xBin];
-        }
+        SampleHandlerFD_array_w2[idx] += SampleHandlerFD_array_private_w2[idx];
       }
     }
-    
-    for (size_t yBin = 0; yBin < Binning.nYBins; ++yBin) {
-      delete[] SampleHandlerFD_array_private[yBin];
-      delete[] SampleHandlerFD_array_private_w2[yBin];
-    }
+
     delete[] SampleHandlerFD_array_private;
     delete[] SampleHandlerFD_array_private_w2;
   } //end of parallel region
@@ -606,14 +595,12 @@ void SampleHandlerFD::ResetHistograms() {
 // **************************************************  
   //DB Reset values stored in PDF array to 0.
   // Don't openMP this; no significant gain
-  for (size_t yBin = 0; yBin < Binning.nYBins; ++yBin) {
-    #ifdef MULTITHREAD
-    #pragma omp simd
-    #endif
-    for (size_t xBin = 0; xBin < Binning.nXBins; ++xBin) {
-      SampleHandlerFD_array[yBin][xBin] = 0.;
-      if(FirstTimeW2) SampleHandlerFD_array_w2[yBin][xBin] = 0.;
-    }
+  #ifdef MULTITHREAD
+  #pragma omp simd
+  #endif
+  for (size_t i = 0; i < Binning.nBins; ++i) {
+    SampleHandlerFD_array[i] = 0.;
+    if (FirstTimeW2) SampleHandlerFD_array_w2[i] = 0.;
   }
 } // end function
 
@@ -916,18 +903,17 @@ void SampleHandlerFD::SetupReweightArrays(const size_t numberXBins, const size_t
   Binning.nXBins = numberXBins;
   Binning.nYBins = numberYBins;
 
-  SampleHandlerFD_array = new double*[Binning.nYBins];
-  SampleHandlerFD_array_w2 = new double*[Binning.nYBins];
-  SampleHandlerFD_data = new double*[Binning.nYBins];
-  for (size_t yBin=0;yBin<Binning.nYBins;yBin++) {
-    SampleHandlerFD_array[yBin] = new double[Binning.nXBins];
-    SampleHandlerFD_array_w2[yBin] = new double[Binning.nXBins];
-    SampleHandlerFD_data[yBin] = new double[Binning.nXBins];
-    for (size_t xBin=0;xBin<Binning.nXBins;xBin++) {
-      SampleHandlerFD_array[yBin][xBin] = 0.;
-      SampleHandlerFD_array_w2[yBin][xBin] = 0.;
-      SampleHandlerFD_data[yBin][xBin] = 0.;
-    }
+  // Set total number of bins
+  Binning.nBins = Binning.nXBins * Binning.nYBins;
+
+  SampleHandlerFD_array = new double[Binning.nBins];
+  SampleHandlerFD_array_w2 = new double[Binning.nBins];
+  SampleHandlerFD_data = new double[Binning.nBins];
+
+  for (size_t i = 0; i < Binning.nBins; ++i) {
+    SampleHandlerFD_array[i] = 0.0;
+    SampleHandlerFD_array_w2[i] = 0.0;
+    SampleHandlerFD_data[i] = 0.0;
   }
 }
 
@@ -1090,24 +1076,29 @@ void SampleHandlerFD::FindNominalBinAndEdges2D() {
   }
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+
 // ************************************************
 TH1* SampleHandlerFD::GetW2Hist(const int Dimension) {
 // ************************************************
   if(Dimension == 1) {
     TH1D* W2Hist = dynamic_cast<TH1D*>(_hPDF1D->Clone((_hPDF1D->GetName() + std::string("_W2")).c_str()));
     W2Hist->Reset();
-    for (unsigned int yBin = 0; yBin < (Binning.YBinEdges.size()-1); yBin++) {
-      for (unsigned int xBin = 0; xBin < (Binning.XBinEdges.size()-1); xBin++) {
-        W2Hist->AddBinContent(xBin+1, SampleHandlerFD_array_w2[yBin][xBin]);
+    for (size_t yBin = 0; yBin < Binning.nYBins; ++yBin) {
+      for (size_t xBin = 0; xBin < Binning.nXBins; ++xBin) {
+        const int idx = Binning.GetBinSafe(xBin, yBin);
+        W2Hist->AddBinContent(idx + 1, SampleHandlerFD_array_w2[idx]);
       }
     }
     return W2Hist;
   } else if(Dimension == 2) {
     TH2D* W2Hist = dynamic_cast<TH2D*>(_hPDF2D->Clone((_hPDF2D->GetName() + std::string("_W2")).c_str()));
     W2Hist->Reset();
-    for (unsigned int yBin = 0; yBin < (Binning.YBinEdges.size()-1); yBin++) {
-      for (unsigned int xBin = 0; xBin < (Binning.XBinEdges.size()-1); xBin++) {
-        W2Hist->SetBinContent(xBin+1, yBin+1, SampleHandlerFD_array_w2[yBin][xBin]);
+    for (size_t yBin = 0; yBin < Binning.nYBins; ++yBin) {
+      for (size_t xBin = 0; xBin < Binning.nXBins; ++xBin) {
+        const int idx = Binning.GetBinSafe(xBin, yBin);
+        W2Hist->SetBinContent(static_cast<int>(xBin + 1), static_cast<int>(yBin + 1), SampleHandlerFD_array_w2[idx]);
       }
     }
     return W2Hist;
@@ -1116,6 +1107,7 @@ TH1* SampleHandlerFD::GetW2Hist(const int Dimension) {
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 }
+#pragma GCC diagnostic pop
 
 // ************************************************
 TH1* SampleHandlerFD::GetMCHist(const int Dimension) {
@@ -1168,13 +1160,15 @@ void SampleHandlerFD::AddData(std::vector<double> &data) {
     MACH3LOG_ERROR("SampleHandlerFD_data haven't been initialised yet");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-  for (size_t yBin=0;yBin<Binning.nYBins;yBin++) {
-    for (size_t xBin=0;xBin<Binning.nXBins;xBin++) {
-      SampleHandlerFD_data[yBin][xBin] = dathist->GetBinContent(static_cast<int>(xBin+1));
-    }
+  // Assuming nBins == nXBins here, because you have 1D data
+  for (size_t bin = 0; bin < Binning.nXBins; ++bin) {
+    // ROOT histograms are 1-based, so bin index + 1
+    SampleHandlerFD_data[bin] = dathist->GetBinContent(static_cast<int>(bin + 1));
   }
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
 void SampleHandlerFD::AddData(std::vector< std::vector <double> > &data) {
   if (dathist2d == nullptr) {
     MACH3LOG_ERROR("Data hist hasn't been initialised yet");
@@ -1205,7 +1199,8 @@ void SampleHandlerFD::AddData(std::vector< std::vector <double> > &data) {
     for (size_t xBin=0;xBin<Binning.nXBins;xBin++) {
       //Need to cast to an int (Int_t) for ROOT
       //Need to do +1 for the bin, this is to be consistent with ROOTs binning scheme
-      SampleHandlerFD_data[yBin][xBin] = dathist2d->GetBinContent(static_cast<int>(xBin+1),static_cast<int>(yBin+1));
+      const int idx = Binning.GetBinSafe(xBin, yBin);
+      SampleHandlerFD_data[idx] = dathist2d->GetBinContent(static_cast<int>(xBin + 1), static_cast<int>(yBin + 1));
     }
   }
 }
@@ -1228,12 +1223,10 @@ void SampleHandlerFD::AddData(TH1D* Data) {
     MACH3LOG_ERROR("SampleHandlerFD_data haven't been initialised yet");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-  for (size_t yBin=0;yBin<Binning.nYBins;yBin++) {
-    for (size_t xBin=0;xBin<Binning.nXBins;xBin++) {
-      //Need to cast to an int (Int_t) for ROOT
-      //Need to do +1 for the bin, this is to be consistent with ROOTs binning scheme
-      SampleHandlerFD_data[yBin][xBin] = Data->GetBinContent(static_cast<int>(xBin+1));
-    }
+
+  for (size_t bin = 0; bin < Binning.nXBins; ++bin) {
+    // ROOT histograms are 1-based, so bin index + 1
+    SampleHandlerFD_data[bin] = dathist->GetBinContent(static_cast<int>(bin + 1));
   }
 }
 
@@ -1257,10 +1250,12 @@ void SampleHandlerFD::AddData(TH2D* Data) {
     for (size_t xBin=0;xBin<Binning.nXBins;xBin++) {
       //Need to cast to an int (Int_t) for ROOT
       //Need to do +1 for the bin, this is to be consistent with ROOTs binning scheme
-      SampleHandlerFD_data[yBin][xBin] = dathist2d->GetBinContent(static_cast<int>(xBin+1),static_cast<int>(yBin+1));
+      const int idx = Binning.GetBinSafe(xBin, yBin);
+      SampleHandlerFD_data[idx] = dathist2d->GetBinContent(static_cast<int>(xBin + 1), static_cast<int>(yBin + 1));
     }
   }
 }
+#pragma GCC diagnostic pop
 
 // ************************************************
 void SampleHandlerFD::InitialiseNuOscillatorObjects() {
@@ -1429,19 +1424,16 @@ double SampleHandlerFD::GetLikelihood() {
     
   double negLogL = 0.;
   #ifdef MULTITHREAD
-  #pragma omp parallel for collapse(2) reduction(+:negLogL)
+  #pragma omp parallel for reduction(+:negLogL)
   #endif
-  for (size_t yBin = 0; yBin < Binning.nYBins; ++yBin)
+  for (size_t idx = 0; idx < Binning.nBins; ++idx)
   {
-    for (size_t xBin = 0; xBin < Binning.nXBins; ++xBin)
-    {
-      const double DataVal = SampleHandlerFD_data[yBin][xBin];
-      const double MCPred = SampleHandlerFD_array[yBin][xBin];
-      const double w2 = SampleHandlerFD_array_w2[yBin][xBin];
-      
-      //KS: Calculate likelihood using Barlow-Beeston Poisson or even IceCube
-      negLogL += GetTestStatLLH(DataVal, MCPred, w2);
-    }
+    const double DataVal = SampleHandlerFD_data[idx];
+    const double MCPred = SampleHandlerFD_array[idx];
+    const double w2 = SampleHandlerFD_array_w2[idx];
+
+    //KS: Calculate likelihood using Barlow-Beeston Poisson or even IceCube
+    negLogL += GetTestStatLLH(DataVal, MCPred, w2);
   }
   return negLogL;
 }
