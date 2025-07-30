@@ -1,9 +1,9 @@
 var searchData=
 [
-  ['name_0',['name',['../structTypeParameterBase.html#a9cec220ee7904196cc6a7d98c2b061f8',1,'TypeParameterBase']]],
-  ['name_1',['Name',['../structMaCh3ModeInfo.html#a8c957d49742a2ad0faa79fbc07427767',1,'MaCh3ModeInfo']]],
+  ['name_0',['Name',['../structMaCh3ModeInfo.html#a8c957d49742a2ad0faa79fbc07427767',1,'MaCh3ModeInfo']]],
+  ['name_1',['name',['../structTypeParameterBase.html#a9cec220ee7904196cc6a7d98c2b061f8',1,'TypeParameterBase']]],
   ['nbatches_2',['nBatches',['../classMCMCProcessor.html#a02c5a3f849cf217705816c650c678d19',1,'MCMCProcessor']]],
-  ['nbins_3',['nBins',['../GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1',1,'nBins():&#160;GetPostfitParamPlots.cpp'],['../classMCMCProcessor.html#a6b74f8195bcbca0979f9e9fe43468bae',1,'MCMCProcessor::nBins()']]],
+  ['nbins_3',['nBins',['../GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1',1,'nBins():&#160;GetPostfitParamPlots.cpp'],['../classMCMCProcessor.html#a6b74f8195bcbca0979f9e9fe43468bae',1,'MCMCProcessor::nBins()'],['../structSampleBinningInfo.html#af20237040c5fe0d4a26b63fc83e55ff9',1,'SampleBinningInfo::nBins()']]],
   ['nbranches_4',['nBranches',['../classMCMCProcessor.html#af6ba5d9aec5350fafebbf81309e813cb',1,'MCMCProcessor']]],
   ['nccmodes_5',['nCCModes',['../classMaCh3Modes.html#a0635bbfc95b50bab0b1e036d33360947',1,'MaCh3Modes']]],
   ['nchains_6',['Nchains',['../RHat_8cpp.html#a231bc179b5599c7e29d5ba28ff2b4b70',1,'Nchains():&#160;RHat.cpp'],['../RHat__HighMem_8cpp.html#a231bc179b5599c7e29d5ba28ff2b4b70',1,'Nchains():&#160;RHat_HighMem.cpp']]],
@@ -48,7 +48,7 @@ var searchData=
   ['ntf1coeff_45',['nTF1coeff',['../classSMonolith.html#a403e7cf909f98d4c59b5f6c7ff8aac5b',1,'SMonolith']]],
   ['nthin_46',['NThin',['../RHat_8cpp.html#a4ec30f0e42bb1f5a77dd83079d3eba64',1,'RHat.cpp']]],
   ['nthrows_47',['nThrows',['../classSampleSummary.html#aa5c4055d4bb4dc720a4118032cdb4910',1,'SampleSummary']]],
-  ['ntoys_48',['Ntoys',['../RHat__HighMem_8cpp.html#afa110f35953074d3cc7ad452d003fd7a',1,'Ntoys():&#160;RHat_HighMem.cpp'],['../classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893',1,'PredictiveThrower::Ntoys()']]],
+  ['ntoys_48',['Ntoys',['../classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893',1,'PredictiveThrower::Ntoys()'],['../RHat__HighMem_8cpp.html#afa110f35953074d3cc7ad452d003fd7a',1,'Ntoys():&#160;RHat_HighMem.cpp']]],
   ['ntoys_5ffilled_49',['Ntoys_filled',['../RHat_8cpp.html#a348f0c1b68d0a2ece8297050105dffc1',1,'RHat.cpp']]],
   ['ntoys_5frequested_50',['Ntoys_requested',['../RHat_8cpp.html#a7b48ace8081df9b5f35c17126ee81046',1,'RHat.cpp']]],
   ['numparpca_51',['NumParPCA',['../classPCAHandler.html#a5f08019f3db758953464fb1d0db71ea0',1,'PCAHandler']]],
