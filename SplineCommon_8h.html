@@ -85,8 +85,8 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#define-members">Macros</a> &#124;
-<a href="#enum-members">Enumerations</a>  </div>
+<a href="#enum-members">Enumerations</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">SplineCommon.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -108,15 +108,6 @@ Classes</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Struct storing information for spline monolith.  <a href="structSplineMonoStruct.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:a283177311bade7400c6088e8fad71a1f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="SplineCommon_8h.html#a283177311bade7400c6088e8fad71a1f">_nCoeff_</a>&#160;&#160;&#160;4</td></tr>
-<tr class="memdesc:a283177311bade7400c6088e8fad71a1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: We store coefficients {y,b,c,d} in one array one by one, this is only to define it once rather then insert "4" all over the code.  <br /></td></tr>
-<tr class="separator:a283177311bade7400c6088e8fad71a1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a911160077ffa38727e0494f178ce380a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="SplineCommon_8h.html#a911160077ffa38727e0494f178ce380a">_nTF1Coeff_</a>&#160;&#160;&#160;2</td></tr>
-<tr class="memdesc:a911160077ffa38727e0494f178ce380a"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: For TF1 we store at most 5 coefficients, we could make it more flexible but for now define it here to make future changes easier to track.  <br /></td></tr>
-<tr class="separator:a911160077ffa38727e0494f178ce380a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="enum-members" name="enum-members"></a>
 Enumerations</h2></td></tr>
 <tr class="memitem:aac6312c7a4c683e6d016d9fccdc7d7c0"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="SplineCommon_8h.html#aac6312c7a4c683e6d016d9fccdc7d7c0">SplineSegmentCoeffs</a> { <a class="el" href="SplineCommon_8h.html#aac6312c7a4c683e6d016d9fccdc7d7c0a9e87d802f64d8929291c58eeb0eb16e6">kCoeffY</a> = 0
@@ -126,6 +117,15 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:aac6312c7a4c683e6d016d9fccdc7d7c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">HW: Coefficients for grabbing items from manycoeff_arr (rather than having y=manycoeffarray[index+0])  <a href="SplineCommon_8h.html#aac6312c7a4c683e6d016d9fccdc7d7c0">More...</a><br /></td></tr>
 <tr class="separator:aac6312c7a4c683e6d016d9fccdc7d7c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a790348db7c20fb9896e94403fbee52cf"><td class="memItemLeft" align="right" valign="top">constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="SplineCommon_8h.html#a790348db7c20fb9896e94403fbee52cf">_nCoeff_</a> = 4</td></tr>
+<tr class="memdesc:a790348db7c20fb9896e94403fbee52cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: We store coefficients {y,b,c,d} in one array one by one, this is only to define it once rather then insert "4" all over the code.  <br /></td></tr>
+<tr class="separator:a790348db7c20fb9896e94403fbee52cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad6cacf3d45a37eeeeffe38ad24345d54"><td class="memItemLeft" align="right" valign="top">constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="SplineCommon_8h.html#ad6cacf3d45a37eeeeffe38ad24345d54">_nTF1Coeff_</a> = 2</td></tr>
+<tr class="memdesc:ad6cacf3d45a37eeeeffe38ad24345d54"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: For TF1 we store at most 5 coefficients, we could make it more flexible but for now define it here to make future changes easier to track.  <br /></td></tr>
+<tr class="separator:ad6cacf3d45a37eeeeffe38ad24345d54"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Contains definitions for spline coefficients and structure used in both CPU and GPU code. </p>
@@ -134,44 +134,7 @@ Enumerations</h2></td></tr>
 Kamil Skwarczynski </dd></dl>
 
 <p class="definition">Definition in file <a class="el" href="SplineCommon_8h_source.html">SplineCommon.h</a>.</p>
-</div><h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a283177311bade7400c6088e8fad71a1f" name="a283177311bade7400c6088e8fad71a1f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a283177311bade7400c6088e8fad71a1f">&#9670;&#160;</a></span>_nCoeff_</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define _nCoeff_&#160;&#160;&#160;4</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>KS: We store coefficients {y,b,c,d} in one array one by one, this is only to define it once rather then insert "4" all over the code. </p>
-
-<p class="definition">Definition at line <a class="el" href="SplineCommon_8h_source.html#l00013">13</a> of file <a class="el" href="SplineCommon_8h_source.html">SplineCommon.h</a>.</p>
-
-</div>
-</div>
-<a id="a911160077ffa38727e0494f178ce380a" name="a911160077ffa38727e0494f178ce380a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a911160077ffa38727e0494f178ce380a">&#9670;&#160;</a></span>_nTF1Coeff_</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define _nTF1Coeff_&#160;&#160;&#160;2</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>KS: For TF1 we store at most 5 coefficients, we could make it more flexible but for now define it here to make future changes easier to track. </p>
-
-<p class="definition">Definition at line <a class="el" href="SplineCommon_8h_source.html#l00015">15</a> of file <a class="el" href="SplineCommon_8h_source.html">SplineCommon.h</a>.</p>
-
-</div>
-</div>
-<h2 class="groupheader">Enumeration Type Documentation</h2>
+</div><h2 class="groupheader">Enumeration Type Documentation</h2>
 <a id="aac6312c7a4c683e6d016d9fccdc7d7c0" name="aac6312c7a4c683e6d016d9fccdc7d7c0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aac6312c7a4c683e6d016d9fccdc7d7c0">&#9670;&#160;</a></span>SplineSegmentCoeffs</h2>
 
@@ -208,6 +171,59 @@ Kamil Skwarczynski </dd></dl>
 <div class="ttc" id="aSplineCommon_8h_html_aac6312c7a4c683e6d016d9fccdc7d7c0a9e87d802f64d8929291c58eeb0eb16e6"><div class="ttname"><a href="SplineCommon_8h.html#aac6312c7a4c683e6d016d9fccdc7d7c0a9e87d802f64d8929291c58eeb0eb16e6">kCoeffY</a></div><div class="ttdeci">@ kCoeffY</div><div class="ttdoc">Coefficient Y.</div><div class="ttdef"><b>Definition:</b> <a href="SplineCommon_8h_source.html#l00020">SplineCommon.h:20</a></div></div>
 <div class="ttc" id="aSplineCommon_8h_html_aac6312c7a4c683e6d016d9fccdc7d7c0af73b429597449e82d2920f69d03cef36"><div class="ttname"><a href="SplineCommon_8h.html#aac6312c7a4c683e6d016d9fccdc7d7c0af73b429597449e82d2920f69d03cef36">kCoeffC</a></div><div class="ttdeci">@ kCoeffC</div><div class="ttdoc">Coefficient C.</div><div class="ttdef"><b>Definition:</b> <a href="SplineCommon_8h_source.html#l00022">SplineCommon.h:22</a></div></div>
 </div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a790348db7c20fb9896e94403fbee52cf" name="a790348db7c20fb9896e94403fbee52cf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a790348db7c20fb9896e94403fbee52cf">&#9670;&#160;</a></span>_nCoeff_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr int _nCoeff_ = 4</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>KS: We store coefficients {y,b,c,d} in one array one by one, this is only to define it once rather then insert "4" all over the code. </p>
+
+<p class="definition">Definition at line <a class="el" href="SplineCommon_8h_source.html#l00013">13</a> of file <a class="el" href="SplineCommon_8h_source.html">SplineCommon.h</a>.</p>
+
+</div>
+</div>
+<a id="ad6cacf3d45a37eeeeffe38ad24345d54" name="ad6cacf3d45a37eeeeffe38ad24345d54"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad6cacf3d45a37eeeeffe38ad24345d54">&#9670;&#160;</a></span>_nTF1Coeff_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr int _nTF1Coeff_ = 2</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>KS: For TF1 we store at most 5 coefficients, we could make it more flexible but for now define it here to make future changes easier to track. </p>
+
+<p class="definition">Definition at line <a class="el" href="SplineCommon_8h_source.html#l00015">15</a> of file <a class="el" href="SplineCommon_8h_source.html">SplineCommon.h</a>.</p>
+
 </div>
 </div>
 </div><!-- contents -->
