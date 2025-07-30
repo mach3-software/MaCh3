@@ -224,7 +224,7 @@ var searchData=
   ['getsplitbysample_221',['getSplitBySample',['../classMaCh3Plotting_1_1PlottingManager.html#accbc8139f12323e7b3e2ed2222d1db45',1,'MaCh3Plotting::PlottingManager']]],
   ['getsplitsamplestack_222',['getSplitSampleStack',['../PlotLLH_8cpp.html#ac434b1236e675ded43713ded78c5de8f',1,'PlotLLH.cpp']]],
   ['getstepscalebasedonllhscan_223',['GetStepScaleBasedOnLLHScan',['../classFitterBase.html#a63820450a9089d5281769288c007db55',1,'FitterBase']]],
-  ['getsubmatrix_224',['GetSubMatrix',['../MatrixPlotter_8cpp.html#a2c43f409ad4e7256a1b2ba9ab34c1a8e',1,'MatrixPlotter.cpp']]],
+  ['getsubmatrix_224',['GetSubMatrix',['../MatrixPlotter_8cpp.html#abffaab8c1cff4aa67e426355d5f526d9',1,'MatrixPlotter.cpp']]],
   ['getsuboptimality_225',['GetSubOptimality',['../StatisticalUtils_8h.html#a34d5232bfb12e29ec9d63acaa8744b58',1,'GetSubOptimality(const std::vector&lt; double &gt; &amp;EigenValues, const int TotalTarameters):&#160;StatisticalUtils.cpp'],['../StatisticalUtils_8cpp.html#a34d5232bfb12e29ec9d63acaa8744b58',1,'GetSubOptimality(const std::vector&lt; double &gt; &amp;EigenValues, const int TotalTarameters):&#160;StatisticalUtils.cpp']]],
   ['getsystindexfromsamplename_226',['GetSystIndexFromSampleName',['../group__ParameterHandlerGetters.html#ga45b0e33d7f1016e2df09419969198e72',1,'ParameterHandlerGeneric']]],
   ['gettaggedparameters_227',['getTaggedParameters',['../classMaCh3Plotting_1_1InputManager.html#a375aba4aa8fc8b763756f8b45682a715',1,'MaCh3Plotting::InputManager']]],
