@@ -2259,8 +2259,8 @@ void MCMCProcessor::FindInputFilesLegacy() {
     MACH3LOG_WARN("Couldn't find NDCov (legacy) branch in output");
   } else{
     //If the FD Cov is not none, then you need the name of the covariance object to grab
-    CovNamePos[kNDPar].push_back(GetFromManager<std::string>(Settings["General"]["Systematics"]["NDCovName"], "none"));
-    MACH3LOG_INFO("Given NDCovFile {} and NDCovName {}", CovPos[kNDPar].back(), CovNamePos[kNDPar].back());
+    CovNamePos[kNDPar] = GetFromManager<std::string>(Settings["General"]["Systematics"]["NDCovName"], "none");
+    MACH3LOG_INFO("Given NDCovFile {} and NDCovName {}", CovPos[kNDPar].back(), CovNamePos[kNDPar]);
   }
 
   //CW: And the FD Covariance matrix
@@ -2270,8 +2270,8 @@ void MCMCProcessor::FindInputFilesLegacy() {
     MACH3LOG_WARN("Couldn't find FDCov (legacy) branch in output");
   } else {
     //If the FD Cov is not none, then you need the name of the covariance object to grab
-    CovNamePos[kFDDetPar].push_back(GetFromManager<std::string>(Settings["General"]["Systematics"]["FDCovName"], "none"));
-    MACH3LOG_INFO("Given FDCovFile {} and FDCovName {}", CovPos[kFDDetPar].back(), CovNamePos[kFDDetPar].back());
+    CovNamePos[kFDDetPar] = GetFromManager<std::string>(Settings["General"]["Systematics"]["FDCovName"], "none");
+    MACH3LOG_INFO("Given FDCovFile {} and FDCovName {}", CovPos[kFDDetPar].back(), CovNamePos[kFDDetPar]);
   }
 
   if (const char * mach3_env = std::getenv("MACH3"))
@@ -2348,7 +2348,7 @@ void MCMCProcessor::ReadNDFile() {
   }
   NDdetFile->cd();
 
-  TMatrixDSym *NDdetMatrix = NDdetFile->Get<TMatrixDSym>(CovNamePos[kNDPar].back().c_str());
+  TMatrixDSym *NDdetMatrix = NDdetFile->Get<TMatrixDSym>(CovNamePos[kNDPar].c_str());
   TVectorD *NDdetNominal = NDdetFile->Get<TVectorD>("det_weights");
   TDirectory *BinningDirectory = NDdetFile->Get<TDirectory>("Binning");
 
@@ -2391,7 +2391,7 @@ void MCMCProcessor::ReadFDFile() {
   }
   FDdetFile->cd();
 
-  TMatrixD *FDdetMatrix = FDdetFile->Get<TMatrixD>(CovNamePos[kFDDetPar].back().c_str());
+  TMatrixD *FDdetMatrix = FDdetFile->Get<TMatrixD>(CovNamePos[kFDDetPar].c_str());
 
   for (int i = 0; i < FDdetMatrix->GetNrows(); ++i)
   {

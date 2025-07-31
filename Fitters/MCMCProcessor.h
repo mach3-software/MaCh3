@@ -374,7 +374,7 @@ class MCMCProcessor {
     /// Covariance matrix file name position
     std::vector<std::vector<std::string>> CovPos;
     /// Covariance matrix name position
-    std::vector<std::vector<std::string>> CovNamePos;
+    std::vector<std::string> CovNamePos;
     /// Covariance matrix config
     std::vector<YAML::Node> CovConfig;
 
