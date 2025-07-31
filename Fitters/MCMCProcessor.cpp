@@ -80,6 +80,7 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
   ParamTypeStartPos.resize(kNParameterEnum);
   nParam.resize(kNParameterEnum);
   CovPos.resize(kNParameterEnum);
+  CovNamePos.resize(kNParameterEnum);
   CovConfig.resize(kNParameterEnum);
 
   for(int i = 0; i < kNParameterEnum; i++)
@@ -2253,14 +2254,24 @@ void MCMCProcessor::FindInputFilesLegacy() {
 
   //CW: And the ND Covariance matrix
   CovPos[kNDPar].push_back(GetFromManager<std::string>(Settings["General"]["Systematics"]["NDCovFile"], "none"));
+
   if(CovPos[kNDPar].back() == "none") {
     MACH3LOG_WARN("Couldn't find NDCov (legacy) branch in output");
+  } else{
+    //If the FD Cov is not none, then you need the name of the covariance object to grab
+    CovNamePos[kNDPar].push_back(GetFromManager<std::string>(Settings["General"]["Systematics"]["NDCovName"], "none"));
+    MACH3LOG_INFO("Given NDCovFile {} and NDCovName {}", CovPos[kNDPar].back(), CovNames[kNDPar].back());
   }
 
   //CW: And the FD Covariance matrix
   CovPos[kFDDetPar].push_back(GetFromManager<std::string>(Settings["General"]["Systematics"]["FDCovFile"], "none"));
+
   if(CovPos[kFDDetPar].back() == "none") {
     MACH3LOG_WARN("Couldn't find FDCov (legacy) branch in output");
+  } else {
+    //If the FD Cov is not none, then you need the name of the covariance object to grab
+    CovNamePos[kFDDetPar].push_back(GetFromManager<std::string>(Settings["General"]["Systematics"]["FDCovName"], "none"));
+    MACH3LOG_INFO("Given FDCovFile {} and FDCovName {}", CovPos[kFDPar].back(), CovNames[kFDPar].back());
   }
 
   if (const char * mach3_env = std::getenv("MACH3"))
@@ -2337,7 +2348,7 @@ void MCMCProcessor::ReadNDFile() {
   }
   NDdetFile->cd();
 
-  TMatrixDSym *NDdetMatrix = NDdetFile->Get<TMatrixDSym>("nddet_cov");
+  TMatrixDSym *NDdetMatrix = NDdetFile->Get<TMatrixDSym>(CovNamePos[kNDPar].back().c_str());
   TVectorD *NDdetNominal = NDdetFile->Get<TVectorD>("det_weights");
   TDirectory *BinningDirectory = NDdetFile->Get<TDirectory>("Binning");
 
@@ -2375,12 +2386,12 @@ void MCMCProcessor::ReadFDFile() {
   // Do the same for the FD
   TFile *FDdetFile = new TFile(CovPos[kFDDetPar].back().c_str(), "open");
   if (FDdetFile->IsZombie()) {
-    MACH3LOG_ERROR("Couldn't find NDdetFile {}", CovPos[kFDDetPar].back());
+    MACH3LOG_ERROR("Couldn't find FDdetFile {}", CovPos[kFDDetPar].back());
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   FDdetFile->cd();
 
-  TMatrixDSym *FDdetMatrix = FDdetFile->Get<TMatrixDSym>("SKJointError_Erec_Total");
+  TMatrixD *FDdetMatrix = FDdetFile->Get<TMatrixD>(CovNamePos[kFDDetPar].back().c_str());
 
   for (int i = 0; i < FDdetMatrix->GetNrows(); ++i)
   {
@@ -2395,6 +2406,7 @@ void MCMCProcessor::ReadFDFile() {
     ParamFlat[kFDDetPar].push_back( false );
   }
   //KS: The last parameter is p scale
+  //ETA: we need to be careful here, this is only true for SK in the T2K beam analysis...
   if(FancyPlotNames) ParamNames[kFDDetPar].back() = "Momentum Scale";
 
   FDdetFile->Close();
