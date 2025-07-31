@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['name_0',['Name',['../structMaCh3ModeInfo.html#a8c957d49742a2ad0faa79fbc07427767',1,'MaCh3ModeInfo']]],
-  ['name_1',['name',['../structTypeParameterBase.html#a9cec220ee7904196cc6a7d98c2b061f8',1,'TypeParameterBase']]],
+  ['name_0',['name',['../structTypeParameterBase.html#a9cec220ee7904196cc6a7d98c2b061f8',1,'TypeParameterBase']]],
+  ['name_1',['Name',['../structMaCh3ModeInfo.html#a8c957d49742a2ad0faa79fbc07427767',1,'MaCh3ModeInfo']]],
   ['nbatches_2',['nBatches',['../classMCMCProcessor.html#a02c5a3f849cf217705816c650c678d19',1,'MCMCProcessor']]],
   ['nbins_3',['nBins',['../GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1',1,'nBins():&#160;GetPostfitParamPlots.cpp'],['../classMCMCProcessor.html#a6b74f8195bcbca0979f9e9fe43468bae',1,'MCMCProcessor::nBins()'],['../structSampleBinningInfo.html#af20237040c5fe0d4a26b63fc83e55ff9',1,'SampleBinningInfo::nBins()']]],
   ['nbranches_4',['nBranches',['../classMCMCProcessor.html#af6ba5d9aec5350fafebbf81309e813cb',1,'MCMCProcessor']]],

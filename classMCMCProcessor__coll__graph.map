@@ -1,20 +1,20 @@
 <map id="MCMCProcessor" name="MCMCProcessor">
-<area shape="rect" id="node1" title="Class responsible for processing MCMC chains, performing diagnostics, generating plots,..." alt="" coords="592,538,719,563"/>
+<area shape="rect" id="node1" title="Class responsible for processing MCMC chains, performing diagnostics, generating plots,..." alt="" coords="592,543,719,569"/>
 <area shape="rect" id="node2" title=" " alt="" coords="263,74,349,99"/>
 <area shape="rect" id="node3" title=" " alt="" coords="5,67,144,107"/>
 <area shape="rect" id="node4" title=" " alt="" coords="219,124,393,164"/>
-<area shape="rect" id="node5" title=" " alt="" coords="231,188,381,228"/>
-<area shape="rect" id="node6" title=" " alt="" coords="223,261,389,286"/>
-<area shape="rect" id="node7" title=" " alt="" coords="213,339,399,365"/>
-<area shape="rect" id="node8" title=" " alt="" coords="231,389,381,414"/>
-<area shape="rect" id="node9" title=" " alt="" coords="219,439,393,479"/>
-<area shape="rect" id="node10" title=" " alt="" coords="219,503,393,543"/>
-<area shape="rect" id="node11" title=" " alt="" coords="219,567,393,607"/>
-<area shape="rect" id="node12" title=" " alt="" coords="237,631,375,657"/>
-<area shape="rect" id="node13" title=" " alt="" coords="193,681,419,706"/>
-<area shape="rect" id="node14" title=" " alt="" coords="219,730,393,755"/>
-<area shape="rect" id="node15" title=" " alt="" coords="204,779,408,805"/>
-<area shape="rect" id="node16" title=" " alt="" coords="222,829,390,854"/>
-<area shape="rect" id="node17" title=" " alt="" coords="219,879,393,919"/>
-<area shape="rect" id="node18" title=" " alt="" coords="213,945,399,970"/>
+<area shape="rect" id="node5" title=" " alt="" coords="213,226,399,251"/>
+<area shape="rect" id="node6" title=" " alt="" coords="231,276,381,316"/>
+<area shape="rect" id="node7" title=" " alt="" coords="223,345,389,370"/>
+<area shape="rect" id="node8" title=" " alt="" coords="231,394,381,419"/>
+<area shape="rect" id="node9" title=" " alt="" coords="219,444,393,484"/>
+<area shape="rect" id="node10" title=" " alt="" coords="219,508,393,548"/>
+<area shape="rect" id="node11" title=" " alt="" coords="219,572,393,612"/>
+<area shape="rect" id="node12" title=" " alt="" coords="237,637,375,662"/>
+<area shape="rect" id="node13" title=" " alt="" coords="193,686,419,711"/>
+<area shape="rect" id="node14" title=" " alt="" coords="219,735,393,761"/>
+<area shape="rect" id="node15" title=" " alt="" coords="204,785,408,810"/>
+<area shape="rect" id="node16" title=" " alt="" coords="222,834,390,859"/>
+<area shape="rect" id="node17" title=" " alt="" coords="219,884,393,924"/>
+<area shape="rect" id="node18" title=" " alt="" coords="213,950,399,975"/>
 </map>
