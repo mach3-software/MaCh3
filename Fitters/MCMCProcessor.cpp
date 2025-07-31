@@ -2260,7 +2260,7 @@ void MCMCProcessor::FindInputFilesLegacy() {
   } else{
     //If the FD Cov is not none, then you need the name of the covariance object to grab
     CovNamePos[kNDPar].push_back(GetFromManager<std::string>(Settings["General"]["Systematics"]["NDCovName"], "none"));
-    MACH3LOG_INFO("Given NDCovFile {} and NDCovName {}", CovPos[kNDPar].back(), CovNames[kNDPar].back());
+    MACH3LOG_INFO("Given NDCovFile {} and NDCovName {}", CovPos[kNDPar].back(), CovNamePos[kNDPar].back());
   }
 
   //CW: And the FD Covariance matrix
@@ -2271,7 +2271,7 @@ void MCMCProcessor::FindInputFilesLegacy() {
   } else {
     //If the FD Cov is not none, then you need the name of the covariance object to grab
     CovNamePos[kFDDetPar].push_back(GetFromManager<std::string>(Settings["General"]["Systematics"]["FDCovName"], "none"));
-    MACH3LOG_INFO("Given FDCovFile {} and FDCovName {}", CovPos[kFDPar].back(), CovNames[kFDPar].back());
+    MACH3LOG_INFO("Given FDCovFile {} and FDCovName {}", CovPos[kFDDetPar].back(), CovNamePos[kFDDetPar].back());
   }
 
   if (const char * mach3_env = std::getenv("MACH3"))
