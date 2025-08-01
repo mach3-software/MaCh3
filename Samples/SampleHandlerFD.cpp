@@ -1059,6 +1059,10 @@ TH1* SampleHandlerFD::GetW2Hist(const int Dimension) {
 // ************************************************
   if(Dimension == 1) {
     TH1D* W2Hist = dynamic_cast<TH1D*>(RunSamples._hPDF1D->Clone((RunSamples._hPDF1D->GetName() + std::string("_W2")).c_str()));
+    if (!W2Hist) {
+      MACH3LOG_ERROR("Failed to cast");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
     W2Hist->Reset();
     for (size_t yBin = 0; yBin < Binning.nYBins; ++yBin) {
       for (size_t xBin = 0; xBin < Binning.nXBins; ++xBin) {
@@ -1069,6 +1073,10 @@ TH1* SampleHandlerFD::GetW2Hist(const int Dimension) {
     return W2Hist;
   } else if(Dimension == 2) {
     TH2D* W2Hist = dynamic_cast<TH2D*>(RunSamples._hPDF2D->Clone((RunSamples._hPDF2D->GetName() + std::string("_W2")).c_str()));
+    if (!W2Hist) {
+      MACH3LOG_ERROR("Failed to cast");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
     W2Hist->Reset();
     for (size_t yBin = 0; yBin < Binning.nYBins; ++yBin) {
       for (size_t xBin = 0; xBin < Binning.nXBins; ++xBin) {
