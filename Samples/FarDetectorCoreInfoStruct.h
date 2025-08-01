@@ -70,9 +70,6 @@ struct SampleInfo {
   /// histogram used for plotting storing 2D MC distribution
   TH2D* _hPDF2D = nullptr;
 
-  /// Stores info about oscillation channel for a single sample
-  std::vector<OscChannelInfo> OscChannels;
-
   /// @brief Initialise histograms used for plotting
   void InitialiseHistograms() {
     TString histname1d = (XVarStr).c_str();

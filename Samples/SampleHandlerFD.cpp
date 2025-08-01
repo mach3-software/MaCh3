@@ -126,7 +126,7 @@ void SampleHandlerFD::ReadSampleConfig()
   auto splinesuffix  = Get<std::string>(SampleManager->raw()["InputFiles"]["splinesuffix"], __FILE__, __LINE__);
   
   int NChannels = static_cast<M3::int_t>(SampleManager->raw()["SubSamples"].size());
-  RunSamples.OscChannels.reserve(NChannels);
+  OscChannels.reserve(NChannels);
 
   for (auto const &osc_channel : SampleManager->raw()["SubSamples"]) {
     std::string MTupleFileName = mtupleprefix+osc_channel["mtuplefile"].as<std::string>()+mtuplesuffix;
@@ -138,7 +138,7 @@ void SampleHandlerFD::ReadSampleConfig()
     OscInfo.FinalPDG          = static_cast<NuPDG>(osc_channel["oscnutype"].as<int>());
     OscInfo.ChannelIndex      = GetNOscChannels();
 
-    RunSamples.OscChannels.push_back(std::move(OscInfo));
+    OscChannels.push_back(std::move(OscInfo));
 
     FileToInitPDGMap[MTupleFileName] = static_cast<NuPDG>(osc_channel["nutype"].as<int>());
     FileToFinalPDGMap[MTupleFileName] = static_cast<NuPDG>(osc_channel["oscnutype"].as<int>());
@@ -1268,7 +1268,7 @@ void SampleHandlerFD::InitialiseNuOscillatorObjects() {
 
       for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
         // KS: This is bit weird but we basically loop over all events and push to vector only these which are part of a given OscChannel
-        const int Channel = GetOscChannel(RunSamples.OscChannels, (*MCSamples[iEvent].nupdgUnosc), (*MCSamples[iEvent].nupdg));
+        const int Channel = GetOscChannel(OscChannels, (*MCSamples[iEvent].nupdgUnosc), (*MCSamples[iEvent].nupdg));
         //DB Remove NC events from the arrays which are handed to the NuOscillator objects
         if (!MCSamples[iEvent].isNC && Channel == iChannel) {
           EnergyArray.push_back(M3::float_t(*(MCSamples[iEvent].rw_etru)));
@@ -1281,7 +1281,7 @@ void SampleHandlerFD::InitialiseNuOscillatorObjects() {
       if (*(MCSamples[0].rw_truecz) != M3::_BAD_DOUBLE_) {
         for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
           // KS: This is bit weird but we basically loop over all events and push to vector only these which are part of a given OscChannel
-          const int Channel = GetOscChannel(RunSamples.OscChannels, (*MCSamples[iEvent].nupdgUnosc), (*MCSamples[iEvent].nupdg));
+          const int Channel = GetOscChannel(OscChannels, (*MCSamples[iEvent].nupdgUnosc), (*MCSamples[iEvent].nupdg));
           //DB Remove NC events from the arrays which are handed to the NuOscillator objects
           if (!MCSamples[iEvent].isNC && Channel == iChannel) {
             CosineZArray.push_back(M3::float_t(*(MCSamples[iEvent].rw_truecz)));
@@ -1319,7 +1319,7 @@ void SampleHandlerFD::SetupNuOscillatorPointers() {
         throw MaCh3Exception(__FILE__, __LINE__);
       }
 
-      const int OscIndex = GetOscChannel(RunSamples.OscChannels, (*MCSamples[iEvent].nupdgUnosc), (*MCSamples[iEvent].nupdg));
+      const int OscIndex = GetOscChannel(OscChannels, (*MCSamples[iEvent].nupdgUnosc), (*MCSamples[iEvent].nupdg));
       //Can only happen if truecz has been initialised within the experiment specific code
       if (*(MCSamples[iEvent].rw_truecz) != M3::_BAD_DOUBLE_) {
         //Atmospherics
@@ -1365,7 +1365,7 @@ M3::float_t SampleHandlerFD::GetEventWeight(const int iEntry) const {
 void SampleHandlerFD::FillSplineBins() {
   //Now loop over events and get the spline bin for each event
   for (unsigned int j = 0; j < GetNEvents(); ++j) {
-    const int OscIndex = GetOscChannel(RunSamples.OscChannels, (*MCSamples[j].nupdgUnosc), (*MCSamples[j].nupdg));
+    const int OscIndex = GetOscChannel(OscChannels, (*MCSamples[j].nupdgUnosc), (*MCSamples[j].nupdg));
 
     std::vector< std::vector<int> > EventSplines;
     switch(GetNDim()){
@@ -1947,7 +1947,7 @@ void SampleHandlerFD::PrintIntegral(const TString& OutputFileName, const int Wei
   for (int i = 0;i < GetNOscChannels(); i++) {
     table_headings += fmt::format(" {:<17} |", GetFlavourName(i));
     table_footline += "--------------------";
-    if (printToFile) {outfile << "&" << std::setw(space) << RunSamples.OscChannels[i].flavourName_Latex << " ";}
+    if (printToFile) {outfile << "&" << std::setw(space) << OscChannels[i].flavourName_Latex << " ";}
     if (printToCSV)  {outcsv << GetFlavourName(i) << ",";}
   }
   if (printToFile) {outfile << "&" << std::setw(space) << "Total:" << "\\\\ \\hline" << std::endl;}
@@ -2099,7 +2099,7 @@ THStack* SampleHandlerFD::ReturnStackedHistBySelection1D(std::string KinematicPr
 // ************************************************
 const double* SampleHandlerFD::GetPointerToOscChannel(int iEvent) const {
 // ************************************************
-  const int Channel = GetOscChannel(RunSamples.OscChannels, (*MCSamples[iEvent].nupdgUnosc), (*MCSamples[iEvent].nupdg));
+  const int Channel = GetOscChannel(OscChannels, (*MCSamples[iEvent].nupdgUnosc), (*MCSamples[iEvent].nupdg));
 
-  return &(RunSamples.OscChannels[Channel].ChannelIndex);
+  return &(OscChannels[Channel].ChannelIndex);
 }

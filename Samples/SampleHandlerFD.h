@@ -77,7 +77,7 @@ class SampleHandlerFD :  public SampleHandlerBase
   void ReadSampleConfig();
 
   /// @ingroup SampleHandlerGetters
-  int GetNOscChannels() override {return static_cast<int>(RunSamples.OscChannels.size());}
+  int GetNOscChannels() override {return static_cast<int>(OscChannels.size());}
 
   /// @ingroup SampleHandlerGetters
   std::string GetFlavourName(const int iChannel) {
@@ -85,7 +85,7 @@ class SampleHandlerFD :  public SampleHandlerBase
       MACH3LOG_ERROR("Invalid Channel Requested: {}", iChannel);
       throw MaCh3Exception(__FILE__ , __LINE__);      
     }
-    return RunSamples.OscChannels[iChannel].flavourName;
+    return OscChannels[iChannel].flavourName;
   }
 
   /// @ingroup SampleHandlerGetters
@@ -255,7 +255,7 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// This way func weight shall be used in GetEventWeight
   virtual void CalcWeightFunc(int iEvent){return; (void)iEvent;};
 
-  /// @brief Return the value of an assocaited kinematic parameter for an event
+  /// @brief Return the value of an associated kinematic parameter for an event
   virtual double ReturnKinematicParameter(std::string KinematicParamter, int iEvent) = 0;
   virtual double ReturnKinematicParameter(int KinematicVariable, int iEvent) = 0;
   
@@ -311,6 +311,8 @@ class SampleHandlerFD :  public SampleHandlerBase
   std::vector<FarDetectorCoreInfo> MCSamples;
   /// Stores info about currently initialised sample
   SampleInfo RunSamples;
+  /// Stores info about oscillation channel for a single sample
+  std::vector<OscChannelInfo> OscChannels;
   //===============================================================================
 
   //===============================================================================
