@@ -49,9 +49,9 @@ struct SampleInfo {
     if(_hPDF2D   != nullptr) delete _hPDF2D;
   }
 
-  /// the strings associated with the variables used for the binning e.g. "RecoNeutrinoEnergy"
+  /// the strings associated with the variables used for the X binning e.g. "RecoNeutrinoEnergy"
   std::string XVarStr = "";
-  /// the strings associated with the variables used for the binning e.g. "RecoNeutrinoEnergy"
+  /// the strings associated with the variables used for the Y binning e.g. "RecoNeutrinoEnergy"
   std::string YVarStr = "";
 
   /// @brief the name of this sample e.g."muon-like"
