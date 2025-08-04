@@ -93,8 +93,15 @@ void mcmc::RunMCMC() {
   // Accept the first step to set logLCurr: this shouldn't affect the MCMC because we ignore the first N steps in burn-in
   logLCurr = logLProp;
 
+  // KS: Make sure we don't hit limits when using very long
+  if (stepStart > std::numeric_limits<decltype(stepStart)>::max() - chainLength) {
+    MACH3LOG_ERROR("stepStart ({}) + chainLength ({}) would overflow limit {}",
+                   stepStart, chainLength, std::numeric_limits<decltype(stepStart)>::max());
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
   // Begin MCMC
-  const auto StepEnd = stepStart + chainLength;
+  const unsigned int StepEnd = stepStart + chainLength;
   for (step = stepStart; step < StepEnd; ++step)
   {
     stepClock->Start();

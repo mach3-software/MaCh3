@@ -343,6 +343,17 @@ void PredictiveThrower::ProduceToys() {
   //Get the burn-in from the config
   auto burn_in = Get<int>(fitMan->raw()["Predictive"]["BurnInSteps"], __FILE__, __LINE__);
 
+  //DL: Adding sanity check for chains shorter than burn in
+  const unsigned int maxNsteps = static_cast<unsigned int>(PosteriorFile->GetMaximum("step"));
+  if(static_cast<unsigned int>(burn_in) >= maxNsteps)
+  {
+    MACH3LOG_ERROR("You are running on a chain shorter than burn in cut");
+    MACH3LOG_ERROR("Maximal value of nSteps: {}, burn in cut {}", maxNsteps, burn_in);
+    MACH3LOG_ERROR("You will run into infinite loop");
+    MACH3LOG_ERROR("You can make new chain or modify burn in cut");
+    throw MaCh3Exception(__FILE__,__LINE__);
+  }
+
   TStopwatch TempClock;
   TempClock.Start();
   for(int i = 0; i < Ntoys; i++)
@@ -643,15 +654,15 @@ void PredictiveThrower::MakeChi2Plots(const std::vector<std::vector<double>>& Ch
       chi2_x_per_sample[iToy]  = Chi2_x[iToy][iSample];
     }
 
-    double min_val = std::min(*std::min_element(chi2_y_sample.begin(), chi2_y_sample.end()),
+    const double min_val = std::min(*std::min_element(chi2_y_sample.begin(), chi2_y_sample.end()),
                               *std::min_element(chi2_x_per_sample.begin(), chi2_x_per_sample.end()));
-    double max_val = std::max(*std::max_element(chi2_y_sample.begin(), chi2_y_sample.end()),
+    const double max_val = std::max(*std::max_element(chi2_y_sample.begin(), chi2_y_sample.end()),
                               *std::max_element(chi2_x_per_sample.begin(), chi2_x_per_sample.end()));
 
     auto chi2_hist = std::make_unique<TH2D>((SampleNames[iSample] + Tittle).c_str(),
                                             (SampleNames[iSample] + Tittle).c_str(),
                                             100, min_val, max_val, 100, min_val, max_val);
-
+    chi2_hist->SetDirectory(nullptr);
     chi2_hist->GetXaxis()->SetTitle(Chi2_x_title.c_str());
     chi2_hist->GetYaxis()->SetTitle(Chi2_y_title.c_str());
 
