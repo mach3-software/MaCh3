@@ -28,16 +28,16 @@ class SampleHandlerFD :  public SampleHandlerBase
 
   /// @brief DB Function to differentiate 1D or 2D binning
   /// @ingroup SampleHandlerGetters
-  int GetNDim() const { return RunSamples.nDimensions; }
+  int GetNDim() const { return SampleDetails.nDimensions; }
   /// @ingroup SampleHandlerGetters
   std::string GetSampleName(int iSample = 0) const override;
   /// @ingroup SampleHandlerGetters
-  std::string GetTitle() const override {return RunSamples.SampleTitle;}
+  std::string GetTitle() const override {return SampleDetails.SampleTitle;}
 
   /// @ingroup SampleHandlerGetters
-  std::string GetXBinVarName() const {return RunSamples.XVarStr;}
+  std::string GetXBinVarName() const {return SampleDetails.XVarStr;}
   /// @ingroup SampleHandlerGetters
-  std::string GetYBinVarName() const {return RunSamples.YVarStr;}
+  std::string GetYBinVarName() const {return SampleDetails.YVarStr;}
 
   void PrintIntegral(const TString& OutputName="/dev/null", const int WeightStyle=0, const TString& OutputCSVName="/dev/null");
   
@@ -310,7 +310,7 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// Stores information about every MC event
   std::vector<FarDetectorCoreInfo> MCSamples;
   /// Stores info about currently initialised sample
-  SampleInfo RunSamples;
+  SampleInfo SampleDetails;
   /// Stores info about oscillation channel for a single sample
   std::vector<OscChannelInfo> OscChannels;
   //===============================================================================

@@ -59,7 +59,7 @@ void SampleHandlerFD::ReadSampleConfig()
   auto ModeName = Get<std::string>(SampleManager->raw()["MaCh3ModeConfig"], __FILE__ , __LINE__);
   Modes = std::make_unique<MaCh3Modes>(ModeName);
   //SampleTitle has to be provided in the sample yaml otherwise this will throw an exception
-  RunSamples.SampleTitle = Get<std::string>(SampleManager->raw()["SampleTitle"], __FILE__ , __LINE__);
+  SampleDetails.SampleTitle = Get<std::string>(SampleManager->raw()["SampleTitle"], __FILE__ , __LINE__);
   //SampleName has to be provided in the sample yaml otherwise this will throw an exception
   SampleName = Get<std::string>(SampleManager->raw()["SampleName"], __FILE__ , __LINE__);
 
@@ -68,8 +68,8 @@ void SampleHandlerFD::ReadSampleConfig()
     UpdateW2 = GetFromManager<bool>(SampleManager->raw()["LikelihoodOptions"]["UpdateW2"], false);
   }
   //Binning
-  RunSamples.nDimensions = 0;
-  RunSamples.XVarStr = GetFromManager(SampleManager->raw()["Binning"]["XVarStr"], std::string(""));
+  SampleDetails.nDimensions = 0;
+  SampleDetails.XVarStr = GetFromManager(SampleManager->raw()["Binning"]["XVarStr"], std::string(""));
   Binning.XBinEdges = GetFromManager(SampleManager->raw()["Binning"]["XVarBins"], std::vector<double>());
   const auto& edgesx = Binning.XBinEdges;
   if (!std::is_sorted(edgesx.begin(), edgesx.end())) {
@@ -78,13 +78,13 @@ void SampleHandlerFD::ReadSampleConfig()
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   if(GetXBinVarName().length() > 0){
-    RunSamples.nDimensions++;
+    SampleDetails.nDimensions++;
   } else{
     MACH3LOG_ERROR("Please specify an X-variable string in sample config {}", SampleManager->GetFileName());
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   
-  RunSamples.YVarStr = GetFromManager(SampleManager->raw()["Binning"]["YVarStr"], std::string(""));
+  SampleDetails.YVarStr = GetFromManager(SampleManager->raw()["Binning"]["YVarStr"], std::string(""));
   Binning.YBinEdges = GetFromManager(SampleManager->raw()["Binning"]["YVarBins"], std::vector<double>());
   const auto& edgesy = Binning.YBinEdges;
   if (!std::is_sorted(edgesy.begin(), edgesy.end())) {
@@ -97,7 +97,7 @@ void SampleHandlerFD::ReadSampleConfig()
       MACH3LOG_ERROR("Please specify an X-variable string in sample config {}. I won't work only with a Y-variable", SampleManager->GetFileName());
       throw MaCh3Exception(__FILE__, __LINE__);
     }
-    RunSamples.nDimensions++;
+    SampleDetails.nDimensions++;
   }
   
   if(GetNDim() == 0){
@@ -263,11 +263,11 @@ void SampleHandlerFD::Fill1DHist()
 {
   // DB Commented out by default - Code heading towards GetLikelihood using arrays instead of root objects
   // Wouldn't actually need this for GetLikelihood as TH objects wouldn't be filled
-  RunSamples._hPDF1D->Reset();
+  SampleDetails._hPDF1D->Reset();
   for (size_t yBin = 0; yBin < Binning.nYBins; ++yBin) {
     for (size_t xBin = 0; xBin < Binning.nXBins; ++xBin) {
       const int idx = Binning.GetBinSafe(xBin, yBin);
-      RunSamples._hPDF1D->AddBinContent(idx + 1, SampleHandlerFD_array[idx]);
+      SampleDetails._hPDF1D->AddBinContent(idx + 1, SampleHandlerFD_array[idx]);
     }
   }
 }
@@ -276,11 +276,11 @@ void SampleHandlerFD::Fill2DHist()
 {
   // DB Commented out by default - Code heading towards GetLikelihood using arrays instead of root objects
   // Wouldn't actually need this for GetLikelihood as TH objects wouldn't be filled
-  RunSamples._hPDF2D->Reset();
+  SampleDetails._hPDF2D->Reset();
   for (size_t yBin = 0; yBin < Binning.nYBins; ++yBin) {
     for (size_t xBin = 0; xBin < Binning.nXBins; ++xBin) {
       const int idx = Binning.GetBinSafe(xBin, yBin);
-      RunSamples._hPDF2D->SetBinContent(static_cast<int>(xBin + 1), static_cast<int>(yBin + 1), SampleHandlerFD_array[idx]);
+      SampleDetails._hPDF2D->SetBinContent(static_cast<int>(xBin + 1), static_cast<int>(yBin + 1), SampleHandlerFD_array[idx]);
     }
   }
 }
@@ -294,7 +294,7 @@ void SampleHandlerFD::Fill2DHist()
 void SampleHandlerFD::SetupSampleBinning(){
 // ************************************************
   MACH3LOG_INFO("Setting up Sample Binning");
-  RunSamples.InitialiseHistograms();
+  SampleDetails.InitialiseHistograms();
 
   //A string to store the binning for a nice print out
   std::string XBinEdgesStr = "";
@@ -395,7 +395,7 @@ void SampleHandlerFD::Reweight() {
 /// function takes advantage of most of the things called in setupSKMC to reduce reweighting time.
 /// It also follows the ND code reweighting pretty closely. This function fills the SampleHandlerFD 
 /// array array which is binned to match the sample binning, such that bin[1][1] is the 
-/// equivalent of RunSamples._hPDF2D->GetBinContent(2,2) {Noticing the offset}
+/// equivalent of SampleDetails._hPDF2D->GetBinContent(2,2) {Noticing the offset}
 void SampleHandlerFD::FillArray() {
 //************************************************
   //DB Reset which cuts to apply
@@ -899,9 +899,9 @@ void SampleHandlerFD::SetupReweightArrays(const size_t numberXBins, const size_t
 //fill1Dhist and fill2Dhist quicker
 void SampleHandlerFD::Set1DBinning(size_t nbins, double* boundaries)
 {
-  RunSamples._hPDF1D->Reset();
-  RunSamples._hPDF1D->SetBins(static_cast<int>(nbins),boundaries);
-  RunSamples.dathist->SetBins(static_cast<int>(nbins),boundaries);
+  SampleDetails._hPDF1D->Reset();
+  SampleDetails._hPDF1D->SetBins(static_cast<int>(nbins),boundaries);
+  SampleDetails.dathist->SetBins(static_cast<int>(nbins),boundaries);
 
   Binning.YBinEdges = std::vector<double>(2);
   Binning.YBinEdges[0] = -1e8;
@@ -911,9 +911,9 @@ void SampleHandlerFD::Set1DBinning(size_t nbins, double* boundaries)
   YBinEdges_Arr[0] = Binning.YBinEdges[0];
   YBinEdges_Arr[1] = Binning.YBinEdges[1];
 
-  RunSamples._hPDF2D->Reset();
-  RunSamples._hPDF2D->SetBins(static_cast<int>(nbins),boundaries,1,YBinEdges_Arr);
-  RunSamples.dathist2d->SetBins(static_cast<int>(nbins),boundaries,1,YBinEdges_Arr);
+  SampleDetails._hPDF2D->Reset();
+  SampleDetails._hPDF2D->SetBins(static_cast<int>(nbins),boundaries,1,YBinEdges_Arr);
+  SampleDetails.dathist2d->SetBins(static_cast<int>(nbins),boundaries,1,YBinEdges_Arr);
 
   //Set the number of X and Y bins now
   SetupReweightArrays(Binning.XBinEdges.size() - 1, Binning.YBinEdges.size() - 1);
@@ -932,7 +932,7 @@ void SampleHandlerFD::FindNominalBinAndEdges1D() {
 
     //Give y_var M3::_BAD_DOUBLE_ value for the 1D case since this won't be used
     MCSamples[event_i].y_var = &(M3::_BAD_DOUBLE_);
-    int bin = RunSamples._hPDF1D->FindBin(*(MCSamples[event_i].x_var));
+    int bin = SampleDetails._hPDF1D->FindBin(*(MCSamples[event_i].x_var));
 
     if ((bin-1) >= 0 && (bin-1) < int(Binning.XBinEdges.size()-1)) {
       MCSamples[event_i].NomXBin = bin-1;
@@ -974,13 +974,13 @@ void SampleHandlerFD::FindNominalBinAndEdges1D() {
 
 void SampleHandlerFD::Set2DBinning(size_t nbins1, double* boundaries1, size_t nbins2, double* boundaries2)
 {
-  RunSamples._hPDF1D->Reset();
-  RunSamples._hPDF1D->SetBins(static_cast<int>(nbins1),boundaries1);
-  RunSamples.dathist->SetBins(static_cast<int>(nbins1),boundaries1);
+  SampleDetails._hPDF1D->Reset();
+  SampleDetails._hPDF1D->SetBins(static_cast<int>(nbins1),boundaries1);
+  SampleDetails.dathist->SetBins(static_cast<int>(nbins1),boundaries1);
 
-  RunSamples._hPDF2D->Reset();
-  RunSamples._hPDF2D->SetBins(static_cast<int>(nbins1),boundaries1,static_cast<int>(nbins2),boundaries2);
-  RunSamples.dathist2d->SetBins(static_cast<int>(nbins1),boundaries1,static_cast<int>(nbins2),boundaries2);
+  SampleDetails._hPDF2D->Reset();
+  SampleDetails._hPDF2D->SetBins(static_cast<int>(nbins1),boundaries1,static_cast<int>(nbins2),boundaries2);
+  SampleDetails.dathist2d->SetBins(static_cast<int>(nbins1),boundaries1,static_cast<int>(nbins2),boundaries2);
   
   //Set the number of X and Y bins now
   SetupReweightArrays(Binning.XBinEdges.size() - 1, Binning.YBinEdges.size() - 1);
@@ -1005,12 +1005,12 @@ void SampleHandlerFD::FindNominalBinAndEdges2D() {
       throw MaCh3Exception(__FILE__, __LINE__);
     }
     //Global bin number
-    int bin = RunSamples._hPDF2D->FindBin(*(MCSamples[event_i].x_var), *(MCSamples[event_i].y_var));
+    int bin = SampleDetails._hPDF2D->FindBin(*(MCSamples[event_i].x_var), *(MCSamples[event_i].y_var));
 
     int bin_x = M3::_BAD_INT_;
     int bin_y = M3::_BAD_INT_;
     int bin_z = M3::_BAD_INT_;
-    RunSamples._hPDF2D->GetBinXYZ(bin, bin_x, bin_y, bin_z);
+    SampleDetails._hPDF2D->GetBinXYZ(bin, bin_x, bin_y, bin_z);
 
     if ((bin_x-1) >= 0 && (bin_x-1) < int(Binning.XBinEdges.size()-1)) {
       MCSamples[event_i].NomXBin = bin_x-1;
@@ -1058,7 +1058,7 @@ void SampleHandlerFD::FindNominalBinAndEdges2D() {
 TH1* SampleHandlerFD::GetW2Hist(const int Dimension) {
 // ************************************************
   if(Dimension == 1) {
-    TH1D* W2Hist = dynamic_cast<TH1D*>(RunSamples._hPDF1D->Clone((RunSamples._hPDF1D->GetName() + std::string("_W2")).c_str()));
+    TH1D* W2Hist = dynamic_cast<TH1D*>(SampleDetails._hPDF1D->Clone((SampleDetails._hPDF1D->GetName() + std::string("_W2")).c_str()));
     if (!W2Hist) {
       MACH3LOG_ERROR("Failed to cast");
       throw MaCh3Exception(__FILE__, __LINE__);
@@ -1072,7 +1072,7 @@ TH1* SampleHandlerFD::GetW2Hist(const int Dimension) {
     }
     return W2Hist;
   } else if(Dimension == 2) {
-    TH2D* W2Hist = dynamic_cast<TH2D*>(RunSamples._hPDF2D->Clone((RunSamples._hPDF2D->GetName() + std::string("_W2")).c_str()));
+    TH2D* W2Hist = dynamic_cast<TH2D*>(SampleDetails._hPDF2D->Clone((SampleDetails._hPDF2D->GetName() + std::string("_W2")).c_str()));
     if (!W2Hist) {
       MACH3LOG_ERROR("Failed to cast");
       throw MaCh3Exception(__FILE__, __LINE__);
@@ -1097,10 +1097,10 @@ TH1* SampleHandlerFD::GetMCHist(const int Dimension) {
 // ************************************************
   if(Dimension == 1) {
     Fill1DHist();
-    return RunSamples._hPDF1D;
+    return SampleDetails._hPDF1D;
   } else if(Dimension == 2) {
     Fill2DHist();
-    return RunSamples._hPDF2D;
+    return SampleDetails._hPDF2D;
   } else{
     MACH3LOG_ERROR("Asdking for {} with N Dimension = {}. This is not implemented", __func__, Dimension);
     throw MaCh3Exception(__FILE__, __LINE__);
@@ -1111,9 +1111,9 @@ TH1* SampleHandlerFD::GetMCHist(const int Dimension) {
 TH1* SampleHandlerFD::GetDataHist(const int Dimension) {
 // ************************************************
   if(Dimension == 1) {
-    return RunSamples.dathist;
+    return SampleDetails.dathist;
   } else if(Dimension == 2) {
-    return RunSamples.dathist2d;
+    return SampleDetails.dathist2d;
   } else{
     MACH3LOG_ERROR("Asdking for {} with N Dimension = {}. This is not implemented", __func__, Dimension);
     throw MaCh3Exception(__FILE__, __LINE__);
@@ -1121,13 +1121,13 @@ TH1* SampleHandlerFD::GetDataHist(const int Dimension) {
 }
 
 void SampleHandlerFD::AddData(std::vector<double> &data) {
-  if (RunSamples.dathist == nullptr) {
+  if (SampleDetails.dathist == nullptr) {
     MACH3LOG_ERROR("Data hist hasn't been initialised yet");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
-  RunSamples.dathist2d = nullptr;
-  RunSamples.dathist->Reset();
+  SampleDetails.dathist2d = nullptr;
+  SampleDetails.dathist->Reset();
 
   if (GetNDim()!=1) {
     MACH3LOG_ERROR("Trying to set a 1D 'data' histogram when the number of dimensions for this sample is {}", GetNDim());
@@ -1136,7 +1136,7 @@ void SampleHandlerFD::AddData(std::vector<double> &data) {
   }
 
   for (auto const& data_point : data){
-    RunSamples.dathist->Fill(data_point);
+    SampleDetails.dathist->Fill(data_point);
   }
 
   if(SampleHandlerFD_data == nullptr) {
@@ -1146,20 +1146,20 @@ void SampleHandlerFD::AddData(std::vector<double> &data) {
   // Assuming nBins == nXBins here, because you have 1D data
   for (size_t bin = 0; bin < Binning.nXBins; ++bin) {
     // ROOT histograms are 1-based, so bin index + 1
-    SampleHandlerFD_data[bin] = RunSamples.dathist->GetBinContent(static_cast<int>(bin + 1));
+    SampleHandlerFD_data[bin] = SampleDetails.dathist->GetBinContent(static_cast<int>(bin + 1));
   }
 }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
 void SampleHandlerFD::AddData(std::vector< std::vector <double> > &data) {
-  if (RunSamples.dathist2d == nullptr) {
+  if (SampleDetails.dathist2d == nullptr) {
     MACH3LOG_ERROR("Data hist hasn't been initialised yet");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
-  RunSamples.dathist = nullptr;
-  RunSamples.dathist2d->Reset();
+  SampleDetails.dathist = nullptr;
+  SampleDetails.dathist2d->Reset();
 
   if (GetNDim()!=2) {
     MACH3LOG_ERROR("Trying to set a 2D 'data' histogram when the number of dimensions for this sample is {}", GetNDim());
@@ -1171,7 +1171,7 @@ void SampleHandlerFD::AddData(std::vector< std::vector <double> > &data) {
   //ETA: I think this might just be wrong? We should probably just make this AddData(std::vector<double> data_x, std::vector<double> data_y)
   // or maybe something like AddData(std::vector<std::pair<double, double>> data)?
   for (int i = 0; i < int(data.size()); i++) {
-    RunSamples.dathist2d->Fill(data.at(0)[i],data.at(1)[i]);
+    SampleDetails.dathist2d->Fill(data.at(0)[i],data.at(1)[i]);
   }
 
   if(SampleHandlerFD_data == nullptr) {
@@ -1183,18 +1183,18 @@ void SampleHandlerFD::AddData(std::vector< std::vector <double> > &data) {
       //Need to cast to an int (Int_t) for ROOT
       //Need to do +1 for the bin, this is to be consistent with ROOTs binning scheme
       const int idx = Binning.GetBinSafe(xBin, yBin);
-      SampleHandlerFD_data[idx] = RunSamples.dathist2d->GetBinContent(static_cast<int>(xBin + 1), static_cast<int>(yBin + 1));
+      SampleHandlerFD_data[idx] = SampleDetails.dathist2d->GetBinContent(static_cast<int>(xBin + 1), static_cast<int>(yBin + 1));
     }
   }
 }
 
 void SampleHandlerFD::AddData(TH1D* Data) {
   MACH3LOG_INFO("Adding 1D data histogram: {} with {:.2f} events", Data->GetTitle(), Data->Integral());
-  if (RunSamples.dathist != nullptr) {
-    delete RunSamples.dathist;
+  if (SampleDetails.dathist != nullptr) {
+    delete SampleDetails.dathist;
   }
-  RunSamples.dathist2d = nullptr;
-  RunSamples.dathist = static_cast<TH1D*>(Data->Clone());
+  SampleDetails.dathist2d = nullptr;
+  SampleDetails.dathist = static_cast<TH1D*>(Data->Clone());
 
   if (GetNDim() != 1) {
     MACH3LOG_ERROR("Trying to set a 1D 'data' histogram in a 2D sample - Quitting"); 
@@ -1209,17 +1209,17 @@ void SampleHandlerFD::AddData(TH1D* Data) {
 
   for (size_t bin = 0; bin < Binning.nXBins; ++bin) {
     // ROOT histograms are 1-based, so bin index + 1
-    SampleHandlerFD_data[bin] = RunSamples.dathist->GetBinContent(static_cast<int>(bin + 1));
+    SampleHandlerFD_data[bin] = SampleDetails.dathist->GetBinContent(static_cast<int>(bin + 1));
   }
 }
 
 void SampleHandlerFD::AddData(TH2D* Data) {
   MACH3LOG_INFO("Adding 2D data histogram: {} with {:.2f} events", Data->GetTitle(), Data->Integral());
-  if (RunSamples.dathist2d != nullptr) {
-    delete RunSamples.dathist2d;
+  if (SampleDetails.dathist2d != nullptr) {
+    delete SampleDetails.dathist2d;
   }
-  RunSamples.dathist2d = static_cast<TH2D*>(Data->Clone());
-  RunSamples.dathist = nullptr;
+  SampleDetails.dathist2d = static_cast<TH2D*>(Data->Clone());
+  SampleDetails.dathist = nullptr;
 
   if (GetNDim() != 2) {
     MACH3LOG_ERROR("Trying to set a 2D 'data' histogram in a 1D sample - Quitting"); 
@@ -1234,7 +1234,7 @@ void SampleHandlerFD::AddData(TH2D* Data) {
       //Need to cast to an int (Int_t) for ROOT
       //Need to do +1 for the bin, this is to be consistent with ROOTs binning scheme
       const int idx = Binning.GetBinSafe(xBin, yBin);
-      SampleHandlerFD_data[idx] = RunSamples.dathist2d->GetBinContent(static_cast<int>(xBin + 1), static_cast<int>(yBin + 1));
+      SampleHandlerFD_data[idx] = SampleDetails.dathist2d->GetBinContent(static_cast<int>(xBin + 1), static_cast<int>(yBin + 1));
     }
   }
 }
