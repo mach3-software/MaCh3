@@ -536,12 +536,12 @@ Clarence Wret </dd></dl>
 <div class="line"><span class="lineno">  585</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> data = DatHist-&gt;GetBinContent(i);</div>
 <div class="line"><span class="lineno">  586</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> mc = MCHist-&gt;GetBinContent(i);</div>
 <div class="line"><span class="lineno">  587</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> w2 = W2Hist-&gt;GetBinContent(i);</div>
-<div class="line"><span class="lineno">  588</span>    llh += SampleHandler-&gt;<a class="code hl_function" href="group__SampleHandlerGetters.html#gac0cfbc3d13eafd3b5687ff739b862b80">GetTestStatLLH</a>(data, mc, w2);</div>
+<div class="line"><span class="lineno">  588</span>    llh += SampleHandler-&gt;<a class="code hl_function" href="group__SampleHandlerGetters.html#gaed7090f469ee422fa1f88768b9c28c1b">GetTestStatLLH</a>(data, mc, w2);</div>
 <div class="line"><span class="lineno">  589</span>  }</div>
 <div class="line"><span class="lineno">  590</span>  <span class="comment">//KS: do times 2 because banff reports chi2</span></div>
 <div class="line"><span class="lineno">  591</span>  <span class="keywordflow">return</span> 2*llh;</div>
 <div class="line"><span class="lineno">  592</span>}</div>
-<div class="ttc" id="agroup__SampleHandlerGetters_html_gac0cfbc3d13eafd3b5687ff739b862b80"><div class="ttname"><a href="group__SampleHandlerGetters.html#gac0cfbc3d13eafd3b5687ff739b862b80">SampleHandlerBase::GetTestStatLLH</a></div><div class="ttdeci">double GetTestStatLLH(double data, double mc) const</div><div class="ttdoc">Calculate test statistic for a single bin using Poisson.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8cpp_source.html#l00018">SampleHandlerBase.cpp:18</a></div></div>
+<div class="ttc" id="agroup__SampleHandlerGetters_html_gaed7090f469ee422fa1f88768b9c28c1b"><div class="ttname"><a href="group__SampleHandlerGetters.html#gaed7090f469ee422fa1f88768b9c28c1b">SampleHandlerBase::GetTestStatLLH</a></div><div class="ttdeci">double GetTestStatLLH(const double data, const double mc) const</div><div class="ttdoc">Calculate test statistic for a single bin using Poisson.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8cpp_source.html#l00018">SampleHandlerBase.cpp:18</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

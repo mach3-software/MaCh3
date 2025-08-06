@@ -10,5 +10,5 @@ var searchData=
   ['xsec_5fspline_5fpointers_7',['xsec_spline_pointers',['../structFarDetectorCoreInfo.html#a993998a2c2d82bfeae285d71741ad2f2',1,'FarDetectorCoreInfo']]],
   ['xsec_5fw_8',['xsec_w',['../structFarDetectorCoreInfo.html#a91586f67da67dcb925715a94ed04a299',1,'FarDetectorCoreInfo']]],
   ['xsecstartingpos_9',['XsecStartingPos',['../GetPostfitParamPlots_8cpp.html#a3bb8bb8766f5ea15aa9ac31a1c9127e8',1,'GetPostfitParamPlots.cpp']]],
-  ['xvarstr_10',['XVarStr',['../classSampleHandlerFD.html#a5cd052288a69d57c215088e666fa4be3',1,'SampleHandlerFD']]]
+  ['xvarstr_10',['XVarStr',['../structSampleInfo.html#a94ef862377431975710a3ca0c761b01c',1,'SampleInfo']]]
 ];

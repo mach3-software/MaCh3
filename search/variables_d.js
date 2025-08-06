@@ -8,7 +8,7 @@ var searchData=
   ['nccmodes_5',['nCCModes',['../classMaCh3Modes.html#a0635bbfc95b50bab0b1e036d33360947',1,'MaCh3Modes']]],
   ['nchains_6',['Nchains',['../RHat_8cpp.html#a231bc179b5599c7e29d5ba28ff2b4b70',1,'Nchains():&#160;RHat.cpp'],['../RHat__HighMem_8cpp.html#a231bc179b5599c7e29d5ba28ff2b4b70',1,'Nchains():&#160;RHat_HighMem.cpp']]],
   ['nchainsteps_7',['nChainSteps',['../classSampleSummary.html#af4767862e5c1f4e3319d16b861213555',1,'SampleSummary']]],
-  ['ndimensions_8',['nDimensions',['../classSampleHandlerFD.html#af03bf91649d1848a3e531ff7f865c313',1,'SampleHandlerFD']]],
+  ['ndimensions_8',['nDimensions',['../structSampleInfo.html#a4402b585d1e3fde1dcd040ea59a0b209',1,'SampleInfo']]],
   ['ndparameters_9',['NDParameters',['../GetPostfitParamPlots_8cpp.html#adb4ee3a874472b4ffccc8734da66250e',1,'GetPostfitParamPlots.cpp']]],
   ['ndparametersstartingpos_10',['NDParametersStartingPos',['../GetPostfitParamPlots_8cpp.html#aa7bc6e5554391b57acf10c691b6374e0',1,'GetPostfitParamPlots.cpp']]],
   ['ndraw_11',['nDraw',['../classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d',1,'MCMCProcessor::nDraw()'],['../RHat__HighMem_8cpp.html#ae2faf756e30936102294777663fae31d',1,'nDraw():&#160;RHat_HighMem.cpp'],['../RHat_8cpp.html#ae2faf756e30936102294777663fae31d',1,'nDraw():&#160;RHat.cpp']]],

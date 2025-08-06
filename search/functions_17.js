@@ -25,13 +25,14 @@ var searchData=
   ['_7epso_22',['~PSO',['../classPSO.html#a120de7511935d934568360acd1a68d2f',1,'PSO']]],
   ['_7esamplehandlerbase_23',['~SampleHandlerBase',['../classSampleHandlerBase.html#a07b6726b71241ea71e12cfa78fbc49ed',1,'SampleHandlerBase']]],
   ['_7esamplehandlerfd_24',['~SampleHandlerFD',['../classSampleHandlerFD.html#a7aa8473194b5afccfbf453392b49e580',1,'SampleHandlerFD']]],
-  ['_7esamplesummary_25',['~SampleSummary',['../classSampleSummary.html#a0ff4ad11cdada6c57e9e525decdfc6a6',1,'SampleSummary']]],
-  ['_7esmonolith_26',['~SMonolith',['../classSMonolith.html#ac0ae7f110fa4c6e46e808d8c1ae979b6',1,'SMonolith']]],
-  ['_7esmonolithgpu_27',['~SMonolithGPU',['../classSMonolithGPU.html#a780471949538f9b359fe9f604491e620',1,'SMonolithGPU']]],
-  ['_7esplinebase_28',['~SplineBase',['../classSplineBase.html#a0de19b2322edb4197380506d594456bd',1,'SplineBase']]],
-  ['_7esplinemonostruct_29',['~SplineMonoStruct',['../structSplineMonoStruct.html#a9c25ada47632c29ab73d6f79b19ec2e5',1,'SplineMonoStruct']]],
-  ['_7estylemanager_30',['~StyleManager',['../classMaCh3Plotting_1_1StyleManager.html#af5267abeb152c1c482f00a98ab9c722f',1,'MaCh3Plotting::StyleManager']]],
-  ['_7etf1_5fred_31',['~TF1_red',['../classTF1__red.html#a924e317434d841390d4b787ec0354c02',1,'TF1_red']]],
-  ['_7etresponsefunction_5fred_32',['~TResponseFunction_red',['../classTResponseFunction__red.html#a216998fd1fed9353073640ede950a916',1,'TResponseFunction_red']]],
-  ['_7etspline3_5fred_33',['~TSpline3_red',['../classTSpline3__red.html#a3e675b3f84a92347498b2cebff39e584',1,'TSpline3_red']]]
+  ['_7esampleinfo_25',['~SampleInfo',['../structSampleInfo.html#a57f1e1d164bc8f27b4800962659f2af3',1,'SampleInfo']]],
+  ['_7esamplesummary_26',['~SampleSummary',['../classSampleSummary.html#a0ff4ad11cdada6c57e9e525decdfc6a6',1,'SampleSummary']]],
+  ['_7esmonolith_27',['~SMonolith',['../classSMonolith.html#ac0ae7f110fa4c6e46e808d8c1ae979b6',1,'SMonolith']]],
+  ['_7esmonolithgpu_28',['~SMonolithGPU',['../classSMonolithGPU.html#a780471949538f9b359fe9f604491e620',1,'SMonolithGPU']]],
+  ['_7esplinebase_29',['~SplineBase',['../classSplineBase.html#a0de19b2322edb4197380506d594456bd',1,'SplineBase']]],
+  ['_7esplinemonostruct_30',['~SplineMonoStruct',['../structSplineMonoStruct.html#a9c25ada47632c29ab73d6f79b19ec2e5',1,'SplineMonoStruct']]],
+  ['_7estylemanager_31',['~StyleManager',['../classMaCh3Plotting_1_1StyleManager.html#af5267abeb152c1c482f00a98ab9c722f',1,'MaCh3Plotting::StyleManager']]],
+  ['_7etf1_5fred_32',['~TF1_red',['../classTF1__red.html#a924e317434d841390d4b787ec0354c02',1,'TF1_red']]],
+  ['_7etresponsefunction_5fred_33',['~TResponseFunction_red',['../classTResponseFunction__red.html#a216998fd1fed9353073640ede950a916',1,'TResponseFunction_red']]],
+  ['_7etspline3_5fred_34',['~TSpline3_red',['../classTSpline3__red.html#a3e675b3f84a92347498b2cebff39e584',1,'TSpline3_red']]]
 ];
