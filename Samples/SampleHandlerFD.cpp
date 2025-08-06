@@ -26,10 +26,6 @@ SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGen
     MACH3LOG_WARN("You have passed an Oscillator object through the constructor of a SampleHandlerFD object - this will be used for all oscillation channels");
     Oscillator = OscillatorObj_;
   }
-  dathist = nullptr;
-  dathist2d = nullptr;
-  _hPDF1D = nullptr;
-  _hPDF2D = nullptr;
 
   KinematicParameters = nullptr;
   ReversedKinematicParameters = nullptr;
@@ -56,11 +52,6 @@ SampleHandlerFD::~SampleHandlerFD() {
   if (SampleHandlerFD_data != nullptr) delete[] SampleHandlerFD_data;
 
   if(THStackLeg != nullptr) delete THStackLeg;
-
-  if(dathist != nullptr) delete dathist;
-  if(dathist2d != nullptr) delete dathist2d;
-  if(_hPDF1D != nullptr) delete _hPDF1D;
-  if(_hPDF2D != nullptr) delete _hPDF2D;
 }
 
 void SampleHandlerFD::ReadSampleConfig() 
@@ -68,7 +59,7 @@ void SampleHandlerFD::ReadSampleConfig()
   auto ModeName = Get<std::string>(SampleManager->raw()["MaCh3ModeConfig"], __FILE__ , __LINE__);
   Modes = std::make_unique<MaCh3Modes>(ModeName);
   //SampleTitle has to be provided in the sample yaml otherwise this will throw an exception
-  SampleTitle = Get<std::string>(SampleManager->raw()["SampleTitle"], __FILE__ , __LINE__);
+  SampleDetails.SampleTitle = Get<std::string>(SampleManager->raw()["SampleTitle"], __FILE__ , __LINE__);
   //SampleName has to be provided in the sample yaml otherwise this will throw an exception
   SampleName = Get<std::string>(SampleManager->raw()["SampleName"], __FILE__ , __LINE__);
 
@@ -77,8 +68,8 @@ void SampleHandlerFD::ReadSampleConfig()
     UpdateW2 = GetFromManager<bool>(SampleManager->raw()["LikelihoodOptions"]["UpdateW2"], false);
   }
   //Binning
-  nDimensions = 0;
-  XVarStr = GetFromManager(SampleManager->raw()["Binning"]["XVarStr"], std::string(""));
+  SampleDetails.nDimensions = 0;
+  SampleDetails.XVarStr = GetFromManager(SampleManager->raw()["Binning"]["XVarStr"], std::string(""));
   Binning.XBinEdges = GetFromManager(SampleManager->raw()["Binning"]["XVarBins"], std::vector<double>());
   const auto& edgesx = Binning.XBinEdges;
   if (!std::is_sorted(edgesx.begin(), edgesx.end())) {
@@ -86,14 +77,14 @@ void SampleHandlerFD::ReadSampleConfig()
                    GetTitle(), fmt::join(edgesx, ", "));
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-  if(XVarStr.length() > 0){
-    nDimensions++;
+  if(GetXBinVarName().length() > 0){
+    SampleDetails.nDimensions++;
   } else{
     MACH3LOG_ERROR("Please specify an X-variable string in sample config {}", SampleManager->GetFileName());
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   
-  YVarStr = GetFromManager(SampleManager->raw()["Binning"]["YVarStr"], std::string(""));
+  SampleDetails.YVarStr = GetFromManager(SampleManager->raw()["Binning"]["YVarStr"], std::string(""));
   Binning.YBinEdges = GetFromManager(SampleManager->raw()["Binning"]["YVarBins"], std::vector<double>());
   const auto& edgesy = Binning.YBinEdges;
   if (!std::is_sorted(edgesy.begin(), edgesy.end())) {
@@ -101,21 +92,21 @@ void SampleHandlerFD::ReadSampleConfig()
                    GetTitle(), fmt::join(edgesy, ", "));
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-  if(YVarStr.length() > 0){
-    if(XVarStr.length() == 0){
+  if(GetYBinVarName().length() > 0){
+    if(GetXBinVarName().length() == 0){
       MACH3LOG_ERROR("Please specify an X-variable string in sample config {}. I won't work only with a Y-variable", SampleManager->GetFileName());
       throw MaCh3Exception(__FILE__, __LINE__);
     }
-    nDimensions++;
+    SampleDetails.nDimensions++;
   }
   
-  if(nDimensions == 0){
+  if(GetNDim() == 0){
     MACH3LOG_ERROR("Error setting up the sample binning");
-    MACH3LOG_ERROR("Number of dimensions is {}", nDimensions);
+    MACH3LOG_ERROR("Number of dimensions is {}", GetNDim());
     MACH3LOG_ERROR("Check that an XVarStr has been given in the sample config");
     throw MaCh3Exception(__FILE__, __LINE__);
   } else{
-    MACH3LOG_INFO("Found {} dimensions for sample binning", nDimensions);
+    MACH3LOG_INFO("Found {} dimensions for sample binning", GetNDim());
   }
   
   //Sanity check that some binning has been specified
@@ -145,8 +136,7 @@ void SampleHandlerFD::ReadSampleConfig()
     OscInfo.flavourName_Latex = osc_channel["LatexName"].as<std::string>();
     OscInfo.InitPDG           = static_cast<NuPDG>(osc_channel["nutype"].as<int>());
     OscInfo.FinalPDG          = static_cast<NuPDG>(osc_channel["oscnutype"].as<int>());
-    OscInfo.ChannelIndex      = static_cast<int>(OscChannels.size());
-
+    OscInfo.ChannelIndex      = GetNOscChannels();
 
     OscChannels.push_back(std::move(OscInfo));
 
@@ -273,11 +263,11 @@ void SampleHandlerFD::Fill1DHist()
 {
   // DB Commented out by default - Code heading towards GetLikelihood using arrays instead of root objects
   // Wouldn't actually need this for GetLikelihood as TH objects wouldn't be filled
-  _hPDF1D->Reset();
+  SampleDetails._hPDF1D->Reset();
   for (size_t yBin = 0; yBin < Binning.nYBins; ++yBin) {
     for (size_t xBin = 0; xBin < Binning.nXBins; ++xBin) {
       const int idx = Binning.GetBinSafe(xBin, yBin);
-      _hPDF1D->AddBinContent(idx + 1, SampleHandlerFD_array[idx]);
+      SampleDetails._hPDF1D->AddBinContent(idx + 1, SampleHandlerFD_array[idx]);
     }
   }
 }
@@ -286,11 +276,11 @@ void SampleHandlerFD::Fill2DHist()
 {
   // DB Commented out by default - Code heading towards GetLikelihood using arrays instead of root objects
   // Wouldn't actually need this for GetLikelihood as TH objects wouldn't be filled
-  _hPDF2D->Reset();
+  SampleDetails._hPDF2D->Reset();
   for (size_t yBin = 0; yBin < Binning.nYBins; ++yBin) {
     for (size_t xBin = 0; xBin < Binning.nXBins; ++xBin) {
       const int idx = Binning.GetBinSafe(xBin, yBin);
-      _hPDF2D->SetBinContent(static_cast<int>(xBin + 1), static_cast<int>(yBin + 1), SampleHandlerFD_array[idx]);
+      SampleDetails._hPDF2D->SetBinContent(static_cast<int>(xBin + 1), static_cast<int>(yBin + 1), SampleHandlerFD_array[idx]);
     }
   }
 }
@@ -304,22 +294,7 @@ void SampleHandlerFD::Fill2DHist()
 void SampleHandlerFD::SetupSampleBinning(){
 // ************************************************
   MACH3LOG_INFO("Setting up Sample Binning");
-  TString histname1d = (XVarStr).c_str();
-  TString histname2d = (XVarStr+"_"+YVarStr).c_str();
-  TString histtitle = GetTitle();
-
-  //The binning here is arbitrary, now we get info from cfg so the
-  //set1DBinning and set2Dbinning calls below will make the binning
-  //to be what we actually want
-  _hPDF1D   = new TH1D("h" + histname1d + GetTitle(),histtitle, 1, 0, 1);
-  dathist   = new TH1D("d" + histname1d + GetTitle(),histtitle, 1, 0, 1);
-  _hPDF2D   = new TH2D("h" + histname2d + GetTitle(),histtitle, 1, 0, 1, 1, 0, 1);
-  dathist2d = new TH2D("d" + histname2d + GetTitle(),histtitle, 1, 0, 1, 1, 0, 1);
-
-  _hPDF1D->GetXaxis()->SetTitle(XVarStr.c_str());
-  dathist->GetXaxis()->SetTitle(XVarStr.c_str());
-  _hPDF2D->GetXaxis()->SetTitle(XVarStr.c_str());
-  dathist2d->GetXaxis()->SetTitle(XVarStr.c_str());
+  SampleDetails.InitialiseHistograms();
 
   //A string to store the binning for a nice print out
   std::string XBinEdgesStr = "";
@@ -341,12 +316,12 @@ void SampleHandlerFD::SetupSampleBinning(){
   MACH3LOG_INFO("{}", YBinEdgesStr);
   
   //Check whether you are setting up 1D or 2D binning
-  if(nDimensions == 1){
-    MACH3LOG_INFO("Setting up 1D binning with {}", XVarStr);
+  if(GetNDim() == 1){
+    MACH3LOG_INFO("Setting up {}D binning with {}", GetNDim(), GetXBinVarName());
     Set1DBinning(Binning.XBinEdges);
   }
-  else if(nDimensions == 2){
-    MACH3LOG_INFO("Setting up 2D binning with {} and {}", XVarStr, YVarStr);
+  else if(GetNDim() == 2){
+    MACH3LOG_INFO("Setting up {}D binning with {} and {}", GetNDim(), GetXBinVarName(), GetYBinVarName());
     Set2DBinning(Binning.XBinEdges, Binning.YBinEdges);
   }
   else{
@@ -420,7 +395,7 @@ void SampleHandlerFD::Reweight() {
 /// function takes advantage of most of the things called in setupSKMC to reduce reweighting time.
 /// It also follows the ND code reweighting pretty closely. This function fills the SampleHandlerFD 
 /// array array which is binned to match the sample binning, such that bin[1][1] is the 
-/// equivalent of _hPDF2D->GetBinContent(2,2) {Noticing the offset}
+/// equivalent of SampleDetails._hPDF2D->GetBinContent(2,2) {Noticing the offset}
 void SampleHandlerFD::FillArray() {
 //************************************************
   //DB Reset which cuts to apply
@@ -924,9 +899,9 @@ void SampleHandlerFD::SetupReweightArrays(const size_t numberXBins, const size_t
 //fill1Dhist and fill2Dhist quicker
 void SampleHandlerFD::Set1DBinning(size_t nbins, double* boundaries)
 {
-  _hPDF1D->Reset();
-  _hPDF1D->SetBins(static_cast<int>(nbins),boundaries);
-  dathist->SetBins(static_cast<int>(nbins),boundaries);
+  SampleDetails._hPDF1D->Reset();
+  SampleDetails._hPDF1D->SetBins(static_cast<int>(nbins),boundaries);
+  SampleDetails.dathist->SetBins(static_cast<int>(nbins),boundaries);
 
   Binning.YBinEdges = std::vector<double>(2);
   Binning.YBinEdges[0] = -1e8;
@@ -936,9 +911,9 @@ void SampleHandlerFD::Set1DBinning(size_t nbins, double* boundaries)
   YBinEdges_Arr[0] = Binning.YBinEdges[0];
   YBinEdges_Arr[1] = Binning.YBinEdges[1];
 
-  _hPDF2D->Reset();
-  _hPDF2D->SetBins(static_cast<int>(nbins),boundaries,1,YBinEdges_Arr);
-  dathist2d->SetBins(static_cast<int>(nbins),boundaries,1,YBinEdges_Arr);
+  SampleDetails._hPDF2D->Reset();
+  SampleDetails._hPDF2D->SetBins(static_cast<int>(nbins),boundaries,1,YBinEdges_Arr);
+  SampleDetails.dathist2d->SetBins(static_cast<int>(nbins),boundaries,1,YBinEdges_Arr);
 
   //Set the number of X and Y bins now
   SetupReweightArrays(Binning.XBinEdges.size() - 1, Binning.YBinEdges.size() - 1);
@@ -949,7 +924,7 @@ void SampleHandlerFD::Set1DBinning(size_t nbins, double* boundaries)
 void SampleHandlerFD::FindNominalBinAndEdges1D() {
   for(unsigned int event_i = 0; event_i < GetNEvents(); event_i++){
     //Set x_var and y_var values based on XVarStr and YVarStr
-    MCSamples[event_i].x_var = GetPointerToKinematicParameter(XVarStr, event_i);
+    MCSamples[event_i].x_var = GetPointerToKinematicParameter(GetXBinVarName(), event_i);
     if (std::isnan(*MCSamples[event_i].x_var) || std::isinf(*MCSamples[event_i].x_var)) {
       MACH3LOG_ERROR("X var for event {} is ill-defined and equal to {}", event_i, *MCSamples[event_i].x_var);
       throw MaCh3Exception(__FILE__, __LINE__);
@@ -957,7 +932,7 @@ void SampleHandlerFD::FindNominalBinAndEdges1D() {
 
     //Give y_var M3::_BAD_DOUBLE_ value for the 1D case since this won't be used
     MCSamples[event_i].y_var = &(M3::_BAD_DOUBLE_);
-    int bin = _hPDF1D->FindBin(*(MCSamples[event_i].x_var));
+    int bin = SampleDetails._hPDF1D->FindBin(*(MCSamples[event_i].x_var));
 
     if ((bin-1) >= 0 && (bin-1) < int(Binning.XBinEdges.size()-1)) {
       MCSamples[event_i].NomXBin = bin-1;
@@ -999,13 +974,13 @@ void SampleHandlerFD::FindNominalBinAndEdges1D() {
 
 void SampleHandlerFD::Set2DBinning(size_t nbins1, double* boundaries1, size_t nbins2, double* boundaries2)
 {
-  _hPDF1D->Reset();
-  _hPDF1D->SetBins(static_cast<int>(nbins1),boundaries1);
-  dathist->SetBins(static_cast<int>(nbins1),boundaries1);
+  SampleDetails._hPDF1D->Reset();
+  SampleDetails._hPDF1D->SetBins(static_cast<int>(nbins1),boundaries1);
+  SampleDetails.dathist->SetBins(static_cast<int>(nbins1),boundaries1);
 
-  _hPDF2D->Reset();
-  _hPDF2D->SetBins(static_cast<int>(nbins1),boundaries1,static_cast<int>(nbins2),boundaries2);
-  dathist2d->SetBins(static_cast<int>(nbins1),boundaries1,static_cast<int>(nbins2),boundaries2);
+  SampleDetails._hPDF2D->Reset();
+  SampleDetails._hPDF2D->SetBins(static_cast<int>(nbins1),boundaries1,static_cast<int>(nbins2),boundaries2);
+  SampleDetails.dathist2d->SetBins(static_cast<int>(nbins1),boundaries1,static_cast<int>(nbins2),boundaries2);
   
   //Set the number of X and Y bins now
   SetupReweightArrays(Binning.XBinEdges.size() - 1, Binning.YBinEdges.size() - 1);
@@ -1018,8 +993,8 @@ void SampleHandlerFD::FindNominalBinAndEdges2D() {
 // ************************************************
   for(unsigned int event_i = 0 ; event_i < GetNEvents(); event_i++) {
     //Set x_var and y_var values based on XVarStr and YVarStr
-    MCSamples[event_i].x_var = GetPointerToKinematicParameter(XVarStr, event_i);
-    MCSamples[event_i].y_var = GetPointerToKinematicParameter(YVarStr, event_i);
+    MCSamples[event_i].x_var = GetPointerToKinematicParameter(GetXBinVarName(), event_i);
+    MCSamples[event_i].y_var = GetPointerToKinematicParameter(GetYBinVarName(), event_i);
 
     if (std::isnan(*MCSamples[event_i].x_var) || std::isinf(*MCSamples[event_i].x_var)) {
       MACH3LOG_ERROR("X var for event {} is ill-defined and equal to {}", event_i, *MCSamples[event_i].x_var);
@@ -1030,12 +1005,12 @@ void SampleHandlerFD::FindNominalBinAndEdges2D() {
       throw MaCh3Exception(__FILE__, __LINE__);
     }
     //Global bin number
-    int bin = _hPDF2D->FindBin(*(MCSamples[event_i].x_var), *(MCSamples[event_i].y_var));
+    int bin = SampleDetails._hPDF2D->FindBin(*(MCSamples[event_i].x_var), *(MCSamples[event_i].y_var));
 
     int bin_x = M3::_BAD_INT_;
     int bin_y = M3::_BAD_INT_;
     int bin_z = M3::_BAD_INT_;
-    _hPDF2D->GetBinXYZ(bin, bin_x, bin_y, bin_z);
+    SampleDetails._hPDF2D->GetBinXYZ(bin, bin_x, bin_y, bin_z);
 
     if ((bin_x-1) >= 0 && (bin_x-1) < int(Binning.XBinEdges.size()-1)) {
       MCSamples[event_i].NomXBin = bin_x-1;
@@ -1083,7 +1058,11 @@ void SampleHandlerFD::FindNominalBinAndEdges2D() {
 TH1* SampleHandlerFD::GetW2Hist(const int Dimension) {
 // ************************************************
   if(Dimension == 1) {
-    TH1D* W2Hist = dynamic_cast<TH1D*>(_hPDF1D->Clone((_hPDF1D->GetName() + std::string("_W2")).c_str()));
+    TH1D* W2Hist = dynamic_cast<TH1D*>(SampleDetails._hPDF1D->Clone((SampleDetails._hPDF1D->GetName() + std::string("_W2")).c_str()));
+    if (!W2Hist) {
+      MACH3LOG_ERROR("Failed to cast");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
     W2Hist->Reset();
     for (size_t yBin = 0; yBin < Binning.nYBins; ++yBin) {
       for (size_t xBin = 0; xBin < Binning.nXBins; ++xBin) {
@@ -1093,7 +1072,11 @@ TH1* SampleHandlerFD::GetW2Hist(const int Dimension) {
     }
     return W2Hist;
   } else if(Dimension == 2) {
-    TH2D* W2Hist = dynamic_cast<TH2D*>(_hPDF2D->Clone((_hPDF2D->GetName() + std::string("_W2")).c_str()));
+    TH2D* W2Hist = dynamic_cast<TH2D*>(SampleDetails._hPDF2D->Clone((SampleDetails._hPDF2D->GetName() + std::string("_W2")).c_str()));
+    if (!W2Hist) {
+      MACH3LOG_ERROR("Failed to cast");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
     W2Hist->Reset();
     for (size_t yBin = 0; yBin < Binning.nYBins; ++yBin) {
       for (size_t xBin = 0; xBin < Binning.nXBins; ++xBin) {
@@ -1114,10 +1097,10 @@ TH1* SampleHandlerFD::GetMCHist(const int Dimension) {
 // ************************************************
   if(Dimension == 1) {
     Fill1DHist();
-    return _hPDF1D;
+    return SampleDetails._hPDF1D;
   } else if(Dimension == 2) {
     Fill2DHist();
-    return _hPDF2D;
+    return SampleDetails._hPDF2D;
   } else{
     MACH3LOG_ERROR("Asdking for {} with N Dimension = {}. This is not implemented", __func__, Dimension);
     throw MaCh3Exception(__FILE__, __LINE__);
@@ -1128,9 +1111,9 @@ TH1* SampleHandlerFD::GetMCHist(const int Dimension) {
 TH1* SampleHandlerFD::GetDataHist(const int Dimension) {
 // ************************************************
   if(Dimension == 1) {
-    return dathist;
+    return SampleDetails.dathist;
   } else if(Dimension == 2) {
-    return dathist2d;
+    return SampleDetails.dathist2d;
   } else{
     MACH3LOG_ERROR("Asdking for {} with N Dimension = {}. This is not implemented", __func__, Dimension);
     throw MaCh3Exception(__FILE__, __LINE__);
@@ -1138,13 +1121,13 @@ TH1* SampleHandlerFD::GetDataHist(const int Dimension) {
 }
 
 void SampleHandlerFD::AddData(std::vector<double> &data) {
-  if (dathist == nullptr) {
+  if (SampleDetails.dathist == nullptr) {
     MACH3LOG_ERROR("Data hist hasn't been initialised yet");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
-  dathist2d = nullptr;
-  dathist->Reset();
+  SampleDetails.dathist2d = nullptr;
+  SampleDetails.dathist->Reset();
 
   if (GetNDim()!=1) {
     MACH3LOG_ERROR("Trying to set a 1D 'data' histogram when the number of dimensions for this sample is {}", GetNDim());
@@ -1153,7 +1136,7 @@ void SampleHandlerFD::AddData(std::vector<double> &data) {
   }
 
   for (auto const& data_point : data){
-    dathist->Fill(data_point);
+    SampleDetails.dathist->Fill(data_point);
   }
 
   if(SampleHandlerFD_data == nullptr) {
@@ -1163,20 +1146,20 @@ void SampleHandlerFD::AddData(std::vector<double> &data) {
   // Assuming nBins == nXBins here, because you have 1D data
   for (size_t bin = 0; bin < Binning.nXBins; ++bin) {
     // ROOT histograms are 1-based, so bin index + 1
-    SampleHandlerFD_data[bin] = dathist->GetBinContent(static_cast<int>(bin + 1));
+    SampleHandlerFD_data[bin] = SampleDetails.dathist->GetBinContent(static_cast<int>(bin + 1));
   }
 }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
 void SampleHandlerFD::AddData(std::vector< std::vector <double> > &data) {
-  if (dathist2d == nullptr) {
+  if (SampleDetails.dathist2d == nullptr) {
     MACH3LOG_ERROR("Data hist hasn't been initialised yet");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
-  dathist = nullptr;
-  dathist2d->Reset();
+  SampleDetails.dathist = nullptr;
+  SampleDetails.dathist2d->Reset();
 
   if (GetNDim()!=2) {
     MACH3LOG_ERROR("Trying to set a 2D 'data' histogram when the number of dimensions for this sample is {}", GetNDim());
@@ -1188,7 +1171,7 @@ void SampleHandlerFD::AddData(std::vector< std::vector <double> > &data) {
   //ETA: I think this might just be wrong? We should probably just make this AddData(std::vector<double> data_x, std::vector<double> data_y)
   // or maybe something like AddData(std::vector<std::pair<double, double>> data)?
   for (int i = 0; i < int(data.size()); i++) {
-    dathist2d->Fill(data.at(0)[i],data.at(1)[i]);
+    SampleDetails.dathist2d->Fill(data.at(0)[i],data.at(1)[i]);
   }
 
   if(SampleHandlerFD_data == nullptr) {
@@ -1200,18 +1183,18 @@ void SampleHandlerFD::AddData(std::vector< std::vector <double> > &data) {
       //Need to cast to an int (Int_t) for ROOT
       //Need to do +1 for the bin, this is to be consistent with ROOTs binning scheme
       const int idx = Binning.GetBinSafe(xBin, yBin);
-      SampleHandlerFD_data[idx] = dathist2d->GetBinContent(static_cast<int>(xBin + 1), static_cast<int>(yBin + 1));
+      SampleHandlerFD_data[idx] = SampleDetails.dathist2d->GetBinContent(static_cast<int>(xBin + 1), static_cast<int>(yBin + 1));
     }
   }
 }
 
 void SampleHandlerFD::AddData(TH1D* Data) {
   MACH3LOG_INFO("Adding 1D data histogram: {} with {:.2f} events", Data->GetTitle(), Data->Integral());
-  if (dathist != nullptr) {
-    delete dathist;
+  if (SampleDetails.dathist != nullptr) {
+    delete SampleDetails.dathist;
   }
-  dathist2d = nullptr;
-  dathist = static_cast<TH1D*>(Data->Clone());
+  SampleDetails.dathist2d = nullptr;
+  SampleDetails.dathist = static_cast<TH1D*>(Data->Clone());
 
   if (GetNDim() != 1) {
     MACH3LOG_ERROR("Trying to set a 1D 'data' histogram in a 2D sample - Quitting"); 
@@ -1226,17 +1209,17 @@ void SampleHandlerFD::AddData(TH1D* Data) {
 
   for (size_t bin = 0; bin < Binning.nXBins; ++bin) {
     // ROOT histograms are 1-based, so bin index + 1
-    SampleHandlerFD_data[bin] = dathist->GetBinContent(static_cast<int>(bin + 1));
+    SampleHandlerFD_data[bin] = SampleDetails.dathist->GetBinContent(static_cast<int>(bin + 1));
   }
 }
 
 void SampleHandlerFD::AddData(TH2D* Data) {
   MACH3LOG_INFO("Adding 2D data histogram: {} with {:.2f} events", Data->GetTitle(), Data->Integral());
-  if (dathist2d != nullptr) {
-    delete dathist2d;
+  if (SampleDetails.dathist2d != nullptr) {
+    delete SampleDetails.dathist2d;
   }
-  dathist2d = static_cast<TH2D*>(Data->Clone());
-  dathist = nullptr;
+  SampleDetails.dathist2d = static_cast<TH2D*>(Data->Clone());
+  SampleDetails.dathist = nullptr;
 
   if (GetNDim() != 2) {
     MACH3LOG_ERROR("Trying to set a 2D 'data' histogram in a 1D sample - Quitting"); 
@@ -1251,7 +1234,7 @@ void SampleHandlerFD::AddData(TH2D* Data) {
       //Need to cast to an int (Int_t) for ROOT
       //Need to do +1 for the bin, this is to be consistent with ROOTs binning scheme
       const int idx = Binning.GetBinSafe(xBin, yBin);
-      SampleHandlerFD_data[idx] = dathist2d->GetBinContent(static_cast<int>(xBin + 1), static_cast<int>(yBin + 1));
+      SampleHandlerFD_data[idx] = SampleDetails.dathist2d->GetBinContent(static_cast<int>(xBin + 1), static_cast<int>(yBin + 1));
     }
   }
 }
@@ -1276,10 +1259,10 @@ void SampleHandlerFD::InitialiseNuOscillatorObjects() {
     MACH3LOG_ERROR("This likely indicates an error in your oscillation YAML configuration.");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-  Oscillator = std::make_shared<OscillationHandler>(NuOscillatorConfigFile, EqualBinningPerOscChannel, OscParams, static_cast<int>(OscChannels.size()));
+  Oscillator = std::make_shared<OscillationHandler>(NuOscillatorConfigFile, EqualBinningPerOscChannel, OscParams, GetNOscChannels());
 
   if (!EqualBinningPerOscChannel) {
-    for(int iChannel = 0; iChannel < static_cast<int>(OscChannels.size()); iChannel++) {
+    for(int iChannel = 0; iChannel < GetNOscChannels(); iChannel++) {
       std::vector<M3::float_t> EnergyArray;
       std::vector<M3::float_t> CosineZArray;
 
@@ -1385,7 +1368,7 @@ void SampleHandlerFD::FillSplineBins() {
     const int OscIndex = GetOscChannel(OscChannels, (*MCSamples[j].nupdgUnosc), (*MCSamples[j].nupdg));
 
     std::vector< std::vector<int> > EventSplines;
-    switch(nDimensions){
+    switch(GetNDim()){
       case 1:
         EventSplines = SplineHandler->GetEventSplines(GetSampleName(), OscIndex, int(*(MCSamples[j].mode)), *(MCSamples[j].rw_etru), *(MCSamples[j].x_var), 0.);
         break;
@@ -1393,7 +1376,7 @@ void SampleHandlerFD::FillSplineBins() {
         EventSplines = SplineHandler->GetEventSplines(GetSampleName(), OscIndex, int(*(MCSamples[j].mode)), *(MCSamples[j].rw_etru), *(MCSamples[j].x_var), *(MCSamples[j].y_var));
         break;
       default:
-        MACH3LOG_ERROR("Error in assigning spline bins because nDimensions = {}", nDimensions);
+        MACH3LOG_ERROR("Error in assigning spline bins because nDimensions = {}", GetNDim());
         MACH3LOG_ERROR("MaCh3 only supports splines binned in Etrue + the sample binning");
         MACH3LOG_ERROR("Please check the sample binning you specified in your sample config ");
         throw MaCh3Exception(__FILE__, __LINE__);
@@ -1456,12 +1439,12 @@ void SampleHandlerFD::SaveAdditionalInfo(TDirectory* Dir) {
 
   if (GetNDim() == 1) {
     data_hist = M3::Clone<TH1D>(dynamic_cast<TH1D*>(GetDataHist(1)), "data_" + GetTitle());
-    data_hist->GetXaxis()->SetTitle(XVarStr.c_str());
+    data_hist->GetXaxis()->SetTitle(GetXBinVarName().c_str());
     data_hist->GetYaxis()->SetTitle("Number of Events");
   } else if (GetNDim() == 2) {
     data_hist = M3::Clone<TH2D>(dynamic_cast<TH2D*>(GetDataHist(2)), "data_" + GetTitle());
-    data_hist->GetXaxis()->SetTitle(XVarStr.c_str());
-    data_hist->GetYaxis()->SetTitle(YVarStr.c_str());
+    data_hist->GetXaxis()->SetTitle(GetXBinVarName().c_str());
+    data_hist->GetYaxis()->SetTitle(GetYBinVarName().c_str());
     data_hist->GetZaxis()->SetTitle("Number of Events");
   } else {
     MACH3LOG_ERROR("Not implemented");
@@ -1479,17 +1462,17 @@ void SampleHandlerFD::SaveAdditionalInfo(TDirectory* Dir) {
 
 void SampleHandlerFD::InitialiseSplineObject() {
   std::vector<std::string> spline_filepaths;
-  for(unsigned iChannel = 0 ; iChannel < OscChannels.size() ; iChannel++){
+  for(int iChannel = 0 ; iChannel < GetNOscChannels(); iChannel++){
     spline_filepaths.push_back(spline_files[iChannel]);
   }
 
   //Keep a track of the spline variables
   std::vector<std::string> SplineVarNames = {"TrueNeutrinoEnergy"};
-  if(XVarStr.length() > 0){
-    SplineVarNames.push_back(XVarStr);
+  if(GetXBinVarName().length() > 0){
+    SplineVarNames.push_back(GetXBinVarName());
   }
-  if(YVarStr.length() > 0){
-    SplineVarNames.push_back(YVarStr);
+  if(GetYBinVarName().length() > 0){
+    SplineVarNames.push_back(GetYBinVarName());
   }
   
   SplineHandler->AddSample(SampleName, spline_filepaths, SplineVarNames);
@@ -1750,9 +1733,9 @@ std::string SampleHandlerFD::ReturnStringFromKinematicVector(const int Kinematic
 std::vector<double> SampleHandlerFD::ReturnKinematicParameterBinning(const std::string& KinematicParameter) {
 // ************************************************
   // If x or y variable return used binning
-  if(KinematicParameter == XVarStr) {
+  if(KinematicParameter == GetXBinVarName()) {
     return Binning.XBinEdges;
-  } else if (KinematicParameter == YVarStr) {
+  } else if (KinematicParameter == GetYBinVarName()) {
     return Binning.YBinEdges;
   }
 
@@ -1927,9 +1910,9 @@ void SampleHandlerFD::PrintIntegral(const TString& OutputFileName, const int Wei
 
   for (int i=0;i<Modes->GetNModes();i++) {
     if (GetNDim()==1) {
-      IntegralList[i] = ReturnHistsBySelection1D(XVarStr,1,i,WeightStyle);
+      IntegralList[i] = ReturnHistsBySelection1D(GetXBinVarName(),1,i,WeightStyle);
     } else {
-      IntegralList[i] = CastVector<TH2, TH1>(ReturnHistsBySelection2D(XVarStr,YVarStr,1,i,WeightStyle));
+      IntegralList[i] = CastVector<TH2, TH1>(ReturnHistsBySelection2D(GetXBinVarName(),GetYBinVarName(),1,i,WeightStyle));
     }
   }
 
@@ -1961,11 +1944,11 @@ void SampleHandlerFD::PrintIntegral(const TString& OutputFileName, const int Wei
 
   std::string table_headings = fmt::format("| {:<8} |", "Mode");
   std::string table_footline = "------------"; //Scalable table horizontal line
-  for (size_t i = 0;i < OscChannels.size(); i++) {
-    table_headings += fmt::format(" {:<17} |", OscChannels[i].flavourName);
+  for (int i = 0;i < GetNOscChannels(); i++) {
+    table_headings += fmt::format(" {:<17} |", GetFlavourName(i));
     table_footline += "--------------------";
     if (printToFile) {outfile << "&" << std::setw(space) << OscChannels[i].flavourName_Latex << " ";}
-    if (printToCSV)  {outcsv << OscChannels[i].flavourName << ",";}
+    if (printToCSV)  {outcsv << GetFlavourName(i) << ",";}
   }
   if (printToFile) {outfile << "&" << std::setw(space) << "Total:" << "\\\\ \\hline" << std::endl;}
   if (printToCSV)  {outcsv <<"Total\n";}
@@ -2057,16 +2040,16 @@ std::vector<TH1*> SampleHandlerFD::ReturnHistsBySelection1D(std::string Kinemati
   }
 
   for (int i=0;i<iMax;i++) {
-    if (Selection1==0) {
+    if (Selection1 == FDPlotType::kModePlot) {
       hHistList.push_back(Get1DVarHistByModeAndChannel(KinematicProjection,i,Selection2,WeightStyle,XAxis));
       THStackLeg->AddEntry(hHistList[i],(Modes->GetMaCh3ModeName(i)+Form(" : (%4.2f)",hHistList[i]->Integral())).c_str(),"f");
 
       hHistList[i]->SetFillColor(static_cast<Color_t>(Modes->GetMaCh3ModePlotColor(i)));
       hHistList[i]->SetLineColor(static_cast<Color_t>(Modes->GetMaCh3ModePlotColor(i)));
     }
-    if (Selection1==1) {
+    if (Selection1 == FDPlotType::kOscChannelPlot) {
       hHistList.push_back(Get1DVarHistByModeAndChannel(KinematicProjection,Selection2,i,WeightStyle,XAxis));
-      THStackLeg->AddEntry(hHistList[i],(OscChannels[i].flavourName+Form(" | %4.2f",hHistList[i]->Integral())).c_str(),"f");
+      THStackLeg->AddEntry(hHistList[i],(GetFlavourName(i)+Form(" | %4.2f",hHistList[i]->Integral())).c_str(),"f");
     }
   }
 
