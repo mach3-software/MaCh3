@@ -22,13 +22,14 @@ class covarianceOsc : public covarianceBase
   /// @brief KS: Print all useful information's after initialization
   void Print();
 
+  /// @brief Initialise adaption
+  void initialiseAdaption(const YAML::Node& adapt_manager);
+
+
  protected:
     /// @brief HW :: This method is a tad hacky but modular arithmetic gives me a headache.
     /// @author Henry Wallace
     void CircularPrior(const int i, const double LowBound, const double UpBound);
-    
-    /// @brief Initialise adaption
-    void initialiseAdaption(const YAML::Node& adapt_manager);
 
     /// Do we flip DeltaM23 or not
     bool flipdelM;

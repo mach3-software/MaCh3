@@ -13,6 +13,7 @@ AdaptiveMCMCHandler::AdaptiveMCMCHandler() {
 
   par_means = {};
   adaptive_covariance = nullptr;
+  _fCurrVal = nullptr;
 }
 
 // ********************************************
@@ -227,7 +228,7 @@ void AdaptiveMCMCHandler::SetThrowMatrixFromFile(const std::string& matrix_file_
 }
 
 // ********************************************
-void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const std::vector<double>& _fCurrVal, const int Npars) {
+void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const std::vector<double>& _fParamsCurrVal, const int Npars) {
 // ********************************************
   std::vector<double> par_means_prev = par_means;
 
@@ -237,7 +238,7 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const std::vector<double>& _f
   #pragma omp parallel for
   #endif
   for(int iRow = 0; iRow < Npars; iRow++) {
-    par_means[iRow] = (_fCurrVal[iRow]+par_means[iRow]*steps_post_burn)/(steps_post_burn+1);
+    par_means[iRow] = (_fParamsCurrVal[iRow]+par_means[iRow]*steps_post_burn)/(steps_post_burn+1);
   }
 
   //Now we update the covariances using cov(x,y)=E(xy)-E(x)E(y)
@@ -255,7 +256,7 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const std::vector<double>& _f
         // https://projecteuclid.org/journals/bernoulli/volume-7/issue-2/An-adaptive-Metropolis-algorithm/bj/1080222083.full
         cov_val = (*adaptive_covariance)(irow, icol)*Npars/5.6644;
         cov_val += par_means_prev[irow]*par_means_prev[icol]; //First we remove the current means
-        cov_val = (cov_val*steps_post_burn+_fCurrVal[irow]*_fCurrVal[icol])/(steps_post_burn+1); //Now get mean(iRow*iCol)
+        cov_val = (cov_val*steps_post_burn+_fParamsCurrVal[irow]*_fParamsCurrVal[icol])/(steps_post_burn+1); //Now get mean(iRow*iCol)
         cov_val -= par_means[icol]*par_means[irow];
         cov_val*=5.6644/Npars;
       }

@@ -60,6 +60,14 @@ class AdaptiveMCMCHandler{
   /// @brief Add flip parameters to vector
   void AddFlipParameters(const std::unordered_map<int, double>& parameters);
 
+  std::vector<double>* _fCurrVal = nullptr;
+
+  void SetCurrentValues(std::vector<double>* fCurrVal) {
+    _fCurrVal = fCurrVal;
+  }
+
+  std::unordered_map<int, double> FlipParameterMap;
+
   /// @brief Get current value of parameter
   double CurrVal(const int par_index);
 

@@ -75,11 +75,11 @@ void covarianceOsc::CircularPrior(const int index, const double LowBound, const 
   }
 }
 
-void CovarianceOsc::initialiseAdaption(const YAML::Node& adapt_manager){
-    CovarianceBase::initialiseAdaption(adapt_manager);
-    std::unordered_map<int, double flip_indices;
+void covarianceOsc::initialiseAdaption(const YAML::Node& adapt_manager){
+    covarianceBase::initialiseAdaption(adapt_manager);
+    std::unordered_map<int, double> flip_indices;
     flip_indices[kDeltaM23] = 0.0;
-    AdaptiveMCMCHandler->AddFlipParameters(flip_indices)
+    AdaptiveHandler.AddFlipParameters(flip_indices);
 }
 
 // *************************************
