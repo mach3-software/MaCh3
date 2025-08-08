@@ -54,6 +54,15 @@ class AdaptiveMCMCHandler{
   /// @brief Tell whether we want reset step scale or not
   bool IndivStepScaleAdapt();
 
+  /// @brief Flip value for a parameter
+  double FlipValue(const int par_index);
+
+  /// @brief Add flip parameters to vector
+  void AddFlipParameters(const std::unordered_map<int, double>& parameters);
+
+  /// @brief Get current value of parameter
+  double CurrVal(const int par_index);
+
   /// @brief Tell whether matrix should be updated
   bool UpdateMatrixAdapt();
 

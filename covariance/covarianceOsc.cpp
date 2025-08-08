@@ -1,4 +1,5 @@
 #include "covariance/covarianceOsc.h"
+#include "unordered_map"
 
 // *************************************
 covarianceOsc::covarianceOsc(const std::vector<std::string>& YAMLFile, std::string name, double threshold, int FirstPCA, int LastPCA)
@@ -72,6 +73,13 @@ void covarianceOsc::CircularPrior(const int index, const double LowBound, const 
   } else if (_fPropVal[index] < LowBound) {
     _fPropVal[index] = UpBound - std::fmod(LowBound - _fPropVal[index], UpBound - LowBound);
   }
+}
+
+void CovarianceOsc::initialiseAdaption(const YAML::Node& adapt_manager){
+    CovarianceBase::initialiseAdaption(adapt_manager);
+    std::unordered_map<int, double flip_indices;
+    flip_indices[kDeltaM23] = 0.0;
+    AdaptiveMCMCHandler->AddFlipParameters(flip_indices)
 }
 
 // *************************************

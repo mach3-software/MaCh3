@@ -272,6 +272,27 @@ bool AdaptiveMCMCHandler::IndivStepScaleAdapt() {
   else return false;
 }
 
+
+double AdaptiveMCMCHandler::FlipValue(const int par_index) {
+  // We assume covariance is in a SINGLE mode
+
+  // Find the true index of 
+  double flip_point = FlipParameterMap[par_index];
+
+  if ((*_fCurrVal)[par_index] < flip_point)
+  {
+    // This just flips the parameter about the central axis
+    return 2*flip_point - (*_fCurrVal)[par_index];
+  }
+  return (*_fCurrVal)[par_index];
+}
+
+void AdaptiveMCMCHandler::AddFlipParameters(const std::unordered_map<int, double>& parameters) {
+  /// This function adds the flipped parameters to the vector
+  /// It is used to add the flipped parameters to the adaptive covariance matrix
+  FlipParameterMap = parameters;
+}
+
 // ********************************************
 bool AdaptiveMCMCHandler::UpdateMatrixAdapt() {
 // ********************************************
@@ -309,6 +330,15 @@ void AdaptiveMCMCHandler::Print() {
   MACH3LOG_INFO("Steps Between Updates              : {}", adaptive_update_step);
   MACH3LOG_INFO("Saving matrices to file            : {}", output_file_name);
   MACH3LOG_INFO("Will only save every {} iterations"     , adaptive_save_n_iterations);
+}
+
+double AdaptiveMCMCHandler::CurrVal(const int par_index){
+  /// HW Implemented as its own method to allow for
+  /// different behaviour in the future
+  if(FlipParameterMap.count(par_index)>0){
+    return FlipValue(par_index);
+  }
+  return (*_fCurrVal)[par_index];
 }
 
 } //end adaptive_mcmc

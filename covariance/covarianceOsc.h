@@ -26,6 +26,10 @@ class covarianceOsc : public covarianceBase
     /// @brief HW :: This method is a tad hacky but modular arithmetic gives me a headache.
     /// @author Henry Wallace
     void CircularPrior(const int i, const double LowBound, const double UpBound);
+    
+    /// @brief Initialise adaption
+    void initialiseAdaption(const YAML::Node& adapt_manager);
+
     /// Do we flip DeltaM23 or not
     bool flipdelM;
     /// There is special treatment for delta CP, therefore store enum keeping track when to apply special treatment
