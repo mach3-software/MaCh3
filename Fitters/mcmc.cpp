@@ -90,6 +90,11 @@ void mcmc::RunMCMC() {
   // Remove obsolete memory and make other checks before fit starts
   SanitiseInputs();
 
+  // Setup penalty term likelihood for proposed step
+  syst_llh_prop = syst_llh;
+  // Setup sample likelihood for proposed step
+  sample_llh_prop = sample_llh;
+
   // Reconfigure the samples, systematics and oscillation for first weight
   // ProposeStep sets logLProp
   ProposeStep();
@@ -97,11 +102,6 @@ void mcmc::RunMCMC() {
   // Accept the first step to set logLCurr: this shouldn't affect the MCMC because we ignore the first N steps in burn-in
   logLCurr = logLProp;
 
-  // Setup penalty term likelihood for proposed step
-  syst_llh_prop = syst_llh;
-  
-  // Setup sample likelihood for proposed step
-  sample_llh_prop = sample_llh;
 
 
   // KS: Make sure we don't hit limits when using very long
