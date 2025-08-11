@@ -117,7 +117,7 @@ void BinnedSplineHandler::AddSample(const std::string& SampleName,
 void BinnedSplineHandler::InvestigateMissingSplines() const {
 //****************************************
   // Map: sample index → syst index → {sample name, set of problematic mode suffixes}
-  std::map<unsigned int, std::map<unsigned int, std::pair<std::string, std::set<std::string>>>> systZeroCounts;
+  std::map<unsigned int, std::map<unsigned int, std::pair<std::string, std::map<std::string, std::pair<unsigned int, unsigned int>>>>> systZeroCounts;
 
   for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++) {
     std::string SampleName = SampleNames[iSample];
@@ -129,6 +129,7 @@ void BinnedSplineHandler::InvestigateMissingSplines() const {
     for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++) {
       for (unsigned int iSyst = 0; iSyst < indexvec[iSample][iOscChan].size(); iSyst++) {
         unsigned int zeroCount = 0;
+        unsigned int totalSplines = 0;
 
         for (unsigned int iMode = 0; iMode < indexvec[iSample][iOscChan][iSyst].size(); iMode++) {
           // Get the mode suffix string
@@ -138,11 +139,12 @@ void BinnedSplineHandler::InvestigateMissingSplines() const {
           for (unsigned int iVar1 = 0; iVar1 < indexvec[iSample][iOscChan][iSyst][iMode].size(); iVar1++) {
             for (unsigned int iVar2 = 0; iVar2 < indexvec[iSample][iOscChan][iSyst][iMode][iVar1].size(); iVar2++) {
               for (unsigned int iVar3 = 0; iVar3 < indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2].size(); iVar3++) {
+                totalSplines++;
                 if (indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2][iVar3] == 0) {
                   zeroCount++;
                   if(zeroCount > 1){
                     systZeroCounts[iSample][iSyst].first = SampleName;
-                    systZeroCounts[iSample][iSyst].second.insert(modeSuffix);
+                    systZeroCounts[iSample][iSyst].second[modeSuffix] = std::make_pair(totalSplines, zeroCount);
                   }
                   MACH3LOG_DEBUG(
                     "Sample '{}' | OscChan {} | Syst '{}' | Mode '{}' | Var1 {} | Var2 {} | Var3 {} => Value: {}",
@@ -172,20 +174,21 @@ void BinnedSplineHandler::InvestigateMissingSplines() const {
 
     for (const auto& systPair : samplePair.second) {
       const auto& systName = SplineFileParPrefixNames_Sample[systPair.first];
-      const auto& modeSuffixes = systPair.second.second;
 
       std::string modeList;
-      for (auto it = modeSuffixes.begin(); it != modeSuffixes.end(); ++it) {
-        if (it != modeSuffixes.begin()) modeList += ", ";
-        modeList += *it;
-      }
+      for (const auto& modePair : systPair.second.second) {
+        if (!modeList.empty()) modeList += ", ";
+        modeList += modePair.first;
 
-      MACH3LOG_CRITICAL(
-        "Sample '{}': Systematic '{}' has missing splines in mode(s): {}",
-                        systPair.second.first,
-                        systName,
-                        modeList
-      );
+        MACH3LOG_CRITICAL(
+          "Sample '{}': Systematic '{}' has missing splines in mode(s): {}. Excepted Splines: {}, Missing Splines: {}",
+                          SampleName,
+                          systName,
+                          modePair.first,
+                          modePair.second.first,
+                          modePair.second.second
+        );
+      }
     }
   }
 }
