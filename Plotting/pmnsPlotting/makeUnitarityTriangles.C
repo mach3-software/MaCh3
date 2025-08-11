@@ -16,9 +16,9 @@
 #include <iostream>
 #include <sstream>
 
-void makeUnitarityTriangles(bool RCreweight = false, std::string fit_type = "OA2021"){
+void makeUnitarityTriangles(bool RCreweight = false, std::string fit_type = "FD+ND"){
 
-  std::string chain = "T2K";
+  std::string chain = "DUNE";
   std::string fitter = "MaCh3";
 
   int n_bins = 200;
@@ -46,6 +46,8 @@ void makeUnitarityTriangles(bool RCreweight = false, std::string fit_type = "OA2
   bool doReal = false;
   bool doImag = false;
   bool doPrior = false;
+
+  bool doJarlskog = true;
 
   std::map<bool, std::string> bool_str{{false, "wo"}, {true, "w"}};
   std::map<std::string, std::string> infile_str{{"AsimovA22","oa2021/AsimovA22_NonUniform_041022_reduced_smeared_reweighted.root"},{"AsimovB22","oa2021/AsimovB22_NonUniform_Full_161222_reduced_smeared_reweighted.root"},{"OA2021","oa2021/Data_NonUniform_021222_Full_reduced_reweighted_smeared.root"},{"OA2020","MaCh3-OA2020_ALL_data_RCweights_reduced_burnInCut_smearedRevision_withPionSI.root"}};
@@ -118,6 +120,8 @@ void makeUnitarityTriangles(bool RCreweight = false, std::string fit_type = "OA2
 
   std::cout << "number of mcmc steps = " << nSteps << std::endl;
 
+  std::cout<<"Doing Jarlskog? "<<doJarlskog<<std::endl;
+
   double th13, th23;
   double s2th13, s2th23, s2th12, dcp, dm2, rc;
   double s22th13, s22th23, prob, mh;
@@ -169,6 +173,8 @@ void makeUnitarityTriangles(bool RCreweight = false, std::string fit_type = "OA2
   TComplex tr_emu_num_prior, tr_etau_num_prior, tr_mutau_num_prior, tr_12_num_prior, tr_13_num_prior, tr_23_num_prior;
   TComplex tr_emu_denom_prior, tr_etau_denom_prior, tr_mutau_denom_prior, tr_12_denom_prior, tr_13_denom_prior, tr_23_denom_prior;
   TComplex tr_emu_prior, tr_etau_prior, tr_mutau_prior, tr_12_prior, tr_13_prior, tr_23_prior;
+
+  double j_e1, j_e2, j_mu1, j_mu3, j_tau2, j_tau3;
 
   TH1D* h_ue1;
   TH1D* h_ue2;
@@ -266,6 +272,13 @@ void makeUnitarityTriangles(bool RCreweight = false, std::string fit_type = "OA2
   TH1D* h_eta_13_prior;
   TH1D* h_eta_23_prior;
 
+  TH1D* h_j_e1;
+  TH1D* h_j_e2;
+  TH1D* h_j_mu1;
+  TH1D* h_j_mu3;
+  TH1D* h_j_tau2;
+  TH1D* h_j_tau3;
+
   if(doModulus) {
     h_ue1 = new TH1D("h_ue1",";U_{e1}",100,0.,1.);
     h_ue2 = new TH1D("h_ue2",";U_{e2}",100,0.,1.);
@@ -330,6 +343,15 @@ void makeUnitarityTriangles(bool RCreweight = false, std::string fit_type = "OA2
     h_imag_utau1_prior = new TH1D("h_imag_utau1_prior",";Im(U_{#tau1})",100,-1.,1.);
     h_imag_utau2_prior = new TH1D("h_imag_utau2_prior",";Im(U_{#tau2})",100,-1.,1.);
     h_imag_utau3_prior = new TH1D("h_imag_utau3_prior",";Im(U_{#tau3})",100,-1.,1.); 
+  }
+
+  if(doJarlskog) {
+    h_j_e1 = new TH1D("h_j_e1",";J_{e1}",200,-0.05,0.05);
+    h_j_e2 = new TH1D("h_j_e2",";J_{e2}",200,-0.05,0.05);
+    h_j_mu1 = new TH1D("h_j_mu1",";J_{#mu1}",200,-0.05,0.05);
+    h_j_mu3 = new TH1D("h_j_mu3",";J_{#mu3}",200,-0.05,0.05);
+    h_j_tau2 = new TH1D("h_j_tau2",";J_{#tau2}",200,-0.05,0.05);
+    h_j_tau3 = new TH1D("h_j_tau3",";J_{#tau3}",200,-0.05,0.05);
   }
 
   gStyle->SetOptStat(0);
@@ -470,6 +492,14 @@ void makeUnitarityTriangles(bool RCreweight = false, std::string fit_type = "OA2
     tr_23_denom = ue2.operator*(TComplex::Conjugate(ue3));
     tr_23       = - tr_23_num.operator/(tr_23_denom);
 
+    //Jarlskog
+    j_e1 = tr_mutau.Im()*TComplex::Abs(umu2)*TComplex::Abs(umu2)*TComplex::Abs(utau2)*TComplex::Abs(utau2);
+    j_e2 = TComplex::Power(tr_13,-1).Im()*TComplex::Abs(umu1)*TComplex::Abs(umu1)*TComplex::Abs(umu3)*TComplex::Abs(umu3);
+    j_mu1 = TComplex::Power(tr_23,-1).Im()*TComplex::Abs(utau2)*TComplex::Abs(utau2)*TComplex::Abs(utau3)*TComplex::Abs(utau3);
+    j_mu3 = tr_etau.Im()*TComplex::Abs(ue1)*TComplex::Abs(ue1)*TComplex::Abs(utau1)*TComplex::Abs(utau1);
+    j_tau2 = tr_emu.Im()*TComplex::Abs(ue3)*TComplex::Abs(ue3)*TComplex::Abs(umu3)*TComplex::Abs(umu3);
+    j_tau3 = TComplex::Power(tr_12,-1).Im()*TComplex::Abs(ue1)*TComplex::Abs(ue1)*TComplex::Abs(ue2)*TComplex::Abs(ue2);
+
     if(doModulus) {
       h_ue1->Fill(TComplex::Abs(ue1),rc);
       h_ue2->Fill(TComplex::Abs(ue2),rc);
@@ -505,6 +535,15 @@ void makeUnitarityTriangles(bool RCreweight = false, std::string fit_type = "OA2
       h_imag_utau1->Fill(imag_utau1,rc);
       h_imag_utau2->Fill(imag_utau2,rc);
       h_imag_utau3->Fill(imag_utau3,rc);
+    }
+
+    if(doJarlskog) {
+      h_j_e1->Fill(j_e1,rc);
+      h_j_e2->Fill(j_e2,rc);
+      h_j_mu1->Fill(j_mu1,rc);
+      h_j_mu3->Fill(j_mu3,rc);
+      h_j_tau2->Fill(j_tau2,rc);
+      h_j_tau3->Fill(j_tau3,rc);
     }
 
     gStyle->SetOptStat(0);
@@ -745,6 +784,15 @@ void makeUnitarityTriangles(bool RCreweight = false, std::string fit_type = "OA2
     h_imag_utau1_prior->Write("h_imag_utau1_prior");
     h_imag_utau2_prior->Write("h_imag_utau2_prior");
     h_imag_utau3_prior->Write("h_imag_utau3_prior");
+  }
+
+  if(doJarlskog) {
+    h_j_e1->Write("h_j_e1");
+    h_j_e2->Write("h_j_e2");
+    h_j_mu1->Write("h_j_mu1");
+    h_j_mu3->Write("h_j_mu3");
+    h_j_tau2->Write("h_j_tau2");
+    h_j_tau3->Write("h_j_tau3");
   }
 
   //triangles
