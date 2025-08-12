@@ -249,6 +249,8 @@ class MCMCProcessor {
     /// @brief Set the step cutting by int
     /// @param Cuts integer telling cut value
     void SetStepCut(const int Cuts);
+    /// @brief Check if step cut isn't larger than highest values of step in a chain
+    void CheckStepCut() const;
 
     /// @brief You can set relative to prior or relative to generated. It is advised to use relate to prior
     /// @param PlotOrNot bool controlling plotRelativeToPrior argument
