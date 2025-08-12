@@ -32,7 +32,7 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, 
       # so your job can access it
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       
       # Updates the package list to ensure you get the latest version of packages
       - run: sudo apt-get update
@@ -75,7 +75,7 @@ jobs:
     
       # Checks-out your repository under $GITHUB_WORKSPACE, 
       # so your job can access it
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Check Python 
         run: python3 --version

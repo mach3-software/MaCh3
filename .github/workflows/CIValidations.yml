@@ -53,7 +53,7 @@ jobs:
       image: ghcr.io/mach3-software/mach3:alma9latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Set MACH3_BRANCH
       run: echo "MACH3_BRANCH=${GITHUB_HEAD_REF}" >> "$GITHUB_ENV"
