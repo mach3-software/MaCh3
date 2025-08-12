@@ -12,6 +12,7 @@ permissions:
   # Required permissions for GitHub Pages deployment and content updates
   deployments: write
   contents: write
+  pull-requests: write
 
 jobs:
   benchmark:
@@ -56,7 +57,7 @@ jobs:
         uses: benchmark-action/github-action-benchmark@v1
         with:
           tool: 'catch2' # Specify that the benchmark tool is Catch2
-          github-token: ${{ secrets.MACH3_VALIDATIONS_PAT }} # Use GitHub token for authentication
+          ${{ secrets.MACH3_VALIDATIONS_PAT || secrets.GITHUB_TOKEN }} # Use GitHub token for authentication
           output-file-path: /opt/MaCh3Validations/build/output.txt # Path to the benchmark output file
           alert-threshold: 150% # Alert threshold for performance degradation
           comment-on-alert: true
