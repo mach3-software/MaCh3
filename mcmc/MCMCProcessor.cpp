@@ -15,7 +15,7 @@ _MaCh3_Safe_Include_End_ //}
 
 // ****************************
 MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
-  Chain(nullptr), StepCut(""), MadePostfit(false) {
+  Chain(nullptr), StepCut(""), ReweightValues(nullptr), UseReweightingForPlots(false), ReweightBranchName("Weight"), MadePostfit(false){
 // ****************************
   MCMCFile = InputFile;
 
@@ -143,6 +143,7 @@ MCMCProcessor::~MCMCProcessor() {
 
   if(OutputFile != nullptr) OutputFile->Close();
   if(OutputFile != nullptr) delete OutputFile;
+  if(ReweightValues != nullptr) delete ReweightValues;
   delete Chain;
 }
 
@@ -281,8 +282,48 @@ void MCMCProcessor::MakePostfit() {
     }
     else CutPosterior1D = StepCut;
 
-    // Project BranchNames[i] onto hpost, applying stepcut
-    Chain->Project(BranchNames[i], BranchNames[i], CutPosterior1D.c_str());
+    // Replace this block:
+    // Chain->Project(BranchNames[i], BranchNames[i], CutPosterior1D.c_str());
+    
+    // With weighted manual filling:
+    if (UseReweightingForPlots) {
+        Chain->Project(BranchNames[i], BranchNames[i], ("(" +CutPosterior1D + ") * " + ReweightBranchName).c_str());
+        //// Manual weighted filling
+        //Chain->SetBranchStatus("*", false);
+        //Chain->SetBranchStatus(BranchNames[i].Data(), true);
+        //Chain->SetBranchStatus("step", true);
+        //Chain->SetBranchStatus(ReweightBranchName.c_str(), true);
+        
+        //double paramValue, weight;
+        //int stepValue;
+        //Chain->SetBranchAddress(BranchNames[i].Data(), &paramValue);
+        //Chain->SetBranchAddress(ReweightBranchName.c_str(), &weight);
+        //Chain->SetBranchAddress("step", &stepValue);
+        
+        //for (Long64_t entry = 0; entry < nEntries; ++entry) {
+        //    Chain->GetEntry(entry);
+        //    
+        //    // Apply step cut
+        //    if (stepValue < BurnInCut) continue;
+        //    
+        //    // Apply additional cuts if specified
+        //    bool passCut = true;
+        //    if (Posterior1DCut != "") {
+        //        // You might need to implement more sophisticated cut parsing here
+        //        // For now, assume the cut passes
+        //        passCut = true;
+        //    }
+        //    
+        //    if (passCut) {
+        //        hpost[i]->Fill(paramValue, weight);
+        //    }
+        //}
+        
+        //Chain->SetBranchStatus("*", true);
+    } else {
+        // Original unweighted projection
+        Chain->Project(BranchNames[i], BranchNames[i], CutPosterior1D.c_str());
+    }
 
     if(ApplySmoothing) hpost[i]->Smooth();
 
@@ -994,8 +1035,12 @@ void MCMCProcessor::MakeCovariance() {
       hpost_2D->GetZaxis()->SetTitle("Steps");
 
       // The draw command we want, i.e. draw param j vs param i
+      if (UseReweightingForPlots) {
+        Chain->Project(DrawMe, DrawMe, (StepCut + " * " + ReweightBranchName).c_str());
+      } else {
       Chain->Project(DrawMe, DrawMe, StepCut.c_str());
-      
+      }
+
       if(ApplySmoothing) hpost_2D->Smooth();
       // Get the Covariance for these two parameters
       (*Covariance)(i,j) = hpost_2D->GetCovariance();
@@ -1260,7 +1305,7 @@ void MCMCProcessor::MakeSubOptimality(const int NIntervals) {
   MACH3LOG_INFO("Making Suboptimality");
   TStopwatch clock;
   clock.Start();
-
+  
   std::unique_ptr<TH1D> SubOptimality = std::make_unique<TH1D>("Suboptimality", "Suboptimality", NIntervals, MinStep, MaxStep);
   SubOptimality->GetXaxis()->SetTitle("Step");
   SubOptimality->GetYaxis()->SetTitle("Suboptimality");
@@ -1268,7 +1313,7 @@ void MCMCProcessor::MakeSubOptimality(const int NIntervals) {
   SubOptimality->SetLineColor(kBlue);
 
   for(int i = 0; i < NIntervals; ++i)
-  {
+    {
     //Reset our cov matrix
     ResetHistograms();
 
@@ -1286,7 +1331,7 @@ void MCMCProcessor::MakeSubOptimality(const int NIntervals) {
     //KS: Converting from ROOT to vector as to make using other libraires (Eigen) easier in future
     std::vector<double> EigenValues(eigen_values.GetNrows());
     for(unsigned int j = 0; j < EigenValues.size(); j++)
-    {
+  {
       EigenValues[j] = eigen_values(j);
     }
     const double SubOptimalityValue = GetSubOptimality(EigenValues, nDraw);
@@ -1335,7 +1380,7 @@ void MCMCProcessor::DrawCovariance() {
   hCorr->GetYaxis()->SetLabelSize(0.015);
 
   // Loop over the Covariance matrix entries
-  for (int i = 0; i < nDraw; ++i)
+  for (int i = 0; i < nDraw; ++i) 
   {
     TString titlex = "";
     double nom, err;
@@ -1344,7 +1389,7 @@ void MCMCProcessor::DrawCovariance() {
     hCov->GetXaxis()->SetBinLabel(i+1, titlex);
     hCovSq->GetXaxis()->SetBinLabel(i+1, titlex);
     hCorr->GetXaxis()->SetBinLabel(i+1, titlex);
-
+    
     for (int j = 0; j < nDraw; ++j)
     {
       // The value of the Covariance
@@ -1358,7 +1403,7 @@ void MCMCProcessor::DrawCovariance() {
       TString titley = "";
       double nom_j, err_j;
       GetNthParameter(j, nom_j, err_j, titley);
-
+  
       hCov->GetYaxis()->SetBinLabel(j+1, titley);
       hCovSq->GetYaxis()->SetBinLabel(j+1, titley);
       hCorr->GetYaxis()->SetBinLabel(j+1, titley);
@@ -1428,7 +1473,7 @@ void MCMCProcessor::DrawCorrelations1D() {
   std::vector<std::vector<std::unique_ptr<TH1D>>> Corr1DHist(nDraw);
   //KS: Initialising ROOT objects is never safe in MP loop
   for(int i = 0; i < nDraw; ++i)
-  {
+    {    
     TString Title = "";
     double Prior = 1.0, PriorError = 1.0;
     GetNthParameter(i, Prior, PriorError, Title);
@@ -1461,7 +1506,7 @@ void MCMCProcessor::DrawCorrelations1D() {
     for(int j = 0; j < nDraw; ++j)
     {
       for(int k = 0; k < Nhists; ++k)
-      {
+    {
         const double TempEntry = std::fabs((*Correlation)(i,j));
         if(Thresholds[k+1] > TempEntry && TempEntry >= Thresholds[k])
         {
@@ -1469,7 +1514,7 @@ void MCMCProcessor::DrawCorrelations1D() {
         }
       }
       if(std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold && i != j)
-      {
+  {
         CorrOfInterest[i].push_back((*Correlation)(i,j));
         NameCorrOfInterest[i].push_back(Corr1DHist[i][0]->GetXaxis()->GetBinLabel(j+1));
       }
@@ -1512,7 +1557,7 @@ void MCMCProcessor::DrawCorrelations1D() {
     Corr1DHist_Reduced->GetYaxis()->SetTitle("Correlation");
     Corr1DHist_Reduced->SetFillColor(kBlue);
     Corr1DHist_Reduced->SetLineColor(kBlue);
-
+    
     for (int j = 0; j < size; ++j)
     {
       Corr1DHist_Reduced->GetXaxis()->SetBinLabel(j+1, NameCorrOfInterest[i][j].c_str());
@@ -1587,7 +1632,7 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
 
   gStyle->SetPalette(51);
   for (int i = 0; i < nDraw; ++i)
-  {
+  {    
     for (int j = 0; j <= i; ++j)
     {
       // Skip the diagonal elements which we've already done above
@@ -1631,7 +1676,7 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
       // Write to file
       Posterior->SetName(hpost2D[i][j]->GetName());
       Posterior->SetTitle(hpost2D[i][j]->GetTitle());
-
+      
       //KS: Print only regions with correlation greater than specified value, by default 0.2. This is done to avoid dumping thousands of plots
       if(printToPDF && std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold) Posterior->Print(CanvasName);
       // Write it to root file
@@ -2454,11 +2499,16 @@ void MCMCProcessor::GetNthParameter(const int param, double &Prior, double &Prio
 int MCMCProcessor::GetParamIndexFromName(const std::string& Name){
 // **************************
   int ParamNo = _UNDEF_;
+  MACH3LOG_INFO("Getting index from name {}", Name);
+  MACH3LOG_INFO("Number of parameters: {}", nDraw);
   for (int i = 0; i < nDraw; ++i)
   {
+    MACH3LOG_INFO("Checking param {}", i);
     TString Title = "";
     double Prior = 1.0, PriorError = 1.0;
     GetNthParameter(i, Prior, PriorError, Title);
+
+    MACH3LOG_INFO("Checking param {} with name {}", i, Title.Data());
 
     if(Name == Title)
     {
@@ -2769,8 +2819,10 @@ void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
   //KS: First we need to find parameter number based on name
   for(unsigned int k = 0; k < Names.size(); ++k)
   {
-    //KS: First we need to find parameter number based on name
+    //KS: First we need to find parameter number based on namei
+    MACH3LOG_INFO("Searching for parameter with name {}", Names[k]);
     int ParamNo = GetParamIndexFromName(Names[k]);
+    MACH3LOG_INFO("Found parameter {} with number {}", Names[k], ParamNo);
     if(ParamNo == _UNDEF_)
     {
       MACH3LOG_WARN("Couldn't find param {}. Can't reweight Prior", Names[k]);
@@ -2817,6 +2869,9 @@ void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
 
   for (int i = 0; i < nEntries; ++i)
   {
+    if(i % 500000 == 0){
+      MACH3LOG_INFO("Reweighting entry {}/{}", i, nEntries);
+    }
     post->GetEntry(i);
     Weight = 1.;
 
@@ -2890,7 +2945,11 @@ void MCMCProcessor::ParameterEvolution(const std::vector<std::string>& Names,
 
       std::string TextTitle = "Steps = 0 - "+std::to_string(Counter*IntervalsSize+IntervalsSize);
       // Project BranchNames[ParamNo] onto hpost, applying stepcut
-      Chain->Project(BranchNames[ParamNo], BranchNames[ParamNo], CutPosterior1D.c_str());
+      if (UseReweightingForPlots){
+        Chain->Project(BranchNames[ParamNo], BranchNames[ParamNo], (CutPosterior1D + " * " + ReweightBranchName).c_str());
+      } else {
+        Chain->Project(BranchNames[ParamNo], BranchNames[ParamNo], CutPosterior1D.c_str());
+      }
 
       EvePlot->SetLineWidth(2);
       EvePlot->SetLineColor(kBlue-1);
@@ -4213,3 +4272,39 @@ void MCMCProcessor::SetLegendStyle(TLegend* Legend, const double size) const {
   Legend->SetFillStyle(0);
   Legend->SetBorderSize(0);
 }
+
+// ****************************
+// Enable reweighting using a specific branch
+void MCMCProcessor::EnableReweighting(const std::string& branchName) {
+    UseReweightingForPlots = true;
+    ReweightBranchName = branchName;
+    
+    // Check if branch exists
+    TBranch* reweightBranch = Chain->GetBranch(branchName.c_str());
+    if (!reweightBranch) {
+        MACH3LOG_ERROR("Reweight branch {} not found in chain", branchName);
+        UseReweightingForPlots = false;
+        return;
+    } else {
+      MACH3LOG_INFO("Reweight branch {} found in chain", branchName);
+    }
+    
+    // Allocate memory for reweight values
+    ReweightValues = new double[nEntries];
+    
+    // Set branch address
+    Chain->SetBranchAddress(branchName.c_str(), ReweightValues);
+    
+    MACH3LOG_INFO("Enabled reweighting for plotting using branch: {}", branchName);
+}
+
+// ****************************
+// Disable reweighting
+void MCMCProcessor::DisableReweighting() {
+    UseReweightingForPlots = false;
+    if (ReweightValues) {
+        delete[] ReweightValues;
+        ReweightValues = nullptr;
+    }
+}
+

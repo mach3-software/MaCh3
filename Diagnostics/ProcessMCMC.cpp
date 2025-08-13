@@ -71,12 +71,48 @@ int main(int argc, char *argv[])
 void ProcessMCMC(const std::string& inputFile)
 {
   MACH3LOG_INFO("File for study: {} with config  {}", inputFile, config);
-  // Make the processor)
-  auto Processor = std::make_unique<MCMCProcessor>(inputFile);
+  // Make the processor
+  // auto Processor = std::make_unique<MCMCProcessor>(inputFile); // define this later 
 
   YAML::Node card_yaml = M3OpenConfig(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
 
+  std::string inputFile_reweighted = "";
+
+  // Check if we want to reweight prior first
+  if(GetFromManager<bool>(Settings["ReweightPrior"], false)){
+    // check if there is already a reweight branch in the file
+    auto checkFile = std::unique_ptr<TFile>(new TFile(inputFile.c_str(), "READ"));
+    std::unique_ptr<TTree> checkTree(checkFile->Get<TTree>("posteriors"));
+
+    if (checkTree && checkTree->GetBranch("Weight")) {
+        MACH3LOG_WARN("Reweighting prior is already done, skipping for now, please give me an unweighted file");
+
+    } else {
+
+        auto temp_Processor = std::make_unique<MCMCProcessor>(inputFile);
+        temp_Processor->Initialise();
+        MACH3LOG_INFO("No weight branch found, proceeding with reweighting prior");
+        // Reweight the prior
+        ReweightPrior(temp_Processor);   
+        // set the name for the reactor constrained file here
+        inputFile_reweighted = inputFile.substr(0, inputFile.find(".root")) + "_reweighted.root";
+        MACH3LOG_INFO("Reweighted file will be saved as {}", inputFile_reweighted);
+    }
+  }
+
+  std::unique_ptr<MCMCProcessor> Processor;
+
+  bool applyReweight = GetFromManager<bool>(Settings["ApplyReweightToPlots"], false);
+  if(applyReweight){
+    MACH3LOG_INFO("Applying reweighting to plots, using file {}", inputFile_reweighted);
+    Processor = std::make_unique<MCMCProcessor>(inputFile_reweighted);
+  } else {
+    // If we don't apply reweight, we use the original file
+    MACH3LOG_INFO("Not applying reweighting to plots, using file {}", inputFile);
+    Processor = std::make_unique<MCMCProcessor>(inputFile);
+  }
+  
   const bool PlotCorr = GetFromManager<bool>(Settings["PlotCorr"], false);
 
   Processor->SetExcludedTypes(GetFromManager<std::vector<std::string>>(Settings["ExcludedTypes"], {}));
@@ -97,6 +133,11 @@ void ProcessMCMC(const std::string& inputFile)
   Processor->SetPost2DPlotThreshold(GetFromManager<double>(Settings["Post2DPlotThreshold"], 0.2));
 
   Processor->Initialise();
+
+  // after initialisation enable reweighting if required
+  if (applyReweight) {
+    Processor->EnableReweighting("Weight");
+  }
 
   if(Settings["BurnInSteps"])
   {
@@ -158,7 +199,7 @@ void ProcessMCMC(const std::string& inputFile)
     //KS: When creating covariance matrix longest time is spend on caching every step, since we already cached we can run some fancy covariance stability diagnostic
     if(GetFromManager<bool>(Settings["DiagnoseCovarianceMatrix"], false)) DiagnoseCovarianceMatrix(Processor, inputFile);
   }
-  if(GetFromManager<bool>(Settings["ReweightPrior"], false)) ReweightPrior(Processor);
+
 }
 
 void MultipleProcessMCMC()
@@ -613,6 +654,10 @@ void ReweightPrior(const std::unique_ptr<MCMCProcessor>& Processor)
   std::vector<double> NewCentral = Prior[1].as<std::vector<double>>();
   std::vector<double> NewError = Prior[2].as<std::vector<double>>();
 
+  for (const auto& name : Names)
+  {
+    MACH3LOG_INFO("Reweighting prior for {} with new central value {} and error {}", name, NewCentral[&name - &Names[0]], NewError[&name - &Names[0]]);
+  }
   Processor->ReweightPrior(Names, NewCentral, NewError);
 }
 

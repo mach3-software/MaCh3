@@ -272,6 +272,11 @@ class MCMCProcessor {
     inline void SetOutputSuffix(const std::string Suffix){OutputSuffix = Suffix; };
     /// @brief Allow to set addtional cuts based on ROOT TBrowser cut, for to only affect one mass ordering
     inline void SetPosterior1DCut(const std::string Cut){Posterior1DCut = Cut; };
+
+    void EnableReweighting(const std::string& branchName = "Weight");
+    void DisableReweighting();
+    inline bool IsReweightingEnabled() const { return UseReweightingForPlots; }
+
   protected:
     /// @brief Prepare prefit histogram for parameter overlay plot
     inline std::unique_ptr<TH1D> MakePrefit();
@@ -389,6 +394,10 @@ class MCMCProcessor {
     int nSysts;
     /// Number of all parameters used in the analysis
     int nDraw;
+
+    double* ReweightValues;
+    bool UseReweightingForPlots;
+    std::string ReweightBranchName;
 
     //Name of all branches as well as branches we don't want to include in the analysis
     std::vector<TString> BranchNames;
