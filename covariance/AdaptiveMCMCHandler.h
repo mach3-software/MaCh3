@@ -24,7 +24,7 @@ class AdaptiveMCMCHandler{
 
   /// @brief Read initial values from config file
   /// @param adapt_manager Config file from which we update matrix
-  bool InitFromConfig(const YAML::Node& adapt_manager, const std::string& matrix_name_str, const int Npars);
+  bool InitFromConfig(const YAML::Node& adapt_manager, const std::string& matrix_name_str, std::vector<double>* current_params, const int Npars);
 
   /// @brief If we don't have a covariance matrix to start from for adaptive tune we need to make one!
   void CreateNewAdaptiveCovariance(const int Npars);
@@ -49,7 +49,7 @@ class AdaptiveMCMCHandler{
   /// @brief Method to update adaptive MCMC
   /// @cite haario2001adaptive
   /// @param _fCurrVal Value of each parameter necessary for updating throw matrix
-  void UpdateAdaptiveCovariance(const std::vector<double>& _fCurrVal, const int Npars);
+  void UpdateAdaptiveCovariance(const int Npars);
 
   /// @brief Tell whether we want reset step scale or not
   bool IndivStepScaleAdapt();
@@ -63,6 +63,12 @@ class AdaptiveMCMCHandler{
   std::vector<double>* _fCurrVal = nullptr;
 
   void SetCurrentValues(std::vector<double>* fCurrVal) {
+    MACH3LOG_INFO("Setting current values for adaptive MCMC handler");
+    if (fCurrVal == nullptr) {
+      MACH3LOG_ERROR("Current values vector is null, cannot set current values for adaptive MCMC handler");
+      return;
+    }
+    MACH3LOG_INFO("Vector size: " + std::to_string(fCurrVal->size()));
     _fCurrVal = fCurrVal;
   }
 

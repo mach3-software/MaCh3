@@ -79,6 +79,7 @@ void covarianceOsc::initialiseAdaption(const YAML::Node& adapt_manager){
     covarianceBase::initialiseAdaption(adapt_manager);
     std::unordered_map<int, double> flip_indices;
     flip_indices[kDeltaM23] = 0.0;
+    flip_indices[kSinTheta23] = 0.5112;
     AdaptiveHandler.AddFlipParameters(flip_indices);
 }
 

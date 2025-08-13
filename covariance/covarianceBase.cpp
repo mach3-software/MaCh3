@@ -1042,7 +1042,7 @@ void covarianceBase::updateThrowMatrix(TMatrixDSym *cov){
 void covarianceBase::initialiseAdaption(const YAML::Node& adapt_manager){
 // ********************************************
   // Now we read the general settings [these SHOULD be common across all matrices!]
-  bool success = AdaptiveHandler.InitFromConfig(adapt_manager, matrixName, getNpars());
+  bool success = AdaptiveHandler.InitFromConfig(adapt_manager, matrixName, &_fCurrVal, getNpars());
   if(!success) return;
   AdaptiveHandler.Print();
 
@@ -1064,7 +1064,6 @@ void covarianceBase::initialiseAdaption(const YAML::Node& adapt_manager){
   AdaptiveHandler.SetThrowMatrixFromFile(external_file_name, external_matrix_name, external_mean_name, use_adaptive, _fNumPar);
   setThrowMatrix(AdaptiveHandler.adaptive_covariance);
   MACH3LOG_INFO("Successfully Set External Throw Matrix Stored in {}", external_file_name);
-  AdaptiveHandler.SetCurrentValues(&_fCurrVal);
 }
 
 // ********************************************
@@ -1081,7 +1080,7 @@ void covarianceBase::updateAdaptiveCovariance(){
   }
 
   // Call main adaption function
-  AdaptiveHandler.UpdateAdaptiveCovariance(_fCurrVal, _fNumPar);
+  AdaptiveHandler.UpdateAdaptiveCovariance(_fNumPar);
 
   //This is likely going to be the slow bit!
   if(AdaptiveHandler.IndivStepScaleAdapt()) {

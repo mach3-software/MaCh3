@@ -25,7 +25,7 @@ AdaptiveMCMCHandler::~AdaptiveMCMCHandler() {
 }
 
 // ********************************************
-bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const std::string& matrix_name_str, const int Npars) {
+bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const std::string& matrix_name_str, std::vector<double>* current_params, const int Npars) {
 // ********************************************
   /*
    * HW: Idea is that adaption can simply read the YAML config
@@ -71,6 +71,8 @@ bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const 
   adaptive_update_step  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["UpdateStep"], 100);
   adaptive_save_n_iterations  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["SaveNIterations"], 1);
   output_file_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Settings"]["OutputFileName"], "");
+
+  SetCurrentValues(current_params);
 
   // We also want to check for "blocks" by default all parameters "know" about each other
   // but we can split the matrix into independent block matrices
@@ -228,7 +230,7 @@ void AdaptiveMCMCHandler::SetThrowMatrixFromFile(const std::string& matrix_file_
 }
 
 // ********************************************
-void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const std::vector<double>& _fParamsCurrVal, const int Npars) {
+void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const int Npars) {
 // ********************************************
   std::vector<double> par_means_prev = par_means;
 
@@ -238,7 +240,7 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const std::vector<double>& _f
   #pragma omp parallel for
   #endif
   for(int iRow = 0; iRow < Npars; iRow++) {
-    par_means[iRow] = (_fParamsCurrVal[iRow]+par_means[iRow]*steps_post_burn)/(steps_post_burn+1);
+    par_means[iRow] = (CurrVal(iRow)+par_means[iRow]*steps_post_burn)/(steps_post_burn+1);
   }
 
   //Now we update the covariances using cov(x,y)=E(xy)-E(x)E(y)
@@ -256,7 +258,7 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance(const std::vector<double>& _f
         // https://projecteuclid.org/journals/bernoulli/volume-7/issue-2/An-adaptive-Metropolis-algorithm/bj/1080222083.full
         cov_val = (*adaptive_covariance)(irow, icol)*Npars/5.6644;
         cov_val += par_means_prev[irow]*par_means_prev[icol]; //First we remove the current means
-        cov_val = (cov_val*steps_post_burn+_fParamsCurrVal[irow]*_fParamsCurrVal[icol])/(steps_post_burn+1); //Now get mean(iRow*iCol)
+        cov_val = (cov_val*steps_post_burn+CurrVal(irow)*CurrVal(icol))/(steps_post_burn+1); //Now get mean(iRow*iCol)
         cov_val -= par_means[icol]*par_means[irow];
         cov_val*=5.6644/Npars;
       }
@@ -289,6 +291,7 @@ double AdaptiveMCMCHandler::FlipValue(const int par_index) {
 }
 
 void AdaptiveMCMCHandler::AddFlipParameters(const std::unordered_map<int, double>& parameters) {
+  MACH3LOG_INFO("Adding {} flipped parameters", parameters.size());
   /// This function adds the flipped parameters to the vector
   /// It is used to add the flipped parameters to the adaptive covariance matrix
   FlipParameterMap = parameters;

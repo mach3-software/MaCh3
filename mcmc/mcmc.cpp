@@ -165,7 +165,7 @@ void mcmc::runMCMC() {
       for (auto& syst : systematics) {
         if (syst->getName() == "osc_cov") {
           syst->setIndivStepScale(multicanonicalVar, stepScale);
-          MACH3LOG_INFO("Setting individual step scale for osc_cov systematic to {}", stepScale);
+          MACH3LOG_INFO("Setting individual step scale for {} systematic to {}", multicanonicalVar, stepScale);
         }
       }      
     } else {
