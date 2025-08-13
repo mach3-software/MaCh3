@@ -277,10 +277,8 @@ class SampleHandlerFD :  public SampleHandlerBase
   //===============================================================================
   //DB Functions required for reweighting functions
   //DB Replace previous implementation with reading bin contents from SampleHandlerFD_array
-  /// @brief Fill a 1D histogram with the event-level information used in the fit
-  void Fill1DHist();
-  /// @brief Fill a 2D histogram with the event-level information used in the fit
-  void Fill2DHist();
+  /// @brief Fill a histogram with the event-level information used in the fit
+  void FillMCHist(const int Dimension);
 
   /// @brief DB Nice new multi-threaded function which calculates the event weights and fills the relevant bins of an array
 #ifdef MULTITHREAD
