@@ -632,7 +632,6 @@ void MCMCProcessor::DrawPostfit() {
     paramPlot_Gauss->Draw("e2, same");
     paramPlot_HPD->Draw("e1, same");
     CompLeg->Draw("same");
-    Posterior->Write("param_xsec_canv");
     if(printToPDF) Posterior->Print(CanvasName);
     Posterior->Clear();
   }
