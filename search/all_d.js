@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['name_0',['name',['../structTypeParameterBase.html#a9cec220ee7904196cc6a7d98c2b061f8',1,'TypeParameterBase']]],
-  ['name_1',['Name',['../structMaCh3ModeInfo.html#a8c957d49742a2ad0faa79fbc07427767',1,'MaCh3ModeInfo']]],
+  ['name_0',['Name',['../structMaCh3ModeInfo.html#a8c957d49742a2ad0faa79fbc07427767',1,'MaCh3ModeInfo']]],
+  ['name_1',['name',['../structTypeParameterBase.html#a9cec220ee7904196cc6a7d98c2b061f8',1,'TypeParameterBase']]],
   ['nbatches_2',['nBatches',['../classMCMCProcessor.html#a02c5a3f849cf217705816c650c678d19',1,'MCMCProcessor']]],
   ['nbins_3',['nBins',['../GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1',1,'nBins():&#160;GetPostfitParamPlots.cpp'],['../classMCMCProcessor.html#a6b74f8195bcbca0979f9e9fe43468bae',1,'MCMCProcessor::nBins()'],['../structSampleBinningInfo.html#af20237040c5fe0d4a26b63fc83e55ff9',1,'SampleBinningInfo::nBins()']]],
   ['nbranches_4',['nBranches',['../classMCMCProcessor.html#af6ba5d9aec5350fafebbf81309e813cb',1,'MCMCProcessor']]],
@@ -22,8 +22,8 @@ var searchData=
   ['nknots_19',['nKnots',['../classSMonolith.html#afc0e3d1eafd575cf7628319a66925d5b',1,'SMonolith']]],
   ['nknots_5farr_20',['nKnots_arr',['../structSplineMonoStruct.html#a398e0212915793852137384a3406b37f',1,'SplineMonoStruct']]],
   ['nmcmcentries_21',['nMCMCentries',['../structMaCh3Plotting_1_1InputFile.html#ae00097a495ed0cc29a0858e1918fb9f7',1,'MaCh3Plotting::InputFile']]],
-  ['nmodelparams_22',['NModelParams',['../classPredictiveThrower.html#a74f465fe73227797d8818749fca5f043',1,'PredictiveThrower']]],
-  ['nmodelparams_23',['nModelParams',['../classSampleSummary.html#a49215601479aaa99f9f64d8f7c900385',1,'SampleSummary']]],
+  ['nmodelparams_22',['nModelParams',['../classSampleSummary.html#a49215601479aaa99f9f64d8f7c900385',1,'SampleSummary']]],
+  ['nmodelparams_23',['NModelParams',['../classPredictiveThrower.html#a74f465fe73227797d8818749fca5f043',1,'PredictiveThrower']]],
   ['nmodes_24',['NModes',['../classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf',1,'MaCh3Modes']]],
   ['nominal_25',['nominal',['../GetPenaltyTerm_8cpp.html#a35f9d8ea46badc9ea84d62feaa0e73df',1,'GetPenaltyTerm.cpp']]],
   ['nominalhist_26',['NominalHist',['../classSampleSummary.html#a503b0dc19bb1ad57e7f2560cc64feef9',1,'SampleSummary']]],
