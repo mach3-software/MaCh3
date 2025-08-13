@@ -565,28 +565,66 @@ void MCMCProcessor::DrawPostfit() {
 
   OutputFile->cd();
 
-  //KS: Plot Xsec and Flux
-  /// @todo this need revision
-  if (nParam[kXSecPar] > 0)
+  // Write the individual ones
+  prefit->Write("param_xsec_prefit");
+  paramPlot->Write("param_xsec");
+  paramPlot_Gauss->Write("param_xsec_gaus");
+  paramPlot_HPD->Write("param_xsec_HPD");
+
+  // Plot the xsec parameters (0 to ~nXsec-nFlux) nXsec == xsec + flux, quite confusing I know
+  // Have already looked through the branches earlier
+  if(plotRelativeToPrior)  prefit->GetYaxis()->SetTitle("Variation rel. prior");
+  else prefit->GetYaxis()->SetTitle("Parameter Value");
+  prefit->GetYaxis()->SetRangeUser(-2.5, 2.5);
+
+  // And the combined
+  prefit->Draw("e2");
+  paramPlot->Draw("e2, same");
+  paramPlot_Gauss->Draw("e2, same");
+  paramPlot_HPD->Draw("e1, same");
+  CompLeg->Draw("same");
+  Posterior->Write("param_xsec_canv");
+
+  //KS: Tells how many parameters in one canvas we want
+  constexpr int IntervalsSize = 20;
+  const int NIntervals = nDraw/IntervalsSize;
+
+  for (int i = 0; i < NIntervals+1; ++i)
   {
-    const int Start = ParamTypeStartPos[kXSecPar];
-    const int nFlux = GetGroup("Flux");
-    // Plot the xsec parameters (0 to ~nXsec-nFlux) nXsec == xsec + flux, quite confusing I know
-    // Have already looked through the branches earlier
-    if(plotRelativeToPrior)  prefit->GetYaxis()->SetTitle("Variation rel. prior"); 
-    else prefit->GetYaxis()->SetTitle("Parameter Value");
-    prefit->GetYaxis()->SetRangeUser(-2.5, 2.5);
+    int RangeMin = i*IntervalsSize;
+    int RangeMax =RangeMin + IntervalsSize;
+    if(i == NIntervals+1) {
+      RangeMin = i*IntervalsSize;
+      RangeMax = nDraw;
+    }
+    if(RangeMin >= nDraw) break;
 
-    prefit->GetXaxis()->SetRangeUser(Start, Start + nParam[kXSecPar]-nFlux);
-    paramPlot->GetXaxis()->SetRangeUser(Start, Start + nParam[kXSecPar]-nFlux);
-    paramPlot_Gauss->GetXaxis()->SetRangeUser(Start, Start+ nParam[kXSecPar]-nFlux);
-    paramPlot_HPD->GetXaxis()->SetRangeUser(Start, Start + nParam[kXSecPar]-nFlux);
+    double ymin = std::numeric_limits<double>::max();
+    double ymax = -std::numeric_limits<double>::max();
+    for (int b = RangeMin; b <= RangeMax; ++b) {
+      // prefit
+      {
+        double val = prefit->GetBinContent(b);
+        double err = prefit->GetBinError(b);
+        ymin = std::min(ymin, val - err);
+        ymax = std::max(ymax, val + err);
+      }
+      // paramPlot_HPD
+      {
+        double val = paramPlot_HPD->GetBinContent(b);
+        double err = paramPlot_HPD->GetBinError(b);
+        ymin = std::min(ymin, val - err);
+        ymax = std::max(ymax, val + err);
+      }
+    }
 
-    // Write the individual ones
-    prefit->Write("param_xsec_prefit");
-    paramPlot->Write("param_xsec");
-    paramPlot_Gauss->Write("param_xsec_gaus");
-    paramPlot_HPD->Write("param_xsec_HPD");
+    double margin = 0.1 * (ymax - ymin);
+    prefit->GetYaxis()->SetRangeUser(ymin - margin, ymax + margin);
+
+    prefit->GetXaxis()->SetRangeUser(RangeMin, RangeMax);
+    paramPlot->GetXaxis()->SetRangeUser(RangeMin, RangeMax);
+    paramPlot_Gauss->GetXaxis()->SetRangeUser(RangeMin, RangeMax);
+    paramPlot_HPD->GetXaxis()->SetRangeUser(RangeMin, RangeMax);
 
     // And the combined
     prefit->Draw("e2");
@@ -594,37 +632,10 @@ void MCMCProcessor::DrawPostfit() {
     paramPlot_Gauss->Draw("e2, same");
     paramPlot_HPD->Draw("e1, same");
     CompLeg->Draw("same");
-    Posterior->Write("param_xsec_canv");
-    if(printToPDF) Posterior->Print(CanvasName);
-    Posterior->Clear();
-  
-    OutputFile->cd();
-    // Plot the flux parameters (nXSec to nxsec+nflux) if enabled
-    // Have already looked through the branches earlier
-    prefit->GetYaxis()->SetRangeUser(0.7, 1.3);
-    paramPlot->GetYaxis()->SetRangeUser(0.7, 1.3);
-    paramPlot_Gauss->GetYaxis()->SetRangeUser(0.7, 1.3);
-    paramPlot_HPD->GetYaxis()->SetRangeUser(0.7, 1.3);
-    
-    prefit->GetXaxis()->SetRangeUser(Start + nParam[kXSecPar]-nFlux, Start + nParam[kXSecPar]);
-    paramPlot->GetXaxis()->SetRangeUser(Start + nParam[kXSecPar]-nFlux, Start + nParam[kXSecPar]);
-    paramPlot_Gauss->GetXaxis()->SetRangeUser(Start + nParam[kXSecPar]-nFlux, Start + nParam[kXSecPar]);
-    paramPlot_HPD->GetXaxis()->SetRangeUser(Start + nParam[kXSecPar]-nFlux, Start + nParam[kXSecPar]);
-
-    prefit->Write("param_flux_prefit");
-    paramPlot->Write("param_flux");
-    paramPlot_Gauss->Write("param_flux_gaus");
-    paramPlot_HPD->Write("param_flux_HPD");
-
-    prefit->Draw("e2");
-    paramPlot->Draw("e2, same");
-    paramPlot_Gauss->Draw("e1, same");
-    paramPlot_HPD->Draw("e1, same");
-    CompLeg->Draw("same");
-    Posterior->Write("param_flux_canv");
     if(printToPDF) Posterior->Print(CanvasName);
     Posterior->Clear();
   }
+
   if(nParam[kNDPar] > 0)
   {
     int Start = ParamTypeStartPos[kNDPar];
@@ -913,13 +924,17 @@ void MCMCProcessor::MakeViolin() {
   hviolin_prior->GetYaxis()->SetRangeUser(-1, +2);
   for (int i = 0; i < NIntervals+1; ++i)
   {
-    hviolin->GetXaxis()->SetRangeUser(i*IntervalsSize, i*IntervalsSize+IntervalsSize);
-    hviolin_prior->GetXaxis()->SetRangeUser(i*IntervalsSize, i*IntervalsSize+IntervalsSize);
-    if(i == NIntervals+1)
-    {
-      hviolin->GetXaxis()->SetRangeUser(i*IntervalsSize, nDraw); 
-      hviolin_prior->GetXaxis()->SetRangeUser(i*IntervalsSize, nDraw);
+    int RangeMin = i*IntervalsSize;
+    int RangeMax =RangeMin + IntervalsSize;
+    if(i == NIntervals+1) {
+      RangeMin = i*IntervalsSize;
+      RangeMax = nDraw;
     }
+    if(RangeMin >= nDraw) break;
+
+    hviolin->GetXaxis()->SetRangeUser(RangeMin, RangeMax);
+    hviolin_prior->GetXaxis()->SetRangeUser(RangeMin, RangeMax);
+
     //KS: ROOT6 has some additional options, consider updating it. more https://root.cern/doc/master/classTHistPainter.html#HP140b
     hviolin_prior->Draw("violinX(03100300)");
     hviolin->Draw("violinX(03100300) SAME");
