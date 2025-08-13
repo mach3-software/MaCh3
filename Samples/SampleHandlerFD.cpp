@@ -259,29 +259,31 @@ void SampleHandlerFD::SetupKinematicMap() {
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
-void SampleHandlerFD::Fill1DHist()
-{
+// ************************************************
+void SampleHandlerFD::FillMCHist(const int Dimension) {
+// ************************************************
   // DB Commented out by default - Code heading towards GetLikelihood using arrays instead of root objects
   // Wouldn't actually need this for GetLikelihood as TH objects wouldn't be filled
-  SampleDetails._hPDF1D->Reset();
-  for (size_t yBin = 0; yBin < Binning.nYBins; ++yBin) {
-    for (size_t xBin = 0; xBin < Binning.nXBins; ++xBin) {
-      const int idx = Binning.GetBinSafe(xBin, yBin);
-      SampleDetails._hPDF1D->AddBinContent(idx + 1, SampleHandlerFD_array[idx]);
+  if(Dimension == 1){
+    SampleDetails._hPDF1D->Reset();
+    for (size_t yBin = 0; yBin < Binning.nYBins; ++yBin) {
+      for (size_t xBin = 0; xBin < Binning.nXBins; ++xBin) {
+        const int idx = Binning.GetBinSafe(xBin, yBin);
+        SampleDetails._hPDF1D->SetBinContent(idx + 1, SampleHandlerFD_array[idx]);
+      }
     }
-  }
-}
+  } else if (Dimension == 2) {
+    SampleDetails._hPDF2D->Reset();
+    for (size_t yBin = 0; yBin < Binning.nYBins; ++yBin) {
+      for (size_t xBin = 0; xBin < Binning.nXBins; ++xBin) {
+        const int idx = Binning.GetBinSafe(xBin, yBin);
+        SampleDetails._hPDF2D->SetBinContent(static_cast<int>(xBin + 1), static_cast<int>(yBin + 1), SampleHandlerFD_array[idx]);
+      }
+    }
 
-void SampleHandlerFD::Fill2DHist()
-{
-  // DB Commented out by default - Code heading towards GetLikelihood using arrays instead of root objects
-  // Wouldn't actually need this for GetLikelihood as TH objects wouldn't be filled
-  SampleDetails._hPDF2D->Reset();
-  for (size_t yBin = 0; yBin < Binning.nYBins; ++yBin) {
-    for (size_t xBin = 0; xBin < Binning.nXBins; ++xBin) {
-      const int idx = Binning.GetBinSafe(xBin, yBin);
-      SampleDetails._hPDF2D->SetBinContent(static_cast<int>(xBin + 1), static_cast<int>(yBin + 1), SampleHandlerFD_array[idx]);
-    }
+  } else {
+    MACH3LOG_ERROR("Asking for {} with N Dimension = {}. This is not implemented", __func__, Dimension);
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
 }
 #pragma GCC diagnostic pop
@@ -1095,14 +1097,14 @@ TH1* SampleHandlerFD::GetW2Hist(const int Dimension) {
 // ************************************************
 TH1* SampleHandlerFD::GetMCHist(const int Dimension) {
 // ************************************************
+  FillMCHist(Dimension);
+
   if(Dimension == 1) {
-    Fill1DHist();
     return SampleDetails._hPDF1D;
   } else if(Dimension == 2) {
-    Fill2DHist();
     return SampleDetails._hPDF2D;
   } else{
-    MACH3LOG_ERROR("Asdking for {} with N Dimension = {}. This is not implemented", __func__, Dimension);
+    MACH3LOG_ERROR("Asking for {} with N Dimension = {}. This is not implemented", __func__, Dimension);
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 }
