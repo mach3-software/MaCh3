@@ -1,0 +1,23 @@
+ReweightMCMC:
+  # Reactor constraint reweight
+  ReactorConstraint:
+    Enabled: true
+    ReweightName: "PDG Reactor Constraint"
+    ReweightDim: 1
+    ReweightVar: "sin2th_13"
+    ReweightType: "Gaussian"
+    ReweightPrior: [0.0220, 0.0007] # [mean, sigma] for Gaussian
+    
+  # Combined theta13 and deltaCP constraint
+  DayaBay2DConstraint:
+    Enabled: false
+    ReweightName: "DayaBay theta13-delm2_32 Constraint"
+    ReweightDim: 2
+    ReweightVar: ["sin2th_13", "delm2_32"]
+    ReweightType: "TGraph2D"
+    ReweightPrior: 
+      file: "path/to/your/daya_bay_2d_constraint.root"
+      graph_name: "constraint_graph"
+      x_axis: "sin2th_13"
+      y_axis: "delm2_32"
+      
