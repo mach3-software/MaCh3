@@ -183,7 +183,7 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
         return;
     }
     
-    // Create MCMCProcessor to get parameter information (for validation only)
+    // Create MCMCProcessor to get parameter information 
     auto processor = std::make_unique<MCMCProcessor>(inputFile);
     processor->Initialise();
     
@@ -321,7 +321,7 @@ double Graph_interpolateNO(TGraph2D* graph, double theta13, double dm32)
 {
     if (!graph) {
         MACH3LOG_ERROR("Graph pointer is null");
-        return 0.0;
+        throw MaCh3Exception(__FILE__, __LINE__);
     }
     
     double xmax = graph->GetXmax(); 
@@ -345,7 +345,7 @@ double Graph_interpolateIO(TGraph2D* graph, double theta13, double dm32)
 {
     if (!graph) {
         MACH3LOG_ERROR("Graph pointer is null");
-        return 0.0;
+        throw MaCh3Exception(__FILE__, __LINE__);
     }
     
     double xmax = graph->GetXmax();
@@ -370,7 +370,7 @@ double Graph_interpolate1D(TGraph* graph, double theta13)
 {
     if (!graph) {
         MACH3LOG_ERROR("Graph pointer is null");
-        return 0.0;
+        throw MaCh3Exception(__FILE__, __LINE__);
     }
     
     double xmax = -999999999;
