@@ -334,6 +334,14 @@ void MCMCProcessor::MakePostfit() {
       //KS:Set mean and error to prior for fixed parameters, it looks much better when fixed parameter has mean on prior rather than on 0 with 0 error.
       (*Means_HPD)(i)  = Prior;
       (*Errors_HPD)(i) = PriorError;
+      (*Errors_HPD_Positive)(i)  = PriorError;
+      (*Errors_HPD_Negative)(i) = PriorError;
+
+      (*Means_Gauss)(i)  = Prior;
+      (*Errors_Gauss)(i) = PriorError;
+
+      (*Means)(i)  = Prior;
+      (*Errors)(i) = PriorError;
       continue;
     }
 
@@ -2420,6 +2428,8 @@ void MCMCProcessor::SetStepCut(const std::string& Cuts) {
 // ***************
   StepCut = Cuts;
   BurnInCut = std::stoi( Cuts );
+
+  CheckStepCut();
 }
 
 // ***************
@@ -2430,6 +2440,18 @@ void MCMCProcessor::SetStepCut(const int Cuts) {
   TempStream << "step > " << Cuts;
   StepCut = TempStream.str();
   BurnInCut = Cuts;
+  CheckStepCut();
+}
+
+// ***************
+// Make the step cut from an int
+void MCMCProcessor::CheckStepCut() const {
+// ***************
+  const int maxNsteps = Chain->GetMaximum("step");
+  if(BurnInCut > maxNsteps){
+    MACH3LOG_ERROR("StepCut({}) is larger than highest value of step({})", BurnInCut, maxNsteps);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
 }
 
 // ***************
@@ -2728,13 +2750,13 @@ void MCMCProcessor::SavageDickeyPlot(std::unique_ptr<TH1D>& PriorHist,
 
   std::string DunneKabothScale = GetDunneKaboth(SavageDickey);
   //Get Best point
-  std::unique_ptr<TGraph> PostPoint(new TGraph(1));
+  auto PostPoint = std::make_unique<TGraph>(1);
   PostPoint->SetPoint(0, EvaluationPoint, ProbPosterior);
   PostPoint->SetMarkerStyle(20);
   PostPoint->SetMarkerSize(1);
   PostPoint->Draw("P same");
 
-  std::unique_ptr<TGraph> PriorPoint(new TGraph(1));
+  auto PriorPoint = std::make_unique<TGraph>(1);
   PriorPoint->SetPoint(0, EvaluationPoint, ProbPrior);
   PriorPoint->SetMarkerStyle(20);
   PriorPoint->SetMarkerSize(1);
@@ -2925,7 +2947,6 @@ void MCMCProcessor::ParameterEvolution(const std::vector<std::string>& Names,
 
       if(i == 0) Posterior->Print((Names[k] + ".gif++20").c_str()); // produces infinite loop animated GIF
       else Posterior->Print((Names[k] + ".gif+20").c_str()); // add picture to .gif
-
       delete EvePlot;
       Counter++;
     }
@@ -3538,7 +3559,7 @@ void MCMCProcessor::CalculateESS(const int nLags, const std::vector<std::vector<
 // **************************
   if(LagL.size() == 0)
   {
-    MACH3LOG_ERROR("Size of LagL is 0");
+    MACH3LOG_ERROR("Size of LagL is {}", LagL.size());
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   MACH3LOG_INFO("Making ESS plots...");

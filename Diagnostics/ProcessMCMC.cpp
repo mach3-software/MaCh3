@@ -42,10 +42,16 @@ int main(int argc, char *argv[])
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
+  config = argv[1];
+  YAML::Node card_yaml = M3OpenConfig(config);
+  if (!CheckNodeExists(card_yaml, "ProcessMCMC")) {
+    MACH3LOG_ERROR("The 'ProcessMCMC' node is not defined in the YAML configuration.");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+
   if (argc == 3)
   {
     MACH3LOG_INFO("Producing single fit output");
-    config = argv[1];
     std::string filename = argv[2];
     ProcessMCMC(filename);
   }
@@ -53,8 +59,6 @@ int main(int argc, char *argv[])
   else if (argc == 6 || argc == 8)
   {
     MACH3LOG_INFO("Producing two fit comparison");
-    config = argv[1];
-
     FileNames.push_back(argv[2]);
     TitleNames.push_back(argv[3]);
 
@@ -182,7 +186,7 @@ void MultipleProcessMCMC()
     MACH3LOG_WARN("BurnInSteps not set, defaulting to 20%");
   }
 
-  for (int ik = 0; ik < nFiles;  ik++)
+  for (int ik = 0; ik < nFiles; ik++)
   {
     MACH3LOG_INFO("File for study: {}", FileNames[ik]);
     // Make the processor
@@ -209,7 +213,7 @@ void MultipleProcessMCMC()
     }
   }
   //KS: Multithreading here is very tempting but there are some issues with root that need to be resovled :(
-  for (int ik = 0; ik < nFiles;  ik++)
+  for (int ik = 0; ik < nFiles; ik++)
   {
     // Make the postfit
     Processor[ik]->MakePostfit();
@@ -246,9 +250,9 @@ void MultipleProcessMCMC()
   for(int i = 0; i < Processor[0]->GetNParams(); ++i) 
   {
     // This holds the posterior density
-    std::vector<TH1D*> hpost(nFiles);
+    std::vector<std::unique_ptr<TH1D>> hpost(nFiles);
     std::vector<std::unique_ptr<TLine>> hpd(nFiles);
-    hpost[0] = static_cast<TH1D *>(Processor[0]->GetHpost(i)->Clone());
+    hpost[0] = M3::Clone(Processor[0]->GetHpost(i));
 
     bool Skip = false;
     for (int ik = 1 ; ik < nFiles;  ik++)
@@ -260,20 +264,16 @@ void MultipleProcessMCMC()
         Skip = true;
         break;
       }
-      hpost[ik] = static_cast<TH1D *>(Processor[ik]->GetHpost(Index)->Clone());
+      hpost[ik] = M3::Clone(Processor[ik]->GetHpost(Index));
     }
 
     // Don't plot if this is a fixed histogram (i.e. the peak is the whole integral)
-    if(hpost[0]->GetMaximum() == hpost[0]->Integral()*1.5 || Skip)
-    {
-      for (int ik = 0; ik < nFiles;  ik++)
-        delete hpost[ik];
-
+    if(hpost[0]->GetMaximum() == hpost[0]->Integral()*1.5 || Skip) {
       continue;
     }
     for (int ik = 0; ik < nFiles;  ik++)
     {
-      RemoveFitter(hpost[ik], "Gauss");
+      RemoveFitter(hpost[ik].get(), "Gauss");
 
       // Set some nice colours
       hpost[ik]->SetLineColor(PosteriorColor[ik]);
@@ -305,10 +305,10 @@ void MultipleProcessMCMC()
     TString asimovLeg = Form("#splitline{Prior}{x = %.2f , #sigma = %.2f}", Prior, PriorError);
     leg->AddEntry(Asimov.get(), asimovLeg, "l");
 
-    for (int ik = 0; ik < nFiles;  ik++)
+    for (int ik = 0; ik < nFiles; ik++)
     {
       TString rebinLeg = Form("#splitline{%s}{#mu = %.2f, #sigma = %.2f}", TitleNames[ik].c_str(), hpost[ik]->GetMean(), hpost[ik]->GetRMS());
-      leg->AddEntry(hpost[ik],  rebinLeg, "l");
+      leg->AddEntry(hpost[ik].get(),  rebinLeg, "l");
 
       hpd[ik] = std::make_unique<TLine>(hpost[ik]->GetBinCenter(hpost[ik]->GetMaximumBin()), hpost[ik]->GetMinimum(),
                                         hpost[ik]->GetBinCenter(hpost[ik]->GetMaximumBin()), hpost[ik]->GetMaximum());
@@ -319,19 +319,16 @@ void MultipleProcessMCMC()
 
     // Find the maximum value to nicely resize hist
     double maximum = 0;
-    for (int ik = 0; ik < nFiles;  ik++) maximum = std::max(maximum, hpost[ik]->GetMaximum());
-    for (int ik = 0; ik < nFiles;  ik++) hpost[ik]->SetMaximum(1.3*maximum);
+    for (int ik = 0; ik < nFiles; ik++) maximum = std::max(maximum, hpost[ik]->GetMaximum());
+    for (int ik = 0; ik < nFiles; ik++) hpost[ik]->SetMaximum(1.3*maximum);
 
     hpost[0]->Draw("hist");
-    for (int ik = 1; ik < nFiles;  ik++) hpost[ik]->Draw("hist same");
+    for (int ik = 1; ik < nFiles; ik++) hpost[ik]->Draw("hist same");
     Asimov->Draw("same");
-    for (int ik = 0; ik < nFiles;  ik++) hpd[ik]->Draw("same");
+    for (int ik = 0; ik < nFiles; ik++) hpd[ik]->Draw("same");
     leg->Draw("same");
     Posterior->cd();
     Posterior->Print(canvasname);
-    for (int ik = 0; ik < nFiles;  ik++) {
-      delete hpost[ik];
-    }
   }//End loop over parameters
     
   // Finally draw the parameter plot onto the PDF
