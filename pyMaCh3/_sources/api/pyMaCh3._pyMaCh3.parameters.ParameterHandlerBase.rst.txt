@@ -1,0 +1,29 @@
+ParameterHandlerBase
+====================
+
+.. currentmodule:: pyMaCh3._pyMaCh3.parameters
+
+.. autoclass:: ParameterHandlerBase
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~ParameterHandlerBase.calculate_likelihood
+      ~ParameterHandlerBase.get_fancy_par_name
+      ~ParameterHandlerBase.get_internal_par_name
+      ~ParameterHandlerBase.get_n_pars
+      ~ParameterHandlerBase.get_proposal_array
+      ~ParameterHandlerBase.propose_step
+      ~ParameterHandlerBase.throw_par_prop
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: calculate_likelihood
+   .. automethod:: get_fancy_par_name
+   .. automethod:: get_internal_par_name
+   .. automethod:: get_n_pars
+   .. automethod:: get_proposal_array
+   .. automethod:: propose_step
+   .. automethod:: throw_par_prop
