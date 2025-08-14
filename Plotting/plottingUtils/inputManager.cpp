@@ -106,8 +106,8 @@ void InputManager::print(const std::string &printLevel) const {
   MACH3LOG_INFO("");
 }
 
-double InputManager::getPostFitError(int fileNum, const std::string &paramName,
-                                          std::string errorType) const {
+double InputManager::getPostFitError(const int fileNum, const std::string &paramName,
+                                     std::string errorType) const {
   const InputFile &inputFileDef = getFile(fileNum);
 
   // set default type if not specified
@@ -134,8 +134,8 @@ double InputManager::getPostFitError(int fileNum, const std::string &paramName,
   return M3::_BAD_DOUBLE_;
 }
 
-double InputManager::getPostFitValue(int fileNum, const std::string &paramName,
-                                          std::string errorType) const {
+double InputManager::getPostFitValue(const int fileNum, const std::string &paramName,
+                                     std::string errorType) const {
   const InputFile &inputFileDef = getFile(fileNum);
 
   // set default type if not specified
@@ -157,7 +157,7 @@ double InputManager::getPostFitValue(int fileNum, const std::string &paramName,
     return inputFileDef.postFitValues.at(errorType).at(paramName);
   }
   
-  MACH3LOG_WARN("Didn't fnd {} post fit value for {}. Returning {}", errorType, paramName, M3::_BAD_DOUBLE_);
+  MACH3LOG_WARN("Didn't find {} post fit value for {}. Returning {}", errorType, paramName, M3::_BAD_DOUBLE_);
 
   return M3::_BAD_DOUBLE_;
 }
@@ -216,7 +216,7 @@ std::vector<std::string> InputManager::getTaggedValues(const std::vector<std::st
     {
       if ( tagCount > 0 ) retVec.push_back(val);
     }
-    else if ( checkType == "exect" )
+    else if ( checkType == "exact" )
     {
       // EM: note that this will break if duplicate tags are specified in either vector... so please don't do that
       if ( tagCount == valTags.size() ) retVec.push_back(val);
@@ -567,7 +567,7 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
       }
 
       if (printThoughts)
-        MACH3LOG_INFO(".... Found {}\n", numLLHParams);
+        MACH3LOG_INFO(".... Found {}", numLLHParams);
 
       if (numLLHParams > 0)
       {
@@ -620,7 +620,7 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
     }
 
     if (printThoughts)
-      MACH3LOG_INFO(".... Found {}\n", numPostFitParams);
+      MACH3LOG_INFO(".... Found {}", numPostFitParams);
 
     if (numPostFitParams > 0)
     {
@@ -762,7 +762,7 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
     {
       if (printThoughts)
       {
-        MACH3LOG_INFO("This is a {} file!\n", fitter);
+        MACH3LOG_INFO("This is a {} file!", fitter);
       }
       inputFileDef.fitter = fitter;
       return;

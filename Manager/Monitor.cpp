@@ -305,6 +305,40 @@ void PrintConfig(const YAML::Node& node){
 }
 
 // ***************************************************************************
+//KS: Print content of TFile using logger
+void Print(const TTree* tree) {
+// ***************************************************************************
+  if (!tree) return;
+
+  // Create a temporary file to capture stdout
+  FILE* tmpFile = tmpfile();
+  if (!tmpFile) return;
+
+  // Save old stdout
+  int oldStdout = dup(fileno(stdout));
+  // Redirect stdout to tmpFile
+  dup2(fileno(tmpFile), fileno(stdout));
+
+  tree->Print();  // ROOT writes to stdout
+
+  fflush(stdout);
+  // Restore old stdout
+  dup2(oldStdout, fileno(stdout));
+  close(oldStdout);
+
+  // Read tmpFile content
+  fseek(tmpFile, 0, SEEK_SET);
+  char buffer[1024];
+  while (fgets(buffer, sizeof(buffer), tmpFile)) {
+    std::string line(buffer);
+    if (!line.empty() && line.back() == '\n') line.pop_back();
+    MACH3LOG_INFO("{}", line);
+  }
+
+  fclose(tmpFile);
+}
+
+// ***************************************************************************
 //KS: Almost all MaCh3 executables have the same usage, prepare simple printer
 void MaCh3Usage(int argc, char **argv) {
 // ***************************************************************************

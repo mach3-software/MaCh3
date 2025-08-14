@@ -18,19 +18,31 @@ std::string StyleManager::prettifyName(const std::string &origName, const std::s
   return prettyName;
 }
 
-void StyleManager::setPalette(int rootPlotStyle) const {
+void StyleManager::setPalette(const int rootPlotStyle) const {
   // set the colour palette to one of the root palettes
   gStyle->SetPalette(rootPlotStyle);
 }
 
-void StyleManager::setPalette(std::string configStyleName) const {
+void StyleManager::setPalette(const std::string& configStyleName) const {
   // set the colour palette to one of the palettes defined in PlottingConfig.yaml
 
   // get the definition of the provided style from the config file
   YAML::Node palettes = _styleConfig["ColorPallettes"];
-  std::vector<std::vector<double>> paletteDef =
-      palettes[configStyleName].as<std::vector<std::vector<double>>>();
+  YAML::Node styleDef;
+  if (palettes) {
+    styleDef = palettes[configStyleName];
+  }
 
+  auto paletteDef = GetFromManager<std::vector<std::vector<double>>>(
+    styleDef["MarkerColor"],
+    std::vector<std::vector<double>>{
+      {4.0},                         // NCont
+      {0.0   , 0.33  , 0.66 , 1.0},  // stops
+      {0.0   , 0.0   , 0.0  , 0.0},  // Reds
+      {0.0   , 0.0   , 1.0  , 0.0},  // Greens
+      {0.0   , 1.0   , 0.0  , 0.0}   // Blues
+    }
+  );
   const Int_t NCont = Int_t(paletteDef[0][0]);
 
   std::vector<double> stopVec = paletteDef[1];
@@ -43,8 +55,8 @@ void StyleManager::setPalette(std::string configStyleName) const {
   if (redsVec.size() != NRGBs || greensVec.size() != NRGBs ||
       bluesVec.size() != NRGBs)
   {
-    MACH3LOG_ERROR("invalid colour palettet defined in style config file: {}");
-    MACH3LOG_ERROR("RGB arrays dont all have the same size, please fix that");
+    MACH3LOG_ERROR("invalid colour palette defined in style config file: {}");
+    MACH3LOG_ERROR("RGB arrays don't all have the same size, please fix that");
   }
 
   // now actually set the palette
@@ -52,35 +64,20 @@ void StyleManager::setPalette(std::string configStyleName) const {
   gStyle->SetNumberContours(NCont);
 }
 
-void StyleManager::setTH1Style(TH1 *hist, std::string styleName) const {
+void StyleManager::setTH1Style(TH1 *hist, const std::string& styleName) const {
   // get the definition of the provided style from the config file
   YAML::Node TH1Styles = _styleConfig["TH1Styles"];
-  YAML::Node styleDef = TH1Styles[styleName];
+  YAML::Node styleDef ;
+  if (TH1Styles) {
+    styleDef = TH1Styles[styleName];
+  }
 
-  if (styleDef["MarkerColor"])
-  {
-    hist->SetMarkerColor(styleDef["MarkerColor"].as<Color_t>());
-  }
-  if (styleDef["MarkerStyle"])
-  {
-    hist->SetMarkerStyle(styleDef["MarkerStyle"].as<Color_t>());
-  }
-  if (styleDef["FillColor"])
-  {
-    hist->SetFillColor(styleDef["FillColor"].as<Color_t>());
-  }
-  if (styleDef["FillStyle"])
-  {
-    hist->SetFillStyle(styleDef["FillStyle"].as<Color_t>());
-  }
-  if (styleDef["LineColor"])
-  {
-    hist->SetLineColor(styleDef["LineColor"].as<Color_t>());
-  }
-  if (styleDef["LineStyle"])
-  {
-    hist->SetLineStyle(styleDef["LineStyle"].as<Color_t>());
-  }
+  hist->SetMarkerColor(GetFromManager<Color_t>(styleDef["MarkerColor"], kRed));
+  hist->SetMarkerStyle(GetFromManager<Color_t>(styleDef["MarkerStyle"], 7));
+  hist->SetFillColor(GetFromManager<Color_t>(styleDef["FillColor"], kRed));
+  hist->SetFillStyle(GetFromManager<Color_t>(styleDef["FillStyle"], 3003));
+  hist->SetLineColor(GetFromManager<Color_t>(styleDef["LineColor"], kRed));
+  hist->SetLineStyle(GetFromManager<Color_t>(styleDef["LineStyle"], 1));
 }
 
 } // namespace MaCh3Plotting

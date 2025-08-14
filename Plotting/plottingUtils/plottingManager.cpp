@@ -136,7 +136,7 @@ void PlottingManager::parseInputs(int argc, char * const *argv) {
     }
   }
 
-  MACH3LOG_INFO("\nInput files provided");
+  MACH3LOG_INFO("Input files provided");
   // optind is for the extra arguments that are not parsed by the program
   for (; optind < argc; optind++)
   {
@@ -194,7 +194,7 @@ void PlottingManager::usage() {
 /// use the provided string as the full output name. If no file extension is specified, append .pdf
 /// so plots will be saved as pdf. if some other file extension is specified, replace with .pdf as
 /// only .pdf and .eps support printing multiple plots to one file in root.
-void PlottingManager::setOutFileName(std::string saveName) {
+void PlottingManager::setOutFileName(const std::string& saveName) {
   if (saveName.find(".") == std::string::npos)
   {
     _outputName = saveName + ".pdf";
@@ -237,7 +237,7 @@ const std::string PlottingManager::getOutputName(const std::string &suffix) {
 
 /// This is used by e.g. getOption() so the PlottingManager knows where to look for the option in
 /// the plotting config file.
-void PlottingManager::setExec(std::string execName) {
+void PlottingManager::setExec(const std::string& execName) {
   MACH3LOG_DEBUG("Setting internal exec name to {}", execName);
   _execOptions = _plottingConfig[execName];
   if (_outputName == "Plot.pdf")
