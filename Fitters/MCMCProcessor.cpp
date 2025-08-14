@@ -372,13 +372,6 @@ void MCMCProcessor::MakePostfit() {
 
   OutputFile->cd();
   TTree *SettingsBranch = new TTree("Settings", "Settings");
-  int CrossSectionParameters = nParam[kXSecPar];
-  SettingsBranch->Branch("CrossSectionParameters", &CrossSectionParameters);
-  int CrossSectionParametersStartingPos = ParamTypeStartPos[kXSecPar];
-  SettingsBranch->Branch("CrossSectionParametersStartingPos", &CrossSectionParametersStartingPos);
-  int FluxParameters = GetGroup("Flux");
-  SettingsBranch->Branch("FluxParameters", &FluxParameters);
-  
   int NDParameters = nParam[kNDPar];
   SettingsBranch->Branch("NDParameters", &NDParameters);
   int NDParametersStartingPos = ParamTypeStartPos[kNDPar];
