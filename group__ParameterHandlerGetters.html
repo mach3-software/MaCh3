@@ -417,32 +417,32 @@ Functions</h2></td></tr>
 <p>KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plotting. </p>
 <p>This function converts the covariance matrix to a correlation matrix and returns a TH2D object, which can be used for advanced plotting purposes. </p><dl class="section return"><dt>Returns</dt><dd>A pointer to a TH2D object representing the correlation matrix </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8cpp_source.html#l01226">1226</a> of file <a class="el" href="ParameterHandlerBase_8cpp_source.html">ParameterHandlerBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 1226</span>                                                 {</div>
-<div class="line"><span class="lineno"> 1227</span><span class="comment">// ********************************************</span></div>
-<div class="line"><span class="lineno"> 1228</span>  TH2D* hMatrix = <span class="keyword">new</span> TH2D(<a class="code hl_function" href="group__ParameterHandlerGetters.html#gab1ef5c9f3c3eb619752a073590f5fd53">GetName</a>().c_str(), <a class="code hl_function" href="group__ParameterHandlerGetters.html#gab1ef5c9f3c3eb619752a073590f5fd53">GetName</a>().c_str(), <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>, 0.0, <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>, <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>, 0.0, <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>);</div>
-<div class="line"><span class="lineno"> 1229</span>  hMatrix-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
-<div class="line"><span class="lineno"> 1230</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>; i++)</div>
-<div class="line"><span class="lineno"> 1231</span>  {</div>
-<div class="line"><span class="lineno"> 1232</span>    hMatrix-&gt;SetBinContent(i+1, i+1, 1.);</div>
-<div class="line"><span class="lineno"> 1233</span>    hMatrix-&gt;GetXaxis()-&gt;SetBinLabel(i+1, <a class="code hl_function" href="group__ParameterHandlerGetters.html#ga65b61ae6c60d4eadbb06fdef9596cc7f">GetParFancyName</a>(i).c_str());</div>
-<div class="line"><span class="lineno"> 1234</span>    hMatrix-&gt;GetYaxis()-&gt;SetBinLabel(i+1, <a class="code hl_function" href="group__ParameterHandlerGetters.html#ga65b61ae6c60d4eadbb06fdef9596cc7f">GetParFancyName</a>(i).c_str());</div>
-<div class="line"><span class="lineno"> 1235</span>  }</div>
-<div class="line"><span class="lineno"> 1236</span> </div>
-<div class="line"><span class="lineno"> 1237</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
-<div class="line"><span class="lineno"> 1238</span><span class="preprocessor">  #pragma omp parallel for</span></div>
-<div class="line"><span class="lineno"> 1239</span><span class="preprocessor">  #endif</span></div>
-<div class="line"><span class="lineno"> 1240</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>; i++)</div>
-<div class="line"><span class="lineno"> 1241</span>  {</div>
-<div class="line"><span class="lineno"> 1242</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j = 0; j &lt;= i; j++)</div>
-<div class="line"><span class="lineno"> 1243</span>    {</div>
-<div class="line"><span class="lineno"> 1244</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> Corr = (*covMatrix)(i,j) / ( <a class="code hl_function" href="group__ParameterHandlerGetters.html#gadbc5117b45107ac274689b1708fadf0e">GetDiagonalError</a>(i) * <a class="code hl_function" href="group__ParameterHandlerGetters.html#gadbc5117b45107ac274689b1708fadf0e">GetDiagonalError</a>(j));</div>
-<div class="line"><span class="lineno"> 1245</span>      hMatrix-&gt;SetBinContent(i+1, j+1, Corr);</div>
-<div class="line"><span class="lineno"> 1246</span>      hMatrix-&gt;SetBinContent(j+1, i+1, Corr);</div>
-<div class="line"><span class="lineno"> 1247</span>    }</div>
-<div class="line"><span class="lineno"> 1248</span>  }</div>
-<div class="line"><span class="lineno"> 1249</span>  <span class="keywordflow">return</span> hMatrix;</div>
-<div class="line"><span class="lineno"> 1250</span>}</div>
+<p class="definition">Definition at line <a class="el" href="ParameterHandlerBase_8cpp_source.html#l01227">1227</a> of file <a class="el" href="ParameterHandlerBase_8cpp_source.html">ParameterHandlerBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 1227</span>                                                 {</div>
+<div class="line"><span class="lineno"> 1228</span><span class="comment">// ********************************************</span></div>
+<div class="line"><span class="lineno"> 1229</span>  TH2D* hMatrix = <span class="keyword">new</span> TH2D(<a class="code hl_function" href="group__ParameterHandlerGetters.html#gab1ef5c9f3c3eb619752a073590f5fd53">GetName</a>().c_str(), <a class="code hl_function" href="group__ParameterHandlerGetters.html#gab1ef5c9f3c3eb619752a073590f5fd53">GetName</a>().c_str(), <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>, 0.0, <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>, <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>, 0.0, <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>);</div>
+<div class="line"><span class="lineno"> 1230</span>  hMatrix-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno"> 1231</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>; i++)</div>
+<div class="line"><span class="lineno"> 1232</span>  {</div>
+<div class="line"><span class="lineno"> 1233</span>    hMatrix-&gt;SetBinContent(i+1, i+1, 1.);</div>
+<div class="line"><span class="lineno"> 1234</span>    hMatrix-&gt;GetXaxis()-&gt;SetBinLabel(i+1, <a class="code hl_function" href="group__ParameterHandlerGetters.html#ga65b61ae6c60d4eadbb06fdef9596cc7f">GetParFancyName</a>(i).c_str());</div>
+<div class="line"><span class="lineno"> 1235</span>    hMatrix-&gt;GetYaxis()-&gt;SetBinLabel(i+1, <a class="code hl_function" href="group__ParameterHandlerGetters.html#ga65b61ae6c60d4eadbb06fdef9596cc7f">GetParFancyName</a>(i).c_str());</div>
+<div class="line"><span class="lineno"> 1236</span>  }</div>
+<div class="line"><span class="lineno"> 1237</span> </div>
+<div class="line"><span class="lineno"> 1238</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
+<div class="line"><span class="lineno"> 1239</span><span class="preprocessor">  #pragma omp parallel for</span></div>
+<div class="line"><span class="lineno"> 1240</span><span class="preprocessor">  #endif</span></div>
+<div class="line"><span class="lineno"> 1241</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">_fNumPar</a>; i++)</div>
+<div class="line"><span class="lineno"> 1242</span>  {</div>
+<div class="line"><span class="lineno"> 1243</span>    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j = 0; j &lt;= i; j++)</div>
+<div class="line"><span class="lineno"> 1244</span>    {</div>
+<div class="line"><span class="lineno"> 1245</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> Corr = (*covMatrix)(i,j) / ( <a class="code hl_function" href="group__ParameterHandlerGetters.html#gadbc5117b45107ac274689b1708fadf0e">GetDiagonalError</a>(i) * <a class="code hl_function" href="group__ParameterHandlerGetters.html#gadbc5117b45107ac274689b1708fadf0e">GetDiagonalError</a>(j));</div>
+<div class="line"><span class="lineno"> 1246</span>      hMatrix-&gt;SetBinContent(i+1, j+1, Corr);</div>
+<div class="line"><span class="lineno"> 1247</span>      hMatrix-&gt;SetBinContent(j+1, i+1, Corr);</div>
+<div class="line"><span class="lineno"> 1248</span>    }</div>
+<div class="line"><span class="lineno"> 1249</span>  }</div>
+<div class="line"><span class="lineno"> 1250</span>  <span class="keywordflow">return</span> hMatrix;</div>
+<div class="line"><span class="lineno"> 1251</span>}</div>
 <div class="ttc" id="aclassParameterHandlerBase_html_a8d9a71d60c526da6b9ef9d276b1a2fad"><div class="ttname"><a href="classParameterHandlerBase.html#a8d9a71d60c526da6b9ef9d276b1a2fad">ParameterHandlerBase::_fNumPar</a></div><div class="ttdeci">int _fNumPar</div><div class="ttdoc">Number of systematic parameters.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00453">ParameterHandlerBase.h:453</a></div></div>
 <div class="ttc" id="agroup__ParameterHandlerGetters_html_ga65b61ae6c60d4eadbb06fdef9596cc7f"><div class="ttname"><a href="group__ParameterHandlerGetters.html#ga65b61ae6c60d4eadbb06fdef9596cc7f">ParameterHandlerBase::GetParFancyName</a></div><div class="ttdeci">std::string GetParFancyName(const int i) const</div><div class="ttdoc">Get fancy name of the Parameter.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00171">ParameterHandlerBase.h:171</a></div></div>
 <div class="ttc" id="agroup__ParameterHandlerGetters_html_gab1ef5c9f3c3eb619752a073590f5fd53"><div class="ttname"><a href="group__ParameterHandlerGetters.html#gab1ef5c9f3c3eb619752a073590f5fd53">ParameterHandlerBase::GetName</a></div><div class="ttdeci">std::string GetName() const</div><div class="ttdoc">Get name of covariance.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00158">ParameterHandlerBase.h:158</a></div></div>
@@ -861,7 +861,7 @@ Functions</h2></td></tr>
 <div class="line"><span class="lineno">  241</span>  }</div>
 <div class="line"><span class="lineno">  242</span>  <span class="keywordflow">return</span> returnVec;</div>
 <div class="line"><span class="lineno">  243</span>}</div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a3c5d92e6b592f18ea4d6bd9afaca7ebd"><div class="ttname"><a href="classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd">ParameterHandlerBase::AppliesToSample</a></div><div class="ttdeci">bool AppliesToSample(const int SystIndex, const std::string &amp;SampleName) const</div><div class="ttdoc">Check if parameter is affecting given sample name.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l01279">ParameterHandlerBase.cpp:1279</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a3c5d92e6b592f18ea4d6bd9afaca7ebd"><div class="ttname"><a href="classParameterHandlerBase.html#a3c5d92e6b592f18ea4d6bd9afaca7ebd">ParameterHandlerBase::AppliesToSample</a></div><div class="ttdeci">bool AppliesToSample(const int SystIndex, const std::string &amp;SampleName) const</div><div class="ttdoc">Check if parameter is affecting given sample name.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l01280">ParameterHandlerBase.cpp:1280</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
