@@ -33,6 +33,8 @@ struct ReweightConfig {
     std::string fileName;
     std::string graphName;
     std::string hierarchyType; // "NO", "IO", or "auto"
+    std::unique_ptr<TGraph2D> graph_NO;
+    std::unique_ptr<TGraph2D> graph_IO;
 };
 
 /// @brief Main executable responsible for reweighting MCMC chains
@@ -84,8 +86,6 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
 
     // Parse all reweight configurations first
     std::vector<ReweightConfig> reweightConfigs;
-    std::map<std::string, std::unique_ptr<TGraph2D>> graphs2D;
-    std::map<std::string, std::unique_ptr<TGraph>> graphs1D;
     
     for (const auto& reweight : reweight_settings) {
         const std::string& reweightKey = reweight.first.as<std::string>();
@@ -149,21 +149,36 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
                 // Load both NO and IO graphs if hierarchy is auto
                 if (reweightConfig.hierarchyType == "auto" || reweightConfig.hierarchyType == "NO") {
                     std::string graphName_NO = reweightConfig.graphName + "_NO";
+                    MACH3LOG_INFO("Loading NO graph: {}", graphName_NO);
                     auto graph_NO = constraintFile->Get<TGraph2D>(graphName_NO.c_str());
                     if (graph_NO) {
-                        graphs2D[reweightKey + "_NO"] = std::unique_ptr<TGraph2D>(static_cast<TGraph2D*>(graph_NO->Clone()));
+                        // Create a completely independent copy
+                        auto cloned_graph = static_cast<TGraph2D*>(graph_NO->Clone());
+                        cloned_graph->SetBit(kCanDelete, true); // Allow ROOT to delete it when we're done
+                        reweightConfig.graph_NO = std::unique_ptr<TGraph2D>(cloned_graph);
                         MACH3LOG_INFO("Loaded NO graph: {}", graphName_NO);
+                    } else {
+                        MACH3LOG_ERROR("Failed to load NO graph: {}", graphName_NO);
                     }
                 }
                 
                 if (reweightConfig.hierarchyType == "auto" || reweightConfig.hierarchyType == "IO") {
                     std::string graphName_IO = reweightConfig.graphName + "_IO";
+                    MACH3LOG_INFO("Loading IO graph: {}", graphName_IO);
                     auto graph_IO = constraintFile->Get<TGraph2D>(graphName_IO.c_str());
                     if (graph_IO) {
-                        graphs2D[reweightKey + "_IO"] = std::unique_ptr<TGraph2D>(static_cast<TGraph2D*>(graph_IO->Clone()));
+                        // Create a completely independent copy
+                        auto cloned_graph = static_cast<TGraph2D*>(graph_IO->Clone());
+                        cloned_graph->SetBit(kCanDelete, true); // Allow ROOT to delete it when we're done
+                        reweightConfig.graph_IO = std::unique_ptr<TGraph2D>(cloned_graph);
                         MACH3LOG_INFO("Loaded IO graph: {}", graphName_IO);
+                    } else {
+                        MACH3LOG_ERROR("Failed to load IO graph: {}", graphName_IO);
                     }
                 }
+                
+                // Explicitly close the constraint file to ensure clean separation
+                constraintFile->Close();
                 
             } else {
                 MACH3LOG_ERROR("Unknown 2D reweight type: {} for {}", reweightConfig.type, reweightKey);
@@ -174,8 +189,8 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
             continue;
         }
         
-        reweightConfigs.push_back(reweightConfig);
-        MACH3LOG_INFO("Added reweight configuration: {} ({}D, type: {})", reweightConfig.name, reweightConfig.dimension, reweightConfig.type);
+        reweightConfigs.push_back(std::move(reweightConfig));
+        MACH3LOG_INFO("Added reweight configuration: {} ({}D, type: {})", reweightConfigs.back().name, reweightConfigs.back().dimension, reweightConfigs.back().type);
     }
     
     if (reweightConfigs.empty()) {
@@ -187,7 +202,7 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
     auto processor = std::make_unique<MCMCProcessor>(inputFile);
     processor->Initialise();
     
-    // Validate that all required parameters exist in the chain
+    // Validate that all required parameters exist in the chain TODO: Get list only of UNIQUE parameters, this is repeating unnecessarily
     for (const auto& rwConfig : reweightConfigs) {
         for (const auto& paramName : rwConfig.paramNames) {
             int paramIndex = processor->GetParamIndexFromName(paramName);
@@ -278,26 +293,23 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
                 if (rwConfig.type == "TGraph2D") {
                     double theta13 = paramValues[rwConfig.paramNames[0]];
                     double dm32 = paramValues[rwConfig.paramNames[1]];
-                    
-                    // Determine hierarchy based on dm32 sign
-                    std::string hierarchyKey;
-                    if (rwConfig.hierarchyType == "auto") {
-                        hierarchyKey = (dm32 > 0) ? "_NO" : "_IO";
-                    } else {
-                        hierarchyKey = "_" + rwConfig.hierarchyType;
-                    }
-                    
-                    std::string graphKey = rwConfig.key + hierarchyKey;
-                    auto it = graphs2D.find(graphKey);
-                    if (it != graphs2D.end()) {
-                        if (dm32 > 0) {
-                            weight = Graph_interpolateNO(it->second.get(), theta13, dm32);
+                  
+                    if (dm32 > 0) {
+                        // Normal Ordering
+                        if (rwConfig.graph_NO) {
+                            weight = Graph_interpolateNO(rwConfig.graph_NO.get(), theta13, dm32);
                         } else {
-                            weight = Graph_interpolateIO(it->second.get(), theta13, dm32);
+                            MACH3LOG_ERROR("NO graph not available for {}", rwConfig.key);
+                            weight = 0.0;
                         }
                     } else {
-                        MACH3LOG_WARN("Graph not found for key: {}", graphKey);
-                        weight = 0.0;
+                        // Inverted Ordering
+                        if (rwConfig.graph_IO) {
+                            weight = Graph_interpolateIO(rwConfig.graph_IO.get(), theta13, dm32);
+                        } else {
+                            MACH3LOG_ERROR("IO graph not available for {}", rwConfig.key);
+                            weight = 0.0;
+                        }
                     }
                 }
             }

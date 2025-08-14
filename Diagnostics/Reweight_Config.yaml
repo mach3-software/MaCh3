@@ -10,14 +10,14 @@ ReweightMCMC:
     
   # Combined theta13 and deltaCP constraint
   DayaBay2DConstraint:
-    Enabled: false
-    ReweightName: "DayaBay theta13-delm2_32 Constraint"
+    Enabled: true
+    ReweightName: "DayaBay theta13-delm2_23 Constraint"
     ReweightDim: 2
-    ReweightVar: ["sin2th_13", "delm2_32"]
+    ReweightVar: ["delm2_23","sin2th_13"]
     ReweightType: "TGraph2D"
     ReweightPrior: 
-      file: "path/to/your/daya_bay_2d_constraint.root"
-      graph_name: "constraint_graph"
-      x_axis: "sin2th_13"
-      y_axis: "delm2_32"
+      file: "/home/ppe/d/driley/DayaBay_new/MaCh3/utils/reweighting/reactor_constraint_2D/chi_sq_processing/DayaBay_2DConstraint.root"
+      graph_name: "DayaBay_2DGraph"
+      x_axis: "delm2_23"
+      y_axis: "sin2th_13" 
       
