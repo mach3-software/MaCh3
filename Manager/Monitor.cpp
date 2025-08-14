@@ -1,4 +1,5 @@
 #include "Manager/Monitor.h"
+#include <unistd.h>
 
 //Only if GPU is enabled
 #ifdef MaCh3_CUDA
