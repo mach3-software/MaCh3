@@ -63,6 +63,10 @@ void mcmc::CheckStep() {
     // Loop over systematics and accept
     for (size_t s = 0; s < systematics.size(); ++s) {
       systematics[s]->AcceptStep();
+      syst_llh[s] = syst_llh_prop[s];
+    }
+    for(size_t s = 0; s < samples.size(); ++s) {
+      sample_llh[s] = sample_llh_prop[s];
     }
   }
 
@@ -86,12 +90,19 @@ void mcmc::RunMCMC() {
   // Remove obsolete memory and make other checks before fit starts
   SanitiseInputs();
 
+  // Setup penalty term likelihood for proposed step
+  syst_llh_prop = syst_llh;
+  // Setup sample likelihood for proposed step
+  sample_llh_prop = sample_llh;
+
   // Reconfigure the samples, systematics and oscillation for first weight
   // ProposeStep sets logLProp
   ProposeStep();
   // Set the current logL to the proposed logL for the 0th step
   // Accept the first step to set logLCurr: this shouldn't affect the MCMC because we ignore the first N steps in burn-in
   logLCurr = logLProp;
+
+
 
   // KS: Make sure we don't hit limits when using very long
   if (stepStart > std::numeric_limits<decltype(stepStart)>::max() - chainLength) {
@@ -155,10 +166,10 @@ void mcmc::ProposeStep() {
     systematics[s]->ProposeStep();
 
     // Get the likelihood from the systematics
-    syst_llh[s] = systematics[s]->GetLikelihood();
-    llh += syst_llh[s];
+    syst_llh_prop[s] = systematics[s]->GetLikelihood();
+    llh += syst_llh_prop[s];
 
-    #ifdef DEBUG
+#ifdef DEBUG
     if (debug) debugFile << "LLH after " << systematics[s]->GetName() << " " << llh << std::endl;
     #endif
   }
@@ -186,9 +197,9 @@ void mcmc::ProposeStep() {
     //DB for atmospheric event by event sample migration, need to fully reweight all samples to allow event passing prior to likelihood evaluation
     for (size_t i = 0; i < samples.size(); ++i) {
       // Get the sample likelihoods and add them
-      sample_llh[i] = samples[i]->GetLikelihood();
-      llh += sample_llh[i];
-      #ifdef DEBUG
+      sample_llh_prop[i] = samples[i]->GetLikelihood();
+      llh += sample_llh_prop[i];
+#ifdef DEBUG
       if (debug) debugFile << "LLH after sample " << i << " " << llh << std::endl;
       #endif
     }
@@ -197,7 +208,7 @@ void mcmc::ProposeStep() {
   } else {
     for (size_t i = 0; i < samples.size(); ++i) {
       // Set the sample_llh[i] to be madly high also to signify a step out of bounds
-      sample_llh[i] = M3::_LARGE_LOGL_;
+      sample_llh_prop[i] = M3::_LARGE_LOGL_;
       #ifdef DEBUG
       if (debug) debugFile << "LLH after REJECT sample " << i << " " << llh << std::endl;
       #endif
