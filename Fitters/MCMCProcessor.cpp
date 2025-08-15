@@ -1340,17 +1340,17 @@ void MCMCProcessor::MakeSubOptimality(const int NIntervals) {
 // Make the covariance plots
 void MCMCProcessor::DrawCovariance() {
 // *********************
-  const double RightMargin  = Posterior->GetRightMargin();
+  const double RightMargin = Posterior->GetRightMargin();
   Posterior->SetRightMargin(0.15);
 
   // The Covariance matrix from the fit
-  std::unique_ptr<TH2D> hCov = std::make_unique<TH2D>("hCov", "hCov", nDraw, 0, nDraw, nDraw, 0, nDraw);
+  auto hCov = std::make_unique<TH2D>("hCov", "hCov", nDraw, 0, nDraw, nDraw, 0, nDraw);
   hCov->GetZaxis()->SetTitle("Covariance");
   // The Covariance matrix square root, with correct sign
-  std::unique_ptr<TH2D> hCovSq = std::make_unique<TH2D>("hCovSq", "hCovSq", nDraw, 0, nDraw, nDraw, 0, nDraw);
+  auto hCovSq = std::make_unique<TH2D>("hCovSq", "hCovSq", nDraw, 0, nDraw, nDraw, 0, nDraw);
   hCovSq->GetZaxis()->SetTitle("Covariance");
   // The Correlation
-  std::unique_ptr<TH2D> hCorr = std::make_unique<TH2D>("hCorr", "hCorr", nDraw, 0, nDraw, nDraw, 0, nDraw);
+  auto hCorr = std::make_unique<TH2D>("hCorr", "hCorr", nDraw, 0, nDraw, nDraw, 0, nDraw);
   hCorr->GetZaxis()->SetTitle("Correlation");
   hCorr->SetMinimum(-1);
   hCorr->SetMaximum(1);
@@ -1396,7 +1396,7 @@ void MCMCProcessor::DrawCovariance() {
   gStyle->SetOptStat(0);
   if(plotBinValue)gStyle->SetPaintTextFormat("4.1f"); //Precision of value in matrix element
   // Make pretty Correlation colors (red to blue)
-  const int NRGBs = 5;
+  constexpr int NRGBs = 5;
   TColor::InitializeColors();
   Double_t stops[NRGBs] = { 0.00, 0.25, 0.50, 0.75, 1.00 };
   Double_t red[NRGBs]   = { 0.00, 0.25, 1.00, 1.00, 0.50 };
@@ -1426,7 +1426,118 @@ void MCMCProcessor::DrawCovariance() {
   
   //Back to normal
   Posterior->SetRightMargin(RightMargin);
+  DrawCorrelationsGroup(hCorr);
   DrawCorrelations1D();
+}
+
+// *********************
+// Inspired by plot in Ewan thesis see https://www.t2k.org/docs/thesis/152/Thesis#page=147
+void MCMCProcessor::DrawCorrelationsGroup(const std::unique_ptr<TH2D>& CorrMatrix) const {
+// *********************
+  MACH3LOG_INFO("Starting {}", __func__);
+  const double RightMargin = Posterior->GetRightMargin();
+  Posterior->SetRightMargin(0.15);
+  auto MatrixCopy = M3::Clone(CorrMatrix.get());
+
+  std::vector<std::string> GroupName;
+  std::vector<int> GroupStart;
+  std::vector<int> GroupEnd;
+
+  // Loop over the Covariance matrix entries
+  for (int iPar = 0; iPar < nDraw; ++iPar)
+  {
+    std::string GroupNameCurr;
+    if(ParamType[iPar] == kXSecPar){
+      const int InternalNumeration = iPar - ParamTypeStartPos[kXSecPar];
+      GroupNameCurr = ParameterGroup[InternalNumeration];
+    } else {
+      GroupNameCurr = "Other"; // Use Other for all legacy params
+    }
+
+    if(iPar == 0) {
+      GroupName.push_back(GroupNameCurr);
+      GroupStart.push_back(0);
+    } else if(GroupName.back() != GroupNameCurr ){
+      GroupName.push_back(GroupNameCurr);
+      GroupEnd.push_back(iPar);
+      GroupStart.push_back(iPar);
+    }
+
+    MatrixCopy->GetXaxis()->SetBinLabel(iPar+1, "");
+    MatrixCopy->GetYaxis()->SetBinLabel(iPar+1, "");
+  }
+  GroupEnd.push_back(nDraw);
+
+  for(size_t iPar = 0; iPar < GroupName.size(); iPar++) {
+    MACH3LOG_INFO("Group name {} from {} to {}", GroupName[iPar], GroupStart[iPar], GroupEnd[iPar]);
+  }
+  Posterior->cd();
+  Posterior->Clear();
+  MatrixCopy->Draw("colz");
+
+  std::vector<std::unique_ptr<TLine>> groupLines;((GroupStart.size() - 1) * 2);
+
+  int nBinsX = MatrixCopy->GetNbinsX();
+  int nBinsY = MatrixCopy->GetNbinsY();
+
+  // Axis bounds from the histogram itself
+  double xMin = MatrixCopy->GetXaxis()->GetBinLowEdge(1);
+  double xMax = MatrixCopy->GetXaxis()->GetBinUpEdge(nBinsX);
+  double yMin = MatrixCopy->GetYaxis()->GetBinLowEdge(1);
+  double yMax = MatrixCopy->GetYaxis()->GetBinUpEdge(nBinsY);
+
+  for (size_t g = 1; g < GroupStart.size(); ++g) {
+    double posX = MatrixCopy->GetXaxis()->GetBinLowEdge(GroupStart[g] + 1);
+    double posY = MatrixCopy->GetYaxis()->GetBinLowEdge(GroupStart[g] + 1);
+
+    // Vertical line at group start
+    auto vLine = std::make_unique<TLine>(posX, yMin, posX, yMax);
+    vLine->SetLineColor(kBlack);
+    vLine->SetLineWidth(2);
+    vLine->Draw();
+    groupLines.push_back(std::move(vLine));
+
+    // Horizontal line at group start
+    auto hLine = std::make_unique<TLine>(xMin, posY, xMax, posY);
+    hLine->SetLineColor(kBlack);
+    hLine->SetLineWidth(2);
+    hLine->Draw();
+    groupLines.push_back(std::move(hLine));
+  }
+
+  std::vector<std::unique_ptr<TText>> groupLabels(GroupName.size() * 2);
+  double yOffsetBelow = 0.05 * (yMax - yMin); // space below x-axis
+  double xOffsetRight = 0.02 * (xMax - xMin); // space right of y-axis
+
+  for (size_t g = 0; g < GroupName.size(); ++g) {
+    int startBin = GroupStart[g] + 1; // hist bins start at 1
+    int endBin   = GroupEnd[g];
+
+    double xStart = MatrixCopy->GetXaxis()->GetBinLowEdge(startBin);
+    double xEnd   = MatrixCopy->GetXaxis()->GetBinUpEdge(endBin);
+    double xMid   = 0.5 * (xStart + xEnd);
+
+    double yStart = MatrixCopy->GetYaxis()->GetBinLowEdge(startBin);
+    double yEnd   = MatrixCopy->GetYaxis()->GetBinUpEdge(endBin);
+    double yMid   = 0.5 * (yStart + yEnd);
+
+    // Label along X-axis (below histogram)
+    auto labelX = std::make_unique<TText>(xMid, yMin - yOffsetBelow, GroupName[g].c_str());
+    labelX->SetTextAlign(23); // center horizontally, top-aligned vertically
+    labelX->SetTextSize(0.025);
+    labelX->Draw();
+    groupLabels.push_back(std::move(labelX));
+
+    // Label along Y-axis (left of histogram)
+    auto labelY = std::make_unique<TText>(xMin - xOffsetRight, yMid, GroupName[g].c_str());
+    labelY->SetTextAlign(32); // right-aligned horizontally, center vertically
+    labelY->SetTextSize(0.025);
+    labelY->Draw();
+    groupLabels.push_back(std::move(labelY));
+  }
+
+  if(printToPDF) Posterior->Print(CanvasName);
+  Posterior->SetRightMargin(RightMargin);
 }
 
 // *********************
@@ -1481,7 +1592,7 @@ void MCMCProcessor::DrawCorrelations1D() {
   }
 
   #ifdef MULTITHREAD
-  #pragma omp parallel for
+  #pragma omp parallel for collapse(2)
   #endif
   for(int i = 0; i < nDraw; ++i)
   {
@@ -1510,6 +1621,7 @@ void MCMCProcessor::DrawCorrelations1D() {
   {
     if (IamVaried[i] == false) continue;
 
+    Corr1DHist[i][0]->GetXaxis()->LabelsOption("v");
     Corr1DHist[i][0]->SetMaximum(+1.);
     Corr1DHist[i][0]->SetMinimum(-1.);
     Corr1DHist[i][0]->Draw();
@@ -1569,8 +1681,8 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
                                         const std::vector<Style_t>& CredibleRegionStyle,
                                         const std::vector<Color_t>& CredibleRegionColor,
                                         const bool CredibleInSigmas, 
-					const bool Draw2DPosterior,
-					const bool DrawBestFit) {
+                                        const bool Draw2DPosterior,
+                                        const bool DrawBestFit) {
 // *********************
   if(hpost2D.size() == 0) MakeCovariance_MP();
   MACH3LOG_INFO("Making Credible Regions");

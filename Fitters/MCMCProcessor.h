@@ -289,7 +289,9 @@ class MCMCProcessor {
     inline void MakeOutputFile();
     /// @brief Draw 1D correlations which might be more helpful than looking at huge 2D Corr matrix
     inline void DrawCorrelations1D();
-
+    /// @brief Produces correlation matrix but instead of giving name for each param it only give name for param group
+    /// @note Inspired by plot in Ewan thesis see https://www.t2k.org/docs/thesis/152/Thesis#page=147
+    inline void DrawCorrelationsGroup(const std::unique_ptr<TH2D>& CorrMatrix) const;
     /// @brief CW: Read the input Covariance matrix entries. Get stuff like parameter input errors, names, and so on
     inline void ReadInputCov();
     /// @warning This will no longer be supported in future
