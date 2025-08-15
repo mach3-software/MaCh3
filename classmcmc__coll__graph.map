@@ -1,12 +1,12 @@
 <map id="mcmc" name="mcmc">
-<area shape="rect" id="node1" title="Implementation of MR2T2 algorithm." alt="" coords="889,155,952,181"/>
-<area shape="rect" id="node2" href="$classFitterBase.html" title="Base class for implementing fitting algorithms." alt="" coords="752,155,840,181"/>
-<area shape="rect" id="node3" href="$classmanager.html" title="The manager class is responsible for managing configurations and settings." alt="" coords="467,13,547,38"/>
-<area shape="rect" id="node4" title=" " alt="" coords="193,13,280,38"/>
-<area shape="rect" id="node5" title=" " alt="" coords="5,5,144,45"/>
-<area shape="rect" id="node6" title=" " alt="" coords="425,67,590,93"/>
-<area shape="rect" id="node7" title=" " alt="" coords="404,117,611,157"/>
-<area shape="rect" id="node8" title=" " alt="" coords="395,181,619,221"/>
-<area shape="rect" id="node9" title=" " alt="" coords="395,246,620,271"/>
-<area shape="rect" id="node10" title=" " alt="" coords="398,295,617,321"/>
+<area shape="rect" id="node1" title="Implementation of MR2T2 algorithm." alt="" coords="913,66,976,91"/>
+<area shape="rect" id="node2" href="$classFitterBase.html" title="Base class for implementing fitting algorithms." alt="" coords="764,135,852,161"/>
+<area shape="rect" id="node3" href="$classmanager.html" title="The manager class is responsible for managing configurations and settings." alt="" coords="467,79,547,105"/>
+<area shape="rect" id="node4" title=" " alt="" coords="193,79,280,105"/>
+<area shape="rect" id="node5" title=" " alt="" coords="5,72,144,112"/>
+<area shape="rect" id="node6" title=" " alt="" coords="425,15,590,41"/>
+<area shape="rect" id="node7" title=" " alt="" coords="404,179,611,219"/>
+<area shape="rect" id="node8" title=" " alt="" coords="395,243,619,283"/>
+<area shape="rect" id="node9" title=" " alt="" coords="395,309,620,334"/>
+<area shape="rect" id="node10" title=" " alt="" coords="398,129,617,154"/>
 </map>
