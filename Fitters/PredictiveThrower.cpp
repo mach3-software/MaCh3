@@ -326,7 +326,7 @@ void PredictiveThrower::ProduceToys() {
 
   TChain* PosteriorFile = new TChain("posteriors");
   PosteriorFile->Add(PosteriorFileName.c_str());
-  int Step = 0;
+  unsigned int Step = 0;
   PosteriorFile->SetBranchAddress("step", &Step);
 
   if (PosteriorFile->GetBranch("Weight")) {
@@ -341,11 +341,11 @@ void PredictiveThrower::ProduceToys() {
     systematics[s]->MatchMaCh3OutputBranches(PosteriorFile, branch_vals[s], branch_name[s]);
   }
   //Get the burn-in from the config
-  auto burn_in = Get<int>(fitMan->raw()["Predictive"]["BurnInSteps"], __FILE__, __LINE__);
+  auto burn_in = Get<unsigned int>(fitMan->raw()["Predictive"]["BurnInSteps"], __FILE__, __LINE__);
 
   //DL: Adding sanity check for chains shorter than burn in
   const unsigned int maxNsteps = static_cast<unsigned int>(PosteriorFile->GetMaximum("step"));
-  if(static_cast<unsigned int>(burn_in) >= maxNsteps)
+  if(burn_in >= maxNsteps)
   {
     MACH3LOG_ERROR("You are running on a chain shorter than burn in cut");
     MACH3LOG_ERROR("Maximal value of nSteps: {}, burn in cut {}", maxNsteps, burn_in);
@@ -362,7 +362,7 @@ void PredictiveThrower::ProduceToys() {
       MaCh3Utils::PrintProgressBar(i, Ntoys);
     }
     int entry = 0;
-    Step = -999;
+    Step = 0;
 
     //YSP: Ensures you get an entry from the mcmc even when burn_in is set to zero (Although not advised :p ).
     //Take 200k burn in steps, WP: Eb C in 1st peaky
