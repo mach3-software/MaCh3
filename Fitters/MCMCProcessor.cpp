@@ -1066,7 +1066,7 @@ void MCMCProcessor::CacheSteps() {
   clock.Start();
   
   ParStep = new double*[nDraw];
-  StepNumber = new int[nEntries];
+  StepNumber = new unsigned int[nEntries];
   
   hpost2D.resize(nDraw);
   for (int i = 0; i < nDraw; ++i) 
@@ -1077,13 +1077,13 @@ void MCMCProcessor::CacheSteps() {
     {
       ParStep[i][j] = -999.99;
       //KS: Set this only once
-      if(i == 0) StepNumber[j] = -999.99;
+      if(i == 0) StepNumber[j] = 0;
     }
   }
 
   // Set all the branches to off
   Chain->SetBranchStatus("*", false);
-  int stepBranch = 0;
+  unsigned int stepBranch = 0;
   double* ParValBranch = new double[nEntries]();
   // Turn on the branches which we want for parameters
   for (int i = 0; i < nDraw; ++i)
@@ -2455,7 +2455,7 @@ void MCMCProcessor::SetStepCut(const int Cuts) {
 // Make the step cut from an int
 void MCMCProcessor::CheckStepCut() const {
 // ***************
-  const int maxNsteps = Chain->GetMaximum("step");
+  const unsigned int maxNsteps = Chain->GetMaximum("step");
   if(BurnInCut > maxNsteps){
     MACH3LOG_ERROR("StepCut({}) is larger than highest value of step({})", BurnInCut, maxNsteps);
     throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -3021,7 +3021,7 @@ void MCMCProcessor::PrepareDiagMCMC() {
   SampleValues = new double*[nEntries]();
   SystValues = new double*[nEntries]();
   AccProbValues = new double[nEntries]();
-  StepNumber = new int[nEntries]();
+  StepNumber = new unsigned int[nEntries]();
   for (int i = 0; i < nEntries; ++i) {
     SampleValues[i] = new double[nSamples]();
     SystValues[i] = new double[nSysts]();
@@ -3033,7 +3033,7 @@ void MCMCProcessor::PrepareDiagMCMC() {
       SystValues[i][j] = -999.99;
     }
     AccProbValues[i] = -999.99;
-    StepNumber[i] = -999.99;
+    StepNumber[i] = 0;
   }
 
   // Initialise the sums
@@ -4031,7 +4031,7 @@ void MCMCProcessor::GewekeDiagnostic() {
     std::vector<double> SpectralVarianceDown(nDraw, 0.0);
     std::vector<int> DenomCounterDown(nDraw, 0);
 
-    const int ThresholsCheck = Division*k*nSteps;
+    const unsigned int ThresholsCheck = Division*k*nSteps;
     //KS: First mean
     for (int j = 0; j < nDraw; ++j)
     {
