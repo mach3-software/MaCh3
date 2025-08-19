@@ -7,7 +7,7 @@ StyleManager::StyleManager(std::string styleConfigName) {
 
 std::string StyleManager::prettifyName(const std::string &origName, const std::string &nameType) const {
   YAML::Node prettyNames = _styleConfig["PrettyNames"][nameType];
-  auto prettyName = GetFromManager<std::string>(prettyNames["origName"], origName, __FILE__, __LINE__);
+  auto prettyName = GetFromManager<std::string>(prettyNames[origName], origName, __FILE__, __LINE__);
 
   return prettyName;
 }
