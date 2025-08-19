@@ -609,7 +609,7 @@ Additional Inherited Members</h2></td></tr>
 <div class="line"><span class="lineno">  169</span>    <a class="code hl_variable" href="classmcmc.html#a981886264e7e12b610f5f1ec5c1e2bb3">syst_llh_prop</a>[s] = <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;GetLikelihood();</div>
 <div class="line"><span class="lineno">  170</span>    llh += <a class="code hl_variable" href="classmcmc.html#a981886264e7e12b610f5f1ec5c1e2bb3">syst_llh_prop</a>[s];</div>
 <div class="line"><span class="lineno">  171</span> </div>
-<div class="line"><span class="lineno">  172</span><span class="preprocessor">#ifdef DEBUG</span></div>
+<div class="line"><span class="lineno">  172</span><span class="preprocessor">    #ifdef DEBUG</span></div>
 <div class="line"><span class="lineno">  173</span>    <span class="keywordflow">if</span> (debug) debugFile &lt;&lt; <span class="stringliteral">&quot;LLH after &quot;</span> &lt;&lt; <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;GetName() &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; llh &lt;&lt; std::endl;</div>
 <div class="line"><span class="lineno">  174</span><span class="preprocessor">    #endif</span></div>
 <div class="line"><span class="lineno">  175</span>  }</div>
@@ -639,7 +639,7 @@ Additional Inherited Members</h2></td></tr>
 <div class="line"><span class="lineno">  199</span>      <span class="comment">// Get the sample likelihoods and add them</span></div>
 <div class="line"><span class="lineno">  200</span>      <a class="code hl_variable" href="classmcmc.html#a410dd1333ad94e620544192ff72a739d">sample_llh_prop</a>[i] = <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>[i]-&gt;GetLikelihood();</div>
 <div class="line"><span class="lineno">  201</span>      llh += <a class="code hl_variable" href="classmcmc.html#a410dd1333ad94e620544192ff72a739d">sample_llh_prop</a>[i];</div>
-<div class="line"><span class="lineno">  202</span><span class="preprocessor">#ifdef DEBUG</span></div>
+<div class="line"><span class="lineno">  202</span><span class="preprocessor">      #ifdef DEBUG</span></div>
 <div class="line"><span class="lineno">  203</span>      <span class="keywordflow">if</span> (debug) debugFile &lt;&lt; <span class="stringliteral">&quot;LLH after sample &quot;</span> &lt;&lt; i &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; llh &lt;&lt; std::endl;</div>
 <div class="line"><span class="lineno">  204</span><span class="preprocessor">      #endif</span></div>
 <div class="line"><span class="lineno">  205</span>    }</div>
@@ -846,14 +846,14 @@ Additional Inherited Members</h2></td></tr>
 <div class="line"><span class="lineno">  244</span>  <a class="code hl_function" href="classFitterBase.html#a655ccea31627627e2b36745c97e5c0f0">FitterBase::StartFromPreviousFit</a>(FitName);</div>
 <div class="line"><span class="lineno">  245</span> </div>
 <div class="line"><span class="lineno">  246</span>  <span class="comment">// For MCMC we also need to set stepStart</span></div>
-<div class="line"><span class="lineno">  247</span>  TFile *infile = <span class="keyword">new</span> TFile(FitName.c_str(), <span class="stringliteral">&quot;READ&quot;</span>);</div>
+<div class="line"><span class="lineno">  247</span>  TFile *infile = <a class="code hl_function" href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a>(FitName, <span class="stringliteral">&quot;READ&quot;</span>, __FILE__, __LINE__);</div>
 <div class="line"><span class="lineno">  248</span>  TTree *posts = infile-&gt;Get&lt;TTree&gt;(<span class="stringliteral">&quot;posteriors&quot;</span>);</div>
-<div class="line"><span class="lineno">  249</span>  <span class="keywordtype">int</span> step_val = -1;</div>
+<div class="line"><span class="lineno">  249</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> step_val = 0;</div>
 <div class="line"><span class="lineno">  250</span> </div>
 <div class="line"><span class="lineno">  251</span>  posts-&gt;SetBranchAddress(<span class="stringliteral">&quot;step&quot;</span>,&amp;step_val);</div>
 <div class="line"><span class="lineno">  252</span>  posts-&gt;GetEntry(posts-&gt;GetEntries()-1);</div>
 <div class="line"><span class="lineno">  253</span> </div>
-<div class="line"><span class="lineno">  254</span>  <a class="code hl_variable" href="classFitterBase.html#a888f97de872ab396dff2d1a25f5aaa42">stepStart</a> = step_val + 1;</div>
+<div class="line"><span class="lineno">  254</span>  <a class="code hl_variable" href="classFitterBase.html#a888f97de872ab396dff2d1a25f5aaa42">stepStart</a> = step_val;</div>
 <div class="line"><span class="lineno">  255</span>  <span class="comment">// KS: Also update number of steps if using adaption</span></div>
 <div class="line"><span class="lineno">  256</span>  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.size(); ++i){</div>
 <div class="line"><span class="lineno">  257</span>    <span class="keywordflow">if</span>(<a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[i]-&gt;GetDoAdaption()){</div>
@@ -864,6 +864,7 @@ Additional Inherited Members</h2></td></tr>
 <div class="line"><span class="lineno">  262</span>  <span class="keyword">delete</span> infile;</div>
 <div class="line"><span class="lineno">  263</span>}</div>
 <div class="ttc" id="aclassFitterBase_html_a655ccea31627627e2b36745c97e5c0f0"><div class="ttname"><a href="classFitterBase.html#a655ccea31627627e2b36745c97e5c0f0">FitterBase::StartFromPreviousFit</a></div><div class="ttdeci">virtual void StartFromPreviousFit(const std::string &amp;FitName)</div><div class="ttdoc">Allow to start from previous fit/chain.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8cpp_source.html#l00298">FitterBase.cpp:298</a></div></div>
+<div class="ttc" id="anamespaceM3_html_a87841bdbf0e0a2a733d9e4ca499f820d"><div class="ttname"><a href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a></div><div class="ttdeci">TFile * Open(const std::string &amp;Name, const std::string &amp;Type, const std::string &amp;File, const int Line)</div><div class="ttdoc">Opens a ROOT file with the given name and mode.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00610">HistogramUtils.cpp:610</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

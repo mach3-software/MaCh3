@@ -16,5 +16,5 @@ var searchData=
   ['branchnames_13',['BranchNames',['../classMCMCProcessor.html#ad043b6b2c885f47ab9967831bc8d0f5a',1,'MCMCProcessor::BranchNames()'],['../GetPenaltyTerm_8cpp.html#a871d6466cea2597401bdb203293f4033',1,'BranchNames():&#160;GetPenaltyTerm.cpp'],['../RHat_8cpp.html#a871d6466cea2597401bdb203293f4033',1,'BranchNames():&#160;RHat.cpp'],['../RHat__HighMem_8cpp.html#a871d6466cea2597401bdb203293f4033',1,'BranchNames():&#160;RHat_HighMem.cpp']]],
   ['buf_14',['buf',['../classSampleHandlerBase.html#a47d291148fa6153a7e05beebde6cfdb9',1,'SampleHandlerBase']]],
   ['buildsampleindexingarray_15',['BuildSampleIndexingArray',['../classBinnedSplineHandler.html#a9ec76e03369a3cf36c6cdf4eb8004c38',1,'BinnedSplineHandler']]],
-  ['burnincut_16',['BurnInCut',['../classMCMCProcessor.html#a22f82dadceccbe87dd8c5b7daa8432e8',1,'MCMCProcessor']]]
+  ['burnincut_16',['BurnInCut',['../classMCMCProcessor.html#afca259b5bdee2b248d4b1a64ac3e7930',1,'MCMCProcessor']]]
 ];

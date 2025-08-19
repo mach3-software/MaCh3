@@ -408,7 +408,7 @@ $(function() {
 <div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span> </div>
 <div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span>  TChain* PosteriorFile = <span class="keyword">new</span> TChain(<span class="stringliteral">&quot;posteriors&quot;</span>);</div>
 <div class="line"><a id="l00328" name="l00328"></a><span class="lineno">  328</span>  PosteriorFile-&gt;Add(PosteriorFileName.c_str());</div>
-<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span>  <span class="keywordtype">int</span> Step = 0;</div>
+<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> Step = 0;</div>
 <div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span>  PosteriorFile-&gt;SetBranchAddress(<span class="stringliteral">&quot;step&quot;</span>, &amp;Step);</div>
 <div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span> </div>
 <div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span>  <span class="keywordflow">if</span> (PosteriorFile-&gt;GetBranch(<span class="stringliteral">&quot;Weight&quot;</span>)) {</div>
@@ -423,11 +423,11 @@ $(function() {
 <div class="line"><a id="l00341" name="l00341"></a><span class="lineno">  341</span>    <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;MatchMaCh3OutputBranches(PosteriorFile, branch_vals[s], branch_name[s]);</div>
 <div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span>  }</div>
 <div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span>  <span class="comment">//Get the burn-in from the config</span></div>
-<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span>  <span class="keyword">auto</span> burn_in = Get&lt;int&gt;(<a class="code hl_variable" href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">fitMan</a>-&gt;<a class="code hl_function" href="classmanager.html#ab3999cc856ede72b37f68bdb28bd5520">raw</a>()[<span class="stringliteral">&quot;Predictive&quot;</span>][<span class="stringliteral">&quot;BurnInSteps&quot;</span>], __FILE__, __LINE__);</div>
+<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span>  <span class="keyword">auto</span> burn_in = Get&lt;unsigned int&gt;(<a class="code hl_variable" href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">fitMan</a>-&gt;<a class="code hl_function" href="classmanager.html#ab3999cc856ede72b37f68bdb28bd5520">raw</a>()[<span class="stringliteral">&quot;Predictive&quot;</span>][<span class="stringliteral">&quot;BurnInSteps&quot;</span>], __FILE__, __LINE__);</div>
 <div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span> </div>
 <div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span>  <span class="comment">//DL: Adding sanity check for chains shorter than burn in</span></div>
 <div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span>  <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> maxNsteps = <span class="keyword">static_cast&lt;</span><span class="keywordtype">unsigned</span> <span class="keywordtype">int</span><span class="keyword">&gt;</span>(PosteriorFile-&gt;GetMaximum(<span class="stringliteral">&quot;step&quot;</span>));</div>
-<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span>  <span class="keywordflow">if</span>(<span class="keyword">static_cast&lt;</span><span class="keywordtype">unsigned</span> <span class="keywordtype">int</span><span class="keyword">&gt;</span>(burn_in) &gt;= maxNsteps)</div>
+<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span>  <span class="keywordflow">if</span>(burn_in &gt;= maxNsteps)</div>
 <div class="line"><a id="l00349" name="l00349"></a><span class="lineno">  349</span>  {</div>
 <div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;You are running on a chain shorter than burn in cut&quot;</span>);</div>
 <div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Maximal value of nSteps: {}, burn in cut {}&quot;</span>, maxNsteps, burn_in);</div>
@@ -444,7 +444,7 @@ $(function() {
 <div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span>      <a class="code hl_function" href="namespaceMaCh3Utils.html#a4c8bdeb1d34606aed192e9f1311a72f5">MaCh3Utils::PrintProgressBar</a>(i, <a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>);</div>
 <div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span>    }</div>
 <div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span>    <span class="keywordtype">int</span> entry = 0;</div>
-<div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span>    Step = -999;</div>
+<div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span>    Step = 0;</div>
 <div class="line"><a id="l00366" name="l00366"></a><span class="lineno">  366</span> </div>
 <div class="line"><a id="l00367" name="l00367"></a><span class="lineno">  367</span>    <span class="comment">//YSP: Ensures you get an entry from the mcmc even when burn_in is set to zero (Although not advised :p ).</span></div>
 <div class="line"><a id="l00368" name="l00368"></a><span class="lineno">  368</span>    <span class="comment">//Take 200k burn in steps, WP: Eb C in 1st peaky</span></div>

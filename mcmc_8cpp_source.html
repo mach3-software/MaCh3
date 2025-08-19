@@ -257,7 +257,7 @@ $(function() {
 <div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>    <a class="code hl_variable" href="classmcmc.html#a981886264e7e12b610f5f1ec5c1e2bb3">syst_llh_prop</a>[s] = <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;GetLikelihood();</div>
 <div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>    llh += <a class="code hl_variable" href="classmcmc.html#a981886264e7e12b610f5f1ec5c1e2bb3">syst_llh_prop</a>[s];</div>
 <div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span> </div>
-<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span><span class="preprocessor">#ifdef DEBUG</span></div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span><span class="preprocessor">    #ifdef DEBUG</span></div>
 <div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>    <span class="keywordflow">if</span> (debug) debugFile &lt;&lt; <span class="stringliteral">&quot;LLH after &quot;</span> &lt;&lt; <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;GetName() &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; llh &lt;&lt; std::endl;</div>
 <div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span><span class="preprocessor">    #endif</span></div>
 <div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>  }</div>
@@ -287,7 +287,7 @@ $(function() {
 <div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>      <span class="comment">// Get the sample likelihoods and add them</span></div>
 <div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>      <a class="code hl_variable" href="classmcmc.html#a410dd1333ad94e620544192ff72a739d">sample_llh_prop</a>[i] = <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>[i]-&gt;GetLikelihood();</div>
 <div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>      llh += <a class="code hl_variable" href="classmcmc.html#a410dd1333ad94e620544192ff72a739d">sample_llh_prop</a>[i];</div>
-<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span><span class="preprocessor">#ifdef DEBUG</span></div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span><span class="preprocessor">      #ifdef DEBUG</span></div>
 <div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>      <span class="keywordflow">if</span> (debug) debugFile &lt;&lt; <span class="stringliteral">&quot;LLH after sample &quot;</span> &lt;&lt; i &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; llh &lt;&lt; std::endl;</div>
 <div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span><span class="preprocessor">      #endif</span></div>
 <div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>    }</div>
@@ -332,14 +332,14 @@ $(function() {
 <div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>  <a class="code hl_function" href="classFitterBase.html#a655ccea31627627e2b36745c97e5c0f0">FitterBase::StartFromPreviousFit</a>(FitName);</div>
 <div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span> </div>
 <div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>  <span class="comment">// For MCMC we also need to set stepStart</span></div>
-<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>  TFile *infile = <span class="keyword">new</span> TFile(FitName.c_str(), <span class="stringliteral">&quot;READ&quot;</span>);</div>
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>  TFile *infile = <a class="code hl_function" href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a>(FitName, <span class="stringliteral">&quot;READ&quot;</span>, __FILE__, __LINE__);</div>
 <div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>  TTree *posts = infile-&gt;Get&lt;TTree&gt;(<span class="stringliteral">&quot;posteriors&quot;</span>);</div>
-<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>  <span class="keywordtype">int</span> step_val = -1;</div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> step_val = 0;</div>
 <div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span> </div>
 <div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>  posts-&gt;SetBranchAddress(<span class="stringliteral">&quot;step&quot;</span>,&amp;step_val);</div>
 <div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>  posts-&gt;GetEntry(posts-&gt;GetEntries()-1);</div>
 <div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span> </div>
-<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>  <a class="code hl_variable" href="classFitterBase.html#a888f97de872ab396dff2d1a25f5aaa42">stepStart</a> = step_val + 1;</div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>  <a class="code hl_variable" href="classFitterBase.html#a888f97de872ab396dff2d1a25f5aaa42">stepStart</a> = step_val;</div>
 <div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>  <span class="comment">// KS: Also update number of steps if using adaption</span></div>
 <div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.size(); ++i){</div>
 <div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span>    <span class="keywordflow">if</span>(<a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[i]-&gt;GetDoAdaption()){</div>
@@ -393,6 +393,7 @@ $(function() {
 <div class="ttc" id="aclassmcmc_html_adf4c80255288c5396da3b95d609ce4b2"><div class="ttname"><a href="classmcmc.html#adf4c80255288c5396da3b95d609ce4b2">mcmc::StartFromPreviousFit</a></div><div class="ttdeci">void StartFromPreviousFit(const std::string &amp;FitName) override</div><div class="ttdoc">Allow to start from previous fit/chain.</div><div class="ttdef"><b>Definition:</b> <a href="mcmc_8cpp_source.html#l00241">mcmc.cpp:241</a></div></div>
 <div class="ttc" id="aclassmcmc_html_ae0eabbfc70f9bae615332caa48b3f4f4"><div class="ttname"><a href="classmcmc.html#ae0eabbfc70f9bae615332caa48b3f4f4">mcmc::PrintProgress</a></div><div class="ttdeci">void PrintProgress()</div><div class="ttdoc">Print the progress.</div><div class="ttdef"><b>Definition:</b> <a href="mcmc_8cpp_source.html#l00224">mcmc.cpp:224</a></div></div>
 <div class="ttc" id="amcmc_8h_html"><div class="ttname"><a href="mcmc_8h.html">mcmc.h</a></div></div>
+<div class="ttc" id="anamespaceM3_html_a87841bdbf0e0a2a733d9e4ca499f820d"><div class="ttname"><a href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a></div><div class="ttdeci">TFile * Open(const std::string &amp;Name, const std::string &amp;Type, const std::string &amp;File, const int Line)</div><div class="ttdoc">Opens a ROOT file with the given name and mode.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00610">HistogramUtils.cpp:610</a></div></div>
 <div class="ttc" id="anamespaceM3_html_aaf4ba720c8ab2982beaa3c243aee1b98"><div class="ttname"><a href="namespaceM3.html#aaf4ba720c8ab2982beaa3c243aee1b98">M3::_LARGE_LOGL_</a></div><div class="ttdeci">static constexpr const double _LARGE_LOGL_</div><div class="ttdoc">Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such s...</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00070">Core.h:70</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
