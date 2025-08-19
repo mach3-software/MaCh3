@@ -390,9 +390,9 @@ class MCMCProcessor {
     /// Cut used when making 1D Posterior distribution
     std::string Posterior1DCut;
     /// KS: Used only for SubOptimality
-    int UpperCut;
+    unsigned int UpperCut;
     /// Value of burn in cut
-    int BurnInCut;
+    unsigned int BurnInCut;
     /// Number of branches in a TTree
     int nBranches;
     /// KS: For merged chains number of entries will be different from nSteps
@@ -512,7 +512,7 @@ class MCMCProcessor {
     /// Array holding values for all parameters
     double** ParStep;
     /// Step number for step, important if chains were merged
-    int* StepNumber;
+    unsigned int* StepNumber;
 
     /// Number of bins
     int nBins;

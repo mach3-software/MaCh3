@@ -44,5 +44,11 @@ class mcmc : public FitterBase {
   bool anneal;
   /// simulated annealing temperature
   double AnnealTemp;
+
+  /// Penalty term for proposed step
+  std::vector<double> syst_llh_prop;
+
+  /// Sample likelihood for proposed step
+  std::vector<double> sample_llh_prop;
 };
 

@@ -170,7 +170,7 @@ void FitterBase::PrepareOutput() {
     outTree->Branch("LogL", &logLCurr, "LogL/D");
     if(SaveProposal) outTree->Branch("LogLProp", &logLProp, "LogLProp/D");
     outTree->Branch("accProb", &accProb, "accProb/D");
-    outTree->Branch("step", &step, "step/I");
+    outTree->Branch("step", &step, "step/i");
     outTree->Branch("stepTime", &stepTime, "stepTime/D");
 
     // Store individual likelihood components
@@ -196,7 +196,7 @@ void FitterBase::PrepareOutput() {
   {
     outTree->Branch("LogL", &logLCurr, "LogL/D");
     outTree->Branch("accProb", &accProb, "accProb/D");
-    outTree->Branch("step", &step, "step/I");
+    outTree->Branch("step", &step, "step/i");
     outTree->Branch("stepTime", &stepTime, "stepTime/D");
   }
 
