@@ -4140,7 +4140,7 @@ void MCMCProcessor::AcceptanceProbabilities() {
 }
 
 // **************************
-void MCMCProcessor::CheckCredibleIntervalsOrder(const std::vector<double>& CredibleIntervals, const std::vector<Color_t>& CredibleIntervalsColours) {
+void MCMCProcessor::CheckCredibleIntervalsOrder(const std::vector<double>& CredibleIntervals, const std::vector<Color_t>& CredibleIntervalsColours) const {
 // **************************
   if (CredibleIntervals.size() != CredibleIntervalsColours.size()) {
     MACH3LOG_ERROR("size of CredibleIntervals is not equal to size of CredibleIntervalsColours");

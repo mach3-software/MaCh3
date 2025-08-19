@@ -134,7 +134,7 @@ class MCMCProcessor {
     /// @param CredibleIntervals A vector of credible interval values.
     /// @param CredibleIntervalsColours A vector of colors associated with each credible interval.
     /// @throws MaCh3Exception If the sizes are not equal or the intervals are not in decreasing order.
-    void CheckCredibleIntervalsOrder(const std::vector<double>& CredibleIntervals, const std::vector<Color_t>& CredibleIntervalsColours);
+    void CheckCredibleIntervalsOrder(const std::vector<double>& CredibleIntervals, const std::vector<Color_t>& CredibleIntervalsColours) const;
 
     /// @brief Checks the order and size consistency of the `CredibleRegions`, `CredibleRegionStyle`, and `CredibleRegionColor` vectors.
     /// @param CredibleRegions A vector of credible region values.
@@ -188,35 +188,35 @@ class MCMCProcessor {
     /// @brief Thin MCMC Chain, to save space and maintain low autocorrelations.
     /// @param ThinningCut every which entry you want to thin
     /// @param Average If true will perform MCMC averaging instead of thinning
-    inline void ThinMCMC(const int ThinningCut) { ThinningMCMC(MCMCFile+".root", ThinningCut); };
+    inline void ThinMCMC(const int ThinningCut) const { ThinningMCMC(MCMCFile+".root", ThinningCut); };
 
     /// @brief KS: Perform MCMC diagnostic including Autocorrelation, Trace etc.
     void DiagMCMC();
     
     // Get the number of parameters
     /// @brief Get total number of used parameters
-    inline int GetNParams() { return nDraw; };
-    inline int GetNXSec() { return nParam[kXSecPar]; };
-    inline int GetNND() { return nParam[kNDPar]; };
-    inline int GetNFD() { return nParam[kFDDetPar]; };
+    inline int GetNParams() const { return nDraw; };
+    inline int GetNXSec() const { return nParam[kXSecPar]; };
+    inline int GetNND() const { return nParam[kNDPar]; };
+    inline int GetNFD() const { return nParam[kFDDetPar]; };
 
     /// @brief Get Yaml config obtained from a Chain
-    YAML::Node GetCovConfig(const int i) {return CovConfig.at(i); }
+    YAML::Node GetCovConfig(const int i) const {return CovConfig.at(i); }
 
     /// @brief Number of params from a given group, for example flux
     int GetGroup(const std::string& name) const;
 
     /// @brief Get 1D posterior for a given parameter
     /// @param i parameter index
-    inline TH1D* GetHpost(const int i) { return hpost[i]; };
+    inline TH1D* GetHpost(const int i) const { return hpost[i]; };
     /// @brief Get 2D posterior for a given parameter combination
     /// @param i parameter index X
     /// @param j parameter index Y
-    inline TH2D* GetHpost2D(const int i, const int j) { return hpost2D[i][j]; };
+    inline TH2D* GetHpost2D(const int i, const int j) const { return hpost2D[i][j]; };
     /// @brief Get Violin plot for all parameters with posterior values
-    inline TH2D* GetViolin() { return hviolin.get(); };
+    inline TH2D* GetViolin() const { return hviolin.get(); };
     /// @brief Get Violin plot for all parameters with prior values
-    inline TH2D* GetViolinPrior() { return hviolin_prior.get(); };
+    inline TH2D* GetViolinPrior() const { return hviolin_prior.get(); };
 
     //Covariance getters
     inline std::vector<std::string> GetXSecCov()  const { return CovPos[kXSecPar]; };
@@ -243,6 +243,19 @@ class MCMCProcessor {
     /// @brief Get Number of Steps that Chain has, for merged chains will not be the same nEntries
     inline Long64_t GetnSteps(){return nSteps;};
     
+    /// @brief Set number of entries to make potentially MCMC Processing faster
+    inline void SetEntries(const int NewEntries) {
+      if (NewEntries > nEntries) {
+        MACH3LOG_ERROR("Cannot increase entries from {} to {}. Only decreasing is allowed.", nEntries, NewEntries);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+      if (NewEntries <= 0) {
+        MACH3LOG_ERROR("Entries cannot be below 0, but {} was passed.", NewEntries);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+      MACH3LOG_INFO("Setting entries to {} from {}.", NewEntries, nEntries);
+      nEntries = NewEntries;
+    }
     /// @brief Set the step cutting by string
     /// @param Cuts string telling cut value
     void SetStepCut(const std::string& Cuts);
