@@ -182,8 +182,7 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
     Chain->SetBranchAddress(BranchNames[i].Data(), &fParProp[i]);
   }
 
-  YAML::Node Settings = YAML::LoadFile(configFile.c_str());
-
+  YAML::Node Settings = M3OpenConfig(configFile);
   std::vector<std::string> SetsNames;
   std::vector<std::vector<std::string>> RemoveNames;
   std::vector<bool> Exclude;

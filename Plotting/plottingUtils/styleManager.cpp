@@ -2,18 +2,12 @@
 
 namespace MaCh3Plotting {
 StyleManager::StyleManager(std::string styleConfigName) {
-  _styleConfig = YAML::LoadFile(styleConfigName);
+  _styleConfig = M3OpenConfig(styleConfigName);
 }
 
 std::string StyleManager::prettifyName(const std::string &origName, const std::string &nameType) const {
-  std::string prettyName = origName;
-
   YAML::Node prettyNames = _styleConfig["PrettyNames"][nameType];
-
-  if (prettyNames[origName])
-  {
-    prettyName = prettyNames[origName].as<std::string>();
-  }
+  auto prettyName = GetFromManager<std::string>(prettyNames["origName"], origName, __FILE__, __LINE__);
 
   return prettyName;
 }
@@ -41,8 +35,7 @@ void StyleManager::setPalette(const std::string& configStyleName) const {
       {0.0   , 0.0   , 0.0  , 0.0},  // Reds
       {0.0   , 0.0   , 1.0  , 0.0},  // Greens
       {0.0   , 1.0   , 0.0  , 0.0}   // Blues
-    }
-  );
+    }, __FILE__, __LINE__);
   const Int_t NCont = Int_t(paletteDef[0][0]);
 
   std::vector<double> stopVec = paletteDef[1];
@@ -72,12 +65,12 @@ void StyleManager::setTH1Style(TH1 *hist, const std::string& styleName) const {
     styleDef = TH1Styles[styleName];
   }
 
-  hist->SetMarkerColor(GetFromManager<Color_t>(styleDef["MarkerColor"], kRed));
-  hist->SetMarkerStyle(GetFromManager<Color_t>(styleDef["MarkerStyle"], 7));
-  hist->SetFillColor(GetFromManager<Color_t>(styleDef["FillColor"], kRed));
-  hist->SetFillStyle(GetFromManager<Color_t>(styleDef["FillStyle"], 3003));
-  hist->SetLineColor(GetFromManager<Color_t>(styleDef["LineColor"], kRed));
-  hist->SetLineStyle(GetFromManager<Color_t>(styleDef["LineStyle"], 1));
+  hist->SetMarkerColor(GetFromManager<Color_t>(styleDef["MarkerColor"], kRed, __FILE__, __LINE__));
+  hist->SetMarkerStyle(GetFromManager<Color_t>(styleDef["MarkerStyle"], 7, __FILE__, __LINE__));
+  hist->SetFillColor(GetFromManager<Color_t>(styleDef["FillColor"], kRed, __FILE__, __LINE__));
+  hist->SetFillStyle(GetFromManager<Color_t>(styleDef["FillStyle"], 3003, __FILE__, __LINE__));
+  hist->SetLineColor(GetFromManager<Color_t>(styleDef["LineColor"], kRed, __FILE__, __LINE__));
+  hist->SetLineStyle(GetFromManager<Color_t>(styleDef["LineStyle"], 1, __FILE__, __LINE__));
 }
 
 } // namespace MaCh3Plotting

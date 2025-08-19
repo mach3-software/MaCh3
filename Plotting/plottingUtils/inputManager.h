@@ -549,7 +549,7 @@ private:
   // Check the input file for a particular post fit error for a particular parameter. if
   // setInputFileError, will add the information to the InputFiles postFitErrors histogram.
   bool findPostFitParamError(InputFile &inputFileDef, const std::string &parameter, std::string &fitter,
-                             const std::string &errorType, bool setInputFileError = false);
+                             const std::string &errorType, const bool setInputFileError = false);
 
   // Check the input file for a particular post fit error for a particular parameter. if
   // setInputFileError, will add the information to the InputFiles postFitErrors histogram.
@@ -563,8 +563,8 @@ private:
   bool find1dPosterior(InputFile &inputFileDef, const std::string &parameter, std::string &fitter, bool setFileData = false) const ;
 
   // fns tp read an input file
-  void fillFileInfo(InputFile &inputFileDef, bool printThoughts = true);
-  void fillFileData(InputFile &inputFileDef, bool printThoughts = true);
+  void fillFileInfo(InputFile &inputFileDef, const bool printThoughts = true);
+  void fillFileData(InputFile &inputFileDef, const bool printThoughts = true);
 
   // helper function to read from the translation config file to get an option for a particular sub
   // node (e.g. Parameters or Samples) returns true and sets "ret" if the option is specified for this
