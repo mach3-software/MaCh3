@@ -261,6 +261,7 @@ class MCMCProcessor {
       }
 
       MACH3LOG_INFO("Setting entries to {} from {}.", NewEntries, nEntries);
+      MACH3LOG_WARN("This may behave not as expected when using merged multiple chains");
       nEntries = NewEntries;
     }
     /// @brief Set the step cutting by string
