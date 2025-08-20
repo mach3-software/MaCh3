@@ -7,10 +7,11 @@ var searchData=
   ['diagnosecovariancematrix_4',['DiagnoseCovarianceMatrix',['../ProcessMCMC_8cpp.html#a08adc262bf03d1cb8df996b39404572c',1,'ProcessMCMC.cpp']]],
   ['dragrace_5',['DragRace',['../classFitterBase.html#ab3db1d0bb7364e70cd432a3e1c0a600e',1,'FitterBase']]],
   ['drawcorrelations1d_6',['DrawCorrelations1D',['../classMCMCProcessor.html#a5b0961bcb0eea7a347e6a29ef7738d80',1,'MCMCProcessor']]],
-  ['drawcovariance_7',['DrawCovariance',['../classMCMCProcessor.html#a8d9b9c1c780a51b130fe528583dc5019',1,'MCMCProcessor']]],
-  ['drawplots_8',['DrawPlots',['../GetPostfitParamPlots_8cpp.html#a1c32335e684f4321025c4b062b77ff7c',1,'GetPostfitParamPlots.cpp']]],
-  ['drawpostfit_9',['DrawPostfit',['../classMCMCProcessor.html#ab420de77e598da4b02ba74cdc20f2ea9',1,'MCMCProcessor']]],
-  ['drawratiostack_10',['drawRatioStack',['../PlotLLH_8cpp.html#a22a044e77ac75863b8962c3a38b95ef7',1,'PlotLLH.cpp']]],
-  ['dump_11',['Dump',['../structMaCh3Plotting_1_1InputFile.html#a0897b76fdbfc674ed94da1d2b4adb0a2',1,'MaCh3Plotting::InputFile']]],
-  ['dumpmatrixtofile_12',['DumpMatrixToFile',['../classParameterHandlerGeneric.html#aad70f9b7c4c574c09a056693e3ecc0e0',1,'ParameterHandlerGeneric']]]
+  ['drawcorrelationsgroup_7',['DrawCorrelationsGroup',['../classMCMCProcessor.html#a7c9c0c6da5530f5cf1f6fd673d2cc44f',1,'MCMCProcessor']]],
+  ['drawcovariance_8',['DrawCovariance',['../classMCMCProcessor.html#a8d9b9c1c780a51b130fe528583dc5019',1,'MCMCProcessor']]],
+  ['drawplots_9',['DrawPlots',['../GetPostfitParamPlots_8cpp.html#a1c32335e684f4321025c4b062b77ff7c',1,'GetPostfitParamPlots.cpp']]],
+  ['drawpostfit_10',['DrawPostfit',['../classMCMCProcessor.html#ab420de77e598da4b02ba74cdc20f2ea9',1,'MCMCProcessor']]],
+  ['drawratiostack_11',['drawRatioStack',['../PlotLLH_8cpp.html#a22a044e77ac75863b8962c3a38b95ef7',1,'PlotLLH.cpp']]],
+  ['dump_12',['Dump',['../structMaCh3Plotting_1_1InputFile.html#a0897b76fdbfc674ed94da1d2b4adb0a2',1,'MaCh3Plotting::InputFile']]],
+  ['dumpmatrixtofile_13',['DumpMatrixToFile',['../classParameterHandlerGeneric.html#aad70f9b7c4c574c09a056693e3ecc0e0',1,'ParameterHandlerGeneric']]]
 ];
