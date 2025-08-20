@@ -244,6 +244,7 @@ class MCMCProcessor {
     inline Long64_t GetnSteps(){return nSteps;};
     
     /// @brief Set number of entries to make potentially MCMC Processing faster
+    /// @warning This option only sets an upper limit; burn-in events will NOT be discarded
     inline void SetEntries(const int NewEntries) {
       if (NewEntries > nEntries) {
         MACH3LOG_ERROR("Cannot increase entries from {} to {}. Only decreasing is allowed.", nEntries, NewEntries);
@@ -253,6 +254,12 @@ class MCMCProcessor {
         MACH3LOG_ERROR("Entries cannot be below 0, but {} was passed.", NewEntries);
         throw MaCh3Exception(__FILE__, __LINE__);
       }
+
+      if (BurnInCut > NewEntries) {
+          MACH3LOG_ERROR("BurnInCut ({}) is larger than NewEntries ({})", BurnInCut, NewEntries);
+          throw MaCh3Exception(__FILE__, __LINE__);
+      }
+
       MACH3LOG_INFO("Setting entries to {} from {}.", NewEntries, nEntries);
       nEntries = NewEntries;
     }
