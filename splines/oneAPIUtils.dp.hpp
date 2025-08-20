@@ -26,8 +26,7 @@ struct SplineMonoUSM {
     /// CPU array with the number of points per spline (not per spline point!)
     short int* paramNo_arr;
 
-    int* param_n_knots;
-
+    
     /// Keep track of the number of splines that each event needs
     unsigned short int* splines_per_event_arr;
 };

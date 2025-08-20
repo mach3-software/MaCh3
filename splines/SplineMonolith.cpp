@@ -37,7 +37,8 @@ using PipeAB = sycl::ext::intel::pipe<IDPipeAB,        // An identifier for the 
 [[intel::use_stall_enable_clusters]] 
 void FPGACalcSplineWeights(int nParams,
                            int NSplines_valid,
-                           int *param_n_knots,
+                           int *paramNo_arr,
+                           int *nKnots_arr,
                            short *SplineSegments,
                            float *coeff_many,
                            float *coeff_x,
@@ -48,7 +49,8 @@ void FPGACalcSplineWeights(int nParams,
                            unsigned int n_events) {
 //*********************************************************
 
-  sycl::ext::intel::host_ptr<const int> param_n_knots_host(param_n_knots);
+  sycl::ext::intel::host_ptr<const int> params_host(paramNo_arr);
+  sycl::ext::intel::host_ptr<const int> knots_host(nKnots_arr);
   sycl::ext::intel::host_ptr<const short> segments_host(SplineSegments);
   sycl::ext::intel::host_ptr<const float> coeff_many_host(coeff_many);
   sycl::ext::intel::host_ptr<const float> coeff_x_host(coeff_x);
@@ -86,10 +88,8 @@ void FPGACalcSplineWeights(int nParams,
     
     
     for (size_t eventSpline = 0; eventSpline < NSplines_event; eventSpline+= nChunk) {
-      // NEEDED?
-      // //////////////////////////////////////////////////////////////////////
-      int knots_per_spline = 0.;  //fill me in
-      // //////////////////////////////////////////////////////////////////////
+       
+
       
       float for_pipe[nChunk];
       // Execute each clock cycle
@@ -108,12 +108,14 @@ void FPGACalcSplineWeights(int nParams,
           // -> how many knots for this param.
           int current_spline = spline_offset + chunk;
 
-          int segment = 0.; // please help
-          int Param = 0; // more help please!
+          
+          int Param = params_host[spline_offset + eventSpline + chunk];
+          int segment = segments_bram[Param];
+          int CurrentKnotPos = knots_host[spline_offset + eventSpline + chunk] * num_coeff + segment * num_coeff; // still needs to be checked
+
 
           //int CurrentKnotPos =  * num_coeff;
-          int CurrentKnotPos = knot_offset + segment*num_coeff;
-
+          //int CurrentKnotPos = knot_offset + segment*num_coeff;
 
           ac_int<8, false> segment_X = Param * max_knots + segment;
 
@@ -981,9 +983,9 @@ void SMonolith::LoadSplineFile(std::string FileName) {
     std::cout << "Grabbed param_no and nKNots: " << paramNo_arr << " " << nKnots_arr << std::endl;
     int parameter_number = static_cast<int>(paramNo_arr);
     int knots_number = static_cast<int>(nKnots_arr);
-    cpu_spline_handler->param_n_knots[2*i] = parameter_number;//paramNo_arr;
-    cpu_spline_handler->param_n_knots[2*i+1] = knots_number;//nKnots_arr;
-    std::cout << "Grabbed from array param_no and nKNots: " << cpu_spline_handler->param_n_knots[2*i] << " " << cpu_spline_handler->param_n_knots[2*i+1] << std::endl;
+    cpu_spline_handler->paramNo_arr[i] = parameter_number;//paramNo_arr;
+    cpu_spline_handler->nKnots_arr[i] = knots_number;//nKnots_arr;
+    std::cout << "Grabbed from array param_no and nKNots: " << cpu_spline_handler->paramNo_arr[i] << " " << cpu_spline_handler->nKnots_arr[i] << std::endl;
     #endif
   }
 
@@ -1319,11 +1321,11 @@ void SMonolith::Evaluate() {
 #ifdef USE_FPGA
     std::cout << "FPGA DEBUG!" << std::endl;
     std::cout << "Spline number is " << spline_i << std::endl;
-    std::cout << "Parameter number: " << cpu_spline_handler->param_n_knots[2*spline_i] << std::endl;
-    std::cout << "Number of knots: " << cpu_spline_handler->param_n_knots[2*spline_i+1] << std::endl;
-    std::cout << "Segment is: " << SplineSegments[cpu_spline_handler->param_n_knots[2*spline_i]] << std::endl;
-    std::cout << "segment_X is: " << cpu_spline_handler->param_n_knots[2*spline_i+1]*_max_knots+SplineSegments[cpu_spline_handler->param_n_knots[2*spline_i]] << std::endl;
-    std::cout << "CurrentKnotPos is: " << cpu_spline_handler->param_n_knots[2*spline_i+1]*_nCoeff_ + SplineSegments[cpu_spline_handler->param_n_knots[2*spline_i]]*_nCoeff_ << std::endl;
+    std::cout << "Parameter number: " << cpu_spline_handler->paramNo_arr[spline_i] << std::endl;
+    std::cout << "Number of knots: " << cpu_spline_handler->nKnots_arr[spline_i+1] << std::endl;
+    std::cout << "Segment is: " << SplineSegments[cpu_spline_handler->paramNo_arr[spline_i]] << std::endl;
+    std::cout << "segment_X is: " << cpu_spline_handler->nKnots_arr[spline_i]*_max_knots+SplineSegments[cpu_spline_handler->paramNo_arr[spline_i]] << std::endl;
+    std::cout << "CurrentKnotPos is: " << cpu_spline_handler->nKnots_arr[spline_i]*_nCoeff_ + SplineSegments[cpu_spline_handler->paramNo_arr[spline_i]]*_nCoeff_ << std::endl;
     std::cout << "splines in first event" << cpu_spline_handler->splines_per_event_arr[0]<<std::endl;
 #else
     std::cout << "CPU DEBUG!" << std::endl;
@@ -1343,7 +1345,8 @@ void SMonolith::Evaluate() {
     struct OptimizedKernel {
       int nParams;
       unsigned int NSplines_valid;
-      int *param_n_knots;
+      int *paramNo_arr;
+      int *nKnots_arr;
       short int *SplineSegments;
       float *coeff_many;
       float *coeff_x;
@@ -1361,7 +1364,8 @@ void SMonolith::Evaluate() {
         // Pass all the things that FPGACalcSplineWeights needs
         task_a.async(nParams,
                      NSplines_valid,
-                     param_n_knots,
+                     paramNo_arr,
+                     nKnots_arr,
                      SplineSegments,
                      coeff_many,
                      coeff_x,
@@ -1383,7 +1387,8 @@ void SMonolith::Evaluate() {
     // Call the kernel
     auto e = queue.single_task<IDOptimized>(OptimizedKernel{nParams,
                                                             NSplines_valid,
-                                                            cpu_spline_handler->param_n_knots,
+                                                            cpu_spline_handler->paramNo_arr,
+                                                            cpu_spline_handler->nKnots_arr,
                                                             SplineSegments,
                                                             cpu_spline_handler->coeff_many,
                                                             cpu_spline_handler->coeff_x,
