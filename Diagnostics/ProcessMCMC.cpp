@@ -106,16 +106,15 @@ void ProcessMCMC(const std::string& inputFile)
 
   Processor->Initialise();
 
-  if(Settings["BurnInSteps"])
-  {
+  if(Settings["BurnInSteps"]) {
     Processor->SetStepCut(Settings["BurnInSteps"].as<int>());
-  }
-  else
-  {
+  } else {
     MACH3LOG_WARN("BurnInSteps not set, defaulting to 20%");
     Processor->SetStepCut(static_cast<int>(Processor->GetnSteps()/5));
   }
-
+  if(Settings["MaxEntries"]) {
+    Processor->SetEntries(Get<int>(Settings["MaxEntries"], __FILE__, __LINE__));
+  }
   if(Settings["Thinning"])
   {
     if(Settings["Thinning"][0].as<bool>()){
@@ -181,8 +180,7 @@ void MultipleProcessMCMC()
   nFiles = int(FileNames.size());
   std::vector<std::unique_ptr<MCMCProcessor>> Processor(nFiles);
 
-  if(!Settings["BurnInSteps"])
-  {
+  if(!Settings["BurnInSteps"]) {
     MACH3LOG_WARN("BurnInSteps not set, defaulting to 20%");
   }
 
@@ -203,13 +201,14 @@ void MultipleProcessMCMC()
     Processor[ik]->SetFancyNames(GetFromManager<bool>(Settings["FancyNames"], true));
     Processor[ik]->Initialise();
 
-    if(Settings["BurnInSteps"])
-    {
+    if(Settings["BurnInSteps"]) {
       Processor[ik]->SetStepCut(Settings["BurnInSteps"].as<int>());
-    }
-    else
-    {
+    }else {
       Processor[ik]->SetStepCut(static_cast<int>(Processor[ik]->GetnSteps()/5));
+    }
+
+    if(Settings["MaxEntries"]) {
+      Processor[ik]->SetEntries(Get<int>(Settings["MaxEntries"], __FILE__, __LINE__));
     }
   }
   //KS: Multithreading here is very tempting but there are some issues with root that need to be resovled :(
