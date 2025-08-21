@@ -255,7 +255,7 @@ class MCMCProcessor {
         throw MaCh3Exception(__FILE__, __LINE__);
       }
 
-      if (BurnInCut > NewEntries) {
+      if (static_cast<int>(BurnInCut) > NewEntries) {
           MACH3LOG_ERROR("BurnInCut ({}) is larger than NewEntries ({})", BurnInCut, NewEntries);
           throw MaCh3Exception(__FILE__, __LINE__);
       }
