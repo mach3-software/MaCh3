@@ -169,7 +169,7 @@ void mcmc::ProposeStep() {
     syst_llh_prop[s] = systematics[s]->GetLikelihood();
     llh += syst_llh_prop[s];
 
-#ifdef DEBUG
+    #ifdef DEBUG
     if (debug) debugFile << "LLH after " << systematics[s]->GetName() << " " << llh << std::endl;
     #endif
   }
@@ -199,7 +199,7 @@ void mcmc::ProposeStep() {
       // Get the sample likelihoods and add them
       sample_llh_prop[i] = samples[i]->GetLikelihood();
       llh += sample_llh_prop[i];
-#ifdef DEBUG
+      #ifdef DEBUG
       if (debug) debugFile << "LLH after sample " << i << " " << llh << std::endl;
       #endif
     }
@@ -244,14 +244,14 @@ void mcmc::StartFromPreviousFit(const std::string& FitName) {
   FitterBase::StartFromPreviousFit(FitName);
 
   // For MCMC we also need to set stepStart
-  TFile *infile = new TFile(FitName.c_str(), "READ");
+  TFile *infile = M3::Open(FitName, "READ", __FILE__, __LINE__);
   TTree *posts = infile->Get<TTree>("posteriors");
-  int step_val = -1;
+  unsigned int step_val = 0;
 
   posts->SetBranchAddress("step",&step_val);
   posts->GetEntry(posts->GetEntries()-1);
 
-  stepStart = step_val + 1;
+  stepStart = step_val;
   // KS: Also update number of steps if using adaption
   for(unsigned int i = 0; i < systematics.size(); ++i){
     if(systematics[i]->GetDoAdaption()){

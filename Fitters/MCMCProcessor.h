@@ -310,7 +310,10 @@ class MCMCProcessor {
     inline void MakeOutputFile();
     /// @brief Draw 1D correlations which might be more helpful than looking at huge 2D Corr matrix
     inline void DrawCorrelations1D();
-
+    /// @brief Produces correlation matrix but instead of giving name for each param it only give name for param group
+    /// @param CorrMatrix correlation matrix that we are going to plot
+    /// @note Inspired by plot in Ewan thesis see https://www.t2k.org/docs/thesis/152/Thesis#page=147
+    inline void DrawCorrelationsGroup(const std::unique_ptr<TH2D>& CorrMatrix) const;
     /// @brief CW: Read the input Covariance matrix entries. Get stuff like parameter input errors, names, and so on
     inline void ReadInputCov();
     /// @warning This will no longer be supported in future
@@ -408,9 +411,9 @@ class MCMCProcessor {
     /// Cut used when making 1D Posterior distribution
     std::string Posterior1DCut;
     /// KS: Used only for SubOptimality
-    int UpperCut;
+    unsigned int UpperCut;
     /// Value of burn in cut
-    int BurnInCut;
+    unsigned int BurnInCut;
     /// Number of branches in a TTree
     int nBranches;
     /// KS: For merged chains number of entries will be different from nSteps
@@ -530,7 +533,7 @@ class MCMCProcessor {
     /// Array holding values for all parameters
     double** ParStep;
     /// Step number for step, important if chains were merged
-    int* StepNumber;
+    unsigned int* StepNumber;
 
     /// Number of bins
     int nBins;

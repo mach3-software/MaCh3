@@ -174,7 +174,7 @@ void OscProcessor::PerformJarlskogAnalysis() {
   TDirectory *JarlskogDir = OutputFile->mkdir("Jarlskog");
   JarlskogDir->cd();
 
-  int step = M3::_BAD_INT_;
+  unsigned int step = 0;
   Chain->SetBranchStatus("*", false);
 
   Chain->SetBranchStatus(Sin2Theta13Name.c_str(), true);
