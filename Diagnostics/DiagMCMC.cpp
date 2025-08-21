@@ -23,7 +23,9 @@ void DiagMCMC(const std::string& inputFile, const std::string& config)
   Processor->SetnLags(GetFromManager<int>(Settings["DiagMCMC"]["nLags"], 25000));
   Processor->SetPrintToPDF(GetFromManager<bool>(Settings["PrintToPDF"], true));
   Processor->Initialise();
-
+  if(Settings["MaxEntries"]) {
+    Processor->SetEntries(Get<int>(Settings["MaxEntries"], __FILE__, __LINE__));
+  }
   //KS: finally call main method
   Processor->DiagMCMC();
 }
