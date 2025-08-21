@@ -17,11 +17,11 @@ _MaCh3_Safe_Include_End_ //}
 class BinnedSplineHandler : public SplineBase {
   /// @todo ETA - do all of these functions and members actually need to be public?
   public:
-	/// @brief Constructor
-  BinnedSplineHandler(ParameterHandlerGeneric *xsec_, MaCh3Modes *Modes_);
-	/// @brief Destructor
-	/// @todo it need some love
-	virtual ~BinnedSplineHandler();
+    /// @brief Constructor
+    BinnedSplineHandler(ParameterHandlerGeneric *xsec_, MaCh3Modes *Modes_);
+    /// @brief Destructor
+    /// @todo it need some love
+    virtual ~BinnedSplineHandler();
 
     /// @brief CW: This Eval should be used when using two separate x,{y,a,b,c,d} arrays
     /// to store the weights; probably the best one here! Same thing but pass parameter
@@ -70,6 +70,11 @@ class BinnedSplineHandler : public SplineBase {
       int index = indexvec[sample][oscchan][syst][mode][var1bin][var2bin][var3bin];
       return &weightvec_Monolith[index];
     }
+    /// @brief KS: Prepare spline file that can be used for fast loading
+    void PrepareSplineFile(std::string FileName) override;
+    /// @brief KS: Load preprocessed spline file
+    /// @param FileName Path to ROOT file with predefined reduced Spline Monolith
+    void LoadSplineFile(std::string FileName) override;
 
   protected:
     /// @brief CPU based code which eval weight for each spline
@@ -138,4 +143,24 @@ class BinnedSplineHandler : public SplineBase {
   private:
     /// @brief This function will find missing splines in file
     void InvestigateMissingSplines() const;
+
+    /// @brief KS: Load preprocessed Settings
+    /// @param File File from which we load new tree
+    void LoadSettingsDir(std::unique_ptr<TFile>& SplineFile);
+    /// @brief KS: Load preprocessed Monolith
+    /// @param File File from which we load new tree
+    void LoadMonolithDir(std::unique_ptr<TFile>& SplineFile);
+    /// @brief KS: Load preprocessed Index
+    /// @param File File from which we load new tree
+    void LoadIndexDir(std::unique_ptr<TFile>& SplineFile);
+
+    /// @brief KS: Prepare Settings Info within SplineFile
+    void PrepareSettingsDir(std::unique_ptr<TFile>& SplineFile) const;
+    /// @brief KS: Prepare Monolith Info within SplineFile
+    void PrepareMonolithDir(std::unique_ptr<TFile>& SplineFile) const;
+    /// @brief KS: Prepare Index Info within SplineFile
+    void PrepareIndexDir(std::unique_ptr<TFile>& SplineFile) const;
+    /// @brief KS: Prepare Other Info within SplineFile
+    void PrepareOtherInfoDir(std::unique_ptr<TFile>& SplineFile) const;
+
 };

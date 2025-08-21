@@ -38,7 +38,6 @@ void SMonolith::Initialise() {
 SMonolith::SMonolith(std::vector<std::vector<TResponseFunction_red*> > &MasterSpline, const std::vector<RespFuncType> &SplineType, const bool SaveFlatTree)
 : SplineBase() {
 // *****************************************
-
   //KS: If true it will save spline monolith into huge ROOT file
   SaveSplineFile = SaveFlatTree;
   Initialise();
@@ -293,8 +292,7 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
 
   // Print some info; could probably make this to a separate function
   PrintInitialsiation();
-
-  if(SaveSplineFile) PrepareSplineFile();
+  if(SaveSplineFile) PrepareSplineFile("SplineFile.root");
 
   MoveToGPU();
 }
@@ -525,7 +523,6 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   TTree *Settings = SplineFile->Get<TTree>("Settings");
   TTree *Monolith_TF1 = SplineFile->Get<TTree>("Monolith_TF1");
   TTree *EventInfo = SplineFile->Get<TTree>("EventInfo");
-  TTree *FastSplineInfoTree = SplineFile->Get<TTree>("FastSplineInfoTree");
   TTree *SplineTree = SplineFile->Get<TTree>("SplineTree");
 
   unsigned int NEvents_temp;
@@ -597,24 +594,8 @@ void SMonolith::LoadSplineFile(std::string FileName) {
     cpu_nParamPerEvent_tf1[i] = nParamPerEvent_tf1;
   }
 
-  M3::int_t nPoints = 0;
-  float xtemp[20];
-  FastSplineInfoTree->SetBranchAddress("nPts", &nPoints);
-  FastSplineInfoTree->SetBranchAddress("xPts", &xtemp);
+  LoadFastSplineInfoDir(SplineFile);
 
-  SplineInfoArray.resize(nParams);
-  for (M3::int_t i = 0; i < nParams; ++i) {
-    FastSplineInfoTree->GetEntry(i);
-
-    // Fill the number of points
-    SplineInfoArray[i].nPts = nPoints;
-    if(nPoints == -999) continue;
-    SplineInfoArray[i].xPts.resize(SplineInfoArray[i].nPts);
-    for (M3::int_t k = 0; k < SplineInfoArray[i].nPts; ++k)
-    {
-      SplineInfoArray[i].xPts[k] = xtemp[k];
-    }
-  }
   SplineFile->Close();
 
   // Print some info; could probably make this to a separate function
@@ -625,9 +606,8 @@ void SMonolith::LoadSplineFile(std::string FileName) {
 
 // *****************************************
 // Save SplineMonolith into ROOT file
-void SMonolith::PrepareSplineFile() {
+void SMonolith::PrepareSplineFile(std::string FileName) {
 // *****************************************
-  std::string FileName = "SplineFile.root";
   if (std::getenv("MACH3") != nullptr) {
       FileName.insert(0, std::string(std::getenv("MACH3"))+"/");
    }
@@ -637,7 +617,6 @@ void SMonolith::PrepareSplineFile() {
   TTree *Monolith_TF1 = new TTree("Monolith_TF1", "Monolith_TF1");
   TTree *XKnots = new TTree("XKnots", "XKnots");
   TTree *EventInfo = new TTree("EventInfo", "EventInfo");
-  TTree *FastSplineInfoTree = new TTree("FastSplineInfoTree", "FastSplineInfoTree");
 
   unsigned int NEvents_temp = NEvents;
   short int nParams_temp = nParams;
@@ -692,30 +671,12 @@ void SMonolith::PrepareSplineFile() {
   SplineFile->cd();
   EventInfo->Write();
 
-  M3::int_t nPoints = 0;
-  float xtemp[20];
-  FastSplineInfoTree->Branch("nPts", &nPoints, "nPts/I");
-  FastSplineInfoTree->Branch("xPts", xtemp, "xPts[nPts]/F");
-
-  for (M3::int_t i = 0; i < nParams; ++i)
-  {
-    nPoints = SplineInfoArray[i].nPts;
-
-    for (M3::int_t k = 0; k < SplineInfoArray[i].nPts; ++k)
-    {
-      xtemp[k] = float(SplineInfoArray[i].xPts[k]);
-    }
-    FastSplineInfoTree->Fill();
-  }
-
-  SplineFile->cd();
-  FastSplineInfoTree->Write();
+  PrepareFastSplineInfoDir(SplineFile);
 
   delete Settings;
   delete Monolith_TF1;
   delete XKnots;
   delete EventInfo;
-  delete FastSplineInfoTree;
   SplineFile->Close();
 }
 

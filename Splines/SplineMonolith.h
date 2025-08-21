@@ -50,6 +50,12 @@ class SMonolith : public SplineBase {
     /// KS: This holds the total CPU weights that gets read in samplePDFND
     float* cpu_total_weights;
 
+    /// @brief KS: Prepare spline file that can be used for fast loading
+    void PrepareSplineFile(std::string FileName) override;
+    /// @brief KS: Load preprocessed spline file
+    /// @param FileName Path to ROOT file with predefined reduced Spline Monolith
+    void LoadSplineFile(std::string FileName) override;
+
   private:
     /// @brief KS: Set everything to null etc.
     inline void Initialise();
@@ -96,12 +102,6 @@ class SMonolith : public SplineBase {
     inline void ModifyWeights() override;
     /// @brief Conversion from valid splines to all
     inline void ModifyWeights_GPU();
-    
-    /// @brief KS: Prepare spline file that can be used for fast loading
-    inline void PrepareSplineFile();
-    /// @brief KS: Load preprocessed spline file
-    /// @param FileName Path to ROOT file with predefined reduced Spline Monolith
-    inline void LoadSplineFile(std::string FileName);
 
     /// This holds pointer to parameter position which we later copy paste it to GPU
     std::vector< const double* > splineParsPointer;

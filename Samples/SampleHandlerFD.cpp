@@ -1477,10 +1477,19 @@ void SampleHandlerFD::InitialiseSplineObject() {
     SplineVarNames.push_back(GetYBinVarName());
   }
   
-  SplineHandler->AddSample(SampleName, spline_filepaths, SplineVarNames);
-  SplineHandler->CountNumberOfLoadedSplines(false, 1);
-  SplineHandler->TransferToMonolith();
-
+  bool LoadSplineFile = GetFromManager<bool>(SampleManager->raw()["InputFiles"]["LoadSplineFile"], false, __FILE__, __LINE__);
+  bool PrepSplineFile = GetFromManager<bool>(SampleManager->raw()["InputFiles"]["PrepSplineFile"], false, __FILE__, __LINE__);
+  auto SplineFileName = GetFromManager<std::string>(SampleManager->raw()["InputFiles"]["SplineFileName"],
+                                                    (SampleName + "_SplineFile.root"), __FILE__, __LINE__);
+  if(!LoadSplineFile) {
+    SplineHandler->AddSample(SampleName, spline_filepaths, SplineVarNames);
+    SplineHandler->CountNumberOfLoadedSplines(false, 1);
+    SplineHandler->TransferToMonolith();
+    if(PrepSplineFile) SplineHandler->PrepareSplineFile(SampleName + "_SplineFile.root");
+  } else {
+    // KS: Skip default spline loading and use flattened spline format allowing to read stuff much faster
+    SplineHandler->LoadSplineFile(SplineFileName);
+  }
   MACH3LOG_INFO("--------------------------------");
   MACH3LOG_INFO("Setup Far Detector splines");
 

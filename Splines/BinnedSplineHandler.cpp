@@ -27,7 +27,9 @@ BinnedSplineHandler::BinnedSplineHandler(ParameterHandlerGeneric *xsec_, MaCh3Mo
   // Keep these in class scope, important for using 1 monolith/sample!
   MonolithIndex = 0; //Keeps track of the monolith index we're on when filling arrays (declared here so we can have multiple FillSampleArray calls)
   CoeffIndex = 0; //Keeps track of our indexing the coefficient arrays [x, ybcd]
+  isflatarray = nullptr;
 }
+
 //****************************************
 BinnedSplineHandler::~BinnedSplineHandler(){
 //****************************************
@@ -1062,4 +1064,393 @@ void BinnedSplineHandler::FillSampleArray(std::string SampleName, std::vector<st
     File->Delete("*");
     File->Close();
   } //End of oscillation channel loop
+}
+
+// *****************************************
+// Load SplineMonolith from ROOT file
+void BinnedSplineHandler::LoadSplineFile(std::string FileName) {
+// *****************************************
+  if (std::getenv("MACH3") != nullptr) {
+    FileName.insert(0, std::string(std::getenv("MACH3"))+"/");
+  }
+  // Check for spaces in the filename
+  size_t pos = FileName.find(' ');
+  if (pos != std::string::npos) {
+    MACH3LOG_WARN("Filename ({}) contains spaces. Replacing spaces with underscores.", FileName);
+    while ((pos = FileName.find(' ')) != std::string::npos) {
+      FileName[pos] = '_';
+    }
+  }
+  auto SplineFile = std::make_unique<TFile>(FileName.c_str(), "OPEN");
+  LoadSettingsDir(SplineFile);
+  LoadMonolithDir(SplineFile);
+  LoadIndexDir(SplineFile);
+  LoadFastSplineInfoDir(SplineFile);
+
+  for (int iSpline = 0; iSpline < nParams; iSpline++) {
+    SplineInfoArray[iSpline].splineParsPointer = xsec->RetPointer(UniqueSystIndices[iSpline]);
+  }
+  SplineFile->Close();
+}
+
+// *****************************************
+// KS: Prepare Fast Spline Info within SplineFile
+void BinnedSplineHandler::LoadSettingsDir(std::unique_ptr<TFile>& SplineFile) {
+// *****************************************
+  TTree *Settings = SplineFile->Get<TTree>("Settings");
+  int CoeffIndex_temp, MonolithSize_temp;
+  short int nParams_temp;
+  Settings->SetBranchAddress("CoeffIndex", &CoeffIndex_temp);
+  Settings->SetBranchAddress("MonolithSize", &MonolithSize_temp);
+  Settings->SetBranchAddress("nParams", &nParams_temp);
+  int indexvec_sizes[7];
+  for (int i = 0; i < 7; ++i) {
+    Settings->SetBranchAddress(("indexvec_size" + std::to_string(i+1)).c_str(), &indexvec_sizes[i]);
+  }
+
+  int SplineBinning_size1, SplineBinning_size2, SplineBinning_size3;
+  Settings->SetBranchAddress("SplineBinning_size1", &SplineBinning_size1);
+  Settings->SetBranchAddress("SplineBinning_size2", &SplineBinning_size2);
+  Settings->SetBranchAddress("SplineBinning_size3", &SplineBinning_size3);
+  int SplineModeVecs_size1, SplineModeVecs_size2, SplineModeVecs_size3;
+  Settings->SetBranchAddress("SplineModeVecs_size1", &SplineModeVecs_size1);
+  Settings->SetBranchAddress("SplineModeVecs_size2", &SplineModeVecs_size2);
+  Settings->SetBranchAddress("SplineModeVecs_size3", &SplineModeVecs_size3);
+  std::vector<std::string>* SampleNames_temp = nullptr;
+  Settings->SetBranchAddress("SampleNames", &SampleNames_temp);
+  Settings->GetEntry(0);
+
+  CoeffIndex = CoeffIndex_temp;
+  MonolithSize = MonolithSize_temp;
+  SampleNames = *SampleNames_temp;
+  nParams = nParams_temp;
+
+  SplineSegments = new short int[nParams]();
+  ParamValues = new float[nParams]();
+
+  // Resize indexvec according to saved dimensions
+  indexvec.resize(indexvec_sizes[0]);
+  for (int i = 0; i < indexvec_sizes[0]; ++i) {
+    indexvec[i].resize(indexvec_sizes[1]);
+    for (int j = 0; j < indexvec_sizes[1]; ++j) {
+      indexvec[i][j].resize(indexvec_sizes[2]);
+      for (int k = 0; k < indexvec_sizes[2]; ++k) {
+        indexvec[i][j][k].resize(indexvec_sizes[3]);
+        for (int l = 0; l < indexvec_sizes[3]; ++l) {
+          indexvec[i][j][k][l].resize(indexvec_sizes[4]);
+          for (int m = 0; m < indexvec_sizes[4]; ++m) {
+            indexvec[i][j][k][l][m].resize(indexvec_sizes[5]);
+            for (int n = 0; n < indexvec_sizes[5]; ++n) {
+              indexvec[i][j][k][l][m][n].resize(indexvec_sizes[6]);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  auto Resize3D = [](auto& vec, int d1, int d2, int d3) {
+    vec.resize(d1);
+    for (int i = 0; i < d1; ++i) {
+      vec[i].resize(d2);
+      for (int j = 0; j < d2; ++j) {
+        vec[i][j].resize(d3);
+      }
+    }
+  };
+
+  Resize3D(SplineBinning, SplineBinning_size1, SplineBinning_size2, SplineBinning_size3);
+  Resize3D(SplineModeVecs, SplineModeVecs_size1, SplineModeVecs_size2, SplineModeVecs_size3);
+}
+
+// *****************************************
+// KS: Prepare Fast Spline Info within SplineFile
+void BinnedSplineHandler::LoadMonolithDir(std::unique_ptr<TFile>& SplineFile) {
+// *****************************************
+  TTree *MonolithTree = SplineFile->Get<TTree>("MonolithTree");
+
+  manycoeff_arr = new M3::float_t[CoeffIndex * _nCoeff_];
+  MonolithTree->SetBranchAddress("manycoeff", manycoeff_arr);
+  isflatarray = new bool[MonolithSize];
+  weightvec_Monolith.resize(MonolithSize);
+  MonolithTree->SetBranchAddress("isflatarray", isflatarray);
+
+  // Load vectors
+  std::vector<int>* coeffindexvec_temp = nullptr;
+  MonolithTree->SetBranchAddress("coeffindexvec", &coeffindexvec_temp);
+  std::vector<int>* uniquecoeffindices_temp = nullptr;
+  MonolithTree->SetBranchAddress("uniquecoeffindices", &uniquecoeffindices_temp);
+  std::vector<int>* uniquesplinevec_Monolith_temp = nullptr;
+  MonolithTree->SetBranchAddress("uniquesplinevec_Monolith", &uniquesplinevec_Monolith_temp);
+  std::vector<int>* UniqueSystIndices_temp = nullptr;
+  MonolithTree->SetBranchAddress("UniqueSystIndices", &UniqueSystIndices_temp);
+
+  // Allocate and load xcoeff_arr
+  xcoeff_arr = new M3::float_t[CoeffIndex];
+  MonolithTree->SetBranchAddress("xcoeff", xcoeff_arr);
+
+  MonolithTree->GetEntry(0);
+
+  coeffindexvec       = *coeffindexvec_temp;
+  uniquecoeffindices  = *uniquecoeffindices_temp;
+  uniquesplinevec_Monolith = *uniquesplinevec_Monolith_temp;
+  UniqueSystIndices = *UniqueSystIndices_temp;
+}
+
+// *****************************************
+// KS: Prepare Fast Spline Info within SplineFile
+void BinnedSplineHandler::LoadIndexDir(std::unique_ptr<TFile>& SplineFile) {
+// *****************************************
+  TTree *IndexTree = SplineFile->Get<TTree>("IndexVec");
+
+  std::vector<int> Dim(7);
+  int value;
+  for (int d = 0; d < 7; ++d) {
+    IndexTree->SetBranchAddress(Form("dim%d", d+1), &Dim[d]);
+  }
+  IndexTree->SetBranchAddress("value", &value);
+
+  // Fill indexvec with data from IndexTree
+  for (Long64_t i = 0; i < IndexTree->GetEntries(); ++i) {
+    IndexTree->GetEntry(i);
+    indexvec[Dim[0]][Dim[1]][Dim[2]][Dim[3]][Dim[4]][Dim[5]][Dim[6]] = value;
+  }
+
+  // Load SplineBinning data
+  TTree *SplineBinningTree = SplineFile->Get<TTree>("SplineBinningTree");
+  std::vector<int> indices(3);
+  SplineBinningTree->SetBranchAddress("i", &indices[0]);
+  SplineBinningTree->SetBranchAddress("j", &indices[1]);
+  SplineBinningTree->SetBranchAddress("k", &indices[2]);
+  TAxis* axis = nullptr;
+  SplineBinningTree->SetBranchAddress("axis", &axis);
+
+  // Reconstruct TAxis objects
+  for (Long64_t entry = 0; entry < SplineBinningTree->GetEntries(); ++entry) {
+    SplineBinningTree->GetEntry(entry);
+    int i = indices[0];
+    int j = indices[1];
+    int k = indices[2];
+    SplineBinning[i][j][k] = static_cast<TAxis*>(axis->Clone());
+  }
+
+  std::vector<int> indices_mode(3);
+  int mode_value;
+  TTree *SplineModeTree = SplineFile->Get<TTree>("SplineModeTree");
+  SplineModeTree->SetBranchAddress("i", &indices_mode[0]);
+  SplineModeTree->SetBranchAddress("j", &indices_mode[1]);
+  SplineModeTree->SetBranchAddress("k", &indices_mode[2]);
+  SplineModeTree->SetBranchAddress("value", &mode_value);
+
+  // Fill SplineModeVecs with values from the tree
+  for (Long64_t entry = 0; entry < SplineModeTree->GetEntries(); ++entry) {
+    SplineModeTree->GetEntry(entry);
+    int i = indices_mode[0];
+    int j = indices_mode[1];
+    int k = indices_mode[2];
+    SplineModeVecs[i][j][k] = mode_value;
+  }
+}
+
+// *****************************************
+// Save SplineMonolith into ROOT file
+void BinnedSplineHandler::PrepareSplineFile(std::string FileName) {
+// *****************************************
+  if (std::getenv("MACH3") != nullptr) {
+    FileName.insert(0, std::string(std::getenv("MACH3"))+"/");
+  }
+  // Check for spaces in the filename
+  size_t pos = FileName.find(' ');
+  if (pos != std::string::npos) {
+    MACH3LOG_WARN("Filename ({}) contains spaces. Replacing spaces with underscores.", FileName);
+    while ((pos = FileName.find(' ')) != std::string::npos) {
+      FileName[pos] = '_';
+    }
+  }
+
+  auto SplineFile = std::make_unique<TFile>(FileName.c_str(), "recreate");
+  PrepareSettingsDir(SplineFile);
+  PrepareMonolithDir(SplineFile);
+  PrepareIndexDir(SplineFile);
+  PrepareOtherInfoDir(SplineFile);
+  PrepareFastSplineInfoDir(SplineFile);
+
+  SplineFile->Close();
+}
+
+// *****************************************
+void BinnedSplineHandler::PrepareSettingsDir(std::unique_ptr<TFile>& SplineFile) const {
+// *****************************************
+  TTree *Settings = new TTree("Settings", "Settings");
+  int CoeffIndex_temp = CoeffIndex;
+  int MonolithSize_temp = MonolithSize;
+  short int nParams_temp = nParams;
+
+  Settings->Branch("CoeffIndex", &CoeffIndex_temp, "CoeffIndex/I");
+  Settings->Branch("MonolithSize", &MonolithSize_temp, "MonolithSize/I");
+  Settings->Branch("nParams", &nParams_temp, "nParams/S");
+
+  int indexvec_sizes[7];
+  indexvec_sizes[0] = static_cast<int>(indexvec.size());
+  indexvec_sizes[1] = (indexvec_sizes[0] > 0) ? static_cast<int>(indexvec[0].size()) : 0;
+  indexvec_sizes[2] = (indexvec_sizes[1] > 0) ? static_cast<int>(indexvec[0][0].size()) : 0;
+  indexvec_sizes[3] = (indexvec_sizes[2] > 0) ? static_cast<int>(indexvec[0][0][0].size()) : 0;
+  indexvec_sizes[4] = (indexvec_sizes[3] > 0) ? static_cast<int>(indexvec[0][0][0][0].size()) : 0;
+  indexvec_sizes[5] = (indexvec_sizes[4] > 0) ? static_cast<int>(indexvec[0][0][0][0][0].size()) : 0;
+  indexvec_sizes[6] = (indexvec_sizes[5] > 0) ? static_cast<int>(indexvec[0][0][0][0][0][0].size()) : 0;
+
+  for (int i = 0; i < 7; ++i) {
+    Settings->Branch(("indexvec_size" + std::to_string(i+1)).c_str(),
+                     &indexvec_sizes[i], ("indexvec_size" + std::to_string(i+1) + "/I").c_str());
+  }
+
+  int SplineBinning_size1 = static_cast<int>(SplineBinning.size());
+  int SplineBinning_size2 = (SplineBinning_size1 > 0) ? static_cast<int>(SplineBinning[0].size()) : 0;
+  int SplineBinning_size3 = (SplineBinning_size2 > 0) ? static_cast<int>(SplineBinning[0][0].size()) : 0;
+
+  Settings->Branch("SplineBinning_size1", &SplineBinning_size1, "SplineBinning_size1/I");
+  Settings->Branch("SplineBinning_size2", &SplineBinning_size2, "SplineBinning_size2/I");
+  Settings->Branch("SplineBinning_size3", &SplineBinning_size3, "SplineBinning_size3/I");
+
+  int SplineModeVecs_size1 = static_cast<int>(SplineModeVecs.size());
+  int SplineModeVecs_size2 = (SplineModeVecs_size1 > 0) ? static_cast<int>(SplineModeVecs[0].size()) : 0;
+  int SplineModeVecs_size3 = (SplineModeVecs_size2 > 0) ? static_cast<int>(SplineModeVecs[0][0].size()) : 0;
+
+  Settings->Branch("SplineModeVecs_size1", &SplineModeVecs_size1, "SplineModeVecs_size1/I");
+  Settings->Branch("SplineModeVecs_size2", &SplineModeVecs_size2, "SplineModeVecs_size2/I");
+  Settings->Branch("SplineModeVecs_size3", &SplineModeVecs_size3, "SplineModeVecs_size3/I");
+
+  std::vector<std::string> SampleNames_temp = SampleNames;
+  Settings->Branch("SampleNames", &SampleNames_temp);
+
+  Settings->Fill();
+  SplineFile->cd();
+  Settings->Write();
+  delete Settings;
+}
+
+// *****************************************
+void BinnedSplineHandler::PrepareMonolithDir(std::unique_ptr<TFile>& SplineFile) const {
+// *****************************************
+  TTree *MonolithTree = new TTree("MonolithTree", "MonolithTree");
+  MonolithTree->Branch("manycoeff", manycoeff_arr, Form("manycoeff[%d]/%s", CoeffIndex * _nCoeff_, M3::float_t_str));
+  MonolithTree->Branch("isflatarray", isflatarray, Form("isflatarray[%d]/O", MonolithSize));
+
+  std::vector<int> coeffindexvec_temp = coeffindexvec;
+  MonolithTree->Branch("coeffindexvec", &coeffindexvec_temp);
+  std::vector<int> uniquecoeffindices_temp = uniquecoeffindices;
+  MonolithTree->Branch("uniquecoeffindices", &uniquecoeffindices_temp);
+  std::vector<int> uniquesplinevec_Monolith_temp = uniquesplinevec_Monolith;
+  MonolithTree->Branch("uniquesplinevec_Monolith", &uniquesplinevec_Monolith_temp);
+  std::vector<int> UniqueSystIndices_temp = UniqueSystIndices;
+  MonolithTree->Branch("UniqueSystIndices", &UniqueSystIndices_temp);
+  MonolithTree->Branch("xcoeff", xcoeff_arr, Form("xcoeff[%d]/%s", CoeffIndex, M3::float_t_str));
+
+  MonolithTree->Fill();
+  SplineFile->cd();
+  MonolithTree->Write();
+  delete MonolithTree;
+}
+
+// *****************************************
+void BinnedSplineHandler::PrepareIndexDir(std::unique_ptr<TFile>& SplineFile) const {
+// *****************************************
+  // Create a TTree to store the data
+  TTree *IndexTree = new TTree("IndexVec", "IndexVec");
+
+  // Vector holding the 7 dims
+  std::vector<int> Dim(7);
+  int value;
+
+  // Create branches for each dimension
+  for (int d = 0; d < 7; ++d) {
+    IndexTree->Branch(Form("dim%d", d+1), &Dim[d], Form("dim%d/I", d+1));
+  }
+  IndexTree->Branch("value", &value, "value/I");
+
+  // Fill the tree
+  for (size_t i = 0; i < indexvec.size(); ++i) {
+    for (size_t j = 0; j < indexvec[i].size(); ++j) {
+      for (size_t k = 0; k < indexvec[i][j].size(); ++k) {
+        for (size_t l = 0; l < indexvec[i][j][k].size(); ++l) {
+          for (size_t m = 0; m < indexvec[i][j][k][l].size(); ++m) {
+            for (size_t n = 0; n < indexvec[i][j][k][l][m].size(); ++n) {
+              for (size_t p = 0; p < indexvec[i][j][k][l][m][n].size(); ++p) {
+                Dim[0] = static_cast<int>(i);
+                Dim[1] = static_cast<int>(j);
+                Dim[2] = static_cast<int>(k);
+                Dim[3] = static_cast<int>(l);
+                Dim[4] = static_cast<int>(m);
+                Dim[5] = static_cast<int>(n);
+                Dim[6] = static_cast<int>(p);
+                value = static_cast<int>(indexvec[i][j][k][l][m][n][p]);
+                IndexTree->Fill();
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  SplineFile->cd();
+  // Write the tree to the file
+  IndexTree->Write();
+  delete IndexTree;
+}
+
+// *****************************************
+void BinnedSplineHandler::PrepareOtherInfoDir(std::unique_ptr<TFile>& SplineFile) const {
+// *****************************************
+  // Create a new tree for SplineBinning data
+  TTree *SplineBinningTree = new TTree("SplineBinningTree", "SplineBinningTree");
+  std::vector<int> indices(3); // To store the 3D indices
+  TAxis* axis = nullptr;
+  SplineBinningTree->Branch("i", &indices[0], "i/I");
+  SplineBinningTree->Branch("j", &indices[1], "j/I");
+  SplineBinningTree->Branch("k", &indices[2], "k/I");
+  SplineBinningTree->Branch("axis", "TAxis", &axis);
+
+  // Fill the SplineBinningTree
+  for (size_t i = 0; i < SplineBinning.size(); ++i) {
+    for (size_t j = 0; j < SplineBinning[i].size(); ++j) {
+      for (size_t k = 0; k < SplineBinning[i][j].size(); ++k) {
+        axis = SplineBinning[i][j][k];
+        indices[0] = static_cast<int>(i);
+        indices[1] = static_cast<int>(j);
+        indices[2] = static_cast<int>(k);
+        SplineBinningTree->Fill();
+      }
+    }
+  }
+  SplineFile->cd();
+  SplineBinningTree->Write();
+  delete SplineBinningTree;
+
+  std::vector<int> indices_mode(3); // to store 3D indices
+  int mode_value;
+
+  TTree *SplineModeTree = new TTree("SplineModeTree", "SplineModeTree");
+  // Create branches for indices and value
+  SplineModeTree->Branch("i", &indices_mode[0], "i/I");
+  SplineModeTree->Branch("j", &indices_mode[1], "j/I");
+  SplineModeTree->Branch("k", &indices_mode[2], "k/I");
+  SplineModeTree->Branch("value", &mode_value, "value/I");
+
+  // Fill the tree
+  for (size_t i = 0; i < SplineModeVecs.size(); ++i) {
+    for (size_t j = 0; j < SplineModeVecs[i].size(); ++j) {
+      for (size_t k = 0; k < SplineModeVecs[i][j].size(); ++k) {
+        indices_mode[0] = static_cast<int>(i);
+        indices_mode[1] = static_cast<int>(j);
+        indices_mode[2] = static_cast<int>(k);
+        mode_value = SplineModeVecs[i][j][k];
+        SplineModeTree->Fill();
+      }
+    }
+  }
+  // Write the tree to the file
+  SplineFile->cd();
+  SplineModeTree->Write();
+  delete SplineModeTree;
 }
