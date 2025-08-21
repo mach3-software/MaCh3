@@ -54,7 +54,7 @@ var searchData=
   ['pcahandler_2eh_51',['PCAHandler.h',['../PCAHandler_8h.html',1,'']]],
   ['pcaobj_52',['PCAObj',['../classParameterHandlerBase.html#a8d3b05f6bb6ec3f334af6d9891fa031e',1,'ParameterHandlerBase']]],
   ['pdgs_53',['pdgs',['../structFunctionalParameter.html#a9ac723d8cbffaa9adc498942d3c9d7c0',1,'FunctionalParameter::pdgs()'],['../structNormParameter.html#a7f6ae54467bd8b8541e1dd5314610a1a',1,'NormParameter::pdgs()']]],
-  ['pdgtonuoscillatorflavour_54',['PDGToNuOscillatorFlavour',['../namespaceMaCh3Utils.html#a8152408c87ebdf1f28204c54f01384d5',1,'MaCh3Utils']]],
+  ['pdgtonuoscillatorflavour_54',['PDGToNuOscillatorFlavour',['../namespaceMaCh3Utils.html#a6be7338cc227b739251d75b6ec3f4b6d',1,'MaCh3Utils']]],
   ['penaltyterm_55',['PenaltyTerm',['../classPredictiveThrower.html#a10b73ebca659a2162a9869f2696ee7b2',1,'PredictiveThrower']]],
   ['performjarlskoganalysis_56',['PerformJarlskogAnalysis',['../classOscProcessor.html#ae6f3fc0b305b124494de8dc279dd2388',1,'OscProcessor']]],
   ['personal_5fbest_5fposition_57',['personal_best_position',['../classparticle.html#a8b36e78ddaa8737f8d1d3d1b39e6924f',1,'particle']]],

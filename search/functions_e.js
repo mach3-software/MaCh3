@@ -15,7 +15,7 @@ var searchData=
   ['parselocation_12',['parseLocation',['../classMaCh3Plotting_1_1InputManager.html#a041b9611ce812326995c54f8c73c4867',1,'MaCh3Plotting::InputManager']]],
   ['particle_13',['particle',['../classparticle.html#a7ad06fab12e86c9dbf2e0a5e8c794cae',1,'particle']]],
   ['pcahandler_14',['PCAHandler',['../classPCAHandler.html#aabaaecfe5909a6cffbcc0e1a385615fa',1,'PCAHandler']]],
-  ['pdgtonuoscillatorflavour_15',['PDGToNuOscillatorFlavour',['../namespaceMaCh3Utils.html#a8152408c87ebdf1f28204c54f01384d5',1,'MaCh3Utils']]],
+  ['pdgtonuoscillatorflavour_15',['PDGToNuOscillatorFlavour',['../namespaceMaCh3Utils.html#a6be7338cc227b739251d75b6ec3f4b6d',1,'MaCh3Utils']]],
   ['performjarlskoganalysis_16',['PerformJarlskogAnalysis',['../classOscProcessor.html#ae6f3fc0b305b124494de8dc279dd2388',1,'OscProcessor']]],
   ['plotautocorr_17',['PlotAutoCorr',['../PlotMCMCDiag_8cpp.html#adb34dab2a00b2675057f9860468b0a6b',1,'PlotMCMCDiag.cpp']]],
   ['plotaverageacmult_18',['PlotAverageACMult',['../PlotMCMCDiag_8cpp.html#aaff1fd9271707426d962ec32b2690f5a',1,'PlotMCMCDiag.cpp']]],
