@@ -35,7 +35,7 @@ var searchData=
   ['checkbonferonicorrectedpvalue_32',['CheckBonferoniCorrectedpValue',['../StatisticalUtils_8h.html#adba5abb16555092305a8b459f94a24c1',1,'CheckBonferoniCorrectedpValue(const std::vector&lt; std::string &gt; &amp;SampleNameVec, const std::vector&lt; double &gt; &amp;PValVec, const double Threshold=0.05):&#160;StatisticalUtils.cpp'],['../StatisticalUtils_8cpp.html#ac1d08556f305467a4fbf68adae1d93c9',1,'CheckBonferoniCorrectedpValue(const std::vector&lt; std::string &gt; &amp;SampleNameVec, const std::vector&lt; double &gt; &amp;PValVec, const double Threshold):&#160;StatisticalUtils.cpp']]],
   ['checkbounds_33',['CheckBounds',['../classParameterHandlerBase.html#afbe38e4608749a1081a1ece01855d927',1,'ParameterHandlerBase']]],
   ['checkcorrectinitialisation_34',['CheckCorrectInitialisation',['../classParameterHandlerGeneric.html#a7bd990c506d4f8927fcdcb15d7c3d24b',1,'ParameterHandlerGeneric']]],
-  ['checkcredibleintervalsorder_35',['CheckCredibleIntervalsOrder',['../classMCMCProcessor.html#ade917a46fb88e77afbfe47aec2aaa839',1,'MCMCProcessor']]],
+  ['checkcredibleintervalsorder_35',['CheckCredibleIntervalsOrder',['../classMCMCProcessor.html#aa7db7e3aa4403a239b8b2b865cea91f6',1,'MCMCProcessor']]],
   ['checkcredibleregionsorder_36',['CheckCredibleRegionsOrder',['../classMCMCProcessor.html#ab11b70175cd1e63722942a063192968a',1,'MCMCProcessor']]],
   ['checkfolder_37',['CheckFolder',['../CombineMaCh3Chains_8cpp.html#ac53d31a86c4bc38237c950be4fe9603d',1,'CombineMaCh3Chains.cpp']]],
   ['checkgpumem_38',['checkGpuMem',['../gpuUtils_8cuh.html#a5cfcf006bd817b3cff5da08c7f0ecb5e',1,'checkGpuMem():&#160;gpuUtils.cu'],['../gpuUtils_8cu.html#a5cfcf006bd817b3cff5da08c7f0ecb5e',1,'checkGpuMem():&#160;gpuUtils.cu']]],
