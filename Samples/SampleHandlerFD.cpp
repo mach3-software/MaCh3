@@ -882,7 +882,7 @@ void SampleHandlerFD::SetupReweightArrays(const size_t numberXBins, const size_t
 
   // Set total number of bins
   Binning.nBins = Binning.nXBins * Binning.nYBins;
-
+  Binning.GlobalOffset = 0;
   SampleHandlerFD_array = new double[Binning.nBins];
   SampleHandlerFD_array_w2 = new double[Binning.nBins];
   SampleHandlerFD_data = new double[Binning.nBins];

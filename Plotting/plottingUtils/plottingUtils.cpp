@@ -7,7 +7,7 @@ namespace MaCh3Plotting {
 /// and last points it will extend the binning out of the graph bounds using the width between the
 /// outermost and second outermost points. This can be useful if e.g. you want to draw cumulative
 /// stacks of LLH scans.
-TH1D TGraphToTH1D(TGraph graph, std::string newName, std::string newTitle) {
+TH1D TGraphToTH1D(TGraph graph, const std::string& newName, const std::string& newTitle) {
   std::string name;
   std::string title;
 

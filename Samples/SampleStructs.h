@@ -178,6 +178,8 @@ struct SampleBinningInfo {
   size_t nYBins = M3::_BAD_INT_;
   /// Number of total bins
   size_t nBins = M3::_BAD_INT_;
+  /// If you have binning for multiple samples and trying to define 1D vector let's
+  size_t GlobalOffset = M3::_BAD_INT_;
 
   /// lower to check if Eb has moved the erec bin
   std::vector<double> rw_lower_xbinedge;
@@ -196,7 +198,7 @@ struct SampleBinningInfo {
     return static_cast<int>(yBin * nXBins + xBin);
   }
 
-  /// @brief Get linear bin index from 2D bin indices with additional checsk
+  /// @brief Get linear bin index from 2D bin indices with additional checks
   /// @param xBin The bin index along the X axis (0-based)
   /// @param yBin The bin index along the Y axis (0-based)
   /// @return The linear bin index corresponding to (xBin, yBin)
@@ -208,6 +210,13 @@ struct SampleBinningInfo {
       throw MaCh3Exception(__FILE__, __LINE__);
     }
     return GetBin(xBin, yBin);
+  }
+
+  /// @brief Calculates the global bin number for a given 2D bin, accounting for multiple binning samples.
+  /// @param xBin The bin index along the X axis (0-based)
+  /// @param yBin The bin index along the Y axis (0-based)
+  int GetBinGlobal(const int xBin, const int yBin) const {
+    return static_cast<int>(GlobalOffset + GetBin(xBin, yBin));
   }
 
   /// @brief DB Find the relevant bin in the PDF for each event
@@ -237,6 +246,40 @@ struct SampleBinningInfo {
     }
   }
 };
+
+/// @brief Get the sample index corresponding to a global bin number.
+/// @param BinningInfo Vector of SampleBinningInfo structs.
+/// @param GlobalBin The global bin number.
+/// @return The index of the sample, or garbage if not found.
+inline int GetSampleFromGlobalBin(const std::vector<SampleBinningInfo>& BinningInfo, const size_t GlobalBin) {
+  for (size_t iSample = 0; iSample < BinningInfo.size(); ++iSample) {
+    const SampleBinningInfo& info = BinningInfo[iSample];
+    if (GlobalBin >= info.GlobalOffset && GlobalBin < info.GlobalOffset + info.nBins) {
+      return static_cast<int>(iSample);
+    }
+  }
+
+  MACH3LOG_ERROR("Couldn't find sample corresponding to bin {}", GlobalBin);
+  throw MaCh3Exception(__FILE__, __LINE__);
+
+  // GlobalBin is out of range for all samples
+  return M3::_BAD_INT_;
+}
+
+/// @brief Sets the GlobalOffset for each SampleBinningInfo to enable linearization of multiple 2D binning samples.
+/// @param BinningInfo Vector of SampleBinningInfo structs to be updated with global offsets.
+inline void SetGlobalBinNumbers(std::vector<SampleBinningInfo>& BinningInfo){
+  if (BinningInfo.empty()) {
+    MACH3LOG_ERROR("No binning samples provided.");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  size_t GlobalOffsetCounter = 0;
+  for(size_t iSample = 0; iSample < BinningInfo.size(); iSample++){
+    BinningInfo[iSample].GlobalOffset = GlobalOffsetCounter;
+    GlobalOffsetCounter += BinningInfo[iSample].nBins;
+  }
+}
 
 // ***************************
 // A handy namespace for variables extraction
@@ -304,7 +347,7 @@ namespace MaCh3Utils {
   /// @brief Convert from PDG flavour to NuOscillator type
   /// beware that in the case of anti-neutrinos the NuOscillator
   /// type simply gets multiplied by -1
-  inline int PDGToNuOscillatorFlavour(int NuPdg){
+  inline int PDGToNuOscillatorFlavour(const int NuPdg){
     int NuOscillatorFlavour = M3::_BAD_INT_;
     switch(std::abs(NuPdg)){
       case NuPDG::kNue:

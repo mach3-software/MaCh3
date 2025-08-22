@@ -67,6 +67,8 @@ namespace MaCh3Utils {
   /// @brief KS: Print Yaml config using logger
   /// @param node yaml config node
   void PrintConfig(const YAML::Node& node);
+  /// @param tree content of TTree using logger
+  void Print(const TTree* tree);
   /// @brief KS: Almost all MaCh3 executables have the same usage, prepare simple printer
   /// @param argc The number of command-line arguments.
   /// @param argv The array of command-line arguments.

@@ -15,9 +15,9 @@ InputManager::InputManager(const std::string &translationConfigName) {
   _samplesConfig = _translatorConfig["Samples"];
 
   // check the config file and get which parameters, samples, and fitters we've been told about
-  _knownFitters = _fitterSpecConfig["fitters"].as<std::vector<std::string>>();
-  _knownParameters = _parametersConfig["Parameters"].as<std::vector<std::string>>();
-  _knownSamples = _samplesConfig["Samples"].as<std::vector<std::string>>();
+  _knownFitters = Get<std::vector<std::string>>(_fitterSpecConfig["fitters"], __FILE__, __LINE__);
+  _knownParameters = Get<std::vector<std::string>>(_parametersConfig["Parameters"], __FILE__, __LINE__);
+  _knownSamples = Get<std::vector<std::string>>(_samplesConfig["Samples"], __FILE__, __LINE__);
 
   MACH3LOG_DEBUG("Will now check the specified parameters for tags");
 
@@ -31,7 +31,7 @@ InputManager::InputManager(const std::string &translationConfigName) {
     {
       if ( _parametersConfig[param]["tags"] )
       {
-        tags = _parametersConfig[param]["tags"].as<std::vector<std::string>>();
+        tags = Get<std::vector<std::string>>(_parametersConfig[param]["tags"], __FILE__, __LINE__);
         MACH3LOG_DEBUG("  - Found {}!", tags.size());
       }
     }
@@ -50,7 +50,7 @@ InputManager::InputManager(const std::string &translationConfigName) {
     {
       if ( _samplesConfig[samp]["tags"] )
       {
-        tags = _samplesConfig[samp]["tags"].as<std::vector<std::string>>();
+        tags = Get<std::vector<std::string>>(_samplesConfig[samp]["tags"], __FILE__, __LINE__);
         MACH3LOG_DEBUG("  - Found {}!", tags.size());
       }
     }
@@ -106,8 +106,8 @@ void InputManager::print(const std::string &printLevel) const {
   MACH3LOG_INFO("");
 }
 
-double InputManager::getPostFitError(int fileNum, const std::string &paramName,
-                                          std::string errorType) const {
+double InputManager::getPostFitError(const int fileNum, const std::string &paramName,
+                                     std::string errorType) const {
   const InputFile &inputFileDef = getFile(fileNum);
 
   // set default type if not specified
@@ -129,13 +129,13 @@ double InputManager::getPostFitError(int fileNum, const std::string &paramName,
     return inputFileDef.postFitErrors.at(errorType).at(paramName);
   }
 
-  MACH3LOG_WARN("Didn't fnd {} post fit error for {}. Returning {}", errorType, paramName, M3::_BAD_DOUBLE_);
+  MACH3LOG_WARN("Didn't find {} post fit error for {}. Returning {}", errorType, paramName, M3::_BAD_DOUBLE_);
 
   return M3::_BAD_DOUBLE_;
 }
 
-double InputManager::getPostFitValue(int fileNum, const std::string &paramName,
-                                          std::string errorType) const {
+double InputManager::getPostFitValue(const int fileNum, const std::string &paramName,
+                                     std::string errorType) const {
   const InputFile &inputFileDef = getFile(fileNum);
 
   // set default type if not specified
@@ -157,7 +157,7 @@ double InputManager::getPostFitValue(int fileNum, const std::string &paramName,
     return inputFileDef.postFitValues.at(errorType).at(paramName);
   }
   
-  MACH3LOG_WARN("Didn't fnd {} post fit value for {}. Returning {}", errorType, paramName, M3::_BAD_DOUBLE_);
+  MACH3LOG_WARN("Didn't find {} post fit value for {}. Returning {}", errorType, paramName, M3::_BAD_DOUBLE_);
 
   return M3::_BAD_DOUBLE_;
 }
@@ -216,7 +216,7 @@ std::vector<std::string> InputManager::getTaggedValues(const std::vector<std::st
     {
       if ( tagCount > 0 ) retVec.push_back(val);
     }
-    else if ( checkType == "exect" )
+    else if ( checkType == "exact" )
     {
       // EM: note that this will break if duplicate tags are specified in either vector... so please don't do that
       if ( tagCount == valTags.size() ) retVec.push_back(val);
@@ -346,11 +346,9 @@ bool InputManager::findBySampleLLH(InputFile &inputFileDef, const std::string &p
 
   // EM: Get where the by sample LLH scan for this parameter *should* live if it exists
   YAML::Node testLLHConfig = thisFitterSpec_config["bySample_LLH"];
-  std::vector<std::string> testLLHRawLocations =
-      testLLHConfig["location"].as<std::vector<std::string>>();
+  auto testLLHRawLocations = Get<std::vector<std::string>>(testLLHConfig["location"], __FILE__, __LINE__);
 
-  std::string LLHObjType = thisFitterSpec_config["LLHObjectType"].as<std::string>();
-
+  auto LLHObjType = Get<std::string>(thisFitterSpec_config["LLHObjectType"], __FILE__, __LINE__);
   // EM: Now look for the parameter in this folder
   std::shared_ptr<TObject> LLHObj = nullptr;
   for (std::string rawLocation : testLLHRawLocations)
@@ -430,8 +428,8 @@ bool InputManager::find1dPosterior(InputFile &inputFileDef, const std::string &p
   YAML::Node thisFitterSpec_config = _fitterSpecConfig[fitter];
 
   if ( thisFitterSpec_config["1dPosteriors"] ) {
-    std::vector<std::string> rawLocations = thisFitterSpec_config["1dPosteriors"]["location"].as<std::vector<std::string>>();
-
+    auto rawLocations = Get<std::vector<std::string>>(thisFitterSpec_config["1dPosteriors"]["location"],
+                                                      __FILE__, __LINE__);
     for ( const std::string &rawLoc : rawLocations)
     {
       std::shared_ptr<TH1D> posterior1d = std::static_pointer_cast<TH1D>(findRootObject(inputFileDef, parseLocation(rawLoc, fitter, kMCMC, parameter)));
@@ -453,15 +451,14 @@ bool InputManager::find1dPosterior(InputFile &inputFileDef, const std::string &p
 
 bool InputManager::findPostFitParamError(InputFile &inputFileDef, const std::string &parameter,
                                          std::string &fitter, const std::string &errorType,
-                                         bool setInputFileError) {
+                                         const bool setInputFileError) {
   std::string specificName = getFitterSpecificParamName(fitter, kPostFit, parameter);
   YAML::Node thisFitterSpec_config = _fitterSpecConfig[fitter];
 
   // EM: Get which hist this parameter lives in from the config
   YAML::Node postFitErrorTypes = thisFitterSpec_config["postFitErrorTypes"];
   YAML::Node specificErrorType = postFitErrorTypes[errorType];
-  std::vector<std::string> postFitLocations =
-      specificErrorType["location"].as<std::vector<std::string>>();
+  auto postFitLocations = Get<std::vector<std::string>>(specificErrorType["location"], __FILE__, __LINE__);
 
   // EM: If the parameter has a specified list of locations then override the default one
   std::vector<std::string> postFitLocations_override;
@@ -502,7 +499,7 @@ bool InputManager::findPostFitParamError(InputFile &inputFileDef, const std::str
 
 // EM: Lots of room for improvement in fillFileInfo and fillFileData, should be split up into more
 // methods, currently a lot of copy pasting
-void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
+void InputManager::fillFileInfo(InputFile &inputFileDef, const bool printThoughts) {
   /// @todo Would like to be able to specify what kind of file and what fitter an input is from on the command like:
   /// e.g. like `plotApp [options] <fileName1>;<fileType>;<fitterName>... and only try to auto-detect it if its not specified, 
   /// this would save some time and would also be very helpful in situations where we can't auto-detect e.g. if there is some kind of 
@@ -538,8 +535,7 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
 
       // vector of all the possible locations that we might find LLH scans for this type of LLH
       YAML::Node testLLHConfig = thisFitterSpec_config[LLHType + "_LLH"];
-      std::vector<std::string> testLLHRawLocations =
-          testLLHConfig["location"].as<std::vector<std::string>>();
+      auto testLLHRawLocations = Get<std::vector<std::string>>(testLLHConfig["location"], __FILE__, __LINE__);
 
       // counter for the total number of parameters we find scans for
       numLLHParams = 0;
@@ -567,7 +563,7 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
       }
 
       if (printThoughts)
-        MACH3LOG_INFO(".... Found {}\n", numLLHParams);
+        MACH3LOG_INFO(".... Found {}", numLLHParams);
 
       if (numLLHParams > 0)
       {
@@ -595,7 +591,7 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
         YAML::Node postFitErrorSpec = thisFitterSpec_config["postFitErrorTypes"];
         YAML::Node defaultErrorType =
             postFitErrorSpec[thisFitterSpec_config["defaultPostFitErrorType"].as<std::string>()];
-        std::vector<std::string> locations = defaultErrorType["location"].as<std::vector<std::string>>();
+        auto locations = Get<std::vector<std::string>>(defaultErrorType["location"], __FILE__, __LINE__);
         for (std::string loc : locations)
           MACH3LOG_DEBUG(loc);
       } 
@@ -608,8 +604,8 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
     int numPostFitParams = 0;
     std::vector<std::string> enabledPostFitParams;
 
-    std::string defaultErrorType =
-        thisFitterSpec_config["defaultPostFitErrorType"].as<std::string>();
+    auto defaultErrorType =
+        Get<std::string>(thisFitterSpec_config["defaultPostFitErrorType"], __FILE__, __LINE__);
     for (std::string parameter : _knownParameters)
     {
       if (findPostFitParamError(inputFileDef, parameter, fitter, defaultErrorType))
@@ -620,7 +616,7 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
     }
 
     if (printThoughts)
-      MACH3LOG_INFO(".... Found {}\n", numPostFitParams);
+      MACH3LOG_INFO(".... Found {}", numPostFitParams);
 
     if (numPostFitParams > 0)
     {
@@ -673,8 +669,9 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
     if ( thisFitterSpec_config["MCMCsteps"] )
     {
       MACH3LOG_DEBUG("Initialising MCMCProcessor for the input file");
-      std::vector<std::string> posteriorTreeRawLocations = thisFitterSpec_config["MCMCsteps"]["location"].as<std::vector<std::string>>();
-      
+      auto posteriorTreeRawLocations =
+            Get<std::vector<std::string>>(thisFitterSpec_config["MCMCsteps"]["location"], __FILE__, __LINE__);
+
       TTree *postTree = nullptr;
       for ( const std::string &rawLoc: posteriorTreeRawLocations )
       {
@@ -762,7 +759,7 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
     {
       if (printThoughts)
       {
-        MACH3LOG_INFO("This is a {} file!\n", fitter);
+        MACH3LOG_INFO("This is a {} file!", fitter);
       }
       inputFileDef.fitter = fitter;
       return;
@@ -775,7 +772,7 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, bool printThoughts) {
   inputFileDef.fitter = "UNKNOWN_FITTER";
 }
 
-void InputManager::fillFileData(InputFile &inputFileDef, bool printThoughts) {
+void InputManager::fillFileData(InputFile &inputFileDef, const bool printThoughts) {
   // load in the data in the file using the info gotten above
   // EM: a lot of this is copy paste from above, could be better organised
   if (printThoughts)
@@ -785,7 +782,7 @@ void InputManager::fillFileData(InputFile &inputFileDef, bool printThoughts) {
 
   // set the default post fit error type so we can read it as default later
   inputFileDef.defaultErrorType =
-      thisFitterSpec_config["defaultPostFitErrorType"].as<std::string>();
+      Get<std::string>(thisFitterSpec_config["defaultPostFitErrorType"], __FILE__, __LINE__);
 
   // ########### First fill up the LLH vectors ############
   for (const std::string LLHType : {"sample", "penalty", "total"})
@@ -796,11 +793,10 @@ void InputManager::fillFileData(InputFile &inputFileDef, bool printThoughts) {
     // vector of all the possible locations that we might find LLH scans for this type of LLH
     YAML::Node testLLHConfig = thisFitterSpec_config[LLHType + "_LLH"];
     const std::vector<std::string> testLLHRawLocations =
-        testLLHConfig["location"].as<std::vector<std::string>>();
+        Get<std::vector<std::string>>(testLLHConfig["location"], __FILE__, __LINE__);
 
     // get the expected root object type of the llh scans
-    std::string LLHObjType = thisFitterSpec_config["LLHObjectType"].as<std::string>();
-
+    auto LLHObjType = Get<std::string>(thisFitterSpec_config["LLHObjectType"], __FILE__, __LINE__);
     // EM: now get the objects from the file
     for (const std::string &parameter : inputFileDef.availableParams_LLH)
     {
@@ -860,8 +856,9 @@ void InputManager::fillFileData(InputFile &inputFileDef, bool printThoughts) {
   // ####### Get the processed post fit errors #######
   for (const std::string &parameter : inputFileDef.availableParams_postFitErrors)
   {
-    std::vector<std::string> availableErrorTypes =
-        thisFitterSpec_config["AvailablePostFitErrorTypes"].as<std::vector<std::string>>();
+    auto availableErrorTypes = Get<std::vector<std::string>>(thisFitterSpec_config["AvailablePostFitErrorTypes"],
+                                                             __FILE__, __LINE__);
+
     for (const std::string &errorType : availableErrorTypes)
     {
       findPostFitParamError(inputFileDef, parameter, inputFileDef.fitter, errorType, true);
