@@ -326,6 +326,10 @@ void MCMCProcessor::MakePostfit() {
     leg->AddEntry(hpd.get(), Form("#splitline{HPD}{#mu = %.2f, #sigma = %.2f (+%.2f-%.2f)}", (*Means_HPD)(i), (*Errors_HPD)(i), (*Errors_HPD_Positive)(i), (*Errors_HPD_Negative)(i)), "l");
     leg->AddEntry(Asimov.get(), Form("#splitline{Prior}{x = %.2f , #sigma = %.2f}", Prior, PriorError), "l");
 
+    // Write to file
+    Posterior->SetName(Title);
+    Posterior->SetTitle(Title);
+
     //CW: Don't plot if this is a fixed histogram (i.e. the peak is the whole integral)
     if (hpost[i]->GetMaximum() == hpost[i]->Integral()*DrawRange) 
     {
@@ -348,10 +352,6 @@ void MCMCProcessor::MakePostfit() {
     // Store that this parameter is indeed being varied
     IamVaried[i] = true;
 
-    // Write to file
-    Posterior->SetName(Title);
-    Posterior->SetTitle(Title);
-
     // Draw onto the TCanvas
     hpost[i]->Draw();
     hpd->Draw("same");
@@ -372,13 +372,6 @@ void MCMCProcessor::MakePostfit() {
 
   OutputFile->cd();
   TTree *SettingsBranch = new TTree("Settings", "Settings");
-  int CrossSectionParameters = nParam[kXSecPar];
-  SettingsBranch->Branch("CrossSectionParameters", &CrossSectionParameters);
-  int CrossSectionParametersStartingPos = ParamTypeStartPos[kXSecPar];
-  SettingsBranch->Branch("CrossSectionParametersStartingPos", &CrossSectionParametersStartingPos);
-  int FluxParameters = GetGroup("Flux");
-  SettingsBranch->Branch("FluxParameters", &FluxParameters);
-  
   int NDParameters = nParam[kNDPar];
   SettingsBranch->Branch("NDParameters", &NDParameters);
   int NDParametersStartingPos = ParamTypeStartPos[kNDPar];
