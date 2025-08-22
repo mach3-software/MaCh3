@@ -34,7 +34,7 @@ var searchData=
   ['initsamples_31',['initSamples',['../pyMaCh3_8cpp.html#ac28013fb014a3532963849d5ca9b51c4',1,'initSamples(py::module &amp;):&#160;samples.cpp'],['../samples_8cpp.html#a76051d11f0be1cfea3b3489e61273910',1,'initSamples(py::module &amp;m):&#160;samples.cpp']]],
   ['initsplines_32',['initSplines',['../pyMaCh3_8cpp.html#a9602836ac8939de301ca4d9e696d6e7c',1,'initSplines(py::module &amp;):&#160;splines.cpp'],['../splines_8cpp.html#ac852d821e532f068df6194c6da0a7ad5',1,'initSplines(py::module &amp;m):&#160;splines.cpp']]],
   ['inpfilelist_33',['inpFileList',['../CombineMaCh3Chains_8cpp.html#a92bfb809a0500604336ae74b5198373b',1,'CombineMaCh3Chains.cpp']]],
-  ['input_34',['input',['../classMaCh3Plotting_1_1PlottingManager.html#afcde3593be0894c7c1dbef6fa9055dee',1,'MaCh3Plotting::PlottingManager']]],
+  ['input_34',['input',['../classMaCh3Plotting_1_1PlottingManager.html#a360841de706a8058712570c82a6dcfd1',1,'MaCh3Plotting::PlottingManager']]],
   ['inputfile_35',['InputFile',['../structMaCh3Plotting_1_1InputFile.html#adbd21c3ed9c5d161c61e661ad9058ae3',1,'MaCh3Plotting::InputFile::InputFile(InputFile &amp;&amp;)=default'],['../structMaCh3Plotting_1_1InputFile.html#a56fb9148b809f59df92e0dd6424cc589',1,'MaCh3Plotting::InputFile::InputFile(const InputFile &amp;)=delete'],['../structMaCh3Plotting_1_1InputFile.html#a527fa8b92b688c79b14aefcb09418c3f',1,'MaCh3Plotting::InputFile::InputFile(const std::string &amp;fName)']]],
   ['inputfile_36',['inputFile',['../classParameterHandlerBase.html#adb2f867014619b5c38b67cd981e40dcb',1,'ParameterHandlerBase']]],
   ['inputfile_37',['InputFile',['../structMaCh3Plotting_1_1InputFile.html',1,'MaCh3Plotting']]],

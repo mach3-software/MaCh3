@@ -138,7 +138,7 @@ Public Attributes</h2></td></tr>
 <tr class="memdesc:a076134d08d2b54e29e76431a42267a52"><td class="mdescLeft">&#160;</td><td class="mdescRight">The location of the underlying file.  <br /></td></tr>
 <tr class="separator:a076134d08d2b54e29e76431a42267a52"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6ad1094c5fb3dcd4479ef8fdf378370c"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMaCh3Plotting_1_1InputFile.html#a6ad1094c5fb3dcd4479ef8fdf378370c">fitter</a></td></tr>
-<tr class="memdesc:a6ad1094c5fb3dcd4479ef8fdf378370c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Which fitter this file came from, detected by <a class="el" href="classMaCh3Plotting_1_1InputManager.html#aad778d8694f9b581d09279584733f6ea">InputManager::fillFileInfo()</a>.  <br /></td></tr>
+<tr class="memdesc:a6ad1094c5fb3dcd4479ef8fdf378370c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Which fitter this file came from, detected by <a class="el" href="classMaCh3Plotting_1_1InputManager.html#a8a89fc87110fcfad0bfd77b3b572eae4">InputManager::fillFileInfo()</a>.  <br /></td></tr>
 <tr class="separator:a6ad1094c5fb3dcd4479ef8fdf378370c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7491ea81990748b02402796ee512f518"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMaCh3Plotting_1_1InputFile.html#a7491ea81990748b02402796ee512f518">hasLLHScans</a></td></tr>
 <tr class="memdesc:a7491ea81990748b02402796ee512f518"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether or not this file contains any log likelihood scans.  <br /></td></tr>
@@ -245,21 +245,27 @@ Public Attributes</h2></td></tr>
 <div class="line"><span class="lineno">   45</span>    <a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#a076134d08d2b54e29e76431a42267a52">fileName</a> = fName;</div>
 <div class="line"><span class="lineno">   46</span> </div>
 <div class="line"><span class="lineno">   47</span>    <a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#a11c074dd45647dd2957987f8b55f9d73">file</a> = std::make_shared&lt;TFile&gt;(<a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#a076134d08d2b54e29e76431a42267a52">fileName</a>.c_str());</div>
-<div class="line"><span class="lineno">   48</span>    <a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#a7491ea81990748b02402796ee512f518">hasLLHScans</a> = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">   49</span>    <a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#aad5e99c863e5992fdd04aafe3a1b6f84">hasPostFitErrors</a> = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">   50</span>    <a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#a7a953fd14a8a781ab4f0c53e2c1e13b7">hasSigmaVars</a> = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">   51</span> </div>
-<div class="line"><span class="lineno">   52</span>    <span class="keywordflow">for</span> (std::string LLHType : {<span class="stringliteral">&quot;sample&quot;</span>, <span class="stringliteral">&quot;penalty&quot;</span>, <span class="stringliteral">&quot;total&quot;</span>})</div>
-<div class="line"><span class="lineno">   53</span>    {</div>
-<div class="line"><span class="lineno">   54</span>      <a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#a28fa5364bec393769892aae24dfe32bb">hasLLHScans_map</a>[LLHType] = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">   55</span>    }</div>
-<div class="line"><span class="lineno">   56</span>  }</div>
-<div class="ttc" id="astructMaCh3Plotting_1_1InputFile_html_a076134d08d2b54e29e76431a42267a52"><div class="ttname"><a href="structMaCh3Plotting_1_1InputFile.html#a076134d08d2b54e29e76431a42267a52">MaCh3Plotting::InputFile::fileName</a></div><div class="ttdeci">std::string fileName</div><div class="ttdoc">The location of the underlying file.</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00112">inputManager.h:112</a></div></div>
-<div class="ttc" id="astructMaCh3Plotting_1_1InputFile_html_a11c074dd45647dd2957987f8b55f9d73"><div class="ttname"><a href="structMaCh3Plotting_1_1InputFile.html#a11c074dd45647dd2957987f8b55f9d73">MaCh3Plotting::InputFile::file</a></div><div class="ttdeci">std::shared_ptr&lt; TFile &gt; file</div><div class="ttdoc">Pointer to the underlying file for this InputFile instance.</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00111">inputManager.h:111</a></div></div>
-<div class="ttc" id="astructMaCh3Plotting_1_1InputFile_html_a28fa5364bec393769892aae24dfe32bb"><div class="ttname"><a href="structMaCh3Plotting_1_1InputFile.html#a28fa5364bec393769892aae24dfe32bb">MaCh3Plotting::InputFile::hasLLHScans_map</a></div><div class="ttdeci">std::unordered_map&lt; std::string, bool &gt; hasLLHScans_map</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00128">inputManager.h:128</a></div></div>
-<div class="ttc" id="astructMaCh3Plotting_1_1InputFile_html_a7491ea81990748b02402796ee512f518"><div class="ttname"><a href="structMaCh3Plotting_1_1InputFile.html#a7491ea81990748b02402796ee512f518">MaCh3Plotting::InputFile::hasLLHScans</a></div><div class="ttdeci">bool hasLLHScans</div><div class="ttdoc">Whether or not this file contains any log likelihood scans.</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00124">inputManager.h:124</a></div></div>
-<div class="ttc" id="astructMaCh3Plotting_1_1InputFile_html_a7a953fd14a8a781ab4f0c53e2c1e13b7"><div class="ttname"><a href="structMaCh3Plotting_1_1InputFile.html#a7a953fd14a8a781ab4f0c53e2c1e13b7">MaCh3Plotting::InputFile::hasSigmaVars</a></div><div class="ttdeci">bool hasSigmaVars</div><div class="ttdoc">Whether or not this file contains Sigma variations.</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00188">inputManager.h:188</a></div></div>
-<div class="ttc" id="astructMaCh3Plotting_1_1InputFile_html_aad5e99c863e5992fdd04aafe3a1b6f84"><div class="ttname"><a href="structMaCh3Plotting_1_1InputFile.html#aad5e99c863e5992fdd04aafe3a1b6f84">MaCh3Plotting::InputFile::hasPostFitErrors</a></div><div class="ttdeci">bool hasPostFitErrors</div><div class="ttdoc">Whether or not this file contains any processed post fit errors.</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00155">inputManager.h:155</a></div></div>
+<div class="line"><span class="lineno">   48</span>    <span class="keywordflow">if</span> (<a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#a11c074dd45647dd2957987f8b55f9d73">file</a>-&gt;IsZombie()) {</div>
+<div class="line"><span class="lineno">   49</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Failed to open file: {}&quot;</span>, <a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#a076134d08d2b54e29e76431a42267a52">fileName</a>);</div>
+<div class="line"><span class="lineno">   50</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
+<div class="line"><span class="lineno">   51</span>    }</div>
+<div class="line"><span class="lineno">   52</span>    <a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#a7491ea81990748b02402796ee512f518">hasLLHScans</a> = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">   53</span>    <a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#aad5e99c863e5992fdd04aafe3a1b6f84">hasPostFitErrors</a> = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">   54</span>    <a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#a7a953fd14a8a781ab4f0c53e2c1e13b7">hasSigmaVars</a> = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">   55</span> </div>
+<div class="line"><span class="lineno">   56</span>    <span class="keywordflow">for</span> (std::string LLHType : {<span class="stringliteral">&quot;sample&quot;</span>, <span class="stringliteral">&quot;penalty&quot;</span>, <span class="stringliteral">&quot;total&quot;</span>})</div>
+<div class="line"><span class="lineno">   57</span>    {</div>
+<div class="line"><span class="lineno">   58</span>      <a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#a28fa5364bec393769892aae24dfe32bb">hasLLHScans_map</a>[LLHType] = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">   59</span>    }</div>
+<div class="line"><span class="lineno">   60</span>  }</div>
+<div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00025">MaCh3Logger.h:25</a></div></div>
+<div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00013">MaCh3Exception.h:13</a></div></div>
+<div class="ttc" id="astructMaCh3Plotting_1_1InputFile_html_a076134d08d2b54e29e76431a42267a52"><div class="ttname"><a href="structMaCh3Plotting_1_1InputFile.html#a076134d08d2b54e29e76431a42267a52">MaCh3Plotting::InputFile::fileName</a></div><div class="ttdeci">std::string fileName</div><div class="ttdoc">The location of the underlying file.</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00116">inputManager.h:116</a></div></div>
+<div class="ttc" id="astructMaCh3Plotting_1_1InputFile_html_a11c074dd45647dd2957987f8b55f9d73"><div class="ttname"><a href="structMaCh3Plotting_1_1InputFile.html#a11c074dd45647dd2957987f8b55f9d73">MaCh3Plotting::InputFile::file</a></div><div class="ttdeci">std::shared_ptr&lt; TFile &gt; file</div><div class="ttdoc">Pointer to the underlying file for this InputFile instance.</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00115">inputManager.h:115</a></div></div>
+<div class="ttc" id="astructMaCh3Plotting_1_1InputFile_html_a28fa5364bec393769892aae24dfe32bb"><div class="ttname"><a href="structMaCh3Plotting_1_1InputFile.html#a28fa5364bec393769892aae24dfe32bb">MaCh3Plotting::InputFile::hasLLHScans_map</a></div><div class="ttdeci">std::unordered_map&lt; std::string, bool &gt; hasLLHScans_map</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00132">inputManager.h:132</a></div></div>
+<div class="ttc" id="astructMaCh3Plotting_1_1InputFile_html_a7491ea81990748b02402796ee512f518"><div class="ttname"><a href="structMaCh3Plotting_1_1InputFile.html#a7491ea81990748b02402796ee512f518">MaCh3Plotting::InputFile::hasLLHScans</a></div><div class="ttdeci">bool hasLLHScans</div><div class="ttdoc">Whether or not this file contains any log likelihood scans.</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00128">inputManager.h:128</a></div></div>
+<div class="ttc" id="astructMaCh3Plotting_1_1InputFile_html_a7a953fd14a8a781ab4f0c53e2c1e13b7"><div class="ttname"><a href="structMaCh3Plotting_1_1InputFile.html#a7a953fd14a8a781ab4f0c53e2c1e13b7">MaCh3Plotting::InputFile::hasSigmaVars</a></div><div class="ttdeci">bool hasSigmaVars</div><div class="ttdoc">Whether or not this file contains Sigma variations.</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00192">inputManager.h:192</a></div></div>
+<div class="ttc" id="astructMaCh3Plotting_1_1InputFile_html_aad5e99c863e5992fdd04aafe3a1b6f84"><div class="ttname"><a href="structMaCh3Plotting_1_1InputFile.html#aad5e99c863e5992fdd04aafe3a1b6f84">MaCh3Plotting::InputFile::hasPostFitErrors</a></div><div class="ttdeci">bool hasPostFitErrors</div><div class="ttdoc">Whether or not this file contains any processed post fit errors.</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00159">inputManager.h:159</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -340,13 +346,13 @@ Public Attributes</h2></td></tr>
 
 <p>Destructor. </p>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00068">68</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   68</span>               {</div>
-<div class="line"><span class="lineno">   69</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;###### Deleting InputFile Object holding file ######&quot;</span>);</div>
-<div class="line"><span class="lineno">   70</span>    <a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#a6a2aa0adbbb56a35805fe8cfd8cb167e">LLHScans_map</a>.clear();</div>
-<div class="line"><span class="lineno">   71</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00072">72</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   72</span>               {</div>
+<div class="line"><span class="lineno">   73</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;###### Deleting InputFile Object holding file ######&quot;</span>);</div>
+<div class="line"><span class="lineno">   74</span>    <a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#a6a2aa0adbbb56a35805fe8cfd8cb167e">LLHScans_map</a>.clear();</div>
+<div class="line"><span class="lineno">   75</span>  }</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a4db4657acad5c79ac4bbb66a9d1c5905"><div class="ttname"><a href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a></div><div class="ttdeci">#define MACH3LOG_DEBUG</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00022">MaCh3Logger.h:22</a></div></div>
-<div class="ttc" id="astructMaCh3Plotting_1_1InputFile_html_a6a2aa0adbbb56a35805fe8cfd8cb167e"><div class="ttname"><a href="structMaCh3Plotting_1_1InputFile.html#a6a2aa0adbbb56a35805fe8cfd8cb167e">MaCh3Plotting::InputFile::LLHScans_map</a></div><div class="ttdeci">std::unordered_map&lt; std::string, std::unordered_map&lt; std::string, std::shared_ptr&lt; TGraph &gt; &gt; &gt; LLHScans_map</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00131">inputManager.h:131</a></div></div>
+<div class="ttc" id="astructMaCh3Plotting_1_1InputFile_html_a6a2aa0adbbb56a35805fe8cfd8cb167e"><div class="ttname"><a href="structMaCh3Plotting_1_1InputFile.html#a6a2aa0adbbb56a35805fe8cfd8cb167e">MaCh3Plotting::InputFile::LLHScans_map</a></div><div class="ttdeci">std::unordered_map&lt; std::string, std::unordered_map&lt; std::string, std::shared_ptr&lt; TGraph &gt; &gt; &gt; LLHScans_map</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00135">inputManager.h:135</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -378,11 +384,11 @@ Public Attributes</h2></td></tr>
 <p>Should only be done once this <a class="el" href="structMaCh3Plotting_1_1InputFile.html" title="Struct which wraps around the actual input file and also holds general information,...">InputFile</a> is <em>done</em> with, should only really ever be done by the <a class="el" href="classMaCh3Plotting_1_1InputManager.html" title="This guy talks to the input files and is intended to smooth over the fact that our OA fitters use suc...">InputManager</a> that holds this object <br  />
  </p>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00075">75</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   75</span>              {</div>
-<div class="line"><span class="lineno">   76</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;[InputFile] closing file {}&quot;</span>, <a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#a076134d08d2b54e29e76431a42267a52">fileName</a>);</div>
-<div class="line"><span class="lineno">   77</span>    <a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#a11c074dd45647dd2957987f8b55f9d73">file</a>-&gt;Close();</div>
-<div class="line"><span class="lineno">   78</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00079">79</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   79</span>              {</div>
+<div class="line"><span class="lineno">   80</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;[InputFile] closing file {}&quot;</span>, <a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#a076134d08d2b54e29e76431a42267a52">fileName</a>);</div>
+<div class="line"><span class="lineno">   81</span>    <a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#a11c074dd45647dd2957987f8b55f9d73">file</a>-&gt;Close();</div>
+<div class="line"><span class="lineno">   82</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -410,26 +416,26 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Print out a more detailed summary of what is contained in the file. </p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000027">Todo:</a></b></dt><dd>Same as for <a class="el" href="structMaCh3Plotting_1_1InputFile.html#a4b3753ca1fa1a399e519aa15bca8658a" title="Print out a small summary of what is contained in the file.">Summarise()</a>, could add a check that the file info has actually been filled. </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000028">Todo:</a></b></dt><dd>Same as for <a class="el" href="structMaCh3Plotting_1_1InputFile.html#a4b3753ca1fa1a399e519aa15bca8658a" title="Print out a small summary of what is contained in the file.">Summarise()</a>, could add a check that the file info has actually been filled. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00093">93</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   93</span>                    {</div>
-<div class="line"><span class="lineno">   94</span>    <a class="code hl_function" href="structMaCh3Plotting_1_1InputFile.html#a4b3753ca1fa1a399e519aa15bca8658a">Summarise</a>();</div>
-<div class="line"><span class="lineno">   95</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Available LLH parameters: &quot;</span>);</div>
-<div class="line"><span class="lineno">   96</span>    <span class="keywordflow">for</span> (std::string paramName : <a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#a4244508b3b2f75b4e48a340684ddf3bc">availableParams_LLH</a>)</div>
-<div class="line"><span class="lineno">   97</span>    {</div>
-<div class="line"><span class="lineno">   98</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;  {}&quot;</span>, paramName);</div>
-<div class="line"><span class="lineno">   99</span>    }</div>
-<div class="line"><span class="lineno">  100</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Available Post Fit errors: &quot;</span>);</div>
-<div class="line"><span class="lineno">  101</span>    <span class="keywordflow">for</span> (std::string paramName : <a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#aaeae1c258a81785847831e0f3b5beae9">availableParams_postFitErrors</a>)</div>
-<div class="line"><span class="lineno">  102</span>    {</div>
-<div class="line"><span class="lineno">  103</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;  {}&quot;</span>, paramName);</div>
-<div class="line"><span class="lineno">  104</span>    }</div>
-<div class="line"><span class="lineno">  105</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00097">97</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   97</span>                    {</div>
+<div class="line"><span class="lineno">   98</span>    <a class="code hl_function" href="structMaCh3Plotting_1_1InputFile.html#a4b3753ca1fa1a399e519aa15bca8658a">Summarise</a>();</div>
+<div class="line"><span class="lineno">   99</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Available LLH parameters: &quot;</span>);</div>
+<div class="line"><span class="lineno">  100</span>    <span class="keywordflow">for</span> (std::string paramName : <a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#a4244508b3b2f75b4e48a340684ddf3bc">availableParams_LLH</a>)</div>
+<div class="line"><span class="lineno">  101</span>    {</div>
+<div class="line"><span class="lineno">  102</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;  {}&quot;</span>, paramName);</div>
+<div class="line"><span class="lineno">  103</span>    }</div>
+<div class="line"><span class="lineno">  104</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Available Post Fit errors: &quot;</span>);</div>
+<div class="line"><span class="lineno">  105</span>    <span class="keywordflow">for</span> (std::string paramName : <a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#aaeae1c258a81785847831e0f3b5beae9">availableParams_postFitErrors</a>)</div>
+<div class="line"><span class="lineno">  106</span>    {</div>
+<div class="line"><span class="lineno">  107</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;  {}&quot;</span>, paramName);</div>
+<div class="line"><span class="lineno">  108</span>    }</div>
+<div class="line"><span class="lineno">  109</span>  }</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00023">MaCh3Logger.h:23</a></div></div>
-<div class="ttc" id="astructMaCh3Plotting_1_1InputFile_html_a4244508b3b2f75b4e48a340684ddf3bc"><div class="ttname"><a href="structMaCh3Plotting_1_1InputFile.html#a4244508b3b2f75b4e48a340684ddf3bc">MaCh3Plotting::InputFile::availableParams_LLH</a></div><div class="ttdeci">std::vector&lt; std::string &gt; availableParams_LLH</div><div class="ttdoc">The parameters that this file contains likelihood scans for.</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00126">inputManager.h:126</a></div></div>
-<div class="ttc" id="astructMaCh3Plotting_1_1InputFile_html_a4b3753ca1fa1a399e519aa15bca8658a"><div class="ttname"><a href="structMaCh3Plotting_1_1InputFile.html#a4b3753ca1fa1a399e519aa15bca8658a">MaCh3Plotting::InputFile::Summarise</a></div><div class="ttdeci">void Summarise() const</div><div class="ttdoc">Print out a small summary of what is contained in the file.</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00083">inputManager.h:83</a></div></div>
-<div class="ttc" id="astructMaCh3Plotting_1_1InputFile_html_aaeae1c258a81785847831e0f3b5beae9"><div class="ttname"><a href="structMaCh3Plotting_1_1InputFile.html#aaeae1c258a81785847831e0f3b5beae9">MaCh3Plotting::InputFile::availableParams_postFitErrors</a></div><div class="ttdeci">std::vector&lt; std::string &gt; availableParams_postFitErrors</div><div class="ttdoc">The parameters that this file has post fit errors for.</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00157">inputManager.h:157</a></div></div>
+<div class="ttc" id="astructMaCh3Plotting_1_1InputFile_html_a4244508b3b2f75b4e48a340684ddf3bc"><div class="ttname"><a href="structMaCh3Plotting_1_1InputFile.html#a4244508b3b2f75b4e48a340684ddf3bc">MaCh3Plotting::InputFile::availableParams_LLH</a></div><div class="ttdeci">std::vector&lt; std::string &gt; availableParams_LLH</div><div class="ttdoc">The parameters that this file contains likelihood scans for.</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00130">inputManager.h:130</a></div></div>
+<div class="ttc" id="astructMaCh3Plotting_1_1InputFile_html_a4b3753ca1fa1a399e519aa15bca8658a"><div class="ttname"><a href="structMaCh3Plotting_1_1InputFile.html#a4b3753ca1fa1a399e519aa15bca8658a">MaCh3Plotting::InputFile::Summarise</a></div><div class="ttdeci">void Summarise() const</div><div class="ttdoc">Print out a small summary of what is contained in the file.</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00087">inputManager.h:87</a></div></div>
+<div class="ttc" id="astructMaCh3Plotting_1_1InputFile_html_aaeae1c258a81785847831e0f3b5beae9"><div class="ttname"><a href="structMaCh3Plotting_1_1InputFile.html#aaeae1c258a81785847831e0f3b5beae9">MaCh3Plotting::InputFile::availableParams_postFitErrors</a></div><div class="ttdeci">std::vector&lt; std::string &gt; availableParams_postFitErrors</div><div class="ttdoc">The parameters that this file has post fit errors for.</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00161">inputManager.h:161</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -457,17 +463,17 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Print out a small summary of what is contained in the file. </p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000026">Todo:</a></b></dt><dd>Could add some flag to this to check if the relevant information has actually been filled already and if not give some warning or print only some of the values. </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000027">Todo:</a></b></dt><dd>Could add some flag to this to check if the relevant information has actually been filled already and if not give some warning or print only some of the values. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00083">83</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   83</span>                         {</div>
-<div class="line"><span class="lineno">   84</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;### Input File Summary ###&quot;</span>);</div>
-<div class="line"><span class="lineno">   85</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;  Root file loc: {}&quot;</span>, <a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#a076134d08d2b54e29e76431a42267a52">fileName</a>);</div>
-<div class="line"><span class="lineno">   86</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;  Came from fitter: {}&quot;</span>, <a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#a6ad1094c5fb3dcd4479ef8fdf378370c">fitter</a>);</div>
-<div class="line"><span class="lineno">   87</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;  N LLH scans: {}&quot;</span>, <a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#a4244508b3b2f75b4e48a340684ddf3bc">availableParams_LLH</a>.size());</div>
-<div class="line"><span class="lineno">   88</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;  N Processed post fit errors: {}&quot;</span>, <a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#aaeae1c258a81785847831e0f3b5beae9">availableParams_postFitErrors</a>.size());</div>
-<div class="line"><span class="lineno">   89</span>  }</div>
-<div class="ttc" id="astructMaCh3Plotting_1_1InputFile_html_a6ad1094c5fb3dcd4479ef8fdf378370c"><div class="ttname"><a href="structMaCh3Plotting_1_1InputFile.html#a6ad1094c5fb3dcd4479ef8fdf378370c">MaCh3Plotting::InputFile::fitter</a></div><div class="ttdeci">std::string fitter</div><div class="ttdoc">Which fitter this file came from, detected by InputManager::fillFileInfo().</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00114">inputManager.h:114</a></div></div>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00087">87</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   87</span>                         {</div>
+<div class="line"><span class="lineno">   88</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;### Input File Summary ###&quot;</span>);</div>
+<div class="line"><span class="lineno">   89</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;  Root file loc: {}&quot;</span>, <a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#a076134d08d2b54e29e76431a42267a52">fileName</a>);</div>
+<div class="line"><span class="lineno">   90</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;  Came from fitter: {}&quot;</span>, <a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#a6ad1094c5fb3dcd4479ef8fdf378370c">fitter</a>);</div>
+<div class="line"><span class="lineno">   91</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;  N LLH scans: {}&quot;</span>, <a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#a4244508b3b2f75b4e48a340684ddf3bc">availableParams_LLH</a>.size());</div>
+<div class="line"><span class="lineno">   92</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;  N Processed post fit errors: {}&quot;</span>, <a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#aaeae1c258a81785847831e0f3b5beae9">availableParams_postFitErrors</a>.size());</div>
+<div class="line"><span class="lineno">   93</span>  }</div>
+<div class="ttc" id="astructMaCh3Plotting_1_1InputFile_html_a6ad1094c5fb3dcd4479ef8fdf378370c"><div class="ttname"><a href="structMaCh3Plotting_1_1InputFile.html#a6ad1094c5fb3dcd4479ef8fdf378370c">MaCh3Plotting::InputFile::fitter</a></div><div class="ttdeci">std::string fitter</div><div class="ttdoc">Which fitter this file came from, detected by InputManager::fillFileInfo().</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00118">inputManager.h:118</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -484,7 +490,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00179">179</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00183">183</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -502,7 +508,7 @@ Public Attributes</h2></td></tr>
 
 <p>The parameters that this file contains likelihood scans for. </p>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00126">126</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00130">130</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -518,7 +524,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00177">177</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00181">181</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -535,7 +541,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Whether this file has LLH scans of a particular type for a particular parameter, organised as availableParams_map_LLH.at(LLHType).at(parameter) </p>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00134">134</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00138">138</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -552,7 +558,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Whether this file has LLH scans of a particular type for a particular parameter, organised as availableParams_map_LLH.at(sample).at(parameter) </p>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00150">150</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00154">154</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -570,7 +576,7 @@ Public Attributes</h2></td></tr>
 
 <p>whether or not specific parameters exist in the MCMC posterior chain </p>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00176">176</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00180">180</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -586,7 +592,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00180">180</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00184">184</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -604,7 +610,7 @@ Public Attributes</h2></td></tr>
 
 <p>The parameters that this file has post fit errors for. </p>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00157">157</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00161">161</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -621,7 +627,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>The samples that this file contains individual likelihood scans for. </p>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00144">144</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00148">148</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -637,7 +643,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00164">164</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00168">168</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -655,7 +661,7 @@ Public Attributes</h2></td></tr>
 
 <p>Pointer to the underlying file for this <a class="el" href="structMaCh3Plotting_1_1InputFile.html" title="Struct which wraps around the actual input file and also holds general information,...">InputFile</a> instance. </p>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00111">111</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00115">115</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -673,7 +679,7 @@ Public Attributes</h2></td></tr>
 
 <p>The location of the underlying file. </p>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00112">112</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00116">116</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -689,9 +695,9 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Which fitter this file came from, detected by <a class="el" href="classMaCh3Plotting_1_1InputManager.html#aad778d8694f9b581d09279584733f6ea">InputManager::fillFileInfo()</a>. </p>
+<p>Which fitter this file came from, detected by <a class="el" href="classMaCh3Plotting_1_1InputManager.html#a8a89fc87110fcfad0bfd77b3b572eae4">InputManager::fillFileInfo()</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00114">114</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00118">118</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -709,7 +715,7 @@ Public Attributes</h2></td></tr>
 
 <p>Whether or not the file has processed 1d posteriors. </p>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00168">168</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00172">172</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -726,11 +732,11 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Whether or not this file contains any log likelihood scans. </p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000028">Todo:</a></b></dt><dd><p class="startdd">I think it would be nice to store all the <a class="el" href="structMaCh3Plotting_1_1InputFile.html" title="Struct which wraps around the actual input file and also holds general information,...">InputFile</a> data in some non root, maybe custom c++ types, and have separate reader classes for potential different input file formats that can convert to these types. </p>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000029">Todo:</a></b></dt><dd><p class="startdd">I think it would be nice to store all the <a class="el" href="structMaCh3Plotting_1_1InputFile.html" title="Struct which wraps around the actual input file and also holds general information,...">InputFile</a> data in some non root, maybe custom c++ types, and have separate reader classes for potential different input file formats that can convert to these types. </p>
 <p class="enddd">Currently all fitters use root but maybe some wonderful day in the far far future this wont be the case. Doing things this way we could maintain the possible future option of moving away from root??? </p>
 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00124">124</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00128">128</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -747,7 +753,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Whether this file contains specific types of likelihood scans, e.g. hasLLHScans_map.at("prior"). </p>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00128">128</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00132">132</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -764,7 +770,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Whether or not this file contains log likelihood scans broken down per sample. </p>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00142">142</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00146">146</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -782,7 +788,7 @@ Public Attributes</h2></td></tr>
 
 <p>Whether or not the file has unprocessed MCMC chain steps. </p>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00170">170</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00174">174</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -800,7 +806,7 @@ Public Attributes</h2></td></tr>
 
 <p>Whether or not this file contains any processed post fit errors. </p>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00155">155</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00159">159</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -818,7 +824,7 @@ Public Attributes</h2></td></tr>
 
 <p>Whether or not this file contains Sigma variations. </p>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00188">188</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00192">192</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -835,7 +841,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>The actual graphs of the likelihood scans, organised as LLHScans_map.at(LLHType).at(parameter). </p>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00131">131</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00135">135</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -852,7 +858,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>The actual graphs of the likelihood scans, organised as LLHScans_map.at(sample).at(parameter). </p>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00147">147</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00151">151</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -870,7 +876,7 @@ Public Attributes</h2></td></tr>
 
 <p>ptr to an <a class="el" href="classMCMCProcessor.html" title="Class responsible for processing MCMC chains, performing diagnostics, generating plots,...">MCMCProcessor</a> instance to be used if this is a MaCh3 input file </p>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00108">108</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00112">112</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -886,7 +892,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00182">182</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00186">186</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -902,7 +908,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00183">183</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00187">187</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -920,7 +926,7 @@ Public Attributes</h2></td></tr>
 
 <p>The number of steps in the MCMC chain. </p>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00173">173</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00177">177</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -936,7 +942,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00185">185</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00189">189</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -952,7 +958,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00109">109</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00113">113</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -969,7 +975,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>The actual errors on the parameters, organised as postFitErrors.at(errorType).at(parameter). </p>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00159">159</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00163">163</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>
@@ -986,7 +992,7 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>The post fit values of the parameters, organised as postFitValues.at(errorType).at(parameter). </p>
 
-<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00162">162</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inputManager_8h_source.html#l00166">166</a> of file <a class="el" href="inputManager_8h_source.html">inputManager.h</a>.</p>
 
 </div>
 </div>

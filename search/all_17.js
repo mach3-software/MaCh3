@@ -9,6 +9,5 @@ var searchData=
   ['xsec_5fnorm_5fpointers_6',['xsec_norm_pointers',['../structFarDetectorCoreInfo.html#a858d37c3e45ff56022e3101da094743c',1,'FarDetectorCoreInfo']]],
   ['xsec_5fspline_5fpointers_7',['xsec_spline_pointers',['../structFarDetectorCoreInfo.html#a993998a2c2d82bfeae285d71741ad2f2',1,'FarDetectorCoreInfo']]],
   ['xsec_5fw_8',['xsec_w',['../structFarDetectorCoreInfo.html#a91586f67da67dcb925715a94ed04a299',1,'FarDetectorCoreInfo']]],
-  ['xsecstartingpos_9',['XsecStartingPos',['../GetPostfitParamPlots_8cpp.html#a3bb8bb8766f5ea15aa9ac31a1c9127e8',1,'GetPostfitParamPlots.cpp']]],
-  ['xvarstr_10',['XVarStr',['../structSampleInfo.html#a94ef862377431975710a3ca0c761b01c',1,'SampleInfo']]]
+  ['xvarstr_9',['XVarStr',['../structSampleInfo.html#a94ef862377431975710a3ca0c761b01c',1,'SampleInfo']]]
 ];
