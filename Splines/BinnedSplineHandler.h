@@ -30,6 +30,7 @@ class BinnedSplineHandler : public SplineBase {
 
     /// @brief add oscillation channel to spline monolith
     void AddSample(const std::string& SampleName,
+                   const std::string& SampleTittle,
                    const std::vector<std::string>& OscChanFileNames,
                    const std::vector<std::string>& SplineVarNames);
     /// @brief flatten multidimensional spline array into proper monolith
@@ -86,6 +87,7 @@ class BinnedSplineHandler : public SplineBase {
 
     //And now the actual member variables
     std::vector<std::string> SampleNames;
+    std::vector<std::string> SampleTittles;
     std::vector<int> Dimensions;
     std::vector<std::vector<std::string>> DimensionLabels;
     std::vector<int> nSplineParams;

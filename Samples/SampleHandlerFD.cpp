@@ -1482,7 +1482,7 @@ void SampleHandlerFD::InitialiseSplineObject() {
   auto SplineFileName = GetFromManager<std::string>(SampleManager->raw()["InputFiles"]["SplineFileName"],
                                                     (SampleName + "_SplineFile.root"), __FILE__, __LINE__);
   if(!LoadSplineFile) {
-    SplineHandler->AddSample(SampleName, spline_filepaths, SplineVarNames);
+    SplineHandler->AddSample(SampleName, GetTitle(), spline_filepaths, SplineVarNames);
     SplineHandler->CountNumberOfLoadedSplines(false, 1);
     SplineHandler->TransferToMonolith();
     if(PrepSplineFile) SplineHandler->PrepareSplineFile(SampleName + "_SplineFile.root");

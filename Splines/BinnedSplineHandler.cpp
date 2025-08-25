@@ -54,6 +54,7 @@ void BinnedSplineHandler::cleanUpMemory() {
   CleanVector(nSplineParams);
   CleanVector(DimensionLabels);
   CleanVector(SampleNames);
+  CleanVector(SampleTittles);
   CleanVector(Dimensions);
   CleanContainer(splinevec_Monolith);
   CleanContainer(SplineBinning);
@@ -63,12 +64,14 @@ void BinnedSplineHandler::cleanUpMemory() {
 
 //****************************************
 void BinnedSplineHandler::AddSample(const std::string& SampleName,
-                             const std::vector<std::string>& OscChanFileNames,
-                             const std::vector<std::string>& SplineVarNames)
+                                    const std::string& SampleTittle,
+                                    const std::vector<std::string>& OscChanFileNames,
+                                    const std::vector<std::string>& SplineVarNames)
 //Adds samples to the large array
 //****************************************
 {
   SampleNames.push_back(SampleName);
+  SampleTittles.push_back(SampleTittle);
   Dimensions.push_back(static_cast<int>(SplineVarNames.size()));
   DimensionLabels.push_back(SplineVarNames);
 
@@ -123,6 +126,7 @@ void BinnedSplineHandler::InvestigateMissingSplines() const {
 
   for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++) {
     std::string SampleName = SampleNames[iSample];
+    std::string SampleTittle = SampleTittles[iSample];
 
     // Get list of systematic names for this sample
     std::vector<std::string> SplineFileParPrefixNames_Sample =
@@ -145,12 +149,12 @@ void BinnedSplineHandler::InvestigateMissingSplines() const {
                 if (indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2][iVar3] == 0) {
                   zeroCount++;
                   if(zeroCount > 1){
-                    systZeroCounts[iSample][iSyst].first = SampleName;
+                    systZeroCounts[iSample][iSyst].first = SampleTittle;
                     systZeroCounts[iSample][iSyst].second[modeSuffix] = std::make_pair(totalSplines, zeroCount);
                   }
                   MACH3LOG_DEBUG(
                     "Sample '{}' | OscChan {} | Syst '{}' | Mode '{}' | Var1 {} | Var2 {} | Var3 {} => Value: {}",
-                    SampleName,
+                    SampleTittle,
                     iOscChan,
                     SplineFileParPrefixNames_Sample[iSyst],
                     modeSuffix,
@@ -495,7 +499,7 @@ int BinnedSplineHandler::CountNumberOfLoadedSplines(bool NonFlat, int Verbosity)
   { // Loop over systematics
     SampleCounter_NonFlat = 0;
     SampleCounter_All = 0;
-    std::string SampleName = SampleNames[iSample];
+    std::string SampleTittle = SampleTittles[iSample];
     for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++)
     { // Loop over oscillation channels
       for (unsigned int iSyst = 0; iSyst < indexvec[iSample][iOscChan].size(); iSyst++)
@@ -508,7 +512,7 @@ int BinnedSplineHandler::CountNumberOfLoadedSplines(bool NonFlat, int Verbosity)
             { // Loop over second dimension
               for (unsigned int iVar3 = 0; iVar3 < indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2].size(); iVar3++)
               { // Loop over third dimension
-                if (isValidSplineIndex(SampleName, iOscChan, iSyst, iMode, iVar1, iVar2, iVar3))
+                if (isValidSplineIndex(SampleTittle, iOscChan, iSyst, iMode, iVar1, iVar2, iVar3))
                 {
                   int splineindex = indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2][iVar3];
                   if (splinevec_Monolith[splineindex])
@@ -523,7 +527,7 @@ int BinnedSplineHandler::CountNumberOfLoadedSplines(bool NonFlat, int Verbosity)
         }
       }
     }
-    MACH3LOG_DEBUG("{:<10} has {:<10} splines, of which {:<10} are not flat", SampleNames[iSample], SampleCounter_All, SampleCounter_NonFlat);
+    MACH3LOG_DEBUG("{:<10} has {:<10} splines, of which {:<10} are not flat", SampleTittles[iSample], SampleCounter_All, SampleCounter_NonFlat);
 
     FullCounter_NonFlat += SampleCounter_NonFlat;
     FullCounter_All += SampleCounter_All;
@@ -735,8 +739,8 @@ std::string BinnedSplineHandler::getDimLabel(const int iSample, const unsigned i
 //Returns sample index in
 int BinnedSplineHandler::getSampleIndex(const std::string& SampleName) const{
 //****************************************
-  for (size_t iSample = 0; iSample < SampleNames.size(); ++iSample) {
-    if (SampleName == SampleNames[iSample]) {
+  for (size_t iSample = 0; iSample < SampleTittles.size(); ++iSample) {
+    if (SampleName == SampleTittles[iSample]) {
       return static_cast<int>(iSample);
     }
   }
@@ -750,7 +754,7 @@ void BinnedSplineHandler::PrintSampleDetails(const std::string& SampleName) cons
 {
   const int iSample = getSampleIndex(SampleName);
 
-  MACH3LOG_INFO("Details about sample: {:<20}", SampleNames[iSample]);
+  MACH3LOG_INFO("Details about sample: {:<20}", SampleTittles[iSample]);
   MACH3LOG_INFO("\t Dimension: {:<35}", Dimensions[iSample]);
   MACH3LOG_INFO("\t nSplineParam: {:<35}", nSplineParams[iSample]);
   MACH3LOG_INFO("\t nOscChan: {:<35}", nOscChans[iSample]);
@@ -839,8 +843,8 @@ std::vector< std::vector<int> > BinnedSplineHandler::GetEventSplines(const std::
 {
   std::vector<std::vector<int>> ReturnVec;
   int SampleIndex = -1;
-  for (unsigned int iSample = 0; iSample < SampleNames.size(); iSample++) {
-    if (SampleName == SampleNames[iSample]) {
+  for (unsigned int iSample = 0; iSample < SampleTittles.size(); iSample++) {
+    if (SampleName == SampleTittles[iSample]) {
       SampleIndex = iSample;
     }
   }
@@ -1118,11 +1122,15 @@ void BinnedSplineHandler::LoadSettingsDir(std::unique_ptr<TFile>& SplineFile) {
   Settings->SetBranchAddress("SplineModeVecs_size3", &SplineModeVecs_size3);
   std::vector<std::string>* SampleNames_temp = nullptr;
   Settings->SetBranchAddress("SampleNames", &SampleNames_temp);
+  std::vector<std::string>* SampleTittles_temp = nullptr;
+  Settings->SetBranchAddress("SampleTittles", &SampleTittles_temp);
   Settings->GetEntry(0);
 
   CoeffIndex = CoeffIndex_temp;
   MonolithSize = MonolithSize_temp;
   SampleNames = *SampleNames_temp;
+  SampleTittles = *SampleTittles_temp;
+
   nParams = nParams_temp;
 
   SplineSegments = new short int[nParams]();
@@ -1322,6 +1330,8 @@ void BinnedSplineHandler::PrepareSettingsDir(std::unique_ptr<TFile>& SplineFile)
 
   std::vector<std::string> SampleNames_temp = SampleNames;
   Settings->Branch("SampleNames", &SampleNames_temp);
+  std::vector<std::string> SampleTittles_temp = SampleTittles;
+  Settings->Branch("SampleTittles", &SampleNames_temp);
 
   Settings->Fill();
   SplineFile->cd();
