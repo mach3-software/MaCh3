@@ -363,5 +363,22 @@ int GetNThreads() {
   #endif
 }
 
+// ***************************************************************************
+void AddPath(std::string& FilePath) {
+// ***************************************************************************
+  //KS:Most inputs are in ${MACH3}/inputs/blarb.root
+  if (std::getenv("MACH3") != nullptr) {
+    MACH3LOG_ERROR("MACH3 is not defined");
+    MACH3LOG_ERROR("Please source your setup script");
+    MACH3LOG_ERROR("Read more: https://github.com/mach3-software/MaCh3/wiki/0.-FAQ#error-need-mach3-environment-variable");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  std::string MaCh3Path = std::string(std::getenv("MACH3")) + "/";
+   // Check if FilePath does NOT start with MaCh3Path
+  if (FilePath.find(MaCh3Path) != 0) {
+    FilePath.insert(0, MaCh3Path);
+  }
+}
 } //end namespace
 

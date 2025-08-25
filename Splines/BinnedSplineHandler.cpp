@@ -1074,9 +1074,8 @@ void BinnedSplineHandler::FillSampleArray(std::string SampleName, std::vector<st
 // Load SplineMonolith from ROOT file
 void BinnedSplineHandler::LoadSplineFile(std::string FileName) {
 // *****************************************
-  if (std::getenv("MACH3") != nullptr) {
-    FileName.insert(0, std::string(std::getenv("MACH3"))+"/");
-  }
+  M3::AddPath(FileName);
+
   // Check for spaces in the filename
   size_t pos = FileName.find(' ');
   if (pos != std::string::npos) {
@@ -1264,9 +1263,7 @@ void BinnedSplineHandler::LoadIndexDir(std::unique_ptr<TFile>& SplineFile) {
 // Save SplineMonolith into ROOT file
 void BinnedSplineHandler::PrepareSplineFile(std::string FileName) {
 // *****************************************
-  if (std::getenv("MACH3") != nullptr) {
-    FileName.insert(0, std::string(std::getenv("MACH3"))+"/");
-  }
+  M3::AddPath(FileName);
   // Check for spaces in the filename
   size_t pos = FileName.find(' ');
   if (pos != std::string::npos) {
