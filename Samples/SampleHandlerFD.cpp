@@ -1372,10 +1372,10 @@ void SampleHandlerFD::FillSplineBins() {
     std::vector< std::vector<int> > EventSplines;
     switch(GetNDim()){
       case 1:
-        EventSplines = SplineHandler->GetEventSplines(GetSampleName(), OscIndex, int(*(MCSamples[j].mode)), *(MCSamples[j].rw_etru), *(MCSamples[j].x_var), 0.);
+        EventSplines = SplineHandler->GetEventSplines(GetTitle(), OscIndex, int(*(MCSamples[j].mode)), *(MCSamples[j].rw_etru), *(MCSamples[j].x_var), 0.);
         break;
       case 2:
-        EventSplines = SplineHandler->GetEventSplines(GetSampleName(), OscIndex, int(*(MCSamples[j].mode)), *(MCSamples[j].rw_etru), *(MCSamples[j].x_var), *(MCSamples[j].y_var));
+        EventSplines = SplineHandler->GetEventSplines(GetTitle(), OscIndex, int(*(MCSamples[j].mode)), *(MCSamples[j].rw_etru), *(MCSamples[j].x_var), *(MCSamples[j].y_var));
         break;
       default:
         MACH3LOG_ERROR("Error in assigning spline bins because nDimensions = {}", GetNDim());
