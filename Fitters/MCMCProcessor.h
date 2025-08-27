@@ -179,6 +179,15 @@ class MCMCProcessor {
                        const std::vector<double>& NewCentral,
                        const std::vector<double>& NewError);
     
+
+    /// @brief Smear chain contours
+    /// @param Names Parameter names for which we do smearing
+    /// @param Error Error based on which we smear
+    /// @param SaveBranch Whether we save unsmeared branch or not
+    void SmearChain(const std::vector<std::string>& Names,
+                    const std::vector<double>& NewCentral,
+                    const bool& SaveBranch);
+
     /// @brief Make .gif of parameter evolution
     /// @param Names Parameter names for which we do .gif
     /// @param NIntervals Number of intervals for a gif

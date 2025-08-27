@@ -2903,7 +2903,7 @@ void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
 
   if( (Names.size() != NewCentral.size()) || (NewCentral.size() != NewError.size()))
   {
-    MACH3LOG_ERROR("Size of passed vectors doesn't match in ReweightPrior");
+    MACH3LOG_ERROR("Size of passed vectors doesn't match in {}", __func__);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   std::vector<int> Param;
@@ -3002,6 +3002,102 @@ void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
   delete OutputChain;
 
   OutputFile->cd();
+}
+
+
+// **************************
+// KS: Smear contours
+void MCMCProcessor::SmearChain(const std::vector<std::string>& Names,
+                               const std::vector<double>& Error,
+                               const bool& SaveBranch) {
+// **************************
+  MACH3LOG_INFO("Starting {}", __func__);
+
+  if( (Names.size() != Error.size()))
+  {
+    MACH3LOG_ERROR("Size of passed vectors doesn't match in {}", __func__);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+  std::vector<int> Param;
+
+  //KS: First we need to find parameter number based on name
+  for(unsigned int k = 0; k < Names.size(); ++k)
+  {
+    //KS: First we need to find parameter number based on name
+    int ParamNo = GetParamIndexFromName(Names[k]);
+    if(ParamNo == M3::_BAD_INT_)
+    {
+      MACH3LOG_WARN("Couldn't find param {}. Can't Smear", Names[k]);
+      return;
+    }
+
+    TString Title = "";
+    double Prior = 1.0, PriorError = 1.0;
+    GetNthParameter(ParamNo, Prior, PriorError, Title);
+
+    Param.push_back(ParamNo);
+  }
+  std::string InputFile = MCMCFile+".root";
+  std::string OutputFilename = MCMCFile + "_smeared.root";
+
+  //KS: Simply create copy of file and add there new branch
+  int ret = system(("cp " + InputFile + " " + OutputFilename).c_str());
+  if (ret != 0)
+    MACH3LOG_WARN("Error: system call to copy file failed with code {}", ret);
+
+  TFile *OutputChain = new TFile(OutputFilename.c_str(), "UPDATE");
+  OutputChain->cd();
+  TTree *post = OutputChain->Get<TTree>("posteriors");
+  TTree *treeNew = post->CloneTree(0);
+
+  std::vector<double> NewParameter(Names.size());
+  for(size_t i = 0; i < Param.size(); i++) {
+    post->SetBranchAddress(BranchNames[Param[i]], &NewParameter[i]);
+  }
+
+  std::vector<double> Unsmeared_Parameter;
+  if(SaveBranch){
+    Unsmeared_Parameter.resize(Param.size());
+    for(size_t i = 0; i < Param.size(); i++) {
+      treeNew->Branch((BranchNames[Param[i]] + "_unsmeared"), &Unsmeared_Parameter[i]);
+    }
+  }
+
+  auto rand = std::make_unique<TRandom3>(0);
+  Long64_t AllEntries = post->GetEntries();
+  for (Long64_t i = 0; i < AllEntries; ++i) {
+    // Entry from the old chain
+    post->GetEntry(i);
+
+    if(SaveBranch){
+      for(size_t iPar = 0; iPar < Param.size(); iPar++) {
+        Unsmeared_Parameter[iPar] = NewParameter[iPar];
+      }
+    }
+    // Smear it
+    for(size_t iPar = 0; iPar < Param.size(); iPar++) {
+      NewParameter[iPar] = NewParameter[iPar] + rand->Gaus(0, Error[iPar]);
+    }
+    // Fill to the new chain
+    treeNew->Fill();
+  }
+
+  OutputChain->cd();
+  treeNew->Write("posteriors", TObject::kOverwrite);
+
+  // KS: Save reweight metadeta
+  std::ostringstream yaml_stream;
+  yaml_stream << "Smearing:\n";
+  for (size_t k = 0; k < Names.size(); ++k) {
+    yaml_stream << "    " << Names[k] << ": [" << Error[k] << ", " << "Gauss" << "]\n";
+  }
+  std::string yaml_string = yaml_stream.str();
+  YAML::Node root = STRINGtoYAML(yaml_string);
+  TMacro ConfigSave = YAMLtoTMacro(root, "Smearing_Config");
+  ConfigSave.Write();
+
+  OutputChain->Close();
+  delete OutputChain;
 }
 
 // **************************
