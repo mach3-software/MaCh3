@@ -280,7 +280,6 @@ void SampleHandlerFD::FillMCHist(const int Dimension) {
         SampleDetails._hPDF2D->SetBinContent(static_cast<int>(xBin + 1), static_cast<int>(yBin + 1), SampleHandlerFD_array[idx]);
       }
     }
-
   } else {
     MACH3LOG_ERROR("Asking for {} with N Dimension = {}. This is not implemented", __func__, Dimension);
     throw MaCh3Exception(__FILE__, __LINE__);
@@ -905,17 +904,11 @@ void SampleHandlerFD::Set1DBinning(size_t nbins, double* boundaries)
   SampleDetails._hPDF1D->SetBins(static_cast<int>(nbins),boundaries);
   SampleDetails.dathist->SetBins(static_cast<int>(nbins),boundaries);
 
-  Binning.YBinEdges = std::vector<double>(2);
-  Binning.YBinEdges[0] = -1e8;
-  Binning.YBinEdges[1] = 1e8;
-
-  double YBinEdges_Arr[2];
-  YBinEdges_Arr[0] = Binning.YBinEdges[0];
-  YBinEdges_Arr[1] = Binning.YBinEdges[1];
+  Binning.YBinEdges = {-1e8, 1e8};
 
   SampleDetails._hPDF2D->Reset();
-  SampleDetails._hPDF2D->SetBins(static_cast<int>(nbins),boundaries,1,YBinEdges_Arr);
-  SampleDetails.dathist2d->SetBins(static_cast<int>(nbins),boundaries,1,YBinEdges_Arr);
+  SampleDetails._hPDF2D->SetBins(static_cast<int>(nbins),boundaries,1, Binning.YBinEdges.data());
+  SampleDetails.dathist2d->SetBins(static_cast<int>(nbins),boundaries,1, Binning.YBinEdges.data());
 
   //Set the number of X and Y bins now
   SetupReweightArrays(Binning.XBinEdges.size() - 1, Binning.YBinEdges.size() - 1);
@@ -944,34 +937,7 @@ void SampleHandlerFD::FindNominalBinAndEdges1D() {
     MCSamples[event_i].NomYBin = 0;
   }
 
-  Binning.rw_lower_xbinedge.resize(Binning.nXBins);
-  Binning.rw_lower_lower_xbinedge.resize(Binning.nXBins);
-  Binning.rw_upper_xbinedge.resize(Binning.nXBins);
-  Binning.rw_upper_upper_xbinedge.resize(Binning.nXBins);
-  //Set rw_pdf_bin and rw_upper_xbinedge and rw_lower_xbinedge for each skmc_base
-  for(size_t bin_x = 0; bin_x < Binning.nXBins; bin_x++){
-    double low_lower_edge = M3::_DEFAULT_RETURN_VAL_;
-    double low_edge = Binning.XBinEdges[bin_x];
-    double upper_edge = Binning.XBinEdges[bin_x+1];
-    double upper_upper_edge = M3::_DEFAULT_RETURN_VAL_;
-
-    if (bin_x == 0) {
-      low_lower_edge = Binning.XBinEdges[0];
-    } else {
-      low_lower_edge = Binning.XBinEdges[bin_x-1];
-    }
-
-    if (bin_x + 2 < Binning.nXBins) {
-      upper_upper_edge = Binning.XBinEdges[bin_x + 2];
-    } else if (bin_x + 1 < Binning.nXBins) {
-      upper_upper_edge = Binning.XBinEdges[bin_x + 1];
-    }
-
-    Binning.rw_lower_xbinedge[bin_x] = low_edge;
-    Binning.rw_upper_xbinedge[bin_x] = upper_edge;
-    Binning.rw_lower_lower_xbinedge[bin_x] = low_lower_edge;
-    Binning.rw_upper_upper_xbinedge[bin_x] = upper_upper_edge;
-  }
+  Binning.InitialiseBinMigrationLookUp();
 }
 
 void SampleHandlerFD::Set2DBinning(size_t nbins1, double* boundaries1, size_t nbins2, double* boundaries2)
@@ -1022,35 +988,7 @@ void SampleHandlerFD::FindNominalBinAndEdges2D() {
       MACH3LOG_WARN("Nominal YBin PROBLEM, y-bin is {}", MCSamples[event_i].NomYBin);
     }
   }
-
-  Binning.rw_lower_xbinedge.resize(Binning.nXBins);
-  Binning.rw_lower_lower_xbinedge.resize(Binning.nXBins);
-  Binning.rw_upper_xbinedge.resize(Binning.nXBins);
-  Binning.rw_upper_upper_xbinedge.resize(Binning.nXBins);
-  //Set rw_pdf_bin and rw_upper_xbinedge and rw_lower_xbinedge for each skmc_base
-  for(size_t bin_x = 0; bin_x < Binning.nXBins; bin_x++){
-    double low_lower_edge = M3::_DEFAULT_RETURN_VAL_;
-    double low_edge = Binning.XBinEdges[bin_x];
-    double upper_edge = Binning.XBinEdges[bin_x+1];
-    double upper_upper_edge = M3::_DEFAULT_RETURN_VAL_;
-
-    if (bin_x == 0) {
-      low_lower_edge = Binning.XBinEdges[0];
-    } else {
-      low_lower_edge = Binning.XBinEdges[bin_x-1];
-    }
-
-    if (bin_x + 2 < Binning.nXBins) {
-      upper_upper_edge = Binning.XBinEdges[bin_x + 2];
-    } else if (bin_x + 1 < Binning.nXBins) {
-      upper_upper_edge = Binning.XBinEdges[bin_x + 1];
-    }
-
-    Binning.rw_lower_xbinedge[bin_x] = low_edge;
-    Binning.rw_upper_xbinedge[bin_x] = upper_edge;
-    Binning.rw_lower_lower_xbinedge[bin_x] = low_lower_edge;
-    Binning.rw_upper_upper_xbinedge[bin_x] = upper_upper_edge;
-  }
+  Binning.InitialiseBinMigrationLookUp();
 }
 
 #pragma GCC diagnostic push
@@ -1392,9 +1330,9 @@ void SampleHandlerFD::FillSplineBins() {
     for(size_t spline = 0; spline < MCSamples[j].xsec_spline_pointers.size(); spline++) {
       //Event Splines indexed as: sample name, oscillation channel, syst, mode, etrue, var1, var2 (var2 is a dummy 0 for 1D splines)
       MCSamples[j].xsec_spline_pointers[spline] = SplineHandler->retPointer(EventSplines[spline][0], EventSplines[spline][1],
-                                                                                EventSplines[spline][2], EventSplines[spline][3],
-                                                                                EventSplines[spline][4], EventSplines[spline][5],
-                                                                                EventSplines[spline][6]);
+                                                                            EventSplines[spline][2], EventSplines[spline][3],
+                                                                            EventSplines[spline][4], EventSplines[spline][5],
+                                                                            EventSplines[spline][6]);
     }
   }
 }
