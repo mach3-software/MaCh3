@@ -181,7 +181,7 @@ void MCMCBase::AdaptiveStep(){
         if (syst->GetDoAdaption()){
         
             syst->UpdateAdaptiveCovariance();
-            // syst->GetAdaptiveHandler()->SaveAdaptiveToFile(syst->GetAdaptiveHandler()->GetOutFileName(), syst->GetName(), true);
+            syst->GetAdaptiveHandler()->SaveAdaptiveToFile(syst->GetAdaptiveHandler()->GetOutFileName(), syst->GetName(), true);
         }
     }
 }
