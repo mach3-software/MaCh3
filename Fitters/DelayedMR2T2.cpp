@@ -1,7 +1,8 @@
 #include "Fitters/DelayedMR2T2.h"
 
+// *************************
 DelayedMR2T2::DelayedMR2T2(manager * const manager) : MR2T2(manager) {
-
+// *************************
     // Step scale for delayed step = step scale prev delay * decay_rate
     decay_rate = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["DecayRate"], 0.1);
     // Maximum number of rejections
@@ -30,23 +31,27 @@ DelayedMR2T2::DelayedMR2T2(manager * const manager) : MR2T2(manager) {
     MACH3LOG_INFO("Using Delayed MCMC with decay rate: {} and {} allowed rejections", decay_rate, max_rejections);
 }
 
-void DelayedMR2T2::ScaleSystematics(double scale)
-{
+// *************************
+void DelayedMR2T2::ScaleSystematics(const double scale) {
+// *************************
     for (auto &syst : systematics)
     {
         syst->SetStepScale(scale*syst->GetGlobalStepScale(), false);
     }
 }
 
-void DelayedMR2T2::ResetSystScale()
-{
+// *************************
+void DelayedMR2T2::ResetSystScale() {
+// *************************
     for (int i = 0; i < static_cast<int>(systematics.size()); ++i)
     {
         systematics[i]->SetStepScale(start_step_scale[i], false);
     }
 }
 
-void DelayedMR2T2::PrepareOutput(){
+// *************************
+void DelayedMR2T2::PrepareOutput() {
+// *************************
     FitterBase::PrepareOutput();
 
     // Store delayed specific settings
@@ -55,9 +60,8 @@ void DelayedMR2T2::PrepareOutput(){
 }
 
 //**********************************************
-void DelayedMR2T2::StoreCurrentStep()
+void DelayedMR2T2::StoreCurrentStep() {
 // *********************************************
-{
     /*
     Stores values from  step
     */
@@ -72,8 +76,9 @@ void DelayedMR2T2::StoreCurrentStep()
     }
 }
 
-double DelayedMR2T2::AcceptanceProbability()
-{
+// *************************
+double DelayedMR2T2::AcceptanceProbability() {
+// *************************
     // From https://arxiv.org/pdf/2010.04190 and DRAM Matlab implementation
 
     double numerator = std::max(0.0, std::exp(MinLogLikelihood - logLProp) - 1.0);
@@ -89,8 +94,9 @@ double DelayedMR2T2::AcceptanceProbability()
     return std::min(numerator / denominator, 1.0);
 }
 
-void DelayedMR2T2::DoStep()
-{
+// *************************
+void DelayedMR2T2::DoStep() {
+// *************************
     // Set the initial rejection to false
     StoreCurrentStep();
 
@@ -116,7 +122,6 @@ void DelayedMR2T2::DoStep()
         if(out_of_bounds or logLProp>MinLogLikelihood){
             continue;
         }
-
 
         if(i==0){
             accProb = MR2T2::AcceptanceProbability();
@@ -154,7 +159,6 @@ void DelayedMR2T2::DoStep()
     }
 
     // If we reject we need to reset everything [this is probably a tad too slow...
-
     if(!accepted){
         for(int i=0; i<static_cast<int>(systematics.size()); ++i){
             for(int j=0; j<static_cast<int>(systematics[i]->GetParCurrVec().size()); ++j){
@@ -165,7 +169,9 @@ void DelayedMR2T2::DoStep()
     ResetSystScale();
 }
 
-bool DelayedMR2T2::ProbabilisticDelay(){
+// *************************
+bool DelayedMR2T2::ProbabilisticDelay() const {
+// *************************
     // We can delay probabilistically
     return (random->Rndm() > delay_probability);
 }
