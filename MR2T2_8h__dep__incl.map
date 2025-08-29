@@ -1,6 +1,6 @@
 <map id="Fitters/MR2T2.h" name="Fitters/MR2T2.h">
 <area shape="rect" id="node1" title=" " alt="" coords="303,5,427,31"/>
-<area shape="rect" id="node2" href="$DelayedMR2T2_8h.html" title="Implementation of delayed rejection for MR2T2." alt="" coords="213,79,392,104"/>
+<area shape="rect" id="node2" href="$DelayedMR2T2_8h.html" title=" " alt="" coords="213,79,392,104"/>
 <area shape="rect" id="node4" href="$MaCh3Factory_8h.html" title="Factory methods for MaCh3 software which streamline initialisation of different objects." alt="" coords="13,152,182,177"/>
 <area shape="rect" id="node6" href="$fitters_8cpp.html" title=" " alt="" coords="424,152,560,177"/>
 <area shape="rect" id="node7" href="$MR2T2_8cpp.html" title=" " alt="" coords="467,79,605,104"/>

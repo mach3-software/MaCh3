@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Implementation of delayed rejection for MR2T2.">
 <polygon fill="#999999" stroke="#666666" points="91,-19 0,-19 0,0 91,0 91,-19"/>
 <text text-anchor="middle" x="45.5" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">DelayedMR2T2</text>
 </a>

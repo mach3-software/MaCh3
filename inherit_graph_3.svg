@@ -140,7 +140,7 @@
 <!-- Node7 -->
 <g id="node8" class="node">
 <title>Node7</title>
-<g id="a_node8"><a xlink:href="classDelayedMR2T2.html" target="_top" xlink:title=" ">
+<g id="a_node8"><a xlink:href="classDelayedMR2T2.html" target="_top" xlink:title="Implementation of delayed rejection for MR2T2.">
 <polygon fill="white" stroke="#666666" points="460,-83 369,-83 369,-64 460,-64 460,-83"/>
 <text text-anchor="middle" x="414.5" y="-71" font-family="Helvetica,sans-Serif" font-size="10.00">DelayedMR2T2</text>
 </a>

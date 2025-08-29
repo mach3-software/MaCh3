@@ -57,7 +57,7 @@ var sectionId = 'dynsection-1';
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Implementation of delayed rejection for MR2T2.">
 <polygon fill="#999999" stroke="#666666" points="1131,-206 1040,-206 1040,-187 1131,-187 1131,-206"/>
 <text text-anchor="middle" x="1085.5" y="-194" font-family="Helvetica,sans-Serif" font-size="10.00">DelayedMR2T2</text>
 </a>

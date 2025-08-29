@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="DelayedMR2T2_8h.html" target="_top" xlink:title="Implementation of delayed rejection for MR2T2.">
+<g id="a_node2"><a xlink:href="DelayedMR2T2_8h.html" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="#666666" points="726,-591 592,-591 592,-572 726,-572 726,-591"/>
 <text text-anchor="middle" x="659" y="-579" font-family="Helvetica,sans-Serif" font-size="10.00">Fitters/DelayedMR2T2.h</text>
 </a>

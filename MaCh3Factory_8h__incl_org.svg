@@ -50,7 +50,7 @@
 <!-- Node88 -->
 <g id="node45" class="node">
 <title>Node88</title>
-<g id="a_node45"><a xlink:href="DelayedMR2T2_8h.html" target="_top" xlink:title="Implementation of delayed rejection for MR2T2.">
+<g id="a_node45"><a xlink:href="DelayedMR2T2_8h.html" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="#666666" points="1815.45,-602 1681.45,-602 1681.45,-583 1815.45,-583 1815.45,-602"/>
 <text text-anchor="middle" x="1748.45" y="-590" font-family="Helvetica,sans-Serif" font-size="10.00">Fitters/DelayedMR2T2.h</text>
 </a>

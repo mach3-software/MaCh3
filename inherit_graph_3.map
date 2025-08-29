@@ -8,5 +8,5 @@
 <area shape="rect" id="node4" href="$classPSO.html" title="Class PSO, consist of a vector of object Class Particle and global best Takes in the size (number of ..." alt="" coords="365,55,413,80"/>
 <area shape="rect" id="node5" href="$classPyLikelihoodFit.html" title="EW: As LikelihoodFit is an abstract base class we have to do some gymnastics to get it to get it into..." alt="" coords="329,104,449,129"/>
 <area shape="rect" id="node7" href="$classMR2T2.html" title="MCMC algorithm using MR2T2." alt="" coords="356,153,423,179"/>
-<area shape="rect" id="node8" href="$classDelayedMR2T2.html" title=" " alt="" coords="497,153,619,179"/>
+<area shape="rect" id="node8" href="$classDelayedMR2T2.html" title="Implementation of delayed rejection for MR2T2." alt="" coords="497,153,619,179"/>
 </map>
