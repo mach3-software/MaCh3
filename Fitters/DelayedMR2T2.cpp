@@ -165,15 +165,6 @@ void DelayedMR2T2::DoStep()
     ResetSystScale();
 }
 
-void DelayedMR2T2::RunMCMC()
-{
-    MACH3LOG_INFO("Running Delayed MCMC with {} iterations and decay rate {}", max_rejections, decay_rate);
-
-    // Run the MCMC
-    MCMCBase::RunMCMC();
-
-}
-
 bool DelayedMR2T2::ProbabilisticDelay(){
     // We can delay probabilistically
     return (random->Rndm() > delay_probability);

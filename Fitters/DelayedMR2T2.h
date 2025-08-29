@@ -40,9 +40,6 @@ class DelayedMR2T2 : public MR2T2 {
     /// @brief Get name
     inline std::string GetName() const override { return "DelayedMR2T2"; };
 
-    /// @brief Actual implementation of MCMC fitting algorithm
-    void RunMCMC() override;
-
  protected:
 
      /// @brief Step acceptance probability
