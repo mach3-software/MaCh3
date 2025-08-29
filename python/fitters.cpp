@@ -3,7 +3,8 @@
 #include <pybind11/stl.h>
 // MaCh3 includes
 #include "Fitters/FitterBase.h"
-#include "Fitters/MCMCBase.h"
+#include "Fitters/MR2T2.h"
+#include "Fitters/DelayedMR2T2.h"
 #include "Fitters/MinuitFit.h"
 #include "Fitters/PSO.h"
 
@@ -130,12 +131,21 @@ void initFitters(py::module &m){
 
     ; // End of FitterBase class binding
 
-    py::class_<MCMCBase, FitterBase>(m_fitters, "MCMC")
+    py::class_<MR2T2, FitterBase>(m_fitters, "mcmc")
         .def(py::init<manager *const>())
 
         .def(
             "set_chain_length",
-            &MCMCBase::setChainLength,
+            &MR2T2::setChainLength,
+            "Set how long chain should be.",
+            py::arg("length")); // end of MCMC class binding
+
+    py::class_<DelayedMR2T2, FitterBase>(m_fitters, "DelayedMCMC")
+        .def(py::init<manager *const>())
+
+        .def(
+            "set_chain_length",
+            &MR2T2::setChainLength,
             "Set how long chain should be.",
             py::arg("length")); // end of MCMC class binding
 
