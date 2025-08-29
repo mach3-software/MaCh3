@@ -105,10 +105,5 @@ double MR2T2::AcceptanceProbability()
     else
         acc_prob = std::min(1., std::exp(logLCurr - logLProp));
 
-#ifdef DEBUG
-    if (debug)
-        debugFile << " logLProp: " << logLProp << " logLCurr: " << logLCurr << " acc_prob: " << acc_prob << " fRandom: " << fRandom << std::endl;
-#endif
-
     return acc_prob;
 }

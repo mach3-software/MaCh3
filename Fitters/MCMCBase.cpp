@@ -166,11 +166,16 @@ bool MCMCBase::IsStepAccepted(const double acc_prob)
     // Get the random number
     const double fRandom = random->Rndm();
     // Do the accept/reject
+    #ifdef DEBUG
+    debugFile << " logLProp: " << logLProp << " logLCurr: " << logLCurr << " acc_prob: " << acc_prob << " fRandom: " << fRandom << std::endl;
+    #endif
+
     if (fRandom > acc_prob)
     {
         // Reject
         return false;
     }
+
 
     return true;
 
