@@ -1468,7 +1468,7 @@ void MCMCProcessor::DrawCorrelationsGroup(const std::unique_ptr<TH2D>& CorrMatri
   Posterior->Clear();
   MatrixCopy->Draw("colz");
 
-  std::vector<std::unique_ptr<TLine>> groupLines;((GroupStart.size() - 1) * 2);
+  std::vector<std::unique_ptr<TLine>> groupLines; //((GroupStart.size() - 1) * 2);
 
   int nBinsX = MatrixCopy->GetNbinsX();
   int nBinsY = MatrixCopy->GetNbinsY();

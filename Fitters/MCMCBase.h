@@ -40,7 +40,7 @@ class MCMCBase : public FitterBase {
     inline void PreStepProcess();
 
     /// @brief Actions after step proposal [end stopwatch, fill tree]
-    inline void PostStepProccess();
+    inline void PostStepProcess();
 
     /// @brief The MCMC step proposal and acceptance
     virtual void DoStep()=0;

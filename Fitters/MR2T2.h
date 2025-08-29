@@ -14,7 +14,7 @@ class MR2T2 : public MCMCBase {
      /// @brief Destructor
      virtual ~MR2T2() = default;
 
-     inline std::string GetName() const { return "MR2T2"; };
+     inline std::string GetName() const override { return "MR2T2"; };
 
  protected:
  
@@ -22,3 +22,6 @@ class MR2T2 : public MCMCBase {
     void ProposeStep() override;
     double AcceptanceProbability() override;
 };
+
+/// For backwards compatibility
+using mcmc  = MR2T2;

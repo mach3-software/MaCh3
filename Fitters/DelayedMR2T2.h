@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Fitters/MR2T2.h"
-#include "TMultiGraph.h"
 
 /// @brief Implementation of delayed rejection for MR2T2
 /// @author Henry Wallace
@@ -39,10 +38,10 @@ class DelayedMR2T2 : public MR2T2 {
     virtual ~DelayedMR2T2() = default;
 
     /// @brief Get name
-    inline std::string GetName() const { return "DelayedMR2T2"; };
+    inline std::string GetName() const override { return "DelayedMR2T2"; };
 
     /// @brief Actual implementation of MCMC fitting algorithm
-    void RunMCMC();
+    void RunMCMC() override;
 
  protected:
 
@@ -50,7 +49,7 @@ class DelayedMR2T2 : public MR2T2 {
     double AcceptanceProbability() override;
 
     /// @brief The MCMC step proposal
-    void DoStep();
+    void DoStep() override;
 
     /// @brief Store information about the current propsosed step
     void StoreCurrentStep();

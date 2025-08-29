@@ -109,7 +109,7 @@ void MCMCBase::PreStepProcess()
 }
 
 
-void MCMCBase::PostStepProccess(){
+void MCMCBase::PostStepProcess(){
     stepClock->Stop();
     stepTime = stepClock->RealTime();
 
@@ -155,12 +155,12 @@ void MCMCBase::StartFromPreviousFit(const std::string &FitName)
     // For MCMC we also need to set stepStart
     TFile *infile = new TFile(FitName.c_str(), "READ");
     TTree *posts = infile->Get<TTree>("posteriors");
-    int step_val = -1;
+    unsigned int step_val = 0;
 
     posts->SetBranchAddress("step", &step_val);
     posts->GetEntry(posts->GetEntries() - 1);
 
-    stepStart = step_val + 1;
+    stepStart = step_val;
     // KS: Also update number of steps if using adaption
     for (unsigned int i = 0; i < systematics.size(); ++i)
     {
