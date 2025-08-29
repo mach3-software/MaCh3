@@ -4,7 +4,6 @@
 
 /// @brief MCMC algorithm using MR2T2 
 /// @author Asher Kaboth
-
 class MR2T2 : public MCMCBase {
  public:
     /// @brief Constructor
@@ -17,9 +16,11 @@ class MR2T2 : public MCMCBase {
      inline std::string GetName() const override { return "MR2T2"; };
 
  protected:
- 
+    /// @brief The MCMC step proposal and acceptance
     void DoStep() override;
+    /// @brief Propose a step
     void ProposeStep() override;
+    /// @brief Step acceptance probability
     double AcceptanceProbability() override;
 };
 

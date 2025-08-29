@@ -1,6 +1,8 @@
 #include "Fitters/MR2T2.h"
 
-void MR2T2::DoStep(){
+// *******************
+void MR2T2::DoStep() {
+// *******************
     ProposeStep();
     // Does the MCMC accept this step?
     accProb = AcceptanceProbability();
@@ -13,9 +15,8 @@ void MR2T2::DoStep(){
 
 // *******************
 // Do the initial reconfigure of the MCMC
-void MR2T2::ProposeStep()
-{
-    // *******************
+void MR2T2::ProposeStep() {
+// *******************
     // Initial likelihood
 
     out_of_bounds = false;
@@ -93,9 +94,8 @@ void MR2T2::ProposeStep()
 
 // **********************
 // Do we accept the proposed step for all the parameters?
-double MR2T2::AcceptanceProbability()
-{
-    // **********************
+double MR2T2::AcceptanceProbability() {
+// **********************
     // Set the acceptance probability to zero
     double acc_prob = 0.0;
 

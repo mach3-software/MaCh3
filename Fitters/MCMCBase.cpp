@@ -3,9 +3,8 @@
 // *************************
 // Initialise the manager and make it an object of mcmc class
 // Now we can dump manager settings to the output file
-MCMCBase::MCMCBase(manager *man) : FitterBase(man)
-{
-    // *************************
+MCMCBase::MCMCBase(manager *man) : FitterBase(man) {
+// *************************
     // Beginning step number
     stepStart = 0;
 
@@ -28,9 +27,8 @@ MCMCBase::MCMCBase(manager *man) : FitterBase(man)
 
 // *******************
 // Run the Markov chain with all the systematic objects added
-void MCMCBase::RunMCMC()
-{
-    // *******************
+void MCMCBase::RunMCMC() {
+// *******************
     // Save the settings into the output file
     SaveSettings();
 
@@ -60,8 +58,9 @@ void MCMCBase::RunMCMC()
     ProcessMCMC();
 }
 
-
-void MCMCBase::DoMCMCStep(){
+// *******************
+void MCMCBase::DoMCMCStep() {
+// *******************
     /// Starts step timer, prints progress
     PreStepProcess();
     /// Step proposal, acceptance etc
@@ -71,8 +70,9 @@ void MCMCBase::DoMCMCStep(){
     current_step++;
 }
 
-void MCMCBase::PreStepProcess()
-{
+// *******************
+void MCMCBase::PreStepProcess() {
+// *******************
     stepClock->Start();
     out_of_bounds = false;
 
@@ -83,8 +83,9 @@ void MCMCBase::PreStepProcess()
     }
 }
 
-
-void MCMCBase::PostStepProcess(){
+// *************************
+void MCMCBase::PostStepProcess() {
+// *************************
     stepClock->Stop();
     stepTime = stepClock->RealTime();
 
@@ -101,9 +102,8 @@ void MCMCBase::PostStepProcess(){
 
 // *******************
 // Print the fit output progress
-void MCMCBase::PrintProgress()
-{
-    // *******************
+void MCMCBase::PrintProgress() {
+// *******************
     MACH3LOG_INFO("Step:\t{}/{}, current: {:.2f}, proposed: {:.2f}", step - stepStart, chainLength, logLCurr, logLProp);
     MACH3LOG_INFO("Accepted/Total steps: {}/{} = {:.2f}", accCount, step - stepStart, static_cast<double>(accCount) / static_cast<double>(step - stepStart));
 
@@ -121,9 +121,8 @@ void MCMCBase::PrintProgress()
 }
 
 // *******************
-void MCMCBase::StartFromPreviousFit(const std::string &FitName)
-{
-    // *******************
+void MCMCBase::StartFromPreviousFit(const std::string &FitName) {
+// *******************
     // Use base class
     FitterBase::StartFromPreviousFit(FitName);
 
@@ -148,8 +147,9 @@ void MCMCBase::StartFromPreviousFit(const std::string &FitName)
     delete infile;
 }
 
-
-void MCMCBase::AdaptiveStep(){
+// *************************
+void MCMCBase::AdaptiveStep() {
+// *************************
     // Save the Adaptive output
     for (const auto &syst : systematics)
     {
@@ -161,8 +161,9 @@ void MCMCBase::AdaptiveStep(){
     }
 }
 
-bool MCMCBase::IsStepAccepted(const double acc_prob)
-{
+// *************************
+bool MCMCBase::IsStepAccepted(const double acc_prob) {
+// *************************
     // Get the random number
     const double fRandom = random->Rndm();
     // Do the accept/reject
@@ -175,13 +176,12 @@ bool MCMCBase::IsStepAccepted(const double acc_prob)
         // Reject
         return false;
     }
-
-
     return true;
-
 }
 
-void MCMCBase::AcceptStep(){
+// *************************
+void MCMCBase::AcceptStep() {
+// *************************
     ++accCount;
     logLCurr = logLProp;
 

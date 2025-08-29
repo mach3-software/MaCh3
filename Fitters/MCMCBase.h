@@ -4,7 +4,6 @@
 
 /// @brief Base class for MCMC fitting algorithms
 /// @author Asher Kaboth
-
 class MCMCBase : public FitterBase {
  public:
     /// @brief Constructor
@@ -30,8 +29,8 @@ class MCMCBase : public FitterBase {
 
  protected:
  
- /// @brief The full StartStep->DoStep->EndStep chain
- inline void DoMCMCStep();
+    /// @brief The full StartStep->DoStep->EndStep chain
+    inline void DoMCMCStep();
 
     /// @brief Propose a step
     virtual void ProposeStep()=0;
@@ -47,7 +46,6 @@ class MCMCBase : public FitterBase {
 
     /// @brief Step acceptance probability
     virtual double AcceptanceProbability()=0;
-
 
     /// @brief Is step accepted?
     bool IsStepAccepted(const double acc_prob);
