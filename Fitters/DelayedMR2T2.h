@@ -6,27 +6,46 @@
 /// @author Henry Wallace
 /// @cite dram2006
 
-/*  ===============
-    Quick Intro:
-    - Delayed rejection is a method to increase the efficency of MCMC
-    - It is useful if your chain is not mixing well or if adaptive MCMC is struggling
-    - The idea is to propose increasingly small steps centred on the last rejected step
-
-    To enable it you need to add the following to your config.yaml file
-    - Set the algorithm as:  General::FittingAlgorithm::DelayedMR2T2
-    
-    Delayed MCMC will work "as is" but there are some additional options
-    which are set in General::MCMC
-    
-    # Scaling opts:
-    - DecayRate: This should be less than 1 and tells your algorithm how quickly to decrease the step size. By default this is 0.1
-    - MaxRejections: How many steps to delayed-reject before moving on. By default this is 1 and increasing is not recommended
-    - InitialScale: The initial scale of your propsoed steps. I.e. propose step with InitialScale*scale in parameter handler. This allows for a really large/small first step to be proposed. Testing finds the default value of 1 to be most effective with adaptive MCMC
-
-    # Delay Triggers
-    - DelayOnlyOutBounds: Here delaying only happens if a step is throw out of bounds.
-    - DelayProbability: In order to mitigate the slowness of delayed MCMC, there is a probability of proposing a delayed step. By default this is 1.
-*/
+/**
+ * @file DelayedRejectionMCMC.h
+ * @brief Delayed Rejection MCMC Implementation
+ * 
+ * @section intro Quick Introduction
+ * 
+ * Delayed rejection is a method to increase the efficiency of MCMC.
+ * It is useful if your chain is not mixing well or if adaptive MCMC is struggling.
+ * The idea is to propose increasingly small steps centered on the last rejected step.
+ * 
+ * @section config Configuration
+ * 
+ * To enable delayed rejection, add the following to your config.yaml file:
+ * - Set the algorithm as: General::FittingAlgorithm::DelayedMR2T2
+ * 
+ * Delayed MCMC will work "as is" but there are additional options
+ * which are set in General::MCMC
+ * 
+ * @subsection scaling Scaling Options
+ * 
+ * @param DecayRate This should be less than 1 and tells your algorithm how quickly 
+ *                  to decrease the step size. By default this is 0.1
+ * @param MaxRejections How many steps to delayed-reject before moving on. By default 
+ *                      this is 1 and increasing is not recommended
+ * @param InitialScale The initial scale of your proposed steps. I.e. propose step with 
+ *                     InitialScale*scale in parameter handler. This allows for a really 
+ *                     large/small first step to be proposed. Testing finds the default 
+ *                     value of 1 to be most effective with adaptive MCMC
+ * 
+ * @subsection triggers Delay Triggers
+ * 
+ * @param DelayOnlyOutBounds Here delaying only happens if a step is thrown out of bounds
+ * @param DelayProbability In order to mitigate the slowness of delayed MCMC, there is 
+ *                         a probability of proposing a delayed step. By default this is 1
+ * 
+ * @note Delayed rejection MCMC can significantly improve chain mixing but may increase
+ *       computational overhead per step.
+ * 
+ * @see MCMC, AdaptiveMCMC
+ */
 
 class DelayedMR2T2 : public MR2T2 {
  public:
