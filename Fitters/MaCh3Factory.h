@@ -2,12 +2,14 @@
 
 // MaCh3 includes
 #include "Fitters/FitterBase.h"
-#include "Fitters/mcmc.h"
+#include "Fitters/MR2T2.h"
+#include "Fitters/DelayedMR2T2.h"
 #include "Fitters/PSO.h"
 #include "Fitters/LikelihoodFit.h"
 #ifdef MaCh3_MINUIT2
 #include "Fitters/MinuitFit.h"
 #endif
+
 
 #include "Parameters/ParameterHandlerGeneric.h"
 
