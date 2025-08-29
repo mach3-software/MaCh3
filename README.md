@@ -174,9 +174,10 @@ Most of external libraries are being handled through [CPM](https://github.com/cp
 
 Based on several test here are recommended version:
 ```bash
-  GCC: >= 8.5 [lower versions may work]
+  GCC:   >= 8.5   [lower versions may work]
+  C++:   >= 14
   CMake: >= 3.14
-  ROOT: >= 6.18
+  ROOT:  >= 6.18
 ```
 ### Supported operational systems
 | Name        | Status |
@@ -193,6 +194,18 @@ Based on several test here are recommended version:
 
 ✅ - Part of CI/CD <br>
 ❔ - Not part of CI/CD but used by some users/developers so it might work <br>
+❌ - Not supported and no plans right now <br>
+
+### Supported compilers
+| Name        | Status |
+|-------------|--------|
+| GNU         | ✅     |
+| CLANG       | ❔     |
+| INTELLLVM   | ❔     |
+| MSVC        | ❌     |
+
+✅ - Fully working with every feature fully tested by CI/CD <br>
+❔ - Not every feature may work, only compilation being tested by CI/CD <br>
 ❌ - Not supported and no plans right now <br>
 
 ## Plotting and Diagnostic 📊

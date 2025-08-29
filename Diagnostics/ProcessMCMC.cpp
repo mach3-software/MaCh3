@@ -35,14 +35,23 @@ int main(int argc, char *argv[])
   nFiles = 0;
   if (argc != 3 && argc !=6 && argc != 8)
   {
-    MACH3LOG_ERROR("How to use: {} <Config> <MCMM_ND_Output.root>", argv[0]);
+    MACH3LOG_ERROR("How to use: ");
+    MACH3LOG_ERROR("  single chain: {} <Config> <MCMM_ND_Output.root>", argv[0]);
+    MACH3LOG_ERROR("  two chain:    {} <Config> <MCMM_ND_Output_1.root> <Title 1> <MCMC_ND_Output_2.root> <Title 2>", argv[0]);
+    MACH3LOG_ERROR("  three chain:  {} <Config> <MCMM_ND_Output_1.root> <Title 1> <MCMC_ND_Output_2.root> <Title 2> <MCMC_ND_Output_3.root> <Title 3>", argv[0]);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+
+  config = argv[1];
+  YAML::Node card_yaml = M3OpenConfig(config);
+  if (!CheckNodeExists(card_yaml, "ProcessMCMC")) {
+    MACH3LOG_ERROR("The 'ProcessMCMC' node is not defined in the YAML configuration.");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   if (argc == 3)
   {
     MACH3LOG_INFO("Producing single fit output");
-    config = argv[1];
     std::string filename = argv[2];
     ProcessMCMC(filename);
   }
@@ -50,8 +59,6 @@ int main(int argc, char *argv[])
   else if (argc == 6 || argc == 8)
   {
     MACH3LOG_INFO("Producing two fit comparison");
-    config = argv[1];
-
     FileNames.push_back(argv[2]);
     TitleNames.push_back(argv[3]);
 
@@ -99,16 +106,15 @@ void ProcessMCMC(const std::string& inputFile)
 
   Processor->Initialise();
 
-  if(Settings["BurnInSteps"])
-  {
+  if(Settings["BurnInSteps"]) {
     Processor->SetStepCut(Settings["BurnInSteps"].as<int>());
-  }
-  else
-  {
+  } else {
     MACH3LOG_WARN("BurnInSteps not set, defaulting to 20%");
     Processor->SetStepCut(static_cast<int>(Processor->GetnSteps()/5));
   }
-
+  if(Settings["MaxEntries"]) {
+    Processor->SetEntries(Get<int>(Settings["MaxEntries"], __FILE__, __LINE__));
+  }
   if(Settings["Thinning"])
   {
     if(Settings["Thinning"][0].as<bool>()){
@@ -151,8 +157,9 @@ void ProcessMCMC(const std::string& inputFile)
       Processor->MakeCredibleRegions(GetFromManager<std::vector<double>>(Settings["CredibleRegions"], {0.99, 0.90, 0.68}),
                                      GetFromManager<std::vector<short int>>(Settings["CredibleRegionStyle"], {2, 1, 3}),
                                      GetFromManager<std::vector<short int>>(Settings["CredibleRegionColor"], {413, 406, 416}),
-                                     GetFromManager<bool>(Settings["CredibleInSigmas"], false)
-                                     );
+                                     GetFromManager<bool>(Settings["CredibleInSigmas"], false), 
+                                     GetFromManager<bool>(Settings["Draw2DPosterior"], true),
+                                     GetFromManager<bool>(Settings["DrawBestFit"], true));
     }
     if(GetFromManager<bool>(Settings["GetTrianglePlot"], true)) GetTrianglePlot(Processor.get());
 
@@ -173,12 +180,11 @@ void MultipleProcessMCMC()
   nFiles = int(FileNames.size());
   std::vector<std::unique_ptr<MCMCProcessor>> Processor(nFiles);
 
-  if(!Settings["BurnInSteps"])
-  {
+  if(!Settings["BurnInSteps"]) {
     MACH3LOG_WARN("BurnInSteps not set, defaulting to 20%");
   }
 
-  for (int ik = 0; ik < nFiles;  ik++)
+  for (int ik = 0; ik < nFiles; ik++)
   {
     MACH3LOG_INFO("File for study: {}", FileNames[ik]);
     // Make the processor
@@ -195,17 +201,18 @@ void MultipleProcessMCMC()
     Processor[ik]->SetFancyNames(GetFromManager<bool>(Settings["FancyNames"], true));
     Processor[ik]->Initialise();
 
-    if(Settings["BurnInSteps"])
-    {
+    if(Settings["BurnInSteps"]) {
       Processor[ik]->SetStepCut(Settings["BurnInSteps"].as<int>());
-    }
-    else
-    {
+    }else {
       Processor[ik]->SetStepCut(static_cast<int>(Processor[ik]->GetnSteps()/5));
+    }
+
+    if(Settings["MaxEntries"]) {
+      Processor[ik]->SetEntries(Get<int>(Settings["MaxEntries"], __FILE__, __LINE__));
     }
   }
   //KS: Multithreading here is very tempting but there are some issues with root that need to be resovled :(
-  for (int ik = 0; ik < nFiles;  ik++)
+  for (int ik = 0; ik < nFiles; ik++)
   {
     // Make the postfit
     Processor[ik]->MakePostfit();
@@ -242,34 +249,30 @@ void MultipleProcessMCMC()
   for(int i = 0; i < Processor[0]->GetNParams(); ++i) 
   {
     // This holds the posterior density
-    std::vector<TH1D*> hpost(nFiles);
+    std::vector<std::unique_ptr<TH1D>> hpost(nFiles);
     std::vector<std::unique_ptr<TLine>> hpd(nFiles);
-    hpost[0] = static_cast<TH1D *>(Processor[0]->GetHpost(i)->Clone());
+    hpost[0] = M3::Clone(Processor[0]->GetHpost(i));
 
     bool Skip = false;
     for (int ik = 1 ; ik < nFiles;  ik++)
     {
       // KS: If somehow this chain doesn't given params we skip it
       const int Index = Processor[ik]->GetParamIndexFromName(hpost[0]->GetTitle());
-      if(Index == _UNDEF_)
+      if(Index == M3::_BAD_INT_)
       {
         Skip = true;
         break;
       }
-      hpost[ik] = static_cast<TH1D *>(Processor[ik]->GetHpost(Index)->Clone());
+      hpost[ik] = M3::Clone(Processor[ik]->GetHpost(Index));
     }
 
     // Don't plot if this is a fixed histogram (i.e. the peak is the whole integral)
-    if(hpost[0]->GetMaximum() == hpost[0]->Integral()*1.5 || Skip)
-    {
-      for (int ik = 0; ik < nFiles;  ik++)
-        delete hpost[ik];
-
+    if(hpost[0]->GetMaximum() == hpost[0]->Integral()*1.5 || Skip) {
       continue;
     }
     for (int ik = 0; ik < nFiles;  ik++)
     {
-      RemoveFitter(hpost[ik], "Gauss");
+      RemoveFitter(hpost[ik].get(), "Gauss");
 
       // Set some nice colours
       hpost[ik]->SetLineColor(PosteriorColor[ik]);
@@ -301,10 +304,10 @@ void MultipleProcessMCMC()
     TString asimovLeg = Form("#splitline{Prior}{x = %.2f , #sigma = %.2f}", Prior, PriorError);
     leg->AddEntry(Asimov.get(), asimovLeg, "l");
 
-    for (int ik = 0; ik < nFiles;  ik++)
+    for (int ik = 0; ik < nFiles; ik++)
     {
       TString rebinLeg = Form("#splitline{%s}{#mu = %.2f, #sigma = %.2f}", TitleNames[ik].c_str(), hpost[ik]->GetMean(), hpost[ik]->GetRMS());
-      leg->AddEntry(hpost[ik],  rebinLeg, "l");
+      leg->AddEntry(hpost[ik].get(),  rebinLeg, "l");
 
       hpd[ik] = std::make_unique<TLine>(hpost[ik]->GetBinCenter(hpost[ik]->GetMaximumBin()), hpost[ik]->GetMinimum(),
                                         hpost[ik]->GetBinCenter(hpost[ik]->GetMaximumBin()), hpost[ik]->GetMaximum());
@@ -315,19 +318,16 @@ void MultipleProcessMCMC()
 
     // Find the maximum value to nicely resize hist
     double maximum = 0;
-    for (int ik = 0; ik < nFiles;  ik++) maximum = std::max(maximum, hpost[ik]->GetMaximum());
-    for (int ik = 0; ik < nFiles;  ik++) hpost[ik]->SetMaximum(1.3*maximum);
+    for (int ik = 0; ik < nFiles; ik++) maximum = std::max(maximum, hpost[ik]->GetMaximum());
+    for (int ik = 0; ik < nFiles; ik++) hpost[ik]->SetMaximum(1.3*maximum);
 
     hpost[0]->Draw("hist");
-    for (int ik = 1; ik < nFiles;  ik++) hpost[ik]->Draw("hist same");
+    for (int ik = 1; ik < nFiles; ik++) hpost[ik]->Draw("hist same");
     Asimov->Draw("same");
-    for (int ik = 0; ik < nFiles;  ik++) hpd[ik]->Draw("same");
+    for (int ik = 0; ik < nFiles; ik++) hpd[ik]->Draw("same");
     leg->Draw("same");
     Posterior->cd();
     Posterior->Print(canvasname);
-    for (int ik = 0; ik < nFiles;  ik++) {
-      delete hpost[ik];
-    }
   }//End loop over parameters
     
   // Finally draw the parameter plot onto the PDF
@@ -343,7 +343,7 @@ void MultipleProcessMCMC()
   Posterior->Print(canvasname);
 }
 
-// KS: Calculate Bayes factor for a given hypothesis, most informative are those related to osc params. However, it make relative easy interpretation for switch dials
+/// @brief KS: Calculate Bayes factor for a given hypothesis, most informative are those related to osc params. However, it make relative easy interpretation for switch dials
 void CalcBayesFactor(MCMCProcessor* Processor)
 {
   YAML::Node card_yaml = M3OpenConfig(config.c_str());
@@ -516,13 +516,13 @@ void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, const std::string& input
       {
         if( std::fabs (CovarianceDiff->GetBinContent(j, i)) < 1.e-5 && std::fabs (CovariancePreviousHist->GetBinContent(j, i)) < 1.e-5)
         {
-          CovarianceDiff->SetBinContent(j, i, _UNDEF_);
-          CovariancePreviousHist->SetBinContent(j, i, _UNDEF_);
+          CovarianceDiff->SetBinContent(j, i, M3::_BAD_DOUBLE_);
+          CovariancePreviousHist->SetBinContent(j, i, M3::_BAD_DOUBLE_);
         }
         if( std::fabs (CorrelationDiff->GetBinContent(j, i)) < 1.e-5 && std::fabs (CorrelationPreviousHist->GetBinContent(j, i)) < 1.e-5)
         {
-          CorrelationDiff->SetBinContent(j, i, _UNDEF_);
-          CorrelationPreviousHist->SetBinContent(j, i, _UNDEF_);
+          CorrelationDiff->SetBinContent(j, i, M3::_BAD_DOUBLE_);
+          CorrelationPreviousHist->SetBinContent(j, i, M3::_BAD_DOUBLE_);
         }
       }
     }
@@ -633,7 +633,7 @@ TH2D* TMatrixIntoTH2D(TMatrixDSym* Matrix, const std::string& title)
   return hMatrix;
 }
 
-//KS: Perform KS test to check if two posteriors for the same parameter came from the same distribution
+// KS: Perform KS test to check if two posteriors for the same parameter came from the same distribution
 void KolmogorovSmirnovTest(const std::vector<std::unique_ptr<MCMCProcessor>>& Processor,
                            const std::unique_ptr<TCanvas>& Posterior,
                            const TString& canvasname)
@@ -661,7 +661,7 @@ void KolmogorovSmirnovTest(const std::vector<std::unique_ptr<MCMCProcessor>>& Pr
       {
         // KS: If somehow this chain doesn't given params we skip it
         Index = Processor[ik]->GetParamIndexFromName(hpost[0]->GetTitle());
-        if(Index == _UNDEF_)
+        if(Index == M3::_BAD_INT_)
         {
           Skip = true;
           break;

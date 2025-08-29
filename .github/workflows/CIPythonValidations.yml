@@ -22,7 +22,7 @@ jobs:
       image: ghcr.io/mach3-software/mach3:alma9latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Get MaCh3 Validations
       run: |

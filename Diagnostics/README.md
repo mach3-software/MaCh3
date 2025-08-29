@@ -14,6 +14,10 @@
 **DiagMCMC** - Perform MCMC diagnostic like autocorrelation or trace plots.
 
 **PlotMCMCDiag** - Plot output of **DiagMCMC**, can compare multiple files if more than one argument is used
+```bash
+./PlotMCMCDiag DiagMCMC_file_1.root Label_1, DiagMCMC_file_2.root Label_2 ...
+```
+Can process up to 4 files
 
 **RHat** - Performs RHat diagnostic to study if all used chains converged to the same stationary distribution.
 ```bash

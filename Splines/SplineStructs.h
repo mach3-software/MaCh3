@@ -153,14 +153,14 @@ public:
   /// @brief Empty constructor
   TF1_red() : TResponseFunction_red() {
     length = 0;
-    Par = NULL;
+    Par = nullptr;
   }
 
   /// @brief Empty destructor
   virtual ~TF1_red() {
     if (Par != NULL) {
       delete[] Par;
-      Par = NULL;
+      Par = nullptr;
     }
   }
 
@@ -174,20 +174,20 @@ public:
 
   /// @brief The TF1 constructor with deep copy
   TF1_red(TF1* &Function) : TResponseFunction_red() {
-    Par = NULL;
+    Par = nullptr;
     SetFunc(Function);
   }
 
   /// @brief Set the function
   inline void SetFunc(TF1* &Func) {
     length = M3::int_t(Func->GetNpar());
-    if (Par != NULL) delete[] Par;
+    if (Par != nullptr) delete[] Par;
     Par = new M3::float_t[length];
     for (int i = 0; i < length; ++i) {
       Par[i] = M3::float_t(Func->GetParameter(i));
     }
     delete Func;
-    Func = NULL;
+    Func = nullptr;
   }
 
   /// @brief Evaluate a variation
@@ -270,16 +270,16 @@ public:
   /// @brief Empty constructor
   TSpline3_red() : TResponseFunction_red() {
     nPoints = 0;
-    Par = NULL;
-    XPos = NULL;
-    YResp = NULL;
+    Par = nullptr;
+    XPos = nullptr;
+    YResp = nullptr;
   }
 
   /// @brief The constructor that takes a TSpline3 pointer and copies in to memory
   TSpline3_red(TSpline3* &spline, SplineInterpolation InterPolation = kTSpline3) : TResponseFunction_red() {
-    Par = NULL;
-    XPos = NULL;
-    YResp = NULL;
+    Par = nullptr;
+    XPos = nullptr;
+    YResp = nullptr;
     SetFunc(spline, InterPolation);
   }
 
@@ -311,16 +311,16 @@ public:
   /// @brief Set the function
   inline void SetFunc(TSpline3* &spline, SplineInterpolation InterPolation = kTSpline3) {
     nPoints = M3::int_t(spline->GetNp());
-    if (Par != NULL) {
+    if (Par != nullptr) {
       for (int i = 0; i < nPoints; ++i) {
         delete[] Par[i];
-        Par[i] = NULL;
+        Par[i] = nullptr;
       }
       delete[] Par;
-      Par = NULL;
+      Par = nullptr;
     }
-    if (XPos != NULL) delete[] XPos;
-    if (YResp != NULL) delete[] YResp;
+    if (XPos != nullptr) delete[] XPos;
+    if (YResp != nullptr) delete[] YResp;
     // Save the parameters for each knot
     Par = new M3::float_t*[nPoints];
     // Save the positions of the knots
@@ -352,16 +352,21 @@ public:
     else if(InterPolation == kLinear || InterPolation == kLinearFunc)
     {
       for (int k = 0; k < nPoints; ++k) {
-        // 3 is the size of the TSpline3 coefficients
         Par[k] = new M3::float_t[3];
+
         Double_t x1, y1, b1, c1, d1, x2, y2, b2, c2, d2 = 0;
         spline->GetCoeff(k, x1, y1, b1, c1, d1);
-        spline->GetCoeff(k+1, x2, y2, b2, c2, d2);
-        double tempb = (y2-y1)/(x2-x1);
 
+        double tempb = 0;
+        if (k == nPoints - 1) {
+          tempb = Par[k-1][0];
+        } else {
+          spline->GetCoeff(k + 1, x2, y2, b2, c2, d2);
+          tempb = (y2-y1)/(x2-x1);
+        }
         XPos[k]   = M3::float_t(x1);
         YResp[k]  = M3::float_t(y1);
-        Par[k][0] = M3::float_t(tempb);
+        Par[k][0] = M3::float_t(tempb);  // linear slope
         Par[k][1] = M3::float_t(0);
         Par[k][2] = M3::float_t(0);
       }
@@ -573,23 +578,23 @@ public:
     }
 
     delete spline;
-    spline = NULL;
+    spline = nullptr;
   }
 
   /// @brief Empty destructor
   virtual ~TSpline3_red() {
-    if(Par != NULL) {
+    if(Par != nullptr) {
       for (int i = 0; i < nPoints; ++i) {
-        if (Par[i] != NULL) {
+        if (Par[i] != nullptr) {
           delete[] Par[i];
         }
       }
       delete[] Par;
     }
-    if(XPos != NULL) delete[] XPos;
-    if(YResp != NULL) delete[] YResp;
-    Par = NULL;
-    XPos = YResp = NULL;
+    if(XPos != nullptr) delete[] XPos;
+    if(YResp != nullptr) delete[] YResp;
+    Par = nullptr;
+    XPos = YResp = nullptr;
   }
 
   /// @brief Find the segment relevant to this variation in x
@@ -671,6 +676,10 @@ public:
     #else
     TSpline3 *spline = new TSpline3("Spline", XPos, YResp, nPoints);
     #endif
+    for (Int_t i = 0; i < nPoints; ++i) {
+      spline->SetPointCoeff(i, Par[i][0], Par[i][1], Par[i][2]);
+    }
+
     return spline;
   }
 
@@ -738,7 +747,7 @@ inline std::vector<std::vector<TSpline3_red*> > ReduceTSpline3(std::vector<std::
       // Here's our delicious TSpline3 object
       TSpline3 *spline = (*InnerIt);
       // Now make the reduced TSpline3 pointer
-      TSpline3_red *red = NULL;
+      TSpline3_red *red = nullptr;
       if (spline != NULL) {
         red = new TSpline3_red(spline);
         (*InnerIt) = spline;
@@ -776,7 +785,7 @@ inline std::vector<std::vector<TF1_red*> > ReduceTF1(std::vector<std::vector<TF1
       // Here's our delicious TSpline3 object
       TF1* spline = (*InnerIt);
       // Now make the reduced TSpline3 pointer (which deleted TSpline3)
-      TF1_red* red = NULL;
+      TF1_red* red = nullptr;
       if (spline != NULL) {
         red = new TF1_red(spline);
         (*InnerIt) = spline;

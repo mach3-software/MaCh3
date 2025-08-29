@@ -1,9 +1,5 @@
 #pragma once
 
-#ifndef _UNDEF_
-#define _UNDEF_ 1234567890
-#endif
-
 // C++ includes
 #include <complex>
 #include <cstdio>
@@ -111,7 +107,9 @@ class MCMCProcessor {
     void MakeCredibleRegions(const std::vector<double>& CredibleRegions = {0.99, 0.90, 0.68},
                              const std::vector<Style_t>& CredibleRegionStyle = {kDashed, kSolid, kDotted},
                              const std::vector<Color_t>& CredibleRegionColor = {kGreen-3, kGreen-10, kGreen},
-                             const bool CredibleInSigmas = false
+                             const bool CredibleInSigmas = false,
+                             const bool Draw2DPosterior = true,
+                             const bool DrawBestFit = true
                              );
     /// @brief Make fancy triangle plot for selected parameters
     /// @param CredibleIntervals Vector with values of credible intervals, must be in descending order
@@ -136,7 +134,7 @@ class MCMCProcessor {
     /// @param CredibleIntervals A vector of credible interval values.
     /// @param CredibleIntervalsColours A vector of colors associated with each credible interval.
     /// @throws MaCh3Exception If the sizes are not equal or the intervals are not in decreasing order.
-    void CheckCredibleIntervalsOrder(const std::vector<double>& CredibleIntervals, const std::vector<Color_t>& CredibleIntervalsColours);
+    void CheckCredibleIntervalsOrder(const std::vector<double>& CredibleIntervals, const std::vector<Color_t>& CredibleIntervalsColours) const;
 
     /// @brief Checks the order and size consistency of the `CredibleRegions`, `CredibleRegionStyle`, and `CredibleRegionColor` vectors.
     /// @param CredibleRegions A vector of credible region values.
@@ -164,6 +162,15 @@ class MCMCProcessor {
     void GetSavageDickey(const std::vector<std::string>& ParName,
                          const std::vector<double>& EvaluationPoint,
                          const std::vector<std::vector<double>>& Bounds);
+
+    /// @brief Produce Savage Dickey plot
+    /// @param PriorHist Histogram with prior distribution
+    /// @param PosteriorHist Histogram with posterior distribution
+    void SavageDickeyPlot(std::unique_ptr<TH1D>& PriorHist,
+                          std::unique_ptr<TH1D>& PosteriorHist,
+                          const std::string& Title,
+                          const double EvaluationPoint) const ;
+
     /// @brief Reweight Prior by giving new central value and new error
     /// @param Names Parameter names for which we do reweighting
     /// @param NewCentral New central value for which we reweight
@@ -181,31 +188,35 @@ class MCMCProcessor {
     /// @brief Thin MCMC Chain, to save space and maintain low autocorrelations.
     /// @param ThinningCut every which entry you want to thin
     /// @param Average If true will perform MCMC averaging instead of thinning
-    inline void ThinMCMC(const int ThinningCut) { ThinningMCMC(MCMCFile+".root", ThinningCut); };
+    inline void ThinMCMC(const int ThinningCut) const { ThinningMCMC(MCMCFile+".root", ThinningCut); };
 
     /// @brief KS: Perform MCMC diagnostic including Autocorrelation, Trace etc.
     void DiagMCMC();
     
     // Get the number of parameters
     /// @brief Get total number of used parameters
-    inline int GetNParams() { return nDraw; };
-    inline int GetNXSec() { return nParam[kXSecPar]; };
-    inline int GetNND() { return nParam[kNDPar]; };
-    inline int GetNFD() { return nParam[kFDDetPar]; };
+    inline int GetNParams() const { return nDraw; };
+    inline int GetNXSec() const { return nParam[kXSecPar]; };
+    inline int GetNND() const { return nParam[kNDPar]; };
+    inline int GetNFD() const { return nParam[kFDDetPar]; };
+
+    /// @brief Get Yaml config obtained from a Chain
+    YAML::Node GetCovConfig(const int i) const {return CovConfig.at(i); }
+
     /// @brief Number of params from a given group, for example flux
     int GetGroup(const std::string& name) const;
 
     /// @brief Get 1D posterior for a given parameter
     /// @param i parameter index
-    inline TH1D* GetHpost(const int i) { return hpost[i]; };
+    inline TH1D* GetHpost(const int i) const { return hpost[i]; };
     /// @brief Get 2D posterior for a given parameter combination
     /// @param i parameter index X
     /// @param j parameter index Y
-    inline TH2D* GetHpost2D(const int i, const int j) { return hpost2D[i][j]; };
+    inline TH2D* GetHpost2D(const int i, const int j) const { return hpost2D[i][j]; };
     /// @brief Get Violin plot for all parameters with posterior values
-    inline TH2D* GetViolin() { return hviolin.get(); };
+    inline TH2D* GetViolin() const { return hviolin.get(); };
     /// @brief Get Violin plot for all parameters with prior values
-    inline TH2D* GetViolinPrior() { return hviolin_prior.get(); };
+    inline TH2D* GetViolinPrior() const { return hviolin_prior.get(); };
 
     //Covariance getters
     inline std::vector<std::string> GetXSecCov()  const { return CovPos[kXSecPar]; };
@@ -232,12 +243,35 @@ class MCMCProcessor {
     /// @brief Get Number of Steps that Chain has, for merged chains will not be the same nEntries
     inline Long64_t GetnSteps(){return nSteps;};
     
+    /// @brief Set number of entries to make potentially MCMC Processing faster
+    /// @warning This option only sets an upper limit; burn-in events will NOT be discarded
+    inline void SetEntries(const int NewEntries) {
+      if (NewEntries > nEntries) {
+        MACH3LOG_ERROR("Cannot increase entries from {} to {}. Only decreasing is allowed.", nEntries, NewEntries);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+      if (NewEntries <= 0) {
+        MACH3LOG_ERROR("Entries cannot be below 0, but {} was passed.", NewEntries);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+
+      if (static_cast<int>(BurnInCut) > NewEntries) {
+          MACH3LOG_ERROR("BurnInCut ({}) is larger than NewEntries ({})", BurnInCut, NewEntries);
+          throw MaCh3Exception(__FILE__, __LINE__);
+      }
+
+      MACH3LOG_INFO("Setting entries to {} from {}.", NewEntries, nEntries);
+      MACH3LOG_WARN("This may behave not as expected when using merged multiple chains");
+      nEntries = NewEntries;
+    }
     /// @brief Set the step cutting by string
     /// @param Cuts string telling cut value
     void SetStepCut(const std::string& Cuts);
     /// @brief Set the step cutting by int
     /// @param Cuts integer telling cut value
     void SetStepCut(const int Cuts);
+    /// @brief Check if step cut isn't larger than highest values of step in a chain
+    void CheckStepCut() const;
 
     /// @brief You can set relative to prior or relative to generated. It is advised to use relate to prior
     /// @param PlotOrNot bool controlling plotRelativeToPrior argument
@@ -276,7 +310,10 @@ class MCMCProcessor {
     inline void MakeOutputFile();
     /// @brief Draw 1D correlations which might be more helpful than looking at huge 2D Corr matrix
     inline void DrawCorrelations1D();
-
+    /// @brief Produces correlation matrix but instead of giving name for each param it only give name for param group
+    /// @param CorrMatrix correlation matrix that we are going to plot
+    /// @note Inspired by plot in Ewan thesis see https://www.t2k.org/docs/thesis/152/Thesis#page=147
+    inline void DrawCorrelationsGroup(const std::unique_ptr<TH2D>& CorrMatrix) const;
     /// @brief CW: Read the input Covariance matrix entries. Get stuff like parameter input errors, names, and so on
     inline void ReadInputCov();
     /// @warning This will no longer be supported in future
@@ -360,8 +397,10 @@ class MCMCProcessor {
     std::string MCMCFile;
     /// Output file suffix useful when running over same file with different settings
     std::string OutputSuffix;
-    /// Covariance matrix name position
+    /// Covariance matrix file name position
     std::vector<std::vector<std::string>> CovPos;
+    /// Covariance matrix name position
+    std::vector<std::string> CovNamePos;
     /// Covariance matrix config
     std::vector<YAML::Node> CovConfig;
 
@@ -372,9 +411,9 @@ class MCMCProcessor {
     /// Cut used when making 1D Posterior distribution
     std::string Posterior1DCut;
     /// KS: Used only for SubOptimality
-    int UpperCut;
+    unsigned int UpperCut;
     /// Value of burn in cut
-    int BurnInCut;
+    unsigned int BurnInCut;
     /// Number of branches in a TTree
     int nBranches;
     /// KS: For merged chains number of entries will be different from nSteps
@@ -494,7 +533,7 @@ class MCMCProcessor {
     /// Array holding values for all parameters
     double** ParStep;
     /// Step number for step, important if chains were merged
-    int* StepNumber;
+    unsigned int* StepNumber;
 
     /// Number of bins
     int nBins;
@@ -528,7 +567,7 @@ class MCMCProcessor {
     double *AccProbBatchedAverages;
     
   //Only if GPU is enabled
-  #ifdef CUDA
+  #ifdef MaCh3_CUDA
     /// @brief Move stuff to GPU to perform auto correlation calculations there
     inline void PrepareGPU_AutoCorr(const int nLags);
 

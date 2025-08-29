@@ -17,7 +17,7 @@
 /// @author Ed Atkin
 class SampleHandlerFD :  public SampleHandlerBase
 {
-public:
+ public:
   //######################################### Functions #########################################
   /// @brief Constructor
   /// @param ConfigFileName Name of config to initialise the sample object
@@ -28,18 +28,18 @@ public:
 
   /// @brief DB Function to differentiate 1D or 2D binning
   /// @ingroup SampleHandlerGetters
-  int GetNDim() const { return nDimensions; }
+  int GetNDim() const { return SampleDetails.nDimensions; }
   /// @ingroup SampleHandlerGetters
   std::string GetSampleName(int iSample = 0) const override;
   /// @ingroup SampleHandlerGetters
-  std::string GetTitle() const override {return SampleTitle;}
+  std::string GetTitle() const override {return SampleDetails.SampleTitle;}
 
   /// @ingroup SampleHandlerGetters
-  std::string GetXBinVarName() {return XVarStr;}
+  std::string GetXBinVarName() const {return SampleDetails.XVarStr;}
   /// @ingroup SampleHandlerGetters
-  std::string GetYBinVarName() {return YVarStr;}
+  std::string GetYBinVarName() const {return SampleDetails.YVarStr;}
 
-  void PrintIntegral(TString OutputName="/dev/null", int WeightStyle=0, TString OutputCSVName="/dev/null");
+  void PrintIntegral(const TString& OutputName="/dev/null", const int WeightStyle=0, const TString& OutputCSVName="/dev/null");
   
   //===============================================================================
   // DB Reweighting and Likelihood functions
@@ -77,11 +77,11 @@ public:
   void ReadSampleConfig();
 
   /// @ingroup SampleHandlerGetters
-  int GetNOscChannels() {return static_cast<int>(OscChannels.size());}
+  int GetNOscChannels() override {return static_cast<int>(OscChannels.size());}
 
   /// @ingroup SampleHandlerGetters
   std::string GetFlavourName(const int iChannel) {
-    if (iChannel < 0 || iChannel > static_cast<int>(OscChannels.size())) {
+    if (iChannel < 0 || iChannel > GetNOscChannels()) {
       MACH3LOG_ERROR("Invalid Channel Requested: {}", iChannel);
       throw MaCh3Exception(__FILE__ , __LINE__);      
     }
@@ -109,11 +109,11 @@ public:
 
   /// @ingroup SampleHandlerGetters
   TH1 *GetModeHist1D(int s, int m, int style = 0) {
-    return Get1DVarHistByModeAndChannel(XVarStr,m,s,style);
+    return Get1DVarHistByModeAndChannel(GetXBinVarName(),m,s,style);
   }
   /// @ingroup SampleHandlerGetters
   TH2 *GetModeHist2D(int s, int m, int style = 0) {
-    return Get2DVarHistByModeAndChannel(XVarStr,YVarStr,m,s,style);
+    return Get2DVarHistByModeAndChannel(GetXBinVarName(),GetYBinVarName(),m,s,style);
   }
 
   /// @ingroup SampleHandlerGetters
@@ -203,9 +203,6 @@ public:
   void SetupSampleBinning();
   /// @brief Initialise data, MC and W2 histograms
   void SetupReweightArrays(const size_t numberXBins, const size_t numberYBins);
-
-  /// @brief the strings associated with the variables used for the binning e.g. "RecoNeutrinoEnergy"
-  std::string XVarStr, YVarStr;
   //===============================================================================
 
   // ----- Functional Parameters -----
@@ -258,7 +255,7 @@ public:
   /// This way func weight shall be used in GetEventWeight
   virtual void CalcWeightFunc(int iEvent){return; (void)iEvent;};
 
-  /// @brief Return the value of an assocaited kinematic parameter for an event
+  /// @brief Return the value of an associated kinematic parameter for an event
   virtual double ReturnKinematicParameter(std::string KinematicParamter, int iEvent) = 0;
   virtual double ReturnKinematicParameter(int KinematicVariable, int iEvent) = 0;
   
@@ -272,17 +269,16 @@ public:
   virtual const double* GetPointerToKinematicParameter(std::string KinematicParamter, int iEvent) = 0;
   virtual const double* GetPointerToKinematicParameter(double KinematicVariable, int iEvent) = 0;
 
+  /// @brief Get pointer to oscillation channel associated with given event. Osc channel is const
   const double* GetPointerToOscChannel(const int iEvent) const;
-
+  /// @brief Setup the norm parameters by assigning each event with bin
   void SetupNormParameters();
 
   //===============================================================================
   //DB Functions required for reweighting functions
   //DB Replace previous implementation with reading bin contents from SampleHandlerFD_array
-  /// @brief Fill a 1D histogram with the event-level information used in the fit
-  void Fill1DHist();
-  /// @brief Fill a 2D histogram with the event-level information used in the fit
-  void Fill2DHist();
+  /// @brief Fill a histogram with the event-level information used in the fit
+  void FillMCHist(const int Dimension);
 
   /// @brief DB Nice new multi-threaded function which calculates the event weights and fills the relevant bins of an array
 #ifdef MULTITHREAD
@@ -301,16 +297,19 @@ public:
   SampleBinningInfo Binning;
 
   /// DB Array to be filled after reweighting
-  double** SampleHandlerFD_array;
+  double* SampleHandlerFD_array;
   /// KS Array used for MC stat
-  double** SampleHandlerFD_array_w2;
+  double* SampleHandlerFD_array_w2;
   /// DB Array to be filled in AddData
-  double** SampleHandlerFD_data;
+  double* SampleHandlerFD_data;
   //===============================================================================
 
   //===============================================================================
-  //MC variables
+  /// Stores information about every MC event
   std::vector<FarDetectorCoreInfo> MCSamples;
+  /// Stores info about currently initialised sample
+  SampleInfo SampleDetails;
+  /// Stores info about oscillation channel for a single sample
   std::vector<OscChannelInfo> OscChannels;
   //===============================================================================
 
@@ -321,14 +320,8 @@ public:
   ParameterHandlerGeneric *ParHandler = nullptr;
 
   //=============================================================================== 
-
-  /// @brief Keep track of the dimensions of the sample binning
-  int nDimensions = M3::_BAD_INT_;
-  /// @brief A unique ID for each sample based on powers of two for quick binary operator comparisons 
+  /// @brief A unique ID for each sample based on which we can define what systematic should be applied
   std::string SampleName;
-
-  /// @brief the name of this sample e.g."muon-like"
-  std::string SampleTitle;
 
   //===========================================================================
   //DB Vectors to store which kinematic cuts we apply
@@ -361,7 +354,9 @@ public:
   void InitialiseSingleFDMCObject();
   void InitialiseSplineObject();
 
+  /// names of mc files associated associated with this object
   std::vector<std::string> mc_files;
+  /// names of spline files associated associated with this object
   std::vector<std::string> spline_files;
 
   std::unordered_map<std::string, double> _modeNomWeightMap;
@@ -376,18 +371,17 @@ public:
   /// KS:Super hacky to update W2 or not
   bool UpdateW2;
 
-  TH1D *dathist;
-  TH2D *dathist2d;
+  /// @brief Retrieve the initial neutrino PDG code associated with a given input file name.
+  NuPDG GetInitPDGFromFileName(const std::string& FileName) const {return FileToInitPDGMap.at(FileName);}
+  /// @brief Retrieve the final neutrino PDG code associated with a given input file name.
+  NuPDG GetFinalPDGFromFileName(const std::string& FileName) const {return FileToFinalPDGMap.at(FileName);}
 
-  // binned PDFs
-  TH1D* _hPDF1D;
-  TH2D* _hPDF2D;
-
-  NuPDG GetInitPDGFromFileName(const std::string& FileName) {return FileToInitPDGMap.at(FileName);}
-  NuPDG GetFinalPDGFromFileName(const std::string& FileName) {return FileToFinalPDGMap.at(FileName);}
-
-private:
+ private:
   std::unordered_map<std::string, NuPDG> FileToInitPDGMap;
   std::unordered_map<std::string, NuPDG> FileToFinalPDGMap;
   
+  enum FDPlotType {
+    kModePlot = 0,
+    kOscChannelPlot = 1
+  };
 };

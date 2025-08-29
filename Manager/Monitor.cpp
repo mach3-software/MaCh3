@@ -1,7 +1,8 @@
 #include "Manager/Monitor.h"
+#include <unistd.h>
 
 //Only if GPU is enabled
-#ifdef CUDA
+#ifdef MaCh3_CUDA
 #include "Manager/gpuUtils.cuh"
 #endif
 
@@ -141,7 +142,7 @@ void NThreadsSanity() {
 //KS: Simple function retrieving GPU info
 void GetGPUInfo(){
 // ************************
-#ifdef CUDA
+#ifdef MaCh3_CUDA
   MACH3LOG_INFO("Using following GPU:");
   // Print GPU name
   MACH3LOG_INFO("GPU Name: {}", TerminalToString("nvidia-smi --query-gpu=name --format=csv,noheader"));
@@ -209,7 +210,7 @@ void EstimateDataTransferRate(TChain* chain, const Long64_t entry){
 
 // ************************
 //KS: Simply print progress bar
-void PrintProgressBar(const Long64_t Done, const Long64_t All){
+void PrintProgressBar(const Long64_t Done, const Long64_t All) {
 // ************************
   double progress = double(Done)/double(All);
   const int barWidth = 20;
@@ -232,7 +233,7 @@ void PrintProgressBar(const Long64_t Done, const Long64_t All){
 
 // ***************************************************************************
 //CW: Get memory, which is probably silly
-int getValue(const std::string& Type){ //Note: this value is in KB!
+int getValue(const std::string& Type) { //Note: this value is in KB!
 // ***************************************************************************
   std::ifstream file("/proc/self/status");
   int result = -1;
@@ -305,8 +306,42 @@ void PrintConfig(const YAML::Node& node){
 }
 
 // ***************************************************************************
+//KS: Print content of TFile using logger
+void Print(const TTree* tree) {
+// ***************************************************************************
+  if (!tree) return;
+
+  // Create a temporary file to capture stdout
+  FILE* tmpFile = tmpfile();
+  if (!tmpFile) return;
+
+  // Save old stdout
+  int oldStdout = dup(fileno(stdout));
+  // Redirect stdout to tmpFile
+  dup2(fileno(tmpFile), fileno(stdout));
+
+  tree->Print();  // ROOT writes to stdout
+
+  fflush(stdout);
+  // Restore old stdout
+  dup2(oldStdout, fileno(stdout));
+  close(oldStdout);
+
+  // Read tmpFile content
+  fseek(tmpFile, 0, SEEK_SET);
+  char buffer[1024];
+  while (fgets(buffer, sizeof(buffer), tmpFile)) {
+    std::string line(buffer);
+    if (!line.empty() && line.back() == '\n') line.pop_back();
+    MACH3LOG_INFO("{}", line);
+  }
+
+  fclose(tmpFile);
+}
+
+// ***************************************************************************
 //KS: Almost all MaCh3 executables have the same usage, prepare simple printer
-void MaCh3Usage(int argc, char **argv){
+void MaCh3Usage(int argc, char **argv) {
 // ***************************************************************************
   if (argc != 2) {
     MACH3LOG_ERROR("Wrong usage of MaCh3 executable!");

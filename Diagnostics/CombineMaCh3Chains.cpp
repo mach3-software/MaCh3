@@ -271,11 +271,16 @@ void CombineChain()
   TFile *outputFile = fileMerger->GetOutputFile();
   outputFile->cd();
 
-  // EM: write out the version and config files to the combined file
-  TMacro *MaCh3_Config = prevFile->Get<TMacro>("MaCh3_Config");
-
-  if(MaCh3_Config != NULL) MaCh3_Config->Write();
-  delete MaCh3_Config;
+  // EM: Write out the version and config files to the combined file
+  std::vector<std::string> configNames = {"MaCh3_Config", "Reweight_Config"};
+  for (std::size_t i = 0; i < configNames.size(); ++i) {
+    const std::string& name = configNames[i];
+    TMacro* macro = prevFile->Get<TMacro>(name.c_str());
+    if (macro != nullptr) {
+      macro->Write();
+      delete macro;
+    }
+  }
 
   // EM: now let's combine all the trees and write to the output file
   bool mergeSuccess = fileMerger->PartialMerge(TFileMerger::kRegular | TFileMerger::kAll | TFileMerger::kOnlyListed);

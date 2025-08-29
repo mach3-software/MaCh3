@@ -319,7 +319,6 @@ class ParameterHandlerBase {
   /// @brief Fix parameter at prior values
   /// @param name Name of parameter you want to fix
   void ToggleFixParameter(const std::string& name);
-
   /// @brief Is parameter fixed or not
   /// @param i Parameter index
   bool IsParameterFixed(const int i) const {
@@ -366,6 +365,17 @@ class ParameterHandlerBase {
     }
     return PCAObj.get();
   }
+
+  /// @brief Matches branches in a TTree to parameters in a systematic handler.
+  ///
+  /// @param PosteriorFile Pointer to the ROOT TTree from MaCh3 fit.
+  /// @param[out] BranchValues Vector to store the values of the branches (resized inside).
+  /// @param[out] BranchNames Vector to store the names of the branches (resized inside).
+  ///
+  /// @throws MaCh3Exception if any parameter branch is uninitialized.
+  void MatchMaCh3OutputBranches(TTree *PosteriorFile,
+                                std::vector<double>& BranchValues,
+                                std::vector<std::string>& BranchNames);
 
 protected:
   /// @brief Initialisation of the class using matrix from root file

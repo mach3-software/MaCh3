@@ -36,6 +36,61 @@ inline int GetOscChannel(const std::vector<OscChannelInfo>& OscChannel, const in
   throw MaCh3Exception(__FILE__, __LINE__);
 }
 
+/// @brief KS: Store info about MC sample
+struct SampleInfo {
+  /// Default constructor
+  SampleInfo() = default;
+
+  /// Destructor
+  ~SampleInfo() {
+    if(dathist   != nullptr) delete dathist;
+    if(dathist2d != nullptr) delete dathist2d;
+    if(_hPDF1D   != nullptr) delete _hPDF1D;
+    if(_hPDF2D   != nullptr) delete _hPDF2D;
+  }
+
+  /// the strings associated with the variables used for the X binning e.g. "RecoNeutrinoEnergy"
+  std::string XVarStr = "";
+  /// the strings associated with the variables used for the Y binning e.g. "RecoNeutrinoEnergy"
+  std::string YVarStr = "";
+
+  /// @brief the name of this sample e.g."muon-like"
+  std::string SampleTitle = "";
+
+  /// @brief Keep track of the dimensions of the sample binning
+  int nDimensions = M3::_BAD_INT_;
+
+  /// histogram used for plotting storing 1D data distribution
+  TH1D *dathist = nullptr;
+  /// histogram used for plotting storing 2D data distribution
+  TH2D *dathist2d = nullptr;
+
+  /// histogram used for plotting storing 1D MC distribution
+  TH1D* _hPDF1D = nullptr;
+  /// histogram used for plotting storing 2D MC distribution
+  TH2D* _hPDF2D = nullptr;
+
+  /// @brief Initialise histograms used for plotting
+  void InitialiseHistograms() {
+    TString histname1d = (XVarStr).c_str();
+    TString histname2d = (XVarStr + "_" + YVarStr).c_str();
+    TString histtitle = SampleTitle;
+
+    //The binning here is arbitrary, now we get info from cfg so the
+    //set1DBinning and set2Dbinning calls below will make the binning
+    //to be what we actually want
+    _hPDF1D   = new TH1D("h" + histname1d + SampleTitle, histtitle, 1, 0, 1);
+    dathist   = new TH1D("d" + histname1d + SampleTitle, histtitle, 1, 0, 1);
+    _hPDF2D   = new TH2D("h" + histname2d + SampleTitle, histtitle, 1, 0, 1, 1, 0, 1);
+    dathist2d = new TH2D("d" + histname2d + SampleTitle, histtitle, 1, 0, 1, 1, 0, 1);
+
+    _hPDF1D->GetXaxis()->SetTitle(XVarStr.c_str());
+    dathist->GetXaxis()->SetTitle(XVarStr.c_str());
+    _hPDF2D->GetXaxis()->SetTitle(XVarStr.c_str());
+    dathist2d->GetXaxis()->SetTitle(XVarStr.c_str());
+  }
+};
+
 /// @brief constructors are same for all three so put in here
 struct FarDetectorCoreInfo {
   FarDetectorCoreInfo(){}

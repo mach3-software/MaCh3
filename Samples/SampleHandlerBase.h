@@ -57,9 +57,7 @@ class SampleHandlerBase
   virtual double GetLikelihood() = 0;
 
   /// @ingroup SampleHandlerGetters
-  unsigned int GetNEvents(){return nEvents;}
-  /// @ingroup SampleHandlerGetters
-  virtual int GetNMCSamples() { return nSamples; }
+  unsigned int GetNEvents() const {return nEvents;}
   /// @ingroup SampleHandlerGetters
   virtual int GetNOscChannels(){ return 1; }
 
@@ -78,7 +76,7 @@ class SampleHandlerBase
   /// @param data is data
   /// @param mc is mc
   /// @ingroup SampleHandlerGetters
-  double GetTestStatLLH(double data, double mc) const;
+  double GetTestStatLLH(const double data, const double mc) const;
   /// @brief Calculate test statistic for a single bin. Calculation depends on setting of fTestStatistic. Data and mc -> 0 cut-offs are defined in M3::_LOW_MC_BOUND_.
   /// @details Implemented fTestStatistic are kPoisson (with Stirling's approx.), kBarlowBeeston (arXiv:1103.0354), kDembinskiAbdelmotteleb (arXiv:2206.12346), kIceCube (arxiv:1901.04645), and kPearson.
   /// Test statistics require mc > 0, therefore low mc and data values are treated with cut-offs based on M3::_LOW_MC_BOUND_ = .00001 by default.

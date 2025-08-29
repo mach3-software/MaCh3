@@ -10,6 +10,7 @@ set(HEADERS
     OscProcessor.h
     SampleSummary.h
     MaCh3Factory.h
+    PredictiveThrower.h
     StatisticalUtils.h
     gpuMCMCProcessorUtils.cuh
 )
@@ -27,6 +28,7 @@ add_library(Fitters SHARED
     SampleSummary.cpp
     MaCh3Factory.cpp
     StatisticalUtils.cpp
+    PredictiveThrower.cpp
     $<$<BOOL:${MaCh3_GPU_ENABLED}>:gpuMCMCProcessorUtils.cu>
 )
 

@@ -579,12 +579,16 @@ void ParameterHandlerBase::SpecialStepProposal() {
 
   // HW It should now automatically set dcp to be with [-pi, pi]
   for (size_t i = 0; i < CircularBoundsIndex.size(); ++i) {
-    CircularParBounds(CircularBoundsIndex[i], CircularBoundsValues[i].first, CircularBoundsValues[i].second);
+    const int index = CircularBoundsIndex[i];
+    if(!IsParameterFixed(index))
+      CircularParBounds(index, CircularBoundsValues[i].first, CircularBoundsValues[i].second);
   }
 
   // Okay now we've done the standard steps, we can add in our nice flips hierarchy flip first
   for (size_t i = 0; i < FlipParameterIndex.size(); ++i) {
-    FlipParameterValue(FlipParameterIndex[i], FlipParameterPoint[i]);
+    const int index = FlipParameterIndex[i];
+    if(!IsParameterFixed(index))
+      FlipParameterValue(FlipParameterIndex[i], FlipParameterPoint[i]);
   }
 }
 
@@ -601,7 +605,7 @@ void ParameterHandlerBase::Randomize() _noexcept_ {
     #endif
     for (int i = 0; i < _fNumPar; ++i) {
       // If parameter isn't fixed
-      if (_fError[i] > 0.0) {
+      if (!IsParameterFixed(i) > 0.0) {
         randParams[i] = random_number[M3::GetThreadIndex()]->Gaus(0, 1);
         // If parameter IS fixed
       } else {
@@ -639,7 +643,7 @@ void ParameterHandlerBase::CorrelateSteps() _noexcept_ {
     #pragma omp parallel for
     #endif
     for (int i = 0; i < _fNumPar; ++i) {
-      if (_fError[i] > 0.) {
+      if (!IsParameterFixed(i) > 0.) {
         _fPropVal[i] = _fCurrVal[i] + corr_throw[i]*_fGlobalStepScale*_fIndivStepScale[i];
       }
     }
@@ -695,7 +699,7 @@ void ParameterHandlerBase::ThrowParProp(const double mag) {
     M3::MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
     // Number of sigmas we throw
     for (int i = 0; i < _fNumPar; i++) {
-      if (_fError[i] > 0.)
+      if (!IsParameterFixed(i) > 0.)
         _fPropVal[i] = _fCurrVal[i] + corr_throw[i]*mag;
     }
   } else {
@@ -714,7 +718,7 @@ void ParameterHandlerBase::ThrowParCurr(const double mag) {
     // The number of sigmas to throw
     // Should probably have this as a default parameter input to the function instead
     for (int i = 0; i < _fNumPar; i++) {
-      if (_fError[i] > 0.){
+      if (!IsParameterFixed(i) > 0.){
         _fCurrVal[i] = corr_throw[i]*mag;
       }
     }
@@ -1108,6 +1112,10 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
     MACH3LOG_ERROR("PCA has been enabled and now trying to enable Adaption. Right now both configuration don't work with each other");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
+  if(AdaptiveHandler){
+    MACH3LOG_ERROR("Adaptive Handler has already been initialise can't do it again so skipping.");
+    return;
+  }
   AdaptiveHandler = std::make_unique<adaptive_mcmc::AdaptiveMCMCHandler>();
   // Now we read the general settings [these SHOULD be common across all matrices!]
   bool success = AdaptiveHandler->InitFromConfig(adapt_manager, matrixName, &_fCurrVal, &_fError);
@@ -1131,6 +1139,7 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
 
   AdaptiveHandler->SetThrowMatrixFromFile(external_file_name, external_matrix_name, external_mean_name, use_adaptive);
   SetThrowMatrix(AdaptiveHandler->GetAdaptiveCovariance());
+  ResetIndivStepScale();
 
   MACH3LOG_INFO("Successfully Set External Throw Matrix Stored in {}", external_file_name);
 }
@@ -1220,7 +1229,7 @@ void ParameterHandlerBase::MakeClosestPosDef(TMatrixDSym *cov) {
 TH2D* ParameterHandlerBase::GetCorrelationMatrix() {
 // ********************************************
   TH2D* hMatrix = new TH2D(GetName().c_str(), GetName().c_str(), _fNumPar, 0.0, _fNumPar, _fNumPar, 0.0, _fNumPar);
-
+  hMatrix->SetDirectory(nullptr);
   for(int i = 0; i < _fNumPar; i++)
   {
     hMatrix->SetBinContent(i+1, i+1, 1.);
@@ -1319,4 +1328,32 @@ void ParameterHandlerBase::SetTune(const std::string& TuneName) {
   auto Values = Tunes->GetTune(TuneName);
 
   SetParameters(Values);
+}
+
+
+// *************************************
+/// @brief Matches branches in a TTree to parameters in a systematic handler.
+///
+/// @param PosteriorFile Pointer to the ROOT TTree from MaCh3 fit.
+/// @param Systematic Pointer to the systematic parameter handler.
+/// @param[out] BranchValues Vector to store the values of the branches (resized inside).
+/// @param[out] BranchNames Vector to store the names of the branches (resized inside).
+///
+/// @throws MaCh3Exception if any parameter branch is uninitialized.
+void ParameterHandlerBase::MatchMaCh3OutputBranches(TTree *PosteriorFile,
+                              std::vector<double>& BranchValues,
+                              std::vector<std::string>& BranchNames) {
+// *************************************
+  BranchValues.resize(GetNumParams());
+  BranchNames.resize(GetNumParams());
+
+  for (int i = 0; i < GetNumParams(); ++i) {
+    BranchNames[i] = GetParName(i);
+    if (!PosteriorFile->GetBranch(BranchNames[i].c_str())) {
+      MACH3LOG_ERROR("Branch '{}' does not exist in the TTree!", BranchNames[i]);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    PosteriorFile->SetBranchStatus(BranchNames[i].c_str(), true);
+    PosteriorFile->SetBranchAddress(BranchNames[i].c_str(), &BranchValues[i]);
+  }
 }
