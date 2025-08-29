@@ -43,8 +43,6 @@
  * 
  * @note Delayed rejection MCMC can significantly improve chain mixing but may increase
  *       computational overhead per step.
- * 
- * @see MCMC, AdaptiveMCMC
  */
 
 class DelayedMR2T2 : public MR2T2 {
