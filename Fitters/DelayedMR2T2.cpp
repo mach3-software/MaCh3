@@ -1,12 +1,33 @@
 #include "Fitters/DelayedMR2T2.h"
 
 DelayedMR2T2::DelayedMR2T2(manager * const manager) : MR2T2(manager) {
-    
+
+    // Step scale for delayed step = step scale prev delay * decay_rate
     decay_rate = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["DecayRate"], 0.1);
-    number_of_iterations = GetFromManager<int>(fitMan->raw()["General"]["MCMC"]["NRejections"], 2);
-    
-    MinLogLikelihood = M3::_LARGE_LOGL_;
-    MACH3LOG_INFO("Using Delayed MCMC with decay rate: {} and {} allowed rejections", decay_rate, number_of_iterations);
+    // Maximum number of rejections
+    max_rejections = GetFromManager<int>(fitMan->raw()["General"]["MCMC"]["MaxRejections"], 1);
+    // How big is the first step scale. This scales parameter step by initial_scale * <step scale in ParameterHandler>
+    initial_scale = GetFromManager<int>(fitMan->raw()["General"]["MCMC"]["InitialScale"], 1);
+
+    // On delayed on out of bounds steps. This saves some compute time and possibly regains efficiency
+    delay_on_oob_only = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["DelayOnlyOutBounds"], false);
+
+    // 
+    delay_probability = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["DelayProbability"], 1.0);
+
+
+    if(delay_probability > 1.0){
+        MACH3LOG_WARN("Probability of delaying steps > 1, setting to 1");
+        delay_probability = 1.0;
+    }
+    if(delay_probability<=0.0){
+        MACH3LOG_CRITICAL("Probability of delaying steps <= 0, setting to 0, delay will no longer have an impact!");
+        delay_probability = 0.0;
+        // Since we're not delaying at all set max_rejections = 0 to save time
+        max_rejections = 0;
+    }
+
+    MACH3LOG_INFO("Using Delayed MCMC with decay rate: {} and {} allowed rejections", decay_rate, max_rejections);
 }
 
 void DelayedMR2T2::ScaleSystematics(double scale)
@@ -19,13 +40,18 @@ void DelayedMR2T2::ScaleSystematics(double scale)
 
 void DelayedMR2T2::ResetSystScale()
 {
-    // if(step_syst_scale.size() != systematics.size()){
-    //     return;
-    // }
     for (int i = 0; i < static_cast<int>(systematics.size()); ++i)
     {
         systematics[i]->SetStepScale(start_step_scale[i], false);
     }
+}
+
+void DelayedMR2T2::PrepareOutput(){
+    FitterBase::PrepareOutput();
+
+    // Store delayed specific settings
+    outTree->Branch("DelayedStep", &accepted_delayed, "DelayedStep/B");
+
 }
 
 //**********************************************
@@ -67,11 +93,17 @@ void DelayedMR2T2::DoStep()
 {
     // Set the initial rejection to false
     StoreCurrentStep();
-    
+
+    // Apply initial scale
+    ScaleSystematics(initial_scale);
+
     bool accepted = false;
+    bool delay = false;
+    accepted_delayed = false;
+
     MinLogLikelihood = M3::_LARGE_LOGL_;
 
-    for(int i=0; i<number_of_iterations; ++i)
+    for(int i=0; i<=max_rejections; ++i)
     {
         ProposeStep();
 
@@ -91,20 +123,38 @@ void DelayedMR2T2::DoStep()
         }
         else{
             accProb = AcceptanceProbability();
+            delay = true;
         }
         if(IsStepAccepted(accProb)){
             AcceptStep();
             accepted = true;
+
+            // Keep track of if step is delayed + accepted for storage
+            accepted_delayed = delay;
+
             // Update
             break;
         }
-        // Temporary, means we can "leapfrog"
+        /// OOB Check
+        if(not out_of_bounds and delay_on_oob_only){
+            // If we are not out of bounds and only delaying on out of bounds steps
+            // We can skip the delay
+            break;
+        }
+        
+        /// Probabalistic condition
+        if(not ProbabilisticDelay()){
+            break;
+        }
 
+
+        // Temporary, means we can "leapfrog"
         ScaleSystematics(decay_rate);
         MinLogLikelihood = logLProp;
     }
 
     // If we reject we need to reset everything [this is probably a tad too slow...
+
     if(!accepted){
         for(int i=0; i<static_cast<int>(systematics.size()); ++i){
             for(int j=0; j<static_cast<int>(systematics[i]->GetParCurrVec().size()); ++j){
@@ -113,4 +163,18 @@ void DelayedMR2T2::DoStep()
         }
     }
     ResetSystScale();
+}
+
+void DelayedMR2T2::RunMCMC()
+{
+    MACH3LOG_INFO("Running Delayed MCMC with {} iterations and decay rate {}", max_rejections, decay_rate);
+
+    // Run the MCMC
+    MCMCBase::RunMCMC();
+
+}
+
+bool DelayedMR2T2::ProbabilisticDelay(){
+    // We can delay probabilistically
+    return (random->Rndm() > delay_probability);
 }

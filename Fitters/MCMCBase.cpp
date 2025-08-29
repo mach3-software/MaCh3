@@ -21,6 +21,8 @@ MCMCBase::MCMCBase(manager *man) : FitterBase(man)
         MACH3LOG_INFO("Enabling simulated annealing with T = {}", AnnealTemp);
         anneal = true;
     }
+
+    current_step = 0;
 }
 
 
@@ -50,9 +52,32 @@ void MCMCBase::RunMCMC()
     for (step = stepStart; step < StepEnd; ++step)
     {
         DoMCMCStep();
+
+        // Progress bar - update every 1% or minimum every 100 steps
+        const int progress_percent = static_cast<int>(100.0 * (step - stepStart + 1) / chainLength);
+        const int bar_width = 50;
+        const int filled_width = static_cast<int>(bar_width * progress_percent / 100.0);
+
+        std::cout << "\rMCMC Progress: [";
+        for (int i = 0; i < bar_width; ++i)
+        {
+            if (i < filled_width)
+                std::cout << "=";
+            else if (i == filled_width)
+                std::cout << ">";
+            else
+                std::cout << " ";
+        }
+        std::cout << "] " << progress_percent << "% (" << (step - stepStart + 1) << "/" << chainLength << ")";
+        std::cout.flush();
+
+        // Print newline on completion
+        if (step == StepEnd - 1)
+            std::cout << std::endl;
+        
+
         // Auto save the output
     }
-
     // Save all the MCMC output
     SaveOutput();
 
@@ -63,14 +88,15 @@ void MCMCBase::RunMCMC()
 
 void MCMCBase::DoMCMCStep(){
     /// Starts step timer, prints progress
-    StartStep();
+    PreStepProcess();
     /// Step proposal, acceptance etc
     DoStep();
     /// Tree filling etc.
-    EndStep();
+    PostStepProcess();
+    current_step++;
 }
 
-void MCMCBase::StartStep()
+void MCMCBase::PreStepProcess()
 {
     stepClock->Start();
     out_of_bounds = false;
@@ -78,12 +104,12 @@ void MCMCBase::StartStep()
     // Print 10 steps in total
     if ((step - stepStart) % (chainLength / 10) == 0)
     {
-        PrintProgress();
+        // PrintProgress();
     }
 }
 
 
-void MCMCBase::EndStep(){
+void MCMCBase::PostStepProccess(){
     stepClock->Stop();
     stepTime = stepClock->RealTime();
 

@@ -26,20 +26,23 @@ class MCMCBase : public FitterBase {
     inline void setChainLength(unsigned int L) { chainLength = L; };
 
     /// @brief Get name of class
-    inline std::string GetName() const { return "MCMC"; };
+    inline std::string GetName() const override { return "MCMC"; };
 
  protected:
-    /// @brief Do a step
-    inline void DoMCMCStep();
-
-    inline void MCMCStep();
+ 
+ /// @brief The full StartStep->DoStep->EndStep chain
+ inline void DoMCMCStep();
 
     /// @brief Propose a step
     virtual void ProposeStep()=0;
 
-    inline void StartStep();
-    inline void EndStep();
+    /// @brief Actions before step proposal [start stopwatch]
+    inline void PreStepProcess();
 
+    /// @brief Actions after step proposal [end stopwatch, fill tree]
+    inline void PostStepProccess();
+
+    /// @brief The MCMC step proposal and acceptance
     virtual void DoStep()=0;
 
     /// @brief Step acceptance probability
@@ -71,4 +74,7 @@ class MCMCBase : public FitterBase {
     bool anneal;
     /// simulated annealing temperature
     double AnnealTemp;
+
+    /// HW: DEBUG DELETE 
+    int current_step;
 };

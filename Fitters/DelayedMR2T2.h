@@ -1,6 +1,33 @@
 #pragma once
 
 #include "Fitters/MR2T2.h"
+#include "TMultiGraph.h"
+
+/// @brief Implementation of delayed rejection for MR2T2
+/// @author Henry Wallace
+/// @cite dram2006
+
+/*  ===============
+    Quick Intro:
+    - Delayed rejection is a method to increase the efficency of MCMC
+    - It is useful if your chain is not mixing well or if adaptive MCMC is struggling
+    - The idea is to propose increasingly small steps centred on the last rejected step
+
+    To enable it you need to add the following to your config.yaml file
+    - Set the algorithm as:  General::FittingAlgorithm::DelayedMR2T2
+    
+    Delayed MCMC will work "as is" but there are some additional options
+    which are set in General::MCMC
+    
+    # Scaling opts:
+    - DecayRate: This should be less than 1 and tells your algorithm how quickly to decrease the step size. By default this is 0.1
+    - MaxRejections: How many steps to delayed-reject before moving on. By default this is 1 and increasing is not recommended
+    - InitialScale: The initial scale of your propsoed steps. I.e. propose step with InitialScale*scale in parameter handler. This allows for a really large/small first step to be proposed. Testing finds the default value of 1 to be most effective with adaptive MCMC
+
+    # Delay Triggers
+    - DelayOnlyOutBounds: Here delaying only happens if a step is throw out of bounds.
+    - DelayProbability: In order to mitigate the slowness of delayed MCMC, there is a probability of proposing a delayed step. By default this is 1.
+*/
 
 class DelayedMR2T2 : public MR2T2 {
  public:
@@ -10,32 +37,58 @@ class DelayedMR2T2 : public MR2T2 {
 
     /// @brief Destructor
     virtual ~DelayedMR2T2() = default;
+
+    /// @brief Get name
     inline std::string GetName() const { return "DelayedMR2T2"; };
+
+    /// @brief Actual implementation of MCMC fitting algorithm
+    void RunMCMC();
 
  protected:
 
-   double AcceptanceProbability() override;
+     /// @brief Step acceptance probability
+    double AcceptanceProbability() override;
 
-   void DoStep();
+    /// @brief The MCMC step proposal
+    void DoStep();
 
-   void StoreCurrentStep();
+    /// @brief Store information about the current propsosed step
+    void StoreCurrentStep();
 
-   void ResetSystScale();
-   void ScaleSystematics(double scale);
+    /// @brief overide to add in rejection information to output
+    void PrepareOutput();
 
-   double CalculateLogGaussian(std::vector<double> &vec_1, std::vector<double> &vec_2, std::vector<std::vector<double>> &inv_cov_matrix) const _noexcept_;
+    /// @brief Reset scale after delay proscess
+    void ResetSystScale();
 
-   std::vector<std::vector<double>> current_step_vals;
-   std::vector<double> start_step_scale;
+    /// @brief Set parameter scale to be original_scale* scale
+    /// @param scale Multiplicative scale factor
+    void ScaleSystematics(double scale);
 
-   double initial_scale;
-   double decay_rate;
-   int number_of_iterations;
+    /// @brief if delay has a chance of occuring
+    bool ProbabilisticDelay();
 
-   double MinLogLikelihood; // Max Likelihood
+    /// Store information about the current proposed step
+    std::vector<std::vector<double>> current_step_vals;
 
+    /// Stores the initial scale for all parameters
+    std::vector<double> start_step_scale;
 
+    /// Scale for (non-delayed) step is inital_scale*start_step_scale
+    double initial_scale;
+    /// How much to decrease the step scale each step
+    double decay_rate;
+    /// How many rejections allowed?
+    int max_rejections;
 
-   std::vector<double> step_syst_scale;
+    /// Minimum (negative) log-likelihood of proposed steps 
+    double MinLogLikelihood; // Max Likelihood
 
+    /// Was the step we just accepted delayed?
+    bool accepted_delayed;
+
+    /// Delay iff we go out of bounds
+    bool delay_on_oob_only;
+    /// Can delay with probability instead
+    double delay_probability;
 };
