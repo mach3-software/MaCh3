@@ -7,7 +7,7 @@
 /// @cite dram2006
 
 /**
- * @file DelayedRejectionMCMC.h
+ * @file DelayedMR2T2.h
  * @brief Delayed Rejection MCMC Implementation
  * 
  * @section intro Quick Introduction
