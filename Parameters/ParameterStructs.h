@@ -241,6 +241,7 @@ enum SplineInterpolation {
   kLinear,               //!< Linear interpolation between knots
   kMonotonic,            //!< EM: DOES NOT make the entire spline monotonic, only the segments
   kAkima,                //!< EM: Akima spline iis allowed to be discontinuous in 2nd derivative and coefficients in any segment
+  kKochanekBartels,      //!< KS: Kochanek-Bartels spline: allows local control of tension, continuity, and bias
   kLinearFunc,           //!< Liner interpolation using TF1 not spline
   kSplineInterpolations  //!< This only enumerates
 };
@@ -259,6 +260,7 @@ inline std::string GetTF1(const SplineInterpolation i) {
     case SplineInterpolation::kLinear:
     case SplineInterpolation::kMonotonic:
     case SplineInterpolation::kAkima:
+    case SplineInterpolation::kKochanekBartels:
     case SplineInterpolation::kSplineInterpolations:
       MACH3LOG_ERROR("Interpolation type {} not supported for TF1!", static_cast<int>(i));
       throw MaCh3Exception(__FILE__, __LINE__);
@@ -281,6 +283,7 @@ inline RespFuncType SplineInterpolation_ToRespFuncType(const SplineInterpolation
     case SplineInterpolation::kLinear:
     case SplineInterpolation::kMonotonic:
     case SplineInterpolation::kAkima:
+    case SplineInterpolation::kKochanekBartels:
       Type = RespFuncType::kTSpline3_red;
       break;
     case SplineInterpolation::kLinearFunc:
@@ -316,6 +319,9 @@ inline std::string SplineInterpolation_ToString(const SplineInterpolation i) {
     //  (Experimental) Akima_Spline (crd order spline which is allowed to be discontinuous in 2nd deriv)
     case SplineInterpolation::kAkima:
       name = "Akima";
+      break;
+    case SplineInterpolation::kKochanekBartels:
+      name = "KochanekBartels";
       break;
     case SplineInterpolation::kLinearFunc:
       name = "LinearFunc";

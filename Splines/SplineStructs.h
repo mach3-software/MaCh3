@@ -309,6 +309,7 @@ public:
     }
   }
   /// @brief Set the function
+  /// @cite povray_interpolation_guide
   inline void SetFunc(TSpline3* &spline, SplineInterpolation InterPolation = kTSpline3) {
     nPoints = M3::int_t(spline->GetNp());
     if (Par != nullptr) {
@@ -570,6 +571,77 @@ public:
         delete[] Secants;
         delete[] Tangents;
       } // end of if(nPoints !=2)
+    }
+    else if (InterPolation == kKochanekBartels)
+    {
+      // Allocate memory for tangents and coefficients
+      M3::float_t* Tangents = new M3::float_t[nPoints];
+      for (int i = 0; i < nPoints; ++i)
+      {
+        Par[i] = new M3::float_t[3];
+        double x = -999.99, y = -999.99;
+        spline->GetKnot(i, x, y);
+        XPos[i]  = M3::float_t(x);
+        YResp[i] = M3::float_t(y);
+        Tangents[i] = 0.0;
+      }
+
+      // KS: Setting all parameters to 0 gives a Catmull-Rom spline.
+      // Tension (T):
+      //   - T =  0.0: Default smooth interpolation (Catmull-Rom).
+      //   - T =  1.0: Maximum tension; curve becomes linear between knots (no curvature).
+      //   - T = -1.0: Overshooting; creates loops or "bouncy" effects around knots.
+      constexpr M3::float_t T = 0.0;
+
+      // Continuity (C):
+      //   - C =  0.0: Default smooth transition (continuous first derivative).
+      //   - C =  1.0: Sharp corner/crease at knot (discontinuous first derivative).
+      //   - C = -1.0: Inverted curve; creates loops or kinks at knot.
+      constexpr M3::float_t C = 0.0;
+
+      // Bias (B):
+      //   - B =  0.0: Default symmetric curve around knot.
+      //   - B =  1.0: Curve is "pulled" toward the next knot (leading effect).
+      //   - B = -1.0: Curve is "pulled" toward the previous knot (lagging effect).
+      constexpr M3::float_t B = 0.0;
+
+      // Calculate tangents for internal knots
+      for (int i = 1; i < nPoints - 1; ++i)
+      {
+        M3::float_t d0 = (YResp[i]   - YResp[i-1]) / (XPos[i]   - XPos[i-1]);
+        M3::float_t d1 = (YResp[i+1] - YResp[i])   / (XPos[i+1] - XPos[i]);
+
+        M3::float_t term1 = (1.0 - T) * (1.0 + B) * (1.0 + C) * 0.5 * d0;
+        M3::float_t term2 = (1.0 - T) * (1.0 - B) * (1.0 - C) * 0.5 * d1;
+
+        Tangents[i] = term1 + term2;
+      }
+
+      // Boundary conditions (simple choice: secant slopes)
+      Tangents[0]        = (YResp[1]       - YResp[0])       / (XPos[1]       - XPos[0]);
+      Tangents[nPoints-1]= (YResp[nPoints-1] - YResp[nPoints-2]) / (XPos[nPoints-1] - XPos[nPoints-2]);
+
+      // Compute cubic coefficients for each segment
+      for (int i = 0; i < nPoints - 1; ++i)
+      {
+        M3::float_t dx = XPos[i+1] - XPos[i];
+        M3::float_t dy = YResp[i+1] - YResp[i];
+        M3::float_t m0 = Tangents[i];
+        M3::float_t m1 = Tangents[i+1];
+
+        Par[i][0] = m0;                                  // b
+        Par[i][1] = (3*dy/(dx*dx)) - (2*m0 + m1)/dx;     // c
+        Par[i][2] = (m0 + m1 - 2*dy/dx) / (dx*dx);       // d
+
+        MACH3LOG_TRACE("KB segment {}: dx={}, dy={}, b={}, c={}, d={}",
+                       i, dx, dy, Par[i][0], Par[i][1], Par[i][2]);
+      }
+      // Last "virtual" segment
+      Par[nPoints-1][0] = 0.0;
+      Par[nPoints-1][1] = 0.0;
+      Par[nPoints-1][2] = 0.0;
+
+      delete[] Tangents;
     }
     else
     {
