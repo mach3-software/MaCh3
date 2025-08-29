@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['diagmcmc_2ecpp_0',['DiagMCMC.cpp',['../DiagMCMC_8cpp.html',1,'']]]
+  ['delayedmr2t2_2ecpp_0',['DelayedMR2T2.cpp',['../DelayedMR2T2_8cpp.html',1,'']]],
+  ['delayedmr2t2_2eh_1',['DelayedMR2T2.h',['../DelayedMR2T2_8h.html',1,'']]],
+  ['diagmcmc_2ecpp_2',['DiagMCMC.cpp',['../DiagMCMC_8cpp.html',1,'']]]
 ];
