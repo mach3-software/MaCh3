@@ -33,7 +33,7 @@ var searchData=
   ['makeplot_30',['MakePlot',['../PlotMCMCDiag_8cpp.html#a90c4608d3da0a7c10a29902f966ba2d9',1,'PlotMCMCDiag.cpp']]],
   ['makepolyhist_31',['MakePolyHist',['../HistogramUtils_8h.html#a9372bd8295f0ce1759ebf5a35106f4af',1,'MakePolyHist(const std::string &amp;name, const std::vector&lt; double &gt; &amp;BinArray_x, const std::vector&lt; double &gt; &amp;BinArray_y):&#160;HistogramUtils.cpp'],['../HistogramUtils_8cpp.html#a9372bd8295f0ce1759ebf5a35106f4af',1,'MakePolyHist(const std::string &amp;name, const std::vector&lt; double &gt; &amp;BinArray_x, const std::vector&lt; double &gt; &amp;BinArray_y):&#160;HistogramUtils.cpp']]],
   ['makeposdef_32',['MakePosDef',['../classParameterHandlerBase.html#ae5587a730fd27f38d7838b7c1dca0136',1,'ParameterHandlerBase']]],
-  ['makepostfit_33',['MakePostfit',['../classMCMCProcessor.html#a8667510132aa01395520f028287f511b',1,'MCMCProcessor']]],
+  ['makepostfit_33',['MakePostfit',['../classMCMCProcessor.html#a2ce13f3af5ba000e7935f9897b539f11',1,'MCMCProcessor']]],
   ['makepredictive_34',['MakePredictive',['../classPredictiveThrower.html#aeefcada80a73575f50310d012137773b',1,'PredictiveThrower::MakePredictive()'],['../classSampleSummary.html#a44baf8959ced974c9a0b8ae640c336bd',1,'SampleSummary::MakePredictive()']]],
   ['makeprefit_35',['MakePrefit',['../classMCMCProcessor.html#a7627041b5ea3e1bbe038046ebb71a5dc',1,'MCMCProcessor']]],
   ['makeratio_36',['makeRatio',['../GetPostfitParamPlots_8cpp.html#af312df6d76c56485bc660742728adc1b',1,'GetPostfitParamPlots.cpp']]],
