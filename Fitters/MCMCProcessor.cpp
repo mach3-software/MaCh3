@@ -236,7 +236,7 @@ void MCMCProcessor::MakeOutputFile() {
 
 // ****************************
 //CW: Function to make the post-fit
-void MCMCProcessor::MakePostfit() {
+void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, double>>& Edges) {
 // ****************************
   // Check if we've already made post-fit
   if (MadePostfit == true) return;
@@ -265,7 +265,7 @@ void MCMCProcessor::MakePostfit() {
     CutPosterior1D = "(" + CutPosterior1D + ")*(" + ReweightName + ")";
   }
   MACH3LOG_DEBUG("Using following cut {}", CutPosterior1D);
-
+  
   // nDraw is number of draws we want to do
   for (int i = 0; i < nDraw; ++i)
   {
@@ -276,10 +276,16 @@ void MCMCProcessor::MakePostfit() {
     TString Title = "";
     double Prior = 1.0, PriorError = 1.0;
     GetNthParameter(i, Prior, PriorError, Title);
-
-    // This holds the posterior density
-    const double maxi = Chain->GetMaximum(BranchNames[i]);
-    const double mini = Chain->GetMinimum(BranchNames[i]);
+    // Get bin edges for histograms
+    double maxi, mini = M3::_BAD_DOUBLE_;
+    if (Edges.find(Title.Data()) != Edges.end()) {
+      mini = Edges.at(Title.Data()).first;
+      maxi = Edges.at(Title.Data()).second;
+    } else {
+      maxi = Chain->GetMaximum(BranchNames[i]);
+      mini = Chain->GetMinimum(BranchNames[i]);
+    }
+    MACH3LOG_DEBUG("Initialising histogram with binning {:.4f}, {:.4f}", mini, maxi);
     // This holds the posterior density
     hpost[i] = new TH1D(BranchNames[i], BranchNames[i], nBins, mini, maxi);
     hpost[i]->SetMinimum(0);
@@ -698,7 +704,7 @@ void MCMCProcessor::MakeCredibleIntervals(const std::vector<double>& CredibleInt
 // *********************
   if(hpost[0] == nullptr) MakePostfit();
 
-  MACH3LOG_INFO("Making Credible Intervals ");
+  MACH3LOG_INFO("Making Credible Intervals");
   const double LeftMargin = Posterior->GetLeftMargin();
   Posterior->SetLeftMargin(0.15);
 
@@ -2464,26 +2470,37 @@ void MCMCProcessor::ReadModelFile() {
   {
     auto const &param = *it;
     // Push back the name
-    std::string TempString = (param["Systematic"]["Names"]["FancyName"].as<std::string>());
+    std::string ParName = (param["Systematic"]["Names"]["FancyName"].as<std::string>());
+    std::string Group = param["Systematic"]["ParameterGroup"].as<std::string>();
 
     bool rejected = false;
     for (unsigned int ik = 0; ik < ExcludedNames.size(); ++ik)
     {
-      if (TempString.rfind(ExcludedNames.at(ik), 0) == 0)
+      if (ParName.rfind(ExcludedNames[ik], 0) == 0)
       {
+        MACH3LOG_DEBUG("Excluding param {}, from group {}", ParName, Group);
+        rejected = true;
+        break;
+      }
+    }
+    for (unsigned int ik = 0; ik < ExcludedGroups.size(); ++ik)
+    {
+      if (Group == ExcludedGroups[ik])
+      {
+        MACH3LOG_DEBUG("Excluding param {}, from group {}", ParName, Group);
         rejected = true;
         break;
       }
     }
     if(rejected) continue;
 
-    ParamNames[kXSecPar].push_back(TempString);
+    ParamNames[kXSecPar].push_back(ParName);
     ParamCentral[kXSecPar].push_back(param["Systematic"]["ParameterValues"]["PreFitValue"].as<double>());
     ParamNom[kXSecPar].push_back(param["Systematic"]["ParameterValues"]["Generated"].as<double>());
     ParamErrors[kXSecPar].push_back(param["Systematic"]["Error"].as<double>() );
     ParamFlat[kXSecPar].push_back(GetFromManager<bool>(param["Systematic"]["FlatPrior"], false));
 
-    ParameterGroup.push_back(param["Systematic"]["ParameterGroup"].as<std::string>());
+    ParameterGroup.push_back(Group);
 
     nParam[kXSecPar]++;
     ParamType.push_back(kXSecPar);
