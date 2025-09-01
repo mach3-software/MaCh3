@@ -69,7 +69,7 @@ class MCMCProcessor {
     /// @brief Scan chain, what parameters we have and load information from covariance matrices
     void Initialise();
     /// @brief Make 1D projection for each parameter and prepare structure
-    void MakePostfit();
+    void MakePostfit(const std::map<std::string, std::pair<double, double>>& Edges = {});
     /// @brief Calculate covariance by making 2D projection of each combination of parameters
     void MakeCovariance();
     /// @brief KS:By caching each step we use multithreading
@@ -293,6 +293,7 @@ class MCMCProcessor {
     /// @param Batches Vector with parameters type names we want to exclude
     inline void SetExcludedTypes(std::vector<std::string> Name){ExcludedTypes = Name; };
     inline void SetExcludedNames(std::vector<std::string> Name){ExcludedNames = Name; };
+    inline void SetExcludedGroups(std::vector<std::string> Name){ExcludedGroups = Name; };
 
     /// @brief Set value of Nbatches used for batched mean, this need to be done earlier as batches are made when reading tree
     /// @param Batches Number of batches, default is 20
@@ -431,7 +432,8 @@ class MCMCProcessor {
     std::vector<TString> BranchNames;
     std::vector<std::string> ExcludedTypes;
     std::vector<std::string> ExcludedNames;
-    
+    std::vector<std::string> ExcludedGroups;
+
     /// Is the ith parameter varied
     std::vector<bool> IamVaried;
     /// Name of parameters which we are going to analyse

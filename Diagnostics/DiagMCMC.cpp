@@ -17,6 +17,7 @@ void DiagMCMC(const std::string& inputFile, const std::string& config)
   //KS:Turn off plotting detector and some other setting
   Processor->SetExcludedTypes(GetFromManager<std::vector<std::string>>(Settings["DiagMCMC"]["ExcludedTypes"], {}));
   Processor->SetExcludedNames(GetFromManager<std::vector<std::string>>(Settings["DiagMCMC"]["ExcludedNames"], {}));
+  Processor->SetExcludedGroups(GetFromManager<std::vector<std::string>>(Settings["DiagMCMC"]["ExcludedGroups"], {}));
   Processor->SetPlotRelativeToPrior(GetFromManager<bool>(Settings["DiagMCMC"]["PlotRelativeToPrior"], false));
   //KS: Use 20 batches for batched means
   Processor->SetnBatches(GetFromManager<int>(Settings["DiagMCMC"]["nBatches"], 20));
