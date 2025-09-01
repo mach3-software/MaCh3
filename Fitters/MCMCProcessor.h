@@ -71,6 +71,7 @@ class MCMCProcessor {
     /// @brief Make 1D projection for each parameter and prepare structure
     void MakePostfit();
     /// @brief Calculate covariance by making 2D projection of each combination of parameters
+    /// @warning This is deprecated and slower, however it is less RAM intensive
     void MakeCovariance();
     /// @brief KS:By caching each step we use multithreading
     void CacheSteps();
@@ -566,6 +567,13 @@ class MCMCProcessor {
     /// Holds all accProb in batches
     double *AccProbBatchedAverages;
     
+    /// Whether to apply reweighting weight or not
+    bool ReweightPosterior;
+    /// Name of branch used for chain reweighting
+    std::string ReweightName;
+    /// Stores value of weight for each step
+    double* WeightValue;
+
   //Only if GPU is enabled
   #ifdef MaCh3_CUDA
     /// @brief Move stuff to GPU to perform auto correlation calculations there
