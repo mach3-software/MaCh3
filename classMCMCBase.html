@@ -468,18 +468,18 @@ Protected Attributes</h2></td></tr>
 
 <p>Accept a step. </p>
 
-<p class="definition">Definition at line <a class="el" href="MCMCBase_8cpp_source.html#l00183">183</a> of file <a class="el" href="MCMCBase_8cpp_source.html">MCMCBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  183</span>                          {</div>
-<div class="line"><span class="lineno">  184</span><span class="comment">// *************************</span></div>
-<div class="line"><span class="lineno">  185</span>    ++<a class="code hl_variable" href="classFitterBase.html#a2774f3a0047c4347ee0db05406425f79">accCount</a>;</div>
-<div class="line"><span class="lineno">  186</span>    <a class="code hl_variable" href="classFitterBase.html#abfb6f10720764d8bbbe43754fd5cd976">logLCurr</a> = <a class="code hl_variable" href="classFitterBase.html#a187dd22c17f9e96e5a7e2fb2371abace">logLProp</a>;</div>
-<div class="line"><span class="lineno">  187</span> </div>
-<div class="line"><span class="lineno">  188</span>    <span class="comment">// Loop over systematics and accept</span></div>
-<div class="line"><span class="lineno">  189</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> s = 0; s &lt; <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.size(); ++s)</div>
-<div class="line"><span class="lineno">  190</span>    {</div>
-<div class="line"><span class="lineno">  191</span>        <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;AcceptStep();</div>
-<div class="line"><span class="lineno">  192</span>    }</div>
-<div class="line"><span class="lineno">  193</span>}</div>
+<p class="definition">Definition at line <a class="el" href="MCMCBase_8cpp_source.html#l00182">182</a> of file <a class="el" href="MCMCBase_8cpp_source.html">MCMCBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  182</span>                          {</div>
+<div class="line"><span class="lineno">  183</span><span class="comment">// *************************</span></div>
+<div class="line"><span class="lineno">  184</span>    ++<a class="code hl_variable" href="classFitterBase.html#a2774f3a0047c4347ee0db05406425f79">accCount</a>;</div>
+<div class="line"><span class="lineno">  185</span>    <a class="code hl_variable" href="classFitterBase.html#abfb6f10720764d8bbbe43754fd5cd976">logLCurr</a> = <a class="code hl_variable" href="classFitterBase.html#a187dd22c17f9e96e5a7e2fb2371abace">logLProp</a>;</div>
+<div class="line"><span class="lineno">  186</span> </div>
+<div class="line"><span class="lineno">  187</span>    <span class="comment">// Loop over systematics and accept</span></div>
+<div class="line"><span class="lineno">  188</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> s = 0; s &lt; <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.size(); ++s)</div>
+<div class="line"><span class="lineno">  189</span>    {</div>
+<div class="line"><span class="lineno">  190</span>        <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;AcceptStep();</div>
+<div class="line"><span class="lineno">  191</span>    }</div>
+<div class="line"><span class="lineno">  192</span>}</div>
 <div class="ttc" id="aclassFitterBase_html_a187dd22c17f9e96e5a7e2fb2371abace"><div class="ttname"><a href="classFitterBase.html#a187dd22c17f9e96e5a7e2fb2371abace">FitterBase::logLProp</a></div><div class="ttdeci">double logLProp</div><div class="ttdoc">proposed likelihood</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00117">FitterBase.h:117</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_a2774f3a0047c4347ee0db05406425f79"><div class="ttname"><a href="classFitterBase.html#a2774f3a0047c4347ee0db05406425f79">FitterBase::accCount</a></div><div class="ttdeci">int accCount</div><div class="ttdoc">counts accepted steps</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00121">FitterBase.h:121</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_abfb6f10720764d8bbbe43754fd5cd976"><div class="ttname"><a href="classFitterBase.html#abfb6f10720764d8bbbe43754fd5cd976">FitterBase::logLCurr</a></div><div class="ttdeci">double logLCurr</div><div class="ttdoc">current likelihood</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00115">FitterBase.h:115</a></div></div>
@@ -521,10 +521,9 @@ Protected Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  156</span>        <span class="keywordflow">if</span> (syst-&gt;GetDoAdaption()){</div>
 <div class="line"><span class="lineno">  157</span>        </div>
 <div class="line"><span class="lineno">  158</span>            syst-&gt;UpdateAdaptiveCovariance();</div>
-<div class="line"><span class="lineno">  159</span>            syst-&gt;GetAdaptiveHandler()-&gt;SaveAdaptiveToFile(syst-&gt;GetAdaptiveHandler()-&gt;GetOutFileName(), syst-&gt;GetName(), <span class="keyword">true</span>);</div>
-<div class="line"><span class="lineno">  160</span>        }</div>
-<div class="line"><span class="lineno">  161</span>    }</div>
-<div class="line"><span class="lineno">  162</span>}</div>
+<div class="line"><span class="lineno">  159</span>        }</div>
+<div class="line"><span class="lineno">  160</span>    }</div>
+<div class="line"><span class="lineno">  161</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -659,23 +658,23 @@ Protected Attributes</h2></td></tr>
 
 <p>Is step accepted? </p>
 
-<p class="definition">Definition at line <a class="el" href="MCMCBase_8cpp_source.html#l00165">165</a> of file <a class="el" href="MCMCBase_8cpp_source.html">MCMCBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  165</span>                                                   {</div>
-<div class="line"><span class="lineno">  166</span><span class="comment">// *************************</span></div>
-<div class="line"><span class="lineno">  167</span>    <span class="comment">// Get the random number</span></div>
-<div class="line"><span class="lineno">  168</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> fRandom = <a class="code hl_variable" href="classFitterBase.html#a138f250d9204a30204e4ca5b973008b2">random</a>-&gt;Rndm();</div>
-<div class="line"><span class="lineno">  169</span>    <span class="comment">// Do the accept/reject</span></div>
-<div class="line"><span class="lineno">  170</span><span class="preprocessor">    #ifdef DEBUG</span></div>
-<div class="line"><span class="lineno">  171</span>    debugFile &lt;&lt; <span class="stringliteral">&quot; logLProp: &quot;</span> &lt;&lt; <a class="code hl_variable" href="classFitterBase.html#a187dd22c17f9e96e5a7e2fb2371abace">logLProp</a> &lt;&lt; <span class="stringliteral">&quot; logLCurr: &quot;</span> &lt;&lt; <a class="code hl_variable" href="classFitterBase.html#abfb6f10720764d8bbbe43754fd5cd976">logLCurr</a> &lt;&lt; <span class="stringliteral">&quot; acc_prob: &quot;</span> &lt;&lt; acc_prob &lt;&lt; <span class="stringliteral">&quot; fRandom: &quot;</span> &lt;&lt; fRandom &lt;&lt; std::endl;</div>
-<div class="line"><span class="lineno">  172</span><span class="preprocessor">    #endif</span></div>
-<div class="line"><span class="lineno">  173</span> </div>
-<div class="line"><span class="lineno">  174</span>    <span class="keywordflow">if</span> (fRandom &gt; acc_prob)</div>
-<div class="line"><span class="lineno">  175</span>    {</div>
-<div class="line"><span class="lineno">  176</span>        <span class="comment">// Reject</span></div>
-<div class="line"><span class="lineno">  177</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">  178</span>    }</div>
-<div class="line"><span class="lineno">  179</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno">  180</span>}</div>
+<p class="definition">Definition at line <a class="el" href="MCMCBase_8cpp_source.html#l00164">164</a> of file <a class="el" href="MCMCBase_8cpp_source.html">MCMCBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  164</span>                                                   {</div>
+<div class="line"><span class="lineno">  165</span><span class="comment">// *************************</span></div>
+<div class="line"><span class="lineno">  166</span>    <span class="comment">// Get the random number</span></div>
+<div class="line"><span class="lineno">  167</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> fRandom = <a class="code hl_variable" href="classFitterBase.html#a138f250d9204a30204e4ca5b973008b2">random</a>-&gt;Rndm();</div>
+<div class="line"><span class="lineno">  168</span>    <span class="comment">// Do the accept/reject</span></div>
+<div class="line"><span class="lineno">  169</span><span class="preprocessor">    #ifdef DEBUG</span></div>
+<div class="line"><span class="lineno">  170</span>    debugFile &lt;&lt; <span class="stringliteral">&quot; logLProp: &quot;</span> &lt;&lt; <a class="code hl_variable" href="classFitterBase.html#a187dd22c17f9e96e5a7e2fb2371abace">logLProp</a> &lt;&lt; <span class="stringliteral">&quot; logLCurr: &quot;</span> &lt;&lt; <a class="code hl_variable" href="classFitterBase.html#abfb6f10720764d8bbbe43754fd5cd976">logLCurr</a> &lt;&lt; <span class="stringliteral">&quot; acc_prob: &quot;</span> &lt;&lt; acc_prob &lt;&lt; <span class="stringliteral">&quot; fRandom: &quot;</span> &lt;&lt; fRandom &lt;&lt; std::endl;</div>
+<div class="line"><span class="lineno">  171</span><span class="preprocessor">    #endif</span></div>
+<div class="line"><span class="lineno">  172</span> </div>
+<div class="line"><span class="lineno">  173</span>    <span class="keywordflow">if</span> (fRandom &gt; acc_prob)</div>
+<div class="line"><span class="lineno">  174</span>    {</div>
+<div class="line"><span class="lineno">  175</span>        <span class="comment">// Reject</span></div>
+<div class="line"><span class="lineno">  176</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  177</span>    }</div>
+<div class="line"><span class="lineno">  178</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  179</span>}</div>
 <div class="ttc" id="aclassFitterBase_html_a138f250d9204a30204e4ca5b973008b2"><div class="ttname"><a href="classFitterBase.html#a138f250d9204a30204e4ca5b973008b2">FitterBase::random</a></div><div class="ttdeci">std::unique_ptr&lt; TRandom3 &gt; random</div><div class="ttdoc">Random number.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00146">FitterBase.h:146</a></div></div>
 </div><!-- fragment -->
 </div>
