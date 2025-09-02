@@ -153,7 +153,7 @@ std::string MaCh3Modes::GetMaCh3ModeName(const int Index) const {
   // return UNKNOWN_BAD if out of boundary
   if(Index > NModes)
   {
-    MACH3LOG_DEBUG("Asking for mode {}, while I only have {}, returning {} mode", Index, NModes, fMode[NModes].Name);
+    MACH3LOG_DEBUG("Asking for mode {}, while I only have {}, returning {} mode", Index, NModes, fMode.at(NModes).Name);
     return fMode.at(NModes).Name;
   }
   return fMode.at(Index).Name;
@@ -168,7 +168,7 @@ bool MaCh3Modes::IsMaCh3ModeNC(const int Index) const {
   // return UNKNOWN_BAD if out of boundary
   if(Index > NModes)
   {
-    MACH3LOG_DEBUG("Asking for mode {}, while I only have {}, returning {} mode", Index, NModes, fMode[NModes].Name);
+    MACH3LOG_DEBUG("Asking for mode {}, while I only have {}, returning {} mode", Index, NModes, fMode.at(NModes).Name);
     return fMode.at(NModes).IsNC;
   }
   return fMode.at(Index).IsNC;
@@ -183,7 +183,7 @@ std::string MaCh3Modes::GetMaCh3ModeFancyName(const int Index) const {
 
   if(Index > NModes)
   {
-    MACH3LOG_DEBUG("Asking for mode {}, while I only have {}, returning {} mode", Index, NModes, fMode[NModes].Name);
+    MACH3LOG_DEBUG("Asking for mode {}, while I only have {}, returning {} mode", Index, NModes, fMode.at(NModes).Name);
     return fMode.at(NModes).FancyName;
   }
   return fMode.at(Index).FancyName;
@@ -195,7 +195,7 @@ MaCh3Modes_t MaCh3Modes::GetMode(const std::string& name) const {
   if (Mode.count(name)) {
     return Mode.at(name);
   }
-  MACH3LOG_DEBUG("Asking for mode {}, while I only have {}, returning {} mode", name, NModes, fMode[NModes].Name);
+  MACH3LOG_DEBUG("Asking for mode {}, while I only have {}, returning {} mode", name, NModes, fMode.at(NModes).Name);
 
   // return UNKNOWN_BAD
   return NModes;
@@ -209,7 +209,7 @@ MaCh3Modes_t MaCh3Modes::GetModeFromGenerator(const int Index) const {
 
   if(Index >= static_cast<int>(ModeMap.size()))
   {
-    MACH3LOG_DEBUG("Asking for mode {}, while I only have {}, returning {} mode", Index, NModes, fMode[NModes].Name);
+    MACH3LOG_DEBUG("Asking for mode {}, while I only have {}, returning {} mode", Index, NModes, fMode.at(NModes).Name);
     return NModes;
   }
 
@@ -225,7 +225,7 @@ int MaCh3Modes::GetMaCh3ModePlotColor(const int Index) const {
 
   if(Index > NModes)
   {
-    MACH3LOG_DEBUG("Asking for mode {}, while I only have {}, returning {} mode", Index, NModes, fMode[NModes].PlotColor);
+    MACH3LOG_DEBUG("Asking for mode {}, while I only have {}, returning {} mode", Index, NModes, fMode.at(NModes).PlotColor);
     return fMode.at(NModes).PlotColor;
   }
   return fMode.at(Index).PlotColor;
