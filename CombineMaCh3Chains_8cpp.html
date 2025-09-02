@@ -404,7 +404,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  272</span>  outputFile-&gt;cd();</div>
 <div class="line"><span class="lineno">  273</span> </div>
 <div class="line"><span class="lineno">  274</span>  <span class="comment">// EM: Write out the version and config files to the combined file</span></div>
-<div class="line"><span class="lineno">  275</span>  std::vector&lt;std::string&gt; configNames = {<span class="stringliteral">&quot;MaCh3_Config&quot;</span>, <span class="stringliteral">&quot;Reweight_Config&quot;</span>};</div>
+<div class="line"><span class="lineno">  275</span>  std::vector&lt;std::string&gt; configNames = {<span class="stringliteral">&quot;MaCh3_Config&quot;</span>, <span class="stringliteral">&quot;Reweight_Config&quot;</span>, <span class="stringliteral">&quot;Smearing_Config&quot;</span>};</div>
 <div class="line"><span class="lineno">  276</span>  <span class="keywordflow">for</span> (std::size_t i = 0; i &lt; configNames.size(); ++i) {</div>
 <div class="line"><span class="lineno">  277</span>    <span class="keyword">const</span> std::string&amp; name = configNames[i];</div>
 <div class="line"><span class="lineno">  278</span>    TMacro* macro = prevFile-&gt;Get&lt;TMacro&gt;(name.c_str());</div>
