@@ -7,6 +7,7 @@ var searchData=
   ['w2meanhist_4',['W2MeanHist',['../classSampleSummary.html#a2828111584f80f855b56a9a093987673',1,'SampleSummary']]],
   ['w2modehist_5',['W2ModeHist',['../classSampleSummary.html#adf9b943ba381875b3f2e0c4807a9b8c4',1,'SampleSummary']]],
   ['w2nomhist_6',['W2NomHist',['../classSampleSummary.html#a9c37d8669c0f55f6a4620b4f0d7b6e20',1,'SampleSummary']]],
-  ['weightvec_5fmonolith_7',['weightvec_Monolith',['../classBinnedSplineHandler.html#a9e433fb12f9c6759bbf1b0eb61f1f34a',1,'BinnedSplineHandler']]],
-  ['weightvector_8',['WeightVector',['../classSampleSummary.html#ad40a0514f4be18ef026ea41bd5965fa3',1,'SampleSummary']]]
+  ['weightvalue_7',['WeightValue',['../classMCMCProcessor.html#a39d4d6d8cfccf1974a6b084f808211a9',1,'MCMCProcessor']]],
+  ['weightvec_5fmonolith_8',['weightvec_Monolith',['../classBinnedSplineHandler.html#a9e433fb12f9c6759bbf1b0eb61f1f34a',1,'BinnedSplineHandler']]],
+  ['weightvector_9',['WeightVector',['../classSampleSummary.html#ad40a0514f4be18ef026ea41bd5965fa3',1,'SampleSummary']]]
 ];

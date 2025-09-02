@@ -7,11 +7,12 @@ var searchData=
   ['w2meanhist_4',['W2MeanHist',['../classSampleSummary.html#a2828111584f80f855b56a9a093987673',1,'SampleSummary']]],
   ['w2modehist_5',['W2ModeHist',['../classSampleSummary.html#adf9b943ba381875b3f2e0c4807a9b8c4',1,'SampleSummary']]],
   ['w2nomhist_6',['W2NomHist',['../classSampleSummary.html#a9c37d8669c0f55f6a4620b4f0d7b6e20',1,'SampleSummary']]],
-  ['weightvec_5fmonolith_7',['weightvec_Monolith',['../classBinnedSplineHandler.html#a9e433fb12f9c6759bbf1b0eb61f1f34a',1,'BinnedSplineHandler']]],
-  ['weightvector_8',['WeightVector',['../classSampleSummary.html#ad40a0514f4be18ef026ea41bd5965fa3',1,'SampleSummary']]],
-  ['what_9',['what',['../classMaCh3Exception.html#a42be88b1fd75b91ecb5e472ddefcc45d',1,'MaCh3Exception']]],
-  ['write_10',['Write',['../classSampleSummary.html#aacf987756d2024868bf28b9c2c4a5a99',1,'SampleSummary']]],
-  ['writehistograms_11',['WriteHistograms',['../FitterBase_8cpp.html#af6dcdf28c7eef08e565cafd771f6d7e4',1,'FitterBase.cpp']]],
-  ['writehistogramsbymode_12',['WriteHistogramsByMode',['../FitterBase_8cpp.html#a0ec063f69f91a9f46b18f4a5a64c974a',1,'FitterBase.cpp']]],
-  ['writeoutput_13',['WriteOutput',['../classPSO.html#af2a3d758cc67e9b6b6a9a96499345b5b',1,'PSO']]]
+  ['weightvalue_7',['WeightValue',['../classMCMCProcessor.html#a39d4d6d8cfccf1974a6b084f808211a9',1,'MCMCProcessor']]],
+  ['weightvec_5fmonolith_8',['weightvec_Monolith',['../classBinnedSplineHandler.html#a9e433fb12f9c6759bbf1b0eb61f1f34a',1,'BinnedSplineHandler']]],
+  ['weightvector_9',['WeightVector',['../classSampleSummary.html#ad40a0514f4be18ef026ea41bd5965fa3',1,'SampleSummary']]],
+  ['what_10',['what',['../classMaCh3Exception.html#a42be88b1fd75b91ecb5e472ddefcc45d',1,'MaCh3Exception']]],
+  ['write_11',['Write',['../classSampleSummary.html#aacf987756d2024868bf28b9c2c4a5a99',1,'SampleSummary']]],
+  ['writehistograms_12',['WriteHistograms',['../FitterBase_8cpp.html#af6dcdf28c7eef08e565cafd771f6d7e4',1,'FitterBase.cpp']]],
+  ['writehistogramsbymode_13',['WriteHistogramsByMode',['../FitterBase_8cpp.html#a0ec063f69f91a9f46b18f4a5a64c974a',1,'FitterBase.cpp']]],
+  ['writeoutput_14',['WriteOutput',['../classPSO.html#af2a3d758cc67e9b6b6a9a96499345b5b',1,'PSO']]]
 ];
