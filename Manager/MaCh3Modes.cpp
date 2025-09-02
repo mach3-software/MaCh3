@@ -6,11 +6,21 @@ MaCh3Modes::MaCh3Modes(std::string const &filename) {
 // *******************
   // Load config
   YAML::Node config = M3OpenConfig(filename);
+  Initialise(config);
+}
 
-  std::string GetMaCh3ModeName(const int Index);
+// *******************
+MaCh3Modes::MaCh3Modes(const YAML::Node& config) {
+// *******************
+  Initialise(config);
+}
+
+// *******************
+void MaCh3Modes::Initialise(const YAML::Node& config) {
+// *******************
   NModes = 0;
   nCCModes = 0;
-  
+
   Title = config["Title"].as<std::string>();
   Generator = config["GeneratorName"].as<std::string>();
 
@@ -45,7 +55,7 @@ MaCh3Modes::MaCh3Modes(std::string const &filename) {
 }
 
 // *******************
-void MaCh3Modes::Print() {
+void MaCh3Modes::Print() const {
 // *******************
   MACH3LOG_INFO("Printing MaCh3 Modes Called: {}", Title);
 
@@ -53,9 +63,9 @@ void MaCh3Modes::Print() {
   MACH3LOG_INFO("{:<5} {:2} {:<20} {:2} {:<20} {:2} {:<30}", "#", "|", "Name", "|", "FancyName", "|", Generator+" Modes");
   MACH3LOG_INFO("------------------------------------------------------------------------");
   for(int i = 0; i < NModes; ++i) {
-    auto Name = fMode[i].Name;
-    auto FancyName = fMode[i].FancyName;
-    auto Values = fMode[i].GeneratorMaping;
+    auto Name = fMode.at(i).Name;
+    auto FancyName = fMode.at(i).FancyName;
+    auto Values = fMode.at(i).GeneratorMaping;
 
     std::string generatorModes;
     for (const int& element : Values) {
@@ -69,7 +79,7 @@ void MaCh3Modes::Print() {
   MACH3LOG_INFO("{:<10} {:2} {:<30}", Generator + " Modes", "|", "Name");
   MACH3LOG_INFO("--------------------------");
   for (size_t i = 0; i < ModeMap.size(); ++i) {
-    MACH3LOG_INFO("{:<10} {:2} {:<30}", i, "|", fMode[ModeMap[i]].Name);
+    MACH3LOG_INFO("{:<10} {:2} {:<30}", i, "|", fMode.at(ModeMap[i]).Name);
   }
   MACH3LOG_INFO("==========================");
 }
@@ -87,11 +97,11 @@ MaCh3Modes_t MaCh3Modes::EnsureModeNameRegistered(std::string const &name) {
 
 // *******************
 void MaCh3Modes::DeclareNewMode(std::string const &name,
-				std::string const &fancyname,
-				int PlotColor,
-				std::vector<int> const &GenMap,
-				bool IsNC,
-				std::string SplineSuffix) {
+                std::string const &fancyname,
+                int PlotColor,
+                std::vector<int> const &GenMap,
+                bool const IsNC,
+                std::string const &SplineSuffix) {
 // *******************
   MaCh3ModeInfo newinfo;
   newinfo.GeneratorMaping = GenMap;
@@ -135,7 +145,7 @@ void MaCh3Modes::PrepareMap() {
 }
 
 // *******************
-std::string MaCh3Modes::GetMaCh3ModeName(const int Index) {
+std::string MaCh3Modes::GetMaCh3ModeName(const int Index) const {
 // *******************
   if(Index < 0)
     MACH3LOG_CRITICAL("Mode you look for is smaller than 0 and equal to {}", Index);
@@ -144,13 +154,14 @@ std::string MaCh3Modes::GetMaCh3ModeName(const int Index) {
   if(Index > NModes)
   {
     MACH3LOG_DEBUG("Asking for mode {}, while I only have {}, returning {} mode", Index, NModes, fMode[NModes].Name);
-    return fMode[NModes].Name;
+    return fMode.at(NModes).Name;
   }
-  return fMode[Index].Name;
+  return fMode.at(Index).Name;
 }
 
 // *******************
-bool MaCh3Modes::IsMaCh3ModeNC(const int Index) {
+bool MaCh3Modes::IsMaCh3ModeNC(const int Index) const {
+// *******************
   if(Index < 0)
     MACH3LOG_CRITICAL("Mode you look for is smaller than 0 and equal to {}", Index);
   
@@ -158,15 +169,13 @@ bool MaCh3Modes::IsMaCh3ModeNC(const int Index) {
   if(Index > NModes)
   {
     MACH3LOG_DEBUG("Asking for mode {}, while I only have {}, returning {} mode", Index, NModes, fMode[NModes].Name);
-    return fMode[NModes].IsNC;
+    return fMode.at(NModes).IsNC;
   }
-
-  return fMode[Index].IsNC;
+  return fMode.at(Index).IsNC;
 }
-// *******************
 
 // *******************
-std::string MaCh3Modes::GetMaCh3ModeFancyName(const int Index) {
+std::string MaCh3Modes::GetMaCh3ModeFancyName(const int Index) const {
 // *******************
   // return UNKNOWN_BAD if out of boundary
   if(Index < 0)
@@ -175,16 +184,16 @@ std::string MaCh3Modes::GetMaCh3ModeFancyName(const int Index) {
   if(Index > NModes)
   {
     MACH3LOG_DEBUG("Asking for mode {}, while I only have {}, returning {} mode", Index, NModes, fMode[NModes].Name);
-    return fMode[NModes].FancyName;
+    return fMode.at(NModes).FancyName;
   }
-  return fMode[Index].FancyName;
+  return fMode.at(Index).FancyName;
 }
 
 // *******************
-MaCh3Modes_t MaCh3Modes::GetMode(const std::string& name) {
+MaCh3Modes_t MaCh3Modes::GetMode(const std::string& name) const {
 // *******************
   if (Mode.count(name)) {
-    return Mode[name];
+    return Mode.at(name);
   }
   MACH3LOG_DEBUG("Asking for mode {}, while I only have {}, returning {} mode", name, NModes, fMode[NModes].Name);
 
@@ -193,7 +202,7 @@ MaCh3Modes_t MaCh3Modes::GetMode(const std::string& name) {
 }
 
 // *******************
-MaCh3Modes_t MaCh3Modes::GetModeFromGenerator(const int Index) {
+MaCh3Modes_t MaCh3Modes::GetModeFromGenerator(const int Index) const {
 // *******************
   if(Index < 0)
     MACH3LOG_CRITICAL("Mode you look for is smaller than 0 and equal to {}", Index);
@@ -208,7 +217,7 @@ MaCh3Modes_t MaCh3Modes::GetModeFromGenerator(const int Index) {
 }
 
 // *******************
-int MaCh3Modes::GetMaCh3ModePlotColor(const int Index) {
+int MaCh3Modes::GetMaCh3ModePlotColor(const int Index) const {
 // *******************
   // return UNKNOWN_BAD if out of boundary
   if(Index < 0)
@@ -217,9 +226,9 @@ int MaCh3Modes::GetMaCh3ModePlotColor(const int Index) {
   if(Index > NModes)
   {
     MACH3LOG_DEBUG("Asking for mode {}, while I only have {}, returning {} mode", Index, NModes, fMode[NModes].PlotColor);
-    return fMode[NModes].PlotColor;
+    return fMode.at(NModes).PlotColor;
   }
-  return fMode[Index].PlotColor;
+  return fMode.at(Index).PlotColor;
 }
 
 // *******************
