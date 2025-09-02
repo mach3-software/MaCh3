@@ -25,7 +25,9 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
 
   ParStep = nullptr;
   StepNumber = nullptr;
-    
+  ReweightPosterior = false;
+  WeightValue = nullptr;
+
   Posterior = nullptr;
   hviolin = nullptr;
   hviolin_prior = nullptr;
@@ -123,6 +125,7 @@ MCMCProcessor::~MCMCProcessor() {
   delete Errors_HPD_Positive;
   delete Errors_HPD_Negative;
 
+  if(WeightValue) delete[] WeightValue;
   for (int i = 0; i < nDraw; ++i)
   {
     if(hpost[i] != nullptr) delete hpost[i];
@@ -251,7 +254,18 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
   TDirectory *PostDir = OutputFile->mkdir("Post");
   TDirectory *PostHistDir = OutputFile->mkdir("Post_1d_hists");
   
+  //KS: Apply additional Cuts, like mass ordering
+  std::string CutPosterior1D = "";
+  if(Posterior1DCut != "") {
+    CutPosterior1D = StepCut +" && " + Posterior1DCut;
+  } else CutPosterior1D = StepCut;
 
+  // Apply reweighting
+  if (ReweightPosterior) {
+    CutPosterior1D = "(" + CutPosterior1D + ")*(" + ReweightName + ")";
+  }
+  MACH3LOG_DEBUG("Using following cut {}", CutPosterior1D);
+  
   // nDraw is number of draws we want to do
   for (int i = 0; i < nDraw; ++i)
   {
@@ -278,13 +292,6 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
     hpost[i]->GetYaxis()->SetTitle("Steps");
     hpost[i]->GetYaxis()->SetNoExponent(false);
 
-    //KS: Apply additional Cuts, like mass ordering
-    std::string CutPosterior1D = "";
-    if(Posterior1DCut != "")
-    {
-      CutPosterior1D = StepCut +" && " + Posterior1DCut;
-    }
-    else CutPosterior1D = StepCut;
 
     // Project BranchNames[i] onto hpost, applying stepcut
     Chain->Project(BranchNames[i], BranchNames[i], CutPosterior1D.c_str());
@@ -1015,8 +1022,12 @@ void MCMCProcessor::MakeCovariance() {
       hpost_2D->GetYaxis()->SetTitle(Title_j);
       hpost_2D->GetZaxis()->SetTitle("Steps");
 
+      std::string SelectionStr = StepCut;
+      if (ReweightPosterior) {
+        SelectionStr = "(" + StepCut + ")*(" + ReweightName + ")";
+      }
       // The draw command we want, i.e. draw param j vs param i
-      Chain->Project(DrawMe, DrawMe, StepCut.c_str());
+      Chain->Project(DrawMe, DrawMe, SelectionStr.c_str());
       
       if(ApplySmoothing) hpost_2D->Smooth();
       // Get the Covariance for these two parameters
@@ -1091,7 +1102,7 @@ void MCMCProcessor::CacheSteps() {
   // Set all the branches to off
   Chain->SetBranchStatus("*", false);
   unsigned int stepBranch = 0;
-  double* ParValBranch = new double[nEntries]();
+  double* ParValBranch = new double[nDraw]();
   // Turn on the branches which we want for parameters
   for (int i = 0; i < nDraw; ++i)
   {
@@ -1100,6 +1111,15 @@ void MCMCProcessor::CacheSteps() {
   }
   Chain->SetBranchStatus("step", true);
   Chain->SetBranchAddress("step", &stepBranch);
+
+  double ReweightWeight = 1.;
+  if(ReweightPosterior)
+  {
+    WeightValue = new double[nEntries]();
+    Chain->SetBranchStatus(ReweightName.c_str(), true);
+    Chain->SetBranchAddress(ReweightName.c_str(), &ReweightWeight);
+  }
+
   const Long64_t countwidth = nEntries/10;
 
   // Loop over the entries
@@ -1114,9 +1134,12 @@ void MCMCProcessor::CacheSteps() {
     }
     StepNumber[j] = stepBranch;
     // Set the branch addresses for params
-    for (int i = 0; i < nDraw; ++i) 
-    {
+    for (int i = 0; i < nDraw; ++i) {
       ParStep[i][j] = ParValBranch[i];
+    }
+
+    if(ReweightPosterior){
+      WeightValue[j] = ReweightWeight;
     }
   }
   delete[] ParValBranch;
@@ -1162,7 +1185,7 @@ void MCMCProcessor::CacheSteps() {
 
 // *********************
 // Make the post-fit covariance matrix in all dimensions
-void MCMCProcessor::MakeCovariance_MP(bool Mute) {
+void MCMCProcessor::MakeCovariance_MP(const bool Mute) {
 // *********************
   if (OutputFile == nullptr) MakeOutputFile();
     
@@ -1213,8 +1236,9 @@ void MCMCProcessor::MakeCovariance_MP(bool Mute) {
         //KS: Burn in cut
         if(StepNumber[k] < BurnInCut) continue;
 
+        const double Weight = ReweightPosterior ? WeightValue[i] : 1.;
         //KS: Fill histogram with cached steps
-        hpost2D[i][j]->Fill(ParStep[i][k], ParStep[j][k]);
+        hpost2D[i][j]->Fill(ParStep[i][k], ParStep[j][k], Weight);
       }
       if(ApplySmoothing) hpost2D[i][j]->Smooth();
       
@@ -1270,7 +1294,6 @@ void MCMCProcessor::MakeCovariance_MP(bool Mute) {
 // all credits for finding and studying it goes to Henry
 void MCMCProcessor::MakeSubOptimality(const int NIntervals) {
 // *********************
-
   //Save burn in cut, at the end of the loop we will return to default values
   const int DefaultUpperCut = UpperCut;
   const int DefaultBurnInCut = BurnInCut;
@@ -2362,6 +2385,20 @@ void MCMCProcessor::FindInputFiles() {
   // Delete the TTrees and the input file handle since we've now got the settings we need
   delete Config;
   delete XsecConfig;
+
+  TMacro *ReweightConfig = TempFile->Get<TMacro>("Reweight_Config");
+  if (ReweightConfig != nullptr) {
+    YAML::Node ReweightSettings = TMacroToYAML(*ReweightConfig);
+
+    if (ReweightSettings["Weight"]) {
+      ReweightName = "Weight";
+      ReweightPosterior = true;
+      MACH3LOG_INFO("Enabling reweighting with following Config");
+    } else {
+      MACH3LOG_WARN("Found reweight config but without field ''Weight''");
+    }
+    MaCh3Utils::PrintConfig(ReweightSettings);
+  }
 
   // Delete the MCMCFile pointer we're reading
   CovarianceFolder->Close();
