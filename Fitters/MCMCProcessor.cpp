@@ -233,7 +233,7 @@ void MCMCProcessor::MakeOutputFile() {
 
 // ****************************
 //CW: Function to make the post-fit
-void MCMCProcessor::MakePostfit() {
+void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, double>>& Edges) {
 // ****************************
   // Check if we've already made post-fit
   if (MadePostfit == true) return;
@@ -251,6 +251,7 @@ void MCMCProcessor::MakePostfit() {
   TDirectory *PostDir = OutputFile->mkdir("Post");
   TDirectory *PostHistDir = OutputFile->mkdir("Post_1d_hists");
   
+
   // nDraw is number of draws we want to do
   for (int i = 0; i < nDraw; ++i)
   {
@@ -261,10 +262,16 @@ void MCMCProcessor::MakePostfit() {
     TString Title = "";
     double Prior = 1.0, PriorError = 1.0;
     GetNthParameter(i, Prior, PriorError, Title);
-
-    // This holds the posterior density
-    const double maxi = Chain->GetMaximum(BranchNames[i]);
-    const double mini = Chain->GetMinimum(BranchNames[i]);
+    // Get bin edges for histograms
+    double maxi, mini = M3::_BAD_DOUBLE_;
+    if (Edges.find(Title.Data()) != Edges.end()) {
+      mini = Edges.at(Title.Data()).first;
+      maxi = Edges.at(Title.Data()).second;
+    } else {
+      maxi = Chain->GetMaximum(BranchNames[i]);
+      mini = Chain->GetMinimum(BranchNames[i]);
+    }
+    MACH3LOG_DEBUG("Initialising histogram with binning {:.4f}, {:.4f}", mini, maxi);
     // This holds the posterior density
     hpost[i] = new TH1D(BranchNames[i], BranchNames[i], nBins, mini, maxi);
     hpost[i]->SetMinimum(0);
@@ -690,7 +697,7 @@ void MCMCProcessor::MakeCredibleIntervals(const std::vector<double>& CredibleInt
 // *********************
   if(hpost[0] == nullptr) MakePostfit();
 
-  MACH3LOG_INFO("Making Credible Intervals ");
+  MACH3LOG_INFO("Making Credible Intervals");
   const double LeftMargin = Posterior->GetLeftMargin();
   Posterior->SetLeftMargin(0.15);
 
@@ -1468,7 +1475,7 @@ void MCMCProcessor::DrawCorrelationsGroup(const std::unique_ptr<TH2D>& CorrMatri
   Posterior->Clear();
   MatrixCopy->Draw("colz");
 
-  std::vector<std::unique_ptr<TLine>> groupLines;((GroupStart.size() - 1) * 2);
+  std::vector<std::unique_ptr<TLine>> groupLines; //((GroupStart.size() - 1) * 2);
 
   int nBinsX = MatrixCopy->GetNbinsX();
   int nBinsY = MatrixCopy->GetNbinsY();
@@ -2426,26 +2433,37 @@ void MCMCProcessor::ReadModelFile() {
   {
     auto const &param = *it;
     // Push back the name
-    std::string TempString = (param["Systematic"]["Names"]["FancyName"].as<std::string>());
+    std::string ParName = (param["Systematic"]["Names"]["FancyName"].as<std::string>());
+    std::string Group = param["Systematic"]["ParameterGroup"].as<std::string>();
 
     bool rejected = false;
     for (unsigned int ik = 0; ik < ExcludedNames.size(); ++ik)
     {
-      if (TempString.rfind(ExcludedNames.at(ik), 0) == 0)
+      if (ParName.rfind(ExcludedNames[ik], 0) == 0)
       {
+        MACH3LOG_DEBUG("Excluding param {}, from group {}", ParName, Group);
+        rejected = true;
+        break;
+      }
+    }
+    for (unsigned int ik = 0; ik < ExcludedGroups.size(); ++ik)
+    {
+      if (Group == ExcludedGroups[ik])
+      {
+        MACH3LOG_DEBUG("Excluding param {}, from group {}", ParName, Group);
         rejected = true;
         break;
       }
     }
     if(rejected) continue;
 
-    ParamNames[kXSecPar].push_back(TempString);
+    ParamNames[kXSecPar].push_back(ParName);
     ParamCentral[kXSecPar].push_back(param["Systematic"]["ParameterValues"]["PreFitValue"].as<double>());
     ParamNom[kXSecPar].push_back(param["Systematic"]["ParameterValues"]["Generated"].as<double>());
     ParamErrors[kXSecPar].push_back(param["Systematic"]["Error"].as<double>() );
     ParamFlat[kXSecPar].push_back(GetFromManager<bool>(param["Systematic"]["FlatPrior"], false));
 
-    ParameterGroup.push_back(param["Systematic"]["ParameterGroup"].as<std::string>());
+    ParameterGroup.push_back(Group);
 
     nParam[kXSecPar]++;
     ParamType.push_back(kXSecPar);
@@ -2903,7 +2921,7 @@ void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
 
   if( (Names.size() != NewCentral.size()) || (NewCentral.size() != NewError.size()))
   {
-    MACH3LOG_ERROR("Size of passed vectors doesn't match in ReweightPrior");
+    MACH3LOG_ERROR("Size of passed vectors doesn't match in {}", __func__);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   std::vector<int> Param;
@@ -3002,6 +3020,102 @@ void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
   delete OutputChain;
 
   OutputFile->cd();
+}
+
+
+// **************************
+// KS: Smear contours
+void MCMCProcessor::SmearChain(const std::vector<std::string>& Names,
+                               const std::vector<double>& Error,
+                               const bool& SaveBranch) {
+// **************************
+  MACH3LOG_INFO("Starting {}", __func__);
+
+  if( (Names.size() != Error.size()))
+  {
+    MACH3LOG_ERROR("Size of passed vectors doesn't match in {}", __func__);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+  std::vector<int> Param;
+
+  //KS: First we need to find parameter number based on name
+  for(unsigned int k = 0; k < Names.size(); ++k)
+  {
+    //KS: First we need to find parameter number based on name
+    int ParamNo = GetParamIndexFromName(Names[k]);
+    if(ParamNo == M3::_BAD_INT_)
+    {
+      MACH3LOG_WARN("Couldn't find param {}. Can't Smear", Names[k]);
+      return;
+    }
+
+    TString Title = "";
+    double Prior = 1.0, PriorError = 1.0;
+    GetNthParameter(ParamNo, Prior, PriorError, Title);
+
+    Param.push_back(ParamNo);
+  }
+  std::string InputFile = MCMCFile+".root";
+  std::string OutputFilename = MCMCFile + "_smeared.root";
+
+  //KS: Simply create copy of file and add there new branch
+  int ret = system(("cp " + InputFile + " " + OutputFilename).c_str());
+  if (ret != 0)
+    MACH3LOG_WARN("Error: system call to copy file failed with code {}", ret);
+
+  TFile *OutputChain = new TFile(OutputFilename.c_str(), "UPDATE");
+  OutputChain->cd();
+  TTree *post = OutputChain->Get<TTree>("posteriors");
+  TTree *treeNew = post->CloneTree(0);
+
+  std::vector<double> NewParameter(Names.size());
+  for(size_t i = 0; i < Param.size(); i++) {
+    post->SetBranchAddress(BranchNames[Param[i]], &NewParameter[i]);
+  }
+
+  std::vector<double> Unsmeared_Parameter;
+  if(SaveBranch){
+    Unsmeared_Parameter.resize(Param.size());
+    for(size_t i = 0; i < Param.size(); i++) {
+      treeNew->Branch((BranchNames[Param[i]] + "_unsmeared"), &Unsmeared_Parameter[i]);
+    }
+  }
+
+  auto rand = std::make_unique<TRandom3>(0);
+  Long64_t AllEntries = post->GetEntries();
+  for (Long64_t i = 0; i < AllEntries; ++i) {
+    // Entry from the old chain
+    post->GetEntry(i);
+
+    if(SaveBranch){
+      for(size_t iPar = 0; iPar < Param.size(); iPar++) {
+        Unsmeared_Parameter[iPar] = NewParameter[iPar];
+      }
+    }
+    // Smear it
+    for(size_t iPar = 0; iPar < Param.size(); iPar++) {
+      NewParameter[iPar] = NewParameter[iPar] + rand->Gaus(0, Error[iPar]);
+    }
+    // Fill to the new chain
+    treeNew->Fill();
+  }
+
+  OutputChain->cd();
+  treeNew->Write("posteriors", TObject::kOverwrite);
+
+  // KS: Save reweight metadeta
+  std::ostringstream yaml_stream;
+  yaml_stream << "Smearing:\n";
+  for (size_t k = 0; k < Names.size(); ++k) {
+    yaml_stream << "    " << Names[k] << ": [" << Error[k] << ", " << "Gauss" << "]\n";
+  }
+  std::string yaml_string = yaml_stream.str();
+  YAML::Node root = STRINGtoYAML(yaml_string);
+  TMacro ConfigSave = YAMLtoTMacro(root, "Smearing_Config");
+  ConfigSave.Write();
+
+  OutputChain->Close();
+  delete OutputChain;
 }
 
 // **************************

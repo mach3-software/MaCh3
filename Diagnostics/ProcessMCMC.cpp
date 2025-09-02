@@ -89,6 +89,8 @@ void ProcessMCMC(const std::string& inputFile)
 
   Processor->SetExcludedTypes(GetFromManager<std::vector<std::string>>(Settings["ExcludedTypes"], {}));
   Processor->SetExcludedNames(GetFromManager<std::vector<std::string>>(Settings["ExcludedNames"], {}));
+  Processor->SetExcludedGroups(GetFromManager<std::vector<std::string>>(Settings["ExcludedGroups"], {}));
+
   //Apply additional cuts to 1D posterior
   Processor->SetPosterior1DCut(GetFromManager<std::string>(Settings["Posterior1DCut"], ""));
 
@@ -193,6 +195,7 @@ void MultipleProcessMCMC()
 
     Processor[ik]->SetExcludedTypes(GetFromManager<std::vector<std::string>>(Settings["ExcludedTypes"], {}));
     Processor[ik]->SetExcludedNames(GetFromManager<std::vector<std::string>>(Settings["ExcludedNames"], {}));
+    Processor[ik]->SetExcludedGroups(GetFromManager<std::vector<std::string>>(Settings["ExcludedGroups"], {}));
 
     //Apply additional cuts to 1D posterior
     Processor[ik]->SetPosterior1DCut(GetFromManager<std::string>(Settings["Posterior1DCut"], ""));
@@ -211,11 +214,37 @@ void MultipleProcessMCMC()
       Processor[ik]->SetEntries(Get<int>(Settings["MaxEntries"], __FILE__, __LINE__));
     }
   }
+
+  Processor[0]->MakePostfit();
+  Processor[0]->DrawPostfit();
+  // Get edges from first histogram to ensure all params use same binning
+  std::map<std::string, std::pair<double, double>> ParamEdges;
+  for(int i = 0; i < Processor[0]->GetNParams(); ++i) {
+    // Get the histogram for the i-th parameter
+    TH1D* hist = Processor[0]->GetHpost(i);
+    if (!hist) {
+      MACH3LOG_DEBUG("Histogram for parameter {} is null.", i);
+      continue;
+    }
+
+    // Get the parameter name (title of the histogram)
+    std::string paramName = hist->GetTitle();
+
+    // Get the axis limits (edges)
+    TAxis* axis = hist->GetXaxis();
+    double xmin = axis->GetXmin();
+    double xmax = axis->GetXmax();
+
+    MACH3LOG_DEBUG("Adding bin edges for {} equal to {:.4f}, {:.4f}",paramName, xmin, xmax);
+    // Insert into the map
+    ParamEdges[paramName] = std::make_pair(xmin, xmax);
+  }
+
   //KS: Multithreading here is very tempting but there are some issues with root that need to be resovled :(
-  for (int ik = 0; ik < nFiles; ik++)
+  for (int ik = 1; ik < nFiles; ik++)
   {
     // Make the postfit
-    Processor[ik]->MakePostfit();
+    Processor[ik]->MakePostfit(ParamEdges);
     Processor[ik]->DrawPostfit();
   }
 
@@ -227,7 +256,7 @@ void MultipleProcessMCMC()
   Posterior->SetBottomMargin(0.1f);
   Posterior->SetTopMargin(0.05f);
   Posterior->SetRightMargin(0.03f);
-  Posterior->SetLeftMargin(0.10f);
+  Posterior->SetLeftMargin(0.15f);
 
   FileNames[0] = FileNames[0].substr(0, FileNames[0].find(".root")-1);
   TString canvasname = FileNames[0];
@@ -252,7 +281,7 @@ void MultipleProcessMCMC()
     std::vector<std::unique_ptr<TH1D>> hpost(nFiles);
     std::vector<std::unique_ptr<TLine>> hpd(nFiles);
     hpost[0] = M3::Clone(Processor[0]->GetHpost(i));
-
+    hpost[0]->GetYaxis()->SetTitle("Posterior Density");
     bool Skip = false;
     for (int ik = 1 ; ik < nFiles;  ik++)
     {
@@ -280,7 +309,7 @@ void MultipleProcessMCMC()
       hpost[ik]->SetLineWidth(2);
 
       // Area normalise the distributions
-      hpost[ik]->Scale(1./hpost[ik]->Integral(), "width");
+      hpost[ik]->Scale(1./hpost[ik]->Integral());
     }
     TString Title;
     double Prior = 1.0;
@@ -295,7 +324,7 @@ void MultipleProcessMCMC()
     Asimov->SetLineStyle(kDashed);
 
     // Make a nice little TLegend
-    auto leg = std::make_unique<TLegend>(0.12, 0.7, 0.6, 0.97);
+    auto leg = std::make_unique<TLegend>(0.20, 0.7, 0.6, 0.97);
     leg->SetTextSize(0.03f);
     leg->SetFillColor(0);
     leg->SetFillStyle(0);
@@ -638,8 +667,8 @@ void KolmogorovSmirnovTest(const std::vector<std::unique_ptr<MCMCProcessor>>& Pr
                            const std::unique_ptr<TCanvas>& Posterior,
                            const TString& canvasname)
 {
-  const Color_t CumulativeColor[] = {kBlue-1, kRed, kGreen+2};
-  const Style_t CumulativeStyle[] = {kSolid, kDashed, kDotted};
+  constexpr Color_t CumulativeColor[] = {kBlue-1, kRed, kGreen+2};
+  constexpr Style_t CumulativeStyle[] = {kSolid, kDashed, kDotted};
 
   for(int i = 0; i < Processor[0]->GetNParams(); ++i) 
   {
