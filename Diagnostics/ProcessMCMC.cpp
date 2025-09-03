@@ -151,7 +151,7 @@ void ProcessMCMC(const std::string& inputFile)
     //Processor->MakeCovariance();
 //#endif
     Processor->DrawCovariance();
-    if(GetFromManager<bool>(Settings["MakeCovarianceYAML"], true)) Processor->MakeCovarianceYAML(GetFromManager<std::string>(Settings["CovarianceYAMLOutName"], ""), GetFromManager<std::string>(Settings["CovarianceYAMLMeansMethod"], "HPD"));
+    if(GetFromManager<bool>(Settings["MakeCovarianceYAML"], true)) Processor->MakeCovarianceYAML(GetFromManager<std::string>(Settings["CovarianceYAMLOutName"], "UpdatedCorrelationMatrix.yaml"), GetFromManager<std::string>(Settings["CovarianceYAMLMeansMethod"], "HPD"));
 
     auto const &MakeSubOptimality = Settings["MakeSubOptimality"];
     if(MakeSubOptimality[0].as<bool>()) Processor->MakeSubOptimality(MakeSubOptimality[1].as<int>());
