@@ -1,0 +1,5 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classTResponseFunction__red.html" title="KS: A reduced ResponseFunction Generic function used for evaluating weight." alt="" coords="5,31,181,56"/>
+<area shape="rect" id="node2" href="$classTF1__red.html" title="CW: A reduced TF1 class only. Only saves parameters for each TF1 and how many parameters each paramet..." alt="" coords="245,5,320,31"/>
+<area shape="rect" id="node3" href="$classTSpline3__red.html" title="CW: Reduced TSpline3 class." alt="" coords="229,55,336,80"/>
+</map>
