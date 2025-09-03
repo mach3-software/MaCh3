@@ -37,8 +37,8 @@ using PipeAB = sycl::ext::intel::pipe<IDPipeAB,        // An identifier for the 
 [[intel::use_stall_enable_clusters]] 
 void FPGACalcSplineWeights(int nParams,
                            int NSplines_valid,
-                           int *paramNo_arr,
-                           int *nKnots_arr,
+                           short int *paramNo_arr,
+                           unsigned int *nKnots_arr,
                            short *SplineSegments,
                            float *coeff_many,
                            float *coeff_x,
@@ -49,8 +49,8 @@ void FPGACalcSplineWeights(int nParams,
                            unsigned int n_events) {
 //*********************************************************
 
-  sycl::ext::intel::host_ptr<const int> params_host(paramNo_arr);
-  sycl::ext::intel::host_ptr<const int> knots_host(nKnots_arr);
+  sycl::ext::intel::host_ptr<const short> params_host(paramNo_arr);
+  sycl::ext::intel::host_ptr<const unsigned int> knots_host(nKnots_arr);
   sycl::ext::intel::host_ptr<const short> segments_host(SplineSegments);
   sycl::ext::intel::host_ptr<const float> coeff_many_host(coeff_many);
   sycl::ext::intel::host_ptr<const float> coeff_x_host(coeff_x);
@@ -142,7 +142,7 @@ void FPGACalcSplineWeights(int nParams,
       } // end of chunk loop
       PipeAB::write(PipeStruct(eventNum, for_pipe));
 
-      knot_offset += knots_per_spline;
+      // knot_offset += knots_per_spline;
     } //end of splines per event loop
     spline_offset += NSplines_event;
     
@@ -1345,8 +1345,8 @@ void SMonolith::Evaluate() {
     struct OptimizedKernel {
       int nParams;
       unsigned int NSplines_valid;
-      int *paramNo_arr;
-      int *nKnots_arr;
+      short int *paramNo_arr;
+      unsigned int *nKnots_arr;
       short int *SplineSegments;
       float *coeff_many;
       float *coeff_x;
