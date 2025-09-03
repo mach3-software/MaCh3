@@ -1,0 +1,49 @@
+---
+# Update MaCh3 container image registry with newest updates
+name: TagDoxygen
+
+# The events that trigger the workflow
+on:
+  push:
+    tags:
+      - 'v*'
+    branches:
+      - 'feature/kskwarczynski/DoxyTest' #DELETE
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  tag-doxygen:
+    name: TagDoxygen
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0  # Fetch all history for all branches and tags
+
+      - name: Checkout gh-pages branch
+        run: |
+          git fetch origin gh-pages:gh-pages
+          git checkout gh-pages
+
+      - name: Create Tags directory if it doesn't exist
+        run: mkdir -p Tags
+
+      - name: Copy all files to Tags/TagName (except .git and Tags)
+        run: |
+          TAG_NAME=${{ github.ref_name }}
+          TAG_NAME=v2.2.3 #DELETE
+          mkdir -p "Tags/$TAG_NAME"
+          # Copy all files except .git and Tags
+          rsync -av --progress --exclude='.git' --exclude='Tags' . "Tags/$TAG_NAME/"
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add .
+          git commit -m "Tag Doxygen: blarb"
+          git push origin gh-pages
