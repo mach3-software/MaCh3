@@ -23,23 +23,23 @@ void PCAHandler::SetupPointers(std::vector<double>* fCurr_Val,
 }
 
 // ********************************************
-void PCAHandler::ConstructPCA(TMatrixDSym * covMatrix, const int firstPCAd, const int lastPCAd,
-                              const double eigen_thresh, int& _fNumParPCA, const int _fNumPar) {
+void PCAHandler::ConstructPCA(TMatrixDSym* CovMatrix, const int firstPCAd, const int lastPCAd,
+                              const double eigen_thresh, const int _fNumPar) {
 // ********************************************
   FirstPCAdpar = firstPCAd;
   LastPCAdpar = lastPCAd;
   eigen_threshold = eigen_thresh;
 
   // Check that covariance matrix exists
-  if (covMatrix == NULL) {
+  if (CovMatrix == NULL) {
     MACH3LOG_ERROR("Covariance matrix for has not yet been set");
     MACH3LOG_ERROR("Can not construct PCA until it is set");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
-  if(FirstPCAdpar > covMatrix->GetNrows()-1 || LastPCAdpar>covMatrix->GetNrows()-1) {
+  if(FirstPCAdpar > CovMatrix->GetNrows()-1 || LastPCAdpar>CovMatrix->GetNrows()-1) {
     MACH3LOG_ERROR("FirstPCAdpar and LastPCAdpar are higher than the number of parameters");
-    MACH3LOG_ERROR("first: {} last: {}, params: {}", FirstPCAdpar, LastPCAdpar, covMatrix->GetNrows()-1);
+    MACH3LOG_ERROR("first: {} last: {}, params: {}", FirstPCAdpar, LastPCAdpar, CovMatrix->GetNrows()-1);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   if(FirstPCAdpar < 0 || LastPCAdpar < 0){
@@ -48,9 +48,12 @@ void PCAHandler::ConstructPCA(TMatrixDSym * covMatrix, const int firstPCAd, cons
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   MACH3LOG_INFO("PCAing parameters {} through {} inclusive", FirstPCAdpar, LastPCAdpar);
-  int numunpcadpars = covMatrix->GetNrows()-(LastPCAdpar-FirstPCAdpar+1);
+  int numunpcadpars = CovMatrix->GetNrows()-(LastPCAdpar-FirstPCAdpar+1);
 
-  TMatrixDSym submat(covMatrix->GetSub(FirstPCAdpar,LastPCAdpar,FirstPCAdpar,LastPCAdpar));
+  // KS: Make sure we are not doing anything silly with PCA
+  SanitisePCA(CovMatrix);
+
+  TMatrixDSym submat(CovMatrix->GetSub(FirstPCAdpar,LastPCAdpar,FirstPCAdpar,LastPCAdpar));
 
   //CW: Calculate how many eigen values this threshold corresponds to
   TMatrixDSymEigen eigen(submat);
@@ -74,29 +77,28 @@ void PCAHandler::ConstructPCA(TMatrixDSym * covMatrix, const int firstPCAd, cons
       break;
     }
   }
-  _fNumParPCA = numunpcadpars+nKeptPCApars;
-  NumParPCA = _fNumParPCA;
-  MACH3LOG_INFO("Threshold of {} on eigen values relative sum of eigen value ({}) generates {} eigen vectors, plus we have {} unpcad pars, for a total of {}", eigen_threshold, sum, nKeptPCApars, numunpcadpars, _fNumParPCA);
+  NumParPCA = numunpcadpars+nKeptPCApars;
+  MACH3LOG_INFO("Threshold of {} on eigen values relative sum of eigen value ({}) generates {} eigen vectors, plus we have {} unpcad pars, for a total of {}", eigen_threshold, sum, nKeptPCApars, numunpcadpars, NumParPCA);
 
   //DB Create array of correct size so eigen_values can be used in CorrelateSteps
-  eigen_values_master = std::vector<double>(_fNumParPCA, 1.0);
+  eigen_values_master = std::vector<double>(NumParPCA, 1.0);
   for (int i = FirstPCAdpar; i < FirstPCAdpar+nKeptPCApars; ++i) {eigen_values_master[i] = eigen_values(i-FirstPCAdpar);}
 
   // Now construct the transfer matrices
   //These matrices will be as big as number of unPCAd pars plus number of eigenvalues kept
-  TransferMat.ResizeTo(covMatrix->GetNrows(), _fNumParPCA);
-  TransferMatT.ResizeTo(covMatrix->GetNrows(), _fNumParPCA);
+  TransferMat.ResizeTo(CovMatrix->GetNrows(), NumParPCA);
+  TransferMatT.ResizeTo(CovMatrix->GetNrows(), NumParPCA);
 
   // Get a subset of the eigen vector matrix
   TMatrixD temp(eigen_vectors.GetSub(0, eigen_vectors.GetNrows()-1, 0, nKeptPCApars-1));
 
   //Make transfer matrix which is two blocks of identity with a block of the PCA transfer matrix in between
   TMatrixD temp2;
-  temp2.ResizeTo(covMatrix->GetNrows(), _fNumParPCA);
+  temp2.ResizeTo(CovMatrix->GetNrows(), NumParPCA);
 
   //First set the whole thing to 0
-  for(int iRow = 0; iRow < covMatrix->GetNrows(); iRow++){
-    for(int iCol = 0; iCol < _fNumParPCA; iCol++){
+  for(int iRow = 0; iRow < CovMatrix->GetNrows(); iRow++){
+    for(int iCol = 0; iCol < NumParPCA; iCol++){
       temp2[iRow][iCol] = 0;
     }
   }
@@ -111,8 +113,8 @@ void PCAHandler::ConstructPCA(TMatrixDSym * covMatrix, const int firstPCAd, cons
   temp2.SetSub(FirstPCAdpar,FirstPCAdpar,temp);
 
   //Set the second identity block
-  if(LastPCAdpar != covMatrix->GetNrows()-1){
-    for(int iRow = 0;iRow < (covMatrix->GetNrows()-1)-LastPCAdpar; iRow++){
+  if(LastPCAdpar != CovMatrix->GetNrows()-1){
+    for(int iRow = 0;iRow < (CovMatrix->GetNrows()-1)-LastPCAdpar; iRow++){
       temp2[LastPCAdpar+1+iRow][FirstPCAdpar+nKeptPCApars+iRow] = 1;
     }
   }
@@ -125,25 +127,55 @@ void PCAHandler::ConstructPCA(TMatrixDSym * covMatrix, const int firstPCAd, cons
 
   #ifdef DEBUG_PCA
   //KS: Let's dump all useful matrices to properly validate PCA
-  DebugPCA(sum, temp, submat, covMatrix->GetNrows());
+  DebugPCA(sum, temp, submat, CovMatrix->GetNrows());
   #endif
 
   // Make the PCA parameter arrays
-  _fParCurrPCA.ResizeTo(_fNumParPCA);
-  _fParPropPCA.ResizeTo(_fNumParPCA);
-  _fPreFitValuePCA.resize(_fNumParPCA);
+  _fParCurrPCA.ResizeTo(NumParPCA);
+  _fParPropPCA.ResizeTo(NumParPCA);
+  _fPreFitValuePCA.resize(NumParPCA);
 
   //KS: make easy map so we could easily find un-decomposed parameters
-  isDecomposedPCA.resize(_fNumParPCA);
-  _fParSigmaPCA.resize(_fNumParPCA);
-  for (int i = 0; i < _fNumParPCA; ++i)
+  isDecomposedPCA.resize(NumParPCA);
+  _fErrorPCA.resize(NumParPCA);
+  for (int i = 0; i < NumParPCA; ++i)
   {
-    _fParSigmaPCA[i] = 1;
+    _fErrorPCA[i] = 1;
     isDecomposedPCA[i] = -1;
   }
   for (int i = 0; i < FirstPCAdpar; ++i) isDecomposedPCA[i] = i;
 
-  for (int i = FirstPCAdpar+nKeptPCApars+1; i < _fNumParPCA; ++i) isDecomposedPCA[i] = i+(_fNumPar-_fNumParPCA);
+  for (int i = FirstPCAdpar+nKeptPCApars+1; i < NumParPCA; ++i) isDecomposedPCA[i] = i+(_fNumPar-NumParPCA);
+}
+
+
+// ********************************************
+// Make sure decomposed matrix isn't correlated with undecomposed
+void PCAHandler::SanitisePCA(TMatrixDSym* CovMatrix) {
+// ********************************************
+  constexpr double correlation_threshold = 1e-6;
+
+  bool found_significant_correlation = false;
+
+  int N = CovMatrix->GetNrows();
+  for (int i = FirstPCAdpar; i <= LastPCAdpar; ++i) {
+    for (int j = 0; j < N; ++j) {
+      // Skip if j is inside the decomposed range (we only want cross-correlations)
+      if (j >= FirstPCAdpar && j <= LastPCAdpar) continue;
+
+      double corr_val = (*CovMatrix)(i, j);
+      if (std::fabs(corr_val) > correlation_threshold) {
+        found_significant_correlation = true;
+        MACH3LOG_ERROR("Significant correlation detected between decomposed parameter '{}' "
+        "and undecomposed parameter '{}': {:.6e}", i, j, corr_val);
+      }
+    }
+  }
+
+  if (found_significant_correlation) {
+    MACH3LOG_ERROR("There are correlations between undecomposed and decomposed part of matrices, this will not work");
+    throw MaCh3Exception(__FILE__ , __LINE__);
+  }
 }
 
 // ********************************************
@@ -174,7 +206,7 @@ void PCAHandler::CorrelateSteps(const std::vector<double>& IndivStepScale,
   #endif
   for (int i = 0; i < NumParPCA; ++i)
   {
-    if (_fParSigmaPCA[i] > 0.)
+    if (_fErrorPCA[i] > 0.)
     {
       double IndStepScale = 1.;
       //KS: If undecomposed parameter apply individual step scale and Cholesky for better acceptance rate
@@ -214,6 +246,20 @@ void PCAHandler::TransferToPCA() {
 }
 
 // ********************************************
+void PCAHandler::SetInitialParameters(std::vector<double>& IndStepScale) {
+// ********************************************
+  TransferToPCA();
+  for (int i = 0; i < NumParPCA; ++i) {
+    _fPreFitValuePCA[i] = _fParCurrPCA(i);
+  }
+  //DB Set Individual Step scale for PCA parameters to the LastPCAdpar fIndivStepScale because the step scale for those parameters is set by 'eigen_values[i]' but needs an overall step scale
+  //   However, individual step scale for non-PCA parameters needs to be set correctly
+  for (int i = FirstPCAdpar; i <= LastPCAdpar; i++) {
+    IndStepScale[i] = IndStepScale[LastPCAdpar-1];
+  }
+}
+
+// ********************************************
 // Transfer a parameter variation in the eigen basis to the parameter basis
 void PCAHandler::TransferToParam() {
 // ********************************************
@@ -226,6 +272,130 @@ void PCAHandler::TransferToParam() {
   for(int i = 0; i < static_cast<int>(_pCurrVal->size()); ++i) {
     (*_pPropVal)[i] = fParProp_vec(i);
     (*_pCurrVal)[i] = fParCurr_vec(i);
+  }
+}
+
+// ********************************************
+// Throw the proposed parameter by mag sigma.
+void PCAHandler::ThrowParProp(const double mag, const double* _restrict_ randParams) {
+// ********************************************
+  for (int i = 0; i < NumParPCA; i++) {
+    if (_fErrorPCA[i] > 0.) {
+    _fParPropPCA(i) = _fParCurrPCA(i)+mag*randParams[i];
+    }
+  }
+  TransferToParam();
+}
+
+// ********************************************
+// Throw the proposed parameter by mag sigma.
+void PCAHandler::ThrowParCurr(const double mag, const double* _restrict_ randParams) {
+// ********************************************
+  for (int i = 0; i < NumParPCA; i++) {
+    if (_fErrorPCA[i] > 0.) {
+    _fParPropPCA(i) = mag*randParams[i];
+    }
+  }
+  TransferToParam();
+}
+
+// ********************************************
+void PCAHandler::Print() {
+// ********************************************
+  MACH3LOG_INFO("PCA:");
+  for (int i = 0; i < NumParPCA; ++i) {
+    MACH3LOG_INFO("PCA {:<2} Current: {:<10.2f} Proposed: {:<10.2f}", i, _fParCurrPCA(i), _fParPropPCA(i));
+  }
+}
+
+// ********************************************
+void PCAHandler::SetBranches(TTree &tree, bool SaveProposal, const std::vector<std::string>& Names) {
+// ********************************************
+  for (int i = 0; i < NumParPCA; ++i) {
+    tree.Branch(Form("%s_PCA", Names[i].c_str()), &_fParCurrPCA.GetMatrixArray()[i], Form("%s_PCA/D", Names[i].c_str()));
+  }
+
+  if(SaveProposal)
+  {
+    for (int i = 0; i < NumParPCA; ++i) {
+      tree.Branch(Form("%s_PCA_Prop", Names[i].c_str()), &_fParPropPCA.GetMatrixArray()[i], Form("%s_PCA_Prop/D", Names[i].c_str()));
+    }
+  }
+}
+
+// ********************************************
+void PCAHandler::ToggleFixAllParameters() {
+// ********************************************
+  for (int i = 0; i < NumParPCA; i++) {
+    _fErrorPCA[i] *= -1.0;
+  }
+}
+
+// ********************************************
+void PCAHandler::ToggleFixParameter(const int i, const std::vector<std::string>& Names) {
+// ********************************************
+  int isDecom = -1;
+  for (int im = 0; im < NumParPCA; ++im) {
+    if(isDecomposedPCA[im] == i) {isDecom = im;}
+  }
+  if(isDecom < 0) {
+    MACH3LOG_ERROR("Parameter {} is PCA decomposed can't fix this", Names[i]);
+    //throw MaCh3Exception(__FILE__ , __LINE__ );
+  } else {
+    _fErrorPCA[isDecom] *= -1.0;
+    MACH3LOG_INFO("Setting un-decomposed {}(parameter {}/{} in PCA base) to fixed at {}", Names[i], i, isDecom, (*_pCurrVal)[i]);
+  }
+}
+
+
+// ********************************************
+void PCAHandler::ThrowParameters(const std::vector<std::unique_ptr<TRandom3>>& random_number,
+                                 double** throwMatrixCholDecomp,
+                                 double* randParams,
+                                 double* corr_throw,
+                                 const std::vector<double>& fPreFitValue,
+                                 const std::vector<double>& fLowBound,
+                                 const std::vector<double>& fUpBound,
+                                 const int _fNumPar) {
+// ********************************************
+  //KS: Do not multithread!
+  for (int i = 0; i < NumParPCA; ++i) {
+    // Check if parameter is fixed first: if so don't randomly throw
+    if (IsParameterFixedPCA(i)) continue;
+
+    if(!IsParameterDecomposed(i))
+    {
+      (*_pPropVal)[i] = fPreFitValue[i] + corr_throw[i];
+      int throws = 0;
+      // Try again if we the initial parameter proposal falls outside of the range of the parameter
+      while ((*_pPropVal)[i] > fUpBound[i] || (*_pPropVal)[i] < fLowBound[i]) {
+        randParams[i] = random_number[M3::GetThreadIndex()]->Gaus(0, 1);
+        const double corr_throw_single = M3::MatrixVectorMultiSingle(throwMatrixCholDecomp, randParams, _fNumPar, i);
+        (*_pPropVal)[i] = fPreFitValue[i] + corr_throw_single;
+        if (throws > 10000)
+        {
+          //KS: Since we are multithreading there is danger that those messages
+          //will be all over the place, small price to pay for faster code
+          MACH3LOG_WARN("Tried {} times to throw parameter {} but failed", throws, i);
+          MACH3LOG_WARN("Setting _fPropVal:  {} to {}", (*_pPropVal)[i], fPreFitValue[i]);
+          MACH3LOG_WARN("I live at {}:{}", __FILE__, __LINE__);
+         (*_pPropVal)[i] = fPreFitValue[i];
+        }
+        throws++;
+      }
+      (*_pCurrVal)[i] = (*_pPropVal)[i];
+
+    } else {
+      // KS: We have to multiply by number of parameters in PCA base
+      SetParPropPCA(i, GetPreFitValuePCA(i) + randParams[i] * eigen_values_master[i] * (LastPCAdpar - FirstPCAdpar));
+      SetParCurrPCA(i, GetParPropPCA(i));
+    }
+  } // end of parameter loop
+
+  /// @todo KS: We don't check if param is out of bounds. This is more problematic for PCA params.
+  for (int i = 0; i < _fNumPar; ++i) {
+    (*_pPropVal)[i] = std::max(fLowBound[i], std::min((*_pPropVal)[i], fUpBound[i]));
+    (*_pCurrVal)[i] = (*_pPropVal)[i];
   }
 }
 
@@ -475,7 +645,7 @@ void PCAHandler::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, i
   leg_Eigen->SetFillStyle(0);
   leg_Eigen->Draw("Same");
 
-  c1->Print( "Debug_PCA.pdf");
+  c1->Print("Debug_PCA.pdf");
   c1->SetLogy(0);
   delete heigen_values_Eigen;
   delete heigen_cumulative_Eigen;
@@ -510,13 +680,13 @@ void PCAHandler::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, i
   else heigen_vectors->GetZaxis()->SetRangeUser(0-fabs(0-minz),0+fabs(0-minz));
   if(PlotText) heigen_vectors->Draw("COLZ TEXT");
   else heigen_vectors->Draw("COLZ");
-  c1->Print( "Debug_PCA.pdf");
+  c1->Print("Debug_PCA.pdf");
   delete heigen_vectors_Eigen;
 
-  #endif
+  #endif // end if Eigen enabled
   delete heigen_vectors;
 
-  c1->Print( "Debug_PCA.pdf]");
+  c1->Print("Debug_PCA.pdf]");
   delete c1;
   PCA_Debug->Close();
   delete PCA_Debug;

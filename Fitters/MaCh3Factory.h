@@ -2,15 +2,16 @@
 
 // MaCh3 includes
 #include "Fitters/FitterBase.h"
-#include "Fitters/mcmc.h"
+#include "Fitters/MR2T2.h"
+#include "Fitters/DelayedMR2T2.h"
 #include "Fitters/PSO.h"
 #include "Fitters/LikelihoodFit.h"
 #ifdef MaCh3_MINUIT2
 #include "Fitters/MinuitFit.h"
 #endif
 
+
 #include "Parameters/ParameterHandlerGeneric.h"
-#include "Parameters/ParameterHandlerOsc.h"
 
 /// @file MaCh3Factory.h
 /// @brief Factory methods for MaCh3 software which streamline initialisation of different objects
@@ -18,8 +19,6 @@
 
 /// @brief MaCh3 Factory initiates one of implemented fitting algorithms
 /// @param fitMan pointer to Manager class
-/// @param Samples vector of Sample PDF which will be used in the fits
-/// @param Covariances vector of Systematic objects which will be used in the fits
 ///
 /// @note Example YAML configuration:
 /// @code
@@ -41,8 +40,8 @@ std::unique_ptr<manager> MaCh3ManagerFactory(int argc, char **argv);
 // ********************************************
 /// @brief Factory function for creating a covariance class for systematic handling.
 ///
-/// @param fitMan Pointer to the manager class that holds the configuration settings.
-/// @param name Prefix, for example Xsec, then code will look for XsecCovFile
+/// @param FitManager Pointer to the manager class that holds the configuration settings.
+/// @param PreFix Prefix, for example Xsec, then code will look for XsecCovFile
 /// @return Pointer to the initialized covarianceXsec matrix object.
 ///
 /// @note Example YAML configuration:
@@ -117,23 +116,21 @@ std::unique_ptr<CovType> MaCh3CovarianceFactory(manager *FitManager, const std::
 /// @tparam SampleType The class type of the sample to create, e.g., `SampleHandlerTutorial`.
 /// @param SampleConfig Path to sample config.
 /// @param xsec A pointer to a ParameterHandlerGeneric object for cross-section systematic settings.
-/// @param osc (Optional) A pointer to a ParameterHandlerOsc object for oscillation systematic settings.
 /// @return Vector of SampleType object, initialized and ready for use.
 ///
 /// @note Example
 /// ```cpp
-/// auto mySamples = MaCh3SampleHandlerFactory<SampleHandlerTutorial>(SampleConfig, xsec, osc);
+/// auto mySamples = MaCh3SampleHandlerFactory<SampleHandlerTutorial>(SampleConfig, xsec);
 /// ```
 template <typename SampleType>
 std::vector<SampleType*> MaCh3SampleHandlerFactory(const std::vector<std::string>& SampleConfig,
-                                               ParameterHandlerGeneric* xsec,
-                                               ParameterHandlerOsc* osc = nullptr) {
+                                               ParameterHandlerGeneric* xsec) {
 // ********************************************
   std::vector<SampleType*> Handlers(SampleConfig.size());
   for (size_t i = 0; i < SampleConfig.size(); ++i)
   {
     // Instantiate the sample using the specified class type
-    SampleType* Sample = new SampleType(SampleConfig[i], xsec, osc);
+    SampleType* Sample = new SampleType(SampleConfig[i], xsec);
     Sample->Reweight();
 
     // Obtain sample name and create a TString version for histogram naming
@@ -141,8 +138,13 @@ std::vector<SampleType*> MaCh3SampleHandlerFactory(const std::vector<std::string
     TString NameTString = TString(name.c_str());
 
     // Clone the 1D histogram with a modified name
-    TH1D* SampleHistogramPrior = static_cast<TH1D*>(Sample->Get1DHist()->Clone(NameTString + "_Prior"));
-    Sample->AddData(SampleHistogramPrior);
+    if (Sample->GetNDim() == 1) {
+      auto hist = static_cast<TH1D*>(Sample->GetMCHist(1));
+      Sample->AddData(hist);
+    } else {
+      auto hist = static_cast<TH2D*>(Sample->GetMCHist(2));
+      Sample->AddData(hist);
+    }
     Handlers[i] = Sample;
   }
   return Handlers;

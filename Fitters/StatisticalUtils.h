@@ -9,23 +9,16 @@
 #include <cmath>
 
 //MaCh3 includes
-#include "Samples/Structs.h"
 #include "Manager/Manager.h"
 #include "Samples/HistogramUtils.h"
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wconversion"
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+_MaCh3_Safe_Include_Start_ //{
 // ROOT includes
 #include "TCanvas.h"
 #include "TLine.h"
 #include "TROOT.h"
 #include "TStyle.h"
-#pragma GCC diagnostic pop
+_MaCh3_Safe_Include_End_ //}
 
 /// @file StatisticalUtils.h
 /// @brief Utility functions for statistical interpretations in MaCh3
@@ -111,12 +104,12 @@ void GetCredibleIntervalSig(const std::unique_ptr<TH1D>& hist, std::unique_ptr<T
 
 /// @brief KS: Set 2D contour within some coverage
 /// @param hist2D histograms based on which we calculate credible regions
-/// @param CredibleInSigmas Whether interval is in sigmas or percentage
 /// @param coverage What is defined coverage, by default 0.6827 (1 sigma)
 void GetCredibleRegion(std::unique_ptr<TH2D>& hist2D, const double coverage = 0.6827);
 
 /// @brief KS: Set 2D contour within some coverage
 /// @param hist2D histograms based on which we calculate credible regions
+/// @param CredibleInSigmas Whether interval is in sigmas or percentage
 /// @param coverage What is defined coverage, by default 0.6827 (1 sigma)
 void GetCredibleRegionSig(std::unique_ptr<TH2D>& hist2D, const bool CredibleInSigmas, const double coverage = 0.6827);
 

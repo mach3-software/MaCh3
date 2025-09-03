@@ -3,13 +3,14 @@
 #include <pybind11/stl.h>
 // MaCh3 includes
 #include "Fitters/FitterBase.h"
-#include "Fitters/mcmc.h"
+#include "Fitters/MR2T2.h"
+#include "Fitters/DelayedMR2T2.h"
 #include "Fitters/MinuitFit.h"
 #include "Fitters/PSO.h"
 
 namespace py = pybind11;
 
-// As FitterBase is an abstract base class we have to do some gymnastics to get it to get it into python
+/// @brief EW: As FitterBase is an abstract base class we have to do some gymnastics to get it to get it into python
 class PyFitterBase : public FitterBase {
 public:
     /* Inherit the constructors */
@@ -35,7 +36,7 @@ public:
     }
 };
 
-// As LikelihoodFit is an abstract base class we have to do some gymnastics to get it to get it into python
+/// @brief EW: As LikelihoodFit is an abstract base class we have to do some gymnastics to get it to get it into python
 class PyLikelihoodFit : public LikelihoodFit {
 public:
     /* Inherit the constructors */
@@ -130,16 +131,23 @@ void initFitters(py::module &m){
 
     ; // End of FitterBase class binding
 
-    py::class_<mcmc, FitterBase>(m_fitters, "MCMC")
-        .def(py::init<manager* const>())
-        
+    py::class_<MR2T2, FitterBase>(m_fitters, "mcmc")
+        .def(py::init<manager *const>())
+
         .def(
-            "set_chain_length", 
-            &mcmc::setChainLength, 
+            "set_chain_length",
+            &MR2T2::setChainLength,
             "Set how long chain should be.",
-            py::arg("length")
-        )
-    ; // end of MCMC class binding
+            py::arg("length")); // end of MCMC class binding
+
+    py::class_<DelayedMR2T2, FitterBase>(m_fitters, "DelayedMCMC")
+        .def(py::init<manager *const>())
+
+        .def(
+            "set_chain_length",
+            &MR2T2::setChainLength,
+            "Set how long chain should be.",
+            py::arg("length")); // end of MCMC class binding
 
     py::class_<LikelihoodFit, PyLikelihoodFit /* <--- trampoline*/, FitterBase>(m_fitters, "LikelihoodFit")
         .def(py::init<manager* const>())

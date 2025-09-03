@@ -5,21 +5,18 @@
 #include "Manager/YamlHelper.h"
 #include "Manager/MaCh3Exception.h"
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wconversion"
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+_MaCh3_Safe_Include_Start_ //{
 // ROOT Things
 #include "TColor.h"
 #include "TH1.h"
 #include "TStyle.h"
-#pragma GCC diagnostic pop
+_MaCh3_Safe_Include_End_ //}
+
 
 namespace MaCh3Plotting {
 /// @author Ewan Miller
+
+/// @brief EW: provides centralized styling utilities for plots, including name prettification and style application
 class StyleManager {
 public:
   /// @brief Constructor
@@ -56,17 +53,17 @@ public:
   /// @brief Set the root colour palette to one of the default root pallettes as defined in (root
   /// docs)[https://root.cern.ch/doc/master/classTColor.html#C05]
   /// @param rootPlotStyle The index of the palette as defined by root
-  void setPalette(int rootPlotStyle) const;
+  void setPalette(const int rootPlotStyle) const;
 
   /// @brief Set the root colour palette to one of the ones defined in the style config
   /// @param rootPlotStyle The name of the palette you want to use, should be the same as it appears
   /// in the style config
-  void setPalette(std::string configStyleName) const;
+  void setPalette(const std::string& configStyleName) const;
 
   /// @brief Set the style of a TH1 to one of the styles defined in the style config
   /// @param hist The TH1 that you wish to modify
   /// @param styleName The name of the style you want to use, as it appears in the config file
-  void setTH1Style(TH1 *hist, std::string styleName) const;
+  void setTH1Style(TH1 *hist, const std::string& styleName) const;
 
 private:
   YAML::Node _styleConfig;

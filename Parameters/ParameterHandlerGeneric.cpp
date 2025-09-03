@@ -1,5 +1,4 @@
 #include "Parameters/ParameterHandlerGeneric.h"
-#include "Samples/Structs.h"
 
 // ********************************************
 // ETA - YAML constructor
@@ -8,7 +7,7 @@
 ParameterHandlerGeneric::ParameterHandlerGeneric(const std::vector<std::string>& YAMLFile, std::string name, double threshold, int FirstPCA, int LastPCA)
                : ParameterHandlerBase(YAMLFile, name, threshold, FirstPCA, LastPCA){
 // ********************************************
-  InitXsecFromConfig();
+  InitParametersTypeFromConfig();
 
   //ETA - again this really doesn't need to be hear...
   for (int i = 0; i < _fNumPar; i++)
@@ -17,14 +16,14 @@ ParameterHandlerGeneric::ParameterHandlerGeneric(const std::vector<std::string>&
     if(int(_fNames[i].length()) > PrintLength) PrintLength = int(_fNames[i].length());
   } // end the for loop
 
-  MACH3LOG_DEBUG("Constructing instance of covarianceXsec");
+  MACH3LOG_DEBUG("Constructing instance of ParameterHandler");
   InitParams();
   // Print
   Print();
 }
 
 // ********************************************
-void ParameterHandlerGeneric::InitXsecFromConfig() {
+void ParameterHandlerGeneric::InitParametersTypeFromConfig() {
 // ********************************************
   _fSystToGlobalSystIndexMap.resize(SystType::kSystTypes);
 
@@ -35,6 +34,7 @@ void ParameterHandlerGeneric::InitXsecFromConfig() {
   NormParams.reserve(_fNumPar);
   SplineParams.reserve(_fNumPar);
   FuncParams.reserve(_fNumPar);
+  OscParams.reserve(_fNumPar);
 
   int i = 0;
   unsigned int ParamCounter[SystType::kSystTypes] = {0};
@@ -53,7 +53,7 @@ void ParameterHandlerGeneric::InitXsecFromConfig() {
       //Set param type
       _fParamType[i] = SystType::kSpline;
       // Fill Spline info
-      SplineParams.push_back(GetSplineParameter(param["Systematic"]));
+      SplineParams.push_back(GetSplineParameter(param["Systematic"], i));
 
       if (param["Systematic"]["SplineInformation"]["SplineName"]) {
         _fSplineNames.push_back(param["Systematic"]["SplineInformation"]["SplineName"].as<std::string>());
@@ -73,6 +73,11 @@ void ParameterHandlerGeneric::InitXsecFromConfig() {
       FuncParams.push_back(GetFunctionalParameters(param["Systematic"], i));
       _fSystToGlobalSystIndexMap[SystType::kFunc].insert(std::make_pair(ParamCounter[SystType::kFunc], i));
       ParamCounter[SystType::kFunc]++;
+    } else if(param["Systematic"]["Type"].as<std::string>() == SystType_ToString(SystType::kOsc)){
+      _fParamType[i] = SystType::kOsc;
+      OscParams.push_back(GetOscillationParameters(param["Systematic"], i));
+      _fSystToGlobalSystIndexMap[SystType::kOsc].insert(std::make_pair(ParamCounter[SystType::kOsc], i));
+      ParamCounter[SystType::kOsc]++;
     } else{
       MACH3LOG_ERROR("Given unrecognised systematic type: {}", param["Systematic"]["Type"].as<std::string>());
       std::string expectedTypes = "Expecting ";
@@ -96,12 +101,13 @@ void ParameterHandlerGeneric::InitXsecFromConfig() {
   NormParams.shrink_to_fit();
   SplineParams.shrink_to_fit();
   FuncParams.shrink_to_fit();
+  OscParams.shrink_to_fit();
 }
 
 // ********************************************
 ParameterHandlerGeneric::~ParameterHandlerGeneric() {
 // ********************************************
-  MACH3LOG_DEBUG("Deleting covarianceXsec");
+  MACH3LOG_DEBUG("Deleting ParameterHandler");
 }
 
 // ********************************************
@@ -115,7 +121,6 @@ const std::vector<std::string> ParameterHandlerGeneric::GetSplineParsNamesFromSa
     if (AppliesToSample(SystIndex, SampleName)) { //If parameter applies to required Sample
       returnVec.push_back(_fSplineNames.at(SplineIndex));
     }
-
   }
   return returnVec;
 }
@@ -157,36 +162,37 @@ const std::vector< std::vector<int> > ParameterHandlerGeneric::GetSplineModeVecF
 NormParameter ParameterHandlerGeneric::GetNormParameter(const YAML::Node& param, const int Index) {
 // ********************************************
   NormParameter norm;
-  norm.name = GetParFancyName(Index);
 
-  // ETA Empty DummyVector can be used to specify no cut for mode, target and neutrino flavour
-  // ETA Has to be of size 0 to mean apply to all
-  std::vector<int> DummyModeVec;
-  //Ultimately all this information ends up in the NormParams vector
+  GetBaseParameter(param, Index, norm);
 
-  //Copy the mode information into an XsecNorms4 struct
-  norm.modes = GetFromManager<std::vector<int>>(param["Mode"], DummyModeVec, __FILE__ , __LINE__);
-  norm.pdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavour"], DummyModeVec, __FILE__ , __LINE__);
-  norm.preoscpdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavourUnosc"], DummyModeVec, __FILE__ , __LINE__);
-  norm.targets = GetFromManager<std::vector<int>>(param["TargetNuclei"], DummyModeVec, __FILE__ , __LINE__);
+  /// ETA size 0 to mean apply to all
+  /// Ultimately all this information ends up in the @NormParams vector
+  norm.modes = GetFromManager<std::vector<int>>(param["Mode"], {}, __FILE__ , __LINE__);
+  norm.pdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavour"], {}, __FILE__ , __LINE__);
+  norm.preoscpdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavourUnosc"], {}, __FILE__ , __LINE__);
+  norm.targets = GetFromManager<std::vector<int>>(param["TargetNuclei"], {}, __FILE__ , __LINE__);
 
-  //ETA - I think this can go in the norm parameters only if statement above
+  if(_fLowBound[Index] < 0.) {
+    MACH3LOG_ERROR("Normalisation Parameter {} ({}), has lower parameters bound which can go below 0 and is equal {}",
+                   GetParFancyName(Index), Index, _fLowBound[Index]);
+    MACH3LOG_ERROR("Normalisation parameters can't go bellow 0 as this is unphysical");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
   int NumKinematicCuts = 0;
-  if(param["KinematicCuts"]){
-
+  if(param["KinematicCuts"]) {
     NumKinematicCuts = int(param["KinematicCuts"].size());
 
     std::vector<std::string> TempKinematicStrings;
-    std::vector<std::vector<double>> TempKinematicBounds;
+    std::vector<std::vector<std::vector<double>>> TempKinematicBounds;
     //First element of TempKinematicBounds is always -999, and size is then 3
-    for(int KinVar_i = 0 ; KinVar_i < NumKinematicCuts ; ++KinVar_i){
+    for(int KinVar_i = 0 ; KinVar_i < NumKinematicCuts ; ++KinVar_i) {
       //ETA: This is a bit messy, Kinematic cuts is a list of maps
       for (YAML::const_iterator it = param["KinematicCuts"][KinVar_i].begin();it!=param["KinematicCuts"][KinVar_i].end();++it) {
         TempKinematicStrings.push_back(it->first.as<std::string>());
-        TempKinematicBounds.push_back(it->second.as<std::vector<double>>());
+        TempKinematicBounds.push_back(Get2DBounds(it->second));
       }
       if(TempKinematicStrings.size() == 0) {
-        MACH3LOG_ERROR("Recived a KinematicCuts node but couldn't read the contents (it's a list of single-element dictionaries (python) = map of pairs (C++))");
+        MACH3LOG_ERROR("Received a KinematicCuts node but couldn't read the contents (it's a list of single-element dictionaries (python) = map of pairs (C++))");
         MACH3LOG_ERROR("For Param {}", norm.name);
         throw MaCh3Exception(__FILE__, __LINE__);
       }
@@ -195,7 +201,7 @@ NormParameter ParameterHandlerGeneric::GetNormParameter(const YAML::Node& param,
     norm.Selection = TempKinematicBounds;
   }
 
-  //Next ones are kinematic bounds on where normalisation parameter should apply (at the moment only etrue but hope to add q2
+  //Next ones are kinematic bounds on where normalisation parameter should apply
   //We set a bool to see if any bounds exist so we can short-circuit checking all of them every step
   bool HasKinBounds = false;
 
@@ -204,11 +210,22 @@ NormParameter ParameterHandlerGeneric::GetNormParameter(const YAML::Node& param,
   norm.hasKinBounds = HasKinBounds;
   //End of kinematic bound checking
 
-  // Set the global parameter index of the normalisation parameter
-  norm.index = Index;
-
   return norm;
 }
+
+// ********************************************
+// Get Base Param
+void ParameterHandlerGeneric::GetBaseParameter(const YAML::Node& param, const int Index, TypeParameterBase& Parameter) {
+// ********************************************
+  // KS: For now we don't use so avoid compilation error
+  (void) param;
+
+  Parameter.name = GetParFancyName(Index);
+
+  // Set the global parameter index of the normalisation parameter
+  Parameter.index = Index;
+}
+
 
 // ********************************************
 // Grab the global syst index for the relevant SampleName
@@ -228,7 +245,7 @@ const std::vector<int> ParameterHandlerGeneric::GetGlobalSystIndexFromSampleName
 // ********************************************
 // Grab the global syst index for the relevant SampleName
 // i.e. get a vector of size nSplines where each entry is filled with the global syst number
-const std::vector<int> ParameterHandlerGeneric::GetSystIndexFromSampleName(const std::string& SampleName,  const SystType Type) {
+const std::vector<int> ParameterHandlerGeneric::GetSystIndexFromSampleName(const std::string& SampleName,  const SystType Type) const {
 // ********************************************
   std::vector<int> returnVec;
   for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
@@ -243,10 +260,11 @@ const std::vector<int> ParameterHandlerGeneric::GetSystIndexFromSampleName(const
 
 // ********************************************
 // Get Norm params
-SplineParameter ParameterHandlerGeneric::GetSplineParameter(const YAML::Node& param) {
+SplineParameter ParameterHandlerGeneric::GetSplineParameter(const YAML::Node& param, const int Index) {
 // ********************************************
   SplineParameter Spline;
 
+  GetBaseParameter(param, Index, Spline);
   //Now get the Spline interpolation type
   if (param["SplineInformation"]["InterpolationType"]){
     for(int InterpType = 0; InterpType < kSplineInterpolations ; ++InterpType){
@@ -274,7 +292,8 @@ SplineParameter ParameterHandlerGeneric::GetSplineParameter(const YAML::Node& pa
 FunctionalParameter ParameterHandlerGeneric::GetFunctionalParameters(const YAML::Node& param, const int Index) {
 // ********************************************
   FunctionalParameter func;
-  func.name = GetParFancyName(Index);
+  GetBaseParameter(param, Index, func);
+
   func.pdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavour"], std::vector<int>(), __FILE__ , __LINE__);
   func.targets = GetFromManager<std::vector<int>>(param["TargetNuclei"], std::vector<int>(), __FILE__ , __LINE__);
   func.modes = GetFromManager<std::vector<int>>(param["Mode"], std::vector<int>(), __FILE__ , __LINE__);
@@ -287,16 +306,16 @@ FunctionalParameter ParameterHandlerGeneric::GetFunctionalParameters(const YAML:
     NumKinematicCuts = int(param["KinematicCuts"].size());
 
     std::vector<std::string> TempKinematicStrings;
-    std::vector<std::vector<double>> TempKinematicBounds;
+    std::vector<std::vector<std::vector<double>>> TempKinematicBounds;
     //First element of TempKinematicBounds is always -999, and size is then 3
     for(int KinVar_i = 0 ; KinVar_i < NumKinematicCuts ; ++KinVar_i){
       //ETA: This is a bit messy, Kinematic cuts is a list of maps
       for (YAML::const_iterator it = param["KinematicCuts"][KinVar_i].begin();it!=param["KinematicCuts"][KinVar_i].end();++it) {
         TempKinematicStrings.push_back(it->first.as<std::string>());
-        TempKinematicBounds.push_back(it->second.as<std::vector<double>>());
+        TempKinematicBounds.push_back(Get2DBounds(it->second));
       }
       if(TempKinematicStrings.size() == 0) {
-        MACH3LOG_ERROR("Recived a KinematicCuts node but couldn't read the contents (it's a list of single-element dictionaries (python) = map of pairs (C++))");
+        MACH3LOG_ERROR("Received a KinematicCuts node but couldn't read the contents (it's a list of single-element dictionaries (python) = map of pairs (C++))");
         MACH3LOG_ERROR("For Param {}", func.name);
         throw MaCh3Exception(__FILE__, __LINE__);
       }
@@ -304,36 +323,51 @@ FunctionalParameter ParameterHandlerGeneric::GetFunctionalParameters(const YAML:
     func.KinematicVarStr = TempKinematicStrings;
     func.Selection = TempKinematicBounds;
   }
-  func.index = Index;
   func.valuePtr = RetPointer(Index);
   return func;
 }
 
 // ********************************************
+// Get Osc params
+OscillationParameter ParameterHandlerGeneric::GetOscillationParameters(const YAML::Node& param, const int Index) {
+// ********************************************
+  OscillationParameter OscParamInfo;
+  GetBaseParameter(param, Index, OscParamInfo);
+
+  return OscParamInfo;
+}
+
+// ********************************************
 // HH: Grab the Functional parameters for the relevant SampleName
-const std::vector<FunctionalParameter> ParameterHandlerGeneric::GetFunctionalParametersFromSampleName(const std::string& SampleName) {
-  // ********************************************
-  std::vector<FunctionalParameter> returnVec;
-  for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kFunc]) {
-    auto &FuncIndex = pair.first;
-    auto &GlobalIndex = pair.second;
-    if (AppliesToSample(GlobalIndex, SampleName)) {
-      returnVec.push_back(FuncParams[FuncIndex]);
-    }
-  }
-  return returnVec;
+const std::vector<FunctionalParameter> ParameterHandlerGeneric::GetFunctionalParametersFromSampleName(const std::string& SampleName) const {
+// ********************************************
+  return GetTypeParamsFromSampleName(_fSystToGlobalSystIndexMap[SystType::kFunc], FuncParams, SampleName);
 }
 
 // ********************************************
 // DB Grab the Normalisation parameters for the relevant SampleName
-const std::vector<NormParameter> ParameterHandlerGeneric::GetNormParsFromSampleName(const std::string& SampleName) {
+const std::vector<NormParameter> ParameterHandlerGeneric::GetNormParsFromSampleName(const std::string& SampleName) const {
 // ********************************************
-  std::vector<NormParameter> returnVec;
-  for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kNorm]) {
-    auto &NormIndex = pair.first;
-    auto &GlobalIndex = pair.second;
-    if (AppliesToSample(GlobalIndex, SampleName)) {
-      returnVec.push_back(NormParams[NormIndex]);
+  return GetTypeParamsFromSampleName(_fSystToGlobalSystIndexMap[SystType::kNorm], NormParams, SampleName);
+}
+
+// ********************************************
+// KS Grab the Spline parameters for the relevant SampleName
+const std::vector<SplineParameter> ParameterHandlerGeneric::GetSplineParsFromSampleName(const std::string& SampleName) const {
+// ********************************************
+  return GetTypeParamsFromSampleName(_fSystToGlobalSystIndexMap[SystType::kSpline], SplineParams, SampleName);
+}
+
+// ********************************************
+template<typename ParamT>
+std::vector<ParamT> ParameterHandlerGeneric::GetTypeParamsFromSampleName(const std::map<int, int>& indexMap, const std::vector<ParamT>& params, const std::string& SampleName) const {
+// ********************************************
+  std::vector<ParamT> returnVec;
+  for (const auto& pair : indexMap) {
+    const auto& localIndex = pair.first;
+    const auto& globalIndex = pair.second;
+    if (AppliesToSample(globalIndex, SampleName)) {
+      returnVec.push_back(params[localIndex]);
     }
   }
   return returnVec;
@@ -393,25 +427,24 @@ void ParameterHandlerGeneric::InitParams() {
     //ETA - set the name to be xsec_% as this is what ProcessorMCMC expects
     _fNames[i] = "xsec_"+std::to_string(i);
 
-    // Set covarianceBase parameters (Curr = current, Prop = proposed, Sigma = step)
+    // KS: Plenty
+    if(_fParamType[i] == kOsc){
+      _fNames[i] = _fFancyNames[i];
+
+      if(_ParameterGroup[i] != "Osc"){
+        MACH3LOG_ERROR("Parameter {}, is of type Oscillation but doesn't belong to Osc group", _fFancyNames[i]);
+        MACH3LOG_ERROR("It belongs to {} group", _ParameterGroup[i]);
+        throw MaCh3Exception(__FILE__ , __LINE__ );
+      }
+    }
+    // Set ParameterHandler parameters (Curr = current, Prop = proposed, Sigma = step)
     _fCurrVal[i] = _fPreFitValue[i];
     _fPropVal[i] = _fCurrVal[i];
   }
-  //DB Set Individual Step scale for PCA parameters to the LastPCAdpar fIndivStepScale because the step scale for those parameters is set by 'eigen_values[i]' but needs an overall step scale
-  //   However, individual step scale for non-PCA parameters needs to be set correctly
-  if (pca) {
-    for (int i = FirstPCAdpar; i <= LastPCAdpar; i++) {
-      _fIndivStepScale[i] = _fIndivStepScale[LastPCAdpar-1];
-    }
-  }
   Randomize();
   //KS: Transfer the starting parameters to the PCA basis, you don't want to start with zero..
-  if (pca)
-  {
-    PCAObj->TransferToPCA();
-    for (int i = 0; i < _fNumParPCA; ++i) {
-      PCAObj->_fPreFitValuePCA[i] = PCAObj->_fParCurrPCA(i);
-    }
+  if (pca) {
+    PCAObj->SetInitialParameters(_fIndivStepScale);
   }
 }
 
@@ -420,7 +453,7 @@ void ParameterHandlerGeneric::InitParams() {
 void ParameterHandlerGeneric::Print() {
 // ********************************************
   MACH3LOG_INFO("#################################################");
-  MACH3LOG_INFO("Printing covarianceXsec:");
+  MACH3LOG_INFO("Printing ParameterHandlerGeneric:");
 
   PrintGlobablInfo();
 
@@ -429,6 +462,8 @@ void ParameterHandlerGeneric::Print() {
   PrintSplineParams();
 
   PrintFunctionalParams();
+
+  PrintOscillationParams();
 
   PrintParameterGroups();
 
@@ -442,7 +477,7 @@ void ParameterHandlerGeneric::Print() {
 void ParameterHandlerGeneric::PrintGlobablInfo() {
 // ********************************************
   MACH3LOG_INFO("============================================================================================================================================================");
-  MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10}", "#", "|", "Name", "|", "Gen.", "|", "Prior", "|", "Error", "|", "Lower", "|", "Upper", "|", "StepScale", "|", "SampleNames", "|", "Type");
+  MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<20} {:2} {:<10}", "#", "|", "Name", "|", "Prior", "|", "Error", "|", "Lower", "|", "Upper", "|", "StepScale", "|", "SampleNames", "|", "Type");
   MACH3LOG_INFO("------------------------------------------------------------------------------------------------------------------------------------------------------------");
   for (int i = 0; i < GetNumParams(); i++) {
     std::string ErrString = fmt::format("{:.2f}", _fError[i]);
@@ -453,7 +488,7 @@ void ParameterHandlerGeneric::PrintGlobablInfo() {
       }
       SampleNameString += SampleName;
     }
-    MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10}", i, "|", GetParFancyName(i), "|", _fGenerated[i], "|", _fPreFitValue[i], "|", "+/- " + ErrString, "|", _fLowBound[i], "|", _fUpBound[i], "|", _fIndivStepScale[i], "|", SampleNameString, "|", SystType_ToString(_fParamType[i]));
+    MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<20} {:2} {:<10}", i, "|", GetParFancyName(i), "|", _fPreFitValue[i], "|", "+/- " + ErrString, "|", _fLowBound[i], "|", _fUpBound[i], "|", _fIndivStepScale[i], "|", SampleNameString, "|", SystType_ToString(_fParamType[i]));
   }
   MACH3LOG_INFO("============================================================================================================================================================");
 }
@@ -515,8 +550,9 @@ void ParameterHandlerGeneric::PrintNormParams() {
       for(long unsigned int icut = 0; icut < ncuts; icut++) {
         std::string kinematicCutValueString;
         for(const auto & value : NormParams[i].Selection[icut]) {
-          kinematicCutValueString += std::to_string(value);
-          kinematicCutValueString += " ";
+          for (const auto& v : value) {
+            kinematicCutValueString += fmt::format("{:.2f} ", v);
+          }
         }
         if(icut == 0)
           MACH3LOG_INFO("│{: <4}│{: <10}│{: <40}│{: <20}│{: <40}│", i, NormParams[i].index, NormParams[i].name, NormParams[i].KinematicVarStr[icut], kinematicCutValueString);
@@ -569,6 +605,22 @@ void ParameterHandlerGeneric::PrintFunctionalParams() {
 }
 
 // ********************************************
+void ParameterHandlerGeneric::PrintOscillationParams() {
+// ********************************************
+  MACH3LOG_INFO("Oscillation parameters: {}", _fSystToGlobalSystIndexMap[SystType::kOsc].size());
+  if(_fSystToGlobalSystIndexMap[SystType::kOsc].size() == 0) return;
+  MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┐");
+  MACH3LOG_INFO("│{0:4}│{1:10}│{2:40}│", "#", "Global #", "Name");
+  MACH3LOG_INFO("├────┼──────────┼────────────────────────────────────────┤");
+  for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kOsc]) {
+    auto &OscIndex = pair.first;
+    auto &GlobalIndex = pair.second;
+    MACH3LOG_INFO("│{0:4}│{1:<10}│{2:40}│", std::to_string(OscIndex), GlobalIndex, GetParFancyName(GlobalIndex));
+  }
+  MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┘");
+}
+
+// ********************************************
 void ParameterHandlerGeneric::PrintParameterGroups() {
 // ********************************************
   // KS: Create a map to store the counts of unique strings, in principle this could be in header file
@@ -584,6 +636,21 @@ void ParameterHandlerGeneric::PrintParameterGroups() {
   for (const auto& pair : paramCounts) {
     MACH3LOG_INFO("Found {}: {} params", pair.second, pair.first);
   }
+}
+
+// ********************************************
+std::vector<std::string> ParameterHandlerGeneric::GetUniqueParameterGroups() {
+// ********************************************
+  std::unordered_set<std::string> uniqueGroups;
+
+  // Fill the set with unique values
+  for (const auto& param : _ParameterGroup) {
+    uniqueGroups.insert(param);
+  }
+
+  // Convert to vector and return
+  std::vector<std::string> result(uniqueGroups.begin(), uniqueGroups.end());
+  return result;
 }
 
 // ********************************************
@@ -611,21 +678,47 @@ void ParameterHandlerGeneric::CheckCorrectInitialisation() {
 
 // ********************************************
 // Function to set to prior parameters of a given group
-void ParameterHandlerGeneric::SetGroupOnlyParameters(const std::string& Group) {
+void ParameterHandlerGeneric::SetGroupOnlyParameters(const std::vector< std::string>& Groups) {
 // ********************************************
-  if(!pca) {
+  for(size_t i = 0; i < Groups.size(); i++){
+    SetGroupOnlyParameters(Groups[i]);
+  }
+}
+
+// ********************************************
+// Function to set to prior parameters of a given group
+void ParameterHandlerGeneric::SetGroupOnlyParameters(const std::string& Group, const std::vector<double>& Pars) {
+// ********************************************
+  // If empty, set the proposed to prior
+  if (Pars.empty()) {
     for (int i = 0; i < _fNumPar; i++) {
       if(IsParFromGroup(i, Group)) _fPropVal[i] = _fPreFitValue[i];
     }
-  } else {
-    MACH3LOG_ERROR("SetGroupOnlyParameters not implemented for PCA");
-    throw MaCh3Exception(__FILE__, __LINE__);
+  } else{
+    const size_t ExpectedSize = static_cast<size_t>(GetNumParFromGroup(Group));
+    if (Pars.size() != ExpectedSize) {
+      MACH3LOG_ERROR("Number of param in group {} is {}, while you passed {}", Group, ExpectedSize, Pars.size());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    int Counter = 0;
+    for (int i = 0; i < _fNumPar; i++) {
+      // If belongs to group set value from parsed vector, otherwise use propose value
+      if(IsParFromGroup(i, Group)){
+        _fPropVal[i] = Pars[Counter];
+        Counter++;
+      }
+    }
+  }
+  // And if pca make the transfer
+  if (pca) {
+    PCAObj->TransferToPCA();
+    PCAObj->TransferToParam();
   }
 }
 
 // ********************************************
 // Checks if parameter belongs to a given group
-bool ParameterHandlerGeneric::IsParFromGroup(const int i, const std::string& Group) {
+bool ParameterHandlerGeneric::IsParFromGroup(const int i, const std::string& Group) const {
 // ********************************************
   std::string groupLower = Group;
   std::string paramGroupLower = _ParameterGroup[i];
@@ -635,6 +728,30 @@ bool ParameterHandlerGeneric::IsParFromGroup(const int i, const std::string& Gro
   std::transform(paramGroupLower.begin(), paramGroupLower.end(), paramGroupLower.begin(), ::tolower);
 
   return groupLower == paramGroupLower;
+}
+
+// ********************************************
+int ParameterHandlerGeneric::GetNumParFromGroup(const std::string& Group) const {
+// ********************************************
+  int Counter = 0;
+  for (int i = 0; i < _fNumPar; i++) {
+    if(IsParFromGroup(i, Group)) Counter++;
+  }
+  return Counter;
+}
+
+// ********************************************
+// DB Grab the Normalisation parameters for the relevant sample name
+std::vector<const double*> ParameterHandlerGeneric::GetOscParsFromSampleName(const std::string& SampleName) {
+// ********************************************
+  std::vector<const double*> returnVec;
+  for (const auto& pair : _fSystToGlobalSystIndexMap[SystType::kOsc]) {
+    const auto& globalIndex = pair.second;
+    if (AppliesToSample(globalIndex, SampleName)) {
+      returnVec.push_back(RetPointer(globalIndex));
+    }
+  }
+  return returnVec;
 }
 
 // ********************************************
@@ -650,7 +767,6 @@ void ParameterHandlerGeneric::DumpMatrixToFile(const std::string& Name) {
   TVectorD* xsec_param_prior = new TVectorD(_fNumPar);
   TVectorD* xsec_flat_prior = new TVectorD(_fNumPar);
   TVectorD* xsec_stepscale = new TVectorD(_fNumPar);
-  TVectorD* xsec_param_generated = new TVectorD(_fNumPar);
   TVectorD* xsec_param_lb = new TVectorD(_fNumPar);
   TVectorD* xsec_param_ub = new TVectorD(_fNumPar);
 
@@ -670,7 +786,6 @@ void ParameterHandlerGeneric::DumpMatrixToFile(const std::string& Name) {
     xsec_spline_names->AddLast(splineName);
 
     (*xsec_param_prior)[i] = _fPreFitValue[i];
-    (*xsec_param_generated)[i] = _fGenerated[i];
     (*xsec_flat_prior)[i] = _fFlatPrior[i];
     (*xsec_stepscale)[i] = _fIndivStepScale[i];
     (*xsec_error)[i] = _fError[i];
@@ -709,8 +824,6 @@ void ParameterHandlerGeneric::DumpMatrixToFile(const std::string& Name) {
   delete xsec_flat_prior;
   xsec_stepscale->Write("xsec_stepscale");
   delete xsec_stepscale;
-  xsec_param_generated->Write("xsec_param_nom");
-  delete xsec_param_generated;
   xsec_param_lb->Write("xsec_param_lb");
   delete xsec_param_lb;
   xsec_param_ub->Write("xsec_param_ub");
@@ -731,5 +844,5 @@ void ParameterHandlerGeneric::DumpMatrixToFile(const std::string& Name) {
   outputFile->Close();
   delete outputFile;
 
-  MACH3LOG_INFO("Finished dumping covariance object");
+  MACH3LOG_INFO("Finished dumping ParameterHandler object");
 }

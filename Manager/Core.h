@@ -39,24 +39,42 @@ namespace M3 {
     return std::fma(x, y, z);
     #endif
   }
+  /// Default value used for double initialisation
   constexpr static const double _BAD_DOUBLE_ = -999.99;
+  /// Default value used for int initialisation
   constexpr static const int _BAD_INT_ = -999;
   constexpr static const double _DEFAULT_RETURN_VAL_ = -999999.123456;
 
   /// Some commonly used variables to which we set pointers to
-  constexpr static const double Unity = 1.;
-  constexpr static const double Zero = 0.;
+  constexpr static const double Unity_D = 1.;
   constexpr static const float Unity_F = 1.;
+  #ifdef _LOW_MEMORY_STRUCTS_
+  constexpr static const float_t Unity = Unity_F;
+  #else
+  constexpr static const float_t Unity = Unity_D;
+  #endif
+  constexpr static const double Zero_D = 0.;
   constexpr static const float Zero_F = 0.;
-  constexpr static const int Unity_Int = 1;
+  #ifdef _LOW_MEMORY_STRUCTS_
+  constexpr static const float_t Zero = Zero_F;
+  #else
+  constexpr static const float_t Zero = Zero_D;
+  #endif
 
+  /// When parameter has no bound this serves as it. Lowest possible value the system
   constexpr static const double KinematicLowBound = std::numeric_limits<double>::lowest();
+  /// When parameter has no bound this serves as it. Highest possible value the system
   constexpr static const double KinematicUpBound = std::numeric_limits<double>::max();
 
   /// Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such step should be removed
   constexpr static const double _LARGE_LOGL_ = 1234567890.0;
 
+  /// MC prediction lower bound in bin to identify problematic binning definitions and handle LogL calculation
+  constexpr static const double _LOW_MC_BOUND_ = .00001;
+
+  /// Default value for spline knot capping, default mean not capping is being applied
   constexpr static const double DefSplineKnotUpBound = 9999;
+  /// Default value for spline knot capping, default mean not capping is being applied
   constexpr static const double DefSplineKnotLowBound = -9999;
 }
 
@@ -93,14 +111,14 @@ _Pragma("GCC diagnostic ignored \"-Wold-style-cast\"") \
 _Pragma("GCC diagnostic ignored \"-Wformat-nonliteral\"") \
 _Pragma("GCC diagnostic ignored \"-Wswitch-enum\"") \
 _Pragma("GCC diagnostic ignored \"-Wconversion\"") \
-_Pragma("GCC diagnostic ignored \"-Wshadow\"")
-
+_Pragma("GCC diagnostic ignored \"-Wshadow\"") \
+_Pragma("GCC diagnostic ignored \"-Wswitch-enum\"")
 /// @brief KS: Restore warning checking after including external headers
 #define _MaCh3_Safe_Include_End_ \
 _Pragma("GCC diagnostic pop")
 
-// clang need slightly different diagnostics
-#if defined(__clang__)
+// clang and IntelLLVM need slightly different diagnostics
+#if defined(__clang__) || defined(__INTEL_LLVM_COMPILER)
   #undef _MaCh3_Safe_Include_Start_
   #define _MaCh3_Safe_Include_Start_ \
   _Pragma("clang diagnostic push") \
@@ -109,8 +127,8 @@ _Pragma("GCC diagnostic pop")
   _Pragma("clang diagnostic ignored \"-Wformat-nonliteral\"") \
   _Pragma("clang diagnostic ignored \"-Wswitch-enum\"") \
   _Pragma("clang diagnostic ignored \"-Wconversion\"") \
-  _Pragma("clang diagnostic ignored \"-Wshadow\"")
-
+  _Pragma("clang diagnostic ignored \"-Wshadow\"") \
+  _Pragma("clang diagnostic ignored \"-Wswitch-enum\"")
   #undef _MaCh3_Safe_Include_End_
   #define _MaCh3_Safe_Include_End_ \
   _Pragma("clang diagnostic pop")

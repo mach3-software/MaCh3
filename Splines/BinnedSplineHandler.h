@@ -1,7 +1,6 @@
 #pragma once
 
 //MaCh3 includes
-#include "Samples/Structs.h"
 #include "Splines/SplineBase.h"
 #include "Manager/MaCh3Modes.h"
 
@@ -27,7 +26,7 @@ class BinnedSplineHandler : public SplineBase {
     /// @brief CW: This Eval should be used when using two separate x,{y,a,b,c,d} arrays
     /// to store the weights; probably the best one here! Same thing but pass parameter
     /// spline segments instead of variations
-    void Evaluate();
+    void Evaluate() override;
 
     /// @brief add oscillation channel to spline monolith
     void AddSample(const std::string& SampleName,
@@ -135,4 +134,8 @@ class BinnedSplineHandler : public SplineBase {
     MaCh3Modes* Modes;
     enum TokenOrdering{kSystToken,kModeToken,kVar1BinToken,kVar2BinToken,kVar3BinToken,kNTokens};
     virtual std::vector<std::string> GetTokensFromSplineName(std::string FullSplineName) = 0;
+
+  private:
+    /// @brief This function will find missing splines in file
+    void InvestigateMissingSplines() const;
 };

@@ -4,7 +4,7 @@
 #include <assert.h>
 
 //MaCh3 includes
-#include "Samples/Structs.h"
+#include "Samples/SampleStructs.h"
 #include "Samples/HistogramUtils.h"
 #include "Manager/Manager.h"
 #include "Manager/MaCh3Modes.h"
@@ -25,33 +25,41 @@ _MaCh3_Safe_Include_End_ //}
 class SampleHandlerBase
 {
  public:
+   /// @brief The main constructor
    SampleHandlerBase();
   /// @brief destructor
   virtual ~SampleHandlerBase();
 
+  /// @defgroup SampleHandlerSetters Sample Handler Setters
+  /// Group of functions to set various parameters, names, and values.
+
+  /// @defgroup SampleHandlerGetters Sample Handler Getters
+  /// Group of functions to get various parameters, names, and values.
+
+  /// @ingroup SampleHandlerGetters
   virtual inline M3::int_t GetNsamples(){ return nSamples; };
+  /// @ingroup SampleHandlerGetters
   virtual inline std::string GetTitle()const {return "SampleHandler";};
+  /// @ingroup SampleHandlerGetters
   virtual std::string GetSampleName(int Sample) const = 0;
+  /// @ingroup SampleHandlerGetters
   virtual inline double GetSampleLikelihood(const int isample){(void) isample; return GetLikelihood();};
-
+  /// @brief Allow to clean not used memory before fit starts
+  virtual void CleanMemoryBeforeFit() = 0;
+  /// @brief Store additional info in a chan
+  virtual void SaveAdditionalInfo(TDirectory* Dir) {(void) Dir;};
   /// @brief Return pointer to MaCh3 modes
-  MaCh3Modes* GetMaCh3Modes() const { return Modes; }
-
-  TH1D* Get1DHist();                                               
-  TH2D* Get2DHist();
-  TH1D* Get1DDataHist(){return dathist;}
-  TH2D* Get2DDataHist(){return dathist2d;}
+  /// @ingroup SampleHandlerGetters
+  MaCh3Modes* GetMaCh3Modes() const { return Modes.get(); }
       
   virtual void Reweight()=0;
+  /// @ingroup SampleHandlerGetters
   virtual double GetLikelihood() = 0;
 
-  virtual int GetNEventsInSample(int sample){ (void) sample; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); }
-  virtual int GetNMCSamples(){ throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); }
-
-  virtual void AddData(std::vector<double> &dat);
-  virtual void AddData(std::vector< std::vector <double> > &dat);
-  virtual void AddData(TH1D* binneddata);
-  virtual void AddData(TH2D* binneddata);
+  /// @ingroup SampleHandlerGetters
+  unsigned int GetNEvents() const {return nEvents;}
+  /// @ingroup SampleHandlerGetters
+  virtual int GetNOscChannels(){ return 1; }
 
   // WARNING KS: Needed for sigma var
   virtual void SetupBinning(const M3::int_t Selection, std::vector<double> &BinningX, std::vector<double> &BinningY){
@@ -64,18 +72,29 @@ class SampleHandlerBase
   virtual inline std::string GetKinVarLabel(const int sample, const int Dimension) {
     (void) sample; (void) Dimension; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");  };
 
-  double GetTestStatLLH(double data, double mc) const;
-  /// @brief Calculate test statistic for a single bin. Calculation depends on setting of fTestStatistic
+  /// @brief Calculate test statistic for a single bin using Poisson
+  /// @param data is data
+  /// @param mc is mc
+  /// @ingroup SampleHandlerGetters
+  double GetTestStatLLH(const double data, const double mc) const;
+  /// @brief Calculate test statistic for a single bin. Calculation depends on setting of fTestStatistic. Data and mc -> 0 cut-offs are defined in M3::_LOW_MC_BOUND_.
+  /// @details Implemented fTestStatistic are kPoisson (with Stirling's approx.), kBarlowBeeston (arXiv:1103.0354), kDembinskiAbdelmotteleb (arXiv:2206.12346), kIceCube (arxiv:1901.04645), and kPearson.
+  /// Test statistics require mc > 0, therefore low mc and data values are treated with cut-offs based on M3::_LOW_MC_BOUND_ = .00001 by default.
+  /// For kPoisson, kBarlowBeeston, kDembinskiAbdelmotteleb, kPearson:
+  /// data > _LOW_MC_BOUND_ & mc <= _LOW_MC_BOUND_: returns GetTestStatLLH(data, _LOW_MC_BOUND_, w2), with Poisson(data,_LOW_MC_BOUND_) limit for mc->0, w2->0.
+  /// mc < data <= _LOW_MC_BOUND_: returns 0 (as if any data <= _LOW_MC_BOUND_ were effectively consistent with 0 data count), with a limit of 0 for mc->0.
+  /// data = 0: returns mc (or mc/2. for kPearson), with a limit of 0 for mc->0.
+  /// For kIceCube:
+  /// mc < data returns the lower of IceCube(data,mc,w2) and Poisson(data,mc) penalties, with a Poisson(data,_LOW_MC_BOUND_) limit for mc->0, w2->0.
   /// @param data is data
   /// @param mc is mc
   /// @param w2 is is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
+  /// @ingroup SampleHandlerGetters
   double GetTestStatLLH(const double data, const double mc, const double w2) const;
   /// @brief Set the test statistic to be used when calculating the binned likelihoods
   /// @param testStat The test statistic to use.
+  /// @ingroup SampleHandlerGetters
   inline void SetTestStatistic(TestStatistic testStat){ fTestStatistic = testStat; }
-
-  virtual void Fill1DHist()=0;
-  virtual void Fill2DHist()=0;
 
 protected:
   /// @brief CW: Redirect std::cout to silence some experiment specific libraries
@@ -102,18 +121,10 @@ protected:
 
   /// Contains how many samples we've got
   M3::int_t nSamples;
-  /// KS: number of dimension for this sample
-  int nDims;
+
+  /// Number of MC events are there
+  unsigned int nEvents;
 
   /// Holds information about used Generator and MaCh3 modes
-  MaCh3Modes* Modes;
-
-  TH1D *dathist; // tempstore for likelihood calc
-  TH2D *dathist2d;
-
-  // binned PDFs
-  TH1D*_hPDF1D;
-  TH2D*_hPDF2D;
-
-  TRandom3* rnd;
+  std::unique_ptr<MaCh3Modes> Modes;
 };

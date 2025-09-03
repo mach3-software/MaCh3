@@ -1,18 +1,19 @@
 set(HEADERS
     ParameterHandlerUtils.h
     ParameterHandlerBase.h
-    ParameterHandlerOsc.h
     ParameterHandlerGeneric.h
     AdaptiveMCMCHandler.h
     PCAHandler.h
+    ParameterTunes.h
+    ParameterStructs.h
 )
 
 add_library(Parameters SHARED
     ParameterHandlerBase.cpp
-    ParameterHandlerOsc.cpp
     ParameterHandlerGeneric.cpp
     AdaptiveMCMCHandler.cpp
     PCAHandler.cpp
+    ParameterTunes.cpp
 )
 
 set_target_properties(Parameters PROPERTIES

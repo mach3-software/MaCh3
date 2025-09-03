@@ -5,12 +5,10 @@
 // MaCh3 includes
 #include "Parameters/ParameterHandlerBase.h"
 #include "Parameters/ParameterHandlerGeneric.h"
-#include "Parameters/ParameterHandlerOsc.h"
-
 
 namespace py = pybind11;
 
-// As ParameterHandlerBase is an abstract base class we have to do some gymnastics to get it to get it into python
+/// @brief EW: As ParameterHandlerBase is an abstract base class we have to do some gymnastics to get it to get it into python
 class PyParameterHandlerBase : public ParameterHandlerBase {
 public:
     /* Inherit the constructors */
@@ -25,32 +23,13 @@ public:
             GetLikelihood     /* Name of function in C++ (must match Python name) */
         );
     }
-    
-    double GetNominal(int i) override {
-        PYBIND11_OVERRIDE_NAME(
-            double,          /* Return type */
-            ParameterHandlerBase,  /* Parent class */
-            "get_nominal",   /* Name in python*/
-            GetNominal,      /* Name of function in C++ (must match Python name) */
-            i                /* Arguments*/
-        );
-    }
-    
+
     void ProposeStep() override {
         PYBIND11_OVERRIDE_NAME(
             void,            /* Return type */
             ParameterHandlerBase,  /* Parent class */
             "propose_step",  /* Name in python*/
             ProposeStep      /* Name of function in C++ (must match Python name) */
-        );
-    }
-
-    std::vector<double> GetNominalArray() override {
-        PYBIND11_OVERRIDE_NAME(
-            std::vector<double>, /* Return type */
-            ParameterHandlerBase,      /* Parent class */
-            "get_nominal_array", /* Name in python*/
-            GetNominalArray      /* Name of function in C++ (must match Python name) */
         );
     }
 };
@@ -200,30 +179,6 @@ void initParameters(py::module &m){
             :param index: The index of the spline parameter",
             py::arg("index")
         )
-        
-        .def(
-            "get_nominal_par_values",
-            &ParameterHandlerGeneric::GetNominalArray,
-            "Get the nominal values of all the parameters as a list. "
-        )
 
     ; // End of ParameterHandlerGeneric binding
-    
-    py::class_<ParameterHandlerOsc, ParameterHandlerBase /* <--- trampoline*/>(m_parameters, "ParameterHandlerOsc")
-        .def(
-            py::init<const std::vector<std::string>&, const char *, double, int, int>(),
-            "Construct a oscillation parameter handler object from a set of yaml files that define the systematic parameters \n\
-            :param yaml_files: The name of the yaml file to initialise from. \n\
-            :param name: the name of this parameter handler object. \n\
-            :param threshold: threshold PCA threshold from 0 to 1. Default is -1 and means no PCA. \n\
-            :param first_PCA_par: FirstPCAdpar First PCA parameter that will be decomposed. \n\
-            :param last_PCA_par: LastPCAdpar First PCA parameter that will be decomposed.",
-            py::arg("yaml_files"),
-            py::arg("name") = "xsec_cov",
-            py::arg("threshold") = -1.0,
-            py::arg("firs_PCA_par") = -999,
-            py::arg("last_PCA_par") = -999
-        )
-    ; // End of ParameterHandlerOsc binding
-
 }

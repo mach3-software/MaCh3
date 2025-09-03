@@ -5,7 +5,7 @@
 #include "Manager/YamlHelper.h"
 #include "Manager/MaCh3Exception.h"
 #include "Fitters/MCMCProcessor.h"
-#include "Samples/Structs.h"
+#include "Samples/SampleStructs.h"
 
 // Other plotting includes
 #include "plottingUtils.h"
@@ -22,18 +22,17 @@ enum fileTypeEnum {
   kNFileTypes //!< Number of types of file
 };
 
+/// @brief Struct which wraps around the actual input file and also holds general information, and
+/// data from the file to be used by other classes.
+/// @details This is just a little guy thats
+/// intended to be just a plain old data type which simply holds and organises information and
+/// data read from the underlying input file, just some methods to inspect the contents of the
+/// object. As such it does not implement methods to manipulate such data, which is all done via
+/// the InputManager() class. Reason for this object is to try to smooth over the cracks that come
+/// from very different file structures used by different fitters and provide a common format to
+/// be used for plot making. Intended use of this objects is only via InputManager which contains
+/// the methods to fill and manipulate it.
 struct InputFile {
-  /// @brief Struct which wraps around the actual input file and also holds general information, and
-  /// data from the file to be used by other classes.
-  /// @details This is just a little guy thats
-  /// intended to be just a plain old data type which simply holds and organises information and
-  /// data read from the underlying input file, just some methods to inspect the contents of the
-  /// object. As such it does not implement methods to manipulate such data, which is all done via
-  /// the InputManager() class. Reason for this object is to try to smooth over the cracks that come
-  /// from very different file structures used by different fitters and provide a common format to
-  /// be used for plot making. Intended use of this objects is only via InputManager which contains
-  /// the methods to fill and manipulate it.
-
   /// @brief Create InputFile instance based on a specified file.
   /// @param fName The name of the file to open.
   /// @return The constructed InputFile.
@@ -46,6 +45,10 @@ struct InputFile {
     fileName = fName;
 
     file = std::make_shared<TFile>(fileName.c_str());
+    if (file->IsZombie()) {
+      MACH3LOG_ERROR("Failed to open file: {}", fileName);
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
     hasLLHScans = false;
     hasPostFitErrors = false;
     hasSigmaVars = false;
@@ -253,7 +256,7 @@ public:
   /// @param fileType The file type ID to convert.
   /// @return The name of the file type, or "UNKNOWN_FILE_TYPE" if the fileType does not match any
   /// known file type.
-  static const std::string convertFileTypeNames(fileTypeEnum fileType) {
+  static const std::string convertFileTypeNames(const fileTypeEnum fileType) {
     switch (fileType)
     {
     case kLLH:
@@ -283,7 +286,7 @@ public:
   /// @param paramName The parameter you want the information about.
   /// @param LLHType The type of log likelihood scan you want (e.g. total, penalty, etc.)
   /// @return A vector of vectors containing the LLH scan data. First entry is x axis, 2nd is y axis
-  std::vector<std::vector<double>> getLLHScan(int fileNum, std::string paramName, std::string LLHType) const {
+  std::vector<std::vector<double>> getLLHScan(const int fileNum, const std::string& paramName, const std::string& LLHType) const {
     if (!getEnabledLLH(fileNum, paramName, LLHType))
     {
       MACH3LOG_WARN("file at index {} does not have LLH scan for parameter {}", fileNum, paramName);
@@ -296,7 +299,7 @@ public:
   /// @brief Get the MCMC chain entry in an InputFile.
   /// @param fileNum The index of the file you want the data from.
   /// @param entry The entry to get.
-  void getMCMCentry(int fileNum, int entry) const {
+  void getMCMCentry(const int fileNum, const int entry) const {
     // EM: the const here is a little bit of a lie since GetEntry will in fact modify 
     //     the pointers to the stored data for the MCMC chain values but hopefully this should be ok
     const InputFile &file = _fileVec[fileNum];
@@ -309,7 +312,7 @@ public:
     {
       MACH3LOG_TRACE("Getting entry {} in MCMC tree for file at index {}", entry, fileNum);
       file.posteriorTree->GetEntry(entry);
-      MACH3LOG_TRACE("  Got successfuly");
+      MACH3LOG_TRACE("  Got successfully");
     }
   }
 
@@ -331,7 +334,7 @@ public:
   /// @param fileNum The index of the file you want the data from.
   /// @param paramName The parameter you want the information about.
   /// @return A vector of vectors containing the posterior data. First entry is x axis (i.e. the parameter values), 2nd is y axis
-  std::vector<std::vector<double>> get1dPosterior(int fileNum, std::string paramName) const {
+  std::vector<std::vector<double>> get1dPosterior(const int fileNum, const std::string& paramName) const {
     if (!getEnabled1dPosteriors(fileNum, paramName))
     {
       MACH3LOG_WARN("file at index {} does not have a 1d posterior for parameter {}", fileNum, paramName);
@@ -343,7 +346,7 @@ public:
 
   /// @brief Get the number of entries in the MCMC chain in a particular file.
   /// @param fileNum The index of the file you want the number of steps from.
-  int getnMCMCentries(int fileNum) const {
+  int getnMCMCentries(const int fileNum) const {
     return _fileVec[fileNum].nMCMCentries;
   }
 
@@ -354,7 +357,7 @@ public:
   /// @tparam T The type you would like your scan returned as, currently only TGraph and TH1D are
   /// supported
   /// @return The graph of the likelihood scan.
-  inline TGraph getLLHScan_TGraph(int fileNum, std::string paramName, std::string LLHType) const {
+  inline TGraph getLLHScan_TGraph(const int fileNum, const std::string& paramName, const std::string& LLHType) const {
     if (!getEnabledLLH(fileNum, paramName, LLHType))
     {
       MACH3LOG_WARN("file at index {} does not have LLH scan for parameter {}", fileNum, paramName);
@@ -364,7 +367,7 @@ public:
     return *_fileVec[fileNum].LLHScans_map.at(LLHType).at(paramName);
   }
 
-  inline TH1D getLLHScan_TH1D(int fileNum, std::string paramName, std::string LLHType) const {
+  inline TH1D getLLHScan_TH1D(const int fileNum, const std::string& paramName, const std::string& LLHType) const {
     if (!getEnabledLLH(fileNum, paramName, LLHType))
     {
       MACH3LOG_WARN("file at index {} does not have LLH scan for parameter {}", fileNum, paramName);
@@ -380,7 +383,7 @@ public:
   /// @param paramName The name of the parameter whose LLH scan you would like.
   /// @param sample The sample that you would like the LLH scan for.
   /// @return A vector of vectors containing the LLH scan data. First entry is x axis, 2nd is y axis.
-  std::vector<std::vector<double>> getSampleSpecificLLHScan(int fileNum, std::string paramName, std::string sample) const {
+  std::vector<std::vector<double>> getSampleSpecificLLHScan(const int fileNum, const std::string& paramName, const std::string& sample) const {
     if (!getEnabledLLHBySample(fileNum, paramName, sample))
     {
       MACH3LOG_WARN("file at index {} does not have LLH scan for sample {} for parameter {}", fileNum, sample, paramName);
@@ -390,8 +393,8 @@ public:
     return TGraphToVector(*_fileVec[fileNum].LLHScansBySample_map.at(sample).at(paramName));
   }
 
-  inline TGraph getSampleSpecificLLHScan_TGraph(int fileNum, std::string paramName,
-                                         std::string sample) const {
+  inline TGraph getSampleSpecificLLHScan_TGraph(const int fileNum, const std::string& paramName,
+                                         const std::string& sample) const {
     if (!getEnabledLLHBySample(fileNum, paramName, sample))
     {
       MACH3LOG_WARN("file at index {} does not have LLH scan for sample {} for parameter {}", fileNum, sample, paramName);
@@ -401,7 +404,7 @@ public:
     return *_fileVec[fileNum].LLHScansBySample_map.at(sample).at(paramName);
   }
 
-  inline TH1D getSampleSpecificLLHScan_TH1D(int fileNum, std::string paramName, std::string sample) const {
+  inline TH1D getSampleSpecificLLHScan_TH1D(const int fileNum, const std::string& paramName, const std::string& sample) const {
     if (!getEnabledLLHBySample(fileNum, paramName, sample))
     {
       MACH3LOG_WARN("file at index {} does not have LLH scan for sample {} for parameter {}", fileNum, sample, paramName);
@@ -416,7 +419,7 @@ public:
   /// @param paramName The name of the parameter whose LLH scan you would like to check for.
   /// @param LLHType The type of likelihood scan you would like to check for, e.h. total, prior etc.
   /// @return true if scan exists, false if not.
-  inline bool getEnabledLLH(int fileNum, std::string paramName,
+  inline bool getEnabledLLH(const int fileNum, const std::string& paramName,
                              std::string LLHType = "total") const {
     return _fileVec[fileNum].availableParams_map_LLH.at(LLHType).at(paramName);
   }
@@ -427,7 +430,7 @@ public:
   /// @param paramName The name of the parameter whose LLH scan you would like to check for.
   /// @param sample The sample to check.
   /// @return true if scan exists, false if not.
-  inline bool getEnabledLLHBySample(int fileNum, std::string paramName, std::string sample) const {
+  inline bool getEnabledLLHBySample(const int fileNum, const std::string& paramName, const std::string& sample) const {
     return _fileVec[fileNum].availableParams_map_LLHBySample.at(sample).at(paramName);
   }
 
@@ -435,7 +438,7 @@ public:
   /// @param fileNum The index of the file that you would like to know about.
   /// @param paramName The name of the parameter whose LLH scan you would like to check for.
   /// @return true if scan exists, false if not.
-  inline bool getEnabledMCMCchain(int fileNum, std::string paramName) const {
+  inline bool getEnabledMCMCchain(const int fileNum, const std::string& paramName) const {
     return _fileVec[fileNum].availableParams_map_MCMCchain.at(paramName);
   }
 
@@ -443,7 +446,7 @@ public:
   /// @param fileNum The index of the file that you would like to know about.
   /// @param paramName The name of the parameter whose 1d posterior you would like to check for.
   /// @return true if scan exists, false if not.
-  inline bool getEnabled1dPosteriors(int fileNum, std::string paramName) const {
+  inline bool getEnabled1dPosteriors(const int fileNum, const std::string& paramName) const {
     return _fileVec[fileNum].availableParams_map_1dPosteriors.at(paramName);
   }
 
@@ -454,7 +457,7 @@ public:
   /// possible types will be fitter dependent, e.g. "gauss" or "hpd" for MaCh3. If not specified,
   /// will use the default one, as specified in the fitter definition config.
   /// @return The error on the specified parameter.
-  double getPostFitError(int fileNum, const std::string &paramName, std::string errorType = "") const;
+  double getPostFitError(const int fileNum, const std::string &paramName, std::string errorType = "") const;
 
   /// @brief Get the post fit value for a particular parameter from a particular input file.
   /// @param fileNum The index of the file that you would like to get the value from.
@@ -463,7 +466,7 @@ public:
   /// possible types will be fitter dependent, e.g. "gauss" or "hpd" for MaCh3. If not specified,
   /// will use the default one, as specified in the fitter definition config.
   /// @return The value of the specified parameter.
-  double getPostFitValue(int fileNum, const std::string &paramName, std::string errorType = "") const;
+  double getPostFitValue(const int fileNum, const std::string &paramName, std::string errorType = "") const;
 
   /// @name General Getters
   /// @{
@@ -546,7 +549,7 @@ private:
   // Check the input file for a particular post fit error for a particular parameter. if
   // setInputFileError, will add the information to the InputFiles postFitErrors histogram.
   bool findPostFitParamError(InputFile &inputFileDef, const std::string &parameter, std::string &fitter,
-                             const std::string &errorType, bool setInputFileError = false);
+                             const std::string &errorType, const bool setInputFileError = false);
 
   // Check the input file for a particular post fit error for a particular parameter. if
   // setInputFileError, will add the information to the InputFiles postFitErrors histogram.
@@ -560,8 +563,8 @@ private:
   bool find1dPosterior(InputFile &inputFileDef, const std::string &parameter, std::string &fitter, bool setFileData = false) const ;
 
   // fns tp read an input file
-  void fillFileInfo(InputFile &inputFileDef, bool printThoughts = true);
-  void fillFileData(InputFile &inputFileDef, bool printThoughts = true);
+  void fillFileInfo(InputFile &inputFileDef, const bool printThoughts = true);
+  void fillFileData(InputFile &inputFileDef, const bool printThoughts = true);
 
   // helper function to read from the translation config file to get an option for a particular sub
   // node (e.g. Parameters or Samples) returns true and sets "ret" if the option is specified for this

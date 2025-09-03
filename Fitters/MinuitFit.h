@@ -22,10 +22,10 @@ class MinuitFit : public LikelihoodFit {
   void RunMCMC() override;
 
   /// @brief Get name of class
-  inline std::string GetName()const {return "MinuitFit";};
+  inline std::string GetName() const override {return "MinuitFit";};
 
  private:
   /// Pointer to minimizer, which most often is Minuit
-  ROOT::Math::Minimizer* minuit;
+  std::unique_ptr<ROOT::Math::Minimizer> minuit;
 };
 

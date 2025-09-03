@@ -6,7 +6,7 @@
 
 namespace py = pybind11;
 
-// As SampleHandlerBase is an abstract base class we have to do some gymnastics to get it to get it into python
+/// @brief EW: As SampleHandlerBase is an abstract base class we have to do some gymnastics to get it to get it into python
 class PySampleHandlerBase : public SampleHandlerBase {
 public:
     /* Inherit the constructors */
@@ -31,6 +31,15 @@ public:
         );
     }
 
+    /* Trampoline (need one for each virtual function) */
+    void CleanMemoryBeforeFit() override {
+        PYBIND11_OVERRIDE_PURE(
+            void,          /* Return type */
+            SampleHandlerBase, /* Parent class */
+            CleanMemoryBeforeFit       /* Name of function in C++ (must match Python name) */
+        );
+    }
+
     double GetLikelihood() override {
         PYBIND11_OVERRIDE_PURE_NAME(
             double,        /* Return type */
@@ -40,29 +49,10 @@ public:
                            /* Argument(s) */
         );
     }
-    
-    void Fill1DHist() override {
-        PYBIND11_OVERRIDE_PURE_NAME(
-            void,          /* Return type */
-            SampleHandlerBase, /* Parent class */
-            "fill_1d_hist", /* Python Name */
-            Fill1DHist     /* Name of function in C++ (must match Python name) */
-        );
-    }
-    
-    void Fill2DHist() override {
-        PYBIND11_OVERRIDE_PURE_NAME(
-            void,          /* Return type */
-            SampleHandlerBase, /* Parent class */
-            "fill_2d_hist",/* Python name*/
-            Fill2DHist     /* Name of function in C++ (must match Python name) */
-                           /* Argument(s) */
-        );
-    }
 };
 
 
-// As SampleHandlerFD is an abstract base class we have to do some gymnastics to get it to get it into python
+/// @brief As SampleHandlerFD is an abstract base class we have to do some gymnastics to get it to get it into python
 class PySampleHandlerFD : public SampleHandlerFD {
 public:
     /* Inherit the constructors */
@@ -76,6 +66,15 @@ public:
             "setup_weight_pointers", /*python name*/
             SetupWeightPointers,     /* Name of function in C++ */
                              /* Argument(s) */
+        );
+    }
+
+    /* Trampoline (need one for each virtual function) */
+    void CleanMemoryBeforeFit() override {
+        PYBIND11_OVERRIDE_PURE(
+            void,          /* Return type */
+            SampleHandlerFD, /* Parent class */
+            CleanMemoryBeforeFit       /* Name of function in C++ (must match Python name) */
         );
     }
 
@@ -102,24 +101,22 @@ public:
     }
     
     /* Trampoline (need one for each virtual function) */
-    int SetupExperimentMC(int) override {
+    int SetupExperimentMC() override {
         PYBIND11_OVERRIDE_PURE_NAME(
             int,             /* Return type */
             SampleHandlerFD, /* Parent class */
             "setup_experiment_MC", /*python name*/
             SetupExperimentMC,     /* Name of function in C++ */
-            py::arg("sample_id")   /* Argument(s) */
         );
     }
 
     /* Trampoline (need one for each virtual function) */
-    void SetupFDMC(int) override {
+    void SetupFDMC() override {
         PYBIND11_OVERRIDE_PURE_NAME(
             void,            /* Return type */
             SampleHandlerFD, /* Parent class */
             "setup_FD_MC",   /*python name*/
             SetupFDMC,       /* Name of function in C++ */
-            py::arg("sample_id") /* Argument(s) */
         );
     }
 
@@ -143,72 +140,49 @@ public:
         );
     }
 
-    double ReturnKinematicParameter(std::string, int, int) override {
+    double ReturnKinematicParameter(std::string, int) override {
         PYBIND11_OVERRIDE_PURE_NAME(
             double,                     /* Return type */
             SampleHandlerFD,            /* Parent class */
             "get_event_kinematic_value",/* python name*/
             ReturnKinematicParameter,  /* Name of function in C++ (must match Python name) */
             py::arg("variable"),
-            py::arg("sample"),
             py::arg("event")            /* Argument(s) */
         );
     }
 
-    double ReturnKinematicParameter(int, int, int) override {
+    double ReturnKinematicParameter(int, int) override {
         PYBIND11_OVERRIDE_PURE_NAME(
             double,                     /* Return type */
             SampleHandlerFD,            /* Parent class */
             "get_event_kinematic_value",/* python name*/
             ReturnKinematicParameter,  /* Name of function in C++ (must match Python name) */
             py::arg("variable"),
-            py::arg("sample"),
             py::arg("event")            /* Argument(s) */
         );
     }
 
-    const double *GetPointerToKinematicParameter(std::string, int, int) override {
+    const double *GetPointerToKinematicParameter(std::string, int) override {
         PYBIND11_OVERRIDE_PURE_NAME(
             const double *,                   /* Return type */
             SampleHandlerFD,            /* Parent class */
             "get_event_kinematic_value_reference",/* python name*/
             GetPointerToKinematicParameter, /* Name of function in C++ (must match Python name) */
             py::arg("variable"),
-            py::arg("sample"),
             py::arg("event")            /* Argument(s) */
         );
     }
-    const double *GetPointerToKinematicParameter(double, int, int) override {
+    const double *GetPointerToKinematicParameter(double, int) override {
         PYBIND11_OVERRIDE_PURE_NAME(
             const double *,                   /* Return type */
             SampleHandlerFD,            /* Parent class */
             "get_event_kinematic_value_reference",/* python name*/
             GetPointerToKinematicParameter, /* Name of function in C++ (must match Python name) */
             py::arg("variable"),
-            py::arg("sample"),
             py::arg("event")            /* Argument(s) */
         );
     }
     
-    std::vector<double> ReturnKinematicParameterBinning(std::string) override {
-        PYBIND11_OVERRIDE_PURE_NAME(
-            std::vector<double>,          /* Return type */
-            SampleHandlerFD,              /* Parent class */
-            "get_event_kinematic_binning",/* python name*/
-            ReturnKinematicParameterBinning, /* Name of function in C++ (must match Python name) */
-            py::arg("variable")           /* Argument(s) */
-        );
-    }
-    
-    void Fill2DHist() override {
-        PYBIND11_OVERRIDE_PURE(
-            void,          /* Return type */
-            SampleHandlerBase, /* Parent class */
-            Fill2DHist     /* Name of function in C++ (must match Python name) */
-                           /* Argument(s) */
-        );
-    }
-
     void RegisterFunctionalParameters() override {
         PYBIND11_OVERRIDE_PURE_NAME(
             void,
@@ -249,18 +223,6 @@ void initSamples(py::module &m){
             "Get the sample likelihood at the current point in your model space. You will need to override this."
         )
         
-        .def(
-            "fill_1d_hist", 
-            &SampleHandlerBase::Fill1DHist,
-            "Do the initial filling of the sample for 1d histogram. You will need to override this."
-        )
-        
-        .def(
-            "fill_2d_hist", 
-            &SampleHandlerBase::Fill2DHist,
-            "Do the initial filling of the sample for 2d histogram. You will need to override this."
-        )
-
         .def(
             "set_test_stat",
             &SampleHandlerBase::SetTestStatistic,

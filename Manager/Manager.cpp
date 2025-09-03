@@ -70,7 +70,7 @@ void manager::SaveSettings(TFile* const OutputFile) {
   int n_cpus = 1;
   #endif
 
-  #ifdef CUDA
+  #ifdef MaCh3_CUDA
   bool gpu_on = true;
   #else
   bool gpu_on = false;

@@ -2,7 +2,7 @@
 
 // MaCh3  includes
 #include "Parameters/ParameterHandlerGeneric.h"
-#include "Samples/Structs.h"
+#include "Parameters/ParameterStructs.h"
 
 #include <cmath>
 
@@ -153,14 +153,14 @@ public:
   /// @brief Empty constructor
   TF1_red() : TResponseFunction_red() {
     length = 0;
-    Par = NULL;
+    Par = nullptr;
   }
 
   /// @brief Empty destructor
   virtual ~TF1_red() {
     if (Par != NULL) {
       delete[] Par;
-      Par = NULL;
+      Par = nullptr;
     }
   }
 
@@ -174,20 +174,20 @@ public:
 
   /// @brief The TF1 constructor with deep copy
   TF1_red(TF1* &Function) : TResponseFunction_red() {
-    Par = NULL;
+    Par = nullptr;
     SetFunc(Function);
   }
 
   /// @brief Set the function
   inline void SetFunc(TF1* &Func) {
     length = M3::int_t(Func->GetNpar());
-    if (Par != NULL) delete[] Par;
+    if (Par != nullptr) delete[] Par;
     Par = new M3::float_t[length];
     for (int i = 0; i < length; ++i) {
       Par[i] = M3::float_t(Func->GetParameter(i));
     }
     delete Func;
-    Func = NULL;
+    Func = nullptr;
   }
 
   /// @brief Evaluate a variation
@@ -270,16 +270,16 @@ public:
   /// @brief Empty constructor
   TSpline3_red() : TResponseFunction_red() {
     nPoints = 0;
-    Par = NULL;
-    XPos = NULL;
-    YResp = NULL;
+    Par = nullptr;
+    XPos = nullptr;
+    YResp = nullptr;
   }
 
   /// @brief The constructor that takes a TSpline3 pointer and copies in to memory
   TSpline3_red(TSpline3* &spline, SplineInterpolation InterPolation = kTSpline3) : TResponseFunction_red() {
-    Par = NULL;
-    XPos = NULL;
-    YResp = NULL;
+    Par = nullptr;
+    XPos = nullptr;
+    YResp = nullptr;
     SetFunc(spline, InterPolation);
   }
 
@@ -311,16 +311,16 @@ public:
   /// @brief Set the function
   inline void SetFunc(TSpline3* &spline, SplineInterpolation InterPolation = kTSpline3) {
     nPoints = M3::int_t(spline->GetNp());
-    if (Par != NULL) {
+    if (Par != nullptr) {
       for (int i = 0; i < nPoints; ++i) {
         delete[] Par[i];
-        Par[i] = NULL;
+        Par[i] = nullptr;
       }
       delete[] Par;
-      Par = NULL;
+      Par = nullptr;
     }
-    if (XPos != NULL) delete[] XPos;
-    if (YResp != NULL) delete[] YResp;
+    if (XPos != nullptr) delete[] XPos;
+    if (YResp != nullptr) delete[] YResp;
     // Save the parameters for each knot
     Par = new M3::float_t*[nPoints];
     // Save the positions of the knots
@@ -352,16 +352,21 @@ public:
     else if(InterPolation == kLinear || InterPolation == kLinearFunc)
     {
       for (int k = 0; k < nPoints; ++k) {
-        // 3 is the size of the TSpline3 coefficients
         Par[k] = new M3::float_t[3];
+
         Double_t x1, y1, b1, c1, d1, x2, y2, b2, c2, d2 = 0;
         spline->GetCoeff(k, x1, y1, b1, c1, d1);
-        spline->GetCoeff(k+1, x2, y2, b2, c2, d2);
-        double tempb = (y2-y1)/(x2-x1);
 
+        double tempb = 0;
+        if (k == nPoints - 1) {
+          tempb = Par[k-1][0];
+        } else {
+          spline->GetCoeff(k + 1, x2, y2, b2, c2, d2);
+          tempb = (y2-y1)/(x2-x1);
+        }
         XPos[k]   = M3::float_t(x1);
         YResp[k]  = M3::float_t(y1);
-        Par[k][0] = M3::float_t(tempb);
+        Par[k][0] = M3::float_t(tempb);  // linear slope
         Par[k][1] = M3::float_t(0);
         Par[k][2] = M3::float_t(0);
       }
@@ -573,23 +578,23 @@ public:
     }
 
     delete spline;
-    spline = NULL;
+    spline = nullptr;
   }
 
   /// @brief Empty destructor
   virtual ~TSpline3_red() {
-    if(Par != NULL) {
+    if(Par != nullptr) {
       for (int i = 0; i < nPoints; ++i) {
-        if (Par[i] != NULL) {
+        if (Par[i] != nullptr) {
           delete[] Par[i];
         }
       }
       delete[] Par;
     }
-    if(XPos != NULL) delete[] XPos;
-    if(YResp != NULL) delete[] YResp;
-    Par = NULL;
-    XPos = YResp = NULL;
+    if(XPos != nullptr) delete[] XPos;
+    if(YResp != nullptr) delete[] YResp;
+    Par = nullptr;
+    XPos = YResp = nullptr;
   }
 
   /// @brief Find the segment relevant to this variation in x
@@ -671,6 +676,10 @@ public:
     #else
     TSpline3 *spline = new TSpline3("Spline", XPos, YResp, nPoints);
     #endif
+    for (Int_t i = 0; i < nPoints; ++i) {
+      spline->SetPointCoeff(i, Par[i][0], Par[i][1], Par[i][2]);
+    }
+
     return spline;
   }
 
@@ -738,7 +747,7 @@ inline std::vector<std::vector<TSpline3_red*> > ReduceTSpline3(std::vector<std::
       // Here's our delicious TSpline3 object
       TSpline3 *spline = (*InnerIt);
       // Now make the reduced TSpline3 pointer
-      TSpline3_red *red = NULL;
+      TSpline3_red *red = nullptr;
       if (spline != NULL) {
         red = new TSpline3_red(spline);
         (*InnerIt) = spline;
@@ -776,7 +785,7 @@ inline std::vector<std::vector<TF1_red*> > ReduceTF1(std::vector<std::vector<TF1
       // Here's our delicious TSpline3 object
       TF1* spline = (*InnerIt);
       // Now make the reduced TSpline3 pointer (which deleted TSpline3)
-      TF1_red* red = NULL;
+      TF1_red* red = nullptr;
       if (spline != NULL) {
         red = new TF1_red(spline);
         (*InnerIt) = spline;
@@ -788,6 +797,77 @@ inline std::vector<std::vector<TF1_red*> > ReduceTF1(std::vector<std::vector<TF1
   } // End outer for loop
   // Now have the reduced vector
   return ReducedVector;
+}
+
+// *********************************
+/// @brief KS: Create Response Function using TGraph
+/// @param graph This holds weights for each "spline" knot
+/// @param SplineRespFuncType Type of response function, whether we use Spline or TF1
+/// @param SplineInterpolationType Interpolation type for example Monotonic Akima etc.
+/// @param Title title you want for ROOT object, isn't very useful as in MaCh3 we usually convert later to something light weight to not waste RAM.
+inline TResponseFunction_red* CreateResponseFunction(TGraph* &graph,
+                                                     const RespFuncType SplineRespFuncType,
+                                                     const SplineInterpolation SplineInterpolationType,
+                                                     const std::string& Title) {
+// *********************************
+  TResponseFunction_red* RespFunc = nullptr;
+
+  if (graph && graph->GetN() > 1)
+  {
+    if(SplineRespFuncType == kTSpline3_red)
+    {
+      // Here's the TSpline3
+      TSpline3* spline = nullptr;
+      TSpline3_red *spline_red = nullptr;
+
+      // Create the TSpline3* from the TGraph* and build the coefficients
+      spline = new TSpline3(Title.c_str(), graph);
+      spline->SetNameTitle(Title.c_str(), Title.c_str());
+
+      // Make the reduced TSpline3 format and delete the old spline
+      spline_red = new TSpline3_red(spline, SplineInterpolationType);
+
+      RespFunc = spline_red;
+    }
+    else if(SplineRespFuncType == kTF1_red)
+    {
+      // The TF1 object we build from fitting the TGraph
+      TF1 *Fitter = nullptr;
+      TF1_red *tf1_red = nullptr;
+
+      if(graph->GetN() != 2) {
+        MACH3LOG_ERROR("Trying to make TF1 from more than 2 knots.  Knots = {}", graph->GetN());
+        MACH3LOG_ERROR("Currently support only linear with 2 knots :(");
+        throw MaCh3Exception(__FILE__ , __LINE__ );
+      }
+
+      // Try simple linear function
+      Fitter = new TF1(Title.c_str(), "([1]+[0]*x)", graph->GetX()[0], graph->GetX()[graph->GetN()-1]);
+      //CW: For 2p2h shape C and O we can't fit a polynomial: try a linear combination of two linear functions around 0
+      //Fitter = new TF1(Title.c_str(), "(x<=0)*(1+[0]*x)+(x>0)*([1]*x+1)", graph->GetX()[0], graph->GetX()[graph->GetN()-1]);
+      // Fit 5hd order polynomial for all other parameters
+      //Fitter = new TF1(Title.c_str(), "1+[0]*x+[1]*x*x+[2]*x*x*x+[3]*x*x*x*x+[4]*x*x*x*x*x", graph->GetX()[0], graph->GetX()[graph->GetN()-1]);
+      //Pseudo Heaviside for Pauli Blocking
+      //Fitter = new TF1(Title.c_str(), "(x <= 0)*(1+[0]*x) + (1 >= x)*(x > 0)*(1+[1]*x) + (x > 1)*([3]+[2]*x)", graph->GetX()[0], graph->GetX()[graph->GetN()-1]);
+
+      // Fit the TF1 to the graph
+      graph->Fit(Fitter, "Q0");
+      // Make the reduced TF1 if we want
+      tf1_red = new TF1_red(Fitter);
+
+      RespFunc = tf1_red;
+    }
+    else
+    {
+      MACH3LOG_ERROR("Unsupported response function type");
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
+  }
+  else
+  {
+    RespFunc = nullptr;
+  }
+  return RespFunc;
 }
 
 #pragma GCC diagnostic pop

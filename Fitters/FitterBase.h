@@ -57,6 +57,10 @@ class FitterBase {
   /// @warning Code uses TH2Poly
   void RunSigmaVar();
 
+  /// @brief Perform a 1D sigma var for all samples.
+  /// @warning Code uses SampleHandlerFD
+  void RunSigmaVarFD();
+
   /// @brief Allow to start from previous fit/chain
   /// @param FitName Name of previous chain
   /// @todo implement some check that number of params matches etc
@@ -74,8 +78,33 @@ class FitterBase {
   /// @brief Save output and close files.
   void SaveOutput();
 
+  /// @brief Remove obsolete memory and make other checks before fit starts
+  /// @todo consider expanding into ParmaterHandler and add more sanitisers
+  void SanitiseInputs();
+
   /// @brief Save the settings that the MCMC was run with.
   void SaveSettings();
+
+  /// @brief YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D. Barrow
+  bool GetScaneRange(std::map<std::string, std::vector<double>>& scanRanges);
+
+  /// @brief KS: Check whether we want to skip parameter using skip vector
+  bool CheckSkipParameter(const std::vector<std::string>& SkipVector, const std::string& ParamName) const;
+
+
+  /// @brief For comparison with P-Theta we usually have to apply different parameter values then usual 1, 3 sigma
+  ///
+  /// Example YAML format:
+  /// @code{.yaml}
+  /// SigmaVar:
+  ///   Q2_norm_7:
+  ///     "3": 2.0
+  ///   SRC_Norm_O:
+  ///     "-1": 0.5
+  ///     "1": 1.5
+  ///     "3": 2.0
+  /// @endcode
+  void CustomRange(const std::string& ParName, const double sigma, double& ParamShiftValue);
 
   /// The manager
   manager *fitMan;
@@ -90,8 +119,8 @@ class FitterBase {
   double accProb;
   /// counts accepted steps
   int accCount;
-  /// step start if restarting
-  int stepStart;
+  /// step start, by default 0 if we start from previous chain then it will be different
+  unsigned int stepStart;
 
   /// store the llh breakdowns
   std::vector<double> sample_llh;
@@ -120,6 +149,8 @@ class FitterBase {
   TFile *outputFile;
   /// Output cov folder
   TDirectory *CovFolder;
+  /// Output sample folder
+  TDirectory *SampleFolder;
   /// Output tree with posteriors
   TTree *outTree;
   /// auto save every N steps
@@ -127,8 +158,6 @@ class FitterBase {
 
   /// Necessary for some fitting algorithms like PSO
   bool fTestLikelihood;
-  /// Save proposal at each step
-  bool SaveProposal;
 
   /// Checks if file saved not repeat some operations
   bool FileSaved;

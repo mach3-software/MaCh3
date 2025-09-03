@@ -221,6 +221,15 @@ inline bool compareYAMLNodes(const YAML::Node& node1, const YAML::Node& node2) {
 
 // **********************
 /// @brief Overrides the configuration settings based on provided arguments.
+/// @param node YAML node that will be modified
+template <typename TValue>
+void OverrideConfig(YAML::Node node, std::string const &key, TValue val) {
+// **********************
+  node[key] = val;
+}
+
+// **********************
+/// @brief Overrides the configuration settings based on provided arguments.
 ///
 /// This function allows you to set configuration options in a nested YAML node.
 /// @param node YAML node that will be modified
@@ -232,11 +241,6 @@ inline bool compareYAMLNodes(const YAML::Node& node1, const YAML::Node& node2) {
 /// OverrideConfig(config, "General", "OutputFile", "Wooimbouttamakeanameformyselfere.root");
 /// OverrideConfig(config, "General", "MyDouble", 5.3);
 /// @endcode
-template <typename TValue>
-void OverrideConfig(YAML::Node node, std::string const &key, TValue val) {
-// **********************
-  node[key] = val;
-}
 template <typename... Args>
 void OverrideConfig(YAML::Node node, std::string const &key, Args... args) {
 // **********************
@@ -260,10 +264,6 @@ inline std::string DemangleTypeName(const std::string& mangledName) {
 template<typename Type>
 Type Get(const YAML::Node& node, const std::string File, const int Line) {
 // **********************
-  if (!node) {
-    MACH3LOG_ERROR("Empty Yaml node");
-    throw MaCh3Exception(File , Line );
-  }
   try {
     // Attempt to convert the node to the expected type
     return node.as<Type>();
@@ -271,6 +271,21 @@ Type Get(const YAML::Node& node, const std::string File, const int Line) {
     const std::string nodeAsString = YAMLtoSTRING(node);
     MACH3LOG_ERROR("YAML type mismatch: {}", e.what());
     MACH3LOG_ERROR("While trying to access variable {}", nodeAsString);
+    throw MaCh3Exception(File , Line );
+  } catch (const YAML::InvalidNode& e) {
+    std::string key = "<unknown>";
+    const std::string msg = e.what();
+    const std::string search = "first invalid key: \"";
+    auto start = msg.find(search);
+    if (start != std::string::npos) {
+      start += search.length();
+      auto end = msg.find("\"", start);
+      if (end != std::string::npos) {
+        key = msg.substr(start, end - start);
+      }
+    }
+    MACH3LOG_ERROR("Invalid YAML node: {}", e.what());
+    MACH3LOG_ERROR("While trying to access key: {}", key);
     throw MaCh3Exception(File , Line );
   }
 }
@@ -311,9 +326,9 @@ inline YAML::Node LoadYamlConfig(const std::string& filename, const std::string&
 // **********************
   // KS: YAML can be dumb and not throw error if you pass toml for example...
   if (!(filename.length() >= 5 && filename.compare(filename.length() - 5, 5, ".yaml") == 0) &&
-    !(filename.length() >= 4 && filename.compare(filename.length() - 4, 4, ".yml") == 0)) {
-    MACH3LOG_ERROR("Invalid file extension: {}\n", filename);
-    throw MaCh3Exception(File, Line);
+      !(filename.length() >= 4 && filename.compare(filename.length() - 4, 4, ".yml") == 0)) {
+      MACH3LOG_ERROR("Invalid file extension: {}\n", filename);
+      throw MaCh3Exception(File, Line);
   }
 
   try {
@@ -325,34 +340,47 @@ inline YAML::Node LoadYamlConfig(const std::string& filename, const std::string&
     buffer << fileStream.rdbuf();
     std::string fileContent = buffer.str();
 
-    // Use regex to find any line starting with `-` but not followed by space or tab
-    std::regex linePattern(R"(^\s*-\S.*$)");
+    // Use regex to find any line starting with `-` but not followed by space, digit, or dot
+    // This excludes valid numeric negative values like -1760.0
+    std::regex linePattern(R"(^\s*-(?![\d\s\.]).*)");
+
     std::istringstream contentStream(fileContent);
     std::string lineconfig;
     int lineNumber = 1;
 
+    // KS: Instead of boolean, track flow-style list nesting depth
+    int flowListDepth = 0;
+
     while (std::getline(contentStream, lineconfig)) {
-      // Log the line for debugging
-      // Ignore lines with '---' (YAML document separator)
+      // Ignore YAML document separator
       if (lineconfig.find("---") != std::string::npos) {
+        lineNumber++;
         continue;
       }
 
-      // Check if the line matches the pattern for missing space after `-`
-      if (std::regex_match(lineconfig, linePattern)) {
-        MACH3LOG_ERROR("Warning: Missing space or tab after '-' at line {}: {}\n", lineNumber, lineconfig);
-       throw MaCh3Exception(File, Line);
+      // Update flow list depth (increment for each '[' and decrement for each ']')
+      for (char c : lineconfig) {
+        if (c == '[') flowListDepth++;
+        else if (c == ']') flowListDepth = std::max(0, flowListDepth - 1);
       }
+
+      // Check lines only outside flow-style lists
+      if (flowListDepth == 0 && std::regex_match(lineconfig, linePattern)) {
+        MACH3LOG_ERROR("Warning: Missing space or tab after '-' at line {}: {}\n", lineNumber, lineconfig);
+        throw MaCh3Exception(File, Line);
+      }
+
       lineNumber++;
     }
+
     return yamlNode;
+
   } catch (const std::exception& e) {
     MACH3LOG_ERROR("{}\n", e.what());
     MACH3LOG_ERROR("Can't open file {}\n", filename);
     throw MaCh3Exception(File, Line);
   }
 }
-
 
 // **********************
 /// @brief KS: Convenience wrapper to return a YAML node as-is.
@@ -427,32 +455,108 @@ inline std::vector<double> ParseBounds(const YAML::Node& node, const std::string
 // **********************
   std::vector<double> bounds;
 
-  if (!node || !node.IsSequence() || node.size() != 2) {
-    MACH3LOG_ERROR("Bounds must be a sequence of exactly 2 elements, got size {}", static_cast<int>(node.size()));
+  if (!node || !node.IsSequence() || (node.size() != 1 && node.size() != 2)) {
+    MACH3LOG_ERROR("Bounds must be a sequence of 1 or 2 elements, got size {}", static_cast<int>(node.size()));
     throw MaCh3Exception(File, Line);
   }
 
-  for (std::size_t i = 0; i < 2; ++i) {
-    const YAML::Node& val = node[i];
+  if (node.size() == 1) {
+    const YAML::Node& val = node[0];
 
     if (!val || val.IsNull() || (val.IsScalar() && val.Scalar().empty())) {
-      bounds.push_back(i == 0 ? M3::KinematicLowBound : M3::KinematicUpBound);
+      MACH3LOG_ERROR("Single-element bounds must contain a valid numeric value.");
+      throw MaCh3Exception(File, Line);
     } else if (val.IsScalar()) {
       try {
-        bounds.push_back(val.as<double>());
+        const double center = val.as<double>();
+        if (std::floor(center) != center) {
+          MACH3LOG_ERROR("Invalid center value in Bounds[0]: '{}'. Expected an integer (e.g., 0 or 1).", static_cast<std::string>(val.Scalar()));
+          throw MaCh3Exception(File, Line);
+        }
+        bounds = {center - 0.5, center + 0.5};
       } catch (const YAML::BadConversion& e) {
-        MACH3LOG_ERROR("Invalid value in Bounds[{}]: '{}'. Expected a number or empty string.",
-                       static_cast<int>(i), static_cast<std::string>(val.Scalar()));
+        MACH3LOG_ERROR("Invalid value in Bounds[0]: '{}'. Expected a number.", static_cast<std::string>(val.Scalar()));
         throw MaCh3Exception(File, Line);
       }
     } else {
-      MACH3LOG_ERROR("Invalid type in Bounds[{}]", static_cast<int>(i));
+      MACH3LOG_ERROR("Invalid type in Bounds[0]");
       throw MaCh3Exception(File, Line);
     }
+  } else {
+    for (std::size_t i = 0; i < 2; ++i) {
+      const YAML::Node& val = node[i];
+
+      if (!val || val.IsNull() || (val.IsScalar() && val.Scalar().empty())) {
+        bounds.push_back(i == 0 ? M3::KinematicLowBound : M3::KinematicUpBound);
+      } else if (val.IsScalar()) {
+        try {
+          bounds.push_back(val.as<double>());
+        } catch (const YAML::BadConversion& e) {
+          MACH3LOG_ERROR("Invalid value in Bounds[{}]: '{}'. Expected a number or empty string.",
+                         static_cast<int>(i), static_cast<std::string>(val.Scalar()));
+          throw MaCh3Exception(File, Line);
+        }
+      } else {
+        MACH3LOG_ERROR("Invalid type in Bounds[{}]", static_cast<int>(i));
+        throw MaCh3Exception(File, Line);
+      }
+    }
   }
+  return bounds;
+}
+
+// **********************
+/// @brief KS: Get 2D bounds from YAML for example for selection cuts
+///
+/// Parses a YAML node representing 2D selection bounds. Each element in the node must be
+/// a sequence of 1 or 2 scalar values. If a single value is given, it is interpreted as the
+/// center of a bin and expanded to [value - 0.5, value + 0.5]. If two values are given, they
+/// are used as-is. If an element is empty or null, default bounds are used.
+///
+/// This function is useful for interpreting kinematic or classification bounds specified in
+/// YAML configuration files.
+///
+/// Example YAML input:
+/// ```yaml
+/// bounds2D:
+///   - [1]
+///   - [0.2, 0.8]
+///   - ["", "2.0"]
+/// ```
+///
+/// Resulting vector:
+/// ```cpp
+/// [ [0.5, 1.5],
+///   [0.2, 0.8],
+///   [M3::KinematicLowBound, 2.0] ]
+/// ```
+///
+/// @param node The YAML node containing a sequence of bounds (each being a 1- or 2-element sequence).
+/// @param File The name of the file calling this function (for error reporting).
+/// @param Line The line number in the file calling this function (for error reporting).
+/// @return std::vector<std::vector<double>> A list of bound pairs for each selection region.
+inline std::vector<std::vector<double>> Parse2DBounds(const YAML::Node& node, const std::string& File, const int Line) {
+// **********************
+  std::vector<std::vector<double>> bounds;
+  if (!node || !node.IsSequence()) {
+    MACH3LOG_ERROR("Expected a sequence node for 2D bounds");
+    throw MaCh3Exception(File, Line);
+  }
+
+  // Case 1: Single pair like [0.25, 0.5]
+  if (node.size() == 2 && node[0].IsScalar()) {
+    bounds.push_back(ParseBounds(node, File, Line));
+  } else { // Case 2: List of pairs like [[0.25, 0.5], [0.75, 1.0]]
+    for (std::size_t i = 0; i < node.size(); ++i) {
+      const YAML::Node& subnode = node[i];
+      bounds.push_back(ParseBounds(subnode, File, Line));
+    }
+  }
+
   return bounds;
 }
 
 /// Macro to simplify calling LoadYaml with file and line info
 #define M3OpenConfig(filename) LoadYamlConfig((filename), __FILE__, __LINE__)
 #define GetBounds(filename) ParseBounds((filename), __FILE__, __LINE__)
+#define Get2DBounds(filename) Parse2DBounds((filename), __FILE__, __LINE__)

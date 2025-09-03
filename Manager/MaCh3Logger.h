@@ -26,6 +26,25 @@ _MaCh3_Safe_Include_End_ //}
 #define MACH3LOG_CRITICAL SPDLOG_CRITICAL
 #define MACH3LOG_OFF SPDLOG_OFF
 
+/// @brief KS: Map string macro to spdlog::level enum
+/// @todo make constexpr with c++17
+inline spdlog::level::level_enum get_default_log_level() {
+  #ifdef SPDLOG_ACTIVE_LEVEL
+  switch (SPDLOG_ACTIVE_LEVEL) {
+    case SPDLOG_LEVEL_TRACE:    return spdlog::level::trace;
+    case SPDLOG_LEVEL_DEBUG:    return spdlog::level::debug;
+    case SPDLOG_LEVEL_INFO:     return spdlog::level::info;
+    case SPDLOG_LEVEL_WARN:     return spdlog::level::warn;
+    case SPDLOG_LEVEL_ERROR:    return spdlog::level::err;
+    case SPDLOG_LEVEL_CRITICAL: return spdlog::level::critical;
+    case SPDLOG_LEVEL_OFF:      return spdlog::level::off;
+    default: throw std::runtime_error("Unknown SPDLOG_ACTIVE_LEVEL");
+  }
+  #else
+  throw std::runtime_error("SPDLOG_ACTIVE_LEVEL is not defined");
+  #endif
+}
+
 /// @brief Set messaging format of the logger
 inline void SetMaCh3LoggerFormat()
 {
@@ -38,6 +57,8 @@ inline void SetMaCh3LoggerFormat()
   //spdlog::set_pattern("[%H:%M:%S][%s][%^%l%$] %v");
   spdlog::set_pattern("[%s][%^%l%$] %v");
   #endif
+
+  spdlog::set_level(get_default_log_level());
 }
 
 /// @brief KS: This is bit convoluted but this is to allow redirecting cout and errors from external library into MaCh3 logger format
