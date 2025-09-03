@@ -257,6 +257,7 @@ inline void MakeCorrelationMatrix(YAML::Node& root,
                                   const std::vector<double>& Values,
                                   const std::vector<double>& Errors,
                                   const std::vector<std::vector<double>>& Correlation,
+                                  const std::string& OutYAMLName,
                                   const std::vector<std::string>& FancyNames = {}) {
 // *************************************
   if (Values.size() != Errors.size() || Values.size() != Correlation.size()) {
@@ -347,10 +348,9 @@ inline void MakeCorrelationMatrix(YAML::Node& root,
   // Convert and write
   std::string YAMLString = YAMLtoSTRING(NodeCopy);
   FixSampleNamesQuotes(YAMLString);
-  std::string OutName = "UpdatedCorrelationMatrix.yaml";
-  std::ofstream outFile(OutName);
+  std::ofstream outFile(OutYAMLName);
   if (!outFile) {
-    MACH3LOG_ERROR("Failed to open file for writing: {}", OutName);
+    MACH3LOG_ERROR("Failed to open file for writing: {}", OutYAMLName);
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
