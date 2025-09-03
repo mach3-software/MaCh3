@@ -133,11 +133,12 @@ For example, you can use NuFast for beam samples and CUDAProb3 for atmospheric s
 ## Fitting algorithms
 The following fitting algorithms are available:
 
-| Algorithm  | Reference        |Need Ext Lib  |
-|------------|------------------|--------------|
-| MR2T2      | [Ref](https://doi.org/10.1063/1.1699114)       | No       |
-| MINUIT2    | [Ref](https://cds.cern.ch/record/2296388/)     | Yes      |
-| PSO        | [Ref](https://doi.org/10.1162/EVCO_r_00180)    | No       |
+| Algorithm    | Reference        |Need Ext Lib  |
+|--------------|------------------|--------------|
+| MR2T2        | [Ref](https://doi.org/10.1063/1.1699114)          | No       |
+| DelayedMR2T2 | [Ref](https://doi.org/10.1007/s11222-006-9438-0)  | No       |
+| MINUIT2      | [Ref](https://cds.cern.ch/record/2296388/)        | Yes      |
+| PSO          | [Ref](https://doi.org/10.1162/EVCO_r_00180)       | No       |
 
 ## Debug
 Several debugging options are available which are heavy for RAM and performance and, therefore not used by default. To enable it:

@@ -3,6 +3,7 @@
 #include "Fitters/FitterBase.h"
 
 /// @brief Base class for MCMC fitting algorithms
+/// @details Inherits from `FitterBase` and defines the interface for MCMC-based fitting, including chain management and step handling.
 /// @author Asher Kaboth
 class MCMCBase : public FitterBase {
  public:
@@ -14,7 +15,7 @@ class MCMCBase : public FitterBase {
     virtual ~MCMCBase() = default;
 
     /// @brief Actual implementation of MCMC fitting algorithm
-    virtual void RunMCMC() override;
+    void RunMCMC() override;
 
     /// @brief Allow to start from previous fit/chain
     /// @param FitName Name of previous chain
@@ -22,13 +23,13 @@ class MCMCBase : public FitterBase {
     void StartFromPreviousFit(const std::string &FitName) override;
 
     /// @brief Set how long chain should be
+    /// @param L new chain length
     inline void setChainLength(unsigned int L) { chainLength = L; };
 
     /// @brief Get name of class
     inline std::string GetName() const override { return "MCMC"; };
 
  protected:
- 
     /// @brief The full StartStep->DoStep->EndStep chain
     inline void DoMCMCStep();
 
@@ -48,6 +49,7 @@ class MCMCBase : public FitterBase {
     virtual double AcceptanceProbability()=0;
 
     /// @brief Is step accepted?
+    /// @param acc_prob used for telling whether step is accepted or not
     bool IsStepAccepted(const double acc_prob);
 
     /// @brief Accept a step
@@ -72,7 +74,4 @@ class MCMCBase : public FitterBase {
     bool anneal;
     /// simulated annealing temperature
     double AnnealTemp;
-
-    /// HW: DEBUG DELETE 
-    int current_step;
 };

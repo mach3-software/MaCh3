@@ -22,7 +22,7 @@ std::unique_ptr<FitterBase> MaCh3FitterFactory(manager *fitMan) {
   }
   else if (Algorithm == "Minuit2")
   {
-#ifdef MaCh3_MINUIT2
+    #ifdef MaCh3_MINUIT2
     MaCh3Fitter = std::make_unique<MinuitFit>(fitMan);
     #else
     MACH3LOG_ERROR("Trying to use Minuit2 however MaCh3 was compiled without Minuit2 support");
