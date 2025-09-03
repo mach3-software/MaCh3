@@ -7,8 +7,6 @@ on:
   push:
     tags:
       - 'v*'
-    branches:
-      - 'feature/kskwarczynski/DoxyTest' #DELETE
 permissions:
   contents: write
   packages: write
@@ -35,15 +33,15 @@ jobs:
       - name: Copy all files to Tags/TagName (except .git and Tags)
         run: |
           TAG_NAME=${{ github.ref_name }}
-          TAG_NAME=v2.2.3 #DELETE
-          mkdir -p "Tags/$TAG_NAME"
+          rm -rf "Tags/$TAG_NAME/"
+          mkdir -p "Tags/$TAG_NAME/"
           # Copy all files except .git and Tags
-          rsync -av --progress --exclude='.git' --exclude='Tags' . "Tags/$TAG_NAME/"
+          rsync -av --progress --exclude='.git' --exclude='Tags' . "Tags/$TAG_NAME/
 
       - name: Commit and push changes
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
           git add .
-          git commit -m "Tag Doxygen: blarb"
+          git commit -m "Tag Doxygen: ${{ github.ref_name }}"
           git push origin gh-pages
