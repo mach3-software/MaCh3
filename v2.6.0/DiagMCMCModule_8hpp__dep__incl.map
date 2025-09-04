@@ -1,0 +1,6 @@
+<map id="CLI/Modules/DiagMCMCModule.hpp" name="CLI/Modules/DiagMCMCModule.hpp">
+<area shape="rect" id="node1" title="Module for MCMC diagnostic analysis." alt="" coords="155,5,391,32"/>
+<area shape="rect" id="node2" href="$DiagMCMC_8cpp.html" title=" " alt="" coords="5,80,193,107"/>
+<area shape="rect" id="node3" href="$mach3_8cpp.html" title="Main entry point for the MaCh3 command&#45;line interface." alt="" coords="217,80,328,107"/>
+<area shape="rect" id="node4" href="$DiagMCMCModule_8cpp.html" title="Implementation of the DiagMCMCModule class." alt="" coords="352,80,588,107"/>
+</map>

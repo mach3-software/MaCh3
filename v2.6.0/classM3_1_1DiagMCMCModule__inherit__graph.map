@@ -1,0 +1,5 @@
+<map id="M3::DiagMCMCModule" name="M3::DiagMCMCModule">
+<area shape="rect" id="node1" title="Module for performing diagnostic analysis on MCMC chains." alt="" coords="5,155,164,181"/>
+<area shape="rect" id="node2" href="$classM3_1_1PluginBase.html" title=" " alt="" coords="35,80,134,107"/>
+<area shape="rect" id="node3" href="$classM3_1_1IPlugin.html" title="Interface for MaCh3 plugins and modules." alt="" coords="41,5,129,32"/>
+</map>

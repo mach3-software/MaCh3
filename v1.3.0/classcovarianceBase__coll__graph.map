@@ -1,0 +1,13 @@
+<map id="covarianceBase" name="covarianceBase">
+<area shape="rect" id="node1" title="Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada..." alt="" coords="956,419,1071,445"/>
+<area shape="rect" id="node2" href="$classPCAHandler.html" title="Class responsible for handling Principal Component Analysis (PCA) of covariance matrix." alt="" coords="632,260,727,287"/>
+<area shape="rect" id="node3" title=" " alt="" coords="206,216,351,243"/>
+<area shape="rect" id="node4" href="$classadaptive__mcmc_1_1AdaptiveMCMCHandler.html" title="Contains information about adaptive covariance matrix." alt="" coords="551,328,808,355"/>
+<area shape="rect" id="node5" title=" " alt="" coords="218,359,339,385"/>
+<area shape="rect" id="node6" title=" " alt="" coords="239,475,319,501"/>
+<area shape="rect" id="node11" title=" " alt="" coords="597,519,762,545"/>
+<area shape="rect" id="node7" title=" " alt="" coords="5,467,132,509"/>
+<area shape="rect" id="node8" title=" " alt="" coords="600,570,759,611"/>
+<area shape="rect" id="node9" title=" " alt="" coords="181,577,376,604"/>
+<area shape="rect" id="node10" title=" " alt="" coords="614,636,745,663"/>
+</map>
