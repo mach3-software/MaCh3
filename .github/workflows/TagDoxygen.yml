@@ -2,11 +2,13 @@
 # Tag Doxygen Documentation when MaCh3 tag is produced
 name: TagDoxygen
 
-# The events that trigger the workflow
 on:
   push:
     tags:
       - 'v*'
+    branches:
+      - 'feature/kskwarczynski/DoxyTest'
+
 permissions:
   contents: write
   packages: write
@@ -22,58 +24,31 @@ jobs:
         with:
           fetch-depth: 0  # Fetch all history for all branches and tags
 
-      - name: Checkout gh-pages branch
+      - name: Fetch gh-pages branch
         run: |
           git fetch origin gh-pages:gh-pages
-          git checkout gh-pages
 
-      - name: Create Tags directory if it doesn't exist
-        run: mkdir -p Tags
-
----
-# Tag Doxygen Documentation when MaCh3 tag is produced
-name: TagDoxygen
-
-# The events that trigger the workflow
-on:
-  push:
-    tags:
-      - 'v*'
-permissions:
-  contents: write
-  packages: write
-
-jobs:
-  tag-doxygen:
-    name: TagDoxygen
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-        with:
-          fetch-depth: 0  # Fetch all history for all branches and tags
-
-      - name: Checkout gh-pages branch
+      - name: Switch to gh-pages-archive branch
         run: |
-          git fetch origin gh-pages:gh-pages
-          git checkout gh-pages
+          git fetch origin gh-pages-archive:gh-pages-archive || \
+          git checkout --orphan gh-pages-archive
+          git checkout gh-pages-archive
 
-      - name: Create Tags directory if it doesn't exist
-        run: mkdir -p Tags
-
-      - name: Copy all files to Tags/TagName (except .git and Tags)
+      - name: Copy gh-pages content into archive
         run: |
           TAG_NAME=${{ github.ref_name }}
-          rm -rf "Tags/$TAG_NAME/"
-          mkdir -p "Tags/$TAG_NAME/"
-          # Copy all files except .git and Tags
-          rsync -av --progress --exclude='.git' --exclude='Tags' . "Tags/$TAG_NAME/"
+          TAG_NAME=v2.2.3
+          rm -rf "$TAG_NAME/"
+          mkdir -p "$TAG_NAME/"
+          # Checkout gh-pages content into a temporary directory
+          git --work-tree /tmp/gh-pages checkout gh-pages -- .
+          # Copy files into archive branch directly under $TAG_NAME/
+          rsync -av --progress --exclude='.git' /tmp/gh-pages/ "$TAG_NAME/"
 
       - name: Commit and push changes
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
           git add .
-          git commit -m "Tag Doxygen: ${{ github.ref_name }}"
-          git push origin gh-pages
+          git commit -m "Archive Doxygen for ${{ github.ref_name }}" || echo "No changes to commit"
+          git push origin gh-pages-archive
