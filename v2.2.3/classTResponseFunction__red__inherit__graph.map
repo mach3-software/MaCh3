@@ -1,0 +1,5 @@
+<map id="TResponseFunction_red" name="TResponseFunction_red">
+<area shape="rect" id="node1" title="KS: A reduced ResponseFunction Generic function used for evaluating weight." alt="" coords="12,5,188,31"/>
+<area shape="rect" id="node2" href="$classTF1__red.html" title="CW: A reduced TF1 class only. Only saves parameters for each TF1 and how many parameters each paramet..." alt="" coords="5,79,80,104"/>
+<area shape="rect" id="node3" href="$classTSpline3__red.html" title="CW: Reduced TSpline3 class." alt="" coords="104,79,211,104"/>
+</map>

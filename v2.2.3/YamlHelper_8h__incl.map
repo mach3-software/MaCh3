@@ -1,0 +1,24 @@
+<map id="Manager/YamlHelper.h" name="Manager/YamlHelper.h">
+<area shape="rect" id="node1" title="Utility functions for handling YAML nodes." alt="" coords="314,5,482,31"/>
+<area shape="rect" id="node2" title=" " alt="" coords="152,299,232,324"/>
+<area shape="rect" id="node3" title=" " alt="" coords="340,299,413,324"/>
+<area shape="rect" id="node4" title=" " alt="" coords="71,225,130,251"/>
+<area shape="rect" id="node5" title=" " alt="" coords="111,79,188,104"/>
+<area shape="rect" id="node6" title=" " alt="" coords="212,79,271,104"/>
+<area shape="rect" id="node7" href="$MaCh3Exception_8h.html" title=" " alt="" coords="296,79,500,104"/>
+<area shape="rect" id="node13" href="$Core_8h.html" title=" " alt="" coords="676,225,802,251"/>
+<area shape="rect" id="node19" title=" " alt="" coords="575,79,658,104"/>
+<area shape="rect" id="node20" title=" " alt="" coords="682,79,748,104"/>
+<area shape="rect" id="node21" title=" " alt="" coords="772,79,874,104"/>
+<area shape="rect" id="node22" title=" " alt="" coords="898,79,1030,104"/>
+<area shape="rect" id="node8" title=" " alt="" coords="205,152,292,177"/>
+<area shape="rect" id="node9" href="$MaCh3Logger_8h.html" title="KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/incl..." alt="" coords="316,152,498,177"/>
+<area shape="rect" id="node10" title=" " alt="" coords="458,299,532,324"/>
+<area shape="rect" id="node11" title=" " alt="" coords="306,225,393,251"/>
+<area shape="rect" id="node12" title=" " alt="" coords="417,225,504,251"/>
+<area shape="rect" id="node18" title=" " alt="" coords="528,225,652,251"/>
+<area shape="rect" id="node14" title=" " alt="" coords="568,299,630,324"/>
+<area shape="rect" id="node15" title=" " alt="" coords="655,299,730,324"/>
+<area shape="rect" id="node16" title=" " alt="" coords="754,299,817,324"/>
+<area shape="rect" id="node17" title=" " alt="" coords="842,299,900,324"/>
+</map>

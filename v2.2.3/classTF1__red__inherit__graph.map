@@ -1,0 +1,4 @@
+<map id="TF1_red" name="TF1_red">
+<area shape="rect" id="node1" title="CW: A reduced TF1 class only. Only saves parameters for each TF1 and how many parameters each paramet..." alt="" coords="56,79,131,104"/>
+<area shape="rect" id="node2" href="$classTResponseFunction__red.html" title="KS: A reduced ResponseFunction Generic function used for evaluating weight." alt="" coords="5,5,181,31"/>
+</map>
