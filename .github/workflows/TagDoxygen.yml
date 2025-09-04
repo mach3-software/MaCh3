@@ -6,8 +6,6 @@ on:
   push:
     tags:
       - 'v*'
-    branches:
-      - 'feature/kskwarczynski/DoxyTest'
 
 permissions:
   contents: write
@@ -38,8 +36,6 @@ jobs:
       - name: Copy gh-pages content into archive
         run: |
           TAG_NAME=${{ github.ref_name }}
-          # Debug override
-          TAG_NAME=v2.2.3
           echo "Using TAG_NAME=$TAG_NAME"
 
           cd gh-pages-archive
