@@ -1,0 +1,6 @@
+<map id="MR2T2" name="MR2T2">
+<area shape="rect" id="node1" title="MCMC algorithm using MR2T2." alt="" coords="33,152,99,177"/>
+<area shape="rect" id="node4" href="$classDelayedMR2T2.html" title="Implementation of delayed rejection for MR2T2." alt="" coords="5,225,127,251"/>
+<area shape="rect" id="node2" href="$classMCMCBase.html" title="Base class for MCMC fitting algorithms." alt="" coords="18,79,114,104"/>
+<area shape="rect" id="node3" href="$classFitterBase.html" title="Base class for implementing fitting algorithms." alt="" coords="22,5,110,31"/>
+</map>

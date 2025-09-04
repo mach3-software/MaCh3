@@ -1,0 +1,5 @@
+<map id="ParameterHandlerBase" name="ParameterHandlerBase">
+<area shape="rect" id="node1" title="Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada..." alt="" coords="121,5,293,31"/>
+<area shape="rect" id="node2" href="$classParameterHandlerGeneric.html" title="Class responsible for handling of systematic error parameters with different types defined in the con..." alt="" coords="5,79,196,104"/>
+<area shape="rect" id="node3" href="$classPyParameterHandlerBase.html" title="EW: As ParameterHandlerBase is an abstract base class we have to do some gymnastics to get it to get ..." alt="" coords="220,79,408,104"/>
+</map>
