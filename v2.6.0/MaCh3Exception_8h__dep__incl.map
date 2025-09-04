@@ -1,0 +1,52 @@
+<map id="Manager/MaCh3Exception.h" name="Manager/MaCh3Exception.h">
+<area shape="rect" id="node1" title="Defines the custom exception class used throughout MaCh3." alt="" coords="2919,5,3106,32"/>
+<area shape="rect" id="node2" href="$MaCh3Modes_8h.html" title=" " alt="" coords="2818,237,2986,263"/>
+<area shape="rect" id="node7" href="$SampleHandlerBase_8cpp.html" title=" " alt="" coords="4522,676,4743,703"/>
+<area shape="rect" id="node14" href="$Manager_8h.html" title=" " alt="" coords="1936,237,2073,263"/>
+<area shape="rect" id="node41" href="$Monitor_8h.html" title="System and monitoring utilities for printing system information and status updates." alt="" coords="2683,155,2814,181"/>
+<area shape="rect" id="node43" href="$YamlHelper_8h.html" title="Utility functions for handling YAML nodes." alt="" coords="2821,80,2975,107"/>
+<area shape="rect" id="node45" href="$SampleStructs_8h.html" title=" " alt="" coords="3877,155,4052,181"/>
+<area shape="rect" id="node49" href="$ParameterStructs_8h.html" title="Definitions of generic parameter structs and utility templates for MaCh3." alt="" coords="3532,80,3739,107"/>
+<area shape="rect" id="node3" href="$MaCh3Modes_8cpp.html" title=" " alt="" coords="2377,326,2560,353"/>
+<area shape="rect" id="node4" href="$BinnedSplineHandler_8h.html" title=" " alt="" coords="2801,326,3003,353"/>
+<area shape="rect" id="node8" href="$SampleHandlerInterface_8h.html" title=" " alt="" coords="3211,326,3441,353"/>
+<area shape="rect" id="node5" href="$BinnedSplineHandler_8cpp.html" title=" " alt="" coords="2795,415,3009,442"/>
+<area shape="rect" id="node6" href="$SampleHandlerBase_8h.html" title=" " alt="" coords="4293,594,4500,621"/>
+<area shape="rect" id="node9" href="$SampleHandlerInterface_8cpp.html" title=" " alt="" coords="3363,415,3606,442"/>
+<area shape="rect" id="node10" href="$SampleHandlerNuDockBase_8h.html" title="Client&#45;side sample handler that delegates reweighting and likelihood evaluation to a remote NuDock se..." alt="" coords="3538,587,3749,628"/>
+<area shape="rect" id="node11" href="$FitterBase_8h.html" title=" " alt="" coords="1889,505,2024,531"/>
+<area shape="rect" id="node13" href="$SampleSummary_8h.html" title=" " alt="" coords="3113,415,3288,442"/>
+<area shape="rect" id="node12" href="$NuDockServerBase_8h.html" title="Base class for the MaCh3 NuDock server, exposing fit internals via a JSON&#45;based request/response prot..." alt="" coords="1856,594,2057,621"/>
+<area shape="rect" id="node15" href="$Manager_8cpp.html" title=" " alt="" coords="1040,326,1191,353"/>
+<area shape="rect" id="node16" href="$BinningHandler_8h.html" title=" " alt="" coords="4361,326,4537,353"/>
+<area shape="rect" id="node18" href="$NuDockFactory_8h.html" title="Factory utilities for creating and configuring NuDock communication objects." alt="" coords="1668,505,1845,531"/>
+<area shape="rect" id="node20" href="$MulticanonicalMCMCHandler_8h.html" title=" " alt="" coords="913,505,1157,531"/>
+<area shape="rect" id="node21" href="$UmbrellaPlotting_8cpp.html" title=" " alt="" coords="1048,587,1249,628"/>
+<area shape="rect" id="node22" href="$UmbrellaSolver_8cpp.html" title=" " alt="" coords="620,587,821,628"/>
+<area shape="rect" id="node23" href="$StatisticalUtils_8h.html" title="Utility functions for statistical interpretations in MaCh3." alt="" coords="3027,326,3187,353"/>
+<area shape="rect" id="node24" href="$CombineMaCh3Chains_8cpp.html" title="Combine chains files produced by MCMC, enforcing the condition that all the files to combine were mad..." alt="" coords="4097,319,4286,360"/>
+<area shape="rect" id="node25" href="$PlotLLHMap_8cpp.html" title="Processing n&#45;dimensional LLHMap outputs generating 1D and 2D profiled likelihoods as defined in confi..." alt="" coords="1367,326,1559,353"/>
+<area shape="rect" id="node26" href="$ReweightMCMC_8cpp.html" title="This executable allow to reweight MCMC Chain, such technique is used to study impact of different pri..." alt="" coords="5,326,220,353"/>
+<area shape="rect" id="node27" href="$RHat_8cpp.html" title="This executable calculates the &#160;estimator for Markov Chain Monte Carlo (MCMC) convergence." alt="" coords="3683,326,3833,353"/>
+<area shape="rect" id="node28" href="$RHat__HighMem_8cpp.html" title=" " alt="" coords="3857,326,4072,353"/>
+<area shape="rect" id="node29" href="$SmearChain_8cpp.html" title="Allows you to smear contour. For example after performing sets of study one finds out that used sets ..." alt="" coords="2585,326,2777,353"/>
+<area shape="rect" id="node30" href="$DiagMCMCModule_8cpp.html" title="Implementation of the DiagMCMCModule class." alt="" coords="244,326,480,353"/>
+<area shape="rect" id="node31" href="$GetPenaltyTermModule_8cpp.html" title=" " alt="" coords="3465,319,3659,360"/>
+<area shape="rect" id="node32" href="$ProcessMCMCModule_8cpp.html" title="Implementation of the ProcessMCMCModule class." alt="" coords="556,326,813,353"/>
+<area shape="rect" id="node33" href="$AdaptiveMCMCHandler_8h.html" title=" " alt="" coords="1836,326,2077,353"/>
+<area shape="rect" id="node34" href="$ParameterHandlerBase_8h.html" title=" " alt="" coords="1857,408,2056,449"/>
+<area shape="rect" id="node38" href="$ParameterTunes_8h.html" title=" " alt="" coords="2102,326,2302,353"/>
+<area shape="rect" id="node39" href="$PCAHandler_8h.html" title=" " alt="" coords="1635,326,1812,353"/>
+<area shape="rect" id="node40" href="$manager_8h.html" title=" " alt="" coords="837,326,964,353"/>
+<area shape="rect" id="node17" href="$BinningHandler_8cpp.html" title=" " alt="" coords="4143,415,4333,442"/>
+<area shape="rect" id="node19" href="$NuDockFactory_8cpp.html" title="Implementation of NuDock factory utilities for object creation and oscillation parameter format conve..." alt="" coords="1641,594,1832,621"/>
+<area shape="rect" id="node35" href="$ParameterHandlerGeneric_8h.html" title=" " alt="" coords="3716,497,3915,539"/>
+<area shape="rect" id="node36" href="$SplineStructs_8h.html" title="Contains structures and helper functions for handling spline representations of systematic parameters..." alt="" coords="3873,594,4032,621"/>
+<area shape="rect" id="node37" href="$splines_8h.html" title=" " alt="" coords="4269,676,4386,703"/>
+<area shape="rect" id="node42" href="$Monitor_8cpp.html" title=" " alt="" coords="1767,237,1911,263"/>
+<area shape="rect" id="node44" href="$HistogramUtils_8h.html" title=" " alt="" coords="3548,237,3723,263"/>
+<area shape="rect" id="node46" href="$EventInfo_8h.html" title=" " alt="" coords="4587,505,4729,531"/>
+<area shape="rect" id="node47" href="$OscillationHandler_8h.html" title=" " alt="" coords="4510,415,4705,442"/>
+<area shape="rect" id="node48" href="$SampleInfo_8h.html" title=" " alt="" coords="4411,237,4566,263"/>
+<area shape="rect" id="node50" href="$ParameterHandlerUtils_8h.html" title=" " alt="" coords="2192,229,2391,271"/>
+</map>

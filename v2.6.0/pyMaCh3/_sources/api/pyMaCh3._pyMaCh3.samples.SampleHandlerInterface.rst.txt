@@ -1,0 +1,29 @@
+SampleHandlerInterface
+======================
+
+.. currentmodule:: pyMaCh3._pyMaCh3.samples
+
+.. autoclass:: SampleHandlerInterface
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~SampleHandlerInterface.get_bin_LLH
+      ~SampleHandlerInterface.get_likelihood
+      ~SampleHandlerInterface.get_mc_hist
+      ~SampleHandlerInterface.get_n_dim
+      ~SampleHandlerInterface.get_n_samples
+      ~SampleHandlerInterface.reweight
+      ~SampleHandlerInterface.set_test_stat
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: get_bin_LLH
+   .. automethod:: get_likelihood
+   .. automethod:: get_mc_hist
+   .. automethod:: get_n_dim
+   .. automethod:: get_n_samples
+   .. automethod:: reweight
+   .. automethod:: set_test_stat

@@ -1,0 +1,9 @@
+<map id="SMonolith" name="SMonolith">
+<area shape="rect" id="node1" title="Even&#45;by&#45;event class calculating response for spline parameters. It is possible to use GPU acceleratio..." alt="" coords="325,148,405,175"/>
+<area shape="rect" id="node2" href="$classSplineBase.html" title="Base class for calculating weight from spline." alt="" coords="35,5,123,32"/>
+<area shape="rect" id="node3" title=" " alt="" coords="15,57,142,98"/>
+<area shape="rect" id="node4" href="$structFastSplineInfo.html" title="CW: Add a struct to hold info about the splinified xsec parameters and help with FindSplineSegment." alt="" coords="25,123,132,149"/>
+<area shape="rect" id="node5" title=" " alt="" coords="13,177,145,204"/>
+<area shape="rect" id="node6" title=" " alt="" coords="5,230,152,271"/>
+<area shape="rect" id="node7" title=" " alt="" coords="16,295,141,337"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="SampleHandlerNuDockBase" name="SampleHandlerNuDockBase">
+<area shape="rect" id="node1" title="A SampleHandlerInterface class that acts as a client to an external NuDock server." alt="" coords="5,80,195,107"/>
+<area shape="rect" id="node2" href="$classSampleHandlerInterface.html" title="Class responsible for handling implementation of samples used in analysis, reweighting and returning ..." alt="" coords="19,5,181,32"/>
+</map>

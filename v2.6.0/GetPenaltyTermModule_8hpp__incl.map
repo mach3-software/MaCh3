@@ -1,0 +1,8 @@
+<map id="CLI/Modules/GetPenaltyTermModule.hpp" name="CLI/Modules/GetPenaltyTermModule.hpp">
+<area shape="rect" id="node1" title="Module for extracting penalty terms from systematic chains." alt="" coords="40,5,233,47"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,95,121,121"/>
+<area shape="rect" id="node3" href="$plugin_8hpp.html" title="Plugin interface and registration macros for MaCh3." alt="" coords="146,95,277,121"/>
+<area shape="rect" id="node4" title=" " alt="" coords="105,169,176,196"/>
+<area shape="rect" id="node5" href="$m3argparse_8hpp.html" title="MaCh3 wrapper for argparse library with additional functionality." alt="" coords="200,169,367,196"/>
+<area shape="rect" id="node6" title=" " alt="" coords="207,244,360,271"/>
+</map>

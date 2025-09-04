@@ -1,0 +1,19 @@
+YamlNode
+========
+
+.. currentmodule:: pyMaCh3._pyMaCh3.manager
+
+.. autoclass:: YamlNode
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~YamlNode.data
+      ~YamlNode.type
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: data
+   .. automethod:: type

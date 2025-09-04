@@ -1,0 +1,4 @@
+<map id="NuDockServerBase" name="NuDockServerBase">
+<area shape="rect" id="node1" title="A class that implements a NuDock server for cross&#45;fitter communication." alt="" coords="5,80,144,107"/>
+<area shape="rect" id="node2" href="$classFitterBase.html" title="Base class for implementing fitting algorithms." alt="" coords="33,5,116,32"/>
+</map>

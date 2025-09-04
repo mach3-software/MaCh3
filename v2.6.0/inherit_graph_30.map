@@ -1,0 +1,7 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classSampleHandlerInterface.html" title="Class responsible for handling implementation of samples used in analysis, reweighting and returning ..." alt="" coords="5,56,168,83"/>
+<area shape="rect" id="node2" href="$classPySampleHandlerInterface.html" title="EW: As SampleHandlerBase is an abstract base class we have to do some gymnastics to get it to get it ..." alt="" coords="221,5,400,32"/>
+<area shape="rect" id="node3" href="$classSampleHandlerBase.html" title="Class responsible for handling implementation of samples used in analysis, reweighting and returning ..." alt="" coords="240,56,381,83"/>
+<area shape="rect" id="node5" href="$classSampleHandlerNuDockBase.html" title="A SampleHandlerInterface class that acts as a client to an external NuDock server." alt="" coords="216,107,405,133"/>
+<area shape="rect" id="node4" href="$classPySampleHandlerBase.html" title="As SampleHandlerBase is an abstract base class we have to do some gymnastics to get it to get it into..." alt="" coords="453,56,611,83"/>
+</map>

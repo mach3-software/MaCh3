@@ -1,0 +1,18 @@
+<map id="PyParameterHandlerBase" name="PyParameterHandlerBase">
+<area shape="rect" id="node1" title="EW: As ParameterHandlerBase is an abstract base class we have to do some gymnastics to get it to get ..." alt="" coords="773,381,947,408"/>
+<area shape="rect" id="node2" href="$classParameterHandlerBase.html" title="Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada..." alt="" coords="567,381,724,408"/>
+<area shape="rect" id="node3" title=" " alt="" coords="181,12,385,39"/>
+<area shape="rect" id="node4" title=" " alt="" coords="198,63,369,105"/>
+<area shape="rect" id="node5" title=" " alt="" coords="193,129,373,170"/>
+<area shape="rect" id="node6" title=" " alt="" coords="205,194,361,235"/>
+<area shape="rect" id="node7" title=" " alt="" coords="205,259,361,301"/>
+<area shape="rect" id="node8" title=" " alt="" coords="212,325,355,366"/>
+<area shape="rect" id="node9" title=" " alt="" coords="243,391,323,417"/>
+<area shape="rect" id="node10" title=" " alt="" coords="5,383,132,425"/>
+<area shape="rect" id="node11" title=" " alt="" coords="223,441,344,468"/>
+<area shape="rect" id="node12" title=" " alt="" coords="204,493,363,534"/>
+<area shape="rect" id="node13" title=" " alt="" coords="218,560,349,587"/>
+<area shape="rect" id="node14" title=" " alt="" coords="199,611,368,637"/>
+<area shape="rect" id="node15" title=" " alt="" coords="201,667,366,693"/>
+<area shape="rect" id="node16" title=" " alt="" coords="211,815,356,841"/>
+</map>
