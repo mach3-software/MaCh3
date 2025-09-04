@@ -35,7 +35,7 @@ jobs:
       # Copy content
       - name: Copy gh-pages content into archive
         run: |
-          TAG_NAME=${{ github.ref_name }}
+          TAG_NAME="${{ github.ref_name:? }}"
           echo "Using TAG_NAME=$TAG_NAME"
 
           cd gh-pages-archive
