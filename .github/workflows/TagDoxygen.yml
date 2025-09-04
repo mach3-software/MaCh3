@@ -19,34 +19,38 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      # Checkout gh-pages (source of docs)
+      - name: Checkout gh-pages branch
         uses: actions/checkout@v5
         with:
-          fetch-depth: 0  # Fetch all history for all branches and tags
+          ref: gh-pages
+          path: gh-pages
 
-      - name: Fetch gh-pages branch
-        run: |
-          git fetch origin gh-pages:gh-pages
+      # Checkout gh-pages-archive (destination)
+      - name: Checkout gh-pages-archive branch
+        uses: actions/checkout@v5
+        with:
+          ref: gh-pages-archive
+          path: gh-pages-archive
+          fetch-depth: 0
 
-      - name: Switch to gh-pages-archive branch
-        run: |
-          git fetch origin gh-pages-archive:gh-pages-archive || \
-          git checkout --orphan gh-pages-archive
-          git checkout gh-pages-archive
-
+      # Copy content
       - name: Copy gh-pages content into archive
         run: |
           TAG_NAME=${{ github.ref_name }}
+          # Debug override
           TAG_NAME=v2.2.3
+          echo "Using TAG_NAME=$TAG_NAME"
+
+          cd gh-pages-archive
           rm -rf "$TAG_NAME/"
           mkdir -p "$TAG_NAME/"
-          # Checkout gh-pages content into a temporary directory
-          git --work-tree /tmp/gh-pages checkout gh-pages -- .
-          # Copy files into archive branch directly under $TAG_NAME/
-          rsync -av --progress --exclude='.git' /tmp/gh-pages/ "$TAG_NAME/"
+          rsync -av --progress ../gh-pages/ "$TAG_NAME/" --exclude='.git'
 
+      # Commit and push
       - name: Commit and push changes
         run: |
+          cd gh-pages-archive
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
           git add .
