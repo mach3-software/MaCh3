@@ -134,13 +134,7 @@ jobs:
           name: DocumentationHTML
           path: to-upload/
 
-      #KS: Copy previous documentation
-      - name: Copy previous docs
-        run: |
-          git clone --branch gh-pages-archive https://github.com/mach3-software/MaCh3.git temp-gh-pages-archive
-          mkdir -p to-upload/.Archive/
-          cp -r temp-gh-pages-archive/* to-upload/.Archive/
-          rm -rf temp-gh-pages-archive
+
 
       ## EM: Now we delete the artifact so it doesn't use up our allowance
       - uses: geekyeggo/delete-artifact@v5
