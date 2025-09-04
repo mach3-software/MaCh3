@@ -1,0 +1,25 @@
+<map id="ParameterHandlerGeneric" name="ParameterHandlerGeneric">
+<area shape="rect" id="node1" title="Class responsible for handling of systematic error parameters with different types defined in the con..." alt="" coords="1084,1021,1256,1048"/>
+<area shape="rect" id="node2" href="$classParameterHandlerBase.html" title="Base class for handling systematic uncertainty parameters." alt="" coords="668,497,825,524"/>
+<area shape="rect" id="node3" title=" " alt="" coords="181,163,385,189"/>
+<area shape="rect" id="node4" title=" " alt="" coords="198,214,369,255"/>
+<area shape="rect" id="node5" title=" " alt="" coords="193,279,373,321"/>
+<area shape="rect" id="node6" title=" " alt="" coords="210,345,357,386"/>
+<area shape="rect" id="node7" title=" " alt="" coords="205,410,361,451"/>
+<area shape="rect" id="node8" title=" " alt="" coords="212,475,355,517"/>
+<area shape="rect" id="node9" title=" " alt="" coords="243,541,323,568"/>
+<area shape="rect" id="node10" title=" " alt="" coords="5,534,132,575"/>
+<area shape="rect" id="node11" title=" " alt="" coords="223,592,344,619"/>
+<area shape="rect" id="node12" title=" " alt="" coords="218,643,349,669"/>
+<area shape="rect" id="node13" title=" " alt="" coords="199,693,368,720"/>
+<area shape="rect" id="node14" title=" " alt="" coords="201,827,366,853"/>
+<area shape="rect" id="node15" title=" " alt="" coords="183,745,384,786"/>
+<area shape="rect" id="node16" title=" " alt="" coords="211,112,356,139"/>
+<area shape="rect" id="node17" title=" " alt="" coords="673,905,820,946"/>
+<area shape="rect" id="node18" title=" " alt="" coords="666,971,827,997"/>
+<area shape="rect" id="node19" title=" " alt="" coords="647,1021,846,1048"/>
+<area shape="rect" id="node20" title=" " alt="" coords="669,1073,825,1114"/>
+<area shape="rect" id="node21" title=" " alt="" coords="633,1139,860,1165"/>
+<area shape="rect" id="node22" title=" " alt="" coords="645,1189,848,1216"/>
+<area shape="rect" id="node23" title=" " alt="" coords="669,1241,825,1282"/>
+</map>

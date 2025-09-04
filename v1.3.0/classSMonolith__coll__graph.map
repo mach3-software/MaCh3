@@ -1,0 +1,13 @@
+<map id="SMonolith" name="SMonolith">
+<area shape="rect" id="node1" title="Even&#45;by&#45;event class calculating response for spline parameters. It is possible to use GPU acceleratio..." alt="" coords="635,263,715,289"/>
+<area shape="rect" id="node2" href="$classSplineBase.html" title="Base class for calculating weight from spline." alt="" coords="331,5,419,32"/>
+<area shape="rect" id="node3" title=" " alt="" coords="312,57,439,98"/>
+<area shape="rect" id="node4" href="$structSplineMonoStruct.html" title="KS: Struct storing information for spline monolith." alt="" coords="313,196,438,223"/>
+<area shape="rect" id="node5" title=" " alt="" coords="13,161,145,188"/>
+<area shape="rect" id="node6" title=" " alt="" coords="5,223,152,265"/>
+<area shape="rect" id="node7" title=" " alt="" coords="16,310,141,351"/>
+<area shape="rect" id="node8" title=" " alt="" coords="315,401,436,428"/>
+<area shape="rect" id="node9" title=" " alt="" coords="280,452,471,479"/>
+<area shape="rect" id="node10" href="$structFastSplineInfo.html" title="CW: Add a struct to hold info about the splinified xsec parameters and help with FindSplineSegment." alt="" coords="25,452,132,479"/>
+<area shape="rect" id="node11" href="$classSMonolithGPU.html" title="Class responsible for calculating spline weight on GPU." alt="" coords="321,503,429,529"/>
+</map>

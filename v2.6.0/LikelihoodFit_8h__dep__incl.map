@@ -1,0 +1,13 @@
+<map id="Fitters/LikelihoodFit.h" name="Fitters/LikelihoodFit.h">
+<area shape="rect" id="node1" title=" " alt="" coords="247,5,393,32"/>
+<area shape="rect" id="node2" href="$LikelihoodFit_8cpp.html" title=" " alt="" coords="5,80,165,107"/>
+<area shape="rect" id="node3" href="$MaCh3Factory_8h.html" title="Factory methods for MaCh3 software which streamline initialisation of different objects." alt="" coords="474,155,635,181"/>
+<area shape="rect" id="node5" href="$MinuitFit_8h.html" title=" " alt="" coords="190,80,314,107"/>
+<area shape="rect" id="node10" href="$PSO_8h.html" title=" " alt="" coords="338,80,441,107"/>
+<area shape="rect" id="node4" href="$MaCh3Factory_8cpp.html" title=" " alt="" coords="467,229,642,256"/>
+<area shape="rect" id="node6" href="$MinuitFit_8cpp.html" title=" " alt="" coords="33,155,172,181"/>
+<area shape="rect" id="node7" href="$fitters_8h.html" title=" " alt="" coords="197,155,307,181"/>
+<area shape="rect" id="node8" href="$pyMaCh3_8h.html" title=" " alt="" coords="186,229,318,256"/>
+<area shape="rect" id="node9" href="$pyMaCh3_8cpp.html" title=" " alt="" coords="179,304,325,331"/>
+<area shape="rect" id="node11" href="$PSO_8cpp.html" title=" " alt="" coords="332,155,449,181"/>
+</map>

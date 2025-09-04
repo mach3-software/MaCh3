@@ -1,0 +1,6 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classSplineBase.html" title="Base class for calculating weight from spline." alt="" coords="5,56,93,83"/>
+<area shape="rect" id="node2" href="$classPySplineBase.html" title=" " alt="" coords="141,5,245,32"/>
+<area shape="rect" id="node3" href="$classSMonolith.html" title="Even&#45;by&#45;event class calculating response for spline parameters. It is possible to use GPU acceleratio..." alt="" coords="153,56,233,83"/>
+<area shape="rect" id="node4" href="$classsplineFDBase.html" title="Bin&#45;by&#45;bin class calculating response for spline parameters." alt="" coords="141,107,245,133"/>
+</map>

@@ -1,0 +1,43 @@
+<map id="PredictiveSample" name="PredictiveSample">
+<area shape="rect" id="node1" title="KS: Summary of sample info to be used by." alt="" coords="1759,73,1881,99"/>
+<area shape="rect" id="node2" href="$classBinningHandler.html" title="KS: Class handling binning for multiple samples." alt="" coords="1513,18,1624,45"/>
+<area shape="rect" id="node3" title=" " alt="" coords="1061,5,1244,47"/>
+<area shape="rect" id="node4" title=" " alt="" coords="252,514,332,541"/>
+<area shape="rect" id="node6" href="$classSampleHandlerFD.html" title="Class responsible for handling implementation of samples used in analysis, reweighting and returning ..." alt="" coords="1504,657,1633,683"/>
+<area shape="rect" id="node15" href="$classParameterHandlerBase.html" title="Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada..." alt="" coords="619,1042,776,1069"/>
+<area shape="rect" id="node5" title=" " alt="" coords="5,507,132,548"/>
+<area shape="rect" id="node7" href="$classSampleHandlerBase.html" title="Class responsible for handling implementation of samples used in analysis, reweighting and returning ..." alt="" coords="1082,565,1223,591"/>
+<area shape="rect" id="node8" title=" " alt="" coords="591,565,804,591"/>
+<area shape="rect" id="node9" title=" " alt="" coords="1077,616,1228,657"/>
+<area shape="rect" id="node10" title=" " alt="" coords="1075,681,1231,723"/>
+<area shape="rect" id="node11" title=" " alt="" coords="1066,747,1239,788"/>
+<area shape="rect" id="node12" title=" " alt="" coords="1066,813,1239,839"/>
+<area shape="rect" id="node13" title=" " alt="" coords="1084,864,1221,905"/>
+<area shape="rect" id="node14" href="$classParameterHandlerGeneric.html" title="Class responsible for handling of systematic error parameters with different types defined in the con..." alt="" coords="1067,981,1239,1007"/>
+<area shape="rect" id="node16" title=" " alt="" coords="181,880,403,921"/>
+<area shape="rect" id="node17" title=" " alt="" coords="190,946,394,973"/>
+<area shape="rect" id="node18" title=" " alt="" coords="202,997,382,1039"/>
+<area shape="rect" id="node19" title=" " alt="" coords="214,1063,370,1104"/>
+<area shape="rect" id="node20" title=" " alt="" coords="214,1128,370,1169"/>
+<area shape="rect" id="node21" title=" " alt="" coords="221,1193,363,1235"/>
+<area shape="rect" id="node22" title=" " alt="" coords="231,1259,353,1286"/>
+<area shape="rect" id="node23" title=" " alt="" coords="213,1311,371,1352"/>
+<area shape="rect" id="node24" title=" " alt="" coords="227,1379,357,1406"/>
+<area shape="rect" id="node25" title=" " alt="" coords="209,829,375,855"/>
+<area shape="rect" id="node26" title=" " alt="" coords="219,1542,365,1569"/>
+<area shape="rect" id="node27" title=" " alt="" coords="624,1093,771,1135"/>
+<area shape="rect" id="node28" title=" " alt="" coords="617,746,778,773"/>
+<area shape="rect" id="node29" title=" " alt="" coords="598,797,797,823"/>
+<area shape="rect" id="node30" title=" " alt="" coords="584,1159,811,1186"/>
+<area shape="rect" id="node31" title=" " alt="" coords="596,847,799,874"/>
+<area shape="rect" id="node32" title=" " alt="" coords="619,899,775,940"/>
+<area shape="rect" id="node33" title=" " alt="" coords="1071,1147,1234,1188"/>
+<area shape="rect" id="node34" title=" " alt="" coords="1074,1212,1231,1253"/>
+<area shape="rect" id="node35" title=" " alt="" coords="1061,1278,1244,1305"/>
+<area shape="rect" id="node36" title=" " alt="" coords="1075,135,1231,176"/>
+<area shape="rect" id="node37" title=" " alt="" coords="1035,201,1271,227"/>
+<area shape="rect" id="node38" title=" " alt="" coords="1061,252,1244,293"/>
+<area shape="rect" id="node39" title=" " alt="" coords="1055,317,1251,359"/>
+<area shape="rect" id="node40" title=" " alt="" coords="1071,383,1235,424"/>
+<area shape="rect" id="node41" title=" " alt="" coords="1084,448,1221,489"/>
+</map>

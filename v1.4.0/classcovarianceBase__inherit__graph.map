@@ -1,0 +1,6 @@
+<map id="covarianceBase" name="covarianceBase">
+<area shape="rect" id="node1" title="Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada..." alt="" coords="160,5,275,32"/>
+<area shape="rect" id="node2" href="$classPyCovarianceBase.html" title=" " alt="" coords="5,80,139,107"/>
+<area shape="rect" id="node3" href="$classcovarianceOsc.html" title="Class responsible for handling of neutrino oscillation parameters." alt="" coords="163,80,271,107"/>
+<area shape="rect" id="node4" href="$classcovarianceXsec.html" title="Class responsible for handling of systematic error parameters with different types defined in the con..." alt="" coords="296,80,411,107"/>
+</map>

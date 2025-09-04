@@ -1,0 +1,9 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classFitterBase.html" title="Base class for implementing fitting algorithms." alt="" coords="5,107,88,133"/>
+<area shape="rect" id="node2" href="$classLikelihoodFit.html" title="Implementation of base Likelihood Fit class, it is mostly responsible for likelihood calculation whil..." alt="" coords="138,56,233,83"/>
+<area shape="rect" id="node6" href="$classPyFitterBase.html" title=" " alt="" coords="136,107,235,133"/>
+<area shape="rect" id="node7" href="$classmcmc.html" title="Implementation of MR2T2 algorithm." alt="" coords="156,157,215,184"/>
+<area shape="rect" id="node3" href="$classMinuitFit.html" title="Implementation of Minuit fitting algorithm ." alt="" coords="302,5,374,32"/>
+<area shape="rect" id="node4" href="$classPSO.html" title="Class PSO, consist of a vector of object Class Particle and global best Takes in the size (number of ..." alt="" coords="313,56,363,83"/>
+<area shape="rect" id="node5" href="$classPyLikelihoodFit.html" title=" " alt="" coords="283,107,393,133"/>
+</map>

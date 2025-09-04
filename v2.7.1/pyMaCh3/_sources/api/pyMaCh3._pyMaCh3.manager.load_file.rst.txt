@@ -1,0 +1,6 @@
+load_file
+=========
+
+.. currentmodule:: pyMaCh3._pyMaCh3.manager
+
+.. autofunction:: load_file

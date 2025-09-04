@@ -1,0 +1,7 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$structTypeParameterBase.html" title="Base class storing info for parameters types, helping unify codebase." alt="" coords="5,81,145,108"/>
+<area shape="rect" id="node2" href="$structFunctionalParameter.html" title="HH &#45; Functional parameters Carrier for whether you want to apply a systematic to an event or not." alt="" coords="193,5,336,32"/>
+<area shape="rect" id="node3" href="$structNormParameter.html" title="ETA &#45; Normalisations for cross&#45;section parameters Carrier for whether you want to apply a systematic ..." alt="" coords="207,56,322,83"/>
+<area shape="rect" id="node4" href="$structOscillationParameter.html" title="KS: Struct holding info about oscillation Systematics." alt="" coords="193,107,336,133"/>
+<area shape="rect" id="node5" href="$structSplineParameter.html" title="KS: Struct holding info about Spline Systematics." alt="" coords="205,157,324,184"/>
+</map>

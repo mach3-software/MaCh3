@@ -1,0 +1,13 @@
+<map id="PyLikelihoodFit" name="PyLikelihoodFit">
+<area shape="rect" id="node1" title="EW: As LikelihoodFit is an abstract base class we have to do some gymnastics to get it to get it into..." alt="" coords="969,152,1080,179"/>
+<area shape="rect" id="node2" href="$classLikelihoodFit.html" title="Implementation of base Likelihood Fit class, it is mostly responsible for likelihood calculation whil..." alt="" coords="825,152,920,179"/>
+<area shape="rect" id="node3" href="$classFitterBase.html" title="Base class for implementing fitting algorithms." alt="" coords="693,152,776,179"/>
+<area shape="rect" id="node4" title=" " alt="" coords="371,5,572,32"/>
+<area shape="rect" id="node5" title=" " alt="" coords="371,57,571,98"/>
+<area shape="rect" id="node6" title=" " alt="" coords="374,123,569,149"/>
+<area shape="rect" id="node7" title=" " alt="" coords="379,174,563,215"/>
+<area shape="rect" id="node8" href="$classmanager.html" title="The manager class is responsible for managing configurations and settings." alt="" coords="435,240,507,267"/>
+<area shape="rect" id="node9" title=" " alt="" coords="181,240,261,267"/>
+<area shape="rect" id="node10" title=" " alt="" coords="5,233,132,274"/>
+<area shape="rect" id="node11" title=" " alt="" coords="399,291,544,317"/>
+</map>

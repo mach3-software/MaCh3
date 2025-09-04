@@ -1,0 +1,4 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classMCMCProcessor.html" title="Class responsible for processing MCMC chains, performing diagnostics, generating plots,..." alt="" coords="5,5,128,32"/>
+<area shape="rect" id="node2" href="$classOscProcessor.html" title="This class extends MCMC and allow specialised for Oscillation parameters analysis which require speci..." alt="" coords="176,5,281,32"/>
+</map>

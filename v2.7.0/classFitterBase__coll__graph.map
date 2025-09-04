@@ -1,0 +1,10 @@
+<map id="FitterBase" name="FitterBase">
+<area shape="rect" id="node1" title="Base class for implementing fitting algorithms." alt="" coords="693,160,776,187"/>
+<area shape="rect" id="node2" title=" " alt="" coords="371,5,572,32"/>
+<area shape="rect" id="node3" title=" " alt="" coords="379,57,563,98"/>
+<area shape="rect" id="node4" title=" " alt="" coords="371,122,571,163"/>
+<area shape="rect" id="node5" title=" " alt="" coords="181,220,261,247"/>
+<area shape="rect" id="node7" href="$classManager.html" title="The manager class is responsible for managing configurations and settings." alt="" coords="435,251,507,277"/>
+<area shape="rect" id="node6" title=" " alt="" coords="5,213,132,254"/>
+<area shape="rect" id="node8" title=" " alt="" coords="399,301,544,328"/>
+</map>
