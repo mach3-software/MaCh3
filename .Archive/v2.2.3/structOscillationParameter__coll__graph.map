@@ -1,6 +1,0 @@
-<map id="OscillationParameter" name="OscillationParameter">
-<area shape="rect" id="node1" title="KS: Struct holding info about oscillation Systematics." alt="" coords="5,257,164,283"/>
-<area shape="rect" id="node2" href="$structTypeParameterBase.html" title="Base class storing info for parameters types, helping unify codebase." alt="" coords="9,183,160,208"/>
-<area shape="rect" id="node3" title=" " alt="" coords="41,95,128,120"/>
-<area shape="rect" id="node4" title=" " alt="" coords="15,5,154,45"/>
-</map>
