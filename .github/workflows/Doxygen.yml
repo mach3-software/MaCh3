@@ -9,7 +9,7 @@ on:
   # Triggers the workflow on push or pull request events 
   # but only for the develop branch
   push:
-    branches: [develop]
+    branches: [develop, feature/kskwarczynski/PreserveDocumenation]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -90,7 +90,15 @@ jobs:
       - uses: geekyeggo/delete-artifact@v5
         with:
           name: DoxygenHTML
-          
+
+       #KS: Copy previous documentation
+      - name: Copy previous docs
+        run: |
+          git clone --branch main https://github.com/mach3-software/MaCh3.git temp-gh-pages-archive
+          mkdir -p to-upload/.Archive/
+          cp -r temp-gh-pages-archive/gh-pages-archive/* to-upload/.Archive/
+          rm -rf temp-gh-pages-archive
+
       - name: Build MaCh3
         run: | 
           mkdir build
