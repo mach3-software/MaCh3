@@ -1,0 +1,15 @@
+<map id="Splines/SplineStructs.h" name="Splines/SplineStructs.h">
+<area shape="rect" id="node1" title="Contains structures and helper functions for handling spline representations of systematic parameters..." alt="" coords="748,5,907,32"/>
+<area shape="rect" id="node2" href="$SplineBase_8h.html" title=" " alt="" coords="669,80,815,107"/>
+<area shape="rect" id="node13" href="$splines_8cpp.html" title=" " alt="" coords="822,229,953,256"/>
+<area shape="rect" id="node3" href="$BinnedSplineHandler_8h.html" title=" " alt="" coords="249,155,451,181"/>
+<area shape="rect" id="node10" href="$SplineBase_8cpp.html" title=" " alt="" coords="475,155,635,181"/>
+<area shape="rect" id="node11" href="$SplineMonolith_8h.html" title=" " alt="" coords="659,155,825,181"/>
+<area shape="rect" id="node4" href="$BinnedSplineHandler_8cpp.html" title=" " alt="" coords="75,229,289,256"/>
+<area shape="rect" id="node5" href="$SampleHandlerFD_8h.html" title=" " alt="" coords="314,229,509,256"/>
+<area shape="rect" id="node6" href="$SampleHandlerFD_8cpp.html" title=" " alt="" coords="5,304,215,331"/>
+<area shape="rect" id="node7" href="$FitterBase_8cpp.html" title=" " alt="" coords="239,304,389,331"/>
+<area shape="rect" id="node8" href="$PredictiveThrower_8cpp.html" title=" " alt="" coords="413,304,605,331"/>
+<area shape="rect" id="node9" href="$samples_8cpp.html" title=" " alt="" coords="629,304,767,331"/>
+<area shape="rect" id="node12" href="$SplineMonolith_8cpp.html" title=" " alt="" coords="619,229,798,256"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="SplineBase" name="SplineBase">
+<area shape="rect" id="node1" title="Base class for calculating weight from spline." alt="" coords="59,5,147,32"/>
+<area shape="rect" id="node2" href="$classSMonolith.html" title="Even&#45;by&#45;event class calculating response for spline parameters. It is possible to use GPU acceleratio..." alt="" coords="5,80,85,107"/>
+<area shape="rect" id="node3" href="$classsplineFDBase.html" title="Bin&#45;by&#45;bin class calculating response for spline parameters." alt="" coords="109,80,213,107"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="samplePDFBase" name="samplePDFBase">
+<area shape="rect" id="node1" title="Class responsible for handling implementation of samples used in analysis, reweighting and returning ..." alt="" coords="1343,173,1463,200"/>
+<area shape="rect" id="node2" href="$classMaCh3Modes.html" title="KS: Class describing MaCh3 modes used in the analysis, it is being initialised from config." alt="" coords="1148,127,1251,153"/>
+<area shape="rect" id="node3" title=" " alt="" coords="597,171,744,213"/>
+<area shape="rect" id="node4" title=" " alt="" coords="202,152,282,179"/>
+<area shape="rect" id="node7" href="$structMaCh3ModeInfo.html" title="KS: Class containing information for a single MaCh3Mode." alt="" coords="455,67,573,93"/>
+<area shape="rect" id="node9" title=" " alt="" coords="959,225,1124,252"/>
+<area shape="rect" id="node5" title=" " alt="" coords="5,145,132,186"/>
+<area shape="rect" id="node6" title=" " alt="" coords="768,59,935,101"/>
+<area shape="rect" id="node8" title=" " alt="" coords="181,5,303,32"/>
+</map>
