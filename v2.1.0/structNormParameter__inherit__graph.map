@@ -1,0 +1,4 @@
+<map id="NormParameter" name="NormParameter">
+<area shape="rect" id="node1" title="ETA &#45; Normalisations for cross&#45;section parameters Carrier for whether you want to apply a systematic ..." alt="" coords="18,80,133,107"/>
+<area shape="rect" id="node2" href="$structTypeParameterBase.html" title="Base class storing info for parameters types, helping unify codebase." alt="" coords="5,5,145,32"/>
+</map>
