@@ -1,0 +1,5 @@
+<map id="MinuitFit" name="MinuitFit">
+<area shape="rect" id="node1" title="Implementation of Minuit fitting algorithm ." alt="" coords="18,152,97,177"/>
+<area shape="rect" id="node2" href="$classLikelihoodFit.html" title="Implementation of base Likelihood Fit class, it is mostly responsible for likelihood calculation whil..." alt="" coords="5,79,109,104"/>
+<area shape="rect" id="node3" href="$classFitterBase.html" title="Base class for implementing fitting algorithms." alt="" coords="13,5,101,31"/>
+</map>

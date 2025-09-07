@@ -1,0 +1,52 @@
+<map id="Manager/Core.h" name="Manager/Core.h">
+<area shape="rect" id="node1" title=" " alt="" coords="3237,5,3363,31"/>
+<area shape="rect" id="node2" href="$MaCh3Exception_8h.html" title=" " alt="" coords="3542,152,3746,177"/>
+<area shape="rect" id="node38" href="$YamlHelper_8h.html" title="Utility functions for handling YAML nodes." alt="" coords="3439,225,3607,251"/>
+<area shape="rect" id="node41" href="$ParameterStructs_8h.html" title=" " alt="" coords="1860,225,2084,251"/>
+<area shape="rect" id="node47" href="$SampleStructs_8h.html" title=" " alt="" coords="2631,306,2819,331"/>
+<area shape="rect" id="node50" href="$MaCh3Logger_8h.html" title="KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/incl..." alt="" coords="3658,79,3841,104"/>
+<area shape="rect" id="node3" href="$MaCh3Modes_8h.html" title=" " alt="" coords="3490,394,3673,419"/>
+<area shape="rect" id="node8" href="$Manager_8h.html" title=" " alt="" coords="1865,394,2015,419"/>
+<area shape="rect" id="node19" href="$inputManager_8h.html" title=" " alt="" coords="3349,651,3505,691"/>
+<area shape="rect" id="node21" href="$plottingManager_8h.html" title=" " alt="" coords="4118,739,4274,779"/>
+<area shape="rect" id="node36" href="$Monitor_8h.html" title="System and monitoring utilities for printing system information and status updates." alt="" coords="3681,306,3825,331"/>
+<area shape="rect" id="node39" href="$styleManager_8h.html" title=" " alt="" coords="3957,299,4113,339"/>
+<area shape="rect" id="node44" href="$plottingUtils_8h.html" title=" " alt="" coords="4159,563,4315,603"/>
+<area shape="rect" id="node46" href="$SampleHandlerFD_8cpp.html" title=" " alt="" coords="3951,225,4177,251"/>
+<area shape="rect" id="node4" href="$MaCh3Modes_8cpp.html" title=" " alt="" coords="3489,482,3687,507"/>
+<area shape="rect" id="node5" href="$SampleHandlerBase_8h.html" title=" " alt="" coords="2313,482,2540,507"/>
+<area shape="rect" id="node7" href="$BinnedSplineHandler_8h.html" title=" " alt="" coords="3711,482,3931,507"/>
+<area shape="rect" id="node6" href="$FitterBase_8h.html" title=" " alt="" coords="1463,658,1609,683"/>
+<area shape="rect" id="node9" href="$CombineMaCh3Chains_8cpp.html" title="Combine chains files produced by MCMC, enforcing the condition that all the files to combine were mad..." alt="" coords="2820,475,3025,515"/>
+<area shape="rect" id="node10" href="$DiagMCMC_8cpp.html" title=" " alt="" coords="1633,658,1834,683"/>
+<area shape="rect" id="node11" href="$GetPenaltyTerm_8cpp.html" title="KS: This file contains the implementation of the function to extract specific penalty terms from syst..." alt="" coords="1037,482,1270,507"/>
+<area shape="rect" id="node12" href="$ProcessMCMC_8cpp.html" title="Main exectable responsible for different types of MCMC processing like drawing posteriors,..." alt="" coords="1697,482,1919,507"/>
+<area shape="rect" id="node13" href="$RHat_8cpp.html" title="This executable calculates the &#160;estimator for Markov Chain Monte Carlo (MCMC) convergence." alt="" coords="3050,482,3211,507"/>
+<area shape="rect" id="node14" href="$RHat__HighMem_8cpp.html" title=" " alt="" coords="2565,482,2795,507"/>
+<area shape="rect" id="node15" href="$SmearChain_8cpp.html" title=" " alt="" coords="1231,658,1439,683"/>
+<area shape="rect" id="node16" href="$StatisticalUtils_8h.html" title="Utility functions for statistical interpretations in MaCh3." alt="" coords="1346,482,1521,507"/>
+<area shape="rect" id="node27" href="$Manager_8cpp.html" title=" " alt="" coords="1943,482,2110,507"/>
+<area shape="rect" id="node28" href="$AdaptiveMCMCHandler_8h.html" title=" " alt="" coords="698,482,961,507"/>
+<area shape="rect" id="node29" href="$ParameterHandlerBase_8h.html" title=" " alt="" coords="471,563,689,603"/>
+<area shape="rect" id="node33" href="$PCAHandler_8h.html" title=" " alt="" coords="486,482,674,507"/>
+<area shape="rect" id="node34" href="$ParameterTunes_8h.html" title=" " alt="" coords="245,482,461,507"/>
+<area shape="rect" id="node35" href="$manager_8cpp.html" title=" " alt="" coords="2135,482,2289,507"/>
+<area shape="rect" id="node17" href="$MCMCProcessor_8h.html" title=" " alt="" coords="1290,570,1473,595"/>
+<area shape="rect" id="node18" href="$PlotMCMCDiag_8cpp.html" title="KS: This script is used to analyse output form DiagMCMC." alt="" coords="777,658,1004,683"/>
+<area shape="rect" id="node20" href="$inputManager_8cpp.html" title=" " alt="" coords="3349,739,3505,779"/>
+<area shape="rect" id="node26" href="$plotting_8cpp.html" title=" " alt="" coords="3773,834,3921,859"/>
+<area shape="rect" id="node22" href="$GetPostfitParamPlots_8cpp.html" title=" " alt="" coords="4516,827,4697,867"/>
+<area shape="rect" id="node23" href="$MatrixPlotter_8cpp.html" title=" " alt="" coords="4305,834,4492,859"/>
+<area shape="rect" id="node24" href="$PlotLLH_8cpp.html" title=" " alt="" coords="3945,834,4097,859"/>
+<area shape="rect" id="node25" href="$plottingManager_8cpp.html" title=" " alt="" coords="4122,827,4281,867"/>
+<area shape="rect" id="node30" href="$ParameterHandlerGeneric_8h.html" title=" " alt="" coords="257,651,476,691"/>
+<area shape="rect" id="node31" href="$SplineStructs_8h.html" title="Contains structures and helper functions for handling spline representations of systematic parameters..." alt="" coords="281,746,452,771"/>
+<area shape="rect" id="node32" href="$splines_8cpp.html" title=" " alt="" coords="1736,834,1880,859"/>
+<area shape="rect" id="node37" href="$Monitor_8cpp.html" title=" " alt="" coords="3697,394,3855,419"/>
+<area shape="rect" id="node40" href="$styleManager_8cpp.html" title=" " alt="" coords="3982,387,4138,427"/>
+<area shape="rect" id="node42" href="$ParameterHandlerUtils_8h.html" title=" " alt="" coords="471,387,689,427"/>
+<area shape="rect" id="node43" href="$HistogramUtils_8h.html" title=" " alt="" coords="1380,394,1572,419"/>
+<area shape="rect" id="node45" href="$plottingUtils_8cpp.html" title=" " alt="" coords="4159,651,4315,691"/>
+<area shape="rect" id="node48" href="$FarDetectorCoreInfoStruct_8h.html" title=" " alt="" coords="2813,387,3025,427"/>
+<area shape="rect" id="node49" href="$OscillationHandler_8h.html" title=" " alt="" coords="3049,394,3263,419"/>
+</map>
