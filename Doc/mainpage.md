@@ -20,16 +20,3 @@ If something is unclear please contact us via
 The Markov Chain 3 flavour is a framework born in 2013 as a Bayesian MCMC fitter for [T2K](https://t2k-experiment.org/pl/) oscillation analysis. It has now been used for multiple T2K Oscillation analyses both at the Near and Far detectors throughout the years and is also used by the DUNE and HK oscillation analysis groups as well as for joint fits between T2K and NOvA and T2K and SK's atmospheric data.
 
 The framework has also evolved to allow non MCMC modules to interrogate the likelihoods implemented.
-
-
-### Documentation Version
-You can find previous version of documentation here:
-* [develop](https://mach3-software.github.io/MaCh3/)
-* [v2.2.0](https://mach3-software.github.io/MaCh3/.Archive/v2.2.0/index.html)
-* [v2.1.0](https://mach3-software.github.io/MaCh3/.Archive/v2.1.0/index.html)
-* [v2.0.0](https://mach3-software.github.io/MaCh3/.Archive/v2.0.0/index.html)
-* [v1.5.0](https://mach3-software.github.io/MaCh3/.Archive/v1.5.0/index.html)
-* [v1.4.0](https://mach3-software.github.io/MaCh3/.Archive/v1.4.0/index.html)
-* [v1.3.0](https://mach3-software.github.io/MaCh3/.Archive/v1.3.0/index.html)
-* [v1.2.0](https://mach3-software.github.io/MaCh3/.Archive/v1.2.0/index.html)
-* [v1.1.0](https://mach3-software.github.io/MaCh3/.Archive/v1.1.0/index.html)
