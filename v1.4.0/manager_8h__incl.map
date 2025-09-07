@@ -1,5 +1,5 @@
-<map id="/hosthome/MaCh3_1.4.0/manager/manager.h" name="/hosthome/MaCh3_1.4.0/manager/manager.h">
-<area shape="rect" id="node1" title=" " alt="" coords="1084,5,1249,47"/>
+<map id="/hosthome/v1.4.0/manager/manager.h" name="/hosthome/v1.4.0/manager/manager.h">
+<area shape="rect" id="node1" title=" " alt="" coords="1078,5,1255,47"/>
 <area shape="rect" id="node2" href="$MaCh3Logger_8h.html" title="KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/incl..." alt="" coords="1024,393,1192,420"/>
 <area shape="rect" id="node14" href="$Structs_8h.html" title=" " alt="" coords="663,244,809,271"/>
 <area shape="rect" id="node18" href="$MaCh3Exception_8h.html" title=" " alt="" coords="1225,319,1412,345"/>

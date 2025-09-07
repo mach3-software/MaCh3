@@ -24,7 +24,7 @@ var searchData=
   ['diagmcmc_258',['DiagMCMC',['../DiagMCMC_8cpp.html#ae234755b7b483f97d2a48d8959e90a18',1,'DiagMCMC():&#160;DiagMCMC.cpp'],['../classMCMCProcessor.html#a7f8faecae63616ba100cf24ae42ecc08',1,'MCMCProcessor::DiagMCMC()']]],
   ['diagmcmc_2ecpp_259',['DiagMCMC.cpp',['../DiagMCMC_8cpp.html',1,'']]],
   ['diagnosecovariancematrix_260',['DiagnoseCovarianceMatrix',['../ProcessMCMC_8cpp.html#a721fcdb3001f72ff5e40d6334d56e0d0',1,'ProcessMCMC.cpp']]],
-  ['diagnostic_261',['Diagnostic',['../md__hosthome_MaCh3_1_4_0_Diagnostics_README.html',1,'']]],
+  ['diagnostic_261',['Diagnostic',['../md__hosthome_v1_4_0_Diagnostics_README.html',1,'']]],
   ['dimensionlabels_262',['DimensionLabels',['../classsplineFDBase.html#a00e1aeea8e9389c41f93469a26c83adc',1,'splineFDBase']]],
   ['dimensions_263',['Dimensions',['../classsplineFDBase.html#a6c28400605049bdee229885c46463dcd',1,'splineFDBase']]],
   ['dir_264',['Dir',['../classSampleSummary.html#aa2064e7455c3164ee5118a5e5162f282',1,'SampleSummary']]],

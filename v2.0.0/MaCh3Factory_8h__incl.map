@@ -1,4 +1,4 @@
-<map id="/hosthome/MaCh3_2.0.0/Fitters/MaCh3Factory.h" name="/hosthome/MaCh3_2.0.0/Fitters/MaCh3Factory.h">
+<map id="/hosthome/v2.0.0/Fitters/MaCh3Factory.h" name="/hosthome/v2.0.0/Fitters/MaCh3Factory.h">
 <area shape="rect" id="node1" title="Factory methods for MaCh3 software which streamline initialisation of different objects." alt="" coords="2068,5,2234,47"/>
 <area shape="rect" id="node2" href="$FitterBase_8h.html" title=" " alt="" coords="2153,251,2288,278"/>
 <area shape="rect" id="node44" href="$mcmc_8h.html" title=" " alt="" coords="2433,95,2544,121"/>

@@ -85,7 +85,7 @@ $(function() {
 <p>Class responsible for processing MCMC chains, performing diagnostics, generating plots, and managing Bayesian analysis.  
  <a href="classMCMCProcessor.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="MCMCProcessor_8h_source.html">/hosthome/MaCh3_1.5.0/mcmc/MCMCProcessor.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="MCMCProcessor_8h_source.html">/hosthome/v1.5.0/mcmc/MCMCProcessor.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for MCMCProcessor:</div>
 <div class="dyncontent">
@@ -145,7 +145,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:ab367cb5f56606338bb1fce780f2414e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate covariance by making 2D projection of each combination of parameters using multithreading.  <a href="classMCMCProcessor.html#ab367cb5f56606338bb1fce780f2414e8">More...</a><br /></td></tr>
 <tr class="separator:ab367cb5f56606338bb1fce780f2414e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afac304b884238cc3624f5471b43f1a7e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#afac304b884238cc3624f5471b43f1a7e">MakeSubOptimality</a> (const int NIntervals=10)</td></tr>
-<tr class="memdesc:afac304b884238cc3624f5471b43f1a7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make and Draw SubOptimality <b>[roberts2009adaptive]</b>.  <a href="classMCMCProcessor.html#afac304b884238cc3624f5471b43f1a7e">More...</a><br /></td></tr>
+<tr class="memdesc:afac304b884238cc3624f5471b43f1a7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make and Draw SubOptimality <a class="el" href="citelist.html#CITEREF_roberts2009adaptive">[19]</a>.  <a href="classMCMCProcessor.html#afac304b884238cc3624f5471b43f1a7e">More...</a><br /></td></tr>
 <tr class="separator:afac304b884238cc3624f5471b43f1a7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a36441ec3d5b0e24e48040282ffcda3eb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#a36441ec3d5b0e24e48040282ffcda3eb">ResetHistograms</a> ()</td></tr>
 <tr class="memdesc:a36441ec3d5b0e24e48040282ffcda3eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset 2D posteriors, in case we would like to calculate in again with different BurnInCut.  <a href="classMCMCProcessor.html#a36441ec3d5b0e24e48040282ffcda3eb">More...</a><br /></td></tr>
@@ -357,19 +357,19 @@ Protected Member Functions</h2></td></tr>
 <tr class="memdesc:aa9f3e028ad30d09e5a14a984385b95f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: calc Effective Sample Size.  <a href="classMCMCProcessor.html#aa9f3e028ad30d09e5a14a984385b95f0">More...</a><br /></td></tr>
 <tr class="separator:aa9f3e028ad30d09e5a14a984385b95f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a29d492906e0c027d089331a0509cd2c3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#a29d492906e0c027d089331a0509cd2c3">BatchedAnalysis</a> ()</td></tr>
-<tr class="memdesc:a29d492906e0c027d089331a0509cd2c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the batched means variance estimation and variable indicating if number of batches is sensible <b>[chakraborty2019estimating]</b> <b>[rossetti2024batch]</b>.  <a href="classMCMCProcessor.html#a29d492906e0c027d089331a0509cd2c3">More...</a><br /></td></tr>
+<tr class="memdesc:a29d492906e0c027d089331a0509cd2c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the batched means variance estimation and variable indicating if number of batches is sensible <a class="el" href="citelist.html#CITEREF_chakraborty2019estimating">[2]</a> <a class="el" href="citelist.html#CITEREF_rossetti2024batch">[20]</a>.  <a href="classMCMCProcessor.html#a29d492906e0c027d089331a0509cd2c3">More...</a><br /></td></tr>
 <tr class="separator:a29d492906e0c027d089331a0509cd2c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af3658b8adee50f6ef5557ebbd1c87b8e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#af3658b8adee50f6ef5557ebbd1c87b8e">BatchedMeans</a> ()</td></tr>
 <tr class="memdesc:af3658b8adee50f6ef5557ebbd1c87b8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">CW: Batched means, literally read from an array and chuck into TH1D.  <a href="classMCMCProcessor.html#af3658b8adee50f6ef5557ebbd1c87b8e">More...</a><br /></td></tr>
 <tr class="separator:af3658b8adee50f6ef5557ebbd1c87b8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a03b7c4bb9cd9a90aa7d284b0f1a6156b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#a03b7c4bb9cd9a90aa7d284b0f1a6156b">GewekeDiagnostic</a> ()</td></tr>
-<tr class="memdesc:a03b7c4bb9cd9a90aa7d284b0f1a6156b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Geweke Diagnostic based on the methods described by Fang (2014) and Karlsbakk (2011). <b>[Fang2014GewekeDiagnostics]</b> <b>[karlsbakk2011]</b>.  <a href="classMCMCProcessor.html#a03b7c4bb9cd9a90aa7d284b0f1a6156b">More...</a><br /></td></tr>
+<tr class="memdesc:a03b7c4bb9cd9a90aa7d284b0f1a6156b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Geweke Diagnostic based on the methods described by Fang (2014) and Karlsbakk (2011). <a class="el" href="citelist.html#CITEREF_Fang2014GewekeDiagnostics">[6]</a> <a class="el" href="citelist.html#CITEREF_karlsbakk2011">[15]</a>.  <a href="classMCMCProcessor.html#a03b7c4bb9cd9a90aa7d284b0f1a6156b">More...</a><br /></td></tr>
 <tr class="separator:a03b7c4bb9cd9a90aa7d284b0f1a6156b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a278b82fa945d847e57ae6ed6357d8f61"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#a278b82fa945d847e57ae6ed6357d8f61">AcceptanceProbabilities</a> ()</td></tr>
 <tr class="memdesc:a278b82fa945d847e57ae6ed6357d8f61"><td class="mdescLeft">&#160;</td><td class="mdescRight">Acceptance Probability.  <a href="classMCMCProcessor.html#a278b82fa945d847e57ae6ed6357d8f61">More...</a><br /></td></tr>
 <tr class="separator:a278b82fa945d847e57ae6ed6357d8f61"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef760d8c4bb70690a5c4114f4b2409b3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#aef760d8c4bb70690a5c4114f4b2409b3">PowerSpectrumAnalysis</a> ()</td></tr>
-<tr class="memdesc:aef760d8c4bb70690a5c4114f4b2409b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">RC: Perform spectral analysis of MCMC <b>[Dunkley:2004sv]</b>.  <a href="classMCMCProcessor.html#aef760d8c4bb70690a5c4114f4b2409b3">More...</a><br /></td></tr>
+<tr class="memdesc:aef760d8c4bb70690a5c4114f4b2409b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">RC: Perform spectral analysis of MCMC <a class="el" href="citelist.html#CITEREF_Dunkley:2004sv">[5]</a>.  <a href="classMCMCProcessor.html#aef760d8c4bb70690a5c4114f4b2409b3">More...</a><br /></td></tr>
 <tr class="separator:aef760d8c4bb70690a5c4114f4b2409b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1dfc05edf0b1295e561d5956b43b1c6b"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#a1dfc05edf0b1295e561d5956b43b1c6b">GetMargins</a> (const std::unique_ptr&lt; TCanvas &gt; &amp;Canv) const</td></tr>
 <tr class="memdesc:a1dfc05edf0b1295e561d5956b43b1c6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get TCanvas margins, to be able to reset them if particular function need different margins.  <a href="classMCMCProcessor.html#a1dfc05edf0b1295e561d5956b43b1c6b">More...</a><br /></td></tr>
@@ -1251,7 +1251,7 @@ Kamil Skwarczynski </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p>Get the batched means variance estimation and variable indicating if number of batches is sensible <b>[chakraborty2019estimating]</b> <b>[rossetti2024batch]</b>. </p>
+<p>Get the batched means variance estimation and variable indicating if number of batches is sensible <a class="el" href="citelist.html#CITEREF_chakraborty2019estimating">[2]</a> <a class="el" href="citelist.html#CITEREF_rossetti2024batch">[20]</a>. </p>
 
 <p class="definition">Definition at line <a class="el" href="MCMCProcessor_8cpp_source.html#l03678">3678</a> of file <a class="el" href="MCMCProcessor_8cpp_source.html">MCMCProcessor.cpp</a>.</p>
 <div class="fragment"><div class="line"><a name="l03678"></a><span class="lineno"> 3678</span>&#160;                                    {</div>
@@ -1622,7 +1622,7 @@ Kamil Skwarczynski </dd></dl>
   </table>
   </dd>
 </dl>
-<p>This function computes the Effective Sample Size (ESS) using the autocorrelations calculated by <a class="el" href="classMCMCProcessor.html#a322bee0c362ba83df8c45769d299ce9f" title="KS: Calculate autocorrelations supports both OpenMP and CUDA :)">AutoCorrelation()</a>. Ensure that the parameter nLags here matches the number of lags used in <a class="el" href="classMCMCProcessor.html#a322bee0c362ba83df8c45769d299ce9f" title="KS: Calculate autocorrelations supports both OpenMP and CUDA :)">AutoCorrelation()</a> to obtain accurate results. <b>[StanManual]</b> <b>[hanson2008mcmc]</b> <b>[gabry2024visual]</b> </p>
+<p>This function computes the Effective Sample Size (ESS) using the autocorrelations calculated by <a class="el" href="classMCMCProcessor.html#a322bee0c362ba83df8c45769d299ce9f" title="KS: Calculate autocorrelations supports both OpenMP and CUDA :)">AutoCorrelation()</a>. Ensure that the parameter nLags here matches the number of lags used in <a class="el" href="classMCMCProcessor.html#a322bee0c362ba83df8c45769d299ce9f" title="KS: Calculate autocorrelations supports both OpenMP and CUDA :)">AutoCorrelation()</a> to obtain accurate results. <a class="el" href="citelist.html#CITEREF_StanManual">[22]</a> <a class="el" href="citelist.html#CITEREF_hanson2008mcmc">[11]</a> <a class="el" href="citelist.html#CITEREF_gabry2024visual">[7]</a> </p>
 
 <p class="definition">Definition at line <a class="el" href="MCMCProcessor_8cpp_source.html#l03523">3523</a> of file <a class="el" href="MCMCProcessor_8cpp_source.html">MCMCProcessor.cpp</a>.</p>
 <div class="fragment"><div class="line"><a name="l03523"></a><span class="lineno"> 3523</span>&#160;                                                                                          {</div>
@@ -3813,7 +3813,7 @@ Kamil Skwarczynski </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p>Geweke Diagnostic based on the methods described by Fang (2014) and Karlsbakk (2011). <b>[Fang2014GewekeDiagnostics]</b> <b>[karlsbakk2011]</b>. </p>
+<p>Geweke Diagnostic based on the methods described by Fang (2014) and Karlsbakk (2011). <a class="el" href="citelist.html#CITEREF_Fang2014GewekeDiagnostics">[6]</a> <a class="el" href="citelist.html#CITEREF_karlsbakk2011">[15]</a>. </p>
 
 <p class="definition">Definition at line <a class="el" href="MCMCProcessor_8cpp_source.html#l03916">3916</a> of file <a class="el" href="MCMCProcessor_8cpp_source.html">MCMCProcessor.cpp</a>.</p>
 <div class="fragment"><div class="line"><a name="l03916"></a><span class="lineno"> 3916</span>&#160;                                     {</div>
@@ -4927,7 +4927,7 @@ Kamil Skwarczynski </dd></dl>
       </table>
 </div><div class="memdoc">
 
-<p>Make and Draw SubOptimality <b>[roberts2009adaptive]</b>. </p>
+<p>Make and Draw SubOptimality <a class="el" href="citelist.html#CITEREF_roberts2009adaptive">[19]</a>. </p>
 <dl class="section author"><dt>Author</dt><dd>Henry Wallace </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="MCMCProcessor_8cpp_source.html#l01244">1244</a> of file <a class="el" href="MCMCProcessor_8cpp_source.html">MCMCProcessor.cpp</a>.</p>
@@ -5730,7 +5730,7 @@ Kamil Skwarczynski </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p>RC: Perform spectral analysis of MCMC <b>[Dunkley:2004sv]</b>. </p>
+<p>RC: Perform spectral analysis of MCMC <a class="el" href="citelist.html#CITEREF_Dunkley:2004sv">[5]</a>. </p>
 <dl class="section author"><dt>Author</dt><dd>Richard Calland </dd></dl>
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000014">Todo:</a></b></dt><dd>KS: Code is awfully slow... I know how to make it faster (GPU scream in a distant) but for now just make it for two params, bit hacky sry... </dd></dl>
 
@@ -9545,13 +9545,30 @@ Kamil Skwarczynski </dd></dl>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>/hosthome/MaCh3_1.5.0/mcmc/<a class="el" href="MCMCProcessor_8h_source.html">MCMCProcessor.h</a></li>
-<li>/hosthome/MaCh3_1.5.0/mcmc/<a class="el" href="MCMCProcessor_8cpp_source.html">MCMCProcessor.cpp</a></li>
+<li>/hosthome/v1.5.0/mcmc/<a class="el" href="MCMCProcessor_8h_source.html">MCMCProcessor.h</a></li>
+<li>/hosthome/v1.5.0/mcmc/<a class="el" href="MCMCProcessor_8cpp_source.html">MCMCProcessor.cpp</a></li>
 </ul>
 </div><!-- contents -->
-<!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
-Generated by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
-</small></address>
-</body>
-</html>
+<footer class="mach3-footer" style="text-align: center;">
+    <div style="margin-bottom: 15px;">
+        <span style="font-weight: bold;">The MaCh3 Collaboration</span>
+    </div>
+    <div style="margin-bottom: 10px;">
+        <span>Select Software Version: </span>
+        <select id="versionSelector" onchange="window.location.href=this.value" style="padding: 5px; border-radius: 4px; border: 1px solid #ccc;">
+            <option value="">-- Select --</option>
+            <option value="https://mach3-software.github.io/MaCh3/">develop</option>
+            <option value="https://mach3-software.github.io/MaCh3/.Archive/v2.2.0/index.html">v2.2.0</option>
+            <option value="https://mach3-software.github.io/MaCh3/.Archive/v2.1.0/index.html">v2.1.0</option>
+            <option value="https://mach3-software.github.io/MaCh3/.Archive/v2.0.0/index.html">v2.0.0</option>
+            <option value="https://mach3-software.github.io/MaCh3/.Archive/v1.5.0/index.html">v1.5.0</option>
+            <option value="https://mach3-software.github.io/MaCh3/.Archive/v1.4.0/index.html">v1.4.0</option>
+            <option value="https://mach3-software.github.io/MaCh3/.Archive/v1.3.0/index.html">v1.3.0</option>
+            <option value="https://mach3-software.github.io/MaCh3/.Archive/v1.2.0/index.html">v1.2.0</option>
+            <option value="https://mach3-software.github.io/MaCh3/.Archive/v1.1.0/index.html">v1.1.0</option>
+        </select>
+    </div>
+    <div style="font-size: 0.9em; color: #666; margin-top: 10px;">
+        Documentation generated with <a href="https://www.doxygen.nl/" target="_blank" style="color: #666;">Doxygen</a>
+    </div>
+</footer>

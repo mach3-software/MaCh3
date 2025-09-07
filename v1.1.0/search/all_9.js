@@ -18,7 +18,7 @@ var searchData=
   ['hfineenergy_688',['hFineEnergy',['../classOscillator.html#a57c4971f8da63332a6a7d9561670ca7b',1,'Oscillator']]],
   ['histogramsinitialised_689',['HistogramsInitialised',['../classOscillator.html#a3627014bbf95f278475a9975fa38d157',1,'Oscillator']]],
   ['horncurrents_690',['horncurrents',['../structXsecNorms4.html#ad9b663a9fe71c5b3feb844179bba8822',1,'XsecNorms4']]],
-  ['how_20to_20contribute_20code_20to_20mach3_691',['How to Contribute Code to MaCh3',['../md__hosthome_MaCh3_1_1_0_CONTRIBUTING.html',1,'']]],
+  ['how_20to_20contribute_20code_20to_20mach3_691',['How to Contribute Code to MaCh3',['../md__hosthome_v1_1_0_CONTRIBUTING.html',1,'']]],
   ['hpost_692',['hpost',['../classMCMCProcessor.html#aa3c928a09df7d6fc431c0b879d5c40e4',1,'MCMCProcessor']]],
   ['hpost2d_693',['hpost2D',['../classMCMCProcessor.html#a0ddcfa4ba1e4dcdea366d88decc64391',1,'MCMCProcessor']]],
   ['hprimarybinning_694',['hPrimaryBinning',['../classOscillator.html#ad7da187ecbc0c6c2f39d16fe4221d97a',1,'Oscillator']]],

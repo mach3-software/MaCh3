@@ -3,7 +3,7 @@ var searchData=
   ['m3_868',['M3',['../namespaceM3.html',1,'']]],
   ['m3openconfig_869',['M3OpenConfig',['../YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59',1,'YamlHelper.h']]],
   ['mach3_870',['MaCh3',['../index.html',1,'']]],
-  ['mach3_20_3cimg_20src_3d_22doc_2fmach3logo_2epng_22_20alt_3d_22mach3_22_20align_3d_22center_22_20width_3d_22100_22_2f_3e_871',['MaCh3 &lt;img src=&quot;Doc/mach3logo.png&quot; alt=&quot;MaCh3&quot; align=&quot;center&quot; width=&quot;100&quot;/&gt;',['../md__hosthome_MaCh3_2_1_0_README.html',1,'']]],
+  ['mach3_20_3cimg_20src_3d_22doc_2fmach3logo_2epng_22_20alt_3d_22mach3_22_20align_3d_22center_22_20width_3d_22100_22_2f_3e_871',['MaCh3 &lt;img src=&quot;Doc/mach3logo.png&quot; alt=&quot;MaCh3&quot; align=&quot;center&quot; width=&quot;100&quot;/&gt;',['../md__hosthome_v2_1_0_README.html',1,'']]],
   ['mach3covariancefactory_872',['MaCh3CovarianceFactory',['../MaCh3Factory_8h.html#a6a20eec7f0813dec80b8620c1f3e3b18',1,'MaCh3Factory.h']]],
   ['mach3exception_873',['MaCh3Exception',['../classMaCh3Exception.html',1,'MaCh3Exception'],['../classMaCh3Exception.html#a848f0037a80a607b8721b7a163b1077e',1,'MaCh3Exception::MaCh3Exception()']]],
   ['mach3exception_2eh_874',['MaCh3Exception.h',['../MaCh3Exception_8h.html',1,'']]],

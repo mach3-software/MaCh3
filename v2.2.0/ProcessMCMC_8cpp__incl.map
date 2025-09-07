@@ -1,5 +1,5 @@
-<map id="/hosthome/MaCh3_2.2.0/Diagnostics/ProcessMCMC.cpp" name="/hosthome/MaCh3_2.2.0/Diagnostics/ProcessMCMC.cpp">
-<area shape="rect" id="node1" title="Main exectable responsible for different types of MCMC processing like drawing posteriors,..." alt="" coords="131,5,344,47"/>
+<map id="/hosthome/v2.2.0/Diagnostics/ProcessMCMC.cpp" name="/hosthome/v2.2.0/Diagnostics/ProcessMCMC.cpp">
+<area shape="rect" id="node1" title="Main exectable responsible for different types of MCMC processing like drawing posteriors,..." alt="" coords="139,5,335,47"/>
 <area shape="rect" id="node2" href="$OscProcessor_8h.html" title=" " alt="" coords="217,95,375,121"/>
 <area shape="rect" id="node8" href="$Manager_8h.html" title=" " alt="" coords="259,333,397,360"/>
 <area shape="rect" id="node3" href="$MCMCProcessor_8h.html" title=" " alt="" coords="1485,169,1661,196"/>

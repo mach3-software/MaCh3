@@ -1,5 +1,5 @@
-<map id="/hosthome/MaCh3_2.2.0/Diagnostics/PlotMCMCDiag.cpp" name="/hosthome/MaCh3_2.2.0/Diagnostics/PlotMCMCDiag.cpp">
-<area shape="rect" id="node1" title="KS: This script is used to analyse output form DiagMCMC." alt="" coords="3378,5,3593,47"/>
+<map id="/hosthome/v2.2.0/Diagnostics/PlotMCMCDiag.cpp" name="/hosthome/v2.2.0/Diagnostics/PlotMCMCDiag.cpp">
+<area shape="rect" id="node1" title="KS: This script is used to analyse output form DiagMCMC." alt="" coords="3387,5,3583,47"/>
 <area shape="rect" id="node2" href="$MCMCProcessor_8h.html" title=" " alt="" coords="2028,95,2204,121"/>
 <area shape="rect" id="node16" href="$HistogramUtils_8h.html" title=" " alt="" coords="2894,259,3069,285"/>
 <area shape="rect" id="node18" title=" " alt="" coords="1035,333,1191,360"/>
