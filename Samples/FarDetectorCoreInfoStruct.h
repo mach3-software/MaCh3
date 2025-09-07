@@ -16,7 +16,7 @@ struct OscChannelInfo {
   /// PDG of oscillated/final flavour
   int FinalPDG;
 
-  /// In case experiment specific would like to have pointer to channel after using @GetOscChannel, they can set pointer to this
+  /// In case experiment specific would like to have pointer to channel after using `GetOscChannel`, they can set pointer to this
   double ChannelIndex;
 };
 
@@ -119,7 +119,7 @@ struct FarDetectorCoreInfo {
   M3::float_t xsec_w = 1.;
   /// pointer to oscillation weight which is being calculated by Oscillation Handler
   const M3::float_t* osc_w_pointer = &M3::Unity;
-  /// Pointers to @xsec_w, @osc_w_pointer and remaining experiment specific weights
+  /// Pointers to @ref xsec_w, @ref osc_w_pointer and remaining experiment specific weights
   std::vector<const M3::float_t*> total_weight_pointers;
 
   //M3::float_t total_w  = M3::_BAD_INT_;
