@@ -107,7 +107,7 @@ inline TMatrixD MatrixMult(TMatrixD A, TMatrixD B)
 /// @brief KS: Custom function to perform multiplication of matrix and vector with multithreading
 /// @param VecMulti Output Vector, VecMulti = matrix x vector
 /// @param matrix This matrix is used for multiplication VecMulti = matrix x vector
-/// @param VecMulti This vector is used for multiplication VecMulti = matrix x vector
+/// @param vector This vector is used for multiplication VecMulti = matrix x vector
 /// @param n this is size of matrix and vector, we assume matrix is symmetric
 inline void MatrixVectorMulti(double* _restrict_ VecMulti, double** _restrict_ matrix, const double* _restrict_ vector, const int n) {
 // ********************************************
@@ -131,6 +131,7 @@ inline void MatrixVectorMulti(double* _restrict_ VecMulti, double** _restrict_ m
 // ********************************************
 /// @brief KS: Custom function to perform multiplication of matrix and single element which is thread safe
 /// @param matrix This matrix is used for multiplication VecMulti = matrix x vector
+/// @param vector This vector is used for multiplication VecMulti = matrix x vector
 /// @param Length this is size of matrix and vector, we assume matrix is symmetric
 /// @param i Element of matrix that we want to multiply
 inline double MatrixVectorMultiSingle(double** _restrict_ matrix, const double* _restrict_ vector, const int Length, const int i) {
