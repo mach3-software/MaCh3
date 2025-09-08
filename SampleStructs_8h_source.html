@@ -478,10 +478,12 @@ $(function() {
 <div class="ttc" id="astructSampleBinningInfo_html_af20237040c5fe0d4a26b63fc83e55ff9"><div class="ttname"><a href="structSampleBinningInfo.html#af20237040c5fe0d4a26b63fc83e55ff9">SampleBinningInfo::nBins</a></div><div class="ttdeci">size_t nBins</div><div class="ttdoc">Number of total bins.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00180">SampleStructs.h:180</a></div></div>
 <div class="ttc" id="astructSampleBinningInfo_html_afbde5f960f500d0a5defa08775aedef5"><div class="ttname"><a href="structSampleBinningInfo.html#afbde5f960f500d0a5defa08775aedef5">SampleBinningInfo::FindXBin</a></div><div class="ttdeci">int FindXBin(const double XVar, const int NomXBin) const</div><div class="ttdoc">DB Find the relevant bin in the PDF for each event.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00223">SampleStructs.h:223</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
+<!-- Footer for MaCh3 Doxygen documentation -->
 <footer class="mach3-footer" style="text-align: center;">
     <div style="margin-bottom: 15px;">
         <span style="font-weight: bold;">The MaCh3 Collaboration</span>
     </div>
+    <!-- Dropdown to jump between doc versions -->
     <div style="margin-bottom: 10px;">
         <span>Select Software Version: </span>
         <select id="versionSelector" onchange="window.location.href=this.value" style="padding: 5px; border-radius: 4px; border: 1px solid #ccc;">
@@ -497,7 +499,20 @@ $(function() {
             <option value="https://mach3-software.github.io/MaCh3/.Archive/v1.1.0/index.html">v1.1.0</option>
         </select>
     </div>
+    <!-- Footer info about doxygen -->
     <div style="font-size: 0.9em; color: #666; margin-top: 10px;">
-        Documentation generated with <a href="https://www.doxygen.nl/" target="_blank" style="color: #666;">Doxygen</a>
+        Documentation generated with
+        <a href="https://www.doxygen.nl/" target="_blank" style="color: #666;">Doxygen</a>
+        <span id="doxygenVersion"></span>
     </div>
+    <!-- Now grab doxygen version from metadata -->
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const meta = document.querySelector('meta[name="generator"]');
+        if (meta) {
+            const version = meta.getAttribute("content").replace("Doxygen ", "");
+            document.getElementById("doxygenVersion").textContent = " " + version;
+        }
+    });
+    </script>
 </footer>

@@ -458,10 +458,12 @@ $(function() {
 <div class="ttc" id="agroup__ParameterHandlerSetters_html_gad67854b2d6b51ae20e8196cdbdaae6d8"><div class="ttname"><a href="group__ParameterHandlerSetters.html#gad67854b2d6b51ae20e8196cdbdaae6d8">ParameterHandlerBase::SetIndivStepScale</a></div><div class="ttdeci">void SetIndivStepScale(const int ParameterIndex, const double StepScale)</div><div class="ttdoc">DB Function to set fIndivStepScale from a vector (Can be used from execs and inside covariance constr...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00107">ParameterHandlerBase.h:107</a></div></div>
 <div class="ttc" id="agroup__ParameterHandlerSetters_html_gaddbbec083a8f60c49e7aea75a1ce62a1"><div class="ttname"><a href="group__ParameterHandlerSetters.html#gaddbbec083a8f60c49e7aea75a1ce62a1">ParameterHandlerBase::SetTune</a></div><div class="ttdeci">void SetTune(const std::string &amp;TuneName)</div><div class="ttdoc">KS: Set proposed parameter values vector to be base on tune values, for example set proposed values t...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l01322">ParameterHandlerBase.cpp:1322</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
+<!-- Footer for MaCh3 Doxygen documentation -->
 <footer class="mach3-footer" style="text-align: center;">
     <div style="margin-bottom: 15px;">
         <span style="font-weight: bold;">The MaCh3 Collaboration</span>
     </div>
+    <!-- Dropdown to jump between doc versions -->
     <div style="margin-bottom: 10px;">
         <span>Select Software Version: </span>
         <select id="versionSelector" onchange="window.location.href=this.value" style="padding: 5px; border-radius: 4px; border: 1px solid #ccc;">
@@ -477,7 +479,20 @@ $(function() {
             <option value="https://mach3-software.github.io/MaCh3/.Archive/v1.1.0/index.html">v1.1.0</option>
         </select>
     </div>
+    <!-- Footer info about doxygen -->
     <div style="font-size: 0.9em; color: #666; margin-top: 10px;">
-        Documentation generated with <a href="https://www.doxygen.nl/" target="_blank" style="color: #666;">Doxygen</a>
+        Documentation generated with
+        <a href="https://www.doxygen.nl/" target="_blank" style="color: #666;">Doxygen</a>
+        <span id="doxygenVersion"></span>
     </div>
+    <!-- Now grab doxygen version from metadata -->
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const meta = document.querySelector('meta[name="generator"]');
+        if (meta) {
+            const version = meta.getAttribute("content").replace("Doxygen ", "");
+            document.getElementById("doxygenVersion").textContent = " " + version;
+        }
+    });
+    </script>
 </footer>

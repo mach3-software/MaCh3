@@ -142,10 +142,12 @@ $(function() {
 <div class="ttc" id="aclassmanager_html_ad5f9fad9ba7b6e4ff0d65834a478bfc2"><div class="ttname"><a href="classmanager.html#ad5f9fad9ba7b6e4ff0d65834a478bfc2">manager::~manager</a></div><div class="ttdeci">virtual ~manager()</div><div class="ttdoc">Destroys the manager object.</div><div class="ttdef"><b>Definition:</b> <a href="Manager_8cpp_source.html#l00041">Manager.cpp:41</a></div></div>
 <div class="ttc" id="aclassmanager_html_add5993e63225ab419ede0a3ba80c9f7f"><div class="ttname"><a href="classmanager.html#add5993e63225ab419ede0a3ba80c9f7f">manager::GetName</a></div><div class="ttdeci">std::string GetName() const</div><div class="ttdoc">Get class name.</div><div class="ttdef"><b>Definition:</b> <a href="Manager_8h_source.html#l00043">Manager.h:43</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
+<!-- Footer for MaCh3 Doxygen documentation -->
 <footer class="mach3-footer" style="text-align: center;">
     <div style="margin-bottom: 15px;">
         <span style="font-weight: bold;">The MaCh3 Collaboration</span>
     </div>
+    <!-- Dropdown to jump between doc versions -->
     <div style="margin-bottom: 10px;">
         <span>Select Software Version: </span>
         <select id="versionSelector" onchange="window.location.href=this.value" style="padding: 5px; border-radius: 4px; border: 1px solid #ccc;">
@@ -161,7 +163,20 @@ $(function() {
             <option value="https://mach3-software.github.io/MaCh3/.Archive/v1.1.0/index.html">v1.1.0</option>
         </select>
     </div>
+    <!-- Footer info about doxygen -->
     <div style="font-size: 0.9em; color: #666; margin-top: 10px;">
-        Documentation generated with <a href="https://www.doxygen.nl/" target="_blank" style="color: #666;">Doxygen</a>
+        Documentation generated with
+        <a href="https://www.doxygen.nl/" target="_blank" style="color: #666;">Doxygen</a>
+        <span id="doxygenVersion"></span>
     </div>
+    <!-- Now grab doxygen version from metadata -->
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const meta = document.querySelector('meta[name="generator"]');
+        if (meta) {
+            const version = meta.getAttribute("content").replace("Doxygen ", "");
+            document.getElementById("doxygenVersion").textContent = " " + version;
+        }
+    });
+    </script>
 </footer>
