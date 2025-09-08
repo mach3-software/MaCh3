@@ -1146,7 +1146,7 @@ void MCMCProcessor::CacheSteps() {
 
   // Set all the branches to on
   Chain->SetBranchStatus("*", true);
-  
+
   // KS: Set temporary branch address to allow min/max, otherwise ROOT can segfaults
   double tempVal = 0.0;
   std::vector<double> Min_Chain(nDraw);
@@ -1451,6 +1451,58 @@ void MCMCProcessor::DrawCovariance() {
   Posterior->SetRightMargin(RightMargin);
   DrawCorrelationsGroup(hCorr);
   DrawCorrelations1D();
+}
+
+// *********************
+void MCMCProcessor::MakeCovarianceYAML(const std::string& OutputYAMLFile, const std::string& MeansMethod) const {
+// *********************
+  MACH3LOG_INFO("Making covariance matrix YAML file");
+
+  if (ParamNames[kXSecPar].size() != static_cast<size_t>(nDraw)) {
+    MACH3LOG_ERROR("Using Legacy Parameters i.e. not one from Parameter Handler Generic, this will not work");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  std::vector<double> MeanArray(nDraw);
+  std::vector<double> ErrorArray(nDraw);
+  std::vector<std::vector<double>> CorrelationMatrix(nDraw, std::vector<double>(nDraw, 0.0));
+
+  TVectorD* means_vec;
+  TVectorD* errors_vec;
+
+  if (MeansMethod == "Arithmetic") {
+    means_vec = Means;
+    errors_vec = Errors;
+  } else if (MeansMethod == "Gaussian") {
+    means_vec = Means_Gauss;
+    errors_vec = Errors_Gauss;
+  } else if (MeansMethod == "HPD") {
+    means_vec = Means_HPD;
+    errors_vec = Errors_HPD;
+  } else {
+    MACH3LOG_ERROR("Unknown means method: {}, should be either 'Arithmetic', 'Gaussian', or 'HPD'.", MeansMethod);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  //Make vectors of mean, error, and correlations
+  for (int i = 0; i < nDraw; i++)
+  {
+    MeanArray[i]  = (*means_vec)(i);
+    ErrorArray[i] = (*errors_vec)(i);
+    for (int j = 0; j <= i; j++)
+    {
+      CorrelationMatrix[i][j] = (*Correlation)(i,j);
+      if(i != j) CorrelationMatrix[j][i] = (*Correlation)(i,j);
+    }
+  }
+
+  //Make std::string param name vector
+  std::vector<std::string> ParamStrings(ParamNames[kXSecPar].size());
+  for (size_t i = 0; i < ParamNames[kXSecPar].size(); ++i) {
+    ParamStrings[i] = static_cast<std::string>(ParamNames[kXSecPar][i]);
+  }
+
+  YAML::Node XSecFile = CovConfig[kXSecPar];
+  M3::MakeCorrelationMatrix(XSecFile, MeanArray, ErrorArray, CorrelationMatrix, OutputYAMLFile, ParamStrings);
 }
 
 // *********************
