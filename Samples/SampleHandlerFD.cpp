@@ -288,11 +288,10 @@ void SampleHandlerFD::FillMCHist(const int Dimension) {
 }
 #pragma GCC diagnostic pop
 // ************************************************
-/// @function SampleHandlerFD::SetupSampleBinning()
-/// @brief Function to setup the binning of your sample histograms and the underlying
-/// arrays that get handled in fillArray() and fillArray_MP().
-/// The Binning.XBinEdges are filled in the daughter class from the sample config file.
-/// This "passing" can be removed. 
+// Function to setup the binning of your sample histograms and the underlying
+// arrays that get handled in fillArray() and fillArray_MP().
+// The Binning.XBinEdges are filled in the daughter class from the sample config file.
+// This "passing" can be removed.
 void SampleHandlerFD::SetupSampleBinning(){
 // ************************************************
   MACH3LOG_INFO("Setting up Sample Binning");
@@ -391,13 +390,12 @@ void SampleHandlerFD::Reweight() {
 }
 
 //************************************************
-/// @function SampleHandlerFD::fillArray()
-/// Function which does the core reweighting. This assumes that oscillation weights have 
-/// already been calculated and stored in SampleHandlerFD.osc_w[iEvent]. This
-/// function takes advantage of most of the things called in setupSKMC to reduce reweighting time.
-/// It also follows the ND code reweighting pretty closely. This function fills the SampleHandlerFD 
-/// array array which is binned to match the sample binning, such that bin[1][1] is the 
-/// equivalent of SampleDetails._hPDF2D->GetBinContent(2,2) {Noticing the offset}
+// Function which does the core reweighting. This assumes that oscillation weights have
+// already been calculated and stored in SampleHandlerFD.osc_w[iEvent]. This
+// function takes advantage of most of the things called in setupSKMC to reduce reweighting time.
+// It also follows the ND code reweighting pretty closely. This function fills the SampleHandlerFD
+// array array which is binned to match the sample binning, such that bin[1][1] is the
+// equivalent of SampleDetails._hPDF2D->GetBinContent(2,2) {Noticing the offset}
 void SampleHandlerFD::FillArray() {
 //************************************************
   //DB Reset which cuts to apply
@@ -1361,9 +1359,8 @@ M3::float_t SampleHandlerFD::GetEventWeight(const int iEntry) const {
   return totalweight;
 }
 
-/// @func fillSplineBins()
-/// @brief Finds the binned spline that an event should apply to and stored them in a
-/// a vector for easy evaluation in the fillArray() function.
+// Finds the binned spline that an event should apply to and stored them in a
+// a vector for easy evaluation in the fillArray() function.
 void SampleHandlerFD::FillSplineBins() {
   //Now loop over events and get the spline bin for each event
   for (unsigned int j = 0; j < GetNEvents(); ++j) {
