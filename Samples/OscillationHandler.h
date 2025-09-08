@@ -16,7 +16,7 @@ class OscillationHandler
   /// @param EqualBinningPerChannel whether to use same binning per each oscillation channel
   /// @param OscParams_ Pointers to values of oscillation parameters
   /// @param SubChannels Number of oscillation channels
-  /// @warning if @EqualBinningPerChannel is true then argument SubChannels make no difference
+   /// @warning If @p EqualBinningPerChannel is true then argument @p SubChannels makes no difference
   OscillationHandler(const std::string& ConfigFile, bool EqualBinningPerChannel,
                      std::vector<const double*> OscParams_, const int SubChannels);
   /// @brief Destructor
