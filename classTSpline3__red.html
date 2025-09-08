@@ -122,7 +122,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a3e675b3f84a92347498b2cebff39e584"><td class="mdescLeft">&#160;</td><td class="mdescRight">Empty destructor.  <br /></td></tr>
 <tr class="separator:a3e675b3f84a92347498b2cebff39e584"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a39668a1dc14058a1f833e9621ec19caf"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTSpline3__red.html#a39668a1dc14058a1f833e9621ec19caf">FindX</a> (double x)</td></tr>
-<tr class="memdesc:a39668a1dc14058a1f833e9621ec19caf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find the segment relevant to this variation in x See root/hist/hist/src/TSpline3<a class="el" href="classTSpline3__red.html#a39668a1dc14058a1f833e9621ec19caf" title="Find the segment relevant to this variation in x See root/hist/hist/src/TSpline3FindX(double) or samp...">FindX(double)</a> or samplePDFND....::FindSplineSegment.  <br /></td></tr>
+<tr class="memdesc:a39668a1dc14058a1f833e9621ec19caf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find the segment relevant to this variation in x.  <br /></td></tr>
 <tr class="separator:a39668a1dc14058a1f833e9621ec19caf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a12bb3549bacb76c7d04ee303c4abe389"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTSpline3__red.html#a12bb3549bacb76c7d04ee303c4abe389">Eval</a> (double var) override</td></tr>
 <tr class="memdesc:a12bb3549bacb76c7d04ee303c4abe389"><td class="mdescLeft">&#160;</td><td class="mdescRight">CW: Evaluate the weight from a variation.  <br /></td></tr>
@@ -475,7 +475,7 @@ Protected Attributes</h2></td></tr>
 <div class="line"><span class="lineno">  644</span>    <span class="keywordtype">double</span> weight = y+dx*(b+dx*(c+d*dx));</div>
 <div class="line"><span class="lineno">  645</span>    <span class="keywordflow">return</span> weight;</div>
 <div class="line"><span class="lineno">  646</span>  }</div>
-<div class="ttc" id="aclassTSpline3__red_html_a39668a1dc14058a1f833e9621ec19caf"><div class="ttname"><a href="classTSpline3__red.html#a39668a1dc14058a1f833e9621ec19caf">TSpline3_red::FindX</a></div><div class="ttdeci">int FindX(double x)</div><div class="ttdoc">Find the segment relevant to this variation in x See root/hist/hist/src/TSpline3FindX(double) or samp...</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00602">SplineStructs.h:602</a></div></div>
+<div class="ttc" id="aclassTSpline3__red_html_a39668a1dc14058a1f833e9621ec19caf"><div class="ttname"><a href="classTSpline3__red.html#a39668a1dc14058a1f833e9621ec19caf">TSpline3_red::FindX</a></div><div class="ttdeci">int FindX(double x)</div><div class="ttdoc">Find the segment relevant to this variation in x.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00602">SplineStructs.h:602</a></div></div>
 <div class="ttc" id="aclassTSpline3__red_html_a74d108b99a9060ab85c22343fa4a4532"><div class="ttname"><a href="classTSpline3__red.html#a74d108b99a9060ab85c22343fa4a4532">TSpline3_red::GetCoeff</a></div><div class="ttdeci">void GetCoeff(int segment, M3::float_t &amp;x, M3::float_t &amp;y, M3::float_t &amp;b, M3::float_t &amp;c, M3::float_t &amp;d)</div><div class="ttdoc">CW: Get the coefficient of a given segment.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00657">SplineStructs.h:657</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -504,7 +504,8 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Find the segment relevant to this variation in x See root/hist/hist/src/TSpline3<a class="el" href="classTSpline3__red.html#a39668a1dc14058a1f833e9621ec19caf" title="Find the segment relevant to this variation in x See root/hist/hist/src/TSpline3FindX(double) or samp...">FindX(double)</a> or samplePDFND....::FindSplineSegment. </p>
+<p>Find the segment relevant to this variation in x. </p>
+<dl class="section note"><dt>Note</dt><dd>See <code>root/hist/hist/src/TSpline3<a class="el" href="classTSpline3__red.html#a39668a1dc14058a1f833e9621ec19caf" title="Find the segment relevant to this variation in x.">FindX(double)</a></code> or <code>FindSplineSegment</code> </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00602">602</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  602</span>                             {</div>

@@ -160,13 +160,13 @@ template&lt;typename CovType &gt; </div>
 <p>MaCh3 Factory initiates one of implemented fitting algorithms. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">fitMan</td><td>pointer to Manager class</td></tr>
+    <tr><td class="paramname">FitManager</td><td>pointer to Manager class</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>Example YAML configuration: <div class="fragment"><div class="line">    General:</div>
 <div class="line">      FittingAlgorithm: [<span class="stringliteral">&quot;MCMC&quot;</span>]</div>
-<div class="line">std::unique_ptr&lt;FitterBase&gt; <a class="code hl_function" href="MaCh3Factory_8cpp.html#a126d15eeabecd1e4ab67422784a9f84a">MaCh3FitterFactory</a>(<a class="code hl_class" href="classmanager.html">manager</a> *fitMan);</div>
+<div class="line">std::unique_ptr&lt;FitterBase&gt; <a class="code hl_function" href="MaCh3Factory_8cpp.html#a126d15eeabecd1e4ab67422784a9f84a">MaCh3FitterFactory</a>(<a class="code hl_class" href="classmanager.html">manager</a> *FitManager);</div>
 <div class="line"> </div>
 <div class="line">    @brief Initializes the <a class="code hl_variable" href="ProcessMCMC_8cpp.html#a13056efd080ab16304b6f7be0ebf0a61">config</a> <a class="code hl_class" href="classmanager.html">manager</a> <span class="keyword">class </span>and allows overriding settings via command-line arguments.</div>
 <div class="line">    @param argc number of arguments</div>

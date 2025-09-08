@@ -731,6 +731,7 @@ Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">hist</td><td>histograms based on which we calculate credible interval </td></tr>
+    <tr><td class="paramname">hpost_copy</td><td>To make code thread safe we use copy of histograms which user has to pass </td></tr>
     <tr><td class="paramname">coverage</td><td>What is defined coverage, by default 0.6827 (1 sigma) </td></tr>
   </table>
   </dd>
@@ -831,6 +832,7 @@ Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">hist</td><td>histograms based on which we calculate credible interval </td></tr>
+    <tr><td class="paramname">hpost_copy</td><td>To make code thread safe we use copy of histograms which user has to pass </td></tr>
     <tr><td class="paramname">CredibleInSigmas</td><td>Whether interval is in sigmas or percentage </td></tr>
     <tr><td class="paramname">coverage</td><td>What is defined coverage, by default 0.6827 (1 sigma) </td></tr>
   </table>
@@ -1284,7 +1286,7 @@ Functions</h2></td></tr>
 <p>Interquartile Range (IQR) </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">hist</td><td>histograms from which we IQR </td></tr>
+    <tr><td class="paramname">Hist</td><td>histograms from which we IQR </td></tr>
   </table>
   </dd>
 </dl>
@@ -1616,6 +1618,7 @@ Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">EigenValues</td><td>Eigen values of covariance matrix </td></tr>
+    <tr><td class="paramname">TotalTarameters</td><td>Total number of parameters needed to correctly calculate suboptimality </td></tr>
   </table>
   </dd>
 </dl>
