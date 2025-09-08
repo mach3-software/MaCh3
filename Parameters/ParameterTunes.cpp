@@ -63,7 +63,7 @@ ParameterTunes::~ParameterTunes() {
 }
 
 // ********************************************
-std::vector<double> ParameterTunes::ParameterTunes::GetTune(const int TuneNumber) const {
+std::vector<double> ParameterTunes::GetTune(const int TuneNumber) const {
 // ********************************************
   if (TuneNumber >= static_cast<int>(TuneValues.size())) {
     MACH3LOG_ERROR("I only have {} tune(s), but you asked for index {}", TuneValues.size(), TuneNumber);
@@ -74,7 +74,7 @@ std::vector<double> ParameterTunes::ParameterTunes::GetTune(const int TuneNumber
 }
 
 // ********************************************
-std::vector<double> ParameterTunes::ParameterTunes::GetTune(const std::string& TuneName) const {
+std::vector<double> ParameterTunes::GetTune(const std::string& TuneName) const {
 // ********************************************
   auto it = TuneMap.find(TuneName);
   if (it == TuneMap.end()) {
@@ -86,7 +86,7 @@ std::vector<double> ParameterTunes::ParameterTunes::GetTune(const std::string& T
 }
 
 // ********************************************
-void ParameterTunes::ParameterTunes::PrintTunes() const {
+void ParameterTunes::PrintTunes() const {
 // ********************************************
   MACH3LOG_INFO("Available tunes:");
   for (size_t i = 0; i < TuneNames.size(); ++i) {
