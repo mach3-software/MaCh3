@@ -1,6 +1,6 @@
 <map id="DelayedMR2T2" name="DelayedMR2T2">
 <area shape="rect" id="node1" title="Implementation of delayed rejection for MR2T2." alt="" coords="1392,71,1513,97"/>
-<area shape="rect" id="node2" href="$classMR2T2.html" title="MCMC algorithm using MR2T2." alt="" coords="1103,71,1170,97"/>
+<area shape="rect" id="node2" href="$classMR2T2.html" title="MCMC algorithm implementing the **Metropolis–Rosenbluth–Rosenbluth–Teller–Teller (MR T2)** method." alt="" coords="1103,71,1170,97"/>
 <area shape="rect" id="node3" href="$classMCMCBase.html" title="Base class for MCMC fitting algorithms." alt="" coords="897,89,993,114"/>
 <area shape="rect" id="node4" href="$classFitterBase.html" title="Base class for implementing fitting algorithms." alt="" coords="752,147,840,173"/>
 <area shape="rect" id="node5" href="$classmanager.html" title="The manager class is responsible for managing configurations and settings." alt="" coords="467,91,547,117"/>

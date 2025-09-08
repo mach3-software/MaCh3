@@ -1,5 +1,5 @@
 <map id="MR2T2" name="MR2T2">
-<area shape="rect" id="node1" title="MCMC algorithm using MR2T2." alt="" coords="1035,155,1101,181"/>
+<area shape="rect" id="node1" title="MCMC algorithm implementing the **Metropolis–Rosenbluth–Rosenbluth–Teller–Teller (MR T2)** method." alt="" coords="1035,155,1101,181"/>
 <area shape="rect" id="node2" href="$classMCMCBase.html" title="Base class for MCMC fitting algorithms." alt="" coords="889,155,985,181"/>
 <area shape="rect" id="node3" href="$classFitterBase.html" title="Base class for implementing fitting algorithms." alt="" coords="752,155,840,181"/>
 <area shape="rect" id="node4" href="$classmanager.html" title="The manager class is responsible for managing configurations and settings." alt="" coords="467,13,547,38"/>

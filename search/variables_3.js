@@ -34,7 +34,6 @@ var searchData=
   ['cpu_5fweights_5fspline_5fvar_31',['cpu_weights_spline_var',['../classSMonolith.html#a870bb2bce61e17162b9425f82cf2a099',1,'SMonolith']]],
   ['cpu_5fweights_5ftf1_5fvar_32',['cpu_weights_tf1_var',['../classSMonolith.html#a4a1d45d273cc40cb4f684400812dcb60',1,'SMonolith']]],
   ['curr_5fvalue_33',['curr_value',['../classparticle.html#a3fa66bc070aa43b66389b8e0b9754f32',1,'particle']]],
-  ['current_5fstep_34',['current_step',['../classMCMCBase.html#ac9aee069282a16a647be64a579ccef74',1,'MCMCBase']]],
-  ['current_5fstep_5fvals_35',['current_step_vals',['../classDelayedMR2T2.html#af8590de3ef5df7a7bfb9483f78c2efe5',1,'DelayedMR2T2']]],
-  ['currsegment_36',['CurrSegment',['../structFastSplineInfo.html#a80e4c1195099d2c34a1a511e4f749fe4',1,'FastSplineInfo']]]
+  ['current_5fstep_5fvals_34',['current_step_vals',['../classDelayedMR2T2.html#af8590de3ef5df7a7bfb9483f78c2efe5',1,'DelayedMR2T2']]],
+  ['currsegment_35',['CurrSegment',['../structFastSplineInfo.html#a80e4c1195099d2c34a1a511e4f749fe4',1,'FastSplineInfo']]]
 ];

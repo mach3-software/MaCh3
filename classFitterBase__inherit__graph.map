@@ -7,6 +7,6 @@
 <area shape="rect" id="node3" href="$classMinuitFit.html" title="Implementation of Minuit fitting algorithm ." alt="" coords="5,152,84,177"/>
 <area shape="rect" id="node4" href="$classPSO.html" title="Class PSO, consist of a vector of object Class Particle and global best Takes in the size (number of ..." alt="" coords="109,152,157,177"/>
 <area shape="rect" id="node5" href="$classPyLikelihoodFit.html" title="EW: As LikelihoodFit is an abstract base class we have to do some gymnastics to get it to get it into..." alt="" coords="181,152,301,177"/>
-<area shape="rect" id="node7" href="$classMR2T2.html" title="MCMC algorithm using MR2T2." alt="" coords="325,152,391,177"/>
+<area shape="rect" id="node7" href="$classMR2T2.html" title="MCMC algorithm implementing the **Metropolis–Rosenbluth–Rosenbluth–Teller–Teller (MR T2)** method." alt="" coords="325,152,391,177"/>
 <area shape="rect" id="node8" href="$classDelayedMR2T2.html" title="Implementation of delayed rejection for MR2T2." alt="" coords="297,225,419,251"/>
 </map>

@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classMR2T2.html" target="_top" xlink:title="MCMC algorithm using MR2T2.">
+<g id="a_node2"><a xlink:href="classMR2T2.html" target="_top" xlink:title="MCMC algorithm implementing the **Metropolis–Rosenbluth–Rosenbluth–Teller–Teller (MR T2)** method.">
 <polygon fill="white" stroke="#666666" points="873.5,-206 823.5,-206 823.5,-187 873.5,-187 873.5,-206"/>
 <text text-anchor="middle" x="848.5" y="-194" font-family="Helvetica,sans-Serif" font-size="10.00">MR2T2</text>
 </a>
