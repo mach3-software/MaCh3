@@ -27,6 +27,7 @@
 /Parameters/PCAHandler* @kskwarczynski
 
 /Fitters/* @kskwarczynski
+/Fitters/DelayedMR2T2* @henry-wallace-phys
 
 /Samples/SampleHandlerFD* @edatkin @dbarrow257
 /Samples/OscillationHandler* @dbarrow257

@@ -2,12 +2,14 @@
 
 // MaCh3 includes
 #include "Fitters/FitterBase.h"
-#include "Fitters/mcmc.h"
+#include "Fitters/MR2T2.h"
+#include "Fitters/DelayedMR2T2.h"
 #include "Fitters/PSO.h"
 #include "Fitters/LikelihoodFit.h"
 #ifdef MaCh3_MINUIT2
 #include "Fitters/MinuitFit.h"
 #endif
+
 
 #include "Parameters/ParameterHandlerGeneric.h"
 
@@ -16,13 +18,13 @@
 /// @author Kamil Skwarczynski
 
 /// @brief MaCh3 Factory initiates one of implemented fitting algorithms
-/// @param fitMan pointer to Manager class
+/// @param FitManager pointer to Manager class
 ///
 /// @note Example YAML configuration:
 /// @code
 /// General:
 ///   FittingAlgorithm: ["MCMC"]
-std::unique_ptr<FitterBase> MaCh3FitterFactory(manager *fitMan);
+std::unique_ptr<FitterBase> MaCh3FitterFactory(manager *FitManager);
 
 /// @brief Initializes the config manager class and allows overriding settings via command-line arguments.
 /// @param argc number of arguments

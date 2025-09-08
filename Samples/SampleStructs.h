@@ -245,6 +245,39 @@ struct SampleBinningInfo {
       return static_cast<int>(std::distance(XBinEdges.begin(), std::upper_bound(XBinEdges.begin(), XBinEdges.end(), XVar)) - 1);
     }
   }
+  /// @brief Initialise special lookup arrays allowing to more efficiently perform bin-migration
+  ///        These arrays store the lower and upper edges of each bin and their neighboring bins.
+  /// @todo expand to use y-axis
+  void InitialiseBinMigrationLookUp() {
+    rw_lower_xbinedge.resize(nXBins);
+    rw_lower_lower_xbinedge.resize(nXBins);
+    rw_upper_xbinedge.resize(nXBins);
+    rw_upper_upper_xbinedge.resize(nXBins);
+    //Set rw_pdf_bin and rw_upper_xbinedge and rw_lower_xbinedge for each skmc_base
+    for(size_t bin_x = 0; bin_x < nXBins; bin_x++){
+      double low_lower_edge = M3::_DEFAULT_RETURN_VAL_;
+      double low_edge = XBinEdges[bin_x];
+      double upper_edge = XBinEdges[bin_x+1];
+      double upper_upper_edge = M3::_DEFAULT_RETURN_VAL_;
+
+      if (bin_x == 0) {
+        low_lower_edge = XBinEdges[0];
+      } else {
+        low_lower_edge = XBinEdges[bin_x-1];
+      }
+
+      if (bin_x + 2 < nXBins) {
+        upper_upper_edge = XBinEdges[bin_x + 2];
+      } else if (bin_x + 1 < nXBins) {
+        upper_upper_edge = XBinEdges[bin_x + 1];
+      }
+
+      rw_lower_xbinedge[bin_x] = low_edge;
+      rw_upper_xbinedge[bin_x] = upper_edge;
+      rw_lower_lower_xbinedge[bin_x] = low_lower_edge;
+      rw_upper_upper_xbinedge[bin_x] = upper_upper_edge;
+    }
+  }
 };
 
 /// @brief Get the sample index corresponding to a global bin number.

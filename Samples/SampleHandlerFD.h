@@ -199,7 +199,10 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// @param XVec vector containing the binning in axis 1 (the x-axis)
   /// @param YVec vector containing the binning in axis 2 (the y-axis)
   void Set2DBinning(std::vector<double> &XVec, std::vector<double> &YVec) {Set2DBinning(XVec.size()-1, XVec.data(), YVec.size()-1, YVec.data());};
-  /// @brief wrapper to call set binning functions based on sample config info
+  /// @brief Function to setup the binning of your sample histograms and the underlying
+  /// arrays that get handled in fillArray() and fillArray_MP().
+  /// The Binning.XBinEdges are filled in the daughter class from the sample config file.
+  /// This "passing" can be removed.
   void SetupSampleBinning();
   /// @brief Initialise data, MC and W2 histograms
   void SetupReweightArrays(const size_t numberXBins, const size_t numberYBins);
@@ -285,7 +288,12 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// @brief fills the SampleHandlerFD_array vector with the weight calculated from reweighting but multithreaded
   void FillArray_MP();
 #endif
-  /// @brief fills the SampleHandlerFD_array vector with the weight calculated from reweighting
+  /// @brief Function which does the core reweighting. This assumes that oscillation weights have
+  /// already been calculated and stored in SampleHandlerFD.osc_w[iEvent]. This
+  /// function takes advantage of most of the things called in setupSKMC to reduce reweighting time.
+  /// It also follows the ND code reweighting pretty closely. This function fills the SampleHandlerFD
+  /// array array which is binned to match the sample binning, such that bin[1][1] is the
+  /// equivalent of SampleDetails._hPDF2D->GetBinContent(2,2) {Noticing the offset}
   void FillArray();
 
   /// @brief Helper function to reset histograms
