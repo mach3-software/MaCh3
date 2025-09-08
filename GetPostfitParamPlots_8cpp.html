@@ -153,7 +153,11 @@ Functions</h2></td></tr>
 <tr class="memitem:a8c6b82cdd0cece21648bf5b8bc1f25fd"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; TGraphAsymmErrors &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="GetPostfitParamPlots_8cpp.html#a8c6b82cdd0cece21648bf5b8bc1f25fd">MakeTGraphAsymmErrors</a> (const std::shared_ptr&lt; TFile &gt; &amp;File, std::vector&lt; int &gt; Index={})</td></tr>
 <tr class="separator:a8c6b82cdd0cece21648bf5b8bc1f25fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8681598ff6721b09a9d1f03c4efe114d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="GetPostfitParamPlots_8cpp.html#a8681598ff6721b09a9d1f03c4efe114d">GetViolinPlots</a> (std::string FileName1=&quot;&quot;, std::string FileName2=&quot;&quot;)</td></tr>
+<tr class="memdesc:a8681598ff6721b09a9d1f03c4efe114d"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Make fancy violin plots.  <br /></td></tr>
 <tr class="separator:a8681598ff6721b09a9d1f03c4efe114d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a797916c99123381b3b61e55e7398f695"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="GetPostfitParamPlots_8cpp.html#a797916c99123381b3b61e55e7398f695">Get2DComparison</a> (const std::string &amp;FileName1, const std::string &amp;FileName2)</td></tr>
+<tr class="memdesc:a797916c99123381b3b61e55e7398f695"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Make comparison of 2D Posteriors.  <br /></td></tr>
+<tr class="separator:a797916c99123381b3b61e55e7398f695"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0ddf1224851353fc92bfbff6f499fa97"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="GetPostfitParamPlots_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a> (int argc, char *argv[])</td></tr>
 <tr class="separator:a0ddf1224851353fc92bfbff6f499fa97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -493,6 +497,139 @@ Ewan Miller </dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
+<a id="a797916c99123381b3b61e55e7398f695" name="a797916c99123381b3b61e55e7398f695"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a797916c99123381b3b61e55e7398f695">&#9670;&#160;</a></span>Get2DComparison()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Get2DComparison </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>FileName1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>FileName2</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>KS: Make comparison of 2D Posteriors. </p>
+
+<p class="definition">Definition at line <a class="el" href="GetPostfitParamPlots_8cpp_source.html#l01033">1033</a> of file <a class="el" href="GetPostfitParamPlots_8cpp_source.html">GetPostfitParamPlots.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 1034</span>{</div>
+<div class="line"><span class="lineno"> 1035</span>  <span class="keyword">auto</span> canvas = std::make_unique&lt;TCanvas&gt;(<span class="stringliteral">&quot;canvas&quot;</span>, <span class="stringliteral">&quot;canvas&quot;</span>, 0, 0, 1024, 1024);</div>
+<div class="line"><span class="lineno"> 1036</span>  canvas-&gt;SetBottomMargin(0.1f);</div>
+<div class="line"><span class="lineno"> 1037</span>  canvas-&gt;SetTopMargin(0.05f);</div>
+<div class="line"><span class="lineno"> 1038</span>  canvas-&gt;SetRightMargin(0.03f);</div>
+<div class="line"><span class="lineno"> 1039</span>  canvas-&gt;SetLeftMargin(0.15f);</div>
+<div class="line"><span class="lineno"> 1040</span> </div>
+<div class="line"><span class="lineno"> 1041</span>  <span class="comment">// Open the two ROOT files</span></div>
+<div class="line"><span class="lineno"> 1042</span>  TFile* File1 = <a class="code hl_function" href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a>(FileName1, <span class="stringliteral">&quot;READ&quot;</span>, __FILE__, __LINE__);</div>
+<div class="line"><span class="lineno"> 1043</span>  TFile* File2 = <a class="code hl_function" href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a>(FileName2, <span class="stringliteral">&quot;READ&quot;</span>, __FILE__, __LINE__);</div>
+<div class="line"><span class="lineno"> 1044</span> </div>
+<div class="line"><span class="lineno"> 1045</span>  <span class="comment">// Get the Post_2d_hists directory from both files</span></div>
+<div class="line"><span class="lineno"> 1046</span>  TDirectory* Dir1 = File1-&gt;Get&lt;TDirectory&gt;(<span class="stringliteral">&quot;Post_2d_hists&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1047</span>  TDirectory* Dir2 = File2-&gt;Get&lt;TDirectory&gt;(<span class="stringliteral">&quot;Post_2d_hists&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1048</span> </div>
+<div class="line"><span class="lineno"> 1049</span>  <span class="keywordflow">if</span> (!Dir1 || !Dir2) {</div>
+<div class="line"><span class="lineno"> 1050</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Post_2d_hists directory not found in one or both files while running {}.&quot;</span>, __func__);</div>
+<div class="line"><span class="lineno"> 1051</span>    File1-&gt;Close();</div>
+<div class="line"><span class="lineno"> 1052</span>    <span class="keyword">delete</span> File1;</div>
+<div class="line"><span class="lineno"> 1053</span>    File2-&gt;Close();</div>
+<div class="line"><span class="lineno"> 1054</span>    <span class="keyword">delete</span> File2;</div>
+<div class="line"><span class="lineno"> 1055</span>    <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno"> 1056</span>  }</div>
+<div class="line"><span class="lineno"> 1057</span> </div>
+<div class="line"><span class="lineno"> 1058</span>  <span class="comment">// Get the list of keys in the first directory</span></div>
+<div class="line"><span class="lineno"> 1059</span>  TIter next1(Dir1-&gt;GetListOfKeys());</div>
+<div class="line"><span class="lineno"> 1060</span>  TKey* key1 = <span class="keyword">nullptr</span>;</div>
+<div class="line"><span class="lineno"> 1061</span> </div>
+<div class="line"><span class="lineno"> 1062</span>  <span class="comment">// Prepare the output PDF filename</span></div>
+<div class="line"><span class="lineno"> 1063</span>  std::string SaveName2D = <span class="stringliteral">&quot;2DComparison_&quot;</span> + FileName1 + <span class="stringliteral">&quot;_&quot;</span> + FileName2;</div>
+<div class="line"><span class="lineno"> 1064</span>  SaveName2D = SaveName2D.substr(0, SaveName2D.find(<span class="stringliteral">&quot;.root&quot;</span>));</div>
+<div class="line"><span class="lineno"> 1065</span>  SaveName2D = SaveName2D + <span class="stringliteral">&quot;.pdf&quot;</span>;</div>
+<div class="line"><span class="lineno"> 1066</span> </div>
+<div class="line"><span class="lineno"> 1067</span>  canvas-&gt;Print((SaveName2D+<span class="stringliteral">&quot;[&quot;</span>).c_str());</div>
+<div class="line"><span class="lineno"> 1068</span>  <span class="comment">// Loop over keys in the first directory</span></div>
+<div class="line"><span class="lineno"> 1069</span>  <span class="keywordflow">while</span> ((key1 = <span class="keyword">static_cast&lt;</span>TKey*<span class="keyword">&gt;</span>(next1()))) {</div>
+<div class="line"><span class="lineno"> 1070</span>    TString histName = key1-&gt;GetName();</div>
+<div class="line"><span class="lineno"> 1071</span> </div>
+<div class="line"><span class="lineno"> 1072</span>    <span class="comment">// Check if the key is a TH2D</span></div>
+<div class="line"><span class="lineno"> 1073</span>    <span class="keywordflow">if</span> (TString(key1-&gt;GetClassName()) == <span class="stringliteral">&quot;TH2D&quot;</span>) {</div>
+<div class="line"><span class="lineno"> 1074</span>      TH2D* hist1 = <span class="keyword">static_cast&lt;</span>TH2D*<span class="keyword">&gt;</span>(key1-&gt;ReadObj());</div>
+<div class="line"><span class="lineno"> 1075</span> </div>
+<div class="line"><span class="lineno"> 1076</span>      <span class="comment">// Try to get the histogram with the same name from the second directory</span></div>
+<div class="line"><span class="lineno"> 1077</span>      TH2D* hist2 = <span class="keyword">static_cast&lt;</span>TH2D*<span class="keyword">&gt;</span>(Dir2-&gt;Get(histName));</div>
+<div class="line"><span class="lineno"> 1078</span> </div>
+<div class="line"><span class="lineno"> 1079</span>      <span class="keywordflow">if</span> (hist2) {</div>
+<div class="line"><span class="lineno"> 1080</span>        hist1-&gt;SetTitle(<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1081</span>        hist1-&gt;SetTitle(<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1082</span> </div>
+<div class="line"><span class="lineno"> 1083</span>        <span class="comment">// Prettify axis titles</span></div>
+<div class="line"><span class="lineno"> 1084</span>        std::string Xtitle = <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a47be42e0b0a566e932d420ec75dfc59a">style</a>().<a class="code hl_function" href="classMaCh3Plotting_1_1StyleManager.html#a0677ca5b68a2ecb684189524fb533019">prettifyParamName</a>(hist1-&gt;GetXaxis()-&gt;GetTitle());</div>
+<div class="line"><span class="lineno"> 1085</span>        std::string Ytitle = <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a47be42e0b0a566e932d420ec75dfc59a">style</a>().<a class="code hl_function" href="classMaCh3Plotting_1_1StyleManager.html#a0677ca5b68a2ecb684189524fb533019">prettifyParamName</a>(hist1-&gt;GetYaxis()-&gt;GetTitle());</div>
+<div class="line"><span class="lineno"> 1086</span> </div>
+<div class="line"><span class="lineno"> 1087</span>        <span class="comment">// Adjust the axis ranges of hist1 to include both histograms</span></div>
+<div class="line"><span class="lineno"> 1088</span>        <span class="keywordtype">double</span> xmin = std::min(hist1-&gt;GetXaxis()-&gt;GetXmin(), hist2-&gt;GetXaxis()-&gt;GetXmin());</div>
+<div class="line"><span class="lineno"> 1089</span>        <span class="keywordtype">double</span> xmax = std::max(hist1-&gt;GetXaxis()-&gt;GetXmax(), hist2-&gt;GetXaxis()-&gt;GetXmax());</div>
+<div class="line"><span class="lineno"> 1090</span>        <span class="keywordtype">double</span> ymin = std::min(hist1-&gt;GetYaxis()-&gt;GetXmin(), hist2-&gt;GetYaxis()-&gt;GetXmin());</div>
+<div class="line"><span class="lineno"> 1091</span>        <span class="keywordtype">double</span> ymax = std::max(hist1-&gt;GetYaxis()-&gt;GetXmax(), hist2-&gt;GetYaxis()-&gt;GetXmax());</div>
+<div class="line"><span class="lineno"> 1092</span> </div>
+<div class="line"><span class="lineno"> 1093</span>        hist1-&gt;GetXaxis()-&gt;SetRangeUser(xmin, xmax);</div>
+<div class="line"><span class="lineno"> 1094</span>        hist1-&gt;GetYaxis()-&gt;SetRangeUser(ymin, ymax);</div>
+<div class="line"><span class="lineno"> 1095</span> </div>
+<div class="line"><span class="lineno"> 1096</span>        hist1-&gt;GetXaxis()-&gt;SetTitle(Xtitle.c_str());</div>
+<div class="line"><span class="lineno"> 1097</span>        hist1-&gt;GetYaxis()-&gt;SetTitle(Ytitle.c_str());</div>
+<div class="line"><span class="lineno"> 1098</span> </div>
+<div class="line"><span class="lineno"> 1099</span>        hist1-&gt;SetLineColor(kBlue);</div>
+<div class="line"><span class="lineno"> 1100</span>        hist1-&gt;SetLineStyle(kSolid);</div>
+<div class="line"><span class="lineno"> 1101</span>        hist1-&gt;SetLineWidth(2);</div>
+<div class="line"><span class="lineno"> 1102</span> </div>
+<div class="line"><span class="lineno"> 1103</span>        hist2-&gt;SetLineColor(kRed);</div>
+<div class="line"><span class="lineno"> 1104</span>        hist2-&gt;SetLineStyle(kDashed);</div>
+<div class="line"><span class="lineno"> 1105</span>        hist2-&gt;SetLineWidth(2);</div>
+<div class="line"><span class="lineno"> 1106</span> </div>
+<div class="line"><span class="lineno"> 1107</span>        hist1-&gt;Draw(<span class="stringliteral">&quot;CONT3&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1108</span>        hist2-&gt;Draw(<span class="stringliteral">&quot;CONT3 SAME&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1109</span> </div>
+<div class="line"><span class="lineno"> 1110</span>        <span class="keyword">auto</span> Legend = std::make_unique&lt;TLegend&gt;(0.20, 0.7, 0.4, 0.92);</div>
+<div class="line"><span class="lineno"> 1111</span>        Legend-&gt;AddEntry(hist1, <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a4a964e2ca4a9e29e106ea890c0ce1dbb">getFileLabel</a>(0).c_str(), <span class="stringliteral">&quot;l&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1112</span>        Legend-&gt;AddEntry(hist2, <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a4a964e2ca4a9e29e106ea890c0ce1dbb">getFileLabel</a>(1).c_str(), <span class="stringliteral">&quot;l&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1113</span>        Legend-&gt;SetTextSize(0.03);</div>
+<div class="line"><span class="lineno"> 1114</span>        Legend-&gt;SetLineColor(0);</div>
+<div class="line"><span class="lineno"> 1115</span>        Legend-&gt;SetLineStyle(0);</div>
+<div class="line"><span class="lineno"> 1116</span>        Legend-&gt;SetFillColor(0);</div>
+<div class="line"><span class="lineno"> 1117</span>        Legend-&gt;SetFillStyle(0);</div>
+<div class="line"><span class="lineno"> 1118</span>        Legend-&gt;SetBorderSize(0);</div>
+<div class="line"><span class="lineno"> 1119</span>        Legend-&gt;Draw(<span class="stringliteral">&quot;SAME&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1120</span>        canvas-&gt;Print((SaveName2D).c_str());</div>
+<div class="line"><span class="lineno"> 1121</span>      }</div>
+<div class="line"><span class="lineno"> 1122</span>    }</div>
+<div class="line"><span class="lineno"> 1123</span>  }</div>
+<div class="line"><span class="lineno"> 1124</span>  canvas-&gt;Print((SaveName2D+<span class="stringliteral">&quot;]&quot;</span>).c_str());</div>
+<div class="line"><span class="lineno"> 1125</span> </div>
+<div class="line"><span class="lineno"> 1126</span>  File1-&gt;Close();</div>
+<div class="line"><span class="lineno"> 1127</span>  <span class="keyword">delete</span> File1;</div>
+<div class="line"><span class="lineno"> 1128</span>  File2-&gt;Close();</div>
+<div class="line"><span class="lineno"> 1129</span>  <span class="keyword">delete</span> File2;</div>
+<div class="line"><span class="lineno"> 1130</span>}</div>
+<div class="ttc" id="aclassMaCh3Plotting_1_1PlottingManager_html_a47be42e0b0a566e932d420ec75dfc59a"><div class="ttname"><a href="classMaCh3Plotting_1_1PlottingManager.html#a47be42e0b0a566e932d420ec75dfc59a">MaCh3Plotting::PlottingManager::style</a></div><div class="ttdeci">const StyleManager &amp; style() const</div><div class="ttdoc">Get the StyleManager contained within this PlottingManager, for doing style related things.</div><div class="ttdef"><b>Definition:</b> <a href="plottingManager_8h_source.html#l00158">plottingManager.h:158</a></div></div>
+<div class="ttc" id="aclassMaCh3Plotting_1_1PlottingManager_html_a4a964e2ca4a9e29e106ea890c0ce1dbb"><div class="ttname"><a href="classMaCh3Plotting_1_1PlottingManager.html#a4a964e2ca4a9e29e106ea890c0ce1dbb">MaCh3Plotting::PlottingManager::getFileLabel</a></div><div class="ttdeci">const std::string getFileLabel(int i) const</div><div class="ttdef"><b>Definition:</b> <a href="plottingManager_8h_source.html#l00126">plottingManager.h:126</a></div></div>
+<div class="ttc" id="aclassMaCh3Plotting_1_1StyleManager_html_a0677ca5b68a2ecb684189524fb533019"><div class="ttname"><a href="classMaCh3Plotting_1_1StyleManager.html#a0677ca5b68a2ecb684189524fb533019">MaCh3Plotting::StyleManager::prettifyParamName</a></div><div class="ttdeci">std::string prettifyParamName(const std::string &amp;origName) const</div><div class="ttdoc">Convert hideous and vulgar internal parameter name into a beautiful presentable name.</div><div class="ttdef"><b>Definition:</b> <a href="styleManager_8h_source.html#l00039">styleManager.h:39</a></div></div>
+<div class="ttc" id="anamespaceM3_html_a87841bdbf0e0a2a733d9e4ca499f820d"><div class="ttname"><a href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a></div><div class="ttdeci">TFile * Open(const std::string &amp;Name, const std::string &amp;Type, const std::string &amp;File, const int Line)</div><div class="ttdoc">Opens a ROOT file with the given name and mode.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00610">HistogramUtils.cpp:610</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
 <a id="ad53f55565623ac6efd066209b1821ea6" name="ad53f55565623ac6efd066209b1821ea6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad53f55565623ac6efd066209b1821ea6">&#9670;&#160;</a></span>GetPostfitParamPlots()</h2>
 
@@ -598,8 +735,6 @@ Ewan Miller </dd></dl>
 <div class="ttc" id="aGetPostfitParamPlots_8cpp_html_afe35956eaa3ea0ca15aa76c791342ee7"><div class="ttname"><a href="GetPostfitParamPlots_8cpp.html#afe35956eaa3ea0ca15aa76c791342ee7">MakeFDDetPlots</a></div><div class="ttdeci">void MakeFDDetPlots()</div><div class="ttdef"><b>Definition:</b> <a href="GetPostfitParamPlots_8cpp_source.html#l00543">GetPostfitParamPlots.cpp:543</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00023">MaCh3Logger.h:23</a></div></div>
 <div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_a2f8f94ca3b6e0d2b34c75dee24b81e49"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#a2f8f94ca3b6e0d2b34c75dee24b81e49">MaCh3Plotting::InputManager::getFile</a></div><div class="ttdeci">InputFile const &amp; getFile(int fileId) const</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00502">inputManager.h:502</a></div></div>
-<div class="ttc" id="aclassMaCh3Plotting_1_1PlottingManager_html_a47be42e0b0a566e932d420ec75dfc59a"><div class="ttname"><a href="classMaCh3Plotting_1_1PlottingManager.html#a47be42e0b0a566e932d420ec75dfc59a">MaCh3Plotting::PlottingManager::style</a></div><div class="ttdeci">const StyleManager &amp; style() const</div><div class="ttdoc">Get the StyleManager contained within this PlottingManager, for doing style related things.</div><div class="ttdef"><b>Definition:</b> <a href="plottingManager_8h_source.html#l00158">plottingManager.h:158</a></div></div>
-<div class="ttc" id="aclassMaCh3Plotting_1_1PlottingManager_html_a4a964e2ca4a9e29e106ea890c0ce1dbb"><div class="ttname"><a href="classMaCh3Plotting_1_1PlottingManager.html#a4a964e2ca4a9e29e106ea890c0ce1dbb">MaCh3Plotting::PlottingManager::getFileLabel</a></div><div class="ttdeci">const std::string getFileLabel(int i) const</div><div class="ttdef"><b>Definition:</b> <a href="plottingManager_8h_source.html#l00126">plottingManager.h:126</a></div></div>
 <div class="ttc" id="aclassMaCh3Plotting_1_1PlottingManager_html_a5e290c4d6f4214fd4703226924d605a7"><div class="ttname"><a href="classMaCh3Plotting_1_1PlottingManager.html#a5e290c4d6f4214fd4703226924d605a7">MaCh3Plotting::PlottingManager::getOutputName</a></div><div class="ttdeci">const std::string getOutputName() const</div><div class="ttdoc">Get the straight up output file name with no bells or whistles, just the file extension.</div><div class="ttdef"><b>Definition:</b> <a href="plottingManager_8h_source.html#l00133">plottingManager.h:133</a></div></div>
 <div class="ttc" id="aclassMaCh3Plotting_1_1PlottingManager_html_ab68ca7513891fd6b38e8c67650cbaf3d"><div class="ttname"><a href="classMaCh3Plotting_1_1PlottingManager.html#ab68ca7513891fd6b38e8c67650cbaf3d">MaCh3Plotting::PlottingManager::getNFiles</a></div><div class="ttdeci">size_t getNFiles() const</div><div class="ttdef"><b>Definition:</b> <a href="plottingManager_8h_source.html#l00145">plottingManager.h:145</a></div></div>
 <div class="ttc" id="aclassMaCh3Plotting_1_1StyleManager_html_ac351a67811a38da8c0bbeb6fc439fcca"><div class="ttname"><a href="classMaCh3Plotting_1_1StyleManager.html#ac351a67811a38da8c0bbeb6fc439fcca">MaCh3Plotting::StyleManager::setTH1Style</a></div><div class="ttdeci">void setTH1Style(TH1 *hist, const std::string &amp;styleName) const</div><div class="ttdoc">Set the style of a TH1 to one of the styles defined in the style config.</div><div class="ttdef"><b>Definition:</b> <a href="styleManager_8cpp_source.html#l00060">styleManager.cpp:60</a></div></div>
@@ -632,6 +767,8 @@ Ewan Miller </dd></dl>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>KS: Make fancy violin plots. </p>
 
 <p class="definition">Definition at line <a class="el" href="GetPostfitParamPlots_8cpp_source.html#l00855">855</a> of file <a class="el" href="GetPostfitParamPlots_8cpp_source.html">GetPostfitParamPlots.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  856</span>{</div>
@@ -906,48 +1043,49 @@ Ewan Miller </dd></dl>
         </tr>
       </table>
 </div><div class="memdoc">
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000023">Todo:</a></b></dt><dd>KS: Violin plot currently not supported by three file version although it should be super easy to adapt </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="GetPostfitParamPlots_8cpp_source.html#l01032">1032</a> of file <a class="el" href="GetPostfitParamPlots_8cpp_source.html">GetPostfitParamPlots.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno"> 1033</span>{</div>
-<div class="line"><span class="lineno"> 1034</span>  <a class="code hl_function" href="MaCh3Logger_8h.html#aa603c55ea73cd86d1994901227883e1e">SetMaCh3LoggerFormat</a>();</div>
-<div class="line"><span class="lineno"> 1035</span>  <span class="comment">// Avoid Info in &lt;TCanvas::Print&gt;</span></div>
-<div class="line"><span class="lineno"> 1036</span>  gErrorIgnoreLevel = kWarning;</div>
-<div class="line"><span class="lineno"> 1037</span> </div>
-<div class="line"><span class="lineno"> 1038</span>  <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a> = <span class="keyword">new</span> <a class="code hl_class" href="classMaCh3Plotting_1_1PlottingManager.html">MaCh3Plotting::PlottingManager</a>();</div>
-<div class="line"><span class="lineno"> 1039</span>  <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a6abd05428a9f8827c67a22bd6f8ffce3">parseInputs</a>(argc, argv);</div>
-<div class="line"><span class="lineno"> 1040</span><span class="preprocessor">  #ifdef DEBUG</span></div>
-<div class="line"><span class="lineno"> 1041</span>  std::cout &lt;&lt; std::endl &lt;&lt; std::endl &lt;&lt; <span class="stringliteral">&quot;====================&quot;</span> &lt;&lt; std::endl;</div>
-<div class="line"><span class="lineno"> 1042</span>  <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a360841de706a8058712570c82a6dcfd1">input</a>().<a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#a2f8f94ca3b6e0d2b34c75dee24b81e49">getFile</a>(0).<a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#a11c074dd45647dd2957987f8b55f9d73">file</a>-&gt;ls();</div>
-<div class="line"><span class="lineno"> 1043</span><span class="preprocessor">  #endif</span></div>
-<div class="line"><span class="lineno"> 1044</span>  <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a3a050cf9827170d52c514eafa78297d3">setExec</a>(<span class="stringliteral">&quot;GetPostfitParamPlots&quot;</span>);</div>
-<div class="line"><span class="lineno"> 1045</span> </div>
-<div class="line"><span class="lineno"> 1046</span>  <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a47be42e0b0a566e932d420ec75dfc59a">style</a>().<a class="code hl_function" href="classMaCh3Plotting_1_1StyleManager.html#ac450a51ad776190c67b345c33c83cb03">setPalette</a>(<a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a794329580b30ab7eb9a15641f2ba53f2">getOption</a>&lt;std::string&gt;(<span class="stringliteral">&quot;colorPalette&quot;</span>));</div>
-<div class="line"><span class="lineno"> 1047</span> </div>
-<div class="line"><span class="lineno"> 1048</span>  <a class="code hl_function" href="GetPostfitParamPlots_8cpp.html#ad53f55565623ac6efd066209b1821ea6">GetPostfitParamPlots</a>();</div>
-<div class="line"><span class="lineno"> 1049</span> </div>
-<div class="line"><span class="lineno"> 1050</span>  <span class="keywordflow">if</span> (<a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a360841de706a8058712570c82a6dcfd1">input</a>().<a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#ae330e86f77b9be82935d6a86fa7c96fa">getNInputFiles</a>() == 1)</div>
-<div class="line"><span class="lineno"> 1051</span>  {</div>
-<div class="line"><span class="lineno"> 1052</span>    std::string filename = <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a1ea14bdee742085ea0e5c80876974816">getFileName</a>(0);</div>
-<div class="line"><span class="lineno"> 1053</span>    <a class="code hl_function" href="GetPostfitParamPlots_8cpp.html#a8681598ff6721b09a9d1f03c4efe114d">GetViolinPlots</a>(filename);</div>
-<div class="line"><span class="lineno"> 1054</span>  }</div>
-<div class="line"><span class="lineno"> 1055</span>  <span class="keywordflow">else</span> <span class="keywordflow">if</span> (<a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a360841de706a8058712570c82a6dcfd1">input</a>().<a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#ae330e86f77b9be82935d6a86fa7c96fa">getNInputFiles</a>() == 2)</div>
-<div class="line"><span class="lineno"> 1056</span>  {</div>
-<div class="line"><span class="lineno"> 1057</span>    std::string filename1 = <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a1ea14bdee742085ea0e5c80876974816">getFileName</a>(0);</div>
-<div class="line"><span class="lineno"> 1058</span>    std::string filename2 = <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a1ea14bdee742085ea0e5c80876974816">getFileName</a>(1);</div>
-<div class="line"><span class="lineno"> 1059</span>    <a class="code hl_function" href="GetPostfitParamPlots_8cpp.html#a8681598ff6721b09a9d1f03c4efe114d">GetViolinPlots</a>(filename1, filename2);</div>
-<div class="line"><span class="lineno"> 1060</span>  }</div>
-<div class="line"><span class="lineno"> 1061</span>  <span class="keywordflow">else</span> <span class="keywordflow">if</span> (<a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a360841de706a8058712570c82a6dcfd1">input</a>().<a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#ae330e86f77b9be82935d6a86fa7c96fa">getNInputFiles</a>() == 3)</div>
-<div class="line"><span class="lineno"> 1062</span>  {</div>
-<div class="line"><span class="lineno"> 1063</span>    std::string filename1 = <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a1ea14bdee742085ea0e5c80876974816">getFileName</a>(0);</div>
-<div class="line"><span class="lineno"> 1064</span>    std::string filename2 = <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a1ea14bdee742085ea0e5c80876974816">getFileName</a>(1);</div>
-<div class="line"><span class="lineno"> 1065</span>    std::string filename3 = <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a1ea14bdee742085ea0e5c80876974816">getFileName</a>(3);</div>
-<div class="line"><span class="lineno"> 1066</span>    <span class="comment">//KS: Violin plot currently not supported by three file version although it should be super easy to adapt</span></div>
-<div class="line"><span class="lineno"> 1067</span>  }</div>
-<div class="line"><span class="lineno"> 1068</span> </div>
-<div class="line"><span class="lineno"> 1069</span>  <span class="keyword">delete</span> <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>;</div>
-<div class="line"><span class="lineno"> 1070</span>  <span class="keywordflow">return</span> 0;</div>
-<div class="line"><span class="lineno"> 1071</span>}</div>
-<div class="ttc" id="aGetPostfitParamPlots_8cpp_html_a8681598ff6721b09a9d1f03c4efe114d"><div class="ttname"><a href="GetPostfitParamPlots_8cpp.html#a8681598ff6721b09a9d1f03c4efe114d">GetViolinPlots</a></div><div class="ttdeci">void GetViolinPlots(std::string FileName1=&quot;&quot;, std::string FileName2=&quot;&quot;)</div><div class="ttdef"><b>Definition:</b> <a href="GetPostfitParamPlots_8cpp_source.html#l00855">GetPostfitParamPlots.cpp:855</a></div></div>
+<p class="definition">Definition at line <a class="el" href="GetPostfitParamPlots_8cpp_source.html#l01132">1132</a> of file <a class="el" href="GetPostfitParamPlots_8cpp_source.html">GetPostfitParamPlots.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno"> 1133</span>{</div>
+<div class="line"><span class="lineno"> 1134</span>  <a class="code hl_function" href="MaCh3Logger_8h.html#aa603c55ea73cd86d1994901227883e1e">SetMaCh3LoggerFormat</a>();</div>
+<div class="line"><span class="lineno"> 1135</span>  <span class="comment">// Avoid Info in &lt;TCanvas::Print&gt;</span></div>
+<div class="line"><span class="lineno"> 1136</span>  gErrorIgnoreLevel = kWarning;</div>
+<div class="line"><span class="lineno"> 1137</span> </div>
+<div class="line"><span class="lineno"> 1138</span>  <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a> = <span class="keyword">new</span> <a class="code hl_class" href="classMaCh3Plotting_1_1PlottingManager.html">MaCh3Plotting::PlottingManager</a>();</div>
+<div class="line"><span class="lineno"> 1139</span>  <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a6abd05428a9f8827c67a22bd6f8ffce3">parseInputs</a>(argc, argv);</div>
+<div class="line"><span class="lineno"> 1140</span><span class="preprocessor">  #ifdef DEBUG</span></div>
+<div class="line"><span class="lineno"> 1141</span>  <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a360841de706a8058712570c82a6dcfd1">input</a>().<a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#a2f8f94ca3b6e0d2b34c75dee24b81e49">getFile</a>(0).<a class="code hl_variable" href="structMaCh3Plotting_1_1InputFile.html#a11c074dd45647dd2957987f8b55f9d73">file</a>-&gt;ls();</div>
+<div class="line"><span class="lineno"> 1142</span><span class="preprocessor">  #endif</span></div>
+<div class="line"><span class="lineno"> 1143</span>  <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a3a050cf9827170d52c514eafa78297d3">setExec</a>(<span class="stringliteral">&quot;GetPostfitParamPlots&quot;</span>);</div>
+<div class="line"><span class="lineno"> 1144</span> </div>
+<div class="line"><span class="lineno"> 1145</span>  <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a47be42e0b0a566e932d420ec75dfc59a">style</a>().<a class="code hl_function" href="classMaCh3Plotting_1_1StyleManager.html#ac450a51ad776190c67b345c33c83cb03">setPalette</a>(<a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a794329580b30ab7eb9a15641f2ba53f2">getOption</a>&lt;std::string&gt;(<span class="stringliteral">&quot;colorPalette&quot;</span>));</div>
+<div class="line"><span class="lineno"> 1146</span> </div>
+<div class="line"><span class="lineno"> 1147</span>  <a class="code hl_function" href="GetPostfitParamPlots_8cpp.html#ad53f55565623ac6efd066209b1821ea6">GetPostfitParamPlots</a>();</div>
+<div class="line"><span class="lineno"> 1148</span> </div>
+<div class="line"><span class="lineno"> 1149</span>  <span class="keywordflow">if</span> (<a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a360841de706a8058712570c82a6dcfd1">input</a>().<a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#ae330e86f77b9be82935d6a86fa7c96fa">getNInputFiles</a>() == 1)</div>
+<div class="line"><span class="lineno"> 1150</span>  {</div>
+<div class="line"><span class="lineno"> 1151</span>    std::string filename = <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a1ea14bdee742085ea0e5c80876974816">getFileName</a>(0);</div>
+<div class="line"><span class="lineno"> 1152</span>    <a class="code hl_function" href="GetPostfitParamPlots_8cpp.html#a8681598ff6721b09a9d1f03c4efe114d">GetViolinPlots</a>(filename);</div>
+<div class="line"><span class="lineno"> 1153</span>  }</div>
+<div class="line"><span class="lineno"> 1154</span>  <span class="keywordflow">else</span> <span class="keywordflow">if</span> (<a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a360841de706a8058712570c82a6dcfd1">input</a>().<a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#ae330e86f77b9be82935d6a86fa7c96fa">getNInputFiles</a>() == 2)</div>
+<div class="line"><span class="lineno"> 1155</span>  {</div>
+<div class="line"><span class="lineno"> 1156</span>    std::string filename1 = <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a1ea14bdee742085ea0e5c80876974816">getFileName</a>(0);</div>
+<div class="line"><span class="lineno"> 1157</span>    std::string filename2 = <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a1ea14bdee742085ea0e5c80876974816">getFileName</a>(1);</div>
+<div class="line"><span class="lineno"> 1158</span>    <a class="code hl_function" href="GetPostfitParamPlots_8cpp.html#a8681598ff6721b09a9d1f03c4efe114d">GetViolinPlots</a>(filename1, filename2);</div>
+<div class="line"><span class="lineno"> 1159</span>    <a class="code hl_function" href="GetPostfitParamPlots_8cpp.html#a797916c99123381b3b61e55e7398f695">Get2DComparison</a>(filename1, filename2);</div>
+<div class="line"><span class="lineno"> 1160</span>  }</div>
+<div class="line"><span class="lineno"> 1161</span>  <span class="keywordflow">else</span> <span class="keywordflow">if</span> (<a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a360841de706a8058712570c82a6dcfd1">input</a>().<a class="code hl_function" href="classMaCh3Plotting_1_1InputManager.html#ae330e86f77b9be82935d6a86fa7c96fa">getNInputFiles</a>() == 3)</div>
+<div class="line"><span class="lineno"> 1162</span>  {</div>
+<div class="line"><span class="lineno"> 1163</span>    std::string filename1 = <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a1ea14bdee742085ea0e5c80876974816">getFileName</a>(0);</div>
+<div class="line"><span class="lineno"> 1164</span>    std::string filename2 = <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a1ea14bdee742085ea0e5c80876974816">getFileName</a>(1);</div>
+<div class="line"><span class="lineno"> 1165</span>    std::string filename3 = <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>-&gt;<a class="code hl_function" href="classMaCh3Plotting_1_1PlottingManager.html#a1ea14bdee742085ea0e5c80876974816">getFileName</a>(3);</div>
+<div class="line"><span class="lineno"> 1167</span>  }</div>
+<div class="line"><span class="lineno"> 1168</span> </div>
+<div class="line"><span class="lineno"> 1169</span>  <span class="keyword">delete</span> <a class="code hl_variable" href="GetPostfitParamPlots_8cpp.html#aa6f3c9a8cee8f72f6f8ce65b720a2d40">man</a>;</div>
+<div class="line"><span class="lineno"> 1170</span>  <span class="keywordflow">return</span> 0;</div>
+<div class="line"><span class="lineno"> 1171</span>}</div>
+<div class="ttc" id="aGetPostfitParamPlots_8cpp_html_a797916c99123381b3b61e55e7398f695"><div class="ttname"><a href="GetPostfitParamPlots_8cpp.html#a797916c99123381b3b61e55e7398f695">Get2DComparison</a></div><div class="ttdeci">void Get2DComparison(const std::string &amp;FileName1, const std::string &amp;FileName2)</div><div class="ttdoc">KS: Make comparison of 2D Posteriors.</div><div class="ttdef"><b>Definition:</b> <a href="GetPostfitParamPlots_8cpp_source.html#l01033">GetPostfitParamPlots.cpp:1033</a></div></div>
+<div class="ttc" id="aGetPostfitParamPlots_8cpp_html_a8681598ff6721b09a9d1f03c4efe114d"><div class="ttname"><a href="GetPostfitParamPlots_8cpp.html#a8681598ff6721b09a9d1f03c4efe114d">GetViolinPlots</a></div><div class="ttdeci">void GetViolinPlots(std::string FileName1=&quot;&quot;, std::string FileName2=&quot;&quot;)</div><div class="ttdoc">KS: Make fancy violin plots.</div><div class="ttdef"><b>Definition:</b> <a href="GetPostfitParamPlots_8cpp_source.html#l00855">GetPostfitParamPlots.cpp:855</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_aa603c55ea73cd86d1994901227883e1e"><div class="ttname"><a href="MaCh3Logger_8h.html#aa603c55ea73cd86d1994901227883e1e">SetMaCh3LoggerFormat</a></div><div class="ttdeci">void SetMaCh3LoggerFormat()</div><div class="ttdoc">Set messaging format of the logger.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00049">MaCh3Logger.h:49</a></div></div>
 <div class="ttc" id="aclassMaCh3Plotting_1_1InputManager_html_ae330e86f77b9be82935d6a86fa7c96fa"><div class="ttname"><a href="classMaCh3Plotting_1_1InputManager.html#ae330e86f77b9be82935d6a86fa7c96fa">MaCh3Plotting::InputManager::getNInputFiles</a></div><div class="ttdeci">size_t getNInputFiles() const</div><div class="ttdef"><b>Definition:</b> <a href="inputManager_8h_source.html#l00475">inputManager.h:475</a></div></div>
 <div class="ttc" id="aclassMaCh3Plotting_1_1PlottingManager_html"><div class="ttname"><a href="classMaCh3Plotting_1_1PlottingManager.html">MaCh3Plotting::PlottingManager</a></div><div class="ttdoc">The main class to be used in plotting scripts.</div><div class="ttdef"><b>Definition:</b> <a href="plottingManager_8h_source.html#l00033">plottingManager.h:33</a></div></div>
@@ -1636,7 +1774,6 @@ Ewan Miller </dd></dl>
 <div class="line"><span class="lineno">  742</span>  blankCanv-&gt;SaveAs(<span class="stringliteral">&quot;RidgePlots.pdf]&quot;</span>);</div>
 <div class="line"><span class="lineno">  743</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_afc88f0aa23c7127b2ff6e5c7ca3fa892"><div class="ttname"><a href="MaCh3Logger_8h.html#afc88f0aa23c7127b2ff6e5c7ca3fa892">MACH3LOG_TRACE</a></div><div class="ttdeci">#define MACH3LOG_TRACE</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00021">MaCh3Logger.h:21</a></div></div>
-<div class="ttc" id="aclassMaCh3Plotting_1_1StyleManager_html_a0677ca5b68a2ecb684189524fb533019"><div class="ttname"><a href="classMaCh3Plotting_1_1StyleManager.html#a0677ca5b68a2ecb684189524fb533019">MaCh3Plotting::StyleManager::prettifyParamName</a></div><div class="ttdeci">std::string prettifyParamName(const std::string &amp;origName) const</div><div class="ttdoc">Convert hideous and vulgar internal parameter name into a beautiful presentable name.</div><div class="ttdef"><b>Definition:</b> <a href="styleManager_8h_source.html#l00039">styleManager.h:39</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
