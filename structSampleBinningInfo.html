@@ -112,6 +112,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:afbde5f960f500d0a5defa08775aedef5"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSampleBinningInfo.html#afbde5f960f500d0a5defa08775aedef5">FindXBin</a> (const double XVar, const int NomXBin) const</td></tr>
 <tr class="memdesc:afbde5f960f500d0a5defa08775aedef5"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Find the relevant bin in the PDF for each event.  <br /></td></tr>
 <tr class="separator:afbde5f960f500d0a5defa08775aedef5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1ed80362ca1da2a2a5098d8b59d4d6cf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSampleBinningInfo.html#a1ed80362ca1da2a2a5098d8b59d4d6cf">InitialiseBinMigrationLookUp</a> ()</td></tr>
+<tr class="memdesc:a1ed80362ca1da2a2a5098d8b59d4d6cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise special lookup arrays allowing to more efficiently perform bin-migration These arrays store the lower and upper edges of each bin and their neighboring bins.  <br /></td></tr>
+<tr class="separator:a1ed80362ca1da2a2a5098d8b59d4d6cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -382,6 +385,67 @@ Public Attributes</h2></td></tr>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00025">MaCh3Logger.h:25</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00013">MaCh3Exception.h:13</a></div></div>
 <div class="ttc" id="astructSampleBinningInfo_html_a6fde8c8353eceaccfca0bfece5094ead"><div class="ttname"><a href="structSampleBinningInfo.html#a6fde8c8353eceaccfca0bfece5094ead">SampleBinningInfo::nYBins</a></div><div class="ttdeci">size_t nYBins</div><div class="ttdoc">Number of Y axis bins in the histogram used for likelihood calculation.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00178">SampleStructs.h:178</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a1ed80362ca1da2a2a5098d8b59d4d6cf" name="a1ed80362ca1da2a2a5098d8b59d4d6cf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1ed80362ca1da2a2a5098d8b59d4d6cf">&#9670;&#160;</a></span>InitialiseBinMigrationLookUp()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SampleBinningInfo::InitialiseBinMigrationLookUp </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Initialise special lookup arrays allowing to more efficiently perform bin-migration These arrays store the lower and upper edges of each bin and their neighboring bins. </p>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000008">Todo:</a></b></dt><dd>expand to use y-axis </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="SampleStructs_8h_source.html#l00251">251</a> of file <a class="el" href="SampleStructs_8h_source.html">SampleStructs.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  251</span>                                      {</div>
+<div class="line"><span class="lineno">  252</span>    <a class="code hl_variable" href="structSampleBinningInfo.html#a7d1207002d3ebaf3e8594caca23c380b">rw_lower_xbinedge</a>.resize(<a class="code hl_variable" href="structSampleBinningInfo.html#a6db26440b230c9c3ded5882135393422">nXBins</a>);</div>
+<div class="line"><span class="lineno">  253</span>    <a class="code hl_variable" href="structSampleBinningInfo.html#a6f6bf0055cb0edeee0f2a713421f35a5">rw_lower_lower_xbinedge</a>.resize(<a class="code hl_variable" href="structSampleBinningInfo.html#a6db26440b230c9c3ded5882135393422">nXBins</a>);</div>
+<div class="line"><span class="lineno">  254</span>    <a class="code hl_variable" href="structSampleBinningInfo.html#a38df9115f10c97e64cffa3ac8de869c8">rw_upper_xbinedge</a>.resize(<a class="code hl_variable" href="structSampleBinningInfo.html#a6db26440b230c9c3ded5882135393422">nXBins</a>);</div>
+<div class="line"><span class="lineno">  255</span>    <a class="code hl_variable" href="structSampleBinningInfo.html#ab20455912755bdfa5df5670e8a378035">rw_upper_upper_xbinedge</a>.resize(<a class="code hl_variable" href="structSampleBinningInfo.html#a6db26440b230c9c3ded5882135393422">nXBins</a>);</div>
+<div class="line"><span class="lineno">  256</span>    <span class="comment">//Set rw_pdf_bin and rw_upper_xbinedge and rw_lower_xbinedge for each skmc_base</span></div>
+<div class="line"><span class="lineno">  257</span>    <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> bin_x = 0; bin_x &lt; <a class="code hl_variable" href="structSampleBinningInfo.html#a6db26440b230c9c3ded5882135393422">nXBins</a>; bin_x++){</div>
+<div class="line"><span class="lineno">  258</span>      <span class="keywordtype">double</span> low_lower_edge = <a class="code hl_variable" href="namespaceM3.html#a4fc5221346bd0dd85e3dadaf1ecdf502">M3::_DEFAULT_RETURN_VAL_</a>;</div>
+<div class="line"><span class="lineno">  259</span>      <span class="keywordtype">double</span> low_edge = <a class="code hl_variable" href="structSampleBinningInfo.html#ae69c8c4db52dea5025220f6d008cf4f4">XBinEdges</a>[bin_x];</div>
+<div class="line"><span class="lineno">  260</span>      <span class="keywordtype">double</span> upper_edge = <a class="code hl_variable" href="structSampleBinningInfo.html#ae69c8c4db52dea5025220f6d008cf4f4">XBinEdges</a>[bin_x+1];</div>
+<div class="line"><span class="lineno">  261</span>      <span class="keywordtype">double</span> upper_upper_edge = <a class="code hl_variable" href="namespaceM3.html#a4fc5221346bd0dd85e3dadaf1ecdf502">M3::_DEFAULT_RETURN_VAL_</a>;</div>
+<div class="line"><span class="lineno">  262</span> </div>
+<div class="line"><span class="lineno">  263</span>      <span class="keywordflow">if</span> (bin_x == 0) {</div>
+<div class="line"><span class="lineno">  264</span>        low_lower_edge = <a class="code hl_variable" href="structSampleBinningInfo.html#ae69c8c4db52dea5025220f6d008cf4f4">XBinEdges</a>[0];</div>
+<div class="line"><span class="lineno">  265</span>      } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  266</span>        low_lower_edge = <a class="code hl_variable" href="structSampleBinningInfo.html#ae69c8c4db52dea5025220f6d008cf4f4">XBinEdges</a>[bin_x-1];</div>
+<div class="line"><span class="lineno">  267</span>      }</div>
+<div class="line"><span class="lineno">  268</span> </div>
+<div class="line"><span class="lineno">  269</span>      <span class="keywordflow">if</span> (bin_x + 2 &lt; <a class="code hl_variable" href="structSampleBinningInfo.html#a6db26440b230c9c3ded5882135393422">nXBins</a>) {</div>
+<div class="line"><span class="lineno">  270</span>        upper_upper_edge = <a class="code hl_variable" href="structSampleBinningInfo.html#ae69c8c4db52dea5025220f6d008cf4f4">XBinEdges</a>[bin_x + 2];</div>
+<div class="line"><span class="lineno">  271</span>      } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (bin_x + 1 &lt; <a class="code hl_variable" href="structSampleBinningInfo.html#a6db26440b230c9c3ded5882135393422">nXBins</a>) {</div>
+<div class="line"><span class="lineno">  272</span>        upper_upper_edge = <a class="code hl_variable" href="structSampleBinningInfo.html#ae69c8c4db52dea5025220f6d008cf4f4">XBinEdges</a>[bin_x + 1];</div>
+<div class="line"><span class="lineno">  273</span>      }</div>
+<div class="line"><span class="lineno">  274</span> </div>
+<div class="line"><span class="lineno">  275</span>      <a class="code hl_variable" href="structSampleBinningInfo.html#a7d1207002d3ebaf3e8594caca23c380b">rw_lower_xbinedge</a>[bin_x] = low_edge;</div>
+<div class="line"><span class="lineno">  276</span>      <a class="code hl_variable" href="structSampleBinningInfo.html#a38df9115f10c97e64cffa3ac8de869c8">rw_upper_xbinedge</a>[bin_x] = upper_edge;</div>
+<div class="line"><span class="lineno">  277</span>      <a class="code hl_variable" href="structSampleBinningInfo.html#a6f6bf0055cb0edeee0f2a713421f35a5">rw_lower_lower_xbinedge</a>[bin_x] = low_lower_edge;</div>
+<div class="line"><span class="lineno">  278</span>      <a class="code hl_variable" href="structSampleBinningInfo.html#ab20455912755bdfa5df5670e8a378035">rw_upper_upper_xbinedge</a>[bin_x] = upper_upper_edge;</div>
+<div class="line"><span class="lineno">  279</span>    }</div>
+<div class="line"><span class="lineno">  280</span>  }</div>
+<div class="ttc" id="anamespaceM3_html_a4fc5221346bd0dd85e3dadaf1ecdf502"><div class="ttname"><a href="namespaceM3.html#a4fc5221346bd0dd85e3dadaf1ecdf502">M3::_DEFAULT_RETURN_VAL_</a></div><div class="ttdeci">static constexpr const double _DEFAULT_RETURN_VAL_</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00046">Core.h:46</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

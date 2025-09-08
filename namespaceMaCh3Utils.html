@@ -225,13 +225,13 @@ Functions</h2></td></tr>
 
 <p>Convert double into string for precision, useful for playing with yaml if you don't want to have in config floating point precision... </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleStructs_8h_source.html#l00378">378</a> of file <a class="el" href="SampleStructs_8h_source.html">SampleStructs.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  378</span>                                                                         {</div>
-<div class="line"><span class="lineno">  379</span>  <span class="comment">// ***************************</span></div>
-<div class="line"><span class="lineno">  380</span>    std::ostringstream oss;</div>
-<div class="line"><span class="lineno">  381</span>    oss &lt;&lt; std::fixed &lt;&lt; std::setprecision(precision) &lt;&lt; value;</div>
-<div class="line"><span class="lineno">  382</span>    <span class="keywordflow">return</span> oss.str();</div>
-<div class="line"><span class="lineno">  383</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="SampleStructs_8h_source.html#l00411">411</a> of file <a class="el" href="SampleStructs_8h_source.html">SampleStructs.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  411</span>                                                                         {</div>
+<div class="line"><span class="lineno">  412</span>  <span class="comment">// ***************************</span></div>
+<div class="line"><span class="lineno">  413</span>    std::ostringstream oss;</div>
+<div class="line"><span class="lineno">  414</span>    oss &lt;&lt; std::fixed &lt;&lt; std::setprecision(precision) &lt;&lt; value;</div>
+<div class="line"><span class="lineno">  415</span>    <span class="keywordflow">return</span> oss.str();</div>
+<div class="line"><span class="lineno">  416</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -445,58 +445,58 @@ Functions</h2></td></tr>
 <p>Return mass for given PDG. </p>
 <dl class="section note"><dt>Note</dt><dd>Get the mass of a particle from the PDG In GeV, not MeV! <a class="el" href="citelist.html#CITEREF_pdg2024">[22]</a> (particle masses) <a class="el" href="citelist.html#CITEREF_ame2020">[31]</a> (nuclear masses) </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="SampleStructs_8h_source.html#l00293">293</a> of file <a class="el" href="SampleStructs_8h_source.html">SampleStructs.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  293</span>                                              {</div>
-<div class="line"><span class="lineno">  294</span>    <span class="comment">// *****************************</span></div>
-<div class="line"><span class="lineno">  295</span>    <span class="keywordflow">switch</span> (abs(PDG)) {</div>
-<div class="line"><span class="lineno">  296</span>      <span class="comment">// Leptons</span></div>
-<div class="line"><span class="lineno">  297</span>      <span class="keywordflow">case</span> 11: <span class="keywordflow">return</span> 0.00051099895; <span class="comment">// e</span></div>
-<div class="line"><span class="lineno">  298</span>      <span class="keywordflow">case</span> 13: <span class="keywordflow">return</span> 0.1056583755;  <span class="comment">// mu</span></div>
-<div class="line"><span class="lineno">  299</span>      <span class="keywordflow">case</span> 15: <span class="keywordflow">return</span> 1.77693;       <span class="comment">// tau</span></div>
-<div class="line"><span class="lineno">  300</span>      <span class="comment">// Neutrinos</span></div>
-<div class="line"><span class="lineno">  301</span>      <span class="keywordflow">case</span> 12:</div>
-<div class="line"><span class="lineno">  302</span>      <span class="keywordflow">case</span> 14:</div>
-<div class="line"><span class="lineno">  303</span>      <span class="keywordflow">case</span> 16:</div>
-<div class="line"><span class="lineno">  304</span>        <span class="keywordflow">return</span> 0.; </div>
-<div class="line"><span class="lineno">  305</span>      <span class="comment">// Photon</span></div>
-<div class="line"><span class="lineno">  306</span>      <span class="keywordflow">case</span> 22: <span class="keywordflow">return</span> 0.; </div>
-<div class="line"><span class="lineno">  307</span>      <span class="comment">// Mesons</span></div>
-<div class="line"><span class="lineno">  308</span>      <span class="keywordflow">case</span> 211: <span class="keywordflow">return</span> 0.13957039; <span class="comment">// pi_+/-</span></div>
-<div class="line"><span class="lineno">  309</span>      <span class="keywordflow">case</span> 111: <span class="keywordflow">return</span> 0.1349768;  <span class="comment">// pi_0</span></div>
-<div class="line"><span class="lineno">  310</span>      <span class="keywordflow">case</span> 221: <span class="keywordflow">return</span> 0.547862;   <span class="comment">// eta</span></div>
-<div class="line"><span class="lineno">  311</span>      <span class="keywordflow">case</span> 311:                    <span class="comment">// K_0</span></div>
-<div class="line"><span class="lineno">  312</span>      <span class="keywordflow">case</span> 130:                    <span class="comment">// K_0_L</span></div>
-<div class="line"><span class="lineno">  313</span>      <span class="keywordflow">case</span> 310:                    <span class="comment">// K_0_S</span></div>
-<div class="line"><span class="lineno">  314</span>        <span class="keywordflow">return</span> 0.497611;</div>
-<div class="line"><span class="lineno">  315</span>      <span class="keywordflow">case</span> 321: <span class="keywordflow">return</span> 0.493677;   <span class="comment">// K_+/-</span></div>
-<div class="line"><span class="lineno">  316</span>      <span class="comment">// Baryons</span></div>
-<div class="line"><span class="lineno">  317</span>      <span class="keywordflow">case</span> 2112: <span class="keywordflow">return</span> 0.939565; <span class="comment">// n</span></div>
-<div class="line"><span class="lineno">  318</span>      <span class="keywordflow">case</span> 2212: <span class="keywordflow">return</span> 0.938272; <span class="comment">// p</span></div>
-<div class="line"><span class="lineno">  319</span>      <span class="keywordflow">case</span> 3122: <span class="keywordflow">return</span> 1.115683; <span class="comment">// lambda</span></div>
-<div class="line"><span class="lineno">  320</span>      <span class="keywordflow">case</span> 3222: <span class="keywordflow">return</span> 1.118937; <span class="comment">// sig_+</span></div>
-<div class="line"><span class="lineno">  321</span>      <span class="keywordflow">case</span> 3112: <span class="keywordflow">return</span> 1.197449; <span class="comment">// sig_-</span></div>
-<div class="line"><span class="lineno">  322</span>      <span class="keywordflow">case</span> 3212: <span class="keywordflow">return</span> 1.192642; <span class="comment">// sig_0</span></div>
-<div class="line"><span class="lineno">  323</span>      <span class="comment">// Nuclei</span></div>
-<div class="line"><span class="lineno">  324</span>      <span class="keywordflow">case</span> 1000050110: <span class="keywordflow">return</span> 10.255103; <span class="comment">// Boron-11</span></div>
-<div class="line"><span class="lineno">  325</span>      <span class="keywordflow">case</span> 1000060120: <span class="keywordflow">return</span> 11.177929; <span class="comment">// Carbon-12</span></div>
-<div class="line"><span class="lineno">  326</span>      <span class="keywordflow">case</span> 1000070140: <span class="keywordflow">return</span> 13.043781; <span class="comment">// Nitrogen-14</span></div>
-<div class="line"><span class="lineno">  327</span>      <span class="keywordflow">case</span> 1000080160: <span class="keywordflow">return</span> 14.899169; <span class="comment">// Oxygen-16</span></div>
-<div class="line"><span class="lineno">  328</span>      <span class="keywordflow">case</span> 1000090190: <span class="keywordflow">return</span> 17.696901; <span class="comment">// Fluorine-19</span></div>
-<div class="line"><span class="lineno">  329</span>      <span class="keywordflow">case</span> 1000110230: <span class="keywordflow">return</span> 21.414835; <span class="comment">// Sodium-23</span></div>
-<div class="line"><span class="lineno">  330</span>      <span class="keywordflow">case</span> 1000130270: <span class="keywordflow">return</span> 25.133144; <span class="comment">// Aluminum-27</span></div>
-<div class="line"><span class="lineno">  331</span>      <span class="keywordflow">case</span> 1000140280: <span class="keywordflow">return</span> 26.060342; <span class="comment">// Silicon-28</span></div>
-<div class="line"><span class="lineno">  332</span>      <span class="keywordflow">case</span> 1000190390: <span class="keywordflow">return</span> 36.294463; <span class="comment">// Potassium-39</span></div>
-<div class="line"><span class="lineno">  333</span>      <span class="keywordflow">case</span> 1000180400: <span class="keywordflow">return</span> 37.224724; <span class="comment">// Argon-40</span></div>
-<div class="line"><span class="lineno">  334</span>      <span class="keywordflow">case</span> 1000220480: <span class="keywordflow">return</span> 44.663224; <span class="comment">// Titanium-48</span></div>
-<div class="line"><span class="lineno">  335</span>      <span class="keywordflow">case</span> 1000300640: <span class="keywordflow">return</span> 59.549619; <span class="comment">// Zinc-64</span></div>
-<div class="line"><span class="lineno">  336</span>      <span class="keywordflow">default</span>:</div>
-<div class="line"><span class="lineno">  337</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Haven&#39;t got a saved mass for PDG: {}&quot;</span>, PDG);</div>
-<div class="line"><span class="lineno">  338</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Please implement me!&quot;</span>);</div>
-<div class="line"><span class="lineno">  339</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><span class="lineno">  340</span>    } <span class="comment">// End switch</span></div>
-<div class="line"><span class="lineno">  341</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Warning, didn&#39;t catch a saved mass&quot;</span>);</div>
-<div class="line"><span class="lineno">  342</span>    <span class="keywordflow">return</span> 0;</div>
-<div class="line"><span class="lineno">  343</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="SampleStructs_8h_source.html#l00326">326</a> of file <a class="el" href="SampleStructs_8h_source.html">SampleStructs.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  326</span>                                              {</div>
+<div class="line"><span class="lineno">  327</span>    <span class="comment">// *****************************</span></div>
+<div class="line"><span class="lineno">  328</span>    <span class="keywordflow">switch</span> (abs(PDG)) {</div>
+<div class="line"><span class="lineno">  329</span>      <span class="comment">// Leptons</span></div>
+<div class="line"><span class="lineno">  330</span>      <span class="keywordflow">case</span> 11: <span class="keywordflow">return</span> 0.00051099895; <span class="comment">// e</span></div>
+<div class="line"><span class="lineno">  331</span>      <span class="keywordflow">case</span> 13: <span class="keywordflow">return</span> 0.1056583755;  <span class="comment">// mu</span></div>
+<div class="line"><span class="lineno">  332</span>      <span class="keywordflow">case</span> 15: <span class="keywordflow">return</span> 1.77693;       <span class="comment">// tau</span></div>
+<div class="line"><span class="lineno">  333</span>      <span class="comment">// Neutrinos</span></div>
+<div class="line"><span class="lineno">  334</span>      <span class="keywordflow">case</span> 12:</div>
+<div class="line"><span class="lineno">  335</span>      <span class="keywordflow">case</span> 14:</div>
+<div class="line"><span class="lineno">  336</span>      <span class="keywordflow">case</span> 16:</div>
+<div class="line"><span class="lineno">  337</span>        <span class="keywordflow">return</span> 0.; </div>
+<div class="line"><span class="lineno">  338</span>      <span class="comment">// Photon</span></div>
+<div class="line"><span class="lineno">  339</span>      <span class="keywordflow">case</span> 22: <span class="keywordflow">return</span> 0.; </div>
+<div class="line"><span class="lineno">  340</span>      <span class="comment">// Mesons</span></div>
+<div class="line"><span class="lineno">  341</span>      <span class="keywordflow">case</span> 211: <span class="keywordflow">return</span> 0.13957039; <span class="comment">// pi_+/-</span></div>
+<div class="line"><span class="lineno">  342</span>      <span class="keywordflow">case</span> 111: <span class="keywordflow">return</span> 0.1349768;  <span class="comment">// pi_0</span></div>
+<div class="line"><span class="lineno">  343</span>      <span class="keywordflow">case</span> 221: <span class="keywordflow">return</span> 0.547862;   <span class="comment">// eta</span></div>
+<div class="line"><span class="lineno">  344</span>      <span class="keywordflow">case</span> 311:                    <span class="comment">// K_0</span></div>
+<div class="line"><span class="lineno">  345</span>      <span class="keywordflow">case</span> 130:                    <span class="comment">// K_0_L</span></div>
+<div class="line"><span class="lineno">  346</span>      <span class="keywordflow">case</span> 310:                    <span class="comment">// K_0_S</span></div>
+<div class="line"><span class="lineno">  347</span>        <span class="keywordflow">return</span> 0.497611;</div>
+<div class="line"><span class="lineno">  348</span>      <span class="keywordflow">case</span> 321: <span class="keywordflow">return</span> 0.493677;   <span class="comment">// K_+/-</span></div>
+<div class="line"><span class="lineno">  349</span>      <span class="comment">// Baryons</span></div>
+<div class="line"><span class="lineno">  350</span>      <span class="keywordflow">case</span> 2112: <span class="keywordflow">return</span> 0.939565; <span class="comment">// n</span></div>
+<div class="line"><span class="lineno">  351</span>      <span class="keywordflow">case</span> 2212: <span class="keywordflow">return</span> 0.938272; <span class="comment">// p</span></div>
+<div class="line"><span class="lineno">  352</span>      <span class="keywordflow">case</span> 3122: <span class="keywordflow">return</span> 1.115683; <span class="comment">// lambda</span></div>
+<div class="line"><span class="lineno">  353</span>      <span class="keywordflow">case</span> 3222: <span class="keywordflow">return</span> 1.118937; <span class="comment">// sig_+</span></div>
+<div class="line"><span class="lineno">  354</span>      <span class="keywordflow">case</span> 3112: <span class="keywordflow">return</span> 1.197449; <span class="comment">// sig_-</span></div>
+<div class="line"><span class="lineno">  355</span>      <span class="keywordflow">case</span> 3212: <span class="keywordflow">return</span> 1.192642; <span class="comment">// sig_0</span></div>
+<div class="line"><span class="lineno">  356</span>      <span class="comment">// Nuclei</span></div>
+<div class="line"><span class="lineno">  357</span>      <span class="keywordflow">case</span> 1000050110: <span class="keywordflow">return</span> 10.255103; <span class="comment">// Boron-11</span></div>
+<div class="line"><span class="lineno">  358</span>      <span class="keywordflow">case</span> 1000060120: <span class="keywordflow">return</span> 11.177929; <span class="comment">// Carbon-12</span></div>
+<div class="line"><span class="lineno">  359</span>      <span class="keywordflow">case</span> 1000070140: <span class="keywordflow">return</span> 13.043781; <span class="comment">// Nitrogen-14</span></div>
+<div class="line"><span class="lineno">  360</span>      <span class="keywordflow">case</span> 1000080160: <span class="keywordflow">return</span> 14.899169; <span class="comment">// Oxygen-16</span></div>
+<div class="line"><span class="lineno">  361</span>      <span class="keywordflow">case</span> 1000090190: <span class="keywordflow">return</span> 17.696901; <span class="comment">// Fluorine-19</span></div>
+<div class="line"><span class="lineno">  362</span>      <span class="keywordflow">case</span> 1000110230: <span class="keywordflow">return</span> 21.414835; <span class="comment">// Sodium-23</span></div>
+<div class="line"><span class="lineno">  363</span>      <span class="keywordflow">case</span> 1000130270: <span class="keywordflow">return</span> 25.133144; <span class="comment">// Aluminum-27</span></div>
+<div class="line"><span class="lineno">  364</span>      <span class="keywordflow">case</span> 1000140280: <span class="keywordflow">return</span> 26.060342; <span class="comment">// Silicon-28</span></div>
+<div class="line"><span class="lineno">  365</span>      <span class="keywordflow">case</span> 1000190390: <span class="keywordflow">return</span> 36.294463; <span class="comment">// Potassium-39</span></div>
+<div class="line"><span class="lineno">  366</span>      <span class="keywordflow">case</span> 1000180400: <span class="keywordflow">return</span> 37.224724; <span class="comment">// Argon-40</span></div>
+<div class="line"><span class="lineno">  367</span>      <span class="keywordflow">case</span> 1000220480: <span class="keywordflow">return</span> 44.663224; <span class="comment">// Titanium-48</span></div>
+<div class="line"><span class="lineno">  368</span>      <span class="keywordflow">case</span> 1000300640: <span class="keywordflow">return</span> 59.549619; <span class="comment">// Zinc-64</span></div>
+<div class="line"><span class="lineno">  369</span>      <span class="keywordflow">default</span>:</div>
+<div class="line"><span class="lineno">  370</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Haven&#39;t got a saved mass for PDG: {}&quot;</span>, PDG);</div>
+<div class="line"><span class="lineno">  371</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Please implement me!&quot;</span>);</div>
+<div class="line"><span class="lineno">  372</span>        <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><span class="lineno">  373</span>    } <span class="comment">// End switch</span></div>
+<div class="line"><span class="lineno">  374</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Warning, didn&#39;t catch a saved mass&quot;</span>);</div>
+<div class="line"><span class="lineno">  375</span>    <span class="keywordflow">return</span> 0;</div>
+<div class="line"><span class="lineno">  376</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -814,31 +814,31 @@ Functions</h2></td></tr>
 
 <p>Convert from PDG flavour to NuOscillator type beware that in the case of anti-neutrinos the NuOscillator type simply gets multiplied by -1. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleStructs_8h_source.html#l00350">350</a> of file <a class="el" href="SampleStructs_8h_source.html">SampleStructs.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  350</span>                                                      {</div>
-<div class="line"><span class="lineno">  351</span>    <span class="keywordtype">int</span> NuOscillatorFlavour = <a class="code hl_variable" href="namespaceM3.html#aed6ca6561a78ba6c90a98ddfa22353aa">M3::_BAD_INT_</a>;</div>
-<div class="line"><span class="lineno">  352</span>    <span class="keywordflow">switch</span>(std::abs(NuPdg)){</div>
-<div class="line"><span class="lineno">  353</span>      <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="SampleStructs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2aab024bd4737ec207f00dcd86a5d05908">NuPDG::kNue</a>:</div>
-<div class="line"><span class="lineno">  354</span>        NuOscillatorFlavour = NuOscillator::kElectron;</div>
-<div class="line"><span class="lineno">  355</span>        <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  356</span>      <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="SampleStructs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2ab0c6aa36beb10b27d1595708db570b20">NuPDG::kNumu</a>:</div>
-<div class="line"><span class="lineno">  357</span>        NuOscillatorFlavour = NuOscillator::kMuon;</div>
-<div class="line"><span class="lineno">  358</span>        <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  359</span>      <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="SampleStructs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2a3845eaeb2a574c79e40ccb2e7b0c0a21">NuPDG::kNutau</a>:</div>
-<div class="line"><span class="lineno">  360</span>        NuOscillatorFlavour = NuOscillator::kTau;</div>
-<div class="line"><span class="lineno">  361</span>        <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  362</span>      <span class="keywordflow">default</span>:</div>
-<div class="line"><span class="lineno">  363</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Unknown Neutrino PDG {}, cannot convert to NuOscillator type&quot;</span>, NuPdg);</div>
-<div class="line"><span class="lineno">  364</span>        <span class="keywordflow">break</span>;</div>
-<div class="line"><span class="lineno">  365</span>    }</div>
-<div class="line"><span class="lineno">  366</span> </div>
-<div class="line"><span class="lineno">  367</span>    <span class="comment">//This is very cheeky but if the PDG is negative then multiply the PDG by -1</span></div>
-<div class="line"><span class="lineno">  368</span>    <span class="comment">// This is consistent with the treatment that NuOscillator expects as enums only</span></div>
-<div class="line"><span class="lineno">  369</span>    <span class="comment">// exist for the generic matter flavour and not the anti-matter version</span></div>
-<div class="line"><span class="lineno">  370</span>    <span class="keywordflow">if</span>(NuPdg &lt; 0){NuOscillatorFlavour *= -1;}</div>
-<div class="line"><span class="lineno">  371</span> </div>
-<div class="line"><span class="lineno">  372</span>    <span class="keywordflow">return</span> NuOscillatorFlavour;</div>
-<div class="line"><span class="lineno">  373</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="SampleStructs_8h_source.html#l00383">383</a> of file <a class="el" href="SampleStructs_8h_source.html">SampleStructs.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  383</span>                                                      {</div>
+<div class="line"><span class="lineno">  384</span>    <span class="keywordtype">int</span> NuOscillatorFlavour = <a class="code hl_variable" href="namespaceM3.html#aed6ca6561a78ba6c90a98ddfa22353aa">M3::_BAD_INT_</a>;</div>
+<div class="line"><span class="lineno">  385</span>    <span class="keywordflow">switch</span>(std::abs(NuPdg)){</div>
+<div class="line"><span class="lineno">  386</span>      <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="SampleStructs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2aab024bd4737ec207f00dcd86a5d05908">NuPDG::kNue</a>:</div>
+<div class="line"><span class="lineno">  387</span>        NuOscillatorFlavour = NuOscillator::kElectron;</div>
+<div class="line"><span class="lineno">  388</span>        <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  389</span>      <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="SampleStructs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2ab0c6aa36beb10b27d1595708db570b20">NuPDG::kNumu</a>:</div>
+<div class="line"><span class="lineno">  390</span>        NuOscillatorFlavour = NuOscillator::kMuon;</div>
+<div class="line"><span class="lineno">  391</span>        <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  392</span>      <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="SampleStructs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2a3845eaeb2a574c79e40ccb2e7b0c0a21">NuPDG::kNutau</a>:</div>
+<div class="line"><span class="lineno">  393</span>        NuOscillatorFlavour = NuOscillator::kTau;</div>
+<div class="line"><span class="lineno">  394</span>        <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  395</span>      <span class="keywordflow">default</span>:</div>
+<div class="line"><span class="lineno">  396</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Unknown Neutrino PDG {}, cannot convert to NuOscillator type&quot;</span>, NuPdg);</div>
+<div class="line"><span class="lineno">  397</span>        <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  398</span>    }</div>
+<div class="line"><span class="lineno">  399</span> </div>
+<div class="line"><span class="lineno">  400</span>    <span class="comment">//This is very cheeky but if the PDG is negative then multiply the PDG by -1</span></div>
+<div class="line"><span class="lineno">  401</span>    <span class="comment">// This is consistent with the treatment that NuOscillator expects as enums only</span></div>
+<div class="line"><span class="lineno">  402</span>    <span class="comment">// exist for the generic matter flavour and not the anti-matter version</span></div>
+<div class="line"><span class="lineno">  403</span>    <span class="keywordflow">if</span>(NuPdg &lt; 0){NuOscillatorFlavour *= -1;}</div>
+<div class="line"><span class="lineno">  404</span> </div>
+<div class="line"><span class="lineno">  405</span>    <span class="keywordflow">return</span> NuOscillatorFlavour;</div>
+<div class="line"><span class="lineno">  406</span>  }</div>
 <div class="ttc" id="aSampleStructs_8h_html_a0dfdd8cf84b8fa3495e9e5e520fe6cd2a3845eaeb2a574c79e40ccb2e7b0c0a21"><div class="ttname"><a href="SampleStructs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2a3845eaeb2a574c79e40ccb2e7b0c0a21">kNutau</a></div><div class="ttdeci">@ kNutau</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00105">SampleStructs.h:105</a></div></div>
 <div class="ttc" id="aSampleStructs_8h_html_a0dfdd8cf84b8fa3495e9e5e520fe6cd2aab024bd4737ec207f00dcd86a5d05908"><div class="ttname"><a href="SampleStructs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2aab024bd4737ec207f00dcd86a5d05908">kNue</a></div><div class="ttdeci">@ kNue</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00103">SampleStructs.h:103</a></div></div>
 <div class="ttc" id="aSampleStructs_8h_html_a0dfdd8cf84b8fa3495e9e5e520fe6cd2ab0c6aa36beb10b27d1595708db570b20"><div class="ttname"><a href="SampleStructs_8h.html#a0dfdd8cf84b8fa3495e9e5e520fe6cd2ab0c6aa36beb10b27d1595708db570b20">kNumu</a></div><div class="ttdeci">@ kNumu</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00104">SampleStructs.h:104</a></div></div>
