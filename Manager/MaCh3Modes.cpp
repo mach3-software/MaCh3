@@ -63,23 +63,31 @@ void MaCh3Modes::Print() const {
   MACH3LOG_INFO("{:<5} {:2} {:<20} {:2} {:<20} {:2} {:<30}", "#", "|", "Name", "|", "FancyName", "|", Generator+" Modes");
   MACH3LOG_INFO("------------------------------------------------------------------------");
   for(int i = 0; i < NModes; ++i) {
-    auto Name = fMode.at(i).Name;
-    auto FancyName = fMode.at(i).FancyName;
-    auto Values = fMode.at(i).GeneratorMaping;
-
-    std::string generatorModes;
-    for (const int& element : Values) {
-      generatorModes += std::to_string(element) + " ";
+    try {
+      auto Name = fMode.at(i).Name;
+      auto FancyName = fMode.at(i).FancyName;
+      auto Values = fMode.at(i).GeneratorMaping;
+      std::string generatorModes;
+      for (const int& element : Values) {
+        generatorModes += std::to_string(element) + " ";
+      }
+      MACH3LOG_INFO("{:<5} {:2} {:<20} {:2} {:<20} {:2} {:<30}", i, "|", Name, "|", FancyName, "|", generatorModes);
+    } catch (const std::out_of_range& e) {
+      MACH3LOG_ERROR("Index {} is out of bounds for fMode. Check NModes or fMode size.", i);
+      throw MaCh3Exception(__FILE__ , __LINE__ );
     }
-    MACH3LOG_INFO("{:<5} {:2} {:<20} {:2} {:<20} {:2} {:<30}", i, "|", Name, "|", FancyName, "|", generatorModes);
   }
   MACH3LOG_INFO("========================================================================");
-
   MACH3LOG_INFO("==========================");
   MACH3LOG_INFO("{:<10} {:2} {:<30}", Generator + " Modes", "|", "Name");
   MACH3LOG_INFO("--------------------------");
   for (size_t i = 0; i < ModeMap.size(); ++i) {
-    MACH3LOG_INFO("{:<10} {:2} {:<30}", i, "|", fMode.at(ModeMap[i]).Name);
+    try {
+      MACH3LOG_INFO("{:<10} {:2} {:<30}", i, "|", fMode.at(ModeMap[i]).Name);
+    } catch (const std::out_of_range& e) {
+      MACH3LOG_ERROR("ModeMap[{}] = {} is out of bounds for fMode. Check ModeMap or fMode size.", i, ModeMap[i]);
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
   }
   MACH3LOG_INFO("==========================");
 }
