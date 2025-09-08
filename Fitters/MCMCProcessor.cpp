@@ -25,7 +25,9 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
 
   ParStep = nullptr;
   StepNumber = nullptr;
-    
+  ReweightPosterior = false;
+  WeightValue = nullptr;
+
   Posterior = nullptr;
   hviolin = nullptr;
   hviolin_prior = nullptr;
@@ -123,6 +125,7 @@ MCMCProcessor::~MCMCProcessor() {
   delete Errors_HPD_Positive;
   delete Errors_HPD_Negative;
 
+  if(WeightValue) delete[] WeightValue;
   for (int i = 0; i < nDraw; ++i)
   {
     if(hpost[i] != nullptr) delete hpost[i];
@@ -251,7 +254,18 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
   TDirectory *PostDir = OutputFile->mkdir("Post");
   TDirectory *PostHistDir = OutputFile->mkdir("Post_1d_hists");
   
+  //KS: Apply additional Cuts, like mass ordering
+  std::string CutPosterior1D = "";
+  if(Posterior1DCut != "") {
+    CutPosterior1D = StepCut +" && " + Posterior1DCut;
+  } else CutPosterior1D = StepCut;
 
+  // Apply reweighting
+  if (ReweightPosterior) {
+    CutPosterior1D = "(" + CutPosterior1D + ")*(" + ReweightName + ")";
+  }
+  MACH3LOG_DEBUG("Using following cut {}", CutPosterior1D);
+  
   // nDraw is number of draws we want to do
   for (int i = 0; i < nDraw; ++i)
   {
@@ -278,13 +292,6 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
     hpost[i]->GetYaxis()->SetTitle("Steps");
     hpost[i]->GetYaxis()->SetNoExponent(false);
 
-    //KS: Apply additional Cuts, like mass ordering
-    std::string CutPosterior1D = "";
-    if(Posterior1DCut != "")
-    {
-      CutPosterior1D = StepCut +" && " + Posterior1DCut;
-    }
-    else CutPosterior1D = StepCut;
 
     // Project BranchNames[i] onto hpost, applying stepcut
     Chain->Project(BranchNames[i], BranchNames[i], CutPosterior1D.c_str());
@@ -805,11 +812,14 @@ void MCMCProcessor::MakeViolin() {
 
   MACH3LOG_INFO("Producing Violin Plot");
 
+  // KS: Set temporary branch address to allow min/max, otherwise ROOT can segfaults
+  double tempVal = 0.0;
   //KS: Find min and max to make histogram in range
-  double maxi_y = Chain->GetMaximum(BranchNames[0]);
-  double mini_y = Chain->GetMinimum(BranchNames[0]);
-  for (int i = 1; i < nDraw; ++i)
+  double maxi_y = -9999;
+  double mini_y = +9999;
+  for (int i = 0; i < nDraw; ++i)
   {
+    Chain->SetBranchAddress(BranchNames[i].Data(), &tempVal);
     const double max_val = Chain->GetMaximum(BranchNames[i]);
     const double min_val = Chain->GetMinimum(BranchNames[i]);
   
@@ -967,6 +977,9 @@ void MCMCProcessor::MakeCovariance() {
   if (HaveMadeDiagonal == false) {
     MakePostfit();
   }
+
+  TDirectory *PostHistDir = OutputFile->mkdir("Post_2d_hists");
+  PostHistDir->cd();
   gStyle->SetPalette(55);
   // Now we are sure we have the diagonal elements, let's make the off-diagonals
   for (int i = 0; i < nDraw; ++i)
@@ -979,9 +992,6 @@ void MCMCProcessor::MakeCovariance() {
 
     GetNthParameter(i, Prior_i, PriorError, Title_i);
     
-    const double min_i = Chain->GetMinimum(BranchNames[i]);
-    const double max_i = Chain->GetMaximum(BranchNames[i]);
-
     // Loop over the other parameters to get the correlations
     for (int j = 0; j <= i; ++j) {
       // Skip the diagonal elements which we've already done above
@@ -1005,18 +1015,21 @@ void MCMCProcessor::MakeCovariance() {
       // The draw which we want to perform
       TString DrawMe = BranchNames[j]+":"+BranchNames[i];
 
-      const double max_j = Chain->GetMaximum(BranchNames[j]);
-      const double min_j = Chain->GetMinimum(BranchNames[j]);
-
       // TH2F to hold the Correlation 
-      std::unique_ptr<TH2D> hpost_2D = std::make_unique<TH2D>(DrawMe, DrawMe, nBins, min_i, max_i, nBins, min_j, max_j);
+      auto hpost_2D = std::make_unique<TH2D>(DrawMe, DrawMe,
+                      nBins, hpost[i]->GetXaxis()->GetXmin(), hpost[i]->GetXaxis()->GetXmax(),
+                      nBins, hpost[j]->GetXaxis()->GetXmin(), hpost[j]->GetXaxis()->GetXmax());
       hpost_2D->SetMinimum(0);
       hpost_2D->GetXaxis()->SetTitle(Title_i);
       hpost_2D->GetYaxis()->SetTitle(Title_j);
       hpost_2D->GetZaxis()->SetTitle("Steps");
 
+      std::string SelectionStr = StepCut;
+      if (ReweightPosterior) {
+        SelectionStr = "(" + StepCut + ")*(" + ReweightName + ")";
+      }
       // The draw command we want, i.e. draw param j vs param i
-      Chain->Project(DrawMe, DrawMe, StepCut.c_str());
+      Chain->Project(DrawMe, DrawMe, SelectionStr.c_str());
       
       if(ApplySmoothing) hpost_2D->Smooth();
       // Get the Covariance for these two parameters
@@ -1038,6 +1051,7 @@ void MCMCProcessor::MakeCovariance() {
             Posterior->SetName(hpost_2D->GetName());
             Posterior->SetTitle(hpost_2D->GetTitle());
             Posterior->Print(CanvasName);
+            hpost2D[i][j]->Write(hpost2D[i][j]->GetTitle());
           }
         }
       }
@@ -1046,6 +1060,8 @@ void MCMCProcessor::MakeCovariance() {
       //if( std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold ) hpost_2D->Write();
     } // End j loop
   } // End i loop
+  PostHistDir->Close();
+  delete PostHistDir;
   OutputFile->cd();
   Covariance->Write("Covariance");
   Correlation->Write("Correlation");
@@ -1091,7 +1107,7 @@ void MCMCProcessor::CacheSteps() {
   // Set all the branches to off
   Chain->SetBranchStatus("*", false);
   unsigned int stepBranch = 0;
-  double* ParValBranch = new double[nEntries]();
+  double* ParValBranch = new double[nDraw]();
   // Turn on the branches which we want for parameters
   for (int i = 0; i < nDraw; ++i)
   {
@@ -1100,6 +1116,15 @@ void MCMCProcessor::CacheSteps() {
   }
   Chain->SetBranchStatus("step", true);
   Chain->SetBranchAddress("step", &stepBranch);
+
+  double ReweightWeight = 1.;
+  if(ReweightPosterior)
+  {
+    WeightValue = new double[nEntries]();
+    Chain->SetBranchStatus(ReweightName.c_str(), true);
+    Chain->SetBranchAddress(ReweightName.c_str(), &ReweightWeight);
+  }
+
   const Long64_t countwidth = nEntries/10;
 
   // Loop over the entries
@@ -1114,16 +1139,19 @@ void MCMCProcessor::CacheSteps() {
     }
     StepNumber[j] = stepBranch;
     // Set the branch addresses for params
-    for (int i = 0; i < nDraw; ++i) 
-    {
+    for (int i = 0; i < nDraw; ++i) {
       ParStep[i][j] = ParValBranch[i];
+    }
+
+    if(ReweightPosterior){
+      WeightValue[j] = ReweightWeight;
     }
   }
   delete[] ParValBranch;
 
   // Set all the branches to on
   Chain->SetBranchStatus("*", true);
-  
+
   // KS: Set temporary branch address to allow min/max, otherwise ROOT can segfaults
   double tempVal = 0.0;
   std::vector<double> Min_Chain(nDraw);
@@ -1135,6 +1163,11 @@ void MCMCProcessor::CacheSteps() {
     Max_Chain[i] = Chain->GetMaximum(BranchNames[i]);
   }
 
+  // Calculate the total number of TH2D objects
+  size_t nHistograms = nDraw * (nDraw + 1) / 2;
+  MACH3LOG_INFO("Caching 2D posterior histograms...");
+  MACH3LOG_INFO("Allocating {:.2f} MB for {} 2D Posteriors (each {}x{} bins)",
+                double(nHistograms * nBins * nBins * sizeof(double)) / 1.E6, nHistograms, nBins, nBins);
   // Cache max and min in chain for covariance matrix
   for (int i = 0; i < nDraw; ++i)
   {
@@ -1144,12 +1177,14 @@ void MCMCProcessor::CacheSteps() {
 
     for (int j = 0; j <= i; ++j)
     {
-      // TH2D to hold the Correlation
-      hpost2D[i][j] = new TH2D(Form("hpost2D_%i_%i",i,j), Form("hpost2D_%i_%i",i,j), nBins, Min_Chain[i], Max_Chain[i], nBins, Min_Chain[j], Max_Chain[j]);
       TString Title_j = "";
       double Prior_j, PriorError_j;
       GetNthParameter(j, Prior_j, PriorError_j, Title_j);
 
+      // TH2D to hold the Correlation
+      hpost2D[i][j] = new TH2D((Title_i + "_" + Title_j).Data(), (Title_i + "_" + Title_j).Data(),
+                               nBins, hpost[i]->GetXaxis()->GetXmin(), hpost[i]->GetXaxis()->GetXmax(),
+                               nBins, hpost[j]->GetXaxis()->GetXmin(), hpost[j]->GetXaxis()->GetXmax());
       hpost2D[i][j]->SetMinimum(0);
       hpost2D[i][j]->GetXaxis()->SetTitle(Title_i);
       hpost2D[i][j]->GetYaxis()->SetTitle(Title_j);
@@ -1162,7 +1197,7 @@ void MCMCProcessor::CacheSteps() {
 
 // *********************
 // Make the post-fit covariance matrix in all dimensions
-void MCMCProcessor::MakeCovariance_MP(bool Mute) {
+void MCMCProcessor::MakeCovariance_MP(const bool Mute) {
 // *********************
   if (OutputFile == nullptr) MakeOutputFile();
     
@@ -1182,9 +1217,17 @@ void MCMCProcessor::MakeCovariance_MP(bool Mute) {
   }
     
   if (HaveMadeDiagonal == false) MakePostfit();
-  if(!Mute) MACH3LOG_INFO("Calculating covariance matrix");
   TStopwatch clock;
-  if(!Mute) clock.Start();
+  TDirectory *PostHistDir = nullptr;
+  if(!Mute)
+  {
+    MACH3LOG_INFO("Calculating covariance matrix");
+    clock.Start();
+    PostHistDir = OutputFile->mkdir("Post_2d_hists");
+    PostHistDir->cd();
+  }
+
+  if(!Mute)
 
   gStyle->SetPalette(55);
   // Now we are sure we have the diagonal elements, let's make the off-diagonals
@@ -1213,8 +1256,9 @@ void MCMCProcessor::MakeCovariance_MP(bool Mute) {
         //KS: Burn in cut
         if(StepNumber[k] < BurnInCut) continue;
 
+        const double Weight = ReweightPosterior ? WeightValue[i] : 1.;
         //KS: Fill histogram with cached steps
-        hpost2D[i][j]->Fill(ParStep[i][k], ParStep[j][k]);
+        hpost2D[i][j]->Fill(ParStep[i][k], ParStep[j][k], Weight);
       }
       if(ApplySmoothing) hpost2D[i][j]->Smooth();
       
@@ -1232,37 +1276,38 @@ void MCMCProcessor::MakeCovariance_MP(bool Mute) {
   if(!Mute) {
     clock.Stop();
     MACH3LOG_INFO("Making Covariance took {:.2f}s to finish for {} steps", clock.RealTime(), nEntries);
-  }
-  OutputFile->cd();
-  if(printToPDF)
-  {
-    Posterior->cd();
-    for (int i = 0; i < nDraw; ++i)
-    {    
-      for (int j = 0; j <= i; ++j)
+    if(printToPDF)
+    {
+      Posterior->cd();
+      for (int i = 0; i < nDraw; ++i)
       {
-        // Skip the diagonal elements which we've already done above
-        if (j == i) continue;
-        if (IamVaried[j] == false) continue;
-
-        if(ParamType[i] == kXSecPar && ParamType[j] == kXSecPar)
+        for (int j = 0; j <= i; ++j)
         {
-          if(std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold)
+          // Skip the diagonal elements which we've already done above
+          if (j == i) continue;
+          if (IamVaried[j] == false) continue;
+
+          if(ParamType[i] == kXSecPar && ParamType[j] == kXSecPar)
           {
-            hpost2D[i][j]->Draw("colz");
-            Posterior->SetName(hpost2D[i][j]->GetName());
-            Posterior->SetTitle(hpost2D[i][j]->GetTitle());
-            Posterior->Print(CanvasName);
+            if(std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold)
+            {
+              hpost2D[i][j]->Draw("colz");
+              Posterior->SetName(hpost2D[i][j]->GetName());
+              Posterior->SetTitle(hpost2D[i][j]->GetTitle());
+              Posterior->Print(CanvasName);
+              hpost2D[i][j]->Write(hpost2D[i][j]->GetTitle());
+            }
           }
-        }
-        //if( std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold) hpost2D[i][j]->Write();
-      }// End j loop
-    }// End i loop
-  } //end if pdf
-  if(!Mute) {
+          //if( std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold) hpost2D[i][j]->Write();
+        }// End j loop
+      }// End i loop
+    } //end if pdf
+    PostHistDir->Close();
+    delete PostHistDir;
+    OutputFile->cd();
     Covariance->Write("Covariance");
     Correlation->Write("Correlation");
-  }
+  } // end if not mute
 }
 
 // *********************
@@ -1270,7 +1315,6 @@ void MCMCProcessor::MakeCovariance_MP(bool Mute) {
 // all credits for finding and studying it goes to Henry
 void MCMCProcessor::MakeSubOptimality(const int NIntervals) {
 // *********************
-
   //Save burn in cut, at the end of the loop we will return to default values
   const int DefaultUpperCut = UpperCut;
   const int DefaultBurnInCut = BurnInCut;
@@ -1428,6 +1472,58 @@ void MCMCProcessor::DrawCovariance() {
   Posterior->SetRightMargin(RightMargin);
   DrawCorrelationsGroup(hCorr);
   DrawCorrelations1D();
+}
+
+// *********************
+void MCMCProcessor::MakeCovarianceYAML(const std::string& OutputYAMLFile, const std::string& MeansMethod) const {
+// *********************
+  MACH3LOG_INFO("Making covariance matrix YAML file");
+
+  if (ParamNames[kXSecPar].size() != static_cast<size_t>(nDraw)) {
+    MACH3LOG_ERROR("Using Legacy Parameters i.e. not one from Parameter Handler Generic, this will not work");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  std::vector<double> MeanArray(nDraw);
+  std::vector<double> ErrorArray(nDraw);
+  std::vector<std::vector<double>> CorrelationMatrix(nDraw, std::vector<double>(nDraw, 0.0));
+
+  TVectorD* means_vec;
+  TVectorD* errors_vec;
+
+  if (MeansMethod == "Arithmetic") {
+    means_vec = Means;
+    errors_vec = Errors;
+  } else if (MeansMethod == "Gaussian") {
+    means_vec = Means_Gauss;
+    errors_vec = Errors_Gauss;
+  } else if (MeansMethod == "HPD") {
+    means_vec = Means_HPD;
+    errors_vec = Errors_HPD;
+  } else {
+    MACH3LOG_ERROR("Unknown means method: {}, should be either 'Arithmetic', 'Gaussian', or 'HPD'.", MeansMethod);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  //Make vectors of mean, error, and correlations
+  for (int i = 0; i < nDraw; i++)
+  {
+    MeanArray[i]  = (*means_vec)(i);
+    ErrorArray[i] = (*errors_vec)(i);
+    for (int j = 0; j <= i; j++)
+    {
+      CorrelationMatrix[i][j] = (*Correlation)(i,j);
+      if(i != j) CorrelationMatrix[j][i] = (*Correlation)(i,j);
+    }
+  }
+
+  //Make std::string param name vector
+  std::vector<std::string> ParamStrings(ParamNames[kXSecPar].size());
+  for (size_t i = 0; i < ParamNames[kXSecPar].size(); ++i) {
+    ParamStrings[i] = static_cast<std::string>(ParamNames[kXSecPar][i]);
+  }
+
+  YAML::Node XSecFile = CovConfig[kXSecPar];
+  M3::MakeCorrelationMatrix(XSecFile, MeanArray, ErrorArray, CorrelationMatrix, OutputYAMLFile, ParamStrings);
 }
 
 // *********************
@@ -1755,10 +1851,9 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
       //Plot default 2D posterior
 
       if(Draw2DPosterior){
-      hpost_2D_copy[i][j]->Draw("COLZ");
-      }
-      else{
-      hpost_2D_copy[i][j]->Draw("AXIS");
+        hpost_2D_copy[i][j]->Draw("COLZ");
+      } else{
+        hpost_2D_copy[i][j]->Draw("AXIS");
       }
 
       //Now credible regions
@@ -2362,6 +2457,20 @@ void MCMCProcessor::FindInputFiles() {
   // Delete the TTrees and the input file handle since we've now got the settings we need
   delete Config;
   delete XsecConfig;
+
+  TMacro *ReweightConfig = TempFile->Get<TMacro>("Reweight_Config");
+  if (ReweightConfig != nullptr) {
+    YAML::Node ReweightSettings = TMacroToYAML(*ReweightConfig);
+
+    if (ReweightSettings["Weight"]) {
+      ReweightName = "Weight";
+      ReweightPosterior = true;
+      MACH3LOG_INFO("Enabling reweighting with following Config");
+    } else {
+      MACH3LOG_WARN("Found reweight config but without field ''Weight''");
+    }
+    MaCh3Utils::PrintConfig(ReweightSettings);
+  }
 
   // Delete the MCMCFile pointer we're reading
   CovarianceFolder->Close();
@@ -3138,26 +3247,39 @@ void MCMCProcessor::ParameterEvolution(const std::vector<std::string>& Names,
 
     const int IntervalsSize = nSteps/NIntervals[k];
     // ROOT won't overwrite gifs so we need to delete the file if it's there already
-    int ret = system(fmt::format("rm {}.gif",Names[k]).c_str());
-    if (ret != 0){
-      MACH3LOG_WARN("Error: system call to delete {} failed with code {}", Names[k], ret);
+    std::string filename = Names[k] + ".gif";
+    std::ifstream f(filename);
+    if (f.good()) {
+      f.close();
+      int ret = system(fmt::format("rm {}", filename).c_str());
+      if (ret != 0) {
+        MACH3LOG_WARN("Error: system call to delete {} failed with code {}", filename, ret);
+      }
     }
-
-    // This holds the posterior density
-    const double maxi = Chain->GetMaximum(BranchNames[ParamNo]);
-    const double mini = Chain->GetMinimum(BranchNames[ParamNo]);
 
     int Counter = 0;
     for(int i = NIntervals[k]-1; i >= 0; --i)
     {
       // This holds the posterior density
-      TH1D* EvePlot = new TH1D(BranchNames[ParamNo], BranchNames[ParamNo], nBins, mini, maxi);
+      // KS: WARNING do not change to smart pointer, it breaks and I don't know why
+      TH1D* EvePlot = new TH1D(BranchNames[ParamNo], BranchNames[ParamNo], nBins,
+                               hpost[ParamNo]->GetXaxis()->GetXmin(), hpost[ParamNo]->GetXaxis()->GetXmax());
       EvePlot->SetMinimum(0);
       EvePlot->GetYaxis()->SetTitle("PDF");
       EvePlot->GetYaxis()->SetNoExponent(false);
 
       //KS: Apply additional Cuts, like mass ordering
       std::string CutPosterior1D = "step > " + std::to_string(i*IntervalsSize+IntervalsSize);
+
+      // If Posterior1DCut is not empty, append it
+      if (!Posterior1DCut.empty()) {
+        CutPosterior1D += " && " + Posterior1DCut;
+      }
+
+      // Apply reweighting if requested
+      if (ReweightPosterior) {
+        CutPosterior1D = "(" + CutPosterior1D + ")*(" + ReweightName + ")";
+      }
 
       std::string TextTitle = "Steps = 0 - "+std::to_string(Counter*IntervalsSize+IntervalsSize);
       // Project BranchNames[ParamNo] onto hpost, applying stepcut

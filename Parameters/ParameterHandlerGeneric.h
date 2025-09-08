@@ -59,14 +59,17 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     inline double GetParSplineKnotLowerBound(const int i) const {return SplineParams.at(i)._SplineKnotLowBound;}
 
     /// @brief DB Grab the number of parameters for the relevant SampleName
+    /// @param SampleName property of SampleHandler class based on which we select whether to apply uncertainties or not
     /// @param Type Type of syst, for example kNorm, kSpline etc
     /// @ingroup ParameterHandlerGetters
     int GetNumParamsFromSampleName(const std::string& SampleName, const SystType Type);
     /// @brief DB Grab the parameter names for the relevant SampleName
+    /// @param SampleName property of SampleHandler class based on which we select whether to apply uncertainties or not
     /// @param Type Type of syst, for example kNorm, kSpline etc
     /// @ingroup ParameterHandlerGetters
     const std::vector<std::string> GetParsNamesFromSampleName(const std::string& SampleName, const SystType Type);
     /// @brief DB Grab the parameter indices for the relevant SampleName
+    /// @param SampleName property of SampleHandler class based on which we select whether to apply uncertainties or not
     /// @param Type Type of syst, for example kNorm, kSpline etc
     /// @ingroup ParameterHandlerGetters
     const std::vector<int> GetParsIndexFromSampleName(const std::string& SampleName, const SystType Type);
@@ -82,6 +85,7 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @ingroup ParameterHandlerGetters
     const std::vector< std::vector<int> > GetSplineModeVecFromSampleName(const std::string& SampleName);
     /// @brief Grab the index of the syst relative to global numbering.
+    /// @param SampleName property of SampleHandler class based on which we select whether to apply uncertainties or not
     /// @param Type Type of syst, for example kNorm, kSpline etc
     /// @ingroup ParameterHandlerGetters
     const std::vector<int> GetSystIndexFromSampleName(const std::string& SampleName, const SystType Type) const;
@@ -116,7 +120,7 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @note this mimic functionality of @ParameterHandlerBase::SetParameters
     void SetGroupOnlyParameters(const std::string& Group, const std::vector<double>& Pars = {});
     /// @brief KS Function to set to prior parameters of a given groups or values from vector
-    /// @param Group vector of group names, like Xsec or Flux
+    /// @param Groups vector of group names, like Xsec or Flux
     /// @ingroup ParameterHandlerSetters
     void SetGroupOnlyParameters(const std::vector<std::string>& Groups);
 

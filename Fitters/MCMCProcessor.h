@@ -71,6 +71,7 @@ class MCMCProcessor {
     /// @brief Make 1D projection for each parameter and prepare structure
     void MakePostfit(const std::map<std::string, std::pair<double, double>>& Edges = {});
     /// @brief Calculate covariance by making 2D projection of each combination of parameters
+    /// @warning This is deprecated and slower, however it is less RAM intensive
     void MakeCovariance();
     /// @brief KS:By caching each step we use multithreading
     void CacheSteps();
@@ -99,6 +100,8 @@ class MCMCProcessor {
                                );
     /// @brief Draw the post-fit covariances
     void DrawCovariance();
+    /// @brief Make YAML file from post-fit covariance
+    void MakeCovarianceYAML(const std::string& OutputYAMLFile, const std::string& MeansMethod) const;
     /// @brief Make and Draw Credible Regions
     /// @param CredibleRegions Vector with values of credible intervals, must be in descending order
     /// @param CredibleRegionStyle Style_t telling what line style to use for each Interval line
@@ -577,6 +580,13 @@ class MCMCProcessor {
     /// Holds all accProb in batches
     double *AccProbBatchedAverages;
     
+    /// Whether to apply reweighting weight or not
+    bool ReweightPosterior;
+    /// Name of branch used for chain reweighting
+    std::string ReweightName;
+    /// Stores value of weight for each step
+    double* WeightValue;
+
   //Only if GPU is enabled
   #ifdef MaCh3_CUDA
     /// @brief Move stuff to GPU to perform auto correlation calculations there

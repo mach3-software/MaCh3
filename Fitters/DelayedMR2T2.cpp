@@ -56,7 +56,6 @@ void DelayedMR2T2::PrepareOutput() {
 
     // Store delayed specific settings
     outTree->Branch("DelayedStep", &accepted_delayed, "DelayedStep/B");
-
 }
 
 //**********************************************
@@ -80,16 +79,14 @@ void DelayedMR2T2::StoreCurrentStep() {
 double DelayedMR2T2::AcceptanceProbability() {
 // *************************
     // From https://arxiv.org/pdf/2010.04190 and DRAM Matlab implementation
-
-    double numerator = std::max(0.0, std::exp(MinLogLikelihood - logLProp) - 1.0);
-    double denominator = std::exp(MinLogLikelihood - logLCurr) - 1.0;
+    const double numerator = std::max(0.0, std::exp(MinLogLikelihood - logLProp) - 1.0);
+    const double denominator = std::exp(MinLogLikelihood - logLCurr) - 1.0;
     if (denominator <= 0.0) return 1.0;
 
     // Large enough that the the minus 1 will make NO difference so the max term cancels
     if(std::isinf(numerator) or std::isinf(denominator) ){
         return MR2T2::AcceptanceProbability();
     }
-
 
     return std::min(numerator / denominator, 1.0);
 }
@@ -159,6 +156,7 @@ void DelayedMR2T2::DoStep() {
     }
 
     // If we reject we need to reset everything [this is probably a tad too slow...
+    // especially in PCA...
     if(!accepted){
         for(int i=0; i<static_cast<int>(systematics.size()); ++i){
             for(int j=0; j<static_cast<int>(systematics[i]->GetParCurrVec().size()); ++j){

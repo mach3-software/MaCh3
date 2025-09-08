@@ -18,13 +18,13 @@
 /// @author Kamil Skwarczynski
 
 /// @brief MaCh3 Factory initiates one of implemented fitting algorithms
-/// @param fitMan pointer to Manager class
+/// @param FitManager pointer to Manager class
 ///
 /// @note Example YAML configuration:
 /// @code
 /// General:
 ///   FittingAlgorithm: ["MCMC"]
-std::unique_ptr<FitterBase> MaCh3FitterFactory(manager *fitMan);
+std::unique_ptr<FitterBase> MaCh3FitterFactory(manager *FitManager);
 
 /// @brief Initializes the config manager class and allows overriding settings via command-line arguments.
 /// @param argc number of arguments

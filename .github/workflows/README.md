@@ -56,4 +56,7 @@ Summary of currently implemented bots
 ## TaskChecker
 * We require every user before merging PR to tick that they have read contributing. This simply ensures people actually ticked it. We can't check people actually read it, for now ;)
 
+## TagDoxygen
+* Tag Doxygen Documentation when MaCh3 tag is produced
+
 
