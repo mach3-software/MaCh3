@@ -1334,7 +1334,7 @@ void BinnedSplineHandler::PrepareSettingsDir(std::unique_ptr<TFile>& SplineFile)
 void BinnedSplineHandler::PrepareMonolithDir(std::unique_ptr<TFile>& SplineFile) const {
 // *****************************************
   TTree *MonolithTree = new TTree("MonolithTree", "MonolithTree");
-  MonolithTree->Branch("manycoeff", manycoeff_arr, Form("manycoeff[%d]/%s", CoeffIndex * _nCoeff_, M3::float_t_str));
+  MonolithTree->Branch("manycoeff", manycoeff_arr, Form("manycoeff[%d]/%s", CoeffIndex * _nCoeff_, M3::float_t_str_repr));
   MonolithTree->Branch("isflatarray", isflatarray, Form("isflatarray[%d]/O", MonolithSize));
 
   std::vector<int> coeffindexvec_temp = coeffindexvec;
@@ -1345,7 +1345,7 @@ void BinnedSplineHandler::PrepareMonolithDir(std::unique_ptr<TFile>& SplineFile)
   MonolithTree->Branch("uniquesplinevec_Monolith", &uniquesplinevec_Monolith_temp);
   std::vector<int> UniqueSystIndices_temp = UniqueSystIndices;
   MonolithTree->Branch("UniqueSystIndices", &UniqueSystIndices_temp);
-  MonolithTree->Branch("xcoeff", xcoeff_arr, Form("xcoeff[%d]/%s", CoeffIndex, M3::float_t_str));
+  MonolithTree->Branch("xcoeff", xcoeff_arr, Form("xcoeff[%d]/%s", CoeffIndex, M3::float_t_str_repr));
 
   MonolithTree->Fill();
   SplineFile->cd();
