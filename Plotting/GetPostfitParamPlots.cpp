@@ -851,7 +851,7 @@ inline std::unique_ptr<TGraphAsymmErrors> MakeTGraphAsymmErrors(const std::share
   return PostGraph;
 }
    
-//KS: Make fancy violin plots
+/// @brief KS: Make fancy violin plots
 void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
 {
   //KS: Should be in some config... either way it control whether you plot symmetric or asymmetric error bars
@@ -1029,6 +1029,106 @@ void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
   }
 }
 
+/// @brief KS: Make comparison of 2D Posteriors
+void Get2DComparison(const std::string& FileName1, const std::string& FileName2)
+{
+  auto canvas = std::make_unique<TCanvas>("canvas", "canvas", 0, 0, 1024, 1024);
+  canvas->SetBottomMargin(0.1f);
+  canvas->SetTopMargin(0.05f);
+  canvas->SetRightMargin(0.03f);
+  canvas->SetLeftMargin(0.15f);
+
+  // Open the two ROOT files
+  TFile* File1 = M3::Open(FileName1, "READ", __FILE__, __LINE__);
+  TFile* File2 = M3::Open(FileName2, "READ", __FILE__, __LINE__);
+
+  // Get the Post_2d_hists directory from both files
+  TDirectory* Dir1 = File1->Get<TDirectory>("Post_2d_hists");
+  TDirectory* Dir2 = File2->Get<TDirectory>("Post_2d_hists");
+
+  if (!Dir1 || !Dir2) {
+    MACH3LOG_WARN("Post_2d_hists directory not found in one or both files while running {}.", __func__);
+    File1->Close();
+    delete File1;
+    File2->Close();
+    delete File2;
+    return;
+  }
+
+  // Get the list of keys in the first directory
+  TIter next1(Dir1->GetListOfKeys());
+  TKey* key1 = nullptr;
+
+  // Prepare the output PDF filename
+  std::string SaveName2D = "2DComparison_" + FileName1 + "_" + FileName2;
+  SaveName2D = SaveName2D.substr(0, SaveName2D.find(".root"));
+  SaveName2D = SaveName2D + ".pdf";
+
+  canvas->Print((SaveName2D+"[").c_str());
+  // Loop over keys in the first directory
+  while ((key1 = static_cast<TKey*>(next1()))) {
+    TString histName = key1->GetName();
+
+    // Check if the key is a TH2D
+    if (TString(key1->GetClassName()) == "TH2D") {
+      TH2D* hist1 = static_cast<TH2D*>(key1->ReadObj());
+
+      // Try to get the histogram with the same name from the second directory
+      TH2D* hist2 = static_cast<TH2D*>(Dir2->Get(histName));
+
+      if (hist2) {
+        hist1->SetTitle("");
+        hist1->SetTitle("");
+
+        // Prettify axis titles
+        std::string Xtitle = man->style().prettifyParamName(hist1->GetXaxis()->GetTitle());
+        std::string Ytitle = man->style().prettifyParamName(hist1->GetYaxis()->GetTitle());
+
+        // Adjust the axis ranges of hist1 to include both histograms
+        double xmin = std::min(hist1->GetXaxis()->GetXmin(), hist2->GetXaxis()->GetXmin());
+        double xmax = std::max(hist1->GetXaxis()->GetXmax(), hist2->GetXaxis()->GetXmax());
+        double ymin = std::min(hist1->GetYaxis()->GetXmin(), hist2->GetYaxis()->GetXmin());
+        double ymax = std::max(hist1->GetYaxis()->GetXmax(), hist2->GetYaxis()->GetXmax());
+
+        hist1->GetXaxis()->SetRangeUser(xmin, xmax);
+        hist1->GetYaxis()->SetRangeUser(ymin, ymax);
+
+        hist1->GetXaxis()->SetTitle(Xtitle.c_str());
+        hist1->GetYaxis()->SetTitle(Ytitle.c_str());
+
+        hist1->SetLineColor(kBlue);
+        hist1->SetLineStyle(kSolid);
+        hist1->SetLineWidth(2);
+
+        hist2->SetLineColor(kRed);
+        hist2->SetLineStyle(kDashed);
+        hist2->SetLineWidth(2);
+
+        hist1->Draw("CONT3");
+        hist2->Draw("CONT3 SAME");
+
+        auto Legend = std::make_unique<TLegend>(0.20, 0.7, 0.4, 0.92);
+        Legend->AddEntry(hist1, man->getFileLabel(0).c_str(), "l");
+        Legend->AddEntry(hist2, man->getFileLabel(1).c_str(), "l");
+        Legend->SetTextSize(0.03);
+        Legend->SetLineColor(0);
+        Legend->SetLineStyle(0);
+        Legend->SetFillColor(0);
+        Legend->SetFillStyle(0);
+        Legend->SetBorderSize(0);
+        Legend->Draw("SAME");
+        canvas->Print((SaveName2D).c_str());
+      }
+    }
+  }
+  canvas->Print((SaveName2D+"]").c_str());
+
+  File1->Close();
+  delete File1;
+  File2->Close();
+  delete File2;
+}
+
 int main(int argc, char *argv[]) 
 {
   SetMaCh3LoggerFormat();
@@ -1038,7 +1138,6 @@ int main(int argc, char *argv[])
   man = new MaCh3Plotting::PlottingManager();
   man->parseInputs(argc, argv);
   #ifdef DEBUG
-  std::cout << std::endl << std::endl << "====================" << std::endl;
   man->input().getFile(0).file->ls();
   #endif
   man->setExec("GetPostfitParamPlots");
@@ -1057,13 +1156,14 @@ int main(int argc, char *argv[])
     std::string filename1 = man->getFileName(0);
     std::string filename2 = man->getFileName(1);
     GetViolinPlots(filename1, filename2);
+    Get2DComparison(filename1, filename2);
   }
   else if (man->input().getNInputFiles() == 3)
   {
     std::string filename1 = man->getFileName(0);
     std::string filename2 = man->getFileName(1);
     std::string filename3 = man->getFileName(3);
-    //KS: Violin plot currently not supported by three file version although it should be super easy to adapt
+    /// @todo KS: Violin plot currently not supported by three file version although it should be super easy to adapt
   }
 
   delete man;

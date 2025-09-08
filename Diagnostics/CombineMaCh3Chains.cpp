@@ -272,7 +272,7 @@ void CombineChain()
   outputFile->cd();
 
   // EM: Write out the version and config files to the combined file
-  std::vector<std::string> configNames = {"MaCh3_Config", "Reweight_Config"};
+  std::vector<std::string> configNames = {"MaCh3_Config", "Reweight_Config", "Smearing_Config"};
   for (std::size_t i = 0; i < configNames.size(); ++i) {
     const std::string& name = configNames[i];
     TMacro* macro = prevFile->Get<TMacro>(name.c_str());

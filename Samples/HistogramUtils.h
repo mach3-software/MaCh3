@@ -133,6 +133,7 @@ namespace M3 {
 ///
 /// @tparam ObjectType The type of the object to clone for example TH1D or TH2Poly.
 /// @param obj Pointer to the object to clone.
+/// @param name Optional argument allowing to set new name of cloned object
 /// @return std::unique_ptr<ObjectType> Owning pointer to the cloned object.
 template <typename ObjectType>
 std::unique_ptr<ObjectType> Clone(const ObjectType* obj, const std::string& name = "") {

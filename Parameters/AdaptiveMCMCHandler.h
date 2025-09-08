@@ -22,7 +22,12 @@ class AdaptiveMCMCHandler{
   void Print();
 
   /// @brief Read initial values from config file
-  /// @param adapt_manager Config file from which we update matrix
+  ///
+  /// @param adapt_manager YAML node containing the configuration (`AdaptionOptions`).
+  /// @param matrix_name_str Name of the covariance matrix block to configure.
+  /// @param parameters Pointer to a vector of parameter values (nominal values).
+  /// @param fixed Pointer to a vector of fixed parameter values.
+  /// @return True if adaptive MCMC configuration was successfully initialized, false otherwise.
   bool InitFromConfig(const YAML::Node& adapt_manager, const std::string& matrix_name_str,
                       const std::vector<double>* parameters, const std::vector<double>* fixed);
 
