@@ -94,6 +94,7 @@ endif()
 #endif()
 
 set(MaCh3_Fitter_ENABLED "MR2T2")
+LIST(APPEND MaCh3_Fitter_ENABLED " DelayedMR2T2")
 LIST(APPEND MaCh3_Fitter_ENABLED " PSO")
 if(MaCh3_MINUIT2_ENABLED)
   LIST(APPEND MaCh3_Fitter_ENABLED " Minuit2")

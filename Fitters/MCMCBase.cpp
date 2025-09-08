@@ -20,8 +20,6 @@ MCMCBase::MCMCBase(manager *man) : FitterBase(man) {
         MACH3LOG_INFO("Enabling simulated annealing with T = {}", AnnealTemp);
         anneal = true;
     }
-
-    current_step = 0;
 }
 
 
@@ -67,7 +65,6 @@ void MCMCBase::DoMCMCStep() {
     DoStep();
     /// Tree filling etc.
     PostStepProcess();
-    current_step++;
 }
 
 // *******************
@@ -154,7 +151,6 @@ void MCMCBase::AdaptiveStep() {
     for (const auto &syst : systematics)
     {
         if (syst->GetDoAdaption()){
-        
             syst->UpdateAdaptiveCovariance();
         }
     }

@@ -52,7 +52,6 @@ class DelayedMR2T2 : public MR2T2 {
     inline std::string GetName() const override { return "DelayedMR2T2"; };
 
  protected:
-
      /// @brief Step acceptance probability
     double AcceptanceProbability() override;
 
@@ -81,7 +80,7 @@ class DelayedMR2T2 : public MR2T2 {
     /// Stores the initial scale for all parameters
     std::vector<double> start_step_scale;
 
-    /// Scale for (non-delayed) step is inital_scale*start_step_scale
+    /// Scale for (non-delayed) step is #initial_scale * #start_step_scale
     double initial_scale;
     /// How much to decrease the step scale each step
     double decay_rate;
@@ -94,7 +93,7 @@ class DelayedMR2T2 : public MR2T2 {
     /// Was the step we just accepted delayed?
     bool accepted_delayed;
 
-    /// Delay iff we go out of bounds
+    /// Delay only if we go out of bounds
     bool delay_on_oob_only;
     /// Can delay with probability instead
     double delay_probability;

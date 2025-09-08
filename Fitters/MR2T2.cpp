@@ -7,7 +7,7 @@ void MR2T2::DoStep() {
     // Does the MCMC accept this step?
     accProb = AcceptanceProbability();
 
-    if (IsStepAccepted(accProb) and !out_of_bounds)
+    if (!out_of_bounds && IsStepAccepted(accProb))
     {
         AcceptStep();
     }
@@ -18,7 +18,6 @@ void MR2T2::DoStep() {
 void MR2T2::ProposeStep() {
 // *******************
     // Initial likelihood
-
     out_of_bounds = false;
     
     double llh = 0.0;
