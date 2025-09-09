@@ -4,7 +4,7 @@ var searchData=
   ['mach3exception_1',['MaCh3Exception',['../classMaCh3Exception.html#a848f0037a80a607b8721b7a163b1077e',1,'MaCh3Exception']]],
   ['mach3fitterfactory_2',['MaCh3FitterFactory',['../MaCh3Factory_8cpp.html#a126d15eeabecd1e4ab67422784a9f84a',1,'MaCh3Factory.cpp']]],
   ['mach3managerfactory_3',['MaCh3ManagerFactory',['../MaCh3Factory_8cpp.html#aada46b6630f2f29c34c35354973388b3',1,'MaCh3Factory.cpp']]],
-  ['mach3modes_4',['MaCh3Modes',['../classMaCh3Modes.html#a1ea9394c1498bf6b37724d41c31f2f2d',1,'MaCh3Modes']]],
+  ['mach3modes_4',['MaCh3Modes',['../classMaCh3Modes.html#a1ea9394c1498bf6b37724d41c31f2f2d',1,'MaCh3Modes::MaCh3Modes(std::string const &amp;filename)'],['../classMaCh3Modes.html#a8e0beef569e89d66d63c6923aa9531e1',1,'MaCh3Modes::MaCh3Modes(const YAML::Node &amp;config)']]],
   ['mach3samplehandlerfactory_5',['MaCh3SampleHandlerFactory',['../MaCh3Factory_8h.html#a790d0802b36a03be651d830ae33ed8e6',1,'MaCh3Factory.h']]],
   ['mach3usage_6',['MaCh3Usage',['../namespaceMaCh3Utils.html#abcecb06e3d26685da80dd1f3a08e3d0c',1,'MaCh3Utils']]],
   ['mach3welcome_7',['MaCh3Welcome',['../namespaceMaCh3Utils.html#ac6f4a3b6a7749967ff9a011469352f6c',1,'MaCh3Utils']]],

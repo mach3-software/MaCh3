@@ -1,11 +1,18 @@
 /* MaCh3 doxygen HTML_EXTRA_STYLESHEET */
 
+/* Main content container */
 div.contents {
     max-width: 100em;
     margin-right: 5em;
     margin-left: 5em;
 }
 
+/* Main page text styling */
+div.PageDoc div.textblock {
+    font-size: 1.2em;
+}
+
+/* Footer styling */
 .mach3-footer {
     background-image: url('OscPattern.png');
     background-size: contain;
