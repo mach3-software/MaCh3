@@ -37,7 +37,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           retention-days: 1
-          name: Doxyfile
+          name: DoxyfileMaCh3
           path: Doc/Doxyfile
 
   Doxygen:
@@ -60,8 +60,8 @@ jobs:
       - name: Download Doxygen Artifact
         uses: actions/download-artifact@v4
         with:
-          name: Doxyfile
-          path: to-upload/Doc
+          name: DoxyfileMaCh3
+          path: Doc
 
       # Updates the package list to ensure you get the latest version of packages
       - run: sudo apt-get update
