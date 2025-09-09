@@ -39,14 +39,14 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: ghcr.io/mach3-software/mach3:alma9latest
-          options: "--rm -v ${{ github.workspace }}:/workspace -w /workspace"
+          options: "--rm -v ${{ github.workspace }}:/workspace -w /workspace -u $(id -u):$(id -g)"
           run: |
             mkdir -p build
             cd build
             cmake ../
             cd ../
             rm -r -f build
-            chmod 755 Doc/Doxyfile
+            ls -l Doc/Doxyfile
 
       # Updates the package list to ensure you get the latest version of packages
       - run: sudo apt-get update
