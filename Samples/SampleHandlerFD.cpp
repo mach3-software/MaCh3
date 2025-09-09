@@ -1307,10 +1307,10 @@ void SampleHandlerFD::FillSplineBins() {
     std::vector< std::vector<int> > EventSplines;
     switch(GetNDim()){
       case 1:
-        EventSplines = SplineHandler->GetEventSplines(GetSampleName(), OscIndex, int(*(MCSamples[j].mode)), *(MCSamples[j].rw_etru), *(MCSamples[j].x_var), 0.);
+        EventSplines = SplineHandler->GetEventSplines(GetTitle(), OscIndex, int(*(MCSamples[j].mode)), *(MCSamples[j].rw_etru), *(MCSamples[j].x_var), 0.);
         break;
       case 2:
-        EventSplines = SplineHandler->GetEventSplines(GetSampleName(), OscIndex, int(*(MCSamples[j].mode)), *(MCSamples[j].rw_etru), *(MCSamples[j].x_var), *(MCSamples[j].y_var));
+        EventSplines = SplineHandler->GetEventSplines(GetTitle(), OscIndex, int(*(MCSamples[j].mode)), *(MCSamples[j].rw_etru), *(MCSamples[j].x_var), *(MCSamples[j].y_var));
         break;
       default:
         MACH3LOG_ERROR("Error in assigning spline bins because nDimensions = {}", GetNDim());
@@ -1412,10 +1412,19 @@ void SampleHandlerFD::InitialiseSplineObject() {
     SplineVarNames.push_back(GetYBinVarName());
   }
   
-  SplineHandler->AddSample(SampleName, spline_filepaths, SplineVarNames);
-  SplineHandler->CountNumberOfLoadedSplines(false, 1);
-  SplineHandler->TransferToMonolith();
-
+  bool LoadSplineFile = GetFromManager<bool>(SampleManager->raw()["InputFiles"]["LoadSplineFile"], false, __FILE__, __LINE__);
+  bool PrepSplineFile = GetFromManager<bool>(SampleManager->raw()["InputFiles"]["PrepSplineFile"], false, __FILE__, __LINE__);
+  auto SplineFileName = GetFromManager<std::string>(SampleManager->raw()["InputFiles"]["SplineFileName"],
+                                                    (SampleName + "_SplineFile.root"), __FILE__, __LINE__);
+  if(!LoadSplineFile) {
+    SplineHandler->AddSample(SampleName, GetTitle(), spline_filepaths, SplineVarNames);
+    SplineHandler->CountNumberOfLoadedSplines(false, 1);
+    SplineHandler->TransferToMonolith();
+    if(PrepSplineFile) SplineHandler->PrepareSplineFile(SplineFileName);
+  } else {
+    // KS: Skip default spline loading and use flattened spline format allowing to read stuff much faster
+    SplineHandler->LoadSplineFile(SplineFileName);
+  }
   MACH3LOG_INFO("--------------------------------");
   MACH3LOG_INFO("Setup Far Detector splines");
 

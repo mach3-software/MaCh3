@@ -15,9 +15,11 @@ class SMonolith : public SplineBase {
     /// @param MasterSpline Vector of TSpline3 pointers which we strip back
     /// @param SplineType Whether object is TSpline3 or TF1
     /// @param SaveFlatTree Whether we want to save monolith into speedy flat tree
+    /// @param _FastSplineName Name to which spline file will be saved
     SMonolith(std::vector<std::vector<TResponseFunction_red*> > &MasterSpline,
               const std::vector<RespFuncType> &SplineType,
-              const bool SaveFlatTree = false);
+              const bool SaveFlatTree = false,
+              const std::string& _FastSplineName = "SplineFile.root");
     /// @brief Constructor where you pass path to preprocessed root FileName
     /// @param FileName path to pre-processed root file containing stripped monolith info
     SMonolith(const std::string& FileName);
@@ -49,6 +51,12 @@ class SMonolith : public SplineBase {
     float* cpu_weights;
     /// KS: This holds the total CPU weights that gets read in samplePDFND
     float* cpu_total_weights;
+
+    /// @brief KS: Prepare spline file that can be used for fast loading
+    void PrepareSplineFile(std::string FileName) override;
+    /// @brief KS: Load preprocessed spline file
+    /// @param FileName Path to ROOT file with predefined reduced Spline Monolith
+    void LoadSplineFile(std::string FileName) override;
 
   private:
     /// @brief KS: Set everything to null etc.
@@ -96,12 +104,6 @@ class SMonolith : public SplineBase {
     inline void ModifyWeights() override;
     /// @brief Conversion from valid splines to all
     inline void ModifyWeights_GPU();
-    
-    /// @brief KS: Prepare spline file that can be used for fast loading
-    inline void PrepareSplineFile();
-    /// @brief KS: Load preprocessed spline file
-    /// @param FileName Path to ROOT file with predefined reduced Spline Monolith
-    inline void LoadSplineFile(std::string FileName);
 
     /// This holds pointer to parameter position which we later copy paste it to GPU
     std::vector< const double* > splineParsPointer;
@@ -156,4 +158,7 @@ class SMonolith : public SplineBase {
 
     /// Flag telling whether we are saving spline monolith into handy root file
     bool SaveSplineFile;
+
+    /// Name of Fast Spline to which will be saved
+    std::string FastSplineName;
 };
