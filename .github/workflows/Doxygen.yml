@@ -23,9 +23,6 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
-    container:
-      image: ghcr.io/mach3-software/mach3:alma9latest
-
     permissions:
       contents: write
       id-token: write
@@ -36,28 +33,30 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, 
       # so your job can access it
       - uses: actions/checkout@v5
+      
+      # Run CMake inside AlmaLinux container to generate Doxyfile
+      - name: Generate Doxyfile using CMake
+        uses: addnab/docker-run-action@v3
         with:
-          path: MaCh3
-
-      # Need to run cmake to get doxyfile with correct version
-      - run: mkdir -p build && cd build && cmake ../
-        working-directory: MaCh3
+          image: ghcr.io/mach3-software/mach3:alma9latest
+          options: "--rm -v ${{ github.workspace }}:/workspace -w /workspace/MaCh3"
+          run: |
+            mkdir -p build
+            cd build
+            cmake ../
 
       # Updates the package list to ensure you get the latest version of packages
-      - run: dnf update -y
-
-      # Get Doxygen
-      - run: dnf install -y doxygen
+      - run: sudo apt-get update
 
       # Installs texlive for LaTeX support in Doxygen documentation
-      - run: dnf install -y texlive
+      - run: sudo apt-get install -y texlive
 
       # Installs libjs-mathjax for rendering mathematical notation 
       # in Doxygen documentation
-      - run: dnf install -y mathjax
+      - run: sudo apt-get install -y libjs-mathjax
 
       # Install perl for bibtex
-      - run: dnf install -y perl
+      - run: sudo apt-get install -y perl
 
       # Runs a single command using the runners shell
       - uses: DenverCoder1/doxygen-github-pages-action@v2.0.0
