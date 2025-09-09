@@ -47,13 +47,16 @@ jobs:
       # Install perl for bibtex
       - run: sudo apt-get install -y perl
 
-      # Install Doxygen 1.9.1
+      # Install Doxygen 1.9.1 from source
       - name: Install Doxygen 1.9.1
         run: |
           DOXYGEN_VERSION=1.9.1
-          wget https://github.com/doxygen/doxygen/releases/download/Release_${DOXYGEN_VERSION}/doxygen-${DOXYGEN_VERSION}.linux.bin.tar.gz
-          tar -xzf doxygen-${DOXYGEN_VERSION}.linux.bin.tar.gz
-          sudo mv doxygen-${DOXYGEN_VERSION}/bin/doxygen /usr/local/bin/
+          wget https://github.com/doxygen/doxygen/releases/download/Release_${DOXYGEN_VERSION}/doxygen-${DOXYGEN_VERSION}.tar.gz
+          tar -xzf doxygen-${DOXYGEN_VERSION}.tar.gz
+          cd doxygen-${DOXYGEN_VERSION}
+          cmake .
+          make
+          sudo make install
           doxygen --version
 
       # Runs a single command using the runners shell
