@@ -23,6 +23,9 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
+    container:
+      image: ghcr.io/mach3-software/mach3:alma9latest
+
     permissions:
       contents: write
       id-token: write
@@ -33,19 +36,28 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, 
       # so your job can access it
       - uses: actions/checkout@v5
-      
+        with:
+          path: MaCh3
+
+      # Need to run cmake to get doxyfile with correct version
+      - run: cmake ../
+        working-directory: MaCh3
+
       # Updates the package list to ensure you get the latest version of packages
-      - run: sudo apt-get update
+      - run: dnf update -y
+
+      # Get Doxygen
+      - run: dnf install -y doxygen
 
       # Installs texlive for LaTeX support in Doxygen documentation
-      - run: sudo apt-get install -y texlive
+      - run: dnf install -y texlive
 
       # Installs libjs-mathjax for rendering mathematical notation 
       # in Doxygen documentation
-      - run: sudo apt-get install -y libjs-mathjax
+      - run: dnf install -y libjs-mathjax
 
       # Install perl for bibtex
-      - run: sudo apt-get install -y perl
+      - run: dnf install -y perl
 
       # Runs a single command using the runners shell
       - uses: DenverCoder1/doxygen-github-pages-action@v2.0.0
