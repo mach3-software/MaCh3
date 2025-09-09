@@ -46,6 +46,7 @@ jobs:
             cmake ../
             cd ../
             rm -r -f build
+            chmod 755 Doc/Doxyfile
 
       # Updates the package list to ensure you get the latest version of packages
       - run: sudo apt-get update
