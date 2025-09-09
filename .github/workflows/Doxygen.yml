@@ -54,7 +54,7 @@ jobs:
 
       # Installs libjs-mathjax for rendering mathematical notation 
       # in Doxygen documentation
-      - run: dnf install -y libjs-mathjax
+      - run: dnf install -y mathjax
 
       # Install perl for bibtex
       - run: dnf install -y perl
