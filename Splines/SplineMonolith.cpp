@@ -35,11 +35,15 @@ void SMonolith::Initialise() {
 }
 
 // *****************************************
-SMonolith::SMonolith(std::vector<std::vector<TResponseFunction_red*> > &MasterSpline, const std::vector<RespFuncType> &SplineType, const bool SaveFlatTree)
+SMonolith::SMonolith(std::vector<std::vector<TResponseFunction_red*> > &MasterSpline,
+                     const std::vector<RespFuncType> &SplineType,
+                     const bool SaveFlatTree,
+                     const std::string& _FastSplineName)
 : SplineBase() {
 // *****************************************
   //KS: If true it will save spline monolith into huge ROOT file
   SaveSplineFile = SaveFlatTree;
+  FastSplineName = _FastSplineName;
   Initialise();
   MACH3LOG_INFO("-- GPUING WITH arrays and master spline containing TResponseFunction_red");
 
@@ -292,7 +296,7 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
 
   // Print some info; could probably make this to a separate function
   PrintInitialsiation();
-  if(SaveSplineFile) PrepareSplineFile("SplineFile.root");
+  if(SaveSplineFile) PrepareSplineFile(FastSplineName);
 
   MoveToGPU();
 }

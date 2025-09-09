@@ -51,7 +51,7 @@ template<class HistType> HistType* RatioHists(HistType* NumHist, HistType* Denom
 TH2Poly* RatioPolys(TH2Poly* NumPoly, TH2Poly* DenomPoly);
 
 /// @brief WP: Helper function to create TH2Poly histogram with uniform binning
-/// @param name This will be tittle of output histogram
+/// @param name This will be title of output histogram
 /// @param BinArray_x Bin edges for X axis
 /// @param BinArray_y Bin edges for Y axis
 TH2Poly* MakePolyHist(const std::string& name, const std::vector<double>& BinArray_x, const std::vector<double>& BinArray_y);
@@ -81,7 +81,7 @@ int GetRandomPoly2(const TH2Poly* PolyHist, TRandom3* rand);
 /// @param sigmaArrayLeft sigma var hist at -1 or -3 sigma shift
 /// @param sigmaArrayCentr sigma var hist at prior values
 /// @param sigmaArrayRight sigma var hist at +1 or +3 sigma shift
-/// @param title A tittle for returned object
+/// @param title A title for returned object
 /// @return A `TGraphAsymmErrors` object that visualizes the sigma variation of spectra, showing confidence intervals between different sigma shifts.
 std::unique_ptr<TGraphAsymmErrors> MakeAsymGraph(TH1* sigmaArrayLeft, TH1* sigmaArrayCentr, TH1* sigmaArrayRight, const std::string& title);
 
