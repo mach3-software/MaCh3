@@ -699,11 +699,11 @@ void KolmogorovSmirnovTest(const std::vector<std::unique_ptr<MCMCProcessor>>& Pr
       CumulativeDistribution[ik]->Fill(0., 0.);
       CumulativeDistribution[ik]->Reset();
       CumulativeDistribution[ik]->SetMaximum(1.);
-      TString TempTittle = Title+" Kolmogorov Smirnov";
-      CumulativeDistribution[ik]->SetTitle(TempTittle);
+      TString TempTitle = Title+" Kolmogorov Smirnov";
+      CumulativeDistribution[ik]->SetTitle(TempTitle);
       
-      TempTittle = Title+" Value";
-      CumulativeDistribution[ik]->GetXaxis()->SetTitle(TempTittle);
+      TempTitle = Title+" Value";
+      CumulativeDistribution[ik]->GetXaxis()->SetTitle(TempTitle);
       CumulativeDistribution[ik]->GetYaxis()->SetTitle("Cumulative Probability");
       
       CumulativeDistribution[ik]->SetLineWidth(2);

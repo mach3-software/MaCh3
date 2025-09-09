@@ -640,7 +640,7 @@ void PredictiveThrower::MakeChi2Plots(const std::vector<std::vector<double>>& Ch
                    const std::vector<std::vector<double>>& Chi2_y,
                    const std::string& Chi2_y_title,
                    const std::vector<TDirectory*>& SampleDir,
-                   const std::string Tittle) {
+                   const std::string Title) {
 // *************************
   for (int iSample = 0; iSample < TotalNumberOfSamples+1; ++iSample) {
     SampleDir[iSample]->cd();
@@ -659,8 +659,8 @@ void PredictiveThrower::MakeChi2Plots(const std::vector<std::vector<double>>& Ch
     const double max_val = std::max(*std::max_element(chi2_y_sample.begin(), chi2_y_sample.end()),
                               *std::max_element(chi2_x_per_sample.begin(), chi2_x_per_sample.end()));
 
-    auto chi2_hist = std::make_unique<TH2D>((SampleNames[iSample] + Tittle).c_str(),
-                                            (SampleNames[iSample] + Tittle).c_str(),
+    auto chi2_hist = std::make_unique<TH2D>((SampleNames[iSample] + Title).c_str(),
+                                            (SampleNames[iSample] + Title).c_str(),
                                             100, min_val, max_val, 100, min_val, max_val);
     chi2_hist->SetDirectory(nullptr);
     chi2_hist->GetXaxis()->SetTitle(Chi2_x_title.c_str());

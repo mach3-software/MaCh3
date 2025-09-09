@@ -186,7 +186,7 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
   std::vector<std::string> SetsNames;
   std::vector<std::vector<std::string>> RemoveNames;
   std::vector<bool> Exclude;
-  std::vector<std::string> FancyTittle;
+  std::vector<std::string> FancyTitle;
 
   std::vector<std::vector<bool>> isRelevantParam;
   std::vector<std::string> node = Settings["GetPenaltyTerm"]["PenaltySets"].as<std::vector<std::string>>();
@@ -199,7 +199,7 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
 
     RemoveNames.push_back(Set[0].as<std::vector<std::string>>());
     Exclude.push_back(Set[1].as<bool>());
-    FancyTittle.push_back(Set[2].as<std::string>());
+    FancyTitle.push_back(Set[2].as<std::string>());
   }
 
   const int NSets = int(SetsNames.size());
@@ -346,9 +346,9 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
   {
     const double Maximum = hLogL[i]->GetMaximum();
     hLogL[i]->GetYaxis()->SetRangeUser(0., Maximum*1.2);
-    hLogL[i]->SetTitle(FancyTittle[i].c_str());
+    hLogL[i]->SetTitle(FancyTitle[i].c_str());
     hLogL[i]->GetXaxis()->SetTitle("Step");
-    hLogL[i]->GetYaxis()->SetTitle(FancyTittle[i].c_str());
+    hLogL[i]->GetYaxis()->SetTitle(FancyTitle[i].c_str());
     hLogL[i]->GetYaxis()->SetTitleOffset(1.4f);
 
     hLogL[i]->Draw("");
