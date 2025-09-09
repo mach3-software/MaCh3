@@ -76,14 +76,19 @@ jobs:
       # Install perl for bibtex
       - run: sudo apt-get install -y perl
 
+      - name: Debug Doxyfile path
+        run: |
+            pwd
+            ls -l Doc
+            ls -l Doc/html
+
       # Runs a single command using the runners shell
       - uses: DenverCoder1/doxygen-github-pages-action@v2.0.0
-        working-directory: /home/runner/work/MaCh3/MaCh3/
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          folder: Doc/html
+          folder: /home/runner/work/MaCh3/MaCh3/Doc/html
           branch: gh-pages
-          config_file: Doc/Doxyfile
+          config_file: /home/runner/work/MaCh3/MaCh3/Doc/Doxyfile
 
       - name: Upload Doxygen Artifact
         uses: actions/upload-artifact@v4
