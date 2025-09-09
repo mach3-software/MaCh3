@@ -79,7 +79,9 @@ namespace MaCh3Utils {
 namespace M3 {
   /// @brief number of threads which we need for example for TRandom3
   int GetNThreads();
-
+  /// @brief Prepends the MACH3 environment path to FilePath if it is not already present.
+  /// @param FilePath Reference to the file path string to be modified.
+  void AddPath(std::string& FilePath);
   /// @brief thread index inside parallel loop
   inline int GetThreadIndex() {
     #ifdef MULTITHREAD
