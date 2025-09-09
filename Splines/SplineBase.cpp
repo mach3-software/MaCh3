@@ -125,3 +125,59 @@ void SplineBase::getTF1Coeff(TF1_red* &spl, int &nPoints, float *& coeffs) {
   }
   // The structure is now coeffs  = {a,b,c,d,e}
 }
+
+
+// *****************************************
+void SplineBase::PrepareFastSplineInfoDir(std::unique_ptr<TFile>& SplineFile) const {
+// *****************************************
+  TTree *FastSplineInfoTree = new TTree("FastSplineInfoTree", "FastSplineInfoTree");
+
+  M3::int_t nPoints = 0;
+  float xtemp[20];
+  FastSplineInfoTree->Branch("nPts", &nPoints, "nPts/I");
+  FastSplineInfoTree->Branch("xPts", xtemp, "xPts[nPts]/F");
+
+  for (M3::int_t i = 0; i < nParams; ++i)
+  {
+    nPoints = SplineInfoArray[i].nPts;
+
+    for (M3::int_t k = 0; k < SplineInfoArray[i].nPts; ++k)
+    {
+      xtemp[k] = float(SplineInfoArray[i].xPts[k]);
+    }
+    FastSplineInfoTree->Fill();
+  }
+
+  SplineFile->cd();
+  FastSplineInfoTree->Write();
+
+  delete FastSplineInfoTree;
+}
+
+// *****************************************
+// KS: Prepare Fast Spline Info within SplineFile
+void SplineBase::LoadFastSplineInfoDir(std::unique_ptr<TFile>& SplineFile) {
+// *****************************************
+  TTree *FastSplineInfoTree = SplineFile->Get<TTree>("FastSplineInfoTree");
+  M3::int_t nPoints = 0;
+  float xtemp[20];
+  FastSplineInfoTree->SetBranchAddress("nPts", &nPoints);
+  FastSplineInfoTree->SetBranchAddress("xPts", &xtemp);
+
+  if(nParams == 0){
+    MACH3LOG_WARN("Calling {} with {} number of params", __func__, nParams);
+  }
+  SplineInfoArray.resize(nParams);
+  for (M3::int_t i = 0; i < nParams; ++i) {
+    FastSplineInfoTree->GetEntry(i);
+
+    // Fill the number of points
+    SplineInfoArray[i].nPts = nPoints;
+    if(nPoints == -999) continue;
+    SplineInfoArray[i].xPts.resize(SplineInfoArray[i].nPts);
+    for (M3::int_t k = 0; k < SplineInfoArray[i].nPts; ++k)
+    {
+      SplineInfoArray[i].xPts[k] = xtemp[k];
+    }
+  }
+}

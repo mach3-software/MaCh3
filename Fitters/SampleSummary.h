@@ -56,12 +56,12 @@ class SampleSummary {
     /// @brief KS: Prepare output tree and necessary variables
     inline void PrepareOutput();
 
-    /// @brief Helper functions to calculate likelihoods using TH2Poly, will modify MC hist tittle to include LLH
+    /// @brief Helper functions to calculate likelihoods using TH2Poly, will modify MC hist title to include LLH
     /// @param Data histogram with data distribution for a single sample
     /// @param MC histogram with MC distribution for a single sample
     /// @param W2 histogram with W2 distribution for a single sample
     inline void CalcLLH(TH2Poly * const & Data, TH2Poly * const & MC, TH2Poly * const & W2);
-    /// @brief Helper functions to calculate likelihoods using TH1D, will modify MC hist tittle to include LLH
+    /// @brief Helper functions to calculate likelihoods using TH1D, will modify MC hist title to include LLH
     /// @param Data histogram with data distribution for a single sample
     /// @param MC histogram with MC distribution for a single sample
     /// @param W2 histogram with W2 distribution for a single sample

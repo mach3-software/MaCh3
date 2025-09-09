@@ -24,10 +24,13 @@ namespace M3 {
   using int_t = short;
   /// Custom unsigned integer (unsigned short int or unsigned int)
   using uint_t = unsigned short;
+  /// Custom variable allowing us to save in either double or float
+  constexpr static const char* float_t_str = "F";
   #else
   using float_t = double;
   using int_t = int;
   using uint_t = unsigned;
+  constexpr static const char* float_t_str = "D";
   #endif
 
   /// Function template for fused multiply-add
