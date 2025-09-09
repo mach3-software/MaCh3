@@ -63,7 +63,7 @@ jobs:
           name: DoxyfileMaCh3
           path: Doc/
 
-      - run: ls -l Doc
+      - run: chmod 777 Doc/Doxyfile && ls -l Doc && pwd
 
       # Updates the package list to ensure you get the latest version of packages
       - run: sudo apt-get update
