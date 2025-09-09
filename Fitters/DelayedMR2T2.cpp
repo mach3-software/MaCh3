@@ -17,7 +17,7 @@ DelayedMR2T2::DelayedMR2T2(manager * const manager) : MR2T2(manager) {
     delay_probability = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["DelayProbability"], 1.0);
 
     // If we've delayed DON'T flip any parameters
-    flip_on_reject = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["FlipOnReject"], true);
+    flip_on_reject = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["KeepFlippingOnReject"], true);
 
 
     if(delay_probability > 1.0){
