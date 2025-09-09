@@ -63,8 +63,6 @@ jobs:
           name: DoxyfileMaCh3
           path: Doc/
 
-      - run: chmod 777 Doc/Doxyfile && ls -l Doc && pwd
-
       # Updates the package list to ensure you get the latest version of packages
       - run: sudo apt-get update
 
@@ -80,6 +78,7 @@ jobs:
 
       # Runs a single command using the runners shell
       - uses: DenverCoder1/doxygen-github-pages-action@v2.0.0
+        working-directory: /home/runner/work/MaCh3/MaCh3/
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           folder: Doc/html
