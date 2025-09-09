@@ -1420,7 +1420,7 @@ void SampleHandlerFD::InitialiseSplineObject() {
     SplineHandler->AddSample(SampleName, GetTitle(), spline_filepaths, SplineVarNames);
     SplineHandler->CountNumberOfLoadedSplines(false, 1);
     SplineHandler->TransferToMonolith();
-    if(PrepSplineFile) SplineHandler->PrepareSplineFile(SampleName + "_SplineFile.root");
+    if(PrepSplineFile) SplineHandler->PrepareSplineFile(SplineFileName);
   } else {
     // KS: Skip default spline loading and use flattened spline format allowing to read stuff much faster
     SplineHandler->LoadSplineFile(SplineFileName);
