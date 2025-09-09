@@ -34,7 +34,7 @@ jobs:
       # so your job can access it
       - uses: actions/checkout@v5
       
-      # Run CMake inside AlmaLinux container to generate Doxyfile
+      # Run CMake inside container to generate Doxyfile
       - name: Generate Doxyfile using CMake
         uses: addnab/docker-run-action@v3
         with:
