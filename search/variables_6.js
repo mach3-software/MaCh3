@@ -29,7 +29,7 @@ var searchData=
   ['flavourname_5flatex_26',['flavourName_Latex',['../structOscChannelInfo.html#aa3359c3cd440a244cde9970774a9a5a9',1,'OscChannelInfo']]],
   ['flipparameterindex_27',['FlipParameterIndex',['../classParameterHandlerBase.html#a36c4d088cad713dcc8e457475707a426',1,'ParameterHandlerBase']]],
   ['flipparameterpoint_28',['FlipParameterPoint',['../classParameterHandlerBase.html#a63efdd91c7f4a5afaa0fa24766a29923',1,'ParameterHandlerBase']]],
-  ['float_5ft_5fstr_29',['float_t_str',['../namespaceM3.html#ae5dcb061aa5a1277260173df0b21637a',1,'M3']]],
+  ['float_5ft_5fstr_5frepr_29',['float_t_str_repr',['../namespaceM3.html#a1f7f36d023b8c549459b28521e002f6d',1,'M3']]],
   ['fmirroring_30',['fMirroring',['../classLikelihoodFit.html#ae1e5d13b373bf73e1b1003f7f9d65f00',1,'LikelihoodFit']]],
   ['fmode_31',['fMode',['../classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8',1,'MaCh3Modes']]],
   ['fone_32',['fOne',['../classPSO.html#aa02f509433bb6c25126a180ab27b8277',1,'PSO']]],

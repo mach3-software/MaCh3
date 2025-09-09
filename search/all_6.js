@@ -67,7 +67,7 @@ var searchData=
   ['flipparameterpoint_64',['FlipParameterPoint',['../classParameterHandlerBase.html#a63efdd91c7f4a5afaa0fa24766a29923',1,'ParameterHandlerBase']]],
   ['flipparametervalue_65',['FlipParameterValue',['../classParameterHandlerBase.html#a8ed8388f3d07e1a7a1918bae1074ff1d',1,'ParameterHandlerBase']]],
   ['float_5ft_66',['float_t',['../namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68',1,'M3']]],
-  ['float_5ft_5fstr_67',['float_t_str',['../namespaceM3.html#ae5dcb061aa5a1277260173df0b21637a',1,'M3']]],
+  ['float_5ft_5fstr_5frepr_67',['float_t_str_repr',['../namespaceM3.html#a1f7f36d023b8c549459b28521e002f6d',1,'M3']]],
   ['fmaf_5ft_68',['fmaf_t',['../namespaceM3.html#ad501f876b26ca2cef7bb5f434deaffb8',1,'M3']]],
   ['fmirroring_69',['fMirroring',['../classLikelihoodFit.html#ae1e5d13b373bf73e1b1003f7f9d65f00',1,'LikelihoodFit']]],
   ['fmode_70',['fMode',['../classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8',1,'MaCh3Modes']]],
