@@ -1,0 +1,6 @@
+<map id="SplineBase" name="SplineBase">
+<area shape="rect" id="node1" title="Base class for calculating weight from spline." alt="" coords="57,273,145,300"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,184,196,211"/>
+<area shape="rect" id="node3" href="$structFastSplineInfo.html" title="CW: Add a struct to hold info about the splinified xsec parameters and help with FindSplineSegment." alt="" coords="47,95,154,121"/>
+<area shape="rect" id="node4" title=" " alt="" coords="16,5,185,32"/>
+</map>
