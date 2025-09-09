@@ -9,7 +9,7 @@ on:
   # Triggers the workflow on push or pull request events 
   # but only for the develop branch
   push:
-    branches: [develop, tidy/kskwarczynski/doxygen]
+    branches: [develop,  tidy/kskwarczynski/doxygen]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -18,33 +18,10 @@ on:
 # sequentially or in parallel
 jobs:
   # This workflow contains a single job called "Doxygen"
-  Doxyfile:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-
-    container:
-      image: ghcr.io/mach3-software/mach3:alma9latest
-
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE,
-      # so your job can access it
-      - uses: actions/checkout@v5
-
-      - name: Configure CMake
-        run: mkdir -p build && cd build && cmake ../
-
-      - name: Upload Doxygen Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          retention-days: 1
-          name: DoxyfileMaCh3
-          path: Doc/Doxyfile
-
+  
   Doxygen:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
-    needs: Doxyfile
 
     permissions:
       contents: write
@@ -57,12 +34,6 @@ jobs:
       # so your job can access it
       - uses: actions/checkout@v5
       
-      - name: Download Doxygen Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: DoxyfileMaCh3
-          path: Doc/
-
       # Updates the package list to ensure you get the latest version of packages
       - run: sudo apt-get update
 
@@ -76,19 +47,13 @@ jobs:
       # Install perl for bibtex
       - run: sudo apt-get install -y perl
 
-      - name: Debug Doxyfile path
-        run: |
-            pwd
-            ls -l Doc
-            ls -l Doc/html
-
       # Runs a single command using the runners shell
       - uses: DenverCoder1/doxygen-github-pages-action@v2.0.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          folder: /home/runner/work/MaCh3/MaCh3/Doc/html
+          folder: Doc/html
           branch: gh-pages
-          config_file: /home/runner/work/MaCh3/MaCh3/Doc/Doxyfile
+          config_file: Doc/Doxyfile
 
       - name: Upload Doxygen Artifact
         uses: actions/upload-artifact@v4
@@ -96,11 +61,6 @@ jobs:
           retention-days: 1
           name: DoxygenHTML
           path: Doc/html
-
-      ## EM: Now we delete the artifact so it doesn't use up our allowance
-      - uses: geekyeggo/delete-artifact@v5
-        with:
-          name: DoxyfileMaCh3
 
   Sphinx:
     # The type of runner that the job will run on
@@ -121,7 +81,7 @@ jobs:
         run: python3 --version
 
       - name: Download Doxygen Artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@master
         with:
           name: DoxygenHTML
           path: to-upload/
@@ -169,7 +129,7 @@ jobs:
     steps:
 
       - name: Download Artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@master
         with:
           name: DocumentationHTML
           path: to-upload/
