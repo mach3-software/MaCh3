@@ -85,7 +85,7 @@ void DelayedMR2T2::StoreCurrentStep() {
     }
 
     // Don't need to disable
-    if flip_on_reject{
+    if(flip_on_reject){
         return;
     }
 
