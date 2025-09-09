@@ -44,6 +44,8 @@ jobs:
             mkdir -p build
             cd build
             cmake ../
+            cd ../
+            rm -r -f build
 
       # Updates the package list to ensure you get the latest version of packages
       - run: sudo apt-get update
