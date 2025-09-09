@@ -1325,7 +1325,7 @@ void BinnedSplineHandler::PrepareSettingsDir(std::unique_ptr<TFile>& SplineFile)
   std::vector<std::string> SampleNames_temp = SampleNames;
   Settings->Branch("SampleNames", &SampleNames_temp);
   std::vector<std::string> SampleTittles_temp = SampleTittles;
-  Settings->Branch("SampleTittles", &SampleNames_temp);
+  Settings->Branch("SampleTittles", &SampleTittles_temp);
 
   Settings->Fill();
   SplineFile->cd();
