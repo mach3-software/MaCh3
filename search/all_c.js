@@ -35,7 +35,7 @@ var searchData=
   ['mainpage_2emd_32',['mainpage.md',['../mainpage_8md.html',1,'']]],
   ['makeasymgraph_33',['MakeAsymGraph',['../HistogramUtils_8h.html#a792a2482c0eaaececd33ce9aaf1f3caf',1,'MakeAsymGraph(TH1 *sigmaArrayLeft, TH1 *sigmaArrayCentr, TH1 *sigmaArrayRight, const std::string &amp;title):&#160;HistogramUtils.cpp'],['../HistogramUtils_8cpp.html#a792a2482c0eaaececd33ce9aaf1f3caf',1,'MakeAsymGraph(TH1 *sigmaArrayLeft, TH1 *sigmaArrayCentr, TH1 *sigmaArrayRight, const std::string &amp;title):&#160;HistogramUtils.cpp']]],
   ['makechi2hists_34',['MakeChi2Hists',['../classSampleSummary.html#a316974fb99c5a775e1c7099be3bccc7b',1,'SampleSummary']]],
-  ['makechi2plots_35',['MakeChi2Plots',['../classPredictiveThrower.html#a47eedf37154cfb4880c0827b1a580d41',1,'PredictiveThrower']]],
+  ['makechi2plots_35',['MakeChi2Plots',['../classPredictiveThrower.html#a95c9962dd060c6fbf8914afb0ca1f952',1,'PredictiveThrower']]],
   ['makeclosestposdef_36',['MakeClosestPosDef',['../classParameterHandlerBase.html#a5f8e47eeb39c923e6e54f77a87f27d91',1,'ParameterHandlerBase']]],
   ['makecorrelationmatrix_37',['MakeCorrelationMatrix',['../namespaceM3.html#a50bc6511eef3b80c8ef0a1cbb45a4eff',1,'M3']]],
   ['makecovariance_38',['MakeCovariance',['../classMCMCProcessor.html#afc94f21ffd599b1e2dd7e62f24f6c4de',1,'MCMCProcessor']]],

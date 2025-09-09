@@ -238,7 +238,7 @@ Variables</h2></td></tr>
 <div class="line"><span class="lineno">  186</span>  std::vector&lt;std::string&gt; SetsNames;</div>
 <div class="line"><span class="lineno">  187</span>  std::vector&lt;std::vector&lt;std::string&gt;&gt; RemoveNames;</div>
 <div class="line"><span class="lineno">  188</span>  std::vector&lt;bool&gt; Exclude;</div>
-<div class="line"><span class="lineno">  189</span>  std::vector&lt;std::string&gt; FancyTittle;</div>
+<div class="line"><span class="lineno">  189</span>  std::vector&lt;std::string&gt; FancyTitle;</div>
 <div class="line"><span class="lineno">  190</span> </div>
 <div class="line"><span class="lineno">  191</span>  std::vector&lt;std::vector&lt;bool&gt;&gt; isRelevantParam;</div>
 <div class="line"><span class="lineno">  192</span>  std::vector&lt;std::string&gt; node = Settings[<span class="stringliteral">&quot;GetPenaltyTerm&quot;</span>][<span class="stringliteral">&quot;PenaltySets&quot;</span>].as&lt;std::vector&lt;std::string&gt;&gt;();</div>
@@ -251,7 +251,7 @@ Variables</h2></td></tr>
 <div class="line"><span class="lineno">  199</span> </div>
 <div class="line"><span class="lineno">  200</span>    RemoveNames.push_back(Set[0].as&lt;std::vector&lt;std::string&gt;&gt;());</div>
 <div class="line"><span class="lineno">  201</span>    Exclude.push_back(Set[1].as&lt;bool&gt;());</div>
-<div class="line"><span class="lineno">  202</span>    FancyTittle.push_back(Set[2].as&lt;std::string&gt;());</div>
+<div class="line"><span class="lineno">  202</span>    FancyTitle.push_back(Set[2].as&lt;std::string&gt;());</div>
 <div class="line"><span class="lineno">  203</span>  }</div>
 <div class="line"><span class="lineno">  204</span> </div>
 <div class="line"><span class="lineno">  205</span>  <span class="keyword">const</span> <span class="keywordtype">int</span> NSets = int(SetsNames.size());</div>
@@ -398,9 +398,9 @@ Variables</h2></td></tr>
 <div class="line"><span class="lineno">  346</span>  {</div>
 <div class="line"><span class="lineno">  347</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> Maximum = hLogL[i]-&gt;GetMaximum();</div>
 <div class="line"><span class="lineno">  348</span>    hLogL[i]-&gt;GetYaxis()-&gt;SetRangeUser(0., Maximum*1.2);</div>
-<div class="line"><span class="lineno">  349</span>    hLogL[i]-&gt;SetTitle(FancyTittle[i].c_str());</div>
+<div class="line"><span class="lineno">  349</span>    hLogL[i]-&gt;SetTitle(FancyTitle[i].c_str());</div>
 <div class="line"><span class="lineno">  350</span>    hLogL[i]-&gt;GetXaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Step&quot;</span>);</div>
-<div class="line"><span class="lineno">  351</span>    hLogL[i]-&gt;GetYaxis()-&gt;SetTitle(FancyTittle[i].c_str());</div>
+<div class="line"><span class="lineno">  351</span>    hLogL[i]-&gt;GetYaxis()-&gt;SetTitle(FancyTitle[i].c_str());</div>
 <div class="line"><span class="lineno">  352</span>    hLogL[i]-&gt;GetYaxis()-&gt;SetTitleOffset(1.4f);</div>
 <div class="line"><span class="lineno">  353</span> </div>
 <div class="line"><span class="lineno">  354</span>    hLogL[i]-&gt;Draw(<span class="stringliteral">&quot;&quot;</span>);</div>

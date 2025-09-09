@@ -192,9 +192,9 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:ad8e72b4e6224c625629a2ac6f3deef11"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPredictiveThrower.html#ad8e72b4e6224c625629a2ac6f3deef11">GetLLH</a> (const std::unique_ptr&lt; TH1D &gt; &amp;DatHist, const std::unique_ptr&lt; TH1D &gt; &amp;MCHist, const std::unique_ptr&lt; TH1D &gt; &amp;W2Hist, <a class="el" href="classSampleHandlerBase.html">SampleHandlerBase</a> *SampleHandler)</td></tr>
 <tr class="memdesc:ad8e72b4e6224c625629a2ac6f3deef11"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper functions to calculate likelihoods using TH1D.  <br /></td></tr>
 <tr class="separator:ad8e72b4e6224c625629a2ac6f3deef11"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a47eedf37154cfb4880c0827b1a580d41"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPredictiveThrower.html#a47eedf37154cfb4880c0827b1a580d41">MakeChi2Plots</a> (const std::vector&lt; std::vector&lt; double &gt; &gt; &amp;Chi2_x, const std::string &amp;Chi2_x_title, const std::vector&lt; std::vector&lt; double &gt; &gt; &amp;Chi2_y, const std::string &amp;Chi2_y_title, const std::vector&lt; TDirectory * &gt; &amp;SampleDir, const std::string Tittle)</td></tr>
-<tr class="memdesc:a47eedf37154cfb4880c0827b1a580d41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Produce Chi2 plot for a single sample based on which $p$-value is calculated.  <br /></td></tr>
-<tr class="separator:a47eedf37154cfb4880c0827b1a580d41"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a95c9962dd060c6fbf8914afb0ca1f952"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPredictiveThrower.html#a95c9962dd060c6fbf8914afb0ca1f952">MakeChi2Plots</a> (const std::vector&lt; std::vector&lt; double &gt; &gt; &amp;Chi2_x, const std::string &amp;Chi2_x_title, const std::vector&lt; std::vector&lt; double &gt; &gt; &amp;Chi2_y, const std::string &amp;Chi2_y_title, const std::vector&lt; TDirectory * &gt; &amp;SampleDir, const std::string Title)</td></tr>
+<tr class="memdesc:a95c9962dd060c6fbf8914afb0ca1f952"><td class="mdescLeft">&#160;</td><td class="mdescRight">Produce Chi2 plot for a single sample based on which $p$-value is calculated.  <br /></td></tr>
+<tr class="separator:a95c9962dd060c6fbf8914afb0ca1f952"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
@@ -704,8 +704,8 @@ Clarence Wret </dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a47eedf37154cfb4880c0827b1a580d41" name="a47eedf37154cfb4880c0827b1a580d41"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a47eedf37154cfb4880c0827b1a580d41">&#9670;&#160;</a></span>MakeChi2Plots()</h2>
+<a id="a95c9962dd060c6fbf8914afb0ca1f952" name="a95c9962dd060c6fbf8914afb0ca1f952"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a95c9962dd060c6fbf8914afb0ca1f952">&#9670;&#160;</a></span>MakeChi2Plots()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -747,7 +747,7 @@ Clarence Wret </dd></dl>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const std::string&#160;</td>
-          <td class="paramname"><em>Tittle</em>&#160;</td>
+          <td class="paramname"><em>Title</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -765,7 +765,7 @@ Clarence Wret </dd></dl>
 <p>Produce Chi2 plot for a single sample based on which $p$-value is calculated. </p>
 
 <p class="definition">Definition at line <a class="el" href="PredictiveThrower_8cpp_source.html#l00638">638</a> of file <a class="el" href="PredictiveThrower_8cpp_source.html">PredictiveThrower.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  643</span>                                           {</div>
+<div class="fragment"><div class="line"><span class="lineno">  643</span>                                          {</div>
 <div class="line"><span class="lineno">  644</span><span class="comment">// *************************</span></div>
 <div class="line"><span class="lineno">  645</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iSample = 0; iSample &lt; <a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>+1; ++iSample) {</div>
 <div class="line"><span class="lineno">  646</span>    SampleDir[iSample]-&gt;cd();</div>
@@ -784,8 +784,8 @@ Clarence Wret </dd></dl>
 <div class="line"><span class="lineno">  659</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> max_val = std::max(*std::max_element(chi2_y_sample.begin(), chi2_y_sample.end()),</div>
 <div class="line"><span class="lineno">  660</span>                              *std::max_element(chi2_x_per_sample.begin(), chi2_x_per_sample.end()));</div>
 <div class="line"><span class="lineno">  661</span> </div>
-<div class="line"><span class="lineno">  662</span>    <span class="keyword">auto</span> chi2_hist = std::make_unique&lt;TH2D&gt;((<a class="code hl_variable" href="classPredictiveThrower.html#a12713d50372297fbaa3788b7bacecf5f">SampleNames</a>[iSample] + Tittle).c_str(),</div>
-<div class="line"><span class="lineno">  663</span>                                            (<a class="code hl_variable" href="classPredictiveThrower.html#a12713d50372297fbaa3788b7bacecf5f">SampleNames</a>[iSample] + Tittle).c_str(),</div>
+<div class="line"><span class="lineno">  662</span>    <span class="keyword">auto</span> chi2_hist = std::make_unique&lt;TH2D&gt;((<a class="code hl_variable" href="classPredictiveThrower.html#a12713d50372297fbaa3788b7bacecf5f">SampleNames</a>[iSample] + Title).c_str(),</div>
+<div class="line"><span class="lineno">  663</span>                                            (<a class="code hl_variable" href="classPredictiveThrower.html#a12713d50372297fbaa3788b7bacecf5f">SampleNames</a>[iSample] + Title).c_str(),</div>
 <div class="line"><span class="lineno">  664</span>                                            100, min_val, max_val, 100, min_val, max_val);</div>
 <div class="line"><span class="lineno">  665</span>    chi2_hist-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
 <div class="line"><span class="lineno">  666</span>    chi2_hist-&gt;GetXaxis()-&gt;SetTitle(Chi2_x_title.c_str());</div>
@@ -962,13 +962,13 @@ Clarence Wret </dd></dl>
 <div class="line"><span class="lineno">  630</span>    }</div>
 <div class="line"><span class="lineno">  631</span>  }</div>
 <div class="line"><span class="lineno">  632</span> </div>
-<div class="line"><span class="lineno">  633</span>  <a class="code hl_function" href="classPredictiveThrower.html#a47eedf37154cfb4880c0827b1a580d41">MakeChi2Plots</a>(chi2_mc_vec,   <span class="stringliteral">&quot;-2LLH (Draw Fluc, Draw)&quot;</span>, chi2_dat_vec, <span class="stringliteral">&quot;-2LLH (Data, Draw)&quot;</span>, SampleDir, <span class="stringliteral">&quot;_drawfluc_draw&quot;</span>);</div>
-<div class="line"><span class="lineno">  634</span>  <a class="code hl_function" href="classPredictiveThrower.html#a47eedf37154cfb4880c0827b1a580d41">MakeChi2Plots</a>(chi2_pred_vec, <span class="stringliteral">&quot;-2LLH (Pred Fluc, Draw)&quot;</span>, chi2_dat_vec, <span class="stringliteral">&quot;-2LLH (Data, Draw)&quot;</span>, SampleDir, <span class="stringliteral">&quot;_predfluc_draw&quot;</span>);</div>
+<div class="line"><span class="lineno">  633</span>  <a class="code hl_function" href="classPredictiveThrower.html#a95c9962dd060c6fbf8914afb0ca1f952">MakeChi2Plots</a>(chi2_mc_vec,   <span class="stringliteral">&quot;-2LLH (Draw Fluc, Draw)&quot;</span>, chi2_dat_vec, <span class="stringliteral">&quot;-2LLH (Data, Draw)&quot;</span>, SampleDir, <span class="stringliteral">&quot;_drawfluc_draw&quot;</span>);</div>
+<div class="line"><span class="lineno">  634</span>  <a class="code hl_function" href="classPredictiveThrower.html#a95c9962dd060c6fbf8914afb0ca1f952">MakeChi2Plots</a>(chi2_pred_vec, <span class="stringliteral">&quot;-2LLH (Pred Fluc, Draw)&quot;</span>, chi2_dat_vec, <span class="stringliteral">&quot;-2LLH (Data, Draw)&quot;</span>, SampleDir, <span class="stringliteral">&quot;_predfluc_draw&quot;</span>);</div>
 <div class="line"><span class="lineno">  635</span>}</div>
 <div class="ttc" id="aHistogramUtils_8cpp_html_a1d326700660ac56ba63cba9ac12316bc"><div class="ttname"><a href="HistogramUtils_8cpp.html#a1d326700660ac56ba63cba9ac12316bc">MakeFluctuatedHistogramAlternative</a></div><div class="ttdeci">void MakeFluctuatedHistogramAlternative(TH1D *FluctHist, TH1D *PolyHist, TRandom3 *rand)</div><div class="ttdoc">Make Poisson fluctuation of TH1D hist using slow method which is only for cross-check.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00443">HistogramUtils.cpp:443</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_a138f250d9204a30204e4ca5b973008b2"><div class="ttname"><a href="classFitterBase.html#a138f250d9204a30204e4ca5b973008b2">FitterBase::random</a></div><div class="ttdeci">std::unique_ptr&lt; TRandom3 &gt; random</div><div class="ttdoc">Random number.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00146">FitterBase.h:146</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_a14b43b7f5e5a482da68d0e8c564a1494"><div class="ttname"><a href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">FitterBase::samples</a></div><div class="ttdeci">std::vector&lt; SampleHandlerBase * &gt; samples</div><div class="ttdoc">Sample holder.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00131">FitterBase.h:131</a></div></div>
-<div class="ttc" id="aclassPredictiveThrower_html_a47eedf37154cfb4880c0827b1a580d41"><div class="ttname"><a href="classPredictiveThrower.html#a47eedf37154cfb4880c0827b1a580d41">PredictiveThrower::MakeChi2Plots</a></div><div class="ttdeci">void MakeChi2Plots(const std::vector&lt; std::vector&lt; double &gt; &gt; &amp;Chi2_x, const std::string &amp;Chi2_x_title, const std::vector&lt; std::vector&lt; double &gt; &gt; &amp;Chi2_y, const std::string &amp;Chi2_y_title, const std::vector&lt; TDirectory * &gt; &amp;SampleDir, const std::string Tittle)</div><div class="ttdoc">Produce Chi2 plot for a single sample based on which $p$-value is calculated.</div><div class="ttdef"><b>Definition:</b> <a href="PredictiveThrower_8cpp_source.html#l00638">PredictiveThrower.cpp:638</a></div></div>
+<div class="ttc" id="aclassPredictiveThrower_html_a95c9962dd060c6fbf8914afb0ca1f952"><div class="ttname"><a href="classPredictiveThrower.html#a95c9962dd060c6fbf8914afb0ca1f952">PredictiveThrower::MakeChi2Plots</a></div><div class="ttdeci">void MakeChi2Plots(const std::vector&lt; std::vector&lt; double &gt; &gt; &amp;Chi2_x, const std::string &amp;Chi2_x_title, const std::vector&lt; std::vector&lt; double &gt; &gt; &amp;Chi2_y, const std::string &amp;Chi2_y_title, const std::vector&lt; TDirectory * &gt; &amp;SampleDir, const std::string Title)</div><div class="ttdoc">Produce Chi2 plot for a single sample based on which $p$-value is calculated.</div><div class="ttdef"><b>Definition:</b> <a href="PredictiveThrower_8cpp_source.html#l00638">PredictiveThrower.cpp:638</a></div></div>
 <div class="ttc" id="aclassPredictiveThrower_html_a9c49aff75c195e2ca0a31a6fb7bf1f1f"><div class="ttname"><a href="classPredictiveThrower.html#a9c49aff75c195e2ca0a31a6fb7bf1f1f">PredictiveThrower::SampleObjectMap</a></div><div class="ttdeci">std::vector&lt; int &gt; SampleObjectMap</div><div class="ttdoc">Maps if sample with given SampleHandler, useful if we have more than one sample in single object.</div><div class="ttdef"><b>Definition:</b> <a href="PredictiveThrower_8h_source.html#l00103">PredictiveThrower.h:103</a></div></div>
 <div class="ttc" id="aclassPredictiveThrower_html_ad8e72b4e6224c625629a2ac6f3deef11"><div class="ttname"><a href="classPredictiveThrower.html#ad8e72b4e6224c625629a2ac6f3deef11">PredictiveThrower::GetLLH</a></div><div class="ttdeci">double GetLLH(const std::unique_ptr&lt; TH1D &gt; &amp;DatHist, const std::unique_ptr&lt; TH1D &gt; &amp;MCHist, const std::unique_ptr&lt; TH1D &gt; &amp;W2Hist, SampleHandlerBase *SampleHandler)</div><div class="ttdoc">Helper functions to calculate likelihoods using TH1D.</div><div class="ttdef"><b>Definition:</b> <a href="PredictiveThrower_8cpp_source.html#l00577">PredictiveThrower.cpp:577</a></div></div>
 </div><!-- fragment -->
