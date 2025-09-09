@@ -25,7 +25,7 @@ var searchData=
   ['adddata_22',['AddData',['../classSampleSummary.html#a681bee322172bef35a64e86c23c415b6',1,'SampleSummary::AddData()'],['../classSampleHandlerFD.html#a46fc91d1f0be1e36afd3e5c3c9dadb12',1,'SampleHandlerFD::AddData(std::vector&lt; std::vector&lt; double &gt; &gt; &amp;data)'],['../classSampleHandlerFD.html#ab5703d617a9bee2a1c29b132f6481458',1,'SampleHandlerFD::AddData(TH2D *Data)'],['../classSampleHandlerFD.html#a118508d506dfe7a7660600832297b341',1,'SampleHandlerFD::AddData(TH1D *Data)'],['../classSampleHandlerFD.html#a8092a829974491cdbebc736555553adb',1,'SampleHandlerFD::AddData(std::vector&lt; double &gt; &amp;data)']]],
   ['addfile_23',['addFile',['../classMaCh3Plotting_1_1InputManager.html#a8f78dd7607191728f0a52bc27ade9af3',1,'MaCh3Plotting::InputManager']]],
   ['addnominal_24',['AddNominal',['../classSampleSummary.html#a8c870b718bccf37fc7f91b5201345f8e',1,'SampleSummary']]],
-  ['addsample_25',['AddSample',['../classBinnedSplineHandler.html#a7356dea9463c34b25461a9c94bce8329',1,'BinnedSplineHandler']]],
+  ['addsample_25',['AddSample',['../classBinnedSplineHandler.html#a2b0c0e2c12b4f762dce9e6579849c54c',1,'BinnedSplineHandler']]],
   ['addsamplehandler_26',['AddSampleHandler',['../classFitterBase.html#a136edf12d32b87320ed5440b02efdc43',1,'FitterBase']]],
   ['addsystobj_27',['AddSystObj',['../classFitterBase.html#a0c2f50da385ffc24db94a1b67880093c',1,'FitterBase']]],
   ['addthrow_28',['AddThrow',['../classSampleSummary.html#a10d0df830c319f3d8b76d2c3b85b4215',1,'SampleSummary']]],

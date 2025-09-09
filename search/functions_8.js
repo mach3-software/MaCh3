@@ -2,8 +2,8 @@ var searchData=
 [
   ['incrementnsteps_0',['IncrementNSteps',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#aff6c0cc73cc423806174a79006cdf3e8',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
   ['indivstepscaleadapt_1',['IndivStepScaleAdapt',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a77726d0255edf32a817339fcbac30bee',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
-  ['init_2',['init',['../classPSO.html#a20cba5b6be9f5996dba818220f7a3524',1,'PSO']]],
-  ['init_3',['Init',['../classSampleHandlerFD.html#a09cbb146872131227838a06581103c33',1,'SampleHandlerFD::Init()'],['../classParameterHandlerBase.html#a5e5bce6f487e7214be680a9b4adf6b6c',1,'ParameterHandlerBase::Init(const std::string &amp;name, const std::string &amp;file)'],['../classParameterHandlerBase.html#ad95eaae2d1ebc24aad6916f1789eafca',1,'ParameterHandlerBase::Init(const std::vector&lt; std::string &gt; &amp;YAMLFile)'],['../classPySampleHandlerFD.html#a3e39054bb83ce3dfe7a9492e0bec3500',1,'PySampleHandlerFD::Init()']]],
+  ['init_2',['Init',['../classSampleHandlerFD.html#a09cbb146872131227838a06581103c33',1,'SampleHandlerFD::Init()'],['../classParameterHandlerBase.html#a5e5bce6f487e7214be680a9b4adf6b6c',1,'ParameterHandlerBase::Init(const std::string &amp;name, const std::string &amp;file)'],['../classParameterHandlerBase.html#ad95eaae2d1ebc24aad6916f1789eafca',1,'ParameterHandlerBase::Init(const std::vector&lt; std::string &gt; &amp;YAMLFile)'],['../classPySampleHandlerFD.html#a3e39054bb83ce3dfe7a9492e0bec3500',1,'PySampleHandlerFD::Init()']]],
+  ['init_3',['init',['../classPSO.html#a20cba5b6be9f5996dba818220f7a3524',1,'PSO']]],
   ['initfitters_4',['initFitters',['../pyMaCh3_8cpp.html#a1e4c27fe3d37a57c44bd65826476b5b5',1,'initFitters(py::module &amp;):&#160;fitters.cpp'],['../fitters_8cpp.html#ac47a9545d42447ccddb7968bb22f4286',1,'initFitters(py::module &amp;m):&#160;fitters.cpp']]],
   ['initfromconfig_5',['InitFromConfig',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a2d4967be9c1cf7a06c0ca0db3e5cc125',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
   ['initgpu_5fautocorr_6',['InitGPU_AutoCorr',['../gpuMCMCProcessorUtils_8cu.html#a5f83eaf9a69d10b00a4078608bdd0674',1,'InitGPU_AutoCorr(float **ParStep_gpu, float **NumeratorSum_gpu, float **ParamSums_gpu, float **DenomSum_gpu, int n_Entries, int n_Pars, const int n_Lags):&#160;gpuMCMCProcessorUtils.cu'],['../gpuMCMCProcessorUtils_8cuh.html#a5f83eaf9a69d10b00a4078608bdd0674',1,'InitGPU_AutoCorr(float **ParStep_gpu, float **NumeratorSum_gpu, float **ParamSums_gpu, float **DenomSum_gpu, int n_Entries, int n_Pars, const int n_Lags):&#160;gpuMCMCProcessorUtils.cu']]],
@@ -46,6 +46,6 @@ var searchData=
   ['isstepaccepted_43',['IsStepAccepted',['../classMCMCBase.html#a9b8aac7fa8691719347ae70a5fa20226',1,'MCMCBase']]],
   ['issubeventselected_44',['IsSubEventSelected',['../classSampleHandlerFD.html#aacc4d573b8e4569269b51ac325bc0092',1,'SampleHandlerFD']]],
   ['issubeventvarstring_45',['IsSubEventVarString',['../classSampleHandlerFD.html#ad14d9728400a7b87f095aca00761b829',1,'SampleHandlerFD']]],
-  ['isvalidsplineindex_46',['isValidSplineIndex',['../classBinnedSplineHandler.html#af9a948b25fbed9dc3a27642c9118cb5c',1,'BinnedSplineHandler']]],
+  ['isvalidsplineindex_46',['isValidSplineIndex',['../classBinnedSplineHandler.html#aabec2c420a0d4a0757e1d01bc3936618',1,'BinnedSplineHandler']]],
   ['iterateoverparams_47',['IterateOverParams',['../classParameterHandlerGeneric.html#ae708dcd0bbfac4a5dd599a5c536da62b',1,'ParameterHandlerGeneric']]]
 ];
