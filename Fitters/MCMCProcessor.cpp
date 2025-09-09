@@ -2422,11 +2422,6 @@ void MCMCProcessor::FindInputFiles() {
     TempFile->ls();
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-  //KS:Most inputs are in ${MACH3}/inputs/blarb.root
-  if (std::getenv("MACH3") != nullptr) {
-    MACH3LOG_INFO("Found MACH3 environment variable: {}", std::getenv("MACH3"));
-  }
-
   MACH3LOG_INFO("Loading YAML config from MCMC chain");
 
   YAML::Node Settings = TMacroToYAML(*Config);
@@ -2448,11 +2443,8 @@ void MCMCProcessor::FindInputFiles() {
   }
   if(InputNotFound) MaCh3Utils::PrintConfig(Settings);
 
-  if (const char * mach3_env = std::getenv("MACH3"))
-  {
-    for(size_t i = 0; i < CovPos[kXSecPar].size(); i++)
-      CovPos[kXSecPar][i].insert(0, std::string(mach3_env)+"/");
-  }
+  for(size_t i = 0; i < CovPos[kXSecPar].size(); i++)
+    M3::AddPath(CovPos[kXSecPar][i]);
 
   // Delete the TTrees and the input file handle since we've now got the settings we need
   delete Config;
@@ -2518,14 +2510,12 @@ void MCMCProcessor::FindInputFilesLegacy() {
     MACH3LOG_INFO("Given FDCovFile {} and FDCovName {}", CovPos[kFDDetPar].back(), CovNamePos[kFDDetPar]);
   }
 
-  if (const char * mach3_env = std::getenv("MACH3"))
-  {
-    for(size_t i = 0; i < CovPos[kNDPar].size(); i++)
-      CovPos[kNDPar][i].insert(0, std::string(mach3_env)+"/");
+  for(size_t i = 0; i < CovPos[kNDPar].size(); i++)
+    M3::AddPath(CovPos[kNDPar][i]);
 
-    for(size_t i = 0; i < CovPos[kFDDetPar].size(); i++)
-      CovPos[kFDDetPar][i].insert(0, std::string(mach3_env)+"/");
-  }
+  for(size_t i = 0; i < CovPos[kFDDetPar].size(); i++)
+    M3::AddPath(CovPos[kFDDetPar][i]);
+
   TempFile->Close();
   delete TempFile;
 }

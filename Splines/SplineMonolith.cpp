@@ -519,10 +519,7 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   throw MaCh3Exception(__FILE__ , __LINE__ );
   #endif
 
-  if (std::getenv("MACH3") != nullptr) {
-      FileName.insert(0, std::string(std::getenv("MACH3"))+"/");
-   }
-
+  M3::AddPath(FileName);
   auto SplineFile = std::make_unique<TFile>(FileName.c_str(), "OPEN");
   TTree *Settings = SplineFile->Get<TTree>("Settings");
   TTree *Monolith_TF1 = SplineFile->Get<TTree>("Monolith_TF1");
@@ -612,9 +609,7 @@ void SMonolith::LoadSplineFile(std::string FileName) {
 // Save SplineMonolith into ROOT file
 void SMonolith::PrepareSplineFile(std::string FileName) {
 // *****************************************
-  if (std::getenv("MACH3") != nullptr) {
-      FileName.insert(0, std::string(std::getenv("MACH3"))+"/");
-   }
+  M3::AddPath(FileName);
 
   auto SplineFile = std::make_unique<TFile>(FileName.c_str(), "recreate");
   TTree *Settings = new TTree("Settings", "Settings");
