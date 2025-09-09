@@ -44,12 +44,7 @@ jobs:
             -w /workspace/MaCh3 \
             -u $MY_UID:$MY_GID \
             ghcr.io/mach3-software/mach3:alma9latest \
-          mkdir -p build
-          cd build
-          cmake ../
-          cd ../
-          rm -r -f build
-          ls -l Doc/Doxyfile
+            bash -c "mkdir -p build && cd build && cmake ../ && cd .. && rm -r -f build && ls -l Doc/Doxyfile"
 
       # Updates the package list to ensure you get the latest version of packages
       - run: sudo apt-get update
