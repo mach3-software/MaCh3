@@ -43,15 +43,11 @@ var searchData=
   ['lnlhist_5fsample_5fdrawflucdraw_40',['lnLHist_Sample_DrawflucDraw',['../classSampleSummary.html#afddd2abc0ec07b52dc9004880522ab5a',1,'SampleSummary']]],
   ['lnlhist_5fsample_5fpredflucdraw_41',['lnLHist_Sample_PredflucDraw',['../classSampleSummary.html#aecf1c224162e1055e8306d438e1a3761',1,'SampleSummary']]],
   ['loadadditionalinfo_42',['LoadAdditionalInfo',['../classMCMCProcessor.html#aabac168d6ff10dc3d57667db532476a2',1,'MCMCProcessor::LoadAdditionalInfo()'],['../classOscProcessor.html#aa5b2ecf52ca107e11ac55bb9721db2c5',1,'OscProcessor::LoadAdditionalInfo()']]],
-  ['loadfastsplineinfodir_43',['LoadFastSplineInfoDir',['../classSplineBase.html#ad4f4b51619ef0573c7f1497f5d1fd52d',1,'SplineBase']]],
-  ['loadindexdir_44',['LoadIndexDir',['../classBinnedSplineHandler.html#a176d5a7858bbbb69b2ff3bdebc6d02a7',1,'BinnedSplineHandler']]],
-  ['loadmonolithdir_45',['LoadMonolithDir',['../classBinnedSplineHandler.html#ab4affb91911fc7fd636bcd675d67dcf2',1,'BinnedSplineHandler']]],
-  ['loadsettingsdir_46',['LoadSettingsDir',['../classBinnedSplineHandler.html#a2ad4f3e2807dc537f450a5893bfe6246',1,'BinnedSplineHandler']]],
-  ['loadsplinefile_47',['LoadSplineFile',['../classBinnedSplineHandler.html#a614d30bc719514ec496221303e1330c5',1,'BinnedSplineHandler::LoadSplineFile()'],['../classSplineBase.html#ad107ad4a91c5de35f14f3805bc52c1d3',1,'SplineBase::LoadSplineFile()'],['../classSMonolith.html#adeda10c85b2835adf8219cb460ae2db3',1,'SMonolith::LoadSplineFile()']]],
-  ['loadtoys_48',['LoadToys',['../classPredictiveThrower.html#a223d3c924374dddc3812cd3ad5d87e09',1,'PredictiveThrower']]],
-  ['loadyamlconfig_49',['LoadYamlConfig',['../YamlHelper_8h.html#a7d9483510cc8dcf165dc9e13f85a7e3e',1,'YamlHelper.h']]],
-  ['loggerprint_50',['LoggerPrint',['../MaCh3Logger_8h.html#ada930684d7c1ed8916f1fbe6d266ca77',1,'MaCh3Logger.h']]],
-  ['loglcurr_51',['logLCurr',['../classFitterBase.html#abfb6f10720764d8bbbe43754fd5cd976',1,'FitterBase']]],
-  ['loglprop_52',['logLProp',['../classFitterBase.html#a187dd22c17f9e96e5a7e2fb2371abace',1,'FitterBase']]],
-  ['lowerbound_53',['LowerBound',['../structKinematicCut.html#aa654b5f2ef7ca1b57d9238c428fdc11f',1,'KinematicCut']]]
+  ['loadsplinefile_43',['LoadSplineFile',['../classSMonolith.html#a6783cdc3c485378ca21852e1a7b02482',1,'SMonolith']]],
+  ['loadtoys_44',['LoadToys',['../classPredictiveThrower.html#a223d3c924374dddc3812cd3ad5d87e09',1,'PredictiveThrower']]],
+  ['loadyamlconfig_45',['LoadYamlConfig',['../YamlHelper_8h.html#a7d9483510cc8dcf165dc9e13f85a7e3e',1,'YamlHelper.h']]],
+  ['loggerprint_46',['LoggerPrint',['../MaCh3Logger_8h.html#ada930684d7c1ed8916f1fbe6d266ca77',1,'MaCh3Logger.h']]],
+  ['loglcurr_47',['logLCurr',['../classFitterBase.html#abfb6f10720764d8bbbe43754fd5cd976',1,'FitterBase']]],
+  ['loglprop_48',['logLProp',['../classFitterBase.html#a187dd22c17f9e96e5a7e2fb2371abace',1,'FitterBase']]],
+  ['lowerbound_49',['LowerBound',['../structKinematicCut.html#aa654b5f2ef7ca1b57d9238c428fdc11f',1,'KinematicCut']]]
 ];

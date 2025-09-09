@@ -159,8 +159,6 @@ Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:ae5dcb061aa5a1277260173df0b21637a"><td class="memItemLeft" align="right" valign="top">static constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#ae5dcb061aa5a1277260173df0b21637a">float_t_str</a> = &quot;D&quot;</td></tr>
-<tr class="separator:ae5dcb061aa5a1277260173df0b21637a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a32ef26a222f7341e03dcc42cdd2badd3"><td class="memItemLeft" align="right" valign="top">static constexpr const double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceM3.html#a32ef26a222f7341e03dcc42cdd2badd3">_BAD_DOUBLE_</a> = -999.99</td></tr>
 <tr class="memdesc:a32ef26a222f7341e03dcc42cdd2badd3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default value used for double initialisation.  <br /></td></tr>
 <tr class="separator:a32ef26a222f7341e03dcc42cdd2badd3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -216,7 +214,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00030">30</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00028">28</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -232,7 +230,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00031">31</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00029">29</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -248,7 +246,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00032">32</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00030">30</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -577,14 +575,14 @@ template&lt;typename T &gt; </div>
 
 <p>Function template for fused multiply-add. </p>
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00038">38</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   38</span>                                    {</div>
-<div class="line"><span class="lineno">   39</span><span class="preprocessor">    #ifdef _LOW_MEMORY_STRUCTS_</span></div>
-<div class="line"><span class="lineno">   40</span>    <span class="keywordflow">return</span> std::fmaf(x, y, z);</div>
-<div class="line"><span class="lineno">   41</span><span class="preprocessor">    #else</span></div>
-<div class="line"><span class="lineno">   42</span>    <span class="keywordflow">return</span> std::fma(x, y, z);</div>
-<div class="line"><span class="lineno">   43</span><span class="preprocessor">    #endif</span></div>
-<div class="line"><span class="lineno">   44</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00035">35</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   35</span>                                    {</div>
+<div class="line"><span class="lineno">   36</span><span class="preprocessor">    #ifdef _LOW_MEMORY_STRUCTS_</span></div>
+<div class="line"><span class="lineno">   37</span>    <span class="keywordflow">return</span> std::fmaf(x, y, z);</div>
+<div class="line"><span class="lineno">   38</span><span class="preprocessor">    #else</span></div>
+<div class="line"><span class="lineno">   39</span>    <span class="keywordflow">return</span> std::fma(x, y, z);</div>
+<div class="line"><span class="lineno">   40</span><span class="preprocessor">    #endif</span></div>
+<div class="line"><span class="lineno">   41</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1394,7 +1392,7 @@ template&lt;typename T &gt; </div>
 
 <p>Default value used for double initialisation. </p>
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00046">46</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00043">43</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -1420,7 +1418,7 @@ template&lt;typename T &gt; </div>
 
 <p>Default value used for int initialisation. </p>
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00048">48</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00045">45</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -1444,7 +1442,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00049">49</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00046">46</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -1470,7 +1468,7 @@ template&lt;typename T &gt; </div>
 
 <p>Large Likelihood is used it parameter go out of physical boundary, this indicates in MCMC that such step should be removed. </p>
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00073">73</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00070">70</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -1496,7 +1494,7 @@ template&lt;typename T &gt; </div>
 
 <p>MC prediction lower bound in bin to identify problematic binning definitions and handle LogL calculation. </p>
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00076">76</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00073">73</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -1522,7 +1520,7 @@ template&lt;typename T &gt; </div>
 
 <p>Default value for spline knot capping, default mean not capping is being applied. </p>
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00081">81</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00078">78</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -1548,31 +1546,7 @@ template&lt;typename T &gt; </div>
 
 <p>Default value for spline knot capping, default mean not capping is being applied. </p>
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00079">79</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
-
-</div>
-</div>
-<a id="ae5dcb061aa5a1277260173df0b21637a" name="ae5dcb061aa5a1277260173df0b21637a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae5dcb061aa5a1277260173df0b21637a">&#9670;&#160;</a></span>float_t_str</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">constexpr const char* M3::float_t_str = &quot;D&quot;</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00033">33</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00076">76</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -1598,7 +1572,7 @@ template&lt;typename T &gt; </div>
 
 <p>When parameter has no bound this serves as it. Lowest possible value the system. </p>
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00068">68</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00065">65</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -1624,7 +1598,7 @@ template&lt;typename T &gt; </div>
 
 <p>When parameter has no bound this serves as it. Highest possible value the system. </p>
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00070">70</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00067">67</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -1648,7 +1622,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00057">57</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00054">54</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -1674,7 +1648,7 @@ template&lt;typename T &gt; </div>
 
 <p>Some commonly used variables to which we set pointers to. </p>
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00052">52</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00049">49</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -1698,7 +1672,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00053">53</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00050">50</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -1722,7 +1696,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00064">64</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00061">61</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -1746,7 +1720,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00059">59</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00056">56</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -1770,7 +1744,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00060">60</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00057">57</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
