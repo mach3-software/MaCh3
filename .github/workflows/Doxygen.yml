@@ -39,9 +39,9 @@ jobs:
         run: |
           docker run --rm \
             -v $PWD:/workspace \
-            -w /workspace/MaCh3 \
+            -w /workspace  \
             ghcr.io/mach3-software/mach3:alma9latest \
-            bash -c "mkdir -p build && cd build && cmake ../ && cd .. && rm -r -f build && ls -l Doc/Doxyfile"
+            bash -c " pwd && ls && mkdir -p build && cd build && cmake ../ && cd .. && rm -r -f build && ls -l Doc/Doxyfile"
 
       # Updates the package list to ensure you get the latest version of packages
       - run: sudo apt-get update
