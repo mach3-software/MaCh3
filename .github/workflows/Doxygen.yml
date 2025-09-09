@@ -40,7 +40,7 @@ jobs:
           path: MaCh3
 
       # Need to run cmake to get doxyfile with correct version
-      - run: cmake ../
+      - run: mkdir -p build && cd build && cmake ../
         working-directory: MaCh3
 
       # Updates the package list to ensure you get the latest version of packages
