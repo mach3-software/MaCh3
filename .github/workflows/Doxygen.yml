@@ -51,7 +51,7 @@ jobs:
       - name: Install Doxygen 1.9.1
         run: |
           DOXYGEN_VERSION=1.9.1
-          wget https://github.com/doxygen/doxygen/releases/download/Release_${DOXYGEN_VERSION}/doxygen-${DOXYGEN_VERSION}.tar.gz
+          wget https://github.com/doxygen/doxygen/releases/download/Release_${DOXYGEN_VERSION}/doxygen-${DOXYGEN_VERSION}.src.tar.gz
           tar -xzf doxygen-${DOXYGEN_VERSION}.tar.gz
           cd doxygen-${DOXYGEN_VERSION}
           cmake .
