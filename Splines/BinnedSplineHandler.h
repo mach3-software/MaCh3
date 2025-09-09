@@ -87,7 +87,7 @@ class BinnedSplineHandler : public SplineBase {
 
     //And now the actual member variables
     std::vector<std::string> SampleNames;
-    std::vector<std::string> SampleTittles;
+    std::vector<std::string> SampleTitles;
     std::vector<int> Dimensions;
     std::vector<std::vector<std::string>> DimensionLabels;
     std::vector<int> nSplineParams;

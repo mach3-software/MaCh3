@@ -54,7 +54,7 @@ void BinnedSplineHandler::cleanUpMemory() {
   CleanVector(nSplineParams);
   CleanVector(DimensionLabels);
   CleanVector(SampleNames);
-  CleanVector(SampleTittles);
+  CleanVector(SampleTitles);
   CleanVector(Dimensions);
   CleanContainer(splinevec_Monolith);
   CleanContainer(SplineBinning);
@@ -71,7 +71,7 @@ void BinnedSplineHandler::AddSample(const std::string& SampleName,
 //****************************************
 {
   SampleNames.push_back(SampleName);
-  SampleTittles.push_back(SampleTittle);
+  SampleTitles.push_back(SampleTittle);
   Dimensions.push_back(static_cast<int>(SplineVarNames.size()));
   DimensionLabels.push_back(SplineVarNames);
 
@@ -152,7 +152,7 @@ void BinnedSplineHandler::InvestigateMissingSplines() const {
                   }
                   MACH3LOG_DEBUG(
                     "Sample '{}' | OscChan {} | Syst '{}' | Mode '{}' | Var1 {} | Var2 {} | Var3 {} => Value: {}",
-                    SampleTittles[iSample],
+                    SampleTitles[iSample],
                     iOscChan,
                     SplineFileParPrefixNames_Sample[iSyst],
                     modeSuffix,
@@ -182,7 +182,7 @@ void BinnedSplineHandler::InvestigateMissingSplines() const {
         const auto& counts = modePair.second;
         MACH3LOG_CRITICAL(
           "Sample '{}': Systematic '{}' has missing splines in mode '{}'. Expected Splines: {}, Missing Splines: {}",
-          SampleTittles[iSample],
+          SampleTitles[iSample],
           systName,
           modeSuffix,
           counts.first,
@@ -493,7 +493,7 @@ int BinnedSplineHandler::CountNumberOfLoadedSplines(bool NonFlat, int Verbosity)
   { // Loop over systematics
     SampleCounter_NonFlat = 0;
     SampleCounter_All = 0;
-    std::string SampleTittle = SampleTittles[iSample];
+    std::string SampleTittle = SampleTitles[iSample];
     for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++)
     { // Loop over oscillation channels
       for (unsigned int iSyst = 0; iSyst < indexvec[iSample][iOscChan].size(); iSyst++)
@@ -521,7 +521,7 @@ int BinnedSplineHandler::CountNumberOfLoadedSplines(bool NonFlat, int Verbosity)
         }
       }
     }
-    MACH3LOG_DEBUG("{:<10} has {:<10} splines, of which {:<10} are not flat", SampleTittles[iSample], SampleCounter_All, SampleCounter_NonFlat);
+    MACH3LOG_DEBUG("{:<10} has {:<10} splines, of which {:<10} are not flat", SampleTitles[iSample], SampleCounter_All, SampleCounter_NonFlat);
 
     FullCounter_NonFlat += SampleCounter_NonFlat;
     FullCounter_All += SampleCounter_All;
@@ -733,8 +733,8 @@ std::string BinnedSplineHandler::getDimLabel(const int iSample, const unsigned i
 //Returns sample index in
 int BinnedSplineHandler::getSampleIndex(const std::string& SampleTittle) const{
 //****************************************
-  for (size_t iSample = 0; iSample < SampleTittles.size(); ++iSample) {
-    if (SampleTittle == SampleTittles[iSample]) {
+  for (size_t iSample = 0; iSample < SampleTitles.size(); ++iSample) {
+    if (SampleTittle == SampleTitles[iSample]) {
       return static_cast<int>(iSample);
     }
   }
@@ -748,7 +748,7 @@ void BinnedSplineHandler::PrintSampleDetails(const std::string& SampleTittle) co
 {
   const int iSample = getSampleIndex(SampleTittle);
 
-  MACH3LOG_INFO("Details about sample: {:<20}", SampleTittles[iSample]);
+  MACH3LOG_INFO("Details about sample: {:<20}", SampleTitles[iSample]);
   MACH3LOG_INFO("\t Dimension: {:<35}", Dimensions[iSample]);
   MACH3LOG_INFO("\t nSplineParam: {:<35}", nSplineParams[iSample]);
   MACH3LOG_INFO("\t nOscChan: {:<35}", nOscChans[iSample]);
@@ -837,8 +837,8 @@ std::vector< std::vector<int> > BinnedSplineHandler::GetEventSplines(const std::
 {
   std::vector<std::vector<int>> ReturnVec;
   int SampleIndex = -1;
-  for (unsigned int iSample = 0; iSample < SampleTittles.size(); iSample++) {
-    if (SampleTittle == SampleTittles[iSample]) {
+  for (unsigned int iSample = 0; iSample < SampleTitles.size(); iSample++) {
+    if (SampleTittle == SampleTitles[iSample]) {
       SampleIndex = iSample;
     }
   }
@@ -1116,14 +1116,14 @@ void BinnedSplineHandler::LoadSettingsDir(std::unique_ptr<TFile>& SplineFile) {
   Settings->SetBranchAddress("SplineModeVecs_size3", &SplineModeVecs_size3);
   std::vector<std::string>* SampleNames_temp = nullptr;
   Settings->SetBranchAddress("SampleNames", &SampleNames_temp);
-  std::vector<std::string>* SampleTittles_temp = nullptr;
-  Settings->SetBranchAddress("SampleTittles", &SampleTittles_temp);
+  std::vector<std::string>* SampleTitles_temp = nullptr;
+  Settings->SetBranchAddress("SampleTitles", &SampleTitles_temp);
   Settings->GetEntry(0);
 
   CoeffIndex = CoeffIndex_temp;
   MonolithSize = MonolithSize_temp;
   SampleNames = *SampleNames_temp;
-  SampleTittles = *SampleTittles_temp;
+  SampleTitles = *SampleTitles_temp;
 
   nParams = nParams_temp;
 
@@ -1324,8 +1324,8 @@ void BinnedSplineHandler::PrepareSettingsDir(std::unique_ptr<TFile>& SplineFile)
 
   std::vector<std::string> SampleNames_temp = SampleNames;
   Settings->Branch("SampleNames", &SampleNames_temp);
-  std::vector<std::string> SampleTittles_temp = SampleTittles;
-  Settings->Branch("SampleTittles", &SampleTittles_temp);
+  std::vector<std::string> SampleTitles_temp = SampleTitles;
+  Settings->Branch("SampleTitles", &SampleTitles_temp);
 
   Settings->Fill();
   SplineFile->cd();
