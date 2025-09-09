@@ -61,7 +61,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: DoxyfileMaCh3
-          path: Doc
+          path: Doc/
+
+      - run: ls -l Doc
 
       # Updates the package list to ensure you get the latest version of packages
       - run: sudo apt-get update
@@ -90,6 +92,11 @@ jobs:
           retention-days: 1
           name: DoxygenHTML
           path: Doc/html
+
+      ## EM: Now we delete the artifact so it doesn't use up our allowance
+      - uses: geekyeggo/delete-artifact@v5
+        with:
+          name: DoxyfileMaCh3
 
   Sphinx:
     # The type of runner that the job will run on
