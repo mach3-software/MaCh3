@@ -15,7 +15,7 @@ var searchData=
   ['dathist2d_12',['dathist2d',['../structSampleInfo.html#aa6f0af6a7e4c166fcf3422ceb3b2d3f7',1,'SampleInfo']]],
   ['debug_13',['Debug',['../classSampleSummary.html#a807e348a85fb460c5ca4a1ce56d08aab',1,'SampleSummary']]],
   ['decay_5frate_14',['decay_rate',['../classDelayedMR2T2.html#a97286b3dc12944f370d411fa74b93819',1,'DelayedMR2T2']]],
-  ['declarenewmode_15',['DeclareNewMode',['../classMaCh3Modes.html#a30fc687aebaa1b9cbac9d3f356bad4be',1,'MaCh3Modes']]],
+  ['declarenewmode_15',['DeclareNewMode',['../classMaCh3Modes.html#a180684434c373add20e58ab9fd083a93',1,'MaCh3Modes']]],
   ['default_5fplotting_5fconfig_16',['DEFAULT_PLOTTING_CONFIG',['../classMaCh3Plotting_1_1PlottingManager.html#a1947b4f022707ef6f570787ec62ba90c',1,'MaCh3Plotting::PlottingManager']]],
   ['default_5fstyle_5fconfig_17',['DEFAULT_STYLE_CONFIG',['../classMaCh3Plotting_1_1PlottingManager.html#a2e234f2546aa3eb2c7d97e2f28024511',1,'MaCh3Plotting::PlottingManager']]],
   ['default_5ftranslation_5fconfig_18',['DEFAULT_TRANSLATION_CONFIG',['../classMaCh3Plotting_1_1PlottingManager.html#a59d9e05c0590931aa260d81cd97bf3e4',1,'MaCh3Plotting::PlottingManager']]],
