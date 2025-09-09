@@ -129,7 +129,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:ab367cb5f56606338bb1fce780f2414e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate covariance by making 2D projection of each combination of parameters using multithreading.  <br /></td></tr>
 <tr class="separator:ab367cb5f56606338bb1fce780f2414e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afac304b884238cc3624f5471b43f1a7e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#afac304b884238cc3624f5471b43f1a7e">MakeSubOptimality</a> (const int NIntervals=10)</td></tr>
-<tr class="memdesc:afac304b884238cc3624f5471b43f1a7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make and Draw SubOptimality <a class="el" href="citelist.html#CITEREF_roberts2009adaptive">[25]</a>.  <br /></td></tr>
+<tr class="memdesc:afac304b884238cc3624f5471b43f1a7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make and Draw SubOptimality <a class="el" href="citelist.html#CITEREF_roberts2009adaptive">[26]</a>.  <br /></td></tr>
 <tr class="separator:afac304b884238cc3624f5471b43f1a7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a36441ec3d5b0e24e48040282ffcda3eb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#a36441ec3d5b0e24e48040282ffcda3eb">ResetHistograms</a> ()</td></tr>
 <tr class="memdesc:a36441ec3d5b0e24e48040282ffcda3eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset 2D posteriors, in case we would like to calculate in again with different BurnInCut.  <br /></td></tr>
@@ -361,7 +361,7 @@ Protected Member Functions</h2></td></tr>
 <tr class="memdesc:a1eb6f27c2fb967326dc14dc3dcdc3957"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: calc Effective Sample Size.  <br /></td></tr>
 <tr class="separator:a1eb6f27c2fb967326dc14dc3dcdc3957"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a29d492906e0c027d089331a0509cd2c3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#a29d492906e0c027d089331a0509cd2c3">BatchedAnalysis</a> ()</td></tr>
-<tr class="memdesc:a29d492906e0c027d089331a0509cd2c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the batched means variance estimation and variable indicating if number of batches is sensible <a class="el" href="citelist.html#CITEREF_chakraborty2019estimating">[4]</a> <a class="el" href="citelist.html#CITEREF_rossetti2024batch">[26]</a>.  <br /></td></tr>
+<tr class="memdesc:a29d492906e0c027d089331a0509cd2c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the batched means variance estimation and variable indicating if number of batches is sensible <a class="el" href="citelist.html#CITEREF_chakraborty2019estimating">[4]</a> <a class="el" href="citelist.html#CITEREF_rossetti2024batch">[27]</a>.  <br /></td></tr>
 <tr class="separator:a29d492906e0c027d089331a0509cd2c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af3658b8adee50f6ef5557ebbd1c87b8e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMCMCProcessor.html#af3658b8adee50f6ef5557ebbd1c87b8e">BatchedMeans</a> ()</td></tr>
 <tr class="memdesc:af3658b8adee50f6ef5557ebbd1c87b8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">CW: Batched means, literally read from an array and chuck into TH1D.  <br /></td></tr>
@@ -1276,7 +1276,7 @@ Kamil Skwarczynski </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p>Get the batched means variance estimation and variable indicating if number of batches is sensible <a class="el" href="citelist.html#CITEREF_chakraborty2019estimating">[4]</a> <a class="el" href="citelist.html#CITEREF_rossetti2024batch">[26]</a>. </p>
+<p>Get the batched means variance estimation and variable indicating if number of batches is sensible <a class="el" href="citelist.html#CITEREF_chakraborty2019estimating">[4]</a> <a class="el" href="citelist.html#CITEREF_rossetti2024batch">[27]</a>. </p>
 
 <p class="definition">Definition at line <a class="el" href="MCMCProcessor_8cpp_source.html#l04069">4069</a> of file <a class="el" href="MCMCProcessor_8cpp_source.html">MCMCProcessor.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 4069</span>                                    {</div>
@@ -1672,7 +1672,7 @@ Kamil Skwarczynski </dd></dl>
   </table>
   </dd>
 </dl>
-<p>This function computes the Effective Sample Size (ESS) using the autocorrelations calculated by <a class="el" href="classMCMCProcessor.html#a322bee0c362ba83df8c45769d299ce9f" title="KS: Calculate autocorrelations supports both OpenMP and CUDA :)">AutoCorrelation()</a>. Ensure that the parameter nLags here matches the number of lags used in <a class="el" href="classMCMCProcessor.html#a322bee0c362ba83df8c45769d299ce9f" title="KS: Calculate autocorrelations supports both OpenMP and CUDA :)">AutoCorrelation()</a> to obtain accurate results. <a class="el" href="citelist.html#CITEREF_StanManual">[28]</a> <a class="el" href="citelist.html#CITEREF_hanson2008mcmc">[14]</a> <a class="el" href="citelist.html#CITEREF_gabry2024visual">[9]</a> </p>
+<p>This function computes the Effective Sample Size (ESS) using the autocorrelations calculated by <a class="el" href="classMCMCProcessor.html#a322bee0c362ba83df8c45769d299ce9f" title="KS: Calculate autocorrelations supports both OpenMP and CUDA :)">AutoCorrelation()</a>. Ensure that the parameter nLags here matches the number of lags used in <a class="el" href="classMCMCProcessor.html#a322bee0c362ba83df8c45769d299ce9f" title="KS: Calculate autocorrelations supports both OpenMP and CUDA :)">AutoCorrelation()</a> to obtain accurate results. <a class="el" href="citelist.html#CITEREF_StanManual">[29]</a> <a class="el" href="citelist.html#CITEREF_hanson2008mcmc">[14]</a> <a class="el" href="citelist.html#CITEREF_gabry2024visual">[9]</a> </p>
 
 <p class="definition">Definition at line <a class="el" href="MCMCProcessor_8cpp_source.html#l03914">3914</a> of file <a class="el" href="MCMCProcessor_8cpp_source.html">MCMCProcessor.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno"> 3914</span>                                                                                          {</div>
@@ -5296,7 +5296,7 @@ Kamil Skwarczynski </dd></dl>
       </table>
 </div><div class="memdoc">
 
-<p>Make and Draw SubOptimality <a class="el" href="citelist.html#CITEREF_roberts2009adaptive">[25]</a>. </p>
+<p>Make and Draw SubOptimality <a class="el" href="citelist.html#CITEREF_roberts2009adaptive">[26]</a>. </p>
 <dl class="section author"><dt>Author</dt><dd>Henry Wallace </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="MCMCProcessor_8cpp_source.html#l01316">1316</a> of file <a class="el" href="MCMCProcessor_8cpp_source.html">MCMCProcessor.cpp</a>.</p>

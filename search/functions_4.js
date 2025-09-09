@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['declarenewmode_0',['DeclareNewMode',['../classMaCh3Modes.html#a180684434c373add20e58ab9fd083a93',1,'MaCh3Modes']]],
+  ['declarenewmode_0',['DeclareNewMode',['../classMaCh3Modes.html#a30fc687aebaa1b9cbac9d3f356bad4be',1,'MaCh3Modes']]],
   ['delayedmr2t2_1',['DelayedMR2T2',['../classDelayedMR2T2.html#a57cd4fa23139d3b8564b5c2d2f8390c8',1,'DelayedMR2T2']]],
   ['demangletypename_2',['DemangleTypeName',['../YamlHelper_8h.html#a57276bf6624191db1d835a88b711e096',1,'YamlHelper.h']]],
   ['destroyarrays_3',['DestroyArrays',['../RHat__HighMem_8cpp.html#abb60917440a91d5a3507fd4059d3e23b',1,'DestroyArrays():&#160;RHat_HighMem.cpp'],['../RHat_8cpp.html#abb60917440a91d5a3507fd4059d3e23b',1,'DestroyArrays():&#160;RHat.cpp']]],
