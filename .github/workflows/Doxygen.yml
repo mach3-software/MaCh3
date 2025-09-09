@@ -37,12 +37,9 @@ jobs:
       # Run CMake inside container to generate Doxyfile
       - name: Generate Doxyfile using CMake
         run: |
-          MY_UID=$(id -u)
-          MY_GID=$(id -g)
           docker run --rm \
             -v $PWD:/workspace \
             -w /workspace/MaCh3 \
-            -u $MY_UID:$MY_GID \
             ghcr.io/mach3-software/mach3:alma9latest \
             bash -c "mkdir -p build && cd build && cmake ../ && cd .. && rm -r -f build && ls -l Doc/Doxyfile"
 
