@@ -39,7 +39,7 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: ghcr.io/mach3-software/mach3:alma9latest
-          options: "--rm -v ${{ github.workspace }}:/workspace -w /workspace/MaCh3"
+          options: "--rm -v ${{ github.workspace }}:/workspace -w /workspace"
           run: |
             mkdir -p build
             cd build
