@@ -38,7 +38,7 @@ Summary of currently implemented bots
 ## Newsletter
 * Make weekly summary of
 
-## PRtittleChecker
+## PRtitleChecker
 * Ensures each PR starts with suffix like tidy: for example
 
 ## Stale

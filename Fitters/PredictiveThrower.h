@@ -86,7 +86,7 @@ class PredictiveThrower : public FitterBase {
                      const std::vector<std::vector<double>>& Chi2_y,
                      const std::string& Chi2_y_title,
                      const std::vector<TDirectory*>& SampleDir,
-                     const std::string Tittle);
+                     const std::string Title);
 
   /// KS: Use Full LLH or only sample contribution based on discussion with Asher we almost always only want the sample likelihood
   bool FullLLH;
