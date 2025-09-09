@@ -7,6 +7,8 @@ ParameterHandlerBase::ParameterHandlerBase(std::string name, std::string file, d
 // ********************************************
   MACH3LOG_DEBUG("Constructing instance of ParameterHandler");
   doSpecialStepProposal = false;
+  doFlipStepProposal = false;                      
+
   if (threshold < 0 || threshold >= 1) {
     MACH3LOG_INFO("NOTE: {} {}", name, file);
     MACH3LOG_INFO("Principal component analysis but given the threshold for the principal components to be less than 0, or greater than (or equal to) 1. This will not work");
@@ -307,6 +309,7 @@ void ParameterHandlerBase::EnableSpecialProposal(const YAML::Node& param, const 
 
   if (param["FlipParameter"]) {
     FlipEnabled = true;
+    doFlipStepProposal = true;
   }
 
   if (!CircEnabled && !FlipEnabled) {

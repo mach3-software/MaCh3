@@ -308,6 +308,12 @@ class ParameterHandlerBase {
   /// @cite haario2001adaptive
   void UpdateAdaptiveCovariance();
 
+  /// @brief Check if we have any flip step proposal enabled
+  bool HasFlipStepProposal() const { return doFlipStepProposal; }
+
+  /// @brief enable/disable flips, used in Delayed Rejection
+  void EnableFlipStepProposal(bool enable) { doFlipStepProposal = enable; }
+
   /// @brief Accepted this step
   void AcceptStep() _noexcept_;
 
@@ -321,6 +327,7 @@ class ParameterHandlerBase {
   void ToggleFixParameter(const std::string& name);
   /// @brief Is parameter fixed or not
   /// @param i Parameter index
+
   bool IsParameterFixed(const int i) const {
     if (_fError[i] < 0) { return true; }
     else                { return false; }
@@ -422,6 +429,9 @@ protected:
 
   /// Check if any of special step proposal were enabled
   bool doSpecialStepProposal;
+
+  /// Specifically disable flips, used in Delayed Rejection
+  bool doFlipStepProposal;
 
   /// The input root file we read in
   const std::string inputFile;

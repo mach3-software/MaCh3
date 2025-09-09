@@ -13,8 +13,11 @@ DelayedMR2T2::DelayedMR2T2(manager * const manager) : MR2T2(manager) {
     // On delayed on out of bounds steps. This saves some compute time and possibly regains efficiency
     delay_on_oob_only = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["DelayOnlyOutBounds"], false);
 
-    // 
+    // Delay with a certain probability
     delay_probability = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["DelayProbability"], 1.0);
+
+    // If we've delayed DON'T flip any parameters
+    flip_on_reject = true;
 
 
     if(delay_probability > 1.0){
@@ -47,6 +50,13 @@ void DelayedMR2T2::ResetSystScale() {
     {
         systematics[i]->SetStepScale(start_step_scale[i], false);
     }
+
+    if (!flip_on_reject){
+        // Reset the flip settings
+        for(int i=0; i<static_cast<int>(systematics.size()); ++i){
+            systematics[i]->EnableFlipStepProposal(initial_flip_setting[i]);
+        }
+    }
 }
 
 // *************************
@@ -72,6 +82,18 @@ void DelayedMR2T2::StoreCurrentStep() {
     for(int i=0; i<static_cast<int>(systematics.size()); ++i){
         current_step_vals[i] = std::vector<double>(systematics[i]->GetParCurrVec());
         start_step_scale[i] = systematics[i]->GetGlobalStepScale();
+    }
+
+    // Don't need to disable
+    if flip_on_reject{
+        return;
+    }
+
+    // We also need the flips
+    initial_flip_setting = std::vector<bool>(systematics.size());
+    for(int i=0; i<static_cast<int>(systematics.size()); ++i){
+        initial_flip_setting[i] = systematics[i]->HasFlipStepProposal();
+        systematics[i]->EnableFlipStepProposal(false);
     }
 }
 
@@ -152,6 +174,7 @@ void DelayedMR2T2::DoStep() {
 
         // Temporary, means we can "leapfrog"
         ScaleSystematics(decay_rate);
+
         MinLogLikelihood = logLProp;
     }
 
