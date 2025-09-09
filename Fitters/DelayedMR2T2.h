@@ -99,7 +99,7 @@ class DelayedMR2T2 : public MR2T2 {
     double delay_probability;
 
     /// Continue flipping parameters on reject
-    bool flip_on_reject;
+    bool keep_flipping_on_reject;
     /// bool to store the INITIAL flip setting
     std::vector<bool> initial_flip_setting;
 
