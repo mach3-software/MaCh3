@@ -76,6 +76,12 @@ class mcmc : public FitterBase {
   TSpline3 *dcp_spline_NO;
   /// multi-canonical beta
   double multicanonicalBeta;
+  /// umbrella number
+  int umbrellaNumber;
+  /// the desired overlap of evenly placed umbrellas
+  double umbrellaSigmaOverlap;
+  /// umbrella relative step scale
+  double umbrellaStepScaleFactor;
   /// multi-canonical sigma
   double multicanonicalSigma;
   /// multi-canonical penalty
