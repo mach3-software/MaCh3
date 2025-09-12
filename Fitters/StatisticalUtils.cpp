@@ -151,7 +151,7 @@ int GetNumberOfRuns(const std::vector<int>& GroupClasifier) {
 }
 
 // ****************
-double GetBetaParameter(const double data, const double mc, const double w2, TestStatistic TestStat) {
+double GetBetaParameter(const double data, const double mc, const double w2, const TestStatistic TestStat) {
 // ****************
   double Beta = 0.0;
 

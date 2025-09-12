@@ -120,11 +120,11 @@ enum TestStatistic {
 
 // **************************************************
 /// @brief Convert a LLH type to a string
-inline std::string TestStatistic_ToString(TestStatistic i) {
+inline std::string TestStatistic_ToString(const TestStatistic TestStat) {
 // **************************************************
   std::string name = "";
 
-  switch(i) {
+  switch(TestStat) {
     case TestStatistic::kPoisson:
     name = "Poisson";
     break;
@@ -145,7 +145,7 @@ inline std::string TestStatistic_ToString(TestStatistic i) {
       throw MaCh3Exception(__FILE__, __LINE__);
     default:
       MACH3LOG_ERROR("UNKNOWN LIKELIHOOD SPECIFIED!");
-      MACH3LOG_ERROR("You gave test-statistic {}", static_cast<int>(i));
+      MACH3LOG_ERROR("You gave test-statistic {}", static_cast<int>(TestStat));
       throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   return name;
@@ -301,7 +301,7 @@ inline int GetSampleFromGlobalBin(const std::vector<SampleBinningInfo>& BinningI
 
 /// @brief Sets the GlobalOffset for each SampleBinningInfo to enable linearization of multiple 2D binning samples.
 /// @param BinningInfo Vector of SampleBinningInfo structs to be updated with global offsets.
-inline void SetGlobalBinNumbers(std::vector<SampleBinningInfo>& BinningInfo){
+inline void SetGlobalBinNumbers(std::vector<SampleBinningInfo>& BinningInfo) {
   if (BinningInfo.empty()) {
     MACH3LOG_ERROR("No binning samples provided.");
     throw MaCh3Exception(__FILE__, __LINE__);
@@ -318,13 +318,14 @@ inline void SetGlobalBinNumbers(std::vector<SampleBinningInfo>& BinningInfo){
 // A handy namespace for variables extraction
 namespace MaCh3Utils {
 // ***************************
-
-/// @brief Return mass for given PDG
+  // *****************************
+  /// @brief Return mass for given PDG
   /// @note Get the mass of a particle from the PDG In GeV, not MeV!
+  /// @todo this could be constexpr in c++17
   /// @cite pdg2024 (particle masses)
   /// @cite ame2020 (nuclear masses)
   inline double GetMassFromPDG(const int PDG) {
-    // *****************************
+  // *****************************
     switch (abs(PDG)) {
       // Leptons
       case 11: return 0.00051099895; // e

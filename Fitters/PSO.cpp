@@ -5,6 +5,7 @@
 // ***************
 PSO::PSO(manager *man) : LikelihoodFit(man) {
 // ***************
+  AlgorithmName = "PSO";
   fConstriction = Get<double>(fitMan->raw()["General"]["PSO"]["Constriction"], __FILE__, __LINE__);
   fInertia = Get<double>(fitMan->raw()["General"]["PSO"]["Inertia"], __FILE__, __LINE__) * fConstriction;
   fOne = Get<double>(fitMan->raw()["General"]["PSO"]["One"], __FILE__, __LINE__) * fConstriction;

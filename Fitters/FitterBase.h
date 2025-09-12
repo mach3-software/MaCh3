@@ -67,7 +67,7 @@ class FitterBase {
   virtual void StartFromPreviousFit(const std::string& FitName);
 
   /// @brief Get name of class
-  virtual inline std::string GetName()const {return "FitterBase";};
+  inline std::string GetName() const {return AlgorithmName;};
  protected:
   /// @brief Process MCMC output
   void ProcessMCMC();
@@ -165,6 +165,9 @@ class FitterBase {
   bool SettingsSaved;
   /// Checks if output prepared not repeat some operations
   bool OutputPrepared;
+
+  /// Name of fitting algorithm that is being used
+  std::string AlgorithmName;
 
   #ifdef DEBUG
   /// Debugging flag
