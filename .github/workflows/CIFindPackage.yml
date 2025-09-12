@@ -24,7 +24,7 @@ jobs:
 
           - name: Find Package Rocky9 CUDA
             container: ghcr.io/mach3-software/mach3:rocky9cudav2.2.0
-            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DNuFastLinear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DProbGPULinear_ENABLED=ON
+            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DNuFastLinear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProb3ppLinear_ENABLED=ON
 
     name: ${{ matrix.name }}
 
