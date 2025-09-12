@@ -35,11 +35,13 @@ jobs:
     - uses: actions/checkout@v5
 
     - name: Get MaCh3
+      env:
+        HEAD_REF: ${{ github.head_ref || github.ref_name }}
       run: |
         cd /opt/
         git clone https://github.com/mach3-software/MaCh3.git MaCh3Core
         cd MaCh3Core
-        git checkout ${{ github.head_ref }}
+        git checkout "$HEAD_REF"
         mkdir build
         cd build
         cmake ../ ${{ matrix.cmakeoptions }}
