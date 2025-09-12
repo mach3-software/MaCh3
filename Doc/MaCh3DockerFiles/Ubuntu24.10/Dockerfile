@@ -9,8 +9,7 @@ LABEL compiler="Clang 19.1.1"
 LABEL root_version="v6.34.00"
 LABEL org.opencontainers.image.description="Official MaCh3 container"
 
-# KS: Comment out becasue looks like Ubuntu dropped support for some pakcages...
-#RUN apt update && apt upgrade -y
+RUN apt update && apt upgrade -y
 
 RUN apt-get install -y nlohmann-json3-dev
 #MISC_SW
