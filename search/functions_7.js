@@ -209,7 +209,7 @@ var searchData=
   ['getrandompoly2_206',['GetRandomPoly2',['../HistogramUtils_8cpp.html#a454513bc80904ed4f7982d0c62aaf09a',1,'GetRandomPoly2(const TH2Poly *PolyHist, TRandom3 *rand):&#160;HistogramUtils.cpp'],['../HistogramUtils_8h.html#a454513bc80904ed4f7982d0c62aaf09a',1,'GetRandomPoly2(const TH2Poly *PolyHist, TRandom3 *rand):&#160;HistogramUtils.cpp']]],
   ['getrandomthrow_207',['GetRandomThrow',['../group__ParameterHandlerGetters.html#ga7ede45af69c20ffaaa6d43cf883a09b2',1,'ParameterHandlerBase']]],
   ['getsamplefromglobalbin_208',['GetSampleFromGlobalBin',['../SampleStructs_8h.html#a7daaa1b563068e0d1a75d166126d0ce9',1,'SampleStructs.h']]],
-  ['getsampleindex_209',['getSampleIndex',['../classBinnedSplineHandler.html#ab5179dd2c2adcb85bc607ae18184c6b3',1,'BinnedSplineHandler']]],
+  ['getsampleindex_209',['GetSampleIndex',['../classBinnedSplineHandler.html#a64f156f32a705b7758e5790cf9cfa4eb',1,'BinnedSplineHandler']]],
   ['getsamplelikelihood_210',['GetSampleLikelihood',['../group__SampleHandlerGetters.html#ga3f4388fbe27168c5dae8fa722a7c1299',1,'SampleHandlerBase']]],
   ['getsamplename_211',['GetSampleName',['../group__SampleHandlerGetters.html#ga0ed9dd339235b3bdea2680078ab129ab',1,'SampleHandlerBase::GetSampleName()'],['../group__SampleHandlerGetters.html#ga46ca9963ed2f9b9b337db72bf52d99e6',1,'SampleHandlerFD::GetSampleName()'],['../classPySampleHandlerBase.html#a11fa6d8b67b61b75d1f8c1a63dae36f5',1,'PySampleHandlerBase::GetSampleName()']]],
   ['getsamplespecificllhscan_212',['getSampleSpecificLLHScan',['../classMaCh3Plotting_1_1InputManager.html#a3da6a57726f4b4d37ec9937538d28b6b',1,'MaCh3Plotting::InputManager']]],
