@@ -114,7 +114,7 @@ void splineFDBase::AddSample(const std::string& SampleName,
 }
 
 //****************************************
-void BinnedSplineHandler::InvestigateMissingSplines() const {
+void splineFDBase::InvestigateMissingSplines() const {
 //****************************************
   // Map: iSample → iSyst → modeSuffix → {totalSplines, zeroCount}
   std::map<unsigned int, std::map<unsigned int, std::map<std::string, std::pair<unsigned int, unsigned int>>>> systZeroCounts;
