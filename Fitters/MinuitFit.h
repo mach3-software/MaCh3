@@ -20,10 +20,6 @@ class MinuitFit : public LikelihoodFit {
 
   /// @brief Actual implementation of Minuit Fit algorithm
   void RunMCMC() override;
-
-  /// @brief Get name of class
-  inline std::string GetName() const override {return "MinuitFit";};
-
  private:
   /// Pointer to minimizer, which most often is Minuit
   std::unique_ptr<ROOT::Math::Minimizer> minuit;

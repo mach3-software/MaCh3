@@ -1,5 +1,12 @@
 #include "Fitters/MR2T2.h"
 
+
+// ***************
+MR2T2::MR2T2(manager *man) : MCMCBase(man) {
+// ***************
+    AlgorithmName = "MR2T2";
+}
+
 // *******************
 void MR2T2::DoStep() {
 // *******************

@@ -72,25 +72,100 @@ class SampleHandlerBase
   virtual inline std::string GetKinVarLabel(const int sample, const int Dimension) {
     (void) sample; (void) Dimension; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");  };
 
+
   /// @brief Calculate test statistic for a single bin using Poisson
   /// @param data is data
   /// @param mc is mc
   /// @ingroup SampleHandlerGetters
-  double GetTestStatLLH(const double data, const double mc) const;
-  /// @brief Calculate test statistic for a single bin. Calculation depends on setting of fTestStatistic. Data and mc -> 0 cut-offs are defined in M3::_LOW_MC_BOUND_.
-  /// @details Implemented fTestStatistic are kPoisson (with Stirling's approx.), kBarlowBeeston (arXiv:1103.0354), kDembinskiAbdelmotteleb (arXiv:2206.12346), kIceCube (arxiv:1901.04645), and kPearson.
+  double GetPoissonLLH(const double data, const double mc) const;
+
+  /// @brief Calculate test statistic for a single bin. Calculation depends on setting of @p fTestStatistic. Data and mc -> 0 cut-offs are defined in M3::_LOW_MC_BOUND_.
+  ///
+  /// @details
+  ///
+  /// ### Poisson
+  /// Standard Poisson log-likelihood (Stirling approximation) @cite BakerCousins1984
+  /// \f[
+  /// - \log \mathcal{L}_\mathrm{Poisson} = \sum_i N_i^\mathrm{MC} - N_i^\mathrm{data} +
+  /// N_i^\mathrm{data} \ln \frac{N_i^\mathrm{data}}{N_i^\mathrm{MC}},
+  /// \f]
+  ///
+  /// ### Pearson
+  /// Standard Pearson likelihood @cite Pearson1900 (assumes Gaussian approximation of bin counts):
+  /// \f[
+  /// - \log \mathcal{L}_\mathrm{Pearson} = \sum_i \frac{(N_i^\mathrm{data} - N_i^\mathrm{MC})^2}{2 \, N_i^\mathrm{MC}}
+  /// \f]
+  ///
+  /// ### Barlow-Beeston
+  /// Based on @cite Barlow:1993dm and following Conway approximation (@cite Conway:2011in)
+  /// The generation of MC is a stochastic process, so even identical settings can lead to different outputs
+  /// (assuming that the seeds of the random number generator are different). This introduces uncertainty in
+  /// MC distributions, especially in bins with low statistics.
+  ///
+  /// \f[
+  /// - \log \mathcal{L}_\mathrm{BB} = - \log \mathcal{L}_\mathrm{Poisson} - \log \mathcal{L}_\mathrm{MC_{stat}}
+  /// =  \sum_i \Biggl[ N_i^\mathrm{MC}(\vec{\theta}) - N_i^\mathrm{data} +
+  /// N_i^\mathrm{data} \ln \frac{N_i^\mathrm{data}}{N_i^\mathrm{MC}(\vec{\theta})} +
+  /// \frac{(\beta_i - 1)^2}{2 \sigma_{\beta_i}^2} \Biggr],
+  /// \f]
+  ///
+  /// where \f$\beta_i\f$ is a scaling parameter between ideal ("true") and generated MC in a bin
+  /// (\f$N^\mathrm{true}_{\mathrm{MC},i} = \beta_i N_i^\mathrm{MC}\f$), and
+  /// \f$\sigma^2_{\beta_i} = \frac{\sum_i w_i^2}{N_i^\mathrm{MC}}\f$, with \f$\sum_i w_i^2\f$ being the sum of the
+  /// squares of weights in bin \f$i\f$. Assuming \f$\beta_i\f$ follows a Gaussian, its mean can be found by solving
+  /// the quadratic equation derived by Conway:
+  ///
+  /// \f[
+  /// \beta_i^2 + (N_i^\mathrm{MC} \sigma_{\beta_i}^2 - 1)\beta_i - N_i^\mathrm{data} \sigma_{\beta_i}^2 = 0
+  /// \f]
+  ///
+  /// ### Dembinski-Abdelmotteleb
+  /// Alternative treatment of MC statistical uncertainty following Hans Dembinski and Ahmed Abdelmotteleb @cite Dembinski:2022ios
+  ///
+  /// This approach extends the Barlow-Beeston method. For each bin:
+  /// \f[
+  /// - \log \mathcal{L}_\mathrm{DA} = (N_i^{\mathrm{MC},\prime} - N_i^\mathrm{data} +
+  /// N_i^\mathrm{data} \ln \frac{N_i^\mathrm{data}}{N_i^{\mathrm{MC},\prime}}) + k \beta - k + k \ln \frac{k}{k \beta}
+  /// \f]
+  /// where
+  /// \f[
+  /// k = \frac{(N_i^\mathrm{MC})^2}{\sum_i w_i^2}
+  /// \f]
+  /// and
+  /// \f[
+  /// \beta = \frac{N_i^\mathrm{data} + k}{N_i^\mathrm{MC} + k}, \quad
+  /// N_i^{\mathrm{MC},\prime} = N_i^\mathrm{MC} \cdot \beta
+  /// \f]
+  ///
+  /// ### IceCube
+  /// Alternative likelihood definition described by the IceCube collaboration @cite Arguelles:2019izp
+  /// \f[
+  /// - \log \mathcal{L} = -  \sum_i \Biggl(
+  ///     a_i \log(b_i) + \log[\Gamma(N_i^{\mathrm{data}}+a_i)]
+  ///     - (N_i^{\mathrm{data}}+a_i)\log(b_i+1) - \log[\Gamma(a_i)]
+  /// \Biggr),
+  /// \f]
+  /// where the auxiliary variables are
+  /// \f[
+  /// a_i = N^{\mathrm{gen}}_{\mathrm{MC},i} \, b_i + 1, \quad
+  /// b_i = \frac{N^{\mathrm{gen}}_{\mathrm{MC},i}}{\sum_i w_i^2}.
+  /// \f]
+  ///
+  /// ### Treatment of low data/mc
+  /// Implemented fTestStatistic are @p kPoisson (with Stirling's approx.), @p kBarlowBeeston (arXiv:1103.0354), @p kDembinskiAbdelmotteleb (arXiv:2206.12346), @p kIceCube (arxiv:1901.04645), and @p kPearson.
   /// Test statistics require mc > 0, therefore low mc and data values are treated with cut-offs based on M3::_LOW_MC_BOUND_ = .00001 by default.
-  /// For kPoisson, kBarlowBeeston, kDembinskiAbdelmotteleb, kPearson:
+  /// For @p kPoisson, @p kBarlowBeeston, @p kDembinskiAbdelmotteleb, @p kPearson:
   /// data > _LOW_MC_BOUND_ & mc <= _LOW_MC_BOUND_: returns GetTestStatLLH(data, _LOW_MC_BOUND_, w2), with Poisson(data,_LOW_MC_BOUND_) limit for mc->0, w2->0.
   /// mc < data <= _LOW_MC_BOUND_: returns 0 (as if any data <= _LOW_MC_BOUND_ were effectively consistent with 0 data count), with a limit of 0 for mc->0.
-  /// data = 0: returns mc (or mc/2. for kPearson), with a limit of 0 for mc->0.
-  /// For kIceCube:
+  /// data = 0: returns mc (or mc/2. for @p kPearson), with a limit of 0 for mc->0.
+  /// For @p kIceCube:
   /// mc < data returns the lower of IceCube(data,mc,w2) and Poisson(data,mc) penalties, with a Poisson(data,_LOW_MC_BOUND_) limit for mc->0, w2->0.
   /// @param data is data
   /// @param mc is mc
-  /// @param w2 is is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
+  /// @param w2 is \f$\sum_{i} w_{i}^2\f$ (sum of weights squared), which is \f$\sigma^2_{\text{MC stats}}\f$
   /// @ingroup SampleHandlerGetters
   double GetTestStatLLH(const double data, const double mc, const double w2) const;
+
   /// @brief Set the test statistic to be used when calculating the binned likelihoods
   /// @param testStat The test statistic to use.
   /// @ingroup SampleHandlerGetters

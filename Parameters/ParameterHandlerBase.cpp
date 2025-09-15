@@ -1007,7 +1007,7 @@ void ParameterHandlerBase::MakePosDef(TMatrixDSym *cov) {
   gErrorIgnoreLevel = kFatal;
   
   //DB Loop 1000 times adding 1e-9 which tops out at 1e-6 shift on the diagonal before throwing error
-  int MaxAttempts = 1e5;
+  constexpr int MaxAttempts = 1e5;
   int iAttempt = 0;
   bool CanDecomp = false;
   TDecompChol chdcmp;
@@ -1092,7 +1092,6 @@ void ParameterHandlerBase::SetThrowMatrix(TMatrixDSym *cov){
     }
   }
 }
-
 
 // ********************************************
 void ParameterHandlerBase::UpdateThrowMatrix(TMatrixDSym *cov){

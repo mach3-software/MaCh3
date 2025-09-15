@@ -25,10 +25,6 @@ class MCMCBase : public FitterBase {
     /// @brief Set how long chain should be
     /// @param L new chain length
     inline void setChainLength(unsigned int L) { chainLength = L; };
-
-    /// @brief Get name of class
-    inline std::string GetName() const override { return "MCMC"; };
-
  protected:
     /// @brief The full StartStep->DoStep->EndStep chain
     inline void DoMCMCStep();

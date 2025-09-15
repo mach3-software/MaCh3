@@ -15,7 +15,7 @@ SampleHandlerBase::~SampleHandlerBase() {
 
 // ***************************************************************************
 // Poisson likelihood calc for data and MC event rates
-double SampleHandlerBase::GetTestStatLLH(const double data, const double mc) const {
+double SampleHandlerBase::GetPoissonLLH(const double data, const double mc) const {
 // ***************************************************************************
   // Return MC if there are no data, returns 0 for data == 0 && mc == 0  
   if ( data == 0 ) return mc;
@@ -94,7 +94,7 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, con
       //https://github.com/scikit-hep/iminuit/blob/059d06b00cae097ebf340b218b4eb57357111df8/src/iminuit/cost.py#L274-L300
       
       // If there is no MC stat error for any reason, return Poisson LogL
-      if ( w2 == 0 ) return GetTestStatLLH(data,mc);
+      if ( w2 == 0 ) return GetPoissonLLH(data,mc);
       
       // The MC can be changed
       double newmc = mc;
@@ -138,7 +138,7 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, con
       // The 0 MC limit is set to Poisson(data, 0.) as there is no way to get a non-diverging and reasonable guess on w2
 
       // If there is 0 MC uncertainty (technically also when MC is 0) => Return Poisson(data, mc)
-      if ( w2 == 0 ) return GetTestStatLLH(data,mc);
+      if ( w2 == 0 ) return GetPoissonLLH(data,mc);
       
       // Auxiliary variables
       const long double b = mc / w2;
@@ -151,7 +151,7 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, con
       // TN: I believe this might get some extra optimization
       if ( mc <= data ) {
         if ( data <= M3::_LOW_MC_BOUND_ ) return 0.;
-        const double poisson = GetTestStatLLH(data, M3::_LOW_MC_BOUND_);
+        const double poisson = GetPoissonLLH(data, M3::_LOW_MC_BOUND_);
         if ( stat > poisson ) return poisson;
       }
 
@@ -178,9 +178,9 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, con
     break;
     case (kPoisson):
     {
-      //Just call GetTestStatLLH which doesn't take in weights
+      //Just call GetPoissonLLH which doesn't take in weights
       //and is a Poisson likelihood comparison.
-      return GetTestStatLLH(data, mc);
+      return GetPoissonLLH(data, mc);
     }
     break;
     case TestStatistic::kNTestStatistics:

@@ -30,6 +30,7 @@ When using MaCh3 you must cite our doi from Zenodo. The bibtex file can be found
 
 ## Help and Guidelines 📄
 - [Tutorial](https://github.com/mach3-software/MaCh3Tutorial)
+- [Indico](https://indico.global/category/1289/) If you need a password, please reach out to MaCh3-leadership for access.
 - [How to contribute](https://github.com/mach3-software/MaCh3/blob/develop/.github/CONTRIBUTING.md)
 - [Wiki](https://github.com/mach3-software/MaCh3/wiki)
 - [Slack](https://t2k-experiment.slack.com/archives/C06EM0C6D7W/p1705599931356889)

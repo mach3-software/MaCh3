@@ -19,7 +19,7 @@ class AdaptiveMCMCHandler{
   virtual ~AdaptiveMCMCHandler();
 
   /// @brief Print all class members
-  void Print();
+  void Print() const;
 
   /// @brief Read initial values from config file
   ///
@@ -56,24 +56,24 @@ class AdaptiveMCMCHandler{
   void UpdateAdaptiveCovariance();
 
   /// @brief Tell whether we want reset step scale or not
-  bool IndivStepScaleAdapt();
+  bool IndivStepScaleAdapt() const;
 
   /// @brief Tell whether matrix should be updated
   bool UpdateMatrixAdapt();
 
   /// @brief To be fair not a clue...
-  bool AdaptionUpdate();
+  bool AdaptionUpdate() const;
 
   /// @brief Tell if we are Skipping Adaption
-  bool SkipAdaption();
+  bool SkipAdaption() const;
 
   /// @brief Set the current values of the parameters
-  void SetParams(const std::vector<double>* params){
+  void SetParams(const std::vector<double>* params) {
     _fCurrVal = params;
   }
 
   /// @brief Set the fixed parameters
-  void SetFixed(const std::vector<double>* fix){
+  void SetFixed(const std::vector<double>* fix) {
     _fFixedPars = fix;
   }
 
@@ -92,7 +92,7 @@ class AdaptiveMCMCHandler{
   }
 
   /// @brief Get Current value of parameter
-  double CurrVal(const int par_index);
+  double CurrVal(const int par_index) const;
 
   /// @brief Get Total Number of Steps
   /// @ingroup ParameterHandlerGetters
