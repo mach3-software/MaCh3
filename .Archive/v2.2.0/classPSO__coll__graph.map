@@ -1,0 +1,18 @@
+<map id="PSO" name="PSO">
+<area shape="rect" id="node1" title="Class PSO, consist of a vector of object Class Particle and global best Takes in the size (number of ..." alt="" coords="1249,451,1300,477"/>
+<area shape="rect" id="node2" href="$classLikelihoodFit.html" title="Implementation of base Likelihood Fit class, it is mostly responsible for likelihood calculation whil..." alt="" coords="995,232,1089,259"/>
+<area shape="rect" id="node3" href="$classFitterBase.html" title="Base class for implementing fitting algorithms." alt="" coords="759,188,841,215"/>
+<area shape="rect" id="node4" title=" " alt="" coords="371,19,572,45"/>
+<area shape="rect" id="node5" title=" " alt="" coords="371,70,571,111"/>
+<area shape="rect" id="node6" title=" " alt="" coords="374,136,569,163"/>
+<area shape="rect" id="node7" title=" " alt="" coords="379,187,563,229"/>
+<area shape="rect" id="node8" href="$classmanager.html" title="The manager class is responsible for managing configurations and settings." alt="" coords="435,253,507,280"/>
+<area shape="rect" id="node9" title=" " alt="" coords="181,253,261,280"/>
+<area shape="rect" id="node10" title=" " alt="" coords="5,246,132,287"/>
+<area shape="rect" id="node11" title=" " alt="" coords="399,337,544,364"/>
+<area shape="rect" id="node15" href="$classparticle.html" title="Class particle &#45; stores the position, velocity and personal best With functions which move particle a..." alt="" coords="869,395,935,421"/>
+<area shape="rect" id="node12" title=" " alt="" coords="965,451,1119,477"/>
+<area shape="rect" id="node13" title=" " alt="" coords="963,501,1121,528"/>
+<area shape="rect" id="node14" title=" " alt="" coords="964,553,1120,594"/>
+<area shape="rect" id="node16" title=" " alt="" coords="977,619,1107,645"/>
+</map>
