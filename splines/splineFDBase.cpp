@@ -60,7 +60,7 @@ void splineFDBase::cleanUpMemory() {
 }
 
 //****************************************
-void splineFDBase::AddSample(const std::string& SampleName,
+void splineFDBase::AddSample(const std::string& SampleName,                               
                              const std::vector<std::string>& OscChanFileNames,
                              const std::vector<std::string>& SplineVarNames)
 //Adds samples to the large array
@@ -147,7 +147,7 @@ void splineFDBase::InvestigateMissingSplines() const {
                   }
                   MACH3LOG_DEBUG(
                     "Sample '{}' | OscChan {} | Syst '{}' | Mode '{}' | Var1 {} | Var2 {} | Var3 {} => Value: {}",
-                    SampleTitles[iSample],
+                    SampleName,
                     iOscChan,
                     SplineFileParPrefixNames_Sample[iSyst],
                     modeSuffix,
@@ -177,7 +177,7 @@ void splineFDBase::InvestigateMissingSplines() const {
         const auto& counts = modePair.second;
         MACH3LOG_CRITICAL(
           "Sample '{}': Systematic '{}' has missing splines in mode '{}'. Expected Splines: {}, Missing Splines: {}",
-          SampleTitles[iSample],
+          SampleName,
           systName,
           modeSuffix,
           counts.first,
