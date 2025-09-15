@@ -7,7 +7,7 @@ var searchData=
   ['targets_4',['targets',['../structNormParameter.html#ae2c0218617a00ed886ca7f697b4140eb',1,'NormParameter::targets()'],['../structFunctionalParameter.html#a76af17874ac4d58d37b9b94cf5e96421',1,'FunctionalParameter::targets()']]],
   ['terminaltostring_5',['TerminalToString',['../namespaceMaCh3Utils.html#a10a037c1bcf48073ae105968128a55c5',1,'MaCh3Utils']]],
   ['teststatistic_6',['TestStatistic',['../SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67',1,'SampleStructs.h']]],
-  ['teststatistic_5ftostring_7',['TestStatistic_ToString',['../SampleStructs_8h.html#afe33f23691e6b5e3e0f5ab97aaeb7726',1,'SampleStructs.h']]],
+  ['teststatistic_5ftostring_7',['TestStatistic_ToString',['../SampleStructs_8h.html#a300e6cbc6c664b9ae8462c637732cf61',1,'SampleStructs.h']]],
   ['text_5fcoeff_5fx_8',['text_coeff_x',['../classSMonolithGPU.html#a1fb766b50293e6b611c45aa21c5c1b9c',1,'SMonolithGPU']]],
   ['text_5fnparamperevent_9',['text_nParamPerEvent',['../classSMonolithGPU.html#a663a150b3464b28d6161df1924cd534f',1,'SMonolithGPU']]],
   ['text_5fnparamperevent_5ftf1_10',['text_nParamPerEvent_TF1',['../classSMonolithGPU.html#a089fd1b491667e60d06c3713cd45552e',1,'SMonolithGPU']]],

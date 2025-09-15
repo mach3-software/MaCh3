@@ -2,7 +2,7 @@ var searchData=
 [
   ['targetmat_5ftostring_0',['TargetMat_ToString',['../SampleStructs_8h.html#a36b7eae1e9918d93ac6912d88c498a24',1,'SampleStructs.h']]],
   ['terminaltostring_1',['TerminalToString',['../namespaceMaCh3Utils.html#a10a037c1bcf48073ae105968128a55c5',1,'MaCh3Utils']]],
-  ['teststatistic_5ftostring_2',['TestStatistic_ToString',['../SampleStructs_8h.html#afe33f23691e6b5e3e0f5ab97aaeb7726',1,'SampleStructs.h']]],
+  ['teststatistic_5ftostring_2',['TestStatistic_ToString',['../SampleStructs_8h.html#a300e6cbc6c664b9ae8462c637732cf61',1,'SampleStructs.h']]],
   ['tf1_5fred_3',['TF1_red',['../classTF1__red.html#a503700d13da3bc04710c6a52e14877e6',1,'TF1_red::TF1_red()'],['../classTF1__red.html#adead62e9b0591aec30925907f6972086',1,'TF1_red::TF1_red(M3::int_t nSize, M3::float_t *Array)'],['../classTF1__red.html#a7ee6185f2184824a190d146375522952',1,'TF1_red::TF1_red(TF1 *&amp;Function)']]],
   ['tgraphtoth1d_4',['TGraphToTH1D',['../group__Utils.html#gacb903a36ea5439021f7994c0dd3158dd',1,'MaCh3Plotting']]],
   ['tgraphtovector_5',['TGraphToVector',['../group__Utils.html#gabee3ac13b77811574c1650016e81a229',1,'MaCh3Plotting::TGraphToVector(TGraph graph)'],['../group__Utils.html#ga30c29bb2cae29751d106bd93dfeaff81',1,'MaCh3Plotting::TGraphToVector(TGraph2D graph)']]],

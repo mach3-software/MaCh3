@@ -187,9 +187,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a36b7eae1e9918d93ac6912d88c498a24"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="SampleStructs_8h.html#a36b7eae1e9918d93ac6912d88c498a24">TargetMat_ToString</a> (const <a class="el" href="SampleStructs_8h.html#a706416000041de040e97d5dbe0bdb580">TargetMat</a> i)</td></tr>
 <tr class="memdesc:a36b7eae1e9918d93ac6912d88c498a24"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converted the Target Mat to a string.  <br /></td></tr>
 <tr class="separator:a36b7eae1e9918d93ac6912d88c498a24"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afe33f23691e6b5e3e0f5ab97aaeb7726"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="SampleStructs_8h.html#afe33f23691e6b5e3e0f5ab97aaeb7726">TestStatistic_ToString</a> (<a class="el" href="SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67">TestStatistic</a> i)</td></tr>
-<tr class="memdesc:afe33f23691e6b5e3e0f5ab97aaeb7726"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a LLH type to a string.  <br /></td></tr>
-<tr class="separator:afe33f23691e6b5e3e0f5ab97aaeb7726"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a300e6cbc6c664b9ae8462c637732cf61"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="SampleStructs_8h.html#a300e6cbc6c664b9ae8462c637732cf61">TestStatistic_ToString</a> (const <a class="el" href="SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67">TestStatistic</a> TestStat)</td></tr>
+<tr class="memdesc:a300e6cbc6c664b9ae8462c637732cf61"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a LLH type to a string.  <br /></td></tr>
+<tr class="separator:a300e6cbc6c664b9ae8462c637732cf61"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7daaa1b563068e0d1a75d166126d0ce9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="SampleStructs_8h.html#a7daaa1b563068e0d1a75d166126d0ce9">GetSampleFromGlobalBin</a> (const std::vector&lt; <a class="el" href="structSampleBinningInfo.html">SampleBinningInfo</a> &gt; &amp;BinningInfo, const size_t GlobalBin)</td></tr>
 <tr class="memdesc:a7daaa1b563068e0d1a75d166126d0ce9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the sample index corresponding to a global bin number.  <br /></td></tr>
 <tr class="separator:a7daaa1b563068e0d1a75d166126d0ce9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -341,7 +341,7 @@ Kamil Skwarczynski </dd></dl>
 </td></tr>
 <tr><td class="fieldname"><a id="a960da89e33ac45a56f7bbfac3068dc67a5a1aedce85942661f297f503d606c472" name="a960da89e33ac45a56f7bbfac3068dc67a5a1aedce85942661f297f503d606c472"></a>kIceCube&#160;</td><td class="fielddoc"><p>Based on <a class="el" href="citelist.html#CITEREF_Arguelles:2019izp">[1]</a>. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a960da89e33ac45a56f7bbfac3068dc67a1ac0c03f07bf2bb9ad083e449d69ffd7" name="a960da89e33ac45a56f7bbfac3068dc67a1ac0c03f07bf2bb9ad083e449d69ffd7"></a>kPearson&#160;</td><td class="fielddoc"><p>Standard Pearson likelihood <a class="el" href="citelist.html#CITEREF_Pearson1900">[23]</a>. </p>
+<tr><td class="fieldname"><a id="a960da89e33ac45a56f7bbfac3068dc67a1ac0c03f07bf2bb9ad083e449d69ffd7" name="a960da89e33ac45a56f7bbfac3068dc67a1ac0c03f07bf2bb9ad083e449d69ffd7"></a>kPearson&#160;</td><td class="fielddoc"><p>Standard Pearson likelihood <a class="el" href="citelist.html#CITEREF_Pearson1900">[24]</a>. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="a960da89e33ac45a56f7bbfac3068dc67a7d4e059541c7ec9737f5c884cd6cd0f0" name="a960da89e33ac45a56f7bbfac3068dc67a7d4e059541c7ec9737f5c884cd6cd0f0"></a>kDembinskiAbdelmotteleb&#160;</td><td class="fielddoc"><p>Based on <a class="el" href="citelist.html#CITEREF_Dembinski:2022ios">[6]</a>. </p>
 </td></tr>
@@ -469,7 +469,7 @@ Kamil Skwarczynski </dd></dl>
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="SampleStructs_8h_source.html#l00321">321</a> of file <a class="el" href="SampleStructs_8h_source.html">SampleStructs.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  321</span>                                                                          {</div>
+<div class="fragment"><div class="line"><span class="lineno">  321</span>                                                                           {</div>
 <div class="line"><span class="lineno">  322</span>  <span class="keywordflow">if</span> (BinningInfo.empty()) {</div>
 <div class="line"><span class="lineno">  323</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;No binning samples provided.&quot;</span>);</div>
 <div class="line"><span class="lineno">  324</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
@@ -598,8 +598,8 @@ Kamil Skwarczynski </dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="afe33f23691e6b5e3e0f5ab97aaeb7726" name="afe33f23691e6b5e3e0f5ab97aaeb7726"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afe33f23691e6b5e3e0f5ab97aaeb7726">&#9670;&#160;</a></span>TestStatistic_ToString()</h2>
+<a id="a300e6cbc6c664b9ae8462c637732cf61" name="a300e6cbc6c664b9ae8462c637732cf61"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a300e6cbc6c664b9ae8462c637732cf61">&#9670;&#160;</a></span>TestStatistic_ToString()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -610,8 +610,8 @@ Kamil Skwarczynski </dd></dl>
         <tr>
           <td class="memname">std::string TestStatistic_ToString </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67">TestStatistic</a>&#160;</td>
-          <td class="paramname"><em>i</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67">TestStatistic</a>&#160;</td>
+          <td class="paramname"><em>TestStat</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -625,11 +625,11 @@ Kamil Skwarczynski </dd></dl>
 <p>Convert a LLH type to a string. </p>
 
 <p class="definition">Definition at line <a class="el" href="SampleStructs_8h_source.html#l00123">123</a> of file <a class="el" href="SampleStructs_8h_source.html">SampleStructs.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  123</span>                                                         {</div>
+<div class="fragment"><div class="line"><span class="lineno">  123</span>                                                                      {</div>
 <div class="line"><span class="lineno">  124</span><span class="comment">// **************************************************</span></div>
 <div class="line"><span class="lineno">  125</span>  std::string name = <span class="stringliteral">&quot;&quot;</span>;</div>
 <div class="line"><span class="lineno">  126</span> </div>
-<div class="line"><span class="lineno">  127</span>  <span class="keywordflow">switch</span>(i) {</div>
+<div class="line"><span class="lineno">  127</span>  <span class="keywordflow">switch</span>(TestStat) {</div>
 <div class="line"><span class="lineno">  128</span>    <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67a82f43d91f1eda213c4b5c486672a32a5">TestStatistic::kPoisson</a>:</div>
 <div class="line"><span class="lineno">  129</span>    name = <span class="stringliteral">&quot;Poisson&quot;</span>;</div>
 <div class="line"><span class="lineno">  130</span>    <span class="keywordflow">break</span>;</div>
@@ -650,7 +650,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><span class="lineno">  145</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
 <div class="line"><span class="lineno">  146</span>    <span class="keywordflow">default</span>:</div>
 <div class="line"><span class="lineno">  147</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;UNKNOWN LIKELIHOOD SPECIFIED!&quot;</span>);</div>
-<div class="line"><span class="lineno">  148</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;You gave test-statistic {}&quot;</span>, <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(i));</div>
+<div class="line"><span class="lineno">  148</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;You gave test-statistic {}&quot;</span>, <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(TestStat));</div>
 <div class="line"><span class="lineno">  149</span>      <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
 <div class="line"><span class="lineno">  150</span>  }</div>
 <div class="line"><span class="lineno">  151</span>  <span class="keywordflow">return</span> name;</div>

@@ -97,32 +97,32 @@ $(function() {
 <dt>Member <a class="el" href="HistogramUtils_8h.html#a2dce7c8dec7d4d7f9c61346893973421">CalculateEnu</a>  (double PLep, double cosTheta, double EB, bool neutrino)</dt>
 <dd><a class="anchor" id="_todo000006"></a>WARNING this is hardcoded  </dd>
 <dt>Member <a class="el" href="ParameterStructs_8h.html#a577c6b383a75eba2eef6001eb18c9106">CleanVector</a>  (std::vector&lt; std::vector&lt; std::vector&lt; std::vector&lt; std::vector&lt; std::vector&lt; std::vector&lt; T &gt; &gt; &gt; &gt; &gt; &gt; &gt; &amp;vec)</dt>
-<dd><a class="anchor" id="_todo000042"></a>Use recursive to make it more scalable in future  </dd>
+<dd><a class="anchor" id="_todo000043"></a>Use recursive to make it more scalable in future  </dd>
 <dt>Member <a class="el" href="CombineMaCh3Chains_8cpp.html#a2c9f5c3c2218d29b0374c7e3c4fb32ff">CompareHistograms</a>  (const TH1 *h1, const TH1 *h2, const std::string &amp;histName, const std::string &amp;folderName)</dt>
-<dd><a class="anchor" id="_todo000021"></a>add checks for stuff like bin content etc  </dd>
+<dd><a class="anchor" id="_todo000022"></a>add checks for stuff like bin content etc  </dd>
 <dt>Member <a class="el" href="classFitterBase.html#aed21cb87772dcaecb0bc5ccb44b6efd4">FitterBase::SanitiseInputs</a>  ()</dt>
-<dd><a class="anchor" id="_todo000010"></a>consider expanding into ParmaterHandler and add more sanitisers  </dd>
+<dd><a class="anchor" id="_todo000011"></a>consider expanding into ParmaterHandler and add more sanitisers  </dd>
 <dt>Member <a class="el" href="classFitterBase.html#a655ccea31627627e2b36745c97e5c0f0">FitterBase::StartFromPreviousFit</a>  (const std::string &amp;FitName)</dt>
-<dd><a class="anchor" id="_todo000009"></a>implement some check that number of params matches etc  </dd>
+<dd><a class="anchor" id="_todo000010"></a>implement some check that number of params matches etc  </dd>
 <dt>Member <a class="el" href="MaCh3Logger_8h.html#a2c1ca790abd0cc6e40d642c2cf55b2d4">get_default_log_level</a>  ()</dt>
 <dd><a class="anchor" id="_todo000002"></a>make constexpr with c++17  </dd>
 <dt>File <a class="el" href="GetPenaltyTerm_8cpp.html">GetPenaltyTerm.cpp</a>  </dt>
-<dd><a class="anchor" id="_todo000022"></a>KS: This should really be moved to MCMC Processor  </dd>
+<dd><a class="anchor" id="_todo000023"></a>KS: This should really be moved to MCMC Processor  </dd>
 <dt>Member <a class="el" href="MaCh3Factory_8h.html#ac6dbfd8e5dc633275a94f0fc88cac50d">MaCh3CovarianceFactory</a>  (manager *FitManager, const std::string &amp;PreFix)</dt>
-<dd><a class="anchor" id="_todo000012"></a>add adaptive stuff  </dd>
+<dd><a class="anchor" id="_todo000013"></a>add adaptive stuff  </dd>
 <dt>Member <a class="el" href="MaCh3Factory_8cpp.html#aada46b6630f2f29c34c35354973388b3">MaCh3ManagerFactory</a>  (int argc, char **argv)</dt>
-<dd><a class="anchor" id="_todo000011"></a>KS: May need some recursive magic to reduce amount of hardcoding  </dd>
+<dd><a class="anchor" id="_todo000012"></a>KS: May need some recursive magic to reduce amount of hardcoding  </dd>
 <dt>Member <a class="el" href="structMaCh3Plotting_1_1InputFile.html#a0897b76fdbfc674ed94da1d2b4adb0a2">MaCh3Plotting::InputFile::Dump</a>  () const</dt>
-<dd><a class="anchor" id="_todo000030"></a>Same as for <a class="el" href="structMaCh3Plotting_1_1InputFile.html#a4b3753ca1fa1a399e519aa15bca8658a" title="Print out a small summary of what is contained in the file.">Summarise()</a>, could add a check that the file info has actually been filled.  </dd>
+<dd><a class="anchor" id="_todo000031"></a>Same as for <a class="el" href="structMaCh3Plotting_1_1InputFile.html#a4b3753ca1fa1a399e519aa15bca8658a" title="Print out a small summary of what is contained in the file.">Summarise()</a>, could add a check that the file info has actually been filled.  </dd>
 <dt>Member <a class="el" href="structMaCh3Plotting_1_1InputFile.html#a7491ea81990748b02402796ee512f518">MaCh3Plotting::InputFile::hasLLHScans</a>  </dt>
-<dd><p class="startdd"><a class="anchor" id="_todo000031"></a>I think it would be nice to store all the <a class="el" href="structMaCh3Plotting_1_1InputFile.html" title="Struct which wraps around the actual input file and also holds general information,...">InputFile</a> data in some non root, maybe custom c++ types, and have separate reader classes for potential different input file formats that can convert to these types. </p>
+<dd><p class="startdd"><a class="anchor" id="_todo000032"></a>I think it would be nice to store all the <a class="el" href="structMaCh3Plotting_1_1InputFile.html" title="Struct which wraps around the actual input file and also holds general information,...">InputFile</a> data in some non root, maybe custom c++ types, and have separate reader classes for potential different input file formats that can convert to these types. </p>
 <p class="interdd"></p>
 <p class="enddd">Currently all fitters use root but maybe some wonderful day in the far far future this wont be the case. Doing things this way we could maintain the possible future option of moving away from root???  </p>
 </dd>
 <dt>Member <a class="el" href="structMaCh3Plotting_1_1InputFile.html#a4b3753ca1fa1a399e519aa15bca8658a">MaCh3Plotting::InputFile::Summarise</a>  () const</dt>
-<dd><a class="anchor" id="_todo000029"></a>Could add some flag to this to check if the relevant information has actually been filled already and if not give some warning or print only some of the values.  </dd>
+<dd><a class="anchor" id="_todo000030"></a>Could add some flag to this to check if the relevant information has actually been filled already and if not give some warning or print only some of the values.  </dd>
 <dt>Class <a class="el" href="classMaCh3Plotting_1_1InputManager.html">MaCh3Plotting::InputManager</a>  </dt>
-<dd><p class="startdd"><a class="anchor" id="_todo000028"></a>A lot of string comparisons going on in the code for the post fit errors, would maybe be good to implement some kind of indexing for parameters and just have a map between the parameter names and this index to be used internally by the class. </p>
+<dd><p class="startdd"><a class="anchor" id="_todo000029"></a>A lot of string comparisons going on in the code for the post fit errors, would maybe be good to implement some kind of indexing for parameters and just have a map between the parameter names and this index to be used internally by the class. </p>
 <p class="interdd"></p>
 <p class="interdd">Add code to read MCMC from input file </p>
 <p class="interdd"></p>
@@ -131,61 +131,63 @@ $(function() {
 <p class="enddd">Add code to read in Violin plots from the postfit error output files.  </p>
 </dd>
 <dt>Member <a class="el" href="classMaCh3Plotting_1_1InputManager.html#a8a89fc87110fcfad0bfd77b3b572eae4">MaCh3Plotting::InputManager::fillFileInfo</a>  (<a class="el" href="structMaCh3Plotting_1_1InputFile.html" title="Struct which wraps around the actual input file and also holds general information,...">InputFile</a> &amp;inputFileDef, const bool printThoughts=true)</dt>
-<dd><p class="startdd"><a class="anchor" id="_todo000026"></a>Would like to be able to specify what kind of file and what fitter an input is from on the command like: e.g. like `plotApp [options] &lt;fileName1&gt;;&lt;fileType&gt;;&lt;fitterName&gt;... and only try to auto-detect it if its not specified, this would save some time and would also be very helpful in situations where we can't auto-detect e.g. if there is some kind of overlap in the file structure between two fitters </p>
-<p class="enddd"><a class="anchor" id="_todo000027"></a>add a check here to make sure all the scans that are in the file are being picked up by the reader, and warn if any are not being used  </p>
+<dd><p class="startdd"><a class="anchor" id="_todo000028"></a>add a check here to make sure all the scans that are in the file are being picked up by the reader, and warn if any are not being used </p>
+<p class="enddd"><a class="anchor" id="_todo000027"></a>Would like to be able to specify what kind of file and what fitter an input is from on the command like: e.g. like `plotApp [options] &lt;fileName1&gt;;&lt;fileType&gt;;&lt;fitterName&gt;... and only try to auto-detect it if its not specified, this would save some time and would also be very helpful in situations where we can't auto-detect e.g. if there is some kind of overlap in the file structure between two fitters  </p>
 </dd>
 <dt>Member <a class="el" href="classMaCh3Plotting_1_1PlottingManager.html#aeb042d09d55644d8b35632f66f1832b6">MaCh3Plotting::PlottingManager::addUserOption</a>  ()</dt>
-<dd><p class="startdd"><a class="anchor" id="_todo000034"></a>Would be good to add functionality to this to allow user to add their own options. </p>
+<dd><p class="startdd"><a class="anchor" id="_todo000035"></a>Would be good to add functionality to this to allow user to add their own options. </p>
 <p class="interdd"></p>
 <p class="interdd">The way I can think to do this would be have fn <a class="el" href="classMaCh3Plotting_1_1PlottingManager.html#aeb042d09d55644d8b35632f66f1832b6" title="Describe an option you want to add to the PlottingManager which can be read in from the command line ...">addUserOption()</a> to set the options, defining the cmd line option (e.g. -x), the name of the option, and maybe some description of the option to be used in the help message </p>
 <p class="interdd"></p>
 <p class="interdd">can then store these options in some map or something to be retrieved later by <a class="el" href="classMaCh3Plotting_1_1PlottingManager.html#af9f60a6196a9249d7ad7fee6c7bba89a" title="Retrieve a command line option you specified using addOption.">getUserOption()</a> </p>
-<p class="enddd"><a class="anchor" id="_todo000035"></a>Implement this.  </p>
+<p class="enddd"><a class="anchor" id="_todo000036"></a>Implement this.  </p>
 </dd>
 <dt>Member <a class="el" href="classMaCh3Plotting_1_1PlottingManager.html#a9c1177794e2fecce4e258ee8446d6569">MaCh3Plotting::PlottingManager::getOutputName</a>  (const std::string &amp;suffix)</dt>
-<dd><a class="anchor" id="_todo000040"></a>Make this support .root files too  </dd>
+<dd><a class="anchor" id="_todo000041"></a>Make this support .root files too  </dd>
 <dt>Member <a class="el" href="classMaCh3Plotting_1_1PlottingManager.html#af9f60a6196a9249d7ad7fee6c7bba89a">MaCh3Plotting::PlottingManager::getUserOption</a>  (std::string option)</dt>
-<dd><a class="anchor" id="_todo000036"></a>Implement this.  </dd>
+<dd><a class="anchor" id="_todo000037"></a>Implement this.  </dd>
 <dt>Member <a class="el" href="classMaCh3Plotting_1_1PlottingManager.html#a20fbe3c9673f14adb46d3cd8919e306d">MaCh3Plotting::PlottingManager::initialise</a>  ()</dt>
-<dd><a class="anchor" id="_todo000032"></a>should add some kind of validataConfigs() method to got throught all of the specified config files and make sure that all provided options are valid and all necessary options are provided as it can be pretty annoying and difficult to identify what's going wrong when yaml just fails to find an option at runtime  </dd>
+<dd><a class="anchor" id="_todo000033"></a>should add some kind of validataConfigs() method to got throught all of the specified config files and make sure that all provided options are valid and all necessary options are provided as it can be pretty annoying and difficult to identify what's going wrong when yaml just fails to find an option at runtime  </dd>
 <dt>Member <a class="el" href="classMaCh3Plotting_1_1PlottingManager.html#a6abd05428a9f8827c67a22bd6f8ffce3">MaCh3Plotting::PlottingManager::parseInputs</a>  (int argc, char *const *argv)</dt>
-<dd><a class="anchor" id="_todo000033"></a>make this able to return any un-parsed arguments so that user can specify their own arguments for use in their plotting scripts  </dd>
+<dd><a class="anchor" id="_todo000034"></a>make this able to return any un-parsed arguments so that user can specify their own arguments for use in their plotting scripts  </dd>
 <dt>Member <a class="el" href="classMaCh3Plotting_1_1PlottingManager.html#a8910c157ce1ec6698f3bacdf521789ff">MaCh3Plotting::PlottingManager::usage</a>  ()</dt>
-<dd><p class="startdd"><a class="anchor" id="_todo000037"></a>Implement this. </p>
-<p class="interdd"><a class="anchor" id="_todo000038"></a></p>
-<p class="enddd"><a class="anchor" id="_todo000039"></a>could add some function to allow user to specify the help message for their particular script, then auto generate what the cmd line syntax looks like based on user specified options?  </p>
+<dd><p class="startdd"><a class="anchor" id="_todo000038"></a>Implement this. </p>
+<p class="interdd"><a class="anchor" id="_todo000039"></a></p>
+<p class="enddd"><a class="anchor" id="_todo000040"></a>could add some function to allow user to specify the help message for their particular script, then auto generate what the cmd line syntax looks like based on user specified options?  </p>
 </dd>
+<dt>Member <a class="el" href="namespaceMaCh3Utils.html#a1b305c72615a48a89e74a9c3ded69c02">MaCh3Utils::GetMassFromPDG</a>  (const int PDG)</dt>
+<dd><a class="anchor" id="_todo000009"></a>this could be constexpr in c++17 <a class="el" href="citelist.html#CITEREF_pdg2024">[23]</a> (particle masses) <a class="el" href="citelist.html#CITEREF_ame2020">[33]</a> (nuclear masses)  </dd>
 <dt>Member <a class="el" href="GetPostfitParamPlots_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>  (int argc, char *argv[])</dt>
-<dd><a class="anchor" id="_todo000024"></a>KS: Violin plot currently not supported by three file version although it should be super easy to adapt  </dd>
+<dd><a class="anchor" id="_todo000025"></a>KS: Violin plot currently not supported by three file version although it should be super easy to adapt  </dd>
 <dt>File <a class="el" href="MatrixPlotter_8cpp.html">MatrixPlotter.cpp</a>  </dt>
-<dd><a class="anchor" id="_todo000025"></a>Integrate within StylePlotting to get fancy labels etc  </dd>
+<dd><a class="anchor" id="_todo000026"></a>Integrate within StylePlotting to get fancy labels etc  </dd>
 <dt>Member <a class="el" href="classMCMCBase.html#a5921193bf940821aabec7831466d6060">MCMCBase::StartFromPreviousFit</a>  (const std::string &amp;FitName) override</dt>
-<dd><a class="anchor" id="_todo000013"></a>implement some check that number of params matches etc  </dd>
+<dd><a class="anchor" id="_todo000014"></a>implement some check that number of params matches etc  </dd>
 <dt>Member <a class="el" href="classMCMCProcessor.html#aef760d8c4bb70690a5c4114f4b2409b3">MCMCProcessor::PowerSpectrumAnalysis</a>  ()</dt>
-<dd><a class="anchor" id="_todo000014"></a>KS: Code is awfully slow... I know how to make it faster (GPU scream in a distant) but for now just make it for two params, bit hacky sry...  </dd>
+<dd><a class="anchor" id="_todo000015"></a>KS: Code is awfully slow... I know how to make it faster (GPU scream in a distant) but for now just make it for two params, bit hacky sry...  </dd>
 <dt>Member <a class="el" href="classMinuitFit.html#a5392a49207148d7b884974db3d3f5eac">MinuitFit::MinuitFit</a>  (manager *const fitMan)</dt>
-<dd><a class="anchor" id="_todo000016"></a>KS: Make this in future configurable, for more see: <a href="https://root.cern.ch/doc/master/classROOT_1_1Math_1_1Minimizer.html">https://root.cern.ch/doc/master/classROOT_1_1Math_1_1Minimizer.html</a>  </dd>
+<dd><a class="anchor" id="_todo000017"></a>KS: Make this in future configurable, for more see: <a href="https://root.cern.ch/doc/master/classROOT_1_1Math_1_1Minimizer.html">https://root.cern.ch/doc/master/classROOT_1_1Math_1_1Minimizer.html</a>  </dd>
 <dt>Member <a class="el" href="classOscProcessor.html#aa5b2ecf52ca107e11ac55bb9721db2c5">OscProcessor::LoadAdditionalInfo</a>  () override</dt>
-<dd><p class="startdd"><a class="anchor" id="_todo000019"></a>we should actually calculate central value and prior error but leave it for now... </p>
-<p class="enddd"><a class="anchor" id="_todo000018"></a>remove this hardcoding (e.g., use a map or enum-to-name function)  </p>
+<dd><p class="startdd"><a class="anchor" id="_todo000019"></a>remove this hardcoding (e.g., use a map or enum-to-name function) </p>
+<p class="enddd"><a class="anchor" id="_todo000020"></a>we should actually calculate central value and prior error but leave it for now...  </p>
 </dd>
 <dt>Member <a class="el" href="classOscProcessor.html#a4f6aea5665b9966d7fe42b53805e7305">OscProcessor::OscProcessor</a>  (const std::string &amp;InputFile)</dt>
-<dd><a class="anchor" id="_todo000017"></a>Here where we should add all unitarity triangles, fancy Jarlskog studies and other hacky things that only make sense for oscitations  </dd>
+<dd><a class="anchor" id="_todo000018"></a>Here where we should add all unitarity triangles, fancy Jarlskog studies and other hacky things that only make sense for oscitations  </dd>
 <dt>Member <a class="el" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20b">ParameterEnum</a>  </dt>
-<dd><p class="startdd"><a class="anchor" id="_todo000015"></a>KS: Apply reweighted weight to plotting and Bayes Factor. </p>
+<dd><p class="startdd"><a class="anchor" id="_todo000016"></a>KS: Apply reweighted weight to plotting and Bayes Factor. </p>
 <p class="interdd"></p>
 <p class="interdd">KS: Implement 2D reweighing like DayaBay. </p>
 <p class="interdd"></p>
 <p class="enddd">KS: Implement <a class="el" href="GetPenaltyTerm_8cpp.html" title="KS: This file contains the implementation of the function to extract specific penalty terms from syst...">Diagnostics/GetPenaltyTerm.cpp</a> here.  </p>
 </dd>
 <dt>Member <a class="el" href="classParameterHandlerBase.html#a216561fe8c8fbcd8e607d857a0559738">ParameterHandlerBase::PrintParameters</a>  () const</dt>
-<dd><a class="anchor" id="_todo000041"></a>remove it  </dd>
+<dd><a class="anchor" id="_todo000042"></a>remove it  </dd>
 <dt>Member <a class="el" href="classPCAHandler.html#a5d95270f4cebb6ac0d0a380401dbd304">PCAHandler::ThrowParameters</a>  (const std::vector&lt; std::unique_ptr&lt; TRandom3 &gt; &gt; &amp;random_number, double **throwMatrixCholDecomp, double *randParams, double *corr_throw, const std::vector&lt; double &gt; &amp;fPreFitValue, const std::vector&lt; double &gt; &amp;fLowBound, const std::vector&lt; double &gt; &amp;fUpBound, int _fNumPar)</dt>
-<dd><a class="anchor" id="_todo000044"></a>KS: We don't check if param is out of bounds. This is more problematic for PCA params.  </dd>
+<dd><a class="anchor" id="_todo000045"></a>KS: We don't check if param is out of bounds. This is more problematic for PCA params.  </dd>
 <dt>File <a class="el" href="PlotMCMCDiag_8cpp.html">PlotMCMCDiag.cpp</a>  </dt>
-<dd><a class="anchor" id="_todo000023"></a>this need serious refactor  </dd>
+<dd><a class="anchor" id="_todo000024"></a>this need serious refactor  </dd>
 <dt>Class <a class="el" href="classPredictiveThrower.html">PredictiveThrower</a>  </dt>
-<dd><p class="startdd"><a class="anchor" id="_todo000020"></a>add BIC, DIC, WAIC </p>
+<dd><p class="startdd"><a class="anchor" id="_todo000021"></a>add BIC, DIC, WAIC </p>
 <p class="interdd"></p>
 <p class="interdd">add ability yo make projection for Get1DDiscVar </p>
 <p class="interdd"></p>
@@ -202,7 +204,7 @@ $(function() {
 <dt>Member <a class="el" href="classSampleHandlerFD.html#a1a984c564107c7207a2611d0bf67d9cc">SampleHandlerFD::SetupSplines</a>  ()=0</dt>
 <dd><a class="anchor" id="_todo000007"></a>abstract the spline initialisation completely to core  </dd>
 <dt>Member <a class="el" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2f">SystType</a>  </dt>
-<dd><a class="anchor" id="_todo000043"></a>KS: Consider using enum class, it is generally recommended as safer. It will require many static_cast </dd>
+<dd><a class="anchor" id="_todo000044"></a>KS: Consider using enum class, it is generally recommended as safer. It will require many static_cast </dd>
 </dl>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

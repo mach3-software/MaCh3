@@ -74,6 +74,6 @@ var searchData=
   ['createminmaxband_71',['CreateMinMaxBand',['../PlotMCMCDiag_8cpp.html#a2c0d8a2e8d398ccc7ecde8525ae19140',1,'PlotMCMCDiag.cpp']]],
   ['createnewadaptivecovariance_72',['CreateNewAdaptiveCovariance',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a8ecabda538889e8e66991cff4923bd97',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
   ['createresponsefunction_73',['CreateResponseFunction',['../SplineStructs_8h.html#ab2c8d72ae04d6efb77876248cb67a338',1,'SplineStructs.h']]],
-  ['currval_74',['CurrVal',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a2af0eae25a363847e8dcd13838e08307',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
+  ['currval_74',['CurrVal',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac217019634fb10a0f1ebe834919ec57d',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
   ['customrange_75',['CustomRange',['../classFitterBase.html#a9a2ad372f4237cef49c90e59651999e8',1,'FitterBase']]]
 ];

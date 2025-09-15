@@ -150,11 +150,11 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a41b7cf662f3f3b62bdb46bc78020dd8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9bef25c33bdd8d4c800cb64ae4197911"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a9bef25c33bdd8d4c800cb64ae4197911">GetKinVarLabel</a> (const int sample, const int Dimension)</td></tr>
 <tr class="separator:a9bef25c33bdd8d4c800cb64ae4197911"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaed7090f469ee422fa1f88768b9c28c1b"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#gaed7090f469ee422fa1f88768b9c28c1b">GetTestStatLLH</a> (const double data, const double mc) const</td></tr>
-<tr class="memdesc:gaed7090f469ee422fa1f88768b9c28c1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate test statistic for a single bin using Poisson.  <br /></td></tr>
-<tr class="separator:gaed7090f469ee422fa1f88768b9c28c1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae5849766fbbc7aa71672da8b0f189fe5"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#gae5849766fbbc7aa71672da8b0f189fe5">GetPoissonLLH</a> (const double data, const double mc) const</td></tr>
+<tr class="memdesc:gae5849766fbbc7aa71672da8b0f189fe5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate test statistic for a single bin using Poisson.  <br /></td></tr>
+<tr class="separator:gae5849766fbbc7aa71672da8b0f189fe5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga527307a4186e2eb61475ea975108aa65"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#ga527307a4186e2eb61475ea975108aa65">GetTestStatLLH</a> (const double data, const double mc, const double w2) const</td></tr>
-<tr class="memdesc:ga527307a4186e2eb61475ea975108aa65"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate test statistic for a single bin. Calculation depends on setting of fTestStatistic. Data and mc -&gt; 0 cut-offs are defined in <a class="el" href="namespaceM3.html">M3</a>::<em>LOW_MC_BOUND</em>.  <br /></td></tr>
+<tr class="memdesc:ga527307a4186e2eb61475ea975108aa65"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate test statistic for a single bin. Calculation depends on setting of <code>fTestStatistic</code>. Data and mc -&gt; 0 cut-offs are defined in <a class="el" href="namespaceM3.html">M3</a>::<em>LOW_MC_BOUND</em>.  <br /></td></tr>
 <tr class="separator:ga527307a4186e2eb61475ea975108aa65"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga1c81b6b7a7e70b04c6c6ca1c81c70fc5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#ga1c81b6b7a7e70b04c6c6ca1c81c70fc5">SetTestStatistic</a> (<a class="el" href="SampleStructs_8h.html#a960da89e33ac45a56f7bbfac3068dc67">TestStatistic</a> testStat)</td></tr>
 <tr class="memdesc:ga1c81b6b7a7e70b04c6c6ca1c81c70fc5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the test statistic to be used when calculating the binned likelihoods.  <br /></td></tr>
@@ -222,8 +222,8 @@ Protected Attributes</h2></td></tr>
 <div class="line"><span class="lineno">    6</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#ab497b52d94868283a8a7cedbd1a4d777">nEvents</a> = 0;</div>
 <div class="line"><span class="lineno">    7</span>  <a class="code hl_variable" href="classSampleHandlerBase.html#aa7a13af22c2314c718fb6438d493d3d1">nSamples</a> = 0;</div>
 <div class="line"><span class="lineno">    8</span>}</div>
-<div class="ttc" id="aclassSampleHandlerBase_html_aa7a13af22c2314c718fb6438d493d3d1"><div class="ttname"><a href="classSampleHandlerBase.html#aa7a13af22c2314c718fb6438d493d3d1">SampleHandlerBase::nSamples</a></div><div class="ttdeci">M3::int_t nSamples</div><div class="ttdoc">Contains how many samples we've got.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00123">SampleHandlerBase.h:123</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_ab497b52d94868283a8a7cedbd1a4d777"><div class="ttname"><a href="classSampleHandlerBase.html#ab497b52d94868283a8a7cedbd1a4d777">SampleHandlerBase::nEvents</a></div><div class="ttdeci">unsigned int nEvents</div><div class="ttdoc">Number of MC events are there.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00126">SampleHandlerBase.h:126</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_aa7a13af22c2314c718fb6438d493d3d1"><div class="ttname"><a href="classSampleHandlerBase.html#aa7a13af22c2314c718fb6438d493d3d1">SampleHandlerBase::nSamples</a></div><div class="ttdeci">M3::int_t nSamples</div><div class="ttdoc">Contains how many samples we've got.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00198">SampleHandlerBase.h:198</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_ab497b52d94868283a8a7cedbd1a4d777"><div class="ttname"><a href="classSampleHandlerBase.html#ab497b52d94868283a8a7cedbd1a4d777">SampleHandlerBase::nEvents</a></div><div class="ttdeci">unsigned int nEvents</div><div class="ttdoc">Number of MC events are there.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00201">SampleHandlerBase.h:201</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -496,13 +496,13 @@ template&lt;typename T &gt; </div>
 
 <p>check if event is affected by following conditions, for example pdg, or modes etc </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00107">107</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  107</span>                                                                         {</div>
-<div class="line"><span class="lineno">  108</span>    <span class="keywordflow">if</span> (allowedValues.empty()) {</div>
-<div class="line"><span class="lineno">  109</span>      <span class="keywordflow">return</span> <span class="keyword">true</span>;  <span class="comment">// Apply to all if no specific values are specified</span></div>
-<div class="line"><span class="lineno">  110</span>    }</div>
-<div class="line"><span class="lineno">  111</span>    <span class="keywordflow">return</span> std::find(allowedValues.begin(), allowedValues.end(), value) != allowedValues.end();</div>
-<div class="line"><span class="lineno">  112</span>  }</div>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00182">182</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  182</span>                                                                         {</div>
+<div class="line"><span class="lineno">  183</span>    <span class="keywordflow">if</span> (allowedValues.empty()) {</div>
+<div class="line"><span class="lineno">  184</span>      <span class="keywordflow">return</span> <span class="keyword">true</span>;  <span class="comment">// Apply to all if no specific values are specified</span></div>
+<div class="line"><span class="lineno">  185</span>    }</div>
+<div class="line"><span class="lineno">  186</span>    <span class="keywordflow">return</span> std::find(allowedValues.begin(), allowedValues.end(), value) != allowedValues.end();</div>
+<div class="line"><span class="lineno">  187</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -541,8 +541,8 @@ template&lt;typename T &gt; </div>
 <div class="line"><span class="lineno">  217</span>  std::cerr.rdbuf(<a class="code hl_variable" href="classSampleHandlerBase.html#a6b884367733c4f3a93c75127ed6e9df9">errbuf</a>);</div>
 <div class="line"><span class="lineno">  218</span><span class="preprocessor">  #endif</span></div>
 <div class="line"><span class="lineno">  219</span>}</div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a47d291148fa6153a7e05beebde6cfdb9"><div class="ttname"><a href="classSampleHandlerBase.html#a47d291148fa6153a7e05beebde6cfdb9">SampleHandlerBase::buf</a></div><div class="ttdeci">std::streambuf * buf</div><div class="ttdoc">Keep the cout buffer.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00118">SampleHandlerBase.h:118</a></div></div>
-<div class="ttc" id="aclassSampleHandlerBase_html_a6b884367733c4f3a93c75127ed6e9df9"><div class="ttname"><a href="classSampleHandlerBase.html#a6b884367733c4f3a93c75127ed6e9df9">SampleHandlerBase::errbuf</a></div><div class="ttdeci">std::streambuf * errbuf</div><div class="ttdoc">Keep the cerr buffer.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00120">SampleHandlerBase.h:120</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a47d291148fa6153a7e05beebde6cfdb9"><div class="ttname"><a href="classSampleHandlerBase.html#a47d291148fa6153a7e05beebde6cfdb9">SampleHandlerBase::buf</a></div><div class="ttdeci">std::streambuf * buf</div><div class="ttdoc">Keep the cout buffer.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00193">SampleHandlerBase.h:193</a></div></div>
+<div class="ttc" id="aclassSampleHandlerBase_html_a6b884367733c4f3a93c75127ed6e9df9"><div class="ttname"><a href="classSampleHandlerBase.html#a6b884367733c4f3a93c75127ed6e9df9">SampleHandlerBase::errbuf</a></div><div class="ttdeci">std::streambuf * errbuf</div><div class="ttdoc">Keep the cerr buffer.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00195">SampleHandlerBase.h:195</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -715,7 +715,7 @@ template&lt;typename T &gt; </div>
 
 <p>Keep the cout buffer. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00118">118</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00193">193</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -741,7 +741,7 @@ template&lt;typename T &gt; </div>
 
 <p>Keep the cerr buffer. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00120">120</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00195">195</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -767,7 +767,7 @@ template&lt;typename T &gt; </div>
 
 <p>Test statistic tells what kind of likelihood sample is using. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00115">115</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00190">190</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -793,7 +793,7 @@ template&lt;typename T &gt; </div>
 
 <p>Holds information about used Generator and MaCh3 modes. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00129">129</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00204">204</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -819,7 +819,7 @@ template&lt;typename T &gt; </div>
 
 <p>Number of MC events are there. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00126">126</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00201">201</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>
@@ -845,7 +845,7 @@ template&lt;typename T &gt; </div>
 
 <p>Contains how many samples we've got. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00123">123</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00198">198</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 
 </div>
 </div>

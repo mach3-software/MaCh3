@@ -108,7 +108,7 @@ var searchData=
   ['setupweightpointers_105',['SetupWeightPointers',['../classPySampleHandlerFD.html#a0edc138b054b18f0d5c4c7d9dff10314',1,'PySampleHandlerFD::SetupWeightPointers()'],['../classSampleHandlerFD.html#addd28baa3d823f7a9cd69864185fe399',1,'SampleHandlerFD::SetupWeightPointers()']]],
   ['setusefftautocorrelation_106',['SetUseFFTAutoCorrelation',['../classMCMCProcessor.html#ab90c5ec77c57103dfaa72648c330a390',1,'MCMCProcessor']]],
   ['shouldskipline_107',['ShouldSkipLine',['../CombineMaCh3Chains_8cpp.html#abbd9b7766547362faa69a37ad56b0fc3',1,'CombineMaCh3Chains.cpp']]],
-  ['skipadaption_108',['SkipAdaption',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#af797ab969eb8c1802afa12df8c2106d8',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
+  ['skipadaption_108',['SkipAdaption',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a9964a3aca703a398825faf2f61d81d86',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
   ['smearchain_109',['SmearChain',['../classMCMCProcessor.html#ad963439e2e8e78cb2264ea3617ae38bc',1,'MCMCProcessor']]],
   ['smonolith_110',['SMonolith',['../classSMonolith.html#a2ddb60ccfabbb433c316fde62e93e8df',1,'SMonolith::SMonolith(const std::string &amp;FileName)'],['../classSMonolith.html#ab94ae8ed43de245bff67b8e18159b5e1',1,'SMonolith::SMonolith(std::vector&lt; std::vector&lt; TResponseFunction_red * &gt; &gt; &amp;MasterSpline, const std::vector&lt; RespFuncType &gt; &amp;SplineType, const bool SaveFlatTree=false, const std::string &amp;_FastSplineName=&quot;SplineFile.root&quot;)']]],
   ['smonolithgpu_111',['SMonolithGPU',['../classSMonolithGPU.html#aa19e498d0e762566ee62c7b93de18598',1,'SMonolithGPU']]],

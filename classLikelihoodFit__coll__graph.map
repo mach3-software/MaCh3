@@ -1,12 +1,12 @@
 <map id="LikelihoodFit" name="LikelihoodFit">
-<area shape="rect" id="node1" title="Implementation of base Likelihood Fit class, it is mostly responsible for likelihood calculation whil..." alt="" coords="889,155,993,181"/>
-<area shape="rect" id="node2" href="$classFitterBase.html" title="Base class for implementing fitting algorithms." alt="" coords="752,155,840,181"/>
-<area shape="rect" id="node3" href="$classmanager.html" title="The manager class is responsible for managing configurations and settings." alt="" coords="467,13,547,38"/>
-<area shape="rect" id="node4" title=" " alt="" coords="193,13,280,38"/>
-<area shape="rect" id="node5" title=" " alt="" coords="5,5,144,45"/>
-<area shape="rect" id="node6" title=" " alt="" coords="425,67,590,93"/>
-<area shape="rect" id="node7" title=" " alt="" coords="404,117,611,157"/>
-<area shape="rect" id="node8" title=" " alt="" coords="395,181,619,221"/>
-<area shape="rect" id="node9" title=" " alt="" coords="395,246,620,271"/>
-<area shape="rect" id="node10" title=" " alt="" coords="398,295,617,321"/>
+<area shape="rect" id="node1" title="Implementation of base Likelihood Fit class, it is mostly responsible for likelihood calculation whil..." alt="" coords="889,182,993,207"/>
+<area shape="rect" id="node2" href="$classFitterBase.html" title="Base class for implementing fitting algorithms." alt="" coords="752,182,840,207"/>
+<area shape="rect" id="node3" href="$classmanager.html" title="The manager class is responsible for managing configurations and settings." alt="" coords="467,75,547,101"/>
+<area shape="rect" id="node4" title=" " alt="" coords="193,45,280,70"/>
+<area shape="rect" id="node5" title=" " alt="" coords="5,37,144,77"/>
+<area shape="rect" id="node6" title=" " alt="" coords="425,125,590,150"/>
+<area shape="rect" id="node7" title=" " alt="" coords="404,175,611,215"/>
+<area shape="rect" id="node8" title=" " alt="" coords="395,239,619,279"/>
+<area shape="rect" id="node9" title=" " alt="" coords="395,303,620,329"/>
+<area shape="rect" id="node10" title=" " alt="" coords="398,353,617,378"/>
 </map>
