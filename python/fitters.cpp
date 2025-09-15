@@ -25,15 +25,6 @@ public:
             RunMCMC      /* Name of function in C++ (must match Python name) */
         );
     }
-
-    std::string GetName() const override {
-        PYBIND11_OVERRIDE_PURE_NAME(
-            std::string, /* Return type */
-            FitterBase,  /* Parent class */
-            "get_name",  /* Python name*/
-            GetName      /* Name of function in C++ (must match Python name) */
-        );
-    }
 };
 
 /// @brief EW: As LikelihoodFit is an abstract base class we have to do some gymnastics to get it to get it into python

@@ -3,6 +3,7 @@
 // *************************
 DelayedMR2T2::DelayedMR2T2(manager * const manager) : MR2T2(manager) {
 // *************************
+    AlgorithmName = "DelayedMR2T2";
     // Step scale for delayed step = step scale prev delay * decay_rate
     decay_rate = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["DecayRate"], 0.1);
     // Maximum number of rejections

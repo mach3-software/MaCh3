@@ -5,7 +5,8 @@
 // *************************
 PredictiveThrower::PredictiveThrower(manager *man) : FitterBase(man) {
 // *************************
- if(!CheckNodeExists(fitMan->raw(), "Predictive")) {
+ AlgorithmName = "PredictiveThrower";
+  if(!CheckNodeExists(fitMan->raw(), "Predictive")) {
    MACH3LOG_ERROR("Predictive is missing in your main yaml config");
    throw MaCh3Exception(__FILE__ , __LINE__ );
   }

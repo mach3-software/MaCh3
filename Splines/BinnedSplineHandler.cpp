@@ -7,6 +7,7 @@
 _MaCh3_Safe_Include_Start_ //{
 #include "TROOT.h"
 #include "TKey.h"
+#include "TH3F.h"
 _MaCh3_Safe_Include_End_ //}
 
 //****************************************
@@ -349,7 +350,7 @@ void BinnedSplineHandler::CalcSplineWeights()
 void BinnedSplineHandler::BuildSampleIndexingArray(const std::string& SampleTittle)
 //****************************************
 {  
-  int iSample = getSampleIndex(SampleTittle);
+  int iSample = GetSampleIndex(SampleTittle);
   int nSplineSysts = nSplineParams[iSample];
   int nOscChannels = nOscChans[iSample];
 
@@ -381,7 +382,7 @@ void BinnedSplineHandler::BuildSampleIndexingArray(const std::string& SampleTitt
 std::vector<TAxis *> BinnedSplineHandler::FindSplineBinning(const std::string& FileName, const std::string& SampleTittle)
 //****************************************
 {
-  int iSample=getSampleIndex(SampleTittle);
+  int iSample = GetSampleIndex(SampleTittle);
 
   //Try declaring these outside of TFile so they aren't owned by File
   constexpr int nDummyBins = 1;
@@ -731,7 +732,7 @@ std::string BinnedSplineHandler::getDimLabel(const int iSample, const unsigned i
 
 //****************************************
 //Returns sample index in
-int BinnedSplineHandler::getSampleIndex(const std::string& SampleTittle) const{
+int BinnedSplineHandler::GetSampleIndex(const std::string& SampleTittle) const{
 //****************************************
   for (size_t iSample = 0; iSample < SampleTitles.size(); ++iSample) {
     if (SampleTittle == SampleTitles[iSample]) {
@@ -746,7 +747,7 @@ int BinnedSplineHandler::getSampleIndex(const std::string& SampleTittle) const{
 void BinnedSplineHandler::PrintSampleDetails(const std::string& SampleTittle) const
 //****************************************
 {
-  const int iSample = getSampleIndex(SampleTittle);
+  const int iSample = GetSampleIndex(SampleTittle);
 
   MACH3LOG_INFO("Details about sample: {:<20}", SampleTitles[iSample]);
   MACH3LOG_INFO("\t Dimension: {:<35}", Dimensions[iSample]);
@@ -758,7 +759,7 @@ void BinnedSplineHandler::PrintSampleDetails(const std::string& SampleTittle) co
 void BinnedSplineHandler::PrintArrayDetails(const std::string& SampleTittle) const
 //****************************************
 {
-  int iSample = getSampleIndex(SampleTittle);
+  int iSample = GetSampleIndex(SampleTittle);
   int nOscChannels = int(indexvec[iSample].size());
   MACH3LOG_INFO("Sample {} has {} oscillation channels", SampleTittle, nOscChannels);
   
@@ -784,7 +785,7 @@ void BinnedSplineHandler::PrintArrayDetails(const std::string& SampleTittle) con
 bool BinnedSplineHandler::isValidSplineIndex(const std::string& SampleTittle, int iOscChan, int iSyst, int iMode, int iVar1, int iVar2, int iVar3)
 //****************************************
 {
-  int iSample = getSampleIndex(SampleTittle);
+  int iSample = GetSampleIndex(SampleTittle);
   bool isValid = true;
 
   // Lambda to check if an index is valid for a specific dimension
@@ -836,20 +837,8 @@ std::vector< std::vector<int> > BinnedSplineHandler::GetEventSplines(const std::
 //****************************************
 {
   std::vector<std::vector<int>> ReturnVec;
-  int SampleIndex = -1;
-  for (unsigned int iSample = 0; iSample < SampleTitles.size(); iSample++) {
-    if (SampleTittle == SampleTitles[iSample]) {
-      SampleIndex = iSample;
-    }
-  }
-
-  if (SampleIndex == -1) {
-    MACH3LOG_ERROR("Sample not found: {}", SampleTittle);
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  
+  int SampleIndex = GetSampleIndex(SampleTittle);
   int nSplineSysts = static_cast<int>(indexvec[SampleIndex][iOscChan].size());
-
 
   int Mode = -1;
   std::string SuffixForEventMode = Modes->GetSplineSuffixFromMaCh3Mode(EventMode);
@@ -937,7 +926,7 @@ std::vector< std::vector<int> > BinnedSplineHandler::StripDuplicatedModes(const 
 
 void BinnedSplineHandler::FillSampleArray(std::string SampleTittle, std::vector<std::string> OscChanFileNames)
 {
-  int iSample = getSampleIndex(SampleTittle);
+  int iSample = GetSampleIndex(SampleTittle);
   int nOscChannels = nOscChans[iSample];
   
   for (int iOscChan = 0; iOscChan < nOscChannels; iOscChan++) {

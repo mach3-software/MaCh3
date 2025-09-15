@@ -4,11 +4,6 @@
 #include "Splines/SplineBase.h"
 #include "Manager/MaCh3Modes.h"
 
-_MaCh3_Safe_Include_Start_ //{
-// ROOT includes
-#include "TH3F.h"
-_MaCh3_Safe_Include_End_ //}
-
 /// @brief Bin-by-bin class calculating response for spline parameters.
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/05.-Splines).
 /// @author Dan Barrow
@@ -53,7 +48,8 @@ class BinnedSplineHandler : public SplineBase {
     int CountNumberOfLoadedSplines(bool NonFlat=false, int Verbosity=0);
     std::string getDimLabel(const int BinningOpt, const unsigned int Axis) const;
     /// @brief Get index of sample based on name
-    int getSampleIndex(const std::string& SampleTittle) const;
+    /// @param SampleTitle The title of the sample to search for.
+    int GetSampleIndex(const std::string& SampleTittle) const;
     /// @brief Ensure we have spline for a given bin
     bool isValidSplineIndex(const std::string& SampleTittle, int iSyst, int iOscChan, int iMode, int iVar1, int iVar2, int iVar3);
 
