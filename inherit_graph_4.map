@@ -1,3 +1,12 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$structKinematicCut.html" title="KS: Small struct used for applying kinematic cuts." alt="" coords="5,5,116,31"/>
+<area shape="rect" id="node1" href="$classFitterBase.html" title="Base class for implementing fitting algorithms." alt="" coords="5,165,93,191"/>
+<area shape="rect" id="node2" href="$classLikelihoodFit.html" title="Implementation of base Likelihood Fit class, it is mostly responsible for likelihood calculation whil..." alt="" coords="159,79,263,104"/>
+<area shape="rect" id="node6" href="$classMCMCBase.html" title="Base class for MCMC fitting algorithms." alt="" coords="163,140,259,165"/>
+<area shape="rect" id="node9" href="$classPredictiveThrower.html" title="Implementation of Prior/Posterior Predictive and Bayesian p&#45;Value calculations following the approach..." alt="" coords="141,189,281,215"/>
+<area shape="rect" id="node10" href="$classPyFitterBase.html" title="EW: As FitterBase is an abstract base class we have to do some gymnastics to get it to get it into py..." alt="" coords="159,239,263,264"/>
+<area shape="rect" id="node3" href="$classMinuitFit.html" title="Implementation of Minuit fitting algorithm ." alt="" coords="350,5,429,31"/>
+<area shape="rect" id="node4" href="$classPSO.html" title="Class PSO, consist of a vector of object Class Particle and global best Takes in the size (number of ..." alt="" coords="365,55,413,80"/>
+<area shape="rect" id="node5" href="$classPyLikelihoodFit.html" title="EW: As LikelihoodFit is an abstract base class we have to do some gymnastics to get it to get it into..." alt="" coords="329,104,449,129"/>
+<area shape="rect" id="node7" href="$classMR2T2.html" title="MCMC algorithm implementing the **Metropolis–Rosenbluth–Rosenbluth–Teller–Teller (MR T2)** method." alt="" coords="356,153,423,179"/>
+<area shape="rect" id="node8" href="$classDelayedMR2T2.html" title="Implementation of delayed rejection for MR2T2." alt="" coords="497,153,619,179"/>
 </map>

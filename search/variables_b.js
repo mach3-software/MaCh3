@@ -41,5 +41,7 @@ var searchData=
   ['lnlhist_5fsample_5fpredflucdraw_38',['lnLHist_Sample_PredflucDraw',['../classSampleSummary.html#aecf1c224162e1055e8306d438e1a3761',1,'SampleSummary']]],
   ['loglcurr_39',['logLCurr',['../classFitterBase.html#abfb6f10720764d8bbbe43754fd5cd976',1,'FitterBase']]],
   ['loglprop_40',['logLProp',['../classFitterBase.html#a187dd22c17f9e96e5a7e2fb2371abace',1,'FitterBase']]],
-  ['lowerbound_41',['LowerBound',['../structKinematicCut.html#aa654b5f2ef7ca1b57d9238c428fdc11f',1,'KinematicCut']]]
+  ['lower_5fbinedge_41',['lower_binedge',['../structBinShiftLookup.html#ad442bd57965a7c8d4bbe12ec768d2338',1,'BinShiftLookup']]],
+  ['lower_5flower_5fbinedge_42',['lower_lower_binedge',['../structBinShiftLookup.html#a21701f88a5c48f9b80ff93a3303b4b9b',1,'BinShiftLookup']]],
+  ['lowerbound_43',['LowerBound',['../structKinematicCut.html#aa654b5f2ef7ca1b57d9238c428fdc11f',1,'KinematicCut']]]
 ];

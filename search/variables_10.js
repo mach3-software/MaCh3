@@ -13,13 +13,9 @@ var searchData=
   ['reweightname_10',['ReweightName',['../classMCMCProcessor.html#ad56b25b03eb5caab7b2a9c2ebf3ec178',1,'MCMCProcessor']]],
   ['reweightposterior_11',['ReweightPosterior',['../classMCMCProcessor.html#a6f27039da3508952600b1ef26e76fe19',1,'MCMCProcessor']]],
   ['reweightweight_12',['ReweightWeight',['../classPredictiveThrower.html#ace711c729993a63c2141893888ab5322',1,'PredictiveThrower']]],
-  ['rhat_13',['RHat',['../RHat__HighMem_8cpp.html#ab5cfb5e8741283e8d8252aae184004e4',1,'RHat():&#160;RHat_HighMem.cpp'],['../RHat_8cpp.html#ab5cfb5e8741283e8d8252aae184004e4',1,'RHat():&#160;RHat.cpp']]],
+  ['rhat_13',['RHat',['../RHat_8cpp.html#ab5cfb5e8741283e8d8252aae184004e4',1,'RHat():&#160;RHat.cpp'],['../RHat__HighMem_8cpp.html#ab5cfb5e8741283e8d8252aae184004e4',1,'RHat():&#160;RHat_HighMem.cpp']]],
   ['rhatfolded_14',['RHatFolded',['../RHat__HighMem_8cpp.html#a754fbe6088f05d880121693722fe6b99',1,'RHat_HighMem.cpp']]],
   ['rnd_15',['rnd',['../classSampleSummary.html#a364fb16938a26adbe59fdd057f4b9405',1,'SampleSummary']]],
   ['rw_5fetru_16',['rw_etru',['../structFarDetectorCoreInfo.html#acfc344a4365828d63409fa2c2c5f4633',1,'FarDetectorCoreInfo']]],
-  ['rw_5flower_5flower_5fxbinedge_17',['rw_lower_lower_xbinedge',['../structSampleBinningInfo.html#a6f6bf0055cb0edeee0f2a713421f35a5',1,'SampleBinningInfo']]],
-  ['rw_5flower_5fxbinedge_18',['rw_lower_xbinedge',['../structSampleBinningInfo.html#a7d1207002d3ebaf3e8594caca23c380b',1,'SampleBinningInfo']]],
-  ['rw_5ftruecz_19',['rw_truecz',['../structFarDetectorCoreInfo.html#afa3d9bb4acd11164ba41d602330243f2',1,'FarDetectorCoreInfo']]],
-  ['rw_5fupper_5fupper_5fxbinedge_20',['rw_upper_upper_xbinedge',['../structSampleBinningInfo.html#ab20455912755bdfa5df5670e8a378035',1,'SampleBinningInfo']]],
-  ['rw_5fupper_5fxbinedge_21',['rw_upper_xbinedge',['../structSampleBinningInfo.html#a38df9115f10c97e64cffa3ac8de869c8',1,'SampleBinningInfo']]]
+  ['rw_5ftruecz_17',['rw_truecz',['../structFarDetectorCoreInfo.html#afa3d9bb4acd11164ba41d602330243f2',1,'FarDetectorCoreInfo']]]
 ];

@@ -14,9 +14,11 @@ var searchData=
   ['updatematrixadapt_11',['UpdateMatrixAdapt',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a217c72a492c9d3e1b3a7b14626d19ab2',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
   ['updatethrowmatrix_12',['UpdateThrowMatrix',['../classParameterHandlerBase.html#a82072628057bfd93a0ee4d56253ffe55',1,'ParameterHandlerBase']]],
   ['updatew2_13',['UpdateW2',['../classSampleHandlerFD.html#aa654562842a0da51ff917aaed517310e',1,'SampleHandlerFD']]],
-  ['upperbound_14',['UpperBound',['../structKinematicCut.html#a244bd4ada65739a6984a2039a5a6f200',1,'KinematicCut']]],
-  ['uppercut_15',['UpperCut',['../classMCMCProcessor.html#a6b14dd9e571803d8946781642348bee1',1,'MCMCProcessor']]],
-  ['usage_16',['usage',['../classMaCh3Plotting_1_1PlottingManager.html#a8910c157ce1ec6698f3bacdf521789ff',1,'MaCh3Plotting::PlottingManager::usage()'],['../CombineMaCh3Chains_8cpp.html#a2ef30c42cbc289d899a8be5d2d8f77d0',1,'usage():&#160;CombineMaCh3Chains.cpp']]],
-  ['use_5fadaptive_17',['use_adaptive',['../classParameterHandlerBase.html#a0919e47e80710af8b9a3f837bba9bf8b',1,'ParameterHandlerBase']]],
-  ['usefftautocorrelation_18',['useFFTAutoCorrelation',['../classMCMCProcessor.html#a562261269f0f4ec4a209b2fca64ff443',1,'MCMCProcessor']]]
+  ['upper_5fbinedge_14',['upper_binedge',['../structBinShiftLookup.html#ae765797b7019e6df3a355d736327eb88',1,'BinShiftLookup']]],
+  ['upper_5fupper_5fbinedge_15',['upper_upper_binedge',['../structBinShiftLookup.html#a39c1b9fc17dd4b439afd480dec35d0f7',1,'BinShiftLookup']]],
+  ['upperbound_16',['UpperBound',['../structKinematicCut.html#a244bd4ada65739a6984a2039a5a6f200',1,'KinematicCut']]],
+  ['uppercut_17',['UpperCut',['../classMCMCProcessor.html#a6b14dd9e571803d8946781642348bee1',1,'MCMCProcessor']]],
+  ['usage_18',['usage',['../classMaCh3Plotting_1_1PlottingManager.html#a8910c157ce1ec6698f3bacdf521789ff',1,'MaCh3Plotting::PlottingManager::usage()'],['../CombineMaCh3Chains_8cpp.html#a2ef30c42cbc289d899a8be5d2d8f77d0',1,'usage():&#160;CombineMaCh3Chains.cpp']]],
+  ['use_5fadaptive_19',['use_adaptive',['../classParameterHandlerBase.html#a0919e47e80710af8b9a3f837bba9bf8b',1,'ParameterHandlerBase']]],
+  ['usefftautocorrelation_20',['useFFTAutoCorrelation',['../classMCMCProcessor.html#a562261269f0f4ec4a209b2fca64ff443',1,'MCMCProcessor']]]
 ];

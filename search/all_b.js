@@ -53,5 +53,7 @@ var searchData=
   ['loggerprint_50',['LoggerPrint',['../MaCh3Logger_8h.html#ada930684d7c1ed8916f1fbe6d266ca77',1,'MaCh3Logger.h']]],
   ['loglcurr_51',['logLCurr',['../classFitterBase.html#abfb6f10720764d8bbbe43754fd5cd976',1,'FitterBase']]],
   ['loglprop_52',['logLProp',['../classFitterBase.html#a187dd22c17f9e96e5a7e2fb2371abace',1,'FitterBase']]],
-  ['lowerbound_53',['LowerBound',['../structKinematicCut.html#aa654b5f2ef7ca1b57d9238c428fdc11f',1,'KinematicCut']]]
+  ['lower_5fbinedge_53',['lower_binedge',['../structBinShiftLookup.html#ad442bd57965a7c8d4bbe12ec768d2338',1,'BinShiftLookup']]],
+  ['lower_5flower_5fbinedge_54',['lower_lower_binedge',['../structBinShiftLookup.html#a21701f88a5c48f9b80ff93a3303b4b9b',1,'BinShiftLookup']]],
+  ['lowerbound_55',['LowerBound',['../structKinematicCut.html#aa654b5f2ef7ca1b57d9238c428fdc11f',1,'KinematicCut']]]
 ];
