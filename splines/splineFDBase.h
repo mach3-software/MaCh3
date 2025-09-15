@@ -134,4 +134,8 @@ class splineFDBase : public SplineBase {
     MaCh3Modes* Modes;
     enum TokenOrdering{kSystToken,kModeToken,kVar1BinToken,kVar2BinToken,kVar3BinToken,kNTokens};
     virtual std::vector<std::string> GetTokensFromSplineName(std::string FullSplineName) = 0;
+
+  private:
+    /// @brief This function will find missing splines in file
+    void InvestigateMissingSplines() const;
 };

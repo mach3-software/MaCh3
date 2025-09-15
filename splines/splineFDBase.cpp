@@ -114,6 +114,81 @@ void splineFDBase::AddSample(const std::string& SampleName,
 }
 
 //****************************************
+void BinnedSplineHandler::InvestigateMissingSplines() const {
+//****************************************
+  // Map: iSample → iSyst → modeSuffix → {totalSplines, zeroCount}
+  std::map<unsigned int, std::map<unsigned int, std::map<std::string, std::pair<unsigned int, unsigned int>>>> systZeroCounts;
+
+  for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++) {
+    std::string SampleName = SampleNames[iSample];
+
+    // Get list of systematic names for this sample
+    std::vector<std::string> SplineFileParPrefixNames_Sample =
+    xsec->GetParsNamesFromSampleName(SampleName, kSpline);
+
+    for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++) {
+      for (unsigned int iSyst = 0; iSyst < indexvec[iSample][iOscChan].size(); iSyst++) {
+        unsigned int zeroCount = 0;
+        unsigned int totalSplines = 0;
+
+        for (unsigned int iMode = 0; iMode < indexvec[iSample][iOscChan][iSyst].size(); iMode++) {
+          // Get the mode suffix string
+          std::string modeSuffix =
+          Modes->GetSplineSuffixFromMaCh3Mode(SplineModeVecs[iSample][iSyst][iMode]);
+
+          for (unsigned int iVar1 = 0; iVar1 < indexvec[iSample][iOscChan][iSyst][iMode].size(); iVar1++) {
+            for (unsigned int iVar2 = 0; iVar2 < indexvec[iSample][iOscChan][iSyst][iMode][iVar1].size(); iVar2++) {
+              for (unsigned int iVar3 = 0; iVar3 < indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2].size(); iVar3++) {
+                totalSplines++;
+                if (indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2][iVar3] == 0) {
+                  zeroCount++;
+                  if(zeroCount > 1){
+                    systZeroCounts[iSample][iSyst][modeSuffix] = {totalSplines, zeroCount};
+                  }
+                  MACH3LOG_DEBUG(
+                    "Sample '{}' | OscChan {} | Syst '{}' | Mode '{}' | Var1 {} | Var2 {} | Var3 {} => Value: {}",
+                    SampleTitles[iSample],
+                    iOscChan,
+                    SplineFileParPrefixNames_Sample[iSyst],
+                    modeSuffix,
+                    iVar1,
+                    iVar2,
+                    iVar3,
+                    indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2][iVar3]
+                  );
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // KS: Let's print this atrocious mess...
+  for (const auto& samplePair : systZeroCounts) {
+    unsigned int iSample = samplePair.first;
+    std::vector<std::string> SplineFileParPrefixNames_Sample = xsec->GetParsNamesFromSampleName(SampleNames[iSample], kSpline);
+    for (const auto& systPair : samplePair.second) {
+      unsigned int iSyst = systPair.first;
+      const auto& systName = SplineFileParPrefixNames_Sample[iSyst];
+      for (const auto& modePair : systPair.second) {
+        const auto& modeSuffix = modePair.first;
+        const auto& counts = modePair.second;
+        MACH3LOG_CRITICAL(
+          "Sample '{}': Systematic '{}' has missing splines in mode '{}'. Expected Splines: {}, Missing Splines: {}",
+          SampleTitles[iSample],
+          systName,
+          modeSuffix,
+          counts.first,
+          counts.second
+        );
+      }
+    }
+  }
+}
+
+//****************************************
 void splineFDBase::TransferToMonolith()
 //****************************************
 {
@@ -121,6 +196,7 @@ void splineFDBase::TransferToMonolith()
   MonolithSize = CountNumberOfLoadedSplines(false, 1);
 
   if(MonolithSize!=MonolithIndex){
+    InvestigateMissingSplines();
     MACH3LOG_ERROR("Something's gone wrong when we tried to get the size of your monolith");
     MACH3LOG_ERROR("MonolithSize is {}", MonolithSize);
     MACH3LOG_ERROR("MonolithIndex is {}", MonolithIndex);
