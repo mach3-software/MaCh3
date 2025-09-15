@@ -153,6 +153,9 @@ void ProcessMCMC(const std::string& inputFile)
   if(Settings["MaxEntries"]) {
     Processor->SetEntries(Get<int>(Settings["MaxEntries"], __FILE__, __LINE__));
   }
+  if(Settings["NBins"]) {
+    Processor->SetNBins(Get<int>(Settings["NBins"], __FILE__, __LINE__));
+  }
   if(Settings["Thinning"])
   {
     if(Settings["Thinning"][0].as<bool>()){
@@ -246,6 +249,9 @@ void MultipleProcessMCMC()
 
     if(Settings["MaxEntries"]) {
       Processor[ik]->SetEntries(Get<int>(Settings["MaxEntries"], __FILE__, __LINE__));
+    }
+    if(Settings["NBins"]) {
+      Processor->SetNBins(Get<int>(Settings["NBins"], __FILE__, __LINE__));
     }
   }
 

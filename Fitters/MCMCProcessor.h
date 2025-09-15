@@ -254,7 +254,9 @@ class MCMCProcessor {
     inline Long64_t GetnEntries(){return nEntries;};
     /// @brief Get Number of Steps that Chain has, for merged chains will not be the same nEntries
     inline Long64_t GetnSteps(){return nSteps;};
-    
+    /// @brief Modify number of bins used for 1D and 2D Histograms
+    inline void SetNBins(const int NewBins) {nBins = NewBins;};
+
     /// @brief Set number of entries to make potentially MCMC Processing faster
     /// @warning This option only sets an upper limit; burn-in events will NOT be discarded
     inline void SetEntries(const int NewEntries) {
