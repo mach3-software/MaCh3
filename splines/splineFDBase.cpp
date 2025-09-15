@@ -147,7 +147,7 @@ void splineFDBase::InvestigateMissingSplines() const {
                   }
                   MACH3LOG_DEBUG(
                     "Sample '{}' | OscChan {} | Syst '{}' | Mode '{}' | Var1 {} | Var2 {} | Var3 {} => Value: {}",
-                    SampleName,
+                    SampleNames[iSample],
                     iOscChan,
                     SplineFileParPrefixNames_Sample[iSyst],
                     modeSuffix,
@@ -177,7 +177,7 @@ void splineFDBase::InvestigateMissingSplines() const {
         const auto& counts = modePair.second;
         MACH3LOG_CRITICAL(
           "Sample '{}': Systematic '{}' has missing splines in mode '{}'. Expected Splines: {}, Missing Splines: {}",
-          SampleName,
+          SampleNames[iSample],
           systName,
           modeSuffix,
           counts.first,
