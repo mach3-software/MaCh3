@@ -251,7 +251,7 @@ void MultipleProcessMCMC()
       Processor[ik]->SetEntries(Get<int>(Settings["MaxEntries"], __FILE__, __LINE__));
     }
     if(Settings["NBins"]) {
-      Processor->SetNBins(Get<int>(Settings["NBins"], __FILE__, __LINE__));
+      Processor[ik]->SetNBins(Get<int>(Settings["NBins"], __FILE__, __LINE__));
     }
   }
 
