@@ -187,7 +187,7 @@ Based on several test here are recommended version:
 | Rocky9      | ✅     |
 | Ubi9        | ✅     |
 | Ubuntu22.04 | ✅     |
-| Ubuntu24.10 | ✅     |
+| Ubuntu25.04 | ✅     |
 | Fedora32    | ✅     |
 | CentOS7     | ❔     |
 | Windows     | ❌     |
