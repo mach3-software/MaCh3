@@ -76,6 +76,42 @@ int main(int argc, char *argv[])
   return 0;
 }
 
+/// @brief Parse custom binning edges from a YAML configuration node.
+///
+/// This function reads the `CustomBinEdges` section of the YAML config and
+/// returns a mapping of parameter names to their lower and upper edges.
+///
+/// The expected YAML syntax is:
+/// @code{.yaml}
+/// CustomBinEdges:
+///   delta_cp: [-3.141592, 3.141592]
+///   another_param: [min, max]
+/// @endcode
+///
+/// @param Settings YAML configuration node containing the optional
+///        `CustomBinEdges` section.
+std::map<std::string, std::pair<double, double>> GetCustomBinning(const YAML::Node& Settings)
+{
+  std::map<std::string, std::pair<double, double>> CustomBinning;
+  if (Settings["CustomBinEdges"]) {
+    const YAML::Node& edges = Settings["CustomBinEdges"];
+
+    for (const auto& node : edges) {
+      std::string key = node.first.as<std::string>();
+      auto values = node.second.as<std::vector<double>>();
+
+      if (values.size() == 2) {
+        CustomBinning[key] = std::make_pair(values[0], values[1]);
+        MACH3LOG_DEBUG("Adding custom binning {} with {:.4f}, {:.4f}", key, values[0], values[1]);
+      } else {
+        MACH3LOG_ERROR("Invalid number of values for key: {}", key);
+        throw MaCh3Exception(__FILE__ , __LINE__ );
+      }
+    }
+  }
+  return CustomBinning;
+}
+
 void ProcessMCMC(const std::string& inputFile)
 {
   MACH3LOG_INFO("File for study: {} with config  {}", inputFile, config);
@@ -117,6 +153,9 @@ void ProcessMCMC(const std::string& inputFile)
   if(Settings["MaxEntries"]) {
     Processor->SetEntries(Get<int>(Settings["MaxEntries"], __FILE__, __LINE__));
   }
+  if(Settings["NBins"]) {
+    Processor->SetNBins(Get<int>(Settings["NBins"], __FILE__, __LINE__));
+  }
   if(Settings["Thinning"])
   {
     if(Settings["Thinning"][0].as<bool>()){
@@ -124,7 +163,7 @@ void ProcessMCMC(const std::string& inputFile)
     }
   }
   // Make the postfit
-  Processor->MakePostfit();
+  Processor->MakePostfit(GetCustomBinning(Settings));
   Processor->DrawPostfit();
   //KS: Should set via config whether you want below or not
   if(GetFromManager<bool>(Settings["MakeCredibleIntervals"], true)) {
@@ -211,9 +250,12 @@ void MultipleProcessMCMC()
     if(Settings["MaxEntries"]) {
       Processor[ik]->SetEntries(Get<int>(Settings["MaxEntries"], __FILE__, __LINE__));
     }
+    if(Settings["NBins"]) {
+      Processor[ik]->SetNBins(Get<int>(Settings["NBins"], __FILE__, __LINE__));
+    }
   }
 
-  Processor[0]->MakePostfit();
+  Processor[0]->MakePostfit(GetCustomBinning(Settings));
   Processor[0]->DrawPostfit();
   // Get edges from first histogram to ensure all params use same binning
   std::map<std::string, std::pair<double, double>> ParamEdges;

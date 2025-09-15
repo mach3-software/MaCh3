@@ -285,7 +285,7 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
       maxi = Chain->GetMaximum(BranchNames[i]);
       mini = Chain->GetMinimum(BranchNames[i]);
     }
-    MACH3LOG_DEBUG("Initialising histogram with binning {:.4f}, {:.4f}", mini, maxi);
+    MACH3LOG_DEBUG("Initialising histogram for {} with binning {:.4f}, {:.4f}", Title, mini, maxi);
     // This holds the posterior density
     hpost[i] = new TH1D(BranchNames[i], BranchNames[i], nBins, mini, maxi);
     hpost[i]->SetMinimum(0);
