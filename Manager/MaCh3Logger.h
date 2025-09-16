@@ -17,6 +17,8 @@ _MaCh3_Safe_Include_End_ //}
 
 /// @file MaCh3Logger.h
 /// @brief KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/include/spdlog/spdlog.h#L284
+/// @note can read more about spdlog [here](https://github.com/gabime/spdlog/wiki)
+/// @author Kamil Skwarczynski
 
 #define MACH3LOG_TRACE SPDLOG_TRACE
 #define MACH3LOG_DEBUG SPDLOG_DEBUG
