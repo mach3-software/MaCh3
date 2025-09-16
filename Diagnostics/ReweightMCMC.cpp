@@ -86,12 +86,13 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
 
     // Parse all reweight configurations first
     std::vector<ReweightConfig> reweightConfigs;
-    
+   
+    // iterate through the keys in the reweighting yaml creating and storing the ReweightConfig as we go
     for (const auto& reweight : reweight_settings) {
         const std::string& reweightKey = reweight.first.as<std::string>();
         const YAML::Node& reweightConfigNode = reweight.second;
         
-        // Check if this reweight is enabled
+        // Check if this particular reweight is enabled
         if (!GetFromManager<bool>(reweightConfigNode["Enabled"], false)) {
             MACH3LOG_INFO("Skipping disabled reweight: {}", reweightKey);
             continue;
@@ -105,7 +106,9 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
         reweightConfig.weightBranchName = "Weight_" + reweightKey;
         reweightConfig.enabled = true;
         
+        // Handle different reweight types as they fill different members
         if (reweightConfig.dimension == 1) {
+
             std::string paramName = GetFromManager<std::string>(reweightConfigNode["ReweightVar"], "");
             auto priorValues = GetFromManager<std::vector<double>>(reweightConfigNode["ReweightPrior"], {});
             
@@ -120,6 +123,7 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
         } else if (reweightConfig.dimension == 2) {
             auto paramNames = GetFromManager<std::vector<std::string>>(reweightConfigNode["ReweightVar"], {});
             
+            // 2D reweights need 2 parameter names
             if (paramNames.size() != 2) {
                 MACH3LOG_ERROR("2D reweighting requires exactly 2 parameter names for {}", reweightKey);
                 continue;
@@ -154,6 +158,7 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
                     if (graph_NO) {
                         // Create a completely independent copy
                         auto cloned_graph = static_cast<TGraph2D*>(graph_NO->Clone());
+                        cloned_graph->SetDirectory(nullptr); // Detach from file
                         cloned_graph->SetBit(kCanDelete, true); // Allow ROOT to delete it when we're done
                         reweightConfig.graph_NO = std::unique_ptr<TGraph2D>(cloned_graph);
                         MACH3LOG_INFO("Loaded NO graph: {}", graphName_NO);
@@ -169,6 +174,7 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
                     if (graph_IO) {
                         // Create a completely independent copy
                         auto cloned_graph = static_cast<TGraph2D*>(graph_IO->Clone());
+                        cloned_graph->SetDirectory(nullptr); // Detach from file
                         cloned_graph->SetBit(kCanDelete, true); // Allow ROOT to delete it when we're done
                         reweightConfig.graph_IO = std::unique_ptr<TGraph2D>(cloned_graph);
                         MACH3LOG_INFO("Loaded IO graph: {}", graphName_IO);
@@ -177,7 +183,6 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
                     }
                 }
                 
-                // Explicitly close the constraint file to ensure clean separation
                 constraintFile->Close();
                 
             } else {
@@ -252,6 +257,10 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
         }
     }
     
+    // We should set up the branches for reweighting first and then iterate over the entries
+    // Adding one branch at a time is inefficient as you have to copy and replace the same file over and over
+    // We will work out all the weights we need to add first and add them event by event
+
     // Add weight branches
     std::map<std::string, double> weights;
     std::map<std::string, TBranch*> weightBranches;
@@ -263,7 +272,7 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
             &weights[rwConfig.weightBranchName], 
             (rwConfig.weightBranchName + "/D").c_str()
         );
-        MACH3LOG_INFO("Added weight branch: {}", rwConfig.weightBranchName);
+        MACH3LOG_INFO("Added weight branch DEBUG: {}", rwConfig.weightBranchName);
     }
     
     // Process all entries
@@ -286,18 +295,23 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
                 double paramValue = paramValues[paramName];
                 
                 if (rwConfig.type == "Gaussian") {
+                    // TODO : just use MCMCProcessors gaussian reweight
                     weight = CalculateGaussianWeight(paramValue, rwConfig.priorValues[0], rwConfig.priorValues[1]);
                 }
                 
             } else if (rwConfig.dimension == 2) {
                 if (rwConfig.type == "TGraph2D") {
-                    double theta13 = paramValues[rwConfig.paramNames[0]];
-                    double dm32 = paramValues[rwConfig.paramNames[1]];
-                  
+                    double dm32 = paramValues[rwConfig.paramNames[0]];
+                    double theta13 = paramValues[rwConfig.paramNames[1]];
+                    std::cout << "Parameters for reweight " << rwConfig.key << ": " << rwConfig.paramNames[0] << "=" << dm32 << ", " << rwConfig.paramNames[1] << "=" << theta13 << std::endl;
+                    // TODO did I get theta13 and dm32 the wrong way around
                     if (dm32 > 0) {
                         // Normal Ordering
                         if (rwConfig.graph_NO) {
                             weight = Graph_interpolateNO(rwConfig.graph_NO.get(), theta13, dm32);
+                            std::cout << "rwConfig.graph_NO min x: " << rwConfig.graph_NO->GetXmin() << ", max x: " << rwConfig.graph_NO->GetXmax() << std::endl;
+                            std::cout << "rwConfig.graph_NO min y: " << rwConfig.graph_NO->GetYmin() << ", max y: " << rwConfig.graph_NO->GetYmax() << std::endl;
+                            std::cout << "NO weight for theta13=" << theta13 << ", dm32=" << dm32 << " is " << weight << std::endl;
                         } else {
                             MACH3LOG_ERROR("NO graph not available for {}", rwConfig.key);
                             weight = 0.0;
@@ -306,6 +320,7 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
                         // Inverted Ordering
                         if (rwConfig.graph_IO) {
                             weight = Graph_interpolateIO(rwConfig.graph_IO.get(), theta13, dm32);
+                            std::cout << "IO weight for theta13=" << theta13 << ", dm32=" << dm32 << " is " << weight << std::endl;
                         } else {
                             MACH3LOG_ERROR("IO graph not available for {}", rwConfig.key);
                             weight = 0.0;
@@ -365,6 +380,7 @@ double Graph_interpolateIO(TGraph2D* graph, double theta13, double dm32)
     double ymax = graph->GetYmax();
     double ymin = graph->GetYmin();
     
+    // The dm32 value is positive for in the TGraph2D so we should compare the abs value of the -delM32 values to get the chisq
     double mod_dm32 = std::abs(dm32);
     double chiSquared, prior;
 
@@ -380,6 +396,7 @@ double Graph_interpolateIO(TGraph2D* graph, double theta13, double dm32)
 
 double Graph_interpolate1D(TGraph* graph, double theta13)
 {
+    // TODO implement TGraph interpolation for 1D
     if (!graph) {
         MACH3LOG_ERROR("Graph pointer is null");
         throw MaCh3Exception(__FILE__, __LINE__);
@@ -411,6 +428,7 @@ double CalculateGaussianWeight(double value, double newMean, double newSigma)
     // Calculate Gaussian prior weight
     // Weight = P_new(x) = exp(-(x-mu)^2/(2*sigma^2)) / sqrt(2*pi*sigma^2)
     // Since we're often going from flat priors, just calculate the new Gaussian probability
+    // TODO handle non flat priors
     
     if (newSigma <= 0) {
         MACH3LOG_ERROR("Invalid sigma value for Gaussian weight calculation");
