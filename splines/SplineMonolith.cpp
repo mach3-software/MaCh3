@@ -61,6 +61,10 @@ void FPGACalcSplineWeights(int nParams,
   int spline_offset = 0;
   int knot_offset = 0;
 
+
+  sycl::oneapi::experimental::printf("N_events %d \n", n_events);
+
+
   // for each event
   // for each spline
   // find which knot we care about amongst nknots per spline
@@ -85,7 +89,8 @@ void FPGACalcSplineWeights(int nParams,
     // Read the number of splines for this event
 
     int NSplines_event = splines_per_event[eventNum]; // retrieve the amount of splines for this event
-    
+    sycl::oneapi::experimental::printf("N_splines_event %d \n", NSplines_event);
+
     
     for (size_t eventSpline = 0; eventSpline < NSplines_event; eventSpline+= nChunk) {
        
@@ -241,6 +246,10 @@ void FPGAModifyWeights(int NSplines_valid, float *cpu_total_weights){
   const size_t chunk_size = 2;
   int current_event = 0;
   float prod = 1;
+
+  sycl::oneapi::experimental::printf("NSplines_valid %d \n", NSplines_valid);
+
+
   for (size_t i = 0; i < NSplines_valid / chunk_size; i++) {
     PipeStruct tmp = PipeAB::read();
 
