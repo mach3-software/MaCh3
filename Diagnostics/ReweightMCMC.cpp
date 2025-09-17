@@ -266,7 +266,23 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
             MACH3LOG_INFO("Parameter {} found in chain", paramName);
         }
     }
-    
+   
+    // TODO Finish Asimov shifting implementation, for now just warn that Asimovs are not being properly handled
+    // Get the settings for the MCMC
+    TMacro *Config = TempFile->Get<TMacro>("MaCh3_Config");
+    if (Config == nullptr) {
+        MACH3LOG_ERROR("Didn't find MaCh3_Config tree in MCMC file! {}", MCMCFile);
+        TempFile->ls();
+        throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
+    MACH3LOG_INFO("Loading YAML config from MCMC chain");
+    YAML::Node Settings = TMacroToYAML(*Config);
+    bool isAsimov = GetFromManager<bool>(Settings["MCMC"]["Asimov"], false);
+    if (isAsimov) {
+        MACH3LOG_WARN("ReweightMCMC does not currently handle Asimov shifting, results may be incorrect!");
+    }   
+
+
     // Open input file and get tree
     auto inFile = std::unique_ptr<TFile>(TFile::Open(inputFile.c_str(), "READ"));
     if (!inFile || inFile->IsZombie()) {
