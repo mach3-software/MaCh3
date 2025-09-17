@@ -56,9 +56,6 @@ double Graph_interpolateIO(TGraph2D* graph, double theta13, double dm32);
 /// @brief Function to interpolate 1D graph
 double Graph_interpolate1D(TGraph* graph, double theta13);
 
-/// @brief Calculate Gaussian weight for a given parameter value
-double CalculateGaussianWeight(double value, double newMean, double newSigma);
-
 /// @brief Get parameter information from MCMCProcessor
 bool GetParameterInfo(MCMCProcessor* processor, const std::string& paramName, 
                      double& mean, double& sigma);
@@ -281,16 +278,18 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
     }
    
     // If a given reweight is 1D Gaussian we can just let MCMCProcessor method do the reweight
-
     if (rwConfig.dimension == 1 && rwConfig.type == "Gaussian"){
         processor->ReweightPrior(rwConfig.paramNames[0], rwConfig.priorValues[0], rwConfig.priorValues[1]);
         MACH3LOG_INFO("Applied Gaussian reweighting for {} with mean={} and sigma={}", rwConfig.paramNames[0], rwConfig.priorValues[0], rwConfig.priorValues[1]);
     }
 
+    // For 2D reweight and non-gaussian (ie TGraph) 1D reweight we need to do it ourselves
     // Process all entries
     Long64_t nEntries = inTree->GetEntries();
     MACH3LOG_INFO("Processing {} entries", nEntries);
     
+    // TODO: add tracking for how many events are outside the graph ranges for diagnostics DWR
+
     for (Long64_t i = 0; i < nEntries; ++i) {
         if (i % (nEntries/10) == 0) {
             MACH3LOG_INFO("Processing entry {}/{}", i, nEntries);
@@ -304,7 +303,7 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
             
             if (rwConfig.dimension == 1 && rwConfig.type != "Gaussian") {
                 
-                // TODO implement TGraph1D reweighting if needed
+                // TODO implement TGraph1D reweighting
                 MACH3LOG_ERROR("Unsupported 1D reweight type: {} for {}, TGraph1D not yet implemented", rwConfig.type, rwConfig.key);
                 
             } else if (rwConfig.dimension == 2) {
@@ -428,24 +427,6 @@ double Graph_interpolate1D(TGraph* graph, double theta13)
     }
     
     return prior;
-}
-
-double CalculateGaussianWeight(double value, double newMean, double newSigma)
-{
-    // Calculate Gaussian prior weight
-    // Weight = P_new(x) = exp(-(x-mu)^2/(2*sigma^2)) / sqrt(2*pi*sigma^2)
-    // Since we're often going from flat priors, just calculate the new Gaussian probability
-    // TODO handle non flat priors
-    
-    if (newSigma <= 0) {
-        MACH3LOG_ERROR("Invalid sigma value for Gaussian weight calculation");
-        throw MaCh3Exception(__FILE__, __LINE__);
-    }
-    
-    double chi2 = std::pow((value - newMean) / newSigma, 2);
-    double weight = std::exp(-0.5 * chi2);
-    
-    return weight;
 }
 
 bool GetParameterInfo(MCMCProcessor* processor, const std::string& paramName, 
