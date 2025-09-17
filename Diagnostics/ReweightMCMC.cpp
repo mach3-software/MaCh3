@@ -152,7 +152,6 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
                 if (graph) {
                     // Create a completely independent copy
                     auto cloned_graph = static_cast<TGraph*>(graph->Clone());
-                    cloned_graph->SetDirectory(nullptr); // Detach from file
                     cloned_graph->SetBit(kCanDelete, true); // Allow ROOT to delete it when we're done
                     reweightConfig.graph_1D = std::unique_ptr<TGraph>(cloned_graph);
                     MACH3LOG_INFO("Loaded 1D graph: {}", reweightConfig.graphName);
@@ -269,9 +268,14 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
    
     // TODO Finish Asimov shifting implementation, for now just warn that Asimovs are not being properly handled
     // Get the settings for the MCMC
+    TFile *TempFile = TFile::Open(inputFile.c_str(), "READ");
+    if (TempFile == nullptr || TempFile->IsZombie()) {
+        MACH3LOG_ERROR("Cannot open MCMC file: {}", inputFile);
+        throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
     TMacro *Config = TempFile->Get<TMacro>("MaCh3_Config");
     if (Config == nullptr) {
-        MACH3LOG_ERROR("Didn't find MaCh3_Config tree in MCMC file! {}", MCMCFile);
+        MACH3LOG_ERROR("Didn't find MaCh3_Config tree in MCMC file! {}", inputFile.c_str());
         TempFile->ls();
         throw MaCh3Exception(__FILE__ , __LINE__ );
     }
@@ -341,11 +345,11 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
     for (const auto& rwConfig : reweightConfigs){
         if (rwConfig.dimension == 1 && rwConfig.type == "Gaussian"){
             // case the rwConfig parameters to the specific format processor needs
-            const std::string& paramName = rwConfig.paramNames[0];
+            const std::vector<std::string>& paramName = {rwConfig.paramNames[0]};
             const std::vector<double>& priorCentral = {rwConfig.priorValues[0]};
             const std::vector<double>& priorSigma = {rwConfig.priorValues[1]};
             processor->ReweightPrior(paramName, priorCentral, priorSigma);
-            MACH3LOG_INFO("Applied Gaussian reweighting for {} with mean={} and sigma={}", paramName, priorCentral[0], priorSigma[0]);
+            MACH3LOG_INFO("Applied Gaussian reweighting for {} with mean={} and sigma={}", paramName[0], priorCentral[0], priorSigma[0]);
         }
     }
     // For 2D reweight and non-gaussian (ie TGraph) 1D reweight we need to do it ourselves
