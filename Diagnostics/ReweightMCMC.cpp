@@ -277,10 +277,12 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
     }
     MACH3LOG_INFO("Loading YAML config from MCMC chain");
     YAML::Node Settings = TMacroToYAML(*Config);
-    bool isAsimov = GetFromManager<bool>(Settings["MCMC"]["Asimov"], false);
-    if (isAsimov) {
+    bool asimovfit = GetFromManager(fitMan->raw()["General"]["Asimov"], false);
+    if (asimovfit) {
         MACH3LOG_WARN("ReweightMCMC does not currently handle Asimov shifting, results may be incorrect!");
-    }   
+    } else {
+        MACH3LOG_INFO("Not an Asimov fit, proceeding with reweighting");
+    }
 
 
     // Open input file and get tree
@@ -349,9 +351,7 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
     // TODO: add tracking for how many events are outside the graph ranges for diagnostics DWR
 
     for (Long64_t i = 0; i < nEntries; ++i) {
-        if (i % (nEntries/10) == 0) {
-            MACH3LOG_INFO("Processing entry {}/{}", i, nEntries);
-        }
+        if(i % 10000 == 0) MaCh3Utils::PrintProgressBar(i, nEntries);
         
         inTree->GetEntry(i);
         
