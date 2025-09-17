@@ -110,7 +110,8 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
         reweightConfig.name = GetFromManager<std::string>(reweightConfigNode["ReweightName"], reweightKey);
         reweightConfig.type = GetFromManager<std::string>(reweightConfigNode["ReweightType"], "Gaussian");
         reweightConfig.dimension = GetFromManager<int>(reweightConfigNode["ReweightDim"], 1);
-        reweightConfig.weightBranchName = "Weight_" + reweightKey;
+        // reweightConfig.weightBranchName = "Weight_" + reweightKey; // for now all weights will be stored in branches called Weight until multi weight support
+        reweightConfig.weightBranchName = "Weight";
         reweightConfig.enabled = true;
         
         // Handle different reweight types as they fill different members
@@ -283,6 +284,7 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
     YAML::Node Settings = TMacroToYAML(*Config);
     bool asimovfit = GetFromManager<bool>(Settings["General"]["Asimov"], false);
     if (asimovfit) {
+        MACH3LOG_WARN("MCMC chain was produced from an Asimov fit");
         MACH3LOG_WARN("ReweightMCMC does not currently handle Asimov shifting, results may be incorrect!");
     } else {
         MACH3LOG_INFO("Not an Asimov fit, proceeding with reweighting");
@@ -361,7 +363,7 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
 
     for (Long64_t i = 0; i < nEntries; ++i) {
         if(i % 10000 == 0) MaCh3Utils::PrintProgressBar(i, nEntries);
-        
+       
         inTree->GetEntry(i);
         
         // Calculate weights for all configurations
@@ -371,7 +373,6 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
             if (rwConfig.dimension == 1 && rwConfig.type != "Gaussian") {
                 if (rwConfig.type == "TGraph") {
                         double paramValue = paramValues[rwConfig.paramNames[0]];
-                        std::cout << "Parameter for reweight " << rwConfig.key << ": " << rwConfig.paramNames[0] << "=" << paramValue << std::endl;
                         weight = Graph_interpolate1D(nullptr, paramValue); // TODO replace nullptr with actual TGraph pointer when implemented
                 } else {
                     MACH3LOG_ERROR("Unsupported 1D reweight type: {} for {}", rwConfig.type, rwConfig.key);
@@ -380,14 +381,10 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
                 if (rwConfig.type == "TGraph2D") {
                     double dm32 = paramValues[rwConfig.paramNames[0]];
                     double theta13 = paramValues[rwConfig.paramNames[1]];
-                    std::cout << "Parameters for reweight " << rwConfig.key << ": " << rwConfig.paramNames[0] << "=" << dm32 << ", " << rwConfig.paramNames[1] << "=" << theta13 << std::endl;
                     if (dm32 > 0) {
                         // Normal Ordering
                         if (rwConfig.graph_NO) {
                             weight = Graph_interpolateNO(rwConfig.graph_NO.get(), theta13, dm32);
-                            std::cout << "rwConfig.graph_NO min x: " << rwConfig.graph_NO->GetXmin() << ", max x: " << rwConfig.graph_NO->GetXmax() << std::endl;
-                            std::cout << "rwConfig.graph_NO min y: " << rwConfig.graph_NO->GetYmin() << ", max y: " << rwConfig.graph_NO->GetYmax() << std::endl;
-                            std::cout << "NO weight for theta13=" << theta13 << ", dm32=" << dm32 << " is " << weight << std::endl;
                         } else {
                             MACH3LOG_ERROR("NO graph not available for {}", rwConfig.key);
                             weight = 0.0;
@@ -396,7 +393,6 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
                         // Inverted Ordering
                         if (rwConfig.graph_IO) {
                             weight = Graph_interpolateIO(rwConfig.graph_IO.get(), theta13, dm32);
-                            std::cout << "IO weight for theta13=" << theta13 << ", dm32=" << dm32 << " is " << weight << std::endl;
                         } else {
                             MACH3LOG_ERROR("IO graph not available for {}", rwConfig.key);
                             weight = 0.0;
