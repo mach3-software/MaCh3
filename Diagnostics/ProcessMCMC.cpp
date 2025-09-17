@@ -23,7 +23,6 @@ inline TH2D* TMatrixIntoTH2D(TMatrixDSym* Matrix, const std::string& title);
 inline void KolmogorovSmirnovTest(const std::vector<std::unique_ptr<MCMCProcessor>>& Processor,
                                   const std::unique_ptr<TCanvas>& Posterior,
                                   const TString& canvasname);
-
 int nFiles;
 std::vector <std::string> FileNames;
 std::vector <std::string> TitleNames;
@@ -297,18 +296,23 @@ void MultipleProcessMCMC()
   Posterior->SetTopMargin(0.05f);
   Posterior->SetRightMargin(0.03f);
   Posterior->SetLeftMargin(0.15f);
+  
+  // First filename: keep path, just remove ".root"
+  // Would be nice to specify outpath in a later update
+  size_t pos = FileNames[0].rfind(".root");
+  std::string base = (pos == std::string::npos) ? FileNames[0] : FileNames[0].substr(0, pos);
+  TString canvasname = base;
 
-  FileNames[0] = FileNames[0].substr(0, FileNames[0].find(".root")-1);
-  TString canvasname = FileNames[0];
-  for (int ik = 1; ik < nFiles;  ik++)
-  {
-    while (FileNames[ik].find("/") != std::string::npos)
-    {
-      FileNames[ik] = FileNames[ik].substr(FileNames[ik].find("/")+1, FileNames[ik].find(".root")-1);
-    }
-    canvasname = canvasname + "_"+FileNames[ik];
+  // Remaining filenames: strip path and ".root"
+  // So if you have /path/to/file1.root and /path/to/file2.root or /another/path/to/file2.root, canvasname = /path/to/file1_file2.root
+  for (int ik = 1; ik < nFiles; ik++) {
+    pos = FileNames[ik].find_last_of('/');
+    base = (pos == std::string::npos) ? FileNames[ik] : FileNames[ik].substr(pos + 1);
+    pos = base.rfind(".root");
+    if (pos != std::string::npos) base = base.substr(0, pos);
+    canvasname += "_" + TString(base);
   }
-
+  
   canvasname = canvasname +".pdf[";
 
   Posterior->Print(canvasname);
