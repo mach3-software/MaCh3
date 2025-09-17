@@ -94,10 +94,10 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
         const std::string& reweightKey = reweight.first.as<std::string>();
         const YAML::Node& reweightConfigNode = reweight.second;
         
-        // Check if this particular reweight is enabled
-        if (!GetFromManager<bool>(reweightConfigNode["Enabled"], false)) {
-            MACH3LOG_INFO("Skipping disabled reweight: {}", reweightKey);
-            continue;
+        // Check if this particular reweight is enabled !!! Curently only support one reweight at a time so this defaults to enabled
+        if (!GetFromManager<bool>(reweightConfigNode["Enabled"], true)) {
+           MACH3LOG_INFO("Skipping disabled reweight: {}", reweightKey);
+           continue;
         }
         
         ReweightConfig reweightConfig;
@@ -111,16 +111,30 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
         // Handle different reweight types as they fill different members
         if (reweightConfig.dimension == 1) {
 
-            std::string paramName = GetFromManager<std::string>(reweightConfigNode["ReweightVar"], "");
-            auto priorValues = GetFromManager<std::vector<double>>(reweightConfigNode["ReweightPrior"], {});
-            
-            if (paramName.empty() || priorValues.size() < 2) {
-                MACH3LOG_ERROR("Invalid 1D reweight configuration for {}", reweightKey);
+            if (reweightConfig.type != "Gaussian" && reweightConfig.type != "TGraph") {
+                MACH3LOG_ERROR("Unsupported 1D reweight type: {} for {}", reweightConfig.type, reweightKey);
                 continue;
             }
-            
-            reweightConfig.paramNames = {paramName};
-            reweightConfig.priorValues = priorValues;
+
+            if (reweightConfig.type == "Gaussian") {
+                // For Gaussian reweights, we need the parameter name and prior values (mean, sigma)
+                std::string paramName = GetFromManager<std::string>(reweightConfigNode["ReweightVar"], "");
+                auto priorValues = GetFromManager<std::vector<double>>(reweightConfigNode["ReweightPrior"], {});
+                
+                if (paramName.empty() || priorValues.size() != 2) {
+                    MACH3LOG_ERROR("Invalid Gaussian reweight configuration for {}", reweightKey);
+                    continue;
+                }
+                
+                reweightConfig.paramNames = {paramName};
+                reweightConfig.priorValues = priorValues;
+                
+            } else if (reweightConfig.type == "TGraph") {
+                // For TGraph reweights, we need the parameter name and the TGraph file and name
+                std::string paramName = GetFromManager<std::string>(reweightConfigNode["ReweightVar"], "");
+                std::string fileName = GetFromManager<std::string>(reweightConfigNode["ReweightPrior"]["file"], "");
+                std::string graphName = GetFromManager<std::string>(reweightConfigNode["ReweightPrior"]["graph_name"], ""); 
+            }
             
         } else if (reweightConfig.dimension == 2) {
             auto paramNames = GetFromManager<std::vector<std::string>>(reweightConfigNode["ReweightVar"], {});
@@ -201,8 +215,11 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
     }
     
     if (reweightConfigs.empty()) {
-        MACH3LOG_WARN("No valid reweight configurations found");
-        return;
+        MACH3LOG_ERROR("No valid reweight configurations found in config file");
+        throw MaCh3Exception(__FILE__, __LINE__);
+    } else if (reweightConfigs.size() > 1) {    // check number of ReweightConfigs, currently maximum supported is 1 due to structure of ProcessMCMC
+        MACH3LOG_ERROR("Currently only one reweight configuration is supported at a time, found {}", reweight_settings.size());
+        throw MaCh3Exception(__FILE__, __LINE__);
     }
     
     // Create MCMCProcessor to get parameter information 
@@ -258,10 +275,6 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
             }
         }
     }
-    
-    // We should set up the branches for reweighting first and then iterate over the entries
-    // Adding one branch at a time is inefficient as you have to copy and replace the same file over and over
-    // We will work out all the weights we need to add first and add them event by event
 
     // Add weight branches
     std::map<std::string, double> weights;
@@ -302,10 +315,13 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
             double weight = 1.0;
             
             if (rwConfig.dimension == 1 && rwConfig.type != "Gaussian") {
-                
-                // TODO implement TGraph1D reweighting
-                MACH3LOG_ERROR("Unsupported 1D reweight type: {} for {}, TGraph1D not yet implemented", rwConfig.type, rwConfig.key);
-                
+                if (rwConfig.type == "TGraph") {
+                        double paramValue = paramValues[rwConfig.paramNames[0]];
+                        std::cout << "Parameter for reweight " << rwConfig.key << ": " << rwConfig.paramNames[0] << "=" << paramValue << std::endl;
+                        weight = Graph_interpolate1D(nullptr, paramValue); // TODO replace nullptr with actual TGraph pointer when implemented
+                } else {
+                    MACH3LOG_ERROR("Unsupported 1D reweight type: {} for {}", rwConfig.type, rwConfig.key);
+                }
             } else if (rwConfig.dimension == 2) {
                 if (rwConfig.type == "TGraph2D") {
                     double dm32 = paramValues[rwConfig.paramNames[0]];
