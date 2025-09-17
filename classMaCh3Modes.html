@@ -212,7 +212,7 @@ Daniel Barrow </dd></dl>
 <div class="line"><span class="lineno">    9</span>  <a class="code hl_function" href="classMaCh3Modes.html#a0dab0bdaf0fb46f5fd8e2be2668ef7c5">Initialise</a>(<a class="code hl_variable" href="ProcessMCMC_8cpp.html#a13056efd080ab16304b6f7be0ebf0a61">config</a>);</div>
 <div class="line"><span class="lineno">   10</span>}</div>
 <div class="ttc" id="aProcessMCMC_8cpp_html_a13056efd080ab16304b6f7be0ebf0a61"><div class="ttname"><a href="ProcessMCMC_8cpp.html#a13056efd080ab16304b6f7be0ebf0a61">config</a></div><div class="ttdeci">std::string config</div><div class="ttdef"><b>Definition:</b> <a href="ProcessMCMC_8cpp_source.html#l00029">ProcessMCMC.cpp:29</a></div></div>
-<div class="ttc" id="aYamlHelper_8h_html_ad802d5a5acdc16a796b21af74f6f5f59"><div class="ttname"><a href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">M3OpenConfig</a></div><div class="ttdeci">#define M3OpenConfig(filename)</div><div class="ttdoc">Macro to simplify calling LoadYaml with file and line info.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00560">YamlHelper.h:560</a></div></div>
+<div class="ttc" id="aYamlHelper_8h_html_ad802d5a5acdc16a796b21af74f6f5f59"><div class="ttname"><a href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">M3OpenConfig</a></div><div class="ttdeci">#define M3OpenConfig(filename)</div><div class="ttdoc">Macro to simplify calling LoadYaml with file and line info.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00561">YamlHelper.h:561</a></div></div>
 <div class="ttc" id="aclassMaCh3Modes_html_a0dab0bdaf0fb46f5fd8e2be2668ef7c5"><div class="ttname"><a href="classMaCh3Modes.html#a0dab0bdaf0fb46f5fd8e2be2668ef7c5">MaCh3Modes::Initialise</a></div><div class="ttdeci">void Initialise(const YAML::Node &amp;config)</div><div class="ttdoc">KS: Initialise MaCh3 modes based on provided config.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8cpp_source.html#l00019">MaCh3Modes.cpp:19</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -435,8 +435,8 @@ Daniel Barrow </dd></dl>
 <div class="line"><span class="lineno">  196</span>  }</div>
 <div class="line"><span class="lineno">  197</span>  <span class="keywordflow">return</span> <a class="code hl_variable" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>.at(Index).FancyName;</div>
 <div class="line"><span class="lineno">  198</span>}</div>
-<div class="ttc" id="aMaCh3Logger_8h_html_a07ff6d6a15b24f94afc88a1b89779beb"><div class="ttname"><a href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a></div><div class="ttdeci">#define MACH3LOG_CRITICAL</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00026">MaCh3Logger.h:26</a></div></div>
-<div class="ttc" id="aMaCh3Logger_8h_html_a4db4657acad5c79ac4bbb66a9d1c5905"><div class="ttname"><a href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a></div><div class="ttdeci">#define MACH3LOG_DEBUG</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00022">MaCh3Logger.h:22</a></div></div>
+<div class="ttc" id="aMaCh3Logger_8h_html_a07ff6d6a15b24f94afc88a1b89779beb"><div class="ttname"><a href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a></div><div class="ttdeci">#define MACH3LOG_CRITICAL</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00028">MaCh3Logger.h:28</a></div></div>
+<div class="ttc" id="aMaCh3Logger_8h_html_a4db4657acad5c79ac4bbb66a9d1c5905"><div class="ttname"><a href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a></div><div class="ttdeci">#define MACH3LOG_DEBUG</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00024">MaCh3Logger.h:24</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -772,7 +772,7 @@ Daniel Barrow </dd></dl>
 <div class="line"><span class="lineno">   53</span> </div>
 <div class="line"><span class="lineno">   54</span>  <a class="code hl_function" href="classMaCh3Modes.html#a5aa6f9f9acfc8b22d7764ed48d8ed64f">Print</a>();</div>
 <div class="line"><span class="lineno">   55</span>}</div>
-<div class="ttc" id="aYamlHelper_8h_html_ab5a40370dca062f6b2c87fabece7db27"><div class="ttname"><a href="YamlHelper_8h.html#ab5a40370dca062f6b2c87fabece7db27">Get</a></div><div class="ttdeci">Type Get(const YAML::Node &amp;node, const std::string File, const int Line)</div><div class="ttdoc">Get content of config file.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00265">YamlHelper.h:265</a></div></div>
+<div class="ttc" id="aYamlHelper_8h_html_ab5a40370dca062f6b2c87fabece7db27"><div class="ttname"><a href="YamlHelper_8h.html#ab5a40370dca062f6b2c87fabece7db27">Get</a></div><div class="ttdeci">Type Get(const YAML::Node &amp;node, const std::string File, const int Line)</div><div class="ttdoc">Get content of config file.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00266">YamlHelper.h:266</a></div></div>
 <div class="ttc" id="aclassMaCh3Modes_html_a30fc687aebaa1b9cbac9d3f356bad4be"><div class="ttname"><a href="classMaCh3Modes.html#a30fc687aebaa1b9cbac9d3f356bad4be">MaCh3Modes::DeclareNewMode</a></div><div class="ttdeci">void DeclareNewMode(std::string const &amp;name, std::string const &amp;fancyname, int PlotColor, std::vector&lt; int &gt; const &amp;GenMap, const bool IsNC, const std::string &amp;SplineSuffix)</div><div class="ttdoc">KS: Add new mode.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8cpp_source.html#l00107">MaCh3Modes.cpp:107</a></div></div>
 <div class="ttc" id="aclassMaCh3Modes_html_a5aa6f9f9acfc8b22d7764ed48d8ed64f"><div class="ttname"><a href="classMaCh3Modes.html#a5aa6f9f9acfc8b22d7764ed48d8ed64f">MaCh3Modes::Print</a></div><div class="ttdeci">void Print() const</div><div class="ttdoc">KS: Print info about initialised modes.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8cpp_source.html#l00058">MaCh3Modes.cpp:58</a></div></div>
 <div class="ttc" id="aclassMaCh3Modes_html_a68ccf4c0fcd926574b33ef1dbcad3110"><div class="ttname"><a href="classMaCh3Modes.html#a68ccf4c0fcd926574b33ef1dbcad3110">MaCh3Modes::Generator</a></div><div class="ttdeci">std::string Generator</div><div class="ttdoc">KS: Name of generator like NEUT, NuWro etc. this is to make stuff fancy.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00105">MaCh3Modes.h:105</a></div></div>
@@ -867,7 +867,7 @@ Daniel Barrow </dd></dl>
 <div class="line"><span class="lineno">  151</span>    }</div>
 <div class="line"><span class="lineno">  152</span>  }</div>
 <div class="line"><span class="lineno">  153</span>}</div>
-<div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00025">MaCh3Logger.h:25</a></div></div>
+<div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00027">MaCh3Logger.h:27</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00013">MaCh3Exception.h:13</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -926,7 +926,7 @@ Daniel Barrow </dd></dl>
 <div class="line"><span class="lineno">   91</span>  }</div>
 <div class="line"><span class="lineno">   92</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;==========================&quot;</span>);</div>
 <div class="line"><span class="lineno">   93</span>}</div>
-<div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00023">MaCh3Logger.h:23</a></div></div>
+<div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00025">MaCh3Logger.h:25</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
