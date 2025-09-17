@@ -28,10 +28,15 @@ struct ReweightConfig {
     std::vector<double> priorValues;
     std::string weightBranchName;
     bool enabled;
-    
-    // For 2D TGraph2D reweighting
+   
+    // For TGraph 1D or 2D
     std::string fileName;
     std::string graphName;
+
+    // For TGraph1D
+    std::unique_ptr<TGraph> graph_1D;
+
+    // For TGraph2D
     std::string hierarchyType; // "NO", "IO", or "auto"
     std::unique_ptr<TGraph2D> graph_NO;
     std::unique_ptr<TGraph2D> graph_IO;
@@ -110,30 +115,54 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
         
         // Handle different reweight types as they fill different members
         if (reweightConfig.dimension == 1) {
-
-            if (reweightConfig.type != "Gaussian" && reweightConfig.type != "TGraph") {
-                MACH3LOG_ERROR("Unsupported 1D reweight type: {} for {}", reweightConfig.type, reweightKey);
-                continue;
-            }
-
             if (reweightConfig.type == "Gaussian") {
                 // For Gaussian reweights, we need the parameter name and prior values (mean, sigma)
                 std::string paramName = GetFromManager<std::string>(reweightConfigNode["ReweightVar"], "");
                 auto priorValues = GetFromManager<std::vector<double>>(reweightConfigNode["ReweightPrior"], {});
                 
+                reweightConfig.paramNames = {paramName};
+                reweightConfig.priorValues = priorValues;
+
                 if (paramName.empty() || priorValues.size() != 2) {
                     MACH3LOG_ERROR("Invalid Gaussian reweight configuration for {}", reweightKey);
                     continue;
                 }
-                
-                reweightConfig.paramNames = {paramName};
-                reweightConfig.priorValues = priorValues;
-                
             } else if (reweightConfig.type == "TGraph") {
                 // For TGraph reweights, we need the parameter name and the TGraph file and name
                 std::string paramName = GetFromManager<std::string>(reweightConfigNode["ReweightVar"], "");
                 std::string fileName = GetFromManager<std::string>(reweightConfigNode["ReweightPrior"]["file"], "");
                 std::string graphName = GetFromManager<std::string>(reweightConfigNode["ReweightPrior"]["graph_name"], ""); 
+                reweightConfig.paramNames = {paramName};
+                reweightConfig.fileName = fileName;
+                reweightConfig.graphName = graphName;
+
+                if (paramName.empty() || fileName.empty() || graphName.empty()) {
+                    MACH3LOG_ERROR("Invalid TGraph reweight configuration for {}", reweightKey);
+                    continue;
+                }
+
+                // Load the 1D graph
+                MACH3LOG_INFO("Loading 1D constraint from file: {} (graph: {})", reweightConfig.fileName, reweightConfig.graphName);
+                auto constraintFile = std::unique_ptr<TFile>(TFile::Open(reweightConfig.fileName.c_str(), "READ"));
+                if (!constraintFile || constraintFile->IsZombie()) {
+                    MACH3LOG_ERROR("Failed to open constraint file: {}", reweightConfig.fileName);
+                    continue;
+                }
+                auto graph = constraintFile->Get<TGraph>(reweightConfig.graphName.c_str());
+                if (graph) {
+                    // Create a completely independent copy
+                    auto cloned_graph = static_cast<TGraph*>(graph->Clone());
+                    cloned_graph->SetDirectory(nullptr); // Detach from file
+                    cloned_graph->SetBit(kCanDelete, true); // Allow ROOT to delete it when we're done
+                    reweightConfig.graph_1D = std::unique_ptr<TGraph>(cloned_graph);
+                    MACH3LOG_INFO("Loaded 1D graph: {}", reweightConfig.graphName);
+                } else {
+                    MACH3LOG_ERROR("Failed to load graph: {}", reweightConfig.graphName);
+                    continue;
+                }
+            } else {
+                MACH3LOG_ERROR("Unknown 1D reweight type: {} for {}", reweightConfig.type, reweightKey);
+                throw MaCh3Exception(__FILE__, __LINE__);
             }
             
         } else if (reweightConfig.dimension == 2) {
