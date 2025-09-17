@@ -2,7 +2,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 // MaCh3 includes
-#include "manager/manager.h"
+#include "Manager/Manager.h"
 // yaml includes
 #include "yaml-cpp/yaml.h"
 
@@ -84,13 +84,13 @@ void initManager(py::module &m){
         
         .def(
             "print", 
-            &manager::Print, 
+            &manager::Print,
             "Print currently used config."
         )
         
         .def(
             "raw", 
-            &manager::raw, 
+            &manager::raw,
             "Get the raw yaml config."
         )
 

@@ -42,8 +42,8 @@ jobs:
             file: Doc/MaCh3DockerFiles/Rocky9/Dockerfile
             tag: rocky9latest
             cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DMaCh3_LOW_MEMORY_STRUCTS_ENABLED=ON -DNuFastLinear_ENABLED=ON
-          - os: Rocky9 CUDA NoMultithreading
-            file: Doc/MaCh3DockerFiles/Rocky9/Dockerfile
+          - os: Ubi9 CUDA NoMultithreading
+            file: Doc/MaCh3DockerFiles/Ubi9/Dockerfile
             tag: rocky9latest
             cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DMaCh3_MULTITHREAD_ENABLED=OFF -DNuFastLinear_ENABLED=ON
           - os: Alma9 NoMultithreading
@@ -54,15 +54,19 @@ jobs:
             file: Doc/MaCh3DockerFiles/Alma9/Dockerfile
             tag: alma9latest
             cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DMaCh3_NATIVE_ENABLED=ON
-          - os: Ubuntu24.10 Clang NoMultithreading
-            file: Doc/MaCh3DockerFiles/Ubuntu24.10/Dockerfile
-            tag: ubuntu24.10latest
+          - os: Ubuntu25.04 Clang NoMultithreading
+            file: Doc/MaCh3DockerFiles/Ubuntu25.04/Dockerfile
+            tag: ubuntu25.04latest
             cmakeoptions: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DMaCh3_MULTITHREAD_ENABLED=OFF -DMaCh3_PYTHON_ENABLED=ON -DNuFastLinear_ENABLED=ON
+          - os: Alma9 ICPX NoMultithreading
+            file: Doc/MaCh3DockerFiles/Alma9_icpx/Dockerfile
+            tag: Alma9icpxlatest
+            cmakeoptions: -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx -DMaCh3_MULTITHREAD_ENABLED=OFF  -DMaCh3_PYTHON_ENABLED=ON -DNuFastLinear_ENABLED=ON -DMaCh3_WERROR_ENABLED=FALSE
 
     name: Build CI ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Log in to GitHub Container Registry
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
@@ -72,5 +76,12 @@ jobs:
       env:
         GITHUB_HEAD_REF: ${{ github.head_ref }}
 
+
     - name: Build the Docker image
-      run: docker build . --file ${{ matrix.file }} --tag ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.tag }} --build-arg MACH3_VERSION="$MACH3_VERSION" --build-arg CMAKE_OPTIONS="${{ matrix.cmakeoptions }}"
+      run: |
+        docker build . \
+          --file ${{ matrix.file }} \
+          --tag ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.tag }} \
+          --build-arg MACH3_VERSION="$MACH3_VERSION" \
+          --build-arg CMAKE_OPTIONS="${{ matrix.cmakeoptions }}" \
+          --build-arg REPOSITORY_URL="https://github.com/${{ github.repository }}"

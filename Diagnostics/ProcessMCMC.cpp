@@ -1,21 +1,22 @@
 //MaCh3 includes
-#include "mcmc/MCMCProcessor.h"
-#include "manager/manager.h"
+#include "Fitters/OscProcessor.h"
+#include "Manager/Manager.h"
 
 /// @file ProcessMCMC.cpp
 /// @brief Main exectable responsible for different types of MCMC processing like drawing posteriors, triangle plots etc. Actual implantation of methods is in MCMCProcessor
+/// @author Kamil Skwarczynski
 
 /// @brief Main function processing MCMC and Producing plots
 inline void ProcessMCMC(const std::string& inputFile);
 /// @brief Function producing comparison of posterior and more betwen a few MCMC chains
 inline void MultipleProcessMCMC();
-inline void CalcBayesFactor(const std::unique_ptr<MCMCProcessor>& Processor);
-inline void CalcSavageDickey(const std::unique_ptr<MCMCProcessor>& Processor);
-inline void CalcBipolarPlot(const std::unique_ptr<MCMCProcessor>& Processor);
-inline void CalcParameterEvolution(const std::unique_ptr<MCMCProcessor>& Processor);
-inline void GetTrianglePlot(const std::unique_ptr<MCMCProcessor>& Processor);
-inline void DiagnoseCovarianceMatrix(const std::unique_ptr<MCMCProcessor>& Processor, const std::string& inputFile);
-inline void ReweightPrior(const std::unique_ptr<MCMCProcessor>& Processor);
+inline void CalcBayesFactor(MCMCProcessor* Processor);
+inline void CalcSavageDickey(MCMCProcessor* Processor);
+inline void CalcBipolarPlot(MCMCProcessor* Processor);
+inline void CalcParameterEvolution(MCMCProcessor* Processor);
+inline void GetTrianglePlot(MCMCProcessor* Processor);
+inline void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, const std::string& inputFile);
+inline void ReweightPrior(MCMCProcessor* Processor);
 /// @brief KS: Convert TMatrix to TH2D, mostly useful for making fancy plots
 inline TH2D* TMatrixIntoTH2D(TMatrixDSym* Matrix, const std::string& title);
 /// @brief KS: Perform KS test to check if two posteriors for the same parameter came from the same distribution
@@ -34,14 +35,23 @@ int main(int argc, char *argv[])
   nFiles = 0;
   if (argc != 3 && argc !=6 && argc != 8)
   {
-    MACH3LOG_ERROR("How to use: {} <Config> <MCMM_ND_Output.root>", argv[0]);
+    MACH3LOG_ERROR("How to use: ");
+    MACH3LOG_ERROR("  single chain: {} <Config> <MCMM_ND_Output.root>", argv[0]);
+    MACH3LOG_ERROR("  two chain:    {} <Config> <MCMM_ND_Output_1.root> <Title 1> <MCMC_ND_Output_2.root> <Title 2>", argv[0]);
+    MACH3LOG_ERROR("  three chain:  {} <Config> <MCMM_ND_Output_1.root> <Title 1> <MCMC_ND_Output_2.root> <Title 2> <MCMC_ND_Output_3.root> <Title 3>", argv[0]);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+
+  config = argv[1];
+  YAML::Node card_yaml = M3OpenConfig(config);
+  if (!CheckNodeExists(card_yaml, "ProcessMCMC")) {
+    MACH3LOG_ERROR("The 'ProcessMCMC' node is not defined in the YAML configuration.");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
   if (argc == 3)
   {
     MACH3LOG_INFO("Producing single fit output");
-    config = argv[1];
     std::string filename = argv[2];
     ProcessMCMC(filename);
   }
@@ -49,8 +59,6 @@ int main(int argc, char *argv[])
   else if (argc == 6 || argc == 8)
   {
     MACH3LOG_INFO("Producing two fit comparison");
-    config = argv[1];
-
     FileNames.push_back(argv[2]);
     TitleNames.push_back(argv[3]);
 
@@ -68,55 +76,57 @@ int main(int argc, char *argv[])
   return 0;
 }
 
+/// @brief Parse custom binning edges from a YAML configuration node.
+///
+/// This function reads the `CustomBinEdges` section of the YAML config and
+/// returns a mapping of parameter names to their lower and upper edges.
+///
+/// The expected YAML syntax is:
+/// @code{.yaml}
+/// CustomBinEdges:
+///   delta_cp: [-3.141592, 3.141592]
+///   another_param: [min, max]
+/// @endcode
+///
+/// @param Settings YAML configuration node containing the optional
+///        `CustomBinEdges` section.
+std::map<std::string, std::pair<double, double>> GetCustomBinning(const YAML::Node& Settings)
+{
+  std::map<std::string, std::pair<double, double>> CustomBinning;
+  if (Settings["CustomBinEdges"]) {
+    const YAML::Node& edges = Settings["CustomBinEdges"];
+
+    for (const auto& node : edges) {
+      std::string key = node.first.as<std::string>();
+      auto values = node.second.as<std::vector<double>>();
+
+      if (values.size() == 2) {
+        CustomBinning[key] = std::make_pair(values[0], values[1]);
+        MACH3LOG_DEBUG("Adding custom binning {} with {:.4f}, {:.4f}", key, values[0], values[1]);
+      } else {
+        MACH3LOG_ERROR("Invalid number of values for key: {}", key);
+        throw MaCh3Exception(__FILE__ , __LINE__ );
+      }
+    }
+  }
+  return CustomBinning;
+}
+
 void ProcessMCMC(const std::string& inputFile)
 {
   MACH3LOG_INFO("File for study: {} with config  {}", inputFile, config);
-  // Make the processor
-  // auto Processor = std::make_unique<MCMCProcessor>(inputFile); // define this later 
+  // Make the processor)
+  auto Processor = std::make_unique<OscProcessor>(inputFile);
 
   YAML::Node card_yaml = M3OpenConfig(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
-
-  std::string inputFile_reweighted = "";
-
-  // Check if we want to reweight prior first
-  if(GetFromManager<bool>(Settings["ReweightPrior"], false)){
-    // check if there is already a reweight branch in the file
-    auto checkFile = std::unique_ptr<TFile>(new TFile(inputFile.c_str(), "READ"));
-    std::unique_ptr<TTree> checkTree(checkFile->Get<TTree>("posteriors"));
-
-    if (checkTree && checkTree->GetBranch("Weight")) {
-        MACH3LOG_WARN("Reweighting prior is already done, skipping for now, please give me an unweighted file");
-
-    } else {
-
-        auto temp_Processor = std::make_unique<MCMCProcessor>(inputFile);
-        temp_Processor->Initialise();
-        MACH3LOG_INFO("No weight branch found, proceeding with reweighting prior");
-        // Reweight the prior
-        ReweightPrior(temp_Processor);   
-        // set the name for the reactor constrained file here
-        inputFile_reweighted = inputFile.substr(0, inputFile.find(".root")) + "_reweighted.root";
-        MACH3LOG_INFO("Reweighted file will be saved as {}", inputFile_reweighted);
-    }
-  }
-
-  std::unique_ptr<MCMCProcessor> Processor;
-
-  bool applyReweight = GetFromManager<bool>(Settings["ApplyReweightToPlots"], false);
-  if(applyReweight){
-    MACH3LOG_INFO("Applying reweighting to plots, using file {}", inputFile_reweighted);
-    Processor = std::make_unique<MCMCProcessor>(inputFile_reweighted);
-  } else {
-    // If we don't apply reweight, we use the original file
-    MACH3LOG_INFO("Not applying reweighting to plots, using file {}", inputFile);
-    Processor = std::make_unique<MCMCProcessor>(inputFile);
-  }
   
   const bool PlotCorr = GetFromManager<bool>(Settings["PlotCorr"], false);
 
   Processor->SetExcludedTypes(GetFromManager<std::vector<std::string>>(Settings["ExcludedTypes"], {}));
   Processor->SetExcludedNames(GetFromManager<std::vector<std::string>>(Settings["ExcludedNames"], {}));
+  Processor->SetExcludedGroups(GetFromManager<std::vector<std::string>>(Settings["ExcludedGroups"], {}));
+
   //Apply additional cuts to 1D posterior
   Processor->SetPosterior1DCut(GetFromManager<std::string>(Settings["Posterior1DCut"], ""));
 
@@ -134,21 +144,18 @@ void ProcessMCMC(const std::string& inputFile)
 
   Processor->Initialise();
 
-  // after initialisation enable reweighting if required
-  if (applyReweight) {
-    Processor->EnableReweighting("Weight");
-  }
-
-  if(Settings["BurnInSteps"])
-  {
+  if(Settings["BurnInSteps"]) {
     Processor->SetStepCut(Settings["BurnInSteps"].as<int>());
-  }
-  else
-  {
+  } else {
     MACH3LOG_WARN("BurnInSteps not set, defaulting to 20%");
     Processor->SetStepCut(static_cast<int>(Processor->GetnSteps()/5));
   }
-
+  if(Settings["MaxEntries"]) {
+    Processor->SetEntries(Get<int>(Settings["MaxEntries"], __FILE__, __LINE__));
+  }
+  if(Settings["NBins"]) {
+    Processor->SetNBins(Get<int>(Settings["NBins"], __FILE__, __LINE__));
+  }
   if(Settings["Thinning"])
   {
     if(Settings["Thinning"][0].as<bool>()){
@@ -156,7 +163,7 @@ void ProcessMCMC(const std::string& inputFile)
     }
   }
   // Make the postfit
-  Processor->MakePostfit();
+  Processor->MakePostfit(GetCustomBinning(Settings));
   Processor->DrawPostfit();
   //KS: Should set via config whether you want below or not
   if(GetFromManager<bool>(Settings["MakeCredibleIntervals"], true)) {
@@ -164,25 +171,23 @@ void ProcessMCMC(const std::string& inputFile)
                                      GetFromManager<std::vector<short int>>(Settings["CredibleIntervalsColours"], {436, 430, 422}),
                                      GetFromManager<bool>(Settings["CredibleInSigmas"], false));
   }
-  if(GetFromManager<bool>(Settings["CalcBayesFactor"], true))  CalcBayesFactor(Processor);
-  if(GetFromManager<bool>(Settings["CalcSavageDickey"], true)) CalcSavageDickey(Processor);
-  if(GetFromManager<bool>(Settings["CalcBipolarPlot"], false)) CalcBipolarPlot(Processor);
-  if(GetFromManager<bool>(Settings["CalcParameterEvolution"], false)) CalcParameterEvolution(Processor);
+  if(GetFromManager<bool>(Settings["CalcBayesFactor"], true))  CalcBayesFactor(Processor.get());
+  if(GetFromManager<bool>(Settings["CalcSavageDickey"], true)) CalcSavageDickey(Processor.get());
+  if(GetFromManager<bool>(Settings["CalcBipolarPlot"], false)) CalcBipolarPlot(Processor.get());
+  if(GetFromManager<bool>(Settings["CalcParameterEvolution"], false)) CalcParameterEvolution(Processor.get());
 
   if(PlotCorr)
   {
     Processor->SetSmoothing(GetFromManager<bool>(Settings["Smoothing"], true));
     // Make the covariance matrix
     //We have different treatment for multithread
-//#ifdef MULTITHREAD
     Processor->CacheSteps();
     //KS: Since we cached let's make fancy violins :)
     if(GetFromManager<bool>(Settings["MakeViolin"], true)) Processor->MakeViolin();
     Processor->MakeCovariance_MP();
-//#else
-    //Processor->MakeCovariance();
-//#endif
+
     Processor->DrawCovariance();
+    if(GetFromManager<bool>(Settings["MakeCovarianceYAML"], true)) Processor->MakeCovarianceYAML(GetFromManager<std::string>(Settings["CovarianceYAMLOutName"], "UpdatedCorrelationMatrix.yaml"), GetFromManager<std::string>(Settings["CovarianceYAMLMeansMethod"], "HPD"));
 
     auto const &MakeSubOptimality = Settings["MakeSubOptimality"];
     if(MakeSubOptimality[0].as<bool>()) Processor->MakeSubOptimality(MakeSubOptimality[1].as<int>());
@@ -191,15 +196,17 @@ void ProcessMCMC(const std::string& inputFile)
       Processor->MakeCredibleRegions(GetFromManager<std::vector<double>>(Settings["CredibleRegions"], {0.99, 0.90, 0.68}),
                                      GetFromManager<std::vector<short int>>(Settings["CredibleRegionStyle"], {2, 1, 3}),
                                      GetFromManager<std::vector<short int>>(Settings["CredibleRegionColor"], {413, 406, 416}),
-                                     GetFromManager<bool>(Settings["CredibleInSigmas"], false)
-                                     );
+                                     GetFromManager<bool>(Settings["CredibleInSigmas"], false), 
+                                     GetFromManager<bool>(Settings["Draw2DPosterior"], true),
+                                     GetFromManager<bool>(Settings["DrawBestFit"], true));
     }
-    if(GetFromManager<bool>(Settings["GetTrianglePlot"], true)) GetTrianglePlot(Processor);
+    if(GetFromManager<bool>(Settings["GetTrianglePlot"], true)) GetTrianglePlot(Processor.get());
 
     //KS: When creating covariance matrix longest time is spend on caching every step, since we already cached we can run some fancy covariance stability diagnostic
-    if(GetFromManager<bool>(Settings["DiagnoseCovarianceMatrix"], false)) DiagnoseCovarianceMatrix(Processor, inputFile);
+    if(GetFromManager<bool>(Settings["DiagnoseCovarianceMatrix"], false)) DiagnoseCovarianceMatrix(Processor.get(), inputFile);
   }
-
+  if(GetFromManager<bool>(Settings["ReweightPrior"], false)) ReweightPrior(Processor.get());
+  if(GetFromManager<bool>(Settings["JarlskogAnalysis"], true)) Processor->PerformJarlskogAnalysis();
 }
 
 void MultipleProcessMCMC()
@@ -212,12 +219,11 @@ void MultipleProcessMCMC()
   nFiles = int(FileNames.size());
   std::vector<std::unique_ptr<MCMCProcessor>> Processor(nFiles);
 
-  if(!Settings["BurnInSteps"])
-  {
+  if(!Settings["BurnInSteps"]) {
     MACH3LOG_WARN("BurnInSteps not set, defaulting to 20%");
   }
 
-  for (int ik = 0; ik < nFiles;  ik++)
+  for (int ik = 0; ik < nFiles; ik++)
   {
     MACH3LOG_INFO("File for study: {}", FileNames[ik]);
     // Make the processor
@@ -226,6 +232,7 @@ void MultipleProcessMCMC()
 
     Processor[ik]->SetExcludedTypes(GetFromManager<std::vector<std::string>>(Settings["ExcludedTypes"], {}));
     Processor[ik]->SetExcludedNames(GetFromManager<std::vector<std::string>>(Settings["ExcludedNames"], {}));
+    Processor[ik]->SetExcludedGroups(GetFromManager<std::vector<std::string>>(Settings["ExcludedGroups"], {}));
 
     //Apply additional cuts to 1D posterior
     Processor[ik]->SetPosterior1DCut(GetFromManager<std::string>(Settings["Posterior1DCut"], ""));
@@ -234,20 +241,50 @@ void MultipleProcessMCMC()
     Processor[ik]->SetFancyNames(GetFromManager<bool>(Settings["FancyNames"], true));
     Processor[ik]->Initialise();
 
-    if(Settings["BurnInSteps"])
-    {
+    if(Settings["BurnInSteps"]) {
       Processor[ik]->SetStepCut(Settings["BurnInSteps"].as<int>());
-    }
-    else
-    {
+    }else {
       Processor[ik]->SetStepCut(static_cast<int>(Processor[ik]->GetnSteps()/5));
     }
+
+    if(Settings["MaxEntries"]) {
+      Processor[ik]->SetEntries(Get<int>(Settings["MaxEntries"], __FILE__, __LINE__));
+    }
+    if(Settings["NBins"]) {
+      Processor[ik]->SetNBins(Get<int>(Settings["NBins"], __FILE__, __LINE__));
+    }
   }
+
+  Processor[0]->MakePostfit(GetCustomBinning(Settings));
+  Processor[0]->DrawPostfit();
+  // Get edges from first histogram to ensure all params use same binning
+  std::map<std::string, std::pair<double, double>> ParamEdges;
+  for(int i = 0; i < Processor[0]->GetNParams(); ++i) {
+    // Get the histogram for the i-th parameter
+    TH1D* hist = Processor[0]->GetHpost(i);
+    if (!hist) {
+      MACH3LOG_DEBUG("Histogram for parameter {} is null.", i);
+      continue;
+    }
+
+    // Get the parameter name (title of the histogram)
+    std::string paramName = hist->GetTitle();
+
+    // Get the axis limits (edges)
+    TAxis* axis = hist->GetXaxis();
+    double xmin = axis->GetXmin();
+    double xmax = axis->GetXmax();
+
+    MACH3LOG_DEBUG("Adding bin edges for {} equal to {:.4f}, {:.4f}",paramName, xmin, xmax);
+    // Insert into the map
+    ParamEdges[paramName] = std::make_pair(xmin, xmax);
+  }
+
   //KS: Multithreading here is very tempting but there are some issues with root that need to be resovled :(
-  for (int ik = 0; ik < nFiles;  ik++)
+  for (int ik = 1; ik < nFiles; ik++)
   {
     // Make the postfit
-    Processor[ik]->MakePostfit();
+    Processor[ik]->MakePostfit(ParamEdges);
     Processor[ik]->DrawPostfit();
   }
 
@@ -259,7 +296,7 @@ void MultipleProcessMCMC()
   Posterior->SetBottomMargin(0.1f);
   Posterior->SetTopMargin(0.05f);
   Posterior->SetRightMargin(0.03f);
-  Posterior->SetLeftMargin(0.10f);
+  Posterior->SetLeftMargin(0.15f);
 
   FileNames[0] = FileNames[0].substr(0, FileNames[0].find(".root")-1);
   TString canvasname = FileNames[0];
@@ -281,34 +318,30 @@ void MultipleProcessMCMC()
   for(int i = 0; i < Processor[0]->GetNParams(); ++i) 
   {
     // This holds the posterior density
-    std::vector<TH1D*> hpost(nFiles);
+    std::vector<std::unique_ptr<TH1D>> hpost(nFiles);
     std::vector<std::unique_ptr<TLine>> hpd(nFiles);
-    hpost[0] = static_cast<TH1D *>(Processor[0]->GetHpost(i)->Clone());
-
+    hpost[0] = M3::Clone(Processor[0]->GetHpost(i));
+    hpost[0]->GetYaxis()->SetTitle("Posterior Density");
     bool Skip = false;
     for (int ik = 1 ; ik < nFiles;  ik++)
     {
       // KS: If somehow this chain doesn't given params we skip it
       const int Index = Processor[ik]->GetParamIndexFromName(hpost[0]->GetTitle());
-      if(Index == _UNDEF_)
+      if(Index == M3::_BAD_INT_)
       {
         Skip = true;
         break;
       }
-      hpost[ik] = static_cast<TH1D *>(Processor[ik]->GetHpost(Index)->Clone());
+      hpost[ik] = M3::Clone(Processor[ik]->GetHpost(Index));
     }
 
     // Don't plot if this is a fixed histogram (i.e. the peak is the whole integral)
-    if(hpost[0]->GetMaximum() == hpost[0]->Integral()*1.5 || Skip)
-    {
-      for (int ik = 0; ik < nFiles;  ik++)
-        delete hpost[ik];
-
+    if(hpost[0]->GetMaximum() == hpost[0]->Integral()*1.5 || Skip) {
       continue;
     }
     for (int ik = 0; ik < nFiles;  ik++)
     {
-      RemoveFitter(hpost[ik], "Gauss");
+      RemoveFitter(hpost[ik].get(), "Gauss");
 
       // Set some nice colours
       hpost[ik]->SetLineColor(PosteriorColor[ik]);
@@ -316,7 +349,7 @@ void MultipleProcessMCMC()
       hpost[ik]->SetLineWidth(2);
 
       // Area normalise the distributions
-      hpost[ik]->Scale(1./hpost[ik]->Integral(), "width");
+      hpost[ik]->Scale(1./hpost[ik]->Integral());
     }
     TString Title;
     double Prior = 1.0;
@@ -331,7 +364,7 @@ void MultipleProcessMCMC()
     Asimov->SetLineStyle(kDashed);
 
     // Make a nice little TLegend
-    auto leg = std::make_unique<TLegend>(0.12, 0.7, 0.6, 0.97);
+    auto leg = std::make_unique<TLegend>(0.20, 0.7, 0.6, 0.97);
     leg->SetTextSize(0.03f);
     leg->SetFillColor(0);
     leg->SetFillStyle(0);
@@ -340,10 +373,10 @@ void MultipleProcessMCMC()
     TString asimovLeg = Form("#splitline{Prior}{x = %.2f , #sigma = %.2f}", Prior, PriorError);
     leg->AddEntry(Asimov.get(), asimovLeg, "l");
 
-    for (int ik = 0; ik < nFiles;  ik++)
+    for (int ik = 0; ik < nFiles; ik++)
     {
       TString rebinLeg = Form("#splitline{%s}{#mu = %.2f, #sigma = %.2f}", TitleNames[ik].c_str(), hpost[ik]->GetMean(), hpost[ik]->GetRMS());
-      leg->AddEntry(hpost[ik],  rebinLeg, "l");
+      leg->AddEntry(hpost[ik].get(),  rebinLeg, "l");
 
       hpd[ik] = std::make_unique<TLine>(hpost[ik]->GetBinCenter(hpost[ik]->GetMaximumBin()), hpost[ik]->GetMinimum(),
                                         hpost[ik]->GetBinCenter(hpost[ik]->GetMaximumBin()), hpost[ik]->GetMaximum());
@@ -354,19 +387,16 @@ void MultipleProcessMCMC()
 
     // Find the maximum value to nicely resize hist
     double maximum = 0;
-    for (int ik = 0; ik < nFiles;  ik++) maximum = std::max(maximum, hpost[ik]->GetMaximum());
-    for (int ik = 0; ik < nFiles;  ik++) hpost[ik]->SetMaximum(1.3*maximum);
+    for (int ik = 0; ik < nFiles; ik++) maximum = std::max(maximum, hpost[ik]->GetMaximum());
+    for (int ik = 0; ik < nFiles; ik++) hpost[ik]->SetMaximum(1.3*maximum);
 
     hpost[0]->Draw("hist");
-    for (int ik = 1; ik < nFiles;  ik++) hpost[ik]->Draw("hist same");
+    for (int ik = 1; ik < nFiles; ik++) hpost[ik]->Draw("hist same");
     Asimov->Draw("same");
-    for (int ik = 0; ik < nFiles;  ik++) hpd[ik]->Draw("same");
+    for (int ik = 0; ik < nFiles; ik++) hpd[ik]->Draw("same");
     leg->Draw("same");
     Posterior->cd();
     Posterior->Print(canvasname);
-    for (int ik = 0; ik < nFiles;  ik++) {
-      delete hpost[ik];
-    }
   }//End loop over parameters
     
   // Finally draw the parameter plot onto the PDF
@@ -382,8 +412,8 @@ void MultipleProcessMCMC()
   Posterior->Print(canvasname);
 }
 
-// KS: Calculate Bayes factor for a given hypothesis, most informative are those related to osc params. However, it make relative easy interpretation for switch dials
-void CalcBayesFactor(const std::unique_ptr<MCMCProcessor>& Processor)
+/// @brief KS: Calculate Bayes factor for a given hypothesis, most informative are those related to osc params. However, it make relative easy interpretation for switch dials
+void CalcBayesFactor(MCMCProcessor* Processor)
 {
   YAML::Node card_yaml = M3OpenConfig(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
@@ -403,7 +433,7 @@ void CalcBayesFactor(const std::unique_ptr<MCMCProcessor>& Processor)
   Processor->GetBayesFactor(ParNames, Model1Bounds, Model2Bounds, ModelNames);
 }
 
-void CalcSavageDickey(const std::unique_ptr<MCMCProcessor>& Processor)
+void CalcSavageDickey(MCMCProcessor* Processor)
 {
   YAML::Node card_yaml = M3OpenConfig(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
@@ -421,7 +451,7 @@ void CalcSavageDickey(const std::unique_ptr<MCMCProcessor>& Processor)
   Processor->GetSavageDickey(ParNames, EvaluationPoint, Bounds);
 }
 
-void CalcParameterEvolution(const std::unique_ptr<MCMCProcessor>& Processor)
+void CalcParameterEvolution(MCMCProcessor* Processor)
 {
   YAML::Node card_yaml = M3OpenConfig(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
@@ -436,7 +466,7 @@ void CalcParameterEvolution(const std::unique_ptr<MCMCProcessor>& Processor)
   Processor->ParameterEvolution(ParNames, Intervals);
 }
 
-void CalcBipolarPlot(const std::unique_ptr<MCMCProcessor>& Processor)
+void CalcBipolarPlot(MCMCProcessor* Processor)
 {
   YAML::Node card_yaml = M3OpenConfig(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
@@ -449,7 +479,7 @@ void CalcBipolarPlot(const std::unique_ptr<MCMCProcessor>& Processor)
   Processor->GetPolarPlot(ParNames);
 }
 
-void GetTrianglePlot(const std::unique_ptr<MCMCProcessor>& Processor) {
+void GetTrianglePlot(MCMCProcessor* Processor) {
   YAML::Node card_yaml = M3OpenConfig(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
 
@@ -469,7 +499,7 @@ void GetTrianglePlot(const std::unique_ptr<MCMCProcessor>& Processor) {
 }
 
 /// @brief KS: You validate stability of posterior covariance matrix, you set burn calc cov matrix increase burn calc again and compare. By performing such operation several hundred times we can check when matrix becomes stable
-void DiagnoseCovarianceMatrix(const std::unique_ptr<MCMCProcessor>& Processor, const std::string& inputFile)
+void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, const std::string& inputFile)
 {
   //Turn of plots from Processor
   Processor->SetPrintToPDF(false);
@@ -555,13 +585,13 @@ void DiagnoseCovarianceMatrix(const std::unique_ptr<MCMCProcessor>& Processor, c
       {
         if( std::fabs (CovarianceDiff->GetBinContent(j, i)) < 1.e-5 && std::fabs (CovariancePreviousHist->GetBinContent(j, i)) < 1.e-5)
         {
-          CovarianceDiff->SetBinContent(j, i, _UNDEF_);
-          CovariancePreviousHist->SetBinContent(j, i, _UNDEF_);
+          CovarianceDiff->SetBinContent(j, i, M3::_BAD_DOUBLE_);
+          CovariancePreviousHist->SetBinContent(j, i, M3::_BAD_DOUBLE_);
         }
         if( std::fabs (CorrelationDiff->GetBinContent(j, i)) < 1.e-5 && std::fabs (CorrelationPreviousHist->GetBinContent(j, i)) < 1.e-5)
         {
-          CorrelationDiff->SetBinContent(j, i, _UNDEF_);
-          CorrelationPreviousHist->SetBinContent(j, i, _UNDEF_);
+          CorrelationDiff->SetBinContent(j, i, M3::_BAD_DOUBLE_);
+          CorrelationPreviousHist->SetBinContent(j, i, M3::_BAD_DOUBLE_);
         }
       }
     }
@@ -644,7 +674,7 @@ void DiagnoseCovarianceMatrix(const std::unique_ptr<MCMCProcessor>& Processor, c
   if(CorrelationHist != nullptr)         delete CorrelationHist;
 }
 
-void ReweightPrior(const std::unique_ptr<MCMCProcessor>& Processor)
+void ReweightPrior(MCMCProcessor* Processor)
 {
   YAML::Node card_yaml = M3OpenConfig(config.c_str());
   YAML::Node Settings = card_yaml["ProcessMCMC"];
@@ -676,19 +706,19 @@ TH2D* TMatrixIntoTH2D(TMatrixDSym* Matrix, const std::string& title)
   return hMatrix;
 }
 
-//KS: Perform KS test to check if two posteriors for the same parameter came from the same distribution
+// KS: Perform KS test to check if two posteriors for the same parameter came from the same distribution
 void KolmogorovSmirnovTest(const std::vector<std::unique_ptr<MCMCProcessor>>& Processor,
                            const std::unique_ptr<TCanvas>& Posterior,
                            const TString& canvasname)
 {
-  const Color_t CumulativeColor[] = {kBlue-1, kRed, kGreen+2};
-  const Style_t CumulativeStyle[] = {kSolid, kDashed, kDotted};
+  constexpr Color_t CumulativeColor[] = {kBlue-1, kRed, kGreen+2};
+  constexpr Style_t CumulativeStyle[] = {kSolid, kDashed, kDotted};
 
   for(int i = 0; i < Processor[0]->GetNParams(); ++i) 
   {
     // This holds the posterior density
-    std::vector<TH1D*> hpost(nFiles);
-    std::vector<TH1D*> CumulativeDistribution(nFiles);
+    std::vector<std::unique_ptr<TH1D>> hpost(nFiles);
+    std::vector<std::unique_ptr<TH1D>> CumulativeDistribution(nFiles);
        
     TString Title;
     double Prior = 1.0;
@@ -704,22 +734,22 @@ void KolmogorovSmirnovTest(const std::vector<std::unique_ptr<MCMCProcessor>>& Pr
       {
         // KS: If somehow this chain doesn't given params we skip it
         Index = Processor[ik]->GetParamIndexFromName(hpost[0]->GetTitle());
-        if(Index == _UNDEF_)
+        if(Index == M3::_BAD_INT_)
         {
           Skip = true;
           break;
         }
       }
-      hpost[ik] = static_cast<TH1D*>(Processor[ik]->GetHpost(Index)->Clone());
-      CumulativeDistribution[ik] = static_cast<TH1D*>(Processor[ik]->GetHpost(Index)->Clone());
+      hpost[ik] = M3::Clone(Processor[ik]->GetHpost(Index));
+      CumulativeDistribution[ik] = M3::Clone(Processor[ik]->GetHpost(Index));
       CumulativeDistribution[ik]->Fill(0., 0.);
       CumulativeDistribution[ik]->Reset();
       CumulativeDistribution[ik]->SetMaximum(1.);
-      TString TempTittle = Title+" Kolmogorov Smirnov";
-      CumulativeDistribution[ik]->SetTitle(TempTittle);
+      TString TempTitle = Title+" Kolmogorov Smirnov";
+      CumulativeDistribution[ik]->SetTitle(TempTitle);
       
-      TempTittle = Title+" Value";
-      CumulativeDistribution[ik]->GetXaxis()->SetTitle(TempTittle);
+      TempTitle = Title+" Value";
+      CumulativeDistribution[ik]->GetXaxis()->SetTitle(TempTitle);
       CumulativeDistribution[ik]->GetYaxis()->SetTitle("Cumulative Probability");
       
       CumulativeDistribution[ik]->SetLineWidth(2);
@@ -728,13 +758,7 @@ void KolmogorovSmirnovTest(const std::vector<std::unique_ptr<MCMCProcessor>>& Pr
     }
 
     // Don't plot if this is a fixed histogram (i.e. the peak is the whole integral)
-    if(hpost[0]->GetMaximum() == hpost[0]->Integral()*1.5 || Skip)
-    {
-      for (int ik = 0; ik < nFiles;  ik++)
-      {
-        delete hpost[ik];
-        delete CumulativeDistribution[ik];
-      }
+    if(hpost[0]->GetMaximum() == hpost[0]->Integral()*1.5 || Skip) {
       continue;
     }
     
@@ -786,7 +810,7 @@ void KolmogorovSmirnovTest(const std::vector<std::unique_ptr<MCMCProcessor>>& Pr
     auto leg = std::make_unique<TLegend>(0.15, 0.7, 0.5, 0.90);
     leg->SetTextSize(0.04f);
     for (int ik = 0; ik < nFiles;  ik++)
-      leg->AddEntry(CumulativeDistribution[ik], TitleNames[ik].c_str(), "l");
+      leg->AddEntry(CumulativeDistribution[ik].get(), TitleNames[ik].c_str(), "l");
     for (int ik = 1; ik < nFiles;  ik++)
       leg->AddEntry(LineD[ik].get(), Form("#Delta D = %.4f", TestStatD[ik]), "l");
     
@@ -801,11 +825,5 @@ void KolmogorovSmirnovTest(const std::vector<std::unique_ptr<MCMCProcessor>>& Pr
       
     Posterior->cd();
     Posterior->Print(canvasname);
-    
-    for (int ik = 0; ik < nFiles;  ik++)
-    {
-      delete hpost[ik];
-      delete CumulativeDistribution[ik];
-    }
   } //End loop over parameter
 }

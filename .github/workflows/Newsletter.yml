@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the MaCh3 repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0  # Fetch all history including tags
           repository: mach3-software/MaCh3
@@ -30,7 +30,7 @@ jobs:
       - name: Get the current date
         run: |
           current_date=$(date +"%d/%m/%Y")
-          echo "current_date=${current_date}" >> $GITHUB_ENV
+          echo "current_date=${current_date}" >> "$GITHUB_ENV"
 
       - name: Get the most active author in the last week for MaCh3
         run: |
@@ -44,8 +44,28 @@ jobs:
           echo "maCh3_most_active_author_count=${COUNT}" >> "$GITHUB_ENV"
           echo "maCh3_most_active_author_name=${NAME}" >> "$GITHUB_ENV"
 
+      - name: Get number of PR last week
+        run: |
+          number_of_PR=$(GH_TOKEN=${{ secrets.GITHUB_TOKEN }} gh search prs --repo mach3-software/MaCh3 --created ">$(date -d '7 days ago' +%Y-%m-%d)" --limit 1000 --json number | jq '. | length')
+          echo "number_of_PR=${number_of_PR}" >> "$GITHUB_ENV"
+
+      - name: Get author with most PRs for MaCh3
+        run: |
+          most_active_pr_author_maCh3=$(GH_TOKEN=${{ secrets.GITHUB_TOKEN }} gh search prs \
+            --repo mach3-software/MaCh3 \
+            --created ">$(date -d '7 days ago' +%Y-%m-%d)" \
+            --limit 1000 --json author \
+            | jq -r '.[] | .author.login' \
+            | sort | uniq -c | sort -nr | head -n 1)
+
+          COUNT=$(echo "$most_active_pr_author_maCh3" | awk '{print $1}')
+          NAME=$(echo "$most_active_pr_author_maCh3" | awk '{$1=""; sub(/^ /, ""); print}')
+
+          echo "maCh3_most_active_pr_author_count=${COUNT}" >> "$GITHUB_ENV"
+          echo "maCh3_most_active_pr_author_name=${NAME}" >> "$GITHUB_ENV"
+
       - name: Checkout the MaCh3Tutorial repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0  # Fetch all history including tags
           repository: mach3-software/MaCh3Tutorial
@@ -76,8 +96,28 @@ jobs:
           echo "maCh3Tutorial_most_active_author_count=${COUNT}" >> "$GITHUB_ENV"
           echo "maCh3Tutorial_most_active_author_name=${NAME}" >> "$GITHUB_ENV"
 
+      - name: Get number of PR last week for MaCh3Tutorial
+        run: |
+          number_of_PR_tutorial=$(GH_TOKEN=${{ secrets.GITHUB_TOKEN }} gh search prs --repo mach3-software/MaCh3Tutorial --created ">$(date -d '7 days ago' +%Y-%m-%d)" --limit 1000 --json number | jq '. | length')
+          echo "number_of_PR_tutorial=${number_of_PR_tutorial}" >> "$GITHUB_ENV"
+
+      - name: Get the author with most PRs for MaCh3Tutorial (count and name)
+        run: |
+          tutorial_most_active_pr_author=$(GH_TOKEN=${{ secrets.GITHUB_TOKEN }} gh search prs \
+            --repo mach3-software/MaCh3Tutorial \
+            --created ">$(date -d '7 days ago' +%Y-%m-%d)" \
+            --limit 1000 --json author \
+            | jq -r '.[] | .author.login' \
+            | sort | uniq -c | sort -nr | head -n 1)
+
+          COUNT=$(echo "$tutorial_most_active_pr_author" | awk '{print $1}')
+          NAME=$(echo "$tutorial_most_active_pr_author" | awk '{$1=""; sub(/^ /, ""); print}')
+
+          echo "maCh3Tutorial_most_active_pr_author_count=${COUNT}" >> "$GITHUB_ENV"
+          echo "maCh3Tutorial_most_active_pr_author_name=${NAME}" >> "$GITHUB_ENV"
+
       - name: Checkout the MaCh3-PythonUtils repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0  # Fetch all history including tags
           repository: mach3-software/MaCh3-PythonUtils
@@ -108,12 +148,32 @@ jobs:
           echo "maCh3PythonUtils_most_active_author_count=${COUNT}" >> "$GITHUB_ENV"
           echo "maCh3PythonUtils_most_active_author_name=${NAME}" >> "$GITHUB_ENV"
 
+      - name: Get number of PR last week for MaCh3-PythonUtils
+        run: |
+          number_of_PR_python=$(GH_TOKEN=${{ secrets.GITHUB_TOKEN }} gh search prs --repo mach3-software/MaCh3-PythonUtils --created ">$(date -d '7 days ago' +%Y-%m-%d)" --limit 1000 --json number | jq '. | length')
+          echo "number_of_PR_python=${number_of_PR_python}" >> "$GITHUB_ENV"
+
+      - name: Get author with most PRs for MaCh3-PythonUtils
+        run: |
+          most_active_pr_author_python=$(GH_TOKEN=${{ secrets.GITHUB_TOKEN }} gh search prs \
+            --repo mach3-software/MaCh3-PythonUtils \
+            --created ">$(date -d '7 days ago' +%Y-%m-%d)" \
+            --limit 1000 --json author \
+            | jq -r '.[] | .author.login' \
+            | sort | uniq -c | sort -nr | head -n 1)
+
+          COUNT=$(echo "$most_active_pr_author_python" | awk '{print $1}')
+          NAME=$(echo "$most_active_pr_author_python" | awk '{$1=""; sub(/^ /, ""); print}')
+
+          echo "maCh3PythonUtils_most_active_pr_author_count=${COUNT}" >> "$GITHUB_ENV"
+          echo "maCh3PythonUtils_most_active_pr_author_name=${NAME}" >> "$GITHUB_ENV"
+
       - name: Create a new GitHub Discussion
         uses: abirismyname/create-discussion@v1.x
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          title: MaCh3 Newsletter - ${{ env.current_date }}
+          title: MaCh3 Newsletter 📰 - ${{ env.current_date }}
           body: |
             It's-a me, MaChio! Welcome to the newsletter.
 
@@ -124,18 +184,24 @@ jobs:
             - Total number of commits in the last week: ${{ env.commits_last_week }}
             - Most recent tag: ${{ env.latest_tag }}
             - Most active author in the last week: ${{ env.maCh3_most_active_author_name }} (Commits: ${{ env.maCh3_most_active_author_count }})
+            - Author with most PRs last week: ${{ env.maCh3_most_active_pr_author_name }} (PRs: ${{ env.maCh3_most_active_pr_author_count }})
+            - Number of PR last week is ${{ env.number_of_PR }}
 
             **MaCh3Tutorial Repository**
             - Total number of commits: ${{ env.tutorial_commit_count }}
             - Total number of commits in the last week: ${{ env.tutorial_commits_last_week }}
             - Most recent tag: ${{ env.tutorial_latest_tag }}
             - Most active author in the last week: ${{ env.maCh3Tutorial_most_active_author_name }} (Commits: ${{ env.maCh3Tutorial_most_active_author_count }})
+            - Author with most PRs last week: ${{ env.maCh3Tutorial_most_active_pr_author_name }} (PRs: ${{ env.maCh3Tutorial_most_active_pr_author_count }})
+            - Number of PR last week is ${{ env.number_of_PR_tutorial }}
 
             **MaCh3-PythonUtils Repository**
             - Total number of commits: ${{ env.python_utils_commit_count }}
             - Total number of commits in the last week: ${{ env.python_utils_commits_last_week }}
             - Most recent tag: ${{ env.python_utils_latest_tag }}
             - Most active author in the last week: ${{ env.maCh3PythonUtils_most_active_author_name }} (Commits: ${{ env.maCh3PythonUtils_most_active_author_count }})
+            - Author with most PRs last week: ${{ env.maCh3PythonUtils_most_active_pr_author_name }} (PRs: ${{ env.maCh3PythonUtils_most_active_pr_author_count }})
+            - Number of PR last week is ${{ env.number_of_PR_python }}
 
             Cheers,
             MaCh3-bot

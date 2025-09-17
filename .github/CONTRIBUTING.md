@@ -5,6 +5,10 @@ New features should be developed on branches in this repository with the branch 
 
 Please see [here](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) for more details
 
+We generally discourage fork-based development for anything beyond small changes (e.g., one-liners). This is to avoid situations where contributors develop large features in isolation and miss out on important upstream updates.
+
+If you’d like to contribute more extensively, please consider joining the organization. To request access, contact the [MaCh3 Admins](https://github.com/orgs/mach3-software/teams/mach3admin).
+
 ## Versioning of this package
 
 This package will follow this numbering convention for releases
@@ -36,6 +40,19 @@ CI heavily depends on the setup in the [MaCh3 Tutorial](https://github.com/mach3
 This process ensures that:
 - Breaking changes are properly registered.
 - The [MaCh3 Tutorial](https://github.com/mach3-software/MaCh3Tutorial) remains up-to-date.
+
+### Monitoring Jobs
+Some bots are tasked with weekly or long-term monitoring tasks.
+For example:
+- [Valgrind outputs](https://github.com/mach3-software/MaCh3/tree/gh-profiling) are updated on a weekly basis to track memory-related issues and visualize the CMake dependency graph.
+- [Benchmarking results](https://mach3-software.github.io/MaCh3Tutorial/) are stored and published periodically to monitor performance metrics over time.
+- [Profiling results](https://github.com/mach3-software/MaCh3Tutorial/tree/gh-benchmarks) are updated on a weekly basis to track performance bottlenecks across different execution eras. These tests are run separately for each Sample object, i.e., distinct runs are performed for Beam and ATM samples.
+- [Code-sanning results](https://github.com/mach3-software/MaCh3/security/code-scanning) is run on a weekly schedule to detect potential security vulnerabilities and code quality issues in the MaCh3 codebase. These scans are fully automated and rely on GitHub’s CodeQL engine, which performs static analysis across the repository.
+
+These outputs are primarily intended for expert developers. However, they **should still be regularly monitored** to identify:
+- Persistent memory leaks
+- Performance regressions
+- Issues in the CMake linking flow
 
 ## Doxygen
 When making comments try following Doxygen type of comments
@@ -201,3 +218,80 @@ Putting it all together might look like:
 
 This allows us to disable the diagnostic just for the relevant line.
 
+## C++ Standard
+As of May 2025, the minimum supported C++ standard for MaCh3 is **C++14**, although the codebase is compatible with newer standards such as **C++17** and beyond.
+These are often referred to collectively as *modern C++*.
+MaCh3 aims to use modern C++ features to encourage safer, cleaner, and more maintainable code.
+
+### Pointers
+Instead of using raw pointer
+```c++
+    Class* example = new Class;
+
+    // ... some code ...
+    delete example;
+```
+Use *std::unique_ptr* to manage memory automatically:
+```c++
+    auto example = std::make_unique<Class>();
+```
+This eliminates the need to manually delete the object and helps prevent memory leaks.
+
+### Dynamic Arrays
+Instead of manually managing dynamic arrays:
+
+```c++
+    double* example = new double[N];
+
+    // ... some code ...
+
+    delete[] example;
+```
+Use a *std::vector* to automatically manage the memory:
+```c++
+    std::vector<double> example(N);
+```
+### Use `nullptr` Instead of `NULL` or `0`
+
+Modern C++ introduces `nullptr` as a type-safe null pointer constant.
+Avoid legacy `NULL` or `0` which can lead to ambiguous or unsafe behavior.
+```c++
+    int* ptr = nullptr;
+
+    if (ptr == nullptr) {
+        std::cout << "Pointer is null." << std::endl;
+    }
+```
+### Casting
+
+Use `static_cast<T>(value)` instead of `(T)value` for type conversions.
+It makes the intent clear and avoids unsafe conversions allowed by C-style casts.
+```c++
+    double x = 3.14;
+    int y = static_cast<int>(x);
+```
+
+## Formatting
+To ensure a unified style in MaCh3 software you can use a clang-format file which has instructions about formatting code.
+```bash
+clang-format --assume-filename=/path/to/your/.clang-format=${MaCh3_ROOT}/../.clang-format blarb.cpp
+```
+Please see [here](https://clang.llvm.org/docs/ClangFormat.html) and [here](https://root.cern/contribute/coding_conventions/) for more details.
+
+## Code-style
+We want to try to make code more readable in general so please try to stick to using name style and conventions given in the google style guide [here](https://google.github.io/styleguide/cppguide.html). A few examples are given below:
+
+- When naming function please capitalise the first letter and use CamelCase.
+- For member variables try to use snake case
+- Don't unnecessarily abbreviate variable names for the sake of saving a few characters
+```c++
+void GetMyFaviouriteVariable();
+int my_name_member_variable;
+int parameter_counter; //Not par_count
+```
+
+Please note that a lot of this has not been followed in MaCh3 but we are trying to improve the coding style so please bare this in mind when contributing!
+
+## ROOT
+MaCh3 uses the CERN ROOT package for plotting and I/O operations. While MaCh3 does not require a specific ROOT version—ensuring compatibility across a wide range of scientific clusters used by different users—be aware that ROOT developers occasionally introduce bugs or breaking changes in new releases.
+To improve stability and portability, it is recommended to prefer standard C++ (STL) counterparts whenever possible.

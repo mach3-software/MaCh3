@@ -1,0 +1,848 @@
+#include "Parameters/ParameterHandlerGeneric.h"
+
+// ********************************************
+// ETA - YAML constructor
+// this will replace the root file constructor but let's keep it in
+// to do some validations
+ParameterHandlerGeneric::ParameterHandlerGeneric(const std::vector<std::string>& YAMLFile, std::string name, double threshold, int FirstPCA, int LastPCA)
+               : ParameterHandlerBase(YAMLFile, name, threshold, FirstPCA, LastPCA){
+// ********************************************
+  InitParametersTypeFromConfig();
+
+  //ETA - again this really doesn't need to be hear...
+  for (int i = 0; i < _fNumPar; i++)
+  {
+    // Sort out the print length
+    if(int(_fNames[i].length()) > PrintLength) PrintLength = int(_fNames[i].length());
+  } // end the for loop
+
+  MACH3LOG_DEBUG("Constructing instance of ParameterHandler");
+  InitParams();
+  // Print
+  Print();
+}
+
+// ********************************************
+void ParameterHandlerGeneric::InitParametersTypeFromConfig() {
+// ********************************************
+  _fSystToGlobalSystIndexMap.resize(SystType::kSystTypes);
+
+  _fParamType = std::vector<SystType>(_fNumPar);
+  _ParameterGroup = std::vector<std::string>(_fNumPar);
+
+  //KS: We know at most how params we expect so reserve memory for max possible params. Later we will shrink to size to not waste memory. Reserving means slightly faster loading and possible less memory fragmentation.
+  NormParams.reserve(_fNumPar);
+  SplineParams.reserve(_fNumPar);
+  FuncParams.reserve(_fNumPar);
+  OscParams.reserve(_fNumPar);
+
+  int i = 0;
+  unsigned int ParamCounter[SystType::kSystTypes] = {0};
+  //ETA - read in the systematics. Would be good to add in some checks to make sure
+  //that there are the correct number of entries i.e. are the _fNumPars for Names,
+  //PreFitValues etc etc.
+  for (auto const &param : _fYAMLDoc["Systematics"])
+  {
+    _ParameterGroup[i] = Get<std::string>(param["Systematic"]["ParameterGroup"], __FILE__ , __LINE__);
+
+    //Fill the map to get the correlations later as well
+    auto ParamType = Get<std::string>(param["Systematic"]["Type"], __FILE__ , __LINE__);
+    //Now load in variables for spline systematics only
+    if (ParamType.find(SystType_ToString(SystType::kSpline)) != std::string::npos)
+    {
+      //Set param type
+      _fParamType[i] = SystType::kSpline;
+      // Fill Spline info
+      SplineParams.push_back(GetSplineParameter(param["Systematic"], i));
+
+      if (param["Systematic"]["SplineInformation"]["SplineName"]) {
+        _fSplineNames.push_back(param["Systematic"]["SplineInformation"]["SplineName"].as<std::string>());
+      }
+
+      //Insert the mapping from the spline index i.e. the length of _fSplineNames etc
+      //to the Systematic index i.e. the counter for things like _fSampleID
+      _fSystToGlobalSystIndexMap[SystType::kSpline].insert(std::make_pair(ParamCounter[SystType::kSpline], i));
+      ParamCounter[SystType::kSpline]++;
+    } else if(param["Systematic"]["Type"].as<std::string>() == SystType_ToString(SystType::kNorm)) {
+      _fParamType[i] = SystType::kNorm;
+      NormParams.push_back(GetNormParameter(param["Systematic"], i));
+      _fSystToGlobalSystIndexMap[SystType::kNorm].insert(std::make_pair(ParamCounter[SystType::kNorm], i));
+      ParamCounter[SystType::kNorm]++;
+    } else if(param["Systematic"]["Type"].as<std::string>() == SystType_ToString(SystType::kFunc)){
+      _fParamType[i] = SystType::kFunc;
+      FuncParams.push_back(GetFunctionalParameters(param["Systematic"], i));
+      _fSystToGlobalSystIndexMap[SystType::kFunc].insert(std::make_pair(ParamCounter[SystType::kFunc], i));
+      ParamCounter[SystType::kFunc]++;
+    } else if(param["Systematic"]["Type"].as<std::string>() == SystType_ToString(SystType::kOsc)){
+      _fParamType[i] = SystType::kOsc;
+      OscParams.push_back(GetOscillationParameters(param["Systematic"], i));
+      _fSystToGlobalSystIndexMap[SystType::kOsc].insert(std::make_pair(ParamCounter[SystType::kOsc], i));
+      ParamCounter[SystType::kOsc]++;
+    } else{
+      MACH3LOG_ERROR("Given unrecognised systematic type: {}", param["Systematic"]["Type"].as<std::string>());
+      std::string expectedTypes = "Expecting ";
+      for (int s = 0; s < SystType::kSystTypes; ++s) {
+        if (s > 0) expectedTypes += ", ";
+        expectedTypes += SystType_ToString(static_cast<SystType>(s)) + "\"";
+      }
+      expectedTypes += ".";
+      MACH3LOG_ERROR(expectedTypes);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    i++;
+  } //end loop over params
+
+  //Add a sanity check,
+  if(_fSplineNames.size() != ParamCounter[SystType::kSpline]){
+    MACH3LOG_ERROR("_fSplineNames is of size {} but found {} spline parameters", _fSplineNames.size(), ParamCounter[SystType::kSpline]);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  //KS We resized them above to all params to fight memory fragmentation, now let's resize to fit only allocated memory to save RAM
+  NormParams.shrink_to_fit();
+  SplineParams.shrink_to_fit();
+  FuncParams.shrink_to_fit();
+  OscParams.shrink_to_fit();
+}
+
+// ********************************************
+ParameterHandlerGeneric::~ParameterHandlerGeneric() {
+// ********************************************
+  MACH3LOG_DEBUG("Deleting ParameterHandler");
+}
+
+// ********************************************
+// DB Grab the Spline Names for the relevant SampleName
+const std::vector<std::string> ParameterHandlerGeneric::GetSplineParsNamesFromSampleName(const std::string& SampleName) {
+// ********************************************
+  std::vector<std::string> returnVec;
+  for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
+    auto &SplineIndex = pair.first;
+    auto &SystIndex = pair.second;
+    if (AppliesToSample(SystIndex, SampleName)) { //If parameter applies to required Sample
+      returnVec.push_back(_fSplineNames.at(SplineIndex));
+    }
+  }
+  return returnVec;
+}
+
+// ********************************************
+const std::vector<SplineInterpolation> ParameterHandlerGeneric::GetSplineInterpolationFromSampleName(const std::string& SampleName) {
+// ********************************************
+  std::vector<SplineInterpolation> returnVec;
+  for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
+    auto &SplineIndex = pair.first;
+    auto &SystIndex = pair.second;
+
+    if (AppliesToSample(SystIndex, SampleName)) { //If parameter applies to required SampleID
+      returnVec.push_back(SplineParams.at(SplineIndex)._SplineInterpolationType);
+    }
+  }
+  return returnVec;
+}
+
+// ********************************************
+// DB Grab the Spline Modes for the relevant SampleName
+const std::vector< std::vector<int> > ParameterHandlerGeneric::GetSplineModeVecFromSampleName(const std::string& SampleName) {
+// ********************************************
+  std::vector< std::vector<int> > returnVec;
+  //Need a counter or something to correctly get the index in _fSplineModes since it's not of length nPars
+  //Should probably just make a std::map<std::string, int> for param name to FD spline index
+  for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
+    auto &SplineIndex = pair.first;
+    auto &SystIndex = pair.second;
+    if (AppliesToSample(SystIndex, SampleName)) { //If parameter applies to required SampleID
+      returnVec.push_back(SplineParams.at(SplineIndex)._fSplineModes);
+    }
+  }
+  return returnVec;
+}
+
+// ********************************************
+// Get Norm params
+NormParameter ParameterHandlerGeneric::GetNormParameter(const YAML::Node& param, const int Index) {
+// ********************************************
+  NormParameter norm;
+
+  GetBaseParameter(param, Index, norm);
+
+  /// ETA size 0 to mean apply to all
+  /// Ultimately all this information ends up in the @NormParams vector
+  norm.modes = GetFromManager<std::vector<int>>(param["Mode"], {}, __FILE__ , __LINE__);
+  norm.pdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavour"], {}, __FILE__ , __LINE__);
+  norm.preoscpdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavourUnosc"], {}, __FILE__ , __LINE__);
+  norm.targets = GetFromManager<std::vector<int>>(param["TargetNuclei"], {}, __FILE__ , __LINE__);
+
+  if(_fLowBound[Index] < 0.) {
+    MACH3LOG_ERROR("Normalisation Parameter {} ({}), has lower parameters bound which can go below 0 and is equal {}",
+                   GetParFancyName(Index), Index, _fLowBound[Index]);
+    MACH3LOG_ERROR("Normalisation parameters can't go bellow 0 as this is unphysical");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  int NumKinematicCuts = 0;
+  if(param["KinematicCuts"]) {
+    NumKinematicCuts = int(param["KinematicCuts"].size());
+
+    std::vector<std::string> TempKinematicStrings;
+    std::vector<std::vector<std::vector<double>>> TempKinematicBounds;
+    //First element of TempKinematicBounds is always -999, and size is then 3
+    for(int KinVar_i = 0 ; KinVar_i < NumKinematicCuts ; ++KinVar_i) {
+      //ETA: This is a bit messy, Kinematic cuts is a list of maps
+      for (YAML::const_iterator it = param["KinematicCuts"][KinVar_i].begin();it!=param["KinematicCuts"][KinVar_i].end();++it) {
+        TempKinematicStrings.push_back(it->first.as<std::string>());
+        TempKinematicBounds.push_back(Get2DBounds(it->second));
+      }
+      if(TempKinematicStrings.size() == 0) {
+        MACH3LOG_ERROR("Received a KinematicCuts node but couldn't read the contents (it's a list of single-element dictionaries (python) = map of pairs (C++))");
+        MACH3LOG_ERROR("For Param {}", norm.name);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+    }//KinVar_i
+    norm.KinematicVarStr = TempKinematicStrings;
+    norm.Selection = TempKinematicBounds;
+  }
+
+  //Next ones are kinematic bounds on where normalisation parameter should apply
+  //We set a bool to see if any bounds exist so we can short-circuit checking all of them every step
+  bool HasKinBounds = false;
+
+  if(norm.KinematicVarStr.size() > 0) HasKinBounds = true;
+
+  norm.hasKinBounds = HasKinBounds;
+  //End of kinematic bound checking
+
+  return norm;
+}
+
+// ********************************************
+// Get Base Param
+void ParameterHandlerGeneric::GetBaseParameter(const YAML::Node& param, const int Index, TypeParameterBase& Parameter) {
+// ********************************************
+  // KS: For now we don't use so avoid compilation error
+  (void) param;
+
+  Parameter.name = GetParFancyName(Index);
+
+  // Set the global parameter index of the normalisation parameter
+  Parameter.index = Index;
+}
+
+
+// ********************************************
+// Grab the global syst index for the relevant SampleName
+// i.e. get a vector of size nSplines where each entry is filled with the global syst number
+const std::vector<int> ParameterHandlerGeneric::GetGlobalSystIndexFromSampleName(const std::string& SampleName, const SystType Type) {
+// ********************************************
+  std::vector<int> returnVec;
+  for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
+    auto &SystIndex = pair.second;
+    if (AppliesToSample(SystIndex, SampleName)) { //If parameter applies to required SampleID
+      returnVec.push_back(SystIndex);
+    }
+  }
+  return returnVec;
+}
+
+// ********************************************
+// Grab the global syst index for the relevant SampleName
+// i.e. get a vector of size nSplines where each entry is filled with the global syst number
+const std::vector<int> ParameterHandlerGeneric::GetSystIndexFromSampleName(const std::string& SampleName,  const SystType Type) const {
+// ********************************************
+  std::vector<int> returnVec;
+  for (auto &pair : _fSystToGlobalSystIndexMap[Type]) {
+    auto &SplineIndex = pair.first;
+    auto &systIndex = pair.second;
+    if (AppliesToSample(systIndex, SampleName)) { //If parameter applies to required SampleID
+      returnVec.push_back(SplineIndex);
+    }
+  }
+  return returnVec;
+}
+
+// ********************************************
+// Get Norm params
+SplineParameter ParameterHandlerGeneric::GetSplineParameter(const YAML::Node& param, const int Index) {
+// ********************************************
+  SplineParameter Spline;
+
+  GetBaseParameter(param, Index, Spline);
+  //Now get the Spline interpolation type
+  if (param["SplineInformation"]["InterpolationType"]){
+    for(int InterpType = 0; InterpType < kSplineInterpolations ; ++InterpType){
+      if(param["SplineInformation"]["InterpolationType"].as<std::string>() == SplineInterpolation_ToString(SplineInterpolation(InterpType)))
+        Spline._SplineInterpolationType = SplineInterpolation(InterpType);
+    }
+  } else { //KS: By default use TSpline3
+    Spline._SplineInterpolationType = kTSpline3;
+  }
+  Spline._SplineKnotUpBound = GetFromManager<double>(param["SplineInformation"]["SplineKnotUpBound"], M3::DefSplineKnotUpBound, __FILE__ , __LINE__);
+  Spline._SplineKnotLowBound = GetFromManager<double>(param["SplineInformation"]["SplineKnotLowBound"], M3::DefSplineKnotLowBound, __FILE__ , __LINE__);
+
+  if(Spline._SplineKnotUpBound != M3::DefSplineKnotUpBound ||  Spline._SplineKnotLowBound != M3::DefSplineKnotLowBound) {
+    MACH3LOG_WARN("Spline knot capping enabled with bounds [{}, {}]. For reliable fits, consider modifying the input generation instead.",
+                  Spline._SplineKnotLowBound, Spline._SplineKnotUpBound);
+  }
+  //If there is no mode information given then this will be an empty vector
+  Spline._fSplineModes = GetFromManager(param["SplineInformation"]["Mode"], std::vector<int>(), __FILE__ , __LINE__);
+
+  return Spline;
+}
+
+// ********************************************
+// Get Func params
+FunctionalParameter ParameterHandlerGeneric::GetFunctionalParameters(const YAML::Node& param, const int Index) {
+// ********************************************
+  FunctionalParameter func;
+  GetBaseParameter(param, Index, func);
+
+  func.pdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavour"], std::vector<int>(), __FILE__ , __LINE__);
+  func.targets = GetFromManager<std::vector<int>>(param["TargetNuclei"], std::vector<int>(), __FILE__ , __LINE__);
+  func.modes = GetFromManager<std::vector<int>>(param["Mode"], std::vector<int>(), __FILE__ , __LINE__);
+  func.preoscpdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavourUnosc"], std::vector<int>(), __FILE__ , __LINE__);
+
+  // HH - Copied from GetXsecNorm
+  int NumKinematicCuts = 0;
+  if(param["KinematicCuts"]){
+
+    NumKinematicCuts = int(param["KinematicCuts"].size());
+
+    std::vector<std::string> TempKinematicStrings;
+    std::vector<std::vector<std::vector<double>>> TempKinematicBounds;
+    //First element of TempKinematicBounds is always -999, and size is then 3
+    for(int KinVar_i = 0 ; KinVar_i < NumKinematicCuts ; ++KinVar_i){
+      //ETA: This is a bit messy, Kinematic cuts is a list of maps
+      for (YAML::const_iterator it = param["KinematicCuts"][KinVar_i].begin();it!=param["KinematicCuts"][KinVar_i].end();++it) {
+        TempKinematicStrings.push_back(it->first.as<std::string>());
+        TempKinematicBounds.push_back(Get2DBounds(it->second));
+      }
+      if(TempKinematicStrings.size() == 0) {
+        MACH3LOG_ERROR("Received a KinematicCuts node but couldn't read the contents (it's a list of single-element dictionaries (python) = map of pairs (C++))");
+        MACH3LOG_ERROR("For Param {}", func.name);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+    }//KinVar_i
+    func.KinematicVarStr = TempKinematicStrings;
+    func.Selection = TempKinematicBounds;
+  }
+  func.valuePtr = RetPointer(Index);
+  return func;
+}
+
+// ********************************************
+// Get Osc params
+OscillationParameter ParameterHandlerGeneric::GetOscillationParameters(const YAML::Node& param, const int Index) {
+// ********************************************
+  OscillationParameter OscParamInfo;
+  GetBaseParameter(param, Index, OscParamInfo);
+
+  return OscParamInfo;
+}
+
+// ********************************************
+// HH: Grab the Functional parameters for the relevant SampleName
+const std::vector<FunctionalParameter> ParameterHandlerGeneric::GetFunctionalParametersFromSampleName(const std::string& SampleName) const {
+// ********************************************
+  return GetTypeParamsFromSampleName(_fSystToGlobalSystIndexMap[SystType::kFunc], FuncParams, SampleName);
+}
+
+// ********************************************
+// DB Grab the Normalisation parameters for the relevant SampleName
+const std::vector<NormParameter> ParameterHandlerGeneric::GetNormParsFromSampleName(const std::string& SampleName) const {
+// ********************************************
+  return GetTypeParamsFromSampleName(_fSystToGlobalSystIndexMap[SystType::kNorm], NormParams, SampleName);
+}
+
+// ********************************************
+// KS Grab the Spline parameters for the relevant SampleName
+const std::vector<SplineParameter> ParameterHandlerGeneric::GetSplineParsFromSampleName(const std::string& SampleName) const {
+// ********************************************
+  return GetTypeParamsFromSampleName(_fSystToGlobalSystIndexMap[SystType::kSpline], SplineParams, SampleName);
+}
+
+// ********************************************
+template<typename ParamT>
+std::vector<ParamT> ParameterHandlerGeneric::GetTypeParamsFromSampleName(const std::map<int, int>& indexMap, const std::vector<ParamT>& params, const std::string& SampleName) const {
+// ********************************************
+  std::vector<ParamT> returnVec;
+  for (const auto& pair : indexMap) {
+    const auto& localIndex = pair.first;
+    const auto& globalIndex = pair.second;
+    if (AppliesToSample(globalIndex, SampleName)) {
+      returnVec.push_back(params[localIndex]);
+    }
+  }
+  return returnVec;
+}
+
+// ********************************************
+// DB Grab the number of parameters for the relevant SampleName
+int ParameterHandlerGeneric::GetNumParamsFromSampleName(const std::string& SampleName, const SystType Type) {
+// ********************************************
+  int returnVal = 0;
+  IterateOverParams(SampleName,
+    [&](int i) { return GetParamType(i) == Type; }, // Filter condition
+    [&](int) { returnVal += 1; } // Action to perform if filter passes
+  );
+  return returnVal;
+}
+
+// ********************************************
+// DB Grab the parameter names for the relevant SampleName
+const std::vector<std::string> ParameterHandlerGeneric::GetParsNamesFromSampleName(const std::string& SampleName, const SystType Type) {
+// ********************************************
+  std::vector<std::string> returnVec;
+  IterateOverParams(SampleName,
+    [&](int i) { return GetParamType(i) == Type; }, // Filter condition
+    [&](int i) { returnVec.push_back(GetParFancyName(i)); } // Action to perform if filter passes
+  );
+  return returnVec;
+}
+
+// ********************************************
+// DB DB Grab the parameter indices for the relevant SampleName
+const std::vector<int> ParameterHandlerGeneric::GetParsIndexFromSampleName(const std::string& SampleName, const SystType Type) {
+// ********************************************
+  std::vector<int> returnVec;
+  IterateOverParams(SampleName,
+    [&](int i) { return GetParamType(i) == Type; }, // Filter condition
+    [&](int i) { returnVec.push_back(i); } // Action to perform if filter passes
+  );
+  return returnVec;
+}
+
+// ********************************************
+template <typename FilterFunc, typename ActionFunc>
+void ParameterHandlerGeneric::IterateOverParams(const std::string& SampleName, FilterFunc filter, ActionFunc action) {
+// ********************************************
+  for (int i = 0; i < _fNumPar; ++i) {
+    if ((AppliesToSample(i, SampleName)) && filter(i)) { // Common filter logic
+      action(i); // Specific action for each function
+    }
+  }
+}
+
+// ********************************************
+void ParameterHandlerGeneric::InitParams() {
+// ********************************************
+  for (int i = 0; i < _fNumPar; ++i) {
+    //ETA - set the name to be xsec_% as this is what ProcessorMCMC expects
+    _fNames[i] = "xsec_"+std::to_string(i);
+
+    // KS: Plenty
+    if(_fParamType[i] == kOsc){
+      _fNames[i] = _fFancyNames[i];
+
+      if(_ParameterGroup[i] != "Osc"){
+        MACH3LOG_ERROR("Parameter {}, is of type Oscillation but doesn't belong to Osc group", _fFancyNames[i]);
+        MACH3LOG_ERROR("It belongs to {} group", _ParameterGroup[i]);
+        throw MaCh3Exception(__FILE__ , __LINE__ );
+      }
+    }
+    // Set ParameterHandler parameters (Curr = current, Prop = proposed, Sigma = step)
+    _fCurrVal[i] = _fPreFitValue[i];
+    _fPropVal[i] = _fCurrVal[i];
+  }
+  Randomize();
+  //KS: Transfer the starting parameters to the PCA basis, you don't want to start with zero..
+  if (pca) {
+    PCAObj->SetInitialParameters(_fIndivStepScale);
+  }
+}
+
+// ********************************************
+// Print everything we know about the inputs we're Getting
+void ParameterHandlerGeneric::Print() {
+// ********************************************
+  MACH3LOG_INFO("#################################################");
+  MACH3LOG_INFO("Printing ParameterHandlerGeneric:");
+
+  PrintGlobablInfo();
+
+  PrintNormParams();
+
+  PrintSplineParams();
+
+  PrintFunctionalParams();
+
+  PrintOscillationParams();
+
+  PrintParameterGroups();
+
+  MACH3LOG_INFO("Finished");
+  MACH3LOG_INFO("#################################################");
+
+  CheckCorrectInitialisation();
+} // End
+
+// ********************************************
+void ParameterHandlerGeneric::PrintGlobablInfo() {
+// ********************************************
+  MACH3LOG_INFO("============================================================================================================================================================");
+  MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<20} {:2} {:<10}", "#", "|", "Name", "|", "Prior", "|", "Error", "|", "Lower", "|", "Upper", "|", "StepScale", "|", "SampleNames", "|", "Type");
+  MACH3LOG_INFO("------------------------------------------------------------------------------------------------------------------------------------------------------------");
+  for (int i = 0; i < GetNumParams(); i++) {
+    std::string ErrString = fmt::format("{:.2f}", _fError[i]);
+    std::string SampleNameString = "";
+    for (const auto& SampleName : _fSampleNames[i]) {
+      if (!SampleNameString.empty()) {
+        SampleNameString += ", ";
+      }
+      SampleNameString += SampleName;
+    }
+    MACH3LOG_INFO("{:<5} {:2} {:<40} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<10} {:2} {:<20} {:2} {:<10}", i, "|", GetParFancyName(i), "|", _fPreFitValue[i], "|", "+/- " + ErrString, "|", _fLowBound[i], "|", _fUpBound[i], "|", _fIndivStepScale[i], "|", SampleNameString, "|", SystType_ToString(_fParamType[i]));
+  }
+  MACH3LOG_INFO("============================================================================================================================================================");
+}
+
+// ********************************************
+void ParameterHandlerGeneric::PrintNormParams() {
+// ********************************************
+  // Output the normalisation parameters as a sanity check!
+  MACH3LOG_INFO("Normalisation parameters:  {}", NormParams.size());
+  if(_fSystToGlobalSystIndexMap[SystType::kNorm].size() == 0) return;
+
+  bool have_parameter_with_kin_bounds = false;
+
+  //KS: Consider making some class producing table..
+  MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┬────────────────────┬────────────────────┬────────────────────┐");
+  MACH3LOG_INFO("│{0:4}│{1:10}│{2:40}│{3:20}│{4:20}│{5:20}│", "#", "Global #", "Name", "Int. mode", "Target", "pdg");
+  MACH3LOG_INFO("├────┼──────────┼────────────────────────────────────────┼────────────────────┼────────────────────┼────────────────────┤");
+
+  for (unsigned int i = 0; i < NormParams.size(); ++i)
+  {
+    std::string intModeString;
+    for (unsigned int j = 0; j < NormParams[i].modes.size(); j++) {
+      intModeString += std::to_string(NormParams[i].modes[j]);
+      intModeString += " ";
+    }
+    if (NormParams[i].modes.empty()) intModeString += "all";
+
+    std::string targetString;
+    for (unsigned int j = 0; j < NormParams[i].targets.size(); j++) {
+      targetString += std::to_string(NormParams[i].targets[j]);
+      targetString += " ";
+    }
+    if (NormParams[i].targets.empty()) targetString += "all";
+
+    std::string pdgString;
+    for (unsigned int j = 0; j < NormParams[i].pdgs.size(); j++) {
+      pdgString += std::to_string(NormParams[i].pdgs[j]);
+      pdgString += " ";
+    }
+    if (NormParams[i].pdgs.empty()) pdgString += "all";
+
+    MACH3LOG_INFO("│{: <4}│{: <10}│{: <40}│{: <20}│{: <20}│{: <20}│", i, NormParams[i].index, NormParams[i].name, intModeString, targetString, pdgString);
+
+    if(NormParams[i].hasKinBounds) have_parameter_with_kin_bounds = true;
+  }
+  MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┴────────────────────┴────────────────────┴────────────────────┘");
+
+  if(have_parameter_with_kin_bounds) {
+    MACH3LOG_INFO("Normalisation parameters KinematicCuts information");
+    MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┬────────────────────┬────────────────────────────────────────┐");
+    MACH3LOG_INFO("│{0:4}│{1:10}│{2:40}│{3:20}│{4:40}│", "#", "Global #", "Name", "KinematicCut", "Value");
+    MACH3LOG_INFO("├────┼──────────┼────────────────────────────────────────┼────────────────────┼────────────────────────────────────────┤");
+    for (unsigned int i = 0; i < NormParams.size(); ++i)
+    {
+      //skip parameters with no KinematicCuts
+      if(!NormParams[i].hasKinBounds) continue;
+
+      const long unsigned int ncuts = NormParams[i].KinematicVarStr.size();
+      for(long unsigned int icut = 0; icut < ncuts; icut++) {
+        std::string kinematicCutValueString;
+        for(const auto & value : NormParams[i].Selection[icut]) {
+          for (const auto& v : value) {
+            kinematicCutValueString += fmt::format("{:.2f} ", v);
+          }
+        }
+        if(icut == 0)
+          MACH3LOG_INFO("│{: <4}│{: <10}│{: <40}│{: <20}│{: <40}│", i, NormParams[i].index, NormParams[i].name, NormParams[i].KinematicVarStr[icut], kinematicCutValueString);
+        else
+          MACH3LOG_INFO("│{: <4}│{: <10}│{: <40}│{: <20}│{: <40}│", "", "", "", NormParams[i].KinematicVarStr[icut], kinematicCutValueString);
+      }//icut
+    }//i
+    MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┴────────────────────┴────────────────────────────────────────┘");
+  }
+  else
+    MACH3LOG_INFO("No normalisation parameters have KinematicCuts defined");
+}
+
+// ********************************************
+void ParameterHandlerGeneric::PrintSplineParams() {
+// ********************************************
+  MACH3LOG_INFO("Spline parameters: {}", _fSystToGlobalSystIndexMap[SystType::kSpline].size());
+  if(_fSystToGlobalSystIndexMap[SystType::kSpline].size() == 0) return;
+  MACH3LOG_INFO("=====================================================================================================================================================================");
+  MACH3LOG_INFO("{:<4} {:<2} {:<40} {:<2} {:<40} {:<2} {:<20} {:<2} {:<20} {:<2} {:<20} {:<2}", "#", "|", "Name", "|", "Spline Name", "|", "Spline Interpolation", "|", "Low Knot Bound", "|", "Up Knot Bound", "|");
+  MACH3LOG_INFO("---------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+  for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
+    auto &SplineIndex = pair.first;
+    auto &GlobalIndex = pair.second;
+
+    MACH3LOG_INFO("{:<4} {:<2} {:<40} {:<2} {:<40} {:<2} {:<20} {:<2} {:<20} {:<2} {:<20} {:<2}",
+                  SplineIndex, "|", GetParFancyName(GlobalIndex), "|",
+                  _fSplineNames[SplineIndex], "|",
+                  SplineInterpolation_ToString(GetParSplineInterpolation(SplineIndex)), "|",
+                  GetParSplineKnotLowerBound(SplineIndex), "|",
+                  GetParSplineKnotUpperBound(SplineIndex), "|");
+  }
+  MACH3LOG_INFO("=====================================================================================================================================================================");
+}
+
+// ********************************************
+void ParameterHandlerGeneric::PrintFunctionalParams() {
+// ********************************************
+  MACH3LOG_INFO("Functional parameters: {}", _fSystToGlobalSystIndexMap[SystType::kFunc].size());
+  if(_fSystToGlobalSystIndexMap[SystType::kFunc].size() == 0) return;
+  MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┐");
+  MACH3LOG_INFO("│{0:4}│{1:10}│{2:40}│", "#", "Global #", "Name");
+  MACH3LOG_INFO("├────┼──────────┼────────────────────────────────────────┤");
+  for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kFunc]) {
+    auto &FuncIndex = pair.first;
+    auto &GlobalIndex = pair.second;
+    MACH3LOG_INFO("│{0:4}│{1:<10}│{2:40}│", std::to_string(FuncIndex), GlobalIndex, GetParFancyName(GlobalIndex));
+  }
+  MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┘");
+}
+
+// ********************************************
+void ParameterHandlerGeneric::PrintOscillationParams() {
+// ********************************************
+  MACH3LOG_INFO("Oscillation parameters: {}", _fSystToGlobalSystIndexMap[SystType::kOsc].size());
+  if(_fSystToGlobalSystIndexMap[SystType::kOsc].size() == 0) return;
+  MACH3LOG_INFO("┌────┬──────────┬────────────────────────────────────────┐");
+  MACH3LOG_INFO("│{0:4}│{1:10}│{2:40}│", "#", "Global #", "Name");
+  MACH3LOG_INFO("├────┼──────────┼────────────────────────────────────────┤");
+  for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kOsc]) {
+    auto &OscIndex = pair.first;
+    auto &GlobalIndex = pair.second;
+    MACH3LOG_INFO("│{0:4}│{1:<10}│{2:40}│", std::to_string(OscIndex), GlobalIndex, GetParFancyName(GlobalIndex));
+  }
+  MACH3LOG_INFO("└────┴──────────┴────────────────────────────────────────┘");
+}
+
+// ********************************************
+void ParameterHandlerGeneric::PrintParameterGroups() {
+// ********************************************
+  // KS: Create a map to store the counts of unique strings, in principle this could be in header file
+  std::unordered_map<std::string, int> paramCounts;
+
+  std::for_each(_ParameterGroup.begin(), _ParameterGroup.end(),
+                [&paramCounts](const std::string& param) {
+                  paramCounts[param]++;
+                });
+
+  MACH3LOG_INFO("Printing parameter groups");
+  // Output the counts
+  for (const auto& pair : paramCounts) {
+    MACH3LOG_INFO("Found {}: {} params", pair.second, pair.first);
+  }
+}
+
+// ********************************************
+std::vector<std::string> ParameterHandlerGeneric::GetUniqueParameterGroups() {
+// ********************************************
+  std::unordered_set<std::string> uniqueGroups;
+
+  // Fill the set with unique values
+  for (const auto& param : _ParameterGroup) {
+    uniqueGroups.insert(param);
+  }
+
+  // Convert to vector and return
+  std::vector<std::string> result(uniqueGroups.begin(), uniqueGroups.end());
+  return result;
+}
+
+// ********************************************
+// KS: Check if matrix is correctly initialised
+void ParameterHandlerGeneric::CheckCorrectInitialisation() {
+// ********************************************
+  // KS: Lambda Function which simply checks if there are no duplicates in std::vector
+  auto CheckForDuplicates = [](const std::vector<std::string>& names, const std::string& nameType) {
+    std::unordered_map<std::string, size_t> seenStrings;
+    for (size_t i = 0; i < names.size(); ++i) {
+      const auto& name = names[i];
+      if (seenStrings.find(name) != seenStrings.end()) {
+        size_t firstIndex = seenStrings[name];
+        MACH3LOG_CRITICAL("There are two systematics with the same {} '{}', first at index {}, and again at index {}", nameType, name, firstIndex, i);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+      seenStrings[name] = i;
+    }
+  };
+
+  // KS: Checks if there are no duplicates in fancy names etc, this can happen if we merge configs etc
+  CheckForDuplicates(_fFancyNames, "_fFancyNames");
+  CheckForDuplicates(_fSplineNames, "_fSplineNames");
+}
+
+// ********************************************
+// Function to set to prior parameters of a given group
+void ParameterHandlerGeneric::SetGroupOnlyParameters(const std::vector< std::string>& Groups) {
+// ********************************************
+  for(size_t i = 0; i < Groups.size(); i++){
+    SetGroupOnlyParameters(Groups[i]);
+  }
+}
+
+// ********************************************
+// Function to set to prior parameters of a given group
+void ParameterHandlerGeneric::SetGroupOnlyParameters(const std::string& Group, const std::vector<double>& Pars) {
+// ********************************************
+  // If empty, set the proposed to prior
+  if (Pars.empty()) {
+    for (int i = 0; i < _fNumPar; i++) {
+      if(IsParFromGroup(i, Group)) _fPropVal[i] = _fPreFitValue[i];
+    }
+  } else{
+    const size_t ExpectedSize = static_cast<size_t>(GetNumParFromGroup(Group));
+    if (Pars.size() != ExpectedSize) {
+      MACH3LOG_ERROR("Number of param in group {} is {}, while you passed {}", Group, ExpectedSize, Pars.size());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    int Counter = 0;
+    for (int i = 0; i < _fNumPar; i++) {
+      // If belongs to group set value from parsed vector, otherwise use propose value
+      if(IsParFromGroup(i, Group)){
+        _fPropVal[i] = Pars[Counter];
+        Counter++;
+      }
+    }
+  }
+  // And if pca make the transfer
+  if (pca) {
+    PCAObj->TransferToPCA();
+    PCAObj->TransferToParam();
+  }
+}
+
+// ********************************************
+// Checks if parameter belongs to a given group
+bool ParameterHandlerGeneric::IsParFromGroup(const int i, const std::string& Group) const {
+// ********************************************
+  std::string groupLower = Group;
+  std::string paramGroupLower = _ParameterGroup[i];
+
+  // KS: Convert both strings to lowercase, this way comparison will be case insensitive
+  std::transform(groupLower.begin(), groupLower.end(), groupLower.begin(), ::tolower);
+  std::transform(paramGroupLower.begin(), paramGroupLower.end(), paramGroupLower.begin(), ::tolower);
+
+  return groupLower == paramGroupLower;
+}
+
+// ********************************************
+int ParameterHandlerGeneric::GetNumParFromGroup(const std::string& Group) const {
+// ********************************************
+  int Counter = 0;
+  for (int i = 0; i < _fNumPar; i++) {
+    if(IsParFromGroup(i, Group)) Counter++;
+  }
+  return Counter;
+}
+
+// ********************************************
+// DB Grab the Normalisation parameters for the relevant sample name
+std::vector<const double*> ParameterHandlerGeneric::GetOscParsFromSampleName(const std::string& SampleName) {
+// ********************************************
+  std::vector<const double*> returnVec;
+  for (const auto& pair : _fSystToGlobalSystIndexMap[SystType::kOsc]) {
+    const auto& globalIndex = pair.second;
+    if (AppliesToSample(globalIndex, SampleName)) {
+      returnVec.push_back(RetPointer(globalIndex));
+    }
+  }
+  return returnVec;
+}
+
+// ********************************************
+// Dump Matrix to ROOT file, useful when we need to pass matrix info to another fitting group
+void ParameterHandlerGeneric::DumpMatrixToFile(const std::string& Name) {
+// ********************************************
+  TFile* outputFile = new TFile(Name.c_str(), "RECREATE");
+
+  TObjArray* xsec_param_names = new TObjArray();
+  TObjArray* xsec_spline_interpolation = new TObjArray();
+  TObjArray* xsec_spline_names = new TObjArray();
+
+  TVectorD* xsec_param_prior = new TVectorD(_fNumPar);
+  TVectorD* xsec_flat_prior = new TVectorD(_fNumPar);
+  TVectorD* xsec_stepscale = new TVectorD(_fNumPar);
+  TVectorD* xsec_param_lb = new TVectorD(_fNumPar);
+  TVectorD* xsec_param_ub = new TVectorD(_fNumPar);
+
+  TVectorD* xsec_param_knot_weight_lb = new TVectorD(_fNumPar);
+  TVectorD* xsec_param_knot_weight_ub = new TVectorD(_fNumPar);
+  TVectorD* xsec_error = new TVectorD(_fNumPar);
+
+  for(int i = 0; i < _fNumPar; ++i)
+  {
+    TObjString* nameObj = new TObjString(_fFancyNames[i].c_str());
+    xsec_param_names->AddLast(nameObj);
+
+    TObjString* splineType = new TObjString("TSpline3");
+    xsec_spline_interpolation->AddLast(splineType);
+
+    TObjString* splineName = new TObjString("");
+    xsec_spline_names->AddLast(splineName);
+
+    (*xsec_param_prior)[i] = _fPreFitValue[i];
+    (*xsec_flat_prior)[i] = _fFlatPrior[i];
+    (*xsec_stepscale)[i] = _fIndivStepScale[i];
+    (*xsec_error)[i] = _fError[i];
+
+    (*xsec_param_lb)[i] = _fLowBound[i];
+    (*xsec_param_ub)[i] = _fUpBound[i];
+
+    //Default values
+    (*xsec_param_knot_weight_lb)[i] = -9999;
+    (*xsec_param_knot_weight_ub)[i] = +9999;
+  }
+
+  for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
+    auto &SplineIndex = pair.first;
+    auto &SystIndex = pair.second;
+
+    (*xsec_param_knot_weight_lb)[SystIndex] = SplineParams.at(SplineIndex)._SplineKnotLowBound;
+    (*xsec_param_knot_weight_ub)[SystIndex] = SplineParams.at(SplineIndex)._SplineKnotUpBound;
+
+    TObjString* splineType = new TObjString(SplineInterpolation_ToString(SplineParams.at(SplineIndex)._SplineInterpolationType).c_str());
+    xsec_spline_interpolation->AddAt(splineType, SystIndex);
+
+    TObjString* splineName = new TObjString(_fSplineNames[SplineIndex].c_str());
+    xsec_spline_names->AddAt(splineName, SystIndex);
+  }
+  xsec_param_names->Write("xsec_param_names", TObject::kSingleKey);
+  delete xsec_param_names;
+  xsec_spline_interpolation->Write("xsec_spline_interpolation", TObject::kSingleKey);
+  delete xsec_spline_interpolation;
+  xsec_spline_names->Write("xsec_spline_names", TObject::kSingleKey);
+  delete xsec_spline_names;
+
+  xsec_param_prior->Write("xsec_param_prior");
+  delete xsec_param_prior;
+  xsec_flat_prior->Write("xsec_flat_prior");
+  delete xsec_flat_prior;
+  xsec_stepscale->Write("xsec_stepscale");
+  delete xsec_stepscale;
+  xsec_param_lb->Write("xsec_param_lb");
+  delete xsec_param_lb;
+  xsec_param_ub->Write("xsec_param_ub");
+  delete xsec_param_ub;
+
+  xsec_param_knot_weight_lb->Write("xsec_param_knot_weight_lb");
+  delete xsec_param_knot_weight_lb;
+  xsec_param_knot_weight_ub->Write("xsec_param_knot_weight_ub");
+  delete xsec_param_knot_weight_ub;
+  xsec_error->Write("xsec_error");
+  delete xsec_error;
+
+  covMatrix->Write("xsec_cov");
+  TH2D* CorrMatrix = GetCorrelationMatrix();
+  CorrMatrix->Write("hcov");
+  delete CorrMatrix;
+
+  outputFile->Close();
+  delete outputFile;
+
+  MACH3LOG_INFO("Finished dumping ParameterHandler object");
+}

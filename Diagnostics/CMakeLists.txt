@@ -8,6 +8,7 @@ foreach(app
     ProcessMCMC
     CombineMaCh3Chains
     PlotMCMCDiag
+    SmearChain
     ReweightMCMC
     )
     add_executable(${app} ${app}.cpp)

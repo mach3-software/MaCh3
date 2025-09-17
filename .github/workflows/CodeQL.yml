@@ -1,17 +1,22 @@
 # This scans MaCh3 and tries to find vulnerabilities
-
+# KS: Scan both CPU and GPU
 name: "CodeQL C++ Analysis"
-
 on:
   schedule:
-    - cron: '0 0 * * 0' # Every Sunday at midnight
+    - cron: '0 0 * * 1' # KS: Every Monday at midnight to not disturb during weekend...
 
 jobs:
   analyze:
     name: Analyze C++ Code with CodeQL
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        container: [
+          "ghcr.io/mach3-software/mach3:alma9latest",
+          "ghcr.io/mach3-software/mach3:rocky9cudalatest"
+        ]
     container:
-      image: ghcr.io/mach3-software/mach3:alma9latest
+      image: ${{ matrix.container }}
     permissions:
       security-events: write
       packages: read
@@ -19,13 +24,13 @@ jobs:
       contents: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: c-cpp
-          build: none  # Specify build none to skip any build steps
+          build-mode: manual
 
       - name: Build Code
         run: |
