@@ -239,8 +239,6 @@ public:
     {
       file.Close();
     }
-
-    _fileVec.clear();
   }
 
   // NO COPYING!

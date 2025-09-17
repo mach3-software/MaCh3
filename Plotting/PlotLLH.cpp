@@ -67,8 +67,7 @@ void getSplitSampleStack(int fileIdx, std::string parameterName, TH1D LLH_allSam
     LLH_indivSam->SetFillColor(TColor::GetColorPalette(
         floor(static_cast<float>(i) * TColor::GetNumberOfColors() / static_cast<float>(nSamples))));
     sampleStack->Add(LLH_indivSam);
-    splitSamplesLegend->AddEntry(LLH_indivSam, man->style().prettifySampleName(sampName).c_str(),
-                                 "lf");
+    splitSamplesLegend->AddEntry(LLH_indivSam, man->style().prettifySampleName(sampName).c_str(), "lf");
 
     float lastBinLLH = LLH_indivSam->GetBinContent(nBins);
     cumSum += lastBinLLH;
@@ -83,8 +82,7 @@ void getSplitSampleStack(int fileIdx, std::string parameterName, TH1D LLH_allSam
         (LLH_indivSam->Integral() / baselineLLH_main > sampleLabelThreshold))
     {
       drawLabel[i] = true;
-    } else
-    {
+    } else {
       drawLabel[i] = false;
     }
     MACH3LOG_DEBUG("    drawLabel = {}", drawLabel.back()); 
@@ -121,11 +119,15 @@ void drawRatioStack(THStack *ratioCompStack) {
   ratioCompStack->GetYaxis()->SetNdivisions(5, 2, 0);
 }
 
-void makeLLHScanComparisons(std::string paramName, std::string LLHType, std::string outputFileName,
-                            TCanvas *canv, TPad *LLHPad, TPad *ratioPad) {
+void makeLLHScanComparisons(const std::string& paramName,
+                            const std::string& LLHType,
+                            const std::string& outputFileName,
+                            const std::unique_ptr<TCanvas>& canv,
+                            const std::unique_ptr<TPad>& LLHPad,
+                            const std::unique_ptr<TPad>& ratioPad) {
   // will use these to make comparisons of likelihoods
-  THStack *compStack = new THStack("LLH_Stack", "");
-  THStack *ratioCompStack = new THStack("LLH_Ratio_Stack", "");
+  auto compStack = std::make_unique<THStack>("LLH_Stack", "");
+  auto ratioCompStack = std::make_unique<THStack>("LLH_Ratio_Stack", "");
   auto legend = std::make_unique<TLegend>(0.3, 0.6, 0.7, 0.8);
 
   // get the sample reweight hist from the main file
@@ -141,8 +143,13 @@ void makeLLHScanComparisons(std::string paramName, std::string LLHType, std::str
   // go through the other files
   for (unsigned int extraFileIdx = 1; extraFileIdx < man->input().getNInputFiles(); extraFileIdx++)
   {
+    int originalErrorLevel = gErrorIgnoreLevel;
+    gErrorIgnoreLevel = kFatal;
+
     TH1D *compHist = new TH1D(man->input().getLLHScan_TH1D(extraFileIdx, paramName, LLHType));
+    compHist->SetName(Form("LLHScan_%s_%s_%d", paramName.c_str(), LLHType.c_str(), extraFileIdx));
     compHist->SetBit(kCanDelete); // <- will allow this to be deleted by root once done plotting
+    gErrorIgnoreLevel = originalErrorLevel;
     if (compHist->GetNbinsX() == 0)
       continue;
 
@@ -192,7 +199,7 @@ void makeLLHScanComparisons(std::string paramName, std::string LLHType, std::str
     if (man->getDrawGrid())
       ratioPad->SetGrid();
 
-    drawRatioStack(ratioCompStack);
+    drawRatioStack(ratioCompStack.get());
 
     // add horizontal line at 1 for reference
     TLine line = TLine();
@@ -203,14 +210,13 @@ void makeLLHScanComparisons(std::string paramName, std::string LLHType, std::str
 
   // save to the output file
   canv->SaveAs(outputFileName.c_str());
-
-  // will use these to make comparisons of likelihoods
-  delete compStack;
-  delete ratioCompStack;
 }
 
-void makeSplitSampleLLHScanComparisons(std::string paramName, std::string outputFileName,
-                                       TCanvas *canv, TPad *LLHPad, TPad *ratioPad) {
+void makeSplitSampleLLHScanComparisons(const std::string& paramName,
+                                       const std::string& outputFileName,
+                                       const std::unique_ptr<TCanvas>& canv,
+                                       const std::unique_ptr<TPad>& LLHPad,
+                                       const std::unique_ptr<TPad>& ratioPad) {
   MACH3LOG_DEBUG(" Making split sample LLH comparison");
   canv->Clear();
   canv->Draw();
@@ -378,28 +384,26 @@ void makeSplitSampleLLHScanComparisons(std::string paramName, std::string output
 }
 
 int PlotLLH() {
-
   man->style().setPalette(man->getOption<std::string>("colorPalette"));
 
   // make the canvas and other plotting stuff
-  TCanvas *canv = new TCanvas("canv", "", 1024, 1024);
+  auto canv = std::make_unique<TCanvas>("canv", "", 1024, 1024);
   gStyle->SetOptTitle(2);
   // split up the canvas so can have side by side plots, one for each file
-  TCanvas *splitSamplesCanv = new TCanvas("splitSampCanv", "", 4096 * man->getNFiles(), 4096);
+  auto splitSamplesCanv = std::make_unique<TCanvas>("splitSampCanv", "", 4096 * man->getNFiles(), 4096);
 
   // split the canvas if plotting ratios
-  TPad *LLHPad, *ratioPad;
+  std::unique_ptr<TPad> LLHPad, ratioPad;
   if (man->getPlotRatios())
   {
-    LLHPad = new TPad("LLHPad", "LLHPad", 0.0, ratioPlotSplit, 1.0, 1.0);
+    LLHPad = std::make_unique<TPad>("LLHPad", "LLHPad", 0.0, ratioPlotSplit, 1.0, 1.0);
     LLHPad->SetBottomMargin(0.0);
-    ratioPad = new TPad("ratioPad", "ratioPad", 0.0, 0.0, 1.0, ratioPlotSplit);
+    ratioPad = std::make_unique<TPad>("ratioPad", "ratioPad", 0.0, 0.0, 1.0, ratioPlotSplit);
     ratioPad->SetTopMargin(0.0);
     ratioPad->SetBottomMargin(0.3);
-  } else
-  {
-    LLHPad = new TPad("AllSampPad", "AllSampPad", 0.0, 0.0, 1.0, 1.0);
-    ratioPad = new TPad("AllSampRatioPad", "AllSampRatioPad", 0.0, 0.0, 0.0, 0.0);
+  } else {
+    LLHPad = std::make_unique<TPad>("AllSampPad", "AllSampPad", 0.0, 0.0, 1.0, 1.0);
+    ratioPad = std::make_unique<TPad>("AllSampRatioPad", "AllSampRatioPad", 0.0, 0.0, 0.0, 0.0);
   }
 
   canv->SaveAs((man->getOutputName("_Sample") + "[").c_str());
@@ -441,9 +445,6 @@ int PlotLLH() {
   if (man->getSplitBySample())
     canv->SaveAs((man->getOutputName("_bySample") + "]").c_str());
 
-  delete LLHPad;
-  delete ratioPad;
-  delete canv;
   if(man != nullptr) delete man;
 
   return 0;
@@ -451,6 +452,7 @@ int PlotLLH() {
 
 int main(int argc, char **argv) {
   SetMaCh3LoggerFormat();
+  MaCh3Utils::MaCh3Welcome();
 
   man = new MaCh3Plotting::PlottingManager();
   man->parseInputs(argc, argv);
