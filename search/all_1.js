@@ -26,7 +26,7 @@ var searchData=
   ['addfile_23',['addFile',['../classMaCh3Plotting_1_1InputManager.html#a8f78dd7607191728f0a52bc27ade9af3',1,'MaCh3Plotting::InputManager']]],
   ['addnominal_24',['AddNominal',['../classSampleSummary.html#a8c870b718bccf37fc7f91b5201345f8e',1,'SampleSummary']]],
   ['addpath_25',['AddPath',['../namespaceM3.html#ad7693a9e309503bd894b04443f163f3c',1,'M3']]],
-  ['addsample_26',['AddSample',['../classBinnedSplineHandler.html#a2b0c0e2c12b4f762dce9e6579849c54c',1,'BinnedSplineHandler']]],
+  ['addsample_26',['AddSample',['../classBinnedSplineHandler.html#aa1eb83224262073a7ea324f288d80c35',1,'BinnedSplineHandler']]],
   ['addsamplehandler_27',['AddSampleHandler',['../classFitterBase.html#a136edf12d32b87320ed5440b02efdc43',1,'FitterBase']]],
   ['addsystobj_28',['AddSystObj',['../classFitterBase.html#a0c2f50da385ffc24db94a1b67880093c',1,'FitterBase']]],
   ['addthrow_29',['AddThrow',['../classSampleSummary.html#a10d0df830c319f3d8b76d2c3b85b4215',1,'SampleSummary']]],

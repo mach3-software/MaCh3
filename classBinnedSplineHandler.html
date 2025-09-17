@@ -118,50 +118,50 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a45e151624b2e80880299293fb2cc4673"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#a45e151624b2e80880299293fb2cc4673">Evaluate</a> () override</td></tr>
 <tr class="memdesc:a45e151624b2e80880299293fb2cc4673"><td class="mdescLeft">&#160;</td><td class="mdescRight">CW: This Eval should be used when using two separate x,{y,a,b,c,d} arrays to store the weights; probably the best one here! Same thing but pass parameter spline segments instead of variations.  <br /></td></tr>
 <tr class="separator:a45e151624b2e80880299293fb2cc4673"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2b0c0e2c12b4f762dce9e6579849c54c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#a2b0c0e2c12b4f762dce9e6579849c54c">AddSample</a> (const std::string &amp;SampleName, const std::string &amp;SampleTittle, const std::vector&lt; std::string &gt; &amp;OscChanFileNames, const std::vector&lt; std::string &gt; &amp;SplineVarNames)</td></tr>
-<tr class="memdesc:a2b0c0e2c12b4f762dce9e6579849c54c"><td class="mdescLeft">&#160;</td><td class="mdescRight">add oscillation channel to spline monolith  <br /></td></tr>
-<tr class="separator:a2b0c0e2c12b4f762dce9e6579849c54c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa1eb83224262073a7ea324f288d80c35"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#aa1eb83224262073a7ea324f288d80c35">AddSample</a> (const std::string &amp;SampleName, const std::string &amp;SampleTitle, const std::vector&lt; std::string &gt; &amp;OscChanFileNames, const std::vector&lt; std::string &gt; &amp;SplineVarNames)</td></tr>
+<tr class="memdesc:aa1eb83224262073a7ea324f288d80c35"><td class="mdescLeft">&#160;</td><td class="mdescRight">add oscillation channel to spline monolith  <br /></td></tr>
+<tr class="separator:aa1eb83224262073a7ea324f288d80c35"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aecb3c81a5a0f422eb2807a67afc8844d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#aecb3c81a5a0f422eb2807a67afc8844d">TransferToMonolith</a> ()</td></tr>
 <tr class="memdesc:aecb3c81a5a0f422eb2807a67afc8844d"><td class="mdescLeft">&#160;</td><td class="mdescRight">flatten multidimensional spline array into proper monolith  <br /></td></tr>
 <tr class="separator:aecb3c81a5a0f422eb2807a67afc8844d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2d7fe695a7924712cd9c8bfc262f2ff3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#a2d7fe695a7924712cd9c8bfc262f2ff3">cleanUpMemory</a> ()</td></tr>
 <tr class="memdesc:a2d7fe695a7924712cd9c8bfc262f2ff3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove setup variables not needed for spline evaluations.  <br /></td></tr>
 <tr class="separator:a2d7fe695a7924712cd9c8bfc262f2ff3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab0a3c3ffb452e9fca2407106f48f954e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#ab0a3c3ffb452e9fca2407106f48f954e">FillSampleArray</a> (std::string SampleTittle, std::vector&lt; std::string &gt; OscChanFileNames)</td></tr>
-<tr class="memdesc:ab0a3c3ffb452e9fca2407106f48f954e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loads and processes splines from ROOT files for a given sample.  <br /></td></tr>
-<tr class="separator:ab0a3c3ffb452e9fca2407106f48f954e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9a4621f7bc5aa24a97fca813018b86b4"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#a9a4621f7bc5aa24a97fca813018b86b4">FillSampleArray</a> (std::string SampleTitle, std::vector&lt; std::string &gt; OscChanFileNames)</td></tr>
+<tr class="memdesc:a9a4621f7bc5aa24a97fca813018b86b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loads and processes splines from ROOT files for a given sample.  <br /></td></tr>
+<tr class="separator:a9a4621f7bc5aa24a97fca813018b86b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a960a64e0a855d797d74d052764f5ea3a"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; int &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#a960a64e0a855d797d74d052764f5ea3a">StripDuplicatedModes</a> (const std::vector&lt; std::vector&lt; int &gt; &gt; &amp;InputVector)</td></tr>
 <tr class="memdesc:a960a64e0a855d797d74d052764f5ea3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if there are any repeated modes. This is used to reduce the number of modes in case many interaction modes get averaged into one spline.  <br /></td></tr>
 <tr class="separator:a960a64e0a855d797d74d052764f5ea3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adb7c6c41c76784e988407a399a900131"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; int &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#adb7c6c41c76784e988407a399a900131">GetEventSplines</a> (const std::string &amp;SampleTittle, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val)</td></tr>
-<tr class="memdesc:adb7c6c41c76784e988407a399a900131"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the splines which affect a given event.  <br /></td></tr>
-<tr class="separator:adb7c6c41c76784e988407a399a900131"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8f175eb0f4dd4639f3f4e3164d4b57ce"><td class="memItemLeft" align="right" valign="top">std::vector&lt; TAxis * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#a8f175eb0f4dd4639f3f4e3164d4b57ce">FindSplineBinning</a> (const std::string &amp;FileName, const std::string &amp;SampleTittle)</td></tr>
-<tr class="memdesc:a8f175eb0f4dd4639f3f4e3164d4b57ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Grab histograms with spline binning.  <br /></td></tr>
-<tr class="separator:a8f175eb0f4dd4639f3f4e3164d4b57ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e3cd817c57cfbce64d08db8854bbdc0"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; int &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#a7e3cd817c57cfbce64d08db8854bbdc0">GetEventSplines</a> (const std::string &amp;SampleTitle, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val)</td></tr>
+<tr class="memdesc:a7e3cd817c57cfbce64d08db8854bbdc0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the splines which affect a given event.  <br /></td></tr>
+<tr class="separator:a7e3cd817c57cfbce64d08db8854bbdc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa3cfd3c0730281791227f25f04c944ee"><td class="memItemLeft" align="right" valign="top">std::vector&lt; TAxis * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#aa3cfd3c0730281791227f25f04c944ee">FindSplineBinning</a> (const std::string &amp;FileName, const std::string &amp;SampleTitle)</td></tr>
+<tr class="memdesc:aa3cfd3c0730281791227f25f04c944ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Grab histograms with spline binning.  <br /></td></tr>
+<tr class="separator:aa3cfd3c0730281791227f25f04c944ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a19b93ef716d594de4b0266dd84580cfe"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#a19b93ef716d594de4b0266dd84580cfe">CountNumberOfLoadedSplines</a> (bool NonFlat=false, int Verbosity=0)</td></tr>
 <tr class="separator:a19b93ef716d594de4b0266dd84580cfe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0b8ef77922fdeddb085c3a9d0d1cb6c9"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#a0b8ef77922fdeddb085c3a9d0d1cb6c9">getDimLabel</a> (const int BinningOpt, const unsigned int Axis) const</td></tr>
 <tr class="separator:a0b8ef77922fdeddb085c3a9d0d1cb6c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a64f156f32a705b7758e5790cf9cfa4eb"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#a64f156f32a705b7758e5790cf9cfa4eb">GetSampleIndex</a> (const std::string &amp;SampleTittle) const</td></tr>
-<tr class="memdesc:a64f156f32a705b7758e5790cf9cfa4eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get index of sample based on name.  <br /></td></tr>
-<tr class="separator:a64f156f32a705b7758e5790cf9cfa4eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aabec2c420a0d4a0757e1d01bc3936618"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#aabec2c420a0d4a0757e1d01bc3936618">isValidSplineIndex</a> (const std::string &amp;SampleTittle, int iSyst, int iOscChan, int iMode, int iVar1, int iVar2, int iVar3)</td></tr>
-<tr class="memdesc:aabec2c420a0d4a0757e1d01bc3936618"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ensure we have spline for a given bin.  <br /></td></tr>
-<tr class="separator:aabec2c420a0d4a0757e1d01bc3936618"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a51189cf9b403e9be3e05d7a14b851bb2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#a51189cf9b403e9be3e05d7a14b851bb2">BuildSampleIndexingArray</a> (const std::string &amp;SampleTittle)</td></tr>
-<tr class="separator:a51189cf9b403e9be3e05d7a14b851bb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af4be12b4e410259ec60d311cdfeb1a99"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#af4be12b4e410259ec60d311cdfeb1a99">GetSampleIndex</a> (const std::string &amp;SampleTitle) const</td></tr>
+<tr class="memdesc:af4be12b4e410259ec60d311cdfeb1a99"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get index of sample based on name.  <br /></td></tr>
+<tr class="separator:af4be12b4e410259ec60d311cdfeb1a99"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab8cf7e65f7d3ff6e9a3b9dbabb389f42"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#ab8cf7e65f7d3ff6e9a3b9dbabb389f42">isValidSplineIndex</a> (const std::string &amp;SampleTitle, int iSyst, int iOscChan, int iMode, int iVar1, int iVar2, int iVar3)</td></tr>
+<tr class="memdesc:ab8cf7e65f7d3ff6e9a3b9dbabb389f42"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ensure we have spline for a given bin.  <br /></td></tr>
+<tr class="separator:ab8cf7e65f7d3ff6e9a3b9dbabb389f42"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9112bad5ade2818e33a969429db514cd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#a9112bad5ade2818e33a969429db514cd">BuildSampleIndexingArray</a> (const std::string &amp;SampleTitle)</td></tr>
+<tr class="separator:a9112bad5ade2818e33a969429db514cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3f82ff6646004c7030110aafabb52e8a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#a3f82ff6646004c7030110aafabb52e8a">PrepForReweight</a> ()</td></tr>
 <tr class="separator:a3f82ff6646004c7030110aafabb52e8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a05fd3d9253866f067ca3a184fa1ece06"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#a05fd3d9253866f067ca3a184fa1ece06">getSplineCoeff_SepMany</a> (int splineindex, <a class="el" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a> *&amp;xArray, <a class="el" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a> *&amp;manyArray)</td></tr>
 <tr class="separator:a05fd3d9253866f067ca3a184fa1ece06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a37c341f5f23957b0e928e617486842da"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#a37c341f5f23957b0e928e617486842da">PrintBinning</a> (TAxis *Axis) const</td></tr>
 <tr class="separator:a37c341f5f23957b0e928e617486842da"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af7be2c7fa836b4b2866294a949c272bf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#af7be2c7fa836b4b2866294a949c272bf">PrintSampleDetails</a> (const std::string &amp;SampleTittle) const</td></tr>
-<tr class="memdesc:af7be2c7fa836b4b2866294a949c272bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print info like Sample ID of spline params etc.  <br /></td></tr>
-<tr class="separator:af7be2c7fa836b4b2866294a949c272bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a711de7e5ab626c795dda3b92d6deb410"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#a711de7e5ab626c795dda3b92d6deb410">PrintArrayDetails</a> (const std::string &amp;SampleTittle) const</td></tr>
-<tr class="separator:a711de7e5ab626c795dda3b92d6deb410"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a61753ed3e44cda6fabb031fd8ef19e79"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#a61753ed3e44cda6fabb031fd8ef19e79">PrintSampleDetails</a> (const std::string &amp;SampleTitle) const</td></tr>
+<tr class="memdesc:a61753ed3e44cda6fabb031fd8ef19e79"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print info like Sample ID of spline params etc.  <br /></td></tr>
+<tr class="separator:a61753ed3e44cda6fabb031fd8ef19e79"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad580bcacf16ba7a69a3ed157ae598a5c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#ad580bcacf16ba7a69a3ed157ae598a5c">PrintArrayDetails</a> (const std::string &amp;SampleTitle) const</td></tr>
+<tr class="separator:ad580bcacf16ba7a69a3ed157ae598a5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a175a813d3de7089c2ea2af49ebc06c93"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#a175a813d3de7089c2ea2af49ebc06c93">retPointer</a> (const int sample, const int oscchan, const int syst, const int mode, const int var1bin, const int var2bin, const int var3bin) const</td></tr>
 <tr class="memdesc:a175a813d3de7089c2ea2af49ebc06c93"><td class="mdescLeft">&#160;</td><td class="mdescRight">get pointer to spline weight based on bin variables  <br /></td></tr>
 <tr class="separator:a175a813d3de7089c2ea2af49ebc06c93"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -500,8 +500,8 @@ Henry Wallace </dd></dl>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a2b0c0e2c12b4f762dce9e6579849c54c" name="a2b0c0e2c12b4f762dce9e6579849c54c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2b0c0e2c12b4f762dce9e6579849c54c">&#9670;&#160;</a></span>AddSample()</h2>
+<a id="aa1eb83224262073a7ea324f288d80c35" name="aa1eb83224262073a7ea324f288d80c35"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa1eb83224262073a7ea324f288d80c35">&#9670;&#160;</a></span>AddSample()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -516,7 +516,7 @@ Henry Wallace </dd></dl>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>SampleTittle</em>, </td>
+          <td class="paramname"><em>SampleTitle</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -543,7 +543,7 @@ Henry Wallace </dd></dl>
 <p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8cpp_source.html#l00067">67</a> of file <a class="el" href="BinnedSplineHandler_8cpp_source.html">BinnedSplineHandler.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   73</span>{</div>
 <div class="line"><span class="lineno">   74</span>  <a class="code hl_variable" href="classBinnedSplineHandler.html#ae66666026b08ba7f67c21c41b9c46f02">SampleNames</a>.push_back(SampleName);</div>
-<div class="line"><span class="lineno">   75</span>  <a class="code hl_variable" href="classBinnedSplineHandler.html#a60e27e7861b7f06b2d42aedb54b77d03">SampleTitles</a>.push_back(SampleTittle);</div>
+<div class="line"><span class="lineno">   75</span>  <a class="code hl_variable" href="classBinnedSplineHandler.html#a60e27e7861b7f06b2d42aedb54b77d03">SampleTitles</a>.push_back(SampleTitle);</div>
 <div class="line"><span class="lineno">   76</span>  <a class="code hl_variable" href="classBinnedSplineHandler.html#a8824387f90bd051b370bebd843691b83">Dimensions</a>.push_back(<span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(SplineVarNames.size()));</div>
 <div class="line"><span class="lineno">   77</span>  <a class="code hl_variable" href="classBinnedSplineHandler.html#aa3db668a55f3d3356f63cb055819b2b0">DimensionLabels</a>.push_back(SplineVarNames);</div>
 <div class="line"><span class="lineno">   78</span> </div>
@@ -572,41 +572,41 @@ Henry Wallace </dd></dl>
 <div class="line"><span class="lineno">  101</span>  <span class="keywordtype">int</span> nOscChan = int(OscChanFileNames.size());</div>
 <div class="line"><span class="lineno">  102</span>  <a class="code hl_variable" href="classBinnedSplineHandler.html#a54efbb1b4af41a83ef2c12599b0e4a92">nOscChans</a>.push_back(nOscChan);</div>
 <div class="line"><span class="lineno">  103</span> </div>
-<div class="line"><span class="lineno">  104</span>  <a class="code hl_function" href="classBinnedSplineHandler.html#af7be2c7fa836b4b2866294a949c272bf">PrintSampleDetails</a>(SampleTittle);</div>
+<div class="line"><span class="lineno">  104</span>  <a class="code hl_function" href="classBinnedSplineHandler.html#a61753ed3e44cda6fabb031fd8ef19e79">PrintSampleDetails</a>(SampleTitle);</div>
 <div class="line"><span class="lineno">  105</span> </div>
 <div class="line"><span class="lineno">  106</span>  std::vector&lt;std::vector&lt;TAxis *&gt;&gt; SampleBinning(nOscChan);</div>
 <div class="line"><span class="lineno">  107</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iOscChan = 0; iOscChan &lt; nOscChan; iOscChan++)</div>
 <div class="line"><span class="lineno">  108</span>  {</div>
-<div class="line"><span class="lineno">  109</span>    SampleBinning[iOscChan] = <a class="code hl_function" href="classBinnedSplineHandler.html#a8f175eb0f4dd4639f3f4e3164d4b57ce">FindSplineBinning</a>(OscChanFileNames[iOscChan], SampleTittle);</div>
+<div class="line"><span class="lineno">  109</span>    SampleBinning[iOscChan] = <a class="code hl_function" href="classBinnedSplineHandler.html#aa3cfd3c0730281791227f25f04c944ee">FindSplineBinning</a>(OscChanFileNames[iOscChan], SampleTitle);</div>
 <div class="line"><span class="lineno">  110</span>  }</div>
 <div class="line"><span class="lineno">  111</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;#----------------------------------------------------------------------------------------------------------------------------------#&quot;</span>);</div>
 <div class="line"><span class="lineno">  112</span>  <a class="code hl_variable" href="classBinnedSplineHandler.html#ab54b0bf1e1f45af6362300ead59a1b8b">SplineBinning</a>.push_back(SampleBinning);</div>
 <div class="line"><span class="lineno">  113</span> </div>
-<div class="line"><span class="lineno">  114</span>  <a class="code hl_function" href="classBinnedSplineHandler.html#a51189cf9b403e9be3e05d7a14b851bb2">BuildSampleIndexingArray</a>(SampleTittle);</div>
-<div class="line"><span class="lineno">  115</span>  <a class="code hl_function" href="classBinnedSplineHandler.html#a711de7e5ab626c795dda3b92d6deb410">PrintArrayDetails</a>(SampleTittle);</div>
+<div class="line"><span class="lineno">  114</span>  <a class="code hl_function" href="classBinnedSplineHandler.html#a9112bad5ade2818e33a969429db514cd">BuildSampleIndexingArray</a>(SampleTitle);</div>
+<div class="line"><span class="lineno">  115</span>  <a class="code hl_function" href="classBinnedSplineHandler.html#ad580bcacf16ba7a69a3ed157ae598a5c">PrintArrayDetails</a>(SampleTitle);</div>
 <div class="line"><span class="lineno">  116</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;#----------------------------------------------------------------------------------------------------------------------------------#&quot;</span>);</div>
 <div class="line"><span class="lineno">  117</span> </div>
-<div class="line"><span class="lineno">  118</span>  <a class="code hl_function" href="classBinnedSplineHandler.html#ab0a3c3ffb452e9fca2407106f48f954e">FillSampleArray</a>(SampleTittle, OscChanFileNames);</div>
+<div class="line"><span class="lineno">  118</span>  <a class="code hl_function" href="classBinnedSplineHandler.html#a9a4621f7bc5aa24a97fca813018b86b4">FillSampleArray</a>(SampleTitle, OscChanFileNames);</div>
 <div class="line"><span class="lineno">  119</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;#----------------------------------------------------------------------------------------------------------------------------------#&quot;</span>);</div>
 <div class="line"><span class="lineno">  120</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00023">MaCh3Logger.h:23</a></div></div>
 <div class="ttc" id="aclassBinnedSplineHandler_html_a26abd2a3fead4879ac1eb9c170658ba0"><div class="ttname"><a href="classBinnedSplineHandler.html#a26abd2a3fead4879ac1eb9c170658ba0">BinnedSplineHandler::SplineFileParPrefixNames</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; std::string &gt; &gt; SplineFileParPrefixNames</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00093">BinnedSplineHandler.h:93</a></div></div>
 <div class="ttc" id="aclassBinnedSplineHandler_html_a4dbb81c0f4c8641580a9f9dd4231c8b1"><div class="ttname"><a href="classBinnedSplineHandler.html#a4dbb81c0f4c8641580a9f9dd4231c8b1">BinnedSplineHandler::nSplineParams</a></div><div class="ttdeci">std::vector&lt; int &gt; nSplineParams</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00089">BinnedSplineHandler.h:89</a></div></div>
 <div class="ttc" id="aclassBinnedSplineHandler_html_a4fc9418367526011494eea1266da4b51"><div class="ttname"><a href="classBinnedSplineHandler.html#a4fc9418367526011494eea1266da4b51">BinnedSplineHandler::SplineModeVecs</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; std::vector&lt; int &gt; &gt; &gt; SplineModeVecs</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00097">BinnedSplineHandler.h:97</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_a51189cf9b403e9be3e05d7a14b851bb2"><div class="ttname"><a href="classBinnedSplineHandler.html#a51189cf9b403e9be3e05d7a14b851bb2">BinnedSplineHandler::BuildSampleIndexingArray</a></div><div class="ttdeci">void BuildSampleIndexingArray(const std::string &amp;SampleTittle)</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8cpp_source.html#l00350">BinnedSplineHandler.cpp:350</a></div></div>
 <div class="ttc" id="aclassBinnedSplineHandler_html_a54efbb1b4af41a83ef2c12599b0e4a92"><div class="ttname"><a href="classBinnedSplineHandler.html#a54efbb1b4af41a83ef2c12599b0e4a92">BinnedSplineHandler::nOscChans</a></div><div class="ttdeci">std::vector&lt; int &gt; nOscChans</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00090">BinnedSplineHandler.h:90</a></div></div>
 <div class="ttc" id="aclassBinnedSplineHandler_html_a60e27e7861b7f06b2d42aedb54b77d03"><div class="ttname"><a href="classBinnedSplineHandler.html#a60e27e7861b7f06b2d42aedb54b77d03">BinnedSplineHandler::SampleTitles</a></div><div class="ttdeci">std::vector&lt; std::string &gt; SampleTitles</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00086">BinnedSplineHandler.h:86</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_a711de7e5ab626c795dda3b92d6deb410"><div class="ttname"><a href="classBinnedSplineHandler.html#a711de7e5ab626c795dda3b92d6deb410">BinnedSplineHandler::PrintArrayDetails</a></div><div class="ttdeci">void PrintArrayDetails(const std::string &amp;SampleTittle) const</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8cpp_source.html#l00759">BinnedSplineHandler.cpp:759</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_a61753ed3e44cda6fabb031fd8ef19e79"><div class="ttname"><a href="classBinnedSplineHandler.html#a61753ed3e44cda6fabb031fd8ef19e79">BinnedSplineHandler::PrintSampleDetails</a></div><div class="ttdeci">void PrintSampleDetails(const std::string &amp;SampleTitle) const</div><div class="ttdoc">Print info like Sample ID of spline params etc.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8cpp_source.html#l00747">BinnedSplineHandler.cpp:747</a></div></div>
 <div class="ttc" id="aclassBinnedSplineHandler_html_a75583f3110d18b04557262520281503e"><div class="ttname"><a href="classBinnedSplineHandler.html#a75583f3110d18b04557262520281503e">BinnedSplineHandler::SplineInterpolationTypes</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; SplineInterpolation &gt; &gt; SplineInterpolationTypes</div><div class="ttdoc">spline interpolation types for each sample. These vectors are from a call to GetSplineInterpolationFr...</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00104">BinnedSplineHandler.h:104</a></div></div>
 <div class="ttc" id="aclassBinnedSplineHandler_html_a8824387f90bd051b370bebd843691b83"><div class="ttname"><a href="classBinnedSplineHandler.html#a8824387f90bd051b370bebd843691b83">BinnedSplineHandler::Dimensions</a></div><div class="ttdeci">std::vector&lt; int &gt; Dimensions</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00087">BinnedSplineHandler.h:87</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_a8f175eb0f4dd4639f3f4e3164d4b57ce"><div class="ttname"><a href="classBinnedSplineHandler.html#a8f175eb0f4dd4639f3f4e3164d4b57ce">BinnedSplineHandler::FindSplineBinning</a></div><div class="ttdeci">std::vector&lt; TAxis * &gt; FindSplineBinning(const std::string &amp;FileName, const std::string &amp;SampleTittle)</div><div class="ttdoc">Grab histograms with spline binning.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8cpp_source.html#l00382">BinnedSplineHandler.cpp:382</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_a9112bad5ade2818e33a969429db514cd"><div class="ttname"><a href="classBinnedSplineHandler.html#a9112bad5ade2818e33a969429db514cd">BinnedSplineHandler::BuildSampleIndexingArray</a></div><div class="ttdeci">void BuildSampleIndexingArray(const std::string &amp;SampleTitle)</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8cpp_source.html#l00350">BinnedSplineHandler.cpp:350</a></div></div>
 <div class="ttc" id="aclassBinnedSplineHandler_html_a960a64e0a855d797d74d052764f5ea3a"><div class="ttname"><a href="classBinnedSplineHandler.html#a960a64e0a855d797d74d052764f5ea3a">BinnedSplineHandler::StripDuplicatedModes</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; int &gt; &gt; StripDuplicatedModes(const std::vector&lt; std::vector&lt; int &gt; &gt; &amp;InputVector)</div><div class="ttdoc">Check if there are any repeated modes. This is used to reduce the number of modes in case many intera...</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8cpp_source.html#l00892">BinnedSplineHandler.cpp:892</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_a9a4621f7bc5aa24a97fca813018b86b4"><div class="ttname"><a href="classBinnedSplineHandler.html#a9a4621f7bc5aa24a97fca813018b86b4">BinnedSplineHandler::FillSampleArray</a></div><div class="ttdeci">virtual void FillSampleArray(std::string SampleTitle, std::vector&lt; std::string &gt; OscChanFileNames)</div><div class="ttdoc">Loads and processes splines from ROOT files for a given sample.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8cpp_source.html#l00927">BinnedSplineHandler.cpp:927</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_aa3cfd3c0730281791227f25f04c944ee"><div class="ttname"><a href="classBinnedSplineHandler.html#aa3cfd3c0730281791227f25f04c944ee">BinnedSplineHandler::FindSplineBinning</a></div><div class="ttdeci">std::vector&lt; TAxis * &gt; FindSplineBinning(const std::string &amp;FileName, const std::string &amp;SampleTitle)</div><div class="ttdoc">Grab histograms with spline binning.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8cpp_source.html#l00382">BinnedSplineHandler.cpp:382</a></div></div>
 <div class="ttc" id="aclassBinnedSplineHandler_html_aa3db668a55f3d3356f63cb055819b2b0"><div class="ttname"><a href="classBinnedSplineHandler.html#aa3db668a55f3d3356f63cb055819b2b0">BinnedSplineHandler::DimensionLabels</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; std::string &gt; &gt; DimensionLabels</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00088">BinnedSplineHandler.h:88</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_ab0a3c3ffb452e9fca2407106f48f954e"><div class="ttname"><a href="classBinnedSplineHandler.html#ab0a3c3ffb452e9fca2407106f48f954e">BinnedSplineHandler::FillSampleArray</a></div><div class="ttdeci">virtual void FillSampleArray(std::string SampleTittle, std::vector&lt; std::string &gt; OscChanFileNames)</div><div class="ttdoc">Loads and processes splines from ROOT files for a given sample.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8cpp_source.html#l00927">BinnedSplineHandler.cpp:927</a></div></div>
 <div class="ttc" id="aclassBinnedSplineHandler_html_ab54b0bf1e1f45af6362300ead59a1b8b"><div class="ttname"><a href="classBinnedSplineHandler.html#ab54b0bf1e1f45af6362300ead59a1b8b">BinnedSplineHandler::SplineBinning</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; std::vector&lt; TAxis * &gt; &gt; &gt; SplineBinning</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00092">BinnedSplineHandler.h:92</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_ad580bcacf16ba7a69a3ed157ae598a5c"><div class="ttname"><a href="classBinnedSplineHandler.html#ad580bcacf16ba7a69a3ed157ae598a5c">BinnedSplineHandler::PrintArrayDetails</a></div><div class="ttdeci">void PrintArrayDetails(const std::string &amp;SampleTitle) const</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8cpp_source.html#l00759">BinnedSplineHandler.cpp:759</a></div></div>
 <div class="ttc" id="aclassBinnedSplineHandler_html_ad7470dbc245ccb614f6f92159522b1cf"><div class="ttname"><a href="classBinnedSplineHandler.html#ad7470dbc245ccb614f6f92159522b1cf">BinnedSplineHandler::GlobalSystIndex</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; int &gt; &gt; GlobalSystIndex</div><div class="ttdoc">This holds the global spline index and is used to grab the current parameter value to evaluate spline...</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00101">BinnedSplineHandler.h:101</a></div></div>
 <div class="ttc" id="aclassBinnedSplineHandler_html_ae66666026b08ba7f67c21c41b9c46f02"><div class="ttname"><a href="classBinnedSplineHandler.html#ae66666026b08ba7f67c21c41b9c46f02">BinnedSplineHandler::SampleNames</a></div><div class="ttdeci">std::vector&lt; std::string &gt; SampleNames</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00085">BinnedSplineHandler.h:85</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_af7be2c7fa836b4b2866294a949c272bf"><div class="ttname"><a href="classBinnedSplineHandler.html#af7be2c7fa836b4b2866294a949c272bf">BinnedSplineHandler::PrintSampleDetails</a></div><div class="ttdeci">void PrintSampleDetails(const std::string &amp;SampleTittle) const</div><div class="ttdoc">Print info like Sample ID of spline params etc.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8cpp_source.html#l00747">BinnedSplineHandler.cpp:747</a></div></div>
 <div class="ttc" id="agroup__ParameterHandlerGetters_html_ga58ccccc2b9a4280021e4663202612038"><div class="ttname"><a href="group__ParameterHandlerGetters.html#ga58ccccc2b9a4280021e4663202612038">ParameterHandlerGeneric::GetGlobalSystIndexFromSampleName</a></div><div class="ttdeci">const std::vector&lt; int &gt; GetGlobalSystIndexFromSampleName(const std::string &amp;SampleName, const SystType Type)</div><div class="ttdoc">DB Get spline parameters depending on given SampleName.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8cpp_source.html#l00233">ParameterHandlerGeneric.cpp:233</a></div></div>
 <div class="ttc" id="agroup__ParameterHandlerGetters_html_ga9b25b6f2f2d032d086963293eeb981c4"><div class="ttname"><a href="group__ParameterHandlerGetters.html#ga9b25b6f2f2d032d086963293eeb981c4">ParameterHandlerGeneric::GetNumParamsFromSampleName</a></div><div class="ttdeci">int GetNumParamsFromSampleName(const std::string &amp;SampleName, const SystType Type)</div><div class="ttdoc">DB Grab the number of parameters for the relevant SampleName.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8cpp_source.html#l00378">ParameterHandlerGeneric.cpp:378</a></div></div>
 <div class="ttc" id="agroup__ParameterHandlerGetters_html_gadc9644bbd41005c36945bc9504ef91fd"><div class="ttname"><a href="group__ParameterHandlerGetters.html#gadc9644bbd41005c36945bc9504ef91fd">ParameterHandlerGeneric::GetSplineParsNamesFromSampleName</a></div><div class="ttdeci">const std::vector&lt; std::string &gt; GetSplineParsNamesFromSampleName(const std::string &amp;SampleName)</div><div class="ttdoc">DB Get spline parameters depending on given SampleName.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8cpp_source.html#l00115">ParameterHandlerGeneric.cpp:115</a></div></div>
@@ -615,8 +615,8 @@ Henry Wallace </dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a51189cf9b403e9be3e05d7a14b851bb2" name="a51189cf9b403e9be3e05d7a14b851bb2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a51189cf9b403e9be3e05d7a14b851bb2">&#9670;&#160;</a></span>BuildSampleIndexingArray()</h2>
+<a id="a9112bad5ade2818e33a969429db514cd" name="a9112bad5ade2818e33a969429db514cd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9112bad5ade2818e33a969429db514cd">&#9670;&#160;</a></span>BuildSampleIndexingArray()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -625,7 +625,7 @@ Henry Wallace </dd></dl>
           <td class="memname">void BinnedSplineHandler::BuildSampleIndexingArray </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>SampleTittle</em></td><td>)</td>
+          <td class="paramname"><em>SampleTitle</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -633,7 +633,7 @@ Henry Wallace </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8cpp_source.html#l00350">350</a> of file <a class="el" href="BinnedSplineHandler_8cpp_source.html">BinnedSplineHandler.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  352</span>{  </div>
-<div class="line"><span class="lineno">  353</span>  <span class="keywordtype">int</span> iSample = <a class="code hl_function" href="classBinnedSplineHandler.html#a64f156f32a705b7758e5790cf9cfa4eb">GetSampleIndex</a>(SampleTittle);</div>
+<div class="line"><span class="lineno">  353</span>  <span class="keywordtype">int</span> iSample = <a class="code hl_function" href="classBinnedSplineHandler.html#af4be12b4e410259ec60d311cdfeb1a99">GetSampleIndex</a>(SampleTitle);</div>
 <div class="line"><span class="lineno">  354</span>  <span class="keywordtype">int</span> nSplineSysts = <a class="code hl_variable" href="classBinnedSplineHandler.html#a4dbb81c0f4c8641580a9f9dd4231c8b1">nSplineParams</a>[iSample];</div>
 <div class="line"><span class="lineno">  355</span>  <span class="keywordtype">int</span> nOscChannels = <a class="code hl_variable" href="classBinnedSplineHandler.html#a54efbb1b4af41a83ef2c12599b0e4a92">nOscChans</a>[iSample];</div>
 <div class="line"><span class="lineno">  356</span> </div>
@@ -661,7 +661,7 @@ Henry Wallace </dd></dl>
 <div class="line"><span class="lineno">  378</span>  } <span class="comment">// end of iOscChan loop</span></div>
 <div class="line"><span class="lineno">  379</span>}</div>
 <div class="ttc" id="aclassBinnedSplineHandler_html_a1e0e6f58e9d7b67a4c4a20987f927ff8"><div class="ttname"><a href="classBinnedSplineHandler.html#a1e0e6f58e9d7b67a4c4a20987f927ff8">BinnedSplineHandler::indexvec</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; std::vector&lt; std::vector&lt; std::vector&lt; std::vector&lt; std::vector&lt; int &gt; &gt; &gt; &gt; &gt; &gt; &gt; indexvec</div><div class="ttdoc">Variables related to determined which modes have splines and which piggy-back of other modes.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00112">BinnedSplineHandler.h:112</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_a64f156f32a705b7758e5790cf9cfa4eb"><div class="ttname"><a href="classBinnedSplineHandler.html#a64f156f32a705b7758e5790cf9cfa4eb">BinnedSplineHandler::GetSampleIndex</a></div><div class="ttdeci">int GetSampleIndex(const std::string &amp;SampleTittle) const</div><div class="ttdoc">Get index of sample based on name.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8cpp_source.html#l00735">BinnedSplineHandler.cpp:735</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_af4be12b4e410259ec60d311cdfeb1a99"><div class="ttname"><a href="classBinnedSplineHandler.html#af4be12b4e410259ec60d311cdfeb1a99">BinnedSplineHandler::GetSampleIndex</a></div><div class="ttdeci">int GetSampleIndex(const std::string &amp;SampleTitle) const</div><div class="ttdoc">Get index of sample based on name.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8cpp_source.html#l00735">BinnedSplineHandler.cpp:735</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -828,7 +828,7 @@ Henry Wallace </dd></dl>
 <div class="line"><span class="lineno">  494</span>  { <span class="comment">// Loop over systematics</span></div>
 <div class="line"><span class="lineno">  495</span>    SampleCounter_NonFlat = 0;</div>
 <div class="line"><span class="lineno">  496</span>    SampleCounter_All = 0;</div>
-<div class="line"><span class="lineno">  497</span>    std::string SampleTittle = <a class="code hl_variable" href="classBinnedSplineHandler.html#a60e27e7861b7f06b2d42aedb54b77d03">SampleTitles</a>[iSample];</div>
+<div class="line"><span class="lineno">  497</span>    std::string SampleTitle = <a class="code hl_variable" href="classBinnedSplineHandler.html#a60e27e7861b7f06b2d42aedb54b77d03">SampleTitles</a>[iSample];</div>
 <div class="line"><span class="lineno">  498</span>    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> iOscChan = 0; iOscChan &lt; <a class="code hl_variable" href="classBinnedSplineHandler.html#a1e0e6f58e9d7b67a4c4a20987f927ff8">indexvec</a>[iSample].size(); iOscChan++)</div>
 <div class="line"><span class="lineno">  499</span>    { <span class="comment">// Loop over oscillation channels</span></div>
 <div class="line"><span class="lineno">  500</span>      <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> iSyst = 0; iSyst &lt; <a class="code hl_variable" href="classBinnedSplineHandler.html#a1e0e6f58e9d7b67a4c4a20987f927ff8">indexvec</a>[iSample][iOscChan].size(); iSyst++)</div>
@@ -841,7 +841,7 @@ Henry Wallace </dd></dl>
 <div class="line"><span class="lineno">  507</span>            { <span class="comment">// Loop over second dimension</span></div>
 <div class="line"><span class="lineno">  508</span>              <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> iVar3 = 0; iVar3 &lt; <a class="code hl_variable" href="classBinnedSplineHandler.html#a1e0e6f58e9d7b67a4c4a20987f927ff8">indexvec</a>[iSample][iOscChan][iSyst][iMode][iVar1][iVar2].size(); iVar3++)</div>
 <div class="line"><span class="lineno">  509</span>              { <span class="comment">// Loop over third dimension</span></div>
-<div class="line"><span class="lineno">  510</span>                <span class="keywordflow">if</span> (<a class="code hl_function" href="classBinnedSplineHandler.html#aabec2c420a0d4a0757e1d01bc3936618">isValidSplineIndex</a>(SampleTittle, iOscChan, iSyst, iMode, iVar1, iVar2, iVar3))</div>
+<div class="line"><span class="lineno">  510</span>                <span class="keywordflow">if</span> (<a class="code hl_function" href="classBinnedSplineHandler.html#ab8cf7e65f7d3ff6e9a3b9dbabb389f42">isValidSplineIndex</a>(SampleTitle, iOscChan, iSyst, iMode, iVar1, iVar2, iVar3))</div>
 <div class="line"><span class="lineno">  511</span>                {</div>
 <div class="line"><span class="lineno">  512</span>                  <span class="keywordtype">int</span> splineindex = <a class="code hl_variable" href="classBinnedSplineHandler.html#a1e0e6f58e9d7b67a4c4a20987f927ff8">indexvec</a>[iSample][iOscChan][iSyst][iMode][iVar1][iVar2][iVar3];</div>
 <div class="line"><span class="lineno">  513</span>                  <span class="keywordflow">if</span> (<a class="code hl_variable" href="classBinnedSplineHandler.html#ac029b5a9c5b3b11874f5f1ada5acc31f">splinevec_Monolith</a>[splineindex])</div>
@@ -875,7 +875,7 @@ Henry Wallace </dd></dl>
 <div class="line"><span class="lineno">  541</span>  }</div>
 <div class="line"><span class="lineno">  542</span>}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a4db4657acad5c79ac4bbb66a9d1c5905"><div class="ttname"><a href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a></div><div class="ttdeci">#define MACH3LOG_DEBUG</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00022">MaCh3Logger.h:22</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_aabec2c420a0d4a0757e1d01bc3936618"><div class="ttname"><a href="classBinnedSplineHandler.html#aabec2c420a0d4a0757e1d01bc3936618">BinnedSplineHandler::isValidSplineIndex</a></div><div class="ttdeci">bool isValidSplineIndex(const std::string &amp;SampleTittle, int iSyst, int iOscChan, int iMode, int iVar1, int iVar2, int iVar3)</div><div class="ttdoc">Ensure we have spline for a given bin.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8cpp_source.html#l00785">BinnedSplineHandler.cpp:785</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_ab8cf7e65f7d3ff6e9a3b9dbabb389f42"><div class="ttname"><a href="classBinnedSplineHandler.html#ab8cf7e65f7d3ff6e9a3b9dbabb389f42">BinnedSplineHandler::isValidSplineIndex</a></div><div class="ttdeci">bool isValidSplineIndex(const std::string &amp;SampleTitle, int iSyst, int iOscChan, int iMode, int iVar1, int iVar2, int iVar3)</div><div class="ttdoc">Ensure we have spline for a given bin.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8cpp_source.html#l00785">BinnedSplineHandler.cpp:785</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -925,8 +925,8 @@ Henry Wallace </dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="ab0a3c3ffb452e9fca2407106f48f954e" name="ab0a3c3ffb452e9fca2407106f48f954e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab0a3c3ffb452e9fca2407106f48f954e">&#9670;&#160;</a></span>FillSampleArray()</h2>
+<a id="a9a4621f7bc5aa24a97fca813018b86b4" name="a9a4621f7bc5aa24a97fca813018b86b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9a4621f7bc5aa24a97fca813018b86b4">&#9670;&#160;</a></span>FillSampleArray()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -938,7 +938,7 @@ Henry Wallace </dd></dl>
           <td class="memname">void BinnedSplineHandler::FillSampleArray </td>
           <td>(</td>
           <td class="paramtype">std::string&#160;</td>
-          <td class="paramname"><em>SampleTittle</em>, </td>
+          <td class="paramname"><em>SampleTitle</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -964,7 +964,7 @@ Henry Wallace </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8cpp_source.html#l00927">927</a> of file <a class="el" href="BinnedSplineHandler_8cpp_source.html">BinnedSplineHandler.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  928</span>{</div>
-<div class="line"><span class="lineno">  929</span>  <span class="keywordtype">int</span> iSample = <a class="code hl_function" href="classBinnedSplineHandler.html#a64f156f32a705b7758e5790cf9cfa4eb">GetSampleIndex</a>(SampleTittle);</div>
+<div class="line"><span class="lineno">  929</span>  <span class="keywordtype">int</span> iSample = <a class="code hl_function" href="classBinnedSplineHandler.html#af4be12b4e410259ec60d311cdfeb1a99">GetSampleIndex</a>(SampleTitle);</div>
 <div class="line"><span class="lineno">  930</span>  <span class="keywordtype">int</span> nOscChannels = <a class="code hl_variable" href="classBinnedSplineHandler.html#a54efbb1b4af41a83ef2c12599b0e4a92">nOscChans</a>[iSample];</div>
 <div class="line"><span class="lineno">  931</span>  </div>
 <div class="line"><span class="lineno">  932</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iOscChan = 0; iOscChan &lt; nOscChannels; iOscChan++) {</div>
@@ -1047,7 +1047,7 @@ Henry Wallace </dd></dl>
 <div class="line"><span class="lineno"> 1009</span> </div>
 <div class="line"><span class="lineno"> 1010</span>      mySpline = Key-&gt;ReadObject&lt;TSpline3&gt;();</div>
 <div class="line"><span class="lineno"> 1011</span> </div>
-<div class="line"><span class="lineno"> 1012</span>      <span class="keywordflow">if</span> (<a class="code hl_function" href="classBinnedSplineHandler.html#aabec2c420a0d4a0757e1d01bc3936618">isValidSplineIndex</a>(SampleTittle, iOscChan, SystNum, ModeNum, Var1Bin, Var2Bin, Var3Bin)) { <span class="comment">// loop over all the spline knots and check their value</span></div>
+<div class="line"><span class="lineno"> 1012</span>      <span class="keywordflow">if</span> (<a class="code hl_function" href="classBinnedSplineHandler.html#ab8cf7e65f7d3ff6e9a3b9dbabb389f42">isValidSplineIndex</a>(SampleTitle, iOscChan, SystNum, ModeNum, Var1Bin, Var2Bin, Var3Bin)) { <span class="comment">// loop over all the spline knots and check their value</span></div>
 <div class="line"><span class="lineno"> 1013</span>        <a class="code hl_define" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Pushed back monolith for spline {}&quot;</span>, FullSplineName);</div>
 <div class="line"><span class="lineno"> 1014</span>        <span class="comment">// if the value is 1 then set the flat bool to false</span></div>
 <div class="line"><span class="lineno"> 1015</span>        nKnots = mySpline-&gt;GetNp();</div>
@@ -1101,8 +1101,8 @@ Henry Wallace </dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a8f175eb0f4dd4639f3f4e3164d4b57ce" name="a8f175eb0f4dd4639f3f4e3164d4b57ce"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8f175eb0f4dd4639f3f4e3164d4b57ce">&#9670;&#160;</a></span>FindSplineBinning()</h2>
+<a id="aa3cfd3c0730281791227f25f04c944ee" name="aa3cfd3c0730281791227f25f04c944ee"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa3cfd3c0730281791227f25f04c944ee">&#9670;&#160;</a></span>FindSplineBinning()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1117,7 +1117,7 @@ Henry Wallace </dd></dl>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>SampleTittle</em>&#160;</td>
+          <td class="paramname"><em>SampleTitle</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1131,7 +1131,7 @@ Henry Wallace </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8cpp_source.html#l00382">382</a> of file <a class="el" href="BinnedSplineHandler_8cpp_source.html">BinnedSplineHandler.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  384</span>{</div>
-<div class="line"><span class="lineno">  385</span>  <span class="keywordtype">int</span> iSample = <a class="code hl_function" href="classBinnedSplineHandler.html#a64f156f32a705b7758e5790cf9cfa4eb">GetSampleIndex</a>(SampleTittle);</div>
+<div class="line"><span class="lineno">  385</span>  <span class="keywordtype">int</span> iSample = <a class="code hl_function" href="classBinnedSplineHandler.html#af4be12b4e410259ec60d311cdfeb1a99">GetSampleIndex</a>(SampleTitle);</div>
 <div class="line"><span class="lineno">  386</span> </div>
 <div class="line"><span class="lineno">  387</span>  <span class="comment">//Try declaring these outside of TFile so they aren&#39;t owned by File</span></div>
 <div class="line"><span class="lineno">  388</span>  <span class="keyword">constexpr</span> <span class="keywordtype">int</span> nDummyBins = 1;</div>
@@ -1272,8 +1272,8 @@ Henry Wallace </dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="adb7c6c41c76784e988407a399a900131" name="adb7c6c41c76784e988407a399a900131"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adb7c6c41c76784e988407a399a900131">&#9670;&#160;</a></span>GetEventSplines()</h2>
+<a id="a7e3cd817c57cfbce64d08db8854bbdc0" name="a7e3cd817c57cfbce64d08db8854bbdc0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e3cd817c57cfbce64d08db8854bbdc0">&#9670;&#160;</a></span>GetEventSplines()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1282,7 +1282,7 @@ Henry Wallace </dd></dl>
           <td class="memname">std::vector&lt; std::vector&lt; int &gt; &gt; BinnedSplineHandler::GetEventSplines </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>SampleTittle</em>, </td>
+          <td class="paramname"><em>SampleTitle</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1327,7 +1327,7 @@ Henry Wallace </dd></dl>
 <p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8cpp_source.html#l00836">836</a> of file <a class="el" href="BinnedSplineHandler_8cpp_source.html">BinnedSplineHandler.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  838</span>{</div>
 <div class="line"><span class="lineno">  839</span>  std::vector&lt;std::vector&lt;int&gt;&gt; ReturnVec;</div>
-<div class="line"><span class="lineno">  840</span>  <span class="keywordtype">int</span> SampleIndex = <a class="code hl_function" href="classBinnedSplineHandler.html#a64f156f32a705b7758e5790cf9cfa4eb">GetSampleIndex</a>(SampleTittle);</div>
+<div class="line"><span class="lineno">  840</span>  <span class="keywordtype">int</span> SampleIndex = <a class="code hl_function" href="classBinnedSplineHandler.html#af4be12b4e410259ec60d311cdfeb1a99">GetSampleIndex</a>(SampleTitle);</div>
 <div class="line"><span class="lineno">  841</span>  <span class="keywordtype">int</span> nSplineSysts = <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code hl_variable" href="classBinnedSplineHandler.html#a1e0e6f58e9d7b67a4c4a20987f927ff8">indexvec</a>[SampleIndex][iOscChan].size());</div>
 <div class="line"><span class="lineno">  842</span> </div>
 <div class="line"><span class="lineno">  843</span>  <span class="keywordtype">int</span> Mode = -1;</div>
@@ -1380,8 +1380,8 @@ Henry Wallace </dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a64f156f32a705b7758e5790cf9cfa4eb" name="a64f156f32a705b7758e5790cf9cfa4eb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a64f156f32a705b7758e5790cf9cfa4eb">&#9670;&#160;</a></span>GetSampleIndex()</h2>
+<a id="af4be12b4e410259ec60d311cdfeb1a99" name="af4be12b4e410259ec60d311cdfeb1a99"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af4be12b4e410259ec60d311cdfeb1a99">&#9670;&#160;</a></span>GetSampleIndex()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1390,7 +1390,7 @@ Henry Wallace </dd></dl>
           <td class="memname">int BinnedSplineHandler::GetSampleIndex </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>SampleTittle</em></td><td>)</td>
+          <td class="paramname"><em>SampleTitle</em></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
@@ -1405,14 +1405,14 @@ Henry Wallace </dd></dl>
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8cpp_source.html#l00735">735</a> of file <a class="el" href="BinnedSplineHandler_8cpp_source.html">BinnedSplineHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  735</span>                                                                          {</div>
+<div class="fragment"><div class="line"><span class="lineno">  735</span>                                                                         {</div>
 <div class="line"><span class="lineno">  736</span><span class="comment">//****************************************</span></div>
 <div class="line"><span class="lineno">  737</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> iSample = 0; iSample &lt; <a class="code hl_variable" href="classBinnedSplineHandler.html#a60e27e7861b7f06b2d42aedb54b77d03">SampleTitles</a>.size(); ++iSample) {</div>
-<div class="line"><span class="lineno">  738</span>    <span class="keywordflow">if</span> (SampleTittle == <a class="code hl_variable" href="classBinnedSplineHandler.html#a60e27e7861b7f06b2d42aedb54b77d03">SampleTitles</a>[iSample]) {</div>
+<div class="line"><span class="lineno">  738</span>    <span class="keywordflow">if</span> (SampleTitle == <a class="code hl_variable" href="classBinnedSplineHandler.html#a60e27e7861b7f06b2d42aedb54b77d03">SampleTitles</a>[iSample]) {</div>
 <div class="line"><span class="lineno">  739</span>      <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(iSample);</div>
 <div class="line"><span class="lineno">  740</span>    }</div>
 <div class="line"><span class="lineno">  741</span>  }</div>
-<div class="line"><span class="lineno">  742</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Sample name not found: {}&quot;</span>, SampleTittle);</div>
+<div class="line"><span class="lineno">  742</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Sample name not found: {}&quot;</span>, SampleTitle);</div>
 <div class="line"><span class="lineno">  743</span>  <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
 <div class="line"><span class="lineno">  744</span>}</div>
 </div><!-- fragment -->
@@ -1617,8 +1617,8 @@ Henry Wallace </dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="aabec2c420a0d4a0757e1d01bc3936618" name="aabec2c420a0d4a0757e1d01bc3936618"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aabec2c420a0d4a0757e1d01bc3936618">&#9670;&#160;</a></span>isValidSplineIndex()</h2>
+<a id="ab8cf7e65f7d3ff6e9a3b9dbabb389f42" name="ab8cf7e65f7d3ff6e9a3b9dbabb389f42"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab8cf7e65f7d3ff6e9a3b9dbabb389f42">&#9670;&#160;</a></span>isValidSplineIndex()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1627,7 +1627,7 @@ Henry Wallace </dd></dl>
           <td class="memname">bool BinnedSplineHandler::isValidSplineIndex </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>SampleTittle</em>, </td>
+          <td class="paramname"><em>SampleTitle</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1677,7 +1677,7 @@ Henry Wallace </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8cpp_source.html#l00785">785</a> of file <a class="el" href="BinnedSplineHandler_8cpp_source.html">BinnedSplineHandler.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  787</span>{</div>
-<div class="line"><span class="lineno">  788</span>  <span class="keywordtype">int</span> iSample = <a class="code hl_function" href="classBinnedSplineHandler.html#a64f156f32a705b7758e5790cf9cfa4eb">GetSampleIndex</a>(SampleTittle);</div>
+<div class="line"><span class="lineno">  788</span>  <span class="keywordtype">int</span> iSample = <a class="code hl_function" href="classBinnedSplineHandler.html#af4be12b4e410259ec60d311cdfeb1a99">GetSampleIndex</a>(SampleTitle);</div>
 <div class="line"><span class="lineno">  789</span>  <span class="keywordtype">bool</span> isValid = <span class="keyword">true</span>;</div>
 <div class="line"><span class="lineno">  790</span> </div>
 <div class="line"><span class="lineno">  791</span>  <span class="comment">// Lambda to check if an index is valid for a specific dimension</span></div>
@@ -2586,8 +2586,8 @@ Henry Wallace </dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a711de7e5ab626c795dda3b92d6deb410" name="a711de7e5ab626c795dda3b92d6deb410"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a711de7e5ab626c795dda3b92d6deb410">&#9670;&#160;</a></span>PrintArrayDetails()</h2>
+<a id="ad580bcacf16ba7a69a3ed157ae598a5c" name="ad580bcacf16ba7a69a3ed157ae598a5c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad580bcacf16ba7a69a3ed157ae598a5c">&#9670;&#160;</a></span>PrintArrayDetails()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2596,7 +2596,7 @@ Henry Wallace </dd></dl>
           <td class="memname">void BinnedSplineHandler::PrintArrayDetails </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>SampleTittle</em></td><td>)</td>
+          <td class="paramname"><em>SampleTitle</em></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
@@ -2604,9 +2604,9 @@ Henry Wallace </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8cpp_source.html#l00759">759</a> of file <a class="el" href="BinnedSplineHandler_8cpp_source.html">BinnedSplineHandler.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  761</span>{</div>
-<div class="line"><span class="lineno">  762</span>  <span class="keywordtype">int</span> iSample = <a class="code hl_function" href="classBinnedSplineHandler.html#a64f156f32a705b7758e5790cf9cfa4eb">GetSampleIndex</a>(SampleTittle);</div>
+<div class="line"><span class="lineno">  762</span>  <span class="keywordtype">int</span> iSample = <a class="code hl_function" href="classBinnedSplineHandler.html#af4be12b4e410259ec60d311cdfeb1a99">GetSampleIndex</a>(SampleTitle);</div>
 <div class="line"><span class="lineno">  763</span>  <span class="keywordtype">int</span> nOscChannels = int(<a class="code hl_variable" href="classBinnedSplineHandler.html#a1e0e6f58e9d7b67a4c4a20987f927ff8">indexvec</a>[iSample].<a class="code hl_variable" href="GetPenaltyTerm_8cpp.html#a439227feff9d7f55384e8780cfc2eb82">size</a>());</div>
-<div class="line"><span class="lineno">  764</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Sample {} has {} oscillation channels&quot;</span>, SampleTittle, nOscChannels);</div>
+<div class="line"><span class="lineno">  764</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Sample {} has {} oscillation channels&quot;</span>, SampleTitle, nOscChannels);</div>
 <div class="line"><span class="lineno">  765</span>  </div>
 <div class="line"><span class="lineno">  766</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iOscChan = 0; iOscChan &lt; nOscChannels; iOscChan++)</div>
 <div class="line"><span class="lineno">  767</span>  {</div>
@@ -2656,8 +2656,8 @@ Henry Wallace </dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="af7be2c7fa836b4b2866294a949c272bf" name="af7be2c7fa836b4b2866294a949c272bf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af7be2c7fa836b4b2866294a949c272bf">&#9670;&#160;</a></span>PrintSampleDetails()</h2>
+<a id="a61753ed3e44cda6fabb031fd8ef19e79" name="a61753ed3e44cda6fabb031fd8ef19e79"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a61753ed3e44cda6fabb031fd8ef19e79">&#9670;&#160;</a></span>PrintSampleDetails()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2666,7 +2666,7 @@ Henry Wallace </dd></dl>
           <td class="memname">void BinnedSplineHandler::PrintSampleDetails </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>SampleTittle</em></td><td>)</td>
+          <td class="paramname"><em>SampleTitle</em></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
@@ -2676,7 +2676,7 @@ Henry Wallace </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8cpp_source.html#l00747">747</a> of file <a class="el" href="BinnedSplineHandler_8cpp_source.html">BinnedSplineHandler.cpp</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  749</span>{</div>
-<div class="line"><span class="lineno">  750</span>  <span class="keyword">const</span> <span class="keywordtype">int</span> iSample = <a class="code hl_function" href="classBinnedSplineHandler.html#a64f156f32a705b7758e5790cf9cfa4eb">GetSampleIndex</a>(SampleTittle);</div>
+<div class="line"><span class="lineno">  750</span>  <span class="keyword">const</span> <span class="keywordtype">int</span> iSample = <a class="code hl_function" href="classBinnedSplineHandler.html#af4be12b4e410259ec60d311cdfeb1a99">GetSampleIndex</a>(SampleTitle);</div>
 <div class="line"><span class="lineno">  751</span> </div>
 <div class="line"><span class="lineno">  752</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Details about sample: {:&lt;20}&quot;</span>, <a class="code hl_variable" href="classBinnedSplineHandler.html#a60e27e7861b7f06b2d42aedb54b77d03">SampleTitles</a>[iSample]);</div>
 <div class="line"><span class="lineno">  753</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;\t Dimension: {:&lt;35}&quot;</span>, <a class="code hl_variable" href="classBinnedSplineHandler.html#a8824387f90bd051b370bebd843691b83">Dimensions</a>[iSample]);</div>

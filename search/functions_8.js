@@ -47,6 +47,6 @@ var searchData=
   ['isstepaccepted_44',['IsStepAccepted',['../classMCMCBase.html#a9b8aac7fa8691719347ae70a5fa20226',1,'MCMCBase']]],
   ['issubeventselected_45',['IsSubEventSelected',['../classSampleHandlerFD.html#aacc4d573b8e4569269b51ac325bc0092',1,'SampleHandlerFD']]],
   ['issubeventvarstring_46',['IsSubEventVarString',['../classSampleHandlerFD.html#ad14d9728400a7b87f095aca00761b829',1,'SampleHandlerFD']]],
-  ['isvalidsplineindex_47',['isValidSplineIndex',['../classBinnedSplineHandler.html#aabec2c420a0d4a0757e1d01bc3936618',1,'BinnedSplineHandler']]],
+  ['isvalidsplineindex_47',['isValidSplineIndex',['../classBinnedSplineHandler.html#ab8cf7e65f7d3ff6e9a3b9dbabb389f42',1,'BinnedSplineHandler']]],
   ['iterateoverparams_48',['IterateOverParams',['../classParameterHandlerGeneric.html#ae708dcd0bbfac4a5dd599a5c536da62b',1,'ParameterHandlerGeneric']]]
 ];
