@@ -148,6 +148,7 @@ inline double MatrixVectorMultiSingle(double** _restrict_ matrix, const double* 
 
 // *************************************
 /// @brief KS: Yaml emitter has problem and drops "", if you have special signs in you like * then there is problem. This bit hacky code adds these ""
+/// @param yamlStr The YAML string to be processed (modified in-place).
 inline void FixSampleNamesQuotes(std::string& yamlStr) {
 // *************************************
   std::stringstream input(yamlStr);
@@ -179,6 +180,10 @@ inline void FixSampleNamesQuotes(std::string& yamlStr) {
 
 // *************************************
 /// @brief KS: Add Tune values to YAML covariance matrix
+/// @param root The root YAML node to be updated.
+/// @param Values The values to add for the specified tune.
+/// @param Tune The name of the tune (e.g., "PostFit").
+/// @param FancyNames Optional list of fancy names to match systematics (must match Values size if provided).
 inline void AddTuneValues(YAML::Node& root,
                           const std::vector<double>& Values,
                           const std::string& Tune,
@@ -254,6 +259,12 @@ inline void AddTuneValues(YAML::Node& root,
 
 // *************************************
 /// @brief KS: Replace correlation matrix and tune values in YAML covariance matrix
+/// @param root The root YAML node to be updated.
+/// @param Values The new values for each systematic.
+/// @param Errors The new errors for each systematic.
+/// @param Correlation The new correlation matrix (must be square and match Values size).
+/// @param OutYAMLName The output filename for the updated YAML.
+/// @param FancyNames Optional list of fancy names to match systematics (must match Values size if provided).
 inline void MakeCorrelationMatrix(YAML::Node& root,
                                   const std::vector<double>& Values,
                                   const std::vector<double>& Errors,
@@ -311,6 +322,8 @@ inline void MakeCorrelationMatrix(YAML::Node& root,
       YAML::Node correlationsNode = YAML::Node(YAML::NodeType::Sequence);
       for (std::size_t j = 0; j < FancyNames.size(); ++j) {
         if (i == j) continue;
+        // KS: Skip if value close to 0
+        if (std::abs(Correlation[i][j]) < 1e-8) continue;
         YAML::Node singleEntry;
         singleEntry[FancyNames[j]] = MaCh3Utils::FormatDouble(Correlation[i][j], 4);
         correlationsNode.push_back(singleEntry);
@@ -337,6 +350,8 @@ inline void MakeCorrelationMatrix(YAML::Node& root,
       YAML::Node correlationsNode = YAML::Node(YAML::NodeType::Sequence);
       for (std::size_t j = 0; j < Correlation[i].size(); ++j) {
         if (i == j) continue;
+        // KS: Skip if value close to 0
+        if (std::abs(Correlation[i][j]) < 1e-8) continue;
         YAML::Node singleEntry;
         const std::string& otherName = systematics[j]["Systematic"]["Names"]["FancyName"].as<std::string>();
         singleEntry[otherName] = MaCh3Utils::FormatDouble(Correlation[i][j], 4);
