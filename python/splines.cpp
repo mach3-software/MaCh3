@@ -3,10 +3,10 @@
 #include <pybind11/stl.h>
 #include <pybind11/numpy.h>
 // MaCh3 includes
-#include "splines/SplineBase.h"
-#include "splines/SplineMonolith.h"
-#include "splines/SplineStructs.h"
-#include "samplePDF/Structs.h" // <- The spline stuff that's in here should really be moved to splineStructs.h but I ain't doing that right now
+#include "Splines/SplineBase.h"
+#include "Splines/SplineMonolith.h"
+#include "Splines/SplineStructs.h"
+#include "Samples/SampleStructs.h" // <- The spline stuff that's in here should really be moved to splineStructs.h but I ain't doing that right now
 // ROOT includes
 #include "TSpline.h"
 
@@ -15,7 +15,7 @@
 
 namespace py = pybind11;
 
-// As SplineBase is an abstract base class we have to do some gymnastics to get it to get it into python
+/// @brief EW: As SplineBase is an abstract base class we have to do some gymnastics to get it to get it into python
 class PySplineBase : public SplineBase {
 public:
     /* Inherit the constructors */
@@ -158,7 +158,7 @@ void initSplines(py::module &m){
                     for(uint i = 0; i < responseFns[0].size(); i++)
                     {
                         // ** WARNING **
-                        // Right now I'm only pushing back TSpline3_reds as thats all thats supported right now
+                        // Right now I'm only pushing back TSpline3_reds as that's all that's supported right now
                         // In the future there might be more
                         // I think what would be best to do would be to store the interpolation type somehow in the ResponseFunction objects
                         // then just read them here and pass through to the constructor

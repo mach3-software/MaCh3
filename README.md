@@ -19,6 +19,7 @@ likelihoods implemented.
 [![Code - Doxygen](https://img.shields.io/badge/Code-Doxygen-2ea44f)](https://mach3-software.github.io/MaCh3/index.html)
 [![Build CI](https://github.com/mach3-software/MaCh3/actions/workflows/CIBuild.yml/badge.svg)](https://github.com/mach3-software/MaCh3/actions/workflows/CIBuild.yml)
 [![CodeFactor](https://www.codefactor.io/repository/github/mach3-software/mach3/badge/develop)](https://www.codefactor.io/repository/github/mach3-software/mach3/overview/develop)
+
 ## Famous Plots
 Example of plots made using MaCh3 apparent in scientific publications, for more see [here](https://github.com/mach3-software/MaCh3/wiki/14.-MaCh3-in-the-Field)
 <img src="Doc/Plots/delta.png" alt="MaCh3" align="left" width="200"/>
@@ -26,6 +27,15 @@ Example of plots made using MaCh3 apparent in scientific publications, for more 
 
 ## Cite
 When using MaCh3 you must cite our doi from Zenodo. The bibtex file can be found by exporting the citation from this link: [on Zenodo](https://zenodo.org/records/7608367) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7608367.svg)](https://doi.org/10.5281/zenodo.7608367).
+
+## Help and Guidelines 📄
+- [Tutorial](https://github.com/mach3-software/MaCh3Tutorial)
+- [Indico](https://indico.global/category/1289/) If you need a password, please reach out to MaCh3-leadership for access.
+- [How to contribute](https://github.com/mach3-software/MaCh3/blob/develop/.github/CONTRIBUTING.md)
+- [Wiki](https://github.com/mach3-software/MaCh3/wiki)
+- [Slack](https://t2k-experiment.slack.com/archives/C06EM0C6D7W/p1705599931356889)
+- [Discussions](https://github.com/mach3-software/MaCh3/discussions)
+- [Benchmark](https://mach3-software.github.io/MaCh3Tutorial/)
 
 ## How to Compile
 MaCh3 follows standard cmake pattern. By default you should get most optimal build setting although below we list many configurable options:
@@ -63,7 +73,7 @@ target_link_libraries(blarb MaCh3::All)
 
 Some functionalities rely on setting `Env{MACH3}` which should point to path experiment specific MaCh3. This way MaCh3 can easily find `Env{MACH3}/inputs/SomeInput.root` for example.
 
-## Python
+## Python 🐍
 
 MaCh3 has an optional python interface (pyMaCh3) which provides much of the same functionality as the c++ interface (see [here](https://mach3-software.github.io/MaCh3/pyMaCh3/mainpage.html) for documentation).
 
@@ -124,11 +134,12 @@ For example, you can use NuFast for beam samples and CUDAProb3 for atmospheric s
 ## Fitting algorithms
 The following fitting algorithms are available:
 
-| Algorithm  | Reference        |Need Ext Lib  |
-|------------|------------------|--------------|
-| MR2T2      | [Ref](https://doi.org/10.1063/1.1699114)       | No       |
-| MINUIT2    | [Ref](https://cds.cern.ch/record/2296388/)     | Yes      |
-| PSO        | [Ref](https://doi.org/10.1162/EVCO_r_00180)    | No       |
+| Algorithm    | Reference        |Need Ext Lib  |
+|--------------|------------------|--------------|
+| MR2T2        | [Ref](https://doi.org/10.1063/1.1699114)          | No       |
+| DelayedMR2T2 | [Ref](https://doi.org/10.1007/s11222-006-9438-0)  | No       |
+| MINUIT2      | [Ref](https://cds.cern.ch/record/2296388/)        | Yes      |
+| PSO          | [Ref](https://doi.org/10.1162/EVCO_r_00180)       | No       |
 
 ## Debug
 Several debugging options are available which are heavy for RAM and performance and, therefore not used by default. To enable it:
@@ -140,6 +151,23 @@ There are several debug modes, to enable more detailed but very heavy specific d
 ```bash
 cmake ../ -DMaCh3_DEBUG_ENABLED=<ON,OFF> -DDEBUG_LEVEL=<1,2,3>
 ```
+## Logger
+Several logging options are available. By default, MaCh3 uses `INFO` level logging.
+You can enable more verbose logging by specifying the desired level during configuration:
+```bash
+cmake ../ -DLOG_LEVEL="TRACE"
+```
+You can find more [here](https://github.com/mach3-software/MaCh3/blob/develop/cmake/Modules/Logger.cmake).
+
+## Other CMake Options
+
+| Option                               | Meaning                                                                         |
+| ------                               | -------                                                                         |
+| `MaCh3_NATIVE_ENABLED`               | Enables native CPU optimizations for improved performance. Not recommended on clusters with multiple CPU configurations due to potential compatibility issues.   |
+| `MaCh3_NuOsc_GPU_ENABLED`            | By default MaCh3 will use NuOscillator with GPU if MaCh3 is compiled with GPU, this flag allows disabling GPU for NuOscillator even if MaCh3 has GPU enabled     |
+| `MaCh3_LOW_MEMORY_STRUCTS_ENABLED`   | This will use float/short string for many structures |
+
+
 ## System Requirements
 Most of external libraries are being handled through [CPM](https://github.com/cpm-cmake/CPM.cmake). The only external library that is not being handled through [CPM](https://github.com/cpm-cmake/CPM.cmake) and is required is [ROOT](https://root.cern/). Currently used external dependencies include:
 
@@ -148,17 +176,19 @@ Most of external libraries are being handled through [CPM](https://github.com/cp
 
 Based on several test here are recommended version:
 ```bash
-  GCC: >= 8.5 [lower versions may work]
+  GCC:   >= 8.5   [lower versions may work]
+  C++:   >= 14
   CMake: >= 3.14
-  ROOT: >= 6.18
+  ROOT:  >= 6.18
 ```
 ### Supported operational systems
 | Name        | Status |
 |-------------|--------|
 | Alma9       | ✅     |
 | Rocky9      | ✅     |
+| Ubi9        | ✅     |
 | Ubuntu22.04 | ✅     |
-| Ubuntu24.10 | ✅     |
+| Ubuntu25.04 | ✅     |
 | Fedora32    | ✅     |
 | CentOS7     | ❔     |
 | Windows     | ❌     |
@@ -168,15 +198,19 @@ Based on several test here are recommended version:
 ❔ - Not part of CI/CD but used by some users/developers so it might work <br>
 ❌ - Not supported and no plans right now <br>
 
-## Help and Guidelines
-- [Tutorial](https://github.com/mach3-software/MaCh3Tutorial)
-- [How to contribute](https://github.com/mach3-software/MaCh3/blob/develop/.github/CONTRIBUTING.md)
-- [Wiki](https://github.com/mach3-software/MaCh3/wiki)
-- [Slack](https://t2k-experiment.slack.com/archives/C06EM0C6D7W/p1705599931356889)
-- [Discussions](https://github.com/mach3-software/MaCh3/discussions)
-- [Benchmark](https://mach3-software.github.io/MaCh3Tutorial/)
+### Supported compilers
+| Name        | Status |
+|-------------|--------|
+| GNU         | ✅     |
+| CLANG       | ❔     |
+| INTELLLVM   | ❔     |
+| MSVC        | ❌     |
 
-## Plotting and Diagnostic
+✅ - Fully working with every feature fully tested by CI/CD <br>
+❔ - Not every feature may work, only compilation being tested by CI/CD <br>
+❌ - Not supported and no plans right now <br>
+
+## Plotting and Diagnostic 📊
 Example of chain diagnostic utils can be found [here](https://github.com/mach3-software/MaCh3/tree/develop/Diagnostics) with example of config.
 The MaCh3 core plotting library code can be found [here](https://github.com/mach3-software/MaCh3/tree/develop/plotting) along with example config files and some apps for making standard plots.
 
@@ -186,8 +220,8 @@ This is an example how your executable can look like using MaCh3:
   //Manager is responsible for reading from config
   std::unique_ptr<manager> fitMan = MaCh3ManagerFactory(argc, argv);
 
-  std::vector<samplePDFBase*> sample; //vector storing information about sample for different detector
-  std::vector<covarianceBase*> Cov; // vector with systematic implementation
+  std::vector<SampleHandlerBase*> sample; //vector storing information about sample for different detector
+  std::vector<ParameterHandlerBase*> Cov; // vector with systematic implementation
   MakeMaCh3Instance(fitMan.get(), sample, Cov); //Factory like function which initialises everything
 
   // FitterBase class, can be replaced with other fitting method
@@ -195,11 +229,11 @@ This is an example how your executable can look like using MaCh3:
 
   //Adding samples and covariances to the Fitter class could be in the factory
   for(unsigned int i = 0; sample.size(); i++)
-    MarkovChain->addSamplePDF(sample[i]);
+    MarkovChain->AddSampleHandler(sample[i]);
   for(unsigned int i = 0; Cov.size(); i++)
-    MarkovChain->addSystObj(Cov[i]);
+    MarkovChain->AddSystObj(Cov[i]);
 
   MarkovChain->RunLLHScan(); // can run LLH scan
-  MarkovChain->runMCMC(); //or run actual fit
+  MarkovChain->RunMCMC(); //or run actual fit
 ```
 For more see [here](https://github.com/mach3-software/MaCh3Tutorial/blob/main/Tutorial/MCMCTutorial.cpp)

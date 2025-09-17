@@ -20,13 +20,22 @@
 *.cu @kskwarczynski
 *.cuh @kskwarczynski
 
-/covariance/AdaptiveMCMCHandler* @henry-wallace-phys
-/mcmc/* @kskwarczynski
+/Manager/YamlHelper* @kskwarczynski
+/Manager/MaCh3Logger* @kskwarczynski
 
-/samplePDF/samplePDFFDBase* @edatkin @dbarrow257
-/splines/splineFDBase* @edatkin @dbarrow257
+/Parameters/AdaptiveMCMCHandler* @henry-wallace-phys
+/Parameters/PCAHandler* @kskwarczynski
 
-/plotting/* @ewanwm
+/Fitters/* @kskwarczynski
+/Fitters/DelayedMR2T2* @henry-wallace-phys
+
+/Samples/SampleHandlerFD* @edatkin @dbarrow257
+/Samples/OscillationHandler* @dbarrow257
+
+/Splines/BinnedSplineHandler* @edatkin @dbarrow257
+/Splines/SplineMonolith* @kskwarczynski
+
+/Plotting/* @ewanwm
 *.py @henry-wallace-phys @ewanwm
 py* @henry-wallace-phys @ewanwm
 

@@ -1,0 +1,56 @@
+---
+# Tag Doxygen Documentation when MaCh3 tag is produced
+name: TagDoxygen
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  tag-doxygen:
+    name: TagDoxygen
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout gh-pages (source of docs)
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v5
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      # Checkout gh-pages-archive (destination)
+      - name: Checkout gh-pages-archive branch
+        uses: actions/checkout@v5
+        with:
+          ref: gh-pages-archive
+          path: gh-pages-archive
+          fetch-depth: 0
+
+      # Copy content
+      - name: Copy gh-pages content into archive
+        env:
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+        run: |
+          TAG_NAME="${GITHUB_REF_NAME}"
+          echo "Using TAG_NAME=$TAG_NAME"
+
+          cd gh-pages-archive
+          rm -rf "$TAG_NAME/"
+          mkdir -p "$TAG_NAME/"
+          rsync -av --progress ../gh-pages/ "$TAG_NAME/" --exclude='.git'
+
+      # Commit and push
+      - name: Commit and push changes
+        run: |
+          cd gh-pages-archive
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add .
+          git commit -m "Archive Doxygen for ${{ github.ref_name }}" || echo "No changes to commit"
+          git push origin gh-pages-archive
