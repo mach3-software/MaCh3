@@ -1,6 +1,6 @@
 //MaCh3 includes
-#include "manager/manager.h"
-#include "mcmc/MCMCProcessor.h"
+#include "Manager/Manager.h"
+#include "Fitters/MCMCProcessor.h"
 
 // ROOT includes
 #include "TFile.h"
