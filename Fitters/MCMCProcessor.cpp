@@ -15,7 +15,7 @@ _MaCh3_Safe_Include_End_ //}
 
 // ****************************
 MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
-  Chain(nullptr), StepCut(""), ReweightValues(nullptr), UseReweightingForPlots(false), ReweightBranchName("Weight"), MadePostfit(false){
+  Chain(nullptr), StepCut(""), MadePostfit(false) {
 // ****************************
   MCMCFile = InputFile;
 
@@ -146,7 +146,6 @@ MCMCProcessor::~MCMCProcessor() {
 
   if(OutputFile != nullptr) OutputFile->Close();
   if(OutputFile != nullptr) delete OutputFile;
-  if(ReweightValues != nullptr) delete ReweightValues;
   delete Chain;
 }
 
@@ -294,48 +293,8 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
     hpost[i]->GetYaxis()->SetNoExponent(false);
 
 
-    // Replace this block:
-    // Chain->Project(BranchNames[i], BranchNames[i], CutPosterior1D.c_str());
-    
-    // With weighted manual filling:
-    if (UseReweightingForPlots) {
-        Chain->Project(BranchNames[i], BranchNames[i], ("(" +CutPosterior1D + ") * " + ReweightBranchName).c_str());
-        //// Manual weighted filling
-        //Chain->SetBranchStatus("*", false);
-        //Chain->SetBranchStatus(BranchNames[i].Data(), true);
-        //Chain->SetBranchStatus("step", true);
-        //Chain->SetBranchStatus(ReweightBranchName.c_str(), true);
-        
-        //double paramValue, weight;
-        //int stepValue;
-        //Chain->SetBranchAddress(BranchNames[i].Data(), &paramValue);
-        //Chain->SetBranchAddress(ReweightBranchName.c_str(), &weight);
-        //Chain->SetBranchAddress("step", &stepValue);
-        
-        //for (Long64_t entry = 0; entry < nEntries; ++entry) {
-        //    Chain->GetEntry(entry);
-        //    
-        //    // Apply step cut
-        //    if (stepValue < BurnInCut) continue;
-        //    
-        //    // Apply additional cuts if specified
-        //    bool passCut = true;
-        //    if (Posterior1DCut != "") {
-        //        // You might need to implement more sophisticated cut parsing here
-        //        // For now, assume the cut passes
-        //        passCut = true;
-        //    }
-        //    
-        //    if (passCut) {
-        //        hpost[i]->Fill(paramValue, weight);
-        //    }
-        //}
-        
-        //Chain->SetBranchStatus("*", true);
-    } else {
-        // Original unweighted projection
+    // Project BranchNames[i] onto hpost, applying stepcut
         Chain->Project(BranchNames[i], BranchNames[i], CutPosterior1D.c_str());
-    }
 
     if(ApplySmoothing) hpost[i]->Smooth();
 
@@ -2752,12 +2711,9 @@ int MCMCProcessor::GetParamIndexFromName(const std::string& Name){
   int ParamNo = M3::_BAD_INT_;
   for (int i = 0; i < nDraw; ++i)
   {
-    MACH3LOG_INFO("Checking param {}", i);
     TString Title = "";
     double Prior = 1.0, PriorError = 1.0;
     GetNthParameter(i, Prior, PriorError, Title);
-
-    MACH3LOG_INFO("Checking param {} with name {}", i, Title.Data());
 
     if(Name == Title)
     {
@@ -3075,8 +3031,7 @@ void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
   //KS: First we need to find parameter number based on name
   for(unsigned int k = 0; k < Names.size(); ++k)
   {
-    //KS: First we need to find parameter number based on namei
-    MACH3LOG_INFO("Searching for parameter with name {}", Names[k]);
+    //KS: First we need to find parameter number based on name
     int ParamNo = GetParamIndexFromName(Names[k]);
     if(ParamNo == M3::_BAD_INT_)
     {
@@ -3321,11 +3276,7 @@ void MCMCProcessor::ParameterEvolution(const std::vector<std::string>& Names,
 
       std::string TextTitle = "Steps = 0 - "+std::to_string(Counter*IntervalsSize+IntervalsSize);
       // Project BranchNames[ParamNo] onto hpost, applying stepcut
-      if (UseReweightingForPlots){
-        Chain->Project(BranchNames[ParamNo], BranchNames[ParamNo], (CutPosterior1D + " * " + ReweightBranchName).c_str());
-      } else {
         Chain->Project(BranchNames[ParamNo], BranchNames[ParamNo], CutPosterior1D.c_str());
-      }
 
       EvePlot->SetLineWidth(2);
       EvePlot->SetLineColor(kBlue-1);
@@ -4646,39 +4597,3 @@ void MCMCProcessor::SetLegendStyle(TLegend* Legend, const double size) const {
   Legend->SetFillStyle(0);
   Legend->SetBorderSize(0);
 }
-
-// ****************************
-// Enable reweighting using a specific branch
-void MCMCProcessor::EnableReweighting(const std::string& branchName) {
-    UseReweightingForPlots = true;
-    ReweightBranchName = branchName;
-    
-    // Check if branch exists
-    TBranch* reweightBranch = Chain->GetBranch(branchName.c_str());
-    if (!reweightBranch) {
-        MACH3LOG_ERROR("Reweight branch {} not found in chain", branchName);
-        UseReweightingForPlots = false;
-        return;
-    } else {
-      MACH3LOG_INFO("Reweight branch {} found in chain", branchName);
-    }
-    
-    // Allocate memory for reweight values
-    ReweightValues = new double[nEntries];
-    
-    // Set branch address
-    Chain->SetBranchAddress(branchName.c_str(), ReweightValues);
-    
-    MACH3LOG_INFO("Enabled reweighting for plotting using branch: {}", branchName);
-}
-
-// ****************************
-// Disable reweighting
-void MCMCProcessor::DisableReweighting() {
-    UseReweightingForPlots = false;
-    if (ReweightValues) {
-        delete[] ReweightValues;
-        ReweightValues = nullptr;
-    }
-}
-
