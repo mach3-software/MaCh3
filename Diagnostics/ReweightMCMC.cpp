@@ -40,7 +40,12 @@ struct ReweightConfig {
 /// @brief Main executable responsible for reweighting MCMC chains
 /// @param inputFile MCMC Chain file path
 /// @param configFile Config file with reweighting settings
+/// @author David Riley
+/// @author Evan Goodman
+
 void ReweightMCMC(const std::string& inputFile, const std::string& configFile);
+
+// TODO: Maybe add a generic 2D reweight that is not dm32 and theta13 specific? DWR
 
 /// @brief Function to interpolate 2D graph for Normal Ordering
 double Graph_interpolateNO(TGraph2D* graph, double theta13, double dm32);
@@ -207,7 +212,7 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
     auto processor = std::make_unique<MCMCProcessor>(inputFile);
     processor->Initialise();
     
-    // Validate that all required parameters exist in the chain TODO: Get list only of UNIQUE parameters, this is repeating unnecessarily
+    // Validate that all required parameters exist in the chain TODO: Get list only of UNIQUE parameters, this is repeating unnecessarily DWR
     for (const auto& rwConfig : reweightConfigs) {
         for (const auto& paramName : rwConfig.paramNames) {
             int paramIndex = processor->GetParamIndexFromName(paramName);
@@ -272,7 +277,7 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
             &weights[rwConfig.weightBranchName], 
             (rwConfig.weightBranchName + "/D").c_str()
         );
-        MACH3LOG_INFO("Added weight branch DEBUG: {}", rwConfig.weightBranchName);
+        MACH3LOG_INFO("Added weight branch: {}", rwConfig.weightBranchName);
     }
     
     // Process all entries
@@ -295,7 +300,7 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
                 double paramValue = paramValues[paramName];
                 
                 if (rwConfig.type == "Gaussian") {
-                    // TODO : just use MCMCProcessors gaussian reweight
+                    // TODO : just use MCMCProcessors gaussian reweight DWR
                     weight = CalculateGaussianWeight(paramValue, rwConfig.priorValues[0], rwConfig.priorValues[1]);
                 }
                 
@@ -304,7 +309,6 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
                     double dm32 = paramValues[rwConfig.paramNames[0]];
                     double theta13 = paramValues[rwConfig.paramNames[1]];
                     std::cout << "Parameters for reweight " << rwConfig.key << ": " << rwConfig.paramNames[0] << "=" << dm32 << ", " << rwConfig.paramNames[1] << "=" << theta13 << std::endl;
-                    // TODO did I get theta13 and dm32 the wrong way around
                     if (dm32 > 0) {
                         // Normal Ordering
                         if (rwConfig.graph_NO) {
