@@ -279,7 +279,14 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
         );
         MACH3LOG_INFO("Added weight branch: {}", rwConfig.weightBranchName);
     }
-    
+   
+    // If a given reweight is 1D Gaussian we can just let MCMCProcessor method do the reweight
+
+    if (rwConfig.dimension == 1 && rwConfig.type == "Gaussian"){
+        processor->ReweightPrior(rwConfig.paramNames[0], rwConfig.priorValues[0], rwConfig.priorValues[1]);
+        MACH3LOG_INFO("Applied Gaussian reweighting for {} with mean={} and sigma={}", rwConfig.paramNames[0], rwConfig.priorValues[0], rwConfig.priorValues[1]);
+    }
+
     // Process all entries
     Long64_t nEntries = inTree->GetEntries();
     MACH3LOG_INFO("Processing {} entries", nEntries);
@@ -295,14 +302,10 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
         for (const auto& rwConfig : reweightConfigs) {
             double weight = 1.0;
             
-            if (rwConfig.dimension == 1) {
-                const std::string& paramName = rwConfig.paramNames[0];
-                double paramValue = paramValues[paramName];
+            if (rwConfig.dimension == 1 && rwConfig.type != "Gaussian") {
                 
-                if (rwConfig.type == "Gaussian") {
-                    // TODO : just use MCMCProcessors gaussian reweight DWR
-                    weight = CalculateGaussianWeight(paramValue, rwConfig.priorValues[0], rwConfig.priorValues[1]);
-                }
+                // TODO implement TGraph1D reweighting if needed
+                MACH3LOG_ERROR("Unsupported 1D reweight type: {} for {}, TGraph1D not yet implemented", rwConfig.type, rwConfig.key);
                 
             } else if (rwConfig.dimension == 2) {
                 if (rwConfig.type == "TGraph2D") {
