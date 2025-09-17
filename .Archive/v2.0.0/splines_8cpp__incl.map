@@ -1,0 +1,52 @@
+<map id="/hosthome/v2.0.0/python/splines.cpp" name="/hosthome/v2.0.0/python/splines.cpp">
+<area shape="rect" id="node1" title=" " alt="" coords="841,5,1007,47"/>
+<area shape="rect" id="node2" title=" " alt="" coords="441,95,583,121"/>
+<area shape="rect" id="node3" title=" " alt="" coords="607,95,710,121"/>
+<area shape="rect" id="node4" title=" " alt="" coords="734,95,861,121"/>
+<area shape="rect" id="node5" href="$SplineBase_8h.html" title=" " alt="" coords="1372,169,1519,196"/>
+<area shape="rect" id="node8" href="$SplineStructs_8h.html" title="Contains structures and helper functions for handling spline representations of systematic parameters..." alt="" coords="753,244,911,271"/>
+<area shape="rect" id="node12" href="$Structs_8h.html" title=" " alt="" coords="832,661,963,688"/>
+<area shape="rect" id="node30" title=" " alt="" coords="1717,736,1795,763"/>
+<area shape="rect" id="node50" href="$SplineMonolith_8h.html" title=" " alt="" coords="1200,95,1365,121"/>
+<area shape="rect" id="node6" title=" " alt="" coords="1817,244,1877,271"/>
+<area shape="rect" id="node7" title=" " alt="" coords="1387,960,1453,987"/>
+<area shape="rect" id="node32" title=" " alt="" coords="1447,736,1510,763"/>
+<area shape="rect" id="node39" title=" " alt="" coords="1037,661,1104,688"/>
+<area shape="rect" id="node40" title=" " alt="" coords="1477,661,1579,688"/>
+<area shape="rect" id="node43" href="$SplineCommon_8h.html" title="Contains definitions for spline coefficients and structure used in both CPU and GPU code." alt="" coords="1038,244,1207,271"/>
+<area shape="rect" id="node44" title=" " alt="" coords="1231,244,1297,271"/>
+<area shape="rect" id="node45" title=" " alt="" coords="1321,244,1383,271"/>
+<area shape="rect" id="node46" title=" " alt="" coords="1408,244,1483,271"/>
+<area shape="rect" id="node47" title=" " alt="" coords="1507,244,1589,271"/>
+<area shape="rect" id="node48" title=" " alt="" coords="1614,244,1698,271"/>
+<area shape="rect" id="node49" title=" " alt="" coords="1722,244,1793,271"/>
+<area shape="rect" id="node9" href="$ParameterHandlerGeneric_8h.html" title=" " alt="" coords="473,319,671,360"/>
+<area shape="rect" id="node27" title=" " alt="" coords="11,960,69,987"/>
+<area shape="rect" id="node10" href="$ParameterHandlerBase_8h.html" title=" " alt="" coords="473,408,671,449"/>
+<area shape="rect" id="node11" href="$Manager_8h.html" title=" " alt="" coords="387,579,525,606"/>
+<area shape="rect" id="node38" href="$ParameterHandlerUtils_8h.html" title=" " alt="" coords="662,572,861,613"/>
+<area shape="rect" id="node41" href="$AdaptiveMCMCHandler_8h.html" title=" " alt="" coords="569,497,810,524"/>
+<area shape="rect" id="node42" href="$PCAHandler_8h.html" title=" " alt="" coords="367,497,545,524"/>
+<area shape="rect" id="node16" href="$MaCh3Exception_8h.html" title=" " alt="" coords="365,736,552,763"/>
+<area shape="rect" id="node37" href="$YamlHelper_8h.html" title="Utility functions for handling YAML nodes." alt="" coords="131,661,285,688"/>
+<area shape="rect" id="node13" title=" " alt="" coords="813,736,853,763"/>
+<area shape="rect" id="node14" title=" " alt="" coords="878,736,917,763"/>
+<area shape="rect" id="node15" title=" " alt="" coords="941,736,1051,763"/>
+<area shape="rect" id="node20" href="$MaCh3Logger_8h.html" title="KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/incl..." alt="" coords="628,811,796,837"/>
+<area shape="rect" id="node24" href="$Core_8h.html" title=" " alt="" coords="315,885,429,912"/>
+<area shape="rect" id="node31" title=" " alt="" coords="246,736,341,763"/>
+<area shape="rect" id="node33" title=" " alt="" coords="1177,736,1233,763"/>
+<area shape="rect" id="node34" title=" " alt="" coords="1257,736,1340,763"/>
+<area shape="rect" id="node35" title=" " alt="" coords="1364,736,1423,763"/>
+<area shape="rect" id="node36" title=" " alt="" coords="577,736,789,763"/>
+<area shape="rect" id="node17" title=" " alt="" coords="205,960,277,987"/>
+<area shape="rect" id="node18" title=" " alt="" coords="231,885,286,912"/>
+<area shape="rect" id="node19" title=" " alt="" coords="419,811,498,837"/>
+<area shape="rect" id="node21" title=" " alt="" coords="665,960,735,987"/>
+<area shape="rect" id="node22" title=" " alt="" coords="505,885,583,912"/>
+<area shape="rect" id="node23" title=" " alt="" coords="608,885,685,912"/>
+<area shape="rect" id="node29" title=" " alt="" coords="710,885,823,912"/>
+<area shape="rect" id="node25" title=" " alt="" coords="108,960,175,987"/>
+<area shape="rect" id="node26" title=" " alt="" coords="383,960,441,987"/>
+<area shape="rect" id="node28" title=" " alt="" coords="305,960,359,987"/>
+</map>
