@@ -277,7 +277,7 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
     }
     MACH3LOG_INFO("Loading YAML config from MCMC chain");
     YAML::Node Settings = TMacroToYAML(*Config);
-    bool asimovfit = GetFromManager(fitMan->raw()["General"]["Asimov"], false);
+    bool asimovfit = GetFromManager<bool>(Settings["General"]["Asimov"], false);
     if (asimovfit) {
         MACH3LOG_WARN("ReweightMCMC does not currently handle Asimov shifting, results may be incorrect!");
     } else {
@@ -338,11 +338,16 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
     }
    
     // If a given reweight is 1D Gaussian we can just let MCMCProcessor method do the reweight
-    if (rwConfig.dimension == 1 && rwConfig.type == "Gaussian"){
-        processor->ReweightPrior(rwConfig.paramNames[0], rwConfig.priorValues[0], rwConfig.priorValues[1]);
-        MACH3LOG_INFO("Applied Gaussian reweighting for {} with mean={} and sigma={}", rwConfig.paramNames[0], rwConfig.priorValues[0], rwConfig.priorValues[1]);
+    for (const auto& rwConfig : reweightConfigs){
+        if (rwConfig.dimension == 1 && rwConfig.type == "Gaussian"){
+            // case the rwConfig parameters to the specific format processor needs
+            const std::string& paramName = rwConfig.paramNames[0];
+            const std::vector<double>& priorCentral = {rwConfig.priorValues[0]};
+            const std::vector<double>& priorSigma = {rwConfig.priorValues[1]};
+            processor->ReweightPrior(paramName, priorCentral, priorSigma);
+            MACH3LOG_INFO("Applied Gaussian reweighting for {} with mean={} and sigma={}", paramName, priorCentral[0], priorSigma[0]);
+        }
     }
-
     // For 2D reweight and non-gaussian (ie TGraph) 1D reweight we need to do it ourselves
     // Process all entries
     Long64_t nEntries = inTree->GetEntries();
