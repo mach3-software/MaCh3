@@ -146,7 +146,9 @@ void FPGACalcSplineWeights(int nParams,
           for_pipe[chunk] = c;
         }
       } // end of chunk loop
+      sycl::ext::oneapi::experimental::printf("Writing to pipe");
       PipeAB::write(PipeStruct(eventNum, for_pipe));
+      sycl::ext::oneapi::experimental::printf("written");
 
       // knot_offset += knots_per_spline;
     } //end of splines per event loop
