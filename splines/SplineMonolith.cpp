@@ -255,7 +255,9 @@ void FPGAModifyWeights(int NSplines_valid, float *cpu_total_weights){
 
 
   for (size_t i = 0; i < NSplines_valid / chunk_size; i++) {
+    sycl::ext::oneapi::experimental::printf("Reading from pipe\n");
     PipeStruct tmp = PipeAB::read();
+    sycl::ext::oneapi::experimental::printf("Read from pipe\n");
 
     if (tmp.eventNum != current_event){
       cpu_total_weights_host[current_event] = prod;
