@@ -89,7 +89,7 @@ void FPGACalcSplineWeights(int nParams,
     // Read the number of splines for this event
 
     int NSplines_event = splines_per_event[eventNum]; // retrieve the amount of splines for this event
-    //sycl::ext::oneapi::experimental::printf("%d/%d: N_splines_event %d \n", eventNum, n_events, NSplines_event);
+    sycl::ext::oneapi::experimental::printf("%d/%d: N_splines_event %d \n", eventNum, n_events, NSplines_event);
 
     
     for (size_t eventSpline = 0; eventSpline < NSplines_event; eventSpline+= nChunk) {
@@ -101,7 +101,7 @@ void FPGACalcSplineWeights(int nParams,
       #pragma unroll
       [[intel::initiation_interval(1)]]
       for (size_t chunk = 0; chunk < nChunk; chunk++) {
-        //sycl::ext::oneapi::experimental::printf("%d/%d: chunk loop \n", chunk, nChunk);
+        sycl::ext::oneapi::experimental::printf("%d/%d: chunk loop \n", chunk, nChunk);
         if (eventSpline+chunk > NSplines_event){
           for_pipe[chunk] = 1.;
         }
@@ -145,11 +145,11 @@ void FPGACalcSplineWeights(int nParams,
 
           for_pipe[chunk] = c;
         }
-        //sycl::ext::oneapi::experimental::printf("End chunk conditional \n", chunk, nChunk);
+        sycl::ext::oneapi::experimental::printf("End chunk conditional \n", chunk, nChunk);
       } // end of chunk loop
-      //sycl::ext::oneapi::experimental::printf("Writing to pipe\n");
+      sycl::ext::oneapi::experimental::printf("Writing to pipe\n");
       PipeAB::write(PipeStruct(eventNum, for_pipe));
-      //sycl::ext::oneapi::experimental::printf("written\n");
+      sycl::ext::oneapi::experimental::printf("written\n");
 
       // knot_offset += knots_per_spline;
     } //end of splines per event loop
