@@ -145,6 +145,7 @@ void FPGACalcSplineWeights(int nParams,
 
           for_pipe[chunk] = c;
         }
+        sycl::ext::oneapi::experimental::printf("End chunk conditional \n", chunk, nChunk);
       } // end of chunk loop
       sycl::ext::oneapi::experimental::printf("Writing to pipe\n");
       PipeAB::write(PipeStruct(eventNum, for_pipe));
