@@ -101,6 +101,7 @@ void FPGACalcSplineWeights(int nParams,
       #pragma unroll
       [[intel::initiation_interval(1)]]
       for (size_t chunk = 0; chunk < nChunk; chunk++) {
+        sycl::ext::oneapi::experimental::printf("%d/%d: chunk loop \n", chunk, nChunk);
         if (eventSpline+chunk > NSplines_event){
           for_pipe[chunk] = 1.;
         }
