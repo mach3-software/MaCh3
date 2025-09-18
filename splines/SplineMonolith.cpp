@@ -147,8 +147,9 @@ void FPGACalcSplineWeights(int nParams,
         }
         sycl::ext::oneapi::experimental::printf("End chunk conditional \n", chunk, nChunk);
       } // end of chunk loop
+      bool success = false;
       sycl::ext::oneapi::experimental::printf("Writing to pipe\n");
-      PipeAB::write(PipeStruct(eventNum, for_pipe));
+      while (!success) PipeAB::write(PipeStruct(eventNum, for_pipe), success);
       sycl::ext::oneapi::experimental::printf("written\n");
 
       // knot_offset += knots_per_spline;
@@ -255,8 +256,9 @@ void FPGAModifyWeights(int NSplines_valid, float *cpu_total_weights){
 
 
   for (size_t i = 0; i < NSplines_valid / chunk_size; i++) {
+    bool success = false;
     sycl::ext::oneapi::experimental::printf("Reading from pipe\n");
-    PipeStruct tmp = PipeAB::read();
+    while (!success) tmp = PipeAB::read(success);
     sycl::ext::oneapi::experimental::printf("Read from pipe\n");
 
     if (tmp.eventNum != current_event){
