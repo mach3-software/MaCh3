@@ -257,6 +257,7 @@ void FPGAModifyWeights(int NSplines_valid, float *cpu_total_weights){
 
   for (size_t i = 0; i < NSplines_valid / chunk_size; i++) {
     bool success = false;
+    PipeStruct tmp;
     sycl::ext::oneapi::experimental::printf("Reading from pipe\n");
     while (!success) tmp = PipeAB::read(success);
     sycl::ext::oneapi::experimental::printf("Read from pipe\n");
