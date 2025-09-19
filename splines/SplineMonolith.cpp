@@ -15,7 +15,7 @@ class IDOptimized;
 
 // Minimum capacity of a pipe.
 // Set to 0 to allow the compiler to save area if possible.
-constexpr size_t kPipeMinCapacity = 32;
+constexpr size_t kPipeMinCapacity = 0;
 
 // Pipes
 struct PipeStruct{
