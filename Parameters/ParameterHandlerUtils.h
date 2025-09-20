@@ -454,4 +454,90 @@ inline TMatrixDSym* GetCovMatrixFromChain(TDirectory* TempFile) {
     return fallback;
   }
 }
+
+// *************************************
+/// @brief Computes Cholesky decomposition of a symmetric positive definite matrix using custom function which can be even 20 times faster
+/// @param matrix Input symmetric positive definite matrix
+/// @param matrixName Identifier for error reporting
+inline std::vector<std::vector<double>> GetCholeskyDecomposedMatrix(const TMatrixDSym& matrix, const std::string& matrixName) {
+// *************************************
+  const Int_t n = matrix.GetNrows();
+  std::vector<std::vector<double>> L(n, std::vector<double>(n, 0.0));
+
+  for (Int_t j = 0; j < n; ++j) {
+    // Compute diagonal element (must be serial)
+    double sum_diag = matrix(j, j);
+    for (Int_t k = 0; k < j; ++k) {
+      sum_diag -= L[j][k] * L[j][k];
+    }
+    const double tol = 1e-15;
+    if (sum_diag <= tol) {
+      MACH3LOG_ERROR("Cholesky decomposition failed for {} (non-positive diagonal)", matrixName);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    L[j][j] = std::sqrt(sum_diag);
+
+    // Compute the rest of the column in parallel
+    #ifdef MULTITHREAD
+    #pragma omp parallel for
+    #endif
+    for (Int_t i = j + 1; i < n; ++i) {
+      double sum = matrix(i, j);
+      for (Int_t k = 0; k < j; ++k) {
+        sum -= L[i][k] * L[j][k];
+      }
+      L[i][j] = sum / L[j][j];
+    }
+  }
+  return L;
+}
+
+// *************************************
+/// @brief Checks if a matrix can be Cholesky decomposed
+/// @param matrix Input symmetric matrix to test
+inline bool CanDecomposeMatrix(const TMatrixDSym& matrix) {
+// *************************************
+  TDecompChol chdcmp(matrix);
+  return chdcmp.Decompose();
+}
+
+// *************************************
+/// @brief Makes sure that matrix is positive-definite by adding a small number to on-diagonal elements
+inline void MakeMatrixPosDef(TMatrixDSym *cov) {
+// *************************************
+  //DB Save original warning state and then increase it in this function to suppress 'matrix not positive definite' messages
+  //Means we no longer need to overload
+  int originalErrorWarning = gErrorIgnoreLevel;
+  gErrorIgnoreLevel = kFatal;
+
+  //DB Loop 1000 times adding 1e-9 which tops out at 1e-6 shift on the diagonal before throwing error
+  constexpr int MaxAttempts = 1e5;
+  const int matrixSize = cov->GetNrows();
+  int iAttempt = 0;
+  bool CanDecomp = false;
+
+  for (iAttempt = 0; iAttempt < MaxAttempts; iAttempt++) {
+    if (CanDecomposeMatrix(*cov)) {
+      CanDecomp = true;
+      break;
+    } else {
+      #ifdef MULTITHREAD
+      #pragma omp parallel for
+      #endif
+      for (int iVar = 0 ; iVar < matrixSize; iVar++) {
+        (*cov)(iVar,iVar) += pow(10, -9);
+      }
+    }
+  }
+
+  if (!CanDecomp) {
+    MACH3LOG_ERROR("Tried {} times to shift diagonal but still can not decompose the matrix", MaxAttempts);
+    MACH3LOG_ERROR("This indicates that something is wrong with the input matrix");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+
+  //DB Resetting warning level
+  gErrorIgnoreLevel = originalErrorWarning;
+}
+
 } // end M3 namespace
