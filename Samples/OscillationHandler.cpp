@@ -33,13 +33,13 @@ OscillationHandler::OscillationHandler(const std::string& NuOscillatorConfigFile
     NuOscProbCalcers[0]->Setup();
   } else {
     NuOscProbCalcers.resize(SubChannels);
-    for (int iSample = 0; iSample < SubChannels; iSample++) {
-      MACH3LOG_INFO("Setting up NuOscillator::Oscillator object in OscillationChannel: {}/{}", iSample, SubChannels);
+    for (int iChannel = 0; iChannel < SubChannels; iChannel++) {
+      MACH3LOG_INFO("Setting up NuOscillator::Oscillator object in OscillationChannel: {}/{}", iChannel, SubChannels);
 
       LoggerPrint("NuOscillator",
                   [](const std::string& message) { MACH3LOG_INFO("{}", message); },
-                  [this, iSample, &OscillFactory, &NuOscillatorConfigFile]() {
-                    this->NuOscProbCalcers[iSample] = std::unique_ptr<OscillatorBase>(
+                  [this, iChannel, &OscillFactory, &NuOscillatorConfigFile]() {
+                    this->NuOscProbCalcers[iChannel] = std::unique_ptr<OscillatorBase>(
                       OscillFactory->CreateOscillator(NuOscillatorConfigFile));
                   });
     }
