@@ -39,11 +39,11 @@ class SampleHandlerBase
   /// @ingroup SampleHandlerGetters
   virtual inline M3::int_t GetNsamples(){ return nSamples; };
   /// @ingroup SampleHandlerGetters
-  virtual inline std::string GetTitle()const {return "SampleHandler";};
+  virtual std::string GetSampleTitle(const int Sample) const = 0;
   /// @ingroup SampleHandlerGetters
-  virtual std::string GetSampleName(int Sample) const = 0;
+  virtual std::string GetSampleHandlerName() const = 0;
   /// @ingroup SampleHandlerGetters
-  virtual inline double GetSampleLikelihood(const int isample){(void) isample; return GetLikelihood();};
+  virtual double GetSampleLikelihood(const int isample) const = 0;
   /// @brief Allow to clean not used memory before fit starts
   virtual void CleanMemoryBeforeFit() = 0;
   /// @brief Store additional info in a chan
@@ -54,12 +54,12 @@ class SampleHandlerBase
       
   virtual void Reweight()=0;
   /// @ingroup SampleHandlerGetters
-  virtual double GetLikelihood() = 0;
+  virtual double GetLikelihood() const = 0;
 
   /// @ingroup SampleHandlerGetters
   unsigned int GetNEvents() const {return nEvents;}
   /// @ingroup SampleHandlerGetters
-  virtual int GetNOscChannels(){ return 1; }
+  virtual int GetNOscChannels(const int iSample) const = 0;
 
   // WARNING KS: Needed for sigma var
   virtual void SetupBinning(const M3::int_t Selection, std::vector<double> &BinningX, std::vector<double> &BinningY){

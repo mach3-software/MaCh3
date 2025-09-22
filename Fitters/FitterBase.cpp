@@ -141,7 +141,7 @@ void FitterBase::SaveSettings() {
     MACH3LOG_INFO("{}: Cov name: {}, it has {} params", i, systematics[i]->GetName(), systematics[i]->GetNumParams());
   MACH3LOG_INFO("Number of SampleHandlers: {}", samples.size());
   for(unsigned int i = 0; i < samples.size(); ++i)
-    MACH3LOG_INFO("{}: SampleHandler name: {}, it has {} samples, {} OscChannels",i , samples[i]->GetTitle(), samples[i]->GetNsamples(), samples[i]->GetNOscChannels());
+    MACH3LOG_INFO("{}: SampleHandler name: {}, it has {} samples, {} OscChannels",i , samples[i]->GetSampleHandlerName(), samples[i]->GetNsamples());
 
   //TN: Have to close the folder in order to write it to disk before SaveOutput is called in the destructor
   CovFolder->Close();
@@ -254,10 +254,24 @@ void FitterBase::SaveOutput() {
 // Add SampleHandler object to the Markov Chain
 void FitterBase::AddSampleHandler(SampleHandlerBase * const sample) {
 // *************************
-  //Check if the sample has a unique name
+  // Check if any subsample name collides with already-registered subsamples
   for (const auto &s : samples) {
-    if (s->GetTitle() == sample->GetTitle()) {
-      MACH3LOG_ERROR("SampleHandler with name '{}' already exists!", sample->GetTitle());
+    for (int iExisting = 0; iExisting < s->GetNsamples(); ++iExisting) {
+      for (int iNew = 0; iNew < sample->GetNsamples(); ++iNew) {
+        if (s->GetSampleTitle(iExisting) == sample->GetSampleTitle(iNew)) {
+          MACH3LOG_ERROR(
+            "Duplicate sample title '{}' in handler {} detected: "
+            "same tittle exist in handler ", sample->GetSampleTitle(iNew),
+            sample->GetSampleHandlerName(), s->GetSampleHandlerName());
+          throw MaCh3Exception(__FILE__, __LINE__);
+        }
+      }
+    }
+  }
+
+  for (const auto &s : samples) {
+    if (s->GetSampleHandlerName() == sample->GetSampleHandlerName()) {
+      MACH3LOG_ERROR("SampleHandler with name '{}' already exists!", sample->GetSampleHandlerName());
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   }
@@ -266,7 +280,7 @@ void FitterBase::AddSampleHandler(SampleHandlerBase * const sample) {
 
   sample->SaveAdditionalInfo(SampleFolder);
   TotalNSamples += sample->GetNsamples();
-  MACH3LOG_INFO("Adding {} object, with {} samples", sample->GetTitle(), sample->GetNsamples());
+  MACH3LOG_INFO("Adding {} object, with {} samples", sample->GetSampleHandlerName(), sample->GetNsamples());
   samples.push_back(sample);
   outputFile->cd();
 }
@@ -429,7 +443,7 @@ void FitterBase::DragRace(const int NLaps) {
       samples[ivs]->Reweight();
     }
     clockRace.Stop();
-    MACH3LOG_INFO("It took {:.4f} s to reweights {} times sample: {}", clockRace.RealTime(), NLaps, samples[ivs]->GetTitle());
+    MACH3LOG_INFO("It took {:.4f} s to reweights {} times sample: {}", clockRace.RealTime(), NLaps, samples[ivs]->GetSampleHandlerName());
     MACH3LOG_INFO("On average {:.6f}", clockRace.RealTime()/NLaps);
   }
 
@@ -441,7 +455,7 @@ void FitterBase::DragRace(const int NLaps) {
       samples[ivs]->GetLikelihood();
     }
     clockRace.Stop();
-    MACH3LOG_INFO("It took {:.4f} s to calculate  GetLikelihood {} times sample:  {}", clockRace.RealTime(), NLaps, samples[ivs]->GetTitle());
+    MACH3LOG_INFO("It took {:.4f} s to calculate  GetLikelihood {} times sample:  {}", clockRace.RealTime(), NLaps, samples[ivs]->GetSampleHandlerName());
     MACH3LOG_INFO("On average {:.6f}", clockRace.RealTime()/NLaps);
   }
   // Get vector of proposed steps. If we want to run LLH scan or something else after we need to revert changes after proposing steps multiple times
@@ -521,8 +535,8 @@ void FitterBase::RunLLHScan() {
   MACH3LOG_INFO("Starting LLH Scan");
 
   //KS: Turn it on if you want LLH scan for each ND sample separately, which increase time significantly but can be useful for validating new samples or dials.
-  bool PlotLLHScanBySample = GetFromManager<bool>(fitMan->raw()["LLHScan"]["LLHScanBySample"], false, __FILE__ , __LINE__);;
-  auto SkipVector = GetFromManager<std::vector<std::string>>(fitMan->raw()["LLHScan"]["LLHScanSkipVector"], {}, __FILE__ , __LINE__);;
+  bool PlotLLHScanBySample = GetFromManager<bool>(fitMan->raw()["LLHScan"]["LLHScanBySample"], false, __FILE__ , __LINE__);
+  auto SkipVector = GetFromManager<std::vector<std::string>>(fitMan->raw()["LLHScan"]["LLHScanSkipVector"], {}, __FILE__ , __LINE__);
 
   // Now finally get onto the LLH scan stuff
   // Very similar code to MCMC but never start MCMC; just scan over the parameter space
@@ -537,7 +551,7 @@ void FitterBase::RunLLHScan() {
   std::vector<TDirectory *> SampleClass_LLH(samples.size());
   for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
   {
-    std::string NameTemp = samples[ivs]->GetTitle();
+    std::string NameTemp = samples[ivs]->GetSampleHandlerName();
     SampleClass_LLH[ivs] = outputFile->mkdir(NameTemp.c_str());
   }
 
@@ -553,7 +567,7 @@ void FitterBase::RunLLHScan() {
     {
       for(int is = 0; is < samples[ivs]->GetNsamples(); ++is )
       {
-        SampleSplit_LLH[SampleIterator] = outputFile->mkdir((samples[ivs]->GetSampleName(is)+ "_LLH").c_str());
+        SampleSplit_LLH[SampleIterator] = outputFile->mkdir((samples[ivs]->GetSampleTitle(is)+ "_LLH").c_str());
         SampleIterator++;
       }
     }
@@ -636,7 +650,7 @@ void FitterBase::RunLLHScan() {
       std::vector<double> nSamLLH(samples.size());
       for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
       {
-        std::string NameTemp = samples[ivs]->GetTitle();
+        std::string NameTemp = samples[ivs]->GetSampleHandlerName();
         hScanSample[ivs] = std::make_unique<TH1D>((name+"_"+NameTemp).c_str(), (name+"_" + NameTemp).c_str(), n_points, lower, upper);
         hScanSample[ivs]->SetDirectory(nullptr);
         hScanSample[ivs]->SetTitle(("2LLH_" + NameTemp + ", " + name + ";" + name + "; -2(ln L_{" + NameTemp +"})").c_str());
@@ -666,7 +680,7 @@ void FitterBase::RunLLHScan() {
           sampleSplitllh.resize(TotalNSamples);
           for(int is = 0; is < samples[ivs]->GetNsamples(); ++is )
           {
-            hScanSamSplit[SampleIterator] = new TH1D((name+samples[ivs]->GetSampleName(is)).c_str(), (name+samples[ivs]->GetSampleName(is)).c_str(), n_points, lower, upper);
+            hScanSamSplit[SampleIterator] = new TH1D((name+samples[ivs]->GetSampleTitle(is)).c_str(), (name+samples[ivs]->GetSampleTitle(is)).c_str(), n_points, lower, upper);
             hScanSamSplit[SampleIterator]->SetTitle((std::string("2LLH_sam, ") + name + ";" + name + "; -2(ln L_{sample})").c_str());
             SampleIterator++;
           }
@@ -1363,38 +1377,38 @@ void WriteHistogramsByMode(SampleHandlerFD *sample,
                            const std::vector<TDirectory*>& SampleDir) {
 // *************************
   MaCh3Modes *modes = sample->GetMaCh3Modes();
-  for (int subSampleIndex = 0; subSampleIndex < sample->GetNsamples(); ++subSampleIndex) {
-    SampleDir[subSampleIndex]->cd();
-    std::string sampleName = sample->GetTitle();
+  for (int iSample = 0; iSample < sample->GetNsamples(); ++iSample) {
+    SampleDir[iSample]->cd();
+    std::string sampleName = sample->GetSampleTitle(iSample);
     // Probably a better way of handling this logic
     if (by_mode) {
       for (int iMode = 0; iMode < modes->GetNModes(); ++iMode) {
-        auto modeHist = sample->Get1DVarHistByModeAndChannel(sample->GetXBinVarName(), iMode);
+        auto modeHist = sample->Get1DVarHistByModeAndChannel(iSample, sample->GetXBinVarName(iSample), iMode);
         WriteHistograms(modeHist, sampleName + "_" + modes->GetMaCh3ModeName(iMode) + suffix);
         delete modeHist;
       }
     }
 
     if (by_channel) {
-      for (int iChan = 0; iChan < sample->GetNOscChannels(); ++iChan) {
-        auto chanHist = sample->Get1DVarHistByModeAndChannel(sample->GetXBinVarName(), -1, iChan); // -1 skips over mode plotting
-        WriteHistograms(chanHist, sampleName + "_" + sample->GetFlavourName(iChan) + suffix);
+      for (int iChan = 0; iChan < sample->GetNOscChannels(iSample); ++iChan) {
+        auto chanHist = sample->Get1DVarHistByModeAndChannel(iSample, sample->GetXBinVarName(iSample), -1, iChan); // -1 skips over mode plotting
+        WriteHistograms(chanHist, sampleName + "_" + sample->GetFlavourName(iSample, iChan) + suffix);
         delete chanHist;
       }
     }
 
     if (by_mode && by_channel) {
       for (int iMode = 0; iMode < modes->GetNModes(); ++iMode) {
-        for (int iChan = 0; iChan < sample->GetNOscChannels(); ++iChan) {
-          auto hist = sample->Get1DVarHistByModeAndChannel(sample->GetXBinVarName(), iMode, iChan);
-          WriteHistograms(hist, sampleName + "_" + modes->GetMaCh3ModeName(iMode) + "_" + sample->GetFlavourName(iChan) + suffix);
+        for (int iChan = 0; iChan < sample->GetNOscChannels(iSample); ++iChan) {
+          auto hist = sample->Get1DVarHistByModeAndChannel(iSample, sample->GetXBinVarName(iSample), iMode, iChan);
+          WriteHistograms(hist, sampleName + "_" + modes->GetMaCh3ModeName(iMode) + "_" + sample->GetFlavourName(iSample, iChan) + suffix);
           delete hist;
         }
       }
     }
 
     if (!by_mode && !by_channel) {
-      auto hist = sample->Get1DVarHistByModeAndChannel(sample->GetXBinVarName());
+      auto hist = sample->Get1DVarHistByModeAndChannel(iSample, sample->GetXBinVarName(iSample));
       WriteHistograms(hist, sampleName + suffix);
       delete hist;
     }
@@ -1445,12 +1459,12 @@ void FitterBase::RunSigmaVarFD() {
       {
         auto* MaCh3Sample = dynamic_cast<SampleHandlerFD*>(samples[iSample]);
         if (!MaCh3Sample) {
-          MACH3LOG_ERROR(":: Sample {} do not inherit from  SampleHandlerFD this is not implemented::", samples[i]->GetTitle());
+          MACH3LOG_ERROR(":: Sample {} do not inherit from  SampleHandlerFD this is not implemented::", samples[i]->GetSampleTitle(iSample));
           throw MaCh3Exception(__FILE__, __LINE__);
         }
         std::vector<TDirectory*> SampleDir(MaCh3Sample->GetNsamples());
-        for (int subSampleIndex = 0; subSampleIndex < MaCh3Sample->GetNsamples(); ++subSampleIndex) {
-          SampleDir[subSampleIndex] = ParamDir->mkdir(MaCh3Sample->GetTitle().c_str());
+        for (int SampleIndex = 0; SampleIndex < MaCh3Sample->GetNsamples(); ++SampleIndex) {
+          SampleDir[SampleIndex] = ParamDir->mkdir(MaCh3Sample->GetSampleTitle(SampleIndex).c_str());
         }
 
         for (size_t j = 0; j < SigmaArray.size(); ++j) {

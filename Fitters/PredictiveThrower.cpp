@@ -65,7 +65,7 @@ void PredictiveThrower::SetupSampleInformation() {
   {
     auto* MaCh3Sample = dynamic_cast<SampleHandlerFD*>(samples[iPDF]);
     if (!MaCh3Sample) {
-      MACH3LOG_ERROR("Sample {} do not inherit from SampleHandlerFD this is not implemented", samples[iPDF]->GetTitle());
+      MACH3LOG_ERROR("Sample {} do not inherit from SampleHandlerFD this is not implemented", samples[iPDF]->GetSampleHandlerName());
       throw MaCh3Exception(__FILE__, __LINE__);
     }
     TotalNumberOfSamples += samples[iPDF]->GetNsamples();
@@ -95,7 +95,7 @@ void PredictiveThrower::SetupSampleInformation() {
   for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
     MC_Hist_Toy[sample].resize(Ntoys);
     W2_Hist_Toy[sample].resize(Ntoys);
-    SampleNames[sample] = samples[sample]->GetTitle();
+    SampleNames[sample] = samples[sample]->GetSampleTitle(sample);
   }
   SampleNames[TotalNumberOfSamples] = "Total";
 }
@@ -309,17 +309,17 @@ void PredictiveThrower::ProduceToys() {
     for (int SampleIndex = 0; SampleIndex < MaCh3Sample->GetNsamples(); ++SampleIndex)
     {
       // Get nominal spectra and event rates
-      TH1D* DataHist1D = static_cast<TH1D*>(MaCh3Sample->GetDataHist(1));
-      Data_Hist[iPDF] = M3::Clone(DataHist1D, MaCh3Sample->GetTitle() + "_data");
-      Data_Hist[iPDF]->Write((MaCh3Sample->GetTitle() + "_data").c_str());
+      TH1D* DataHist1D = static_cast<TH1D*>(MaCh3Sample->GetDataHist(SampleIndex, 1));
+      Data_Hist[iPDF] = M3::Clone(DataHist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_data");
+      Data_Hist[iPDF]->Write((MaCh3Sample->GetSampleTitle(SampleIndex) + "_data").c_str());
 
-      TH1D* MCHist1D = static_cast<TH1D*>(MaCh3Sample->GetMCHist(1));
-      MC_Nom_Hist[iPDF] = M3::Clone(MCHist1D, MaCh3Sample->GetTitle() + "_mc");
-      MCHist1D->Write((MaCh3Sample->GetTitle() + "_mc").c_str());
+      TH1D* MCHist1D = static_cast<TH1D*>(MaCh3Sample->GetMCHist(SampleIndex, 1));
+      MC_Nom_Hist[iPDF] = M3::Clone(MCHist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_mc");
+      MCHist1D->Write((MaCh3Sample->GetSampleTitle(SampleIndex) + "_mc").c_str());
 
-      TH1D* W2Hist1D = static_cast<TH1D*>(MaCh3Sample->GetW2Hist(1));
-      W2_Nom_Hist[iPDF] = M3::Clone(W2Hist1D, MaCh3Sample->GetTitle() + "_w2");
-      W2Hist1D->Write((MaCh3Sample->GetTitle() + "_w2").c_str());
+      TH1D* W2Hist1D = static_cast<TH1D*>(MaCh3Sample->GetW2Hist(SampleIndex, 1));
+      W2_Nom_Hist[iPDF] = M3::Clone(W2Hist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_w2");
+      W2Hist1D->Write((MaCh3Sample->GetSampleTitle(SampleIndex) + "_w2").c_str());
       delete W2Hist1D;
     }
   }
@@ -409,12 +409,12 @@ void PredictiveThrower::ProduceToys() {
       auto* MaCh3Sample = dynamic_cast<SampleHandlerFD*>(samples[iPDF]);
       for (int SampleIndex = 0; SampleIndex < MaCh3Sample->GetNsamples(); ++SampleIndex)
       {
-        TH1D* MCHist1D = static_cast<TH1D*>(MaCh3Sample->GetMCHist(1));
-        MC_Hist_Toy[iPDF][i] = M3::Clone(MCHist1D, MaCh3Sample->GetTitle() + "_mc_" + std::to_string(i));
+        TH1D* MCHist1D = static_cast<TH1D*>(MaCh3Sample->GetMCHist(SampleIndex, 1));
+        MC_Hist_Toy[iPDF][i] = M3::Clone(MCHist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_mc_" + std::to_string(i));
         MC_Hist_Toy[iPDF][i]->Write();
 
-        TH1D* W2Hist1D = static_cast<TH1D*>(MaCh3Sample->GetW2Hist(1));
-        W2_Hist_Toy[iPDF][i] = M3::Clone(W2Hist1D, MaCh3Sample->GetTitle() + "_w2_" + std::to_string(i));
+        TH1D* W2Hist1D = static_cast<TH1D*>(MaCh3Sample->GetW2Hist(SampleIndex, 1));
+        W2_Hist_Toy[iPDF][i] = M3::Clone(W2Hist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_w2_" + std::to_string(i));
         W2_Hist_Toy[iPDF][i]->Write();
         delete W2Hist1D;
       }

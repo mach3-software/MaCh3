@@ -8,6 +8,7 @@
 #include "Samples/SampleHandlerBase.h"
 #include "Samples/OscillationHandler.h"
 #include "Samples/FarDetectorCoreInfoStruct.h"
+#include "Samples/BinningHandler.h"
 
 #include "THStack.h"
 #include "TLegend.h"
@@ -28,44 +29,47 @@ class SampleHandlerFD :  public SampleHandlerBase
 
   /// @brief DB Function to differentiate 1D or 2D binning
   /// @ingroup SampleHandlerGetters
-  int GetNDim() const { return SampleDetails.nDimensions; }
+  int GetNDim(const int Sample) const { return SampleDetails[Sample].nDimensions; }
   /// @ingroup SampleHandlerGetters
-  std::string GetSampleName(int iSample = 0) const override;
+  std::string GetSampleHandlerName() const override;
   /// @ingroup SampleHandlerGetters
-  std::string GetTitle() const override {return SampleDetails.SampleTitle;}
+  std::string GetSampleTitle(const int Sample) const override {return SampleDetails[Sample].SampleTitle;}
 
   /// @ingroup SampleHandlerGetters
-  std::string GetXBinVarName() const {return SampleDetails.XVarStr;}
+  std::string GetXBinVarName(const int Sample) const {return SampleDetails[Sample].XVarStr;}
   /// @ingroup SampleHandlerGetters
-  std::string GetYBinVarName() const {return SampleDetails.YVarStr;}
+  std::string GetYBinVarName(const int Sample) const {return SampleDetails[Sample].YVarStr;}
 
-  void PrintIntegral(const TString& OutputName="/dev/null", const int WeightStyle=0, const TString& OutputCSVName="/dev/null");
+  void PrintIntegral(const int iSample, const TString& OutputName="/dev/null", const int WeightStyle=0, const TString& OutputCSVName="/dev/null");
   
   //===============================================================================
   // DB Reweighting and Likelihood functions
 
   //ETA - abstract these to SampleHandlerFDBase
   //DB Require these four functions to allow conversion from TH1(2)D to array for multi-threaded GetLikelihood
-  void AddData(TH1D* Data);
-  void AddData(TH2D* Data);
-  void AddData(std::vector<double> &data);
-  void AddData(std::vector< std::vector <double> > &data);
+  void AddData(const int Sample, TH1D* Data);
+  void AddData(const int Sample, TH2D* Data);
+  void AddData(const int Sample, std::vector<double> &data);
+  void AddData(const int Sample, std::vector< std::vector <double> > &data);
 
   /// @brief DB Multi-threaded GetLikelihood
-  double GetLikelihood() override;
+  double GetLikelihood() const override;
+  /// @ingroup SampleHandlerGetters
+  /// @brief Get likelihood for single sample
+  double GetSampleLikelihood(const int isample) const override;
   //===============================================================================
 
   /// @brief Get MC histogram
   /// @ingroup SampleHandlerGetters
-  TH1* GetMCHist(const int Dimension);
+  TH1* GetMCHist(const int Sample, const int Dimension);
 
   /// @brief Get W2 histogram
   /// @ingroup SampleHandlerGetters
-  TH1* GetW2Hist(const int Dimension);
+  TH1* GetW2Hist(const int Sample, const int Dimension);
 
   /// @brief Get Data histogram
   /// @ingroup SampleHandlerGetters
-  TH1* GetDataHist(const int Dimension);
+  TH1* GetDataHist(const int Sample, const int Dimension);
 
   void Reweight() override;
   M3::float_t GetEventWeight(const int iEntry) const;
@@ -77,51 +81,51 @@ class SampleHandlerFD :  public SampleHandlerBase
   void ReadSampleConfig();
 
   /// @ingroup SampleHandlerGetters
-  int GetNOscChannels() override {return static_cast<int>(OscChannels.size());}
+  int GetNOscChannels(const int iSample) const override {return static_cast<int>(SampleDetails[iSample].OscChannels.size());};
 
   /// @ingroup SampleHandlerGetters
-  std::string GetFlavourName(const int iChannel) {
-    if (iChannel < 0 || iChannel > GetNOscChannels()) {
+  std::string GetFlavourName(const int iSample, const int iChannel) {
+    if (iChannel < 0 || iChannel > GetNOscChannels(iSample)) {
       MACH3LOG_ERROR("Invalid Channel Requested: {}", iChannel);
       throw MaCh3Exception(__FILE__ , __LINE__);      
     }
-    return OscChannels[iChannel].flavourName;
+    return SampleDetails[iSample].OscChannels[iChannel].flavourName;
   }
 
   /// @ingroup SampleHandlerGetters
-  TH1* Get1DVarHist(const std::string& ProjectionVar, const std::vector< KinematicCut >& EventSelectionVec = std::vector< KinematicCut >(),
+  TH1* Get1DVarHist(const int iSample, const std::string& ProjectionVar, const std::vector< KinematicCut >& EventSelectionVec = std::vector< KinematicCut >(),
                     int WeightStyle=0, TAxis* Axis=nullptr, const std::vector< KinematicCut >& SubEventSelectionVec = std::vector< KinematicCut >());
-  TH2* Get2DVarHist(const std::string& ProjectionVarX, const std::string& ProjectionVarY,
+  TH2* Get2DVarHist(const int iSample, const std::string& ProjectionVarX, const std::string& ProjectionVarY,
                     const std::vector< KinematicCut >& EventSelectionVec = std::vector< KinematicCut >(),
                     int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr,
                     const std::vector< KinematicCut >& SubEventSelectionVec = std::vector< KinematicCut >());
   
   /// @ingroup SampleHandlerGetters
-  void Fill1DSubEventHist(TH1D* _h1DVar, const std::string& ProjectionVar, const std::vector< KinematicCut >& SubEventSelectionVec = std::vector< KinematicCut >(),
+  void Fill1DSubEventHist(const int iSample, TH1D* _h1DVar, const std::string& ProjectionVar, const std::vector< KinematicCut >& SubEventSelectionVec = std::vector< KinematicCut >(),
                     int WeightStyle=0);
-  void Fill2DSubEventHist(TH2D* _h2DVar, const std::string& ProjectionVarX, const std::string& ProjectionVarY,
+  void Fill2DSubEventHist(const int iSample, TH2D* _h2DVar, const std::string& ProjectionVarX, const std::string& ProjectionVarY,
                     const std::vector< KinematicCut >& SubEventSelectionVec = std::vector< KinematicCut >(), int WeightStyle=0);
   
   /// @ingroup SampleHandlerGetters
-  TH1* Get1DVarHistByModeAndChannel(const std::string& ProjectionVar_Str, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* Axis=nullptr);
+  TH1* Get1DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_Str, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* Axis=nullptr);
   /// @ingroup SampleHandlerGetters
-  TH2* Get2DVarHistByModeAndChannel(const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
+  TH2* Get2DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY, int kModeToFill=-1, int kChannelToFill=-1, int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr);
 
   /// @ingroup SampleHandlerGetters
-  TH1 *GetModeHist1D(int s, int m, int style = 0) {
-    return Get1DVarHistByModeAndChannel(GetXBinVarName(),m,s,style);
+  TH1 *GetModeHist1D(const int iSample, int s, int m, int style = 0) {
+    return Get1DVarHistByModeAndChannel(iSample, GetXBinVarName(iSample), m, s, style);
   }
   /// @ingroup SampleHandlerGetters
-  TH2 *GetModeHist2D(int s, int m, int style = 0) {
-    return Get2DVarHistByModeAndChannel(GetXBinVarName(),GetYBinVarName(),m,s,style);
+  TH2 *GetModeHist2D(const int iSample, int s, int m, int style = 0) {
+    return Get2DVarHistByModeAndChannel(iSample, GetXBinVarName(iSample),GetYBinVarName(iSample), m, s, style);
   }
 
   /// @ingroup SampleHandlerGetters
-  std::vector<TH1*> ReturnHistsBySelection1D(std::string KinematicProjection, int Selection1,int Selection2=-1, int WeightStyle=0, TAxis* Axis=0);
+  std::vector<TH1*> ReturnHistsBySelection1D(const int iSample, std::string KinematicProjection, int Selection1,int Selection2=-1, int WeightStyle=0, TAxis* Axis=0);
   /// @ingroup SampleHandlerGetters
-  std::vector<TH2*> ReturnHistsBySelection2D(std::string KinematicProjectionX, std::string KinematicProjectionY, int Selection1, int Selection2=-1, int WeightStyle=0, TAxis* XAxis=0, TAxis* YAxis=0);
+  std::vector<TH2*> ReturnHistsBySelection2D(const int iSample, std::string KinematicProjectionX, std::string KinematicProjectionY, int Selection1, int Selection2=-1, int WeightStyle=0, TAxis* XAxis=0, TAxis* YAxis=0);
   /// @ingroup SampleHandlerGetters
-  THStack* ReturnStackedHistBySelection1D(std::string KinematicProjection, int Selection1, int Selection2=-1, int WeightStyle=0, TAxis* Axis=0);
+  THStack* ReturnStackedHistBySelection1D(const int iSample, const std::string& KinematicProjection, int Selection1, int Selection2=-1, int WeightStyle=0, TAxis* Axis=0);
   /// @ingroup SampleHandlerGetters
   TLegend* ReturnStackHistLegend() {return THStackLeg;}
   
@@ -177,35 +181,13 @@ class SampleHandlerFD :  public SampleHandlerBase
   void FillSplineBins();
 
   //Functions which find the nominal bin and bin edges
-  void FindNominalBinAndEdges1D();
-  void FindNominalBinAndEdges2D();
+  void FindNominalBinAndEdges();
 
-  //DB Overrided functions of base class which calculate erec bin and boundaries for reweighting speedup in beam samples
-  //ETA - this can be done using the core info stored in the new fdmc_struct
-  /// @brief sets the binning used for the likelihood calculation, used for both data and MC
-  /// @param nbins number of total bins
-  /// @param boundaries the bin edges e.g. 0, 0.1, 0.2, 0.3 
-  void Set1DBinning(size_t nbins, double* boundaries);
   /// @brief set the binning for 2D sample used for the likelihood calculation
-  /// @param nbins1 number of bins in axis 1 (the x-axis)
-  /// @param nbins2 number of bins in axis 2 (the y-axis)
-  /// @param boundaries1 the bin boundaries used in axis 1 (the x-axis)
-  /// @param boundaries2 the bin boundaries used in axis 2 (the y-axis)
-  void Set2DBinning(size_t nbins1, double* boundaries1, size_t nbins2, double* boundaries2);
-  /// @brief set the binning for 1D sample used for the likelihood calculation
-  /// @param XVec vector containing the binning in axis 1 (the x-axis)
-  void Set1DBinning(std::vector<double> &XVec) {Set1DBinning(XVec.size()-1, XVec.data());};
-  /// @brief set the binning for 2D sample used for the likelihood calculation
-  /// @param XVec vector containing the binning in axis 1 (the x-axis)
-  /// @param YVec vector containing the binning in axis 2 (the y-axis)
-  void Set2DBinning(std::vector<double> &XVec, std::vector<double> &YVec) {Set2DBinning(XVec.size()-1, XVec.data(), YVec.size()-1, YVec.data());};
-  /// @brief Function to setup the binning of your sample histograms and the underlying
-  /// arrays that get handled in fillArray() and fillArray_MP().
-  /// The Binning.XBinEdges are filled in the daughter class from the sample config file.
-  /// This "passing" can be removed.
-  void SetupSampleBinning();
+  void SetBinning();
+
   /// @brief Initialise data, MC and W2 histograms
-  void SetupReweightArrays(const size_t numberXBins, const size_t numberYBins);
+  void SetupReweightArrays();
   //===============================================================================
 
   // ----- Functional Parameters -----
@@ -221,7 +203,7 @@ class SampleHandlerFD :  public SampleHandlerBase
   virtual void ApplyShifts(int iEvent);
 
   /// @brief DB Function which determines if an event is selected, where Selection double looks like {{ND280KinematicTypes Var1, douuble LowBound}
-  bool IsEventSelected(const int iEvent);
+  bool IsEventSelected(const int iSample, const int iEvent);
   /// @brief JM Function which determines if a subevent is selected
   bool IsSubEventSelected(const std::vector<KinematicCut> &SubEventCuts, const int iEvent, unsigned const int iSubEvent, size_t nsubevents);
   /// @brief HH - reset the shifted values to the original values
@@ -268,7 +250,7 @@ class SampleHandlerFD :  public SampleHandlerBase
   // ===========================================================
 
   /// @brief Return the binning used to draw a kinematic parameter
-  std::vector<double> ReturnKinematicParameterBinning(const std::string& KinematicParameter);
+  std::vector<double> ReturnKinematicParameterBinning(const int Sample, const std::string& KinematicParameter) const;
   virtual const double* GetPointerToKinematicParameter(std::string KinematicParamter, int iEvent) = 0;
   virtual const double* GetPointerToKinematicParameter(double KinematicVariable, int iEvent) = 0;
 
@@ -281,7 +263,7 @@ class SampleHandlerFD :  public SampleHandlerBase
   //DB Functions required for reweighting functions
   //DB Replace previous implementation with reading bin contents from SampleHandlerFD_array
   /// @brief Fill a histogram with the event-level information used in the fit
-  void FillMCHist(const int Dimension);
+  void FillMCHist(const int Sample, const int Dimension);
 
   /// @brief DB Nice new multi-threaded function which calculates the event weights and fills the relevant bins of an array
 #ifdef MULTITHREAD
@@ -302,8 +284,7 @@ class SampleHandlerFD :  public SampleHandlerBase
   //===============================================================================
   //DB Variables required for GetLikelihood
   /// KS: This stores binning information, in future could be come vector to store binning for every used sample
-  SampleBinningInfo Binning;
-
+  std::unique_ptr<BinningHandler> Binning;
   /// DB Array to be filled after reweighting
   double* SampleHandlerFD_array;
   /// KS Array used for MC stat
@@ -316,9 +297,7 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// Stores information about every MC event
   std::vector<FarDetectorCoreInfo> MCSamples;
   /// Stores info about currently initialised sample
-  SampleInfo SampleDetails;
-  /// Stores info about oscillation channel for a single sample
-  std::vector<OscChannelInfo> OscChannels;
+  std::vector<SampleInfo> SampleDetails;
   //===============================================================================
 
   //===============================================================================
@@ -329,7 +308,7 @@ class SampleHandlerFD :  public SampleHandlerBase
 
   //=============================================================================== 
   /// @brief A unique ID for each sample based on which we can define what systematic should be applied
-  std::string SampleName;
+  std::string SampleHandlerName;
 
   //===========================================================================
   //DB Vectors to store which kinematic cuts we apply
@@ -339,10 +318,10 @@ class SampleHandlerFD :  public SampleHandlerBase
   
   /// @brief What gets pulled from config options, these are constant after loading in
   /// this is of length 3: 0th index is the value, 1st is lower bound, 2nd is upper bound
-  std::vector< KinematicCut > StoredSelection;
+  std::vector< std::vector< KinematicCut > > StoredSelection;
   /// @brief a way to store selection cuts which you may push back in the get1DVar functions
   /// most of the time this is just the same as StoredSelection
-  std::vector< KinematicCut > Selection;
+  std::vector< std::vector< KinematicCut > > Selection;
    //===========================================================================
 
   /// Mapping between string and kinematic enum
@@ -361,11 +340,6 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// they are the appropriate size.
   void InitialiseSingleFDMCObject();
   void InitialiseSplineObject();
-
-  /// names of mc files associated associated with this object
-  std::vector<std::string> mc_files;
-  /// names of spline files associated associated with this object
-  std::vector<std::string> spline_files;
 
   std::unordered_map<std::string, double> _modeNomWeightMap;
   
