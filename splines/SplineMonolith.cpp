@@ -36,7 +36,7 @@ using PipeAB = sycl::ext::intel::pipe<IDPipeAB,        // An identifier for the 
 //*********************************************************
 [[intel::use_stall_enable_clusters]] 
 void FPGACalcSplineWeights(int nParams,
-                           int NSplines_valid,
+                           int total_chunks,
                            short int *paramNo_arr,
                            unsigned int *nKnots_arr,
                            short *SplineSegments,
@@ -244,7 +244,7 @@ void FPGACalcSplineWeights(int nParams,
 //*********************************************************
 //KS: Calc total event weight on CPU
 [[intel::use_stall_enable_clusters]]
-void FPGAModifyWeights(int NSplines_valid, float *cpu_total_weights){
+void FPGAModifyWeights(int total_chunks, float *cpu_total_weights){
 //*********************************************************
   sycl::ext::intel::host_ptr<float> cpu_total_weights_host(cpu_total_weights);
 
@@ -255,7 +255,7 @@ void FPGAModifyWeights(int NSplines_valid, float *cpu_total_weights){
   sycl::ext::oneapi::experimental::printf("NSplines_valid %d \n", NSplines_valid);
 
 
-  for (size_t i = 0; i < NSplines_valid / chunk_size; i++) {
+  for (size_t i = 0; i < total_chunks; i++) {
     bool success = false;
     PipeStruct tmp;
     sycl::ext::oneapi::experimental::printf("Reading from pipe\n");
@@ -273,7 +273,9 @@ void FPGAModifyWeights(int NSplines_valid, float *cpu_total_weights){
       prod *= tmp.spline_computations[a];
     }
   }
-
+  // IMPORTANT: Need to write out the result for the very last event after the loop finishes.
+  // The if-condition (tmp.eventNum != current_event) only triggers on event CHANGE.
+  cpu_total_weights_host[current_event] = prod; 
 
   // OLD
   // [[intel::initiation_interval(1)]]
@@ -1397,14 +1399,24 @@ void SMonolith::Evaluate() {
     };
  
     int n_coeff = _nCoeff_;
-    // Time the kernel call
+     // On the host, before kernel submission
+    unsigned int total_chunks = 0;
+    // nChunk is a const int = 2 in the producer
+    const int nChunk = 2; 
+    
+    for (unsigned int i = 0; i < n_events; ++i) {
+        // This is a common way to calculate ceil(a/b) with integer arithmetic
+        total_chunks += (splines_per_event[i] + nChunk - 1) / nChunk;
+    }
+  
+  // Time the kernel call
     std::chrono::time_point<std::chrono::system_clock> start, end; 
     //Before the kernal call
     start = std::chrono::system_clock::now();
  
     // Call the kernel
     auto e = queue.single_task<IDOptimized>(OptimizedKernel{nParams,
-                                                            NSplines_valid,
+                                                            total_chunks,
                                                             cpu_spline_handler->paramNo_arr,
                                                             cpu_spline_handler->nKnots_arr,
                                                             SplineSegments,
