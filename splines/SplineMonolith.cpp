@@ -252,7 +252,7 @@ void FPGAModifyWeights(int total_chunks, float *cpu_total_weights){
   int current_event = 0;
   float prod = 1;
 
-  sycl::ext::oneapi::experimental::printf("NSplines_valid %d \n", NSplines_valid);
+  sycl::ext::oneapi::experimental::printf("total_chunks %d \n", total_chunks);
 
 
   for (size_t i = 0; i < total_chunks; i++) {
