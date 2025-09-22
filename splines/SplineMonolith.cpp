@@ -1404,9 +1404,9 @@ void SMonolith::Evaluate() {
     // nChunk is a const int = 2 in the producer
     const int nChunk = 2; 
     
-    for (unsigned int i = 0; i < n_events; ++i) {
+    for (unsigned int i = 0; i < NEvents; ++i) {
         // This is a common way to calculate ceil(a/b) with integer arithmetic
-        total_chunks += (splines_per_event[i] + nChunk - 1) / nChunk;
+        total_chunks += (cpu_spline_handler->splines_per_event_arr[i] + nChunk - 1) / nChunk;
     }
   
   // Time the kernel call
