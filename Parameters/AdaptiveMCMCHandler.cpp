@@ -191,7 +191,7 @@ void AdaptiveMCMCHandler::SetThrowMatrixFromFile(const std::string& matrix_file_
 // ********************************************
   // Lets you set the throw matrix externally
   // Open file
-  std::unique_ptr<TFile>matrix_file(new TFile(matrix_file_name.c_str()));
+  auto matrix_file = std::make_unique<TFile>(matrix_file_name.c_str());
   use_adaptive = true;
 
   if(matrix_file->IsZombie()){

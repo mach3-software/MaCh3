@@ -2777,8 +2777,8 @@ void MCMCProcessor::GetPolarPlot(const std::vector<std::string>& ParNames){
     std::vector<double> x_val(nBins);
     std::vector<double> y_val(nBins);
 
-    double xmin = 0;
-    double xmax = 2*TMath::Pi();
+    constexpr double xmin = 0;
+    constexpr double xmax = 2*TMath::Pi();
 
     double Integral = hpost[ParamNo]->Integral();
     for (Int_t ipt = 0; ipt < nBins; ipt++)

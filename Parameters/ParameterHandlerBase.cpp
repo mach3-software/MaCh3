@@ -54,7 +54,6 @@ ParameterHandlerBase::~ParameterHandlerBase(){
 
   if (covMatrix != nullptr) delete covMatrix;
   if (invCovMatrix != nullptr) delete invCovMatrix;
-  if (throwMatrix_CholDecomp != nullptr) delete throwMatrix_CholDecomp;
   if (throwMatrix != nullptr) delete throwMatrix;
   for(int i = 0; i < _fNumPar; i++) {
     delete[] throwMatrixCholDecomp[i];
@@ -1001,42 +1000,7 @@ void ParameterHandlerBase::MakePosDef(TMatrixDSym *cov) {
     MACH3LOG_WARN("Passed nullptr to cov matrix in {}", matrixName);
   }
 
-  //DB Save original warning state and then increase it in this function to suppress 'matrix not positive definite' messages
-  //Means we no longer need to overload
-  int originalErrorWarning = gErrorIgnoreLevel;
-  gErrorIgnoreLevel = kFatal;
-  
-  //DB Loop 1000 times adding 1e-9 which tops out at 1e-6 shift on the diagonal before throwing error
-  constexpr int MaxAttempts = 1e5;
-  int iAttempt = 0;
-  bool CanDecomp = false;
-  TDecompChol chdcmp;
-  
-  for (iAttempt = 0; iAttempt < MaxAttempts; iAttempt++) {
-    chdcmp = TDecompChol(*cov);
-    if (chdcmp.Decompose()) {
-      CanDecomp = true;
-      break;
-    } else {
-      #ifdef MULTITHREAD
-      #pragma omp parallel for
-      #endif
-      for (int iVar = 0 ; iVar < _fNumPar; iVar++) {
-        (*cov)(iVar,iVar) += pow(10, -9);
-      }
-    }
-  }
-
-  if (!CanDecomp) {
-    MACH3LOG_ERROR("Tried {} times to shift diagonal but still can not decompose the matrix", MaxAttempts);
-    MACH3LOG_ERROR("This indicates that something is wrong with the input matrix");
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-  if(!use_adaptive || AdaptiveHandler->GetTotalSteps() < 2) {
-    MACH3LOG_INFO("Had to shift diagonal {} time(s) to allow the covariance matrix to be decomposed", iAttempt);
-  }
-  //DB Resetting warning level
-  gErrorIgnoreLevel = originalErrorWarning;
+  M3::MakeMatrixPosDef(cov);
 }
 
 // ********************************************
@@ -1070,15 +1034,7 @@ void ParameterHandlerBase::SetThrowMatrix(TMatrixDSym *cov){
   if(use_adaptive && AdaptiveHandler->AdaptionUpdate()) MakeClosestPosDef(throwMatrix);
   else MakePosDef(throwMatrix);
   
-  TDecompChol TDecompChol_throwMatrix(*throwMatrix);
-  
-  if(!TDecompChol_throwMatrix.Decompose()) {
-    MACH3LOG_ERROR("Cholesky decomposition failed for {} trying to make positive definite", matrixName);
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-
-  throwMatrix_CholDecomp = new TMatrixD(TDecompChol_throwMatrix.GetU());
-  throwMatrix_CholDecomp->T();
+  auto throwMatrix_CholDecomp = M3::GetCholeskyDecomposedMatrix(*throwMatrix, matrixName);
   
   //KS: ROOT has bad memory management, using standard double means we can decrease most operation by factor 2 simply due to cache hits
   #ifdef MULTITHREAD
@@ -1088,7 +1044,7 @@ void ParameterHandlerBase::SetThrowMatrix(TMatrixDSym *cov){
   {
     for (int j = 0; j < _fNumPar; ++j)
     {
-      throwMatrixCholDecomp[i][j] = (*throwMatrix_CholDecomp)(i,j);
+      throwMatrixCholDecomp[i][j] = throwMatrix_CholDecomp[i][j];
     }
   }
 }
@@ -1098,8 +1054,6 @@ void ParameterHandlerBase::UpdateThrowMatrix(TMatrixDSym *cov){
 // ********************************************
   delete throwMatrix;
   throwMatrix = nullptr;
-  delete throwMatrix_CholDecomp;
-  throwMatrix_CholDecomp = nullptr;
   SetThrowMatrix(cov);
 }
 
@@ -1328,7 +1282,6 @@ void ParameterHandlerBase::SetTune(const std::string& TuneName) {
 
   SetParameters(Values);
 }
-
 
 // *************************************
 /// @brief Matches branches in a TTree to parameters in a systematic handler.

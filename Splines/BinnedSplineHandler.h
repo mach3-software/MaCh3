@@ -25,7 +25,7 @@ class BinnedSplineHandler : public SplineBase {
 
     /// @brief add oscillation channel to spline monolith
     void AddSample(const std::string& SampleName,
-                   const std::string& SampleTittle,
+                   const std::string& SampleTitle,
                    const std::vector<std::string>& OscChanFileNames,
                    const std::vector<std::string>& SplineVarNames);
     /// @brief flatten multidimensional spline array into proper monolith
@@ -35,31 +35,31 @@ class BinnedSplineHandler : public SplineBase {
 
     /// @brief Loads and processes splines from ROOT files for a given sample.
     /// @note DB Add virtual so it can be overridden in experiment specific (if needed)
-    virtual void FillSampleArray(std::string SampleTittle, std::vector<std::string> OscChanFileNames);
+    virtual void FillSampleArray(std::string SampleTitle, std::vector<std::string> OscChanFileNames);
     /// @brief Check if there are any repeated modes. This is used to reduce the number
     /// of modes in case many interaction modes get averaged into one spline
     std::vector< std::vector<int> > StripDuplicatedModes(const std::vector< std::vector<int> >& InputVector);
     /// @brief Return the splines which affect a given event
-    std::vector< std::vector<int> > GetEventSplines(const std::string& SampleTittle, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val);
+    std::vector< std::vector<int> > GetEventSplines(const std::string& SampleTitle, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val);
 
     /// @brief Grab histograms with spline binning
-    std::vector<TAxis*> FindSplineBinning(const std::string& FileName, const std::string& SampleTittle);
+    std::vector<TAxis*> FindSplineBinning(const std::string& FileName, const std::string& SampleTitle);
 
     int CountNumberOfLoadedSplines(bool NonFlat=false, int Verbosity=0);
     std::string getDimLabel(const int BinningOpt, const unsigned int Axis) const;
     /// @brief Get index of sample based on name
     /// @param SampleTitle The title of the sample to search for.
-    int GetSampleIndex(const std::string& SampleTittle) const;
+    int GetSampleIndex(const std::string& SampleTitle) const;
     /// @brief Ensure we have spline for a given bin
-    bool isValidSplineIndex(const std::string& SampleTittle, int iSyst, int iOscChan, int iMode, int iVar1, int iVar2, int iVar3);
+    bool isValidSplineIndex(const std::string& SampleTitle, int iSyst, int iOscChan, int iMode, int iVar1, int iVar2, int iVar3);
 
-    void BuildSampleIndexingArray(const std::string& SampleTittle);
+    void BuildSampleIndexingArray(const std::string& SampleTitle);
     void PrepForReweight();
     void getSplineCoeff_SepMany(int splineindex, M3::float_t *& xArray, M3::float_t *&manyArray);
     void PrintBinning(TAxis* Axis) const;
     /// @brief Print info like Sample ID of spline params etc.
-    void PrintSampleDetails(const std::string& SampleTittle) const;
-    void PrintArrayDetails(const std::string& SampleTittle) const;
+    void PrintSampleDetails(const std::string& SampleTitle) const;
+    void PrintArrayDetails(const std::string& SampleTitle) const;
 
     /// @brief get pointer to spline weight based on bin variables
     const M3::float_t* retPointer(const int sample, const int oscchan, const int syst, const int mode,
