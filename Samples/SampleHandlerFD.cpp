@@ -54,7 +54,7 @@ SampleHandlerFD::~SampleHandlerFD() {
   if(THStackLeg != nullptr) delete THStackLeg;
 }
 
-void SampleHandlerFD::ReadSampleConfig() 
+void SampleHandlerFD::ReadSampleHandlerConfig()
 {
   auto ModeName = Get<std::string>(SampleManager->raw()["MaCh3ModeConfig"], __FILE__ , __LINE__);
   Modes = std::make_unique<MaCh3Modes>(ModeName);
@@ -65,7 +65,11 @@ void SampleHandlerFD::ReadSampleConfig()
   if (CheckNodeExists(SampleManager->raw(), "LikelihoodOptions")) {
     UpdateW2 = GetFromManager<bool>(SampleManager->raw()["LikelihoodOptions"]["UpdateW2"], false);
   }
-  SampleInfo SingleSample;
+
+  if (!CheckNodeExists(SampleManager->raw(), "BinningFile")){
+    MACH3LOG_ERROR("BinningFile not given in for sample handler {}, ReturnKinematicParameterBinning will not work", SampleHandlerName);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
 
   auto EnabledSasmples = Get<std::vector<std::string>>(SampleManager->raw()["Samples"], __FILE__ , __LINE__);
   // Get number of samples and resize relevant objects
@@ -75,109 +79,7 @@ void SampleHandlerFD::ReadSampleConfig()
   for (int iSample = 0; iSample < nSamples; iSample++)
   {
     auto SampleSettings = SampleManager->raw()[EnabledSasmples[iSample]];
-    //SampleTitle has to be provided in the sample yaml otherwise this will throw an exception
-    SingleSample.SampleTitle = Get<std::string>(SampleSettings["SampleTitle"], __FILE__ , __LINE__);
-
-    //Binning
-    SingleSample.nDimensions = 0;
-    SingleSample.XVarStr = GetFromManager(SampleSettings["Binning"]["XVarStr"], std::string(""));
-    auto XBinEdges = GetFromManager(SampleSettings["Binning"]["XVarBins"], std::vector<double>());
-    const auto& edgesx = XBinEdges;
-    if (!std::is_sorted(edgesx.begin(), edgesx.end())) {
-      MACH3LOG_ERROR("XVarBins must be in increasing order in sample config {}\n  XVarBins: [{}]",
-                    SingleSample.SampleTitle, fmt::join(edgesx, ", "));
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-    if(SingleSample.XVarStr.length() > 0){
-      SingleSample.nDimensions++;
-    } else{
-      MACH3LOG_ERROR("Please specify an X-variable string in sample config {}", SampleManager->GetFileName());
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-
-    SingleSample.YVarStr = GetFromManager(SampleSettings["Binning"]["YVarStr"], std::string(""));
-    auto YBinEdges = GetFromManager(SampleSettings["Binning"]["YVarBins"], std::vector<double>());
-    const auto& edgesy = YBinEdges;
-    if (!std::is_sorted(edgesy.begin(), edgesy.end())) {
-      MACH3LOG_ERROR("YBinEdges must be in increasing order in sample config {}\n  YBinEdges: [{}]",
-                    SingleSample.SampleTitle, fmt::join(edgesy, ", "));
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-    if(SingleSample.YVarStr.length() > 0){
-      if(SingleSample.XVarStr.length() == 0){
-        MACH3LOG_ERROR("Please specify an X-variable string in sample config {}. I won't work only with a Y-variable", SampleManager->GetFileName());
-        throw MaCh3Exception(__FILE__, __LINE__);
-      }
-      SingleSample.nDimensions++;
-    }
-
-    if(SingleSample.nDimensions == 0){
-      MACH3LOG_ERROR("Error setting up the sample binning");
-      MACH3LOG_ERROR("Number of dimensions is {}", SingleSample.nDimensions);
-      MACH3LOG_ERROR("Check that an XVarStr has been given in the sample config");
-      throw MaCh3Exception(__FILE__, __LINE__);
-    } else{
-      MACH3LOG_INFO("Found {} dimensions for sample binning", SingleSample.nDimensions);
-    }
-
-    //Check whether you are setting up 1D or 2D binning
-    if(SingleSample.nDimensions == 1){
-      MACH3LOG_INFO("Setting up {}D binning with {}", SingleSample.nDimensions, SingleSample.XVarStr);
-      YBinEdges = {-1e8, 1e8};
-    } else if(SingleSample.nDimensions == 2){
-      MACH3LOG_INFO("Setting up {}D binning with {} and {}", SingleSample.nDimensions, SingleSample.XVarStr, SingleSample.YVarStr);
-    } else{
-      MACH3LOG_ERROR("Number of dimensions is not 1 or 2, this is unsupported at the moment");
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-
-
-    if (!CheckNodeExists(SampleManager->raw(), "BinningFile")){
-      MACH3LOG_ERROR("BinningFile not given in for sample {}, ReturnKinematicParameterBinning will not work", SingleSample.SampleTitle);
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-    Binning->SetupSampleBinning(XBinEdges, YBinEdges);
-
-    auto mtupleprefix  = Get<std::string>(SampleManager->raw()["InputFiles"]["mtupleprefix"], __FILE__, __LINE__);
-    auto mtuplesuffix  = Get<std::string>(SampleManager->raw()["InputFiles"]["mtuplesuffix"], __FILE__, __LINE__);
-    auto splineprefix  = Get<std::string>(SampleManager->raw()["InputFiles"]["splineprefix"], __FILE__, __LINE__);
-    auto splinesuffix  = Get<std::string>(SampleManager->raw()["InputFiles"]["splinesuffix"], __FILE__, __LINE__);
-
-    int NChannels = static_cast<M3::int_t>(SampleManager->raw()["SubSamples"].size());
-    SingleSample.OscChannels.reserve(NChannels);
-
-    for (auto const &osc_channel : SampleManager->raw()["SubSamples"]) {
-      std::string MTupleFileName = mtupleprefix+osc_channel["mtuplefile"].as<std::string>()+mtuplesuffix;
-
-      OscChannelInfo OscInfo;
-      OscInfo.flavourName       = osc_channel["Name"].as<std::string>();
-      OscInfo.flavourName_Latex = osc_channel["LatexName"].as<std::string>();
-      OscInfo.InitPDG           = static_cast<NuPDG>(osc_channel["nutype"].as<int>());
-      OscInfo.FinalPDG          = static_cast<NuPDG>(osc_channel["oscnutype"].as<int>());
-      OscInfo.ChannelIndex      = GetNOscChannels(iSample);
-
-      SingleSample.OscChannels.push_back(std::move(OscInfo));
-
-      FileToInitPDGMap[MTupleFileName] = static_cast<NuPDG>(osc_channel["nutype"].as<int>());
-      FileToFinalPDGMap[MTupleFileName] = static_cast<NuPDG>(osc_channel["oscnutype"].as<int>());
-
-      SingleSample.mc_files.push_back(MTupleFileName);
-      SingleSample.spline_files.push_back(splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);
-    }
-
-    //Now grab the selection cuts from the manager
-    for ( auto const &SelectionCuts : SampleManager->raw()["SelectionCuts"]) {
-      auto TempBoundsVec = GetBounds(SelectionCuts["Bounds"]);
-      KinematicCut CutObj;
-      CutObj.LowerBound = TempBoundsVec[0];
-      CutObj.UpperBound = TempBoundsVec[1];
-      CutObj.ParamToCutOnIt = ReturnKinematicParameterFromString(SelectionCuts["KinematicStr"].as<std::string>());
-      MACH3LOG_INFO("Adding cut on {} with bounds {} to {}", SelectionCuts["KinematicStr"].as<std::string>(), TempBoundsVec[0], TempBoundsVec[1]);
-      StoredSelection[iSample].push_back(CutObj);
-    }
-    /// Add new sample
-    SingleSample.InitialiseHistograms();
-    SampleDetails[iSample] = SingleSample;
+    LoadSingleSample(iSample, SampleSettings);
   } // end loop over enabling samples
 
   // EM: initialise the mode weight map
@@ -204,16 +106,121 @@ void SampleHandlerFD::ReadSampleConfig()
   }
 }
 
+
+// ************************************************
+void SampleHandlerFD::LoadSingleSample(const int iSample, const YAML::Node& SampleSettings) {
+// ************************************************
+  SampleInfo SingleSample;
+  //SampleTitle has to be provided in the sample yaml otherwise this will throw an exception
+  SingleSample.SampleTitle = Get<std::string>(SampleSettings["SampleTitle"], __FILE__ , __LINE__);
+
+  //Binning
+  SingleSample.nDimensions = 0;
+  SingleSample.XVarStr = GetFromManager(SampleSettings["Binning"]["XVarStr"], std::string(""));
+  auto XBinEdges = GetFromManager(SampleSettings["Binning"]["XVarBins"], std::vector<double>());
+  const auto& edgesx = XBinEdges;
+  if (!std::is_sorted(edgesx.begin(), edgesx.end())) {
+    MACH3LOG_ERROR("XVarBins must be in increasing order in sample config {}\n  XVarBins: [{}]",
+                   SingleSample.SampleTitle, fmt::join(edgesx, ", "));
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  if(SingleSample.XVarStr.length() > 0){
+    SingleSample.nDimensions++;
+  } else{
+    MACH3LOG_ERROR("Please specify an X-variable string in sample config {}", SampleManager->GetFileName());
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  SingleSample.YVarStr = GetFromManager(SampleSettings["Binning"]["YVarStr"], std::string(""));
+  auto YBinEdges = GetFromManager(SampleSettings["Binning"]["YVarBins"], std::vector<double>());
+  const auto& edgesy = YBinEdges;
+  if (!std::is_sorted(edgesy.begin(), edgesy.end())) {
+    MACH3LOG_ERROR("YBinEdges must be in increasing order in sample config {}\n  YBinEdges: [{}]",
+                   SingleSample.SampleTitle, fmt::join(edgesy, ", "));
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  if(SingleSample.YVarStr.length() > 0){
+    if(SingleSample.XVarStr.length() == 0){
+      MACH3LOG_ERROR("Please specify an X-variable string in sample config {}. I won't work only with a Y-variable", SampleManager->GetFileName());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    SingleSample.nDimensions++;
+  }
+
+  if(SingleSample.nDimensions == 0){
+    MACH3LOG_ERROR("Error setting up the sample binning");
+    MACH3LOG_ERROR("Number of dimensions is {}", SingleSample.nDimensions);
+    MACH3LOG_ERROR("Check that an XVarStr has been given in the sample config");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  } else{
+    MACH3LOG_INFO("Found {} dimensions for sample binning", SingleSample.nDimensions);
+  }
+
+  //Check whether you are setting up 1D or 2D binning
+  if(SingleSample.nDimensions == 1){
+    MACH3LOG_INFO("Setting up {}D binning with {}", SingleSample.nDimensions, SingleSample.XVarStr);
+    YBinEdges = {-1e8, 1e8};
+  } else if(SingleSample.nDimensions == 2){
+    MACH3LOG_INFO("Setting up {}D binning with {} and {}", SingleSample.nDimensions, SingleSample.XVarStr, SingleSample.YVarStr);
+  } else{
+    MACH3LOG_ERROR("Number of dimensions is not 1 or 2, this is unsupported at the moment");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  Binning->SetupSampleBinning(XBinEdges, YBinEdges);
+
+  auto mtupleprefix  = Get<std::string>(SampleSettings["InputFiles"]["mtupleprefix"], __FILE__, __LINE__);
+  auto mtuplesuffix  = Get<std::string>(SampleSettings["InputFiles"]["mtuplesuffix"], __FILE__, __LINE__);
+  auto splineprefix  = Get<std::string>(SampleSettings["InputFiles"]["splineprefix"], __FILE__, __LINE__);
+  auto splinesuffix  = Get<std::string>(SampleSettings["InputFiles"]["splinesuffix"], __FILE__, __LINE__);
+
+  int NChannels = static_cast<M3::int_t>(SampleSettings["SubSamples"].size());
+  SingleSample.OscChannels.reserve(NChannels);
+
+  for (auto const &osc_channel : SampleSettings["SubSamples"]) {
+    std::string MTupleFileName = mtupleprefix+osc_channel["mtuplefile"].as<std::string>()+mtuplesuffix;
+
+    OscChannelInfo OscInfo;
+    OscInfo.flavourName       = osc_channel["Name"].as<std::string>();
+    OscInfo.flavourName_Latex = osc_channel["LatexName"].as<std::string>();
+    OscInfo.InitPDG           = static_cast<NuPDG>(osc_channel["nutype"].as<int>());
+    OscInfo.FinalPDG          = static_cast<NuPDG>(osc_channel["oscnutype"].as<int>());
+    OscInfo.ChannelIndex      = GetNOscChannels(iSample);
+
+    SingleSample.OscChannels.push_back(std::move(OscInfo));
+
+    FileToInitPDGMap[MTupleFileName] = static_cast<NuPDG>(osc_channel["nutype"].as<int>());
+    FileToFinalPDGMap[MTupleFileName] = static_cast<NuPDG>(osc_channel["oscnutype"].as<int>());
+
+    SingleSample.mc_files.push_back(MTupleFileName);
+    SingleSample.spline_files.push_back(splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);
+  }
+  //Now grab the selection cuts from the manager
+  for ( auto const &SelectionCuts : SampleSettings["SelectionCuts"]) {
+    auto TempBoundsVec = GetBounds(SelectionCuts["Bounds"]);
+    KinematicCut CutObj;
+    CutObj.LowerBound = TempBoundsVec[0];
+    CutObj.UpperBound = TempBoundsVec[1];
+    CutObj.ParamToCutOnIt = ReturnKinematicParameterFromString(SelectionCuts["KinematicStr"].as<std::string>());
+    MACH3LOG_INFO("Adding cut on {} with bounds {} to {}", SelectionCuts["KinematicStr"].as<std::string>(), TempBoundsVec[0], TempBoundsVec[1]);
+    StoredSelection[iSample].emplace_back(CutObj);
+  }
+  /// Add new sample
+  // KS: Important to first call move and then InitialiseHistograms otheriwse histograms will be deleted
+  // need safer solution but do this like this for now
+  SampleDetails[iSample] = std::move(SingleSample);
+  SampleDetails[iSample].InitialiseHistograms();
+}
+
 void SampleHandlerFD::Initialise() {
   //First grab all the information from your sample config via your manager
-  ReadSampleConfig();
+  ReadSampleHandlerConfig();
 
   //Now initialise all the variables you will need
   Init();
 
   nEvents = SetupExperimentMC();
-
-  InitialiseSingleFDMCObject();
+  MCSamples.resize(nEvents);
   SetupFDMC();
 
   MACH3LOG_INFO("=============================================");
@@ -290,7 +297,7 @@ void SampleHandlerFD::FillMCHist(const int Sample, const int Dimension) {
     for (int yBin = 0; yBin < Binning->GetNYBins(Sample); ++yBin) {
       for (int xBin = 0; xBin < Binning->GetNXBins(Sample); ++xBin) {
         const int idx = Binning->GetGlobalBinSafe(Sample, xBin, yBin);
-        SampleDetails[Sample]._hPDF1D->SetBinContent(idx + 1, SampleHandlerFD_array[idx]);
+        SampleDetails[Sample]._hPDF1D->SetBinContent(xBin + 1, SampleHandlerFD_array[idx]);
       }
     }
   } else if (Dimension == 2) {
@@ -419,7 +426,7 @@ void SampleHandlerFD::FillArray() {
     const int GlobalBin = Binning->FindGlobalBin(MCEvent->NomSample, XVar, MCEvent->NomXBin, MCEvent->NomYBin);
 
     //DB Fill relevant part of thread array
-    if (GlobalBin > 0) {
+    if (GlobalBin > -1) {
       SampleHandlerFD_array[GlobalBin] += totalweight;
       if (FirstTimeW2) SampleHandlerFD_array_w2[GlobalBin] += totalweight*totalweight;
     }
@@ -515,7 +522,7 @@ void SampleHandlerFD::FillArray_MP() {
       //Maybe we can add an overflow bin to the array and assign any events to this bin?
       //Might save us an extra if call?
       //DB Fill relevant part of thread array
-      if (GlobalBin > 0) {
+      if (GlobalBin > -1) {
         SampleHandlerFD_array_private[GlobalBin] += totalweight;
         SampleHandlerFD_array_private_w2[GlobalBin] += totalweight*totalweight;
       }
@@ -1155,9 +1162,12 @@ void SampleHandlerFD::InitialiseNuOscillatorObjects() {
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   Oscillator = std::make_shared<OscillationHandler>(NuOscillatorConfigFile, EqualBinningPerOscChannel, OscParams, GetNOscChannels(0));
-  // KS: Start from 1 becasue sample 0 aleady added
-  for(int iSample = 1; iSample < GetNsamples(); iSample++) {
-    Oscillator->AddSample(NuOscillatorConfigFile, GetNOscChannels(iSample));
+  // Add samples only if we don't use same binning
+  if(!EqualBinningPerOscChannel) {
+    // KS: Start from 1 because sample 0 already added
+    for(int iSample = 1; iSample < GetNsamples(); iSample++) {
+      Oscillator->AddSample(NuOscillatorConfigFile, GetNOscChannels(iSample));
+    }
   }
   if (!EqualBinningPerOscChannel) {
     for(int iSample = 0; iSample < GetNsamples(); iSample++) {
@@ -1343,11 +1353,6 @@ double SampleHandlerFD::GetLikelihood() const {
   return negLogL;
 }
 
-void SampleHandlerFD::InitialiseSingleFDMCObject() {
-  MCSamples.resize(nEvents);
-}
-
-
 // ************************************************
 void SampleHandlerFD::SaveAdditionalInfo(TDirectory* Dir) {
 // ************************************************
@@ -1357,7 +1362,7 @@ void SampleHandlerFD::SaveAdditionalInfo(TDirectory* Dir) {
   TMacro ConfigSave = YAMLtoTMacro(Config, (std::string("Config_") + GetSampleHandlerName()));
   ConfigSave.Write();
 
-  for(int iSample = 0; GetNsamples(); iSample++)
+  for(int iSample = 0; iSample < GetNsamples(); iSample++)
   {
     std::unique_ptr<TH1> data_hist;
 
@@ -1371,7 +1376,7 @@ void SampleHandlerFD::SaveAdditionalInfo(TDirectory* Dir) {
       data_hist->GetYaxis()->SetTitle(GetYBinVarName(iSample).c_str());
       data_hist->GetZaxis()->SetTitle("Number of Events");
     } else {
-      MACH3LOG_ERROR("Not implemented");
+      MACH3LOG_ERROR("Not implemented for dimension {}", GetNDim(iSample));
       throw MaCh3Exception(__FILE__, __LINE__);
     }
 

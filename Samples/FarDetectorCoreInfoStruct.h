@@ -92,6 +92,11 @@ struct SampleInfo {
     _hPDF2D   = new TH2D("h" + histname2d + SampleTitle, histtitle, 1, 0, 1, 1, 0, 1);
     dathist2d = new TH2D("d" + histname2d + SampleTitle, histtitle, 1, 0, 1, 1, 0, 1);
 
+    _hPDF1D->SetDirectory(nullptr);
+    dathist->SetDirectory(nullptr);
+    _hPDF2D->SetDirectory(nullptr);
+    dathist2d->SetDirectory(nullptr);
+
     _hPDF1D->GetXaxis()->SetTitle(XVarStr.c_str());
     dathist->GetXaxis()->SetTitle(XVarStr.c_str());
     _hPDF2D->GetXaxis()->SetTitle(XVarStr.c_str());

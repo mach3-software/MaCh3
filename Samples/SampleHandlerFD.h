@@ -78,7 +78,8 @@ class SampleHandlerFD :  public SampleHandlerBase
   void InitialiseNuOscillatorObjects();
   void SetupNuOscillatorPointers();
 
-  void ReadSampleConfig();
+  void ReadSampleHandlerConfig();
+  void LoadSingleSample(const int iSample, const YAML::Node& Settings);
 
   /// @ingroup SampleHandlerGetters
   int GetNOscChannels(const int iSample) const override {return static_cast<int>(SampleDetails[iSample].OscChannels.size());};
@@ -336,9 +337,6 @@ class SampleHandlerFD :  public SampleHandlerBase
 
   /// The manager object used to read the sample yaml file
   std::unique_ptr<manager> SampleManager;
-  /// @brief function to create the member of the FarDetectorInfo struct so
-  /// they are the appropriate size.
-  void InitialiseSingleFDMCObject();
   void InitialiseSplineObject();
 
   std::unordered_map<std::string, double> _modeNomWeightMap;
