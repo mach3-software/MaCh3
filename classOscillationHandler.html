@@ -217,13 +217,13 @@ Private Attributes</h2></td></tr>
 <div class="line"><span class="lineno">   33</span>    <a class="code hl_variable" href="classOscillationHandler.html#aa246e725c7adc16c0b7516a593173162">NuOscProbCalcers</a>[0]-&gt;Setup();</div>
 <div class="line"><span class="lineno">   34</span>  } <span class="keywordflow">else</span> {</div>
 <div class="line"><span class="lineno">   35</span>    <a class="code hl_variable" href="classOscillationHandler.html#aa246e725c7adc16c0b7516a593173162">NuOscProbCalcers</a>.resize(SubChannels);</div>
-<div class="line"><span class="lineno">   36</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iSample = 0; iSample &lt; SubChannels; iSample++) {</div>
-<div class="line"><span class="lineno">   37</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Setting up NuOscillator::Oscillator object in OscillationChannel: {}/{}&quot;</span>, iSample, SubChannels);</div>
+<div class="line"><span class="lineno">   36</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iChannel = 0; iChannel &lt; SubChannels; iChannel++) {</div>
+<div class="line"><span class="lineno">   37</span>      <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Setting up NuOscillator::Oscillator object in OscillationChannel: {}/{}&quot;</span>, iChannel, SubChannels);</div>
 <div class="line"><span class="lineno">   38</span> </div>
 <div class="line"><span class="lineno">   39</span>      <a class="code hl_function" href="MaCh3Logger_8h.html#ada930684d7c1ed8916f1fbe6d266ca77">LoggerPrint</a>(<span class="stringliteral">&quot;NuOscillator&quot;</span>,</div>
 <div class="line"><span class="lineno">   40</span>                  [](<span class="keyword">const</span> std::string&amp; message) { <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{}&quot;</span>, message); },</div>
-<div class="line"><span class="lineno">   41</span>                  [<span class="keyword">this</span>, iSample, &amp;OscillFactory, &amp;NuOscillatorConfigFile]() {</div>
-<div class="line"><span class="lineno">   42</span>                    this-&gt;<a class="code hl_variable" href="classOscillationHandler.html#aa246e725c7adc16c0b7516a593173162">NuOscProbCalcers</a>[iSample] = std::unique_ptr&lt;OscillatorBase&gt;(</div>
+<div class="line"><span class="lineno">   41</span>                  [<span class="keyword">this</span>, iChannel, &amp;OscillFactory, &amp;NuOscillatorConfigFile]() {</div>
+<div class="line"><span class="lineno">   42</span>                    this-&gt;<a class="code hl_variable" href="classOscillationHandler.html#aa246e725c7adc16c0b7516a593173162">NuOscProbCalcers</a>[iChannel] = std::unique_ptr&lt;OscillatorBase&gt;(</div>
 <div class="line"><span class="lineno">   43</span>                      OscillFactory-&gt;CreateOscillator(NuOscillatorConfigFile));</div>
 <div class="line"><span class="lineno">   44</span>                  });</div>
 <div class="line"><span class="lineno">   45</span>    }</div>

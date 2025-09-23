@@ -529,20 +529,20 @@ Clarence Wret </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="PredictiveThrower_8cpp_source.html#l00578">578</a> of file <a class="el" href="PredictiveThrower_8cpp_source.html">PredictiveThrower.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  581</span>                                                                   {</div>
-<div class="line"><span class="lineno">  582</span><span class="comment">// *************************</span></div>
-<div class="line"><span class="lineno">  583</span>  <span class="keywordtype">double</span> llh = 0.0;</div>
-<div class="line"><span class="lineno">  584</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 1; i &lt;= DatHist-&gt;GetXaxis()-&gt;GetNbins(); ++i)</div>
-<div class="line"><span class="lineno">  585</span>  {</div>
-<div class="line"><span class="lineno">  586</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> data = DatHist-&gt;GetBinContent(i);</div>
-<div class="line"><span class="lineno">  587</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> mc = MCHist-&gt;GetBinContent(i);</div>
-<div class="line"><span class="lineno">  588</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> w2 = W2Hist-&gt;GetBinContent(i);</div>
-<div class="line"><span class="lineno">  589</span>    llh += SampleHandler-&gt;<a class="code hl_function" href="group__SampleHandlerGetters.html#ga527307a4186e2eb61475ea975108aa65">GetTestStatLLH</a>(data, mc, w2);</div>
-<div class="line"><span class="lineno">  590</span>  }</div>
-<div class="line"><span class="lineno">  591</span>  <span class="comment">//KS: do times 2 because banff reports chi2</span></div>
-<div class="line"><span class="lineno">  592</span>  <span class="keywordflow">return</span> 2*llh;</div>
-<div class="line"><span class="lineno">  593</span>}</div>
+<p class="definition">Definition at line <a class="el" href="PredictiveThrower_8cpp_source.html#l00583">583</a> of file <a class="el" href="PredictiveThrower_8cpp_source.html">PredictiveThrower.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  586</span>                                                                   {</div>
+<div class="line"><span class="lineno">  587</span><span class="comment">// *************************</span></div>
+<div class="line"><span class="lineno">  588</span>  <span class="keywordtype">double</span> llh = 0.0;</div>
+<div class="line"><span class="lineno">  589</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 1; i &lt;= DatHist-&gt;GetXaxis()-&gt;GetNbins(); ++i)</div>
+<div class="line"><span class="lineno">  590</span>  {</div>
+<div class="line"><span class="lineno">  591</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> data = DatHist-&gt;GetBinContent(i);</div>
+<div class="line"><span class="lineno">  592</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> mc = MCHist-&gt;GetBinContent(i);</div>
+<div class="line"><span class="lineno">  593</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> w2 = W2Hist-&gt;GetBinContent(i);</div>
+<div class="line"><span class="lineno">  594</span>    llh += SampleHandler-&gt;<a class="code hl_function" href="group__SampleHandlerGetters.html#ga527307a4186e2eb61475ea975108aa65">GetTestStatLLH</a>(data, mc, w2);</div>
+<div class="line"><span class="lineno">  595</span>  }</div>
+<div class="line"><span class="lineno">  596</span>  <span class="comment">//KS: do times 2 because banff reports chi2</span></div>
+<div class="line"><span class="lineno">  597</span>  <span class="keywordflow">return</span> 2*llh;</div>
+<div class="line"><span class="lineno">  598</span>}</div>
 <div class="ttc" id="agroup__SampleHandlerGetters_html_ga527307a4186e2eb61475ea975108aa65"><div class="ttname"><a href="group__SampleHandlerGetters.html#ga527307a4186e2eb61475ea975108aa65">SampleHandlerBase::GetTestStatLLH</a></div><div class="ttdeci">double GetTestStatLLH(const double data, const double mc, const double w2) const</div><div class="ttdoc">Calculate test statistic for a single bin. Calculation depends on setting of fTestStatistic....</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8cpp_source.html#l00036">SampleHandlerBase.cpp:36</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -734,41 +734,41 @@ Clarence Wret </dd></dl>
 
 <p>Produce Chi2 plot for a single sample based on which $p$-value is calculated. </p>
 
-<p class="definition">Definition at line <a class="el" href="PredictiveThrower_8cpp_source.html#l00639">639</a> of file <a class="el" href="PredictiveThrower_8cpp_source.html">PredictiveThrower.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  644</span>                                          {</div>
-<div class="line"><span class="lineno">  645</span><span class="comment">// *************************</span></div>
-<div class="line"><span class="lineno">  646</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iSample = 0; iSample &lt; <a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>+1; ++iSample) {</div>
-<div class="line"><span class="lineno">  647</span>    SampleDir[iSample]-&gt;cd();</div>
-<div class="line"><span class="lineno">  648</span> </div>
-<div class="line"><span class="lineno">  649</span>    <span class="comment">// Transpose to extract chi2 values for a given sample across all toys</span></div>
-<div class="line"><span class="lineno">  650</span>    std::vector&lt;double&gt; chi2_y_sample(<a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>);</div>
-<div class="line"><span class="lineno">  651</span>    std::vector&lt;double&gt; chi2_x_per_sample(<a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>);</div>
-<div class="line"><span class="lineno">  652</span> </div>
-<div class="line"><span class="lineno">  653</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iToy = 0; iToy &lt; <a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>; ++iToy) {</div>
-<div class="line"><span class="lineno">  654</span>      chi2_y_sample[iToy] = Chi2_y[iToy][iSample];</div>
-<div class="line"><span class="lineno">  655</span>      chi2_x_per_sample[iToy]  = Chi2_x[iToy][iSample];</div>
-<div class="line"><span class="lineno">  656</span>    }</div>
+<p class="definition">Definition at line <a class="el" href="PredictiveThrower_8cpp_source.html#l00644">644</a> of file <a class="el" href="PredictiveThrower_8cpp_source.html">PredictiveThrower.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  649</span>                                          {</div>
+<div class="line"><span class="lineno">  650</span><span class="comment">// *************************</span></div>
+<div class="line"><span class="lineno">  651</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iSample = 0; iSample &lt; <a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>+1; ++iSample) {</div>
+<div class="line"><span class="lineno">  652</span>    SampleDir[iSample]-&gt;cd();</div>
+<div class="line"><span class="lineno">  653</span> </div>
+<div class="line"><span class="lineno">  654</span>    <span class="comment">// Transpose to extract chi2 values for a given sample across all toys</span></div>
+<div class="line"><span class="lineno">  655</span>    std::vector&lt;double&gt; chi2_y_sample(<a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>);</div>
+<div class="line"><span class="lineno">  656</span>    std::vector&lt;double&gt; chi2_x_per_sample(<a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>);</div>
 <div class="line"><span class="lineno">  657</span> </div>
-<div class="line"><span class="lineno">  658</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> min_val = std::min(*std::min_element(chi2_y_sample.begin(), chi2_y_sample.end()),</div>
-<div class="line"><span class="lineno">  659</span>                              *std::min_element(chi2_x_per_sample.begin(), chi2_x_per_sample.end()));</div>
-<div class="line"><span class="lineno">  660</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> max_val = std::max(*std::max_element(chi2_y_sample.begin(), chi2_y_sample.end()),</div>
-<div class="line"><span class="lineno">  661</span>                              *std::max_element(chi2_x_per_sample.begin(), chi2_x_per_sample.end()));</div>
+<div class="line"><span class="lineno">  658</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iToy = 0; iToy &lt; <a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>; ++iToy) {</div>
+<div class="line"><span class="lineno">  659</span>      chi2_y_sample[iToy] = Chi2_y[iToy][iSample];</div>
+<div class="line"><span class="lineno">  660</span>      chi2_x_per_sample[iToy]  = Chi2_x[iToy][iSample];</div>
+<div class="line"><span class="lineno">  661</span>    }</div>
 <div class="line"><span class="lineno">  662</span> </div>
-<div class="line"><span class="lineno">  663</span>    <span class="keyword">auto</span> chi2_hist = std::make_unique&lt;TH2D&gt;((<a class="code hl_variable" href="classPredictiveThrower.html#a12713d50372297fbaa3788b7bacecf5f">SampleNames</a>[iSample] + Title).c_str(),</div>
-<div class="line"><span class="lineno">  664</span>                                            (<a class="code hl_variable" href="classPredictiveThrower.html#a12713d50372297fbaa3788b7bacecf5f">SampleNames</a>[iSample] + Title).c_str(),</div>
-<div class="line"><span class="lineno">  665</span>                                            100, min_val, max_val, 100, min_val, max_val);</div>
-<div class="line"><span class="lineno">  666</span>    chi2_hist-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
-<div class="line"><span class="lineno">  667</span>    chi2_hist-&gt;GetXaxis()-&gt;SetTitle(Chi2_x_title.c_str());</div>
-<div class="line"><span class="lineno">  668</span>    chi2_hist-&gt;GetYaxis()-&gt;SetTitle(Chi2_y_title.c_str());</div>
-<div class="line"><span class="lineno">  669</span> </div>
-<div class="line"><span class="lineno">  670</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iToy = 0; iToy &lt; <a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>; ++iToy) {</div>
-<div class="line"><span class="lineno">  671</span>      chi2_hist-&gt;Fill(chi2_x_per_sample[iToy], chi2_y_sample[iToy]);</div>
-<div class="line"><span class="lineno">  672</span>    }</div>
-<div class="line"><span class="lineno">  673</span> </div>
-<div class="line"><span class="lineno">  674</span>    <a class="code hl_function" href="StatisticalUtils_8cpp.html#a57771836d3d082d24170e24a2f04a4d6">Get2DBayesianpValue</a>(chi2_hist.get());</div>
-<div class="line"><span class="lineno">  675</span>    chi2_hist-&gt;Write();</div>
-<div class="line"><span class="lineno">  676</span>  }</div>
-<div class="line"><span class="lineno">  677</span>}</div>
+<div class="line"><span class="lineno">  663</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> min_val = std::min(*std::min_element(chi2_y_sample.begin(), chi2_y_sample.end()),</div>
+<div class="line"><span class="lineno">  664</span>                              *std::min_element(chi2_x_per_sample.begin(), chi2_x_per_sample.end()));</div>
+<div class="line"><span class="lineno">  665</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> max_val = std::max(*std::max_element(chi2_y_sample.begin(), chi2_y_sample.end()),</div>
+<div class="line"><span class="lineno">  666</span>                              *std::max_element(chi2_x_per_sample.begin(), chi2_x_per_sample.end()));</div>
+<div class="line"><span class="lineno">  667</span> </div>
+<div class="line"><span class="lineno">  668</span>    <span class="keyword">auto</span> chi2_hist = std::make_unique&lt;TH2D&gt;((<a class="code hl_variable" href="classPredictiveThrower.html#a12713d50372297fbaa3788b7bacecf5f">SampleNames</a>[iSample] + Title).c_str(),</div>
+<div class="line"><span class="lineno">  669</span>                                            (<a class="code hl_variable" href="classPredictiveThrower.html#a12713d50372297fbaa3788b7bacecf5f">SampleNames</a>[iSample] + Title).c_str(),</div>
+<div class="line"><span class="lineno">  670</span>                                            100, min_val, max_val, 100, min_val, max_val);</div>
+<div class="line"><span class="lineno">  671</span>    chi2_hist-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno">  672</span>    chi2_hist-&gt;GetXaxis()-&gt;SetTitle(Chi2_x_title.c_str());</div>
+<div class="line"><span class="lineno">  673</span>    chi2_hist-&gt;GetYaxis()-&gt;SetTitle(Chi2_y_title.c_str());</div>
+<div class="line"><span class="lineno">  674</span> </div>
+<div class="line"><span class="lineno">  675</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iToy = 0; iToy &lt; <a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>; ++iToy) {</div>
+<div class="line"><span class="lineno">  676</span>      chi2_hist-&gt;Fill(chi2_x_per_sample[iToy], chi2_y_sample[iToy]);</div>
+<div class="line"><span class="lineno">  677</span>    }</div>
+<div class="line"><span class="lineno">  678</span> </div>
+<div class="line"><span class="lineno">  679</span>    <a class="code hl_function" href="StatisticalUtils_8cpp.html#a57771836d3d082d24170e24a2f04a4d6">Get2DBayesianpValue</a>(chi2_hist.get());</div>
+<div class="line"><span class="lineno">  680</span>    chi2_hist-&gt;Write();</div>
+<div class="line"><span class="lineno">  681</span>  }</div>
+<div class="line"><span class="lineno">  682</span>}</div>
 <div class="ttc" id="aStatisticalUtils_8cpp_html_a57771836d3d082d24170e24a2f04a4d6"><div class="ttname"><a href="StatisticalUtils_8cpp.html#a57771836d3d082d24170e24a2f04a4d6">Get2DBayesianpValue</a></div><div class="ttdeci">void Get2DBayesianpValue(TH2D *Histogram)</div><div class="ttdoc">Calculates the 2D Bayesian p-value and generates a visualization.</div><div class="ttdef"><b>Definition:</b> <a href="StatisticalUtils_8cpp_source.html#l00599">StatisticalUtils.cpp:599</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -821,41 +821,41 @@ Clarence Wret </dd></dl>
 
 <p>Produce posterior predictive distribution. </p>
 
-<p class="definition">Definition at line <a class="el" href="PredictiveThrower_8cpp_source.html#l00489">489</a> of file <a class="el" href="PredictiveThrower_8cpp_source.html">PredictiveThrower.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  492</span>                                                                                    {</div>
-<div class="line"><span class="lineno">  493</span><span class="comment">// *************************</span></div>
-<div class="line"><span class="lineno">  494</span>  <span class="keyword">constexpr</span> <span class="keywordtype">int</span> nXBins = 100;</div>
-<div class="line"><span class="lineno">  495</span>  <span class="keywordtype">int</span> nbinsx = Toys[0]-&gt;GetNbinsX();</div>
-<div class="line"><span class="lineno">  496</span> </div>
-<div class="line"><span class="lineno">  497</span>  <span class="keyword">auto</span> PredictiveHist = std::make_unique&lt;TH1D&gt;((Sample_Name + <span class="stringliteral">&quot;_&quot;</span> + suffix + <span class="stringliteral">&quot;_PostPred&quot;</span>).c_str(),</div>
-<div class="line"><span class="lineno">  498</span>                                               (Sample_Name + <span class="stringliteral">&quot;_&quot;</span> + suffix + <span class="stringliteral">&quot;_PostPred&quot;</span>).c_str(),</div>
-<div class="line"><span class="lineno">  499</span>                                                nbinsx, Toys[0]-&gt;GetXaxis()-&gt;GetXbins()-&gt;GetArray());</div>
-<div class="line"><span class="lineno">  500</span>  PredictiveHist-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
+<p class="definition">Definition at line <a class="el" href="PredictiveThrower_8cpp_source.html#l00494">494</a> of file <a class="el" href="PredictiveThrower_8cpp_source.html">PredictiveThrower.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  497</span>                                                                                    {</div>
+<div class="line"><span class="lineno">  498</span><span class="comment">// *************************</span></div>
+<div class="line"><span class="lineno">  499</span>  <span class="keyword">constexpr</span> <span class="keywordtype">int</span> nXBins = 100;</div>
+<div class="line"><span class="lineno">  500</span>  <span class="keywordtype">int</span> nbinsx = Toys[0]-&gt;GetNbinsX();</div>
 <div class="line"><span class="lineno">  501</span> </div>
-<div class="line"><span class="lineno">  502</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 1; i &lt;= nbinsx; ++i) {</div>
-<div class="line"><span class="lineno">  503</span>    <span class="keywordtype">double</span> x_low  = Toys[0]-&gt;GetXaxis()-&gt;GetBinLowEdge(i);</div>
-<div class="line"><span class="lineno">  504</span>    <span class="keywordtype">double</span> x_high = Toys[0]-&gt;GetXaxis()-&gt;GetBinUpEdge(i);</div>
-<div class="line"><span class="lineno">  505</span>    TString projName = TString::Format(<span class="stringliteral">&quot;%s %s X: [%.3f, %.3f]&quot;</span>, Sample_Name.c_str(), suffix.c_str(), x_low, x_high);</div>
-<div class="line"><span class="lineno">  506</span>    <span class="keyword">auto</span> PosteriorHist = std::make_unique&lt;TH1D&gt;(projName, projName, nXBins, 1, -1);</div>
-<div class="line"><span class="lineno">  507</span>    PosteriorHist-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
-<div class="line"><span class="lineno">  508</span> </div>
-<div class="line"><span class="lineno">  509</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> iToy = 0; iToy &lt; Toys.size(); ++iToy) {</div>
-<div class="line"><span class="lineno">  510</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> Content = Toys[iToy]-&gt;GetBinContent(i);</div>
-<div class="line"><span class="lineno">  511</span>      PosteriorHist-&gt;Fill(Content, <a class="code hl_variable" href="classPredictiveThrower.html#ace711c729993a63c2141893888ab5322">ReweightWeight</a>[iToy]);</div>
-<div class="line"><span class="lineno">  512</span>    }</div>
+<div class="line"><span class="lineno">  502</span>  <span class="keyword">auto</span> PredictiveHist = std::make_unique&lt;TH1D&gt;((Sample_Name + <span class="stringliteral">&quot;_&quot;</span> + suffix + <span class="stringliteral">&quot;_PostPred&quot;</span>).c_str(),</div>
+<div class="line"><span class="lineno">  503</span>                                               (Sample_Name + <span class="stringliteral">&quot;_&quot;</span> + suffix + <span class="stringliteral">&quot;_PostPred&quot;</span>).c_str(),</div>
+<div class="line"><span class="lineno">  504</span>                                                nbinsx, Toys[0]-&gt;GetXaxis()-&gt;GetXbins()-&gt;GetArray());</div>
+<div class="line"><span class="lineno">  505</span>  PredictiveHist-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno">  506</span> </div>
+<div class="line"><span class="lineno">  507</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 1; i &lt;= nbinsx; ++i) {</div>
+<div class="line"><span class="lineno">  508</span>    <span class="keywordtype">double</span> x_low  = Toys[0]-&gt;GetXaxis()-&gt;GetBinLowEdge(i);</div>
+<div class="line"><span class="lineno">  509</span>    <span class="keywordtype">double</span> x_high = Toys[0]-&gt;GetXaxis()-&gt;GetBinUpEdge(i);</div>
+<div class="line"><span class="lineno">  510</span>    TString projName = TString::Format(<span class="stringliteral">&quot;%s %s X: [%.3f, %.3f]&quot;</span>, Sample_Name.c_str(), suffix.c_str(), x_low, x_high);</div>
+<div class="line"><span class="lineno">  511</span>    <span class="keyword">auto</span> PosteriorHist = std::make_unique&lt;TH1D&gt;(projName, projName, nXBins, 1, -1);</div>
+<div class="line"><span class="lineno">  512</span>    PosteriorHist-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
 <div class="line"><span class="lineno">  513</span> </div>
-<div class="line"><span class="lineno">  514</span>    <span class="keywordflow">if</span>(DebugHistograms) PosteriorHist-&gt;Write();</div>
-<div class="line"><span class="lineno">  515</span> </div>
-<div class="line"><span class="lineno">  516</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> nMean = PosteriorHist-&gt;GetMean();</div>
-<div class="line"><span class="lineno">  517</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> nMeanError = PosteriorHist-&gt;GetRMS();</div>
+<div class="line"><span class="lineno">  514</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> iToy = 0; iToy &lt; Toys.size(); ++iToy) {</div>
+<div class="line"><span class="lineno">  515</span>      <span class="keyword">const</span> <span class="keywordtype">double</span> Content = Toys[iToy]-&gt;GetBinContent(i);</div>
+<div class="line"><span class="lineno">  516</span>      PosteriorHist-&gt;Fill(Content, <a class="code hl_variable" href="classPredictiveThrower.html#ace711c729993a63c2141893888ab5322">ReweightWeight</a>[iToy]);</div>
+<div class="line"><span class="lineno">  517</span>    }</div>
 <div class="line"><span class="lineno">  518</span> </div>
-<div class="line"><span class="lineno">  519</span>    PredictiveHist-&gt;SetBinContent(i, nMean);</div>
-<div class="line"><span class="lineno">  520</span>    PredictiveHist-&gt;SetBinError(i, nMeanError);</div>
-<div class="line"><span class="lineno">  521</span>  }</div>
-<div class="line"><span class="lineno">  522</span> </div>
-<div class="line"><span class="lineno">  523</span>  PredictiveHist-&gt;Write();</div>
-<div class="line"><span class="lineno">  524</span>  <span class="keywordflow">return</span> PredictiveHist;</div>
-<div class="line"><span class="lineno">  525</span>}</div>
+<div class="line"><span class="lineno">  519</span>    <span class="keywordflow">if</span>(DebugHistograms) PosteriorHist-&gt;Write();</div>
+<div class="line"><span class="lineno">  520</span> </div>
+<div class="line"><span class="lineno">  521</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> nMean = PosteriorHist-&gt;GetMean();</div>
+<div class="line"><span class="lineno">  522</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> nMeanError = PosteriorHist-&gt;GetRMS();</div>
+<div class="line"><span class="lineno">  523</span> </div>
+<div class="line"><span class="lineno">  524</span>    PredictiveHist-&gt;SetBinContent(i, nMean);</div>
+<div class="line"><span class="lineno">  525</span>    PredictiveHist-&gt;SetBinError(i, nMeanError);</div>
+<div class="line"><span class="lineno">  526</span>  }</div>
+<div class="line"><span class="lineno">  527</span> </div>
+<div class="line"><span class="lineno">  528</span>  PredictiveHist-&gt;Write();</div>
+<div class="line"><span class="lineno">  529</span>  <span class="keywordflow">return</span> PredictiveHist;</div>
+<div class="line"><span class="lineno">  530</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -896,51 +896,51 @@ Clarence Wret </dd></dl>
 <p>Calculate Posterior Predictive $p$-value. </p>
 <p>TODO This can be multithreaded</p>
 
-<p class="definition">Definition at line <a class="el" href="PredictiveThrower_8cpp_source.html#l00596">596</a> of file <a class="el" href="PredictiveThrower_8cpp_source.html">PredictiveThrower.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  598</span>                                                                                           {</div>
-<div class="line"><span class="lineno">  599</span><span class="comment">// *************************</span></div>
-<div class="line"><span class="lineno">  600</span>  <span class="comment">//(void) PostPred_w2;</span></div>
-<div class="line"><span class="lineno">  601</span>  <span class="comment">// [Toys][Sample]</span></div>
-<div class="line"><span class="lineno">  602</span>  std::vector&lt;std::vector&lt;double&gt;&gt; chi2_dat_vec(<a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>);</div>
-<div class="line"><span class="lineno">  603</span>  std::vector&lt;std::vector&lt;double&gt;&gt; chi2_mc_vec(<a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>);</div>
-<div class="line"><span class="lineno">  604</span>  std::vector&lt;std::vector&lt;double&gt;&gt; chi2_pred_vec(<a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>);</div>
-<div class="line"><span class="lineno">  605</span> </div>
-<div class="line"><span class="lineno">  606</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iToy = 0; iToy &lt; <a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>; iToy++) {</div>
-<div class="line"><span class="lineno">  607</span>    chi2_dat_vec[iToy].resize(<a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>+1, 0);</div>
-<div class="line"><span class="lineno">  608</span>    chi2_mc_vec[iToy].resize(<a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>+1, 0);</div>
-<div class="line"><span class="lineno">  609</span>    chi2_pred_vec[iToy].resize(<a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>+1, 0);</div>
+<p class="definition">Definition at line <a class="el" href="PredictiveThrower_8cpp_source.html#l00601">601</a> of file <a class="el" href="PredictiveThrower_8cpp_source.html">PredictiveThrower.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  603</span>                                                                                           {</div>
+<div class="line"><span class="lineno">  604</span><span class="comment">// *************************</span></div>
+<div class="line"><span class="lineno">  605</span>  <span class="comment">//(void) PostPred_w2;</span></div>
+<div class="line"><span class="lineno">  606</span>  <span class="comment">// [Toys][Sample]</span></div>
+<div class="line"><span class="lineno">  607</span>  std::vector&lt;std::vector&lt;double&gt;&gt; chi2_dat_vec(<a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>);</div>
+<div class="line"><span class="lineno">  608</span>  std::vector&lt;std::vector&lt;double&gt;&gt; chi2_mc_vec(<a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>);</div>
+<div class="line"><span class="lineno">  609</span>  std::vector&lt;std::vector&lt;double&gt;&gt; chi2_pred_vec(<a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>);</div>
 <div class="line"><span class="lineno">  610</span> </div>
-<div class="line"><span class="lineno">  611</span>    chi2_dat_vec[iToy].back() = <a class="code hl_variable" href="classPredictiveThrower.html#a10b73ebca659a2162a9869f2696ee7b2">PenaltyTerm</a>[iToy];</div>
-<div class="line"><span class="lineno">  612</span>    chi2_mc_vec[iToy].back() = <a class="code hl_variable" href="classPredictiveThrower.html#a10b73ebca659a2162a9869f2696ee7b2">PenaltyTerm</a>[iToy];</div>
-<div class="line"><span class="lineno">  613</span>    chi2_pred_vec[iToy].back() = <a class="code hl_variable" href="classPredictiveThrower.html#a10b73ebca659a2162a9869f2696ee7b2">PenaltyTerm</a>[iToy];</div>
-<div class="line"><span class="lineno">  614</span> </div>
-<div class="line"><span class="lineno">  616</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iSample = 0; iSample &lt; <a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>; ++iSample) {</div>
-<div class="line"><span class="lineno">  617</span>      <span class="keyword">auto</span> DrawFluctHist = <a class="code hl_function" href="namespaceM3.html#aa374c88684482cdd66297f6ae828372d">M3::Clone</a>(<a class="code hl_variable" href="classPredictiveThrower.html#aebfa278a480b0e682881f74a27d02b32">MC_Hist_Toy</a>[iSample][iToy].get());</div>
-<div class="line"><span class="lineno">  618</span>      <a class="code hl_function" href="HistogramUtils_8cpp.html#a1d326700660ac56ba63cba9ac12316bc">MakeFluctuatedHistogramAlternative</a>(DrawFluctHist.get(), <a class="code hl_variable" href="classPredictiveThrower.html#aebfa278a480b0e682881f74a27d02b32">MC_Hist_Toy</a>[iSample][iToy].get(), <a class="code hl_variable" href="classFitterBase.html#a138f250d9204a30204e4ca5b973008b2">random</a>.get());</div>
+<div class="line"><span class="lineno">  611</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iToy = 0; iToy &lt; <a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>; iToy++) {</div>
+<div class="line"><span class="lineno">  612</span>    chi2_dat_vec[iToy].resize(<a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>+1, 0);</div>
+<div class="line"><span class="lineno">  613</span>    chi2_mc_vec[iToy].resize(<a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>+1, 0);</div>
+<div class="line"><span class="lineno">  614</span>    chi2_pred_vec[iToy].resize(<a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>+1, 0);</div>
+<div class="line"><span class="lineno">  615</span> </div>
+<div class="line"><span class="lineno">  616</span>    chi2_dat_vec[iToy].back() = <a class="code hl_variable" href="classPredictiveThrower.html#a10b73ebca659a2162a9869f2696ee7b2">PenaltyTerm</a>[iToy];</div>
+<div class="line"><span class="lineno">  617</span>    chi2_mc_vec[iToy].back() = <a class="code hl_variable" href="classPredictiveThrower.html#a10b73ebca659a2162a9869f2696ee7b2">PenaltyTerm</a>[iToy];</div>
+<div class="line"><span class="lineno">  618</span>    chi2_pred_vec[iToy].back() = <a class="code hl_variable" href="classPredictiveThrower.html#a10b73ebca659a2162a9869f2696ee7b2">PenaltyTerm</a>[iToy];</div>
 <div class="line"><span class="lineno">  619</span> </div>
-<div class="line"><span class="lineno">  620</span>      <span class="keyword">auto</span> PredFluctHist = <a class="code hl_function" href="namespaceM3.html#aa374c88684482cdd66297f6ae828372d">M3::Clone</a>(PostPred_mc[iSample].get());</div>
-<div class="line"><span class="lineno">  621</span>      <a class="code hl_function" href="HistogramUtils_8cpp.html#a1d326700660ac56ba63cba9ac12316bc">MakeFluctuatedHistogramAlternative</a>(PredFluctHist.get(), PostPred_mc[iSample].get(), <a class="code hl_variable" href="classFitterBase.html#a138f250d9204a30204e4ca5b973008b2">random</a>.get());</div>
-<div class="line"><span class="lineno">  622</span> </div>
-<div class="line"><span class="lineno">  623</span>      <span class="comment">// Okay now we can do our chi2 calculation for our sample</span></div>
-<div class="line"><span class="lineno">  624</span>      chi2_dat_vec[iToy][iSample]  = <a class="code hl_function" href="classPredictiveThrower.html#ad8e72b4e6224c625629a2ac6f3deef11">GetLLH</a>(<a class="code hl_variable" href="classPredictiveThrower.html#adf7f2824dab0117f99167b5d642ed0c7">Data_Hist</a>[iSample], <a class="code hl_variable" href="classPredictiveThrower.html#aebfa278a480b0e682881f74a27d02b32">MC_Hist_Toy</a>[iSample][iToy], <a class="code hl_variable" href="classPredictiveThrower.html#a4d9eb7777c6e93efd412cdf3d146fff9">W2_Hist_Toy</a>[iSample][iToy], <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>[<a class="code hl_variable" href="classPredictiveThrower.html#a9c49aff75c195e2ca0a31a6fb7bf1f1f">SampleObjectMap</a>[iSample]]);</div>
-<div class="line"><span class="lineno">  625</span>      chi2_mc_vec[iToy][iSample]   = <a class="code hl_function" href="classPredictiveThrower.html#ad8e72b4e6224c625629a2ac6f3deef11">GetLLH</a>(DrawFluctHist, <a class="code hl_variable" href="classPredictiveThrower.html#aebfa278a480b0e682881f74a27d02b32">MC_Hist_Toy</a>[iSample][iToy], <a class="code hl_variable" href="classPredictiveThrower.html#a4d9eb7777c6e93efd412cdf3d146fff9">W2_Hist_Toy</a>[iSample][iToy], <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>[<a class="code hl_variable" href="classPredictiveThrower.html#a9c49aff75c195e2ca0a31a6fb7bf1f1f">SampleObjectMap</a>[iSample]]);</div>
-<div class="line"><span class="lineno">  626</span>      chi2_pred_vec[iToy][iSample] = <a class="code hl_function" href="classPredictiveThrower.html#ad8e72b4e6224c625629a2ac6f3deef11">GetLLH</a>(PredFluctHist, <a class="code hl_variable" href="classPredictiveThrower.html#aebfa278a480b0e682881f74a27d02b32">MC_Hist_Toy</a>[iSample][iToy], <a class="code hl_variable" href="classPredictiveThrower.html#a4d9eb7777c6e93efd412cdf3d146fff9">W2_Hist_Toy</a>[iSample][iToy], <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>[<a class="code hl_variable" href="classPredictiveThrower.html#a9c49aff75c195e2ca0a31a6fb7bf1f1f">SampleObjectMap</a>[iSample]]);</div>
+<div class="line"><span class="lineno">  621</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iSample = 0; iSample &lt; <a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>; ++iSample) {</div>
+<div class="line"><span class="lineno">  622</span>      <span class="keyword">auto</span> DrawFluctHist = <a class="code hl_function" href="namespaceM3.html#aa374c88684482cdd66297f6ae828372d">M3::Clone</a>(<a class="code hl_variable" href="classPredictiveThrower.html#aebfa278a480b0e682881f74a27d02b32">MC_Hist_Toy</a>[iSample][iToy].get());</div>
+<div class="line"><span class="lineno">  623</span>      <a class="code hl_function" href="HistogramUtils_8cpp.html#a1d326700660ac56ba63cba9ac12316bc">MakeFluctuatedHistogramAlternative</a>(DrawFluctHist.get(), <a class="code hl_variable" href="classPredictiveThrower.html#aebfa278a480b0e682881f74a27d02b32">MC_Hist_Toy</a>[iSample][iToy].get(), <a class="code hl_variable" href="classFitterBase.html#a138f250d9204a30204e4ca5b973008b2">random</a>.get());</div>
+<div class="line"><span class="lineno">  624</span> </div>
+<div class="line"><span class="lineno">  625</span>      <span class="keyword">auto</span> PredFluctHist = <a class="code hl_function" href="namespaceM3.html#aa374c88684482cdd66297f6ae828372d">M3::Clone</a>(PostPred_mc[iSample].get());</div>
+<div class="line"><span class="lineno">  626</span>      <a class="code hl_function" href="HistogramUtils_8cpp.html#a1d326700660ac56ba63cba9ac12316bc">MakeFluctuatedHistogramAlternative</a>(PredFluctHist.get(), PostPred_mc[iSample].get(), <a class="code hl_variable" href="classFitterBase.html#a138f250d9204a30204e4ca5b973008b2">random</a>.get());</div>
 <div class="line"><span class="lineno">  627</span> </div>
-<div class="line"><span class="lineno">  628</span>      chi2_dat_vec[iToy].back()  += chi2_dat_vec[iToy][iSample];</div>
-<div class="line"><span class="lineno">  629</span>      chi2_mc_vec[iToy].back()   += chi2_mc_vec[iToy][iSample];</div>
-<div class="line"><span class="lineno">  630</span>      chi2_pred_vec[iToy].back() += chi2_pred_vec[iToy][iSample];</div>
-<div class="line"><span class="lineno">  631</span>    }</div>
-<div class="line"><span class="lineno">  632</span>  }</div>
-<div class="line"><span class="lineno">  633</span> </div>
-<div class="line"><span class="lineno">  634</span>  <a class="code hl_function" href="classPredictiveThrower.html#a95c9962dd060c6fbf8914afb0ca1f952">MakeChi2Plots</a>(chi2_mc_vec,   <span class="stringliteral">&quot;-2LLH (Draw Fluc, Draw)&quot;</span>, chi2_dat_vec, <span class="stringliteral">&quot;-2LLH (Data, Draw)&quot;</span>, SampleDir, <span class="stringliteral">&quot;_drawfluc_draw&quot;</span>);</div>
-<div class="line"><span class="lineno">  635</span>  <a class="code hl_function" href="classPredictiveThrower.html#a95c9962dd060c6fbf8914afb0ca1f952">MakeChi2Plots</a>(chi2_pred_vec, <span class="stringliteral">&quot;-2LLH (Pred Fluc, Draw)&quot;</span>, chi2_dat_vec, <span class="stringliteral">&quot;-2LLH (Data, Draw)&quot;</span>, SampleDir, <span class="stringliteral">&quot;_predfluc_draw&quot;</span>);</div>
-<div class="line"><span class="lineno">  636</span>}</div>
+<div class="line"><span class="lineno">  628</span>      <span class="comment">// Okay now we can do our chi2 calculation for our sample</span></div>
+<div class="line"><span class="lineno">  629</span>      chi2_dat_vec[iToy][iSample]  = <a class="code hl_function" href="classPredictiveThrower.html#ad8e72b4e6224c625629a2ac6f3deef11">GetLLH</a>(<a class="code hl_variable" href="classPredictiveThrower.html#adf7f2824dab0117f99167b5d642ed0c7">Data_Hist</a>[iSample], <a class="code hl_variable" href="classPredictiveThrower.html#aebfa278a480b0e682881f74a27d02b32">MC_Hist_Toy</a>[iSample][iToy], <a class="code hl_variable" href="classPredictiveThrower.html#a4d9eb7777c6e93efd412cdf3d146fff9">W2_Hist_Toy</a>[iSample][iToy], <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>[<a class="code hl_variable" href="classPredictiveThrower.html#a9c49aff75c195e2ca0a31a6fb7bf1f1f">SampleObjectMap</a>[iSample]]);</div>
+<div class="line"><span class="lineno">  630</span>      chi2_mc_vec[iToy][iSample]   = <a class="code hl_function" href="classPredictiveThrower.html#ad8e72b4e6224c625629a2ac6f3deef11">GetLLH</a>(DrawFluctHist, <a class="code hl_variable" href="classPredictiveThrower.html#aebfa278a480b0e682881f74a27d02b32">MC_Hist_Toy</a>[iSample][iToy], <a class="code hl_variable" href="classPredictiveThrower.html#a4d9eb7777c6e93efd412cdf3d146fff9">W2_Hist_Toy</a>[iSample][iToy], <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>[<a class="code hl_variable" href="classPredictiveThrower.html#a9c49aff75c195e2ca0a31a6fb7bf1f1f">SampleObjectMap</a>[iSample]]);</div>
+<div class="line"><span class="lineno">  631</span>      chi2_pred_vec[iToy][iSample] = <a class="code hl_function" href="classPredictiveThrower.html#ad8e72b4e6224c625629a2ac6f3deef11">GetLLH</a>(PredFluctHist, <a class="code hl_variable" href="classPredictiveThrower.html#aebfa278a480b0e682881f74a27d02b32">MC_Hist_Toy</a>[iSample][iToy], <a class="code hl_variable" href="classPredictiveThrower.html#a4d9eb7777c6e93efd412cdf3d146fff9">W2_Hist_Toy</a>[iSample][iToy], <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>[<a class="code hl_variable" href="classPredictiveThrower.html#a9c49aff75c195e2ca0a31a6fb7bf1f1f">SampleObjectMap</a>[iSample]]);</div>
+<div class="line"><span class="lineno">  632</span> </div>
+<div class="line"><span class="lineno">  633</span>      chi2_dat_vec[iToy].back()  += chi2_dat_vec[iToy][iSample];</div>
+<div class="line"><span class="lineno">  634</span>      chi2_mc_vec[iToy].back()   += chi2_mc_vec[iToy][iSample];</div>
+<div class="line"><span class="lineno">  635</span>      chi2_pred_vec[iToy].back() += chi2_pred_vec[iToy][iSample];</div>
+<div class="line"><span class="lineno">  636</span>    }</div>
+<div class="line"><span class="lineno">  637</span>  }</div>
+<div class="line"><span class="lineno">  638</span> </div>
+<div class="line"><span class="lineno">  639</span>  <a class="code hl_function" href="classPredictiveThrower.html#a95c9962dd060c6fbf8914afb0ca1f952">MakeChi2Plots</a>(chi2_mc_vec,   <span class="stringliteral">&quot;-2LLH (Draw Fluc, Draw)&quot;</span>, chi2_dat_vec, <span class="stringliteral">&quot;-2LLH (Data, Draw)&quot;</span>, SampleDir, <span class="stringliteral">&quot;_drawfluc_draw&quot;</span>);</div>
+<div class="line"><span class="lineno">  640</span>  <a class="code hl_function" href="classPredictiveThrower.html#a95c9962dd060c6fbf8914afb0ca1f952">MakeChi2Plots</a>(chi2_pred_vec, <span class="stringliteral">&quot;-2LLH (Pred Fluc, Draw)&quot;</span>, chi2_dat_vec, <span class="stringliteral">&quot;-2LLH (Data, Draw)&quot;</span>, SampleDir, <span class="stringliteral">&quot;_predfluc_draw&quot;</span>);</div>
+<div class="line"><span class="lineno">  641</span>}</div>
 <div class="ttc" id="aHistogramUtils_8cpp_html_a1d326700660ac56ba63cba9ac12316bc"><div class="ttname"><a href="HistogramUtils_8cpp.html#a1d326700660ac56ba63cba9ac12316bc">MakeFluctuatedHistogramAlternative</a></div><div class="ttdeci">void MakeFluctuatedHistogramAlternative(TH1D *FluctHist, TH1D *PolyHist, TRandom3 *rand)</div><div class="ttdoc">Make Poisson fluctuation of TH1D hist using slow method which is only for cross-check.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00443">HistogramUtils.cpp:443</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_a138f250d9204a30204e4ca5b973008b2"><div class="ttname"><a href="classFitterBase.html#a138f250d9204a30204e4ca5b973008b2">FitterBase::random</a></div><div class="ttdeci">std::unique_ptr&lt; TRandom3 &gt; random</div><div class="ttdoc">Random number.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00146">FitterBase.h:146</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_a14b43b7f5e5a482da68d0e8c564a1494"><div class="ttname"><a href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">FitterBase::samples</a></div><div class="ttdeci">std::vector&lt; SampleHandlerBase * &gt; samples</div><div class="ttdoc">Sample holder.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00131">FitterBase.h:131</a></div></div>
-<div class="ttc" id="aclassPredictiveThrower_html_a95c9962dd060c6fbf8914afb0ca1f952"><div class="ttname"><a href="classPredictiveThrower.html#a95c9962dd060c6fbf8914afb0ca1f952">PredictiveThrower::MakeChi2Plots</a></div><div class="ttdeci">void MakeChi2Plots(const std::vector&lt; std::vector&lt; double &gt; &gt; &amp;Chi2_x, const std::string &amp;Chi2_x_title, const std::vector&lt; std::vector&lt; double &gt; &gt; &amp;Chi2_y, const std::string &amp;Chi2_y_title, const std::vector&lt; TDirectory * &gt; &amp;SampleDir, const std::string Title)</div><div class="ttdoc">Produce Chi2 plot for a single sample based on which $p$-value is calculated.</div><div class="ttdef"><b>Definition:</b> <a href="PredictiveThrower_8cpp_source.html#l00639">PredictiveThrower.cpp:639</a></div></div>
+<div class="ttc" id="aclassPredictiveThrower_html_a95c9962dd060c6fbf8914afb0ca1f952"><div class="ttname"><a href="classPredictiveThrower.html#a95c9962dd060c6fbf8914afb0ca1f952">PredictiveThrower::MakeChi2Plots</a></div><div class="ttdeci">void MakeChi2Plots(const std::vector&lt; std::vector&lt; double &gt; &gt; &amp;Chi2_x, const std::string &amp;Chi2_x_title, const std::vector&lt; std::vector&lt; double &gt; &gt; &amp;Chi2_y, const std::string &amp;Chi2_y_title, const std::vector&lt; TDirectory * &gt; &amp;SampleDir, const std::string Title)</div><div class="ttdoc">Produce Chi2 plot for a single sample based on which $p$-value is calculated.</div><div class="ttdef"><b>Definition:</b> <a href="PredictiveThrower_8cpp_source.html#l00644">PredictiveThrower.cpp:644</a></div></div>
 <div class="ttc" id="aclassPredictiveThrower_html_a9c49aff75c195e2ca0a31a6fb7bf1f1f"><div class="ttname"><a href="classPredictiveThrower.html#a9c49aff75c195e2ca0a31a6fb7bf1f1f">PredictiveThrower::SampleObjectMap</a></div><div class="ttdeci">std::vector&lt; int &gt; SampleObjectMap</div><div class="ttdoc">Maps if sample with given SampleHandler, useful if we have more than one sample in single object.</div><div class="ttdef"><b>Definition:</b> <a href="PredictiveThrower_8h_source.html#l00101">PredictiveThrower.h:101</a></div></div>
-<div class="ttc" id="aclassPredictiveThrower_html_ad8e72b4e6224c625629a2ac6f3deef11"><div class="ttname"><a href="classPredictiveThrower.html#ad8e72b4e6224c625629a2ac6f3deef11">PredictiveThrower::GetLLH</a></div><div class="ttdeci">double GetLLH(const std::unique_ptr&lt; TH1D &gt; &amp;DatHist, const std::unique_ptr&lt; TH1D &gt; &amp;MCHist, const std::unique_ptr&lt; TH1D &gt; &amp;W2Hist, SampleHandlerBase *SampleHandler)</div><div class="ttdoc">Helper functions to calculate likelihoods using TH1D.</div><div class="ttdef"><b>Definition:</b> <a href="PredictiveThrower_8cpp_source.html#l00578">PredictiveThrower.cpp:578</a></div></div>
+<div class="ttc" id="aclassPredictiveThrower_html_ad8e72b4e6224c625629a2ac6f3deef11"><div class="ttname"><a href="classPredictiveThrower.html#ad8e72b4e6224c625629a2ac6f3deef11">PredictiveThrower::GetLLH</a></div><div class="ttdeci">double GetLLH(const std::unique_ptr&lt; TH1D &gt; &amp;DatHist, const std::unique_ptr&lt; TH1D &gt; &amp;MCHist, const std::unique_ptr&lt; TH1D &gt; &amp;W2Hist, SampleHandlerBase *SampleHandler)</div><div class="ttdoc">Helper functions to calculate likelihoods using TH1D.</div><div class="ttdef"><b>Definition:</b> <a href="PredictiveThrower_8cpp_source.html#l00583">PredictiveThrower.cpp:583</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -980,60 +980,60 @@ Clarence Wret </dd></dl>
 
 <p>Produce Violin style spectra. </p>
 
-<p class="definition">Definition at line <a class="el" href="PredictiveThrower_8cpp_source.html#l00433">433</a> of file <a class="el" href="PredictiveThrower_8cpp_source.html">PredictiveThrower.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  434</span>                                                                                             {</div>
-<div class="line"><span class="lineno">  435</span><span class="comment">// *************************</span></div>
-<div class="line"><span class="lineno">  436</span>  std::vector&lt;double&gt; MaxValue(<a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>);</div>
-<div class="line"><span class="lineno">  437</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
-<div class="line"><span class="lineno">  438</span><span class="preprocessor">  #pragma omp parallel for</span></div>
-<div class="line"><span class="lineno">  439</span><span class="preprocessor">  #endif</span></div>
-<div class="line"><span class="lineno">  440</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> sample = 0; sample &lt; <a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>; ++sample) {</div>
-<div class="line"><span class="lineno">  441</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> toy = 0; toy &lt; <a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>; ++toy) {</div>
-<div class="line"><span class="lineno">  442</span>      <span class="keywordtype">double</span> max_val = Toys[sample][toy]-&gt;GetMaximum();</div>
-<div class="line"><span class="lineno">  443</span>      MaxValue[sample] = std::max(MaxValue[sample], max_val);</div>
-<div class="line"><span class="lineno">  444</span>    }</div>
-<div class="line"><span class="lineno">  445</span>  }</div>
-<div class="line"><span class="lineno">  446</span> </div>
-<div class="line"><span class="lineno">  447</span>  std::vector&lt;std::unique_ptr&lt;TH2D&gt;&gt; Spectra(<a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>);</div>
-<div class="line"><span class="lineno">  448</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> sample = 0; sample &lt; <a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>; ++sample) {</div>
-<div class="line"><span class="lineno">  449</span>    <span class="comment">// Get MC histogram x-axis binning</span></div>
-<div class="line"><span class="lineno">  450</span>    TH1D* refHist = Toys[sample][0].get();</div>
+<p class="definition">Definition at line <a class="el" href="PredictiveThrower_8cpp_source.html#l00438">438</a> of file <a class="el" href="PredictiveThrower_8cpp_source.html">PredictiveThrower.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  439</span>                                                                                             {</div>
+<div class="line"><span class="lineno">  440</span><span class="comment">// *************************</span></div>
+<div class="line"><span class="lineno">  441</span>  std::vector&lt;double&gt; MaxValue(<a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>);</div>
+<div class="line"><span class="lineno">  442</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
+<div class="line"><span class="lineno">  443</span><span class="preprocessor">  #pragma omp parallel for collapse(2)</span></div>
+<div class="line"><span class="lineno">  444</span><span class="preprocessor">  #endif</span></div>
+<div class="line"><span class="lineno">  445</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> sample = 0; sample &lt; <a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>; ++sample) {</div>
+<div class="line"><span class="lineno">  446</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> toy = 0; toy &lt; <a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>; ++toy) {</div>
+<div class="line"><span class="lineno">  447</span>      <span class="keywordtype">double</span> max_val = Toys[sample][toy]-&gt;GetMaximum();</div>
+<div class="line"><span class="lineno">  448</span>      MaxValue[sample] = std::max(MaxValue[sample], max_val);</div>
+<div class="line"><span class="lineno">  449</span>    }</div>
+<div class="line"><span class="lineno">  450</span>  }</div>
 <div class="line"><span class="lineno">  451</span> </div>
-<div class="line"><span class="lineno">  452</span>    <span class="keyword">const</span> <span class="keywordtype">int</span> n_bins_x = refHist-&gt;GetNbinsX();</div>
-<div class="line"><span class="lineno">  453</span>    std::vector&lt;double&gt; x_bin_edges(n_bins_x + 1);</div>
-<div class="line"><span class="lineno">  454</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> b = 0; b &lt;= n_bins_x; ++b) {</div>
-<div class="line"><span class="lineno">  455</span>      x_bin_edges[b] = refHist-&gt;GetXaxis()-&gt;GetBinLowEdge(b + 1); <span class="comment">// ROOT bins start at 1</span></div>
-<div class="line"><span class="lineno">  456</span>    }</div>
-<div class="line"><span class="lineno">  457</span>    <span class="comment">// Last edge is upper edge of last bin:</span></div>
-<div class="line"><span class="lineno">  458</span>    x_bin_edges[n_bins_x] = refHist-&gt;GetXaxis()-&gt;GetBinUpEdge(n_bins_x);</div>
-<div class="line"><span class="lineno">  459</span> </div>
-<div class="line"><span class="lineno">  460</span>    <span class="keyword">constexpr</span> <span class="keywordtype">int</span> n_bins_y = 400;</div>
-<div class="line"><span class="lineno">  461</span>    <span class="keyword">constexpr</span> <span class="keywordtype">double</span> y_min = 0.0;</div>
-<div class="line"><span class="lineno">  462</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> y_max = MaxValue[sample] * 1.05;</div>
-<div class="line"><span class="lineno">  463</span> </div>
-<div class="line"><span class="lineno">  464</span>    <span class="comment">// Create TH2D with variable binning on x axis</span></div>
-<div class="line"><span class="lineno">  465</span>    Spectra[sample] = std::make_unique&lt;TH2D&gt;(</div>
-<div class="line"><span class="lineno">  466</span>      (<a class="code hl_variable" href="classPredictiveThrower.html#a12713d50372297fbaa3788b7bacecf5f">SampleNames</a>[sample] + <span class="stringliteral">&quot;_&quot;</span> + suffix).c_str(),   <span class="comment">// name</span></div>
-<div class="line"><span class="lineno">  467</span>      (<a class="code hl_variable" href="classPredictiveThrower.html#a12713d50372297fbaa3788b7bacecf5f">SampleNames</a>[sample] + <span class="stringliteral">&quot;_&quot;</span> + suffix).c_str(),   <span class="comment">// title</span></div>
-<div class="line"><span class="lineno">  468</span>      n_bins_x, x_bin_edges.data(),                   <span class="comment">// x axis bins</span></div>
-<div class="line"><span class="lineno">  469</span>      n_bins_y, y_min, y_max                          <span class="comment">// y axis bins</span></div>
-<div class="line"><span class="lineno">  470</span>    );</div>
-<div class="line"><span class="lineno">  471</span> </div>
-<div class="line"><span class="lineno">  472</span>    Spectra[sample]-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
-<div class="line"><span class="lineno">  473</span>    Spectra[sample]-&gt;Sumw2(<span class="keyword">true</span>);</div>
-<div class="line"><span class="lineno">  474</span>  }</div>
-<div class="line"><span class="lineno">  475</span> </div>
-<div class="line"><span class="lineno">  476</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
-<div class="line"><span class="lineno">  477</span><span class="preprocessor">  #pragma omp parallel for</span></div>
-<div class="line"><span class="lineno">  478</span><span class="preprocessor">  #endif</span></div>
-<div class="line"><span class="lineno">  479</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> sample = 0; sample &lt; <a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>; ++sample) {</div>
-<div class="line"><span class="lineno">  480</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> toy = 0; toy &lt; <a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>; ++toy) {</div>
-<div class="line"><span class="lineno">  481</span>      <a class="code hl_function" href="HistogramUtils_8cpp.html#a5057e3deaf657180213e52d3f5bc41cc">FastViolinFill</a>(Spectra[sample].get(), Toys[sample][toy].get());</div>
-<div class="line"><span class="lineno">  482</span>    }</div>
-<div class="line"><span class="lineno">  483</span>  }</div>
-<div class="line"><span class="lineno">  484</span> </div>
-<div class="line"><span class="lineno">  485</span>  <span class="keywordflow">return</span> Spectra;</div>
-<div class="line"><span class="lineno">  486</span>}</div>
+<div class="line"><span class="lineno">  452</span>  std::vector&lt;std::unique_ptr&lt;TH2D&gt;&gt; Spectra(<a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>);</div>
+<div class="line"><span class="lineno">  453</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> sample = 0; sample &lt; <a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>; ++sample) {</div>
+<div class="line"><span class="lineno">  454</span>    <span class="comment">// Get MC histogram x-axis binning</span></div>
+<div class="line"><span class="lineno">  455</span>    TH1D* refHist = Toys[sample][0].get();</div>
+<div class="line"><span class="lineno">  456</span> </div>
+<div class="line"><span class="lineno">  457</span>    <span class="keyword">const</span> <span class="keywordtype">int</span> n_bins_x = refHist-&gt;GetNbinsX();</div>
+<div class="line"><span class="lineno">  458</span>    std::vector&lt;double&gt; x_bin_edges(n_bins_x + 1);</div>
+<div class="line"><span class="lineno">  459</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> b = 0; b &lt;= n_bins_x; ++b) {</div>
+<div class="line"><span class="lineno">  460</span>      x_bin_edges[b] = refHist-&gt;GetXaxis()-&gt;GetBinLowEdge(b + 1); <span class="comment">// ROOT bins start at 1</span></div>
+<div class="line"><span class="lineno">  461</span>    }</div>
+<div class="line"><span class="lineno">  462</span>    <span class="comment">// Last edge is upper edge of last bin:</span></div>
+<div class="line"><span class="lineno">  463</span>    x_bin_edges[n_bins_x] = refHist-&gt;GetXaxis()-&gt;GetBinUpEdge(n_bins_x);</div>
+<div class="line"><span class="lineno">  464</span> </div>
+<div class="line"><span class="lineno">  465</span>    <span class="keyword">constexpr</span> <span class="keywordtype">int</span> n_bins_y = 400;</div>
+<div class="line"><span class="lineno">  466</span>    <span class="keyword">constexpr</span> <span class="keywordtype">double</span> y_min = 0.0;</div>
+<div class="line"><span class="lineno">  467</span>    <span class="keyword">const</span> <span class="keywordtype">double</span> y_max = MaxValue[sample] * 1.05;</div>
+<div class="line"><span class="lineno">  468</span> </div>
+<div class="line"><span class="lineno">  469</span>    <span class="comment">// Create TH2D with variable binning on x axis</span></div>
+<div class="line"><span class="lineno">  470</span>    Spectra[sample] = std::make_unique&lt;TH2D&gt;(</div>
+<div class="line"><span class="lineno">  471</span>      (<a class="code hl_variable" href="classPredictiveThrower.html#a12713d50372297fbaa3788b7bacecf5f">SampleNames</a>[sample] + <span class="stringliteral">&quot;_&quot;</span> + suffix).c_str(),   <span class="comment">// name</span></div>
+<div class="line"><span class="lineno">  472</span>      (<a class="code hl_variable" href="classPredictiveThrower.html#a12713d50372297fbaa3788b7bacecf5f">SampleNames</a>[sample] + <span class="stringliteral">&quot;_&quot;</span> + suffix).c_str(),   <span class="comment">// title</span></div>
+<div class="line"><span class="lineno">  473</span>      n_bins_x, x_bin_edges.data(),                   <span class="comment">// x axis bins</span></div>
+<div class="line"><span class="lineno">  474</span>      n_bins_y, y_min, y_max                          <span class="comment">// y axis bins</span></div>
+<div class="line"><span class="lineno">  475</span>    );</div>
+<div class="line"><span class="lineno">  476</span> </div>
+<div class="line"><span class="lineno">  477</span>    Spectra[sample]-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno">  478</span>    Spectra[sample]-&gt;Sumw2(<span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  479</span>  }</div>
+<div class="line"><span class="lineno">  480</span> </div>
+<div class="line"><span class="lineno">  481</span><span class="preprocessor">  #ifdef MULTITHREAD</span></div>
+<div class="line"><span class="lineno">  482</span><span class="preprocessor">  #pragma omp parallel for</span></div>
+<div class="line"><span class="lineno">  483</span><span class="preprocessor">  #endif</span></div>
+<div class="line"><span class="lineno">  484</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> sample = 0; sample &lt; <a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>; ++sample) {</div>
+<div class="line"><span class="lineno">  485</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> toy = 0; toy &lt; <a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>; ++toy) {</div>
+<div class="line"><span class="lineno">  486</span>      <a class="code hl_function" href="HistogramUtils_8cpp.html#a5057e3deaf657180213e52d3f5bc41cc">FastViolinFill</a>(Spectra[sample].get(), Toys[sample][toy].get());</div>
+<div class="line"><span class="lineno">  487</span>    }</div>
+<div class="line"><span class="lineno">  488</span>  }</div>
+<div class="line"><span class="lineno">  489</span> </div>
+<div class="line"><span class="lineno">  490</span>  <span class="keywordflow">return</span> Spectra;</div>
+<div class="line"><span class="lineno">  491</span>}</div>
 <div class="ttc" id="aHistogramUtils_8cpp_html_a5057e3deaf657180213e52d3f5bc41cc"><div class="ttname"><a href="HistogramUtils_8cpp.html#a5057e3deaf657180213e52d3f5bc41cc">FastViolinFill</a></div><div class="ttdeci">void FastViolinFill(TH2D *violin, TH1D *hist_1d)</div><div class="ttdoc">KS: Fill Violin histogram with entry from a toy.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00548">HistogramUtils.cpp:548</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -1085,127 +1085,132 @@ Clarence Wret </dd></dl>
 <div class="line"><span class="lineno">  306</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> iPDF = 0; iPDF &lt; <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>.size(); iPDF++)</div>
 <div class="line"><span class="lineno">  307</span>  {</div>
 <div class="line"><span class="lineno">  308</span>    <span class="keyword">auto</span>* MaCh3Sample = <span class="keyword">dynamic_cast&lt;</span><a class="code hl_class" href="classSampleHandlerFD.html">SampleHandlerFD</a>*<span class="keyword">&gt;</span>(<a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>[iPDF]);</div>
-<div class="line"><span class="lineno">  309</span>    <span class="comment">// Get nominal spectra and event rates</span></div>
-<div class="line"><span class="lineno">  310</span>    TH1D* DataHist1D = <span class="keyword">static_cast&lt;</span>TH1D*<span class="keyword">&gt;</span>(MaCh3Sample-&gt;GetDataHist(1));</div>
-<div class="line"><span class="lineno">  311</span>    <a class="code hl_variable" href="classPredictiveThrower.html#adf7f2824dab0117f99167b5d642ed0c7">Data_Hist</a>[iPDF] = <a class="code hl_function" href="namespaceM3.html#aa374c88684482cdd66297f6ae828372d">M3::Clone</a>(DataHist1D, MaCh3Sample-&gt;GetTitle() + <span class="stringliteral">&quot;_data&quot;</span>);</div>
-<div class="line"><span class="lineno">  312</span>    <a class="code hl_variable" href="classPredictiveThrower.html#adf7f2824dab0117f99167b5d642ed0c7">Data_Hist</a>[iPDF]-&gt;Write((MaCh3Sample-&gt;GetTitle() + <span class="stringliteral">&quot;_data&quot;</span>).c_str());</div>
-<div class="line"><span class="lineno">  313</span> </div>
-<div class="line"><span class="lineno">  314</span>    TH1D* MCHist1D = <span class="keyword">static_cast&lt;</span>TH1D*<span class="keyword">&gt;</span>(MaCh3Sample-&gt;GetMCHist(1));</div>
-<div class="line"><span class="lineno">  315</span>    <a class="code hl_variable" href="classPredictiveThrower.html#a15bdbfe780399f677afc3d638c1ca343">MC_Nom_Hist</a>[iPDF] = <a class="code hl_function" href="namespaceM3.html#aa374c88684482cdd66297f6ae828372d">M3::Clone</a>(MCHist1D, MaCh3Sample-&gt;GetTitle() + <span class="stringliteral">&quot;_mc&quot;</span>);</div>
-<div class="line"><span class="lineno">  316</span>    MCHist1D-&gt;Write((MaCh3Sample-&gt;GetTitle() + <span class="stringliteral">&quot;_mc&quot;</span>).c_str());</div>
-<div class="line"><span class="lineno">  317</span> </div>
-<div class="line"><span class="lineno">  318</span>    TH1D* W2Hist1D = <span class="keyword">static_cast&lt;</span>TH1D*<span class="keyword">&gt;</span>(MaCh3Sample-&gt;GetW2Hist(1));</div>
-<div class="line"><span class="lineno">  319</span>    <a class="code hl_variable" href="classPredictiveThrower.html#a71a3c5b49ff2dbfc3a4ac50d2f118574">W2_Nom_Hist</a>[iPDF] = <a class="code hl_function" href="namespaceM3.html#aa374c88684482cdd66297f6ae828372d">M3::Clone</a>(W2Hist1D, MaCh3Sample-&gt;GetTitle() + <span class="stringliteral">&quot;_w2&quot;</span>);</div>
-<div class="line"><span class="lineno">  320</span>    W2Hist1D-&gt;Write((MaCh3Sample-&gt;GetTitle() + <span class="stringliteral">&quot;_w2&quot;</span>).c_str());</div>
-<div class="line"><span class="lineno">  321</span>    <span class="keyword">delete</span> W2Hist1D;</div>
-<div class="line"><span class="lineno">  322</span>  }</div>
-<div class="line"><span class="lineno">  323</span> </div>
-<div class="line"><span class="lineno">  325</span>  std::vector&lt;std::vector&lt;double&gt;&gt; branch_vals(<a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.size());</div>
-<div class="line"><span class="lineno">  326</span>  std::vector&lt;std::vector&lt;std::string&gt;&gt; branch_name(<a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.size());</div>
-<div class="line"><span class="lineno">  327</span> </div>
-<div class="line"><span class="lineno">  328</span>  TChain* PosteriorFile = <span class="keyword">new</span> TChain(<span class="stringliteral">&quot;posteriors&quot;</span>);</div>
-<div class="line"><span class="lineno">  329</span>  PosteriorFile-&gt;Add(PosteriorFileName.c_str());</div>
-<div class="line"><span class="lineno">  330</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> Step = 0;</div>
-<div class="line"><span class="lineno">  331</span>  PosteriorFile-&gt;SetBranchAddress(<span class="stringliteral">&quot;step&quot;</span>, &amp;Step);</div>
-<div class="line"><span class="lineno">  332</span> </div>
-<div class="line"><span class="lineno">  333</span>  <span class="keywordflow">if</span> (PosteriorFile-&gt;GetBranch(<span class="stringliteral">&quot;Weight&quot;</span>)) {</div>
-<div class="line"><span class="lineno">  334</span>    PosteriorFile-&gt;SetBranchStatus(<span class="stringliteral">&quot;Weight&quot;</span>, <span class="keyword">true</span>);</div>
-<div class="line"><span class="lineno">  335</span>    PosteriorFile-&gt;SetBranchAddress(<span class="stringliteral">&quot;Weight&quot;</span>, &amp;Weight);</div>
-<div class="line"><span class="lineno">  336</span>  } <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  337</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Not applying reweighting weight&quot;</span>);</div>
-<div class="line"><span class="lineno">  338</span>    Weight = 1.0;</div>
-<div class="line"><span class="lineno">  339</span>  }</div>
-<div class="line"><span class="lineno">  340</span> </div>
-<div class="line"><span class="lineno">  341</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> s = 0; s &lt; <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.size(); ++s) {</div>
-<div class="line"><span class="lineno">  342</span>    <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;MatchMaCh3OutputBranches(PosteriorFile, branch_vals[s], branch_name[s]);</div>
-<div class="line"><span class="lineno">  343</span>  }</div>
-<div class="line"><span class="lineno">  344</span>  <span class="comment">//Get the burn-in from the config</span></div>
-<div class="line"><span class="lineno">  345</span>  <span class="keyword">auto</span> burn_in = Get&lt;unsigned int&gt;(<a class="code hl_variable" href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">fitMan</a>-&gt;<a class="code hl_function" href="classmanager.html#ab3999cc856ede72b37f68bdb28bd5520">raw</a>()[<span class="stringliteral">&quot;Predictive&quot;</span>][<span class="stringliteral">&quot;BurnInSteps&quot;</span>], __FILE__, __LINE__);</div>
-<div class="line"><span class="lineno">  346</span> </div>
-<div class="line"><span class="lineno">  347</span>  <span class="comment">//DL: Adding sanity check for chains shorter than burn in</span></div>
-<div class="line"><span class="lineno">  348</span>  <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> maxNsteps = <span class="keyword">static_cast&lt;</span><span class="keywordtype">unsigned</span> <span class="keywordtype">int</span><span class="keyword">&gt;</span>(PosteriorFile-&gt;GetMaximum(<span class="stringliteral">&quot;step&quot;</span>));</div>
-<div class="line"><span class="lineno">  349</span>  <span class="keywordflow">if</span>(burn_in &gt;= maxNsteps)</div>
-<div class="line"><span class="lineno">  350</span>  {</div>
-<div class="line"><span class="lineno">  351</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;You are running on a chain shorter than burn in cut&quot;</span>);</div>
-<div class="line"><span class="lineno">  352</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Maximal value of nSteps: {}, burn in cut {}&quot;</span>, maxNsteps, burn_in);</div>
-<div class="line"><span class="lineno">  353</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;You will run into infinite loop&quot;</span>);</div>
-<div class="line"><span class="lineno">  354</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;You can make new chain or modify burn in cut&quot;</span>);</div>
-<div class="line"><span class="lineno">  355</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__,__LINE__);</div>
-<div class="line"><span class="lineno">  356</span>  }</div>
-<div class="line"><span class="lineno">  357</span> </div>
-<div class="line"><span class="lineno">  358</span>  TStopwatch TempClock;</div>
-<div class="line"><span class="lineno">  359</span>  TempClock.Start();</div>
-<div class="line"><span class="lineno">  360</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>; i++)</div>
-<div class="line"><span class="lineno">  361</span>  {</div>
-<div class="line"><span class="lineno">  362</span>    <span class="keywordflow">if</span>( i % (<a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>/10) == 0) {</div>
-<div class="line"><span class="lineno">  363</span>      <a class="code hl_function" href="namespaceMaCh3Utils.html#a4c8bdeb1d34606aed192e9f1311a72f5">MaCh3Utils::PrintProgressBar</a>(i, <a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>);</div>
-<div class="line"><span class="lineno">  364</span>    }</div>
-<div class="line"><span class="lineno">  365</span>    <span class="keywordtype">int</span> entry = 0;</div>
-<div class="line"><span class="lineno">  366</span>    Step = 0;</div>
-<div class="line"><span class="lineno">  367</span> </div>
-<div class="line"><span class="lineno">  368</span>    <span class="comment">//YSP: Ensures you get an entry from the mcmc even when burn_in is set to zero (Although not advised :p ).</span></div>
-<div class="line"><span class="lineno">  369</span>    <span class="comment">//Take 200k burn in steps, WP: Eb C in 1st peaky</span></div>
-<div class="line"><span class="lineno">  370</span>    <span class="comment">// If we have combined chains by hadd need to check the step in the chain</span></div>
-<div class="line"><span class="lineno">  371</span>    <span class="comment">// Note, entry is not necessarily same as step due to merged ROOT files, so can&#39;t choose entry in the range BurnIn - nEntries :(</span></div>
-<div class="line"><span class="lineno">  372</span>    <span class="keywordflow">while</span>(Step &lt; burn_in){</div>
-<div class="line"><span class="lineno">  373</span>      entry = <a class="code hl_variable" href="classFitterBase.html#a138f250d9204a30204e4ca5b973008b2">random</a>-&gt;Integer(<span class="keyword">static_cast&lt;</span><span class="keywordtype">unsigned</span> <span class="keywordtype">int</span><span class="keyword">&gt;</span>(PosteriorFile-&gt;GetEntries()));</div>
-<div class="line"><span class="lineno">  374</span>      PosteriorFile-&gt;GetEntry(entry);</div>
-<div class="line"><span class="lineno">  375</span>    }</div>
-<div class="line"><span class="lineno">  376</span>    <span class="keywordflow">if</span>(!<a class="code hl_variable" href="classPredictiveThrower.html#a6be5b493541d6f30b3a0d6fd0e7557e9">Is_PriorPredictive</a>) Draw = entry;</div>
-<div class="line"><span class="lineno">  377</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> s = 0; s &lt; <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.size(); ++s)</div>
-<div class="line"><span class="lineno">  378</span>    {</div>
-<div class="line"><span class="lineno">  379</span>      <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;SetParameters(branch_vals[s]);</div>
-<div class="line"><span class="lineno">  380</span> </div>
-<div class="line"><span class="lineno">  381</span>      <span class="comment">//KS: Below line can help you get prior predictive distributions which are helpful for getting pre and post ND fit spectra</span></div>
-<div class="line"><span class="lineno">  382</span>      <span class="comment">//YSP: If not set in the config, the code runs SK Posterior Predictive distributions by default. If true, then the code runs SK prior predictive.</span></div>
-<div class="line"><span class="lineno">  383</span>      <span class="keywordflow">if</span>(<a class="code hl_variable" href="classPredictiveThrower.html#a6be5b493541d6f30b3a0d6fd0e7557e9">Is_PriorPredictive</a>) <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;ThrowParameters();</div>
-<div class="line"><span class="lineno">  384</span>    }</div>
-<div class="line"><span class="lineno">  385</span> </div>
-<div class="line"><span class="lineno">  386</span>    <span class="comment">// This set some params to prior value this way you can evaluate errors from subset of errors</span></div>
-<div class="line"><span class="lineno">  387</span>    <a class="code hl_function" href="classPredictiveThrower.html#a08a59c10c1d2a63027c394873020e901">SetParamters</a>();</div>
+<div class="line"><span class="lineno">  309</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> SampleIndex = 0; SampleIndex &lt; MaCh3Sample-&gt;GetNsamples(); ++SampleIndex)</div>
+<div class="line"><span class="lineno">  310</span>    {</div>
+<div class="line"><span class="lineno">  311</span>      <span class="comment">// Get nominal spectra and event rates</span></div>
+<div class="line"><span class="lineno">  312</span>      TH1D* DataHist1D = <span class="keyword">static_cast&lt;</span>TH1D*<span class="keyword">&gt;</span>(MaCh3Sample-&gt;GetDataHist(1));</div>
+<div class="line"><span class="lineno">  313</span>      <a class="code hl_variable" href="classPredictiveThrower.html#adf7f2824dab0117f99167b5d642ed0c7">Data_Hist</a>[iPDF] = <a class="code hl_function" href="namespaceM3.html#aa374c88684482cdd66297f6ae828372d">M3::Clone</a>(DataHist1D, MaCh3Sample-&gt;GetTitle() + <span class="stringliteral">&quot;_data&quot;</span>);</div>
+<div class="line"><span class="lineno">  314</span>      <a class="code hl_variable" href="classPredictiveThrower.html#adf7f2824dab0117f99167b5d642ed0c7">Data_Hist</a>[iPDF]-&gt;Write((MaCh3Sample-&gt;GetTitle() + <span class="stringliteral">&quot;_data&quot;</span>).c_str());</div>
+<div class="line"><span class="lineno">  315</span> </div>
+<div class="line"><span class="lineno">  316</span>      TH1D* MCHist1D = <span class="keyword">static_cast&lt;</span>TH1D*<span class="keyword">&gt;</span>(MaCh3Sample-&gt;GetMCHist(1));</div>
+<div class="line"><span class="lineno">  317</span>      <a class="code hl_variable" href="classPredictiveThrower.html#a15bdbfe780399f677afc3d638c1ca343">MC_Nom_Hist</a>[iPDF] = <a class="code hl_function" href="namespaceM3.html#aa374c88684482cdd66297f6ae828372d">M3::Clone</a>(MCHist1D, MaCh3Sample-&gt;GetTitle() + <span class="stringliteral">&quot;_mc&quot;</span>);</div>
+<div class="line"><span class="lineno">  318</span>      MCHist1D-&gt;Write((MaCh3Sample-&gt;GetTitle() + <span class="stringliteral">&quot;_mc&quot;</span>).c_str());</div>
+<div class="line"><span class="lineno">  319</span> </div>
+<div class="line"><span class="lineno">  320</span>      TH1D* W2Hist1D = <span class="keyword">static_cast&lt;</span>TH1D*<span class="keyword">&gt;</span>(MaCh3Sample-&gt;GetW2Hist(1));</div>
+<div class="line"><span class="lineno">  321</span>      <a class="code hl_variable" href="classPredictiveThrower.html#a71a3c5b49ff2dbfc3a4ac50d2f118574">W2_Nom_Hist</a>[iPDF] = <a class="code hl_function" href="namespaceM3.html#aa374c88684482cdd66297f6ae828372d">M3::Clone</a>(W2Hist1D, MaCh3Sample-&gt;GetTitle() + <span class="stringliteral">&quot;_w2&quot;</span>);</div>
+<div class="line"><span class="lineno">  322</span>      W2Hist1D-&gt;Write((MaCh3Sample-&gt;GetTitle() + <span class="stringliteral">&quot;_w2&quot;</span>).c_str());</div>
+<div class="line"><span class="lineno">  323</span>      <span class="keyword">delete</span> W2Hist1D;</div>
+<div class="line"><span class="lineno">  324</span>    }</div>
+<div class="line"><span class="lineno">  325</span>  }</div>
+<div class="line"><span class="lineno">  326</span> </div>
+<div class="line"><span class="lineno">  328</span>  std::vector&lt;std::vector&lt;double&gt;&gt; branch_vals(<a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.size());</div>
+<div class="line"><span class="lineno">  329</span>  std::vector&lt;std::vector&lt;std::string&gt;&gt; branch_name(<a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.size());</div>
+<div class="line"><span class="lineno">  330</span> </div>
+<div class="line"><span class="lineno">  331</span>  TChain* PosteriorFile = <span class="keyword">new</span> TChain(<span class="stringliteral">&quot;posteriors&quot;</span>);</div>
+<div class="line"><span class="lineno">  332</span>  PosteriorFile-&gt;Add(PosteriorFileName.c_str());</div>
+<div class="line"><span class="lineno">  333</span>  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> Step = 0;</div>
+<div class="line"><span class="lineno">  334</span>  PosteriorFile-&gt;SetBranchAddress(<span class="stringliteral">&quot;step&quot;</span>, &amp;Step);</div>
+<div class="line"><span class="lineno">  335</span> </div>
+<div class="line"><span class="lineno">  336</span>  <span class="keywordflow">if</span> (PosteriorFile-&gt;GetBranch(<span class="stringliteral">&quot;Weight&quot;</span>)) {</div>
+<div class="line"><span class="lineno">  337</span>    PosteriorFile-&gt;SetBranchStatus(<span class="stringliteral">&quot;Weight&quot;</span>, <span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  338</span>    PosteriorFile-&gt;SetBranchAddress(<span class="stringliteral">&quot;Weight&quot;</span>, &amp;Weight);</div>
+<div class="line"><span class="lineno">  339</span>  } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  340</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Not applying reweighting weight&quot;</span>);</div>
+<div class="line"><span class="lineno">  341</span>    Weight = 1.0;</div>
+<div class="line"><span class="lineno">  342</span>  }</div>
+<div class="line"><span class="lineno">  343</span> </div>
+<div class="line"><span class="lineno">  344</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> s = 0; s &lt; <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.size(); ++s) {</div>
+<div class="line"><span class="lineno">  345</span>    <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;MatchMaCh3OutputBranches(PosteriorFile, branch_vals[s], branch_name[s]);</div>
+<div class="line"><span class="lineno">  346</span>  }</div>
+<div class="line"><span class="lineno">  347</span>  <span class="comment">//Get the burn-in from the config</span></div>
+<div class="line"><span class="lineno">  348</span>  <span class="keyword">auto</span> burn_in = Get&lt;unsigned int&gt;(<a class="code hl_variable" href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">fitMan</a>-&gt;<a class="code hl_function" href="classmanager.html#ab3999cc856ede72b37f68bdb28bd5520">raw</a>()[<span class="stringliteral">&quot;Predictive&quot;</span>][<span class="stringliteral">&quot;BurnInSteps&quot;</span>], __FILE__, __LINE__);</div>
+<div class="line"><span class="lineno">  349</span> </div>
+<div class="line"><span class="lineno">  350</span>  <span class="comment">//DL: Adding sanity check for chains shorter than burn in</span></div>
+<div class="line"><span class="lineno">  351</span>  <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> maxNsteps = <span class="keyword">static_cast&lt;</span><span class="keywordtype">unsigned</span> <span class="keywordtype">int</span><span class="keyword">&gt;</span>(PosteriorFile-&gt;GetMaximum(<span class="stringliteral">&quot;step&quot;</span>));</div>
+<div class="line"><span class="lineno">  352</span>  <span class="keywordflow">if</span>(burn_in &gt;= maxNsteps)</div>
+<div class="line"><span class="lineno">  353</span>  {</div>
+<div class="line"><span class="lineno">  354</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;You are running on a chain shorter than burn in cut&quot;</span>);</div>
+<div class="line"><span class="lineno">  355</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Maximal value of nSteps: {}, burn in cut {}&quot;</span>, maxNsteps, burn_in);</div>
+<div class="line"><span class="lineno">  356</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;You will run into infinite loop&quot;</span>);</div>
+<div class="line"><span class="lineno">  357</span>    <a class="code hl_define" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;You can make new chain or modify burn in cut&quot;</span>);</div>
+<div class="line"><span class="lineno">  358</span>    <span class="keywordflow">throw</span> <a class="code hl_class" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__,__LINE__);</div>
+<div class="line"><span class="lineno">  359</span>  }</div>
+<div class="line"><span class="lineno">  360</span> </div>
+<div class="line"><span class="lineno">  361</span>  TStopwatch TempClock;</div>
+<div class="line"><span class="lineno">  362</span>  TempClock.Start();</div>
+<div class="line"><span class="lineno">  363</span>  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>; i++)</div>
+<div class="line"><span class="lineno">  364</span>  {</div>
+<div class="line"><span class="lineno">  365</span>    <span class="keywordflow">if</span>( i % (<a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>/10) == 0) {</div>
+<div class="line"><span class="lineno">  366</span>      <a class="code hl_function" href="namespaceMaCh3Utils.html#a4c8bdeb1d34606aed192e9f1311a72f5">MaCh3Utils::PrintProgressBar</a>(i, <a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>);</div>
+<div class="line"><span class="lineno">  367</span>    }</div>
+<div class="line"><span class="lineno">  368</span>    <span class="keywordtype">int</span> entry = 0;</div>
+<div class="line"><span class="lineno">  369</span>    Step = 0;</div>
+<div class="line"><span class="lineno">  370</span> </div>
+<div class="line"><span class="lineno">  371</span>    <span class="comment">//YSP: Ensures you get an entry from the mcmc even when burn_in is set to zero (Although not advised :p ).</span></div>
+<div class="line"><span class="lineno">  372</span>    <span class="comment">//Take 200k burn in steps, WP: Eb C in 1st peaky</span></div>
+<div class="line"><span class="lineno">  373</span>    <span class="comment">// If we have combined chains by hadd need to check the step in the chain</span></div>
+<div class="line"><span class="lineno">  374</span>    <span class="comment">// Note, entry is not necessarily same as step due to merged ROOT files, so can&#39;t choose entry in the range BurnIn - nEntries :(</span></div>
+<div class="line"><span class="lineno">  375</span>    <span class="keywordflow">while</span>(Step &lt; burn_in){</div>
+<div class="line"><span class="lineno">  376</span>      entry = <a class="code hl_variable" href="classFitterBase.html#a138f250d9204a30204e4ca5b973008b2">random</a>-&gt;Integer(<span class="keyword">static_cast&lt;</span><span class="keywordtype">unsigned</span> <span class="keywordtype">int</span><span class="keyword">&gt;</span>(PosteriorFile-&gt;GetEntries()));</div>
+<div class="line"><span class="lineno">  377</span>      PosteriorFile-&gt;GetEntry(entry);</div>
+<div class="line"><span class="lineno">  378</span>    }</div>
+<div class="line"><span class="lineno">  379</span>    <span class="keywordflow">if</span>(!<a class="code hl_variable" href="classPredictiveThrower.html#a6be5b493541d6f30b3a0d6fd0e7557e9">Is_PriorPredictive</a>) Draw = entry;</div>
+<div class="line"><span class="lineno">  380</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> s = 0; s &lt; <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.size(); ++s)</div>
+<div class="line"><span class="lineno">  381</span>    {</div>
+<div class="line"><span class="lineno">  382</span>      <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;SetParameters(branch_vals[s]);</div>
+<div class="line"><span class="lineno">  383</span> </div>
+<div class="line"><span class="lineno">  384</span>      <span class="comment">//KS: Below line can help you get prior predictive distributions which are helpful for getting pre and post ND fit spectra</span></div>
+<div class="line"><span class="lineno">  385</span>      <span class="comment">//YSP: If not set in the config, the code runs SK Posterior Predictive distributions by default. If true, then the code runs SK prior predictive.</span></div>
+<div class="line"><span class="lineno">  386</span>      <span class="keywordflow">if</span>(<a class="code hl_variable" href="classPredictiveThrower.html#a6be5b493541d6f30b3a0d6fd0e7557e9">Is_PriorPredictive</a>) <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;ThrowParameters();</div>
+<div class="line"><span class="lineno">  387</span>    }</div>
 <div class="line"><span class="lineno">  388</span> </div>
-<div class="line"><span class="lineno">  389</span>    Penalty = 0;</div>
-<div class="line"><span class="lineno">  390</span>    <span class="keywordflow">if</span>(<a class="code hl_variable" href="classPredictiveThrower.html#a1a66f2a24728f4bb112f3c6fd9385c6a">FullLLH</a>) {</div>
-<div class="line"><span class="lineno">  391</span>      <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> s = 0; s &lt; <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.size(); ++s) {</div>
-<div class="line"><span class="lineno">  392</span>        <span class="comment">//KS: do times 2 because banff reports chi2</span></div>
-<div class="line"><span class="lineno">  393</span>        Penalty = 2.0 * <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;GetLikelihood();</div>
-<div class="line"><span class="lineno">  394</span>      }</div>
-<div class="line"><span class="lineno">  395</span>    }</div>
-<div class="line"><span class="lineno">  396</span> </div>
-<div class="line"><span class="lineno">  397</span>    <a class="code hl_variable" href="classPredictiveThrower.html#a10b73ebca659a2162a9869f2696ee7b2">PenaltyTerm</a>[i] = Penalty;</div>
-<div class="line"><span class="lineno">  398</span>    <a class="code hl_variable" href="classPredictiveThrower.html#ace711c729993a63c2141893888ab5322">ReweightWeight</a>[i] = Weight;</div>
+<div class="line"><span class="lineno">  389</span>    <span class="comment">// This set some params to prior value this way you can evaluate errors from subset of errors</span></div>
+<div class="line"><span class="lineno">  390</span>    <a class="code hl_function" href="classPredictiveThrower.html#a08a59c10c1d2a63027c394873020e901">SetParamters</a>();</div>
+<div class="line"><span class="lineno">  391</span> </div>
+<div class="line"><span class="lineno">  392</span>    Penalty = 0;</div>
+<div class="line"><span class="lineno">  393</span>    <span class="keywordflow">if</span>(<a class="code hl_variable" href="classPredictiveThrower.html#a1a66f2a24728f4bb112f3c6fd9385c6a">FullLLH</a>) {</div>
+<div class="line"><span class="lineno">  394</span>      <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> s = 0; s &lt; <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.size(); ++s) {</div>
+<div class="line"><span class="lineno">  395</span>        <span class="comment">//KS: do times 2 because banff reports chi2</span></div>
+<div class="line"><span class="lineno">  396</span>        Penalty = 2.0 * <a class="code hl_variable" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;GetLikelihood();</div>
+<div class="line"><span class="lineno">  397</span>      }</div>
+<div class="line"><span class="lineno">  398</span>    }</div>
 <div class="line"><span class="lineno">  399</span> </div>
-<div class="line"><span class="lineno">  400</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> iPDF = 0; iPDF &lt; <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>.size(); iPDF++) {</div>
-<div class="line"><span class="lineno">  401</span>      <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>[iPDF]-&gt;Reweight();</div>
-<div class="line"><span class="lineno">  402</span>    }</div>
-<div class="line"><span class="lineno">  403</span> </div>
-<div class="line"><span class="lineno">  404</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> iPDF = 0; iPDF &lt; <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>.size(); iPDF++)</div>
-<div class="line"><span class="lineno">  405</span>    {</div>
-<div class="line"><span class="lineno">  406</span>      <span class="keyword">auto</span>* MaCh3Sample = <span class="keyword">dynamic_cast&lt;</span><a class="code hl_class" href="classSampleHandlerFD.html">SampleHandlerFD</a>*<span class="keyword">&gt;</span>(<a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>[iPDF]);</div>
-<div class="line"><span class="lineno">  407</span> </div>
-<div class="line"><span class="lineno">  408</span>      TH1D* MCHist1D = <span class="keyword">static_cast&lt;</span>TH1D*<span class="keyword">&gt;</span>(MaCh3Sample-&gt;GetMCHist(1));</div>
-<div class="line"><span class="lineno">  409</span>      <a class="code hl_variable" href="classPredictiveThrower.html#aebfa278a480b0e682881f74a27d02b32">MC_Hist_Toy</a>[iPDF][i] = <a class="code hl_function" href="namespaceM3.html#aa374c88684482cdd66297f6ae828372d">M3::Clone</a>(MCHist1D, MaCh3Sample-&gt;GetTitle() + <span class="stringliteral">&quot;_mc_&quot;</span> + std::to_string(i));</div>
-<div class="line"><span class="lineno">  410</span>      <a class="code hl_variable" href="classPredictiveThrower.html#aebfa278a480b0e682881f74a27d02b32">MC_Hist_Toy</a>[iPDF][i]-&gt;Write();</div>
-<div class="line"><span class="lineno">  411</span> </div>
-<div class="line"><span class="lineno">  412</span>      TH1D* W2Hist1D = <span class="keyword">static_cast&lt;</span>TH1D*<span class="keyword">&gt;</span>(MaCh3Sample-&gt;GetW2Hist(1));</div>
-<div class="line"><span class="lineno">  413</span>      <a class="code hl_variable" href="classPredictiveThrower.html#a4d9eb7777c6e93efd412cdf3d146fff9">W2_Hist_Toy</a>[iPDF][i] = <a class="code hl_function" href="namespaceM3.html#aa374c88684482cdd66297f6ae828372d">M3::Clone</a>(W2Hist1D, MaCh3Sample-&gt;GetTitle() + <span class="stringliteral">&quot;_w2_&quot;</span> + std::to_string(i));</div>
-<div class="line"><span class="lineno">  414</span>      <a class="code hl_variable" href="classPredictiveThrower.html#a4d9eb7777c6e93efd412cdf3d146fff9">W2_Hist_Toy</a>[iPDF][i]-&gt;Write();</div>
-<div class="line"><span class="lineno">  415</span>      <span class="keyword">delete</span> W2Hist1D;</div>
-<div class="line"><span class="lineno">  416</span>    }</div>
-<div class="line"><span class="lineno">  417</span>    ToyTree-&gt;Fill();</div>
-<div class="line"><span class="lineno">  418</span>  }<span class="comment">//end of toys loop</span></div>
-<div class="line"><span class="lineno">  419</span>  TempClock.Stop();</div>
-<div class="line"><span class="lineno">  420</span> </div>
-<div class="line"><span class="lineno">  421</span>  <span class="keyword">delete</span> PosteriorFile;</div>
-<div class="line"><span class="lineno">  422</span>  ToyDirectory-&gt;Close();</div>
-<div class="line"><span class="lineno">  423</span>  <span class="keyword">delete</span> ToyDirectory;</div>
-<div class="line"><span class="lineno">  424</span> </div>
-<div class="line"><span class="lineno">  425</span>  <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;cd();</div>
-<div class="line"><span class="lineno">  426</span>  ToyTree-&gt;Write();</div>
-<div class="line"><span class="lineno">  427</span>  <span class="keyword">delete</span> ToyTree;</div>
-<div class="line"><span class="lineno">  428</span> </div>
-<div class="line"><span class="lineno">  429</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{} took {:.2f}s to finish for {} toys&quot;</span>, __func__, TempClock.RealTime(), <a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>);</div>
-<div class="line"><span class="lineno">  430</span>}</div>
+<div class="line"><span class="lineno">  400</span>    <a class="code hl_variable" href="classPredictiveThrower.html#a10b73ebca659a2162a9869f2696ee7b2">PenaltyTerm</a>[i] = Penalty;</div>
+<div class="line"><span class="lineno">  401</span>    <a class="code hl_variable" href="classPredictiveThrower.html#ace711c729993a63c2141893888ab5322">ReweightWeight</a>[i] = Weight;</div>
+<div class="line"><span class="lineno">  402</span> </div>
+<div class="line"><span class="lineno">  403</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> iPDF = 0; iPDF &lt; <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>.size(); iPDF++) {</div>
+<div class="line"><span class="lineno">  404</span>      <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>[iPDF]-&gt;Reweight();</div>
+<div class="line"><span class="lineno">  405</span>    }</div>
+<div class="line"><span class="lineno">  406</span> </div>
+<div class="line"><span class="lineno">  407</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> iPDF = 0; iPDF &lt; <a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>.size(); iPDF++)</div>
+<div class="line"><span class="lineno">  408</span>    {</div>
+<div class="line"><span class="lineno">  409</span>      <span class="keyword">auto</span>* MaCh3Sample = <span class="keyword">dynamic_cast&lt;</span><a class="code hl_class" href="classSampleHandlerFD.html">SampleHandlerFD</a>*<span class="keyword">&gt;</span>(<a class="code hl_variable" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>[iPDF]);</div>
+<div class="line"><span class="lineno">  410</span>      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> SampleIndex = 0; SampleIndex &lt; MaCh3Sample-&gt;GetNsamples(); ++SampleIndex)</div>
+<div class="line"><span class="lineno">  411</span>      {</div>
+<div class="line"><span class="lineno">  412</span>        TH1D* MCHist1D = <span class="keyword">static_cast&lt;</span>TH1D*<span class="keyword">&gt;</span>(MaCh3Sample-&gt;GetMCHist(1));</div>
+<div class="line"><span class="lineno">  413</span>        <a class="code hl_variable" href="classPredictiveThrower.html#aebfa278a480b0e682881f74a27d02b32">MC_Hist_Toy</a>[iPDF][i] = <a class="code hl_function" href="namespaceM3.html#aa374c88684482cdd66297f6ae828372d">M3::Clone</a>(MCHist1D, MaCh3Sample-&gt;GetTitle() + <span class="stringliteral">&quot;_mc_&quot;</span> + std::to_string(i));</div>
+<div class="line"><span class="lineno">  414</span>        <a class="code hl_variable" href="classPredictiveThrower.html#aebfa278a480b0e682881f74a27d02b32">MC_Hist_Toy</a>[iPDF][i]-&gt;Write();</div>
+<div class="line"><span class="lineno">  415</span> </div>
+<div class="line"><span class="lineno">  416</span>        TH1D* W2Hist1D = <span class="keyword">static_cast&lt;</span>TH1D*<span class="keyword">&gt;</span>(MaCh3Sample-&gt;GetW2Hist(1));</div>
+<div class="line"><span class="lineno">  417</span>        <a class="code hl_variable" href="classPredictiveThrower.html#a4d9eb7777c6e93efd412cdf3d146fff9">W2_Hist_Toy</a>[iPDF][i] = <a class="code hl_function" href="namespaceM3.html#aa374c88684482cdd66297f6ae828372d">M3::Clone</a>(W2Hist1D, MaCh3Sample-&gt;GetTitle() + <span class="stringliteral">&quot;_w2_&quot;</span> + std::to_string(i));</div>
+<div class="line"><span class="lineno">  418</span>        <a class="code hl_variable" href="classPredictiveThrower.html#a4d9eb7777c6e93efd412cdf3d146fff9">W2_Hist_Toy</a>[iPDF][i]-&gt;Write();</div>
+<div class="line"><span class="lineno">  419</span>        <span class="keyword">delete</span> W2Hist1D;</div>
+<div class="line"><span class="lineno">  420</span>      }</div>
+<div class="line"><span class="lineno">  421</span>    }</div>
+<div class="line"><span class="lineno">  422</span>    ToyTree-&gt;Fill();</div>
+<div class="line"><span class="lineno">  423</span>  }<span class="comment">//end of toys loop</span></div>
+<div class="line"><span class="lineno">  424</span>  TempClock.Stop();</div>
+<div class="line"><span class="lineno">  425</span> </div>
+<div class="line"><span class="lineno">  426</span>  <span class="keyword">delete</span> PosteriorFile;</div>
+<div class="line"><span class="lineno">  427</span>  ToyDirectory-&gt;Close();</div>
+<div class="line"><span class="lineno">  428</span>  <span class="keyword">delete</span> ToyDirectory;</div>
+<div class="line"><span class="lineno">  429</span> </div>
+<div class="line"><span class="lineno">  430</span>  <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;cd();</div>
+<div class="line"><span class="lineno">  431</span>  ToyTree-&gt;Write();</div>
+<div class="line"><span class="lineno">  432</span>  <span class="keyword">delete</span> ToyTree;</div>
+<div class="line"><span class="lineno">  433</span> </div>
+<div class="line"><span class="lineno">  434</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{} took {:.2f}s to finish for {} toys&quot;</span>, __func__, TempClock.RealTime(), <a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>);</div>
+<div class="line"><span class="lineno">  435</span>}</div>
 <div class="ttc" id="aclassFitterBase_html_a4260b312e3f35cf01fc73b02239f8990"><div class="ttname"><a href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">FitterBase::outputFile</a></div><div class="ttdeci">TFile * outputFile</div><div class="ttdoc">Output.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00149">FitterBase.h:149</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_afeffc9d794c973a015aa12ec1a8f79da"><div class="ttname"><a href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">FitterBase::systematics</a></div><div class="ttdeci">std::vector&lt; ParameterHandlerBase * &gt; systematics</div><div class="ttdoc">Systematic holder.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00136">FitterBase.h:136</a></div></div>
 <div class="ttc" id="aclassPredictiveThrower_html_a08a59c10c1d2a63027c394873020e901"><div class="ttname"><a href="classPredictiveThrower.html#a08a59c10c1d2a63027c394873020e901">PredictiveThrower::SetParamters</a></div><div class="ttdeci">void SetParamters()</div><div class="ttdoc">This set some params to prior value this way you can evaluate errors from subset of errors.</div><div class="ttdef"><b>Definition:</b> <a href="PredictiveThrower_8cpp_source.html#l00034">PredictiveThrower.cpp:34</a></div></div>
@@ -1269,57 +1274,57 @@ Clarence Wret </dd></dl>
 
 <p>Main routine responsible for producing posterior predictive distributions and $p$-value. </p>
 
-<p class="definition">Definition at line <a class="el" href="PredictiveThrower_8cpp_source.html#l00529">529</a> of file <a class="el" href="PredictiveThrower_8cpp_source.html">PredictiveThrower.cpp</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  529</span>                                              {</div>
-<div class="line"><span class="lineno">  530</span><span class="comment">// *************************</span></div>
-<div class="line"><span class="lineno">  531</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Starting {}&quot;</span>, __func__);</div>
-<div class="line"><span class="lineno">  532</span>  TStopwatch TempClock;</div>
-<div class="line"><span class="lineno">  533</span>  TempClock.Start();</div>
-<div class="line"><span class="lineno">  534</span> </div>
-<div class="line"><span class="lineno">  535</span>  <span class="keyword">auto</span> DebugHistograms = GetFromManager&lt;bool&gt;(<a class="code hl_variable" href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">fitMan</a>-&gt;<a class="code hl_function" href="classmanager.html#ab3999cc856ede72b37f68bdb28bd5520">raw</a>()[<span class="stringliteral">&quot;Predictive&quot;</span>][<span class="stringliteral">&quot;DebugHistograms&quot;</span>], <span class="keyword">false</span>, __FILE__, __LINE__);</div>
-<div class="line"><span class="lineno">  536</span> </div>
-<div class="line"><span class="lineno">  537</span>  TDirectory* PredictiveDir = <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;mkdir(<span class="stringliteral">&quot;Predictive&quot;</span>);</div>
-<div class="line"><span class="lineno">  538</span>  std::vector&lt;TDirectory*&gt; SampleDirectories;</div>
-<div class="line"><span class="lineno">  539</span>  SampleDirectories.resize(<a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>+1);</div>
-<div class="line"><span class="lineno">  540</span> </div>
-<div class="line"><span class="lineno">  541</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> sample = 0; sample &lt; <a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>+1; ++sample) {</div>
-<div class="line"><span class="lineno">  542</span>    SampleDirectories[sample] = PredictiveDir-&gt;mkdir(<a class="code hl_variable" href="classPredictiveThrower.html#a12713d50372297fbaa3788b7bacecf5f">SampleNames</a>[sample].c_str());</div>
-<div class="line"><span class="lineno">  543</span>  }</div>
-<div class="line"><span class="lineno">  544</span> </div>
-<div class="line"><span class="lineno">  545</span>  std::vector&lt;std::unique_ptr&lt;TH2D&gt;&gt; Spectra_mc = <a class="code hl_function" href="classPredictiveThrower.html#ac3cd8579ebc54875c4b1630b73b9d4e8">ProduceSpectra</a>(<a class="code hl_variable" href="classPredictiveThrower.html#aebfa278a480b0e682881f74a27d02b32">MC_Hist_Toy</a>, <span class="stringliteral">&quot;mc&quot;</span>);</div>
-<div class="line"><span class="lineno">  546</span>  <span class="comment">//std::vector&lt;std::unique_ptr&lt;TH2D&gt;&gt; Spectra_w2 = ProduceSpectra(W2_Hist_Toy, &quot;w2&quot;);</span></div>
-<div class="line"><span class="lineno">  547</span>  std::vector&lt;std::unique_ptr&lt;TH1D&gt;&gt; PostPred_mc(<a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>);</div>
-<div class="line"><span class="lineno">  548</span>  <span class="comment">//std::vector&lt;std::unique_ptr&lt;TH1D&gt;&gt; PostPred_w2(TotalNumberOfSamples);</span></div>
-<div class="line"><span class="lineno">  549</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> sample = 0; sample &lt; <a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>; ++sample) {</div>
-<div class="line"><span class="lineno">  550</span>    SampleDirectories[sample]-&gt;cd();</div>
-<div class="line"><span class="lineno">  551</span>    Spectra_mc[sample]-&gt;Write();</div>
-<div class="line"><span class="lineno">  552</span>    <span class="comment">//Spectra_w2[sample]-&gt;Write();</span></div>
-<div class="line"><span class="lineno">  553</span> </div>
-<div class="line"><span class="lineno">  554</span>    PostPred_mc[sample] = <a class="code hl_function" href="classPredictiveThrower.html#aeefcada80a73575f50310d012137773b">MakePredictive</a>(<a class="code hl_variable" href="classPredictiveThrower.html#aebfa278a480b0e682881f74a27d02b32">MC_Hist_Toy</a>[sample], <a class="code hl_variable" href="classPredictiveThrower.html#a12713d50372297fbaa3788b7bacecf5f">SampleNames</a>[sample], <span class="stringliteral">&quot;mc&quot;</span>, DebugHistograms);</div>
-<div class="line"><span class="lineno">  555</span>    <span class="comment">//PostPred_w2[sample] = MakePredictive(W2_Hist_Toy[sample], SampleNames[sample], &quot;w2&quot;, DebugHistograms);</span></div>
-<div class="line"><span class="lineno">  556</span>  }</div>
-<div class="line"><span class="lineno">  557</span> </div>
-<div class="line"><span class="lineno">  558</span>  <a class="code hl_function" href="classPredictiveThrower.html#a89cfdb8be6194aeff6f40f6d7d82723a">PosteriorPredictivepValue</a>(PostPred_mc,</div>
-<div class="line"><span class="lineno">  559</span>                            <span class="comment">//PostPred_w2,</span></div>
-<div class="line"><span class="lineno">  560</span>                            SampleDirectories);</div>
-<div class="line"><span class="lineno">  561</span> </div>
-<div class="line"><span class="lineno">  562</span>  <span class="comment">// Close directories</span></div>
-<div class="line"><span class="lineno">  563</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> sample = 0; sample &lt; <a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>+1; ++sample) {</div>
-<div class="line"><span class="lineno">  564</span>    SampleDirectories[sample]-&gt;Close();</div>
-<div class="line"><span class="lineno">  565</span>    <span class="keyword">delete</span> SampleDirectories[sample];</div>
-<div class="line"><span class="lineno">  566</span>  }</div>
-<div class="line"><span class="lineno">  567</span> </div>
-<div class="line"><span class="lineno">  568</span>  PredictiveDir-&gt;Close();</div>
-<div class="line"><span class="lineno">  569</span>  <span class="keyword">delete</span> PredictiveDir;</div>
-<div class="line"><span class="lineno">  570</span> </div>
-<div class="line"><span class="lineno">  571</span>  <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;cd();</div>
+<p class="definition">Definition at line <a class="el" href="PredictiveThrower_8cpp_source.html#l00534">534</a> of file <a class="el" href="PredictiveThrower_8cpp_source.html">PredictiveThrower.cpp</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  534</span>                                              {</div>
+<div class="line"><span class="lineno">  535</span><span class="comment">// *************************</span></div>
+<div class="line"><span class="lineno">  536</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Starting {}&quot;</span>, __func__);</div>
+<div class="line"><span class="lineno">  537</span>  TStopwatch TempClock;</div>
+<div class="line"><span class="lineno">  538</span>  TempClock.Start();</div>
+<div class="line"><span class="lineno">  539</span> </div>
+<div class="line"><span class="lineno">  540</span>  <span class="keyword">auto</span> DebugHistograms = GetFromManager&lt;bool&gt;(<a class="code hl_variable" href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">fitMan</a>-&gt;<a class="code hl_function" href="classmanager.html#ab3999cc856ede72b37f68bdb28bd5520">raw</a>()[<span class="stringliteral">&quot;Predictive&quot;</span>][<span class="stringliteral">&quot;DebugHistograms&quot;</span>], <span class="keyword">false</span>, __FILE__, __LINE__);</div>
+<div class="line"><span class="lineno">  541</span> </div>
+<div class="line"><span class="lineno">  542</span>  TDirectory* PredictiveDir = <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;mkdir(<span class="stringliteral">&quot;Predictive&quot;</span>);</div>
+<div class="line"><span class="lineno">  543</span>  std::vector&lt;TDirectory*&gt; SampleDirectories;</div>
+<div class="line"><span class="lineno">  544</span>  SampleDirectories.resize(<a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>+1);</div>
+<div class="line"><span class="lineno">  545</span> </div>
+<div class="line"><span class="lineno">  546</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> sample = 0; sample &lt; <a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>+1; ++sample) {</div>
+<div class="line"><span class="lineno">  547</span>    SampleDirectories[sample] = PredictiveDir-&gt;mkdir(<a class="code hl_variable" href="classPredictiveThrower.html#a12713d50372297fbaa3788b7bacecf5f">SampleNames</a>[sample].c_str());</div>
+<div class="line"><span class="lineno">  548</span>  }</div>
+<div class="line"><span class="lineno">  549</span> </div>
+<div class="line"><span class="lineno">  550</span>  std::vector&lt;std::unique_ptr&lt;TH2D&gt;&gt; Spectra_mc = <a class="code hl_function" href="classPredictiveThrower.html#ac3cd8579ebc54875c4b1630b73b9d4e8">ProduceSpectra</a>(<a class="code hl_variable" href="classPredictiveThrower.html#aebfa278a480b0e682881f74a27d02b32">MC_Hist_Toy</a>, <span class="stringliteral">&quot;mc&quot;</span>);</div>
+<div class="line"><span class="lineno">  551</span>  <span class="comment">//std::vector&lt;std::unique_ptr&lt;TH2D&gt;&gt; Spectra_w2 = ProduceSpectra(W2_Hist_Toy, &quot;w2&quot;);</span></div>
+<div class="line"><span class="lineno">  552</span>  std::vector&lt;std::unique_ptr&lt;TH1D&gt;&gt; PostPred_mc(<a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>);</div>
+<div class="line"><span class="lineno">  553</span>  <span class="comment">//std::vector&lt;std::unique_ptr&lt;TH1D&gt;&gt; PostPred_w2(TotalNumberOfSamples);</span></div>
+<div class="line"><span class="lineno">  554</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> sample = 0; sample &lt; <a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>; ++sample) {</div>
+<div class="line"><span class="lineno">  555</span>    SampleDirectories[sample]-&gt;cd();</div>
+<div class="line"><span class="lineno">  556</span>    Spectra_mc[sample]-&gt;Write();</div>
+<div class="line"><span class="lineno">  557</span>    <span class="comment">//Spectra_w2[sample]-&gt;Write();</span></div>
+<div class="line"><span class="lineno">  558</span> </div>
+<div class="line"><span class="lineno">  559</span>    PostPred_mc[sample] = <a class="code hl_function" href="classPredictiveThrower.html#aeefcada80a73575f50310d012137773b">MakePredictive</a>(<a class="code hl_variable" href="classPredictiveThrower.html#aebfa278a480b0e682881f74a27d02b32">MC_Hist_Toy</a>[sample], <a class="code hl_variable" href="classPredictiveThrower.html#a12713d50372297fbaa3788b7bacecf5f">SampleNames</a>[sample], <span class="stringliteral">&quot;mc&quot;</span>, DebugHistograms);</div>
+<div class="line"><span class="lineno">  560</span>    <span class="comment">//PostPred_w2[sample] = MakePredictive(W2_Hist_Toy[sample], SampleNames[sample], &quot;w2&quot;, DebugHistograms);</span></div>
+<div class="line"><span class="lineno">  561</span>  }</div>
+<div class="line"><span class="lineno">  562</span> </div>
+<div class="line"><span class="lineno">  563</span>  <a class="code hl_function" href="classPredictiveThrower.html#a89cfdb8be6194aeff6f40f6d7d82723a">PosteriorPredictivepValue</a>(PostPred_mc,</div>
+<div class="line"><span class="lineno">  564</span>                            <span class="comment">//PostPred_w2,</span></div>
+<div class="line"><span class="lineno">  565</span>                            SampleDirectories);</div>
+<div class="line"><span class="lineno">  566</span> </div>
+<div class="line"><span class="lineno">  567</span>  <span class="comment">// Close directories</span></div>
+<div class="line"><span class="lineno">  568</span>  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> sample = 0; sample &lt; <a class="code hl_variable" href="classPredictiveThrower.html#aaf0c9a35865bc8aa45025e2a41431f44">TotalNumberOfSamples</a>+1; ++sample) {</div>
+<div class="line"><span class="lineno">  569</span>    SampleDirectories[sample]-&gt;Close();</div>
+<div class="line"><span class="lineno">  570</span>    <span class="keyword">delete</span> SampleDirectories[sample];</div>
+<div class="line"><span class="lineno">  571</span>  }</div>
 <div class="line"><span class="lineno">  572</span> </div>
-<div class="line"><span class="lineno">  573</span>  TempClock.Stop();</div>
-<div class="line"><span class="lineno">  574</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{} took {:.2f}s to finish for {} toys&quot;</span>, __func__, TempClock.RealTime(), <a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>);</div>
-<div class="line"><span class="lineno">  575</span>}</div>
-<div class="ttc" id="aclassPredictiveThrower_html_a89cfdb8be6194aeff6f40f6d7d82723a"><div class="ttname"><a href="classPredictiveThrower.html#a89cfdb8be6194aeff6f40f6d7d82723a">PredictiveThrower::PosteriorPredictivepValue</a></div><div class="ttdeci">void PosteriorPredictivepValue(const std::vector&lt; std::unique_ptr&lt; TH1D &gt; &gt; &amp;PostPred_mc, const std::vector&lt; TDirectory * &gt; &amp;SampleDir)</div><div class="ttdoc">Calculate Posterior Predictive $p$-value.</div><div class="ttdef"><b>Definition:</b> <a href="PredictiveThrower_8cpp_source.html#l00596">PredictiveThrower.cpp:596</a></div></div>
-<div class="ttc" id="aclassPredictiveThrower_html_ac3cd8579ebc54875c4b1630b73b9d4e8"><div class="ttname"><a href="classPredictiveThrower.html#ac3cd8579ebc54875c4b1630b73b9d4e8">PredictiveThrower::ProduceSpectra</a></div><div class="ttdeci">std::vector&lt; std::unique_ptr&lt; TH2D &gt; &gt; ProduceSpectra(const std::vector&lt; std::vector&lt; std::unique_ptr&lt; TH1D &gt; &gt; &gt; &amp;Toys, const std::string suffix)</div><div class="ttdoc">Produce Violin style spectra.</div><div class="ttdef"><b>Definition:</b> <a href="PredictiveThrower_8cpp_source.html#l00433">PredictiveThrower.cpp:433</a></div></div>
-<div class="ttc" id="aclassPredictiveThrower_html_aeefcada80a73575f50310d012137773b"><div class="ttname"><a href="classPredictiveThrower.html#aeefcada80a73575f50310d012137773b">PredictiveThrower::MakePredictive</a></div><div class="ttdeci">std::unique_ptr&lt; TH1D &gt; MakePredictive(const std::vector&lt; std::unique_ptr&lt; TH1D &gt; &gt; &amp;Toys, const std::string &amp;Sample_Name, const std::string &amp;suffix, const bool DebugHistograms)</div><div class="ttdoc">Produce posterior predictive distribution.</div><div class="ttdef"><b>Definition:</b> <a href="PredictiveThrower_8cpp_source.html#l00489">PredictiveThrower.cpp:489</a></div></div>
+<div class="line"><span class="lineno">  573</span>  PredictiveDir-&gt;Close();</div>
+<div class="line"><span class="lineno">  574</span>  <span class="keyword">delete</span> PredictiveDir;</div>
+<div class="line"><span class="lineno">  575</span> </div>
+<div class="line"><span class="lineno">  576</span>  <a class="code hl_variable" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;cd();</div>
+<div class="line"><span class="lineno">  577</span> </div>
+<div class="line"><span class="lineno">  578</span>  TempClock.Stop();</div>
+<div class="line"><span class="lineno">  579</span>  <a class="code hl_define" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{} took {:.2f}s to finish for {} toys&quot;</span>, __func__, TempClock.RealTime(), <a class="code hl_variable" href="classPredictiveThrower.html#a7c57173426e2368e055cc6b2d0e4d893">Ntoys</a>);</div>
+<div class="line"><span class="lineno">  580</span>}</div>
+<div class="ttc" id="aclassPredictiveThrower_html_a89cfdb8be6194aeff6f40f6d7d82723a"><div class="ttname"><a href="classPredictiveThrower.html#a89cfdb8be6194aeff6f40f6d7d82723a">PredictiveThrower::PosteriorPredictivepValue</a></div><div class="ttdeci">void PosteriorPredictivepValue(const std::vector&lt; std::unique_ptr&lt; TH1D &gt; &gt; &amp;PostPred_mc, const std::vector&lt; TDirectory * &gt; &amp;SampleDir)</div><div class="ttdoc">Calculate Posterior Predictive $p$-value.</div><div class="ttdef"><b>Definition:</b> <a href="PredictiveThrower_8cpp_source.html#l00601">PredictiveThrower.cpp:601</a></div></div>
+<div class="ttc" id="aclassPredictiveThrower_html_ac3cd8579ebc54875c4b1630b73b9d4e8"><div class="ttname"><a href="classPredictiveThrower.html#ac3cd8579ebc54875c4b1630b73b9d4e8">PredictiveThrower::ProduceSpectra</a></div><div class="ttdeci">std::vector&lt; std::unique_ptr&lt; TH2D &gt; &gt; ProduceSpectra(const std::vector&lt; std::vector&lt; std::unique_ptr&lt; TH1D &gt; &gt; &gt; &amp;Toys, const std::string suffix)</div><div class="ttdoc">Produce Violin style spectra.</div><div class="ttdef"><b>Definition:</b> <a href="PredictiveThrower_8cpp_source.html#l00438">PredictiveThrower.cpp:438</a></div></div>
+<div class="ttc" id="aclassPredictiveThrower_html_aeefcada80a73575f50310d012137773b"><div class="ttname"><a href="classPredictiveThrower.html#aeefcada80a73575f50310d012137773b">PredictiveThrower::MakePredictive</a></div><div class="ttdeci">std::unique_ptr&lt; TH1D &gt; MakePredictive(const std::vector&lt; std::unique_ptr&lt; TH1D &gt; &gt; &amp;Toys, const std::string &amp;Sample_Name, const std::string &amp;suffix, const bool DebugHistograms)</div><div class="ttdoc">Produce posterior predictive distribution.</div><div class="ttdef"><b>Definition:</b> <a href="PredictiveThrower_8cpp_source.html#l00494">PredictiveThrower.cpp:494</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
