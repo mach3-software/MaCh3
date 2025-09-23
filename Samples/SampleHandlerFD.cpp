@@ -73,7 +73,7 @@ void SampleHandlerFD::ReadSampleHandlerConfig()
 
   auto EnabledSasmples = Get<std::vector<std::string>>(SampleManager->raw()["Samples"], __FILE__ , __LINE__);
   // Get number of samples and resize relevant objects
-  nSamples = static_cast<int>(EnabledSasmples.size());
+  nSamples = static_cast<M3::int_t>(EnabledSasmples.size());
   SampleDetails.resize(nSamples);
   StoredSelection.resize(nSamples);
   for (int iSample = 0; iSample < nSamples; iSample++)
