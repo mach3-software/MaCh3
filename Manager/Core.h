@@ -117,8 +117,8 @@ _Pragma("GCC diagnostic ignored \"-Wswitch-enum\"")
 #define _MaCh3_Safe_Include_End_ \
 _Pragma("GCC diagnostic pop")
 
-// clang need slightly different diagnostics
-#if defined(__clang__)
+// clang and IntelLLVM need slightly different diagnostics
+#if defined(__clang__) || defined(__INTEL_LLVM_COMPILER)
   #undef _MaCh3_Safe_Include_Start_
   #define _MaCh3_Safe_Include_Start_ \
   _Pragma("clang diagnostic push") \

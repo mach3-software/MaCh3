@@ -1,4 +1,5 @@
 #include "FitterBase.h"
+#include "Samples/SampleHandlerFD.h"
 
 _MaCh3_Safe_Include_Start_ //{
 #include "TRandom.h"
@@ -34,16 +35,13 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   //you don't want this too often https://root.cern/root/html606/TTree_8cxx_source.html#l01229
   auto_save = Get<int>(fitMan->raw()["General"]["MCMC"]["AutoSave"], __FILE__ , __LINE__);
 
-  // Do we want to save proposal? This will break plotting scripts and is heave for disk space and step time. Only use when debugging
-  SaveProposal = false;
-
   #ifdef MULTITHREAD
   //KS: TODO This should help with performance when saving entries to ROOT file. I didn't have time to validate hence commented out
   //Based on other tests it is really helpful
   //ROOT::EnableImplicitMT();
   #endif
   // Set the output file
-  outputFile = new TFile(outfile.c_str(), "RECREATE");
+  outputFile = M3::Open(outfile, "RECREATE", __FILE__, __LINE__);
   outputFile->cd();
   // Set output tree
   outTree = new TTree("posteriors", "Posterior_Distributions");
@@ -160,12 +158,17 @@ void FitterBase::PrepareOutput() {
       //throw MaCh3Exception(__FILE__ , __LINE__ );
     }
 
+    // Do we want to save proposal? This will break plotting scripts and is heave for disk space and step time. Only use when debugging
+    bool SaveProposal = GetFromManager<bool>(fitMan->raw()["General"]["SaveProposal"], false, __FILE__ , __LINE__);
+
+    if(SaveProposal) MACH3LOG_INFO("Will save in the chain proposal parameters and LogL");
     // Prepare the output trees
     for (ParameterHandlerBase *cov : systematics) {
       cov->SetBranches(*outTree, SaveProposal);
     }
 
     outTree->Branch("LogL", &logLCurr, "LogL/D");
+    if(SaveProposal) outTree->Branch("LogLProp", &logLProp, "LogLProp/D");
     outTree->Branch("accProb", &accProb, "accProb/D");
     outTree->Branch("step", &step, "step/I");
     outTree->Branch("stepTime", &stepTime, "stepTime/D");
@@ -328,27 +331,18 @@ void FitterBase::StartFromPreviousFit(const std::string& FitName) {
     CovarianceFolder->Close();
     delete CovarianceFolder;
 
-    std::vector<double> branch_vals(systematics[s]->GetNumParams(), M3::_BAD_DOUBLE_);
-    for (int i = 0; i < systematics[s]->GetNumParams(); ++i) {
-      posts->SetBranchAddress(systematics[s]->GetParName(i).c_str(), &branch_vals[i]);
-    }
+    std::vector<double> branch_vals;
+    std::vector<std::string> branch_name;
+    systematics[s]->MatchMaCh3OutputBranches(posts, branch_vals, branch_name);
     posts->GetEntry(posts->GetEntries()-1);
 
-    for (int i = 0; i < systematics[s]->GetNumParams(); ++i) {
-      if(branch_vals[i] == M3::_BAD_DOUBLE_)
-      {
-        MACH3LOG_ERROR("Parameter {} is unvitalised with value {}", i, branch_vals[i]);
-        MACH3LOG_ERROR("Please check more precisely chain you passed {}", FitName);
-        throw MaCh3Exception(__FILE__ , __LINE__ );
-      }
-    }
     systematics[s]->SetParameters(branch_vals);
     systematics[s]->AcceptStep();
 
     MACH3LOG_INFO("Printing new starting values for: {}", systematics[s]->GetName());
     systematics[s]->PrintNominalCurrProp();
 
-    // Resetting branch adressed to nullptr as we don't want to write into a delected vector out of scope...
+    // Resetting branch addressed to nullptr as we don't want to write into a delected vector out of scope...
     for (int i = 0; i < systematics[s]->GetNumParams(); ++i) {
       posts->SetBranchAddress(systematics[s]->GetParName(i).c_str(), nullptr);
     }
@@ -1324,4 +1318,185 @@ void FitterBase::RunSigmaVar() {
       }
     } // end looping over xsec parameters (i)
   } // end looping over covarianceBase objects
+}
+
+
+// *************************
+// For comparison with P-Theta we usually have to apply different parameter values then usual 1, 3 sigma
+void FitterBase::CustomRange(const std::string& ParName, const double sigma, double& ParamShiftValue) {
+// *************************
+  if(!fitMan->raw()["SigmaVar"]["CustomRange"]) return;
+
+  auto Config = fitMan->raw()["SigmaVar"]["CustomRange"];
+
+  const auto sigmaStr = std::to_string(static_cast<int>(std::round(sigma)));
+
+  if (Config[ParName] && Config[ParName][sigmaStr]) {
+    ParamShiftValue = Config[ParName][sigmaStr].as<double>();
+    MACH3LOG_INFO("  ::: setting custom range from config ::: {} -> {}", ParName, ParamShiftValue);
+  }
+}
+
+// *************************
+/// Helper to write histograms
+void WriteHistograms(TH1 *hist, const std::string& baseName) {
+// *************************
+  if (!hist) return;
+  hist->SetTitle(baseName.c_str());
+  hist->GetYaxis()->SetTitle("Events");
+  hist->SetDirectory(nullptr);
+  hist->Write(baseName.c_str());
+}
+
+// *************************
+/// Generic histogram writer - should make main code more palatable
+void WriteHistogramsByMode(SampleHandlerFD *sample, const std::string& suffix, const bool by_mode, const bool by_channel) {
+// *************************
+  std::string sampleName = sample->GetTitle();
+  MaCh3Modes *modes = sample->GetMaCh3Modes();
+
+  // Probably a better way of handling this logic
+  if (by_mode) {
+    for (int iMode = 0; iMode < modes->GetNModes(); ++iMode) {
+      auto modeHist = sample->Get1DVarHistByModeAndChannel(sample->GetXBinVarName(), iMode);
+      WriteHistograms(modeHist, sampleName + "_" + modes->GetMaCh3ModeName(iMode) + suffix);
+      delete modeHist;
+    }
+  }
+
+  if (by_channel) {
+    for (int iChan = 0; iChan < sample->GetNOscChannels(); ++iChan) {
+      auto chanHist = sample->Get1DVarHistByModeAndChannel(sample->GetXBinVarName(), -1, iChan); // -1 skips over mode plotting
+      WriteHistograms(chanHist, sampleName + "_" + sample->GetFlavourName(iChan) + suffix);
+      delete chanHist;
+    }
+  }
+
+  if (by_mode && by_channel) {
+    for (int iMode = 0; iMode < modes->GetNModes(); ++iMode) {
+      for (int iChan = 0; iChan < sample->GetNOscChannels(); ++iChan) {
+        auto hist = sample->Get1DVarHistByModeAndChannel(sample->GetXBinVarName(), iMode, iChan);
+        WriteHistograms(hist, sampleName + "_" + modes->GetMaCh3ModeName(iMode) + "_" + sample->GetFlavourName(iChan) + suffix);
+        delete hist;
+      }
+    }
+  }
+
+  if (!by_mode && !by_channel) {
+    auto hist = sample->Get1DVarHistByModeAndChannel(sample->GetXBinVarName());
+    WriteHistograms(hist, sampleName + suffix);
+    delete hist;
+  }
+}
+
+// *************************
+void FitterBase::RunSigmaVarFD() {
+// *************************
+  // Save the settings into the output file
+  SaveSettings();
+
+  bool plot_by_mode = GetFromManager<bool>(fitMan->raw()["SigmaVar"]["PlotByMode"], false);
+  bool plot_by_channel = GetFromManager<bool>(fitMan->raw()["SigmaVar"]["PlotByChannel"], false);
+  auto SkipVector = GetFromManager<std::vector<std::string>>(fitMan->raw()["SigmaVar"]["SkipVector"], {}, __FILE__ , __LINE__);
+
+  if (plot_by_mode) MACH3LOG_INFO("Plotting by sample and mode");
+  if (plot_by_channel) MACH3LOG_INFO("Plotting by sample and channel");
+  if (!plot_by_mode && !plot_by_channel) MACH3LOG_INFO("Plotting by sample only");
+  if (plot_by_mode && plot_by_channel) MACH3LOG_INFO("Plotting by sample, mode and channel");
+
+  auto SigmaArray = GetFromManager<std::vector<double>>(fitMan->raw()["SigmaVar"]["SigmaArray"], {-3, -1, 0, 1, 3}, __FILE__ , __LINE__);
+  if (std::find(SigmaArray.begin(), SigmaArray.end(), 0.0) == SigmaArray.end()) {
+    MACH3LOG_ERROR(":: SigmaArray does not contain 0! Current contents: {} ::", fmt::join(SigmaArray, ", "));
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  TDirectory* SigmaDir = outputFile->mkdir("SigmaVar");
+  outputFile->cd();
+
+  for (size_t s = 0; s < systematics.size(); ++s)
+  {
+    for(int i = 0; i < systematics[s]->GetNumParams(); i++)
+    {
+      std::string ParName = systematics[s]->GetParFancyName(i);
+      // KS: Check if we want to skip this parameter
+      if(CheckSkipParameter(SkipVector, ParName)) continue;
+
+      MACH3LOG_INFO(":: Param {} ::", systematics[s]->GetParFancyName(i));
+
+      TDirectory* ParamDir = SigmaDir->mkdir(ParName.c_str());
+      ParamDir->cd();
+      double ParamNomValue = systematics[s]->GetParProp(i);
+      double ParamLower = systematics[s]->GetLowerBound(i);
+      double ParamUpper = systematics[s]->GetUpperBound(i);
+
+      for(unsigned int iSample = 0; iSample < samples.size(); ++iSample)
+      {
+        if(samples[iSample]->GetNsamples() > 1){
+          MACH3LOG_ERROR(":: Sample has more than one sample {} ::", samples[iSample]->GetNsamples());
+          throw MaCh3Exception(__FILE__ , __LINE__ );
+        }
+
+        auto* MaCh3Sample = dynamic_cast<SampleHandlerFD*>(samples[iSample]);
+        if (!MaCh3Sample) {
+          MACH3LOG_ERROR(":: Sample {} do not inherit from  SampleHandlerFD this is not implemented::", samples[i]->GetTitle());
+          throw MaCh3Exception(__FILE__, __LINE__);
+        }
+        TDirectory* SampleDir = ParamDir->mkdir(MaCh3Sample->GetTitle().c_str());
+        SampleDir->cd();
+
+        for (size_t j = 0; j < SigmaArray.size(); ++j) {
+          double sigma = SigmaArray[j];
+
+          double ParamShiftValue = ParamNomValue + sigma * std::sqrt((*systematics[s]->GetCovMatrix())(i,i));
+          ParamShiftValue = std::max(std::min(ParamShiftValue, ParamUpper), ParamLower);
+
+          /// Apply custom range to make easier comparison with p-theta
+          CustomRange(ParName, sigma, ParamShiftValue);
+
+          MACH3LOG_INFO(
+            "  - set to {:<5.2f} ({:<2} sigma shift)",
+                        ParamShiftValue,
+                        sigma
+          );
+
+          systematics[s]->SetParProp(i, ParamShiftValue);
+
+          std::ostringstream valStream;
+          valStream << std::fixed << std::setprecision(2) << ParamShiftValue;
+          std::string valueStr = valStream.str();
+
+          std::ostringstream sigmaStream;
+          sigmaStream << std::fixed << std::setprecision(2) << std::abs(sigma);
+          std::string sigmaStr = sigmaStream.str();
+
+          std::string suffix;
+          if (sigma == 0) {
+            suffix = "_" + ParName + "_nom_val_" + valueStr;
+          } else {
+            std::string sign = (sigma > 0) ? "p" : "n";
+            suffix = "_" + ParName + "_sig_" + sign + sigmaStr + "_val_" + valueStr;
+          }
+
+          systematics[s]->SetParProp(i, ParamShiftValue);
+          MaCh3Sample->Reweight();
+
+          WriteHistogramsByMode(MaCh3Sample, suffix, plot_by_mode, plot_by_channel);
+        }
+        SampleDir->Close();
+        delete SampleDir;
+        ParamDir->cd();
+      }
+
+      systematics[s]->SetParProp(i, ParamNomValue);
+      MACH3LOG_INFO("  - set back to nominal value {:<5.2f}", ParamNomValue);
+      MACH3LOG_INFO("");
+      ParamDir->Close();
+      delete ParamDir;
+      SigmaDir->cd();
+    } // end loop over params
+  } // end loop over systemics
+  SigmaDir->Close();
+  delete SigmaDir;
+
+  outputFile->cd();
 }

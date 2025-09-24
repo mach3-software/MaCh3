@@ -35,7 +35,10 @@ int main(int argc, char *argv[])
   nFiles = 0;
   if (argc != 3 && argc !=6 && argc != 8)
   {
-    MACH3LOG_ERROR("How to use: {} <Config> <MCMM_ND_Output.root>", argv[0]);
+    MACH3LOG_ERROR("How to use: ");
+    MACH3LOG_ERROR("  single chain: {} <Config> <MCMM_ND_Output.root>", argv[0]);
+    MACH3LOG_ERROR("  two chain:    {} <Config> <MCMM_ND_Output_1.root> <Title 1> <MCMC_ND_Output_2.root> <Title 2>", argv[0]);
+    MACH3LOG_ERROR("  three chain:  {} <Config> <MCMM_ND_Output_1.root> <Title 1> <MCMC_ND_Output_2.root> <Title 2> <MCMC_ND_Output_3.root> <Title 3>", argv[0]);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
@@ -151,8 +154,9 @@ void ProcessMCMC(const std::string& inputFile)
       Processor->MakeCredibleRegions(GetFromManager<std::vector<double>>(Settings["CredibleRegions"], {0.99, 0.90, 0.68}),
                                      GetFromManager<std::vector<short int>>(Settings["CredibleRegionStyle"], {2, 1, 3}),
                                      GetFromManager<std::vector<short int>>(Settings["CredibleRegionColor"], {413, 406, 416}),
-                                     GetFromManager<bool>(Settings["CredibleInSigmas"], false)
-                                     );
+                                     GetFromManager<bool>(Settings["CredibleInSigmas"], false), 
+                                     GetFromManager<bool>(Settings["Draw2DPosterior"], true),
+                                     GetFromManager<bool>(Settings["DrawBestFit"], true));
     }
     if(GetFromManager<bool>(Settings["GetTrianglePlot"], true)) GetTrianglePlot(Processor.get());
 
@@ -251,7 +255,7 @@ void MultipleProcessMCMC()
     {
       // KS: If somehow this chain doesn't given params we skip it
       const int Index = Processor[ik]->GetParamIndexFromName(hpost[0]->GetTitle());
-      if(Index == _UNDEF_)
+      if(Index == M3::_BAD_INT_)
       {
         Skip = true;
         break;
@@ -343,7 +347,7 @@ void MultipleProcessMCMC()
   Posterior->Print(canvasname);
 }
 
-// KS: Calculate Bayes factor for a given hypothesis, most informative are those related to osc params. However, it make relative easy interpretation for switch dials
+/// @brief KS: Calculate Bayes factor for a given hypothesis, most informative are those related to osc params. However, it make relative easy interpretation for switch dials
 void CalcBayesFactor(MCMCProcessor* Processor)
 {
   YAML::Node card_yaml = M3OpenConfig(config.c_str());
@@ -516,13 +520,13 @@ void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, const std::string& input
       {
         if( std::fabs (CovarianceDiff->GetBinContent(j, i)) < 1.e-5 && std::fabs (CovariancePreviousHist->GetBinContent(j, i)) < 1.e-5)
         {
-          CovarianceDiff->SetBinContent(j, i, _UNDEF_);
-          CovariancePreviousHist->SetBinContent(j, i, _UNDEF_);
+          CovarianceDiff->SetBinContent(j, i, M3::_BAD_DOUBLE_);
+          CovariancePreviousHist->SetBinContent(j, i, M3::_BAD_DOUBLE_);
         }
         if( std::fabs (CorrelationDiff->GetBinContent(j, i)) < 1.e-5 && std::fabs (CorrelationPreviousHist->GetBinContent(j, i)) < 1.e-5)
         {
-          CorrelationDiff->SetBinContent(j, i, _UNDEF_);
-          CorrelationPreviousHist->SetBinContent(j, i, _UNDEF_);
+          CorrelationDiff->SetBinContent(j, i, M3::_BAD_DOUBLE_);
+          CorrelationPreviousHist->SetBinContent(j, i, M3::_BAD_DOUBLE_);
         }
       }
     }
@@ -633,7 +637,7 @@ TH2D* TMatrixIntoTH2D(TMatrixDSym* Matrix, const std::string& title)
   return hMatrix;
 }
 
-//KS: Perform KS test to check if two posteriors for the same parameter came from the same distribution
+// KS: Perform KS test to check if two posteriors for the same parameter came from the same distribution
 void KolmogorovSmirnovTest(const std::vector<std::unique_ptr<MCMCProcessor>>& Processor,
                            const std::unique_ptr<TCanvas>& Posterior,
                            const TString& canvasname)
@@ -661,7 +665,7 @@ void KolmogorovSmirnovTest(const std::vector<std::unique_ptr<MCMCProcessor>>& Pr
       {
         // KS: If somehow this chain doesn't given params we skip it
         Index = Processor[ik]->GetParamIndexFromName(hpost[0]->GetTitle());
-        if(Index == _UNDEF_)
+        if(Index == M3::_BAD_INT_)
         {
           Skip = true;
           break;

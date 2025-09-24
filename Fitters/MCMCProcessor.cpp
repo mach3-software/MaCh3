@@ -6,7 +6,7 @@ _MaCh3_Safe_Include_Start_ //{
 _MaCh3_Safe_Include_End_ //}
 
 //Only if GPU is enabled
-#ifdef CUDA
+#ifdef MaCh3_CUDA
 #include "Fitters/gpuMCMCProcessorUtils.cuh"
 #endif
 
@@ -60,7 +60,7 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
 
   nDraw = 0;
   nEntries = 0;
-  UpperCut = _UNDEF_;
+  UpperCut = M3::_BAD_INT_;
   nSteps = 0;
   nBatches = 0;
   AutoCorrLag = 0;
@@ -80,6 +80,7 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
   ParamTypeStartPos.resize(kNParameterEnum);
   nParam.resize(kNParameterEnum);
   CovPos.resize(kNParameterEnum);
+  CovNamePos.resize(kNParameterEnum);
   CovConfig.resize(kNParameterEnum);
 
   for(int i = 0; i < kNParameterEnum; i++)
@@ -88,7 +89,7 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
     nParam[i] = 0;
   }
   //Only if GPU is enabled
-  #ifdef CUDA
+  #ifdef MaCh3_CUDA
    ParStep_cpu = nullptr;
    NumeratorSum_cpu = nullptr;
    ParamSums_cpu = nullptr;
@@ -110,7 +111,6 @@ MCMCProcessor::~MCMCProcessor() {
   CanvasName += "]";
   if(printToPDF) Posterior->Print(CanvasName);
 
-  delete Gauss;
   delete Covariance;
   delete Correlation;
   delete Central_Value;
@@ -244,14 +244,12 @@ void MCMCProcessor::MakePostfit() {
   
   MACH3LOG_INFO("MCMCProcessor is making post-fit plots...");
 
+  int originalErrorLevel = gErrorIgnoreLevel;
+  gErrorIgnoreLevel = kFatal;
+
   // Directory for posteriors
   TDirectory *PostDir = OutputFile->mkdir("Post");
   TDirectory *PostHistDir = OutputFile->mkdir("Post_1d_hists");
-
-  // We fit with this Gaussian
-  Gauss = new TF1("Gauss","[0]/sqrt(2.0*3.14159)/[2]*TMath::Exp(-0.5*pow(x-[1],2)/[2]/[2])",-5,5);
-  Gauss->SetLineWidth(2);
-  Gauss->SetLineColor(kOrange-5);
   
   // nDraw is number of draws we want to do
   for (int i = 0; i < nDraw; ++i)
@@ -293,7 +291,7 @@ void MCMCProcessor::MakePostfit() {
     (*Means)(i) = Mean;
     (*Errors)(i) = Err;
 
-    GetGaussian(hpost[i], Gauss, Mean, Err);
+    GetGaussian(hpost[i], Gauss.get(), Mean, Err);
     (*Means_Gauss)(i) = Mean;
     (*Errors_Gauss)(i) = Err;
 
@@ -324,14 +322,14 @@ void MCMCProcessor::MakePostfit() {
     auto leg = std::make_unique<TLegend>(0.12, 0.6, 0.6, 0.97);
     SetLegendStyle(leg.get(), 0.04);
     leg->AddEntry(hpost[i], Form("#splitline{PDF}{#mu = %.2f, #sigma = %.2f}", hpost[i]->GetMean(), hpost[i]->GetRMS()), "l");
-    leg->AddEntry(Gauss, Form("#splitline{Gauss}{#mu = %.2f, #sigma = %.2f}", Gauss->GetParameter(1), Gauss->GetParameter(2)), "l");
+    leg->AddEntry(Gauss.get(), Form("#splitline{Gauss}{#mu = %.2f, #sigma = %.2f}", Gauss->GetParameter(1), Gauss->GetParameter(2)), "l");
     leg->AddEntry(hpd.get(), Form("#splitline{HPD}{#mu = %.2f, #sigma = %.2f (+%.2f-%.2f)}", (*Means_HPD)(i), (*Errors_HPD)(i), (*Errors_HPD_Positive)(i), (*Errors_HPD_Negative)(i)), "l");
     leg->AddEntry(Asimov.get(), Form("#splitline{Prior}{x = %.2f , #sigma = %.2f}", Prior, PriorError), "l");
 
     //CW: Don't plot if this is a fixed histogram (i.e. the peak is the whole integral)
     if (hpost[i]->GetMaximum() == hpost[i]->Integral()*DrawRange) 
     {
-      MACH3LOG_WARN("Found fixed parameter, moving on");
+      MACH3LOG_WARN("Found fixed parameter: {} ({}), moving on", Title, i);
       IamVaried[i] = false;
       //KS:Set mean and error to prior for fixed parameters, it looks much better when fixed parameter has mean on prior rather than on 0 with 0 error.
       (*Means_HPD)(i)  = Prior;
@@ -413,6 +411,9 @@ void MCMCProcessor::MakePostfit() {
   delete PostDir;
   PostHistDir->Close();
   delete PostHistDir;
+
+  // restore original warning setting
+  gErrorIgnoreLevel = originalErrorLevel;
 } // Have now written the postfit projections
 
 // *******************
@@ -931,7 +932,7 @@ void MCMCProcessor::MakeCovariance() {
   // Check that the diagonal entries have been filled
   // i.e. MakePostfit() has been called
   for (int i = 0; i < nDraw; ++i) {
-    if ((*Covariance)(i,i) == _UNDEF_) {
+    if ((*Covariance)(i,i) == M3::_BAD_DOUBLE_) {
       HaveMadeDiagonal = false;
       MACH3LOG_INFO("Have not run diagonal elements in covariance, will do so now by calling MakePostfit()");
       break;
@@ -1148,7 +1149,7 @@ void MCMCProcessor::MakeCovariance_MP(bool Mute) {
   // Check that the diagonal entries have been filled
   // i.e. MakePostfit() has been called
   for (int i = 0; i < nDraw; ++i) {
-    if ((*Covariance)(i,i) == _UNDEF_) {
+    if ((*Covariance)(i,i) == M3::_BAD_DOUBLE_) {
       HaveMadeDiagonal = false;
       MACH3LOG_WARN("Have not run diagonal elements in covariance, will do so now by calling MakePostfit()");
       break;
@@ -1544,7 +1545,9 @@ void MCMCProcessor::DrawCorrelations1D() {
 void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegions,
                                         const std::vector<Style_t>& CredibleRegionStyle,
                                         const std::vector<Color_t>& CredibleRegionColor,
-                                        const bool CredibleInSigmas) {
+                                        const bool CredibleInSigmas, 
+					const bool Draw2DPosterior,
+					const bool DrawBestFit) {
 // *********************
   if(hpost2D.size() == 0) MakeCovariance_MP();
   MACH3LOG_INFO("Making Credible Regions");
@@ -1613,10 +1616,15 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
       bestfitM->SetMarkerStyle(22);
       bestfitM->SetMarkerSize(1);
       bestfitM->SetMarkerColor(kMagenta);
-      legend->AddEntry(bestfitM.get(),"Best Fit","p");
-
+    
       //Plot default 2D posterior
+
+      if(Draw2DPosterior){
       hpost_2D_copy[i][j]->Draw("COLZ");
+      }
+      else{
+      hpost_2D_copy[i][j]->Draw("AXIS");
+      }
 
       //Now credible regions
       for (int k = 0; k < nCredible; ++k)
@@ -1629,7 +1637,11 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
           legend->AddEntry(hpost_2D_cl[i][j][k].get(), Form("%.0f%% Credible Region", CredibleRegions[k]*100), "l");
       }
       legend->Draw("SAME");
+  
+    if(DrawBestFit){
+      legend->AddEntry(bestfitM.get(),"Best Fit","p");
       bestfitM->Draw("SAME.P");
+     }
 
       // Write to file
       Posterior->SetName(hpost2D[i][j]->GetName());
@@ -1667,7 +1679,7 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
   for(int j = 0; j < nParamPlot; ++j)
   {
     int ParamNo = GetParamIndexFromName(ParNames[j]);
-    if(ParamNo == _UNDEF_)
+    if(ParamNo == M3::_BAD_INT_)
     {
       MACH3LOG_WARN("Couldn't find param {}. Will not plot Triangle plot", ParNames[j]);
       return;
@@ -1923,15 +1935,16 @@ void MCMCProcessor::ScanInput() {
   UpperCut = nEntries+1;
 
   // Get the list of branches
-
   TObjArray* brlis = Chain->GetListOfBranches();
 
   // Get the number of branches
   nBranches = brlis->GetEntries();
 
   BranchNames.reserve(nBranches);
-  IamVaried.reserve(nBranches);
   ParamType.reserve(nBranches);
+
+  // Read the input Covariances
+  ReadInputCov();
 
   // Set all the branches to off
   Chain->SetBranchStatus("*", false);
@@ -1963,19 +1976,7 @@ void MCMCProcessor::ScanInput() {
     // Turn on the branches which we want for parameters
     Chain->SetBranchStatus(bname.Data(), true);
 
-    // If we're on beam systematics
-    if(bname.BeginsWith("xsec_")   ||
-      bname.BeginsWith("sin2th_")  ||
-      bname.BeginsWith("delm2_")   ||
-      bname.BeginsWith("delta_")   ||
-      bname.BeginsWith("baseline") ||
-      bname.BeginsWith("density"))
-    {
-      BranchNames.push_back(bname);
-      ParamType.push_back(kXSecPar);
-      nParam[kXSecPar]++;
-    }
-    else if (bname.BeginsWith("ndd_"))
+    if (bname.BeginsWith("ndd_"))
     {
       BranchNames.push_back(bname);
       ParamType.push_back(kNDPar);
@@ -1999,11 +2000,14 @@ void MCMCProcessor::ScanInput() {
     }
   }
   nDraw = int(BranchNames.size());
+
   // Read the input Covariances
-  ReadInputCov();
+  ReadInputCovLegacy();
   
   // Check order of parameter types
   ScanParameterOrder();
+
+  IamVaried.resize(nDraw, true);
 
   // Print useful Info
   PrintInfo();
@@ -2012,6 +2016,9 @@ void MCMCProcessor::ScanInput() {
   // Set the step cut to be 20%
   int cut = nSteps/5;
   SetStepCut(cut);
+
+  // Basically allow loading oscillation parameters
+  LoadAdditionalInfo();
 }
 
 // ****************************
@@ -2031,7 +2038,9 @@ void MCMCProcessor::SetupOutput() {
   CanvasName.ReplaceAll("[","");
 
   // We fit with this Gaussian
-  Gauss = new TF1("gauss","[0]/sqrt(2.0*3.14159)/[2]*TMath::Exp(-0.5*pow(x-[1],2)/[2]/[2])", -5, 5);
+  Gauss = std::make_unique<TF1>("Gauss", "[0]/sqrt(2.0*3.14159)/[2]*TMath::Exp(-0.5*pow(x-[1],2)/[2]/[2])", -5, 5);
+  Gauss->SetLineWidth(2);
+  Gauss->SetLineColor(kOrange-5);
 
   // Declare the TVectors
   Covariance = new TMatrixDSym(nDraw);
@@ -2052,18 +2061,18 @@ void MCMCProcessor::SetupOutput() {
   #endif
   for (int i = 0; i < nDraw; ++i)
   {
-    (*Central_Value)(i) = _UNDEF_;
-    (*Means)(i) = _UNDEF_;
-    (*Errors)(i) = _UNDEF_;
-    (*Means_Gauss)(i) = _UNDEF_;
-    (*Errors_Gauss)(i) = _UNDEF_;
-    (*Means_HPD)(i) = _UNDEF_;
-    (*Errors_HPD)(i) = _UNDEF_;
-    (*Errors_HPD_Positive)(i) = _UNDEF_;
-    (*Errors_HPD_Negative)(i) = _UNDEF_;
+    (*Central_Value)(i) = M3::_BAD_DOUBLE_;
+    (*Means)(i) = M3::_BAD_DOUBLE_;
+    (*Errors)(i) = M3::_BAD_DOUBLE_;
+    (*Means_Gauss)(i) = M3::_BAD_DOUBLE_;
+    (*Errors_Gauss)(i) = M3::_BAD_DOUBLE_;
+    (*Means_HPD)(i) = M3::_BAD_DOUBLE_;
+    (*Errors_HPD)(i) = M3::_BAD_DOUBLE_;
+    (*Errors_HPD_Positive)(i) = M3::_BAD_DOUBLE_;
+    (*Errors_HPD_Negative)(i) = M3::_BAD_DOUBLE_;
     for (int j = 0; j < nDraw; ++j) {
-      (*Covariance)(i, j) = _UNDEF_;
-      (*Correlation)(i, j) = _UNDEF_;
+      (*Covariance)(i, j) = M3::_BAD_DOUBLE_;
+      (*Correlation)(i, j) = M3::_BAD_DOUBLE_;
     }
   }
   hpost.resize(nDraw);
@@ -2154,11 +2163,17 @@ std::unique_ptr<TH1D> MCMCProcessor::MakePrefit() {
 void MCMCProcessor::ReadInputCov() {
 // **************************
   FindInputFiles();
-  if(nParam[kXSecPar] > 0)  ReadXSecFile();
+  if(CovPos[kXSecPar].back() != "none") ReadModelFile();
+}
+
+// **************************
+//CW: Read the input Covariance matrix entries
+// Get stuff like parameter input errors, names, and so on
+void MCMCProcessor::ReadInputCovLegacy() {
+// **************************
+  FindInputFilesLegacy();
   if(nParam[kNDPar] > 0)    ReadNDFile();
   if(nParam[kFDDetPar] > 0) ReadFDFile();
-  //KS: Remove parameters which were removed
-  RemoveParameters();
 }
 
 // **************************
@@ -2201,32 +2216,12 @@ void MCMCProcessor::FindInputFiles() {
   } else {
     CovConfig[kXSecPar] = TMacroToYAML(*XsecConfig);
   }
-  //CW: And the ND Covariance matrix
-  CovPos[kNDPar].push_back(GetFromManager<std::string>(Settings["General"]["Systematics"]["NDCovFile"], "none"));
-  if(CovPos[kNDPar].back() == "none") {
-    MACH3LOG_WARN("Couldn't find NDCov branch in output");
-    InputNotFound = true;
-  }
-
-  //CW: And the FD Covariance matrix
-  CovPos[kFDDetPar].push_back(GetFromManager<std::string>(Settings["General"]["Systematics"]["FDCovFile"], "none"));
-  if(CovPos[kFDDetPar].back() == "none") {
-    MACH3LOG_WARN("Couldn't find FDCov branch in output");
-    InputNotFound = true;
-  }
-
   if(InputNotFound) MaCh3Utils::PrintConfig(Settings);
 
   if (const char * mach3_env = std::getenv("MACH3"))
   {
     for(size_t i = 0; i < CovPos[kXSecPar].size(); i++)
       CovPos[kXSecPar][i].insert(0, std::string(mach3_env)+"/");
-
-    for(size_t i = 0; i < CovPos[kNDPar].size(); i++)
-      CovPos[kNDPar][i].insert(0, std::string(mach3_env)+"/");
-
-    for(size_t i = 0; i < CovPos[kFDDetPar].size(); i++)
-      CovPos[kFDDetPar][i].insert(0, std::string(mach3_env)+"/");
   }
 
   // Delete the TTrees and the input file handle since we've now got the settings we need
@@ -2240,15 +2235,66 @@ void MCMCProcessor::FindInputFiles() {
   delete TempFile;
 }
 
+// **************************
+// Read the output MCMC file and find what inputs were used
+void MCMCProcessor::FindInputFilesLegacy() {
+// **************************
+  // Now read the MCMC file
+  TFile *TempFile = new TFile(MCMCFile.c_str(), "open");
+
+  // Get the settings for the MCMC
+  TMacro *Config = TempFile->Get<TMacro>("MaCh3_Config");
+
+  if (Config == nullptr) {
+    MACH3LOG_ERROR("Didn't find MaCh3_Config tree in MCMC file! {}", MCMCFile);
+    TempFile->ls();
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+  YAML::Node Settings = TMacroToYAML(*Config);
+
+  //CW: And the ND Covariance matrix
+  CovPos[kNDPar].push_back(GetFromManager<std::string>(Settings["General"]["Systematics"]["NDCovFile"], "none"));
+
+  if(CovPos[kNDPar].back() == "none") {
+    MACH3LOG_WARN("Couldn't find NDCov (legacy) branch in output");
+  } else{
+    //If the FD Cov is not none, then you need the name of the covariance object to grab
+    CovNamePos[kNDPar] = GetFromManager<std::string>(Settings["General"]["Systematics"]["NDCovName"], "none");
+    MACH3LOG_INFO("Given NDCovFile {} and NDCovName {}", CovPos[kNDPar].back(), CovNamePos[kNDPar]);
+  }
+
+  //CW: And the FD Covariance matrix
+  CovPos[kFDDetPar].push_back(GetFromManager<std::string>(Settings["General"]["Systematics"]["FDCovFile"], "none"));
+
+  if(CovPos[kFDDetPar].back() == "none") {
+    MACH3LOG_WARN("Couldn't find FDCov (legacy) branch in output");
+  } else {
+    //If the FD Cov is not none, then you need the name of the covariance object to grab
+    CovNamePos[kFDDetPar] = GetFromManager<std::string>(Settings["General"]["Systematics"]["FDCovName"], "none");
+    MACH3LOG_INFO("Given FDCovFile {} and FDCovName {}", CovPos[kFDDetPar].back(), CovNamePos[kFDDetPar]);
+  }
+
+  if (const char * mach3_env = std::getenv("MACH3"))
+  {
+    for(size_t i = 0; i < CovPos[kNDPar].size(); i++)
+      CovPos[kNDPar][i].insert(0, std::string(mach3_env)+"/");
+
+    for(size_t i = 0; i < CovPos[kFDDetPar].size(); i++)
+      CovPos[kFDDetPar][i].insert(0, std::string(mach3_env)+"/");
+  }
+  TempFile->Close();
+  delete TempFile;
+}
+
 // ***************
-// Read the xsec file and get the input central values and errors
-void MCMCProcessor::ReadXSecFile() {
+// Read the model file and get the input central values and errors
+void MCMCProcessor::ReadModelFile() {
 // ***************
   YAML::Node XSecFile = CovConfig[kXSecPar];
 
   auto systematics = XSecFile["Systematics"];
-  int i = 0;
-  for (auto it = systematics.begin(); it != systematics.end(); ++it, ++i)
+  int paramIndex  = 0;
+  for (auto it = systematics.begin(); it != systematics.end(); ++it, ++paramIndex )
   {
     auto const &param = *it;
     // Push back the name
@@ -2259,14 +2305,12 @@ void MCMCProcessor::ReadXSecFile() {
     {
       if (TempString.rfind(ExcludedNames.at(ik), 0) == 0)
       {
-        const int Tracker = ParamTypeStartPos[kXSecPar] + i;
-        BranchNames[Tracker] = "delete";
-        nParam[kXSecPar]--;
         rejected = true;
         break;
       }
     }
     if(rejected) continue;
+
     ParamNames[kXSecPar].push_back(TempString);
     ParamCentral[kXSecPar].push_back(param["Systematic"]["ParameterValues"]["PreFitValue"].as<double>());
     ParamNom[kXSecPar].push_back(param["Systematic"]["ParameterValues"]["Generated"].as<double>());
@@ -2274,6 +2318,21 @@ void MCMCProcessor::ReadXSecFile() {
     ParamFlat[kXSecPar].push_back(GetFromManager<bool>(param["Systematic"]["FlatPrior"], false));
 
     ParameterGroup.push_back(param["Systematic"]["ParameterGroup"].as<std::string>());
+
+    nParam[kXSecPar]++;
+    ParamType.push_back(kXSecPar);
+    // Params from osc group have branch name equal to fancy name while all others are basically xsec_0 for example
+    if(ParameterGroup.back() == "Osc") {
+      BranchNames.push_back(ParamNames[kXSecPar].back());
+    } else {
+      BranchNames.push_back("xsec_" + std::to_string(paramIndex));
+    }
+
+    // Check that the branch exists before setting address
+    if (!Chain->GetBranch(BranchNames.back())) {
+      MACH3LOG_ERROR("Couldn't find branch '{}'", BranchNames.back());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
   }
 }
 
@@ -2289,7 +2348,7 @@ void MCMCProcessor::ReadNDFile() {
   }
   NDdetFile->cd();
 
-  TMatrixDSym *NDdetMatrix = NDdetFile->Get<TMatrixDSym>("nddet_cov");
+  TMatrixDSym *NDdetMatrix = NDdetFile->Get<TMatrixDSym>(CovNamePos[kNDPar].c_str());
   TVectorD *NDdetNominal = NDdetFile->Get<TVectorD>("det_weights");
   TDirectory *BinningDirectory = NDdetFile->Get<TDirectory>("Binning");
 
@@ -2327,12 +2386,12 @@ void MCMCProcessor::ReadFDFile() {
   // Do the same for the FD
   TFile *FDdetFile = new TFile(CovPos[kFDDetPar].back().c_str(), "open");
   if (FDdetFile->IsZombie()) {
-    MACH3LOG_ERROR("Couldn't find NDdetFile {}", CovPos[kFDDetPar].back());
+    MACH3LOG_ERROR("Couldn't find FDdetFile {}", CovPos[kFDDetPar].back());
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   FDdetFile->cd();
 
-  TMatrixDSym *FDdetMatrix = FDdetFile->Get<TMatrixDSym>("SKJointError_Erec_Total");
+  TMatrixD *FDdetMatrix = FDdetFile->Get<TMatrixD>(CovNamePos[kFDDetPar].c_str());
 
   for (int i = 0; i < FDdetMatrix->GetNrows(); ++i)
   {
@@ -2347,27 +2406,12 @@ void MCMCProcessor::ReadFDFile() {
     ParamFlat[kFDDetPar].push_back( false );
   }
   //KS: The last parameter is p scale
+  //ETA: we need to be careful here, this is only true for SK in the T2K beam analysis...
   if(FancyPlotNames) ParamNames[kFDDetPar].back() = "Momentum Scale";
 
   FDdetFile->Close();
   delete FDdetFile;
   delete FDdetMatrix;
-}
-
-// ***************
-//This is bit messy as currently BranchNames is taken from actual Chain.root file while proper parameter name from matrix.root and right now we don't access them at the same time.
-void MCMCProcessor::RemoveParameters() {
-// ***************
-  for(int i = 0; i < nDraw; i++)
-  {
-    if(BranchNames[i] == "delete")
-    {
-      BranchNames.erase(BranchNames.begin() + i);
-      ParamType.erase(ParamType.begin() + i);
-      nDraw--;
-      i = 0;
-    }
-  }
 }
 
 // ***************
@@ -2393,7 +2437,7 @@ void MCMCProcessor::SetStepCut(const int Cuts) {
 void MCMCProcessor::GetNthParameter(const int param, double &Prior, double &PriorError, TString &Title) const {
 // **************************
   ParameterEnum ParType = ParamType[param];
-  int ParamNo = _UNDEF_;
+  int ParamNo = M3::_BAD_INT_;
   ParamNo = param - ParamTypeStartPos[ParType];
 
   Prior = ParamCentral[ParType][ParamNo];
@@ -2405,7 +2449,7 @@ void MCMCProcessor::GetNthParameter(const int param, double &Prior, double &Prio
 // Find Param Index based on name
 int MCMCProcessor::GetParamIndexFromName(const std::string& Name){
 // **************************
-  int ParamNo = _UNDEF_;
+  int ParamNo = M3::_BAD_INT_;
   for (int i = 0; i < nDraw; ++i)
   {
     TString Title = "";
@@ -2461,7 +2505,7 @@ void MCMCProcessor::GetPolarPlot(const std::vector<std::string>& ParNames){
   {
     //KS: First we need to find parameter number based on name
     int ParamNo = GetParamIndexFromName(ParNames[k]);
-    if(ParamNo == _UNDEF_)
+    if(ParamNo == M3::_BAD_INT_)
     {
       MACH3LOG_WARN("Couldn't find param {}. Will not calculate Polar Plot", ParNames[k]);
       continue;
@@ -2527,7 +2571,7 @@ void MCMCProcessor::GetBayesFactor(const std::vector<std::string>& ParNames,
   {
     //KS: First we need to find parameter number based on name
     int ParamNo = GetParamIndexFromName(ParNames[k]);
-    if(ParamNo == _UNDEF_)
+    if(ParamNo == M3::_BAD_INT_)
     {
       MACH3LOG_WARN("Couldn't find param {}. Will not calculate Bayes Factor", ParNames[k]);
       continue;
@@ -2587,7 +2631,7 @@ void MCMCProcessor::GetSavageDickey(const std::vector<std::string>& ParNames,
   {
     //KS: First we need to find parameter number based on name
     int ParamNo = GetParamIndexFromName(ParNames[k]);
-    if(ParamNo == _UNDEF_)
+    if(ParamNo == M3::_BAD_INT_)
     {
       MACH3LOG_WARN("Couldn't find param {}. Will not calculate SavageDickey", ParNames[k]);
       continue;
@@ -2602,10 +2646,10 @@ void MCMCProcessor::GetSavageDickey(const std::vector<std::string>& ParNames,
     int ParamTemp = ParamNo - ParamTypeStartPos[ParType];
     FlatPrior = ParamFlat[ParType][ParamTemp];
     
-    TH1D* PosteriorHist = static_cast<TH1D *>(hpost[ParamNo]->Clone(Title));
-    RemoveFitter(PosteriorHist, "Gauss");
+    auto PosteriorHist = M3::Clone<TH1D>(hpost[ParamNo], std::string(Title));
+    RemoveFitter(PosteriorHist.get(), "Gauss");
             
-    TH1D* PriorHist = nullptr;
+    std::unique_ptr<TH1D> PriorHist;
     //KS: If flat prior we need to have well defined bounds otherwise Prior distribution will not make sense
     if(FlatPrior)
     {
@@ -2615,7 +2659,7 @@ void MCMCProcessor::GetSavageDickey(const std::vector<std::string>& ParNames,
         MACH3LOG_ERROR("Lower bound is higher than upper bound");
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
-      PriorHist = new TH1D("PriorHist", Title, NBins, Bounds[k][0], Bounds[k][1]);
+      PriorHist = std::make_unique<TH1D>("PriorHist", Title, NBins, Bounds[k][0], Bounds[k][1]);
       
       double FlatProb = ( Bounds[k][1] - Bounds[k][0]) / NBins;
       for (int g = 0; g < NBins + 1; ++g) 
@@ -2625,7 +2669,7 @@ void MCMCProcessor::GetSavageDickey(const std::vector<std::string>& ParNames,
     }
     else //KS: Otherwise throw from Gaussian
     {
-      PriorHist = static_cast<TH1D*>(PosteriorHist->Clone("Prior"));
+      PriorHist = M3::Clone<TH1D>(PosteriorHist.get(), "Prior");
       PriorHist->Reset("");
       PriorHist->Fill(0.0, 0.0);
       
@@ -2636,68 +2680,75 @@ void MCMCProcessor::GetSavageDickey(const std::vector<std::string>& ParNames,
         PriorHist->Fill(rand->Gaus(Prior, PriorError));
       }
     }
-    // Area normalise the distributions
-    PriorHist->Scale(1./PriorHist->Integral(), "width");
-    PosteriorHist->Scale(1./PosteriorHist->Integral(), "width");
-      
-    PriorHist->SetLineColor(kRed);
-    PriorHist->SetMarkerColor(kRed);
-    PriorHist->SetFillColorAlpha(kRed, 0.35);
-    PriorHist->SetFillStyle(1001);
-    PriorHist->GetXaxis()->SetTitle(Title);
-    PriorHist->GetYaxis()->SetTitle("Posterior Probability");
-    PriorHist->SetMaximum(PosteriorHist->GetMaximum()*1.5);
-    PriorHist->GetYaxis()->SetLabelOffset(999);
-    PriorHist->GetYaxis()->SetLabelSize(0);
-    PriorHist->SetLineWidth(2);
-    PriorHist->SetLineStyle(kSolid);
-    
-    PosteriorHist->SetLineColor(kBlue);
-    PosteriorHist->SetMarkerColor(kBlue);
-    PosteriorHist->SetFillColorAlpha(kBlue, 0.35);
-    PosteriorHist->SetFillStyle(1001);
-   
-    PriorHist->Draw("hist");
-    PosteriorHist->Draw("hist same");
-
-    double ProbPrior = PriorHist->GetBinContent(PriorHist->FindBin(EvaluationPoint[k]));
-    //KS: In case we go so far away that prior is 0, set this to small value to avoid dividing by 0
-    if(ProbPrior < 0) ProbPrior = 0.00001;
-    double ProbPosterior = PosteriorHist->GetBinContent(PosteriorHist->FindBin(EvaluationPoint[k]));
-    double SavageDickey = ProbPosterior/ProbPrior;
-    
-    std::string DunneKabothScale = GetDunneKaboth(SavageDickey);
-    //Get Best point
-    std::unique_ptr<TGraph> PostPoint(new TGraph(1));
-    PostPoint->SetPoint(0, EvaluationPoint[k], ProbPosterior);
-    PostPoint->SetMarkerStyle(20);
-    PostPoint->SetMarkerSize(1);
-    PostPoint->Draw("P same");
-    
-    std::unique_ptr<TGraph> PriorPoint(new TGraph(1));
-    PriorPoint->SetPoint(0, EvaluationPoint[k], ProbPrior);
-    PriorPoint->SetMarkerStyle(20);
-    PriorPoint->SetMarkerSize(1);
-    PriorPoint->Draw("P same");
-    
-    auto legend = std::make_unique<TLegend>(0.12, 0.6, 0.6, 0.97);
-    SetLegendStyle(legend.get(), 0.04);
-    legend->AddEntry(PriorHist, "Prior", "l");
-    legend->AddEntry(PosteriorHist, "Posterior", "l");
-    legend->AddEntry(PostPoint.get(), Form("SavageDickey = %.2f, (%s)", SavageDickey, DunneKabothScale.c_str()),"");
-    legend->Draw("same");
-  
-    Posterior->Print(CanvasName);
-    Posterior->Write(Title);
-    
-    delete PosteriorHist;
-    delete PriorHist;
+    SavageDickeyPlot(PriorHist, PosteriorHist, std::string(Title), EvaluationPoint[k]);
   } //End loop over parameters
 
   SavageDickeyDir->Close();
   delete SavageDickeyDir;
 
   OutputFile->cd();
+}
+
+// **************************
+// KS: Get Savage Dickey point hypothesis test
+void MCMCProcessor::SavageDickeyPlot(std::unique_ptr<TH1D>& PriorHist,
+                                     std::unique_ptr<TH1D>& PosteriorHist,
+                                     const std::string& Title,
+                                     const double EvaluationPoint) const {
+// **************************
+  // Area normalise the distributions
+  PriorHist->Scale(1./PriorHist->Integral(), "width");
+  PosteriorHist->Scale(1./PosteriorHist->Integral(), "width");
+
+  PriorHist->SetLineColor(kRed);
+  PriorHist->SetMarkerColor(kRed);
+  PriorHist->SetFillColorAlpha(kRed, 0.35);
+  PriorHist->SetFillStyle(1001);
+  PriorHist->GetXaxis()->SetTitle(Title.c_str());
+  PriorHist->GetYaxis()->SetTitle("Posterior Probability");
+  PriorHist->SetMaximum(PosteriorHist->GetMaximum()*1.5);
+  PriorHist->GetYaxis()->SetLabelOffset(999);
+  PriorHist->GetYaxis()->SetLabelSize(0);
+  PriorHist->SetLineWidth(2);
+  PriorHist->SetLineStyle(kSolid);
+
+  PosteriorHist->SetLineColor(kBlue);
+  PosteriorHist->SetMarkerColor(kBlue);
+  PosteriorHist->SetFillColorAlpha(kBlue, 0.35);
+  PosteriorHist->SetFillStyle(1001);
+
+  PriorHist->Draw("hist");
+  PosteriorHist->Draw("hist same");
+
+  double ProbPrior = PriorHist->GetBinContent(PriorHist->FindBin(EvaluationPoint));
+  //KS: In case we go so far away that prior is 0, set this to small value to avoid dividing by 0
+  if(ProbPrior < 0) ProbPrior = 0.00001;
+  double ProbPosterior = PosteriorHist->GetBinContent(PosteriorHist->FindBin(EvaluationPoint));
+  double SavageDickey = ProbPosterior/ProbPrior;
+
+  std::string DunneKabothScale = GetDunneKaboth(SavageDickey);
+  //Get Best point
+  std::unique_ptr<TGraph> PostPoint(new TGraph(1));
+  PostPoint->SetPoint(0, EvaluationPoint, ProbPosterior);
+  PostPoint->SetMarkerStyle(20);
+  PostPoint->SetMarkerSize(1);
+  PostPoint->Draw("P same");
+
+  std::unique_ptr<TGraph> PriorPoint(new TGraph(1));
+  PriorPoint->SetPoint(0, EvaluationPoint, ProbPrior);
+  PriorPoint->SetMarkerStyle(20);
+  PriorPoint->SetMarkerSize(1);
+  PriorPoint->Draw("P same");
+
+  auto legend = std::make_unique<TLegend>(0.12, 0.6, 0.6, 0.97);
+  SetLegendStyle(legend.get(), 0.04);
+  legend->AddEntry(PriorHist.get(), "Prior", "l");
+  legend->AddEntry(PosteriorHist.get(), "Posterior", "l");
+  legend->AddEntry(PostPoint.get(), Form("SavageDickey = %.2f, (%s)", SavageDickey, DunneKabothScale.c_str()),"");
+  legend->Draw("same");
+
+  Posterior->Print(CanvasName);
+  Posterior->Write(Title.c_str());
 }
 
 // **************************
@@ -2723,10 +2774,10 @@ void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
   {
     //KS: First we need to find parameter number based on name
     int ParamNo = GetParamIndexFromName(Names[k]);
-    if(ParamNo == _UNDEF_)
+    if(ParamNo == M3::_BAD_INT_)
     {
       MACH3LOG_WARN("Couldn't find param {}. Can't reweight Prior", Names[k]);
-      continue;
+      return;
     }
 
     TString Title = "";
@@ -2793,6 +2844,18 @@ void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
   post->SetBranchStatus("*",true);
   OutputChain->cd();
   post->Write("posteriors", TObject::kOverwrite);
+
+  // KS: Save reweight metadeta
+  std::ostringstream yaml_stream;
+  yaml_stream << "Weight:\n";
+  for (size_t k = 0; k < Names.size(); ++k) {
+    yaml_stream << "    " << Names[k] << ": [" << NewCentral[k] << ", " << NewError[k] << "]\n";
+  }
+  std::string yaml_string = yaml_stream.str();
+  YAML::Node root = STRINGtoYAML(yaml_string);
+  TMacro ConfigSave = YAMLtoTMacro(root, "Reweight_Config");
+  ConfigSave.Write();
+
   OutputChain->Close();
   delete OutputChain;
 
@@ -2811,7 +2874,7 @@ void MCMCProcessor::ParameterEvolution(const std::vector<std::string>& Names,
   {
     //KS: First we need to find parameter number based on name
     int ParamNo = GetParamIndexFromName(Names[k]);
-    if(ParamNo == _UNDEF_)
+    if(ParamNo == M3::_BAD_INT_)
     {
       MACH3LOG_WARN("Couldn't find param {}. Can't reweight Prior", Names[k]);
       continue;
@@ -3292,7 +3355,7 @@ void MCMCProcessor::AutoCorrelation() {
     LagKPlots[j]->GetYaxis()->SetTitle("Auto-correlation function");
   }
 //KS: If CUDA is not enabled do calculations on CPU
-#ifndef CUDA
+#ifndef MaCh3_CUDA
   // Loop over the lags
   //CW: Each lag is independent so might as well multi-thread them!
   #ifdef MULTITHREAD
@@ -3387,12 +3450,11 @@ void MCMCProcessor::AutoCorrelation() {
   MACH3LOG_INFO("Making auto-correlations took {:.2f}s", clock.RealTime());
 }
 
-#ifdef CUDA
+#ifdef MaCh3_CUDA
 // **************************
 //KS: Allocates memory and copy data from CPU to GPU
 void MCMCProcessor::PrepareGPU_AutoCorr(const int nLags) {
 // **************************
-
   //KS: Create temporary arrays that will communicate with GPU code
   ParStep_cpu = new float[nDraw*nEntries];
   NumeratorSum_cpu = new float[nDraw*nLags];
@@ -3513,8 +3575,8 @@ void MCMCProcessor::CalculateESS(const int nLags, const std::vector<std::vector<
   //KS: Calculate ESS and MCMC efficiency for each parameter
   for (int j = 0; j < nDraw; ++j)
   {
-    (*EffectiveSampleSize)(j) = _UNDEF_;
-    (*SamplingEfficiency)(j) = _UNDEF_;
+    (*EffectiveSampleSize)(j) = M3::_BAD_DOUBLE_;
+    (*SamplingEfficiency)(j) = M3::_BAD_DOUBLE_;
     TempDenominator[j] = 0.;
     //KS: Firs sum over all Calculated autocorrelations
     for (int k = 0; k < nLags; ++k)
@@ -3764,7 +3826,7 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
 
   int nPrams = nDraw;
   /// @todo KS: Code is awfully slow... I know how to make it faster (GPU scream in a distant) but for now just make it for two params, bit hacky sry...
-  nPrams = 2;
+  nPrams = 1;
 
   std::vector<std::vector<float>> k_j(nPrams, std::vector<float>(v_size, 0.0));
   std::vector<std::vector<float>> P_j(nPrams, std::vector<float>(v_size, 0.0));
@@ -3806,7 +3868,7 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
   TVectorD* PowerSpectrumStepSize = new TVectorD(nPrams);
   for (int j = 0; j < nPrams; ++j)
   {
-    TGraph* plot = new TGraph(v_size, k_j[j].data(), P_j[j].data());
+    auto plot = std::make_unique<TGraph>(v_size, k_j[j].data(), P_j[j].data());
 
     TString Title = "";
     double Prior = 1.0, PriorError = 1.0;
@@ -3846,7 +3908,6 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
     //KS: I have no clue what is the reason behind this. Found this in Rick Calland code...
     (*PowerSpectrumStepSize)(j) = std::sqrt(func->GetParameter(0)/float(v_size*0.5));
     delete func;
-    delete plot;
   }
 
   PowerSpectrumStepSize->Write("PowerSpectrumStepSize");
@@ -4102,25 +4163,27 @@ void MCMCProcessor::PrintInfo() const {
 // **************************
   // KS: Create a map to store the counts of unique strings
   std::unordered_map<std::string, int> paramCounts;
+  std::vector<std::string> orderedKeys;
 
-  std::for_each(ParameterGroup.begin(), ParameterGroup.end(),
-                [&paramCounts](const std::string& param) {
-                  paramCounts[param]++;
-                });
+  for (const std::string& param : ParameterGroup) {
+    if (paramCounts[param] == 0) {
+      orderedKeys.push_back(param);  // preserve order of first appearance
+    }
+    paramCounts[param]++;
+  }
 
   MACH3LOG_INFO("************************************************");
   MACH3LOG_INFO("Scanning output branches...");
-  MACH3LOG_INFO("# useful entries in tree: \033[1;32m {} \033[0m ", nDraw);
+  MACH3LOG_INFO("# Useful entries in tree: \033[1;32m {} \033[0m ", nDraw);
   MACH3LOG_INFO("# Model params:  \033[1;32m {} starting at {} \033[0m ", nParam[kXSecPar], ParamTypeStartPos[kXSecPar]);
   MACH3LOG_INFO("# With following groups: ");
-  for (const auto& pair : paramCounts) {
-    MACH3LOG_INFO(" # {} params: {}", pair.first, pair.second);
+  for (const std::string& key : orderedKeys) {
+    MACH3LOG_INFO(" # {} params: {}", key, paramCounts[key]);
   }
-  MACH3LOG_INFO("# ND params:    \033[1;32m {} starting at {} \033[0m ", nParam[kNDPar], ParamTypeStartPos[kNDPar]);
-  MACH3LOG_INFO("# FD params:    \033[1;32m {} starting at {} \033[0m ", nParam[kFDDetPar], ParamTypeStartPos[kFDDetPar]);
+  MACH3LOG_INFO("# ND params (legacy):    \033[1;32m {} starting at {} \033[0m ", nParam[kNDPar], ParamTypeStartPos[kNDPar]);
+  MACH3LOG_INFO("# FD params (legacy):    \033[1;32m {} starting at {} \033[0m ", nParam[kFDDetPar], ParamTypeStartPos[kFDDetPar]);
   MACH3LOG_INFO("************************************************");
 }
-
 
 // **************************
 std::vector<double> MCMCProcessor::GetMargins(const std::unique_ptr<TCanvas>& Canv) const {

@@ -38,11 +38,11 @@ void mcmc::CheckStep() {
   accProb = 0.0;
 
   // Calculate acceptance probability
-  if (anneal) accProb = TMath::Min(1.,TMath::Exp( -(logLProp-logLCurr) / (TMath::Exp(-step/AnnealTemp)))); 
-  else accProb = TMath::Min(1., TMath::Exp(logLCurr-logLProp));
+  if (anneal) accProb = std::min(1., std::exp( -(logLProp-logLCurr) / (std::exp(-step/AnnealTemp))));
+  else accProb = std::min(1., std::exp(logLCurr-logLProp));
 
   // Get the random number
-  double fRandom = random->Rndm();
+  const double fRandom = random->Rndm();
 
   // Do the accept/reject
   if (fRandom <= accProb) {
@@ -93,8 +93,16 @@ void mcmc::RunMCMC() {
   // Accept the first step to set logLCurr: this shouldn't affect the MCMC because we ignore the first N steps in burn-in
   logLCurr = logLProp;
 
+  // KS: Make sure we don't hit limits when using very long
+  if (stepStart > std::numeric_limits<decltype(stepStart)>::max() - chainLength) {
+    MACH3LOG_ERROR("stepStart ({}) + chainLength ({}) would overflow limit {}",
+                   stepStart, chainLength, std::numeric_limits<decltype(stepStart)>::max());
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
   // Begin MCMC
-  for (step = stepStart; step < stepStart+chainLength; ++step)
+  const unsigned int StepEnd = stepStart + chainLength;
+  for (step = stepStart; step < StepEnd; ++step)
   {
     stepClock->Start();
     // Set the initial rejection to false

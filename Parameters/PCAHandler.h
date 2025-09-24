@@ -196,6 +196,9 @@ class PCAHandler{
   #endif
 
  private:
+  /// @biref KS: Make sure decomposed matrix isn't correlated with undecomposed
+  void SanitisePCA(TMatrixDSym* CovMatrix);
+
   /// Prefit value for PCA params
   std::vector<double> _fPreFitValuePCA;
   /// CW: Current parameter value in PCA base

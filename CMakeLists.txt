@@ -3,7 +3,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # CMake version check
 cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
-project(MaCh3 VERSION 2.2.0 LANGUAGES CXX)
+project(MaCh3 VERSION 2.2.2 LANGUAGES CXX)
 set(MaCh3_VERSION ${PROJECT_VERSION})
 
 option(MaCh3_PYTHON_ENABLED "Whether to build MaCh3 python bindings" OFF)
@@ -57,8 +57,9 @@ find_program(CMAKE_CXX_COMPILER NAMES $ENV{CXX} g++ PATHS ENV PATH NO_DEFAULT_PA
 include(MaCh3Dependencies)
 
 ############################  C++ Compiler  ####################################
+set(CXX_MINIMAL_STANDARD 14)
 if (NOT DEFINED CMAKE_CXX_STANDARD OR "${CMAKE_CXX_STANDARD} " STREQUAL " ")
-  set(CMAKE_CXX_STANDARD 14)
+  set(CMAKE_CXX_STANDARD ${CXX_MINIMAL_STANDARD})
   cmessage(STATUS "Set default CXX standard: \"${CMAKE_CXX_STANDARD}\"")
 endif()
 
@@ -67,6 +68,9 @@ if(DEFINED ROOT_CXX_STANDARD AND NOT ROOT_CXX_STANDARD EQUAL CMAKE_CXX_STANDARD)
   cmessage(STATUS "Set CXX standard due to ROOT: \"${ROOT_CXX_STANDARD}\"")
 endif()
 cmessage(STATUS "CMAKE_CXX_STANDARD: \"${CMAKE_CXX_STANDARD}\"")
+if (CMAKE_CXX_STANDARD LESS CXX_MINIMAL_STANDARD)
+  cmessage(FATAL_ERROR "Set CXX standard is lower than the minimal working standard: ${CXX_MINIMAL_STANDARD}")
+endif()
 set(MACH3_CXX_STANDARD ${CMAKE_CXX_STANDARD})
 set_property(GLOBAL PROPERTY MACH3_CXX_STANDARD "${MACH3_CXX_STANDARD}")
 
@@ -113,11 +117,12 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     -Wduplicated-cond       # Warn if if / else chain has duplicated conditions (only in GCC >= 6.0)
     -Wduplicated-branches   # Warn if if / else branches have duplicated code (only in GCC >= 7.0)
     -Wuseless-cast          # Warn if you perform a cast to the same type (only in GCC >= 4.8)
+    -Wsuggest-override      # Warn if a virtual function override is not marked 'override' (only in GCC >= 5.1)
   )
 endif()
 
-# KS: Clang is super picky, it is almost impossible to make it work with Werror
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+# KS: Clang and IntelLLVM is super picky, it is almost impossible to make it work with Werror
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "IntelLLVM")
   set(MaCh3_WERROR_ENABLED FALSE)
 endif()
 
@@ -178,11 +183,17 @@ endif()
 
 #Add Multithread flags
 if(MaCh3_MULTITHREAD_ENABLED)
-  target_compile_options(MaCh3CompilerOptions INTERFACE -fopenmp)
+  if(CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
+    #ETA: intel icpx requires this I believe
+    find_package(OpenMP REQUIRED)
+    target_compile_options(MaCh3CompilerOptions INTERFACE -qopenmp)
+    target_link_libraries(MaCh3CompilerOptions INTERFACE OpenMP::OpenMP_CXX)
   # KS: Not a clue why clang need different...
-  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    target_compile_options(MaCh3CompilerOptions INTERFACE -fopenmp)
     target_link_libraries(MaCh3CompilerOptions INTERFACE omp)
   else()
+    target_compile_options(MaCh3CompilerOptions INTERFACE -fopenmp)
     target_link_libraries(MaCh3CompilerOptions INTERFACE gomp)
   endif()
   target_compile_definitions(MaCh3CompileDefinitions INTERFACE MULTITHREAD)

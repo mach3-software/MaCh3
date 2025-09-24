@@ -264,10 +264,6 @@ inline std::string DemangleTypeName(const std::string& mangledName) {
 template<typename Type>
 Type Get(const YAML::Node& node, const std::string File, const int Line) {
 // **********************
-  if (!node) {
-    MACH3LOG_ERROR("Empty Yaml node");
-    throw MaCh3Exception(File , Line );
-  }
   try {
     // Attempt to convert the node to the expected type
     return node.as<Type>();
@@ -275,6 +271,21 @@ Type Get(const YAML::Node& node, const std::string File, const int Line) {
     const std::string nodeAsString = YAMLtoSTRING(node);
     MACH3LOG_ERROR("YAML type mismatch: {}", e.what());
     MACH3LOG_ERROR("While trying to access variable {}", nodeAsString);
+    throw MaCh3Exception(File , Line );
+  } catch (const YAML::InvalidNode& e) {
+    std::string key = "<unknown>";
+    const std::string msg = e.what();
+    const std::string search = "first invalid key: \"";
+    auto start = msg.find(search);
+    if (start != std::string::npos) {
+      start += search.length();
+      auto end = msg.find("\"", start);
+      if (end != std::string::npos) {
+        key = msg.substr(start, end - start);
+      }
+    }
+    MACH3LOG_ERROR("Invalid YAML node: {}", e.what());
+    MACH3LOG_ERROR("While trying to access key: {}", key);
     throw MaCh3Exception(File , Line );
   }
 }
@@ -458,6 +469,10 @@ inline std::vector<double> ParseBounds(const YAML::Node& node, const std::string
     } else if (val.IsScalar()) {
       try {
         const double center = val.as<double>();
+        if (std::floor(center) != center) {
+          MACH3LOG_ERROR("Invalid center value in Bounds[0]: '{}'. Expected an integer (e.g., 0 or 1).", static_cast<std::string>(val.Scalar()));
+          throw MaCh3Exception(File, Line);
+        }
         bounds = {center - 0.5, center + 0.5};
       } catch (const YAML::BadConversion& e) {
         MACH3LOG_ERROR("Invalid value in Bounds[0]: '{}'. Expected a number.", static_cast<std::string>(val.Scalar()));

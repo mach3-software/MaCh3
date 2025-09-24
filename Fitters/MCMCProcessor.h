@@ -1,9 +1,5 @@
 #pragma once
 
-#ifndef _UNDEF_
-#define _UNDEF_ 1234567890
-#endif
-
 // C++ includes
 #include <complex>
 #include <cstdio>
@@ -111,7 +107,9 @@ class MCMCProcessor {
     void MakeCredibleRegions(const std::vector<double>& CredibleRegions = {0.99, 0.90, 0.68},
                              const std::vector<Style_t>& CredibleRegionStyle = {kDashed, kSolid, kDotted},
                              const std::vector<Color_t>& CredibleRegionColor = {kGreen-3, kGreen-10, kGreen},
-                             const bool CredibleInSigmas = false
+                             const bool CredibleInSigmas = false,
+                             const bool Draw2DPosterior = true,
+                             const bool DrawBestFit = true
                              );
     /// @brief Make fancy triangle plot for selected parameters
     /// @param CredibleIntervals Vector with values of credible intervals, must be in descending order
@@ -164,6 +162,15 @@ class MCMCProcessor {
     void GetSavageDickey(const std::vector<std::string>& ParName,
                          const std::vector<double>& EvaluationPoint,
                          const std::vector<std::vector<double>>& Bounds);
+
+    /// @brief Produce Savage Dickey plot
+    /// @param PriorHist Histogram with prior distribution
+    /// @param PosteriorHist Histogram with posterior distribution
+    void SavageDickeyPlot(std::unique_ptr<TH1D>& PriorHist,
+                          std::unique_ptr<TH1D>& PosteriorHist,
+                          const std::string& Title,
+                          const double EvaluationPoint) const ;
+
     /// @brief Reweight Prior by giving new central value and new error
     /// @param Names Parameter names for which we do reweighting
     /// @param NewCentral New central value for which we reweight
@@ -192,6 +199,10 @@ class MCMCProcessor {
     inline int GetNXSec() { return nParam[kXSecPar]; };
     inline int GetNND() { return nParam[kNDPar]; };
     inline int GetNFD() { return nParam[kFDDetPar]; };
+
+    /// @brief Get Yaml config obtained from a Chain
+    YAML::Node GetCovConfig(const int i) {return CovConfig.at(i); }
+
     /// @brief Number of params from a given group, for example flux
     int GetGroup(const std::string& name) const;
 
@@ -279,17 +290,20 @@ class MCMCProcessor {
 
     /// @brief CW: Read the input Covariance matrix entries. Get stuff like parameter input errors, names, and so on
     inline void ReadInputCov();
+    /// @warning This will no longer be supported in future
+    inline void ReadInputCovLegacy();
     /// @brief Read the output MCMC file and find what inputs were used
-    /// @warning There is bit of hardcoding for names so we should revisit it
     inline void FindInputFiles();
+    /// @warning This will no longer be supported in future
+    inline void FindInputFilesLegacy();
     /// @brief Read the xsec file and get the input central values and errors
-    virtual void ReadXSecFile();
+    inline void ReadModelFile();
+    /// @brief allow loading additional info for example used for oscillation parameters
+    virtual void LoadAdditionalInfo() {};
     /// @brief Read the ND cov file and get the input central values and errors
     inline void ReadNDFile();
     /// @brief Read the FD cov file and get the input central values and errors
     inline void ReadFDFile();
-    /// @brief Remove parameter specified in config
-    inline void RemoveParameters();
     /// @brief Print info like how many params have been loaded etc
     inline void PrintInfo() const;
 
@@ -357,8 +371,10 @@ class MCMCProcessor {
     std::string MCMCFile;
     /// Output file suffix useful when running over same file with different settings
     std::string OutputSuffix;
-    /// Covariance matrix name position
+    /// Covariance matrix file name position
     std::vector<std::vector<std::string>> CovPos;
+    /// Covariance matrix name position
+    std::vector<std::string> CovNamePos;
     /// Covariance matrix config
     std::vector<YAML::Node> CovConfig;
 
@@ -397,7 +413,9 @@ class MCMCProcessor {
     /// Parameters central values which we are going to analyse
     std::vector<std::vector<double>>  ParamCentral;
     std::vector<std::vector<double>>  ParamNom;
+    /// Uncertainty on a single parameter
     std::vector<std::vector<double>>  ParamErrors;
+    /// Whether Param has flat prior or not
     std::vector<std::vector<bool>>    ParamFlat;
     /// Number of parameters per type
     std::vector<int> nParam;
@@ -444,7 +462,7 @@ class MCMCProcessor {
     std::vector<std::string> NDSamplesNames;
 
     /// Gaussian fitter
-    TF1 *Gauss;
+    std::unique_ptr<TF1> Gauss;
 
     /// The output file
     TFile *OutputFile;
@@ -523,7 +541,7 @@ class MCMCProcessor {
     double *AccProbBatchedAverages;
     
   //Only if GPU is enabled
-  #ifdef CUDA
+  #ifdef MaCh3_CUDA
     /// @brief Move stuff to GPU to perform auto correlation calculations there
     inline void PrepareGPU_AutoCorr(const int nLags);
 

@@ -159,10 +159,14 @@ __host__ void SMonolithGPU::InitGPU_SplineMonolith(
 #endif
   
   // Print allocation info to user
-  printf("Allocated %i entries for paramNo and nKnots arrays, size = %f MB\n", n_splines, double(sizeof(short int)*n_splines+sizeof(unsigned int)*n_splines)/1.E6);
-  printf("Allocated %i entries for x coeff arrays, size = %f MB\n", Eve_size, double(sizeof(float)*Eve_size)/1.E6);
-  printf("Allocated %i entries for {ybcd} coeff arrays, size = %f MB\n", _nCoeff_*total_nknots, double(sizeof(float)*_nCoeff_*total_nknots)/1.E6);
-  printf("Allocated %i entries for TF1 coefficient arrays, size = %f MB\n", _nTF1Coeff_*n_tf1, double(sizeof(float)*_nTF1Coeff_*n_tf1)/1.E6);
+  printf("Allocated %i entries for paramNo and nKnots arrays, size = %f MB\n",
+         n_splines, static_cast<double>(sizeof(short int) * n_splines + sizeof(unsigned int) * n_splines) / 1.0e6);
+  printf("Allocated %i entries for x coeff arrays, size = %f MB\n",
+         Eve_size, static_cast<double>(sizeof(float) * Eve_size) / 1.0e6);
+  printf("Allocated %i entries for {ybcd} coeff arrays, size = %f MB\n",
+         _nCoeff_ * total_nknots, static_cast<double>(sizeof(float) * _nCoeff_ * total_nknots) / 1.0e6);
+  printf("Allocated %i entries for TF1 coefficient arrays, size = %f MB\n",
+         _nTF1Coeff_ * n_tf1, static_cast<double>(sizeof(float) * _nTF1Coeff_ * n_tf1) / 1.0e6);
 
   //KS: Ask CUDA about memory usage
   checkGpuMem();
@@ -182,7 +186,6 @@ __host__ void SMonolithGPU::InitGPU_Segments(short int **segment) {
 // Allocate memory for spline segments
 __host__ void SMonolithGPU::InitGPU_Vals(float **vals) {
 // *******************************************
-
   //KS: Rather than allocate memory in standard way this fancy cuda tool allows to pin host memory which make memory transfer faster
   cudaMallocHost((void **) vals, _N_SPLINES_*sizeof(float));
   CudaCheckError();
@@ -217,7 +220,7 @@ __host__ void SMonolithGPU::CopyToGPU_SplineMonolith(
     printf("Number of splines not equal to %i, GPU code for event-by-event splines will fail\n", _N_SPLINES_);
     printf("n_params = %i\n", n_params);
     printf("%s : %i\n", __FILE__, __LINE__);
-    exit(-1);
+    throw;
   }
 
   // Write to the global statics (h_* denotes host stored variable)
@@ -264,7 +267,7 @@ __host__ void SMonolithGPU::CopyToGPU_SplineMonolith(
   texDesc_coeff_x.readMode = cudaReadModeElementType;
 
   // Create texture object
-  cudaCreateTextureObject(&text_coeff_x, &resDesc_coeff_x, &texDesc_coeff_x, NULL);
+  cudaCreateTextureObject(&text_coeff_x, &resDesc_coeff_x, &texDesc_coeff_x, nullptr);
   CudaCheckError();
 
   // Also copy the parameter number for each spline onto the GPU; i.e. what spline parameter are we calculating right now
@@ -304,7 +307,7 @@ __host__ void SMonolithGPU::CopyToGPU_SplineMonolith(
   texDesc_nParamPerEvent.readMode = cudaReadModeElementType;
 
   //Finally create texture object
-  cudaCreateTextureObject(&text_nParamPerEvent, &resDesc_nParamPerEvent, &texDesc_nParamPerEvent, NULL);
+  cudaCreateTextureObject(&text_nParamPerEvent, &resDesc_nParamPerEvent, &texDesc_nParamPerEvent, nullptr);
   CudaCheckError();
 
   // Now TF1
@@ -326,9 +329,8 @@ __host__ void SMonolithGPU::CopyToGPU_SplineMonolith(
   texDesc_nParamPerEvent_tf1.readMode = cudaReadModeElementType;
 
   //Finally create texture object
-  cudaCreateTextureObject(&text_nParamPerEvent_TF1, &resDesc_nParamPerEvent_tf1, &texDesc_nParamPerEvent_tf1, NULL);
+  cudaCreateTextureObject(&text_nParamPerEvent_TF1, &resDesc_nParamPerEvent_tf1, &texDesc_nParamPerEvent_tf1, nullptr);
   CudaCheckError();
-
   #endif
 }
 
@@ -468,7 +470,6 @@ __host__ void SMonolithGPU::RunGPU_SplineMonolith(
     const unsigned int h_n_splines,
     const unsigned int h_n_tf1) {
 // *****************************************
-
   dim3 block_size;
   dim3 grid_size;
 
@@ -579,7 +580,6 @@ __host__ void SMonolithGPU::CleanupGPU_SplineMonolith(
   cudaFreeHost(cpu_total_weights);
   cpu_total_weights = nullptr;
 #endif
-  return;
 }
 
 // *******************************************
@@ -591,6 +591,4 @@ __host__ void SMonolithGPU::CleanupGPU_Segments(short int *segment, float *vals)
 
   segment = nullptr;
   vals = nullptr;
-
-  return;
 }

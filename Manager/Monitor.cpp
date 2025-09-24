@@ -1,7 +1,7 @@
 #include "Manager/Monitor.h"
 
 //Only if GPU is enabled
-#ifdef CUDA
+#ifdef MaCh3_CUDA
 #include "Manager/gpuUtils.cuh"
 #endif
 
@@ -141,7 +141,7 @@ void NThreadsSanity() {
 //KS: Simple function retrieving GPU info
 void GetGPUInfo(){
 // ************************
-#ifdef CUDA
+#ifdef MaCh3_CUDA
   MACH3LOG_INFO("Using following GPU:");
   // Print GPU name
   MACH3LOG_INFO("GPU Name: {}", TerminalToString("nvidia-smi --query-gpu=name --format=csv,noheader"));
@@ -153,6 +153,12 @@ void GetGPUInfo(){
   MACH3LOG_INFO("Driver Version: {}", TerminalToString("nvidia-smi --query-gpu=driver_version --format=csv,noheader"));
   // Print N GPU thread
   MACH3LOG_INFO("Currently used GPU has: {} threads", GetNumGPUThreads());
+  // Print L2 cache
+  MACH3LOG_INFO("Currently used GPU has: {} KB L2 cache", GetL2CacheSize() / 1024);
+  // Shared memory info
+  MACH3LOG_INFO("Max shared memory per block: {} KB", GetSharedMemoryPerBlock() / 1024);
+  // Print 1D texture size
+  MACH3LOG_INFO("Max 1D texture size: {}", GetMaxTexture1DSize());
 #endif
 }
 
@@ -203,7 +209,7 @@ void EstimateDataTransferRate(TChain* chain, const Long64_t entry){
 
 // ************************
 //KS: Simply print progress bar
-void PrintProgressBar(const Long64_t Done, const Long64_t All){
+void PrintProgressBar(const Long64_t Done, const Long64_t All) {
 // ************************
   double progress = double(Done)/double(All);
   const int barWidth = 20;
@@ -226,7 +232,7 @@ void PrintProgressBar(const Long64_t Done, const Long64_t All){
 
 // ***************************************************************************
 //CW: Get memory, which is probably silly
-int getValue(const std::string& Type){ //Note: this value is in KB!
+int getValue(const std::string& Type) { //Note: this value is in KB!
 // ***************************************************************************
   std::ifstream file("/proc/self/status");
   int result = -1;
@@ -300,7 +306,7 @@ void PrintConfig(const YAML::Node& node){
 
 // ***************************************************************************
 //KS: Almost all MaCh3 executables have the same usage, prepare simple printer
-void MaCh3Usage(int argc, char **argv){
+void MaCh3Usage(int argc, char **argv) {
 // ***************************************************************************
   if (argc != 2) {
     MACH3LOG_ERROR("Wrong usage of MaCh3 executable!");
