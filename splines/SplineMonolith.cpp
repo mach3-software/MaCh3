@@ -17,279 +17,159 @@ class IDOptimized;
 // Set to 0 to allow the compiler to save area if possible.
 constexpr size_t kPipeMinCapacity = 32;
 
-// Pipes
-struct PipeStruct{
-  PipeStruct() = default;
-    PipeStruct(int a, float b[2]):
-    eventNum(a),
-    spline_computations{b[0], b[1]}{}
-  int eventNum;
-  float spline_computations[2];
-};
-class IDPipeAB;
-using PipeAB = sycl::ext::intel::pipe<IDPipeAB,        // An identifier for the pipe
-                                      PipeStruct,           // The type of data in the pipe
-                                      kPipeMinCapacity // The capacity of the pipe
-                                      >;
+class IDSplinePipe;
+class IDTF1Pipe;
+using SplinePipe = sycl::ext::intel::pipe<IDSplinePipe,        // An identifier for the pipe
+                                          float,           // The type of data in the pipe
+                                          kPipeMinCapacity // The capacity of the pipe
+                                          >;
+using TF1Pipe = sycl::ext::intel::pipe<IDTF1Pipe,        // An identifier for the pipe
+                                       float,           // The type of data in the pipe
+                                       kPipeMinCapacity // The capacity of the pipe
+                                       >;
 
 
 //*********************************************************
-[[intel::use_stall_enable_clusters]] 
-void FPGACalcSplineWeights(int nParams,
-                           int total_chunks,
-                           short int *paramNo_arr,
-                           unsigned int *nKnots_arr,
-                           short *SplineSegments,
+//*********************************************************
+void FPGACalcSplineWeights(short *SplineSegments,
                            float *coeff_many,
+                           float *ParamValues,
                            float *coeff_x,
-                           float *ParamValues, 
-                           int max_knots,
-                           int n_coeff,
-                           unsigned short* splines_per_event,
-                           unsigned int n_events) {
+                           unsigned int *nKnots_arr,
+                           short *paramNo_arr,
+                           int NSplines_valid,
+                           int nCoeff,
+                           int max_knots) {
 //*********************************************************
-
-  sycl::ext::intel::host_ptr<const short> params_host(paramNo_arr);
-  sycl::ext::intel::host_ptr<const unsigned int> knots_host(nKnots_arr);
-  sycl::ext::intel::host_ptr<const short> segments_host(SplineSegments);
-  sycl::ext::intel::host_ptr<const float> coeff_many_host(coeff_many);
-  sycl::ext::intel::host_ptr<const float> coeff_x_host(coeff_x);
-  sycl::ext::intel::host_ptr<const float> vals_host(ParamValues);
-  const int nChunk = 2;
-  const int num_coeff = 4;
-
-  int spline_offset = 0;
-  int knot_offset = 0;
-
-
-  sycl::ext::oneapi::experimental::printf("N_events %d \n", n_events);
-
-
-  // for each event
-  // for each spline
-  // find which knot we care about amongst nknots per spline
-  // get knot co-eff
-  // do some calculation
-  // shove down pipe calculation done on coeff for each spline in a given event
-
-
-  // DONT know if we still need this?
-  // //////////////////////////////////////////////////////////////////////////
-  // 200 = arbitrary number > nParams
-  [[intel::fpga_memory("BLOCK_RAM")]] int segments_bram[200];
-  [[intel::max_replicates(4)]] float vals_bram[200];
-  for (int i = 0; i < nParams; i++) {
-    segments_bram[i] = segments_host[i];
-    vals_bram[i] = vals_host[i];
-  }
-  // //////////////////////////////////////////////////////////////////////////
-
-  for (size_t eventNum = 0; eventNum < n_events; eventNum++) {
-
-    // Read the number of splines for this event
-
-    int NSplines_event = splines_per_event[eventNum]; // retrieve the amount of splines for this event
-    sycl::ext::oneapi::experimental::printf("%d/%d: N_splines_event %d \n", eventNum, n_events, NSplines_event);
-
+    sycl::ext::intel::host_ptr<const short> segments_host(SplineSegments);
+    sycl::ext::intel::host_ptr<const float> coeff_many_host(coeff_many);
+    sycl::ext::intel::host_ptr<const float> paramvalues_host(ParamValues);
+    sycl::ext::intel::host_ptr<const float> coeff_x_host(coeff_x);
+    sycl::ext::intel::host_ptr<const unsigned int> knots_host(nKnots_arr);
+    sycl::ext::intel::host_ptr<const short> params_host(paramNo_arr);
     
-    for (size_t eventSpline = 0; eventSpline < NSplines_event; eventSpline+= nChunk) {
-       
+    [[intel::fpga_memory("BLOCK_RAM")]] int segments_bram[200];
+    [[intel::max_replicates(4)]] float paramvalues_bram[200];
+    for (int i = 0; i < nParams; i++) {
+        segments_bram[i] = segments_host[i];
+        paramvalues_bram[i] = paramvalues_host[i];
+    }
 
-      
-      float for_pipe[nChunk];
-      // Execute each clock cycle
-      #pragma unroll
-      [[intel::initiation_interval(1)]]
-      for (size_t chunk = 0; chunk < nChunk; chunk++) {
-        sycl::ext::oneapi::experimental::printf("%d/%d: chunk loop \n", chunk, nChunk);
-        if (eventSpline+chunk > NSplines_event){
-          for_pipe[chunk] = 1.;
+
+    for (unsigned int splineNum = 0; splineNum < NSplines_valid; ++splineNum){
+        const short int Param = params_host[splineNum];
+        const short int segment = segments_bram[Param];
+        const short int segment_X = short(Param * max_knots + segment);
+        const unsigned int CurrentKnotPos = knots_host[splineNum] * nCoeff + segment * nCoeff;
+
+        // fetch all fX simultaneously
+        float coeffs[num_coeff];
+        #pragma unroll
+        for (unsigned int icoeff = 0; icoeff < num_coeff; icoeff++) {
+
+        coeffs[icoeff] = coeff_many_host[CurrentKnotPos+icoeff];
+
         }
-        else{
+        const float fA = coeffs[CurrentKnotPos];
+        const float fB = coeffs[CurrentKnotPos + 1];
+        const float fC = coeffs[CurrentKnotPos + 2];
+        const float fD = coeffs[CurrentKnotPos + 3];
+        const float dx = paramvalues_bram[Param] - coeff_x_host[segment_X];
 
-          // IS THIS BIT OK?
-          // //////////////////////////////////////////////////////////////////
-          // how many knots in this spline
-          // -> which param this spline is for
-          // -> how many knots for this param.
-          int current_spline = spline_offset + chunk;
+        bool success = false;
+        while (!success) SplinePipe::write((fA+dx*(fB+dx*(fC+dx*fD))), success);
+    }
+}
+//********************************************************************
+void FPGACalcTF1Weights(float *ParamValues,
+                        float *cpu_paramNo_TF1_arr,
+                        float *cpu_coeff_TF1_many,
+                        int NTF1_valid,
+                        int nTF1Coeff) {
 
-          
-          int Param = params_host[spline_offset + eventSpline + chunk];
-          int segment = segments_bram[Param];
-          int CurrentKnotPos = knots_host[spline_offset + eventSpline + chunk] * num_coeff + segment * num_coeff; // still needs to be checked
-
-
-          //int CurrentKnotPos =  * num_coeff;
-          //int CurrentKnotPos = knot_offset + segment*num_coeff;
-
-          ac_int<8, false> segment_X = Param * max_knots + segment;
-
-          // //////////////////////////////////////////////////////////////////
-          float coeffs[num_coeff];
-
-          // fetch all fX simultaneously
-          #pragma unroll
-          for (unsigned int icoeff = 0; icoeff < num_coeff; icoeff++) {
-
-            coeffs[icoeff] = coeff_many_host[CurrentKnotPos+icoeff];
-            // coeff_many = n_splines * n_knots -> large!
-
-          }
-
-          const float dx = vals_bram[Param] - coeff_x_host[segment_X];
-
-          float a = dx * coeffs[3] + coeffs[2];
-          float b = dx * a + coeffs[1];
-          float c = dx * b + coeffs[0];
-
-          for_pipe[chunk] = c;
-        }
-        sycl::ext::oneapi::experimental::printf("End chunk conditional \n", chunk, nChunk);
-      } // end of chunk loop
-      bool success = false;
-      sycl::ext::oneapi::experimental::printf("Writing to pipe\n");
-      while (!success) PipeAB::write(PipeStruct(eventNum, for_pipe), success);
-      sycl::ext::oneapi::experimental::printf("written\n");
-
-      // knot_offset += knots_per_spline;
-    } //end of splines per event loop
-    spline_offset += NSplines_event;
+    sycl::ext::intel::host_ptr<const float> paramvalues_host(ParamValues);
+    sycl::ext::intel::host_ptr<const float> paramNo_TF1_host(cpu_paramNo_TF1_arr);
+    sycl::ext::intel::host_ptr<const float> coeff_TF1_many_host(cpu_coeff_TF1_many);
     
-    
-  } // end of event loop
-} 
-//   // OLD STUFF
-//   //////////////////////////////////////////////////////////////////////
-//   sycl::ext::intel::host_ptr<const int> param_n_knots_host(param_n_knots);
-//   sycl::ext::intel::host_ptr<const short> segments_host(SplineSegments);
-//   sycl::ext::intel::host_ptr<const float> coeff_many_host(coeff_many);
-//   sycl::ext::intel::host_ptr<const float> coeff_x_host(coeff_x);
-//   sycl::ext::intel::host_ptr<const float> vals_host(ParamValues);
-//   // //int _nCoeff_,
-//   // //int _max_knots, 
-//   // int *param_n_knots, 
-//   // int *segments, 
-//   // float *coeff_many, 
-//   // float *coeff_x, 
-//   // float *vals
+    [[intel::max_replicates(4)]] float paramvalues_bram[200];
+    for (int i = 0; i < nParams; i++) {
+        paramvalues_bram[i] = paramvalues_host[i];
+    }
 
-//   //ETA
-//   //Always assume these are cubic splines for now
-//   //const int _nCoeff = 3;
-//   //Always assume the max number of knots is 7 for now
+    for (unsigned int tf1Num = 0; tf1Num < NTF1_valid; ++tf1Num){
+        const float x = paramvalues_bram[paramNo_TF1_host[tf1Num]];
 
-//   // 200 = arbitrary number > nParams
-//   // [[intel::fpga_memory("BLOCK_RAM")]] std::array<int, 200> segments_bram;
-//   [[intel::fpga_memory("BLOCK_RAM")]] int segments_bram[200];
+        const unsigned int TF1_Index = tf1Num * nTF1Coeff;
+        const float a = coeff_TF1_many_host[TF1_Index];
+        const float b = coeff_TF1_many_host[TF1_Index + 1];
 
-//   // [[intel::max_replicates(4)]] std::array<float, 200> vals_bram;
-//   [[intel::max_replicates(4)]] float vals_bram[200];
+        bool success = false;
+        while (!success) TF1Pipe::write(a*x + b, success);
+    }
 
-//   //#pragma unroll
-//   for (int i = 0; i < nParams; i++) {
-//     segments_bram[i] = segments_host[i];
-//     vals_bram[i] = vals_host[i];
-//   }
-
-//   [[intel::initiation_interval(1)]]
-//   for (size_t splineNum = 0; splineNum < NSplines_valid; splineNum++) {
-
-//     //ETA - I don't understand this. The parameter index should run from 1 to n_params
-//     // it is really just used to calculate systematic level constants e.g. the segment, _max_knots, _nCoeff etc
-//     //ac_int<8, false> Param = param_n_knots_host[2*splineNum]; // Param range 10e2
-//     ac_int<8, false> Param = param_n_knots_host[2*splineNum];//paramNo_arr_host[splineNum]; // parameters range 10e2
-//     ac_int<8, false> segment = segments_bram[Param]; // segments range 10e2
-
-//     // param_n_knots is [[param, nKnots]....]
-//     // KS: Segment for coeff_x is simply parameter*max knots + segment as each
-//     // parameters has the same spacing
-//     //ETA check is it should be _max_knots + segment
-//     // ac_int<8, false> segment_X = Param; //* _max_knots + segment;
-//     ac_int<8, false> segment_X = Param * max_knots + segment;
-
-//     // KS: Find knot position in out monoithical structure
-                                      
-//     ac_int<16, false> CurrentKnotPos = param_n_knots_host[2*splineNum+1]*_nCoeff_ + segment*_nCoeff_;
-
-//     // possibly combine nKnots_arr and  paramNo_arr
-
-//     // std::array<float, 4> fX;
-//     float fX[4];
-
-//     #pragma unroll
-//     for (unsigned int knotPos = 0; knotPos < 4; knotPos++) {
-
-//       fX[knotPos] = coeff_many_host[CurrentKnotPos+knotPos];
-//       // coeff_many = n_splines * n_knots -> large!
-
-//     }
-
-//     const float dx = vals_bram[Param] - coeff_x_host[segment_X];
-
-//     //  optimizations:
-//     // combine nknots and paramno as a single object to FPGA DDR
-//     // store segments on chip
-//     // store coeff_many on FPGA DDR
-
-//     //ETA - does fmaf exist for FPGA?
-//     float a = dx * fX[3] + fX[2];
-//     float b = dx * a + fX[1];
-//     float c = dx * b + fX[0];
-//     // write to pipe
-//     PipeAB::write(c);
-//   }
-// }
+}
 
 //*********************************************************
-//KS: Calc total event weight on CPU
 [[intel::use_stall_enable_clusters]]
-void FPGAModifyWeights(int total_chunks, float *cpu_total_weights){
-//*********************************************************
-  sycl::ext::intel::host_ptr<float> cpu_total_weights_host(cpu_total_weights);
+void FPGAModifyWeights(int total_chunks,
+                       int NEvents,
+                       float *cpu_total_weights,
+                       int *cpu_nParamPerEvent,
+                       int *cpu_nParamPerEvent_tf1){
+    sycl::ext::intel::host_ptr<float> total_weights_host(cpu_total_weights);
+    sycl::ext::intel::host_ptr<int> nParamPerEvent_host(cpu_nParamPerEvent);
+    sycl::ext::intel::host_ptr<int> nParamPerEvent_tf1_host(cpu_nParamPerEvent_tf1);
 
-  const size_t chunk_size = 2;
-  int current_event = 0;
-  float prod = 1;
+    for (unsigned int EventNum = 0; EventNum < NEvents; ++EventNum){
+        float totalWeight = 1.0f; // Initialize total weight for each event
 
-  sycl::ext::oneapi::experimental::printf("total_chunks %d \n", total_chunks);
+        const unsigned int Offset = 2 * EventNum;
 
+        // Extract the parameters for the current event
+        const unsigned int startIndex = nParamPerEvent_host[Offset + 1];
+        const unsigned int numParams = nParamPerEvent_host[Offset];
+        const unsigned int startIndex_tf1 = nParamPerEvent_tf1_host[Offset + 1];
+        const unsigned int numParams_tf1 = nParamPerEvent_tf1_host[Offset];
+        int current_spline_param = 0;
+        int current_tf1_param = 0;
 
-  for (size_t i = 0; i < total_chunks; i++) {
-    bool success = false;
-    PipeStruct tmp;
-    sycl::ext::oneapi::experimental::printf("Reading from pipe\n");
-    while (!success) tmp = PipeAB::read(success);
-    sycl::ext::oneapi::experimental::printf("Read from pipe\n");
+        bool spline_success = false;
+        bool tf1_success = false;
+        float spline_val;
+        float tf1_val;
+        while (current_spline_param < numParams || current_tf1_param < numParams_tf1){
 
-    if (tmp.eventNum != current_event){
-      cpu_total_weights_host[current_event] = prod;
-      prod = 1;
-      current_event = tmp.eventNum;
+            if (current_spline_param < numParams){
+                spline_val = SplinePipe::read(spline_success);
+                if (spline_success){
+                    totalWeight *= spline_val;
+                    current_spline_param++;
+                    spline_success = false;
+                }
+            }
+
+            if (current_tf1_param < numParams_tf1){
+                tf1_val = TF1Pipe::read(tf1_success);
+                if (tf1_success){
+                    totalWeight *= tf1_val;
+                    current_tf1_param++;
+                    tf1_success = false;
+                }
+            }
+        }
+
+        // // Compute total weight for the current event
+        // for (unsigned int id = 0; id < numParams; ++id) {
+        //     totalWeight *= cpu_weights_spline_var[startIndex + id];
+        // }
+        // // Compute total weight for the current event
+        // for (unsigned int id = 0; id < numParams_tf1; ++id) {
+        //     totalWeight *= cpu_weights_tf1_var[startIndex_tf1 + id];
+        // }
+
+        // Store the total weight for the current event
+        total_weights_host[EventNum] = totalWeight;
     }
-
-    #pragma unroll
-    for (size_t a = 0; a < chunk_size; a++) {
-      prod *= tmp.spline_computations[a];
-    }
-  }
-  // IMPORTANT: Need to write out the result for the very last event after the loop finishes.
-  // The if-condition (tmp.eventNum != current_event) only triggers on event CHANGE.
-  cpu_total_weights_host[current_event] = prod; 
-
-  // OLD
-  // [[intel::initiation_interval(1)]]
-  // for (size_t i = 0; i < NSplines_valid / 4; i++) {
-
-  //   float sum = 1;
-
-  //   for (size_t a = 0; a < 4; a++) {
-  //     float tmp = PipeAB::read();
-  //     sum *= tmp;
-  //   }
-
-  //   cpu_total_weights_host[i] = sum;
-  // }
 }
 
 #endif
@@ -1363,38 +1243,43 @@ void SMonolith::Evaluate() {
   #ifdef USE_FPGA
 
     struct OptimizedKernel {
-      int nParams;
-      unsigned int NSplines_valid;
-      short int *paramNo_arr;
-      unsigned int *nKnots_arr;
       short int *SplineSegments;
       float *coeff_many;
-      float *coeff_x;
       float *ParamValues;
-      int max_knots;
-      float *cpu_total_weights;
+      float *coeff_x;
+      unsigned int *nKnots_arr;
+      short int *paramNo_arr;
+      unsigned int NSplines_valid;
       int n_coeff;
-      unsigned short *splines_per_event;
+      int max_knots;
+      int nParams;
+      float *cpu_paramNo_TF1_arr
+      float *cpu_coeff_TF1_many
+      int NTF1_valid
+      int nTF1Coeff
       unsigned int n_events;
+      float *cpu_total_weights;
+      int *cpu_nParamPerEvent,
+      int *cpu_nParamPerEvent_tf1
       [[intel::kernel_args_restrict]]
       void operator()() const {
         sycl::ext::intel::experimental::task_sequence<FPGACalcSplineWeights> task_a;
-        sycl::ext::intel::experimental::task_sequence<FPGAModifyWeights> task_b;
+        sycl::ext::intel::experimental::task_sequence<FPGACalcTF1Weights> task_b;
+        sycl::ext::intel::experimental::task_sequence<FPGAModifyWeights> task_c;
 
         // Pass all the things that FPGACalcSplineWeights needs
-        task_a.async(nParams,
-                     NSplines_valid,
-                     paramNo_arr,
-                     nKnots_arr,
-                     SplineSegments,
+        task_a.async(SplineSegments,
                      coeff_many,
-                     coeff_x,
                      ParamValues,
-                     max_knots,
+                     coeff_x,
+                     nKnots_arr,
+                     paramNo_arr,
+                     NSplines_valid,
                      n_coeff,
-                     splines_per_event,
-                     n_events);
-        task_b.async(NSplines_valid, cpu_total_weights);
+                     max_knots,
+                     nParams);
+        task_b.async(ParamValues, cpu_paramNo_TF1_arr,cpu_coeff_TF1_many, NTF1_valid, nTF1Coeff);
+        task_c.async(n_events, cpu_total_weights, cpu_nParamPerEvent, cpu_nParamPerEvent_tf1);
       }
     };
  
@@ -1415,19 +1300,24 @@ void SMonolith::Evaluate() {
     start = std::chrono::system_clock::now();
  
     // Call the kernel
-    auto e = queue.single_task<IDOptimized>(OptimizedKernel{nParams,
-                                                            total_chunks,
-                                                            cpu_spline_handler->paramNo_arr,
-                                                            cpu_spline_handler->nKnots_arr,
-                                                            SplineSegments,
+    auto e = queue.single_task<IDOptimized>(OptimizedKernel{SplineSegments,
                                                             cpu_spline_handler->coeff_many,
-                                                            cpu_spline_handler->coeff_x,
                                                             ParamValues,
+                                                            cpu_spline_handler->coeff_x,
+                                                            cpu_spline_handler->nKnots_arr,
+                                                            cpu_spline_handler->paramNo_arr,
+                                                            NSplines_valid,
+                                                            _nCoeff_,
                                                             _max_knots,
+                                                            nParams,
+                                                            cpu_paramNo_TF1_arr,
+                                                            cpu_coeff_TF1_many,
+                                                            NTF1_valid,
+                                                            _nTF1Coeff_,
+                                                            NEvents,
                                                             cpu_total_weights,
-                                                            n_coeff,
-                                                            cpu_spline_handler->splines_per_event_arr,
-                                                            NEvents});
+                                                            cpu_nParamPerEvent,
+                                                            cpu_nParamPerEvent_tf1});
 
     e.wait();
 
