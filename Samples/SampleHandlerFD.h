@@ -396,8 +396,48 @@ public:
   TH1D* _hPDF1D;
   TH2D* _hPDF2D;
 
-  NuPDG GetInitPDGFromFileName(const std::string& FileName) {return FileToInitPDGMap.at(FileName);}
-  NuPDG GetFinalPDGFromFileName(const std::string& FileName) {return FileToFinalPDGMap.at(FileName);}
+  bool MatchWildcard(const std::string &str, const std::string &pattern) {
+    std::string regex_pattern;
+    for (char c : pattern) {
+      if (c == '*') {
+        regex_pattern += ".*"; // Convert '*' to '.*' in regex
+      } else if (c == '.' || c == '^' || c == '$' || c == '+' || c == '?' ||
+                 c == '(' || c == ')' || c == '[' || c == ']' || c == '{' ||
+                 c == '}' || c == '|' || c == '\\') {
+        regex_pattern += '\\';
+        regex_pattern += c; // Escape regex special characters
+      } else {
+        regex_pattern += c; // Regular character
+      }
+    }
+    std::regex regex(regex_pattern);
+    return std::regex_match(str, regex);
+  }
+
+  template<typename Map>
+  auto GetFromMapWithWildcards(const Map& MapWithWildcards, const std::string& Key) {
+    std::vector<std::string> keys;
+    keys.reserve(MapWithWildcards.size());
+    for (const auto& pair : MapWithWildcards) {
+      keys.push_back(pair.first);
+      if (MatchWildcard(Key, pair.first)) {
+        return pair.second;
+      }
+    }
+    MACH3LOG_ERROR("File name {} is not in the map!", Key);
+    MACH3LOG_ERROR("Available keys are:");
+    for (const auto& key : keys) {
+      MACH3LOG_ERROR("  {}", key);
+    }
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  NuPDG GetInitPDGFromFileName(const std::string& FileName) {
+    return GetFromMapWithWildcards(FileToInitPDGMap, FileName);
+  }
+  NuPDG GetFinalPDGFromFileName(const std::string& FileName) {
+    return GetFromMapWithWildcards(FileToFinalPDGMap, FileName);
+  }
 
 private:
   std::unordered_map<std::string, NuPDG> FileToInitPDGMap;
