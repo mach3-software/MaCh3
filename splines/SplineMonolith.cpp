@@ -39,7 +39,8 @@ void FPGACalcSplineWeights(short *SplineSegments,
                            short *paramNo_arr,
                            int NSplines_valid,
                            int nCoeff,
-                           int max_knots) {
+                           int max_knots,
+                           int nParams) {
 //*********************************************************
     sycl::ext::intel::host_ptr<const short> segments_host(SplineSegments);
     sycl::ext::intel::host_ptr<const float> coeff_many_host(coeff_many);
@@ -63,9 +64,9 @@ void FPGACalcSplineWeights(short *SplineSegments,
         const unsigned int CurrentKnotPos = knots_host[splineNum] * nCoeff + segment * nCoeff;
 
         // fetch all fX simultaneously
-        float coeffs[num_coeff];
+        float coeffs[4];
         #pragma unroll
-        for (unsigned int icoeff = 0; icoeff < num_coeff; icoeff++) {
+        for (unsigned int icoeff = 0; icoeff < 4; icoeff++) {
 
         coeffs[icoeff] = coeff_many_host[CurrentKnotPos+icoeff];
 
@@ -82,13 +83,14 @@ void FPGACalcSplineWeights(short *SplineSegments,
 }
 //********************************************************************
 void FPGACalcTF1Weights(float *ParamValues,
-                        float *cpu_paramNo_TF1_arr,
+                        short *cpu_paramNo_TF1_arr,
                         float *cpu_coeff_TF1_many,
-                        int NTF1_valid,
-                        int nTF1Coeff) {
+                        unsigned int NTF1_valid,
+                        int nTF1Coeff,
+                        int nParams) {
 
     sycl::ext::intel::host_ptr<const float> paramvalues_host(ParamValues);
-    sycl::ext::intel::host_ptr<const float> paramNo_TF1_host(cpu_paramNo_TF1_arr);
+    sycl::ext::intel::host_ptr<const short> paramNo_TF1_host(cpu_paramNo_TF1_arr);
     sycl::ext::intel::host_ptr<const float> coeff_TF1_many_host(cpu_coeff_TF1_many);
     
     [[intel::max_replicates(4)]] float paramvalues_bram[200];
@@ -111,14 +113,13 @@ void FPGACalcTF1Weights(float *ParamValues,
 
 //*********************************************************
 [[intel::use_stall_enable_clusters]]
-void FPGAModifyWeights(int total_chunks,
-                       int NEvents,
+void FPGAModifyWeights(int NEvents,
                        float *cpu_total_weights,
-                       int *cpu_nParamPerEvent,
-                       int *cpu_nParamPerEvent_tf1){
+                       unsigned int *cpu_nParamPerEvent,
+                       unsigned int *cpu_nParamPerEvent_tf1){
     sycl::ext::intel::host_ptr<float> total_weights_host(cpu_total_weights);
-    sycl::ext::intel::host_ptr<int> nParamPerEvent_host(cpu_nParamPerEvent);
-    sycl::ext::intel::host_ptr<int> nParamPerEvent_tf1_host(cpu_nParamPerEvent_tf1);
+    sycl::ext::intel::host_ptr<const unsigned int> nParamPerEvent_host(cpu_nParamPerEvent);
+    sycl::ext::intel::host_ptr<const unsigned int> nParamPerEvent_tf1_host(cpu_nParamPerEvent_tf1);
 
     for (unsigned int EventNum = 0; EventNum < NEvents; ++EventNum){
         float totalWeight = 1.0f; // Initialize total weight for each event
@@ -1253,14 +1254,14 @@ void SMonolith::Evaluate() {
       int n_coeff;
       int max_knots;
       int nParams;
-      float *cpu_paramNo_TF1_arr
-      float *cpu_coeff_TF1_many
-      int NTF1_valid
-      int nTF1Coeff
+      short *cpu_paramNo_TF1_arr;
+      float *cpu_coeff_TF1_many;
+      unsigned int NTF1_valid;
+      int nTF1Coeff;
       unsigned int n_events;
       float *cpu_total_weights;
-      int *cpu_nParamPerEvent,
-      int *cpu_nParamPerEvent_tf1
+      unsigned int *cpu_nParamPerEvent;
+      unsigned int *cpu_nParamPerEvent_tf1;
       [[intel::kernel_args_restrict]]
       void operator()() const {
         sycl::ext::intel::experimental::task_sequence<FPGACalcSplineWeights> task_a;
@@ -1278,7 +1279,7 @@ void SMonolith::Evaluate() {
                      n_coeff,
                      max_knots,
                      nParams);
-        task_b.async(ParamValues, cpu_paramNo_TF1_arr,cpu_coeff_TF1_many, NTF1_valid, nTF1Coeff);
+        task_b.async(ParamValues, cpu_paramNo_TF1_arr,cpu_coeff_TF1_many, NTF1_valid, nTF1Coeff, nParams);
         task_c.async(n_events, cpu_total_weights, cpu_nParamPerEvent, cpu_nParamPerEvent_tf1);
       }
     };
@@ -1316,8 +1317,8 @@ void SMonolith::Evaluate() {
                                                             _nTF1Coeff_,
                                                             NEvents,
                                                             cpu_total_weights,
-                                                            cpu_nParamPerEvent,
-                                                            cpu_nParamPerEvent_tf1});
+                                                            cpu_nParamPerEvent.data(),
+                                                            cpu_nParamPerEvent_tf1.data()});
 
     e.wait();
 
