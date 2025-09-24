@@ -311,13 +311,39 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
         MACH3LOG_ERROR("Cannot create output file: {}", outputFile);
         throw MaCh3Exception(__FILE__, __LINE__);
     }
-    
+
     MACH3LOG_INFO("Output file will be: {}", outputFile);
     
+    // Copy all the remaining objects into the out file (ie all but posteriors tree)
+
+    TIter next(inFile->GetListOfKeys());
+    while (TKey* key = dynamic_cast<TKey*>(next())) {
+        inFile->cd();
+        TObject* obj = key->ReadObj();
+        if (obj->IsA()->InheritsFrom(TDirectory::Class())) {
+            // It's a folder, create and copy its contents
+            TDirectory* srcDir = static_cast<TDirectory*>(obj);
+            TDirectory* destDir = outFile->mkdir(srcDir->GetName());
+            TIter nextSubKey(srcDir->GetListOfKeys());
+            while (TKey* subKey = dynamic_cast<TKey*>(nextSubKey())) {
+                srcDir->cd();
+                TObject* subObj = subKey->ReadObj();
+                destDir->cd();
+                subObj->Write();
+            }
+        } else if (std::string(key->GetName()) != "posteriors") {
+            // Regular object, skip "posteriors" tree
+            outFile->cd();
+            obj->Write();
+        }
+    }
+
     // Clone the tree structure
     outFile->cd();
     std::unique_ptr<TTree> outTree(inTree->CloneTree(0));
     
+
+
     // Set up parameter reading
     std::map<std::string, double> paramValues;
     for (const auto& rwConfig : reweightConfigs) {
