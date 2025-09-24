@@ -71,10 +71,10 @@ void FPGACalcSplineWeights(short *SplineSegments,
         coeffs[icoeff] = coeff_many_host[CurrentKnotPos+icoeff];
 
         }
-        const float fA = coeffs[CurrentKnotPos];
-        const float fB = coeffs[CurrentKnotPos + 1];
-        const float fC = coeffs[CurrentKnotPos + 2];
-        const float fD = coeffs[CurrentKnotPos + 3];
+        const float fA = coeffs[0];
+        const float fB = coeffs[1];
+        const float fC = coeffs[2];
+        const float fD = coeffs[3];
         const float dx = paramvalues_bram[Param] - coeff_x_host[segment_X];
 
         bool success = false;
