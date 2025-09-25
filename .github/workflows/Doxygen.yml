@@ -9,7 +9,7 @@ on:
   # Triggers the workflow on push or pull request events 
   # but only for the develop branch
   push:
-    branches: [develop]
+    branches: [develop, feature/kskwarczynski/DoxyfileMath]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -23,6 +23,9 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
+    container:
+      image: ghcr.io/mach3-software/mach3:alma9latest
+
     permissions:
       contents: write
       id-token: write
@@ -34,26 +37,27 @@ jobs:
       # so your job can access it
       - uses: actions/checkout@v5
       
-      # Updates the package list to ensure you get the latest version of packages
-      - run: sudo apt-get update
-
       # Installs texlive for LaTeX support in Doxygen documentation
-      - run: sudo apt-get install -y texlive
+      - run: dnf install -y texlive-scheme-basic texlive-latex
 
       # Installs libjs-mathjax for rendering mathematical notation 
       # in Doxygen documentation
-      - run: sudo apt-get install -y libjs-mathjax
+      - run: dnf install -y mathjax-perl
 
       # Install perl for bibtex
-      - run: sudo apt-get install -y perl
+      - run: dnf install -y perl
+
+      # Install perl for bibtex
+      - run: dnf install -y perl
 
       # Runs a single command using the runners shell
-      - uses: DenverCoder1/doxygen-github-pages-action@v2.0.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          folder: Doc/html
-          branch: gh-pages
-          config_file: Doc/Doxyfile
+      - name: Build and generate documentation
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+          cd ..
+          doxygen Doc/Doxyfile
 
       - name: Upload Doxygen Artifact
         uses: actions/upload-artifact@v4
