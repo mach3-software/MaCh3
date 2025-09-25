@@ -1,5 +1,5 @@
-<map id="/__w/MaCh3/MaCh3/Fitters/gpuMCMCProcessorUtils.cu" name="/__w/MaCh3/MaCh3/Fitters/gpuMCMCProcessorUtils.cu">
-<area shape="rect" id="node1" title=" " alt="" coords="23,5,217,47"/>
+<map id="Fitters/gpuMCMCProcessorUtils.cu" name="Fitters/gpuMCMCProcessorUtils.cu">
+<area shape="rect" id="node1" title=" " alt="" coords="27,5,213,47"/>
 <area shape="rect" id="node2" href="$gpuMCMCProcessorUtils_8cuh.html" title=" " alt="" coords="27,95,213,136"/>
 <area shape="rect" id="node3" href="$gpuUtils_8cuh.html" title="Common CUDA utilities and definitions for shared GPU functionality." alt="" coords="45,184,195,211"/>
 <area shape="rect" id="node4" title=" " alt="" coords="5,259,67,285"/>

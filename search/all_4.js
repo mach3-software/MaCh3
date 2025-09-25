@@ -36,7 +36,7 @@ var searchData=
   ['diagmcmc_296',['DiagMCMC',['../DiagMCMC_8cpp.html#ae234755b7b483f97d2a48d8959e90a18',1,'DiagMCMC(const std::string &amp;inputFile, const std::string &amp;config):&#160;DiagMCMC.cpp'],['../SmearChain_8cpp.html#ae234755b7b483f97d2a48d8959e90a18',1,'DiagMCMC(const std::string &amp;inputFile, const std::string &amp;config):&#160;SmearChain.cpp'],['../classMCMCProcessor.html#a7f8faecae63616ba100cf24ae42ecc08',1,'MCMCProcessor::DiagMCMC()']]],
   ['diagmcmc_2ecpp_297',['DiagMCMC.cpp',['../DiagMCMC_8cpp.html',1,'']]],
   ['diagnosecovariancematrix_298',['DiagnoseCovarianceMatrix',['../ProcessMCMC_8cpp.html#a08adc262bf03d1cb8df996b39404572c',1,'ProcessMCMC.cpp']]],
-  ['diagnostic_299',['Diagnostic',['../md____w_MaCh3_MaCh3_Diagnostics_README.html',1,'']]],
+  ['diagnostic_299',['Diagnostic',['../md_Diagnostics_README.html',1,'']]],
   ['dimensionlabels_300',['DimensionLabels',['../classBinnedSplineHandler.html#aa3db668a55f3d3356f63cb055819b2b0',1,'BinnedSplineHandler']]],
   ['dimensions_301',['Dimensions',['../classBinnedSplineHandler.html#a8824387f90bd051b370bebd843691b83',1,'BinnedSplineHandler']]],
   ['dir_302',['Dir',['../classSampleSummary.html#aa2064e7455c3164ee5118a5e5162f282',1,'SampleSummary']]],

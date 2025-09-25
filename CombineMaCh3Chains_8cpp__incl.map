@@ -1,5 +1,5 @@
-<map id="/__w/MaCh3/MaCh3/Diagnostics/CombineMaCh3Chains.cpp" name="/__w/MaCh3/MaCh3/Diagnostics/CombineMaCh3Chains.cpp">
-<area shape="rect" id="node1" title="Combine chains files produced by MCMC, enforcing the condition that all the files to combine were mad..." alt="" coords="1661,5,1876,47"/>
+<map id="Diagnostics/CombineMaCh3Chains.cpp" name="Diagnostics/CombineMaCh3Chains.cpp">
+<area shape="rect" id="node1" title="Combine chains files produced by MCMC, enforcing the condition that all the files to combine were mad..." alt="" coords="1674,5,1863,47"/>
 <area shape="rect" id="node2" title=" " alt="" coords="5,95,73,121"/>
 <area shape="rect" id="node3" href="$Manager_8h.html" title=" " alt="" coords="1296,95,1433,121"/>
 <area shape="rect" id="node4" href="$SampleStructs_8h.html" title=" " alt="" coords="1759,244,1933,271"/>

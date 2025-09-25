@@ -71,7 +71,7 @@ var searchData=
   ['plotmatrix_1252',['PlotMatrix',['../MatrixPlotter_8cpp.html#ad0e6272bb78644580f1890f90fd521f7',1,'MatrixPlotter.cpp']]],
   ['plotmcmcdiag_2ecpp_1253',['PlotMCMCDiag.cpp',['../PlotMCMCDiag_8cpp.html',1,'']]],
   ['plotrelativetoprior_1254',['plotRelativeToPrior',['../classMCMCProcessor.html#afbac2a114c15ca7db4abe71dd549504c',1,'MCMCProcessor']]],
-  ['plotting_1255',['Plotting',['../md____w_MaCh3_MaCh3_Plotting_README.html',1,'']]],
+  ['plotting_1255',['Plotting',['../md_Plotting_README.html',1,'']]],
   ['plotting_20utility_20functions_1256',['Plotting Utility Functions',['../group__Utils.html',1,'']]],
   ['plotting_2ecpp_1257',['plotting.cpp',['../plotting_8cpp.html',1,'']]],
   ['plottingmanager_1258',['PlottingManager',['../classMaCh3Plotting_1_1PlottingManager.html',1,'MaCh3Plotting::PlottingManager'],['../classMaCh3Plotting_1_1PlottingManager.html#a28c0b6e9ba8e0b09b0cffc09801d1e69',1,'MaCh3Plotting::PlottingManager::PlottingManager(const std::string &amp;PlottingConfigName)'],['../classMaCh3Plotting_1_1PlottingManager.html#aa94590f322dcf7cd1130d8165378c7f5',1,'MaCh3Plotting::PlottingManager::PlottingManager()']]],

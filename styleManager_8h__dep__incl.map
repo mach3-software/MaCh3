@@ -1,10 +1,10 @@
-<map id="/__w/MaCh3/MaCh3/Plotting/plottingUtils/styleManager.h" name="/__w/MaCh3/MaCh3/Plotting/plottingUtils/styleManager.h">
-<area shape="rect" id="node1" title=" " alt="" coords="787,5,977,47"/>
-<area shape="rect" id="node2" href="$plottingManager_8h.html" title=" " alt="" coords="542,95,745,136"/>
-<area shape="rect" id="node7" href="$plotting_8cpp.html" title=" " alt="" coords="891,184,1076,225"/>
-<area shape="rect" id="node8" href="$styleManager_8cpp.html" title=" " alt="" coords="919,95,1122,136"/>
-<area shape="rect" id="node3" href="$GetPostfitParamPlots_8cpp.html" title=" " alt="" coords="5,184,196,225"/>
-<area shape="rect" id="node4" href="$MatrixPlotter_8cpp.html" title=" " alt="" coords="220,184,411,225"/>
-<area shape="rect" id="node5" href="$PlotLLH_8cpp.html" title=" " alt="" coords="435,184,625,225"/>
-<area shape="rect" id="node6" href="$plottingManager_8cpp.html" title=" " alt="" coords="650,184,866,225"/>
+<map id="Plotting/plottingUtils/styleManager.h" name="Plotting/plottingUtils/styleManager.h">
+<area shape="rect" id="node1" title=" " alt="" coords="663,5,802,47"/>
+<area shape="rect" id="node2" href="$plottingManager_8h.html" title=" " alt="" coords="446,95,585,136"/>
+<area shape="rect" id="node7" href="$plotting_8cpp.html" title=" " alt="" coords="723,191,855,218"/>
+<area shape="rect" id="node8" href="$styleManager_8cpp.html" title=" " alt="" coords="770,95,909,136"/>
+<area shape="rect" id="node3" href="$GetPostfitParamPlots_8cpp.html" title=" " alt="" coords="5,184,172,225"/>
+<area shape="rect" id="node4" href="$MatrixPlotter_8cpp.html" title=" " alt="" coords="196,191,365,218"/>
+<area shape="rect" id="node5" href="$PlotLLH_8cpp.html" title=" " alt="" coords="389,191,532,218"/>
+<area shape="rect" id="node6" href="$plottingManager_8cpp.html" title=" " alt="" coords="556,184,699,225"/>
 </map>
