@@ -1,23 +1,23 @@
 <map id="ParameterHandlerGeneric" name="ParameterHandlerGeneric">
-<area shape="rect" id="node1" title="Class responsible for handling of systematic error parameters with different types defined in the con..." alt="" coords="1125,446,1316,471"/>
-<area shape="rect" id="node2" href="$classParameterHandlerBase.html" title="Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada..." alt="" coords="671,310,843,335"/>
-<area shape="rect" id="node3" title=" " alt="" coords="271,21,358,46"/>
-<area shape="rect" id="node4" title=" " alt="" coords="5,13,144,53"/>
-<area shape="rect" id="node5" title=" " alt="" coords="227,83,402,123"/>
-<area shape="rect" id="node6" title=" " alt="" coords="225,312,404,352"/>
-<area shape="rect" id="node7" title=" " alt="" coords="221,147,408,173"/>
-<area shape="rect" id="node8" title=" " alt="" coords="232,499,397,525"/>
-<area shape="rect" id="node9" title=" " alt="" coords="240,549,389,574"/>
-<area shape="rect" id="node10" title=" " alt="" coords="227,599,402,639"/>
-<area shape="rect" id="node11" title=" " alt="" coords="201,663,428,689"/>
-<area shape="rect" id="node12" title=" " alt="" coords="193,713,436,753"/>
-<area shape="rect" id="node13" title=" " alt="" coords="214,197,415,237"/>
-<area shape="rect" id="node14" title=" " alt="" coords="245,262,384,287"/>
-<area shape="rect" id="node15" title=" " alt="" coords="233,376,396,416"/>
-<area shape="rect" id="node16" title=" " alt="" coords="667,359,846,385"/>
-<area shape="rect" id="node17" title=" " alt="" coords="675,409,838,449"/>
-<area shape="rect" id="node18" title=" " alt="" coords="643,474,871,499"/>
-<area shape="rect" id="node19" title=" " alt="" coords="645,523,869,549"/>
-<area shape="rect" id="node20" title=" " alt="" coords="629,573,884,598"/>
-<area shape="rect" id="node21" title=" " alt="" coords="669,623,844,663"/>
+<area shape="rect" id="node1" title="Class responsible for handling of systematic error parameters with different types defined in the con..." alt="" coords="1035,947,1207,973"/>
+<area shape="rect" id="node2" href="$classParameterHandlerBase.html" title="Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada..." alt="" coords="619,472,776,499"/>
+<area shape="rect" id="node3" title=" " alt="" coords="181,162,403,203"/>
+<area shape="rect" id="node4" title=" " alt="" coords="190,228,394,255"/>
+<area shape="rect" id="node5" title=" " alt="" coords="202,279,382,321"/>
+<area shape="rect" id="node6" title=" " alt="" coords="214,345,370,386"/>
+<area shape="rect" id="node7" title=" " alt="" coords="214,410,370,451"/>
+<area shape="rect" id="node8" title=" " alt="" coords="221,475,363,517"/>
+<area shape="rect" id="node9" title=" " alt="" coords="252,541,332,568"/>
+<area shape="rect" id="node10" title=" " alt="" coords="5,534,132,575"/>
+<area shape="rect" id="node11" title=" " alt="" coords="231,592,353,619"/>
+<area shape="rect" id="node12" title=" " alt="" coords="213,643,371,685"/>
+<area shape="rect" id="node13" title=" " alt="" coords="227,709,357,736"/>
+<area shape="rect" id="node14" title=" " alt="" coords="209,773,375,800"/>
+<area shape="rect" id="node15" title=" " alt="" coords="219,111,365,137"/>
+<area shape="rect" id="node16" title=" " alt="" coords="624,855,771,897"/>
+<area shape="rect" id="node17" title=" " alt="" coords="617,921,778,948"/>
+<area shape="rect" id="node18" title=" " alt="" coords="598,972,797,999"/>
+<area shape="rect" id="node19" title=" " alt="" coords="584,1023,811,1049"/>
+<area shape="rect" id="node20" title=" " alt="" coords="596,1073,799,1100"/>
+<area shape="rect" id="node21" title=" " alt="" coords="619,1125,775,1166"/>
 </map>
