@@ -42,13 +42,13 @@ jobs:
 
       # Installs libjs-mathjax for rendering mathematical notation 
       # in Doxygen documentation
-      - run: dnf install -y mathjax-perl
+      - run: dnf install -y mathjax
 
       # Install perl for bibtex
       - run: dnf install -y perl
 
-      # Install perl for bibtex
-      - run: dnf install -y perl
+        # Install doxgyen
+      - run: dnf install -y doxygen
 
       # Runs a single command using the runners shell
       - name: Build and generate documentation
