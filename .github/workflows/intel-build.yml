@@ -1,0 +1,27 @@
+# .github/workflows/intel-build.yml
+
+name: 'Intel ICPX Build'
+
+# Trigger on a push to the 'intel_icpx' branch
+on:
+  push:
+    branches:
+      - intel_icpx
+
+jobs:
+  run-local-script:
+    # Whitelist of allowed GitHub users
+    if: github.actor == 'laurilaatu' || github.actor == 'alexanderrichards' || github.actor == 'EdAtkin'
+
+    runs-on: [self-hosted, icpx]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Run the ICPX build script
+        run: |
+          chmod +x /home/llaatu/mach3/MaCh3Tutorial/start_build.sh
+          
+          /home/llaatu/mach3/MaCh3Tutorial/start_build.sh emulator
+        shell: bash
