@@ -162,9 +162,14 @@ void OscProcessor::PerformJarlskogAnalysis() {
   if (Config != nullptr) {
     YAML::Node Settings = TMacroToYAML(*Config);
     if(CheckNodeExists(Settings, "Weight", Sin2Theta13Name)) {
+      if(Settings["ReweightType"].as<std::string>() == "Gaussian") {
       Sin13_NewPrior = Get<std::pair<double, double>>(Settings["Weight"][Sin2Theta13Name], __FILE__, __LINE__);
       MACH3LOG_INFO("Found Weight in chain, using RC reweighting with new priors {} +- {}", Sin13_NewPrior.first, Sin13_NewPrior.second);
       DoReweight = true;
+      } else {
+        MACH3LOG_ERROR("ReweightType {} not supported for Jarlskog reweighting", Settings["ReweightType"].as<std::string>());
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
     }
   }
 
