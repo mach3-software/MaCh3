@@ -21,7 +21,14 @@ jobs:
 
       - name: Run the ICPX build script
         run: |
-          chmod +x /home/hep/llaatu/mach3/MaCh3Tutorial/start_build.sh
+
+          chmod +x /home/hep/llaatu/mach3/MaCh3Utils/start_build.sh
           
-          /home/hep/llaatu/mach3/MaCh3Tutorial/start_build.sh emulator
+          /home/hep/llaatu/mach3/MaCh3Utils/start_build.sh emulator /home/hep/llaatu/actions-runner/_work/MaCh3/MaCh3/
+
+          chmod +x /home/hep/llaatu/mach3/MaCh3Utils/tutorial_build.sh
+          
+          source /home/hep/llaatu/actions-runner/_work/MaCh3/MaCh3/build/bin/setup.MaCh3.sh
+
+          /home/hep/llaatu/mach3/MaCh3Utils/tutorial_build.sh emulator
         shell: bash
