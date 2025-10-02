@@ -53,3 +53,35 @@ jobs:
           cd /home/hep/llaatu/mach3/MaCh3Tutorial/build/
           ./CIValidations/SplineValidations
         shell: bash
+
+
+      - name: Build for hardware
+        run: |
+
+          chmod +x /home/hep/llaatu/mach3/MaCh3Utils/start_build.sh
+          
+          /home/hep/llaatu/mach3/MaCh3Utils/start_build.sh hardware /home/hep/llaatu/gh-runner/_work/MaCh3/MaCh3/
+
+          chmod +x /home/hep/llaatu/mach3/MaCh3Utils/tutorial_build.sh
+          
+          source /home/hep/llaatu/gh-runner/_work/MaCh3/MaCh3/build/bin/setup.MaCh3.sh
+
+          /home/hep/llaatu/mach3/MaCh3Utils/tutorial_build.sh hardware
+
+
+
+        shell: bash
+
+
+      - name: Run Tutorial on hardware
+        run: |
+          export QUARTUS_ROOTDIR_OVERRIDE=/opt/intelFPGA_pro/23.1.0/quartus/
+          export LM_LICENSE_FILE=5280@licsrv00.hep.ph.ic.ac.uk
+
+          . /opt/intel/oneapi/2025.0/oneapi-vars.sh --force
+
+          source /home/hep/llaatu/gh-runner/_work/MaCh3/MaCh3/build/bin/setup.MaCh3.sh
+
+          cd /home/hep/llaatu/mach3/MaCh3Tutorial/build/
+          ./CIValidations/SplineValidations
+        shell: bash        
