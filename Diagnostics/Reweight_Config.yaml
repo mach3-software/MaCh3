@@ -11,7 +11,7 @@
   
 # Combined theta13 and deltaCP constraint
 ReweightMCMC:
-  DayaBay2DConstraint:
+  Weight:
     ReweightName: "DayaBay theta13-delm2_23 Constraint"
     ReweightDim: 2
     ReweightVar: ["delm2_23","sin2th_13"] # must match TTree branch names, given in X,Y order of the TGraph2D
