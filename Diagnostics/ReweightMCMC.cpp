@@ -437,7 +437,17 @@ void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
     // Write and close
     outFile->cd();
     outTree->Write();
+
+    // once we have finished the reweight save its configuration (reweightConfigNode) to the root file as a macro 
     
+    TMacro reweightMacro;
+    reweightMacro.SetName("Reweight_Config");
+    reweightMacro.SetTitle("ReweightMCMC configuration");
+    std::stringstream ss;
+    ss << reweight_settings;
+    reweightMacro.AddLine(ss.str().c_str());
+    reweightMacro.Write();
+
     MACH3LOG_INFO("Reweighting completed successfully!");
     MACH3LOG_INFO("Final reweighted file is: {}", outputFile);
 }
