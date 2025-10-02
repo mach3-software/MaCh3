@@ -79,7 +79,8 @@ jobs:
           export LM_LICENSE_FILE=5280@licsrv00.hep.ph.ic.ac.uk
 
           . /opt/intel/oneapi/2025.0/oneapi-vars.sh --force
-
+          aocl program acl0 /opt/oneapi-asp/ia840f/bringup/aocxs/ofs_ia840f_usm.aocx
+          aocl program acl1 /opt/oneapi-asp/ia840f/bringup/aocxs/ofs_ia840f_usm.aocx
           source /home/hep/llaatu/gh-runner/_work/MaCh3/MaCh3/build/bin/setup.MaCh3.sh
 
           cd /home/hep/llaatu/mach3/MaCh3Tutorial/build/
