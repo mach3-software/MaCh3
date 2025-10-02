@@ -42,5 +42,12 @@ jobs:
 
 
       - name: Run Tutorial
-        run: /home/hep/llaatu/mach3/MaCh3Tutorial/build/CIValidations/SplineValidations
+        run: |
+          export QUARTUS_ROOTDIR_OVERRIDE=/opt/intelFPGA_pro/23.1.0/quartus/
+          export LM_LICENSE_FILE=5280@licsrv00.hep.ph.ic.ac.uk
+
+          . /opt/intel/oneapi/2025.0/oneapi-vars.sh --force
+
+
+          /home/hep/llaatu/mach3/MaCh3Tutorial/build/CIValidations/SplineValidations
         shell: bash
