@@ -123,6 +123,13 @@ void MCMCBase::PostStepProcess() {
 // Print the fit output progress
 void MCMCBase::PrintProgress() {
 // *******************
+
+    #ifdef MPIENABLED
+    // We only print from the master process
+    if (mpi_rank != 0)
+        return;
+    #endif
+    
     MACH3LOG_INFO("Step:\t{}/{}, current: {:.2f}, proposed: {:.2f}", step - stepStart, chainLength, logLCurr, logLProp);
     MACH3LOG_INFO("Accepted/Total steps: {}/{} = {:.2f}", accCount, step - stepStart, static_cast<double>(accCount) / static_cast<double>(step - stepStart));
 

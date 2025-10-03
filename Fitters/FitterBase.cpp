@@ -54,6 +54,12 @@ void FitterBase::Init(){
 #endif
 
   auto outfile = Get<std::string>(fitMan->raw()["General"]["OutputFile"], __FILE__, __LINE__);
+
+  #ifdef MPIENABLED
+  // Add rank to output file name
+  outfile = outfile.substr(0, outfile.find_last_of('.')) + "_rank" + std::to_string(mpi_rank) + outfile.substr(outfile.find_last_of('.'));
+  #endif
+
   // Save output every auto_save steps
   // you don't want this too often https://root.cern/root/html606/TTree_8cxx_source.html#l01229
   auto_save = Get<int>(fitMan->raw()["General"]["MCMC"]["AutoSave"], __FILE__, __LINE__);

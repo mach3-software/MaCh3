@@ -69,6 +69,9 @@ void DEMCMC::ProposeStep(){
         for (int p = 0; p < systematics[s]->GetNumParams(); ++p)
         {
             // Get the two other steps
+            // Now we check if it's fixed
+            if (systematics[s]->IsParameterFixed(p)) continue;
+
             double step_a = all_params[random_a * n_params + curr_step_idx[s] + p];
             double step_b = all_params[random_b * n_params + curr_step_idx[s] + p];
 
@@ -88,6 +91,7 @@ void DEMCMC::ProposeStep(){
         for (int p = 0; p < systematics[s]->GetNumParams(); ++p)
         {
             systematics[s]->SetParProp(p, transfer_vec[curr_step_idx[s] + p]);
+            systematics[s]->SpecialStepProposal();
         }
 
         // Get the likelihood from the systematics
