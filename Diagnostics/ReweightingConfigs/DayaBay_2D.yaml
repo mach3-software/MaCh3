@@ -1,0 +1,11 @@
+# Combined theta13 and deltaCP constraint
+ReweightMCMC:
+  Weight:
+    ReweightName: "DayaBay theta13-delm2_23 Constraint"
+    ReweightDim: 2
+    ReweightVar: ["delm2_23","sin2th_13"] # must match TTree branch names, given in X,Y order of the TGraph2D
+    ReweightType: "TGraph2D"
+    ReweightPrior: 
+      file: "/home/ppe/d/driley/DayaBay_new/MaCh3/utils/reweighting/reactor_constraint_2D/chi_sq_processing/DayaBay_2DConstraint.root"
+      graph_name: "DayaBay_2DGraph"
+      # hierarchy: # "NO","IO"   ---  optional, only needed if file contains a single hierarchy to be reweighted

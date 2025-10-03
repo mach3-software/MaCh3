@@ -305,7 +305,7 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
     }
     
     // Create output file
-    std::string outputFile = inputFile.substr(0, inputFile.find_last_of('.')) + "_reweighted.root";
+    std::string outputFile = inputFile.substr(0, inputFile.find_last_of('.')) + "_reweighted_" + configFile.substr(0, configFile.find_last_of('.')) + ".root";
     auto outFile = std::unique_ptr<TFile>(TFile::Open(outputFile.c_str(), "RECREATE"));
     if (!outFile || outFile->IsZombie()) {
         MACH3LOG_ERROR("Cannot create output file: {}", outputFile);
