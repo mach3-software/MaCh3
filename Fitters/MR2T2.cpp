@@ -7,12 +7,6 @@ MR2T2::MR2T2(manager *man) : MCMCBase(man) {
     AlgorithmName = "MR2T2";
 }
 
-#ifdef MPIENABLED
-MR2T2::MR2T2(manager *const man, int mpi_rank_) : MCMCBase(man, mpi_rank_) {
-    AlgorithmName = "MR2T2";
-}
-#endif
-
 // *******************
 void MR2T2::DoStep() {
 // *******************

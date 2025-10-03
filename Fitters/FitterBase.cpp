@@ -15,19 +15,16 @@ _MaCh3_Safe_Include_End_ //}
 // Now we can dump manager settings to the output file
 FitterBase::FitterBase(manager * const man) : fitMan(man) {
 // *************************
-  Init();
-}
-
-
-#ifdef MPIENABLED
-FitterBase::FitterBase(manager * const man, int mpi_rank_) : fitMan(man), mpi_rank(mpi_rank_) {
+  #ifdef MPIENABLED
   /// Get number of processes
   MPI_Comm_size(MPI_COMM_WORLD, &n_procs);
+  /// Get MPI rank
+  MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
   /// Set up MPI
   MACH3LOG_INFO("Initialising fitter with MPI rank {}", mpi_rank);
+  #endif
   Init();
 }
-#endif
 
 // *************************
 // Destructor: close the logger and output file

@@ -11,10 +11,6 @@ class MCMCBase : public FitterBase {
     /// @param fitMan A pointer to a manager object, which will handle all settings.
     MCMCBase(manager * const fitMan);
 
-   #ifdef MPIENABLED
-   MCMCBase(manager *const man, int mpi_rank_);
-   #endif
-
     /// @brief Destructor
     virtual ~MCMCBase() = default;
 

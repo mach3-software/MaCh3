@@ -8,12 +8,6 @@ MCMCBase::MCMCBase(manager *man) : FitterBase(man) {
     Init();
 }
 
-#ifdef MPIENABLED
-MCMCBase::MCMCBase(manager *const man, int mpi_rank_) : FitterBase(man, mpi_rank_)
-{
-    Init();
-}
-#endif
 
 void MCMCBase::Init(){
     // Beginning step number
@@ -55,8 +49,16 @@ void MCMCBase::RunMCMC() {
     // Accept the first step to set logLCurr: this shouldn't affect the MCMC because we ignore the first N steps in burn-in
     logLCurr = logLProp;
 
+
+
     // Begin MCMC
     const auto StepEnd = stepStart + chainLength;
+
+    #ifdef MPIENABLED
+    // We send a signal to all other fitters that we are ready to start MCMC
+    MPI_Barrier(MPI_COMM_WORLD);
+    #endif
+
     for (step = stepStart; step < StepEnd; ++step)
     {
         DoMCMCStep();

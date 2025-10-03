@@ -1,31 +1,38 @@
 #include "Fitters/DEMCMC.h"
 
-DEMCMC::DEMCMC(manager *manager) : MR2T2(manager) {
-    MACH3LOG_ERROR("Using DEMCMC fitter without MPI... this is not implemented!");
-    throw MaCh3Exception(__FILE__, __LINE__);
-}
 
-
-#ifdef MPIENABLED
-DEMCMC::DEMCMC(manager *const manager, int mpi_rank_) : MR2T2(manager, mpi_rank_) {
+DEMCMC::DEMCMC(manager *const manager) : MR2T2(manager) {
+    #ifdef MPIENABLED
     MACH3LOG_INFO("Using DEMCMC fitter");
 
     // Get the gamma parameter
     gamma = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["Lambda"], 1.0);
-
+    
     // Gaussian with tiny variance
     scaling_matrix = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["ScalingMatrix"], 1e-6);
+    #else
+    MACH3LOG_ERROR("Using DEMCMC fitter without MPI... this is not implemented!");
+    throw MaCh3Exception(__FILE__, __LINE__);
+    #endif
 }
-#endif
 
+#ifdef MPIENABLED
 void DEMCMC::RunMCMC()
 {
-    curr_step = std::vector<std::vector<double>>(systematics.size());
+    curr_step_idx = std::vector<int>(systematics.size());
     // We can now loop over systs to assign the right amount of memory
+    int idx = 0;
     for(size_t s=0; s < systematics.size(); ++s){
-        curr_step[s] = std::vector<double>(systematics[s]->GetNumParams(), 0.0);
-    }
+        curr_step_idx[s] = idx;
+        for(int p = 0; p < systematics[s]->GetNumParams(); ++p){
+            transfer_vec.push_back(0.0);
+        }
 
+        idx += systematics[s]->GetNumParams();
+    }
+    n_params = static_cast<int>(transfer_vec.size());
+
+    all_params = std::vector<double>(n_params * n_procs);
     MR2T2::RunMCMC();
 }
 
@@ -38,49 +45,40 @@ void DEMCMC::ProposeStep(){
         systematics[s]->ProposeStep();
         for (int p = 0; p < systematics[s]->GetNumParams(); ++p)
         {
-            curr_step[s][p] = systematics[s]->GetParProp(p);
+            transfer_vec[curr_step_idx[s] + p] = systematics[s]->GetParProp(p);
         }
     }
 
-    // We send a signal to all other fitters that we are ready to do a DEMCMC step
-    // We then wait for all other fitters to be ready
-    #ifdef MPIENABLED
+    // Gather all parameters from all processes
+    MPI_Allgather(transfer_vec.data(), n_params, MPI_DOUBLE,
+                  all_params.data(), n_params, MPI_DOUBLE,
+                  MPI_COMM_WORLD);
+
     MPI_Barrier(MPI_COMM_WORLD);
-    #endif
 
     // NOW we select two fitters from our fitter vector
-    int random_a = random->Integer(GetNFitters());
-    int random_b = random->Integer(GetNFitters());
+    int random_a = random->Integer(n_procs);
+    int random_b = random->Integer(n_procs);
     // A bit dodgy but we want to make sure we don't pick the same fitter twice
     while(random_b == random_a){
-        random_b = random->Integer(GetNFitters());
+        random_b = random->Integer(n_procs);
     }
 
 
     for (size_t s = 0; s < systematics.size(); ++s){
-        auto a_vec = connectedFitters[random_a]->GetSystObjs()[s]->GetParPropVec();
-        auto b_vec = connectedFitters[random_b]->GetSystObjs()[s]->GetParPropVec();
-        if(a_vec.size() != b_vec.size()){
-            MACH3LOG_ERROR("Connected fitters have different number of parameters this should not happen");
-            throw MaCh3Exception(__FILE__, __LINE__);
-        }
-
-
         for (int p = 0; p < systematics[s]->GetNumParams(); ++p)
         {
             // Get the two other steps
-            double step_a = connectedFitters[random_a]->GetSystObjs()[s]->GetParProp(p);
-            double step_b = connectedFitters[random_b]->GetSystObjs()[s]->GetParProp(p);
+            double step_a = all_params[random_a * n_params + curr_step_idx[s] + p];
+            double step_b = all_params[random_b * n_params + curr_step_idx[s] + p];
 
             // Now do the DEMCMC step
             double perturbation = random->Gaus(0, scaling_matrix);
-            curr_step[s][p] += gamma * (step_a - step_b) + perturbation;
+            transfer_vec[curr_step_idx[s] + p] += gamma * (step_a - step_b) + perturbation;
         }
     }
     /// We now have everything we need to do the DEMCMC step so we need to wait
-    #ifdef MPIENABLED
     MPI_Barrier(MPI_COMM_WORLD);
-    #endif
 
     // Final loop
     double llh = 0.0;
@@ -89,16 +87,16 @@ void DEMCMC::ProposeStep(){
         // Set the proposed step
         for (int p = 0; p < systematics[s]->GetNumParams(); ++p)
         {
-            systematics[s]->SetParProp(p, curr_step[s][p]);
+            systematics[s]->SetParProp(p, transfer_vec[curr_step_idx[s] + p]);
         }
 
         // Get the likelihood from the systematics
         syst_llh[s] = systematics[s]->GetLikelihood();
         llh += syst_llh[s];
-        #ifdef DEBUG
+#ifdef DEBUG
                 if (debug)
                     debugFile << "LLH after " << systematics[s]->GetName() << " " << llh << std::endl;
-        #endif
+#endif
             
     }
 
@@ -154,3 +152,9 @@ void DEMCMC::ProposeStep(){
     // Save the proposed likelihood (class member)
     logLProp = llh;
 }
+#else
+void DEMCMC::ProposeStep(){
+    MACH3LOG_ERROR("Using DEMCMC fitter without MPI... this is not implemented!");
+    throw MaCh3Exception(__FILE__, __LINE__);
+}
+#endif

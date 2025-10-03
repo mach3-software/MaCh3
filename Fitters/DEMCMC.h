@@ -31,10 +31,6 @@ class DEMCMC : public MR2T2 {
     /// @param fitMan A pointer to a manager object, which will handle all settings.
     DEMCMC(manager *manager);
    
-   #ifdef MPIENABLED
-   DEMCMC(manager *const manager, int mpi_rank);
-   #endif
-
     /// @brief Destructor
     virtual ~DEMCMC() = default;
  protected:
@@ -47,5 +43,8 @@ class DEMCMC : public MR2T2 {
 
    double gamma;
    double scaling_matrix;
-   std::vector<std::vector<double>> curr_step;
+   int n_params;
+   std::vector<int> curr_step_idx;
+   std::vector<double> transfer_vec;
+   std::vector<double> all_params;
 };

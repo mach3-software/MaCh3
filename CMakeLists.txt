@@ -206,14 +206,15 @@ if(MaCh3_MULTITHREAD_ENABLED)
 endif()
 
 if(MaCh3_MPI_ENABLED)
-  find_package(MPI REQUIRED)
+  find_package(MPI REQUIRED COMPONENTS CXX)
   if(MPI_CXX_FOUND)
-    message(STATUS "MPI found. Adding MPI support.")
+    cmessage(STATUS "MPI found. Adding MPI support.")
+    cmessage(STATUS "MPI CXX Compiler: ${MPI_CXX_COMPILER}")
+    cmessage(STATUS "MPI CXX Version: ${MPI_CXX_VERSION}")
     target_link_libraries(MaCh3CompilerOptions INTERFACE MPI::MPI_CXX)
-    target_include_directories(MaCh3CompilerOptions INTERFACE ${MPI_CXX_INCLUDE_PATH})
     target_compile_definitions(MaCh3CompileDefinitions INTERFACE MPIENABLED)
   else()
-    message(FATAL_ERROR "MPI requested but MPI C++ compiler not found!")
+    cmessage(FATAL_ERROR "MPI requested but MPI C++ compiler not found!")
   endif()
 endif()
 
@@ -259,7 +260,7 @@ LIST(APPEND ALL_FEATURES
   MULTITHREAD
   GPU
   PYTHON
-  MPIENABLED
+  MPI
   LOW_MEMORY_STRUCTS
   Oscillator
   Fitter

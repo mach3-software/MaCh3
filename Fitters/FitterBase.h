@@ -30,13 +30,6 @@ class FitterBase {
   /// @param fitMan A pointer to a manager object, which will handle all settings.
   FitterBase(manager * const fitMan);
 
-  #ifdef MPIENABLED
-  /// @brief Constructor with MPI rank
-  /// @param fitMan A pointer to a manager object, which will handle all settings.
-  /// @param mpi_rank The MPI rank of the current process.
-  FitterBase(manager *const fitMan, int mpi_rank_);
-  #endif
-
   /// @brief Destructor for the FitterBase class.
   virtual ~FitterBase();
 
@@ -87,7 +80,8 @@ class FitterBase {
 
   /// @brief Get name of class
   inline std::string GetName() const {return AlgorithmName;};
- protected:
+  
+protected:
   /// @brief Initialise
   void Init();
 
@@ -191,16 +185,7 @@ class FitterBase {
   /// Name of fitting algorithm that is being used
   std::string AlgorithmName;
 
-  /// MPI rank
-  std::vector<FitterBase*> connectedFitters;
-  void ConnectFitter(FitterBase* fitter){
-    connectedFitters.push_back(fitter);
-  }
-
-  int GetNFitters(){
-    return static_cast<int>(connectedFitters.size());
-  }
-  
+  /// MPI rank  
   #ifdef MPIENABLED
   int mpi_rank;
   int n_procs;
