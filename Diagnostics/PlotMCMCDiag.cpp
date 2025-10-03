@@ -565,6 +565,11 @@ void PlotAverageACMult(std::vector<TString> input_files,
 
 int main(int argc, char *argv[])
 {
+  #ifdef MPIENABLED
+    MPI_Init(&argc, &argv);
+  #endif
+
+
   SetMaCh3LoggerFormat();
   if (argc != 3 && argc != 5 && argc != 7 && argc != 9)
   {
@@ -598,5 +603,9 @@ int main(int argc, char *argv[])
     PlotAutoCorr(argv[1], argv[2], argv[3], argv[4], argv[5], argv[6], argv[7], argv[8]);
     PlotAverageACMult({argv[1], argv[3], argv[5], argv[7]}, {argv[2], argv[4], argv[6], argv[8]}, Form("%s_Average_Auto_Corr", argv[2]), true);
   }
+#ifdef MPIENABLED
+  MPI_Finalize();
+#endif
+
   return 0;
 }

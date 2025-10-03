@@ -6,10 +6,10 @@ DEMCMC::DEMCMC(manager *const manager) : MR2T2(manager) {
     MACH3LOG_INFO("Using DEMCMC fitter");
 
     // Get the gamma parameter
-    gamma = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["Lambda"], 1.0);
+    gamma = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["Lambda"], -1.0);
     
     // Gaussian with tiny variance
-    scaling_matrix = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["ScalingMatrix"], 1e-6);
+    scaling_matrix = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["ScalingMatrix"], 1e-5);
     #else
     MACH3LOG_ERROR("Using DEMCMC fitter without MPI... this is not implemented!");
     throw MaCh3Exception(__FILE__, __LINE__);
@@ -33,6 +33,13 @@ void DEMCMC::RunMCMC()
     n_params = static_cast<int>(transfer_vec.size());
 
     all_params = std::vector<double>(n_params * n_procs);
+
+    if(gamma<0){
+        gamma = 2.38 / std::sqrt(2*n_params);
+    }
+
+    MACH3LOG_INFO("Running DEMCMC with g={} and g={}", gamma, scaling_matrix);
+
     MR2T2::RunMCMC();
 }
 
@@ -42,10 +49,9 @@ void DEMCMC::ProposeStep(){
     {
         // Could throw the initial value here to do MCMC stability studies
         // Propose the steps for the systematics
-        systematics[s]->ProposeStep();
         for (int p = 0; p < systematics[s]->GetNumParams(); ++p)
         {
-            transfer_vec[curr_step_idx[s] + p] = systematics[s]->GetParProp(p);
+            transfer_vec[curr_step_idx[s] + p] = systematics[s]->GetParCurr(p);
         }
     }
 
@@ -58,9 +64,15 @@ void DEMCMC::ProposeStep(){
 
     // NOW we select two fitters from our fitter vector
     int random_a = random->Integer(n_procs);
+    while (random_a == mpi_rank)
+    {
+        random_a = random->Integer(n_procs);
+    }
+    
+
     int random_b = random->Integer(n_procs);
     // A bit dodgy but we want to make sure we don't pick the same fitter twice
-    while(random_b == random_a){
+    while(random_b == random_a or random_b == mpi_rank){
         random_b = random->Integer(n_procs);
     }
 
@@ -79,6 +91,7 @@ void DEMCMC::ProposeStep(){
             double perturbation = random->Gaus(0, scaling_matrix);
             transfer_vec[curr_step_idx[s] + p] += gamma * (step_a - step_b) + perturbation;
         }
+        // systematics[s]->SpecialStepProposal();
     }
     /// We now have everything we need to do the DEMCMC step so we need to wait
     MPI_Barrier(MPI_COMM_WORLD);
@@ -91,7 +104,6 @@ void DEMCMC::ProposeStep(){
         for (int p = 0; p < systematics[s]->GetNumParams(); ++p)
         {
             systematics[s]->SetParProp(p, transfer_vec[curr_step_idx[s] + p]);
-            systematics[s]->SpecialStepProposal();
         }
 
         // Get the likelihood from the systematics
@@ -123,13 +135,21 @@ void DEMCMC::ProposeStep(){
         // Could multi-thread this
         // But since sample reweight is multi-threaded it's probably better to do that
         for (size_t i = 0; i < samples.size(); ++i)
-        {
-            samples[i]->Reweight();
+        {   
+            try{
+                samples[i]->Reweight();
+            }
+            catch(...){
+                out_of_bounds = true;
+                llh = M3::_LARGE_LOGL_;
+                break;
+            }
         }
 
         // DB for atmospheric event by event sample migration, need to fully reweight all samples to allow event passing prior to likelihood evaluation
         for (size_t i = 0; i < samples.size(); ++i)
         {
+            if(out_of_bounds) break;
             // Get the sample likelihoods and add them
             sample_llh[i] = samples[i]->GetLikelihood();
             llh += sample_llh[i];

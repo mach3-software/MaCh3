@@ -7,6 +7,10 @@
 #include <string>
 #include <exception>
 
+#ifdef MPIENABLED
+#include <mpi.h>
+#endif
+
 // MaCh3 Includes
 #include "Manager/Core.h"
 
@@ -58,6 +62,20 @@ inline void SetMaCh3LoggerFormat()
   #else
   //spdlog::set_pattern("[%H:%M:%S][%s][%^%l%$] %v");
   spdlog::set_pattern("[%s][%^%l%$] %v");
+  #endif
+
+  #ifdef MPIENABLED
+  // We only want to log for the FIRST process
+  int mpi_rank = 0;
+
+  // Do we actually have an MPI job running?
+  
+
+  MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
+  if (mpi_rank != 0) {
+    spdlog::set_level(spdlog::level::off);
+    return;
+  }
   #endif
 
   spdlog::set_level(get_default_log_level());

@@ -386,9 +386,17 @@ void ParseArg(int argc, char *argv[]){
 
 int main(int argc, char *argv[])
 {
+#ifdef MPIENABLED
+  MPI_Init(&argc, &argv);
+#endif
+
   SetMaCh3LoggerFormat();
   MaCh3Utils::MaCh3Welcome();
   ParseArg(argc, argv);
   CombineChain();
+#ifdef MPIENABLED
+  MPI_Finalize();
+#endif
+
   return 0;
 }

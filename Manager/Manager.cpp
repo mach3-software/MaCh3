@@ -31,6 +31,13 @@ void manager::Initialise() {
 
   MACH3LOG_INFO("Setting config to be: {}", FileName);
 
+  #ifdef MPIENABLED
+  // Print out MPI information
+  int total_processes = 0;
+  MPI_Comm_size(MPI_COMM_WORLD, &total_processes);
+  MACH3LOG_INFO("Starting MaCh3 with MPI support, total processes: {}", total_processes);
+  #endif
+
   MACH3LOG_INFO("Config is now: ");
   MaCh3Utils::PrintConfig(config);
 }

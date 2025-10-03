@@ -81,6 +81,10 @@ void CapVariable(double var, double cap);
 // *******************
 int main(int argc, char *argv[]) {
 // *******************
+#ifdef MPIENABLED
+  MPI_Init(&argc, &argv);
+#endif
+
 
   SetMaCh3LoggerFormat();
   MaCh3Utils::MaCh3Welcome();
@@ -152,6 +156,9 @@ int main(int argc, char *argv[]) {
   SaveResults();
 
   DestroyArrays();
+#ifdef MPIENABLED
+  MPI_Finalize();
+#endif
 
   return 0;
 }

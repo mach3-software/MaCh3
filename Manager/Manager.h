@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef MPIENABLED
+#include <mpi.h>
+#endif
+
 // MaCh3 Includes
 #include "Samples/SampleStructs.h"
 #include "Manager/YamlHelper.h"
