@@ -388,7 +388,7 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
     // TODO: add tracking for how many events are outside the graph ranges for diagnostics DWR
 
     for (Long64_t i = 0; i < nEntries; ++i) {
-        if(i % 10000 == 0) MaCh3Utils::PrintProgressBar(i, nEntries);
+        if(i % (nEntries/20) == 0) MaCh3Utils::PrintProgressBar(i, nEntries);
        
         inTree->GetEntry(i);
         
