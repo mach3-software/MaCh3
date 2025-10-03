@@ -71,19 +71,19 @@ int main(int argc, char *argv[])
     SetMaCh3LoggerFormat();
     
     if (argc != 3) {
-        MACH3LOG_ERROR("How to use: {} <input_file.root> <config.yaml>", argv[0]);
+        MACH3LOG_ERROR("How to use: {} <config.yaml> <input_file.root>", argv[0]);
         throw MaCh3Exception(__FILE__, __LINE__);
     }
+
+    std::string configFile = argv[1]; 
+    std::string inputFile = argv[2];
     
-    std::string inputFile = argv[1];
-    std::string configFile = argv[2];
-    
-    ReweightMCMC(inputFile, configFile);
+    ReweightMCMC(configFile, inputFile);
     
     return 0;
 }
 
-void ReweightMCMC(const std::string& inputFile, const std::string& configFile)
+void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
 {
     MACH3LOG_INFO("File for reweighting: {} with config {}", inputFile, configFile);
 
