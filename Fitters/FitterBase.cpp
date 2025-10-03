@@ -15,8 +15,33 @@ _MaCh3_Safe_Include_End_ //}
 // Now we can dump manager settings to the output file
 FitterBase::FitterBase(manager * const man) : fitMan(man) {
 // *************************
+  Init();
+}
+
+
+#ifdef MPIENABLED
+FitterBase::FitterBase(manager * const man, int mpi_rank_) : fitMan(man), mpi_rank(mpi_rank_) {
+  /// Get number of processes
+  MPI_Comm_size(MPI_COMM_WORLD, &n_procs);
+  /// Set up MPI
+  MACH3LOG_INFO("Initialising fitter with MPI rank {}", mpi_rank);
+  Init();
+}
+#endif
+
+// *************************
+// Destructor: close the logger and output file
+FitterBase::~FitterBase() {
+// *************************
+  SaveOutput();
+  if(outputFile != nullptr) delete outputFile;
+  outputFile = nullptr;
+  MACH3LOG_DEBUG("Closing MaCh3 Fitter Engine");
+}
+
+void FitterBase::Init(){
   AlgorithmName = "";
-  //Get mach3 modes from manager
+  // Get mach3 modes from manager
   random = std::make_unique<TRandom3>(Get<int>(fitMan->raw()["General"]["Seed"], __FILE__, __LINE__));
 
   // Counter of the accepted # of steps
@@ -26,21 +51,21 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
 
   clock = std::make_unique<TStopwatch>();
   stepClock = std::make_unique<TStopwatch>();
-  #ifdef DEBUG
+#ifdef DEBUG
   // Fit summary and debug info
-  debug = GetFromManager<bool>(fitMan->raw()["General"]["Debug"], false, __FILE__ , __LINE__);
-  #endif
+  debug = GetFromManager<bool>(fitMan->raw()["General"]["Debug"], false, __FILE__, __LINE__);
+#endif
 
-  auto outfile = Get<std::string>(fitMan->raw()["General"]["OutputFile"], __FILE__ , __LINE__);
+  auto outfile = Get<std::string>(fitMan->raw()["General"]["OutputFile"], __FILE__, __LINE__);
   // Save output every auto_save steps
-  //you don't want this too often https://root.cern/root/html606/TTree_8cxx_source.html#l01229
-  auto_save = Get<int>(fitMan->raw()["General"]["MCMC"]["AutoSave"], __FILE__ , __LINE__);
+  // you don't want this too often https://root.cern/root/html606/TTree_8cxx_source.html#l01229
+  auto_save = Get<int>(fitMan->raw()["General"]["MCMC"]["AutoSave"], __FILE__, __LINE__);
 
-  #ifdef MULTITHREAD
-  //KS: TODO This should help with performance when saving entries to ROOT file. I didn't have time to validate hence commented out
-  //Based on other tests it is really helpful
-  //ROOT::EnableImplicitMT();
-  #endif
+#ifdef MULTITHREAD
+// KS: TODO This should help with performance when saving entries to ROOT file. I didn't have time to validate hence commented out
+// Based on other tests it is really helpful
+// ROOT::EnableImplicitMT();
+#endif
   // Set the output file
   outputFile = M3::Open(outfile, "RECREATE", __FILE__, __LINE__);
   outputFile->cd();
@@ -53,30 +78,20 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   SettingsSaved = false;
   OutputPrepared = false;
 
-  //Create TDirectory
+  // Create TDirectory
   CovFolder = outputFile->mkdir("CovarianceFolder");
   outputFile->cd();
   SampleFolder = outputFile->mkdir("SampleFolder");
   outputFile->cd();
 
-  #ifdef DEBUG
+#ifdef DEBUG
   // Prepare the output log file
-  if (debug) debugFile.open((outfile+".log").c_str());
-  #endif
+  if (debug)
+    debugFile.open((outfile + ".log").c_str());
+#endif
 
   TotalNSamples = 0;
-  fTestLikelihood = GetFromManager<bool>(fitMan->raw()["General"]["Fitter"]["FitTestLikelihood"], false, __FILE__ , __LINE__);
-}
-
-// *************************
-// Destructor: close the logger and output file
-FitterBase::~FitterBase() {
-// *************************
-  SaveOutput();
-
-  if(outputFile != nullptr) delete outputFile;
-  outputFile = nullptr;
-  MACH3LOG_DEBUG("Closing MaCh3 Fitter Engine");
+  fTestLikelihood = GetFromManager<bool>(fitMan->raw()["General"]["Fitter"]["FitTestLikelihood"], false, __FILE__, __LINE__);
 }
 
 // *******************

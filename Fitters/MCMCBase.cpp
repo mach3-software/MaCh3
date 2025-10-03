@@ -5,6 +5,17 @@
 // Now we can dump manager settings to the output file
 MCMCBase::MCMCBase(manager *man) : FitterBase(man) {
 // *************************
+    Init();
+}
+
+#ifdef MPIENABLED
+MCMCBase::MCMCBase(manager *const man, int mpi_rank_) : FitterBase(man, mpi_rank_)
+{
+    Init();
+}
+#endif
+
+void MCMCBase::Init(){
     // Beginning step number
     stepStart = 0;
 
@@ -21,6 +32,7 @@ MCMCBase::MCMCBase(manager *man) : FitterBase(man) {
         anneal = true;
     }
 }
+
 
 
 // *******************
@@ -56,12 +68,20 @@ void MCMCBase::RunMCMC() {
     ProcessMCMC();
 }
 
+
+
 // *******************
 void MCMCBase::DoMCMCStep() {
 // *******************
     /// Starts step timer, prints progress
     PreStepProcess();
     /// Step proposal, acceptance etc
+
+    #ifdef MPIENABLED
+    // We send a signal to all other fitters that we are ready to propose a step
+    MPI_Barrier(MPI_COMM_WORLD);
+    #endif
+
     DoStep();
     /// Tree filling etc.
     PostStepProcess();

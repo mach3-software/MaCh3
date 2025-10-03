@@ -9,6 +9,9 @@
 #ifdef MaCh3_MINUIT2
 #include "Fitters/MinuitFit.h"
 #endif
+#ifdef MPIENABLED
+#include "Fitters/DEMCMC.h"
+#endif
 
 
 #include "Parameters/ParameterHandlerGeneric.h"

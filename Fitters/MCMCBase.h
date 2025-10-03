@@ -10,7 +10,11 @@ class MCMCBase : public FitterBase {
     /// @brief Constructor
     /// @param fitMan A pointer to a manager object, which will handle all settings.
     MCMCBase(manager * const fitMan);
-    
+
+   #ifdef MPIENABLED
+   MCMCBase(manager *const man, int mpi_rank_);
+   #endif
+
     /// @brief Destructor
     virtual ~MCMCBase() = default;
 
@@ -26,7 +30,9 @@ class MCMCBase : public FitterBase {
     /// @param L new chain length
     inline void setChainLength(unsigned int L) { chainLength = L; };
  protected:
-    /// @brief The full StartStep->DoStep->EndStep chain
+   void Init();   
+
+   /// @brief The full StartStep->DoStep->EndStep chain
     inline void DoMCMCStep();
 
     /// @brief Propose a step
@@ -70,4 +76,6 @@ class MCMCBase : public FitterBase {
     bool anneal;
     /// simulated annealing temperature
     double AnnealTemp;
+
+
 };

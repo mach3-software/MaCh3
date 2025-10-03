@@ -26,7 +26,16 @@ class MR2T2 : public MCMCBase {
  public:
     /// @brief Constructor
     /// @param fitMan A pointer to a manager object, which will handle all settings.
-     MR2T2(manager *const manager);
+    MR2T2(manager *const manager);
+    
+     #ifdef MPIENABLED
+    /// @brief Constructor with MPI rank
+    /// @param fitMan A pointer to a manager object, which will handle all settings.
+    /// @param mpi_rank The MPI rank of the current process.
+    MR2T2(manager *const manager, int mpi_rank);
+    #endif
+
+
 
      /// @brief Destructor
      virtual ~MR2T2() = default;
