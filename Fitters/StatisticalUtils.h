@@ -171,3 +171,6 @@ double GetModeError(TH1D* hpost);
 /// @param Histogram A pointer to a TH2D histogram object. The function modifies the histogram's title to include the p-value information.
 /// @warning The canvas is saved to the current ROOT file using `TempCanvas->Write()`.
 void Get2DBayesianpValue(TH2D *Histogram);
+
+
+void PassErrorToRatioPlot(TH1D* RatioHist, TH1D* Hist1, TH1D* DataHist);

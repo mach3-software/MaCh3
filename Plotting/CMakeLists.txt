@@ -3,6 +3,7 @@ add_subdirectory(plottingUtils)
 
 foreach(app
     GetPostfitParamPlots
+    PredictivePlotting
     PlotLLH
     MatrixPlotter
     )
