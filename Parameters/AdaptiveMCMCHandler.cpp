@@ -72,6 +72,13 @@ bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const 
   adaptive_save_n_iterations  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["SaveNIterations"], -1);
   output_file_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Settings"]["OutputFileName"], "");
 
+  #ifdef MPIENABLED
+  /// Means we can do AMCMC with MPI
+  int mpi_rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
+  output_file_name = output_file_name.substr(0, output_file_name.find_last_of('.')) + "_rank" + std::to_string(mpi_rank) + output_file_name.substr(output_file_name.find_last_of('.'));
+  #endif
+
   // We also want to check for "blocks" by default all parameters "know" about each other
   // but we can split the matrix into independent block matrices
   SetParams(parameters);
