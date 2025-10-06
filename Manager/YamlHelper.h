@@ -23,6 +23,7 @@ _MaCh3_Safe_Include_End_ //}
 
 /// @file YamlHelper.h
 /// @brief Utility functions for handling YAML nodes
+/// @note you can read more about Yaml: [here](https://codedocs.xyz/jbeder/yaml-cpp/index.html)
 /// @author Kamil Skwarczynski
 /// @author Luke Pickering
 
