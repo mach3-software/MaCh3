@@ -63,7 +63,7 @@ void DelayedMR2T2::ResetSystScale() {
 void DelayedMR2T2::PrepareOutput() {
 // *************************
     FitterBase::PrepareOutput();
-
+    initial_flip_setting = std::vector<bool>(systematics.size());
     // Store delayed specific settings
     outTree->Branch("DelayedStep", &accepted_delayed, "DelayedStep/B");
 }
@@ -90,7 +90,6 @@ void DelayedMR2T2::StoreCurrentStep() {
     }
 
     // We also need the flips
-    initial_flip_setting = std::vector<bool>(systematics.size());
     for(int i=0; i<static_cast<int>(systematics.size()); ++i){
         initial_flip_setting[i] = systematics[i]->HasFlipStepProposal();
         systematics[i]->EnableFlipStepProposal(false);
