@@ -68,7 +68,7 @@ jobs:
           #echo "![Memory Usage Plot](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.upload-artifact.outputs.artifact-id }})" >> $GITHUB_STEP_SUMMARY
 
       - name: Create PR comment with summary and artifact link
-        uses: peter-evans/create-or-update-comment@v4
+        uses: peter-evans/create-or-update-comment@v5
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
