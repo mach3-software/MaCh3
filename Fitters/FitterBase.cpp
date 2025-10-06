@@ -16,6 +16,7 @@ _MaCh3_Safe_Include_End_ //}
 FitterBase::FitterBase(manager * const man) : fitMan(man) {
 // *************************
   #ifdef MPIENABLED
+
   /// Get number of processes
   MPI_Comm_size(MPI_COMM_WORLD, &n_procs);
   /// Get MPI rank
@@ -34,6 +35,9 @@ FitterBase::~FitterBase() {
   if(outputFile != nullptr) delete outputFile;
   outputFile = nullptr;
   MACH3LOG_DEBUG("Closing MaCh3 Fitter Engine");
+  #ifdef MPIENABLED
+    MPI_Finalize();
+  #endif
 }
 
 void FitterBase::Init(){

@@ -40,7 +40,6 @@ class FitterBase {
   /// @brief Get the sample handlers
   std::vector<SampleHandlerBase*> GetSampleHandlers() const { return samples; }
 
-
   /// @brief This function adds a Covariance object to the analysis framework. The Covariance object will be utilized in fitting procedures or likelihood scans.
   /// @param cov A pointer to a Covariance object derived from ParameterHandlerBase.
   void AddSystObj(ParameterHandlerBase* cov);

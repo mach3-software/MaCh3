@@ -5,6 +5,8 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TFile.h"
 _MaCh3_Safe_Include_End_ //}
 
+#include <cstdlib> // for std::atexit
+
 // *************************
 manager::manager(std::string const &filename)
 : config(M3OpenConfig(filename)) {
@@ -38,6 +40,18 @@ void manager::Initialise() {
   int total_processes = 0;
   MPI_Comm_size(MPI_COMM_WORLD, &total_processes);
   MACH3LOG_INFO("Starting MaCh3 with MPI support, total processes: {}", total_processes);
+  // Register a safe finalizer to be run at program exit. This avoids
+  // calling MPI_Finalize() from the manager destructor where static
+  // destruction order can cause "MPI_FINALIZE CANNOT..." errors.
+  std::atexit([](){
+    int initialised = 0;
+    int finalised = 0;
+    MPI_Initialized(&initialised);
+    MPI_Finalized(&finalised);
+    if (initialised && !finalised) {
+      MPI_Finalize();
+    }
+  });
   #endif
 
   MACH3LOG_INFO("Config is now: ");
@@ -49,9 +63,6 @@ void manager::Initialise() {
 // Empty destructor, for now...
 manager::~manager() {
 // *************************
-  #ifdef MPIENABLED
-    MPI_Finalize();
-  #endif
 }
 
 // *************************
