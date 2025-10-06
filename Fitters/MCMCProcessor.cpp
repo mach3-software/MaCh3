@@ -285,7 +285,7 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
       maxi = Chain->GetMaximum(BranchNames[i]);
       mini = Chain->GetMinimum(BranchNames[i]);
     }
-    MACH3LOG_DEBUG("Initialising histogram with binning {:.4f}, {:.4f}", mini, maxi);
+    MACH3LOG_DEBUG("Initialising histogram for {} with binning {:.4f}, {:.4f}", Title, mini, maxi);
     // This holds the posterior density
     hpost[i] = new TH1D(BranchNames[i], BranchNames[i], nBins, mini, maxi);
     hpost[i]->SetMinimum(0);
@@ -2777,8 +2777,8 @@ void MCMCProcessor::GetPolarPlot(const std::vector<std::string>& ParNames){
     std::vector<double> x_val(nBins);
     std::vector<double> y_val(nBins);
 
-    double xmin = 0;
-    double xmax = 2*TMath::Pi();
+    constexpr double xmin = 0;
+    constexpr double xmax = 2*TMath::Pi();
 
     double Integral = hpost[ParamNo]->Integral();
     for (Int_t ipt = 0; ipt < nBins; ipt++)

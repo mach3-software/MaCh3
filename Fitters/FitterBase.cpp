@@ -15,6 +15,7 @@ _MaCh3_Safe_Include_End_ //}
 // Now we can dump manager settings to the output file
 FitterBase::FitterBase(manager * const man) : fitMan(man) {
 // *************************
+  AlgorithmName = "";
   //Get mach3 modes from manager
   random = std::make_unique<TRandom3>(Get<int>(fitMan->raw()["General"]["Seed"], __FILE__, __LINE__));
 
@@ -116,6 +117,11 @@ void FitterBase::SaveSettings() {
   versionHeader.ReadFile(header_path.c_str());
   versionHeader.Write();
 
+  if(GetName() == ""){
+    MACH3LOG_ERROR("Name of currently used algorithm is {}", GetName());
+    MACH3LOG_ERROR("Have you forgotten to modify AlgorithmName?");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
   TNamed Engine(GetName(), GetName());
   Engine.Write(GetName().c_str());
 
@@ -1350,42 +1356,48 @@ void WriteHistograms(TH1 *hist, const std::string& baseName) {
 
 // *************************
 /// Generic histogram writer - should make main code more palatable
-void WriteHistogramsByMode(SampleHandlerFD *sample, const std::string& suffix, const bool by_mode, const bool by_channel) {
+void WriteHistogramsByMode(SampleHandlerFD *sample,
+                           const std::string& suffix,
+                           const bool by_mode,
+                           const bool by_channel,
+                           const std::vector<TDirectory*>& SampleDir) {
 // *************************
-  std::string sampleName = sample->GetTitle();
   MaCh3Modes *modes = sample->GetMaCh3Modes();
-
-  // Probably a better way of handling this logic
-  if (by_mode) {
-    for (int iMode = 0; iMode < modes->GetNModes(); ++iMode) {
-      auto modeHist = sample->Get1DVarHistByModeAndChannel(sample->GetXBinVarName(), iMode);
-      WriteHistograms(modeHist, sampleName + "_" + modes->GetMaCh3ModeName(iMode) + suffix);
-      delete modeHist;
-    }
-  }
-
-  if (by_channel) {
-    for (int iChan = 0; iChan < sample->GetNOscChannels(); ++iChan) {
-      auto chanHist = sample->Get1DVarHistByModeAndChannel(sample->GetXBinVarName(), -1, iChan); // -1 skips over mode plotting
-      WriteHistograms(chanHist, sampleName + "_" + sample->GetFlavourName(iChan) + suffix);
-      delete chanHist;
-    }
-  }
-
-  if (by_mode && by_channel) {
-    for (int iMode = 0; iMode < modes->GetNModes(); ++iMode) {
-      for (int iChan = 0; iChan < sample->GetNOscChannels(); ++iChan) {
-        auto hist = sample->Get1DVarHistByModeAndChannel(sample->GetXBinVarName(), iMode, iChan);
-        WriteHistograms(hist, sampleName + "_" + modes->GetMaCh3ModeName(iMode) + "_" + sample->GetFlavourName(iChan) + suffix);
-        delete hist;
+  for (int subSampleIndex = 0; subSampleIndex < sample->GetNsamples(); ++subSampleIndex) {
+    SampleDir[subSampleIndex]->cd();
+    std::string sampleName = sample->GetTitle();
+    // Probably a better way of handling this logic
+    if (by_mode) {
+      for (int iMode = 0; iMode < modes->GetNModes(); ++iMode) {
+        auto modeHist = sample->Get1DVarHistByModeAndChannel(sample->GetXBinVarName(), iMode);
+        WriteHistograms(modeHist, sampleName + "_" + modes->GetMaCh3ModeName(iMode) + suffix);
+        delete modeHist;
       }
     }
-  }
 
-  if (!by_mode && !by_channel) {
-    auto hist = sample->Get1DVarHistByModeAndChannel(sample->GetXBinVarName());
-    WriteHistograms(hist, sampleName + suffix);
-    delete hist;
+    if (by_channel) {
+      for (int iChan = 0; iChan < sample->GetNOscChannels(); ++iChan) {
+        auto chanHist = sample->Get1DVarHistByModeAndChannel(sample->GetXBinVarName(), -1, iChan); // -1 skips over mode plotting
+        WriteHistograms(chanHist, sampleName + "_" + sample->GetFlavourName(iChan) + suffix);
+        delete chanHist;
+      }
+    }
+
+    if (by_mode && by_channel) {
+      for (int iMode = 0; iMode < modes->GetNModes(); ++iMode) {
+        for (int iChan = 0; iChan < sample->GetNOscChannels(); ++iChan) {
+          auto hist = sample->Get1DVarHistByModeAndChannel(sample->GetXBinVarName(), iMode, iChan);
+          WriteHistograms(hist, sampleName + "_" + modes->GetMaCh3ModeName(iMode) + "_" + sample->GetFlavourName(iChan) + suffix);
+          delete hist;
+        }
+      }
+    }
+
+    if (!by_mode && !by_channel) {
+      auto hist = sample->Get1DVarHistByModeAndChannel(sample->GetXBinVarName());
+      WriteHistograms(hist, sampleName + suffix);
+      delete hist;
+    }
   }
 }
 
@@ -1425,24 +1437,21 @@ void FitterBase::RunSigmaVarFD() {
 
       TDirectory* ParamDir = SigmaDir->mkdir(ParName.c_str());
       ParamDir->cd();
-      double ParamNomValue = systematics[s]->GetParProp(i);
-      double ParamLower = systematics[s]->GetLowerBound(i);
-      double ParamUpper = systematics[s]->GetUpperBound(i);
+      const double ParamNomValue = systematics[s]->GetParProp(i);
+      const double ParamLower = systematics[s]->GetLowerBound(i);
+      const double ParamUpper = systematics[s]->GetUpperBound(i);
 
       for(unsigned int iSample = 0; iSample < samples.size(); ++iSample)
       {
-        if(samples[iSample]->GetNsamples() > 1){
-          MACH3LOG_ERROR(":: Sample has more than one sample {} ::", samples[iSample]->GetNsamples());
-          throw MaCh3Exception(__FILE__ , __LINE__ );
-        }
-
         auto* MaCh3Sample = dynamic_cast<SampleHandlerFD*>(samples[iSample]);
         if (!MaCh3Sample) {
           MACH3LOG_ERROR(":: Sample {} do not inherit from  SampleHandlerFD this is not implemented::", samples[i]->GetTitle());
           throw MaCh3Exception(__FILE__, __LINE__);
         }
-        TDirectory* SampleDir = ParamDir->mkdir(MaCh3Sample->GetTitle().c_str());
-        SampleDir->cd();
+        std::vector<TDirectory*> SampleDir(MaCh3Sample->GetNsamples());
+        for (int subSampleIndex = 0; subSampleIndex < MaCh3Sample->GetNsamples(); ++subSampleIndex) {
+          SampleDir[subSampleIndex] = ParamDir->mkdir(MaCh3Sample->GetTitle().c_str());
+        }
 
         for (size_t j = 0; j < SigmaArray.size(); ++j) {
           double sigma = SigmaArray[j];
@@ -1480,10 +1489,12 @@ void FitterBase::RunSigmaVarFD() {
           systematics[s]->SetParProp(i, ParamShiftValue);
           MaCh3Sample->Reweight();
 
-          WriteHistogramsByMode(MaCh3Sample, suffix, plot_by_mode, plot_by_channel);
+          WriteHistogramsByMode(MaCh3Sample, suffix, plot_by_mode, plot_by_channel, SampleDir);
         }
-        SampleDir->Close();
-        delete SampleDir;
+        for (int subSampleIndex = 0; subSampleIndex < MaCh3Sample->GetNsamples(); ++subSampleIndex) {
+          SampleDir[subSampleIndex]->Close();
+          delete SampleDir[subSampleIndex];
+        }
         ParamDir->cd();
       }
 

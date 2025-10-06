@@ -148,6 +148,7 @@ inline double MatrixVectorMultiSingle(double** _restrict_ matrix, const double* 
 
 // *************************************
 /// @brief KS: Yaml emitter has problem and drops "", if you have special signs in you like * then there is problem. This bit hacky code adds these ""
+/// @param yamlStr The YAML string to be processed (modified in-place).
 inline void FixSampleNamesQuotes(std::string& yamlStr) {
 // *************************************
   std::stringstream input(yamlStr);
@@ -179,6 +180,10 @@ inline void FixSampleNamesQuotes(std::string& yamlStr) {
 
 // *************************************
 /// @brief KS: Add Tune values to YAML covariance matrix
+/// @param root The root YAML node to be updated.
+/// @param Values The values to add for the specified tune.
+/// @param Tune The name of the tune (e.g., "PostFit").
+/// @param FancyNames Optional list of fancy names to match systematics (must match Values size if provided).
 inline void AddTuneValues(YAML::Node& root,
                           const std::vector<double>& Values,
                           const std::string& Tune,
@@ -254,6 +259,12 @@ inline void AddTuneValues(YAML::Node& root,
 
 // *************************************
 /// @brief KS: Replace correlation matrix and tune values in YAML covariance matrix
+/// @param root The root YAML node to be updated.
+/// @param Values The new values for each systematic.
+/// @param Errors The new errors for each systematic.
+/// @param Correlation The new correlation matrix (must be square and match Values size).
+/// @param OutYAMLName The output filename for the updated YAML.
+/// @param FancyNames Optional list of fancy names to match systematics (must match Values size if provided).
 inline void MakeCorrelationMatrix(YAML::Node& root,
                                   const std::vector<double>& Values,
                                   const std::vector<double>& Errors,
@@ -311,6 +322,8 @@ inline void MakeCorrelationMatrix(YAML::Node& root,
       YAML::Node correlationsNode = YAML::Node(YAML::NodeType::Sequence);
       for (std::size_t j = 0; j < FancyNames.size(); ++j) {
         if (i == j) continue;
+        // KS: Skip if value close to 0
+        if (std::abs(Correlation[i][j]) < 1e-8) continue;
         YAML::Node singleEntry;
         singleEntry[FancyNames[j]] = MaCh3Utils::FormatDouble(Correlation[i][j], 4);
         correlationsNode.push_back(singleEntry);
@@ -337,6 +350,8 @@ inline void MakeCorrelationMatrix(YAML::Node& root,
       YAML::Node correlationsNode = YAML::Node(YAML::NodeType::Sequence);
       for (std::size_t j = 0; j < Correlation[i].size(); ++j) {
         if (i == j) continue;
+        // KS: Skip if value close to 0
+        if (std::abs(Correlation[i][j]) < 1e-8) continue;
         YAML::Node singleEntry;
         const std::string& otherName = systematics[j]["Systematic"]["Names"]["FancyName"].as<std::string>();
         singleEntry[otherName] = MaCh3Utils::FormatDouble(Correlation[i][j], 4);
@@ -439,4 +454,90 @@ inline TMatrixDSym* GetCovMatrixFromChain(TDirectory* TempFile) {
     return fallback;
   }
 }
+
+// *************************************
+/// @brief Computes Cholesky decomposition of a symmetric positive definite matrix using custom function which can be even 20 times faster
+/// @param matrix Input symmetric positive definite matrix
+/// @param matrixName Identifier for error reporting
+inline std::vector<std::vector<double>> GetCholeskyDecomposedMatrix(const TMatrixDSym& matrix, const std::string& matrixName) {
+// *************************************
+  const Int_t n = matrix.GetNrows();
+  std::vector<std::vector<double>> L(n, std::vector<double>(n, 0.0));
+
+  for (Int_t j = 0; j < n; ++j) {
+    // Compute diagonal element (must be serial)
+    double sum_diag = matrix(j, j);
+    for (Int_t k = 0; k < j; ++k) {
+      sum_diag -= L[j][k] * L[j][k];
+    }
+    const double tol = 1e-15;
+    if (sum_diag <= tol) {
+      MACH3LOG_ERROR("Cholesky decomposition failed for {} (non-positive diagonal)", matrixName);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    L[j][j] = std::sqrt(sum_diag);
+
+    // Compute the rest of the column in parallel
+    #ifdef MULTITHREAD
+    #pragma omp parallel for
+    #endif
+    for (Int_t i = j + 1; i < n; ++i) {
+      double sum = matrix(i, j);
+      for (Int_t k = 0; k < j; ++k) {
+        sum -= L[i][k] * L[j][k];
+      }
+      L[i][j] = sum / L[j][j];
+    }
+  }
+  return L;
+}
+
+// *************************************
+/// @brief Checks if a matrix can be Cholesky decomposed
+/// @param matrix Input symmetric matrix to test
+inline bool CanDecomposeMatrix(const TMatrixDSym& matrix) {
+// *************************************
+  TDecompChol chdcmp(matrix);
+  return chdcmp.Decompose();
+}
+
+// *************************************
+/// @brief Makes sure that matrix is positive-definite by adding a small number to on-diagonal elements
+inline void MakeMatrixPosDef(TMatrixDSym *cov) {
+// *************************************
+  //DB Save original warning state and then increase it in this function to suppress 'matrix not positive definite' messages
+  //Means we no longer need to overload
+  int originalErrorWarning = gErrorIgnoreLevel;
+  gErrorIgnoreLevel = kFatal;
+
+  //DB Loop 1000 times adding 1e-9 which tops out at 1e-6 shift on the diagonal before throwing error
+  constexpr int MaxAttempts = 1e5;
+  const int matrixSize = cov->GetNrows();
+  int iAttempt = 0;
+  bool CanDecomp = false;
+
+  for (iAttempt = 0; iAttempt < MaxAttempts; iAttempt++) {
+    if (CanDecomposeMatrix(*cov)) {
+      CanDecomp = true;
+      break;
+    } else {
+      #ifdef MULTITHREAD
+      #pragma omp parallel for
+      #endif
+      for (int iVar = 0 ; iVar < matrixSize; iVar++) {
+        (*cov)(iVar,iVar) += pow(10, -9);
+      }
+    }
+  }
+
+  if (!CanDecomp) {
+    MACH3LOG_ERROR("Tried {} times to shift diagonal but still can not decompose the matrix", MaxAttempts);
+    MACH3LOG_ERROR("This indicates that something is wrong with the input matrix");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+
+  //DB Resetting warning level
+  gErrorIgnoreLevel = originalErrorWarning;
+}
+
 } // end M3 namespace

@@ -135,7 +135,7 @@ endif()
 add_library(MaCh3CompilerOptions INTERFACE)
 target_link_libraries(MaCh3CompilerOptions INTERFACE MaCh3CompileDefinitions)
 target_compile_options(MaCh3CompilerOptions INTERFACE
-    -g                      # Generate debug information
+    -g                   # Generate debug information
 )
 
 #If DEBUG_LEVEL was defined but MaCh3_DEBUG_ENABLED not, enable debug flag
@@ -151,23 +151,25 @@ endif()
 #KS: If Debug add debugging compile flag if not add optimisation for speed
 if(MaCh3_DEBUG_ENABLED)
   target_compile_options(MaCh3CompilerOptions INTERFACE
-    -O0                                  # Turn off any optimisation to have best debug experience
-    -mno-avx
+    -O0         # Turn off any optimisation to have best debug experience
+    -mno-avx    # Disable AVX instructions to simplify debugging and improve reproducibility
   )
   target_compile_definitions(MaCh3CompileDefinitions INTERFACE DEBUG=${DEBUG_LEVEL})
   cmessage(STATUS "Enabling DEBUG with Level: \"${DEBUG_LEVEL}\"")
 else()
-  #KS: Consider in future __attribute__((always_inline)) see https://indico.cern.ch/event/386232/sessions/159923/attachments/771039/1057534/always_inline_performance.pdf
-  #https://gcc.gnu.org/onlinedocs/gcc-3.3.6/gcc/Optimize-Options.html
+  #https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html
   target_compile_options(MaCh3CompilerOptions INTERFACE
     -O3                                   # Optimize code for maximum speed
-    #-fstrict-aliasing                    # Assume that pointers of different types do not point to the same memory location
-    # KS: After benchmarking below didn't in fact worse performance, leave it for future tests and documentation
+    # KS: Below could help with performance but require validations and benchmarking
+    #-fipa-pta                            # Pointer analysis for better intraprocedural optimization, increases compilation time
+    #-fno-trapping-math                   # Assume FP ops don’t trap (helps vectorisation)
+    #-fno-math-errno                      # Don’t set errno after math calls (can speed up hot loops with math)
     #-funroll-loops                       # Unroll loops where possible for performance
     #--param=max-vartrack-size=100000000  # Set maximum size of variable tracking data to avoid excessive memory usage
     #-flto                                # Enable link-time optimization (commented out for now, needs more testing)
   )
   # KS Some compiler options are only available in GCC, in case we move to other compilers we will have to expand this
+  #KS: Consider in future __attribute__((always_inline)) see https://indico.cern.ch/event/386232/sessions/159923/attachments/771039/1057534/always_inline_performance.pdf
   if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     target_compile_options(MaCh3CompilerOptions INTERFACE
       -finline-limit=100000000              # Increase the limit for inlining functions to improve performance
@@ -178,7 +180,10 @@ else()
 endif()
 
 if(MaCh3_NATIVE_ENABLED)
-  target_compile_options(MaCh3CompilerOptions INTERFACE -march=native)
+  target_compile_options(MaCh3CompilerOptions INTERFACE
+    -march=native    #Generate instructions for the host CPU architecture.
+    -mtune=native    #Optimize instruction scheduling and pipeline usage for host CPU.
+  )
 endif()
 
 #Add Multithread flags

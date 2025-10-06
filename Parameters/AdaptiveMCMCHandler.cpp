@@ -191,7 +191,7 @@ void AdaptiveMCMCHandler::SetThrowMatrixFromFile(const std::string& matrix_file_
 // ********************************************
   // Lets you set the throw matrix externally
   // Open file
-  std::unique_ptr<TFile>matrix_file(new TFile(matrix_file_name.c_str()));
+  auto matrix_file = std::make_unique<TFile>(matrix_file_name.c_str());
   use_adaptive = true;
 
   if(matrix_file->IsZombie()){
@@ -288,7 +288,7 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance() {
 }
 
 // ********************************************
-bool AdaptiveMCMCHandler::IndivStepScaleAdapt() {
+bool AdaptiveMCMCHandler::IndivStepScaleAdapt() const {
 // ********************************************
   if(total_steps == start_adaptive_throw) return true;
   else return false;
@@ -307,7 +307,7 @@ bool AdaptiveMCMCHandler::UpdateMatrixAdapt() {
 }
 
 // ********************************************
-bool AdaptiveMCMCHandler::SkipAdaption() {
+bool AdaptiveMCMCHandler::SkipAdaption() const {
 // ********************************************
   if(total_steps > end_adaptive_update ||
     total_steps< start_adaptive_update) return true;
@@ -315,14 +315,14 @@ bool AdaptiveMCMCHandler::SkipAdaption() {
 }
 
 // ********************************************
-bool AdaptiveMCMCHandler::AdaptionUpdate() {
+bool AdaptiveMCMCHandler::AdaptionUpdate() const {
 // ********************************************
   if(total_steps <= start_adaptive_throw) return true;
   else return false;
 }
 
 // ********************************************
-void AdaptiveMCMCHandler::Print() {
+void AdaptiveMCMCHandler::Print() const {
 // ********************************************
   MACH3LOG_INFO("Adaptive MCMC Info:");
   MACH3LOG_INFO("Throwing from New Matrix from Step : {}", start_adaptive_throw);
@@ -333,7 +333,7 @@ void AdaptiveMCMCHandler::Print() {
   MACH3LOG_INFO("Will only save every {} iterations"     , adaptive_save_n_iterations);
 }
 
-double AdaptiveMCMCHandler::CurrVal(const int par_index){
+double AdaptiveMCMCHandler::CurrVal(const int par_index) const {
   /// HW Implemented as its own method to allow for
   /// different behaviour in the future
   return (*_fCurrVal)[par_index];

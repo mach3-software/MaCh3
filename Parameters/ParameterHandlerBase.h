@@ -213,9 +213,6 @@ class ParameterHandlerBase {
   /// @brief Get matrix used for step proposal
   /// @ingroup ParameterHandlerGetters
   double GetThrowMatrix(const int i, const int j) const { return throwMatrixCholDecomp[i][j];}
-  /// @brief Get the Cholesky decomposition of the throw matrix
-  /// @ingroup ParameterHandlerGetters
-  inline TMatrixD *GetThrowMatrix_CholDecomp() const {return throwMatrix_CholDecomp;}
 
   /// @brief KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plotting
   /// @details This function converts the covariance matrix to a correlation matrix and
@@ -487,8 +484,6 @@ protected:
 
   /// Matrix which we use for step proposal before Cholesky decomposition (not actually used for step proposal)
   TMatrixDSym* throwMatrix;
-  /// Matrix which we use for step proposal after Cholesky decomposition
-  TMatrixD* throwMatrix_CholDecomp;
   /// Throw matrix that is being used in the fit, much faster as TMatrixDSym cache miss
   double** throwMatrixCholDecomp;
 

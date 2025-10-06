@@ -23,7 +23,6 @@ inline TH2D* TMatrixIntoTH2D(TMatrixDSym* Matrix, const std::string& title);
 inline void KolmogorovSmirnovTest(const std::vector<std::unique_ptr<MCMCProcessor>>& Processor,
                                   const std::unique_ptr<TCanvas>& Posterior,
                                   const TString& canvasname);
-
 int nFiles;
 std::vector <std::string> FileNames;
 std::vector <std::string> TitleNames;
@@ -76,6 +75,42 @@ int main(int argc, char *argv[])
   return 0;
 }
 
+/// @brief Parse custom binning edges from a YAML configuration node.
+///
+/// This function reads the `CustomBinEdges` section of the YAML config and
+/// returns a mapping of parameter names to their lower and upper edges.
+///
+/// The expected YAML syntax is:
+/// @code{.yaml}
+/// CustomBinEdges:
+///   delta_cp: [-3.141592, 3.141592]
+///   another_param: [min, max]
+/// @endcode
+///
+/// @param Settings YAML configuration node containing the optional
+///        `CustomBinEdges` section.
+std::map<std::string, std::pair<double, double>> GetCustomBinning(const YAML::Node& Settings)
+{
+  std::map<std::string, std::pair<double, double>> CustomBinning;
+  if (Settings["CustomBinEdges"]) {
+    const YAML::Node& edges = Settings["CustomBinEdges"];
+
+    for (const auto& node : edges) {
+      std::string key = node.first.as<std::string>();
+      auto values = node.second.as<std::vector<double>>();
+
+      if (values.size() == 2) {
+        CustomBinning[key] = std::make_pair(values[0], values[1]);
+        MACH3LOG_DEBUG("Adding custom binning {} with {:.4f}, {:.4f}", key, values[0], values[1]);
+      } else {
+        MACH3LOG_ERROR("Invalid number of values for key: {}", key);
+        throw MaCh3Exception(__FILE__ , __LINE__ );
+      }
+    }
+  }
+  return CustomBinning;
+}
+
 void ProcessMCMC(const std::string& inputFile)
 {
   MACH3LOG_INFO("File for study: {} with config  {}", inputFile, config);
@@ -117,6 +152,9 @@ void ProcessMCMC(const std::string& inputFile)
   if(Settings["MaxEntries"]) {
     Processor->SetEntries(Get<int>(Settings["MaxEntries"], __FILE__, __LINE__));
   }
+  if(Settings["NBins"]) {
+    Processor->SetNBins(Get<int>(Settings["NBins"], __FILE__, __LINE__));
+  }
   if(Settings["Thinning"])
   {
     if(Settings["Thinning"][0].as<bool>()){
@@ -124,7 +162,7 @@ void ProcessMCMC(const std::string& inputFile)
     }
   }
   // Make the postfit
-  Processor->MakePostfit();
+  Processor->MakePostfit(GetCustomBinning(Settings));
   Processor->DrawPostfit();
   //KS: Should set via config whether you want below or not
   if(GetFromManager<bool>(Settings["MakeCredibleIntervals"], true)) {
@@ -211,9 +249,12 @@ void MultipleProcessMCMC()
     if(Settings["MaxEntries"]) {
       Processor[ik]->SetEntries(Get<int>(Settings["MaxEntries"], __FILE__, __LINE__));
     }
+    if(Settings["NBins"]) {
+      Processor[ik]->SetNBins(Get<int>(Settings["NBins"], __FILE__, __LINE__));
+    }
   }
 
-  Processor[0]->MakePostfit();
+  Processor[0]->MakePostfit(GetCustomBinning(Settings));
   Processor[0]->DrawPostfit();
   // Get edges from first histogram to ensure all params use same binning
   std::map<std::string, std::pair<double, double>> ParamEdges;
@@ -255,18 +296,23 @@ void MultipleProcessMCMC()
   Posterior->SetTopMargin(0.05f);
   Posterior->SetRightMargin(0.03f);
   Posterior->SetLeftMargin(0.15f);
+  
+  // First filename: keep path, just remove ".root"
+  // Would be nice to specify outpath in a later update
+  size_t pos = FileNames[0].rfind(".root");
+  std::string base = (pos == std::string::npos) ? FileNames[0] : FileNames[0].substr(0, pos);
+  TString canvasname = base;
 
-  FileNames[0] = FileNames[0].substr(0, FileNames[0].find(".root")-1);
-  TString canvasname = FileNames[0];
-  for (int ik = 1; ik < nFiles;  ik++)
-  {
-    while (FileNames[ik].find("/") != std::string::npos)
-    {
-      FileNames[ik] = FileNames[ik].substr(FileNames[ik].find("/")+1, FileNames[ik].find(".root")-1);
-    }
-    canvasname = canvasname + "_"+FileNames[ik];
+  // Remaining filenames: strip path and ".root"
+  // So if you have /path/to/file1.root and /path/to/file2.root or /another/path/to/file2.root, canvasname = /path/to/file1_file2.root
+  for (int ik = 1; ik < nFiles; ik++) {
+    pos = FileNames[ik].find_last_of('/');
+    base = (pos == std::string::npos) ? FileNames[ik] : FileNames[ik].substr(pos + 1);
+    pos = base.rfind(".root");
+    if (pos != std::string::npos) base = base.substr(0, pos);
+    canvasname += "_" + TString(base);
   }
-
+  
   canvasname = canvasname +".pdf[";
 
   Posterior->Print(canvasname);

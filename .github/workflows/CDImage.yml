@@ -25,11 +25,11 @@ jobs:
             file: Doc/MaCh3DockerFiles/Alma9/Dockerfile
             tag_latest: alma9latest
             installoptions: -j4
-            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DNuFastLinear_ENABLED=ON -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DNuSQUIDSLinear_ENABLED=ON -DOscProb_ENABLED=ON
+            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DNuFastLinear_ENABLED=ON -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProb3ppLinear_ENABLED=ON
           - os: rocky9cuda
             file: Doc/MaCh3DockerFiles/Rocky9/Dockerfile
             tag_latest: rocky9cudalatest
-            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DNuFastLinear_ENABLED=ON -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DNuSQUIDSLinear_ENABLED=ON -DOscProb_ENABLED=ON -DProbGPULinear_ENABLED=ON
+            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DNuFastLinear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProb3ppLinear_ENABLED=ON
             installoptions: -j4
 #          - os: ubuntu22.04
 #            file: Doc/MaCh3DockerFiles/Ubuntu22.04/Dockerfile

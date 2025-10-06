@@ -7,6 +7,7 @@
 _MaCh3_Safe_Include_Start_ //{
 #include "TROOT.h"
 #include "TKey.h"
+#include "TH3F.h"
 _MaCh3_Safe_Include_End_ //}
 
 //****************************************
@@ -64,14 +65,14 @@ void BinnedSplineHandler::cleanUpMemory() {
 
 //****************************************
 void BinnedSplineHandler::AddSample(const std::string& SampleName,
-                                    const std::string& SampleTittle,
+                                    const std::string& SampleTitle,
                                     const std::vector<std::string>& OscChanFileNames,
                                     const std::vector<std::string>& SplineVarNames)
 //Adds samples to the large array
 //****************************************
 {
   SampleNames.push_back(SampleName);
-  SampleTitles.push_back(SampleTittle);
+  SampleTitles.push_back(SampleTitle);
   Dimensions.push_back(static_cast<int>(SplineVarNames.size()));
   DimensionLabels.push_back(SplineVarNames);
 
@@ -100,21 +101,21 @@ void BinnedSplineHandler::AddSample(const std::string& SampleName,
   int nOscChan = int(OscChanFileNames.size());
   nOscChans.push_back(nOscChan);
 
-  PrintSampleDetails(SampleTittle);
+  PrintSampleDetails(SampleTitle);
 
   std::vector<std::vector<TAxis *>> SampleBinning(nOscChan);
   for (int iOscChan = 0; iOscChan < nOscChan; iOscChan++)
   {
-    SampleBinning[iOscChan] = FindSplineBinning(OscChanFileNames[iOscChan], SampleTittle);
+    SampleBinning[iOscChan] = FindSplineBinning(OscChanFileNames[iOscChan], SampleTitle);
   }
   MACH3LOG_INFO("#----------------------------------------------------------------------------------------------------------------------------------#");
   SplineBinning.push_back(SampleBinning);
 
-  BuildSampleIndexingArray(SampleTittle);
-  PrintArrayDetails(SampleTittle);
+  BuildSampleIndexingArray(SampleTitle);
+  PrintArrayDetails(SampleTitle);
   MACH3LOG_INFO("#----------------------------------------------------------------------------------------------------------------------------------#");
 
-  FillSampleArray(SampleTittle, OscChanFileNames);
+  FillSampleArray(SampleTitle, OscChanFileNames);
   MACH3LOG_INFO("#----------------------------------------------------------------------------------------------------------------------------------#");
 }
 
@@ -346,10 +347,10 @@ void BinnedSplineHandler::CalcSplineWeights()
 //****************************************
 //Creates an array to be filled with monolith indexes for each sample (allows for indexing between 7D binning and 1D Vector)
 //Only need 1 indexing array everything else interfaces with this to get binning properties
-void BinnedSplineHandler::BuildSampleIndexingArray(const std::string& SampleTittle)
+void BinnedSplineHandler::BuildSampleIndexingArray(const std::string& SampleTitle)
 //****************************************
 {  
-  int iSample = getSampleIndex(SampleTittle);
+  int iSample = GetSampleIndex(SampleTitle);
   int nSplineSysts = nSplineParams[iSample];
   int nOscChannels = nOscChans[iSample];
 
@@ -378,10 +379,10 @@ void BinnedSplineHandler::BuildSampleIndexingArray(const std::string& SampleTitt
 }
 
 //****************************************
-std::vector<TAxis *> BinnedSplineHandler::FindSplineBinning(const std::string& FileName, const std::string& SampleTittle)
+std::vector<TAxis *> BinnedSplineHandler::FindSplineBinning(const std::string& FileName, const std::string& SampleTitle)
 //****************************************
 {
-  int iSample=getSampleIndex(SampleTittle);
+  int iSample = GetSampleIndex(SampleTitle);
 
   //Try declaring these outside of TFile so they aren't owned by File
   constexpr int nDummyBins = 1;
@@ -493,7 +494,7 @@ int BinnedSplineHandler::CountNumberOfLoadedSplines(bool NonFlat, int Verbosity)
   { // Loop over systematics
     SampleCounter_NonFlat = 0;
     SampleCounter_All = 0;
-    std::string SampleTittle = SampleTitles[iSample];
+    std::string SampleTitle = SampleTitles[iSample];
     for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++)
     { // Loop over oscillation channels
       for (unsigned int iSyst = 0; iSyst < indexvec[iSample][iOscChan].size(); iSyst++)
@@ -506,7 +507,7 @@ int BinnedSplineHandler::CountNumberOfLoadedSplines(bool NonFlat, int Verbosity)
             { // Loop over second dimension
               for (unsigned int iVar3 = 0; iVar3 < indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2].size(); iVar3++)
               { // Loop over third dimension
-                if (isValidSplineIndex(SampleTittle, iOscChan, iSyst, iMode, iVar1, iVar2, iVar3))
+                if (isValidSplineIndex(SampleTitle, iOscChan, iSyst, iMode, iVar1, iVar2, iVar3))
                 {
                   int splineindex = indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2][iVar3];
                   if (splinevec_Monolith[splineindex])
@@ -731,22 +732,22 @@ std::string BinnedSplineHandler::getDimLabel(const int iSample, const unsigned i
 
 //****************************************
 //Returns sample index in
-int BinnedSplineHandler::getSampleIndex(const std::string& SampleTittle) const{
+int BinnedSplineHandler::GetSampleIndex(const std::string& SampleTitle) const{
 //****************************************
   for (size_t iSample = 0; iSample < SampleTitles.size(); ++iSample) {
-    if (SampleTittle == SampleTitles[iSample]) {
+    if (SampleTitle == SampleTitles[iSample]) {
       return static_cast<int>(iSample);
     }
   }
-  MACH3LOG_ERROR("Sample name not found: {}", SampleTittle);
+  MACH3LOG_ERROR("Sample name not found: {}", SampleTitle);
   throw MaCh3Exception(__FILE__, __LINE__);
 }
 
 //****************************************
-void BinnedSplineHandler::PrintSampleDetails(const std::string& SampleTittle) const
+void BinnedSplineHandler::PrintSampleDetails(const std::string& SampleTitle) const
 //****************************************
 {
-  const int iSample = getSampleIndex(SampleTittle);
+  const int iSample = GetSampleIndex(SampleTitle);
 
   MACH3LOG_INFO("Details about sample: {:<20}", SampleTitles[iSample]);
   MACH3LOG_INFO("\t Dimension: {:<35}", Dimensions[iSample]);
@@ -755,12 +756,12 @@ void BinnedSplineHandler::PrintSampleDetails(const std::string& SampleTittle) co
 }
 
 //****************************************
-void BinnedSplineHandler::PrintArrayDetails(const std::string& SampleTittle) const
+void BinnedSplineHandler::PrintArrayDetails(const std::string& SampleTitle) const
 //****************************************
 {
-  int iSample = getSampleIndex(SampleTittle);
+  int iSample = GetSampleIndex(SampleTitle);
   int nOscChannels = int(indexvec[iSample].size());
-  MACH3LOG_INFO("Sample {} has {} oscillation channels", SampleTittle, nOscChannels);
+  MACH3LOG_INFO("Sample {} has {} oscillation channels", SampleTitle, nOscChannels);
   
   for (int iOscChan = 0; iOscChan < nOscChannels; iOscChan++)
   {
@@ -781,10 +782,10 @@ void BinnedSplineHandler::PrintArrayDetails(const std::string& SampleTittle) con
 }
 
 //****************************************
-bool BinnedSplineHandler::isValidSplineIndex(const std::string& SampleTittle, int iOscChan, int iSyst, int iMode, int iVar1, int iVar2, int iVar3)
+bool BinnedSplineHandler::isValidSplineIndex(const std::string& SampleTitle, int iOscChan, int iSyst, int iMode, int iVar1, int iVar2, int iVar3)
 //****************************************
 {
-  int iSample = getSampleIndex(SampleTittle);
+  int iSample = GetSampleIndex(SampleTitle);
   bool isValid = true;
 
   // Lambda to check if an index is valid for a specific dimension
@@ -832,24 +833,12 @@ void BinnedSplineHandler::PrintBinning(TAxis *Axis) const
 }
 
 //****************************************
-std::vector< std::vector<int> > BinnedSplineHandler::GetEventSplines(const std::string& SampleTittle, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val)
+std::vector< std::vector<int> > BinnedSplineHandler::GetEventSplines(const std::string& SampleTitle, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val)
 //****************************************
 {
   std::vector<std::vector<int>> ReturnVec;
-  int SampleIndex = -1;
-  for (unsigned int iSample = 0; iSample < SampleTitles.size(); iSample++) {
-    if (SampleTittle == SampleTitles[iSample]) {
-      SampleIndex = iSample;
-    }
-  }
-
-  if (SampleIndex == -1) {
-    MACH3LOG_ERROR("Sample not found: {}", SampleTittle);
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  
+  int SampleIndex = GetSampleIndex(SampleTitle);
   int nSplineSysts = static_cast<int>(indexvec[SampleIndex][iOscChan].size());
-
 
   int Mode = -1;
   std::string SuffixForEventMode = Modes->GetSplineSuffixFromMaCh3Mode(EventMode);
@@ -935,9 +924,9 @@ std::vector< std::vector<int> > BinnedSplineHandler::StripDuplicatedModes(const 
   return ReturnVec;
 }
 
-void BinnedSplineHandler::FillSampleArray(std::string SampleTittle, std::vector<std::string> OscChanFileNames)
+void BinnedSplineHandler::FillSampleArray(std::string SampleTitle, std::vector<std::string> OscChanFileNames)
 {
-  int iSample = getSampleIndex(SampleTittle);
+  int iSample = GetSampleIndex(SampleTitle);
   int nOscChannels = nOscChans[iSample];
   
   for (int iOscChan = 0; iOscChan < nOscChannels; iOscChan++) {
@@ -1020,7 +1009,7 @@ void BinnedSplineHandler::FillSampleArray(std::string SampleTittle, std::vector<
 
       mySpline = Key->ReadObject<TSpline3>();
 
-      if (isValidSplineIndex(SampleTittle, iOscChan, SystNum, ModeNum, Var1Bin, Var2Bin, Var3Bin)) { // loop over all the spline knots and check their value
+      if (isValidSplineIndex(SampleTitle, iOscChan, SystNum, ModeNum, Var1Bin, Var2Bin, Var3Bin)) { // loop over all the spline knots and check their value
         MACH3LOG_DEBUG("Pushed back monolith for spline {}", FullSplineName);
         // if the value is 1 then set the flat bool to false
         nKnots = mySpline->GetNp();

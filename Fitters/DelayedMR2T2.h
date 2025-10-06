@@ -48,9 +48,6 @@ class DelayedMR2T2 : public MR2T2 {
     /// @brief Destructor
     virtual ~DelayedMR2T2() = default;
 
-    /// @brief Get name
-    inline std::string GetName() const override { return "DelayedMR2T2"; };
-
  protected:
      /// @brief Step acceptance probability
     double AcceptanceProbability() override;

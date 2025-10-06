@@ -120,11 +120,11 @@ enum TestStatistic {
 
 // **************************************************
 /// @brief Convert a LLH type to a string
-inline std::string TestStatistic_ToString(TestStatistic i) {
+inline std::string TestStatistic_ToString(const TestStatistic TestStat) {
 // **************************************************
   std::string name = "";
 
-  switch(i) {
+  switch(TestStat) {
     case TestStatistic::kPoisson:
     name = "Poisson";
     break;
@@ -145,7 +145,7 @@ inline std::string TestStatistic_ToString(TestStatistic i) {
       throw MaCh3Exception(__FILE__, __LINE__);
     default:
       MACH3LOG_ERROR("UNKNOWN LIKELIHOOD SPECIFIED!");
-      MACH3LOG_ERROR("You gave test-statistic {}", static_cast<int>(i));
+      MACH3LOG_ERROR("You gave test-statistic {}", static_cast<int>(TestStat));
       throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   return name;
@@ -161,6 +161,21 @@ struct KinematicCut {
   double LowerBound = M3::_BAD_DOUBLE_;
   /// Upper bound on which we apply cut
   double UpperBound = M3::_BAD_DOUBLE_;
+};
+
+
+// ***************************
+/// @brief KS: Store bin lookups allowing to quickly find bin after migration
+struct BinShiftLookup {
+// ***************************
+  /// lower to check if Eb has moved the erec bin
+  double lower_binedge;
+  /// lower to check if Eb has moved the erec bin
+  double lower_lower_binedge;
+  /// upper to check if Eb has moved the erec bin
+  double upper_binedge;
+  /// upper to check if Eb has moved the erec bin
+  double upper_upper_binedge;
 };
 
 // ***************************
@@ -180,15 +195,8 @@ struct SampleBinningInfo {
   size_t nBins = M3::_BAD_INT_;
   /// If you have binning for multiple samples and trying to define 1D vector let's
   size_t GlobalOffset = M3::_BAD_INT_;
-
-  /// lower to check if Eb has moved the erec bin
-  std::vector<double> rw_lower_xbinedge;
-  /// lower to check if Eb has moved the erec bin
-  std::vector<double> rw_lower_lower_xbinedge;
-  /// upper to check if Eb has moved the erec bin
-  std::vector<double> rw_upper_xbinedge;
-  /// upper to check if Eb has moved the erec bin
-  std::vector<double> rw_upper_upper_xbinedge;
+  /// Bin lookups for X axis only
+  std::vector<BinShiftLookup> xBinLookup;
 
   /// @brief Get linear bin index from 2D bin indices
   /// @param xBin The bin index along the X axis (0-based)
@@ -221,22 +229,25 @@ struct SampleBinningInfo {
 
   /// @brief DB Find the relevant bin in the PDF for each event
   int FindXBin(const double XVar, const int NomXBin) const {
+    // KS: Get reference to avoid repeated indexing and help with performance
+    const auto& xBin = xBinLookup[NomXBin];
+
     //DB Check to see if momentum shift has moved bins
     //DB - First , check to see if the event is outside of the binning range and skip event if it is
      if (XVar < XBinEdges[0] || XVar >= XBinEdges[nXBins]) {
       return -1;
     }
     //DB - Second, check to see if the event is still in the nominal bin
-    else if (XVar < rw_upper_xbinedge[NomXBin] && XVar >= rw_lower_xbinedge[NomXBin]) {
+    else if (XVar < xBin.upper_binedge && XVar >= xBin.lower_binedge) {
       return NomXBin;
     }
     //DB - Thirdly, check the adjacent bins first as Eb+CC+EScale shifts aren't likely to move an Erec more than 1bin width
     //Shifted down one bin from the event bin at nominal
-    else if (XVar < rw_lower_xbinedge[NomXBin] && XVar >= rw_lower_lower_xbinedge[NomXBin]) {
+    else if (XVar < xBin.lower_binedge && XVar >= xBin.lower_lower_binedge) {
       return NomXBin-1;
     }
     //Shifted up one bin from the event bin at nominal
-    else if (XVar < rw_upper_upper_xbinedge[NomXBin] && XVar >= rw_upper_xbinedge[NomXBin]) {
+    else if (XVar < xBin.upper_upper_binedge && XVar >= xBin.upper_binedge) {
       return NomXBin+1;
     }
     //DB - If we end up in this loop, the event has been shifted outside of its nominal bin, but is still within the allowed binning range
@@ -245,38 +256,44 @@ struct SampleBinningInfo {
       return static_cast<int>(std::distance(XBinEdges.begin(), std::upper_bound(XBinEdges.begin(), XBinEdges.end(), XVar)) - 1);
     }
   }
-  /// @brief Initialise special lookup arrays allowing to more efficiently perform bin-migration
-  ///        These arrays store the lower and upper edges of each bin and their neighboring bins.
-  /// @todo expand to use y-axis
-  void InitialiseBinMigrationLookUp() {
-    rw_lower_xbinedge.resize(nXBins);
-    rw_lower_lower_xbinedge.resize(nXBins);
-    rw_upper_xbinedge.resize(nXBins);
-    rw_upper_upper_xbinedge.resize(nXBins);
-    //Set rw_pdf_bin and rw_upper_xbinedge and rw_lower_xbinedge for each skmc_base
-    for(size_t bin_x = 0; bin_x < nXBins; bin_x++){
+
+  /// @brief Initializes lookup arrays for efficient bin migration in a single dimension.
+  /// @param BinLookup Reference to the BinShiftLookup struct to be initialized.
+  /// @param BinEdges Vector of bin edges defining the bin boundaries.
+  /// @param TotBins Number of bins in the dimension.
+  void InitialiseLookUpSingleDimension(std::vector<BinShiftLookup>& BinLookup, const std::vector<double>& BinEdges, const size_t TotBins) {
+    BinLookup.resize(TotBins);
+    //Set rw_pdf_bin and upper_binedge and lower_binedge for each skmc_base
+    for(size_t bin_i = 0; bin_i < TotBins; bin_i++){
       double low_lower_edge = M3::_DEFAULT_RETURN_VAL_;
-      double low_edge = XBinEdges[bin_x];
-      double upper_edge = XBinEdges[bin_x+1];
+      double low_edge = BinEdges[bin_i];
+      double upper_edge = BinEdges[bin_i+1];
       double upper_upper_edge = M3::_DEFAULT_RETURN_VAL_;
 
-      if (bin_x == 0) {
-        low_lower_edge = XBinEdges[0];
+      if (bin_i == 0) {
+        low_lower_edge = BinEdges[0];
       } else {
-        low_lower_edge = XBinEdges[bin_x-1];
+        low_lower_edge = BinEdges[bin_i-1];
       }
 
-      if (bin_x + 2 < nXBins) {
-        upper_upper_edge = XBinEdges[bin_x + 2];
-      } else if (bin_x + 1 < nXBins) {
-        upper_upper_edge = XBinEdges[bin_x + 1];
+      if (bin_i + 2 < TotBins) {
+        upper_upper_edge = BinEdges[bin_i + 2];
+      } else if (bin_i + 1 < TotBins) {
+        upper_upper_edge = BinEdges[bin_i + 1];
       }
 
-      rw_lower_xbinedge[bin_x] = low_edge;
-      rw_upper_xbinedge[bin_x] = upper_edge;
-      rw_lower_lower_xbinedge[bin_x] = low_lower_edge;
-      rw_upper_upper_xbinedge[bin_x] = upper_upper_edge;
+      BinLookup[bin_i].lower_binedge = low_edge;
+      BinLookup[bin_i].upper_binedge = upper_edge;
+      BinLookup[bin_i].lower_lower_binedge = low_lower_edge;
+      BinLookup[bin_i].upper_upper_binedge = upper_upper_edge;
     }
+  }
+
+  /// @brief Initialise special lookup arrays allowing to more efficiently perform bin-migration
+  ///        These arrays store the lower and upper edges of each bin and their neighboring bins.
+  void InitialiseBinMigrationLookUp() {
+    InitialiseLookUpSingleDimension(xBinLookup, XBinEdges, nXBins);
+    /// @todo KS: This could be expanded easily for Y axis
   }
 };
 
@@ -301,7 +318,7 @@ inline int GetSampleFromGlobalBin(const std::vector<SampleBinningInfo>& BinningI
 
 /// @brief Sets the GlobalOffset for each SampleBinningInfo to enable linearization of multiple 2D binning samples.
 /// @param BinningInfo Vector of SampleBinningInfo structs to be updated with global offsets.
-inline void SetGlobalBinNumbers(std::vector<SampleBinningInfo>& BinningInfo){
+inline void SetGlobalBinNumbers(std::vector<SampleBinningInfo>& BinningInfo) {
   if (BinningInfo.empty()) {
     MACH3LOG_ERROR("No binning samples provided.");
     throw MaCh3Exception(__FILE__, __LINE__);
@@ -318,13 +335,14 @@ inline void SetGlobalBinNumbers(std::vector<SampleBinningInfo>& BinningInfo){
 // A handy namespace for variables extraction
 namespace MaCh3Utils {
 // ***************************
-
-/// @brief Return mass for given PDG
+  // *****************************
+  /// @brief Return mass for given PDG
   /// @note Get the mass of a particle from the PDG In GeV, not MeV!
+  /// @todo this could be constexpr in c++17
   /// @cite pdg2024 (particle masses)
   /// @cite ame2020 (nuclear masses)
   inline double GetMassFromPDG(const int PDG) {
-    // *****************************
+  // *****************************
     switch (abs(PDG)) {
       // Leptons
       case 11: return 0.00051099895; // e

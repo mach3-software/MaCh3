@@ -5,7 +5,8 @@
 // *************************
 PredictiveThrower::PredictiveThrower(manager *man) : FitterBase(man) {
 // *************************
- if(!CheckNodeExists(fitMan->raw(), "Predictive")) {
+ AlgorithmName = "PredictiveThrower";
+  if(!CheckNodeExists(fitMan->raw(), "Predictive")) {
    MACH3LOG_ERROR("Predictive is missing in your main yaml config");
    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
@@ -305,19 +306,22 @@ void PredictiveThrower::ProduceToys() {
   for (size_t iPDF = 0; iPDF < samples.size(); iPDF++)
   {
     auto* MaCh3Sample = dynamic_cast<SampleHandlerFD*>(samples[iPDF]);
-    // Get nominal spectra and event rates
-    TH1D* DataHist1D = static_cast<TH1D*>(MaCh3Sample->GetDataHist(1));
-    Data_Hist[iPDF] = M3::Clone(DataHist1D, MaCh3Sample->GetTitle() + "_data");
-    Data_Hist[iPDF]->Write((MaCh3Sample->GetTitle() + "_data").c_str());
+    for (int SampleIndex = 0; SampleIndex < MaCh3Sample->GetNsamples(); ++SampleIndex)
+    {
+      // Get nominal spectra and event rates
+      TH1D* DataHist1D = static_cast<TH1D*>(MaCh3Sample->GetDataHist(1));
+      Data_Hist[iPDF] = M3::Clone(DataHist1D, MaCh3Sample->GetTitle() + "_data");
+      Data_Hist[iPDF]->Write((MaCh3Sample->GetTitle() + "_data").c_str());
 
-    TH1D* MCHist1D = static_cast<TH1D*>(MaCh3Sample->GetMCHist(1));
-    MC_Nom_Hist[iPDF] = M3::Clone(MCHist1D, MaCh3Sample->GetTitle() + "_mc");
-    MCHist1D->Write((MaCh3Sample->GetTitle() + "_mc").c_str());
+      TH1D* MCHist1D = static_cast<TH1D*>(MaCh3Sample->GetMCHist(1));
+      MC_Nom_Hist[iPDF] = M3::Clone(MCHist1D, MaCh3Sample->GetTitle() + "_mc");
+      MCHist1D->Write((MaCh3Sample->GetTitle() + "_mc").c_str());
 
-    TH1D* W2Hist1D = static_cast<TH1D*>(MaCh3Sample->GetW2Hist(1));
-    W2_Nom_Hist[iPDF] = M3::Clone(W2Hist1D, MaCh3Sample->GetTitle() + "_w2");
-    W2Hist1D->Write((MaCh3Sample->GetTitle() + "_w2").c_str());
-    delete W2Hist1D;
+      TH1D* W2Hist1D = static_cast<TH1D*>(MaCh3Sample->GetW2Hist(1));
+      W2_Nom_Hist[iPDF] = M3::Clone(W2Hist1D, MaCh3Sample->GetTitle() + "_w2");
+      W2Hist1D->Write((MaCh3Sample->GetTitle() + "_w2").c_str());
+      delete W2Hist1D;
+    }
   }
 
   /// this store value of parameters sampled from a chain
@@ -403,15 +407,17 @@ void PredictiveThrower::ProduceToys() {
     for (size_t iPDF = 0; iPDF < samples.size(); iPDF++)
     {
       auto* MaCh3Sample = dynamic_cast<SampleHandlerFD*>(samples[iPDF]);
+      for (int SampleIndex = 0; SampleIndex < MaCh3Sample->GetNsamples(); ++SampleIndex)
+      {
+        TH1D* MCHist1D = static_cast<TH1D*>(MaCh3Sample->GetMCHist(1));
+        MC_Hist_Toy[iPDF][i] = M3::Clone(MCHist1D, MaCh3Sample->GetTitle() + "_mc_" + std::to_string(i));
+        MC_Hist_Toy[iPDF][i]->Write();
 
-      TH1D* MCHist1D = static_cast<TH1D*>(MaCh3Sample->GetMCHist(1));
-      MC_Hist_Toy[iPDF][i] = M3::Clone(MCHist1D, MaCh3Sample->GetTitle() + "_mc_" + std::to_string(i));
-      MC_Hist_Toy[iPDF][i]->Write();
-
-      TH1D* W2Hist1D = static_cast<TH1D*>(MaCh3Sample->GetW2Hist(1));
-      W2_Hist_Toy[iPDF][i] = M3::Clone(W2Hist1D, MaCh3Sample->GetTitle() + "_w2_" + std::to_string(i));
-      W2_Hist_Toy[iPDF][i]->Write();
-      delete W2Hist1D;
+        TH1D* W2Hist1D = static_cast<TH1D*>(MaCh3Sample->GetW2Hist(1));
+        W2_Hist_Toy[iPDF][i] = M3::Clone(W2Hist1D, MaCh3Sample->GetTitle() + "_w2_" + std::to_string(i));
+        W2_Hist_Toy[iPDF][i]->Write();
+        delete W2Hist1D;
+      }
     }
     ToyTree->Fill();
   }//end of toys loop
@@ -434,7 +440,7 @@ std::vector<std::unique_ptr<TH2D>> PredictiveThrower::ProduceSpectra(const std::
 // *************************
   std::vector<double> MaxValue(TotalNumberOfSamples);
   #ifdef MULTITHREAD
-  #pragma omp parallel for
+  #pragma omp parallel for collapse(2)
   #endif
   for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
     for (int toy = 0; toy < Ntoys; ++toy) {

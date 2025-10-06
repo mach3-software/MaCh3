@@ -588,8 +588,8 @@ void OscProcessor::MakeJarlskogPlot(const std::unique_ptr<TH1D>& jarl,
     auto j_sdcp_arrow_2sig_up = MakeArrow(j_sdcp_2sig_up, j_hist_sdcp_2sig->GetLineColor(), j_hist_sdcp_2sig->GetLineWidth());
     auto j_sdcp_arrow_3sig_up = MakeArrow(j_sdcp_3sig_up, j_hist_sdcp_3sig->GetLineColor(), j_hist_sdcp_3sig->GetLineWidth());
 
-    MACH3LOG_DEBUG("j_1sig_low = {}, j_2sig_low = {}, j_3sig_low = {}", j_1sig_low, j_2sig_low, j_3sig_low);
-    MACH3LOG_DEBUG("j_1sig_up = {}, j_2sig_up = {}, j_3sig_up = {}", j_1sig_up, j_2sig_up, j_3sig_up);
+    MACH3LOG_DEBUG("j_1sig_low = {:.4f}, j_2sig_low = {:.4f}, j_3sig_low = {:.4f}", j_1sig_low, j_2sig_low, j_3sig_low);
+    MACH3LOG_DEBUG("j_1sig_up = {:.4f}, j_2sig_up = {:.4f}, j_3sig_up = {:.4f}", j_1sig_up, j_2sig_up, j_3sig_up);
 
     auto CopyLineStyle = [](const TH1D* src, TLine* dst) {
       dst->SetLineColor(src->GetLineColor());
