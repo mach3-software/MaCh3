@@ -11,6 +11,7 @@
 #endif
 #ifdef MPIENABLED
 #include "Fitters/DEMCMC.h"
+#include "Fitters/PTMR2T2.h"
 #endif
 
 

@@ -38,7 +38,7 @@ class MCMCBase : public FitterBase {
     inline void PreStepProcess();
 
     /// @brief Actions after step proposal [end stopwatch, fill tree]
-    inline void PostStepProcess();
+   void PostStepProcess();
 
     /// @brief The MCMC step proposal and acceptance
     virtual void DoStep()=0;
@@ -72,6 +72,5 @@ class MCMCBase : public FitterBase {
     bool anneal;
     /// simulated annealing temperature
     double AnnealTemp;
-
 
 };

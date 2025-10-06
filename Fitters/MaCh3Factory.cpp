@@ -37,6 +37,15 @@ std::unique_ptr<FitterBase> MaCh3FitterFactory(manager *fitMan) {
     throw MaCh3Exception(__FILE__ , __LINE__ );
     #endif
   }
+  else if (Algorithm == "PTMR2T2")
+  {
+#ifdef MPIENABLED
+    MaCh3Fitter = std::make_unique<PTMR2T2>(fitMan);
+#else
+    MACH3LOG_ERROR("Trying to use DEMCMC however MaCh3 was compiled without MPI support");
+    throw MaCh3Exception(__FILE__, __LINE__);
+#endif
+  }
 
   else
   {

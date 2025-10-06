@@ -24,6 +24,7 @@ Basic algorithm:
    ---
 
 */
+#ifdef MPIENABLED
 
 class DEMCMC : public MR2T2 {
  public:
@@ -38,13 +39,19 @@ class DEMCMC : public MR2T2 {
 
     /// @brief Propose a step
     void ProposeStep() override;
-    /// @brief Step acceptance probability
 
+   void DEMCMCStep();
+   void ReweightLikelihood();
 
-   double gamma;
-   double scaling_matrix;
-   int n_params;
-   std::vector<int> curr_step_idx;
-   std::vector<double> transfer_vec;
-   std::vector<double> all_params;
+    double gamma;
+    double scaling_matrix;
+    int n_params;
+    std::vector<int> curr_step_idx;
+    std::vector<double> transfer_vec;
+    std::vector<double> all_params;
+
+    // Adaption
+
 };
+
+#endif
