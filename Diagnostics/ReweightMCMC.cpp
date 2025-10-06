@@ -50,7 +50,7 @@ struct ReweightConfig {
 
 void ReweightMCMC(const std::string& inputFile, const std::string& configFile);
 
-// TODO: Maybe add a generic 2D reweight that is not dm32 and theta13 specific? DWR
+/// @todo add a generic 2D reweight that is not dm32 and theta13 specific DWR
 
 /// @brief Function to interpolate 2D graph for Normal Ordering
 double Graph_interpolateNO(TGraph2D* graph, double theta13, double dm32);
@@ -255,7 +255,8 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
     auto processor = std::make_unique<MCMCProcessor>(inputFile);
     processor->Initialise();
     
-    // Validate that all required parameters exist in the chain TODO: Get list only of UNIQUE parameters, this is repeating unnecessarily DWR
+    // Validate that all required parameters exist in the chain 
+    /// @todo Get list only of unique parameters, this is repeating unnecessarily when adding more than 1 weight DWR
     for (const auto& rwConfig : reweightConfigs) {
         for (const auto& paramName : rwConfig.paramNames) {
             int paramIndex = processor->GetParamIndexFromName(paramName);
@@ -266,8 +267,8 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
             MACH3LOG_INFO("Parameter {} found in chain", paramName);
         }
     }
-   
-    // TODO Finish Asimov shifting implementation, for now just warn that Asimovs are not being properly handled
+
+    /// @todo Finish Asimov shifting implementation, for now just warn that Asimovs are not being properly handled
     // Get the settings for the MCMC
     TFile *TempFile = TFile::Open(inputFile.c_str(), "READ");
     if (TempFile == nullptr || TempFile->IsZombie()) {
@@ -390,7 +391,7 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
     MACH3LOG_INFO("Processing {} entries", nEntries);
     
 
-    // TODO: add tracking for how many events are outside the graph ranges for diagnostics DWR
+    /// @todo add tracking for how many events are outside the graph ranges for diagnostics DWR
     
     if (processMCMCreweighted) {
         MACH3LOG_INFO("MCMCProcessor has reweighted, skipping duplicate reweighting");
@@ -398,7 +399,7 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
         for (Long64_t i = 0; i < nEntries; ++i) {
             if(i % (nEntries/20) == 0) MaCh3Utils::PrintProgressBar(i, nEntries);
         
-            inTree->GetEntry(i);
+            inTree->GetEntry(i)
             
             // Calculate weights for all configurations
             for (const auto& rwConfig : reweightConfigs) {
@@ -407,7 +408,7 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
                 if (rwConfig.dimension == 1 && rwConfig.type != "Gaussian") {
                     if (rwConfig.type == "TGraph") {
                             double paramValue = paramValues[rwConfig.paramNames[0]];
-                            weight = Graph_interpolate1D(nullptr, paramValue); // TODO replace nullptr with actual TGraph pointer when implemented
+                            weight = Graph_interpolate1D(rwConfig.graph_1D.get(), paramValue); 
                     } else {
                         MACH3LOG_ERROR("Unsupported 1D reweight type: {} for {}", rwConfig.type, rwConfig.key);
                     }
@@ -517,7 +518,7 @@ double Graph_interpolateIO(TGraph2D* graph, double theta13, double dm32)
 
 double Graph_interpolate1D(TGraph* graph, double theta13)
 {
-    // TODO implement TGraph interpolation for 1D
+    /// @todo double check implementation of TGraph interpolation for 1DD
     if (!graph) {
         MACH3LOG_ERROR("Graph pointer is null");
         throw MaCh3Exception(__FILE__, __LINE__);
