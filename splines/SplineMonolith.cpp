@@ -60,7 +60,7 @@ void FPGACalcSplineWeights(short int *SplineSegments,
     for (unsigned int splineNum = 0; splineNum < NSplines_valid; ++splineNum){
         const short int Param = params_host[splineNum];
         const short int segment = segments_bram[Param];
-        const short int segment_X = short int(Param * max_knots + segment);
+        const short int segment_X = static_cast<short int>(Param * max_knots + segment);
         const unsigned int CurrentKnotPos = knots_host[splineNum] * nCoeff + segment * nCoeff;
 
         // fetch all fX simultaneously
