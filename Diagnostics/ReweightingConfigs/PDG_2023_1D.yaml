@@ -1,7 +1,7 @@
-Example 1D constraint reweight configuration
-Reactor constraint reweight
+#Example 1D constraint reweight configuration
+#Reactor constraint reweight
 ReweightMCMC:
-  ReactorConstraint:
+  Weight:
      ReweightName: "PDG Reactor Constraint"
      ReweightDim: 1
      ReweightVar: "sin2th_13"
