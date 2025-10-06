@@ -161,15 +161,38 @@ void OscProcessor::PerformJarlskogAnalysis() {
 
   if (Config != nullptr) {
     YAML::Node Settings = TMacroToYAML(*Config);
+    
+    // Check for the old simple format (should be used for Jarlskog)
     if(CheckNodeExists(Settings, "Weight", Sin2Theta13Name)) {
-      if(Settings["ReweightType"].as<std::string>() == "Gaussian") {
-      Sin13_NewPrior = Get<std::pair<double, double>>(Settings["Weight"][Sin2Theta13Name], __FILE__, __LINE__);
-      MACH3LOG_INFO("Found Weight in chain, using RC reweighting with new priors {} +- {}", Sin13_NewPrior.first, Sin13_NewPrior.second);
-      DoReweight = true;
+      // New format: direct Weight section with ReweightType at top level
+      if(CheckNodeExists(Settings, "ReweightType")) {
+        std::string reweightType = Settings["ReweightType"].as<std::string>();
+        if(reweightType == "Gaussian") {
+          Sin13_NewPrior = Get<std::pair<double, double>>(Settings["Weight"][Sin2Theta13Name], __FILE__, __LINE__);
+          MACH3LOG_INFO("Found Weight in chain, using RC reweighting with new priors {} +- {}", Sin13_NewPrior.first, Sin13_NewPrior.second);
+          DoReweight = true;
+        } else {
+          MACH3LOG_ERROR("ReweightType {} not supported for Jarlskog reweighting", reweightType);
+          throw MaCh3Exception(__FILE__, __LINE__);
+        }
       } else {
-        MACH3LOG_ERROR("ReweightType {} not supported for Jarlskog reweighting", Settings["ReweightType"].as<std::string>());
-        throw MaCh3Exception(__FILE__, __LINE__);
+        // MCMCProcessor format only sin2th_13: [mean, sigma]
+        MACH3LOG_WARN("Found Weight section but no ReweightType specified, assuming Gaussian");
+        Sin13_NewPrior = Get<std::pair<double, double>>(Settings["Weight"][Sin2Theta13Name], __FILE__, __LINE__);
+        MACH3LOG_INFO("Found Weight in chain, using RC reweighting with new priors {} +- {}", Sin13_NewPrior.first, Sin13_NewPrior.second);
+        DoReweight = true;
       }
+    }
+    // Check if we have the new ReweightMCMC structure (not used for Jarlskog)
+    else if(CheckNodeExists(Settings, "ReweightMCMC")) {
+      MACH3LOG_WARN("Found ReweightMCMC structure in Reweight_Config");
+      MACH3LOG_WARN("Jarlskog analysis expects simple format:");
+      MACH3LOG_WARN("ReweightType: \"Gaussian\"");
+      MACH3LOG_WARN("Weight:");
+      MACH3LOG_WARN("  {}: [mean, sigma]", Sin2Theta13Name);
+      MACH3LOG_WARN("Skipping reweighting for Jarlskog analysis");
+    } else {
+      MACH3LOG_INFO("No reweighting configuration found for Jarlskog analysis");
     }
   }
 

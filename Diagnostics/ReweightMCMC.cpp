@@ -399,7 +399,7 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
         for (Long64_t i = 0; i < nEntries; ++i) {
             if(i % (nEntries/20) == 0) MaCh3Utils::PrintProgressBar(i, nEntries);
         
-            inTree->GetEntry(i)
+            inTree->GetEntry(i);
             
             // Calculate weights for all configurations
             for (const auto& rwConfig : reweightConfigs) {
@@ -461,6 +461,7 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
     if (processMCMCreweighted){
         MACH3LOG_INFO("MCMCProcessor reweighting applied, Final reweighted file is: {}_reweighted.root", inputFile.substr(0, inputFile.find_last_of('.')));
         // delete the file we just created since MCMCProcessor already did the reweighting and saved it to a file
+        /// @todo fix seg fault because we deleted this DWR
         outFile->Close();
         if (std::remove(outputFile.c_str()) != 0) {
             MACH3LOG_ERROR("Error deleting temporary file: {}", outputFile);
