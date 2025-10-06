@@ -274,9 +274,9 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
     std::cout<<"CHECK!!! USE_FPGA active"<<std::endl;
     queue = sycl::queue(selector);//, fpga_tools::exception_handler, sycl::property::queue::enable_profiling{});
     //queue = sycl::queue(sycl::default_selector{});
-    //segments = sycl::malloc_shared<short int>(nParams, queue);
+    //segments = sycl::malloc_host<short int>(nParams, queue);
     SplineSegments = sycl::malloc_host<short int>(nParams, queue);
-    ParamValues = sycl::malloc_shared<float>(nParams, queue);
+    ParamValues = sycl::malloc_host<float>(nParams, queue);
   #else
     SplineSegments = new short int[nParams]();
     ParamValues = new float[nParams]();
@@ -304,8 +304,8 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
 
   #ifdef USE_FPGA
     cpu_spline_handler = new SplineMonoUSM(queue, event_size_max, nKnots*_nCoeff_, NSplines_valid, NSplines_valid, NEvents);
-    cpu_coeff_TF1_many = sycl::malloc_shared<float>(nTF1coeff, queue);
-    cpu_paramNo_TF1_arr = sycl::malloc_shared<short int>(NTF1_valid, queue);
+    cpu_coeff_TF1_many = sycl::malloc_host<float>(nTF1coeff, queue);
+    cpu_paramNo_TF1_arr = sycl::malloc_host<short int>(NTF1_valid, queue);
     cpu_total_weights = sycl::malloc_host<float>(NEvents, queue);
   #else
     cpu_spline_handler->paramNo_arr.resize(NSplines_valid);
@@ -804,9 +804,9 @@ void SMonolith::LoadSplineFile(std::string FileName) {
     auto selector = sycl::default_selector{};
   #endif
   queue = sycl::queue(selector);//, fpga_tools::exception_handler, sycl::property::queue::enable_profiling{});
-  //segments = sycl::malloc_shared<short int>(nParams, queue);
+  //segments = sycl::malloc_host<short int>(nParams, queue);
   SplineSegments = sycl::malloc_host<short int>(nParams, queue);
-  ParamValues = sycl::malloc_shared<float>(nParams, queue);
+  ParamValues = sycl::malloc_host<float>(nParams, queue);
   
 #else
   SplineSegments = new short int[nParams]();
@@ -819,8 +819,8 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   cpu_nParamPerEvent_tf1.resize(2*NEvents);
   #ifdef USE_FPGA
     cpu_spline_handler = new SplineMonoUSM(queue, event_size_max, nKnots*_nCoeff_, NSplines_valid, NSplines_valid, NEvents);
-    cpu_coeff_TF1_many = sycl::malloc_shared<float>(nTF1coeff, queue);
-    cpu_paramNo_TF1_arr = sycl::malloc_shared<short int>(NTF1_valid, queue);
+    cpu_coeff_TF1_many = sycl::malloc_host<float>(nTF1coeff, queue);
+    cpu_paramNo_TF1_arr = sycl::malloc_host<short int>(NTF1_valid, queue);
   #else
     cpu_spline_handler->paramNo_arr.resize(NSplines_valid);
     //KS: And array which tells where each spline stars in a big monolith array, sort of knot map
@@ -839,8 +839,8 @@ void SMonolith::LoadSplineFile(std::string FileName) {
 #ifndef CUDA
   #ifdef USE_FPGA
     cpu_total_weights = sycl::malloc_host<float>(NEvents, queue);
-    cpu_weights_spline_var = sycl::malloc_shared<float>(NSplines_valid, queue);
-    cpu_weights_tf1_var = sycl::malloc_shared<float>(NTF1_valid, queue);
+    cpu_weights_spline_var = sycl::malloc_host<float>(NSplines_valid, queue);
+    cpu_weights_tf1_var = sycl::malloc_host<float>(NTF1_valid, queue);
   #else
     cpu_total_weights = new float[NEvents]();
     cpu_weights_spline_var = new float[NSplines_valid]();
@@ -1297,9 +1297,39 @@ void SMonolith::Evaluate() {
   
   // Time the kernel call
     std::chrono::time_point<std::chrono::system_clock> start, end; 
-    //Before the kernal call
+    //Before the kernel call
     start = std::chrono::system_clock::now();
- 
+
+    // ==================== DEBUG PRINTS START ====================
+    // Include the <iostream> header if you haven't already.
+    std::cout <<  "Pre-Kernel Launch Argument Verification" << std::endl;
+
+    // Task A arguments
+    std::cout << "SplineSegments:           " << static_cast<void*>(SplineSegments) << std::endl;
+    std::cout << "coeff_many:               " << static_cast<void*>(cpu_spline_handler->coeff_many) << std::endl;
+    std::cout << "ParamValues:              " << static_cast<void*>(ParamValues) << std::endl;
+    std::cout << "coeff_x:                  " << static_cast<void*>(cpu_spline_handler->coeff_x) << std::endl;
+    std::cout << "nKnots_arr:               " << static_cast<void*>(cpu_spline_handler->nKnots_arr) << std::endl;
+    std::cout << "paramNo_arr:              " << static_cast<void*>(cpu_spline_handler->paramNo_arr) << std::endl;
+    std::cout << "NSplines_valid:           " << NSplines_valid << std::endl;
+    std::cout << "_nCoeff_:                 " << _nCoeff_ << std::endl;
+    std::cout << "_max_knots:               " << _max_knots << std::endl;
+    std::cout << "nParams:                  " << nParams << std::endl;
+
+    // Task B arguments
+    std::cout << "cpu_paramNo_TF1_arr:      " << static_cast<void*>(cpu_paramNo_TF1_arr) << std::endl;
+    std::cout << "cpu_coeff_TF1_many:       " << static_cast<void*>(cpu_coeff_TF1_many) << std::endl;
+    std::cout << "NTF1_valid:               " << NTF1_valid << std::endl;
+    std::cout << "_nTF1Coeff_:              " << _nTF1Coeff_ << std::endl;
+
+    // Task C arguments
+    std::cout << "NEvents:                  " << NEvents << std::endl;
+    std::cout << "cpu_total_weights:        " << static_cast<void*>(cpu_total_weights) << std::endl;
+    std::cout << "cpu_nParamPerEvent.data(): " << static_cast<void*>(cpu_nParamPerEvent.data()) << std::endl;
+    std::cout << "cpu_nParamPerEvent_tf1.data(): " << static_cast<void*>(cpu_nParamPerEvent_tf1.data()) << std::endl;
+
+    std::cout << "Calling kernel:" << std::endl;
+
     // Call the kernel
     auto e = queue.single_task<IDOptimized>(OptimizedKernel{SplineSegments,
                                                             cpu_spline_handler->coeff_many,

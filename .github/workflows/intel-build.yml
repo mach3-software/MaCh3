@@ -84,6 +84,6 @@ jobs:
           source /home/hep/llaatu/gh-runner/_work/MaCh3/MaCh3/build/bin/setup.MaCh3.sh
 
           cd /home/hep/llaatu/mach3/MaCh3Tutorial/build/
-          export SYCL_UR_TRACE=2
+          export SYCL_UR_TRACE=-1
           ./CIValidations/SplineValidations
         shell: bash        
