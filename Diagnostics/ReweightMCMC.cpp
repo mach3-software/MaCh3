@@ -149,7 +149,8 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
                     MACH3LOG_ERROR("Failed to open constraint file: {}", reweightConfig.fileName);
                     continue;
                 }
-                auto graph = constraintFile->Get<TGraph>(reweightConfig.graphName.c_str());
+                
+                std::unique_ptr<TGraph> graph(constraintFile->Get<TGraph>(reweightConfig.graphName.c_str()));
                 if (graph) {
                     // Create a completely independent copy
                     auto cloned_graph = static_cast<TGraph*>(graph->Clone());
@@ -199,7 +200,8 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
                 if (reweightConfig.hierarchyType == "auto" || reweightConfig.hierarchyType == "NO") {
                     std::string graphName_NO = reweightConfig.graphName + "_NO";
                     MACH3LOG_INFO("Loading NO graph: {}", graphName_NO);
-                    auto graph_NO = constraintFile->Get<TGraph2D>(graphName_NO.c_str());
+                   
+                    std::unique_ptr<TGraph2D> graph_NO(constraintFile->Get<TGraph2D>(graphName_NO.c_str()));
                     if (graph_NO) {
                         // Create a completely independent copy
                         auto cloned_graph = static_cast<TGraph2D*>(graph_NO->Clone());
@@ -215,7 +217,7 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
                 if (reweightConfig.hierarchyType == "auto" || reweightConfig.hierarchyType == "IO") {
                     std::string graphName_IO = reweightConfig.graphName + "_IO";
                     MACH3LOG_INFO("Loading IO graph: {}", graphName_IO);
-                    auto graph_IO = constraintFile->Get<TGraph2D>(graphName_IO.c_str());
+                    std::unique_ptr<TGraph2D> graph_IO(constraintFile->Get<TGraph2D>(graphName_IO.c_str()));
                     if (graph_IO) {
                         // Create a completely independent copy
                         auto cloned_graph = static_cast<TGraph2D*>(graph_IO->Clone());
@@ -270,13 +272,13 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
 
     /// @todo Finish Asimov shifting implementation, for now just warn that Asimovs are not being properly handled
     // Get the settings for the MCMC
-    TFile *TempFile = TFile::Open(inputFile.c_str(), "READ");
-    if (TempFile == nullptr || TempFile->IsZombie()) {
+    auto TempFile = std::unique_ptr<TFile>(TFile::Open(inputFile.c_str(), "READ"));
+    if (!TempFile || TempFile->IsZombie()) {
         MACH3LOG_ERROR("Cannot open MCMC file: {}", inputFile);
         throw MaCh3Exception(__FILE__ , __LINE__ );
     }
-    TMacro *Config = TempFile->Get<TMacro>("MaCh3_Config");
-    if (Config == nullptr) {
+    std::unique_ptr<TMacro> Config(TempFile->Get<TMacro>("MaCh3_Config"));
+    if (!Config) {
         MACH3LOG_ERROR("Didn't find MaCh3_Config tree in MCMC file! {}", inputFile.c_str());
         TempFile->ls();
         throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -317,19 +319,18 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
     MACH3LOG_INFO("Output file will be: {}", outputFile);
     
     // Copy all the remaining objects into the out file (ie all but posteriors tree)
-
     TIter next(inFile->GetListOfKeys());
     while (TKey* key = dynamic_cast<TKey*>(next())) {
         inFile->cd();
-        TObject* obj = key->ReadObj();
+        std::unique_ptr<TObject> obj(key->ReadObj());
         if (obj->IsA()->InheritsFrom(TDirectory::Class())) {
             // It's a folder, create and copy its contents
-            TDirectory* srcDir = static_cast<TDirectory*>(obj);
+            TDirectory* srcDir = static_cast<TDirectory*>(obj.get());
             TDirectory* destDir = outFile->mkdir(srcDir->GetName());
             TIter nextSubKey(srcDir->GetListOfKeys());
             while (TKey* subKey = dynamic_cast<TKey*>(nextSubKey())) {
                 srcDir->cd();
-                TObject* subObj = subKey->ReadObj();
+                std::unique_ptr<TObject> subObj(subKey->ReadObj());
                 destDir->cd();
                 subObj->Write();
             }
@@ -526,7 +527,7 @@ double Graph_interpolateIO(TGraph2D* graph, double theta13, double dm32)
 
 double Graph_interpolate1D(TGraph* graph, double theta13)
 {
-    /// @todo double check implementation of TGraph interpolation for 1DD
+    /// @todo double check implementation of TGraph interpolation for 1D
     if (!graph) {
         MACH3LOG_ERROR("Graph pointer is null");
         throw MaCh3Exception(__FILE__, __LINE__);
