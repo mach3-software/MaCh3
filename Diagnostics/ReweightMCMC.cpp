@@ -305,7 +305,8 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
     }
     
     // Create output file
-    std::string outputFile = inputFile.substr(0, inputFile.find_last_of('.')) + "_reweighted_" + configFile.substr(0, configFile.find_last_of('.')) + ".root";
+    std::string configString = configFile.substr(configFile.find_last_of('/') + 1, configFile.find_last_of('.') - configFile.find_last_of('/') - 1);
+    std::string outputFile = inputFile.substr(0, inputFile.find_last_of('.')) + "_reweighted_" + configString + ".root";
     auto outFile = std::unique_ptr<TFile>(TFile::Open(outputFile.c_str(), "RECREATE"));
     if (!outFile || outFile->IsZombie()) {
         MACH3LOG_ERROR("Cannot create output file: {}", outputFile);
@@ -368,7 +369,9 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
         );
         MACH3LOG_INFO("Added weight branch: {}", rwConfig.weightBranchName);
     }
-   
+    
+    bool processMCMCreweighted=false;
+
     // If a given reweight is 1D Gaussian we can just let MCMCProcessor method do the reweight
     for (const auto& rwConfig : reweightConfigs){
         if (rwConfig.dimension == 1 && rwConfig.type == "Gaussian"){
@@ -378,6 +381,7 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
             const std::vector<double>& priorSigma = {rwConfig.priorValues[1]};
             processor->ReweightPrior(paramName, priorCentral, priorSigma);
             MACH3LOG_INFO("Applied Gaussian reweighting for {} with mean={} and sigma={}", paramName[0], priorCentral[0], priorSigma[0]);
+            processMCMCreweighted=true;
         }
     }
     // For 2D reweight and non-gaussian (ie TGraph) 1D reweight we need to do it ourselves
@@ -385,53 +389,58 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
     Long64_t nEntries = inTree->GetEntries();
     MACH3LOG_INFO("Processing {} entries", nEntries);
     
-    // TODO: add tracking for how many events are outside the graph ranges for diagnostics DWR
 
-    for (Long64_t i = 0; i < nEntries; ++i) {
-        if(i % (nEntries/20) == 0) MaCh3Utils::PrintProgressBar(i, nEntries);
-       
-        inTree->GetEntry(i);
+    // TODO: add tracking for how many events are outside the graph ranges for diagnostics DWR
+    
+    if (processMCMCreweighted) {
+        MACH3LOG_INFO("MCMCProcessor has reweighted, skipping duplicate reweighting");
+    } else {
+        for (Long64_t i = 0; i < nEntries; ++i) {
+            if(i % (nEntries/20) == 0) MaCh3Utils::PrintProgressBar(i, nEntries);
         
-        // Calculate weights for all configurations
-        for (const auto& rwConfig : reweightConfigs) {
-            double weight = 1.0;
+            inTree->GetEntry(i);
             
-            if (rwConfig.dimension == 1 && rwConfig.type != "Gaussian") {
-                if (rwConfig.type == "TGraph") {
-                        double paramValue = paramValues[rwConfig.paramNames[0]];
-                        weight = Graph_interpolate1D(nullptr, paramValue); // TODO replace nullptr with actual TGraph pointer when implemented
-                } else {
-                    MACH3LOG_ERROR("Unsupported 1D reweight type: {} for {}", rwConfig.type, rwConfig.key);
-                }
-            } else if (rwConfig.dimension == 2) {
-                if (rwConfig.type == "TGraph2D") {
-                    double dm32 = paramValues[rwConfig.paramNames[0]];
-                    double theta13 = paramValues[rwConfig.paramNames[1]];
-                    if (dm32 > 0) {
-                        // Normal Ordering
-                        if (rwConfig.graph_NO) {
-                            weight = Graph_interpolateNO(rwConfig.graph_NO.get(), theta13, dm32);
-                        } else {
-                            MACH3LOG_ERROR("NO graph not available for {}", rwConfig.key);
-                            weight = 0.0;
-                        }
+            // Calculate weights for all configurations
+            for (const auto& rwConfig : reweightConfigs) {
+                double weight = 1.0;
+                
+                if (rwConfig.dimension == 1 && rwConfig.type != "Gaussian") {
+                    if (rwConfig.type == "TGraph") {
+                            double paramValue = paramValues[rwConfig.paramNames[0]];
+                            weight = Graph_interpolate1D(nullptr, paramValue); // TODO replace nullptr with actual TGraph pointer when implemented
                     } else {
-                        // Inverted Ordering
-                        if (rwConfig.graph_IO) {
-                            weight = Graph_interpolateIO(rwConfig.graph_IO.get(), theta13, dm32);
+                        MACH3LOG_ERROR("Unsupported 1D reweight type: {} for {}", rwConfig.type, rwConfig.key);
+                    }
+                } else if (rwConfig.dimension == 2) {
+                    if (rwConfig.type == "TGraph2D") {
+                        double dm32 = paramValues[rwConfig.paramNames[0]];
+                        double theta13 = paramValues[rwConfig.paramNames[1]];
+                        if (dm32 > 0) {
+                            // Normal Ordering
+                            if (rwConfig.graph_NO) {
+                                weight = Graph_interpolateNO(rwConfig.graph_NO.get(), theta13, dm32);
+                            } else {
+                                MACH3LOG_ERROR("NO graph not available for {}", rwConfig.key);
+                                weight = 0.0;
+                            }
                         } else {
-                            MACH3LOG_ERROR("IO graph not available for {}", rwConfig.key);
-                            weight = 0.0;
+                            // Inverted Ordering
+                            if (rwConfig.graph_IO) {
+                                weight = Graph_interpolateIO(rwConfig.graph_IO.get(), theta13, dm32);
+                            } else {
+                                MACH3LOG_ERROR("IO graph not available for {}", rwConfig.key);
+                                weight = 0.0;
+                            }
                         }
                     }
                 }
+                
+                weights[rwConfig.weightBranchName] = weight;
             }
             
-            weights[rwConfig.weightBranchName] = weight;
+            // Fill the output tree
+            outTree->Fill();
         }
-        
-        // Fill the output tree
-        outTree->Fill();
     }
     
     // Write and close
@@ -448,8 +457,12 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
     reweightMacro.AddLine(ss.str().c_str());
     reweightMacro.Write();
 
-    MACH3LOG_INFO("Reweighting completed successfully!");
-    MACH3LOG_INFO("Final reweighted file is: {}", outputFile);
+    if (processMCMCreweighted){
+        MACH3LOG_INFO("MCMCProcessor reweighting applied, Final reweighted file is: {}_reweighted.root", inputFile.substr(0, inputFile.find_last_of('.')));
+    } else {
+        MACH3LOG_INFO("Reweighting completed successfully!");
+        MACH3LOG_INFO("Final reweighted file is: {}", outputFile);
+    }
 }
 
 double Graph_interpolateNO(TGraph2D* graph, double theta13, double dm32)
