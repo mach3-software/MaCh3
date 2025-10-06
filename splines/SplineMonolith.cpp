@@ -42,34 +42,40 @@ void FPGACalcSplineWeights(short *SplineSegments,
                            int max_knots,
                            int nParams) {
 //*********************************************************
-    // The host_ptr declarations have been removed.
-    // We now use the raw pointer arguments (e.g., SplineSegments) directly.
-
+    sycl::ext::intel::host_ptr<const short> segments_host(SplineSegments);
+    sycl::ext::intel::host_ptr<const float> coeff_many_host(coeff_many);
+    sycl::ext::intel::host_ptr<const float> paramvalues_host(ParamValues);
+    sycl::ext::intel::host_ptr<const float> coeff_x_host(coeff_x);
+    sycl::ext::intel::host_ptr<const unsigned int> knots_host(nKnots_arr);
+    sycl::ext::intel::host_ptr<const short> params_host(paramNo_arr);
+    
     [[intel::fpga_memory("BLOCK_RAM")]] int segments_bram[200];
     [[intel::max_replicates(4)]] float paramvalues_bram[200];
     for (int i = 0; i < nParams; i++) {
-        segments_bram[i] = SplineSegments[i];
-        paramvalues_bram[i] = ParamValues[i];
+        segments_bram[i] = segments_host[i];
+        paramvalues_bram[i] = paramvalues_host[i];
     }
 
 
     for (unsigned int splineNum = 0; splineNum < NSplines_valid; ++splineNum){
-        const short int Param = paramNo_arr[splineNum];
+        const short int Param = params_host[splineNum];
         const short int segment = segments_bram[Param];
         const short int segment_X = short(Param * max_knots + segment);
-        const unsigned int CurrentKnotPos = nKnots_arr[splineNum] * nCoeff + segment * nCoeff;
+        const unsigned int CurrentKnotPos = knots_host[splineNum] * nCoeff + segment * nCoeff;
 
         // fetch all fX simultaneously
         float coeffs[4];
         #pragma unroll
         for (unsigned int icoeff = 0; icoeff < 4; icoeff++) {
-            coeffs[icoeff] = coeff_many[CurrentKnotPos+icoeff];
+
+        coeffs[icoeff] = coeff_many_host[CurrentKnotPos+icoeff];
+
         }
         const float fA = coeffs[0];
         const float fB = coeffs[1];
         const float fC = coeffs[2];
         const float fD = coeffs[3];
-        const float dx = paramvalues_bram[Param] - coeff_x[segment_X];
+        const float dx = paramvalues_bram[Param] - coeff_x_host[segment_X];
 
         bool success = false;
         while (!success) SplinePipe::write((fA+dx*(fB+dx*(fC+dx*fD))), success);
@@ -83,19 +89,21 @@ void FPGACalcTF1Weights(float *ParamValues,
                         int nTF1Coeff,
                         int nParams) {
 
-    // The host_ptr declarations have been removed.
+    sycl::ext::intel::host_ptr<const float> paramvalues_host(ParamValues);
+    sycl::ext::intel::host_ptr<const short> paramNo_TF1_host(cpu_paramNo_TF1_arr);
+    sycl::ext::intel::host_ptr<const float> coeff_TF1_many_host(cpu_coeff_TF1_many);
     
     [[intel::max_replicates(4)]] float paramvalues_bram[200];
     for (int i = 0; i < nParams; i++) {
-        paramvalues_bram[i] = ParamValues[i];
+        paramvalues_bram[i] = paramvalues_host[i];
     }
 
     for (unsigned int tf1Num = 0; tf1Num < NTF1_valid; ++tf1Num){
-        const float x = paramvalues_bram[cpu_paramNo_TF1_arr[tf1Num]];
+        const float x = paramvalues_bram[paramNo_TF1_host[tf1Num]];
 
         const unsigned int TF1_Index = tf1Num * nTF1Coeff;
-        const float a = cpu_coeff_TF1_many[TF1_Index];
-        const float b = cpu_coeff_TF1_many[TF1_Index + 1];
+        const float a = coeff_TF1_many_host[TF1_Index];
+        const float b = coeff_TF1_many_host[TF1_Index + 1];
 
         bool success = false;
         while (!success) TF1Pipe::write(a*x + b, success);
@@ -109,7 +117,9 @@ void FPGAModifyWeights(int NEvents,
                        float *cpu_total_weights,
                        unsigned int *cpu_nParamPerEvent,
                        unsigned int *cpu_nParamPerEvent_tf1){
-    // The host_ptr declarations have been removed.
+    sycl::ext::intel::host_ptr<float> total_weights_host(cpu_total_weights);
+    sycl::ext::intel::host_ptr<const unsigned int> nParamPerEvent_host(cpu_nParamPerEvent);
+    sycl::ext::intel::host_ptr<const unsigned int> nParamPerEvent_tf1_host(cpu_nParamPerEvent_tf1);
 
     for (unsigned int EventNum = 0; EventNum < NEvents; ++EventNum){
         float totalWeight = 1.0f; // Initialize total weight for each event
@@ -117,8 +127,10 @@ void FPGAModifyWeights(int NEvents,
         const unsigned int Offset = 2 * EventNum;
 
         // Extract the parameters for the current event
-        const unsigned int numParams = cpu_nParamPerEvent[Offset];
-        const unsigned int numParams_tf1 = cpu_nParamPerEvent_tf1[Offset];
+        const unsigned int startIndex = nParamPerEvent_host[Offset + 1];
+        const unsigned int numParams = nParamPerEvent_host[Offset];
+        const unsigned int startIndex_tf1 = nParamPerEvent_tf1_host[Offset + 1];
+        const unsigned int numParams_tf1 = nParamPerEvent_tf1_host[Offset];
         int current_spline_param = 0;
         int current_tf1_param = 0;
 
@@ -146,15 +158,20 @@ void FPGAModifyWeights(int NEvents,
                 }
             }
         }
-        
-        // Note: The commented-out section was removed for clarity as it
-        // appeared to reference variables not in the function signature.
+
+        // // Compute total weight for the current event
+        // for (unsigned int id = 0; id < numParams; ++id) {
+        //     totalWeight *= cpu_weights_spline_var[startIndex + id];
+        // }
+        // // Compute total weight for the current event
+        // for (unsigned int id = 0; id < numParams_tf1; ++id) {
+        //     totalWeight *= cpu_weights_tf1_var[startIndex_tf1 + id];
+        // }
 
         // Store the total weight for the current event
-        cpu_total_weights[EventNum] = totalWeight;
+        total_weights_host[EventNum] = totalWeight;
     }
 }
-
 
 #endif
 #ifdef CUDA
