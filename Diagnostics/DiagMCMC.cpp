@@ -32,10 +32,6 @@ void DiagMCMC(const std::string& inputFile, const std::string& config)
 }
 
 int main(int argc, char *argv[]) {
-  #ifdef MPIENABLED
-  MPI_Init(&argc, &argv);
-  #endif
-
   SetMaCh3LoggerFormat();
   if (argc != 3)
   {

@@ -12,7 +12,7 @@ PTMR2T2::PTMR2T2(manager *const manager) : MR2T2(manager) {
     n_up_swap = 0;
 
 
-    max_temp = 1000;
+    max_temp = 100000;
     min_temp = 1.0;
     if(temperature > max_temp){
         temperature = max_temp;

@@ -372,10 +372,6 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
 
 int main(int argc, char *argv[])
 {
-  #ifdef MPIENABLED
-    MPI_Init(&argc, &argv);
-  #endif
-
   SetMaCh3LoggerFormat();
   MaCh3Utils::MaCh3Welcome();
   if (argc != 3 )
@@ -387,9 +383,5 @@ int main(int argc, char *argv[])
   std::string filename = argv[1];
   std::string config = argv[2];
   GetPenaltyTerm(filename, config);
-#ifdef MPIENABLED
-  MPI_Finalize();
-#endif
-
   return 0;
 }

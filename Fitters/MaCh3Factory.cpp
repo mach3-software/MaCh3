@@ -58,6 +58,10 @@ std::unique_ptr<FitterBase> MaCh3FitterFactory(manager *fitMan) {
 // ********************************************
 std::unique_ptr<manager> MaCh3ManagerFactory(int argc, char **argv) {
 // ********************************************
+  #ifdef MPIENABLED
+    MPI_Init(&argc, &argv);
+  #endif
+
   if (argc < 2) {
     MACH3LOG_ERROR("Wrong usage of MaCh3 executable!");
     MACH3LOG_ERROR("Syntax is $: {} config.yaml", argv[0]);

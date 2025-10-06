@@ -26,6 +26,8 @@ manager::manager(const YAML::Node ConfigNode) {
 // *************************
 void manager::Initialise() {
 // *************************
+
+
   SetMaCh3LoggerFormat();
   MaCh3Utils::MaCh3Welcome();
 
@@ -47,6 +49,9 @@ void manager::Initialise() {
 // Empty destructor, for now...
 manager::~manager() {
 // *************************
+  #ifdef MPIENABLED
+    MPI_Finalize();
+  #endif
 }
 
 // *************************

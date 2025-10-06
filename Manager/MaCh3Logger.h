@@ -64,7 +64,7 @@ inline void SetMaCh3LoggerFormat()
   spdlog::set_pattern("[%s][%^%l%$] %v");
   #endif
 
-  #ifdef MPIENABLED
+  #ifdef MPIENABLED 
   // We only want to log for the FIRST process
   int mpi_rank = 0;
 
@@ -81,7 +81,7 @@ inline void SetMaCh3LoggerFormat()
   spdlog::set_level(get_default_log_level());
 }
 
-/// @brief KS: This is bit convoluted but this is to allow redirecting cout and errors from external library into MaCh3 logger format
+/// @brief KS: This is bit convoluted but this is to al/low redirecting cout and errors from external library into MaCh3 logger format
 /// @tparam Func The type of the function to be called, which outputs to stdout and stderr.
 /// @tparam LogFunc The type of the logging function, typically a lambda that formats and logs messages.
 /// @tparam Args The types of the arguments to be passed to `func`.

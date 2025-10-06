@@ -30,10 +30,6 @@ std::string config;
 
 int main(int argc, char *argv[]) 
 {
-#ifdef MPIENABLED
-  MPI_Init(&argc, &argv);
-#endif
-
   SetMaCh3LoggerFormat();
   nFiles = 0;
   if (argc != 3 && argc !=6 && argc != 8)
@@ -76,10 +72,6 @@ int main(int argc, char *argv[])
 
     MultipleProcessMCMC();
   }
-#ifdef MPIENABLED
-  MPI_Finalize();
-#endif
-
   return 0;
 }
 
