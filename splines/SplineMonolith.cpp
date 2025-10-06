@@ -31,23 +31,23 @@ using TF1Pipe = sycl::ext::intel::pipe<IDTF1Pipe,        // An identifier for th
 
 //*********************************************************
 //*********************************************************
-void FPGACalcSplineWeights(short *SplineSegments,
+void FPGACalcSplineWeights(short int *SplineSegments,
                            float *coeff_many,
                            float *ParamValues,
                            float *coeff_x,
                            unsigned int *nKnots_arr,
-                           short *paramNo_arr,
+                           short int *paramNo_arr,
                            int NSplines_valid,
                            int nCoeff,
                            int max_knots,
                            int nParams) {
 //*********************************************************
-    sycl::ext::intel::host_ptr<const short> segments_host(SplineSegments);
+    sycl::ext::intel::host_ptr<const short int> segments_host(SplineSegments);
     sycl::ext::intel::host_ptr<const float> coeff_many_host(coeff_many);
     sycl::ext::intel::host_ptr<const float> paramvalues_host(ParamValues);
     sycl::ext::intel::host_ptr<const float> coeff_x_host(coeff_x);
     sycl::ext::intel::host_ptr<const unsigned int> knots_host(nKnots_arr);
-    sycl::ext::intel::host_ptr<const short> params_host(paramNo_arr);
+    sycl::ext::intel::host_ptr<const short int> params_host(paramNo_arr);
     
     [[intel::fpga_memory("BLOCK_RAM")]] int segments_bram[200];
     [[intel::max_replicates(4)]] float paramvalues_bram[200];
@@ -60,7 +60,7 @@ void FPGACalcSplineWeights(short *SplineSegments,
     for (unsigned int splineNum = 0; splineNum < NSplines_valid; ++splineNum){
         const short int Param = params_host[splineNum];
         const short int segment = segments_bram[Param];
-        const short int segment_X = short(Param * max_knots + segment);
+        const short int segment_X = short int(Param * max_knots + segment);
         const unsigned int CurrentKnotPos = knots_host[splineNum] * nCoeff + segment * nCoeff;
 
         // fetch all fX simultaneously
@@ -83,14 +83,14 @@ void FPGACalcSplineWeights(short *SplineSegments,
 }
 //********************************************************************
 void FPGACalcTF1Weights(float *ParamValues,
-                        short *cpu_paramNo_TF1_arr,
+                        short int *cpu_paramNo_TF1_arr,
                         float *cpu_coeff_TF1_many,
                         unsigned int NTF1_valid,
                         int nTF1Coeff,
                         int nParams) {
 
     sycl::ext::intel::host_ptr<const float> paramvalues_host(ParamValues);
-    sycl::ext::intel::host_ptr<const short> paramNo_TF1_host(cpu_paramNo_TF1_arr);
+    sycl::ext::intel::host_ptr<const short int> paramNo_TF1_host(cpu_paramNo_TF1_arr);
     sycl::ext::intel::host_ptr<const float> coeff_TF1_many_host(cpu_coeff_TF1_many);
     
     [[intel::max_replicates(4)]] float paramvalues_bram[200];
@@ -1254,7 +1254,7 @@ void SMonolith::Evaluate() {
       int n_coeff;
       int max_knots;
       int nParams;
-      short *cpu_paramNo_TF1_arr;
+      short int *cpu_paramNo_TF1_arr;
       float *cpu_coeff_TF1_many;
       unsigned int NTF1_valid;
       int nTF1Coeff;
