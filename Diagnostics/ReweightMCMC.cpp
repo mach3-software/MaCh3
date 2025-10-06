@@ -462,8 +462,10 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
     if (processMCMCreweighted){
         MACH3LOG_INFO("MCMCProcessor reweighting applied, Final reweighted file is: {}_reweighted.root", inputFile.substr(0, inputFile.find_last_of('.')));
         // delete the file we just created since MCMCProcessor already did the reweighting and saved it to a file
-        /// @todo fix seg fault because we deleted this DWR
+        outTree.reset(); // Release TTree before closing TFile
         outFile->Close();
+        outFile.reset(); 
+        
         if (std::remove(outputFile.c_str()) != 0) {
             MACH3LOG_ERROR("Error deleting temporary file: {}", outputFile);
         } else {
