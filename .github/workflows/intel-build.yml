@@ -85,5 +85,6 @@ jobs:
 
           cd /home/hep/llaatu/mach3/MaCh3Tutorial/build/
           export SYCL_UR_TRACE=-1
+          export ACL_CONTEXT_CALLBACK_DEBUG=1
           ./CIValidations/SplineValidations
         shell: bash        
