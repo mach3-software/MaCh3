@@ -116,7 +116,7 @@ void FPGACalcSplineWeights(short int *SplineSegments,
 [[intel::use_stall_enable_clusters]]
 void FPGAModifyWeights(int NEvents,
                        float *cpu_total_weights,
-                       unsigned int *cpu_nParamPerEvent,
+                       unsigned int *cpu_nParamPerEvent
                       // unsigned int *cpu_nParamPerEvent_tf1
                       ){
     sycl::ext::intel::host_ptr<float> total_weights_host(cpu_total_weights);
