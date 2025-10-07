@@ -1298,10 +1298,7 @@ void SMonolith::Evaluate() {
         total_chunks += (cpu_spline_handler->splines_per_event_arr[i] + nChunk - 1) / nChunk;
     }
   
-  // Time the kernel call
-    std::chrono::time_point<std::chrono::system_clock> start, end; 
-    //Before the kernel call
-    start = std::chrono::system_clock::now();
+
 
     // ==================== DEBUG PRINTS START ====================
     // Include the <iostream> header if you haven't already.
@@ -1332,6 +1329,11 @@ void SMonolith::Evaluate() {
     std::cout << "cpu_nParamPerEvent_tf1.data(): " << static_cast<void*>(cpu_nParamPerEvent_tf1.data()) << std::endl;
 
     std::cout << "Calling kernel:" << std::endl;
+
+  // Time the kernel call
+    std::chrono::time_point<std::chrono::system_clock> start, end; 
+    //Before the kernel call
+    start = std::chrono::system_clock::now();    
 
     // Call the kernel
     auto e = queue.single_task<IDOptimized>(OptimizedKernel{SplineSegments,
