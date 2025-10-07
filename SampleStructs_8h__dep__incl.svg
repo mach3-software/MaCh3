@@ -110,9 +110,9 @@ var sectionId = 'dynsection-1';
 <path fill="none" stroke="midnightblue" d="M1777.05,-400.2C1463.69,-400.74 284.68,-399.76 220,-355 150.55,-306.94 135.84,-193.72 132.79,-153.76"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1777.4,-403.7 1787.39,-400.18 1777.38,-396.7 1777.4,-403.7"/>
 </g>
-<!-- Node48 -->
+<!-- Node49 -->
 <g id="node28" class="node">
-<title>Node48</title>
+<title>Node49</title>
 <g id="a_node28"><a xlink:href="CombineMaCh3Chains_8cpp.html" target="_top" xlink:title="Combine chains files produced by MCMC, enforcing the condition that all the files to combine were mad...">
 <polygon fill="white" stroke="black" points="2012,-257.5 2012,-287.5 2154,-287.5 2154,-257.5 2012,-257.5"/>
 <text text-anchor="start" x="2020" y="-275.5" font-family="Helvetica" font-size="10.00">Diagnostics/CombineMaCh3</text>
@@ -120,60 +120,60 @@ var sectionId = 'dynsection-1';
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node48 -->
+<!-- Node1&#45;&gt;Node49 -->
 <g id="edge77" class="edge">
-<title>Node1&#45;&gt;Node48</title>
+<title>Node1&#45;&gt;Node49</title>
 <path fill="none" stroke="midnightblue" d="M1877.66,-386.44C1921.5,-362.33 2012.58,-312.23 2057.21,-287.68"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1875.88,-383.42 1868.81,-391.31 1879.26,-389.55 1875.88,-383.42"/>
 </g>
-<!-- Node49 -->
+<!-- Node50 -->
 <g id="node29" class="node">
-<title>Node49</title>
+<title>Node50</title>
 <g id="a_node29"><a xlink:href="GetPenaltyTerm_8cpp.html" target="_top" xlink:title="KS: This file contains the implementation of the function to extract specific penalty terms from syst...">
 <polygon fill="white" stroke="black" points="2172,-263 2172,-282 2332,-282 2332,-263 2172,-263"/>
 <text text-anchor="middle" x="2252" y="-270" font-family="Helvetica" font-size="10.00">Diagnostics/GetPenaltyTerm.cpp</text>
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node49 -->
+<!-- Node1&#45;&gt;Node50 -->
 <g id="edge78" class="edge">
-<title>Node1&#45;&gt;Node49</title>
+<title>Node1&#45;&gt;Node50</title>
 <path fill="none" stroke="midnightblue" d="M1889.7,-388.36C1969.14,-363.18 2155.48,-304.1 2225.11,-282.02"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1888.59,-385.05 1880.11,-391.4 1890.7,-391.72 1888.59,-385.05"/>
 </g>
-<!-- Node50 -->
+<!-- Node51 -->
 <g id="node30" class="node">
-<title>Node50</title>
+<title>Node51</title>
 <g id="a_node30"><a xlink:href="RHat_8cpp.html" target="_top" xlink:title="This executable calculates the &#160;estimator for Markov Chain Monte Carlo (MCMC) convergence.">
 <polygon fill="white" stroke="black" points="2350.5,-263 2350.5,-282 2463.5,-282 2463.5,-263 2350.5,-263"/>
 <text text-anchor="middle" x="2407" y="-270" font-family="Helvetica" font-size="10.00">Diagnostics/RHat.cpp</text>
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node50 -->
+<!-- Node1&#45;&gt;Node51 -->
 <g id="edge79" class="edge">
-<title>Node1&#45;&gt;Node50</title>
+<title>Node1&#45;&gt;Node51</title>
 <path fill="none" stroke="midnightblue" d="M1903.72,-389.3C1945.87,-380.34 2007.4,-367.11 2061,-355 2174.77,-329.3 2309.14,-297.12 2371.68,-282.04"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1902.76,-385.92 1893.7,-391.42 1904.21,-392.77 1902.76,-385.92"/>
 </g>
-<!-- Node51 -->
+<!-- Node52 -->
 <g id="node31" class="node">
-<title>Node51</title>
+<title>Node52</title>
 <g id="a_node31"><a xlink:href="RHat__HighMem_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="black" points="2481.5,-263 2481.5,-282 2642.5,-282 2642.5,-263 2481.5,-263"/>
 <text text-anchor="middle" x="2562" y="-270" font-family="Helvetica" font-size="10.00">Diagnostics/RHat_HighMem.cpp</text>
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node51 -->
+<!-- Node1&#45;&gt;Node52 -->
 <g id="edge80" class="edge">
-<title>Node1&#45;&gt;Node51</title>
+<title>Node1&#45;&gt;Node52</title>
 <path fill="none" stroke="midnightblue" d="M1922.31,-389.95C1980.92,-381.27 2067.09,-368.1 2142,-355 2281.2,-330.67 2445.47,-297.49 2520.66,-282.05"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1921.43,-386.54 1912.05,-391.46 1922.46,-393.46 1921.43,-386.54"/>
 </g>
-<!-- Node56 -->
+<!-- Node57 -->
 <g id="node36" class="node">
-<title>Node56</title>
+<title>Node57</title>
 <g id="a_node36"><a xlink:href="ParameterHandlerGeneric_8h.html" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="black" points="1698.5,-123.5 1698.5,-153.5 1847.5,-153.5 1847.5,-123.5 1698.5,-123.5"/>
 <text text-anchor="start" x="1706.5" y="-141.5" font-family="Helvetica" font-size="10.00">Parameters/ParameterHandler</text>
@@ -181,30 +181,30 @@ var sectionId = 'dynsection-1';
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node56 -->
+<!-- Node1&#45;&gt;Node57 -->
 <g id="edge82" class="edge">
-<title>Node1&#45;&gt;Node56</title>
+<title>Node1&#45;&gt;Node57</title>
 <path fill="none" stroke="midnightblue" d="M1928.9,-398.63C2146.31,-393.37 2749.7,-368.63 2652,-257 2599.21,-196.68 2050.63,-156.74 1847.83,-143.94"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1928.76,-395.14 1918.85,-398.87 1928.93,-402.13 1928.76,-395.14"/>
 </g>
-<!-- Node64 -->
+<!-- Node65 -->
 <g id="node38" class="node">
-<title>Node64</title>
+<title>Node65</title>
 <g id="a_node38"><a xlink:href="splines_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="black" points="2465,-0.5 2465,-19.5 2563,-19.5 2563,-0.5 2465,-0.5"/>
 <text text-anchor="middle" x="2514" y="-7.5" font-family="Helvetica" font-size="10.00">python/splines.cpp</text>
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node64 -->
+<!-- Node1&#45;&gt;Node65 -->
 <g id="edge83" class="edge">
-<title>Node1&#45;&gt;Node64</title>
+<title>Node1&#45;&gt;Node65</title>
 <path fill="none" stroke="midnightblue" d="M1928.91,-399.52C2087.41,-397.83 2448.56,-390.11 2566,-355 2636.09,-334.05 2709,-346.65 2709,-273.5 2709,-273.5 2709,-273.5 2709,-137.5 2709,-66.48 2616.83,-33.32 2559.23,-19.53"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1928.73,-396.03 1918.77,-399.63 1928.8,-403.03 1928.73,-396.03"/>
 </g>
-<!-- Node72 -->
+<!-- Node73 -->
 <g id="node46" class="node">
-<title>Node72</title>
+<title>Node73</title>
 <g id="a_node46"><a xlink:href="FarDetectorCoreInfoStruct_8h.html" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="black" points="229.5,-324.5 229.5,-354.5 376.5,-354.5 376.5,-324.5 229.5,-324.5"/>
 <text text-anchor="start" x="237.5" y="-342.5" font-family="Helvetica" font-size="10.00">Samples/FarDetectorCoreInfo</text>
@@ -212,39 +212,39 @@ var sectionId = 'dynsection-1';
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node72 -->
+<!-- Node1&#45;&gt;Node73 -->
 <g id="edge64" class="edge">
-<title>Node1&#45;&gt;Node72</title>
+<title>Node1&#45;&gt;Node73</title>
 <path fill="none" stroke="midnightblue" d="M1777.26,-400.36C1562.66,-400.8 932.28,-398.01 411,-355 399.88,-354.08 388.14,-352.82 376.67,-351.41"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1777.48,-403.86 1787.47,-400.34 1777.46,-396.86 1777.48,-403.86"/>
 </g>
-<!-- Node73 -->
+<!-- Node74 -->
 <g id="node47" class="node">
-<title>Node73</title>
+<title>Node74</title>
 <g id="a_node47"><a xlink:href="HistogramUtils_8h.html" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="black" points="420.5,-330 420.5,-349 551.5,-349 551.5,-330 420.5,-330"/>
 <text text-anchor="middle" x="486" y="-337" font-family="Helvetica" font-size="10.00">Samples/HistogramUtils.h</text>
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node73 -->
+<!-- Node1&#45;&gt;Node74 -->
 <g id="edge66" class="edge">
-<title>Node1&#45;&gt;Node73</title>
+<title>Node1&#45;&gt;Node74</title>
 <path fill="none" stroke="midnightblue" d="M1777.12,-399.21C1583.43,-396.77 1054.99,-387.42 616,-355 595.05,-353.45 572.27,-351.13 551.71,-348.8"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1777.15,-402.71 1787.19,-399.34 1777.24,-395.71 1777.15,-402.71"/>
 </g>
-<!-- Node75 -->
+<!-- Node76 -->
 <g id="node49" class="node">
-<title>Node75</title>
+<title>Node76</title>
 <g id="a_node49"><a xlink:href="OscillationHandler_8h.html" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="black" points="625,-330 625,-349 771,-349 771,-330 625,-330"/>
 <text text-anchor="middle" x="698" y="-337" font-family="Helvetica" font-size="10.00">Samples/OscillationHandler.h</text>
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node75 -->
+<!-- Node1&#45;&gt;Node76 -->
 <g id="edge73" class="edge">
-<title>Node1&#45;&gt;Node75</title>
+<title>Node1&#45;&gt;Node76</title>
 <path fill="none" stroke="midnightblue" d="M1777.15,-396.09C1566.79,-385.26 977.96,-354.92 771.03,-344.26"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1777.01,-399.59 1787.17,-396.61 1777.37,-392.6 1777.01,-399.59"/>
 </g>
@@ -344,48 +344,48 @@ var sectionId = 'dynsection-1';
 <path fill="none" stroke="midnightblue" d="M1561.95,-333.94C1430.99,-324.08 1136.83,-300.67 1119,-288 1069.87,-253.09 1054.79,-174.16 1051.06,-148.06"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1561.99,-337.45 1572.22,-334.71 1562.51,-330.47 1561.99,-337.45"/>
 </g>
-<!-- Node2&#45;&gt;Node48 -->
+<!-- Node2&#45;&gt;Node49 -->
 <g id="edge35" class="edge">
-<title>Node2&#45;&gt;Node48</title>
+<title>Node2&#45;&gt;Node49</title>
 <path fill="none" stroke="midnightblue" d="M1685.98,-331.08C1760.95,-321.9 1890.95,-305.35 2002,-288 2005.25,-287.49 2008.56,-286.96 2011.91,-286.41"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1685.27,-327.64 1675.77,-332.32 1686.12,-334.58 1685.27,-327.64"/>
 </g>
-<!-- Node2&#45;&gt;Node49 -->
+<!-- Node2&#45;&gt;Node50 -->
 <g id="edge37" class="edge">
-<title>Node2&#45;&gt;Node49</title>
+<title>Node2&#45;&gt;Node50</title>
 <path fill="none" stroke="midnightblue" d="M1686.05,-334.07C1786.49,-326.58 1990.8,-310.07 2163,-288 2176.2,-286.31 2190.44,-284.14 2203.59,-282"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1685.5,-330.6 1675.78,-334.83 1686.02,-337.58 1685.5,-330.6"/>
 </g>
-<!-- Node2&#45;&gt;Node50 -->
+<!-- Node2&#45;&gt;Node51 -->
 <g id="edge39" class="edge">
-<title>Node2&#45;&gt;Node50</title>
+<title>Node2&#45;&gt;Node51</title>
 <path fill="none" stroke="midnightblue" d="M1685.67,-337.18C1810.16,-333.86 2100.14,-322.75 2341,-288 2351.33,-286.51 2362.46,-284.3 2372.58,-282.06"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1685.48,-333.69 1675.57,-337.45 1685.66,-340.69 1685.48,-333.69"/>
 </g>
-<!-- Node2&#45;&gt;Node51 -->
+<!-- Node2&#45;&gt;Node52 -->
 <g id="edge40" class="edge">
-<title>Node2&#45;&gt;Node51</title>
+<title>Node2&#45;&gt;Node52</title>
 <path fill="none" stroke="midnightblue" d="M1685.98,-336.98C1826.42,-333.06 2179.49,-320.55 2473,-288 2486.85,-286.46 2501.82,-284.24 2515.47,-282"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1685.74,-333.49 1675.84,-337.26 1685.93,-340.48 1685.74,-333.49"/>
 </g>
-<!-- Node52 -->
+<!-- Node53 -->
 <g id="node32" class="node">
-<title>Node52</title>
+<title>Node53</title>
 <g id="a_node32"><a xlink:href="AdaptiveMCMCHandler_8h.html" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="black" points="1199.5,-263 1199.5,-282 1380.5,-282 1380.5,-263 1199.5,-263"/>
 <text text-anchor="middle" x="1290" y="-270" font-family="Helvetica" font-size="10.00">Parameters/AdaptiveMCMCHandler.h</text>
 </a>
 </g>
 </g>
-<!-- Node2&#45;&gt;Node52 -->
+<!-- Node2&#45;&gt;Node53 -->
 <g id="edge42" class="edge">
-<title>Node2&#45;&gt;Node52</title>
+<title>Node2&#45;&gt;Node53</title>
 <path fill="none" stroke="midnightblue" d="M1569.83,-327.96C1504.09,-315.16 1394.53,-293.84 1333.84,-282.03"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1569.51,-331.46 1579.99,-329.94 1570.84,-324.59 1569.51,-331.46"/>
 </g>
-<!-- Node54 -->
+<!-- Node55 -->
 <g id="node34" class="node">
-<title>Node54</title>
+<title>Node55</title>
 <g id="a_node34"><a xlink:href="ParameterHandlerBase_8h.html" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="black" points="1600.5,-190.5 1600.5,-220.5 1749.5,-220.5 1749.5,-190.5 1600.5,-190.5"/>
 <text text-anchor="start" x="1608.5" y="-208.5" font-family="Helvetica" font-size="10.00">Parameters/ParameterHandler</text>
@@ -393,54 +393,54 @@ var sectionId = 'dynsection-1';
 </a>
 </g>
 </g>
-<!-- Node2&#45;&gt;Node54 -->
+<!-- Node2&#45;&gt;Node55 -->
 <g id="edge56" class="edge">
-<title>Node2&#45;&gt;Node54</title>
+<title>Node2&#45;&gt;Node55</title>
 <path fill="none" stroke="midnightblue" d="M1651.58,-324.9C1665.54,-316.4 1681.17,-304 1689,-288 1699.67,-266.21 1690.15,-237.67 1682.45,-220.79"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1649.7,-321.94 1642.74,-329.93 1653.16,-328.03 1649.7,-321.94"/>
 </g>
-<!-- Node67 -->
+<!-- Node68 -->
 <g id="node41" class="node">
-<title>Node67</title>
+<title>Node68</title>
 <g id="a_node41"><a xlink:href="ParameterTunes_8h.html" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="black" points="1399,-263 1399,-282 1549,-282 1549,-263 1399,-263"/>
 <text text-anchor="middle" x="1474" y="-270" font-family="Helvetica" font-size="10.00">Parameters/ParameterTunes.h</text>
 </a>
 </g>
 </g>
-<!-- Node2&#45;&gt;Node67 -->
+<!-- Node2&#45;&gt;Node68 -->
 <g id="edge57" class="edge">
-<title>Node2&#45;&gt;Node67</title>
+<title>Node2&#45;&gt;Node68</title>
 <path fill="none" stroke="midnightblue" d="M1594.65,-325.78C1564.94,-312.91 1519.82,-293.35 1494,-282.17"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1593.51,-329.1 1604.08,-329.87 1596.3,-322.68 1593.51,-329.1"/>
 </g>
-<!-- Node69 -->
+<!-- Node70 -->
 <g id="node43" class="node">
-<title>Node69</title>
+<title>Node70</title>
 <g id="a_node43"><a xlink:href="PCAHandler_8h.html" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="black" points="1737.5,-263 1737.5,-282 1870.5,-282 1870.5,-263 1737.5,-263"/>
 <text text-anchor="middle" x="1804" y="-270" font-family="Helvetica" font-size="10.00">Parameters/PCAHandler.h</text>
 </a>
 </g>
 </g>
-<!-- Node2&#45;&gt;Node69 -->
+<!-- Node2&#45;&gt;Node70 -->
 <g id="edge60" class="edge">
-<title>Node2&#45;&gt;Node69</title>
+<title>Node2&#45;&gt;Node70</title>
 <path fill="none" stroke="midnightblue" d="M1657.41,-326.44C1693.12,-313.54 1748.83,-293.42 1780.29,-282.06"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1656.12,-323.18 1647.9,-329.87 1658.5,-329.76 1656.12,-323.18"/>
 </g>
-<!-- Node71 -->
+<!-- Node72 -->
 <g id="node45" class="node">
-<title>Node71</title>
+<title>Node72</title>
 <g id="a_node45"><a xlink:href="manager_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="black" points="1888.5,-263 1888.5,-282 1993.5,-282 1993.5,-263 1888.5,-263"/>
 <text text-anchor="middle" x="1941" y="-270" font-family="Helvetica" font-size="10.00">python/manager.cpp</text>
 </a>
 </g>
 </g>
-<!-- Node2&#45;&gt;Node71 -->
+<!-- Node2&#45;&gt;Node72 -->
 <g id="edge63" class="edge">
-<title>Node2&#45;&gt;Node71</title>
+<title>Node2&#45;&gt;Node72</title>
 <path fill="none" stroke="midnightblue" d="M1679.67,-328.04C1731.41,-318.19 1810.55,-302.78 1879,-288 1887.54,-286.16 1896.71,-284.07 1905.31,-282.07"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1678.87,-324.63 1669.7,-329.94 1680.18,-331.51 1678.87,-324.63"/>
 </g>
@@ -639,18 +639,18 @@ var sectionId = 'dynsection-1';
 <path fill="none" stroke="midnightblue" d="M736.93,-260.72C678.64,-247.92 582.6,-226.83 529.09,-215.08"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="736.48,-264.21 747,-262.94 737.98,-257.37 736.48,-264.21"/>
 </g>
-<!-- Node47 -->
+<!-- Node48 -->
 <g id="node27" class="node">
-<title>Node47</title>
+<title>Node48</title>
 <g id="a_node27"><a xlink:href="StatisticalUtils_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="black" points="612.5,-196 612.5,-215 743.5,-215 743.5,-196 612.5,-196"/>
 <text text-anchor="middle" x="678" y="-203" font-family="Helvetica" font-size="10.00">Fitters/StatisticalUtils.cpp</text>
 </a>
 </g>
 </g>
-<!-- Node30&#45;&gt;Node47 -->
+<!-- Node30&#45;&gt;Node48 -->
 <g id="edge34" class="edge">
-<title>Node30&#45;&gt;Node47</title>
+<title>Node30&#45;&gt;Node48</title>
 <path fill="none" stroke="midnightblue" d="M762.64,-257.44C741.25,-244.57 710.28,-225.93 692.33,-215.13"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="761.06,-260.58 771.43,-262.73 764.67,-254.58 761.06,-260.58"/>
 </g>
@@ -752,57 +752,57 @@ var sectionId = 'dynsection-1';
 <path fill="none" stroke="midnightblue" d="M157.37,-116.88C169.53,-107.01 183.78,-95.43 194.68,-86.58"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="154.91,-114.37 149.36,-123.4 159.33,-119.81 154.91,-114.37"/>
 </g>
-<!-- Node46 -->
+<!-- Node47 -->
 <g id="node26" class="node">
-<title>Node46</title>
+<title>Node47</title>
 <g id="a_node26"><a xlink:href="plotting_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="black" points="122.5,-0.5 122.5,-19.5 221.5,-19.5 221.5,-0.5 122.5,-0.5"/>
 <text text-anchor="middle" x="172" y="-7.5" font-family="Helvetica" font-size="10.00">python/plotting.cpp</text>
 </a>
 </g>
 </g>
-<!-- Node39&#45;&gt;Node46 -->
+<!-- Node39&#45;&gt;Node47 -->
 <g id="edge32" class="edge">
-<title>Node39&#45;&gt;Node46</title>
+<title>Node39&#45;&gt;Node47</title>
 <path fill="none" stroke="midnightblue" d="M136.23,-113.53C139.45,-97.09 144.46,-74.92 151,-56 155.51,-42.96 162.58,-28.64 167.26,-19.74"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="132.78,-112.93 134.36,-123.41 139.66,-114.23 132.78,-112.93"/>
 </g>
-<!-- Node41&#45;&gt;Node46 -->
+<!-- Node41&#45;&gt;Node47 -->
 <g id="edge31" class="edge">
-<title>Node41&#45;&gt;Node46</title>
+<title>Node41&#45;&gt;Node47</title>
 <path fill="none" stroke="midnightblue" d="M196.74,-47.8C190.13,-37.96 182.78,-27.03 177.82,-19.66"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="194.04,-50.05 202.52,-56.4 199.85,-46.15 194.04,-50.05"/>
 </g>
-<!-- Node53 -->
+<!-- Node54 -->
 <g id="node33" class="node">
-<title>Node53</title>
+<title>Node54</title>
 <g id="a_node33"><a xlink:href="AdaptiveMCMCHandler_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="black" points="1212.5,-196 1212.5,-215 1403.5,-215 1403.5,-196 1212.5,-196"/>
 <text text-anchor="middle" x="1308" y="-203" font-family="Helvetica" font-size="10.00">Parameters/AdaptiveMCMCHandler.cpp</text>
 </a>
 </g>
 </g>
-<!-- Node52&#45;&gt;Node53 -->
+<!-- Node53&#45;&gt;Node54 -->
 <g id="edge43" class="edge">
-<title>Node52&#45;&gt;Node53</title>
+<title>Node53&#45;&gt;Node54</title>
 <path fill="none" stroke="midnightblue" d="M1295.15,-252.91C1298.59,-240.49 1302.96,-224.72 1305.61,-215.13"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1291.72,-252.16 1292.43,-262.73 1298.47,-254.03 1291.72,-252.16"/>
 </g>
-<!-- Node52&#45;&gt;Node54 -->
+<!-- Node53&#45;&gt;Node55 -->
 <g id="edge44" class="edge">
-<title>Node52&#45;&gt;Node54</title>
+<title>Node53&#45;&gt;Node55</title>
 <path fill="none" stroke="midnightblue" d="M1351.34,-261.3C1412.17,-251.16 1508.04,-235.12 1591,-221 1594.06,-220.48 1597.19,-219.95 1600.35,-219.41"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1350.43,-257.9 1341.14,-263 1351.58,-264.8 1350.43,-257.9"/>
 </g>
-<!-- Node54&#45;&gt;Node11 -->
+<!-- Node55&#45;&gt;Node11 -->
 <g id="edge45" class="edge">
-<title>Node54&#45;&gt;Node11</title>
+<title>Node55&#45;&gt;Node11</title>
 <path fill="none" stroke="midnightblue" d="M1590.13,-189.9C1472.85,-171.73 1347.84,-154.96 1279.74,-146.05"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1589.95,-193.41 1600.37,-191.49 1591.02,-186.49 1589.95,-193.41"/>
 </g>
-<!-- Node55 -->
+<!-- Node56 -->
 <g id="node35" class="node">
-<title>Node55</title>
+<title>Node56</title>
 <g id="a_node35"><a xlink:href="ParameterHandlerBase_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="black" points="1492.5,-123.5 1492.5,-153.5 1641.5,-153.5 1641.5,-123.5 1492.5,-123.5"/>
 <text text-anchor="start" x="1500.5" y="-141.5" font-family="Helvetica" font-size="10.00">Parameters/ParameterHandler</text>
@@ -810,69 +810,69 @@ var sectionId = 'dynsection-1';
 </a>
 </g>
 </g>
-<!-- Node54&#45;&gt;Node55 -->
+<!-- Node55&#45;&gt;Node56 -->
 <g id="edge46" class="edge">
-<title>Node54&#45;&gt;Node55</title>
+<title>Node55&#45;&gt;Node56</title>
 <path fill="none" stroke="midnightblue" d="M1642.63,-185.02C1625.82,-174.9 1605.66,-162.77 1590.39,-153.58"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1641.19,-188.24 1651.57,-190.4 1644.8,-182.24 1641.19,-188.24"/>
 </g>
-<!-- Node54&#45;&gt;Node56 -->
+<!-- Node55&#45;&gt;Node57 -->
 <g id="edge47" class="edge">
-<title>Node54&#45;&gt;Node56</title>
+<title>Node55&#45;&gt;Node57</title>
 <path fill="none" stroke="midnightblue" d="M1704.8,-184.73C1719.97,-174.68 1738.04,-162.68 1751.78,-153.58"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1702.66,-181.95 1696.26,-190.4 1706.53,-187.79 1702.66,-181.95"/>
 </g>
-<!-- Node66 -->
+<!-- Node67 -->
 <g id="node40" class="node">
-<title>Node66</title>
+<title>Node67</title>
 <g id="a_node40"><a xlink:href="parameters_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="black" points="1589.5,-62 1589.5,-81 1706.5,-81 1706.5,-62 1589.5,-62"/>
 <text text-anchor="middle" x="1648" y="-69" font-family="Helvetica" font-size="10.00">python/parameters.cpp</text>
 </a>
 </g>
 </g>
-<!-- Node54&#45;&gt;Node66 -->
+<!-- Node55&#45;&gt;Node67 -->
 <g id="edge55" class="edge">
-<title>Node54&#45;&gt;Node66</title>
+<title>Node55&#45;&gt;Node67</title>
 <path fill="none" stroke="midnightblue" d="M1670.05,-180.32C1663.93,-150.38 1653.81,-100.91 1649.76,-81.1"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1666.68,-181.28 1672.11,-190.37 1673.54,-179.88 1666.68,-181.28"/>
 </g>
-<!-- Node56&#45;&gt;Node6 -->
+<!-- Node57&#45;&gt;Node6 -->
 <g id="edge50" class="edge">
-<title>Node56&#45;&gt;Node6</title>
+<title>Node57&#45;&gt;Node6</title>
 <path fill="none" stroke="midnightblue" d="M1688.12,-126.66C1675.36,-125.27 1662.35,-123.99 1650,-123 1276.19,-93.03 1179.79,-127.74 807,-87 793.92,-85.57 779.78,-83.33 766.98,-81.02"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1687.96,-130.16 1698.29,-127.79 1688.74,-123.2 1687.96,-130.16"/>
 </g>
-<!-- Node56&#45;&gt;Node9 -->
+<!-- Node57&#45;&gt;Node9 -->
 <g id="edge52" class="edge">
-<title>Node56&#45;&gt;Node9</title>
+<title>Node57&#45;&gt;Node9</title>
 <path fill="none" stroke="midnightblue" d="M1763.22,-114C1753.87,-94.81 1737.81,-68.84 1715,-56 1668.44,-29.81 1322.1,-17.17 1169.2,-12.82"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1760.14,-115.69 1767.49,-123.31 1766.5,-112.76 1760.14,-115.69"/>
 </g>
-<!-- Node56&#45;&gt;Node14 -->
+<!-- Node57&#45;&gt;Node14 -->
 <g id="edge51" class="edge">
-<title>Node56&#45;&gt;Node14</title>
+<title>Node57&#45;&gt;Node14</title>
 <path fill="none" stroke="midnightblue" d="M1772.36,-113.42C1770.53,-95.05 1764.98,-70.5 1749,-56 1724.08,-33.37 1636.27,-21.33 1575.6,-15.55"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1768.87,-113.66 1773.05,-123.4 1775.85,-113.18 1768.87,-113.66"/>
 </g>
-<!-- Node57 -->
+<!-- Node58 -->
 <g id="node37" class="node">
-<title>Node57</title>
+<title>Node58</title>
 <g id="a_node37"><a xlink:href="SplineStructs_8h.html" target="_top" xlink:title="Contains structures and helper functions for handling spline representations of systematic parameters...">
 <polygon fill="white" stroke="red" points="2260.5,-62 2260.5,-81 2379.5,-81 2379.5,-62 2260.5,-62"/>
 <text text-anchor="middle" x="2320" y="-69" font-family="Helvetica" font-size="10.00">Splines/SplineStructs.h</text>
 </a>
 </g>
 </g>
-<!-- Node56&#45;&gt;Node57 -->
+<!-- Node57&#45;&gt;Node58 -->
 <g id="edge48" class="edge">
-<title>Node56&#45;&gt;Node57</title>
+<title>Node57&#45;&gt;Node58</title>
 <path fill="none" stroke="midnightblue" d="M1857.83,-127.42C1969.42,-114.16 2162.74,-91.19 2260.18,-79.61"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1857.14,-123.98 1847.63,-128.63 1857.97,-130.93 1857.14,-123.98"/>
 </g>
-<!-- Node65 -->
+<!-- Node66 -->
 <g id="node39" class="node">
-<title>Node65</title>
+<title>Node66</title>
 <g id="a_node39"><a xlink:href="ParameterHandlerGeneric_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="black" points="1801.5,-56.5 1801.5,-86.5 1950.5,-86.5 1950.5,-56.5 1801.5,-56.5"/>
 <text text-anchor="start" x="1809.5" y="-74.5" font-family="Helvetica" font-size="10.00">Parameters/ParameterHandler</text>
@@ -880,135 +880,135 @@ var sectionId = 'dynsection-1';
 </a>
 </g>
 </g>
-<!-- Node56&#45;&gt;Node65 -->
+<!-- Node57&#45;&gt;Node66 -->
 <g id="edge53" class="edge">
-<title>Node56&#45;&gt;Node65</title>
+<title>Node57&#45;&gt;Node66</title>
 <path fill="none" stroke="midnightblue" d="M1803.88,-118.02C1819.9,-107.9 1839.13,-95.77 1853.69,-86.58"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1801.94,-115.1 1795.35,-123.4 1805.67,-121.02 1801.94,-115.1"/>
 </g>
-<!-- Node56&#45;&gt;Node66 -->
+<!-- Node57&#45;&gt;Node67 -->
 <g id="edge54" class="edge">
-<title>Node56&#45;&gt;Node66</title>
+<title>Node57&#45;&gt;Node67</title>
 <path fill="none" stroke="midnightblue" d="M1736.73,-118.64C1712.81,-106.2 1682.64,-90.51 1664.36,-81.01"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1735.39,-121.89 1745.88,-123.4 1738.62,-115.68 1735.39,-121.89"/>
 </g>
-<!-- Node57&#45;&gt;Node64 -->
+<!-- Node58&#45;&gt;Node65 -->
 <g id="edge49" class="edge">
-<title>Node57&#45;&gt;Node64</title>
+<title>Node58&#45;&gt;Node65</title>
 <path fill="none" stroke="midnightblue" d="M2357.4,-59.03C2395.11,-47.46 2452.43,-29.88 2486.26,-19.51"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="2356.33,-55.7 2347.8,-61.98 2358.38,-62.39 2356.33,-55.7"/>
 </g>
-<!-- Node67&#45;&gt;Node54 -->
+<!-- Node68&#45;&gt;Node55 -->
 <g id="edge58" class="edge">
-<title>Node67&#45;&gt;Node54</title>
+<title>Node68&#45;&gt;Node55</title>
 <path fill="none" stroke="midnightblue" d="M1510.26,-259.77C1544.34,-248.75 1595.39,-232.24 1631.62,-220.53"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1509.13,-256.46 1500.69,-262.87 1511.28,-263.12 1509.13,-256.46"/>
 </g>
-<!-- Node68 -->
+<!-- Node69 -->
 <g id="node42" class="node">
-<title>Node68</title>
+<title>Node69</title>
 <g id="a_node42"><a xlink:href="ParameterTunes_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="black" points="1421.5,-196 1421.5,-215 1582.5,-215 1582.5,-196 1421.5,-196"/>
 <text text-anchor="middle" x="1502" y="-203" font-family="Helvetica" font-size="10.00">Parameters/ParameterTunes.cpp</text>
 </a>
 </g>
 </g>
-<!-- Node67&#45;&gt;Node68 -->
+<!-- Node68&#45;&gt;Node69 -->
 <g id="edge59" class="edge">
-<title>Node67&#45;&gt;Node68</title>
+<title>Node68&#45;&gt;Node69</title>
 <path fill="none" stroke="midnightblue" d="M1481.84,-253.29C1487.22,-240.81 1494.11,-224.81 1498.28,-215.13"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1478.52,-252.16 1477.78,-262.73 1484.95,-254.93 1478.52,-252.16"/>
 </g>
-<!-- Node69&#45;&gt;Node54 -->
+<!-- Node70&#45;&gt;Node55 -->
 <g id="edge61" class="edge">
-<title>Node69&#45;&gt;Node54</title>
+<title>Node70&#45;&gt;Node55</title>
 <path fill="none" stroke="midnightblue" d="M1777.89,-258.34C1756.17,-247.4 1725.33,-231.86 1703.09,-220.65"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1776.36,-261.49 1786.87,-262.87 1779.51,-255.24 1776.36,-261.49"/>
 </g>
-<!-- Node70 -->
+<!-- Node71 -->
 <g id="node44" class="node">
-<title>Node70</title>
+<title>Node71</title>
 <g id="a_node44"><a xlink:href="PCAHandler_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="black" points="1767.5,-196 1767.5,-215 1910.5,-215 1910.5,-196 1767.5,-196"/>
 <text text-anchor="middle" x="1839" y="-203" font-family="Helvetica" font-size="10.00">Parameters/PCAHandler.cpp</text>
 </a>
 </g>
 </g>
-<!-- Node69&#45;&gt;Node70 -->
+<!-- Node70&#45;&gt;Node71 -->
 <g id="edge62" class="edge">
-<title>Node69&#45;&gt;Node70</title>
+<title>Node70&#45;&gt;Node71</title>
 <path fill="none" stroke="midnightblue" d="M1813.6,-253.66C1820.35,-241.13 1829.09,-224.91 1834.35,-215.13"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="1810.38,-252.27 1808.72,-262.73 1816.54,-255.59 1810.38,-252.27"/>
 </g>
-<!-- Node72&#45;&gt;Node6 -->
+<!-- Node73&#45;&gt;Node6 -->
 <g id="edge65" class="edge">
-<title>Node72&#45;&gt;Node6</title>
+<title>Node73&#45;&gt;Node6</title>
 <path fill="none" stroke="midnightblue" d="M292.16,-314.98C273.65,-270.86 242.47,-175.41 292,-123 316.24,-97.35 534.97,-82.27 651.95,-75.97"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="289.02,-316.53 296.22,-324.31 295.44,-313.74 289.02,-316.53"/>
 </g>
-<!-- Node73&#45;&gt;Node4 -->
+<!-- Node74&#45;&gt;Node4 -->
 <g id="edge68" class="edge">
-<title>Node73&#45;&gt;Node4</title>
+<title>Node74&#45;&gt;Node4</title>
 <path fill="none" stroke="midnightblue" d="M561.99,-328.76C636.66,-319.03 753.8,-303.36 855,-288 867.11,-286.16 880.15,-284.06 892.35,-282.03"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="561.2,-325.33 551.74,-330.09 562.11,-332.27 561.2,-325.33"/>
 </g>
-<!-- Node73&#45;&gt;Node30 -->
+<!-- Node74&#45;&gt;Node30 -->
 <g id="edge71" class="edge">
-<title>Node73&#45;&gt;Node30</title>
+<title>Node74&#45;&gt;Node30</title>
 <path fill="none" stroke="midnightblue" d="M535.37,-327.8C594.41,-315.01 692.04,-293.86 746.38,-282.08"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="534.56,-324.4 525.53,-329.94 536.04,-331.24 534.56,-324.4"/>
 </g>
-<!-- Node73&#45;&gt;Node31 -->
+<!-- Node74&#45;&gt;Node31 -->
 <g id="edge69" class="edge">
-<title>Node73&#45;&gt;Node31</title>
+<title>Node74&#45;&gt;Node31</title>
 <path fill="none" stroke="midnightblue" d="M486.57,-319.78C487.45,-290.75 489.1,-236.04 489.74,-215.02"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="483.07,-319.74 486.26,-329.84 490.06,-319.95 483.07,-319.74"/>
 </g>
-<!-- Node73&#45;&gt;Node33 -->
+<!-- Node74&#45;&gt;Node33 -->
 <g id="edge70" class="edge">
-<title>Node73&#45;&gt;Node33</title>
+<title>Node74&#45;&gt;Node33</title>
 <path fill="none" stroke="midnightblue" d="M413.33,-328.23C366.71,-319.98 312.32,-306.68 298,-288 261.14,-239.93 335.67,-171.94 364.91,-148.13"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="412.99,-331.72 423.44,-329.96 414.18,-324.82 412.99,-331.72"/>
 </g>
-<!-- Node73&#45;&gt;Node37 -->
+<!-- Node74&#45;&gt;Node37 -->
 <g id="edge72" class="edge">
-<title>Node73&#45;&gt;Node37</title>
+<title>Node74&#45;&gt;Node37</title>
 <path fill="none" stroke="midnightblue" d="M418.7,-328.13C373.88,-319.69 320.77,-306.19 307,-288 298.68,-277.01 300.3,-269.04 307,-257 343.66,-191.11 431.74,-160.87 486.48,-148.02"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="418.24,-331.6 428.71,-329.96 419.5,-324.72 418.24,-331.6"/>
 </g>
-<!-- Node74 -->
+<!-- Node75 -->
 <g id="node48" class="node">
-<title>Node74</title>
+<title>Node75</title>
 <g id="a_node48"><a xlink:href="HistogramUtils_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="black" points="316,-263 316,-282 458,-282 458,-263 316,-263"/>
 <text text-anchor="middle" x="387" y="-270" font-family="Helvetica" font-size="10.00">Samples/HistogramUtils.cpp</text>
 </a>
 </g>
 </g>
-<!-- Node73&#45;&gt;Node74 -->
+<!-- Node74&#45;&gt;Node75 -->
 <g id="edge67" class="edge">
-<title>Node73&#45;&gt;Node74</title>
+<title>Node74&#45;&gt;Node75</title>
 <path fill="none" stroke="midnightblue" d="M464.06,-324.09C444.47,-311.24 416.44,-292.83 400.14,-282.13"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="462.37,-327.17 472.65,-329.73 466.21,-321.32 462.37,-327.17"/>
 </g>
-<!-- Node75&#45;&gt;Node6 -->
+<!-- Node76&#45;&gt;Node6 -->
 <g id="edge75" class="edge">
-<title>Node75&#45;&gt;Node6</title>
+<title>Node76&#45;&gt;Node6</title>
 <path fill="none" stroke="midnightblue" d="M699.24,-319.81C699.37,-301.07 696.34,-272.79 679,-257 591.44,-177.27 526.43,-261.09 415,-221 354.01,-199.06 264,-171.5 307,-123 329.43,-97.7 537.73,-82.59 651.55,-76.16"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="695.74,-319.69 698.86,-329.81 702.73,-319.95 695.74,-319.69"/>
 </g>
-<!-- Node76 -->
+<!-- Node77 -->
 <g id="node50" class="node">
-<title>Node76</title>
+<title>Node77</title>
 <g id="a_node50"><a xlink:href="OscillationHandler_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="black" points="514,-263 514,-282 670,-282 670,-263 514,-263"/>
 <text text-anchor="middle" x="592" y="-270" font-family="Helvetica" font-size="10.00">Samples/OscillationHandler.cpp</text>
 </a>
 </g>
 </g>
-<!-- Node75&#45;&gt;Node76 -->
+<!-- Node76&#45;&gt;Node77 -->
 <g id="edge74" class="edge">
-<title>Node75&#45;&gt;Node76</title>
+<title>Node76&#45;&gt;Node77</title>
 <path fill="none" stroke="midnightblue" d="M675.08,-324.44C654.08,-311.57 623.68,-292.93 606.07,-282.13"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="673.35,-327.49 683.7,-329.73 677.01,-321.52 673.35,-327.49"/>
 </g>
