@@ -1,10 +1,11 @@
 #pragma once
 
 #include "Fitters/MR2T2.h"
+#include "numeric"
 
 /*
 
-
+https://academic.oup.com/jrsssb/article/84/2/321/7056147#396806364
 https://arxiv.org/pdf/1205.1076
 */
 
@@ -43,6 +44,9 @@ class PTMR2T2 : public MR2T2
     void SwapStepInformation(int swap_rank);
     void SynchronizeTemperatures();
     void AdaptTemperature();
+    void PrepareOutput();
+
+    void GlobalAdaptTemperatures();
 
     // MPI stuff    
 
@@ -62,8 +66,15 @@ class PTMR2T2 : public MR2T2
 
     std::vector<double> transfer_vector_send;
     std::vector<double> transfer_vector_recv;
-
     std::vector<double> temp_vec;
+
+    std::vector<double> Barrier_lambda;
+    std::vector<double> Barrier_Lambda;
+    std::vector<double> Barrier_Temps;
+    std::vector<double> Barrier_Betas;
+    int Barrier_step;
+
+
 };
 
 

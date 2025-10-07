@@ -4,7 +4,7 @@
 
 /*
 MPI demonstration of Differential Evolution Markov Chain Monte Carlo with snooker updater and Z-matrix crossover
-Based on https://arxiv.org/abs/1005.5256
+Based on 
 
 
 Basic algorithm:
