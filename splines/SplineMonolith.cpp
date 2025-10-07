@@ -1268,8 +1268,8 @@ void SMonolith::Evaluate() {
       [[intel::kernel_args_restrict]]
       void operator()() const {
         sycl::ext::intel::experimental::task_sequence<FPGACalcSplineWeights> task_a;
-        sycl::ext::intel::experimental::task_sequence<FPGACalcTF1Weights> task_b;
-        //sycl::ext::intel::experimental::task_sequence<FPGAModifyWeights> task_c;
+        //sycl::ext::intel::experimental::task_sequence<FPGACalcTF1Weights> task_b;
+        sycl::ext::intel::experimental::task_sequence<FPGAModifyWeights> task_c;
 
         // Pass all the things that FPGACalcSplineWeights needs
         task_a.async(SplineSegments,
