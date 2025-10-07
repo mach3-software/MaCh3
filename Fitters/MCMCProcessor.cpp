@@ -3079,9 +3079,7 @@ void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
 
   for (int i = 0; i < nEntries; ++i)
   {
-    if(i % 500000 == 0){
-      MACH3LOG_INFO("Reweighting entry {}/{}", i, nEntries);
-    }
+    if(i % (nEntries/10) == 0) MaCh3Utils::PrintProgressBar(i, nEntries);
     post->GetEntry(i);
     Weight = 1.;
 
