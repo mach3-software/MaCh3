@@ -138,7 +138,7 @@ void FPGAModifyWeights(int NEvents,
 
         bool spline_success = false;
         //bool tf1_success = false;
-        //float spline_val;
+        float spline_val;
         //float tf1_val;
         //while (current_spline_param < numParams || current_tf1_param < numParams_tf1){
         while (current_spline_param < numParams){
