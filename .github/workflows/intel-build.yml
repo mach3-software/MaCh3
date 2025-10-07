@@ -49,9 +49,11 @@ jobs:
           . /opt/intel/oneapi/2025.0/oneapi-vars.sh --force
 
           source /home/hep/llaatu/gh-runner/_work/MaCh3/MaCh3/build/bin/setup.MaCh3.sh
+          source /home/hep/llaatu/mach3/MaCh3Tutorial/build/bin/setup.MaCh3Tutorial.sh
 
           cd /home/hep/llaatu/mach3/MaCh3Tutorial/build/
           ./CIValidations/SplineValidations
+          cp out.txt out_$(date +%s).txt
         shell: bash
 
 
@@ -82,8 +84,12 @@ jobs:
           aocl program acl0 /opt/oneapi-asp/ia840f/bringup/aocxs/ofs_ia840f_usm.aocx
           aocl program acl1 /opt/oneapi-asp/ia840f/bringup/aocxs/ofs_ia840f_usm.aocx
           source /home/hep/llaatu/gh-runner/_work/MaCh3/MaCh3/build/bin/setup.MaCh3.sh
+          source /home/hep/llaatu/mach3/MaCh3Tutorial/build/bin/setup.MaCh3Tutorial.sh
 
           cd /home/hep/llaatu/mach3/MaCh3Tutorial/build/
           export SYCL_UR_TRACE=-1
+          export ACL_CONTEXT_CALLBACK_DEBUG=1          
           ./CIValidations/SplineValidations
+          cp out.txt out_$(date +%s).txt
+
         shell: bash        
