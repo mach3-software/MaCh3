@@ -43,37 +43,28 @@ class PTMR2T2 : public MR2T2
     void Swap();
     void SwapStepInformation(int swap_rank);
     void SynchronizeTemperatures();
-    void AdaptTemperature();
+
     void PrepareOutput();
+    // void AdaptTemperature();
 
     void GlobalAdaptTemperatures();
 
     // MPI stuff    
 
     // PTMCMC parameters
-    double temperature;
+    double TempScale;
     double LogL_replica;
     double temp_replica;
-    double adaption_rate;
-
+    double round_trip_rate;
+    int temp_adapt_step;
 
     bool do_swap;
     int n_up_swap;
     int n_down_swap;
-    double max_temp;
-    double min_temp;
-    double target_rate;
 
     std::vector<double> transfer_vector_send;
     std::vector<double> transfer_vector_recv;
     std::vector<double> temp_vec;
-
-    std::vector<double> Barrier_lambda;
-    std::vector<double> Barrier_Lambda;
-    std::vector<double> Barrier_Temps;
-    std::vector<double> Barrier_Betas;
-    int Barrier_step;
-
 
 };
 
