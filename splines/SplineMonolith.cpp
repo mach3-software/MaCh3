@@ -1353,8 +1353,9 @@ void SMonolith::Evaluate() {
                                                             //_nTF1Coeff_,
                                                             NEvents,
                                                             cpu_total_weights,
-                                                            cpu_nParamPerEvent.data(),
-                                                            cpu_nParamPerEvent_tf1.data()});
+                                                            cpu_nParamPerEvent.data()
+                                                            //cpu_nParamPerEvent_tf1.data()
+                                                            });
 
     e.wait();
 
