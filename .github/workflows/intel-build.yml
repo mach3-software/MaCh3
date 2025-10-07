@@ -53,7 +53,7 @@ jobs:
 
           cd /home/hep/llaatu/mach3/MaCh3Tutorial/build/
           ./CIValidations/SplineValidations
-          cp out.txt out_$(date +%s).txt
+          cp out.txt /home/hep/llaatu/mach3/output/out_emu_$(date +%s).txt
         shell: bash
 
 
@@ -90,6 +90,6 @@ jobs:
           export SYCL_UR_TRACE=-1
           export ACL_CONTEXT_CALLBACK_DEBUG=1          
           ./CIValidations/SplineValidations
-          cp out.txt out_$(date +%s).txt
+          cp out.txt /home/hep/llaatu/mach3/output/out_hw_$(date +%s).txt
 
         shell: bash        

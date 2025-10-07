@@ -23,14 +23,15 @@ using SplinePipe = sycl::ext::intel::pipe<IDSplinePipe,        // An identifier 
                                           float,           // The type of data in the pipe
                                           kPipeMinCapacity // The capacity of the pipe
                                           >;
-using TF1Pipe = sycl::ext::intel::pipe<IDTF1Pipe,        // An identifier for the pipe
+/*using TF1Pipe = sycl::ext::intel::pipe<IDTF1Pipe,        // An identifier for the pipe
                                        float,           // The type of data in the pipe
                                        kPipeMinCapacity // The capacity of the pipe
                                        >;
-
+*/
 
 //*********************************************************
 //*********************************************************
+[[intel::use_stall_enable_clusters]]
 void FPGACalcSplineWeights(short int *SplineSegments,
                            float *coeff_many,
                            float *ParamValues,
@@ -82,7 +83,7 @@ void FPGACalcSplineWeights(short int *SplineSegments,
     }
 }
 //********************************************************************
-void FPGACalcTF1Weights(float *ParamValues,
+/*void FPGACalcTF1Weights(float *ParamValues,
                         short int *cpu_paramNo_TF1_arr,
                         float *cpu_coeff_TF1_many,
                         unsigned int NTF1_valid,
@@ -109,17 +110,18 @@ void FPGACalcTF1Weights(float *ParamValues,
         while (!success) TF1Pipe::write(a*x + b, success);
     }
 
-}
+}*/
 
 //*********************************************************
 [[intel::use_stall_enable_clusters]]
 void FPGAModifyWeights(int NEvents,
                        float *cpu_total_weights,
                        unsigned int *cpu_nParamPerEvent,
-                       unsigned int *cpu_nParamPerEvent_tf1){
+                      // unsigned int *cpu_nParamPerEvent_tf1
+                      ){
     sycl::ext::intel::host_ptr<float> total_weights_host(cpu_total_weights);
     sycl::ext::intel::host_ptr<const unsigned int> nParamPerEvent_host(cpu_nParamPerEvent);
-    sycl::ext::intel::host_ptr<const unsigned int> nParamPerEvent_tf1_host(cpu_nParamPerEvent_tf1);
+    //sycl::ext::intel::host_ptr<const unsigned int> nParamPerEvent_tf1_host(cpu_nParamPerEvent_tf1);
 
     for (unsigned int EventNum = 0; EventNum < NEvents; ++EventNum){
         float totalWeight = 1.0f; // Initialize total weight for each event
@@ -129,8 +131,8 @@ void FPGAModifyWeights(int NEvents,
         // Extract the parameters for the current event
         const unsigned int startIndex = nParamPerEvent_host[Offset + 1];
         const unsigned int numParams = nParamPerEvent_host[Offset];
-        const unsigned int startIndex_tf1 = nParamPerEvent_tf1_host[Offset + 1];
-        const unsigned int numParams_tf1 = nParamPerEvent_tf1_host[Offset];
+        //const unsigned int startIndex_tf1 = nParamPerEvent_tf1_host[Offset + 1];
+        //const unsigned int numParams_tf1 = nParamPerEvent_tf1_host[Offset];
         int current_spline_param = 0;
         int current_tf1_param = 0;
 
@@ -149,6 +151,7 @@ void FPGAModifyWeights(int NEvents,
                 }
             }
 
+              /*
             if (current_tf1_param < numParams_tf1){
                 tf1_val = TF1Pipe::read(tf1_success);
                 if (tf1_success){
@@ -156,7 +159,7 @@ void FPGAModifyWeights(int NEvents,
                     current_tf1_param++;
                     tf1_success = false;
                 }
-            }
+            }*/
         }
 
         // // Compute total weight for the current event
@@ -1254,19 +1257,19 @@ void SMonolith::Evaluate() {
       int n_coeff;
       int max_knots;
       int nParams;
-      short int *cpu_paramNo_TF1_arr;
-      float *cpu_coeff_TF1_many;
-      unsigned int NTF1_valid;
-      int nTF1Coeff;
+      //short int *cpu_paramNo_TF1_arr;
+      //float *cpu_coeff_TF1_many;
+      //unsigned int NTF1_valid;
+      //int nTF1Coeff;
       unsigned int n_events;
       float *cpu_total_weights;
       unsigned int *cpu_nParamPerEvent;
-      unsigned int *cpu_nParamPerEvent_tf1;
+      //unsigned int *cpu_nParamPerEvent_tf1;
       [[intel::kernel_args_restrict]]
       void operator()() const {
         sycl::ext::intel::experimental::task_sequence<FPGACalcSplineWeights> task_a;
         sycl::ext::intel::experimental::task_sequence<FPGACalcTF1Weights> task_b;
-        sycl::ext::intel::experimental::task_sequence<FPGAModifyWeights> task_c;
+        //sycl::ext::intel::experimental::task_sequence<FPGAModifyWeights> task_c;
 
         // Pass all the things that FPGACalcSplineWeights needs
         task_a.async(SplineSegments,
@@ -1279,8 +1282,8 @@ void SMonolith::Evaluate() {
                      n_coeff,
                      max_knots,
                      nParams);
-        task_b.async(ParamValues, cpu_paramNo_TF1_arr,cpu_coeff_TF1_many, NTF1_valid, nTF1Coeff, nParams);
-        task_c.async(n_events, cpu_total_weights, cpu_nParamPerEvent, cpu_nParamPerEvent_tf1);
+        //task_b.async(ParamValues, cpu_paramNo_TF1_arr,cpu_coeff_TF1_many, NTF1_valid, nTF1Coeff, nParams);
+        task_c.async(n_events, cpu_total_weights, cpu_nParamPerEvent);//, cpu_nParamPerEvent_tf1);
       }
     };
  
