@@ -162,13 +162,20 @@ void OscProcessor::PerformJarlskogAnalysis() {
   if (Config != nullptr) {
     MACH3LOG_INFO("Found Reweight_Config in chain");
     
-    // Print the reweight configuration for user to see if they want it in their Jarlskog analysis 
-    YAML::Node Settings = TMacroToYAML(*Config);
-    std::stringstream configStream;
-    configStream << Settings;
-    MACH3LOG_INFO("Reweight configuration:\n{}", configStream.str());
-    
-    DoReweight = true;
+    // Print the reweight configuration for user info
+    YAML::Node Settings = TMacroToYAML(*Config); 
+    // Simple check: only enable DoReweight if it's a 1D sin2th_13 Gaussian reweight since Savage Dickey process later on generates values from the Gaussian
+    if(CheckNodeExists(Settings, "ReweightMCMC")) {
+      YAML::Node firstReweight = Settings["ReweightMCMC"].begin()->second;
+      int dimension = GetFromManager<int>(firstReweight["ReweightDim"], 1);
+      std::string reweightType = GetFromManager<std::string>(firstReweight["ReweightType"], "");
+      auto paramNames = GetFromManager<std::vector<std::string>>(firstReweight["ReweightVar"], {});
+      if (dimension == 1 && reweightType == "Gaussian" && paramNames.size() == 1){
+        Sin13_NewPrior = Get<std::pair<double, double>>(firstReweight["ReweightPrior"]);
+        DoReweight = true;
+      } else {
+        MACH3LOG_INFO("No valid reweighting configuration (1D Gaussian on sin2th_13 only) found for Jarlskog analysis");
+      }
   } else {
     MACH3LOG_INFO("No reweighting configuration found for Jarlskog analysis");
   }
