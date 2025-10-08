@@ -3108,15 +3108,15 @@ void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
   // KS: Save reweight metadeta
   std::ostringstream yaml_stream;
   yaml_stream << "Weight:\n";
-  yaml_stream << "ReweightDim: 1\n";
-  yaml_stream << "ReweightType: \"Gaussian\"\n";
-  yaml_stream << "ReweightVar: [";
+  yaml_stream << "  ReweightDim: 1\n";
+  yaml_stream << "  ReweightType: \"Gaussian\"\n";
+  yaml_stream << "  ReweightVar: [";
   for (size_t k = 0; k < Names.size(); ++k) {
     yaml_stream << "\"" << Names[k] << "\"";
     if (k < Names.size() - 1) yaml_stream << ", ";
   }
   yaml_stream << "]\n";
-  yaml_stream << "ReweightPrior: [";
+  yaml_stream << "  ReweightPrior: [";
   for (size_t k = 0; k < Names.size(); ++k) {
     yaml_stream << "[" << NewCentral[k] << ", " << NewError[k] << "]";
     if (k < Names.size() - 1) yaml_stream << ", ";
