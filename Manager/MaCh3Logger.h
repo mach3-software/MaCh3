@@ -65,18 +65,18 @@ inline void SetMaCh3LoggerFormat()
   #endif
 
   #ifdef MPIENABLED 
-  // We only want to log for the FIRST process
+  // We only want to log for the FIRST process [unless we're in debug mode]
+  #ifndef DEBUG
   int mpi_rank = 0;
 
   // Do we actually have an MPI job running?
-  
-
   MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
   if (mpi_rank != 0) {
     spdlog::set_level(spdlog::level::off);
     return;
   }
-  #endif
+  #endif // Debug
+  #endif // MPI
 
   spdlog::set_level(get_default_log_level());
 }

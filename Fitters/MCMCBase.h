@@ -57,7 +57,7 @@ class MCMCBase : public FitterBase {
     inline void AdaptiveStep();
 
     /// @brief Print the progress
-    inline void PrintProgress();
+    virtual void PrintProgress();
 
     /// Do we reject based on hitting boundaries in systs
     bool out_of_bounds;

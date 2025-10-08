@@ -42,10 +42,10 @@ class PTMR2T2 : public MR2T2
 
     void Swap();
     void SwapStepInformation(int swap_rank);
-    void SynchronizeTemperatures();
 
-    void PrepareOutput();
-    // void AdaptTemperature();
+    void PrepareOutput() override;
+
+    void PrintProgress() override;
 
     void GlobalAdaptTemperatures();
 
@@ -53,10 +53,12 @@ class PTMR2T2 : public MR2T2
 
     // PTMCMC parameters
     double TempScale;
+    double inv_TempScale; // Cache 1/TempScale for faster division
     double LogL_replica;
     double temp_replica;
     double round_trip_rate;
     int temp_adapt_step;
+    int n_temp_adapts;
 
     bool do_swap;
     int n_up_swap;
@@ -65,6 +67,11 @@ class PTMR2T2 : public MR2T2
     std::vector<double> transfer_vector_send;
     std::vector<double> transfer_vector_recv;
     std::vector<double> temp_vec;
+
+    // Timing benchmarks
+    double time_base_dostep;
+    double time_swap;
+    double time_global_adapt;
 
 };
 

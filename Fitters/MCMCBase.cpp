@@ -99,6 +99,10 @@ void MCMCBase::PreStepProcess() {
     if ((step - stepStart) % (chainLength / 10) == 0)
     {
         PrintProgress();
+        /// Prevent thread conflcits
+        #ifdef MPIENABLED
+        MPI_Barrier(MPI_COMM_WORLD);
+        #endif
     }
 }
 
@@ -123,15 +127,30 @@ void MCMCBase::PostStepProcess() {
 // Print the fit output progress
 void MCMCBase::PrintProgress() {
 // *******************
-
-    #ifdef MPIENABLED
-    // We only print from the master process
-    if (mpi_rank != 0)
-        return;
-    #endif
-    
     MACH3LOG_INFO("Step:\t{}/{}, current: {:.2f}, proposed: {:.2f}", step - stepStart, chainLength, logLCurr, logLProp);
     MACH3LOG_INFO("Accepted/Total steps: {}/{} = {:.2f}", accCount, step - stepStart, static_cast<double>(accCount) / static_cast<double>(step - stepStart));
+    #ifdef MPIENABLED
+    // Print this info for all other MPI ranks
+    if(mpi_rank==0){
+        for(int i = 1; i < n_procs; ++i){
+            double mpi_info[3] = {0.0, 0.0, 0.0};
+            MPI_Recv(mpi_info, 3, MPI_DOUBLE, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            int rank = static_cast<int>(mpi_info[0]);
+            int acc_steps = static_cast<int>(mpi_info[1]);
+            int total_steps = static_cast<int>(mpi_info[2]);
+            double acc_rate = 0.0;
+            if(total_steps > 0){
+                acc_rate = static_cast<double>(acc_steps) / static_cast<double>(total_steps);
+            }
+            MACH3LOG_INFO("Rank {}: Accepted/Total steps: {}/{} = {:.2f}", rank, acc_steps, total_steps, acc_rate);
+        }
+    }
+    else{
+        double mpi_info[3] = {static_cast<double>(mpi_rank), static_cast<double>(accCount), static_cast<double>(step - stepStart)};
+        MPI_Send(mpi_info, 3, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
+        return;
+    }
+    #endif
 
     for (ParameterHandlerBase *cov : systematics)
     {

@@ -88,7 +88,7 @@ protected:
   void ProcessMCMC();
 
   /// @brief Prepare the output file.
-  void PrepareOutput();
+  virtual void PrepareOutput();
 
   /// @brief Save output and close files.
   void SaveOutput();

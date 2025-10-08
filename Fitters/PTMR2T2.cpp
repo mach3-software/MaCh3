@@ -1,4 +1,5 @@
 #include "Fitters/PTMR2T2.h"
+#include <chrono>
 
 #ifdef MPIENABLED
 PTMR2T2::PTMR2T2(manager *const manager) : MR2T2(manager) {
@@ -13,15 +14,23 @@ PTMR2T2::PTMR2T2(manager *const manager) : MR2T2(manager) {
     n_up_swap = 0;
 
     temp_adapt_step = GetFromManager<int>(fitMan->raw()["General"]["MCMC"]["TempAdaptRate"], 500);
+    n_temp_adapts = GetFromManager<int>(fitMan->raw()["General"]["MCMC"]["NTempAdapts"], 5);
 
     round_trip_rate = 0.0;
+    
+    inv_TempScale = 1.0 / TempScale;
 
     temp_vec = std::vector<double>(n_procs);
     MPI_Allgather(&TempScale, 1, MPI_DOUBLE, temp_vec.data(), 1, MPI_DOUBLE, MPI_COMM_WORLD);
     MACH3LOG_INFO("Using PTMR2T2 fitter with TempScale {} and AnnealTemps: ", TempScale);
     for(int i = 0; i < n_procs; ++i){
         MACH3LOG_INFO("Rank {}: T = {}", i, temp_vec[i]);
-    } 
+    }
+    
+    // Initialize timing benchmarks
+    time_base_dostep = 0.0;
+    time_swap = 0.0;
+    time_global_adapt = 0.0;
 }
 
 void PTMR2T2::PrepareOutput()
@@ -29,9 +38,17 @@ void PTMR2T2::PrepareOutput()
     FitterBase::PrepareOutput();
 
     // Store PTMCMC specific diagnostics
-    outTree->Branch("n_up_swap", &n_up_swap, "n_up_swap/I");
-    outTree->Branch("n_down_swap", &n_down_swap, "n_down_swap/I");
-    outTree->Branch("round_trip_rate", &round_trip_rate, "round_trip_rate/D");
+    // outTree->Branch("n_up_swap", &n_up_swap, "n_up_swap/I");
+    // outTree->Branch("n_down_swap", &n_down_swap, "n_down_swap/I");
+    // outTree->Branch("round_trip_rate", &round_trip_rate, "round_trip_rate/D");
+    
+    // // Store timing benchmarks
+    // #ifdef DEBUG
+    // outTree->Branch("time_base_dostep", &time_base_dostep, "time_base_dostep/D");
+    // outTree->Branch("time_swap", &time_swap, "time_swap/D");
+    // outTree->Branch("time_global_adapt", &time_global_adapt, "time_global_adapt/D");
+    // MACH3LOG_INFO("PTMR2T2 timing branches added to output tree");
+    // #endif
 }
 
 void PTMR2T2::RunMCMC(){
@@ -39,6 +56,8 @@ void PTMR2T2::RunMCMC(){
 
     for(size_t s = 0; s < systematics.size(); ++s)
     {
+        // We also want to make sure we're not starting with a tiny step scale
+        // Thankfully it's not too bad to do this since temperature scales with sqrt(sigma)
         for (int p = 0; p < systematics[s]->GetNumParams(); ++p)
         {
             transfer_vector_send.push_back(systematics[s]->GetParCurr(p));
@@ -53,11 +72,55 @@ void PTMR2T2::RunMCMC(){
 
 void PTMR2T2::DoStep()
 {
+    // Adds in timing if debug enabled
+
+    #ifdef DEBUG
+    auto t_start = std::chrono::high_resolution_clock::now();
+    #endif
+    
     MR2T2::DoStep();
-    // Now we do the swap
+
+    #ifdef DEBUG
+    auto t_end = std::chrono::high_resolution_clock::now();
+    time_base_dostep = std::chrono::duration<double>(t_end - t_start).count();
+    // Benchmark: Time the Swap operation
+    t_start = std::chrono::high_resolution_clock::now();
+    #endif
+
     Swap();
-    if (step % temp_adapt_step == 0 && step > 0)
+    #ifdef DEBUG
+    t_end = std::chrono::high_resolution_clock::now();
+    time_swap = std::chrono::duration<double>(t_end - t_start).count();
+    #endif
+    // We only want to do adaption a small number of times since this process is clunky
+    if (step < static_cast<unsigned int>(temp_adapt_step*n_temp_adapts)
+        && step % temp_adapt_step == 0
+        && step > 0 )
+    {
+        // Benchmark: Time the GlobalAdaptTemperatures operation
+        #ifdef DEBUG
+        t_start = std::chrono::high_resolution_clock::now();
+        #endif
         GlobalAdaptTemperatures();
+        #ifdef DEBUG
+        t_end = std::chrono::high_resolution_clock::now();
+        time_global_adapt = std::chrono::duration<double>(t_end - t_start).count();
+        #endif
+    }
+    #ifdef DEBUG
+    else
+    {
+        time_global_adapt = 0.0;
+    }
+    #endif
+    
+    #ifdef DEBUG
+    // Debug logging every 100 steps
+    if (step % 100 == 0 && mpi_rank == 0) {
+        MACH3LOG_DEBUG("Step {}: time_base_dostep={:.6f}s, time_swap={:.6f}s, time_global_adapt={:.6f}s", 
+                       step, time_base_dostep, time_swap, time_global_adapt);
+    }
+    #endif
 }
 
 
@@ -67,45 +130,30 @@ void PTMR2T2::ProposeStep()
 
     MR2T2::ProposeStep();
 
-    /// Need to scale the likelihoods by the TempScale
     for (size_t s = 0; s < systematics.size(); ++s)
     {
-        syst_llh[s] /= TempScale;
+        syst_llh[s] *= inv_TempScale;
     }
     for(size_t s = 0; s < samples.size(); ++s){
-        sample_llh[s] /= TempScale;
+        sample_llh[s] *= inv_TempScale;
     }
 
 }
 
 void PTMR2T2::Swap()
 {
-    // Calculate swap partner
     const int offset = (mpi_rank % 2 == static_cast<int>(step) % 2) ? 1 : -1;
     const int swap_rank = mpi_rank + offset;
 
-    // Early exit if no valid partner
     if (swap_rank < 0 || swap_rank >= n_procs)
     {
         do_swap = false;
         return;
     }
 
-    // ========================================================================
-    // Pack metadata: [logLProp, TempScale, decision (if lower rank)]
-    // This reduces to a single Sendrecv for metadata exchange
-    // ========================================================================
-
     const bool i_am_lower = (swap_rank > mpi_rank);
-    double send_meta[3] = {logLProp, TempScale, 0.0};
-    double recv_meta[3] = {0.0, 0.0, 0.0};
-
-    // If I'm the lower rank, compute decision before sending
-    if (i_am_lower)
-    {
-        // We need partner's data first, so we'll do decision in next step
-        // For now, just exchange basic data
-    }
+    double send_meta[2] = {logLProp, TempScale};
+    double recv_meta[2] = {0.0, 0.0};
 
     MPI_Sendrecv(
         send_meta, 2, MPI_DOUBLE, swap_rank, 0,
@@ -115,16 +163,14 @@ void PTMR2T2::Swap()
     LogL_replica = recv_meta[0];
     temp_replica = recv_meta[1];
 
-    // Make and communicate decision
     int decision = 0;
 
     if (i_am_lower)
     {
         const double swap_rand = random->Uniform(0.0, 1.0);
 
-        /// Need to do a bit of scale
-
-        const double swap_prob = std::exp((LogL_replica - logLProp) * (1.0 / TempScale - 1.0 / temp_replica));
+        const double inv_temp_replica = 1.0 / temp_replica;
+        const double swap_prob = std::exp((LogL_replica - logLProp) * (inv_TempScale - inv_temp_replica));
 
         do_swap = swap_rand < swap_prob &&
                   !out_of_bounds &&
@@ -140,7 +186,6 @@ void PTMR2T2::Swap()
         do_swap = (decision == 1);
     }
 
-    // Execute swap
     if (do_swap)
     {
         i_am_lower ? n_up_swap++ : n_down_swap++;
@@ -150,7 +195,6 @@ void PTMR2T2::Swap()
 
 void PTMR2T2::SwapStepInformation(int swap_rank)
 {    
-    // Pack data into single send buffer
     const size_t header_size = 2;
     transfer_vector_send[0] = logLProp;
     transfer_vector_send[1] = TempScale;
@@ -163,31 +207,24 @@ void PTMR2T2::SwapStepInformation(int swap_rank)
         idx += systematics[s]->GetNumParams();
     }
     
-    // ========================================================================
-    // MPI_Sendrecv: Simultaneous send/receive in single call
-    // This is the safest and often fastest approach for paired exchanges
-    // ========================================================================
-    
     MPI_Sendrecv(
-        transfer_vector_send.data(),                        // send buffer
-        static_cast<int>(transfer_vector_send.size()),     // send count
-        MPI_DOUBLE,                                         // send type
-        swap_rank,                                          // destination
-        0,                                                  // send tag
-        transfer_vector_recv.data(),                        // receive buffer
-        static_cast<int>(transfer_vector_recv.size()),     // receive count
-        MPI_DOUBLE,                                         // receive type
-        swap_rank,                                          // source
-        0,                                                  // receive tag
-        MPI_COMM_WORLD,                                     // communicator
-        MPI_STATUS_IGNORE                                   // status
+        transfer_vector_send.data(),
+        static_cast<int>(transfer_vector_send.size()),
+        MPI_DOUBLE,
+        swap_rank,
+        0,
+        transfer_vector_recv.data(),
+        static_cast<int>(transfer_vector_recv.size()),
+        MPI_DOUBLE,
+        swap_rank,
+        0,
+        MPI_COMM_WORLD,
+        MPI_STATUS_IGNORE
     );
     
-    // Extract received data
     LogL_replica = transfer_vector_recv[0];
     temp_replica = transfer_vector_recv[1];
     
-    // Update parameters
     idx = header_size;
     for(size_t s = 0; s < systematics.size(); ++s)
     {
@@ -204,61 +241,6 @@ void PTMR2T2::SwapStepInformation(int swap_rank)
     logLProp = LogL_replica * TempScale / temp_replica;
 }
 
-void PTMR2T2::SynchronizeTemperatures()
-{
-    // Gather all AnnealTemps to ensure the ladder is properly ordered
-    MPI_Allgather(&TempScale, 1, MPI_DOUBLE, temp_vec.data(), 1, MPI_DOUBLE, MPI_COMM_WORLD);
-
-    // Rank 0 sorts and redistributes if needed
-    if (mpi_rank == 0)
-    {
-        std::sort(temp_vec.begin(), temp_vec.end());
-        temp_vec[0] = 1.0; // Ensure canonical chain
-    }
-
-    // Broadcast the sorted AnnealTemps
-    MPI_Bcast(temp_vec.data(), n_procs, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
-    // Each chain takes its TempScale
-    TempScale = temp_vec[mpi_rank];
-}
-
-// void PTMR2T2::AdaptTemperature()
-// {
-//     // Only adapt for chains that are not at the boundaries
-//     if (mpi_rank == 0)
-//     {
-//         // This is the canonical chain (T=1), don't adapt
-//         return;
-//     }
-
-//     // Calculate current swap acceptance rate
-//     int total_swaps = n_up_swap + n_down_swap;
-//     if (total_swaps == 0)
-//         return; // No swaps yet, can't adapt
-
-//     double current_swap_rate = static_cast<double>(n_up_swap) / static_cast<double>(total_swaps);
-
-//     // Adaptive step using stochastic approximation
-//     // If acceptance rate is too low, decrease TempScale (move closer to neighbor)
-//     // If acceptance rate is too high, increase TempScale (move further from neighbor)
-//     double delta = adaption_rate * (current_swap_rate - target_rate);
-
-//     // Update TempScale using log scale for stability
-//     double log_temp = std::log(TempScale);
-//     log_temp += delta;
-//     TempScale = std::exp(log_temp);
-
-//     // Enforce TempScale bounds
-//     TempScale = std::max(min_temp, std::min(max_temp, TempScale));
-
-//     // Optionally: Synchronize AnnealTemps across chains periodically
-//     // This ensures the TempScale ladder remains ordered
-//     if (step % 1000 == 0)
-//     {
-//         SynchronizeTemperatures();
-//     }
-// }
 
 void PTMR2T2::GlobalAdaptTemperatures()
 {
@@ -303,11 +285,16 @@ void PTMR2T2::GlobalAdaptTemperatures()
         for (int i = 0; i < n_procs; ++i)
             betas[i] = 1.0 / temps_sorted[i];
 
+        // Sort acceptances to match temperature ordering
+        std::vector<double> accepts_sorted(n_procs);
+        for (int i = 0; i < n_procs; ++i)
+            accepts_sorted[i] = all_accepts[indices[i]];
+
         // Compute local communication barriers λ_i = -log(accept_i)
         std::vector<double> lambda(n_procs - 1);
         for (int i = 0; i < n_procs - 1; ++i)
         {
-            double acc = std::max(1e-6, std::min(1.0 - 1e-6, all_accepts[i]));
+            double acc = std::max(1e-6, std::min(1.0 - 1e-6, accepts_sorted[i]));
             lambda[i] = -std::log(acc);
         }
 
@@ -346,21 +333,14 @@ void PTMR2T2::GlobalAdaptTemperatures()
         for (int i = 0; i < n_procs; ++i)
             all_temps[i] = 1.0 / new_betas[i];
 
-        // Enforce T[0] = 1.0 canonical chain
         all_temps[0] = 1.0;
         std::sort(all_temps.begin(), all_temps.end());
     }
 
-    // --------------------------------------------------------------------
-    // 2. Broadcast new temperature ladder to all ranks
-    // --------------------------------------------------------------------
     MPI_Bcast(all_temps.data(), n_procs, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     TempScale = all_temps[mpi_rank];
+    inv_TempScale = 1.0 / TempScale;
 
-    // --------------------------------------------------------------------
-    // 3. Reset swap counters for next adaptation window
-    // --------------------------------------------------------------------
-    // Before resetting, compute a simple global round-trip metric (mean acceptance)
     double local_accept_for_rt = 0.0;
     int total_swaps_rt = n_up_swap + n_down_swap;
     if (total_swaps_rt > 0)
@@ -368,25 +348,57 @@ void PTMR2T2::GlobalAdaptTemperatures()
 
     double global_round_trip = 0.0;
     MPI_Allreduce(&local_accept_for_rt, &global_round_trip, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-    global_round_trip /= static_cast<double>(n_procs);
-
-    round_trip_rate = global_round_trip;
-
+    round_trip_rate = global_round_trip / static_cast<double>(n_procs);
 
     if (mpi_rank == 0)
     {
         MACH3LOG_INFO("Adapted global temperature ladder:");
-
-        MACH3LOG_INFO("Swapped {}/{} steps between adaptations", n_up_swap, temp_adapt_step);
+        MACH3LOG_INFO("Global mean swap rate: {:.3f}", round_trip_rate);
 
         for (int i = 0; i < n_procs; ++i)
         {
             double swap_rate = (i < n_procs - 1) ? all_accepts[i] : 0.0;
-            MACH3LOG_INFO("Rank {} -> T = {} | Swap Rate {}", i, all_temps[i], swap_rate);
+            MACH3LOG_INFO("Rank {} -> T = {:.4f} | Swap Rate {:.3f}", i, all_temps[i], swap_rate);
         }
     }
+    
     n_up_swap = 0;
     n_down_swap = 0;
 }
+
+void PTMR2T2::PrintProgress(){
+    MR2T2::PrintProgress();
+
+    MACH3LOG_INFO("Temperature: {:.2f}, Up Going: {:.2f}", TempScale, static_cast<double>(n_up_swap));
+
+    if (mpi_rank == 0)
+    {
+        for (int i = 1; i < n_procs; ++i)
+        {
+            double mpi_info[4] = {0.0, 0.0, 0.0, 0.0};
+            MPI_Recv(mpi_info, 4, MPI_DOUBLE, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            int rank = static_cast<int>(mpi_info[0]);
+            double temp = mpi_info[1];
+            int n_up = static_cast<int>(mpi_info[2]);
+            int n_down = static_cast<int>(mpi_info[3]);
+            int total_steps_up_down = n_up + n_down;
+
+            double swap_rate = 0.0;
+            if (total_steps_up_down > 0)
+            {
+                swap_rate = static_cast<double>(n_up) / static_cast<double>(total_steps_up_down);
+            }
+            MACH3LOG_INFO("Rank {}: Swap Rate: {:.2f} (up: {}, down: {}), Temp: {:.2f}", rank, swap_rate, n_up, n_down, temp);
+        }
+
+    }
+    else
+    {
+        double mpi_info[4] = {static_cast<double>(mpi_rank), TempScale, static_cast<double>(n_up_swap), static_cast<double>(n_down_swap)};
+        MPI_Send(mpi_info, 4, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
+        return;
+    }
+}
+
 
 #endif
