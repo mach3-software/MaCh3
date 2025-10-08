@@ -25,7 +25,7 @@ struct ReweightConfig {
     std::string type;  // "Gaussian", "TGraph2D"
     int dimension;     // 1 or 2
     std::vector<std::string> paramNames;
-    std::vector<double> priorValues;
+    std::vector<std::vector<double>> priorValues; // Changed to handle multiple [mean, sigma] pairs
     std::string weightBranchName;
     bool enabled;
    
@@ -117,27 +117,41 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
         // Handle different reweight types as they fill different members
         if (reweightConfig.dimension == 1) {
             if (reweightConfig.type == "Gaussian") {
-                // For Gaussian reweights, we need the parameter name and prior values (mean, sigma)
-                std::string paramName = GetFromManager<std::string>(reweightConfigNode["ReweightVar"], "");
-                auto priorValues = GetFromManager<std::vector<double>>(reweightConfigNode["ReweightPrior"], {});
+                // For Gaussian reweights, we need the parameter name(s) and prior values (mean, sigma pairs)
+                auto paramNames = GetFromManager<std::vector<std::string>>(reweightConfigNode["ReweightVar"], {});
                 
-                reweightConfig.paramNames = {paramName};
-                reweightConfig.priorValues = priorValues;
+                // Get prior values - always a list of [mean, sigma] pairs
+                auto priorNode = reweightConfigNode["ReweightPrior"];
+                std::vector<std::vector<double>> allPriorValues;
+                
+                if (priorNode.IsSequence()) {
+                    // Multiple [mean, sigma] pairs
+                    for (const auto& priorPair : priorNode) {
+                        auto priorValues = GetFromManager<std::vector<double>>(priorPair, {});
+                        if (priorValues.size() == 2) {
+                            allPriorValues.push_back(priorValues);
+                        }
+                    }
+                }
+                
+                reweightConfig.paramNames = paramNames;
+                reweightConfig.priorValues = allPriorValues;
 
-                if (paramName.empty() || priorValues.size() != 2) {
-                    MACH3LOG_ERROR("Invalid Gaussian reweight configuration for {}", reweightKey);
+                if (paramNames.empty() || allPriorValues.empty() || paramNames.size() != allPriorValues.size()) {
+                    MACH3LOG_ERROR("Invalid Gaussian reweight configuration for {}: {} parameters, {} prior pairs", 
+                                   reweightKey, paramNames.size(), allPriorValues.size());
                     continue;
                 }
             } else if (reweightConfig.type == "TGraph") {
                 // For TGraph reweights, we need the parameter name and the TGraph file and name
-                std::string paramName = GetFromManager<std::string>(reweightConfigNode["ReweightVar"], "");
+                auto paramNames = GetFromManager<std::vector<std::string>>(reweightConfigNode["ReweightVar"], {});
                 std::string fileName = GetFromManager<std::string>(reweightConfigNode["ReweightPrior"]["file"], "");
                 std::string graphName = GetFromManager<std::string>(reweightConfigNode["ReweightPrior"]["graph_name"], ""); 
-                reweightConfig.paramNames = {paramName};
+                reweightConfig.paramNames = paramNames;
                 reweightConfig.fileName = fileName;
                 reweightConfig.graphName = graphName;
 
-                if (paramName.empty() || fileName.empty() || graphName.empty()) {
+                if (paramNames.empty() || paramNames.size() != 1 || fileName.empty() || graphName.empty()) {
                     MACH3LOG_ERROR("Invalid TGraph reweight configuration for {}", reweightKey);
                     continue;
                 }
@@ -377,12 +391,22 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
     // If a given reweight is 1D Gaussian we can just let MCMCProcessor method do the reweight
     for (const auto& rwConfig : reweightConfigs){
         if (rwConfig.dimension == 1 && rwConfig.type == "Gaussian"){
-            // case the rwConfig parameters to the specific format processor needs
-            const std::vector<std::string>& paramName = {rwConfig.paramNames[0]};
-            const std::vector<double>& priorCentral = {rwConfig.priorValues[0]};
-            const std::vector<double>& priorSigma = {rwConfig.priorValues[1]};
-            processor->ReweightPrior(paramName, priorCentral, priorSigma);
-            MACH3LOG_INFO("Applied Gaussian reweighting for {} with mean={} and sigma={}", paramName[0], priorCentral[0], priorSigma[0]);
+            // Extract the parameter names and convert priorValues to the format processor needs
+            const std::vector<std::string>& paramNames = rwConfig.paramNames;
+            std::vector<double> priorCentral;
+            std::vector<double> priorSigma;
+            
+            // Extract means and sigmas from the prior pairs
+            for (const auto& priorPair : rwConfig.priorValues) {
+                priorCentral.push_back(priorPair[0]); // mean
+                priorSigma.push_back(priorPair[1]);   // sigma
+            }
+            
+            processor->ReweightPrior(paramNames, priorCentral, priorSigma);
+            MACH3LOG_INFO("Applied Gaussian reweighting for {} parameters", paramNames.size());
+            for (size_t i = 0; i < paramNames.size(); ++i) {
+                MACH3LOG_INFO("  {}: mean={}, sigma={}", paramNames[i], priorCentral[i], priorSigma[i]);
+            }
             processMCMCreweighted=true;
         }
     }
