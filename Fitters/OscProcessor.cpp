@@ -171,14 +171,15 @@ void OscProcessor::PerformJarlskogAnalysis() {
       std::string reweightType = GetFromManager<std::string>(firstReweight["ReweightType"], "");
       auto paramNames = GetFromManager<std::vector<std::string>>(firstReweight["ReweightVar"], {});
       if (dimension == 1 && reweightType == "Gaussian" && paramNames.size() == 1){
-        Sin13_NewPrior = Get<std::pair<double, double>>(firstReweight["ReweightPrior"]);
+        Sin13_NewPrior = Get<std::pair<double, double>>(firstReweight["ReweightPrior"],__FILE__,__LINE__);
         DoReweight = true;
       } else {
         MACH3LOG_INFO("No valid reweighting configuration (1D Gaussian on sin2th_13 only) found for Jarlskog analysis");
       }
-  } else {
-    MACH3LOG_INFO("No reweighting configuration found for Jarlskog analysis");
-  }
+    } else {
+      MACH3LOG_INFO("No reweighting configuration found for Jarlskog analysis");
+    }
+}
 
   TempFile->Close();
   delete TempFile;
