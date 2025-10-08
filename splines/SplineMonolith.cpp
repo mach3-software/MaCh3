@@ -267,6 +267,7 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
     #if FPGA_SIMULATOR
       auto selector = sycl::ext::intel::fpga_simulator_selector_v;
     #elif FPGA_HARDWARE
+      std::cout<<"CHECKEDDDD!!! FPGA_HARDWARE active"<<std::endl;
       auto selector = sycl::ext::intel::fpga_selector_v;
     #elif FPGA_EMULATOR
       std::cout<<"CHECKEDDDD!!! FPGA_EMULATOR active"<<std::endl;
@@ -796,7 +797,8 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   gpu_spline_handler->InitGPU_Vals(&ParamValues);
 #elif USE_FPGA
 
-   
+  std::cout<<"CHECK!!! USE_FPGA active in LoadSplineFile don't initialize queue here"<<std::endl;
+   /*
   #if FPGA_SIMULATOR
     auto selector = sycl::ext::intel::fpga_simulator_selector_v;
   #elif FPGA_HARDWARE
@@ -811,11 +813,11 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   #endif
   queue = sycl::queue(selector);//, fpga_tools::exception_handler, sycl::property::queue::enable_profiling{});
   
-
+   
   //segments = sycl::malloc_host<short int>(nParams, queue);
   SplineSegments = sycl::malloc_host<short int>(nParams, queue);
   ParamValues = sycl::malloc_host<float>(nParams, queue);
-  
+  */
 #else
   SplineSegments = new short int[nParams]();
   ParamValues = new float[nParams]();
