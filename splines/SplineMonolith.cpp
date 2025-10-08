@@ -263,7 +263,8 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
   gpu_spline_handler->InitGPU_Segments(&SplineSegments);
   gpu_spline_handler->InitGPU_Vals(&ParamValues);
   #elif USE_FPGA
-    
+    std::cout<<"CHECK!!! USE_FPGA active in PrepareForGPU"<<std::endl;
+    /*
     #if FPGA_SIMULATOR
       auto selector = sycl::ext::intel::fpga_simulator_selector_v;
     #elif FPGA_HARDWARE
@@ -276,13 +277,14 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
       auto selector = sycl::default_selector{};
     #endif
 
-    std::cout<<"CHECK!!! USE_FPGA active"<<std::endl;
+    
     queue = sycl::queue(selector);//, fpga_tools::exception_handler, sycl::property::queue::enable_profiling{});
+    */
     //queue = sycl::queue(sycl::default_selector{});
     //segments = sycl::malloc_host<short int>(nParams, queue);
     
-    SplineSegments = sycl::malloc_host<short int>(nParams, queue);
-    ParamValues = sycl::malloc_host<float>(nParams, queue);
+    //SplineSegments = sycl::malloc_host<short int>(nParams, queue);
+    //ParamValues = sycl::malloc_host<float>(nParams, queue);
   #else
     SplineSegments = new short int[nParams]();
     ParamValues = new float[nParams]();
@@ -797,8 +799,8 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   gpu_spline_handler->InitGPU_Vals(&ParamValues);
 #elif USE_FPGA
 
-  std::cout<<"CHECK!!! USE_FPGA active in LoadSplineFile don't initialize queue here"<<std::endl;
-   /*
+  std::cout<<"CHECK!!! USE_FPGA active in LoadSplineFile"<<std::endl;
+   
   #if FPGA_SIMULATOR
     auto selector = sycl::ext::intel::fpga_simulator_selector_v;
   #elif FPGA_HARDWARE
@@ -817,7 +819,7 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   //segments = sycl::malloc_host<short int>(nParams, queue);
   SplineSegments = sycl::malloc_host<short int>(nParams, queue);
   ParamValues = sycl::malloc_host<float>(nParams, queue);
-  */
+  
 #else
   SplineSegments = new short int[nParams]();
   ParamValues = new float[nParams]();
