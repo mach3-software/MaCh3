@@ -16,7 +16,6 @@ inline void CalcBipolarPlot(MCMCProcessor* Processor);
 inline void CalcParameterEvolution(MCMCProcessor* Processor);
 inline void GetTrianglePlot(MCMCProcessor* Processor);
 inline void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, const std::string& inputFile);
-inline void ReweightPrior(MCMCProcessor* Processor);
 /// @brief KS: Convert TMatrix to TH2D, mostly useful for making fancy plots
 inline TH2D* TMatrixIntoTH2D(TMatrixDSym* Matrix, const std::string& title);
 /// @brief KS: Perform KS test to check if two posteriors for the same parameter came from the same distribution
@@ -204,7 +203,6 @@ void ProcessMCMC(const std::string& inputFile)
     //KS: When creating covariance matrix longest time is spend on caching every step, since we already cached we can run some fancy covariance stability diagnostic
     if(GetFromManager<bool>(Settings["DiagnoseCovarianceMatrix"], false)) DiagnoseCovarianceMatrix(Processor.get(), inputFile);
   }
-  if(GetFromManager<bool>(Settings["ReweightPrior"], false)) ReweightPrior(Processor.get());
   if(GetFromManager<bool>(Settings["JarlskogAnalysis"], true)) Processor->PerformJarlskogAnalysis();
 }
 
@@ -676,23 +674,6 @@ void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, const std::string& input
   if(CorrelationPreviousHist != nullptr) delete CorrelationPreviousHist;
   if(CovarianceHist != nullptr)          delete CovarianceHist;
   if(CorrelationHist != nullptr)         delete CorrelationHist;
-}
-
-void ReweightPrior(MCMCProcessor* Processor)
-{
-  YAML::Node card_yaml = M3OpenConfig(config.c_str());
-  YAML::Node Settings = card_yaml["ProcessMCMC"];
-
-  const auto& Prior = Settings["PriorReweighting"];
-  std::vector<std::string> Names = Prior[0].as<std::vector<std::string>>();
-  std::vector<double> NewCentral = Prior[1].as<std::vector<double>>();
-  std::vector<double> NewError = Prior[2].as<std::vector<double>>();
-
-  for (const auto& name : Names)
-  {
-    MACH3LOG_INFO("Reweighting prior for {} with new central value {} and error {}", name, NewCentral[&name - &Names[0]], NewError[&name - &Names[0]]);
-  }
-  Processor->ReweightPrior(Names, NewCentral, NewError);
 }
 
 //KS: Convert TMatrix to TH2D, mostly useful for making fancy plots
