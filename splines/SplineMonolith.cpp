@@ -263,7 +263,7 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
   gpu_spline_handler->InitGPU_Segments(&SplineSegments);
   gpu_spline_handler->InitGPU_Vals(&ParamValues);
   #elif USE_FPGA
-
+    
     #if FPGA_SIMULATOR
       auto selector = sycl::ext::intel::fpga_simulator_selector_v;
     #elif FPGA_HARDWARE
@@ -279,6 +279,7 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
     queue = sycl::queue(selector);//, fpga_tools::exception_handler, sycl::property::queue::enable_profiling{});
     //queue = sycl::queue(sycl::default_selector{});
     //segments = sycl::malloc_host<short int>(nParams, queue);
+    
     SplineSegments = sycl::malloc_host<short int>(nParams, queue);
     ParamValues = sycl::malloc_host<float>(nParams, queue);
   #else
@@ -308,8 +309,8 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
 
   #ifdef USE_FPGA
     cpu_spline_handler = new SplineMonoUSM(queue, event_size_max, nKnots*_nCoeff_, NSplines_valid, NSplines_valid, NEvents);
-    cpu_coeff_TF1_many = sycl::malloc_host<float>(nTF1coeff, queue);
-    cpu_paramNo_TF1_arr = sycl::malloc_host<short int>(NTF1_valid, queue);
+    //cpu_coeff_TF1_many = sycl::malloc_host<float>(nTF1coeff, queue);
+    //cpu_paramNo_TF1_arr = sycl::malloc_host<short int>(NTF1_valid, queue);
     cpu_total_weights = sycl::malloc_host<float>(NEvents, queue);
   #else
     cpu_spline_handler->paramNo_arr.resize(NSplines_valid);
@@ -795,6 +796,7 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   gpu_spline_handler->InitGPU_Vals(&ParamValues);
 #elif USE_FPGA
 
+   
   #if FPGA_SIMULATOR
     auto selector = sycl::ext::intel::fpga_simulator_selector_v;
   #elif FPGA_HARDWARE
@@ -808,6 +810,8 @@ void SMonolith::LoadSplineFile(std::string FileName) {
     auto selector = sycl::default_selector{};
   #endif
   queue = sycl::queue(selector);//, fpga_tools::exception_handler, sycl::property::queue::enable_profiling{});
+  
+
   //segments = sycl::malloc_host<short int>(nParams, queue);
   SplineSegments = sycl::malloc_host<short int>(nParams, queue);
   ParamValues = sycl::malloc_host<float>(nParams, queue);
@@ -823,8 +827,8 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   cpu_nParamPerEvent_tf1.resize(2*NEvents);
   #ifdef USE_FPGA
     cpu_spline_handler = new SplineMonoUSM(queue, event_size_max, nKnots*_nCoeff_, NSplines_valid, NSplines_valid, NEvents);
-    cpu_coeff_TF1_many = sycl::malloc_host<float>(nTF1coeff, queue);
-    cpu_paramNo_TF1_arr = sycl::malloc_host<short int>(NTF1_valid, queue);
+    //cpu_coeff_TF1_many = sycl::malloc_host<float>(nTF1coeff, queue);
+    //cpu_paramNo_TF1_arr = sycl::malloc_host<short int>(NTF1_valid, queue);
   #else
     cpu_spline_handler->paramNo_arr.resize(NSplines_valid);
     //KS: And array which tells where each spline stars in a big monolith array, sort of knot map
@@ -844,7 +848,7 @@ void SMonolith::LoadSplineFile(std::string FileName) {
   #ifdef USE_FPGA
     cpu_total_weights = sycl::malloc_host<float>(NEvents, queue);
     cpu_weights_spline_var = sycl::malloc_host<float>(NSplines_valid, queue);
-    cpu_weights_tf1_var = sycl::malloc_host<float>(NTF1_valid, queue);
+    //cpu_weights_tf1_var = sycl::malloc_host<float>(NTF1_valid, queue);
   #else
     cpu_total_weights = new float[NEvents]();
     cpu_weights_spline_var = new float[NSplines_valid]();
@@ -1103,9 +1107,9 @@ SMonolith::~SMonolith() {
   if(cpu_weights != nullptr) delete[] cpu_weights;
   #ifdef USE_FPGA
     if(cpu_weights_spline_var != nullptr) sycl::free(cpu_weights_spline_var, queue);
-    if(cpu_weights_tf1_var != nullptr) sycl::free(cpu_weights_tf1_var, queue);
-    sycl::free(cpu_coeff_TF1_many, queue);
-    sycl::free(cpu_paramNo_TF1_arr, queue);
+    //if(cpu_weights_tf1_var != nullptr) sycl::free(cpu_weights_tf1_var, queue);
+    //sycl::free(cpu_coeff_TF1_many, queue);
+    //sycl::free(cpu_paramNo_TF1_arr, queue);
   #else
     if(cpu_weights_spline_var != nullptr) delete[] cpu_weights_spline_var;
     if(cpu_weights_tf1_var != nullptr) delete[] cpu_weights_tf1_var;
