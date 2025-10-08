@@ -172,7 +172,6 @@ void OscProcessor::PerformJarlskogAnalysis() {
   } else {
     MACH3LOG_INFO("No reweighting configuration found for Jarlskog analysis");
   }
-  }
 
   TempFile->Close();
   delete TempFile;
