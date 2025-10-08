@@ -120,16 +120,25 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
                 // For Gaussian reweights, we need the parameter name(s) and prior values (mean, sigma pairs)
                 auto paramNames = GetFromManager<std::vector<std::string>>(reweightConfigNode["ReweightVar"], {});
                 
-                // Get prior values - always a list of [mean, sigma] pairs
+                // Get prior values - handle both single [mean, sigma] pair and list of pairs for safety
                 auto priorNode = reweightConfigNode["ReweightPrior"];
                 std::vector<std::vector<double>> allPriorValues;
                 
-                if (priorNode.IsSequence()) {
-                    // Multiple [mean, sigma] pairs
-                    for (const auto& priorPair : priorNode) {
-                        auto priorValues = GetFromManager<std::vector<double>>(priorPair, {});
+                if (priorNode.IsSequence() && priorNode.size() > 0) {
+                    // Check if first element is a number (single [mean, sigma] pair) or sequence (list of pairs)
+                    if (priorNode[0].IsScalar()) {
+                        // Single [mean, sigma] pair - convert to list format
+                        auto priorValues = GetFromManager<std::vector<double>>(priorNode, {});
                         if (priorValues.size() == 2) {
                             allPriorValues.push_back(priorValues);
+                        }
+                    } else {
+                        // List of [mean, sigma] pairs
+                        for (const auto& priorPair : priorNode) {
+                            auto priorValues = GetFromManager<std::vector<double>>(priorPair, {});
+                            if (priorValues.size() == 2) {
+                                allPriorValues.push_back(priorValues);
+                            }
                         }
                     }
                 }
