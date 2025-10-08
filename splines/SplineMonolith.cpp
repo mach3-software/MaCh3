@@ -194,27 +194,6 @@ void SMonolith::Initialise() {
   gpu_spline_handler = nullptr;
 #endif
 
-#ifndef USE_FPGA
-  cpu_spline_handler = new SplineMonoStruct();
-
-  std::cout<<"CHECK!!! USE_FPGA in Initialise"<<std::endl;
-   
-  #if FPGA_SIMULATOR
-    auto selector = sycl::ext::intel::fpga_simulator_selector_v;
-  #elif FPGA_HARDWARE
-   //-Xshardware -fsycl-link=early -DFPGA_HARDWARE
-    auto selector = sycl::ext::intel::fpga_selector_v;
-  #elif FPGA_EMULATOR
-    std::cout<<"CHECK TWO!!! FPGA_EMULATOR active"<<std::endl;
-
-    auto selector = sycl::ext::intel::fpga_emulator_selector_v;
-  #else
-    auto selector = sycl::default_selector{};
-  #endif
-  queue = sycl::queue(selector);//, fpga_tools::exception_handler, sycl::property::queue::enable_profiling{});
-
-#endif
-
   nKnots = 0;
   nTF1coeff = 0;
   NEvents = 0;
@@ -229,6 +208,31 @@ void SMonolith::Initialise() {
   cpu_weights_tf1_var = nullptr;
 
   cpu_total_weights = nullptr;
+
+#ifndef USE_FPGA
+
+  std::cout<<"CHECK!!! USE_FPGA in Initialise"<<std::endl;
+
+  cpu_spline_handler = new SplineMonoStruct();
+   
+  #if FPGA_SIMULATOR
+    auto selector = sycl::ext::intel::fpga_simulator_selector_v;
+  #elif FPGA_HARDWARE
+   //-Xshardware -fsycl-link=early -DFPGA_HARDWARE
+    std::cout<<"CHECK TWO!!! FPGA_HARDWARE active"<<std::endl;
+
+    auto selector = sycl::ext::intel::fpga_selector_v;
+  #elif FPGA_EMULATOR
+    std::cout<<"CHECK TWO!!! FPGA_EMULATOR active"<<std::endl;
+
+    auto selector = sycl::ext::intel::fpga_emulator_selector_v;
+  #else
+    auto selector = sycl::default_selector{};
+  #endif
+  queue = sycl::queue(selector);//, fpga_tools::exception_handler, sycl::property::queue::enable_profiling{});
+
+#endif
+
 }
 
 // *****************************************
