@@ -219,15 +219,16 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="classSampleHandlerBase.html#ab6e807de9ac80fb9f12722e033c44f7e">SampleHandlerBase</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="samples_8cpp_source.html#l00035">35</a> of file <a class="el" href="samples_8cpp_source.html">samples.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;                                         {</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;        PYBIND11_OVERRIDE_PURE(</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;            <span class="keywordtype">void</span>,          <span class="comment">/* Return type */</span></div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;            <a class="code" href="classSampleHandlerBase.html">SampleHandlerBase</a>, <span class="comment">/* Parent class */</span></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;            <a class="code" href="classPySampleHandlerBase.html#a5c795e9eed36782d6193f7f88372153b">CleanMemoryBeforeFit</a>       <span class="comment">/* Name of function in C++ (must match Python name) */</span></div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        );</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    }</div>
-<div class="ttc" id="aclassPySampleHandlerBase_html_a5c795e9eed36782d6193f7f88372153b"><div class="ttname"><a href="classPySampleHandlerBase.html#a5c795e9eed36782d6193f7f88372153b">PySampleHandlerBase::CleanMemoryBeforeFit</a></div><div class="ttdeci">void CleanMemoryBeforeFit() override</div><div class="ttdoc">Allow to clean not used memory before fit starts.</div><div class="ttdef"><b>Definition:</b> <a href="samples_8cpp_source.html#l00035">samples.cpp:35</a></div></div>
+<p class="definition">Definition at line <a class="el" href="samples_8cpp_source.html#l00036">36</a> of file <a class="el" href="samples_8cpp_source.html">samples.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;                                         {</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        PYBIND11_OVERRIDE_PURE_NAME(</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;            <span class="keywordtype">void</span>,                  <span class="comment">/* Return type */</span></div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;            <a class="code" href="classSampleHandlerBase.html">SampleHandlerBase</a>,     <span class="comment">/* Parent class */</span></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;            <span class="stringliteral">&quot;clean_memory_before_fit&quot;</span>,</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;            <a class="code" href="classPySampleHandlerBase.html#a5c795e9eed36782d6193f7f88372153b">CleanMemoryBeforeFit</a>   <span class="comment">/* Name of function in C++ (must match Python name) */</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        );</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    }</div>
+<div class="ttc" id="aclassPySampleHandlerBase_html_a5c795e9eed36782d6193f7f88372153b"><div class="ttname"><a href="classPySampleHandlerBase.html#a5c795e9eed36782d6193f7f88372153b">PySampleHandlerBase::CleanMemoryBeforeFit</a></div><div class="ttdeci">void CleanMemoryBeforeFit() override</div><div class="ttdoc">Allow to clean not used memory before fit starts.</div><div class="ttdef"><b>Definition:</b> <a href="samples_8cpp_source.html#l00036">samples.cpp:36</a></div></div>
 <div class="ttc" id="aclassSampleHandlerBase_html"><div class="ttname"><a href="classSampleHandlerBase.html">SampleHandlerBase</a></div><div class="ttdoc">Class responsible for handling implementation of samples used in analysis, reweighting and returning ...</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00025">SampleHandlerBase.h:26</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -257,17 +258,17 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Implements <a class="el" href="group__SampleHandlerGetters.html#ga65bbd8a3084731b4bdb0c4d3fcaf641e">SampleHandlerBase</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="samples_8cpp_source.html#l00043">43</a> of file <a class="el" href="samples_8cpp_source.html">samples.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;                                    {</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        PYBIND11_OVERRIDE_PURE_NAME(</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;            <span class="keywordtype">double</span>,        <span class="comment">/* Return type */</span></div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;            <a class="code" href="classSampleHandlerBase.html">SampleHandlerBase</a>, <span class="comment">/* Parent class */</span></div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;            <span class="stringliteral">&quot;get_likelihood&quot;</span>, <span class="comment">/* Python name*/</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;            <a class="code" href="classPySampleHandlerBase.html#a8309f7b5490faa56109d2f9cf99b8cd8">GetLikelihood</a>  <span class="comment">/* Name of function in C++ (must match Python name) */</span></div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;                           <span class="comment">/* Argument(s) */</span></div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        );</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    }</div>
-<div class="ttc" id="aclassPySampleHandlerBase_html_a8309f7b5490faa56109d2f9cf99b8cd8"><div class="ttname"><a href="classPySampleHandlerBase.html#a8309f7b5490faa56109d2f9cf99b8cd8">PySampleHandlerBase::GetLikelihood</a></div><div class="ttdeci">double GetLikelihood() override</div><div class="ttdef"><b>Definition:</b> <a href="samples_8cpp_source.html#l00043">samples.cpp:43</a></div></div>
+<p class="definition">Definition at line <a class="el" href="samples_8cpp_source.html#l00045">45</a> of file <a class="el" href="samples_8cpp_source.html">samples.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;                                    {</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        PYBIND11_OVERRIDE_PURE_NAME(</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;            <span class="keywordtype">double</span>,        <span class="comment">/* Return type */</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;            <a class="code" href="classSampleHandlerBase.html">SampleHandlerBase</a>, <span class="comment">/* Parent class */</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;            <span class="stringliteral">&quot;get_likelihood&quot;</span>, <span class="comment">/* Python name*/</span></div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;            <a class="code" href="classPySampleHandlerBase.html#a8309f7b5490faa56109d2f9cf99b8cd8">GetLikelihood</a>  <span class="comment">/* Name of function in C++ (must match Python name) */</span></div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;                           <span class="comment">/* Argument(s) */</span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        );</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    }</div>
+<div class="ttc" id="aclassPySampleHandlerBase_html_a8309f7b5490faa56109d2f9cf99b8cd8"><div class="ttname"><a href="classPySampleHandlerBase.html#a8309f7b5490faa56109d2f9cf99b8cd8">PySampleHandlerBase::GetLikelihood</a></div><div class="ttdeci">double GetLikelihood() override</div><div class="ttdef"><b>Definition:</b> <a href="samples_8cpp_source.html#l00045">samples.cpp:45</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -337,12 +338,13 @@ Additional Inherited Members</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="samples_8cpp_source.html#l00026">26</a> of file <a class="el" href="samples_8cpp_source.html">samples.cpp</a>.</p>
 <div class="fragment"><div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;                             {</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        PYBIND11_OVERRIDE_PURE(</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        PYBIND11_OVERRIDE_PURE_NAME(</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;            <span class="keywordtype">void</span>,          <span class="comment">/* Return type */</span></div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;            <a class="code" href="classSampleHandlerBase.html">SampleHandlerBase</a>, <span class="comment">/* Parent class */</span></div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;            <a class="code" href="classPySampleHandlerBase.html#a6e3629f5e902771c7812daf4003958f0">Reweight</a>       <span class="comment">/* Name of function in C++ (must match Python name) */</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;        );</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    }</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;            <span class="stringliteral">&quot;reweight&quot;</span>,</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;            <a class="code" href="classPySampleHandlerBase.html#a6e3629f5e902771c7812daf4003958f0">Reweight</a>       <span class="comment">/* Name of function in C++ (must match Python name) */</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;        );</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    }</div>
 <div class="ttc" id="aclassPySampleHandlerBase_html_a6e3629f5e902771c7812daf4003958f0"><div class="ttname"><a href="classPySampleHandlerBase.html#a6e3629f5e902771c7812daf4003958f0">PySampleHandlerBase::Reweight</a></div><div class="ttdeci">void Reweight() override</div><div class="ttdef"><b>Definition:</b> <a href="samples_8cpp_source.html#l00026">samples.cpp:26</a></div></div>
 </div><!-- fragment -->
 </div>
