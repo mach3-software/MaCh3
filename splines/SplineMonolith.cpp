@@ -209,27 +209,39 @@ void SMonolith::Initialise() {
 
   cpu_total_weights = nullptr;
 
-#ifndef USE_FPGA
+#ifdef USE_FPGA
 
   std::cout<<"CHECK!!! USE_FPGA in Initialise"<<std::endl;
 
   cpu_spline_handler = new SplineMonoStruct();
    
   #if FPGA_SIMULATOR
+    std::cout<<"CHECK TWO!!! FPGA_SIMULATOR active"<<std::endl;
     auto selector = sycl::ext::intel::fpga_simulator_selector_v;
+        
+
   #elif FPGA_HARDWARE
    //-Xshardware -fsycl-link=early -DFPGA_HARDWARE
     std::cout<<"CHECK TWO!!! FPGA_HARDWARE active"<<std::endl;
-
     auto selector = sycl::ext::intel::fpga_selector_v;
-  #elif FPGA_EMULATOR
-    std::cout<<"CHECK TWO!!! FPGA_EMULATOR active"<<std::endl;
 
+  #elif FPGA_EMULATOR
+
+    std::cout<<"CHECK TWO!!! FPGA_EMULATOR active"<<std::endl;
     auto selector = sycl::ext::intel::fpga_emulator_selector_v;
+
   #else
+    std::cout<<"CHECK TWO!!! default selector active"<<std::endl;  
     auto selector = sycl::default_selector{};
+
   #endif
-  queue = sycl::queue(selector);//, fpga_tools::exception_handler, sycl::property::queue::enable_profiling{});
+  queue = sycl::queue(selector, fpga_tools::exception_handler, sycl::property::queue::enable_profiling{});
+
+  auto device = q.get_device();
+
+  std::cout << "Running on device: "
+            << device.get_info<sycl::info::device::name>().c_str()
+            << std::endl;
 
 #endif
 
@@ -1240,7 +1252,7 @@ void SMonolith::Evaluate() {
   std::streambuf *coutbuf = std::cout.rdbuf(); //save old buf
   std::cout.rdbuf(out.rdbuf()); //redirect std::cout to out.txt!
 
-  std::cout << "Paratemter values going into the function " << std::endl;
+  std::cout << "Parameter values going into the function " << std::endl;
   std::cout << "nParams: " << nParams << std::endl;
   std::cout << "NSplines_valid: " << NSplines_valid << std::endl;
 
