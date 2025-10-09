@@ -150,6 +150,9 @@ class SMonolith : public SplineBase {
     float* cpu_coeff_TF1_many;
 
     short int* cpu_paramNo_TF1_arr;
+
+    unsigned int* cpu_nParamPerEvent_usm;
+
     #else
     /// KS: Store info about Spline monolith, this allow to obtain better step time. As all necessary information for spline weight calculation are here meaning better cache hits.
     SplineMonoStruct* cpu_spline_handler;

@@ -877,7 +877,10 @@ void SMonolith::LoadSplineFile(std::string FileName) {
     //cpu_coeff_TF1_many = sycl::malloc_host<float>(nTF1coeff, queue);
     //cpu_paramNo_TF1_arr = sycl::malloc_host<short int>(NTF1_valid, queue);
 
-    unsigned int* cpu_nParamPerEvent_usm = sycl::malloc_host<unsigned int>(data_size, queue);
+    size_t data_size = cpu_nParamPerEvent.size();
+
+    cpu_nParamPerEvent_usm = sycl::malloc_host<unsigned int>(data_size, queue);
+    
     std::memcpy(cpu_nParamPerEvent_usm, cpu_nParamPerEvent.data(), data_size * sizeof(unsigned int));    
 
   #else
