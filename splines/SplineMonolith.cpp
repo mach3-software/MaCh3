@@ -883,6 +883,8 @@ void SMonolith::LoadSplineFile(std::string FileName) {
     
     std::memcpy(cpu_nParamPerEvent_usm, cpu_nParamPerEvent.data(), data_size * sizeof(unsigned int));    
 
+    std::cout << "cpu_nParamPerEvent_usm copied" << std::endl;
+
   #else
     cpu_spline_handler->paramNo_arr.resize(NSplines_valid);
     //KS: And array which tells where each spline stars in a big monolith array, sort of knot map
