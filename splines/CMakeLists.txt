@@ -44,6 +44,9 @@ if (USE_FPGA)
 	-DFPGA_HARDWARE
 	-fsycl
 	-fintelfpga
+	-Xshardware
+	-Xstarget=${FPGA_DEVICE}
+
       )
       target_link_options(Splines PRIVATE
 	-fsycl
@@ -58,13 +61,16 @@ if (USE_FPGA)
 	-DFPGA_HARDWARE
 	-fsycl
 	-fintelfpga
+	-Xshardware
+	-Xstarget=${FPGA_DEVICE}
+	-fsycl-link=early
       )
       target_link_options(Splines PRIVATE
 	-fsycl
 	-fintelfpga
 	-Xshardware
 	-Xstarget=${FPGA_DEVICE}
-	-fsycl-link=early
+	# -fsycl-link=early
       )
     endif()
 endif()
