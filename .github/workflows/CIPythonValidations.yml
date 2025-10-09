@@ -37,7 +37,7 @@ jobs:
     - name: Install pyMaCh3
       working-directory: /opt/MaCh3Validations
       run: |
-        pip install /opt/MaCh3 -t python-test-modules/
+        pip install . -t python-test-modules/
         
     - name: Validations
       working-directory: /opt/MaCh3Validations
