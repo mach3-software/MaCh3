@@ -357,6 +357,8 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
     //cpu_coeff_TF1_many = sycl::malloc_host<float>(nTF1coeff, queue);
     //cpu_paramNo_TF1_arr = sycl::malloc_host<short int>(NTF1_valid, queue);
     cpu_total_weights = sycl::malloc_host<float>(NEvents, queue);
+    cpu_nParamPerEvent = sycl::malloc_host<unsigned int>(2*NEvents, queue);
+
   #else
     cpu_spline_handler->paramNo_arr.resize(NSplines_valid);
     //KS: And array which tells where each spline stars in a big monolith array, sort of knot map
