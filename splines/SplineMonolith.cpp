@@ -396,17 +396,17 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
   #ifdef MULTITHREAD
   #pragma omp parallel for
   #endif
-  for (unsigned int j = 0; j < NSplines_total_large; j++) {
-    index_spline_cpu[j] = -1;
-    index_TF1_cpu[j] = -1;
-  }
-  // This holds the total CPU weights that gets read in samplePDFND
-  cpu_weights = new float[NSplines_total_large];
+    for (unsigned int j = 0; j < NSplines_total_large; j++) {
+      index_spline_cpu[j] = -1;
+      index_TF1_cpu[j] = -1;
+    }
+    // This holds the total CPU weights that gets read in samplePDFND
+    cpu_weights = new float[NSplines_total_large];
   #else
   #ifndef USE_FPGA
-  //KS: Map keeping track how many parameters applies to each event, we keep two numbers here {number of splines per event, index where splines start for a given event}
-  cpu_nParamPerEvent.resize(2*NEvents);
-  cpu_nParamPerEvent_tf1.resize(2*NEvents);
+    //KS: Map keeping track how many parameters applies to each event, we keep two numbers here {number of splines per event, index where splines start for a given event}
+    cpu_nParamPerEvent.resize(2*NEvents);
+    cpu_nParamPerEvent_tf1.resize(2*NEvents);
 
   #endif
   #ifdef MULTITHREAD
