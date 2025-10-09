@@ -42,7 +42,7 @@ jobs:
       working-directory: /opt/MaCh3Validations
       run: |
         source /opt/root/v6-26-10/bin/thisroot.sh
-        export PYTHONPATH=$PYTHONPATH:$PWD/python-test-modules/
+        export PYTHONPATH=$PYTHONPATH:/python-test-modules/
         export MACH3=$PWD
         
         python3 -m pytest --config TutorialConfigs/FitterConfig.yaml CIValidations/PythonTests
