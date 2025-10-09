@@ -62,12 +62,17 @@ void PTMR2T2::RunMCMC(){
         {
             transfer_vector_send.push_back(systematics[s]->GetParCurr(p));
         }
+
+        double init_scale = systematics[s]->GetGlobalStepScale();
+        // Scale by sqrt(temp)
+        systematics[s]->SetStepScale(init_scale * std::sqrt(TempScale));
     }
 
     transfer_vector_send = std::vector<double>(transfer_vector_send.size() + 2); // Add space for header info
     transfer_vector_recv = std::vector<double>(transfer_vector_send.size());
 
     MR2T2::RunMCMC();
+    sample_logLCurr = sample_logLProp;
 }
 
 void PTMR2T2::DoStep()
@@ -86,58 +91,55 @@ void PTMR2T2::DoStep()
     // Benchmark: Time the Swap operation
     t_start = std::chrono::high_resolution_clock::now();
     #endif
-
     Swap();
     #ifdef DEBUG
     t_end = std::chrono::high_resolution_clock::now();
     time_swap = std::chrono::duration<double>(t_end - t_start).count();
     #endif
     // We only want to do adaption a small number of times since this process is clunky
-    if (step < static_cast<unsigned int>(temp_adapt_step*n_temp_adapts)
-        && step % temp_adapt_step == 0
-        && step > 0 )
-    {
-        // Benchmark: Time the GlobalAdaptTemperatures operation
-        #ifdef DEBUG
-        t_start = std::chrono::high_resolution_clock::now();
-        #endif
-        GlobalAdaptTemperatures();
-        #ifdef DEBUG
-        t_end = std::chrono::high_resolution_clock::now();
-        time_global_adapt = std::chrono::duration<double>(t_end - t_start).count();
-        #endif
-    }
-    #ifdef DEBUG
-    else
-    {
-        time_global_adapt = 0.0;
-    }
-    #endif
+    // if (step < static_cast<unsigned int>(temp_adapt_step*n_temp_adapts)
+    //     && step % temp_adapt_step == 0
+    //     && step > 0 )
+    // {
+    //     // Benchmark: Time the GlobalAdaptTemperatures operation
+    //     #ifdef DEBUG
+    //     t_start = std::chrono::high_resolution_clock::now();
+    //     #endif
+    //     GlobalAdaptTemperatures();
+    //     #ifdef DEBUG
+    //     t_end = std::chrono::high_resolution_clock::now();
+    //     time_global_adapt = std::chrono::duration<double>(t_end - t_start).count();
+    //     #endif
+    // }
+    // #ifdef DEBUG
+    // else
+    // {
+    //     time_global_adapt = 0.0;
+    // }
+    // #endif
     
-    #ifdef DEBUG
-    // Debug logging every 100 steps
-    if (step % 100 == 0 && mpi_rank == 0) {
-        MACH3LOG_DEBUG("Step {}: time_base_dostep={:.6f}s, time_swap={:.6f}s, time_global_adapt={:.6f}s", 
-                       step, time_base_dostep, time_swap, time_global_adapt);
-    }
-    #endif
+    // #ifdef DEBUG
+    // // Debug logging every 100 steps
+    // if (step % 100 == 0 && mpi_rank == 0) {
+    //     MACH3LOG_DEBUG("Step {}: time_base_dostep={:.6f}s, time_swap={:.6f}s, time_global_adapt={:.6f}s", 
+    //                    step, time_base_dostep, time_swap, time_global_adapt);
+    // }
+    // #endif
 }
 
 
 void PTMR2T2::ProposeStep()
 {
     do_swap = false;
-
     MR2T2::ProposeStep();
-
-    for (size_t s = 0; s < systematics.size(); ++s)
-    {
-        syst_llh[s] *= inv_TempScale;
-    }
+    sample_logLProp = 0.0;
     for(size_t s = 0; s < samples.size(); ++s){
+        logLProp -= sample_llh[s];
+        // For swapping!
+        sample_logLProp += sample_llh[s];
         sample_llh[s] *= inv_TempScale;
+        logLProp += sample_llh[s];
     }
-
 }
 
 void PTMR2T2::Swap()
@@ -152,16 +154,18 @@ void PTMR2T2::Swap()
     }
 
     const bool i_am_lower = (swap_rank > mpi_rank);
-    double send_meta[2] = {logLProp, TempScale};
-    double recv_meta[2] = {0.0, 0.0};
+
+    double send_meta[3] = {logLCurr, sample_logLCurr, TempScale};
+    double recv_meta[3] = {0.0, 0.0, 0.0};
 
     MPI_Sendrecv(
-        send_meta, 2, MPI_DOUBLE, swap_rank, 0,
-        recv_meta, 2, MPI_DOUBLE, swap_rank, 0,
+        send_meta, 3, MPI_DOUBLE, swap_rank, 0,
+        recv_meta, 3, MPI_DOUBLE, swap_rank, 0,
         MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-    LogL_replica = recv_meta[0];
-    temp_replica = recv_meta[1];
+    LogLCurr_replica = recv_meta[0];
+    sample_LogLCurr_replica= recv_meta[1];
+    temp_replica = recv_meta[2];
 
     int decision = 0;
 
@@ -170,11 +174,16 @@ void PTMR2T2::Swap()
         const double swap_rand = random->Uniform(0.0, 1.0);
 
         const double inv_temp_replica = 1.0 / temp_replica;
-        const double swap_prob = std::exp((LogL_replica - logLProp) * (inv_TempScale - inv_temp_replica));
+
+        double log_swap =-1*(sample_LogLCurr_replica - sample_logLCurr) * (inv_TempScale - inv_temp_replica);
+
+        const double swap_prob = std::exp(log_swap);
+        MACH3LOG_DEBUG("Swap prob {}: logL_curr = {}, logL_replica = {}, T_curr = {}, T_replica = {}, swap_prob = {}, rand = {}",
+                     swap_prob, sample_logLCurr, sample_LogLCurr_replica, TempScale, temp_replica, swap_prob, swap_rand);
 
         do_swap = swap_rand < swap_prob &&
                   !out_of_bounds &&
-                  LogL_replica < M3::_LARGE_LOGL_ &&
+                  LogLCurr_replica < M3::_LARGE_LOGL_ &&
                   logLProp < M3::_LARGE_LOGL_;
 
         decision = do_swap ? 1 : 0;
@@ -195,10 +204,11 @@ void PTMR2T2::Swap()
 
 void PTMR2T2::SwapStepInformation(int swap_rank)
 {    
-    const size_t header_size = 2;
-    transfer_vector_send[0] = logLProp;
-    transfer_vector_send[1] = TempScale;
-    
+    const size_t header_size = 3;
+    transfer_vector_send[0] = sample_logLCurr;
+    transfer_vector_send[1] = logLCurr;
+    transfer_vector_send[2] = TempScale;
+
     int idx = header_size;
     for(size_t s = 0; s < systematics.size(); ++s)
     {
@@ -222,8 +232,9 @@ void PTMR2T2::SwapStepInformation(int swap_rank)
         MPI_STATUS_IGNORE
     );
     
-    LogL_replica = transfer_vector_recv[0];
-    temp_replica = transfer_vector_recv[1];
+    LogLCurr_replica = transfer_vector_recv[0];
+    sample_LogLCurr_replica = transfer_vector_recv[1];
+    temp_replica = transfer_vector_recv[2];
     
     idx = header_size;
     for(size_t s = 0; s < systematics.size(); ++s)
@@ -237,134 +248,148 @@ void PTMR2T2::SwapStepInformation(int swap_rank)
         );
         idx += num_params;
     }
+
+    // Now we need to swap information between chains
+
+    // Get the penalty term first since this is not temp scaled
+    double penalty = LogLCurr_replica - sample_LogLCurr_replica/temp_replica;
+
+    // Scale sample likelihood
+    sample_LogLCurr_replica *= temp_replica/TempScale;
+
+    // Now do the swap
+    sample_logLCurr = sample_LogLCurr_replica;
     
-    logLProp = LogL_replica * TempScale / temp_replica;
+    logLCurr= sample_LogLCurr_replica + penalty;
+    #ifdef DEBUG
+    double DEBUG_LLH = logLCurr;
+    MACH3LOG_DEBUG("LLH Before swap: {} | After {}", DEBUG_LLH, logLCurr);
+    #endif
 }
 
 
-void PTMR2T2::GlobalAdaptTemperatures()
-{
-    // --------------------------------------------------------------------
-    // 0. Gather swap acceptance rates and temperatures from all ranks
-    // --------------------------------------------------------------------
-    double local_accept = 0.0;
+// void PTMR2T2::GlobalAdaptTemperatures()
+// {
+//     // --------------------------------------------------------------------
+//     // 0. Gather swap acceptance rates and temperatures from all ranks
+//     // --------------------------------------------------------------------
+//     double local_accept = 0.0;
 
-    int total_swaps = n_up_swap + n_down_swap;
-    if (total_swaps > 0)
-    {
-        local_accept = static_cast<double>(n_up_swap) / static_cast<double>(total_swaps);
-    }
+//     int total_swaps = n_up_swap + n_down_swap;
+//     if (total_swaps > 0)
+//     {
+//         local_accept = static_cast<double>(n_up_swap) / static_cast<double>(total_swaps);
+//     }
 
-    std::vector<double> all_accepts(n_procs, 0.0);
-    std::vector<double> all_temps(n_procs, 0.0);
+//     std::vector<double> all_accepts(n_procs, 0.0);
+//     std::vector<double> all_temps(n_procs, 0.0);
 
-    MPI_Gather(&local_accept, 1, MPI_DOUBLE,
-               all_accepts.data(), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+//     MPI_Gather(&local_accept, 1, MPI_DOUBLE,
+//                all_accepts.data(), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
-    MPI_Gather(&TempScale, 1, MPI_DOUBLE,
-               all_temps.data(), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+//     MPI_Gather(&TempScale, 1, MPI_DOUBLE,
+//                all_temps.data(), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
-    // --------------------------------------------------------------------
-    // 1. Rank 0 computes new temperatures based on communication barriers
-    // --------------------------------------------------------------------
-    if (mpi_rank == 0)
-    {
-        // Sort by temperature to ensure correct ordering
-        std::vector<int> indices(n_procs);
-        std::iota(indices.begin(), indices.end(), 0);
-        std::sort(indices.begin(), indices.end(),
-                  [&](int a, int b)
-                  { return all_temps[a] < all_temps[b]; });
+//     // --------------------------------------------------------------------
+//     // 1. Rank 0 computes new temperatures based on communication barriers
+//     // --------------------------------------------------------------------
+//     if (mpi_rank == 0)
+//     {
+//         // Sort by temperature to ensure correct ordering
+//         std::vector<int> indices(n_procs);
+//         std::iota(indices.begin(), indices.end(), 0);
+//         std::sort(indices.begin(), indices.end(),
+//                   [&](int a, int b)
+//                   { return all_temps[a] < all_temps[b]; });
 
-        std::vector<double> temps_sorted(n_procs);
-        for (int i = 0; i < n_procs; ++i)
-            temps_sorted[i] = all_temps[indices[i]];
+//         std::vector<double> temps_sorted(n_procs);
+//         for (int i = 0; i < n_procs; ++i)
+//             temps_sorted[i] = all_temps[indices[i]];
 
-        // Convert to inverse temperatures β = 1/T
-        std::vector<double> betas(n_procs);
-        for (int i = 0; i < n_procs; ++i)
-            betas[i] = 1.0 / temps_sorted[i];
+//         // Convert to inverse temperatures β = 1/T
+//         std::vector<double> betas(n_procs);
+//         for (int i = 0; i < n_procs; ++i)
+//             betas[i] = 1.0 / temps_sorted[i];
 
-        // Sort acceptances to match temperature ordering
-        std::vector<double> accepts_sorted(n_procs);
-        for (int i = 0; i < n_procs; ++i)
-            accepts_sorted[i] = all_accepts[indices[i]];
+//         // Sort acceptances to match temperature ordering
+//         std::vector<double> accepts_sorted(n_procs);
+//         for (int i = 0; i < n_procs; ++i)
+//             accepts_sorted[i] = all_accepts[indices[i]];
 
-        // Compute local communication barriers λ_i = -log(accept_i)
-        std::vector<double> lambda(n_procs - 1);
-        for (int i = 0; i < n_procs - 1; ++i)
-        {
-            double acc = std::max(1e-6, std::min(1.0 - 1e-6, accepts_sorted[i]));
-            lambda[i] = -std::log(acc);
-        }
+//         // Compute local communication barriers λ_i = -log(accept_i)
+//         std::vector<double> lambda(n_procs - 1);
+//         for (int i = 0; i < n_procs - 1; ++i)
+//         {
+//             double acc = std::max(1e-6, std::min(1.0 - 1e-6, accepts_sorted[i]));
+//             lambda[i] = -std::log(acc);
+//         }
 
-        // Compute cumulative barrier Λ
-        std::vector<double> Lambda(n_procs);
-        Lambda[0] = 0.0;
-        for (int i = 1; i < n_procs; ++i)
-            Lambda[i] = Lambda[i - 1] + lambda[i - 1];
+//         // Compute cumulative barrier Λ
+//         std::vector<double> Lambda(n_procs);
+//         Lambda[0] = 0.0;
+//         for (int i = 1; i < n_procs; ++i)
+//             Lambda[i] = Lambda[i - 1] + lambda[i - 1];
 
-        // Target equal spacing in Λ-space
-        std::vector<double> new_Lambda(n_procs);
-        for (int i = 0; i < n_procs; ++i)
-            new_Lambda[i] = i * Lambda.back() / (n_procs - 1);
+//         // Target equal spacing in Λ-space
+//         std::vector<double> new_Lambda(n_procs);
+//         for (int i = 0; i < n_procs; ++i)
+//             new_Lambda[i] = i * Lambda.back() / (n_procs - 1);
 
-        // Linear interpolation helper lambda
-        auto interpolate = [&](const std::vector<double> &x,
-                               const std::vector<double> &y,
-                               double x_new)
-        {
-            if (x_new <= x.front())
-                return y.front();
-            if (x_new >= x.back())
-                return y.back();
+//         // Linear interpolation helper lambda
+//         auto interpolate = [&](const std::vector<double> &x,
+//                                const std::vector<double> &y,
+//                                double x_new)
+//         {
+//             if (x_new <= x.front())
+//                 return y.front();
+//             if (x_new >= x.back())
+//                 return y.back();
 
-            auto it = std::upper_bound(x.begin(), x.end(), x_new);
-            size_t j = std::distance(x.begin(), it) - 1;
-            double t = (x_new - x[j]) / (x[j + 1] - x[j]);
-            return y[j] + t * (y[j + 1] - y[j]);
-        };
+//             auto it = std::upper_bound(x.begin(), x.end(), x_new);
+//             size_t j = std::distance(x.begin(), it) - 1;
+//             double t = (x_new - x[j]) / (x[j + 1] - x[j]);
+//             return y[j] + t * (y[j + 1] - y[j]);
+//         };
 
-        // Interpolate new β’s and convert back to temperatures
-        std::vector<double> new_betas(n_procs);
-        for (int i = 0; i < n_procs; ++i)
-            new_betas[i] = interpolate(Lambda, betas, new_Lambda[i]);
+//         // Interpolate new β’s and convert back to temperatures
+//         std::vector<double> new_betas(n_procs);
+//         for (int i = 0; i < n_procs; ++i)
+//             new_betas[i] = interpolate(Lambda, betas, new_Lambda[i]);
 
-        for (int i = 0; i < n_procs; ++i)
-            all_temps[i] = 1.0 / new_betas[i];
+//         for (int i = 0; i < n_procs; ++i)
+//             all_temps[i] = 1.0 / new_betas[i];
 
-        all_temps[0] = 1.0;
-        std::sort(all_temps.begin(), all_temps.end());
-    }
+//         all_temps[0] = 1.0;
+//         std::sort(all_temps.begin(), all_temps.end());
+//     }
 
-    MPI_Bcast(all_temps.data(), n_procs, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    TempScale = all_temps[mpi_rank];
-    inv_TempScale = 1.0 / TempScale;
+//     MPI_Bcast(all_temps.data(), n_procs, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+//     TempScale = all_temps[mpi_rank];
 
-    double local_accept_for_rt = 0.0;
-    int total_swaps_rt = n_up_swap + n_down_swap;
-    if (total_swaps_rt > 0)
-        local_accept_for_rt = static_cast<double>(n_up_swap) / static_cast<double>(total_swaps_rt);
+//     double local_accept_for_rt = 0.0;
+//     int total_swaps_rt = n_up_swap + n_down_swap;
+//     if (total_swaps_rt > 0)
+//         local_accept_for_rt = static_cast<double>(n_up_swap) / static_cast<double>(total_swaps_rt);
 
-    double global_round_trip = 0.0;
-    MPI_Allreduce(&local_accept_for_rt, &global_round_trip, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-    round_trip_rate = global_round_trip / static_cast<double>(n_procs);
+//     double global_round_trip = 0.0;
+//     MPI_Allreduce(&local_accept_for_rt, &global_round_trip, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+//     round_trip_rate = global_round_trip / static_cast<double>(n_procs);
 
-    if (mpi_rank == 0)
-    {
-        MACH3LOG_INFO("Adapted global temperature ladder:");
-        MACH3LOG_INFO("Global mean swap rate: {:.3f}", round_trip_rate);
+//     if (mpi_rank == 0)
+//     {
+//         MACH3LOG_INFO("Adapted global temperature ladder:");
+//         MACH3LOG_INFO("Global mean swap rate: {:.3f}", round_trip_rate);
 
-        for (int i = 0; i < n_procs; ++i)
-        {
-            double swap_rate = (i < n_procs - 1) ? all_accepts[i] : 0.0;
-            MACH3LOG_INFO("Rank {} -> T = {:.4f} | Swap Rate {:.3f}", i, all_temps[i], swap_rate);
-        }
-    }
+//         for (int i = 0; i < n_procs; ++i)
+//         {
+//             double swap_rate = (i < n_procs - 1) ? all_accepts[i] : 0.0;
+//             MACH3LOG_INFO("Rank {} -> T = {:.4f} | Swap Rate {:.3f}", i, all_temps[i], swap_rate);
+//         }
+//     }
     
-    n_up_swap = 0;
-    n_down_swap = 0;
-}
+//     n_up_swap = 0;
+//     n_down_swap = 0;
+// }
 
 void PTMR2T2::PrintProgress(){
     MR2T2::PrintProgress();
@@ -400,5 +425,10 @@ void PTMR2T2::PrintProgress(){
     }
 }
 
+void PTMR2T2::AcceptStep()
+{
+    MR2T2::AcceptStep();
+    sample_logLCurr = sample_logLProp;
+}
 
 #endif

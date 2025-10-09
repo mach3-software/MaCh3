@@ -51,7 +51,7 @@ class MCMCBase : public FitterBase {
     bool IsStepAccepted(const double acc_prob);
 
     /// @brief Accept a step
-    void AcceptStep();
+    virtual void AcceptStep();
 
     /// @brief Adaptive MCMC step
     inline void AdaptiveStep();

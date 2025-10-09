@@ -546,6 +546,8 @@ void FitterBase::RunLLHScan() {
   bool PlotLLHScanBySample = GetFromManager<bool>(fitMan->raw()["LLHScan"]["LLHScanBySample"], false, __FILE__ , __LINE__);;
   auto SkipVector = GetFromManager<std::vector<std::string>>(fitMan->raw()["LLHScan"]["LLHScanSkipVector"], {}, __FILE__ , __LINE__);;
 
+  double ScanTemperature = GetFromManager<double>(fitMan->raw()["LLHScan"]["LLHScanTemperature"], 1.0, __FILE__, __LINE__);
+
   // Now finally get onto the LLH scan stuff
   // Very similar code to MCMC but never start MCMC; just scan over the parameter space
   std::vector<TDirectory *> Cov_LLH(systematics.size());
@@ -722,13 +724,13 @@ void FitterBase::RunLLHScan() {
 
         for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
         {
-          nSamLLH[ivs] = samples[ivs]->GetLikelihood();
+          nSamLLH[ivs] = samples[ivs]->GetLikelihood()/ScanTemperature;
           samplellh += nSamLLH[ivs];
         }
 
         for(unsigned int ivc = 0; ivc < systematics.size(); ++ivc )
         {
-          nCovLLH[ivc] = systematics[ivc]->GetLikelihood();
+          nCovLLH[ivc] = systematics[ivc]->GetLikelihood()/ScanTemperature;
           totalllh += nCovLLH[ivc];
         }
 
