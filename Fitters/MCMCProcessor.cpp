@@ -294,7 +294,7 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
 
 
     // Project BranchNames[i] onto hpost, applying stepcut
-    Chain->Project(BranchNames[i], BranchNames[i], CutPosterior1D.c_str());
+        Chain->Project(BranchNames[i], BranchNames[i], CutPosterior1D.c_str());
 
     if(ApplySmoothing) hpost[i]->Smooth();
 
@@ -1331,7 +1331,7 @@ void MCMCProcessor::MakeSubOptimality(const int NIntervals) {
   MACH3LOG_INFO("Making Suboptimality");
   TStopwatch clock;
   clock.Start();
-
+  
   std::unique_ptr<TH1D> SubOptimality = std::make_unique<TH1D>("Suboptimality", "Suboptimality", NIntervals, MinStep, MaxStep);
   SubOptimality->GetXaxis()->SetTitle("Step");
   SubOptimality->GetYaxis()->SetTitle("Suboptimality");
@@ -1339,7 +1339,7 @@ void MCMCProcessor::MakeSubOptimality(const int NIntervals) {
   SubOptimality->SetLineColor(kBlue);
 
   for(int i = 0; i < NIntervals; ++i)
-  {
+    {
     //Reset our cov matrix
     ResetHistograms();
 
@@ -1357,7 +1357,7 @@ void MCMCProcessor::MakeSubOptimality(const int NIntervals) {
     //KS: Converting from ROOT to vector as to make using other libraires (Eigen) easier in future
     std::vector<double> EigenValues(eigen_values.GetNrows());
     for(unsigned int j = 0; j < EigenValues.size(); j++)
-    {
+  {
       EigenValues[j] = eigen_values(j);
     }
     const double SubOptimalityValue = GetSubOptimality(EigenValues, nDraw);
@@ -1406,7 +1406,7 @@ void MCMCProcessor::DrawCovariance() {
   hCorr->GetYaxis()->SetLabelSize(0.015);
 
   // Loop over the Covariance matrix entries
-  for (int i = 0; i < nDraw; ++i)
+  for (int i = 0; i < nDraw; ++i) 
   {
     TString titlex = "";
     double nom, err;
@@ -1415,7 +1415,7 @@ void MCMCProcessor::DrawCovariance() {
     hCov->GetXaxis()->SetBinLabel(i+1, titlex);
     hCovSq->GetXaxis()->SetBinLabel(i+1, titlex);
     hCorr->GetXaxis()->SetBinLabel(i+1, titlex);
-
+    
     for (int j = 0; j < nDraw; ++j)
     {
       // The value of the Covariance
@@ -1429,7 +1429,7 @@ void MCMCProcessor::DrawCovariance() {
       TString titley = "";
       double nom_j, err_j;
       GetNthParameter(j, nom_j, err_j, titley);
-
+  
       hCov->GetYaxis()->SetBinLabel(j+1, titley);
       hCovSq->GetYaxis()->SetBinLabel(j+1, titley);
       hCorr->GetYaxis()->SetBinLabel(j+1, titley);
@@ -1662,7 +1662,7 @@ void MCMCProcessor::DrawCorrelations1D() {
   std::vector<std::vector<std::unique_ptr<TH1D>>> Corr1DHist(nDraw);
   //KS: Initialising ROOT objects is never safe in MP loop
   for(int i = 0; i < nDraw; ++i)
-  {
+    {    
     TString Title = "";
     double Prior = 1.0, PriorError = 1.0;
     GetNthParameter(i, Prior, PriorError, Title);
@@ -1695,7 +1695,7 @@ void MCMCProcessor::DrawCorrelations1D() {
     for(int j = 0; j < nDraw; ++j)
     {
       for(int k = 0; k < Nhists; ++k)
-      {
+    {
         const double TempEntry = std::fabs((*Correlation)(i,j));
         if(Thresholds[k+1] > TempEntry && TempEntry >= Thresholds[k])
         {
@@ -1703,7 +1703,7 @@ void MCMCProcessor::DrawCorrelations1D() {
         }
       }
       if(std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold && i != j)
-      {
+  {
         CorrOfInterest[i].push_back((*Correlation)(i,j));
         NameCorrOfInterest[i].push_back(Corr1DHist[i][0]->GetXaxis()->GetBinLabel(j+1));
       }
@@ -1747,7 +1747,7 @@ void MCMCProcessor::DrawCorrelations1D() {
     Corr1DHist_Reduced->GetYaxis()->SetTitle("Correlation");
     Corr1DHist_Reduced->SetFillColor(kBlue);
     Corr1DHist_Reduced->SetLineColor(kBlue);
-
+    
     for (int j = 0; j < size; ++j)
     {
       Corr1DHist_Reduced->GetXaxis()->SetBinLabel(j+1, NameCorrOfInterest[i][j].c_str());
@@ -1824,7 +1824,7 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
 
   gStyle->SetPalette(51);
   for (int i = 0; i < nDraw; ++i)
-  {
+  {    
     for (int j = 0; j <= i; ++j)
     {
       // Skip the diagonal elements which we've already done above
@@ -1876,7 +1876,7 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
       // Write to file
       Posterior->SetName(hpost2D[i][j]->GetName());
       Posterior->SetTitle(hpost2D[i][j]->GetTitle());
-
+      
       //KS: Print only regions with correlation greater than specified value, by default 0.2. This is done to avoid dumping thousands of plots
       if(printToPDF && std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold) Posterior->Print(CanvasName);
       // Write it to root file
@@ -3079,6 +3079,7 @@ void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
 
   for (int i = 0; i < nEntries; ++i)
   {
+    if(i % (nEntries/10) == 0) MaCh3Utils::PrintProgressBar(i, nEntries);
     post->GetEntry(i);
     Weight = 1.;
 
@@ -3107,9 +3108,20 @@ void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
   // KS: Save reweight metadeta
   std::ostringstream yaml_stream;
   yaml_stream << "Weight:\n";
+  yaml_stream << "  ReweightDim: 1\n";
+  yaml_stream << "  ReweightType: \"Gaussian\"\n";
+  yaml_stream << "  ReweightVar: [";
   for (size_t k = 0; k < Names.size(); ++k) {
-    yaml_stream << "    " << Names[k] << ": [" << NewCentral[k] << ", " << NewError[k] << "]\n";
+    yaml_stream << "\"" << Names[k] << "\"";
+    if (k < Names.size() - 1) yaml_stream << ", ";
   }
+  yaml_stream << "]\n";
+  yaml_stream << "  ReweightPrior: [";
+  for (size_t k = 0; k < Names.size(); ++k) {
+    yaml_stream << "[" << NewCentral[k] << ", " << NewError[k] << "]";
+    if (k < Names.size() - 1) yaml_stream << ", ";
+  }
+  yaml_stream << "]\n";
   std::string yaml_string = yaml_stream.str();
   YAML::Node root = STRINGtoYAML(yaml_string);
   TMacro ConfigSave = YAMLtoTMacro(root, "Reweight_Config");
@@ -3273,7 +3285,7 @@ void MCMCProcessor::ParameterEvolution(const std::vector<std::string>& Names,
 
       std::string TextTitle = "Steps = 0 - "+std::to_string(Counter*IntervalsSize+IntervalsSize);
       // Project BranchNames[ParamNo] onto hpost, applying stepcut
-      Chain->Project(BranchNames[ParamNo], BranchNames[ParamNo], CutPosterior1D.c_str());
+        Chain->Project(BranchNames[ParamNo], BranchNames[ParamNo], CutPosterior1D.c_str());
 
       EvePlot->SetLineWidth(2);
       EvePlot->SetLineColor(kBlue-1);
