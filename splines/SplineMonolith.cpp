@@ -876,6 +876,10 @@ void SMonolith::LoadSplineFile(std::string FileName) {
     cpu_spline_handler = new SplineMonoUSM(queue, event_size_max, nKnots*_nCoeff_, NSplines_valid, NSplines_valid, NEvents);
     //cpu_coeff_TF1_many = sycl::malloc_host<float>(nTF1coeff, queue);
     //cpu_paramNo_TF1_arr = sycl::malloc_host<short int>(NTF1_valid, queue);
+
+    unsigned int* cpu_nParamPerEvent_usm = sycl::malloc_host<unsigned int>(data_size, queue);
+    std::memcpy(cpu_nParamPerEvent_usm, cpu_nParamPerEvent.data(), data_size * sizeof(unsigned int));    
+
   #else
     cpu_spline_handler->paramNo_arr.resize(NSplines_valid);
     //KS: And array which tells where each spline stars in a big monolith array, sort of knot map
@@ -1379,6 +1383,8 @@ void SMonolith::Evaluate() {
     std::cout << "cpu_total_weights:        " << static_cast<void*>(cpu_total_weights) << std::endl;
     std::cout << "cpu_nParamPerEvent.data(): " << static_cast<void*>(cpu_nParamPerEvent.data()) << std::endl;
     std::cout << "cpu_nParamPerEvent_tf1.data(): " << static_cast<void*>(cpu_nParamPerEvent_tf1.data()) << std::endl;
+    std::cout << "cpu_nParamPerEvent_usm: " << static_cast<void*>(cpu_nParamPerEvent_usm) << std::endl;
+
 
     std::cout << "Calling kernel:" << std::endl;
 
@@ -1404,7 +1410,7 @@ void SMonolith::Evaluate() {
                                                             //_nTF1Coeff_,
                                                             NEvents,
                                                             cpu_total_weights,
-                                                            cpu_nParamPerEvent.data()
+                                                            cpu_nParamPerEvent_usm//.data()
                                                             //cpu_nParamPerEvent_tf1.data()
                                                             });
 
