@@ -357,6 +357,7 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
     //cpu_paramNo_TF1_arr = sycl::malloc_host<short int>(NTF1_valid, queue);
     cpu_total_weights = sycl::malloc_host<float>(NEvents, queue);
     cpu_nParamPerEvent = sycl::malloc_host<unsigned int>(2*NEvents, queue);
+    cpu_nParamPerEvent_tf1.resize(2*NEvents);
 
     std::cout<<"CHECK!!! After new SplineMonoUSM"<<std::endl;
 
