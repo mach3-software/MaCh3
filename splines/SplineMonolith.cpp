@@ -1266,6 +1266,8 @@ void SMonolith::Evaluate() {
 // *****************************************
   // There's a parameter mapping that goes from spline parameter to a global parameter index
   // Find the spline segments
+
+  std::cout << "CPU Evaluate!" << std::endl;
   FindSplineSegment();
 
   std::cout << "------------------" << std::endl;
