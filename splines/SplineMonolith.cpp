@@ -575,6 +575,9 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
   if(SaveSplineFile) PrepareSplineFile();
 
   MoveToGPU();
+
+  std::cout<<"CHECK!!! End of PrepareForGPU"<<std::endl;
+
 }
 
 // *****************************************
