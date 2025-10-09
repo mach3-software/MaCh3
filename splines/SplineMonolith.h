@@ -138,9 +138,6 @@ class SMonolith : public SplineBase {
     /// CPU arrays to hold weight for each TF1
     float *cpu_weights_tf1_var;
 
-    /// KS: CPU map keeping track how many parameters applies to each event, we keep two numbers here {number of splines per event, index where splines start for a given event}
-    std::vector<unsigned int> cpu_nParamPerEvent;
-
     /// KS: CPU map keeping track how many parameters applies to each event, we keep two numbers here {number of TF1 per event, index where TF1 start for a given event}
     std::vector<unsigned int> cpu_nParamPerEvent_tf1;
 
@@ -151,9 +148,14 @@ class SMonolith : public SplineBase {
 
     short int* cpu_paramNo_TF1_arr;
 
-    unsigned int* cpu_nParamPerEvent_usm;
+    unsigned int* cpu_nParamPerEvent;
 
     #else
+
+    /// KS: CPU map keeping track how many parameters applies to each event, we keep two numbers here {number of splines per event, index where splines start for a given event}
+    std::vector<unsigned int> cpu_nParamPerEvent;
+
+
     /// KS: Store info about Spline monolith, this allow to obtain better step time. As all necessary information for spline weight calculation are here meaning better cache hits.
     SplineMonoStruct* cpu_spline_handler;
     /// CPU arrays to hold TF1 coefficients
