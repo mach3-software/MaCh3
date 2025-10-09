@@ -235,13 +235,15 @@ void SMonolith::Initialise() {
     auto selector = sycl::default_selector{};
 
   #endif
-  queue = sycl::queue(selector, fpga_tools::exception_handler, sycl::property::queue::enable_profiling{});
+  queue = sycl::queue(selector)//, fpga_tools::exception_handler, sycl::property::queue::enable_profiling{});
 
-  auto device = q.get_device();
+  
+  auto device = queue.get_device();
 
   std::cout << "Running on device: "
             << device.get_info<sycl::info::device::name>().c_str()
             << std::endl;
+  
 
 #endif
 
