@@ -209,11 +209,16 @@ void SMonolith::Initialise() {
 
   cpu_total_weights = nullptr;
 
+#ifndef USE_FPGA
+  cpu_spline_handler = new SplineMonoStruct();
+#endif
+
 #ifdef USE_FPGA
+
 
   std::cout<<"CHECK!!! USE_FPGA in Initialise"<<std::endl;
 
-  cpu_spline_handler = new SplineMonoStruct();
+  
    
   #if FPGA_SIMULATOR
     std::cout<<"CHECK TWO!!! FPGA_SIMULATOR active"<<std::endl;
@@ -235,7 +240,7 @@ void SMonolith::Initialise() {
     auto selector = sycl::default_selector{};
 
   #endif
-  queue = sycl::queue(selector)//, fpga_tools::exception_handler, sycl::property::queue::enable_profiling{});
+  queue = sycl::queue(selector);//, fpga_tools::exception_handler, sycl::property::queue::enable_profiling{});
 
   
   auto device = queue.get_device();
