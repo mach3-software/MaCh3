@@ -353,11 +353,13 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
   #ifdef USE_FPGA
     cpu_spline_handler = new SplineMonoUSM(queue, event_size_max, nKnots*_nCoeff_, NSplines_valid, NSplines_valid, NEvents);
 
-    std::cout<<"CHECK!!! After new SplineMonoUSM"<<std::endl;
     //cpu_coeff_TF1_many = sycl::malloc_host<float>(nTF1coeff, queue);
     //cpu_paramNo_TF1_arr = sycl::malloc_host<short int>(NTF1_valid, queue);
     cpu_total_weights = sycl::malloc_host<float>(NEvents, queue);
     cpu_nParamPerEvent = sycl::malloc_host<unsigned int>(2*NEvents, queue);
+
+    std::cout<<"CHECK!!! After new SplineMonoUSM"<<std::endl;
+
 
   #else
     cpu_spline_handler->paramNo_arr.resize(NSplines_valid);
@@ -414,6 +416,8 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
     cpu_nParamPerEvent_tf1[j] = -1;
   }
   #endif
+
+  std::cout<<"CHECK!!! Before loop over events"<<std::endl;
 
   // Make array with the number of points per spline (not per spline point!)
   //cpu_spline_handler->paramNo_arr.resize(NSplines_valid);
