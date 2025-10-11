@@ -9,10 +9,6 @@
 /// @file PredictivePlotting.cpp
 /// @author Kamil Skwarczynski
 
-
-constexpr Color_t PosteriorColor[] = {kBlue, kRed, kGreen};
-const std::string Titles[] = {"Prior Predictive","Posterior Predictive", "Third File"};
-
 std::vector<std::string> FindSamples(std::string File)
 {
   TFile *file = M3::Open(File, "READ", __FILE__, __LINE__);
@@ -43,7 +39,8 @@ std::vector<std::string> FindSamples(std::string File)
   return SampleNames;
 }
 
-void OverlayPredicitve(const std::vector<TFile*>& InputFiles,
+void OverlayPredicitve(const YAML::Node& Settings,
+                       const std::vector<TFile*>& InputFiles,
                        const std::vector<std::string>& SampleNames,
                        const std::unique_ptr<TCanvas>& canv)
 {
@@ -70,6 +67,8 @@ void OverlayPredicitve(const std::vector<TFile*>& InputFiles,
   pad2->SetTopMargin(0);
   pad2->SetBottomMargin(0.28);
 
+  auto PosteriorColor = Get<std::vector<Color_t >>(Settings["PosteriorColor"], __FILE__, __LINE__);
+  auto Titles = Get<std::vector<std::string>>(Settings["FileTitle"], __FILE__, __LINE__);
   for(size_t iSample = 0; iSample < SampleNames.size(); iSample++)
   {
     const int nFiles = static_cast<int>(InputFiles.size());
@@ -180,7 +179,8 @@ void OverlayPredicitve(const std::vector<TFile*>& InputFiles,
   delete pad2;
 }
 
-void PredictivePlotting(const std::vector<std::string>& FileNames)
+void PredictivePlotting(const std::string& ConfigName,
+                        const std::vector<std::string>& FileNames)
 {
   auto canvas = std::make_unique<TCanvas>("canv", "canv", 1080, 1080);
   // set the paper & margin sizes
@@ -205,7 +205,12 @@ void PredictivePlotting(const std::vector<std::string>& FileNames)
     InputFiles[i] = M3::Open(FileNames[i], "READ", __FILE__, __LINE__);
   }
 
-  OverlayPredicitve(InputFiles, Samples, canvas);
+  // Load the YAML file
+  YAML::Node Config = M3OpenConfig(ConfigName);
+  // Access the "MatrixPlotter" section
+  YAML::Node settings = Config["PredictivePlotting"];
+
+  OverlayPredicitve(settings, InputFiles, Samples, canvas);
 
   for(size_t i = 0; i < FileNames.size(); i++)
   {
@@ -218,16 +223,17 @@ void PredictivePlotting(const std::vector<std::string>& FileNames)
 int main(int argc, char **argv)
 {
   SetMaCh3LoggerFormat();
-  if ( !(argc == 3 || argc == 4))
+  if ( !(argc == 4 || argc == 5))
   {
     MACH3LOG_ERROR("Need at least two arguments, ./{} <Prior/Post_PredOutput.root> <Prior/Post_PredOutput.root>", argv[0]);
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
-  std::vector<std::string> FileNames = {std::string(argv[1]), std::string(argv[2])};
-  if (argc == 4) FileNames.push_back(std::string(argv[3]));
+  std::string ConfigName = std::string(argv[1]);
+  std::vector<std::string> FileNames = {std::string(argv[2]), std::string(argv[3])};
+  if (argc == 5) FileNames.push_back(std::string(argv[4]));
 
-  PredictivePlotting(FileNames);
+  PredictivePlotting(ConfigName, FileNames);
 
   return 0;
 }
