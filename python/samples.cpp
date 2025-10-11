@@ -43,9 +43,10 @@ public:
 
     /* Trampoline (need one for each virtual function) */
     void Reweight() override {
-        PYBIND11_OVERRIDE_PURE(
+        PYBIND11_OVERRIDE_PURE_NAME(
             void,              /* Return type */
             SampleHandlerBase, /* Parent class */
+            "reweight",
             Reweight           /* Name of function in C++ (must match Python name) */
         );
     }
@@ -53,9 +54,10 @@ public:
 
     /* Trampoline (need one for each virtual function) */
     double GetSampleLikelihood(const int iSample) const override {
-        PYBIND11_OVERRIDE_PURE(
+        PYBIND11_OVERRIDE_PURE_NAME(
             double,                /* Return type */
             SampleHandlerBase,     /* Parent class */
+            "get_sample_likelihood",
             GetSampleLikelihood,   /* Name of function in C++ (must match Python name) */
             iSample                /* Argument(s) */
         );
@@ -63,10 +65,11 @@ public:
 
     /* Trampoline (need one for each virtual function) */
     void CleanMemoryBeforeFit() override {
-        PYBIND11_OVERRIDE_PURE(
-            void,                /* Return type */
-            SampleHandlerBase,   /* Parent class */
-            CleanMemoryBeforeFit /* Name of function in C++ (must match Python name) */
+        PYBIND11_OVERRIDE_PURE_NAME(
+            void,                  /* Return type */
+            SampleHandlerBase,     /* Parent class */
+            "clean_memory_before_fit",
+            CleanMemoryBeforeFit   /* Name of function in C++ (must match Python name) */
         );
     }
 

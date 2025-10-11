@@ -1453,7 +1453,8 @@ TH1* SampleHandlerFD::Get1DVarHist(const int iSample, const std::string& Project
     std::vector<double> xBinEdges = ReturnKinematicParameterBinning(iSample, ProjectionVar_Str);
     _h1DVar = new TH1D("", "", int(xBinEdges.size())-1, xBinEdges.data());
   }
-  
+  _h1DVar->GetXaxis()->SetTitle(ProjectionVar_Str.c_str());
+
   if (IsSubEventVarString(ProjectionVar_Str)) {
     Fill1DSubEventHist(iSample, _h1DVar, ProjectionVar_Str, SubEventSelectionVec, WeightStyle);
   } else {

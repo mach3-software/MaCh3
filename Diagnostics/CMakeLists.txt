@@ -9,6 +9,7 @@ foreach(app
     CombineMaCh3Chains
     PlotMCMCDiag
     SmearChain
+    ReweightMCMC
     )
     add_executable(${app} ${app}.cpp)
     add_dependencies(DiagApps ${app})
