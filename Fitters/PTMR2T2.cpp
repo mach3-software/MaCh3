@@ -16,6 +16,9 @@ PTMR2T2::PTMR2T2(manager *const manager) : MR2T2(manager) {
     temp_adapt_step = GetFromManager<int>(fitMan->raw()["General"]["MCMC"]["TempAdaptRate"], 500);
     n_temp_adapts = GetFromManager<int>(fitMan->raw()["General"]["MCMC"]["NTempAdapts"], 5);
 
+    // How many steps BEFORE we try to swap [so we can burn-in]
+    steps_before_swapping = GetFromManager<unsigned int>(fitMan->raw()["General"]["MCMC"]["StepsBeforeSwapping"], 10000);
+
     round_trip_rate = 0.0;
     
     inv_TempScale = 1.0 / TempScale;
@@ -28,20 +31,15 @@ PTMR2T2::PTMR2T2(manager *const manager) : MR2T2(manager) {
     }
     
     // Initialize timing benchmarks
-    time_base_dostep = 0.0;
-    time_swap = 0.0;
-    time_global_adapt = 0.0;
 }
 
 void PTMR2T2::PrepareOutput()
 {
     FitterBase::PrepareOutput();
 
-    // Store PTMCMC specific diagnostics
-    // outTree->Branch("n_up_swap", &n_up_swap, "n_up_swap/I");
-    // outTree->Branch("n_down_swap", &n_down_swap, "n_down_swap/I");
-    // outTree->Branch("round_trip_rate", &round_trip_rate, "round_trip_rate/D");
-    
+    // Store temperature scale [used in reweighting so good to have/event]
+    outTree->Branch("TempScale", &TempScale, "TempScale/D");
+
     // // Store timing benchmarks
     // #ifdef DEBUG
     // outTree->Branch("time_base_dostep", &time_base_dostep, "time_base_dostep/D");
@@ -53,23 +51,24 @@ void PTMR2T2::PrepareOutput()
 
 void PTMR2T2::RunMCMC(){
     // Make a single transfer vector which will link to systematic values
-
+    
+    // First calculate the total size needed
+    size_t total_params = 0;
     for(size_t s = 0; s < systematics.size(); ++s)
     {
+        total_params += systematics[s]->GetNumParams();
+        
         // We also want to make sure we're not starting with a tiny step scale
         // Thankfully it's not too bad to do this since temperature scales with sqrt(sigma)
-        for (int p = 0; p < systematics[s]->GetNumParams(); ++p)
-        {
-            transfer_vector_send.push_back(systematics[s]->GetParCurr(p));
-        }
-
         double init_scale = systematics[s]->GetGlobalStepScale();
         // Scale by sqrt(temp)
         systematics[s]->SetStepScale(init_scale * std::sqrt(TempScale));
     }
 
-    transfer_vector_send = std::vector<double>(transfer_vector_send.size() + 2); // Add space for header info
-    transfer_vector_recv = std::vector<double>(transfer_vector_send.size());
+    // Allocate transfer vectors with space for header (3 elements: logLCurr, sample_logLCurr, TempScale)
+    const size_t header_size = 3;
+    transfer_vector_send.resize(header_size + total_params);
+    transfer_vector_recv.resize(header_size + total_params);
 
     MR2T2::RunMCMC();
     sample_logLCurr = sample_logLProp;
@@ -78,53 +77,11 @@ void PTMR2T2::RunMCMC(){
 void PTMR2T2::DoStep()
 {
     // Adds in timing if debug enabled
-
-    #ifdef DEBUG
-    auto t_start = std::chrono::high_resolution_clock::now();
-    #endif
-    
     MR2T2::DoStep();
 
-    #ifdef DEBUG
-    auto t_end = std::chrono::high_resolution_clock::now();
-    time_base_dostep = std::chrono::duration<double>(t_end - t_start).count();
-    // Benchmark: Time the Swap operation
-    t_start = std::chrono::high_resolution_clock::now();
-    #endif
-    Swap();
-    #ifdef DEBUG
-    t_end = std::chrono::high_resolution_clock::now();
-    time_swap = std::chrono::duration<double>(t_end - t_start).count();
-    #endif
-    // We only want to do adaption a small number of times since this process is clunky
-    // if (step < static_cast<unsigned int>(temp_adapt_step*n_temp_adapts)
-    //     && step % temp_adapt_step == 0
-    //     && step > 0 )
-    // {
-    //     // Benchmark: Time the GlobalAdaptTemperatures operation
-    //     #ifdef DEBUG
-    //     t_start = std::chrono::high_resolution_clock::now();
-    //     #endif
-    //     GlobalAdaptTemperatures();
-    //     #ifdef DEBUG
-    //     t_end = std::chrono::high_resolution_clock::now();
-    //     time_global_adapt = std::chrono::duration<double>(t_end - t_start).count();
-    //     #endif
-    // }
-    // #ifdef DEBUG
-    // else
-    // {
-    //     time_global_adapt = 0.0;
-    // }
-    // #endif
-    
-    // #ifdef DEBUG
-    // // Debug logging every 100 steps
-    // if (step % 100 == 0 && mpi_rank == 0) {
-    //     MACH3LOG_DEBUG("Step {}: time_base_dostep={:.6f}s, time_swap={:.6f}s, time_global_adapt={:.6f}s", 
-    //                    step, time_base_dostep, time_swap, time_global_adapt);
-    // }
-    // #endif
+    if(step > steps_before_swapping){
+        Swap();
+    }
 }
 
 
@@ -155,36 +112,49 @@ void PTMR2T2::Swap()
 
     const bool i_am_lower = (swap_rank > mpi_rank);
 
-    double send_meta[3] = {logLCurr, sample_logLCurr, TempScale};
-    double recv_meta[3] = {0.0, 0.0, 0.0};
+    const int header_size = 3;
+
+    double send_meta[header_size] = {logLCurr, sample_logLCurr, TempScale};
+    double recv_meta[header_size] = {0.0, 0.0, 0.0};
 
     MPI_Sendrecv(
-        send_meta, 3, MPI_DOUBLE, swap_rank, 0,
-        recv_meta, 3, MPI_DOUBLE, swap_rank, 0,
+        send_meta, header_size, MPI_DOUBLE, swap_rank, 0,
+        recv_meta, header_size, MPI_DOUBLE, swap_rank, 0,
         MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
     LogLCurr_replica = recv_meta[0];
     sample_LogLCurr_replica= recv_meta[1];
     temp_replica = recv_meta[2];
+    // Bit of a hack, send info as double to ensure we can do 1 message + avoid overhead
 
     int decision = 0;
 
+    /// If either chain is out of bounds, we don't swap
     if (i_am_lower)
     {
         const double swap_rand = random->Uniform(0.0, 1.0);
 
         const double inv_temp_replica = 1.0 / temp_replica;
 
-        double log_swap =-1*(sample_LogLCurr_replica - sample_logLCurr) * (inv_TempScale - inv_temp_replica);
+        /// We need to get our LogL at temperature = 0
+        double logLCurr_t0 = logLCurr + (1 - inv_TempScale) * sample_logLCurr;
+        double LogLCurr_replica_t0 = LogLCurr_replica + (1 - inv_temp_replica) * sample_LogLCurr_replica;
 
+        double log_swap =-1*(LogLCurr_replica_t0 - logLCurr_t0) * (inv_TempScale - inv_temp_replica);
+
+        // Protect against overflow in exp() for numerical stability
+        const double max_log_swap = 1000.0;
+        if (log_swap > max_log_swap) {
+            log_swap = max_log_swap;
+        }
+        
         const double swap_prob = std::exp(log_swap);
-        MACH3LOG_DEBUG("Swap prob {}: logL_curr = {}, logL_replica = {}, T_curr = {}, T_replica = {}, swap_prob = {}, rand = {}",
-                     swap_prob, sample_logLCurr, sample_LogLCurr_replica, TempScale, temp_replica, swap_prob, swap_rand);
+        // MACH3LOG_INFO("Swap prob {}: logLCurr_t0 = {}, logL_replica = {}, T_curr = {}, T_replica = {}, swap_prob = {}, rand = {}",
+        //               swap_prob, logLCurr_t0, LogLCurr_replica_t0, TempScale, temp_replica, swap_prob, swap_rand);
 
         do_swap = swap_rand < swap_prob &&
-                  !out_of_bounds &&
                   LogLCurr_replica < M3::_LARGE_LOGL_ &&
-                  logLProp < M3::_LARGE_LOGL_;
+                  logLCurr < M3::_LARGE_LOGL_;  
 
         decision = do_swap ? 1 : 0;
         MPI_Send(&decision, 1, MPI_INT, swap_rank, 1, MPI_COMM_WORLD);
@@ -205,16 +175,17 @@ void PTMR2T2::Swap()
 void PTMR2T2::SwapStepInformation(int swap_rank)
 {    
     const size_t header_size = 3;
-    transfer_vector_send[0] = sample_logLCurr;
-    transfer_vector_send[1] = logLCurr;
+    transfer_vector_send[0] = logLCurr;
+    transfer_vector_send[1] = sample_logLCurr;
     transfer_vector_send[2] = TempScale;
 
-    int idx = header_size;
+    size_t idx = header_size;
     for(size_t s = 0; s < systematics.size(); ++s)
     {
-        const auto& params = systematics[s]->GetParPropVec();
-        std::copy(params.begin(), params.end(), transfer_vector_send.begin() + idx);
-        idx += systematics[s]->GetNumParams();
+        for (int p = 0; p < systematics[s]->GetNumParams(); ++p)
+        {
+            transfer_vector_send[idx++] = systematics[s]->GetParCurr(p);
+        }
     }
     
     MPI_Sendrecv(
@@ -240,19 +211,26 @@ void PTMR2T2::SwapStepInformation(int swap_rank)
     for(size_t s = 0; s < systematics.size(); ++s)
     {
         const int num_params = systematics[s]->GetNumParams();
-        systematics[s]->SetParameters(
-            std::vector<double>(
-                transfer_vector_recv.begin() + idx,
-                transfer_vector_recv.begin() + idx + num_params
-            )
-        );
-        idx += num_params;
+        for (int p = 0; p < num_params; ++p)
+        {
+            systematics[s]->SetParCurrProp(p, transfer_vector_recv[idx++]);
+        }
     }
 
     // Now we need to swap information between chains
 
+    #ifdef DEBUG
+    double DEBUG_LLH_before = logLCurr;
+    #endif
+    
     // Get the penalty term first since this is not temp scaled
     double penalty = LogLCurr_replica - sample_LogLCurr_replica/temp_replica;
+    if (penalty < 0)
+    {
+        MACH3LOG_CRITICAL("Negative Penalty term when swapping!!! logLCurr_replica: {}, sample_LogLCurr_replica: {}, temp_replica: {}, penalty {}", LogLCurr_replica, sample_LogLCurr_replica, temp_replica, penalty);
+        throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    
 
     // Scale sample likelihood
     sample_LogLCurr_replica *= temp_replica/TempScale;
@@ -260,13 +238,68 @@ void PTMR2T2::SwapStepInformation(int swap_rank)
     // Now do the swap
     sample_logLCurr = sample_LogLCurr_replica;
     
-    logLCurr= sample_LogLCurr_replica + penalty;
+    logLCurr = sample_LogLCurr_replica + penalty;
+    
     #ifdef DEBUG
-    double DEBUG_LLH = logLCurr;
-    MACH3LOG_DEBUG("LLH Before swap: {} | After {}", DEBUG_LLH, logLCurr);
+    MACH3LOG_DEBUG("LLH Before swap: {} | After {}", DEBUG_LLH_before, logLCurr);
     #endif
 }
 
+
+void PTMR2T2::PrintProgress(){
+    MR2T2::PrintProgress();
+
+    MACH3LOG_INFO("Temperature: {:.2f}, Up Going: {:.2f}", TempScale, static_cast<double>(n_up_swap));
+
+    // Optimized: Use MPI_Gather instead of sequential sends/receives
+    std::vector<double> all_mpi_info;
+    double local_mpi_info[4] = {
+        static_cast<double>(mpi_rank), 
+        TempScale, 
+        static_cast<double>(n_up_swap), 
+        static_cast<double>(n_down_swap)
+    };
+    
+    if (mpi_rank == 0)
+    {
+        all_mpi_info.resize(4 * n_procs);
+    }
+    
+    int result = MPI_Gather(local_mpi_info, 4, MPI_DOUBLE, 
+                            all_mpi_info.data(), 4, MPI_DOUBLE, 
+                            0, MPI_COMM_WORLD);
+    
+    if (result != MPI_SUCCESS)
+    {
+        MACH3LOG_ERROR("MPI_Gather failed in PrintProgress with error code {}", result);
+        return;
+    }
+    
+    if (mpi_rank == 0)
+    {
+        for (int i = 0; i < n_procs; ++i)
+        {
+            int rank = static_cast<int>(all_mpi_info[i * 4 + 0]);
+            double temp = all_mpi_info[i * 4 + 1];
+            int n_up = static_cast<int>(all_mpi_info[i * 4 + 2]);
+            int n_down = static_cast<int>(all_mpi_info[i * 4 + 3]);
+            int total_steps_up_down = n_up + n_down;
+
+            double swap_rate = 0.0;
+            if (total_steps_up_down > 0)
+            {
+                swap_rate = static_cast<double>(n_up) / static_cast<double>(total_steps_up_down);
+            }
+            MACH3LOG_INFO("Rank {}: Swap Rate: {:.2f} (up: {}, down: {}), Temp: {:.2f} | Swap/step = {:.2f} %", rank, swap_rate, n_up, n_down, temp, 100*total_steps_up_down/static_cast<double>(step+1-stepStart));
+        }
+    }
+}
+
+void PTMR2T2::AcceptStep()
+{
+    MR2T2::AcceptStep();
+    sample_logLCurr = sample_logLProp;
+}
 
 // void PTMR2T2::GlobalAdaptTemperatures()
 // {
@@ -386,49 +419,9 @@ void PTMR2T2::SwapStepInformation(int swap_rank)
 //             MACH3LOG_INFO("Rank {} -> T = {:.4f} | Swap Rate {:.3f}", i, all_temps[i], swap_rate);
 //         }
 //     }
-    
+
 //     n_up_swap = 0;
 //     n_down_swap = 0;
 // }
-
-void PTMR2T2::PrintProgress(){
-    MR2T2::PrintProgress();
-
-    MACH3LOG_INFO("Temperature: {:.2f}, Up Going: {:.2f}", TempScale, static_cast<double>(n_up_swap));
-
-    if (mpi_rank == 0)
-    {
-        for (int i = 1; i < n_procs; ++i)
-        {
-            double mpi_info[4] = {0.0, 0.0, 0.0, 0.0};
-            MPI_Recv(mpi_info, 4, MPI_DOUBLE, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-            int rank = static_cast<int>(mpi_info[0]);
-            double temp = mpi_info[1];
-            int n_up = static_cast<int>(mpi_info[2]);
-            int n_down = static_cast<int>(mpi_info[3]);
-            int total_steps_up_down = n_up + n_down;
-
-            double swap_rate = 0.0;
-            if (total_steps_up_down > 0)
-            {
-                swap_rate = static_cast<double>(n_up) / static_cast<double>(total_steps_up_down);
-            }
-            MACH3LOG_INFO("Rank {}: Swap Rate: {:.2f} (up: {}, down: {}), Temp: {:.2f}", rank, swap_rate, n_up, n_down, temp);
-        }
-
-    }
-    else
-    {
-        double mpi_info[4] = {static_cast<double>(mpi_rank), TempScale, static_cast<double>(n_up_swap), static_cast<double>(n_down_swap)};
-        MPI_Send(mpi_info, 4, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
-        return;
-    }
-}
-
-void PTMR2T2::AcceptStep()
-{
-    MR2T2::AcceptStep();
-    sample_logLCurr = sample_logLProp;
-}
 
 #endif

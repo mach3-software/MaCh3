@@ -142,7 +142,7 @@ void MCMCBase::PrintProgress() {
             if(total_steps > 0){
                 acc_rate = static_cast<double>(acc_steps) / static_cast<double>(total_steps);
             }
-            MACH3LOG_INFO("Rank {}: Accepted/Total steps: {}/{} = {:.2f}", rank, acc_steps, total_steps, acc_rate);
+            MACH3LOG_INFO("Rank {}: Accepted/Total steps: {}/{} = {:.2e}", rank, acc_steps, total_steps, acc_rate);
         }
     }
     else{

@@ -5,6 +5,30 @@
 #include "Parameters/ParameterHandlerUtils.h"
 
 namespace adaptive_mcmc{
+  
+// A rough approximation of a mode
+class AdaptiveMode{
+public:
+  AdaptiveMode(const std::vector<double>& point);
+  void Update(const std::vector<double>& point);
+  double NSigmaFromMode(std::vector<double> point) const;
+  
+  /// @brief Get the mean values for this mode
+  std::vector<double> GetMeans() const { return means; }
+  
+  /// @brief Get the variance values for this mode
+  std::vector<double> GetVariances() const { return variances; }
+  
+  /// @brief Get the number of steps accumulated in this mode
+  int GetNSteps() const { return n_steps; }
+  
+protected:
+  std::vector<double> means;
+  std::vector<double> variances;
+  int n_steps;
+
+};
+
 
 /// @brief Contains information about adaptive covariance matrix
 /// @cite haario2001adaptive
@@ -128,6 +152,24 @@ class AdaptiveMCMCHandler{
     return output_file_name;
   }
 
+  /// @brief Enable or disable mode tracking
+  void SetModeTracking(bool enable) {
+    track_modes = enable;
+  }
+
+  /// @brief Check if mode tracking is enabled
+  bool IsModeTrackingEnabled() const {
+    return track_modes;
+  }
+
+  /// @brief Get the number of detected modes
+  size_t GetNModes() const {
+    return mode_information.size();
+  }
+
+  /// @brief Print information about detected modes
+  void PrintModeInfo() const;
+
  private:
   /// Meta variables related to adaption run time
   /// When do we start throwing
@@ -173,6 +215,17 @@ class AdaptiveMCMCHandler{
 
   /// Current values of parameters
   const std::vector<double>* _fCurrVal;
+
+  /// Enable mode tracking and correction
+  bool track_modes;
+
+  /// Move parameter to a given mode
+  void UpdateModes(const std::vector<double>& point);
+  int GetClosestMode(const std::vector<double>& point) const; 
+  void MergeSimilarModes();
+  std::vector<double> MoveToInitMode(const std::vector<double>& point) const;
+  std::vector<std::unique_ptr<AdaptiveMode>> mode_information;
+
 };
 
 } // adaptive_mcmc namespace

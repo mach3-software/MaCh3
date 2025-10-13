@@ -63,6 +63,8 @@ class PTMR2T2 : public MR2T2
     double sample_LogLCurr_replica;
     double temp_replica;
 
+    unsigned int steps_before_swapping;
+
     bool do_swap;
     int n_up_swap;
     int n_down_swap;
@@ -71,15 +73,10 @@ class PTMR2T2 : public MR2T2
     std::vector<double> transfer_vector_recv;
     std::vector<double> temp_vec;
 
-    // Timing benchmarks
-    double time_base_dostep;
-    double time_swap;
-    double time_global_adapt;
 
     // need for swap
     double sample_logLProp;
     double sample_logLCurr;
-
 };
 
 

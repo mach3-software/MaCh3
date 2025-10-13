@@ -191,20 +191,25 @@ class MCMCProcessor {
                     const std::vector<double>& NewCentral,
                     const bool& SaveBranch);
 
+    /// @brief Calculate Thermodynamic weight for each step in chain
+    void ThermodynamicWeight();
+
+
     /// @brief Make .gif of parameter evolution
     /// @param Names Parameter names for which we do .gif
     /// @param NIntervals Number of intervals for a gif
     void ParameterEvolution(const std::vector<std::string>& Names,
                             const std::vector<int>& NIntervals);
 
-    /// @brief Thin MCMC Chain, to save space and maintain low autocorrelations.
+                            /// @brief Thin MCMC Chain, to save space and maintain low autocorrelations.
     /// @param ThinningCut every which entry you want to thin
     /// @param Average If true will perform MCMC averaging instead of thinning
     inline void ThinMCMC(const int ThinningCut) const { ThinningMCMC(MCMCFile+".root", ThinningCut); };
 
     /// @brief KS: Perform MCMC diagnostic including Autocorrelation, Trace etc.
     void DiagMCMC();
-    
+
+
     // Get the number of parameters
     /// @brief Get total number of used parameters
     inline int GetNParams() const { return nDraw; };
