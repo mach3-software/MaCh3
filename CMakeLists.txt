@@ -7,6 +7,8 @@ project(MaCh3 VERSION 2.3.0 LANGUAGES CXX)
 set(MaCh3_VERSION ${PROJECT_VERSION})
 
 option(MaCh3_PYTHON_ENABLED "Whether to build MaCh3 python bindings" OFF)
+option(MaCh3_SAMPLED_PROFILING_ENABLED "Whether to use tracy to randomly sample call stack to profile MaCh3" OFF)
+option(MaCh3_INSTRUMENTED_PROFILING_ENABLED "Whether to use instrumented tracy to profile MaCh3" OFF)
 option(MaCh3_WERROR_ENABLED "Whether to build MaCh3 with heightened compiler pedancy" ON)
 option(MaCh3_LOW_MEMORY_STRUCTS_ENABLED "This will use float/short string for many structures" OFF)
 option(MaCh3_MULTITHREAD_ENABLED "This will enable multithreading (OMP) in whole framework" ON)
@@ -16,6 +18,12 @@ option(MaCh3_GPU_BENCHMARK "Perform fancy CUDA Benchmarking" OFF)
 option(MaCh3_NATIVE_ENABLED "Enable native CPU optimizations for improved performance during benchmarking)" OFF)
 option(MaCh3_GPU_ENABLED "Use GPU acceleration or not" ON)
 option(MaCh3_NuOsc_GPU_ENABLED "By default MaCh3 will use NuOscillator with GPU if MaCh3 is compiled with GPU, this flag allows disabling GPU for NuOscillator even if MaCh3 has GPU enabled" ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+# EM: Check validity of profiling option
+if (MaCh3_SAMPLED_PROFILING_ENABLED AND MaCh3_INSTRUMENTED_PROFILING_ENABLED)
+  cmessage(FATAL_ERROR "Cannot have both MaCh3_SAMPLED_PROFILING_ENABLED AND MaCh3_INSTRUMENTED_PROFILING_ENABLED. Please choose one or neither!")
+endif()
 
 #KS: Load cmake function like DefineEnabledRequiredSwitch allowing to write more compact cmake
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/Modules)
@@ -258,6 +266,7 @@ endforeach()
 ################################# Build MaCh3 ##################################
 
 # Build components
+add_subdirectory(Profiling)
 add_subdirectory(Manager)
 add_subdirectory(Parameters)
 add_subdirectory(Splines)

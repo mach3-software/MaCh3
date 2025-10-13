@@ -114,3 +114,15 @@ if( MaCh3_PYTHON_ENABLED )
       GIT_TAG v2.13.5
     )
 endif()
+
+
+######################### Tracy tracing ##########################
+if( MaCh3_TRACING_ENABLED )
+  CPMFindPackage(
+      NAME tracy
+      VERSION 0.11.0
+      GITHUB_REPOSITORY "wolfpld/tracy"
+      GIT_SHALLOW YES
+      GIT_TAG v0.11.0
+    )
+endif()

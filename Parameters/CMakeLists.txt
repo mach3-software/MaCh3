@@ -29,6 +29,7 @@ endif()
 
 target_link_libraries(Parameters PUBLIC Manager)
 target_link_libraries(Parameters PRIVATE MaCh3Warnings)
+target_link_libraries(Parameters PRIVATE Profiling)
 
 target_include_directories(Parameters PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>

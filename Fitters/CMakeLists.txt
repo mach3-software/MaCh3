@@ -44,6 +44,7 @@ set_target_properties(Fitters PROPERTIES
 
 target_link_libraries(Fitters PUBLIC Samples)
 target_link_libraries(Fitters PRIVATE MaCh3Warnings)
+target_link_libraries(Fitters PRIVATE Profiling)
 
 target_include_directories(Fitters PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>

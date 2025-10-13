@@ -31,6 +31,7 @@ set_target_properties(Splines PROPERTIES
 
 target_link_libraries(Splines PUBLIC Parameters MaCh3CompilerOptions MaCh3GPUCompilerOptions)
 target_link_libraries(Splines PRIVATE MaCh3Warnings)
+target_link_libraries(Splines PRIVATE Profiling)
 
 target_include_directories(Splines PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>

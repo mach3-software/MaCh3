@@ -18,6 +18,7 @@ add_library(Samples SHARED
 
 target_link_libraries(Samples PUBLIC Splines NuOscillator)
 target_link_libraries(Samples PRIVATE MaCh3Warnings)
+target_link_libraries(Samples PRIVATE Profiling)
 
 target_include_directories(Samples PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
