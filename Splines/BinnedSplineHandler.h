@@ -3,6 +3,7 @@
 //MaCh3 includes
 #include "Splines/SplineBase.h"
 #include "Manager/MaCh3Modes.h"
+#include "Profiling/Profiling.h"
 
 /// @brief Bin-by-bin class calculating response for spline parameters.
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/05.-Splines).

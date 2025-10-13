@@ -9,6 +9,7 @@
 #include "Samples/OscillationHandler.h"
 #include "Samples/FarDetectorCoreInfoStruct.h"
 #include "Samples/BinningHandler.h"
+#include "Profiling/Profiling.h"
 
 #include "THStack.h"
 #include "TLegend.h"

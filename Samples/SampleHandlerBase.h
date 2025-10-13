@@ -8,6 +8,7 @@
 #include "Samples/HistogramUtils.h"
 #include "Manager/Manager.h"
 #include "Manager/MaCh3Modes.h"
+#include "Profiling/Profiling.h"
 
 _MaCh3_Safe_Include_Start_ //{
 //ROOT includes

@@ -2,6 +2,7 @@
 
 //MaCh3 includes
 #include "Samples/SampleStructs.h"
+#include "Profiling/Profiling.h"
 
 //forward declare so we don't bleed NuOscillator headers
 class OscillatorBase;

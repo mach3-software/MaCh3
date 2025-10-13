@@ -7,6 +7,7 @@
 // MaCh3  includes
 #include "Splines/SplineStructs.h"
 #include "Splines/SplineCommon.h"
+#include "Profiling/Profiling.h"
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT include

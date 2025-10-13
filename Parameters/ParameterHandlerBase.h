@@ -6,6 +6,7 @@
 #include "Parameters/AdaptiveMCMCHandler.h"
 #include "Parameters/PCAHandler.h"
 #include "Parameters/ParameterTunes.h"
+#include "Profiling/Profiling.h"
 
 /// @brief Base class responsible for handling of systematic error parameters. Capable of using PCA or using adaptive throw matrix
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/02.-Implementation-of-Systematic).
