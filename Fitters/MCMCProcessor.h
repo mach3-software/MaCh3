@@ -318,6 +318,7 @@ class MCMCProcessor {
     inline void SetOutputSuffix(const std::string Suffix){OutputSuffix = Suffix; };
     /// @brief Allow to set addtional cuts based on ROOT TBrowser cut, for to only affect one mass ordering
     inline void SetPosterior1DCut(const std::string Cut){Posterior1DCut = Cut; };
+
   protected:
     /// @brief Prepare prefit histogram for parameter overlay plot
     inline std::unique_ptr<TH1D> MakePrefit();
@@ -441,7 +442,7 @@ class MCMCProcessor {
     int nSysts;
     /// Number of all parameters used in the analysis
     int nDraw;
-
+    
     //Name of all branches as well as branches we don't want to include in the analysis
     std::vector<TString> BranchNames;
     std::vector<std::string> ExcludedTypes;

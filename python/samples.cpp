@@ -24,19 +24,21 @@ public:
 
     /* Trampoline (need one for each virtual function) */
     void Reweight() override {
-        PYBIND11_OVERRIDE_PURE(
+        PYBIND11_OVERRIDE_PURE_NAME(
             void,          /* Return type */
             SampleHandlerBase, /* Parent class */
+            "reweight",
             Reweight       /* Name of function in C++ (must match Python name) */
         );
     }
 
     /* Trampoline (need one for each virtual function) */
     void CleanMemoryBeforeFit() override {
-        PYBIND11_OVERRIDE_PURE(
-            void,          /* Return type */
-            SampleHandlerBase, /* Parent class */
-            CleanMemoryBeforeFit       /* Name of function in C++ (must match Python name) */
+        PYBIND11_OVERRIDE_PURE_NAME(
+            void,                  /* Return type */
+            SampleHandlerBase,     /* Parent class */
+            "clean_memory_before_fit",
+            CleanMemoryBeforeFit   /* Name of function in C++ (must match Python name) */
         );
     }
 
