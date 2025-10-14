@@ -117,7 +117,7 @@ endif()
 
 
 ######################### Tracy tracing ##########################
-if( MaCh3_TRACING_ENABLED )
+if(MaCh3_SAMPLED_PROFILING_ENABLED OR MaCh3_INSTRUMENTED_PROFILING_ENABLED)
   CPMFindPackage(
       NAME tracy
       VERSION 0.11.0
