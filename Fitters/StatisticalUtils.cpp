@@ -646,3 +646,18 @@ void Get2DBayesianpValue(TH2D *Histogram) {
 
   TempCanvas->Write();
 }
+
+
+
+// ****************
+void PassErrorToRatioPlot(TH1D* RatioHist, TH1D* Hist1, TH1D* DataHist) {
+// ****************
+  for (int j = 0; j <= RatioHist->GetNbinsX(); ++j)
+  {
+    if(DataHist->GetBinContent(j) > 0)
+    {
+      double dx = Hist1->GetBinError(j) / DataHist->GetBinContent(j);
+      RatioHist->SetBinError(j, dx);
+    }
+  }
+}
