@@ -69,6 +69,11 @@ void OverlayPredicitve(const YAML::Node& Settings,
 
   auto PosteriorColor = Get<std::vector<Color_t >>(Settings["PosteriorColor"], __FILE__, __LINE__);
   auto Titles = Get<std::vector<std::string>>(Settings["FileTitle"], __FILE__, __LINE__);
+
+  if(Titles.size() < InputFiles.size() || PosteriorColor.size() < InputFiles.size()){
+    MACH3LOG_ERROR("Passed {} files, while only {} titles and {} colors", InputFiles.size(), Titles.size(), PosteriorColor.size());
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
   for(size_t iSample = 0; iSample < SampleNames.size(); iSample++)
   {
     const int nFiles = static_cast<int>(InputFiles.size());
