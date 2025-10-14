@@ -78,7 +78,7 @@ class SampleHandlerFD :  public SampleHandlerBase
   void InitialiseNuOscillatorObjects();
   void SetupNuOscillatorPointers();
 
-  void ReadSampleHandlerConfig();
+  void ReadConfig();
   void LoadSingleSample(const int iSample, const YAML::Node& Settings);
 
   /// @ingroup SampleHandlerGetters

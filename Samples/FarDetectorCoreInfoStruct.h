@@ -141,7 +141,7 @@ struct FarDetectorCoreInfo {
   int NomYBin = -1;
 
   /// Nominal sample to which event is associated
-  int NomSample = 0;
+  int NominalSample = 0;
 
   bool isNC = false;
 

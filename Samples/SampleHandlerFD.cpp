@@ -54,7 +54,7 @@ SampleHandlerFD::~SampleHandlerFD() {
   if(THStackLeg != nullptr) delete THStackLeg;
 }
 
-void SampleHandlerFD::ReadSampleHandlerConfig()
+void SampleHandlerFD::ReadConfig()
 {
   auto ModeName = Get<std::string>(SampleManager->raw()["MaCh3ModeConfig"], __FILE__ , __LINE__);
   Modes = std::make_unique<MaCh3Modes>(ModeName);
@@ -214,7 +214,7 @@ void SampleHandlerFD::LoadSingleSample(const int iSample, const YAML::Node& Samp
 
 void SampleHandlerFD::Initialise() {
   //First grab all the information from your sample config via your manager
-  ReadSampleHandlerConfig();
+  ReadConfig();
 
   //Now initialise all the variables you will need
   Init();
@@ -393,7 +393,7 @@ void SampleHandlerFD::FillArray() {
     ApplyShifts(iEvent);
     FarDetectorCoreInfo* MCEvent = &MCSamples[iEvent];
 
-    if (!IsEventSelected(MCEvent->NomSample, iEvent)) {
+    if (!IsEventSelected(MCEvent->NominalSample, iEvent)) {
       continue;
     }
     M3::float_t splineweight = CalcWeightSpline(MCEvent);
@@ -423,7 +423,7 @@ void SampleHandlerFD::FillArray() {
     const double XVar = *(MCEvent->x_var);
 
     //DB Find the relevant bin in the PDF for each event
-    const int GlobalBin = Binning->FindGlobalBin(MCEvent->NomSample, XVar, MCEvent->NomXBin, MCEvent->NomYBin);
+    const int GlobalBin = Binning->FindGlobalBin(MCEvent->NominalSample, XVar, MCEvent->NomXBin, MCEvent->NomYBin);
 
     //DB Fill relevant part of thread array
     if (GlobalBin > -1) {
@@ -483,7 +483,7 @@ void SampleHandlerFD::FillArray_MP() {
       //ETA - generic functions to apply shifts to kinematic variable
       //this is going to be slow right now due to string comps under the hood.
       //Need to implement a more efficient version of event-by-event cut checks
-      if(!IsEventSelected(MCEvent->NomSample, iEvent)){
+      if(!IsEventSelected(MCEvent->NominalSample, iEvent)){
         continue;
       }
 
@@ -516,7 +516,7 @@ void SampleHandlerFD::FillArray_MP() {
       const double XVar = (*(MCEvent->x_var));
 
       //DB Find the relevant bin in the PDF for each event
-      const int GlobalBin = Binning->FindGlobalBin(MCEvent->NomSample, XVar, MCEvent->NomXBin, MCEvent->NomYBin);
+      const int GlobalBin = Binning->FindGlobalBin(MCEvent->NominalSample, XVar, MCEvent->NomXBin, MCEvent->NomYBin);
 
       //ETA - we can probably remove this final if check on the -1?
       //Maybe we can add an overflow bin to the array and assign any events to this bin?
@@ -894,7 +894,7 @@ void SampleHandlerFD::SetBinning() {
 void SampleHandlerFD::FindNominalBinAndEdges() {
 // ************************************************
   for (unsigned int event_i = 0; event_i < GetNEvents(); event_i++) {
-    int Sample = MCSamples[event_i].NomSample;
+    int Sample = MCSamples[event_i].NominalSample;
 
     // Set and validate x_var (common to both cases)
     MCSamples[event_i].x_var = GetPointerToKinematicParameter(GetXBinVarName(Sample), event_i);
@@ -1168,17 +1168,15 @@ void SampleHandlerFD::InitialiseNuOscillatorObjects() {
     for(int iSample = 1; iSample < GetNsamples(); iSample++) {
       Oscillator->AddSample(NuOscillatorConfigFile, GetNOscChannels(iSample));
     }
-  }
-  if (!EqualBinningPerOscChannel) {
     for(int iSample = 0; iSample < GetNsamples(); iSample++) {
       for(int iChannel = 0; iChannel < GetNOscChannels(iSample); iChannel++) {
         std::vector<M3::float_t> EnergyArray;
         std::vector<M3::float_t> CosineZArray;
 
         for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
-          if(MCSamples[iEvent].NomSample != iSample) continue;
+          if(MCSamples[iEvent].NominalSample != iSample) continue;
           // KS: This is bit weird but we basically loop over all events and push to vector only these which are part of a given OscChannel
-          const int Channel = GetOscChannel(SampleDetails[MCSamples[iEvent].NomSample].OscChannels, (*MCSamples[iEvent].nupdgUnosc), (*MCSamples[iEvent].nupdg));
+          const int Channel = GetOscChannel(SampleDetails[MCSamples[iEvent].NominalSample].OscChannels, (*MCSamples[iEvent].nupdgUnosc), (*MCSamples[iEvent].nupdg));
           //DB Remove NC events from the arrays which are handed to the NuOscillator objects
           if (!MCSamples[iEvent].isNC && Channel == iChannel) {
             EnergyArray.push_back(M3::float_t(*(MCSamples[iEvent].rw_etru)));
@@ -1190,9 +1188,9 @@ void SampleHandlerFD::InitialiseNuOscillatorObjects() {
         //DB Atmospheric only part, can only happen if truecz has been initialised within the experiment specific code
         if (*(MCSamples[0].rw_truecz) != M3::_BAD_DOUBLE_) {
           for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
-            if(MCSamples[iEvent].NomSample != iSample) continue;
+            if(MCSamples[iEvent].NominalSample != iSample) continue;
             // KS: This is bit weird but we basically loop over all events and push to vector only these which are part of a given OscChannel
-            const int Channel = GetOscChannel(SampleDetails[MCSamples[iEvent].NomSample].OscChannels, (*MCSamples[iEvent].nupdgUnosc), (*MCSamples[iEvent].nupdg));
+            const int Channel = GetOscChannel(SampleDetails[MCSamples[iEvent].NominalSample].OscChannels, (*MCSamples[iEvent].nupdgUnosc), (*MCSamples[iEvent].nupdg));
             //DB Remove NC events from the arrays which are handed to the NuOscillator objects
             if (!MCSamples[iEvent].isNC && Channel == iChannel) {
               CosineZArray.push_back(M3::float_t(*(MCSamples[iEvent].rw_truecz)));
@@ -1230,7 +1228,7 @@ void SampleHandlerFD::SetupNuOscillatorPointers() {
         MACH3LOG_ERROR("FinalFlav: {}", FinalFlav);
         throw MaCh3Exception(__FILE__, __LINE__);
       }
-      const int Sample = MCSamples[iEvent].NomSample;
+      const int Sample = MCSamples[iEvent].NominalSample;
 
       const int OscIndex = GetOscChannel(SampleDetails[Sample].OscChannels, (*MCSamples[iEvent].nupdgUnosc), (*MCSamples[iEvent].nupdg));
       //Can only happen if truecz has been initialised within the experiment specific code
@@ -1274,7 +1272,7 @@ M3::float_t SampleHandlerFD::GetEventWeight(const int iEntry) const {
 void SampleHandlerFD::FillSplineBins() {
   //Now loop over events and get the spline bin for each event
   for (unsigned int j = 0; j < GetNEvents(); ++j) {
-    const int SampleIndex = MCSamples[j].NomSample;
+    const int SampleIndex = MCSamples[j].NominalSample;
     const int OscIndex = GetOscChannel(SampleDetails[SampleIndex].OscChannels, (*MCSamples[j].nupdgUnosc), (*MCSamples[j].nupdg));
 
     std::vector< std::vector<int> > EventSplines;
@@ -1463,7 +1461,7 @@ TH1* SampleHandlerFD::Get1DVarHist(const int iSample, const std::string& Project
 
     //DB Loop over all events
     for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
-      const int EventSample = MCSamples[iEvent].NomSample;
+      const int EventSample = MCSamples[iEvent].NominalSample;
       if(EventSample != iSample) continue;
       if (IsEventSelected(EventSample, iEvent)) {
         double Weight = GetEventWeight(iEvent);
@@ -1486,7 +1484,7 @@ void SampleHandlerFD::Fill1DSubEventHist(const int iSample, TH1D* _h1DVar, const
 
   //JM Loop over all events
   for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
-    const int EventSample = MCSamples[iEvent].NomSample;
+    const int EventSample = MCSamples[iEvent].NominalSample;
     if(EventSample != iSample) continue;
     if (IsEventSelected(EventSample, iEvent)) {
       double Weight = GetEventWeight(iEvent);
@@ -1545,7 +1543,7 @@ TH2* SampleHandlerFD::Get2DVarHist(const int iSample, const std::string& Project
 
     //DB Loop over all events
     for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
-      const int EventSample = MCSamples[iEvent].NomSample;
+      const int EventSample = MCSamples[iEvent].NominalSample;
       if(EventSample != iSample) continue;
       if (IsEventSelected(EventSample, iEvent)) {
         double Weight = GetEventWeight(iEvent);
@@ -1577,7 +1575,7 @@ void SampleHandlerFD::Fill2DSubEventHist(const int iSample, TH2D* _h2DVar, const
 
   //JM Loop over all events
   for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
-    const int EventSample = MCSamples[iEvent].NomSample;
+    const int EventSample = MCSamples[iEvent].NominalSample;
     if(EventSample != iSample) continue;
     if (IsEventSelected(EventSample, iEvent)) {
       double Weight = GetEventWeight(iEvent);
@@ -2044,7 +2042,7 @@ THStack* SampleHandlerFD::ReturnStackedHistBySelection1D(const int iSample, cons
 // ************************************************
 const double* SampleHandlerFD::GetPointerToOscChannel(const int iEvent) const {
 // ************************************************
-  auto& OscillationChannels = SampleDetails[MCSamples[iEvent].NomSample].OscChannels;
+  auto& OscillationChannels = SampleDetails[MCSamples[iEvent].NominalSample].OscChannels;
   const int Channel = GetOscChannel(OscillationChannels, (*MCSamples[iEvent].nupdgUnosc), (*MCSamples[iEvent].nupdg));
 
   return &(OscillationChannels[Channel].ChannelIndex);
