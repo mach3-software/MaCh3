@@ -82,7 +82,6 @@ void CapVariable(double var, double cap);
 // *******************
 int main(int argc, char *argv[]) {
 // *******************
-
   SetMaCh3LoggerFormat();
   MaCh3Utils::MaCh3Welcome();
 
@@ -133,7 +132,6 @@ int main(int argc, char *argv[]) {
   SaveResults();
 
   DestroyArrays();
-
   return 0;
 }
 

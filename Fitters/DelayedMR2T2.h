@@ -59,7 +59,7 @@ class DelayedMR2T2 : public MR2T2 {
     void StoreCurrentStep();
 
     /// @brief override to add in rejection information to output
-    void PrepareOutput();
+    void PrepareOutput() override;
 
     /// @brief Reset scale after delay process
     void ResetSystScale();

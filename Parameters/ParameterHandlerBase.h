@@ -374,6 +374,10 @@ class ParameterHandlerBase {
                                 std::vector<double>& BranchValues,
                                 std::vector<std::string>& BranchNames);
 
+                                /// @brief Perform Special Step Proposal
+  void SpecialStepProposal();
+
+
 protected:
   /// @brief Initialisation of the class using matrix from root file
   void Init(const std::string& name, const std::string& file);
@@ -413,9 +417,6 @@ protected:
 
   /// @brief Enable special proposal
   void EnableSpecialProposal(const YAML::Node& param, const int Index);
-
-  /// @brief Perform Special Step Proposal
-  void SpecialStepProposal();
 
   /// Check if any of special step proposal were enabled
   bool doSpecialStepProposal;

@@ -5,6 +5,11 @@
 // Now we can dump manager settings to the output file
 MCMCBase::MCMCBase(manager *man) : FitterBase(man) {
 // *************************
+    Init();
+}
+
+
+void MCMCBase::Init(){
     // Beginning step number
     stepStart = 0;
 
@@ -21,6 +26,7 @@ MCMCBase::MCMCBase(manager *man) : FitterBase(man) {
         anneal = true;
     }
 }
+
 
 
 // *******************
@@ -43,8 +49,16 @@ void MCMCBase::RunMCMC() {
     // Accept the first step to set logLCurr: this shouldn't affect the MCMC because we ignore the first N steps in burn-in
     logLCurr = logLProp;
 
+
+
     // Begin MCMC
     const auto StepEnd = stepStart + chainLength;
+
+    #ifdef MPIENABLED
+    // We send a signal to all other fitters that we are ready to start MCMC
+    MPI_Barrier(MPI_COMM_WORLD);
+    #endif
+
     for (step = stepStart; step < StepEnd; ++step)
     {
         DoMCMCStep();
@@ -56,12 +70,20 @@ void MCMCBase::RunMCMC() {
     ProcessMCMC();
 }
 
+
+
 // *******************
 void MCMCBase::DoMCMCStep() {
 // *******************
     /// Starts step timer, prints progress
     PreStepProcess();
     /// Step proposal, acceptance etc
+
+    #ifdef MPIENABLED
+    // We send a signal to all other fitters that we are ready to propose a step
+    MPI_Barrier(MPI_COMM_WORLD);
+    #endif
+
     DoStep();
     /// Tree filling etc.
     PostStepProcess();
@@ -77,6 +99,10 @@ void MCMCBase::PreStepProcess() {
     if ((step - stepStart) % (chainLength / 10) == 0)
     {
         PrintProgress();
+        /// Prevent thread conflcits
+        #ifdef MPIENABLED
+        MPI_Barrier(MPI_COMM_WORLD);
+        #endif
     }
 }
 
@@ -103,6 +129,28 @@ void MCMCBase::PrintProgress() {
 // *******************
     MACH3LOG_INFO("Step:\t{}/{}, current: {:.2f}, proposed: {:.2f}", step - stepStart, chainLength, logLCurr, logLProp);
     MACH3LOG_INFO("Accepted/Total steps: {}/{} = {:.2f}", accCount, step - stepStart, static_cast<double>(accCount) / static_cast<double>(step - stepStart));
+    #ifdef MPIENABLED
+    // Print this info for all other MPI ranks
+    if(mpi_rank==0){
+        for(int i = 1; i < n_procs; ++i){
+            double mpi_info[3] = {0.0, 0.0, 0.0};
+            MPI_Recv(mpi_info, 3, MPI_DOUBLE, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            int rank = static_cast<int>(mpi_info[0]);
+            int acc_steps = static_cast<int>(mpi_info[1]);
+            int total_steps = static_cast<int>(mpi_info[2]);
+            double acc_rate = 0.0;
+            if(total_steps > 0){
+                acc_rate = static_cast<double>(acc_steps) / static_cast<double>(total_steps);
+            }
+            MACH3LOG_INFO("Rank {}: Accepted/Total steps: {}/{} = {:.2e}", rank, acc_steps, total_steps, acc_rate);
+        }
+    }
+    else{
+        double mpi_info[3] = {static_cast<double>(mpi_rank), static_cast<double>(accCount), static_cast<double>(step - stepStart)};
+        MPI_Send(mpi_info, 3, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
+        return;
+    }
+    #endif
 
     for (ParameterHandlerBase *cov : systematics)
     {

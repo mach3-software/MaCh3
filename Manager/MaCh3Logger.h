@@ -7,6 +7,10 @@
 #include <string>
 #include <exception>
 
+#ifdef MPIENABLED
+#include <mpi.h>
+#endif
+
 // MaCh3 Includes
 #include "Manager/Core.h"
 
@@ -60,10 +64,24 @@ inline void SetMaCh3LoggerFormat()
   spdlog::set_pattern("[%s][%^%l%$] %v");
   #endif
 
+  #ifdef MPIENABLED 
+  // We only want to log for the FIRST process [unless we're in debug mode]
+  #ifndef DEBUG
+  int mpi_rank = 0;
+
+  // Do we actually have an MPI job running?
+  MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
+  if (mpi_rank != 0) {
+    spdlog::set_level(spdlog::level::off);
+    return;
+  }
+  #endif // Debug
+  #endif // MPI
+
   spdlog::set_level(get_default_log_level());
 }
 
-/// @brief KS: This is bit convoluted but this is to allow redirecting cout and errors from external library into MaCh3 logger format
+/// @brief KS: This is bit convoluted but this is to al/low redirecting cout and errors from external library into MaCh3 logger format
 /// @tparam Func The type of the function to be called, which outputs to stdout and stderr.
 /// @tparam LogFunc The type of the logging function, typically a lambda that formats and logs messages.
 /// @tparam Args The types of the arguments to be passed to `func`.

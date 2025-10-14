@@ -15,8 +15,34 @@ _MaCh3_Safe_Include_End_ //}
 // Now we can dump manager settings to the output file
 FitterBase::FitterBase(manager * const man) : fitMan(man) {
 // *************************
+  #ifdef MPIENABLED
+
+  /// Get number of processes
+  MPI_Comm_size(MPI_COMM_WORLD, &n_procs);
+  /// Get MPI rank
+  MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
+  /// Set up MPI
+  MACH3LOG_INFO("Initialising fitter with MPI rank {}", mpi_rank);
+  #endif
+  Init();
+}
+
+// *************************
+// Destructor: close the logger and output file
+FitterBase::~FitterBase() {
+// *************************
+  SaveOutput();
+  if(outputFile != nullptr) delete outputFile;
+  outputFile = nullptr;
+  MACH3LOG_DEBUG("Closing MaCh3 Fitter Engine");
+  #ifdef MPIENABLED
+    MPI_Finalize();
+  #endif
+}
+
+void FitterBase::Init(){
   AlgorithmName = "";
-  //Get mach3 modes from manager
+  // Get mach3 modes from manager
   random = std::make_unique<TRandom3>(Get<int>(fitMan->raw()["General"]["Seed"], __FILE__, __LINE__));
 
   // Counter of the accepted # of steps
@@ -26,21 +52,27 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
 
   clock = std::make_unique<TStopwatch>();
   stepClock = std::make_unique<TStopwatch>();
-  #ifdef DEBUG
+#ifdef DEBUG
   // Fit summary and debug info
-  debug = GetFromManager<bool>(fitMan->raw()["General"]["Debug"], false, __FILE__ , __LINE__);
+  debug = GetFromManager<bool>(fitMan->raw()["General"]["Debug"], false, __FILE__, __LINE__);
+#endif
+
+  auto outfile = Get<std::string>(fitMan->raw()["General"]["OutputFile"], __FILE__, __LINE__);
+
+  #ifdef MPIENABLED
+  // Add rank to output file name
+  outfile = outfile.substr(0, outfile.find_last_of('.')) + "_rank" + std::to_string(mpi_rank) + outfile.substr(outfile.find_last_of('.'));
   #endif
 
-  auto outfile = Get<std::string>(fitMan->raw()["General"]["OutputFile"], __FILE__ , __LINE__);
   // Save output every auto_save steps
-  //you don't want this too often https://root.cern/root/html606/TTree_8cxx_source.html#l01229
-  auto_save = Get<int>(fitMan->raw()["General"]["MCMC"]["AutoSave"], __FILE__ , __LINE__);
+  // you don't want this too often https://root.cern/root/html606/TTree_8cxx_source.html#l01229
+  auto_save = Get<int>(fitMan->raw()["General"]["MCMC"]["AutoSave"], __FILE__, __LINE__);
 
-  #ifdef MULTITHREAD
-  //KS: TODO This should help with performance when saving entries to ROOT file. I didn't have time to validate hence commented out
-  //Based on other tests it is really helpful
-  //ROOT::EnableImplicitMT();
-  #endif
+#ifdef MULTITHREAD
+// KS: TODO This should help with performance when saving entries to ROOT file. I didn't have time to validate hence commented out
+// Based on other tests it is really helpful
+// ROOT::EnableImplicitMT();
+#endif
   // Set the output file
   outputFile = M3::Open(outfile, "RECREATE", __FILE__, __LINE__);
   outputFile->cd();
@@ -53,30 +85,20 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   SettingsSaved = false;
   OutputPrepared = false;
 
-  //Create TDirectory
+  // Create TDirectory
   CovFolder = outputFile->mkdir("CovarianceFolder");
   outputFile->cd();
   SampleFolder = outputFile->mkdir("SampleFolder");
   outputFile->cd();
 
-  #ifdef DEBUG
+#ifdef DEBUG
   // Prepare the output log file
-  if (debug) debugFile.open((outfile+".log").c_str());
-  #endif
+  if (debug)
+    debugFile.open((outfile + ".log").c_str());
+#endif
 
   TotalNSamples = 0;
-  fTestLikelihood = GetFromManager<bool>(fitMan->raw()["General"]["Fitter"]["FitTestLikelihood"], false, __FILE__ , __LINE__);
-}
-
-// *************************
-// Destructor: close the logger and output file
-FitterBase::~FitterBase() {
-// *************************
-  SaveOutput();
-
-  if(outputFile != nullptr) delete outputFile;
-  outputFile = nullptr;
-  MACH3LOG_DEBUG("Closing MaCh3 Fitter Engine");
+  fTestLikelihood = GetFromManager<bool>(fitMan->raw()["General"]["Fitter"]["FitTestLikelihood"], false, __FILE__, __LINE__);
 }
 
 // *******************
@@ -524,6 +546,8 @@ void FitterBase::RunLLHScan() {
   bool PlotLLHScanBySample = GetFromManager<bool>(fitMan->raw()["LLHScan"]["LLHScanBySample"], false, __FILE__ , __LINE__);;
   auto SkipVector = GetFromManager<std::vector<std::string>>(fitMan->raw()["LLHScan"]["LLHScanSkipVector"], {}, __FILE__ , __LINE__);;
 
+  double ScanTemperature = GetFromManager<double>(fitMan->raw()["LLHScan"]["LLHScanTemperature"], 1.0, __FILE__, __LINE__);
+
   // Now finally get onto the LLH scan stuff
   // Very similar code to MCMC but never start MCMC; just scan over the parameter space
   std::vector<TDirectory *> Cov_LLH(systematics.size());
@@ -700,13 +724,13 @@ void FitterBase::RunLLHScan() {
 
         for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
         {
-          nSamLLH[ivs] = samples[ivs]->GetLikelihood();
+          nSamLLH[ivs] = samples[ivs]->GetLikelihood()/ScanTemperature;
           samplellh += nSamLLH[ivs];
         }
 
         for(unsigned int ivc = 0; ivc < systematics.size(); ++ivc )
         {
-          nCovLLH[ivc] = systematics[ivc]->GetLikelihood();
+          nCovLLH[ivc] = systematics[ivc]->GetLikelihood()/ScanTemperature;
           totalllh += nCovLLH[ivc];
         }
 

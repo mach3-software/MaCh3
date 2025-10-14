@@ -140,6 +140,10 @@ The following fitting algorithms are available:
 | DelayedMR2T2 | [Ref](https://doi.org/10.1007/s11222-006-9438-0)  | No       |
 | MINUIT2      | [Ref](https://cds.cern.ch/record/2296388/)        | Yes      |
 | PSO          | [Ref](https://doi.org/10.1162/EVCO_r_00180)       | No       |
+| DE-MCMC      | [Ref](https://doi.org/10.1007/s11222-008-9104-9)  | Yes      |
+| PTMR2T2      | [Ref](https://doi.org/10.1111/rssb.12464)         | Yes      |
+
+> **_NOTE:_**  For Delayed Evolution MCMC (DE-MCMC) and Parallel Tempered MR2T2 (PTMR2T2), the -DMaCh3_MPI_ENABLED=ON flag is required. Additionally, all executables must be run with `mpirun -np <n MPI jobs> ./path/to/exectuable [cmds]`. This will spawn `n` MPI processes running your jobs.
 
 ## Debug
 Several debugging options are available which are heavy for RAM and performance and, therefore not used by default. To enable it:

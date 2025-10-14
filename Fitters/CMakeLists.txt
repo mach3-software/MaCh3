@@ -12,6 +12,8 @@ set(HEADERS
     MaCh3Factory.h
     PredictiveThrower.h
     StatisticalUtils.h
+    DEMCMC.h
+    PTMR2T2.h
     gpuMCMCProcessorUtils.cuh
 )
 
@@ -28,6 +30,9 @@ add_library(Fitters SHARED
     SampleSummary.cpp
     MaCh3Factory.cpp
     StatisticalUtils.cpp
+    $<$<BOOL:${MaCh3_MPI_ENABLED}>:DEMCMC.cpp>
+    $<$<BOOL:${MaCh3_MPI_ENABLED}>:PTMR2T2.cpp>
+
     PredictiveThrower.cpp
     $<$<BOOL:${MaCh3_GPU_ENABLED}>:gpuMCMCProcessorUtils.cu>
 )

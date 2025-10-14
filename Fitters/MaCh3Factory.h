@@ -9,6 +9,10 @@
 #ifdef MaCh3_MINUIT2
 #include "Fitters/MinuitFit.h"
 #endif
+#ifdef MPIENABLED
+#include "Fitters/DEMCMC.h"
+#include "Fitters/PTMR2T2.h"
+#endif
 
 
 #include "Parameters/ParameterHandlerGeneric.h"
@@ -96,7 +100,7 @@ std::unique_ptr<CovType> MaCh3CovarianceFactory(manager *FitManager, const std::
     for (unsigned int j = 0; j < FixParams.size(); j++) {
       CovObject->ToggleFixParameter(FixParams.at(j));
     }
-  }
+}
   //Global step scale for matrix
   auto StepScale = Get<double>(Settings[std::string(PreFix) + "StepScale"], __FILE__, __LINE__);
 

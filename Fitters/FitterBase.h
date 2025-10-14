@@ -5,6 +5,10 @@
 #include <fstream>
 #include <sstream>
 
+#ifdef MPIENABLED
+#include <mpi.h>
+#endif
+
 // MaCh3 Includes
 #include "Samples/SampleHandlerBase.h"
 #include "Parameters/ParameterHandlerBase.h"
@@ -25,6 +29,7 @@ class FitterBase {
   /// @brief Constructor
   /// @param fitMan A pointer to a manager object, which will handle all settings.
   FitterBase(manager * const fitMan);
+
   /// @brief Destructor for the FitterBase class.
   virtual ~FitterBase();
 
@@ -32,9 +37,15 @@ class FitterBase {
   /// @param sample A pointer to a sample PDF object derived from ParameterHandlerBase.
   void AddSampleHandler(SampleHandlerBase* sample);
 
+  /// @brief Get the sample handlers
+  std::vector<SampleHandlerBase*> GetSampleHandlers() const { return samples; }
+
   /// @brief This function adds a Covariance object to the analysis framework. The Covariance object will be utilized in fitting procedures or likelihood scans.
   /// @param cov A pointer to a Covariance object derived from ParameterHandlerBase.
   void AddSystObj(ParameterHandlerBase* cov);
+
+  /// @brief Get the systematic objects
+  std::vector<ParameterHandlerBase*> GetSystObjs() const { return systematics; }
 
   /// @brief The specific fitting algorithm implemented in this function depends on the derived class. It could be Markov Chain Monte Carlo (MCMC), MinuitFit, or another algorithm.
   virtual void RunMCMC() = 0;
@@ -68,12 +79,16 @@ class FitterBase {
 
   /// @brief Get name of class
   inline std::string GetName() const {return AlgorithmName;};
- protected:
+  
+protected:
+  /// @brief Initialise
+  void Init();
+
   /// @brief Process MCMC output
   void ProcessMCMC();
 
   /// @brief Prepare the output file.
-  void PrepareOutput();
+  virtual void PrepareOutput();
 
   /// @brief Save output and close files.
   void SaveOutput();
@@ -168,6 +183,12 @@ class FitterBase {
 
   /// Name of fitting algorithm that is being used
   std::string AlgorithmName;
+
+  /// MPI rank  
+  #ifdef MPIENABLED
+  int mpi_rank;
+  int n_procs;
+  #endif
 
   #ifdef DEBUG
   /// Debugging flag

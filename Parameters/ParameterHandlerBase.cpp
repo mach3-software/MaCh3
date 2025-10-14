@@ -746,7 +746,7 @@ void ParameterHandlerBase::PrintNominalCurrProp() const {
   }
   MACH3LOG_INFO("{:<30} {:<10} {:<10} {:<10}", "Name", "Prior", "Current", "Proposed");
   for (int i = 0; i < _fNumPar; ++i) {
-    MACH3LOG_INFO("{:<30} {:<10.2f} {:<10.2f} {:<10.2f}", GetParFancyName(i), _fPreFitValue[i], _fCurrVal[i], _fPropVal[i]);
+    MACH3LOG_INFO("{:<30} {:<10.2f} {:<10.2e} {:<10.2e}", GetParFancyName(i), _fPreFitValue[i], _fCurrVal[i], _fPropVal[i]);
   }
 }
 

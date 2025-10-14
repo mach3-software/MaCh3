@@ -35,6 +35,5 @@ int main(int argc, char *argv[]) {
   std::string filename = argv[1];
   std::string config = argv[2];
   DiagMCMC(filename, config);
-
   return 0;
 }

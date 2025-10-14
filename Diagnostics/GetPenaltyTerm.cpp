@@ -383,6 +383,5 @@ int main(int argc, char *argv[])
   std::string filename = argv[1];
   std::string config = argv[2];
   GetPenaltyTerm(filename, config);
-
   return 0;
 }

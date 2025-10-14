@@ -386,6 +386,7 @@ void ParseArg(int argc, char *argv[]){
 
 int main(int argc, char *argv[])
 {
+
   SetMaCh3LoggerFormat();
   MaCh3Utils::MaCh3Welcome();
   ParseArg(argc, argv);

@@ -10,7 +10,7 @@ class MCMCBase : public FitterBase {
     /// @brief Constructor
     /// @param fitMan A pointer to a manager object, which will handle all settings.
     MCMCBase(manager * const fitMan);
-    
+
     /// @brief Destructor
     virtual ~MCMCBase() = default;
 
@@ -26,7 +26,9 @@ class MCMCBase : public FitterBase {
     /// @param L new chain length
     inline void setChainLength(unsigned int L) { chainLength = L; };
  protected:
-    /// @brief The full StartStep->DoStep->EndStep chain
+   void Init();   
+
+   /// @brief The full StartStep->DoStep->EndStep chain
     inline void DoMCMCStep();
 
     /// @brief Propose a step
@@ -36,7 +38,7 @@ class MCMCBase : public FitterBase {
     inline void PreStepProcess();
 
     /// @brief Actions after step proposal [end stopwatch, fill tree]
-    inline void PostStepProcess();
+   void PostStepProcess();
 
     /// @brief The MCMC step proposal and acceptance
     virtual void DoStep()=0;
@@ -49,13 +51,13 @@ class MCMCBase : public FitterBase {
     bool IsStepAccepted(const double acc_prob);
 
     /// @brief Accept a step
-    void AcceptStep();
+    virtual void AcceptStep();
 
     /// @brief Adaptive MCMC step
     inline void AdaptiveStep();
 
     /// @brief Print the progress
-    inline void PrintProgress();
+    virtual void PrintProgress();
 
     /// Do we reject based on hitting boundaries in systs
     bool out_of_bounds;
@@ -70,4 +72,5 @@ class MCMCBase : public FitterBase {
     bool anneal;
     /// simulated annealing temperature
     double AnnealTemp;
+
 };
