@@ -188,6 +188,8 @@ Functions</h2></td></tr>
 <tr class="memitem:a57771836d3d082d24170e24a2f04a4d6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="StatisticalUtils_8h.html#a57771836d3d082d24170e24a2f04a4d6">Get2DBayesianpValue</a> (TH2D *Histogram)</td></tr>
 <tr class="memdesc:a57771836d3d082d24170e24a2f04a4d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the 2D Bayesian p-value and generates a visualization.  <a href="StatisticalUtils_8h.html#a57771836d3d082d24170e24a2f04a4d6">More...</a><br /></td></tr>
 <tr class="separator:a57771836d3d082d24170e24a2f04a4d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9200ca12dfa35fbeedc9dff8d5b2d73a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="StatisticalUtils_8h.html#a9200ca12dfa35fbeedc9dff8d5b2d73a">PassErrorToRatioPlot</a> (TH1D *RatioHist, TH1D *Hist1, TH1D *DataHist)</td></tr>
+<tr class="separator:a9200ca12dfa35fbeedc9dff8d5b2d73a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Utility functions for statistical interpretations in MaCh3. </p>
@@ -1685,6 +1687,53 @@ Functions</h2></td></tr>
 <div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160;<span class="comment">// ********************</span></div>
 <div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160;  <span class="keywordflow">return</span> (value - mean) / stddev;</div>
 <div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a9200ca12dfa35fbeedc9dff8d5b2d73a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9200ca12dfa35fbeedc9dff8d5b2d73a">&#9670;&nbsp;</a></span>PassErrorToRatioPlot()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PassErrorToRatioPlot </td>
+          <td>(</td>
+          <td class="paramtype">TH1D *&#160;</td>
+          <td class="paramname"><em>RatioHist</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TH1D *&#160;</td>
+          <td class="paramname"><em>Hist1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TH1D *&#160;</td>
+          <td class="paramname"><em>DataHist</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="StatisticalUtils_8cpp_source.html#l00653">653</a> of file <a class="el" href="StatisticalUtils_8cpp_source.html">StatisticalUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;                                                                        {</div>
+<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;<span class="comment">// ****************</span></div>
+<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt;= RatioHist-&gt;GetNbinsX(); ++j)</div>
+<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;  {</div>
+<div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;    <span class="keywordflow">if</span>(DataHist-&gt;GetBinContent(j) &gt; 0)</div>
+<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;    {</div>
+<div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;      <span class="keywordtype">double</span> dx = Hist1-&gt;GetBinError(j) / DataHist-&gt;GetBinContent(j);</div>
+<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;      RatioHist-&gt;SetBinError(j, dx);</div>
+<div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;    }</div>
+<div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160;  }</div>
+<div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>

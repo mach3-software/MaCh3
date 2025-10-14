@@ -46,7 +46,7 @@ if (edges && edges.length) {
         </defs>
 
 <script type="text/javascript">
-var viewWidth = 818;
+var viewWidth = 983;
 var viewHeight = 173;
 var sectionId = 'dynsection-1';
 </script>
@@ -54,14 +54,14 @@ var sectionId = 'dynsection-1';
 <svg id="graph" class="graph">
 <g id="viewport">
 <title>Plotting/plottingUtils/styleManager.h</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-169 814,-169 814,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-169 979,-169 979,4 -4,4"/>
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
 <g id="a_node1"><a xlink:title=" ">
-<polygon fill="#bfbfbf" stroke="black" points="613.5,-134.5 613.5,-164.5 717.5,-164.5 717.5,-134.5 613.5,-134.5"/>
-<text text-anchor="start" x="621.5" y="-152.5" font-family="Helvetica" font-size="10.00">Plotting/plottingUtils</text>
-<text text-anchor="middle" x="665.5" y="-141.5" font-family="Helvetica" font-size="10.00">/styleManager.h</text>
+<polygon fill="#bfbfbf" stroke="black" points="737.5,-134.5 737.5,-164.5 841.5,-164.5 841.5,-134.5 737.5,-134.5"/>
+<text text-anchor="start" x="745.5" y="-152.5" font-family="Helvetica" font-size="10.00">Plotting/plottingUtils</text>
+<text text-anchor="middle" x="789.5" y="-141.5" font-family="Helvetica" font-size="10.00">/styleManager.h</text>
 </a>
 </g>
 </g>
@@ -69,48 +69,48 @@ var sectionId = 'dynsection-1';
 <g id="node2" class="node">
 <title>Node2</title>
 <g id="a_node2"><a xlink:href="plottingManager_8h.html" target="_top" xlink:title=" ">
-<polygon fill="white" stroke="black" points="438.5,-67.5 438.5,-97.5 542.5,-97.5 542.5,-67.5 438.5,-67.5"/>
-<text text-anchor="start" x="446.5" y="-85.5" font-family="Helvetica" font-size="10.00">Plotting/plottingUtils</text>
-<text text-anchor="middle" x="490.5" y="-74.5" font-family="Helvetica" font-size="10.00">/plottingManager.h</text>
+<polygon fill="white" stroke="black" points="522.5,-67.5 522.5,-97.5 626.5,-97.5 626.5,-67.5 522.5,-67.5"/>
+<text text-anchor="start" x="530.5" y="-85.5" font-family="Helvetica" font-size="10.00">Plotting/plottingUtils</text>
+<text text-anchor="middle" x="574.5" y="-74.5" font-family="Helvetica" font-size="10.00">/plottingManager.h</text>
 </a>
 </g>
 </g>
 <!-- Node1&#45;&gt;Node2 -->
 <g id="edge1" class="edge">
 <title>Node1&#45;&gt;Node2</title>
-<path fill="none" stroke="midnightblue" d="M617.9,-130.82C589.77,-120.37 554.64,-107.32 528.4,-97.58"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="616.93,-134.2 627.53,-134.4 619.37,-127.63 616.93,-134.2"/>
-</g>
-<!-- Node8 -->
-<g id="node8" class="node">
-<title>Node8</title>
-<g id="a_node8"><a xlink:href="plotting_8cpp.html" target="_top" xlink:title=" ">
-<polygon fill="white" stroke="black" points="711,-6 711,-25 810,-25 810,-6 711,-6"/>
-<text text-anchor="middle" x="760.5" y="-13" font-family="Helvetica" font-size="10.00">python/plotting.cpp</text>
-</a>
-</g>
-</g>
-<!-- Node1&#45;&gt;Node8 -->
-<g id="edge9" class="edge">
-<title>Node1&#45;&gt;Node8</title>
-<path fill="none" stroke="midnightblue" d="M666.51,-123.86C668.29,-106.61 672.88,-83.74 684.5,-67 698.14,-47.35 722.13,-33.31 739.51,-25.1"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="662.99,-124.02 665.71,-134.26 669.97,-124.56 662.99,-124.02"/>
+<path fill="none" stroke="midnightblue" d="M733.53,-131.58C698.61,-121.02 654.19,-107.59 621.17,-97.61"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="732.53,-134.93 743.11,-134.48 734.55,-128.23 732.53,-134.93"/>
 </g>
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="styleManager_8cpp.html" target="_top" xlink:title=" ">
-<polygon fill="white" stroke="black" points="693.5,-67.5 693.5,-97.5 797.5,-97.5 797.5,-67.5 693.5,-67.5"/>
-<text text-anchor="start" x="701.5" y="-85.5" font-family="Helvetica" font-size="10.00">Plotting/plottingUtils</text>
-<text text-anchor="middle" x="745.5" y="-74.5" font-family="Helvetica" font-size="10.00">/styleManager.cpp</text>
+<g id="a_node9"><a xlink:href="plotting_8cpp.html" target="_top" xlink:title=" ">
+<polygon fill="white" stroke="black" points="876,-6 876,-25 975,-25 975,-6 876,-6"/>
+<text text-anchor="middle" x="925.5" y="-13" font-family="Helvetica" font-size="10.00">python/plotting.cpp</text>
 </a>
 </g>
 </g>
 <!-- Node1&#45;&gt;Node9 -->
-<g id="edge8" class="edge">
+<g id="edge10" class="edge">
 <title>Node1&#45;&gt;Node9</title>
-<path fill="none" stroke="midnightblue" d="M690.87,-127.88C703.03,-118.01 717.28,-106.43 728.18,-97.58"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="688.41,-125.37 682.86,-134.4 692.83,-130.81 688.41,-125.37"/>
+<path fill="none" stroke="midnightblue" d="M789.54,-124.3C790.79,-106.59 795.15,-82.97 808.5,-67 820.49,-52.66 867.64,-35.24 898.3,-25.06"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="786.04,-124.3 789.11,-134.44 793.03,-124.59 786.04,-124.3"/>
+</g>
+<!-- Node10 -->
+<g id="node10" class="node">
+<title>Node10</title>
+<g id="a_node10"><a xlink:href="styleManager_8cpp.html" target="_top" xlink:title=" ">
+<polygon fill="white" stroke="black" points="817.5,-67.5 817.5,-97.5 921.5,-97.5 921.5,-67.5 817.5,-67.5"/>
+<text text-anchor="start" x="825.5" y="-85.5" font-family="Helvetica" font-size="10.00">Plotting/plottingUtils</text>
+<text text-anchor="middle" x="869.5" y="-74.5" font-family="Helvetica" font-size="10.00">/styleManager.cpp</text>
+</a>
+</g>
+</g>
+<!-- Node1&#45;&gt;Node10 -->
+<g id="edge9" class="edge">
+<title>Node1&#45;&gt;Node10</title>
+<path fill="none" stroke="midnightblue" d="M814.87,-127.88C827.03,-118.01 841.28,-106.43 852.18,-97.58"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="812.41,-125.37 806.86,-134.4 816.83,-130.81 812.41,-125.37"/>
 </g>
 <!-- Node3 -->
 <g id="node3" class="node">
@@ -125,8 +125,8 @@ var sectionId = 'dynsection-1';
 <!-- Node2&#45;&gt;Node3 -->
 <g id="edge2" class="edge">
 <title>Node2&#45;&gt;Node3</title>
-<path fill="none" stroke="midnightblue" d="M428.15,-73.85C356.75,-64.82 236.39,-48.77 133.5,-31 130.77,-30.53 127.99,-30.03 125.18,-29.52"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="427.96,-77.35 438.32,-75.13 428.83,-70.41 427.96,-77.35"/>
+<path fill="none" stroke="midnightblue" d="M512.29,-76.11C426.69,-68.29 267.88,-52.37 133.5,-31 130.77,-30.57 127.98,-30.1 125.17,-29.61"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="512.09,-79.6 522.36,-77.02 512.72,-72.63 512.09,-79.6"/>
 </g>
 <!-- Node4 -->
 <g id="node4" class="node">
@@ -140,8 +140,8 @@ var sectionId = 'dynsection-1';
 <!-- Node2&#45;&gt;Node4 -->
 <g id="edge3" class="edge">
 <title>Node2&#45;&gt;Node4</title>
-<path fill="none" stroke="midnightblue" d="M428.54,-67.32C372.14,-54.41 290.75,-35.78 243.77,-25.03"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="427.88,-70.76 438.41,-69.58 429.44,-63.94 427.88,-70.76"/>
+<path fill="none" stroke="midnightblue" d="M512.22,-71.43C452.25,-61.6 359.05,-45.98 278.5,-31 268.6,-29.16 257.95,-27.07 247.96,-25.07"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="511.85,-74.91 522.28,-73.07 512.98,-68.01 511.85,-74.91"/>
 </g>
 <!-- Node5 -->
 <g id="node5" class="node">
@@ -155,8 +155,8 @@ var sectionId = 'dynsection-1';
 <!-- Node2&#45;&gt;Node5 -->
 <g id="edge4" class="edge">
 <title>Node2&#45;&gt;Node5</title>
-<path fill="none" stroke="midnightblue" d="M448.77,-63.3C420.03,-50.76 383.18,-34.68 361,-25.01"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="447.6,-66.61 458.17,-67.4 450.4,-60.19 447.6,-66.61"/>
+<path fill="none" stroke="midnightblue" d="M514.46,-64.75C468.89,-52.04 408.12,-35.09 372.07,-25.03"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="513.66,-68.16 524.23,-67.48 515.54,-61.42 513.66,-68.16"/>
 </g>
 <!-- Node6 -->
 <g id="node6" class="node">
@@ -170,30 +170,45 @@ var sectionId = 'dynsection-1';
 <!-- Node2&#45;&gt;Node6 -->
 <g id="edge5" class="edge">
 <title>Node2&#45;&gt;Node6</title>
-<path fill="none" stroke="midnightblue" d="M490.5,-57.25C490.5,-46.02 490.5,-33.38 490.5,-25.19"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="487,-57.4 490.5,-67.4 494,-57.4 487,-57.4"/>
+<path fill="none" stroke="midnightblue" d="M548.02,-61.01C532.42,-48.94 513.51,-34.3 501.74,-25.19"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="546.22,-64.04 556.27,-67.4 550.51,-58.51 546.22,-64.04"/>
 </g>
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="plottingManager_8cpp.html" target="_top" xlink:title=" ">
-<polygon fill="white" stroke="black" points="586,-0.5 586,-30.5 693,-30.5 693,-0.5 586,-0.5"/>
-<text text-anchor="start" x="594" y="-18.5" font-family="Helvetica" font-size="10.00">Plotting/plottingUtils</text>
-<text text-anchor="middle" x="639.5" y="-7.5" font-family="Helvetica" font-size="10.00">/plottingManager.cpp</text>
+<g id="a_node7"><a xlink:href="PredictivePlotting_8cpp.html" target="_top" xlink:title=" ">
+<polygon fill="white" stroke="black" points="586,-6 586,-25 733,-25 733,-6 586,-6"/>
+<text text-anchor="middle" x="659.5" y="-13" font-family="Helvetica" font-size="10.00">Plotting/PredictivePlotting.cpp</text>
 </a>
 </g>
 </g>
 <!-- Node2&#45;&gt;Node7 -->
 <g id="edge6" class="edge">
 <title>Node2&#45;&gt;Node7</title>
-<path fill="none" stroke="midnightblue" d="M532.29,-63.27C556.02,-52.92 585.28,-40.15 607.23,-30.58"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="530.6,-60.19 522.83,-67.4 533.4,-66.61 530.6,-60.19"/>
+<path fill="none" stroke="midnightblue" d="M601.3,-61.01C617.08,-48.94 636.22,-34.3 648.13,-25.19"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="598.76,-58.54 592.94,-67.4 603.01,-64.1 598.76,-58.54"/>
+</g>
+<!-- Node8 -->
+<g id="node8" class="node">
+<title>Node8</title>
+<g id="a_node8"><a xlink:href="plottingManager_8cpp.html" target="_top" xlink:title=" ">
+<polygon fill="white" stroke="black" points="751,-0.5 751,-30.5 858,-30.5 858,-0.5 751,-0.5"/>
+<text text-anchor="start" x="759" y="-18.5" font-family="Helvetica" font-size="10.00">Plotting/plottingUtils</text>
+<text text-anchor="middle" x="804.5" y="-7.5" font-family="Helvetica" font-size="10.00">/plottingManager.cpp</text>
+</a>
+</g>
 </g>
 <!-- Node2&#45;&gt;Node8 -->
 <g id="edge7" class="edge">
 <title>Node2&#45;&gt;Node8</title>
-<path fill="none" stroke="midnightblue" d="M552.68,-66.88C594.96,-56.89 652.14,-43.29 702.5,-31 710.26,-29.1 718.6,-27.04 726.47,-25.07"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="551.74,-63.51 542.81,-69.21 553.35,-70.32 551.74,-63.51"/>
+<path fill="none" stroke="midnightblue" d="M633.89,-64.71C671.32,-54.14 719.1,-40.63 754.57,-30.61"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="632.79,-61.39 624.12,-67.48 634.7,-68.12 632.79,-61.39"/>
+</g>
+<!-- Node2&#45;&gt;Node9 -->
+<g id="edge8" class="edge">
+<title>Node2&#45;&gt;Node9</title>
+<path fill="none" stroke="midnightblue" d="M636.58,-72.17C696.06,-62.91 788.24,-47.71 867.5,-31 875.83,-29.24 884.77,-27.13 893.08,-25.06"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="635.94,-68.73 626.59,-73.72 637.01,-75.65 635.94,-68.73"/>
 </g>
 </g>
 </svg>

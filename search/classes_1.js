@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['binnedsplinehandler_1861',['BinnedSplineHandler',['../classBinnedSplineHandler.html',1,'']]],
-  ['binshiftlookup_1862',['BinShiftLookup',['../structBinShiftLookup.html',1,'']]]
+  ['binnedsplinehandler_1866',['BinnedSplineHandler',['../classBinnedSplineHandler.html',1,'']]],
+  ['binshiftlookup_1867',['BinShiftLookup',['../structBinShiftLookup.html',1,'']]]
 ];

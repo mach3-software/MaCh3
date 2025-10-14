@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['adaptivemcmchandler_1860',['AdaptiveMCMCHandler',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html',1,'adaptive_mcmc']]]
+  ['adaptivemcmchandler_1865',['AdaptiveMCMCHandler',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html',1,'adaptive_mcmc']]]
 ];
