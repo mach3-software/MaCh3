@@ -359,11 +359,14 @@ namespace MaCh3Utils {
       case 211: return 0.13957039; // pi_+/-
       case 111: return 0.1349768;  // pi_0
       case 221: return 0.547862;   // eta
+      case 331: return 0.95778;    // eta'
       case 311:                    // K_0
       case 130:                    // K_0_L
       case 310:                    // K_0_S
         return 0.497611;
       case 321: return 0.493677;   // K_+/-
+      case 113: return 0.77526;    // rho_0
+      case 223: return 1.41;       // omega
       // Baryons
       case 2112: return 0.939565; // n
       case 2212: return 0.938272; // p
@@ -371,6 +374,7 @@ namespace MaCh3Utils {
       case 3222: return 1.118937; // sig_+
       case 3112: return 1.197449; // sig_-
       case 3212: return 1.192642; // sig_0
+      case 3312: return 1.32171;  // xi_-
       // Nuclei
       case 1000050110: return 10.255103; // Boron-11
       case 1000060120: return 11.177929; // Carbon-12
