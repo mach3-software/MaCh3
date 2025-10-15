@@ -83,15 +83,15 @@ int BinningHandler::FindGlobalBin(const int NomSample, const double XVar, const 
 // ************************************************
 int BinningHandler::GetBinSafe(const int Sample, const int xBin, const int yBin) const {
   // ************************************************
-  const int GlobalbBin = SampleBinning[Sample].GetBinSafe(xBin, yBin);
-  return GlobalbBin;
+  const int GlobalBin = SampleBinning[Sample].GetBinSafe(xBin, yBin);
+  return GlobalBin;
 }
 
 // ************************************************
 int BinningHandler::GetGlobalBinSafe(const int Sample, const int xBin, const int yBin) const {
 // ************************************************
-  const int GlobalbBin = SampleBinning[Sample].GetBinSafe(xBin, yBin) + static_cast<int>(SampleBinning[Sample].GlobalOffset);
-  return GlobalbBin;
+  const int GlobalBin = SampleBinning[Sample].GetBinSafe(xBin, yBin) + static_cast<int>(SampleBinning[Sample].GlobalOffset);
+  return GlobalBin;
 }
 
 // ************************************************

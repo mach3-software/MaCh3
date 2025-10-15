@@ -261,7 +261,7 @@ void FitterBase::AddSampleHandler(SampleHandlerBase * const sample) {
         if (s->GetSampleTitle(iExisting) == sample->GetSampleTitle(iNew)) {
           MACH3LOG_ERROR(
             "Duplicate sample title '{}' in handler {} detected: "
-            "same tittle exist in handler ", sample->GetSampleTitle(iNew),
+            "same title exist in handler ", sample->GetSampleTitle(iNew),
             sample->GetSampleHandlerName(), s->GetSampleHandlerName());
           throw MaCh3Exception(__FILE__, __LINE__);
         }
