@@ -140,9 +140,12 @@ void FitterBase::SaveSettings() {
   for(unsigned int i = 0; i < systematics.size(); ++i)
     MACH3LOG_INFO("{}: Cov name: {}, it has {} params", i, systematics[i]->GetName(), systematics[i]->GetNumParams());
   MACH3LOG_INFO("Number of SampleHandlers: {}", samples.size());
-  for(unsigned int i = 0; i < samples.size(); ++i)
+  for(unsigned int i = 0; i < samples.size(); ++i) {
     MACH3LOG_INFO("{}: SampleHandler name: {}, it has {} samples",i , samples[i]->GetSampleHandlerName(), samples[i]->GetNsamples());
-
+    for(int iSam = 0; iSam < samples[i]->GetNsamples(); ++iSam) {
+      MACH3LOG_INFO("   {}: Sample name: {}, with {} osc channels",iSam , samples[i]->GetSampleTitle(iSam), samples[i]->GetNOscChannels(iSam));
+    }
+  }
   //TN: Have to close the folder in order to write it to disk before SaveOutput is called in the destructor
   CovFolder->Close();
   SampleFolder->Close();
