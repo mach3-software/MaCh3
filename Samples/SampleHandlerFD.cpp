@@ -237,7 +237,7 @@ void SampleHandlerFD::Initialise() {
       }
 
       if(OscParams.size() != Oscillator->GetOscParamsSize()){
-        MACH3LOG_ERROR("SampleHandler {} has {} osc params, while shared NuOsc has {} osc params", GetSampleHandlerName(),
+        MACH3LOG_ERROR("SampleHandler {} has {} osc params, while shared NuOsc has {} osc params", GetName(),
                        OscParams.size(), Oscillator->GetOscParamsSize());
         MACH3LOG_ERROR("This indicate misconfiguration in your Osc yaml");
         throw MaCh3Exception(__FILE__, __LINE__);
@@ -721,7 +721,7 @@ void SampleHandlerFD::SetupNormParameters() {
 // ***************************************************************************
   std::vector< std::vector< int > > xsec_norms_bins(GetNEvents());
 
-  std::vector<NormParameter> norm_parameters = ParHandler->GetNormParsFromSampleName(GetSampleHandlerName());
+  std::vector<NormParameter> norm_parameters = ParHandler->GetNormParsFromSampleName(GetName());
 
   if(!ParHandler){
     MACH3LOG_ERROR("ParHandler is not setup!");
@@ -1157,7 +1157,7 @@ void SampleHandlerFD::InitialiseNuOscillatorObjects() {
   }
   std::vector<const double*> OscParams = ParHandler->GetOscParsFromSampleName(SampleHandlerName);
   if (OscParams.empty()) {
-    MACH3LOG_ERROR("OscParams is empty for sample '{}'.", GetSampleHandlerName());
+    MACH3LOG_ERROR("OscParams is empty for sample '{}'.", GetName());
     MACH3LOG_ERROR("This likely indicates an error in your oscillation YAML configuration.");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
@@ -1243,7 +1243,7 @@ void SampleHandlerFD::SetupNuOscillatorPointers() {
   } // end loop over events
 }
 
-std::string SampleHandlerFD::GetSampleHandlerName() const {
+std::string SampleHandlerFD::GetName() const {
   //ETA - extra safety to make sure SampleHandlerName is actually set
   // probably unnecessary due to the requirement for it to be in the yaml config
   if(SampleHandlerName.length() == 0) {
@@ -1357,7 +1357,7 @@ void SampleHandlerFD::SaveAdditionalInfo(TDirectory* Dir) {
   Dir->cd();
 
   YAML::Node Config = SampleManager->raw();
-  TMacro ConfigSave = YAMLtoTMacro(Config, (std::string("Config_") + GetSampleHandlerName()));
+  TMacro ConfigSave = YAMLtoTMacro(Config, (std::string("Config_") + GetName()));
   ConfigSave.Write();
 
   for(int iSample = 0; iSample < GetNsamples(); iSample++)

@@ -31,7 +31,7 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// @ingroup SampleHandlerGetters
   int GetNDim(const int Sample) const { return SampleDetails[Sample].nDimensions; }
   /// @ingroup SampleHandlerGetters
-  std::string GetSampleHandlerName() const override;
+  std::string GetName() const override;
   /// @ingroup SampleHandlerGetters
   std::string GetSampleTitle(const int Sample) const override {return SampleDetails[Sample].SampleTitle;}
 

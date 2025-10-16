@@ -141,7 +141,7 @@ void FitterBase::SaveSettings() {
     MACH3LOG_INFO("{}: Cov name: {}, it has {} params", i, systematics[i]->GetName(), systematics[i]->GetNumParams());
   MACH3LOG_INFO("Number of SampleHandlers: {}", samples.size());
   for(unsigned int i = 0; i < samples.size(); ++i) {
-    MACH3LOG_INFO("{}: SampleHandler name: {}, it has {} samples",i , samples[i]->GetSampleHandlerName(), samples[i]->GetNsamples());
+    MACH3LOG_INFO("{}: SampleHandler name: {}, it has {} samples",i , samples[i]->GetName(), samples[i]->GetNsamples());
     for(int iSam = 0; iSam < samples[i]->GetNsamples(); ++iSam) {
       MACH3LOG_INFO("   {}: Sample name: {}, with {} osc channels",iSam , samples[i]->GetSampleTitle(iSam), samples[i]->GetNOscChannels(iSam));
     }
@@ -265,7 +265,7 @@ void FitterBase::AddSampleHandler(SampleHandlerBase * const sample) {
           MACH3LOG_ERROR(
             "Duplicate sample title '{}' in handler {} detected: "
             "same title exist in handler ", sample->GetSampleTitle(iNew),
-            sample->GetSampleHandlerName(), s->GetSampleHandlerName());
+            sample->GetName(), s->GetName());
           throw MaCh3Exception(__FILE__, __LINE__);
         }
       }
@@ -273,8 +273,8 @@ void FitterBase::AddSampleHandler(SampleHandlerBase * const sample) {
   }
 
   for (const auto &s : samples) {
-    if (s->GetSampleHandlerName() == sample->GetSampleHandlerName()) {
-      MACH3LOG_ERROR("SampleHandler with name '{}' already exists!", sample->GetSampleHandlerName());
+    if (s->GetName() == sample->GetName()) {
+      MACH3LOG_ERROR("SampleHandler with name '{}' already exists!", sample->GetName());
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   }
@@ -283,7 +283,7 @@ void FitterBase::AddSampleHandler(SampleHandlerBase * const sample) {
 
   sample->SaveAdditionalInfo(SampleFolder);
   TotalNSamples += sample->GetNsamples();
-  MACH3LOG_INFO("Adding {} object, with {} samples", sample->GetSampleHandlerName(), sample->GetNsamples());
+  MACH3LOG_INFO("Adding {} object, with {} samples", sample->GetName(), sample->GetNsamples());
   samples.push_back(sample);
   outputFile->cd();
 }
@@ -446,7 +446,7 @@ void FitterBase::DragRace(const int NLaps) {
       samples[ivs]->Reweight();
     }
     clockRace.Stop();
-    MACH3LOG_INFO("It took {:.4f} s to reweights {} times sample: {}", clockRace.RealTime(), NLaps, samples[ivs]->GetSampleHandlerName());
+    MACH3LOG_INFO("It took {:.4f} s to reweights {} times sample: {}", clockRace.RealTime(), NLaps, samples[ivs]->GetName());
     MACH3LOG_INFO("On average {:.6f}", clockRace.RealTime()/NLaps);
   }
 
@@ -458,7 +458,7 @@ void FitterBase::DragRace(const int NLaps) {
       samples[ivs]->GetLikelihood();
     }
     clockRace.Stop();
-    MACH3LOG_INFO("It took {:.4f} s to calculate  GetLikelihood {} times sample:  {}", clockRace.RealTime(), NLaps, samples[ivs]->GetSampleHandlerName());
+    MACH3LOG_INFO("It took {:.4f} s to calculate  GetLikelihood {} times sample:  {}", clockRace.RealTime(), NLaps, samples[ivs]->GetName());
     MACH3LOG_INFO("On average {:.6f}", clockRace.RealTime()/NLaps);
   }
   // Get vector of proposed steps. If we want to run LLH scan or something else after we need to revert changes after proposing steps multiple times
@@ -554,7 +554,7 @@ void FitterBase::RunLLHScan() {
   std::vector<TDirectory *> SampleClass_LLH(samples.size());
   for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
   {
-    std::string NameTemp = samples[ivs]->GetSampleHandlerName();
+    std::string NameTemp = samples[ivs]->GetName();
     SampleClass_LLH[ivs] = outputFile->mkdir(NameTemp.c_str());
   }
 
@@ -653,7 +653,7 @@ void FitterBase::RunLLHScan() {
       std::vector<double> nSamLLH(samples.size());
       for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
       {
-        std::string NameTemp = samples[ivs]->GetSampleHandlerName();
+        std::string NameTemp = samples[ivs]->GetName();
         hScanSample[ivs] = std::make_unique<TH1D>((name+"_"+NameTemp).c_str(), (name+"_" + NameTemp).c_str(), n_points, lower, upper);
         hScanSample[ivs]->SetDirectory(nullptr);
         hScanSample[ivs]->SetTitle(("2LLH_" + NameTemp + ", " + name + ";" + name + "; -2(ln L_{" + NameTemp +"})").c_str());

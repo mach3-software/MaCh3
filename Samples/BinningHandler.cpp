@@ -44,6 +44,7 @@ void BinningHandler::SetupSampleBinning(const std::vector<double>& X_BinEdges, c
   //Sanity check that some binning has been specified
   if(SingleBinning.XBinEdges.size() == 0 && SingleBinning.YBinEdges.size() == 0){
     MACH3LOG_ERROR("No binning specified for either X or Y of sample binning, please add some binning to the sample config");
+    MACH3LOG_ERROR("Please ensure XVarBins and/or YVarStr are correctly configured");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 

@@ -41,7 +41,7 @@ class SampleHandlerBase
   /// @ingroup SampleHandlerGetters
   virtual std::string GetSampleTitle(const int Sample) const = 0;
   /// @ingroup SampleHandlerGetters
-  virtual std::string GetSampleHandlerName() const = 0;
+  virtual std::string GetName() const = 0;
   /// @ingroup SampleHandlerGetters
   virtual double GetSampleLikelihood(const int isample) const = 0;
   /// @brief Allow to clean not used memory before fit starts

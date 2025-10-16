@@ -13,11 +13,11 @@ public:
     using SampleHandlerBase::SampleHandlerBase;
 
     /* Trampoline (need one for each virtual function) */
-    std::string GetSampleHandlerName() const override {
+    std::string GetName() const override {
         PYBIND11_OVERRIDE_PURE(
             std::string,          /* Return type */
             SampleHandlerBase,    /* Parent class */
-            GetSampleHandlerName, /* Name of function in C++ (must match Python name) */
+            GetName, /* Name of function in C++ (must match Python name) */
         );
     }
 
