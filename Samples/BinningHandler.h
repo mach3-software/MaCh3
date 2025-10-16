@@ -3,6 +3,8 @@
 #include <string>
 
 #include "Samples/SampleStructs.h"
+#include "Samples/FarDetectorCoreInfoStruct.h"
+#include "Manager/Manager.h"
 
 // ***************************
 /// @brief KS: Class handling binning for multiple samples
@@ -59,9 +61,7 @@ class BinningHandler {
 
   /// @brief Function to setup the binning of your sample histograms and the underlying
   /// arrays that get handled in fillArray() and fillArray_MP().
-  /// The Binning.XBinEdges are filled in the daughter class from the sample config file.
-  /// This "passing" can be removed.
-  void SetupSampleBinning(const std::vector<double>& X_BinEdges, const std::vector<double>& Y_BinEdges);
+  void SetupSampleBinning(const YAML::Node& Settings, SampleInfo& SingleSample);
 
  private:
   /// Total number of bins

@@ -114,60 +114,8 @@ void SampleHandlerFD::LoadSingleSample(const int iSample, const YAML::Node& Samp
   //SampleTitle has to be provided in the sample yaml otherwise this will throw an exception
   SingleSample.SampleTitle = Get<std::string>(SampleSettings["SampleTitle"], __FILE__ , __LINE__);
 
-  //Binning
-  SingleSample.nDimensions = 0;
-  SingleSample.XVarStr = GetFromManager(SampleSettings["Binning"]["XVarStr"], std::string(""));
-  auto XBinEdges = GetFromManager(SampleSettings["Binning"]["XVarBins"], std::vector<double>());
-  const auto& edgesx = XBinEdges;
-  if (!std::is_sorted(edgesx.begin(), edgesx.end())) {
-    MACH3LOG_ERROR("XVarBins must be in increasing order in sample config {}\n  XVarBins: [{}]",
-                   SingleSample.SampleTitle, fmt::join(edgesx, ", "));
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  if(SingleSample.XVarStr.length() > 0){
-    SingleSample.nDimensions++;
-  } else{
-    MACH3LOG_ERROR("Please specify an X-variable string in sample config {}", SampleManager->GetFileName());
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
 
-  SingleSample.YVarStr = GetFromManager(SampleSettings["Binning"]["YVarStr"], std::string(""));
-  auto YBinEdges = GetFromManager(SampleSettings["Binning"]["YVarBins"], std::vector<double>());
-  const auto& edgesy = YBinEdges;
-  if (!std::is_sorted(edgesy.begin(), edgesy.end())) {
-    MACH3LOG_ERROR("YBinEdges must be in increasing order in sample config {}\n  YBinEdges: [{}]",
-                   SingleSample.SampleTitle, fmt::join(edgesy, ", "));
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  if(SingleSample.YVarStr.length() > 0){
-    if(SingleSample.XVarStr.length() == 0){
-      MACH3LOG_ERROR("Please specify an X-variable string in sample config {}. I won't work only with a Y-variable", SampleManager->GetFileName());
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-    SingleSample.nDimensions++;
-  }
-
-  if(SingleSample.nDimensions == 0){
-    MACH3LOG_ERROR("Error setting up the sample binning");
-    MACH3LOG_ERROR("Number of dimensions is {}", SingleSample.nDimensions);
-    MACH3LOG_ERROR("Check that an XVarStr has been given in the sample config");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  } else{
-    MACH3LOG_INFO("Found {} dimensions for sample binning", SingleSample.nDimensions);
-  }
-
-  //Check whether you are setting up 1D or 2D binning
-  if(SingleSample.nDimensions == 1){
-    MACH3LOG_INFO("Setting up {}D binning with {}", SingleSample.nDimensions, SingleSample.XVarStr);
-    YBinEdges = {-1e8, 1e8};
-  } else if(SingleSample.nDimensions == 2){
-    MACH3LOG_INFO("Setting up {}D binning with {} and {}", SingleSample.nDimensions, SingleSample.XVarStr, SingleSample.YVarStr);
-  } else{
-    MACH3LOG_ERROR("Number of dimensions is not 1 or 2, this is unsupported at the moment");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-
-  Binning->SetupSampleBinning(XBinEdges, YBinEdges);
+  Binning->SetupSampleBinning(SampleSettings["Binning"], SingleSample);
 
   auto mtupleprefix  = Get<std::string>(SampleSettings["InputFiles"]["mtupleprefix"], __FILE__, __LINE__);
   auto mtuplesuffix  = Get<std::string>(SampleSettings["InputFiles"]["mtuplesuffix"], __FILE__, __LINE__);
