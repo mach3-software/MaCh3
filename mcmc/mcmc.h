@@ -78,8 +78,12 @@ class mcmc : public FitterBase {
   double multicanonicalBeta;
   /// umbrella number
   int umbrellaNumber;
+  /// Toggle for setting umbrella widths based on umbrella overlap
+  bool umbrellaOverlapMode;
   /// the desired overlap of evenly placed umbrellas
   double umbrellaSigmaOverlap;
+  /// umbrella auto adjust step scale mode
+  bool umbrellaAdjustStepScale;
   /// umbrella relative step scale
   double umbrellaStepScaleFactor;
   /// multi-canonical sigma

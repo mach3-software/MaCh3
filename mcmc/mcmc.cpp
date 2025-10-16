@@ -153,24 +153,37 @@ void mcmc::runMCMC() {
     } else if (multicanonicalSeparate) { 
       // If we are using the multicanonical method in separate chains, we need to get the separate mean and sigma values
       MACH3LOG_INFO("Using separate multicanonical method");
-      umbrellaNumber = GetFromManager<int>(fitMan->raw()["General"]["MCMC"]["UmbrellaNumber"], 5);
-      umbrellaSigmaOverlap = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["UmbrellaSigmaOverlap"], 3.0);
-      MACH3LOG_INFO("Setting umbrella number to {}", umbrellaNumber);
-      multicanonicalSeparateSigma = TMath::Pi()/((umbrellaNumber - 1)*(umbrellaSigmaOverlap));
       multicanonicalSeparateMean = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["MulticanonicalSeparateMean"], -TMath::Pi());
       MACH3LOG_INFO("Setting multicanonical mean to {}", multicanonicalSeparateMean);
+      umbrellaNumber = GetFromManager<int>(fitMan->raw()["General"]["MCMC"]["UmbrellaNumber"], 5);
+      umbrellaOverlapMode = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["UmbrellaOverlapMode"], false);
+      if (umbrellaOverlapMode) {
+        MACH3LOG_INFO("Setting width based on # of sigma overlapping between umbrellas");
+        umbrellaSigmaOverlap = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["UmbrellaSigmaOverlap"], 3.0);
+        MACH3LOG_INFO("Setting umbrella number to {}", umbrellaNumber);
+        multicanonicalSeparateSigma = TMath::Pi()/((umbrellaNumber - 1)*(umbrellaSigmaOverlap));
+      } else {
+        MACH3LOG_INFO("Setting width based on value in config (default 2pi/umbrellaNumber)");
+        multicanonicalSeparateSigma = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["MulticanonicalSeparateSigma"],(2*TMath::Pi())/umbrellaNumber);
+      } 
       // set individual step scale for dcp, so that the ratio of the step scale to the multicanonical sigma is stepscale/1sigmaerror = 1/2pi 
+      umbrellaAdjustStepScale = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["UmbrellaAdjustStepScale"], false);
       umbrellaStepScaleFactor = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["UmbrellaStepScaleFactor"], 1.0);
-      MACH3LOG_INFO("Setting umbrella step scale factor to {}", umbrellaStepScaleFactor);
-      double stepScale = (multicanonicalSeparateSigma * umbrellaStepScaleFactor) / (2.0 * TMath::Pi());
-      MACH3LOG_INFO("Setting individual step scale for multicanonical separate to {}", stepScale);
-      // Set the individual step scale for the multicanonical variable
-      for (auto& syst : systematics) {
-        if (syst->getName() == "osc_cov") {
-          syst->setIndivStepScale(multicanonicalVar, stepScale);
-          MACH3LOG_INFO("Setting individual step scale for {} systematic to {}", multicanonicalVar, stepScale);
-        }
-      }      
+      if (umbrellaAdjustStepScale){
+        MACH3LOG_INFO("Adjusting umbrella step scale to keep ratio of step scale to multicanonical sigma constant");
+        MACH3LOG_INFO("Setting umbrella step scale factor to {}", umbrellaStepScaleFactor);
+        double stepScale = (multicanonicalSeparateSigma * umbrellaStepScaleFactor) / (2.0 * TMath::Pi());
+        MACH3LOG_INFO("Setting individual step scale for multicanonical separate to {}", stepScale);
+        // Set the individual step scale for the multicanonical variable
+        for (auto& syst : systematics) {
+          if (syst->getName() == "osc_cov") {
+            syst->setIndivStepScale(multicanonicalVar, stepScale);
+            MACH3LOG_INFO("Setting individual step scale for {} systematic to {}", multicanonicalVar, stepScale);
+          }
+        }       
+      } else {
+        MACH3LOG_INFO("Not adjusting umbrella step scale, using value in OscCov config");
+      }
     } else {
       MACH3LOG_INFO("Using multicanonical Gaussian umbrellas");
       // Get the multicanonical sigma values from the configuration file
