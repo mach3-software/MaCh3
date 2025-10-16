@@ -95,7 +95,13 @@ void PredictiveThrower::SetupSampleInformation() {
   for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
     MC_Hist_Toy[sample].resize(Ntoys);
     W2_Hist_Toy[sample].resize(Ntoys);
-    SampleNames[sample] = samples[sample]->GetSampleTitle(sample);
+  }
+  int counter = 0;
+  for (size_t iPDF = 0; iPDF < samples.size(); iPDF++) {
+    for (int SampleIndex = 0; SampleIndex < samples[iPDF]->GetNsamples(); ++SampleIndex) {
+      SampleNames[counter] = samples[iPDF]->GetSampleTitle(SampleIndex);
+      counter++;
+    }
   }
   SampleNames[TotalNumberOfSamples] = "Total";
 }
