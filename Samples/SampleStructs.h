@@ -363,18 +363,27 @@ namespace MaCh3Utils {
       case 311:                    // K_0
       case 130:                    // K_0_L
       case 310:                    // K_0_S
-        return 0.497611;
+        return 0.497611; 
       case 321: return 0.493677;   // K_+/-
       case 113: return 0.77526;    // rho_0
-      case 223: return 1.41;       // omega
+      case 213: return 0.77511;    // rho_+/-
+      case 223: return 0.78266;    // omega
+      case 411: return 1.86966;    // D_+/-
+      case 421: return 1.86484;    // D_0
+      case 431: return 1.96835;    // D_s+/-
       // Baryons
       case 2112: return 0.939565; // n
       case 2212: return 0.938272; // p
-      case 3122: return 1.115683; // lambda
-      case 3222: return 1.118937; // sig_+
-      case 3112: return 1.197449; // sig_-
-      case 3212: return 1.192642; // sig_0
-      case 3312: return 1.32171;  // xi_-
+      case 3122: return 1.115683; // Lambda
+      case 3222: return 1.118937; // Sig_+
+      case 3112: return 1.197449; // Sig_-
+      case 3212: return 1.192642; // Sig_0
+      case 3312: return 1.32171;  // Xi_+/-
+      case 3322: return 1.31486;  // Xi_0 
+      case 3334: return 1.67245;  // Omega_+/-
+      case 4122: return 2.28646;  // Lambda_c+
+      case 4212: return 2.45265;  // Sigma_c+
+      case 4222: return 2.45397;  // Sigma_c++
       // Nuclei
       case 1000050110: return 10.255103; // Boron-11
       case 1000060120: return 11.177929; // Carbon-12
