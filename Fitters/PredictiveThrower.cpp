@@ -497,6 +497,11 @@ std::vector<std::vector<std::unique_ptr<TH2D>>> PredictiveThrower::ProduceSpectr
         throw MaCh3Exception(__FILE__, __LINE__);
       }
 
+      if (!refHist) {
+        MACH3LOG_ERROR("Failed to cast to {} dimensions in {}!", nDims, __func__);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+
       const int n_bins_x = refHist->GetNbinsX();
       std::vector<double> x_bin_edges(n_bins_x + 1);
       for (int b = 0; b <= n_bins_x; ++b) {
