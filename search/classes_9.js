@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['oscchannelinfo_1886',['OscChannelInfo',['../structOscChannelInfo.html',1,'']]],
-  ['oscillationhandler_1887',['OscillationHandler',['../classOscillationHandler.html',1,'']]],
-  ['oscillationparameter_1888',['OscillationParameter',['../structOscillationParameter.html',1,'']]],
-  ['oscprocessor_1889',['OscProcessor',['../classOscProcessor.html',1,'']]]
+  ['oscchannelinfo_1903',['OscChannelInfo',['../structOscChannelInfo.html',1,'']]],
+  ['oscillationhandler_1904',['OscillationHandler',['../classOscillationHandler.html',1,'']]],
+  ['oscillationparameter_1905',['OscillationParameter',['../structOscillationParameter.html',1,'']]],
+  ['oscprocessor_1906',['OscProcessor',['../classOscProcessor.html',1,'']]]
 ];

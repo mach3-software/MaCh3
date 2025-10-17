@@ -31,7 +31,7 @@
   <td id="projectlogo"><img alt="Logo" src="mach3logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">MaCh3
-   &#160;<span id="projectnumber">2.2.3</span>
+   &#160;<span id="projectnumber">2.3.0</span>
    </div>
    <div id="projectbrief">Reference Guide</div>
   </td>
@@ -187,9 +187,6 @@ Functions</h2></td></tr>
 <tr class="memitem:a7daaa1b563068e0d1a75d166126d0ce9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="SampleStructs_8h.html#a7daaa1b563068e0d1a75d166126d0ce9">GetSampleFromGlobalBin</a> (const std::vector&lt; <a class="el" href="structSampleBinningInfo.html">SampleBinningInfo</a> &gt; &amp;BinningInfo, const size_t GlobalBin)</td></tr>
 <tr class="memdesc:a7daaa1b563068e0d1a75d166126d0ce9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the sample index corresponding to a global bin number.  <a href="SampleStructs_8h.html#a7daaa1b563068e0d1a75d166126d0ce9">More...</a><br /></td></tr>
 <tr class="separator:a7daaa1b563068e0d1a75d166126d0ce9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a782087443b184c7d19f53fc49e23c39c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="SampleStructs_8h.html#a782087443b184c7d19f53fc49e23c39c">SetGlobalBinNumbers</a> (std::vector&lt; <a class="el" href="structSampleBinningInfo.html">SampleBinningInfo</a> &gt; &amp;BinningInfo)</td></tr>
-<tr class="memdesc:a782087443b184c7d19f53fc49e23c39c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the GlobalOffset for each <a class="el" href="structSampleBinningInfo.html" title="KS: Small struct storying info about used binning.">SampleBinningInfo</a> to enable linearization of multiple 2D binning samples.  <a href="SampleStructs_8h.html#a782087443b184c7d19f53fc49e23c39c">More...</a><br /></td></tr>
-<tr class="separator:a782087443b184c7d19f53fc49e23c39c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1b305c72615a48a89e74a9c3ded69c02"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceMaCh3Utils.html#a1b305c72615a48a89e74a9c3ded69c02">MaCh3Utils::GetMassFromPDG</a> (const int PDG)</td></tr>
 <tr class="memdesc:a1b305c72615a48a89e74a9c3ded69c02"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return mass for given PDG.  <a href="namespaceMaCh3Utils.html#a1b305c72615a48a89e74a9c3ded69c02">More...</a><br /></td></tr>
 <tr class="separator:a1b305c72615a48a89e74a9c3ded69c02"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -427,54 +424,6 @@ Kamil Skwarczynski </dd></dl>
 <div class="ttc" id="astructSampleBinningInfo_html"><div class="ttname"><a href="structSampleBinningInfo.html">SampleBinningInfo</a></div><div class="ttdoc">KS: Small struct storying info about used binning.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00183">SampleStructs.h:183</a></div></div>
 <div class="ttc" id="astructSampleBinningInfo_html_ad0a32f17ef0b235e5c24605a9b2d1153"><div class="ttname"><a href="structSampleBinningInfo.html#ad0a32f17ef0b235e5c24605a9b2d1153">SampleBinningInfo::GlobalOffset</a></div><div class="ttdeci">size_t GlobalOffset</div><div class="ttdoc">If you have binning for multiple samples and trying to define 1D vector let's.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00197">SampleStructs.h:197</a></div></div>
 <div class="ttc" id="astructSampleBinningInfo_html_af20237040c5fe0d4a26b63fc83e55ff9"><div class="ttname"><a href="structSampleBinningInfo.html#af20237040c5fe0d4a26b63fc83e55ff9">SampleBinningInfo::nBins</a></div><div class="ttdeci">size_t nBins</div><div class="ttdoc">Number of total bins.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00195">SampleStructs.h:195</a></div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="a782087443b184c7d19f53fc49e23c39c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a782087443b184c7d19f53fc49e23c39c">&#9670;&nbsp;</a></span>SetGlobalBinNumbers()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void SetGlobalBinNumbers </td>
-          <td>(</td>
-          <td class="paramtype">std::vector&lt; <a class="el" href="structSampleBinningInfo.html">SampleBinningInfo</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>BinningInfo</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Sets the GlobalOffset for each <a class="el" href="structSampleBinningInfo.html" title="KS: Small struct storying info about used binning.">SampleBinningInfo</a> to enable linearization of multiple 2D binning samples. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">BinningInfo</td><td>Vector of <a class="el" href="structSampleBinningInfo.html" title="KS: Small struct storying info about used binning.">SampleBinningInfo</a> structs to be updated with global offsets. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="SampleStructs_8h_source.html#l00321">321</a> of file <a class="el" href="SampleStructs_8h_source.html">SampleStructs.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;                                                                           {</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;  <span class="keywordflow">if</span> (BinningInfo.empty()) {</div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;No binning samples provided.&quot;</span>);</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;  }</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160; </div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;  <span class="keywordtype">size_t</span> GlobalOffsetCounter = 0;</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> iSample = 0; iSample &lt; BinningInfo.size(); iSample++){</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;    BinningInfo[iSample].GlobalOffset = GlobalOffsetCounter;</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;    GlobalOffsetCounter += BinningInfo[iSample].nBins;</div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;  }</div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>

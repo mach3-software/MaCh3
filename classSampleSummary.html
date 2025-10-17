@@ -31,7 +31,7 @@
   <td id="projectlogo"><img alt="Logo" src="mach3logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">MaCh3
-   &#160;<span id="projectnumber">2.2.3</span>
+   &#160;<span id="projectnumber">2.3.0</span>
    </div>
    <div id="projectbrief">Reference Guide</div>
   </td>
@@ -848,7 +848,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        <a class="code" href="classSampleSummary.html#abfeb54f4d95b5b74257a1abf5c98824f">DataHist_ProjectY</a>[i] = <a class="code" href="classSampleSummary.html#a685a8ef3180d4f6474328b5c806d8b74">ProjectPoly</a>(<a class="code" href="classSampleSummary.html#a7e962b36331edb6ff1e9de849cbabee3">DataHist</a>[i], <span class="keyword">false</span>, i);</div>
 <div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;        <a class="code" href="classSampleSummary.html#af5a3139cef917abfddc36dbb8d4ac2fd">maxBins</a>[i] = <a class="code" href="classSampleSummary.html#a7e962b36331edb6ff1e9de849cbabee3">DataHist</a>[i]-&gt;GetNumberOfBins();</div>
 <div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;      } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;        <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Somehow sample {} doesn&#39;t use TH2Poly&quot;</span>, <a class="code" href="classSampleSummary.html#a0e4a3bd85a31c266501190fd229a0e6e">SampleHandler</a>-&gt;<a class="code" href="group__SampleHandlerGetters.html#ga0ed9dd339235b3bdea2680078ab129ab">GetSampleName</a>(i));</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;        <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Somehow sample {} doesn&#39;t use TH2Poly&quot;</span>, <a class="code" href="classSampleSummary.html#a0e4a3bd85a31c266501190fd229a0e6e">SampleHandler</a>-&gt;<a class="code" href="group__SampleHandlerGetters.html#gad3df6900450be4bbb05453e3b166e09e">GetSampleTitle</a>(i));</div>
 <div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;        <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Right now I only support TH2Poly but I am ambitious piece of code and surely will have more support in the future&quot;</span>);</div>
 <div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;        <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
 <div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;      }</div>
@@ -860,7 +860,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00013">MaCh3Exception.h:13</a></div></div>
 <div class="ttc" id="aclassSampleSummary_html_a685a8ef3180d4f6474328b5c806d8b74"><div class="ttname"><a href="classSampleSummary.html#a685a8ef3180d4f6474328b5c806d8b74">SampleSummary::ProjectPoly</a></div><div class="ttdeci">TH1D * ProjectPoly(TH2Poly *Histogram, const bool ProjectX, const int selection, const bool MakeErrorHist=false)</div><div class="ttdoc">Helper to project TH2Poly onto axis.</div><div class="ttdef"><b>Definition:</b> <a href="SampleSummary_8cpp_source.html#l02163">SampleSummary.cpp:2163</a></div></div>
 <div class="ttc" id="aclassSampleSummary_html_a8c5a4ed4db695ce5c5820d857c76b4ff"><div class="ttname"><a href="classSampleSummary.html#a8c5a4ed4db695ce5c5820d857c76b4ff">SampleSummary::CheckSamples</a></div><div class="ttdeci">bool CheckSamples(const int Length)</div><div class="ttdoc">Check the length of samples agrees.</div><div class="ttdef"><b>Definition:</b> <a href="SampleSummary_8cpp_source.html#l00217">SampleSummary.cpp:217</a></div></div>
-<div class="ttc" id="agroup__SampleHandlerGetters_html_ga0ed9dd339235b3bdea2680078ab129ab"><div class="ttname"><a href="group__SampleHandlerGetters.html#ga0ed9dd339235b3bdea2680078ab129ab">SampleHandlerBase::GetSampleName</a></div><div class="ttdeci">virtual std::string GetSampleName(int Sample) const =0</div></div>
+<div class="ttc" id="agroup__SampleHandlerGetters_html_gad3df6900450be4bbb05453e3b166e09e"><div class="ttname"><a href="group__SampleHandlerGetters.html#gad3df6900450be4bbb05453e3b166e09e">SampleHandlerBase::GetSampleTitle</a></div><div class="ttdeci">virtual std::string GetSampleTitle(const int Sample) const =0</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2603,7 +2603,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code" href="classSampleSummary.html#ab16d22bf65d2a9c15072901161fc160a">nSamples</a>; ++i)</div>
 <div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;  {</div>
 <div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;    <span class="comment">// Get the name</span></div>
-<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;    std::string SampleName = <a class="code" href="classSampleSummary.html#a0e4a3bd85a31c266501190fd229a0e6e">SampleHandler</a>-&gt;<a class="code" href="group__SampleHandlerGetters.html#ga0ed9dd339235b3bdea2680078ab129ab">GetSampleName</a>(i);</div>
+<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;    std::string SampleName = <a class="code" href="classSampleSummary.html#a0e4a3bd85a31c266501190fd229a0e6e">SampleHandler</a>-&gt;<a class="code" href="group__SampleHandlerGetters.html#gad3df6900450be4bbb05453e3b166e09e">GetSampleTitle</a>(i);</div>
 <div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;    <span class="comment">// Strip out spaces</span></div>
 <div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;    <span class="keywordflow">while</span> (SampleName.find(<span class="stringliteral">&quot; &quot;</span>) != std::string::npos) {</div>
 <div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;      SampleName.replace(SampleName.find(<span class="stringliteral">&quot; &quot;</span>), 1, std::string(<span class="stringliteral">&quot;_&quot;</span>));</div>

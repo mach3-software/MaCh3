@@ -31,7 +31,7 @@
   <td id="projectlogo"><img alt="Logo" src="mach3logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">MaCh3
-   &#160;<span id="projectnumber">2.2.3</span>
+   &#160;<span id="projectnumber">2.3.0</span>
    </div>
    <div id="projectbrief">Reference Guide</div>
   </td>
@@ -88,7 +88,7 @@ $(function() {
 <div class="dynheader">
 Collaboration diagram for SampleInfo:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="structSampleInfo__coll__graph.svg" width="148" height="247"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="structSampleInfo__coll__graph.svg" width="507" height="247"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -118,6 +118,15 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a4402b585d1e3fde1dcd040ea59a0b209"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSampleInfo.html#a4402b585d1e3fde1dcd040ea59a0b209">nDimensions</a> = <a class="el" href="namespaceM3.html#ac289df32a5b3b05c61a87cbac5702b25">M3::_BAD_INT_</a></td></tr>
 <tr class="memdesc:a4402b585d1e3fde1dcd040ea59a0b209"><td class="mdescLeft">&#160;</td><td class="mdescRight">Keep track of the dimensions of the sample binning.  <a href="structSampleInfo.html#a4402b585d1e3fde1dcd040ea59a0b209">More...</a><br /></td></tr>
 <tr class="separator:a4402b585d1e3fde1dcd040ea59a0b209"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a79cdb16f1294d9ef3524801367a2531a"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSampleInfo.html#a79cdb16f1294d9ef3524801367a2531a">mc_files</a></td></tr>
+<tr class="memdesc:a79cdb16f1294d9ef3524801367a2531a"><td class="mdescLeft">&#160;</td><td class="mdescRight">names of mc files associated associated with this object  <a href="structSampleInfo.html#a79cdb16f1294d9ef3524801367a2531a">More...</a><br /></td></tr>
+<tr class="separator:a79cdb16f1294d9ef3524801367a2531a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac3914beef03de94be8dd2e31e660831a"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSampleInfo.html#ac3914beef03de94be8dd2e31e660831a">spline_files</a></td></tr>
+<tr class="memdesc:ac3914beef03de94be8dd2e31e660831a"><td class="mdescLeft">&#160;</td><td class="mdescRight">names of spline files associated associated with this object  <a href="structSampleInfo.html#ac3914beef03de94be8dd2e31e660831a">More...</a><br /></td></tr>
+<tr class="separator:ac3914beef03de94be8dd2e31e660831a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ce072b7de4e67ba232e3196731790ea"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structOscChannelInfo.html">OscChannelInfo</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSampleInfo.html#a4ce072b7de4e67ba232e3196731790ea">OscChannels</a></td></tr>
+<tr class="memdesc:a4ce072b7de4e67ba232e3196731790ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stores info about oscillation channel for a single sample.  <a href="structSampleInfo.html#a4ce072b7de4e67ba232e3196731790ea">More...</a><br /></td></tr>
+<tr class="separator:a4ce072b7de4e67ba232e3196731790ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa8a6c969046ca812c76198faa0175b89"><td class="memItemLeft" align="right" valign="top">TH1D *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSampleInfo.html#aa8a6c969046ca812c76198faa0175b89">dathist</a> = nullptr</td></tr>
 <tr class="memdesc:aa8a6c969046ca812c76198faa0175b89"><td class="mdescLeft">&#160;</td><td class="mdescRight">histogram used for plotting storing 1D data distribution  <a href="structSampleInfo.html#aa8a6c969046ca812c76198faa0175b89">More...</a><br /></td></tr>
 <tr class="separator:aa8a6c969046ca812c76198faa0175b89"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -195,10 +204,10 @@ Public Attributes</h2></td></tr>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="structSampleInfo.html#a164184cba17531aeb71fa507cb44f9ab">_hPDF1D</a>   != <span class="keyword">nullptr</span>) <span class="keyword">delete</span> <a class="code" href="structSampleInfo.html#a164184cba17531aeb71fa507cb44f9ab">_hPDF1D</a>;</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="structSampleInfo.html#a34cf26cf1fa2cfb5c20c34968abbb551">_hPDF2D</a>   != <span class="keyword">nullptr</span>) <span class="keyword">delete</span> <a class="code" href="structSampleInfo.html#a34cf26cf1fa2cfb5c20c34968abbb551">_hPDF2D</a>;</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  }</div>
-<div class="ttc" id="astructSampleInfo_html_a164184cba17531aeb71fa507cb44f9ab"><div class="ttname"><a href="structSampleInfo.html#a164184cba17531aeb71fa507cb44f9ab">SampleInfo::_hPDF1D</a></div><div class="ttdeci">TH1D * _hPDF1D</div><div class="ttdoc">histogram used for plotting storing 1D MC distribution</div><div class="ttdef"><b>Definition:</b> <a href="FarDetectorCoreInfoStruct_8h_source.html#l00069">FarDetectorCoreInfoStruct.h:69</a></div></div>
-<div class="ttc" id="astructSampleInfo_html_a34cf26cf1fa2cfb5c20c34968abbb551"><div class="ttname"><a href="structSampleInfo.html#a34cf26cf1fa2cfb5c20c34968abbb551">SampleInfo::_hPDF2D</a></div><div class="ttdeci">TH2D * _hPDF2D</div><div class="ttdoc">histogram used for plotting storing 2D MC distribution</div><div class="ttdef"><b>Definition:</b> <a href="FarDetectorCoreInfoStruct_8h_source.html#l00071">FarDetectorCoreInfoStruct.h:71</a></div></div>
-<div class="ttc" id="astructSampleInfo_html_aa6f0af6a7e4c166fcf3422ceb3b2d3f7"><div class="ttname"><a href="structSampleInfo.html#aa6f0af6a7e4c166fcf3422ceb3b2d3f7">SampleInfo::dathist2d</a></div><div class="ttdeci">TH2D * dathist2d</div><div class="ttdoc">histogram used for plotting storing 2D data distribution</div><div class="ttdef"><b>Definition:</b> <a href="FarDetectorCoreInfoStruct_8h_source.html#l00066">FarDetectorCoreInfoStruct.h:66</a></div></div>
-<div class="ttc" id="astructSampleInfo_html_aa8a6c969046ca812c76198faa0175b89"><div class="ttname"><a href="structSampleInfo.html#aa8a6c969046ca812c76198faa0175b89">SampleInfo::dathist</a></div><div class="ttdeci">TH1D * dathist</div><div class="ttdoc">histogram used for plotting storing 1D data distribution</div><div class="ttdef"><b>Definition:</b> <a href="FarDetectorCoreInfoStruct_8h_source.html#l00064">FarDetectorCoreInfoStruct.h:64</a></div></div>
+<div class="ttc" id="astructSampleInfo_html_a164184cba17531aeb71fa507cb44f9ab"><div class="ttname"><a href="structSampleInfo.html#a164184cba17531aeb71fa507cb44f9ab">SampleInfo::_hPDF1D</a></div><div class="ttdeci">TH1D * _hPDF1D</div><div class="ttdoc">histogram used for plotting storing 1D MC distribution</div><div class="ttdef"><b>Definition:</b> <a href="FarDetectorCoreInfoStruct_8h_source.html#l00077">FarDetectorCoreInfoStruct.h:77</a></div></div>
+<div class="ttc" id="astructSampleInfo_html_a34cf26cf1fa2cfb5c20c34968abbb551"><div class="ttname"><a href="structSampleInfo.html#a34cf26cf1fa2cfb5c20c34968abbb551">SampleInfo::_hPDF2D</a></div><div class="ttdeci">TH2D * _hPDF2D</div><div class="ttdoc">histogram used for plotting storing 2D MC distribution</div><div class="ttdef"><b>Definition:</b> <a href="FarDetectorCoreInfoStruct_8h_source.html#l00079">FarDetectorCoreInfoStruct.h:79</a></div></div>
+<div class="ttc" id="astructSampleInfo_html_aa6f0af6a7e4c166fcf3422ceb3b2d3f7"><div class="ttname"><a href="structSampleInfo.html#aa6f0af6a7e4c166fcf3422ceb3b2d3f7">SampleInfo::dathist2d</a></div><div class="ttdeci">TH2D * dathist2d</div><div class="ttdoc">histogram used for plotting storing 2D data distribution</div><div class="ttdef"><b>Definition:</b> <a href="FarDetectorCoreInfoStruct_8h_source.html#l00074">FarDetectorCoreInfoStruct.h:74</a></div></div>
+<div class="ttc" id="astructSampleInfo_html_aa8a6c969046ca812c76198faa0175b89"><div class="ttname"><a href="structSampleInfo.html#aa8a6c969046ca812c76198faa0175b89">SampleInfo::dathist</a></div><div class="ttdeci">TH1D * dathist</div><div class="ttdoc">histogram used for plotting storing 1D data distribution</div><div class="ttdef"><b>Definition:</b> <a href="FarDetectorCoreInfoStruct_8h_source.html#l00072">FarDetectorCoreInfoStruct.h:72</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -228,25 +237,30 @@ Public Attributes</h2></td></tr>
 
 <p>Initialise histograms used for plotting. </p>
 
-<p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00074">74</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;                              {</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    TString histname1d = (<a class="code" href="structSampleInfo.html#a94ef862377431975710a3ca0c761b01c">XVarStr</a>).c_str();</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    TString histname2d = (<a class="code" href="structSampleInfo.html#a94ef862377431975710a3ca0c761b01c">XVarStr</a> + <span class="stringliteral">&quot;_&quot;</span> + <a class="code" href="structSampleInfo.html#ad2989f69823dbac9c39edabc4e034340">YVarStr</a>).c_str();</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    TString histtitle = <a class="code" href="structSampleInfo.html#aa08cf57ea6717add258666f4966cde6d">SampleTitle</a>;</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <span class="comment">//The binning here is arbitrary, now we get info from cfg so the</span></div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="comment">//set1DBinning and set2Dbinning calls below will make the binning</span></div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <span class="comment">//to be what we actually want</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <a class="code" href="structSampleInfo.html#a164184cba17531aeb71fa507cb44f9ab">_hPDF1D</a>   = <span class="keyword">new</span> TH1D(<span class="stringliteral">&quot;h&quot;</span> + histname1d + <a class="code" href="structSampleInfo.html#aa08cf57ea6717add258666f4966cde6d">SampleTitle</a>, histtitle, 1, 0, 1);</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <a class="code" href="structSampleInfo.html#aa8a6c969046ca812c76198faa0175b89">dathist</a>   = <span class="keyword">new</span> TH1D(<span class="stringliteral">&quot;d&quot;</span> + histname1d + <a class="code" href="structSampleInfo.html#aa08cf57ea6717add258666f4966cde6d">SampleTitle</a>, histtitle, 1, 0, 1);</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <a class="code" href="structSampleInfo.html#a34cf26cf1fa2cfb5c20c34968abbb551">_hPDF2D</a>   = <span class="keyword">new</span> TH2D(<span class="stringliteral">&quot;h&quot;</span> + histname2d + <a class="code" href="structSampleInfo.html#aa08cf57ea6717add258666f4966cde6d">SampleTitle</a>, histtitle, 1, 0, 1, 1, 0, 1);</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <a class="code" href="structSampleInfo.html#aa6f0af6a7e4c166fcf3422ceb3b2d3f7">dathist2d</a> = <span class="keyword">new</span> TH2D(<span class="stringliteral">&quot;d&quot;</span> + histname2d + <a class="code" href="structSampleInfo.html#aa08cf57ea6717add258666f4966cde6d">SampleTitle</a>, histtitle, 1, 0, 1, 1, 0, 1);</div>
+<p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00082">82</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;                              {</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    TString histname1d = (<a class="code" href="structSampleInfo.html#a94ef862377431975710a3ca0c761b01c">XVarStr</a>).c_str();</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    TString histname2d = (<a class="code" href="structSampleInfo.html#a94ef862377431975710a3ca0c761b01c">XVarStr</a> + <span class="stringliteral">&quot;_&quot;</span> + <a class="code" href="structSampleInfo.html#ad2989f69823dbac9c39edabc4e034340">YVarStr</a>).c_str();</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    TString histtitle = <a class="code" href="structSampleInfo.html#aa08cf57ea6717add258666f4966cde6d">SampleTitle</a>;</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <a class="code" href="structSampleInfo.html#a164184cba17531aeb71fa507cb44f9ab">_hPDF1D</a>-&gt;GetXaxis()-&gt;SetTitle(<a class="code" href="structSampleInfo.html#a94ef862377431975710a3ca0c761b01c">XVarStr</a>.c_str());</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <a class="code" href="structSampleInfo.html#aa8a6c969046ca812c76198faa0175b89">dathist</a>-&gt;GetXaxis()-&gt;SetTitle(<a class="code" href="structSampleInfo.html#a94ef862377431975710a3ca0c761b01c">XVarStr</a>.c_str());</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <a class="code" href="structSampleInfo.html#a34cf26cf1fa2cfb5c20c34968abbb551">_hPDF2D</a>-&gt;GetXaxis()-&gt;SetTitle(<a class="code" href="structSampleInfo.html#a94ef862377431975710a3ca0c761b01c">XVarStr</a>.c_str());</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <a class="code" href="structSampleInfo.html#aa6f0af6a7e4c166fcf3422ceb3b2d3f7">dathist2d</a>-&gt;GetXaxis()-&gt;SetTitle(<a class="code" href="structSampleInfo.html#a94ef862377431975710a3ca0c761b01c">XVarStr</a>.c_str());</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  }</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <span class="comment">//The binning here is arbitrary, now we get info from cfg so the</span></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <span class="comment">//set1DBinning and set2Dbinning calls below will make the binning</span></div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="comment">//to be what we actually want</span></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <a class="code" href="structSampleInfo.html#a164184cba17531aeb71fa507cb44f9ab">_hPDF1D</a>   = <span class="keyword">new</span> TH1D(<span class="stringliteral">&quot;h&quot;</span> + histname1d + <a class="code" href="structSampleInfo.html#aa08cf57ea6717add258666f4966cde6d">SampleTitle</a>, histtitle, 1, 0, 1);</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <a class="code" href="structSampleInfo.html#aa8a6c969046ca812c76198faa0175b89">dathist</a>   = <span class="keyword">new</span> TH1D(<span class="stringliteral">&quot;d&quot;</span> + histname1d + <a class="code" href="structSampleInfo.html#aa08cf57ea6717add258666f4966cde6d">SampleTitle</a>, histtitle, 1, 0, 1);</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <a class="code" href="structSampleInfo.html#a34cf26cf1fa2cfb5c20c34968abbb551">_hPDF2D</a>   = <span class="keyword">new</span> TH2D(<span class="stringliteral">&quot;h&quot;</span> + histname2d + <a class="code" href="structSampleInfo.html#aa08cf57ea6717add258666f4966cde6d">SampleTitle</a>, histtitle, 1, 0, 1, 1, 0, 1);</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <a class="code" href="structSampleInfo.html#aa6f0af6a7e4c166fcf3422ceb3b2d3f7">dathist2d</a> = <span class="keyword">new</span> TH2D(<span class="stringliteral">&quot;d&quot;</span> + histname2d + <a class="code" href="structSampleInfo.html#aa08cf57ea6717add258666f4966cde6d">SampleTitle</a>, histtitle, 1, 0, 1, 1, 0, 1);</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160; </div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    <a class="code" href="structSampleInfo.html#a164184cba17531aeb71fa507cb44f9ab">_hPDF1D</a>-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <a class="code" href="structSampleInfo.html#aa8a6c969046ca812c76198faa0175b89">dathist</a>-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <a class="code" href="structSampleInfo.html#a34cf26cf1fa2cfb5c20c34968abbb551">_hPDF2D</a>-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <a class="code" href="structSampleInfo.html#aa6f0af6a7e4c166fcf3422ceb3b2d3f7">dathist2d</a>-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160; </div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <a class="code" href="structSampleInfo.html#a164184cba17531aeb71fa507cb44f9ab">_hPDF1D</a>-&gt;GetXaxis()-&gt;SetTitle(<a class="code" href="structSampleInfo.html#a94ef862377431975710a3ca0c761b01c">XVarStr</a>.c_str());</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <a class="code" href="structSampleInfo.html#aa8a6c969046ca812c76198faa0175b89">dathist</a>-&gt;GetXaxis()-&gt;SetTitle(<a class="code" href="structSampleInfo.html#a94ef862377431975710a3ca0c761b01c">XVarStr</a>.c_str());</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    <a class="code" href="structSampleInfo.html#a34cf26cf1fa2cfb5c20c34968abbb551">_hPDF2D</a>-&gt;GetXaxis()-&gt;SetTitle(<a class="code" href="structSampleInfo.html#a94ef862377431975710a3ca0c761b01c">XVarStr</a>.c_str());</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    <a class="code" href="structSampleInfo.html#aa6f0af6a7e4c166fcf3422ceb3b2d3f7">dathist2d</a>-&gt;GetXaxis()-&gt;SetTitle(<a class="code" href="structSampleInfo.html#a94ef862377431975710a3ca0c761b01c">XVarStr</a>.c_str());</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  }</div>
 <div class="ttc" id="astructSampleInfo_html_a94ef862377431975710a3ca0c761b01c"><div class="ttname"><a href="structSampleInfo.html#a94ef862377431975710a3ca0c761b01c">SampleInfo::XVarStr</a></div><div class="ttdeci">std::string XVarStr</div><div class="ttdoc">the strings associated with the variables used for the X binning e.g. &quot;RecoNeutrinoEnergy&quot;</div><div class="ttdef"><b>Definition:</b> <a href="FarDetectorCoreInfoStruct_8h_source.html#l00053">FarDetectorCoreInfoStruct.h:53</a></div></div>
 <div class="ttc" id="astructSampleInfo_html_aa08cf57ea6717add258666f4966cde6d"><div class="ttname"><a href="structSampleInfo.html#aa08cf57ea6717add258666f4966cde6d">SampleInfo::SampleTitle</a></div><div class="ttdeci">std::string SampleTitle</div><div class="ttdoc">the name of this sample e.g.&quot;muon-like&quot;</div><div class="ttdef"><b>Definition:</b> <a href="FarDetectorCoreInfoStruct_8h_source.html#l00058">FarDetectorCoreInfoStruct.h:58</a></div></div>
 <div class="ttc" id="astructSampleInfo_html_ad2989f69823dbac9c39edabc4e034340"><div class="ttname"><a href="structSampleInfo.html#ad2989f69823dbac9c39edabc4e034340">SampleInfo::YVarStr</a></div><div class="ttdeci">std::string YVarStr</div><div class="ttdoc">the strings associated with the variables used for the Y binning e.g. &quot;RecoNeutrinoEnergy&quot;</div><div class="ttdef"><b>Definition:</b> <a href="FarDetectorCoreInfoStruct_8h_source.html#l00055">FarDetectorCoreInfoStruct.h:55</a></div></div>
@@ -268,7 +282,7 @@ Public Attributes</h2></td></tr>
 
 <p>histogram used for plotting storing 1D MC distribution </p>
 
-<p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00069">69</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00077">77</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
 
 </div>
 </div>
@@ -286,7 +300,7 @@ Public Attributes</h2></td></tr>
 
 <p>histogram used for plotting storing 2D MC distribution </p>
 
-<p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00071">71</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00079">79</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
 
 </div>
 </div>
@@ -304,7 +318,7 @@ Public Attributes</h2></td></tr>
 
 <p>histogram used for plotting storing 1D data distribution </p>
 
-<p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00064">64</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00072">72</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
 
 </div>
 </div>
@@ -322,7 +336,25 @@ Public Attributes</h2></td></tr>
 
 <p>histogram used for plotting storing 2D data distribution </p>
 
-<p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00066">66</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00074">74</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
+
+</div>
+</div>
+<a id="a79cdb16f1294d9ef3524801367a2531a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a79cdb16f1294d9ef3524801367a2531a">&#9670;&nbsp;</a></span>mc_files</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;std::string&gt; SampleInfo::mc_files</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>names of mc files associated associated with this object </p>
+
+<p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00064">64</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
 
 </div>
 </div>
@@ -344,6 +376,24 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a4ce072b7de4e67ba232e3196731790ea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4ce072b7de4e67ba232e3196731790ea">&#9670;&nbsp;</a></span>OscChannels</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="structOscChannelInfo.html">OscChannelInfo</a>&gt; SampleInfo::OscChannels</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Stores info about oscillation channel for a single sample. </p>
+
+<p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00069">69</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
+
+</div>
+</div>
 <a id="aa08cf57ea6717add258666f4966cde6d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa08cf57ea6717add258666f4966cde6d">&#9670;&nbsp;</a></span>SampleTitle</h2>
 
@@ -359,6 +409,24 @@ Public Attributes</h2></td></tr>
 <p>the name of this sample e.g."muon-like" </p>
 
 <p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00058">58</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
+
+</div>
+</div>
+<a id="ac3914beef03de94be8dd2e31e660831a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac3914beef03de94be8dd2e31e660831a">&#9670;&nbsp;</a></span>spline_files</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;std::string&gt; SampleInfo::spline_files</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>names of spline files associated associated with this object </p>
+
+<p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00066">66</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
 
 </div>
 </div>

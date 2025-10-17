@@ -31,7 +31,7 @@
   <td id="projectlogo"><img alt="Logo" src="mach3logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">MaCh3
-   &#160;<span id="projectnumber">2.2.3</span>
+   &#160;<span id="projectnumber">2.3.0</span>
    </div>
    <div id="projectbrief">Reference Guide</div>
   </td>
@@ -109,12 +109,12 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a07b6726b71241ea71e12cfa78fbc49ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gac4b73a8841ff9bab2fb08b578ad4137f"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#gac4b73a8841ff9bab2fb08b578ad4137f">GetNsamples</a> ()</td></tr>
 <tr class="separator:gac4b73a8841ff9bab2fb08b578ad4137f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga97d4dfa8ea998240fab6c09786c5b7c1"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#ga97d4dfa8ea998240fab6c09786c5b7c1">GetTitle</a> () const</td></tr>
-<tr class="separator:ga97d4dfa8ea998240fab6c09786c5b7c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga0ed9dd339235b3bdea2680078ab129ab"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#ga0ed9dd339235b3bdea2680078ab129ab">GetSampleName</a> (int Sample) const =0</td></tr>
-<tr class="separator:ga0ed9dd339235b3bdea2680078ab129ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga3f4388fbe27168c5dae8fa722a7c1299"><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#ga3f4388fbe27168c5dae8fa722a7c1299">GetSampleLikelihood</a> (const int isample)</td></tr>
-<tr class="separator:ga3f4388fbe27168c5dae8fa722a7c1299"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad3df6900450be4bbb05453e3b166e09e"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#gad3df6900450be4bbb05453e3b166e09e">GetSampleTitle</a> (const int Sample) const =0</td></tr>
+<tr class="separator:gad3df6900450be4bbb05453e3b166e09e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gadc0365a430cbe628f5ec63ef49bf6f5e"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#gadc0365a430cbe628f5ec63ef49bf6f5e">GetName</a> () const =0</td></tr>
+<tr class="separator:gadc0365a430cbe628f5ec63ef49bf6f5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga60ce18ee8d7adbc78b9be1269f081aa3"><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#ga60ce18ee8d7adbc78b9be1269f081aa3">GetSampleLikelihood</a> (const int isample) const =0</td></tr>
+<tr class="separator:ga60ce18ee8d7adbc78b9be1269f081aa3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab6e807de9ac80fb9f12722e033c44f7e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#ab6e807de9ac80fb9f12722e033c44f7e">CleanMemoryBeforeFit</a> ()=0</td></tr>
 <tr class="memdesc:ab6e807de9ac80fb9f12722e033c44f7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allow to clean not used memory before fit starts.  <a href="classSampleHandlerBase.html#ab6e807de9ac80fb9f12722e033c44f7e">More...</a><br /></td></tr>
 <tr class="separator:ab6e807de9ac80fb9f12722e033c44f7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -126,12 +126,12 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ga4e232eb59bc09c3f8ff4cbed69fcd688"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3efb49c2a39d87b71e4dec7c7115fa88"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a3efb49c2a39d87b71e4dec7c7115fa88">Reweight</a> ()=0</td></tr>
 <tr class="separator:a3efb49c2a39d87b71e4dec7c7115fa88"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga65bbd8a3084731b4bdb0c4d3fcaf641e"><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#ga65bbd8a3084731b4bdb0c4d3fcaf641e">GetLikelihood</a> ()=0</td></tr>
-<tr class="separator:ga65bbd8a3084731b4bdb0c4d3fcaf641e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac4cd44c594061bfc45da228220dcd950"><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#gac4cd44c594061bfc45da228220dcd950">GetLikelihood</a> () const =0</td></tr>
+<tr class="separator:gac4cd44c594061bfc45da228220dcd950"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga6ceca02f83e878ef1aec6e54e7b2f331"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#ga6ceca02f83e878ef1aec6e54e7b2f331">GetNEvents</a> () const</td></tr>
 <tr class="separator:ga6ceca02f83e878ef1aec6e54e7b2f331"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaeb7b2ceb1ff0720b5f4976035d5900c7"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#gaeb7b2ceb1ff0720b5f4976035d5900c7">GetNOscChannels</a> ()</td></tr>
-<tr class="separator:gaeb7b2ceb1ff0720b5f4976035d5900c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga9d9a63f16c4acc2ab7bdd39df77712d4"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#ga9d9a63f16c4acc2ab7bdd39df77712d4">GetNOscChannels</a> (const int iSample) const =0</td></tr>
+<tr class="separator:ga9d9a63f16c4acc2ab7bdd39df77712d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0cf61d8f769755c4a0fa549adc575c3e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a0cf61d8f769755c4a0fa549adc575c3e">SetupBinning</a> (const <a class="el" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> Selection, std::vector&lt; double &gt; &amp;BinningX, std::vector&lt; double &gt; &amp;BinningY)</td></tr>
 <tr class="separator:a0cf61d8f769755c4a0fa549adc575c3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa5a3f0796fcbbe49c4368d71a2198861"><td class="memItemLeft" align="right" valign="top">virtual TH1 *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#aa5a3f0796fcbbe49c4368d71a2198861">GetData</a> (const int Selection)</td></tr>
