@@ -19,7 +19,6 @@ class MCMCBase : public FitterBase {
 
     /// @brief Allow to start from previous fit/chain
     /// @param FitName Name of previous chain
-    /// @todo implement some check that number of params matches etc
     void StartFromPreviousFit(const std::string &FitName) override;
 
     /// @brief Set how long chain should be

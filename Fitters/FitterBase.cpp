@@ -494,7 +494,7 @@ void FitterBase::DragRace(const int NLaps) {
 }
 
 // *************************
-bool FitterBase::GetScaneRange(std::map<std::string, std::vector<double>>& scanRanges) {
+bool FitterBase::GetScanRange(std::map<std::string, std::vector<double>>& scanRanges) {
 // *************************
   bool isScanRanges = false;
   // YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D. Barrow

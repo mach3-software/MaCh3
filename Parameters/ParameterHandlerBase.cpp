@@ -752,9 +752,9 @@ void ParameterHandlerBase::PrintNominalCurrProp() const {
 
 // ********************************************
 // Get the likelihood in the case where we want to include priors on the parameters
-// fParEvalLikelihood stores if we want to evaluate the likelihood for the given parameter
-//                    true = evaluate likelihood (so run with a prior)
-//                    false = don't evaluate likelihood (so run without a prior)
+// _fFlatPrior stores if we want to evaluate the likelihood for the given parameter
+//                    true = don't evaluate likelihood (so run without a prior)
+//                    false = evaluate likelihood (so run with a prior)
 double ParameterHandlerBase::CalcLikelihood() const _noexcept_ {
 // ********************************************
   double logL = 0.0;

@@ -2,6 +2,9 @@
 
 #include "Manager/Manager.h"
 
+/// @file SmearChain.cpp
+/// @brief Allows you to smear contour. For example after performing sets of study one finds out that used sets of uncertainty doesn't fully cover analysis need. Then one can smear additionally contour.
+
 /// @brief Main function  creating MCMCProcessor and calling Smear Chain
 /// @param inputFile MCMC Chain
 /// @param config Config file with settings

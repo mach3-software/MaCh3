@@ -41,3 +41,12 @@ CombineMaCh3Chains [-h] [-c [0-9]] [-f] [-o <output file>] file1.root [file2.roo
 
 
 **SmearChain** - Allows you to smear contour. For example after performing sets of study one finds out that used sets of uncertainty doesn't fully cover analysis need. Then one can smear additionally contour.
+```bash
+SmearChain MCMCchain.root Config.yaml
+```
+
+**ReweightMCMC** - Chain reweighting is used when one want to test different prior choices without need of rerunning MCMC.
+Most commonly used when studying impact of reactor constrains on θ<sub>13</sub>
+```bash
+ReweightMCMC Config.yaml MCMCchain.root
+```

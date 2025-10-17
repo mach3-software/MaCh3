@@ -63,7 +63,6 @@ class FitterBase {
 
   /// @brief Allow to start from previous fit/chain
   /// @param FitName Name of previous chain
-  /// @todo implement some check that number of params matches etc
   virtual void StartFromPreviousFit(const std::string& FitName);
 
   /// @brief Get name of class
@@ -86,7 +85,8 @@ class FitterBase {
   void SaveSettings();
 
   /// @brief YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D. Barrow
-  bool GetScaneRange(std::map<std::string, std::vector<double>>& scanRanges);
+  /// @param scanRanges A map with user specified parameter ranges
+  bool GetScanRange(std::map<std::string, std::vector<double>>& scanRanges);
 
   /// @brief KS: Check whether we want to skip parameter using skip vector
   bool CheckSkipParameter(const std::vector<std::string>& SkipVector, const std::string& ParamName) const;
