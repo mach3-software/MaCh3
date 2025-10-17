@@ -251,7 +251,7 @@ void SampleSummary::AddData(std::vector<TH2Poly*> &Data) {
         DataHist_ProjectY[i] = ProjectPoly(DataHist[i], false, i);
         maxBins[i] = DataHist[i]->GetNumberOfBins();
       } else {
-        MACH3LOG_ERROR("Somehow sample {} doesn't use TH2Poly", SampleHandler->GetSampleName(i));
+        MACH3LOG_ERROR("Somehow sample {} doesn't use TH2Poly", SampleHandler->GetSampleTitle(i));
         MACH3LOG_ERROR("Right now I only support TH2Poly but I am ambitious piece of code and surely will have more support in the future");
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
@@ -601,7 +601,7 @@ void SampleSummary::PrepareOutput() {
   for (int i = 0; i < nSamples; ++i)
   {
     // Get the name
-    std::string SampleName = SampleHandler->GetSampleName(i);
+    std::string SampleName = SampleHandler->GetSampleTitle(i);
     // Strip out spaces
     while (SampleName.find(" ") != std::string::npos) {
       SampleName.replace(SampleName.find(" "), 1, std::string("_"));

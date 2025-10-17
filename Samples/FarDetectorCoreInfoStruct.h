@@ -60,6 +60,14 @@ struct SampleInfo {
   /// @brief Keep track of the dimensions of the sample binning
   int nDimensions = M3::_BAD_INT_;
 
+  /// names of mc files associated associated with this object
+  std::vector<std::string> mc_files;
+  /// names of spline files associated associated with this object
+  std::vector<std::string> spline_files;
+
+  /// Stores info about oscillation channel for a single sample
+  std::vector<OscChannelInfo> OscChannels;
+
   /// histogram used for plotting storing 1D data distribution
   TH1D *dathist = nullptr;
   /// histogram used for plotting storing 2D data distribution
@@ -83,6 +91,11 @@ struct SampleInfo {
     dathist   = new TH1D("d" + histname1d + SampleTitle, histtitle, 1, 0, 1);
     _hPDF2D   = new TH2D("h" + histname2d + SampleTitle, histtitle, 1, 0, 1, 1, 0, 1);
     dathist2d = new TH2D("d" + histname2d + SampleTitle, histtitle, 1, 0, 1, 1, 0, 1);
+
+    _hPDF1D->SetDirectory(nullptr);
+    dathist->SetDirectory(nullptr);
+    _hPDF2D->SetDirectory(nullptr);
+    dathist2d->SetDirectory(nullptr);
 
     _hPDF1D->GetXaxis()->SetTitle(XVarStr.c_str());
     dathist->GetXaxis()->SetTitle(XVarStr.c_str());
@@ -126,6 +139,9 @@ struct FarDetectorCoreInfo {
 
   int NomXBin = -1;
   int NomYBin = -1;
+
+  /// Nominal sample to which event is associated
+  int NominalSample = 0;
 
   bool isNC = false;
 

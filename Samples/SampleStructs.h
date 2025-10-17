@@ -316,20 +316,6 @@ inline int GetSampleFromGlobalBin(const std::vector<SampleBinningInfo>& BinningI
   return M3::_BAD_INT_;
 }
 
-/// @brief Sets the GlobalOffset for each SampleBinningInfo to enable linearization of multiple 2D binning samples.
-/// @param BinningInfo Vector of SampleBinningInfo structs to be updated with global offsets.
-inline void SetGlobalBinNumbers(std::vector<SampleBinningInfo>& BinningInfo) {
-  if (BinningInfo.empty()) {
-    MACH3LOG_ERROR("No binning samples provided.");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-
-  size_t GlobalOffsetCounter = 0;
-  for(size_t iSample = 0; iSample < BinningInfo.size(); iSample++){
-    BinningInfo[iSample].GlobalOffset = GlobalOffsetCounter;
-    GlobalOffsetCounter += BinningInfo[iSample].nBins;
-  }
-}
 
 // ***************************
 // A handy namespace for variables extraction
