@@ -18,7 +18,7 @@
 #include <fstream>
 #include <map>
 
-// Structure to hold reweight configuration
+/// Structure to hold reweight configuration
 struct ReweightConfig {
     std::string key;       // The YAML key for this reweight
     std::string name;

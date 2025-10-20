@@ -494,7 +494,7 @@ void FitterBase::DragRace(const int NLaps) {
 }
 
 // *************************
-bool FitterBase::GetScaneRange(std::map<std::string, std::vector<double>>& scanRanges) {
+bool FitterBase::GetScanRange(std::map<std::string, std::vector<double>>& scanRanges) {
 // *************************
   bool isScanRanges = false;
   // YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D. Barrow
@@ -584,7 +584,7 @@ void FitterBase::RunLLHScan() {
 
   // YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D. Barrow
   std::map<std::string, std::vector<double>> scanRanges;
-  const bool isScanRanges = GetScaneRange(scanRanges);
+  const bool isScanRanges = GetScanRange(scanRanges);
    
   // Loop over the covariance classes
   for (ParameterHandlerBase *cov : systematics)
@@ -905,7 +905,7 @@ void FitterBase::Run2DLLHScan() {
   const int countwidth = int(double(n_points)/double(5));
 
   std::map<std::string, std::vector<double>> scanRanges;
-  const bool isScanRanges = GetScaneRange(scanRanges);
+  const bool isScanRanges = GetScanRange(scanRanges);
 
   const double nSigma = GetFromManager<int>(fitMan->raw()["LLHScan"]["LLHScanSigma"], 1., __FILE__, __LINE__);
 

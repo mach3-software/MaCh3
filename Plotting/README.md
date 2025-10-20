@@ -113,3 +113,8 @@ options:
 ```
 
 **MatrixPlotter** - As input you need output from `ProcessMCMC`, keep in mind you need to run it with `PlotCorr`. The executable allows to plot submatrices and whatever combination of parameters you like.
+
+**PredictivePlotting** - Allows to compare prior/posterior predictive distribution, need output from running `PredictiveThrowe`
+
+**PlotSigmaVariation** - Allows to produce sigma variation comparison, need output produce with running `RunSigmaVarFD`
+

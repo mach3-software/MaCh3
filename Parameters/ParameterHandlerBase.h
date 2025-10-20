@@ -129,6 +129,18 @@ class ParameterHandlerBase {
   /// @brief Check if parameters were proposed outside physical boundary
   int CheckBounds() const _noexcept_;
   /// @brief Calc penalty term based on inverted covariance matrix
+  ///
+  /// @details
+  /// The log-likelihood is computed as:
+  /// \f[
+  ///   \log \mathcal{L} = \frac{1}{2} \sum_{i}^{\textrm{pars}} \sum_{j}^{\textrm{pars}} \Delta \vec{p}_i \left( V^{-1} \right)_{i,j} \Delta \vec{p}_j
+  /// \f]
+  /// where:
+  /// - \f$\Delta \vec{p}_i = \theta_i - \theta_{i,0}\f$ is the difference between the current and pre-fit parameter values,
+  /// - \f$V^{-1}\f$ is the inverted covariance matrix.
+  ///
+  /// @note
+  /// - If `_fFlatPrior[i]` is `true`, the parameter is excluded from the calculation.
   double CalcLikelihood() const _noexcept_;
   /// @brief Return CalcLikelihood if some params were thrown out of boundary return _LARGE_LOGL_
   /// @ingroup ParameterHandlerGetters
@@ -199,6 +211,7 @@ class ParameterHandlerBase {
   /// @brief Use new throw matrix, used in adaptive MCMC
   /// @ingroup ParameterHandlerSetters
   void SetThrowMatrix(TMatrixDSym *cov);
+  /// @brief Replaces old throw matrix with new one
   void UpdateThrowMatrix(TMatrixDSym *cov);
   /// @brief Set number of MCMC step, when running adaptive MCMC it is updated with given frequency. We need number of steps to determine frequency.
    /// @ingroup ParameterHandlerSetters
@@ -236,7 +249,6 @@ class ParameterHandlerBase {
   /// Can be useful if you want to track these without having to copy values using getProposed()
   inline const std::vector<double> &GetParPropVec() {return _fPropVal;}
 
-  //Some Getters
   /// @brief Get total number of parameters
   /// @ingroup ParameterHandlerGetters
   inline int  GetNumParams() const {return _fNumPar;}
@@ -415,6 +427,7 @@ protected:
   void EnableSpecialProposal(const YAML::Node& param, const int Index);
 
   /// @brief Perform Special Step Proposal
+  /// @warning KS: Following Asher comment we do "Step->Circular Bounds->Flip"
   void SpecialStepProposal();
 
   /// Check if any of special step proposal were enabled
