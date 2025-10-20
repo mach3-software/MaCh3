@@ -153,7 +153,7 @@ public:
         );
     }
 
-    int ReturnKinematicParameterFromString(std::string) {
+    int ReturnKinematicParameterFromString(const std::string&) const {
         PYBIND11_OVERRIDE_PURE_NAME(
             int,                     /* Return type */
             SampleHandlerFD,            /* Parent class */
@@ -163,7 +163,7 @@ public:
         );
     }
     
-    std::string ReturnStringFromKinematicParameter(int) {
+    std::string ReturnStringFromKinematicParameter(const int) const {
         PYBIND11_OVERRIDE_PURE_NAME(
             std::string,                /* Return type */
             SampleHandlerFD,            /* Parent class */
@@ -173,7 +173,7 @@ public:
         );
     }
 
-    double ReturnKinematicParameter(std::string, int) override {
+    double ReturnKinematicParameter(const std::string&, const int) const override {
         PYBIND11_OVERRIDE_PURE_NAME(
             double,                     /* Return type */
             SampleHandlerFD,            /* Parent class */
@@ -184,7 +184,7 @@ public:
         );
     }
 
-    double ReturnKinematicParameter(int, int) override {
+    double ReturnKinematicParameter(const int, const int) const override {
         PYBIND11_OVERRIDE_PURE_NAME(
             double,                     /* Return type */
             SampleHandlerFD,            /* Parent class */
@@ -195,7 +195,7 @@ public:
         );
     }
 
-    const double *GetPointerToKinematicParameter(std::string, int) override {
+    const double *GetPointerToKinematicParameter(const std::string&, const int) const override {
         PYBIND11_OVERRIDE_PURE_NAME(
             const double *,                   /* Return type */
             SampleHandlerFD,            /* Parent class */
@@ -205,7 +205,7 @@ public:
             py::arg("event")            /* Argument(s) */
         );
     }
-    const double *GetPointerToKinematicParameter(double, int) override {
+    const double *GetPointerToKinematicParameter(const double, const int) const override {
         PYBIND11_OVERRIDE_PURE_NAME(
             const double *,                   /* Return type */
             SampleHandlerFD,            /* Parent class */
