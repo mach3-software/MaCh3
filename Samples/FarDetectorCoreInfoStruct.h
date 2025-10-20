@@ -114,15 +114,9 @@ struct FarDetectorCoreInfo {
 
   ~FarDetectorCoreInfo(){}
 
-  const int* Target = 0; ///< target the interaction was on
-  const int* nupdg  = 0;
-  const int* nupdgUnosc = 0;
-
   //THe x_var and y_vars that you're binning in
   const double* x_var = &M3::Unity_D;
   const double* y_var = &M3::Unity_D;
-  const double* rw_etru = &M3::_BAD_DOUBLE_;
-  const double* rw_truecz = &M3::_BAD_DOUBLE_;
 
   /// Pointers to normalisation weights which are being taken from Parameter Handler
   std::vector<const double*> xsec_norm_pointers;
@@ -136,14 +130,16 @@ struct FarDetectorCoreInfo {
   std::vector<const M3::float_t*> total_weight_pointers;
 
   //M3::float_t total_w  = M3::_BAD_INT_;
-
+  /// Nominal bin for X variable used to help finding bin after migration
   int NomXBin = -1;
+  /// Nominal bin for Y variable used to help finding bin after migration
   int NomYBin = -1;
 
   /// Nominal sample to which event is associated
   int NominalSample = 0;
 
-  bool isNC = false;
+  const int* nupdg  = 0;
+  const int* nupdgUnosc = 0;
 
-  const double* mode = &M3::Unity_D;
+  bool isNC = false;
 };

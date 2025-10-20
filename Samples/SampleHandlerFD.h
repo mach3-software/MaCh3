@@ -242,18 +242,18 @@ class SampleHandlerFD :  public SampleHandlerBase
   virtual void CalcWeightFunc(int iEvent){return; (void)iEvent;};
 
   /// @brief Return the value of an associated kinematic parameter for an event
-  virtual double ReturnKinematicParameter(std::string KinematicParamter, int iEvent) = 0;
-  virtual double ReturnKinematicParameter(int KinematicVariable, int iEvent) = 0;
+  virtual double ReturnKinematicParameter(const std::string& KinematicParamter, const int iEvent) const = 0;
+  virtual double ReturnKinematicParameter(const int KinematicVariable, const int iEvent) const = 0;
   
   // === JM declare the same functions for kinematic vectors ===
-  virtual std::vector<double> ReturnKinematicVector(std::string KinematicParameter, int iEvent) {return {}; (void)KinematicParameter; (void)iEvent;};
-  virtual std::vector<double> ReturnKinematicVector(int KinematicVariable, int iEvent) {return {}; (void)KinematicVariable; (void)iEvent;};
+  virtual std::vector<double> ReturnKinematicVector(const std::string& KinematicParameter, const int iEvent) const {return {}; (void)KinematicParameter; (void)iEvent;};
+  virtual std::vector<double> ReturnKinematicVector(const int KinematicVariable, const int iEvent) const {return {}; (void)KinematicVariable; (void)iEvent;};
   // ===========================================================
 
   /// @brief Return the binning used to draw a kinematic parameter
   std::vector<double> ReturnKinematicParameterBinning(const int Sample, const std::string& KinematicParameter) const;
-  virtual const double* GetPointerToKinematicParameter(std::string KinematicParamter, int iEvent) = 0;
-  virtual const double* GetPointerToKinematicParameter(double KinematicVariable, int iEvent) = 0;
+  virtual const double* GetPointerToKinematicParameter(const std::string& KinematicParamter, const int iEvent) const = 0;
+  virtual const double* GetPointerToKinematicParameter(const double KinematicVariable, const int iEvent) const = 0;
 
   /// @brief Get pointer to oscillation channel associated with given event. Osc channel is const
   const double* GetPointerToOscChannel(const int iEvent) const;
