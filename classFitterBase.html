@@ -158,9 +158,9 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a48f38bfa8996fe00d51f35b05dd16b46"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFitterBase.html#a48f38bfa8996fe00d51f35b05dd16b46">SaveSettings</a> ()</td></tr>
 <tr class="memdesc:a48f38bfa8996fe00d51f35b05dd16b46"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save the settings that the MCMC was run with.  <a href="classFitterBase.html#a48f38bfa8996fe00d51f35b05dd16b46">More...</a><br /></td></tr>
 <tr class="separator:a48f38bfa8996fe00d51f35b05dd16b46"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa5a5791fa27ded38e221892f885560f6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFitterBase.html#aa5a5791fa27ded38e221892f885560f6">GetScaneRange</a> (std::map&lt; std::string, std::vector&lt; double &gt;&gt; &amp;scanRanges)</td></tr>
-<tr class="memdesc:aa5a5791fa27ded38e221892f885560f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D. Barrow.  <a href="classFitterBase.html#aa5a5791fa27ded38e221892f885560f6">More...</a><br /></td></tr>
-<tr class="separator:aa5a5791fa27ded38e221892f885560f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aecdbb30227044b6a075bf897cd821efb"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFitterBase.html#aecdbb30227044b6a075bf897cd821efb">GetScanRange</a> (std::map&lt; std::string, std::vector&lt; double &gt;&gt; &amp;scanRanges)</td></tr>
+<tr class="memdesc:aecdbb30227044b6a075bf897cd821efb"><td class="mdescLeft">&#160;</td><td class="mdescRight">YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D. Barrow.  <a href="classFitterBase.html#aecdbb30227044b6a075bf897cd821efb">More...</a><br /></td></tr>
+<tr class="separator:aecdbb30227044b6a075bf897cd821efb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1c4d01c39f70e95eab05dc04d42a6032"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFitterBase.html#a1c4d01c39f70e95eab05dc04d42a6032">CheckSkipParameter</a> (const std::vector&lt; std::string &gt; &amp;SkipVector, const std::string &amp;ParamName) const</td></tr>
 <tr class="memdesc:a1c4d01c39f70e95eab05dc04d42a6032"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Check whether we want to skip parameter using skip vector.  <a href="classFitterBase.html#a1c4d01c39f70e95eab05dc04d42a6032">More...</a><br /></td></tr>
 <tr class="separator:a1c4d01c39f70e95eab05dc04d42a6032"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -519,12 +519,12 @@ Protected Attributes</h2></td></tr>
 <div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;}</div>
 <div class="ttc" id="aYamlHelper_8h_html_a2d4f3247b6e13ef8c127ff66e699d3cb"><div class="ttname"><a href="YamlHelper_8h.html#a2d4f3247b6e13ef8c127ff66e699d3cb">YAMLtoTMacro</a></div><div class="ttdeci">TMacro YAMLtoTMacro(const YAML::Node &amp;yaml_node, const std::string &amp;name)</div><div class="ttdoc">Convert a YAML node to a ROOT TMacro object.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00162">YamlHelper.h:162</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_afeffc9d794c973a015aa12ec1a8f79da"><div class="ttname"><a href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">FitterBase::systematics</a></div><div class="ttdeci">std::vector&lt; ParameterHandlerBase * &gt; systematics</div><div class="ttdoc">Systematic holder.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00136">FitterBase.h:136</a></div></div>
-<div class="ttc" id="agroup__ParameterHandlerGetters_html_ga042501dd3e6e0395d48b5d94a60eb7c7"><div class="ttname"><a href="group__ParameterHandlerGetters.html#ga042501dd3e6e0395d48b5d94a60eb7c7">ParameterHandlerBase::GetNumParams</a></div><div class="ttdeci">int GetNumParams() const</div><div class="ttdoc">Get total number of parameters.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00242">ParameterHandlerBase.h:242</a></div></div>
-<div class="ttc" id="agroup__ParameterHandlerGetters_html_ga623716c327d8a05b065173524553d11d"><div class="ttname"><a href="group__ParameterHandlerGetters.html#ga623716c327d8a05b065173524553d11d">ParameterHandlerBase::GetCovMatrix</a></div><div class="ttdeci">TMatrixDSym * GetCovMatrix() const</div><div class="ttdoc">Return covariance matrix.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00139">ParameterHandlerBase.h:139</a></div></div>
+<div class="ttc" id="agroup__ParameterHandlerGetters_html_ga042501dd3e6e0395d48b5d94a60eb7c7"><div class="ttname"><a href="group__ParameterHandlerGetters.html#ga042501dd3e6e0395d48b5d94a60eb7c7">ParameterHandlerBase::GetNumParams</a></div><div class="ttdeci">int GetNumParams() const</div><div class="ttdoc">Get total number of parameters.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00254">ParameterHandlerBase.h:254</a></div></div>
+<div class="ttc" id="agroup__ParameterHandlerGetters_html_ga623716c327d8a05b065173524553d11d"><div class="ttname"><a href="group__ParameterHandlerGetters.html#ga623716c327d8a05b065173524553d11d">ParameterHandlerBase::GetCovMatrix</a></div><div class="ttdeci">TMatrixDSym * GetCovMatrix() const</div><div class="ttdoc">Return covariance matrix.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00151">ParameterHandlerBase.h:151</a></div></div>
 <div class="ttc" id="agroup__ParameterHandlerGetters_html_ga6745aac0b811863722e4030421adee92"><div class="ttname"><a href="group__ParameterHandlerGetters.html#ga6745aac0b811863722e4030421adee92">ParameterHandlerBase::GetCorrelationMatrix</a></div><div class="ttdeci">TH2D * GetCorrelationMatrix()</div><div class="ttdoc">KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plott...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l01182">ParameterHandlerBase.cpp:1182</a></div></div>
-<div class="ttc" id="agroup__ParameterHandlerGetters_html_gab1ef5c9f3c3eb619752a073590f5fd53"><div class="ttname"><a href="group__ParameterHandlerGetters.html#gab1ef5c9f3c3eb619752a073590f5fd53">ParameterHandlerBase::GetName</a></div><div class="ttdeci">std::string GetName() const</div><div class="ttdoc">Get name of covariance.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00159">ParameterHandlerBase.h:159</a></div></div>
-<div class="ttc" id="agroup__ParameterHandlerGetters_html_gad1397b3bc7853bceefab290fdd0f0fa9"><div class="ttname"><a href="group__ParameterHandlerGetters.html#gad1397b3bc7853bceefab290fdd0f0fa9">ParameterHandlerBase::GetParInit</a></div><div class="ttdeci">double GetParInit(const int i) const</div><div class="ttdoc">Get prior parameter value.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00264">ParameterHandlerBase.h:264</a></div></div>
-<div class="ttc" id="agroup__ParameterHandlerGetters_html_gade58875564157c7c0aad0433498f955d"><div class="ttname"><a href="group__ParameterHandlerGetters.html#gade58875564157c7c0aad0433498f955d">ParameterHandlerBase::GetConfig</a></div><div class="ttdeci">YAML::Node GetConfig() const</div><div class="ttdoc">Getter to return a copy of the YAML node.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00341">ParameterHandlerBase.h:341</a></div></div>
+<div class="ttc" id="agroup__ParameterHandlerGetters_html_gab1ef5c9f3c3eb619752a073590f5fd53"><div class="ttname"><a href="group__ParameterHandlerGetters.html#gab1ef5c9f3c3eb619752a073590f5fd53">ParameterHandlerBase::GetName</a></div><div class="ttdeci">std::string GetName() const</div><div class="ttdoc">Get name of covariance.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00171">ParameterHandlerBase.h:171</a></div></div>
+<div class="ttc" id="agroup__ParameterHandlerGetters_html_gad1397b3bc7853bceefab290fdd0f0fa9"><div class="ttname"><a href="group__ParameterHandlerGetters.html#gad1397b3bc7853bceefab290fdd0f0fa9">ParameterHandlerBase::GetParInit</a></div><div class="ttdeci">double GetParInit(const int i) const</div><div class="ttdoc">Get prior parameter value.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00276">ParameterHandlerBase.h:276</a></div></div>
+<div class="ttc" id="agroup__ParameterHandlerGetters_html_gade58875564157c7c0aad0433498f955d"><div class="ttname"><a href="group__ParameterHandlerGetters.html#gade58875564157c7c0aad0433498f955d">ParameterHandlerBase::GetConfig</a></div><div class="ttdeci">YAML::Node GetConfig() const</div><div class="ttdoc">Getter to return a copy of the YAML node.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00353">ParameterHandlerBase.h:353</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -761,13 +761,13 @@ Protected Attributes</h2></td></tr>
 
 <p>Get name of class. </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00070">70</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;{<span class="keywordflow">return</span> <a class="code" href="classFitterBase.html#a6c5b6c38ba4c6f482592147c7e6b3b95">AlgorithmName</a>;};</div>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00069">69</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;{<span class="keywordflow">return</span> <a class="code" href="classFitterBase.html#a6c5b6c38ba4c6f482592147c7e6b3b95">AlgorithmName</a>;};</div>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="aa5a5791fa27ded38e221892f885560f6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa5a5791fa27ded38e221892f885560f6">&#9670;&nbsp;</a></span>GetScaneRange()</h2>
+<a id="aecdbb30227044b6a075bf897cd821efb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aecdbb30227044b6a075bf897cd821efb">&#9670;&nbsp;</a></span>GetScanRange()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -776,7 +776,7 @@ Protected Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool FitterBase::GetScaneRange </td>
+          <td class="memname">bool FitterBase::GetScanRange </td>
           <td>(</td>
           <td class="paramtype">std::map&lt; std::string, std::vector&lt; double &gt;&gt; &amp;&#160;</td>
           <td class="paramname"><em>scanRanges</em></td><td>)</td>
@@ -791,9 +791,15 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D. Barrow. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">scanRanges</td><td>A map with user specified parameter ranges </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p class="definition">Definition at line <a class="el" href="FitterBase_8cpp_source.html#l00497">497</a> of file <a class="el" href="FitterBase_8cpp_source.html">FitterBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;                                                                               {</div>
+<div class="fragment"><div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;                                                                              {</div>
 <div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;<span class="comment">// *************************</span></div>
 <div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;  <span class="keywordtype">bool</span> isScanRanges = <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;  <span class="comment">// YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D. Barrow</span></div>
@@ -1095,7 +1101,7 @@ Protected Attributes</h2></td></tr>
 <div class="line"><a name="l00905"></a><span class="lineno">  905</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">int</span> countwidth = int(<span class="keywordtype">double</span>(n_points)/<span class="keywordtype">double</span>(5));</div>
 <div class="line"><a name="l00906"></a><span class="lineno">  906</span>&#160; </div>
 <div class="line"><a name="l00907"></a><span class="lineno">  907</span>&#160;  std::map&lt;std::string, std::vector&lt;double&gt;&gt; scanRanges;</div>
-<div class="line"><a name="l00908"></a><span class="lineno">  908</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">bool</span> isScanRanges = <a class="code" href="classFitterBase.html#aa5a5791fa27ded38e221892f885560f6">GetScaneRange</a>(scanRanges);</div>
+<div class="line"><a name="l00908"></a><span class="lineno">  908</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">bool</span> isScanRanges = <a class="code" href="classFitterBase.html#aecdbb30227044b6a075bf897cd821efb">GetScanRange</a>(scanRanges);</div>
 <div class="line"><a name="l00909"></a><span class="lineno">  909</span>&#160; </div>
 <div class="line"><a name="l00910"></a><span class="lineno">  910</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">double</span> nSigma = GetFromManager&lt;int&gt;(<a class="code" href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">fitMan</a>-&gt;<a class="code" href="classmanager.html#ab0a6c73b5f9b948408af15a32c3e4bd4">raw</a>()[<span class="stringliteral">&quot;LLHScan&quot;</span>][<span class="stringliteral">&quot;LLHScanSigma&quot;</span>], 1., __FILE__, __LINE__);</div>
 <div class="line"><a name="l00911"></a><span class="lineno">  911</span>&#160; </div>
@@ -1247,7 +1253,7 @@ Protected Attributes</h2></td></tr>
 <div class="line"><a name="l01057"></a><span class="lineno"> 1057</span>&#160;}</div>
 <div class="ttc" id="aclassFitterBase_html_a1c4d01c39f70e95eab05dc04d42a6032"><div class="ttname"><a href="classFitterBase.html#a1c4d01c39f70e95eab05dc04d42a6032">FitterBase::CheckSkipParameter</a></div><div class="ttdeci">bool CheckSkipParameter(const std::vector&lt; std::string &gt; &amp;SkipVector, const std::string &amp;ParamName) const</div><div class="ttdoc">KS: Check whether we want to skip parameter using skip vector.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8cpp_source.html#l00517">FitterBase.cpp:517</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_a48f38bfa8996fe00d51f35b05dd16b46"><div class="ttname"><a href="classFitterBase.html#a48f38bfa8996fe00d51f35b05dd16b46">FitterBase::SaveSettings</a></div><div class="ttdeci">void SaveSettings()</div><div class="ttdoc">Save the settings that the MCMC was run with.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8cpp_source.html#l00084">FitterBase.cpp:84</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_aa5a5791fa27ded38e221892f885560f6"><div class="ttname"><a href="classFitterBase.html#aa5a5791fa27ded38e221892f885560f6">FitterBase::GetScaneRange</a></div><div class="ttdeci">bool GetScaneRange(std::map&lt; std::string, std::vector&lt; double &gt;&gt; &amp;scanRanges)</div><div class="ttdoc">YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D....</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8cpp_source.html#l00497">FitterBase.cpp:497</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_aecdbb30227044b6a075bf897cd821efb"><div class="ttname"><a href="classFitterBase.html#aecdbb30227044b6a075bf897cd821efb">FitterBase::GetScanRange</a></div><div class="ttdeci">bool GetScanRange(std::map&lt; std::string, std::vector&lt; double &gt;&gt; &amp;scanRanges)</div><div class="ttdoc">YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D....</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8cpp_source.html#l00497">FitterBase.cpp:497</a></div></div>
 <div class="ttc" id="anamespaceMaCh3Utils_html_a4c8bdeb1d34606aed192e9f1311a72f5"><div class="ttname"><a href="namespaceMaCh3Utils.html#a4c8bdeb1d34606aed192e9f1311a72f5">MaCh3Utils::PrintProgressBar</a></div><div class="ttdeci">void PrintProgressBar(const Long64_t Done, const Long64_t All)</div><div class="ttdoc">KS: Simply print progress bar.</div><div class="ttdef"><b>Definition:</b> <a href="Monitor_8cpp_source.html#l00213">Monitor.cpp:213</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -1324,7 +1330,7 @@ Protected Attributes</h2></td></tr>
 <div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160; </div>
 <div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;  <span class="comment">// YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D. Barrow</span></div>
 <div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;  std::map&lt;std::string, std::vector&lt;double&gt;&gt; scanRanges;</div>
-<div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">bool</span> isScanRanges = <a class="code" href="classFitterBase.html#aa5a5791fa27ded38e221892f885560f6">GetScaneRange</a>(scanRanges);</div>
+<div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">bool</span> isScanRanges = <a class="code" href="classFitterBase.html#aecdbb30227044b6a075bf897cd821efb">GetScanRange</a>(scanRanges);</div>
 <div class="line"><a name="l00588"></a><span class="lineno">  588</span>&#160;   </div>
 <div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160;  <span class="comment">// Loop over the covariance classes</span></div>
 <div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;  <span class="keywordflow">for</span> (<a class="code" href="classParameterHandlerBase.html">ParameterHandlerBase</a> *cov : <a class="code" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>)</div>
@@ -1918,7 +1924,7 @@ Protected Attributes</h2></td></tr>
 <div class="ttc" id="aHistogramUtils_8cpp_html_a70f8b42a786759a17100280ad4d01a6e"><div class="ttname"><a href="HistogramUtils_8cpp.html#a70f8b42a786759a17100280ad4d01a6e">PolyProjectionY</a></div><div class="ttdeci">TH1D * PolyProjectionY(TObject *poly, std::string TempName, const std::vector&lt; double &gt; &amp;ybins, const bool computeErrors)</div><div class="ttdoc">WP: Poly Projectors.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00131">HistogramUtils.cpp:131</a></div></div>
 <div class="ttc" id="aMaCh3Modes_8h_html_adf43f6c73c9598abc381855d31ef5682"><div class="ttname"><a href="MaCh3Modes_8h.html#adf43f6c73c9598abc381855d31ef5682">MaCh3Modes_t</a></div><div class="ttdeci">int MaCh3Modes_t</div><div class="ttdoc">Enumerator of MaCh3Mode.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00014">MaCh3Modes.h:14</a></div></div>
 <div class="ttc" id="aPlotSigmaVariation_8cpp_html_ab681ef5f6f410c793fb6440aa3fd66c5"><div class="ttname"><a href="PlotSigmaVariation_8cpp.html#ab681ef5f6f410c793fb6440aa3fd66c5">sigmaArray</a></div><div class="ttdeci">std::vector&lt; double &gt; sigmaArray</div><div class="ttdef"><b>Definition:</b> <a href="PlotSigmaVariation_8cpp_source.html#l00015">PlotSigmaVariation.cpp:15</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_a10aff47013f10946a769ffe3b1af641a"><div class="ttname"><a href="classFitterBase.html#a10aff47013f10946a769ffe3b1af641a">FitterBase::GetName</a></div><div class="ttdeci">std::string GetName() const</div><div class="ttdoc">Get name of class.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00070">FitterBase.h:70</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_a10aff47013f10946a769ffe3b1af641a"><div class="ttname"><a href="classFitterBase.html#a10aff47013f10946a769ffe3b1af641a">FitterBase::GetName</a></div><div class="ttdeci">std::string GetName() const</div><div class="ttdoc">Get name of class.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00069">FitterBase.h:69</a></div></div>
 <div class="ttc" id="anamespaceM3_html_adb59b8ecdc4e1b2d5d4c826a13aa7463"><div class="ttname"><a href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a></div><div class="ttdeci">int int_t</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00031">Core.h:31</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -2081,7 +2087,7 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Remove obsolete memory and make other checks before fit starts. </p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000012">Todo:</a></b></dt><dd>consider expanding into ParmaterHandler and add more sanitisers </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000011">Todo:</a></b></dt><dd>consider expanding into ParmaterHandler and add more sanitisers </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="FitterBase_8cpp_source.html#l00225">225</a> of file <a class="el" href="FitterBase_8cpp_source.html">FitterBase.cpp</a>.</p>
 <div class="fragment"><div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;                                {</div>
@@ -2277,7 +2283,6 @@ Protected Attributes</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000011">Todo:</a></b></dt><dd>implement some check that number of params matches etc </dd></dl>
 
 <p>Reimplemented in <a class="el" href="classMCMCBase.html#a5921193bf940821aabec7831466d6060">MCMCBase</a>.</p>
 

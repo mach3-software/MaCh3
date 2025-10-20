@@ -162,7 +162,7 @@
 <!-- Node31 -->
 <g id="node31" class="node">
 <title>Node31</title>
-<g id="a_node31"><a xlink:href="SmearChain_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node31"><a xlink:href="SmearChain_8cpp.html" target="_top" xlink:title="Allows you to smear contour. For example after performing sets of study one finds out that used sets ...">
 <polygon fill="white" stroke="black" points="917.5,-308 917.5,-327 1061.5,-327 1061.5,-308 917.5,-308"/>
 <text text-anchor="middle" x="989.5" y="-315" font-family="Helvetica" font-size="10.00">Diagnostics/SmearChain.cpp</text>
 </a>

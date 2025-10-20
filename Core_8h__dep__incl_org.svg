@@ -461,7 +461,7 @@
 <!-- Node46 -->
 <g id="node19" class="node">
 <title>Node46</title>
-<g id="a_node19"><a xlink:href="SmearChain_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node19"><a xlink:href="SmearChain_8cpp.html" target="_top" xlink:title="Allows you to smear contour. For example after performing sets of study one finds out that used sets ...">
 <polygon fill="white" stroke="black" points="1369.5,-252 1369.5,-271 1513.5,-271 1513.5,-252 1369.5,-252"/>
 <text text-anchor="middle" x="1441.5" y="-259" font-family="Helvetica" font-size="10.00">Diagnostics/SmearChain.cpp</text>
 </a>

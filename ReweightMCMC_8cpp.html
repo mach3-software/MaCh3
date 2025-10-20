@@ -109,6 +109,7 @@ Include dependency graph for ReweightMCMC.cpp:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structReweightConfig.html">ReweightConfig</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Structure to hold reweight configuration.  <a href="structReweightConfig.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
@@ -221,7 +222,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Function to interpolate 1D graph. </p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000030">Todo:</a></b></dt><dd>double check implementation of TGraph interpolation for 1D </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000028">Todo:</a></b></dt><dd>double check implementation of TGraph interpolation for 1D </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="ReweightMCMC_8cpp_source.html#l00563">563</a> of file <a class="el" href="ReweightMCMC_8cpp_source.html">ReweightMCMC.cpp</a>.</p>
 <div class="fragment"><div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;{</div>
@@ -351,7 +352,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Function to interpolate 2D graph for Normal Ordering. </p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000026">Todo:</a></b></dt><dd>add a generic 2D reweight that is not dm32 and theta13 specific DWR </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000024">Todo:</a></b></dt><dd>add a generic 2D reweight that is not dm32 and theta13 specific DWR </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="ReweightMCMC_8cpp_source.html#l00513">513</a> of file <a class="el" href="ReweightMCMC_8cpp_source.html">ReweightMCMC.cpp</a>.</p>
 <div class="fragment"><div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;{</div>
@@ -465,9 +466,9 @@ Functions</h2></td></tr>
 <dl class="section author"><dt>Author</dt><dd>David Riley </dd>
 <dd>
 Evan Goodman </dd></dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000027">Todo:</a></b></dt><dd>Get list only of unique parameters, this is repeating unnecessarily when adding more than 1 weight DWR </dd></dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000028">Todo:</a></b></dt><dd>Finish Asimov shifting implementation, for now just warn that Asimovs are not being properly handled </dd></dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000029">Todo:</a></b></dt><dd>add tracking for how many events are outside the graph ranges for diagnostics DWR </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000025">Todo:</a></b></dt><dd>Get list only of unique parameters, this is repeating unnecessarily when adding more than 1 weight DWR </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000026">Todo:</a></b></dt><dd>Finish Asimov shifting implementation, for now just warn that Asimovs are not being properly handled </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000027">Todo:</a></b></dt><dd>add tracking for how many events are outside the graph ranges for diagnostics DWR </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="ReweightMCMC_8cpp_source.html#l00086">86</a> of file <a class="el" href="ReweightMCMC_8cpp_source.html">ReweightMCMC.cpp</a>.</p>
 <div class="fragment"><div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;{</div>
@@ -901,7 +902,7 @@ Evan Goodman </dd></dl>
 <div class="ttc" id="aYamlHelper_8h_html_ad802d5a5acdc16a796b21af74f6f5f59"><div class="ttname"><a href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">M3OpenConfig</a></div><div class="ttdeci">#define M3OpenConfig(filename)</div><div class="ttdoc">Macro to simplify calling LoadYaml with file and line info.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00561">YamlHelper.h:561</a></div></div>
 <div class="ttc" id="anamespaceM3_html_a87841bdbf0e0a2a733d9e4ca499f820d"><div class="ttname"><a href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a></div><div class="ttdeci">TFile * Open(const std::string &amp;Name, const std::string &amp;Type, const std::string &amp;File, const int Line)</div><div class="ttdoc">Opens a ROOT file with the given name and mode.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00610">HistogramUtils.cpp:610</a></div></div>
 <div class="ttc" id="anamespaceMaCh3Utils_html_a4c8bdeb1d34606aed192e9f1311a72f5"><div class="ttname"><a href="namespaceMaCh3Utils.html#a4c8bdeb1d34606aed192e9f1311a72f5">MaCh3Utils::PrintProgressBar</a></div><div class="ttdeci">void PrintProgressBar(const Long64_t Done, const Long64_t All)</div><div class="ttdoc">KS: Simply print progress bar.</div><div class="ttdef"><b>Definition:</b> <a href="Monitor_8cpp_source.html#l00213">Monitor.cpp:213</a></div></div>
-<div class="ttc" id="astructReweightConfig_html"><div class="ttname"><a href="structReweightConfig.html">ReweightConfig</a></div><div class="ttdef"><b>Definition:</b> <a href="ReweightMCMC_8cpp_source.html#l00022">ReweightMCMC.cpp:22</a></div></div>
+<div class="ttc" id="astructReweightConfig_html"><div class="ttname"><a href="structReweightConfig.html">ReweightConfig</a></div><div class="ttdoc">Structure to hold reweight configuration.</div><div class="ttdef"><b>Definition:</b> <a href="ReweightMCMC_8cpp_source.html#l00022">ReweightMCMC.cpp:22</a></div></div>
 <div class="ttc" id="astructReweightConfig_html_a08b20382f10927bf67afe36be7a6213a"><div class="ttname"><a href="structReweightConfig.html#a08b20382f10927bf67afe36be7a6213a">ReweightConfig::graph_NO</a></div><div class="ttdeci">std::unique_ptr&lt; TGraph2D &gt; graph_NO</div><div class="ttdef"><b>Definition:</b> <a href="ReweightMCMC_8cpp_source.html#l00041">ReweightMCMC.cpp:41</a></div></div>
 <div class="ttc" id="astructReweightConfig_html_a08f35a979c1f955b50423b105f6b1a52"><div class="ttname"><a href="structReweightConfig.html#a08f35a979c1f955b50423b105f6b1a52">ReweightConfig::key</a></div><div class="ttdeci">std::string key</div><div class="ttdef"><b>Definition:</b> <a href="ReweightMCMC_8cpp_source.html#l00023">ReweightMCMC.cpp:23</a></div></div>
 <div class="ttc" id="astructReweightConfig_html_a2f118ccc5cf3b9bb8c72a4ee713741e2"><div class="ttname"><a href="structReweightConfig.html#a2f118ccc5cf3b9bb8c72a4ee713741e2">ReweightConfig::weightBranchName</a></div><div class="ttdeci">std::string weightBranchName</div><div class="ttdef"><b>Definition:</b> <a href="ReweightMCMC_8cpp_source.html#l00029">ReweightMCMC.cpp:29</a></div></div>

@@ -187,7 +187,7 @@ var sectionId = 'dynsection-1';
 <!-- Node40 -->
 <g id="node34" class="node">
 <title>Node40</title>
-<g id="a_node34"><a xlink:href="SmearChain_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node34"><a xlink:href="SmearChain_8cpp.html" target="_top" xlink:title="Allows you to smear contour. For example after performing sets of study one finds out that used sets ...">
 <polygon fill="white" stroke="black" points="1798,-230 1798,-249 1942,-249 1942,-230 1798,-230"/>
 <text text-anchor="middle" x="1870" y="-237" font-family="Helvetica" font-size="10.00">Diagnostics/SmearChain.cpp</text>
 </a>

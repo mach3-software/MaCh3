@@ -101,8 +101,9 @@ Study covariance matrix stability  </li>
 <p>-f force overwrite of the combined file if it exists already</p>
 <p>-h print usage message and exit</p>
 <p><em>Output file</em> (optional) name of the combined file. If not specified, will just use <em>file1.root</em>, the first in the list of files, same as <em>hadd</em>.</p>
-<p><b>SmearChain</b> - Allows you to smear contour. For example after performing sets of study one finds out that used sets of uncertainty doesn't fully cover analysis need. Then one can smear additionally contour. </p>
-</div></div><!-- contents -->
+<p><b>SmearChain</b> - Allows you to smear contour. For example after performing sets of study one finds out that used sets of uncertainty doesn't fully cover analysis need. Then one can smear additionally contour. </p><div class="fragment"><div class="line">SmearChain MCMCchain.root Config.yaml</div>
+</div><!-- fragment --><p><b>ReweightMCMC</b> - Chain reweighting is used when one want to test different prior choices without need of rerunning MCMC. Most commonly used when studying impact of reactor constrains on θ<sub>13</sub> </p><div class="fragment"><div class="line">ReweightMCMC Config.yaml MCMCchain.root</div>
+</div><!-- fragment --> </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- Footer for MaCh3 Doxygen documentation -->
 <footer class="mach3-footer" style="text-align: center;">

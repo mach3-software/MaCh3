@@ -233,7 +233,7 @@ var searchData=
   ['getsamplestartbin_681',['GetSampleStartBin',['../classBinningHandler.html#a3add6a17401b21279d695d23c7f94d86',1,'BinningHandler']]],
   ['getsampletitle_682',['GetSampleTitle',['../group__SampleHandlerGetters.html#gad3df6900450be4bbb05453e3b166e09e',1,'SampleHandlerBase::GetSampleTitle()'],['../group__SampleHandlerGetters.html#gadfad2507ad845ad36fff3c82231a143c',1,'SampleHandlerFD::GetSampleTitle()'],['../classPySampleHandlerBase.html#ab5e1742f6636b3c05d078250b8611366',1,'PySampleHandlerBase::GetSampleTitle()']]],
   ['getsavagedickey_683',['GetSavageDickey',['../classMCMCProcessor.html#ad9c3ef9ecc7cb66791837e5127970d9f',1,'MCMCProcessor']]],
-  ['getscanerange_684',['GetScaneRange',['../classFitterBase.html#aa5a5791fa27ded38e221892f885560f6',1,'FitterBase']]],
+  ['getscanrange_684',['GetScanRange',['../classFitterBase.html#aecdbb30227044b6a075bf897cd821efb',1,'FitterBase']]],
   ['getsharedmemoryperblock_685',['GetSharedMemoryPerBlock',['../gpuUtils_8cu.html#af6d44efbc302c80d9611dc6837b4eb02',1,'GetSharedMemoryPerBlock(const int device):&#160;gpuUtils.cu'],['../gpuUtils_8cuh.html#ad6688220105d96b4fdbcf3f9e839beb7',1,'GetSharedMemoryPerBlock(const int device=0):&#160;gpuUtils.cu']]],
   ['getsigmavalue_686',['GetSigmaValue',['../StatisticalUtils_8cpp.html#a04394b98587b44b98b003bd1226606ed',1,'GetSigmaValue(const int sigma):&#160;StatisticalUtils.cpp'],['../StatisticalUtils_8h.html#a04394b98587b44b98b003bd1226606ed',1,'GetSigmaValue(const int sigma):&#160;StatisticalUtils.cpp']]],
   ['getsize_687',['GetSize',['../classTF1__red.html#af9e3b0e8d2edad0e7e08f3bf215525c9',1,'TF1_red']]],
