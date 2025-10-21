@@ -230,7 +230,7 @@ struct SampleBinningInfo {
   /// @brief DB Find the relevant bin in the PDF for each event
   int FindXBin(const double XVar, const int NomXBin) const {
     // KS: Get reference to avoid repeated indexing and help with performance
-    const auto& xBin = xBinLookup[NomXBin];
+    const auto&  xBin = xBinLookup[NomXBin];
 
     //DB Check to see if momentum shift has moved bins
     //DB - First , check to see if the event is outside of the binning range and skip event if it is

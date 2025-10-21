@@ -40,10 +40,7 @@ _MaCh3_Safe_Include_End_ //}
 class TChain;
 class TF1;
 
-/// @todo KS: Apply reweighted weight to plotting and Bayes Factor.
-/// @todo KS: Implement 2D reweighing like DayaBay.
 /// @todo KS: Implement Diagnostics/GetPenaltyTerm.cpp here.
-
 /// KS: Enum for different covariance classes
 enum ParameterEnum {
   kXSecPar  = 0,
@@ -359,6 +356,8 @@ class MCMCProcessor {
     // MCMC Diagnostic
     /// @brief CW: Prepare branches etc. for DiagMCMC
     inline void PrepareDiagMCMC();
+    /// @brief Computes the average of each parameter across all MCMC entries. Useful for autocorrelation
+    std::vector <double> GetParameterSums();
     /// @brief CW: Draw trace plots of the parameters i.e. parameter vs step
     inline void ParamTraces();
     /// @brief KS: Calculate autocorrelations supports both OpenMP and CUDA :)
@@ -437,9 +436,9 @@ class MCMCProcessor {
     /// KS: For merged chains number of entries will be different from nSteps
     int nSteps;
     /// Number of sample PDF objects
-    int nSamples;
+    int nSampleHandlers;
     /// Number of covariance objects
-    int nSysts;
+    int nParameterHandlers;
     /// Number of all parameters used in the analysis
     int nDraw;
     
@@ -548,7 +547,7 @@ class MCMCProcessor {
     std::unique_ptr<TH2D> hviolin_prior;
 
     /// Array holding values for all parameters
-    double** ParStep;
+    M3::float_t** ParStep;
     /// Step number for step, important if chains were merged
     unsigned int* StepNumber;
 
@@ -568,8 +567,6 @@ class MCMCProcessor {
     /// LagL used in AutoCorrelation
     int AutoCorrLag;
     
-    /// Total parameter sum for each param
-    double *ParamSums;
     /// Values of batched average for every param and batch
     double **BatchedAverages;
 
@@ -593,7 +590,7 @@ class MCMCProcessor {
   //Only if GPU is enabled
   #ifdef MaCh3_CUDA
     /// @brief Move stuff to GPU to perform auto correlation calculations there
-    inline void PrepareGPU_AutoCorr(const int nLags);
+    inline void PrepareGPU_AutoCorr(const int nLags, const std::vector<double>& ParamSums);
 
     /// Value of each param that will be copied to GPU
     float* ParStep_cpu;
