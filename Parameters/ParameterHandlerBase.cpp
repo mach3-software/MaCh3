@@ -1081,6 +1081,7 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
     MACH3LOG_WARN("Not using external matrix for {}, initialising adaption from scratch", matrixName);
     // If we don't have a covariance matrix to start from for adaptive tune we need to make one!
     use_adaptive = true;
+    AdaptiveHandler->CheckMatrixValidityForAdaption(GetCovMatrix());
     AdaptiveHandler->CreateNewAdaptiveCovariance();
     return;
   }

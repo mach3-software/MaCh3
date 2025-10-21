@@ -333,6 +333,63 @@ void AdaptiveMCMCHandler::Print() const {
   MACH3LOG_INFO("Will only save every {} iterations"     , adaptive_save_n_iterations);
 }
 
+// ********************************************
+void AdaptiveMCMCHandler::CheckMatrixValidityForAdaption(const TMatrixDSym *covMatrix) const {
+// ********************************************
+  int n = covMatrix->GetNrows();
+  std::vector<std::vector<double>> corrMatrix(n, std::vector<double>(n));
+
+  // Extract standard deviations from the diagonal
+  std::vector<double> stdDevs(n);
+  for (int i = 0; i < n; ++i) {
+    stdDevs[i] = std::sqrt((*covMatrix)(i, i));
+  }
+
+  // Compute correlation for each element
+  for (int i = 0; i < n; ++i) {
+    for (int j = 0; j < n; ++j) {
+      double cov = (*covMatrix)(i, j);
+      double corr = cov / (stdDevs[i] * stdDevs[j]);
+      corrMatrix[i][j] = corr;
+    }
+  }
+
+  // KS: These numbers are completely arbitrary
+  constexpr double NumberOfParametersThreshold = 5;
+  constexpr double CorrelationThreshold = 0.5;
+
+  bool FlagMessage = false;
+  // For each parameter, count how many others it is correlated with
+  for (int i = 0; i < n; ++i) {
+    if (IsFixed(i)) {
+      continue;
+    }
+    int block_i = adapt_block_matrix_indices[i];
+    int correlatedCount = 0;
+    std::vector<int> correlatedWith;
+
+    for (int j = 0; j < n; ++j) {
+      if (i == j || IsFixed(j) || adapt_block_matrix_indices[j] != block_i) {
+        continue;
+      }
+      if (corrMatrix[i][j] > CorrelationThreshold) {
+        correlatedCount++;
+        correlatedWith.push_back(j);
+      }
+    }
+
+    if (correlatedCount > NumberOfParametersThreshold) {
+      MACH3LOG_WARN("Parameter {} is highly correlated with {} other parameters (above threshold {}).", i, correlatedCount, CorrelationThreshold);
+      MACH3LOG_WARN("Correlated with parameters: {}.", fmt::join(correlatedWith, ", "));
+      FlagMessage = true;
+    }
+  }
+  if(FlagMessage){
+    MACH3LOG_WARN("Found highly correlated block, adaptive may not work as intended, proceed with caution");
+    MACH3LOG_WARN("You can consider defying so called Adaption Block to not update this part of matrix");
+  }
+}
+
 double AdaptiveMCMCHandler::CurrVal(const int par_index) const {
   /// HW Implemented as its own method to allow for
   /// different behaviour in the future

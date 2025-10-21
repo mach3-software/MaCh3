@@ -50,6 +50,11 @@ class AdaptiveMCMCHandler{
                               const std::string& means_name,
                               bool& use_adaptive);
 
+  /// @brief Check if there are structures in matrix that could result in failure of adaption fits.
+  /// this mostly cover cases of highly correlated block which seem to results in adaption failure
+  /// @param covMatrix covariance matrix which we convert into correlation matrix
+  void CheckMatrixValidityForAdaption(const TMatrixDSym *covMatrix) const;
+
   /// @brief Method to update adaptive MCMC
   /// @cite haario2001adaptive
   /// @param _fCurrVal Value of each parameter necessary for updating throw matrix
