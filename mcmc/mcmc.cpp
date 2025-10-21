@@ -217,6 +217,8 @@ void mcmc::runMCMC() {
           syst->setParCurrProp(multicanonicalVar, multicanonicalSeparateMean);
           syst->setParProp(multicanonicalVar, multicanonicalSeparateMean);
           MACH3LOG_INFO("Setting starting point of chain to mean value for multicanonical separate: {}", multicanonicalSeparateMean);
+          // pass the mean to the covarianceOsc object for parameter flipping
+          syst->setMulticanonicalSeparateMean(multicanonicalSeparateMean);
           syst->printNominalCurrProp();
         }
       }
