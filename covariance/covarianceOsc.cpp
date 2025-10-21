@@ -63,9 +63,9 @@ void covarianceOsc::proposeStep() {
     _fPropVal[kSinTheta23] = 0.5112 - (_fPropVal[kSinTheta23] - 0.5112);
   }
 
-  if(random_number[0]->Uniform() < 0.5){
+  if(random_number[0]->Uniform() < 0.15 && flipWindow){
+    // flip delta_cp around mean value
     _fPropVal[kDeltaCP] = multicanonicalSeparateMean - (_fPropVal[kDeltaCP] - multicanonicalSeparateMean);
-    MACH3LOG_INFO("Performing delta_cp flip around mean value: {}", multicanonicalSeparateMean);
   }
 
 

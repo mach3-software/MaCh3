@@ -1,4 +1,5 @@
 #include "mcmc.h"
+#include "covariance/covarianceOsc.h"
 
 // *************************
 // Initialise the manager and make it an object of mcmc class
@@ -184,6 +185,11 @@ void mcmc::runMCMC() {
       } else {
         MACH3LOG_INFO("Not adjusting umbrella step scale, using value in OscCov config");
       }
+
+      // Set the flip window flag for the oscillation systematic
+      flipWindow = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["FlipWindow"], false);
+      MACH3LOG_INFO("Flip Window: {}", flipWindow);
+
     } else {
       MACH3LOG_INFO("Using multicanonical Gaussian umbrellas");
       // Get the multicanonical sigma values from the configuration file
@@ -218,7 +224,13 @@ void mcmc::runMCMC() {
           syst->setParProp(multicanonicalVar, multicanonicalSeparateMean);
           MACH3LOG_INFO("Setting starting point of chain to mean value for multicanonical separate: {}", multicanonicalSeparateMean);
           // pass the mean to the covarianceOsc object for parameter flipping
-          syst->setMulticanonicalSeparateMean(multicanonicalSeparateMean);
+          if (flipWindow) {
+            auto* oscCov = dynamic_cast<covarianceOsc*>(syst);
+            if (oscCov) {
+              oscCov->setFlipWindow(flipWindow);
+              oscCov->setMulticanonicalSeparateMean(multicanonicalSeparateMean);
+            }
+          }
           syst->printNominalCurrProp();
         }
       }

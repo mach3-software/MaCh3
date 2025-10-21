@@ -90,6 +90,8 @@ class mcmc : public FitterBase {
   double multicanonicalSigma;
   /// multi-canonical penalty
   double multicanonical_penalty;
+  /// flip window toggle
+  bool flipWindow;
   /// osc_cov systematic variable we wish to apply multicanonical to
   int oscCovVar;
   /// multi-canonical par number
