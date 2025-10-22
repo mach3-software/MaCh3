@@ -115,18 +115,27 @@ void initParameters(py::module &m) {
             "get_proposal_array",
             [](ParameterHandlerBase &self)
             {
-                return py::memoryview::from_buffer<double>(
-                    self.GetParPropVec().data(), // the data pointer
-                    {self.GetNParameters()}, // shape
-                    {sizeof(double)} // shape
-                ); 
+                // Get the number of parameters
+                size_t n_pars = self.GetNParameters();
+                
+                // Get pointer to the data
+                const double* data_ptr = self.GetParPropVec().data();
+                
+                // Create a numpy array that copies the data
+                // This ensures the numpy array owns its data and won't have lifetime issues
+                py::array_t<double> result(n_pars);
+                auto buf = result.request();
+                double* result_ptr = static_cast<double*>(buf.ptr);
+                
+                // Copy the data
+                std::memcpy(result_ptr, data_ptr, n_pars * sizeof(double));
+                
+                return result;
             },
-            "Bind a python array to the parameter proposal values for this ParameterHandler object. \n\
-            This allows you to set e.g. a numpy array to 'track' the parameter proposal values. You could either use this to directly set the proposals, or to just read the values proposed by e.g. throw_par_prop() \n\
-            :warning: This should be set *AFTER* all of the parameters have been read in from the config file as it resizes the array to fit the number of parameters. \n\
-            :param array: This is the array that will be set. Size and contents don't matter as it will be changed to fit the parameters. "
+            "Get the parameter proposal values as a numpy array. \n\
+            This returns a copy of the current proposal values. \n\
+            :return: A numpy array containing the proposal values for all parameters."
         )
-
 
     ; // End of ParameterHandlerBase binding
 
