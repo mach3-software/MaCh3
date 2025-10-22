@@ -3353,9 +3353,9 @@ void MCMCProcessor::PrepareDiagMCMC() {
   }
     
   // Initialise ParStep
-  ParStep = new double*[nDraw]();
+  ParStep = new M3::float_t*[nDraw]();
   for (int j = 0; j < nDraw; ++j) {
-    ParStep[j] = new double[nEntries]();
+    ParStep[j] = new M3::float_t[nEntries]();
     for (int i = 0; i < nEntries; ++i) {
       ParStep[j][i] = -999.99;
     }
@@ -4233,11 +4233,11 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
   {
     for (int jj = start; jj < end; ++jj)
     {
-      std::complex<double> a_j = 0.0;
+      std::complex<M3::float_t> a_j = 0.0;
       for (int n = 0; n < _N; ++n)
       {
         //if(StepNumber[n] < BurnInCut) continue;
-        std::complex<double> exp_temp(0, two_pi_over_N * jj * n);
+        std::complex<M3::float_t> exp_temp(0, two_pi_over_N * jj * n);
         a_j += ParStep[j][n] * std::exp(exp_temp);
       }
       a_j /= std::sqrt(float(_N));
