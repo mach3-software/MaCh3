@@ -915,6 +915,11 @@ void ParameterHandlerBase::ToggleFixParameter(const int i) {
       _fError[i] *= -1.0;
       MACH3LOG_INFO("Setting {}(parameter {}) to fixed at {}", GetParFancyName(i), i, _fCurrVal[i]);
     }
+    if(_fCurrVal[i] > _fUpBound[i] || _fCurrVal[i] < _fLowBound[i]) {
+      MACH3LOG_ERROR("Parameter {} (index {}) is fixed at {}, which is outside of its bounds [{}, {}]", GetParFancyName(i), i, _fCurrVal[i], _fLowBound[i], _fUpBound[i]);
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
+
   } else {
     PCAObj->ToggleFixParameter(i, _fNames);
   }
