@@ -59,7 +59,7 @@ SampleHandlerFD::~SampleHandlerFD() {
 void SampleHandlerFD::ReadConfig()
 {
   auto ModeName = Get<std::string>(SampleManager->raw()["MaCh3ModeConfig"], __FILE__ , __LINE__);
-  Modes = std::make_unique<MaCh3Modes>(ModeName);
+  Modes = std::make_unique<MaCh3Modes>(getenv("MACH3")+std::string("/") + ModeName);
   //SampleName has to be provided in the sample yaml otherwise this will throw an exception
   SampleHandlerName = Get<std::string>(SampleManager->raw()["SampleHandlerName"], __FILE__ , __LINE__);
 
