@@ -57,7 +57,7 @@ SampleHandlerFD::~SampleHandlerFD() {
 void SampleHandlerFD::ReadSampleConfig() 
 {
   auto ModeName = Get<std::string>(SampleManager->raw()["MaCh3ModeConfig"], __FILE__ , __LINE__);
-  Modes = std::make_unique<MaCh3Modes>(ModeName);
+  Modes = std::make_unique<MaCh3Modes>(getenv("MACH3")+std::string("/")+ModeName);
   //SampleTitle has to be provided in the sample yaml otherwise this will throw an exception
   SampleDetails.SampleTitle = Get<std::string>(SampleManager->raw()["SampleTitle"], __FILE__ , __LINE__);
   //SampleName has to be provided in the sample yaml otherwise this will throw an exception
@@ -143,8 +143,10 @@ void SampleHandlerFD::ReadSampleConfig()
     FileToInitPDGMap[MTupleFileName] = static_cast<NuPDG>(osc_channel["nutype"].as<int>());
     FileToFinalPDGMap[MTupleFileName] = static_cast<NuPDG>(osc_channel["oscnutype"].as<int>());
 
-    mc_files.push_back(MTupleFileName);
-    spline_files.push_back(splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);
+    std::string m3_path = (getenv("MACH3")+std::string("/")); 
+
+    mc_files.push_back(m3_path+MTupleFileName);
+    spline_files.push_back(m3_path+splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);
   }
 
   //Now grab the selection cuts from the manager
