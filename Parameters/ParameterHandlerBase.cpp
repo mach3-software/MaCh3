@@ -766,7 +766,8 @@ double ParameterHandlerBase::CalcLikelihood() const _noexcept_ {
       //HW: Flat prior, no need to calculate anything
       continue;
     }
-
+    // KS: Precalculate Diff once per "i" without doing this for every "j"
+    const double Diff = _fPropVal[i] - _fPreFitValue[i];
     #ifdef MULTITHREAD
     #pragma omp simd
     #endif
@@ -774,7 +775,7 @@ double ParameterHandlerBase::CalcLikelihood() const _noexcept_ {
       if (!_fFlatPrior[j]) {
         //KS: Since matrix is symmetric we can calculate non diagonal elements only once and multiply by 2, can bring up to factor speed decrease.
         double scale = (i != j) ? 1. : 0.5;
-        logL += scale * (_fPropVal[i] - _fPreFitValue[i])*(_fPropVal[j] - _fPreFitValue[j])*InvertCovMatrix[i][j];
+        logL += scale * Diff * (_fPropVal[j] - _fPreFitValue[j])*InvertCovMatrix[i][j];
       }
     }
   }
