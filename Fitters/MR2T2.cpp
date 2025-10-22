@@ -39,8 +39,8 @@ void MR2T2::ProposeStep() {
         systematics[s]->ProposeStep();
 
         // Get the likelihood from the systematics
-        syst_llh[s] = systematics[s]->GetLikelihood();
-        llh += syst_llh[s];
+        syst_llh_prop[s] = systematics[s]->GetLikelihood();
+        llh += syst_llh_prop[s];
 
 #ifdef DEBUG
         if (debug)
@@ -74,8 +74,8 @@ void MR2T2::ProposeStep() {
         for (size_t i = 0; i < samples.size(); ++i)
         {
             // Get the sample likelihoods and add them
-            sample_llh[i] = samples[i]->GetLikelihood();
-            llh += sample_llh[i];
+            sample_llh_prop[i] = samples[i]->GetLikelihood();
+            llh += sample_llh_prop[i];
 #ifdef DEBUG
             if (debug)
                 debugFile << "LLH after sample " << i << " " << llh << std::endl;
@@ -89,7 +89,7 @@ void MR2T2::ProposeStep() {
         for (size_t i = 0; i < samples.size(); ++i)
         {
             // Set the sample_llh[i] to be madly high also to signify a step out of bounds
-            sample_llh[i] = M3::_LARGE_LOGL_;
+            sample_llh_prop[i] = M3::_LARGE_LOGL_;
 #ifdef DEBUG
             if (debug)
                 debugFile << "LLH after REJECT sample " << i << " " << llh << std::endl;

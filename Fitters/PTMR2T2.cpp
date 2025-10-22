@@ -35,18 +35,9 @@ PTMR2T2::PTMR2T2(manager *const manager) : MR2T2(manager) {
 
 void PTMR2T2::PrepareOutput()
 {
-    FitterBase::PrepareOutput();
-
+    MR2T2::PrepareOutput();
     // Store temperature scale [used in reweighting so good to have/event]
     outTree->Branch("TempScale", &TempScale, "TempScale/D");
-
-    // // Store timing benchmarks
-    // #ifdef DEBUG
-    // outTree->Branch("time_base_dostep", &time_base_dostep, "time_base_dostep/D");
-    // outTree->Branch("time_swap", &time_swap, "time_swap/D");
-    // outTree->Branch("time_global_adapt", &time_global_adapt, "time_global_adapt/D");
-    // MACH3LOG_INFO("PTMR2T2 timing branches added to output tree");
-    // #endif
 }
 
 void PTMR2T2::RunMCMC(){
@@ -91,11 +82,11 @@ void PTMR2T2::ProposeStep()
     MR2T2::ProposeStep();
     sample_logLProp = 0.0;
     for(size_t s = 0; s < samples.size(); ++s){
-        logLProp -= sample_llh[s];
+        logLProp -= sample_llh_prop[s];
         // For swapping!
-        sample_logLProp += sample_llh[s];
-        sample_llh[s] *= inv_TempScale;
-        logLProp += sample_llh[s];
+        sample_logLProp += sample_llh_prop[s];
+        sample_llh_prop[s] *= inv_TempScale;
+        logLProp += sample_llh_prop[s];
     }
 }
 

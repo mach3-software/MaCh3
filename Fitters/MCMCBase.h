@@ -43,8 +43,11 @@ class MCMCBase : public FitterBase {
     /// @brief The MCMC step proposal and acceptance
     virtual void DoStep()=0;
 
-    /// @brief Step acceptance probability
-    virtual double AcceptanceProbability()=0;
+   /// @brief so we don't save our proposed likelihoods
+   void PrepareOutput() override;
+
+   /// @brief Step acceptance probability
+   virtual double AcceptanceProbability() = 0;
 
     /// @brief Is step accepted?
     /// @param acc_prob used for telling whether step is accepted or not
@@ -73,4 +76,8 @@ class MCMCBase : public FitterBase {
     /// simulated annealing temperature
     double AnnealTemp;
 
+    /// proposed sample likelihood
+    std::vector<double> sample_llh_prop;
+    // current systematic likelihood
+    std::vector<double> syst_llh_prop;
 };

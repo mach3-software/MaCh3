@@ -1,5 +1,7 @@
 #include "Parameters/AdaptiveMCMCHandler.h"
 
+#include <algorithm>
+
 namespace adaptive_mcmc{
 
 /*
@@ -46,17 +48,26 @@ double AdaptiveMode::NSigmaFromMode(std::vector<double> point) const{
 
   // With sufficient statistics, use proper Mahalanobis-like distance
   double nSigma = 0.0;
+  double max_param_sigma = 0.0;
   for(size_t i = 0; i < means.size(); ++i){
     double var = variances[i] / (n_steps - 1);
     if(var > 1e-10){  // Numerical safety
-      nSigma += ((point[i] - means[i]) * (point[i] - means[i])) / var;
+      double delta = point[i] - means[i];
+      double sigma_sq = (delta * delta) / var;
+      nSigma += sigma_sq;
+      max_param_sigma = std::max(max_param_sigma, std::sqrt(sigma_sq));
     } else {
       // If variance is essentially zero, use the squared deviation directly
       double delta = point[i] - means[i];
-      nSigma += delta * delta * 1e10;  // Penalize deviation from a precise mean
+      double sigma_sq = delta * delta * 1e10;  // Penalize deviation from a precise mean
+      nSigma += sigma_sq;
+      max_param_sigma = std::max(max_param_sigma, std::sqrt(sigma_sq));
     }
   }
-  return std::sqrt(nSigma / static_cast<double>(means.size()));  // Normalize by dimension
+  // Return the larger of the joint N-sigma distance or the largest single-parameter excursion.
+  // This prevents dilution of a strongly multi-modal parameter by nearly-fixed companions.
+  double joint_distance = std::sqrt(nSigma);
+  return std::max(joint_distance, max_param_sigma);
 }
 
 
@@ -467,11 +478,11 @@ double AdaptiveMCMCHandler::CurrVal(const int par_index) const {
 void AdaptiveMCMCHandler::UpdateModes(const std::vector<double>& point) {
   // Adaptive threshold: start large and decrease as we gain statistics
   // With low stats, we're more lenient about creating new modes
-  double mode_threshold = 3.0;  // N-sigma threshold
+  double mode_threshold = 0.5;  // N-sigma threshold
   
   // Make threshold more stringent as we accumulate data
   if(total_steps > 1000) {
-    mode_threshold = 2.5;
+    mode_threshold = 1.0;
   }
   if(total_steps > 5000) {
     mode_threshold = 2.0;
@@ -504,7 +515,7 @@ void AdaptiveMCMCHandler::UpdateModes(const std::vector<double>& point) {
     if(mode_information.size() < max_modes) {
       std::unique_ptr<AdaptiveMode> new_mode = std::make_unique<AdaptiveMode>(point);
       mode_information.push_back(std::move(new_mode));
-      MACH3LOG_INFO("Created new mode {} at step {} ({} total modes)", 
+      MACH3LOG_DEBUG("Created new mode {} at step {} ({} total modes)", 
                     mode_information.size()-1, total_steps, mode_information.size());
     } else {
       // If at max modes, force update of closest mode
@@ -541,7 +552,7 @@ int AdaptiveMCMCHandler::GetClosestMode(const std::vector<double>& point) const 
 
 void AdaptiveMCMCHandler::MergeSimilarModes() {
   // Check all pairs of modes and merge if they're too similar
-  const double merge_threshold = 3.0;  // Modes within 3 sigma get merged
+  const double merge_threshold = 2.0;  // Modes within 2 sigma get merged
   
   for(size_t i = 0; i < mode_information.size(); ++i) {
     for(size_t j = i+1; j < mode_information.size(); ++j) {
@@ -550,7 +561,7 @@ void AdaptiveMCMCHandler::MergeSimilarModes() {
       double distance = mode_information[j]->NSigmaFromMode(means_i);
       
       if(distance < merge_threshold) {
-        MACH3LOG_INFO("Merging mode {} into mode {} (distance: {} sigma)", j, i, distance);
+        MACH3LOG_DEBUG("Merging mode {} into mode {} (distance: {} sigma)", j, i, distance);
         // Simply remove the redundant mode (the other will capture future points)
         mode_information.erase(mode_information.begin() + j);
         // After erasing, adjust indices

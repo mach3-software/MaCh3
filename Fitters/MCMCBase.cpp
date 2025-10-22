@@ -27,7 +27,14 @@ void MCMCBase::Init(){
     }
 }
 
+void MCMCBase::PrepareOutput()
+{
+    FitterBase::PrepareOutput();
 
+    // We also need to resize our proposal vectors
+    sample_llh_prop.resize(samples.size());
+    syst_llh_prop.resize(systematics.size());
+}
 
 // *******************
 // Run the Markov chain with all the systematic objects added
@@ -48,13 +55,17 @@ void MCMCBase::RunMCMC() {
     // Set the current logL to the proposed logL for the 0th step
     // Accept the first step to set logLCurr: this shouldn't affect the MCMC because we ignore the first N steps in burn-in
     logLCurr = logLProp;
-
-
+    for(size_t s=0; s < systematics.size(); ++s){    
+        sample_llh[s] = sample_llh_prop[s];
+    }
+    for(size_t s=0; s < systematics.size(); ++s){
+        syst_llh = syst_llh_prop;
+    }
 
     // Begin MCMC
     const auto StepEnd = stepStart + chainLength;
 
-    #ifdef MPIENABLED
+#ifdef MPIENABLED
     // We send a signal to all other fitters that we are ready to start MCMC
     MPI_Barrier(MPI_COMM_WORLD);
     #endif
@@ -232,5 +243,11 @@ void MCMCBase::AcceptStep() {
     for (size_t s = 0; s < systematics.size(); ++s)
     {
         systematics[s]->AcceptStep();
+        syst_llh[s] = syst_llh_prop[s];
+    }
+    // Loop over samples and swap
+    for( size_t i = 0; i < samples.size(); ++i)
+    {
+        sample_llh[i] = sample_llh_prop[i];
     }
 }

@@ -3,229 +3,245 @@
 // MaCh3 Includes
 #include "Manager/Manager.h"
 #include "Parameters/ParameterHandlerUtils.h"
+#include <deque> // NEW: For sliding window
 
-namespace adaptive_mcmc{
-  
-// A rough approximation of a mode
-class AdaptiveMode{
-public:
-  AdaptiveMode(const std::vector<double>& point);
-  void Update(const std::vector<double>& point);
-  double NSigmaFromMode(std::vector<double> point) const;
-  
-  /// @brief Get the mean values for this mode
-  std::vector<double> GetMeans() const { return means; }
-  
-  /// @brief Get the variance values for this mode
-  std::vector<double> GetVariances() const { return variances; }
-  
-  /// @brief Get the number of steps accumulated in this mode
-  int GetNSteps() const { return n_steps; }
-  
-protected:
-  std::vector<double> means;
-  std::vector<double> variances;
-  int n_steps;
+namespace adaptive_mcmc
+{
 
-};
+  // A rough approximation of a mode
+  class AdaptiveMode
+  {
+  public:
+    AdaptiveMode(const std::vector<double> &point);
+    void Update(const std::vector<double> &point);
+    double NSigmaFromMode(std::vector<double> point) const;
 
+    /// @brief Get the mean values for this mode
+    std::vector<double> GetMeans() const { return means; }
 
-/// @brief Contains information about adaptive covariance matrix
-/// @cite haario2001adaptive
-/// @author Henry Wallace
-/// @details struct encapsulating all adaptive MCMC information
-class AdaptiveMCMCHandler{
- public:
-  /// @brief Constructor
-  AdaptiveMCMCHandler();
+    /// @brief Get the variance values for this mode
+    std::vector<double> GetVariances() const { return variances; }
 
-  /// @brief Destructor
-  virtual ~AdaptiveMCMCHandler();
+    /// @brief Get the number of steps accumulated in this mode
+    int GetNSteps() const { return n_steps; }
 
-  /// @brief Print all class members
-  void Print() const;
+  protected:
+    std::vector<double> means;
+    std::vector<double> variances;
+    int n_steps;
+  };
 
-  /// @brief Read initial values from config file
-  ///
-  /// @param adapt_manager YAML node containing the configuration (`AdaptionOptions`).
-  /// @param matrix_name_str Name of the covariance matrix block to configure.
-  /// @param parameters Pointer to a vector of parameter values (nominal values).
-  /// @param fixed Pointer to a vector of fixed parameter values.
-  /// @return True if adaptive MCMC configuration was successfully initialized, false otherwise.
-  bool InitFromConfig(const YAML::Node& adapt_manager, const std::string& matrix_name_str,
-                      const std::vector<double>* parameters, const std::vector<double>* fixed);
-
-  /// @brief If we don't have a covariance matrix to start from for adaptive tune we need to make one!
-  void CreateNewAdaptiveCovariance();
-
-  /// @brief HW: sets adaptive block matrix
-  /// @param block_indices Values for sub-matrix blocks
-  void SetAdaptiveBlocks(const std::vector<std::vector<int>>& block_indices);
-
-  /// @brief HW: Save adaptive throw matrix to file
-  void SaveAdaptiveToFile(const std::string& outFileName, const std::string& systematicName, const bool is_final=false);
-
-  /// @brief sets throw matrix from a file
-  /// @param matrix_file_name name of file matrix lives in
-  /// @param matrix_name name of matrix in file
-  /// @param means_name name of means vec in file
-  void SetThrowMatrixFromFile(const std::string& matrix_file_name,
-                              const std::string& matrix_name,
-                              const std::string& means_name,
-                              bool& use_adaptive);
-
-  /// @brief Method to update adaptive MCMC
+  /// @brief Contains information about adaptive covariance matrix
   /// @cite haario2001adaptive
-  /// @param _fCurrVal Value of each parameter necessary for updating throw matrix
-  void UpdateAdaptiveCovariance();
+  /// @author Henry Wallace
+  /// @details struct encapsulating all adaptive MCMC information
+  class AdaptiveMCMCHandler
+  {
+  public:
+    /// @brief Constructor
+    AdaptiveMCMCHandler();
 
-  /// @brief Tell whether we want reset step scale or not
-  bool IndivStepScaleAdapt() const;
+    /// @brief Destructor
+    virtual ~AdaptiveMCMCHandler();
 
-  /// @brief Tell whether matrix should be updated
-  bool UpdateMatrixAdapt();
+    /// @brief Print all class members
+    void Print() const;
 
-  /// @brief To be fair not a clue...
-  bool AdaptionUpdate() const;
+    /// @brief Read initial values from config file
+    bool InitFromConfig(const YAML::Node &adapt_manager, const std::string &matrix_name_str,
+                        const std::vector<double> *parameters, const std::vector<double> *fixed);
 
-  /// @brief Tell if we are Skipping Adaption
-  bool SkipAdaption() const;
+    /// @brief If we don't have a covariance matrix to start from for adaptive tune we need to make one!
+    void CreateNewAdaptiveCovariance();
 
-  /// @brief Set the current values of the parameters
-  void SetParams(const std::vector<double>* params) {
-    _fCurrVal = params;
-  }
+    /// @brief HW: sets adaptive block matrix
+    void SetAdaptiveBlocks(const std::vector<std::vector<int>> &block_indices);
 
-  /// @brief Set the fixed parameters
-  void SetFixed(const std::vector<double>* fix) {
-    _fFixedPars = fix;
-  }
+    /// @brief HW: Save adaptive throw matrix to file
+    void SaveAdaptiveToFile(const std::string &outFileName, const std::string &systematicName, const bool is_final = false);
 
-  /// @brief Get the current values of the parameters
-  /// @ingroup ParameterHandlerGetters
-  int GetNumParams() const {
-    return static_cast<int>(_fCurrVal->size());
-  }
+    /// @brief sets throw matrix from a file
+    void SetThrowMatrixFromFile(const std::string &matrix_file_name,
+                                const std::string &matrix_name,
+                                const std::string &means_name,
+                                bool &use_adaptive);
 
-  /// @brief Check if a parameter is fixed
-  bool IsFixed(const int ipar) const {
-    if(!_fFixedPars){
-      return false;
+    /// @brief Method to update adaptive MCMC
+    void UpdateAdaptiveCovariance();
+
+    /// @brief Tell whether we want reset step scale or not
+    bool IndivStepScaleAdapt() const;
+
+    /// @brief Tell whether matrix should be updated
+    bool UpdateMatrixAdapt();
+
+    /// @brief To be fair not a clue...
+    bool AdaptionUpdate() const;
+
+    /// @brief Tell if we are Skipping Adaption
+    bool SkipAdaption() const;
+
+    /// @brief Set the current values of the parameters
+    void SetParams(const std::vector<double> *params)
+    {
+      _fCurrVal = params;
     }
-    return ((*_fFixedPars)[ipar] < 0);
-  }
 
-  /// @brief Get Current value of parameter
-  double CurrVal(const int par_index) const;
+    /// @brief Set the fixed parameters
+    void SetFixed(const std::vector<double> *fix)
+    {
+      _fFixedPars = fix;
+    }
 
-  /// @brief Get Total Number of Steps
-  /// @ingroup ParameterHandlerGetters
-  int GetTotalSteps() const {
-    return total_steps;
-  }
+    /// @brief Get the current values of the parameters
+    int GetNumParams() const
+    {
+      return static_cast<int>(_fCurrVal->size());
+    }
 
-  /// @brief Change Total Number of Steps to new value
-  void SetTotalSteps(const int nsteps) {
-    total_steps = nsteps;
-  }
+    /// @brief Check if a parameter is fixed
+    bool IsFixed(const int ipar) const
+    {
+      if (!_fFixedPars)
+      {
+        return false;
+      }
+      return ((*_fFixedPars)[ipar] < 0);
+    }
 
-  /// @brief Increase by one number of total steps
-  void IncrementNSteps() {
-    total_steps++;
-  }
+    /// @brief Get Current value of parameter
+    double CurrVal(const int par_index) const;
 
-  /// @brief Increase by one number of total steps
-  /// @ingroup ParameterHandlerGetters
-  TMatrixDSym* GetAdaptiveCovariance() const {
-    return adaptive_covariance;
-  }
+    /// @brief Get Total Number of Steps
+    int GetTotalSteps() const
+    {
+      return total_steps;
+    }
 
-  /// @brief Get the parameter means used in the adaptive handler
-  /// @ingroup ParameterHandlerGetters
-  std::vector<double> GetParameterMeans() const {
-    return par_means;
-  }
+    /// @brief Change Total Number of Steps to new value
+    void SetTotalSteps(const int nsteps)
+    {
+      total_steps = nsteps;
+    }
 
-  /// @brief Get Name of Output File
-  /// @ingroup ParameterHandlerGetters
-  std::string GetOutFileName() const {
-    return output_file_name;
-  }
+    /// @brief Increase by one number of total steps
+    void IncrementNSteps()
+    {
+      total_steps++;
+    }
 
-  /// @brief Enable or disable mode tracking
-  void SetModeTracking(bool enable) {
-    track_modes = enable;
-  }
+    /// @brief Get adaptive covariance matrix
+    TMatrixDSym *GetAdaptiveCovariance() const
+    {
+      return adaptive_covariance;
+    }
 
-  /// @brief Check if mode tracking is enabled
-  bool IsModeTrackingEnabled() const {
-    return track_modes;
-  }
+    /// @brief Get the parameter means used in the adaptive handler
+    std::vector<double> GetParameterMeans() const
+    {
+      return par_means;
+    }
 
-  /// @brief Get the number of detected modes
-  size_t GetNModes() const {
-    return mode_information.size();
-  }
+    /// @brief Get Name of Output File
+    std::string GetOutFileName() const
+    {
+      return output_file_name;
+    }
 
-  /// @brief Print information about detected modes
-  void PrintModeInfo() const;
+    /// @brief Enable or disable mode tracking
+    void SetModeTracking(bool enable)
+    {
+      track_modes = enable;
+    }
 
- private:
-  /// Meta variables related to adaption run time
-  /// When do we start throwing
-  int start_adaptive_throw;
+    /// @brief Check if mode tracking is enabled
+    bool IsModeTrackingEnabled() const
+    {
+      return track_modes;
+    }
 
-  /// When do we stop update the adaptive matrix
-  int start_adaptive_update;
+    /// @brief Get the number of detected modes
+    size_t GetNModes() const
+    {
+      return mode_information.size();
+    }
 
-  /// Steps between changing throw matrix
-  int end_adaptive_update;
+    /// @brief Print information about detected modes
+    void PrintModeInfo() const;
 
-  /// Steps between changing throw matrix
-  int adaptive_update_step;
+    /// @brief Set the size of the sliding window for covariance estimation
+    void SetWindowSize(int size)
+    {
+      window_size = size;
+    }
 
-  /// If you don't want to save every adaption then
-  /// you can specify this here
-  int adaptive_save_n_iterations;
+    /// @brief Get the current window size
+    int GetWindowSize() const
+    {
+      return window_size;
+    }
 
-  /// Name of the file to save the adaptive matrices into
-  std::string output_file_name;
+    /// @brief Set minimum steps required for stability before adapting
+    void SetMinStableSteps(int steps)
+    {
+      min_stable_steps = steps;
+    }
 
-  /// Indices for block-matrix adaption
-  std::vector<int> adapt_block_matrix_indices;
+    /// @brief Set the mode jump detection threshold (in sigma)
+    void SetModeJumpThreshold(double threshold)
+    {
+      mode_jump_threshold = threshold;
+    }
 
-  /// Size of blocks for adaption
-  std::vector<int> adapt_block_sizes;
+    /// @brief Set the covariance shrink factor applied after mode jumps
+    void SetPostJumpShrinkFactor(double factor)
+    {
+      post_jump_shrink_factor = factor;
+    }
 
-  // Variables directedly linked to adaption
-  /// Mean values for all parameters
-  std::vector<double> par_means;
+  private:
+    /// Meta variables related to adaption run time
+    int start_adaptive_throw;
+    int start_adaptive_update;
+    int end_adaptive_update;
+    int adaptive_update_step;
+    int adaptive_save_n_iterations;
+    std::string output_file_name;
 
-  /// Full adaptive covariance matrix
-  TMatrixDSym* adaptive_covariance;
+    /// Indices for block-matrix adaption
+    std::vector<int> adapt_block_matrix_indices;
+    std::vector<int> adapt_block_sizes;
 
-  /// Total number of MCMC steps
-  int total_steps;
+    // Variables directly linked to adaption
+    std::vector<double> par_means;
+    TMatrixDSym *adaptive_covariance;
+    int total_steps;
+    double adaption_scale;
 
-  /// Scaling factor
-  double adaption_scale;
+    /// Fixed and current parameter values
+    const std::vector<double> *_fFixedPars;
+    const std::vector<double> *_fCurrVal;
 
-  /// Vector of fixed parameters
-  const std::vector<double>* _fFixedPars;
+    /// Mode tracking
+    bool track_modes;
+    std::vector<std::unique_ptr<AdaptiveMode>> mode_information;
+    void UpdateModes(const std::vector<double> &point);
+    int GetClosestMode(const std::vector<double> &point) const;
+    void MergeSimilarModes();
+    std::vector<double> MoveToInitMode(const std::vector<double> &point) const;
 
-  /// Current values of parameters
-  const std::vector<double>* _fCurrVal;
+    /// NEW: Windowed adaptation for multimodal distributions
+    std::deque<std::vector<double>> recent_points; // Sliding window of recent MCMC points
+    std::vector<double> prev_point;                // Previous MCMC point
+    int steps_since_mode_change;                   // Steps since last mode jump
+    int current_mode_idx;                          // Index of current mode
 
-  /// Enable mode tracking and correction
-  bool track_modes;
-
-  /// Move parameter to a given mode
-  void UpdateModes(const std::vector<double>& point);
-  int GetClosestMode(const std::vector<double>& point) const; 
-  void MergeSimilarModes();
-  std::vector<double> MoveToInitMode(const std::vector<double>& point) const;
-  std::vector<std::unique_ptr<AdaptiveMode>> mode_information;
-
-};
+    // Configurable parameters for windowed adaptation
+    int window_size;                    // Size of sliding window (default: 500)
+    int min_stable_steps;               // Min steps in mode before adapting (default: 50)
+    double mode_jump_threshold;         // N-sigma threshold for mode jump (default: 3.0)
+    double post_jump_shrink_factor;     // Covariance shrink after jump (default: 0.5)
+    double exponential_smoothing_alpha; // Weight for new covariance (default: 0.8)
+  };
 
 } // adaptive_mcmc namespace
