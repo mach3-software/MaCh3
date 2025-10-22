@@ -6,6 +6,100 @@
 
 namespace py = pybind11;
 
+
+// Add these includes at the top of the file
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+#include <pybind11/numpy.h>
+#include "TH1.h"
+#include "TH2.h"
+
+namespace py = pybind11;
+
+// Helper function to convert TH1 to numpy arrays
+std::tuple<py::array_t<double>, py::array_t<double>> TH1ToNumpy(TH1* hist) {
+    if (!hist) {
+        throw std::runtime_error("Histogram pointer is null");
+    }
+    
+    int nbins = hist->GetNbinsX();
+    
+    // Create numpy array for bin contents
+    py::array_t<double> contents(nbins);
+    auto contents_buf = contents.request();
+    double* contents_ptr = static_cast<double*>(contents_buf.ptr);
+    
+    // Create numpy array for bin edges (nbins + 1 edges)
+    py::array_t<double> edges(nbins + 1);
+    auto edges_buf = edges.request();
+    double* edges_ptr = static_cast<double*>(edges_buf.ptr);
+    
+    // Copy bin contents (ROOT bins start at 1, not 0)
+    for (int i = 0; i < nbins; ++i) {
+        std::cout << "Bin countent for bin " << i + 1 << ": " << hist->GetBinContent(i + 1) << std::endl;
+        contents_ptr[i] = hist->GetBinContent(i + 1);
+    }
+    
+    // Copy bin edges
+    for (int i = 0; i <= nbins; ++i) {
+        edges_ptr[i] = hist->GetBinLowEdge(i + 1);
+    }
+    // Add the upper edge of the last bin
+    edges_ptr[nbins] = hist->GetBinLowEdge(nbins + 1) + hist->GetBinWidth(nbins + 1);
+    
+    return std::make_tuple(contents, edges);
+}
+
+// Helper function to convert TH2 to numpy arrays
+std::tuple<py::array_t<double>, py::array_t<double>, py::array_t<double>> TH2ToNumpy(TH2* hist) {
+    if (!hist) {
+        throw std::runtime_error("Histogram pointer is null");
+    }
+    
+    int nbinsX = hist->GetNbinsX();
+    int nbinsY = hist->GetNbinsY();
+    
+    // Create 2D numpy array for bin contents (shape: nbinsY x nbinsX to match numpy convention)
+    py::array_t<double> contents({nbinsY, nbinsX});
+    auto contents_buf = contents.request();
+    double* contents_ptr = static_cast<double*>(contents_buf.ptr);
+    
+    // Create numpy arrays for bin edges
+    py::array_t<double> edgesX(nbinsX + 1);
+    auto edgesX_buf = edgesX.request();
+    double* edgesX_ptr = static_cast<double*>(edgesX_buf.ptr);
+    
+    py::array_t<double> edgesY(nbinsY + 1);
+    auto edgesY_buf = edgesY.request();
+    double* edgesY_ptr = static_cast<double*>(edgesY_buf.ptr);
+    
+    // Copy bin contents (ROOT bins start at 1, not 0)
+    // Note: numpy uses row-major order (C-style), so we iterate Y then X
+    for (int iy = 0; iy < nbinsY; ++iy) {
+        for (int ix = 0; ix < nbinsX; ++ix) {
+            contents_ptr[iy * nbinsX + ix] = hist->GetBinContent(ix + 1, iy + 1);
+        }
+    }
+    
+    // Copy X bin edges
+    for (int i = 0; i <= nbinsX; ++i) {
+        edgesX_ptr[i] = hist->GetXaxis()->GetBinLowEdge(i + 1);
+    }
+    edgesX_ptr[nbinsX] = hist->GetXaxis()->GetBinLowEdge(nbinsX + 1) + 
+                         hist->GetXaxis()->GetBinWidth(nbinsX + 1);
+    
+    // Copy Y bin edges
+    for (int i = 0; i <= nbinsY; ++i) {
+        edgesY_ptr[i] = hist->GetYaxis()->GetBinLowEdge(i + 1);
+    }
+    edgesY_ptr[nbinsY] = hist->GetYaxis()->GetBinLowEdge(nbinsY + 1) + 
+                         hist->GetYaxis()->GetBinWidth(nbinsY + 1);
+    
+    return std::make_tuple(contents, edgesX, edgesY);
+}
+
+// Add these bindings to the PySampleHandlerFD class definition:
+
 /// @brief EW: As SampleHandlerBase is an abstract base class we have to do some gymnastics to get it to get it into python
 class PySampleHandlerBase : public SampleHandlerBase {
 public:
@@ -439,18 +533,136 @@ void initSamples(py::module &m) {
         )
     ; // End of SampleHandlerBase binding
 
-    py::class_<SampleHandlerFD, PySampleHandlerFD /* <--- trampoline*/, SampleHandlerBase>(m_samples, "SampleHandlerFD")
+    py::class_<SampleHandlerFD, PySampleHandlerFD /* <--- trampoline*/,
+               SampleHandlerBase>(m_samples, "SampleHandlerFD")
         .def(
-            py::init<std::string, ParameterHandlerGeneric*>(),
+            py::init<std::string, ParameterHandlerGeneric *>(),
             "This should never be called directly as SampleHandlerFD is an abstract base class. \n\
             However when creating a derived class, in the __init__() method, you should call the parent constructor i.e. this one by doing:: \n\
             \n\
             \tsuper(<your derived SampleHandler class>, self).__init__(*args) \n\
             \n ",
-            py::arg("mc_version"),
-            py::arg("xsec_cov")
-        )
-    ;
+            py::arg("mc_version"), py::arg("xsec_cov"))
+
+        .def(
+            "get_mc_hist",
+            [](SampleHandlerFD &self, const int Dimension) {
+
+              //self.Reweight();
+              
+              // Get the histogram pointer BEFORE cloning
+              TH1 *hist_original = self.GetMCHist(Dimension);
+              
+              // Debug: Check the original histogram
+              std::cout << "=== ORIGINAL HISTOGRAM ===" << std::endl;
+              if (!hist_original) {
+                throw std::runtime_error("GetMCHist returned null pointer");
+              }
+              std::cout << "Dimension is " << Dimension << std::endl;
+              std::cout << "Original histogram address: " << hist_original << std::endl;
+              std::cout << "Original histogram name: " << hist_original->GetName() << std::endl;
+              std::cout << "Original histogram bins: " << hist_original->GetNbinsX() << std::endl;
+              std::cout << "Original histogram integral: " << hist_original->Integral() << std::endl;
+              std::cout << "Original histogram entries: " << hist_original->GetEntries() << std::endl;
+              
+              // Print first few bin contents
+              std::cout << "First 5 bin contents of original:" << std::endl;
+              for (int i = 1; i <= std::min(5, hist_original->GetNbinsX()); ++i) {
+                std::cout << "  Bin " << i << ": " << hist_original->GetBinContent(i) << std::endl;
+              }
+              
+              // Now clone it
+              TH1D *hist = (TH1D*)hist_original->Clone("cloned_hist");
+              
+              // Debug: Check the cloned histogram
+              std::cout << "=== CLONED HISTOGRAM ===" << std::endl;
+              std::cout << "Cloned histogram address: " << hist << std::endl;
+              std::cout << "Cloned histogram name: " << hist->GetName() << std::endl;
+              std::cout << "Cloned histogram integral: " << hist->Integral() << std::endl;
+              std::cout << "Cloned histogram entries: " << hist->GetEntries() << std::endl;
+              
+              // Print first few bin contents of clone
+              std::cout << "First 5 bin contents of clone:" << std::endl;
+              for (int i = 1; i <= std::min(5, hist->GetNbinsX()); ++i) {
+                std::cout << "  Bin " << i << ": " << hist->GetBinContent(i) << std::endl;
+              }
+
+              if (Dimension == 1) {
+                // 1D histogram
+                auto [contents, edges] = TH1ToNumpy(hist);
+                return py::make_tuple(contents, edges);
+              } else if (Dimension == 2) {
+                // 2D histogram - cast to TH2
+                TH2 *hist2d = dynamic_cast<TH2 *>(hist);
+                if (!hist2d) {
+                  throw std::runtime_error("Failed to cast to TH2");
+                }
+                auto [contents, edgesX, edgesY] = TH2ToNumpy(hist2d);
+                return py::make_tuple(contents, edgesX, edgesY);
+              } else {
+                throw std::invalid_argument("Dimension must be 1 or 2");
+              }
+            },
+            py::return_value_policy::reference_internal,
+            py::arg("Dimension"),
+            "Get MC histogram as numpy arrays.\n"
+            "For 1D: Returns (contents, edges)\n"
+            "For 2D: Returns (contents, edgesX, edgesY)\n"
+            "where contents is shape (nbinsY, nbinsX) for 2D")
+
+        .def(
+            "get_data_hist",
+            [](SampleHandlerFD &self, const int Dimension) {
+              TH1 *hist = self.GetDataHist(Dimension);
+
+              if (Dimension == 1) {
+                // 1D histogram
+                auto [contents, edges] = TH1ToNumpy(hist);
+                return py::make_tuple(contents, edges);
+              } else if (Dimension == 2) {
+                // 2D histogram - cast to TH2
+                TH2 *hist2d = dynamic_cast<TH2 *>(hist);
+                if (!hist2d) {
+                  throw std::runtime_error("Failed to cast to TH2");
+                }
+                auto [contents, edgesX, edgesY] = TH2ToNumpy(hist2d);
+                return py::make_tuple(contents, edgesX, edgesY);
+              } else {
+                throw std::invalid_argument("Dimension must be 1 or 2");
+              }
+            },
+            py::arg("Dimension"),
+            "Get Data histogram as numpy arrays.\n"
+            "For 1D: Returns (contents, edges)\n"
+            "For 2D: Returns (contents, edgesX, edgesY)\n"
+            "where contents is shape (nbinsY, nbinsX) for 2D")
+
+        .def(
+            "get_w2_hist",
+            [](SampleHandlerFD &self, const int Dimension) {
+              TH1 *hist = self.GetW2Hist(Dimension);
+
+              if (Dimension == 1) {
+                // 1D histogram
+                auto [contents, edges] = TH1ToNumpy(hist);
+                return py::make_tuple(contents, edges);
+              } else if (Dimension == 2) {
+                // 2D histogram - cast to TH2
+                TH2 *hist2d = dynamic_cast<TH2 *>(hist);
+                if (!hist2d) {
+                  throw std::runtime_error("Failed to cast to TH2");
+                }
+                auto [contents, edgesX, edgesY] = TH2ToNumpy(hist2d);
+                return py::make_tuple(contents, edgesX, edgesY);
+              } else {
+                throw std::invalid_argument("Dimension must be 1 or 2");
+              }
+            },
+            py::arg("Dimension"),
+            "Get W2 histogram as numpy arrays.\n"
+            "For 1D: Returns (contents, edges)\n"
+            "For 2D: Returns (contents, edgesX, edgesY)\n"
+            "where contents is shape (nbinsY, nbinsX) for 2D");
 
     /* Not sure if this will be needed in future versions of MaCh3 so leaving commented for now
     py::class_<fdmc_base>(m_samples, "MCstruct")
