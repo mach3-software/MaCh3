@@ -1168,8 +1168,8 @@ void ParameterHandlerBase::MakeClosestPosDef(TMatrixDSym *cov) {
   //Do SVD to get polar form
   TDecompSVD cov_sym_svd=TDecompSVD(cov_sym);
   if(!cov_sym_svd.Decompose()){
-    MACH3LOG_ERROR("Cannot do SVD on input matrix!");
-    throw MaCh3Exception(__FILE__ , __LINE__ );
+    MACH3LOG_WARN("Cannot do SVD on input matrix, trying MakePosDef() first!");
+    MakePosDef(&cov_sym);
   }
   
   TMatrixD cov_sym_v = cov_sym_svd.GetV();
