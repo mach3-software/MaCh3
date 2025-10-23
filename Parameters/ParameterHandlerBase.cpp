@@ -666,6 +666,11 @@ void ParameterHandlerBase::AcceptStep() _noexcept_ {
   } else {
     PCAObj->AcceptStep();
   }
+
+  if (AdaptiveHandler) {
+    AdaptiveHandler->IncrementAcceptedSteps();
+  }
+
 }
 
 // *************************************
@@ -1117,6 +1122,11 @@ void ParameterHandlerBase::UpdateAdaptiveCovariance(){
     return;
   }
 
+  /// Need to adjust the scale every step
+  if(AdaptiveHandler->GetUseRobbinsMonro()){
+    SetStepScale(AdaptiveHandler->GetAdaptionScale(), false);
+  }
+
   // Call main adaption function
   AdaptiveHandler->UpdateAdaptiveCovariance();
 
@@ -1128,6 +1138,9 @@ void ParameterHandlerBase::UpdateAdaptiveCovariance(){
   if(AdaptiveHandler->UpdateMatrixAdapt()) {
     TMatrixDSym* update_matrix = static_cast<TMatrixDSym*>(AdaptiveHandler->GetAdaptiveCovariance()->Clone());
     UpdateThrowMatrix(update_matrix); //Now we update and continue!
+    // Also update global step scale so we're multiplying by 2.38^2/d OR our adapted scale
+    SetStepScale(AdaptiveHandler->GetAdaptionScale(), AdaptiveHandler->GetUseRobbinsMonro());
+
     //Also Save the adaptive to file
     AdaptiveHandler->SaveAdaptiveToFile(AdaptiveHandler->GetOutFileName(), GetName());
   }

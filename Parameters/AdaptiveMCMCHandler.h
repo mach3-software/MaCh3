@@ -4,6 +4,8 @@
 #include "Manager/Manager.h"
 #include "Parameters/ParameterHandlerUtils.h"
 
+#include "Math/DistFunc.h"
+
 namespace adaptive_mcmc{
 
 /// @brief Contains information about adaptive covariance matrix
@@ -115,6 +117,11 @@ class AdaptiveMCMCHandler{
     total_steps++;
   }
 
+  void IncrementAcceptedSteps() {
+    prev_step_accepted = true;
+  }
+
+  
   /// @brief Increase by one number of total steps
   /// @ingroup ParameterHandlerGetters
   TMatrixDSym* GetAdaptiveCovariance() const {
@@ -133,7 +140,22 @@ class AdaptiveMCMCHandler{
     return output_file_name;
   }
 
+  double GetAdaptionScale(){
+    if(use_robbins_monro){
+      UpdateRobbinsMonroScale();
+    }
+    return adaption_scale;
+  }
+
+  bool GetUseRobbinsMonro() const {
+    return use_robbins_monro;
+  }
+
  private:
+
+  void UpdateRobbinsMonroScale();
+  void CalculateRobbinsMonroStepLength();
+  double GetRobbinsMonrotepLength();
   /// Meta variables related to adaption run time
   /// When do we start throwing
   int start_adaptive_throw;
@@ -178,6 +200,26 @@ class AdaptiveMCMCHandler{
 
   /// Current values of parameters
   const std::vector<double>* _fCurrVal;
+  
+  /// Acceptance rate in the current batch
+  int acceptance_rate_batch_size;
+
+  /// Use Robbins Monro https://arxiv.org/pdf/1006.3690
+  bool use_robbins_monro;
+
+  /// Target acceptance rate for Robbins Monro
+  double target_acceptance;
+
+  /// Scale factor for Robbins Monro
+  double c_robbins_monro;
+  
+  /// Number of restarts for Robbins Monro
+  int n_rm_restarts;
+
+  /// Total number of restarts ALLOWED for Robbins Monro
+  int total_rm_restarts;
+
+  bool prev_step_accepted;
 };
 
 } // adaptive_mcmc namespace
