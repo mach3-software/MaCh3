@@ -34,7 +34,6 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
 
   OutputFile = nullptr;
   
-  ParamSums = nullptr;
   BatchedAverages = nullptr;
   SampleValues = nullptr;
   SystValues = nullptr;
@@ -66,8 +65,8 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
   nSteps = 0;
   nBatches = 0;
   AutoCorrLag = 0;
-  nSysts = 0;
-  nSamples = 0;
+  nParameterHandlers = 0;
+  nSampleHandlers = 0;
   
   nBins = 70;
   DrawRange = 1.5;
@@ -452,7 +451,8 @@ void MCMCProcessor::DrawPostfit() {
   else CutPosterior1D = StepCut;
 
   // Make a TH1D of the central values and the errors
-  TH1D *paramPlot = new TH1D("paramPlot", "paramPlot", nDraw, 0, nDraw);
+  std::unique_ptr<TH1D> paramPlot = std::make_unique<TH1D>("paramPlot", "paramPlot", nDraw, 0, nDraw);
+  paramPlot->SetDirectory(nullptr);
   paramPlot->SetName("mach3params");
   paramPlot->SetTitle(CutPosterior1D.c_str());
   paramPlot->SetFillStyle(3001);
@@ -464,7 +464,7 @@ void MCMCProcessor::DrawPostfit() {
   paramPlot->GetXaxis()->SetTitle("");
 
   // Same but with Gaussian output
-  TH1D *paramPlot_Gauss = static_cast<TH1D*>(paramPlot->Clone());
+  std::unique_ptr<TH1D> paramPlot_Gauss = M3::Clone(paramPlot.get());
   paramPlot_Gauss->SetMarkerColor(kOrange-5);
   paramPlot_Gauss->SetMarkerStyle(23);
   paramPlot_Gauss->SetLineWidth(2);
@@ -475,7 +475,7 @@ void MCMCProcessor::DrawPostfit() {
   paramPlot_Gauss->GetXaxis()->SetTitle("");
 
   // Same but with Gaussian output
-  TH1D *paramPlot_HPD = static_cast<TH1D*>(paramPlot->Clone());
+  std::unique_ptr<TH1D> paramPlot_HPD = M3::Clone(paramPlot.get());
   paramPlot_HPD->SetMarkerColor(kBlack);
   paramPlot_HPD->SetMarkerStyle(25);
   paramPlot_HPD->SetLineWidth(2);
@@ -558,9 +558,9 @@ void MCMCProcessor::DrawPostfit() {
   // Make a TLegend
   auto CompLeg = std::make_unique<TLegend>(0.33, 0.73, 0.76, 0.95);
   CompLeg->AddEntry(prefit.get(), "Prefit", "fp");
-  CompLeg->AddEntry(paramPlot, "Postfit PDF", "fp");
-  CompLeg->AddEntry(paramPlot_Gauss, "Postfit Gauss", "fp");
-  CompLeg->AddEntry(paramPlot_HPD, "Postfit HPD", "lfep");
+  CompLeg->AddEntry(paramPlot.get(), "Postfit PDF", "fp");
+  CompLeg->AddEntry(paramPlot_Gauss.get(), "Postfit Gauss", "fp");
+  CompLeg->AddEntry(paramPlot_HPD.get(), "Postfit HPD", "lfep");
   CompLeg->SetFillColor(0);
   CompLeg->SetFillStyle(0);
   CompLeg->SetLineWidth(0);
@@ -688,10 +688,6 @@ void MCMCProcessor::DrawPostfit() {
       Start += NDSamplesBins[i];
     }
   }
-  delete paramPlot;
-  delete paramPlot_Gauss;
-  delete paramPlot_HPD;
-
   //KS: Return Margin to default one
   SetMargins(Posterior, Margins);
 }
@@ -704,7 +700,7 @@ void MCMCProcessor::MakeCredibleIntervals(const std::vector<double>& CredibleInt
 // *********************
   if(hpost[0] == nullptr) MakePostfit();
 
-  MACH3LOG_INFO("Making Credible Intervals");
+  MACH3LOG_INFO("Starting {}", __func__);
   const double LeftMargin = Posterior->GetLeftMargin();
   Posterior->SetLeftMargin(0.15);
 
@@ -809,8 +805,7 @@ void MCMCProcessor::MakeViolin() {
 // *********************
   //KS: Make sure we have steps
   if(!CacheMCMC) CacheSteps();
-
-  MACH3LOG_INFO("Producing Violin Plot");
+  MACH3LOG_INFO("Starting {}", __func__);
 
   // KS: Set temporary branch address to allow min/max, otherwise ROOT can segfaults
   double tempVal = 0.0;
@@ -1084,17 +1079,17 @@ void MCMCProcessor::CacheSteps() {
   }
 
   MACH3LOG_INFO("Caching input tree...");
-  MACH3LOG_INFO("Allocating {:.2f} MB", double(sizeof(double)*nDraw*nEntries)/1.E6);
+  MACH3LOG_INFO("Allocating {:.2f} MB", double(sizeof(M3::float_t)*nDraw*nEntries)/1.E6);
   TStopwatch clock;
   clock.Start();
   
-  ParStep = new double*[nDraw];
+  ParStep = new M3::float_t*[nDraw];
   StepNumber = new unsigned int[nEntries];
   
   hpost2D.resize(nDraw);
   for (int i = 0; i < nDraw; ++i) 
   {
-    ParStep[i] = new double[nEntries];
+    ParStep[i] = new M3::float_t[nEntries];
     hpost2D[i].resize(nDraw);
     for (int j = 0; j < nEntries; ++j)
     {
@@ -1107,7 +1102,7 @@ void MCMCProcessor::CacheSteps() {
   // Set all the branches to off
   Chain->SetBranchStatus("*", false);
   unsigned int stepBranch = 0;
-  double* ParValBranch = new double[nDraw]();
+  std::vector<double> ParValBranch(nDraw);
   // Turn on the branches which we want for parameters
   for (int i = 0; i < nDraw; ++i)
   {
@@ -1147,8 +1142,6 @@ void MCMCProcessor::CacheSteps() {
       WeightValue[j] = ReweightWeight;
     }
   }
-  delete[] ParValBranch;
-
   // Set all the branches to on
   Chain->SetBranchStatus("*", true);
 
@@ -1583,8 +1576,8 @@ void MCMCProcessor::DrawCorrelationsGroup(const std::unique_ptr<TH2D>& CorrMatri
   double yMax = MatrixCopy->GetYaxis()->GetBinUpEdge(nBinsY);
 
   for (size_t g = 1; g < GroupStart.size(); ++g) {
-    double posX = MatrixCopy->GetXaxis()->GetBinLowEdge(GroupStart[g] + 1);
-    double posY = MatrixCopy->GetYaxis()->GetBinLowEdge(GroupStart[g] + 1);
+    const double posX = MatrixCopy->GetXaxis()->GetBinLowEdge(GroupStart[g] + 1);
+    const double posY = MatrixCopy->GetYaxis()->GetBinLowEdge(GroupStart[g] + 1);
 
     // Vertical line at group start
     auto vLine = std::make_unique<TLine>(posX, yMin, posX, yMax);
@@ -1602,20 +1595,20 @@ void MCMCProcessor::DrawCorrelationsGroup(const std::unique_ptr<TH2D>& CorrMatri
   }
 
   std::vector<std::unique_ptr<TText>> groupLabels(GroupName.size() * 2);
-  double yOffsetBelow = 0.05 * (yMax - yMin); // space below x-axis
-  double xOffsetRight = 0.02 * (xMax - xMin); // space right of y-axis
+  const double yOffsetBelow = 0.05 * (yMax - yMin); // space below x-axis
+  const double xOffsetRight = 0.02 * (xMax - xMin); // space right of y-axis
 
   for (size_t g = 0; g < GroupName.size(); ++g) {
-    int startBin = GroupStart[g] + 1; // hist bins start at 1
-    int endBin   = GroupEnd[g];
+    const int startBin = GroupStart[g] + 1; // hist bins start at 1
+    const int endBin   = GroupEnd[g];
 
-    double xStart = MatrixCopy->GetXaxis()->GetBinLowEdge(startBin);
-    double xEnd   = MatrixCopy->GetXaxis()->GetBinUpEdge(endBin);
-    double xMid   = 0.5 * (xStart + xEnd);
+    const double xStart = MatrixCopy->GetXaxis()->GetBinLowEdge(startBin);
+    const double xEnd   = MatrixCopy->GetXaxis()->GetBinUpEdge(endBin);
+    const double xMid   = 0.5 * (xStart + xEnd);
 
-    double yStart = MatrixCopy->GetYaxis()->GetBinLowEdge(startBin);
-    double yEnd   = MatrixCopy->GetYaxis()->GetBinUpEdge(endBin);
-    double yMid   = 0.5 * (yStart + yEnd);
+    const double yStart = MatrixCopy->GetYaxis()->GetBinLowEdge(startBin);
+    const double yEnd   = MatrixCopy->GetYaxis()->GetBinUpEdge(endBin);
+    const double yMid   = 0.5 * (yStart + yEnd);
 
     // Label along X-axis (below histogram)
     auto labelX = std::make_unique<TText>(xMid, yMin - yOffsetBelow, GroupName[g].c_str());
@@ -2222,11 +2215,11 @@ void MCMCProcessor::ScanInput() {
     //KS: as a bonus get LogL systematic
     if (bname.BeginsWith("LogL_sample_")) {
       SampleName_v.push_back(bname);
-      nSamples++;
+      nSampleHandlers++;
     }
     else if (bname.BeginsWith("LogL_systematic_")) {
       SystName_v.push_back(bname);
-      nSysts++;
+      nParameterHandlers++;
     }
   }
   nDraw = int(BranchNames.size());
@@ -3360,9 +3353,9 @@ void MCMCProcessor::PrepareDiagMCMC() {
   }
     
   // Initialise ParStep
-  ParStep = new double*[nDraw]();
+  ParStep = new M3::float_t*[nDraw]();
   for (int j = 0; j < nDraw; ++j) {
-    ParStep[j] = new double[nEntries]();
+    ParStep[j] = new M3::float_t[nEntries]();
     for (int i = 0; i < nEntries; ++i) {
       ParStep[j][i] = -999.99;
     }
@@ -3373,24 +3366,19 @@ void MCMCProcessor::PrepareDiagMCMC() {
   AccProbValues = new double[nEntries]();
   StepNumber = new unsigned int[nEntries]();
   for (int i = 0; i < nEntries; ++i) {
-    SampleValues[i] = new double[nSamples]();
-    SystValues[i] = new double[nSysts]();
+    SampleValues[i] = new double[nSampleHandlers]();
+    SystValues[i] = new double[nParameterHandlers]();
 
-    for (int j = 0; j < nSamples; ++j) {
+    for (int j = 0; j < nSampleHandlers; ++j) {
       SampleValues[i][j] = -999.99;
     }
-    for (int j = 0; j < nSysts; ++j) {
+    for (int j = 0; j < nParameterHandlers; ++j) {
       SystValues[i][j] = -999.99;
     }
     AccProbValues[i] = -999.99;
     StepNumber[i] = 0;
   }
 
-  // Initialise the sums
-  ParamSums = new double[nDraw]();
-  for (int i = 0; i < nDraw; ++i) {
-    ParamSums[i] = 0.0;
-  }
   MACH3LOG_INFO("Reading input tree...");
   TStopwatch clock;
   clock.Start();
@@ -3414,8 +3402,8 @@ void MCMCProcessor::PrepareDiagMCMC() {
     }
   }
   std::vector<double> ParStepBranch(nDraw);
-  std::vector<double> SampleValuesBranch(nSamples);
-  std::vector<double> SystValuesBranch(nSysts);
+  std::vector<double> SampleValuesBranch(nSampleHandlers);
+  std::vector<double> SystValuesBranch(nParameterHandlers);
   int StepNumberBranch = 0;
   double AccProbValuesBranch = 0;
   // Set the branch addresses for params
@@ -3424,12 +3412,12 @@ void MCMCProcessor::PrepareDiagMCMC() {
     Chain->SetBranchAddress(BranchNames[j].Data(), &ParStepBranch[j]);
   }
   // Set the branch addresses for samples
-  for (int j = 0; j < nSamples; ++j) {
+  for (int j = 0; j < nSampleHandlers; ++j) {
     Chain->SetBranchStatus(SampleName_v[j].Data(), true);
     Chain->SetBranchAddress(SampleName_v[j].Data(), &SampleValuesBranch[j]);
   }
   // Set the branch addresses for systematics
-  for (int j = 0; j < nSysts; ++j) {
+  for (int j = 0; j < nParameterHandlers; ++j) {
     Chain->SetBranchStatus(SystName_v[j].Data(), true);
     Chain->SetBranchAddress(SystName_v[j].Data(), &SystValuesBranch[j]);
   }
@@ -3454,11 +3442,11 @@ void MCMCProcessor::PrepareDiagMCMC() {
       ParStep[j][i] = ParStepBranch[j];
     }
     // Set the branch addresses for samples
-    for (int j = 0; j < nSamples; ++j) {
+    for (int j = 0; j < nSampleHandlers; ++j) {
       SampleValues[i][j] = SampleValuesBranch[j];
     }
     // Set the branch addresses for systematics
-    for (int j = 0; j < nSysts; ++j) {
+    for (int j = 0; j < nParameterHandlers; ++j) {
       SystValues[i][j] = SystValuesBranch[j];
     }
       
@@ -3477,7 +3465,6 @@ void MCMCProcessor::PrepareDiagMCMC() {
     }
     // Fill up the sum for each j param
     for (int j = 0; j < nDraw; ++j) {
-      ParamSums[j] += ParStep[j][i];
       BatchedAverages[BatchNumber][j] += ParStep[j][i];
     }
     
@@ -3492,7 +3479,6 @@ void MCMCProcessor::PrepareDiagMCMC() {
   #pragma omp parallel for
   #endif
   for (int i = 0; i < nDraw; ++i) {
-    ParamSums[i] /= double(nEntries);
     for (int j = 0; j < nBatches; ++j) {
       // Divide by the total number of events in the batch
       BatchedAverages[j][i] /= BatchLength;
@@ -3511,9 +3497,9 @@ void MCMCProcessor::ParamTraces() {
   if (ParStep == nullptr) PrepareDiagMCMC();
   MACH3LOG_INFO("Making trace plots...");
   // Make the TH1Ds
-  std::vector<TH1D*> TraceParamPlots(nDraw);
-  std::vector<TH1D*> TraceSamplePlots(nSamples);
-  std::vector<TH1D*> TraceSystsPlots(nSysts);
+  std::vector<std::unique_ptr<TH1D>> TraceParamPlots(nDraw);
+  std::vector<std::unique_ptr<TH1D>> TraceSamplePlots(nSampleHandlers);
+  std::vector<std::unique_ptr<TH1D>> TraceSystsPlots(nParameterHandlers);
 
   // Set the titles and limits for TH2Ds
   for (int j = 0; j < nDraw; ++j) {
@@ -3522,21 +3508,24 @@ void MCMCProcessor::ParamTraces() {
     
     GetNthParameter(j, Prior, PriorError, Title);
     std::string HistName = Form("%s_%s_Trace", Title.Data(), BranchNames[j].Data());
-    TraceParamPlots[j] = new TH1D(HistName.c_str(), HistName.c_str(), nEntries, 0, nEntries);
+    TraceParamPlots[j] = std::make_unique<TH1D>(HistName.c_str(), HistName.c_str(), nEntries, 0, nEntries);
+    TraceParamPlots[j]->SetDirectory(nullptr);
     TraceParamPlots[j]->GetXaxis()->SetTitle("Step");
     TraceParamPlots[j]->GetYaxis()->SetTitle("Parameter Variation");
   }
 
-  for (int j = 0; j < nSamples; ++j) {
+  for (int j = 0; j < nSampleHandlers; ++j) {
     std::string HistName = SampleName_v[j].Data();
-    TraceSamplePlots[j] = new TH1D(HistName.c_str(), HistName.c_str(), nEntries, 0, nEntries);
+    TraceSamplePlots[j] = std::make_unique<TH1D>(HistName.c_str(), HistName.c_str(), nEntries, 0, nEntries);
+    TraceSamplePlots[j]->SetDirectory(nullptr);
     TraceSamplePlots[j]->GetXaxis()->SetTitle("Step");
     TraceSamplePlots[j]->GetYaxis()->SetTitle("Sample -logL");
   }
 
-  for (int j = 0; j < nSysts; ++j) {
+  for (int j = 0; j < nParameterHandlers; ++j) {
     std::string HistName = SystName_v[j].Data();
-    TraceSystsPlots[j] = new TH1D(HistName.c_str(), HistName.c_str(), nEntries, 0, nEntries);
+    TraceSystsPlots[j] = std::make_unique<TH1D>(HistName.c_str(), HistName.c_str(), nEntries, 0, nEntries);
+    TraceSystsPlots[j]->SetDirectory(nullptr);
     TraceSystsPlots[j]->GetXaxis()->SetTitle("Step");
     TraceSystsPlots[j]->GetYaxis()->SetTitle("Systematic -logL");
   }
@@ -3553,10 +3542,10 @@ void MCMCProcessor::ParamTraces() {
     for (int j = 0; j < nDraw; ++j) {
       TraceParamPlots[j]->SetBinContent(i, ParStep[j][i]);
     }
-    for (int j = 0; j < nSamples; ++j) {
+    for (int j = 0; j < nSampleHandlers; ++j) {
       TraceSamplePlots[j]->SetBinContent(i, SampleValues[i][j]);
     }
-    for (int j = 0; j < nSysts; ++j) {
+    for (int j = 0; j < nParameterHandlers; ++j) {
       TraceSystsPlots[j]->SetBinContent(i, SystValues[i][j]);
     }
   }
@@ -3566,26 +3555,22 @@ void MCMCProcessor::ParamTraces() {
   TraceDir->cd();
   for (int j = 0; j < nDraw; ++j) {
     // Fit a linear function to the traces
-    TF1 *Fitter = new TF1("Fitter","[0]", nEntries/2, nEntries);
+    auto Fitter = std::make_unique<TF1>("Fitter", "[0]", nEntries/2, nEntries);
     Fitter->SetLineColor(kRed);
     TraceParamPlots[j]->Fit("Fitter","Rq");
     TraceParamPlots[j]->Write();
-    delete Fitter;
-    delete TraceParamPlots[j];
   }
 
   TDirectory *LLDir = OutputFile->mkdir("LogL");
   LLDir->cd();
-  for (int j = 0; j < nSamples; ++j) {
+  for (int j = 0; j < nSampleHandlers; ++j) {
     TraceSamplePlots[j]->Write();
-    delete TraceSamplePlots[j];
     delete[] SampleValues[j];
   }
   delete[] SampleValues;
 
-  for (int j = 0; j < nSysts; ++j) {
+  for (int j = 0; j < nParameterHandlers; ++j) {
     TraceSystsPlots[j]->Write();
-    delete TraceSystsPlots[j];
     delete SystValues[j];
   }
   delete[] SystValues;
@@ -3594,6 +3579,30 @@ void MCMCProcessor::ParamTraces() {
   delete TraceDir;
 
   OutputFile->cd();
+}
+
+// *********************************
+std::vector <double> MCMCProcessor::GetParameterSums() {
+// *********************************
+  // Initialise the sums
+  std::vector <double> ParamSums(nDraw,0);
+
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for (int j = 0; j < nDraw; ++j) {
+    for (int i = 0; i < nEntries; ++i) {
+      ParamSums[j] += ParStep[j][i];
+    }
+  }
+  // Make the sums into average
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for (int i = 0; i < nDraw; ++i) {
+    ParamSums[i] /= double(nEntries);
+  }
+  return ParamSums;
 }
 
 // *********************************
@@ -3611,7 +3620,7 @@ void MCMCProcessor::AutoCorrelation_FFT() {
   // Prep outputs
   OutputFile->cd();
   TDirectory* AutoCorrDir = OutputFile->mkdir("Auto_corr");
-  std::vector<TH1D*> LagKPlots(nDraw);
+  std::vector<std::unique_ptr<TH1D>> LagKPlots(nDraw);
   std::vector<std::vector<double>> LagL(nDraw);
 
   // Arrays needed to perform FFT using ROOT
@@ -3622,6 +3631,7 @@ void MCMCProcessor::AutoCorrelation_FFT() {
   std::vector<double> ParValsFFTSquare(nEntries, 0.0);  // FFT Absolute square
   std::vector<double> ParValsComplex(nEntries, 0.0);  // Input Imaginary values (0)
 
+  auto ParamSums = GetParameterSums();
   // Create forward and reverse FFT objects. I don't love using ROOT here,
   // but it works so I can't complain
   TVirtualFFT* fftf = TVirtualFFT::FFT(1, &nEntries, "C2CFORWARD");
@@ -3664,7 +3674,8 @@ void MCMCProcessor::AutoCorrelation_FFT() {
     std::string HistName = Form("%s_%s_Lag", Title.Data(), BranchNames[j].Data());
 
     // Initialize Lag plot
-    LagKPlots[j] = new TH1D(HistName.c_str(), HistName.c_str(), nLags, 0.0, nLags);
+    LagKPlots[j] = std::make_unique<TH1D>(HistName.c_str(), HistName.c_str(), nLags, 0.0, nLags);
+    LagKPlots[j]->SetDirectory(nullptr);
     LagKPlots[j]->GetXaxis()->SetTitle("Lag");
     LagKPlots[j]->GetYaxis()->SetTitle("Auto-correlation function");
 
@@ -3677,7 +3688,6 @@ void MCMCProcessor::AutoCorrelation_FFT() {
     // Write and clean up
     AutoCorrDir->cd();
     LagKPlots[j]->Write();
-    delete LagKPlots[j];
   }
 
   //KS: This is different diagnostic however it relies on calculated Lag, thus we call it before we delete LagKPlots
@@ -3707,12 +3717,13 @@ void MCMCProcessor::AutoCorrelation() {
   std::vector<std::vector<double>> DenomSum(nDraw);
   std::vector<std::vector<double>> NumeratorSum(nDraw);
   std::vector<std::vector<double>> LagL(nDraw);
+  auto ParamSums = GetParameterSums();
   for (int j = 0; j < nDraw; ++j) {
     DenomSum[j].resize(nLags);
     NumeratorSum[j].resize(nLags);
     LagL[j].resize(nLags);
   }
-  std::vector<TH1D*> LagKPlots(nDraw);
+  std::vector<std::unique_ptr<TH1D>> LagKPlots(nDraw);
   // Loop over the parameters of interest
   for (int j = 0; j < nDraw; ++j)
   {
@@ -3729,7 +3740,8 @@ void MCMCProcessor::AutoCorrelation() {
     
     GetNthParameter(j, Prior, PriorError, Title);
     std::string HistName = Form("%s_%s_Lag", Title.Data(), BranchNames[j].Data());
-    LagKPlots[j] = new TH1D(HistName.c_str(), HistName.c_str(), nLags, 0.0, nLags);
+    LagKPlots[j] = std::make_unique<TH1D>(HistName.c_str(), HistName.c_str(), nLags, 0.0, nLags);
+    LagKPlots[j]->SetDirectory(nullptr);
     LagKPlots[j]->GetXaxis()->SetTitle("Lag");
     LagKPlots[j]->GetYaxis()->SetTitle("Auto-correlation function");
   }
@@ -3762,7 +3774,7 @@ void MCMCProcessor::AutoCorrelation() {
 #else //NOW GPU specific code
   MACH3LOG_INFO("Using GPU");
   //KS: This allocates memory and copy data from CPU to GPU
-  PrepareGPU_AutoCorr(nLags);
+  PrepareGPU_AutoCorr(nLags, ParamSums);
 
   //KS: This runs the main kernel and copy results back to CPU
   RunGPU_AutoCorr(
@@ -3812,13 +3824,10 @@ void MCMCProcessor::AutoCorrelation() {
     }
     AutoCorrDir->cd();
     LagKPlots[j]->Write();
-    delete LagKPlots[j];
   }
 
   //KS: This is different diagnostic however it relies on calculated Lag, thus we call it before we delete LagKPlots
   CalculateESS(nLags, LagL);
-
-  delete[] ParamSums;
 
   AutoCorrDir->Close();
   delete AutoCorrDir;
@@ -3832,7 +3841,7 @@ void MCMCProcessor::AutoCorrelation() {
 #ifdef MaCh3_CUDA
 // **************************
 //KS: Allocates memory and copy data from CPU to GPU
-void MCMCProcessor::PrepareGPU_AutoCorr(const int nLags) {
+void MCMCProcessor::PrepareGPU_AutoCorr(const int nLags, const std::vector<double>& ParamSums) {
 // **************************
   //KS: Create temporary arrays that will communicate with GPU code
   ParStep_cpu = new float[nDraw*nEntries];
@@ -4015,7 +4024,7 @@ void MCMCProcessor::BatchedMeans() {
   if (BatchedAverages == nullptr) PrepareDiagMCMC();
   MACH3LOG_INFO("Making BatchedMeans plots...");
   
-  std::vector<TH1D*> BatchedParamPlots(nDraw);
+  std::vector<std::unique_ptr<TH1D>> BatchedParamPlots(nDraw);
   for (int j = 0; j < nDraw; ++j) {
     TString Title = "";
     double Prior = 1.0, PriorError = 1.0;
@@ -4023,7 +4032,8 @@ void MCMCProcessor::BatchedMeans() {
     GetNthParameter(j, Prior, PriorError, Title);
     
     std::string HistName = Form("%s_%s_batch", Title.Data(), BranchNames[j].Data());
-    BatchedParamPlots[j] = new TH1D(HistName.c_str(), HistName.c_str(), nBatches, 0, nBatches);
+    BatchedParamPlots[j] = std::make_unique<TH1D>(HistName.c_str(), HistName.c_str(), nBatches, 0, nBatches);
+    BatchedParamPlots[j]->SetDirectory(nullptr);
   }
 
   #ifdef MULTITHREAD
@@ -4043,12 +4053,10 @@ void MCMCProcessor::BatchedMeans() {
   TDirectory *BatchDir = OutputFile->mkdir("Batched_means");
   BatchDir->cd();
   for (int j = 0; j < nDraw; ++j) {
-    TF1 *Fitter = new TF1("Fitter","[0]", 0, nBatches);
+    auto Fitter = std::make_unique<TF1>("Fitter", "[0]", 0, nBatches);
     Fitter->SetLineColor(kRed);
     BatchedParamPlots[j]->Fit("Fitter","Rq");
     BatchedParamPlots[j]->Write();
-    delete Fitter;
-    delete BatchedParamPlots[j];
   }
 
   //KS: Get the batched means variance estimation and variable indicating if number of batches is sensible
@@ -4225,11 +4233,11 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
   {
     for (int jj = start; jj < end; ++jj)
     {
-      std::complex<double> a_j = 0.0;
+      std::complex<M3::float_t> a_j = 0.0;
       for (int n = 0; n < _N; ++n)
       {
         //if(StepNumber[n] < BurnInCut) continue;
-        std::complex<double> exp_temp(0, two_pi_over_N * jj * n);
+        std::complex<M3::float_t> exp_temp(0, two_pi_over_N * jj * n);
         a_j += ParStep[j][n] * std::exp(exp_temp);
       }
       a_j /= std::sqrt(float(_N));
@@ -4261,7 +4269,7 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
     plot->SetMarkerStyle(7);
 
     // Equation 18
-    TF1 *func = new TF1("power_template", "[0]*( ([1] / x)^[2] / (([1] / x)^[2] +1) )", 0.0, 1.0);
+    auto func = std::make_unique<TF1>("power_template", "[0]*( ([1] / x)^[2] / (([1] / x)^[2] +1) )", 0.0, 1.0);
     // P0 gives the amplitude of the white noise spectrum in the k → 0 limit
     func->SetParameter(0, 10.0);
     // k* indicates the position of the turnover to a different power law behaviour
@@ -4286,7 +4294,6 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
 
     //KS: I have no clue what is the reason behind this. Found this in Rick Calland code...
     (*PowerSpectrumStepSize)(j) = std::sqrt(func->GetParameter(0)/float(v_size*0.5));
-    delete func;
   }
 
   PowerSpectrumStepSize->Write("PowerSpectrumStepSize");
