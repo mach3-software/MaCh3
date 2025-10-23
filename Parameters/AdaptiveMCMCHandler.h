@@ -10,8 +10,11 @@ namespace adaptive_mcmc{
 
 /// @brief Contains information about adaptive covariance matrix
 /// @cite haario2001adaptive
+/// @cite Garthwaite01092016
 /// @author Henry Wallace
-/// @details struct encapsulating all adaptive MCMC information
+/// @details struct encapsulating all adaptive MCMC information. Adaption can be done in the pure "Haario/Roberts-Rosenthal"
+/// style using a constant scale of 2.38^2/num_params or via a Robbins-Monro style adaption where the scale is updated.
+/// The latter approach allows you to target a specific acceptance rate resulting in potentially better mixing.
 class AdaptiveMCMCHandler{
  public:
   /// @brief Constructor
@@ -155,6 +158,7 @@ class AdaptiveMCMCHandler{
     return output_file_name;
   }
 
+  /// @brief Get the current adaption scale
   double GetAdaptionScale(){
     if(use_robbins_monro){
       UpdateRobbinsMonroScale();
@@ -162,15 +166,17 @@ class AdaptiveMCMCHandler{
     return adaption_scale;
   }
 
+  /// Use Robbins-Monro approach?
   bool GetUseRobbinsMonro() const {
     return use_robbins_monro;
   }
 
  private:
-
+  /// Update the scale factor for Robbins-Monro adaption
   void UpdateRobbinsMonroScale();
+  /// Calculate the constant step length for Robbins-Monro adaption
   void CalculateRobbinsMonroStepLength();
-  double GetRobbinsMonrotepLength();
+
   /// Meta variables related to adaption run time
   /// When do we start throwing
   int start_adaptive_throw;
@@ -225,10 +231,10 @@ class AdaptiveMCMCHandler{
   /// Target acceptance rate for Robbins Monro
   double target_acceptance;
 
-  /// Scale factor for Robbins Monro
+  /// Constant "step scaling" factor for Robbins-Monro
   double c_robbins_monro;
   
-  /// Number of restarts for Robbins Monro
+  /// Number of restarts for Robbins Monro (so far)
   int n_rm_restarts;
 
   /// Total number of restarts ALLOWED for Robbins Monro
