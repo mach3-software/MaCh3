@@ -202,7 +202,7 @@ void AdaptiveMCMCHandler::SaveAdaptiveToFile(const std::string &outFileName,
     outFile->cd();
     auto adaptive_to_save = static_cast<TMatrixDSym*>(adaptive_covariance->Clone());
     // Multiply by scale
-    (*adaptive_to_save) *= GetAdaptionScale();
+    // (*adaptive_to_save) *= GetAdaptionScale()/2.0;
     adaptive_to_save->Write(adaptive_cov_name.c_str());
     outMeanVec->Write(mean_vec_name.c_str());
     outFile->Close();
