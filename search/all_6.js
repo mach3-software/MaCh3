@@ -47,7 +47,7 @@ var searchData=
   ['findsplinebinning_403',['FindSplineBinning',['../classBinnedSplineHandler.html#aa3cfd3c0730281791227f25f04c944ee',1,'BinnedSplineHandler']]],
   ['findsplinesegment_404',['FindSplineSegment',['../classSplineBase.html#a589011b547ff70262ed43021a016ef30',1,'SplineBase::FindSplineSegment()'],['../classPySplineBase.html#a0589f9189764287f84b61b89fc1a4c1f',1,'PySplineBase::FindSplineSegment()']]],
   ['findx_405',['FindX',['../classTSpline3__red.html#a39668a1dc14058a1f833e9621ec19caf',1,'TSpline3_red']]],
-  ['findxbin_406',['FindXBin',['../structSampleBinningInfo.html#afbde5f960f500d0a5defa08775aedef5',1,'SampleBinningInfo']]],
+  ['findxbin_406',['FindXBin',['../structSampleBinningInfo.html#a2a79cef42789c713b7cc7b0f62defbf7',1,'SampleBinningInfo']]],
   ['finertia_407',['fInertia',['../classPSO.html#a9b3d14a97a9d838a9f009f9cc54968d3',1,'PSO']]],
   ['first_5fpass_408',['first_pass',['../classSampleSummary.html#a4ade2ccb94981d4483f0b4e6e367b1a0',1,'SampleSummary']]],
   ['firstpcadpar_409',['FirstPCAdpar',['../classPCAHandler.html#afc00f628b947fd407d05790f4d0eaaec',1,'PCAHandler']]],

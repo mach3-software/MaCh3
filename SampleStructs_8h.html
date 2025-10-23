@@ -403,21 +403,21 @@ Kamil Skwarczynski </dd></dl>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The index of the sample, or garbage if not found. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="SampleStructs_8h_source.html#l00304">304</a> of file <a class="el" href="SampleStructs_8h_source.html">SampleStructs.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;                                                                                                           {</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> iSample = 0; iSample &lt; BinningInfo.size(); ++iSample) {</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;    <span class="keyword">const</span> <a class="code" href="structSampleBinningInfo.html">SampleBinningInfo</a>&amp; info = BinningInfo[iSample];</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;    <span class="keywordflow">if</span> (GlobalBin &gt;= info.<a class="code" href="structSampleBinningInfo.html#ad0a32f17ef0b235e5c24605a9b2d1153">GlobalOffset</a> &amp;&amp; GlobalBin &lt; info.<a class="code" href="structSampleBinningInfo.html#ad0a32f17ef0b235e5c24605a9b2d1153">GlobalOffset</a> + info.<a class="code" href="structSampleBinningInfo.html#af20237040c5fe0d4a26b63fc83e55ff9">nBins</a>) {</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(iSample);</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;    }</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;  }</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160; </div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Couldn&#39;t find sample corresponding to bin {}&quot;</span>, GlobalBin);</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;  <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<p class="definition">Definition at line <a class="el" href="SampleStructs_8h_source.html#l00307">307</a> of file <a class="el" href="SampleStructs_8h_source.html">SampleStructs.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;                                                                                                           {</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> iSample = 0; iSample &lt; BinningInfo.size(); ++iSample) {</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;    <span class="keyword">const</span> <a class="code" href="structSampleBinningInfo.html">SampleBinningInfo</a>&amp; info = BinningInfo[iSample];</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;    <span class="keywordflow">if</span> (GlobalBin &gt;= info.<a class="code" href="structSampleBinningInfo.html#ad0a32f17ef0b235e5c24605a9b2d1153">GlobalOffset</a> &amp;&amp; GlobalBin &lt; info.<a class="code" href="structSampleBinningInfo.html#ad0a32f17ef0b235e5c24605a9b2d1153">GlobalOffset</a> + info.<a class="code" href="structSampleBinningInfo.html#af20237040c5fe0d4a26b63fc83e55ff9">nBins</a>) {</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(iSample);</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    }</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;  }</div>
 <div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160; </div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;  <span class="comment">// GlobalBin is out of range for all samples</span></div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceM3.html#ac289df32a5b3b05c61a87cbac5702b25">M3::_BAD_INT_</a>;</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;}</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Couldn&#39;t find sample corresponding to bin {}&quot;</span>, GlobalBin);</div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;  <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160; </div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;  <span class="comment">// GlobalBin is out of range for all samples</span></div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceM3.html#ac289df32a5b3b05c61a87cbac5702b25">M3::_BAD_INT_</a>;</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00027">MaCh3Logger.h:27</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class for MaCh3 errors.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00013">MaCh3Exception.h:13</a></div></div>
 <div class="ttc" id="anamespaceM3_html_ac289df32a5b3b05c61a87cbac5702b25"><div class="ttname"><a href="namespaceM3.html#ac289df32a5b3b05c61a87cbac5702b25">M3::_BAD_INT_</a></div><div class="ttdeci">constexpr static const int _BAD_INT_</div><div class="ttdoc">Default value used for int initialisation.</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00048">Core.h:48</a></div></div>

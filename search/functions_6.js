@@ -27,7 +27,7 @@ var searchData=
   ['findsplinebinning_2207',['FindSplineBinning',['../classBinnedSplineHandler.html#aa3cfd3c0730281791227f25f04c944ee',1,'BinnedSplineHandler']]],
   ['findsplinesegment_2208',['FindSplineSegment',['../classPySplineBase.html#a0589f9189764287f84b61b89fc1a4c1f',1,'PySplineBase::FindSplineSegment()'],['../classSplineBase.html#a589011b547ff70262ed43021a016ef30',1,'SplineBase::FindSplineSegment()']]],
   ['findx_2209',['FindX',['../classTSpline3__red.html#a39668a1dc14058a1f833e9621ec19caf',1,'TSpline3_red']]],
-  ['findxbin_2210',['FindXBin',['../structSampleBinningInfo.html#afbde5f960f500d0a5defa08775aedef5',1,'SampleBinningInfo']]],
+  ['findxbin_2210',['FindXBin',['../structSampleBinningInfo.html#a2a79cef42789c713b7cc7b0f62defbf7',1,'SampleBinningInfo']]],
   ['fishercombinedpvalue_2211',['FisherCombinedPValue',['../StatisticalUtils_8cpp.html#a8ba1090ae92f61008a6576c45b4b3b7b',1,'FisherCombinedPValue(const std::vector&lt; double &gt; &amp;pvalues):&#160;StatisticalUtils.cpp'],['../StatisticalUtils_8h.html#a8ba1090ae92f61008a6576c45b4b3b7b',1,'FisherCombinedPValue(const std::vector&lt; double &gt; &amp;pvalues):&#160;StatisticalUtils.cpp']]],
   ['fitterbase_2212',['FitterBase',['../classPyFitterBase.html#ada72ecad038edc97497f9d4067ce77f5',1,'PyFitterBase::FitterBase()'],['../classFitterBase.html#ada72ecad038edc97497f9d4067ce77f5',1,'FitterBase::FitterBase()']]],
   ['fixsamplenamesquotes_2213',['FixSampleNamesQuotes',['../namespaceM3.html#a68ab9b6b3d413a94604c740208c7895d',1,'M3']]],
