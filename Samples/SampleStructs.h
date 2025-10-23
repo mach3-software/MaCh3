@@ -228,33 +228,36 @@ struct SampleBinningInfo {
   }
 
   /// @brief DB Find the relevant bin in the PDF for each event
-  int FindXBin(const double XVar, const int NomXBin) const {
-    // KS: Get reference to avoid repeated indexing and help with performance
-    const auto& xBin = xBinLookup[NomXBin];
-
+  int FindXBin(const double XVar, const int NomBin) const {
     //DB Check to see if momentum shift has moved bins
     //DB - First , check to see if the event is outside of the binning range and skip event if it is
-     if (XVar < XBinEdges[0] || XVar >= XBinEdges[nXBins]) {
+    if (XVar < XBinEdges[0] || XVar >= XBinEdges[nXBins]) {
       return -1;
     }
+
+    // KS: Get reference to avoid repeated indexing and help with performance
+    const BinShiftLookup& _restrict_ xBin = xBinLookup[NomBin];
+    const double lower = xBin.lower_binedge;
+    const double upper = xBin.upper_binedge;
+    const double lower_lower = xBin.lower_lower_binedge;
+    const double upper_upper = xBin.upper_upper_binedge;
+
     //DB - Second, check to see if the event is still in the nominal bin
-    else if (XVar < xBin.upper_binedge && XVar >= xBin.lower_binedge) {
-      return NomXBin;
+    if (XVar < upper && XVar >= lower) {
+      return NomBin;
     }
     //DB - Thirdly, check the adjacent bins first as Eb+CC+EScale shifts aren't likely to move an Erec more than 1bin width
     //Shifted down one bin from the event bin at nominal
-    else if (XVar < xBin.lower_binedge && XVar >= xBin.lower_lower_binedge) {
-      return NomXBin-1;
+    if (XVar < lower && XVar >= lower_lower) {
+      return NomBin-1;
     }
     //Shifted up one bin from the event bin at nominal
-    else if (XVar < xBin.upper_upper_binedge && XVar >= xBin.upper_binedge) {
-      return NomXBin+1;
+    if (XVar < upper_upper && XVar >= upper) {
+      return NomBin+1;
     }
     //DB - If we end up in this loop, the event has been shifted outside of its nominal bin, but is still within the allowed binning range
-    else {
-      // KS: Perform binary search to find correct bin. We already checked if isn't outside of bounds
-      return static_cast<int>(std::distance(XBinEdges.begin(), std::upper_bound(XBinEdges.begin(), XBinEdges.end(), XVar)) - 1);
-    }
+    // KS: Perform binary search to find correct bin. We already checked if isn't outside of bounds
+    return static_cast<int>(std::distance(XBinEdges.begin(), std::upper_bound(XBinEdges.begin(), XBinEdges.end(), XVar)) - 1);
   }
 
   /// @brief Initializes lookup arrays for efficient bin migration in a single dimension.
