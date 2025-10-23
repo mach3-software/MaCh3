@@ -440,9 +440,11 @@ void AdaptiveMCMCHandler::CalculateRobbinsMonroStepLength() {
   /// Firstly we need to calculate the alpha value, this is in some sense "optimal"
   double alpha = -ROOT::Math::normal_quantile(target_acceptance/2, 1.0); 
 
+  int non_fixed_pars = GetNumParams()-GetNFixed();
+
   /// Now we can calculate the scale factor
-  c_robbins_monro = (1- 1/GetNumParams())*std::sqrt(TMath::Pi()*2 * std::exp(alpha*alpha));
-  c_robbins_monro += 1/(GetNumParams()*target_acceptance*(1-target_acceptance));
+  c_robbins_monro = (1- 1/non_fixed_pars)*std::sqrt(TMath::Pi()*2 * std::exp(alpha*alpha));
+  c_robbins_monro += 1/(non_fixed_pars*target_acceptance*(1-target_acceptance));
 
   MACH3LOG_INFO("Robbins-Monro scale factor set to {}", c_robbins_monro);
 }
@@ -463,8 +465,10 @@ void AdaptiveMCMCHandler::UpdateRobbinsMonroScale(){
     batch_step = total_steps % acceptance_rate_batch_size;
   }
 
-  /// Update the scale factor for Robbins-Monro adaption
-  double scale_factor = adaption_scale*c_robbins_monro/std::max(GetNumParams(), batch_step/GetNumParams());
+  int non_fixed_pars = GetNumParams()-GetNFixed();
+
+  /// Update the scale factor for Robbins-Monro adaption [200 is arbitrary for early stability but motivated by paper]
+  double scale_factor = adaption_scale*c_robbins_monro/std::max(200.0, static_cast<double>(batch_step)/non_fixed_pars);
 
   /// Now we either increase or decrease the scale
   if(prev_step_accepted){

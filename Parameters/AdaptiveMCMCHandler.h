@@ -84,6 +84,21 @@ class AdaptiveMCMCHandler{
     _fFixedPars = fix;
   }
 
+  /// @brief Get the number of fixed parameters
+  /// @ingroup ParameterHandlerGetters
+  int GetNFixed() const {
+    if(!_fFixedPars){
+      return 0;
+    }
+    int n_fixed = 0;
+    for(int i=0; i<static_cast<int>(_fFixedPars->size()); i++){
+      if((*_fFixedPars)[i]<0){
+        n_fixed++;
+      }
+    }
+    return n_fixed;
+  }
+
   /// @brief Get the current values of the parameters
   /// @ingroup ParameterHandlerGetters
   int GetNumParams() const {
