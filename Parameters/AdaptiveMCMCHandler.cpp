@@ -81,6 +81,11 @@ bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const 
   // Check for Robbins-Monro adaption
   use_robbins_monro = GetFromManager<bool>(adapt_manager["AdaptionOptions"]["Settings"]["UseRobbinsMonro"], false);
   target_acceptance = GetFromManager<double>(adapt_manager["AdaptionOptions"]["Settings"]["TargetAcceptance"], 0.234);
+  if (target_acceptance <= 0 || target_acceptance >= 1) {
+    MACH3LOG_ERROR("Target acceptance must be in (0,1), got {}", target_acceptance);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
   acceptance_rate_batch_size = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AcceptanceRateBatchSize"], 10000);
   total_rm_restarts = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["TotalRobbinsMonroRestarts"], 0);
   n_rm_restarts = 0;
@@ -357,7 +362,11 @@ void AdaptiveMCMCHandler::Print() const {
   MACH3LOG_INFO("Adaption Matrix Ending Updates     : {}", end_adaptive_update);
   MACH3LOG_INFO("Steps Between Updates              : {}", adaptive_update_step);
   MACH3LOG_INFO("Saving matrices to file            : {}", output_file_name);
-  MACH3LOG_INFO("Will only save every {} iterations"     , adaptive_save_n_iterations);
+  MACH3LOG_INFO("Will only save every {} iterations"     , adaptive_save_n_iterations); 
+  if(use_robbins_monro) {
+    MACH3LOG_INFO("Using Robbins-Monro for adaptive step size tuning with target acceptance {}", target_acceptance);
+  }
+
 }
 
 // ********************************************
