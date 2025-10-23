@@ -137,6 +137,35 @@ void initParameters(py::module &m) {
             :return: A numpy array containing the proposal values for all parameters."
         )
 
+        .def("set_parameters", 
+             [](ParameterHandlerBase& self, py::object pars_obj = py::none()) {
+                 if (pars_obj.is_none()) {
+                     self.SetParameters();
+                 } else {
+                     // This handles both numpy arrays and Python lists
+                     std::vector<double> pars_vec = pars_obj.cast<std::vector<double>>();
+                     self.SetParameters(pars_vec);
+                 }
+             },
+             py::arg("pars") = py::none(),
+             R"pbdoc(
+                 Set parameter values using array.
+                 
+                 Parameters
+                 ----------
+                 pars : numpy.ndarray or list of float, optional
+                     Array holding new values for every parameter.
+                     Must have same size as the number of parameters in the covariance class.
+                     If not provided, parameters are set to their pre-fit values.
+                     
+                 Examples
+                 --------
+                 >>> import numpy as np
+                 >>> handler.set_parameters(np.array([1.0, 2.0, 3.0]))
+                 >>> handler.set_parameters([1.0, 2.0, 3.0])
+                 >>> handler.set_parameters()
+             )pbdoc")
+
     ; // End of ParameterHandlerBase binding
 
     
