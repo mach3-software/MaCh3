@@ -142,10 +142,8 @@ class AdaptiveMCMCHandler{
   
   /// @brief Increase by one number of total steps
   /// @ingroup ParameterHandlerGetters
-  TMatrixDSym* GetAdaptiveCovariance() {
-    auto new_matrix = static_cast<TMatrixDSym*>( adaptive_covariance->Clone());
-    (*new_matrix) *= GetAdaptionScale();
-    return new_matrix;
+  TMatrixDSym* GetAdaptiveCovariance() const {
+    return adaptive_covariance;
   }
 
   /// @brief Get the parameter means used in the adaptive handler
