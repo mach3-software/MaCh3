@@ -896,9 +896,20 @@ void SampleHandlerFD::FindNominalBinAndEdges() {
   }
 }
 
+// ************************************************
+int SampleHandlerFD::GetSampleIndex(const std::string& SampleTitle) const {
+// ************************************************
+  for (M3::int_t iSample = 0; iSample < nSamples; ++iSample) {
+    if (SampleTitle == GetSampleTitle(iSample)) {
+      return iSample;
+    }
+  }
+  MACH3LOG_ERROR("Sample name not found: {}", SampleTitle);
+  throw MaCh3Exception(__FILE__, __LINE__);
+}
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
-
 // ************************************************
 TH1* SampleHandlerFD::GetW2Hist(const int Sample, const int Dimension) {
 // ************************************************
@@ -938,6 +949,13 @@ TH1* SampleHandlerFD::GetW2Hist(const int Sample, const int Dimension) {
 #pragma GCC diagnostic pop
 
 // ************************************************
+TH1* SampleHandlerFD::GetW2Hist(const std::string& Sample, const int Dimension) {
+// ************************************************
+  const int Index = GetSampleIndex(Sample);
+  return GetW2Hist(Index, Dimension);
+}
+
+// ************************************************
 TH1* SampleHandlerFD::GetMCHist(const int Sample, const int Dimension) {
 // ************************************************
   FillMCHist(Sample, Dimension);
@@ -953,6 +971,13 @@ TH1* SampleHandlerFD::GetMCHist(const int Sample, const int Dimension) {
 }
 
 // ************************************************
+TH1* SampleHandlerFD::GetMCHist(const std::string& Sample, const int Dimension) {
+// ************************************************
+  const int Index = GetSampleIndex(Sample);
+  return GetMCHist(Index, Dimension);
+}
+
+// ************************************************
 TH1* SampleHandlerFD::GetDataHist(const int Sample, const int Dimension) {
 // ************************************************
   if(Dimension == 1) {
@@ -963,6 +988,13 @@ TH1* SampleHandlerFD::GetDataHist(const int Sample, const int Dimension) {
     MACH3LOG_ERROR("Asdking for {} with N Dimension = {}. This is not implemented", __func__, Dimension);
     throw MaCh3Exception(__FILE__, __LINE__);
   }
+}
+
+// ************************************************
+TH1* SampleHandlerFD::GetDataHist(const std::string& Sample, const int Dimension) {
+// ************************************************
+  int Index = GetSampleIndex(Sample);
+  return GetDataHist(Index, Dimension);
 }
 
 void SampleHandlerFD::AddData(const int Sample, std::vector<double> &data) {

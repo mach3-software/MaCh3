@@ -59,17 +59,25 @@ class SampleHandlerFD :  public SampleHandlerBase
   double GetSampleLikelihood(const int isample) const override;
   //===============================================================================
 
+  /// @brief Get index of sample based on name
+  /// @param SampleTitle The title of the sample to search for.
+  /// @ingroup SampleHandlerGetters
+  int GetSampleIndex(const std::string& SampleTitle) const;
+
   /// @brief Get MC histogram
   /// @ingroup SampleHandlerGetters
   TH1* GetMCHist(const int Sample, const int Dimension);
+  TH1* GetMCHist(const std::string& Sample, const int Dimension);
 
   /// @brief Get W2 histogram
   /// @ingroup SampleHandlerGetters
   TH1* GetW2Hist(const int Sample, const int Dimension);
+  TH1* GetW2Hist(const std::string& Sample, const int Dimension);
 
   /// @brief Get Data histogram
   /// @ingroup SampleHandlerGetters
   TH1* GetDataHist(const int Sample, const int Dimension);
+  TH1* GetDataHist(const std::string& Sample, const int Dimension);
 
   void Reweight() override;
   M3::float_t GetEventWeight(const int iEntry) const;
