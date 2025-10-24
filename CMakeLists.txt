@@ -160,7 +160,6 @@ else()
   #https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html
   target_compile_options(MaCh3CompilerOptions INTERFACE
     -O3                                   # Optimize code for maximum speed
-    $<$<COMPILE_LANGUAGE:CXX>:-flto>      # Enable link-time optimization, don't apply it to CUDA or other languages!
     # KS: Below could help with performance but require validations and benchmarking
     #-funroll-loops                       # Unroll loops where possible for performance
     #-fno-trapping-math                   # Assume FP ops don’t trap (helps vectorisation)
@@ -172,12 +171,13 @@ else()
   #KS: Consider in future __attribute__((always_inline)) see https://indico.cern.ch/event/386232/sessions/159923/attachments/771039/1057534/always_inline_performance.pdf
   if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     target_compile_options(MaCh3CompilerOptions INTERFACE
+      $<$<COMPILE_LANGUAGE:CXX>:-flto>      # Enable link-time optimization, don't apply it to CUDA or other languages!
       -finline-limit=100000000              # Increase the limit for inlining functions to improve performance
       #-fipa-pta                            # Pointer analysis for better intraprocedural optimization, increases compilation time
     )
-  endif()
   #KS: add Link-Time Optimization (LTO)
   target_link_libraries(MaCh3CompilerOptions INTERFACE -flto)
+  endif()
 endif()
 
 if(MaCh3_NATIVE_ENABLED)
