@@ -126,22 +126,15 @@ struct FarDetectorCoreInfo {
 
   /// Pointers to normalisation weights which are being taken from Parameter Handler
   std::vector<const double*> xsec_norm_pointers;
-  /// Pointers to spline weights which are being calculated by Splines Handler
-  std::vector<const M3::float_t*> xsec_spline_pointers;
-  /// Total weight of norm and spline parameters
-  M3::float_t xsec_w = 1.;
-  /// pointer to oscillation weight which is being calculated by Oscillation Handler
-  const M3::float_t* osc_w_pointer = &M3::Unity;
-  /// Pointers to @ref xsec_w, @ref osc_w_pointer and remaining experiment specific weights
+
+  /// Pointers to weights like oscillation spline etc
   std::vector<const M3::float_t*> total_weight_pointers;
 
-  //M3::float_t total_w  = M3::_BAD_INT_;
-
-  int NomXBin = -1;
-  int NomYBin = -1;
+  int NomXBin = M3::_BAD_INT_;
+  int NomYBin = M3::_BAD_INT_;
 
   /// Nominal sample to which event is associated
-  int NominalSample = 0;
+  int NominalSample = M3::_BAD_INT_;
 
   bool isNC = false;
 

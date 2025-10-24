@@ -92,13 +92,13 @@ public:
     using SampleHandlerFD::SampleHandlerFD;
 
     /* Trampoline (need one for each virtual function) */
-    void SetupWeightPointers() override {
+    void AddAdditionalWeightPointers() override {
         PYBIND11_OVERRIDE_PURE_NAME(
-            void,            /* Return type */
-            SampleHandlerFD, /* Parent class */
-            "setup_weight_pointers", /*python name*/
-            SetupWeightPointers,     /* Name of function in C++ */
-                             /* Argument(s) */
+            void,                             /* Return type */
+            SampleHandlerFD,                  /* Parent class */
+            "add_additional_weight_pointers", /*python name*/
+            AddAdditionalWeightPointers,      /* Name of function in C++ */
+                                              /* Argument(s) */
         );
     }
 
