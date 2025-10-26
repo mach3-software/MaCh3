@@ -208,6 +208,8 @@ void SampleHandlerFD::Initialise() {
   SetupNormParameters();
   MACH3LOG_INFO("Setting up Functional Pointers..");
   SetupFunctionalParameters();
+  MACH3LOG_INFO("Setting up Additional Weight Pointers..");
+  AddAdditionalWeightPointers();
   MACH3LOG_INFO("Setting up Kinematic Map..");
   SetupKinematicMap();
   clock.Stop();
