@@ -1680,7 +1680,7 @@ void MCMCProcessor::DrawCorrelations1D() {
     }
   }
 
-  # KS: Do not add collapse(2) otherwise one can intorduce race condition :(
+  // KS: Do not add collapse(2) otherwise one can intorduce race condition :(
   #ifdef MULTITHREAD
   #pragma omp parallel for
   #endif
