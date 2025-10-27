@@ -91,7 +91,7 @@ class covarianceBase {
   /// @param scale Value of global step scale
   /// @cite luengo2020survey
   /// \ingroup Setters
-  void setStepScale(const double scale);
+  void setStepScale(const double scale, bool verbose=true);
   /// @brief DB Function to set fIndivStepScale from a vector (Can be used from execs and inside covariance constructors)
   /// @param ParameterIndex Parameter Index
   /// @param StepScale Value of individual step scale
@@ -172,7 +172,7 @@ class covarianceBase {
   void initialiseAdaption(const YAML::Node& adapt_manager);
   /// @brief Save adaptive throw matrix to file
   void saveAdaptiveToFile(const std::string& outFileName, const std::string& systematicName) {
-    AdaptiveHandler.SaveAdaptiveToFile(outFileName, systematicName); }
+    AdaptiveHandler->SaveAdaptiveToFile(outFileName, systematicName); }
 
   /// @brief Do we adapt or not
   bool getDoAdaption(){return use_adaptive;}
@@ -181,8 +181,8 @@ class covarianceBase {
   void updateThrowMatrix(TMatrixDSym *cov);
   /// @brief Set number of MCMC step, when running adaptive MCMC it is updated with given frequency. We need number of steps to determine frequency.
   inline void setNumberOfSteps(const int nsteps) {
-    AdaptiveHandler.total_steps = nsteps;
-    if(AdaptiveHandler.AdaptionUpdate()) resetIndivStepScale();
+    AdaptiveHandler->SetTotalSteps(nsteps);
+    if(AdaptiveHandler->AdaptionUpdate()) resetIndivStepScale();
   }
 
   /// @brief Get matrix used for step proposal
@@ -192,7 +192,7 @@ class covarianceBase {
   /// @brief Get the Cholesky decomposition of the throw matrix
   inline TMatrixD *getThrowMatrix_CholDecomp(){return throwMatrix_CholDecomp;}
   /// @brief Get the parameter means used in the adaptive handler
-  inline std::vector<double> getParameterMeans(){return AdaptiveHandler.par_means;}
+  inline std::vector<double> getParameterMeans(){return AdaptiveHandler->GetParameterMeans();}
   /// @brief KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plotting
   /// @details This function converts the covariance matrix to a correlation matrix and
   ///          returns a TH2D object, which can be used for advanced plotting purposes.
@@ -392,7 +392,14 @@ class covarianceBase {
 
   // HH: Getter for AdaptiveHandler
   /// @brief Get pointer for AdaptiveHandler
-  inline adaptive_mcmc::AdaptiveMCMCHandler* getAdaptiveHandler() { return &AdaptiveHandler; }
+  inline adaptive_mcmc::AdaptiveMCMCHandler* getAdaptiveHandler() {
+    if (!use_adaptive)
+    {
+      MACH3LOG_ERROR("Am not running in Adaptive mode");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    return AdaptiveHandler.get();
+  }
 
   // HH: Getter for use_adaptive
   /// @brief Get bool for whether we are using adaptive MCMC
@@ -509,5 +516,5 @@ protected:
   /// Struct containing information about PCA
   std::unique_ptr<PCAHandler> PCAObj;
   /// Struct containing information about adaption
-  adaptive_mcmc::AdaptiveMCMCHandler AdaptiveHandler;
+  std::unique_ptr<adaptive_mcmc::AdaptiveMCMCHandler> AdaptiveHandler;
 };
