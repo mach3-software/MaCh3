@@ -971,7 +971,12 @@ void covarianceBase::MakePosDef(TMatrixDSym *cov) {
     MACH3LOG_ERROR("This indicates that something is wrong with the input matrix");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-  if(AdaptiveHandler->GetTotalSteps() < 2) {
+  if(use_adaptive){
+    if(AdaptiveHandler->GetTotalSteps() < 2) {
+      MACH3LOG_INFO("Had to shift diagonal {} time(s) to allow the covariance matrix to be decomposed", iAttempt);
+    }
+  }
+  else{
     MACH3LOG_INFO("Had to shift diagonal {} time(s) to allow the covariance matrix to be decomposed", iAttempt);
   }
   //DB Resetting warning level
