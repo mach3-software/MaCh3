@@ -865,6 +865,11 @@ void ParameterHandlerBase::SetBranches(TTree &tree, bool SaveProposal) {
       tree.Branch(Form("%s_Prop", _fNames[i].c_str()), &_fPropVal[i], Form("%s_Prop/D", _fNames[i].c_str()));
     }
   }
+  if(use_adaptive && AdaptiveHandler->GetUseRobbinsMonro()){
+
+    tree.Branch(Form("GlobalStepScale_%s", GetName().c_str()), &_fGlobalStepScale, Form("GlobalStepScale_%s/D", GetName().c_str()));
+  }
+
 }
 
 // ********************************************
@@ -1139,7 +1144,11 @@ void ParameterHandlerBase::UpdateAdaptiveCovariance(){
     TMatrixDSym* update_matrix = static_cast<TMatrixDSym*>(AdaptiveHandler->GetAdaptiveCovariance()->Clone());
     UpdateThrowMatrix(update_matrix); //Now we update and continue!
     // Also update global step scale so we're multiplying by 2.38^2/d OR our adapted scale
-    SetStepScale(AdaptiveHandler->GetAdaptionScale(), AdaptiveHandler->GetUseRobbinsMonro());
+    bool verbose = false;
+    #ifdef DEBUG
+    verbose = AdaptiveHandler->GetUseRobbinsMonro();
+#endif
+    SetStepScale(AdaptiveHandler->GetAdaptionScale(), verbose);
 
     //Also Save the adaptive to file
     AdaptiveHandler->SaveAdaptiveToFile(AdaptiveHandler->GetOutFileName(), GetName());
@@ -1328,4 +1337,6 @@ void ParameterHandlerBase::MatchMaCh3OutputBranches(TTree *PosteriorFile,
     PosteriorFile->SetBranchStatus(BranchNames[i].c_str(), true);
     PosteriorFile->SetBranchAddress(BranchNames[i].c_str(), &BranchValues[i]);
   }
+
 }
+
