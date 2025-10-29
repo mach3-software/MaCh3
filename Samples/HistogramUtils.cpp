@@ -614,7 +614,7 @@ TFile* Open(const std::string& Name, const std::string& Type, const std::string&
   // Check if the file is successfully opened and usable
   if (OutFile->IsZombie()) {
     MACH3LOG_ERROR("Failed to open file: {}", Name);
-    if (Type == "RECREATE") {
+    if (Type == "RECREATE" || Type == "recreate") {
       MACH3LOG_ERROR("Check if directory exist");
     }
     delete OutFile;

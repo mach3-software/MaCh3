@@ -4,6 +4,7 @@
 // MaCh3 includes
 #include "Manager/Manager.h"
 #include "Samples/SampleStructs.h"
+#include "Samples/HistogramUtils.h"
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT includes
@@ -28,8 +29,6 @@ std::vector<std::string> inpFileList;
 bool forceOverwrite = false;
 bool forceMerge = false;
 
-
-
 /// @brief KS: This allow us to skip output name etc in config. We expect Output name will be different but this doesn't invalidate chain merging
 bool ShouldSkipLine(const std::string& line, const std::vector<std::string>& SkipVector) {
   // Otherwise, check if the line contains any word from SkipVector
@@ -43,6 +42,10 @@ bool ShouldSkipLine(const std::string& line, const std::vector<std::string>& Ski
   return false;
 }
 
+/// @brief make sure two configs are identical but skip specified fields. For example when comparing two chains nsteps or output name might be different and this is still fine to merge
+/// @param File1 Config from chain1
+/// @param File2 Config from chain2
+/// @param SkipVector Fields in yaml file to skip
 bool CompareTwoConfigs(const std::string& File1, const std::string& File2, const std::vector<std::string>& SkipVector) {
   std::istringstream file1(File1);
   std::istringstream file2(File2);
@@ -76,7 +79,7 @@ bool CompareTwoConfigs(const std::string& File1, const std::string& File2, const
   return areEqual;
 }
 
-/// EM: Will compare the version header contained in the two provided files and shout if they don't match
+/// @brief EM: Will compare the version header contained in the two provided files and shout if they don't match
 bool checkSoftwareVersions(TFile *file, TFile *prevFile, const std::string& ConfigName, const std::vector<std::string>& SkipVector = {})
 {
   bool weirdFile = false;
@@ -94,6 +97,7 @@ bool checkSoftwareVersions(TFile *file, TFile *prevFile, const std::string& Conf
   return weirdFile;
 }
 
+/// @brief When we merge two chains they have TDirectory ROOT didn't provide method for this so here we have this bad boy
 void CopyDir(TDirectory *source) {
   //copy all objects and subdirs of directory source as a subdir of the current directory
   source->ls();
@@ -292,7 +296,7 @@ void CombineChain()
   delete fileMerger;
 
   //KS: Sadly we need to open file to save TDirectories to not have weird copy of several obejcts there...
-  outputFile = new TFile(OutFileName.c_str(), "UPDATE");
+  outputFile = M3::Open(OutFileName, "UPDATE", __FILE__, __LINE__);
 
   // Get the source directory
   TDirectory *MaCh3EngineDir = prevFile->Get<TDirectory>("MaCh3Engine");
