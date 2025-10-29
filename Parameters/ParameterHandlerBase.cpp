@@ -1146,8 +1146,8 @@ void ParameterHandlerBase::UpdateAdaptiveCovariance(){
     // Also update global step scale so we're multiplying by 2.38^2/d OR our adapted scale
     bool verbose = false;
     #ifdef DEBUG
-    verbose = AdaptiveHandler->GetRobbinsMonroVerbose();
-    #endif
+    verbose = AdaptiveHandler->GetUseRobbinsMonro();
+#endif
     SetStepScale(AdaptiveHandler->GetAdaptionScale(), verbose);
 
     //Also Save the adaptive to file
