@@ -1068,6 +1068,19 @@ void BinnedSplineHandler::LoadSplineFile(std::string FileName) {
     }
   }
   auto SplineFile = std::make_unique<TFile>(FileName.c_str(), "OPEN");
+
+  TMacro *ConfigCov = SplineFile->Get<TMacro>("ParameterHandler");
+  // Config which was in MCMC from which we are starting
+  YAML::Node CovSettings = TMacroToYAML(*ConfigCov);
+  // Config from currently used cov object
+  YAML::Node ConfigCurrent = xsec->GetConfig();
+
+  if (!compareYAMLNodes(CovSettings, ConfigCurrent))
+  {
+    MACH3LOG_ERROR("Loading precomputed spline file, however encountered different YAML config, please regenerate input");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+
   LoadSettingsDir(SplineFile);
   LoadMonolithDir(SplineFile);
   LoadIndexDir(SplineFile);
@@ -1255,8 +1268,12 @@ void BinnedSplineHandler::PrepareSplineFile(std::string FileName) {
       FileName[pos] = '_';
     }
   }
-
+  // Save ROOT File
   auto SplineFile = std::make_unique<TFile>(FileName.c_str(), "recreate");
+  YAML::Node ConfigCurrent = xsec->GetConfig();
+  TMacro ConfigSave = YAMLtoTMacro(ConfigCurrent, "ParameterHandler");
+  ConfigSave.Write();
+
   PrepareSettingsDir(SplineFile);
   PrepareMonolithDir(SplineFile);
   PrepareIndexDir(SplineFile);

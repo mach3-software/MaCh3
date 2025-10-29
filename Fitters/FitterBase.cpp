@@ -344,7 +344,7 @@ void FitterBase::StartFromPreviousFit(const std::string& FitName) {
 
       if (!compareYAMLNodes(CovSettings, ConfigCurrent))
       {
-        MACH3LOG_ERROR("Yaml configs in previous chain and current one are different", FitName);
+        MACH3LOG_ERROR("Yaml configs in previous chain (from path {}) and current one are different", FitName);
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
 
