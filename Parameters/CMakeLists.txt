@@ -27,7 +27,7 @@ if(MaCh3_GPU_ENABLED)
     set_property(TARGET Parameters PROPERTY CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
 endif()
 
-target_link_libraries(Parameters PUBLIC Manager)
+target_link_libraries(Parameters PUBLIC Manager ROOT::MathMore)
 target_link_libraries(Parameters PRIVATE MaCh3Warnings)
 
 target_include_directories(Parameters PUBLIC
