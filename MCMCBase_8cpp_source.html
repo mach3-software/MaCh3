@@ -203,7 +203,7 @@ $(function() {
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <a class="code" href="classFitterBase.html#a655ccea31627627e2b36745c97e5c0f0">FitterBase::StartFromPreviousFit</a>(FitName);</div>
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160; </div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <span class="comment">// For MCMC we also need to set stepStart</span></div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    TFile *infile = <span class="keyword">new</span> TFile(FitName.c_str(), <span class="stringliteral">&quot;READ&quot;</span>);</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    TFile *infile = <a class="code" href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a>(FitName, <span class="stringliteral">&quot;READ&quot;</span>, __FILE__, __LINE__);</div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    TTree *posts = infile-&gt;Get&lt;TTree&gt;(<span class="stringliteral">&quot;posteriors&quot;</span>);</div>
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> step_val = 0;</div>
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160; </div>
@@ -306,6 +306,7 @@ $(function() {
 <div class="ttc" id="aclassParameterHandlerBase_html"><div class="ttname"><a href="classParameterHandlerBase.html">ParameterHandlerBase</a></div><div class="ttdoc">Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00015">ParameterHandlerBase.h:15</a></div></div>
 <div class="ttc" id="aclassmanager_html"><div class="ttname"><a href="classmanager.html">manager</a></div><div class="ttdoc">The manager class is responsible for managing configurations and settings.</div><div class="ttdef"><b>Definition:</b> <a href="Manager_8h_source.html#l00016">Manager.h:16</a></div></div>
 <div class="ttc" id="aclassmanager_html_ab0a6c73b5f9b948408af15a32c3e4bd4"><div class="ttname"><a href="classmanager.html#ab0a6c73b5f9b948408af15a32c3e4bd4">manager::raw</a></div><div class="ttdeci">YAML::Node const  &amp; raw()</div><div class="ttdoc">Return config.</div><div class="ttdef"><b>Definition:</b> <a href="Manager_8h_source.html#l00041">Manager.h:41</a></div></div>
+<div class="ttc" id="anamespaceM3_html_a87841bdbf0e0a2a733d9e4ca499f820d"><div class="ttname"><a href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a></div><div class="ttdeci">TFile * Open(const std::string &amp;Name, const std::string &amp;Type, const std::string &amp;File, const int Line)</div><div class="ttdoc">Opens a ROOT file with the given name and mode.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00610">HistogramUtils.cpp:610</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- Footer for MaCh3 Doxygen documentation -->
 <footer class="mach3-footer" style="text-align: center;">

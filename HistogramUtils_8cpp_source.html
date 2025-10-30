@@ -695,16 +695,18 @@ $(function() {
 <div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;  <span class="comment">// Check if the file is successfully opened and usable</span></div>
 <div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;  <span class="keywordflow">if</span> (OutFile-&gt;IsZombie()) {</div>
 <div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Failed to open file: {}&quot;</span>, Name);</div>
-<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;    <span class="keywordflow">if</span> (Type == <span class="stringliteral">&quot;RECREATE&quot;</span>) {</div>
-<div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Check if directory exist&quot;</span>);</div>
-<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;    }</div>
-<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;    <span class="keyword">delete</span> OutFile;</div>
-<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
-<div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;  }</div>
-<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;  <span class="keywordflow">return</span> OutFile;</div>
-<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;}</div>
-<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160; </div>
-<div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;} <span class="comment">//end M3</span></div>
+<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;    std::string lowerType = Type;</div>
+<div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;    std::transform(lowerType.begin(), lowerType.end(), lowerType.begin(), ::tolower);</div>
+<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;    <span class="keywordflow">if</span> (lowerType == <span class="stringliteral">&quot;recreate&quot;</span>) {</div>
+<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Check if directory exist&quot;</span>);</div>
+<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;    }</div>
+<div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;    <span class="keyword">delete</span> OutFile;</div>
+<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
+<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;  }</div>
+<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;  <span class="keywordflow">return</span> OutFile;</div>
+<div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;}</div>
+<div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160; </div>
+<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;} <span class="comment">//end M3</span></div>
 <div class="ttc" id="aCore_8h_html_a46b8fa28114cf68de4549061568b5ade"><div class="ttname"><a href="Core_8h.html#a46b8fa28114cf68de4549061568b5ade">_MaCh3_Safe_Include_Start_</a></div><div class="ttdeci">#define _MaCh3_Safe_Include_Start_</div><div class="ttdoc">KS: Avoiding warning checking for headers.</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00109">Core.h:109</a></div></div>
 <div class="ttc" id="aCore_8h_html_a91209a17295738b34b124b79faa68a1b"><div class="ttname"><a href="Core_8h.html#a91209a17295738b34b124b79faa68a1b">_MaCh3_Safe_Include_End_</a></div><div class="ttdeci">#define _MaCh3_Safe_Include_End_</div><div class="ttdoc">KS: Restore warning checking after including external headers.</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00120">Core.h:120</a></div></div>
 <div class="ttc" id="aHistogramUtils_8cpp_html_a0524e39ba8566ad495da1533e2c48d29"><div class="ttname"><a href="HistogramUtils_8cpp.html#a0524e39ba8566ad495da1533e2c48d29">MakeAsymGraph</a></div><div class="ttdeci">std::unique_ptr&lt; TGraphAsymmErrors &gt; MakeAsymGraph(TH1 *sigmaArrayLeft, TH1 *sigmaArrayCentr, TH1 *sigmaArrayRight, const std::string &amp;title)</div><div class="ttdoc">Used by sigma variation, check how 1 sigma changes spectra.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00516">HistogramUtils.cpp:516</a></div></div>
