@@ -909,51 +909,51 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Acceptance Probability. </p>
 
-<p class="definition">Definition at line <a class="el" href="MCMCProcessor_8cpp_source.html#l04448">4448</a> of file <a class="el" href="MCMCProcessor_8cpp_source.html">MCMCProcessor.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l04448"></a><span class="lineno"> 4448</span>&#160;                                            {</div>
-<div class="line"><a name="l04449"></a><span class="lineno"> 4449</span>&#160;<span class="comment">// **************************</span></div>
-<div class="line"><a name="l04450"></a><span class="lineno"> 4450</span>&#160;  <span class="keywordflow">if</span> (<a class="code" href="classMCMCProcessor.html#a523a223a4754c133121796f4591c7be3">AccProbBatchedAverages</a> == <span class="keyword">nullptr</span>) <a class="code" href="classMCMCProcessor.html#a930cadafa41b31b58066dea68628de9f">PrepareDiagMCMC</a>();</div>
-<div class="line"><a name="l04451"></a><span class="lineno"> 4451</span>&#160; </div>
-<div class="line"><a name="l04452"></a><span class="lineno"> 4452</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Making AccProb plots...&quot;</span>);</div>
-<div class="line"><a name="l04453"></a><span class="lineno"> 4453</span>&#160; </div>
-<div class="line"><a name="l04454"></a><span class="lineno"> 4454</span>&#160;  <span class="comment">// Set the titles and limits for TH1Ds</span></div>
-<div class="line"><a name="l04455"></a><span class="lineno"> 4455</span>&#160;  <span class="keyword">auto</span> AcceptanceProbPlot = std::make_unique&lt;TH1D&gt;(<span class="stringliteral">&quot;AcceptanceProbability&quot;</span>, <span class="stringliteral">&quot;Acceptance Probability&quot;</span>, <a class="code" href="classMCMCProcessor.html#af3a19b885e9c34e1674aea8cfbe14e1c">nEntries</a>, 0, <a class="code" href="classMCMCProcessor.html#af3a19b885e9c34e1674aea8cfbe14e1c">nEntries</a>);</div>
-<div class="line"><a name="l04456"></a><span class="lineno"> 4456</span>&#160;  AcceptanceProbPlot-&gt;GetXaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Step&quot;</span>);</div>
-<div class="line"><a name="l04457"></a><span class="lineno"> 4457</span>&#160;  AcceptanceProbPlot-&gt;GetYaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Acceptance Probability&quot;</span>);</div>
-<div class="line"><a name="l04458"></a><span class="lineno"> 4458</span>&#160; </div>
-<div class="line"><a name="l04459"></a><span class="lineno"> 4459</span>&#160;  <span class="keyword">auto</span> BatchedAcceptanceProblot = std::make_unique&lt;TH1D&gt;(<span class="stringliteral">&quot;AcceptanceProbability_Batch&quot;</span>, <span class="stringliteral">&quot;AcceptanceProbability_Batch&quot;</span>, <a class="code" href="classMCMCProcessor.html#a02c5a3f849cf217705816c650c678d19">nBatches</a>, 0, <a class="code" href="classMCMCProcessor.html#a02c5a3f849cf217705816c650c678d19">nBatches</a>);</div>
-<div class="line"><a name="l04460"></a><span class="lineno"> 4460</span>&#160;  BatchedAcceptanceProblot-&gt;GetYaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Acceptance Probability&quot;</span>);</div>
-<div class="line"><a name="l04461"></a><span class="lineno"> 4461</span>&#160;  </div>
-<div class="line"><a name="l04462"></a><span class="lineno"> 4462</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code" href="classMCMCProcessor.html#a02c5a3f849cf217705816c650c678d19">nBatches</a>; ++i) {</div>
-<div class="line"><a name="l04463"></a><span class="lineno"> 4463</span>&#160;    BatchedAcceptanceProblot-&gt;SetBinContent(i+1, <a class="code" href="classMCMCProcessor.html#a523a223a4754c133121796f4591c7be3">AccProbBatchedAverages</a>[i]);</div>
-<div class="line"><a name="l04464"></a><span class="lineno"> 4464</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">int</span> BatchRangeLow = double(i)*double(<a class="code" href="classMCMCProcessor.html#af3a19b885e9c34e1674aea8cfbe14e1c">nEntries</a>)/double(<a class="code" href="classMCMCProcessor.html#a02c5a3f849cf217705816c650c678d19">nBatches</a>);</div>
-<div class="line"><a name="l04465"></a><span class="lineno"> 4465</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">int</span> BatchRangeHigh = double(i+1)*double(<a class="code" href="classMCMCProcessor.html#af3a19b885e9c34e1674aea8cfbe14e1c">nEntries</a>)/double(<a class="code" href="classMCMCProcessor.html#a02c5a3f849cf217705816c650c678d19">nBatches</a>);</div>
-<div class="line"><a name="l04466"></a><span class="lineno"> 4466</span>&#160;    std::stringstream ss;</div>
-<div class="line"><a name="l04467"></a><span class="lineno"> 4467</span>&#160;    ss &lt;&lt; BatchRangeLow &lt;&lt; <span class="stringliteral">&quot; - &quot;</span> &lt;&lt; BatchRangeHigh;</div>
-<div class="line"><a name="l04468"></a><span class="lineno"> 4468</span>&#160;    BatchedAcceptanceProblot-&gt;GetXaxis()-&gt;SetBinLabel(i+1, ss.str().c_str());</div>
-<div class="line"><a name="l04469"></a><span class="lineno"> 4469</span>&#160;  }</div>
-<div class="line"><a name="l04470"></a><span class="lineno"> 4470</span>&#160;  </div>
-<div class="line"><a name="l04471"></a><span class="lineno"> 4471</span>&#160;<span class="preprocessor">  #ifdef MULTITHREAD</span></div>
-<div class="line"><a name="l04472"></a><span class="lineno"> 4472</span>&#160;<span class="preprocessor">  #pragma omp parallel for</span></div>
-<div class="line"><a name="l04473"></a><span class="lineno"> 4473</span>&#160;<span class="preprocessor">  #endif</span></div>
-<div class="line"><a name="l04474"></a><span class="lineno"> 4474</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code" href="classMCMCProcessor.html#af3a19b885e9c34e1674aea8cfbe14e1c">nEntries</a>; ++i) {</div>
-<div class="line"><a name="l04475"></a><span class="lineno"> 4475</span>&#160;    <span class="comment">// Set bin content for the i-th bin to the parameter values</span></div>
-<div class="line"><a name="l04476"></a><span class="lineno"> 4476</span>&#160;    AcceptanceProbPlot-&gt;SetBinContent(i, <a class="code" href="classMCMCProcessor.html#a88cab29770fd6098a674a0ab3628a251">AccProbValues</a>[i]);</div>
-<div class="line"><a name="l04477"></a><span class="lineno"> 4477</span>&#160;  }</div>
-<div class="line"><a name="l04478"></a><span class="lineno"> 4478</span>&#160;    </div>
-<div class="line"><a name="l04479"></a><span class="lineno"> 4479</span>&#160;  TDirectory *probDir = <a class="code" href="classMCMCProcessor.html#a62035b99df4617ab334cd1abd6ed0346">OutputFile</a>-&gt;mkdir(<span class="stringliteral">&quot;AccProb&quot;</span>);</div>
-<div class="line"><a name="l04480"></a><span class="lineno"> 4480</span>&#160;  probDir-&gt;cd();</div>
-<div class="line"><a name="l04481"></a><span class="lineno"> 4481</span>&#160;  </div>
-<div class="line"><a name="l04482"></a><span class="lineno"> 4482</span>&#160;  AcceptanceProbPlot-&gt;Write();</div>
-<div class="line"><a name="l04483"></a><span class="lineno"> 4483</span>&#160;  BatchedAcceptanceProblot-&gt;Write();</div>
-<div class="line"><a name="l04484"></a><span class="lineno"> 4484</span>&#160;  <span class="keyword">delete</span>[] <a class="code" href="classMCMCProcessor.html#a88cab29770fd6098a674a0ab3628a251">AccProbValues</a>;</div>
-<div class="line"><a name="l04485"></a><span class="lineno"> 4485</span>&#160;  <span class="keyword">delete</span>[] <a class="code" href="classMCMCProcessor.html#a523a223a4754c133121796f4591c7be3">AccProbBatchedAverages</a>;</div>
-<div class="line"><a name="l04486"></a><span class="lineno"> 4486</span>&#160; </div>
-<div class="line"><a name="l04487"></a><span class="lineno"> 4487</span>&#160;  probDir-&gt;Close();</div>
-<div class="line"><a name="l04488"></a><span class="lineno"> 4488</span>&#160;  <span class="keyword">delete</span> probDir;</div>
-<div class="line"><a name="l04489"></a><span class="lineno"> 4489</span>&#160; </div>
-<div class="line"><a name="l04490"></a><span class="lineno"> 4490</span>&#160;  <a class="code" href="classMCMCProcessor.html#a62035b99df4617ab334cd1abd6ed0346">OutputFile</a>-&gt;cd();</div>
-<div class="line"><a name="l04491"></a><span class="lineno"> 4491</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="MCMCProcessor_8cpp_source.html#l04449">4449</a> of file <a class="el" href="MCMCProcessor_8cpp_source.html">MCMCProcessor.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l04449"></a><span class="lineno"> 4449</span>&#160;                                            {</div>
+<div class="line"><a name="l04450"></a><span class="lineno"> 4450</span>&#160;<span class="comment">// **************************</span></div>
+<div class="line"><a name="l04451"></a><span class="lineno"> 4451</span>&#160;  <span class="keywordflow">if</span> (<a class="code" href="classMCMCProcessor.html#a523a223a4754c133121796f4591c7be3">AccProbBatchedAverages</a> == <span class="keyword">nullptr</span>) <a class="code" href="classMCMCProcessor.html#a930cadafa41b31b58066dea68628de9f">PrepareDiagMCMC</a>();</div>
+<div class="line"><a name="l04452"></a><span class="lineno"> 4452</span>&#160; </div>
+<div class="line"><a name="l04453"></a><span class="lineno"> 4453</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Making AccProb plots...&quot;</span>);</div>
+<div class="line"><a name="l04454"></a><span class="lineno"> 4454</span>&#160; </div>
+<div class="line"><a name="l04455"></a><span class="lineno"> 4455</span>&#160;  <span class="comment">// Set the titles and limits for TH1Ds</span></div>
+<div class="line"><a name="l04456"></a><span class="lineno"> 4456</span>&#160;  <span class="keyword">auto</span> AcceptanceProbPlot = std::make_unique&lt;TH1D&gt;(<span class="stringliteral">&quot;AcceptanceProbability&quot;</span>, <span class="stringliteral">&quot;Acceptance Probability&quot;</span>, <a class="code" href="classMCMCProcessor.html#af3a19b885e9c34e1674aea8cfbe14e1c">nEntries</a>, 0, <a class="code" href="classMCMCProcessor.html#af3a19b885e9c34e1674aea8cfbe14e1c">nEntries</a>);</div>
+<div class="line"><a name="l04457"></a><span class="lineno"> 4457</span>&#160;  AcceptanceProbPlot-&gt;GetXaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Step&quot;</span>);</div>
+<div class="line"><a name="l04458"></a><span class="lineno"> 4458</span>&#160;  AcceptanceProbPlot-&gt;GetYaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Acceptance Probability&quot;</span>);</div>
+<div class="line"><a name="l04459"></a><span class="lineno"> 4459</span>&#160; </div>
+<div class="line"><a name="l04460"></a><span class="lineno"> 4460</span>&#160;  <span class="keyword">auto</span> BatchedAcceptanceProblot = std::make_unique&lt;TH1D&gt;(<span class="stringliteral">&quot;AcceptanceProbability_Batch&quot;</span>, <span class="stringliteral">&quot;AcceptanceProbability_Batch&quot;</span>, <a class="code" href="classMCMCProcessor.html#a02c5a3f849cf217705816c650c678d19">nBatches</a>, 0, <a class="code" href="classMCMCProcessor.html#a02c5a3f849cf217705816c650c678d19">nBatches</a>);</div>
+<div class="line"><a name="l04461"></a><span class="lineno"> 4461</span>&#160;  BatchedAcceptanceProblot-&gt;GetYaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Acceptance Probability&quot;</span>);</div>
+<div class="line"><a name="l04462"></a><span class="lineno"> 4462</span>&#160;  </div>
+<div class="line"><a name="l04463"></a><span class="lineno"> 4463</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code" href="classMCMCProcessor.html#a02c5a3f849cf217705816c650c678d19">nBatches</a>; ++i) {</div>
+<div class="line"><a name="l04464"></a><span class="lineno"> 4464</span>&#160;    BatchedAcceptanceProblot-&gt;SetBinContent(i+1, <a class="code" href="classMCMCProcessor.html#a523a223a4754c133121796f4591c7be3">AccProbBatchedAverages</a>[i]);</div>
+<div class="line"><a name="l04465"></a><span class="lineno"> 4465</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">int</span> BatchRangeLow = double(i)*double(<a class="code" href="classMCMCProcessor.html#af3a19b885e9c34e1674aea8cfbe14e1c">nEntries</a>)/double(<a class="code" href="classMCMCProcessor.html#a02c5a3f849cf217705816c650c678d19">nBatches</a>);</div>
+<div class="line"><a name="l04466"></a><span class="lineno"> 4466</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">int</span> BatchRangeHigh = double(i+1)*double(<a class="code" href="classMCMCProcessor.html#af3a19b885e9c34e1674aea8cfbe14e1c">nEntries</a>)/double(<a class="code" href="classMCMCProcessor.html#a02c5a3f849cf217705816c650c678d19">nBatches</a>);</div>
+<div class="line"><a name="l04467"></a><span class="lineno"> 4467</span>&#160;    std::stringstream ss;</div>
+<div class="line"><a name="l04468"></a><span class="lineno"> 4468</span>&#160;    ss &lt;&lt; BatchRangeLow &lt;&lt; <span class="stringliteral">&quot; - &quot;</span> &lt;&lt; BatchRangeHigh;</div>
+<div class="line"><a name="l04469"></a><span class="lineno"> 4469</span>&#160;    BatchedAcceptanceProblot-&gt;GetXaxis()-&gt;SetBinLabel(i+1, ss.str().c_str());</div>
+<div class="line"><a name="l04470"></a><span class="lineno"> 4470</span>&#160;  }</div>
+<div class="line"><a name="l04471"></a><span class="lineno"> 4471</span>&#160;  </div>
+<div class="line"><a name="l04472"></a><span class="lineno"> 4472</span>&#160;<span class="preprocessor">  #ifdef MULTITHREAD</span></div>
+<div class="line"><a name="l04473"></a><span class="lineno"> 4473</span>&#160;<span class="preprocessor">  #pragma omp parallel for</span></div>
+<div class="line"><a name="l04474"></a><span class="lineno"> 4474</span>&#160;<span class="preprocessor">  #endif</span></div>
+<div class="line"><a name="l04475"></a><span class="lineno"> 4475</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code" href="classMCMCProcessor.html#af3a19b885e9c34e1674aea8cfbe14e1c">nEntries</a>; ++i) {</div>
+<div class="line"><a name="l04476"></a><span class="lineno"> 4476</span>&#160;    <span class="comment">// Set bin content for the i-th bin to the parameter values</span></div>
+<div class="line"><a name="l04477"></a><span class="lineno"> 4477</span>&#160;    AcceptanceProbPlot-&gt;SetBinContent(i, <a class="code" href="classMCMCProcessor.html#a88cab29770fd6098a674a0ab3628a251">AccProbValues</a>[i]);</div>
+<div class="line"><a name="l04478"></a><span class="lineno"> 4478</span>&#160;  }</div>
+<div class="line"><a name="l04479"></a><span class="lineno"> 4479</span>&#160;    </div>
+<div class="line"><a name="l04480"></a><span class="lineno"> 4480</span>&#160;  TDirectory *probDir = <a class="code" href="classMCMCProcessor.html#a62035b99df4617ab334cd1abd6ed0346">OutputFile</a>-&gt;mkdir(<span class="stringliteral">&quot;AccProb&quot;</span>);</div>
+<div class="line"><a name="l04481"></a><span class="lineno"> 4481</span>&#160;  probDir-&gt;cd();</div>
+<div class="line"><a name="l04482"></a><span class="lineno"> 4482</span>&#160;  </div>
+<div class="line"><a name="l04483"></a><span class="lineno"> 4483</span>&#160;  AcceptanceProbPlot-&gt;Write();</div>
+<div class="line"><a name="l04484"></a><span class="lineno"> 4484</span>&#160;  BatchedAcceptanceProblot-&gt;Write();</div>
+<div class="line"><a name="l04485"></a><span class="lineno"> 4485</span>&#160;  <span class="keyword">delete</span>[] <a class="code" href="classMCMCProcessor.html#a88cab29770fd6098a674a0ab3628a251">AccProbValues</a>;</div>
+<div class="line"><a name="l04486"></a><span class="lineno"> 4486</span>&#160;  <span class="keyword">delete</span>[] <a class="code" href="classMCMCProcessor.html#a523a223a4754c133121796f4591c7be3">AccProbBatchedAverages</a>;</div>
+<div class="line"><a name="l04487"></a><span class="lineno"> 4487</span>&#160; </div>
+<div class="line"><a name="l04488"></a><span class="lineno"> 4488</span>&#160;  probDir-&gt;Close();</div>
+<div class="line"><a name="l04489"></a><span class="lineno"> 4489</span>&#160;  <span class="keyword">delete</span> probDir;</div>
+<div class="line"><a name="l04490"></a><span class="lineno"> 4490</span>&#160; </div>
+<div class="line"><a name="l04491"></a><span class="lineno"> 4491</span>&#160;  <a class="code" href="classMCMCProcessor.html#a62035b99df4617ab334cd1abd6ed0346">OutputFile</a>-&gt;cd();</div>
+<div class="line"><a name="l04492"></a><span class="lineno"> 4492</span>&#160;}</div>
 <div class="ttc" id="aclassMCMCProcessor_html_a930cadafa41b31b58066dea68628de9f"><div class="ttname"><a href="classMCMCProcessor.html#a930cadafa41b31b58066dea68628de9f">MCMCProcessor::PrepareDiagMCMC</a></div><div class="ttdeci">void PrepareDiagMCMC()</div><div class="ttdoc">CW: Prepare branches etc. for DiagMCMC.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l03340">MCMCProcessor.cpp:3340</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -1764,7 +1764,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><a name="l04018"></a><span class="lineno"> 4018</span>&#160;  <span class="keyword">delete</span> SamplingEfficiency;</div>
 <div class="line"><a name="l04019"></a><span class="lineno"> 4019</span>&#160;}</div>
 <div class="ttc" id="aRHat_8cpp_html_ae673254e98992bd483de55c6c1d1dcaf"><div class="ttname"><a href="RHat_8cpp.html#ae673254e98992bd483de55c6c1d1dcaf">EffectiveSampleSize</a></div><div class="ttdeci">double * EffectiveSampleSize</div><div class="ttdef"><b>Definition:</b> <a href="RHat_8cpp_source.html#l00067">RHat.cpp:67</a></div></div>
-<div class="ttc" id="aclassMCMCProcessor_html_a704afa8c216722e730be2c2a33b594f0"><div class="ttname"><a href="classMCMCProcessor.html#a704afa8c216722e730be2c2a33b594f0">MCMCProcessor::SetLegendStyle</a></div><div class="ttdeci">void SetLegendStyle(TLegend *Legend, const double size) const</div><div class="ttdoc">Configures the style of a TLegend object.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l04608">MCMCProcessor.cpp:4608</a></div></div>
+<div class="ttc" id="aclassMCMCProcessor_html_a704afa8c216722e730be2c2a33b594f0"><div class="ttname"><a href="classMCMCProcessor.html#a704afa8c216722e730be2c2a33b594f0">MCMCProcessor::SetLegendStyle</a></div><div class="ttdeci">void SetLegendStyle(TLegend *Legend, const double size) const</div><div class="ttdoc">Configures the style of a TLegend object.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l04609">MCMCProcessor.cpp:4609</a></div></div>
 <div class="ttc" id="anamespaceM3_html_a2aed672aeeb4fcf51069966193176ff3"><div class="ttname"><a href="namespaceM3.html#a2aed672aeeb4fcf51069966193176ff3">M3::_BAD_DOUBLE_</a></div><div class="ttdeci">constexpr static const double _BAD_DOUBLE_</div><div class="ttdoc">Default value used for double initialisation.</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00046">Core.h:46</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -1810,24 +1810,24 @@ Kamil Skwarczynski </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="MCMCProcessor_8cpp_source.html#l04494">4494</a> of file <a class="el" href="MCMCProcessor_8cpp_source.html">MCMCProcessor.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l04494"></a><span class="lineno"> 4494</span>&#160;                                                                                                                                                    {</div>
-<div class="line"><a name="l04495"></a><span class="lineno"> 4495</span>&#160;<span class="comment">// **************************</span></div>
-<div class="line"><a name="l04496"></a><span class="lineno"> 4496</span>&#160;  <span class="keywordflow">if</span> (CredibleIntervals.size() != CredibleIntervalsColours.size()) {</div>
-<div class="line"><a name="l04497"></a><span class="lineno"> 4497</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;size of CredibleIntervals is not equal to size of CredibleIntervalsColours&quot;</span>);</div>
-<div class="line"><a name="l04498"></a><span class="lineno"> 4498</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><a name="l04499"></a><span class="lineno"> 4499</span>&#160;  }</div>
-<div class="line"><a name="l04500"></a><span class="lineno"> 4500</span>&#160;  <span class="keywordflow">if</span> (CredibleIntervals.size() &gt; 1) {</div>
-<div class="line"><a name="l04501"></a><span class="lineno"> 4501</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 1; i &lt; CredibleIntervals.size(); i++) {</div>
-<div class="line"><a name="l04502"></a><span class="lineno"> 4502</span>&#160;      <span class="keywordflow">if</span> (CredibleIntervals[i] &gt; CredibleIntervals[i - 1]) {</div>
-<div class="line"><a name="l04503"></a><span class="lineno"> 4503</span>&#160;        <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Interval {} is smaller than {}&quot;</span>, i, i - 1);</div>
-<div class="line"><a name="l04504"></a><span class="lineno"> 4504</span>&#160;        <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;{:.2f} {:.2f}&quot;</span>, CredibleIntervals[i], CredibleIntervals[i - 1]);</div>
-<div class="line"><a name="l04505"></a><span class="lineno"> 4505</span>&#160;        <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;They should be grouped in decreasing order&quot;</span>);</div>
-<div class="line"><a name="l04506"></a><span class="lineno"> 4506</span>&#160;        <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><a name="l04507"></a><span class="lineno"> 4507</span>&#160;      }</div>
-<div class="line"><a name="l04508"></a><span class="lineno"> 4508</span>&#160;    }</div>
-<div class="line"><a name="l04509"></a><span class="lineno"> 4509</span>&#160;  }</div>
-<div class="line"><a name="l04510"></a><span class="lineno"> 4510</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="MCMCProcessor_8cpp_source.html#l04495">4495</a> of file <a class="el" href="MCMCProcessor_8cpp_source.html">MCMCProcessor.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l04495"></a><span class="lineno"> 4495</span>&#160;                                                                                                                                                    {</div>
+<div class="line"><a name="l04496"></a><span class="lineno"> 4496</span>&#160;<span class="comment">// **************************</span></div>
+<div class="line"><a name="l04497"></a><span class="lineno"> 4497</span>&#160;  <span class="keywordflow">if</span> (CredibleIntervals.size() != CredibleIntervalsColours.size()) {</div>
+<div class="line"><a name="l04498"></a><span class="lineno"> 4498</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;size of CredibleIntervals is not equal to size of CredibleIntervalsColours&quot;</span>);</div>
+<div class="line"><a name="l04499"></a><span class="lineno"> 4499</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><a name="l04500"></a><span class="lineno"> 4500</span>&#160;  }</div>
+<div class="line"><a name="l04501"></a><span class="lineno"> 4501</span>&#160;  <span class="keywordflow">if</span> (CredibleIntervals.size() &gt; 1) {</div>
+<div class="line"><a name="l04502"></a><span class="lineno"> 4502</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 1; i &lt; CredibleIntervals.size(); i++) {</div>
+<div class="line"><a name="l04503"></a><span class="lineno"> 4503</span>&#160;      <span class="keywordflow">if</span> (CredibleIntervals[i] &gt; CredibleIntervals[i - 1]) {</div>
+<div class="line"><a name="l04504"></a><span class="lineno"> 4504</span>&#160;        <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Interval {} is smaller than {}&quot;</span>, i, i - 1);</div>
+<div class="line"><a name="l04505"></a><span class="lineno"> 4505</span>&#160;        <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;{:.2f} {:.2f}&quot;</span>, CredibleIntervals[i], CredibleIntervals[i - 1]);</div>
+<div class="line"><a name="l04506"></a><span class="lineno"> 4506</span>&#160;        <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;They should be grouped in decreasing order&quot;</span>);</div>
+<div class="line"><a name="l04507"></a><span class="lineno"> 4507</span>&#160;        <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><a name="l04508"></a><span class="lineno"> 4508</span>&#160;      }</div>
+<div class="line"><a name="l04509"></a><span class="lineno"> 4509</span>&#160;    }</div>
+<div class="line"><a name="l04510"></a><span class="lineno"> 4510</span>&#160;  }</div>
+<div class="line"><a name="l04511"></a><span class="lineno"> 4511</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1879,22 +1879,22 @@ Kamil Skwarczynski </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="MCMCProcessor_8cpp_source.html#l04513">4513</a> of file <a class="el" href="MCMCProcessor_8cpp_source.html">MCMCProcessor.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l04515"></a><span class="lineno"> 4515</span>&#160;                                                                              {</div>
-<div class="line"><a name="l04516"></a><span class="lineno"> 4516</span>&#160;<span class="comment">// **************************</span></div>
-<div class="line"><a name="l04517"></a><span class="lineno"> 4517</span>&#160;  <span class="keywordflow">if</span> ((CredibleRegions.size() != CredibleRegionStyle.size()) || (CredibleRegionStyle.size() != CredibleRegionColor.size())) {</div>
-<div class="line"><a name="l04518"></a><span class="lineno"> 4518</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;size of CredibleRegions is not equal to size of CredibleRegionStyle or CredibleRegionColor&quot;</span>);</div>
-<div class="line"><a name="l04519"></a><span class="lineno"> 4519</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><a name="l04520"></a><span class="lineno"> 4520</span>&#160;  }</div>
-<div class="line"><a name="l04521"></a><span class="lineno"> 4521</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 1; i &lt; CredibleRegions.size(); i++) {</div>
-<div class="line"><a name="l04522"></a><span class="lineno"> 4522</span>&#160;    <span class="keywordflow">if</span> (CredibleRegions[i] &gt; CredibleRegions[i - 1]) {</div>
-<div class="line"><a name="l04523"></a><span class="lineno"> 4523</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Interval {} is smaller than {}&quot;</span>, i, i - 1);</div>
-<div class="line"><a name="l04524"></a><span class="lineno"> 4524</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;{:.2f} {:.2f}&quot;</span>, CredibleRegions[i], CredibleRegions[i - 1]);</div>
-<div class="line"><a name="l04525"></a><span class="lineno"> 4525</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;They should be grouped in decreasing order&quot;</span>);</div>
-<div class="line"><a name="l04526"></a><span class="lineno"> 4526</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><a name="l04527"></a><span class="lineno"> 4527</span>&#160;    }</div>
-<div class="line"><a name="l04528"></a><span class="lineno"> 4528</span>&#160;  }</div>
-<div class="line"><a name="l04529"></a><span class="lineno"> 4529</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="MCMCProcessor_8cpp_source.html#l04514">4514</a> of file <a class="el" href="MCMCProcessor_8cpp_source.html">MCMCProcessor.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l04516"></a><span class="lineno"> 4516</span>&#160;                                                                              {</div>
+<div class="line"><a name="l04517"></a><span class="lineno"> 4517</span>&#160;<span class="comment">// **************************</span></div>
+<div class="line"><a name="l04518"></a><span class="lineno"> 4518</span>&#160;  <span class="keywordflow">if</span> ((CredibleRegions.size() != CredibleRegionStyle.size()) || (CredibleRegionStyle.size() != CredibleRegionColor.size())) {</div>
+<div class="line"><a name="l04519"></a><span class="lineno"> 4519</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;size of CredibleRegions is not equal to size of CredibleRegionStyle or CredibleRegionColor&quot;</span>);</div>
+<div class="line"><a name="l04520"></a><span class="lineno"> 4520</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><a name="l04521"></a><span class="lineno"> 4521</span>&#160;  }</div>
+<div class="line"><a name="l04522"></a><span class="lineno"> 4522</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 1; i &lt; CredibleRegions.size(); i++) {</div>
+<div class="line"><a name="l04523"></a><span class="lineno"> 4523</span>&#160;    <span class="keywordflow">if</span> (CredibleRegions[i] &gt; CredibleRegions[i - 1]) {</div>
+<div class="line"><a name="l04524"></a><span class="lineno"> 4524</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Interval {} is smaller than {}&quot;</span>, i, i - 1);</div>
+<div class="line"><a name="l04525"></a><span class="lineno"> 4525</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;{:.2f} {:.2f}&quot;</span>, CredibleRegions[i], CredibleRegions[i - 1]);</div>
+<div class="line"><a name="l04526"></a><span class="lineno"> 4526</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;They should be grouped in decreasing order&quot;</span>);</div>
+<div class="line"><a name="l04527"></a><span class="lineno"> 4527</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><a name="l04528"></a><span class="lineno"> 4528</span>&#160;    }</div>
+<div class="line"><a name="l04529"></a><span class="lineno"> 4529</span>&#160;  }</div>
+<div class="line"><a name="l04530"></a><span class="lineno"> 4530</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1973,8 +1973,8 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><a name="l03334"></a><span class="lineno"> 3334</span>&#160;  <span class="comment">// Draw acceptance Probability</span></div>
 <div class="line"><a name="l03335"></a><span class="lineno"> 3335</span>&#160;  <a class="code" href="classMCMCProcessor.html#a278b82fa945d847e57ae6ed6357d8f61">AcceptanceProbabilities</a>();</div>
 <div class="line"><a name="l03336"></a><span class="lineno"> 3336</span>&#160;}</div>
-<div class="ttc" id="aclassMCMCProcessor_html_a03b7c4bb9cd9a90aa7d284b0f1a6156b"><div class="ttname"><a href="classMCMCProcessor.html#a03b7c4bb9cd9a90aa7d284b0f1a6156b">MCMCProcessor::GewekeDiagnostic</a></div><div class="ttdeci">void GewekeDiagnostic()</div><div class="ttdoc">Geweke Diagnostic based on the methods described by Fang (2014) and Karlsbakk (2011)....</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l04316">MCMCProcessor.cpp:4316</a></div></div>
-<div class="ttc" id="aclassMCMCProcessor_html_a278b82fa945d847e57ae6ed6357d8f61"><div class="ttname"><a href="classMCMCProcessor.html#a278b82fa945d847e57ae6ed6357d8f61">MCMCProcessor::AcceptanceProbabilities</a></div><div class="ttdeci">void AcceptanceProbabilities()</div><div class="ttdoc">Acceptance Probability.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l04448">MCMCProcessor.cpp:4448</a></div></div>
+<div class="ttc" id="aclassMCMCProcessor_html_a03b7c4bb9cd9a90aa7d284b0f1a6156b"><div class="ttname"><a href="classMCMCProcessor.html#a03b7c4bb9cd9a90aa7d284b0f1a6156b">MCMCProcessor::GewekeDiagnostic</a></div><div class="ttdeci">void GewekeDiagnostic()</div><div class="ttdoc">Geweke Diagnostic based on the methods described by Fang (2014) and Karlsbakk (2011)....</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l04317">MCMCProcessor.cpp:4317</a></div></div>
+<div class="ttc" id="aclassMCMCProcessor_html_a278b82fa945d847e57ae6ed6357d8f61"><div class="ttname"><a href="classMCMCProcessor.html#a278b82fa945d847e57ae6ed6357d8f61">MCMCProcessor::AcceptanceProbabilities</a></div><div class="ttdeci">void AcceptanceProbabilities()</div><div class="ttdoc">Acceptance Probability.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l04449">MCMCProcessor.cpp:4449</a></div></div>
 <div class="ttc" id="aclassMCMCProcessor_html_a322bee0c362ba83df8c45769d299ce9f"><div class="ttname"><a href="classMCMCProcessor.html#a322bee0c362ba83df8c45769d299ce9f">MCMCProcessor::AutoCorrelation</a></div><div class="ttdeci">void AutoCorrelation()</div><div class="ttdoc">KS: Calculate autocorrelations supports both OpenMP and CUDA :)</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l03708">MCMCProcessor.cpp:3708</a></div></div>
 <div class="ttc" id="aclassMCMCProcessor_html_a929d6efec80bb4de05eea7011257439a"><div class="ttname"><a href="classMCMCProcessor.html#a929d6efec80bb4de05eea7011257439a">MCMCProcessor::ParamTraces</a></div><div class="ttdeci">void ParamTraces()</div><div class="ttdoc">CW: Draw trace plots of the parameters i.e. parameter vs step.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l03496">MCMCProcessor.cpp:3496</a></div></div>
 <div class="ttc" id="aclassMCMCProcessor_html_abeb5e115fa9f58ea7872af5cf13c6b79"><div class="ttname"><a href="classMCMCProcessor.html#abeb5e115fa9f58ea7872af5cf13c6b79">MCMCProcessor::AutoCorrelation_FFT</a></div><div class="ttdeci">void AutoCorrelation_FFT()</div><div class="ttdoc">MJR: Autocorrelation function using FFT algorithm for extra speed.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l03612">MCMCProcessor.cpp:3612</a></div></div>
@@ -2143,8 +2143,8 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><a name="l01765"></a><span class="lineno"> 1765</span>&#160;  gStyle-&gt;SetOptTitle(OptTitle);</div>
 <div class="line"><a name="l01766"></a><span class="lineno"> 1766</span>&#160;}</div>
 <div class="ttc" id="aGetPenaltyTerm_8cpp_html_a439227feff9d7f55384e8780cfc2eb82"><div class="ttname"><a href="GetPenaltyTerm_8cpp.html#a439227feff9d7f55384e8780cfc2eb82">size</a></div><div class="ttdeci">int size</div><div class="ttdef"><b>Definition:</b> <a href="GetPenaltyTerm_8cpp_source.html#l00039">GetPenaltyTerm.cpp:39</a></div></div>
-<div class="ttc" id="aclassMCMCProcessor_html_a1dfc05edf0b1295e561d5956b43b1c6b"><div class="ttname"><a href="classMCMCProcessor.html#a1dfc05edf0b1295e561d5956b43b1c6b">MCMCProcessor::GetMargins</a></div><div class="ttdeci">std::vector&lt; double &gt; GetMargins(const std::unique_ptr&lt; TCanvas &gt; &amp;Canv) const</div><div class="ttdoc">Get TCanvas margins, to be able to reset them if particular function need different margins.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l04576">MCMCProcessor.cpp:4576</a></div></div>
-<div class="ttc" id="aclassMCMCProcessor_html_a922f4c04b67ca9c6faab00efdb5277ea"><div class="ttname"><a href="classMCMCProcessor.html#a922f4c04b67ca9c6faab00efdb5277ea">MCMCProcessor::SetMargins</a></div><div class="ttdeci">void SetMargins(std::unique_ptr&lt; TCanvas &gt; &amp;Canv, const std::vector&lt; double &gt; &amp;margins)</div><div class="ttdoc">Set TCanvas margins to specified values.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l04583">MCMCProcessor.cpp:4583</a></div></div>
+<div class="ttc" id="aclassMCMCProcessor_html_a1dfc05edf0b1295e561d5956b43b1c6b"><div class="ttname"><a href="classMCMCProcessor.html#a1dfc05edf0b1295e561d5956b43b1c6b">MCMCProcessor::GetMargins</a></div><div class="ttdeci">std::vector&lt; double &gt; GetMargins(const std::unique_ptr&lt; TCanvas &gt; &amp;Canv) const</div><div class="ttdoc">Get TCanvas margins, to be able to reset them if particular function need different margins.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l04577">MCMCProcessor.cpp:4577</a></div></div>
+<div class="ttc" id="aclassMCMCProcessor_html_a922f4c04b67ca9c6faab00efdb5277ea"><div class="ttname"><a href="classMCMCProcessor.html#a922f4c04b67ca9c6faab00efdb5277ea">MCMCProcessor::SetMargins</a></div><div class="ttdeci">void SetMargins(std::unique_ptr&lt; TCanvas &gt; &amp;Canv, const std::vector&lt; double &gt; &amp;margins)</div><div class="ttdoc">Set TCanvas margins to specified values.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l04584">MCMCProcessor.cpp:4584</a></div></div>
 <div class="ttc" id="aclassMCMCProcessor_html_a95fa49737432818bc830a44898d0d850"><div class="ttname"><a href="classMCMCProcessor.html#a95fa49737432818bc830a44898d0d850">MCMCProcessor::IamVaried</a></div><div class="ttdeci">std::vector&lt; bool &gt; IamVaried</div><div class="ttdoc">Is the ith parameter varied.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00452">MCMCProcessor.h:452</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -3132,22 +3132,22 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Number of params from a given group, for example flux. </p>
 
-<p class="definition">Definition at line <a class="el" href="MCMCProcessor_8cpp_source.html#l04532">4532</a> of file <a class="el" href="MCMCProcessor_8cpp_source.html">MCMCProcessor.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l04532"></a><span class="lineno"> 4532</span>&#160;                                                       {</div>
-<div class="line"><a name="l04533"></a><span class="lineno"> 4533</span>&#160;<span class="comment">// **************************</span></div>
-<div class="line"><a name="l04534"></a><span class="lineno"> 4534</span>&#160;  <span class="comment">// Lambda to compare strings case-insensitively</span></div>
-<div class="line"><a name="l04535"></a><span class="lineno"> 4535</span>&#160;  <span class="keyword">auto</span> caseInsensitiveCompare = [](<span class="keyword">const</span> std::string&amp; a, <span class="keyword">const</span> std::string&amp; b) {</div>
-<div class="line"><a name="l04536"></a><span class="lineno"> 4536</span>&#160;    <span class="keywordflow">return</span> std::equal(a.begin(), a.end(), b.begin(), b.end(),</div>
-<div class="line"><a name="l04537"></a><span class="lineno"> 4537</span>&#160;                      [](<span class="keywordtype">char</span> c1, <span class="keywordtype">char</span> c2) { return std::tolower(c1) == std::tolower(c2); });</div>
-<div class="line"><a name="l04538"></a><span class="lineno"> 4538</span>&#160;  };</div>
-<div class="line"><a name="l04539"></a><span class="lineno"> 4539</span>&#160;  <span class="keywordtype">int</span> numerator = 0;</div>
-<div class="line"><a name="l04540"></a><span class="lineno"> 4540</span>&#160;  <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; groupName : <a class="code" href="classMCMCProcessor.html#ab72dd21faa732ec38e550c37635ee66d">ParameterGroup</a>) {</div>
-<div class="line"><a name="l04541"></a><span class="lineno"> 4541</span>&#160;    <span class="keywordflow">if</span> (caseInsensitiveCompare(groupName, name)) {</div>
-<div class="line"><a name="l04542"></a><span class="lineno"> 4542</span>&#160;      numerator++;</div>
-<div class="line"><a name="l04543"></a><span class="lineno"> 4543</span>&#160;    }</div>
-<div class="line"><a name="l04544"></a><span class="lineno"> 4544</span>&#160;  }</div>
-<div class="line"><a name="l04545"></a><span class="lineno"> 4545</span>&#160;  <span class="keywordflow">return</span> numerator;</div>
-<div class="line"><a name="l04546"></a><span class="lineno"> 4546</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="MCMCProcessor_8cpp_source.html#l04533">4533</a> of file <a class="el" href="MCMCProcessor_8cpp_source.html">MCMCProcessor.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l04533"></a><span class="lineno"> 4533</span>&#160;                                                       {</div>
+<div class="line"><a name="l04534"></a><span class="lineno"> 4534</span>&#160;<span class="comment">// **************************</span></div>
+<div class="line"><a name="l04535"></a><span class="lineno"> 4535</span>&#160;  <span class="comment">// Lambda to compare strings case-insensitively</span></div>
+<div class="line"><a name="l04536"></a><span class="lineno"> 4536</span>&#160;  <span class="keyword">auto</span> caseInsensitiveCompare = [](<span class="keyword">const</span> std::string&amp; a, <span class="keyword">const</span> std::string&amp; b) {</div>
+<div class="line"><a name="l04537"></a><span class="lineno"> 4537</span>&#160;    <span class="keywordflow">return</span> std::equal(a.begin(), a.end(), b.begin(), b.end(),</div>
+<div class="line"><a name="l04538"></a><span class="lineno"> 4538</span>&#160;                      [](<span class="keywordtype">char</span> c1, <span class="keywordtype">char</span> c2) { return std::tolower(c1) == std::tolower(c2); });</div>
+<div class="line"><a name="l04539"></a><span class="lineno"> 4539</span>&#160;  };</div>
+<div class="line"><a name="l04540"></a><span class="lineno"> 4540</span>&#160;  <span class="keywordtype">int</span> numerator = 0;</div>
+<div class="line"><a name="l04541"></a><span class="lineno"> 4541</span>&#160;  <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; groupName : <a class="code" href="classMCMCProcessor.html#ab72dd21faa732ec38e550c37635ee66d">ParameterGroup</a>) {</div>
+<div class="line"><a name="l04542"></a><span class="lineno"> 4542</span>&#160;    <span class="keywordflow">if</span> (caseInsensitiveCompare(groupName, name)) {</div>
+<div class="line"><a name="l04543"></a><span class="lineno"> 4543</span>&#160;      numerator++;</div>
+<div class="line"><a name="l04544"></a><span class="lineno"> 4544</span>&#160;    }</div>
+<div class="line"><a name="l04545"></a><span class="lineno"> 4545</span>&#160;  }</div>
+<div class="line"><a name="l04546"></a><span class="lineno"> 4546</span>&#160;  <span class="keywordflow">return</span> numerator;</div>
+<div class="line"><a name="l04547"></a><span class="lineno"> 4547</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3262,12 +3262,12 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Get TCanvas margins, to be able to reset them if particular function need different margins. </p>
 
-<p class="definition">Definition at line <a class="el" href="MCMCProcessor_8cpp_source.html#l04576">4576</a> of file <a class="el" href="MCMCProcessor_8cpp_source.html">MCMCProcessor.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l04576"></a><span class="lineno"> 4576</span>&#160;                                                                                    {</div>
-<div class="line"><a name="l04577"></a><span class="lineno"> 4577</span>&#160;<span class="comment">// **************************</span></div>
-<div class="line"><a name="l04578"></a><span class="lineno"> 4578</span>&#160;  <span class="keywordflow">return</span> std::vector&lt;double&gt;{Canv-&gt;GetTopMargin(), Canv-&gt;GetBottomMargin(),</div>
-<div class="line"><a name="l04579"></a><span class="lineno"> 4579</span>&#160;                              Canv-&gt;GetLeftMargin(), Canv-&gt;GetRightMargin()};</div>
-<div class="line"><a name="l04580"></a><span class="lineno"> 4580</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="MCMCProcessor_8cpp_source.html#l04577">4577</a> of file <a class="el" href="MCMCProcessor_8cpp_source.html">MCMCProcessor.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l04577"></a><span class="lineno"> 4577</span>&#160;                                                                                    {</div>
+<div class="line"><a name="l04578"></a><span class="lineno"> 4578</span>&#160;<span class="comment">// **************************</span></div>
+<div class="line"><a name="l04579"></a><span class="lineno"> 4579</span>&#160;  <span class="keywordflow">return</span> std::vector&lt;double&gt;{Canv-&gt;GetTopMargin(), Canv-&gt;GetBottomMargin(),</div>
+<div class="line"><a name="l04580"></a><span class="lineno"> 4580</span>&#160;                              Canv-&gt;GetLeftMargin(), Canv-&gt;GetRightMargin()};</div>
+<div class="line"><a name="l04581"></a><span class="lineno"> 4581</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -4061,136 +4061,136 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Geweke Diagnostic based on the methods described by Fang (2014) and Karlsbakk (2011). <a class="el" href="citelist.html#CITEREF_Fang2014GewekeDiagnostics">[8]</a> <a class="el" href="citelist.html#CITEREF_karlsbakk2011">[21]</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="MCMCProcessor_8cpp_source.html#l04316">4316</a> of file <a class="el" href="MCMCProcessor_8cpp_source.html">MCMCProcessor.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l04316"></a><span class="lineno"> 4316</span>&#160;                                     {</div>
-<div class="line"><a name="l04317"></a><span class="lineno"> 4317</span>&#160;<span class="comment">// **************************</span></div>
-<div class="line"><a name="l04318"></a><span class="lineno"> 4318</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Making Geweke Diagnostic&quot;</span>);</div>
-<div class="line"><a name="l04319"></a><span class="lineno"> 4319</span>&#160;  <span class="comment">//KS: Up refers to upper limit we check, it stays constant, in literature it is mostly 50% thus using 0.5 for threshold</span></div>
-<div class="line"><a name="l04320"></a><span class="lineno"> 4320</span>&#160;  std::vector&lt;double&gt; MeanUp(<a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>, 0.0);</div>
-<div class="line"><a name="l04321"></a><span class="lineno"> 4321</span>&#160;  std::vector&lt;double&gt; SpectralVarianceUp(<a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>, 0.0);</div>
-<div class="line"><a name="l04322"></a><span class="lineno"> 4322</span>&#160;  std::vector&lt;int&gt; DenomCounterUp(<a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>, 0);</div>
-<div class="line"><a name="l04323"></a><span class="lineno"> 4323</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">double</span> Threshold = 0.5 * <a class="code" href="classMCMCProcessor.html#aae0016a4e1d105d5d65243438c622a97">nSteps</a>;</div>
-<div class="line"><a name="l04324"></a><span class="lineno"> 4324</span>&#160; </div>
-<div class="line"><a name="l04325"></a><span class="lineno"> 4325</span>&#160;  <span class="comment">//KS: Select values between which you want to scan, for example 0 means 0% burn in and 1 100% burn in.</span></div>
-<div class="line"><a name="l04326"></a><span class="lineno"> 4326</span>&#160;  constexpr <span class="keywordtype">double</span> LowerThreshold = 0;</div>
-<div class="line"><a name="l04327"></a><span class="lineno"> 4327</span>&#160;  constexpr <span class="keywordtype">double</span> UpperThreshold = 1.0;</div>
-<div class="line"><a name="l04328"></a><span class="lineno"> 4328</span>&#160;  <span class="comment">// Tells how many intervals between thresholds we want to check</span></div>
-<div class="line"><a name="l04329"></a><span class="lineno"> 4329</span>&#160;  constexpr <span class="keywordtype">int</span> NChecks = 100;</div>
-<div class="line"><a name="l04330"></a><span class="lineno"> 4330</span>&#160;  constexpr <span class="keywordtype">double</span> Division = (UpperThreshold - LowerThreshold)/NChecks;</div>
-<div class="line"><a name="l04331"></a><span class="lineno"> 4331</span>&#160; </div>
-<div class="line"><a name="l04332"></a><span class="lineno"> 4332</span>&#160;  std::vector&lt;std::unique_ptr&lt;TH1D&gt;&gt; GewekePlots(<a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>);</div>
-<div class="line"><a name="l04333"></a><span class="lineno"> 4333</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; <a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>; ++j)</div>
-<div class="line"><a name="l04334"></a><span class="lineno"> 4334</span>&#160;  {</div>
-<div class="line"><a name="l04335"></a><span class="lineno"> 4335</span>&#160;    TString Title = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a name="l04336"></a><span class="lineno"> 4336</span>&#160;    <span class="keywordtype">double</span> Prior = 1.0, PriorError = 1.0;</div>
-<div class="line"><a name="l04337"></a><span class="lineno"> 4337</span>&#160;    <a class="code" href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">GetNthParameter</a>(j, Prior, PriorError, Title);</div>
-<div class="line"><a name="l04338"></a><span class="lineno"> 4338</span>&#160;    std::string HistName = Form(<span class="stringliteral">&quot;%s_%s_Geweke&quot;</span>, Title.Data(), <a class="code" href="classMCMCProcessor.html#ad043b6b2c885f47ab9967831bc8d0f5a">BranchNames</a>[j].Data());</div>
-<div class="line"><a name="l04339"></a><span class="lineno"> 4339</span>&#160;    GewekePlots[j] = std::make_unique&lt;TH1D&gt;(HistName.c_str(), HistName.c_str(), NChecks, 0.0, 100 * UpperThreshold);</div>
-<div class="line"><a name="l04340"></a><span class="lineno"> 4340</span>&#160;    GewekePlots[j]-&gt;GetXaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Burn-In (%)&quot;</span>);</div>
-<div class="line"><a name="l04341"></a><span class="lineno"> 4341</span>&#160;    GewekePlots[j]-&gt;GetYaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Geweke T score&quot;</span>);</div>
-<div class="line"><a name="l04342"></a><span class="lineno"> 4342</span>&#160;  }</div>
-<div class="line"><a name="l04343"></a><span class="lineno"> 4343</span>&#160; </div>
-<div class="line"><a name="l04344"></a><span class="lineno"> 4344</span>&#160;<span class="comment">//KS: Start parallel region</span></div>
-<div class="line"><a name="l04345"></a><span class="lineno"> 4345</span>&#160;<span class="preprocessor">#ifdef MULTITHREAD</span></div>
-<div class="line"><a name="l04346"></a><span class="lineno"> 4346</span>&#160;<span class="preprocessor">#pragma omp parallel</span></div>
-<div class="line"><a name="l04347"></a><span class="lineno"> 4347</span>&#160;{</div>
-<div class="line"><a name="l04348"></a><span class="lineno"> 4348</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l04349"></a><span class="lineno"> 4349</span>&#160;  <span class="comment">//KS: First we calculate mean and spectral variance for the upper limit, this doesn&#39;t change and in literature is most often 50%</span></div>
-<div class="line"><a name="l04350"></a><span class="lineno"> 4350</span>&#160;<span class="preprocessor">  #ifdef MULTITHREAD</span></div>
-<div class="line"><a name="l04351"></a><span class="lineno"> 4351</span>&#160;<span class="preprocessor">  #pragma omp for</span></div>
-<div class="line"><a name="l04352"></a><span class="lineno"> 4352</span>&#160;<span class="preprocessor">  #endif</span></div>
-<div class="line"><a name="l04353"></a><span class="lineno"> 4353</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; <a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>; ++j)</div>
-<div class="line"><a name="l04354"></a><span class="lineno"> 4354</span>&#160;  {</div>
-<div class="line"><a name="l04355"></a><span class="lineno"> 4355</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; <a class="code" href="classMCMCProcessor.html#af3a19b885e9c34e1674aea8cfbe14e1c">nEntries</a>; ++i)</div>
-<div class="line"><a name="l04356"></a><span class="lineno"> 4356</span>&#160;    {</div>
-<div class="line"><a name="l04357"></a><span class="lineno"> 4357</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="classMCMCProcessor.html#a6058bb3e817401423231f85a71db46a0">StepNumber</a>[i] &gt; Threshold)</div>
-<div class="line"><a name="l04358"></a><span class="lineno"> 4358</span>&#160;      {</div>
-<div class="line"><a name="l04359"></a><span class="lineno"> 4359</span>&#160;        MeanUp[j] += <a class="code" href="classMCMCProcessor.html#a200b389934dcb87bf091229fb7b3fa9f">ParStep</a>[j][i];</div>
-<div class="line"><a name="l04360"></a><span class="lineno"> 4360</span>&#160;        DenomCounterUp[j]++;</div>
-<div class="line"><a name="l04361"></a><span class="lineno"> 4361</span>&#160;      }</div>
-<div class="line"><a name="l04362"></a><span class="lineno"> 4362</span>&#160;    }</div>
-<div class="line"><a name="l04363"></a><span class="lineno"> 4363</span>&#160;    MeanUp[j] = MeanUp[j]/DenomCounterUp[j];</div>
-<div class="line"><a name="l04364"></a><span class="lineno"> 4364</span>&#160;  }</div>
-<div class="line"><a name="l04365"></a><span class="lineno"> 4365</span>&#160; </div>
-<div class="line"><a name="l04366"></a><span class="lineno"> 4366</span>&#160;  <span class="comment">//KS: now Spectral variance which in this case is sample variance</span></div>
-<div class="line"><a name="l04367"></a><span class="lineno"> 4367</span>&#160;<span class="preprocessor">  #ifdef MULTITHREAD</span></div>
-<div class="line"><a name="l04368"></a><span class="lineno"> 4368</span>&#160;<span class="preprocessor">  #pragma omp for collapse(2)</span></div>
-<div class="line"><a name="l04369"></a><span class="lineno"> 4369</span>&#160;<span class="preprocessor">  #endif</span></div>
-<div class="line"><a name="l04370"></a><span class="lineno"> 4370</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; <a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>; ++j)</div>
-<div class="line"><a name="l04371"></a><span class="lineno"> 4371</span>&#160;  {</div>
-<div class="line"><a name="l04372"></a><span class="lineno"> 4372</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; <a class="code" href="classMCMCProcessor.html#af3a19b885e9c34e1674aea8cfbe14e1c">nEntries</a>; ++i)</div>
-<div class="line"><a name="l04373"></a><span class="lineno"> 4373</span>&#160;    {</div>
-<div class="line"><a name="l04374"></a><span class="lineno"> 4374</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="classMCMCProcessor.html#a6058bb3e817401423231f85a71db46a0">StepNumber</a>[i] &gt; Threshold)</div>
-<div class="line"><a name="l04375"></a><span class="lineno"> 4375</span>&#160;      {</div>
-<div class="line"><a name="l04376"></a><span class="lineno"> 4376</span>&#160;        SpectralVarianceUp[j] += (<a class="code" href="classMCMCProcessor.html#a200b389934dcb87bf091229fb7b3fa9f">ParStep</a>[j][i] - MeanUp[j])*(<a class="code" href="classMCMCProcessor.html#a200b389934dcb87bf091229fb7b3fa9f">ParStep</a>[j][i] - MeanUp[j]);</div>
-<div class="line"><a name="l04377"></a><span class="lineno"> 4377</span>&#160;      }</div>
-<div class="line"><a name="l04378"></a><span class="lineno"> 4378</span>&#160;    }</div>
-<div class="line"><a name="l04379"></a><span class="lineno"> 4379</span>&#160;  }</div>
-<div class="line"><a name="l04380"></a><span class="lineno"> 4380</span>&#160; </div>
-<div class="line"><a name="l04381"></a><span class="lineno"> 4381</span>&#160;  <span class="comment">//Loop over how many intervals we calculate</span></div>
-<div class="line"><a name="l04382"></a><span class="lineno"> 4382</span>&#160;<span class="preprocessor">  #ifdef MULTITHREAD</span></div>
-<div class="line"><a name="l04383"></a><span class="lineno"> 4383</span>&#160;<span class="preprocessor">  #pragma omp for</span></div>
-<div class="line"><a name="l04384"></a><span class="lineno"> 4384</span>&#160;<span class="preprocessor">  #endif</span></div>
-<div class="line"><a name="l04385"></a><span class="lineno"> 4385</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k = 1; k &lt; NChecks+1; ++k)</div>
-<div class="line"><a name="l04386"></a><span class="lineno"> 4386</span>&#160;  {</div>
-<div class="line"><a name="l04387"></a><span class="lineno"> 4387</span>&#160;    <span class="comment">//KS each thread has it&#39;s own</span></div>
-<div class="line"><a name="l04388"></a><span class="lineno"> 4388</span>&#160;    std::vector&lt;double&gt; MeanDown(<a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>, 0.0);</div>
-<div class="line"><a name="l04389"></a><span class="lineno"> 4389</span>&#160;    std::vector&lt;double&gt; SpectralVarianceDown(<a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>, 0.0);</div>
-<div class="line"><a name="l04390"></a><span class="lineno"> 4390</span>&#160;    std::vector&lt;int&gt; DenomCounterDown(<a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>, 0);</div>
-<div class="line"><a name="l04391"></a><span class="lineno"> 4391</span>&#160; </div>
-<div class="line"><a name="l04392"></a><span class="lineno"> 4392</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ThresholsCheck = Division*k*<a class="code" href="classMCMCProcessor.html#aae0016a4e1d105d5d65243438c622a97">nSteps</a>;</div>
-<div class="line"><a name="l04393"></a><span class="lineno"> 4393</span>&#160;    <span class="comment">//KS: First mean</span></div>
-<div class="line"><a name="l04394"></a><span class="lineno"> 4394</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; <a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>; ++j)</div>
-<div class="line"><a name="l04395"></a><span class="lineno"> 4395</span>&#160;    {</div>
-<div class="line"><a name="l04396"></a><span class="lineno"> 4396</span>&#160;      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; <a class="code" href="classMCMCProcessor.html#af3a19b885e9c34e1674aea8cfbe14e1c">nEntries</a>; ++i)</div>
-<div class="line"><a name="l04397"></a><span class="lineno"> 4397</span>&#160;      {</div>
-<div class="line"><a name="l04398"></a><span class="lineno"> 4398</span>&#160;        <span class="keywordflow">if</span>(<a class="code" href="classMCMCProcessor.html#a6058bb3e817401423231f85a71db46a0">StepNumber</a>[i] &lt; ThresholsCheck)</div>
-<div class="line"><a name="l04399"></a><span class="lineno"> 4399</span>&#160;        {</div>
-<div class="line"><a name="l04400"></a><span class="lineno"> 4400</span>&#160;          MeanDown[j] += <a class="code" href="classMCMCProcessor.html#a200b389934dcb87bf091229fb7b3fa9f">ParStep</a>[j][i];</div>
-<div class="line"><a name="l04401"></a><span class="lineno"> 4401</span>&#160;          DenomCounterDown[j]++;</div>
-<div class="line"><a name="l04402"></a><span class="lineno"> 4402</span>&#160;        }</div>
-<div class="line"><a name="l04403"></a><span class="lineno"> 4403</span>&#160;      }</div>
-<div class="line"><a name="l04404"></a><span class="lineno"> 4404</span>&#160;      MeanDown[j] = MeanDown[j]/DenomCounterDown[j];</div>
-<div class="line"><a name="l04405"></a><span class="lineno"> 4405</span>&#160;    }</div>
-<div class="line"><a name="l04406"></a><span class="lineno"> 4406</span>&#160;    <span class="comment">//Now spectral variance</span></div>
-<div class="line"><a name="l04407"></a><span class="lineno"> 4407</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; <a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>; ++j)</div>
-<div class="line"><a name="l04408"></a><span class="lineno"> 4408</span>&#160;    {</div>
-<div class="line"><a name="l04409"></a><span class="lineno"> 4409</span>&#160;      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; <a class="code" href="classMCMCProcessor.html#af3a19b885e9c34e1674aea8cfbe14e1c">nEntries</a>; ++i)</div>
-<div class="line"><a name="l04410"></a><span class="lineno"> 4410</span>&#160;      {</div>
-<div class="line"><a name="l04411"></a><span class="lineno"> 4411</span>&#160;        <span class="keywordflow">if</span>(<a class="code" href="classMCMCProcessor.html#a6058bb3e817401423231f85a71db46a0">StepNumber</a>[i] &lt; ThresholsCheck)</div>
-<div class="line"><a name="l04412"></a><span class="lineno"> 4412</span>&#160;        {</div>
-<div class="line"><a name="l04413"></a><span class="lineno"> 4413</span>&#160;          SpectralVarianceDown[j] += (<a class="code" href="classMCMCProcessor.html#a200b389934dcb87bf091229fb7b3fa9f">ParStep</a>[j][i] - MeanDown[j])*(<a class="code" href="classMCMCProcessor.html#a200b389934dcb87bf091229fb7b3fa9f">ParStep</a>[j][i] - MeanDown[j]);</div>
-<div class="line"><a name="l04414"></a><span class="lineno"> 4414</span>&#160;        }</div>
-<div class="line"><a name="l04415"></a><span class="lineno"> 4415</span>&#160;      }</div>
-<div class="line"><a name="l04416"></a><span class="lineno"> 4416</span>&#160;    }</div>
-<div class="line"><a name="l04417"></a><span class="lineno"> 4417</span>&#160;    <span class="comment">//Lastly calc T score and fill histogram entry</span></div>
-<div class="line"><a name="l04418"></a><span class="lineno"> 4418</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; <a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>; ++j)</div>
-<div class="line"><a name="l04419"></a><span class="lineno"> 4419</span>&#160;    {</div>
-<div class="line"><a name="l04420"></a><span class="lineno"> 4420</span>&#160;      <span class="keywordtype">double</span> T_score = std::fabs((MeanDown[j] - MeanUp[j])/std::sqrt(SpectralVarianceDown[j]/DenomCounterDown[j] + SpectralVarianceUp[j]/DenomCounterUp[j]));</div>
-<div class="line"><a name="l04421"></a><span class="lineno"> 4421</span>&#160;      GewekePlots[j]-&gt;SetBinContent(k, T_score);</div>
-<div class="line"><a name="l04422"></a><span class="lineno"> 4422</span>&#160;    }</div>
-<div class="line"><a name="l04423"></a><span class="lineno"> 4423</span>&#160;  } <span class="comment">//end loop over intervals</span></div>
-<div class="line"><a name="l04424"></a><span class="lineno"> 4424</span>&#160;<span class="preprocessor">#ifdef MULTITHREAD</span></div>
-<div class="line"><a name="l04425"></a><span class="lineno"> 4425</span>&#160;} <span class="comment">//End parallel region</span></div>
-<div class="line"><a name="l04426"></a><span class="lineno"> 4426</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l04427"></a><span class="lineno"> 4427</span>&#160; </div>
-<div class="line"><a name="l04428"></a><span class="lineno"> 4428</span>&#160;  <span class="comment">//Finally save it to TFile</span></div>
-<div class="line"><a name="l04429"></a><span class="lineno"> 4429</span>&#160;  <a class="code" href="classMCMCProcessor.html#a62035b99df4617ab334cd1abd6ed0346">OutputFile</a>-&gt;cd();</div>
-<div class="line"><a name="l04430"></a><span class="lineno"> 4430</span>&#160;  TDirectory *GewekeDir = <a class="code" href="classMCMCProcessor.html#a62035b99df4617ab334cd1abd6ed0346">OutputFile</a>-&gt;mkdir(<span class="stringliteral">&quot;Geweke&quot;</span>);</div>
-<div class="line"><a name="l04431"></a><span class="lineno"> 4431</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; <a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>; ++j)</div>
-<div class="line"><a name="l04432"></a><span class="lineno"> 4432</span>&#160;  {</div>
-<div class="line"><a name="l04433"></a><span class="lineno"> 4433</span>&#160;    GewekeDir-&gt;cd();</div>
-<div class="line"><a name="l04434"></a><span class="lineno"> 4434</span>&#160;    GewekePlots[j]-&gt;Write();</div>
-<div class="line"><a name="l04435"></a><span class="lineno"> 4435</span>&#160;  }</div>
-<div class="line"><a name="l04436"></a><span class="lineno"> 4436</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>; ++i) {</div>
-<div class="line"><a name="l04437"></a><span class="lineno"> 4437</span>&#160;    <span class="keyword">delete</span>[] <a class="code" href="classMCMCProcessor.html#a200b389934dcb87bf091229fb7b3fa9f">ParStep</a>[i];</div>
-<div class="line"><a name="l04438"></a><span class="lineno"> 4438</span>&#160;  }</div>
-<div class="line"><a name="l04439"></a><span class="lineno"> 4439</span>&#160;  <span class="keyword">delete</span>[] <a class="code" href="classMCMCProcessor.html#a200b389934dcb87bf091229fb7b3fa9f">ParStep</a>;</div>
-<div class="line"><a name="l04440"></a><span class="lineno"> 4440</span>&#160; </div>
-<div class="line"><a name="l04441"></a><span class="lineno"> 4441</span>&#160;  GewekeDir-&gt;Close();</div>
-<div class="line"><a name="l04442"></a><span class="lineno"> 4442</span>&#160;  <span class="keyword">delete</span> GewekeDir;</div>
-<div class="line"><a name="l04443"></a><span class="lineno"> 4443</span>&#160;  <a class="code" href="classMCMCProcessor.html#a62035b99df4617ab334cd1abd6ed0346">OutputFile</a>-&gt;cd();</div>
-<div class="line"><a name="l04444"></a><span class="lineno"> 4444</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="MCMCProcessor_8cpp_source.html#l04317">4317</a> of file <a class="el" href="MCMCProcessor_8cpp_source.html">MCMCProcessor.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l04317"></a><span class="lineno"> 4317</span>&#160;                                     {</div>
+<div class="line"><a name="l04318"></a><span class="lineno"> 4318</span>&#160;<span class="comment">// **************************</span></div>
+<div class="line"><a name="l04319"></a><span class="lineno"> 4319</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Making Geweke Diagnostic&quot;</span>);</div>
+<div class="line"><a name="l04320"></a><span class="lineno"> 4320</span>&#160;  <span class="comment">//KS: Up refers to upper limit we check, it stays constant, in literature it is mostly 50% thus using 0.5 for threshold</span></div>
+<div class="line"><a name="l04321"></a><span class="lineno"> 4321</span>&#160;  std::vector&lt;double&gt; MeanUp(<a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>, 0.0);</div>
+<div class="line"><a name="l04322"></a><span class="lineno"> 4322</span>&#160;  std::vector&lt;double&gt; SpectralVarianceUp(<a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>, 0.0);</div>
+<div class="line"><a name="l04323"></a><span class="lineno"> 4323</span>&#160;  std::vector&lt;int&gt; DenomCounterUp(<a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>, 0);</div>
+<div class="line"><a name="l04324"></a><span class="lineno"> 4324</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">double</span> Threshold = 0.5 * <a class="code" href="classMCMCProcessor.html#aae0016a4e1d105d5d65243438c622a97">nSteps</a>;</div>
+<div class="line"><a name="l04325"></a><span class="lineno"> 4325</span>&#160; </div>
+<div class="line"><a name="l04326"></a><span class="lineno"> 4326</span>&#160;  <span class="comment">//KS: Select values between which you want to scan, for example 0 means 0% burn in and 1 100% burn in.</span></div>
+<div class="line"><a name="l04327"></a><span class="lineno"> 4327</span>&#160;  constexpr <span class="keywordtype">double</span> LowerThreshold = 0;</div>
+<div class="line"><a name="l04328"></a><span class="lineno"> 4328</span>&#160;  constexpr <span class="keywordtype">double</span> UpperThreshold = 1.0;</div>
+<div class="line"><a name="l04329"></a><span class="lineno"> 4329</span>&#160;  <span class="comment">// Tells how many intervals between thresholds we want to check</span></div>
+<div class="line"><a name="l04330"></a><span class="lineno"> 4330</span>&#160;  constexpr <span class="keywordtype">int</span> NChecks = 100;</div>
+<div class="line"><a name="l04331"></a><span class="lineno"> 4331</span>&#160;  constexpr <span class="keywordtype">double</span> Division = (UpperThreshold - LowerThreshold)/NChecks;</div>
+<div class="line"><a name="l04332"></a><span class="lineno"> 4332</span>&#160; </div>
+<div class="line"><a name="l04333"></a><span class="lineno"> 4333</span>&#160;  std::vector&lt;std::unique_ptr&lt;TH1D&gt;&gt; GewekePlots(<a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>);</div>
+<div class="line"><a name="l04334"></a><span class="lineno"> 4334</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; <a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>; ++j)</div>
+<div class="line"><a name="l04335"></a><span class="lineno"> 4335</span>&#160;  {</div>
+<div class="line"><a name="l04336"></a><span class="lineno"> 4336</span>&#160;    TString Title = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a name="l04337"></a><span class="lineno"> 4337</span>&#160;    <span class="keywordtype">double</span> Prior = 1.0, PriorError = 1.0;</div>
+<div class="line"><a name="l04338"></a><span class="lineno"> 4338</span>&#160;    <a class="code" href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">GetNthParameter</a>(j, Prior, PriorError, Title);</div>
+<div class="line"><a name="l04339"></a><span class="lineno"> 4339</span>&#160;    std::string HistName = Form(<span class="stringliteral">&quot;%s_%s_Geweke&quot;</span>, Title.Data(), <a class="code" href="classMCMCProcessor.html#ad043b6b2c885f47ab9967831bc8d0f5a">BranchNames</a>[j].Data());</div>
+<div class="line"><a name="l04340"></a><span class="lineno"> 4340</span>&#160;    GewekePlots[j] = std::make_unique&lt;TH1D&gt;(HistName.c_str(), HistName.c_str(), NChecks, 0.0, 100 * UpperThreshold);</div>
+<div class="line"><a name="l04341"></a><span class="lineno"> 4341</span>&#160;    GewekePlots[j]-&gt;GetXaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Burn-In (%)&quot;</span>);</div>
+<div class="line"><a name="l04342"></a><span class="lineno"> 4342</span>&#160;    GewekePlots[j]-&gt;GetYaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Geweke T score&quot;</span>);</div>
+<div class="line"><a name="l04343"></a><span class="lineno"> 4343</span>&#160;  }</div>
+<div class="line"><a name="l04344"></a><span class="lineno"> 4344</span>&#160; </div>
+<div class="line"><a name="l04345"></a><span class="lineno"> 4345</span>&#160;<span class="comment">//KS: Start parallel region</span></div>
+<div class="line"><a name="l04346"></a><span class="lineno"> 4346</span>&#160;<span class="preprocessor">#ifdef MULTITHREAD</span></div>
+<div class="line"><a name="l04347"></a><span class="lineno"> 4347</span>&#160;<span class="preprocessor">#pragma omp parallel</span></div>
+<div class="line"><a name="l04348"></a><span class="lineno"> 4348</span>&#160;{</div>
+<div class="line"><a name="l04349"></a><span class="lineno"> 4349</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l04350"></a><span class="lineno"> 4350</span>&#160;  <span class="comment">//KS: First we calculate mean and spectral variance for the upper limit, this doesn&#39;t change and in literature is most often 50%</span></div>
+<div class="line"><a name="l04351"></a><span class="lineno"> 4351</span>&#160;<span class="preprocessor">  #ifdef MULTITHREAD</span></div>
+<div class="line"><a name="l04352"></a><span class="lineno"> 4352</span>&#160;<span class="preprocessor">  #pragma omp for</span></div>
+<div class="line"><a name="l04353"></a><span class="lineno"> 4353</span>&#160;<span class="preprocessor">  #endif</span></div>
+<div class="line"><a name="l04354"></a><span class="lineno"> 4354</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; <a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>; ++j)</div>
+<div class="line"><a name="l04355"></a><span class="lineno"> 4355</span>&#160;  {</div>
+<div class="line"><a name="l04356"></a><span class="lineno"> 4356</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; <a class="code" href="classMCMCProcessor.html#af3a19b885e9c34e1674aea8cfbe14e1c">nEntries</a>; ++i)</div>
+<div class="line"><a name="l04357"></a><span class="lineno"> 4357</span>&#160;    {</div>
+<div class="line"><a name="l04358"></a><span class="lineno"> 4358</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="classMCMCProcessor.html#a6058bb3e817401423231f85a71db46a0">StepNumber</a>[i] &gt; Threshold)</div>
+<div class="line"><a name="l04359"></a><span class="lineno"> 4359</span>&#160;      {</div>
+<div class="line"><a name="l04360"></a><span class="lineno"> 4360</span>&#160;        MeanUp[j] += <a class="code" href="classMCMCProcessor.html#a200b389934dcb87bf091229fb7b3fa9f">ParStep</a>[j][i];</div>
+<div class="line"><a name="l04361"></a><span class="lineno"> 4361</span>&#160;        DenomCounterUp[j]++;</div>
+<div class="line"><a name="l04362"></a><span class="lineno"> 4362</span>&#160;      }</div>
+<div class="line"><a name="l04363"></a><span class="lineno"> 4363</span>&#160;    }</div>
+<div class="line"><a name="l04364"></a><span class="lineno"> 4364</span>&#160;    MeanUp[j] = MeanUp[j]/DenomCounterUp[j];</div>
+<div class="line"><a name="l04365"></a><span class="lineno"> 4365</span>&#160;  }</div>
+<div class="line"><a name="l04366"></a><span class="lineno"> 4366</span>&#160; </div>
+<div class="line"><a name="l04367"></a><span class="lineno"> 4367</span>&#160;  <span class="comment">//KS: now Spectral variance which in this case is sample variance</span></div>
+<div class="line"><a name="l04368"></a><span class="lineno"> 4368</span>&#160;<span class="preprocessor">  #ifdef MULTITHREAD</span></div>
+<div class="line"><a name="l04369"></a><span class="lineno"> 4369</span>&#160;<span class="preprocessor">  #pragma omp for collapse(2)</span></div>
+<div class="line"><a name="l04370"></a><span class="lineno"> 4370</span>&#160;<span class="preprocessor">  #endif</span></div>
+<div class="line"><a name="l04371"></a><span class="lineno"> 4371</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; <a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>; ++j)</div>
+<div class="line"><a name="l04372"></a><span class="lineno"> 4372</span>&#160;  {</div>
+<div class="line"><a name="l04373"></a><span class="lineno"> 4373</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; <a class="code" href="classMCMCProcessor.html#af3a19b885e9c34e1674aea8cfbe14e1c">nEntries</a>; ++i)</div>
+<div class="line"><a name="l04374"></a><span class="lineno"> 4374</span>&#160;    {</div>
+<div class="line"><a name="l04375"></a><span class="lineno"> 4375</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="classMCMCProcessor.html#a6058bb3e817401423231f85a71db46a0">StepNumber</a>[i] &gt; Threshold)</div>
+<div class="line"><a name="l04376"></a><span class="lineno"> 4376</span>&#160;      {</div>
+<div class="line"><a name="l04377"></a><span class="lineno"> 4377</span>&#160;        SpectralVarianceUp[j] += (<a class="code" href="classMCMCProcessor.html#a200b389934dcb87bf091229fb7b3fa9f">ParStep</a>[j][i] - MeanUp[j])*(<a class="code" href="classMCMCProcessor.html#a200b389934dcb87bf091229fb7b3fa9f">ParStep</a>[j][i] - MeanUp[j]);</div>
+<div class="line"><a name="l04378"></a><span class="lineno"> 4378</span>&#160;      }</div>
+<div class="line"><a name="l04379"></a><span class="lineno"> 4379</span>&#160;    }</div>
+<div class="line"><a name="l04380"></a><span class="lineno"> 4380</span>&#160;  }</div>
+<div class="line"><a name="l04381"></a><span class="lineno"> 4381</span>&#160; </div>
+<div class="line"><a name="l04382"></a><span class="lineno"> 4382</span>&#160;  <span class="comment">//Loop over how many intervals we calculate</span></div>
+<div class="line"><a name="l04383"></a><span class="lineno"> 4383</span>&#160;<span class="preprocessor">  #ifdef MULTITHREAD</span></div>
+<div class="line"><a name="l04384"></a><span class="lineno"> 4384</span>&#160;<span class="preprocessor">  #pragma omp for</span></div>
+<div class="line"><a name="l04385"></a><span class="lineno"> 4385</span>&#160;<span class="preprocessor">  #endif</span></div>
+<div class="line"><a name="l04386"></a><span class="lineno"> 4386</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> k = 1; k &lt; NChecks+1; ++k)</div>
+<div class="line"><a name="l04387"></a><span class="lineno"> 4387</span>&#160;  {</div>
+<div class="line"><a name="l04388"></a><span class="lineno"> 4388</span>&#160;    <span class="comment">//KS each thread has it&#39;s own</span></div>
+<div class="line"><a name="l04389"></a><span class="lineno"> 4389</span>&#160;    std::vector&lt;double&gt; MeanDown(<a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>, 0.0);</div>
+<div class="line"><a name="l04390"></a><span class="lineno"> 4390</span>&#160;    std::vector&lt;double&gt; SpectralVarianceDown(<a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>, 0.0);</div>
+<div class="line"><a name="l04391"></a><span class="lineno"> 4391</span>&#160;    std::vector&lt;int&gt; DenomCounterDown(<a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>, 0);</div>
+<div class="line"><a name="l04392"></a><span class="lineno"> 4392</span>&#160; </div>
+<div class="line"><a name="l04393"></a><span class="lineno"> 4393</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ThresholsCheck = Division*k*<a class="code" href="classMCMCProcessor.html#aae0016a4e1d105d5d65243438c622a97">nSteps</a>;</div>
+<div class="line"><a name="l04394"></a><span class="lineno"> 4394</span>&#160;    <span class="comment">//KS: First mean</span></div>
+<div class="line"><a name="l04395"></a><span class="lineno"> 4395</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; <a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>; ++j)</div>
+<div class="line"><a name="l04396"></a><span class="lineno"> 4396</span>&#160;    {</div>
+<div class="line"><a name="l04397"></a><span class="lineno"> 4397</span>&#160;      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; <a class="code" href="classMCMCProcessor.html#af3a19b885e9c34e1674aea8cfbe14e1c">nEntries</a>; ++i)</div>
+<div class="line"><a name="l04398"></a><span class="lineno"> 4398</span>&#160;      {</div>
+<div class="line"><a name="l04399"></a><span class="lineno"> 4399</span>&#160;        <span class="keywordflow">if</span>(<a class="code" href="classMCMCProcessor.html#a6058bb3e817401423231f85a71db46a0">StepNumber</a>[i] &lt; ThresholsCheck)</div>
+<div class="line"><a name="l04400"></a><span class="lineno"> 4400</span>&#160;        {</div>
+<div class="line"><a name="l04401"></a><span class="lineno"> 4401</span>&#160;          MeanDown[j] += <a class="code" href="classMCMCProcessor.html#a200b389934dcb87bf091229fb7b3fa9f">ParStep</a>[j][i];</div>
+<div class="line"><a name="l04402"></a><span class="lineno"> 4402</span>&#160;          DenomCounterDown[j]++;</div>
+<div class="line"><a name="l04403"></a><span class="lineno"> 4403</span>&#160;        }</div>
+<div class="line"><a name="l04404"></a><span class="lineno"> 4404</span>&#160;      }</div>
+<div class="line"><a name="l04405"></a><span class="lineno"> 4405</span>&#160;      MeanDown[j] = MeanDown[j]/DenomCounterDown[j];</div>
+<div class="line"><a name="l04406"></a><span class="lineno"> 4406</span>&#160;    }</div>
+<div class="line"><a name="l04407"></a><span class="lineno"> 4407</span>&#160;    <span class="comment">//Now spectral variance</span></div>
+<div class="line"><a name="l04408"></a><span class="lineno"> 4408</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; <a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>; ++j)</div>
+<div class="line"><a name="l04409"></a><span class="lineno"> 4409</span>&#160;    {</div>
+<div class="line"><a name="l04410"></a><span class="lineno"> 4410</span>&#160;      <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; <a class="code" href="classMCMCProcessor.html#af3a19b885e9c34e1674aea8cfbe14e1c">nEntries</a>; ++i)</div>
+<div class="line"><a name="l04411"></a><span class="lineno"> 4411</span>&#160;      {</div>
+<div class="line"><a name="l04412"></a><span class="lineno"> 4412</span>&#160;        <span class="keywordflow">if</span>(<a class="code" href="classMCMCProcessor.html#a6058bb3e817401423231f85a71db46a0">StepNumber</a>[i] &lt; ThresholsCheck)</div>
+<div class="line"><a name="l04413"></a><span class="lineno"> 4413</span>&#160;        {</div>
+<div class="line"><a name="l04414"></a><span class="lineno"> 4414</span>&#160;          SpectralVarianceDown[j] += (<a class="code" href="classMCMCProcessor.html#a200b389934dcb87bf091229fb7b3fa9f">ParStep</a>[j][i] - MeanDown[j])*(<a class="code" href="classMCMCProcessor.html#a200b389934dcb87bf091229fb7b3fa9f">ParStep</a>[j][i] - MeanDown[j]);</div>
+<div class="line"><a name="l04415"></a><span class="lineno"> 4415</span>&#160;        }</div>
+<div class="line"><a name="l04416"></a><span class="lineno"> 4416</span>&#160;      }</div>
+<div class="line"><a name="l04417"></a><span class="lineno"> 4417</span>&#160;    }</div>
+<div class="line"><a name="l04418"></a><span class="lineno"> 4418</span>&#160;    <span class="comment">//Lastly calc T score and fill histogram entry</span></div>
+<div class="line"><a name="l04419"></a><span class="lineno"> 4419</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; <a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>; ++j)</div>
+<div class="line"><a name="l04420"></a><span class="lineno"> 4420</span>&#160;    {</div>
+<div class="line"><a name="l04421"></a><span class="lineno"> 4421</span>&#160;      <span class="keywordtype">double</span> T_score = std::fabs((MeanDown[j] - MeanUp[j])/std::sqrt(SpectralVarianceDown[j]/DenomCounterDown[j] + SpectralVarianceUp[j]/DenomCounterUp[j]));</div>
+<div class="line"><a name="l04422"></a><span class="lineno"> 4422</span>&#160;      GewekePlots[j]-&gt;SetBinContent(k, T_score);</div>
+<div class="line"><a name="l04423"></a><span class="lineno"> 4423</span>&#160;    }</div>
+<div class="line"><a name="l04424"></a><span class="lineno"> 4424</span>&#160;  } <span class="comment">//end loop over intervals</span></div>
+<div class="line"><a name="l04425"></a><span class="lineno"> 4425</span>&#160;<span class="preprocessor">#ifdef MULTITHREAD</span></div>
+<div class="line"><a name="l04426"></a><span class="lineno"> 4426</span>&#160;} <span class="comment">//End parallel region</span></div>
+<div class="line"><a name="l04427"></a><span class="lineno"> 4427</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l04428"></a><span class="lineno"> 4428</span>&#160; </div>
+<div class="line"><a name="l04429"></a><span class="lineno"> 4429</span>&#160;  <span class="comment">//Finally save it to TFile</span></div>
+<div class="line"><a name="l04430"></a><span class="lineno"> 4430</span>&#160;  <a class="code" href="classMCMCProcessor.html#a62035b99df4617ab334cd1abd6ed0346">OutputFile</a>-&gt;cd();</div>
+<div class="line"><a name="l04431"></a><span class="lineno"> 4431</span>&#160;  TDirectory *GewekeDir = <a class="code" href="classMCMCProcessor.html#a62035b99df4617ab334cd1abd6ed0346">OutputFile</a>-&gt;mkdir(<span class="stringliteral">&quot;Geweke&quot;</span>);</div>
+<div class="line"><a name="l04432"></a><span class="lineno"> 4432</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; <a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>; ++j)</div>
+<div class="line"><a name="l04433"></a><span class="lineno"> 4433</span>&#160;  {</div>
+<div class="line"><a name="l04434"></a><span class="lineno"> 4434</span>&#160;    GewekeDir-&gt;cd();</div>
+<div class="line"><a name="l04435"></a><span class="lineno"> 4435</span>&#160;    GewekePlots[j]-&gt;Write();</div>
+<div class="line"><a name="l04436"></a><span class="lineno"> 4436</span>&#160;  }</div>
+<div class="line"><a name="l04437"></a><span class="lineno"> 4437</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>; ++i) {</div>
+<div class="line"><a name="l04438"></a><span class="lineno"> 4438</span>&#160;    <span class="keyword">delete</span>[] <a class="code" href="classMCMCProcessor.html#a200b389934dcb87bf091229fb7b3fa9f">ParStep</a>[i];</div>
+<div class="line"><a name="l04439"></a><span class="lineno"> 4439</span>&#160;  }</div>
+<div class="line"><a name="l04440"></a><span class="lineno"> 4440</span>&#160;  <span class="keyword">delete</span>[] <a class="code" href="classMCMCProcessor.html#a200b389934dcb87bf091229fb7b3fa9f">ParStep</a>;</div>
+<div class="line"><a name="l04441"></a><span class="lineno"> 4441</span>&#160; </div>
+<div class="line"><a name="l04442"></a><span class="lineno"> 4442</span>&#160;  GewekeDir-&gt;Close();</div>
+<div class="line"><a name="l04443"></a><span class="lineno"> 4443</span>&#160;  <span class="keyword">delete</span> GewekeDir;</div>
+<div class="line"><a name="l04444"></a><span class="lineno"> 4444</span>&#160;  <a class="code" href="classMCMCProcessor.html#a62035b99df4617ab334cd1abd6ed0346">OutputFile</a>-&gt;cd();</div>
+<div class="line"><a name="l04445"></a><span class="lineno"> 4445</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -4760,8 +4760,8 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><a name="l00799"></a><span class="lineno">  799</span>&#160;  <a class="code" href="classMCMCProcessor.html#a61deb3c399dc10813b5cd116f041e981">Posterior</a>-&gt;SetLeftMargin(LeftMargin);</div>
 <div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160;}</div>
 <div class="ttc" id="aStatisticalUtils_8cpp_html_a83d228a56830a0b5800ac956216c424b"><div class="ttname"><a href="StatisticalUtils_8cpp.html#a83d228a56830a0b5800ac956216c424b">GetCredibleIntervalSig</a></div><div class="ttdeci">void GetCredibleIntervalSig(const std::unique_ptr&lt; TH1D &gt; &amp;hist, std::unique_ptr&lt; TH1D &gt; &amp;hpost_copy, const bool CredibleInSigmas, const double coverage)</div><div class="ttdoc">KS: Get 1D histogram within credible interval, hpost_copy has to have the same binning,...</div><div class="ttdef"><b>Definition:</b> <a href="StatisticalUtils_8cpp_source.html#l00367">StatisticalUtils.cpp:367</a></div></div>
-<div class="ttc" id="aclassMCMCProcessor_html_aa7db7e3aa4403a239b8b2b865cea91f6"><div class="ttname"><a href="classMCMCProcessor.html#aa7db7e3aa4403a239b8b2b865cea91f6">MCMCProcessor::CheckCredibleIntervalsOrder</a></div><div class="ttdeci">void CheckCredibleIntervalsOrder(const std::vector&lt; double &gt; &amp;CredibleIntervals, const std::vector&lt; Color_t &gt; &amp;CredibleIntervalsColours) const</div><div class="ttdoc">Checks the order and size consistency of the CredibleIntervals and CredibleIntervalsColours vectors.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l04494">MCMCProcessor.cpp:4494</a></div></div>
-<div class="ttc" id="aclassMCMCProcessor_html_ac0763bc26066a8cf7ea00148eb45af7a"><div class="ttname"><a href="classMCMCProcessor.html#ac0763bc26066a8cf7ea00148eb45af7a">MCMCProcessor::SetTLineStyle</a></div><div class="ttdeci">void SetTLineStyle(TLine *Line, const Color_t Colour, const Width_t Width, const ELineStyle Style) const</div><div class="ttdoc">Configures a TLine object with the specified style parameters.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l04600">MCMCProcessor.cpp:4600</a></div></div>
+<div class="ttc" id="aclassMCMCProcessor_html_aa7db7e3aa4403a239b8b2b865cea91f6"><div class="ttname"><a href="classMCMCProcessor.html#aa7db7e3aa4403a239b8b2b865cea91f6">MCMCProcessor::CheckCredibleIntervalsOrder</a></div><div class="ttdeci">void CheckCredibleIntervalsOrder(const std::vector&lt; double &gt; &amp;CredibleIntervals, const std::vector&lt; Color_t &gt; &amp;CredibleIntervalsColours) const</div><div class="ttdoc">Checks the order and size consistency of the CredibleIntervals and CredibleIntervalsColours vectors.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l04495">MCMCProcessor.cpp:4495</a></div></div>
+<div class="ttc" id="aclassMCMCProcessor_html_ac0763bc26066a8cf7ea00148eb45af7a"><div class="ttname"><a href="classMCMCProcessor.html#ac0763bc26066a8cf7ea00148eb45af7a">MCMCProcessor::SetTLineStyle</a></div><div class="ttdeci">void SetTLineStyle(TLine *Line, const Color_t Colour, const Width_t Width, const ELineStyle Style) const</div><div class="ttdoc">Configures a TLine object with the specified style parameters.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l04601">MCMCProcessor.cpp:4601</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -4937,7 +4937,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><a name="l01882"></a><span class="lineno"> 1882</span>&#160;  <a class="code" href="classMCMCProcessor.html#a62035b99df4617ab334cd1abd6ed0346">OutputFile</a>-&gt;cd();</div>
 <div class="line"><a name="l01883"></a><span class="lineno"> 1883</span>&#160;}</div>
 <div class="ttc" id="aStatisticalUtils_8cpp_html_ab0babebde48f51680e675beaa1dd8c33"><div class="ttname"><a href="StatisticalUtils_8cpp.html#ab0babebde48f51680e675beaa1dd8c33">GetCredibleRegionSig</a></div><div class="ttdeci">void GetCredibleRegionSig(std::unique_ptr&lt; TH2D &gt; &amp;hist2D, const bool CredibleInSigmas, const double coverage)</div><div class="ttdoc">KS: Set 2D contour within some coverage.</div><div class="ttdef"><b>Definition:</b> <a href="StatisticalUtils_8cpp_source.html#l00431">StatisticalUtils.cpp:431</a></div></div>
-<div class="ttc" id="aclassMCMCProcessor_html_ab11b70175cd1e63722942a063192968a"><div class="ttname"><a href="classMCMCProcessor.html#ab11b70175cd1e63722942a063192968a">MCMCProcessor::CheckCredibleRegionsOrder</a></div><div class="ttdeci">void CheckCredibleRegionsOrder(const std::vector&lt; double &gt; &amp;CredibleRegions, const std::vector&lt; Style_t &gt; &amp;CredibleRegionStyle, const std::vector&lt; Color_t &gt; &amp;CredibleRegionColor)</div><div class="ttdoc">Checks the order and size consistency of the CredibleRegions, CredibleRegionStyle,...</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l04513">MCMCProcessor.cpp:4513</a></div></div>
+<div class="ttc" id="aclassMCMCProcessor_html_ab11b70175cd1e63722942a063192968a"><div class="ttname"><a href="classMCMCProcessor.html#ab11b70175cd1e63722942a063192968a">MCMCProcessor::CheckCredibleRegionsOrder</a></div><div class="ttdeci">void CheckCredibleRegionsOrder(const std::vector&lt; double &gt; &amp;CredibleRegions, const std::vector&lt; Style_t &gt; &amp;CredibleRegionStyle, const std::vector&lt; Color_t &gt; &amp;CredibleRegionColor)</div><div class="ttdoc">Checks the order and size consistency of the CredibleRegions, CredibleRegionStyle,...</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l04514">MCMCProcessor.cpp:4514</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -6199,79 +6199,80 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><a name="l04235"></a><span class="lineno"> 4235</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> jj = start; jj &lt; end; ++jj)</div>
 <div class="line"><a name="l04236"></a><span class="lineno"> 4236</span>&#160;    {</div>
 <div class="line"><a name="l04237"></a><span class="lineno"> 4237</span>&#160;      std::complex&lt;M3::float_t&gt; a_j = 0.0;</div>
-<div class="line"><a name="l04238"></a><span class="lineno"> 4238</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> n = 0; n &lt; _N; ++n)</div>
-<div class="line"><a name="l04239"></a><span class="lineno"> 4239</span>&#160;      {</div>
-<div class="line"><a name="l04240"></a><span class="lineno"> 4240</span>&#160;        <span class="comment">//if(StepNumber[n] &lt; BurnInCut) continue;</span></div>
-<div class="line"><a name="l04241"></a><span class="lineno"> 4241</span>&#160;        std::complex&lt;M3::float_t&gt; exp_temp(0, two_pi_over_N * jj * n);</div>
-<div class="line"><a name="l04242"></a><span class="lineno"> 4242</span>&#160;        a_j += <a class="code" href="classMCMCProcessor.html#a200b389934dcb87bf091229fb7b3fa9f">ParStep</a>[j][n] * std::exp(exp_temp);</div>
-<div class="line"><a name="l04243"></a><span class="lineno"> 4243</span>&#160;      }</div>
-<div class="line"><a name="l04244"></a><span class="lineno"> 4244</span>&#160;      a_j /= std::sqrt(<span class="keywordtype">float</span>(_N));</div>
-<div class="line"><a name="l04245"></a><span class="lineno"> 4245</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">int</span> _c = jj - start;</div>
-<div class="line"><a name="l04246"></a><span class="lineno"> 4246</span>&#160; </div>
-<div class="line"><a name="l04247"></a><span class="lineno"> 4247</span>&#160;      k_j[j][_c] = two_pi_over_N * jj;</div>
-<div class="line"><a name="l04248"></a><span class="lineno"> 4248</span>&#160;      <span class="comment">// Equation 13</span></div>
-<div class="line"><a name="l04249"></a><span class="lineno"> 4249</span>&#160;      P_j[j][_c] = std::norm(a_j);</div>
-<div class="line"><a name="l04250"></a><span class="lineno"> 4250</span>&#160;    }</div>
-<div class="line"><a name="l04251"></a><span class="lineno"> 4251</span>&#160;  }</div>
-<div class="line"><a name="l04252"></a><span class="lineno"> 4252</span>&#160; </div>
-<div class="line"><a name="l04253"></a><span class="lineno"> 4253</span>&#160;  TDirectory *PowerDir = <a class="code" href="classMCMCProcessor.html#a62035b99df4617ab334cd1abd6ed0346">OutputFile</a>-&gt;mkdir(<span class="stringliteral">&quot;PowerSpectrum&quot;</span>);</div>
-<div class="line"><a name="l04254"></a><span class="lineno"> 4254</span>&#160;  PowerDir-&gt;cd();</div>
-<div class="line"><a name="l04255"></a><span class="lineno"> 4255</span>&#160; </div>
-<div class="line"><a name="l04256"></a><span class="lineno"> 4256</span>&#160;  TVectorD* PowerSpectrumStepSize = <span class="keyword">new</span> TVectorD(nPrams);</div>
-<div class="line"><a name="l04257"></a><span class="lineno"> 4257</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; nPrams; ++j)</div>
-<div class="line"><a name="l04258"></a><span class="lineno"> 4258</span>&#160;  {</div>
-<div class="line"><a name="l04259"></a><span class="lineno"> 4259</span>&#160;    <span class="keyword">auto</span> plot = std::make_unique&lt;TGraph&gt;(v_size, k_j[j].data(), P_j[j].data());</div>
-<div class="line"><a name="l04260"></a><span class="lineno"> 4260</span>&#160; </div>
-<div class="line"><a name="l04261"></a><span class="lineno"> 4261</span>&#160;    TString Title = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a name="l04262"></a><span class="lineno"> 4262</span>&#160;    <span class="keywordtype">double</span> Prior = 1.0, PriorError = 1.0;</div>
-<div class="line"><a name="l04263"></a><span class="lineno"> 4263</span>&#160;    <a class="code" href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">GetNthParameter</a>(j, Prior, PriorError, Title);</div>
-<div class="line"><a name="l04264"></a><span class="lineno"> 4264</span>&#160; </div>
-<div class="line"><a name="l04265"></a><span class="lineno"> 4265</span>&#160;    std::string name = Form(<span class="stringliteral">&quot;Power Spectrum of %s;k;P(k)&quot;</span>, Title.Data());</div>
-<div class="line"><a name="l04266"></a><span class="lineno"> 4266</span>&#160; </div>
-<div class="line"><a name="l04267"></a><span class="lineno"> 4267</span>&#160;    plot-&gt;SetTitle(name.c_str());</div>
-<div class="line"><a name="l04268"></a><span class="lineno"> 4268</span>&#160;    name = Form(<span class="stringliteral">&quot;%s_power_spectrum&quot;</span>, Title.Data());</div>
-<div class="line"><a name="l04269"></a><span class="lineno"> 4269</span>&#160;    plot-&gt;SetName(name.c_str());</div>
-<div class="line"><a name="l04270"></a><span class="lineno"> 4270</span>&#160;    plot-&gt;SetMarkerStyle(7);</div>
-<div class="line"><a name="l04271"></a><span class="lineno"> 4271</span>&#160; </div>
-<div class="line"><a name="l04272"></a><span class="lineno"> 4272</span>&#160;    <span class="comment">// Equation 18</span></div>
-<div class="line"><a name="l04273"></a><span class="lineno"> 4273</span>&#160;    <span class="keyword">auto</span> func = std::make_unique&lt;TF1&gt;(<span class="stringliteral">&quot;power_template&quot;</span>, <span class="stringliteral">&quot;[0]*( ([1] / x)^[2] / (([1] / x)^[2] +1) )&quot;</span>, 0.0, 1.0);</div>
-<div class="line"><a name="l04274"></a><span class="lineno"> 4274</span>&#160;    <span class="comment">// P0 gives the amplitude of the white noise spectrum in the k → 0 limit</span></div>
-<div class="line"><a name="l04275"></a><span class="lineno"> 4275</span>&#160;    func-&gt;SetParameter(0, 10.0);</div>
-<div class="line"><a name="l04276"></a><span class="lineno"> 4276</span>&#160;    <span class="comment">// k* indicates the position of the turnover to a different power law behaviour</span></div>
-<div class="line"><a name="l04277"></a><span class="lineno"> 4277</span>&#160;    func-&gt;SetParameter(1, 0.1);</div>
-<div class="line"><a name="l04278"></a><span class="lineno"> 4278</span>&#160;    <span class="comment">// alpha free parameter</span></div>
-<div class="line"><a name="l04279"></a><span class="lineno"> 4279</span>&#160;    func-&gt;SetParameter(2, 2.0);</div>
-<div class="line"><a name="l04280"></a><span class="lineno"> 4280</span>&#160; </div>
-<div class="line"><a name="l04281"></a><span class="lineno"> 4281</span>&#160;    <span class="comment">// Set parameter limits for stability</span></div>
-<div class="line"><a name="l04282"></a><span class="lineno"> 4282</span>&#160;    func-&gt;SetParLimits(0, 0.0, 100.0); <span class="comment">// Amplitude should be non-negative</span></div>
-<div class="line"><a name="l04283"></a><span class="lineno"> 4283</span>&#160;    func-&gt;SetParLimits(1, 0.001, 1.0); <span class="comment">// k* should be within a reasonable range</span></div>
-<div class="line"><a name="l04284"></a><span class="lineno"> 4284</span>&#160;    func-&gt;SetParLimits(2, 0.0, 5.0);   <span class="comment">// alpha should be positive</span></div>
-<div class="line"><a name="l04285"></a><span class="lineno"> 4285</span>&#160; </div>
-<div class="line"><a name="l04286"></a><span class="lineno"> 4286</span>&#160;    plot-&gt;Fit(<span class="stringliteral">&quot;power_template&quot;</span>,<span class="stringliteral">&quot;Rq&quot;</span>);</div>
-<div class="line"><a name="l04287"></a><span class="lineno"> 4287</span>&#160; </div>
-<div class="line"><a name="l04288"></a><span class="lineno"> 4288</span>&#160;    <a class="code" href="classMCMCProcessor.html#a61deb3c399dc10813b5cd116f041e981">Posterior</a>-&gt;SetLogx();</div>
-<div class="line"><a name="l04289"></a><span class="lineno"> 4289</span>&#160;    <a class="code" href="classMCMCProcessor.html#a61deb3c399dc10813b5cd116f041e981">Posterior</a>-&gt;SetLogy();</div>
-<div class="line"><a name="l04290"></a><span class="lineno"> 4290</span>&#160;    <a class="code" href="classMCMCProcessor.html#a61deb3c399dc10813b5cd116f041e981">Posterior</a>-&gt;SetGrid();</div>
-<div class="line"><a name="l04291"></a><span class="lineno"> 4291</span>&#160;    plot-&gt;Write(plot-&gt;GetName());</div>
-<div class="line"><a name="l04292"></a><span class="lineno"> 4292</span>&#160;    plot-&gt;Draw(<span class="stringliteral">&quot;AL&quot;</span>);</div>
-<div class="line"><a name="l04293"></a><span class="lineno"> 4293</span>&#160;    func-&gt;Draw(<span class="stringliteral">&quot;SAME&quot;</span>);</div>
-<div class="line"><a name="l04294"></a><span class="lineno"> 4294</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classMCMCProcessor.html#ad73755714ae3d6dc951158d5513c6eee">printToPDF</a>) <a class="code" href="classMCMCProcessor.html#a61deb3c399dc10813b5cd116f041e981">Posterior</a>-&gt;Print(<a class="code" href="classMCMCProcessor.html#ab5aec3dc293919701d31e6ae705601dd">CanvasName</a>);</div>
-<div class="line"><a name="l04295"></a><span class="lineno"> 4295</span>&#160; </div>
-<div class="line"><a name="l04296"></a><span class="lineno"> 4296</span>&#160;    <span class="comment">//KS: I have no clue what is the reason behind this. Found this in Rick Calland code...</span></div>
-<div class="line"><a name="l04297"></a><span class="lineno"> 4297</span>&#160;    (*PowerSpectrumStepSize)(j) = std::sqrt(func-&gt;GetParameter(0)/float(v_size*0.5));</div>
-<div class="line"><a name="l04298"></a><span class="lineno"> 4298</span>&#160;  }</div>
-<div class="line"><a name="l04299"></a><span class="lineno"> 4299</span>&#160; </div>
-<div class="line"><a name="l04300"></a><span class="lineno"> 4300</span>&#160;  PowerSpectrumStepSize-&gt;Write(<span class="stringliteral">&quot;PowerSpectrumStepSize&quot;</span>);</div>
-<div class="line"><a name="l04301"></a><span class="lineno"> 4301</span>&#160;  <span class="keyword">delete</span> PowerSpectrumStepSize;</div>
-<div class="line"><a name="l04302"></a><span class="lineno"> 4302</span>&#160;  PowerDir-&gt;Close();</div>
-<div class="line"><a name="l04303"></a><span class="lineno"> 4303</span>&#160;  <span class="keyword">delete</span> PowerDir;</div>
-<div class="line"><a name="l04304"></a><span class="lineno"> 4304</span>&#160; </div>
-<div class="line"><a name="l04305"></a><span class="lineno"> 4305</span>&#160;  clock.Stop();</div>
-<div class="line"><a name="l04306"></a><span class="lineno"> 4306</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Making Power Spectrum took {:.2f}s&quot;</span>, clock.RealTime());</div>
-<div class="line"><a name="l04307"></a><span class="lineno"> 4307</span>&#160; </div>
-<div class="line"><a name="l04308"></a><span class="lineno"> 4308</span>&#160;  <a class="code" href="classMCMCProcessor.html#a61deb3c399dc10813b5cd116f041e981">Posterior</a>-&gt;SetTopMargin(TopMargin);</div>
-<div class="line"><a name="l04309"></a><span class="lineno"> 4309</span>&#160;  gStyle-&gt;SetOptTitle(OptTitle);</div>
-<div class="line"><a name="l04310"></a><span class="lineno"> 4310</span>&#160;}</div>
+<div class="line"><a name="l04238"></a><span class="lineno"> 4238</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">double</span> two_pi_over_N_jj = two_pi_over_N * jj;</div>
+<div class="line"><a name="l04239"></a><span class="lineno"> 4239</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> n = 0; n &lt; _N; ++n)</div>
+<div class="line"><a name="l04240"></a><span class="lineno"> 4240</span>&#160;      {</div>
+<div class="line"><a name="l04241"></a><span class="lineno"> 4241</span>&#160;        <span class="comment">//if(StepNumber[n] &lt; BurnInCut) continue;</span></div>
+<div class="line"><a name="l04242"></a><span class="lineno"> 4242</span>&#160;        std::complex&lt;M3::float_t&gt; exp_temp(0, two_pi_over_N_jj * n);</div>
+<div class="line"><a name="l04243"></a><span class="lineno"> 4243</span>&#160;        a_j += <a class="code" href="classMCMCProcessor.html#a200b389934dcb87bf091229fb7b3fa9f">ParStep</a>[j][n] * std::exp(exp_temp);</div>
+<div class="line"><a name="l04244"></a><span class="lineno"> 4244</span>&#160;      }</div>
+<div class="line"><a name="l04245"></a><span class="lineno"> 4245</span>&#160;      a_j /= std::sqrt(<span class="keywordtype">float</span>(_N));</div>
+<div class="line"><a name="l04246"></a><span class="lineno"> 4246</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">int</span> _c = jj - start;</div>
+<div class="line"><a name="l04247"></a><span class="lineno"> 4247</span>&#160; </div>
+<div class="line"><a name="l04248"></a><span class="lineno"> 4248</span>&#160;      k_j[j][_c] = two_pi_over_N_jj;</div>
+<div class="line"><a name="l04249"></a><span class="lineno"> 4249</span>&#160;      <span class="comment">// Equation 13</span></div>
+<div class="line"><a name="l04250"></a><span class="lineno"> 4250</span>&#160;      P_j[j][_c] = std::norm(a_j);</div>
+<div class="line"><a name="l04251"></a><span class="lineno"> 4251</span>&#160;    }</div>
+<div class="line"><a name="l04252"></a><span class="lineno"> 4252</span>&#160;  }</div>
+<div class="line"><a name="l04253"></a><span class="lineno"> 4253</span>&#160; </div>
+<div class="line"><a name="l04254"></a><span class="lineno"> 4254</span>&#160;  TDirectory *PowerDir = <a class="code" href="classMCMCProcessor.html#a62035b99df4617ab334cd1abd6ed0346">OutputFile</a>-&gt;mkdir(<span class="stringliteral">&quot;PowerSpectrum&quot;</span>);</div>
+<div class="line"><a name="l04255"></a><span class="lineno"> 4255</span>&#160;  PowerDir-&gt;cd();</div>
+<div class="line"><a name="l04256"></a><span class="lineno"> 4256</span>&#160; </div>
+<div class="line"><a name="l04257"></a><span class="lineno"> 4257</span>&#160;  TVectorD* PowerSpectrumStepSize = <span class="keyword">new</span> TVectorD(nPrams);</div>
+<div class="line"><a name="l04258"></a><span class="lineno"> 4258</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; nPrams; ++j)</div>
+<div class="line"><a name="l04259"></a><span class="lineno"> 4259</span>&#160;  {</div>
+<div class="line"><a name="l04260"></a><span class="lineno"> 4260</span>&#160;    <span class="keyword">auto</span> plot = std::make_unique&lt;TGraph&gt;(v_size, k_j[j].data(), P_j[j].data());</div>
+<div class="line"><a name="l04261"></a><span class="lineno"> 4261</span>&#160; </div>
+<div class="line"><a name="l04262"></a><span class="lineno"> 4262</span>&#160;    TString Title = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a name="l04263"></a><span class="lineno"> 4263</span>&#160;    <span class="keywordtype">double</span> Prior = 1.0, PriorError = 1.0;</div>
+<div class="line"><a name="l04264"></a><span class="lineno"> 4264</span>&#160;    <a class="code" href="classMCMCProcessor.html#a07204936619139b886e9a877bc46d1a4">GetNthParameter</a>(j, Prior, PriorError, Title);</div>
+<div class="line"><a name="l04265"></a><span class="lineno"> 4265</span>&#160; </div>
+<div class="line"><a name="l04266"></a><span class="lineno"> 4266</span>&#160;    std::string name = Form(<span class="stringliteral">&quot;Power Spectrum of %s;k;P(k)&quot;</span>, Title.Data());</div>
+<div class="line"><a name="l04267"></a><span class="lineno"> 4267</span>&#160; </div>
+<div class="line"><a name="l04268"></a><span class="lineno"> 4268</span>&#160;    plot-&gt;SetTitle(name.c_str());</div>
+<div class="line"><a name="l04269"></a><span class="lineno"> 4269</span>&#160;    name = Form(<span class="stringliteral">&quot;%s_power_spectrum&quot;</span>, Title.Data());</div>
+<div class="line"><a name="l04270"></a><span class="lineno"> 4270</span>&#160;    plot-&gt;SetName(name.c_str());</div>
+<div class="line"><a name="l04271"></a><span class="lineno"> 4271</span>&#160;    plot-&gt;SetMarkerStyle(7);</div>
+<div class="line"><a name="l04272"></a><span class="lineno"> 4272</span>&#160; </div>
+<div class="line"><a name="l04273"></a><span class="lineno"> 4273</span>&#160;    <span class="comment">// Equation 18</span></div>
+<div class="line"><a name="l04274"></a><span class="lineno"> 4274</span>&#160;    <span class="keyword">auto</span> func = std::make_unique&lt;TF1&gt;(<span class="stringliteral">&quot;power_template&quot;</span>, <span class="stringliteral">&quot;[0]*( ([1] / x)^[2] / (([1] / x)^[2] +1) )&quot;</span>, 0.0, 1.0);</div>
+<div class="line"><a name="l04275"></a><span class="lineno"> 4275</span>&#160;    <span class="comment">// P0 gives the amplitude of the white noise spectrum in the k → 0 limit</span></div>
+<div class="line"><a name="l04276"></a><span class="lineno"> 4276</span>&#160;    func-&gt;SetParameter(0, 10.0);</div>
+<div class="line"><a name="l04277"></a><span class="lineno"> 4277</span>&#160;    <span class="comment">// k* indicates the position of the turnover to a different power law behaviour</span></div>
+<div class="line"><a name="l04278"></a><span class="lineno"> 4278</span>&#160;    func-&gt;SetParameter(1, 0.1);</div>
+<div class="line"><a name="l04279"></a><span class="lineno"> 4279</span>&#160;    <span class="comment">// alpha free parameter</span></div>
+<div class="line"><a name="l04280"></a><span class="lineno"> 4280</span>&#160;    func-&gt;SetParameter(2, 2.0);</div>
+<div class="line"><a name="l04281"></a><span class="lineno"> 4281</span>&#160; </div>
+<div class="line"><a name="l04282"></a><span class="lineno"> 4282</span>&#160;    <span class="comment">// Set parameter limits for stability</span></div>
+<div class="line"><a name="l04283"></a><span class="lineno"> 4283</span>&#160;    func-&gt;SetParLimits(0, 0.0, 100.0); <span class="comment">// Amplitude should be non-negative</span></div>
+<div class="line"><a name="l04284"></a><span class="lineno"> 4284</span>&#160;    func-&gt;SetParLimits(1, 0.001, 1.0); <span class="comment">// k* should be within a reasonable range</span></div>
+<div class="line"><a name="l04285"></a><span class="lineno"> 4285</span>&#160;    func-&gt;SetParLimits(2, 0.0, 5.0);   <span class="comment">// alpha should be positive</span></div>
+<div class="line"><a name="l04286"></a><span class="lineno"> 4286</span>&#160; </div>
+<div class="line"><a name="l04287"></a><span class="lineno"> 4287</span>&#160;    plot-&gt;Fit(<span class="stringliteral">&quot;power_template&quot;</span>,<span class="stringliteral">&quot;Rq&quot;</span>);</div>
+<div class="line"><a name="l04288"></a><span class="lineno"> 4288</span>&#160; </div>
+<div class="line"><a name="l04289"></a><span class="lineno"> 4289</span>&#160;    <a class="code" href="classMCMCProcessor.html#a61deb3c399dc10813b5cd116f041e981">Posterior</a>-&gt;SetLogx();</div>
+<div class="line"><a name="l04290"></a><span class="lineno"> 4290</span>&#160;    <a class="code" href="classMCMCProcessor.html#a61deb3c399dc10813b5cd116f041e981">Posterior</a>-&gt;SetLogy();</div>
+<div class="line"><a name="l04291"></a><span class="lineno"> 4291</span>&#160;    <a class="code" href="classMCMCProcessor.html#a61deb3c399dc10813b5cd116f041e981">Posterior</a>-&gt;SetGrid();</div>
+<div class="line"><a name="l04292"></a><span class="lineno"> 4292</span>&#160;    plot-&gt;Write(plot-&gt;GetName());</div>
+<div class="line"><a name="l04293"></a><span class="lineno"> 4293</span>&#160;    plot-&gt;Draw(<span class="stringliteral">&quot;AL&quot;</span>);</div>
+<div class="line"><a name="l04294"></a><span class="lineno"> 4294</span>&#160;    func-&gt;Draw(<span class="stringliteral">&quot;SAME&quot;</span>);</div>
+<div class="line"><a name="l04295"></a><span class="lineno"> 4295</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classMCMCProcessor.html#ad73755714ae3d6dc951158d5513c6eee">printToPDF</a>) <a class="code" href="classMCMCProcessor.html#a61deb3c399dc10813b5cd116f041e981">Posterior</a>-&gt;Print(<a class="code" href="classMCMCProcessor.html#ab5aec3dc293919701d31e6ae705601dd">CanvasName</a>);</div>
+<div class="line"><a name="l04296"></a><span class="lineno"> 4296</span>&#160; </div>
+<div class="line"><a name="l04297"></a><span class="lineno"> 4297</span>&#160;    <span class="comment">//KS: I have no clue what is the reason behind this. Found this in Rick Calland code...</span></div>
+<div class="line"><a name="l04298"></a><span class="lineno"> 4298</span>&#160;    (*PowerSpectrumStepSize)(j) = std::sqrt(func-&gt;GetParameter(0)/float(v_size*0.5));</div>
+<div class="line"><a name="l04299"></a><span class="lineno"> 4299</span>&#160;  }</div>
+<div class="line"><a name="l04300"></a><span class="lineno"> 4300</span>&#160; </div>
+<div class="line"><a name="l04301"></a><span class="lineno"> 4301</span>&#160;  PowerSpectrumStepSize-&gt;Write(<span class="stringliteral">&quot;PowerSpectrumStepSize&quot;</span>);</div>
+<div class="line"><a name="l04302"></a><span class="lineno"> 4302</span>&#160;  <span class="keyword">delete</span> PowerSpectrumStepSize;</div>
+<div class="line"><a name="l04303"></a><span class="lineno"> 4303</span>&#160;  PowerDir-&gt;Close();</div>
+<div class="line"><a name="l04304"></a><span class="lineno"> 4304</span>&#160;  <span class="keyword">delete</span> PowerDir;</div>
+<div class="line"><a name="l04305"></a><span class="lineno"> 4305</span>&#160; </div>
+<div class="line"><a name="l04306"></a><span class="lineno"> 4306</span>&#160;  clock.Stop();</div>
+<div class="line"><a name="l04307"></a><span class="lineno"> 4307</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Making Power Spectrum took {:.2f}s&quot;</span>, clock.RealTime());</div>
+<div class="line"><a name="l04308"></a><span class="lineno"> 4308</span>&#160; </div>
+<div class="line"><a name="l04309"></a><span class="lineno"> 4309</span>&#160;  <a class="code" href="classMCMCProcessor.html#a61deb3c399dc10813b5cd116f041e981">Posterior</a>-&gt;SetTopMargin(TopMargin);</div>
+<div class="line"><a name="l04310"></a><span class="lineno"> 4310</span>&#160;  gStyle-&gt;SetOptTitle(OptTitle);</div>
+<div class="line"><a name="l04311"></a><span class="lineno"> 4311</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -6482,32 +6483,32 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Print info like how many params have been loaded etc. </p>
 
-<p class="definition">Definition at line <a class="el" href="MCMCProcessor_8cpp_source.html#l04549">4549</a> of file <a class="el" href="MCMCProcessor_8cpp_source.html">MCMCProcessor.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l04549"></a><span class="lineno"> 4549</span>&#160;                                    {</div>
-<div class="line"><a name="l04550"></a><span class="lineno"> 4550</span>&#160;<span class="comment">// **************************</span></div>
-<div class="line"><a name="l04551"></a><span class="lineno"> 4551</span>&#160;  <span class="comment">// KS: Create a map to store the counts of unique strings</span></div>
-<div class="line"><a name="l04552"></a><span class="lineno"> 4552</span>&#160;  std::unordered_map&lt;std::string, int&gt; paramCounts;</div>
-<div class="line"><a name="l04553"></a><span class="lineno"> 4553</span>&#160;  std::vector&lt;std::string&gt; orderedKeys;</div>
-<div class="line"><a name="l04554"></a><span class="lineno"> 4554</span>&#160; </div>
-<div class="line"><a name="l04555"></a><span class="lineno"> 4555</span>&#160;  <span class="keywordflow">for</span> (<span class="keyword">const</span> std::string&amp; param : <a class="code" href="classMCMCProcessor.html#ab72dd21faa732ec38e550c37635ee66d">ParameterGroup</a>) {</div>
-<div class="line"><a name="l04556"></a><span class="lineno"> 4556</span>&#160;    <span class="keywordflow">if</span> (paramCounts[param] == 0) {</div>
-<div class="line"><a name="l04557"></a><span class="lineno"> 4557</span>&#160;      orderedKeys.push_back(param);  <span class="comment">// preserve order of first appearance</span></div>
-<div class="line"><a name="l04558"></a><span class="lineno"> 4558</span>&#160;    }</div>
-<div class="line"><a name="l04559"></a><span class="lineno"> 4559</span>&#160;    paramCounts[param]++;</div>
-<div class="line"><a name="l04560"></a><span class="lineno"> 4560</span>&#160;  }</div>
-<div class="line"><a name="l04561"></a><span class="lineno"> 4561</span>&#160; </div>
-<div class="line"><a name="l04562"></a><span class="lineno"> 4562</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;************************************************&quot;</span>);</div>
-<div class="line"><a name="l04563"></a><span class="lineno"> 4563</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Scanning output branches...&quot;</span>);</div>
-<div class="line"><a name="l04564"></a><span class="lineno"> 4564</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;# Useful entries in tree: \033[1;32m {} \033[0m &quot;</span>, <a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>);</div>
-<div class="line"><a name="l04565"></a><span class="lineno"> 4565</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;# Model params:  \033[1;32m {} starting at {} \033[0m &quot;</span>, <a class="code" href="classMCMCProcessor.html#a4200e7cbe1c8f811d3640ebfd648ca85">nParam</a>[<a class="code" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba7386f5611ea4d01b85b9bb92a5ca335f">kXSecPar</a>], <a class="code" href="classMCMCProcessor.html#aeab63979ff36256072c046a15d981875">ParamTypeStartPos</a>[<a class="code" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba7386f5611ea4d01b85b9bb92a5ca335f">kXSecPar</a>]);</div>
-<div class="line"><a name="l04566"></a><span class="lineno"> 4566</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;# With following groups: &quot;</span>);</div>
-<div class="line"><a name="l04567"></a><span class="lineno"> 4567</span>&#160;  <span class="keywordflow">for</span> (<span class="keyword">const</span> std::string&amp; key : orderedKeys) {</div>
-<div class="line"><a name="l04568"></a><span class="lineno"> 4568</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot; # {} params: {}&quot;</span>, key, paramCounts[key]);</div>
-<div class="line"><a name="l04569"></a><span class="lineno"> 4569</span>&#160;  }</div>
-<div class="line"><a name="l04570"></a><span class="lineno"> 4570</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;# ND params (legacy):    \033[1;32m {} starting at {} \033[0m &quot;</span>, <a class="code" href="classMCMCProcessor.html#a4200e7cbe1c8f811d3640ebfd648ca85">nParam</a>[<a class="code" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba4ac215e1a6cd9e776ec0a230f62a0bb4">kNDPar</a>], <a class="code" href="classMCMCProcessor.html#aeab63979ff36256072c046a15d981875">ParamTypeStartPos</a>[<a class="code" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba4ac215e1a6cd9e776ec0a230f62a0bb4">kNDPar</a>]);</div>
-<div class="line"><a name="l04571"></a><span class="lineno"> 4571</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;# FD params (legacy):    \033[1;32m {} starting at {} \033[0m &quot;</span>, <a class="code" href="classMCMCProcessor.html#a4200e7cbe1c8f811d3640ebfd648ca85">nParam</a>[<a class="code" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20bad7032c60390bd4bb843950e9a7afcdae">kFDDetPar</a>], <a class="code" href="classMCMCProcessor.html#aeab63979ff36256072c046a15d981875">ParamTypeStartPos</a>[<a class="code" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20bad7032c60390bd4bb843950e9a7afcdae">kFDDetPar</a>]);</div>
-<div class="line"><a name="l04572"></a><span class="lineno"> 4572</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;************************************************&quot;</span>);</div>
-<div class="line"><a name="l04573"></a><span class="lineno"> 4573</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="MCMCProcessor_8cpp_source.html#l04550">4550</a> of file <a class="el" href="MCMCProcessor_8cpp_source.html">MCMCProcessor.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l04550"></a><span class="lineno"> 4550</span>&#160;                                    {</div>
+<div class="line"><a name="l04551"></a><span class="lineno"> 4551</span>&#160;<span class="comment">// **************************</span></div>
+<div class="line"><a name="l04552"></a><span class="lineno"> 4552</span>&#160;  <span class="comment">// KS: Create a map to store the counts of unique strings</span></div>
+<div class="line"><a name="l04553"></a><span class="lineno"> 4553</span>&#160;  std::unordered_map&lt;std::string, int&gt; paramCounts;</div>
+<div class="line"><a name="l04554"></a><span class="lineno"> 4554</span>&#160;  std::vector&lt;std::string&gt; orderedKeys;</div>
+<div class="line"><a name="l04555"></a><span class="lineno"> 4555</span>&#160; </div>
+<div class="line"><a name="l04556"></a><span class="lineno"> 4556</span>&#160;  <span class="keywordflow">for</span> (<span class="keyword">const</span> std::string&amp; param : <a class="code" href="classMCMCProcessor.html#ab72dd21faa732ec38e550c37635ee66d">ParameterGroup</a>) {</div>
+<div class="line"><a name="l04557"></a><span class="lineno"> 4557</span>&#160;    <span class="keywordflow">if</span> (paramCounts[param] == 0) {</div>
+<div class="line"><a name="l04558"></a><span class="lineno"> 4558</span>&#160;      orderedKeys.push_back(param);  <span class="comment">// preserve order of first appearance</span></div>
+<div class="line"><a name="l04559"></a><span class="lineno"> 4559</span>&#160;    }</div>
+<div class="line"><a name="l04560"></a><span class="lineno"> 4560</span>&#160;    paramCounts[param]++;</div>
+<div class="line"><a name="l04561"></a><span class="lineno"> 4561</span>&#160;  }</div>
+<div class="line"><a name="l04562"></a><span class="lineno"> 4562</span>&#160; </div>
+<div class="line"><a name="l04563"></a><span class="lineno"> 4563</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;************************************************&quot;</span>);</div>
+<div class="line"><a name="l04564"></a><span class="lineno"> 4564</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Scanning output branches...&quot;</span>);</div>
+<div class="line"><a name="l04565"></a><span class="lineno"> 4565</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;# Useful entries in tree: \033[1;32m {} \033[0m &quot;</span>, <a class="code" href="classMCMCProcessor.html#aa30545fedb0af2ad9619d6accf42a10d">nDraw</a>);</div>
+<div class="line"><a name="l04566"></a><span class="lineno"> 4566</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;# Model params:  \033[1;32m {} starting at {} \033[0m &quot;</span>, <a class="code" href="classMCMCProcessor.html#a4200e7cbe1c8f811d3640ebfd648ca85">nParam</a>[<a class="code" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba7386f5611ea4d01b85b9bb92a5ca335f">kXSecPar</a>], <a class="code" href="classMCMCProcessor.html#aeab63979ff36256072c046a15d981875">ParamTypeStartPos</a>[<a class="code" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba7386f5611ea4d01b85b9bb92a5ca335f">kXSecPar</a>]);</div>
+<div class="line"><a name="l04567"></a><span class="lineno"> 4567</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;# With following groups: &quot;</span>);</div>
+<div class="line"><a name="l04568"></a><span class="lineno"> 4568</span>&#160;  <span class="keywordflow">for</span> (<span class="keyword">const</span> std::string&amp; key : orderedKeys) {</div>
+<div class="line"><a name="l04569"></a><span class="lineno"> 4569</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot; # {} params: {}&quot;</span>, key, paramCounts[key]);</div>
+<div class="line"><a name="l04570"></a><span class="lineno"> 4570</span>&#160;  }</div>
+<div class="line"><a name="l04571"></a><span class="lineno"> 4571</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;# ND params (legacy):    \033[1;32m {} starting at {} \033[0m &quot;</span>, <a class="code" href="classMCMCProcessor.html#a4200e7cbe1c8f811d3640ebfd648ca85">nParam</a>[<a class="code" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba4ac215e1a6cd9e776ec0a230f62a0bb4">kNDPar</a>], <a class="code" href="classMCMCProcessor.html#aeab63979ff36256072c046a15d981875">ParamTypeStartPos</a>[<a class="code" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20ba4ac215e1a6cd9e776ec0a230f62a0bb4">kNDPar</a>]);</div>
+<div class="line"><a name="l04572"></a><span class="lineno"> 4572</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;# FD params (legacy):    \033[1;32m {} starting at {} \033[0m &quot;</span>, <a class="code" href="classMCMCProcessor.html#a4200e7cbe1c8f811d3640ebfd648ca85">nParam</a>[<a class="code" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20bad7032c60390bd4bb843950e9a7afcdae">kFDDetPar</a>], <a class="code" href="classMCMCProcessor.html#aeab63979ff36256072c046a15d981875">ParamTypeStartPos</a>[<a class="code" href="MCMCProcessor_8h.html#acd2848273413543fe14936252942c20bad7032c60390bd4bb843950e9a7afcdae">kFDDetPar</a>]);</div>
+<div class="line"><a name="l04573"></a><span class="lineno"> 4573</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;************************************************&quot;</span>);</div>
+<div class="line"><a name="l04574"></a><span class="lineno"> 4574</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -7241,7 +7242,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><a name="l02245"></a><span class="lineno"> 2245</span>&#160;  <a class="code" href="classMCMCProcessor.html#aabac168d6ff10dc3d57667db532476a2">LoadAdditionalInfo</a>();</div>
 <div class="line"><a name="l02246"></a><span class="lineno"> 2246</span>&#160;}</div>
 <div class="ttc" id="aclassMCMCProcessor_html_a015cf0d6925d026e5bd9d82aa31083b6"><div class="ttname"><a href="classMCMCProcessor.html#a015cf0d6925d026e5bd9d82aa31083b6">MCMCProcessor::ScanParameterOrder</a></div><div class="ttdeci">void ScanParameterOrder()</div><div class="ttdoc">Scan order of params from a different groups.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l02307">MCMCProcessor.cpp:2307</a></div></div>
-<div class="ttc" id="aclassMCMCProcessor_html_a1229c5b253883017c4efd636cdd7071e"><div class="ttname"><a href="classMCMCProcessor.html#a1229c5b253883017c4efd636cdd7071e">MCMCProcessor::PrintInfo</a></div><div class="ttdeci">void PrintInfo() const</div><div class="ttdoc">Print info like how many params have been loaded etc.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l04549">MCMCProcessor.cpp:4549</a></div></div>
+<div class="ttc" id="aclassMCMCProcessor_html_a1229c5b253883017c4efd636cdd7071e"><div class="ttname"><a href="classMCMCProcessor.html#a1229c5b253883017c4efd636cdd7071e">MCMCProcessor::PrintInfo</a></div><div class="ttdeci">void PrintInfo() const</div><div class="ttdoc">Print info like how many params have been loaded etc.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l04550">MCMCProcessor.cpp:4550</a></div></div>
 <div class="ttc" id="aclassMCMCProcessor_html_aabac168d6ff10dc3d57667db532476a2"><div class="ttname"><a href="classMCMCProcessor.html#aabac168d6ff10dc3d57667db532476a2">MCMCProcessor::LoadAdditionalInfo</a></div><div class="ttdeci">virtual void LoadAdditionalInfo()</div><div class="ttdoc">allow loading additional info for example used for oscillation parameters</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00341">MCMCProcessor.h:341</a></div></div>
 <div class="ttc" id="aclassMCMCProcessor_html_aada4aadea10661586b46c1013a9d018f"><div class="ttname"><a href="classMCMCProcessor.html#aada4aadea10661586b46c1013a9d018f">MCMCProcessor::ExcludedTypes</a></div><div class="ttdeci">std::vector&lt; std::string &gt; ExcludedTypes</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00447">MCMCProcessor.h:447</a></div></div>
 <div class="ttc" id="aclassMCMCProcessor_html_ac0e758c91b6f57a75544a0c61228f8dc"><div class="ttname"><a href="classMCMCProcessor.html#ac0e758c91b6f57a75544a0c61228f8dc">MCMCProcessor::ReadInputCovLegacy</a></div><div class="ttdeci">void ReadInputCovLegacy()</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8cpp_source.html#l02396">MCMCProcessor.cpp:2396</a></div></div>
@@ -7512,16 +7513,16 @@ Kamil Skwarczynski </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="MCMCProcessor_8cpp_source.html#l04608">4608</a> of file <a class="el" href="MCMCProcessor_8cpp_source.html">MCMCProcessor.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l04608"></a><span class="lineno"> 4608</span>&#160;                                                                           {</div>
-<div class="line"><a name="l04609"></a><span class="lineno"> 4609</span>&#160;<span class="comment">// **************************</span></div>
-<div class="line"><a name="l04610"></a><span class="lineno"> 4610</span>&#160;  Legend-&gt;SetTextSize(<a class="code" href="GetPenaltyTerm_8cpp.html#a439227feff9d7f55384e8780cfc2eb82">size</a>);</div>
-<div class="line"><a name="l04611"></a><span class="lineno"> 4611</span>&#160;  Legend-&gt;SetLineColor(0);</div>
-<div class="line"><a name="l04612"></a><span class="lineno"> 4612</span>&#160;  Legend-&gt;SetLineStyle(0);</div>
-<div class="line"><a name="l04613"></a><span class="lineno"> 4613</span>&#160;  Legend-&gt;SetFillColor(0);</div>
-<div class="line"><a name="l04614"></a><span class="lineno"> 4614</span>&#160;  Legend-&gt;SetFillStyle(0);</div>
-<div class="line"><a name="l04615"></a><span class="lineno"> 4615</span>&#160;  Legend-&gt;SetBorderSize(0);</div>
-<div class="line"><a name="l04616"></a><span class="lineno"> 4616</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="MCMCProcessor_8cpp_source.html#l04609">4609</a> of file <a class="el" href="MCMCProcessor_8cpp_source.html">MCMCProcessor.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l04609"></a><span class="lineno"> 4609</span>&#160;                                                                           {</div>
+<div class="line"><a name="l04610"></a><span class="lineno"> 4610</span>&#160;<span class="comment">// **************************</span></div>
+<div class="line"><a name="l04611"></a><span class="lineno"> 4611</span>&#160;  Legend-&gt;SetTextSize(<a class="code" href="GetPenaltyTerm_8cpp.html#a439227feff9d7f55384e8780cfc2eb82">size</a>);</div>
+<div class="line"><a name="l04612"></a><span class="lineno"> 4612</span>&#160;  Legend-&gt;SetLineColor(0);</div>
+<div class="line"><a name="l04613"></a><span class="lineno"> 4613</span>&#160;  Legend-&gt;SetLineStyle(0);</div>
+<div class="line"><a name="l04614"></a><span class="lineno"> 4614</span>&#160;  Legend-&gt;SetFillColor(0);</div>
+<div class="line"><a name="l04615"></a><span class="lineno"> 4615</span>&#160;  Legend-&gt;SetFillStyle(0);</div>
+<div class="line"><a name="l04616"></a><span class="lineno"> 4616</span>&#160;  Legend-&gt;SetBorderSize(0);</div>
+<div class="line"><a name="l04617"></a><span class="lineno"> 4617</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -7561,22 +7562,22 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Set TCanvas margins to specified values. </p>
 
-<p class="definition">Definition at line <a class="el" href="MCMCProcessor_8cpp_source.html#l04583">4583</a> of file <a class="el" href="MCMCProcessor_8cpp_source.html">MCMCProcessor.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l04583"></a><span class="lineno"> 4583</span>&#160;                                                                                             {</div>
-<div class="line"><a name="l04584"></a><span class="lineno"> 4584</span>&#160;<span class="comment">// **************************</span></div>
-<div class="line"><a name="l04585"></a><span class="lineno"> 4585</span>&#160;  <span class="keywordflow">if</span> (!Canv) {</div>
-<div class="line"><a name="l04586"></a><span class="lineno"> 4586</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Canv is nullptr&quot;</span>);</div>
-<div class="line"><a name="l04587"></a><span class="lineno"> 4587</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><a name="l04588"></a><span class="lineno"> 4588</span>&#160;  }</div>
-<div class="line"><a name="l04589"></a><span class="lineno"> 4589</span>&#160;  <span class="keywordflow">if</span> (margins.size() != 4) {</div>
-<div class="line"><a name="l04590"></a><span class="lineno"> 4590</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Margin vector must have exactly 4 elements&quot;</span>);</div>
-<div class="line"><a name="l04591"></a><span class="lineno"> 4591</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><a name="l04592"></a><span class="lineno"> 4592</span>&#160;  }</div>
-<div class="line"><a name="l04593"></a><span class="lineno"> 4593</span>&#160;  Canv-&gt;SetTopMargin(margins[0]);</div>
-<div class="line"><a name="l04594"></a><span class="lineno"> 4594</span>&#160;  Canv-&gt;SetBottomMargin(margins[1]);</div>
-<div class="line"><a name="l04595"></a><span class="lineno"> 4595</span>&#160;  Canv-&gt;SetLeftMargin(margins[2]);</div>
-<div class="line"><a name="l04596"></a><span class="lineno"> 4596</span>&#160;  Canv-&gt;SetRightMargin(margins[3]);</div>
-<div class="line"><a name="l04597"></a><span class="lineno"> 4597</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="MCMCProcessor_8cpp_source.html#l04584">4584</a> of file <a class="el" href="MCMCProcessor_8cpp_source.html">MCMCProcessor.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l04584"></a><span class="lineno"> 4584</span>&#160;                                                                                             {</div>
+<div class="line"><a name="l04585"></a><span class="lineno"> 4585</span>&#160;<span class="comment">// **************************</span></div>
+<div class="line"><a name="l04586"></a><span class="lineno"> 4586</span>&#160;  <span class="keywordflow">if</span> (!Canv) {</div>
+<div class="line"><a name="l04587"></a><span class="lineno"> 4587</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Canv is nullptr&quot;</span>);</div>
+<div class="line"><a name="l04588"></a><span class="lineno"> 4588</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><a name="l04589"></a><span class="lineno"> 4589</span>&#160;  }</div>
+<div class="line"><a name="l04590"></a><span class="lineno"> 4590</span>&#160;  <span class="keywordflow">if</span> (margins.size() != 4) {</div>
+<div class="line"><a name="l04591"></a><span class="lineno"> 4591</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Margin vector must have exactly 4 elements&quot;</span>);</div>
+<div class="line"><a name="l04592"></a><span class="lineno"> 4592</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><a name="l04593"></a><span class="lineno"> 4593</span>&#160;  }</div>
+<div class="line"><a name="l04594"></a><span class="lineno"> 4594</span>&#160;  Canv-&gt;SetTopMargin(margins[0]);</div>
+<div class="line"><a name="l04595"></a><span class="lineno"> 4595</span>&#160;  Canv-&gt;SetBottomMargin(margins[1]);</div>
+<div class="line"><a name="l04596"></a><span class="lineno"> 4596</span>&#160;  Canv-&gt;SetLeftMargin(margins[2]);</div>
+<div class="line"><a name="l04597"></a><span class="lineno"> 4597</span>&#160;  Canv-&gt;SetRightMargin(margins[3]);</div>
+<div class="line"><a name="l04598"></a><span class="lineno"> 4598</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -8062,13 +8063,13 @@ Kamil Skwarczynski </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="MCMCProcessor_8cpp_source.html#l04600">4600</a> of file <a class="el" href="MCMCProcessor_8cpp_source.html">MCMCProcessor.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l04600"></a><span class="lineno"> 4600</span>&#160;                                                                                                                      {</div>
-<div class="line"><a name="l04601"></a><span class="lineno"> 4601</span>&#160;<span class="comment">// **************************</span></div>
-<div class="line"><a name="l04602"></a><span class="lineno"> 4602</span>&#160;  Line-&gt;SetLineColor(Colour);</div>
-<div class="line"><a name="l04603"></a><span class="lineno"> 4603</span>&#160;  Line-&gt;SetLineWidth(Width);</div>
-<div class="line"><a name="l04604"></a><span class="lineno"> 4604</span>&#160;  Line-&gt;SetLineStyle(<a class="code" href="PlotSigmaVariation_8cpp.html#a2c1881be081f561337336d11d34572a9">Style</a>);</div>
-<div class="line"><a name="l04605"></a><span class="lineno"> 4605</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="MCMCProcessor_8cpp_source.html#l04601">4601</a> of file <a class="el" href="MCMCProcessor_8cpp_source.html">MCMCProcessor.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l04601"></a><span class="lineno"> 4601</span>&#160;                                                                                                                      {</div>
+<div class="line"><a name="l04602"></a><span class="lineno"> 4602</span>&#160;<span class="comment">// **************************</span></div>
+<div class="line"><a name="l04603"></a><span class="lineno"> 4603</span>&#160;  Line-&gt;SetLineColor(Colour);</div>
+<div class="line"><a name="l04604"></a><span class="lineno"> 4604</span>&#160;  Line-&gt;SetLineWidth(Width);</div>
+<div class="line"><a name="l04605"></a><span class="lineno"> 4605</span>&#160;  Line-&gt;SetLineStyle(<a class="code" href="PlotSigmaVariation_8cpp.html#a2c1881be081f561337336d11d34572a9">Style</a>);</div>
+<div class="line"><a name="l04606"></a><span class="lineno"> 4606</span>&#160;}</div>
 <div class="ttc" id="aPlotSigmaVariation_8cpp_html_a2c1881be081f561337336d11d34572a9"><div class="ttname"><a href="PlotSigmaVariation_8cpp.html#a2c1881be081f561337336d11d34572a9">Style</a></div><div class="ttdeci">constexpr ELineStyle Style[NVars]</div><div class="ttdef"><b>Definition:</b> <a href="PlotSigmaVariation_8cpp_source.html#l00021">PlotSigmaVariation.cpp:21</a></div></div>
 </div><!-- fragment -->
 </div>
