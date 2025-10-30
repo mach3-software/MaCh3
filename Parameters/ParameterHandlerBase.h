@@ -495,9 +495,6 @@ protected:
   /// Are we using AMCMC?
   bool use_adaptive;
 
-  /// Do we want to override adaptive scale from config
-  double adaptive_scale_override;
-
   /// Struct containing information about PCA
   std::unique_ptr<PCAHandler> PCAObj;
   /// Struct containing information about adaption

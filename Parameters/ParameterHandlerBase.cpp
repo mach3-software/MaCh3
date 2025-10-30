@@ -1086,6 +1086,7 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
     return;
   }
   AdaptiveHandler = std::make_unique<adaptive_mcmc::AdaptiveMCMCHandler>();
+
   // Now we read the general settings [these SHOULD be common across all matrices!]
   bool success = AdaptiveHandler->InitFromConfig(adapt_manager, matrixName, &_fCurrVal, &_fError);
   if(!success) return;
@@ -1110,13 +1111,7 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
   AdaptiveHandler->SetThrowMatrixFromFile(external_file_name, external_matrix_name, external_mean_name, use_adaptive);
   SetThrowMatrix(AdaptiveHandler->GetAdaptiveCovariance());
 
-  adaptive_scale_override = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["OverrideGlobalStepScale"], -1);
   ResetIndivStepScale();
-
-  if (adaptive_scale_override > 0)
-  {
-    SetStepScale(adaptive_scale_override, true);
-  }
 
   MACH3LOG_INFO("Successfully Set External Throw Matrix Stored in {}", external_file_name);
 }
@@ -1146,13 +1141,9 @@ void ParameterHandlerBase::UpdateAdaptiveCovariance(){
   // Call main adaption function
   AdaptiveHandler->UpdateAdaptiveCovariance();
 
-  // Set scales to 1 * optimal scale * user override
+  // Set scales to 1 * optimal scale
   if(AdaptiveHandler->IndivStepScaleAdapt()) {
     ResetIndivStepScale();
-    if (adaptive_scale_override > 0)
-    {
-      SetStepScale(adaptive_scale_override * AdaptiveHandler->GetAdaptionScale(), true);
-    }
   }
 
   if(AdaptiveHandler->UpdateMatrixAdapt()) {
