@@ -1086,6 +1086,7 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
     return;
   }
   AdaptiveHandler = std::make_unique<adaptive_mcmc::AdaptiveMCMCHandler>();
+
   // Now we read the general settings [these SHOULD be common across all matrices!]
   bool success = AdaptiveHandler->InitFromConfig(adapt_manager, matrixName, &_fCurrVal, &_fError);
   if(!success) return;
@@ -1109,6 +1110,7 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
 
   AdaptiveHandler->SetThrowMatrixFromFile(external_file_name, external_matrix_name, external_mean_name, use_adaptive);
   SetThrowMatrix(AdaptiveHandler->GetAdaptiveCovariance());
+
   ResetIndivStepScale();
 
   MACH3LOG_INFO("Successfully Set External Throw Matrix Stored in {}", external_file_name);
@@ -1129,13 +1131,17 @@ void ParameterHandlerBase::UpdateAdaptiveCovariance(){
 
   /// Need to adjust the scale every step
   if(AdaptiveHandler->GetUseRobbinsMonro()){
-    SetStepScale(AdaptiveHandler->GetAdaptionScale(), false);
+    bool verbose=false;
+    #ifdef DEBUG
+    verbose=true;
+    #endif
+    SetStepScale(AdaptiveHandler->GetAdaptionScale(), verbose);
   }
 
   // Call main adaption function
   AdaptiveHandler->UpdateAdaptiveCovariance();
 
-  //This is likely going to be the slow bit!
+  // Set scales to 1 * optimal scale
   if(AdaptiveHandler->IndivStepScaleAdapt()) {
     ResetIndivStepScale();
   }
@@ -1143,13 +1149,6 @@ void ParameterHandlerBase::UpdateAdaptiveCovariance(){
   if(AdaptiveHandler->UpdateMatrixAdapt()) {
     TMatrixDSym* update_matrix = static_cast<TMatrixDSym*>(AdaptiveHandler->GetAdaptiveCovariance()->Clone());
     UpdateThrowMatrix(update_matrix); //Now we update and continue!
-    // Also update global step scale so we're multiplying by 2.38^2/d OR our adapted scale
-    bool verbose = false;
-    #ifdef DEBUG
-    verbose = AdaptiveHandler->GetUseRobbinsMonro();
-#endif
-    SetStepScale(AdaptiveHandler->GetAdaptionScale(), verbose);
-
     //Also Save the adaptive to file
     AdaptiveHandler->SaveAdaptiveToFile(AdaptiveHandler->GetOutFileName(), GetName());
   }
