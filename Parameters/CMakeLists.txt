@@ -28,6 +28,14 @@ if(MaCh3_GPU_ENABLED)
 endif()
 
 target_link_libraries(Parameters PUBLIC Manager ROOT::MathMore)
+# KS: ROOT ≤ 6.30 requires explicit linking of MathMore (if built, not sure why through...)
+if(ROOT_VERSION VERSION_LESS 6.30)
+    if(TARGET ROOT::MathMore)
+        target_link_libraries(Parameters PUBLIC ROOT::MathMore)
+    else()
+        message(WARNING "ROOT::MathMore target not found; continuing without it")
+    endif()
+endif()
 target_link_libraries(Parameters PRIVATE MaCh3Warnings)
 
 target_include_directories(Parameters PUBLIC
