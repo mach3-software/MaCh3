@@ -8,9 +8,8 @@ _MaCh3_Safe_Include_Start_ //{
 #include "Math/DistFunc.h"
 _MaCh3_Safe_Include_End_ //}
 
-    namespace adaptive_mcmc
+namespace adaptive_mcmc
 {
-
   /// @brief Contains information about adaptive covariance matrix
   /// @cite haario2001adaptive
   /// @cite Garthwaite01092016
@@ -265,5 +264,4 @@ _MaCh3_Safe_Include_End_ //}
     /// Need to keep track of whether previous step was accepted for RM
     bool prev_step_accepted;
   };
-
 } // adaptive_mcmc namespace
