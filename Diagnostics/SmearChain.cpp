@@ -1,5 +1,5 @@
 #include "Fitters/MCMCProcessor.h"
-
+#include "Samples/HistogramUtils.h"
 #include "Manager/Manager.h"
 
 /// @file SmearChain.cpp
@@ -20,8 +20,9 @@ void DiagMCMC(const std::string& inputFile, const std::string& config)
   Processor->Initialise();
 
   const auto& Smear = Settings["SmearChain"];
-  std::vector<std::string> Names = Smear["Smear"][0].as<std::vector<std::string>>();
-  std::vector<double> ErrorValue = Smear["Smear"][1].as<std::vector<double>>();
+
+  std::vector<std::string> Names = Get<std::vector<std::string>>(Smear["Smear"][0], __FILE__, __LINE__);
+  std::vector<double> ErrorValue = Get<std::vector<double>>(Smear["Smear"][1], __FILE__, __LINE__);
 
   bool SaveUnsmearedBranch = GetFromManager<bool>(Smear["SaveUnsmearedBranch"], false);
   Processor->SmearChain(Names, ErrorValue, SaveUnsmearedBranch);
