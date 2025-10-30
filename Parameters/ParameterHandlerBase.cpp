@@ -1110,7 +1110,7 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
   AdaptiveHandler->SetThrowMatrixFromFile(external_file_name, external_matrix_name, external_mean_name, use_adaptive);
   SetThrowMatrix(AdaptiveHandler->GetAdaptiveCovariance());
 
-  adaptive_scale_override = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["SaveNIterations"], -1);
+  adaptive_scale_override = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["OverrideGlobalStepScale"], -1);
   ResetIndivStepScale();
 
   if (adaptive_scale_override > 0)
@@ -1136,31 +1136,28 @@ void ParameterHandlerBase::UpdateAdaptiveCovariance(){
 
   /// Need to adjust the scale every step
   if(AdaptiveHandler->GetUseRobbinsMonro()){
-    SetStepScale(AdaptiveHandler->GetAdaptionScale(), false);
+    bool verbose=false;
+    #ifdef DEBUG
+    verbose=true;
+    #endif
+    SetStepScale(AdaptiveHandler->GetAdaptionScale(), verbose);
   }
 
   // Call main adaption function
   AdaptiveHandler->UpdateAdaptiveCovariance();
 
-  //This is likely going to be the slow bit!
+  // Set scales to 1 * optimal scale * user override
   if(AdaptiveHandler->IndivStepScaleAdapt()) {
     ResetIndivStepScale();
     if (adaptive_scale_override > 0)
     {
-      SetStepScale(adaptive_scale_override, true);
+      SetStepScale(adaptive_scale_override * AdaptiveHandler->GetAdaptionScale(), true);
     }
   }
 
   if(AdaptiveHandler->UpdateMatrixAdapt()) {
     TMatrixDSym* update_matrix = static_cast<TMatrixDSym*>(AdaptiveHandler->GetAdaptiveCovariance()->Clone());
     UpdateThrowMatrix(update_matrix); //Now we update and continue!
-    // Also update global step scale so we're multiplying by 2.38^2/d OR our adapted scale
-    bool verbose = false;
-    #ifdef DEBUG
-    verbose = AdaptiveHandler->GetUseRobbinsMonro();
-#endif
-    SetStepScale(AdaptiveHandler->GetAdaptionScale(), verbose);
-
     //Also Save the adaptive to file
     AdaptiveHandler->SaveAdaptiveToFile(AdaptiveHandler->GetOutFileName(), GetName());
   }
