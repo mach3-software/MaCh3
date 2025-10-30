@@ -1109,7 +1109,14 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
 
   AdaptiveHandler->SetThrowMatrixFromFile(external_file_name, external_matrix_name, external_mean_name, use_adaptive);
   SetThrowMatrix(AdaptiveHandler->GetAdaptiveCovariance());
+
+  adaptive_scale_override = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["SaveNIterations"], -1);
   ResetIndivStepScale();
+
+  if (adaptive_scale_override > 0)
+  {
+    SetStepScale(adaptive_scale_override, true);
+  }
 
   MACH3LOG_INFO("Successfully Set External Throw Matrix Stored in {}", external_file_name);
 }
@@ -1138,6 +1145,10 @@ void ParameterHandlerBase::UpdateAdaptiveCovariance(){
   //This is likely going to be the slow bit!
   if(AdaptiveHandler->IndivStepScaleAdapt()) {
     ResetIndivStepScale();
+    if (adaptive_scale_override > 0)
+    {
+      SetStepScale(adaptive_scale_override, true);
+    }
   }
 
   if(AdaptiveHandler->UpdateMatrixAdapt()) {
