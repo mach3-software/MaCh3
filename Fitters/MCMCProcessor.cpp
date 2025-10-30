@@ -4235,16 +4235,17 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
     for (int jj = start; jj < end; ++jj)
     {
       std::complex<M3::float_t> a_j = 0.0;
+      const double two_pi_over_N_jj = two_pi_over_N * jj;
       for (int n = 0; n < _N; ++n)
       {
         //if(StepNumber[n] < BurnInCut) continue;
-        std::complex<M3::float_t> exp_temp(0, two_pi_over_N * jj * n);
+        std::complex<M3::float_t> exp_temp(0, two_pi_over_N_jj * n);
         a_j += ParStep[j][n] * std::exp(exp_temp);
       }
       a_j /= std::sqrt(float(_N));
       const int _c = jj - start;
 
-      k_j[j][_c] = two_pi_over_N * jj;
+      k_j[j][_c] = two_pi_over_N_jj;
       // Equation 13
       P_j[j][_c] = std::norm(a_j);
     }
