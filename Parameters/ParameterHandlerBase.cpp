@@ -1034,6 +1034,7 @@ void ParameterHandlerBase::ResetIndivStepScale() {
 // HW: Code for throwing from separate throw matrix, needs to be set after init to ensure pos-def
 void ParameterHandlerBase::SetThrowMatrix(TMatrixDSym *cov){
 // ********************************************
+
    if (cov == nullptr) {
     MACH3LOG_ERROR("Could not find covariance matrix you provided to {}", __func__);
     throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -1135,6 +1136,7 @@ void ParameterHandlerBase::UpdateAdaptiveCovariance(){
     #ifdef DEBUG
     verbose=true;
     #endif
+    AdaptiveHandler->UpdateRobbinsMonroScale();
     SetStepScale(AdaptiveHandler->GetAdaptionScale(), verbose);
   }
 
@@ -1144,6 +1146,7 @@ void ParameterHandlerBase::UpdateAdaptiveCovariance(){
   // Set scales to 1 * optimal scale
   if(AdaptiveHandler->IndivStepScaleAdapt()) {
     ResetIndivStepScale();
+    SetStepScale(AdaptiveHandler->GetAdaptionScale());
   }
 
   if(AdaptiveHandler->UpdateMatrixAdapt()) {

@@ -239,7 +239,7 @@ void FitterBase::SaveOutput() {
   outputFile->cd();
   outTree->Write();
 
-  MACH3LOG_INFO("{} steps took {:.2f} seconds to complete. ({:.2f}s / step).", step - stepStart, clock->RealTime(), clock->RealTime() / static_cast<double>(step - stepStart));
+  MACH3LOG_INFO("{} steps took {:.2e} seconds to complete. ({:.2e}s / step).", step - stepStart, clock->RealTime(), clock->RealTime() / static_cast<double>(step - stepStart));
   MACH3LOG_INFO("{} steps were accepted.", accCount);
   #ifdef DEBUG
   if (debug)
