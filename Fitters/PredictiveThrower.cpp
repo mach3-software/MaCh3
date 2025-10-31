@@ -447,13 +447,13 @@ std::vector<std::vector<std::unique_ptr<TH2D>>> PredictiveThrower::ProduceSpectr
 // *************************
   std::vector<std::vector<double>> MaxValue(TotalNumberOfSamples);
   #ifdef MULTITHREAD
-  #pragma omp parallel for
+  #pragma omp parallel for collapse(2)
   #endif
   for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
     const int nDims = Toys[sample][0]->GetDimension();
     MaxValue[sample].resize(nDims);
-    for (int dim = 0; dim < nDims; dim++) {
-      for (int toy = 0; toy < Ntoys; ++toy) {
+    for (int toy = 0; toy < Ntoys; ++toy) {
+      for (int dim = 0; dim < nDims; dim++) {
         double max_val;
         if (nDims == 1) {
           max_val = Toys[sample][toy]->GetMaximum();
