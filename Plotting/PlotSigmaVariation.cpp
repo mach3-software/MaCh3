@@ -7,11 +7,11 @@
 
 /// @file PlotSigmaVariation.cpp
 /// @todo Integrate within StylePlotting to get fancy labels etc
-/// @todo Add support for 2D and by mode etc.
 /// @author Kamil Skwarczynski
 
 std::vector<std::string> DialNameVector;
 std::vector<std::string> SampleNameVector;
+std::vector<int> SampleMaxDim;
 std::vector<double> sigmaArray;
 
 int PriorKnot = M3::_BAD_INT_;
@@ -20,21 +20,73 @@ constexpr const int NVars = 5;
 constexpr Color_t Colours[NVars] = {kRed, kGreen+1, kBlack, kBlue+1, kOrange+1};
 constexpr ELineStyle Style[NVars] = {kDotted, kDashed, kSolid, kDashDotted, kDashDotted};
 
+/// @brief Histograms have name like ND_CC0pi_1DProj0_Norm_Param_0_sig_n3.00_val_0.25. This code is trying to extract sigma names
+void FindKnot(std::vector<double>& SigmaValues,
+              const std::string& dirname,
+              const std::string& subdirname,
+              const std::string& ProjName,
+              std::string histname) {
+  auto StripPrefix = [](std::string& str, const std::string& prefix) {
+    if (str.find(prefix + "_") == 0) {
+      str.erase(0, prefix.length() + 1);
+      if (str.find(prefix) == 0) {
+        MACH3LOG_ERROR("Failed to strip prefix '{}' from string '{}'", prefix, str);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+    } else {
+      MACH3LOG_ERROR("String '{}' does not start with expected prefix '{}'", str, prefix);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+  };
+
+  // Remove sample and dial name to avoid potential issues
+  StripPrefix(histname, subdirname);
+  StripPrefix(histname, ProjName);
+  StripPrefix(histname, dirname);
+
+  MACH3LOG_DEBUG("Name afters striping {}", histname);
+
+  double sigma = 0.0;
+  // Find the "_sig_" part in the name
+  size_t sig_pos = histname.find("_sig_");
+  // Extract the part after "_sig_"
+  std::string sigma_part = histname.substr(sig_pos + 5);
+
+  // Check if it starts with 'n' (negative) or 'p' (positive) or 'nom' (0 or prior)
+  if (histname.find("nom_") != std::string::npos) {
+    sigma = 0.0;
+    PriorKnot = static_cast<int>(SigmaValues.size());
+    MACH3LOG_DEBUG("Found prior knot {}", PriorKnot);
+  } else if (sigma_part.size() > 0 && sigma_part[0] == 'n') {
+    sigma = -std::stod(sigma_part.substr(1));
+  } else if (sigma_part.size() > 0 && sigma_part[0] == 'p') {
+    sigma = std::stod(sigma_part.substr(1));
+  } else {
+    MACH3LOG_ERROR("Weirdly formatted string {}", sigma_part);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+  MACH3LOG_DEBUG("Adding sigma {}", sigma);
+
+  SigmaValues.push_back(sigma);
+}
+
+
 /// @brief Scan inputs to figure out dial name and used sample names
 void ScanInput(std::vector<std::string>& DialNameVecr,
                std::vector<std::string>& SampleNameVec,
+               std::vector<int>& SampleDimVec,
                std::vector<double>& SigmaValues,
                const std::string& filename)
 {
   MACH3LOG_DEBUG("Starting {}", __func__);
-  TFile *infile = TFile::Open(filename.c_str());
+  TFile *infile = M3::Open(filename, "OPEN", __FILE__, __LINE__);
   TDirectoryFile *SigmaDir = infile->Get<TDirectoryFile>("SigmaVar");
 
   //Get all entries in input file
   TIter next(SigmaDir->GetListOfKeys());
   TKey *key = nullptr;
 
-  // Loop through all entries
+  // Loop over directory with dial names
   while ((key = static_cast<TKey*>(next()))) {
     // get directory names, ignore flux
     auto classname = std::string(key->GetClassName());
@@ -51,64 +103,46 @@ void ScanInput(std::vector<std::string>& DialNameVecr,
     MACH3LOG_DEBUG("Entering Dial {}", dirname);
 
     if(SampleNameVec.size() != 0) continue;
-    //loop over items in directory, hard code which th2poly we want
+    //loop over directories with sample names
     while ((subkey = static_cast<TKey*>(nextsub())))
     {
       auto subdirname = std::string(subkey->GetName());
       SampleNameVec.push_back(subdirname);
+      SampleDimVec.push_back(0);
       MACH3LOG_DEBUG("Entering Sample {}", subdirname);
-
-      if(SigmaValues.size() != 0) continue;
       SigmaDir->cd((dirname + "/" +  subdirname).c_str());
 
       TKey *subsubkey = nullptr;
       TIter nextsubsub(gDirectory->GetListOfKeys());
+
+      // Check if we already filled sigma vector
+      bool FillSigma = false;
+      if(SigmaValues.size() == 0) FillSigma = true;
+      // loop over histograms
       while ((subsubkey = static_cast<TKey*>(nextsubsub())))
       {
         auto subsubdirname = std::string(subsubkey->GetTitle());
         MACH3LOG_DEBUG("Entering Hist {}", subsubdirname);
         std::string histname = subsubdirname;
 
-        auto StripPrefix = [](std::string& str, const std::string& prefix) {
-          if (str.find(prefix + "_") == 0) {
-            str.erase(0, prefix.length() + 1);
-            if (str.find(prefix) == 0) {
-              MACH3LOG_ERROR("Failed to strip prefix '{}' from string '{}'", prefix, str);
-              throw MaCh3Exception(__FILE__, __LINE__);
-            }
-          } else {
-            MACH3LOG_ERROR("String '{}' does not start with expected prefix '{}'", str, prefix);
-            throw MaCh3Exception(__FILE__, __LINE__);
-          }
-        };
-        // Remove sample and dial name to avoid potential issues
-        StripPrefix(histname, subdirname);
-        StripPrefix(histname, dirname);
+        classname = std::string(subsubkey->GetClassName());
 
-        MACH3LOG_DEBUG("Name afters striping {}", histname);
+        if (classname != "TH1D") continue;
+        // Find if there is more dimensions
+        size_t proj_pos = histname.find("_1DProj");
+        int proj_number = -1;
 
-        double sigma = 0.0;
-        // Find the "_sig_" part in the name
-        size_t sig_pos = histname.find("_sig_");
-        // Extract the part after "_sig_"
-        std::string sigma_part = histname.substr(sig_pos + 5);
-
-        // Check if it starts with 'n' (negative) or 'p' (positive) or 'nom' (0 or prior)
-        if (histname.find("nom_") != std::string::npos) {
-          sigma = 0.0;
-          PriorKnot = static_cast<int>(SigmaValues.size());
-          MACH3LOG_DEBUG("Found prior knot {}", PriorKnot);
-        } else if (sigma_part.size() > 0 && sigma_part[0] == 'n') {
-          sigma = -std::stod(sigma_part.substr(1));
-        } else if (sigma_part.size() > 0 && sigma_part[0] == 'p') {
-          sigma = std::stod(sigma_part.substr(1));
-        } else {
-          MACH3LOG_ERROR("Weirdly formatted string {}", sigma_part);
-          throw MaCh3Exception(__FILE__ , __LINE__ );
+        if (proj_pos != std::string::npos) {
+          size_t number_start = proj_pos + 7; // skip "_1DProj"
+          size_t number_end = histname.find_first_not_of("0123456789", number_start);
+          proj_number = std::stoi(histname.substr(number_start, number_end - number_start));
         }
-        MACH3LOG_DEBUG("Adding sigma {}", sigma);
+        SampleDimVec.back() = std::max(proj_number, SampleDimVec.back());
+        MACH3LOG_DEBUG("Found dimension {} with dimension", proj_number);
 
-        SigmaValues.push_back(sigma);
+        // KS: Extract knot position from hist only we haven't done this before and for projection X
+        // Sigma are same for projection Y and Z and beyond
+        if(FillSigma && proj_number == 0) FindKnot(SigmaValues, dirname, subdirname, "1DProj" + std::to_string(proj_number), histname);
       }
     }
   }
@@ -120,6 +154,11 @@ void ScanInput(std::vector<std::string>& DialNameVecr,
 
   if(sigmaArray.size() < NVars){
     MACH3LOG_ERROR("Found sigma {}, while I have some hardcoding for {}",sigmaArray.size(), NVars);
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+
+  if(SampleDimVec.size() != SampleDimVec.size()) {
+    MACH3LOG_ERROR("Sample name vec ({}) and sample dimension vec ({}) have different sizes, something is not right");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
@@ -166,6 +205,14 @@ void PlotRatio(const std::vector<std::unique_ptr<TH1D>>& Poly,
                const std::string& outfilename)
 {
   canv->Clear();
+  gStyle->SetDrawBorder(0);
+  gStyle->SetTitleBorderSize(2);
+  gStyle->SetOptStat(0); //Set 0 to disable statistic box
+  canv->SetGrid();
+  canv->SetTopMargin(0.10);
+  canv->SetBottomMargin(0.08);
+  canv->SetRightMargin(0.05);
+  canv->SetLeftMargin(0.12);
 
   TPad* pad1 = new TPad("pad1","pad1",0.,0.25,1.,1.0);
   pad1->AppendPad();
@@ -289,20 +336,12 @@ void CompareSigVar1D(const std::string& filename, const YAML::Node& Settings)
 {
   //Get input file, make canvas and output file
   auto canvas = std::make_unique<TCanvas>("canv", "canv", 1080, 1080);
-  TFile *infile = TFile::Open(filename.c_str());
+  TFile *infile = M3::Open(filename, "OPEN", __FILE__, __LINE__);
   TDirectoryFile *SigmaDir = infile->Get<TDirectoryFile>("SigmaVar");
 
   std::string outfilename = filename.substr(0, filename.find(".root"));
   outfilename = outfilename + "_RatioPlots1d.pdf";
   gErrorIgnoreLevel = kWarning;
-  gStyle->SetDrawBorder(0);
-  gStyle->SetTitleBorderSize(2);
-  gStyle->SetOptStat(0); //Set 0 to disable statistic box
-  canvas->SetGrid();
-  canvas->SetTopMargin(0.10);
-  canvas->SetBottomMargin(0.08);
-  canvas->SetRightMargin(0.05);
-  canvas->SetLeftMargin(0.12);
   canvas->Print((outfilename+"[").c_str());
 
   auto IncludeString = GetFromManager<std::vector<std::string>>(Settings["IncludeString"], {});
@@ -314,14 +353,124 @@ void CompareSigVar1D(const std::string& filename, const YAML::Node& Settings)
     for(size_t is = 0; is < SampleNameVector.size(); is++)
     {
       if(SkipDirectory(ExcludeString, IncludeString, (DialNameVector[id] + "/" + SampleNameVector[is]).c_str())) continue;
-      MACH3LOG_INFO("Entering {}/{}", DialNameVector[id], SampleNameVector[is]);
+      MACH3LOG_INFO("{} Entering {}/{}", __func__, DialNameVector[id], SampleNameVector[is]);
+      SigmaDir->cd((DialNameVector[id] + "/" +  SampleNameVector[is]).c_str());
+
+      //set dir to current directory
+      dir = gDirectory;
+
+      // Loop over dimensions
+      for(int iDim = 0; iDim <= SampleMaxDim[is]; iDim++)
+      {
+        MACH3LOG_DEBUG("Starting loop over dimension {}", iDim);
+        //make -3,-1,0,1,3 polys
+        std::vector<std::unique_ptr<TH1D>> Projection;
+        TIter nextsub(dir->GetListOfKeys());
+        TKey *subsubkey = nullptr;
+
+        //loop over items in directory, hard code which th2poly we want
+        while ((subsubkey = static_cast<TKey*>(nextsub())))
+        {
+          auto name = std::string(subsubkey->GetName());
+          auto classname = std::string(subsubkey->GetClassName());
+          // Looking
+          const std::string ProjectionName = "_1DProj" + std::to_string(iDim);
+          const bool IsProjection = (name.find(ProjectionName) != std::string::npos);
+          if (classname == "TH1D" && IsProjection)
+          {
+            name = DialNameVector[id] + "/" + SampleNameVector[is] + "/" + name;
+            Projection.emplace_back(M3::Clone(SigmaDir->Get<TH1D>(name.c_str())));
+            MACH3LOG_DEBUG("Adding hist {}", name);
+
+          }
+        }
+        std::string Title = DialNameVector[id] + " " + SampleNameVector[is];
+        PlotRatio(Projection, canvas, Title, outfilename);
+        gDirectory->cd("..");
+      }
+    }
+  }
+
+  canvas->Print((outfilename+"]").c_str());
+  infile->Close();
+  delete infile;
+}
+
+void PlotRatio2D(const std::vector<std::unique_ptr<TH2D>>& Poly,
+                 const std::unique_ptr<TCanvas>& canv,
+                 const std::string& Title,
+                 const std::string& outfilename)
+{
+  canv->Clear();
+  gStyle->SetDrawBorder(0);
+  gStyle->SetTitleBorderSize(2);
+  gStyle->SetOptStat(0); //Set 0 to disable statistic box
+  canv->SetGrid();
+  canv->SetTopMargin(0.10);
+  canv->SetBottomMargin(0.10);
+  canv->SetLeftMargin(0.12);
+  canv->SetRightMargin(0.20);
+
+  constexpr int NRGBs = 5;
+  TColor::InitializeColors();
+  Double_t stops[NRGBs] = { 0.00, 0.25, 0.50, 0.75, 1.00 };
+  Double_t red[NRGBs]   = { 0.00, 0.25, 1.00, 1.00, 0.50 };
+  Double_t green[NRGBs] = { 0.00, 0.25, 1.00, 0.25, 0.00 };
+  Double_t blue[NRGBs]  = { 0.50, 1.00, 1.00, 0.25, 0.00 };
+  TColor::CreateGradientColorTable(5, stops, red, green, blue, 255);
+  gStyle->SetNumberContours(255);
+
+  for (int i = 0; i < static_cast<int>(Poly.size()); ++i) {
+    if (i == PriorKnot) continue; // Skip PriorKnot
+    std::unique_ptr<TH2D> Ratio = M3::Clone(Poly[i].get());
+    Ratio->Divide(Poly[PriorKnot].get());
+    Ratio->SetTitle((Title + " " + std::to_string(static_cast<int>(sigmaArray[i])) + "sigma").c_str());
+
+    const double maxz = Ratio->GetMaximum();
+    const double minz = Ratio->GetMinimum();
+    if (std::fabs(1-maxz) > std::fabs(1-minz))
+      Ratio->GetZaxis()->SetRangeUser(1-std::fabs(1-maxz),1+std::fabs(1-maxz));
+    else
+      Ratio->GetZaxis()->SetRangeUser(1-std::fabs(1-minz),1+std::fabs(1-minz));
+    Ratio->GetXaxis()->SetTitleOffset(1.1);
+    Ratio->GetYaxis()->SetTitleOffset(1.1);
+    Ratio->GetZaxis()->SetTitleOffset(1.5);
+    Ratio->GetZaxis()->SetTitle("Ratio to Prior");
+
+    Ratio->Draw("COLZ");
+    canv->Print((outfilename).c_str());
+  }
+}
+
+void CompareSigVar2D(const std::string& filename, const YAML::Node& Settings)
+{
+  //Get input file, make canvas and output file
+  auto canvas = std::make_unique<TCanvas>("canv", "canv", 1080, 1080);
+  TFile *infile = M3::Open(filename, "OPEN", __FILE__, __LINE__);
+  TDirectoryFile *SigmaDir = infile->Get<TDirectoryFile>("SigmaVar");
+
+  std::string outfilename = filename.substr(0, filename.find(".root"));
+  outfilename = outfilename + "_RatioPlots2d.pdf";
+  gErrorIgnoreLevel = kWarning;
+  canvas->Print((outfilename+"[").c_str());
+
+  auto IncludeString = GetFromManager<std::vector<std::string>>(Settings["IncludeString"], {});
+  auto ExcludeString = GetFromManager<std::vector<std::string>>(Settings["ExcludeString"], {});
+  TDirectory *dir = nullptr;
+
+  for(size_t id = 0; id < DialNameVector.size(); id++)
+  {
+    for(size_t is = 0; is < SampleNameVector.size(); is++)
+    {
+      if(SkipDirectory(ExcludeString, IncludeString, (DialNameVector[id] + "/" + SampleNameVector[is]).c_str())) continue;
+      MACH3LOG_INFO("{} Entering {}/{}", __func__, DialNameVector[id], SampleNameVector[is]);
       SigmaDir->cd((DialNameVector[id] + "/" +  SampleNameVector[is]).c_str());
 
       //set dir to current directory
       dir = gDirectory;
 
       //make -3,-1,0,1,3 polys
-      std::vector<std::unique_ptr<TH1D>> Projection;
+      std::vector<std::unique_ptr<TH2D>> Projection;
       TIter nextsub(dir->GetListOfKeys());
       TKey *subsubkey = nullptr;
 
@@ -330,15 +479,19 @@ void CompareSigVar1D(const std::string& filename, const YAML::Node& Settings)
       {
         auto name = std::string(subsubkey->GetName());
         auto classname = std::string(subsubkey->GetClassName());
-
-        if (classname == "TH1D")
+        // Looking
+        const std::string ProjectionName = "_2DProj";
+        const bool IsProjection = (name.find(ProjectionName) != std::string::npos);
+        if (classname == "TH2D" && IsProjection)
         {
           name = DialNameVector[id] + "/" + SampleNameVector[is] + "/" + name;
-          Projection.emplace_back(M3::Clone(SigmaDir->Get<TH1D>(name.c_str())));
+          Projection.emplace_back(M3::Clone(SigmaDir->Get<TH2D>(name.c_str())));
+          MACH3LOG_DEBUG("Adding hist {}", name);
+
         }
       }
       std::string Title = DialNameVector[id] + " " + SampleNameVector[is];
-      PlotRatio(Projection, canvas, Title, outfilename);
+      if(Projection.size() == sigmaArray.size()) PlotRatio2D(Projection, canvas, Title, outfilename);
       gDirectory->cd("..");
     }
   }
@@ -365,9 +518,10 @@ int main(int argc, char **argv)
   // Access the "MatrixPlotter" section
   YAML::Node settings = Config["PlotSigmaVariation"];
 
-  ScanInput(DialNameVector, SampleNameVector, sigmaArray, filename);
+  ScanInput(DialNameVector, SampleNameVector, SampleMaxDim, sigmaArray, filename);
 
   CompareSigVar1D(filename, settings);
+  CompareSigVar2D(filename, settings);
 
   return 0;
 }

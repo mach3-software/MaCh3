@@ -1366,7 +1366,15 @@ void WriteHistograms(TH1 *hist, const std::string& baseName) {
 // *************************
   if (!hist) return;
   hist->SetTitle(baseName.c_str());
-  hist->GetYaxis()->SetTitle("Events");
+  // Get the class name of the histogram
+  TString className = hist->ClassName();
+
+  // Set the appropriate axis title based on the histogram type
+  if (className.Contains("TH1")) {
+    hist->GetYaxis()->SetTitle("Events");
+  } else if (className.Contains("TH2")) {
+    hist->GetZaxis()->SetTitle("Events");
+  }
   hist->SetDirectory(nullptr);
   hist->Write(baseName.c_str());
 }
@@ -1382,38 +1390,57 @@ void WriteHistogramsByMode(SampleHandlerFD *sample,
   MaCh3Modes *modes = sample->GetMaCh3Modes();
   for (int iSample = 0; iSample < sample->GetNsamples(); ++iSample) {
     SampleDir[iSample]->cd();
-    std::string sampleName = sample->GetSampleTitle(iSample);
-    // Probably a better way of handling this logic
-    if (by_mode) {
-      for (int iMode = 0; iMode < modes->GetNModes(); ++iMode) {
-        auto modeHist = sample->Get1DVarHistByModeAndChannel(iSample, sample->GetXBinVarName(iSample), iMode);
-        WriteHistograms(modeHist, sampleName + "_" + modes->GetMaCh3ModeName(iMode) + suffix);
-        delete modeHist;
+    const std::string sampleName = sample->GetSampleTitle(iSample);
+    for(int iDim = 0; iDim < sample->GetNDim(iSample); iDim++) {
+      std::string ProjectionName = "";
+      std::string ProjectionSuffix = "_1DProj" + std::to_string(iDim);
+      if(iDim == 0) {
+        ProjectionName = sample->GetXBinVarName(iSample);
+      } else if (iDim == 1) {
+        ProjectionName = sample->GetYBinVarName(iSample);
+      } else {
+        MACH3LOG_ERROR("Not yet implemented for dimension {}", iDim+1);
+        throw MaCh3Exception(__FILE__, __LINE__);
       }
-    }
 
-    if (by_channel) {
-      for (int iChan = 0; iChan < sample->GetNOscChannels(iSample); ++iChan) {
-        auto chanHist = sample->Get1DVarHistByModeAndChannel(iSample, sample->GetXBinVarName(iSample), -1, iChan); // -1 skips over mode plotting
-        WriteHistograms(chanHist, sampleName + "_" + sample->GetFlavourName(iSample, iChan) + suffix);
-        delete chanHist;
-      }
-    }
-
-    if (by_mode && by_channel) {
-      for (int iMode = 0; iMode < modes->GetNModes(); ++iMode) {
-        for (int iChan = 0; iChan < sample->GetNOscChannels(iSample); ++iChan) {
-          auto hist = sample->Get1DVarHistByModeAndChannel(iSample, sample->GetXBinVarName(iSample), iMode, iChan);
-          WriteHistograms(hist, sampleName + "_" + modes->GetMaCh3ModeName(iMode) + "_" + sample->GetFlavourName(iSample, iChan) + suffix);
-          delete hist;
+      // Probably a better way of handling this logic
+      if (by_mode) {
+        for (int iMode = 0; iMode < modes->GetNModes(); ++iMode) {
+          auto modeHist = sample->Get1DVarHistByModeAndChannel(iSample, ProjectionName, iMode);
+          WriteHistograms(modeHist, sampleName + "_" + modes->GetMaCh3ModeName(iMode) + ProjectionSuffix + suffix);
+          delete modeHist;
         }
       }
-    }
 
-    if (!by_mode && !by_channel) {
-      auto hist = sample->Get1DVarHistByModeAndChannel(iSample, sample->GetXBinVarName(iSample));
-      WriteHistograms(hist, sampleName + suffix);
-      delete hist;
+      if (by_channel) {
+        for (int iChan = 0; iChan < sample->GetNOscChannels(iSample); ++iChan) {
+          auto chanHist = sample->Get1DVarHistByModeAndChannel(iSample, ProjectionName, -1, iChan); // -1 skips over mode plotting
+          WriteHistograms(chanHist, sampleName + "_" + sample->GetFlavourName(iSample, iChan) + ProjectionSuffix + suffix);
+          delete chanHist;
+        }
+      }
+
+      if (by_mode && by_channel) {
+        for (int iMode = 0; iMode < modes->GetNModes(); ++iMode) {
+          for (int iChan = 0; iChan < sample->GetNOscChannels(iSample); ++iChan) {
+            auto hist = sample->Get1DVarHistByModeAndChannel(iSample, ProjectionName, iMode, iChan);
+            WriteHistograms(hist, sampleName + "_" + modes->GetMaCh3ModeName(iMode) + "_" + sample->GetFlavourName(iSample, iChan) + ProjectionSuffix + suffix);
+            delete hist;
+          }
+        }
+      }
+
+      if (!by_mode && !by_channel) {
+        auto hist = sample->Get1DVarHist(iSample, ProjectionName);
+        WriteHistograms(hist, sampleName + ProjectionSuffix + suffix);
+        delete hist;
+        // Only for 2D
+        if(iDim == 1) {
+          auto hist2D = sample->Get2DVarHist(iSample, sample->GetXBinVarName(iSample), sample->GetYBinVarName(iSample));
+          WriteHistograms(hist2D, sampleName + "_2DProj" + suffix);
+          delete hist2D;
+        }
+      }
     }
   }
 }
