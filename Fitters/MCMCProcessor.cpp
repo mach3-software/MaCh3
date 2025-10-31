@@ -4289,7 +4289,6 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
     Posterior->SetLogx();
     Posterior->SetLogy();
     Posterior->SetGrid();
-    plot->Write(plot->GetName());
     plot->Draw("AL");
     func->Draw("SAME");
     if(printToPDF) Posterior->Print(CanvasName);
