@@ -26,7 +26,7 @@ You can find the most recent tags [here](https://github.com/mach3-software/MaCh3
 - Ensure the MaCh3 CMake version matches the tag you want to create. You can find it [here](https://github.com/mach3-software/MaCh3/blob/872910344714bf06c7494c1fe64a5a50d0864e24/CMakeLists.txt#L6).
 - Make sure the Doxygen version switcher is updated [here](https://github.com/mach3-software/MaCh3/blob/872910344714bf06c7494c1fe64a5a50d0864e24/Doc/MaCh3Web/footer.html#L10C1-L21C18).
 
-### Creating a tag will automatically trigger:
+### Creating a tag will automatically trigger
 - 🐋 Building a container for the newly created tag
 - 📘 Creating a matching tag for the [MaCh3Tutorial](https://github.com/mach3-software/MaCh3Tutorial) repository
 - 📝 Generating automatically created release notes
