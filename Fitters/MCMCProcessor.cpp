@@ -245,6 +245,10 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
   if (OutputFile == nullptr) MakeOutputFile();
   
   MACH3LOG_INFO("MCMCProcessor is making post-fit plots...");
+
+  int originalErrorLevel = gErrorIgnoreLevel;
+  gErrorIgnoreLevel = kFatal;
+
   // Directory for posteriors
   TDirectory *PostDir = OutputFile->mkdir("Post");
   TDirectory *PostHistDir = OutputFile->mkdir("Post_1d_hists");
@@ -421,6 +425,9 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
   delete PostDir;
   PostHistDir->Close();
   delete PostHistDir;
+
+  // restore original warning setting
+  gErrorIgnoreLevel = originalErrorLevel;
 } // Have now written the postfit projections
 
 // *******************
@@ -2142,9 +2149,6 @@ void MCMCProcessor::ScanInput() {
   //ROOT::EnableImplicitMT();
   #endif
 
-  int originalErrorLevel = gErrorIgnoreLevel;
-  gErrorIgnoreLevel = kFatal;
-
   // Open the Chain
   Chain = new TChain("posteriors","posteriors");
   Chain->Add(MCMCFile.c_str());
@@ -2239,8 +2243,6 @@ void MCMCProcessor::ScanInput() {
 
   // Basically allow loading oscillation parameters
   LoadAdditionalInfo();
-
-  gErrorIgnoreLevel = originalErrorLevel;
 }
 
 // ****************************
