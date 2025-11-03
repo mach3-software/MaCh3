@@ -250,7 +250,7 @@ void makeSplitSampleLLHScanComparisons(const std::string& paramName,
   baseSplitSamplesStack->Draw(man->getDrawOptions().c_str());
   // KS: Not sure why but need to plot after it's drawn otherwise ROOT throws segfault...
   baseSplitSamplesStack->GetYaxis()->SetTitle("-2LLH_{sam}");
-  if (man->getPlotRatios()) baseSplitSamplesStack->GetXaxis()->SetTitle("Parameter Variation");
+  if (man->getPlotRatios() == false) baseSplitSamplesStack->GetXaxis()->SetTitle("Parameter Variation");
   gPad->Modified();
   gPad->Update();
 
