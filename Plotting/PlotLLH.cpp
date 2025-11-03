@@ -231,22 +231,28 @@ void makeSplitSampleLLHScanComparisons(const std::string& paramName,
     return;
   }
 
-  THStack *baseSplitSamplesStack = new THStack(
+  auto baseSplitSamplesStack = std::make_unique<THStack>(
       paramName.c_str(), Form("%s - %s", paramName.c_str(), man->getFileLabel(0).c_str()));
-  TLegend *baseSplitSamplesLegend = new TLegend(0.37, 0.475, 0.63, 0.9);
+
+  auto baseSplitSamplesLegend = std::make_unique<TLegend>(0.37, 0.475, 0.63, 0.9);
 
   if (man->getDrawGrid())
     canv->cd(1)->SetGrid();
   else
     canv->cd(1);
 
+  canv->cd(1)->SetLeftMargin(0.15);
   std::vector<float> cumSums;
   std::vector<bool> drawLabel;
 
-  getSplitSampleStack(0, paramName, LLH_main, cumSums, drawLabel, baseSplitSamplesStack,
-                      baseSplitSamplesLegend);
-
+  getSplitSampleStack(0, paramName, LLH_main, cumSums, drawLabel, baseSplitSamplesStack.get(),
+                      baseSplitSamplesLegend.get());
   baseSplitSamplesStack->Draw(man->getDrawOptions().c_str());
+  // KS: Not sure why but need to plot after it's drawn otherwise ROOT throws segfault...
+  baseSplitSamplesStack->GetYaxis()->SetTitle("-2LLH_{sam}");
+  if (man->getPlotRatios() == false) baseSplitSamplesStack->GetXaxis()->SetTitle("Parameter Variation");
+  gPad->Modified();
+  gPad->Update();
 
   if (totalOnSplitPlots)
   {
@@ -257,7 +263,7 @@ void makeSplitSampleLLHScanComparisons(const std::string& paramName,
 
   baseSplitSamplesLegend->Draw();
 
-  TLatex *label = new TLatex;
+  auto label = std::make_unique<TLatex>();
   // format the label
   label->SetTextAlign(11);
   label->SetTextAngle(-55);
@@ -292,7 +298,9 @@ void makeSplitSampleLLHScanComparisons(const std::string& paramName,
     THStack *splitSamplesStack =
         new THStack(paramName.c_str(),
                     Form("%s - %s", paramName.c_str(), man->getFileLabel(extraFileIdx).c_str()));
-    TLegend *splitSamplesLegend = new TLegend(0.37, 0.475, 0.63, 0.9);
+
+    auto splitSamplesLegend = std::make_unique<TLegend>(0.37, 0.475, 0.63, 0.9);
+
 
     splitSamplesStack->SetBit(kCanDelete);
     splitSamplesLegend->SetBit(kCanDelete);
@@ -301,7 +309,6 @@ void makeSplitSampleLLHScanComparisons(const std::string& paramName,
     if (compLLH_main.GetNbinsX() == 1)
     {
       delete splitSamplesStack;
-      delete splitSamplesLegend;
       continue;
     }
 
@@ -310,10 +317,10 @@ void makeSplitSampleLLHScanComparisons(const std::string& paramName,
     // the comparisson LLH is much smaller than the baseline one
     if (sameAxis)
       getSplitSampleStack(extraFileIdx, paramName, compLLH_main, extraCumSums, extraDrawLabel,
-                          splitSamplesStack, splitSamplesLegend, LLH_main.Integral());
+                          splitSamplesStack, splitSamplesLegend.get(), LLH_main.Integral());
     else
       getSplitSampleStack(extraFileIdx, paramName, compLLH_main, extraCumSums, extraDrawLabel,
-                          splitSamplesStack, splitSamplesLegend);
+                          splitSamplesStack, splitSamplesLegend.get());
 
     // go to the pad for the histograms
     if (man->getDrawGrid())
@@ -322,8 +329,6 @@ void makeSplitSampleLLHScanComparisons(const std::string& paramName,
     LLHPad->cd();
 
     splitSamplesStack->Draw(man->getDrawOptions().c_str());
-    splitSamplesStack->GetXaxis()->SetTitle("Parameter Variation");
-    splitSamplesStack->GetYaxis()->SetTitle("-2LLH_{sam}");
     if (sameAxis)
       splitSamplesStack->SetMaximum(baseSplitSamplesStack->GetMaximum());
 
@@ -375,12 +380,7 @@ void makeSplitSampleLLHScanComparisons(const std::string& paramName,
       drawRatioStack(splitSamplesStackRatios);
     }
   }
-
   canv->SaveAs(outputFileName.c_str());
-
-  delete label;
-  delete baseSplitSamplesStack;
-  delete baseSplitSamplesLegend;
 }
 
 int PlotLLH() {
