@@ -3,9 +3,12 @@
 // MaCh3 Includes
 #include "manager/manager.h"
 #include "covariance/CovarianceUtils.h"
-#include "Math/DistFunc.h"
 
-namespace adaptive_mcmc
+_MaCh3_Safe_Include_Start_ //{
+#include "Math/DistFunc.h"
+    _MaCh3_Safe_Include_End_ //}
+
+    namespace adaptive_mcmc
 {
 
   /// @brief Contains information about adaptive covariance matrix
@@ -177,10 +180,6 @@ namespace adaptive_mcmc
     /// @brief Get the current adaption scale
     double GetAdaptionScale()
     {
-      if (use_robbins_monro)
-      {
-        UpdateRobbinsMonroScale();
-      }
       return adaption_scale;
     }
 
@@ -190,9 +189,10 @@ namespace adaptive_mcmc
       return use_robbins_monro;
     }
 
-  private:
     /// Update the scale factor for Robbins-Monro adaption
     void UpdateRobbinsMonroScale();
+
+  private:
     /// Calculate the constant step length for Robbins-Monro adaption
     void CalculateRobbinsMonroStepLength();
 

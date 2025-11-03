@@ -1110,25 +1110,28 @@ void covarianceBase::updateAdaptiveCovariance()
   /// Need to adjust the scale every step
   if (AdaptiveHandler->GetUseRobbinsMonro())
   {
-    setStepScale(AdaptiveHandler->GetAdaptionScale(), false);
+    bool verbose = false;
+#ifdef DEBUG
+    verbose = true;
+#endif
+    AdaptiveHandler->UpdateRobbinsMonroScale();
+    setStepScale(AdaptiveHandler->GetAdaptionScale(), verbose);
   }
 
   // Call main adaption function
   AdaptiveHandler->UpdateAdaptiveCovariance();
 
-  // This is likely going to be the slow bit!
+  // Set scales to 1 * optimal scale
   if (AdaptiveHandler->IndivStepScaleAdapt())
   {
     resetIndivStepScale();
+    setStepScale(AdaptiveHandler->GetAdaptionScale());
   }
 
   if (AdaptiveHandler->UpdateMatrixAdapt())
   {
     TMatrixDSym *update_matrix = static_cast<TMatrixDSym *>(AdaptiveHandler->GetAdaptiveCovariance()->Clone());
     updateThrowMatrix(update_matrix); // Now we update and continue!
-    // Also update global step scale so we're multiplying by 2.38^2/d OR our adapted scale
-    setStepScale(AdaptiveHandler->GetAdaptionScale(), AdaptiveHandler->GetUseRobbinsMonro());
-
     // Also Save the adaptive to file
     AdaptiveHandler->SaveAdaptiveToFile(AdaptiveHandler->GetOutFileName(), getName());
   }
