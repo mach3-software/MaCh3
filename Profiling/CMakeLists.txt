@@ -3,16 +3,12 @@ set(HEADERS
     Profiling.h
 )
 
-add_library(Profiling SHARED
-    ${tracy_SOURCE_DIR}/public/TracyClient.cpp
-)
-
-set_target_properties(Profiling PROPERTIES
-    PUBLIC_HEADER "${HEADERS}"
-    EXPORT_NAME Profiling
-)
-
 if(MaCh3_SAMPLED_PROFILING_ENABLED OR MaCh3_INSTRUMENTED_PROFILING_ENABLED)
+
+    add_library(Profiling SHARED
+        ${tracy_SOURCE_DIR}/public/TracyClient.cpp
+    )
+
     target_compile_definitions(Profiling PUBLIC TRACY_ENABLE)
 
     if(MaCh3_INSTRUMENTED_PROFILING_ENABLED)
@@ -31,7 +27,16 @@ if(MaCh3_SAMPLED_PROFILING_ENABLED OR MaCh3_INSTRUMENTED_PROFILING_ENABLED)
         PUBLIC_HEADER DESTINATION include/tracy
     )
 
+else()
+
+    add_library(Profiling INTERFACE)
+
 endif()
+
+set_target_properties(Profiling PROPERTIES
+    PUBLIC_HEADER "${HEADERS}"
+    EXPORT_NAME Profiling
+)
 
 install(TARGETS Profiling
         EXPORT MaCh3-targets
