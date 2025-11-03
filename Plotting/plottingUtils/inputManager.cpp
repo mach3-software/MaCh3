@@ -405,6 +405,12 @@ bool InputManager::findRawChainSteps(InputFile &inputFileDef, const std::string 
       double prior, priorError; // <- will be discarded
       inputFileDef.mcmcProc->GetNthParameter(paramIdx, prior, priorError, title);
 
+      // KS: Fitter Base output used for LLH only may be ill-configured
+      if (!inputFileDef.posteriorTree->GetBranch(branchNames[paramIdx])) {
+        MACH3LOG_DEBUG("Branch {} not found in chain, skipping!", branchNames[paramIdx]);
+        continue;
+      }
+
       if ( strEndsWith(title.Data(), specificName) )
       {
         wasFound = true;
