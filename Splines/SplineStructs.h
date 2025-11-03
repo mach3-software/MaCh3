@@ -3,6 +3,7 @@
 // MaCh3  includes
 #include "Parameters/ParameterHandlerGeneric.h"
 #include "Parameters/ParameterStructs.h"
+#include "Profiling/Profiling.h"
 
 #include <cmath>
 
@@ -50,6 +51,9 @@ struct FastSplineInfo {
 /// @brief EM: Apply capping to knot weight for specified spline parameter. param graph needs to have been set in xsecgraph array first
 inline void ApplyKnotWeightCap(TGraph* xsecgraph, const int splineParsIndex, ParameterHandlerGeneric* XsecCov) {
 // ***************************************************************************
+
+  MaCh3_ProfileScope;
+
   if(xsecgraph == nullptr){
     MACH3LOG_ERROR("hmmm looks like you're trying to apply capping for spline parameter {} but it hasn't been set in xsecgraph yet", XsecCov->GetParFancyName(splineParsIndex));
     throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -99,6 +103,9 @@ inline void ApplyKnotWeightCap(TGraph* xsecgraph, const int splineParsIndex, Par
 /// @brief EM: Apply capping to knot weight for specified spline parameter. param graph needs to have been set in Spline array first
 inline void ApplyKnotWeightCapTSpline3(TSpline3* &Spline, const int splineParsIndex, ParameterHandlerGeneric* XsecCov) {
 // ***************************************************************************
+
+  MaCh3_ProfileScope;
+  
   if(Spline == nullptr) {
     MACH3LOG_ERROR("hmmm looks like you're trying to apply capping for spline parameter {} but it hasn't been set in Spline yet", XsecCov->GetParFancyName(splineParsIndex));
     throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -192,6 +199,9 @@ public:
 
   /// @brief Evaluate a variation
   inline double Eval(const double var) override {
+
+    MaCh3_ProfileScope;
+  
     return Par[1]+Par[0]*var;
 
     /* FIXME in future we might introduce more TF1
@@ -215,11 +225,17 @@ public:
 
   /// @brief Set a parameter to a value
   inline void SetParameter(M3::int_t Parameter, M3::float_t Value) {
+    
+    MaCh3_ProfileScope;
+  
     Par[Parameter] = Value;
   }
 
   /// @brief Get a parameter value
   double GetParameter(M3::int_t Parameter) {
+
+    MaCh3_ProfileScope;
+  
     if (Parameter > length) {
       MACH3LOG_ERROR("You requested parameter number {} but length is {} parameters", Parameter, length);
       throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -672,6 +688,9 @@ public:
   /// @brief Find the segment relevant to this variation in x
   /// @note See `root/hist/hist/src/TSpline3::FindX(double)` or `FindSplineSegment`
   inline int FindX(double x) {
+
+    MaCh3_ProfileScope;
+  
     // The segment we're interested in (klow in ROOT code)
     int segment = 0;
     int kHigh = nPoints-1;
@@ -706,6 +725,9 @@ public:
 
   /// @brief CW: Evaluate the weight from a variation
   inline double Eval(double var) override {
+
+    MaCh3_ProfileScope;
+  
     // Get the segment for this variation
     int segment = FindX(var);
     // The get the coefficients for this variation

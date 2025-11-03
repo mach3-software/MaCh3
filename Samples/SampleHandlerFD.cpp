@@ -10,6 +10,9 @@
 SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGeneric* xsec_cov,
                                  const std::shared_ptr<OscillationHandler>& OscillatorObj_) : SampleHandlerBase() {
 // ************************************************
+
+  MaCh3_ProfileScope;
+  
   MACH3LOG_INFO("-------------------------------------------------------------------");
   MACH3LOG_INFO("Creating SampleHandlerFD object");
 
@@ -44,6 +47,9 @@ SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGen
 }
 
 SampleHandlerFD::~SampleHandlerFD() {
+
+  MaCh3_ProfileScope;
+  
   MACH3LOG_DEBUG("I'm deleting SampleHandlerFD");
   
   if (SampleHandlerFD_array != nullptr) delete[] SampleHandlerFD_array;
@@ -56,6 +62,9 @@ SampleHandlerFD::~SampleHandlerFD() {
 
 void SampleHandlerFD::ReadConfig()
 {
+
+  MaCh3_ProfileScope;
+  
   auto ModeName = Get<std::string>(SampleManager->raw()["MaCh3ModeConfig"], __FILE__ , __LINE__);
   Modes = std::make_unique<MaCh3Modes>(ModeName);
   //SampleName has to be provided in the sample yaml otherwise this will throw an exception
@@ -161,6 +170,9 @@ void SampleHandlerFD::LoadSingleSample(const int iSample, const YAML::Node& Samp
 }
 
 void SampleHandlerFD::Initialise() {
+
+  MaCh3_ProfileScope;
+  
   //First grab all the information from your sample config via your manager
   ReadConfig();
 
@@ -215,6 +227,9 @@ void SampleHandlerFD::Initialise() {
 // ************************************************
 void SampleHandlerFD::SetupKinematicMap() {
 // ************************************************
+
+  MaCh3_ProfileScope;
+  
   if(KinematicParameters == nullptr || ReversedKinematicParameters == nullptr) {
     MACH3LOG_INFO("Map KinematicParameters or ReversedKinematicParameters hasn't been initialised");
     throw MaCh3Exception(__FILE__, __LINE__);
@@ -238,6 +253,9 @@ void SampleHandlerFD::SetupKinematicMap() {
 // ************************************************
 void SampleHandlerFD::FillMCHist(const int Sample, const int Dimension) {
 // ************************************************
+
+  MaCh3_ProfileScope;
+  
   // DB Commented out by default - Code heading towards GetLikelihood using arrays instead of root objects
   // Wouldn't actually need this for GetLikelihood as TH objects wouldn't be filled
   if(Dimension == 1){
@@ -267,6 +285,9 @@ void SampleHandlerFD::FillMCHist(const int Sample, const int Dimension) {
 // ************************************************
 bool SampleHandlerFD::IsEventSelected(const int iSample, const int iEvent) {
 // ************************************************
+
+  MaCh3_ProfileScope;
+  
   const auto& SampleSelection = Selection[iSample];
   const int SelectionSize = static_cast<int>(SampleSelection.size());
   for (int iSelection = 0; iSelection < SelectionSize; ++iSelection) {
@@ -282,6 +303,9 @@ bool SampleHandlerFD::IsEventSelected(const int iSample, const int iEvent) {
 
 // === JM Define function to check if sub-event is selected ===
 bool SampleHandlerFD::IsSubEventSelected(const std::vector<KinematicCut> &SubEventCuts, const int iEvent, const unsigned int iSubEvent, size_t nsubevents) {
+
+  MaCh3_ProfileScope;
+  
   for (unsigned int iSelection=0;iSelection < SubEventCuts.size() ;iSelection++) {
     std::vector<double> Vec = ReturnKinematicVector(SubEventCuts[iSelection].ParamToCutOnIt, iEvent);
     if (nsubevents != Vec.size()) {
@@ -302,6 +326,9 @@ bool SampleHandlerFD::IsSubEventSelected(const std::vector<KinematicCut> &SubEve
 // Reweight function
 void SampleHandlerFD::Reweight() {
 //************************************************
+
+  MaCh3_ProfileScope;
+  
   //KS: Reset the histograms before reweight 
   ResetHistograms();
   
@@ -332,6 +359,9 @@ void SampleHandlerFD::Reweight() {
 // equivalent of SampleDetails._hPDF2D->GetBinContent(2,2) {Noticing the offset}
 void SampleHandlerFD::FillArray() {
 //************************************************
+
+  MaCh3_ProfileScope;
+  
   //DB Reset which cuts to apply
   Selection = StoredSelection;
   
@@ -386,6 +416,9 @@ void SampleHandlerFD::FillArray() {
 /// Multithreaded version of fillArray @see fillArray()
 void SampleHandlerFD::FillArray_MP() {
 // ************************************************
+
+  MaCh3_ProfileScope;
+  
   //DB Reset which cuts to apply
   Selection = StoredSelection;
 
@@ -497,6 +530,9 @@ void SampleHandlerFD::FillArray_MP() {
 // Helper function to reset the data and MC histograms
 void SampleHandlerFD::ResetHistograms() {
 // **************************************************  
+
+  MaCh3_ProfileScope;
+  
   //DB Reset values stored in PDF array to 0.
   // Don't openMP this; no significant gain
   #ifdef MULTITHREAD
@@ -509,6 +545,9 @@ void SampleHandlerFD::ResetHistograms() {
 } // end function
 
 void SampleHandlerFD::RegisterIndividualFunctionalParameter(const std::string& fpName, int fpEnum, FuncParFuncType fpFunc){
+
+  MaCh3_ProfileScope;
+  
   // Add protections to not add the same functional parameter twice
   if (funcParsNamesMap.find(fpName) != funcParsNamesMap.end()) {
     MACH3LOG_ERROR("Functional parameter {} already registered in funcParsNamesMap with enum {}", fpName, funcParsNamesMap[fpName]);
@@ -528,6 +567,9 @@ void SampleHandlerFD::RegisterIndividualFunctionalParameter(const std::string& f
 }
 
 void SampleHandlerFD::SetupFunctionalParameters() {
+
+  MaCh3_ProfileScope;
+  
   funcParsVec = ParHandler->GetFunctionalParametersFromSampleName(SampleHandlerName);
   // RegisterFunctionalParameters is implemented in experiment-specific code, 
   // which calls RegisterIndividualFuncPar to populate funcParsNamesMap, funcParsNamesVec, and funcParsFuncMap
@@ -603,6 +645,9 @@ void SampleHandlerFD::SetupFunctionalParameters() {
 }
 
 void SampleHandlerFD::ApplyShifts(int iEvent) {
+
+  MaCh3_ProfileScope;
+  
   // Given a sample and event, apply the shifts to the event based on the vector of functional parameter enums
   // First reset shifted array back to nominal values
   resetShifts(iEvent);
@@ -627,6 +672,9 @@ void SampleHandlerFD::ApplyShifts(int iEvent) {
 // Calculate the spline weight for one event
 M3::float_t SampleHandlerFD::CalcWeightSpline(const FarDetectorCoreInfo* MCEvent) const {
 // ***************************************************************************
+
+  MaCh3_ProfileScope;
+  
   M3::float_t spline_weight = 1.0;
   const int nSplines = static_cast<int>(MCEvent->xsec_spline_pointers.size());
   //DB Xsec syst
@@ -644,6 +692,9 @@ M3::float_t SampleHandlerFD::CalcWeightSpline(const FarDetectorCoreInfo* MCEvent
 // Calculate the normalisation weight for an event
 M3::float_t SampleHandlerFD::CalcWeightNorm(const FarDetectorCoreInfo* MCEvent) const {
 // ***************************************************************************
+
+  MaCh3_ProfileScope;
+  
   M3::float_t xsecw = 1.0;
   const int nNorms = static_cast<int>(MCEvent->xsec_norm_pointers.size());
   //Loop over stored normalisation and function pointers
@@ -667,6 +718,9 @@ M3::float_t SampleHandlerFD::CalcWeightNorm(const FarDetectorCoreInfo* MCEvent) 
 // Setup the norm parameters
 void SampleHandlerFD::SetupNormParameters() {
 // ***************************************************************************
+
+  MaCh3_ProfileScope;
+  
   std::vector< std::vector< int > > xsec_norms_bins(GetNEvents());
 
   std::vector<NormParameter> norm_parameters = ParHandler->GetNormParsFromSampleName(GetName());
@@ -696,6 +750,9 @@ void SampleHandlerFD::SetupNormParameters() {
 //A way to check whether a normalisation parameter applies to an event or not
 void SampleHandlerFD::CalcNormsBins(std::vector<NormParameter>& norm_parameters, std::vector< std::vector< int > >& xsec_norms_bins) {
 // ************************************************
+
+  MaCh3_ProfileScope;
+  
   #ifdef DEBUG
   std::vector<int> VerboseCounter(norm_parameters.size(), 0);
   #endif
@@ -803,6 +860,9 @@ void SampleHandlerFD::CalcNormsBins(std::vector<NormParameter>& norm_parameters,
 // ************************************************
 void SampleHandlerFD::SetupReweightArrays() {
 // ************************************************
+
+  MaCh3_ProfileScope;
+  
   SampleHandlerFD_array = new double[Binning->GetNBins()];
   SampleHandlerFD_array_w2 = new double[Binning->GetNBins()];
   SampleHandlerFD_data = new double[Binning->GetNBins()];
@@ -817,6 +877,9 @@ void SampleHandlerFD::SetupReweightArrays() {
 // ************************************************
 void SampleHandlerFD::SetBinning() {
 // ************************************************
+  
+  MaCh3_ProfileScope;
+  
   for(int iSample = 0; iSample < GetNsamples(); iSample++)
   {
     auto XVec = Binning->GetXBinEdges(iSample);
@@ -841,6 +904,9 @@ void SampleHandlerFD::SetBinning() {
 // ************************************************
 void SampleHandlerFD::FindNominalBinAndEdges() {
 // ************************************************
+
+  MaCh3_ProfileScope;
+  
   for (unsigned int event_i = 0; event_i < GetNEvents(); event_i++) {
     int Sample = MCSamples[event_i].NominalSample;
 
@@ -902,6 +968,9 @@ void SampleHandlerFD::FindNominalBinAndEdges() {
 // ************************************************
 TH1* SampleHandlerFD::GetW2Hist(const int Sample, const int Dimension) {
 // ************************************************
+
+  MaCh3_ProfileScope;
+  
   if(Dimension == 1) {
     TH1D* W2Hist = dynamic_cast<TH1D*>(SampleDetails[Sample]._hPDF1D->Clone((SampleDetails[Sample]._hPDF1D->GetName() + std::string("_W2")).c_str()));
     if (!W2Hist) {
@@ -940,6 +1009,9 @@ TH1* SampleHandlerFD::GetW2Hist(const int Sample, const int Dimension) {
 // ************************************************
 TH1* SampleHandlerFD::GetMCHist(const int Sample, const int Dimension) {
 // ************************************************
+
+  MaCh3_ProfileScope;
+  
   FillMCHist(Sample, Dimension);
 
   if(Dimension == 1) {
@@ -955,6 +1027,9 @@ TH1* SampleHandlerFD::GetMCHist(const int Sample, const int Dimension) {
 // ************************************************
 TH1* SampleHandlerFD::GetDataHist(const int Sample, const int Dimension) {
 // ************************************************
+
+  MaCh3_ProfileScope;
+  
   if(Dimension == 1) {
     return SampleDetails[Sample].dathist;
   } else if(Dimension == 2) {
@@ -1037,6 +1112,9 @@ void SampleHandlerFD::AddData(const int Sample, std::vector< std::vector <double
 }
 
 void SampleHandlerFD::AddData(const int Sample, TH1D* Data) {
+
+  MaCh3_ProfileScope;
+  
   MACH3LOG_INFO("Adding 1D data histogram: {} with {:.2f} events", Data->GetTitle(), Data->Integral());
   if (SampleDetails[Sample].dathist != nullptr) {
     delete SampleDetails[Sample].dathist;
@@ -1065,6 +1143,9 @@ void SampleHandlerFD::AddData(const int Sample, TH1D* Data) {
 }
 
 void SampleHandlerFD::AddData(const int Sample, TH2D* Data) {
+
+  MaCh3_ProfileScope;
+  
   MACH3LOG_INFO("Adding 2D data histogram: {} with {:.2f} events", Data->GetTitle(), Data->Integral());
   if (SampleDetails[Sample].dathist2d != nullptr) {
     delete SampleDetails[Sample].dathist2d;
@@ -1093,6 +1174,9 @@ void SampleHandlerFD::AddData(const int Sample, TH2D* Data) {
 // ************************************************
 void SampleHandlerFD::InitialiseNuOscillatorObjects() {
 // ************************************************
+
+  MaCh3_ProfileScope;
+  
   auto NuOscillatorConfigFile = Get<std::string>(SampleManager->raw()["NuOsc"]["NuOscConfigFile"], __FILE__ , __LINE__);
   auto EqualBinningPerOscChannel = Get<bool>(SampleManager->raw()["NuOsc"]["EqualBinningPerOscChannel"], __FILE__ , __LINE__);
 
@@ -1153,6 +1237,9 @@ void SampleHandlerFD::InitialiseNuOscillatorObjects() {
 }
 
 void SampleHandlerFD::SetupNuOscillatorPointers() {
+
+  MaCh3_ProfileScope;
+  
   for (unsigned int iEvent=0;iEvent<GetNEvents();iEvent++) {
     MCSamples[iEvent].osc_w_pointer = &M3::Unity;
     if (MCSamples[iEvent].isNC) {
@@ -1192,6 +1279,9 @@ void SampleHandlerFD::SetupNuOscillatorPointers() {
 }
 
 std::string SampleHandlerFD::GetName() const {
+
+  MaCh3_ProfileScope;
+  
   //ETA - extra safety to make sure SampleHandlerName is actually set
   // probably unnecessary due to the requirement for it to be in the yaml config
   if(SampleHandlerName.length() == 0) {
@@ -1203,6 +1293,9 @@ std::string SampleHandlerFD::GetName() const {
 }
 
 M3::float_t SampleHandlerFD::GetEventWeight(const int iEntry) const {
+
+  MaCh3_ProfileScope;
+  
   M3::float_t totalweight = 1.0;
   const int nParams = static_cast<int>(MCSamples[iEntry].total_weight_pointers.size());
   #ifdef MULTITHREAD
@@ -1218,6 +1311,9 @@ M3::float_t SampleHandlerFD::GetEventWeight(const int iEntry) const {
 // Finds the binned spline that an event should apply to and stored them in a
 // a vector for easy evaluation in the fillArray() function.
 void SampleHandlerFD::FillSplineBins() {
+
+  MaCh3_ProfileScope;
+  
   //Now loop over events and get the spline bin for each event
   for (unsigned int j = 0; j < GetNEvents(); ++j) {
     const int SampleIndex = MCSamples[j].NominalSample;
@@ -1256,6 +1352,9 @@ void SampleHandlerFD::FillSplineBins() {
 // ************************************************
 double SampleHandlerFD::GetSampleLikelihood(const int isample) const {
 // ************************************************
+
+  MaCh3_ProfileScope;
+  
   const int Start = Binning->GetSampleStartBin(isample);
   const int End = Binning->GetSampleEndBin(isample);
 
@@ -1278,6 +1377,9 @@ double SampleHandlerFD::GetSampleLikelihood(const int isample) const {
 // ************************************************
 double SampleHandlerFD::GetLikelihood() const {
 // ************************************************
+
+  MaCh3_ProfileScope;
+  
   if (SampleHandlerFD_data == nullptr) {
     MACH3LOG_ERROR("Data sample is empty! Can't calculate a likelihood!");
     throw MaCh3Exception(__FILE__, __LINE__);
@@ -1302,6 +1404,9 @@ double SampleHandlerFD::GetLikelihood() const {
 // ************************************************
 void SampleHandlerFD::SaveAdditionalInfo(TDirectory* Dir) {
 // ************************************************
+
+  MaCh3_ProfileScope;
+  
   Dir->cd();
 
   YAML::Node Config = SampleManager->raw();
@@ -1337,6 +1442,9 @@ void SampleHandlerFD::SaveAdditionalInfo(TDirectory* Dir) {
 }
 
 void SampleHandlerFD::InitialiseSplineObject() {
+
+  MaCh3_ProfileScope;
+  
   bool LoadSplineFile = GetFromManager<bool>(SampleManager->raw()["InputFiles"]["LoadSplineFile"], false, __FILE__, __LINE__);
   bool PrepSplineFile = GetFromManager<bool>(SampleManager->raw()["InputFiles"]["PrepSplineFile"], false, __FILE__, __LINE__);
   auto SplineFileName = GetFromManager<std::string>(SampleManager->raw()["InputFiles"]["SplineFileName"],
@@ -1375,6 +1483,9 @@ void SampleHandlerFD::InitialiseSplineObject() {
 TH1* SampleHandlerFD::Get1DVarHist(const int iSample, const std::string& ProjectionVar_Str, const std::vector< KinematicCut >& EventSelectionVec,
     int WeightStyle, TAxis* Axis, const std::vector< KinematicCut >& SubEventSelectionVec) {
 // ************************************************
+
+  MaCh3_ProfileScope;
+  
   //DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.
   //   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset
   std::vector< std::vector< KinematicCut > > tmp_Selection = Selection;
@@ -1428,6 +1539,9 @@ TH1* SampleHandlerFD::Get1DVarHist(const int iSample, const std::string& Project
 }
 
 void SampleHandlerFD::Fill1DSubEventHist(const int iSample, TH1D* _h1DVar, const std::string& ProjectionVar_Str, const std::vector< KinematicCut >& SubEventSelectionVec, int WeightStyle) {
+  
+  MaCh3_ProfileScope;
+  
   int ProjectionVar_Int = ReturnKinematicVectorFromString(ProjectionVar_Str);
 
   //JM Loop over all events
@@ -1456,6 +1570,9 @@ void SampleHandlerFD::Fill1DSubEventHist(const int iSample, TH1D* _h1DVar, const
 TH2* SampleHandlerFD::Get2DVarHist(const int iSample, const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY,
     const std::vector< KinematicCut >& EventSelectionVec, int WeightStyle, TAxis* AxisX, TAxis* AxisY, const std::vector< KinematicCut >& SubEventSelectionVec) {
 // ************************************************
+
+  MaCh3_ProfileScope;
+  
   //DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.
   //   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset
   std::vector< std::vector< KinematicCut > > tmp_Selection = Selection;
@@ -1512,6 +1629,9 @@ TH2* SampleHandlerFD::Get2DVarHist(const int iSample, const std::string& Project
 
 void SampleHandlerFD::Fill2DSubEventHist(const int iSample, TH2D* _h2DVar, const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY,
     const std::vector< KinematicCut >& SubEventSelectionVec, int WeightStyle) {
+
+  MaCh3_ProfileScope;
+  
   bool IsSubEventVarX = IsSubEventVarString(ProjectionVar_StrX);
   bool IsSubEventVarY = IsSubEventVarString(ProjectionVar_StrY);   
 
@@ -1568,6 +1688,9 @@ void SampleHandlerFD::Fill2DSubEventHist(const int iSample, TH2D* _h2DVar, const
 // ************************************************
 int SampleHandlerFD::ReturnKinematicParameterFromString(const std::string& KinematicParameterStr) const {
 // ************************************************
+
+  MaCh3_ProfileScope;
+  
   auto it = KinematicParameters->find(KinematicParameterStr);
   if (it != KinematicParameters->end()) return it->second;
 
@@ -1580,6 +1703,9 @@ int SampleHandlerFD::ReturnKinematicParameterFromString(const std::string& Kinem
 // ************************************************
 std::string SampleHandlerFD::ReturnStringFromKinematicParameter(const int KinematicParameter) const {
 // ************************************************
+
+  MaCh3_ProfileScope;
+  
   auto it = ReversedKinematicParameters->find(KinematicParameter);
   if (it != ReversedKinematicParameters->end()) {
     return it->second;
@@ -1595,6 +1721,9 @@ std::string SampleHandlerFD::ReturnStringFromKinematicParameter(const int Kinema
 // ************************************************
 int SampleHandlerFD::ReturnKinematicVectorFromString(const std::string& KinematicVectorStr) const {
 // ************************************************
+
+  MaCh3_ProfileScope;
+  
   auto it = KinematicVectors->find(KinematicVectorStr);
   if (it != KinematicVectors->end()) return it->second;
 
@@ -1607,6 +1736,9 @@ int SampleHandlerFD::ReturnKinematicVectorFromString(const std::string& Kinemati
 // ************************************************
 std::string SampleHandlerFD::ReturnStringFromKinematicVector(const int KinematicVector) const {
 // ************************************************
+
+  MaCh3_ProfileScope;
+  
   auto it = ReversedKinematicVectors->find(KinematicVector);
   if (it != ReversedKinematicVectors->end()) {
     return it->second;
@@ -1621,6 +1753,9 @@ std::string SampleHandlerFD::ReturnStringFromKinematicVector(const int Kinematic
 // ************************************************
 std::vector<double> SampleHandlerFD::ReturnKinematicParameterBinning(const int Sample, const std::string& KinematicParameter) const {
 // ************************************************
+
+  MaCh3_ProfileScope;
+  
   // If x or y variable return used binning
   if(KinematicParameter == GetXBinVarName(Sample)) {
     return Binning->GetXBinEdges(Sample);
@@ -1654,6 +1789,9 @@ std::vector<double> SampleHandlerFD::ReturnKinematicParameterBinning(const int S
 
 
 bool SampleHandlerFD::IsSubEventVarString(const std::string& VarStr) {
+
+  MaCh3_ProfileScope;
+  
   if (KinematicVectors == nullptr) return false;
 
   if (KinematicVectors->count(VarStr)) {
@@ -1669,6 +1807,9 @@ bool SampleHandlerFD::IsSubEventVarString(const std::string& VarStr) {
 
 TH1* SampleHandlerFD::Get1DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_Str,
     int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* Axis) {
+
+  MaCh3_ProfileScope;
+  
   bool fChannel;
   bool fMode;
 
@@ -1719,6 +1860,9 @@ TH1* SampleHandlerFD::Get1DVarHistByModeAndChannel(const int iSample, const std:
 
 TH2* SampleHandlerFD::Get2DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY,
     int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
+
+  MaCh3_ProfileScope;
+  
   bool fChannel;
   bool fMode;
 
@@ -1768,6 +1912,9 @@ TH2* SampleHandlerFD::Get2DVarHistByModeAndChannel(const int iSample, const std:
 }
 
 void SampleHandlerFD::PrintIntegral(const int iSample, const TString& OutputFileName, const int WeightStyle, const TString& OutputCSVFileName) {
+  
+  MaCh3_ProfileScope;
+  
   constexpr int space = 14;
 
   bool printToFile=false;
@@ -1910,6 +2057,9 @@ void SampleHandlerFD::PrintIntegral(const int iSample, const TString& OutputFile
 }
 
 std::vector<TH1*> SampleHandlerFD::ReturnHistsBySelection1D(const int iSample, std::string KinematicProjection, int Selection1, int Selection2, int WeightStyle, TAxis* XAxis) {
+  
+  MaCh3_ProfileScope;
+  
   std::vector<TH1*> hHistList;
   std::string legendEntry;
 
@@ -1949,6 +2099,9 @@ std::vector<TH2*> SampleHandlerFD::ReturnHistsBySelection2D(const int iSample, s
                                                             int Selection1, int Selection2, int WeightStyle,
                                                             TAxis* XAxis, TAxis* YAxis) {
 // ************************************************
+
+  MaCh3_ProfileScope;
+  
   std::vector<TH2*> hHistList;
 
   int iMax = -1;
@@ -1978,6 +2131,9 @@ std::vector<TH2*> SampleHandlerFD::ReturnHistsBySelection2D(const int iSample, s
 // ************************************************
 THStack* SampleHandlerFD::ReturnStackedHistBySelection1D(const int iSample, const std::string& KinematicProjection, int Selection1, int Selection2, int WeightStyle, TAxis* XAxis) {
 // ************************************************
+
+  MaCh3_ProfileScope;
+  
   std::vector<TH1*> HistList = ReturnHistsBySelection1D(iSample, KinematicProjection, Selection1, Selection2, WeightStyle, XAxis);
   THStack* StackHist = new THStack((GetSampleTitle(iSample)+"_"+KinematicProjection+"_Stack").c_str(),"");
   for (unsigned int i=0;i<HistList.size();i++) {
@@ -1990,6 +2146,9 @@ THStack* SampleHandlerFD::ReturnStackedHistBySelection1D(const int iSample, cons
 // ************************************************
 const double* SampleHandlerFD::GetPointerToOscChannel(const int iEvent) const {
 // ************************************************
+
+  MaCh3_ProfileScope;
+  
   auto& OscillationChannels = SampleDetails[MCSamples[iEvent].NominalSample].OscChannels;
   const int Channel = GetOscChannel(OscillationChannels, (*MCSamples[iEvent].nupdgUnosc), (*MCSamples[iEvent].nupdg));
 

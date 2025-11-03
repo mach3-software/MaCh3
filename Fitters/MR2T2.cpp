@@ -10,6 +10,7 @@ MR2T2::MR2T2(manager *man) : MCMCBase(man) {
 // *******************
 void MR2T2::DoStep() {
 // *******************
+
     ProposeStep();
     // Does the MCMC accept this step?
     accProb = AcceptanceProbability();
@@ -24,6 +25,9 @@ void MR2T2::DoStep() {
 // Do the initial reconfigure of the MCMC
 void MR2T2::ProposeStep() {
 // *******************
+
+    MaCh3_ProfileScope;
+    
     // Initial likelihood
     out_of_bounds = false;
     
@@ -102,6 +106,9 @@ void MR2T2::ProposeStep() {
 // Do we accept the proposed step for all the parameters?
 double MR2T2::AcceptanceProbability() {
 // **********************
+
+    MaCh3_ProfileScope;
+    
     // Set the acceptance probability to zero
     double acc_prob = 0.0;
 

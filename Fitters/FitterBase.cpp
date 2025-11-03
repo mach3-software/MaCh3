@@ -15,6 +15,9 @@ _MaCh3_Safe_Include_End_ //}
 // Now we can dump manager settings to the output file
 FitterBase::FitterBase(manager * const man) : fitMan(man) {
 // *************************
+
+  MaCh3_ProfileScope;
+
   AlgorithmName = "";
   //Get mach3 modes from manager
   random = std::make_unique<TRandom3>(Get<int>(fitMan->raw()["General"]["Seed"], __FILE__, __LINE__));
@@ -72,6 +75,9 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
 // Destructor: close the logger and output file
 FitterBase::~FitterBase() {
 // *************************
+
+  MaCh3_ProfileScope;
+  
   SaveOutput();
 
   if(outputFile != nullptr) delete outputFile;
@@ -83,6 +89,9 @@ FitterBase::~FitterBase() {
 // Prepare the output tree
 void FitterBase::SaveSettings() {
 // *******************
+
+  MaCh3_ProfileScope;
+  
   if(SettingsSaved) return;
 
   outputFile->cd();
@@ -157,6 +166,9 @@ void FitterBase::SaveSettings() {
 // Prepare the output tree
 void FitterBase::PrepareOutput() {
 // *******************
+
+  MaCh3_ProfileScope;
+  
   if(OutputPrepared) return;
   //MS: Check if we are fitting the test likelihood, rather than T2K likelihood, and only setup T2K output if not
   if(!fTestLikelihood)
@@ -224,6 +236,9 @@ void FitterBase::PrepareOutput() {
 // *******************
 void FitterBase::SanitiseInputs() {
 // *******************
+
+  MaCh3_ProfileScope;
+  
   for (size_t i = 0; i < samples.size(); ++i) {
     samples[i]->CleanMemoryBeforeFit();
   }
@@ -232,6 +247,9 @@ void FitterBase::SanitiseInputs() {
 // *******************
 void FitterBase::SaveOutput() {
 // *******************
+
+  MaCh3_ProfileScope;
+  
   if(FileSaved) return;
   //Stop Clock
   clock->Stop();
@@ -257,6 +275,9 @@ void FitterBase::SaveOutput() {
 // Add SampleHandler object to the Markov Chain
 void FitterBase::AddSampleHandler(SampleHandlerBase * const sample) {
 // *************************
+
+  MaCh3_ProfileScope;
+  
   // Check if any subsample name collides with already-registered subsamples
   for (const auto &s : samples) {
     for (int iExisting = 0; iExisting < s->GetNsamples(); ++iExisting) {
@@ -292,6 +313,9 @@ void FitterBase::AddSampleHandler(SampleHandlerBase * const sample) {
 // Add flux systematics, cross-section systematics, ND systematics to the chain
 void FitterBase::AddSystObj(ParameterHandlerBase * const cov) {
 // *************************
+
+  MaCh3_ProfileScope;
+  
   MACH3LOG_INFO("Adding systematic object {}, with {} params", cov->GetName(), cov->GetNumParams());
   systematics.push_back(cov);
 
@@ -320,6 +344,9 @@ void FitterBase::AddSystObj(ParameterHandlerBase * const cov) {
 // *******************
 void FitterBase::StartFromPreviousFit(const std::string& FitName) {
 // *******************
+
+  MaCh3_ProfileScope;
+  
   MACH3LOG_INFO("Getting starting position from {}", FitName);
 
   TFile *infile = new TFile(FitName.c_str(), "READ");
@@ -387,6 +414,9 @@ void FitterBase::StartFromPreviousFit(const std::string& FitName) {
 // Process the MCMC output to get postfit etc
 void FitterBase::ProcessMCMC() {
 // *******************
+
+  MaCh3_ProfileScope;
+  
   if (fitMan == nullptr) return;
 
   // Process the MCMC
@@ -434,6 +464,9 @@ void FitterBase::ProcessMCMC() {
 // Run Drag Race
 void FitterBase::DragRace(const int NLaps) {
 // *************************
+
+  MaCh3_ProfileScope;
+  
   MACH3LOG_INFO("Let the Race Begin!");
   MACH3LOG_INFO("All tests will be performed with {} threads", M3::GetNThreads());
 
@@ -496,6 +529,9 @@ void FitterBase::DragRace(const int NLaps) {
 // *************************
 bool FitterBase::GetScaneRange(std::map<std::string, std::vector<double>>& scanRanges) {
 // *************************
+
+  MaCh3_ProfileScope;
+  
   bool isScanRanges = false;
   // YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D. Barrow
   if(fitMan->raw()["LLHScan"]["ScanRanges"]){
@@ -516,6 +552,9 @@ bool FitterBase::GetScaneRange(std::map<std::string, std::vector<double>>& scanR
 // *************************
 bool FitterBase::CheckSkipParameter(const std::vector<std::string>& SkipVector, const std::string& ParamName) const {
 // *************************
+
+  MaCh3_ProfileScope;
+  
   bool skip = false;
   for(unsigned int is = 0; is < SkipVector.size(); ++is)
   {
@@ -532,6 +571,9 @@ bool FitterBase::CheckSkipParameter(const std::vector<std::string>& SkipVector, 
 // Run LLH scan
 void FitterBase::RunLLHScan() {
 // *************************
+
+  MaCh3_ProfileScope;
+  
   // Save the settings into the output file
   SaveSettings();
 
@@ -842,6 +884,9 @@ void FitterBase::RunLLHScan() {
 //LLH scan is good first estimate of step scale
 void FitterBase::GetStepScaleBasedOnLLHScan() {
 // *************************
+
+  MaCh3_ProfileScope;
+  
   TDirectory *Sample_LLH = outputFile->Get<TDirectory>("Sample_LLH");
   MACH3LOG_INFO("Starting Get Step Scale Based On LLHScan");
 
@@ -891,6 +936,9 @@ void FitterBase::GetStepScaleBasedOnLLHScan() {
 // Run 2D LLH scan
 void FitterBase::Run2DLLHScan() {
 // *************************
+
+  MaCh3_ProfileScope;
+  
   // Save the settings into the output file
   SaveSettings();
 
@@ -1059,6 +1107,9 @@ void FitterBase::Run2DLLHScan() {
 // *************************
 void FitterBase::RunSigmaVar() {
 // *************************
+
+  MaCh3_ProfileScope;
+  
   // Save the settings into the output file
   SaveSettings();
 
@@ -1348,6 +1399,9 @@ void FitterBase::RunSigmaVar() {
 // For comparison with P-Theta we usually have to apply different parameter values then usual 1, 3 sigma
 void FitterBase::CustomRange(const std::string& ParName, const double sigma, double& ParamShiftValue) {
 // *************************
+
+  MaCh3_ProfileScope;
+  
   if(!fitMan->raw()["SigmaVar"]["CustomRange"]) return;
 
   auto Config = fitMan->raw()["SigmaVar"]["CustomRange"];
@@ -1364,6 +1418,9 @@ void FitterBase::CustomRange(const std::string& ParName, const double sigma, dou
 /// Helper to write histograms
 void WriteHistograms(TH1 *hist, const std::string& baseName) {
 // *************************
+
+  MaCh3_ProfileScope;
+  
   if (!hist) return;
   hist->SetTitle(baseName.c_str());
   hist->GetYaxis()->SetTitle("Events");
@@ -1379,6 +1436,9 @@ void WriteHistogramsByMode(SampleHandlerFD *sample,
                            const bool by_channel,
                            const std::vector<TDirectory*>& SampleDir) {
 // *************************
+
+  MaCh3_ProfileScope;
+  
   MaCh3Modes *modes = sample->GetMaCh3Modes();
   for (int iSample = 0; iSample < sample->GetNsamples(); ++iSample) {
     SampleDir[iSample]->cd();
@@ -1421,6 +1481,9 @@ void WriteHistogramsByMode(SampleHandlerFD *sample,
 // *************************
 void FitterBase::RunSigmaVarFD() {
 // *************************
+
+  MaCh3_ProfileScope;
+  
   // Save the settings into the output file
   SaveSettings();
 

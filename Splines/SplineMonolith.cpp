@@ -791,6 +791,9 @@ void SMonolith::Evaluate() {
 // *****************************************
 void SMonolith::Evaluate() {
 // *****************************************
+
+  MaCh3_ProfileScope;
+
   // There's a parameter mapping that goes from spline parameter to a global parameter index
   // Find the spline segments
   FindSplineSegment();
@@ -811,6 +814,9 @@ void SMonolith::CalcSplineWeights() {
   #pragma omp parallel
   {
   #endif
+
+    MaCh3_ProfileScope;
+  
     //KS: First we calculate
     #ifdef MULTITHREAD
     #pragma omp for simd nowait
@@ -871,6 +877,9 @@ void SMonolith::CalcSplineWeights() {
 //KS: Calc total event weight on CPU
 void SMonolith::ModifyWeights(){
 //*********************************************************
+
+  MaCh3_ProfileScope;
+
 #ifndef Weight_On_SplineBySpline_Basis
   #ifdef MULTITHREAD
   #pragma omp parallel for

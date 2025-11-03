@@ -9,6 +9,9 @@ _MaCh3_Safe_Include_End_ //}
 OscillationHandler::OscillationHandler(const std::string& NuOscillatorConfigFile, bool BinningPerOscChannel_,
                                        std::vector<const double*> OscParams_, const int SubChannels) {
 // ************************************************
+
+  MaCh3_ProfileScope;
+  
   EqualBinningPerOscChannel = BinningPerOscChannel_;
   OscParams = OscParams_;
   // Add first sample
@@ -52,6 +55,8 @@ OscillationHandler::OscillationHandler(const std::string& NuOscillatorConfigFile
 OscillationHandler::~OscillationHandler() {
 // ************************************************
 
+  MaCh3_ProfileScope;
+
 }
 
 // ************************************************
@@ -81,6 +86,9 @@ void OscillationHandler::AddSample(const std::string& NuOscillatorConfigFile, co
 // ************************************************
 void OscillationHandler::Evaluate() {
 // ************************************************
+
+  MaCh3_ProfileScope;
+  
   std::vector<M3::float_t> OscVec(OscParams.size());
   for (size_t iPar = 0; iPar < OscParams.size(); ++iPar) {
     #pragma GCC diagnostic push
@@ -105,6 +113,9 @@ void OscillationHandler::Evaluate() {
 const M3::float_t* OscillationHandler::GetNuOscillatorPointers(const int Sample, const int Channel, const int InitFlav,
                                                                const int FinalFlav, const FLOAT_T TrueEnu, const FLOAT_T TrueCosZenith) {
 // ************************************************
+
+  MaCh3_ProfileScope;
+  
   int IndexSample = 0;
   int IndexChannel = 0;
   if (!EqualBinningPerOscChannel) {
@@ -124,6 +135,9 @@ const M3::float_t* OscillationHandler::GetNuOscillatorPointers(const int Sample,
 void OscillationHandler::SetOscillatorBinning(const int Sample, const int Channel, const std::vector<M3::float_t>& EnergyArray,
                                               const std::vector<M3::float_t>& CosineZArray) {
 // ************************************************
+
+  MaCh3_ProfileScope;
+  
   if (!NuOscProbCalcers[Sample][Channel]->EvalPointsSetInConstructor()) {
     NuOscProbCalcers[Sample][Channel]->SetEnergyArrayInCalcer(EnergyArray);
     if(CosineZArray.size() != 0) NuOscProbCalcers[Sample][Channel]->SetCosineZArrayInCalcer(CosineZArray);

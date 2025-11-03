@@ -59,6 +59,9 @@ void MCMCBase::RunMCMC() {
 // *******************
 void MCMCBase::DoMCMCStep() {
 // *******************
+
+    MaCh3_FrameMark;
+
     /// Starts step timer, prints progress
     PreStepProcess();
     /// Step proposal, acceptance etc
@@ -70,6 +73,9 @@ void MCMCBase::DoMCMCStep() {
 // *******************
 void MCMCBase::PreStepProcess() {
 // *******************
+
+    MaCh3_ProfileScope;
+
     stepClock->Start();
     out_of_bounds = false;
 
@@ -83,6 +89,9 @@ void MCMCBase::PreStepProcess() {
 // *************************
 void MCMCBase::PostStepProcess() {
 // *************************
+
+    MaCh3_ProfileScope;
+
     stepClock->Stop();
     stepTime = stepClock->RealTime();
 
@@ -159,6 +168,9 @@ void MCMCBase::AdaptiveStep() {
 // *************************
 bool MCMCBase::IsStepAccepted(const double acc_prob) {
 // *************************
+
+    MaCh3_ProfileScope;
+
     // Get the random number
     const double fRandom = random->Rndm();
     // Do the accept/reject
@@ -177,6 +189,9 @@ bool MCMCBase::IsStepAccepted(const double acc_prob) {
 // *************************
 void MCMCBase::AcceptStep() {
 // *************************
+
+    MaCh3_ProfileScope;
+    
     ++accCount;
     logLCurr = logLProp;
 

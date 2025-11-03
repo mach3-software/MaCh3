@@ -23,6 +23,9 @@ SplineBase::~SplineBase() {
 // For ROOT version see root/hist/hist/src/TSpline3.cxx TSpline3::FindX(double)
 void SplineBase::FindSplineSegment() {
 // *************************
+
+  MaCh3_ProfileScope;
+
   // Loop over the splines
   //KS: Tried multithreading here with 48 splines and it is faster with one thread, maybe in future multithreading will be worth revisiting
   for (M3::int_t i = 0; i < nParams; ++i)
@@ -105,6 +108,9 @@ void SplineBase::FindSplineSegment() {
 // This should maximize our cache hits!
 void SplineBase::getTF1Coeff(TF1_red* &spl, int &nPoints, float *& coeffs) {
 // *****************************************
+
+  MaCh3_ProfileScope;
+
   // Initialise all arrays to 1.0
   for (int i = 0; i < _nTF1Coeff_; ++i) {
     coeffs[i] = 0.0;

@@ -426,6 +426,9 @@ void ParameterHandlerBase::ReserveMemory(const int SizeVec) {
 // Might want to split this
 void ParameterHandlerBase::SetPar(int i , double val) {
 // ********************************************
+
+  MaCh3_ProfileScope;
+
   MACH3LOG_INFO("Over-riding {}: ", GetParName(i));
   MACH3LOG_INFO("_fPropVal ({}), _fCurrVal ({}), _fPreFitValue ({}) to ({})", _fPropVal[i], _fCurrVal[i], _fPreFitValue[i], val);
 
@@ -440,6 +443,9 @@ void ParameterHandlerBase::SetPar(int i , double val) {
 // ********************************************
 std::vector<double> ParameterHandlerBase::GetProposed() const {
 // ********************************************
+
+  MaCh3_ProfileScope;
+
   std::vector<double> props(_fNumPar);
   for (int i = 0; i < _fNumPar; ++i) props[i] = _fPropVal[i];
   return props;
@@ -450,6 +456,9 @@ std::vector<double> ParameterHandlerBase::GetProposed() const {
 // This shouldn't be used in MCMC code ase it can break Detailed Balance;
 void ParameterHandlerBase::ThrowParameters() {
 // *************************************
+
+  MaCh3_ProfileScope;
+
   // First draw new randParams
   Randomize();
 
@@ -503,6 +512,9 @@ void ParameterHandlerBase::ThrowParameters() {
 // Used to start the chain in different states
 void ParameterHandlerBase::RandomConfiguration() {
 // *************************************
+
+  MaCh3_ProfileScope;
+
   // Have the 1 sigma for each parameter in each covariance class, sweet!
   // Don't want to change the prior array because that's what determines our likelihood
   // Want to change the _fPropVal, _fCurrVal, _fPreFitValue
@@ -540,6 +552,9 @@ void ParameterHandlerBase::RandomConfiguration() {
 // Set a single parameter
 void ParameterHandlerBase::SetSingleParameter(const int parNo, const double parVal) {
 // *************************************
+
+  MaCh3_ProfileScope;
+
   _fPropVal[parNo] = parVal;
   _fCurrVal[parNo] = parVal;
   MACH3LOG_DEBUG("Setting {} (parameter {}) to {})", GetParName(parNo),  parNo, parVal);
@@ -549,6 +564,9 @@ void ParameterHandlerBase::SetSingleParameter(const int parNo, const double parV
 // ********************************************
 void ParameterHandlerBase::SetParCurrProp(const int parNo, const double parVal) {
 // ********************************************
+
+  MaCh3_ProfileScope;
+
   _fPropVal[parNo] = parVal;
   _fCurrVal[parNo] = parVal;
   MACH3LOG_DEBUG("Setting {} (parameter {}) to {})", GetParName(parNo),  parNo, parVal);
@@ -559,6 +577,9 @@ void ParameterHandlerBase::SetParCurrProp(const int parNo, const double parVal) 
 // Propose a step for the set of systematics parameters this covariance class holds
 void ParameterHandlerBase::ProposeStep() {
 // ************************************************
+
+  MaCh3_ProfileScope;
+
   // Make the random numbers for the step proposal
   Randomize();
   CorrelateSteps();
@@ -574,6 +595,9 @@ void ParameterHandlerBase::ProposeStep() {
 // ************************************************
 void ParameterHandlerBase::SpecialStepProposal() {
 // ************************************************
+
+  MaCh3_ProfileScope;
+
   /// @warning KS: Following Asher comment we do "Step->Circular Bounds->Flip"
 
   // HW It should now automatically set dcp to be with [-pi, pi]
@@ -597,6 +621,9 @@ void ParameterHandlerBase::SpecialStepProposal() {
 // Also get a new random number for the randParams
 void ParameterHandlerBase::Randomize() _noexcept_ {
 // ************************************************
+
+  MaCh3_ProfileScope;
+
   if (!pca) {
     //KS: By multithreading here we gain at least factor 2 with 8 threads with ND only fit
     #ifdef MULTITHREAD
@@ -633,6 +660,9 @@ void ParameterHandlerBase::Randomize() _noexcept_ {
 // Correlate the steps by setting the proposed step of a parameter to its current value + some correlated throw
 void ParameterHandlerBase::CorrelateSteps() _noexcept_ {
 // ************************************************
+
+  MaCh3_ProfileScope;
+
   //KS: Using custom function compared to ROOT one with 8 threads we have almost factor 2 performance increase, by replacing TMatrix with just double we increase it even more
   M3::MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
 
@@ -655,6 +685,9 @@ void ParameterHandlerBase::CorrelateSteps() _noexcept_ {
 // Update so that current step becomes the previously proposed step
 void ParameterHandlerBase::AcceptStep() _noexcept_ {
 // ********************************************
+
+  MaCh3_ProfileScope;
+
   if (!pca) {
     #ifdef MULTITHREAD
     #pragma omp parallel for
@@ -672,6 +705,9 @@ void ParameterHandlerBase::AcceptStep() _noexcept_ {
 //HW: This method is a tad hacky but modular arithmetic gives me a headache.
 void ParameterHandlerBase::CircularParBounds(const int index, const double LowBound, const double UpBound) {
 // *************************************
+
+  MaCh3_ProfileScope;
+
   if(_fPropVal[index] > UpBound) {
     _fPropVal[index] = LowBound + std::fmod(_fPropVal[index] - UpBound, UpBound - LowBound);
   } else if (_fPropVal[index] < LowBound) {
@@ -682,6 +718,9 @@ void ParameterHandlerBase::CircularParBounds(const int index, const double LowBo
 // *************************************
 void ParameterHandlerBase::FlipParameterValue(const int index, const double FlipPoint) {
 // *************************************
+
+  MaCh3_ProfileScope;
+
   if(random_number[0]->Uniform() < 0.5) {
     _fPropVal[index] = 2 * FlipPoint - _fPropVal[index];
   }
@@ -692,6 +731,9 @@ void ParameterHandlerBase::FlipParameterValue(const int index, const double Flip
 // Should really just have the user specify this throw by having argument double
 void ParameterHandlerBase::ThrowParProp(const double mag) {
 // ********************************************
+
+  MaCh3_ProfileScope;
+  
   Randomize();
   if (!pca) {
     // Make the correlated throw
@@ -710,6 +752,9 @@ void ParameterHandlerBase::ThrowParProp(const double mag) {
 // Can study bias in MCMC with this; put different starting parameters
 void ParameterHandlerBase::ThrowParCurr(const double mag) {
 // ********************************************
+
+  MaCh3_ProfileScope;
+  
   Randomize();
   if (!pca) {
     // Get the correlated throw vector
@@ -757,6 +802,9 @@ void ParameterHandlerBase::PrintNominalCurrProp() const {
 //                    false = don't evaluate likelihood (so run without a prior)
 double ParameterHandlerBase::CalcLikelihood() const _noexcept_ {
 // ********************************************
+
+  MaCh3_ProfileScope;
+  
   double logL = 0.0;
   #ifdef MULTITHREAD
   #pragma omp parallel for reduction(+:logL)
@@ -784,6 +832,9 @@ double ParameterHandlerBase::CalcLikelihood() const _noexcept_ {
 // ********************************************
 int ParameterHandlerBase::CheckBounds() const _noexcept_ {
 // ********************************************
+
+  MaCh3_ProfileScope;
+  
   int NOutside = 0;
   #ifdef MULTITHREAD
   #pragma omp parallel for reduction(+:NOutside)
@@ -799,6 +850,9 @@ int ParameterHandlerBase::CheckBounds() const _noexcept_ {
 // ********************************************
 double ParameterHandlerBase::GetLikelihood() {
 // ********************************************
+
+  MaCh3_ProfileScope;
+  
   // Default behaviour is to reject negative values + do std llh calculation
   const int NOutside = CheckBounds();
   
@@ -811,6 +865,9 @@ double ParameterHandlerBase::GetLikelihood() {
 // Sets the proposed parameters to the prior values
 void ParameterHandlerBase::SetParameters(const std::vector<double>& pars) {
 // ********************************************
+
+  MaCh3_ProfileScope;
+  
   // If empty, set the proposed to prior
   if (pars.empty()) {
     // For xsec this means setting to the prior (because prior is the prior)
@@ -882,6 +939,9 @@ void ParameterHandlerBase::SetStepScale(const double scale, const bool verbose) 
 // ********************************************
 int ParameterHandlerBase::GetParIndex(const std::string& name) const {
 // ********************************************
+
+  MaCh3_ProfileScope;
+  
   int Index = M3::_BAD_INT_;
   for (int i = 0; i <_fNumPar; ++i) {
     if(name == _fFancyNames[i]) {
@@ -895,6 +955,9 @@ int ParameterHandlerBase::GetParIndex(const std::string& name) const {
 // ********************************************
 void ParameterHandlerBase::ToggleFixAllParameters() {
 // ********************************************
+
+  MaCh3_ProfileScope;
+  
   // fix or unfix all parameters by multiplying by -1
   if(!pca) {
     for (int i = 0; i < _fNumPar; i++) _fError[i] *= -1.0;
@@ -906,6 +969,9 @@ void ParameterHandlerBase::ToggleFixAllParameters() {
 // ********************************************
 void ParameterHandlerBase::ToggleFixParameter(const int i) {
 // ********************************************
+
+  MaCh3_ProfileScope;
+  
   if(!pca) {
     if (i > _fNumPar) {
       MACH3LOG_ERROR("Can't {} for parameter {} because size of covariance ={}", __func__, i, _fNumPar);
@@ -923,6 +989,9 @@ void ParameterHandlerBase::ToggleFixParameter(const int i) {
 // ********************************************
 void ParameterHandlerBase::ToggleFixParameter(const std::string& name) {
 // ********************************************
+
+  MaCh3_ProfileScope;
+  
   const int Index = GetParIndex(name);
   if(Index != M3::_BAD_INT_) {
     ToggleFixParameter(Index);
@@ -935,6 +1004,9 @@ void ParameterHandlerBase::ToggleFixParameter(const std::string& name) {
 // ********************************************
 bool ParameterHandlerBase::IsParameterFixed(const std::string& name) const {
 // ********************************************
+
+  MaCh3_ProfileScope;
+  
   const int Index = GetParIndex(name);
   if(Index != M3::_BAD_INT_) {
     return IsParameterFixed(Index);
@@ -947,6 +1019,9 @@ bool ParameterHandlerBase::IsParameterFixed(const std::string& name) const {
 // ********************************************
 void ParameterHandlerBase::SetFlatPrior(const int i, const bool eL) {
 // ********************************************
+
+  MaCh3_ProfileScope;
+  
   if (i > _fNumPar) {
     MACH3LOG_INFO("Can't {} for Cov={}/Param={} because size of Covariance = {}", __func__, GetName(), i, _fNumPar);
     MACH3LOG_ERROR("Fix this in your config file please!");
@@ -995,6 +1070,9 @@ void ParameterHandlerBase::PrintIndivStepScale() const {
 //Makes sure that matrix is positive-definite by adding a small number to on-diagonal elements
 void ParameterHandlerBase::MakePosDef(TMatrixDSym *cov) {
 // ********************************************
+
+  MaCh3_ProfileScope;
+  
   if(cov == nullptr){
     cov = &*covMatrix;
     MACH3LOG_WARN("Passed nullptr to cov matrix in {}", matrixName);

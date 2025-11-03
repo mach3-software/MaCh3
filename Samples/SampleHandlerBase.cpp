@@ -17,6 +17,9 @@ SampleHandlerBase::~SampleHandlerBase() {
 // Poisson likelihood calc for data and MC event rates
 double SampleHandlerBase::GetPoissonLLH(const double data, const double mc) const {
 // ***************************************************************************
+
+  MaCh3_ProfileScope;
+
   // Return MC if there are no data, returns 0 for data == 0 && mc == 0  
   if ( data == 0 ) return mc;
 
@@ -35,6 +38,9 @@ double SampleHandlerBase::GetPoissonLLH(const double data, const double mc) cons
 // data is data, mc is mc, w2 is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
 double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, const double w2) const {
 // *************************
+
+  MaCh3_ProfileScope;
+  
   switch (fTestStatistic)
   {
     //CW: Not full Barlow-Beeston or what is referred to as "light": we're not introducing any more parameters
