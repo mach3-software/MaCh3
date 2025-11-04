@@ -707,7 +707,7 @@ var sectionId = 'dynsection-0';
 <!-- Node48 -->
 <g id="node18" class="node">
 <title>Node48</title>
-<g id="a_node18"><a xlink:href="ParameterStructs_8h.html" target="_top" xlink:title=" ">
+<g id="a_node18"><a xlink:href="ParameterStructs_8h.html" target="_top" xlink:title="Definitions of generic parameter structs and utility templates for MaCh3.">
 <polygon fill="white" stroke="red" points="720,-56.5 720,-75.5 875,-75.5 875,-56.5 720,-56.5"/>
 <text text-anchor="middle" x="797.5" y="-63.5" font-family="Helvetica" font-size="10.00">Parameters/ParameterStructs.h</text>
 </a>

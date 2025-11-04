@@ -12,7 +12,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Defines the custom exception class used throughout MaCh3.">
 <polygon fill="#bfbfbf" stroke="black" points="2740.5,-503.5 2740.5,-522.5 2880.5,-522.5 2880.5,-503.5 2740.5,-503.5"/>
 <text text-anchor="middle" x="2810.5" y="-510.5" font-family="Helvetica" font-size="10.00">Manager/MaCh3Exception.h</text>
 </a>
@@ -175,7 +175,7 @@
 <!-- Node92 -->
 <g id="node49" class="node">
 <title>Node92</title>
-<g id="a_node49"><a xlink:href="ParameterStructs_8h.html" target="_top" xlink:title=" ">
+<g id="a_node49"><a xlink:href="ParameterStructs_8h.html" target="_top" xlink:title="Definitions of generic parameter structs and utility templates for MaCh3.">
 <polygon fill="white" stroke="black" points="2067,-386 2067,-405 2222,-405 2222,-386 2067,-386"/>
 <text text-anchor="middle" x="2144.5" y="-393" font-family="Helvetica" font-size="10.00">Parameters/ParameterStructs.h</text>
 </a>

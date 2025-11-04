@@ -322,7 +322,7 @@ var sectionId = 'dynsection-0';
 <!-- Node8 -->
 <g id="node8" class="node">
 <title>Node8</title>
-<g id="a_node8"><a xlink:href="MaCh3Exception_8h.html" target="_top" xlink:title=" ">
+<g id="a_node8"><a xlink:href="MaCh3Exception_8h.html" target="_top" xlink:title="Defines the custom exception class used throughout MaCh3.">
 <polygon fill="white" stroke="black" points="976.96,-168.5 976.96,-187.5 1116.96,-187.5 1116.96,-168.5 976.96,-168.5"/>
 <text text-anchor="middle" x="1046.96" y="-175.5" font-family="Helvetica" font-size="10.00">Manager/MaCh3Exception.h</text>
 </a>
@@ -337,7 +337,7 @@ var sectionId = 'dynsection-0';
 <!-- Node12 -->
 <g id="node12" class="node">
 <title>Node12</title>
-<g id="a_node12"><a xlink:href="MaCh3Logger_8h.html" target="_top" xlink:title="KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/incl...">
+<g id="a_node12"><a xlink:href="MaCh3Logger_8h.html" target="_top" xlink:title="MaCh3 Logging utilities built on top of SPDLOG.">
 <polygon fill="white" stroke="black" points="641.96,-112.5 641.96,-131.5 767.96,-131.5 767.96,-112.5 641.96,-112.5"/>
 <text text-anchor="middle" x="704.96" y="-119.5" font-family="Helvetica" font-size="10.00">Manager/MaCh3Logger.h</text>
 </a>
@@ -352,7 +352,7 @@ var sectionId = 'dynsection-0';
 <!-- Node16 -->
 <g id="node16" class="node">
 <title>Node16</title>
-<g id="a_node16"><a xlink:href="Core_8h.html" target="_top" xlink:title=" ">
+<g id="a_node16"><a xlink:href="Core_8h.html" target="_top" xlink:title="KS: Core MaCh3 definitions and compile&#45;time configuration utilities.">
 <polygon fill="white" stroke="black" points="989.96,-56.5 989.96,-75.5 1075.96,-75.5 1075.96,-56.5 989.96,-56.5"/>
 <text text-anchor="middle" x="1032.96" y="-63.5" font-family="Helvetica" font-size="10.00">Manager/Core.h</text>
 </a>
@@ -697,7 +697,7 @@ var sectionId = 'dynsection-0';
 <!-- Node31 -->
 <g id="node31" class="node">
 <title>Node31</title>
-<g id="a_node31"><a xlink:href="ParameterStructs_8h.html" target="_top" xlink:title=" ">
+<g id="a_node31"><a xlink:href="ParameterStructs_8h.html" target="_top" xlink:title="Definitions of generic parameter structs and utility templates for MaCh3.">
 <polygon fill="white" stroke="black" points="690.46,-224.5 690.46,-243.5 845.46,-243.5 845.46,-224.5 690.46,-224.5"/>
 <text text-anchor="middle" x="767.96" y="-231.5" font-family="Helvetica" font-size="10.00">Parameters/ParameterStructs.h</text>
 </a>

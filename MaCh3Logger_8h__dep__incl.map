@@ -1,6 +1,6 @@
 <map id="Manager/MaCh3Logger.h" name="Manager/MaCh3Logger.h">
-<area shape="rect" id="node1" title="KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/incl..." alt="" coords="4272,5,4440,32"/>
-<area shape="rect" id="node2" href="$MaCh3Exception_8h.html" title=" " alt="" coords="3961,80,4148,107"/>
+<area shape="rect" id="node1" title="MaCh3 Logging utilities built on top of SPDLOG." alt="" coords="4272,5,4440,32"/>
+<area shape="rect" id="node2" href="$MaCh3Exception_8h.html" title="Defines the custom exception class used throughout MaCh3." alt="" coords="3961,80,4148,107"/>
 <area shape="rect" id="node27" href="$Monitor_8h.html" title="System and monitoring utilities for printing system information and status updates." alt="" coords="3732,251,3863,278"/>
 <area shape="rect" id="node30" href="$inputManager_8h.html" title=" " alt="" coords="4205,244,4344,285"/>
 <area shape="rect" id="node32" href="$plottingManager_8h.html" title=" " alt="" coords="4589,333,4728,375"/>
@@ -8,7 +8,7 @@
 <area shape="rect" id="node42" href="$SampleHandlerFD_8cpp.html" title=" " alt="" coords="4251,162,4461,189"/>
 <area shape="rect" id="node43" href="$SampleStructs_8h.html" title=" " alt="" coords="987,162,1162,189"/>
 <area shape="rect" id="node47" href="$plottingUtils_8h.html" title=" " alt="" coords="4679,155,4817,196"/>
-<area shape="rect" id="node49" href="$ParameterStructs_8h.html" title=" " alt="" coords="3445,251,3651,278"/>
+<area shape="rect" id="node49" href="$ParameterStructs_8h.html" title="Definitions of generic parameter structs and utility templates for MaCh3." alt="" coords="3445,251,3651,278"/>
 <area shape="rect" id="node3" href="$MaCh3Modes_8h.html" title=" " alt="" coords="3901,341,4069,367"/>
 <area shape="rect" id="node8" href="$Manager_8h.html" title=" " alt="" coords="2395,341,2533,367"/>
 <area shape="rect" id="node29" href="$YamlHelper_8h.html" title="Utility functions for handling YAML nodes." alt="" coords="3920,162,4075,189"/>

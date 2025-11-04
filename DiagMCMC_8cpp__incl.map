@@ -36,11 +36,11 @@
 <area shape="rect" id="node10" title=" " alt="" coords="348,244,423,271"/>
 <area shape="rect" id="node11" title=" " alt="" coords="447,244,505,271"/>
 <area shape="rect" id="node13" href="$SampleStructs_8h.html" title=" " alt="" coords="611,319,786,345"/>
-<area shape="rect" id="node14" href="$MaCh3Exception_8h.html" title=" " alt="" coords="271,468,457,495"/>
+<area shape="rect" id="node14" href="$MaCh3Exception_8h.html" title="Defines the custom exception class used throughout MaCh3." alt="" coords="271,468,457,495"/>
 <area shape="rect" id="node17" href="$YamlHelper_8h.html" title="Utility functions for handling YAML nodes." alt="" coords="169,393,324,420"/>
 <area shape="rect" id="node18" href="$Monitor_8h.html" title="System and monitoring utilities for printing system information and status updates." alt="" coords="392,319,523,345"/>
 <area shape="rect" id="node15" title=" " alt="" coords="870,468,965,495"/>
-<area shape="rect" id="node23" href="$ParameterStructs_8h.html" title=" " alt="" coords="1042,319,1249,345"/>
+<area shape="rect" id="node23" href="$ParameterStructs_8h.html" title="Definitions of generic parameter structs and utility templates for MaCh3." alt="" coords="1042,319,1249,345"/>
 <area shape="rect" id="node24" title=" " alt="" coords="862,319,1018,345"/>
 <area shape="rect" id="node31" title=" " alt="" coords="1523,244,1607,271"/>
 <area shape="rect" id="node32" title=" " alt="" coords="1632,244,1747,271"/>

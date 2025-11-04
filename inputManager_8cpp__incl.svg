@@ -83,7 +83,7 @@ var sectionId = 'dynsection-0';
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="MaCh3Logger_8h.html" target="_top" xlink:title="KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/incl...">
+<g id="a_node3"><a xlink:href="MaCh3Logger_8h.html" target="_top" xlink:title="MaCh3 Logging utilities built on top of SPDLOG.">
 <polygon fill="white" stroke="black" points="725.05,-112.5 725.05,-131.5 851.05,-131.5 851.05,-112.5 725.05,-112.5"/>
 <text text-anchor="middle" x="788.05" y="-119.5" font-family="Helvetica" font-size="10.00">Manager/MaCh3Logger.h</text>
 </a>
@@ -113,7 +113,7 @@ var sectionId = 'dynsection-0';
 <!-- Node19 -->
 <g id="node15" class="node">
 <title>Node19</title>
-<g id="a_node15"><a xlink:href="MaCh3Exception_8h.html" target="_top" xlink:title=" ">
+<g id="a_node15"><a xlink:href="MaCh3Exception_8h.html" target="_top" xlink:title="Defines the custom exception class used throughout MaCh3.">
 <polygon fill="white" stroke="black" points="516.05,-168.5 516.05,-187.5 656.05,-187.5 656.05,-168.5 516.05,-168.5"/>
 <text text-anchor="middle" x="586.05" y="-175.5" font-family="Helvetica" font-size="10.00">Manager/MaCh3Exception.h</text>
 </a>
@@ -248,7 +248,7 @@ var sectionId = 'dynsection-0';
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="Core_8h.html" target="_top" xlink:title=" ">
+<g id="a_node9"><a xlink:href="Core_8h.html" target="_top" xlink:title="KS: Core MaCh3 definitions and compile&#45;time configuration utilities.">
 <polygon fill="white" stroke="red" points="538.05,-56.5 538.05,-75.5 624.05,-75.5 624.05,-56.5 538.05,-56.5"/>
 <text text-anchor="middle" x="581.05" y="-63.5" font-family="Helvetica" font-size="10.00">Manager/Core.h</text>
 </a>

@@ -96,7 +96,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="MaCh3Exception_8h.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="MaCh3Exception_8h.html" target="_top" xlink:title="Defines the custom exception class used throughout MaCh3.">
 <polygon fill="white" stroke="black" points="211.66,-168.5 211.66,-187.5 351.66,-187.5 351.66,-168.5 211.66,-168.5"/>
 <text text-anchor="middle" x="281.66" y="-175.5" font-family="Helvetica" font-size="10.00">Manager/MaCh3Exception.h</text>
 </a>
@@ -111,7 +111,7 @@
 <!-- Node13 -->
 <g id="node13" class="node">
 <title>Node13</title>
-<g id="a_node13"><a xlink:href="Core_8h.html" target="_top" xlink:title=" ">
+<g id="a_node13"><a xlink:href="Core_8h.html" target="_top" xlink:title="KS: Core MaCh3 definitions and compile&#45;time configuration utilities.">
 <polygon fill="white" stroke="black" points="482.66,-56.5 482.66,-75.5 568.66,-75.5 568.66,-56.5 482.66,-56.5"/>
 <text text-anchor="middle" x="525.66" y="-63.5" font-family="Helvetica" font-size="10.00">Manager/Core.h</text>
 </a>
@@ -213,7 +213,7 @@
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="MaCh3Logger_8h.html" target="_top" xlink:title="KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/incl...">
+<g id="a_node9"><a xlink:href="MaCh3Logger_8h.html" target="_top" xlink:title="MaCh3 Logging utilities built on top of SPDLOG.">
 <polygon fill="white" stroke="black" points="226.66,-112.5 226.66,-131.5 352.66,-131.5 352.66,-112.5 226.66,-112.5"/>
 <text text-anchor="middle" x="289.66" y="-119.5" font-family="Helvetica" font-size="10.00">Manager/MaCh3Logger.h</text>
 </a>

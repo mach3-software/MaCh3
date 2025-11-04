@@ -52,7 +52,7 @@
 <!-- Node44 -->
 <g id="node36" class="node">
 <title>Node44</title>
-<g id="a_node36"><a xlink:href="ParameterStructs_8h.html" target="_top" xlink:title=" ">
+<g id="a_node36"><a xlink:href="ParameterStructs_8h.html" target="_top" xlink:title="Definitions of generic parameter structs and utility templates for MaCh3.">
 <polygon fill="white" stroke="black" points="1704.5,-224.5 1704.5,-243.5 1859.5,-243.5 1859.5,-224.5 1704.5,-224.5"/>
 <text text-anchor="middle" x="1782" y="-231.5" font-family="Helvetica" font-size="10.00">Parameters/ParameterStructs.h</text>
 </a>
@@ -180,7 +180,7 @@
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="MaCh3Exception_8h.html" target="_top" xlink:title=" ">
+<g id="a_node9"><a xlink:href="MaCh3Exception_8h.html" target="_top" xlink:title="Defines the custom exception class used throughout MaCh3.">
 <polygon fill="white" stroke="black" points="256,-168.5 256,-187.5 396,-187.5 396,-168.5 256,-168.5"/>
 <text text-anchor="middle" x="326" y="-175.5" font-family="Helvetica" font-size="10.00">Manager/MaCh3Exception.h</text>
 </a>
@@ -276,7 +276,7 @@
 <!-- Node13 -->
 <g id="node13" class="node">
 <title>Node13</title>
-<g id="a_node13"><a xlink:href="MaCh3Logger_8h.html" target="_top" xlink:title="KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/incl...">
+<g id="a_node13"><a xlink:href="MaCh3Logger_8h.html" target="_top" xlink:title="MaCh3 Logging utilities built on top of SPDLOG.">
 <polygon fill="white" stroke="black" points="412,-112.5 412,-131.5 538,-131.5 538,-112.5 412,-112.5"/>
 <text text-anchor="middle" x="475" y="-119.5" font-family="Helvetica" font-size="10.00">Manager/MaCh3Logger.h</text>
 </a>
@@ -291,7 +291,7 @@
 <!-- Node17 -->
 <g id="node17" class="node">
 <title>Node17</title>
-<g id="a_node17"><a xlink:href="Core_8h.html" target="_top" xlink:title=" ">
+<g id="a_node17"><a xlink:href="Core_8h.html" target="_top" xlink:title="KS: Core MaCh3 definitions and compile&#45;time configuration utilities.">
 <polygon fill="white" stroke="black" points="664,-56.5 664,-75.5 750,-75.5 750,-56.5 664,-56.5"/>
 <text text-anchor="middle" x="707" y="-63.5" font-family="Helvetica" font-size="10.00">Manager/Core.h</text>
 </a>

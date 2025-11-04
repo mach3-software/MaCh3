@@ -57,7 +57,7 @@ var searchData=
   ['isflatarray_843',['isflatarray',['../classBinnedSplineHandler.html#a13329dc38e92088744a5a49a60c01a83',1,'BinnedSplineHandler']]],
   ['ishistogramallones_844',['IsHistogramAllOnes',['../PlotMCMCDiag_8cpp.html#a47175dd694387a761ab3d199eabca16d',1,'PlotMCMCDiag.cpp']]],
   ['ismach3modenc_845',['IsMaCh3ModeNC',['../classMaCh3Modes.html#a068ab040cc5d8f6ff594665bef270bc3',1,'MaCh3Modes']]],
-  ['ismode_846',['IsMode',['../structMaCh3ModeInfo.html#a9a89a0394f9f5eb780008253716836fc',1,'MaCh3ModeInfo']]],
+  ['ismode_846',['IsMode',['../structMaCh3ModeInfo.html#abb88d4b6a9edaa26e860024c19a25aea',1,'MaCh3ModeInfo']]],
   ['isnc_847',['isNC',['../structFarDetectorCoreInfo.html#abdba4588283aa31368e3fab57ac8cd60',1,'FarDetectorCoreInfo']]],
   ['isnc_848',['IsNC',['../structMaCh3ModeInfo.html#ad987766dd95bed2cfcdad169d07a885b',1,'MaCh3ModeInfo']]],
   ['isparameterdecomposed_849',['IsParameterDecomposed',['../group__ParameterHandlerGetters.html#ga88a89e8955f06dff98ac343d0f5e84e4',1,'PCAHandler']]],

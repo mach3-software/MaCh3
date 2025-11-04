@@ -58,7 +58,7 @@ var sectionId = 'dynsection-1';
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title="KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/incl...">
+<g id="a_node1"><a xlink:title="MaCh3 Logging utilities built on top of SPDLOG.">
 <polygon fill="#bfbfbf" stroke="black" points="3199.88,-570.5 3199.88,-589.5 3325.88,-589.5 3325.88,-570.5 3199.88,-570.5"/>
 <text text-anchor="middle" x="3262.88" y="-577.5" font-family="Helvetica" font-size="10.00">Manager/MaCh3Logger.h</text>
 </a>
@@ -67,7 +67,7 @@ var sectionId = 'dynsection-1';
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="MaCh3Exception_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="MaCh3Exception_8h.html" target="_top" xlink:title="Defines the custom exception class used throughout MaCh3.">
 <polygon fill="white" stroke="black" points="2966.88,-514.5 2966.88,-533.5 3106.88,-533.5 3106.88,-514.5 2966.88,-514.5"/>
 <text text-anchor="middle" x="3036.88" y="-521.5" font-family="Helvetica" font-size="10.00">Manager/MaCh3Exception.h</text>
 </a>
@@ -191,7 +191,7 @@ var sectionId = 'dynsection-1';
 <!-- Node93 -->
 <g id="node49" class="node">
 <title>Node93</title>
-<g id="a_node49"><a xlink:href="ParameterStructs_8h.html" target="_top" xlink:title=" ">
+<g id="a_node49"><a xlink:href="ParameterStructs_8h.html" target="_top" xlink:title="Definitions of generic parameter structs and utility templates for MaCh3.">
 <polygon fill="white" stroke="black" points="2579.38,-386 2579.38,-405 2734.38,-405 2734.38,-386 2579.38,-386"/>
 <text text-anchor="middle" x="2656.88" y="-393" font-family="Helvetica" font-size="10.00">Parameters/ParameterStructs.h</text>
 </a>

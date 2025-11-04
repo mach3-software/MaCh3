@@ -419,7 +419,7 @@ var sectionId = 'dynsection-0';
 <!-- Node15 -->
 <g id="node12" class="node">
 <title>Node15</title>
-<g id="a_node12"><a xlink:href="MaCh3Exception_8h.html" target="_top" xlink:title=" ">
+<g id="a_node12"><a xlink:href="MaCh3Exception_8h.html" target="_top" xlink:title="Defines the custom exception class used throughout MaCh3.">
 <polygon fill="white" stroke="red" points="230,-56.5 230,-75.5 370,-75.5 370,-56.5 230,-56.5"/>
 <text text-anchor="middle" x="300" y="-63.5" font-family="Helvetica" font-size="10.00">Manager/MaCh3Exception.h</text>
 </a>

@@ -3,14 +3,14 @@
 <area shape="rect" id="node2" href="$Manager_8h.html" title=" " alt="" coords="954,80,1091,107"/>
 <area shape="rect" id="node35" href="$ParameterHandlerUtils_8h.html" title=" " alt="" coords="2726,155,2925,196"/>
 <area shape="rect" id="node3" href="$SampleStructs_8h.html" title=" " alt="" coords="1501,244,1675,271"/>
-<area shape="rect" id="node7" href="$MaCh3Exception_8h.html" title=" " alt="" coords="799,319,985,345"/>
+<area shape="rect" id="node7" href="$MaCh3Exception_8h.html" title="Defines the custom exception class used throughout MaCh3." alt="" coords="799,319,985,345"/>
 <area shape="rect" id="node23" href="$YamlHelper_8h.html" title="Utility functions for handling YAML nodes." alt="" coords="417,244,572,271"/>
 <area shape="rect" id="node29" href="$Monitor_8h.html" title="System and monitoring utilities for printing system information and status updates." alt="" coords="957,162,1088,189"/>
 <area shape="rect" id="node4" title=" " alt="" coords="1839,319,1879,345"/>
 <area shape="rect" id="node5" title=" " alt="" coords="1903,319,1942,345"/>
 <area shape="rect" id="node6" title=" " alt="" coords="1966,319,2077,345"/>
-<area shape="rect" id="node11" href="$MaCh3Logger_8h.html" title="KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/incl..." alt="" coords="953,393,1121,420"/>
-<area shape="rect" id="node13" href="$Core_8h.html" title=" " alt="" coords="1101,468,1216,495"/>
+<area shape="rect" id="node11" href="$MaCh3Logger_8h.html" title="MaCh3 Logging utilities built on top of SPDLOG." alt="" coords="953,393,1121,420"/>
+<area shape="rect" id="node13" href="$Core_8h.html" title="KS: Core MaCh3 definitions and compile&#45;time configuration utilities." alt="" coords="1101,468,1216,495"/>
 <area shape="rect" id="node16" title=" " alt="" coords="2101,319,2179,345"/>
 <area shape="rect" id="node17" title=" " alt="" coords="1111,319,1206,345"/>
 <area shape="rect" id="node18" title=" " alt="" coords="2305,319,2367,345"/>
@@ -34,7 +34,7 @@
 <area shape="rect" id="node32" title=" " alt="" coords="1145,244,1228,271"/>
 <area shape="rect" id="node33" title=" " alt="" coords="1252,244,1327,271"/>
 <area shape="rect" id="node34" title=" " alt="" coords="1791,244,1894,271"/>
-<area shape="rect" id="node36" href="$ParameterStructs_8h.html" title=" " alt="" coords="1918,244,2125,271"/>
+<area shape="rect" id="node36" href="$ParameterStructs_8h.html" title="Definitions of generic parameter structs and utility templates for MaCh3." alt="" coords="1918,244,2125,271"/>
 <area shape="rect" id="node37" title=" " alt="" coords="2425,244,2509,271"/>
 <area shape="rect" id="node38" title=" " alt="" coords="2533,244,2648,271"/>
 <area shape="rect" id="node39" title=" " alt="" coords="2672,244,2757,271"/>

@@ -1,14 +1,14 @@
 <map id="Manager/Manager.h" name="Manager/Manager.h">
 <area shape="rect" id="node1" title=" " alt="" coords="1315,5,1453,32"/>
 <area shape="rect" id="node2" href="$SampleStructs_8h.html" title=" " alt="" coords="539,155,714,181"/>
-<area shape="rect" id="node6" href="$MaCh3Exception_8h.html" title=" " alt="" coords="1185,229,1372,256"/>
+<area shape="rect" id="node6" href="$MaCh3Exception_8h.html" title="Defines the custom exception class used throughout MaCh3." alt="" coords="1185,229,1372,256"/>
 <area shape="rect" id="node28" href="$YamlHelper_8h.html" title="Utility functions for handling YAML nodes." alt="" coords="1593,155,1748,181"/>
 <area shape="rect" id="node34" href="$Monitor_8h.html" title="System and monitoring utilities for printing system information and status updates." alt="" coords="2111,80,2241,107"/>
 <area shape="rect" id="node3" title=" " alt="" coords="5,229,45,256"/>
 <area shape="rect" id="node4" title=" " alt="" coords="70,229,109,256"/>
 <area shape="rect" id="node5" title=" " alt="" coords="133,229,243,256"/>
-<area shape="rect" id="node10" href="$MaCh3Logger_8h.html" title="KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/incl..." alt="" coords="1049,304,1217,331"/>
-<area shape="rect" id="node14" href="$Core_8h.html" title=" " alt="" coords="1869,379,1984,405"/>
+<area shape="rect" id="node10" href="$MaCh3Logger_8h.html" title="MaCh3 Logging utilities built on top of SPDLOG." alt="" coords="1049,304,1217,331"/>
+<area shape="rect" id="node14" href="$Core_8h.html" title="KS: Core MaCh3 definitions and compile&#45;time configuration utilities." alt="" coords="1869,379,1984,405"/>
 <area shape="rect" id="node21" title=" " alt="" coords="268,229,345,256"/>
 <area shape="rect" id="node22" title=" " alt="" coords="1015,229,1110,256"/>
 <area shape="rect" id="node23" title=" " alt="" coords="370,229,433,256"/>

@@ -86,6 +86,9 @@ $(function() {
 <div class="title">Core.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>KS: Core MaCh3 definitions and compile-time configuration utilities.  
+<a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;sstream&gt;</code><br />
 <code>#include &lt;fstream&gt;</code><br />
 <code>#include &lt;iostream&gt;</code><br />
@@ -192,7 +195,9 @@ Variables</h2></td></tr>
 <tr class="separator:a5845b81afc8b4028a72375d5da27bf3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><dl class="section author"><dt>Author</dt><dd>Clarence Wret </dd>
+<div class="textblock"><p>KS: Core MaCh3 definitions and compile-time configuration utilities. </p>
+<p>KS: This header contains the fundamental MaCh3 type definitions, constants, and macros used throughout the framework. It centralizes basic numerical types, default constants, and utility macros for controlling memory layout, precision, and compiler diagnostics.</p>
+<dl class="section author"><dt>Author</dt><dd>Clarence Wret </dd>
 <dd>
 Kamil Skwarczynski </dd>
 <dd>
@@ -214,7 +219,7 @@ Luke Pickering </dd></dl>
 
 <p>KS: Restore warning checking after including external headers. </p>
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00120">120</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00127">127</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -242,7 +247,7 @@ Luke Pickering </dd></dl>
 <p>KS: Avoiding warning checking for headers. </p>
 <p>Many external files don't strictly adhere to rigorous C++ standards. Inline functions in such headers may cause errors when compiled with strict MaCh3 compiler flags. </p><dl class="section warning"><dt>Warning</dt><dd>Use this for any external header file to avoid warnings. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00109">109</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00116">116</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -260,7 +265,7 @@ Luke Pickering </dd></dl>
 
 <p>KS: noexcept can help with performance but is terrible for debugging, this is meant to help easy way of of turning it on or off. In near future move this to struct or other central class. </p>
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00086">86</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00093">93</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -278,7 +283,7 @@ Luke Pickering </dd></dl>
 
 <p>KS: Using restrict limits the effects of pointer aliasing, aiding optimizations. While reading I found that there might be some compilers which don't have <b>restrict</b>. As always we use <em>restrict</em> to more easily turn off restrict in the code. </p>
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00093">93</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00100">100</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>
@@ -296,7 +301,7 @@ Luke Pickering </dd></dl>
 
 <p>Number of overflow bins in TH2Poly,. </p>
 
-<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00099">99</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Core_8h_source.html#l00106">106</a> of file <a class="el" href="Core_8h_source.html">Core.h</a>.</p>
 
 </div>
 </div>

@@ -1,5 +1,5 @@
 <map id="Parameters/ParameterStructs.h" name="Parameters/ParameterStructs.h">
-<area shape="rect" id="node1" title=" " alt="" coords="979,5,1186,32"/>
+<area shape="rect" id="node1" title="Definitions of generic parameter structs and utility templates for MaCh3." alt="" coords="979,5,1186,32"/>
 <area shape="rect" id="node2" href="$SplineStructs_8h.html" title="Contains structures and helper functions for handling spline representations of systematic parameters..." alt="" coords="351,437,510,464"/>
 <area shape="rect" id="node15" href="$HistogramUtils_8h.html" title=" " alt="" coords="1882,87,2057,114"/>
 <area shape="rect" id="node40" href="$ParameterHandlerUtils_8h.html" title=" " alt="" coords="983,80,1182,121"/>

@@ -25,7 +25,7 @@
 <area shape="rect" id="node24" title=" " alt="" coords="1390,557,1461,584"/>
 <area shape="rect" id="node25" title=" " alt="" coords="2344,475,2422,502"/>
 <area shape="rect" id="node26" title=" " alt="" coords="1434,475,1508,502"/>
-<area shape="rect" id="node11" href="$MaCh3Exception_8h.html" title=" " alt="" coords="374,707,560,733"/>
+<area shape="rect" id="node11" href="$MaCh3Exception_8h.html" title="Defines the custom exception class used throughout MaCh3." alt="" coords="374,707,560,733"/>
 <area shape="rect" id="node16" href="$YamlHelper_8h.html" title="Utility functions for handling YAML nodes." alt="" coords="275,632,430,659"/>
 <area shape="rect" id="node17" href="$Monitor_8h.html" title="System and monitoring utilities for printing system information and status updates." alt="" coords="451,557,582,584"/>
 <area shape="rect" id="node19" title=" " alt="" coords="1354,632,1436,659"/>

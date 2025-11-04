@@ -646,7 +646,7 @@
 <!-- Node47 -->
 <g id="node18" class="node">
 <title>Node47</title>
-<g id="a_node18"><a xlink:href="ParameterStructs_8h.html" target="_top" xlink:title=" ">
+<g id="a_node18"><a xlink:href="ParameterStructs_8h.html" target="_top" xlink:title="Definitions of generic parameter structs and utility templates for MaCh3.">
 <polygon fill="white" stroke="red" points="693,-56.5 693,-75.5 848,-75.5 848,-56.5 693,-56.5"/>
 <text text-anchor="middle" x="770.5" y="-63.5" font-family="Helvetica" font-size="10.00">Parameters/ParameterStructs.h</text>
 </a>

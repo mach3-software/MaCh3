@@ -2,15 +2,15 @@
 <area shape="rect" id="node1" title=" " alt="" coords="1017,5,1192,32"/>
 <area shape="rect" id="node2" href="$SampleStructs_8h.html" title=" " alt="" coords="892,80,1066,107"/>
 <area shape="rect" id="node22" title=" " alt="" coords="1204,155,1298,181"/>
-<area shape="rect" id="node28" href="$ParameterStructs_8h.html" title=" " alt="" coords="661,80,868,107"/>
+<area shape="rect" id="node28" href="$ParameterStructs_8h.html" title="Definitions of generic parameter structs and utility templates for MaCh3." alt="" coords="661,80,868,107"/>
 <area shape="rect" id="node29" title=" " alt="" coords="1142,80,1298,107"/>
 <area shape="rect" id="node30" title=" " alt="" coords="1323,80,1419,107"/>
 <area shape="rect" id="node3" title=" " alt="" coords="763,155,803,181"/>
 <area shape="rect" id="node4" title=" " alt="" coords="354,155,393,181"/>
 <area shape="rect" id="node5" title=" " alt="" coords="417,155,528,181"/>
-<area shape="rect" id="node6" href="$MaCh3Exception_8h.html" title=" " alt="" coords="552,155,739,181"/>
-<area shape="rect" id="node10" href="$MaCh3Logger_8h.html" title="KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/incl..." alt="" coords="291,229,459,256"/>
-<area shape="rect" id="node14" href="$Core_8h.html" title=" " alt="" coords="550,304,664,331"/>
+<area shape="rect" id="node6" href="$MaCh3Exception_8h.html" title="Defines the custom exception class used throughout MaCh3." alt="" coords="552,155,739,181"/>
+<area shape="rect" id="node10" href="$MaCh3Logger_8h.html" title="MaCh3 Logging utilities built on top of SPDLOG." alt="" coords="291,229,459,256"/>
+<area shape="rect" id="node14" href="$Core_8h.html" title="KS: Core MaCh3 definitions and compile&#45;time configuration utilities." alt="" coords="550,304,664,331"/>
 <area shape="rect" id="node21" title=" " alt="" coords="827,155,904,181"/>
 <area shape="rect" id="node23" title=" " alt="" coords="929,155,992,181"/>
 <area shape="rect" id="node24" title=" " alt="" coords="1016,155,1072,181"/>

@@ -389,7 +389,7 @@ var sectionId = 'dynsection-0';
 <!-- Node47 -->
 <g id="node27" class="node">
 <title>Node47</title>
-<g id="a_node27"><a xlink:href="ParameterStructs_8h.html" target="_top" xlink:title=" ">
+<g id="a_node27"><a xlink:href="ParameterStructs_8h.html" target="_top" xlink:title="Definitions of generic parameter structs and utility templates for MaCh3.">
 <polygon fill="white" stroke="red" points="545,-230 545,-249 700,-249 700,-230 545,-230"/>
 <text text-anchor="middle" x="622.5" y="-237" font-family="Helvetica" font-size="10.00">Parameters/ParameterStructs.h</text>
 </a>
@@ -480,7 +480,7 @@ var sectionId = 'dynsection-0';
 <!-- Node14 -->
 <g id="node13" class="node">
 <title>Node14</title>
-<g id="a_node13"><a xlink:href="MaCh3Exception_8h.html" target="_top" xlink:title=" ">
+<g id="a_node13"><a xlink:href="MaCh3Exception_8h.html" target="_top" xlink:title="Defines the custom exception class used throughout MaCh3.">
 <polygon fill="white" stroke="black" points="939.5,-168.5 939.5,-187.5 1079.5,-187.5 1079.5,-168.5 939.5,-168.5"/>
 <text text-anchor="middle" x="1009.5" y="-175.5" font-family="Helvetica" font-size="10.00">Manager/MaCh3Exception.h</text>
 </a>
@@ -495,7 +495,7 @@ var sectionId = 'dynsection-0';
 <!-- Node18 -->
 <g id="node17" class="node">
 <title>Node18</title>
-<g id="a_node17"><a xlink:href="MaCh3Logger_8h.html" target="_top" xlink:title="KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/incl...">
+<g id="a_node17"><a xlink:href="MaCh3Logger_8h.html" target="_top" xlink:title="MaCh3 Logging utilities built on top of SPDLOG.">
 <polygon fill="white" stroke="red" points="837.5,-112.5 837.5,-131.5 963.5,-131.5 963.5,-112.5 837.5,-112.5"/>
 <text text-anchor="middle" x="900.5" y="-119.5" font-family="Helvetica" font-size="10.00">Manager/MaCh3Logger.h</text>
 </a>
@@ -510,7 +510,7 @@ var sectionId = 'dynsection-0';
 <!-- Node22 -->
 <g id="node18" class="node">
 <title>Node22</title>
-<g id="a_node18"><a xlink:href="Core_8h.html" target="_top" xlink:title=" ">
+<g id="a_node18"><a xlink:href="Core_8h.html" target="_top" xlink:title="KS: Core MaCh3 definitions and compile&#45;time configuration utilities.">
 <polygon fill="white" stroke="red" points="902.5,-56.5 902.5,-75.5 988.5,-75.5 988.5,-56.5 902.5,-56.5"/>
 <text text-anchor="middle" x="945.5" y="-63.5" font-family="Helvetica" font-size="10.00">Manager/Core.h</text>
 </a>

@@ -544,7 +544,7 @@
 <!-- Node18 -->
 <g id="node13" class="node">
 <title>Node18</title>
-<g id="a_node13"><a xlink:href="MaCh3Exception_8h.html" target="_top" xlink:title=" ">
+<g id="a_node13"><a xlink:href="MaCh3Exception_8h.html" target="_top" xlink:title="Defines the custom exception class used throughout MaCh3.">
 <polygon fill="white" stroke="red" points="180,-168.5 180,-187.5 320,-187.5 320,-168.5 180,-168.5"/>
 <text text-anchor="middle" x="250" y="-175.5" font-family="Helvetica" font-size="10.00">Manager/MaCh3Exception.h</text>
 </a>
@@ -640,7 +640,7 @@
 <!-- Node21 -->
 <g id="node14" class="node">
 <title>Node21</title>
-<g id="a_node14"><a xlink:href="MaCh3Logger_8h.html" target="_top" xlink:title="KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/incl...">
+<g id="a_node14"><a xlink:href="MaCh3Logger_8h.html" target="_top" xlink:title="MaCh3 Logging utilities built on top of SPDLOG.">
 <polygon fill="white" stroke="red" points="285,-112.5 285,-131.5 411,-131.5 411,-112.5 285,-112.5"/>
 <text text-anchor="middle" x="348" y="-119.5" font-family="Helvetica" font-size="10.00">Manager/MaCh3Logger.h</text>
 </a>
@@ -655,7 +655,7 @@
 <!-- Node24 -->
 <g id="node15" class="node">
 <title>Node24</title>
-<g id="a_node15"><a xlink:href="Core_8h.html" target="_top" xlink:title=" ">
+<g id="a_node15"><a xlink:href="Core_8h.html" target="_top" xlink:title="KS: Core MaCh3 definitions and compile&#45;time configuration utilities.">
 <polygon fill="white" stroke="red" points="143,-56.5 143,-75.5 229,-75.5 229,-56.5 143,-56.5"/>
 <text text-anchor="middle" x="186" y="-63.5" font-family="Helvetica" font-size="10.00">Manager/Core.h</text>
 </a>
@@ -907,7 +907,7 @@
 <!-- Node48 -->
 <g id="node30" class="node">
 <title>Node48</title>
-<g id="a_node30"><a xlink:href="ParameterStructs_8h.html" target="_top" xlink:title=" ">
+<g id="a_node30"><a xlink:href="ParameterStructs_8h.html" target="_top" xlink:title="Definitions of generic parameter structs and utility templates for MaCh3.">
 <polygon fill="white" stroke="black" points="870.5,-224.5 870.5,-243.5 1025.5,-243.5 1025.5,-224.5 870.5,-224.5"/>
 <text text-anchor="middle" x="948" y="-231.5" font-family="Helvetica" font-size="10.00">Parameters/ParameterStructs.h</text>
 </a>

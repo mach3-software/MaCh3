@@ -58,7 +58,7 @@ var sectionId = 'dynsection-0';
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title="KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/incl...">
+<g id="a_node1"><a xlink:title="MaCh3 Logging utilities built on top of SPDLOG.">
 <polygon fill="#bfbfbf" stroke="black" points="197,-112.5 197,-131.5 323,-131.5 323,-112.5 197,-112.5"/>
 <text text-anchor="middle" x="260" y="-119.5" font-family="Helvetica" font-size="10.00">Manager/MaCh3Logger.h</text>
 </a>
@@ -142,7 +142,7 @@ var sectionId = 'dynsection-0';
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="Core_8h.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="Core_8h.html" target="_top" xlink:title="KS: Core MaCh3 definitions and compile&#45;time configuration utilities.">
 <polygon fill="white" stroke="black" points="126,-56.5 126,-75.5 212,-75.5 212,-56.5 126,-56.5"/>
 <text text-anchor="middle" x="169" y="-63.5" font-family="Helvetica" font-size="10.00">Manager/Core.h</text>
 </a>

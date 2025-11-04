@@ -81,9 +81,6 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Custom exception class for MaCh3 errors.  
- <a href="classMaCh3Exception.html#details">More...</a></p>
-
 <p><code>#include &lt;<a class="el" href="MaCh3Exception_8h_source.html">Manager/MaCh3Exception.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for MaCh3Exception:</div>
@@ -101,7 +98,7 @@ Collaboration diagram for MaCh3Exception:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a848f0037a80a607b8721b7a163b1077e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMaCh3Exception.html#a848f0037a80a607b8721b7a163b1077e">MaCh3Exception</a> (std::string File, int Line, std::string Message=&quot;&quot;)</td></tr>
-<tr class="memdesc:a848f0037a80a607b8721b7a163b1077e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a <a class="el" href="classMaCh3Exception.html" title="Custom exception class for MaCh3 errors.">MaCh3Exception</a> object with the specified error message.  <a href="classMaCh3Exception.html#a848f0037a80a607b8721b7a163b1077e">More...</a><br /></td></tr>
+<tr class="memdesc:a848f0037a80a607b8721b7a163b1077e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a <a class="el" href="classMaCh3Exception.html">MaCh3Exception</a> object with the specified error message.  <a href="classMaCh3Exception.html#a848f0037a80a607b8721b7a163b1077e">More...</a><br /></td></tr>
 <tr class="separator:a848f0037a80a607b8721b7a163b1077e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a190396baf266a982d8458cd786dcb435"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMaCh3Exception.html#a190396baf266a982d8458cd786dcb435">what</a> () const noexcept override</td></tr>
 <tr class="memdesc:a190396baf266a982d8458cd786dcb435"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the error message associated with this exception.  <a href="classMaCh3Exception.html#a190396baf266a982d8458cd786dcb435">More...</a><br /></td></tr>
@@ -114,9 +111,8 @@ Private Attributes</h2></td></tr>
 <tr class="separator:ab556e4d4710fab4c4d75e94c4bab537d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Custom exception class for MaCh3 errors. </p>
-
-<p class="definition">Definition at line <a class="el" href="MaCh3Exception_8h_source.html#l00013">13</a> of file <a class="el" href="MaCh3Exception_8h_source.html">MaCh3Exception.h</a>.</p>
+<div class="textblock">
+<p class="definition">Definition at line <a class="el" href="MaCh3Exception_8h_source.html#l00020">20</a> of file <a class="el" href="MaCh3Exception_8h_source.html">MaCh3Exception.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a848f0037a80a607b8721b7a163b1077e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a848f0037a80a607b8721b7a163b1077e">&#9670;&nbsp;</a></span>MaCh3Exception()</h2>
@@ -158,7 +154,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Constructs a <a class="el" href="classMaCh3Exception.html" title="Custom exception class for MaCh3 errors.">MaCh3Exception</a> object with the specified error message. </p>
+<p>Constructs a <a class="el" href="classMaCh3Exception.html">MaCh3Exception</a> object with the specified error message. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">File</td><td>The name of the file where the exception occurred. </td></tr>
@@ -168,18 +164,18 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="MaCh3Exception_8h_source.html#l00019">19</a> of file <a class="el" href="MaCh3Exception_8h_source.html">MaCh3Exception.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  {</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <span class="keywordtype">size_t</span> lastSlashPos = File.find_last_of(<span class="charliteral">&#39;/&#39;</span>);</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    std::string fileName = (lastSlashPos != std::string::npos) ? File.substr(lastSlashPos + 1) : File;</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <a class="code" href="classMaCh3Exception.html#ab556e4d4710fab4c4d75e94c4bab537d">errorMessage</a> = ((Message.empty()) ? <span class="stringliteral">&quot;Terminating MaCh3&quot;</span> : Message);</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <span class="comment">// KS: Set logger format where we only have have &quot;information type&quot;, line would be confusing</span></div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    spdlog::set_pattern(<span class="stringliteral">&quot;[%^%l%$] %v&quot;</span>);</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Find me here: {}::{}&quot;</span>, fileName, Line);</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  }</div>
-<div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00027">MaCh3Logger.h:27</a></div></div>
-<div class="ttc" id="aclassMaCh3Exception_html_ab556e4d4710fab4c4d75e94c4bab537d"><div class="ttname"><a href="classMaCh3Exception.html#ab556e4d4710fab4c4d75e94c4bab537d">MaCh3Exception::errorMessage</a></div><div class="ttdeci">std::string errorMessage</div><div class="ttdoc">The error message associated with this exception.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00038">MaCh3Exception.h:38</a></div></div>
+<p class="definition">Definition at line <a class="el" href="MaCh3Exception_8h_source.html#l00026">26</a> of file <a class="el" href="MaCh3Exception_8h_source.html">MaCh3Exception.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  {</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keywordtype">size_t</span> lastSlashPos = File.find_last_of(<span class="charliteral">&#39;/&#39;</span>);</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    std::string fileName = (lastSlashPos != std::string::npos) ? File.substr(lastSlashPos + 1) : File;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <a class="code" href="classMaCh3Exception.html#ab556e4d4710fab4c4d75e94c4bab537d">errorMessage</a> = ((Message.empty()) ? <span class="stringliteral">&quot;Terminating MaCh3&quot;</span> : Message);</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="comment">// KS: Set logger format where we only have have &quot;information type&quot;, line would be confusing</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    spdlog::set_pattern(<span class="stringliteral">&quot;[%^%l%$] %v&quot;</span>);</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Find me here: {}::{}&quot;</span>, fileName, Line);</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  }</div>
+<div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00037">MaCh3Logger.h:37</a></div></div>
+<div class="ttc" id="aclassMaCh3Exception_html_ab556e4d4710fab4c4d75e94c4bab537d"><div class="ttname"><a href="classMaCh3Exception.html#ab556e4d4710fab4c4d75e94c4bab537d">MaCh3Exception::errorMessage</a></div><div class="ttdeci">std::string errorMessage</div><div class="ttdoc">The error message associated with this exception.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00045">MaCh3Exception.h:45</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -210,10 +206,10 @@ Private Attributes</h2></td></tr>
 <p>Returns the error message associated with this exception. </p>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the error message string. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="MaCh3Exception_8h_source.html#l00032">32</a> of file <a class="el" href="MaCh3Exception_8h_source.html">MaCh3Exception.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;                                             {</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classMaCh3Exception.html#ab556e4d4710fab4c4d75e94c4bab537d">errorMessage</a>.c_str();</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="MaCh3Exception_8h_source.html#l00039">39</a> of file <a class="el" href="MaCh3Exception_8h_source.html">MaCh3Exception.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;                                             {</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classMaCh3Exception.html#ab556e4d4710fab4c4d75e94c4bab537d">errorMessage</a>.c_str();</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -240,7 +236,7 @@ Private Attributes</h2></td></tr>
 
 <p>The error message associated with this exception. </p>
 
-<p class="definition">Definition at line <a class="el" href="MaCh3Exception_8h_source.html#l00038">38</a> of file <a class="el" href="MaCh3Exception_8h_source.html">MaCh3Exception.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="MaCh3Exception_8h_source.html#l00045">45</a> of file <a class="el" href="MaCh3Exception_8h_source.html">MaCh3Exception.h</a>.</p>
 
 </div>
 </div>

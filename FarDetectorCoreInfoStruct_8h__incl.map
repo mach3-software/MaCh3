@@ -6,9 +6,9 @@
 <area shape="rect" id="node5" title=" " alt="" coords="1466,169,1506,196"/>
 <area shape="rect" id="node6" title=" " alt="" coords="141,169,180,196"/>
 <area shape="rect" id="node7" title=" " alt="" coords="204,169,315,196"/>
-<area shape="rect" id="node8" href="$MaCh3Exception_8h.html" title=" " alt="" coords="1255,169,1442,196"/>
-<area shape="rect" id="node11" href="$MaCh3Logger_8h.html" title="KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/incl..." alt="" coords="1013,244,1181,271"/>
-<area shape="rect" id="node15" href="$Core_8h.html" title=" " alt="" coords="1181,319,1295,345"/>
+<area shape="rect" id="node8" href="$MaCh3Exception_8h.html" title="Defines the custom exception class used throughout MaCh3." alt="" coords="1255,169,1442,196"/>
+<area shape="rect" id="node11" href="$MaCh3Logger_8h.html" title="MaCh3 Logging utilities built on top of SPDLOG." alt="" coords="1013,244,1181,271"/>
+<area shape="rect" id="node15" href="$Core_8h.html" title="KS: Core MaCh3 definitions and compile&#45;time configuration utilities." alt="" coords="1181,319,1295,345"/>
 <area shape="rect" id="node21" title=" " alt="" coords="339,169,417,196"/>
 <area shape="rect" id="node22" title=" " alt="" coords="441,169,536,196"/>
 <area shape="rect" id="node23" title=" " alt="" coords="560,169,623,196"/>

@@ -21,7 +21,7 @@
 <!-- Node0 -->
 <g id="node2" class="node">
 <title>Node0</title>
-<g id="a_node2"><a xlink:href="classMaCh3Exception.html" target="_top" xlink:title="Custom exception class for MaCh3 errors.">
+<g id="a_node2"><a xlink:href="classMaCh3Exception.html" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="black" points="113,-0.5 113,-19.5 204,-19.5 204,-0.5 113,-0.5"/>
 <text text-anchor="middle" x="158.5" y="-7.5" font-family="Helvetica" font-size="10.00">MaCh3Exception</text>
 </a>

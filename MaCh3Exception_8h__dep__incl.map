@@ -1,5 +1,5 @@
 <map id="Manager/MaCh3Exception.h" name="Manager/MaCh3Exception.h">
-<area shape="rect" id="node1" title=" " alt="" coords="3659,5,3846,32"/>
+<area shape="rect" id="node1" title="Defines the custom exception class used throughout MaCh3." alt="" coords="3659,5,3846,32"/>
 <area shape="rect" id="node2" href="$MaCh3Modes_8h.html" title=" " alt="" coords="369,251,537,278"/>
 <area shape="rect" id="node7" href="$Manager_8h.html" title=" " alt="" coords="2357,251,2495,278"/>
 <area shape="rect" id="node27" href="$Monitor_8h.html" title="System and monitoring utilities for printing system information and status updates." alt="" coords="2361,162,2491,189"/>
@@ -10,7 +10,7 @@
 <area shape="rect" id="node42" href="$SampleHandlerFD_8cpp.html" title=" " alt="" coords="4791,80,5000,107"/>
 <area shape="rect" id="node43" href="$SampleStructs_8h.html" title=" " alt="" coords="3505,162,3680,189"/>
 <area shape="rect" id="node47" href="$plottingUtils_8h.html" title=" " alt="" coords="4767,155,4906,196"/>
-<area shape="rect" id="node49" href="$ParameterStructs_8h.html" title=" " alt="" coords="2761,162,2968,189"/>
+<area shape="rect" id="node49" href="$ParameterStructs_8h.html" title="Definitions of generic parameter structs and utility templates for MaCh3." alt="" coords="2761,162,2968,189"/>
 <area shape="rect" id="node3" href="$MaCh3Modes_8cpp.html" title=" " alt="" coords="5,341,188,367"/>
 <area shape="rect" id="node4" href="$BinnedSplineHandler_8h.html" title=" " alt="" coords="212,341,413,367"/>
 <area shape="rect" id="node5" href="$SampleHandlerBase_8h.html" title=" " alt="" coords="489,341,696,367"/>

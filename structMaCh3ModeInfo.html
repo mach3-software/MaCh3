@@ -94,9 +94,9 @@ Collaboration diagram for MaCh3ModeInfo:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a9a89a0394f9f5eb780008253716836fc"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMaCh3ModeInfo.html#a9a89a0394f9f5eb780008253716836fc">IsMode</a> (const int GenMode)</td></tr>
-<tr class="memdesc:a9a89a0394f9f5eb780008253716836fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Checks MaCh3 modes is associated with a given generator mode.  <a href="structMaCh3ModeInfo.html#a9a89a0394f9f5eb780008253716836fc">More...</a><br /></td></tr>
-<tr class="separator:a9a89a0394f9f5eb780008253716836fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb88d4b6a9edaa26e860024c19a25aea"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMaCh3ModeInfo.html#abb88d4b6a9edaa26e860024c19a25aea">IsMode</a> (const int GenMode) const</td></tr>
+<tr class="memdesc:abb88d4b6a9edaa26e860024c19a25aea"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Checks MaCh3 modes is associated with a given generator mode.  <a href="structMaCh3ModeInfo.html#abb88d4b6a9edaa26e860024c19a25aea">More...</a><br /></td></tr>
+<tr class="separator:abb88d4b6a9edaa26e860024c19a25aea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -124,8 +124,8 @@ Public Attributes</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="MaCh3Modes_8h_source.html#l00017">17</a> of file <a class="el" href="MaCh3Modes_8h_source.html">MaCh3Modes.h</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a9a89a0394f9f5eb780008253716836fc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9a89a0394f9f5eb780008253716836fc">&#9670;&nbsp;</a></span>IsMode()</h2>
+<a id="abb88d4b6a9edaa26e860024c19a25aea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abb88d4b6a9edaa26e860024c19a25aea">&#9670;&nbsp;</a></span>IsMode()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -138,7 +138,7 @@ Public Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">const int&#160;</td>
           <td class="paramname"><em>GenMode</em></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
   </td>
@@ -151,7 +151,7 @@ Public Attributes</h2></td></tr>
 <p>KS: Checks MaCh3 modes is associated with a given generator mode. </p>
 
 <p class="definition">Definition at line <a class="el" href="MaCh3Modes_8h_source.html#l00031">31</a> of file <a class="el" href="MaCh3Modes_8h_source.html">MaCh3Modes.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;                                        {</div>
+<div class="fragment"><div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;                                              {</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="keywordtype">bool</span> exists = std::find(<a class="code" href="structMaCh3ModeInfo.html#a02a4f32a5a65b723a0849539a315cc1a">GeneratorMaping</a>.begin(), <a class="code" href="structMaCh3ModeInfo.html#a02a4f32a5a65b723a0849539a315cc1a">GeneratorMaping</a>.end(), GenMode) != <a class="code" href="structMaCh3ModeInfo.html#a02a4f32a5a65b723a0849539a315cc1a">GeneratorMaping</a>.end();</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keywordflow">return</span> exists;</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  }</div>

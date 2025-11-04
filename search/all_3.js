@@ -121,5 +121,5 @@ var searchData=
   ['current_5fstep_5fvals_268',['current_step_vals',['../classDelayedMR2T2.html#af8590de3ef5df7a7bfb9483f78c2efe5',1,'DelayedMR2T2']]],
   ['currsegment_269',['CurrSegment',['../structFastSplineInfo.html#a80e4c1195099d2c34a1a511e4f749fe4',1,'FastSplineInfo']]],
   ['currval_270',['CurrVal',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac217019634fb10a0f1ebe834919ec57d',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
-  ['customrange_271',['CustomRange',['../classFitterBase.html#a9a2ad372f4237cef49c90e59651999e8',1,'FitterBase']]]
+  ['customrange_271',['CustomRange',['../classFitterBase.html#aad1a1941379bc81a853fa6e1a3f9d5f2',1,'FitterBase']]]
 ];

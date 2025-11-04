@@ -604,7 +604,7 @@
 <!-- Node17 -->
 <g id="node14" class="node">
 <title>Node17</title>
-<g id="a_node14"><a xlink:href="MaCh3Exception_8h.html" target="_top" xlink:title=" ">
+<g id="a_node14"><a xlink:href="MaCh3Exception_8h.html" target="_top" xlink:title="Defines the custom exception class used throughout MaCh3.">
 <polygon fill="white" stroke="red" points="2172.94,-56.5 2172.94,-75.5 2312.94,-75.5 2312.94,-56.5 2172.94,-56.5"/>
 <text text-anchor="middle" x="2242.94" y="-63.5" font-family="Helvetica" font-size="10.00">Manager/MaCh3Exception.h</text>
 </a>
@@ -754,7 +754,7 @@
 <!-- Node47 -->
 <g id="node23" class="node">
 <title>Node47</title>
-<g id="a_node23"><a xlink:href="ParameterStructs_8h.html" target="_top" xlink:title=" ">
+<g id="a_node23"><a xlink:href="ParameterStructs_8h.html" target="_top" xlink:title="Definitions of generic parameter structs and utility templates for MaCh3.">
 <polygon fill="white" stroke="red" points="724.44,-168.5 724.44,-187.5 879.44,-187.5 879.44,-168.5 724.44,-168.5"/>
 <text text-anchor="middle" x="801.94" y="-175.5" font-family="Helvetica" font-size="10.00">Parameters/ParameterStructs.h</text>
 </a>

@@ -419,7 +419,7 @@
 <!-- Node13 -->
 <g id="node10" class="node">
 <title>Node13</title>
-<g id="a_node10"><a xlink:href="MaCh3Exception_8h.html" target="_top" xlink:title=" ">
+<g id="a_node10"><a xlink:href="MaCh3Exception_8h.html" target="_top" xlink:title="Defines the custom exception class used throughout MaCh3.">
 <polygon fill="white" stroke="red" points="1704,-56.5 1704,-75.5 1844,-75.5 1844,-56.5 1704,-56.5"/>
 <text text-anchor="middle" x="1774" y="-63.5" font-family="Helvetica" font-size="10.00">Manager/MaCh3Exception.h</text>
 </a>

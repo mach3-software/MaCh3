@@ -35,7 +35,7 @@
 <area shape="rect" id="node30" href="$AdaptiveMCMCHandler_8h.html" title=" " alt="" coords="948,557,1189,584"/>
 <area shape="rect" id="node31" href="$PCAHandler_8h.html" title=" " alt="" coords="521,557,699,584"/>
 <area shape="rect" id="node32" href="$ParameterTunes_8h.html" title=" " alt="" coords="723,557,923,584"/>
-<area shape="rect" id="node16" href="$MaCh3Exception_8h.html" title=" " alt="" coords="473,871,659,897"/>
+<area shape="rect" id="node16" href="$MaCh3Exception_8h.html" title="Defines the custom exception class used throughout MaCh3." alt="" coords="473,871,659,897"/>
 <area shape="rect" id="node19" href="$YamlHelper_8h.html" title="Utility functions for handling YAML nodes." alt="" coords="243,796,398,823"/>
 <area shape="rect" id="node20" href="$Monitor_8h.html" title="System and monitoring utilities for printing system information and status updates." alt="" coords="407,721,538,748"/>
 <area shape="rect" id="node15" title=" " alt="" coords="1795,796,1835,823"/>
