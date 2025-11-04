@@ -1680,8 +1680,9 @@ void MCMCProcessor::DrawCorrelations1D() {
     }
   }
 
+  // KS: Do not add collapse(2) otherwise one can intorduce race condition :(
   #ifdef MULTITHREAD
-  #pragma omp parallel for collapse(2)
+  #pragma omp parallel for
   #endif
   for(int i = 0; i < nDraw; ++i)
   {
@@ -2568,8 +2569,7 @@ void MCMCProcessor::ReadModelFile() {
 
     // Check that the branch exists before setting address
     if (!Chain->GetBranch(BranchNames.back())) {
-      MACH3LOG_ERROR("Couldn't find branch '{}'", BranchNames.back());
-      throw MaCh3Exception(__FILE__, __LINE__);
+      MACH3LOG_WARN("Couldn't find branch '{}', if you are not planning to draw posteriors this might be fine", BranchNames.back());
     }
   }
 }
@@ -4234,16 +4234,17 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
     for (int jj = start; jj < end; ++jj)
     {
       std::complex<M3::float_t> a_j = 0.0;
+      const double two_pi_over_N_jj = two_pi_over_N * jj;
       for (int n = 0; n < _N; ++n)
       {
         //if(StepNumber[n] < BurnInCut) continue;
-        std::complex<M3::float_t> exp_temp(0, two_pi_over_N * jj * n);
+        std::complex<M3::float_t> exp_temp(0, two_pi_over_N_jj * n);
         a_j += ParStep[j][n] * std::exp(exp_temp);
       }
       a_j /= std::sqrt(float(_N));
       const int _c = jj - start;
 
-      k_j[j][_c] = two_pi_over_N * jj;
+      k_j[j][_c] = two_pi_over_N_jj;
       // Equation 13
       P_j[j][_c] = std::norm(a_j);
     }
@@ -4287,7 +4288,6 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
     Posterior->SetLogx();
     Posterior->SetLogy();
     Posterior->SetGrid();
-    plot->Write(plot->GetName());
     plot->Draw("AL");
     func->Draw("SAME");
     if(printToPDF) Posterior->Print(CanvasName);

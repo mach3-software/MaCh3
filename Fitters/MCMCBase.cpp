@@ -124,7 +124,7 @@ void MCMCBase::StartFromPreviousFit(const std::string &FitName) {
     FitterBase::StartFromPreviousFit(FitName);
 
     // For MCMC we also need to set stepStart
-    TFile *infile = new TFile(FitName.c_str(), "READ");
+    TFile *infile = M3::Open(FitName, "READ", __FILE__, __LINE__);
     TTree *posts = infile->Get<TTree>("posteriors");
     unsigned int step_val = 0;
 

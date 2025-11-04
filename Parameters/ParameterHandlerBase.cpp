@@ -666,6 +666,11 @@ void ParameterHandlerBase::AcceptStep() _noexcept_ {
   } else {
     PCAObj->AcceptStep();
   }
+
+  if (AdaptiveHandler) {
+    AdaptiveHandler->IncrementAcceptedSteps();
+  }
+
 }
 
 // *************************************
@@ -860,6 +865,11 @@ void ParameterHandlerBase::SetBranches(TTree &tree, bool SaveProposal) {
       tree.Branch(Form("%s_Prop", _fNames[i].c_str()), &_fPropVal[i], Form("%s_Prop/D", _fNames[i].c_str()));
     }
   }
+  if(use_adaptive && AdaptiveHandler->GetUseRobbinsMonro()){
+
+    tree.Branch(Form("GlobalStepScale_%s", GetName().c_str()), &_fGlobalStepScale, Form("GlobalStepScale_%s/D", GetName().c_str()));
+  }
+
 }
 
 // ********************************************
@@ -1076,6 +1086,7 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
     return;
   }
   AdaptiveHandler = std::make_unique<adaptive_mcmc::AdaptiveMCMCHandler>();
+
   // Now we read the general settings [these SHOULD be common across all matrices!]
   bool success = AdaptiveHandler->InitFromConfig(adapt_manager, matrixName, &_fCurrVal, &_fError);
   if(!success) return;
@@ -1099,6 +1110,7 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
 
   AdaptiveHandler->SetThrowMatrixFromFile(external_file_name, external_matrix_name, external_mean_name, use_adaptive);
   SetThrowMatrix(AdaptiveHandler->GetAdaptiveCovariance());
+
   ResetIndivStepScale();
 
   MACH3LOG_INFO("Successfully Set External Throw Matrix Stored in {}", external_file_name);
@@ -1117,10 +1129,19 @@ void ParameterHandlerBase::UpdateAdaptiveCovariance(){
     return;
   }
 
+  /// Need to adjust the scale every step
+  if(AdaptiveHandler->GetUseRobbinsMonro()){
+    bool verbose=false;
+    #ifdef DEBUG
+    verbose=true;
+    #endif
+    SetStepScale(AdaptiveHandler->GetAdaptionScale(), verbose);
+  }
+
   // Call main adaption function
   AdaptiveHandler->UpdateAdaptiveCovariance();
 
-  //This is likely going to be the slow bit!
+  // Set scales to 1 * optimal scale
   if(AdaptiveHandler->IndivStepScaleAdapt()) {
     ResetIndivStepScale();
   }
@@ -1155,8 +1176,8 @@ void ParameterHandlerBase::MakeClosestPosDef(TMatrixDSym *cov) {
   //Do SVD to get polar form
   TDecompSVD cov_sym_svd=TDecompSVD(cov_sym);
   if(!cov_sym_svd.Decompose()){
-    MACH3LOG_ERROR("Cannot do SVD on input matrix!");
-    throw MaCh3Exception(__FILE__ , __LINE__ );
+    MACH3LOG_WARN("Cannot do SVD on input matrix, trying MakePosDef() first!");
+    MakePosDef(&cov_sym);
   }
   
   TMatrixD cov_sym_v = cov_sym_svd.GetV();
@@ -1315,4 +1336,6 @@ void ParameterHandlerBase::MatchMaCh3OutputBranches(TTree *PosteriorFile,
     PosteriorFile->SetBranchStatus(BranchNames[i].c_str(), true);
     PosteriorFile->SetBranchAddress(BranchNames[i].c_str(), &BranchValues[i]);
   }
+
 }
+

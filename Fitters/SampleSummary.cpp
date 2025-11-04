@@ -555,11 +555,10 @@ void SampleSummary::AddThrowByMode(std::vector<std::vector<TH2Poly*>> &SampleVec
 // **********************
 void SampleSummary::PrepareOutput() {
 // **********************
-
   // Make the output file (MakePosterioPredictive call writes to this)
   std::string TempString = OutputName;
   TempString.replace(TempString.find(".root"), 5, std::string("_procsW2.root"));
-  Outputfile = new TFile(TempString.c_str(), "RECREATE");
+  Outputfile = M3::Open(TempString, "RECREATE", __FILE__, __LINE__);
 
   // The array of doubles we write to the TTree
   // Data vs Draw

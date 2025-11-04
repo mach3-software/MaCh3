@@ -10,9 +10,15 @@ AdaptiveMCMCHandler::AdaptiveMCMCHandler() {
   end_adaptive_update   = 1;
   adaptive_update_step  = 1000;
   total_steps = 0;
-
   par_means = {};
   adaptive_covariance = nullptr;
+
+  /// Robbins-Monro adaption
+  use_robbins_monro = false;
+  total_rm_restarts = 0;
+  
+  target_acceptance = 0.234;
+  acceptance_rate_batch_size = 10000;
 }
 
 // ********************************************
@@ -72,14 +78,35 @@ bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const 
   adaptive_save_n_iterations  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["SaveNIterations"], -1);
   output_file_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Settings"]["OutputFileName"], "");
 
+  // Check for Robbins-Monro adaption
+  use_robbins_monro = GetFromManager<bool>(adapt_manager["AdaptionOptions"]["Settings"]["UseRobbinsMonro"], false);
+  target_acceptance = GetFromManager<double>(adapt_manager["AdaptionOptions"]["Settings"]["TargetAcceptance"], 0.234);
+  if (target_acceptance <= 0 || target_acceptance >= 1) {
+    MACH3LOG_ERROR("Target acceptance must be in (0,1), got {}", target_acceptance);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  acceptance_rate_batch_size = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AcceptanceRateBatchSize"], 10000);
+  total_rm_restarts = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["TotalRobbinsMonroRestarts"], 0);
+  n_rm_restarts = 0;
+
+  prev_step_accepted = false; 
+
   // We also want to check for "blocks" by default all parameters "know" about each other
   // but we can split the matrix into independent block matrices
   SetParams(parameters);
   SetFixed(fixed);
 
   /// HW: This is technically wrong, should be across all systematics but will be addressed in a later PR
+  if(use_robbins_monro) {
+    MACH3LOG_INFO("Using Robbins-Monro for adaptive step size tuning with target acceptance {}", target_acceptance);
+    // Now we need some thing
+    CalculateRobbinsMonroStepLength();
+  }
+
+  // We'll use the same start scale for Robbins-Monro as standard adaption
   adaption_scale = 2.38*2.38/GetNumParams(); 
-  
+
   // We"ll set a dummy variable here
   auto matrix_blocks = GetFromManager<std::vector<std::vector<int>>>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["MatrixBlocks"], {{}});
 
@@ -173,10 +200,14 @@ void AdaptiveMCMCHandler::SaveAdaptiveToFile(const std::string &outFileName,
     }
 
     outFile->cd();
-    adaptive_covariance->Write(adaptive_cov_name.c_str());
+    auto adaptive_to_save = static_cast<TMatrixDSym*>(adaptive_covariance->Clone());
+    // Multiply by scale
+    (*adaptive_to_save) *= GetAdaptionScale();
+    adaptive_to_save->Write(adaptive_cov_name.c_str());
     outMeanVec->Write(mean_vec_name.c_str());
     outFile->Close();
-    delete outMeanVec;
+    delete adaptive_to_save;
+     delete outMeanVec;
     delete outFile;
   }
 }
@@ -241,6 +272,8 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance() {
   std::vector<double> par_means_prev = par_means;
   int steps_post_burn = total_steps - start_adaptive_update;
 
+  prev_step_accepted = false;
+
   // Step 1: Update means and compute deviations
   for (int i = 0; i < GetNumParams(); ++i) {
     if (IsFixed(i)) continue;
@@ -278,7 +311,7 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance() {
         double curr_means_t = (steps_post_burn + 1) * par_means[i] * par_means[j];
         double curr_step_t = CurrVal(i) * CurrVal(j);
 
-        cov_updated = cov_t + adaption_scale * (prev_means_t - curr_means_t + curr_step_t) / steps_post_burn;
+        cov_updated = cov_t + (prev_means_t - curr_means_t + curr_step_t) / steps_post_burn;
       }
 
       (*adaptive_covariance)(i, j) = cov_updated;
@@ -330,7 +363,11 @@ void AdaptiveMCMCHandler::Print() const {
   MACH3LOG_INFO("Adaption Matrix Ending Updates     : {}", end_adaptive_update);
   MACH3LOG_INFO("Steps Between Updates              : {}", adaptive_update_step);
   MACH3LOG_INFO("Saving matrices to file            : {}", output_file_name);
-  MACH3LOG_INFO("Will only save every {} iterations"     , adaptive_save_n_iterations);
+  MACH3LOG_INFO("Will only save every {} iterations"     , adaptive_save_n_iterations); 
+  if(use_robbins_monro) {
+    MACH3LOG_INFO("Using Robbins-Monro for adaptive step size tuning with target acceptance {}", target_acceptance);
+  }
+
 }
 
 // ********************************************
@@ -390,10 +427,75 @@ void AdaptiveMCMCHandler::CheckMatrixValidityForAdaption(const TMatrixDSym *covM
   }
 }
 
+  
+// ********************************************
 double AdaptiveMCMCHandler::CurrVal(const int par_index) const {
+// ********************************************
   /// HW Implemented as its own method to allow for
   /// different behaviour in the future
   return (*_fCurrVal)[par_index];
+}
+
+// ********************************************
+void AdaptiveMCMCHandler::CalculateRobbinsMonroStepLength() {
+// ********************************************
+  /* 
+    Obtains the constant "step scale" for Robbins-Monro adaption
+    for simplicity and because it has the degrees of freedom "baked in"
+    it will be same across ALL blocks. 
+  */
+
+  /// Firstly we need to calculate the alpha value, this is in some sense "optimal"
+  double alpha = -ROOT::Math::normal_quantile(target_acceptance/2, 1.0); 
+
+  int non_fixed_pars = GetNumParams()-GetNFixed();
+
+  /// Now we can calculate the scale factor
+  c_robbins_monro = (1- 1/non_fixed_pars)*std::sqrt(TMath::Pi()*2 * std::exp(alpha*alpha));
+  c_robbins_monro += 1/(non_fixed_pars*target_acceptance*(1-target_acceptance));
+
+  MACH3LOG_INFO("Robbins-Monro scale factor set to {}", c_robbins_monro);
+}
+
+// ********************************************
+void AdaptiveMCMCHandler::UpdateRobbinsMonroScale(){
+// ********************************************
+  /* 
+  Update the scale factor using Robbins-Monro. 
+  TLDR: If acceptance rate is too high, scale factor goes up, if too low goes down
+        will pretty rapidly converge to the right value.
+  */
+
+
+
+  if ((total_steps>0) && (total_steps % acceptance_rate_batch_size == 0)) {
+    n_rm_restarts++;
+  }
+
+  /// This allows to move towards a STABLE number of steps in the batch
+  int batch_step;
+  if (n_rm_restarts > total_rm_restarts) {
+    batch_step = total_steps;
+  }
+  else{
+    batch_step = total_steps % acceptance_rate_batch_size;
+  }
+
+  int non_fixed_pars = GetNumParams()-GetNFixed();
+
+  double root_scale = std::sqrt(adaption_scale);
+
+  /// Update the scale factor for Robbins-Monro adaption [200 is arbitrary for early stability but motivated by paper]
+  double scale_factor = root_scale*c_robbins_monro/std::max(200.0, static_cast<double>(batch_step)/non_fixed_pars);
+
+  /// Now we either increase or decrease the scale
+  if(prev_step_accepted){
+    root_scale += (1-target_acceptance)*scale_factor;
+  }
+  else{
+      root_scale -= target_acceptance*scale_factor;
+  }
+  adaption_scale = root_scale*root_scale;
 }
 
 } //end adaptive_mcmc
