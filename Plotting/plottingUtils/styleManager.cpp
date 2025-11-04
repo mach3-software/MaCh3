@@ -28,7 +28,7 @@ void StyleManager::setPalette(const std::string& configStyleName) const {
   }
 
   auto paletteDef = GetFromManager<std::vector<std::vector<double>>>(
-    styleDef["MarkerColor"],
+    styleDef,
     std::vector<std::vector<double>>{
       {4.0},                         // NCont
       {0.0   , 0.33  , 0.66 , 1.0},  // stops
