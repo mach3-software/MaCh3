@@ -354,7 +354,7 @@ void SampleHandlerFD::FillArray() {
     CalcWeightFunc(iEvent);
 
     const M3::float_t totalweight = CalcWeightTotal(MCEvent);
-    //DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient. Do this on a spline-by-spline basis
+    //DB Catch negative total weights and skip any event with a negative weight. Previously we would set weight to zero and continue but that is inefficient
     if (totalweight <= 0.){
       continue;
     }
@@ -431,10 +431,8 @@ void SampleHandlerFD::FillArray_MP() {
       // Virtual by default does nothing, has to happen before CalcWeightTotal
       CalcWeightFunc(iEvent);
 
-      //DB SKDet Syst
-      //As weights were skdet::fParProp, and we use the non-shifted erec, we might as well cache the corresponding fParProp index for each event and the pointer to it
       const M3::float_t totalweight = CalcWeightTotal(MCEvent);
-      //DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient. Do this on a spline-by-spline basis
+      //DB Catch negative total weights and skip any event with a negative weight. Previously we would set weight to zero and continue but that is inefficient
       if (totalweight <= 0.){
         continue;
       }
@@ -1218,7 +1216,7 @@ M3::float_t SampleHandlerFD::GetEventWeight(const int iEntry) {
   const FarDetectorCoreInfo* MCEvent = &MCSamples[iEntry];
   M3::float_t totalweight = CalcWeightTotal(MCEvent);
 
-  //DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient. Do this on a spline-by-spline basis
+  //DB Catch negative total weights and skip any event with a negative weight. Previously we would set weight to zero and continue but that is inefficient
   if (totalweight <= 0.){
     totalweight = 0.;
   }
