@@ -494,7 +494,7 @@ void FitterBase::DragRace(const int NLaps) {
 }
 
 // *************************
-bool FitterBase::GetScanRange(std::map<std::string, std::vector<double>>& scanRanges) {
+bool FitterBase::GetScanRange(std::map<std::string, std::vector<double>>& scanRanges) const {
 // *************************
   bool isScanRanges = false;
   // YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D. Barrow
@@ -1346,7 +1346,7 @@ void FitterBase::RunSigmaVar() {
 
 // *************************
 // For comparison with P-Theta we usually have to apply different parameter values then usual 1, 3 sigma
-void FitterBase::CustomRange(const std::string& ParName, const double sigma, double& ParamShiftValue) {
+void FitterBase::CustomRange(const std::string& ParName, const double sigma, double& ParamShiftValue) const {
 // *************************
   if(!fitMan->raw()["SigmaVar"]["CustomRange"]) return;
 
