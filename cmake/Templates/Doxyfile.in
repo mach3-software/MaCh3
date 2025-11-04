@@ -857,6 +857,8 @@ WARN_LOGFILE           =
 
 INPUT                  = . \
                          Doc/MaCh3Web/mainpage.md \
+                         Doc/mach3logo.png \
+                         Doc/Plots \
                          Manager \
                          Splines \
                          Samples \
@@ -1227,7 +1229,9 @@ HTML_EXTRA_STYLESHEET  = Doc/MaCh3Web/MaCh3.css
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
 HTML_EXTRA_FILES       = Doc/MaCh3Web/OscPattern.png \
-                         Doc/mach3logo.png
+                         Doc/mach3logo.png           \
+                         Doc/Plots/delta.png         \
+                         Doc/Plots/Jarlskog.png      \
 
 # The HTML_COLORSTYLE_HUE tag controls the color of the HTML output. Doxygen
 # will adjust the colors in the style sheet and background images according to

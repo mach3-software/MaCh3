@@ -28,7 +28,7 @@ struct MaCh3ModeInfo {
   /// Spline suffix
   std::string SplineSuffix;
   /// @brief KS: Checks MaCh3 modes is associated with a given generator mode
-  inline bool IsMode(const int GenMode) {
+  inline bool IsMode(const int GenMode) const {
     bool exists = std::find(GeneratorMaping.begin(), GeneratorMaping.end(), GenMode) != GeneratorMaping.end();
     return exists;
   }

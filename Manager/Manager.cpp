@@ -46,7 +46,7 @@ manager::~manager() {
 // Save all the settings of the class to an output file
 // Reflection in C++ is a bit of a pain :(
 // Outputfile is the TFile pointer we write to
-void manager::SaveSettings(TFile* const OutputFile) {
+void manager::SaveSettings(TFile* const OutputFile) const {
 // *************************
   std::string OutputFilename = std::string(OutputFile->GetName());
   OutputFile->cd();
@@ -87,7 +87,7 @@ void manager::SaveSettings(TFile* const OutputFile) {
 }
 
 // *************************
-void manager::Print() {
+void manager::Print() const {
 // *************************
   MACH3LOG_INFO("---------------------------------");
   MaCh3Utils::PrintConfig(config);
@@ -95,7 +95,7 @@ void manager::Print() {
 }
 
 // *************************
-int manager::GetMCStatLLH() {
+int manager::GetMCStatLLH() const {
 // *************************
   int mc_stat_llh = kNTestStatistics;
   if (config["LikelihoodOptions"])
