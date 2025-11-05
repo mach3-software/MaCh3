@@ -88,7 +88,7 @@ $(function() {
 <div class="dynheader">
 Collaboration diagram for FarDetectorCoreInfo:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="structFarDetectorCoreInfo__coll__graph.svg" width="342" height="156"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="structFarDetectorCoreInfo__coll__graph.svg" width="336" height="142"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -127,23 +127,14 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a858d37c3e45ff56022e3101da094743c"><td class="memItemLeft" align="right" valign="top">std::vector&lt; const double * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFarDetectorCoreInfo.html#a858d37c3e45ff56022e3101da094743c">xsec_norm_pointers</a></td></tr>
 <tr class="memdesc:a858d37c3e45ff56022e3101da094743c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointers to normalisation weights which are being taken from Parameter Handler.  <a href="structFarDetectorCoreInfo.html#a858d37c3e45ff56022e3101da094743c">More...</a><br /></td></tr>
 <tr class="separator:a858d37c3e45ff56022e3101da094743c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a993998a2c2d82bfeae285d71741ad2f2"><td class="memItemLeft" align="right" valign="top">std::vector&lt; const <a class="el" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFarDetectorCoreInfo.html#a993998a2c2d82bfeae285d71741ad2f2">xsec_spline_pointers</a></td></tr>
-<tr class="memdesc:a993998a2c2d82bfeae285d71741ad2f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointers to spline weights which are being calculated by Splines Handler.  <a href="structFarDetectorCoreInfo.html#a993998a2c2d82bfeae285d71741ad2f2">More...</a><br /></td></tr>
-<tr class="separator:a993998a2c2d82bfeae285d71741ad2f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a91586f67da67dcb925715a94ed04a299"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFarDetectorCoreInfo.html#a91586f67da67dcb925715a94ed04a299">xsec_w</a> = 1.</td></tr>
-<tr class="memdesc:a91586f67da67dcb925715a94ed04a299"><td class="mdescLeft">&#160;</td><td class="mdescRight">Total weight of norm and spline parameters.  <a href="structFarDetectorCoreInfo.html#a91586f67da67dcb925715a94ed04a299">More...</a><br /></td></tr>
-<tr class="separator:a91586f67da67dcb925715a94ed04a299"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a22c8b8558ef220d2648727264974cea8"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFarDetectorCoreInfo.html#a22c8b8558ef220d2648727264974cea8">osc_w_pointer</a> = &amp;<a class="el" href="namespaceM3.html#a8b0081813e8f5b1c946821be4f114bd5">M3::Unity</a></td></tr>
-<tr class="memdesc:a22c8b8558ef220d2648727264974cea8"><td class="mdescLeft">&#160;</td><td class="mdescRight">pointer to oscillation weight which is being calculated by Oscillation Handler  <a href="structFarDetectorCoreInfo.html#a22c8b8558ef220d2648727264974cea8">More...</a><br /></td></tr>
-<tr class="separator:a22c8b8558ef220d2648727264974cea8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5f800754db9e9b52a62cef3568451a07"><td class="memItemLeft" align="right" valign="top">std::vector&lt; const <a class="el" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFarDetectorCoreInfo.html#a5f800754db9e9b52a62cef3568451a07">total_weight_pointers</a></td></tr>
-<tr class="memdesc:a5f800754db9e9b52a62cef3568451a07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointers to <a class="el" href="structFarDetectorCoreInfo.html#a91586f67da67dcb925715a94ed04a299">xsec_w</a>, <a class="el" href="structFarDetectorCoreInfo.html#a22c8b8558ef220d2648727264974cea8">osc_w_pointer</a> and remaining experiment specific weights.  <a href="structFarDetectorCoreInfo.html#a5f800754db9e9b52a62cef3568451a07">More...</a><br /></td></tr>
+<tr class="memdesc:a5f800754db9e9b52a62cef3568451a07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointers to weights like oscillation spline etc.  <a href="structFarDetectorCoreInfo.html#a5f800754db9e9b52a62cef3568451a07">More...</a><br /></td></tr>
 <tr class="separator:a5f800754db9e9b52a62cef3568451a07"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abaa57805bad197bb2a46db12aec54450"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFarDetectorCoreInfo.html#abaa57805bad197bb2a46db12aec54450">NomXBin</a> = -1</td></tr>
+<tr class="memitem:abaa57805bad197bb2a46db12aec54450"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFarDetectorCoreInfo.html#abaa57805bad197bb2a46db12aec54450">NomXBin</a> = <a class="el" href="namespaceM3.html#ac289df32a5b3b05c61a87cbac5702b25">M3::_BAD_INT_</a></td></tr>
 <tr class="separator:abaa57805bad197bb2a46db12aec54450"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a32448e9a710f56b30b53185575ae2d76"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFarDetectorCoreInfo.html#a32448e9a710f56b30b53185575ae2d76">NomYBin</a> = -1</td></tr>
+<tr class="memitem:a32448e9a710f56b30b53185575ae2d76"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFarDetectorCoreInfo.html#a32448e9a710f56b30b53185575ae2d76">NomYBin</a> = <a class="el" href="namespaceM3.html#ac289df32a5b3b05c61a87cbac5702b25">M3::_BAD_INT_</a></td></tr>
 <tr class="separator:a32448e9a710f56b30b53185575ae2d76"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae764ba8c1003043675bc4abfce13019e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFarDetectorCoreInfo.html#ae764ba8c1003043675bc4abfce13019e">NominalSample</a> = 0</td></tr>
+<tr class="memitem:ae764ba8c1003043675bc4abfce13019e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFarDetectorCoreInfo.html#ae764ba8c1003043675bc4abfce13019e">NominalSample</a> = <a class="el" href="namespaceM3.html#ac289df32a5b3b05c61a87cbac5702b25">M3::_BAD_INT_</a></td></tr>
 <tr class="memdesc:ae764ba8c1003043675bc4abfce13019e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Nominal sample to which event is associated.  <a href="structFarDetectorCoreInfo.html#ae764ba8c1003043675bc4abfce13019e">More...</a><br /></td></tr>
 <tr class="separator:ae764ba8c1003043675bc4abfce13019e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abdba4588283aa31368e3fab57ac8cd60"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFarDetectorCoreInfo.html#abdba4588283aa31368e3fab57ac8cd60">isNC</a> = false</td></tr>
@@ -330,7 +321,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00146">146</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00139">139</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
 
 </div>
 </div>
@@ -346,7 +337,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00148">148</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00141">141</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
 
 </div>
 </div>
@@ -357,14 +348,14 @@ Public Attributes</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int FarDetectorCoreInfo::NominalSample = 0</td>
+          <td class="memname">int FarDetectorCoreInfo::NominalSample = <a class="el" href="namespaceM3.html#ac289df32a5b3b05c61a87cbac5702b25">M3::_BAD_INT_</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Nominal sample to which event is associated. </p>
 
-<p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00144">144</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00137">137</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
 
 </div>
 </div>
@@ -375,12 +366,12 @@ Public Attributes</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int FarDetectorCoreInfo::NomXBin = -1</td>
+          <td class="memname">int FarDetectorCoreInfo::NomXBin = <a class="el" href="namespaceM3.html#ac289df32a5b3b05c61a87cbac5702b25">M3::_BAD_INT_</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00140">140</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00133">133</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
 
 </div>
 </div>
@@ -391,12 +382,12 @@ Public Attributes</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int FarDetectorCoreInfo::NomYBin = -1</td>
+          <td class="memname">int FarDetectorCoreInfo::NomYBin = <a class="el" href="namespaceM3.html#ac289df32a5b3b05c61a87cbac5702b25">M3::_BAD_INT_</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00141">141</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00134">134</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
 
 </div>
 </div>
@@ -429,24 +420,6 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00119">119</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
-
-</div>
-</div>
-<a id="a22c8b8558ef220d2648727264974cea8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a22c8b8558ef220d2648727264974cea8">&#9670;&nbsp;</a></span>osc_w_pointer</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a>* FarDetectorCoreInfo::osc_w_pointer = &amp;<a class="el" href="namespaceM3.html#a8b0081813e8f5b1c946821be4f114bd5">M3::Unity</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>pointer to oscillation weight which is being calculated by Oscillation Handler </p>
-
-<p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00134">134</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
 
 </div>
 </div>
@@ -512,9 +485,9 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Pointers to <a class="el" href="structFarDetectorCoreInfo.html#a91586f67da67dcb925715a94ed04a299">xsec_w</a>, <a class="el" href="structFarDetectorCoreInfo.html#a22c8b8558ef220d2648727264974cea8">osc_w_pointer</a> and remaining experiment specific weights. </p>
+<p>Pointers to weights like oscillation spline etc. </p>
 
-<p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00136">136</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00131">131</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
 
 </div>
 </div>
@@ -549,42 +522,6 @@ Public Attributes</h2></td></tr>
 <p>Pointers to normalisation weights which are being taken from Parameter Handler. </p>
 
 <p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00128">128</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
-
-</div>
-</div>
-<a id="a993998a2c2d82bfeae285d71741ad2f2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a993998a2c2d82bfeae285d71741ad2f2">&#9670;&nbsp;</a></span>xsec_spline_pointers</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::vector&lt;const <a class="el" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a>*&gt; FarDetectorCoreInfo::xsec_spline_pointers</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Pointers to spline weights which are being calculated by Splines Handler. </p>
-
-<p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00130">130</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
-
-</div>
-</div>
-<a id="a91586f67da67dcb925715a94ed04a299"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a91586f67da67dcb925715a94ed04a299">&#9670;&nbsp;</a></span>xsec_w</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a> FarDetectorCoreInfo::xsec_w = 1.</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Total weight of norm and spline parameters. </p>
-
-<p class="definition">Definition at line <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html#l00132">132</a> of file <a class="el" href="FarDetectorCoreInfoStruct_8h_source.html">FarDetectorCoreInfoStruct.h</a>.</p>
 
 </div>
 </div>

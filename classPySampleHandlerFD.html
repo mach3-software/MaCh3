@@ -97,9 +97,9 @@ Collaboration diagram for PySampleHandlerFD:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a0edc138b054b18f0d5c4c7d9dff10314"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPySampleHandlerFD.html#a0edc138b054b18f0d5c4c7d9dff10314">SetupWeightPointers</a> () override</td></tr>
-<tr class="memdesc:a0edc138b054b18f0d5c4c7d9dff10314"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Function to determine which weights apply to which types of samples pure virtual!!  <a href="classPySampleHandlerFD.html#a0edc138b054b18f0d5c4c7d9dff10314">More...</a><br /></td></tr>
-<tr class="separator:a0edc138b054b18f0d5c4c7d9dff10314"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afae033f041fbf509b690d216d654983d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPySampleHandlerFD.html#afae033f041fbf509b690d216d654983d">AddAdditionalWeightPointers</a> () override</td></tr>
+<tr class="memdesc:afae033f041fbf509b690d216d654983d"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Function to determine which weights apply to which types of samples.  <a href="classPySampleHandlerFD.html#afae033f041fbf509b690d216d654983d">More...</a><br /></td></tr>
+<tr class="separator:afae033f041fbf509b690d216d654983d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2a723b3ba22bd94a4f250e5c35332ee9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPySampleHandlerFD.html#a2a723b3ba22bd94a4f250e5c35332ee9">CleanMemoryBeforeFit</a> () override</td></tr>
 <tr class="memdesc:a2a723b3ba22bd94a4f250e5c35332ee9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allow to clean not used memory before fit starts.  <a href="classPySampleHandlerFD.html#a2a723b3ba22bd94a4f250e5c35332ee9">More...</a><br /></td></tr>
 <tr class="separator:a2a723b3ba22bd94a4f250e5c35332ee9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -188,8 +188,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ad25f6a275e0cefd9db73215a4687780f inherit pub_methods_classSampleHandlerFD"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae3e03bd9beffb8b31acfd3bb5ebb44a2 inherit pub_methods_classSampleHandlerFD"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerFD.html#ae3e03bd9beffb8b31acfd3bb5ebb44a2">Reweight</a> () override</td></tr>
 <tr class="separator:ae3e03bd9beffb8b31acfd3bb5ebb44a2 inherit pub_methods_classSampleHandlerFD"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9e735d294d926fef87a6fc4c0ec54dca inherit pub_methods_classSampleHandlerFD"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerFD.html#a9e735d294d926fef87a6fc4c0ec54dca">GetEventWeight</a> (const int iEntry) const</td></tr>
-<tr class="separator:a9e735d294d926fef87a6fc4c0ec54dca inherit pub_methods_classSampleHandlerFD"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6831d91d5bcf1fb5723167736e0082ef inherit pub_methods_classSampleHandlerFD"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerFD.html#a6831d91d5bcf1fb5723167736e0082ef">GetEventWeight</a> (const int iEntry)</td></tr>
+<tr class="separator:a6831d91d5bcf1fb5723167736e0082ef inherit pub_methods_classSampleHandlerFD"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9fe790616b56940869c438822a79b1de inherit pub_methods_classSampleHandlerFD"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerFD.html#a9fe790616b56940869c438822a79b1de">InitialiseNuOscillatorObjects</a> ()</td></tr>
 <tr class="memdesc:a9fe790616b56940869c438822a79b1de inherit pub_methods_classSampleHandlerFD"><td class="mdescLeft">&#160;</td><td class="mdescRight">including Dan's magic NuOscillator  <a href="classSampleHandlerFD.html#a9fe790616b56940869c438822a79b1de">More...</a><br /></td></tr>
 <tr class="separator:a9fe790616b56940869c438822a79b1de inherit pub_methods_classSampleHandlerFD"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -323,12 +323,9 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:a01bd11c1b4bef425dd22d8256eca2d81 inherit pro_methods_classSampleHandlerFD"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerFD.html#a01bd11c1b4bef425dd22d8256eca2d81">CalcNormsBins</a> (std::vector&lt; <a class="el" href="structNormParameter.html">NormParameter</a> &gt; &amp;norm_parameters, std::vector&lt; std::vector&lt; int &gt; &gt; &amp;xsec_norms_bins)</td></tr>
 <tr class="memdesc:a01bd11c1b4bef425dd22d8256eca2d81 inherit pro_methods_classSampleHandlerFD"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether a normalisation systematic affects an event or not.  <a href="classSampleHandlerFD.html#a01bd11c1b4bef425dd22d8256eca2d81">More...</a><br /></td></tr>
 <tr class="separator:a01bd11c1b4bef425dd22d8256eca2d81 inherit pro_methods_classSampleHandlerFD"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab661c52bc446ed7a3ba19f90509ce110 inherit pro_methods_classSampleHandlerFD"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerFD.html#ab661c52bc446ed7a3ba19f90509ce110">CalcWeightSpline</a> (const <a class="el" href="structFarDetectorCoreInfo.html">FarDetectorCoreInfo</a> *MCEvent) const</td></tr>
-<tr class="memdesc:ab661c52bc446ed7a3ba19f90509ce110 inherit pro_methods_classSampleHandlerFD"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the spline weight for a given event.  <a href="classSampleHandlerFD.html#ab661c52bc446ed7a3ba19f90509ce110">More...</a><br /></td></tr>
-<tr class="separator:ab661c52bc446ed7a3ba19f90509ce110 inherit pro_methods_classSampleHandlerFD"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa412b194cece690a049f44e52ecdae38 inherit pro_methods_classSampleHandlerFD"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerFD.html#aa412b194cece690a049f44e52ecdae38">CalcWeightNorm</a> (const <a class="el" href="structFarDetectorCoreInfo.html">FarDetectorCoreInfo</a> *MCEvent) const</td></tr>
-<tr class="memdesc:aa412b194cece690a049f44e52ecdae38 inherit pro_methods_classSampleHandlerFD"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the norm weight for a given event.  <a href="classSampleHandlerFD.html#aa412b194cece690a049f44e52ecdae38">More...</a><br /></td></tr>
-<tr class="separator:aa412b194cece690a049f44e52ecdae38 inherit pro_methods_classSampleHandlerFD"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1eb40c8cdf2b64b70300f28c0ce51218 inherit pro_methods_classSampleHandlerFD"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerFD.html#a1eb40c8cdf2b64b70300f28c0ce51218">CalcWeightTotal</a> (const <a class="el" href="structFarDetectorCoreInfo.html">FarDetectorCoreInfo</a> *<a class="el" href="Core_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a> MCEvent) const</td></tr>
+<tr class="memdesc:a1eb40c8cdf2b64b70300f28c0ce51218 inherit pro_methods_classSampleHandlerFD"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the total weight weight for a given event.  <a href="classSampleHandlerFD.html#a1eb40c8cdf2b64b70300f28c0ce51218">More...</a><br /></td></tr>
+<tr class="separator:a1eb40c8cdf2b64b70300f28c0ce51218 inherit pro_methods_classSampleHandlerFD"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1781ff483b5bae72103e9298109c4698 inherit pro_methods_classSampleHandlerFD"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerFD.html#a1781ff483b5bae72103e9298109c4698">CalcWeightFunc</a> (int iEvent)</td></tr>
 <tr class="memdesc:a1781ff483b5bae72103e9298109c4698 inherit pro_methods_classSampleHandlerFD"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate weights for function parameters.  <a href="classSampleHandlerFD.html#a1781ff483b5bae72103e9298109c4698">More...</a><br /></td></tr>
 <tr class="separator:a1781ff483b5bae72103e9298109c4698 inherit pro_methods_classSampleHandlerFD"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -476,6 +473,48 @@ Additional Inherited Members</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="samples_8cpp_source.html#l00089">89</a> of file <a class="el" href="samples_8cpp_source.html">samples.cpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="afae033f041fbf509b690d216d654983d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afae033f041fbf509b690d216d654983d">&#9670;&nbsp;</a></span>AddAdditionalWeightPointers()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PySampleHandlerFD::AddAdditionalWeightPointers </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>DB Function to determine which weights apply to which types of samples. </p>
+
+<p>Implements <a class="el" href="classSampleHandlerFD.html#afbbc56bf8988bb6bf80c5f382f0b603b">SampleHandlerFD</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="samples_8cpp_source.html#l00095">95</a> of file <a class="el" href="samples_8cpp_source.html">samples.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;                                                {</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        PYBIND11_OVERRIDE_PURE_NAME(</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;            <span class="keywordtype">void</span>,                             <span class="comment">/* Return type */</span></div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;            <a class="code" href="classSampleHandlerFD.html">SampleHandlerFD</a>,                  <span class="comment">/* Parent class */</span></div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;            <span class="stringliteral">&quot;add_additional_weight_pointers&quot;</span>, <span class="comment">/*python name*/</span></div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;            <a class="code" href="classPySampleHandlerFD.html#afae033f041fbf509b690d216d654983d">AddAdditionalWeightPointers</a>,      <span class="comment">/* Name of function in C++ */</span></div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;                                              <span class="comment">/* Argument(s) */</span></div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        );</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    }</div>
+<div class="ttc" id="aclassPySampleHandlerFD_html_afae033f041fbf509b690d216d654983d"><div class="ttname"><a href="classPySampleHandlerFD.html#afae033f041fbf509b690d216d654983d">PySampleHandlerFD::AddAdditionalWeightPointers</a></div><div class="ttdeci">void AddAdditionalWeightPointers() override</div><div class="ttdoc">DB Function to determine which weights apply to which types of samples.</div><div class="ttdef"><b>Definition:</b> <a href="samples_8cpp_source.html#l00095">samples.cpp:95</a></div></div>
+<div class="ttc" id="aclassSampleHandlerFD_html"><div class="ttname"><a href="classSampleHandlerFD.html">SampleHandlerFD</a></div><div class="ttdoc">Class responsible for handling implementation of samples used in analysis, reweighting and returning ...</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00019">SampleHandlerFD.h:20</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
 <a id="a2a723b3ba22bd94a4f250e5c35332ee9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2a723b3ba22bd94a4f250e5c35332ee9">&#9670;&nbsp;</a></span>CleanMemoryBeforeFit()</h2>
 
@@ -512,7 +551,6 @@ Additional Inherited Members</h2></td></tr>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;        );</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    }</div>
 <div class="ttc" id="aclassPySampleHandlerFD_html_a2a723b3ba22bd94a4f250e5c35332ee9"><div class="ttname"><a href="classPySampleHandlerFD.html#a2a723b3ba22bd94a4f250e5c35332ee9">PySampleHandlerFD::CleanMemoryBeforeFit</a></div><div class="ttdeci">void CleanMemoryBeforeFit() override</div><div class="ttdoc">Allow to clean not used memory before fit starts.</div><div class="ttdef"><b>Definition:</b> <a href="samples_8cpp_source.html#l00106">samples.cpp:106</a></div></div>
-<div class="ttc" id="aclassSampleHandlerFD_html"><div class="ttname"><a href="classSampleHandlerFD.html">SampleHandlerFD</a></div><div class="ttdoc">Class responsible for handling implementation of samples used in analysis, reweighting and returning ...</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00019">SampleHandlerFD.h:20</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -938,20 +976,20 @@ Additional Inherited Members</h2></td></tr>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00020">MaCh3Exception.h:20</a></div></div>
 <div class="ttc" id="aclassSampleHandlerBase_html_a6a6d7e5d275154ed550cd6c9dfc36000"><div class="ttname"><a href="classSampleHandlerBase.html#a6a6d7e5d275154ed550cd6c9dfc36000">SampleHandlerBase::SampleHandlerBase</a></div><div class="ttdeci">SampleHandlerBase()</div><div class="ttdoc">The main constructor.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8cpp_source.html#l00004">SampleHandlerBase.cpp:4</a></div></div>
 <div class="ttc" id="aclassSampleHandlerBase_html_aa7a13af22c2314c718fb6438d493d3d1"><div class="ttname"><a href="classSampleHandlerBase.html#aa7a13af22c2314c718fb6438d493d3d1">SampleHandlerBase::nSamples</a></div><div class="ttdeci">M3::int_t nSamples</div><div class="ttdoc">Contains how many samples we've got.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00198">SampleHandlerBase.h:198</a></div></div>
-<div class="ttc" id="aclassSampleHandlerFD_html_a1db89c4df22a237b1cb26a2b55ee0866"><div class="ttname"><a href="classSampleHandlerFD.html#a1db89c4df22a237b1cb26a2b55ee0866">SampleHandlerFD::ParHandler</a></div><div class="ttdeci">ParameterHandlerGeneric * ParHandler</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00316">SampleHandlerFD.h:316</a></div></div>
-<div class="ttc" id="aclassSampleHandlerFD_html_a1ff1ef7d99cee6d6a9fba74296d4d0ea"><div class="ttname"><a href="classSampleHandlerFD.html#a1ff1ef7d99cee6d6a9fba74296d4d0ea">SampleHandlerFD::FirstTimeW2</a></div><div class="ttdeci">bool FirstTimeW2</div><div class="ttdoc">KS:Super hacky to update W2 or not.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00358">SampleHandlerFD.h:358</a></div></div>
-<div class="ttc" id="aclassSampleHandlerFD_html_a231b4b5b9b5e5f0d1cb9a3ba96c85ec5"><div class="ttname"><a href="classSampleHandlerFD.html#a231b4b5b9b5e5f0d1cb9a3ba96c85ec5">SampleHandlerFD::Binning</a></div><div class="ttdeci">std::unique_ptr&lt; BinningHandler &gt; Binning</div><div class="ttdoc">KS: This stores binning information, in future could be come vector to store binning for every used s...</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00296">SampleHandlerFD.h:296</a></div></div>
-<div class="ttc" id="aclassSampleHandlerFD_html_a2b16ed4f91f2f37ff707ca048d8d6927"><div class="ttname"><a href="classSampleHandlerFD.html#a2b16ed4f91f2f37ff707ca048d8d6927">SampleHandlerFD::SampleHandlerFD_data</a></div><div class="ttdeci">double * SampleHandlerFD_data</div><div class="ttdoc">DB Array to be filled in AddData.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00302">SampleHandlerFD.h:302</a></div></div>
-<div class="ttc" id="aclassSampleHandlerFD_html_a341f7bf83eb74ba5d27a2c9616202eba"><div class="ttname"><a href="classSampleHandlerFD.html#a341f7bf83eb74ba5d27a2c9616202eba">SampleHandlerFD::ReversedKinematicVectors</a></div><div class="ttdeci">const std::unordered_map&lt; int, std::string &gt; * ReversedKinematicVectors</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00343">SampleHandlerFD.h:343</a></div></div>
-<div class="ttc" id="aclassSampleHandlerFD_html_a5d762b169bab4454bbdb1b387c09f4a7"><div class="ttname"><a href="classSampleHandlerFD.html#a5d762b169bab4454bbdb1b387c09f4a7">SampleHandlerFD::KinematicVectors</a></div><div class="ttdeci">const std::unordered_map&lt; std::string, int &gt; * KinematicVectors</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00342">SampleHandlerFD.h:342</a></div></div>
-<div class="ttc" id="aclassSampleHandlerFD_html_a85415d4ac54a5aefe78e5ab4d7bdb769"><div class="ttname"><a href="classSampleHandlerFD.html#a85415d4ac54a5aefe78e5ab4d7bdb769">SampleHandlerFD::SampleHandlerFD_array</a></div><div class="ttdeci">double * SampleHandlerFD_array</div><div class="ttdoc">DB Array to be filled after reweighting.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00298">SampleHandlerFD.h:298</a></div></div>
-<div class="ttc" id="aclassSampleHandlerFD_html_a9a7fccdf8392ee06495902fab60e9858"><div class="ttname"><a href="classSampleHandlerFD.html#a9a7fccdf8392ee06495902fab60e9858">SampleHandlerFD::SampleHandlerName</a></div><div class="ttdeci">std::string SampleHandlerName</div><div class="ttdoc">A unique ID for each sample based on which we can define what systematic should be applied.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00320">SampleHandlerFD.h:320</a></div></div>
-<div class="ttc" id="aclassSampleHandlerFD_html_a9ccc0e26810ded77d0615e95e8a9b277"><div class="ttname"><a href="classSampleHandlerFD.html#a9ccc0e26810ded77d0615e95e8a9b277">SampleHandlerFD::SampleManager</a></div><div class="ttdeci">std::unique_ptr&lt; manager &gt; SampleManager</div><div class="ttdoc">The manager object used to read the sample yaml file.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00347">SampleHandlerFD.h:347</a></div></div>
-<div class="ttc" id="aclassSampleHandlerFD_html_aa654562842a0da51ff917aaed517310e"><div class="ttname"><a href="classSampleHandlerFD.html#aa654562842a0da51ff917aaed517310e">SampleHandlerFD::UpdateW2</a></div><div class="ttdeci">bool UpdateW2</div><div class="ttdoc">KS:Super hacky to update W2 or not.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00360">SampleHandlerFD.h:360</a></div></div>
+<div class="ttc" id="aclassSampleHandlerFD_html_a1db89c4df22a237b1cb26a2b55ee0866"><div class="ttname"><a href="classSampleHandlerFD.html#a1db89c4df22a237b1cb26a2b55ee0866">SampleHandlerFD::ParHandler</a></div><div class="ttdeci">ParameterHandlerGeneric * ParHandler</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00314">SampleHandlerFD.h:314</a></div></div>
+<div class="ttc" id="aclassSampleHandlerFD_html_a1ff1ef7d99cee6d6a9fba74296d4d0ea"><div class="ttname"><a href="classSampleHandlerFD.html#a1ff1ef7d99cee6d6a9fba74296d4d0ea">SampleHandlerFD::FirstTimeW2</a></div><div class="ttdeci">bool FirstTimeW2</div><div class="ttdoc">KS:Super hacky to update W2 or not.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00356">SampleHandlerFD.h:356</a></div></div>
+<div class="ttc" id="aclassSampleHandlerFD_html_a231b4b5b9b5e5f0d1cb9a3ba96c85ec5"><div class="ttname"><a href="classSampleHandlerFD.html#a231b4b5b9b5e5f0d1cb9a3ba96c85ec5">SampleHandlerFD::Binning</a></div><div class="ttdeci">std::unique_ptr&lt; BinningHandler &gt; Binning</div><div class="ttdoc">KS: This stores binning information, in future could be come vector to store binning for every used s...</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00294">SampleHandlerFD.h:294</a></div></div>
+<div class="ttc" id="aclassSampleHandlerFD_html_a2b16ed4f91f2f37ff707ca048d8d6927"><div class="ttname"><a href="classSampleHandlerFD.html#a2b16ed4f91f2f37ff707ca048d8d6927">SampleHandlerFD::SampleHandlerFD_data</a></div><div class="ttdeci">double * SampleHandlerFD_data</div><div class="ttdoc">DB Array to be filled in AddData.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00300">SampleHandlerFD.h:300</a></div></div>
+<div class="ttc" id="aclassSampleHandlerFD_html_a341f7bf83eb74ba5d27a2c9616202eba"><div class="ttname"><a href="classSampleHandlerFD.html#a341f7bf83eb74ba5d27a2c9616202eba">SampleHandlerFD::ReversedKinematicVectors</a></div><div class="ttdeci">const std::unordered_map&lt; int, std::string &gt; * ReversedKinematicVectors</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00341">SampleHandlerFD.h:341</a></div></div>
+<div class="ttc" id="aclassSampleHandlerFD_html_a5d762b169bab4454bbdb1b387c09f4a7"><div class="ttname"><a href="classSampleHandlerFD.html#a5d762b169bab4454bbdb1b387c09f4a7">SampleHandlerFD::KinematicVectors</a></div><div class="ttdeci">const std::unordered_map&lt; std::string, int &gt; * KinematicVectors</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00340">SampleHandlerFD.h:340</a></div></div>
+<div class="ttc" id="aclassSampleHandlerFD_html_a85415d4ac54a5aefe78e5ab4d7bdb769"><div class="ttname"><a href="classSampleHandlerFD.html#a85415d4ac54a5aefe78e5ab4d7bdb769">SampleHandlerFD::SampleHandlerFD_array</a></div><div class="ttdeci">double * SampleHandlerFD_array</div><div class="ttdoc">DB Array to be filled after reweighting.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00296">SampleHandlerFD.h:296</a></div></div>
+<div class="ttc" id="aclassSampleHandlerFD_html_a9a7fccdf8392ee06495902fab60e9858"><div class="ttname"><a href="classSampleHandlerFD.html#a9a7fccdf8392ee06495902fab60e9858">SampleHandlerFD::SampleHandlerName</a></div><div class="ttdeci">std::string SampleHandlerName</div><div class="ttdoc">A unique ID for each sample based on which we can define what systematic should be applied.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00318">SampleHandlerFD.h:318</a></div></div>
+<div class="ttc" id="aclassSampleHandlerFD_html_a9ccc0e26810ded77d0615e95e8a9b277"><div class="ttname"><a href="classSampleHandlerFD.html#a9ccc0e26810ded77d0615e95e8a9b277">SampleHandlerFD::SampleManager</a></div><div class="ttdeci">std::unique_ptr&lt; manager &gt; SampleManager</div><div class="ttdoc">The manager object used to read the sample yaml file.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00345">SampleHandlerFD.h:345</a></div></div>
+<div class="ttc" id="aclassSampleHandlerFD_html_aa654562842a0da51ff917aaed517310e"><div class="ttname"><a href="classSampleHandlerFD.html#aa654562842a0da51ff917aaed517310e">SampleHandlerFD::UpdateW2</a></div><div class="ttdeci">bool UpdateW2</div><div class="ttdoc">KS:Super hacky to update W2 or not.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00358">SampleHandlerFD.h:358</a></div></div>
 <div class="ttc" id="aclassSampleHandlerFD_html_aa7115dd53d73a45fb64c565561095b6a"><div class="ttname"><a href="classSampleHandlerFD.html#aa7115dd53d73a45fb64c565561095b6a">SampleHandlerFD::Oscillator</a></div><div class="ttdeci">std::shared_ptr&lt; OscillationHandler &gt; Oscillator</div><div class="ttdoc">Contains all your binned splines and handles the setup and the returning of weights from spline evalu...</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00186">SampleHandlerFD.h:186</a></div></div>
-<div class="ttc" id="aclassSampleHandlerFD_html_aae37732e76f0b17b6f124bd5543177e4"><div class="ttname"><a href="classSampleHandlerFD.html#aae37732e76f0b17b6f124bd5543177e4">SampleHandlerFD::KinematicParameters</a></div><div class="ttdeci">const std::unordered_map&lt; std::string, int &gt; * KinematicParameters</div><div class="ttdoc">Mapping between string and kinematic enum.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00337">SampleHandlerFD.h:337</a></div></div>
-<div class="ttc" id="aclassSampleHandlerFD_html_ad7ac675cc4ce81bec42e0700f1ff2620"><div class="ttname"><a href="classSampleHandlerFD.html#ad7ac675cc4ce81bec42e0700f1ff2620">SampleHandlerFD::ReversedKinematicParameters</a></div><div class="ttdeci">const std::unordered_map&lt; int, std::string &gt; * ReversedKinematicParameters</div><div class="ttdoc">Mapping between kinematic enum and string.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00339">SampleHandlerFD.h:339</a></div></div>
-<div class="ttc" id="aclassSampleHandlerFD_html_af5c6a3701c6ac76a96886ff13300a53b"><div class="ttname"><a href="classSampleHandlerFD.html#af5c6a3701c6ac76a96886ff13300a53b">SampleHandlerFD::SampleHandlerFD_array_w2</a></div><div class="ttdeci">double * SampleHandlerFD_array_w2</div><div class="ttdoc">KS Array used for MC stat.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00300">SampleHandlerFD.h:300</a></div></div>
+<div class="ttc" id="aclassSampleHandlerFD_html_aae37732e76f0b17b6f124bd5543177e4"><div class="ttname"><a href="classSampleHandlerFD.html#aae37732e76f0b17b6f124bd5543177e4">SampleHandlerFD::KinematicParameters</a></div><div class="ttdeci">const std::unordered_map&lt; std::string, int &gt; * KinematicParameters</div><div class="ttdoc">Mapping between string and kinematic enum.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00335">SampleHandlerFD.h:335</a></div></div>
+<div class="ttc" id="aclassSampleHandlerFD_html_ad7ac675cc4ce81bec42e0700f1ff2620"><div class="ttname"><a href="classSampleHandlerFD.html#ad7ac675cc4ce81bec42e0700f1ff2620">SampleHandlerFD::ReversedKinematicParameters</a></div><div class="ttdeci">const std::unordered_map&lt; int, std::string &gt; * ReversedKinematicParameters</div><div class="ttdoc">Mapping between kinematic enum and string.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00337">SampleHandlerFD.h:337</a></div></div>
+<div class="ttc" id="aclassSampleHandlerFD_html_af5c6a3701c6ac76a96886ff13300a53b"><div class="ttname"><a href="classSampleHandlerFD.html#af5c6a3701c6ac76a96886ff13300a53b">SampleHandlerFD::SampleHandlerFD_array_w2</a></div><div class="ttdeci">double * SampleHandlerFD_array_w2</div><div class="ttdoc">KS Array used for MC stat.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00298">SampleHandlerFD.h:298</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1074,47 +1112,6 @@ Additional Inherited Members</h2></td></tr>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;        );</div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    }</div>
 <div class="ttc" id="aclassPySampleHandlerFD_html_a0b69ca72140420ed71397b0dd1ceaebc"><div class="ttname"><a href="classPySampleHandlerFD.html#a0b69ca72140420ed71397b0dd1ceaebc">PySampleHandlerFD::SetupSplines</a></div><div class="ttdeci">void SetupSplines() override</div><div class="ttdoc">initialise your splineXX object and then use InitialiseSplineObject to conviently setup everything up</div><div class="ttdef"><b>Definition:</b> <a href="samples_8cpp_source.html#l00115">samples.cpp:115</a></div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="a0edc138b054b18f0d5c4c7d9dff10314"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0edc138b054b18f0d5c4c7d9dff10314">&#9670;&nbsp;</a></span>SetupWeightPointers()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void PySampleHandlerFD::SetupWeightPointers </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>DB Function to determine which weights apply to which types of samples pure virtual!! </p>
-
-<p>Implements <a class="el" href="classSampleHandlerFD.html#addd28baa3d823f7a9cd69864185fe399">SampleHandlerFD</a>.</p>
-
-<p class="definition">Definition at line <a class="el" href="samples_8cpp_source.html#l00095">95</a> of file <a class="el" href="samples_8cpp_source.html">samples.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;                                        {</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        PYBIND11_OVERRIDE_PURE_NAME(</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;            <span class="keywordtype">void</span>,            <span class="comment">/* Return type */</span></div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;            <a class="code" href="classSampleHandlerFD.html">SampleHandlerFD</a>, <span class="comment">/* Parent class */</span></div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;            <span class="stringliteral">&quot;setup_weight_pointers&quot;</span>, <span class="comment">/*python name*/</span></div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;            <a class="code" href="classPySampleHandlerFD.html#a0edc138b054b18f0d5c4c7d9dff10314">SetupWeightPointers</a>,     <span class="comment">/* Name of function in C++ */</span></div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;                             <span class="comment">/* Argument(s) */</span></div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        );</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    }</div>
-<div class="ttc" id="aclassPySampleHandlerFD_html_a0edc138b054b18f0d5c4c7d9dff10314"><div class="ttname"><a href="classPySampleHandlerFD.html#a0edc138b054b18f0d5c4c7d9dff10314">PySampleHandlerFD::SetupWeightPointers</a></div><div class="ttdeci">void SetupWeightPointers() override</div><div class="ttdoc">DB Function to determine which weights apply to which types of samples pure virtual!...</div><div class="ttdef"><b>Definition:</b> <a href="samples_8cpp_source.html#l00095">samples.cpp:95</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
