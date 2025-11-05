@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['histogramutils_2ecpp_1974',['HistogramUtils.cpp',['../HistogramUtils_8cpp.html',1,'']]],
-  ['histogramutils_2eh_1975',['HistogramUtils.h',['../HistogramUtils_8h.html',1,'']]]
+  ['histogramutils_2ecpp_1975',['HistogramUtils.cpp',['../HistogramUtils_8cpp.html',1,'']]],
+  ['histogramutils_2eh_1976',['HistogramUtils.h',['../HistogramUtils_8h.html',1,'']]]
 ];
