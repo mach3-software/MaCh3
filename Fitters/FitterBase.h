@@ -19,6 +19,9 @@ class TGraphAsymmErrors;
 class TDirectory;
 
 /// @brief Base class for implementing fitting algorithms
+/// @details This class wraps MaCh3 classes like SampleHandler and ParameterHandler.
+/// It serves as a base for different fitting algorithms and for validation techniques
+/// such as LLH scans.
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/06.-Fitting-Algorithms).
 class FitterBase {
  public:
@@ -86,7 +89,7 @@ class FitterBase {
 
   /// @brief YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D. Barrow
   /// @param scanRanges A map with user specified parameter ranges
-  bool GetScanRange(std::map<std::string, std::vector<double>>& scanRanges);
+  bool GetScanRange(std::map<std::string, std::vector<double>>& scanRanges) const;
 
   /// @brief KS: Check whether we want to skip parameter using skip vector
   bool CheckSkipParameter(const std::vector<std::string>& SkipVector, const std::string& ParamName) const;
@@ -104,9 +107,9 @@ class FitterBase {
   ///     "1": 1.5
   ///     "3": 2.0
   /// @endcode
-  void CustomRange(const std::string& ParName, const double sigma, double& ParamShiftValue);
+  void CustomRange(const std::string& ParName, const double sigma, double& ParamShiftValue) const;
 
-  /// The manager
+  /// The manager for configuration handling
   manager *fitMan;
 
   /// current state
@@ -129,7 +132,7 @@ class FitterBase {
 
   /// Sample holder
   std::vector<SampleHandlerBase*> samples;
-  /// Total number of samples used
+  /// Total number of samples used, single SampleHandler can store more than one analysis sample!
   unsigned int TotalNSamples;
 
   /// Systematic holder

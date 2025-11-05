@@ -1,6 +1,13 @@
 #pragma once
 
 /// @file Core.h
+/// @brief KS: Core MaCh3 definitions and compile-time configuration utilities.
+///
+/// KS: This header contains the fundamental MaCh3 type definitions, constants,
+/// and macros used throughout the framework. It centralizes basic numerical
+/// types, default constants, and utility macros for controlling memory layout,
+/// precision, and compiler diagnostics.
+///
 /// @author Clarence Wret
 /// @author Kamil Skwarczynski
 /// @author Luke Pickering
