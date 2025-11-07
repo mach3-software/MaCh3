@@ -105,7 +105,7 @@ bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const 
   }
 
   // We'll use the same start scale for Robbins-Monro as standard adaption
-  adaption_scale = 2.38*2.38/GetNumParams(); 
+  adaption_scale = 2.38/std::sqrt(GetNumParams()); 
 
   // We"ll set a dummy variable here
   auto matrix_blocks = GetFromManager<std::vector<std::vector<int>>>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["MatrixBlocks"], {{}});
@@ -202,12 +202,12 @@ void AdaptiveMCMCHandler::SaveAdaptiveToFile(const std::string &outFileName,
     outFile->cd();
     auto adaptive_to_save = static_cast<TMatrixDSym*>(adaptive_covariance->Clone());
     // Multiply by scale
-    (*adaptive_to_save) *= GetAdaptionScale();
+    (*adaptive_to_save) *= std::pow(GetAdaptionScale(),2);
     adaptive_to_save->Write(adaptive_cov_name.c_str());
     outMeanVec->Write(mean_vec_name.c_str());
     outFile->Close();
     delete adaptive_to_save;
-     delete outMeanVec;
+    delete outMeanVec;
     delete outFile;
   }
 }
@@ -244,7 +244,7 @@ void AdaptiveMCMCHandler::SetThrowMatrixFromFile(const std::string& matrix_file_
   if(means_vector){
     // Yay our vector exists! Let's loop and fill it
     // Should check this is done
-    if(means_vector->GetNrows()){
+    if(means_vector->GetNrows() != GetNumParams()){
       MACH3LOG_ERROR("External means vec size ({}) != matrix size ({})", means_vector->GetNrows(), GetNumParams());
       throw MaCh3Exception(__FILE__, __LINE__);
     }
@@ -464,8 +464,6 @@ void AdaptiveMCMCHandler::UpdateRobbinsMonroScale(){
   TLDR: If acceptance rate is too high, scale factor goes up, if too low goes down
         will pretty rapidly converge to the right value.
   */
-
-
   if ((total_steps>0) && (total_steps % acceptance_rate_batch_size == 0)) {
     n_rm_restarts++;
   }
@@ -481,19 +479,18 @@ void AdaptiveMCMCHandler::UpdateRobbinsMonroScale(){
 
   int non_fixed_pars = GetNumParams()-GetNFixed();
 
-  double root_scale = std::sqrt(adaption_scale);
+  // double root_scale = std::sqrt(adaption_scale);
 
   /// Update the scale factor for Robbins-Monro adaption [200 is arbitrary for early stability but motivated by paper]
-  double scale_factor = root_scale*c_robbins_monro/std::max(200.0, static_cast<double>(batch_step)/non_fixed_pars);
+  double scale_factor = adaption_scale * c_robbins_monro / std::max(200.0, static_cast<double>(batch_step) / non_fixed_pars);
 
   /// Now we either increase or decrease the scale
   if(prev_step_accepted){
-    root_scale += (1-target_acceptance)*scale_factor;
+    adaption_scale += (1 - target_acceptance) * scale_factor;
   }
   else{
-      root_scale -= target_acceptance*scale_factor;
+    adaption_scale -= target_acceptance * scale_factor;
   }
-  adaption_scale = root_scale*root_scale;
 }
 
 } //end adaptive_mcmc
