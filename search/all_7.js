@@ -274,7 +274,7 @@ var searchData=
   ['getuseroption_726',['getUserOption',['../classMaCh3Plotting_1_1PlottingManager.html#af9f60a6196a9249d7ad7fee6c7bba89a',1,'MaCh3Plotting::PlottingManager']]],
   ['getvalue_727',['getValue',['../namespaceMaCh3Utils.html#aa406fc13341d99d4ca7a4f43bbb38019',1,'MaCh3Utils']]],
   ['getviolin_728',['GetViolin',['../classMCMCProcessor.html#a6f54781e8a32bfa48036212ee0ae9e3d',1,'MCMCProcessor']]],
-  ['getviolinplots_729',['GetViolinPlots',['../GetPostfitParamPlots_8cpp.html#a8681598ff6721b09a9d1f03c4efe114d',1,'GetPostfitParamPlots.cpp']]],
+  ['getviolinplots_729',['GetViolinPlots',['../GetPostfitParamPlots_8cpp.html#a9176d510f8810d2b58ae481fa9f3f69c',1,'GetPostfitParamPlots.cpp']]],
   ['getviolinprior_730',['GetViolinPrior',['../classMCMCProcessor.html#aaebda73d2ab4fd560e83dcf6e0c68e58',1,'MCMCProcessor']]],
   ['getw2_731',['GetW2',['../classSampleHandlerBase.html#a41f6bdcb629e1269724249fbeb5289c2',1,'SampleHandlerBase']]],
   ['getw2hist_732',['GetW2Hist',['../group__SampleHandlerGetters.html#ga8397aef4b23755ee2dfe145dd5fbb182',1,'SampleHandlerFD::GetW2Hist(const int Sample, const int Dimension)'],['../classSampleHandlerFD.html#a91e1ec2ee8c964ec0b398901bbf65398',1,'SampleHandlerFD::GetW2Hist(const std::string &amp;Sample, const int Dimension)']]],

@@ -404,24 +404,24 @@ Private Attributes</h2></td></tr>
 <p>Firstly we need to calculate the alpha value, this is in some sense "optimal"</p>
 <p>Now we can calculate the scale factor</p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html#l00440">440</a> of file <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html">AdaptiveMCMCHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;                                                          {</div>
-<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;<span class="comment">// ********************************************</span></div>
-<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;  <span class="comment">/* </span></div>
-<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;<span class="comment">    Obtains the constant &quot;step scale&quot; for Robbins-Monro adaption</span></div>
-<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;<span class="comment">    for simplicity and because it has the degrees of freedom &quot;baked in&quot;</span></div>
-<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;<span class="comment">    it will be same across ALL blocks. </span></div>
-<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;<span class="comment">  */</span></div>
-<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160; </div>
-<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;  <span class="keywordtype">double</span> alpha = -ROOT::Math::normal_quantile(<a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a5ee8cfa8ef96f852ad56bb0dc3949c01">target_acceptance</a>/2, 1.0); </div>
-<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160; </div>
-<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;  <span class="keywordtype">int</span> non_fixed_pars = <a class="code" href="group__ParameterHandlerGetters.html#gad53dfcadf98e09ff8d603caeac3466d2">GetNumParams</a>()-<a class="code" href="group__ParameterHandlerGetters.html#ga19f03236e945b834d9a28da28f858ee0">GetNFixed</a>();</div>
-<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160; </div>
-<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;  <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac7772d238ddaf7bf2acdca1224c2b333">c_robbins_monro</a> = (1- 1/non_fixed_pars)*std::sqrt(TMath::Pi()*2 * std::exp(alpha*alpha));</div>
-<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;  <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac7772d238ddaf7bf2acdca1224c2b333">c_robbins_monro</a> += 1/(non_fixed_pars*<a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a5ee8cfa8ef96f852ad56bb0dc3949c01">target_acceptance</a>*(1-<a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a5ee8cfa8ef96f852ad56bb0dc3949c01">target_acceptance</a>));</div>
-<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160; </div>
-<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Robbins-Monro scale factor set to {}&quot;</span>, <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac7772d238ddaf7bf2acdca1224c2b333">c_robbins_monro</a>);</div>
-<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html#l00439">439</a> of file <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html">AdaptiveMCMCHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;                                                          {</div>
+<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;<span class="comment">// ********************************************</span></div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;  <span class="comment">/* </span></div>
+<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;<span class="comment">    Obtains the constant &quot;step scale&quot; for Robbins-Monro adaption</span></div>
+<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;<span class="comment">    for simplicity and because it has the degrees of freedom &quot;baked in&quot;</span></div>
+<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;<span class="comment">    it will be same across ALL blocks. </span></div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;<span class="comment">  */</span></div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160; </div>
+<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;  <span class="keywordtype">double</span> alpha = -ROOT::Math::normal_quantile(<a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a5ee8cfa8ef96f852ad56bb0dc3949c01">target_acceptance</a>/2, 1.0); </div>
+<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160; </div>
+<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;  <span class="keywordtype">int</span> non_fixed_pars = <a class="code" href="group__ParameterHandlerGetters.html#gad53dfcadf98e09ff8d603caeac3466d2">GetNumParams</a>()-<a class="code" href="group__ParameterHandlerGetters.html#ga19f03236e945b834d9a28da28f858ee0">GetNFixed</a>();</div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160; </div>
+<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;  <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac7772d238ddaf7bf2acdca1224c2b333">c_robbins_monro</a> = (1- 1/non_fixed_pars)*std::sqrt(TMath::Pi()*2 * std::exp(alpha*alpha));</div>
+<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;  <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac7772d238ddaf7bf2acdca1224c2b333">c_robbins_monro</a> += 1/(non_fixed_pars*<a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a5ee8cfa8ef96f852ad56bb0dc3949c01">target_acceptance</a>*(1-<a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a5ee8cfa8ef96f852ad56bb0dc3949c01">target_acceptance</a>));</div>
+<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160; </div>
+<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Robbins-Monro scale factor set to {}&quot;</span>, <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac7772d238ddaf7bf2acdca1224c2b333">c_robbins_monro</a>);</div>
+<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00035">MaCh3Logger.h:35</a></div></div>
 <div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_ac7772d238ddaf7bf2acdca1224c2b333"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac7772d238ddaf7bf2acdca1224c2b333">adaptive_mcmc::AdaptiveMCMCHandler::c_robbins_monro</a></div><div class="ttdeci">double c_robbins_monro</div><div class="ttdoc">Constant &quot;step scaling&quot; factor for Robbins-Monro.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00253">AdaptiveMCMCHandler.h:253</a></div></div>
 <div class="ttc" id="agroup__ParameterHandlerGetters_html_ga19f03236e945b834d9a28da28f858ee0"><div class="ttname"><a href="group__ParameterHandlerGetters.html#ga19f03236e945b834d9a28da28f858ee0">adaptive_mcmc::AdaptiveMCMCHandler::GetNFixed</a></div><div class="ttdeci">int GetNFixed() const</div><div class="ttdoc">Get the number of fixed parameters.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00097">AdaptiveMCMCHandler.h:97</a></div></div>
@@ -453,62 +453,62 @@ Private Attributes</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html#l00374">374</a> of file <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html">AdaptiveMCMCHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;                                                                                           {</div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;<span class="comment">// ********************************************</span></div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;  <span class="keywordtype">int</span> n = covMatrix-&gt;GetNrows();</div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;  std::vector&lt;std::vector&lt;double&gt;&gt; corrMatrix(n, std::vector&lt;double&gt;(n));</div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160; </div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;  <span class="comment">// Extract standard deviations from the diagonal</span></div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;  std::vector&lt;double&gt; stdDevs(n);</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; n; ++i) {</div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;    stdDevs[i] = std::sqrt((*covMatrix)(i, i));</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;  }</div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160; </div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;  <span class="comment">// Compute correlation for each element</span></div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; n; ++i) {</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; n; ++j) {</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;      <span class="keywordtype">double</span> cov = (*covMatrix)(i, j);</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;      <span class="keywordtype">double</span> corr = cov / (stdDevs[i] * stdDevs[j]);</div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;      corrMatrix[i][j] = corr;</div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;    }</div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;  }</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160; </div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;  <span class="comment">// KS: These numbers are completely arbitrary</span></div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;  constexpr <span class="keywordtype">double</span> NumberOfParametersThreshold = 5;</div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;  constexpr <span class="keywordtype">double</span> CorrelationThreshold = 0.5;</div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160; </div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;  <span class="keywordtype">bool</span> FlagMessage = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;  <span class="comment">// For each parameter, count how many others it is correlated with</span></div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; n; ++i) {</div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;    <span class="keywordflow">if</span> (<a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a1694d2d408b26edb7258d5bfa15a092f">IsFixed</a>(i)) {</div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;      <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;    }</div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;    <span class="keywordtype">int</span> block_i = <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a23d17e906a663e2b48dd4dfc96300b02">adapt_block_matrix_indices</a>[i];</div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;    <span class="keywordtype">int</span> correlatedCount = 0;</div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;    std::vector&lt;int&gt; correlatedWith;</div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160; </div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; n; ++j) {</div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;      <span class="keywordflow">if</span> (i == j || <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a1694d2d408b26edb7258d5bfa15a092f">IsFixed</a>(j) || <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a23d17e906a663e2b48dd4dfc96300b02">adapt_block_matrix_indices</a>[j] != block_i) {</div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;        <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;      }</div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;      <span class="keywordflow">if</span> (corrMatrix[i][j] &gt; CorrelationThreshold) {</div>
-<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;        correlatedCount++;</div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;        correlatedWith.push_back(j);</div>
-<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;      }</div>
-<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;    }</div>
-<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160; </div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;    <span class="keywordflow">if</span> (correlatedCount &gt; NumberOfParametersThreshold) {</div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Parameter {} is highly correlated with {} other parameters (above threshold {}).&quot;</span>, i, correlatedCount, CorrelationThreshold);</div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Correlated with parameters: {}.&quot;</span>, fmt::join(correlatedWith, <span class="stringliteral">&quot;, &quot;</span>));</div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;      FlagMessage = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;    }</div>
-<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;  }</div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;  <span class="keywordflow">if</span>(FlagMessage){</div>
-<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Found highly correlated block, adaptive may not work as intended, proceed with caution&quot;</span>);</div>
-<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;You can consider defying so called Adaption Block to not update this part of matrix&quot;</span>);</div>
-<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;  }</div>
-<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html#l00373">373</a> of file <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html">AdaptiveMCMCHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;                                                                                           {</div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;<span class="comment">// ********************************************</span></div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;  <span class="keywordtype">int</span> n = covMatrix-&gt;GetNrows();</div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;  std::vector&lt;std::vector&lt;double&gt;&gt; corrMatrix(n, std::vector&lt;double&gt;(n));</div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160; </div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;  <span class="comment">// Extract standard deviations from the diagonal</span></div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;  std::vector&lt;double&gt; stdDevs(n);</div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; n; ++i) {</div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;    stdDevs[i] = std::sqrt((*covMatrix)(i, i));</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;  }</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160; </div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;  <span class="comment">// Compute correlation for each element</span></div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; n; ++i) {</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; n; ++j) {</div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;      <span class="keywordtype">double</span> cov = (*covMatrix)(i, j);</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;      <span class="keywordtype">double</span> corr = cov / (stdDevs[i] * stdDevs[j]);</div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;      corrMatrix[i][j] = corr;</div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;    }</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;  }</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160; </div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;  <span class="comment">// KS: These numbers are completely arbitrary</span></div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;  constexpr <span class="keywordtype">double</span> NumberOfParametersThreshold = 5;</div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;  constexpr <span class="keywordtype">double</span> CorrelationThreshold = 0.5;</div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160; </div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;  <span class="keywordtype">bool</span> FlagMessage = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;  <span class="comment">// For each parameter, count how many others it is correlated with</span></div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; n; ++i) {</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;    <span class="keywordflow">if</span> (<a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a1694d2d408b26edb7258d5bfa15a092f">IsFixed</a>(i)) {</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;      <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;    }</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;    <span class="keywordtype">int</span> block_i = <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a23d17e906a663e2b48dd4dfc96300b02">adapt_block_matrix_indices</a>[i];</div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;    <span class="keywordtype">int</span> correlatedCount = 0;</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;    std::vector&lt;int&gt; correlatedWith;</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160; </div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; n; ++j) {</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;      <span class="keywordflow">if</span> (i == j || <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a1694d2d408b26edb7258d5bfa15a092f">IsFixed</a>(j) || <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a23d17e906a663e2b48dd4dfc96300b02">adapt_block_matrix_indices</a>[j] != block_i) {</div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;        <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;      }</div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;      <span class="keywordflow">if</span> (corrMatrix[i][j] &gt; CorrelationThreshold) {</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;        correlatedCount++;</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;        correlatedWith.push_back(j);</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;      }</div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;    }</div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160; </div>
+<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;    <span class="keywordflow">if</span> (correlatedCount &gt; NumberOfParametersThreshold) {</div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Parameter {} is highly correlated with {} other parameters (above threshold {}).&quot;</span>, i, correlatedCount, CorrelationThreshold);</div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Correlated with parameters: {}.&quot;</span>, fmt::join(correlatedWith, <span class="stringliteral">&quot;, &quot;</span>));</div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;      FlagMessage = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;    }</div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;  }</div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;  <span class="keywordflow">if</span>(FlagMessage){</div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;Found highly correlated block, adaptive may not work as intended, proceed with caution&quot;</span>);</div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;You can consider defying so called Adaption Block to not update this part of matrix&quot;</span>);</div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;  }</div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_ad5b2eb6377721e3ac95def22c2386bb1"><div class="ttname"><a href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a></div><div class="ttdeci">#define MACH3LOG_WARN</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00036">MaCh3Logger.h:36</a></div></div>
 <div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a1694d2d408b26edb7258d5bfa15a092f"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a1694d2d408b26edb7258d5bfa15a092f">adaptive_mcmc::AdaptiveMCMCHandler::IsFixed</a></div><div class="ttdeci">bool IsFixed(const int ipar) const</div><div class="ttdoc">Check if a parameter is fixed.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00122">AdaptiveMCMCHandler.h:122</a></div></div>
 <div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a23d17e906a663e2b48dd4dfc96300b02"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a23d17e906a663e2b48dd4dfc96300b02">adaptive_mcmc::AdaptiveMCMCHandler::adapt_block_matrix_indices</a></div><div class="ttdeci">std::vector&lt; int &gt; adapt_block_matrix_indices</div><div class="ttdoc">Indices for block-matrix adaption.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00219">AdaptiveMCMCHandler.h:219</a></div></div>
@@ -561,11 +561,11 @@ Private Attributes</h2></td></tr>
 <p>Get Current value of parameter. </p>
 <p>HW Implemented as its own method to allow for different behaviour in the future</p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html#l00432">432</a> of file <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html">AdaptiveMCMCHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;                                                             {</div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;<span class="comment">// ********************************************</span></div>
-<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;<span class="comment"></span>  <span class="keywordflow">return</span> (*<a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a55330ea7439ca5a3c3065f5205d99e30">_fCurrVal</a>)[par_index];</div>
-<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html#l00431">431</a> of file <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html">AdaptiveMCMCHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;                                                             {</div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;<span class="comment">// ********************************************</span></div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;<span class="comment"></span>  <span class="keywordflow">return</span> (*<a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a55330ea7439ca5a3c3065f5205d99e30">_fCurrVal</a>)[par_index];</div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;}</div>
 <div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a55330ea7439ca5a3c3065f5205d99e30"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a55330ea7439ca5a3c3065f5205d99e30">adaptive_mcmc::AdaptiveMCMCHandler::_fCurrVal</a></div><div class="ttdeci">const std::vector&lt; double &gt; * _fCurrVal</div><div class="ttdoc">Current values of parameters.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00241">AdaptiveMCMCHandler.h:241</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -864,7 +864,7 @@ Private Attributes</h2></td></tr>
 <div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a7b9bc927e28230929be740d471fb2b6b"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a7b9bc927e28230929be740d471fb2b6b">adaptive_mcmc::AdaptiveMCMCHandler::adaptive_save_n_iterations</a></div><div class="ttdeci">int adaptive_save_n_iterations</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00213">AdaptiveMCMCHandler.h:213</a></div></div>
 <div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a8010c9977ec01b39c7cf12349169b065"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a8010c9977ec01b39c7cf12349169b065">adaptive_mcmc::AdaptiveMCMCHandler::SetFixed</a></div><div class="ttdeci">void SetFixed(const std::vector&lt; double &gt; *fix)</div><div class="ttdoc">Set the fixed parameters.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00090">AdaptiveMCMCHandler.h:90</a></div></div>
 <div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a81349813033e109e470823513a78d51e"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a81349813033e109e470823513a78d51e">adaptive_mcmc::AdaptiveMCMCHandler::SetParams</a></div><div class="ttdeci">void SetParams(const std::vector&lt; double &gt; *params)</div><div class="ttdoc">Set the current values of the parameters.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00084">AdaptiveMCMCHandler.h:84</a></div></div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a823239d1f978de9ea9d7903c84369d1e"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a823239d1f978de9ea9d7903c84369d1e">adaptive_mcmc::AdaptiveMCMCHandler::CalculateRobbinsMonroStepLength</a></div><div class="ttdeci">void CalculateRobbinsMonroStepLength()</div><div class="ttdoc">Calculate the constant step length for Robbins-Monro adaption.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8cpp_source.html#l00440">AdaptiveMCMCHandler.cpp:440</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a823239d1f978de9ea9d7903c84369d1e"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a823239d1f978de9ea9d7903c84369d1e">adaptive_mcmc::AdaptiveMCMCHandler::CalculateRobbinsMonroStepLength</a></div><div class="ttdeci">void CalculateRobbinsMonroStepLength()</div><div class="ttdoc">Calculate the constant step length for Robbins-Monro adaption.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8cpp_source.html#l00439">AdaptiveMCMCHandler.cpp:439</a></div></div>
 <div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_ac5da89509c4d7b10cf760e6f4b500962"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac5da89509c4d7b10cf760e6f4b500962">adaptive_mcmc::AdaptiveMCMCHandler::n_rm_restarts</a></div><div class="ttdeci">int n_rm_restarts</div><div class="ttdoc">Number of restarts for Robbins Monro (so far)</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00256">AdaptiveMCMCHandler.h:256</a></div></div>
 <div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_acaba871e3b65b54d9fcb5d381ea05742"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#acaba871e3b65b54d9fcb5d381ea05742">adaptive_mcmc::AdaptiveMCMCHandler::SetAdaptiveBlocks</a></div><div class="ttdeci">void SetAdaptiveBlocks(const std::vector&lt; std::vector&lt; int &gt;&gt; &amp;block_indices)</div><div class="ttdoc">HW: sets adaptive block matrix.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8cpp_source.html#l00126">AdaptiveMCMCHandler.cpp:126</a></div></div>
 </div><!-- fragment -->
@@ -938,8 +938,7 @@ Private Attributes</h2></td></tr>
 <div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac78f769c84794bc3d67a55dd16e15b62">use_robbins_monro</a>) {</div>
 <div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Using Robbins-Monro for adaptive step size tuning with target acceptance {}&quot;</span>, <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a5ee8cfa8ef96f852ad56bb0dc3949c01">target_acceptance</a>);</div>
 <div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;  }</div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160; </div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;}</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1396,7 +1395,7 @@ Private Attributes</h2></td></tr>
 <div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;    }</div>
 <div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;  }</div>
 <div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;}</div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_ac217019634fb10a0f1ebe834919ec57d"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac217019634fb10a0f1ebe834919ec57d">adaptive_mcmc::AdaptiveMCMCHandler::CurrVal</a></div><div class="ttdeci">double CurrVal(const int par_index) const</div><div class="ttdoc">Get Current value of parameter.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8cpp_source.html#l00432">AdaptiveMCMCHandler.cpp:432</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_ac217019634fb10a0f1ebe834919ec57d"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac217019634fb10a0f1ebe834919ec57d">adaptive_mcmc::AdaptiveMCMCHandler::CurrVal</a></div><div class="ttdeci">double CurrVal(const int par_index) const</div><div class="ttdoc">Get Current value of parameter.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8cpp_source.html#l00431">AdaptiveMCMCHandler.cpp:431</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1451,40 +1450,39 @@ Private Attributes</h2></td></tr>
 <p>Update the scale factor for Robbins-Monro adaption [200 is arbitrary for early stability but motivated by paper]</p>
 <p>Now we either increase or decrease the scale</p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html#l00461">461</a> of file <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html">AdaptiveMCMCHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;                                                 {</div>
-<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;<span class="comment">// ********************************************</span></div>
-<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;  <span class="comment">/* </span></div>
-<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;<span class="comment">  Update the scale factor using Robbins-Monro. </span></div>
-<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;<span class="comment">  TLDR: If acceptance rate is too high, scale factor goes up, if too low goes down</span></div>
-<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;<span class="comment">        will pretty rapidly converge to the right value.</span></div>
-<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;<span class="comment">  */</span></div>
-<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160; </div>
-<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;  <span class="keywordflow">if</span> ((<a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a>&gt;0) &amp;&amp; (<a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a> % <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a5f98ed8d64f26ec6b8c5ea653abac48b">acceptance_rate_batch_size</a> == 0)) {</div>
-<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;    <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac5da89509c4d7b10cf760e6f4b500962">n_rm_restarts</a>++;</div>
-<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;  }</div>
-<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160; </div>
-<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;  <span class="keywordtype">int</span> batch_step;</div>
-<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;  <span class="keywordflow">if</span> (<a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac5da89509c4d7b10cf760e6f4b500962">n_rm_restarts</a> &gt; <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#af98ef5c78b491c12ebe3325322990e29">total_rm_restarts</a>) {</div>
-<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;    batch_step = <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a>;</div>
-<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;  }</div>
-<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;  <span class="keywordflow">else</span>{</div>
-<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;    batch_step = <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a> % <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a5f98ed8d64f26ec6b8c5ea653abac48b">acceptance_rate_batch_size</a>;</div>
-<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html#l00460">460</a> of file <a class="el" href="AdaptiveMCMCHandler_8cpp_source.html">AdaptiveMCMCHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;                                                 {</div>
+<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;<span class="comment">// ********************************************</span></div>
+<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;  <span class="comment">/* </span></div>
+<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;<span class="comment">  Update the scale factor using Robbins-Monro. </span></div>
+<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;<span class="comment">  TLDR: If acceptance rate is too high, scale factor goes up, if too low goes down</span></div>
+<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;<span class="comment">        will pretty rapidly converge to the right value.</span></div>
+<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;<span class="comment">  */</span></div>
+<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;  <span class="keywordflow">if</span> ((<a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a>&gt;0) &amp;&amp; (<a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a> % <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a5f98ed8d64f26ec6b8c5ea653abac48b">acceptance_rate_batch_size</a> == 0)) {</div>
+<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;    <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac5da89509c4d7b10cf760e6f4b500962">n_rm_restarts</a>++;</div>
+<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;  }</div>
+<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160; </div>
+<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;  <span class="keywordtype">int</span> batch_step;</div>
+<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;  <span class="keywordflow">if</span> (<a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac5da89509c4d7b10cf760e6f4b500962">n_rm_restarts</a> &gt; <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#af98ef5c78b491c12ebe3325322990e29">total_rm_restarts</a>) {</div>
+<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;    batch_step = <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a>;</div>
+<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;  }</div>
+<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;  <span class="keywordflow">else</span>{</div>
+<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;    batch_step = <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a> % <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a5f98ed8d64f26ec6b8c5ea653abac48b">acceptance_rate_batch_size</a>;</div>
+<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;  }</div>
+<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160; </div>
+<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;  <span class="keywordtype">int</span> non_fixed_pars = <a class="code" href="group__ParameterHandlerGetters.html#gad53dfcadf98e09ff8d603caeac3466d2">GetNumParams</a>()-<a class="code" href="group__ParameterHandlerGetters.html#ga19f03236e945b834d9a28da28f858ee0">GetNFixed</a>();</div>
 <div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160; </div>
-<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;  <span class="keywordtype">int</span> non_fixed_pars = <a class="code" href="group__ParameterHandlerGetters.html#gad53dfcadf98e09ff8d603caeac3466d2">GetNumParams</a>()-<a class="code" href="group__ParameterHandlerGetters.html#ga19f03236e945b834d9a28da28f858ee0">GetNFixed</a>();</div>
+<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;  <span class="comment">// double root_scale = std::sqrt(adaption_scale);</span></div>
 <div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160; </div>
-<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;  <span class="comment">// double root_scale = std::sqrt(adaption_scale);</span></div>
-<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160; </div>
-<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;  <span class="keywordtype">double</span> scale_factor = <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a3a0dfaa943747e34b562d2a4716ac087">adaption_scale</a> * <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac7772d238ddaf7bf2acdca1224c2b333">c_robbins_monro</a> / std::max(200.0, <span class="keyword">static_cast&lt;</span><span class="keywordtype">double</span><span class="keyword">&gt;</span>(batch_step) / non_fixed_pars);</div>
-<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160; </div>
-<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#af415c82ad2a8a43c628f498ed5267dc1">prev_step_accepted</a>){</div>
-<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;    <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a3a0dfaa943747e34b562d2a4716ac087">adaption_scale</a> += (1 - <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a5ee8cfa8ef96f852ad56bb0dc3949c01">target_acceptance</a>) * scale_factor;</div>
-<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;  }</div>
-<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;  <span class="keywordflow">else</span>{</div>
-<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;    <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a3a0dfaa943747e34b562d2a4716ac087">adaption_scale</a> -= <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a5ee8cfa8ef96f852ad56bb0dc3949c01">target_acceptance</a> * scale_factor;</div>
-<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;  }</div>
-<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;}</div>
+<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;  <span class="keywordtype">double</span> scale_factor = <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a3a0dfaa943747e34b562d2a4716ac087">adaption_scale</a> * <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac7772d238ddaf7bf2acdca1224c2b333">c_robbins_monro</a> / std::max(200.0, <span class="keyword">static_cast&lt;</span><span class="keywordtype">double</span><span class="keyword">&gt;</span>(batch_step) / non_fixed_pars);</div>
+<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160; </div>
+<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#af415c82ad2a8a43c628f498ed5267dc1">prev_step_accepted</a>){</div>
+<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;    <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a3a0dfaa943747e34b562d2a4716ac087">adaption_scale</a> += (1 - <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a5ee8cfa8ef96f852ad56bb0dc3949c01">target_acceptance</a>) * scale_factor;</div>
+<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;  }</div>
+<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;  <span class="keywordflow">else</span>{</div>
+<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;    <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a3a0dfaa943747e34b562d2a4716ac087">adaption_scale</a> -= <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a5ee8cfa8ef96f852ad56bb0dc3949c01">target_acceptance</a> * scale_factor;</div>
+<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;  }</div>
+<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
