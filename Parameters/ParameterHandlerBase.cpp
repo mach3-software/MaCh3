@@ -882,7 +882,7 @@ void ParameterHandlerBase::SetStepScale(const double scale, const bool verbose) 
 
   if(verbose){
     MACH3LOG_INFO("{} setStepScale() = {}", GetName(), scale);
-    const double SuggestedScale = 2.38*2.38/_fNumPar;
+    const double SuggestedScale = 2.38/std::sqrt(_fNumPar);
     if(std::fabs(scale - SuggestedScale)/SuggestedScale > 1) {
       MACH3LOG_WARN("Defined Global StepScale is {}, while suggested suggested {}", scale, SuggestedScale);
     }
