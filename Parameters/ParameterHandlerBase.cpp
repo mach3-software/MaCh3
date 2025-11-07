@@ -670,7 +670,6 @@ void ParameterHandlerBase::AcceptStep() _noexcept_ {
   if (AdaptiveHandler) {
     AdaptiveHandler->IncrementAcceptedSteps();
   }
-
 }
 
 // *************************************
@@ -866,10 +865,8 @@ void ParameterHandlerBase::SetBranches(TTree &tree, bool SaveProposal) {
     }
   }
   if(use_adaptive && AdaptiveHandler->GetUseRobbinsMonro()){
-
     tree.Branch(Form("GlobalStepScale_%s", GetName().c_str()), &_fGlobalStepScale, Form("GlobalStepScale_%s/D", GetName().c_str()));
   }
-
 }
 
 // ********************************************
@@ -1339,6 +1336,5 @@ void ParameterHandlerBase::MatchMaCh3OutputBranches(TTree *PosteriorFile,
     PosteriorFile->SetBranchStatus(BranchNames[i].c_str(), true);
     PosteriorFile->SetBranchAddress(BranchNames[i].c_str(), &BranchValues[i]);
   }
-
 }
 

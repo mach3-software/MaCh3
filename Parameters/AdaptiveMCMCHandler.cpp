@@ -367,7 +367,6 @@ void AdaptiveMCMCHandler::Print() const {
   if(use_robbins_monro) {
     MACH3LOG_INFO("Using Robbins-Monro for adaptive step size tuning with target acceptance {}", target_acceptance);
   }
-
 }
 
 // ********************************************
@@ -465,7 +464,6 @@ void AdaptiveMCMCHandler::UpdateRobbinsMonroScale(){
   TLDR: If acceptance rate is too high, scale factor goes up, if too low goes down
         will pretty rapidly converge to the right value.
   */
-
   if ((total_steps>0) && (total_steps % acceptance_rate_batch_size == 0)) {
     n_rm_restarts++;
   }
