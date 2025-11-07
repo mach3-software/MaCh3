@@ -717,6 +717,54 @@ void ParameterHandlerGeneric::SetGroupOnlyParameters(const std::string& Group, c
 }
 
 // ********************************************
+// Toggle fix/free to parameters of a given group
+void ParameterHandlerGeneric::ToggleFixGroupOnlyParameters(const std::string& Group) {
+// ********************************************
+  for (int i = 0; i < _fNumPar; ++i) 
+    if(IsParFromGroup(i, Group)) ToggleFixParameter(i);
+}
+
+// ********************************************
+// Toggle fix/free to parameters of several groups
+void ParameterHandlerGeneric::ToggleFixGroupOnlyParameters(const std::vector< std::string>& Groups) {
+// ********************************************
+  for(size_t i = 0; i < Groups.size(); i++)
+    ToggleFixGroupOnlyParameters(Groups[i]); 
+}
+
+// ********************************************
+// Set parameters to be fixed in a given group
+void ParameterHandlerGeneric::SetFixGroupOnlyParameters(const std::string& Group) {
+// ********************************************
+  for (int i = 0; i < _fNumPar; ++i) 
+    if(IsParFromGroup(i, Group)) SetFixParameter(i);
+}
+
+// ********************************************
+// Set parameters of several groups to be fixed
+void ParameterHandlerGeneric::SetFixGroupOnlyParameters(const std::vector< std::string>& Groups) {
+// ********************************************
+  for(size_t i = 0; i < Groups.size(); i++)
+    SetFixGroupOnlyParameters(Groups[i]); 
+}
+
+// ********************************************
+// Set parameters to be free in a given group
+void ParameterHandlerGeneric::SetFreeGroupOnlyParameters(const std::string& Group) {
+// ********************************************
+  for (int i = 0; i < _fNumPar; ++i) 
+    if(IsParFromGroup(i, Group)) SetFreeParameter(i);
+}
+
+// ********************************************
+// Set parameters of several groups to be fixed
+void ParameterHandlerGeneric::SetFreeGroupOnlyParameters(const std::vector< std::string>& Groups) {
+// ********************************************
+  for(size_t i = 0; i < Groups.size(); i++)
+    SetFreeGroupOnlyParameters(Groups[i]); 
+}
+
+// ********************************************
 // Checks if parameter belongs to a given group
 bool ParameterHandlerGeneric::IsParFromGroup(const int i, const std::string& Group) const {
 // ********************************************
