@@ -1,6 +1,7 @@
 // MaCh3 includes
 #include "Manager/Manager.h"
 #include "Samples/SampleStructs.h"
+#include "Samples/HistogramUtils.h"
 #include "Parameters/ParameterHandlerUtils.h"
 
 _MaCh3_Safe_Include_Start_ //{
@@ -42,7 +43,7 @@ double** invCovMatrix;
 void ReadXSecFile(const std::string& inputFile)
 {
   // Now read the MCMC file
-  TFile *TempFile = new TFile(inputFile.c_str(), "open");
+  TFile *TempFile = M3::Open(inputFile, "open", __FILE__, __LINE__);
 
   // Get the matrix
   TDirectory* CovarianceFolder = TempFile->Get<TDirectory>("CovarianceFolder");
@@ -338,7 +339,7 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
 
   // Directory for posteriors
   std::string OutputName = inputFile + "_PenaltyTerm" +".root";
-  TFile* OutputFile = new TFile(OutputName.c_str(), "recreate");
+  TFile *OutputFile = M3::Open(OutputName, "recreate", __FILE__, __LINE__);
   TDirectory *PenaltyTermDir = OutputFile->mkdir("PenaltyTerm");
 
   canvas->Print(Form("%s_PenaltyTerm.pdf[",inputFile.c_str()), "pdf");

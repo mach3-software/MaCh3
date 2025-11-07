@@ -154,7 +154,7 @@ void OscProcessor::PerformJarlskogAnalysis() {
   std::pair<double, double> Sin13_NewPrior;
 
   // Now read the MCMC file
-  TFile *TempFile = new TFile((MCMCFile + ".root").c_str(), "open");
+  TFile *TempFile = M3::Open((MCMCFile + ".root"), "open", __FILE__, __LINE__);
 
   // Get the settings for the MCMC
   TMacro *Config = TempFile->Get<TMacro>("Reweight_Config");

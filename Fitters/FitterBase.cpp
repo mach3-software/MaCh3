@@ -344,7 +344,7 @@ void FitterBase::StartFromPreviousFit(const std::string& FitName) {
 
       if (!compareYAMLNodes(CovSettings, ConfigCurrent))
       {
-        MACH3LOG_ERROR("Yaml configs in previous chain and current one are different", FitName);
+        MACH3LOG_ERROR("Yaml configs in previous chain (from path {}) and current one are different", FitName);
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
 
@@ -494,7 +494,7 @@ void FitterBase::DragRace(const int NLaps) {
 }
 
 // *************************
-bool FitterBase::GetScanRange(std::map<std::string, std::vector<double>>& scanRanges) {
+bool FitterBase::GetScanRange(std::map<std::string, std::vector<double>>& scanRanges) const {
 // *************************
   bool isScanRanges = false;
   // YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D. Barrow
@@ -1346,7 +1346,7 @@ void FitterBase::RunSigmaVar() {
 
 // *************************
 // For comparison with P-Theta we usually have to apply different parameter values then usual 1, 3 sigma
-void FitterBase::CustomRange(const std::string& ParName, const double sigma, double& ParamShiftValue) {
+void FitterBase::CustomRange(const std::string& ParName, const double sigma, double& ParamShiftValue) const {
 // *************************
   if(!fitMan->raw()["SigmaVar"]["CustomRange"]) return;
 

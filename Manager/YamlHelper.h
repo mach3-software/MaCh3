@@ -23,6 +23,11 @@ _MaCh3_Safe_Include_End_ //}
 
 /// @file YamlHelper.h
 /// @brief Utility functions for handling YAML nodes
+///
+/// MaCh3 uses YAML in a specific way within its configuration system.
+/// These helper functions act as a safety layer on top of yaml-cpp, adding
+/// MaCh3-specific validation, consistency checks, and enhanced error reporting.
+///
 /// @note you can read more about Yaml: [here](https://codedocs.xyz/jbeder/yaml-cpp/index.html)
 /// @author Kamil Skwarczynski
 /// @author Luke Pickering
@@ -43,7 +48,7 @@ template<typename T, typename... Args>
 bool CheckNodeExistsHelper(const T& node, const std::string& key, Args... args) {\
 // **********************
   if (!node[key]) {
-    //std::cerr << "Node " << key << " doesn't exist." << std::endl;
+    MACH3LOG_TRACE("Node '{}' doesn't exist.", key);
     return false;
   }
   return CheckNodeExistsHelper(node[key], args...);
@@ -70,10 +75,10 @@ T FindFromManagerHelper(const YAML::Node& node) {
 /// @brief Recursive function to traverse YAML nodes
 template<typename T, typename... Args>
 T FindFromManagerHelper(const YAML::Node& node, const std::string& key, Args... args) {
-  // **********************
+// **********************
   if (!node[key]) {
     MACH3LOG_ERROR("Node {} doesn't exist.", key);
-    throw;
+    throw MaCh3Exception(__FILE__, __LINE__);
     return T();
   }
   return FindFromManagerHelper<T>(node[key], args...); // Recursive call
@@ -262,6 +267,8 @@ inline std::string DemangleTypeName(const std::string& mangledName) {
 // **********************
 /// @brief Get content of config file
 /// @param node Yaml node
+/// @param File name of file in which function is being called to make better error message
+/// @param Line File line in which function is being called to make better error message
 template<typename Type>
 Type Get(const YAML::Node& node, const std::string File, const int Line) {
 // **********************
@@ -295,8 +302,10 @@ Type Get(const YAML::Node& node, const std::string File, const int Line) {
 /// @brief Get content of config file if node is not found take default value specified
 /// @param node Yaml node
 /// @param defval Default value which will be used in case node doesn't exist
+/// @param File name of file in which function is being called to make better error message
+/// @param Line File line in which function is being called to make better error message
 template<typename Type>
-Type GetFromManager(const YAML::Node& node, Type defval, const std::string File = "", const int Line = 1) {
+Type GetFromManager(const YAML::Node& node, const Type defval, const std::string File = "", const int Line = 1) {
 // **********************
   if (!node) {
     return defval;
@@ -403,7 +412,7 @@ inline const YAML::Node & Cnode(const YAML::Node &n) {
 /// @param a The base YAML node.
 /// @param b The YAML node to merge into `a`.
 /// @return A new YAML node representing the merged result.
-inline YAML::Node MergeNodes(YAML::Node a, YAML::Node b) {
+inline YAML::Node MergeNodes(const YAML::Node& a, const YAML::Node& b) {
 // **********************
   if (!b.IsMap()) {
     // If b is not a map, merge result is b, unless b is null

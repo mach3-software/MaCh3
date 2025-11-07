@@ -247,7 +247,9 @@ void PlotAutoCorr(TString fname1, TString flabel1, TString fname2, TString flabe
         // KS: This is unfortunately hardcoded, need to find better way to write this
         // histos.back()->GetListOfFunctions()->ls();
         RemoveFitter(histos.back().get(), "Fitter");
-        double MinValue = GetMinimumInRange(histos.back().get(), 0, 24000);
+        // KS: Very arbitrary check if autocorrelation dropped below threshold in half of consider LagL
+        double UpperEdgeBeforeLast = histos.back()->GetXaxis()->GetBinUpEdge(histos.back()->GetNbinsX()/2);
+        double MinValue = GetMinimumInRange(histos.back().get(), 0, UpperEdgeBeforeLast);
 
         if (MinValue >= 0.80)
           histos.back()->SetLineColor(kRed);
