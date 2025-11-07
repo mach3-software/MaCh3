@@ -904,6 +904,50 @@ int ParameterHandlerBase::GetParIndex(const std::string& name) const {
 }
 
 // ********************************************
+void ParameterHandlerBase::SetFixAllParameters() {
+// ********************************************
+  // Check if the parameter is fixed and if not, toggle fix it
+  for (int i = 0; i < _fNumPar; ++i) 
+    if(!IsParameterFixed(i)) ToggleFixParameter(i);
+}
+
+// ********************************************
+void ParameterHandlerBase::SetFixParameter(const int i) {
+// ********************************************
+  // Check if the parameter is fixed and if not, toggle fix it
+  if(!IsParameterFixed(i)) ToggleFixParameter(i);
+}
+
+// ********************************************
+void ParameterHandlerBase::SetFixParameter(const std::string& name) {
+// ********************************************
+  // Check if the parameter is fixed and if not, toggle fix it
+  if(!IsParameterFixed(name)) ToggleFixParameter(name);
+}
+
+// ********************************************
+void ParameterHandlerBase::SetFreeAllParameters() {
+// ********************************************
+  // Check if the parameter is fixed and if not, toggle fix it
+  for (int i = 0; i < _fNumPar; ++i) 
+    if(IsParameterFixed(i)) ToggleFixParameter(i);
+}
+
+// ********************************************
+void ParameterHandlerBase::SetFreeParameter(const int i) {
+// ********************************************
+  // Check if the parameter is fixed and if not, toggle fix it
+  if(IsParameterFixed(i)) ToggleFixParameter(i);
+}
+
+// ********************************************
+void ParameterHandlerBase::SetFreeParameter(const std::string& name) {
+// ********************************************
+  // Check if the parameter is fixed and if not, toggle fix it
+  if(IsParameterFixed(name)) ToggleFixParameter(name);
+}
+
+// ********************************************
 void ParameterHandlerBase::ToggleFixAllParameters() {
 // ********************************************
   // fix or unfix all parameters by multiplying by -1
