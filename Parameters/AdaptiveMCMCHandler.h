@@ -179,10 +179,6 @@ namespace adaptive_mcmc
     /// @brief Get the current adaption scale
     double GetAdaptionScale()
     {
-      if (use_robbins_monro)
-      {
-        UpdateRobbinsMonroScale();
-      }
       return adaption_scale;
     }
 
@@ -192,9 +188,10 @@ namespace adaptive_mcmc
       return use_robbins_monro;
     }
 
-  private:
     /// Update the scale factor for Robbins-Monro adaption
     void UpdateRobbinsMonroScale();
+
+  private:
     /// Calculate the constant step length for Robbins-Monro adaption
     void CalculateRobbinsMonroStepLength();
 

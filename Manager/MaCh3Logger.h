@@ -16,8 +16,18 @@ _MaCh3_Safe_Include_Start_ //{
 _MaCh3_Safe_Include_End_ //}
 
 /// @file MaCh3Logger.h
-/// @brief KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/include/spdlog/spdlog.h#L284
-/// @note can read more about spdlog [here](https://github.com/gabime/spdlog/wiki)
+/// @brief MaCh3 Logging utilities built on top of SPDLOG.
+///
+/// KS: MaCh3 uses SPDLOG as its core logging backend, and this file serves as a wrapper
+/// around it. The MaCh3 logging system uses compile-time log level definitions to control
+/// which log statements are compiled. This ensures that, in default builds, `MACH3LOG_DEBUG`
+/// and lower levels are completely removed at compile time for maximal performance.
+///
+/// The available compile-time log level definitions can be found
+/// [here](https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/include/spdlog/spdlog.h#L284).
+///
+/// @note You can read more about SPDLOG formatting, levels, and configuration
+///       on the [official SPDLOG wiki](https://github.com/gabime/spdlog/wiki).
 /// @author Kamil Skwarczynski
 
 #define MACH3LOG_TRACE SPDLOG_TRACE

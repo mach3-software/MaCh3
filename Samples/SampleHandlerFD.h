@@ -80,7 +80,7 @@ class SampleHandlerFD :  public SampleHandlerBase
   TH1* GetDataHist(const std::string& Sample, const int Dimension);
 
   void Reweight() override;
-  M3::float_t GetEventWeight(const int iEntry) const;
+  M3::float_t GetEventWeight(const int iEntry);
 
   /// @brief including Dan's magic NuOscillator
   void InitialiseNuOscillatorObjects();
@@ -156,8 +156,8 @@ class SampleHandlerFD :  public SampleHandlerBase
   bool IsSubEventVarString(const std::string& VarStr);
 
  protected:
-  /// @brief DB Function to determine which weights apply to which types of samples pure virtual!!
-  virtual void SetupWeightPointers() = 0;
+  /// @brief DB Function to determine which weights apply to which types of samples
+  virtual void AddAdditionalWeightPointers() = 0;
 
   /// @brief Ensure Kinematic Map is setup and make sure it is initialised correctly
   void SetupKinematicMap();
@@ -237,17 +237,15 @@ class SampleHandlerFD :  public SampleHandlerBase
 
   /// @brief Check whether a normalisation systematic affects an event or not
   void CalcNormsBins(std::vector<NormParameter>& norm_parameters, std::vector< std::vector< int > >& xsec_norms_bins);
-  /// @brief Calculate the spline weight for a given event
-  M3::float_t CalcWeightSpline(const FarDetectorCoreInfo* MCEvent) const;
-  /// @brief Calculate the norm weight for a given event
-  M3::float_t CalcWeightNorm(const FarDetectorCoreInfo* MCEvent) const;
+  /// @brief Calculate the total weight weight for a given event
+  M3::float_t CalcWeightTotal(const FarDetectorCoreInfo* _restrict_ MCEvent) const;
 
   /// @brief Calculate weights for function parameters
   ///
   /// First you need to setup additional pointers in you experiment code in SetupWeightPointers
   /// Then in this function you can calculate whatever fancy function you want by filling weight to which you have pointer
   /// This way func weight shall be used in GetEventWeight
-  virtual void CalcWeightFunc(int iEvent){return; (void)iEvent;};
+  virtual void CalcWeightFunc(int iEvent) {return; (void)iEvent;};
 
   /// @brief Return the value of an associated kinematic parameter for an event
   virtual double ReturnKinematicParameter(std::string KinematicParamter, int iEvent) = 0;

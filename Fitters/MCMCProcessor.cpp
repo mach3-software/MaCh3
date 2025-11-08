@@ -2569,8 +2569,7 @@ void MCMCProcessor::ReadModelFile() {
 
     // Check that the branch exists before setting address
     if (!Chain->GetBranch(BranchNames.back())) {
-      MACH3LOG_ERROR("Couldn't find branch '{}'", BranchNames.back());
-      throw MaCh3Exception(__FILE__, __LINE__);
+      MACH3LOG_WARN("Couldn't find branch '{}', if you are not planning to draw posteriors this might be fine", BranchNames.back());
     }
   }
 }
@@ -4289,7 +4288,6 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
     Posterior->SetLogx();
     Posterior->SetLogy();
     Posterior->SetGrid();
-    plot->Write(plot->GetName());
     plot->Draw("AL");
     func->Draw("SAME");
     if(printToPDF) Posterior->Print(CanvasName);

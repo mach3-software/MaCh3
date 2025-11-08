@@ -52,8 +52,19 @@ void MCMCBase::RunMCMC() {
     // Save all the MCMC output
     SaveOutput();
 
+
     // Process MCMC
     ProcessMCMC();
+
+    // Save the adaptive MCMC
+    for (const auto &syst : systematics)
+    {
+        if (syst->GetDoAdaption())
+        {
+            auto adaptive_handler = syst->GetAdaptiveHandler();
+            adaptive_handler->SaveAdaptiveToFile(adaptive_handler->GetOutFileName(), syst->GetName(), true);
+        }
+    }
 }
 
 // *******************

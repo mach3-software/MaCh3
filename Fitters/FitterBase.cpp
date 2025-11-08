@@ -239,7 +239,7 @@ void FitterBase::SaveOutput() {
   outputFile->cd();
   outTree->Write();
 
-  MACH3LOG_INFO("{} steps took {:.2f} seconds to complete. ({:.2f}s / step).", step - stepStart, clock->RealTime(), clock->RealTime() / static_cast<double>(step - stepStart));
+  MACH3LOG_INFO("{} steps took {:.2e} seconds to complete. ({:.2e}s / step).", step - stepStart, clock->RealTime(), clock->RealTime() / static_cast<double>(step - stepStart));
   MACH3LOG_INFO("{} steps were accepted.", accCount);
   #ifdef DEBUG
   if (debug)
@@ -494,7 +494,7 @@ void FitterBase::DragRace(const int NLaps) {
 }
 
 // *************************
-bool FitterBase::GetScanRange(std::map<std::string, std::vector<double>>& scanRanges) {
+bool FitterBase::GetScanRange(std::map<std::string, std::vector<double>>& scanRanges) const {
 // *************************
   bool isScanRanges = false;
   // YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D. Barrow
@@ -1346,7 +1346,7 @@ void FitterBase::RunSigmaVar() {
 
 // *************************
 // For comparison with P-Theta we usually have to apply different parameter values then usual 1, 3 sigma
-void FitterBase::CustomRange(const std::string& ParName, const double sigma, double& ParamShiftValue) {
+void FitterBase::CustomRange(const std::string& ParName, const double sigma, double& ParamShiftValue) const {
 // *************************
   if(!fitMan->raw()["SigmaVar"]["CustomRange"]) return;
 
