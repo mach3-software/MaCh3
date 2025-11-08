@@ -1948,116 +1948,116 @@ Protected Attributes</h2></td></tr>
 <dl class="section warning"><dt>Warning</dt><dd>Code uses <a class="el" href="classSampleHandlerFD.html" title="Class responsible for handling implementation of samples used in analysis, reweighting and returning ...">SampleHandlerFD</a> </dd></dl>
 <p>Apply custom range to make easier comparison with p-theta</p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8cpp_source.html#l01422">1422</a> of file <a class="el" href="FitterBase_8cpp_source.html">FitterBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l01422"></a><span class="lineno"> 1422</span>&#160;                               {</div>
-<div class="line"><a name="l01423"></a><span class="lineno"> 1423</span>&#160;<span class="comment">// *************************</span></div>
-<div class="line"><a name="l01424"></a><span class="lineno"> 1424</span>&#160;  <span class="comment">// Save the settings into the output file</span></div>
-<div class="line"><a name="l01425"></a><span class="lineno"> 1425</span>&#160;  <a class="code" href="classFitterBase.html#a48f38bfa8996fe00d51f35b05dd16b46">SaveSettings</a>();</div>
-<div class="line"><a name="l01426"></a><span class="lineno"> 1426</span>&#160; </div>
-<div class="line"><a name="l01427"></a><span class="lineno"> 1427</span>&#160;  <span class="keywordtype">bool</span> plot_by_mode = GetFromManager&lt;bool&gt;(<a class="code" href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">fitMan</a>-&gt;<a class="code" href="classmanager.html#aecbfb3ead2c10006f39a144f64d3cb53">raw</a>()[<span class="stringliteral">&quot;SigmaVar&quot;</span>][<span class="stringliteral">&quot;PlotByMode&quot;</span>], <span class="keyword">false</span>);</div>
-<div class="line"><a name="l01428"></a><span class="lineno"> 1428</span>&#160;  <span class="keywordtype">bool</span> plot_by_channel = GetFromManager&lt;bool&gt;(<a class="code" href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">fitMan</a>-&gt;<a class="code" href="classmanager.html#aecbfb3ead2c10006f39a144f64d3cb53">raw</a>()[<span class="stringliteral">&quot;SigmaVar&quot;</span>][<span class="stringliteral">&quot;PlotByChannel&quot;</span>], <span class="keyword">false</span>);</div>
-<div class="line"><a name="l01429"></a><span class="lineno"> 1429</span>&#160;  <span class="keyword">auto</span> SkipVector = GetFromManager&lt;std::vector&lt;std::string&gt;&gt;(<a class="code" href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">fitMan</a>-&gt;<a class="code" href="classmanager.html#aecbfb3ead2c10006f39a144f64d3cb53">raw</a>()[<span class="stringliteral">&quot;SigmaVar&quot;</span>][<span class="stringliteral">&quot;SkipVector&quot;</span>], {}, __FILE__ , __LINE__);</div>
-<div class="line"><a name="l01430"></a><span class="lineno"> 1430</span>&#160; </div>
-<div class="line"><a name="l01431"></a><span class="lineno"> 1431</span>&#160;  <span class="keywordflow">if</span> (plot_by_mode) <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Plotting by sample and mode&quot;</span>);</div>
-<div class="line"><a name="l01432"></a><span class="lineno"> 1432</span>&#160;  <span class="keywordflow">if</span> (plot_by_channel) <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Plotting by sample and channel&quot;</span>);</div>
-<div class="line"><a name="l01433"></a><span class="lineno"> 1433</span>&#160;  <span class="keywordflow">if</span> (!plot_by_mode &amp;&amp; !plot_by_channel) <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Plotting by sample only&quot;</span>);</div>
-<div class="line"><a name="l01434"></a><span class="lineno"> 1434</span>&#160;  <span class="keywordflow">if</span> (plot_by_mode &amp;&amp; plot_by_channel) <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Plotting by sample, mode and channel&quot;</span>);</div>
-<div class="line"><a name="l01435"></a><span class="lineno"> 1435</span>&#160; </div>
-<div class="line"><a name="l01436"></a><span class="lineno"> 1436</span>&#160;  <span class="keyword">auto</span> SigmaArray = GetFromManager&lt;std::vector&lt;double&gt;&gt;(<a class="code" href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">fitMan</a>-&gt;<a class="code" href="classmanager.html#aecbfb3ead2c10006f39a144f64d3cb53">raw</a>()[<span class="stringliteral">&quot;SigmaVar&quot;</span>][<span class="stringliteral">&quot;SigmaArray&quot;</span>], {-3, -1, 0, 1, 3}, __FILE__ , __LINE__);</div>
-<div class="line"><a name="l01437"></a><span class="lineno"> 1437</span>&#160;  <span class="keywordflow">if</span> (std::find(SigmaArray.begin(), SigmaArray.end(), 0.0) == SigmaArray.end()) {</div>
-<div class="line"><a name="l01438"></a><span class="lineno"> 1438</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;:: SigmaArray does not contain 0! Current contents: {} ::&quot;</span>, fmt::join(SigmaArray, <span class="stringliteral">&quot;, &quot;</span>));</div>
-<div class="line"><a name="l01439"></a><span class="lineno"> 1439</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><a name="l01440"></a><span class="lineno"> 1440</span>&#160;  }</div>
-<div class="line"><a name="l01441"></a><span class="lineno"> 1441</span>&#160; </div>
-<div class="line"><a name="l01442"></a><span class="lineno"> 1442</span>&#160;  TDirectory* SigmaDir = <a class="code" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;mkdir(<span class="stringliteral">&quot;SigmaVar&quot;</span>);</div>
-<div class="line"><a name="l01443"></a><span class="lineno"> 1443</span>&#160;  <a class="code" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;cd();</div>
-<div class="line"><a name="l01444"></a><span class="lineno"> 1444</span>&#160; </div>
-<div class="line"><a name="l01445"></a><span class="lineno"> 1445</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> s = 0; s &lt; <a class="code" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.size(); ++s)</div>
-<div class="line"><a name="l01446"></a><span class="lineno"> 1446</span>&#160;  {</div>
-<div class="line"><a name="l01447"></a><span class="lineno"> 1447</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; <a class="code" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;GetNumParams(); i++)</div>
-<div class="line"><a name="l01448"></a><span class="lineno"> 1448</span>&#160;    {</div>
-<div class="line"><a name="l01449"></a><span class="lineno"> 1449</span>&#160;      std::string ParName = <a class="code" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;GetParFancyName(i);</div>
-<div class="line"><a name="l01450"></a><span class="lineno"> 1450</span>&#160;      <span class="comment">// KS: Check if we want to skip this parameter</span></div>
-<div class="line"><a name="l01451"></a><span class="lineno"> 1451</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="classFitterBase.html#a1c4d01c39f70e95eab05dc04d42a6032">CheckSkipParameter</a>(SkipVector, ParName)) <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l01452"></a><span class="lineno"> 1452</span>&#160; </div>
-<div class="line"><a name="l01453"></a><span class="lineno"> 1453</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;:: Param {} ::&quot;</span>, <a class="code" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;GetParFancyName(i));</div>
-<div class="line"><a name="l01454"></a><span class="lineno"> 1454</span>&#160; </div>
-<div class="line"><a name="l01455"></a><span class="lineno"> 1455</span>&#160;      TDirectory* ParamDir = SigmaDir-&gt;mkdir(ParName.c_str());</div>
-<div class="line"><a name="l01456"></a><span class="lineno"> 1456</span>&#160;      ParamDir-&gt;cd();</div>
-<div class="line"><a name="l01457"></a><span class="lineno"> 1457</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">double</span> ParamNomValue = <a class="code" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;GetParProp(i);</div>
-<div class="line"><a name="l01458"></a><span class="lineno"> 1458</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">double</span> ParamLower = <a class="code" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;GetLowerBound(i);</div>
-<div class="line"><a name="l01459"></a><span class="lineno"> 1459</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">double</span> ParamUpper = <a class="code" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;GetUpperBound(i);</div>
-<div class="line"><a name="l01460"></a><span class="lineno"> 1460</span>&#160; </div>
-<div class="line"><a name="l01461"></a><span class="lineno"> 1461</span>&#160;      <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> iSample = 0; iSample &lt; <a class="code" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>.size(); ++iSample)</div>
-<div class="line"><a name="l01462"></a><span class="lineno"> 1462</span>&#160;      {</div>
-<div class="line"><a name="l01463"></a><span class="lineno"> 1463</span>&#160;        <span class="keyword">auto</span>* MaCh3Sample = <span class="keyword">dynamic_cast&lt;</span><a class="code" href="classSampleHandlerFD.html">SampleHandlerFD</a>*<span class="keyword">&gt;</span>(<a class="code" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>[iSample]);</div>
-<div class="line"><a name="l01464"></a><span class="lineno"> 1464</span>&#160;        <span class="keywordflow">if</span> (!MaCh3Sample) {</div>
-<div class="line"><a name="l01465"></a><span class="lineno"> 1465</span>&#160;          <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;:: Sample {} do not inherit from  SampleHandlerFD this is not implemented::&quot;</span>, <a class="code" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>[i]-&gt;GetSampleTitle(iSample));</div>
-<div class="line"><a name="l01466"></a><span class="lineno"> 1466</span>&#160;          <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><a name="l01467"></a><span class="lineno"> 1467</span>&#160;        }</div>
-<div class="line"><a name="l01468"></a><span class="lineno"> 1468</span>&#160;        std::vector&lt;TDirectory*&gt; SampleDir(MaCh3Sample-&gt;GetNsamples());</div>
-<div class="line"><a name="l01469"></a><span class="lineno"> 1469</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> SampleIndex = 0; SampleIndex &lt; MaCh3Sample-&gt;GetNsamples(); ++SampleIndex) {</div>
-<div class="line"><a name="l01470"></a><span class="lineno"> 1470</span>&#160;          SampleDir[SampleIndex] = ParamDir-&gt;mkdir(MaCh3Sample-&gt;GetSampleTitle(SampleIndex).c_str());</div>
-<div class="line"><a name="l01471"></a><span class="lineno"> 1471</span>&#160;        }</div>
-<div class="line"><a name="l01472"></a><span class="lineno"> 1472</span>&#160; </div>
-<div class="line"><a name="l01473"></a><span class="lineno"> 1473</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 0; j &lt; SigmaArray.size(); ++j) {</div>
-<div class="line"><a name="l01474"></a><span class="lineno"> 1474</span>&#160;          <span class="keywordtype">double</span> sigma = SigmaArray[j];</div>
-<div class="line"><a name="l01475"></a><span class="lineno"> 1475</span>&#160; </div>
-<div class="line"><a name="l01476"></a><span class="lineno"> 1476</span>&#160;          <span class="keywordtype">double</span> ParamShiftValue = ParamNomValue + sigma * std::sqrt((*<a class="code" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;GetCovMatrix())(i,i));</div>
-<div class="line"><a name="l01477"></a><span class="lineno"> 1477</span>&#160;          ParamShiftValue = std::max(std::min(ParamShiftValue, ParamUpper), ParamLower);</div>
-<div class="line"><a name="l01478"></a><span class="lineno"> 1478</span>&#160; </div>
-<div class="line"><a name="l01480"></a><span class="lineno"> 1480</span>&#160;          <a class="code" href="classFitterBase.html#aad1a1941379bc81a853fa6e1a3f9d5f2">CustomRange</a>(ParName, sigma, ParamShiftValue);</div>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8cpp_source.html#l01449">1449</a> of file <a class="el" href="FitterBase_8cpp_source.html">FitterBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l01449"></a><span class="lineno"> 1449</span>&#160;                               {</div>
+<div class="line"><a name="l01450"></a><span class="lineno"> 1450</span>&#160;<span class="comment">// *************************</span></div>
+<div class="line"><a name="l01451"></a><span class="lineno"> 1451</span>&#160;  <span class="comment">// Save the settings into the output file</span></div>
+<div class="line"><a name="l01452"></a><span class="lineno"> 1452</span>&#160;  <a class="code" href="classFitterBase.html#a48f38bfa8996fe00d51f35b05dd16b46">SaveSettings</a>();</div>
+<div class="line"><a name="l01453"></a><span class="lineno"> 1453</span>&#160; </div>
+<div class="line"><a name="l01454"></a><span class="lineno"> 1454</span>&#160;  <span class="keywordtype">bool</span> plot_by_mode = GetFromManager&lt;bool&gt;(<a class="code" href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">fitMan</a>-&gt;<a class="code" href="classmanager.html#aecbfb3ead2c10006f39a144f64d3cb53">raw</a>()[<span class="stringliteral">&quot;SigmaVar&quot;</span>][<span class="stringliteral">&quot;PlotByMode&quot;</span>], <span class="keyword">false</span>);</div>
+<div class="line"><a name="l01455"></a><span class="lineno"> 1455</span>&#160;  <span class="keywordtype">bool</span> plot_by_channel = GetFromManager&lt;bool&gt;(<a class="code" href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">fitMan</a>-&gt;<a class="code" href="classmanager.html#aecbfb3ead2c10006f39a144f64d3cb53">raw</a>()[<span class="stringliteral">&quot;SigmaVar&quot;</span>][<span class="stringliteral">&quot;PlotByChannel&quot;</span>], <span class="keyword">false</span>);</div>
+<div class="line"><a name="l01456"></a><span class="lineno"> 1456</span>&#160;  <span class="keyword">auto</span> SkipVector = GetFromManager&lt;std::vector&lt;std::string&gt;&gt;(<a class="code" href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">fitMan</a>-&gt;<a class="code" href="classmanager.html#aecbfb3ead2c10006f39a144f64d3cb53">raw</a>()[<span class="stringliteral">&quot;SigmaVar&quot;</span>][<span class="stringliteral">&quot;SkipVector&quot;</span>], {}, __FILE__ , __LINE__);</div>
+<div class="line"><a name="l01457"></a><span class="lineno"> 1457</span>&#160; </div>
+<div class="line"><a name="l01458"></a><span class="lineno"> 1458</span>&#160;  <span class="keywordflow">if</span> (plot_by_mode) <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Plotting by sample and mode&quot;</span>);</div>
+<div class="line"><a name="l01459"></a><span class="lineno"> 1459</span>&#160;  <span class="keywordflow">if</span> (plot_by_channel) <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Plotting by sample and channel&quot;</span>);</div>
+<div class="line"><a name="l01460"></a><span class="lineno"> 1460</span>&#160;  <span class="keywordflow">if</span> (!plot_by_mode &amp;&amp; !plot_by_channel) <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Plotting by sample only&quot;</span>);</div>
+<div class="line"><a name="l01461"></a><span class="lineno"> 1461</span>&#160;  <span class="keywordflow">if</span> (plot_by_mode &amp;&amp; plot_by_channel) <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Plotting by sample, mode and channel&quot;</span>);</div>
+<div class="line"><a name="l01462"></a><span class="lineno"> 1462</span>&#160; </div>
+<div class="line"><a name="l01463"></a><span class="lineno"> 1463</span>&#160;  <span class="keyword">auto</span> SigmaArray = GetFromManager&lt;std::vector&lt;double&gt;&gt;(<a class="code" href="classFitterBase.html#a4fceb68f242feeb04a0ddf42a5a37095">fitMan</a>-&gt;<a class="code" href="classmanager.html#aecbfb3ead2c10006f39a144f64d3cb53">raw</a>()[<span class="stringliteral">&quot;SigmaVar&quot;</span>][<span class="stringliteral">&quot;SigmaArray&quot;</span>], {-3, -1, 0, 1, 3}, __FILE__ , __LINE__);</div>
+<div class="line"><a name="l01464"></a><span class="lineno"> 1464</span>&#160;  <span class="keywordflow">if</span> (std::find(SigmaArray.begin(), SigmaArray.end(), 0.0) == SigmaArray.end()) {</div>
+<div class="line"><a name="l01465"></a><span class="lineno"> 1465</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;:: SigmaArray does not contain 0! Current contents: {} ::&quot;</span>, fmt::join(SigmaArray, <span class="stringliteral">&quot;, &quot;</span>));</div>
+<div class="line"><a name="l01466"></a><span class="lineno"> 1466</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><a name="l01467"></a><span class="lineno"> 1467</span>&#160;  }</div>
+<div class="line"><a name="l01468"></a><span class="lineno"> 1468</span>&#160; </div>
+<div class="line"><a name="l01469"></a><span class="lineno"> 1469</span>&#160;  TDirectory* SigmaDir = <a class="code" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;mkdir(<span class="stringliteral">&quot;SigmaVar&quot;</span>);</div>
+<div class="line"><a name="l01470"></a><span class="lineno"> 1470</span>&#160;  <a class="code" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;cd();</div>
+<div class="line"><a name="l01471"></a><span class="lineno"> 1471</span>&#160; </div>
+<div class="line"><a name="l01472"></a><span class="lineno"> 1472</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> s = 0; s &lt; <a class="code" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>.size(); ++s)</div>
+<div class="line"><a name="l01473"></a><span class="lineno"> 1473</span>&#160;  {</div>
+<div class="line"><a name="l01474"></a><span class="lineno"> 1474</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; <a class="code" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;GetNumParams(); i++)</div>
+<div class="line"><a name="l01475"></a><span class="lineno"> 1475</span>&#160;    {</div>
+<div class="line"><a name="l01476"></a><span class="lineno"> 1476</span>&#160;      std::string ParName = <a class="code" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;GetParFancyName(i);</div>
+<div class="line"><a name="l01477"></a><span class="lineno"> 1477</span>&#160;      <span class="comment">// KS: Check if we want to skip this parameter</span></div>
+<div class="line"><a name="l01478"></a><span class="lineno"> 1478</span>&#160;      <span class="keywordflow">if</span>(<a class="code" href="classFitterBase.html#a1c4d01c39f70e95eab05dc04d42a6032">CheckSkipParameter</a>(SkipVector, ParName)) <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l01479"></a><span class="lineno"> 1479</span>&#160; </div>
+<div class="line"><a name="l01480"></a><span class="lineno"> 1480</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;:: Param {} ::&quot;</span>, <a class="code" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;GetParFancyName(i));</div>
 <div class="line"><a name="l01481"></a><span class="lineno"> 1481</span>&#160; </div>
-<div class="line"><a name="l01482"></a><span class="lineno"> 1482</span>&#160;          <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(</div>
-<div class="line"><a name="l01483"></a><span class="lineno"> 1483</span>&#160;            <span class="stringliteral">&quot;  - set to {:&lt;5.2f} ({:&lt;2} sigma shift)&quot;</span>,</div>
-<div class="line"><a name="l01484"></a><span class="lineno"> 1484</span>&#160;                        ParamShiftValue,</div>
-<div class="line"><a name="l01485"></a><span class="lineno"> 1485</span>&#160;                        sigma</div>
-<div class="line"><a name="l01486"></a><span class="lineno"> 1486</span>&#160;          );</div>
+<div class="line"><a name="l01482"></a><span class="lineno"> 1482</span>&#160;      TDirectory* ParamDir = SigmaDir-&gt;mkdir(ParName.c_str());</div>
+<div class="line"><a name="l01483"></a><span class="lineno"> 1483</span>&#160;      ParamDir-&gt;cd();</div>
+<div class="line"><a name="l01484"></a><span class="lineno"> 1484</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">double</span> ParamNomValue = <a class="code" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;GetParProp(i);</div>
+<div class="line"><a name="l01485"></a><span class="lineno"> 1485</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">double</span> ParamLower = <a class="code" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;GetLowerBound(i);</div>
+<div class="line"><a name="l01486"></a><span class="lineno"> 1486</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">double</span> ParamUpper = <a class="code" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;GetUpperBound(i);</div>
 <div class="line"><a name="l01487"></a><span class="lineno"> 1487</span>&#160; </div>
-<div class="line"><a name="l01488"></a><span class="lineno"> 1488</span>&#160;          <a class="code" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;SetParProp(i, ParamShiftValue);</div>
-<div class="line"><a name="l01489"></a><span class="lineno"> 1489</span>&#160; </div>
-<div class="line"><a name="l01490"></a><span class="lineno"> 1490</span>&#160;          std::ostringstream valStream;</div>
-<div class="line"><a name="l01491"></a><span class="lineno"> 1491</span>&#160;          valStream &lt;&lt; std::fixed &lt;&lt; std::setprecision(2) &lt;&lt; ParamShiftValue;</div>
-<div class="line"><a name="l01492"></a><span class="lineno"> 1492</span>&#160;          std::string valueStr = valStream.str();</div>
-<div class="line"><a name="l01493"></a><span class="lineno"> 1493</span>&#160; </div>
-<div class="line"><a name="l01494"></a><span class="lineno"> 1494</span>&#160;          std::ostringstream sigmaStream;</div>
-<div class="line"><a name="l01495"></a><span class="lineno"> 1495</span>&#160;          sigmaStream &lt;&lt; std::fixed &lt;&lt; std::setprecision(2) &lt;&lt; std::abs(sigma);</div>
-<div class="line"><a name="l01496"></a><span class="lineno"> 1496</span>&#160;          std::string sigmaStr = sigmaStream.str();</div>
-<div class="line"><a name="l01497"></a><span class="lineno"> 1497</span>&#160; </div>
-<div class="line"><a name="l01498"></a><span class="lineno"> 1498</span>&#160;          std::string suffix;</div>
-<div class="line"><a name="l01499"></a><span class="lineno"> 1499</span>&#160;          <span class="keywordflow">if</span> (sigma == 0) {</div>
-<div class="line"><a name="l01500"></a><span class="lineno"> 1500</span>&#160;            suffix = <span class="stringliteral">&quot;_&quot;</span> + ParName + <span class="stringliteral">&quot;_nom_val_&quot;</span> + valueStr;</div>
-<div class="line"><a name="l01501"></a><span class="lineno"> 1501</span>&#160;          } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l01502"></a><span class="lineno"> 1502</span>&#160;            std::string sign = (sigma &gt; 0) ? <span class="stringliteral">&quot;p&quot;</span> : <span class="stringliteral">&quot;n&quot;</span>;</div>
-<div class="line"><a name="l01503"></a><span class="lineno"> 1503</span>&#160;            suffix = <span class="stringliteral">&quot;_&quot;</span> + ParName + <span class="stringliteral">&quot;_sig_&quot;</span> + sign + sigmaStr + <span class="stringliteral">&quot;_val_&quot;</span> + valueStr;</div>
-<div class="line"><a name="l01504"></a><span class="lineno"> 1504</span>&#160;          }</div>
+<div class="line"><a name="l01488"></a><span class="lineno"> 1488</span>&#160;      <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> iSample = 0; iSample &lt; <a class="code" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>.size(); ++iSample)</div>
+<div class="line"><a name="l01489"></a><span class="lineno"> 1489</span>&#160;      {</div>
+<div class="line"><a name="l01490"></a><span class="lineno"> 1490</span>&#160;        <span class="keyword">auto</span>* MaCh3Sample = <span class="keyword">dynamic_cast&lt;</span><a class="code" href="classSampleHandlerFD.html">SampleHandlerFD</a>*<span class="keyword">&gt;</span>(<a class="code" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>[iSample]);</div>
+<div class="line"><a name="l01491"></a><span class="lineno"> 1491</span>&#160;        <span class="keywordflow">if</span> (!MaCh3Sample) {</div>
+<div class="line"><a name="l01492"></a><span class="lineno"> 1492</span>&#160;          <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;:: Sample {} do not inherit from  SampleHandlerFD this is not implemented::&quot;</span>, <a class="code" href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">samples</a>[i]-&gt;GetSampleTitle(iSample));</div>
+<div class="line"><a name="l01493"></a><span class="lineno"> 1493</span>&#160;          <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><a name="l01494"></a><span class="lineno"> 1494</span>&#160;        }</div>
+<div class="line"><a name="l01495"></a><span class="lineno"> 1495</span>&#160;        std::vector&lt;TDirectory*&gt; SampleDir(MaCh3Sample-&gt;GetNsamples());</div>
+<div class="line"><a name="l01496"></a><span class="lineno"> 1496</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> SampleIndex = 0; SampleIndex &lt; MaCh3Sample-&gt;GetNsamples(); ++SampleIndex) {</div>
+<div class="line"><a name="l01497"></a><span class="lineno"> 1497</span>&#160;          SampleDir[SampleIndex] = ParamDir-&gt;mkdir(MaCh3Sample-&gt;GetSampleTitle(SampleIndex).c_str());</div>
+<div class="line"><a name="l01498"></a><span class="lineno"> 1498</span>&#160;        }</div>
+<div class="line"><a name="l01499"></a><span class="lineno"> 1499</span>&#160; </div>
+<div class="line"><a name="l01500"></a><span class="lineno"> 1500</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 0; j &lt; SigmaArray.size(); ++j) {</div>
+<div class="line"><a name="l01501"></a><span class="lineno"> 1501</span>&#160;          <span class="keywordtype">double</span> sigma = SigmaArray[j];</div>
+<div class="line"><a name="l01502"></a><span class="lineno"> 1502</span>&#160; </div>
+<div class="line"><a name="l01503"></a><span class="lineno"> 1503</span>&#160;          <span class="keywordtype">double</span> ParamShiftValue = ParamNomValue + sigma * std::sqrt((*<a class="code" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;GetCovMatrix())(i,i));</div>
+<div class="line"><a name="l01504"></a><span class="lineno"> 1504</span>&#160;          ParamShiftValue = std::max(std::min(ParamShiftValue, ParamUpper), ParamLower);</div>
 <div class="line"><a name="l01505"></a><span class="lineno"> 1505</span>&#160; </div>
-<div class="line"><a name="l01506"></a><span class="lineno"> 1506</span>&#160;          <a class="code" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;SetParProp(i, ParamShiftValue);</div>
-<div class="line"><a name="l01507"></a><span class="lineno"> 1507</span>&#160;          MaCh3Sample-&gt;Reweight();</div>
+<div class="line"><a name="l01507"></a><span class="lineno"> 1507</span>&#160;          <a class="code" href="classFitterBase.html#aad1a1941379bc81a853fa6e1a3f9d5f2">CustomRange</a>(ParName, sigma, ParamShiftValue);</div>
 <div class="line"><a name="l01508"></a><span class="lineno"> 1508</span>&#160; </div>
-<div class="line"><a name="l01509"></a><span class="lineno"> 1509</span>&#160;          <a class="code" href="FitterBase_8cpp.html#abc7e5e1b1cc60deb772ac9a8aa6f68cb">WriteHistogramsByMode</a>(MaCh3Sample, suffix, plot_by_mode, plot_by_channel, SampleDir);</div>
-<div class="line"><a name="l01510"></a><span class="lineno"> 1510</span>&#160;        }</div>
-<div class="line"><a name="l01511"></a><span class="lineno"> 1511</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> subSampleIndex = 0; subSampleIndex &lt; MaCh3Sample-&gt;GetNsamples(); ++subSampleIndex) {</div>
-<div class="line"><a name="l01512"></a><span class="lineno"> 1512</span>&#160;          SampleDir[subSampleIndex]-&gt;Close();</div>
-<div class="line"><a name="l01513"></a><span class="lineno"> 1513</span>&#160;          <span class="keyword">delete</span> SampleDir[subSampleIndex];</div>
-<div class="line"><a name="l01514"></a><span class="lineno"> 1514</span>&#160;        }</div>
-<div class="line"><a name="l01515"></a><span class="lineno"> 1515</span>&#160;        ParamDir-&gt;cd();</div>
-<div class="line"><a name="l01516"></a><span class="lineno"> 1516</span>&#160;      }</div>
-<div class="line"><a name="l01517"></a><span class="lineno"> 1517</span>&#160; </div>
-<div class="line"><a name="l01518"></a><span class="lineno"> 1518</span>&#160;      <a class="code" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;SetParProp(i, ParamNomValue);</div>
-<div class="line"><a name="l01519"></a><span class="lineno"> 1519</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;  - set back to nominal value {:&lt;5.2f}&quot;</span>, ParamNomValue);</div>
-<div class="line"><a name="l01520"></a><span class="lineno"> 1520</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;&quot;</span>);</div>
-<div class="line"><a name="l01521"></a><span class="lineno"> 1521</span>&#160;      ParamDir-&gt;Close();</div>
-<div class="line"><a name="l01522"></a><span class="lineno"> 1522</span>&#160;      <span class="keyword">delete</span> ParamDir;</div>
-<div class="line"><a name="l01523"></a><span class="lineno"> 1523</span>&#160;      SigmaDir-&gt;cd();</div>
-<div class="line"><a name="l01524"></a><span class="lineno"> 1524</span>&#160;    } <span class="comment">// end loop over params</span></div>
-<div class="line"><a name="l01525"></a><span class="lineno"> 1525</span>&#160;  } <span class="comment">// end loop over systemics</span></div>
-<div class="line"><a name="l01526"></a><span class="lineno"> 1526</span>&#160;  SigmaDir-&gt;Close();</div>
-<div class="line"><a name="l01527"></a><span class="lineno"> 1527</span>&#160;  <span class="keyword">delete</span> SigmaDir;</div>
-<div class="line"><a name="l01528"></a><span class="lineno"> 1528</span>&#160; </div>
-<div class="line"><a name="l01529"></a><span class="lineno"> 1529</span>&#160;  <a class="code" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;cd();</div>
-<div class="line"><a name="l01530"></a><span class="lineno"> 1530</span>&#160;}</div>
-<div class="ttc" id="aFitterBase_8cpp_html_abc7e5e1b1cc60deb772ac9a8aa6f68cb"><div class="ttname"><a href="FitterBase_8cpp.html#abc7e5e1b1cc60deb772ac9a8aa6f68cb">WriteHistogramsByMode</a></div><div class="ttdeci">void WriteHistogramsByMode(SampleHandlerFD *sample, const std::string &amp;suffix, const bool by_mode, const bool by_channel, const std::vector&lt; TDirectory * &gt; &amp;SampleDir)</div><div class="ttdoc">Generic histogram writer - should make main code more palatable.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8cpp_source.html#l01376">FitterBase.cpp:1376</a></div></div>
+<div class="line"><a name="l01509"></a><span class="lineno"> 1509</span>&#160;          <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(</div>
+<div class="line"><a name="l01510"></a><span class="lineno"> 1510</span>&#160;            <span class="stringliteral">&quot;  - set to {:&lt;5.2f} ({:&lt;2} sigma shift)&quot;</span>,</div>
+<div class="line"><a name="l01511"></a><span class="lineno"> 1511</span>&#160;                        ParamShiftValue,</div>
+<div class="line"><a name="l01512"></a><span class="lineno"> 1512</span>&#160;                        sigma</div>
+<div class="line"><a name="l01513"></a><span class="lineno"> 1513</span>&#160;          );</div>
+<div class="line"><a name="l01514"></a><span class="lineno"> 1514</span>&#160; </div>
+<div class="line"><a name="l01515"></a><span class="lineno"> 1515</span>&#160;          <a class="code" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;SetParProp(i, ParamShiftValue);</div>
+<div class="line"><a name="l01516"></a><span class="lineno"> 1516</span>&#160; </div>
+<div class="line"><a name="l01517"></a><span class="lineno"> 1517</span>&#160;          std::ostringstream valStream;</div>
+<div class="line"><a name="l01518"></a><span class="lineno"> 1518</span>&#160;          valStream &lt;&lt; std::fixed &lt;&lt; std::setprecision(2) &lt;&lt; ParamShiftValue;</div>
+<div class="line"><a name="l01519"></a><span class="lineno"> 1519</span>&#160;          std::string valueStr = valStream.str();</div>
+<div class="line"><a name="l01520"></a><span class="lineno"> 1520</span>&#160; </div>
+<div class="line"><a name="l01521"></a><span class="lineno"> 1521</span>&#160;          std::ostringstream sigmaStream;</div>
+<div class="line"><a name="l01522"></a><span class="lineno"> 1522</span>&#160;          sigmaStream &lt;&lt; std::fixed &lt;&lt; std::setprecision(2) &lt;&lt; std::abs(sigma);</div>
+<div class="line"><a name="l01523"></a><span class="lineno"> 1523</span>&#160;          std::string sigmaStr = sigmaStream.str();</div>
+<div class="line"><a name="l01524"></a><span class="lineno"> 1524</span>&#160; </div>
+<div class="line"><a name="l01525"></a><span class="lineno"> 1525</span>&#160;          std::string suffix;</div>
+<div class="line"><a name="l01526"></a><span class="lineno"> 1526</span>&#160;          <span class="keywordflow">if</span> (sigma == 0) {</div>
+<div class="line"><a name="l01527"></a><span class="lineno"> 1527</span>&#160;            suffix = <span class="stringliteral">&quot;_&quot;</span> + ParName + <span class="stringliteral">&quot;_nom_val_&quot;</span> + valueStr;</div>
+<div class="line"><a name="l01528"></a><span class="lineno"> 1528</span>&#160;          } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l01529"></a><span class="lineno"> 1529</span>&#160;            std::string sign = (sigma &gt; 0) ? <span class="stringliteral">&quot;p&quot;</span> : <span class="stringliteral">&quot;n&quot;</span>;</div>
+<div class="line"><a name="l01530"></a><span class="lineno"> 1530</span>&#160;            suffix = <span class="stringliteral">&quot;_&quot;</span> + ParName + <span class="stringliteral">&quot;_sig_&quot;</span> + sign + sigmaStr + <span class="stringliteral">&quot;_val_&quot;</span> + valueStr;</div>
+<div class="line"><a name="l01531"></a><span class="lineno"> 1531</span>&#160;          }</div>
+<div class="line"><a name="l01532"></a><span class="lineno"> 1532</span>&#160; </div>
+<div class="line"><a name="l01533"></a><span class="lineno"> 1533</span>&#160;          <a class="code" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;SetParProp(i, ParamShiftValue);</div>
+<div class="line"><a name="l01534"></a><span class="lineno"> 1534</span>&#160;          MaCh3Sample-&gt;Reweight();</div>
+<div class="line"><a name="l01535"></a><span class="lineno"> 1535</span>&#160; </div>
+<div class="line"><a name="l01536"></a><span class="lineno"> 1536</span>&#160;          <a class="code" href="FitterBase_8cpp.html#abc7e5e1b1cc60deb772ac9a8aa6f68cb">WriteHistogramsByMode</a>(MaCh3Sample, suffix, plot_by_mode, plot_by_channel, SampleDir);</div>
+<div class="line"><a name="l01537"></a><span class="lineno"> 1537</span>&#160;        }</div>
+<div class="line"><a name="l01538"></a><span class="lineno"> 1538</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> subSampleIndex = 0; subSampleIndex &lt; MaCh3Sample-&gt;GetNsamples(); ++subSampleIndex) {</div>
+<div class="line"><a name="l01539"></a><span class="lineno"> 1539</span>&#160;          SampleDir[subSampleIndex]-&gt;Close();</div>
+<div class="line"><a name="l01540"></a><span class="lineno"> 1540</span>&#160;          <span class="keyword">delete</span> SampleDir[subSampleIndex];</div>
+<div class="line"><a name="l01541"></a><span class="lineno"> 1541</span>&#160;        }</div>
+<div class="line"><a name="l01542"></a><span class="lineno"> 1542</span>&#160;        ParamDir-&gt;cd();</div>
+<div class="line"><a name="l01543"></a><span class="lineno"> 1543</span>&#160;      }</div>
+<div class="line"><a name="l01544"></a><span class="lineno"> 1544</span>&#160; </div>
+<div class="line"><a name="l01545"></a><span class="lineno"> 1545</span>&#160;      <a class="code" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[s]-&gt;SetParProp(i, ParamNomValue);</div>
+<div class="line"><a name="l01546"></a><span class="lineno"> 1546</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;  - set back to nominal value {:&lt;5.2f}&quot;</span>, ParamNomValue);</div>
+<div class="line"><a name="l01547"></a><span class="lineno"> 1547</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a name="l01548"></a><span class="lineno"> 1548</span>&#160;      ParamDir-&gt;Close();</div>
+<div class="line"><a name="l01549"></a><span class="lineno"> 1549</span>&#160;      <span class="keyword">delete</span> ParamDir;</div>
+<div class="line"><a name="l01550"></a><span class="lineno"> 1550</span>&#160;      SigmaDir-&gt;cd();</div>
+<div class="line"><a name="l01551"></a><span class="lineno"> 1551</span>&#160;    } <span class="comment">// end loop over params</span></div>
+<div class="line"><a name="l01552"></a><span class="lineno"> 1552</span>&#160;  } <span class="comment">// end loop over systemics</span></div>
+<div class="line"><a name="l01553"></a><span class="lineno"> 1553</span>&#160;  SigmaDir-&gt;Close();</div>
+<div class="line"><a name="l01554"></a><span class="lineno"> 1554</span>&#160;  <span class="keyword">delete</span> SigmaDir;</div>
+<div class="line"><a name="l01555"></a><span class="lineno"> 1555</span>&#160; </div>
+<div class="line"><a name="l01556"></a><span class="lineno"> 1556</span>&#160;  <a class="code" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;cd();</div>
+<div class="line"><a name="l01557"></a><span class="lineno"> 1557</span>&#160;}</div>
+<div class="ttc" id="aFitterBase_8cpp_html_abc7e5e1b1cc60deb772ac9a8aa6f68cb"><div class="ttname"><a href="FitterBase_8cpp.html#abc7e5e1b1cc60deb772ac9a8aa6f68cb">WriteHistogramsByMode</a></div><div class="ttdeci">void WriteHistogramsByMode(SampleHandlerFD *sample, const std::string &amp;suffix, const bool by_mode, const bool by_channel, const std::vector&lt; TDirectory * &gt; &amp;SampleDir)</div><div class="ttdoc">Generic histogram writer - should make main code more palatable.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8cpp_source.html#l01384">FitterBase.cpp:1384</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_aad1a1941379bc81a853fa6e1a3f9d5f2"><div class="ttname"><a href="classFitterBase.html#aad1a1941379bc81a853fa6e1a3f9d5f2">FitterBase::CustomRange</a></div><div class="ttdeci">void CustomRange(const std::string &amp;ParName, const double sigma, double &amp;ParamShiftValue) const</div><div class="ttdoc">For comparison with P-Theta we usually have to apply different parameter values then usual 1,...</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8cpp_source.html#l01349">FitterBase.cpp:1349</a></div></div>
 <div class="ttc" id="aclassSampleHandlerFD_html"><div class="ttname"><a href="classSampleHandlerFD.html">SampleHandlerFD</a></div><div class="ttdoc">Class responsible for handling implementation of samples used in analysis, reweighting and returning ...</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00019">SampleHandlerFD.h:20</a></div></div>
 </div><!-- fragment -->
