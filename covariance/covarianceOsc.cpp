@@ -52,9 +52,11 @@ void covarianceOsc::proposeStep() {
   CircularPrior(kDeltaCP, -TMath::Pi(), TMath::Pi());
 
   // Okay now we've done the standard steps, we can add in our nice flips
+  
   // hierarchy flip first
   if(random_number[0]->Uniform() < 0.5 && flipdelM){
-    _fPropVal[kDeltaM23] *= -1;
+    //_fPropVal[kDeltaM23] *= -1;
+    _fPropVal[kDeltaM23] = -0.0000325 - (_fPropVal[kDeltaM23] + 0.0000325); // flip around the mean value of NO vs IO
   }
   // now octant flip
   if(random_number[0]->Uniform() < 0.5) {
@@ -63,7 +65,7 @@ void covarianceOsc::proposeStep() {
     _fPropVal[kSinTheta23] = 0.5112 - (_fPropVal[kSinTheta23] - 0.5112);
   }
 
-  if(random_number[0]->Uniform() < 0.15 && flipWindow){
+  if(random_number[0]->Uniform() < 0.5 && flipWindow){
     // flip delta_cp around mean value
     _fPropVal[kDeltaCP] = multicanonicalSeparateMean - (_fPropVal[kDeltaCP] - multicanonicalSeparateMean);
   }

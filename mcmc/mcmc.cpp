@@ -164,8 +164,8 @@ void mcmc::runMCMC() {
         MACH3LOG_INFO("Setting umbrella number to {}", umbrellaNumber);
         multicanonicalSeparateSigma = TMath::Pi()/((umbrellaNumber - 1)*(umbrellaSigmaOverlap));
       } else {
-        MACH3LOG_INFO("Setting width based on value in config (default 2pi/umbrellaNumber)");
         multicanonicalSeparateSigma = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["MulticanonicalSeparateSigma"],(2*TMath::Pi())/umbrellaNumber);
+        MACH3LOG_INFO("Setting width based on value in config {}", multicanonicalSeparateSigma);
       } 
       // set individual step scale for dcp, so that the ratio of the step scale to the multicanonical sigma is stepscale/1sigmaerror = 1/2pi 
       umbrellaAdjustStepScale = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["UmbrellaAdjustStepScale"], false);
