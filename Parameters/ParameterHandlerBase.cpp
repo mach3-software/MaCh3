@@ -968,7 +968,8 @@ void ParameterHandlerBase::ToggleFixParameter(const int i) {
       throw MaCh3Exception(__FILE__ , __LINE__ );
     } else {
       _fError[i] *= -1.0;
-      MACH3LOG_INFO("Setting {}(parameter {}) to fixed at {}", GetParFancyName(i), i, _fCurrVal[i]);
+      if(IsParameterFixed(i)) MACH3LOG_INFO("Setting {}(parameter {}) to fixed at {}", GetParFancyName(i), i, _fCurrVal[i]);
+      else MACH3LOG_INFO("Setting {}(parameter {}) free", GetParFancyName(i), i);
     }
     if(_fCurrVal[i] > _fUpBound[i] || _fCurrVal[i] < _fLowBound[i]) {
       MACH3LOG_ERROR("Parameter {} (index {}) is fixed at {}, which is outside of its bounds [{}, {}]", GetParFancyName(i), i, _fCurrVal[i], _fLowBound[i], _fUpBound[i]);
