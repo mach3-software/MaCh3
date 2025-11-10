@@ -321,8 +321,7 @@ void FitterBase::AddSystObj(ParameterHandlerBase * const cov) {
 void FitterBase::StartFromPreviousFit(const std::string& FitName) {
 // *******************
   MACH3LOG_INFO("Getting starting position from {}", FitName);
-
-  TFile *infile = new TFile(FitName.c_str(), "READ");
+  TFile *infile = M3::Open(FitName, "READ", __FILE__, __LINE__);
   TTree *posts = infile->Get<TTree>("posteriors");
   int step_val = 0;
   double log_val = M3::_LARGE_LOGL_;

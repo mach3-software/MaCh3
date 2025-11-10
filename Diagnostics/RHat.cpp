@@ -1,6 +1,7 @@
 // MaCh3 includes
 #include "Manager/Manager.h"
 #include "Samples/SampleStructs.h"
+#include "Samples/HistogramUtils.h"
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT includes
@@ -42,7 +43,7 @@ _MaCh3_Safe_Include_End_ //}
 int* Ntoys_requested;
 int* Ntoys_filled;
 int TotToys;
-int NThin;
+unsigned int NThin;
 int Nchains;
 int nDraw;
 
@@ -148,10 +149,10 @@ void PrepareChains() {
   Ntoys_requested = new int[Nchains]();
   Ntoys_filled = new int[Nchains]();
   TotToys = 0;
-  std::vector<int> BurnIn(Nchains);
-  std::vector<int> nEntries(Nchains);
+  std::vector<unsigned int> BurnIn(Nchains);
+  std::vector<unsigned int> nEntries(Nchains);
   std::vector<int> nBranches(Nchains);
-  std::vector<int> step(Nchains);
+  std::vector<unsigned int> step(Nchains);
 
   S1_chain = new double*[Nchains]();
   S2_chain = new double*[Nchains]();
@@ -168,7 +169,7 @@ void PrepareChains() {
     TChain* Chain = new TChain("posteriors");
     Chain->Add(MCMCFile[m].c_str());
 
-    nEntries[m] = int(Chain->GetEntries());
+    nEntries[m] = static_cast<unsigned int>(Chain->GetEntries());
     Ntoys_requested[m] = nEntries[m]/NThin;
     Ntoys_filled[m] = 0;
 
@@ -508,8 +509,7 @@ void SaveResults() {
   }
   NameTemp += "diag.root";
 
-  TFile* DiagFile = new TFile(NameTemp.c_str(), "recreate");
-
+  TFile *DiagFile = M3::Open(NameTemp, "recreate", __FILE__, __LINE__);
   DiagFile->cd();
 
   TH1D *StandardDeviationGlobalPlot = new TH1D("StandardDeviationGlobalPlot", "StandardDeviationGlobalPlot", nDraw, 0, nDraw);

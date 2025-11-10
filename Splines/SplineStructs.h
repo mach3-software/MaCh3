@@ -29,7 +29,6 @@ struct FastSplineInfo {
 
   /// @brief Destructor
   virtual ~FastSplineInfo() {
-
   }
 
   /// Number of points in spline

@@ -177,33 +177,19 @@ void MakePlot(TString fname1, TString flabel1, TString fname2, TString flabel2, 
 
 void PlotAutoCorr(TString fname1, TString flabel1, TString fname2, TString flabel2, TString fname3, TString flabel3, TString fname4, TString flabel4)
 {
-  TString fname[4];
-  fname[0] = fname1;
-  fname[1] = fname2;
-  fname[2] = fname3;
-  fname[3] = fname4;
+  std::vector<TString> fname = {fname1, fname2, fname3, fname4};
   // Color_t PlotColor[4]={kRed, kBlue, kGreen, kOrange};
   std::vector<TString> flabel = {flabel1, flabel2, flabel3, flabel4};
 
-  TFile *infile[4];
-  infile[0] = TFile::Open(fname[0].Data());
-  // KS" We need to check number of files to loop over in very lazy way
-  int Nfiles = 1;
-
-  if (fname[1] != DUMMYFILE)
+  std::vector<TFile*> infile(fname.size());
+  int Nfiles = 0;
+  for(size_t i = 0; i < fname.size(); i++)
   {
-    infile[1] = TFile::Open(fname[1].Data());
-    Nfiles++;
-  }
-  if (fname[2] != DUMMYFILE)
-  {
-    infile[2] = TFile::Open(fname[2].Data());
-    Nfiles++;
-  }
-  if (fname[3] != DUMMYFILE)
-  {
-    infile[3] = TFile::Open(fname[3].Data());
-    Nfiles++;
+    if (fname[i] != DUMMYFILE)
+    {
+      infile[i] = M3::Open(fname[i].Data(), "open", __FILE__, __LINE__);
+      Nfiles++;
+    }
   }
 
   auto c1 = std::make_unique<TCanvas>("c1", " ", 0, 0, 800, 630);
@@ -372,7 +358,7 @@ std::pair<std::unique_ptr<TH1D>, std::unique_ptr<TH1D>> CalculateMinMaxHistogram
 void ProcessAutoCorrelationDirectory(TDirectoryFile *autocor_dir,
                                      std::unique_ptr<TH1D>& average_hist,
                                      int &parameter_count,
-                                     std::vector<TH1D *> &histograms)
+                                     std::vector<TH1D*> &histograms)
 {
   TIter next(autocor_dir->GetListOfKeys());
   TKey *key;
@@ -427,9 +413,8 @@ void ProcessDiagnosticFile(const TString &file_path,
   ProcessAutoCorrelationDirectory(autocor_dir, average_hist, parameter_count, histograms);
 }
 
-std::unique_ptr<TH1D> AutocorrProcessInputs(const TString &input_file, std::vector<TH1D *> &histograms)
+std::unique_ptr<TH1D> AutocorrProcessInputs(const TString &input_file, std::vector<TH1D*> &histograms)
 {
-
   std::unique_ptr<TH1D> average_hist = nullptr;
   int parameter_count = 0;
 
@@ -477,18 +462,15 @@ void CompareAverageAC(const std::vector<std::vector<TH1D *>> &histograms,
     for (size_t i = 0; i < histograms.size(); ++i)
     {
       auto colour = static_cast<Color_t>(TColor::GetColorPalette(static_cast<Int_t>(i * nb / histograms.size())));
-
-      {
-        auto band = CalculateMinMaxBand(histograms[i], colour);
-        band->SetLineWidth(0);
-        band->SetTitle("Average Auto Correlation");
-        band->GetXaxis()->SetTitle("lag");
-        band->GetYaxis()->SetTitle("Autocorrelation Function");
-        if (i == 0) {
-          band->Draw("A3");
-        } else {
-          band->Draw("3 SAME");
-        }
+      auto band = CalculateMinMaxBand(histograms[i], colour);
+      band->SetLineWidth(0);
+      band->SetTitle("Average Auto Correlation");
+      band->GetXaxis()->SetTitle("lag");
+      band->GetYaxis()->SetTitle("Autocorrelation Function");
+      if (i == 0) {
+        band->Draw("A3");
+      } else {
+        band->Draw("3 SAME");
       }
     }
   }
