@@ -952,7 +952,11 @@ void ParameterHandlerBase::ToggleFixAllParameters() {
 // ********************************************
   // fix or unfix all parameters by multiplying by -1
   if(!pca) {
-    for (int i = 0; i < _fNumPar; i++) _fError[i] *= -1.0;
+    for (int i = 0; i < _fNumPar; i++) {
+      _fError[i] *= -1.0;
+      if(IsParameterFixed(i)) MACH3LOG_INFO("Setting {}(parameter {}) to fixed at {}", GetParFancyName(i), i, _fCurrVal[i]);
+      else MACH3LOG_INFO("Setting {}(parameter {}) free", GetParFancyName(i), i);
+    }
   } else{
     PCAObj->ToggleFixAllParameters();
   }
