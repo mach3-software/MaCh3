@@ -1,7 +1,7 @@
 #pragma once
 
 #include "mcmc/FitterBase.h"
-
+#include "mcmc/MulticanonicalMCMCHandler.h"
 /// @brief Implementation of MR2T2 algorithm
 /// @author Asher Kaboth
 class mcmc : public FitterBase {
@@ -42,7 +42,7 @@ class mcmc : public FitterBase {
   inline std::string GetName()const {return "MCMC";};
  private:
   /// @brief Propose a step
-  inline void ProposeStep();
+  inline void ProposeStep(MulticanonicalMCMCHandler* multicanonicalHandler);
 
   /// @brief Do we accept the step
   inline void CheckStep();
@@ -62,46 +62,11 @@ class mcmc : public FitterBase {
 
   /// multi-canonical method toggle on/off
   bool multicanonical;
-
-  /// multi-canonical spline toggle on/off
-  bool multicanonicalSpline;
-  /// multi-canonical separate toggle on/off
-  bool multicanonicalSeparate;
-  /// multi-canonical separate mean
-  double multicanonicalSeparateMean;
-  /// multi-canonical separate sigma
-  double multicanonicalSeparateSigma;
-  /// multi-canonical spline object
-  TSpline3 *dcp_spline_IO;
-  TSpline3 *dcp_spline_NO;
-  /// multi-canonical beta
-  double multicanonicalBeta;
-  /// umbrella number
-  int umbrellaNumber;
-  /// Toggle for setting umbrella widths based on umbrella overlap
-  bool umbrellaOverlapMode;
-  /// the desired overlap of evenly placed umbrellas
-  double umbrellaSigmaOverlap;
-  /// umbrella auto adjust step scale mode
-  bool umbrellaAdjustStepScale;
-  /// umbrella relative step scale
-  double umbrellaStepScaleFactor;
-  /// multi-canonical sigma
-  double multicanonicalSigma;
   /// multi-canonical penalty
   double multicanonical_penalty;
-  /// flip window toggle
-  bool flipWindow;
-  /// osc_cov systematic variable we wish to apply multicanonical to
-  int oscCovVar;
-  /// multi-canonical par number
-  int multicanonicalVar;
-  /// multi-canonical par number
-  int multicanonicalVar_dm23;
   /// delta_cp parameter value
   double delta_cp_value;
   /// dm23 parameter value
   double delm23_value;
-
 };
 
