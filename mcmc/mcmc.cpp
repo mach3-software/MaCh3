@@ -255,7 +255,7 @@ void mcmc::runMCMC() {
 
     // Propose current step variation and save the systematic likelihood that results in this step being taken
     // Updates logLProp
-    ProposeStep();
+    ProposeStep(*multicanonicalHandler);
 
     // Does the MCMC accept this step?
     CheckStep();
@@ -280,7 +280,7 @@ void mcmc::runMCMC() {
 
 // *******************
 // Do the initial reconfigure of the MCMC
-void mcmc::ProposeStep() {
+void mcmc::ProposeStep(MulticanonicalMCMCHandler* multicanonicalHandler) {
 // *******************
   // Initial likelihood
   double llh = 0.0;
