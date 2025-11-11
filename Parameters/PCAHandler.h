@@ -120,7 +120,7 @@ class PCAHandler{
   void SetBranches(TTree &tree, bool SaveProposal, const std::vector<std::string>& Names);
   /// @brief fix parameters at prior values
   /// @ingroup ParameterHandlerSetters
-  void ToggleFixAllParameters();
+  void ToggleFixAllParameters(const std::vector<std::string>& Names);
   /// @brief fix parameters at prior values
   /// @ingroup ParameterHandlerSetters
   void ToggleFixParameter(const int i, const std::vector<std::string>& Names);

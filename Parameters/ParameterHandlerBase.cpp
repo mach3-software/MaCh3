@@ -950,16 +950,9 @@ void ParameterHandlerBase::SetFreeParameter(const std::string& name) {
 // ********************************************
 void ParameterHandlerBase::ToggleFixAllParameters() {
 // ********************************************
-  // fix or unfix all parameters by multiplying by -1
-  if(!pca) {
-    for (int i = 0; i < _fNumPar; i++) {
-      _fError[i] *= -1.0;
-      if(IsParameterFixed(i)) MACH3LOG_INFO("Setting {}(parameter {}) to fixed at {}", GetParFancyName(i), i, _fCurrVal[i]);
-      else MACH3LOG_INFO("Setting {}(parameter {}) free", GetParFancyName(i), i);
-    }
-  } else{
-    PCAObj->ToggleFixAllParameters();
-  }
+  // toggle fix/free all parameters
+  if(!pca) for (int i = 0; i < _fNumPar; i++) ToggleFixParameter(i);
+  else PCAObj->ToggleFixAllParameters(_fNames);
 }
 
 // ********************************************
@@ -979,7 +972,6 @@ void ParameterHandlerBase::ToggleFixParameter(const int i) {
       MACH3LOG_ERROR("Parameter {} (index {}) is fixed at {}, which is outside of its bounds [{}, {}]", GetParFancyName(i), i, _fCurrVal[i], _fLowBound[i], _fUpBound[i]);
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
-
   } else {
     PCAObj->ToggleFixParameter(i, _fNames);
   }
