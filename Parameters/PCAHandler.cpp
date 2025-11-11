@@ -326,7 +326,7 @@ void PCAHandler::SetBranches(TTree &tree, bool SaveProposal, const std::vector<s
 // ********************************************
 void PCAHandler::ToggleFixAllParameters(const std::vector<std::string>& Names) {
 // ********************************************
-  for (int i = 0; i < NumParPCA; i++) ToggleFixParameter(i, Names[i]);
+  for (int i = 0; i < NumParPCA; i++) ToggleFixParameter(i, Names);
 }
 
 // ********************************************
