@@ -123,11 +123,7 @@ void mcmc::runMCMC() {
 
     // Propose current step variation and save the systematic likelihood that results in this step being taken
     // Updates logLProp
-<<<<<<< HEAD
-    ProposeStep(*multicanonicalHandler);
-=======
     ProposeStep(multicanonicalHandler.get());
->>>>>>> 13107a0ad5c5a82e8b9b6e73baa14b686926873e
 
     // Does the MCMC accept this step?
     CheckStep();
