@@ -22,6 +22,8 @@ class MulticanonicalMCMCHandler  {
 
     double GetMulticanonicalWeightGaussian(double deltacp);
 
+    double GetMulticanonicalWeightVonMises(double deltacp);
+
     /// osc_cov systematic variable we wish to apply multicanonical to
     int oscCovVar;
     /// multi-canonical par number
