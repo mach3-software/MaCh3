@@ -10,6 +10,7 @@ set(HEADERS
     MaCh3Factory.h
     StatisticalUtils.h
     gpuMCMCProcessorUtils.cuh
+    MulticanonicalMCMCHandler.h
 )
 
 add_library(MCMC SHARED
@@ -23,6 +24,7 @@ add_library(MCMC SHARED
     SampleSummary.cpp
     MaCh3Factory.cpp
     StatisticalUtils.cpp
+    MulticanonicalMCMCHandler.cpp
     $<$<BOOL:${MaCh3_GPU_ENABLED}>:gpuMCMCProcessorUtils.cu>
 )
 
