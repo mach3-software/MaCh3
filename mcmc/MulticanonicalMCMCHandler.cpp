@@ -22,6 +22,10 @@ MulticanonicalMCMCHandler::MulticanonicalMCMCHandler() {
   umbrellaAdjustStepScale = false;
   umbrellaStepScaleFactor = 1.0;
   flipWindow = false;
+
+  vonMises_mode = false;
+  vonMises_kappa = -1.0;
+  vonMises_I0_kappa = -1.0;
 }
 
 MulticanonicalMCMCHandler::~MulticanonicalMCMCHandler() {
@@ -142,30 +146,43 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(manager* f
       MACH3LOG_INFO("Setting multicanonical sigma to {}", multicanonicalSigma);
     }
 
+    // initialize von Mises parameters if needed
+    if (fitMan->raw()["General"]["MCMC"]["VonMisesMode"]) {
+      vonMises_mode = fitMan->raw()["General"]["MCMC"]["VonMisesMode"].as<bool>();
+    }
+
+    if (vonMises_mode) {
+      double temp_vonMises_sigma;
+      temp_vonMises_sigma = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["VonMisesSigma"], -1.0);
+      vonMises_kappa = 1.0 / (temp_vonMises_sigma * temp_vonMises_sigma);
+      vonMises_I0_kappa = TMath::BesselI0(vonMises_kappa);
+      MACH3LOG_INFO("Using von Mises distribution with kappa = {} and I0(kappa) = {}", vonMises_kappa, vonMises_I0_kappa);
+    }
+
     // Get the multicanonical beta value from the configuration file
     multicanonicalBeta = fitMan->raw()["General"]["MCMC"]["MulticanonicalBeta"].as<double>();
     MACH3LOG_INFO("Setting multicanonical beta to {}", multicanonicalBeta);
 }
 
 void MulticanonicalMCMCHandler::InitializeMulticanonicalParams(std::vector<covarianceBase*>& systematics){
-    if (multicanonicalSeparate){
-    // set the starting point of the chain to the mean value of the multicanonical umbrella
+  if (multicanonicalSeparate){
+  // set the starting point of the chain to the mean value of the multicanonical umbrella
     for (auto& syst : systematics) {
-        if (syst->getName() == "osc_cov") {
-            syst->printNominalCurrProp();
-            syst->setParCurrProp(multicanonicalVar, multicanonicalSeparateMean);
-            syst->setParProp(multicanonicalVar, multicanonicalSeparateMean);
-            MACH3LOG_INFO("Setting starting point of chain to mean value for multicanonical separate: {}", multicanonicalSeparateMean);
-            // pass the mean to the covarianceOsc object for parameter flipping
-            if (flipWindow) {
-            auto* oscCov = dynamic_cast<covarianceOsc*>(syst);
-            if (oscCov) {
-                oscCov->setFlipWindow(flipWindow);
-                oscCov->setMulticanonicalSeparateMean(multicanonicalSeparateMean);
-            }
-            }
-            syst->printNominalCurrProp();
+      if (syst->getName() == "osc_cov") {
+        syst->printNominalCurrProp();
+        syst->setParCurrProp(multicanonicalVar, multicanonicalSeparateMean);
+        syst->setParProp(multicanonicalVar, multicanonicalSeparateMean);
+        MACH3LOG_INFO("Setting starting point of chain to mean value for multicanonical separate: {}", multicanonicalSeparateMean);
+        // pass the mean to the covarianceOsc object for parameter flipping
+        if (flipWindow) {
+          auto* oscCov = dynamic_cast<covarianceOsc*>(syst);
+          if (oscCov) {
+            oscCov->setFlipWindow(flipWindow);
+            oscCov->setMulticanonicalSeparateMean(multicanonicalSeparateMean);
+          }
         }
+        syst->printNominalCurrProp();
+      }
     }
   }
 }
@@ -185,6 +202,11 @@ double MulticanonicalMCMCHandler::GetMulticanonicalWeightGaussian(double deltacp
   return -std::log(inv_sqrt_2pi * (1/sigma) * (exp1 + exp2 + exp3))*(multicanonicalBeta);
 }
 
+double MulticanonicalMCMCHandler::GetMulticanonicalWeightVonMises(double deltacp){
+  // return the log likelihood, ie the log of the normalised von Mises
+  return -std::log(std::exp(vonMises_kappa * std::cos(deltacp)) / (2 * TMath::Pi() * vonMises_I0_kappa))*(multicanonicalBeta);
+}
+
 double MulticanonicalMCMCHandler::GetMulticanonicalWeightSpline(double deltacp, double delm23){
   double dcp_spline_val;
 
@@ -200,6 +222,19 @@ double MulticanonicalMCMCHandler::GetMulticanonicalWeightSpline(double deltacp, 
 
 double MulticanonicalMCMCHandler::GetMulticanonicalWeightSeparate(double deltacp){
   // precalculate constants
+
+  bool vonMises_testing = true;
+
+  if (vonMises_testing) {
+    std::cout << "Von Mises llh test: " << GetMulticanonicalWeightVonMises(deltacp) << std::endl;
+    std::cout << "Gaussian llh test: " << GetMulticanonicalWeightGaussian(deltacp) << std::endl;  
+  }
+
+  if (vonMises_mode) {
+    // precalculate constants
+    return GetMulticanonicalWeightVonMises(deltacp);
+  }
+
   constexpr double inv_sqrt_2pi = 0.3989422804014337;
   const double neg_half_sigma_sq = -1/(2*multicanonicalSeparateSigma*multicanonicalSeparateSigma); 
   // return the log likelihood, ie the log of the normalised gaussian

@@ -68,4 +68,11 @@ class MulticanonicalMCMCHandler  {
     /// flip window toggle
     bool flipWindow;
 
+    /// von Mises mode toggle
+    bool vonMises_mode;
+    /// von Mises kappa parameter
+    double vonMises_kappa;
+    /// von Mises I0(kappa) precomputed value
+    double vonMises_I0_kappa;
+
 };
