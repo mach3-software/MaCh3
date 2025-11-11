@@ -1400,7 +1400,7 @@ TH1* SampleHandlerFD::Get1DVarHist(const int iSample, const std::string& Project
   Selection = SelectionVecToApply;
 
   //DB Define the histogram which will be returned
-  TH1D* _h1DVar;
+  TH1D* _h1DVar = nullptr;;
   if (Axis) {
     _h1DVar = new TH1D("","",Axis->GetNbins(),Axis->GetXbins()->GetArray());
   } else {
@@ -1481,7 +1481,7 @@ TH2* SampleHandlerFD::Get2DVarHist(const int iSample, const std::string& Project
   Selection = SelectionVecToApply;
 
   //DB Define the histogram which will be returned
-  TH2D* _h2DVar;
+  TH2D* _h2DVar = nullptr;
   if (AxisX && AxisY) {
     _h2DVar = new TH2D("","",AxisX->GetNbins(),AxisX->GetXbins()->GetArray(),AxisY->GetNbins(),AxisY->GetXbins()->GetArray());
   } else {
@@ -1489,6 +1489,8 @@ TH2* SampleHandlerFD::Get2DVarHist(const int iSample, const std::string& Project
     std::vector<double> yBinEdges = ReturnKinematicParameterBinning(iSample, ProjectionVar_StrY);
     _h2DVar = new TH2D("", "", int(xBinEdges.size())-1, xBinEdges.data(), int(yBinEdges.size())-1, yBinEdges.data());
   }
+  _h2DVar->GetXaxis()->SetTitle(ProjectionVar_StrX.c_str());
+  _h2DVar->GetYaxis()->SetTitle(ProjectionVar_StrY.c_str());
 
   bool IsSubEventHist = IsSubEventVarString(ProjectionVar_StrX) || IsSubEventVarString(ProjectionVar_StrY);
   if (IsSubEventHist) Fill2DSubEventHist(iSample, _h2DVar, ProjectionVar_StrX, ProjectionVar_StrY, SubEventSelectionVec, WeightStyle);

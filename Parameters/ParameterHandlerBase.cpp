@@ -670,7 +670,6 @@ void ParameterHandlerBase::AcceptStep() _noexcept_ {
   if (AdaptiveHandler) {
     AdaptiveHandler->IncrementAcceptedSteps();
   }
-
 }
 
 // *************************************
@@ -866,10 +865,8 @@ void ParameterHandlerBase::SetBranches(TTree &tree, bool SaveProposal) {
     }
   }
   if(use_adaptive && AdaptiveHandler->GetUseRobbinsMonro()){
-
     tree.Branch(Form("GlobalStepScale_%s", GetName().c_str()), &_fGlobalStepScale, Form("GlobalStepScale_%s/D", GetName().c_str()));
   }
-
 }
 
 // ********************************************
@@ -882,7 +879,7 @@ void ParameterHandlerBase::SetStepScale(const double scale, const bool verbose) 
 
   if(verbose){
     MACH3LOG_INFO("{} setStepScale() = {}", GetName(), scale);
-    const double SuggestedScale = 2.38*2.38/_fNumPar;
+    const double SuggestedScale = 2.38/std::sqrt(_fNumPar);
     if(std::fabs(scale - SuggestedScale)/SuggestedScale > 1) {
       MACH3LOG_WARN("Defined Global StepScale is {}, while suggested suggested {}", scale, SuggestedScale);
     }
@@ -1075,6 +1072,7 @@ void ParameterHandlerBase::ResetIndivStepScale() {
 // HW: Code for throwing from separate throw matrix, needs to be set after init to ensure pos-def
 void ParameterHandlerBase::SetThrowMatrix(TMatrixDSym *cov){
 // ********************************************
+
    if (cov == nullptr) {
     MACH3LOG_ERROR("Could not find covariance matrix you provided to {}", __func__);
     throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -1176,6 +1174,7 @@ void ParameterHandlerBase::UpdateAdaptiveCovariance(){
     #ifdef DEBUG
     verbose=true;
     #endif
+    AdaptiveHandler->UpdateRobbinsMonroScale();
     SetStepScale(AdaptiveHandler->GetAdaptionScale(), verbose);
   }
 
@@ -1185,6 +1184,7 @@ void ParameterHandlerBase::UpdateAdaptiveCovariance(){
   // Set scales to 1 * optimal scale
   if(AdaptiveHandler->IndivStepScaleAdapt()) {
     ResetIndivStepScale();
+    SetStepScale(AdaptiveHandler->GetAdaptionScale());
   }
 
   if(AdaptiveHandler->UpdateMatrixAdapt()) {
@@ -1377,6 +1377,5 @@ void ParameterHandlerBase::MatchMaCh3OutputBranches(TTree *PosteriorFile,
     PosteriorFile->SetBranchStatus(BranchNames[i].c_str(), true);
     PosteriorFile->SetBranchAddress(BranchNames[i].c_str(), &BranchValues[i]);
   }
-
 }
 
