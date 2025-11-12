@@ -324,11 +324,9 @@ void PCAHandler::SetBranches(TTree &tree, bool SaveProposal, const std::vector<s
 }
 
 // ********************************************
-void PCAHandler::ToggleFixAllParameters() {
+void PCAHandler::ToggleFixAllParameters(const std::vector<std::string>& Names) {
 // ********************************************
-  for (int i = 0; i < NumParPCA; i++) {
-    _fErrorPCA[i] *= -1.0;
-  }
+  for (int i = 0; i < NumParPCA; i++) ToggleFixParameter(i, Names);
 }
 
 // ********************************************
@@ -343,7 +341,8 @@ void PCAHandler::ToggleFixParameter(const int i, const std::vector<std::string>&
     //throw MaCh3Exception(__FILE__ , __LINE__ );
   } else {
     _fErrorPCA[isDecom] *= -1.0;
-    MACH3LOG_INFO("Setting un-decomposed {}(parameter {}/{} in PCA base) to fixed at {}", Names[i], i, isDecom, (*_pCurrVal)[i]);
+    if(IsParameterFixedPCA(i)) MACH3LOG_INFO("Setting un-decomposed {}(parameter {}/{} in PCA base) to fixed at {}", Names[i], i, isDecom, (*_pCurrVal)[i]);
+    else MACH3LOG_INFO("Setting un-decomposed {}(parameter {}/{} in PCA base) free", Names[i], i, isDecom);
   }
 }
 
