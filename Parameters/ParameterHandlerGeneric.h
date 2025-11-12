@@ -123,6 +123,27 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @param Groups vector of group names, like Xsec or Flux
     /// @ingroup ParameterHandlerSetters
     void SetGroupOnlyParameters(const std::vector<std::string>& Groups);
+    
+    /// @brief TN Method to set parameters within a group to be fixed to their prior values
+    /// @param Group name of the parameter group (Xsec, Flux, Osc, etc.)
+    void SetFixGroupOnlyParameters(const std::string& Group);
+    /// @brief TN Method to set parameters of certain groups to be fixed to their prior values
+    /// @param Groups vector of group names (e.g. {"Xsec", "Flux"})
+    void SetFixGroupOnlyParameters(const std::vector<std::string>& Groups);
+
+    /// @brief TN Method to set parameters within a group to be treated as free
+    /// @param Group name of the parameter group (Xsec, Flux, Osc, etc.)
+    void SetFreeGroupOnlyParameters(const std::string& Group);
+    /// @brief TN Method to set parameters of certain groups to be treated as free
+    /// @param Groups vector of group names (e.g. {"Xsec", "Flux"})
+    void SetFreeGroupOnlyParameters(const std::vector<std::string>& Groups);
+
+    /// @brief TN Method to toggle fix/free parameters within a group
+    /// @param Group name of the parameter group (Xsec, Flux, Osc, etc.)
+    void ToggleFixGroupOnlyParameters(const std::string& Group);   
+    /// @brief TN Method to toggle fix/free parameters within given groups
+    /// @param Group vector of group names (e.g. {"Xsec", "Flux"})
+    void ToggleFixGroupOnlyParameters(const std::vector<std::string>& Groups);
 
     /// @brief Dump Matrix to ROOT file, useful when we need to pass matrix info to another fitting group
     /// @param Name Name of TFile to which we save stuff

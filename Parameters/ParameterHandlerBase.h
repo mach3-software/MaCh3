@@ -320,12 +320,30 @@ class ParameterHandlerBase {
   /// @brief Accepted this step
   void AcceptStep() _noexcept_;
 
-  /// @brief fix parameters at prior values
+  /// @brief Set all parameters to be fixed at prior values
+  void SetFixAllParameters();
+  /// @brief Set parameter to be fixed at prior value
+  /// @param i Parameter index
+  void SetFixParameter(const int i);
+  /// @brief Set parameter to be fixed at prior value
+  /// @param name Name of the parameter to be fixed
+  void SetFixParameter(const std::string& name);
+
+  /// @brief Set all parameters to be treated as free
+  void SetFreeAllParameters();
+  /// @brief Set parameter to be treated as free
+  /// @param i Parameter index
+  void SetFreeParameter(const int i);
+  /// @brief Set parameter to be treated as free
+  /// @param name Name of the parameter to be treated as free
+  void SetFreeParameter(const std::string& name);
+
+  /// @brief Toggle fixing parameters at prior values
   void ToggleFixAllParameters();
-  /// @brief fix parameter at prior values
+  /// @brief Toggle fixing parameter at prior values
   /// @param i Parameter index
   void ToggleFixParameter(const int i);
-  /// @brief Fix parameter at prior values
+  /// @brief Toggle fixing parameter at prior values
   /// @param name Name of parameter you want to fix
   void ToggleFixParameter(const std::string& name);
   /// @brief Is parameter fixed or not
