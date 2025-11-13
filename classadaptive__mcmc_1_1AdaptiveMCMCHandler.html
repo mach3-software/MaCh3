@@ -262,9 +262,15 @@ Private Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Contains information about adaptive covariance matrix <a class="el" href="citelist.html#CITEREF_haario2001adaptive">[13]</a> <a class="el" href="citelist.html#CITEREF_Garthwaite01092016">[10]</a>. </p>
 <dl class="section author"><dt>Author</dt><dd>Henry Wallace</dd></dl>
-<p>struct encapsulating all adaptive MCMC information. Adaption can be done in the pure "Haario/Roberts-Rosenthal" style using a constant scale of 2.38^2/num_params or via a Robbins-Monro style adaption where the scale is updated. The latter approach allows you to target a specific acceptance rate resulting in potentially better mixing. </p>
+<p>Adaptation can be performed in two ways:</p><ul>
+<li><b>Haario/Roberts-Rosenthal style</b>: Uses a constant scale factor of <p class="formulaDsp">
+\[ \frac{2.38}{\sqrt{\text{num\_params}}} \]
+</p>
+</li>
+<li><b>Robbins-Monro style</b>: Dynamically updates the scale factor to target a specific acceptance rate, potentially improving mixing. </li>
+</ul>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00020">20</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00025">25</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a8c1c9c62865ad7e2a9c9bdfa24ad54be"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8c1c9c62865ad7e2a9c9bdfa24ad54be">&#9670;&nbsp;</a></span>AdaptiveMCMCHandler()</h2>
@@ -301,17 +307,17 @@ Private Attributes</h2></td></tr>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a5ee8cfa8ef96f852ad56bb0dc3949c01">target_acceptance</a> = 0.234;</div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a5f98ed8d64f26ec6b8c5ea653abac48b">acceptance_rate_batch_size</a> = 10000;</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;}</div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a066984e9598e073d04edec51511cdf0a"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">adaptive_mcmc::AdaptiveMCMCHandler::par_means</a></div><div class="ttdeci">std::vector&lt; double &gt; par_means</div><div class="ttdoc">Mean values for all parameters.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00226">AdaptiveMCMCHandler.h:226</a></div></div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a59d194f84b46b159d367477f3d436e10"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a59d194f84b46b159d367477f3d436e10">adaptive_mcmc::AdaptiveMCMCHandler::start_adaptive_update</a></div><div class="ttdeci">int start_adaptive_update</div><div class="ttdoc">When do we stop update the adaptive matrix.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00203">AdaptiveMCMCHandler.h:203</a></div></div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a5ee8cfa8ef96f852ad56bb0dc3949c01"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a5ee8cfa8ef96f852ad56bb0dc3949c01">adaptive_mcmc::AdaptiveMCMCHandler::target_acceptance</a></div><div class="ttdeci">double target_acceptance</div><div class="ttdoc">Target acceptance rate for Robbins Monro.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00250">AdaptiveMCMCHandler.h:250</a></div></div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a5f98ed8d64f26ec6b8c5ea653abac48b"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a5f98ed8d64f26ec6b8c5ea653abac48b">adaptive_mcmc::AdaptiveMCMCHandler::acceptance_rate_batch_size</a></div><div class="ttdeci">int acceptance_rate_batch_size</div><div class="ttdoc">Acceptance rate in the current batch.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00244">AdaptiveMCMCHandler.h:244</a></div></div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a9708ad2c46d0e7a9ac78f5377fbf8839"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a9708ad2c46d0e7a9ac78f5377fbf8839">adaptive_mcmc::AdaptiveMCMCHandler::start_adaptive_throw</a></div><div class="ttdeci">int start_adaptive_throw</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00200">AdaptiveMCMCHandler.h:200</a></div></div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_aa7d3703d1de3c3fbf32f37cadf58be08"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#aa7d3703d1de3c3fbf32f37cadf58be08">adaptive_mcmc::AdaptiveMCMCHandler::end_adaptive_update</a></div><div class="ttdeci">int end_adaptive_update</div><div class="ttdoc">Steps between changing throw matrix.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00206">AdaptiveMCMCHandler.h:206</a></div></div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_ab2837af4566e2d62db7b76f9527fb6d7"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">adaptive_mcmc::AdaptiveMCMCHandler::total_steps</a></div><div class="ttdeci">int total_steps</div><div class="ttdoc">Total number of MCMC steps.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00232">AdaptiveMCMCHandler.h:232</a></div></div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_ac29758f6988af2d8271fe9950989baf4"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac29758f6988af2d8271fe9950989baf4">adaptive_mcmc::AdaptiveMCMCHandler::adaptive_update_step</a></div><div class="ttdeci">int adaptive_update_step</div><div class="ttdoc">Steps between changing throw matrix.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00209">AdaptiveMCMCHandler.h:209</a></div></div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_ac78f769c84794bc3d67a55dd16e15b62"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac78f769c84794bc3d67a55dd16e15b62">adaptive_mcmc::AdaptiveMCMCHandler::use_robbins_monro</a></div><div class="ttdeci">bool use_robbins_monro</div><div class="ttdoc">Use Robbins Monro https://arxiv.org/pdf/1006.3690.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00247">AdaptiveMCMCHandler.h:247</a></div></div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_af98ef5c78b491c12ebe3325322990e29"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#af98ef5c78b491c12ebe3325322990e29">adaptive_mcmc::AdaptiveMCMCHandler::total_rm_restarts</a></div><div class="ttdeci">int total_rm_restarts</div><div class="ttdoc">Total number of restarts ALLOWED for Robbins Monro.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00259">AdaptiveMCMCHandler.h:259</a></div></div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_afd61e64f18f5c25dbbd6bb2bd619a268"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#afd61e64f18f5c25dbbd6bb2bd619a268">adaptive_mcmc::AdaptiveMCMCHandler::adaptive_covariance</a></div><div class="ttdeci">TMatrixDSym * adaptive_covariance</div><div class="ttdoc">Full adaptive covariance matrix.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00229">AdaptiveMCMCHandler.h:229</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a066984e9598e073d04edec51511cdf0a"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a066984e9598e073d04edec51511cdf0a">adaptive_mcmc::AdaptiveMCMCHandler::par_means</a></div><div class="ttdeci">std::vector&lt; double &gt; par_means</div><div class="ttdoc">Mean values for all parameters.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00231">AdaptiveMCMCHandler.h:231</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a59d194f84b46b159d367477f3d436e10"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a59d194f84b46b159d367477f3d436e10">adaptive_mcmc::AdaptiveMCMCHandler::start_adaptive_update</a></div><div class="ttdeci">int start_adaptive_update</div><div class="ttdoc">When do we stop update the adaptive matrix.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00208">AdaptiveMCMCHandler.h:208</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a5ee8cfa8ef96f852ad56bb0dc3949c01"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a5ee8cfa8ef96f852ad56bb0dc3949c01">adaptive_mcmc::AdaptiveMCMCHandler::target_acceptance</a></div><div class="ttdeci">double target_acceptance</div><div class="ttdoc">Target acceptance rate for Robbins Monro.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00255">AdaptiveMCMCHandler.h:255</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a5f98ed8d64f26ec6b8c5ea653abac48b"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a5f98ed8d64f26ec6b8c5ea653abac48b">adaptive_mcmc::AdaptiveMCMCHandler::acceptance_rate_batch_size</a></div><div class="ttdeci">int acceptance_rate_batch_size</div><div class="ttdoc">Acceptance rate in the current batch.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00249">AdaptiveMCMCHandler.h:249</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a9708ad2c46d0e7a9ac78f5377fbf8839"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a9708ad2c46d0e7a9ac78f5377fbf8839">adaptive_mcmc::AdaptiveMCMCHandler::start_adaptive_throw</a></div><div class="ttdeci">int start_adaptive_throw</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00205">AdaptiveMCMCHandler.h:205</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_aa7d3703d1de3c3fbf32f37cadf58be08"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#aa7d3703d1de3c3fbf32f37cadf58be08">adaptive_mcmc::AdaptiveMCMCHandler::end_adaptive_update</a></div><div class="ttdeci">int end_adaptive_update</div><div class="ttdoc">Steps between changing throw matrix.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00211">AdaptiveMCMCHandler.h:211</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_ab2837af4566e2d62db7b76f9527fb6d7"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">adaptive_mcmc::AdaptiveMCMCHandler::total_steps</a></div><div class="ttdeci">int total_steps</div><div class="ttdoc">Total number of MCMC steps.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00237">AdaptiveMCMCHandler.h:237</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_ac29758f6988af2d8271fe9950989baf4"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac29758f6988af2d8271fe9950989baf4">adaptive_mcmc::AdaptiveMCMCHandler::adaptive_update_step</a></div><div class="ttdeci">int adaptive_update_step</div><div class="ttdoc">Steps between changing throw matrix.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00214">AdaptiveMCMCHandler.h:214</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_ac78f769c84794bc3d67a55dd16e15b62"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac78f769c84794bc3d67a55dd16e15b62">adaptive_mcmc::AdaptiveMCMCHandler::use_robbins_monro</a></div><div class="ttdeci">bool use_robbins_monro</div><div class="ttdoc">Use Robbins Monro https://arxiv.org/pdf/1006.3690.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00252">AdaptiveMCMCHandler.h:252</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_af98ef5c78b491c12ebe3325322990e29"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#af98ef5c78b491c12ebe3325322990e29">adaptive_mcmc::AdaptiveMCMCHandler::total_rm_restarts</a></div><div class="ttdeci">int total_rm_restarts</div><div class="ttdoc">Total number of restarts ALLOWED for Robbins Monro.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00264">AdaptiveMCMCHandler.h:264</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_afd61e64f18f5c25dbbd6bb2bd619a268"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#afd61e64f18f5c25dbbd6bb2bd619a268">adaptive_mcmc::AdaptiveMCMCHandler::adaptive_covariance</a></div><div class="ttdeci">TMatrixDSym * adaptive_covariance</div><div class="ttdoc">Full adaptive covariance matrix.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00234">AdaptiveMCMCHandler.h:234</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -423,9 +429,9 @@ Private Attributes</h2></td></tr>
 <div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Robbins-Monro scale factor set to {}&quot;</span>, <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac7772d238ddaf7bf2acdca1224c2b333">c_robbins_monro</a>);</div>
 <div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00035">MaCh3Logger.h:35</a></div></div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_ac7772d238ddaf7bf2acdca1224c2b333"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac7772d238ddaf7bf2acdca1224c2b333">adaptive_mcmc::AdaptiveMCMCHandler::c_robbins_monro</a></div><div class="ttdeci">double c_robbins_monro</div><div class="ttdoc">Constant &quot;step scaling&quot; factor for Robbins-Monro.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00253">AdaptiveMCMCHandler.h:253</a></div></div>
-<div class="ttc" id="agroup__ParameterHandlerGetters_html_ga19f03236e945b834d9a28da28f858ee0"><div class="ttname"><a href="group__ParameterHandlerGetters.html#ga19f03236e945b834d9a28da28f858ee0">adaptive_mcmc::AdaptiveMCMCHandler::GetNFixed</a></div><div class="ttdeci">int GetNFixed() const</div><div class="ttdoc">Get the number of fixed parameters.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00097">AdaptiveMCMCHandler.h:97</a></div></div>
-<div class="ttc" id="agroup__ParameterHandlerGetters_html_gad53dfcadf98e09ff8d603caeac3466d2"><div class="ttname"><a href="group__ParameterHandlerGetters.html#gad53dfcadf98e09ff8d603caeac3466d2">adaptive_mcmc::AdaptiveMCMCHandler::GetNumParams</a></div><div class="ttdeci">int GetNumParams() const</div><div class="ttdoc">Get the current values of the parameters.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00116">AdaptiveMCMCHandler.h:116</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_ac7772d238ddaf7bf2acdca1224c2b333"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac7772d238ddaf7bf2acdca1224c2b333">adaptive_mcmc::AdaptiveMCMCHandler::c_robbins_monro</a></div><div class="ttdeci">double c_robbins_monro</div><div class="ttdoc">Constant &quot;step scaling&quot; factor for Robbins-Monro.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00258">AdaptiveMCMCHandler.h:258</a></div></div>
+<div class="ttc" id="agroup__ParameterHandlerGetters_html_ga19f03236e945b834d9a28da28f858ee0"><div class="ttname"><a href="group__ParameterHandlerGetters.html#ga19f03236e945b834d9a28da28f858ee0">adaptive_mcmc::AdaptiveMCMCHandler::GetNFixed</a></div><div class="ttdeci">int GetNFixed() const</div><div class="ttdoc">Get the number of fixed parameters.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00102">AdaptiveMCMCHandler.h:102</a></div></div>
+<div class="ttc" id="agroup__ParameterHandlerGetters_html_gad53dfcadf98e09ff8d603caeac3466d2"><div class="ttname"><a href="group__ParameterHandlerGetters.html#gad53dfcadf98e09ff8d603caeac3466d2">adaptive_mcmc::AdaptiveMCMCHandler::GetNumParams</a></div><div class="ttdeci">int GetNumParams() const</div><div class="ttdoc">Get the current values of the parameters.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00121">AdaptiveMCMCHandler.h:121</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -510,8 +516,8 @@ Private Attributes</h2></td></tr>
 <div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;  }</div>
 <div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_ad5b2eb6377721e3ac95def22c2386bb1"><div class="ttname"><a href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a></div><div class="ttdeci">#define MACH3LOG_WARN</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00036">MaCh3Logger.h:36</a></div></div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a1694d2d408b26edb7258d5bfa15a092f"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a1694d2d408b26edb7258d5bfa15a092f">adaptive_mcmc::AdaptiveMCMCHandler::IsFixed</a></div><div class="ttdeci">bool IsFixed(const int ipar) const</div><div class="ttdoc">Check if a parameter is fixed.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00122">AdaptiveMCMCHandler.h:122</a></div></div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a23d17e906a663e2b48dd4dfc96300b02"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a23d17e906a663e2b48dd4dfc96300b02">adaptive_mcmc::AdaptiveMCMCHandler::adapt_block_matrix_indices</a></div><div class="ttdeci">std::vector&lt; int &gt; adapt_block_matrix_indices</div><div class="ttdoc">Indices for block-matrix adaption.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00219">AdaptiveMCMCHandler.h:219</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a1694d2d408b26edb7258d5bfa15a092f"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a1694d2d408b26edb7258d5bfa15a092f">adaptive_mcmc::AdaptiveMCMCHandler::IsFixed</a></div><div class="ttdeci">bool IsFixed(const int ipar) const</div><div class="ttdoc">Check if a parameter is fixed.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00127">AdaptiveMCMCHandler.h:127</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a23d17e906a663e2b48dd4dfc96300b02"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a23d17e906a663e2b48dd4dfc96300b02">adaptive_mcmc::AdaptiveMCMCHandler::adapt_block_matrix_indices</a></div><div class="ttdeci">std::vector&lt; int &gt; adapt_block_matrix_indices</div><div class="ttdoc">Indices for block-matrix adaption.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00224">AdaptiveMCMCHandler.h:224</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -566,7 +572,7 @@ Private Attributes</h2></td></tr>
 <div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;<span class="comment">// ********************************************</span></div>
 <div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;<span class="comment"></span>  <span class="keywordflow">return</span> (*<a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a55330ea7439ca5a3c3065f5205d99e30">_fCurrVal</a>)[par_index];</div>
 <div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;}</div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a55330ea7439ca5a3c3065f5205d99e30"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a55330ea7439ca5a3c3065f5205d99e30">adaptive_mcmc::AdaptiveMCMCHandler::_fCurrVal</a></div><div class="ttdeci">const std::vector&lt; double &gt; * _fCurrVal</div><div class="ttdoc">Current values of parameters.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00241">AdaptiveMCMCHandler.h:241</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a55330ea7439ca5a3c3065f5205d99e30"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a55330ea7439ca5a3c3065f5205d99e30">adaptive_mcmc::AdaptiveMCMCHandler::_fCurrVal</a></div><div class="ttdeci">const std::vector&lt; double &gt; * _fCurrVal</div><div class="ttdoc">Current values of parameters.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00246">AdaptiveMCMCHandler.h:246</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -595,11 +601,11 @@ Private Attributes</h2></td></tr>
 
 <p>Get the current adaption scale. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00180">180</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    {</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a3a0dfaa943747e34b562d2a4716ac087">adaption_scale</a>;</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    }</div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a3a0dfaa943747e34b562d2a4716ac087"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a3a0dfaa943747e34b562d2a4716ac087">adaptive_mcmc::AdaptiveMCMCHandler::adaption_scale</a></div><div class="ttdeci">double adaption_scale</div><div class="ttdoc">Scaling factor.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00235">AdaptiveMCMCHandler.h:235</a></div></div>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00185">185</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    {</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a3a0dfaa943747e34b562d2a4716ac087">adaption_scale</a>;</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    }</div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a3a0dfaa943747e34b562d2a4716ac087"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a3a0dfaa943747e34b562d2a4716ac087">adaptive_mcmc::AdaptiveMCMCHandler::adaption_scale</a></div><div class="ttdeci">double adaption_scale</div><div class="ttdoc">Scaling factor.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00240">AdaptiveMCMCHandler.h:240</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -628,10 +634,10 @@ Private Attributes</h2></td></tr>
 
 <p>Use Robbins-Monro approach? </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00186">186</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    {</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac78f769c84794bc3d67a55dd16e15b62">use_robbins_monro</a>;</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    }</div>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00191">191</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    {</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac78f769c84794bc3d67a55dd16e15b62">use_robbins_monro</a>;</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -658,11 +664,11 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00153">153</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    {</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;      <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#af415c82ad2a8a43c628f498ed5267dc1">prev_step_accepted</a> = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    }</div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_af415c82ad2a8a43c628f498ed5267dc1"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#af415c82ad2a8a43c628f498ed5267dc1">adaptive_mcmc::AdaptiveMCMCHandler::prev_step_accepted</a></div><div class="ttdeci">bool prev_step_accepted</div><div class="ttdoc">Need to keep track of whether previous step was accepted for RM.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00262">AdaptiveMCMCHandler.h:262</a></div></div>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00158">158</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    {</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;      <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#af415c82ad2a8a43c628f498ed5267dc1">prev_step_accepted</a> = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    }</div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_af415c82ad2a8a43c628f498ed5267dc1"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#af415c82ad2a8a43c628f498ed5267dc1">adaptive_mcmc::AdaptiveMCMCHandler::prev_step_accepted</a></div><div class="ttdeci">bool prev_step_accepted</div><div class="ttdoc">Need to keep track of whether previous step was accepted for RM.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00267">AdaptiveMCMCHandler.h:267</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -691,10 +697,10 @@ Private Attributes</h2></td></tr>
 
 <p>Increase by one number of total steps. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00148">148</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    {</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;      <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a>++;</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    }</div>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00153">153</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    {</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;      <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a>++;</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -860,12 +866,12 @@ Private Attributes</h2></td></tr>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00037">MaCh3Logger.h:37</a></div></div>
 <div class="ttc" id="aYamlHelper_8h_html_ad2340a340fd6649a6d220abc16d4757b"><div class="ttname"><a href="YamlHelper_8h.html#ad2340a340fd6649a6d220abc16d4757b">CheckNodeExists</a></div><div class="ttdeci">bool CheckNodeExists(const YAML::Node &amp;node, Args... args)</div><div class="ttdoc">KS: Wrapper function to call the recursive helper.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00060">YamlHelper.h:60</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00020">MaCh3Exception.h:20</a></div></div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a3635f63cb8108f58a76b90250894c31c"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a3635f63cb8108f58a76b90250894c31c">adaptive_mcmc::AdaptiveMCMCHandler::output_file_name</a></div><div class="ttdeci">std::string output_file_name</div><div class="ttdoc">Name of the file to save the adaptive matrices into.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00216">AdaptiveMCMCHandler.h:216</a></div></div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a7b9bc927e28230929be740d471fb2b6b"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a7b9bc927e28230929be740d471fb2b6b">adaptive_mcmc::AdaptiveMCMCHandler::adaptive_save_n_iterations</a></div><div class="ttdeci">int adaptive_save_n_iterations</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00213">AdaptiveMCMCHandler.h:213</a></div></div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a8010c9977ec01b39c7cf12349169b065"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a8010c9977ec01b39c7cf12349169b065">adaptive_mcmc::AdaptiveMCMCHandler::SetFixed</a></div><div class="ttdeci">void SetFixed(const std::vector&lt; double &gt; *fix)</div><div class="ttdoc">Set the fixed parameters.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00090">AdaptiveMCMCHandler.h:90</a></div></div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a81349813033e109e470823513a78d51e"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a81349813033e109e470823513a78d51e">adaptive_mcmc::AdaptiveMCMCHandler::SetParams</a></div><div class="ttdeci">void SetParams(const std::vector&lt; double &gt; *params)</div><div class="ttdoc">Set the current values of the parameters.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00084">AdaptiveMCMCHandler.h:84</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a3635f63cb8108f58a76b90250894c31c"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a3635f63cb8108f58a76b90250894c31c">adaptive_mcmc::AdaptiveMCMCHandler::output_file_name</a></div><div class="ttdeci">std::string output_file_name</div><div class="ttdoc">Name of the file to save the adaptive matrices into.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00221">AdaptiveMCMCHandler.h:221</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a7b9bc927e28230929be740d471fb2b6b"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a7b9bc927e28230929be740d471fb2b6b">adaptive_mcmc::AdaptiveMCMCHandler::adaptive_save_n_iterations</a></div><div class="ttdeci">int adaptive_save_n_iterations</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00218">AdaptiveMCMCHandler.h:218</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a8010c9977ec01b39c7cf12349169b065"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a8010c9977ec01b39c7cf12349169b065">adaptive_mcmc::AdaptiveMCMCHandler::SetFixed</a></div><div class="ttdeci">void SetFixed(const std::vector&lt; double &gt; *fix)</div><div class="ttdoc">Set the fixed parameters.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00095">AdaptiveMCMCHandler.h:95</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a81349813033e109e470823513a78d51e"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a81349813033e109e470823513a78d51e">adaptive_mcmc::AdaptiveMCMCHandler::SetParams</a></div><div class="ttdeci">void SetParams(const std::vector&lt; double &gt; *params)</div><div class="ttdoc">Set the current values of the parameters.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00089">AdaptiveMCMCHandler.h:89</a></div></div>
 <div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a823239d1f978de9ea9d7903c84369d1e"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a823239d1f978de9ea9d7903c84369d1e">adaptive_mcmc::AdaptiveMCMCHandler::CalculateRobbinsMonroStepLength</a></div><div class="ttdeci">void CalculateRobbinsMonroStepLength()</div><div class="ttdoc">Calculate the constant step length for Robbins-Monro adaption.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8cpp_source.html#l00439">AdaptiveMCMCHandler.cpp:439</a></div></div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_ac5da89509c4d7b10cf760e6f4b500962"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac5da89509c4d7b10cf760e6f4b500962">adaptive_mcmc::AdaptiveMCMCHandler::n_rm_restarts</a></div><div class="ttdeci">int n_rm_restarts</div><div class="ttdoc">Number of restarts for Robbins Monro (so far)</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00256">AdaptiveMCMCHandler.h:256</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_ac5da89509c4d7b10cf760e6f4b500962"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac5da89509c4d7b10cf760e6f4b500962">adaptive_mcmc::AdaptiveMCMCHandler::n_rm_restarts</a></div><div class="ttdeci">int n_rm_restarts</div><div class="ttdoc">Number of restarts for Robbins Monro (so far)</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00261">AdaptiveMCMCHandler.h:261</a></div></div>
 <div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_acaba871e3b65b54d9fcb5d381ea05742"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#acaba871e3b65b54d9fcb5d381ea05742">adaptive_mcmc::AdaptiveMCMCHandler::SetAdaptiveBlocks</a></div><div class="ttdeci">void SetAdaptiveBlocks(const std::vector&lt; std::vector&lt; int &gt;&gt; &amp;block_indices)</div><div class="ttdoc">HW: sets adaptive block matrix.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8cpp_source.html#l00126">AdaptiveMCMCHandler.cpp:126</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -896,15 +902,15 @@ Private Attributes</h2></td></tr>
 
 <p>Check if a parameter is fixed. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00122">122</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    {</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;      <span class="keywordflow">if</span> (!<a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a7d0bde37dd08e4c47b0e281a2d7b61a1">_fFixedPars</a>)</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;      {</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;      }</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;      <span class="keywordflow">return</span> ((*<a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a7d0bde37dd08e4c47b0e281a2d7b61a1">_fFixedPars</a>)[ipar] &lt; 0);</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    }</div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a7d0bde37dd08e4c47b0e281a2d7b61a1"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a7d0bde37dd08e4c47b0e281a2d7b61a1">adaptive_mcmc::AdaptiveMCMCHandler::_fFixedPars</a></div><div class="ttdeci">const std::vector&lt; double &gt; * _fFixedPars</div><div class="ttdoc">Vector of fixed parameters.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00238">AdaptiveMCMCHandler.h:238</a></div></div>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00127">127</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    {</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;      <span class="keywordflow">if</span> (!<a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a7d0bde37dd08e4c47b0e281a2d7b61a1">_fFixedPars</a>)</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;      {</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;      }</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;      <span class="keywordflow">return</span> ((*<a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a7d0bde37dd08e4c47b0e281a2d7b61a1">_fFixedPars</a>)[ipar] &lt; 0);</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    }</div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a7d0bde37dd08e4c47b0e281a2d7b61a1"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a7d0bde37dd08e4c47b0e281a2d7b61a1">adaptive_mcmc::AdaptiveMCMCHandler::_fFixedPars</a></div><div class="ttdeci">const std::vector&lt; double &gt; * _fFixedPars</div><div class="ttdoc">Vector of fixed parameters.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00243">AdaptiveMCMCHandler.h:243</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1022,7 +1028,7 @@ Private Attributes</h2></td></tr>
 <div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    <span class="keyword">delete</span> outFile;</div>
 <div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;  }</div>
 <div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;}</div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a1e4f83f0fc642b3b47696396280fe062"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a1e4f83f0fc642b3b47696396280fe062">adaptive_mcmc::AdaptiveMCMCHandler::GetAdaptionScale</a></div><div class="ttdeci">double GetAdaptionScale()</div><div class="ttdoc">Get the current adaption scale.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00180">AdaptiveMCMCHandler.h:180</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a1e4f83f0fc642b3b47696396280fe062"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a1e4f83f0fc642b3b47696396280fe062">adaptive_mcmc::AdaptiveMCMCHandler::GetAdaptionScale</a></div><div class="ttdeci">double GetAdaptionScale()</div><div class="ttdoc">Get the current adaption scale.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00185">AdaptiveMCMCHandler.h:185</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1090,7 +1096,7 @@ Private Attributes</h2></td></tr>
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    }</div>
 <div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;  }</div>
 <div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;}</div>
-<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a639f1d4935965556ce4e3d36aef844ec"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a639f1d4935965556ce4e3d36aef844ec">adaptive_mcmc::AdaptiveMCMCHandler::adapt_block_sizes</a></div><div class="ttdeci">std::vector&lt; int &gt; adapt_block_sizes</div><div class="ttdoc">Size of blocks for adaption.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00222">AdaptiveMCMCHandler.h:222</a></div></div>
+<div class="ttc" id="aclassadaptive__mcmc_1_1AdaptiveMCMCHandler_html_a639f1d4935965556ce4e3d36aef844ec"><div class="ttname"><a href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a639f1d4935965556ce4e3d36aef844ec">adaptive_mcmc::AdaptiveMCMCHandler::adapt_block_sizes</a></div><div class="ttdeci">std::vector&lt; int &gt; adapt_block_sizes</div><div class="ttdoc">Size of blocks for adaption.</div><div class="ttdef"><b>Definition:</b> <a href="AdaptiveMCMCHandler_8h_source.html#l00227">AdaptiveMCMCHandler.h:227</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1120,10 +1126,10 @@ Private Attributes</h2></td></tr>
 
 <p>Set the fixed parameters. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00090">90</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    {</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;      <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a7d0bde37dd08e4c47b0e281a2d7b61a1">_fFixedPars</a> = fix;</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    }</div>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00095">95</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    {</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;      <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a7d0bde37dd08e4c47b0e281a2d7b61a1">_fFixedPars</a> = fix;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1153,10 +1159,10 @@ Private Attributes</h2></td></tr>
 
 <p>Set the current values of the parameters. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00084">84</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    {</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;      <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a55330ea7439ca5a3c3065f5205d99e30">_fCurrVal</a> = params;</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    }</div>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00089">89</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    {</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;      <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a55330ea7439ca5a3c3065f5205d99e30">_fCurrVal</a> = params;</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1285,10 +1291,10 @@ Private Attributes</h2></td></tr>
 
 <p>Change Total Number of Steps to new value. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00142">142</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    {</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;      <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a> = nsteps;</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    }</div>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00147">147</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    {</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;      <a class="code" href="classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ab2837af4566e2d62db7b76f9527fb6d7">total_steps</a> = nsteps;</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1509,7 +1515,7 @@ Private Attributes</h2></td></tr>
 
 <p>Current values of parameters. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00241">241</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00246">246</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1535,7 +1541,7 @@ Private Attributes</h2></td></tr>
 
 <p>Vector of fixed parameters. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00238">238</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00243">243</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1561,7 +1567,7 @@ Private Attributes</h2></td></tr>
 
 <p>Acceptance rate in the current batch. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00244">244</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00249">249</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1587,7 +1593,7 @@ Private Attributes</h2></td></tr>
 
 <p>Indices for block-matrix adaption. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00219">219</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00224">224</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1613,7 +1619,7 @@ Private Attributes</h2></td></tr>
 
 <p>Size of blocks for adaption. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00222">222</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00227">227</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1639,7 +1645,7 @@ Private Attributes</h2></td></tr>
 
 <p>Scaling factor. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00235">235</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00240">240</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1665,7 +1671,7 @@ Private Attributes</h2></td></tr>
 
 <p>Full adaptive covariance matrix. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00229">229</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00234">234</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1690,7 +1696,7 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>If you don't want to save every adaption then you can specify this here </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00213">213</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00218">218</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1716,7 +1722,7 @@ Private Attributes</h2></td></tr>
 
 <p>Steps between changing throw matrix. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00209">209</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00214">214</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1742,7 +1748,7 @@ Private Attributes</h2></td></tr>
 
 <p>Constant "step scaling" factor for Robbins-Monro. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00253">253</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00258">258</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1768,7 +1774,7 @@ Private Attributes</h2></td></tr>
 
 <p>Steps between changing throw matrix. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00206">206</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00211">211</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1794,7 +1800,7 @@ Private Attributes</h2></td></tr>
 
 <p>Number of restarts for Robbins Monro (so far) </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00256">256</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00261">261</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1820,7 +1826,7 @@ Private Attributes</h2></td></tr>
 
 <p>Name of the file to save the adaptive matrices into. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00216">216</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00221">221</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1846,7 +1852,7 @@ Private Attributes</h2></td></tr>
 
 <p>Mean values for all parameters. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00226">226</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00231">231</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1872,7 +1878,7 @@ Private Attributes</h2></td></tr>
 
 <p>Need to keep track of whether previous step was accepted for RM. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00262">262</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00267">267</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1897,7 +1903,7 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Meta variables related to adaption run time When do we start throwing </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00200">200</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00205">205</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1923,7 +1929,7 @@ Private Attributes</h2></td></tr>
 
 <p>When do we stop update the adaptive matrix. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00203">203</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00208">208</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1949,7 +1955,7 @@ Private Attributes</h2></td></tr>
 
 <p>Target acceptance rate for Robbins Monro. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00250">250</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00255">255</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1975,7 +1981,7 @@ Private Attributes</h2></td></tr>
 
 <p>Total number of restarts ALLOWED for Robbins Monro. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00259">259</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00264">264</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
 
 </div>
 </div>
@@ -2001,7 +2007,7 @@ Private Attributes</h2></td></tr>
 
 <p>Total number of MCMC steps. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00232">232</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00237">237</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
 
 </div>
 </div>
@@ -2027,7 +2033,7 @@ Private Attributes</h2></td></tr>
 
 <p>Use Robbins Monro <a href="https://arxiv.org/pdf/1006.3690">https://arxiv.org/pdf/1006.3690</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00247">247</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="AdaptiveMCMCHandler_8h_source.html#l00252">252</a> of file <a class="el" href="AdaptiveMCMCHandler_8h_source.html">AdaptiveMCMCHandler.h</a>.</p>
 
 </div>
 </div>

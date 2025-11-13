@@ -135,23 +135,23 @@ Functions</h2></td></tr>
 
 <p>Helper to write histograms. </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8cpp_source.html#l01365">1365</a> of file <a class="el" href="FitterBase_8cpp_source.html">FitterBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l01365"></a><span class="lineno"> 1365</span>&#160;                                                           {</div>
-<div class="line"><a name="l01366"></a><span class="lineno"> 1366</span>&#160;<span class="comment">// *************************</span></div>
-<div class="line"><a name="l01367"></a><span class="lineno"> 1367</span>&#160;  <span class="keywordflow">if</span> (!hist) <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l01368"></a><span class="lineno"> 1368</span>&#160;  hist-&gt;SetTitle(baseName.c_str());</div>
-<div class="line"><a name="l01369"></a><span class="lineno"> 1369</span>&#160;  <span class="comment">// Get the class name of the histogram</span></div>
-<div class="line"><a name="l01370"></a><span class="lineno"> 1370</span>&#160;  TString className = hist-&gt;ClassName();</div>
-<div class="line"><a name="l01371"></a><span class="lineno"> 1371</span>&#160; </div>
-<div class="line"><a name="l01372"></a><span class="lineno"> 1372</span>&#160;  <span class="comment">// Set the appropriate axis title based on the histogram type</span></div>
-<div class="line"><a name="l01373"></a><span class="lineno"> 1373</span>&#160;  <span class="keywordflow">if</span> (className.Contains(<span class="stringliteral">&quot;TH1&quot;</span>)) {</div>
-<div class="line"><a name="l01374"></a><span class="lineno"> 1374</span>&#160;    hist-&gt;GetYaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Events&quot;</span>);</div>
-<div class="line"><a name="l01375"></a><span class="lineno"> 1375</span>&#160;  } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (className.Contains(<span class="stringliteral">&quot;TH2&quot;</span>)) {</div>
-<div class="line"><a name="l01376"></a><span class="lineno"> 1376</span>&#160;    hist-&gt;GetZaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Events&quot;</span>);</div>
-<div class="line"><a name="l01377"></a><span class="lineno"> 1377</span>&#160;  }</div>
-<div class="line"><a name="l01378"></a><span class="lineno"> 1378</span>&#160;  hist-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
-<div class="line"><a name="l01379"></a><span class="lineno"> 1379</span>&#160;  hist-&gt;Write(baseName.c_str());</div>
-<div class="line"><a name="l01380"></a><span class="lineno"> 1380</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8cpp_source.html#l01364">1364</a> of file <a class="el" href="FitterBase_8cpp_source.html">FitterBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l01364"></a><span class="lineno"> 1364</span>&#160;                                                           {</div>
+<div class="line"><a name="l01365"></a><span class="lineno"> 1365</span>&#160;<span class="comment">// *************************</span></div>
+<div class="line"><a name="l01366"></a><span class="lineno"> 1366</span>&#160;  <span class="keywordflow">if</span> (!hist) <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l01367"></a><span class="lineno"> 1367</span>&#160;  hist-&gt;SetTitle(baseName.c_str());</div>
+<div class="line"><a name="l01368"></a><span class="lineno"> 1368</span>&#160;  <span class="comment">// Get the class name of the histogram</span></div>
+<div class="line"><a name="l01369"></a><span class="lineno"> 1369</span>&#160;  TString className = hist-&gt;ClassName();</div>
+<div class="line"><a name="l01370"></a><span class="lineno"> 1370</span>&#160; </div>
+<div class="line"><a name="l01371"></a><span class="lineno"> 1371</span>&#160;  <span class="comment">// Set the appropriate axis title based on the histogram type</span></div>
+<div class="line"><a name="l01372"></a><span class="lineno"> 1372</span>&#160;  <span class="keywordflow">if</span> (className.Contains(<span class="stringliteral">&quot;TH1&quot;</span>)) {</div>
+<div class="line"><a name="l01373"></a><span class="lineno"> 1373</span>&#160;    hist-&gt;GetYaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Events&quot;</span>);</div>
+<div class="line"><a name="l01374"></a><span class="lineno"> 1374</span>&#160;  } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (className.Contains(<span class="stringliteral">&quot;TH2&quot;</span>)) {</div>
+<div class="line"><a name="l01375"></a><span class="lineno"> 1375</span>&#160;    hist-&gt;GetZaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Events&quot;</span>);</div>
+<div class="line"><a name="l01376"></a><span class="lineno"> 1376</span>&#160;  }</div>
+<div class="line"><a name="l01377"></a><span class="lineno"> 1377</span>&#160;  hist-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
+<div class="line"><a name="l01378"></a><span class="lineno"> 1378</span>&#160;  hist-&gt;Write(baseName.c_str());</div>
+<div class="line"><a name="l01379"></a><span class="lineno"> 1379</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -201,67 +201,67 @@ Functions</h2></td></tr>
 
 <p>Generic histogram writer - should make main code more palatable. </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8cpp_source.html#l01384">1384</a> of file <a class="el" href="FitterBase_8cpp_source.html">FitterBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l01388"></a><span class="lineno"> 1388</span>&#160;                                                                    {</div>
-<div class="line"><a name="l01389"></a><span class="lineno"> 1389</span>&#160;<span class="comment">// *************************</span></div>
-<div class="line"><a name="l01390"></a><span class="lineno"> 1390</span>&#160;  <a class="code" href="classMaCh3Modes.html">MaCh3Modes</a> *modes = sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#ga4e232eb59bc09c3f8ff4cbed69fcd688">GetMaCh3Modes</a>();</div>
-<div class="line"><a name="l01391"></a><span class="lineno"> 1391</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iSample = 0; iSample &lt; sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#gac4b73a8841ff9bab2fb08b578ad4137f">GetNsamples</a>(); ++iSample) {</div>
-<div class="line"><a name="l01392"></a><span class="lineno"> 1392</span>&#160;    SampleDir[iSample]-&gt;cd();</div>
-<div class="line"><a name="l01393"></a><span class="lineno"> 1393</span>&#160;    <span class="keyword">const</span> std::string sampleName = sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#gadfad2507ad845ad36fff3c82231a143c">GetSampleTitle</a>(iSample);</div>
-<div class="line"><a name="l01394"></a><span class="lineno"> 1394</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iDim = 0; iDim &lt; sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#ga23987526c4fed2f7426632c6935864e1">GetNDim</a>(iSample); iDim++) {</div>
-<div class="line"><a name="l01395"></a><span class="lineno"> 1395</span>&#160;      std::string ProjectionName = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a name="l01396"></a><span class="lineno"> 1396</span>&#160;      std::string ProjectionSuffix = <span class="stringliteral">&quot;_1DProj&quot;</span> + std::to_string(iDim);</div>
-<div class="line"><a name="l01397"></a><span class="lineno"> 1397</span>&#160;      <span class="keywordflow">if</span>(iDim == 0) {</div>
-<div class="line"><a name="l01398"></a><span class="lineno"> 1398</span>&#160;        ProjectionName = sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#ga9aebf7da41ad6ddb87e3081a7f4763ec">GetXBinVarName</a>(iSample);</div>
-<div class="line"><a name="l01399"></a><span class="lineno"> 1399</span>&#160;      } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (iDim == 1) {</div>
-<div class="line"><a name="l01400"></a><span class="lineno"> 1400</span>&#160;        ProjectionName = sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#ga69d66592696bee9e73f61649c681a573">GetYBinVarName</a>(iSample);</div>
-<div class="line"><a name="l01401"></a><span class="lineno"> 1401</span>&#160;      } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l01402"></a><span class="lineno"> 1402</span>&#160;        <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Not yet implemented for dimension {}&quot;</span>, iDim+1);</div>
-<div class="line"><a name="l01403"></a><span class="lineno"> 1403</span>&#160;        <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><a name="l01404"></a><span class="lineno"> 1404</span>&#160;      }</div>
-<div class="line"><a name="l01405"></a><span class="lineno"> 1405</span>&#160; </div>
-<div class="line"><a name="l01406"></a><span class="lineno"> 1406</span>&#160;      <span class="comment">// Probably a better way of handling this logic</span></div>
-<div class="line"><a name="l01407"></a><span class="lineno"> 1407</span>&#160;      <span class="keywordflow">if</span> (by_mode) {</div>
-<div class="line"><a name="l01408"></a><span class="lineno"> 1408</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iMode = 0; iMode &lt; modes-&gt;<a class="code" href="classMaCh3Modes.html#a1996581eab0194698a4ddccf3b189d49">GetNModes</a>(); ++iMode) {</div>
-<div class="line"><a name="l01409"></a><span class="lineno"> 1409</span>&#160;          <span class="keyword">auto</span> modeHist = sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#gaf193072f552cac18955b2197bd106ed1">Get1DVarHistByModeAndChannel</a>(iSample, ProjectionName, iMode);</div>
-<div class="line"><a name="l01410"></a><span class="lineno"> 1410</span>&#160;          <a class="code" href="FitterBase_8cpp.html#af6dcdf28c7eef08e565cafd771f6d7e4">WriteHistograms</a>(modeHist, sampleName + <span class="stringliteral">&quot;_&quot;</span> + modes-&gt;<a class="code" href="classMaCh3Modes.html#afb5444a949b61a860f724eb184a3e6ff">GetMaCh3ModeName</a>(iMode) + ProjectionSuffix + suffix);</div>
-<div class="line"><a name="l01411"></a><span class="lineno"> 1411</span>&#160;          <span class="keyword">delete</span> modeHist;</div>
-<div class="line"><a name="l01412"></a><span class="lineno"> 1412</span>&#160;        }</div>
-<div class="line"><a name="l01413"></a><span class="lineno"> 1413</span>&#160;      }</div>
-<div class="line"><a name="l01414"></a><span class="lineno"> 1414</span>&#160; </div>
-<div class="line"><a name="l01415"></a><span class="lineno"> 1415</span>&#160;      <span class="keywordflow">if</span> (by_channel) {</div>
-<div class="line"><a name="l01416"></a><span class="lineno"> 1416</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iChan = 0; iChan &lt; sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#gaac276e3f10be081ce8e7f94df131490d">GetNOscChannels</a>(iSample); ++iChan) {</div>
-<div class="line"><a name="l01417"></a><span class="lineno"> 1417</span>&#160;          <span class="keyword">auto</span> chanHist = sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#gaf193072f552cac18955b2197bd106ed1">Get1DVarHistByModeAndChannel</a>(iSample, ProjectionName, -1, iChan); <span class="comment">// -1 skips over mode plotting</span></div>
-<div class="line"><a name="l01418"></a><span class="lineno"> 1418</span>&#160;          <a class="code" href="FitterBase_8cpp.html#af6dcdf28c7eef08e565cafd771f6d7e4">WriteHistograms</a>(chanHist, sampleName + <span class="stringliteral">&quot;_&quot;</span> + sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#ga19cffdf18f1fb12f68b262907671801d">GetFlavourName</a>(iSample, iChan) + ProjectionSuffix + suffix);</div>
-<div class="line"><a name="l01419"></a><span class="lineno"> 1419</span>&#160;          <span class="keyword">delete</span> chanHist;</div>
-<div class="line"><a name="l01420"></a><span class="lineno"> 1420</span>&#160;        }</div>
-<div class="line"><a name="l01421"></a><span class="lineno"> 1421</span>&#160;      }</div>
-<div class="line"><a name="l01422"></a><span class="lineno"> 1422</span>&#160; </div>
-<div class="line"><a name="l01423"></a><span class="lineno"> 1423</span>&#160;      <span class="keywordflow">if</span> (by_mode &amp;&amp; by_channel) {</div>
-<div class="line"><a name="l01424"></a><span class="lineno"> 1424</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iMode = 0; iMode &lt; modes-&gt;<a class="code" href="classMaCh3Modes.html#a1996581eab0194698a4ddccf3b189d49">GetNModes</a>(); ++iMode) {</div>
-<div class="line"><a name="l01425"></a><span class="lineno"> 1425</span>&#160;          <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iChan = 0; iChan &lt; sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#gaac276e3f10be081ce8e7f94df131490d">GetNOscChannels</a>(iSample); ++iChan) {</div>
-<div class="line"><a name="l01426"></a><span class="lineno"> 1426</span>&#160;            <span class="keyword">auto</span> hist = sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#gaf193072f552cac18955b2197bd106ed1">Get1DVarHistByModeAndChannel</a>(iSample, ProjectionName, iMode, iChan);</div>
-<div class="line"><a name="l01427"></a><span class="lineno"> 1427</span>&#160;            <a class="code" href="FitterBase_8cpp.html#af6dcdf28c7eef08e565cafd771f6d7e4">WriteHistograms</a>(hist, sampleName + <span class="stringliteral">&quot;_&quot;</span> + modes-&gt;<a class="code" href="classMaCh3Modes.html#afb5444a949b61a860f724eb184a3e6ff">GetMaCh3ModeName</a>(iMode) + <span class="stringliteral">&quot;_&quot;</span> + sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#ga19cffdf18f1fb12f68b262907671801d">GetFlavourName</a>(iSample, iChan) + ProjectionSuffix + suffix);</div>
-<div class="line"><a name="l01428"></a><span class="lineno"> 1428</span>&#160;            <span class="keyword">delete</span> hist;</div>
-<div class="line"><a name="l01429"></a><span class="lineno"> 1429</span>&#160;          }</div>
-<div class="line"><a name="l01430"></a><span class="lineno"> 1430</span>&#160;        }</div>
-<div class="line"><a name="l01431"></a><span class="lineno"> 1431</span>&#160;      }</div>
-<div class="line"><a name="l01432"></a><span class="lineno"> 1432</span>&#160; </div>
-<div class="line"><a name="l01433"></a><span class="lineno"> 1433</span>&#160;      <span class="keywordflow">if</span> (!by_mode &amp;&amp; !by_channel) {</div>
-<div class="line"><a name="l01434"></a><span class="lineno"> 1434</span>&#160;        <span class="keyword">auto</span> hist = sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#ga95adaa63edf9453f12eed965a3bf46cf">Get1DVarHist</a>(iSample, ProjectionName);</div>
-<div class="line"><a name="l01435"></a><span class="lineno"> 1435</span>&#160;        <a class="code" href="FitterBase_8cpp.html#af6dcdf28c7eef08e565cafd771f6d7e4">WriteHistograms</a>(hist, sampleName + ProjectionSuffix + suffix);</div>
-<div class="line"><a name="l01436"></a><span class="lineno"> 1436</span>&#160;        <span class="keyword">delete</span> hist;</div>
-<div class="line"><a name="l01437"></a><span class="lineno"> 1437</span>&#160;        <span class="comment">// Only for 2D</span></div>
-<div class="line"><a name="l01438"></a><span class="lineno"> 1438</span>&#160;        <span class="keywordflow">if</span>(iDim == 1) {</div>
-<div class="line"><a name="l01439"></a><span class="lineno"> 1439</span>&#160;          <span class="keyword">auto</span> hist2D = sample-&gt;<a class="code" href="classSampleHandlerFD.html#ac5234e3fdfc43fa499744502b28c54be">Get2DVarHist</a>(iSample, sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#ga9aebf7da41ad6ddb87e3081a7f4763ec">GetXBinVarName</a>(iSample), sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#ga69d66592696bee9e73f61649c681a573">GetYBinVarName</a>(iSample));</div>
-<div class="line"><a name="l01440"></a><span class="lineno"> 1440</span>&#160;          <a class="code" href="FitterBase_8cpp.html#af6dcdf28c7eef08e565cafd771f6d7e4">WriteHistograms</a>(hist2D, sampleName + <span class="stringliteral">&quot;_2DProj&quot;</span> + suffix);</div>
-<div class="line"><a name="l01441"></a><span class="lineno"> 1441</span>&#160;          <span class="keyword">delete</span> hist2D;</div>
-<div class="line"><a name="l01442"></a><span class="lineno"> 1442</span>&#160;        }</div>
-<div class="line"><a name="l01443"></a><span class="lineno"> 1443</span>&#160;      }</div>
-<div class="line"><a name="l01444"></a><span class="lineno"> 1444</span>&#160;    }</div>
-<div class="line"><a name="l01445"></a><span class="lineno"> 1445</span>&#160;  }</div>
-<div class="line"><a name="l01446"></a><span class="lineno"> 1446</span>&#160;}</div>
-<div class="ttc" id="aFitterBase_8cpp_html_af6dcdf28c7eef08e565cafd771f6d7e4"><div class="ttname"><a href="FitterBase_8cpp.html#af6dcdf28c7eef08e565cafd771f6d7e4">WriteHistograms</a></div><div class="ttdeci">void WriteHistograms(TH1 *hist, const std::string &amp;baseName)</div><div class="ttdoc">Helper to write histograms.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8cpp_source.html#l01365">FitterBase.cpp:1365</a></div></div>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8cpp_source.html#l01383">1383</a> of file <a class="el" href="FitterBase_8cpp_source.html">FitterBase.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l01387"></a><span class="lineno"> 1387</span>&#160;                                                                    {</div>
+<div class="line"><a name="l01388"></a><span class="lineno"> 1388</span>&#160;<span class="comment">// *************************</span></div>
+<div class="line"><a name="l01389"></a><span class="lineno"> 1389</span>&#160;  <a class="code" href="classMaCh3Modes.html">MaCh3Modes</a> *modes = sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#ga4e232eb59bc09c3f8ff4cbed69fcd688">GetMaCh3Modes</a>();</div>
+<div class="line"><a name="l01390"></a><span class="lineno"> 1390</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iSample = 0; iSample &lt; sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#gac4b73a8841ff9bab2fb08b578ad4137f">GetNsamples</a>(); ++iSample) {</div>
+<div class="line"><a name="l01391"></a><span class="lineno"> 1391</span>&#160;    SampleDir[iSample]-&gt;cd();</div>
+<div class="line"><a name="l01392"></a><span class="lineno"> 1392</span>&#160;    <span class="keyword">const</span> std::string sampleName = sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#gadfad2507ad845ad36fff3c82231a143c">GetSampleTitle</a>(iSample);</div>
+<div class="line"><a name="l01393"></a><span class="lineno"> 1393</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iDim = 0; iDim &lt; sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#ga23987526c4fed2f7426632c6935864e1">GetNDim</a>(iSample); iDim++) {</div>
+<div class="line"><a name="l01394"></a><span class="lineno"> 1394</span>&#160;      std::string ProjectionName = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a name="l01395"></a><span class="lineno"> 1395</span>&#160;      std::string ProjectionSuffix = <span class="stringliteral">&quot;_1DProj&quot;</span> + std::to_string(iDim);</div>
+<div class="line"><a name="l01396"></a><span class="lineno"> 1396</span>&#160;      <span class="keywordflow">if</span>(iDim == 0) {</div>
+<div class="line"><a name="l01397"></a><span class="lineno"> 1397</span>&#160;        ProjectionName = sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#ga9aebf7da41ad6ddb87e3081a7f4763ec">GetXBinVarName</a>(iSample);</div>
+<div class="line"><a name="l01398"></a><span class="lineno"> 1398</span>&#160;      } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (iDim == 1) {</div>
+<div class="line"><a name="l01399"></a><span class="lineno"> 1399</span>&#160;        ProjectionName = sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#ga69d66592696bee9e73f61649c681a573">GetYBinVarName</a>(iSample);</div>
+<div class="line"><a name="l01400"></a><span class="lineno"> 1400</span>&#160;      } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l01401"></a><span class="lineno"> 1401</span>&#160;        <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Not yet implemented for dimension {}&quot;</span>, iDim+1);</div>
+<div class="line"><a name="l01402"></a><span class="lineno"> 1402</span>&#160;        <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><a name="l01403"></a><span class="lineno"> 1403</span>&#160;      }</div>
+<div class="line"><a name="l01404"></a><span class="lineno"> 1404</span>&#160; </div>
+<div class="line"><a name="l01405"></a><span class="lineno"> 1405</span>&#160;      <span class="comment">// Probably a better way of handling this logic</span></div>
+<div class="line"><a name="l01406"></a><span class="lineno"> 1406</span>&#160;      <span class="keywordflow">if</span> (by_mode) {</div>
+<div class="line"><a name="l01407"></a><span class="lineno"> 1407</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iMode = 0; iMode &lt; modes-&gt;<a class="code" href="classMaCh3Modes.html#a1996581eab0194698a4ddccf3b189d49">GetNModes</a>(); ++iMode) {</div>
+<div class="line"><a name="l01408"></a><span class="lineno"> 1408</span>&#160;          <span class="keyword">auto</span> modeHist = sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#gaf193072f552cac18955b2197bd106ed1">Get1DVarHistByModeAndChannel</a>(iSample, ProjectionName, iMode);</div>
+<div class="line"><a name="l01409"></a><span class="lineno"> 1409</span>&#160;          <a class="code" href="FitterBase_8cpp.html#af6dcdf28c7eef08e565cafd771f6d7e4">WriteHistograms</a>(modeHist, sampleName + <span class="stringliteral">&quot;_&quot;</span> + modes-&gt;<a class="code" href="classMaCh3Modes.html#afb5444a949b61a860f724eb184a3e6ff">GetMaCh3ModeName</a>(iMode) + ProjectionSuffix + suffix);</div>
+<div class="line"><a name="l01410"></a><span class="lineno"> 1410</span>&#160;          <span class="keyword">delete</span> modeHist;</div>
+<div class="line"><a name="l01411"></a><span class="lineno"> 1411</span>&#160;        }</div>
+<div class="line"><a name="l01412"></a><span class="lineno"> 1412</span>&#160;      }</div>
+<div class="line"><a name="l01413"></a><span class="lineno"> 1413</span>&#160; </div>
+<div class="line"><a name="l01414"></a><span class="lineno"> 1414</span>&#160;      <span class="keywordflow">if</span> (by_channel) {</div>
+<div class="line"><a name="l01415"></a><span class="lineno"> 1415</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iChan = 0; iChan &lt; sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#gaac276e3f10be081ce8e7f94df131490d">GetNOscChannels</a>(iSample); ++iChan) {</div>
+<div class="line"><a name="l01416"></a><span class="lineno"> 1416</span>&#160;          <span class="keyword">auto</span> chanHist = sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#gaf193072f552cac18955b2197bd106ed1">Get1DVarHistByModeAndChannel</a>(iSample, ProjectionName, -1, iChan); <span class="comment">// -1 skips over mode plotting</span></div>
+<div class="line"><a name="l01417"></a><span class="lineno"> 1417</span>&#160;          <a class="code" href="FitterBase_8cpp.html#af6dcdf28c7eef08e565cafd771f6d7e4">WriteHistograms</a>(chanHist, sampleName + <span class="stringliteral">&quot;_&quot;</span> + sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#ga19cffdf18f1fb12f68b262907671801d">GetFlavourName</a>(iSample, iChan) + ProjectionSuffix + suffix);</div>
+<div class="line"><a name="l01418"></a><span class="lineno"> 1418</span>&#160;          <span class="keyword">delete</span> chanHist;</div>
+<div class="line"><a name="l01419"></a><span class="lineno"> 1419</span>&#160;        }</div>
+<div class="line"><a name="l01420"></a><span class="lineno"> 1420</span>&#160;      }</div>
+<div class="line"><a name="l01421"></a><span class="lineno"> 1421</span>&#160; </div>
+<div class="line"><a name="l01422"></a><span class="lineno"> 1422</span>&#160;      <span class="keywordflow">if</span> (by_mode &amp;&amp; by_channel) {</div>
+<div class="line"><a name="l01423"></a><span class="lineno"> 1423</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iMode = 0; iMode &lt; modes-&gt;<a class="code" href="classMaCh3Modes.html#a1996581eab0194698a4ddccf3b189d49">GetNModes</a>(); ++iMode) {</div>
+<div class="line"><a name="l01424"></a><span class="lineno"> 1424</span>&#160;          <span class="keywordflow">for</span> (<span class="keywordtype">int</span> iChan = 0; iChan &lt; sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#gaac276e3f10be081ce8e7f94df131490d">GetNOscChannels</a>(iSample); ++iChan) {</div>
+<div class="line"><a name="l01425"></a><span class="lineno"> 1425</span>&#160;            <span class="keyword">auto</span> hist = sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#gaf193072f552cac18955b2197bd106ed1">Get1DVarHistByModeAndChannel</a>(iSample, ProjectionName, iMode, iChan);</div>
+<div class="line"><a name="l01426"></a><span class="lineno"> 1426</span>&#160;            <a class="code" href="FitterBase_8cpp.html#af6dcdf28c7eef08e565cafd771f6d7e4">WriteHistograms</a>(hist, sampleName + <span class="stringliteral">&quot;_&quot;</span> + modes-&gt;<a class="code" href="classMaCh3Modes.html#afb5444a949b61a860f724eb184a3e6ff">GetMaCh3ModeName</a>(iMode) + <span class="stringliteral">&quot;_&quot;</span> + sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#ga19cffdf18f1fb12f68b262907671801d">GetFlavourName</a>(iSample, iChan) + ProjectionSuffix + suffix);</div>
+<div class="line"><a name="l01427"></a><span class="lineno"> 1427</span>&#160;            <span class="keyword">delete</span> hist;</div>
+<div class="line"><a name="l01428"></a><span class="lineno"> 1428</span>&#160;          }</div>
+<div class="line"><a name="l01429"></a><span class="lineno"> 1429</span>&#160;        }</div>
+<div class="line"><a name="l01430"></a><span class="lineno"> 1430</span>&#160;      }</div>
+<div class="line"><a name="l01431"></a><span class="lineno"> 1431</span>&#160; </div>
+<div class="line"><a name="l01432"></a><span class="lineno"> 1432</span>&#160;      <span class="keywordflow">if</span> (!by_mode &amp;&amp; !by_channel) {</div>
+<div class="line"><a name="l01433"></a><span class="lineno"> 1433</span>&#160;        <span class="keyword">auto</span> hist = sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#ga95adaa63edf9453f12eed965a3bf46cf">Get1DVarHist</a>(iSample, ProjectionName);</div>
+<div class="line"><a name="l01434"></a><span class="lineno"> 1434</span>&#160;        <a class="code" href="FitterBase_8cpp.html#af6dcdf28c7eef08e565cafd771f6d7e4">WriteHistograms</a>(hist, sampleName + ProjectionSuffix + suffix);</div>
+<div class="line"><a name="l01435"></a><span class="lineno"> 1435</span>&#160;        <span class="keyword">delete</span> hist;</div>
+<div class="line"><a name="l01436"></a><span class="lineno"> 1436</span>&#160;        <span class="comment">// Only for 2D</span></div>
+<div class="line"><a name="l01437"></a><span class="lineno"> 1437</span>&#160;        <span class="keywordflow">if</span>(iDim == 1) {</div>
+<div class="line"><a name="l01438"></a><span class="lineno"> 1438</span>&#160;          <span class="keyword">auto</span> hist2D = sample-&gt;<a class="code" href="classSampleHandlerFD.html#ac5234e3fdfc43fa499744502b28c54be">Get2DVarHist</a>(iSample, sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#ga9aebf7da41ad6ddb87e3081a7f4763ec">GetXBinVarName</a>(iSample), sample-&gt;<a class="code" href="group__SampleHandlerGetters.html#ga69d66592696bee9e73f61649c681a573">GetYBinVarName</a>(iSample));</div>
+<div class="line"><a name="l01439"></a><span class="lineno"> 1439</span>&#160;          <a class="code" href="FitterBase_8cpp.html#af6dcdf28c7eef08e565cafd771f6d7e4">WriteHistograms</a>(hist2D, sampleName + <span class="stringliteral">&quot;_2DProj&quot;</span> + suffix);</div>
+<div class="line"><a name="l01440"></a><span class="lineno"> 1440</span>&#160;          <span class="keyword">delete</span> hist2D;</div>
+<div class="line"><a name="l01441"></a><span class="lineno"> 1441</span>&#160;        }</div>
+<div class="line"><a name="l01442"></a><span class="lineno"> 1442</span>&#160;      }</div>
+<div class="line"><a name="l01443"></a><span class="lineno"> 1443</span>&#160;    }</div>
+<div class="line"><a name="l01444"></a><span class="lineno"> 1444</span>&#160;  }</div>
+<div class="line"><a name="l01445"></a><span class="lineno"> 1445</span>&#160;}</div>
+<div class="ttc" id="aFitterBase_8cpp_html_af6dcdf28c7eef08e565cafd771f6d7e4"><div class="ttname"><a href="FitterBase_8cpp.html#af6dcdf28c7eef08e565cafd771f6d7e4">WriteHistograms</a></div><div class="ttdeci">void WriteHistograms(TH1 *hist, const std::string &amp;baseName)</div><div class="ttdoc">Helper to write histograms.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8cpp_source.html#l01364">FitterBase.cpp:1364</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00037">MaCh3Logger.h:37</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00020">MaCh3Exception.h:20</a></div></div>
 <div class="ttc" id="aclassMaCh3Modes_html"><div class="ttname"><a href="classMaCh3Modes.html">MaCh3Modes</a></div><div class="ttdoc">KS: Class describing MaCh3 modes used in the analysis, it is being initialised from config.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00041">MaCh3Modes.h:41</a></div></div>

@@ -5,7 +5,7 @@ var searchData=
   ['_7ebinninghandler_2984',['~BinningHandler',['../classBinningHandler.html#a37d4efc297291aa0ed38455be365168e',1,'BinningHandler']]],
   ['_7edelayedmr2t2_2985',['~DelayedMR2T2',['../classDelayedMR2T2.html#acc28ebaa16e2e8040b2923dbf7d604d7',1,'DelayedMR2T2']]],
   ['_7efardetectorcoreinfo_2986',['~FarDetectorCoreInfo',['../structFarDetectorCoreInfo.html#a45938774054a8a9a288dd8df2464c475',1,'FarDetectorCoreInfo']]],
-  ['_7efastsplineinfo_2987',['~FastSplineInfo',['../structFastSplineInfo.html#a29129bd9c51916990ef44e99a36fa6b5',1,'FastSplineInfo']]],
+  ['_7efastsplineinfo_2987',['~FastSplineInfo',['../structFastSplineInfo.html#a1803d95b0a90e35b9e87692857207abd',1,'FastSplineInfo']]],
   ['_7efitterbase_2988',['~FitterBase',['../classFitterBase.html#ae8677b449e49ca86bafee685e8dbe93f',1,'FitterBase']]],
   ['_7einputfile_2989',['~InputFile',['../structMaCh3Plotting_1_1InputFile.html#a64c6c4553a2fcc4fb85a243c0b1736f9',1,'MaCh3Plotting::InputFile']]],
   ['_7einputmanager_2990',['~InputManager',['../classMaCh3Plotting_1_1InputManager.html#a911e73c70393339552e7b389f9f28a2f',1,'MaCh3Plotting::InputManager']]],
