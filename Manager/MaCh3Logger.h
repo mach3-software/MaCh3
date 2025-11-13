@@ -73,6 +73,31 @@ inline void SetMaCh3LoggerFormat()
   spdlog::set_level(get_default_log_level());
 }
 
+#ifdef MPIENABLED
+inline void SetMaCh3MPILogging(){
+  // We only want to log for the FIRST process [unless we're in debug mode]
+  int initialised = 0;
+  MPI_Initialized(&initialised);
+
+  if !initialised{
+    MACH3LOG_WARNING("MPI not initialised, not running as an MPI process")
+    return;
+  }
+
+#ifndef DEBUG
+  int mpi_rank = 0;
+
+  // Do we actually have an MPI job running?
+  MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
+  if (mpi_rank != 0)
+  {
+    spdlog::set_level(spdlog::level::off);
+    return;
+  }
+  #endif // Debug
+}
+#endif // MPI
+
 /// @brief KS: This is bit convoluted but this is to allow redirecting cout and errors from external library into MaCh3 logger format
 /// @tparam Func The type of the function to be called, which outputs to stdout and stderr.
 /// @tparam LogFunc The type of the logging function, typically a lambda that formats and logs messages.
