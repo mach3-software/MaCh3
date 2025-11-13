@@ -144,7 +144,7 @@ void MakePlot(std::vector<TString> input_files,
     c1->Print(Form("%s_%s.pdf]", hist_labels[0].Data(), dirname.c_str()), "pdf");
   }
 
-  for (int i = 0; i < static_cast<int>(std::size(infiles)); ++i)
+  for (size_t i = 0; i < infiles.size(); ++i)
   {
     infiles[i]->Close();
     delete infiles[i];
