@@ -61,17 +61,17 @@ void MakePlot(std::vector<TString> input_files,
   gErrorIgnoreLevel = kWarning;
 
   TKey *key = nullptr;
-  std::vector<TFile*> infiles(input_files.size());
+  std::vector<TFile*> infiles;
   bool add_legend = false;
 
   for (const auto& fname : input_files)
   {
     TFile* f = M3::Open(fname.Data(), "UPDATE", __FILE__, __LINE__);
-    if (f) {
-      infiles.push_back(f);
-      add_legend = (input_files.size() > 1);
-    }
+    MACH3LOG_INFO("Adding file {}", fname.Data());
+    infiles.push_back(f);
+    add_legend = (input_files.size() > 1);
   }
+  
   if(input_files.size() > 4){
     MACH3LOG_ERROR("Fix some hardcoding here");
     throw MaCh3Exception(__FILE__, __LINE__);
