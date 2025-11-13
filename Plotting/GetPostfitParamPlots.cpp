@@ -934,11 +934,11 @@ void GetViolinPlots()
   for(unsigned int fileId = 0; fileId < man->getNFiles(); fileId++) {
     leg->AddEntry(Violin[fileId].get(), man->getFileLabel(fileId).c_str(), "lpf");
   }
-  if(PlotAssym)             leg->AddEntry(PostGraphAll.get(), "HPD Assym", "lp");
-  else                      leg->AddEntry(Postfit.get(), "HPD", "lpf");
+  if(PlotAssym) leg->AddEntry(PostGraphAll.get(), "HPD Assym", "lp");
+  else          leg->AddEntry(Postfit.get(), "HPD", "lpf");
 
-  canv->cd();
-  canv->Clear();
+  canvas->cd();
+  canvas->Clear();
   leg->Draw();
   canvas->Print((OutputName+".pdf").c_str());
   
