@@ -6,6 +6,10 @@
 #include "Manager/Monitor.h"
 #include "Manager/MaCh3Exception.h"
 
+#ifdef MPIENABLED
+#include <mpi.h>
+#endif
+
 //KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
 class TFile;
 
@@ -52,9 +56,9 @@ public:
     OverrideConfig(config, std::forward<Args>(args)...);
   }
 
-private:
-  /// @brief Common inialiser for both constructors
-  void Initialise();
+  private :
+    /// @brief Common inialiser for both constructors
+    void Initialise();
 
   void InitialiseMPI();
 

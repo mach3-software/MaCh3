@@ -6,6 +6,9 @@
 #include <functional>
 #include <string>
 #include <exception>
+#ifdef MPIENABLED
+#include <mpi.h>
+#endif
 
 // MaCh3 Includes
 #include "Manager/Core.h"
@@ -79,8 +82,8 @@ inline void SetMaCh3MPILogging(){
   int initialised = 0;
   MPI_Initialized(&initialised);
 
-  if !initialised{
-    MACH3LOG_WARNING("MPI not initialised, not running as an MPI process")
+  if(!initialised){
+    MACH3LOG_WARN("MPI not initialised, not running as an MPI process");
     return;
   }
 

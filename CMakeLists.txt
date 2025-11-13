@@ -16,6 +16,7 @@ option(MaCh3_GPU_BENCHMARK "Perform fancy CUDA Benchmarking" OFF)
 option(MaCh3_NATIVE_ENABLED "Enable native CPU optimizations for improved performance during benchmarking)" OFF)
 option(MaCh3_GPU_ENABLED "Use GPU acceleration or not" ON)
 option(MaCh3_NuOsc_GPU_ENABLED "By default MaCh3 will use NuOscillator with GPU if MaCh3 is compiled with GPU, this flag allows disabling GPU for NuOscillator even if MaCh3 has GPU enabled" ON)
+option(MaCh3_MPI_ENABLED "Enable MPI support" OFF)
 
 #KS: Load cmake function like DefineEnabledRequiredSwitch allowing to write more compact cmake
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/Modules)
@@ -204,6 +205,20 @@ if(MaCh3_MULTITHREAD_ENABLED)
   endif()
   target_compile_definitions(MaCh3CompileDefinitions INTERFACE MULTITHREAD)
 endif()
+
+if(MaCh3_MPI_ENABLED)
+  find_package(MPI REQUIRED COMPONENTS CXX)
+  if(MPI_CXX_FOUND)
+    cmessage(STATUS "MPI found. Adding MPI support.")
+    cmessage(STATUS "MPI CXX Compiler: ${MPI_CXX_COMPILER}")
+    cmessage(STATUS "MPI CXX Version: ${MPI_CXX_VERSION}")
+    target_link_libraries(MaCh3CompilerOptions INTERFACE MPI::MPI_CXX)
+    target_compile_definitions(MaCh3CompileDefinitions INTERFACE MPIENABLED)
+  else()
+    cmessage(FATAL_ERROR "MPI requested but MPI C++ compiler not found!")
+  endif()
+endif()
+
 
 if(MaCh3_GPU_ENABLED) 
   target_compile_definitions(MaCh3GPUCompilerOptions INTERFACE CUDA)

@@ -78,8 +78,21 @@ bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const 
   adaptive_save_n_iterations  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["SaveNIterations"], -1);
   output_file_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Settings"]["OutputFileName"], "");
 
-  // Check for Robbins-Monro adaption
-  use_robbins_monro = GetFromManager<bool>(adapt_manager["AdaptionOptions"]["Settings"]["UseRobbinsMonro"], false);
+  #ifdef MPIENABLED
+  int mpi_init;
+  MPI_Initialized(&mpi_init);
+
+  if(mpi_init){
+    int mpi_rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
+    auto last_idx = output_file_name.find_last_of(".");
+    std::string raw_name = output_file_name.substr(0, last_idx);
+    output_file_name = output_file_name + "_"+ std::to_string(mpi_rank)+".root";
+  }
+  #endif
+
+      // Check for Robbins-Monro adaption
+      use_robbins_monro = GetFromManager<bool>(adapt_manager["AdaptionOptions"]["Settings"]["UseRobbinsMonro"], false);
   target_acceptance = GetFromManager<double>(adapt_manager["AdaptionOptions"]["Settings"]["TargetAcceptance"], 0.234);
   if (target_acceptance <= 0 || target_acceptance >= 1) {
     MACH3LOG_ERROR("Target acceptance must be in (0,1), got {}", target_acceptance);

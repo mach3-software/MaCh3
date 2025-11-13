@@ -29,7 +29,7 @@ void manager::Initialise() {
 
 
   #ifdef MPIENABLED
-  InitialiseMPI()
+  InitialiseMPI();
   #endif
 
     MACH3LOG_INFO("Setting config to be: {}", FileName);
@@ -46,14 +46,14 @@ void manager::InitialiseMPI(){
   int ini = 0;
   MPI_Initialized(&ini);
   if(!ini){
-    MACH3LOG_WARNING("MPI not initialised, not running as an MPI process")
+    MACH3LOG_WARN("MPI not initialised, not running as an MPI process");
   }
 
 
   // Print out MPI information
   int total_processes = 0;
-  SetMaCh3MPILogging()
-  MPI_Comm_size(MPI_COMM_WORLD, &total_processes);SetMaCh3MPILogging
+  SetMaCh3MPILogging();
+  MPI_Comm_size(MPI_COMM_WORLD, &total_processes);
   MACH3LOG_INFO("Starting MaCh3 with MPI support, total processes: {}", total_processes);
 
   // Register a safe finalizer to be run at program exit. This avoids
