@@ -1,0 +1,30 @@
+<map id="PSO" name="PSO">
+<area shape="rect" id="node1" title="Class PSO, consist of a vector of object Class Particle and global best Takes in the size (number of ..." alt="" coords="2528,816,2579,843"/>
+<area shape="rect" id="node2" href="$classLikelihoodFit.html" title="Implementation of base Likelihood Fit class, it is mostly responsible for likelihood calculation whil..." alt="" coords="2296,595,2391,621"/>
+<area shape="rect" id="node3" href="$classFitterBase.html" title="Base class for implementing fitting algorithms." alt="" coords="2076,561,2159,588"/>
+<area shape="rect" id="node4" title=" " alt="" coords="1740,561,1941,588"/>
+<area shape="rect" id="node5" title=" " alt="" coords="768,133,963,160"/>
+<area shape="rect" id="node17" title=" " alt="" coords="1132,171,1291,213"/>
+<area shape="rect" id="node6" title=" " alt="" coords="1737,487,1945,513"/>
+<area shape="rect" id="node7" href="$classcovarianceBase.html" title="Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada..." alt="" coords="1501,399,1616,425"/>
+<area shape="rect" id="node8" title=" " alt="" coords="1109,120,1313,147"/>
+<area shape="rect" id="node9" title=" " alt="" coords="1133,315,1289,357"/>
+<area shape="rect" id="node10" title=" " alt="" coords="783,315,948,341"/>
+<area shape="rect" id="node11" title=" " alt="" coords="202,443,282,469"/>
+<area shape="rect" id="node13" href="$classadaptive__mcmc_1_1AdaptiveMCMCHandler.html" title="Contains information about adaptive covariance matrix ." alt="" coords="1083,432,1340,459"/>
+<area shape="rect" id="node21" href="$classMaCh3Modes.html" title="KS: Class describing MaCh3 modes used in the analysis, it is being initialised from config." alt="" coords="1160,917,1263,944"/>
+<area shape="rect" id="node22" title=" " alt="" coords="597,881,744,922"/>
+<area shape="rect" id="node24" href="$structMaCh3ModeInfo.html" title="KS: Class containing information for a single MaCh3Mode." alt="" coords="455,780,573,807"/>
+<area shape="rect" id="node25" href="$classmanager.html" title="The manager class is responsible for managing configurations and settings." alt="" coords="987,21,1059,48"/>
+<area shape="rect" id="node12" title=" " alt="" coords="5,435,132,477"/>
+<area shape="rect" id="node14" title=" " alt="" coords="181,907,303,933"/>
+<area shape="rect" id="node15" title=" " alt="" coords="793,672,938,699"/>
+<area shape="rect" id="node16" title=" " alt="" coords="1133,649,1289,690"/>
+<area shape="rect" id="node28" href="$classparticle.html" title="Class particle &#45; stores the position, velocity and personal best With functions which move particle a..." alt="" coords="2085,948,2150,975"/>
+<area shape="rect" id="node18" title=" " alt="" coords="1146,765,1277,792"/>
+<area shape="rect" id="node19" title=" " alt="" coords="1733,877,1948,904"/>
+<area shape="rect" id="node20" href="$classsamplePDFBase.html" title="Class responsible for handling implementation of samples used in analysis, reweighting and returning ..." alt="" coords="1499,867,1619,893"/>
+<area shape="rect" id="node23" title=" " alt="" coords="782,798,949,839"/>
+<area shape="rect" id="node26" title=" " alt="" coords="2266,867,2421,893"/>
+<area shape="rect" id="node27" title=" " alt="" coords="2264,980,2423,1007"/>
+</map>
