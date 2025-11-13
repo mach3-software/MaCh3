@@ -71,6 +71,9 @@ class FitterBase {
   /// @brief Get name of class
   inline std::string GetName() const {return AlgorithmName;};
  protected:
+  /// @brief Initialise FitterBase variables
+  void Init();
+
   /// @brief Process MCMC output
   void ProcessMCMC();
 
@@ -177,6 +180,14 @@ class FitterBase {
   bool debug;
   /// Debugging Output file
   std::ofstream debugFile;
+  #endif
+
+  // MPI specific settings
+  #ifdef MPIENABLED
+  /// MPI rank
+  int mpi_rank;
+  /// Number of running MPI processes
+  int n_procs;
   #endif
 };
 

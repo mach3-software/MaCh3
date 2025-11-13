@@ -15,57 +15,15 @@ _MaCh3_Safe_Include_End_ //}
 // Now we can dump manager settings to the output file
 FitterBase::FitterBase(manager * const man) : fitMan(man) {
 // *************************
-  AlgorithmName = "";
-  //Get mach3 modes from manager
-  random = std::make_unique<TRandom3>(Get<int>(fitMan->raw()["General"]["Seed"], __FILE__, __LINE__));
-
-  // Counter of the accepted # of steps
-  accCount = 0;
-  step = 0;
-  stepStart = 0;
-
-  clock = std::make_unique<TStopwatch>();
-  stepClock = std::make_unique<TStopwatch>();
-  #ifdef DEBUG
-  // Fit summary and debug info
-  debug = GetFromManager<bool>(fitMan->raw()["General"]["Debug"], false, __FILE__ , __LINE__);
+#ifdef MPIENABLED
+  /// Get number of processes
+  MPI_Comm_size(MPI_COMM_WORLD, &n_procs);
+  /// Get MPI rank
+  MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
+  /// Set up MPI
+  MACH3LOG_INFO("Initialising fitter with MPI rank {}", mpi_rank);
   #endif
-
-  auto outfile = Get<std::string>(fitMan->raw()["General"]["OutputFile"], __FILE__ , __LINE__);
-  // Save output every auto_save steps
-  //you don't want this too often https://root.cern/root/html606/TTree_8cxx_source.html#l01229
-  auto_save = Get<int>(fitMan->raw()["General"]["MCMC"]["AutoSave"], __FILE__ , __LINE__);
-
-  #ifdef MULTITHREAD
-  //KS: TODO This should help with performance when saving entries to ROOT file. I didn't have time to validate hence commented out
-  //Based on other tests it is really helpful
-  //ROOT::EnableImplicitMT();
-  #endif
-  // Set the output file
-  outputFile = M3::Open(outfile, "RECREATE", __FILE__, __LINE__);
-  outputFile->cd();
-  // Set output tree
-  outTree = new TTree("posteriors", "Posterior_Distributions");
-  // Auto-save every 200MB, the bigger the better https://root.cern/root/html606/TTree_8cxx_source.html#l01229
-  outTree->SetAutoSave(-200E6);
-
-  FileSaved = false;
-  SettingsSaved = false;
-  OutputPrepared = false;
-
-  //Create TDirectory
-  CovFolder = outputFile->mkdir("CovarianceFolder");
-  outputFile->cd();
-  SampleFolder = outputFile->mkdir("SampleFolder");
-  outputFile->cd();
-
-  #ifdef DEBUG
-  // Prepare the output log file
-  if (debug) debugFile.open((outfile+".log").c_str());
-  #endif
-
-  TotalNSamples = 0;
-  fTestLikelihood = GetFromManager<bool>(fitMan->raw()["General"]["Fitter"]["FitTestLikelihood"], false, __FILE__ , __LINE__);
+  Init();
 }
 
 // *************************
@@ -151,6 +109,67 @@ void FitterBase::SaveSettings() {
   SampleFolder->Close();
 
   SettingsSaved = true;
+}
+
+void FitterBase::Init(){
+  AlgorithmName = "";
+  // Get mach3 modes from manager
+  random = std::make_unique<TRandom3>(Get<int>(fitMan->raw()["General"]["Seed"], __FILE__, __LINE__));
+
+  // Counter of the accepted # of steps
+  accCount = 0;
+  step = 0;
+  stepStart = 0;
+
+  clock = std::make_unique<TStopwatch>();
+  stepClock = std::make_unique<TStopwatch>();
+#ifdef DEBUG
+  // Fit summary and debug info
+  debug = GetFromManager<bool>(fitMan->raw()["General"]["Debug"], false, __FILE__, __LINE__);
+#endif
+
+  auto outfile = Get<std::string>(fitMan->raw()["General"]["OutputFile"], __FILE__, __LINE__);
+  
+  #ifdef MPIENABLED
+  // Add rank to output file name
+  outfile = outfile.substr(0, outfile.find_last_of('.')) + "_rank" + std::to_string(mpi_rank) + outfile.substr(outfile.find_last_of('.'));
+  #endif
+
+  // Save output every auto_save steps
+  // you don't want this too often https://root.cern/root/html606/TTree_8cxx_source.html#l01229
+  auto_save = Get<int>(fitMan->raw()["General"]["MCMC"]["AutoSave"], __FILE__, __LINE__);
+
+#ifdef MULTITHREAD
+// KS: TODO This should help with performance when saving entries to ROOT file. I didn't have time to validate hence commented out
+// Based on other tests it is really helpful
+// ROOT::EnableImplicitMT();
+#endif
+  // Set the output file
+  outputFile = M3::Open(outfile, "RECREATE", __FILE__, __LINE__);
+  outputFile->cd();
+  // Set output tree
+  outTree = new TTree("posteriors", "Posterior_Distributions");
+  // Auto-save every 200MB, the bigger the better https://root.cern/root/html606/TTree_8cxx_source.html#l01229
+  outTree->SetAutoSave(-200E6);
+
+  FileSaved = false;
+  SettingsSaved = false;
+  OutputPrepared = false;
+
+  // Create TDirectory
+  CovFolder = outputFile->mkdir("CovarianceFolder");
+  outputFile->cd();
+  SampleFolder = outputFile->mkdir("SampleFolder");
+  outputFile->cd();
+
+#ifdef DEBUG
+  // Prepare the output log file
+  if (debug)
+    debugFile.open((outfile + ".log").c_str());
+#endif
+
+  TotalNSamples = 0;
+  fTestLikelihood = GetFromManager<bool>(fitMan->raw()["General"]["Fitter"]["FitTestLikelihood"], false, __FILE__, __LINE__);
 }
 
 // *******************
