@@ -56,6 +56,8 @@ private:
   /// @brief Common inialiser for both constructors
   void Initialise();
 
+  void InitialiseMPI();
+
   /// The YAML node containing the configuration data.
   YAML::Node config;
   /// The name of the configuration file.

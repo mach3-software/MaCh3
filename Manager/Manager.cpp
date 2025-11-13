@@ -26,15 +26,52 @@ manager::manager(const YAML::Node ConfigNode) {
 // *************************
 void manager::Initialise() {
 // *************************
+
+
+  #ifdef MPIENABLED
+  InitialiseMPI()
+  #endif
+
+    MACH3LOG_INFO("Setting config to be: {}", FileName);
+
   SetMaCh3LoggerFormat();
   MaCh3Utils::MaCh3Welcome();
-
-  MACH3LOG_INFO("Setting config to be: {}", FileName);
 
   MACH3LOG_INFO("Config is now: ");
   MaCh3Utils::PrintConfig(config);
 }
 
+#ifdef MPIENABLED
+void manager::InitialiseMPI(){
+  int ini = 0;
+  MPI_Initialized(&ini);
+  if(!ini){
+    MACH3LOG_WARNING("MPI not initialised, not running as an MPI process")
+  }
+
+
+  // Print out MPI information
+  int total_processes = 0;
+  SetMaCh3MPILogging()
+  MPI_Comm_size(MPI_COMM_WORLD, &total_processes);SetMaCh3MPILogging
+  MACH3LOG_INFO("Starting MaCh3 with MPI support, total processes: {}", total_processes);
+
+  // Register a safe finalizer to be run at program exit. This avoids
+  // calling MPI_Finalize() from the manager destructor where static
+  // destruction order can cause "MPI_FINALIZE CANNOT..." errors.
+  std::atexit([]()
+  {
+    int initialised = 0;
+    int finalised = 0;
+    MPI_Initialized(&initialised);
+    MPI_Finalized(&finalised);
+    if (initialised && !finalised) {
+      MPI_Finalize();
+    } });
+    
+
+  }
+  #endif
 
 // *************************
 // Empty destructor, for now...
