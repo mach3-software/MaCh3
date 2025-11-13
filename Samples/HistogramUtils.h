@@ -69,6 +69,9 @@ void MakeFluctuatedHistogramStandard(TH1D *FluctHist, TH1D* PolyHist, TRandom3* 
 /// @brief Make Poisson fluctuation of TH1D hist using slow method which is only for cross-check
 void MakeFluctuatedHistogramAlternative(TH1D *FluctHist, TH1D* PolyHist, TRandom3* rand);
 
+/// @brief Make Poisson fluctuation of TH2D hist
+void MakeFluctuatedHistogramAlternative(TH2D *FluctHist, TH2D* PolyHist, TRandom3* rand);
+
 /// @brief Make Poisson fluctuation of TH2Poly hist using default fast method
 void MakeFluctuatedHistogramStandard(TH2Poly *FluctHist, TH2Poly* PolyHist, TRandom3* rand);
 /// @brief Make Poisson fluctuation of TH2Poly hist using slow method which is only for cross-check

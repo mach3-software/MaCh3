@@ -460,6 +460,21 @@ void MakeFluctuatedHistogramAlternative(TH1D* FluctHist, TH1D* PolyHist, TRandom
   }
 }
 
+void MakeFluctuatedHistogramAlternative(TH2D* FluctHist, TH2D* PolyHist, TRandom3* rand) {
+    FluctHist->Reset();
+
+    const double evrate = PolyHist->Integral();
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wconversion"
+    const int num = rand->Poisson(evrate);
+    #pragma GCC diagnostic pop
+
+    double x, y;
+    for (int count = 0; count < num; ++count) {
+        PolyHist->GetRandom2(x, y);
+        FluctHist->Fill(x, y);
+    }
+}
 // ****************
 //KS: ROOT developers were too lazy do develop getRanom2 for TH2Poly, this implementation is based on:
 // https://root.cern.ch/doc/master/classTH2.html#a883f419e1f6899f9c4255b458d2afe2e
