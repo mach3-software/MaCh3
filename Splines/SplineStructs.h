@@ -28,8 +28,7 @@ struct FastSplineInfo {
   }
 
   /// @brief Destructor
-  virtual ~FastSplineInfo() {
-  }
+  virtual ~FastSplineInfo() = default;
 
   /// Number of points in spline
   M3::int_t nPts;
