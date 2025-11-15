@@ -1177,8 +1177,17 @@ void MCMCProcessor::MakeCovariance_MP(bool Mute) {
     for (int j = 0; j <= i; ++j)
     {
       // Skip the diagonal elements which we've already done above
-      if (j == i) continue;
-      
+      if (j == i) {
+        if (IamVaried[i] == false) {
+          ParameterEnum ParType = ParamType[i];
+          int ParamNo = i - ParamTypeStartPos[ParType];
+          (*Covariance)(i,j) = ParamErrors[ParType][ParamNo]*ParamErrors[ParType][ParamNo];
+          MACH3LOG_WARN("Setting diagonal term in covariance to {} (prior error)^2", ParamErrors[ParType][ParamNo]*ParamErrors[ParType][ParamNo]);
+          MACH3LOG_WARN("Done this for parameter {} which is not varied i.e. element {}", BranchNames[i].Data(), i);
+        } 
+        continue;
+      }
+
       // If this parameter isn't varied
       if (IamVaried[j] == false) {
         (*Covariance)(i,j) = 0.0;
