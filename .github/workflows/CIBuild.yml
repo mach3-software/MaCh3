@@ -77,7 +77,6 @@ jobs:
         GITHUB_HEAD_REF: ${{ github.head_ref }}
 
     - name: Free disk space for ICPX
-      if: ${{ matrix.os == 'Alma9 ICPX NoMultithreading' }}
       run: |
         echo "Performing full cleanup for ICPX build..."
         sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc || true
