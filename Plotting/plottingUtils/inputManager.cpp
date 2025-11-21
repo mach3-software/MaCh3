@@ -685,7 +685,7 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, const bool printThought
 
         postTree = inputFileDef.file->Get<TTree>(rawLoc.c_str());
 
-        if ( postTree != nullptr )
+        if ( postTree != nullptr & postTree->GetNbranches() != 0 )
         {
           inputFileDef.mcmcProc = new MCMCProcessor(inputFileDef.fileName);
           inputFileDef.mcmcProc->Initialise();
