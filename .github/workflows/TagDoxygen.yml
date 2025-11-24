@@ -19,14 +19,14 @@ jobs:
     steps:
       # Checkout gh-pages (source of docs)
       - name: Checkout gh-pages branch
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: gh-pages
           path: gh-pages
 
       # Checkout gh-pages-archive (destination)
       - name: Checkout gh-pages-archive branch
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: gh-pages-archive
           path: gh-pages-archive
