@@ -274,8 +274,9 @@ void FitterBase::AddSampleHandler(SampleHandlerBase * const sample) {
 
   for (const auto &s : samples) {
     if (s->GetName() == sample->GetName()) {
-      MACH3LOG_ERROR("SampleHandler with name '{}' already exists!", sample->GetName());
-      throw MaCh3Exception(__FILE__ , __LINE__ );
+      MACH3LOG_WARN("SampleHandler with name '{}' already exists!", sample->GetName());
+      MACH3LOG_WARN("Is it intended?");
+      //throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   }
   // Save additional info from samples
