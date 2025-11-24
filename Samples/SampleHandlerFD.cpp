@@ -125,6 +125,7 @@ void SampleHandlerFD::LoadSingleSample(const int iSample, const YAML::Node& Samp
   int NChannels = static_cast<M3::int_t>(SampleSettings["SubSamples"].size());
   SingleSample.OscChannels.reserve(NChannels);
 
+  int OscChannelCounter = 0;
   for (auto const &osc_channel : SampleSettings["SubSamples"]) {
     std::string MTupleFileName = mtupleprefix+osc_channel["mtuplefile"].as<std::string>()+mtuplesuffix;
 
@@ -133,7 +134,7 @@ void SampleHandlerFD::LoadSingleSample(const int iSample, const YAML::Node& Samp
     OscInfo.flavourName_Latex = osc_channel["LatexName"].as<std::string>();
     OscInfo.InitPDG           = static_cast<NuPDG>(osc_channel["nutype"].as<int>());
     OscInfo.FinalPDG          = static_cast<NuPDG>(osc_channel["oscnutype"].as<int>());
-    OscInfo.ChannelIndex      = GetNOscChannels(iSample);
+    OscInfo.ChannelIndex      = OscChannelCounter;
 
     SingleSample.OscChannels.push_back(std::move(OscInfo));
 
@@ -142,6 +143,7 @@ void SampleHandlerFD::LoadSingleSample(const int iSample, const YAML::Node& Samp
 
     SingleSample.mc_files.push_back(MTupleFileName);
     SingleSample.spline_files.push_back(splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);
+    OscChannelCounter++;
   }
   //Now grab the selection cuts from the manager
   for ( auto const &SelectionCuts : SampleSettings["SelectionCuts"]) {
@@ -1154,46 +1156,57 @@ void SampleHandlerFD::InitialiseNuOscillatorObjects() {
 }
 
 void SampleHandlerFD::SetupNuOscillatorPointers() {
+  auto AddOscPointer = GetFromManager<bool>(SampleManager->raw()["NuOsc"]["AddOscPointer"], true, __FILE__ , __LINE__);
+  // Sometimes we don't want to add osc pointer to allow for some experiment specific handling of osc weight, like for example being able to shift osc weigh
+  if(!AddOscPointer) {
+    return;
+  }
   for (unsigned int iEvent=0;iEvent<GetNEvents();iEvent++) {
-    const M3::float_t* osc_w_pointer = &M3::Unity;
-    if (MCSamples[iEvent].isNC) {
-      if (*MCSamples[iEvent].nupdg != *MCSamples[iEvent].nupdgUnosc) {
-        osc_w_pointer = &M3::Zero;
-      } else {
-        osc_w_pointer = &M3::Unity;
-      }
+   const M3::float_t* osc_w_pointer = GetNuOscillatorPointers(iEvent);
+
+   // KS: Do not add unity
+   if (osc_w_pointer != &M3::Unity) {
+     MCSamples[iEvent].total_weight_pointers.push_back(osc_w_pointer);
+   }
+  }
+}
+
+const M3::float_t* SampleHandlerFD::GetNuOscillatorPointers(const int iEvent) const {
+  const M3::float_t* osc_w_pointer = &M3::Unity;
+  if (MCSamples[iEvent].isNC) {
+    if (*MCSamples[iEvent].nupdg != *MCSamples[iEvent].nupdgUnosc) {
+      osc_w_pointer = &M3::Zero;
     } else {
-      int InitFlav = M3::_BAD_INT_;
-      int FinalFlav = M3::_BAD_INT_;
-
-      InitFlav =  MaCh3Utils::PDGToNuOscillatorFlavour((*MCSamples[iEvent].nupdgUnosc));
-      FinalFlav = MaCh3Utils::PDGToNuOscillatorFlavour((*MCSamples[iEvent].nupdg));
-
-      if (InitFlav == M3::_BAD_INT_ || FinalFlav == M3::_BAD_INT_) {
-        MACH3LOG_ERROR("Something has gone wrong in the mapping between MCSamples.nutype and the enum used within NuOscillator");
-        MACH3LOG_ERROR("MCSamples.nupdgUnosc: {}", (*MCSamples[iEvent].nupdgUnosc));
-        MACH3LOG_ERROR("InitFlav: {}", InitFlav);
-        MACH3LOG_ERROR("MCSamples.nupdg: {}", (*MCSamples[iEvent].nupdg));
-        MACH3LOG_ERROR("FinalFlav: {}", FinalFlav);
-        throw MaCh3Exception(__FILE__, __LINE__);
-      }
-      const int Sample = MCSamples[iEvent].NominalSample;
-
-      const int OscIndex = GetOscChannel(SampleDetails[Sample].OscChannels, (*MCSamples[iEvent].nupdgUnosc), (*MCSamples[iEvent].nupdg));
-      //Can only happen if truecz has been initialised within the experiment specific code
-      if (*(MCSamples[iEvent].rw_truecz) != M3::_BAD_DOUBLE_) {
-        //Atmospherics
-        osc_w_pointer = Oscillator->GetNuOscillatorPointers(Sample, OscIndex, InitFlav, FinalFlav, FLOAT_T(*(MCSamples[iEvent].rw_etru)), FLOAT_T(*(MCSamples[iEvent].rw_truecz)));
-      } else {
-        //Beam
-        osc_w_pointer = Oscillator->GetNuOscillatorPointers(Sample, OscIndex, InitFlav, FinalFlav, FLOAT_T(*(MCSamples[iEvent].rw_etru)));
-      }
-    } // end if NC
-    // KS: Do not add unity
-    if (osc_w_pointer != &M3::Unity) {
-      MCSamples[iEvent].total_weight_pointers.push_back(osc_w_pointer);
+      osc_w_pointer = &M3::Unity;
     }
-  } // end loop over events
+  } else {
+    int InitFlav = M3::_BAD_INT_;
+    int FinalFlav = M3::_BAD_INT_;
+
+    InitFlav =  MaCh3Utils::PDGToNuOscillatorFlavour((*MCSamples[iEvent].nupdgUnosc));
+    FinalFlav = MaCh3Utils::PDGToNuOscillatorFlavour((*MCSamples[iEvent].nupdg));
+
+    if (InitFlav == M3::_BAD_INT_ || FinalFlav == M3::_BAD_INT_) {
+      MACH3LOG_ERROR("Something has gone wrong in the mapping between MCSamples.nutype and the enum used within NuOscillator");
+      MACH3LOG_ERROR("MCSamples.nupdgUnosc: {}", (*MCSamples[iEvent].nupdgUnosc));
+      MACH3LOG_ERROR("InitFlav: {}", InitFlav);
+      MACH3LOG_ERROR("MCSamples.nupdg: {}", (*MCSamples[iEvent].nupdg));
+      MACH3LOG_ERROR("FinalFlav: {}", FinalFlav);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    const int Sample = MCSamples[iEvent].NominalSample;
+
+    const int OscIndex = GetOscChannel(SampleDetails[Sample].OscChannels, (*MCSamples[iEvent].nupdgUnosc), (*MCSamples[iEvent].nupdg));
+    //Can only happen if truecz has been initialised within the experiment specific code
+    if (*(MCSamples[iEvent].rw_truecz) != M3::_BAD_DOUBLE_) {
+      //Atmospherics
+      osc_w_pointer = Oscillator->GetNuOscillatorPointers(Sample, OscIndex, InitFlav, FinalFlav, FLOAT_T(*(MCSamples[iEvent].rw_etru)), FLOAT_T(*(MCSamples[iEvent].rw_truecz)));
+    } else {
+      //Beam
+      osc_w_pointer = Oscillator->GetNuOscillatorPointers(Sample, OscIndex, InitFlav, FinalFlav, FLOAT_T(*(MCSamples[iEvent].rw_etru)));
+    }
+  } // end if NC
+  return osc_w_pointer;
 }
 
 std::string SampleHandlerFD::GetName() const {
