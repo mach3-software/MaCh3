@@ -91,15 +91,12 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
   }
   //Only if GPU is enabled
   #ifdef MaCh3_CUDA
+   GPUProcessor = std::make_unique<MCMCProcessorGPU>();
+
    ParStep_cpu = nullptr;
    NumeratorSum_cpu = nullptr;
    ParamSums_cpu = nullptr;
    DenomSum_cpu = nullptr;
-
-   ParStep_gpu = nullptr;
-   NumeratorSum_gpu = nullptr;
-   ParamSums_gpu = nullptr;
-   DenomSum_gpu = nullptr;
   #endif
 }
 
@@ -229,7 +226,7 @@ void MCMCProcessor::MakeOutputFile() {
   OutputName = MCMCFile + OutputSuffix +".root";
 
   // Output file
-  OutputFile = new TFile(OutputName.c_str(), "recreate");
+  OutputFile = M3::Open(OutputName, "recreate", __FILE__, __LINE__);
   OutputFile->cd();
 }
 
@@ -287,13 +284,13 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
     MACH3LOG_DEBUG("Initialising histogram for {} with binning {:.4f}, {:.4f}", Title, mini, maxi);
     // This holds the posterior density
     hpost[i] = new TH1D(BranchNames[i], BranchNames[i], nBins, mini, maxi);
+    hpost[i]->SetDirectory(nullptr);
     hpost[i]->SetMinimum(0);
     hpost[i]->GetYaxis()->SetTitle("Steps");
     hpost[i]->GetYaxis()->SetNoExponent(false);
 
-
     // Project BranchNames[i] onto hpost, applying stepcut
-        Chain->Project(BranchNames[i], BranchNames[i], CutPosterior1D.c_str());
+    Chain->Project(BranchNames[i], BranchNames[i], CutPosterior1D.c_str());
 
     if(ApplySmoothing) hpost[i]->Smooth();
 
@@ -1015,6 +1012,7 @@ void MCMCProcessor::MakeCovariance() {
                       nBins, hpost[i]->GetXaxis()->GetXmin(), hpost[i]->GetXaxis()->GetXmax(),
                       nBins, hpost[j]->GetXaxis()->GetXmin(), hpost[j]->GetXaxis()->GetXmax());
       hpost_2D->SetMinimum(0);
+      hpost_2D->SetDirectory(nullptr);
       hpost_2D->GetXaxis()->SetTitle(Title_i);
       hpost_2D->GetYaxis()->SetTitle(Title_j);
       hpost_2D->GetZaxis()->SetTitle("Steps");
@@ -1326,6 +1324,7 @@ void MCMCProcessor::MakeSubOptimality(const int NIntervals) {
   clock.Start();
   
   std::unique_ptr<TH1D> SubOptimality = std::make_unique<TH1D>("Suboptimality", "Suboptimality", NIntervals, MinStep, MaxStep);
+  SubOptimality->SetDirectory(nullptr);
   SubOptimality->GetXaxis()->SetTitle("Step");
   SubOptimality->GetYaxis()->SetTitle("Suboptimality");
   SubOptimality->SetLineWidth(2);
@@ -1383,11 +1382,14 @@ void MCMCProcessor::DrawCovariance() {
   // The Covariance matrix from the fit
   auto hCov = std::make_unique<TH2D>("hCov", "hCov", nDraw, 0, nDraw, nDraw, 0, nDraw);
   hCov->GetZaxis()->SetTitle("Covariance");
+  hCov->SetDirectory(nullptr);
   // The Covariance matrix square root, with correct sign
   auto hCovSq = std::make_unique<TH2D>("hCovSq", "hCovSq", nDraw, 0, nDraw, nDraw, 0, nDraw);
+  hCovSq->SetDirectory(nullptr);
   hCovSq->GetZaxis()->SetTitle("Covariance");
   // The Correlation
   auto hCorr = std::make_unique<TH2D>("hCorr", "hCorr", nDraw, 0, nDraw, nDraw, 0, nDraw);
+  hCorr->SetDirectory(nullptr);
   hCorr->GetZaxis()->SetTitle("Correlation");
   hCorr->SetMinimum(-1);
   hCorr->SetMaximum(1);
@@ -1665,6 +1667,7 @@ void MCMCProcessor::DrawCorrelations1D() {
     {
       Corr1DHist[i][j] = std::make_unique<TH1D>(Form("Corr1DHist_%i_%i", i, j), Form("Corr1DHist_%i_%i", i, j), nDraw, 0, nDraw);
       Corr1DHist[i][j]->SetTitle(Form("%s",Title.Data()));
+      Corr1DHist[i][j]->SetDirectory(nullptr);
       Corr1DHist[i][j]->GetYaxis()->SetTitle("Correlation");
       Corr1DHist[i][j]->SetFillColor(CorrColours[j]);
       Corr1DHist[i][j]->SetLineColor(kBlack);
@@ -1737,6 +1740,7 @@ void MCMCProcessor::DrawCorrelations1D() {
 
     if(size == 0) continue;
     auto Corr1DHist_Reduced = std::make_unique<TH1D>("Corr1DHist_Reduced", "Corr1DHist_Reduced", size, 0, size);
+    Corr1DHist_Reduced->SetDirectory(nullptr);
     Corr1DHist_Reduced->SetTitle(Corr1DHist[i][0]->GetTitle());
     Corr1DHist_Reduced->GetYaxis()->SetTitle("Correlation");
     Corr1DHist_Reduced->SetFillColor(kBlue);
@@ -2912,7 +2916,7 @@ void MCMCProcessor::GetSavageDickey(const std::vector<std::string>& ParNames,
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
       PriorHist = std::make_unique<TH1D>("PriorHist", Title, NBins, Bounds[k][0], Bounds[k][1]);
-      
+      PriorHist->SetDirectory(nullptr);
       double FlatProb = ( Bounds[k][1] - Bounds[k][0]) / NBins;
       for (int g = 0; g < NBins + 1; ++g) 
       {
@@ -3404,7 +3408,7 @@ void MCMCProcessor::PrepareDiagMCMC() {
   std::vector<double> ParStepBranch(nDraw);
   std::vector<double> SampleValuesBranch(nSampleHandlers);
   std::vector<double> SystValuesBranch(nParameterHandlers);
-  int StepNumberBranch = 0;
+  unsigned int StepNumberBranch = 0;
   double AccProbValuesBranch = 0;
   // Set the branch addresses for params
   for (int j = 0; j < nDraw; ++j) {
@@ -3777,13 +3781,8 @@ void MCMCProcessor::AutoCorrelation() {
   PrepareGPU_AutoCorr(nLags, ParamSums);
 
   //KS: This runs the main kernel and copy results back to CPU
-  RunGPU_AutoCorr(
-    ParStep_gpu,
-    ParamSums_gpu,
-    NumeratorSum_gpu,
-    DenomSum_gpu,
-    NumeratorSum_cpu,
-    DenomSum_cpu);
+  GPUProcessor->RunGPU_AutoCorr(NumeratorSum_cpu,
+                                DenomSum_cpu);
 
   #ifdef MULTITHREAD
   #pragma omp parallel for collapse(2)
@@ -3805,11 +3804,7 @@ void MCMCProcessor::AutoCorrelation() {
   delete[] ParamSums_cpu;
 
   //KS: Delete stuff at GPU as well
-  CleanupGPU_AutoCorr(
-      ParStep_gpu,
-      NumeratorSum_gpu,
-      ParamSums_gpu,
-      DenomSum_gpu);
+  GPUProcessor->CleanupGPU_AutoCorr();
 
 //KS: End of GPU specific code
 #endif
@@ -3894,26 +3889,16 @@ void MCMCProcessor::PrepareGPU_AutoCorr(const int nLags, const std::vector<doubl
   #endif
 
   //KS: First allocate memory on GPU
-  InitGPU_AutoCorr(&ParStep_gpu,
-                   &NumeratorSum_gpu,
-                   &ParamSums_gpu,
-                   &DenomSum_gpu,
-
-                   nEntries,
-                   nDraw,
-                   nLags);
+  GPUProcessor->InitGPU_AutoCorr(nEntries,
+                                 nDraw,
+                                 nLags);
 
 
   //KS: Now copy from CPU to GPU
-  CopyToGPU_AutoCorr(ParStep_cpu,
-                     NumeratorSum_cpu,
-                     ParamSums_cpu,
-                     DenomSum_cpu,
-
-                     ParStep_gpu,
-                     NumeratorSum_gpu,
-                     ParamSums_gpu,
-                     DenomSum_gpu);
+  GPUProcessor->CopyToGPU_AutoCorr(ParStep_cpu,
+                                   NumeratorSum_cpu,
+                                   ParamSums_cpu,
+                                   DenomSum_cpu);
 }
 #endif
 
@@ -3944,6 +3929,7 @@ void MCMCProcessor::CalculateESS(const int nLags, const std::vector<std::vector<
   {
     EffectiveSampleSizeHist[i] =
       std::make_unique<TH1D>(Form("EffectiveSampleSizeHist_%i", i), Form("EffectiveSampleSizeHist_%i", i), nDraw, 0, nDraw);
+    EffectiveSampleSizeHist[i]->SetDirectory(nullptr);
     EffectiveSampleSizeHist[i]->GetYaxis()->SetTitle("N_{eff}/N");
     EffectiveSampleSizeHist[i]->SetFillColor(ESSColours[i]);
     EffectiveSampleSizeHist[i]->SetLineColor(ESSColours[i]);
@@ -4336,6 +4322,7 @@ void MCMCProcessor::GewekeDiagnostic() {
     GetNthParameter(j, Prior, PriorError, Title);
     std::string HistName = Form("%s_%s_Geweke", Title.Data(), BranchNames[j].Data());
     GewekePlots[j] = std::make_unique<TH1D>(HistName.c_str(), HistName.c_str(), NChecks, 0.0, 100 * UpperThreshold);
+    GewekePlots[j]->SetDirectory(nullptr);
     GewekePlots[j]->GetXaxis()->SetTitle("Burn-In (%)");
     GewekePlots[j]->GetYaxis()->SetTitle("Geweke T score");
   }
@@ -4452,10 +4439,12 @@ void MCMCProcessor::AcceptanceProbabilities() {
 
   // Set the titles and limits for TH1Ds
   auto AcceptanceProbPlot = std::make_unique<TH1D>("AcceptanceProbability", "Acceptance Probability", nEntries, 0, nEntries);
+  AcceptanceProbPlot->SetDirectory(nullptr);
   AcceptanceProbPlot->GetXaxis()->SetTitle("Step");
   AcceptanceProbPlot->GetYaxis()->SetTitle("Acceptance Probability");
 
   auto BatchedAcceptanceProblot = std::make_unique<TH1D>("AcceptanceProbability_Batch", "AcceptanceProbability_Batch", nBatches, 0, nBatches);
+  BatchedAcceptanceProblot->SetDirectory(nullptr);
   BatchedAcceptanceProblot->GetYaxis()->SetTitle("Acceptance Probability");
   
   for (int i = 0; i < nBatches; ++i) {
