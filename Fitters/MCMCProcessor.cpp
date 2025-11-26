@@ -92,11 +92,6 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
   //Only if GPU is enabled
   #ifdef MaCh3_CUDA
    GPUProcessor = std::make_unique<MCMCProcessorGPU>();
-
-   ParStep_cpu = nullptr;
-   NumeratorSum_cpu = nullptr;
-   ParamSums_cpu = nullptr;
-   DenomSum_cpu = nullptr;
   #endif
 }
 
@@ -2409,7 +2404,7 @@ void MCMCProcessor::ReadInputCovLegacy() {
 void MCMCProcessor::FindInputFiles() {
 // **************************
   // Now read the MCMC file
-  TFile *TempFile = new TFile(MCMCFile.c_str(), "open");
+  TFile *TempFile = M3::Open(MCMCFile, "open", __FILE__, __LINE__);
   TDirectory* CovarianceFolder = TempFile->Get<TDirectory>("CovarianceFolder");
 
   // Get the settings for the MCMC
@@ -2474,8 +2469,7 @@ void MCMCProcessor::FindInputFiles() {
 void MCMCProcessor::FindInputFilesLegacy() {
 // **************************
   // Now read the MCMC file
-  TFile *TempFile = new TFile(MCMCFile.c_str(), "open");
-
+  TFile *TempFile = M3::Open(MCMCFile, "open", __FILE__, __LINE__);
   // Get the settings for the MCMC
   TMacro *Config = TempFile->Get<TMacro>("MaCh3_Config");
 
@@ -2583,11 +2577,7 @@ void MCMCProcessor::ReadModelFile() {
 void MCMCProcessor::ReadNDFile() {
 // ***************
   // Do the same for the ND280
-  TFile *NDdetFile = new TFile(CovPos[kNDPar].back().c_str(), "open");
-  if (NDdetFile->IsZombie()) {
-    MACH3LOG_ERROR("Couldn't find NDdetFile {}", CovPos[kNDPar].back());
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
+  TFile *NDdetFile = M3::Open(CovPos[kNDPar].back(), "open", __FILE__, __LINE__);
   NDdetFile->cd();
 
   TMatrixDSym *NDdetMatrix = NDdetFile->Get<TMatrixDSym>(CovNamePos[kNDPar].c_str());
@@ -2626,11 +2616,7 @@ void MCMCProcessor::ReadNDFile() {
 void MCMCProcessor::ReadFDFile() {
 // ***************
   // Do the same for the FD
-  TFile *FDdetFile = new TFile(CovPos[kFDDetPar].back().c_str(), "open");
-  if (FDdetFile->IsZombie()) {
-    MACH3LOG_ERROR("Couldn't find FDdetFile {}", CovPos[kFDDetPar].back());
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
+  TFile *FDdetFile = M3::Open(CovPos[kFDDetPar].back(), "open", __FILE__, __LINE__);
   FDdetFile->cd();
 
   TMatrixD *FDdetMatrix = FDdetFile->Get<TMatrixD>(CovNamePos[kFDDetPar].c_str());
@@ -2703,7 +2689,7 @@ void MCMCProcessor::GetNthParameter(const int param, double &Prior, double &Prio
 
 // ***************
 // Find Param Index based on name
-int MCMCProcessor::GetParamIndexFromName(const std::string& Name){
+int MCMCProcessor::GetParamIndexFromName(const std::string& Name) const {
 // **************************
   int ParamNo = M3::_BAD_INT_;
   for (int i = 0; i < nDraw; ++i)
@@ -3059,7 +3045,7 @@ void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
   if (ret != 0)
     MACH3LOG_WARN("Error: system call to copy file failed with code {}", ret);
 
-  TFile *OutputChain = new TFile(OutputFilename.c_str(), "UPDATE");
+  TFile *OutputChain = M3::Open(OutputFilename, "UPDATE", __FILE__, __LINE__);
   OutputChain->cd();
   TTree *post = OutputChain->Get<TTree>("posteriors");
 
@@ -3135,7 +3121,7 @@ void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
 // KS: Smear contours
 void MCMCProcessor::SmearChain(const std::vector<std::string>& Names,
                                const std::vector<double>& Error,
-                               const bool& SaveBranch) {
+                               const bool& SaveBranch) const {
 // **************************
   MACH3LOG_INFO("Starting {}", __func__);
 
@@ -3171,7 +3157,7 @@ void MCMCProcessor::SmearChain(const std::vector<std::string>& Names,
   if (ret != 0)
     MACH3LOG_WARN("Error: system call to copy file failed with code {}", ret);
 
-  TFile *OutputChain = new TFile(OutputFilename.c_str(), "UPDATE");
+  TFile *OutputChain = M3::Open(OutputFilename, "UPDATE", __FILE__, __LINE__);
   OutputChain->cd();
   TTree *post = OutputChain->Get<TTree>("posteriors");
   TTree *treeNew = post->CloneTree(0);
@@ -3231,7 +3217,7 @@ void MCMCProcessor::SmearChain(const std::vector<std::string>& Names,
 void MCMCProcessor::ParameterEvolution(const std::vector<std::string>& Names,
                                        const std::vector<int>& NIntervals) {
 // **************************
-  MACH3LOG_INFO("Parameter Evolution gif");
+  MACH3LOG_INFO("Starting {}", __func__);
 
   //KS: First we need to find parameter number based on name
   for(unsigned int k = 0; k < Names.size(); ++k)
@@ -3777,8 +3763,14 @@ void MCMCProcessor::AutoCorrelation() {
   }
 #else //NOW GPU specific code
   MACH3LOG_INFO("Using GPU");
+  /// Value of each param that will be copied to GPU
+  float* ParStep_cpu = nullptr;
+  float* NumeratorSum_cpu = nullptr;
+  float* ParamSums_cpu = nullptr;
+  float* DenomSum_cpu = nullptr;
+
   //KS: This allocates memory and copy data from CPU to GPU
-  PrepareGPU_AutoCorr(nLags, ParamSums);
+  PrepareGPU_AutoCorr(nLags, ParamSums, ParStep_cpu, NumeratorSum_cpu, ParamSums_cpu, DenomSum_cpu);
 
   //KS: This runs the main kernel and copy results back to CPU
   GPUProcessor->RunGPU_AutoCorr(NumeratorSum_cpu,
@@ -3798,10 +3790,10 @@ void MCMCProcessor::AutoCorrelation() {
     }
   }
   //delete auxiliary variables
-  delete[] NumeratorSum_cpu;
-  delete[] DenomSum_cpu;
-  delete[] ParStep_cpu;
-  delete[] ParamSums_cpu;
+  if(NumeratorSum_cpu) delete[] NumeratorSum_cpu;
+  if(DenomSum_cpu)     delete[] DenomSum_cpu;
+  if(ParStep_cpu)      delete[] ParStep_cpu;
+  if(ParamSums_cpu)    delete[] ParamSums_cpu;
 
   //KS: Delete stuff at GPU as well
   GPUProcessor->CleanupGPU_AutoCorr();
@@ -3836,7 +3828,8 @@ void MCMCProcessor::AutoCorrelation() {
 #ifdef MaCh3_CUDA
 // **************************
 //KS: Allocates memory and copy data from CPU to GPU
-void MCMCProcessor::PrepareGPU_AutoCorr(const int nLags, const std::vector<double>& ParamSums) {
+void MCMCProcessor::PrepareGPU_AutoCorr(const int nLags, const std::vector<double>& ParamSums, float*& ParStep_cpu,
+                                        float*& NumeratorSum_cpu, float*& ParamSums_cpu, float*& DenomSum_cpu) {
 // **************************
   //KS: Create temporary arrays that will communicate with GPU code
   ParStep_cpu = new float[nDraw*nEntries];
