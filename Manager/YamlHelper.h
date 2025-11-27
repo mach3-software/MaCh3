@@ -278,7 +278,10 @@ Type Get(const YAML::Node& node, const std::string File, const int Line) {
   } catch (const YAML::BadConversion& e) {
     const std::string nodeAsString = YAMLtoSTRING(node);
     MACH3LOG_ERROR("YAML type mismatch: {}", e.what());
-    MACH3LOG_ERROR("While trying to access variable {}", nodeAsString);
+    MACH3LOG_ERROR("While trying to access variable \"{}\"", nodeAsString);
+    if (!node || node.IsNull()) {
+      MACH3LOG_ERROR("Requested node does not exist (null or undefined)");
+    }
     throw MaCh3Exception(File , Line );
   } catch (const YAML::InvalidNode& e) {
     std::string key = "<unknown>";
