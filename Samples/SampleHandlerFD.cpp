@@ -894,7 +894,7 @@ TH1* SampleHandlerFD::GetW2Hist(const int Sample, const int Dimension) {
     for (int yBin = 0; yBin < Binning->GetNYBins(Sample); ++yBin) {
       for (int xBin = 0; xBin < Binning->GetNXBins(Sample); ++xBin) {
         const int idx = Binning->GetGlobalBinSafe(Sample, xBin, yBin);
-        W2Hist->AddBinContent(idx + 1, SampleHandlerFD_array_w2[idx]);
+        W2Hist->SetBinContent(idx + 1, SampleHandlerFD_array_w2[idx]);
       }
     }
     return W2Hist;
