@@ -228,15 +228,17 @@ void PredictivePlotting(const std::string& ConfigName,
 int main(int argc, char **argv)
 {
   SetMaCh3LoggerFormat();
-  if ( !(argc == 4 || argc == 5))
+  if (argc < 3)
   {
-    MACH3LOG_ERROR("Need at least two arguments, ./{} <Prior/Post_PredOutput.root> <Prior/Post_PredOutput.root>", argv[0]);
+    MACH3LOG_ERROR("Need at least two arguments, {} <Config.Yaml> <Prior/Post_PredOutput.root>", argv[0]);
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-
   std::string ConfigName = std::string(argv[1]);
-  std::vector<std::string> FileNames = {std::string(argv[2]), std::string(argv[3])};
-  if (argc == 5) FileNames.push_back(std::string(argv[4]));
+  // Collect all remaining arguments as file names
+  std::vector<std::string> FileNames;
+  for (int i = 2; i < argc; ++i) {
+    FileNames.emplace_back(argv[i]);
+  }
 
   PredictivePlotting(ConfigName, FileNames);
 

@@ -125,6 +125,7 @@ void SampleHandlerFD::LoadSingleSample(const int iSample, const YAML::Node& Samp
   int NChannels = static_cast<M3::int_t>(SampleSettings["SubSamples"].size());
   SingleSample.OscChannels.reserve(NChannels);
 
+  int OscChannelCounter = 0;
   for (auto const &osc_channel : SampleSettings["SubSamples"]) {
     std::string MTupleFileName = mtupleprefix+osc_channel["mtuplefile"].as<std::string>()+mtuplesuffix;
 
@@ -133,7 +134,7 @@ void SampleHandlerFD::LoadSingleSample(const int iSample, const YAML::Node& Samp
     OscInfo.flavourName_Latex = osc_channel["LatexName"].as<std::string>();
     OscInfo.InitPDG           = static_cast<NuPDG>(osc_channel["nutype"].as<int>());
     OscInfo.FinalPDG          = static_cast<NuPDG>(osc_channel["oscnutype"].as<int>());
-    OscInfo.ChannelIndex      = GetNOscChannels(iSample);
+    OscInfo.ChannelIndex      = OscChannelCounter;
 
     SingleSample.OscChannels.push_back(std::move(OscInfo));
 
@@ -142,6 +143,7 @@ void SampleHandlerFD::LoadSingleSample(const int iSample, const YAML::Node& Samp
 
     SingleSample.mc_files.push_back(MTupleFileName);
     SingleSample.spline_files.push_back(splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);
+    OscChannelCounter++;
   }
   //Now grab the selection cuts from the manager
   for ( auto const &SelectionCuts : SampleSettings["SelectionCuts"]) {
