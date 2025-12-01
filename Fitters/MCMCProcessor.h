@@ -39,6 +39,7 @@ _MaCh3_Safe_Include_End_ //}
 //KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
 class TChain;
 class TF1;
+class MCMCProcessorGPU;
 
 /// @todo KS: Implement Diagnostics/GetPenaltyTerm.cpp here.
 /// KS: Enum for different covariance classes
@@ -186,7 +187,7 @@ class MCMCProcessor {
     /// @param SaveBranch Whether we save unsmeared branch or not
     void SmearChain(const std::vector<std::string>& Names,
                     const std::vector<double>& NewCentral,
-                    const bool& SaveBranch);
+                    const bool& SaveBranch) const;
 
     /// @brief Make .gif of parameter evolution
     /// @param Names Parameter names for which we do .gif
@@ -246,7 +247,7 @@ class MCMCProcessor {
     /// @brief Get properties of parameter by passing it number
     void GetNthParameter(const int param, double &Prior, double &PriorError, TString &Title) const;
     /// @brief Get parameter number based on name
-    int GetParamIndexFromName(const std::string& Name);
+    int GetParamIndexFromName(const std::string& Name) const;
     /// @brief Get Number of entries that Chain has, for merged chains will not be the same Nsteps
     inline Long64_t GetnEntries(){return nEntries;};
     /// @brief Get Number of Steps that Chain has, for merged chains will not be the same nEntries
@@ -590,18 +591,8 @@ class MCMCProcessor {
   //Only if GPU is enabled
   #ifdef MaCh3_CUDA
     /// @brief Move stuff to GPU to perform auto correlation calculations there
-    inline void PrepareGPU_AutoCorr(const int nLags, const std::vector<double>& ParamSums);
-
-    /// Value of each param that will be copied to GPU
-    float* ParStep_cpu;
-    float* NumeratorSum_cpu;
-    float* ParamSums_cpu;
-    float* DenomSum_cpu;
-
-    /// Value of each param at GPU
-    float* ParStep_gpu;
-    float* NumeratorSum_gpu;
-    float* ParamSums_gpu;
-    float* DenomSum_gpu;
+    void PrepareGPU_AutoCorr(const int nLags, const std::vector<double>& ParamSums, float*& ParStep_cpu,
+                             float*& NumeratorSum_cpu, float*& ParamSums_cpu, float*& DenomSum_cpu);
+    std::unique_ptr<MCMCProcessorGPU> GPUProcessor;
   #endif
 };
