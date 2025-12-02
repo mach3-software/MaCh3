@@ -131,11 +131,11 @@ void PredictiveThrower::SetupToyGeneration() {
 
     ///Let's ask the manager what are the file with covariance matrix
     YAML::Node ConfigInChain = Processor.GetCovConfig(kXSecPar);
-    if(ModelSystematic){
+    if(ModelSystematic) {
       YAML::Node ConfigNow = ModelSystematic->GetConfig();
       if (!compareYAMLNodes(ConfigNow, ConfigInChain))
       {
-        MACH3LOG_ERROR("Yaml configs in previous chain and current one are different", PosteriorFileName);
+        MACH3LOG_ERROR("Yaml configs used for your ParameterHandler for chain you want sample from ({}) and one currently initialised are different", PosteriorFileName);
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
     }

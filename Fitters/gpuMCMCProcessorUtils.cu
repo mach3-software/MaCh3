@@ -25,8 +25,7 @@ MCMCProcessorGPU::MCMCProcessorGPU() {
   DenomSum_gpu = nullptr;
 }
 
-MCMCProcessorGPU::~MCMCProcessorGPU(){
-
+MCMCProcessorGPU::~MCMCProcessorGPU() {
 }
 
 // *******************************************
