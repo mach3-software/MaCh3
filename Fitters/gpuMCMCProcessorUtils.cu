@@ -9,11 +9,6 @@ __device__ __constant__ int d_nLag;
 __device__ __constant__ int d_nDraws;
 __device__ __constant__ int d_nEntries;
 
-// h_NAME declares HOST constants (live on CPU)
-static int h_nLag     = -1;
-static int h_nDraws   = -1;
-static int h_nEntries = -1;
-
 // *******************************************
 //              INITIALISE GPU
 // *******************************************
@@ -23,6 +18,10 @@ MCMCProcessorGPU::MCMCProcessorGPU() {
   NumeratorSum_gpu = nullptr;
   ParamSums_gpu = nullptr;
   DenomSum_gpu = nullptr;
+
+  h_nLag     = -1;
+  h_nDraws   = -1;
+  h_nEntries = -1;
 }
 
 MCMCProcessorGPU::~MCMCProcessorGPU(){
@@ -64,7 +63,7 @@ __host__ void MCMCProcessorGPU::InitGPU_AutoCorr(
   cudaMalloc((void **) &ParamSums_gpu, h_nDraws*sizeof(float));
   CudaCheckError();
 
-  //store value of paramter for each step
+  //store value of parameter for each step
   cudaMalloc((void **) &ParStep_gpu, h_nDraws*h_nEntries*sizeof(float*));
   CudaCheckError();
 
