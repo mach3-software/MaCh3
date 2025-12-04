@@ -1288,11 +1288,6 @@ double SampleHandlerFD::GetSampleLikelihood(const int isample) const {
 // ************************************************
 double SampleHandlerFD::GetLikelihood() const {
 // ************************************************
-  if (SampleHandlerFD_data == nullptr) {
-    MACH3LOG_ERROR("Data sample is empty! Can't calculate a likelihood!");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-    
   double negLogL = 0.;
   #ifdef MULTITHREAD
   #pragma omp parallel for reduction(+:negLogL)
@@ -2007,3 +2002,54 @@ const double* SampleHandlerFD::GetPointerToOscChannel(const int iEvent) const {
 
   return &(OscillationChannels[Channel].ChannelIndex);
 }
+
+// ***************************************************************************
+// Helper function to print rates for the samples with LLH
+void SampleHandlerFD::PrintRates(const bool DataOnly) {
+// ***************************************************************************
+  if (SampleHandlerFD_data == nullptr) {
+    MACH3LOG_ERROR("Data sample is empty!");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  MACH3LOG_INFO("Printing for {}", GetName());
+
+  if (!DataOnly) {
+    const std::string sep_full(71, '-');
+    MACH3LOG_INFO("{}", sep_full);
+    MACH3LOG_INFO("{:<40}{:<10}{:<10}{:<10}|", "Sample", "Data", "MC", "-LLH");
+  } else {
+    const std::string sep_data(51, '-');
+    MACH3LOG_INFO("{}", sep_data);
+    MACH3LOG_INFO("{:<40}{:<10}|", "Sample", "Data");
+  }
+
+  double sumData = 0.0;
+  double sumMC = 0.0;
+  double likelihood = 0.0;
+
+  for (int iSample = 0; iSample < GetNsamples(); ++iSample) {
+    std::string name = GetSampleTitle(iSample);
+    double dataIntegral = GetDataHist(iSample, GetNDim(iSample))->Integral();
+    sumData += dataIntegral;
+    if (!DataOnly) {
+      double mcIntegral = GetMCHist(iSample, GetNDim(iSample))->Integral();
+      sumMC += mcIntegral;
+      likelihood = GetSampleLikelihood(iSample);
+
+      MACH3LOG_INFO("{:<40}{:<10.2f}{:<10.2f}{:<10.2f}|", name, dataIntegral, mcIntegral, likelihood);
+    } else {
+      MACH3LOG_INFO("{:<40}{:<10.2f}|", name, dataIntegral);
+    }
+  }
+  if (!DataOnly) {
+    likelihood = GetLikelihood();
+    MACH3LOG_INFO("{:<40}{:<10.2f}{:<10.2f}{:<10.2f}|", "Total", sumData, sumMC, likelihood);
+    const std::string sep_full(71, '-');
+    MACH3LOG_INFO("{}", sep_full);
+  } else {
+    MACH3LOG_INFO("{:<40}{:<10.2f}|", "Total", sumData);
+    const std::string sep_data(51, '-');
+    MACH3LOG_INFO("{}", sep_data);
+  }
+}
+

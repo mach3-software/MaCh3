@@ -56,6 +56,10 @@ class SampleHandlerBase
   /// @ingroup SampleHandlerGetters
   virtual double GetLikelihood() const = 0;
 
+  /// @brief Helper function to print rates for the samples with LLH
+  /// @param DataOnly whether to print data only rates
+  virtual void PrintRates(const bool DataOnly = false) = 0;
+
   /// @ingroup SampleHandlerGetters
   unsigned int GetNEvents() const {return nEvents;}
   /// @ingroup SampleHandlerGetters
