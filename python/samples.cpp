@@ -74,12 +74,12 @@ public:
     }
 
     /* Trampoline (need one for each virtual function) */
-    void PrintRates(const int iSample) override {
+    void PrintRates(const bool DataOnly = false) override  {
         PYBIND11_OVERRIDE_PURE(
-            void,          /* Return type */
+            void,                 /* Return type */
             SampleHandlerBase,    /* Parent class */
             PrintRates,           /* Name of function in C++ (must match Python name) */
-            iSample               /* Argument(s) */
+            DataOnly              /* Argument(s) */
         );
     }
 
