@@ -86,6 +86,8 @@ class FitterBase {
   double logLCurr;
   /// proposed likelihood
   double logLProp;
+  /// decide on start from previous chain
+  bool chainStart;
   /// current acceptance prob
   double accProb;
   /// counts accepted steps

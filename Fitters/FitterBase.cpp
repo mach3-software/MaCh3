@@ -21,6 +21,7 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   accCount = 0;
   step = 0;
   stepStart = 0;
+  chainStart = false;
 
   clock = std::make_unique<TStopwatch>();
   stepClock = std::make_unique<TStopwatch>();
@@ -346,6 +347,7 @@ void FitterBase::StartFromPreviousFit(const std::string& FitName) {
       systematics[s]->SetNumberOfSteps(step_val);
     }
   }
+  chainStart = true;
 }
 
 // *******************

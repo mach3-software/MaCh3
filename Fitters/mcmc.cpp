@@ -88,7 +88,7 @@ void mcmc::RunMCMC() {
   ProposeStep();
   // Set the current logL to the proposed logL for the 0th step
   // Accept the first step to set logLCurr: this shouldn't affect the MCMC because we ignore the first N steps in burn-in
-  logLCurr = logLProp;
+  if( !chainStart ) logLCurr = logLProp;
 
   // Begin MCMC
   for (step = stepStart; step < stepStart+chainLength; ++step)
