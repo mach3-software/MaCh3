@@ -490,28 +490,29 @@ std::vector<std::vector<std::unique_ptr<TH2D>>> PredictiveThrower::ProduceSpectr
 
   for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
     const int nDims = Toys[sample][0]->GetDimension();
-    MaxValue[sample].resize(nDims);
+    MaxValue[sample].assign(nDims, 0);
     Projections[sample].resize(Ntoys);
     for (int toy = 0; toy < Ntoys; ++toy) {
       if (nDims == 1) {
         // For 1D histograms, no projection needed.
         // Leave Projections[sample][toy][0] == nullptr
       } else if (nDims == 2) {
-          TH2* h2 = dynamic_cast<TH2*>(Toys[sample][toy].get());
-          if (!h2) {
-            MACH3LOG_ERROR("Histogram is not TH2 for nDims==2");
-            throw MaCh3Exception(__FILE__, __LINE__);
-          }
-          auto px = h2->ProjectionX();
-          px->SetDirectory(nullptr);
-          Projections[sample][toy][0] = M3::Clone(px);
+        Projections[sample][toy].resize(nDims);
+        TH2* h2 = dynamic_cast<TH2*>(Toys[sample][toy].get());
+        if (!h2) {
+          MACH3LOG_ERROR("Histogram is not TH2 for nDims==2");
+          throw MaCh3Exception(__FILE__, __LINE__);
+        }
+        auto px = h2->ProjectionX();
+        px->SetDirectory(nullptr);
+        Projections[sample][toy][0] = M3::Clone(px);
 
-          auto py = h2->ProjectionY();
-          py->SetDirectory(nullptr);
-          Projections[sample][toy][1] = M3::Clone(py);
+        auto py = h2->ProjectionY();
+        py->SetDirectory(nullptr);
+        Projections[sample][toy][1] = M3::Clone(py);
 
-          delete px;
-          delete py;
+        delete px;
+        delete py;
       } else {
         MACH3LOG_ERROR("Asking for {} with N Dimension = {}. This is not implemented", __func__, nDims);
         throw MaCh3Exception(__FILE__, __LINE__);
@@ -586,11 +587,14 @@ std::vector<std::vector<std::unique_ptr<TH2D>>> PredictiveThrower::ProduceSpectr
 
       // Create TH2D with variable binning on x axis
       Spectra[sample][dim] = std::make_unique<TH2D>(
-        (SampleNames[sample] + "_" + suffix + "_" + std::to_string(dim)).c_str(),   // name
-        (SampleNames[sample] + "_" + suffix + "_" + std::to_string(dim)).c_str(),   // title
+        (SampleNames[sample] + "_" + suffix + "_dim" + std::to_string(dim)).c_str(),   // name
+        (SampleNames[sample] + "_" + suffix + "_dim" + std::to_string(dim)).c_str(),   // title
         n_bins_x, x_bin_edges.data(),                   // x axis bins
         n_bins_y, y_min, y_max                          // y axis bins
       );
+
+      Spectra[sample][dim]->GetXaxis()->SetTitle(refHist->GetXaxis()->GetTitle());
+      Spectra[sample][dim]->GetYaxis()->SetTitle("Events");
 
       Spectra[sample][dim]->SetDirectory(nullptr);
       Spectra[sample][dim]->Sumw2(true);
@@ -623,9 +627,9 @@ std::vector<std::vector<std::unique_ptr<TH2D>>> PredictiveThrower::ProduceSpectr
 // *************************
 
 std::unique_ptr<TH1> PredictiveThrower::MakePredictive(const std::vector<std::unique_ptr<TH1>>& Toys,
-                                                      const std::string& Sample_Name,
-                                                      const std::string& suffix,
-                                                      const bool DebugHistograms) {
+                                                       const std::string& Sample_Name,
+                                                       const std::string& suffix,
+                                                       const bool DebugHistograms) {
 // *************************
   int nDims = Toys[0]->GetDimension();
 
@@ -637,13 +641,13 @@ std::unique_ptr<TH1> PredictiveThrower::MakePredictive(const std::vector<std::un
           (Sample_Name + "_" + suffix + "_PostPred").c_str(),
           nbinsx, xbins
       );
+      PredictiveHist->GetXaxis()->SetTitle(Toys[0]->GetXaxis()->GetTitle());
+      PredictiveHist->GetYaxis()->SetTitle("Events");
       PredictiveHist->SetDirectory(nullptr);
 
       for (int i = 1; i <= nbinsx; ++i) {
         TString projName = TString::Format("%s %s X Bin %d", Sample_Name.c_str(), suffix.c_str(), i);
-        auto PosteriorHist = std::make_unique<TH1D>(
-            projName, projName, 100, 1, -1
-        );
+        auto PosteriorHist = std::make_unique<TH1D>(projName, projName, 100, 1, -1);
         PosteriorHist->SetDirectory(nullptr);
 
         for (size_t iToy = 0; iToy < Toys.size(); ++iToy) {
@@ -672,6 +676,8 @@ std::unique_ptr<TH1> PredictiveThrower::MakePredictive(const std::vector<std::un
         nbinsx, xbins,
         nbinsy, ybins
     );
+    PredictiveHist->GetXaxis()->SetTitle(Toys[0]->GetXaxis()->GetTitle());
+    PredictiveHist->GetYaxis()->SetTitle(Toys[0]->GetYaxis()->GetTitle());
     PredictiveHist->SetDirectory(nullptr);
 
     for (int ix = 1; ix <= nbinsx; ++ix) {
@@ -679,7 +685,7 @@ std::unique_ptr<TH1> PredictiveThrower::MakePredictive(const std::vector<std::un
         TString projName = TString::Format("%s %s Bin (%d,%d)", Sample_Name.c_str(), suffix.c_str(), ix, iy);
         auto PosteriorHist = std::make_unique<TH1D>(projName, projName, 100, 1, -1);
         PosteriorHist->SetDirectory(nullptr);
-
+        PosteriorHist->GetXaxis()->SetTitle("Events");
         int bin = Toys[0]->GetBin(ix, iy);
         for (size_t iToy = 0; iToy < Toys.size(); ++iToy) {
             double content = Toys[iToy]->GetBinContent(bin);
@@ -826,11 +832,11 @@ void PredictiveThrower::PosteriorPredictivepValue(const std::vector<std::unique_
 
 // *************************
 void PredictiveThrower::MakeChi2Plots(const std::vector<std::vector<double>>& Chi2_x,
-                   const std::string& Chi2_x_title,
-                   const std::vector<std::vector<double>>& Chi2_y,
-                   const std::string& Chi2_y_title,
-                   const std::vector<TDirectory*>& SampleDir,
-                   const std::string Title) {
+                                      const std::string& Chi2_x_title,
+                                      const std::vector<std::vector<double>>& Chi2_y,
+                                      const std::string& Chi2_y_title,
+                                      const std::vector<TDirectory*>& SampleDir,
+                                      const std::string Title) {
 // *************************
   for (int iSample = 0; iSample < TotalNumberOfSamples+1; ++iSample) {
     SampleDir[iSample]->cd();

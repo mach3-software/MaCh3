@@ -9,7 +9,7 @@
 /// @file PredictivePlotting.cpp
 /// @author Kamil Skwarczynski
 
-std::vector<std::string> FindSamples(std::string File)
+std::vector<std::string> FindSamples(const std::string& File)
 {
   TFile *file = M3::Open(File, "READ", __FILE__, __LINE__);
   TDirectoryFile *PredicitveDir = file->Get<TDirectoryFile>("Predictive");
@@ -77,7 +77,13 @@ void OverlayPredicitve(const YAML::Node& Settings,
   for(size_t iSample = 0; iSample < SampleNames.size(); iSample++)
   {
     const int nFiles = static_cast<int>(InputFiles.size());
-    std::unique_ptr<TH1D> DataHist = M3::Clone(InputFiles[0]->Get<TH1D>(("SampleFolder/data_" + SampleNames[iSample]).c_str()));
+    TH1D* hist = InputFiles[0]->Get<TH1D>(("SampleFolder/data_" + SampleNames[iSample]).c_str());
+    if(!hist) {
+      MACH3LOG_WARN("Couldn't find hist for {}, most likely it is using 2D", SampleNames[iSample]);
+      MACH3LOG_WARN("Currently only 1D, sorry");
+      continue;
+    }
+    std::unique_ptr<TH1D> DataHist = M3::Clone(hist);
     DataHist->SetLineColor(kBlack);
     //KS: +1 for data, we want to get integral before scaling of the histogram
     std::vector<double> Integral(nFiles);
