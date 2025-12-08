@@ -45,11 +45,15 @@ void PredictiveThrower::SetParamters() {
     }
   }
 
-  if(ModelSystematic && ParameterGroupsNotVaried.size() > 0) ModelSystematic->SetGroupOnlyParameters(ParameterGroupsNotVaried);
+  // Set groups to prefit values if they were set to not be varies
+  if(ModelSystematic && ParameterGroupsNotVaried.size() > 0) {
+    ModelSystematic->SetGroupOnlyParameters(ParameterGroupsNotVaried);
+  }
 
   /// Alternatively vary only selected params
   if (ModelSystematic && !ParameterOnlyToVary.empty()) {
     for (int i = 0; i < ModelSystematic->GetNumParams(); ++i) {
+      // KS: If parameter is in map then we are skipping this, otherwise for params that we don't want to vary we simply set it to prior
       if (ParameterOnlyToVary.find(i) == ParameterOnlyToVary.end()) {
         ModelSystematic->SetParProp(i, ModelSystematic->GetParInit(i));
       }
@@ -69,10 +73,6 @@ void PredictiveThrower::SetupSampleInformation() {
       throw MaCh3Exception(__FILE__, __LINE__);
     }
     TotalNumberOfSamples += samples[iPDF]->GetNsamples();
-    if(samples[iPDF]->GetNsamples() > 1){
-      MACH3LOG_ERROR("Sample has more than one sample {} ::", samples[iPDF]->GetNsamples());
-      throw MaCh3Exception(__FILE__ , __LINE__ );
-    }
   }
 
   MC_Hist_Toy.resize(TotalNumberOfSamples);
@@ -198,7 +198,11 @@ bool PredictiveThrower::LoadToys() {
 // *************************
   auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
   // Open the ROOT file
+  int originalErrorWarning = gErrorIgnoreLevel;
+  gErrorIgnoreLevel = kFatal;
   TFile* file = TFile::Open(PosteriorFileName.c_str(), "READ");
+
+  gErrorIgnoreLevel = originalErrorWarning;
   TDirectory* ToyDir = nullptr;
   if (!file || file->IsZombie()) {
     return false;
@@ -306,9 +310,23 @@ void PredictiveThrower::ProduceToys() {
   ToyTree->Branch("Draw", &Draw, "Draw/I");
   ToyTree->Branch("NModelParams", &NModelParams, "NModelParams/I");
 
+  // KS: define branches so we can keep track of what params we are throwing
+  std::vector<double> ParamValues(NModelParams);
+  std::vector<const double*> ParampPointers(NModelParams);
+  int ParamCounter = 0;
+  for (size_t iSys = 0; iSys < systematics.size(); iSys++)
+  {
+    for (int iPar = 0; iPar < systematics[iSys]->GetNumParams(); iPar++)
+    {
+      ParampPointers[ParamCounter] = systematics[iSys]->RetPointer(iPar);
+      std::string Name = systematics[iSys]->GetParName(iPar);
+      ToyTree->Branch(Name.c_str(), &ParamValues[ParamCounter], (Name + "/D").c_str());
+      ParamCounter++;
+    }
+  }
   TDirectory* ToyDirectory = outputFile->mkdir("Toys");
   ToyDirectory->cd();
-
+  int SampleCounter = 0;
   for (size_t iPDF = 0; iPDF < samples.size(); iPDF++)
   {
     auto* MaCh3Sample = dynamic_cast<SampleHandlerFD*>(samples[iPDF]);
@@ -316,17 +334,18 @@ void PredictiveThrower::ProduceToys() {
     {
       // Get nominal spectra and event rates
       TH1D* DataHist1D = static_cast<TH1D*>(MaCh3Sample->GetDataHist(SampleIndex, 1));
-      Data_Hist[iPDF] = M3::Clone(DataHist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_data");
-      Data_Hist[iPDF]->Write((MaCh3Sample->GetSampleTitle(SampleIndex) + "_data").c_str());
+      Data_Hist[SampleCounter] = M3::Clone(DataHist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_data");
+      Data_Hist[SampleCounter]->Write((MaCh3Sample->GetSampleTitle(SampleIndex) + "_data").c_str());
 
       TH1D* MCHist1D = static_cast<TH1D*>(MaCh3Sample->GetMCHist(SampleIndex, 1));
-      MC_Nom_Hist[iPDF] = M3::Clone(MCHist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_mc");
-      MCHist1D->Write((MaCh3Sample->GetSampleTitle(SampleIndex) + "_mc").c_str());
+      MC_Nom_Hist[SampleCounter] = M3::Clone(MCHist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_mc");
+      MC_Nom_Hist[SampleCounter]->Write((MaCh3Sample->GetSampleTitle(SampleIndex) + "_mc").c_str());
 
       TH1D* W2Hist1D = static_cast<TH1D*>(MaCh3Sample->GetW2Hist(SampleIndex, 1));
-      W2_Nom_Hist[iPDF] = M3::Clone(W2Hist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_w2");
-      W2Hist1D->Write((MaCh3Sample->GetSampleTitle(SampleIndex) + "_w2").c_str());
+      W2_Nom_Hist[SampleCounter] = M3::Clone(W2Hist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_w2");
+      W2_Nom_Hist[SampleCounter]->Write((MaCh3Sample->GetSampleTitle(SampleIndex) + "_w2").c_str());
       delete W2Hist1D;
+      SampleCounter++;
     }
   }
 
@@ -334,34 +353,41 @@ void PredictiveThrower::ProduceToys() {
   std::vector<std::vector<double>> branch_vals(systematics.size());
   std::vector<std::vector<std::string>> branch_name(systematics.size());
 
-  TChain* PosteriorFile = new TChain("posteriors");
-  PosteriorFile->Add(PosteriorFileName.c_str());
+  TChain* PosteriorFile = nullptr;
+  unsigned int burn_in = 0;
+  unsigned int maxNsteps = 0;
   unsigned int Step = 0;
-  PosteriorFile->SetBranchAddress("step", &Step);
-
-  if (PosteriorFile->GetBranch("Weight")) {
-    PosteriorFile->SetBranchStatus("Weight", true);
-    PosteriorFile->SetBranchAddress("Weight", &Weight);
-  } else {
-    MACH3LOG_WARN("Not applying reweighting weight");
-    Weight = 1.0;
-  }
-
-  for (size_t s = 0; s < systematics.size(); ++s) {
-    systematics[s]->MatchMaCh3OutputBranches(PosteriorFile, branch_vals[s], branch_name[s]);
-  }
-  //Get the burn-in from the config
-  auto burn_in = Get<unsigned int>(fitMan->raw()["Predictive"]["BurnInSteps"], __FILE__, __LINE__);
-
-  //DL: Adding sanity check for chains shorter than burn in
-  const unsigned int maxNsteps = static_cast<unsigned int>(PosteriorFile->GetMaximum("step"));
-  if(burn_in >= maxNsteps)
+  if(!Is_PriorPredictive)
   {
-    MACH3LOG_ERROR("You are running on a chain shorter than burn in cut");
-    MACH3LOG_ERROR("Maximal value of nSteps: {}, burn in cut {}", maxNsteps, burn_in);
-    MACH3LOG_ERROR("You will run into infinite loop");
-    MACH3LOG_ERROR("You can make new chain or modify burn in cut");
-    throw MaCh3Exception(__FILE__,__LINE__);
+    PosteriorFile = new TChain("posteriors");
+    PosteriorFile->Add(PosteriorFileName.c_str());
+
+    PosteriorFile->SetBranchAddress("step", &Step);
+    if (PosteriorFile->GetBranch("Weight")) {
+      PosteriorFile->SetBranchStatus("Weight", true);
+      PosteriorFile->SetBranchAddress("Weight", &Weight);
+    } else {
+      MACH3LOG_WARN("Not applying reweighting weight");
+      Weight = 1.0;
+    }
+
+    for (size_t s = 0; s < systematics.size(); ++s) {
+      systematics[s]->MatchMaCh3OutputBranches(PosteriorFile, branch_vals[s], branch_name[s]);
+    }
+
+    //Get the burn-in from the config
+    burn_in = Get<unsigned int>(fitMan->raw()["Predictive"]["BurnInSteps"], __FILE__, __LINE__);
+
+    //DL: Adding sanity check for chains shorter than burn in
+    maxNsteps = static_cast<unsigned int>(PosteriorFile->GetMaximum("step"));
+    if(burn_in >= maxNsteps)
+    {
+      MACH3LOG_ERROR("You are running on a chain shorter than burn in cut");
+      MACH3LOG_ERROR("Maximal value of nSteps: {}, burn in cut {}", maxNsteps, burn_in);
+      MACH3LOG_ERROR("You will run into infinite loop");
+      MACH3LOG_ERROR("You can make new chain or modify burn in cut");
+      throw MaCh3Exception(__FILE__,__LINE__);
+    }
   }
 
   TStopwatch TempClock;
@@ -371,25 +397,30 @@ void PredictiveThrower::ProduceToys() {
     if( i % (Ntoys/10) == 0) {
       MaCh3Utils::PrintProgressBar(i, Ntoys);
     }
-    int entry = 0;
-    Step = 0;
 
-    //YSP: Ensures you get an entry from the mcmc even when burn_in is set to zero (Although not advised :p ).
-    //Take 200k burn in steps, WP: Eb C in 1st peaky
-    // If we have combined chains by hadd need to check the step in the chain
-    // Note, entry is not necessarily same as step due to merged ROOT files, so can't choose entry in the range BurnIn - nEntries :(
-    while(Step < burn_in){
-      entry = random->Integer(static_cast<unsigned int>(PosteriorFile->GetEntries()));
-      PosteriorFile->GetEntry(entry);
+    if(!Is_PriorPredictive){
+      int entry = 0;
+      Step = 0;
+
+      //YSP: Ensures you get an entry from the mcmc even when burn_in is set to zero (Although not advised :p ).
+      //Take 200k burn in steps, WP: Eb C in 1st peaky
+      // If we have combined chains by hadd need to check the step in the chain
+      // Note, entry is not necessarily same as step due to merged ROOT files, so can't choose entry in the range BurnIn - nEntries :(
+      while(Step < burn_in){
+        entry = random->Integer(static_cast<unsigned int>(PosteriorFile->GetEntries()));
+        PosteriorFile->GetEntry(entry);
+      }
+      Draw = entry;
     }
-    if(!Is_PriorPredictive) Draw = entry;
     for (size_t s = 0; s < systematics.size(); ++s)
     {
-      systematics[s]->SetParameters(branch_vals[s]);
-
       //KS: Below line can help you get prior predictive distributions which are helpful for getting pre and post ND fit spectra
       //YSP: If not set in the config, the code runs SK Posterior Predictive distributions by default. If true, then the code runs SK prior predictive.
-      if(Is_PriorPredictive) systematics[s]->ThrowParameters();
+      if(Is_PriorPredictive) {
+        systematics[s]->ThrowParameters();
+      } else {
+        systematics[s]->SetParameters(branch_vals[s]);
+      }
     }
 
     // This set some params to prior value this way you can evaluate errors from subset of errors
@@ -410,26 +441,34 @@ void PredictiveThrower::ProduceToys() {
       samples[iPDF]->Reweight();
     }
 
+    SampleCounter = 0;
     for (size_t iPDF = 0; iPDF < samples.size(); iPDF++)
     {
       auto* MaCh3Sample = dynamic_cast<SampleHandlerFD*>(samples[iPDF]);
       for (int SampleIndex = 0; SampleIndex < MaCh3Sample->GetNsamples(); ++SampleIndex)
       {
         TH1D* MCHist1D = static_cast<TH1D*>(MaCh3Sample->GetMCHist(SampleIndex, 1));
-        MC_Hist_Toy[iPDF][i] = M3::Clone(MCHist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_mc_" + std::to_string(i));
-        MC_Hist_Toy[iPDF][i]->Write();
+        MC_Hist_Toy[SampleCounter][i] = M3::Clone(MCHist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_mc_" + std::to_string(i));
+        MC_Hist_Toy[SampleCounter][i]->Write();
 
         TH1D* W2Hist1D = static_cast<TH1D*>(MaCh3Sample->GetW2Hist(SampleIndex, 1));
-        W2_Hist_Toy[iPDF][i] = M3::Clone(W2Hist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_w2_" + std::to_string(i));
-        W2_Hist_Toy[iPDF][i]->Write();
+        W2_Hist_Toy[SampleCounter][i] = M3::Clone(W2Hist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_w2_" + std::to_string(i));
+        W2_Hist_Toy[SampleCounter][i]->Write();
         delete W2Hist1D;
+        SampleCounter++;
       }
     }
+
+    // Fill parameter value so we know throw values
+    for (size_t iPar = 0; iPar < ParamValues.size(); iPar++) {
+      ParamValues[iPar] = *ParampPointers[iPar];
+    }
+
     ToyTree->Fill();
   }//end of toys loop
   TempClock.Stop();
 
-  delete PosteriorFile;
+  if(PosteriorFile) delete PosteriorFile;
   ToyDirectory->Close();
   delete ToyDirectory;
 
