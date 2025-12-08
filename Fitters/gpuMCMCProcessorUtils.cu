@@ -24,8 +24,7 @@ MCMCProcessorGPU::MCMCProcessorGPU() {
   h_nEntries = -1;
 }
 
-MCMCProcessorGPU::~MCMCProcessorGPU(){
-
+MCMCProcessorGPU::~MCMCProcessorGPU() {
 }
 
 // *******************************************

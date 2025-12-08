@@ -66,7 +66,7 @@ class PCAHandler{
   virtual ~PCAHandler();
 
   /// @brief KS: Print info about PCA parameters
-  void Print();
+  void Print() const;
   /// @brief Retrieve number of parameters in PCA base
   int GetNumberPCAedParameters() const { return NumParPCA; }
 
