@@ -104,7 +104,7 @@ class PredictiveThrower : public FitterBase {
   int Ntoys;
   /// KS: Names of parameter groups that will not be varied
   std::vector<std::string> ParameterGroupsNotVaried;
-  /// KS: Index of parameters groups that will be varied
+  /// KS: Index of parameters that will be varied
   std::unordered_set<int> ParameterOnlyToVary;
 
   /// Pointer to El Generico

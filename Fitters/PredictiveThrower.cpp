@@ -46,11 +46,15 @@ void PredictiveThrower::SetParamters() {
     }
   }
 
-  if(ModelSystematic && ParameterGroupsNotVaried.size() > 0) ModelSystematic->SetGroupOnlyParameters(ParameterGroupsNotVaried);
+  // Set groups to prefit values if they were set to not be varies
+  if(ModelSystematic && ParameterGroupsNotVaried.size() > 0) {
+    ModelSystematic->SetGroupOnlyParameters(ParameterGroupsNotVaried);
+  }
 
   /// Alternatively vary only selected params
   if (ModelSystematic && !ParameterOnlyToVary.empty()) {
     for (int i = 0; i < ModelSystematic->GetNumParams(); ++i) {
+      // KS: If parameter is in map then we are skipping this, otherwise for params that we don't want to vary we simply set it to prior
       if (ParameterOnlyToVary.find(i) == ParameterOnlyToVary.end()) {
         ModelSystematic->SetParProp(i, ModelSystematic->GetParInit(i));
       }
@@ -70,10 +74,6 @@ void PredictiveThrower::SetupSampleInformation() {
       throw MaCh3Exception(__FILE__, __LINE__);
     }
     TotalNumberOfSamples += samples[iPDF]->GetNsamples();
-    if(samples[iPDF]->GetNsamples() > 1){
-      MACH3LOG_ERROR("Sample has more than one sample {} ::", samples[iPDF]->GetNsamples());
-      throw MaCh3Exception(__FILE__ , __LINE__ );
-    }
   }
 
   MC_Hist_Toy.resize(TotalNumberOfSamples);
@@ -199,7 +199,11 @@ bool PredictiveThrower::LoadToys() {
 // *************************
   auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
   // Open the ROOT file
+  int originalErrorWarning = gErrorIgnoreLevel;
+  gErrorIgnoreLevel = kFatal;
   TFile* file = TFile::Open(PosteriorFileName.c_str(), "READ");
+
+  gErrorIgnoreLevel = originalErrorWarning;
   TDirectory* ToyDir = nullptr;
   if (!file || file->IsZombie()) {
     return false;
@@ -307,9 +311,23 @@ void PredictiveThrower::ProduceToys() {
   ToyTree->Branch("Draw", &Draw, "Draw/I");
   ToyTree->Branch("NModelParams", &NModelParams, "NModelParams/I");
 
+  // KS: define branches so we can keep track of what params we are throwing
+  std::vector<double> ParamValues(NModelParams);
+  std::vector<const double*> ParampPointers(NModelParams);
+  int ParamCounter = 0;
+  for (size_t iSys = 0; iSys < systematics.size(); iSys++)
+  {
+    for (int iPar = 0; iPar < systematics[iSys]->GetNumParams(); iPar++)
+    {
+      ParampPointers[ParamCounter] = systematics[iSys]->RetPointer(iPar);
+      std::string Name = systematics[iSys]->GetParName(iPar);
+      ToyTree->Branch(Name.c_str(), &ParamValues[ParamCounter], (Name + "/D").c_str());
+      ParamCounter++;
+    }
+  }
   TDirectory* ToyDirectory = outputFile->mkdir("Toys");
   ToyDirectory->cd();
-
+  int SampleCounter = 0;
   for (size_t iPDF = 0; iPDF < samples.size(); iPDF++)
   {
     auto* MaCh3Sample = dynamic_cast<SampleHandlerFD*>(samples[iPDF]);
@@ -317,17 +335,18 @@ void PredictiveThrower::ProduceToys() {
     {
       // Get nominal spectra and event rates
       TH1* DataHist1D = MaCh3Sample->GetDataHist(SampleIndex, MaCh3Sample->GetNDim(SampleIndex));
-      Data_Hist[iPDF] = M3::Clone(DataHist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_data");
-      Data_Hist[iPDF]->Write((MaCh3Sample->GetSampleTitle(SampleIndex) + "_data").c_str());
+      Data_Hist[SampleCounter] = M3::Clone(DataHist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_data");
+      Data_Hist[SampleCounter]->Write((MaCh3Sample->GetSampleTitle(SampleIndex) + "_data").c_str());
 
       TH1* MCHist1D = MaCh3Sample->GetMCHist(SampleIndex, MaCh3Sample->GetNDim(SampleIndex));
-      MC_Nom_Hist[iPDF] = M3::Clone(MCHist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_mc");
-      MCHist1D->Write((MaCh3Sample->GetSampleTitle(SampleIndex) + "_mc").c_str());
+      MC_Nom_Hist[SampleCounter] = M3::Clone(MCHist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_mc");
+      MC_Nom_Hist[SampleCounter]->Write((MaCh3Sample->GetSampleTitle(SampleIndex) + "_mc").c_str());
 
       TH1* W2Hist1D = MaCh3Sample->GetW2Hist(SampleIndex, MaCh3Sample->GetNDim(SampleIndex));
-      W2_Nom_Hist[iPDF] = M3::Clone(W2Hist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_w2");
-      W2Hist1D->Write((MaCh3Sample->GetSampleTitle(SampleIndex) + "_w2").c_str());
+      W2_Nom_Hist[SampleCounter] = M3::Clone(W2Hist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_w2");
+      W2_Nom_Hist[SampleCounter]->Write((MaCh3Sample->GetSampleTitle(SampleIndex) + "_w2").c_str());
       delete W2Hist1D;
+      SampleCounter++;
     }
   }
 
@@ -335,34 +354,41 @@ void PredictiveThrower::ProduceToys() {
   std::vector<std::vector<double>> branch_vals(systematics.size());
   std::vector<std::vector<std::string>> branch_name(systematics.size());
 
-  TChain* PosteriorFile = new TChain("posteriors");
-  PosteriorFile->Add(PosteriorFileName.c_str());
+  TChain* PosteriorFile = nullptr;
+  unsigned int burn_in = 0;
+  unsigned int maxNsteps = 0;
   unsigned int Step = 0;
-  PosteriorFile->SetBranchAddress("step", &Step);
-
-  if (PosteriorFile->GetBranch("Weight")) {
-    PosteriorFile->SetBranchStatus("Weight", true);
-    PosteriorFile->SetBranchAddress("Weight", &Weight);
-  } else {
-    MACH3LOG_WARN("Not applying reweighting weight");
-    Weight = 1.0;
-  }
-
-  for (size_t s = 0; s < systematics.size(); ++s) {
-    systematics[s]->MatchMaCh3OutputBranches(PosteriorFile, branch_vals[s], branch_name[s]);
-  }
-  //Get the burn-in from the config
-  auto burn_in = Get<unsigned int>(fitMan->raw()["Predictive"]["BurnInSteps"], __FILE__, __LINE__);
-
-  //DL: Adding sanity check for chains shorter than burn in
-  const unsigned int maxNsteps = static_cast<unsigned int>(PosteriorFile->GetMaximum("step"));
-  if(burn_in >= maxNsteps)
+  if(!Is_PriorPredictive)
   {
-    MACH3LOG_ERROR("You are running on a chain shorter than burn in cut");
-    MACH3LOG_ERROR("Maximal value of nSteps: {}, burn in cut {}", maxNsteps, burn_in);
-    MACH3LOG_ERROR("You will run into infinite loop");
-    MACH3LOG_ERROR("You can make new chain or modify burn in cut");
-    throw MaCh3Exception(__FILE__,__LINE__);
+    PosteriorFile = new TChain("posteriors");
+    PosteriorFile->Add(PosteriorFileName.c_str());
+
+    PosteriorFile->SetBranchAddress("step", &Step);
+    if (PosteriorFile->GetBranch("Weight")) {
+      PosteriorFile->SetBranchStatus("Weight", true);
+      PosteriorFile->SetBranchAddress("Weight", &Weight);
+    } else {
+      MACH3LOG_WARN("Not applying reweighting weight");
+      Weight = 1.0;
+    }
+
+    for (size_t s = 0; s < systematics.size(); ++s) {
+      systematics[s]->MatchMaCh3OutputBranches(PosteriorFile, branch_vals[s], branch_name[s]);
+    }
+
+    //Get the burn-in from the config
+    burn_in = Get<unsigned int>(fitMan->raw()["Predictive"]["BurnInSteps"], __FILE__, __LINE__);
+
+    //DL: Adding sanity check for chains shorter than burn in
+    maxNsteps = static_cast<unsigned int>(PosteriorFile->GetMaximum("step"));
+    if(burn_in >= maxNsteps)
+    {
+      MACH3LOG_ERROR("You are running on a chain shorter than burn in cut");
+      MACH3LOG_ERROR("Maximal value of nSteps: {}, burn in cut {}", maxNsteps, burn_in);
+      MACH3LOG_ERROR("You will run into infinite loop");
+      MACH3LOG_ERROR("You can make new chain or modify burn in cut");
+      throw MaCh3Exception(__FILE__,__LINE__);
+    }
   }
 
   TStopwatch TempClock;
@@ -372,25 +398,30 @@ void PredictiveThrower::ProduceToys() {
     if( i % (Ntoys/10) == 0) {
       MaCh3Utils::PrintProgressBar(i, Ntoys);
     }
-    int entry = 0;
-    Step = 0;
 
-    //YSP: Ensures you get an entry from the mcmc even when burn_in is set to zero (Although not advised :p ).
-    //Take 200k burn in steps, WP: Eb C in 1st peaky
-    // If we have combined chains by hadd need to check the step in the chain
-    // Note, entry is not necessarily same as step due to merged ROOT files, so can't choose entry in the range BurnIn - nEntries :(
-    while(Step < burn_in){
-      entry = random->Integer(static_cast<unsigned int>(PosteriorFile->GetEntries()));
-      PosteriorFile->GetEntry(entry);
+    if(!Is_PriorPredictive){
+      int entry = 0;
+      Step = 0;
+
+      //YSP: Ensures you get an entry from the mcmc even when burn_in is set to zero (Although not advised :p ).
+      //Take 200k burn in steps, WP: Eb C in 1st peaky
+      // If we have combined chains by hadd need to check the step in the chain
+      // Note, entry is not necessarily same as step due to merged ROOT files, so can't choose entry in the range BurnIn - nEntries :(
+      while(Step < burn_in){
+        entry = random->Integer(static_cast<unsigned int>(PosteriorFile->GetEntries()));
+        PosteriorFile->GetEntry(entry);
+      }
+      Draw = entry;
     }
-    if(!Is_PriorPredictive) Draw = entry;
     for (size_t s = 0; s < systematics.size(); ++s)
     {
-      systematics[s]->SetParameters(branch_vals[s]);
-
       //KS: Below line can help you get prior predictive distributions which are helpful for getting pre and post ND fit spectra
       //YSP: If not set in the config, the code runs SK Posterior Predictive distributions by default. If true, then the code runs SK prior predictive.
-      if(Is_PriorPredictive) systematics[s]->ThrowParameters();
+      if(Is_PriorPredictive) {
+        systematics[s]->ThrowParameters();
+      } else {
+        systematics[s]->SetParameters(branch_vals[s]);
+      }
     }
 
     // This set some params to prior value this way you can evaluate errors from subset of errors
@@ -411,26 +442,34 @@ void PredictiveThrower::ProduceToys() {
       samples[iPDF]->Reweight();
     }
 
+    SampleCounter = 0;
     for (size_t iPDF = 0; iPDF < samples.size(); iPDF++)
     {
       auto* MaCh3Sample = dynamic_cast<SampleHandlerFD*>(samples[iPDF]);
       for (int SampleIndex = 0; SampleIndex < MaCh3Sample->GetNsamples(); ++SampleIndex)
       {
         TH1* MCHist1D = MaCh3Sample->GetMCHist(SampleIndex, MaCh3Sample->GetNDim(SampleIndex));
-        MC_Hist_Toy[iPDF][i] = M3::Clone(MCHist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_mc_" + std::to_string(i));
-        MC_Hist_Toy[iPDF][i]->Write();
+        MC_Hist_Toy[SampleCounter][i] = M3::Clone(MCHist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_mc_" + std::to_string(i));
+        MC_Hist_Toy[SampleCounter][i]->Write();
 
         TH1* W2Hist1D = MaCh3Sample->GetW2Hist(SampleIndex, MaCh3Sample->GetNDim(SampleIndex));
-        W2_Hist_Toy[iPDF][i] = M3::Clone(W2Hist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_w2_" + std::to_string(i));
-        W2_Hist_Toy[iPDF][i]->Write();
+        W2_Hist_Toy[SampleCounter][i] = M3::Clone(W2Hist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_w2_" + std::to_string(i));
+        W2_Hist_Toy[SampleCounter][i]->Write();
         delete W2Hist1D;
+        SampleCounter++;
       }
     }
+
+    // Fill parameter value so we know throw values
+    for (size_t iPar = 0; iPar < ParamValues.size(); iPar++) {
+      ParamValues[iPar] = *ParampPointers[iPar];
+    }
+
     ToyTree->Fill();
   }//end of toys loop
   TempClock.Stop();
 
-  delete PosteriorFile;
+  if(PosteriorFile) delete PosteriorFile;
   ToyDirectory->Close();
   delete ToyDirectory;
 
@@ -446,25 +485,58 @@ std::vector<std::vector<std::unique_ptr<TH2D>>> PredictiveThrower::ProduceSpectr
                                                                      const std::string suffix) {
 // *************************
   std::vector<std::vector<double>> MaxValue(TotalNumberOfSamples);
+  //Projections[sample][toy][dim]
+  std::vector<std::vector<std::vector<std::unique_ptr<TH1>>>> Projections(TotalNumberOfSamples);
+
+  for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
+    const int nDims = Toys[sample][0]->GetDimension();
+    MaxValue[sample].resize(nDims);
+    Projections[sample].resize(Ntoys);
+    for (int toy = 0; toy < Ntoys; ++toy) {
+      if (nDims == 1) {
+        // For 1D histograms, no projection needed.
+        // Leave Projections[sample][toy][0] == nullptr
+      } else if (nDims == 2) {
+          TH2* h2 = dynamic_cast<TH2*>(Toys[sample][toy].get());
+          if (!h2) {
+            MACH3LOG_ERROR("Histogram is not TH2 for nDims==2");
+            throw MaCh3Exception(__FILE__, __LINE__);
+          }
+          auto px = h2->ProjectionX();
+          px->SetDirectory(nullptr);
+          Projections[sample][toy][0] = M3::Clone(px);
+
+          auto py = h2->ProjectionY();
+          py->SetDirectory(nullptr);
+          Projections[sample][toy][1] = M3::Clone(py);
+
+          delete px;
+          delete py;
+      } else {
+        MACH3LOG_ERROR("Asking for {} with N Dimension = {}. This is not implemented", __func__, nDims);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+    }
+  }
+
   #ifdef MULTITHREAD
   #pragma omp parallel for collapse(2)
   #endif
   for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
-    const int nDims = Toys[sample][0]->GetDimension();
-    MaxValue[sample].resize(nDims);
     for (int toy = 0; toy < Ntoys; ++toy) {
+      const int nDims = Toys[sample][0]->GetDimension();
       for (int dim = 0; dim < nDims; dim++) {
-        double max_val;
+        double max_val = 0;
         if (nDims == 1) {
           max_val = Toys[sample][toy]->GetMaximum();
         }
         else if (nDims == 2) {
-          if (dim == 0)
-            max_val = dynamic_cast<TH2*>(Toys[sample][toy].get())->ProjectionX()->GetMaximum();
-          else
-            max_val = dynamic_cast<TH2*>(Toys[sample][toy].get())->ProjectionY()->GetMaximum();
-        }
-        else {
+          if (dim == 0) {
+            max_val = Projections[sample][toy][0]->GetMaximum();
+          } else {
+            max_val = Projections[sample][toy][1]->GetMaximum();
+          }
+        } else {
           MACH3LOG_ERROR("Asking for {} with N Dimension = {}. This is not implemented", __func__, nDims);
           throw MaCh3Exception(__FILE__, __LINE__);
         }
@@ -478,19 +550,17 @@ std::vector<std::vector<std::unique_ptr<TH2D>>> PredictiveThrower::ProduceSpectr
     const int nDims = Toys[sample][0]->GetDimension();
     Spectra[sample].resize(nDims);
     for (int dim = 0; dim < nDims; dim++) {
-
       // Get MC histogram x-axis binning
-      TH1D* refHist;
-
+      TH1D* refHist = nullptr;
       if (nDims == 1) {
-        refHist = dynamic_cast<TH1D*>(Toys[sample][0].get());
+        refHist = static_cast<TH1D*>(Toys[sample][0].get());
       }
       else if (nDims == 2) {
-        auto* h2 = dynamic_cast<TH2*>(Toys[sample][0].get());
-        if (dim == 0)
-          refHist = h2->ProjectionX();
-        else
-          refHist = h2->ProjectionY();
+        if (dim == 0) {
+          refHist = static_cast<TH1D*>(Projections[sample][0][0].get());
+        } else {
+          refHist = static_cast<TH1D*>(Projections[sample][0][1].get());
+        }
       }
       else {
         MACH3LOG_ERROR("Asking for {} with N Dimension = {}. This is not implemented", __func__, nDims);
@@ -538,10 +608,7 @@ std::vector<std::vector<std::unique_ptr<TH2D>>> PredictiveThrower::ProduceSpectr
           FastViolinFill(Spectra[sample][dim].get(), static_cast<TH1D*>(Toys[sample][toy].get()));
         }
         else if (nDims == 2) {
-          if (dim == 0)
-            FastViolinFill(Spectra[sample][dim].get(), dynamic_cast<TH2*>(Toys[sample][toy].get())->ProjectionX());
-          else
-            FastViolinFill(Spectra[sample][dim].get(), dynamic_cast<TH2*>(Toys[sample][toy].get())->ProjectionY());
+          FastViolinFill(Spectra[sample][dim].get(), static_cast<TH1D*>(Projections[sample][toy][dim].get()));
         }
         else {
           MACH3LOG_ERROR("Asking for {} with N Dimension = {}. This is not implemented", __func__, nDims);
@@ -553,86 +620,85 @@ std::vector<std::vector<std::unique_ptr<TH2D>>> PredictiveThrower::ProduceSpectr
 
   return Spectra;
 }
+// *************************
 
 std::unique_ptr<TH1> PredictiveThrower::MakePredictive(const std::vector<std::unique_ptr<TH1>>& Toys,
                                                       const std::string& Sample_Name,
                                                       const std::string& suffix,
                                                       const bool DebugHistograms) {
+// *************************
+  int nDims = Toys[0]->GetDimension();
 
-    int nDims = Toys[0]->GetDimension();
+  if (nDims == 1) {
+      int nbinsx = Toys[0]->GetNbinsX();
+      const double* xbins = Toys[0]->GetXaxis()->GetXbins()->GetArray();
+      auto PredictiveHist = std::make_unique<TH1D>(
+          (Sample_Name + "_" + suffix + "_PostPred").c_str(),
+          (Sample_Name + "_" + suffix + "_PostPred").c_str(),
+          nbinsx, xbins
+      );
+      PredictiveHist->SetDirectory(nullptr);
 
-    if (nDims == 1) {
-        int nbinsx = Toys[0]->GetNbinsX();
-        const double* xbins = Toys[0]->GetXaxis()->GetXbins()->GetArray();
-        auto PredictiveHist = std::make_unique<TH1D>(
-            (Sample_Name + "_" + suffix + "_PostPred").c_str(),
-            (Sample_Name + "_" + suffix + "_PostPred").c_str(),
-            nbinsx, xbins
+      for (int i = 1; i <= nbinsx; ++i) {
+        TString projName = TString::Format("%s %s X Bin %d", Sample_Name.c_str(), suffix.c_str(), i);
+        auto PosteriorHist = std::make_unique<TH1D>(
+            projName, projName, 100, 1, -1
         );
-        PredictiveHist->SetDirectory(nullptr);
+        PosteriorHist->SetDirectory(nullptr);
 
-        for (int i = 1; i <= nbinsx; ++i) {
-            TString projName = TString::Format("%s %s X Bin %d", Sample_Name.c_str(), suffix.c_str(), i);
-            auto PosteriorHist = std::make_unique<TH1D>(
-                projName, projName, 100, 1, -1
-            );
-            PosteriorHist->SetDirectory(nullptr);
-
-            for (size_t iToy = 0; iToy < Toys.size(); ++iToy) {
-                double content = Toys[iToy]->GetBinContent(i);
-                PosteriorHist->Fill(content, ReweightWeight[iToy]);
-            }
-
-            if (DebugHistograms) PosteriorHist->Write();
-
-            PredictiveHist->SetBinContent(i, PosteriorHist->GetMean());
-            PredictiveHist->SetBinError(i, PosteriorHist->GetRMS());
+        for (size_t iToy = 0; iToy < Toys.size(); ++iToy) {
+            double content = Toys[iToy]->GetBinContent(i);
+            PosteriorHist->Fill(content, ReweightWeight[iToy]);
         }
-        PredictiveHist->Write();
-        return PredictiveHist;
-    }
-    else if (nDims == 2) {
-        int nbinsx = Toys[0]->GetNbinsX();
-        int nbinsy = Toys[0]->GetNbinsY();
-        const double* xbins = Toys[0]->GetXaxis()->GetXbins()->GetArray();
-        const double* ybins = Toys[0]->GetYaxis()->GetXbins()->GetArray();
 
-        // Create 2D predictive histogram with same binning as Toys[0]
-        auto PredictiveHist = std::make_unique<TH2D>(
-            (Sample_Name + "_" + suffix + "_PostPred").c_str(),
-            (Sample_Name + "_" + suffix + "_PostPred").c_str(),
-            nbinsx, xbins,
-            nbinsy, ybins
-        );
-        PredictiveHist->SetDirectory(nullptr);
+        if (DebugHistograms) PosteriorHist->Write();
 
-        for (int ix = 1; ix <= nbinsx; ++ix) {
-            for (int iy = 1; iy <= nbinsy; ++iy) {
-                TString projName = TString::Format("%s %s Bin (%d,%d)", Sample_Name.c_str(), suffix.c_str(), ix, iy);
-                auto PosteriorHist = std::make_unique<TH1D>(
-                    projName, projName, 100, 1, -1
-                );
-                PosteriorHist->SetDirectory(nullptr);
+        PredictiveHist->SetBinContent(i, PosteriorHist->GetMean());
+        PredictiveHist->SetBinError(i, PosteriorHist->GetRMS());
+      }
+      PredictiveHist->Write();
+      return PredictiveHist;
+  }
+  else if (nDims == 2) {
+    int nbinsx = Toys[0]->GetNbinsX();
+    int nbinsy = Toys[0]->GetNbinsY();
+    const double* xbins = Toys[0]->GetXaxis()->GetXbins()->GetArray();
+    const double* ybins = Toys[0]->GetYaxis()->GetXbins()->GetArray();
 
-                int bin = Toys[0]->GetBin(ix, iy);
-                for (size_t iToy = 0; iToy < Toys.size(); ++iToy) {
-                    double content = Toys[iToy]->GetBinContent(bin);
-                    PosteriorHist->Fill(content, ReweightWeight[iToy]);
-                }
+    // Create 2D predictive histogram with same binning as Toys[0]
+    auto PredictiveHist = std::make_unique<TH2D>(
+        (Sample_Name + "_" + suffix + "_PostPred").c_str(),
+        (Sample_Name + "_" + suffix + "_PostPred").c_str(),
+        nbinsx, xbins,
+        nbinsy, ybins
+    );
+    PredictiveHist->SetDirectory(nullptr);
 
-                if (DebugHistograms) PosteriorHist->Write();
+    for (int ix = 1; ix <= nbinsx; ++ix) {
+      for (int iy = 1; iy <= nbinsy; ++iy) {
+        TString projName = TString::Format("%s %s Bin (%d,%d)", Sample_Name.c_str(), suffix.c_str(), ix, iy);
+        auto PosteriorHist = std::make_unique<TH1D>(projName, projName, 100, 1, -1);
+        PosteriorHist->SetDirectory(nullptr);
 
-                PredictiveHist->SetBinContent(ix, iy, PosteriorHist->GetMean());
-                PredictiveHist->SetBinError(ix, iy, PosteriorHist->GetRMS());
-            }
+        int bin = Toys[0]->GetBin(ix, iy);
+        for (size_t iToy = 0; iToy < Toys.size(); ++iToy) {
+            double content = Toys[iToy]->GetBinContent(bin);
+            PosteriorHist->Fill(content, ReweightWeight[iToy]);
         }
-        PredictiveHist->Write();
-        return PredictiveHist;
+
+        if (DebugHistograms) PosteriorHist->Write();
+
+        PredictiveHist->SetBinContent(ix, iy, PosteriorHist->GetMean());
+        PredictiveHist->SetBinError(ix, iy, PosteriorHist->GetRMS());
+      }
     }
-    else {
-        MACH3LOG_ERROR("Asking for {} with N Dimension = {}. This is not implemented", __func__, nDims);
-        throw MaCh3Exception(__FILE__, __LINE__);
-    }
+    PredictiveHist->Write();
+    return PredictiveHist;
+  }
+  else {
+      MACH3LOG_ERROR("Asking for {} with N Dimension = {}. This is not implemented", __func__, nDims);
+      throw MaCh3Exception(__FILE__, __LINE__);
+  }
 }
 // *************************
 // Perform predictive analysis
@@ -728,16 +794,15 @@ void PredictiveThrower::PosteriorPredictivepValue(const std::vector<std::unique_
     for (int iSample = 0; iSample < TotalNumberOfSamples; ++iSample) {
       const int nDims = MC_Hist_Toy[iSample][0]->GetDimension();
 
-
       auto DrawFluctHist = M3::Clone(MC_Hist_Toy[iSample][iToy].get());
       auto PredFluctHist = M3::Clone(PostPred_mc[iSample].get());
       if (nDims == 1) {
-        MakeFluctuatedHistogramAlternative(dynamic_cast<TH1D*>(DrawFluctHist.get()), dynamic_cast<TH1D*>(MC_Hist_Toy[iSample][iToy].get()), random.get());
-        MakeFluctuatedHistogramAlternative(dynamic_cast<TH1D*>(PredFluctHist.get()), dynamic_cast<TH1D*>(PostPred_mc[iSample].get()), random.get());
+        MakeFluctuatedHistogramAlternative(static_cast<TH1D*>(DrawFluctHist.get()), static_cast<TH1D*>(MC_Hist_Toy[iSample][iToy].get()), random.get());
+        MakeFluctuatedHistogramAlternative(static_cast<TH1D*>(PredFluctHist.get()), static_cast<TH1D*>(PostPred_mc[iSample].get()), random.get());
       }
       else if (nDims == 2) {
-        MakeFluctuatedHistogramAlternative(dynamic_cast<TH2D*>(DrawFluctHist.get()), dynamic_cast<TH2D*>(MC_Hist_Toy[iSample][iToy].get()), random.get());
-        MakeFluctuatedHistogramAlternative(dynamic_cast<TH2D*>(PredFluctHist.get()), dynamic_cast<TH2D*>(PostPred_mc[iSample].get()), random.get());
+        MakeFluctuatedHistogramAlternative(static_cast<TH2D*>(DrawFluctHist.get()), static_cast<TH2D*>(MC_Hist_Toy[iSample][iToy].get()), random.get());
+        MakeFluctuatedHistogramAlternative(static_cast<TH2D*>(PredFluctHist.get()), static_cast<TH2D*>(PostPred_mc[iSample].get()), random.get());
       }
       else {
         MACH3LOG_ERROR("Asking for {} with N Dimension = {}. This is not implemented", __func__, nDims);
