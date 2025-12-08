@@ -9,7 +9,7 @@
 /// @file PredictivePlotting.cpp
 /// @author Kamil Skwarczynski
 
-std::vector<std::string> FindSamples(std::string File)
+std::vector<std::string> FindSamples(const std::string& File)
 {
   TFile *file = M3::Open(File, "READ", __FILE__, __LINE__);
   TDirectoryFile *PredicitveDir = file->Get<TDirectoryFile>("Predictive");
@@ -77,7 +77,13 @@ void OverlayPredicitve(const YAML::Node& Settings,
   for(size_t iSample = 0; iSample < SampleNames.size(); iSample++)
   {
     const int nFiles = static_cast<int>(InputFiles.size());
-    std::unique_ptr<TH1D> DataHist = M3::Clone(InputFiles[0]->Get<TH1D>(("SampleFolder/data_" + SampleNames[iSample]).c_str()));
+    TH1D* hist = InputFiles[0]->Get<TH1D>(("SampleFolder/data_" + SampleNames[iSample]).c_str());
+    if(!hist) {
+      MACH3LOG_WARN("Couldn't find hist for {}, most likely it is using 2D", SampleNames[iSample]);
+      MACH3LOG_WARN("Currently only 1D, sorry");
+      continue;
+    }
+    std::unique_ptr<TH1D> DataHist = M3::Clone(hist);
     DataHist->SetLineColor(kBlack);
     //KS: +1 for data, we want to get integral before scaling of the histogram
     std::vector<double> Integral(nFiles);
@@ -228,15 +234,17 @@ void PredictivePlotting(const std::string& ConfigName,
 int main(int argc, char **argv)
 {
   SetMaCh3LoggerFormat();
-  if ( !(argc == 4 || argc == 5))
+  if (argc < 3)
   {
-    MACH3LOG_ERROR("Need at least two arguments, ./{} <Prior/Post_PredOutput.root> <Prior/Post_PredOutput.root>", argv[0]);
+    MACH3LOG_ERROR("Need at least two arguments, {} <Config.Yaml> <Prior/Post_PredOutput.root>", argv[0]);
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-
   std::string ConfigName = std::string(argv[1]);
-  std::vector<std::string> FileNames = {std::string(argv[2]), std::string(argv[3])};
-  if (argc == 5) FileNames.push_back(std::string(argv[4]));
+  // Collect all remaining arguments as file names
+  std::vector<std::string> FileNames;
+  for (int i = 2; i < argc; ++i) {
+    FileNames.emplace_back(argv[i]);
+  }
 
   PredictivePlotting(ConfigName, FileNames);
 

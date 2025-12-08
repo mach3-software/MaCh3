@@ -525,7 +525,7 @@ inline void MakeMatrixPosDef(TMatrixDSym *cov) {
       #pragma omp parallel for
       #endif
       for (int iVar = 0 ; iVar < matrixSize; iVar++) {
-        (*cov)(iVar,iVar) += pow(10, -9);
+        (*cov)(iVar, iVar) += 1e-9;
       }
     }
   }
