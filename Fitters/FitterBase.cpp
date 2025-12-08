@@ -36,11 +36,6 @@ FitterBase::FitterBase(manager * const man) : fitMan(man) {
   //you don't want this too often https://root.cern/root/html606/TTree_8cxx_source.html#l01229
   auto_save = Get<int>(fitMan->raw()["General"]["MCMC"]["AutoSave"], __FILE__ , __LINE__);
 
-  #ifdef MULTITHREAD
-  //KS: TODO This should help with performance when saving entries to ROOT file. I didn't have time to validate hence commented out
-  //Based on other tests it is really helpful
-  //ROOT::EnableImplicitMT();
-  #endif
   // Set the output file
   outputFile = M3::Open(outfile, "RECREATE", __FILE__, __LINE__);
   outputFile->cd();
@@ -294,13 +289,35 @@ void FitterBase::AddSampleHandler(SampleHandlerBase * const sample) {
 void FitterBase::AddSystObj(ParameterHandlerBase * const cov) {
 // *************************
   MACH3LOG_INFO("Adding systematic object {}, with {} params", cov->GetName(), cov->GetNumParams());
+  // KS: Need to make sure we don't have params with same name, otherwise ROOT I/O and parts of MaCh3 will be terribly confused...
+  for (size_t s = 0; s < systematics.size(); ++s)
+  {
+    for (int iPar = 0; iPar < systematics[s]->GetNumParams(); ++iPar)
+    {
+      for (int i = 0; i < cov->GetNumParams(); ++i)
+      {
+        if(systematics[s]->GetParName(iPar) == cov->GetParName(i)){
+          MACH3LOG_ERROR("ParameterHandler {} has param '{}' which already exists in in {}, with name {}",
+                         cov->GetName(), cov->GetParName(i), systematics[s]->GetName(), systematics[s]->GetParName(iPar));
+          throw MaCh3Exception(__FILE__ , __LINE__ );
+        }
+        // Same for fancy name
+        if(systematics[s]->GetParFancyName(iPar) == cov->GetParFancyName(i)){
+          MACH3LOG_ERROR("ParameterHandler {} has param '{}' which already exists in {}, with name {}",
+                         cov->GetName(), cov->GetParFancyName(i), systematics[s]->GetName(), systematics[s]->GetParFancyName(iPar));
+          throw MaCh3Exception(__FILE__ , __LINE__ );
+        }
+      }
+    }
+  }
+
   systematics.push_back(cov);
 
   CovFolder->cd();
   std::vector<double> n_vec(cov->GetNumParams());
-  for (int i = 0; i < cov->GetNumParams(); ++i)
+  for (int i = 0; i < cov->GetNumParams(); ++i) {
     n_vec[i] = cov->GetParInit(i);
-
+  }
   cov->GetCovMatrix()->Write(cov->GetName().c_str());
 
   TH2D* CorrMatrix = cov->GetCorrelationMatrix();
