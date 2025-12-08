@@ -36,6 +36,9 @@ void MCMCBase::RunMCMC() {
     // Remove obsolete memory and make other checks before fit starts
     SanitiseInputs();
 
+    // Print Progress before Propose Step
+    PrintProgress(false);
+
     // Reconfigure the samples, systematics and oscillation for first weight
     // ProposeStep sets logLProp
     ProposeStep();
@@ -110,13 +113,16 @@ void MCMCBase::PostStepProcess() {
 
 // *******************
 // Print the fit output progress
-void MCMCBase::PrintProgress() {
+void MCMCBase::PrintProgress(bool StepsPrint) {
 // *******************
-    MACH3LOG_INFO("Step:\t{}/{}, current: {:.2f}, proposed: {:.2f}", step - stepStart, chainLength, logLCurr, logLProp);
-    MACH3LOG_INFO("Accepted/Total steps: {}/{} = {:.2f}", accCount, step - stepStart, static_cast<double>(accCount) / static_cast<double>(step - stepStart));
+    if(StepsPrint) MACH3LOG_INFO("Step:\t{}/{}, current: {:.2f}, proposed: {:.2f}", step - stepStart, chainLength, logLCurr, logLProp);
+    if(StepsPrint) MACH3LOG_INFO("Accepted/Total steps: {}/{} = {:.2f}", accCount, step - stepStart, static_cast<double>(accCount) / static_cast<double>(step - stepStart));
 
-    for (ParameterHandlerBase *cov : systematics)
-    {
+    for (size_t i = 0; i < samples.size(); ++i) {
+        samples[i]->PrintRates();
+    }
+
+    for (ParameterHandlerBase *cov : systematics) {
         cov->PrintNominalCurrProp();
     }
 #ifdef DEBUG
