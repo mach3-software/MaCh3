@@ -125,6 +125,7 @@ void SampleHandlerFD::LoadSingleSample(const int iSample, const YAML::Node& Samp
   int NChannels = static_cast<M3::int_t>(SampleSettings["SubSamples"].size());
   SingleSample.OscChannels.reserve(NChannels);
 
+  int OscChannelCounter = 0;
   for (auto const &osc_channel : SampleSettings["SubSamples"]) {
     std::string MTupleFileName = mtupleprefix+osc_channel["mtuplefile"].as<std::string>()+mtuplesuffix;
 
@@ -133,7 +134,7 @@ void SampleHandlerFD::LoadSingleSample(const int iSample, const YAML::Node& Samp
     OscInfo.flavourName_Latex = osc_channel["LatexName"].as<std::string>();
     OscInfo.InitPDG           = static_cast<NuPDG>(osc_channel["nutype"].as<int>());
     OscInfo.FinalPDG          = static_cast<NuPDG>(osc_channel["oscnutype"].as<int>());
-    OscInfo.ChannelIndex      = GetNOscChannels(iSample);
+    OscInfo.ChannelIndex      = OscChannelCounter;
 
     SingleSample.OscChannels.push_back(std::move(OscInfo));
 
@@ -142,6 +143,7 @@ void SampleHandlerFD::LoadSingleSample(const int iSample, const YAML::Node& Samp
 
     SingleSample.mc_files.push_back(MTupleFileName);
     SingleSample.spline_files.push_back(splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);
+    OscChannelCounter++;
   }
   //Now grab the selection cuts from the manager
   for ( auto const &SelectionCuts : SampleSettings["SelectionCuts"]) {
@@ -161,6 +163,9 @@ void SampleHandlerFD::LoadSingleSample(const int iSample, const YAML::Node& Samp
 }
 
 void SampleHandlerFD::Initialise() {
+  TStopwatch clock;
+  clock.Start();
+
   //First grab all the information from your sample config via your manager
   ReadConfig();
 
@@ -205,10 +210,12 @@ void SampleHandlerFD::Initialise() {
   SetupNormParameters();
   MACH3LOG_INFO("Setting up Functional Pointers..");
   SetupFunctionalParameters();
-  MACH3LOG_INFO("Setting up Weight Pointers..");
-  SetupWeightPointers();
+  MACH3LOG_INFO("Setting up Additional Weight Pointers..");
+  AddAdditionalWeightPointers();
   MACH3LOG_INFO("Setting up Kinematic Map..");
   SetupKinematicMap();
+  clock.Stop();
+  MACH3LOG_INFO("Finished loading MC for {}, it took {:.2f}s to finish", GetName(), clock.RealTime());
   MACH3LOG_INFO("=======================================================");
 }
 
@@ -344,28 +351,16 @@ void SampleHandlerFD::FillArray() {
     if (!IsEventSelected(MCEvent->NominalSample, iEvent)) {
       continue;
     }
-    M3::float_t splineweight = CalcWeightSpline(MCEvent);
-    //DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient. Do this on a spline-by-spline basis
-    if (splineweight <= 0.){
-      MCEvent->xsec_w = 0.;
-      continue;
-    }
 
-    //Loop over stored normalisation and function pointers
-    M3::float_t normweight = CalcWeightNorm(MCEvent);
-
-    // Virtual by default does nothing
+    // Virtual by default does nothing, has to happen before CalcWeightTotal
     CalcWeightFunc(iEvent);
 
-    MCEvent->xsec_w = splineweight*normweight;
-
-    //DB Total weight
-    M3::float_t totalweight = GetEventWeight(iEvent);
-    //DB Catch negative weights and skip any event with a negative event
+    const M3::float_t totalweight = CalcWeightTotal(MCEvent);
+    //DB Catch negative total weights and skip any event with a negative weight. Previously we would set weight to zero and continue but that is inefficient
     if (totalweight <= 0.){
-      MCEvent->xsec_w = 0.;
       continue;
     }
+
     //DB Switch on BinningOpt to allow different binning options to be implemented
     //The alternative would be to have inheritance based on BinningOpt
     const double XVar = *(MCEvent->x_var);
@@ -435,27 +430,12 @@ void SampleHandlerFD::FillArray_MP() {
         continue;
       }
 
-      //DB SKDet Syst
-      //As weights were skdet::fParProp, and we use the non-shifted erec, we might as well cache the corresponding fParProp index for each event and the pointer to it
-      const M3::float_t splineweight = CalcWeightSpline(MCEvent);
-      //DB Catch negative spline weights and skip any event with a negative event. Previously we would set weight to zero and continue but that is inefficient
-      if (splineweight <= 0.){
-        MCEvent->xsec_w = 0.;
-        continue;
-      }
-
-      const M3::float_t normweight = CalcWeightNorm(MCEvent);
-
-      // Virtual by default does nothing
+      // Virtual by default does nothing, has to happen before CalcWeightTotal
       CalcWeightFunc(iEvent);
 
-      MCEvent->xsec_w = splineweight*normweight;
-
-      const M3::float_t totalweight = GetEventWeight(iEvent);
-
-      //DB Catch negative weights and skip any event with a negative event
+      const M3::float_t totalweight = CalcWeightTotal(MCEvent);
+      //DB Catch negative total weights and skip any event with a negative weight. Previously we would set weight to zero and continue but that is inefficient
       if (totalweight <= 0.){
-        MCEvent->xsec_w = 0.;
         continue;
       }
 
@@ -625,26 +605,9 @@ void SampleHandlerFD::ApplyShifts(int iEvent) {
 
 // ***************************************************************************
 // Calculate the spline weight for one event
-M3::float_t SampleHandlerFD::CalcWeightSpline(const FarDetectorCoreInfo* MCEvent) const {
+M3::float_t SampleHandlerFD::CalcWeightTotal(const FarDetectorCoreInfo* _restrict_ MCEvent) const {
 // ***************************************************************************
-  M3::float_t spline_weight = 1.0;
-  const int nSplines = static_cast<int>(MCEvent->xsec_spline_pointers.size());
-  //DB Xsec syst
-  //Loop over stored spline pointers
-  #ifdef MULTITHREAD
-  #pragma omp simd
-  #endif
-  for (int iSpline = 0; iSpline < nSplines; ++iSpline) {
-    spline_weight *= *(MCEvent->xsec_spline_pointers[iSpline]);
-  }
-  return spline_weight;
-}
-
-// ***************************************************************************
-// Calculate the normalisation weight for an event
-M3::float_t SampleHandlerFD::CalcWeightNorm(const FarDetectorCoreInfo* MCEvent) const {
-// ***************************************************************************
-  M3::float_t xsecw = 1.0;
+  M3::float_t TotalWeight = 1.0;
   const int nNorms = static_cast<int>(MCEvent->xsec_norm_pointers.size());
   //Loop over stored normalisation and function pointers
   #ifdef MULTITHREAD
@@ -652,15 +615,23 @@ M3::float_t SampleHandlerFD::CalcWeightNorm(const FarDetectorCoreInfo* MCEvent) 
   #endif
   for (int iParam = 0; iParam < nNorms; ++iParam)
   {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-    xsecw *= static_cast<M3::float_t>(*(MCEvent->xsec_norm_pointers[iParam]));
-#pragma GCC diagnostic pop
-    #ifdef DEBUG
-    if (std::isnan(xsecw)) MACH3LOG_WARN("iParam= {} xsecweight=nan from norms", iParam);
-    #endif
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wuseless-cast"
+    TotalWeight *= static_cast<M3::float_t>(*(MCEvent->xsec_norm_pointers[iParam]));
+    #pragma GCC diagnostic pop
   }
-  return xsecw;
+
+  const int TotalWeights = static_cast<int>(MCEvent->total_weight_pointers.size());
+  //DB Xsec syst
+  //Loop over stored spline pointers
+  #ifdef MULTITHREAD
+  #pragma omp simd
+  #endif
+  for (int iWeight = 0; iWeight < TotalWeights; ++iWeight) {
+    TotalWeight *= *(MCEvent->total_weight_pointers[iWeight]);
+  }
+
+  return TotalWeight;
 }
 
 // ***************************************************************************
@@ -1186,12 +1157,12 @@ void SampleHandlerFD::InitialiseNuOscillatorObjects() {
 
 void SampleHandlerFD::SetupNuOscillatorPointers() {
   for (unsigned int iEvent=0;iEvent<GetNEvents();iEvent++) {
-    MCSamples[iEvent].osc_w_pointer = &M3::Unity;
+    const M3::float_t* osc_w_pointer = &M3::Unity;
     if (MCSamples[iEvent].isNC) {
       if (*MCSamples[iEvent].nupdg != *MCSamples[iEvent].nupdgUnosc) {
-        MCSamples[iEvent].osc_w_pointer = &M3::Zero;
+        osc_w_pointer = &M3::Zero;
       } else {
-        MCSamples[iEvent].osc_w_pointer = &M3::Unity;
+        osc_w_pointer = &M3::Unity;
       }
     } else {
       int InitFlav = M3::_BAD_INT_;
@@ -1214,12 +1185,16 @@ void SampleHandlerFD::SetupNuOscillatorPointers() {
       //Can only happen if truecz has been initialised within the experiment specific code
       if (*(MCSamples[iEvent].rw_truecz) != M3::_BAD_DOUBLE_) {
         //Atmospherics
-        MCSamples[iEvent].osc_w_pointer = Oscillator->GetNuOscillatorPointers(Sample, OscIndex, InitFlav, FinalFlav, FLOAT_T(*(MCSamples[iEvent].rw_etru)), FLOAT_T(*(MCSamples[iEvent].rw_truecz)));
+        osc_w_pointer = Oscillator->GetNuOscillatorPointers(Sample, OscIndex, InitFlav, FinalFlav, FLOAT_T(*(MCSamples[iEvent].rw_etru)), FLOAT_T(*(MCSamples[iEvent].rw_truecz)));
       } else {
         //Beam
-        MCSamples[iEvent].osc_w_pointer = Oscillator->GetNuOscillatorPointers(Sample, OscIndex, InitFlav, FinalFlav, FLOAT_T(*(MCSamples[iEvent].rw_etru)));
+        osc_w_pointer = Oscillator->GetNuOscillatorPointers(Sample, OscIndex, InitFlav, FinalFlav, FLOAT_T(*(MCSamples[iEvent].rw_etru)));
       }
     } // end if NC
+    // KS: Do not add unity
+    if (osc_w_pointer != &M3::Unity) {
+      MCSamples[iEvent].total_weight_pointers.push_back(osc_w_pointer);
+    }
   } // end loop over events
 }
 
@@ -1234,16 +1209,19 @@ std::string SampleHandlerFD::GetName() const {
   return SampleHandlerName;
 }
 
-M3::float_t SampleHandlerFD::GetEventWeight(const int iEntry) const {
-  M3::float_t totalweight = 1.0;
-  const int nParams = static_cast<int>(MCSamples[iEntry].total_weight_pointers.size());
-  #ifdef MULTITHREAD
-  #pragma omp simd
-  #endif
-  for (int iParam = 0; iParam < nParams; ++iParam) {
-    totalweight *= *(MCSamples[iEntry].total_weight_pointers[iParam]);
-  }
+M3::float_t SampleHandlerFD::GetEventWeight(const int iEntry) {
+  // KS: WARNING we have to here recalculate weight and cap because there is possibility weight wasn't calculated during FillArray because it didn't fulfil IsEventSelected
 
+  // Virtual by default does nothing, has to happen before CalcWeightTotal
+  CalcWeightFunc(iEntry);
+
+  const FarDetectorCoreInfo* MCEvent = &MCSamples[iEntry];
+  M3::float_t totalweight = CalcWeightTotal(MCEvent);
+
+  //DB Catch negative total weights and skip any event with a negative weight. Previously we would set weight to zero and continue but that is inefficient
+  if (totalweight <= 0.){
+    totalweight = 0.;
+  }
   return totalweight;
 }
 
@@ -1270,17 +1248,17 @@ void SampleHandlerFD::FillSplineBins() {
         throw MaCh3Exception(__FILE__, __LINE__);
         break;
     }
-    int NSplines = int(EventSplines.size());
-    if(NSplines < 0){
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-    MCSamples[j].xsec_spline_pointers.resize(NSplines);
-    for(size_t spline = 0; spline < MCSamples[j].xsec_spline_pointers.size(); spline++) {
+    const int NSplines = static_cast<int>(EventSplines.size());
+    if(NSplines == 0) continue;
+    const int PointersBefore = static_cast<int>(MCSamples[j].total_weight_pointers.size());
+    MCSamples[j].total_weight_pointers.resize(PointersBefore + NSplines);
+
+    for(int spline = 0; spline < NSplines; spline++) {
       //Event Splines indexed as: sample name, oscillation channel, syst, mode, etrue, var1, var2 (var2 is a dummy 0 for 1D splines)
-      MCSamples[j].xsec_spline_pointers[spline] = SplineHandler->retPointer(EventSplines[spline][0], EventSplines[spline][1],
-                                                                            EventSplines[spline][2], EventSplines[spline][3],
-                                                                            EventSplines[spline][4], EventSplines[spline][5],
-                                                                            EventSplines[spline][6]);
+      MCSamples[j].total_weight_pointers[PointersBefore+spline] = SplineHandler->retPointer(EventSplines[spline][0], EventSplines[spline][1],
+                                                                    EventSplines[spline][2], EventSplines[spline][3],
+                                                                    EventSplines[spline][4], EventSplines[spline][5],
+                                                                    EventSplines[spline][6]);
     }
   }
 }
@@ -1424,7 +1402,7 @@ TH1* SampleHandlerFD::Get1DVarHist(const int iSample, const std::string& Project
   Selection = SelectionVecToApply;
 
   //DB Define the histogram which will be returned
-  TH1D* _h1DVar;
+  TH1D* _h1DVar = nullptr;;
   if (Axis) {
     _h1DVar = new TH1D("","",Axis->GetNbins(),Axis->GetXbins()->GetArray());
   } else {
@@ -1505,7 +1483,7 @@ TH2* SampleHandlerFD::Get2DVarHist(const int iSample, const std::string& Project
   Selection = SelectionVecToApply;
 
   //DB Define the histogram which will be returned
-  TH2D* _h2DVar;
+  TH2D* _h2DVar = nullptr;
   if (AxisX && AxisY) {
     _h2DVar = new TH2D("","",AxisX->GetNbins(),AxisX->GetXbins()->GetArray(),AxisY->GetNbins(),AxisY->GetXbins()->GetArray());
   } else {
@@ -1513,6 +1491,8 @@ TH2* SampleHandlerFD::Get2DVarHist(const int iSample, const std::string& Project
     std::vector<double> yBinEdges = ReturnKinematicParameterBinning(iSample, ProjectionVar_StrY);
     _h2DVar = new TH2D("", "", int(xBinEdges.size())-1, xBinEdges.data(), int(yBinEdges.size())-1, yBinEdges.data());
   }
+  _h2DVar->GetXaxis()->SetTitle(ProjectionVar_StrX.c_str());
+  _h2DVar->GetYaxis()->SetTitle(ProjectionVar_StrY.c_str());
 
   bool IsSubEventHist = IsSubEventVarString(ProjectionVar_StrX) || IsSubEventVarString(ProjectionVar_StrY);
   if (IsSubEventHist) Fill2DSubEventHist(iSample, _h2DVar, ProjectionVar_StrX, ProjectionVar_StrY, SubEventSelectionVec, WeightStyle);

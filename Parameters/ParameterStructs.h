@@ -21,6 +21,7 @@ _MaCh3_Safe_Include_Start_ //{
 _MaCh3_Safe_Include_End_ //}
 
 /// @file ParameterStructs.h
+/// @brief Definitions of generic parameter structs and utility templates for MaCh3.
 /// @author Asher Kaboth
 /// @author Clarence Wret
 /// @author Patrick Dunne

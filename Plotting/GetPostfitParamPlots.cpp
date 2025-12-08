@@ -49,10 +49,6 @@ _MaCh3_Safe_Include_End_ //}
 MaCh3Plotting::PlottingManager *man;
 TH1D *Prefit;
 
-TH2D *Violin;
-TH2D *Violin2;
-TH2D *ViolinPre;
-
 int NDParameters;
 int NDParametersStartingPos;
 
@@ -852,7 +848,7 @@ inline std::unique_ptr<TGraphAsymmErrors> MakeTGraphAsymmErrors(const std::share
 }
    
 /// @brief KS: Make fancy violin plots
-void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
+void GetViolinPlots()
 {
   //KS: Should be in some config... either way it control whether you plot symmetric or asymmetric error bars
   bool PlotAssym = true;
@@ -860,43 +856,30 @@ void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
   //KS: No idea why but ROOT changed treatment of violin in R6. If you have non uniform binning this will results in very hard to see violin plots.
   TCandle::SetScaledViolin(false);
 
+  std::string OutputName = "";
+  for(unsigned int fileId = 0; fileId < man->getNFiles(); fileId++){
+    MACH3LOG_INFO("File {}: {} ", fileId, man->getFileName(fileId));
+    OutputName += man->getFileName(fileId);
+    OutputName = OutputName.substr(0, OutputName.find(".root"));
+  }
   MACH3LOG_INFO("Making Violin Plot");
-  if (!FileName1.empty()) MACH3LOG_INFO("File 1: {} ", FileName1);
-  if (!FileName2.empty()) MACH3LOG_INFO("File 2: {}", FileName2);
-    
-  SaveName = FileName1;
-  SaveName = SaveName.substr(0, SaveName.find(".root"));
-  if(FileName2 != "") SaveName += FileName2;
-  if(FileName2 != "") SaveName = SaveName.substr(0, SaveName.find(".root"));
-  SaveName += "_Violin";
-  if(PlotAssym) SaveName += "_Assym";
-   
-  std::shared_ptr<TFile> File1 = std::make_shared<TFile>(FileName1.c_str());
-  std::shared_ptr<TFile> File2 = nullptr;
-  if(FileName2 != "") File2 = std::make_shared<TFile>(FileName2.c_str());
-  
-  canv = new TCanvas("canv", "canv", 1024, 1024);
-  canv->SetGrid();
+  OutputName += "_Violin";
+  if(PlotAssym) OutputName += "_Assym";
+
+  auto canvas = std::make_unique<TCanvas>("canv", "canv", 1024, 1024);
+  canvas->SetGrid();
   gStyle->SetOptStat(0);
   //KS: Remove errors on X axis as they are confusing in violin type of plot
   if(!PlotAssym) gStyle->SetErrorX(0.0001);
-  canv->SetTickx();
-  canv->SetTicky();
-  canv->SetBottomMargin(0.25);
-  canv->SetTopMargin(0.08);
-  canv->SetRightMargin(0.03);
-  canv->SetLeftMargin(0.10);
-  canv->Print((SaveName+".pdf[").c_str());
-  canv->SetGrid();
-
-  Violin = nullptr;
-  ViolinPre = File1->Get<TH2D>( "param_violin_prior" );
-  Violin = File1->Get<TH2D>( "param_violin" );
-  if(Violin == nullptr)
-  {
-    MACH3LOG_ERROR("Couldn't find violin plot, make sure method from MCMCProcessor is being called");
-    return;
-  }
+  canvas->SetTickx();
+  canvas->SetTicky();
+  canvas->SetBottomMargin(0.25);
+  canvas->SetTopMargin(0.08);
+  canvas->SetRightMargin(0.03);
+  canvas->SetLeftMargin(0.10);
+  canvas->Print((OutputName+".pdf[").c_str());
+  canvas->SetGrid();
+  std::unique_ptr<TH2D> ViolinPre = M3::Clone(man->input().getFile(0).file->Get<TH2D>( "param_violin_prior" ));
   // Do some fancy replacements
   ViolinPre->SetFillColor(kRed);
   ViolinPre->SetFillColorAlpha(kRed, 0.35);
@@ -908,40 +891,56 @@ void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
   ViolinPre->GetYaxis()->SetTitle("Parameter Value");
   ViolinPre->GetXaxis()->LabelsOption("v");
 
-  Violin->SetFillColor(kBlue);
-  Violin->SetFillColorAlpha(kBlue, 0.35);
-  Violin->SetMarkerColor(kBlue);
-  Violin->SetMarkerStyle(20);
-  Violin->SetMarkerSize(0.5);
-    
-  TH1D* Postfit = File1->Get<TH1D>( ("param_xsec_"+plotType).c_str() );
+  std::unique_ptr<TH1D> Postfit = M3::Clone(man->input().getFile(0).file->Get<TH1D>( ("param_xsec_"+plotType).c_str() ));
   Postfit->SetMarkerColor(kRed);
   Postfit->SetLineColor(kRed);
   Postfit->SetMarkerStyle(7);
-  
- if(File2 != nullptr)
-  {
-    Violin2 = File2->Get<TH2D>( "param_violin" );
-    Violin2->SetMarkerColor(kGreen);
-    Violin2->SetLineColor(kGreen);
-    Violin2->SetFillColor(kGreen);
-    Violin2->SetFillColorAlpha(kGreen, 0.35);
-  }
-  
-  std::unique_ptr<TGraphAsymmErrors> PostGraphAll = MakeTGraphAsymmErrors(File1);
 
+  std::vector<std::unique_ptr<TH2D>> Violin(man->getNFiles());
+  for(unsigned int fileId = 0; fileId < man->getNFiles(); fileId++) {
+    Violin[fileId] = M3::Clone(man->input().getFile(fileId).file->Get<TH2D>( "param_violin" ));
+    if(Violin[fileId] == nullptr)
+    {
+      MACH3LOG_ERROR("Couldn't find violin plot, make sure method from MCMCProcessor is being called");
+      return;
+    }
+    //KS: I know hardcoded but we can figure out later...
+    if(fileId == 0){
+      Violin[fileId]->SetFillColor(kBlue);
+      Violin[fileId]->SetFillColorAlpha(kBlue, 0.35);
+      Violin[fileId]->SetMarkerColor(kBlue);
+      Violin[fileId]->SetMarkerStyle(20);
+      Violin[fileId]->SetMarkerSize(0.5);
+    } else if (fileId == 1) {
+      Violin[fileId]->SetMarkerColor(kGreen);
+      Violin[fileId]->SetLineColor(kGreen);
+      Violin[fileId]->SetFillColor(kGreen);
+      Violin[fileId]->SetFillColorAlpha(kGreen, 0.35);
+    } else if (fileId == 2) {
+      Violin[fileId]->SetMarkerColor(kMagenta);
+      Violin[fileId]->SetLineColor(kMagenta);
+      Violin[fileId]->SetFillColor(kMagenta);
+      Violin[fileId]->SetFillColorAlpha(kMagenta, 0.35);
+    } else {
+      MACH3LOG_ERROR("Too many file, not implemented...");
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
+  }
+
+  std::unique_ptr<TGraphAsymmErrors> PostGraphAll = MakeTGraphAsymmErrors(man->input().getFile(0).file);
   // Make a Legend page
   auto leg = std::make_unique<TLegend>(0.0, 0.0, 1.0, 1.0);
-  if (ViolinPre != nullptr) leg->AddEntry(ViolinPre, "Prior", "lpf");
-  if (Violin != nullptr)    leg->AddEntry(Violin, "Posterior", "lpf");
-  if (Violin2 != nullptr)   leg->AddEntry(Violin2, "Second Violin", "lpf");
-  if(PlotAssym)             leg->AddEntry(PostGraphAll.get(), "HPD Assym", "lp");
-  else                      leg->AddEntry(Postfit, "HPD", "lpf");
+  if (ViolinPre != nullptr) leg->AddEntry(ViolinPre.get(), "Prior", "lpf");
+  for(unsigned int fileId = 0; fileId < man->getNFiles(); fileId++) {
+    leg->AddEntry(Violin[fileId].get(), man->getFileLabel(fileId).c_str(), "lpf");
+  }
+  if(PlotAssym) leg->AddEntry(PostGraphAll.get(), "HPD Assym", "lp");
+  else          leg->AddEntry(Postfit.get(), "HPD", "lpf");
 
-  canv->cd();
-  canv->Clear();
+  canvas->cd();
+  canvas->Clear();
   leg->Draw();
-  canv->Print((SaveName+".pdf").c_str());
+  canvas->Print((OutputName+".pdf").c_str());
   
   // get the names of the blocks of parameters to group together
   std::vector<std::string> const blockNames = man->getOption<std::vector<std::string>>("paramGroups");
@@ -962,19 +961,17 @@ void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
     // set some plot things
     auto blockHist_prefit = std::make_unique<TH2D>((blockName + "_Prefit").c_str(), blockTitle.c_str(), nParams, 0.0, static_cast<double>(nParams),
                                       ViolinPre->GetYaxis()->GetNbins(), ViolinPre->GetYaxis()->GetXmin(), ViolinPre->GetYaxis()->GetXmax());
-    CopyViolinToBlock(ViolinPre, blockHist_prefit.get(), blockContents);
+    CopyViolinToBlock(ViolinPre.get(), blockHist_prefit.get(), blockContents);
     // set the y axis limits we got from config
     blockHist_prefit->GetYaxis()->SetRangeUser(blockLimits[0], blockLimits[1]);
-    auto blockHist_Violin1 = std::make_unique<TH2D>((blockTitle + "Violin1").c_str(), (blockTitle + "Violin1").c_str(), nParams, 0.0, static_cast<double>(nParams),
-                                       Violin->GetYaxis()->GetNbins(), Violin->GetYaxis()->GetXmin(), Violin->GetYaxis()->GetXmax());
-    CopyViolinToBlock(Violin, blockHist_Violin1.get(), blockContents);
-    blockHist_Violin1->GetYaxis()->SetRangeUser(blockLimits[0], blockLimits[1]);
-    std::unique_ptr<TH2D> blockHist_Violin2 = nullptr;
-    if(Violin2 != nullptr) {
-      blockHist_Violin2 = std::make_unique<TH2D>((blockTitle + "Violin2").c_str(), (blockTitle + "Violin2").c_str(), nParams, 0.0, static_cast<double>(nParams),
-                                   Violin2->GetYaxis()->GetNbins(), Violin2->GetYaxis()->GetXmin(), Violin2->GetYaxis()->GetXmax());
-      CopyViolinToBlock(Violin2, blockHist_Violin2.get(), blockContents);
-      blockHist_Violin2->GetYaxis()->SetRangeUser(blockLimits[0], blockLimits[1]);
+
+    std::vector<std::unique_ptr<TH2D>> blockHist(man->getNFiles());
+    for(unsigned int fileId = 0; fileId < man->getNFiles(); fileId++) {
+      blockHist[fileId] = std::make_unique<TH2D>((blockTitle + "Violin" + fileId).Data(), (blockTitle + "Violin" + fileId).Data(),
+                                                   nParams, 0.0, static_cast<double>(nParams), Violin[fileId]->GetYaxis()->GetNbins(),
+                                                   Violin[fileId]->GetYaxis()->GetXmin(), Violin[fileId]->GetYaxis()->GetXmax());
+      CopyViolinToBlock(Violin[fileId].get(), blockHist[fileId].get(), blockContents);
+      blockHist[fileId]->GetYaxis()->SetRangeUser(blockLimits[fileId], blockLimits[1]);
     }
     // Do some fancy replacements
     PrettifyTitles(blockHist_prefit.get());
@@ -1000,7 +997,7 @@ void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
       }
       Index.push_back(ParamBinId);
     }
-    std::unique_ptr<TGraphAsymmErrors> PostGraph = MakeTGraphAsymmErrors(File1, Index);
+    std::unique_ptr<TGraphAsymmErrors> PostGraph = MakeTGraphAsymmErrors(man->input().getFile(0).file, Index);
     PostGraph->SetMarkerColor(kBlack);
     PostGraph->SetLineColor(kBlack);
     PostGraph->SetMarkerStyle(7);
@@ -1008,25 +1005,15 @@ void GetViolinPlots(std::string FileName1 = "", std::string FileName2 = "")
     PostGraph->SetLineStyle(kSolid);
 
     blockHist_prefit->Draw("violinX(03100300)");
-    blockHist_Violin1->Draw("violinX(03100300) SAME");
-    if(blockHist_Violin2 != nullptr) {
-      blockHist_Violin2->Draw("violinX(03100300) SAME");
+    for(unsigned int fileId = 0; fileId < man->getNFiles(); fileId++) {
+      blockHist[fileId]->Draw("violinX(03100300) SAME");
     }
+
     if(PlotAssym) PostGraph->Draw("P SAME");
     else Postfit->Draw("SAME");
-    canv->Print((SaveName+".pdf").c_str());
+    canvas->Print((OutputName+".pdf").c_str());
   }
-
-  canv->Print((SaveName+".pdf]").c_str());
-  delete canv;
-  delete ViolinPre;
-  delete Violin;
-  if(Violin2 != nullptr) delete Violin2;
-  delete Postfit;
-  File1->Close();
-  if(File2 != nullptr) {
-    File2->Close();
-  }
+  canvas->Print((OutputName+".pdf]").c_str());
 }
 
 /// @brief KS: Make comparison of 2D Posteriors
@@ -1145,25 +1132,13 @@ int main(int argc, char *argv[])
   man->style().setPalette(man->getOption<std::string>("colorPalette"));
 
   GetPostfitParamPlots();
+  GetViolinPlots();
 
-  if (man->input().getNInputFiles() == 1)
-  {
-    std::string filename = man->getFileName(0);
-    GetViolinPlots(filename);
-  }
-  else if (man->input().getNInputFiles() == 2)
+  if (man->input().getNInputFiles() == 2)
   {
     std::string filename1 = man->getFileName(0);
     std::string filename2 = man->getFileName(1);
-    GetViolinPlots(filename1, filename2);
     Get2DComparison(filename1, filename2);
-  }
-  else if (man->input().getNInputFiles() == 3)
-  {
-    std::string filename1 = man->getFileName(0);
-    std::string filename2 = man->getFileName(1);
-    std::string filename3 = man->getFileName(3);
-    /// @todo KS: Violin plot currently not supported by three file version although it should be super easy to adapt
   }
 
   delete man;

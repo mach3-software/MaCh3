@@ -176,7 +176,6 @@ void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > 
     // Structure of MasterSpline is std::vector<std::vector<TSpline3*>>
     // A conventional iterator to count which parameter a given spline should be applied to
     for(unsigned int ParamNumber = 0; ParamNumber < MasterSpline[EventCounter].size(); ++ParamNumber) {
-
       // If NULL we don't have this spline for the event, so move to next spline
       if (MasterSpline[EventCounter][ParamNumber] == NULL) continue;
 
@@ -427,7 +426,6 @@ void SMonolith::ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*>
     int nPoints = 0;
     // Loop over each pointer
     for(unsigned int ParamNumber = 0; ParamNumber < MasterSpline[EventCounter].size(); ++ParamNumber) {
-
       if (MasterSpline[EventCounter][ParamNumber]) {
         if(SplineType[ParamNumber] == kTSpline3_red)
         {

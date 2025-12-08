@@ -28,19 +28,19 @@ public:
 
   /// @brief Add manager useful information's to TFile, in most cases to Fitter
   /// @param OutputFile The ROOT TFile to which the information will be added.
-  void SaveSettings(TFile* const OutputFile);
+  void SaveSettings(TFile* const OutputFile) const;
 
   /// @brief Print currently used config
-  void Print();
+  void Print() const;
 
   /// @brief Get likelihood type defined in the config
-  int GetMCStatLLH();
+  int GetMCStatLLH() const;
   /// @brief Return name of config
-  inline std::string GetFileName(){return FileName;}
+  inline std::string GetFileName() const {return FileName;}
   /// @brief Return config
-  inline YAML::Node const &raw(){return config;}
+  inline YAML::Node const &raw() const {return config;}
   /// @brief Get class name
-  inline std::string GetName()const {return "Manager";};
+  inline std::string GetName() const {return "Manager";};
 
   /// @brief Overrides the configuration settings based on provided arguments.
   /// @note Example usage:

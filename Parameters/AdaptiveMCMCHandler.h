@@ -14,9 +14,14 @@ namespace adaptive_mcmc
   /// @cite haario2001adaptive
   /// @cite Garthwaite01092016
   /// @author Henry Wallace
-  /// @details struct encapsulating all adaptive MCMC information. Adaption can be done in the pure "Haario/Roberts-Rosenthal"
-  /// style using a constant scale of 2.38^2/num_params or via a Robbins-Monro style adaption where the scale is updated.
-  /// The latter approach allows you to target a specific acceptance rate resulting in potentially better mixing.
+  /// @details Adaptation can be performed in two ways:
+  /// - **Haario/Roberts-Rosenthal style**: Uses a constant scale factor of
+  /// \f[
+  /// \frac{2.38}{\sqrt{\text{num\_params}}}
+  /// \f]
+  /// - **Robbins-Monro style**: Dynamically updates the scale factor to target
+  ///   a specific acceptance rate, potentially improving mixing.
+  ///
   class AdaptiveMCMCHandler
   {
   public:
@@ -179,10 +184,6 @@ namespace adaptive_mcmc
     /// @brief Get the current adaption scale
     double GetAdaptionScale()
     {
-      if (use_robbins_monro)
-      {
-        UpdateRobbinsMonroScale();
-      }
       return adaption_scale;
     }
 
@@ -192,9 +193,10 @@ namespace adaptive_mcmc
       return use_robbins_monro;
     }
 
-  private:
     /// Update the scale factor for Robbins-Monro adaption
     void UpdateRobbinsMonroScale();
+
+  private:
     /// Calculate the constant step length for Robbins-Monro adaption
     void CalculateRobbinsMonroStepLength();
 
