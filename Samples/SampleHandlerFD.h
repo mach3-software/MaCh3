@@ -89,6 +89,7 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// @brief including Dan's magic NuOscillator
   void InitialiseNuOscillatorObjects();
   void SetupNuOscillatorPointers();
+  const M3::float_t* GetNuOscillatorPointers(const int iEvent) const;
 
   void ReadConfig();
   void LoadSingleSample(const int iSample, const YAML::Node& Settings);

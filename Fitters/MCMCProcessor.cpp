@@ -278,8 +278,9 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
     }
     MACH3LOG_DEBUG("Initialising histogram for {} with binning {:.4f}, {:.4f}", Title, mini, maxi);
     // This holds the posterior density
+    // KS: WARNING do NOT SetDirectory(nullptr) this will cause issue with Project()
+    // I know is tempting to avoid ROOT memory management but please do not.
     hpost[i] = new TH1D(BranchNames[i], BranchNames[i], nBins, mini, maxi);
-    hpost[i]->SetDirectory(nullptr);
     hpost[i]->SetMinimum(0);
     hpost[i]->GetYaxis()->SetTitle("Steps");
     hpost[i]->GetYaxis()->SetNoExponent(false);
@@ -1003,11 +1004,10 @@ void MCMCProcessor::MakeCovariance() {
       TString DrawMe = BranchNames[j]+":"+BranchNames[i];
 
       // TH2F to hold the Correlation 
-      auto hpost_2D = std::make_unique<TH2D>(DrawMe, DrawMe,
+      auto hpost_2D = new TH2D(DrawMe, DrawMe,
                       nBins, hpost[i]->GetXaxis()->GetXmin(), hpost[i]->GetXaxis()->GetXmax(),
                       nBins, hpost[j]->GetXaxis()->GetXmin(), hpost[j]->GetXaxis()->GetXmax());
       hpost_2D->SetMinimum(0);
-      hpost_2D->SetDirectory(nullptr);
       hpost_2D->GetXaxis()->SetTitle(Title_i);
       hpost_2D->GetYaxis()->SetTitle(Title_j);
       hpost_2D->GetZaxis()->SetTitle("Steps");
@@ -1046,6 +1046,7 @@ void MCMCProcessor::MakeCovariance() {
       // Write it to root file
       //OutputFile->cd();
       //if( std::fabs((*Correlation)(i,j)) > Post2DPlotThreshold ) hpost_2D->Write();
+      delete hpost_2D;
     } // End j loop
   } // End i loop
   PostHistDir->Close();
