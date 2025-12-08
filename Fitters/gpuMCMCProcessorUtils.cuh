@@ -70,4 +70,9 @@ class MCMCProcessorGPU
   float* NumeratorSum_gpu;
   float* ParamSums_gpu;
   float* DenomSum_gpu;
+
+  // h_NAME declares HOST constants (live on CPU)
+  int h_nLag;
+  int h_nDraws;
+  int h_nEntries;
 };
