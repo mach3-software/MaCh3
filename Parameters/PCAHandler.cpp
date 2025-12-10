@@ -242,16 +242,11 @@ void PCAHandler::TransferToPCA() {
 }
 
 // ********************************************
-void PCAHandler::SetInitialParameters(std::vector<double>& IndStepScale) {
+void PCAHandler::SetInitialParameters() {
 // ********************************************
   TransferToPCA();
   for (int i = 0; i < NumParPCA; ++i) {
     _fPreFitValuePCA[i] = _fParCurrPCA(i);
-  }
-  //DB Set Individual Step scale for PCA parameters to the LastPCAdpar fIndivStepScale because the step scale for those parameters is set by 'eigen_values[i]' but needs an overall step scale
-  //   However, individual step scale for non-PCA parameters needs to be set correctly
-  for (int i = FirstPCAdpar; i <= LastPCAdpar; i++) {
-    IndStepScale[i] = IndStepScale[LastPCAdpar-1];
   }
 }
 
@@ -272,30 +267,6 @@ void PCAHandler::TransferToParam() {
 }
 
 // ********************************************
-// Throw the proposed parameter by mag sigma.
-void PCAHandler::ThrowParProp(const double mag, const double* _restrict_ randParams) {
-// ********************************************
-  for (int i = 0; i < NumParPCA; i++) {
-    if (_fErrorPCA[i] > 0.) {
-    _fParPropPCA(i) = _fParCurrPCA(i)+mag*randParams[i];
-    }
-  }
-  TransferToParam();
-}
-
-// ********************************************
-// Throw the proposed parameter by mag sigma.
-void PCAHandler::ThrowParCurr(const double mag, const double* _restrict_ randParams) {
-// ********************************************
-  for (int i = 0; i < NumParPCA; i++) {
-    if (_fErrorPCA[i] > 0.) {
-    _fParPropPCA(i) = mag*randParams[i];
-    }
-  }
-  TransferToParam();
-}
-
-// ********************************************
 void PCAHandler::Print() const {
 // ********************************************
   MACH3LOG_INFO("PCA:");
@@ -305,7 +276,7 @@ void PCAHandler::Print() const {
 }
 
 // ********************************************
-void PCAHandler::SetBranches(TTree &tree, bool SaveProposal, const std::vector<std::string>& Names) {
+void PCAHandler::SetBranches(TTree &tree, const bool SaveProposal, const std::vector<std::string>& Names) {
 // ********************************************
   for (int i = 0; i < NumParPCA; ++i) {
     tree.Branch(Form("%s_PCA", Names[i].c_str()), &_fParCurrPCA.GetMatrixArray()[i], Form("%s_PCA/D", Names[i].c_str()));

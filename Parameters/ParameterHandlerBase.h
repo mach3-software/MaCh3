@@ -116,11 +116,6 @@ class ParameterHandlerBase {
   /// @brief KS: After step scale, prefit etc. value were modified save this modified config.
   void SaveUpdatedMatrixConfig();
 
-  /// @brief Throw the proposed parameter by mag sigma. Should really just have the user specify this throw by having argument double
-  void ThrowParProp(const double mag = 1.);
-
-  /// @brief Helper function to throw the current parameter by mag sigma. Can study bias in MCMC with this; put different starting parameters
-  void ThrowParCurr(const double mag = 1.);
   /// @brief Throw the parameters according to the covariance matrix. This shouldn't be used in MCMC code ase it can break Detailed Balance;
   void ThrowParameters();
   /// @brief Randomly throw the parameters in their 1 sigma range
