@@ -85,13 +85,13 @@ void FitterBase::SaveSettings() {
   TDirectory* MaCh3Version = outputFile->mkdir("MaCh3Engine");
   MaCh3Version->cd();
 
-  if (std::getenv("MaCh3_ROOT") == NULL) {
+  if (std::getenv("MaCh3_ROOT") == nullptr) {
     MACH3LOG_ERROR("Need MaCh3_ROOT environment variable");
     MACH3LOG_ERROR("Please remember about source bin/setup.MaCh3.sh");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
-  if (std::getenv("MACH3") == NULL) {
+  if (std::getenv("MACH3") == nullptr) {
     MACH3LOG_ERROR("Need MACH3 environment variable");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
