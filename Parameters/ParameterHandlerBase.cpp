@@ -1068,6 +1068,22 @@ void ParameterHandlerBase::ResetIndivStepScale() {
   SetIndivStepScale(stepScales);
 }
 
+void ParameterHandlerBase::SetIndivStepScaleForSkippedAdaptParams() {
+  if (!param_skip_adapt_flags.size()) {
+    MACH3LOG_ERROR("Parameter skip adapt flags not set, cannot set individual step scales for skipped parameters.");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+  // HH: Cancel the effect of global step scale change for parameters that are not adapting
+  for (int i = 0; i <_fNumPar; i++) {
+    if (param_skip_adapt_flags[i]) {
+      _fIndivStepScale[i] = _fIndivStepScaleInitial[i] * _fGlobalStepScaleInitial / _fGlobalStepScale;
+    }
+  }
+  MACH3LOG_INFO("Updating individual step scales for non-adapting parameters to cancel global step scale change.");
+  MACH3LOG_INFO("Global step scale initial: {}, current: {}", _fGlobalStepScaleInitial, _fGlobalStepScale);
+  PrintIndivStepScale();
+}
+
 // ********************************************
 // HW: Code for throwing from separate throw matrix, needs to be set after init to ensure pos-def
 void ParameterHandlerBase::SetThrowMatrix(TMatrixDSym *cov){
@@ -1126,8 +1142,44 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
   }
   AdaptiveHandler = std::make_unique<adaptive_mcmc::AdaptiveMCMCHandler>();
 
+  // HH: Backing up _fIndivStepScale and _fGlobalStepScale before adaption
+  _fIndivStepScaleInitial = _fIndivStepScale;
+  _fGlobalStepScaleInitial = _fGlobalStepScale;
+
+  // HH: adding these here because they will be used to set the individual step scales for non-adapting parameters
+  std::vector<std::string> params_to_skip = GetFromManager<std::vector<std::string>>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ParametersToSkip"], {});
+  // Build a list of skip flags
+  param_skip_adapt_flags.resize(_fNumPar, false);
+  for (int i = 0; i <_fNumPar; ++i) {
+    for (const auto& name : params_to_skip) {
+      if(name == _fFancyNames[i]) {
+        param_skip_adapt_flags[i] = true;
+        break;
+      }
+    }
+  }
+  // HH: Loop over correlations to check if any skipped parameter is correlated with adapted one
+  // We don't want to change one parameter while keeping the other fixed as this would
+  // lead to weird penalty terms in the prior after adapting
+  double max_correlation = 0.01; // Define a threshold for significant correlation above which we throw an error
+  for (int i = 0; i < _fNumPar; ++i) {
+    for (int j = 0; j <= i; ++j) {
+      // The symmetry should have been checked during the Init phase 
+      if(param_skip_adapt_flags[i] && !param_skip_adapt_flags[j]) {
+        double corr = (*covMatrix)(i,j)/std::sqrt((*covMatrix)(i,i)*(*covMatrix)(j,j));
+        if(std::fabs(corr) > max_correlation) {
+          MACH3LOG_ERROR("Correlation between skipped parameter {} ({}) and non-skipped parameter {} ({}) is {:.6e}, above the allowed threshold of {:.6e}.",
+                         i, _fFancyNames[i], j, _fFancyNames[j], corr, max_correlation);
+          throw MaCh3Exception(__FILE__, __LINE__);
+        }
+      }
+    }
+  }
   // Now we read the general settings [these SHOULD be common across all matrices!]
-  bool success = AdaptiveHandler->InitFromConfig(adapt_manager, matrixName, &_fCurrVal, &_fError);
+  bool success = AdaptiveHandler->InitFromConfig(adapt_manager, matrixName, 
+    &_fFancyNames, &_fCurrVal, &_fError,
+    &param_skip_adapt_flags, throwMatrix, _fGlobalStepScaleInitial
+  );
   if(!success) return;
   AdaptiveHandler->Print();
 
@@ -1176,6 +1228,7 @@ void ParameterHandlerBase::UpdateAdaptiveCovariance(){
     #endif
     AdaptiveHandler->UpdateRobbinsMonroScale();
     SetStepScale(AdaptiveHandler->GetAdaptionScale(), verbose);
+    SetIndivStepScaleForSkippedAdaptParams();
   }
 
   // Call main adaption function
@@ -1185,6 +1238,7 @@ void ParameterHandlerBase::UpdateAdaptiveCovariance(){
   if(AdaptiveHandler->IndivStepScaleAdapt()) {
     ResetIndivStepScale();
     SetStepScale(AdaptiveHandler->GetAdaptionScale());
+    SetIndivStepScaleForSkippedAdaptParams();
   }
 
   if(AdaptiveHandler->UpdateMatrixAdapt()) {

@@ -42,7 +42,12 @@ namespace adaptive_mcmc
     /// @param fixed Pointer to a vector of fixed parameter values.
     /// @return True if adaptive MCMC configuration was successfully initialized, false otherwise.
     bool InitFromConfig(const YAML::Node &adapt_manager, const std::string &matrix_name_str,
-                        const std::vector<double> *parameters, const std::vector<double> *fixed);
+                        const std::vector<std::string> *parameter_names,
+                        const std::vector<double> *parameters, 
+                        const std::vector<double> *fixed,
+                        const std::vector<bool> *param_skip_adapt_flags,
+                        const TMatrixDSym* throwMatrix,
+                        const double initial_scale_);
 
     /// @brief If we don't have a covariance matrix to start from for adaptive tune we need to make one!
     void CreateNewAdaptiveCovariance();
@@ -84,6 +89,38 @@ namespace adaptive_mcmc
 
     /// @brief Tell if we are Skipping Adaption
     bool SkipAdaption() const;
+
+    /// @brief Get the index of the parameter given its name
+    /// @param param_name Name of the parameter
+    /// @return Index of the parameter
+    int GetParIndex(const std::string& name) const {
+      // HH: Adapted from ParameterHandlerBase.cpp
+      int index = M3::_BAD_INT_;
+      for (size_t i = 0; i < _ParamNames->size(); i++) {
+        if(name == _ParamNames->at(i)) {
+          index = static_cast<int>(i);
+          break;
+        }
+      }
+      return index;
+    }
+
+    /// @brief Convert vector of parameter names to indices
+    /// @param param_names Vector of parameter names
+    /// @return Vector of parameter indices
+    std::vector<int> GetParIndicesFromNames(const std::vector<std::string>& param_names) const {
+      std::vector<int> indices;
+      for (const auto& name : param_names) {
+        int index = GetParIndex(name);
+        if (index != M3::_BAD_INT_) {
+          indices.push_back(index);
+        } else {
+          MACH3LOG_ERROR("Parameter name {} not found in parameter list", name);
+          throw MaCh3Exception(__FILE__, __LINE__);
+        }
+      }
+      return indices;
+    }
 
     /// @brief Set the current values of the parameters
     void SetParams(const std::vector<double> *params)
@@ -239,11 +276,17 @@ namespace adaptive_mcmc
     /// Scaling factor
     double adaption_scale;
 
+    /// Initial scaling factor
+    double initial_scale;
+
     /// Vector of fixed parameters
     const std::vector<double> *_fFixedPars;
 
     /// Current values of parameters
     const std::vector<double> *_fCurrVal;
+
+    /// Parameter names
+    const std::vector<std::string> *_ParamNames;
 
     /// Acceptance rate in the current batch
     int acceptance_rate_batch_size;
@@ -265,5 +308,14 @@ namespace adaptive_mcmc
 
     /// Need to keep track of whether previous step was accepted for RM
     bool prev_step_accepted;
+
+    /// Parameters to skip during adaption
+    const std::vector<bool>* _param_skip_adapt_flags;
+
+    /// Initial throw matrix
+    const TMatrixDSym* initial_throw_matrix;
+
+    /// Flag to check if initial throw matrix has been saved
+    bool initial_throw_matrix_saved = false;
   };
 } // adaptive_mcmc namespace
