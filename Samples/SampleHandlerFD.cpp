@@ -1005,7 +1005,7 @@ TH1* SampleHandlerFD::GetW2Hist(const int Dimension) {
     for (size_t yBin = 0; yBin < Binning.nYBins; ++yBin) {
       for (size_t xBin = 0; xBin < Binning.nXBins; ++xBin) {
         const int idx = Binning.GetBinSafe(xBin, yBin);
-        W2Hist->AddBinContent(idx + 1, SampleHandlerFD_array_w2[idx]);
+        W2Hist->SetBinContent(idx + 1, SampleHandlerFD_array_w2[idx]);
       }
     }
     return W2Hist;
