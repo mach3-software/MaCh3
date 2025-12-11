@@ -8,8 +8,9 @@
 
 /// @file PredictivePlotting.cpp
 /// @author Kamil Skwarczynski
+/// @todo use StyleManger for fancy plots
 
-std::vector<std::string> FindSamples(std::string File)
+std::vector<std::string> FindSamples(const std::string& File)
 {
   TFile *file = M3::Open(File, "READ", __FILE__, __LINE__);
   TDirectoryFile *PredicitveDir = file->Get<TDirectoryFile>("Predictive");
@@ -39,13 +40,182 @@ std::vector<std::string> FindSamples(std::string File)
   return SampleNames;
 }
 
+std::vector<int> FindDimensions(const std::string& File, const std::vector<std::string>& Samples)
+{
+  TFile *file = M3::Open(File, "READ", __FILE__, __LINE__);
+  TDirectoryFile *PredicitveDir = file->Get<TDirectoryFile>("Predictive");
+
+  std::vector<int> SampleDimension;
+  for (const auto& sample : Samples)
+  {
+    // Get directory for this sample
+    TDirectoryFile* SampleDir = PredicitveDir->Get<TDirectoryFile>(sample.c_str());
+
+    int Dimension = 0;
+
+    while (true)
+    {
+      // Construct name Tutorial_mc_dimX
+      std::string histName = fmt::format("{}_mc_dim{}", sample, Dimension);
+
+      TH2D* hist = SampleDir->Get<TH2D>(histName.c_str());
+      if (!hist) break;  // stop when next dimension does not exist
+
+      Dimension++;
+    }
+
+    MACH3LOG_DEBUG("Sample '{}' has dimension {}", sample, Dimension);
+
+    SampleDimension.push_back(Dimension);
+  }
+
+  file->Close();
+  delete file;
+
+  return SampleDimension;
+}
+
+double GetPValue(const TH2D* hist)
+{
+  double pvalue = 0;
+  std::string TempTile = hist->GetTitle();
+  std::string temp = "=";
+
+  std::string::size_type SizeType = TempTile.find(temp);
+  TempTile.erase(0, SizeType+1);
+  pvalue = atof(TempTile.c_str());
+  return pvalue;
+}
+
+void PrintPosteriorPValue(const YAML::Node& Settings,
+                          const std::vector<TFile*>& InputFiles,
+                          const std::vector<std::string>& SampleNames)
+{
+  MACH3LOG_INFO("Starting {}", __func__);
+  auto Titles = Get<std::vector<std::string>>(Settings["FileTitle"], __FILE__, __LINE__);
+  std::vector<std::vector<double>> FlucDrawVec(InputFiles.size());
+
+  //KS: P-values per each sample
+  std::cout<<"\\begin{table}[htb]"<<std::endl;
+  std::cout<<"\\centering"<<std::endl;
+  std::cout<<"\\begin{tabular}{ | l | ";
+
+
+  for(unsigned int f = 0; f < InputFiles.size(); f++)
+  {
+    std::cout<<"c | ";
+  }
+
+  std::cout<<"} \\hline"<<std::endl;
+  std::cout<<"Sample ";
+  for(unsigned int f = 0; f < InputFiles.size(); f++)
+  {
+    std::cout<<"& \\multicolumn{1}{| c |}{" + Titles[f] +" p-value} ";
+  }
+  std::cout<<"\\\\"<<std::endl;
+  for(unsigned int f = 0; f < InputFiles.size(); f++)
+  {
+    std::cout<<" & Fluctuation of Prediction ";
+  }
+  std::cout<<"\\\\ \\hline"<<std::endl;
+  for(unsigned int i = 0; i < SampleNames.size(); i++)
+  {
+    std::cout<<SampleNames[i];
+    for(unsigned int f = 0; f < InputFiles.size(); f++)
+    {
+      std::string TempString = "Predictive/" + SampleNames[i]+"/"+SampleNames[i]+"_predfluc_draw";
+      TH2D *hist2D = InputFiles[f]->Get<TH2D>(TempString.c_str());
+      double FlucDraw = GetPValue(hist2D);
+      std::cout<<" & "<<FlucDraw;
+      FlucDrawVec[f].push_back(FlucDraw);
+    }
+    std::cout<<" \\\\"<<std::endl;
+  }
+  std::cout<<"Total ";
+  for(unsigned int f = 0; f < InputFiles.size(); f++)
+  {
+    TH2D *hFlucPred = InputFiles[f]->Get<TH2D>("Predictive/Total/Total_predfluc_draw");
+    double FlucDraw = GetPValue(hFlucPred);
+    std::cout<<" & "<<FlucDraw;
+  }
+  std::cout<<" \\\\ \\hline"<<std::endl;
+  std::cout<<"\\hline"<<std::endl;
+  std::cout<<"\\end{tabular}"<<std::endl;
+  std::cout<<"\\end{table}"<<std::endl;
+
+
+  auto Threshold = GetFromManager<double>(Settings["Significance"], 0.05);
+  for(unsigned int f = 0; f < InputFiles.size(); f++)
+  {
+    MACH3LOG_INFO("Calculating Shape for file {}", Titles[f]);
+
+    CheckBonferoniCorrectedpValue(SampleNames, FlucDrawVec[f], Threshold);
+    MACH3LOG_INFO("Combined pvalue following Fisher method: {}", FisherCombinedPValue(FlucDrawVec[f]));
+  }
+}
+
+void OverlayViolin(const YAML::Node& Settings,
+                   const std::vector<TFile*>& InputFiles,
+                   const std::vector<std::string>& SampleNames,
+                   const std::vector<int>& SampleDimension,
+                   const std::unique_ptr<TCanvas>& canv)
+{
+  MACH3LOG_INFO("Starting {}", __func__);
+  canv->Clear();
+
+  canv->SetTopMargin(0.10);
+  canv->SetBottomMargin(0.12);
+  canv->SetRightMargin(0.075);
+  canv->SetLeftMargin(0.14);
+
+  auto PosteriorColor = Get<std::vector<Color_t >>(Settings["PosteriorColor"], __FILE__, __LINE__);
+  auto Titles = Get<std::vector<std::string>>(Settings["FileTitle"], __FILE__, __LINE__);
+  const int nFiles = static_cast<int>(InputFiles.size());
+
+  //KS: No idea why but ROOT changed treatment of violin in R6. If you have non uniform binning this will results in very hard to see violin plots.
+  TCandle::SetScaledViolin(false);
+  for(size_t iSample = 0; iSample < SampleNames.size(); iSample++)
+  {
+
+    for(int iDim = 0; iDim < SampleDimension[iSample]; iDim++)
+    {
+      std::vector<std::unique_ptr<TH2D>> ViolinHist(nFiles);
+      for(int iFile = 0; iFile < nFiles; iFile++)
+      {
+        InputFiles[iFile]->cd();
+        ViolinHist[iFile] = M3::Clone(InputFiles[iFile]->Get<TH2D>(("Predictive/" + SampleNames[iSample]
+                                      + "/" + SampleNames[iSample] + "_mc_dim" + iDim).Data()));
+        ViolinHist[iFile]->SetTitle(SampleNames[iSample].c_str());
+        ViolinHist[iFile]->SetLineColor(PosteriorColor[iFile]);
+        ViolinHist[iFile]->SetMarkerColor(PosteriorColor[iFile]);
+        ViolinHist[iFile]->SetFillColorAlpha(PosteriorColor[iFile], 0.35);
+        ViolinHist[iFile]->SetFillStyle(1001);
+        ViolinHist[iFile]->GetYaxis()->SetTitle("Events");
+      }
+
+      ViolinHist[0]->Draw("violinX(03100300)");
+      for(int iFile = 1; iFile < nFiles; iFile++) {
+        ViolinHist[iFile]->Draw("violinX(03100300) same");
+      }
+
+      TLegend legend(0.50, 0.52, 0.90, 0.88);
+      for(int ig = 0; ig < nFiles; ig++) {
+        legend.AddEntry(ViolinHist[ig].get(), Form("%s", Titles[ig].c_str()), "lpf");
+      }
+      legend.SetLineStyle(0);
+      legend.SetTextSize(0.03);
+      legend.Draw();
+
+      canv->Print("Overlay_Predictive.pdf", "pdf");
+    }
+  }
+}
+
 void OverlayPredicitve(const YAML::Node& Settings,
                        const std::vector<TFile*>& InputFiles,
                        const std::vector<std::string>& SampleNames,
                        const std::unique_ptr<TCanvas>& canv)
 {
-  canv->Print("Overlay_Predictive.pdf[", "pdf");
-
   MACH3LOG_INFO("Starting {}", __func__);
   canv->Clear();
 
@@ -77,7 +247,13 @@ void OverlayPredicitve(const YAML::Node& Settings,
   for(size_t iSample = 0; iSample < SampleNames.size(); iSample++)
   {
     const int nFiles = static_cast<int>(InputFiles.size());
-    std::unique_ptr<TH1D> DataHist = M3::Clone(InputFiles[0]->Get<TH1D>(("SampleFolder/data_" + SampleNames[iSample]).c_str()));
+    TH1D* hist = InputFiles[0]->Get<TH1D>(("SampleFolder/data_" + SampleNames[iSample]).c_str());
+    if(!hist) {
+      MACH3LOG_WARN("Couldn't find hist for {}, most likely it is using 2D", SampleNames[iSample]);
+      MACH3LOG_WARN("Currently only 1D, sorry");
+      continue;
+    }
+    std::unique_ptr<TH1D> DataHist = M3::Clone(hist);
     DataHist->SetLineColor(kBlack);
     //KS: +1 for data, we want to get integral before scaling of the histogram
     std::vector<double> Integral(nFiles);
@@ -179,7 +355,6 @@ void OverlayPredicitve(const YAML::Node& Settings,
     canv->Print("Overlay_Predictive.pdf", "pdf");
   }
 
-  canv->Print("Overlay_Predictive.pdf]", "pdf");
   delete pad1;
   delete pad2;
 }
@@ -204,6 +379,8 @@ void PredictivePlotting(const std::string& ConfigName,
   gErrorIgnoreLevel = kWarning;
 
   auto Samples = FindSamples(FileNames[0]);
+  auto Dimensions = FindDimensions(FileNames[0], Samples);
+
   std::vector<TFile*> InputFiles(FileNames.size());
   for(size_t i = 0; i < FileNames.size(); i++)
   {
@@ -214,8 +391,16 @@ void PredictivePlotting(const std::string& ConfigName,
   YAML::Node Config = M3OpenConfig(ConfigName);
   // Access the "MatrixPlotter" section
   YAML::Node settings = Config["PredictivePlotting"];
+  canvas->Print("Overlay_Predictive.pdf[", "pdf");
 
+  // Make overlay of 1D hists
   OverlayPredicitve(settings, InputFiles, Samples, canvas);
+  // Make overlay of violin plots
+  OverlayViolin(settings, InputFiles, Samples, Dimensions, canvas);
+  // Get PValue per sample
+  PrintPosteriorPValue(settings, InputFiles, Samples);
+
+  canvas->Print("Overlay_Predictive.pdf]", "pdf");
 
   for(size_t i = 0; i < FileNames.size(); i++)
   {

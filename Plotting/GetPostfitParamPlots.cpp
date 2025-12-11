@@ -69,8 +69,6 @@ TPad *p4;
 Color_t PlotColor[] = {kRed, kBlack, kBlue, kGreen};
 std::string plotType;
 
-std::vector <std::unique_ptr<TH1D>> PostfitHistVec;
-
 void copyParToBlockHist(const int localBin, const std::string& paramName, TH1D* blockHist,
                         const std::string& type, const int fileId, const bool setLabels = true){
   // Set the values in the sub-histograms
@@ -159,7 +157,7 @@ void PrettifyTitles(TH2D *Hist) {
   }
 }
 
-bool ReadSettings(std::shared_ptr<TFile> File1)
+bool ReadSettings(const std::shared_ptr<TFile>& File1)
 {
   MACH3LOG_DEBUG("Reading settings for file {}", File1->GetName());
   #ifdef DEBUG
@@ -192,7 +190,7 @@ bool ReadSettings(std::shared_ptr<TFile> File1)
   return true;
 }
 
-inline std::unique_ptr<TH1D> makeRatio(TH1D *PrefitCopy, TH1D *PostfitCopy, bool setAxes){
+std::unique_ptr<TH1D> makeRatio(TH1D *PrefitCopy, TH1D *PostfitCopy, bool setAxes) {
   // set up the ratio hist
   std::unique_ptr<TH1D> Ratio = M3::Clone(PrefitCopy);
   Ratio->GetYaxis()->SetTitle("(x_{Post}-#mu_{Prior})/#sigma_{Prior}");
@@ -260,7 +258,7 @@ inline std::unique_ptr<TH1D> makeRatio(TH1D *PrefitCopy, TH1D *PostfitCopy, bool
   return Ratio;
 }
 
-inline void DrawPlots(TCanvas *plotCanv, TH1D* PrefitCopy, const std::vector<std::unique_ptr<TH1D>>& PostfitVec, TPad *mainPad, TPad *ratioPad) {
+void DrawPlots(TCanvas *plotCanv, TH1D* PrefitCopy, const std::vector<std::unique_ptr<TH1D>>& PostfitVec, TPad *mainPad, TPad *ratioPad) {
   // Draw!
   plotCanv->cd();
   mainPad->Draw();
@@ -335,13 +333,13 @@ inline void DrawPlots(TCanvas *plotCanv, TH1D* PrefitCopy, const std::vector<std
   plotCanv->Print((SaveName).c_str());
 }
 
-void MakeXsecPlots()
+void MakeParameterPlots()
 {  
   // get the names of the blocks of parameters to group together
   std::vector<std::string> const blockNames = man->getOption<std::vector<std::string>>("paramGroups");
-  const int XsecPlots = static_cast<int>(blockNames.size());
+  const int nPlots = static_cast<int>(blockNames.size());
 
-  for (int i = 0; i < XsecPlots; i++) 
+  for (int i = 0; i < nPlots; i++)
   {
     // get the configuration for this parameter
     std::string blockName = blockNames[i];
@@ -548,11 +546,12 @@ void MakeFDDetPlots()
   int FDbinCounter = FDParametersStartingPos;
   int Start = FDbinCounter;
   //KS: WARNING This is hardcoded
-  double FDSamplesBins[7] = {12,18,30,36,44,57,58};
+  constexpr double FDSamplesBins[7] = {12,18,30,36,44,57,58};
   std::string FDSamplesNames[7] = {"FHC 1Re", "FHC 1R#mu", "RHC 1Re","RHC 1R#mu","FHC 1Re 1 d.e.","FHC MR#mu 1 or 2 d.e.", "Momentum Scale"};
   for (unsigned int i = 0; i < 7; ++i)
   {
     FDbinCounter = FDParametersStartingPos + FDSamplesBins[i];
+    std::vector <std::unique_ptr<TH1D>> PostfitHistVec;
 
     canv->cd();
     Prefit->SetTitle(FDSamplesNames[i].c_str());
@@ -576,7 +575,7 @@ void MakeFDDetPlots()
    delete pDown;
 }
 
-void MakeXsecRidgePlots()
+void MakeRidgePlots()
 {  
   gStyle->SetPalette(51);
 
@@ -585,13 +584,13 @@ void MakeXsecRidgePlots()
 
   // get the names of the blocks of parameters to group together
   const auto blockNames = man->getOption<std::vector<std::string>>("paramGroups");
-  const int XsecPlots = static_cast<int>(blockNames.size());
+  const int nPlots = static_cast<int>(blockNames.size());
 
   constexpr double padTopMargin = 0.9;
   constexpr double padBottomMargin = 0.1;
   constexpr double padOverlap = 0.9;
   constexpr double ridgeLineWidth = 1.0;
-  for (int i = 0; i < XsecPlots; i++) 
+  for (int i = 0; i < nPlots; i++)
   {
     // get the configuration for this parameter
     std::string blockName = blockNames[i];
@@ -714,7 +713,7 @@ void MakeXsecRidgePlots()
     axisPad->SetFrameFillStyle(4000);
     
     axisPlot->GetXaxis()->SetTickSize(0.01);
-    axisPlot->GetXaxis()->SetTitle("");
+    axisPlot->GetXaxis()->SetTitle("Parameter Variation");
     axisPlot->GetYaxis()->SetLabelOffset(9999);
     axisPlot->GetYaxis()->SetLabelSize(0);
     axisPlot->GetYaxis()->SetTickSize(0);
@@ -795,7 +794,7 @@ void GetPostfitParamPlots()
   leg->Draw();
   canv->Print((SaveName).c_str());
 
-  MakeXsecPlots();
+  MakeParameterPlots();
 
   MakeFluxPlots();
 
@@ -807,13 +806,13 @@ void GetPostfitParamPlots()
   
   canv->Print((SaveName+"]").c_str());
 
-  MakeXsecRidgePlots();
+  MakeRidgePlots();
 
   delete canv;
   delete Prefit;
 }
 
-inline std::unique_ptr<TGraphAsymmErrors> MakeTGraphAsymmErrors(const std::shared_ptr<TFile>& File,  std::vector<int> Index = {})
+std::unique_ptr<TGraphAsymmErrors> MakeTGraphAsymmErrors(const std::shared_ptr<TFile>& File,  std::vector<int> Index = {})
 {
   int GraphBins = Index.size() == 0 ? nBins : Index.size();
   std::vector<double> x(GraphBins);
@@ -944,9 +943,9 @@ void GetViolinPlots()
   
   // get the names of the blocks of parameters to group together
   std::vector<std::string> const blockNames = man->getOption<std::vector<std::string>>("paramGroups");
-  const int XsecPlots = static_cast<int>(blockNames.size());
+  const int nPlots = static_cast<int>(blockNames.size());
 
-  for (int i = 0; i < XsecPlots; i++)
+  for (int i = 0; i < nPlots; i++)
   {
     // get the configuration for this parameter
     std::string blockName = blockNames[i];

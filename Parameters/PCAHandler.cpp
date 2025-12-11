@@ -30,7 +30,7 @@ void PCAHandler::ConstructPCA(TMatrixDSym* CovMatrix, const int firstPCAd, const
   eigen_threshold = eigen_thresh;
 
   // Check that covariance matrix exists
-  if (CovMatrix == NULL) {
+  if (CovMatrix == nullptr) {
     MACH3LOG_ERROR("Covariance matrix for has not yet been set");
     MACH3LOG_ERROR("Can not construct PCA until it is set");
     throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -47,7 +47,7 @@ void PCAHandler::ConstructPCA(TMatrixDSym* CovMatrix, const int firstPCAd, const
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   MACH3LOG_INFO("PCAing parameters {} through {} inclusive", FirstPCAdpar, LastPCAdpar);
-  int numunpcadpars = CovMatrix->GetNrows()-(LastPCAdpar-FirstPCAdpar+1);
+  int NumUnPCAdPars = CovMatrix->GetNrows()-(LastPCAdpar-FirstPCAdpar+1);
 
   // KS: Make sure we are not doing anything silly with PCA
   SanitisePCA(CovMatrix);
@@ -76,9 +76,8 @@ void PCAHandler::ConstructPCA(TMatrixDSym* CovMatrix, const int firstPCAd, const
       break;
     }
   }
-  NumParPCA = numunpcadpars+nKeptPCApars;
-  MACH3LOG_INFO("Threshold of {} on eigen values relative sum of eigen value ({}) generates {} eigen vectors, plus we have {} unpcad pars, for a total of {}", eigen_threshold, sum, nKeptPCApars, numunpcadpars, NumParPCA);
-
+  NumParPCA = NumUnPCAdPars+nKeptPCApars;
+  MACH3LOG_INFO("Threshold of {} on eigen values relative sum of eigen value ({}) generates {} eigen vectors, plus we have {} unpcad pars, for a total of {}", eigen_threshold, sum, nKeptPCApars, NumUnPCAdPars, NumParPCA);
   //DB Create array of correct size so eigen_values can be used in CorrelateSteps
   eigen_values_master = std::vector<double>(NumParPCA, 1.0);
   for (int i = FirstPCAdpar; i < FirstPCAdpar+nKeptPCApars; ++i) {eigen_values_master[i] = eigen_values(i-FirstPCAdpar);}
@@ -96,26 +95,22 @@ void PCAHandler::ConstructPCA(TMatrixDSym* CovMatrix, const int firstPCAd, const
   temp2.ResizeTo(CovMatrix->GetNrows(), NumParPCA);
 
   //First set the whole thing to 0
-  for(int iRow = 0; iRow < CovMatrix->GetNrows(); iRow++){
-    for(int iCol = 0; iCol < NumParPCA; iCol++){
-      temp2[iRow][iCol] = 0;
-    }
-  }
-  //Set the first identity block
-  if(FirstPCAdpar != 0){
-    for(int iRow = 0; iRow < FirstPCAdpar; iRow++){
-      temp2[iRow][iRow] = 1;
-    }
+  temp2.Zero();
+
+  //Set the first identity block for non-PCAed params before PCA block, before PCA XRows == YRows
+  for(int iRow = 0; iRow < FirstPCAdpar; iRow++) {
+    temp2(iRow, iRow) = 1.0;
   }
 
   //Set the transfer matrix block for the PCAd pars
   temp2.SetSub(FirstPCAdpar,FirstPCAdpar,temp);
 
-  //Set the second identity block
-  if(LastPCAdpar != CovMatrix->GetNrows()-1){
-    for(int iRow = 0;iRow < (CovMatrix->GetNrows()-1)-LastPCAdpar; iRow++){
-      temp2[LastPCAdpar+1+iRow][FirstPCAdpar+nKeptPCApars+iRow] = 1;
-    }
+  //Set the second identity block starting after PCA block, remember XRows != YRows.
+  // XRows -> normal base, YRows, PCA base
+  for(int iRow = 0;iRow < (CovMatrix->GetNrows()-1)-LastPCAdpar; iRow++) {
+    const int OrigRow = LastPCAdpar + 1 + iRow;
+    const int PCARow = FirstPCAdpar + nKeptPCApars + iRow;
+    temp2(OrigRow, PCARow) = 1.;
   }
 
   TransferMat = temp2;
@@ -124,29 +119,31 @@ void PCAHandler::ConstructPCA(TMatrixDSym* CovMatrix, const int firstPCAd, const
   // And then transpose
   TransferMatT.T();
 
-  #ifdef DEBUG_PCA
-  //KS: Let's dump all useful matrices to properly validate PCA
-  DebugPCA(sum, temp, submat, CovMatrix->GetNrows());
-  #endif
-
   // Make the PCA parameter arrays
   _fParCurrPCA.ResizeTo(NumParPCA);
   _fParPropPCA.ResizeTo(NumParPCA);
   _fPreFitValuePCA.resize(NumParPCA);
 
   //KS: make easy map so we could easily find un-decomposed parameters
-  isDecomposedPCA.resize(NumParPCA);
-  _fErrorPCA.resize(NumParPCA);
-  for (int i = 0; i < NumParPCA; ++i)
-  {
-    _fErrorPCA[i] = 1;
-    isDecomposedPCA[i] = -1;
+  _fErrorPCA.assign(NumParPCA, 1);
+  isDecomposedPCA.assign(NumParPCA, -1);
+  // First non PCA-ed block, since this is before PCA-ed block we don't need any mapping
+  for (int i = 0; i < FirstPCAdpar; ++i) {
+    isDecomposedPCA[i] = i;
   }
-  for (int i = 0; i < FirstPCAdpar; ++i) isDecomposedPCA[i] = i;
 
-  for (int i = FirstPCAdpar+nKeptPCApars+1; i < NumParPCA; ++i) isDecomposedPCA[i] = i+(_fNumPar-NumParPCA);
+  // Second non-PCA-ed block, keep in mind this is in PCA base so we cannot use LastPCAdpar
+  // we must shift them back into the original parameter index range.
+  const int shift = _fNumPar - NumParPCA;
+  for (int i = FirstPCAdpar + nKeptPCApars; i < NumParPCA; ++i) {
+    isDecomposedPCA[i] = i + shift;
+  }
+
+  #ifdef DEBUG_PCA
+  //KS: Let's dump all useful matrices to properly validate PCA
+  DebugPCA(sum, temp, submat, CovMatrix->GetNrows());
+  #endif
 }
-
 
 // ********************************************
 // Make sure decomposed matrix isn't correlated with undecomposed
@@ -299,7 +296,7 @@ void PCAHandler::ThrowParCurr(const double mag, const double* _restrict_ randPar
 }
 
 // ********************************************
-void PCAHandler::Print() {
+void PCAHandler::Print() const {
 // ********************************************
   MACH3LOG_INFO("PCA:");
   for (int i = 0; i < NumParPCA; ++i) {
@@ -403,7 +400,14 @@ void PCAHandler::ThrowParameters(const std::vector<std::unique_ptr<TRandom3>>& r
 //KS: Let's dump all useful matrices to properly validate PCA
 void PCAHandler::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, int NumPar) {
 // ********************************************
+  int originalErrorWarning = gErrorIgnoreLevel;
+  gErrorIgnoreLevel = kFatal;
+
   (void)submat;//This is used if DEBUG_PCA==2, this hack is to avoid compiler warnings
+  for (int i = 0; i < NumParPCA; ++i) {
+    MACH3LOG_DEBUG("Param {} isDecomposedPCA={}", i, isDecomposedPCA[i]);
+  }
+
   TFile *PCA_Debug = new TFile("Debug_PCA.root", "RECREATE");
   PCA_Debug->cd();
 
@@ -411,9 +415,12 @@ void PCAHandler::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, i
   //KS: If we have more than 200 plot becomes unreadable :(
   if(NumPar > 200) PlotText = false;
 
-  TH1D* heigen_values = new TH1D("eigen_values", "Eigen Values", eigen_values.GetNrows(), 0.0, eigen_values.GetNrows());
-  TH1D* heigen_cumulative = new TH1D("heigen_cumulative", "heigen_cumulative", eigen_values.GetNrows(), 0.0, eigen_values.GetNrows());
-  TH1D* heigen_frac = new TH1D("heigen_fractional", "heigen_fractional", eigen_values.GetNrows(), 0.0, eigen_values.GetNrows());
+  auto heigen_values     = std::make_unique<TH1D>("eigen_values", "Eigen Values", eigen_values.GetNrows(), 0.0, eigen_values.GetNrows());
+  heigen_values->SetDirectory(nullptr);
+  auto heigen_cumulative = std::make_unique<TH1D>("heigen_cumulative", "heigen_cumulative", eigen_values.GetNrows(), 0.0, eigen_values.GetNrows());
+  heigen_cumulative->SetDirectory(nullptr);
+  auto heigen_frac       = std::make_unique<TH1D>("heigen_fractional", "heigen_fractional", eigen_values.GetNrows(), 0.0, eigen_values.GetNrows());
+  heigen_frac->SetDirectory(nullptr);
   heigen_values->GetXaxis()->SetTitle("Eigen Vector");
   heigen_values->GetYaxis()->SetTitle("Eigen Value");
 
@@ -455,7 +462,7 @@ void PCAHandler::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, i
   hTransferMatT->Write("hTransferMatT");
   TransferMatT.Write("TransferMatT");
 
-  TCanvas *c1 = new TCanvas("c1"," ", 0, 0, 1024, 1024);
+  auto c1 = std::make_unique<TCanvas>("c1", " ", 0, 0, 1024, 1024);
   c1->SetBottomMargin(0.1);
   c1->SetTopMargin(0.05);
   c1->SetRightMargin(0.05);
@@ -466,7 +473,7 @@ void PCAHandler::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, i
   gStyle->SetOptFit(0);
   gStyle->SetOptStat(0);
   // Make pretty correlation colors (red to blue)
-  const int NRGBs = 5;
+  constexpr int NRGBs = 5;
   TColor::InitializeColors();
   Double_t stops[NRGBs] = { 0.00, 0.25, 0.50, 0.75, 1.00 };
   Double_t red[NRGBs]   = { 0.00, 0.25, 1.00, 1.00, 0.50 };
@@ -479,12 +486,12 @@ void PCAHandler::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, i
   double minz = 0;
 
   c1->Print("Debug_PCA.pdf[");
-  TLine *EigenLine = new TLine(nKeptPCApars, 0, nKeptPCApars, heigen_cumulative->GetMaximum());
+  auto EigenLine = std::make_unique<TLine>(nKeptPCApars, 0, nKeptPCApars, heigen_cumulative->GetMaximum());
   EigenLine->SetLineColor(kPink);
   EigenLine->SetLineWidth(2);
   EigenLine->SetLineStyle(kSolid);
 
-  TText* text = new TText(0.5, 0.5, Form("Threshold = %g", eigen_threshold));
+  auto text = std::make_unique<TText>(0.5, 0.5, Form("Threshold = %g", eigen_threshold));
   text->SetTextFont (43);
   text->SetTextSize (40);
 
@@ -503,11 +510,11 @@ void PCAHandler::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, i
   EigenLine->Draw("Same");
   text->DrawTextNDC(0.42, 0.84,Form("Threshold = %g", eigen_threshold));
 
-  TLegend *leg = new TLegend(0.2, 0.2, 0.6, 0.5);
+  auto leg = std::make_unique<TLegend>(0.2, 0.2, 0.6, 0.5);
   leg->SetTextSize(0.04);
-  leg->AddEntry(heigen_values, "Absolute", "l");
-  leg->AddEntry(heigen_frac, "Fractional", "l");
-  leg->AddEntry(heigen_cumulative, "Cumulative", "l");
+  leg->AddEntry(heigen_values.get(), "Absolute", "l");
+  leg->AddEntry(heigen_frac.get(), "Fractional", "l");
+  leg->AddEntry(heigen_cumulative.get(), "Cumulative", "l");
 
   leg->SetLineColor(0);
   leg->SetLineStyle(0);
@@ -518,12 +525,6 @@ void PCAHandler::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, i
   c1->Print("Debug_PCA.pdf");
   c1->SetRightMargin(0.15);
   c1->SetLogy(0);
-  delete EigenLine;
-  delete leg;
-  delete text;
-  delete heigen_values;
-  delete heigen_frac;
-  delete heigen_cumulative;
 
   heigen_vectors->SetMarkerSize(0.2);
   minz = heigen_vectors->GetMinimum();
@@ -532,13 +533,12 @@ void PCAHandler::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, i
   if(PlotText) heigen_vectors->Draw("COLZ TEXT");
   else heigen_vectors->Draw("COLZ");
 
-  TLine *Eigen_Line = new TLine(0, nKeptPCApars, LastPCAdpar-FirstPCAdpar, nKeptPCApars);
+  auto Eigen_Line = std::make_unique<TLine>(0, nKeptPCApars, LastPCAdpar - FirstPCAdpar, nKeptPCApars);
   Eigen_Line->SetLineColor(kGreen);
   Eigen_Line->SetLineWidth(2);
   Eigen_Line->SetLineStyle(kDotted);
   Eigen_Line->Draw("SAME");
   c1->Print("Debug_PCA.pdf");
-  delete Eigen_Line;
 
   SubsetPCA->SetMarkerSize(0.2);
   minz = SubsetPCA->GetMinimum();
@@ -631,7 +631,7 @@ void PCAHandler::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, i
   heigen_cumulative_Eigen->Draw("SAME");
   heigen_frac_Eigen->Draw("SAME");
 
-  TLegend *leg_Eigen = new TLegend(0.2, 0.2, 0.6, 0.5);
+  auto leg_Eigen = std::make_unique<TLegend>(0.2, 0.2, 0.6, 0.5);
   leg_Eigen->SetTextSize(0.04);
   leg_Eigen->AddEntry(heigen_values_Eigen, "Absolute", "l");
   leg_Eigen->AddEntry(heigen_frac_Eigen, "Fractional", "l");
@@ -648,7 +648,6 @@ void PCAHandler::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, i
   delete heigen_values_Eigen;
   delete heigen_cumulative_Eigen;
   delete heigen_frac_Eigen;
-  delete leg_Eigen;
 
   TH2D* heigen_vectors_Eigen = new TH2D("Eigen_Vectors", "Eigen_Vectors", eigen_val.size(), 0.0, eigen_val.size(), eigen_val.size(), 0.0, eigen_val.size());
 
@@ -685,8 +684,8 @@ void PCAHandler::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, i
   delete heigen_vectors;
 
   c1->Print("Debug_PCA.pdf]");
-  delete c1;
   PCA_Debug->Close();
   delete PCA_Debug;
+  gErrorIgnoreLevel = originalErrorWarning;
 }
 #endif

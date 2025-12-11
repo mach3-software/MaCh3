@@ -180,9 +180,10 @@ inline TMacro YAMLtoTMacro(const YAML::Node& yaml_node, const std::string& name)
 /// @brief Compare if yaml nodes are identical
 /// @param node1 The first YAML node to compare.
 /// @param node2 The second YAML node to compare.
+/// @param Mute allow to mute warning messages
 /// @return true If the two nodes are equivalent in type and content.
 /// @return false If the two nodes differ in structure or content.
-inline bool compareYAMLNodes(const YAML::Node& node1, const YAML::Node& node2) {
+inline bool compareYAMLNodes(const YAML::Node& node1, const YAML::Node& node2, bool Mute = false) {
 // **********************
   // Check if the types of the nodes match
   if (node1.Type() != node2.Type()) {
@@ -191,7 +192,13 @@ inline bool compareYAMLNodes(const YAML::Node& node1, const YAML::Node& node2) {
 
   // Compare scalar types (like strings, numbers)
   if (node1.IsScalar() && node2.IsScalar()) {
-    return node1.as<std::string>() == node2.as<std::string>();
+    auto v1 = node1.as<std::string>();
+    auto v2 = node2.as<std::string>();
+    if (v1 != v2) {
+      if (!Mute) MACH3LOG_WARN("Scalar value mismatch: '{}' != '{}'", v1, v2);
+      return false;
+    }
+    return true;
   }
 
   // Compare sequences (like YAML lists)
@@ -210,11 +217,18 @@ inline bool compareYAMLNodes(const YAML::Node& node1, const YAML::Node& node2) {
   // Compare maps (like YAML dictionaries)
   if (node1.IsMap() && node2.IsMap()) {
     if (node1.size() != node2.size()) {
+      MACH3LOG_WARN("Map size mismatch: {} != {}",
+                    node1.size(), node2.size());
       return false;
     }
     for (auto it1 = node1.begin(); it1 != node1.end(); ++it1) {
       auto key = it1->first.as<std::string>();
-      if (!node2[key] || !compareYAMLNodes(it1->second, node2[key])) {
+      if (!node2[key]) {
+        MACH3LOG_WARN("Key '{}' missing in second YAML", key);
+        return false;
+      }
+      if (!compareYAMLNodes(it1->second, node2[key])) {
+        MACH3LOG_WARN("Value mismatch at key '{}'", key);
         return false;
       }
     }
@@ -222,6 +236,7 @@ inline bool compareYAMLNodes(const YAML::Node& node1, const YAML::Node& node2) {
   }
 
   // Default case: if it's neither scalar, sequence, nor map, consider it unequal
+  if (!Mute) MACH3LOG_WARN("Unsupported YAML node type encountered");
   return false;
 }
 

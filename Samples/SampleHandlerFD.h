@@ -52,6 +52,10 @@ class SampleHandlerFD :  public SampleHandlerBase
   void AddData(const int Sample, std::vector<double> &data);
   void AddData(const int Sample, std::vector< std::vector <double> > &data);
 
+
+  /// @brief Helper function to print rates for the samples with LLH
+  /// @param DataOnly whether to print data only rates
+  void PrintRates(const bool DataOnly = false) override;
   /// @brief DB Multi-threaded GetLikelihood
   double GetLikelihood() const override;
   /// @ingroup SampleHandlerGetters
@@ -85,6 +89,7 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// @brief including Dan's magic NuOscillator
   void InitialiseNuOscillatorObjects();
   void SetupNuOscillatorPointers();
+  const M3::float_t* GetNuOscillatorPointers(const int iEvent) const;
 
   void ReadConfig();
   void LoadSingleSample(const int iSample, const YAML::Node& Settings);

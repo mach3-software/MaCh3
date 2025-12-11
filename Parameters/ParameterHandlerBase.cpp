@@ -467,6 +467,7 @@ void ParameterHandlerBase::ThrowParameters() {
       if (IsParameterFixed(i)) continue;
 
       _fPropVal[i] = _fPreFitValue[i] + corr_throw[i];
+
       int throws = 0;
       // Try again if we the initial parameter proposal falls outside of the range of the parameter
       while (_fPropVal[i] > _fUpBound[i] || _fPropVal[i] < _fLowBound[i]) {
@@ -496,6 +497,9 @@ void ParameterHandlerBase::ThrowParameters() {
                             randParams, corr_throw,
                             _fPreFitValue, _fLowBound, _fUpBound, _fNumPar);
   } // end if pca
+
+  // KS: At the end once we are happy with proposal do special proposal
+  SpecialStepProposal();
 }
 
 // *************************************

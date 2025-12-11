@@ -381,7 +381,6 @@ void CompareSigVar1D(const std::string& filename, const YAML::Node& Settings)
             name = DialNameVector[id] + "/" + SampleNameVector[is] + "/" + name;
             Projection.emplace_back(M3::Clone(SigmaDir->Get<TH1D>(name.c_str())));
             MACH3LOG_DEBUG("Adding hist {}", name);
-
           }
         }
         std::string Title = DialNameVector[id] + " " + SampleNameVector[is];
@@ -487,7 +486,6 @@ void CompareSigVar2D(const std::string& filename, const YAML::Node& Settings)
           name = DialNameVector[id] + "/" + SampleNameVector[is] + "/" + name;
           Projection.emplace_back(M3::Clone(SigmaDir->Get<TH2D>(name.c_str())));
           MACH3LOG_DEBUG("Adding hist {}", name);
-
         }
       }
       std::string Title = DialNameVector[id] + " " + SampleNameVector[is];
