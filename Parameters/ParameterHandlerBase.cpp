@@ -1184,8 +1184,12 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
     &_fFancyNames, &_fCurrVal, &_fError,
     &param_skip_adapt_flags, throwMatrix, _fGlobalStepScaleInitial
   );
-  if(!success) return;
-  AdaptiveHandler->Print();
+  if (success) {
+    AdaptiveHandler->Print();
+  } 
+  else {
+    MACH3LOG_INFO("Not using adaptive MCMC for {}. Checking external matrix options...", matrixName);
+  }
 
   // Next let"s check for external matrices
   // We"re going to grab this info from the YAML manager
@@ -1207,6 +1211,9 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
   SetThrowMatrix(AdaptiveHandler->GetAdaptiveCovariance());
 
   ResetIndivStepScale();
+  // HH: Set individual step scales for non-adapting parameters to the default individual step scales
+  // global step scale should be 1 so no need to adjust for that
+  SetIndivStepScaleForSkippedAdaptParams();
 
   MACH3LOG_INFO("Successfully Set External Throw Matrix Stored in {}", external_file_name);
 }

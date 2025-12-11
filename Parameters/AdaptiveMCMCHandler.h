@@ -14,6 +14,7 @@ namespace adaptive_mcmc
   /// @cite haario2001adaptive
   /// @cite Garthwaite01092016
   /// @author Henry Wallace
+  /// @author Hank Hua
   /// @details Adaptation can be performed in two ways:
   /// - **Haario/Roberts-Rosenthal style**: Uses a constant scale factor of
   /// \f[
