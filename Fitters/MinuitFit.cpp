@@ -59,6 +59,19 @@ void MinuitFit::RunMCMC() {
   minuit->SetMaxFunctionCalls(fitMan->raw()["General"]["Minuit2"]["NSteps"].as<unsigned>());
   minuit->SetMaxIterations(10000);
 
+
+  // Save the adaptive MCMC
+  for (const auto &syst : systematics)
+  {
+    if (syst->GetDoAdaption())
+    {
+      MACH3LOG_ERROR("Param Handler {} has enabled Adaption, this is not needed for Minuit so please turn it off", syst->GetDoAdaption());
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
+  }
+
+
+
   MACH3LOG_INFO("Preparing Minuit");
   int ParCounter = 0;
 

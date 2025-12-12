@@ -424,10 +424,10 @@ void ParameterHandlerBase::ReserveMemory(const int SizeVec) {
 // ********************************************
 // Set all the covariance matrix parameters to a user-defined value
 // Might want to split this
-void ParameterHandlerBase::SetPar(int i , double val) {
+void ParameterHandlerBase::SetPar(const int i , const double val) {
 // ********************************************
-  MACH3LOG_INFO("Over-riding {}: ", GetParName(i));
-  MACH3LOG_INFO("_fPropVal ({}), _fCurrVal ({}), _fPreFitValue ({}) to ({})", _fPropVal[i], _fCurrVal[i], _fPreFitValue[i], val);
+  MACH3LOG_DEBUG("Over-riding {}: _fPropVal ({}), _fCurrVal ({}), _fPreFitValue ({}) to ({})",
+                 GetParFancyName(i), _fPropVal[i], _fCurrVal[i], _fPreFitValue[i], val);
 
   _fPropVal[i] = val;
   _fCurrVal[i] = val;
@@ -538,6 +538,9 @@ void ParameterHandlerBase::RandomConfiguration() {
     _fCurrVal[i] = _fPropVal[i];
   }
   if (pca) PCAObj->TransferToPCA();
+
+  // KS: At the end once we are happy with proposal do special proposal
+  SpecialStepProposal();
 }
 
 // *************************************
@@ -546,7 +549,7 @@ void ParameterHandlerBase::SetSingleParameter(const int parNo, const double parV
 // *************************************
   _fPropVal[parNo] = parVal;
   _fCurrVal[parNo] = parVal;
-  MACH3LOG_DEBUG("Setting {} (parameter {}) to {})", GetParName(parNo),  parNo, parVal);
+  MACH3LOG_DEBUG("Setting {} (parameter {}) to {})", GetParFancyName(parNo),  parNo, parVal);
   if (pca) PCAObj->TransferToPCA();
 }
 
@@ -555,7 +558,7 @@ void ParameterHandlerBase::SetParCurrProp(const int parNo, const double parVal) 
 // ********************************************
   _fPropVal[parNo] = parVal;
   _fCurrVal[parNo] = parVal;
-  MACH3LOG_DEBUG("Setting {} (parameter {}) to {})", GetParName(parNo),  parNo, parVal);
+  MACH3LOG_DEBUG("Setting {} (parameter {}) to {})", GetParFancyName(parNo),  parNo, parVal);
   if (pca) PCAObj->TransferToPCA();
 }
 
@@ -696,44 +699,6 @@ void ParameterHandlerBase::FlipParameterValue(const int index, const double Flip
 }
 
 // ********************************************
-// Throw the proposed parameter by mag sigma
-// Should really just have the user specify this throw by having argument double
-void ParameterHandlerBase::ThrowParProp(const double mag) {
-// ********************************************
-  Randomize();
-  if (!pca) {
-    // Make the correlated throw
-    M3::MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
-    // Number of sigmas we throw
-    for (int i = 0; i < _fNumPar; i++) {
-      if (!IsParameterFixed(i) > 0.)
-        _fPropVal[i] = _fCurrVal[i] + corr_throw[i]*mag;
-    }
-  } else {
-    PCAObj->ThrowParProp(mag, randParams);
-  }
-}
-// ********************************************
-// Helper function to throw the current parameter by mag sigmas
-// Can study bias in MCMC with this; put different starting parameters
-void ParameterHandlerBase::ThrowParCurr(const double mag) {
-// ********************************************
-  Randomize();
-  if (!pca) {
-    // Get the correlated throw vector
-    M3::MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
-    // The number of sigmas to throw
-    // Should probably have this as a default parameter input to the function instead
-    for (int i = 0; i < _fNumPar; i++) {
-      if (!IsParameterFixed(i) > 0.){
-        _fCurrVal[i] = corr_throw[i]*mag;
-      }
-    }
-  } else {
-    PCAObj->ThrowParCurr(mag, randParams);
-  }
-}
-// ********************************************
 // Function to print the prior values
 void ParameterHandlerBase::PrintNominal() const {
 // ********************************************
@@ -769,7 +734,7 @@ double ParameterHandlerBase::CalcLikelihood() const _noexcept_ {
   #ifdef MULTITHREAD
   #pragma omp parallel for reduction(+:logL)
   #endif
-  for(int i = 0; i < _fNumPar; ++i){
+  for(int i = 0; i < _fNumPar; ++i) {
     if(_fFlatPrior[i]){
       //HW: Flat prior, no need to calculate anything
       continue;
