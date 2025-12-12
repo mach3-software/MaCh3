@@ -973,11 +973,9 @@ void PredictiveThrower::StudyBetaParameters(TDirectory* PredictiveDir) {
     for (int iBin = 0; iBin < SampleInfo[iSample].Binning->GetNBins(SampleInfo[iSample].LocalId); iBin++ ) {
       DirBeta[iSample]->cd();
       BetaHist[iSample][iBin]->Write();
-
     }
     DirBeta[iSample]->Close();
     delete DirBeta[iSample];
-    iSample++;
   }
   BetaDir->Close();
   delete BetaDir;
