@@ -34,6 +34,14 @@ class BinningHandler {
   int GetBinSafe(const int iSample, const int xBin, const int yBin) const;
   /// @brief Get total number of bins over all samples/kinematic bins etc
   int GetNBins() const {return TotalNumberOfBins;};
+  /// @brief Get total number of bins over for a given sample
+  int GetNBins(const int iSample) const {return static_cast<int>(SampleBinning[iSample].nBins);};
+  /// @brief Get fancy name for a given bin, to help match it with global properties
+  /// @param iSample index of a given sample
+  std::string GetBinName(const int iSample, const int GlobSampleBin) const;
+    /// @brief Get fancy name for a given bin, to help match it with global properties
+  /// @param iSample index of a given sample
+  std::string GetBinName(const int iSample, const int xBin, const int yBin) const;
 
   /// @brief Get X bin edges for a given sample
   /// @param iSample index of a given sample

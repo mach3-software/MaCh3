@@ -97,10 +97,18 @@ struct SampleInfo {
     _hPDF2D->SetDirectory(nullptr);
     dathist2d->SetDirectory(nullptr);
 
+    // Set all titles so most of projections don't have empty titles...
     _hPDF1D->GetXaxis()->SetTitle(XVarStr.c_str());
+    _hPDF1D->GetYaxis()->SetTitle("Events");
+
     dathist->GetXaxis()->SetTitle(XVarStr.c_str());
+    dathist->GetYaxis()->SetTitle("Events");
+
     _hPDF2D->GetXaxis()->SetTitle(XVarStr.c_str());
+    _hPDF2D->GetYaxis()->SetTitle(YVarStr.c_str());
+
     dathist2d->GetXaxis()->SetTitle(XVarStr.c_str());
+    dathist2d->GetYaxis()->SetTitle(YVarStr.c_str());
   }
 };
 

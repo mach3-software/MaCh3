@@ -4270,7 +4270,6 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
     Posterior->SetGrid();
     plot->Draw("AL");
     func->Draw("SAME");
-    if(printToPDF) Posterior->Print(CanvasName);
 
     //KS: I have no clue what is the reason behind this. Found this in Rick Calland code...
     (*PowerSpectrumStepSize)(j) = std::sqrt(func->GetParameter(0)/float(v_size*0.5));

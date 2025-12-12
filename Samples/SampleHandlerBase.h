@@ -173,7 +173,9 @@ class SampleHandlerBase
   /// @brief Set the test statistic to be used when calculating the binned likelihoods
   /// @param testStat The test statistic to use.
   /// @ingroup SampleHandlerGetters
-  inline void SetTestStatistic(TestStatistic testStat){ fTestStatistic = testStat; }
+  void SetTestStatistic(TestStatistic testStat){ fTestStatistic = testStat; }
+  /// @brief Get the test statistic used when calculating the binned likelihoods
+  TestStatistic GetTestStatistic() const { return fTestStatistic; }
 
 protected:
   /// @brief CW: Redirect std::cout to silence some experiment specific libraries

@@ -39,6 +39,8 @@ class SampleHandlerFD :  public SampleHandlerBase
   std::string GetXBinVarName(const int Sample) const {return SampleDetails[Sample].XVarStr;}
   /// @ingroup SampleHandlerGetters
   std::string GetYBinVarName(const int Sample) const {return SampleDetails[Sample].YVarStr;}
+  /// @brief Get pointer to binning handler
+  const BinningHandler* GetBinningHandler() const {return Binning.get();}
 
   void PrintIntegral(const int iSample, const TString& OutputName="/dev/null", const int WeightStyle=0, const TString& OutputCSVName="/dev/null");
   
