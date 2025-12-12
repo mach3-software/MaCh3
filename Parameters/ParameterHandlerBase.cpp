@@ -1191,31 +1191,41 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
     MACH3LOG_INFO("Not using adaptive MCMC for {}. Checking external matrix options...", matrixName);
   }
 
-  // Next let"s check for external matrices
-  // We"re going to grab this info from the YAML manager
-  if(!GetFromManager<bool>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["UseExternalMatrix"], false, __FILE__ , __LINE__)) {
-    MACH3LOG_WARN("Not using external matrix for {}, initialising adaption from scratch", matrixName);
+  // HH: Adjusting the external matrix reading logic such that you can not do adaptive 
+  // and still read an external matrix
+  // Logic:
+  // if read external matrix:
+  //    set throw matrix regardless of adaptive or not
+  // else:
+  //    if adaptive:
+  //       create new adaptive matrix from scratch
+  //    else:
+  //       do nothing
+  if(GetFromManager<bool>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["UseExternalMatrix"], false, __FILE__ , __LINE__)) {
+    // Finally, we accept that we want to read the matrix from a file!
+    auto external_file_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ExternalMatrixFileName"], "", __FILE__ , __LINE__);
+    auto external_matrix_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ExternalMatrixName"], "", __FILE__ , __LINE__);
+    auto external_mean_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ExternalMeansName"], "", __FILE__ , __LINE__);
+
+    AdaptiveHandler->SetThrowMatrixFromFile(external_file_name, external_matrix_name, external_mean_name, use_adaptive);
+    SetThrowMatrix(AdaptiveHandler->GetAdaptiveCovariance());
+
+    ResetIndivStepScale();
+    // HH: Set individual step scales for non-adapting parameters to the default individual step scales
+    // global step scale should be 1 so no need to adjust for that
+    SetIndivStepScaleForSkippedAdaptParams();
+
+    MACH3LOG_INFO("Successfully Set External Throw Matrix Stored in {}", external_file_name);
+  } else {
+    MACH3LOG_INFO("Not using external matrix for {}", matrixName);
+    if (!success) return; // Not adaptive either so nothing to do
+    MACH3LOG_INFO("Initialising adaption from scratch");
     // If we don't have a covariance matrix to start from for adaptive tune we need to make one!
     use_adaptive = true;
     AdaptiveHandler->CheckMatrixValidityForAdaption(GetCovMatrix());
     AdaptiveHandler->CreateNewAdaptiveCovariance();
     return;
   }
-
-  // Finally, we accept that we want to read the matrix from a file!
-  auto external_file_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ExternalMatrixFileName"], "", __FILE__ , __LINE__);
-  auto external_matrix_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ExternalMatrixName"], "", __FILE__ , __LINE__);
-  auto external_mean_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ExternalMeansName"], "", __FILE__ , __LINE__);
-
-  AdaptiveHandler->SetThrowMatrixFromFile(external_file_name, external_matrix_name, external_mean_name, use_adaptive);
-  SetThrowMatrix(AdaptiveHandler->GetAdaptiveCovariance());
-
-  ResetIndivStepScale();
-  // HH: Set individual step scales for non-adapting parameters to the default individual step scales
-  // global step scale should be 1 so no need to adjust for that
-  SetIndivStepScaleForSkippedAdaptParams();
-
-  MACH3LOG_INFO("Successfully Set External Throw Matrix Stored in {}", external_file_name);
 }
 
 // ********************************************
