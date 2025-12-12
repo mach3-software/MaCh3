@@ -30,6 +30,7 @@ std::vector<std::string> FindSamples(const std::string& File)
     dirname = std::string(key->GetName());
 
     if(dirname == "Total") continue;
+    if(dirname == "BetaParameters") continue;
 
     SampleNames.push_back(dirname);
     MACH3LOG_DEBUG("Entering Sample {}", dirname);

@@ -180,3 +180,42 @@ void BinningHandler::SetGlobalBinNumbers() {
   // lastly modify total number of bins
   TotalNumberOfBins = static_cast<int>(GlobalOffsetCounter);
 }
+
+// ************************************************
+// Get fancy name for a given bin, to help match it with global properties
+std::string BinningHandler::GetBinName(const int iSample, const int xBin, const int yBin) const {
+// ************************************************
+  return GetBinName(iSample, GetBinSafe(iSample, xBin, yBin));
+}
+
+// ************************************************
+// Get fancy name for a given bin, to help match it with global properties
+std::string BinningHandler::GetBinName(const int iSample, const int GlobSampleBin) const {
+// ************************************************
+  const auto& Binning = SampleBinning[iSample];
+
+  // Safety checks
+  if (GlobSampleBin < 0 || GlobSampleBin >= static_cast<int>(Binning.nBins)) {
+    MACH3LOG_ERROR("Requested bin {} is out of range for sample {}", GlobSampleBin, iSample);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wconversion"
+  const int xBin = GlobSampleBin % Binning.nXBins;
+  const int yBin = GlobSampleBin / Binning.nXBins;
+  #pragma GCC diagnostic pop
+
+  const double xmin = Binning.XBinEdges.at(xBin);
+  const double xmax = Binning.XBinEdges.at(xBin + 1);
+
+  if (Binning.nYBins == 1) {
+    return fmt::format("Dim0 ({:g}, {:g})", xmin, xmax);
+  }
+
+  // 2D sample
+  const double ymin = Binning.YBinEdges.at(yBin);
+  const double ymax = Binning.YBinEdges.at(yBin + 1);
+
+  return fmt::format("Dim0 ({:g}, {:g}), Dim1 ({:g}, {:g})", xmin, xmax, ymin, ymax);
+}
