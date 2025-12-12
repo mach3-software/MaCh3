@@ -24,13 +24,14 @@
 /// @code
 /// General:
 ///   FittingAlgorithm: ["MCMC"]
+/// @endcode
 std::unique_ptr<FitterBase> MaCh3FitterFactory(manager *FitManager);
 
 /// @brief Initializes the config manager class and allows overriding settings via command-line arguments.
 /// @param argc number of arguments
 /// @param argv name of arguments
 /// @return A unique pointer to the initialized `manager` instance with optional overrides applied.
-/// @example Usage examples:
+/// @note Usage examples:
 /// ```
 /// ./bin/MCMCTutorial Inputs/FitterConfig.yaml General:OutputFile:blarb.root
 /// ./bin/MCMCTutorial Inputs/FitterConfig.yaml General:OutputFile:blarb.root General:MCMC:NSteps:50000
