@@ -9,6 +9,7 @@
 class ParameterTunes{
  public:
   /// @brief Constructor
+  ParameterTunes(){};
   ParameterTunes(const YAML::Node& Settings);
   /// @brief
   virtual ~ParameterTunes();
@@ -20,8 +21,8 @@ class ParameterTunes{
   /// @brief Simply print all tunes and associated values
   void PrintTunes() const;
  private:
-  /// Name of each Tun
-   std::vector<std::string> TuneNames;
+  /// Name of each Tune
+  std::vector<std::string> TuneNames;
   /// Values for each Tune and Parameter
   std::vector<std::vector<double>> TuneValues;
   /// Map between tune name and value

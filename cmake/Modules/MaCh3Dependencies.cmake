@@ -114,3 +114,11 @@ if( MaCh3_PYTHON_ENABLED )
       GIT_TAG v2.13.5
     )
 endif()
+
+FetchContent_Declare(
+  Eigen3
+  GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
+  GIT_TAG 5.0.1
+)
+SET(EIGEN_BUILD_CMAKE_PACKAGE ON) #export targets
+FetchContent_MakeAvailable(Eigen3)

@@ -27,7 +27,7 @@ if(MaCh3_GPU_ENABLED)
     set_property(TARGET Parameters PROPERTY CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
 endif()
 
-target_link_libraries(Parameters PUBLIC Manager)
+target_link_libraries(Parameters PUBLIC Manager Eigen3::Eigen)
 # KS: ROOT ≤ 6.30 requires explicit linking of MathMore (if built, not sure why through...)
 if(ROOT_VERSION VERSION_LESS 6.30)
     if(TARGET ROOT::MathMore)
@@ -36,6 +36,7 @@ if(ROOT_VERSION VERSION_LESS 6.30)
         message(WARNING "ROOT::MathMore target not found; continuing without it")
     endif()
 endif()
+
 target_link_libraries(Parameters PRIVATE MaCh3Warnings)
 
 target_include_directories(Parameters PUBLIC

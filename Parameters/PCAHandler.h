@@ -60,21 +60,15 @@
 class PCAHandler{
  public:
   /// @brief Constructor
-  PCAHandler();
+  PCAHandler(){};
 
   /// @brief Destructor
-  virtual ~PCAHandler();
+  virtual ~PCAHandler(){};
 
   /// @brief KS: Print info about PCA parameters
   void Print() const;
   /// @brief Retrieve number of parameters in PCA base
   int GetNumberPCAedParameters() const { return NumParPCA; }
-
-  /// @brief KS: Setup pointers to current and proposed parameter value which we need to convert them to PCA base each step
-  /// @param fCurr_Val pointer to current position of parameter
-  /// @param fProp_Val pointer to proposed position of parameter
-  void SetupPointers(std::vector<double>* fCurr_Val,
-                     std::vector<double>* fProp_Val);
 
   /// @brief CW: Calculate eigen values, prepare transition matrices and remove param based on defined threshold
   /// @param CovMatrix       Symmetric covariance matrix used for eigen decomposition.
@@ -82,11 +76,11 @@ class PCAHandler{
   /// @param lastPCAd        Index of the last PCA component to include.
   /// @param eigen_thresh    Threshold for eigenvalues below which parameters are discarded.
   /// @param _fNumPar        Total number of parameters in the original (non-PCA) basis.
-  void ConstructPCA(TMatrixDSym * CovMatrix, const int firstPCAd, const int lastPCAd,
-                    const double eigen_thresh, const int _fNumPar);
+  void ConstructPCA(Eigen::MatrixXd const & CovMatrix, const int firstPCAd, const int lastPCAd,
+                    const double eigen_thresh);
 
   /// @brief Transfer param values from normal base to PCA base
-  void TransferToPCA();
+  void SetUnrotatedParameterValues(Eigen::VectorXd const &vals);
   /// @brief Transfer param values from PCA base to normal base
   void TransferToParam();
 
@@ -100,7 +94,7 @@ class PCAHandler{
                        const std::vector<double>& fUpBound,
                        int _fNumPar);
 
-  /// @brief Accepted this step
+  /// @brief Accept this step
   void AcceptStep() _noexcept_;
   /// @brief Use Cholesky throw matrix for better step proposal
   void CorrelateSteps(const std::vector<double>& IndivStepScale,
@@ -226,8 +220,6 @@ class PCAHandler{
   #endif
 
  private:
-  /// @brief KS: Make sure decomposed matrix isn't correlated with undecomposed
-  void SanitisePCA(TMatrixDSym* CovMatrix);
 
   /// Prefit value for PCA params
   std::vector<double> _fPreFitValuePCA;

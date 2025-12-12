@@ -1,60 +1,44 @@
 #include "Parameters/PCAHandler.h"
 
-
 // ********************************************
-PCAHandler::PCAHandler() {
-// ********************************************
-  _pCurrVal = nullptr;
-  _pPropVal = nullptr;
-}
-
-// ********************************************
-PCAHandler::~PCAHandler() {
-// ********************************************
-}
-
-// ********************************************
-void PCAHandler::SetupPointers(std::vector<double>* fCurr_Val,
-                               std::vector<double>* fProp_Val) {
-// ********************************************
-  _pCurrVal = fCurr_Val;
-  _pPropVal = fProp_Val;
-}
-
-// ********************************************
-void PCAHandler::ConstructPCA(TMatrixDSym* CovMatrix, const int firstPCAd, const int lastPCAd,
-                              const double eigen_thresh, const int _fNumPar) {
-// ********************************************
+void PCAHandler::ConstructPCA(Eigen::MatrixXd const &CovMatrix,
+                              const int firstPCAd, const int lastPCAd,
+                              const double eigen_thresh) {
+  // ********************************************
   FirstPCAdpar = firstPCAd;
   LastPCAdpar = lastPCAd;
   eigen_threshold = eigen_thresh;
 
   // Check that covariance matrix exists
-  if (CovMatrix == nullptr) {
+  if (CovMatrix == NULL) {
     MACH3LOG_ERROR("Covariance matrix for has not yet been set");
     MACH3LOG_ERROR("Can not construct PCA until it is set");
-    throw MaCh3Exception(__FILE__ , __LINE__ );
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
 
-  if(FirstPCAdpar > CovMatrix->GetNrows()-1 || LastPCAdpar>CovMatrix->GetNrows()-1) {
-    MACH3LOG_ERROR("FirstPCAdpar and LastPCAdpar are higher than the number of parameters");
-    MACH3LOG_ERROR("first: {} last: {}, params: {}", FirstPCAdpar, LastPCAdpar, CovMatrix->GetNrows()-1);
-    throw MaCh3Exception(__FILE__ , __LINE__ );
+  if ((FirstPCAdpar >= CovMatrix.rows()) || (LastPCAdpar >= CovMatrix.rows())) {
+    MACH3LOG_ERROR("FirstPCAdpar and LastPCAdpar are higher than the number of "
+                   "parameters");
+    MACH3LOG_ERROR("first: {} last: {}, params: {}", FirstPCAdpar, LastPCAdpar,
+                   CovMatrix.rows());
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
-  if(FirstPCAdpar < 0 || LastPCAdpar < 0){
-    MACH3LOG_ERROR("FirstPCAdpar and LastPCAdpar are less than 0 but not default -999");
+  if ((FirstPCAdpar < 0) || (LastPCAdpar < 0)) {
+    MACH3LOG_ERROR(
+        "FirstPCAdpar and LastPCAdpar are less than 0 but not default -999");
     MACH3LOG_ERROR("first: {} last: {}", FirstPCAdpar, LastPCAdpar);
-    throw MaCh3Exception(__FILE__ , __LINE__ );
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
-  MACH3LOG_INFO("PCAing parameters {} through {} inclusive", FirstPCAdpar, LastPCAdpar);
-  int NumUnPCAdPars = CovMatrix->GetNrows()-(LastPCAdpar-FirstPCAdpar+1);
+  MACH3LOG_INFO("PCAing parameters {} through {} inclusive", FirstPCAdpar,
+                LastPCAdpar);
+  int numunpcadpars = CovMatrix->GetNrows() - (LastPCAdpar - FirstPCAdpar + 1);
 
-  // KS: Make sure we are not doing anything silly with PCA
-  SanitisePCA(CovMatrix);
+  M3::EnsureNoOutOfBlockCorrelations(CovMatrix, FirstPCAdpar, LastPCAdpar);
 
-  TMatrixDSym submat(CovMatrix->GetSub(FirstPCAdpar,LastPCAdpar,FirstPCAdpar,LastPCAdpar));
+  TMatrixDSym submat(
+      CovMatrix->GetSub(FirstPCAdpar, LastPCAdpar, FirstPCAdpar, LastPCAdpar));
 
-  //CW: Calculate how many eigen values this threshold corresponds to
+  // CW: Calculate how many eigen values this threshold corresponds to
   TMatrixDSymEigen eigen(submat);
   eigen_values.ResizeTo(eigen.GetEigenValues());
   eigen_vectors.ResizeTo(eigen.GetEigenVectors());
@@ -66,51 +50,66 @@ void PCAHandler::ConstructPCA(TMatrixDSym* CovMatrix, const int firstPCAd, const
     sum += eigen_values(i);
   }
   nKeptPCApars = eigen_values.GetNrows();
-  //CW: Now go through again and see how many eigen values correspond to threshold
+  // CW: Now go through again and see how many eigen values correspond to
+  // threshold
   for (int i = 0; i < eigen_values.GetNrows(); ++i) {
     // Get the relative size of the eigen value
-    double sig = eigen_values(i)/sum;
+    double sig = eigen_values(i) / sum;
     // Check against the threshold
     if (sig < eigen_threshold) {
       nKeptPCApars = i;
       break;
     }
   }
-  NumParPCA = NumUnPCAdPars+nKeptPCApars;
-  MACH3LOG_INFO("Threshold of {} on eigen values relative sum of eigen value ({}) generates {} eigen vectors, plus we have {} unpcad pars, for a total of {}", eigen_threshold, sum, nKeptPCApars, NumUnPCAdPars, NumParPCA);
-  //DB Create array of correct size so eigen_values can be used in CorrelateSteps
+  NumParPCA = numunpcadpars + nKeptPCApars;
+  MACH3LOG_INFO("Threshold of {} on eigen values relative sum of eigen value "
+                "({}) generates {} eigen vectors, plus we have {} unpcad pars, "
+                "for a total of {}",
+                eigen_threshold, sum, nKeptPCApars, numunpcadpars, NumParPCA);
+
+  // DB Create array of correct size so eigen_values can be used in
+  // CorrelateSteps
   eigen_values_master = std::vector<double>(NumParPCA, 1.0);
-  for (int i = FirstPCAdpar; i < FirstPCAdpar+nKeptPCApars; ++i) {eigen_values_master[i] = eigen_values(i-FirstPCAdpar);}
+  for (int i = FirstPCAdpar; i < FirstPCAdpar + nKeptPCApars; ++i) {
+    eigen_values_master[i] = eigen_values(i - FirstPCAdpar);
+  }
 
   // Now construct the transfer matrices
-  //These matrices will be as big as number of unPCAd pars plus number of eigenvalues kept
+  // These matrices will be as big as number of unPCAd pars plus number of
+  // eigenvalues kept
   TransferMat.ResizeTo(CovMatrix->GetNrows(), NumParPCA);
   TransferMatT.ResizeTo(CovMatrix->GetNrows(), NumParPCA);
 
   // Get a subset of the eigen vector matrix
-  TMatrixD temp(eigen_vectors.GetSub(0, eigen_vectors.GetNrows()-1, 0, nKeptPCApars-1));
+  TMatrixD temp(eigen_vectors.GetSub(0, eigen_vectors.GetNrows() - 1, 0,
+                                     nKeptPCApars - 1));
 
-  //Make transfer matrix which is two blocks of identity with a block of the PCA transfer matrix in between
+  // Make transfer matrix which is two blocks of identity with a block of the
+  // PCA transfer matrix in between
   TMatrixD temp2;
   temp2.ResizeTo(CovMatrix->GetNrows(), NumParPCA);
 
-  //First set the whole thing to 0
-  temp2.Zero();
-
-  //Set the first identity block for non-PCAed params before PCA block, before PCA XRows == YRows
-  for(int iRow = 0; iRow < FirstPCAdpar; iRow++) {
-    temp2(iRow, iRow) = 1.0;
+  // First set the whole thing to 0
+  for (int iRow = 0; iRow < CovMatrix->GetNrows(); iRow++) {
+    for (int iCol = 0; iCol < NumParPCA; iCol++) {
+      temp2[iRow][iCol] = 0;
+    }
+  }
+  // Set the first identity block
+  if (FirstPCAdpar != 0) {
+    for (int iRow = 0; iRow < FirstPCAdpar; iRow++) {
+      temp2[iRow][iRow] = 1;
+    }
   }
 
-  //Set the transfer matrix block for the PCAd pars
-  temp2.SetSub(FirstPCAdpar,FirstPCAdpar,temp);
+  // Set the transfer matrix block for the PCAd pars
+  temp2.SetSub(FirstPCAdpar, FirstPCAdpar, temp);
 
-  //Set the second identity block starting after PCA block, remember XRows != YRows.
-  // XRows -> normal base, YRows, PCA base
-  for(int iRow = 0;iRow < (CovMatrix->GetNrows()-1)-LastPCAdpar; iRow++) {
-    const int OrigRow = LastPCAdpar + 1 + iRow;
-    const int PCARow = FirstPCAdpar + nKeptPCApars + iRow;
-    temp2(OrigRow, PCARow) = 1.;
+  // Set the second identity block
+  if (LastPCAdpar != CovMatrix.rows() - 1) {
+    for (int iRow = 0; iRow < (CovMatrix.rows() - 1) - LastPCAdpar; iRow++) {
+      temp2[LastPCAdpar + 1 + iRow][FirstPCAdpar + nKeptPCApars + iRow] = 1;
+    }
   }
 
   TransferMat = temp2;
@@ -119,69 +118,38 @@ void PCAHandler::ConstructPCA(TMatrixDSym* CovMatrix, const int firstPCAd, const
   // And then transpose
   TransferMatT.T();
 
+#ifdef DEBUG_PCA
+  // KS: Let's dump all useful matrices to properly validate PCA
+  DebugPCA(sum, temp, submat, CovMatrix->GetNrows());
+#endif
+
   // Make the PCA parameter arrays
   _fParCurrPCA.ResizeTo(NumParPCA);
   _fParPropPCA.ResizeTo(NumParPCA);
   _fPreFitValuePCA.resize(NumParPCA);
 
-  //KS: make easy map so we could easily find un-decomposed parameters
-  _fErrorPCA.assign(NumParPCA, 1);
-  isDecomposedPCA.assign(NumParPCA, -1);
-  // First non PCA-ed block, since this is before PCA-ed block we don't need any mapping
-  for (int i = 0; i < FirstPCAdpar; ++i) {
+  // KS: make easy map so we could easily find un-decomposed parameters
+  isDecomposedPCA.resize(NumParPCA);
+  _fErrorPCA.resize(NumParPCA);
+  for (int i = 0; i < NumParPCA; ++i) {
+    _fErrorPCA[i] = 1;
+    isDecomposedPCA[i] = -1;
+  }
+  for (int i = 0; i < FirstPCAdpar; ++i)
     isDecomposedPCA[i] = i;
-  }
 
-  // Second non-PCA-ed block, keep in mind this is in PCA base so we cannot use LastPCAdpar
-  // we must shift them back into the original parameter index range.
-  const int shift = _fNumPar - NumParPCA;
-  for (int i = FirstPCAdpar + nKeptPCApars; i < NumParPCA; ++i) {
-    isDecomposedPCA[i] = i + shift;
-  }
-
-  #ifdef DEBUG_PCA
-  //KS: Let's dump all useful matrices to properly validate PCA
-  DebugPCA(sum, temp, submat, CovMatrix->GetNrows());
-  #endif
-}
-
-// ********************************************
-// Make sure decomposed matrix isn't correlated with undecomposed
-void PCAHandler::SanitisePCA(TMatrixDSym* CovMatrix) {
-// ********************************************
-  constexpr double correlation_threshold = 1e-6;
-
-  bool found_significant_correlation = false;
-
-  int N = CovMatrix->GetNrows();
-  for (int i = FirstPCAdpar; i <= LastPCAdpar; ++i) {
-    for (int j = 0; j < N; ++j) {
-      // Skip if j is inside the decomposed range (we only want cross-correlations)
-      if (j >= FirstPCAdpar && j <= LastPCAdpar) continue;
-
-      double corr_val = (*CovMatrix)(i, j);
-      if (std::fabs(corr_val) > correlation_threshold) {
-        found_significant_correlation = true;
-        MACH3LOG_ERROR("Significant correlation detected between decomposed parameter '{}' "
-        "and undecomposed parameter '{}': {:.6e}", i, j, corr_val);
-      }
-    }
-  }
-
-  if (found_significant_correlation) {
-    MACH3LOG_ERROR("There are correlations between undecomposed and decomposed part of matrices, this will not work");
-    throw MaCh3Exception(__FILE__ , __LINE__);
-  }
+  for (int i = FirstPCAdpar + nKeptPCApars + 1; i < NumParPCA; ++i)
+    isDecomposedPCA[i] = i + (_fNumPar - NumParPCA);
 }
 
 // ********************************************
 // Update so that current step becomes the previously proposed step
 void PCAHandler::AcceptStep() _noexcept_ {
-// ********************************************
+  // ********************************************
   // Update the book-keeping for the output
-  #ifdef MULTITHREAD
-  #pragma omp parallel for
-  #endif
+#ifdef MULTITHREAD
+#pragma omp parallel for
+#endif
   for (int i = 0; i < NumParPCA; ++i) {
     _fParCurrPCA(i) = _fParPropPCA(i);
   }
@@ -190,35 +158,34 @@ void PCAHandler::AcceptStep() _noexcept_ {
 }
 
 // ************************************************
-// Correlate the steps by setting the proposed step of a parameter to its current value + some correlated throw
-void PCAHandler::CorrelateSteps(const std::vector<double>& IndivStepScale,
-                                const double GlobalStepScale,
-                                const double* _restrict_ randParams,
-                                const double* _restrict_ corr_throw) _noexcept_ {
-// ************************************************
+// Correlate the steps by setting the proposed step of a parameter to its
+// current value + some correlated throw
+void PCAHandler::CorrelateSteps(
+    const std::vector<double> &IndivStepScale, const double GlobalStepScale,
+    const double *_restrict_ randParams,
+    const double *_restrict_ corr_throw) _noexcept_ {
+  // ************************************************
   // Throw around the current step
-  #ifdef MULTITHREAD
-  #pragma omp parallel for
-  #endif
-  for (int i = 0; i < NumParPCA; ++i)
-  {
-    if (_fErrorPCA[i] > 0.)
-    {
+#ifdef MULTITHREAD
+#pragma omp parallel for
+#endif
+  for (int i = 0; i < NumParPCA; ++i) {
+    if (_fErrorPCA[i] > 0.) {
       double IndStepScale = 1.;
-      //KS: If undecomposed parameter apply individual step scale and Cholesky for better acceptance rate
-      if(isDecomposedPCA[i] >= 0)
-      {
+      // KS: If undecomposed parameter apply individual step scale and Cholesky
+      // for better acceptance rate
+      if (isDecomposedPCA[i] >= 0) {
         IndStepScale *= IndivStepScale[isDecomposedPCA[i]];
         IndStepScale *= corr_throw[isDecomposedPCA[i]];
       }
-      //If decomposed apply only random number
-      else
-      {
+      // If decomposed apply only random number
+      else {
         IndStepScale *= randParams[i];
-        //KS: All PCA-ed parameters have the same step scale
+        // KS: All PCA-ed parameters have the same step scale
         IndStepScale *= IndivStepScale[FirstPCAdpar];
       }
-      _fParPropPCA(i) = _fParCurrPCA(i)+GlobalStepScale*IndStepScale*eigen_values_master[i];
+      _fParPropPCA(i) = _fParCurrPCA(i) +
+                        GlobalStepScale * IndStepScale * eigen_values_master[i];
     }
   }
   // Then update the parameter basis
@@ -228,44 +195,47 @@ void PCAHandler::CorrelateSteps(const std::vector<double>& IndivStepScale,
 // ********************************************
 // Transfer a parameter variation in the parameter basis to the eigen basis
 void PCAHandler::TransferToPCA() {
-// ********************************************
+  // ********************************************
   // Make the temporary vectors
   TVectorD fParCurr_vec(static_cast<Int_t>(_pCurrVal->size()));
   TVectorD fParProp_vec(static_cast<Int_t>(_pCurrVal->size()));
-  for(int i = 0; i < static_cast<int>(_pCurrVal->size()); ++i) {
+  for (int i = 0; i < static_cast<int>(_pCurrVal->size()); ++i) {
     fParCurr_vec(i) = (*_pCurrVal)[i];
     fParProp_vec(i) = (*_pPropVal)[i];
   }
 
-  _fParCurrPCA = TransferMatT*fParCurr_vec;
-  _fParPropPCA = TransferMatT*fParProp_vec;
+  _fParCurrPCA = TransferMatT * fParCurr_vec;
+  _fParPropPCA = TransferMatT * fParProp_vec;
 }
 
 // ********************************************
-void PCAHandler::SetInitialParameters(std::vector<double>& IndStepScale) {
-// ********************************************
+void PCAHandler::SetInitialParameters(std::vector<double> &IndStepScale) {
+  // ********************************************
   TransferToPCA();
   for (int i = 0; i < NumParPCA; ++i) {
     _fPreFitValuePCA[i] = _fParCurrPCA(i);
   }
-  //DB Set Individual Step scale for PCA parameters to the LastPCAdpar fIndivStepScale because the step scale for those parameters is set by 'eigen_values[i]' but needs an overall step scale
-  //   However, individual step scale for non-PCA parameters needs to be set correctly
+  // DB Set Individual Step scale for PCA parameters to the LastPCAdpar
+  // fIndivStepScale because the step scale for those parameters is set by
+  // 'eigen_values[i]' but needs an overall step scale
+  //    However, individual step scale for non-PCA parameters needs to be set
+  //    correctly
   for (int i = FirstPCAdpar; i <= LastPCAdpar; i++) {
-    IndStepScale[i] = IndStepScale[LastPCAdpar-1];
+    IndStepScale[i] = IndStepScale[LastPCAdpar - 1];
   }
 }
 
 // ********************************************
 // Transfer a parameter variation in the eigen basis to the parameter basis
 void PCAHandler::TransferToParam() {
-// ********************************************
+  // ********************************************
   // Make the temporary vectors
-  TVectorD fParProp_vec = TransferMat*_fParPropPCA;
-  TVectorD fParCurr_vec = TransferMat*_fParCurrPCA;
-  #ifdef MULTITHREAD
-  #pragma omp parallel for
-  #endif
-  for(int i = 0; i < static_cast<int>(_pCurrVal->size()); ++i) {
+  TVectorD fParProp_vec = TransferMat * _fParPropPCA;
+  TVectorD fParCurr_vec = TransferMat * _fParCurrPCA;
+#ifdef MULTITHREAD
+#pragma omp parallel for
+#endif
+  for (int i = 0; i < static_cast<int>(_pCurrVal->size()); ++i) {
     (*_pPropVal)[i] = fParProp_vec(i);
     (*_pCurrVal)[i] = fParCurr_vec(i);
   }
@@ -273,11 +243,12 @@ void PCAHandler::TransferToParam() {
 
 // ********************************************
 // Throw the proposed parameter by mag sigma.
-void PCAHandler::ThrowParProp(const double mag, const double* _restrict_ randParams) {
-// ********************************************
+void PCAHandler::ThrowParProp(const double mag,
+                              const double *_restrict_ randParams) {
+  // ********************************************
   for (int i = 0; i < NumParPCA; i++) {
     if (_fErrorPCA[i] > 0.) {
-    _fParPropPCA(i) = _fParCurrPCA(i)+mag*randParams[i];
+      _fParPropPCA(i) = _fParCurrPCA(i) + mag * randParams[i];
     }
   }
   TransferToParam();
@@ -285,96 +256,112 @@ void PCAHandler::ThrowParProp(const double mag, const double* _restrict_ randPar
 
 // ********************************************
 // Throw the proposed parameter by mag sigma.
-void PCAHandler::ThrowParCurr(const double mag, const double* _restrict_ randParams) {
-// ********************************************
+void PCAHandler::ThrowParCurr(const double mag,
+                              const double *_restrict_ randParams) {
+  // ********************************************
   for (int i = 0; i < NumParPCA; i++) {
     if (_fErrorPCA[i] > 0.) {
-    _fParPropPCA(i) = mag*randParams[i];
+      _fParPropPCA(i) = mag * randParams[i];
     }
   }
   TransferToParam();
 }
 
 // ********************************************
-void PCAHandler::Print() const {
-// ********************************************
+void PCAHandler::Print() {
+  // ********************************************
   MACH3LOG_INFO("PCA:");
   for (int i = 0; i < NumParPCA; ++i) {
-    MACH3LOG_INFO("PCA {:<2} Current: {:<10.2f} Proposed: {:<10.2f}", i, _fParCurrPCA(i), _fParPropPCA(i));
+    MACH3LOG_INFO("PCA {:<2} Current: {:<10.2f} Proposed: {:<10.2f}", i,
+                  _fParCurrPCA(i), _fParPropPCA(i));
   }
 }
 
 // ********************************************
-void PCAHandler::SetBranches(TTree &tree, bool SaveProposal, const std::vector<std::string>& Names) {
-// ********************************************
+void PCAHandler::SetBranches(TTree &tree, bool SaveProposal,
+                             const std::vector<std::string> &Names) {
+  // ********************************************
   for (int i = 0; i < NumParPCA; ++i) {
-    tree.Branch(Form("%s_PCA", Names[i].c_str()), &_fParCurrPCA.GetMatrixArray()[i], Form("%s_PCA/D", Names[i].c_str()));
+    tree.Branch(Form("%s_PCA", Names[i].c_str()),
+                &_fParCurrPCA.GetMatrixArray()[i],
+                Form("%s_PCA/D", Names[i].c_str()));
   }
 
-  if(SaveProposal)
-  {
+  if (SaveProposal) {
     for (int i = 0; i < NumParPCA; ++i) {
-      tree.Branch(Form("%s_PCA_Prop", Names[i].c_str()), &_fParPropPCA.GetMatrixArray()[i], Form("%s_PCA_Prop/D", Names[i].c_str()));
+      tree.Branch(Form("%s_PCA_Prop", Names[i].c_str()),
+                  &_fParPropPCA.GetMatrixArray()[i],
+                  Form("%s_PCA_Prop/D", Names[i].c_str()));
     }
   }
 }
 
 // ********************************************
-void PCAHandler::ToggleFixAllParameters(const std::vector<std::string>& Names) {
-// ********************************************
-  for (int i = 0; i < NumParPCA; i++) ToggleFixParameter(i, Names);
+void PCAHandler::ToggleFixAllParameters(const std::vector<std::string> &Names) {
+  // ********************************************
+  for (int i = 0; i < NumParPCA; i++)
+    ToggleFixParameter(i, Names);
 }
 
 // ********************************************
-void PCAHandler::ToggleFixParameter(const int i, const std::vector<std::string>& Names) {
-// ********************************************
+void PCAHandler::ToggleFixParameter(const int i,
+                                    const std::vector<std::string> &Names) {
+  // ********************************************
   int isDecom = -1;
   for (int im = 0; im < NumParPCA; ++im) {
-    if(isDecomposedPCA[im] == i) {isDecom = im;}
+    if (isDecomposedPCA[im] == i) {
+      isDecom = im;
+    }
   }
-  if(isDecom < 0) {
+  if (isDecom < 0) {
     MACH3LOG_ERROR("Parameter {} is PCA decomposed can't fix this", Names[i]);
-    //throw MaCh3Exception(__FILE__ , __LINE__ );
+    // throw MaCh3Exception(__FILE__ , __LINE__ );
   } else {
     _fErrorPCA[isDecom] *= -1.0;
-    if(IsParameterFixedPCA(i)) MACH3LOG_INFO("Setting un-decomposed {}(parameter {}/{} in PCA base) to fixed at {}", Names[i], i, isDecom, (*_pCurrVal)[i]);
-    else MACH3LOG_INFO("Setting un-decomposed {}(parameter {}/{} in PCA base) free", Names[i], i, isDecom);
+    if (IsParameterFixedPCA(i))
+      MACH3LOG_INFO("Setting un-decomposed {}(parameter {}/{} in PCA base) to "
+                    "fixed at {}",
+                    Names[i], i, isDecom, (*_pCurrVal)[i]);
+    else
+      MACH3LOG_INFO(
+          "Setting un-decomposed {}(parameter {}/{} in PCA base) free",
+          Names[i], i, isDecom);
   }
 }
 
-
 // ********************************************
-void PCAHandler::ThrowParameters(const std::vector<std::unique_ptr<TRandom3>>& random_number,
-                                 double** throwMatrixCholDecomp,
-                                 double* randParams,
-                                 double* corr_throw,
-                                 const std::vector<double>& fPreFitValue,
-                                 const std::vector<double>& fLowBound,
-                                 const std::vector<double>& fUpBound,
-                                 const int _fNumPar) {
-// ********************************************
-  //KS: Do not multithread!
+void PCAHandler::ThrowParameters(
+    const std::vector<std::unique_ptr<TRandom3>> &random_number,
+    double **throwMatrixCholDecomp, double *randParams, double *corr_throw,
+    const std::vector<double> &fPreFitValue,
+    const std::vector<double> &fLowBound, const std::vector<double> &fUpBound,
+    const int _fNumPar) {
+  // ********************************************
+  // KS: Do not multithread!
   for (int i = 0; i < NumParPCA; ++i) {
     // Check if parameter is fixed first: if so don't randomly throw
-    if (IsParameterFixedPCA(i)) continue;
+    if (IsParameterFixedPCA(i))
+      continue;
 
-    if(!IsParameterDecomposed(i))
-    {
+    if (!IsParameterDecomposed(i)) {
       (*_pPropVal)[i] = fPreFitValue[i] + corr_throw[i];
       int throws = 0;
-      // Try again if we the initial parameter proposal falls outside of the range of the parameter
+      // Try again if we the initial parameter proposal falls outside of the
+      // range of the parameter
       while ((*_pPropVal)[i] > fUpBound[i] || (*_pPropVal)[i] < fLowBound[i]) {
         randParams[i] = random_number[M3::GetThreadIndex()]->Gaus(0, 1);
-        const double corr_throw_single = M3::MatrixVectorMultiSingle(throwMatrixCholDecomp, randParams, _fNumPar, i);
+        const double corr_throw_single = M3::MatrixVectorMultiSingle(
+            throwMatrixCholDecomp, randParams, _fNumPar, i);
         (*_pPropVal)[i] = fPreFitValue[i] + corr_throw_single;
-        if (throws > 10000)
-        {
-          //KS: Since we are multithreading there is danger that those messages
-          //will be all over the place, small price to pay for faster code
-          MACH3LOG_WARN("Tried {} times to throw parameter {} but failed", throws, i);
-          MACH3LOG_WARN("Setting _fPropVal:  {} to {}", (*_pPropVal)[i], fPreFitValue[i]);
+        if (throws > 10000) {
+          // KS: Since we are multithreading there is danger that those messages
+          // will be all over the place, small price to pay for faster code
+          MACH3LOG_WARN("Tried {} times to throw parameter {} but failed",
+                        throws, i);
+          MACH3LOG_WARN("Setting _fPropVal:  {} to {}", (*_pPropVal)[i],
+                        fPreFitValue[i]);
           MACH3LOG_WARN("I live at {}:{}", __FILE__, __LINE__);
-         (*_pPropVal)[i] = fPreFitValue[i];
+          (*_pPropVal)[i] = fPreFitValue[i];
         }
         throws++;
       }
@@ -382,14 +369,18 @@ void PCAHandler::ThrowParameters(const std::vector<std::unique_ptr<TRandom3>>& r
 
     } else {
       // KS: We have to multiply by number of parameters in PCA base
-      SetParPropPCA(i, GetPreFitValuePCA(i) + randParams[i] * eigen_values_master[i] * (LastPCAdpar - FirstPCAdpar));
+      SetParPropPCA(i, GetPreFitValuePCA(i) + randParams[i] *
+                                                  eigen_values_master[i] *
+                                                  (LastPCAdpar - FirstPCAdpar));
       SetParCurrPCA(i, GetParPropPCA(i));
     }
   } // end of parameter loop
 
-  /// @todo KS: We don't check if param is out of bounds. This is more problematic for PCA params.
+  /// @todo KS: We don't check if param is out of bounds. This is more
+  /// problematic for PCA params.
   for (int i = 0; i < _fNumPar; ++i) {
-    (*_pPropVal)[i] = std::max(fLowBound[i], std::min((*_pPropVal)[i], fUpBound[i]));
+    (*_pPropVal)[i] =
+        std::max(fLowBound[i], std::min((*_pPropVal)[i], fUpBound[i]));
     (*_pCurrVal)[i] = (*_pPropVal)[i];
   }
 }
@@ -397,62 +388,61 @@ void PCAHandler::ThrowParameters(const std::vector<std::unique_ptr<TRandom3>>& r
 #ifdef DEBUG_PCA
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
 // ********************************************
-//KS: Let's dump all useful matrices to properly validate PCA
-void PCAHandler::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, int NumPar) {
-// ********************************************
-  int originalErrorWarning = gErrorIgnoreLevel;
-  gErrorIgnoreLevel = kFatal;
-
-  (void)submat;//This is used if DEBUG_PCA==2, this hack is to avoid compiler warnings
-  for (int i = 0; i < NumParPCA; ++i) {
-    MACH3LOG_DEBUG("Param {} isDecomposedPCA={}", i, isDecomposedPCA[i]);
-  }
-
+// KS: Let's dump all useful matrices to properly validate PCA
+void PCAHandler::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat,
+                          int NumPar) {
+  // ********************************************
+  (void)submat; // This is used if DEBUG_PCA==2, this hack is to avoid compiler
+                // warnings
   TFile *PCA_Debug = new TFile("Debug_PCA.root", "RECREATE");
   PCA_Debug->cd();
 
   bool PlotText = true;
-  //KS: If we have more than 200 plot becomes unreadable :(
-  if(NumPar > 200) PlotText = false;
+  // KS: If we have more than 200 plot becomes unreadable :(
+  if (NumPar > 200)
+    PlotText = false;
 
-  auto heigen_values     = std::make_unique<TH1D>("eigen_values", "Eigen Values", eigen_values.GetNrows(), 0.0, eigen_values.GetNrows());
-  heigen_values->SetDirectory(nullptr);
-  auto heigen_cumulative = std::make_unique<TH1D>("heigen_cumulative", "heigen_cumulative", eigen_values.GetNrows(), 0.0, eigen_values.GetNrows());
-  heigen_cumulative->SetDirectory(nullptr);
-  auto heigen_frac       = std::make_unique<TH1D>("heigen_fractional", "heigen_fractional", eigen_values.GetNrows(), 0.0, eigen_values.GetNrows());
-  heigen_frac->SetDirectory(nullptr);
+  TH1D *heigen_values =
+      new TH1D("eigen_values", "Eigen Values", eigen_values.GetNrows(), 0.0,
+               eigen_values.GetNrows());
+  TH1D *heigen_cumulative =
+      new TH1D("heigen_cumulative", "heigen_cumulative",
+               eigen_values.GetNrows(), 0.0, eigen_values.GetNrows());
+  TH1D *heigen_frac =
+      new TH1D("heigen_fractional", "heigen_fractional",
+               eigen_values.GetNrows(), 0.0, eigen_values.GetNrows());
   heigen_values->GetXaxis()->SetTitle("Eigen Vector");
   heigen_values->GetYaxis()->SetTitle("Eigen Value");
 
   double Cumulative = 0;
-  for(int i = 0; i < eigen_values.GetNrows(); i++)
-  {
-    heigen_values->SetBinContent(i+1, (eigen_values)(i));
-    heigen_cumulative->SetBinContent(i+1, (eigen_values)(i)/sum + Cumulative);
-    heigen_frac->SetBinContent(i+1, (eigen_values)(i)/sum);
-    Cumulative += (eigen_values)(i)/sum;
+  for (int i = 0; i < eigen_values.GetNrows(); i++) {
+    heigen_values->SetBinContent(i + 1, (eigen_values)(i));
+    heigen_cumulative->SetBinContent(i + 1,
+                                     (eigen_values)(i) / sum + Cumulative);
+    heigen_frac->SetBinContent(i + 1, (eigen_values)(i) / sum);
+    Cumulative += (eigen_values)(i) / sum;
   }
   heigen_values->Write("heigen_values");
   eigen_values.Write("eigen_values");
   heigen_cumulative->Write("heigen_values_cumulative");
   heigen_frac->Write("heigen_values_frac");
 
-  TH2D* heigen_vectors = new TH2D(eigen_vectors);
+  TH2D *heigen_vectors = new TH2D(eigen_vectors);
   heigen_vectors->GetXaxis()->SetTitle("Parameter in Normal Base");
   heigen_vectors->GetYaxis()->SetTitle("Parameter in Decomposed Base");
   heigen_vectors->Write("heigen_vectors");
   eigen_vectors.Write("eigen_vectors");
 
-  TH2D* SubsetPCA = new TH2D(temp);
+  TH2D *SubsetPCA = new TH2D(temp);
   SubsetPCA->GetXaxis()->SetTitle("Parameter in Normal Base");
   SubsetPCA->GetYaxis()->SetTitle("Parameter in Decomposed Base");
 
   SubsetPCA->Write("hSubsetPCA");
   temp.Write("SubsetPCA");
-  TH2D* hTransferMat = new TH2D(TransferMat);
+  TH2D *hTransferMat = new TH2D(TransferMat);
   hTransferMat->GetXaxis()->SetTitle("Parameter in Normal Base");
   hTransferMat->GetYaxis()->SetTitle("Parameter in Decomposed Base");
-  TH2D* hTransferMatT = new TH2D(TransferMatT);
+  TH2D *hTransferMatT = new TH2D(TransferMatT);
 
   hTransferMatT->GetXaxis()->SetTitle("Parameter in Decomposed Base");
   hTransferMatT->GetYaxis()->SetTitle("Parameter in Normal Base");
@@ -462,7 +452,7 @@ void PCAHandler::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, i
   hTransferMatT->Write("hTransferMatT");
   TransferMatT.Write("TransferMatT");
 
-  auto c1 = std::make_unique<TCanvas>("c1", " ", 0, 0, 1024, 1024);
+  TCanvas *c1 = new TCanvas("c1", " ", 0, 0, 1024, 1024);
   c1->SetBottomMargin(0.1);
   c1->SetTopMargin(0.05);
   c1->SetRightMargin(0.05);
@@ -473,12 +463,12 @@ void PCAHandler::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, i
   gStyle->SetOptFit(0);
   gStyle->SetOptStat(0);
   // Make pretty correlation colors (red to blue)
-  constexpr int NRGBs = 5;
+  const int NRGBs = 5;
   TColor::InitializeColors();
-  Double_t stops[NRGBs] = { 0.00, 0.25, 0.50, 0.75, 1.00 };
-  Double_t red[NRGBs]   = { 0.00, 0.25, 1.00, 1.00, 0.50 };
-  Double_t green[NRGBs] = { 0.00, 0.25, 1.00, 0.25, 0.00 };
-  Double_t blue[NRGBs]  = { 0.50, 1.00, 1.00, 0.25, 0.00 };
+  Double_t stops[NRGBs] = {0.00, 0.25, 0.50, 0.75, 1.00};
+  Double_t red[NRGBs] = {0.00, 0.25, 1.00, 1.00, 0.50};
+  Double_t green[NRGBs] = {0.00, 0.25, 1.00, 0.25, 0.00};
+  Double_t blue[NRGBs] = {0.50, 1.00, 1.00, 0.25, 0.00};
   TColor::CreateGradientColorTable(5, stops, red, green, blue, 255);
   gStyle->SetNumberContours(255);
 
@@ -486,14 +476,15 @@ void PCAHandler::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, i
   double minz = 0;
 
   c1->Print("Debug_PCA.pdf[");
-  auto EigenLine = std::make_unique<TLine>(nKeptPCApars, 0, nKeptPCApars, heigen_cumulative->GetMaximum());
+  TLine *EigenLine =
+      new TLine(nKeptPCApars, 0, nKeptPCApars, heigen_cumulative->GetMaximum());
   EigenLine->SetLineColor(kPink);
   EigenLine->SetLineWidth(2);
   EigenLine->SetLineStyle(kSolid);
 
-  auto text = std::make_unique<TText>(0.5, 0.5, Form("Threshold = %g", eigen_threshold));
-  text->SetTextFont (43);
-  text->SetTextSize (40);
+  TText *text = new TText(0.5, 0.5, Form("Threshold = %g", eigen_threshold));
+  text->SetTextFont(43);
+  text->SetTextSize(40);
 
   heigen_values->SetLineColor(kRed);
   heigen_values->SetLineWidth(2);
@@ -503,18 +494,19 @@ void PCAHandler::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, i
   heigen_frac->SetLineWidth(2);
 
   c1->SetLogy();
-  heigen_values->SetMaximum(heigen_cumulative->GetMaximum()+heigen_cumulative->GetMaximum()*0.4);
+  heigen_values->SetMaximum(heigen_cumulative->GetMaximum() +
+                            heigen_cumulative->GetMaximum() * 0.4);
   heigen_values->Draw();
   heigen_frac->Draw("SAME");
   heigen_cumulative->Draw("SAME");
   EigenLine->Draw("Same");
-  text->DrawTextNDC(0.42, 0.84,Form("Threshold = %g", eigen_threshold));
+  text->DrawTextNDC(0.42, 0.84, Form("Threshold = %g", eigen_threshold));
 
-  auto leg = std::make_unique<TLegend>(0.2, 0.2, 0.6, 0.5);
+  TLegend *leg = new TLegend(0.2, 0.2, 0.6, 0.5);
   leg->SetTextSize(0.04);
-  leg->AddEntry(heigen_values.get(), "Absolute", "l");
-  leg->AddEntry(heigen_frac.get(), "Fractional", "l");
-  leg->AddEntry(heigen_cumulative.get(), "Cumulative", "l");
+  leg->AddEntry(heigen_values, "Absolute", "l");
+  leg->AddEntry(heigen_frac, "Fractional", "l");
+  leg->AddEntry(heigen_cumulative, "Cumulative", "l");
 
   leg->SetLineColor(0);
   leg->SetLineStyle(0);
@@ -525,61 +517,88 @@ void PCAHandler::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, i
   c1->Print("Debug_PCA.pdf");
   c1->SetRightMargin(0.15);
   c1->SetLogy(0);
+  delete EigenLine;
+  delete leg;
+  delete text;
+  delete heigen_values;
+  delete heigen_frac;
+  delete heigen_cumulative;
 
   heigen_vectors->SetMarkerSize(0.2);
   minz = heigen_vectors->GetMinimum();
-  if (fabs(0-maxz)>fabs(0-minz)) heigen_vectors->GetZaxis()->SetRangeUser(0-fabs(0-maxz),0+fabs(0-maxz));
-  else heigen_vectors->GetZaxis()->SetRangeUser(0-fabs(0-minz),0+fabs(0-minz));
-  if(PlotText) heigen_vectors->Draw("COLZ TEXT");
-  else heigen_vectors->Draw("COLZ");
+  if (fabs(0 - maxz) > fabs(0 - minz))
+    heigen_vectors->GetZaxis()->SetRangeUser(0 - fabs(0 - maxz),
+                                             0 + fabs(0 - maxz));
+  else
+    heigen_vectors->GetZaxis()->SetRangeUser(0 - fabs(0 - minz),
+                                             0 + fabs(0 - minz));
+  if (PlotText)
+    heigen_vectors->Draw("COLZ TEXT");
+  else
+    heigen_vectors->Draw("COLZ");
 
-  auto Eigen_Line = std::make_unique<TLine>(0, nKeptPCApars, LastPCAdpar - FirstPCAdpar, nKeptPCApars);
+  TLine *Eigen_Line =
+      new TLine(0, nKeptPCApars, LastPCAdpar - FirstPCAdpar, nKeptPCApars);
   Eigen_Line->SetLineColor(kGreen);
   Eigen_Line->SetLineWidth(2);
   Eigen_Line->SetLineStyle(kDotted);
   Eigen_Line->Draw("SAME");
   c1->Print("Debug_PCA.pdf");
+  delete Eigen_Line;
 
   SubsetPCA->SetMarkerSize(0.2);
   minz = SubsetPCA->GetMinimum();
-  if (fabs(0-maxz)>fabs(0-minz)) SubsetPCA->GetZaxis()->SetRangeUser(0-fabs(0-maxz),0+fabs(0-maxz));
-  else SubsetPCA->GetZaxis()->SetRangeUser(0-fabs(0-minz),0+fabs(0-minz));
-  if(PlotText) SubsetPCA->Draw("COLZ TEXT");
-  else SubsetPCA->Draw("COLZ");
+  if (fabs(0 - maxz) > fabs(0 - minz))
+    SubsetPCA->GetZaxis()->SetRangeUser(0 - fabs(0 - maxz), 0 + fabs(0 - maxz));
+  else
+    SubsetPCA->GetZaxis()->SetRangeUser(0 - fabs(0 - minz), 0 + fabs(0 - minz));
+  if (PlotText)
+    SubsetPCA->Draw("COLZ TEXT");
+  else
+    SubsetPCA->Draw("COLZ");
   c1->Print("Debug_PCA.pdf");
   delete SubsetPCA;
 
   hTransferMat->SetMarkerSize(0.15);
   minz = hTransferMat->GetMinimum();
-  if (fabs(0-maxz)>fabs(0-minz)) hTransferMat->GetZaxis()->SetRangeUser(0-fabs(0-maxz),0+fabs(0-maxz));
-  else hTransferMat->GetZaxis()->SetRangeUser(0-fabs(0-minz),0+fabs(0-minz));
-  if(PlotText) hTransferMat->Draw("COLZ TEXT");
-  else hTransferMat->Draw("COLZ");
+  if (fabs(0 - maxz) > fabs(0 - minz))
+    hTransferMat->GetZaxis()->SetRangeUser(0 - fabs(0 - maxz),
+                                           0 + fabs(0 - maxz));
+  else
+    hTransferMat->GetZaxis()->SetRangeUser(0 - fabs(0 - minz),
+                                           0 + fabs(0 - minz));
+  if (PlotText)
+    hTransferMat->Draw("COLZ TEXT");
+  else
+    hTransferMat->Draw("COLZ");
   c1->Print("Debug_PCA.pdf");
   delete hTransferMat;
 
   hTransferMatT->SetMarkerSize(0.15);
   minz = hTransferMatT->GetMinimum();
-  if (fabs(0-maxz)>fabs(0-minz)) hTransferMatT->GetZaxis()->SetRangeUser(0-fabs(0-maxz),0+fabs(0-maxz));
-  else hTransferMatT->GetZaxis()->SetRangeUser(0-fabs(0-minz),0+fabs(0-minz));
-  if(PlotText) hTransferMatT->Draw("COLZ TEXT");
-  else hTransferMatT->Draw("COLZ");
-  c1->Print( "Debug_PCA.pdf");
+  if (fabs(0 - maxz) > fabs(0 - minz))
+    hTransferMatT->GetZaxis()->SetRangeUser(0 - fabs(0 - maxz),
+                                            0 + fabs(0 - maxz));
+  else
+    hTransferMatT->GetZaxis()->SetRangeUser(0 - fabs(0 - minz),
+                                            0 + fabs(0 - minz));
+  if (PlotText)
+    hTransferMatT->Draw("COLZ TEXT");
+  else
+    hTransferMatT->Draw("COLZ");
+  c1->Print("Debug_PCA.pdf");
   delete hTransferMatT;
 
-
-  //KS: Crosscheck against Eigen library
-  #if DEBUG_PCA == 2
+// KS: Crosscheck against Eigen library
+#if DEBUG_PCA == 2
   Eigen::MatrixXd Submat_Eigen(submat.GetNrows(), submat.GetNcols());
 
-  #ifdef MULTITHREAD
-  #pragma omp parallel for
-  #endif
-  for(int i = 0; i < submat.GetNrows(); i++)
-  {
-    for(int j = 0; j < submat.GetNcols(); j++)
-    {
-      Submat_Eigen(i,j) = (submat)(i,j);
+#ifdef MULTITHREAD
+#pragma omp parallel for
+#endif
+  for (int i = 0; i < submat.GetNrows(); i++) {
+    for (int j = 0; j < submat.GetNcols(); j++) {
+      Submat_Eigen(i, j) = (submat)(i, j);
     }
   }
   Eigen::EigenSolver<Eigen::MatrixXd> EigenSolver;
@@ -588,35 +607,40 @@ void PCAHandler::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, i
   Eigen::MatrixXd eigen_vect = EigenSolver.eigenvectors().real();
   std::vector<std::tuple<double, Eigen::VectorXd>> eigen_vectors_and_values;
   double Sum_Eigen = 0;
-  for(int i = 0; i < eigen_val.size(); i++)
-  {
-    std::tuple<double, Eigen::VectorXd> vec_and_val(eigen_val[i], eigen_vect.row(i));
+  for (int i = 0; i < eigen_val.size(); i++) {
+    std::tuple<double, Eigen::VectorXd> vec_and_val(eigen_val[i],
+                                                    eigen_vect.row(i));
     eigen_vectors_and_values.push_back(vec_and_val);
     Sum_Eigen += eigen_val[i];
   }
   std::sort(eigen_vectors_and_values.begin(), eigen_vectors_and_values.end(),
-            [&](const std::tuple<double, Eigen::VectorXd>& a, const std::tuple<double, Eigen::VectorXd>& b) -> bool
-            { return std::get<0>(a) > std::get<0>(b); } );
+            [&](const std::tuple<double, Eigen::VectorXd> &a,
+                const std::tuple<double, Eigen::VectorXd> &b) -> bool {
+              return std::get<0>(a) > std::get<0>(b);
+            });
   int index = 0;
-  for(auto const vect : eigen_vectors_and_values)
-  {
+  for (auto const vect : eigen_vectors_and_values) {
     eigen_val(index) = std::get<0>(vect);
     eigen_vect.row(index) = std::get<1>(vect);
     index++;
   }
-  TH1D* heigen_values_Eigen = new TH1D("eig_values", "Eigen Values", eigen_val.size(), 0.0, eigen_val.size());
-  TH1D* heigen_cumulative_Eigen = new TH1D("eig_cumulative", "heigen_cumulative", eigen_val.size(), 0.0, eigen_val.size());
-  TH1D* heigen_frac_Eigen = new TH1D("eig_fractional", "heigen_fractional", eigen_val.size(), 0.0, eigen_val.size());
+  TH1D *heigen_values_Eigen = new TH1D("eig_values", "Eigen Values",
+                                       eigen_val.size(), 0.0, eigen_val.size());
+  TH1D *heigen_cumulative_Eigen =
+      new TH1D("eig_cumulative", "heigen_cumulative", eigen_val.size(), 0.0,
+               eigen_val.size());
+  TH1D *heigen_frac_Eigen = new TH1D("eig_fractional", "heigen_fractional",
+                                     eigen_val.size(), 0.0, eigen_val.size());
   heigen_values_Eigen->GetXaxis()->SetTitle("Eigen Vector");
   heigen_values_Eigen->GetYaxis()->SetTitle("Eigen Value");
 
   double Cumulative_Eigen = 0;
-  for(int i = 0; i < eigen_val.size(); i++)
-  {
-    heigen_values_Eigen->SetBinContent(i+1, eigen_val(i));
-    heigen_cumulative_Eigen->SetBinContent(i+1, eigen_val(i)/sum + Cumulative_Eigen);
-    heigen_frac_Eigen->SetBinContent(i+1, eigen_val(i)/sum);
-    Cumulative_Eigen += eigen_val(i)/sum;
+  for (int i = 0; i < eigen_val.size(); i++) {
+    heigen_values_Eigen->SetBinContent(i + 1, eigen_val(i));
+    heigen_cumulative_Eigen->SetBinContent(i + 1, eigen_val(i) / sum +
+                                                      Cumulative_Eigen);
+    heigen_frac_Eigen->SetBinContent(i + 1, eigen_val(i) / sum);
+    Cumulative_Eigen += eigen_val(i) / sum;
   }
   heigen_values_Eigen->SetLineColor(kRed);
   heigen_values_Eigen->SetLineWidth(2);
@@ -626,12 +650,13 @@ void PCAHandler::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, i
   heigen_frac_Eigen->SetLineWidth(2);
 
   c1->SetLogy();
-  heigen_values_Eigen->SetMaximum(heigen_cumulative_Eigen->GetMaximum()+heigen_cumulative_Eigen->GetMaximum()*0.4);
+  heigen_values_Eigen->SetMaximum(heigen_cumulative_Eigen->GetMaximum() +
+                                  heigen_cumulative_Eigen->GetMaximum() * 0.4);
   heigen_values_Eigen->Draw();
   heigen_cumulative_Eigen->Draw("SAME");
   heigen_frac_Eigen->Draw("SAME");
 
-  auto leg_Eigen = std::make_unique<TLegend>(0.2, 0.2, 0.6, 0.5);
+  TLegend *leg_Eigen = new TLegend(0.2, 0.2, 0.6, 0.5);
   leg_Eigen->SetTextSize(0.04);
   leg_Eigen->AddEntry(heigen_values_Eigen, "Absolute", "l");
   leg_Eigen->AddEntry(heigen_frac_Eigen, "Fractional", "l");
@@ -648,44 +673,57 @@ void PCAHandler::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, i
   delete heigen_values_Eigen;
   delete heigen_cumulative_Eigen;
   delete heigen_frac_Eigen;
+  delete leg_Eigen;
 
-  TH2D* heigen_vectors_Eigen = new TH2D("Eigen_Vectors", "Eigen_Vectors", eigen_val.size(), 0.0, eigen_val.size(), eigen_val.size(), 0.0, eigen_val.size());
+  TH2D *heigen_vectors_Eigen =
+      new TH2D("Eigen_Vectors", "Eigen_Vectors", eigen_val.size(), 0.0,
+               eigen_val.size(), eigen_val.size(), 0.0, eigen_val.size());
 
-  for(int i = 0; i < eigen_val.size(); i++)
-  {
-    for(int j = 0; j < eigen_val.size(); j++)
-    {
-      //KS: +1 because there is offset in histogram relative to TMatrix
-      heigen_vectors_Eigen->SetBinContent(i+1,j+1, eigen_vect(i,j));
+  for (int i = 0; i < eigen_val.size(); i++) {
+    for (int j = 0; j < eigen_val.size(); j++) {
+      // KS: +1 because there is offset in histogram relative to TMatrix
+      heigen_vectors_Eigen->SetBinContent(i + 1, j + 1, eigen_vect(i, j));
     }
   }
   heigen_vectors_Eigen->GetXaxis()->SetTitle("Parameter in Normal Base");
   heigen_vectors_Eigen->GetYaxis()->SetTitle("Parameter in Decomposed Base");
   heigen_vectors_Eigen->SetMarkerSize(0.15);
   minz = heigen_vectors_Eigen->GetMinimum();
-  if (fabs(0-maxz)>fabs(0-minz)) heigen_vectors_Eigen->GetZaxis()->SetRangeUser(0-fabs(0-maxz),0+fabs(0-maxz));
-  else heigen_vectors_Eigen->GetZaxis()->SetRangeUser(0-fabs(0-minz),0+fabs(0-minz));
+  if (fabs(0 - maxz) > fabs(0 - minz))
+    heigen_vectors_Eigen->GetZaxis()->SetRangeUser(0 - fabs(0 - maxz),
+                                                   0 + fabs(0 - maxz));
+  else
+    heigen_vectors_Eigen->GetZaxis()->SetRangeUser(0 - fabs(0 - minz),
+                                                   0 + fabs(0 - minz));
 
-  if(PlotText) heigen_vectors_Eigen->Draw("COLZ TEXT");
-  else heigen_vectors_Eigen->Draw("COLZ");
-  c1->Print( "Debug_PCA.pdf");
+  if (PlotText)
+    heigen_vectors_Eigen->Draw("COLZ TEXT");
+  else
+    heigen_vectors_Eigen->Draw("COLZ");
+  c1->Print("Debug_PCA.pdf");
 
   heigen_vectors->SetTitle("ROOT minus Eigen");
   heigen_vectors->Add(heigen_vectors_Eigen, -1.);
   minz = heigen_vectors->GetMinimum();
-  if (fabs(0-maxz)>fabs(0-minz)) heigen_vectors->GetZaxis()->SetRangeUser(0-fabs(0-maxz),0+fabs(0-maxz));
-  else heigen_vectors->GetZaxis()->SetRangeUser(0-fabs(0-minz),0+fabs(0-minz));
-  if(PlotText) heigen_vectors->Draw("COLZ TEXT");
-  else heigen_vectors->Draw("COLZ");
+  if (fabs(0 - maxz) > fabs(0 - minz))
+    heigen_vectors->GetZaxis()->SetRangeUser(0 - fabs(0 - maxz),
+                                             0 + fabs(0 - maxz));
+  else
+    heigen_vectors->GetZaxis()->SetRangeUser(0 - fabs(0 - minz),
+                                             0 + fabs(0 - minz));
+  if (PlotText)
+    heigen_vectors->Draw("COLZ TEXT");
+  else
+    heigen_vectors->Draw("COLZ");
   c1->Print("Debug_PCA.pdf");
   delete heigen_vectors_Eigen;
 
-  #endif // end if Eigen enabled
+#endif // end if Eigen enabled
   delete heigen_vectors;
 
   c1->Print("Debug_PCA.pdf]");
+  delete c1;
   PCA_Debug->Close();
   delete PCA_Debug;
-  gErrorIgnoreLevel = originalErrorWarning;
 }
 #endif
