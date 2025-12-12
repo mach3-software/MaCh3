@@ -31,7 +31,12 @@ AdaptiveMCMCHandler::~AdaptiveMCMCHandler() {
 
 // ********************************************
 bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const std::string& matrix_name_str,
-                                        const std::vector<double>* parameters, const std::vector<double>* fixed) {
+                                        const std::vector<std::string>* parameter_names,
+                                        const std::vector<double>* parameters, 
+                                        const std::vector<double>* fixed,
+                                        const std::vector<bool>* param_skip_adapt_flags,
+                                        const TMatrixDSym* throwMatrix,
+                                        const double initial_scale_) {
 // ********************************************
   /*
    * HW: Idea is that adaption can simply read the YAML config
@@ -97,6 +102,12 @@ bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const 
   SetParams(parameters);
   SetFixed(fixed);
 
+  _ParamNames = parameter_names;
+
+  initial_throw_matrix = static_cast<TMatrixDSym*>(throwMatrix->Clone());
+
+  initial_scale = initial_scale_;
+
   /// HW: This is technically wrong, should be across all systematics but will be addressed in a later PR
   if(use_robbins_monro) {
     MACH3LOG_INFO("Using Robbins-Monro for adaptive step size tuning with target acceptance {}", target_acceptance);
@@ -107,10 +118,25 @@ bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const 
   // We'll use the same start scale for Robbins-Monro as standard adaption
   adaption_scale = 2.38/std::sqrt(GetNumParams()); 
 
-  // We"ll set a dummy variable here
-  auto matrix_blocks = GetFromManager<std::vector<std::vector<int>>>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["MatrixBlocks"], {{}});
-
+  // HH: added ability to define blocks by parameter names
+  bool matrix_blocks_by_name = GetFromManager<bool>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["MatrixBlocksByName"], false);
+  std::vector<std::vector<int>> matrix_blocks;
+  // HH: read blocks by names and convert to indices
+  if (matrix_blocks_by_name) {
+    auto matrix_blocks_input = GetFromManager<std::vector<std::vector<std::string>>>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["MatrixBlocks"], {{}});
+    // Now we need to convert to indices
+    for (const auto& block : matrix_blocks_input) {
+      auto block_indices = GetParIndicesFromNames(block);
+      matrix_blocks.push_back(block_indices);
+    }
+  } else {
+    matrix_blocks = GetFromManager<std::vector<std::vector<int>>>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["MatrixBlocks"], {{}});
+  }
   SetAdaptiveBlocks(matrix_blocks);
+
+  // set parameters to skip during adaption
+  _param_skip_adapt_flags = param_skip_adapt_flags;
+
   return true;
 }
 
@@ -202,9 +228,46 @@ void AdaptiveMCMCHandler::SaveAdaptiveToFile(const std::string &outFileName,
     outFile->cd();
     auto adaptive_to_save = static_cast<TMatrixDSym*>(adaptive_covariance->Clone());
     // Multiply by scale
-    (*adaptive_to_save) *= std::pow(GetAdaptionScale(),2);
+    // HH: Only scale parameters not being skipped
+    for (int i = 0; i < GetNumParams(); ++i) {
+      for (int j = 0; j <= i; ++j) {
+        // If both parameters are skipped, scale by initial scale
+        if ((*_param_skip_adapt_flags)[i] && (*_param_skip_adapt_flags)[j]) {
+          (*adaptive_to_save)(i, j) *= initial_scale * initial_scale;
+          if (i != j) {
+            (*adaptive_to_save)(j, i) *= initial_scale * initial_scale;
+          }
+        }
+        else if (!(*_param_skip_adapt_flags)[i] && !(*_param_skip_adapt_flags)[j]) {
+          (*adaptive_to_save)(i, j) *= GetAdaptionScale() * GetAdaptionScale();
+          if (i != j) {
+            (*adaptive_to_save)(j, i) *= GetAdaptionScale() * GetAdaptionScale();
+          }
+        }
+        else {
+          // Not too sure what to do here, as the correlation should be zero 
+          // Scale by both factors as a compromise
+          (*adaptive_to_save)(i, j) *= GetAdaptionScale() * initial_scale;
+          if (i != j) {
+            (*adaptive_to_save)(j, i) *= GetAdaptionScale() * initial_scale;
+          }
+        }
+      }
+    }
+
     adaptive_to_save->Write(adaptive_cov_name.c_str());
     outMeanVec->Write(mean_vec_name.c_str());
+
+    // HH: Also save the initial throw matrix for reference
+    if (!initial_throw_matrix_saved) {
+      std::string initial_cov_name = "0_" + systematicName + std::string("_initial_throw_matrix");
+      auto initial_throw_matrix_to_save = static_cast<TMatrixDSym*>(initial_throw_matrix->Clone());
+      *(initial_throw_matrix_to_save) *= initial_scale * initial_scale;
+      initial_throw_matrix_saved = true;
+      initial_throw_matrix_to_save->Write(initial_cov_name.c_str());
+      delete initial_throw_matrix_to_save;
+    }
+
     outFile->Close();
     delete adaptive_to_save;
     delete outMeanVec;
@@ -303,6 +366,21 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance() {
 
       double cov_prev = (*adaptive_covariance)(i, j);
       double cov_updated = 0.0;
+
+      // HH: Check if either parameter is skipped
+      // If parameter i and j are both skipped
+      if ((*_param_skip_adapt_flags)[i] && (*_param_skip_adapt_flags)[j]) {
+        // Set covariance to initial throw matrix value
+        (*adaptive_covariance)(i, j) = (*initial_throw_matrix)(i, j);
+        (*adaptive_covariance)(j, i) = (*initial_throw_matrix)(j, i);
+        continue;
+      }
+      // If only one parameter is skipped we need to make sure correlation is zero 
+      // because we don't want to change one parameter while keeping the other fixed 
+      // as this would lead to penalty terms in the prior
+      else if ((*_param_skip_adapt_flags)[i] || (*_param_skip_adapt_flags)[j]) {
+        continue;
+      } // otherwise adapt as normal
 
       if (steps_post_burn > 0) {
       // Haario-style update

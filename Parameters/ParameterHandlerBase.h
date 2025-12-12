@@ -116,11 +116,6 @@ class ParameterHandlerBase {
   /// @brief KS: After step scale, prefit etc. value were modified save this modified config.
   void SaveUpdatedMatrixConfig();
 
-  /// @brief Throw the proposed parameter by mag sigma. Should really just have the user specify this throw by having argument double
-  void ThrowParProp(const double mag = 1.);
-
-  /// @brief Helper function to throw the current parameter by mag sigma. Can study bias in MCMC with this; put different starting parameters
-  void ThrowParCurr(const double mag = 1.);
   /// @brief Throw the parameters according to the covariance matrix. This shouldn't be used in MCMC code ase it can break Detailed Balance;
   void ThrowParameters();
   /// @brief Randomly throw the parameters in their 1 sigma range
@@ -197,6 +192,9 @@ class ParameterHandlerBase {
 
   /// @brief Adaptive Step Tuning Stuff
   void ResetIndivStepScale();
+
+  /// @brief Set individual step scale for parameters which are skipped during adaption to initial values
+  void SetIndivStepScaleForSkippedAdaptParams();
 
   /// @brief Initialise adaptive MCMC
   /// @param adapt_manager Node having from which we load all adaptation options
@@ -502,6 +500,15 @@ protected:
   std::vector<bool> _fFlatPrior;
   /// Tells to which samples object param should be applied
   std::vector<std::vector<std::string>> _fSampleNames;
+  
+  /// Backup of _fIndivStepScale for parameters which are skipped during adaption
+  std::vector<double> _fIndivStepScaleInitial;
+
+  /// Backup of _fGlobalStepScale for parameters which are skipped during adaption
+  double _fGlobalStepScaleInitial;
+
+  /// Flags telling if parameter should be skipped during adaption
+  std::vector<bool> param_skip_adapt_flags;
 
   /// Matrix which we use for step proposal before Cholesky decomposition (not actually used for step proposal)
   TMatrixDSym* throwMatrix;
