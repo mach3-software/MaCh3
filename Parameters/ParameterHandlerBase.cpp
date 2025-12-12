@@ -1072,6 +1072,22 @@ void ParameterHandlerBase::ResetIndivStepScale() {
   SetIndivStepScale(stepScales);
 }
 
+void ParameterHandlerBase::SetIndivStepScaleForSkippedAdaptParams() {
+  if (!param_skip_adapt_flags.size()) {
+    MACH3LOG_ERROR("Parameter skip adapt flags not set, cannot set individual step scales for skipped parameters.");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+  // HH: Cancel the effect of global step scale change for parameters that are not adapting
+  for (int i = 0; i <_fNumPar; i++) {
+    if (param_skip_adapt_flags[i]) {
+      _fIndivStepScale[i] = _fIndivStepScaleInitial[i] * _fGlobalStepScaleInitial / _fGlobalStepScale;
+    }
+  }
+  MACH3LOG_INFO("Updating individual step scales for non-adapting parameters to cancel global step scale change.");
+  MACH3LOG_INFO("Global step scale initial: {}, current: {}", _fGlobalStepScaleInitial, _fGlobalStepScale);
+  PrintIndivStepScale();
+}
+
 // ********************************************
 // HW: Code for throwing from separate throw matrix, needs to be set after init to ensure pos-def
 void ParameterHandlerBase::SetThrowMatrix(TMatrixDSym *cov){
@@ -1130,33 +1146,86 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
   }
   AdaptiveHandler = std::make_unique<adaptive_mcmc::AdaptiveMCMCHandler>();
 
-  // Now we read the general settings [these SHOULD be common across all matrices!]
-  bool success = AdaptiveHandler->InitFromConfig(adapt_manager, matrixName, &_fCurrVal, &_fError);
-  if(!success) return;
-  AdaptiveHandler->Print();
+  // HH: Backing up _fIndivStepScale and _fGlobalStepScale before adaption
+  _fIndivStepScaleInitial = _fIndivStepScale;
+  _fGlobalStepScaleInitial = _fGlobalStepScale;
 
-  // Next let"s check for external matrices
-  // We"re going to grab this info from the YAML manager
-  if(!GetFromManager<bool>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["UseExternalMatrix"], false, __FILE__ , __LINE__)) {
-    MACH3LOG_WARN("Not using external matrix for {}, initialising adaption from scratch", matrixName);
+  // HH: adding these here because they will be used to set the individual step scales for non-adapting parameters
+  std::vector<std::string> params_to_skip = GetFromManager<std::vector<std::string>>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ParametersToSkip"], {});
+  // Build a list of skip flags
+  param_skip_adapt_flags.resize(_fNumPar, false);
+  for (int i = 0; i <_fNumPar; ++i) {
+    for (const auto& name : params_to_skip) {
+      if(name == _fFancyNames[i]) {
+        param_skip_adapt_flags[i] = true;
+        break;
+      }
+    }
+  }
+  // HH: Loop over correlations to check if any skipped parameter is correlated with adapted one
+  // We don't want to change one parameter while keeping the other fixed as this would
+  // lead to weird penalty terms in the prior after adapting
+  double max_correlation = 0.01; // Define a threshold for significant correlation above which we throw an error
+  for (int i = 0; i < _fNumPar; ++i) {
+    for (int j = 0; j <= i; ++j) {
+      // The symmetry should have been checked during the Init phase 
+      if(param_skip_adapt_flags[i] && !param_skip_adapt_flags[j]) {
+        double corr = (*covMatrix)(i,j)/std::sqrt((*covMatrix)(i,i)*(*covMatrix)(j,j));
+        if(std::fabs(corr) > max_correlation) {
+          MACH3LOG_ERROR("Correlation between skipped parameter {} ({}) and non-skipped parameter {} ({}) is {:.6e}, above the allowed threshold of {:.6e}.",
+                         i, _fFancyNames[i], j, _fFancyNames[j], corr, max_correlation);
+          throw MaCh3Exception(__FILE__, __LINE__);
+        }
+      }
+    }
+  }
+  // Now we read the general settings [these SHOULD be common across all matrices!]
+  bool success = AdaptiveHandler->InitFromConfig(adapt_manager, matrixName, 
+    &_fFancyNames, &_fCurrVal, &_fError,
+    &param_skip_adapt_flags, throwMatrix, _fGlobalStepScaleInitial
+  );
+  if (success) {
+    AdaptiveHandler->Print();
+  } 
+  else {
+    MACH3LOG_INFO("Not using adaptive MCMC for {}. Checking external matrix options...", matrixName);
+  }
+
+  // HH: Adjusting the external matrix reading logic such that you can not do adaptive 
+  // and still read an external matrix
+  // Logic:
+  // if read external matrix:
+  //    set throw matrix regardless of adaptive or not
+  // else:
+  //    if adaptive:
+  //       create new adaptive matrix from scratch
+  //    else:
+  //       do nothing
+  if(GetFromManager<bool>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["UseExternalMatrix"], false, __FILE__ , __LINE__)) {
+    // Finally, we accept that we want to read the matrix from a file!
+    auto external_file_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ExternalMatrixFileName"], "", __FILE__ , __LINE__);
+    auto external_matrix_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ExternalMatrixName"], "", __FILE__ , __LINE__);
+    auto external_mean_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ExternalMeansName"], "", __FILE__ , __LINE__);
+
+    AdaptiveHandler->SetThrowMatrixFromFile(external_file_name, external_matrix_name, external_mean_name, use_adaptive);
+    SetThrowMatrix(AdaptiveHandler->GetAdaptiveCovariance());
+
+    ResetIndivStepScale();
+    // HH: Set individual step scales for non-adapting parameters to the default individual step scales
+    // global step scale should be 1 so no need to adjust for that
+    SetIndivStepScaleForSkippedAdaptParams();
+
+    MACH3LOG_INFO("Successfully Set External Throw Matrix Stored in {}", external_file_name);
+  } else {
+    MACH3LOG_INFO("Not using external matrix for {}", matrixName);
+    if (!success) return; // Not adaptive either so nothing to do
+    MACH3LOG_INFO("Initialising adaption from scratch");
     // If we don't have a covariance matrix to start from for adaptive tune we need to make one!
     use_adaptive = true;
     AdaptiveHandler->CheckMatrixValidityForAdaption(GetCovMatrix());
     AdaptiveHandler->CreateNewAdaptiveCovariance();
     return;
   }
-
-  // Finally, we accept that we want to read the matrix from a file!
-  auto external_file_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ExternalMatrixFileName"], "", __FILE__ , __LINE__);
-  auto external_matrix_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ExternalMatrixName"], "", __FILE__ , __LINE__);
-  auto external_mean_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["ExternalMeansName"], "", __FILE__ , __LINE__);
-
-  AdaptiveHandler->SetThrowMatrixFromFile(external_file_name, external_matrix_name, external_mean_name, use_adaptive);
-  SetThrowMatrix(AdaptiveHandler->GetAdaptiveCovariance());
-
-  ResetIndivStepScale();
-
-  MACH3LOG_INFO("Successfully Set External Throw Matrix Stored in {}", external_file_name);
 }
 
 // ********************************************
@@ -1180,6 +1249,7 @@ void ParameterHandlerBase::UpdateAdaptiveCovariance(){
     #endif
     AdaptiveHandler->UpdateRobbinsMonroScale();
     SetStepScale(AdaptiveHandler->GetAdaptionScale(), verbose);
+    SetIndivStepScaleForSkippedAdaptParams();
   }
 
   // Call main adaption function
@@ -1189,6 +1259,7 @@ void ParameterHandlerBase::UpdateAdaptiveCovariance(){
   if(AdaptiveHandler->IndivStepScaleAdapt()) {
     ResetIndivStepScale();
     SetStepScale(AdaptiveHandler->GetAdaptionScale());
+    SetIndivStepScaleForSkippedAdaptParams();
   }
 
   if(AdaptiveHandler->UpdateMatrixAdapt()) {

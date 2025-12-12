@@ -198,6 +198,9 @@ class ParameterHandlerBase {
   /// @brief Adaptive Step Tuning Stuff
   void ResetIndivStepScale();
 
+  /// @brief Set individual step scale for parameters which are skipped during adaption to initial values
+  void SetIndivStepScaleForSkippedAdaptParams();
+
   /// @brief Initialise adaptive MCMC
   /// @param adapt_manager Node having from which we load all adaptation options
   void InitialiseAdaption(const YAML::Node& adapt_manager);
@@ -502,6 +505,15 @@ protected:
   std::vector<bool> _fFlatPrior;
   /// Tells to which samples object param should be applied
   std::vector<std::vector<std::string>> _fSampleNames;
+  
+  /// Backup of _fIndivStepScale for parameters which are skipped during adaption
+  std::vector<double> _fIndivStepScaleInitial;
+
+  /// Backup of _fGlobalStepScale for parameters which are skipped during adaption
+  double _fGlobalStepScaleInitial;
+
+  /// Flags telling if parameter should be skipped during adaption
+  std::vector<bool> param_skip_adapt_flags;
 
   /// Matrix which we use for step proposal before Cholesky decomposition (not actually used for step proposal)
   TMatrixDSym* throwMatrix;
