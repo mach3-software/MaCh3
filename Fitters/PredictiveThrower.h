@@ -102,6 +102,9 @@ class PredictiveThrower : public FitterBase {
 
   /// Number of toys we are generating analysing
   int Ntoys;
+
+  bool SampleWholeChain;
+
   /// KS: Names of parameter groups that will not be varied
   std::vector<std::string> ParameterGroupsNotVaried;
   /// KS: Index of parameters that will be varied

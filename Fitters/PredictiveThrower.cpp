@@ -20,6 +20,8 @@ PredictiveThrower::PredictiveThrower(manager *man) : FitterBase(man) {
   Is_PriorPredictive = Get<bool>(fitMan->raw()["Predictive"]["PriorPredictive"], __FILE__, __LINE__);
   Ntoys = Get<int>(fitMan->raw()["Predictive"]["Ntoy"], __FILE__, __LINE__);
 
+  SampleWholeChain = Get<bool>(fitMan->raw()["Predictive"]["SampleWholeChain"], __FILE__, __LINE__);
+
   ReweightWeight.resize(Ntoys);
   PenaltyTerm.resize(Ntoys);
 }
@@ -389,18 +391,29 @@ void PredictiveThrower::ProduceToys() {
       MACH3LOG_ERROR("You can make new chain or modify burn in cut");
       throw MaCh3Exception(__FILE__,__LINE__);
     }
+
+    if(SampleWholeChain && Ntoys>PosteriorFile->GetEntries()-burn_in){
+      MACH3LOG_ERROR("Total number of toys {} greater than total number of entries {}", Ntoys, PosteriorFile->GetEntries() - burn_in);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
   }
 
   TStopwatch TempClock;
   TempClock.Start();
+
+  int entry;
+  if(SampleWholeChain){
+    entry=burn_in-1;
+  }
+
   for(int i = 0; i < Ntoys; i++)
   {
     if( i % (Ntoys/10) == 0) {
       MaCh3Utils::PrintProgressBar(i, Ntoys);
     }
 
-    if(!Is_PriorPredictive){
-      int entry = 0;
+    if(!Is_PriorPredictive and !SampleWholeChain){
+      entry = 0;
       Step = 0;
 
       //YSP: Ensures you get an entry from the mcmc even when burn_in is set to zero (Although not advised :p ).
@@ -413,6 +426,10 @@ void PredictiveThrower::ProduceToys() {
       }
       Draw = entry;
     }
+    else if(SampleWholeChain and !Is_PriorPredictive){
+      entry++;
+    }
+
     for (size_t s = 0; s < systematics.size(); ++s)
     {
       //KS: Below line can help you get prior predictive distributions which are helpful for getting pre and post ND fit spectra

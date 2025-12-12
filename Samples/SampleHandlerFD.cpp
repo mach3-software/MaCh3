@@ -804,6 +804,7 @@ void SampleHandlerFD::SetBinning() {
                                   static_cast<int>(YVec.size()-1), YVec.data());
 
   }
+
   //Set the number of X and Y bins now
   SetupReweightArrays();
   FindNominalBinAndEdges();
@@ -2064,3 +2065,22 @@ void SampleHandlerFD::PrintRates(const bool DataOnly) {
   }
 }
 
+void SampleHandlerFD::AddBinsToOutTree(TTree &tree) {
+  // Add MC prediction for each bin
+
+  if (SampleHandlerFD_array == nullptr)
+  {
+    MACH3LOG_ERROR("MC not set up!");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  TString branch_name_base(SampleHandlerName.c_str());
+  branch_name_base = branch_name_base.ReplaceAll(" ", "_");  // Remove spaces
+
+  for(int b = 0; b < Binning->GetNBins(); b++){
+    TString branch_name;
+    branch_name.Form("%s_%d", branch_name_base.Data(), b);
+
+    tree.Branch(branch_name, &SampleHandlerFD_array[b]);
+  }
+}

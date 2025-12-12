@@ -80,6 +80,9 @@ class FitterBase {
   /// @brief Save output and close files.
   void SaveOutput();
 
+  /// @brief Add the histogram bin heights from our samples to the output tree [NOTE this will be sloooooow]
+  void AddSampleHistsToOutput();
+
   /// @brief Remove obsolete memory and make other checks before fit starts
   /// @todo consider expanding into ParmaterHandler and add more sanitisers
   void SanitiseInputs();
@@ -135,7 +138,7 @@ class FitterBase {
   /// Total number of samples used, single SampleHandler can store more than one analysis sample!
   unsigned int TotalNSamples;
 
-  /// Systematic holder
+  /// Systematic holderA
   std::vector<ParameterHandlerBase*> systematics;
 
   /// tells global time how long fit took

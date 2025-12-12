@@ -106,9 +106,11 @@ class SampleHandlerFD :  public SampleHandlerBase
     return SampleDetails[iSample].OscChannels[iChannel].flavourName;
   }
 
+  void AddBinsToOutTree(TTree& tree) override;
+
   /// @ingroup SampleHandlerGetters
-  TH1* Get1DVarHist(const int iSample, const std::string& ProjectionVar, const std::vector< KinematicCut >& EventSelectionVec = std::vector< KinematicCut >(),
-                    int WeightStyle=0, TAxis* Axis=nullptr, const std::vector< KinematicCut >& SubEventSelectionVec = std::vector< KinematicCut >());
+  TH1 *Get1DVarHist(const int iSample, const std::string &ProjectionVar, const std::vector<KinematicCut> &EventSelectionVec = std::vector<KinematicCut>(),
+                        int WeightStyle = 0, TAxis *Axis = nullptr, const std::vector<KinematicCut> &SubEventSelectionVec = std::vector<KinematicCut>());
   TH2* Get2DVarHist(const int iSample, const std::string& ProjectionVarX, const std::string& ProjectionVarY,
                     const std::vector< KinematicCut >& EventSelectionVec = std::vector< KinematicCut >(),
                     int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr,

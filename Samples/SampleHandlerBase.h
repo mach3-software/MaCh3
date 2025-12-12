@@ -76,12 +76,15 @@ class SampleHandlerBase
   virtual inline std::string GetKinVarLabel(const int sample, const int Dimension) {
     (void) sample; (void) Dimension; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");  };
 
+  virtual void AddBinsToOutTree(TTree&){
+    throw MaCh3Exception(__FILE__, __LINE__, "Not implemented");
+  }
 
-  /// @brief Calculate test statistic for a single bin using Poisson
-  /// @param data is data
-  /// @param mc is mc
-  /// @ingroup SampleHandlerGetters
-  double GetPoissonLLH(const double data, const double mc) const;
+      /// @brief Calculate test statistic for a single bin using Poisson
+      /// @param data is data
+      /// @param mc is mc
+      /// @ingroup SampleHandlerGetters
+      double GetPoissonLLH(const double data, const double mc) const;
 
   /// @brief Calculate test statistic for a single bin. Calculation depends on setting of @p fTestStatistic. Data and mc -> 0 cut-offs are defined in M3::_LOW_MC_BOUND_.
   ///
