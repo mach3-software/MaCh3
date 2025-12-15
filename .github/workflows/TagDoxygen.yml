@@ -41,8 +41,8 @@ jobs:
           echo "Using TAG_NAME=$TAG_NAME"
 
           cd gh-pages-archive
-          rm -rf "$TAG_NAME/"
-          mkdir -p "$TAG_NAME/"
+          rm -rf "${TAG_NAME:?}/"
+          mkdir -p "${TAG_NAME:?}/"
           rsync -av --progress ../gh-pages/ "$TAG_NAME/" --exclude='.git' --exclude='.Archive'
 
       # Commit and push
