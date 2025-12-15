@@ -496,6 +496,9 @@ void ParameterHandlerBase::ThrowParameters() {
                             randParams, corr_throw,
                             _fPreFitValue, _fLowBound, _fUpBound, _fNumPar);
   } // end if pca
+
+  // KS: At the end once we are happy with proposal do special proposal
+  SpecialStepProposal();
 }
 
 // *************************************
