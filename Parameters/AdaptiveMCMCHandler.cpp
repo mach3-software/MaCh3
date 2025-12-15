@@ -493,7 +493,7 @@ void AdaptiveMCMCHandler::CheckMatrixValidityForAdaption(const TMatrixDSym *covM
     }
 
     if (correlatedCount > NumberOfParametersThreshold) {
-      MACH3LOG_WARN("Parameter {} is highly correlated with {} other parameters (above threshold {}).", i, correlatedCount, CorrelationThreshold);
+      MACH3LOG_WARN("Parameter {} ({}) is highly correlated with {} other parameters (above threshold {}).", _ParamNames->at(i), i, correlatedCount, CorrelationThreshold);
       MACH3LOG_WARN("Correlated with parameters: {}.", fmt::join(correlatedWith, ", "));
       FlagMessage = true;
     }
