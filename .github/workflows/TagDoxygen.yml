@@ -43,7 +43,7 @@ jobs:
           cd gh-pages-archive
           rm -rf "$TAG_NAME/"
           mkdir -p "$TAG_NAME/"
-          rsync -av --progress ../gh-pages/ "$TAG_NAME/" --exclude='.git'
+          rsync -av --progress ../gh-pages/ "$TAG_NAME/" --exclude='.git' --exclude='.Archive'
 
       # Commit and push
       - name: Commit and push changes
