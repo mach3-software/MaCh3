@@ -2081,6 +2081,8 @@ void SampleHandlerFD::AddBinsToOutTree(TTree &tree) {
     TString branch_name;
     branch_name.Form("%s_%d", branch_name_base.Data(), b);
 
+    MACH3LOG_INFO("Initial data for bin {} is {}", b, SampleHandlerFD_data[b]);
+
     tree.Branch(branch_name, &SampleHandlerFD_array[b]);
   }
 }

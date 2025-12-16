@@ -162,6 +162,10 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// @brief JM Check if a kinematic parameter string corresponds to a subevent-level variable
   bool IsSubEventVarString(const std::string& VarStr);
 
+  std::vector<double> GetMCVals() { return std::vector<double>(SampleHandlerFD_array, SampleHandlerFD_array + Binning->GetNBins()); }
+  std::vector<double> GetDataVals() { return std::vector<double>(SampleHandlerFD_data, SampleHandlerFD_data + Binning->GetNBins()); }
+
+
  protected:
   /// @brief DB Function to determine which weights apply to which types of samples
   virtual void AddAdditionalWeightPointers() = 0;
@@ -263,8 +267,9 @@ class SampleHandlerFD :  public SampleHandlerBase
   virtual std::vector<double> ReturnKinematicVector(int KinematicVariable, int iEvent) {return {}; (void)KinematicVariable; (void)iEvent;};
   // ===========================================================
 
+
   /// @brief Return the binning used to draw a kinematic parameter
-  std::vector<double> ReturnKinematicParameterBinning(const int Sample, const std::string& KinematicParameter) const;
+  std::vector<double> ReturnKinematicParameterBinning(const int Sample, const std::string &KinematicParameter) const;
   virtual const double* GetPointerToKinematicParameter(std::string KinematicParamter, int iEvent) = 0;
   virtual const double* GetPointerToKinematicParameter(double KinematicVariable, int iEvent) = 0;
 
