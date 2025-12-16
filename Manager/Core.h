@@ -123,6 +123,9 @@ _Pragma("GCC diagnostic ignored \"-Wswitch-enum\"") \
 _Pragma("GCC diagnostic ignored \"-Wconversion\"") \
 _Pragma("GCC diagnostic ignored \"-Wshadow\"") \
 _Pragma("GCC diagnostic ignored \"-Wswitch-enum\"")
+_Pragma("GCC diagnostic ignored \"-Wduplicated-branches\"")
+_Pragma("GCC diagnostic ignored \"-Wstrict-aliasing\"")
+
 /// @brief KS: Restore warning checking after including external headers
 #define _MaCh3_Safe_Include_End_ \
 _Pragma("GCC diagnostic pop")

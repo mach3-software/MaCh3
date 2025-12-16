@@ -7,7 +7,12 @@
 #include "Parameters/ParameterHandlerUtils.h"
 #include "Parameters/ParameterTunes.h"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Walloca"
 #include "Eigen/Dense"
+#pragma GCC diagnostic pop
+
+#include <random>
 
 /// @brief Base class responsible for handling of systematic error parameters.
 /// Capable of using PCA or using adaptive throw matrix
@@ -22,16 +27,21 @@ public:
     std::string name, fancy_name;
     double prefit, error, stepscale;
     std::array<double, 2> bounds;
-    bool flatprior, fixed;
+    bool flatprior, isfree;
     std::vector<std::string> affected_samples;
   };
 
   void AddParameters(std::vector<ParamInfo> const &params);
   void AddParameter(ParamInfo const &param) {
     AddParameters({
-        params,
+        param,
     });
   }
+
+  void SetParameterCorrelation(int pidi, int pidj, double corr);
+
+  void SetParameterAllCorrelations(
+      int paramid, std::map<std::string, double> const &correlations);
 
   /// @brief ETA - constructor for a YAML file
   /// @param YAMLFile A vector of strings representing the YAML files used for
@@ -44,8 +54,10 @@ public:
   MakeFromYAML(const std::vector<std::string> &YAMLFiles, std::string name,
                double threshold = -1, int FirstPCAdpar = -999,
                int LastPCAdpar = -999) {
-    return ParameterHandlerBase(YAMLFiles, name, threshold, FirstPCAdpar,
-                                LastPCAdpar);
+    (void)threshold;
+    (void)FirstPCAdpar;
+    (void)LastPCAdpar;
+    return ParameterHandlerBase(YAMLFiles, name);
   }
   /// @brief "Usual" constructors from root file
   /// @param name Matrix name
@@ -53,8 +65,10 @@ public:
   static ParameterHandlerBase
   MakeFromTMatrix(std::string name, std::string file, double threshold = -1,
                   int FirstPCAdpar = -999, int LastPCAdpar = -999) {
-    return ParameterHandlerBase(name, file, threshold, FirstPCAdpar,
-                                LastPCAdpar);
+    (void)threshold;
+    (void)FirstPCAdpar;
+    (void)LastPCAdpar;
+    return ParameterHandlerBase(name, file);
   }
 
   /// @brief Destructor
@@ -100,7 +114,7 @@ public:
   /// @param i Parameter index
   /// @param val new value which will be set
   /// @ingroup ParameterHandlerSetters
-  void SetParProp(const int i, const double val) { params.proposed[i] = val; }
+  void SetParProp(const int i, const double val) { steps.proposed[i] = val; }
   /// @brief Set parameter values using vector, it has to have same size as
   /// covariance class
   /// @param pars Vector holding new values for every parameter
@@ -202,10 +216,12 @@ public:
 
   /// @brief Return covariance matrix
   /// @ingroup ParameterHandlerGetters
-  TMatrixDSym *GetCovMatrix() const { return &root_copies.covariance; }
+  TMatrixDSym const *GetCovMatrix() const { return &root_copies.covariance; }
   /// @brief Return inverted covariance matrix
   /// @ingroup ParameterHandlerGetters
-  TMatrixDSym *GetInvCovMatrix() const { return &root_copies.inv_covariance; }
+  TMatrixDSym const *GetInvCovMatrix() const {
+    return &root_copies.inv_covariance;
+  }
   /// @brief Return inverted covariance matrix
   /// @ingroup ParameterHandlerGetters
   double GetInvCovMatrix(const int i, const int j) const {
@@ -215,16 +231,16 @@ public:
   /// @brief Return correlated throws
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
-  double GetCorrThrows(const int i) const { return corr_throw[i]; }
+  double GetCorrThrows(const int i) const { return throws.values[i]; }
 
   /// @brief Get if param has flat prior or not
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
-  inline bool GetFlatPrior(const int i) const { return params.flatprior[i]; }
+  bool GetFlatPrior(const int i) const { return params.flatprior[i]; }
 
   /// @brief Get name of covariance
   /// @ingroup ParameterHandlerGetters
-  std::string GetName() const { return params.matrix_name; }
+  std::string GetName() const { return settings.name; }
   /// @brief Get name of parameter
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
@@ -237,21 +253,23 @@ public:
   /// @brief Get fancy name of the Parameter
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
-  std::string GetParFancyName(const int i) const { return params.fancyname[i]; }
+  std::string GetParFancyName(const int i) const {
+    return params.fancy_name[i];
+  }
   /// @brief Get name of input file
   /// @ingroup ParameterHandlerGetters
-  std::string GetInputFile() const { return config.inputFile; }
+  std::string GetInputFile() const { return config.inputFiles[0]; }
 
   /// @brief Get diagonal error for ith parameter
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
-  inline double GetDiagonalError(const int i) const {
+  double GetDiagonalError(const int i) const {
     return std::sqrt(params.covariance(i, i));
   }
   /// @brief Get the error for the ith parameter
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
-  inline double GetError(const int i) const { return params.error[i]; }
+  double GetError(const int i) const { return params.error[i]; }
 
   /// @brief Adaptive Step Tuning Stuff
   void ResetIndivStepScale();
@@ -276,7 +294,7 @@ public:
   /// @brief Set number of MCMC step, when running adaptive MCMC it is updated
   /// with given frequency. We need number of steps to determine frequency.
   /// @ingroup ParameterHandlerSetters
-  inline void SetNumberOfSteps(const int nsteps) {
+  void SetNumberOfSteps(const int nsteps) {
     AdaptiveHandler.SetTotalSteps(nsteps);
     if (AdaptiveHandler.AdaptionUpdate()) {
       ResetIndivStepScale();
@@ -285,11 +303,11 @@ public:
 
   /// @brief Get matrix used for step proposal
   /// @ingroup ParameterHandlerGetters
-  inline TMatrixDSym *GetThrowMatrix() const { return &root_copies.proposal; }
+  TMatrixDSym const *GetThrowMatrix() const { return &root_copies.proposal; }
   /// @brief Get matrix used for step proposal
   /// @ingroup ParameterHandlerGetters
   double GetThrowMatrix(const int i, const int j) const {
-    return params.l_proposal(i, j);
+    return steps.l_proposal(i, j);
   }
 
   /// @brief KS: Convert covariance matrix to correlation matrix and return TH2D
@@ -304,7 +322,7 @@ public:
 
   /// @brief Get total number of parameters
   /// @ingroup ParameterHandlerGetters
-  inline int GetNumParams() const { return params.prefit.size(); }
+  int GetNumParams() const { return int(params.prefit.size()); }
   /// @brief Get the pre-fit values of the parameters.
   /// @ingroup ParameterHandlerGetters
   std::vector<double> GetPreFitValues() const {
@@ -313,48 +331,41 @@ public:
   /// @brief Get vector of all proposed parameter values
   /// @ingroup ParameterHandlerGetters
   std::vector<double> GetProposed() const {
-    return M3::EigenToStdVector(params.proposed);
+    return M3::EigenToStdVector(steps.proposed);
   }
   /// @brief Get proposed parameter value
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
-  inline double GetParProp(const int i) const { return params.proposed[i]; }
+  double GetParProp(const int i) const { return steps.proposed[i]; }
   /// @brief Get current parameter value
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
-  inline double GetParCurr(const int i) const { return params.current[i]; }
+  double GetParCurr(const int i) const { return steps.current[i]; }
 
   /// @brief Get prior parameter value
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
-  inline double GetParInit(const int i) const { return params.prefit[i]; }
+  double GetParInit(const int i) const { return params.prefit[i]; }
   /// @brief Get upper parameter bound in which it is physically valid
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
-  inline double GetUpperBound(const int i) const { return params.upbound[i]; }
+  double GetUpperBound(const int i) const { return params.upbound[i]; }
   /// @brief Get lower parameter bound in which it is physically valid
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
-  inline double GetLowerBound(const int i) const { return params.lowbound[i]; }
+  double GetLowerBound(const int i) const { return params.lowbound[i]; }
   /// @brief Get individual step scale for selected parameter
   /// @param ParameterIndex Parameter index
   /// @ingroup ParameterHandlerGetters
-  inline double GetIndivStepScale(const int i) const {
-    return params.stepscale[i];
-  }
+  double GetIndivStepScale(const int i) const { return steps.scale[i]; }
   /// @brief Get global step scale for covariance object
   /// @ingroup ParameterHandlerGetters
-  inline double GetGlobalStepScale() const { return settings.GlobalStepScale; }
+  double GetGlobalStepScale() const { return steps.global_scale; }
 
   /// @brief Get number of params which will be different depending if using
   /// Eigen decomposition or not
   /// @ingroup ParameterHandlerGetters
-  inline int GetNParameters() const {
-    if (pca)
-      return PCAObj->GetNumberPCAedParameters();
-    else
-      return GetNumParams();
-  }
+  int GetNParameters() const { return GetNumParams(); }
 
   /// @brief Print prior value for every parameter
   void PrintNominal() const;
@@ -409,7 +420,7 @@ public:
   void ToggleFixParameter(const std::string &name);
   /// @brief Is parameter fixed or not
   /// @param i Parameter index
-  bool IsParameterFixed(const int i) const { return params.fixed[i]; }
+  bool IsParameterFixed(const int i) const { return !params.isfree[i]; }
 
   /// @brief Is parameter fixed or not
   /// @param name Name of parameter you want to check if is fixed
@@ -427,7 +438,7 @@ public:
                     int LastPCAdpar);
 
   /// @brief is PCA, can use to query e.g. LLH scans
-  inline bool IsPCA() const { return pca; }
+  bool IsPCA() const { return pca.enabled; }
 
   /// @brief Getter to return a copy of the YAML node
   /// @ingroup ParameterHandlerGetters
@@ -435,8 +446,8 @@ public:
 
   /// @brief Get pointer for AdaptiveHandler
   /// @ingroup ParameterHandlerGetters
-  inline adaptive_mcmc::AdaptiveMCMCHandler &GetAdaptiveHandler() const {
-    if (!use_adaptive) {
+  adaptive_mcmc::AdaptiveMCMCHandler const &GetAdaptiveHandler() const {
+    if (!settings.use_adaptive) {
       MACH3LOG_ERROR("Am not running in Adaptive mode");
       throw MaCh3Exception(__FILE__, __LINE__);
     }
@@ -447,15 +458,6 @@ public:
   /// for example set proposed values to be of generated or maybe PostND
   /// @ingroup ParameterHandlerSetters
   void SetTune(const std::string &TuneName);
-
-  /// @brief Get pointer for PCAHandler
-  inline PCAHandler &GetPCAHandler() const {
-    if (!pca) {
-      MACH3LOG_ERROR("Am not running in PCA mode");
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-    return PCAObj;
-  }
 
   /// @brief Matches branches in a TTree to parameters in a systematic handler.
   ///
@@ -473,6 +475,11 @@ public:
 protected:
   ParameterHandlerBase();
 
+  /// @brief "Usual" constructors from root file
+  /// @param name Matrix name
+  /// @param file Path to matrix root file
+  ParameterHandlerBase(std::string const &name, std::string const &file);
+
   /// @brief ETA - constructor for a YAML file
   /// @param YAMLFile A vector of strings representing the YAML files used for
   /// initialisation of matrix
@@ -481,14 +488,7 @@ protected:
   /// @param FirstPCAdpar First PCA parameter that will be decomposed.
   /// @param LastPCAdpar First PCA parameter that will be decomposed.
   ParameterHandlerBase(const std::vector<std::string> &YAMLFiles,
-                       std::string name, double threshold = -1,
-                       int FirstPCAdpar = -999, int LastPCAdpar = -999);
-  /// @brief "Usual" constructors from root file
-  /// @param name Matrix name
-  /// @param file Path to matrix root file
-  ParameterHandlerBase(std::string name, std::string file,
-                       double threshold = -1, int FirstPCAdpar = -999,
-                       int LastPCAdpar = -999);
+                       std::string const &name);
 
   /// @brief sets throw matrix from a file
   /// @param matrix_file_name name of file matrix lives in
@@ -526,7 +526,7 @@ protected:
   struct {
     bool enabled;
     std::array<int, 2> block_indices;
-    Eigen::MatrixXd rotation;
+    Eigen::MatrixXd ortho_to_physics;
   } pca;
 
   struct {
@@ -541,20 +541,18 @@ protected:
 
   struct {
     bool enabled;
-    /// Indices of parameters with flip symmetry
-    std::vector<int> FlipParameterIndex;
-    /// Central points around which parameters are flipped
-    std::vector<double> FlipParameterPoint;
-    /// Indices of parameters with circular bounds
-    std::vector<int> CircularBoundsIndex;
-    /// Circular bounds for each parameter (lower, upper)
-    std::vector<std::pair<double, double>> CircularBoundsValues;
+
+    // param_index, flip pivot value
+    std::vector<std::pair<int, double>> flips;
+    // param_index, low bound, up bound
+    std::vector<std::tuple<int, double, double>> circ_bounds;
+
   } special_proposal;
 
   struct {
     std::vector<std::string> name, fancy_name;
     Eigen::VectorXd prefit, error, lowbound, upbound;
-    Eigen::VectorXi flatprior, fixed;
+    Eigen::VectorXi flatprior, isfree;
     std::vector<std::vector<std::string>> samples;
 
     Eigen::MatrixXd covariance;
@@ -564,6 +562,7 @@ protected:
   struct {
     std::ranlux48 e1;
     std::normal_distribution<double> gaus;
+    std::uniform_real_distribution<double> unif;
   } rng;
 
   // to retain external interface where possible
@@ -586,7 +585,7 @@ protected:
 
   struct {
     /// The input root file we read in
-    std::string inputFile;
+    std::vector<std::string> inputFiles;
     /// Stores config describing systematics
     YAML::Node YAMLDoc;
   } config;

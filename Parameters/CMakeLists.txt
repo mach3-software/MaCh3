@@ -9,11 +9,11 @@ set(HEADERS
 )
 
 add_library(Parameters SHARED
-    ParameterHandlerBase.cpp
-    ParameterHandlerGeneric.cpp
-    AdaptiveMCMCHandler.cpp
-    PCAHandler.cpp
+    # ParameterHandlerBase.cpp
+    # ParameterHandlerGeneric.cpp
     ParameterTunes.cpp
+    StepProposer.cpp
+    ParameterList.cpp
 )
 
 set_target_properties(Parameters PROPERTIES
@@ -51,3 +51,4 @@ install(TARGETS Parameters
 
 add_library(MaCh3::Parameters ALIAS Parameters)
 
+add_subdirectory(test)

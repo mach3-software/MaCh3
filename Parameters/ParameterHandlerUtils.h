@@ -4,6 +4,15 @@
 #include "Parameters/ParameterStructs.h"
 
 _MaCh3_Safe_Include_Start_ //{
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Walloca"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wconversion"
+#include "Eigen/Dense"
+#pragma GCC diagnostic pop
+
 // ROOT includes
 #include "TDecompChol.h"
 #include "TDecompSVD.h"
@@ -612,10 +621,10 @@ _MaCh3_Safe_Include_Start_ //{
     constexpr int MaxAttempts = 1e5;
 
     for (int iAttempt = 0; iAttempt < MaxAttempts; iAttempt++) {
-      if (Eigen::LLT(cov).info() == Eigen::Success) {
+      if (Eigen::LLT<Eigen::MatrixXd>(cov).info() == Eigen::Success) {
         return cov;
       } else {
-        cov.diagonal() += 1E-9;
+        cov.diagonal().array() += 1E-9;
       }
     }
 
@@ -632,7 +641,7 @@ _MaCh3_Safe_Include_Start_ //{
   // ||.||_frob
   // Where ||X||_frob=sqrt[sum_ij(x_ij^2)] (basically just turns an n,n matrix
   // into vector in n^2 space then does Euclidean norm)
-  void MakeClosestPosDef(TMatrixDSym * cov) {
+  inline void MakeMatrixClosestPosDef(TMatrixDSym * cov) {
     // ********************************************
     // Want to get cov' = (cov_sym+cov_polar)/2
     // cov_sym=(cov+cov^T)/2
@@ -651,8 +660,8 @@ _MaCh3_Safe_Include_Start_ //{
     TDecompSVD cov_sym_svd = TDecompSVD(cov_sym);
     if (!cov_sym_svd.Decompose()) {
       MACH3LOG_WARN(
-          "Cannot do SVD on input matrix, trying MakePosDef() first!");
-      MakePosDef(&cov_sym);
+          "Cannot do SVD on input matrix, trying MakeMatrixPosDef() first!");
+      MakeMatrixPosDef(&cov_sym);
     }
 
     TMatrixD cov_sym_v = cov_sym_svd.GetV();
@@ -683,27 +692,29 @@ _MaCh3_Safe_Include_Start_ //{
 
     *cov = cov_closest_approx;
     // Now can just add a makeposdef!
-    MakePosDef(cov);
+    MakeMatrixPosDef(cov);
   }
 
   // ********************************************
   // KS: Convert covariance matrix to correlation matrix and return TH2D which
   // can be used for fancy plotting
-  TH2D *GetCorrelationMatrix(Eigen::MatrixXd const &covariance) {
+  inline TH2D *GetCorrelationMatrix(std::string const &name,
+                                    std::vector<std::string> const &parnames,
+                                    Eigen::MatrixXd const &covariance) {
     // ********************************************
-    TH2D *hMatrix =
-        new TH2D(GetName().c_str(), GetName().c_str(), covariance.rows(), 0.0,
-                 covariance.rows(), covariance.rows(), 0.0, covariance.rows());
+    int nrows = int(covariance.rows());
+    TH2D *hMatrix = new TH2D(name.c_str(), name.c_str(), nrows, 0.0, nrows,
+                             nrows, 0.0, nrows);
     hMatrix->SetDirectory(nullptr);
-    for (int i = 0; i < covariance.rows(); i++) {
+    for (int i = 0; i < nrows; i++) {
       hMatrix->SetBinContent(i + 1, i + 1, 1.);
-      hMatrix->GetXaxis()->SetBinLabel(i + 1, GetParFancyName(i).c_str());
-      hMatrix->GetYaxis()->SetBinLabel(i + 1, GetParFancyName(i).c_str());
+      hMatrix->GetXaxis()->SetBinLabel(i + 1, parnames[i].c_str());
+      hMatrix->GetYaxis()->SetBinLabel(i + 1, parnames[i].c_str());
     }
 
     auto sqrt_diag = covariance.diagonal().cwiseSqrt();
 
-    for (int i = 0; i < covariance.rows(); i++) {
+    for (int i = 0; i < nrows; i++) {
       for (int j = 0; j <= i; j++) {
         const double Corr = covariance(i, j) / sqrt_diag(i) * sqrt_diag(j);
         hMatrix->SetBinContent(i + 1, j + 1, Corr);
@@ -713,7 +724,7 @@ _MaCh3_Safe_Include_Start_ //{
     return hMatrix;
   }
 
-  Eigen::MatrixXd ROOTToEigen(TMatrixDSym const &mat) {
+  inline Eigen::MatrixXd ROOTToEigen(TMatrixDSym const &mat) {
     auto emat = Eigen::MatrixXd(mat.GetNrows(), mat.GetNcols());
     for (int ri = 0; ri < mat.GetNrows(); ++ri) {
       for (int ci = 0; ci < mat.GetNcols(); ++ci) {
@@ -723,8 +734,8 @@ _MaCh3_Safe_Include_Start_ //{
     return emat;
   }
 
-  void EigenToROOT(Eigen::MatrixXd const &emat, TMatrixDSym &mat) {
-    mat.ResizeTo(emat.rows(), emat.cols());
+  inline void EigenToROOT(Eigen::MatrixXd const &emat, TMatrixDSym &mat) {
+    mat.ResizeTo(int(emat.rows()), int(emat.cols()));
     for (int ri = 0; ri < emat.rows(); ++ri) {
       for (int ci = 0; ci < emat.cols(); ++ci) {
         mat(ri, ci) = emat(ri, ci);
@@ -732,21 +743,21 @@ _MaCh3_Safe_Include_Start_ //{
     }
   }
 
-  std::vector<double> EigenToStdVector(Eigen::VectorXd const &evec) {
+  inline std::vector<double> EigenToStdVector(Eigen::VectorXd const &evec) {
     return std::vector(evec.begin(), evec.end());
   }
 
-  Eigen::VectorXd StdVectorToEigen(std::vector<double> const &svec) {
+  inline Eigen::VectorXd StdVectorToEigen(std::vector<double> const &svec) {
     Eigen::VectorXd evec(svec.size());
-    for (size_t i = 0; i < svec; ++i) {
+    for (size_t i = 0; i < svec.size(); ++i) {
       evec(i) = svec[i];
     }
     return evec;
   }
 
-  void EnsureNoOutOfBlockCorrelations(Eigen::MatrixXd const &CovMatrix,
-                                      std::array<int, 2> block_definition,
-                                      double threshold = 1E-6) {
+  inline void EnsureNoOutOfBlockCorrelations(
+      Eigen::MatrixXd const &CovMatrix, std::array<int, 2> block_definition,
+      double correlation_threshold = 1E-6) {
 
     for (int i = block_definition[0]; i <= block_definition[1]; ++i) {
       for (int j = 0; j < CovMatrix.rows(); ++j) {
@@ -756,8 +767,10 @@ _MaCh3_Safe_Include_Start_ //{
           continue;
         }
 
-        if (std::fabs(CovMatrix(i, j)) > correlation_threshold) {
-          found_significant_correlation = true;
+        double corr_val =
+            CovMatrix(i, j) / std::sqrt(CovMatrix(i, i) * CovMatrix(j, j));
+
+        if (std::fabs(corr_val) > correlation_threshold) {
           MACH3LOG_ERROR("Significant correlation detected between decomposed "
                          "parameter '{}' "
                          "and undecomposed parameter '{}': {:.6e}",
