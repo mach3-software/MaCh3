@@ -65,6 +65,7 @@ struct ParameterList {
       int paramid, std::map<std::string, double> const &correlations);
 
   int FindParameter(std::string const &name);
+  int NumSystematicBasisParameters() { return params.prefit.size(); }
 
   struct {
     bool enabled;
@@ -87,6 +88,13 @@ struct ParameterList {
 
   constexpr static int ParameterInPCABlock = std::numeric_limits<int>::max();
   int SystematicParameterIndexToOrthogonalIndex(int i);
+
+  int NumOrthogonalBasisParameters() {
+    return pca.enabled
+               ? (NumSystematicBasisParameters() -
+                  pca.nrotated_syst_parameters() + pca.northo_parameters())
+               : NumSystematicBasisParameters();
+  }
 
   double Chi2(Eigen::ArrayXd const &systematic_vals);
 
