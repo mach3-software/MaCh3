@@ -21,6 +21,7 @@ struct StepProposer {
     Eigen::ArrayXd current, proposed, scale;
     Eigen::ArrayXi isfree;
     double global_scale;
+    Eigen::MatrixXd proposal;
     Eigen::MatrixXd l_proposal;
   } params;
 
@@ -41,10 +42,6 @@ struct StepProposer {
   } rng;
 
   struct {
-    TMatrixDSym proposal;
-  } root_copies;
-
-  struct {
     bool enabled;
     size_t nsteps;
     Eigen::MatrixXd accepted_parameter_covariance;
@@ -53,18 +50,20 @@ struct StepProposer {
   StepProposer();
   StepProposer(Eigen::MatrixXd proposal_matrix, Eigen::ArrayXd current_values);
 
+  int NumParameters() const { return int(params.current.size()); }
+
   void SetProposalMatrix(Eigen::MatrixXd proposal_matrix);
   void SetParameterValues(Eigen::ArrayXd current_values) {
     params.current = current_values;
   }
 
-  void EnableAdaption(YAML::Node const &adaption_config);
-  void SetAdaptionCovariance(Eigen::MatrixXd parameter_covariance,
-                             size_t nsteps) {
-    adaptive.nsteps = nsteps;
-    adaptive.accepted_parameter_covariance = parameter_covariance;
-  }
+  void EnableAdaption(YAML::Node const &){}
+  // void SetAdaptionCovariance(Eigen::MatrixXd parameter_covariance,
+  //                            size_t nsteps) {
+  //   adaptive.nsteps = nsteps;
+  //   adaptive.accepted_parameter_covariance = parameter_covariance;
+  // }
 
   Eigen::ArrayXd const &Propose();
-  void Accept();
+  void Accept() { params.current = params.proposed; }
 };

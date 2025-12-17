@@ -9,7 +9,7 @@ set(HEADERS
 )
 
 add_library(Parameters SHARED
-    # ParameterHandlerBase.cpp
+    ParameterHandlerBase.cpp
     # ParameterHandlerGeneric.cpp
     ParameterTunes.cpp
     StepProposer.cpp

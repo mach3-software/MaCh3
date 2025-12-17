@@ -55,12 +55,11 @@ Eigen::ArrayXd const &StepProposer::Propose() {
 }
 
 void StepProposer::SetProposalMatrix(Eigen::MatrixXd proposal_matrix) {
-  Eigen::LLT<Eigen::MatrixXd> lltproposal(proposal_matrix);
+  params.proposal = proposal_matrix;
+  Eigen::LLT<Eigen::MatrixXd> lltproposal(params.proposal);
   if (lltproposal.info() != Eigen::Success) {
     MACH3LOG_ERROR("Failed to LLT decompose proposal matrix");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   params.l_proposal = lltproposal.matrixL();
 }
-
-void StepProposer::Accept() {}

@@ -8,7 +8,7 @@
 using namespace Catch::Matchers;
 
 TEST_CASE("MakeFromYAML", "[Construction]") {
-  auto parlist = MakeFromYAML(YAML::Load(
+  auto parlist = ParameterList::MakeFromYAML(YAML::Load(
       R"(
 Systematics:
 - Systematic: {
@@ -79,7 +79,7 @@ Systematics:
 }
 
 TEST_CASE("MakeFromYAML Bad Correlations", "[Construction]") {
-  REQUIRE_THROWS_AS(MakeFromYAML(YAML::Load(
+  REQUIRE_THROWS_AS(ParameterList::MakeFromYAML(YAML::Load(
                         R"(
 Systematics:
 - Systematic: {
@@ -101,7 +101,7 @@ Systematics:
 )")),
                     MaCh3Exception);
 
-  REQUIRE_THROWS_AS(MakeFromYAML(YAML::Load(
+  REQUIRE_THROWS_AS(ParameterList::MakeFromYAML(YAML::Load(
                         R"(
 Systematics:
 - Systematic: {
@@ -123,7 +123,7 @@ Systematics:
 )")),
                     MaCh3Exception);
 
-  REQUIRE_THROWS_AS(MakeFromYAML(YAML::Load(
+  REQUIRE_THROWS_AS(ParameterList::MakeFromYAML(YAML::Load(
                         R"(
 Systematics:
 - Systematic: {
@@ -162,7 +162,7 @@ Systematics:
 }
 
 TEST_CASE("4param", "[PCA]") {
-  auto parlist = MakeFromYAML(YAML::Load(
+  auto parlist = ParameterList::MakeFromYAML(YAML::Load(
       R"(
 Systematics:
 - Systematic: {
@@ -175,18 +175,18 @@ Systematics:
 - Systematic: {
     Names: { FancyName: par2 },
     ParameterValues: { PreFitValue: 2 },
-    Error: 1,
+    Error: 2,
     StepScale: { MCMC: 1 },
     ParameterBounds: [ -10, 10 ],
-    Correlations: [ { par3: 0.9999 }, ]
+    Correlations: [ { par3: 0.99999 }, ]
   }
 - Systematic: {
     Names: { FancyName: par3 },
     ParameterValues: { PreFitValue: 3 },
-    Error: 1,
+    Error: 3,
     StepScale: { MCMC: 1 },
     ParameterBounds: [ -10, 10 ],
-    Correlations: [ { par2: 0.9999 }, ]
+    Correlations: [ { par2: 0.99999 }, ]
   }
 - Systematic: {
     Names: { FancyName: par4 },
@@ -206,10 +206,45 @@ Systematics:
   REQUIRE(parlist.pca.nrotated_syst_parameters() == 2);
   REQUIRE(parlist.pca.npc_parameters() == 1);
   REQUIRE(parlist.NumPCBasisParameters() == 3);
+
+  REQUIRE(parlist.SystematicParameterIndexToPCIndex(0) == 0);
+  REQUIRE(parlist.SystematicParameterIndexToPCIndex(1) ==
+          ParameterList::ParameterInPCABlock);
+  REQUIRE(parlist.SystematicParameterIndexToPCIndex(2) ==
+          ParameterList::ParameterInPCABlock);
+  REQUIRE(parlist.SystematicParameterIndexToPCIndex(3) == 2);
+
+  Eigen::ArrayXd syst_vals = parlist.params.prefit;
+  Eigen::ArrayXd pc_vals = Eigen::ArrayXd::Zero(parlist.NumPCBasisParameters());
+
+  parlist.RotateSystematicParameterValuesToPCBasis(syst_vals, pc_vals);
+
+  // prefit value should get mapped to 0
+  REQUIRE(pc_vals[1] == 0);
+
+  parlist.RotatePCParameterValuesToSystematicBasis(pc_vals, syst_vals);
+
+  // prefit value should get mapped and back to prefit
+  REQUIRE(syst_vals[1] == 2);
+  REQUIRE(syst_vals[2] == 3);
+
+  // the PC is approximately in the par2+par3 direction, so
+  //   should be able to guess where pc_vals[1] = 1 sets
+  //   syst_vals[1] and syst_vals[2]
+  pc_vals[1] = 1;
+
+  parlist.RotatePCParameterValuesToSystematicBasis(pc_vals, syst_vals);
+
+  REQUIRE_THAT(syst_vals[1], WithinAbs(4, 1E-4));
+  REQUIRE_THAT(syst_vals[2], WithinAbs(6, 1E-4));
+
+  // check that we can rotate back to the expected value
+  parlist.RotateSystematicParameterValuesToPCBasis(syst_vals, pc_vals);
+  REQUIRE_THAT(pc_vals[1], WithinAbs(1, 1E-4));
 }
 
 TEST_CASE("Out of block correlations", "[PCA]") {
-  auto parlist = MakeFromYAML(YAML::Load(
+  auto parlist = ParameterList::MakeFromYAML(YAML::Load(
       R"(
 Systematics:
 - Systematic: {

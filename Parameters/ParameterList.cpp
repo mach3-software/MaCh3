@@ -33,6 +33,10 @@ void ParameterList::AddParameters(std::vector<ParamInfo> const &new_params) {
     params.stepscale[new_block_start + i] = new_params[i].stepscale;
     params.flatprior[new_block_start + i] = new_params[i].flatprior;
     params.isfree[new_block_start + i] = new_params[i].isfree;
+
+    params.covariance.row(new_block_start + i).setZero();
+    params.covariance.col(new_block_start + i).setZero();
+
     params.covariance(new_block_start + i, new_block_start + i) =
         new_params[i].error * new_params[i].error;
   }
@@ -60,10 +64,8 @@ void ParameterList::SetParameterCorrelation(int pidi, int pidj, double corr) {
 void ParameterList::SetParameterAllCorrelations(
     int paramid, std::map<std::string, double> const &correlations) {
 
-  params.covariance.row(paramid) =
-      Eigen::VectorXd::Zero(params.covariance.rows());
-  params.covariance.col(paramid) =
-      Eigen::VectorXd::Zero(params.covariance.rows());
+  params.covariance.row(paramid).setZero();
+  params.covariance.col(paramid).setZero();
 
   params.covariance(paramid, paramid) =
       params.error[paramid] * params.error[paramid];
@@ -73,7 +75,7 @@ void ParameterList::SetParameterAllCorrelations(
   }
 }
 
-int ParameterList::FindParameter(std::string const &name) {
+int ParameterList::FindParameter(std::string const &name) const {
   auto pit = std::find(params.name.begin(), params.name.end(), name);
   if (pit == params.name.end()) {
     MACH3LOG_ERROR("ParameterList manages no parameter named {}.", name);
@@ -94,10 +96,11 @@ void ParameterList::ConstructTruncatedPCA(double threshold, int first,
 
   int blocksize = (last + 1) - first;
 
-  pca.pc_to_syst_rotation = CalculateTruncatedPCARotation(
-      params.covariance.block(pca.first_index, pca.first_index, blocksize,
-                              blocksize),
-      threshold);
+  std::tie(pca.pc_to_syst_rotation, pca.syst_to_pc_rotation) =
+      CalculateTruncatedPCARotation(
+          params.covariance.block(pca.first_index, pca.first_index, blocksize,
+                                  blocksize),
+          threshold);
 
   MACH3LOG_INFO("ParameterList::ConstructTruncatedPCA: threshold = {}, "
                 "nsystparams = {} truncated to {} PC params.",
@@ -106,7 +109,7 @@ void ParameterList::ConstructTruncatedPCA(double threshold, int first,
 }
 
 void ParameterList::RotatePCParameterValuesToSystematicBasis(
-    Eigen::ArrayXd const &pc_vals, Eigen::ArrayXd &systematic_vals) {
+    Eigen::ArrayXd const &pc_vals, Eigen::ArrayXd &systematic_vals) const {
 
   systematic_vals.head(pca.first_index) = pc_vals.head(pca.first_index);
 
@@ -114,17 +117,20 @@ void ParameterList::RotatePCParameterValuesToSystematicBasis(
   //  systematic basis into the by using the PCA matrix.
   // 2) add on the prefit values from to these deltas to return to the
   // systematic basis.
+  auto syst_param_delta =
+      (pca.pc_to_syst_rotation *
+       pc_vals.segment(pca.first_index, pca.npc_parameters()).matrix())
+          .array();
+
   systematic_vals.segment(pca.first_index, pca.nrotated_syst_parameters()) =
       params.prefit.segment(pca.first_index, pca.nrotated_syst_parameters()) +
-      (pc_vals.segment(pca.first_index, pca.npc_parameters()).matrix() *
-       pca.pc_to_syst_rotation)
-          .array();
+      syst_param_delta;
 
   systematic_vals.tail(pca.ntail) = pc_vals.tail(pca.ntail);
 }
 
 void ParameterList::RotateSystematicParameterValuesToPCBasis(
-    Eigen::ArrayXd const &systematic_vals, Eigen::ArrayXd &pc_vals) {
+    Eigen::ArrayXd const &systematic_vals, Eigen::ArrayXd &pc_vals) const {
 
   pc_vals.head(pca.first_index) = systematic_vals.head(pca.first_index);
 
@@ -132,18 +138,18 @@ void ParameterList::RotateSystematicParameterValuesToPCBasis(
   //   PC basis has a CV of 0
   // 2) rotate the resulting parameter 'deltas' in the systematic basis into the
   //  PC basis by using the transpose of the PCA matrix
+  auto syst_param_delta =
+      (systematic_vals - params.prefit)
+          .segment(pca.first_index, pca.nrotated_syst_parameters())
+          .matrix();
+
   pc_vals.segment(pca.first_index, pca.npc_parameters()) =
-      ((systematic_vals.segment(pca.first_index,
-                                pca.nrotated_syst_parameters()) -
-        params.prefit.segment(pca.first_index, pca.nrotated_syst_parameters()))
-           .matrix() *
-       pca.pc_to_syst_rotation.transpose())
-          .array();
+      (pca.syst_to_pc_rotation * syst_param_delta).array();
 
   pc_vals.tail(pca.ntail) = systematic_vals.tail(pca.ntail);
 }
 
-int ParameterList::SystematicParameterIndexToPCIndex(int i) {
+int ParameterList::SystematicParameterIndexToPCIndex(int i) const {
   if ((!pca.enabled) || (i < pca.first_index)) {
     return i;
   } else if ((i >= pca.first_index) && (i <= pca.last_index)) {
@@ -165,7 +171,7 @@ double ParameterList::Chi2(Eigen::ArrayXd const &systematic_vals) {
   return diff.transpose() * params.inv_covariance * diff;
 }
 
-StepProposer ParameterList::MakeProposer() {
+StepProposer ParameterList::MakeProposer() const {
   StepProposer proposer;
 
   if (!pca.enabled) {
@@ -176,8 +182,7 @@ StepProposer ParameterList::MakeProposer() {
     // the PC parameter basis.
 
     // copy the unrotated parameters and covariance blocks
-    int nproposer_parameters =
-        pca.first_index + pca.npc_parameters() + pca.ntail;
+    int nproposer_parameters = NumPCBasisParameters();
 
     Eigen::ArrayXd prefit_pc = Eigen::ArrayXd::Zero(nproposer_parameters);
 
@@ -201,7 +206,11 @@ StepProposer ParameterList::MakeProposer() {
     proposer.SetProposalMatrix(covariance_pc);
   }
 
-  for (int i = 0; i < params.prefit.size(); ++i) {
+  // PCA parameters get a step scale of 1
+  proposer.params.scale = Eigen::ArrayXd::Ones(NumPCBasisParameters());
+  proposer.params.isfree = Eigen::ArrayXi::Ones(NumPCBasisParameters());
+
+  for (int i = 0; i < NumSystematicBasisParameters(); ++i) {
 
     int idx = SystematicParameterIndexToPCIndex(i);
 
@@ -229,12 +238,21 @@ StepProposer ParameterList::MakeProposer() {
           {idx, std::get<1>(params.circ_bounds[i]),
            std::get<2>(params.circ_bounds[i])});
     }
+
+    if (idx == ParameterInPCABlock) {
+      continue;
+    }
+
+    proposer.params.scale[idx] = params.stepscale[i];
+    proposer.params.isfree[idx] = params.isfree[i];
   }
+
+  proposer.params.global_scale = 1;
 
   return proposer;
 }
 
-std::string ParameterList::SystematicParameterToString(int i) {
+std::string ParameterList::SystematicParameterToString(int i) const {
   return fmt::format(
       R"(name: {}, fancy_name: {}
   prefit: {:.3g}, error: {:.3g}, bounds: [ {:.3g}, {:.3g} ], stepscale: {:.3g}
@@ -247,7 +265,7 @@ std::string ParameterList::SystematicParameterToString(int i) {
       params.flip_pivot[i].first, std::get<0>(params.circ_bounds[i]));
 }
 
-ParameterList MakeFromYAML(YAML::Node const &config) {
+ParameterList ParameterList::MakeFromYAML(YAML::Node const &config) {
 
   ParameterList parlist;
 
@@ -426,6 +444,11 @@ ParameterList MakeFromYAML(YAML::Node const &config) {
 
   parlist.params.covariance = M3::MakeMatrixPosDef(parlist.params.covariance);
 
+  parlist.pca.enabled = false;
+  parlist.pca.first_index = parlist.NumSystematicBasisParameters();
+  parlist.pca.last_index = parlist.NumSystematicBasisParameters();
+  parlist.pca.ntail = 0;
+
   MACH3LOG_INFO("----------------");
   MACH3LOG_INFO("Found {} systematics parameters in total",
                 parlist.params.prefit.size());
@@ -434,7 +457,8 @@ ParameterList MakeFromYAML(YAML::Node const &config) {
   return parlist;
 }
 
-ParameterList MakeFromYAML(const std::vector<std::string> &YAMLFiles) {
+ParameterList
+ParameterList::MakeFromYAML(const std::vector<std::string> &YAMLFiles) {
 
   MACH3LOG_INFO("Constructing instance of ParameterHandler using: ");
   for (auto const &yf : YAMLFiles) {
@@ -461,8 +485,8 @@ ParameterList MakeFromYAML(const std::vector<std::string> &YAMLFiles) {
   return parlist;
 }
 
-ParameterList MakeFromTMatrix(std::string const &name,
-                              std::string const &file) {
+ParameterList ParameterList::MakeFromTMatrix(std::string const &name,
+                                             std::string const &file) {
 
   ParameterList parlist;
 
@@ -502,6 +526,11 @@ ParameterList MakeFromTMatrix(std::string const &name,
   parlist.AddParameters(param_infos);
 
   parlist.params.covariance = M3::MakeMatrixPosDef(M3::ROOTToEigen(*CovMat));
+
+  parlist.pca.enabled = false;
+  parlist.pca.first_index = parlist.NumSystematicBasisParameters();
+  parlist.pca.last_index = parlist.NumSystematicBasisParameters();
+  parlist.pca.ntail = 0;
 
   return parlist;
 }

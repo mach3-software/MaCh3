@@ -13,11 +13,13 @@
 #include <cmath>
 #include <vector>
 
-inline Eigen::MatrixXd CalculateTruncatedPCARotation(Eigen::MatrixXd mx_phyiscs_basis,
-                                              double threshold) {
+inline std::pair<Eigen::MatrixXd, Eigen::MatrixXd>
+CalculateTruncatedPCARotation(Eigen::MatrixXd mx_syst_basis, double threshold) {
+
+  int nsyst_params = int(mx_syst_basis.rows());
 
   // a covariance is real symmetric, so self adjoint
-  Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> EigenSolver(mx_phyiscs_basis);
+  Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> EigenSolver(mx_syst_basis);
 
   if (EigenSolver.info() != Eigen::Success) {
     MACH3LOG_ERROR("Failed to eigen decompose matrix.");
@@ -31,10 +33,7 @@ inline Eigen::MatrixXd CalculateTruncatedPCARotation(Eigen::MatrixXd mx_phyiscs_
     evals.emplace_back(i, eigen_val[i]);
   }
 
-  std::cout << "PCA:\n  evals: " << eigen_val << "\n  evects:\n"
-            << eigen_vect << std::endl;
-
-  // sorting is not strictly neccessary but orders the orthogonal parameter
+  // sorting is not strictly neccessary but orders the pc parameter
   //   basis approximately by uncertainty.
   std::sort(
       evals.rbegin(), evals.rend(),
@@ -43,32 +42,40 @@ inline Eigen::MatrixXd CalculateTruncatedPCARotation(Eigen::MatrixXd mx_phyiscs_
       });
 
   double evalsum = 0;
-  int northo_parameters = 0;
+  int npc_parameters = 0;
 
-  double trace = mx_phyiscs_basis.trace();
+  double trace = mx_syst_basis.trace();
 
   for (auto &[i, ev] : evals) {
-    if (std::fabs(ev / trace) > threshold) {
-      evalsum += std::fabs(ev);
-      northo_parameters++;
+    if ((ev / trace) > threshold) {
+      evalsum += ev;
+      npc_parameters++;
     } else {
       break;
     }
   }
 
-  // rows of this matrix correspond to eigenvectors of the input matrix
-  //   we can go from parameters defined in the orthogonal basis back to the
-  //  'physics' parameters by RowVectOfOrthoParamVals * pca.ortho_to_physics
-  Eigen::MatrixXd ortho_to_physics =
-      Eigen::MatrixXd::Zero(northo_parameters, mx_phyiscs_basis.rows());
+  // cols of this matrix correspond to eigenvectors of the input matrix
+  //   we can rotate from the systematic basis to the pc basis by:
+  //     TruncatedEigenVectorMatrix * ColVecPCParams = ColVecSystParams
+  Eigen::MatrixXd TruncatedEigenVectorMatrix =
+      Eigen::MatrixXd::Zero(nsyst_params, npc_parameters);
+  Eigen::MatrixXd TruncatedsqrtEigenValueMatrix =
+      Eigen::MatrixXd::Zero(npc_parameters, npc_parameters);
 
-  for (int i = 0; i < northo_parameters; ++i) {
-    for (int j = 0; j < mx_phyiscs_basis.rows(); ++j) {
-      ortho_to_physics.row(i)[j] =
-          eigen_vect.col(evals[i].first)[evals[j].first] *
-          std::sqrt(evals[i].second);
+  for (int i = 0; i < npc_parameters; ++i) {
+    TruncatedEigenVectorMatrix.col(i) = eigen_vect.col(evals[i].first);
+
+    // bias eigen vectors towards being in the positive direction relative to
+    // other parameters
+    if (TruncatedEigenVectorMatrix.col(i).sum() < 0) {
+      TruncatedEigenVectorMatrix.col(i).array() *= -1;
     }
+
+    TruncatedsqrtEigenValueMatrix(i, i) = std::sqrt(evals[i].second);
   }
 
-  return ortho_to_physics;
+  return {TruncatedEigenVectorMatrix * TruncatedsqrtEigenValueMatrix,
+          TruncatedsqrtEigenValueMatrix.inverse() *
+              TruncatedEigenVectorMatrix.transpose()};
 }

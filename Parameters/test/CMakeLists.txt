@@ -13,7 +13,6 @@ add_executable(ParameterListTest ParameterListTest.cpp)
 target_link_libraries(ParameterListTest PRIVATE Catch2::Catch2WithMain Parameters)
 catch_discover_tests(ParameterListTest)
 
-
-# add_executable(StepProposerTest StepProposerTest.cxx)
-# target_link_libraries(StepProposerTest PRIVATE Catch2::Catch2WithMain Parameters)
-# catch_discover_tests(StepProposerTest)
+add_executable(StepProposerTest StepProposerTest.cpp)
+target_link_libraries(StepProposerTest PRIVATE Catch2::Catch2WithMain Parameters)
+catch_discover_tests(StepProposerTest)
