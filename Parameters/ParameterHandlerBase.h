@@ -146,7 +146,7 @@ class ParameterHandlerBase {
   /// @ingroup ParameterHandlerGetters
   virtual double GetLikelihood();
 
-  std::pair<std::vector<double>, std::vector<double>> GetBounds(){
+  std::pair<std::vector<double>, std::vector<double>> GetParameterBounds(){
     return std::make_pair(_fLowBound, _fUpBound);
   }
 
