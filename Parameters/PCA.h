@@ -13,7 +13,7 @@
 #include <cmath>
 #include <vector>
 
-Eigen::MatrixXd CalculateTruncatedPCARotation(Eigen::MatrixXd mx_phyiscs_basis,
+inline Eigen::MatrixXd CalculateTruncatedPCARotation(Eigen::MatrixXd mx_phyiscs_basis,
                                               double threshold) {
 
   // a covariance is real symmetric, so self adjoint
@@ -31,10 +31,13 @@ Eigen::MatrixXd CalculateTruncatedPCARotation(Eigen::MatrixXd mx_phyiscs_basis,
     evals.emplace_back(i, eigen_val[i]);
   }
 
+  std::cout << "PCA:\n  evals: " << eigen_val << "\n  evects:\n"
+            << eigen_vect << std::endl;
+
   // sorting is not strictly neccessary but orders the orthogonal parameter
   //   basis approximately by uncertainty.
   std::sort(
-      evals.begin(), evals.end(),
+      evals.rbegin(), evals.rend(),
       [](std::pair<int, double> const &l, std::pair<int, double> const &r) {
         return l.second < r.second;
       });
@@ -42,8 +45,10 @@ Eigen::MatrixXd CalculateTruncatedPCARotation(Eigen::MatrixXd mx_phyiscs_basis,
   double evalsum = 0;
   int northo_parameters = 0;
 
+  double trace = mx_phyiscs_basis.trace();
+
   for (auto &[i, ev] : evals) {
-    if (std::fabs(ev) > threshold) {
+    if (std::fabs(ev / trace) > threshold) {
       evalsum += std::fabs(ev);
       northo_parameters++;
     } else {

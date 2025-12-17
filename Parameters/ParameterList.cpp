@@ -90,61 +90,66 @@ void ParameterList::ConstructTruncatedPCA(double threshold, int first,
   pca.enabled = true;
   pca.first_index = first;
   pca.last_index = last;
-  pca.ntail = int(params.prefit.size() - last + 1);
+  pca.ntail = int(params.prefit.size() - (last + 1));
 
-  int blocksize = last - first + 1;
+  int blocksize = (last + 1) - first;
 
-  pca.ortho_to_syst_rotation = CalculateTruncatedPCARotation(
+  pca.pc_to_syst_rotation = CalculateTruncatedPCARotation(
       params.covariance.block(pca.first_index, pca.first_index, blocksize,
                               blocksize),
       threshold);
+
+  MACH3LOG_INFO("ParameterList::ConstructTruncatedPCA: threshold = {}, "
+                "nsystparams = {} truncated to {} PC params.",
+                threshold, pca.nrotated_syst_parameters(),
+                pca.npc_parameters());
 }
 
-void ParameterList::RotateOrthogonalParameterValuesToSystematicBasis(
-    Eigen::ArrayXd const &ortho_vals, Eigen::ArrayXd &systematic_vals) {
+void ParameterList::RotatePCParameterValuesToSystematicBasis(
+    Eigen::ArrayXd const &pc_vals, Eigen::ArrayXd &systematic_vals) {
 
-  systematic_vals.head(pca.first_index) = ortho_vals.head(pca.first_index);
+  systematic_vals.head(pca.first_index) = pc_vals.head(pca.first_index);
 
-  // 1) rotate the orthonogonal parameter values into 'deltas' in the
+  // 1) rotate the principle component parameter values into 'deltas' in the
   //  systematic basis into the by using the PCA matrix.
   // 2) add on the prefit values from to these deltas to return to the
   // systematic basis.
   systematic_vals.segment(pca.first_index, pca.nrotated_syst_parameters()) =
       params.prefit.segment(pca.first_index, pca.nrotated_syst_parameters()) +
-      (ortho_vals.segment(pca.first_index, pca.northo_parameters()).matrix() *
-       pca.ortho_to_syst_rotation)
+      (pc_vals.segment(pca.first_index, pca.npc_parameters()).matrix() *
+       pca.pc_to_syst_rotation)
           .array();
 
-  systematic_vals.tail(pca.ntail) = ortho_vals.tail(pca.ntail);
+  systematic_vals.tail(pca.ntail) = pc_vals.tail(pca.ntail);
 }
 
-void ParameterList::RotateSystematicParameterValuesToOrthogonalBasis(
-    Eigen::ArrayXd const &systematic_vals, Eigen::ArrayXd &ortho_vals) {
+void ParameterList::RotateSystematicParameterValuesToPCBasis(
+    Eigen::ArrayXd const &systematic_vals, Eigen::ArrayXd &pc_vals) {
 
-  ortho_vals.head(pca.first_index) = systematic_vals.head(pca.first_index);
+  pc_vals.head(pca.first_index) = systematic_vals.head(pca.first_index);
 
   // 1) subtract the prefit values from the current parameter values so that the
-  //   orthogonal basis has a CV of 0
+  //   PC basis has a CV of 0
   // 2) rotate the resulting parameter 'deltas' in the systematic basis into the
-  //  orthogonal basis by using the transpose of the PCA matrix
-  ortho_vals.segment(pca.first_index, pca.northo_parameters()) =
+  //  PC basis by using the transpose of the PCA matrix
+  pc_vals.segment(pca.first_index, pca.npc_parameters()) =
       ((systematic_vals.segment(pca.first_index,
                                 pca.nrotated_syst_parameters()) -
         params.prefit.segment(pca.first_index, pca.nrotated_syst_parameters()))
            .matrix() *
-       pca.ortho_to_syst_rotation.transpose())
+       pca.pc_to_syst_rotation.transpose())
           .array();
 
-  ortho_vals.tail(pca.ntail) = systematic_vals.tail(pca.ntail);
+  pc_vals.tail(pca.ntail) = systematic_vals.tail(pca.ntail);
 }
 
-int ParameterList::SystematicParameterIndexToOrthogonalIndex(int i) {
+int ParameterList::SystematicParameterIndexToPCIndex(int i) {
   if ((!pca.enabled) || (i < pca.first_index)) {
     return i;
   } else if ((i >= pca.first_index) && (i <= pca.last_index)) {
     return ParameterInPCABlock;
   } else {
-    return i - pca.nrotated_syst_parameters() + pca.northo_parameters();
+    return i - pca.nrotated_syst_parameters() + pca.npc_parameters();
   }
 }
 
@@ -168,39 +173,37 @@ StepProposer ParameterList::MakeProposer() {
     proposer.SetParameterValues(params.prefit);
   } else {
     // if we are using a PCA rotation then the proposer should only be aware of
-    // the orthogonal parameter basis.
+    // the PC parameter basis.
 
     // copy the unrotated parameters and covariance blocks
     int nproposer_parameters =
-        pca.first_index + pca.northo_parameters() + pca.ntail;
+        pca.first_index + pca.npc_parameters() + pca.ntail;
 
-    Eigen::ArrayXd prefit_ortho = Eigen::ArrayXd::Zero(nproposer_parameters);
+    Eigen::ArrayXd prefit_pc = Eigen::ArrayXd::Zero(nproposer_parameters);
 
-    RotateSystematicParameterValuesToOrthogonalBasis(params.prefit,
-                                                     prefit_ortho);
+    RotateSystematicParameterValuesToPCBasis(params.prefit, prefit_pc);
 
-    proposer.SetParameterValues(prefit_ortho);
+    proposer.SetParameterValues(prefit_pc);
 
-    Eigen::MatrixXd covariance_ortho =
+    Eigen::MatrixXd covariance_pc =
         Eigen::MatrixXd::Zero(nproposer_parameters, nproposer_parameters);
 
-    covariance_ortho.topLeftCorner(pca.first_index, pca.first_index) =
+    covariance_pc.topLeftCorner(pca.first_index, pca.first_index) =
         params.covariance.topLeftCorner(pca.first_index, pca.first_index);
 
-    covariance_ortho.block(pca.first_index, pca.first_index,
-                           pca.northo_parameters(), pca.northo_parameters()) =
-        Eigen::MatrixXd::Identity(pca.northo_parameters(),
-                                  pca.northo_parameters());
+    covariance_pc.block(pca.first_index, pca.first_index, pca.npc_parameters(),
+                        pca.npc_parameters()) =
+        Eigen::MatrixXd::Identity(pca.npc_parameters(), pca.npc_parameters());
 
-    covariance_ortho.bottomRightCorner(pca.ntail, pca.ntail) =
+    covariance_pc.bottomRightCorner(pca.ntail, pca.ntail) =
         params.covariance.bottomRightCorner(pca.ntail, pca.ntail);
 
-    proposer.SetProposalMatrix(covariance_ortho);
+    proposer.SetProposalMatrix(covariance_pc);
   }
 
   for (int i = 0; i < params.prefit.size(); ++i) {
 
-    int idx = SystematicParameterIndexToOrthogonalIndex(i);
+    int idx = SystematicParameterIndexToPCIndex(i);
 
     if (params.flip_pivot[i].first) {
       if (idx == ParameterInPCABlock) {
@@ -240,7 +243,7 @@ std::string ParameterList::SystematicParameterToString(int i) {
       params.name[i], params.fancy_name[i], params.prefit[i], params.error[i],
       params.lowbound[i], params.upbound[i], params.stepscale[i],
       params.flatprior[i], params.isfree[i],
-      SystematicParameterIndexToOrthogonalIndex(i) == ParameterInPCABlock,
+      SystematicParameterIndexToPCIndex(i) == ParameterInPCABlock,
       params.flip_pivot[i].first, std::get<0>(params.circ_bounds[i]));
 }
 
@@ -392,6 +395,32 @@ ParameterList MakeFromYAML(YAML::Node const &config) {
   parlist.AddParameters(param_infos);
 
   for (auto const &[paramid, correlations] : parameter_correlations) {
+
+    // check that we don't have incompatible correlations defined the other way
+    for (auto const &[oparam, corr] : correlations) {
+      int oparamid = parlist.FindParameter(oparam);
+      auto const &pname = parlist.params.name[paramid];
+      auto const &opname = parlist.params.name[oparamid];
+      if (!parameter_correlations.count(oparamid) ||
+          !parameter_correlations.at(oparamid).count(pname)) {
+        MACH3LOG_ERROR("Encountered inconsistent correlations defined between "
+                       "parameters {0} and {1}. {0} reports a correlation of "
+                       "{2} with {1} that is not reciprocated.",
+                       pname, opname, corr);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+      if (parameter_correlations.count(oparamid) &&
+          parameter_correlations.at(oparamid).count(pname) &&
+          std::fabs(parameter_correlations.at(oparamid).at(pname) - corr) >
+              1E-8) {
+        MACH3LOG_ERROR("Encountered inconsistent correlations defined between "
+                       "parameters {} and {}: {} and {}.",
+                       pname, opname, corr,
+                       parameter_correlations.at(oparamid).at(pname));
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+    }
+
     parlist.SetParameterAllCorrelations(paramid, correlations);
   }
 

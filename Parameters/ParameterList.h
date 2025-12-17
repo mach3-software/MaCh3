@@ -65,34 +65,34 @@ struct ParameterList {
       int paramid, std::map<std::string, double> const &correlations);
 
   int FindParameter(std::string const &name);
-  int NumSystematicBasisParameters() { return params.prefit.size(); }
+  int NumSystematicBasisParameters() { return int(params.prefit.size()); }
 
   struct {
     bool enabled;
     int first_index, last_index, ntail;
-    Eigen::MatrixXd ortho_to_syst_rotation;
+    Eigen::MatrixXd pc_to_syst_rotation;
 
     int nrotated_syst_parameters() const {
-      return int(ortho_to_syst_rotation.cols());
+      return int(pc_to_syst_rotation.cols());
     }
-    int northo_parameters() const { return int(ortho_to_syst_rotation.rows()); }
+    int npc_parameters() const { return int(pc_to_syst_rotation.rows()); }
   } pca;
 
   void ConstructTruncatedPCA(double threshold, int first, int last);
 
-  void RotateOrthogonalParameterValuesToSystematicBasis(
-      Eigen::ArrayXd const &ortho_vals, Eigen::ArrayXd &systematic_vals);
+  void RotatePCParameterValuesToSystematicBasis(
+      Eigen::ArrayXd const &pc_vals, Eigen::ArrayXd &systematic_vals);
 
-  void RotateSystematicParameterValuesToOrthogonalBasis(
-      Eigen::ArrayXd const &systematic_vals, Eigen::ArrayXd &ortho_vals);
+  void RotateSystematicParameterValuesToPCBasis(
+      Eigen::ArrayXd const &systematic_vals, Eigen::ArrayXd &pc_vals);
 
   constexpr static int ParameterInPCABlock = std::numeric_limits<int>::max();
-  int SystematicParameterIndexToOrthogonalIndex(int i);
+  int SystematicParameterIndexToPCIndex(int i);
 
-  int NumOrthogonalBasisParameters() {
+  int NumPCBasisParameters() {
     return pca.enabled
                ? (NumSystematicBasisParameters() -
-                  pca.nrotated_syst_parameters() + pca.northo_parameters())
+                  pca.nrotated_syst_parameters() + pca.npc_parameters())
                : NumSystematicBasisParameters();
   }
 
