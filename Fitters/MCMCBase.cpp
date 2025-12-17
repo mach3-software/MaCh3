@@ -1,4 +1,5 @@
 #include "Fitters/MCMCBase.h"
+#include "Manager/MaCh3Logger.h"
 
 // *************************
 // Initialise the manager and make it an object of mcmc class
@@ -11,6 +12,9 @@ MCMCBase::MCMCBase(manager *man) : FitterBase(man) {
     // Starting parameters should be thrown
     out_of_bounds = false;
     chainLength = Get<unsigned>(fitMan->raw()["General"]["MCMC"]["NSteps"], __FILE__, __LINE__);
+    if (chainLength < 10){
+        MACH3LOG_ERROR("MCMC chain length must be at least 10 steps, otherwise this will result in a floating point exception.");
+    }
 
     AnnealTemp = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["AnnealTemp"], -999);
     if (AnnealTemp < 0)
@@ -88,7 +92,7 @@ void MCMCBase::PreStepProcess() {
     out_of_bounds = false;
 
     // Print 10 steps in total
-    if (chainLength >= 10 && (step - stepStart) % (chainLength / 10) == 0)
+    if ((step - stepStart) % (chainLength / 10) == 0)
     {
         PrintProgress();
     }
