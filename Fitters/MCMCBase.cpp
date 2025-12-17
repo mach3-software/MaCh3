@@ -88,7 +88,7 @@ void MCMCBase::PreStepProcess() {
     out_of_bounds = false;
 
     // Print 10 steps in total
-    if ((step - stepStart) % (chainLength / 10) == 0)
+    if (chainLength >= 10 && (step - stepStart) % (chainLength / 10) == 0)
     {
         PrintProgress();
     }
