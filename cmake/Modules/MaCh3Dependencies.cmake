@@ -75,6 +75,8 @@ CPMAddPackage(
       "YAML_CPP_BUILD_TESTS OFF"
       "YAML_CPP_BUILD_CONTRIB OFF"
       "YAML_BUILD_SHARED_LIBS ON"
+    PATCHES
+      "yaml-cpp-fix.patch"
 )
 
 if(NOT TARGET yaml-cpp::yaml-cpp)

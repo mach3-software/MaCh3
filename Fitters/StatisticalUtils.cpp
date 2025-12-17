@@ -381,7 +381,7 @@ void GetCredibleRegion(std::unique_ptr<TH2D>& hist2D, const double coverage) {
 // ***************
   if(coverage > 1)
   {
-    MACH3LOG_ERROR("Specified Credible Region is greater than 1 and equal to {:.2f} Should be between 0 and 1 {}", coverage);
+    MACH3LOG_ERROR("Specified Credible Region is greater than 1 and equal to {:.2f} Should be between 0 and 1", coverage);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 

@@ -47,6 +47,9 @@ add_library(MaCh3::Splines ALIAS Splines)
 
 # KS: Now we generate root dictionary, we can't add it to above as ROOT is bit dumb and things will fail due to MaCh3Warnings etc
 add_library(SplineDict SHARED MaCh3SplineDict.cxx)
+target_compile_options(SplineDict PUBLIC -Wno-alloc-size-larger-than)
+target_link_options(SplineDict PUBLIC -Wno-alloc-size-larger-than)
+
 target_include_directories(SplineDict PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
     $<INSTALL_INTERFACE:include>

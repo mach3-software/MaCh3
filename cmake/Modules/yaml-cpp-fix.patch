@@ -1,0 +1,11 @@
+diff -ruN yaml-cpp/src/emitterutils.cpp yaml-cpp-patched/src/emitterutils.cpp
+--- yaml-cpp/src/emitterutils.cpp	2025-12-16 15:26:10.330386292 +0000
++++ yaml-cpp-patched/src/emitterutils.cpp	2025-12-16 15:27:03.088646067 +0000
+@@ -1,6 +1,7 @@
+ #include <algorithm>
+ #include <iomanip>
+ #include <sstream>
++#include <cstdint>
+ 
+ #include "emitterutils.h"
+ #include "exp.h"
