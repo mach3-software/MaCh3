@@ -146,7 +146,11 @@ class ParameterHandlerBase {
   /// @ingroup ParameterHandlerGetters
   virtual double GetLikelihood();
 
-  /// @brief Return covariance matrix
+  std::pair<std::vector<double>, std::vector<double>> GetBounds(){
+    return std::make_pair(_fLowBound, _fUpBound);
+  }
+
+  /// @brief Return covariance matrixs
   /// @ingroup ParameterHandlerGetters
   TMatrixDSym *GetCovMatrix() const { return covMatrix; }
   /// @brief Return inverted covariance matrix
