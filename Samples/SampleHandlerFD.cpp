@@ -45,7 +45,7 @@ SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGen
 
 SampleHandlerFD::~SampleHandlerFD() {
   MACH3LOG_DEBUG("I'm deleting SampleHandlerFD");
-  
+
   if (SampleHandlerFD_array != nullptr) delete[] SampleHandlerFD_array;
   if (SampleHandlerFD_array_w2 != nullptr) delete[] SampleHandlerFD_array_w2;
   //ETA - there is a chance that you haven't added any data...
@@ -309,9 +309,9 @@ bool SampleHandlerFD::IsSubEventSelected(const std::vector<KinematicCut> &SubEve
 // Reweight function
 void SampleHandlerFD::Reweight() {
 //************************************************
-  //KS: Reset the histograms before reweight 
+  //KS: Reset the histograms before reweight
   ResetHistograms();
-  
+
   //You only need to do these things if Oscillator has been initialised
   //if not then you're not considering oscillations
   if (Oscillator) Oscillator->Evaluate();
@@ -341,7 +341,7 @@ void SampleHandlerFD::FillArray() {
 //************************************************
   //DB Reset which cuts to apply
   Selection = StoredSelection;
-  
+
   PrepFunctionalParameters();
 
   for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
@@ -377,7 +377,7 @@ void SampleHandlerFD::FillArray() {
 }
 
 #ifdef MULTITHREAD
-// ************************************************ 
+// ************************************************
 /// Multithreaded version of fillArray @see fillArray()
 void SampleHandlerFD::FillArray_MP() {
 // ************************************************
@@ -476,7 +476,7 @@ void SampleHandlerFD::FillArray_MP() {
 // **************************************************
 // Helper function to reset the data and MC histograms
 void SampleHandlerFD::ResetHistograms() {
-// **************************************************  
+// **************************************************
   //DB Reset values stored in PDF array to 0.
   // Don't openMP this; no significant gain
   #ifdef MULTITHREAD
@@ -509,7 +509,7 @@ void SampleHandlerFD::RegisterIndividualFunctionalParameter(const std::string& f
 
 void SampleHandlerFD::SetupFunctionalParameters() {
   funcParsVec = ParHandler->GetFunctionalParametersFromSampleName(SampleHandlerName);
-  // RegisterFunctionalParameters is implemented in experiment-specific code, 
+  // RegisterFunctionalParameters is implemented in experiment-specific code,
   // which calls RegisterIndividualFuncPar to populate funcParsNamesMap, funcParsNamesVec, and funcParsFuncMap
   RegisterFunctionalParameters();
   funcParsMap.resize(funcParsNamesMap.size());
@@ -518,16 +518,16 @@ void SampleHandlerFD::SetupFunctionalParameters() {
   // For every functional parameter in XsecCov that matches the name in funcParsNames, add it to the map
   for (FunctionalParameter & fp : funcParsVec) {
     for (std::string name : funcParsNamesVec) {
-      if (fp.name == name) {
-        MACH3LOG_INFO("Adding functional parameter: {} to funcParsMap with key: {}", fp.name, funcParsNamesMap[fp.name]);
-        fp.funcPtr = &funcParsFuncMap[funcParsNamesMap[fp.name]];
-        funcParsMap[static_cast<std::size_t>(funcParsNamesMap[fp.name])] = &fp;
+      if (fp.fancy_name == name) {
+        MACH3LOG_INFO("Adding functional parameter: {} to funcParsMap with key: {}", fp.fancy_name, funcParsNamesMap[fp.fancy_name]);
+        fp.funcPtr = &funcParsFuncMap[funcParsNamesMap[fp.fancy_name]];
+        funcParsMap[static_cast<std::size_t>(funcParsNamesMap[fp.fancy_name])] = &fp;
         continue;
       }
     }
     // If we don't find a match, we need to throw an error
-    if (funcParsMap[static_cast<std::size_t>(funcParsNamesMap[fp.name])] == nullptr) {
-      MACH3LOG_ERROR("Functional parameter {} not found, did you define it in RegisterFunctionalParameters()?", fp.name);
+    if (funcParsMap[static_cast<std::size_t>(funcParsNamesMap[fp.fancy_name])] == nullptr) {
+      MACH3LOG_ERROR("Functional parameter {} not found, did you define it in RegisterFunctionalParameters()?", fp.fancy_name);
       throw MaCh3Exception(__FILE__, __LINE__);
     }
   }
@@ -575,7 +575,7 @@ void SampleHandlerFD::SetupFunctionalParameters() {
         MACH3LOG_TRACE("Event {}, missed Kinematic var check for dial {}", iEvent, (*it).name);
         continue;
       }
-      auto funcparenum = funcParsNamesMap[(*it).name];
+      auto funcparenum = funcParsNamesMap[(*it).fancy_name];
       funcParsGrid.at(iEvent).push_back(funcparenum);
     }
   }
@@ -1048,11 +1048,11 @@ void SampleHandlerFD::AddData(const int Sample, TH1D* Data) {
   SampleDetails[Sample].dathist = static_cast<TH1D*>(Data->Clone());
 
   if (GetNDim(Sample) != 1) {
-    MACH3LOG_ERROR("Trying to set a 1D 'data' histogram in a 2D sample - Quitting"); 
+    MACH3LOG_ERROR("Trying to set a 1D 'data' histogram in a 2D sample - Quitting");
     MACH3LOG_ERROR("The number of dimensions for this sample is {}", GetNDim(Sample));
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
-    
+
   if(SampleHandlerFD_data == nullptr) {
     MACH3LOG_ERROR("SampleHandlerFD_data haven't been initialised yet");
     throw MaCh3Exception(__FILE__, __LINE__);
@@ -1076,9 +1076,9 @@ void SampleHandlerFD::AddData(const int Sample, TH2D* Data) {
   SampleDetails[Sample].dathist = nullptr;
 
   if (GetNDim(Sample) != 2) {
-    MACH3LOG_ERROR("Trying to set a 2D 'data' histogram in a 1D sample - Quitting"); 
+    MACH3LOG_ERROR("Trying to set a 2D 'data' histogram in a 1D sample - Quitting");
     throw MaCh3Exception(__FILE__ , __LINE__ );}
-   
+
   if(SampleHandlerFD_data == nullptr) {
     MACH3LOG_ERROR("SampleHandlerFD_data haven't been initialised yet");
     throw MaCh3Exception(__FILE__, __LINE__);
@@ -1299,6 +1299,7 @@ double SampleHandlerFD::GetSampleLikelihood(const int isample) const {
 // ************************************************
 double SampleHandlerFD::GetLikelihood() const {
 // ************************************************
+
   double negLogL = 0.;
   #ifdef MULTITHREAD
   #pragma omp parallel for reduction(+:negLogL)
@@ -1531,13 +1532,13 @@ TH2* SampleHandlerFD::Get2DVarHist(const int iSample, const std::string& Project
 void SampleHandlerFD::Fill2DSubEventHist(const int iSample, TH2D* _h2DVar, const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY,
     const std::vector< KinematicCut >& SubEventSelectionVec, int WeightStyle) {
   bool IsSubEventVarX = IsSubEventVarString(ProjectionVar_StrX);
-  bool IsSubEventVarY = IsSubEventVarString(ProjectionVar_StrY);   
+  bool IsSubEventVarY = IsSubEventVarString(ProjectionVar_StrY);
 
   int ProjectionVar_IntX, ProjectionVar_IntY;
   if (IsSubEventVarX) ProjectionVar_IntX = ReturnKinematicVectorFromString(ProjectionVar_StrX);
   else ProjectionVar_IntX = ReturnKinematicParameterFromString(ProjectionVar_StrX);
   if (IsSubEventVarY) ProjectionVar_IntY = ReturnKinematicVectorFromString(ProjectionVar_StrY);
-  else ProjectionVar_IntY = ReturnKinematicParameterFromString(ProjectionVar_StrY); 
+  else ProjectionVar_IntY = ReturnKinematicParameterFromString(ProjectionVar_StrY);
 
   //JM Loop over all events
   for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
@@ -1578,7 +1579,7 @@ void SampleHandlerFD::Fill2DSubEventHist(const int iSample, TH2D* _h2DVar, const
           if (IsSubEventVarY) VarY = VecY[iSubEvent];
           _h2DVar->Fill(VarX,VarY,Weight);
         }
-      } 
+      }
     }
   }
 }
