@@ -202,6 +202,12 @@ public:
   std::string GetParName(const int i) const {
     return parlist.params.name.at(i);
   }
+  //need these 'reach into PC' functions for MINUIT
+  std::string GetPCParName(const int i);
+  double GetPCParInit(const int i);
+  double GetPCDiagonalError(const int i);
+  double GetPCLowerBound(const int i);
+  double GetPCUpperBound(const int i);
 
   /// @brief Get index based on name
   /// @ingroup ParameterHandlerGetters
@@ -293,7 +299,10 @@ public:
 
   /// @brief Get total number of parameters
   /// @ingroup ParameterHandlerGetters
-  int GetNumParams() const { return parlist.NumSystematicBasisParameters(); }
+  int GetNumSystematicParams() const {
+    return parlist.NumSystematicBasisParameters();
+  }
+  int GetNumProposalParams() const { return parlist.NumPCBasisParameters(); }
   /// @brief Get the pre-fit values of the parameters.
   /// @ingroup ParameterHandlerGetters
   std::vector<double> GetPreFitValues() const {
@@ -397,6 +406,8 @@ public:
   /// @brief Is parameter fixed or not
   /// @param i Parameter index
   bool IsParameterFixed(const int i) const;
+  bool IsPCParameterFixed(const int i) const;
+
   /// @brief Is parameter fixed or not
   /// @param name Name of parameter you want to check if is fixed
   bool IsParameterFixed(const std::string &name) const;
@@ -411,9 +422,6 @@ public:
   /// [Wiki](https://github.com/mach3-software/MaCh3/wiki/03.-Eigen-Decomposition-%E2%80%90-PCA).
   void ConstructPCA(const double eigen_threshold, int FirstPCAdpar,
                     int LastPCAdpar);
-
-  /// @brief is PCA, can use to query e.g. LLH scans
-  bool IsPCA() const { return parlist.pca.enabled; }
 
   /// @brief Getter to return a copy of the YAML node
   /// @ingroup ParameterHandlerGetters
@@ -445,9 +453,10 @@ protected:
   bool AppliesToSample(const int SystIndex,
                        const std::string &SampleName) const;
 
-  ParameterList parlist;
-  StepProposer proposer;
-
   mutable Eigen::ArrayXd current;
   mutable Eigen::ArrayXd proposed;
+
+public:
+  ParameterList parlist;
+  StepProposer proposer;
 };

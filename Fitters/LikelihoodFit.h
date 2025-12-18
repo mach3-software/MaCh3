@@ -12,6 +12,8 @@ class LikelihoodFit : public FitterBase {
 
     /// @brief Chi2 calculation over all included samples and syst objects
     virtual double CalcChi2(const double* x);
+    //Expects parameters to be in proposal/PCA basis, transforms back before calling CalcChi2
+    virtual double CalcChi2PC(const double* x);
     /// @brief Get total number of params, this sums over all covariance objects
     inline int GetNPars(){return NPars;};
 

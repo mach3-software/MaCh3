@@ -502,6 +502,10 @@ bool ParameterHandlerBase::IsParameterFixed(const int) const {
   throw std::runtime_error("ParameterHandlerBase::IsParameterFixed Removed");
 }
 
+bool ParameterHandlerBase::IsPCParameterFixed(const int i) const {
+  return !proposer.params.isfree[i];
+}
+
 // ********************************************
 bool ParameterHandlerBase::IsParameterFixed(const std::string &) const {
   // ********************************************
@@ -520,6 +524,49 @@ void ParameterHandlerBase::SetFlatPrior(const int i, const bool eL) {
                    "which has been PCA'd.",
                    i, GetParName(i));
     throw MaCh3Exception(__FILE__, __LINE__);
+  }
+}
+
+std::string ParameterHandlerBase::GetPCParName(const int i) {
+  int propidx = parlist.SystematicParameterIndexToPCIndex(i);
+  if (propidx != ParameterList::ParameterInPCABlock) {
+    return parlist.params.name[propidx];
+  } else {
+    return "PCA_" + std::to_string(i - parlist.pca.first_index);
+  }
+}
+
+double ParameterHandlerBase::GetPCParInit(const int i) {
+  int propidx = parlist.SystematicParameterIndexToPCIndex(i);
+  if (propidx != ParameterList::ParameterInPCABlock) {
+    return parlist.params.prefit[propidx];
+  } else {
+    return 0;
+  }
+}
+
+double ParameterHandlerBase::GetPCDiagonalError(const int i) {
+  int propidx = parlist.SystematicParameterIndexToPCIndex(i);
+  if (propidx != ParameterList::ParameterInPCABlock) {
+    return GetDiagonalError(propidx);
+  } else {
+    return 1;
+  }
+}
+double ParameterHandlerBase::GetPCLowerBound(const int i) {
+  int propidx = parlist.SystematicParameterIndexToPCIndex(i);
+  if (propidx != ParameterList::ParameterInPCABlock) {
+    return GetLowerBound(propidx);
+  } else {
+    return -3;
+  }
+}
+double ParameterHandlerBase::GetPCUpperBound(const int i) {
+  int propidx = parlist.SystematicParameterIndexToPCIndex(i);
+  if (propidx != ParameterList::ParameterInPCABlock) {
+    return GetUpperBound(propidx);
+  } else {
+    return 3;
   }
 }
 
@@ -607,29 +654,25 @@ void ParameterHandlerBase::SetThrowMatrix(TMatrixDSym *cov) {
   M3::MakeMatrixPosDef(cov);
   Eigen::MatrixXd covariance = M3::ROOTToEigen(*cov);
 
-  if (parlist.pca.enabled) {
-    Eigen::MatrixXd covariance_pc = Eigen::MatrixXd::Zero(
-        proposer.NumParameters(), proposer.NumParameters());
+  Eigen::MatrixXd covariance_pc =
+      Eigen::MatrixXd::Zero(proposer.NumParameters(), proposer.NumParameters());
 
-    covariance_pc.topLeftCorner(parlist.pca.first_index,
-                                parlist.pca.first_index) =
-        parlist.params.covariance.topLeftCorner(parlist.pca.first_index,
-                                                parlist.pca.first_index);
+  covariance_pc.topLeftCorner(parlist.pca.first_index,
+                              parlist.pca.first_index) =
+      parlist.params.covariance.topLeftCorner(parlist.pca.first_index,
+                                              parlist.pca.first_index);
 
-    covariance_pc.block(parlist.pca.first_index, parlist.pca.first_index,
-                        parlist.pca.npc_parameters(),
-                        parlist.pca.npc_parameters()) =
-        Eigen::MatrixXd::Identity(parlist.pca.npc_parameters(),
-                                  parlist.pca.npc_parameters());
+  covariance_pc.block(parlist.pca.first_index, parlist.pca.first_index,
+                      parlist.pca.npc_parameters(),
+                      parlist.pca.npc_parameters()) =
+      Eigen::MatrixXd::Identity(parlist.pca.npc_parameters(),
+                                parlist.pca.npc_parameters());
 
-    covariance_pc.bottomRightCorner(parlist.pca.ntail, parlist.pca.ntail) =
-        parlist.params.covariance.bottomRightCorner(parlist.pca.ntail,
-                                                    parlist.pca.ntail);
+  covariance_pc.bottomRightCorner(parlist.pca.ntail, parlist.pca.ntail) =
+      parlist.params.covariance.bottomRightCorner(parlist.pca.ntail,
+                                                  parlist.pca.ntail);
 
-    proposer.SetProposalMatrix(covariance_pc);
-  } else {
-    proposer.SetProposalMatrix(covariance);
-  }
+  proposer.SetProposalMatrix(covariance_pc);
 }
 
 void ParameterHandlerBase::UpdateThrowMatrix(TMatrixDSym *) {
@@ -645,8 +688,8 @@ TH2D *ParameterHandlerBase::GetCorrelationMatrix() {
                                   parlist.params.covariance);
 }
 
-const double *ParameterHandlerBase::RetPointer(const int) {
-  throw std::runtime_error("ParameterHandlerBase::RetPointer Removed");
+const double *ParameterHandlerBase::RetPointer(const int i) {
+  return current.data() + i;
 }
 
 // ********************************************
@@ -753,10 +796,10 @@ void ParameterHandlerBase::MatchMaCh3OutputBranches(
     TTree *PosteriorFile, std::vector<double> &BranchValues,
     std::vector<std::string> &BranchNames) {
   // *************************************
-  BranchValues.resize(GetNumParams());
-  BranchNames.resize(GetNumParams());
+  BranchValues.resize(GetNumSystematicParams());
+  BranchNames.resize(GetNumSystematicParams());
 
-  for (int i = 0; i < GetNumParams(); ++i) {
+  for (int i = 0; i < GetNumSystematicParams(); ++i) {
     BranchNames[i] = GetParName(i);
     if (!PosteriorFile->GetBranch(BranchNames[i].c_str())) {
       MACH3LOG_ERROR("Branch '{}' does not exist in the TTree!",
