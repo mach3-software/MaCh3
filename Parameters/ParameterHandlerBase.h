@@ -374,6 +374,10 @@ class ParameterHandlerBase {
                                 std::vector<double>& BranchValues,
                                 std::vector<std::string>& BranchNames);
 
+  std::pair<std::vector<double>, std::vector<double>> GetParameterBounds(){
+    return std::make_pair(_fLowBound, _fUpBound);
+  }
+
 protected:
   /// @brief Initialisation of the class using matrix from root file
   void Init(const std::string& name, const std::string& file);

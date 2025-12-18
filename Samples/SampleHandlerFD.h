@@ -142,7 +142,10 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// @brief JM Check if a kinematic parameter string corresponds to a subevent-level variable
   bool IsSubEventVarString(const std::string& VarStr);
 
- protected:
+  std::vector<double> GetMCVals() { return std::vector<double>(SampleHandlerFD_array, SampleHandlerFD_array + Binning.nBins); }
+  std::vector<double> GetDataVals() { return std::vector<double>(SampleHandlerFD_data, SampleHandlerFD_data + Binning.nBins); }
+
+protected:
   /// @brief DB Function to determine which weights apply to which types of samples pure virtual!!
   virtual void SetupWeightPointers() = 0;
 
