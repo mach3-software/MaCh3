@@ -1,0 +1,57 @@
+#To run use:  docker build -t mach3 .
+# KS: Get glorious container from ROOT which will work as a base
+FROM rootproject/root:6.38.00-ubuntu25.10 AS mach3_build
+
+# Add a label for the author
+LABEL maintainer="The MaCh3 Collaboration"
+LABEL website="https://mach3-software.github.io/MaCh3/"
+LABEL compiler="GNU 15.2.0"
+LABEL root_version="v6.38.00"
+LABEL org.opencontainers.image.description="Official MaCh3 container"
+
+RUN apt update && apt upgrade -y
+
+RUN apt-get install -y nlohmann-json3-dev
+#MISC_SW
+RUN apt install -y --no-install-recommends \
+    vim less nano gdb csh tcsh ed quota python3 python3-dev python3-pip \
+    cvs procmail ca-certificates cmake ninja-build clang libomp-dev
+
+# Declare the build argument
+ARG MACH3_VERSION
+ENV MACH3_VERSION=${MACH3_VERSION:-develop}
+ARG CMAKE_OPTIONS
+ENV CMAKE_OPTIONS=${CMAKE_OPTIONS:-DMaCh3_PYTHON_ENABLED=ON}
+ARG INSTALL_OPTIONS
+ENV INSTALL_OPTIONS=${INSTALL_OPTIONS:-"VERBOSE=1"}
+
+ARG REPOSITORY_URL
+ENV REPOSITORY_URL=${REPOSITORY_URL:-https://github.com/mach3-software/MaCh3}
+
+ENV MACH3_WORK_DIR=/opt/MaCh3/
+ENV MACH3_INSTALL_DIR=/opt/MaCh3/build/
+
+RUN mkdir -p ${MACH3_WORK_DIR}
+
+WORKDIR /opt/
+# KS: Let's clone MaCh3
+RUN --mount=type=ssh git clone ${REPOSITORY_URL} ${MACH3_WORK_DIR}
+WORKDIR ${MACH3_WORK_DIR}
+RUN git checkout ${MACH3_VERSION}
+
+RUN mkdir -p ${MACH3_INSTALL_DIR}
+WORKDIR ${MACH3_INSTALL_DIR}
+RUN cmake ${CMAKE_OPTIONS} ${MACH3_WORK_DIR}
+RUN make ${INSTALL_OPTIONS} && make install
+
+# KS: Need to set them here, otherwise container using this container will not be able to find MaCh3
+ENV MaCh3_ROOT=${MACH3_INSTALL_DIR}
+ENV PATH=${MaCh3_ROOT}/bin:${PATH} \
+    LD_LIBRARY_PATH=${MaCh3_ROOT}/lib:${LD_LIBRARY_PATH}
+
+# pip install pyMaCh3
+WORKDIR ${MACH3_WORK_DIR}
+#RUN pip install .
+
+# Start from MaCh3 install dir
+WORKDIR ${MACH3_INSTALL_DIR}

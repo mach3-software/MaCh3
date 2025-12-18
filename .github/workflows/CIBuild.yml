@@ -62,6 +62,10 @@ jobs:
             file: Doc/MaCh3DockerFiles/Alma9_icpx/Dockerfile
             tag: Alma9icpxlatest
             cmakeoptions: -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx -DMaCh3_MULTITHREAD_ENABLED=OFF  -DMaCh3_PYTHON_ENABLED=ON -DNuFastLinear_ENABLED=ON -DMaCh3_WERROR_ENABLED=FALSE
+          - os: Ubuntu25.10
+            file: Doc/MaCh3DockerFiles/Ubuntu25.10/Dockerfile
+            tag: ubuntu25.10latest
+            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON
 
     name: Build CI ${{ matrix.os }}
 

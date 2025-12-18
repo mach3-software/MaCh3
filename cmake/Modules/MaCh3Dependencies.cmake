@@ -68,7 +68,7 @@ CPMAddPackage(
     NAME yaml-cpp
     VERSION ${YAML_CPP_VERSION}
     GITHUB_REPOSITORY "jbeder/yaml-cpp"
-    GIT_TAG "${YAML_CPP_VERSION}"
+    GIT_TAG bbf8bdb087bb3f3621ca0a5ace06047805f4e9f3
     GIT_SHALLOW YES
     OPTIONS
       "YAML_CPP_INSTALL ON"
