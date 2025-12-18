@@ -3,7 +3,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # CMake version check
 cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
-project(MaCh3 VERSION 2.3.1 LANGUAGES CXX)
+project(MaCh3 VERSION 2.3.2 LANGUAGES CXX)
 set(MaCh3_VERSION ${PROJECT_VERSION})
 
 option(MaCh3_PYTHON_ENABLED "Whether to build MaCh3 python bindings" OFF)
@@ -171,7 +171,7 @@ else()
   #KS: Consider in future __attribute__((always_inline)) see https://indico.cern.ch/event/386232/sessions/159923/attachments/771039/1057534/always_inline_performance.pdf
   if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     target_compile_options(MaCh3CompilerOptions INTERFACE
-      $<$<COMPILE_LANGUAGE:CXX>:-flto>      # Enable link-time optimization, don't apply it to CUDA or other languages!
+      $<$<COMPILE_LANGUAGE:CXX>:-flto=auto>      # Enable link-time optimization, don't apply it to CUDA or other languages!
       -finline-limit=100000000              # Increase the limit for inlining functions to improve performance
       #-fipa-pta                            # Pointer analysis for better intraprocedural optimization, increases compilation time
     )

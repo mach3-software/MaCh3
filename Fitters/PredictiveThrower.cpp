@@ -317,6 +317,10 @@ void PredictiveThrower::ProduceToys() {
     {
       ParampPointers[ParamCounter] = systematics[iSys]->RetPointer(iPar);
       std::string Name = systematics[iSys]->GetParFancyName(iPar);
+      //CW: Also strip out - signs because it messes up TBranches
+      while (Name.find("-") != std::string::npos) {
+        Name.replace(Name.find("-"), 1, std::string("_"));
+      }
       ToyTree->Branch(Name.c_str(), &ParamValues[ParamCounter], (Name + "/D").c_str());
       ParamCounter++;
     }
@@ -391,7 +395,7 @@ void PredictiveThrower::ProduceToys() {
   TempClock.Start();
   for(int i = 0; i < Ntoys; i++)
   {
-    if( i % (Ntoys/10) == 0) {
+    if(Ntoys >= 10 && i % (Ntoys/10) == 0) {
       MaCh3Utils::PrintProgressBar(i, Ntoys);
     }
 
@@ -668,6 +672,8 @@ std::vector<std::unique_ptr<TH1>> PredictiveThrower::MakePredictive(const std::v
         std::string ProjName = fmt::format("{} {} Bin: {}",
                                            SampleInfo[sample].Name, suffix,
                                            SampleInfo[sample].Binning->GetBinName(SampleInfo[sample].LocalId, i-1));
+        //KS: When a histogram is created with an axis lower limit greater or equal to its upper limit ROOT will automatically adjust histogram range
+        // https://root.cern.ch/doc/master/classTH1.html#auto-bin
         auto PosteriorHist = std::make_unique<TH1D>(ProjName.c_str(), ProjName.c_str(), 100, 1, -1);
         PosteriorHist->SetDirectory(nullptr);
         PosteriorHist->GetXaxis()->SetTitle("Events");
@@ -709,6 +715,8 @@ std::vector<std::unique_ptr<TH1>> PredictiveThrower::MakePredictive(const std::v
           std::string ProjName = fmt::format("{} {} Bin: {}",
                                       SampleInfo[sample].Name, suffix,
                                       SampleInfo[sample].Binning->GetBinName(SampleInfo[sample].LocalId, MaCh3Bin));
+          //KS: When a histogram is created with an axis lower limit greater or equal to its upper limit ROOT will automatically adjust histogram range
+          // https://root.cern.ch/doc/master/classTH1.html#auto-bin
           auto PosteriorHist = std::make_unique<TH1D>(ProjName.c_str(), ProjName.c_str(), 100, 1, -1);
           PosteriorHist->SetDirectory(nullptr);
           PosteriorHist->GetXaxis()->SetTitle("Events");
@@ -915,6 +923,8 @@ void PredictiveThrower::StudyBetaParameters(TDirectory* PredictiveDir) {
       std::string title = fmt::format("#beta param, {} Bin: {}",
                                       SampleInfo[iSample].Name,
                                       SampleInfo[iSample].Binning->GetBinName(SampleInfo[iSample].LocalId, iBin));
+      //KS: When a histogram is created with an axis lower limit greater or equal to its upper limit ROOT will automatically adjust histogram range
+      // https://root.cern.ch/doc/master/classTH1.html#auto-bin
       BetaHist[iSample][iBin] = std::make_unique<TH1D>(title.c_str(), title.c_str(), 100, 1, -1);
       BetaHist[iSample][iBin]->SetDirectory(nullptr);
       BetaHist[iSample][iBin]->GetXaxis()->SetTitle("beta parameter");
