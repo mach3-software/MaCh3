@@ -1,5 +1,7 @@
 #include "PredictiveThrower.h"
 #include "Parameters/ParameterHandlerGeneric.h"
+#include "Samples/SampleHandlerFD.h"
+
 #include "TH3.h"
 
 // *************************
@@ -351,7 +353,7 @@ void PredictiveThrower::ProduceToys() {
   std::vector<const double *> ParampPointers(NModelParams);
   int ParamCounter = 0;
   for (size_t iSys = 0; iSys < systematics.size(); iSys++) {
-    for (int iPar = 0; iPar < systematics[iSys]->GetNumParams(); iPar++) {
+    for (int iPar = 0; iPar < systematics[iSys]->GetNumSystematicParams(); iPar++) {
       ParampPointers[ParamCounter] = systematics[iSys]->RetPointer(iPar);
       std::string Name = systematics[iSys]->GetParName(iPar);
       ToyTree->Branch(Name.c_str(), &ParamValues[ParamCounter],
