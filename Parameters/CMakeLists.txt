@@ -2,10 +2,11 @@ set(HEADERS
     ParameterHandlerUtils.h
     ParameterHandlerBase.h
     ParameterHandlerGeneric.h
-    AdaptiveMCMCHandler.h
-    PCAHandler.h
+    PCA.h
     ParameterTunes.h
     ParameterStructs.h
+    StepProposer.h
+    ParameterList.h
 )
 
 add_library(Parameters SHARED
