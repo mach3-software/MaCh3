@@ -391,7 +391,7 @@ void PredictiveThrower::ProduceToys() {
   TempClock.Start();
   for(int i = 0; i < Ntoys; i++)
   {
-    if( i % (Ntoys/10) == 0) {
+    if(Ntoys >= 10 && i % (Ntoys/10) == 0) {
       MaCh3Utils::PrintProgressBar(i, Ntoys);
     }
 
