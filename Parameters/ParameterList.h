@@ -51,11 +51,19 @@ struct ParameterList {
     std::tuple<bool, double, double> circ_bounds;
   };
 
-  void AddParameters(std::vector<ParamInfo> const &new_params);
+  void InsertParameters(int insert_at,
+                        std::vector<ParamInfo> const &new_params);
+  void InsertParameter(int insert_at, ParamInfo const &new_param) {
+    InsertParameters(insert_at, {
+                                    new_param,
+                                });
+  }
+
+  void AddParameters(std::vector<ParamInfo> const &new_params) {
+    InsertParameters(NumSystematicBasisParameters(), new_params);
+  }
   void AddParameter(ParamInfo const &new_param) {
-    AddParameters({
-        new_param,
-    });
+    InsertParameter(NumSystematicBasisParameters(), new_param);
   }
 
   std::string SystematicParameterToString(int i) const;
@@ -65,10 +73,14 @@ struct ParameterList {
       int paramid, std::map<std::string, double> const &correlations);
 
   int FindParameter(std::string const &name) const;
+  int FindParameterByFancyName(std::string const &fancy_name) const;
   int NumSystematicBasisParameters() const { return int(params.prefit.size()); }
+  int NumPCBasisParameters() const {
+    return NumSystematicBasisParameters() - pca.nrotated_syst_parameters() +
+           pca.npc_parameters();
+  }
 
   struct {
-    bool enabled;
     int first_index, last_index, ntail;
     Eigen::MatrixXd pc_to_syst_rotation;
     Eigen::MatrixXd syst_to_pc_rotation;
@@ -89,12 +101,6 @@ struct ParameterList {
 
   constexpr static int ParameterInPCABlock = std::numeric_limits<int>::max();
   int SystematicParameterIndexToPCIndex(int i) const;
-
-  int NumPCBasisParameters() const {
-    return pca.enabled ? (NumSystematicBasisParameters() -
-                          pca.nrotated_syst_parameters() + pca.npc_parameters())
-                       : NumSystematicBasisParameters();
-  }
 
   double Chi2(Eigen::ArrayXd const &systematic_vals);
 

@@ -3,17 +3,22 @@
 #include "Parameters/PCA.h"
 #include "Parameters/ParameterHandlerUtils.h"
 
-void ParameterList::AddParameters(std::vector<ParamInfo> const &new_params) {
+void ParameterList::InsertParameters(int insert_before,
+                                     std::vector<ParamInfo> const &new_params) {
 
-  for (auto const &p : new_params) {
-    params.name.push_back(p.name);
-    params.fancy_name.push_back(p.fancy_name);
-    params.samples.push_back(p.affected_samples);
-    params.flip_pivot.push_back(p.flip_pivot);
-    params.circ_bounds.push_back(p.circ_bounds);
+  for (auto it = new_params.rbegin(); it < new_params.rend(); ++it) {
+    params.name.insert(params.name.begin() + insert_before, it->name);
+    params.fancy_name.insert(params.fancy_name.begin() + insert_before,
+                             it->fancy_name);
+    params.samples.insert(params.samples.begin() + insert_before,
+                          it->affected_samples);
+    params.flip_pivot.insert(params.flip_pivot.begin() + insert_before,
+                             it->flip_pivot);
+    params.circ_bounds.insert(params.circ_bounds.begin() + insert_before,
+                              it->circ_bounds);
   }
 
-  size_t new_block_start = params.prefit.size();
+  auto N = params.prefit.size();
 
   params.prefit.conservativeResize(params.name.size());
   params.error.conservativeResize(params.name.size());
@@ -23,21 +28,43 @@ void ParameterList::AddParameters(std::vector<ParamInfo> const &new_params) {
   params.flatprior.conservativeResize(params.name.size());
   params.isfree.conservativeResize(params.name.size());
 
-  params.covariance.conservativeResize(params.name.size(), params.name.size());
+  params.prefit.tail(N - insert_before) =
+      params.prefit.segment(insert_before, N - insert_before).eval();
+  params.error.tail(N - insert_before) =
+      params.error.segment(insert_before, N - insert_before).eval();
+  params.lowbound.tail(N - insert_before) =
+      params.lowbound.segment(insert_before, N - insert_before).eval();
+  params.upbound.tail(N - insert_before) =
+      params.upbound.segment(insert_before, N - insert_before).eval();
+  params.stepscale.tail(N - insert_before) =
+      params.stepscale.segment(insert_before, N - insert_before).eval();
+  params.flatprior.tail(N - insert_before) =
+      params.flatprior.segment(insert_before, N - insert_before).eval();
+  params.isfree.tail(N - insert_before) =
+      params.isfree.segment(insert_before, N - insert_before).eval();
+
+  Eigen::MatrixXd ncovariance =
+      Eigen::MatrixXd::Zero(params.name.size(), params.name.size());
+  ncovariance.topLeftCorner(N, N) = params.covariance;
+
+  ncovariance.bottomRightCorner(N - insert_before, N - insert_before) =
+      ncovariance.block(insert_before, insert_before, N - insert_before,
+                        N - insert_before);
+  params.covariance = ncovariance;
 
   for (size_t i = 0; i < new_params.size(); ++i) {
-    params.prefit[new_block_start + i] = new_params[i].prefit;
-    params.error[new_block_start + i] = new_params[i].error;
-    params.lowbound[new_block_start + i] = new_params[i].bounds[0];
-    params.upbound[new_block_start + i] = new_params[i].bounds[1];
-    params.stepscale[new_block_start + i] = new_params[i].stepscale;
-    params.flatprior[new_block_start + i] = new_params[i].flatprior;
-    params.isfree[new_block_start + i] = new_params[i].isfree;
+    params.prefit[insert_before + i] = new_params[i].prefit;
+    params.error[insert_before + i] = new_params[i].error;
+    params.lowbound[insert_before + i] = new_params[i].bounds[0];
+    params.upbound[insert_before + i] = new_params[i].bounds[1];
+    params.stepscale[insert_before + i] = new_params[i].stepscale;
+    params.flatprior[insert_before + i] = new_params[i].flatprior;
+    params.isfree[insert_before + i] = new_params[i].isfree;
 
-    params.covariance.row(new_block_start + i).setZero();
-    params.covariance.col(new_block_start + i).setZero();
+    params.covariance.row(insert_before + i).setZero();
+    params.covariance.col(insert_before + i).setZero();
 
-    params.covariance(new_block_start + i, new_block_start + i) =
+    params.covariance(insert_before + i, insert_before + i) =
         new_params[i].error * new_params[i].error;
   }
 
@@ -84,12 +111,22 @@ int ParameterList::FindParameter(std::string const &name) const {
   return int(std::distance(params.name.begin(), pit));
 }
 
+int ParameterList::FindParameterByFancyName(
+    std::string const &fancy_name) const {
+  auto pit =
+      std::find(params.fancy_name.begin(), params.fancy_name.end(), fancy_name);
+  if (pit == params.fancy_name.end()) {
+    MACH3LOG_ERROR("ParameterList manages no parameter named {}.", fancy_name);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  return int(std::distance(params.fancy_name.begin(), pit));
+}
+
 void ParameterList::ConstructTruncatedPCA(double threshold, int first,
                                           int last) {
 
   M3::EnsureNoOutOfBlockCorrelations(params.covariance, {first, last});
 
-  pca.enabled = true;
   pca.first_index = first;
   pca.last_index = last;
   pca.ntail = int(params.prefit.size() - (last + 1));
@@ -150,7 +187,7 @@ void ParameterList::RotateSystematicParameterValuesToPCBasis(
 }
 
 int ParameterList::SystematicParameterIndexToPCIndex(int i) const {
-  if ((!pca.enabled) || (i < pca.first_index)) {
+  if (i < pca.first_index) {
     return i;
   } else if ((i >= pca.first_index) && (i <= pca.last_index)) {
     return ParameterInPCABlock;
@@ -174,37 +211,32 @@ double ParameterList::Chi2(Eigen::ArrayXd const &systematic_vals) {
 StepProposer ParameterList::MakeProposer() const {
   StepProposer proposer;
 
-  if (!pca.enabled) {
-    proposer.SetProposalMatrix(params.covariance);
-    proposer.SetParameterValues(params.prefit);
-  } else {
-    // if we are using a PCA rotation then the proposer should only be aware of
-    // the PC parameter basis.
+  // if we are using a PCA rotation then the proposer should only be aware of
+  // the PC parameter basis.
 
-    // copy the unrotated parameters and covariance blocks
-    int nproposer_parameters = NumPCBasisParameters();
+  // copy the unrotated parameters and covariance blocks
+  int nproposer_parameters = NumPCBasisParameters();
 
-    Eigen::ArrayXd prefit_pc = Eigen::ArrayXd::Zero(nproposer_parameters);
+  Eigen::ArrayXd prefit_pc = Eigen::ArrayXd::Zero(nproposer_parameters);
 
-    RotateSystematicParameterValuesToPCBasis(params.prefit, prefit_pc);
+  RotateSystematicParameterValuesToPCBasis(params.prefit, prefit_pc);
 
-    proposer.SetParameterValues(prefit_pc);
+  proposer.SetParameterValues(prefit_pc);
 
-    Eigen::MatrixXd covariance_pc =
-        Eigen::MatrixXd::Zero(nproposer_parameters, nproposer_parameters);
+  Eigen::MatrixXd covariance_pc =
+      Eigen::MatrixXd::Zero(nproposer_parameters, nproposer_parameters);
 
-    covariance_pc.topLeftCorner(pca.first_index, pca.first_index) =
-        params.covariance.topLeftCorner(pca.first_index, pca.first_index);
+  covariance_pc.topLeftCorner(pca.first_index, pca.first_index) =
+      params.covariance.topLeftCorner(pca.first_index, pca.first_index);
 
-    covariance_pc.block(pca.first_index, pca.first_index, pca.npc_parameters(),
-                        pca.npc_parameters()) =
-        Eigen::MatrixXd::Identity(pca.npc_parameters(), pca.npc_parameters());
+  covariance_pc.block(pca.first_index, pca.first_index, pca.npc_parameters(),
+                      pca.npc_parameters()) =
+      Eigen::MatrixXd::Identity(pca.npc_parameters(), pca.npc_parameters());
 
-    covariance_pc.bottomRightCorner(pca.ntail, pca.ntail) =
-        params.covariance.bottomRightCorner(pca.ntail, pca.ntail);
+  covariance_pc.bottomRightCorner(pca.ntail, pca.ntail) =
+      params.covariance.bottomRightCorner(pca.ntail, pca.ntail);
 
-    proposer.SetProposalMatrix(covariance_pc);
-  }
+  proposer.SetProposalMatrix(covariance_pc);
 
   // PCA parameters get a step scale of 1
   proposer.params.scale = Eigen::ArrayXd::Ones(NumPCBasisParameters());
@@ -444,7 +476,6 @@ ParameterList ParameterList::MakeFromYAML(YAML::Node const &config) {
 
   parlist.params.covariance = M3::MakeMatrixPosDef(parlist.params.covariance);
 
-  parlist.pca.enabled = false;
   parlist.pca.first_index = parlist.NumSystematicBasisParameters();
   parlist.pca.last_index = parlist.NumSystematicBasisParameters();
   parlist.pca.ntail = 0;
@@ -527,7 +558,6 @@ ParameterList ParameterList::MakeFromTMatrix(std::string const &name,
 
   parlist.params.covariance = M3::MakeMatrixPosDef(M3::ROOTToEigen(*CovMat));
 
-  parlist.pca.enabled = false;
   parlist.pca.first_index = parlist.NumSystematicBasisParameters();
   parlist.pca.last_index = parlist.NumSystematicBasisParameters();
   parlist.pca.ntail = 0;

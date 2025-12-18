@@ -161,6 +161,112 @@ Systematics:
                     MaCh3Exception);
 }
 
+TEST_CASE("InsertParameters", "[Construction]") {
+  auto parlist = ParameterList::MakeFromYAML(YAML::Load(
+      R"(
+Systematics:
+- Systematic: {
+    Names: { FancyName: par1 },
+    ParameterValues: { PreFitValue: 1 },
+    Error: 1,
+    StepScale: { MCMC: 0.1 },
+    ParameterBounds: [ -3, 3 ],
+  }
+- Systematic: {
+    Names: { FancyName: par2 },
+    ParameterValues: { PreFitValue: 2 },
+    Error: 1,
+    StepScale: { MCMC: 0.1 },
+    ParameterBounds: [ -3, 3 ],
+  }
+- Systematic: {
+    Names: { FancyName: par3 },
+    ParameterValues: { PreFitValue: 3 },
+    Error: 0.5,
+    StepScale: { MCMC: 1 },
+    ParameterBounds: [ -3, 3 ],
+  }
+)"));
+
+  REQUIRE(parlist.FindParameter("par1") == 0);
+  REQUIRE(parlist.FindParameter("par2") == 1);
+  REQUIRE(parlist.FindParameter("par3") == 2);
+
+  parlist.AddParameter({"extraPar",
+                        "extraPar",
+                        5,
+                        5,
+                        1,
+                        {-5, 5},
+                        false,
+                        true,
+                        {},
+                        {false, 0},
+                        {false, 0, 0}});
+
+  REQUIRE(parlist.FindParameter("par1") == 0);
+  REQUIRE(parlist.FindParameter("par2") == 1);
+  REQUIRE(parlist.FindParameter("par3") == 2);
+  REQUIRE(parlist.FindParameter("extraPar") == 3);
+
+  parlist.InsertParameter(0, {"extraPar2",
+                              "extraPar2",
+                              4,
+                              4,
+                              1,
+                              {-4, 4},
+                              false,
+                              true,
+                              {},
+                              {false, 0},
+                              {false, 0, 0}});
+
+  REQUIRE(parlist.FindParameter("extraPar2") == 0);
+  REQUIRE(parlist.FindParameter("par1") == 1);
+  REQUIRE(parlist.FindParameter("par2") == 2);
+  REQUIRE(parlist.FindParameter("par3") == 3);
+  REQUIRE(parlist.FindParameter("extraPar") == 4);
+
+  parlist.InsertParameter(2, {"extraPar3",
+                              "extraPar3",
+                              7,
+                              7,
+                              1,
+                              {-7, 7},
+                              false,
+                              true,
+                              {},
+                              {false, 0},
+                              {false, 0, 0}});
+
+  REQUIRE(parlist.FindParameter("extraPar2") == 0);
+  REQUIRE(parlist.FindParameter("par1") == 1);
+  REQUIRE(parlist.FindParameter("extraPar3") == 2);
+  REQUIRE(parlist.FindParameter("par2") == 3);
+  REQUIRE(parlist.FindParameter("par3") == 4);
+  REQUIRE(parlist.FindParameter("extraPar") == 5);
+
+  parlist.InsertParameter(6, {"extraPar4",
+                              "extraPar4",
+                              8,
+                              8,
+                              1,
+                              {-8, 8},
+                              false,
+                              true,
+                              {},
+                              {false, 0},
+                              {false, 0, 0}});
+
+  REQUIRE(parlist.FindParameter("extraPar2") == 0);
+  REQUIRE(parlist.FindParameter("par1") == 1);
+  REQUIRE(parlist.FindParameter("extraPar3") == 2);
+  REQUIRE(parlist.FindParameter("par2") == 3);
+  REQUIRE(parlist.FindParameter("par3") == 4);
+  REQUIRE(parlist.FindParameter("extraPar") == 5);
+  REQUIRE(parlist.FindParameter("extraPar4") == 6);
+}
+
 TEST_CASE("4param", "[PCA]") {
   auto parlist = ParameterList::MakeFromYAML(YAML::Load(
       R"(
@@ -199,7 +305,7 @@ Systematics:
 
   parlist.ConstructTruncatedPCA(1E-4, 1, 2);
 
-  REQUIRE(parlist.pca.enabled);
+  REQUIRE(parlist.NumSystematicBasisParameters() == 4);
   REQUIRE(parlist.pca.first_index == 1);
   REQUIRE(parlist.pca.last_index == 2);
   REQUIRE(parlist.pca.ntail == 1);
@@ -241,6 +347,85 @@ Systematics:
   // check that we can rotate back to the expected value
   parlist.RotateSystematicParameterValuesToPCBasis(syst_vals, pc_vals);
   REQUIRE_THAT(pc_vals[1], WithinAbs(1, 1E-4));
+}
+
+TEST_CASE("no explicit PCA checks", "[PCA]") {
+  auto parlist = ParameterList::MakeFromYAML(YAML::Load(
+      R"(
+Systematics:
+- Systematic: {
+    Names: { FancyName: par1 },
+    ParameterValues: { PreFitValue: 1 },
+    Error: 1,
+    StepScale: { MCMC: 1 },
+    ParameterBounds: [ -10, 10 ],
+  }
+- Systematic: {
+    Names: { FancyName: par2 },
+    ParameterValues: { PreFitValue: 2 },
+    Error: 2,
+    StepScale: { MCMC: 1 },
+    ParameterBounds: [ -10, 10 ],
+    Correlations: [ { par3: 0.99999 }, ]
+  }
+- Systematic: {
+    Names: { FancyName: par3 },
+    ParameterValues: { PreFitValue: 3 },
+    Error: 3,
+    StepScale: { MCMC: 1 },
+    ParameterBounds: [ -10, 10 ],
+    Correlations: [ { par2: 0.99999 }, ]
+  }
+- Systematic: {
+    Names: { FancyName: par4 },
+    ParameterValues: { PreFitValue: 4 },
+    Error: 1,
+    StepScale: { MCMC: 1 },
+    ParameterBounds: [ -10, 10 ],
+  }
+)"));
+
+  REQUIRE(parlist.NumSystematicBasisParameters() == 4);
+  REQUIRE(parlist.pca.first_index == 4);
+  REQUIRE(parlist.pca.last_index == 4);
+  REQUIRE(parlist.pca.ntail == 0);
+  REQUIRE(parlist.pca.nrotated_syst_parameters() == 0);
+  REQUIRE(parlist.pca.npc_parameters() == 0);
+  REQUIRE(parlist.NumPCBasisParameters() == 4);
+
+  Eigen::ArrayXd syst_vals = parlist.params.prefit;
+  Eigen::ArrayXd pc_vals = Eigen::ArrayXd::Zero(parlist.NumPCBasisParameters());
+
+  parlist.RotateSystematicParameterValuesToPCBasis(syst_vals, pc_vals);
+
+  REQUIRE(pc_vals[0] == syst_vals[0]);
+  REQUIRE(pc_vals[1] == syst_vals[1]);
+  REQUIRE(pc_vals[2] == syst_vals[2]);
+  REQUIRE(pc_vals[3] == syst_vals[3]);
+
+  parlist.RotatePCParameterValuesToSystematicBasis(pc_vals, syst_vals);
+
+  // prefit value should get mapped and back to prefit
+  REQUIRE(syst_vals[0] == 1);
+  REQUIRE(syst_vals[1] == 2);
+  REQUIRE(syst_vals[2] == 3);
+  REQUIRE(syst_vals[3] == 4);
+
+  // the PC is approximately in the par2+par3 direction, so
+  //   should be able to guess where pc_vals[1] = 1 sets
+  //   syst_vals[1] and syst_vals[2]
+  pc_vals[1] = 1;
+
+  parlist.RotatePCParameterValuesToSystematicBasis(pc_vals, syst_vals);
+
+  REQUIRE(syst_vals[0] == 1);
+  REQUIRE(syst_vals[1] == 1);
+  REQUIRE(syst_vals[2] == 3);
+  REQUIRE(syst_vals[3] == 4);
+
+  // check that we can rotate back to the expected value
+  parlist.RotateSystematicParameterValuesToPCBasis(syst_vals, pc_vals);
+  REQUIRE(pc_vals[1] == 1);
 }
 
 TEST_CASE("Out of block correlations", "[PCA]") {
