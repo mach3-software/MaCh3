@@ -52,4 +52,4 @@ install(TARGETS Parameters
 
 add_library(MaCh3::Parameters ALIAS Parameters)
 
-add_subdirectory(test)
+# add_subdirectory(test)

@@ -60,51 +60,26 @@ struct ParameterList {
   }
 
   void AddParameters(std::vector<ParamInfo> const &new_params) {
-    InsertParameters(NumSystematicBasisParameters(), new_params);
+    InsertParameters(NumParameters(), new_params);
   }
   void AddParameter(ParamInfo const &new_param) {
-    InsertParameter(NumSystematicBasisParameters(), new_param);
+    InsertParameter(NumParameters(), new_param);
   }
 
-  std::string SystematicParameterToString(int i) const;
-
-  void SetParameterCorrelation(int pidi, int pidj, double corr);
+  void SetParameterCorrelation(int i, int j, double corr);
   void SetParameterAllCorrelations(
       int paramid, std::map<std::string, double> const &correlations);
 
   int FindParameter(std::string const &name) const;
   int FindParameterByFancyName(std::string const &fancy_name) const;
-  int NumSystematicBasisParameters() const { return int(params.prefit.size()); }
-  int NumPCBasisParameters() const {
-    return NumSystematicBasisParameters() - pca.nrotated_syst_parameters() +
-           pca.npc_parameters();
-  }
 
-  struct {
-    int first_index, last_index, ntail;
-    Eigen::MatrixXd pc_to_syst_rotation;
-    Eigen::MatrixXd syst_to_pc_rotation;
-
-    int nrotated_syst_parameters() const {
-      return int(pc_to_syst_rotation.rows());
-    }
-    int npc_parameters() const { return int(pc_to_syst_rotation.cols()); }
-  } pca;
-
-  void ConstructTruncatedPCA(double threshold, int first, int last);
-
-  void RotatePCParameterValuesToSystematicBasis(
-      Eigen::ArrayXd const &pc_vals, Eigen::ArrayXd &systematic_vals) const;
-
-  void RotateSystematicParameterValuesToPCBasis(
-      Eigen::ArrayXd const &systematic_vals, Eigen::ArrayXd &pc_vals) const;
-
-  constexpr static int ParameterInPCABlock = std::numeric_limits<int>::max();
-  int SystematicParameterIndexToPCIndex(int i) const;
+  int NumParameters() const { return int(params.prefit.size()); }
+  std::string SystematicParameterToString(int i) const;
 
   double Chi2(Eigen::ArrayXd const &systematic_vals);
 
   StepProposer MakeProposer() const;
+  StepProposer MakePCAProposer(double threshold, int first, int last) const;
 
   struct {
     /// The input root file we read in

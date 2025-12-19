@@ -22,9 +22,9 @@ ParameterHandlerBase::ParameterHandlerBase(std::string name, std::string file,
 
   proposer = parlist.MakeProposer();
 
-  throwMatrix = new TMatrixDSym(int(proposer.params.proposal.rows()),
-                                int(proposer.params.proposal.cols()));
-  M3::EigenToROOT(proposer.params.proposal, *throwMatrix);
+  throwMatrix = new TMatrixDSym(int(proposer.proposal_basis.proposal.rows()),
+                                int(proposer.proposal_basis.proposal.cols()));
+  M3::EigenToROOT(proposer.proposal_basis.proposal, *throwMatrix);
 }
 // ********************************************
 ParameterHandlerBase::ParameterHandlerBase(
@@ -62,21 +62,14 @@ ParameterHandlerBase::ParameterHandlerBase(
   M3::EigenToROOT(parlist.params.inv_covariance, *invCovMatrix);
 
   if (pca) {
-    ConstructPCA(threshold, FirstPCA, LastPCA);
+    proposer = parlist.MakePCAProposer(threshold, FirstPCA, LastPCA);
+  } else {
+    proposer = parlist.MakeProposer();
   }
 
-  proposer = parlist.MakeProposer();
-
-  throwMatrix = new TMatrixDSym(int(proposer.params.proposal.rows()),
-                                int(proposer.params.proposal.cols()));
-  M3::EigenToROOT(proposer.params.proposal, *throwMatrix);
-}
-
-// ********************************************
-void ParameterHandlerBase::ConstructPCA(const double threshold,
-                                        int FirstPCAdpar, int LastPCAdpar) {
-  // ********************************************
-  parlist.ConstructTruncatedPCA(threshold, FirstPCAdpar, LastPCAdpar);
+  throwMatrix = new TMatrixDSym(int(proposer.proposal_basis.proposal.rows()),
+                                int(proposer.proposal_basis.proposal.cols()));
+  M3::EigenToROOT(proposer.proposal_basis.proposal, *throwMatrix);
 }
 
 // ********************************************
@@ -99,16 +92,14 @@ void ParameterHandlerBase::SetPar(int i, double val) {
   MACH3LOG_INFO("_fPropVal ({}), _fCurrVal ({}), _fPreFitValue ({}) to ({})",
                 proposed[i], current[i], parlist.params.prefit[i], val);
 
-  parlist.RotateSystematicParameterValuesToPCBasis(current,
-                                                   proposer.params.current);
-  parlist.RotateSystematicParameterValuesToPCBasis(proposed,
-                                                   proposer.params.proposed);
+  proposer.SetSystematicParameterValues(current);
 }
 
 // ********************************************
 std::vector<double> ParameterHandlerBase::GetProposed() const {
   // ********************************************
-  return M3::EigenToStdVector(proposer.params.proposed);
+  proposer.GetSystematicParameterValues(proposed);
+  return M3::EigenToStdVector(proposed);
 }
 
 // *************************************
@@ -136,10 +127,8 @@ void ParameterHandlerBase::ThrowParameters() {
 
   proposer.Accept();
 
-  parlist.RotatePCParameterValuesToSystematicBasis(proposer.params.current,
-                                                   current);
-  parlist.RotatePCParameterValuesToSystematicBasis(proposer.params.proposed,
-                                                   proposed);
+  proposer.GetSystematicParameterValues(current);
+  proposed = current;
 }
 
 // *************************************
@@ -152,7 +141,7 @@ void ParameterHandlerBase::RandomConfiguration() {
   // likelihood Want to change the _fPropVal, _fCurrVal, _fPreFitValue
   // _fPreFitValue and the others will already be set
 
-  for (int i = 0; i < parlist.NumSystematicBasisParameters(); ++i) {
+  for (int i = 0; i < parlist.NumParameters(); ++i) {
     // Check if parameter is fixed first: if so don't randomly throw
     if (IsParameterFixed(i)) {
       continue;
@@ -188,8 +177,7 @@ void ParameterHandlerBase::RandomConfiguration() {
     MACH3LOG_INFO("Setting current step in {} param {}, {} = {} from {}",
                   GetName(), i, GetParName(i), current[i], current[i]);
   }
-  parlist.RotateSystematicParameterValuesToPCBasis(current,
-                                                   proposer.params.proposed);
+  proposer.SetSystematicParameterValues(current);
   proposer.Accept();
   proposed = current;
 }
@@ -211,8 +199,7 @@ void ParameterHandlerBase::SetParCurrProp(const int parNo,
 
 void ParameterHandlerBase::SetParProp(const int i, const double val) {
   proposed[i] = val;
-  parlist.RotateSystematicParameterValuesToPCBasis(proposed,
-                                                   proposer.params.proposed);
+  proposer.SetSystematicParameterValues(proposed);
 }
 
 void ParameterHandlerBase::SetRandomThrow(const int, const double) {
@@ -230,8 +217,7 @@ double ParameterHandlerBase::GetRandomThrow(const int) const {
 void ParameterHandlerBase::ProposeStep() {
   // ************************************************
   proposer.Propose();
-  parlist.RotatePCParameterValuesToSystematicBasis(proposer.params.proposed,
-                                                   proposed);
+  proposer.GetSystematicParameterValues(proposed);
 }
 
 // ********************************************
@@ -239,8 +225,7 @@ void ParameterHandlerBase::ProposeStep() {
 void ParameterHandlerBase::AcceptStep() _noexcept_ {
   // ********************************************
   proposer.Accept();
-  parlist.RotatePCParameterValuesToSystematicBasis(proposer.params.current,
-                                                   current);
+  current = proposed;
 }
 
 // ********************************************
@@ -249,11 +234,11 @@ void ParameterHandlerBase::AcceptStep() _noexcept_ {
 void ParameterHandlerBase::ThrowParProp(const double mag) {
   // ********************************************
   Eigen::VectorXd new_proposed =
-      ((proposer.Propose() - proposer.params.current) * mag) +
-      proposer.params.current;
+      ((proposer.Propose() - proposer.proposal_basis.current) * mag) +
+      proposer.proposal_basis.current;
   // probably fine but avoid ailiasing for now
-  proposer.params.proposed = new_proposed;
-  parlist.RotatePCParameterValuesToSystematicBasis(new_proposed, proposed);
+  proposer.proposal_basis.proposed = new_proposed;
+  proposer.GetSystematicParameterValues(proposed);
 }
 // ********************************************
 // Helper function to throw the current parameter by mag sigmas
@@ -261,21 +246,21 @@ void ParameterHandlerBase::ThrowParProp(const double mag) {
 void ParameterHandlerBase::ThrowParCurr(const double mag) {
   // ********************************************
 
-  Eigen::VectorXd curr_proposed = proposer.params.proposed;
+  Eigen::VectorXd curr_proposed = proposer.proposal_basis.proposed;
   Eigen::VectorXd new_curr =
-      ((proposer.Propose() - proposer.params.current) * mag);
-  proposer.params.current = new_curr;
+      ((proposer.Propose() - proposer.proposal_basis.current) * mag);
+  proposer.proposal_basis.current = new_curr;
   // probably fine but avoid ailiasing for now
-  proposer.params.proposed = curr_proposed;
+  proposer.proposal_basis.proposed = curr_proposed;
 
-  parlist.RotatePCParameterValuesToSystematicBasis(new_curr, current);
+  proposer.TranformProposalParametersToSystematicBasis(new_curr, current);
 }
 // ********************************************
 // Function to print the prior values
 void ParameterHandlerBase::PrintNominal() const {
   // ********************************************
   MACH3LOG_INFO("Prior values for {} ParameterHandler:", GetName());
-  for (int i = 0; i < parlist.NumSystematicBasisParameters(); i++) {
+  for (int i = 0; i < parlist.NumParameters(); i++) {
     MACH3LOG_INFO("    {}   {} ", GetParFancyName(i), GetParInit(i));
   }
 }
@@ -285,16 +270,16 @@ void ParameterHandlerBase::PrintNominal() const {
 void ParameterHandlerBase::PrintNominalCurrProp() const {
   // ********************************************
 
-  parlist.RotatePCParameterValuesToSystematicBasis(proposer.params.current,
-                                                   current);
+  proposer.TranformProposalParametersToSystematicBasis(
+      proposer.proposal_basis.current, current);
 
-  parlist.RotatePCParameterValuesToSystematicBasis(proposer.params.proposed,
-                                                   proposed);
+  proposer.TranformProposalParametersToSystematicBasis(
+      proposer.proposal_basis.proposed, proposed);
 
   MACH3LOG_INFO("Printing parameters for {}", GetName());
   MACH3LOG_INFO("{:<30} {:<10} {:<10} {:<10}", "Name", "Prior", "Current",
                 "Proposed");
-  for (int i = 0; i < parlist.NumSystematicBasisParameters(); ++i) {
+  for (int i = 0; i < parlist.NumParameters(); ++i) {
     MACH3LOG_INFO("{:<30} {:<10.2f} {:<10.2f} {:<10.2f}", GetParFancyName(i),
                   parlist.params.prefit[i], proposed[i], current[i]);
   }
@@ -308,8 +293,7 @@ void ParameterHandlerBase::PrintNominalCurrProp() const {
 //                    false = evaluate likelihood (so run with a prior)
 double ParameterHandlerBase::CalcLikelihood() _noexcept_ {
   // ********************************************
-  parlist.RotatePCParameterValuesToSystematicBasis(proposer.params.proposed,
-                                                   proposed);
+  proposer.GetSystematicParameterValues(proposed);
 
   return parlist.Chi2(proposed);
 }
@@ -318,8 +302,7 @@ double ParameterHandlerBase::CalcLikelihood() _noexcept_ {
 int ParameterHandlerBase::CheckBounds() const _noexcept_ {
   // ********************************************
 
-  parlist.RotatePCParameterValuesToSystematicBasis(proposer.params.proposed,
-                                                   proposed);
+  proposer.GetSystematicParameterValues(proposed);
 
   return int(((proposed.array() < parlist.params.lowbound.array()) ||
               (proposed.array() >= parlist.params.upbound.array()))
@@ -349,8 +332,8 @@ double ParameterHandlerBase::GetCorrThrows(const int) const {
 }
 
 bool ParameterHandlerBase::GetFlatPrior(const int i) const {
-  int propidx = parlist.SystematicParameterIndexToPCIndex(i);
-  if (propidx != ParameterList::ParameterInPCABlock) {
+  int propidx = proposer.GetProposalParameterIndexFromSystematicIndex(i);
+  if (propidx != StepProposer::ParameterInPCABlock) {
     return parlist.params.flatprior[i];
   } else {
     MACH3LOG_ERROR("You are trying Fix parameter {}, {}, which has been PCA'd.",
@@ -366,19 +349,16 @@ void ParameterHandlerBase::SetParameters(const std::vector<double> &pars) {
   // If empty, set the proposed to prior
   if (pars.empty()) {
     // For xsec this means setting to the prior (because prior is the prior)
-    parlist.RotateSystematicParameterValuesToPCBasis(parlist.params.prefit,
-                                                     proposer.params.proposed);
+    proposer.SetSystematicParameterValues(parlist.params.prefit);
     // If not empty, set the parameters to the specified
   } else {
-    if (int(pars.size()) != parlist.NumSystematicBasisParameters()) {
+    if (int(pars.size()) != parlist.NumParameters()) {
       MACH3LOG_ERROR("Parameter arrays of incompatible size! Not changing "
                      "parameters! {} has size {} but was expecting {}",
-                     GetName(), pars.size(),
-                     parlist.NumSystematicBasisParameters());
+                     GetName(), pars.size(), parlist.NumParameters());
       throw MaCh3Exception(__FILE__, __LINE__);
     }
-    parlist.RotateSystematicParameterValuesToPCBasis(M3::StdVectorToEigen(pars),
-                                                     proposer.params.proposed);
+    proposer.SetSystematicParameterValues(M3::StdVectorToEigen(pars));
   }
 }
 
@@ -386,13 +366,13 @@ void ParameterHandlerBase::SetParameters(const std::vector<double> &pars) {
 void ParameterHandlerBase::SetBranches(TTree &tree, bool SaveProposal) {
   // ********************************************
   // loop over parameters and set a branch
-  for (int i = 0; i < parlist.NumSystematicBasisParameters(); ++i) {
+  for (int i = 0; i < parlist.NumParameters(); ++i) {
     tree.Branch(GetParName(i).c_str(), &current.data()[i],
                 Form("%s/D", GetParName(i).c_str()));
   }
   if (SaveProposal) {
     // loop over parameters and set a branch
-    for (int i = 0; i < parlist.NumSystematicBasisParameters(); ++i) {
+    for (int i = 0; i < parlist.NumParameters(); ++i) {
       tree.Branch(Form("%s_Prop", GetParName(i).c_str()), &proposed.data()[i],
                   Form("%s_Prop/D", GetParName(i).c_str()));
     }
@@ -411,15 +391,14 @@ void ParameterHandlerBase::SetStepScale(const double scale,
 
   if (verbose) {
     MACH3LOG_INFO("{} setStepScale() = {}", GetName(), scale);
-    const double SuggestedScale =
-        2.38 / std::sqrt(parlist.NumPCBasisParameters());
+    const double SuggestedScale = 2.38 / std::sqrt(parlist.NumParameters());
     if (std::fabs(scale - SuggestedScale) / SuggestedScale > 1) {
       MACH3LOG_WARN(
           "Defined Global StepScale is {}, while suggested suggested {}", scale,
           SuggestedScale);
     }
   }
-  proposer.params.global_scale = scale;
+  proposer.proposal_basis.global_scale = scale;
 }
 
 // ********************************************
@@ -431,15 +410,17 @@ int ParameterHandlerBase::GetParIndex(const std::string &name) const {
 // ********************************************
 void ParameterHandlerBase::SetFixAllParameters() {
   // ********************************************
-  proposer.params.isfree = Eigen::ArrayXi::Ones(proposer.NumParameters());
+  proposer.systematic_basis.isfree.setZero();
+  proposer.proposal_basis.isfree.setZero();
 }
 
 // ********************************************
 void ParameterHandlerBase::SetFixParameter(const int i) {
   // ********************************************
-  int propidx = parlist.SystematicParameterIndexToPCIndex(i);
-  if (propidx != ParameterList::ParameterInPCABlock) {
-    proposer.params.isfree[propidx] = false;
+  int propidx = proposer.GetProposalParameterIndexFromSystematicIndex(i);
+  if (propidx != StepProposer::ParameterInPCABlock) {
+    proposer.proposal_basis.isfree[propidx] = false;
+    proposer.systematic_basis.isfree[i] = false;
   } else {
     MACH3LOG_ERROR("You are trying Fix parameter {}, {}, which has been PCA'd.",
                    i, GetParName(i));
@@ -456,15 +437,17 @@ void ParameterHandlerBase::SetFixParameter(const std::string &name) {
 // ********************************************
 void ParameterHandlerBase::SetFreeAllParameters() {
   // ********************************************
-  proposer.params.isfree = Eigen::ArrayXi::Ones(proposer.NumParameters());
+  proposer.systematic_basis.isfree.setOnes();
+  proposer.proposal_basis.isfree.setOnes();
 }
 
 // ********************************************
 void ParameterHandlerBase::SetFreeParameter(const int i) {
   // ********************************************
-  int propidx = parlist.SystematicParameterIndexToPCIndex(i);
-  if (propidx != ParameterList::ParameterInPCABlock) {
-    proposer.params.isfree[propidx] = true;
+  int propidx = proposer.GetProposalParameterIndexFromSystematicIndex(i);
+  if (propidx != StepProposer::ParameterInPCABlock) {
+    proposer.proposal_basis.isfree[propidx] = true;
+    proposer.systematic_basis.isfree[i] = true;
   } else {
     MACH3LOG_ERROR(
         "You are trying Free parameter {}, {}, which has been PCA'd.", i,
@@ -502,8 +485,8 @@ bool ParameterHandlerBase::IsParameterFixed(const int) const {
   throw std::runtime_error("ParameterHandlerBase::IsParameterFixed Removed");
 }
 
-bool ParameterHandlerBase::IsPCParameterFixed(const int i) const {
-  return !proposer.params.isfree[i];
+bool ParameterHandlerBase::IsProposalParameterFixed(const int i) const {
+  return !proposer.proposal_basis.isfree[i];
 }
 
 // ********************************************
@@ -516,8 +499,8 @@ bool ParameterHandlerBase::IsParameterFixed(const std::string &) const {
 void ParameterHandlerBase::SetFlatPrior(const int i, const bool eL) {
   // ********************************************
 
-  int propidx = parlist.SystematicParameterIndexToPCIndex(i);
-  if (propidx != ParameterList::ParameterInPCABlock) {
+  int propidx = proposer.GetProposalParameterIndexFromSystematicIndex(i);
+  if (propidx != StepProposer::ParameterInPCABlock) {
     parlist.params.flatprior[i] = eL;
   } else {
     MACH3LOG_ERROR("You are trying set a flat prior for parameter {}, {}, "
@@ -527,43 +510,44 @@ void ParameterHandlerBase::SetFlatPrior(const int i, const bool eL) {
   }
 }
 
-std::string ParameterHandlerBase::GetPCParName(const int i) {
-  int propidx = parlist.SystematicParameterIndexToPCIndex(i);
-  if (propidx != ParameterList::ParameterInPCABlock) {
+std::string ParameterHandlerBase::GetProposalParName(const int i) {
+  int propidx = proposer.GetProposalParameterIndexFromSystematicIndex(i);
+  if (propidx != StepProposer::ParameterInPCABlock) {
     return parlist.params.name[propidx];
   } else {
-    return "PCA_" + std::to_string(i - parlist.pca.first_index);
+    return "PCA_" +
+           std::to_string(i - proposer.systematic_basis.pca.first_index);
   }
 }
 
-double ParameterHandlerBase::GetPCParInit(const int i) {
-  int propidx = parlist.SystematicParameterIndexToPCIndex(i);
-  if (propidx != ParameterList::ParameterInPCABlock) {
+double ParameterHandlerBase::GetProposalParInit(const int i) {
+  int propidx = proposer.GetProposalParameterIndexFromSystematicIndex(i);
+  if (propidx != StepProposer::ParameterInPCABlock) {
     return parlist.params.prefit[propidx];
   } else {
     return 0;
   }
 }
 
-double ParameterHandlerBase::GetPCDiagonalError(const int i) {
-  int propidx = parlist.SystematicParameterIndexToPCIndex(i);
-  if (propidx != ParameterList::ParameterInPCABlock) {
+double ParameterHandlerBase::GetProposalDiagonalError(const int i) {
+  int propidx = proposer.GetProposalParameterIndexFromSystematicIndex(i);
+  if (propidx != StepProposer::ParameterInPCABlock) {
     return GetDiagonalError(propidx);
   } else {
     return 1;
   }
 }
-double ParameterHandlerBase::GetPCLowerBound(const int i) {
-  int propidx = parlist.SystematicParameterIndexToPCIndex(i);
-  if (propidx != ParameterList::ParameterInPCABlock) {
+double ParameterHandlerBase::GetProposalLowerBound(const int i) {
+  int propidx = proposer.GetProposalParameterIndexFromSystematicIndex(i);
+  if (propidx != StepProposer::ParameterInPCABlock) {
     return GetLowerBound(propidx);
   } else {
     return -3;
   }
 }
-double ParameterHandlerBase::GetPCUpperBound(const int i) {
-  int propidx = parlist.SystematicParameterIndexToPCIndex(i);
-  if (propidx != ParameterList::ParameterInPCABlock) {
+double ParameterHandlerBase::GetProposalUpperBound(const int i) {
+  int propidx = proposer.GetProposalParameterIndexFromSystematicIndex(i);
+  if (propidx != StepProposer::ParameterInPCABlock) {
     return GetUpperBound(propidx);
   } else {
     return 3;
@@ -572,49 +556,51 @@ double ParameterHandlerBase::GetPCUpperBound(const int i) {
 
 void ParameterHandlerBase::SetIndivStepScale(const int ParameterIndex,
                                              const double StepScale) {
-  int idx = parlist.SystematicParameterIndexToPCIndex(ParameterIndex);
-  if (idx == ParameterList::ParameterInPCABlock) {
+  int idx =
+      proposer.GetProposalParameterIndexFromSystematicIndex(ParameterIndex);
+  if (idx == StepProposer::ParameterInPCABlock) {
     MACH3LOG_ERROR("You are trying to set the step scale of parameter {}, {}, "
                    "which has been PCA'd.",
                    ParameterIndex, GetParName(ParameterIndex));
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
-  proposer.params.scale[idx] = StepScale;
+  proposer.proposal_basis.scale[idx] = StepScale;
 }
 
 double ParameterHandlerBase::GetIndivStepScale(const int ParameterIndex) const {
-  int idx = parlist.SystematicParameterIndexToPCIndex(ParameterIndex);
-  if (idx == ParameterList::ParameterInPCABlock) {
+  int idx =
+      proposer.GetProposalParameterIndexFromSystematicIndex(ParameterIndex);
+  if (idx == StepProposer::ParameterInPCABlock) {
     MACH3LOG_ERROR("You are trying to get the step scale of parameter {}, {}, "
                    "which has been PCA'd.",
                    ParameterIndex, GetParName(ParameterIndex));
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
-  return proposer.params.scale[idx];
+  return proposer.proposal_basis.scale[idx];
 }
 
 // ********************************************
 void ParameterHandlerBase::SetIndivStepScale(
     const std::vector<double> &stepscale) {
   // ********************************************
-  if (int(stepscale.size()) != parlist.NumSystematicBasisParameters()) {
+  if (int(stepscale.size()) != parlist.NumParameters()) {
     MACH3LOG_WARN(
         "Stepscale vector not equal to number of parameters. Quitting..");
     MACH3LOG_WARN("Size of argument vector: {}", stepscale.size());
-    MACH3LOG_WARN("Expected size: {}", parlist.NumSystematicBasisParameters());
+    MACH3LOG_WARN("Expected size: {}", parlist.NumParameters());
     return;
   }
 
-  for (int i = 0; i < parlist.NumSystematicBasisParameters(); ++i) {
+  for (int i = 0; i < parlist.NumParameters(); ++i) {
 
-    int idx = parlist.SystematicParameterIndexToPCIndex(i);
-    if (idx == ParameterList::ParameterInPCABlock) {
+    int idx = proposer.GetProposalParameterIndexFromSystematicIndex(i);
+    if (idx == StepProposer::ParameterInPCABlock) {
       continue;
     }
 
-    proposer.params.scale[idx] = stepscale[i];
+    proposer.proposal_basis.scale[idx] = stepscale[i];
   }
 
   PrintIndivStepScale();
@@ -625,14 +611,13 @@ void ParameterHandlerBase::PrintIndivStepScale() const {
   // ********************************************
   MACH3LOG_INFO("============================================================");
   MACH3LOG_INFO("{:<{}} | {:<11}", "Parameter:", PrintLength, "Step scale:");
-  for (int iParam = 0; iParam < parlist.NumSystematicBasisParameters();
-       iParam++) {
-    int idx = parlist.SystematicParameterIndexToPCIndex(iParam);
-    if (idx == ParameterList::ParameterInPCABlock) {
+  for (int iParam = 0; iParam < parlist.NumParameters(); iParam++) {
+    int idx = proposer.GetProposalParameterIndexFromSystematicIndex(iParam);
+    if (idx == StepProposer::ParameterInPCABlock) {
       MACH3LOG_INFO("{:<{}} | {:<11}", GetParName(idx), PrintLength, "PCA'd");
     } else {
       MACH3LOG_INFO("{:<{}} | {:<11}", GetParName(idx), PrintLength,
-                    proposer.params.scale[idx]);
+                    proposer.proposal_basis.scale[idx]);
     }
   }
   MACH3LOG_INFO("============================================================");
@@ -641,8 +626,8 @@ void ParameterHandlerBase::PrintIndivStepScale() const {
 // ********************************************
 void ParameterHandlerBase::ResetIndivStepScale() {
   // ********************************************
-  proposer.params.global_scale = 1;
-  proposer.params.scale = Eigen::ArrayXd::Ones(proposer.NumParameters());
+  proposer.proposal_basis.global_scale = 1;
+  proposer.proposal_basis.scale.setOnes();
 }
 
 // ********************************************
@@ -655,22 +640,20 @@ void ParameterHandlerBase::SetThrowMatrix(TMatrixDSym *cov) {
   Eigen::MatrixXd covariance = M3::ROOTToEigen(*cov);
 
   Eigen::MatrixXd covariance_pc =
-      Eigen::MatrixXd::Zero(proposer.NumParameters(), proposer.NumParameters());
+      Eigen::MatrixXd::Identity(proposer.NumProposalBasisParameters(),
+                                proposer.NumProposalBasisParameters());
 
-  covariance_pc.topLeftCorner(parlist.pca.first_index,
-                              parlist.pca.first_index) =
-      parlist.params.covariance.topLeftCorner(parlist.pca.first_index,
-                                              parlist.pca.first_index);
+  covariance_pc.topLeftCorner(proposer.systematic_basis.pca.first_index,
+                              proposer.systematic_basis.pca.first_index) =
+      parlist.params.covariance.topLeftCorner(
+          proposer.systematic_basis.pca.first_index,
+          proposer.systematic_basis.pca.first_index);
 
-  covariance_pc.block(parlist.pca.first_index, parlist.pca.first_index,
-                      parlist.pca.npc_parameters(),
-                      parlist.pca.npc_parameters()) =
-      Eigen::MatrixXd::Identity(parlist.pca.npc_parameters(),
-                                parlist.pca.npc_parameters());
-
-  covariance_pc.bottomRightCorner(parlist.pca.ntail, parlist.pca.ntail) =
-      parlist.params.covariance.bottomRightCorner(parlist.pca.ntail,
-                                                  parlist.pca.ntail);
+  covariance_pc.bottomRightCorner(proposer.systematic_basis.pca.ntail,
+                                  proposer.systematic_basis.pca.ntail) =
+      parlist.params.covariance.bottomRightCorner(
+          proposer.systematic_basis.pca.ntail,
+          proposer.systematic_basis.pca.ntail);
 
   proposer.SetProposalMatrix(covariance_pc);
 }

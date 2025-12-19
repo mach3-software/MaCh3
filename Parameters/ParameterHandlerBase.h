@@ -202,12 +202,12 @@ public:
   std::string GetParName(const int i) const {
     return parlist.params.name.at(i);
   }
-  //need these 'reach into PC' functions for MINUIT
-  std::string GetPCParName(const int i);
-  double GetPCParInit(const int i);
-  double GetPCDiagonalError(const int i);
-  double GetPCLowerBound(const int i);
-  double GetPCUpperBound(const int i);
+  // need these 'reach into PC' functions for MINUIT
+  std::string GetProposalParName(const int i);
+  double GetProposalParInit(const int i);
+  double GetProposalDiagonalError(const int i);
+  double GetProposalLowerBound(const int i);
+  double GetProposalUpperBound(const int i);
 
   /// @brief Get index based on name
   /// @ingroup ParameterHandlerGetters
@@ -299,10 +299,10 @@ public:
 
   /// @brief Get total number of parameters
   /// @ingroup ParameterHandlerGetters
-  int GetNumSystematicParams() const {
-    return parlist.NumSystematicBasisParameters();
+  int GetNumSystematicParams() const { return parlist.NumParameters(); }
+  int GetNumProposalParams() const {
+    return proposer.NumProposalBasisParameters();
   }
-  int GetNumProposalParams() const { return parlist.NumPCBasisParameters(); }
   /// @brief Get the pre-fit values of the parameters.
   /// @ingroup ParameterHandlerGetters
   std::vector<double> GetPreFitValues() const {
@@ -345,12 +345,14 @@ public:
   double GetIndivStepScale(const int ParameterIndex) const;
   /// @brief Get global step scale for covariance object
   /// @ingroup ParameterHandlerGetters
-  double GetGlobalStepScale() const { return proposer.params.global_scale; }
+  double GetGlobalStepScale() const {
+    return proposer.proposal_basis.global_scale;
+  }
 
   /// @brief Get number of params which will be different depending if using
   /// Eigen decomposition or not
   /// @ingroup ParameterHandlerGetters
-  int GetNParameters() const { return parlist.NumSystematicBasisParameters(); }
+  int GetNParameters() const { return parlist.NumParameters(); }
 
   /// @brief Print prior value for every parameter
   void PrintNominal() const;
@@ -406,7 +408,7 @@ public:
   /// @brief Is parameter fixed or not
   /// @param i Parameter index
   bool IsParameterFixed(const int i) const;
-  bool IsPCParameterFixed(const int i) const;
+  bool IsProposalParameterFixed(const int i) const;
 
   /// @brief Is parameter fixed or not
   /// @param name Name of parameter you want to check if is fixed
@@ -458,5 +460,5 @@ protected:
 
 public:
   ParameterList parlist;
-  StepProposer proposer;
+  mutable StepProposer proposer;
 };

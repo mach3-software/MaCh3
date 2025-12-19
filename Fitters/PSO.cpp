@@ -80,10 +80,10 @@ void PSO::init() {
     for (auto &parhandlr : systematics) {
       fDim += parhandlr->GetNumProposalParams();
       for (int i = 0; i < parhandlr->GetNumProposalParams(); ++i) {
-        double curr = parhandlr->GetPCParInit(i);
-        double lim = 10.0 * parhandlr->GetPCDiagonalError(i);
-        double low = parhandlr->GetPCLowerBound(i);
-        double high = parhandlr->GetPCUpperBound(i);
+        double curr = parhandlr->GetProposalParInit(i);
+        double lim = 10.0 * parhandlr->GetProposalDiagonalError(i);
+        double low = parhandlr->GetProposalLowerBound(i);
+        double high = parhandlr->GetProposalUpperBound(i);
         if (low > curr - lim)
           ranges_min.push_back(low);
         else
@@ -94,7 +94,7 @@ void PSO::init() {
           ranges_min.push_back(curr + lim);
         prior.push_back(curr);
 
-        if (parhandlr->IsPCParameterFixed(i)) {
+        if (parhandlr->IsProposalParameterFixed(i)) {
           fixed.push_back(1);
         } else {
           fixed.push_back(0);

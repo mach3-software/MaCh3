@@ -46,7 +46,7 @@ double LikelihoodFit::CalcChi2PC(const double *x) {
 
     // set the parameters in the sampler basis
     std::copy_n(x + ParCounter, parhandlr->GetNumProposalParams(),
-                parhandlr->proposer.params.proposed.data());
+                parhandlr->proposer.proposal_basis.proposed.data());
     ParCounter += parhandlr->GetNumProposalParams();
 
     // this accepts the step for the proposer and rotates the parameters back to

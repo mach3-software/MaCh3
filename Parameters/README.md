@@ -5,7 +5,6 @@
 Elementary objects needed for sampling:
 - ParameterList
   - Read from YAML. Knows everything about each systematic parameter: name, error, possibly-correlated prior, restrictions on parameter applicability etc...
-  - Optionally performs basis translation and dimensionality truncation via block diagonal PCA and retains the transformations between the 'Systematic Parameter Basis' and the 'Proposer Parameter Basis' (possibly PCA'd).
 
 - StepProposer
   - Knows nothing about the meaning of parameters.
@@ -13,7 +12,7 @@ Elementary objects needed for sampling:
   - Keeps track of parameter step scales and possibly updates the proposal matrix as steps are accepted.
   - Possibly steps in a rotated parameter space.
   - Possibly has 'special proposals': flips and circular
-  - Does not need to know how to translate from its parameter basis back to the systematic parameter basis, that is the job of ParameterList
+  - Needs to know how to translate from its parameter basis back to the systematic parameter basis, that is the job of ParameterList
 
 
 Open Questions:

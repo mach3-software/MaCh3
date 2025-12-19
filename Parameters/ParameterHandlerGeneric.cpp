@@ -12,7 +12,7 @@ ParameterHandlerGeneric::ParameterHandlerGeneric(
   InitParametersTypeFromConfig();
 
   // ETA - again this really doesn't need to be here...
-  for (int i = 0; i < parlist.NumSystematicBasisParameters(); i++) {
+  for (int i = 0; i < parlist.NumParameters(); i++) {
     // Sort out the print length
     if (int(parlist.params.name[i].length()) > PrintLength)
       PrintLength = int(parlist.params.name[i].length());
@@ -111,7 +111,7 @@ void ParameterHandlerGeneric::DetermineGlobalParameterIndices() {
     GlobalParams.push_back(&par);
   }
 
-  //LP order by index... probably doesn't help but probably doesn't hurt
+  // LP order by index... probably doesn't help but probably doesn't hurt
   std::sort(GlobalParams.begin(), GlobalParams.end(),
             [](TypeParameterBase const *l, TypeParameterBase const *r) {
               return l->index < r->index;
@@ -467,7 +467,7 @@ void ParameterHandlerGeneric::IterateOverParams(const std::string &SampleName,
 // ********************************************
 void ParameterHandlerGeneric::InitParams() {
   // ********************************************
-  for (int i = 0; i < parlist.NumSystematicBasisParameters(); ++i) {
+  for (int i = 0; i < parlist.NumParameters(); ++i) {
     // ETA - set the name to be xsec_% as this is what ProcessorMCMC expects
     parlist.params.name[i] = "xsec_" + std::to_string(i);
 
@@ -794,7 +794,7 @@ void ParameterHandlerGeneric::SetGroupOnlyParameters(
   // ********************************************
   // If empty, set the proposed to prior
   if (Pars.empty()) {
-    for (int i = 0; i < parlist.NumSystematicBasisParameters(); i++) {
+    for (int i = 0; i < parlist.NumParameters(); i++) {
       if (IsParFromGroup(i, Group)) {
         SetParProp(i, GetParInit(i));
       }
@@ -807,7 +807,7 @@ void ParameterHandlerGeneric::SetGroupOnlyParameters(
       throw MaCh3Exception(__FILE__, __LINE__);
     }
     int Counter = 0;
-    for (int i = 0; i < parlist.NumSystematicBasisParameters(); i++) {
+    for (int i = 0; i < parlist.NumParameters(); i++) {
       // If belongs to group set value from parsed vector, otherwise use propose
       // value
       if (IsParFromGroup(i, Group)) {
@@ -823,7 +823,7 @@ void ParameterHandlerGeneric::SetGroupOnlyParameters(
 void ParameterHandlerGeneric::ToggleFixGroupOnlyParameters(
     const std::string &Group) {
   // ********************************************
-  for (int i = 0; i < parlist.NumSystematicBasisParameters(); ++i)
+  for (int i = 0; i < parlist.NumParameters(); ++i)
     if (IsParFromGroup(i, Group))
       ToggleFixParameter(i);
 }
@@ -842,7 +842,7 @@ void ParameterHandlerGeneric::ToggleFixGroupOnlyParameters(
 void ParameterHandlerGeneric::SetFixGroupOnlyParameters(
     const std::string &Group) {
   // ********************************************
-  for (int i = 0; i < parlist.NumSystematicBasisParameters(); ++i)
+  for (int i = 0; i < parlist.NumParameters(); ++i)
     if (IsParFromGroup(i, Group))
       SetFixParameter(i);
 }
@@ -861,7 +861,7 @@ void ParameterHandlerGeneric::SetFixGroupOnlyParameters(
 void ParameterHandlerGeneric::SetFreeGroupOnlyParameters(
     const std::string &Group) {
   // ********************************************
-  for (int i = 0; i < parlist.NumSystematicBasisParameters(); ++i)
+  for (int i = 0; i < parlist.NumParameters(); ++i)
     if (IsParFromGroup(i, Group))
       SetFreeParameter(i);
 }
@@ -898,7 +898,7 @@ int ParameterHandlerGeneric::GetNumParFromGroup(
     const std::string &Group) const {
   // ********************************************
   int Counter = 0;
-  for (int i = 0; i < parlist.NumSystematicBasisParameters(); i++) {
+  for (int i = 0; i < parlist.NumParameters(); i++) {
     if (IsParFromGroup(i, Group))
       Counter++;
   }
@@ -930,24 +930,17 @@ void ParameterHandlerGeneric::DumpMatrixToFile(const std::string &Name) {
   TObjArray *xsec_spline_interpolation = new TObjArray();
   TObjArray *xsec_spline_names = new TObjArray();
 
-  TVectorD *xsec_param_prior =
-      new TVectorD(parlist.NumSystematicBasisParameters());
-  TVectorD *xsec_flat_prior =
-      new TVectorD(parlist.NumSystematicBasisParameters());
-  TVectorD *xsec_stepscale =
-      new TVectorD(parlist.NumSystematicBasisParameters());
-  TVectorD *xsec_param_lb =
-      new TVectorD(parlist.NumSystematicBasisParameters());
-  TVectorD *xsec_param_ub =
-      new TVectorD(parlist.NumSystematicBasisParameters());
+  TVectorD *xsec_param_prior = new TVectorD(parlist.NumParameters());
+  TVectorD *xsec_flat_prior = new TVectorD(parlist.NumParameters());
+  TVectorD *xsec_stepscale = new TVectorD(parlist.NumParameters());
+  TVectorD *xsec_param_lb = new TVectorD(parlist.NumParameters());
+  TVectorD *xsec_param_ub = new TVectorD(parlist.NumParameters());
 
-  TVectorD *xsec_param_knot_weight_lb =
-      new TVectorD(parlist.NumSystematicBasisParameters());
-  TVectorD *xsec_param_knot_weight_ub =
-      new TVectorD(parlist.NumSystematicBasisParameters());
-  TVectorD *xsec_error = new TVectorD(parlist.NumSystematicBasisParameters());
+  TVectorD *xsec_param_knot_weight_lb = new TVectorD(parlist.NumParameters());
+  TVectorD *xsec_param_knot_weight_ub = new TVectorD(parlist.NumParameters());
+  TVectorD *xsec_error = new TVectorD(parlist.NumParameters());
 
-  for (int i = 0; i < parlist.NumSystematicBasisParameters(); ++i) {
+  for (int i = 0; i < parlist.NumParameters(); ++i) {
     TObjString *nameObj = new TObjString(GetParFancyName(i).c_str());
     xsec_param_names->AddLast(nameObj);
 

@@ -71,19 +71,18 @@ void ParameterList::InsertParameters(int insert_before,
   params.inv_covariance = Eigen::MatrixXd();
 }
 
-void ParameterList::SetParameterCorrelation(int pidi, int pidj, double corr) {
-  if (pidi == pidj) {
+void ParameterList::SetParameterCorrelation(int i, int j, double corr) {
+  if (i == j) {
     MACH3LOG_ERROR(
         "AddParameterCorrelation cannot be used to set covariance "
         "matrix diagonal elements: ({0},{0}) attempted to be set to {1}",
-        pidi, corr);
+        i, corr);
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
-  params.covariance(pidi, pidj) =
-      corr *
-      std::sqrt(params.covariance(pidi, pidi) * params.covariance(pidj, pidj));
-  params.covariance(pidj, pidi) = params.covariance(pidi, pidj);
+  params.covariance(i, j) =
+      corr * std::sqrt(params.covariance(i, i) * params.covariance(j, j));
+  params.covariance(j, i) = params.covariance(i, j);
 
   params.inv_covariance = Eigen::MatrixXd();
 }
@@ -122,80 +121,6 @@ int ParameterList::FindParameterByFancyName(
   return int(std::distance(params.fancy_name.begin(), pit));
 }
 
-void ParameterList::ConstructTruncatedPCA(double threshold, int first,
-                                          int last) {
-
-  M3::EnsureNoOutOfBlockCorrelations(params.covariance, {first, last});
-
-  pca.first_index = first;
-  pca.last_index = last;
-  pca.ntail = int(params.prefit.size() - (last + 1));
-
-  int blocksize = (last + 1) - first;
-
-  std::tie(pca.pc_to_syst_rotation, pca.syst_to_pc_rotation) =
-      CalculateTruncatedPCARotation(
-          params.covariance.block(pca.first_index, pca.first_index, blocksize,
-                                  blocksize),
-          threshold);
-
-  MACH3LOG_INFO("ParameterList::ConstructTruncatedPCA: threshold = {}, "
-                "nsystparams = {} truncated to {} PC params.",
-                threshold, pca.nrotated_syst_parameters(),
-                pca.npc_parameters());
-}
-
-void ParameterList::RotatePCParameterValuesToSystematicBasis(
-    Eigen::ArrayXd const &pc_vals, Eigen::ArrayXd &systematic_vals) const {
-
-  systematic_vals.head(pca.first_index) = pc_vals.head(pca.first_index);
-
-  // 1) rotate the principle component parameter values into 'deltas' in the
-  //  systematic basis into the by using the PCA matrix.
-  // 2) add on the prefit values from to these deltas to return to the
-  // systematic basis.
-  auto syst_param_delta =
-      (pca.pc_to_syst_rotation *
-       pc_vals.segment(pca.first_index, pca.npc_parameters()).matrix())
-          .array();
-
-  systematic_vals.segment(pca.first_index, pca.nrotated_syst_parameters()) =
-      params.prefit.segment(pca.first_index, pca.nrotated_syst_parameters()) +
-      syst_param_delta;
-
-  systematic_vals.tail(pca.ntail) = pc_vals.tail(pca.ntail);
-}
-
-void ParameterList::RotateSystematicParameterValuesToPCBasis(
-    Eigen::ArrayXd const &systematic_vals, Eigen::ArrayXd &pc_vals) const {
-
-  pc_vals.head(pca.first_index) = systematic_vals.head(pca.first_index);
-
-  // 1) subtract the prefit values from the current parameter values so that the
-  //   PC basis has a CV of 0
-  // 2) rotate the resulting parameter 'deltas' in the systematic basis into the
-  //  PC basis by using the transpose of the PCA matrix
-  auto syst_param_delta =
-      (systematic_vals - params.prefit)
-          .segment(pca.first_index, pca.nrotated_syst_parameters())
-          .matrix();
-
-  pc_vals.segment(pca.first_index, pca.npc_parameters()) =
-      (pca.syst_to_pc_rotation * syst_param_delta).array();
-
-  pc_vals.tail(pca.ntail) = systematic_vals.tail(pca.ntail);
-}
-
-int ParameterList::SystematicParameterIndexToPCIndex(int i) const {
-  if (i < pca.first_index) {
-    return i;
-  } else if ((i >= pca.first_index) && (i <= pca.last_index)) {
-    return ParameterInPCABlock;
-  } else {
-    return i - pca.nrotated_syst_parameters() + pca.npc_parameters();
-  }
-}
-
 double ParameterList::Chi2(Eigen::ArrayXd const &systematic_vals) {
 
   if (!params.inv_covariance.size()) {
@@ -208,46 +133,82 @@ double ParameterList::Chi2(Eigen::ArrayXd const &systematic_vals) {
   return diff.transpose() * params.inv_covariance * diff;
 }
 
-StepProposer ParameterList::MakeProposer() const {
+StepProposer ParameterList::MakePCAProposer(double threshold, int first,
+                                            int last) const {
   StepProposer proposer;
 
+  if ((first >= 0) && (first < params.prefit.size())) {
+
+    if (first >= last) {
+      MACH3LOG_ERROR("On constructing PCA'd StepProposer, given first index: "
+                     "{} and incompatible last index: {}.",
+                     first, last);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+
+    M3::EnsureNoOutOfBlockCorrelations(params.covariance, {first, last});
+
+    proposer.systematic_basis.pca.first_index = first;
+    proposer.systematic_basis.pca.last_index = last;
+    proposer.systematic_basis.pca.ntail =
+        int(params.prefit.size() - (last + 1));
+    proposer.systematic_basis.pca.offset = params.prefit;
+
+    int blocksize = (last + 1) - first;
+
+    std::tie(proposer.systematic_basis.pca.pc_to_syst_rotation,
+             proposer.systematic_basis.pca.syst_to_pc_rotation) =
+        CalculateTruncatedPCARotation(
+            params.covariance.block(proposer.systematic_basis.pca.first_index,
+                                    proposer.systematic_basis.pca.first_index,
+                                    blocksize, blocksize),
+            threshold);
+
+    MACH3LOG_INFO(
+        "ParameterList::MakePCAProposer: threshold = {}, "
+        "nsystparams = {} truncated to {} PC params.",
+        threshold,
+        proposer.systematic_basis.pca.nrotated_systematic_parameters(),
+        proposer.systematic_basis.pca.npc_parameters());
+  } else {
+    proposer.systematic_basis.pca.first_index = NumParameters();
+    proposer.systematic_basis.pca.last_index = NumParameters();
+    proposer.systematic_basis.pca.ntail = 0;
+  }
   // if we are using a PCA rotation then the proposer should only be aware of
   // the PC parameter basis.
 
   // copy the unrotated parameters and covariance blocks
-  int nproposer_parameters = NumPCBasisParameters();
+  int nproposer_parameters = proposer.NumProposalBasisParameters();
 
-  Eigen::ArrayXd prefit_pc = Eigen::ArrayXd::Zero(nproposer_parameters);
-
-  RotateSystematicParameterValuesToPCBasis(params.prefit, prefit_pc);
-
-  proposer.SetParameterValues(prefit_pc);
+  proposer.SetSystematicParameterValues(params.prefit);
 
   Eigen::MatrixXd covariance_pc =
-      Eigen::MatrixXd::Zero(nproposer_parameters, nproposer_parameters);
+      Eigen::MatrixXd::Identity(nproposer_parameters, nproposer_parameters);
 
-  covariance_pc.topLeftCorner(pca.first_index, pca.first_index) =
-      params.covariance.topLeftCorner(pca.first_index, pca.first_index);
+  covariance_pc.topLeftCorner(proposer.systematic_basis.pca.first_index,
+                              proposer.systematic_basis.pca.first_index) =
+      params.covariance.topLeftCorner(
+          proposer.systematic_basis.pca.first_index,
+          proposer.systematic_basis.pca.first_index);
 
-  covariance_pc.block(pca.first_index, pca.first_index, pca.npc_parameters(),
-                      pca.npc_parameters()) =
-      Eigen::MatrixXd::Identity(pca.npc_parameters(), pca.npc_parameters());
-
-  covariance_pc.bottomRightCorner(pca.ntail, pca.ntail) =
-      params.covariance.bottomRightCorner(pca.ntail, pca.ntail);
+  covariance_pc.bottomRightCorner(proposer.systematic_basis.pca.ntail,
+                                  proposer.systematic_basis.pca.ntail) =
+      params.covariance.bottomRightCorner(proposer.systematic_basis.pca.ntail,
+                                          proposer.systematic_basis.pca.ntail);
 
   proposer.SetProposalMatrix(covariance_pc);
 
   // PCA parameters get a step scale of 1
-  proposer.params.scale = Eigen::ArrayXd::Ones(NumPCBasisParameters());
-  proposer.params.isfree = Eigen::ArrayXi::Ones(NumPCBasisParameters());
+  proposer.proposal_basis.scale = Eigen::ArrayXd::Ones(nproposer_parameters);
+  proposer.proposal_basis.isfree = Eigen::ArrayXi::Ones(nproposer_parameters);
 
-  for (int i = 0; i < NumSystematicBasisParameters(); ++i) {
+  for (int i = 0; i < NumParameters(); ++i) {
 
-    int idx = SystematicParameterIndexToPCIndex(i);
+    int idx = proposer.GetProposalParameterIndexFromSystematicIndex(i);
 
     if (params.flip_pivot[i].first) {
-      if (idx == ParameterInPCABlock) {
+      if (idx == StepProposer::ParameterInPCABlock) {
         MACH3LOG_ERROR("Parameter, {}, index: {} is in the PCA block but "
                        "contained a special flip proposal definition",
                        params.name[i], i);
@@ -259,7 +220,7 @@ StepProposer ParameterList::MakeProposer() const {
     }
 
     if (std::get<0>(params.circ_bounds[i])) {
-      if (idx == ParameterInPCABlock) {
+      if (idx == StepProposer::ParameterInPCABlock) {
         MACH3LOG_ERROR(
             "Parameter, {}, index: {} is in the PCA block but "
             "contained a special circular bounds proposal definition",
@@ -271,30 +232,33 @@ StepProposer ParameterList::MakeProposer() const {
            std::get<2>(params.circ_bounds[i])});
     }
 
-    if (idx == ParameterInPCABlock) {
+    if (idx == StepProposer::ParameterInPCABlock) {
       continue;
     }
 
-    proposer.params.scale[idx] = params.stepscale[i];
-    proposer.params.isfree[idx] = params.isfree[i];
+    proposer.proposal_basis.scale[idx] = params.stepscale[i];
+    proposer.proposal_basis.isfree[idx] = params.isfree[i];
   }
 
-  proposer.params.global_scale = 1;
+  proposer.proposal_basis.global_scale = 1;
 
   return proposer;
+}
+
+StepProposer ParameterList::MakeProposer() const {
+  return MakePCAProposer(0, std::numeric_limits<int>::max(), 0);
 }
 
 std::string ParameterList::SystematicParameterToString(int i) const {
   return fmt::format(
       R"(name: {}, fancy_name: {}
-  prefit: {:.3g}, error: {:.3g}, bounds: [ {:.3g}, {:.3g} ], stepscale: {:.3g}
-  flatprior: {}, isfree: {}
-  is_pca: {}, has_flip: {}, has_circ_bounds: {})",
+    prefit: {:.3g}, error: {:.3g}, bounds: [ {:.3g}, {:.3g} ],
+      stepscale: {:.3g}
+      flatprior: {}, isfree: {} has_flip: {}, has_circ_bounds: {})",
       params.name[i], params.fancy_name[i], params.prefit[i], params.error[i],
       params.lowbound[i], params.upbound[i], params.stepscale[i],
-      params.flatprior[i], params.isfree[i],
-      SystematicParameterIndexToPCIndex(i) == ParameterInPCABlock,
-      params.flip_pivot[i].first, std::get<0>(params.circ_bounds[i]));
+      params.flatprior[i], params.isfree[i], params.flip_pivot[i].first,
+      std::get<0>(params.circ_bounds[i]));
 }
 
 ParameterList ParameterList::MakeFromYAML(YAML::Node const &config) {
@@ -476,10 +440,6 @@ ParameterList ParameterList::MakeFromYAML(YAML::Node const &config) {
 
   parlist.params.covariance = M3::MakeMatrixPosDef(parlist.params.covariance);
 
-  parlist.pca.first_index = parlist.NumSystematicBasisParameters();
-  parlist.pca.last_index = parlist.NumSystematicBasisParameters();
-  parlist.pca.ntail = 0;
-
   MACH3LOG_INFO("----------------");
   MACH3LOG_INFO("Found {} systematics parameters in total",
                 parlist.params.prefit.size());
@@ -557,10 +517,6 @@ ParameterList ParameterList::MakeFromTMatrix(std::string const &name,
   parlist.AddParameters(param_infos);
 
   parlist.params.covariance = M3::MakeMatrixPosDef(M3::ROOTToEigen(*CovMat));
-
-  parlist.pca.first_index = parlist.NumSystematicBasisParameters();
-  parlist.pca.last_index = parlist.NumSystematicBasisParameters();
-  parlist.pca.ntail = 0;
 
   return parlist;
 }

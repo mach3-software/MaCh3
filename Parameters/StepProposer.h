@@ -20,10 +20,37 @@ struct StepProposer {
   struct {
     Eigen::ArrayXd current, proposed, scale;
     Eigen::ArrayXi isfree;
-    double global_scale;
     Eigen::MatrixXd proposal;
     Eigen::MatrixXd l_proposal;
-  } params;
+    double global_scale;
+
+    // Used to keep track of if we have already transformed the current proposed
+    // parameters to the systematic_basis
+    size_t _propid;
+
+  } proposal_basis;
+
+  struct {
+    Eigen::ArrayXd proposed;
+
+    // Used to keep track of if we have already transformed the current proposed
+    // parameters to the systematic_basis
+    size_t _propid;
+
+    Eigen::ArrayXi isfree;
+
+    struct {
+      int first_index, last_index, ntail;
+      Eigen::ArrayXd offset;
+      Eigen::MatrixXd pc_to_syst_rotation;
+      Eigen::MatrixXd syst_to_pc_rotation;
+      int nrotated_systematic_parameters() const {
+        return int(pc_to_syst_rotation.rows());
+      }
+      int npc_parameters() const { return int(pc_to_syst_rotation.cols()); }
+    } pca;
+
+  } systematic_basis;
 
   struct {
     bool enabled;
@@ -50,14 +77,29 @@ struct StepProposer {
   StepProposer();
   StepProposer(Eigen::MatrixXd proposal_matrix, Eigen::ArrayXd current_values);
 
-  int NumParameters() const { return int(params.current.size()); }
-
-  void SetProposalMatrix(Eigen::MatrixXd proposal_matrix);
-  void SetParameterValues(Eigen::ArrayXd current_values) {
-    params.current = current_values;
+  int NumSystematicBasisParameters() const {
+    return int(proposal_basis.current.size());
+  }
+  int NumProposalBasisParameters() const {
+    return NumSystematicBasisParameters() -
+           systematic_basis.pca.nrotated_systematic_parameters() +
+           systematic_basis.pca.npc_parameters();
   }
 
-  void EnableAdaption(YAML::Node const &){}
+  void SetProposalMatrix(Eigen::MatrixXd proposal_matrix);
+
+  void SetSystematicParameterValues(Eigen::ArrayXd const &new_values);
+  void GetSystematicParameterValues(Eigen::ArrayXd &proposed_values);
+
+  void TranformProposalParametersToSystematicBasis(
+      Eigen::ArrayXd const &pc_vals, Eigen::ArrayXd &systematic_vals) const;
+  void TranformSystematicParametersProposalToBasis(
+      Eigen::ArrayXd const &systematic_vals, Eigen::ArrayXd &pc_vals) const;
+
+  constexpr static int ParameterInPCABlock = std::numeric_limits<int>::max();
+  int GetProposalParameterIndexFromSystematicIndex(int i) const;
+
+  void EnableAdaption(YAML::Node const &) {}
   // void SetAdaptionCovariance(Eigen::MatrixXd parameter_covariance,
   //                            size_t nsteps) {
   //   adaptive.nsteps = nsteps;
@@ -65,5 +107,5 @@ struct StepProposer {
   // }
 
   Eigen::ArrayXd const &Propose();
-  void Accept() { params.current = params.proposed; }
+  void Accept() { proposal_basis.current = proposal_basis.proposed; }
 };

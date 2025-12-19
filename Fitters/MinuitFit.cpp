@@ -65,15 +65,15 @@ void MinuitFit::RunMCMC() {
 
     for (int i = 0; i < parhandlr->GetNumProposalParams(); ++i, ++ParCounter) {
       // KS: Index, name, prior, step scale [different to MCMC],
-      minuit->SetVariable(ParCounter, (parhandlr->GetPCParName(i)),
-                          parhandlr->GetPCParInit(i),
-                          parhandlr->GetPCDiagonalError(i) / 10.0);
-      minuit->SetVariableValue(ParCounter, parhandlr->GetPCParInit(i));
+      minuit->SetVariable(ParCounter, (parhandlr->GetProposalParName(i)),
+                          parhandlr->GetProposalParInit(i),
+                          parhandlr->GetProposalDiagonalError(i) / 10.0);
+      minuit->SetVariableValue(ParCounter, parhandlr->GetProposalParInit(i));
       // KS: lower bound, upper bound, if Mirroring enabled then ignore
       if (!fMirroring)
-        minuit->SetVariableLimits(ParCounter, parhandlr->GetPCLowerBound(i),
-                                  parhandlr->GetPCUpperBound(i));
-      if (parhandlr->IsPCParameterFixed(i)) {
+        minuit->SetVariableLimits(ParCounter, parhandlr->GetProposalLowerBound(i),
+                                  parhandlr->GetProposalUpperBound(i));
+      if (parhandlr->IsProposalParameterFixed(i)) {
         minuit->FixVariable(ParCounter);
       }
     }
@@ -108,7 +108,7 @@ void MinuitFit::RunMCMC() {
 
     // set the parameters in the sampler basis
     std::copy_n(X + ParCounter, parhandlr->GetNumProposalParams(),
-                parhandlr->proposer.params.proposed.data());
+                parhandlr->proposer.proposal_basis.proposed.data());
 
     // this accepts the step for the proposer and rotates the parameters back to
     // the systematic basis
@@ -133,13 +133,13 @@ void MinuitFit::RunMCMC() {
     for (int i = 0; i < parhandlr->GetNumProposalParams(); ++i) {
 
       (*MinuitParValue)(ParCounter + i) =
-          parhandlr->proposer.params.proposed[i];
+          parhandlr->proposer.proposal_basis.proposed[i];
       (*MinuitParError)(ParCounter + i) = err[ParCounter + i];
 
       // KS: For fixed params HESS will not calculate error so we need to pass
       // prior error
-      if (parhandlr->IsPCParameterFixed(i)) {
-        (*MinuitParError)(ParCounter) = parhandlr->GetPCDiagonalError(i);
+      if (parhandlr->IsProposalParameterFixed(i)) {
+        (*MinuitParError)(ParCounter) = parhandlr->GetProposalDiagonalError(i);
         (*Postmatrix)(ParCounter, ParCounter) =
             (*MinuitParError)(ParCounter) * (*MinuitParError)(ParCounter);
       }
