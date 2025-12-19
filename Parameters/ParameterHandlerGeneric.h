@@ -196,6 +196,13 @@ public:
   std::vector<const double *>
   GetOscParsFromSampleName(const std::string &SampleName);
 
+  void
+  InsertParameters(int insert_at,
+                   std::vector<ParameterList::ParamInfo> const &new_params) {
+    parlist.InsertParameters(insert_at, new_params);
+    DetermineGlobalParameterIndices();
+  }
+
   void DetermineGlobalParameterIndices();
 
 protected:
