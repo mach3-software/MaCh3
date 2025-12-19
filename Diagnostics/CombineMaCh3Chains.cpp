@@ -206,6 +206,7 @@ bool CheckFolder(TFile* file, TFile* prevFile, const std::string& FolderName, co
 void CombineChain()
 {
   TFileMerger *fileMerger = new TFileMerger();
+  fileMerger->SetFastMethod(true);
 
   // EM: If we ever add new trees to the chain files they will need to be added here too
   fileMerger->AddObjectNames("posteriors");
@@ -243,7 +244,7 @@ void CombineChain()
 
     // EM: need to set this in the initial case
     if(prevFile == nullptr) {
-        prevFile = file;
+      prevFile = file;
     }
 
     MACH3LOG_DEBUG("############ File {} #############", fileId);
@@ -268,11 +269,36 @@ void CombineChain()
     // EM: file seems good, we'll add the trees to the lists
     fileMerger->AddFile(file);
 
+    if(prevFile != file) {
+      prevFile->Close();
+      delete prevFile;
+    }
+
     // EM: set these for the next iteration
     prevFile = file;
   }
 
+  TStopwatch clock;
+  clock.Start();
+
+  MACH3LOG_INFO("Starting merging");
+
   TFile *outputFile = fileMerger->GetOutputFile();
+
+  // EM: now let's combine all the trees and write to the output file
+  bool mergeSuccess = fileMerger->PartialMerge(TFileMerger::kRegular | TFileMerger::kAll | TFileMerger::kOnlyListed);
+  if(mergeSuccess){
+    MACH3LOG_INFO("Files merged successfully");
+  } else{
+    MACH3LOG_ERROR("Failed to merge files");
+  }
+
+  delete fileMerger;
+  clock.Stop();
+  MACH3LOG_INFO("Merging of took {:.2f}s to finish", clock.RealTime());
+
+  //KS: Sadly we need to open file to save TDirectories to not have weird copy of several obejcts there...
+  outputFile = M3::Open(OutFileName, "UPDATE", __FILE__, __LINE__);
   outputFile->cd();
 
   // EM: Write out the version and config files to the combined file
@@ -285,18 +311,6 @@ void CombineChain()
       delete macro;
     }
   }
-
-  // EM: now let's combine all the trees and write to the output file
-  bool mergeSuccess = fileMerger->PartialMerge(TFileMerger::kRegular | TFileMerger::kAll | TFileMerger::kOnlyListed);
-  if(mergeSuccess){
-    MACH3LOG_INFO("Files merged successfully");
-  } else{
-    MACH3LOG_ERROR("Failed to merge files");
-  }
-  delete fileMerger;
-
-  //KS: Sadly we need to open file to save TDirectories to not have weird copy of several obejcts there...
-  outputFile = M3::Open(OutFileName, "UPDATE", __FILE__, __LINE__);
 
   // Get the source directory
   TDirectory *MaCh3EngineDir = prevFile->Get<TDirectory>("MaCh3Engine");

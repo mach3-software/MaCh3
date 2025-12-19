@@ -3,7 +3,7 @@
 
 // ********************************************
 ParameterHandlerBase::ParameterHandlerBase(std::string name, std::string file, double threshold, int FirstPCA, int LastPCA)
-                     : inputFile(file), pca(false) {
+                     : inputFile(file), pca(true) {
 // ********************************************
   MACH3LOG_DEBUG("Constructing instance of ParameterHandler");
   doSpecialStepProposal = false;

@@ -207,6 +207,10 @@ void GetArithmetic(TH1D * const hist, double& Mean, double& Error) {
 // **************************
 void GetGaussian(TH1D*& hist, TF1* gauss, double& Mean, double& Error) {
 // **************************
+  // Supress spammy ROOT messages
+  int originalErrorLevel = gErrorIgnoreLevel;
+  gErrorIgnoreLevel = kFatal;
+
   const double meanval = hist->GetMean();
   const double err = hist->GetRMS();
   const double peakval = hist->GetBinCenter(hist->GetMaximumBin());
@@ -222,6 +226,9 @@ void GetGaussian(TH1D*& hist, TF1* gauss, double& Mean, double& Error) {
 
   Mean = gauss->GetParameter(1);
   Error = gauss->GetParameter(2);
+
+  // restore original warning setting
+  gErrorIgnoreLevel = originalErrorLevel;
 }
 
 // ***************
