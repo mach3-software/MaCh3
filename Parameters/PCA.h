@@ -7,6 +7,7 @@
 #pragma GCC diagnostic ignored "-Wconversion"
 #pragma GCC diagnostic ignored "-Wduplicated-branches"
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
+#pragma GCC diagnostic ignored "-Wnull-dereference"
 #include "Eigen/Dense"
 #pragma GCC diagnostic pop
 

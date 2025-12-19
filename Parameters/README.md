@@ -14,6 +14,5 @@ Elementary objects needed for sampling:
   - Possibly has 'special proposals': flips and circular
   - Needs to know how to translate from its parameter basis back to the systematic parameter basis, that is the job of ParameterList
 
-
 Open Questions:
 - Should the likelihood be calculated in the systematic (full) parameter space or the proposal (possibly truncated) parameter space. NPar might differ significantly?
