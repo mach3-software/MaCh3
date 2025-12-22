@@ -13,7 +13,7 @@ jobs:
       matrix:
         container: [
           "ghcr.io/mach3-software/mach3:alma9latest",
-          "ghcr.io/mach3-software/mach3:rocky9cudalatest"
+          #"ghcr.io/mach3-software/mach3:rocky9cudalatest" #
         ]
     container:
       image: ${{ matrix.container }}
@@ -25,15 +25,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-
-      - name: Free disk space for ICPX
-        run: |
-            echo "Performing full cleanup for ICPX build..."
-            sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc || true
-            docker system prune -af || true
-            sudo apt-get clean
-            sudo rm -rf /var/lib/apt/lists/*
-            df -h
             
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
