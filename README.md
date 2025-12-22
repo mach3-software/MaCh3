@@ -52,7 +52,7 @@ Don't forget to:
 source bin/setup.MaCh3.sh
 ```
 
-If the build fails, check your [system/environment requirements](#system-requirements). 
+If the build fails, check your [system/environment requirements](#system-requirements).
 
 ## Building against MaCh3
 To include MaCh3 in your cmake project you can use following syntax
@@ -182,17 +182,17 @@ MaCh3 requires a C++ compiler (e.g. [gcc](https://gcc.gnu.org)), [CMake](https:/
 ```
 
 If you don't already have the correct dependencies, you can install them in a variety of ways, e.g. building from source, via a package manager. If you have access to `cvmfs`, the easiest solution is probably to source an [LCG release](https://lcgdocs.web.cern.ch/lcgdocs/lcgreleases/introduction/). For example, on an x86_64 Alma9 machine:
-```
+```bash
 source /cvmfs/sft.cern.ch/lcg/views/LCG_108/x86_64-el9-gcc15-opt/setup.sh
 ```
 Alternatively, you can create a conda environment which *should* provide a ready-to-go environment. If you have micromamba, you can do:
-```
+```bash
 micromamba env create -n MaCh3 -c conda-forge root cmake
 ```
-and if you don't have micromamba installed, you can follow the instructions [here](https://mamba.readthedocs.io/en/latest/installation/micromamba-installation.html). 
+and if you don't have micromamba installed, you can follow the instructions [here](https://mamba.readthedocs.io/en/latest/installation/micromamba-installation.html).
 
 Before you build MaCh3 following the instructions at the [start](#building-against-mach3) of this README, make sure to activate the environment:
-```
+```bash
 micromamba activate MaCh3
 ```
 and do this everytime you begin from a fresh terminal and want to use MaCh3.
@@ -204,8 +204,7 @@ Other external libraries, which currently include:
 1. [yaml-cpp](https://github.com/jbeder/yaml-cpp)
 2. [spdlog](https://github.com/gabime/spdlog)
 
-are being handled through [CPM](https://github.com/cpm-cmake/CPM.cmake). 
-
+are being handled through [CPM](https://github.com/cpm-cmake/CPM.cmake).
 
 Based on several test here are recommended version:
 ```bash
