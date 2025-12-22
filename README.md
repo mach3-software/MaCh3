@@ -185,10 +185,11 @@ If you don't already have the correct dependencies, you can install them in a va
 ```
 source /cvmfs/sft.cern.ch/lcg/views/LCG_108/x86_64-el9-gcc15-opt/setup.sh
 ```
-Alternatively, you can create a conda environment and install ROOT. This will also install a C++ compiler for you and *should* provide a ready-to-go environment. I recommend using micromamba which you can install by following the instructions [here](https://mamba.readthedocs.io/en/latest/installation/micromamba-installation.html). Then create the environment with
+Alternatively, you can create a conda environment which *should* provide a ready-to-go environment. If you have micromamba, you can do:
 ```
-micromamba env create -n MaCh3 -c conda-forge root
+micromamba env create -n MaCh3 -c conda-forge root cmake
 ```
+and if you don't have micromamba installed, you can follow the instructions [here](https://mamba.readthedocs.io/en/latest/installation/micromamba-installation.html). 
 
 Before you build MaCh3 following the instructions at the [start](#building-against-mach3) of this README, make sure to activate the environment:
 ```
