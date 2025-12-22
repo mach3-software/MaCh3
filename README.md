@@ -197,7 +197,7 @@ micromamba activate MaCh3
 ```
 and do this everytime you begin from a fresh terminal and want to use MaCh3.
 
-> [!TIP] 
+> [!TIP]
 > For MacOS users: the conda environment approach has been validated to work for MacOS. Other avenues are likely to be more difficult.
 
 Other external libraries, which currently include:
