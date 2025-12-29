@@ -37,6 +37,9 @@ if(NOT TARGET spdlog::spdlog)
   cmessage(FATAL_ERROR "Didn't set up spdlog::spdlog")
 endif()
 
+# NuDock depends on nlohmann_json
+find_package(nlohmann_json REQUIRED)
+
 if(MaCh3_GPU_ENABLED)
   enable_language(CUDA)
   add_compile_definitions(CUDA)
