@@ -1,0 +1,21 @@
+ParameterHandlerGeneric
+=======================
+
+.. currentmodule:: pyMaCh3._pyMaCh3.parameters
+
+.. autoclass:: ParameterHandlerGeneric
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~ParameterHandlerGeneric.get_par_spline_name
+      ~ParameterHandlerGeneric.get_par_spline_type
+      ~ParameterHandlerGeneric.get_par_type
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: get_par_spline_name
+   .. automethod:: get_par_spline_type
+   .. automethod:: get_par_type

@@ -1,0 +1,17 @@
+DelayedMCMC
+===========
+
+.. currentmodule:: pyMaCh3._pyMaCh3.fitters
+
+.. autoclass:: DelayedMCMC
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~DelayedMCMC.set_chain_length
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: set_chain_length

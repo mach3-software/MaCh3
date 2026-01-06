@@ -1,0 +1,12 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classFitterBase.html" title="Base class for implementing fitting algorithms." alt="" coords="5,169,88,196"/>
+<area shape="rect" id="node2" href="$classLikelihoodFit.html" title="Implementation of base Likelihood Fit class, it is mostly responsible for likelihood calculation whil..." alt="" coords="151,81,246,108"/>
+<area shape="rect" id="node6" href="$classMCMCBase.html" title="Base class for MCMC fitting algorithms." alt="" coords="151,144,246,171"/>
+<area shape="rect" id="node9" href="$classPredictiveThrower.html" title="Implementation of Prior/Posterior Predictive and Bayesian p&#45;Value calculations following the approach..." alt="" coords="136,195,261,221"/>
+<area shape="rect" id="node10" href="$classPyFitterBase.html" title="EW: As FitterBase is an abstract base class we have to do some gymnastics to get it to get it into py..." alt="" coords="149,245,248,272"/>
+<area shape="rect" id="node3" href="$classMinuitFit.html" title="Implementation of Minuit fitting algorithm ." alt="" coords="329,5,401,32"/>
+<area shape="rect" id="node4" href="$classPSO.html" title="Class PSO, consist of a vector of object Class Particle and global best Takes in the size (number of ..." alt="" coords="339,56,390,83"/>
+<area shape="rect" id="node5" href="$classPyLikelihoodFit.html" title="EW: As LikelihoodFit is an abstract base class we have to do some gymnastics to get it to get it into..." alt="" coords="309,107,420,133"/>
+<area shape="rect" id="node7" href="$classMR2T2.html" title="MCMC algorithm implementing the Metropolis–Rosenbluth–Rosenbluth–Teller–Teller (MR T ) method." alt="" coords="332,157,397,184"/>
+<area shape="rect" id="node8" href="$classDelayedMR2T2.html" title="Implementation of delayed rejection for MR2T2." alt="" coords="468,157,580,184"/>
+</map>

@@ -1,0 +1,10 @@
+<map id="M3::MaCh3Program" name="M3::MaCh3Program">
+<area shape="rect" id="node1" title="Main program class that manages modules, plugins, and command&#45;line parsing." alt="" coords="585,128,724,155"/>
+<area shape="rect" id="node2" href="$classM3_1_1MaCh3ArgumentParser.html" title="Extended ArgumentParser with MaCh3&#45;specific functionality." alt="" coords="207,9,392,36"/>
+<area shape="rect" id="node3" title=" " alt="" coords="23,5,140,32"/>
+<area shape="rect" id="node4" title=" " alt="" coords="242,63,357,89"/>
+<area shape="rect" id="node5" title=" " alt="" coords="5,57,157,98"/>
+<area shape="rect" id="node6" title=" " alt="" coords="216,113,383,169"/>
+<area shape="rect" id="node7" title=" " alt="" coords="217,193,382,220"/>
+<area shape="rect" id="node8" title=" " alt="" coords="216,245,383,315"/>
+</map>
