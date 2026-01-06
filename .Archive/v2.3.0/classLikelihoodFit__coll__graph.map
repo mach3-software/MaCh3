@@ -1,0 +1,12 @@
+<map id="LikelihoodFit" name="LikelihoodFit">
+<area shape="rect" id="node1" title="Implementation of base Likelihood Fit class, it is mostly responsible for likelihood calculation whil..." alt="" coords="825,181,920,208"/>
+<area shape="rect" id="node2" href="$classFitterBase.html" title="Base class for implementing fitting algorithms." alt="" coords="693,181,776,208"/>
+<area shape="rect" id="node3" title=" " alt="" coords="371,5,572,32"/>
+<area shape="rect" id="node4" title=" " alt="" coords="371,57,571,98"/>
+<area shape="rect" id="node5" title=" " alt="" coords="374,123,569,149"/>
+<area shape="rect" id="node6" title=" " alt="" coords="379,174,563,215"/>
+<area shape="rect" id="node7" title=" " alt="" coords="181,272,261,299"/>
+<area shape="rect" id="node9" href="$classmanager.html" title="The manager class is responsible for managing configurations and settings." alt="" coords="435,303,507,329"/>
+<area shape="rect" id="node8" title=" " alt="" coords="5,265,132,306"/>
+<area shape="rect" id="node10" title=" " alt="" coords="399,353,544,380"/>
+</map>

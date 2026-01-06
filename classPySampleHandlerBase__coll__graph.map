@@ -1,0 +1,5 @@
+<map id="PySampleHandlerBase" name="PySampleHandlerBase">
+<area shape="rect" id="node1" title="EW: As SampleHandlerBase is an abstract base class we have to do some gymnastics to get it to get it ..." alt="" coords="33,171,191,197"/>
+<area shape="rect" id="node2" href="$classSampleHandlerBase.html" title="Class responsible for handling implementation of samples used in analysis, reweighting and returning ..." alt="" coords="41,95,183,121"/>
+<area shape="rect" id="node3" title=" " alt="" coords="5,5,219,32"/>
+</map>

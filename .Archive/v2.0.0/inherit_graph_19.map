@@ -1,0 +1,6 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classSampleHandlerBase.html" title="Class responsible for handling implementation of samples used in analysis, reweighting and returning ..." alt="" coords="5,31,147,57"/>
+<area shape="rect" id="node2" href="$classPySampleHandlerBase.html" title=" " alt="" coords="195,5,352,32"/>
+<area shape="rect" id="node3" href="$classSampleHandlerFD.html" title="Class responsible for handling implementation of samples used in analysis, reweighting and returning ..." alt="" coords="209,56,338,83"/>
+<area shape="rect" id="node4" href="$classPySampleHandlerFD.html" title=" " alt="" coords="400,56,545,83"/>
+</map>

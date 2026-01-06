@@ -1,0 +1,52 @@
+<map id="/hosthome/v1.5.0/manager/MaCh3Exception.h" name="/hosthome/v1.5.0/manager/MaCh3Exception.h">
+<area shape="rect" id="node1" title=" " alt="" coords="3455,5,3633,47"/>
+<area shape="rect" id="node2" href="$MaCh3Modes_8h.html" title=" " alt="" coords="515,273,693,315"/>
+<area shape="rect" id="node15" href="$manager_8h.html" title=" " alt="" coords="2407,273,2585,315"/>
+<area shape="rect" id="node32" href="$Monitor_8h.html" title="System and monitoring utilities for printing system information and status updates." alt="" coords="3323,184,3501,225"/>
+<area shape="rect" id="node34" href="$YamlHelper_8h.html" title="Utility functions for handling YAML nodes." alt="" coords="3455,95,3633,136"/>
+<area shape="rect" id="node35" href="$inputManager_8h.html" title=" " alt="" coords="3525,273,3713,315"/>
+<area shape="rect" id="node37" href="$plottingManager_8h.html" title=" " alt="" coords="3864,363,4067,404"/>
+<area shape="rect" id="node43" href="$styleManager_8h.html" title=" " alt="" coords="3890,273,4078,315"/>
+<area shape="rect" id="node45" href="$Structs_8h.html" title=" " alt="" coords="1055,184,1249,225"/>
+<area shape="rect" id="node49" href="$plottingUtils_8h.html" title=" " alt="" coords="4132,184,4311,225"/>
+<area shape="rect" id="node3" href="$MaCh3Modes_8cpp.html" title=" " alt="" coords="430,363,607,404"/>
+<area shape="rect" id="node4" href="$splineFDBase_8h.html" title=" " alt="" coords="187,363,355,404"/>
+<area shape="rect" id="node8" href="$samplePDFBase_8h.html" title=" " alt="" coords="819,363,1013,404"/>
+<area shape="rect" id="node5" href="$splineFDBase_8cpp.html" title=" " alt="" coords="308,452,476,493"/>
+<area shape="rect" id="node6" href="$samplePDFFDBase_8h.html" title=" " alt="" coords="177,631,372,672"/>
+<area shape="rect" id="node7" href="$samplePDFFDBase_8cpp.html" title=" " alt="" coords="43,720,237,761"/>
+<area shape="rect" id="node9" href="$samplePDFBase_8cpp.html" title=" " alt="" coords="819,452,1013,493"/>
+<area shape="rect" id="node10" href="$FitterBase_8h.html" title=" " alt="" coords="1709,541,1872,583"/>
+<area shape="rect" id="node14" href="$SampleSummary_8h.html" title=" " alt="" coords="581,452,744,493"/>
+<area shape="rect" id="node11" href="$FitterBase_8cpp.html" title=" " alt="" coords="1651,631,1813,672"/>
+<area shape="rect" id="node12" href="$LikelihoodFit_8h.html" title=" " alt="" coords="1464,631,1627,672"/>
+<area shape="rect" id="node13" href="$MaCh3Factory_8h.html" title="Factory methods for MaCh3 software which streamline initialisation of different objects." alt="" coords="1464,720,1627,761"/>
+<area shape="rect" id="node16" href="$manager_2manager_8cpp.html" title=" " alt="" coords="2653,363,2830,404"/>
+<area shape="rect" id="node17" href="$StatisticalUtils_8h.html" title="Utility functions for statistical interpretations in MaCh3." alt="" coords="632,363,795,404"/>
+<area shape="rect" id="node18" href="$CombineMaCh3Chains_8cpp.html" title=" " alt="" coords="1682,363,1878,404"/>
+<area shape="rect" id="node19" href="$DiagMCMC_8cpp.html" title=" " alt="" coords="2854,363,3050,404"/>
+<area shape="rect" id="node20" href="$GetPenaltyTerm_8cpp.html" title="KS: This file contains the implementation of the function to extract specific penalty terms from syst..." alt="" coords="2330,363,2526,404"/>
+<area shape="rect" id="node21" href="$ProcessMCMC_8cpp.html" title="Main exectable responsible for different types of MCMC processing like drawing posteriors,..." alt="" coords="3074,363,3270,404"/>
+<area shape="rect" id="node22" href="$RHat_8cpp.html" title="This executable calculates the &#160;estimator for Markov Chain Monte Carlo (MCMC) convergence." alt="" coords="1190,363,1386,404"/>
+<area shape="rect" id="node23" href="$RHat__HighMem_8cpp.html" title=" " alt="" coords="1462,363,1658,404"/>
+<area shape="rect" id="node24" href="$AdaptiveMCMCHandler_8h.html" title=" " alt="" coords="1903,363,2092,404"/>
+<area shape="rect" id="node25" href="$covarianceBase_8h.html" title=" " alt="" coords="1800,452,1989,493"/>
+<area shape="rect" id="node30" href="$PCAHandler_8h.html" title=" " alt="" coords="2116,363,2305,404"/>
+<area shape="rect" id="node31" href="$python_2manager_8cpp.html" title=" " alt="" coords="3294,363,3461,404"/>
+<area shape="rect" id="node26" href="$covarianceXsec_8h.html" title=" " alt="" coords="1007,541,1196,583"/>
+<area shape="rect" id="node27" href="$SplineStructs_8h.html" title="Contains structures and helper functions for handling spline representations of systematic parameters..." alt="" coords="1139,631,1307,672"/>
+<area shape="rect" id="node29" href="$covarianceXsec_8cpp.html" title=" " alt="" coords="875,631,1064,672"/>
+<area shape="rect" id="node28" href="$splines_8cpp.html" title=" " alt="" coords="785,720,951,761"/>
+<area shape="rect" id="node33" href="$Monitor_8cpp.html" title=" " alt="" coords="3323,273,3501,315"/>
+<area shape="rect" id="node36" href="$inputManager_8cpp.html" title=" " alt="" coords="3536,363,3739,404"/>
+<area shape="rect" id="node42" href="$plotting_8cpp.html" title=" " alt="" coords="4157,452,4323,493"/>
+<area shape="rect" id="node38" href="$GetPostfitParamPlots_8cpp.html" title=" " alt="" coords="3519,452,3697,493"/>
+<area shape="rect" id="node39" href="$MatrixPlotter_8cpp.html" title=" " alt="" coords="4347,452,4517,493"/>
+<area shape="rect" id="node40" href="$PlotLLH_8cpp.html" title=" " alt="" coords="3722,452,3891,493"/>
+<area shape="rect" id="node41" href="$plottingManager_8cpp.html" title=" " alt="" coords="3916,452,4132,493"/>
+<area shape="rect" id="node44" href="$styleManager_8cpp.html" title=" " alt="" coords="4091,363,4293,404"/>
+<area shape="rect" id="node46" href="$FarDetectorCoreInfoStruct_8h.html" title=" " alt="" coords="43,541,237,583"/>
+<area shape="rect" id="node47" href="$HistogramUtils_8h.html" title=" " alt="" coords="768,273,963,315"/>
+<area shape="rect" id="node48" href="$CovarianceUtils_8h.html" title=" " alt="" coords="1784,273,1973,315"/>
+<area shape="rect" id="node50" href="$plottingUtils_8cpp.html" title=" " alt="" coords="4470,273,4663,315"/>
+</map>

@@ -1,0 +1,10 @@
+<map id="SampleHandlerBase" name="SampleHandlerBase">
+<area shape="rect" id="node1" title="Class responsible for handling implementation of samples used in analysis, reweighting and returning ..." alt="" coords="1219,113,1360,140"/>
+<area shape="rect" id="node2" href="$classMaCh3Modes.html" title="KS: Class describing MaCh3 modes used in the analysis, it is being initialised from config." alt="" coords="1024,113,1127,140"/>
+<area shape="rect" id="node3" title=" " alt="" coords="597,187,744,229"/>
+<area shape="rect" id="node4" title=" " alt="" coords="202,143,282,169"/>
+<area shape="rect" id="node7" href="$structMaCh3ModeInfo.html" title="KS: Class containing information for a single MaCh3Mode." alt="" coords="455,83,573,109"/>
+<area shape="rect" id="node5" title=" " alt="" coords="5,135,132,177"/>
+<area shape="rect" id="node6" title=" " alt="" coords="768,75,935,117"/>
+<area shape="rect" id="node8" title=" " alt="" coords="181,7,303,33"/>
+</map>

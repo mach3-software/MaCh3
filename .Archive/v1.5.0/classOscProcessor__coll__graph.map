@@ -1,0 +1,21 @@
+<map id="OscProcessor" name="OscProcessor">
+<area shape="rect" id="node1" title="This class extends MCMC and allow specialised for Oscillation parameters analysis which require speci..." alt="" coords="1211,472,1316,499"/>
+<area shape="rect" id="node2" href="$classMCMCProcessor.html" title="Class responsible for processing MCMC chains, performing diagnostics, generating plots,..." alt="" coords="1039,472,1161,499"/>
+<area shape="rect" id="node3" title=" " alt="" coords="671,15,872,41"/>
+<area shape="rect" id="node4" title=" " alt="" coords="693,66,849,107"/>
+<area shape="rect" id="node5" title=" " alt="" coords="702,131,841,173"/>
+<area shape="rect" id="node6" title=" " alt="" coords="693,355,849,397"/>
+<area shape="rect" id="node7" title=" " alt="" coords="367,293,532,320"/>
+<area shape="rect" id="node8" title=" " alt="" coords="181,245,261,272"/>
+<area shape="rect" id="node9" title=" " alt="" coords="5,238,132,279"/>
+<area shape="rect" id="node10" title=" " alt="" coords="688,421,855,448"/>
+<area shape="rect" id="node11" title=" " alt="" coords="680,472,863,499"/>
+<area shape="rect" id="node12" title=" " alt="" coords="693,586,849,627"/>
+<area shape="rect" id="node13" title=" " alt="" coords="384,551,515,577"/>
+<area shape="rect" id="node14" title=" " alt="" coords="693,651,849,693"/>
+<area shape="rect" id="node15" title=" " alt="" coords="377,659,522,685"/>
+<area shape="rect" id="node16" title=" " alt="" coords="711,717,832,744"/>
+<area shape="rect" id="node17" title=" " alt="" coords="375,824,524,851"/>
+<area shape="rect" id="node19" title=" " alt="" coords="693,861,849,902"/>
+<area shape="rect" id="node18" title=" " alt="" coords="696,927,847,953"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="ParameterHandlerGeneric" name="ParameterHandlerGeneric">
+<area shape="rect" id="node1" title="Class responsible for handling of systematic error parameters with different types defined in the con..." alt="" coords="5,80,177,107"/>
+<area shape="rect" id="node2" href="$classParameterHandlerBase.html" title="Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada..." alt="" coords="13,5,170,32"/>
+</map>
