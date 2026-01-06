@@ -1,0 +1,7 @@
+SampleHandlerFD
+===============
+
+.. currentmodule:: pyMaCh3._pyMaCh3.samples
+
+.. autoclass:: SampleHandlerFD
+   :show-inheritance:
