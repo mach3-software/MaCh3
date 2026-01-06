@@ -1392,37 +1392,46 @@ M3::float_t SampleHandlerFD::GetEventWeight(const int iEntry) const {
 /// a vector for easy evaluation in the fillArray() function.
 void SampleHandlerFD::FillSplineBins() {
   //Now loop over events and get the spline bin for each event
-  for (unsigned int j = 0; j < GetNEvents(); ++j) {
-    const int OscIndex = GetOscChannel(OscChannels, (*MCSamples[j].nupdgUnosc), (*MCSamples[j].nupdg));
 
-    std::vector< std::vector<int> > EventSplines;
-    switch(nDimensions){
-      case 1:
-        EventSplines = SplineHandler->GetEventSplines(GetSampleName(), OscIndex, int(*(MCSamples[j].mode)), *(MCSamples[j].rw_etru), *(MCSamples[j].x_var), 0.);
-        break;
-      case 2:
-        EventSplines = SplineHandler->GetEventSplines(GetSampleName(), OscIndex, int(*(MCSamples[j].mode)), *(MCSamples[j].rw_etru), *(MCSamples[j].x_var), *(MCSamples[j].y_var));
-        break;
-      default:
-        MACH3LOG_ERROR("Error in assigning spline bins because nDimensions = {}", nDimensions);
-        MACH3LOG_ERROR("MaCh3 only supports splines binned in Etrue + the sample binning");
-        MACH3LOG_ERROR("Please check the sample binning you specified in your sample config ");
+  if (auto binnedSplineHandler = dynamic_cast<BinnedSplineHandler*>(SplineHandler.get())){
+    for (unsigned int j = 0; j < GetNEvents(); ++j) {
+      const int OscIndex = GetOscChannel(OscChannels, (*MCSamples[j].nupdgUnosc), (*MCSamples[j].nupdg));
+
+      std::vector< std::vector<int> > EventSplines;
+      switch(nDimensions){
+        case 1:
+          EventSplines = binnedSplineHandler->GetEventSplines(GetSampleName(), OscIndex, int(*(MCSamples[j].mode)), *(MCSamples[j].rw_etru), *(MCSamples[j].x_var), 0.);
+          break;
+        case 2:
+          EventSplines = binnedSplineHandler->GetEventSplines(GetSampleName(), OscIndex, int(*(MCSamples[j].mode)), *(MCSamples[j].rw_etru), *(MCSamples[j].x_var), *(MCSamples[j].y_var));
+          break;
+        default:
+          MACH3LOG_ERROR("Error in assigning spline bins because nDimensions = {}", nDimensions);
+          MACH3LOG_ERROR("MaCh3 only supports splines binned in Etrue + the sample binning");
+          MACH3LOG_ERROR("Please check the sample binning you specified in your sample config ");
+          throw MaCh3Exception(__FILE__, __LINE__);
+          break;
+      }
+      int NSplines = int(EventSplines.size());
+      if(NSplines < 0){
         throw MaCh3Exception(__FILE__, __LINE__);
-        break;
-    }
-    int NSplines = int(EventSplines.size());
-    if(NSplines < 0){
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-    MCSamples[j].xsec_spline_pointers.resize(NSplines);
-    for(size_t spline = 0; spline < MCSamples[j].xsec_spline_pointers.size(); spline++) {
-      //Event Splines indexed as: sample name, oscillation channel, syst, mode, etrue, var1, var2 (var2 is a dummy 0 for 1D splines)
-      MCSamples[j].xsec_spline_pointers[spline] = SplineHandler->retPointer(EventSplines[spline][0], EventSplines[spline][1],
-                                                                                EventSplines[spline][2], EventSplines[spline][3],
-                                                                                EventSplines[spline][4], EventSplines[spline][5],
-                                                                                EventSplines[spline][6]);
+      }
+      MCSamples[j].xsec_spline_pointers.resize(NSplines);
+      for(size_t spline = 0; spline < MCSamples[j].xsec_spline_pointers.size(); spline++) {
+        //Event Splines indexed as: sample name, oscillation channel, syst, mode, etrue, var1, var2 (var2 is a dummy 0 for 1D splines)
+        MCSamples[j].xsec_spline_pointers[spline] = binnedSplineHandler->retPointer(EventSplines[spline][0], EventSplines[spline][1],
+                                                                                  EventSplines[spline][2], EventSplines[spline][3],
+                                                                                  EventSplines[spline][4], EventSplines[spline][5],
+                                                                                  EventSplines[spline][6]);
+      }
     }
   }
+  else {
+    MACH3LOG_ERROR("SplineHandler is not of type BinnedSplineHandler, cannot fill spline bins for SampleHandlerFD");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  
 }
 
 // ************************************************
@@ -1505,17 +1514,24 @@ void SampleHandlerFD::InitialiseSplineObject() {
   if(YVarStr.length() > 0){
     SplineVarNames.push_back(YVarStr);
   }
+
+  if(auto binnedSplineHandler = dynamic_cast<BinnedSplineHandler*>(SplineHandler.get())) {
+    binnedSplineHandler->AddSample(SampleName, spline_filepaths, SplineVarNames);
+    binnedSplineHandler->CountNumberOfLoadedSplines(false, 1);
+    binnedSplineHandler->TransferToMonolith();
+
+    MACH3LOG_INFO("--------------------------------");
+    MACH3LOG_INFO("Setup Far Detector splines");
+
+    FillSplineBins();
+
+    binnedSplineHandler->cleanUpMemory();
+  }
+  else {
+    MACH3LOG_ERROR("SplineHandler is not of type BinnedSplineHandler, cannot initialise splines for SampleHandlerFD");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
   
-  SplineHandler->AddSample(SampleName, spline_filepaths, SplineVarNames);
-  SplineHandler->CountNumberOfLoadedSplines(false, 1);
-  SplineHandler->TransferToMonolith();
-
-  MACH3LOG_INFO("--------------------------------");
-  MACH3LOG_INFO("Setup Far Detector splines");
-
-  FillSplineBins();
-
-  SplineHandler->cleanUpMemory();
 }
 
 // === JM adjust GetNDVarHist functions to allow for subevent-level plotting ===

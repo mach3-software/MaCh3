@@ -167,7 +167,7 @@ public:
   void Initialise();
   
   /// @brief Contains all your binned splines and handles the setup and the returning of weights from spline evaluations
-  std::unique_ptr<BinnedSplineHandler> SplineHandler;
+  std::unique_ptr<SplineBase> SplineHandler;
 
   /// @brief Contains all your binned splines and handles the setup and the returning of weights from spline evaluations
   std::shared_ptr<OscillationHandler> Oscillator;
