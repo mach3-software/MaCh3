@@ -1,0 +1,6 @@
+<map id="CLI/DynamicPlugin.hpp" name="CLI/DynamicPlugin.hpp">
+<area shape="rect" id="node1" title="Wrapper class for dynamically loaded plugins." alt="" coords="61,5,221,32"/>
+<area shape="rect" id="node2" href="$MaCh3Program_8hpp.html" title="Core program class for the MaCh3 command&#45;line interface." alt="" coords="59,80,222,107"/>
+<area shape="rect" id="node3" href="$mach3_8cpp.html" title="Main entry point for the MaCh3 command&#45;line interface." alt="" coords="5,155,116,181"/>
+<area shape="rect" id="node4" href="$MaCh3Program_8cpp.html" title="Implementation of the MaCh3Program class." alt="" coords="141,155,303,181"/>
+</map>

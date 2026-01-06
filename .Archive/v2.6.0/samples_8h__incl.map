@@ -1,0 +1,52 @@
+<map id="python/samples.h" name="python/samples.h">
+<area shape="rect" id="node1" title=" " alt="" coords="2071,5,2196,32"/>
+<area shape="rect" id="node2" title=" " alt="" coords="655,80,796,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="821,80,923,107"/>
+<area shape="rect" id="node4" title=" " alt="" coords="2070,162,2197,189"/>
+<area shape="rect" id="node5" href="$SampleHandlerBase_8h.html" title=" " alt="" coords="947,80,1154,107"/>
+<area shape="rect" id="node23" title=" " alt="" coords="2089,557,2148,584"/>
+<area shape="rect" id="node49" title=" " alt="" coords="2325,162,2384,189"/>
+<area shape="rect" id="node50" href="$histutils_8h.html" title="HW: Histogram utilities for converting ROOT histograms to numpy arrays for use in Python." alt="" coords="2195,80,2274,107"/>
+<area shape="rect" id="node6" href="$SampleInfo_8h.html" title=" " alt="" coords="391,333,545,360"/>
+<area shape="rect" id="node25" href="$EventInfo_8h.html" title=" " alt="" coords="173,333,315,360"/>
+<area shape="rect" id="node26" href="$BinnedSplineHandler_8h.html" title=" " alt="" coords="1062,162,1263,189"/>
+<area shape="rect" id="node32" href="$ParameterHandlerGeneric_8h.html" title=" " alt="" coords="839,155,1038,196"/>
+<area shape="rect" id="node35" href="$SampleHandlerInterface_8h.html" title=" " alt="" coords="1344,251,1573,278"/>
+<area shape="rect" id="node43" href="$OscillationHandler_8h.html" title=" " alt="" coords="656,251,851,278"/>
+<area shape="rect" id="node44" href="$BinningHandler_8h.html" title=" " alt="" coords="456,251,632,278"/>
+<area shape="rect" id="node45" href="$SampleHandlerFunctional_8h.html" title=" " alt="" coords="1503,632,1740,659"/>
+<area shape="rect" id="node46" title=" " alt="" coords="1339,162,1424,189"/>
+<area shape="rect" id="node47" title=" " alt="" coords="5,162,88,189"/>
+<area shape="rect" id="node48" href="$SampleHandlerBase_8txx.html" title=" " alt="" coords="112,162,331,189"/>
+<area shape="rect" id="node7" title=" " alt="" coords="375,781,433,808"/>
+<area shape="rect" id="node8" title=" " alt="" coords="670,707,725,733"/>
+<area shape="rect" id="node9" href="$SampleStructs_8h.html" title=" " alt="" coords="819,408,994,435"/>
+<area shape="rect" id="node10" title=" " alt="" coords="675,557,715,584"/>
+<area shape="rect" id="node11" title=" " alt="" coords="801,557,839,584"/>
+<area shape="rect" id="node12" title=" " alt="" coords="863,557,974,584"/>
+<area shape="rect" id="node13" href="$MaCh3Exception_8h.html" title="Defines the custom exception class used throughout MaCh3." alt="" coords="1559,557,1745,584"/>
+<area shape="rect" id="node14" href="$MaCh3Logger_8h.html" title="MaCh3 Logging utilities built on top of SPDLOG." alt="" coords="1159,632,1327,659"/>
+<area shape="rect" id="node16" href="$Core_8h.html" title="KS: Core MaCh3 definitions and compile&#45;time configuration utilities." alt="" coords="1185,707,1300,733"/>
+<area shape="rect" id="node17" href="$ParameterStructs_8h.html" title="Definitions of generic parameter structs and utility templates for MaCh3." alt="" coords="1237,483,1443,509"/>
+<area shape="rect" id="node18" title=" " alt="" coords="999,557,1076,584"/>
+<area shape="rect" id="node19" title=" " alt="" coords="1101,557,1195,584"/>
+<area shape="rect" id="node20" title=" " alt="" coords="1817,557,1879,584"/>
+<area shape="rect" id="node21" title=" " alt="" coords="1220,557,1276,584"/>
+<area shape="rect" id="node22" title=" " alt="" coords="1401,557,1484,584"/>
+<area shape="rect" id="node24" title=" " alt="" coords="847,483,1059,509"/>
+<area shape="rect" id="node15" title=" " alt="" coords="1414,707,1493,733"/>
+<area shape="rect" id="node27" href="$SplineBase_8h.html" title=" " alt="" coords="1989,251,2136,278"/>
+<area shape="rect" id="node31" href="$MaCh3Modes_8h.html" title=" " alt="" coords="1651,408,1819,435"/>
+<area shape="rect" id="node28" title=" " alt="" coords="2121,333,2181,360"/>
+<area shape="rect" id="node29" title=" " alt="" coords="1931,333,2005,360"/>
+<area shape="rect" id="node30" title=" " alt="" coords="2029,333,2096,360"/>
+<area shape="rect" id="node33" href="$ParameterHandlerBase_8h.html" title=" " alt="" coords="926,244,1125,285"/>
+<area shape="rect" id="node34" href="$Manager_8h.html" title=" " alt="" coords="971,333,1109,360"/>
+<area shape="rect" id="node36" title=" " alt="" coords="1285,333,1355,360"/>
+<area shape="rect" id="node37" href="$HistogramUtils_8h.html" title=" " alt="" coords="773,333,947,360"/>
+<area shape="rect" id="node38" title=" " alt="" coords="1379,333,1447,360"/>
+<area shape="rect" id="node39" title=" " alt="" coords="1471,333,1539,360"/>
+<area shape="rect" id="node40" title=" " alt="" coords="1563,333,1634,360"/>
+<area shape="rect" id="node41" title=" " alt="" coords="1659,333,1736,360"/>
+<area shape="rect" id="node42" title=" " alt="" coords="1760,333,1856,360"/>
+</map>

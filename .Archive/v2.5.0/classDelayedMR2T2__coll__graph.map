@@ -1,0 +1,15 @@
+<map id="DelayedMR2T2" name="DelayedMR2T2">
+<area shape="rect" id="node1" title="Implementation of delayed rejection for MR2T2." alt="" coords="1287,379,1399,405"/>
+<area shape="rect" id="node2" href="$classMR2T2.html" title="MCMC algorithm implementing the Metropolis–Rosenbluth–Rosenbluth–Teller–Teller (MR T ) method." alt="" coords="1021,328,1087,355"/>
+<area shape="rect" id="node3" href="$classMCMCBase.html" title="Base class for MCMC fitting algorithms." alt="" coords="829,284,923,311"/>
+<area shape="rect" id="node4" href="$classFitterBase.html" title="Base class for implementing fitting algorithms." alt="" coords="693,215,776,241"/>
+<area shape="rect" id="node5" title=" " alt="" coords="371,5,572,32"/>
+<area shape="rect" id="node6" title=" " alt="" coords="379,57,563,98"/>
+<area shape="rect" id="node7" title=" " alt="" coords="371,122,571,163"/>
+<area shape="rect" id="node8" title=" " alt="" coords="374,188,569,215"/>
+<area shape="rect" id="node9" title=" " alt="" coords="181,271,261,297"/>
+<area shape="rect" id="node11" href="$classManager.html" title="The manager class is responsible for managing configurations and settings." alt="" coords="435,301,507,328"/>
+<area shape="rect" id="node10" title=" " alt="" coords="5,263,132,305"/>
+<area shape="rect" id="node12" title=" " alt="" coords="399,365,544,392"/>
+<area shape="rect" id="node13" title=" " alt="" coords="976,430,1132,471"/>
+</map>

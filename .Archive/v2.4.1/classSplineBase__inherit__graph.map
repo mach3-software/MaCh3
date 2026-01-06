@@ -1,0 +1,6 @@
+<map id="SplineBase" name="SplineBase">
+<area shape="rect" id="node1" title="Base class for calculating weight from spline." alt="" coords="181,5,269,32"/>
+<area shape="rect" id="node2" href="$classBinnedSplineHandler.html" title="Bin&#45;by&#45;bin class calculating response for spline parameters." alt="" coords="5,80,148,107"/>
+<area shape="rect" id="node3" href="$classPySplineBase.html" title="EW: As SplineBase is an abstract base class we have to do some gymnastics to get it to get it into py..." alt="" coords="173,80,277,107"/>
+<area shape="rect" id="node4" href="$classSMonolith.html" title="Even&#45;by&#45;event class calculating response for spline parameters. It is possible to use GPU acceleratio..." alt="" coords="301,80,381,107"/>
+</map>

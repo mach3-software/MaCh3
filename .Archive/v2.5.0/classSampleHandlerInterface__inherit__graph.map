@@ -1,0 +1,6 @@
+<map id="SampleHandlerInterface" name="SampleHandlerInterface">
+<area shape="rect" id="node1" title="Class responsible for handling implementation of samples used in analysis, reweighting and returning ..." alt="" coords="105,5,268,32"/>
+<area shape="rect" id="node2" href="$classPySampleHandlerInterface.html" title="EW: As SampleHandlerBase is an abstract base class we have to do some gymnastics to get it to get it ..." alt="" coords="5,80,184,107"/>
+<area shape="rect" id="node3" href="$classSampleHandlerBase.html" title="Class responsible for handling implementation of samples used in analysis, reweighting and returning ..." alt="" coords="208,80,349,107"/>
+<area shape="rect" id="node4" href="$classPySampleHandlerBase.html" title="As SampleHandlerBase is an abstract base class we have to do some gymnastics to get it to get it into..." alt="" coords="200,155,357,181"/>
+</map>

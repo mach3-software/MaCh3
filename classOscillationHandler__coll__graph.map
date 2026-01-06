@@ -1,0 +1,7 @@
+<map id="OscillationHandler" name="OscillationHandler">
+<area shape="rect" id="node1" title="Interface between NuOscillator and MaCh3, meant to compute oscillation weights for events/bin." alt="" coords="424,107,552,134"/>
+<area shape="rect" id="node2" title=" " alt="" coords="69,5,195,47"/>
+<area shape="rect" id="node3" title=" " alt="" coords="5,71,259,112"/>
+<area shape="rect" id="node4" title=" " alt="" coords="51,137,213,163"/>
+<area shape="rect" id="node5" title=" " alt="" coords="49,187,215,214"/>
+</map>

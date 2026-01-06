@@ -1,0 +1,28 @@
+<map id="MaCh3Plotting::InputFile" name="MaCh3Plotting::InputFile">
+<area shape="rect" id="node1" title="Struct which wraps around the actual input file and also holds general information,..." alt="" coords="964,971,1131,997"/>
+<area shape="rect" id="node2" title=" " alt="" coords="559,310,744,381"/>
+<area shape="rect" id="node3" title=" " alt="" coords="570,405,733,461"/>
+<area shape="rect" id="node4" title=" " alt="" coords="583,486,720,527"/>
+<area shape="rect" id="node5" href="$classMCMCProcessor.html" title="Class responsible for processing MCMC chains, performing diagnostics, generating plots,..." alt="" coords="590,552,713,579"/>
+<area shape="rect" id="node6" title=" " alt="" coords="181,137,383,164"/>
+<area shape="rect" id="node7" title=" " alt="" coords="204,189,360,230"/>
+<area shape="rect" id="node8" title=" " alt="" coords="213,254,351,295"/>
+<area shape="rect" id="node9" title=" " alt="" coords="204,319,360,361"/>
+<area shape="rect" id="node10" title=" " alt="" coords="199,385,365,412"/>
+<area shape="rect" id="node11" title=" " alt="" coords="191,436,373,463"/>
+<area shape="rect" id="node12" title=" " alt="" coords="204,487,360,529"/>
+<area shape="rect" id="node13" title=" " alt="" coords="204,553,360,594"/>
+<area shape="rect" id="node14" title=" " alt="" coords="242,819,322,845"/>
+<area shape="rect" id="node15" title=" " alt="" coords="5,811,132,853"/>
+<area shape="rect" id="node16" title=" " alt="" coords="221,627,343,653"/>
+<area shape="rect" id="node17" title=" " alt="" coords="207,701,357,728"/>
+<area shape="rect" id="node18" title=" " alt="" coords="217,884,347,911"/>
+<area shape="rect" id="node19" title=" " alt="" coords="199,995,365,1021"/>
+<area shape="rect" id="node20" title=" " alt="" coords="207,20,357,47"/>
+<area shape="rect" id="node21" title=" " alt="" coords="204,71,360,113"/>
+<area shape="rect" id="node22" title=" " alt="" coords="570,1032,733,1059"/>
+<area shape="rect" id="node23" title=" " alt="" coords="549,1083,753,1154"/>
+<area shape="rect" id="node24" title=" " alt="" coords="583,1178,720,1219"/>
+<area shape="rect" id="node25" title=" " alt="" coords="572,1243,731,1285"/>
+<area shape="rect" id="node26" title=" " alt="" coords="559,1313,744,1383"/>
+</map>

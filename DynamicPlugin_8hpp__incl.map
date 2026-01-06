@@ -1,0 +1,9 @@
+<map id="CLI/DynamicPlugin.hpp" name="CLI/DynamicPlugin.hpp">
+<area shape="rect" id="node1" title="Wrapper class for dynamically loaded plugins." alt="" coords="63,5,223,32"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,80,67,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="101,155,171,181"/>
+<area shape="rect" id="node4" title=" " alt="" coords="142,80,221,107"/>
+<area shape="rect" id="node5" href="$plugin_8hpp.html" title="Plugin interface and registration macros for MaCh3." alt="" coords="245,80,376,107"/>
+<area shape="rect" id="node6" href="$m3argparse_8hpp.html" title="MaCh3 wrapper for argparse library with additional functionality." alt="" coords="227,155,394,181"/>
+<area shape="rect" id="node7" title=" " alt="" coords="234,229,387,256"/>
+</map>

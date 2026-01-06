@@ -1,0 +1,14 @@
+<map id="ParameterHandlerBase" name="ParameterHandlerBase">
+<area shape="rect" id="node1" title="Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada..." alt="" coords="552,291,709,318"/>
+<area shape="rect" id="node2" title=" " alt="" coords="181,5,403,47"/>
+<area shape="rect" id="node3" title=" " alt="" coords="190,71,394,98"/>
+<area shape="rect" id="node4" title=" " alt="" coords="202,123,382,164"/>
+<area shape="rect" id="node5" title=" " alt="" coords="214,188,370,229"/>
+<area shape="rect" id="node6" title=" " alt="" coords="214,253,370,295"/>
+<area shape="rect" id="node7" title=" " alt="" coords="252,319,332,346"/>
+<area shape="rect" id="node8" title=" " alt="" coords="5,312,132,353"/>
+<area shape="rect" id="node9" title=" " alt="" coords="213,371,371,412"/>
+<area shape="rect" id="node10" title=" " alt="" coords="227,437,357,463"/>
+<area shape="rect" id="node11" title=" " alt="" coords="209,487,375,514"/>
+<area shape="rect" id="node12" title=" " alt="" coords="219,621,365,647"/>
+</map>

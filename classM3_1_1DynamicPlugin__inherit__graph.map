@@ -1,0 +1,4 @@
+<map id="M3::DynamicPlugin" name="M3::DynamicPlugin">
+<area shape="rect" id="node1" title="Manages the lifecycle of a dynamically loaded plugin." alt="" coords="5,80,141,107"/>
+<area shape="rect" id="node2" href="$classM3_1_1IPlugin.html" title="Interface for MaCh3 plugins and modules." alt="" coords="29,5,117,32"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="M3::ProcessMCMCModule" name="M3::ProcessMCMCModule">
+<area shape="rect" id="node1" title="Module for processing MCMC chains and producing various diagnostic plots." alt="" coords="262,213,442,240"/>
+<area shape="rect" id="node2" href="$classM3_1_1PluginBase.html" title=" " alt="" coords="157,109,256,136"/>
+<area shape="rect" id="node3" href="$classM3_1_1IPlugin.html" title="Interface for MaCh3 plugins and modules." alt="" coords="5,13,93,39"/>
+<area shape="rect" id="node4" title=" " alt="" coords="117,5,296,47"/>
+<area shape="rect" id="node5" title=" " alt="" coords="312,109,392,136"/>
+<area shape="rect" id="node6" title=" " alt="" coords="321,5,447,47"/>
+<area shape="rect" id="node7" title=" " alt="" coords="416,109,581,136"/>
+</map>
