@@ -712,13 +712,6 @@ void OscProcessor::MakePiePlot() {
   bds[4] = wrap_pi(best_fit + 2.0 * sigma_p); // +2σ
   bds[5] = wrap_pi(best_fit + 3.0 * sigma_p); // +3σ
 
-  bds[0]=2.545; //3 sig
-  bds[1]=-TMath::Pi(); //2 sig (MUST BE A NEGATIVE NUMBER)
-  bds[2]=-2.545; //1 sig
-  bds[3]=-1.037; //1 sig
-  bds[4]=-0.346; //2 sig
-  bds[5]=0.346; //3 sig
-
   constexpr double radius = 0.4;
   constexpr double rad_to_deg = 180.0 / TMath::Pi();
 
@@ -727,7 +720,7 @@ void OscProcessor::MakePiePlot() {
   // This ensures threesigA slice stays within the intended range.
   auto normalize_angle = [](double rad) {
     // If rad is negative, add 2*pi to wrap into [0, 2*pi)
-    if (rad < 0) rad += 2.0 * 3.141592653589793;
+    if (rad < 0) rad += 2.0 * TMath::Pi();
     return rad;
   };
 
