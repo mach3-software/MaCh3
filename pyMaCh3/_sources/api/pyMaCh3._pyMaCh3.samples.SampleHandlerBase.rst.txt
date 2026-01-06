@@ -1,0 +1,31 @@
+SampleHandlerBase
+=================
+
+.. currentmodule:: pyMaCh3._pyMaCh3.samples
+
+.. autoclass:: SampleHandlerBase
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~SampleHandlerBase.add_data
+      ~SampleHandlerBase.get_data_array
+      ~SampleHandlerBase.get_data_hist
+      ~SampleHandlerBase.get_mc_array
+      ~SampleHandlerBase.get_sample_title
+      ~SampleHandlerBase.get_var_hist
+      ~SampleHandlerBase.get_w2_array
+      ~SampleHandlerBase.get_w2_hist
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: add_data
+   .. automethod:: get_data_array
+   .. automethod:: get_data_hist
+   .. automethod:: get_mc_array
+   .. automethod:: get_sample_title
+   .. automethod:: get_var_hist
+   .. automethod:: get_w2_array
+   .. automethod:: get_w2_hist

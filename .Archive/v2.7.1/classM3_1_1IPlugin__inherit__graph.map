@@ -1,0 +1,8 @@
+<map id="M3::IPlugin" name="M3::IPlugin">
+<area shape="rect" id="node1" title="Interface for MaCh3 plugins and modules." alt="" coords="161,5,249,32"/>
+<area shape="rect" id="node2" href="$classM3_1_1DynamicPlugin.html" title="Manages the lifecycle of a dynamically loaded plugin." alt="" coords="62,80,198,107"/>
+<area shape="rect" id="node3" href="$classM3_1_1PluginBase.html" title=" " alt="" coords="222,80,337,107"/>
+<area shape="rect" id="node4" href="$classM3_1_1DiagMCMCModule.html" title="Module for performing diagnostic analysis on MCMC chains." alt="" coords="5,155,164,181"/>
+<area shape="rect" id="node5" href="$classM3_1_1GetPenaltyTermModule.html" title="Module for extracting specific penalty terms from MCMC chains." alt="" coords="188,155,371,181"/>
+<area shape="rect" id="node6" href="$classM3_1_1ProcessMCMCModule.html" title="Module for processing MCMC chains and producing various diagnostic plots." alt="" coords="395,155,575,181"/>
+</map>

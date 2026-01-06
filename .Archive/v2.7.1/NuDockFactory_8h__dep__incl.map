@@ -1,0 +1,8 @@
+<map id="NuDock/NuDockFactory.h" name="NuDock/NuDockFactory.h">
+<area shape="rect" id="node1" title="Factory utilities for creating and configuring NuDock communication objects." alt="" coords="301,5,479,32"/>
+<area shape="rect" id="node2" href="$NuDockFactory_8cpp.html" title="Implementation of NuDock factory utilities for object creation and oscillation parameter format conve..." alt="" coords="5,87,196,114"/>
+<area shape="rect" id="node3" href="$NuDockServerBase_8h.html" title="Base class for the MaCh3 NuDock server, exposing fit internals via a JSON&#45;based request/response prot..." alt="" coords="220,87,421,114"/>
+<area shape="rect" id="node5" href="$SampleHandlerNuDockBase_8cpp.html" title=" " alt="" coords="474,169,685,211"/>
+<area shape="rect" id="node6" href="$SampleHandlerNuDockBase_8h.html" title="Client&#45;side sample handler that delegates reweighting and likelihood evaluation to a remote NuDock se..." alt="" coords="497,80,707,121"/>
+<area shape="rect" id="node4" href="$NuDockServerBase_8cpp.html" title=" " alt="" coords="213,177,428,203"/>
+</map>

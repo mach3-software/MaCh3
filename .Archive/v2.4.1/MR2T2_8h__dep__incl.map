@@ -1,0 +1,9 @@
+<map id="Fitters/MR2T2.h" name="Fitters/MR2T2.h">
+<area shape="rect" id="node1" title=" " alt="" coords="288,5,407,32"/>
+<area shape="rect" id="node2" href="$DelayedMR2T2_8h.html" title=" " alt="" coords="205,80,370,107"/>
+<area shape="rect" id="node4" href="$MaCh3Factory_8h.html" title="Factory methods for MaCh3 software which streamline initialisation of different objects." alt="" coords="12,155,173,181"/>
+<area shape="rect" id="node6" href="$fitters_8cpp.html" title=" " alt="" coords="401,155,525,181"/>
+<area shape="rect" id="node7" href="$MR2T2_8cpp.html" title=" " alt="" coords="445,80,577,107"/>
+<area shape="rect" id="node3" href="$DelayedMR2T2_8cpp.html" title=" " alt="" coords="198,155,377,181"/>
+<area shape="rect" id="node5" href="$MaCh3Factory_8cpp.html" title=" " alt="" coords="5,229,180,256"/>
+</map>

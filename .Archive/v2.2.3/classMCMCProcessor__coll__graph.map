@@ -1,0 +1,20 @@
+<map id="MCMCProcessor" name="MCMCProcessor">
+<area shape="rect" id="node1" title="Class responsible for processing MCMC chains, performing diagnostics, generating plots,..." alt="" coords="549,457,672,484"/>
+<area shape="rect" id="node2" title=" " alt="" coords="181,15,383,41"/>
+<area shape="rect" id="node3" title=" " alt="" coords="204,66,360,107"/>
+<area shape="rect" id="node4" title=" " alt="" coords="213,131,351,173"/>
+<area shape="rect" id="node5" title=" " alt="" coords="204,197,360,238"/>
+<area shape="rect" id="node6" title=" " alt="" coords="199,263,365,289"/>
+<area shape="rect" id="node7" title=" " alt="" coords="191,313,373,340"/>
+<area shape="rect" id="node8" title=" " alt="" coords="204,365,360,406"/>
+<area shape="rect" id="node9" title=" " alt="" coords="204,430,360,471"/>
+<area shape="rect" id="node10" title=" " alt="" coords="205,496,359,523"/>
+<area shape="rect" id="node11" title=" " alt="" coords="242,599,322,625"/>
+<area shape="rect" id="node12" title=" " alt="" coords="5,591,132,633"/>
+<area shape="rect" id="node13" title=" " alt="" coords="221,673,343,700"/>
+<area shape="rect" id="node14" title=" " alt="" coords="207,745,357,772"/>
+<area shape="rect" id="node15" title=" " alt="" coords="217,796,347,823"/>
+<area shape="rect" id="node16" title=" " alt="" coords="199,909,365,936"/>
+<area shape="rect" id="node17" title=" " alt="" coords="207,960,357,987"/>
+<area shape="rect" id="node18" title=" " alt="" coords="204,1011,360,1053"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="MR2T2" name="MR2T2">
+<area shape="rect" id="node1" title="MCMC algorithm implementing the Metropolis–Rosenbluth–Rosenbluth–Teller–Teller (MR T ) method." alt="" coords="29,155,94,181"/>
+<area shape="rect" id="node4" href="$classDelayedMR2T2.html" title="Implementation of delayed rejection for MR2T2." alt="" coords="5,229,117,256"/>
+<area shape="rect" id="node2" href="$classMCMCBase.html" title="Base class for MCMC fitting algorithms." alt="" coords="14,80,109,107"/>
+<area shape="rect" id="node3" href="$classFitterBase.html" title="Base class for implementing fitting algorithms." alt="" coords="20,5,103,32"/>
+</map>

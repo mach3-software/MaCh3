@@ -1,0 +1,12 @@
+<map id="UnbinnedSplineHandler" name="UnbinnedSplineHandler">
+<area shape="rect" id="node1" title="Even&#45;by&#45;event class calculating response for spline parameters. It is possible to use GPU acceleratio..." alt="" coords="649,203,808,229"/>
+<area shape="rect" id="node2" href="$classSplineBase.html" title="Base class for calculating weight from spline." alt="" coords="367,7,455,33"/>
+<area shape="rect" id="node3" title=" " alt="" coords="5,7,196,33"/>
+<area shape="rect" id="node4" href="$classSplineMonolithGPU.html" title="Class responsible for calculating spline weight on GPU." alt="" coords="344,57,479,84"/>
+<area shape="rect" id="node5" href="$structSplineMonoStruct.html" title="KS: Struct storing information for spline monolith." alt="" coords="349,264,474,291"/>
+<area shape="rect" id="node6" title=" " alt="" coords="35,219,167,245"/>
+<area shape="rect" id="node7" title=" " alt="" coords="27,135,174,177"/>
+<area shape="rect" id="node8" title=" " alt="" coords="38,310,163,351"/>
+<area shape="rect" id="node9" title=" " alt="" coords="371,403,451,429"/>
+<area shape="rect" id="node10" title=" " alt="" coords="37,395,164,437"/>
+</map>

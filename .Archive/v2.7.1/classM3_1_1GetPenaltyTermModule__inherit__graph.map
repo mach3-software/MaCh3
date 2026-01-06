@@ -1,0 +1,5 @@
+<map id="M3::GetPenaltyTermModule" name="M3::GetPenaltyTermModule">
+<area shape="rect" id="node1" title="Module for extracting specific penalty terms from MCMC chains." alt="" coords="5,155,188,181"/>
+<area shape="rect" id="node2" href="$classM3_1_1PluginBase.html" title=" " alt="" coords="47,80,146,107"/>
+<area shape="rect" id="node3" href="$classM3_1_1IPlugin.html" title="Interface for MaCh3 plugins and modules." alt="" coords="53,5,141,32"/>
+</map>
