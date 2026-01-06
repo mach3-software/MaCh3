@@ -101,6 +101,10 @@ void MCMCBase::PreStepProcess() {
 // *************************
 void MCMCBase::PostStepProcess() {
 // *************************
+    //KS: Some version of ROOT keep spamming about accessing already deleted object which is wrong and not helpful...
+    int originalErrorLevel = gErrorIgnoreLevel;
+    gErrorIgnoreLevel = kFatal;
+
     stepClock->Stop();
     stepTime = stepClock->RealTime();
 
@@ -113,6 +117,7 @@ void MCMCBase::PostStepProcess() {
     if (step % auto_save == 0){
         outTree->AutoSave();
     }
+    gErrorIgnoreLevel = originalErrorLevel;
 }
 
 // *******************
