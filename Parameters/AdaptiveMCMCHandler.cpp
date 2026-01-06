@@ -527,6 +527,11 @@ void AdaptiveMCMCHandler::CalculateRobbinsMonroStepLength() {
 
   int non_fixed_pars = GetNumParams()-GetNFixed();
 
+  if(non_fixed_pars == 0){
+    MACH3LOG_ERROR("Number of non_fixed_pars is 0, have you fixed all parameters");
+    MACH3LOG_ERROR("This will cause division by 0 and crash ()");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
   /// Now we can calculate the scale factor
   c_robbins_monro = (1- 1/non_fixed_pars)*std::sqrt(TMath::Pi()*2 * std::exp(alpha*alpha));
   c_robbins_monro += 1/(non_fixed_pars*target_acceptance*(1-target_acceptance));
