@@ -1,0 +1,39 @@
+---
+# Squash some branches
+name: Squash CI
+
+# The events that trigger the workflow
+on:
+  push:
+    branches: [ kskwarczynski/feat/squashBot ]
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false  # KS: Prevents cancellation of remaining jobs if one fails
+      matrix:
+        include:
+          - branch_name: gh-pages
+          #- branch_name: gh-profiling
+          #- branch_name: gh-pages-archive
+
+    name: Squash CI ${{ matrix.branch_name }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ matrix.branch_name }}
+
+      - name: Squash commits
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git reset --soft $(git rev-list --max-parents=0 HEAD)
+          git commit --amend -m "Squashed all commits into one"
+          git push origin ${{ matrix.branch_name }} --force
