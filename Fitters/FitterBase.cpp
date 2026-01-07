@@ -231,6 +231,10 @@ void FitterBase::SaveOutput() {
   //Stop Clock
   clock->Stop();
 
+  //KS: Some version of ROOT keep spamming about accessing already deleted object which is wrong and not helpful...
+  int originalErrorLevel = gErrorIgnoreLevel;
+  gErrorIgnoreLevel = kFatal;
+
   outputFile->cd();
   outTree->Write();
 
@@ -246,6 +250,8 @@ void FitterBase::SaveOutput() {
 
   outputFile->Close();
   FileSaved = true;
+
+  gErrorIgnoreLevel = originalErrorLevel;
 }
 
 // *************************
