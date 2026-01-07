@@ -4,8 +4,8 @@ name: Squash CI
 
 # The events that trigger the workflow
 on:
-  push:
-    branches: [ kskwarczynski/feat/squashBot ]
+  schedule:
+    - cron: '0 12 1 * *'  # Runs at 12:00 GMT (UTC) on the 1st day of every month
 
 permissions:
   contents: write
@@ -19,8 +19,8 @@ jobs:
       matrix:
         include:
           - branch_name: gh-pages
-          #- branch_name: gh-profiling
-          #- branch_name: gh-pages-archive
+          - branch_name: gh-profiling
+          - branch_name: gh-pages-archive
 
     name: Squash CI ${{ matrix.branch_name }}
 
@@ -29,6 +29,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: ${{ matrix.branch_name }}
+          fetch-depth: 0
 
       - name: Squash commits
         run: |
