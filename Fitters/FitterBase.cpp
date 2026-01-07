@@ -639,7 +639,7 @@ void FitterBase::RunLLHScan() {
         lower = CentralValue - nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(i));
         upper = CentralValue + nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(i));
         MACH3LOG_INFO("eval {} = {:.2f}", i, cov->GetPCAHandler()->GetEigenValues()(i));
-        MACH3LOG_INFO("centra {} = {:.2f}", i, CentralValue);
+        MACH3LOG_INFO("CV {} = {:.2f}", i, CentralValue);
         MACH3LOG_INFO("lower {} = {:.2f}", i, lower);
         MACH3LOG_INFO("upper {} = {:.2f}", i, upper);
         MACH3LOG_INFO("nSigma = {:.2f}", nSigma);
@@ -661,7 +661,7 @@ void FitterBase::RunLLHScan() {
       // This also applies for other parameters like osc, etc.
       lower = std::max(lower, cov->GetLowerBound(i));
       upper = std::min(upper, cov->GetUpperBound(i));
-      MACH3LOG_INFO("Scanning {} with {} steps, from [{:.2f} , {:.2f}], central = {:.2f}", name, n_points, lower, upper, CentralValue);
+      MACH3LOG_INFO("Scanning {} with {} steps, from [{:.2f} , {:.2f}], CV = {:.2f}", name, n_points, lower, upper, CentralValue);
 
       // Make the TH1D
       auto hScan = std::make_unique<TH1D>((name + "_full").c_str(), (name + "_full").c_str(), n_points, lower, upper);
@@ -965,7 +965,7 @@ void FitterBase::Run2DLLHScan() {
         lower_x = central_x - nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(i));
         upper_x = central_x + nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(i));
         MACH3LOG_INFO("eval {} = {:.2f}", i, cov->GetPCAHandler()->GetEigenValues()(i));
-        MACH3LOG_INFO("prior {} = {:.2f}", i, central_x);
+        MACH3LOG_INFO("CV {} = {:.2f}", i, central_x);
         MACH3LOG_INFO("lower {} = {:.2f}", i, lower_x);
         MACH3LOG_INFO("upper {} = {:.2f}", i, upper_x);
         MACH3LOG_INFO("nSigma = {:.2f}", nSigma);
@@ -1014,7 +1014,7 @@ void FitterBase::Run2DLLHScan() {
           lower_y = central_y - nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(j));
           upper_y = central_y + nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(j));
           MACH3LOG_INFO("eval {} = {:.2f}", i, cov->GetPCAHandler()->GetEigenValues()(j));
-          MACH3LOG_INFO("prior {} = {:.2f}", i, central_y);
+          MACH3LOG_INFO("CV {} = {:.2f}", i, central_y);
           MACH3LOG_INFO("lower {} = {:.2f}", i, lower_y);
           MACH3LOG_INFO("upper {} = {:.2f}", i, upper_y);
           MACH3LOG_INFO("nSigma = {:.2f}", nSigma);
@@ -1034,8 +1034,8 @@ void FitterBase::Run2DLLHScan() {
         // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables
         lower_y = std::max(lower_y, cov->GetLowerBound(j));
         upper_y = std::min(upper_y, cov->GetUpperBound(j));
-        MACH3LOG_INFO("Scanning X {} with {} steps, from {:.2f} - {:.2f}, prior = {}", name_x, n_points, lower_x, upper_x, central_x);
-        MACH3LOG_INFO("Scanning Y {} with {} steps, from {:.2f} - {:.2f}, prior = {}", name_y, n_points, lower_y, upper_y, central_y);
+        MACH3LOG_INFO("Scanning X {} with {} steps, from {:.2f} - {:.2f}, CV = {}", name_x, n_points, lower_x, upper_x, central_x);
+        MACH3LOG_INFO("Scanning Y {} with {} steps, from {:.2f} - {:.2f}, CV = {}", name_y, n_points, lower_y, upper_y, central_y);
 
         auto hScanSam = std::make_unique<TH2D>((name_x + "_" + name_y + "_sam").c_str(), (name_x + "_" + name_y + "_sam").c_str(),
                                                 n_points, lower_x, upper_x, n_points, lower_y, upper_y);
@@ -1590,7 +1590,7 @@ void FitterBase::RunSigmaVarFD() {
       }
 
       systematics[s]->SetParProp(i, ParamCentralValue);
-      MACH3LOG_INFO("  - set back to central value {:<5.2f}", ParamCentralValue);
+      MACH3LOG_INFO("  - set back to CV {:<5.2f}", ParamCentralValue);
       MACH3LOG_INFO("");
       ParamDir->Close();
       delete ParamDir;
