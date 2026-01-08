@@ -22,6 +22,7 @@ _MaCh3_Safe_Include_Start_ //{
 _MaCh3_Safe_Include_End_ //}
 
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
+/// @ingroup Core Classes
 class SampleHandlerBase
 {
  public:
@@ -29,12 +30,6 @@ class SampleHandlerBase
    SampleHandlerBase();
   /// @brief destructor
   virtual ~SampleHandlerBase();
-
-  /// @defgroup SampleHandlerSetters Sample Handler Setters
-  /// Group of functions to set various parameters, names, and values.
-
-  /// @defgroup SampleHandlerGetters Sample Handler Getters
-  /// Group of functions to get various parameters, names, and values.
 
   /// @ingroup SampleHandlerGetters
   virtual inline M3::int_t GetNsamples(){ return nSamples; };

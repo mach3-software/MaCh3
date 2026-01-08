@@ -12,6 +12,7 @@
 /// @author Dan Barrow
 /// @author Ed Atkin
 /// @author Kamil Skwarczynski
+/// @ingroup Core Classes
 class ParameterHandlerBase {
  public:
   /// @brief ETA - constructor for a YAML file
@@ -28,12 +29,6 @@ class ParameterHandlerBase {
 
   /// @brief Destructor
   virtual ~ParameterHandlerBase();
-  
-  /// @defgroup ParameterHandlerSetters Parameter Handler Setters
-  /// Group of functions to set various parameters, names, and values.
-
-  /// @defgroup ParameterHandlerGetters Parameter Handler Getters
-  /// Group of functions to get various parameters, names, and values.
 
   // ETA - maybe need to add checks to index on the setters? i.e. if( i > _fPropVal.size()){throw;}
   /// @brief Set covariance matrix

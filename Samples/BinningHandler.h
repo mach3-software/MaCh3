@@ -38,6 +38,7 @@ class BinningHandler {
   int GetNBins(const int iSample) const {return static_cast<int>(SampleBinning[iSample].nBins);};
   /// @brief Get fancy name for a given bin, to help match it with global properties
   /// @param iSample index of a given sample
+  /// @param GlobSampleBin Global Bin for a given sample
   std::string GetBinName(const int iSample, const int GlobSampleBin) const;
     /// @brief Get fancy name for a given bin, to help match it with global properties
   /// @param iSample index of a given sample

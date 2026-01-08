@@ -143,22 +143,25 @@ class BinnedSplineHandler : public SplineBase {
     void InvestigateMissingSplines() const;
 
     /// @brief KS: Load preprocessed Settings
-    /// @param File File from which we load new tree
+    /// @param SplineFile File from which we load new tree
     void LoadSettingsDir(std::unique_ptr<TFile>& SplineFile);
     /// @brief KS: Load preprocessed Monolith
-    /// @param File File from which we load new tree
+    /// @param SplineFile File from which we load new tree
     void LoadMonolithDir(std::unique_ptr<TFile>& SplineFile);
     /// @brief KS: Load preprocessed Index
-    /// @param File File from which we load new tree
+    /// @param SplineFile File from which we load new tree
     void LoadIndexDir(std::unique_ptr<TFile>& SplineFile);
 
     /// @brief KS: Prepare Settings Info within SplineFile
+    /// @param SplineFile File from which we load new tree
     void PrepareSettingsDir(std::unique_ptr<TFile>& SplineFile) const;
     /// @brief KS: Prepare Monolith Info within SplineFile
+    /// @param SplineFile File from which we load new tree
     void PrepareMonolithDir(std::unique_ptr<TFile>& SplineFile) const;
     /// @brief KS: Prepare Index Info within SplineFile
+    /// @param SplineFile File from which we load new tree
     void PrepareIndexDir(std::unique_ptr<TFile>& SplineFile) const;
     /// @brief KS: Prepare Other Info within SplineFile
+    /// @param SplineFile File from which we load new tree
     void PrepareOtherInfoDir(std::unique_ptr<TFile>& SplineFile) const;
-
 };
