@@ -13,7 +13,7 @@ class TFile;
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/01.-Manager-and-config-handling).
 /// @author Ed Atkin
 /// @author Kamil Skwarczynski
-/// @ingroup Core Classes
+/// @ingroup CoreClasses
 class manager {
 public:
   /// @brief Constructs a manager object with the specified file name.

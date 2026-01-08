@@ -23,7 +23,7 @@ class TDirectory;
 /// It serves as a base for different fitting algorithms and for validation techniques
 /// such as LLH scans.
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/06.-Fitting-Algorithms).
-/// @ingroup Core Classes
+/// @ingroup CoreClasses
 class FitterBase {
  public:
   /// @brief Constructor

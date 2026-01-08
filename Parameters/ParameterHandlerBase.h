@@ -12,7 +12,7 @@
 /// @author Dan Barrow
 /// @author Ed Atkin
 /// @author Kamil Skwarczynski
-/// @ingroup Core Classes
+/// @ingroup CoreClasses
 class ParameterHandlerBase {
  public:
   /// @brief ETA - constructor for a YAML file

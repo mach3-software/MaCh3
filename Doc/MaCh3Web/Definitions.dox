@@ -18,7 +18,7 @@
   /// @defgroup Utils Plotting Utility Functions
   /// @brief Utility functions for plotting
 
-  /// @defgroup CoreClasses
+  /// @defgroup CoreClasses Core Classes
   /// @brief Core classes of MaCh3 Software
   /// @details These classes form the core of the MaCh3 framework and provide the fundamental
   /// interfaces and base implementations used throughout the analysis chain.
