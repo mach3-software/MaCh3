@@ -3,6 +3,7 @@
 _MaCh3_Safe_Include_Start_ //{
 #include "TChain.h"
 #include "TF1.h"
+#include "TVirtualFFT.h"
 _MaCh3_Safe_Include_End_ //}
 
 //Only if GPU is enabled

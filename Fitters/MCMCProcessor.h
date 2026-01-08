@@ -32,7 +32,6 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TCandle.h"
 #include "TMath.h"
 #include "TMatrixDSymEigen.h"
-#include "TVirtualFFT.h"
 _MaCh3_Safe_Include_End_ //}
 
 
