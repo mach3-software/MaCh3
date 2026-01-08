@@ -558,7 +558,7 @@ void FitterBase::RunLLHScan() {
   // Save the settings into the output file
   SaveSettings();
 
-  MACH3LOG_INFO("Starting LLH Scan");
+  MACH3LOG_INFO("Starting {}", __func__);
 
   //KS: Turn it on if you want LLH scan for each ND sample separately, which increase time significantly but can be useful for validating new samples or dials.
   bool PlotLLHScanBySample = GetFromManager<bool>(fitMan->raw()["LLHScan"]["LLHScanBySample"], false, __FILE__ , __LINE__);
@@ -626,20 +626,26 @@ void FitterBase::RunLLHScan() {
       if(CheckSkipParameter(SkipVector, name)) continue;
 
       // Get the parameter priors and bounds
-      double prior = cov->GetParInit(i);
-      if (IsPCA) prior = cov->GetPCAHandler()->GetParCurrPCA(i);
+      double CentralValue = cov->GetParProp(i);
+      if (IsPCA) CentralValue = cov->GetPCAHandler()->GetParPropPCA(i);
 
+      double prior = cov->GetParInit(i);
+      if (IsPCA) prior = cov->GetPCAHandler()->GetPreFitValuePCA(i);
+
+      if (std::abs(CentralValue - prior) > 1e-10) {
+        MACH3LOG_INFO("For {} scanning around value {} rather than prior {}", name, CentralValue, prior);
+      }
       // Get the covariance matrix and do the +/- nSigma
-      // Set lower and upper bounds relative the prior
+      // Set lower and upper bounds relative the CentralValue
       // Set the parameter ranges between which LLH points are scanned
-      double lower = prior - nSigma*cov->GetDiagonalError(i);
-      double upper = prior + nSigma*cov->GetDiagonalError(i);
+      double lower = CentralValue - nSigma*cov->GetDiagonalError(i);
+      double upper = CentralValue + nSigma*cov->GetDiagonalError(i);
       // If PCA, transform these parameter values to the PCA basis
       if (IsPCA) {
-        lower = prior - nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(i));
-        upper = prior + nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(i));
+        lower = CentralValue - nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(i));
+        upper = CentralValue + nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(i));
         MACH3LOG_INFO("eval {} = {:.2f}", i, cov->GetPCAHandler()->GetEigenValues()(i));
-        MACH3LOG_INFO("prior {} = {:.2f}", i, prior);
+        MACH3LOG_INFO("CV {} = {:.2f}", i, CentralValue);
         MACH3LOG_INFO("lower {} = {:.2f}", i, lower);
         MACH3LOG_INFO("upper {} = {:.2f}", i, upper);
         MACH3LOG_INFO("nSigma = {:.2f}", nSigma);
@@ -661,7 +667,7 @@ void FitterBase::RunLLHScan() {
       // This also applies for other parameters like osc, etc.
       lower = std::max(lower, cov->GetLowerBound(i));
       upper = std::min(upper, cov->GetUpperBound(i));
-      MACH3LOG_INFO("Scanning {} with {} steps, from [{:.2f} , {:.2f}], prior = {:.2f}", name, n_points, lower, upper, prior);
+      MACH3LOG_INFO("Scanning {} with {} steps, from [{:.2f} , {:.2f}], CV = {:.2f}", name, n_points, lower, upper, CentralValue);
 
       // Make the TH1D
       auto hScan = std::make_unique<TH1D>((name + "_full").c_str(), (name + "_full").c_str(), n_points, lower, upper);
@@ -819,11 +825,11 @@ void FitterBase::RunLLHScan() {
         }
       }
 
-      // Reset the parameters to their prior central values
+      // Reset the parameters to their CentralValue central values
       if (IsPCA) {
-        cov->GetPCAHandler()->SetParPropPCA(i, prior);
+        cov->GetPCAHandler()->SetParPropPCA(i, CentralValue);
       } else {
-        cov->SetParProp(i, prior);
+        cov->SetParProp(i, CentralValue);
       }
     }//end loop over systematics
   }//end loop covariance classes
@@ -946,20 +952,26 @@ void FitterBase::Run2DLLHScan() {
       std::string name_x = cov->GetParFancyName(i);
       if (IsPCA) name_x += "_PCA";
 
-      // Get the parameter priors and bounds
-      double prior_x = cov->GetParInit(i);
-      if (IsPCA) prior_x = cov->GetPCAHandler()->GetParCurrPCA(i);
+      // Get the parameter central and bounds
+      double central_x = cov->GetParProp(i);
+      if (IsPCA) central_x = cov->GetPCAHandler()->GetParPropPCA(i);
 
+      double prior_x = cov->GetParInit(i);
+      if (IsPCA) prior_x = cov->GetPCAHandler()->GetPreFitValuePCA(i);
+
+      if (std::abs(central_x - prior_x) > 1e-10) {
+        MACH3LOG_INFO("For {} scanning around value {} rather than prior {}", name_x, central_x, prior_x);
+      }
       // Get the covariance matrix and do the +/- nSigma
       // Set lower and upper bounds relative the prior
-      double lower_x = prior_x - nSigma*cov->GetDiagonalError(i);
-      double upper_x = prior_x + nSigma*cov->GetDiagonalError(i);
+      double lower_x = central_x - nSigma*cov->GetDiagonalError(i);
+      double upper_x = central_x + nSigma*cov->GetDiagonalError(i);
       // If PCA, transform these parameter values to the PCA basis
       if (IsPCA) {
-        lower_x = prior_x - nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(i));
-        upper_x = prior_x + nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(i));
+        lower_x = central_x - nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(i));
+        upper_x = central_x + nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(i));
         MACH3LOG_INFO("eval {} = {:.2f}", i, cov->GetPCAHandler()->GetEigenValues()(i));
-        MACH3LOG_INFO("prior {} = {:.2f}", i, prior_x);
+        MACH3LOG_INFO("CV {} = {:.2f}", i, central_x);
         MACH3LOG_INFO("lower {} = {:.2f}", i, lower_x);
         MACH3LOG_INFO("upper {} = {:.2f}", i, upper_x);
         MACH3LOG_INFO("nSigma = {:.2f}", nSigma);
@@ -989,19 +1001,26 @@ void FitterBase::Run2DLLHScan() {
         // KS: Check if we want to skip this parameter
         if(CheckSkipParameter(SkipVector, name_y)) continue;
 
-        // Get the parameter priors and bounds
+        // Get the parameter central and bounds
+        double central_y = cov->GetParProp(j);
+        if (IsPCA) central_y = cov->GetPCAHandler()->GetParPropPCA(j);
+
         double prior_y = cov->GetParInit(j);
-        if (IsPCA) prior_y = cov->GetPCAHandler()->GetParCurrPCA(j);
+        if (IsPCA) prior_y = cov->GetPCAHandler()->GetPreFitValuePCA(j);
+
+        if (std::abs(central_y - prior_y) > 1e-10) {
+          MACH3LOG_INFO("For {} scanning around value {} rather than prior {}", name_y, central_y, prior_y);
+        }
 
         // Set lower and upper bounds relative the prior
-        double lower_y = prior_y - nSigma*cov->GetDiagonalError(j);
-        double upper_y = prior_y + nSigma*cov->GetDiagonalError(j);
+        double lower_y = central_y - nSigma*cov->GetDiagonalError(j);
+        double upper_y = central_y + nSigma*cov->GetDiagonalError(j);
         // If PCA, transform these parameter values to the PCA basis
         if (IsPCA) {
-          lower_y = prior_y - nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(j));
-          upper_y = prior_y + nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(j));
+          lower_y = central_y - nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(j));
+          upper_y = central_y + nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(j));
           MACH3LOG_INFO("eval {} = {:.2f}", i, cov->GetPCAHandler()->GetEigenValues()(j));
-          MACH3LOG_INFO("prior {} = {:.2f}", i, prior_y);
+          MACH3LOG_INFO("CV {} = {:.2f}", i, central_y);
           MACH3LOG_INFO("lower {} = {:.2f}", i, lower_y);
           MACH3LOG_INFO("upper {} = {:.2f}", i, upper_y);
           MACH3LOG_INFO("nSigma = {:.2f}", nSigma);
@@ -1021,8 +1040,8 @@ void FitterBase::Run2DLLHScan() {
         // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables
         lower_y = std::max(lower_y, cov->GetLowerBound(j));
         upper_y = std::min(upper_y, cov->GetUpperBound(j));
-        MACH3LOG_INFO("Scanning X {} with {} steps, from {:.2f} - {:.2f}, prior = {}", name_x, n_points, lower_x, upper_x, prior_x);
-        MACH3LOG_INFO("Scanning Y {} with {} steps, from {:.2f} - {:.2f}, prior = {}", name_y, n_points, lower_y, upper_y, prior_y);
+        MACH3LOG_INFO("Scanning X {} with {} steps, from {:.2f} - {:.2f}, CV = {}", name_x, n_points, lower_x, upper_x, central_x);
+        MACH3LOG_INFO("Scanning Y {} with {} steps, from {:.2f} - {:.2f}, CV = {}", name_y, n_points, lower_y, upper_y, central_y);
 
         auto hScanSam = std::make_unique<TH2D>((name_x + "_" + name_y + "_sam").c_str(), (name_x + "_" + name_y + "_sam").c_str(),
                                                 n_points, lower_x, upper_x, n_points, lower_y, upper_y);
@@ -1064,13 +1083,13 @@ void FitterBase::Run2DLLHScan() {
 
         Sample_2DLLH->cd();
         hScanSam->Write();
-        // Reset the parameters to their prior central values
+        // Reset the parameters to their central central values
         if (IsPCA) {
-          cov->GetPCAHandler()->SetParPropPCA(i, prior_x);
-          cov->GetPCAHandler()->SetParPropPCA(j, prior_y);
+          cov->GetPCAHandler()->SetParPropPCA(i, central_x);
+          cov->GetPCAHandler()->SetParPropPCA(j, central_y);
         } else {
-          cov->SetParProp(i, prior_x);
-          cov->SetParProp(j, prior_y);
+          cov->SetParProp(i, central_x);
+          cov->SetParProp(j, central_y);
         }
       } //end loop over systematics y
     }//end loop over systematics X
@@ -1140,7 +1159,12 @@ void FitterBase::RunSigmaVar() {
       }
 
       // Get the initial value of ith parameter
-      double init = cov->GetParInit(i);
+      double central = cov->GetParProp(i);
+      double prior = cov->GetParInit(i);
+
+      if (std::abs(central - prior) > 1e-10) {
+        MACH3LOG_INFO("For {} scanning around value {} rather than prior {}", name, central, prior);
+      }
 
       std::vector<std::vector<std::unique_ptr<TH1D>>> sigmaArray_x(numVar);
       std::vector<std::vector<std::unique_ptr<TH1D>>> sigmaArray_y(numVar);
@@ -1162,7 +1186,7 @@ void FitterBase::RunSigmaVar() {
       for (int j = 0; j < numVar; ++j)
       {
         // New value = prior + variation*1sigma uncertainty
-        double paramVal = cov->GetParInit(i)+sigmaArray[j]*std::sqrt((*Cov)(i,i));
+        double paramVal = central+sigmaArray[j]*std::sqrt((*Cov)(i,i));
 
         // Check the bounds on the parameter
         paramVal = std::max(cov->GetLowerBound(i), std::min(paramVal, cov->GetUpperBound(i)));
@@ -1283,7 +1307,7 @@ void FitterBase::RunSigmaVar() {
       } // End looping over variation
 
       // Restore the parameter to prior value
-      cov->SetParProp(i, init);
+      cov->SetParProp(i, central);
 
       SampleIterator = 0;
       // Get each sample and how it's responded to our reweighted parameter
@@ -1504,9 +1528,15 @@ void FitterBase::RunSigmaVarFD() {
 
       TDirectory* ParamDir = SigmaDir->mkdir(ParName.c_str());
       ParamDir->cd();
-      const double ParamNomValue = systematics[s]->GetParProp(i);
+
+      const double ParamCentralValue = systematics[s]->GetParProp(i);
+      const double Prior = systematics[s]->GetParInit(i);
       const double ParamLower = systematics[s]->GetLowerBound(i);
       const double ParamUpper = systematics[s]->GetUpperBound(i);
+
+      if (std::abs(ParamCentralValue - Prior) > 1e-10) {
+        MACH3LOG_INFO("For {} scanning around value {} rather than prior {}", ParName, ParamCentralValue, Prior);
+      }
 
       for(unsigned int iSample = 0; iSample < samples.size(); ++iSample)
       {
@@ -1523,7 +1553,7 @@ void FitterBase::RunSigmaVarFD() {
         for (size_t j = 0; j < SigmaArray.size(); ++j) {
           double sigma = SigmaArray[j];
 
-          double ParamShiftValue = ParamNomValue + sigma * std::sqrt((*systematics[s]->GetCovMatrix())(i,i));
+          double ParamShiftValue = ParamCentralValue + sigma * std::sqrt((*systematics[s]->GetCovMatrix())(i,i));
           ParamShiftValue = std::max(std::min(ParamShiftValue, ParamUpper), ParamLower);
 
           /// Apply custom range to make easier comparison with p-theta
@@ -1565,8 +1595,8 @@ void FitterBase::RunSigmaVarFD() {
         ParamDir->cd();
       }
 
-      systematics[s]->SetParProp(i, ParamNomValue);
-      MACH3LOG_INFO("  - set back to nominal value {:<5.2f}", ParamNomValue);
+      systematics[s]->SetParProp(i, ParamCentralValue);
+      MACH3LOG_INFO("  - set back to CV {:<5.2f}", ParamCentralValue);
       MACH3LOG_INFO("");
       ParamDir->Close();
       delete ParamDir;
