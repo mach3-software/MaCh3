@@ -570,7 +570,7 @@ void DiagnoseCovarianceMatrix(MCMCProcessor* Processor, const std::string& input
     BurnIn = k*IntervalsSize;
     Processor->SetStepCut(BurnIn);
     Processor->GetCovariance(Covariance, Correlation);
-    Processor->ResetHistograms();
+    Processor->Reset2DPosteriors();
     
     CovarianceHist = TMatrixIntoTH2D(Covariance, "Covariance"); 
     CorrelationHist = TMatrixIntoTH2D(Correlation, "Correlation");

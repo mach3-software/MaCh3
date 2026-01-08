@@ -83,7 +83,6 @@ void OscProcessor::LoadAdditionalInfo() {
     nDraw++;
 
     /// @todo we should actually calculate central value and prior error but leave it for now...
-    ParamNom[kXSecPar].push_back( 0. );
     ParamCentral[kXSecPar].push_back( 0. );
     ParamErrors[kXSecPar].push_back( 1. );
     // Push back the name

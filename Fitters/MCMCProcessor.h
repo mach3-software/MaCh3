@@ -81,7 +81,7 @@ class MCMCProcessor {
     void MakeSubOptimality(const int NIntervals = 10);
 
     /// @brief Reset 2D posteriors, in case we would like to calculate in again with different BurnInCut
-    void ResetHistograms();
+    void Reset2DPosteriors();
         
     /// @brief Draw the post-fit comparisons
     void DrawPostfit();
@@ -287,6 +287,7 @@ class MCMCProcessor {
     /// @brief You can set relative to prior or relative to generated. It is advised to use relate to prior
     /// @param PlotOrNot bool controlling plotRelativeToPrior argument
     inline void SetPlotRelativeToPrior(const bool PlotOrNot){plotRelativeToPrior = PlotOrNot; };
+    /// @brief Whether to dump all plots into PDF
     inline void SetPrintToPDF(const bool PlotOrNot){printToPDF = PlotOrNot; };
     /// @brief Set whether you want to plot error for parameters which have flat prior
     inline void SetPlotErrorForFlatPrior(const bool PlotOrNot){PlotFlatPrior = PlotOrNot; };
@@ -454,7 +455,6 @@ class MCMCProcessor {
     std::vector<std::vector<TString>> ParamNames;
     /// Parameters central values which we are going to analyse
     std::vector<std::vector<double>>  ParamCentral;
-    std::vector<std::vector<double>>  ParamNom;
     /// Uncertainty on a single parameter
     std::vector<std::vector<double>>  ParamErrors;
     /// Whether Param has flat prior or not
