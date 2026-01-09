@@ -184,6 +184,8 @@ class MCMCProcessor {
     /// @param Names Parameter names for which we do smearing
     /// @param Error Error based on which we smear
     /// @param SaveBranch Whether we save unsmeared branch or not
+    /// @note based on smear_parameter.C
+    /// @author Dan Barrow
     void SmearChain(const std::vector<std::string>& Names,
                     const std::vector<double>& NewCentral,
                     const bool& SaveBranch) const;
