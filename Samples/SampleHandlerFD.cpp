@@ -1057,6 +1057,9 @@ void SampleHandlerFD::AddData(const int Sample, TH1D* Data) {
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
+  SampleDetails[Sample].dathist->GetXaxis()->SetTitle(GetXBinVarName(Sample).c_str());
+  SampleDetails[Sample].dathist->GetYaxis()->SetTitle("Number of Events");
+
   for (int yBin = 0; yBin < Binning->GetNYBins(Sample); ++yBin) {
     for (int xBin = 0; xBin < Binning->GetNXBins(Sample); ++xBin) {
       const int idx = Binning->GetGlobalBinSafe(Sample, xBin, yBin);
@@ -1082,6 +1085,12 @@ void SampleHandlerFD::AddData(const int Sample, TH2D* Data) {
     MACH3LOG_ERROR("SampleHandlerFD_data haven't been initialised yet");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
+
+
+  SampleDetails[Sample].dathist2d->GetXaxis()->SetTitle(GetXBinVarName(Sample).c_str());
+  SampleDetails[Sample].dathist2d->GetYaxis()->SetTitle(GetYBinVarName(Sample).c_str());
+  SampleDetails[Sample].dathist2d->GetZaxis()->SetTitle("Number of Events");
+
   for (int yBin = 0; yBin < Binning->GetNYBins(Sample); ++yBin) {
     for (int xBin = 0; xBin < Binning->GetNXBins(Sample); ++xBin) {
       const int idx = Binning->GetGlobalBinSafe(Sample, xBin, yBin);
