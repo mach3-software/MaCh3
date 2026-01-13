@@ -44,8 +44,6 @@ std::unique_ptr<TH2D> GetSubMatrix(TH2D *MatrixFull,
   Hist->GetZaxis()->SetTitle("Correlation");
   Hist->SetMinimum(-1.);
   Hist->SetMaximum(1.);
-  Hist->GetXaxis()->SetLabelSize(0.015);
-  Hist->GetYaxis()->SetLabelSize(0.015);
 
   for(size_t x = 0; x < ParamIndex.size(); x++)
   {
@@ -59,6 +57,18 @@ std::unique_ptr<TH2D> GetSubMatrix(TH2D *MatrixFull,
     Hist->GetYaxis()->SetBinLabel(x+1, FancyLabel.c_str());
   }
   return Hist;
+}
+
+void DynamicLabelSize(TH2D* Hist) {
+  if (Hist->GetNbinsX() < 20) {
+    Hist->SetMarkerSize(1.0);
+    Hist->GetXaxis()->SetLabelSize(0.02);
+    Hist->GetYaxis()->SetLabelSize(0.02);
+  } else {
+    Hist->SetMarkerSize(0.5);
+    Hist->GetXaxis()->SetLabelSize(0.015);
+    Hist->GetYaxis()->SetLabelSize(0.015);
+  }
 }
 
 void SetupInfo(const std::string& Config, std::vector<std::string>& Title, std::vector<std::vector<std::string>>& Params)
@@ -129,7 +139,8 @@ void PlotMatrix(const std::unique_ptr<MaCh3Plotting::PlottingManager>& man, cons
 
   //To avoid TCanvas::Print> messages
   gErrorIgnoreLevel = kWarning;
-
+  DynamicLabelSize(MatrixFull);
+  MatrixFull->GetXaxis()->LabelsOption("v");
   MatrixPlot->Print("MatrixPlot.pdf[");
   MatrixFull->SetTitle("");
   MatrixFull->Draw("COLZ");
@@ -143,12 +154,7 @@ void PlotMatrix(const std::unique_ptr<MaCh3Plotting::PlottingManager>& man, cons
   {
     std::unique_ptr<TH2D> Hist = GetSubMatrix(MatrixFull, Title[it], Params[it], man);
     Hist->GetXaxis()->LabelsOption("v");
-
-    if (Hist->GetNbinsX() < 20) {
-      Hist->SetMarkerSize(1.0);
-    } else {
-      Hist->SetMarkerSize(0.5);
-    }
+    DynamicLabelSize(Hist.get());
 
     if(Hist->GetNbinsX() < 50) {
       Hist->Draw("COLZ TEXT");
@@ -222,6 +228,8 @@ void CompareMatrices(const std::unique_ptr<MaCh3Plotting::PlottingManager>& man,
     Hist[0]->GetZaxis()->SetTitle( (Title1 + "/" +  Title2).c_str());
     Hist[0]->GetXaxis()->LabelsOption("v");
     Hist[0]->Divide(Hist[1].get());
+
+    DynamicLabelSize(Hist[0].get());
 
     Hist[0]->Draw("COLZ");
     MatrixPlot->Print("MatrixComparePlot.pdf");
