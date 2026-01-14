@@ -104,6 +104,8 @@ class MCMCProcessor {
     /// @param CredibleRegionStyle Style_t telling what line style to use for each Interval line
     /// @param CredibleRegionColor Color_t telling what colour to use for each Interval line
     /// @param CredibleInSigmas Bool telling whether intervals are in percentage or in sigmas, then special conversions is used
+    /// @param Draw2DPosterior Bool telling whether to draw the 2D posterior distributions
+    /// @param DrawBestFit Bool telling whether to draw the best-fit point on the plots
     void MakeCredibleRegions(const std::vector<double>& CredibleRegions = {0.99, 0.90, 0.68},
                              const std::vector<Style_t>& CredibleRegionStyle = {kDashed, kSolid, kDotted},
                              const std::vector<Color_t>& CredibleRegionColor = {kGreen-3, kGreen-10, kGreen},
@@ -112,12 +114,13 @@ class MCMCProcessor {
                              const bool DrawBestFit = true
                              );
     /// @brief Make fancy triangle plot for selected parameters
+    /// @param ParNames Parameters for which Triangle plot will be made
     /// @param CredibleIntervals Vector with values of credible intervals, must be in descending order
     /// @param CredibleIntervalsColours Color_t telling what colour to use for each Interval line
-    /// @param CredibleInSigmas Bool telling whether intervals are in percentage or in sigmas, then special conversions is used
     /// @param CredibleRegions Vector with values of credible intervals, must be in descending order
     /// @param CredibleRegionStyle Style_t telling what line style to use for each Interval line
     /// @param CredibleRegionColor Color_t telling what colour to use for each Interval line
+    /// @param CredibleInSigmas Bool telling whether intervals are in percentage or in sigmas, then special conversions is used
     void MakeTrianglePlot(const std::vector<std::string>& ParNames,
                           // 1D
                           const std::vector<double>& CredibleIntervals = {0.99, 0.90, 0.68 },
@@ -185,7 +188,7 @@ class MCMCProcessor {
     /// @param Error Error based on which we smear
     /// @param SaveBranch Whether we save unsmeared branch or not
     void SmearChain(const std::vector<std::string>& Names,
-                    const std::vector<double>& NewCentral,
+                    const std::vector<double>& Error,
                     const bool& SaveBranch) const;
 
     /// @brief Make .gif of parameter evolution
@@ -302,7 +305,6 @@ class MCMCProcessor {
     inline void SetUseFFTAutoCorrelation(const bool useFFT){useFFTAutoCorrelation = useFFT; };
 
     /// @brief Setter related what parameters we want to exclude from analysis, for example if cross-section parameters look like xsec_, then passing "xsec_" will
-    /// @param Batches Vector with parameters type names we want to exclude
     inline void SetExcludedTypes(std::vector<std::string> Name){ExcludedTypes = Name; };
     inline void SetExcludedNames(std::vector<std::string> Name){ExcludedNames = Name; };
     inline void SetExcludedGroups(std::vector<std::string> Name){ExcludedGroups = Name; };

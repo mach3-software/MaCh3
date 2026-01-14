@@ -857,6 +857,7 @@ WARN_LOGFILE           =
 
 INPUT                  = . \
                          Doc/MaCh3Web/mainpage.md \
+                         Doc/MaCh3Web/Definitions.dox \
                          Doc/mach3logo.png \
                          Doc/Plots \
                          Manager \
@@ -910,6 +911,7 @@ FILE_PATTERNS          = *.c \
                          *.h++ \
                          *.md \
                          *.py \
+                         *.dox \
                          *.pyx
 
 # The RECURSIVE tag can be used to specify whether or not subdirectories should

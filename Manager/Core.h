@@ -21,9 +21,9 @@
 #include <cmath>
 #include <limits>
 
-/// Run low or high memory versions of structs
-/// N.B. for 64 bit systems sizeof(float) == sizeof(double) so not a huge effect
 namespace M3 {
+  // Run low or high memory versions of structs
+  // N.B. for 64 bit systems sizeof(float) == sizeof(double) so not a huge effect
   #ifdef _LOW_MEMORY_STRUCTS_
   /// Custom floating point (float or double)
   using float_t = float;
