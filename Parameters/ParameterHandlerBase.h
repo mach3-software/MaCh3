@@ -30,6 +30,7 @@ class ParameterHandlerBase {
   /// @brief Destructor
   virtual ~ParameterHandlerBase();
 
+
   // ETA - maybe need to add checks to index on the setters? i.e. if( i > _fPropVal.size()){throw;}
   /// @brief Set covariance matrix
   /// @param cov Covariance matrix which we set and will be used later for evaluation of penalty term
@@ -73,7 +74,7 @@ class ParameterHandlerBase {
   /// @param eL bool telling if it will be flat or not
   /// @ingroup ParameterHandlerSetters
   void SetFlatPrior(const int i, const bool eL);
-  
+
   /// @brief Set random value useful for debugging/CI
   /// @param i Parameter index
   /// @param rand New value for random number
@@ -115,7 +116,7 @@ class ParameterHandlerBase {
   void ThrowParameters();
   /// @brief Randomly throw the parameters in their 1 sigma range
   void RandomConfiguration();
-  
+
   /// @brief Check if parameters were proposed outside physical boundary
   int CheckBounds() const _noexcept_;
   /// @brief Calc penalty term based on inverted covariance matrix
@@ -204,6 +205,7 @@ class ParameterHandlerBase {
   /// @brief Use new throw matrix, used in adaptive MCMC
   /// @ingroup ParameterHandlerSetters
   void SetThrowMatrix(TMatrixDSym *cov);
+  void SetSubThrowMatrix(int first_index, int last_index, TMatrixDSym const &subcov);
   /// @brief Replaces old throw matrix with new one
   void UpdateThrowMatrix(TMatrixDSym *cov);
   /// @brief Set number of MCMC step, when running adaptive MCMC it is updated with given frequency. We need number of steps to determine frequency.
@@ -376,7 +378,7 @@ class ParameterHandlerBase {
   /// @brief KS: Set proposed parameter values vector to be base on tune values, for example set proposed values to be of generated or maybe PostND
   /// @ingroup ParameterHandlerSetters
   void SetTune(const std::string& TuneName);
-  
+
   /// @brief Get pointer for PCAHandler
   inline PCAHandler* GetPCAHandler() const {
     if (!pca) {
@@ -455,7 +457,7 @@ protected:
   TMatrixDSym *invCovMatrix;
   /// KS: Same as above but much faster as TMatrixDSym cache miss
   std::vector<std::vector<double>> InvertCovMatrix;
-    
+
   /// KS: Set Random numbers for each thread so each thread has different seed
   std::vector<std::unique_ptr<TRandom3>> random_number;
 
@@ -495,7 +497,7 @@ protected:
   std::vector<bool> _fFlatPrior;
   /// Tells to which samples object param should be applied
   std::vector<std::vector<std::string>> _fSampleNames;
-  
+
   /// Backup of _fIndivStepScale for parameters which are skipped during adaption
   std::vector<double> _fIndivStepScaleInitial;
 
