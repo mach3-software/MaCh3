@@ -114,21 +114,26 @@ struct SampleInfo {
 
 /// @brief constructors are same for all three so put in here
 struct FarDetectorCoreInfo {
+  /// @brief Default constructor.
   FarDetectorCoreInfo(){}
+  /// @brief Copy constructor (deleted to prevent copying).
   FarDetectorCoreInfo(FarDetectorCoreInfo const &other) = delete;
+  /// @brief Move constructor (defaulted to allow moving).
   FarDetectorCoreInfo(FarDetectorCoreInfo &&other) = default;
+  /// @brief Copy assignment operator (deleted).
   FarDetectorCoreInfo& operator=(FarDetectorCoreInfo const &other) = delete;
+  /// @brief Move assignment operator (deleted).
   FarDetectorCoreInfo& operator=(FarDetectorCoreInfo &&other) = delete;
-
+  /// @brief default destructor
   ~FarDetectorCoreInfo(){}
 
-  const int* Target = 0; ///< target the interaction was on
+  /// target the interaction was on
+  const int* Target = 0;
+  /// PDG of neutrino after oscillation
   const int* nupdg  = 0;
+  /// PDG of neutrino before oscillation
   const int* nupdgUnosc = 0;
 
-  //THe x_var and y_vars that you're binning in
-  const double* x_var = &M3::Unity_D;
-  const double* y_var = &M3::Unity_D;
   const double* rw_etru = &M3::_BAD_DOUBLE_;
   const double* rw_truecz = &M3::_BAD_DOUBLE_;
 
@@ -138,12 +143,14 @@ struct FarDetectorCoreInfo {
   /// Pointers to weights like oscillation spline etc
   std::vector<const M3::float_t*> total_weight_pointers;
 
-  int NomXBin = M3::_BAD_INT_;
-  int NomYBin = M3::_BAD_INT_;
+  /// The x_var and y_vars that you're binning in
+  std::vector<const double*> KinVar;
+  /// starting bins for each dimensions allowing to perform quick lookup
+  std::vector<int> NomBin;
 
   /// Nominal sample to which event is associated
   int NominalSample = M3::_BAD_INT_;
-
+  /// Is event NC or not
   bool isNC = false;
 
   const double* mode = &M3::Unity_D;
