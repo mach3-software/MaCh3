@@ -957,7 +957,6 @@ void PredictiveThrower::StudyBetaParameters(TDirectory* PredictiveDir) {
       const int nY = Data_Hist[iSample]->GetNbinsY();
       for (int y = 0; y < nY; ++y) {
         for (int x = 0; x < nX; ++x) {
-
           const int RootBin = Data_Hist[iSample]->GetBin(x+1, y+1);
           const int MaCh3Bin = SampleInfo[iSample].Binning->GetBinSafe(SampleInfo[iSample].LocalId, x, y);
 

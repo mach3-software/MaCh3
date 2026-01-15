@@ -34,7 +34,7 @@ _MaCh3_Safe_Include_End_ //}
 
 
 namespace MaCh3Plotting {
-/// @defgroup Utils Plotting Utility Functions
+/// @ingroup Utils Plotting Utility Functions
 /// @{
 
 /// @brief This handy little function lets you interpret a TGraph as a TH1D.

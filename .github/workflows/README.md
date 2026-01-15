@@ -59,4 +59,6 @@ Summary of currently implemented bots
 ## TagDoxygen
 * Tag Doxygen Documentation when MaCh3 tag is produced
 
+## Squash
+* Some branches, such as the gh-pages (used for soring doxygen) branch, do not require their full commit history to be preserved. For these branches, the bot squashes commits to keep the repository smaller and cleaner.
 

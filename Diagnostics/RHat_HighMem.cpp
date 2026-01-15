@@ -29,6 +29,9 @@ _MaCh3_Safe_Include_End_ //}
 /// and helps determine whether the chains have reached a stable distribution.
 ///
 /// @cite gelman2019.
+///
+/// @author Kamil Skwarczynski
+/// @author Michael Reh
 
 // *******************
 int Ntoys;

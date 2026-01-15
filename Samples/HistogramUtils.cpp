@@ -572,7 +572,7 @@ void FastViolinFill(TH2D* violin, TH1D* hist_1d){
 
 // ****************
 //DB Get the Cherenkov momentum threshold in MeV
-double returnCherenkovThresholdMomentum(int PDG) {
+double returnCherenkovThresholdMomentum(const int PDG) {
 // ****************
   constexpr double refractiveIndex = 1.334; //DB From https://github.com/fiTQun/fiTQun/blob/646cf9c8ba3d4f7400bcbbde029d5ca15513a3bf/fiTQun_shared.cc#L757
   double mass =  MaCh3Utils::GetMassFromPDG(PDG)*1e3;
@@ -585,16 +585,17 @@ double returnCherenkovThresholdMomentum(int PDG) {
 double CalculateQ2(double PLep, double PUpd, double EnuTrue, double InitialQ2){
 // ***************************************************************************
   constexpr double MLep = 0.10565837;
+  constexpr double MLep2 = MLep * MLep;
 
-  // Caluclate muon energy
-  double ELep = sqrt((MLep*MLep)+(PLep*PLep));
+  // Calculate muon energy
+  double ELep = sqrt((MLep2)+(PLep*PLep));
 
-  double CosTh = (2*EnuTrue*ELep - MLep*MLep - InitialQ2)/(2*EnuTrue*PLep);
+  double CosTh = (2*EnuTrue*ELep - MLep2 - InitialQ2)/(2*EnuTrue*PLep);
 
-  ELep = sqrt((MLep*MLep)+(PUpd*PUpd));
+  ELep = sqrt((MLep2)+(PUpd*PUpd));
 
   // Calculate the new Q2
-  double Q2Upd = -(MLep*MLep) + 2.0*EnuTrue*(ELep - PUpd*CosTh);
+  double Q2Upd = -(MLep2) + 2.0*EnuTrue*(ELep - PUpd*CosTh);
 
   return Q2Upd - InitialQ2;
 }
@@ -612,9 +613,10 @@ double CalculateEnu(double PLep, double costh, double Eb, bool neutrino){
   }
   /// @todo WARNING this is hardcoded
   constexpr double mLep = 0.10565837;
-  double eLep = sqrt(PLep * PLep + mLep * mLep);
+  constexpr double mLep2 = mLep * mLep;
 
-  double Enu = (2 * mNeff * eLep - mLep * mLep + mNoth * mNoth - mNeff * mNeff) /(2 * (mNeff - eLep + PLep * costh));
+  const double eLep = sqrt(PLep * PLep + mLep2);
+  double Enu = (2 * mNeff * eLep - mLep2 + mNoth * mNoth - mNeff * mNeff) /(2 * (mNeff - eLep + PLep * costh));
 
   return Enu;
 }
