@@ -363,8 +363,8 @@ void ParameterHandlerBase::Init(const std::vector<std::string>& YAMLFile) {
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
-  for(auto const & [indices, mat] : ThrowSubMatrixOverrides){
-    SetSubThrowMatrix(indices.first, indices.second, *mat);
+  for(auto const & matovr : ThrowSubMatrixOverrides){
+    SetSubThrowMatrix(matovr.first.first, matovr.first.second, *matovr.second);
   }
 
   Tunes = std::make_unique<ParameterTunes>(_fYAMLDoc["Systematics"]);
@@ -1242,7 +1242,7 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
   double max_correlation = 0.01; // Define a threshold for significant correlation above which we throw an error
   for (int i = 0; i < _fNumPar; ++i) {
     for (int j = 0; j <= i; ++j) {
-      // The symmetry should have been checked during the Init phase 
+      // The symmetry should have been checked during the Init phase
       if(param_skip_adapt_flags[i] && !param_skip_adapt_flags[j]) {
         double corr = (*covMatrix)(i,j)/std::sqrt((*covMatrix)(i,i)*(*covMatrix)(j,j));
         if(std::fabs(corr) > max_correlation) {
@@ -1254,18 +1254,18 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
     }
   }
   // Now we read the general settings [these SHOULD be common across all matrices!]
-  bool success = AdaptiveHandler->InitFromConfig(adapt_manager, matrixName, 
+  bool success = AdaptiveHandler->InitFromConfig(adapt_manager, matrixName,
     &_fFancyNames, &_fCurrVal, &_fError,
     &param_skip_adapt_flags, throwMatrix, _fGlobalStepScaleInitial
   );
   if (success) {
     AdaptiveHandler->Print();
-  } 
+  }
   else {
     MACH3LOG_INFO("Not using adaptive MCMC for {}. Checking external matrix options...", matrixName);
   }
 
-  // HH: Adjusting the external matrix reading logic such that you can not do adaptive 
+  // HH: Adjusting the external matrix reading logic such that you can not do adaptive
   // and still read an external matrix
   // Logic:
   // if read external matrix:
