@@ -432,22 +432,20 @@ __global__ void EvalOnGPU_TotWeight(
 //*********************************************************
   const unsigned int EventNum = (blockIdx.x * blockDim.x + threadIdx.x);
 
-  //KS: Accessing shared memory is much much faster than global memory hence we use shared memory for calculation and then write to global memory
-  __shared__ float shared_total_weights[_BlockSize_];
   if(EventNum < d_n_events) //stopping condition
   {
-    shared_total_weights[threadIdx.x] = 1.f;
+    float local_total_weight = 1.f;
 
     const unsigned int EventOffset = 2 * EventNum;
 
     for (unsigned int id = 0; id < tex1Dfetch<unsigned int>(text_nParamPerEvent, EventOffset); ++id) {
-      shared_total_weights[threadIdx.x] *= gpu_weights[tex1Dfetch<unsigned int>(text_nParamPerEvent, EventOffset+1) + id];
+      local_total_weight *= gpu_weights[tex1Dfetch<unsigned int>(text_nParamPerEvent, EventOffset+1) + id];
     }
 
     for (unsigned int id = 0; id < tex1Dfetch<unsigned int>(text_nParamPerEvent_TF1, EventOffset); ++id) {
-      shared_total_weights[threadIdx.x] *= gpu_weights_tf1[tex1Dfetch<unsigned int>(text_nParamPerEvent_TF1, EventOffset+1) + id];
+      local_total_weight *= gpu_weights_tf1[tex1Dfetch<unsigned int>(text_nParamPerEvent_TF1, EventOffset+1) + id];
     }
-    gpu_total_weights[EventNum] = shared_total_weights[threadIdx.x];
+    gpu_total_weights[EventNum] = local_total_weight;
   }
 }
 #endif
