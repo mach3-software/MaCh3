@@ -198,7 +198,7 @@ void ParameterHandlerBase::Init(const std::vector<std::string>& YAMLFile) {
         auto nametree = submatrix_file->Get<TTree>("param_names");
         if (!nametree) {
           MACH3LOG_CRITICAL("TTree param_names doesn't exist in file: {}. Set "
-                            "ThrowMatrixOverride: { check_names: False } to "
+                            "ThrowMatrixOverride: {{ check_names: False }} to "
                             "disable this check.",
                             filename);
           throw MaCh3Exception(__FILE__, __LINE__);
@@ -209,8 +209,8 @@ void ParameterHandlerBase::Init(const std::vector<std::string>& YAMLFile) {
         if (nametree->GetEntries() != int(YAMLDocTemp["Systematics"].size())) {
           MACH3LOG_CRITICAL("TTree param_names in file: {} has {} entries, but "
                             "the corresponding yaml file only declares {} "
-                            "parameters. Set ThrowMatrixOverride: { "
-                            "check_names: False } to disable this check.",
+                            "parameters. Set ThrowMatrixOverride: {{ "
+                            "check_names: False }} to disable this check.",
                             filename, nametree->GetEntries(),
                             YAMLDocTemp["Systematics"].size());
           throw MaCh3Exception(__FILE__, __LINE__);
@@ -226,8 +226,8 @@ void ParameterHandlerBase::Init(const std::vector<std::string>& YAMLFile) {
                 "TTree param_names in file: {} at entry {} has parameter {}, "
                 "but "
                 "the corresponding yaml parameter is named {}. Set "
-                "ThrowMatrixOverride: { "
-                "check_names: False } to disable this check.",
+                "ThrowMatrixOverride: {{ "
+                "check_names: False }} to disable this check.",
                 filename, pit, (*param_name), yaml_pname);
             throw MaCh3Exception(__FILE__, __LINE__);
           }
