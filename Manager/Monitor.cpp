@@ -143,6 +143,14 @@ void NThreadsSanity() {
 void GetGPUInfo(){
 // ************************
 #ifdef MaCh3_CUDA
+  int nDevices;
+  cudaGetDeviceCount(&nDevices);
+  if (nDevices == 0) {
+    MACH3LOG_CRITICAL("MaCh3 compiled with CUDA support (for GPU acceleration) but could not find GPU");
+    MACH3LOG_CRITICAL("Either allocate GPU for your job or recompile MaCh3 without GPU support");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
   MACH3LOG_INFO("Using following GPU:");
   // Print GPU name
   MACH3LOG_INFO("GPU Name: {}", TerminalToString("nvidia-smi --query-gpu=name --format=csv,noheader"));
