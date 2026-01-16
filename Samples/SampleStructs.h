@@ -364,10 +364,11 @@ inline int GetSampleFromGlobalBin(const std::vector<SampleBinningInfo>& BinningI
 }
 
 
-// ***************************
-// A handy namespace for variables extraction
-namespace MaCh3Utils {
-// ***************************
+    // ***************************
+    // A handy namespace for variables extraction
+    namespace MaCh3Utils
+{
+  // ***************************
   // *****************************
   /// @brief Return mass for given PDG
   /// @note Get the mass of a particle from the PDG In GeV, not MeV!

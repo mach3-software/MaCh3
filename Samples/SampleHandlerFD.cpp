@@ -2072,14 +2072,11 @@ void SampleHandlerFD::AddBinsToOutTree(TTree &tree) {
   }
 
   TString branch_name_base(SampleHandlerName.c_str());
-  branch_name_base = branch_name_base.ReplaceAll(" ", "_");  // Remove spaces
-
   for(int b = 0; b < Binning->GetNBins(); b++){
-    TString branch_name;
-    branch_name.Form("%s_%d", branch_name_base.Data(), b);
-
-    MACH3LOG_INFO("Initial data for bin {} is {}", b, SampleHandlerFD_data[b]);
-
+    TString branch_name(Binning->GetBinName(b));
     tree.Branch(branch_name, &SampleHandlerFD_array[b]);
+    tree.Branch(branch_name+"_w2", &SampleHandlerFD_array_w2[b]);
+
+    MACH3LOG_DEBUG("Initial data for bin {} is {}", b, SampleHandlerFD_data[b]);
   }
 }
