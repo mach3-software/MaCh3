@@ -23,6 +23,8 @@ class BinningHandler {
 
   /// @brief Find Global bin including
   /// @param iSample index of a given sample
+  /// @param KinVar Vector of pointers to kinematic variable like Erec
+  /// @param NomBin Vector of nominal bin indices for this event, one per dimension.
   int FindGlobalBin(const int iSample,
                     const std::vector<const double*>& KinVar,
                     const std::vector<int>& NomBin) const;
