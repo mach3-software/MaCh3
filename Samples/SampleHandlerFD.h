@@ -108,8 +108,6 @@ class SampleHandlerFD :  public SampleHandlerBase
     return SampleDetails[iSample].OscChannels[iChannel].flavourName;
   }
 
-  void AddBinsToOutTree(TTree& tree) override;
-
   /// @ingroup SampleHandlerGetters
   TH1 *Get1DVarHist(const int iSample, const std::string &ProjectionVar, const std::vector<KinematicCut> &EventSelectionVec = std::vector<KinematicCut>(),
                         int WeightStyle = 0, TAxis *Axis = nullptr, const std::vector<KinematicCut> &SubEventSelectionVec = std::vector<KinematicCut>());
@@ -164,9 +162,18 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// @brief JM Check if a kinematic parameter string corresponds to a subevent-level variable
   bool IsSubEventVarString(const std::string& VarStr);
 
-  std::vector<double> GetMCVals() { return std::vector<double>(SampleHandlerFD_array, SampleHandlerFD_array + Binning->GetNBins()); }
-  std::vector<double> GetDataVals() { return std::vector<double>(SampleHandlerFD_data, SampleHandlerFD_data + Binning->GetNBins()); }
-
+  /// @brief Return array storing data entries for every bin
+  std::vector<double> GetDataArray() const {
+    return std::vector<double>(SampleHandlerFD_data, SampleHandlerFD_data + Binning->GetNBins());
+  }
+  /// @brief Return array storing MC entries for every bin
+  std::vector<double> GetMCArray() const {
+    return std::vector<double>(SampleHandlerFD_array, SampleHandlerFD_array + Binning->GetNBins());
+  }
+  /// @brief Return array storing W2 entries for every bin
+  std::vector<double> GetW2Array() const {
+    return std::vector<double>(SampleHandlerFD_array_w2, SampleHandlerFD_array_w2 + Binning->GetNBins());
+  }
 
  protected:
   /// @brief DB Function to determine which weights apply to which types of samples

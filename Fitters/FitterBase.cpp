@@ -164,7 +164,6 @@ void FitterBase::PrepareOutput() {
 
     // Do we want to save proposal? This will break plotting scripts and is heave for disk space and step time. Only use when debugging
     bool SaveProposal = GetFromManager<bool>(fitMan->raw()["General"]["SaveProposal"], false, __FILE__ , __LINE__);
-    bool SaveMCInfo = GetFromManager<bool>(fitMan->raw()["General"]["SaveMCInfo"], false, __FILE__, __LINE__);
 
     if(SaveProposal) MACH3LOG_INFO("Will save in the chain proposal parameters and LogL");
     // Prepare the output trees
@@ -195,11 +194,6 @@ void FitterBase::PrepareOutput() {
       oss << "LogL_systematic_" << systematics[i]->GetName();
       oss2 << oss.str() << "/D";
       outTree->Branch(oss.str().c_str(), &syst_llh[i], oss2.str().c_str());
-    }
-    if (SaveMCInfo)
-    {
-      MACH3LOG_INFO("Will save the MC information for every step!!");
-      AddSampleHistsToOutput();
     }
   }
   else
@@ -1616,11 +1610,4 @@ void FitterBase::RunSigmaVarFD() {
   delete SigmaDir;
 
   outputFile->cd();
-}
-
-
-void FitterBase::AddSampleHistsToOutput(){
-  for (auto &sample : samples){
-    sample->AddBinsToOutTree(*outTree);
-  }
 }

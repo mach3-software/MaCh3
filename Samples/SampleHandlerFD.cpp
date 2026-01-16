@@ -2061,22 +2061,3 @@ void SampleHandlerFD::PrintRates(const bool DataOnly) {
     MACH3LOG_INFO("{}", sep_data);
   }
 }
-
-void SampleHandlerFD::AddBinsToOutTree(TTree &tree) {
-  // Add MC prediction for each bin
-
-  if (SampleHandlerFD_array == nullptr)
-  {
-    MACH3LOG_ERROR("MC not set up!");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-
-  TString branch_name_base(SampleHandlerName.c_str());
-  for(int b = 0; b < Binning->GetNBins(); b++){
-    TString branch_name(Binning->GetBinName(b));
-    tree.Branch(branch_name, &SampleHandlerFD_array[b]);
-    tree.Branch(branch_name+"_w2", &SampleHandlerFD_array_w2[b]);
-
-    MACH3LOG_DEBUG("Initial data for bin {} is {}", b, SampleHandlerFD_data[b]);
-  }
-}

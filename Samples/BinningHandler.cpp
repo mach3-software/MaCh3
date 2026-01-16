@@ -257,7 +257,10 @@ std::string BinningHandler::GetBinName(const int iSample, const int GlobSampleBi
   return BinName;
 }
 
-std::string BinningHandler::GetBinName(const int GlobSampleBin) const {
-  int SampleBin = GetSampleFromGlobalBin(SampleBinning, GlobSampleBin);
-  return GetBinName(SampleBin, GlobSampleBin);
+// ************************************************
+std::string BinningHandler::GetBinName(const int GlobalBin) const {
+// ************************************************
+  int SampleBin = GetSampleFromGlobalBin(SampleBinning, GlobalBin);
+  int LocalBin  = GetLocalBinFromGlobalBin(SampleBinning, GlobalBin);
+  return GetBinName(SampleBin, LocalBin);
 }
