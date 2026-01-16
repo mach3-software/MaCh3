@@ -138,7 +138,7 @@ class FitterBase {
   /// Total number of samples used, single SampleHandler can store more than one analysis sample!
   unsigned int TotalNSamples;
 
-  /// Systematic holderA
+  /// Systematic holder
   std::vector<ParameterHandlerBase*> systematics;
 
   /// tells global time how long fit took
