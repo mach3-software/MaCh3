@@ -18,7 +18,9 @@ void BinningHandler::SetupSampleBinning(const YAML::Node& Settings, SampleInfo& 
 
   //Binning
   SingleSample.nDimensions = 0;
-  SingleSample.XVarStr = GetFromManager(Settings["XVarStr"], std::string(""));
+  /// @warning for now we hardcode to 2D...
+  SingleSample.VarStr.resize(2);
+  SingleSample.VarStr[0] = GetFromManager(Settings["XVarStr"], std::string(""));
   auto X_BinEdges = GetFromManager(Settings["XVarBins"], std::vector<double>());
   const auto& edgesx = X_BinEdges;
   if (!std::is_sorted(edgesx.begin(), edgesx.end())) {
@@ -26,14 +28,14 @@ void BinningHandler::SetupSampleBinning(const YAML::Node& Settings, SampleInfo& 
                    SingleSample.SampleTitle, fmt::join(edgesx, ", "));
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-  if(SingleSample.XVarStr.length() > 0){
+  if(SingleSample.VarStr[0].length() > 0){
     SingleSample.nDimensions++;
   } else{
     MACH3LOG_ERROR("Please specify an X-variable string in sample config");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
-  SingleSample.YVarStr = GetFromManager(Settings["YVarStr"], std::string(""));
+  SingleSample.VarStr[1] = GetFromManager(Settings["YVarStr"], std::string(""));
   auto Y_BinEdges = GetFromManager(Settings["YVarBins"], std::vector<double>());
   const auto& edgesy = Y_BinEdges;
   if (!std::is_sorted(edgesy.begin(), edgesy.end())) {
@@ -41,8 +43,8 @@ void BinningHandler::SetupSampleBinning(const YAML::Node& Settings, SampleInfo& 
                    SingleSample.SampleTitle, fmt::join(edgesy, ", "));
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-  if(SingleSample.YVarStr.length() > 0){
-    if(SingleSample.XVarStr.length() == 0){
+  if(SingleSample.VarStr[1].length() > 0){
+    if(SingleSample.VarStr[0].length() == 0){
       MACH3LOG_ERROR("Please specify an X-variable string in sample config. I won't work only with a Y-variable");
       throw MaCh3Exception(__FILE__, __LINE__);
     }
@@ -60,10 +62,10 @@ void BinningHandler::SetupSampleBinning(const YAML::Node& Settings, SampleInfo& 
 
   //Check whether you are setting up 1D or 2D binning
   if(SingleSample.nDimensions == 1){
-    MACH3LOG_INFO("Setting up {}D binning with {}", SingleSample.nDimensions, SingleSample.XVarStr);
+    MACH3LOG_INFO("Setting up {}D binning with {}", SingleSample.nDimensions, SingleSample.VarStr[0]);
     Y_BinEdges = {-1e8, 1e8};
   } else if(SingleSample.nDimensions == 2){
-    MACH3LOG_INFO("Setting up {}D binning with {} and {}", SingleSample.nDimensions, SingleSample.XVarStr, SingleSample.YVarStr);
+    MACH3LOG_INFO("Setting up {}D binning with {} and {}", SingleSample.nDimensions, SingleSample.VarStr[0], SingleSample.VarStr[1]);
   } else{
     MACH3LOG_ERROR("Number of dimensions is not 1 or 2, this is unsupported at the moment");
     throw MaCh3Exception(__FILE__, __LINE__);
@@ -125,18 +127,36 @@ int BinningHandler::FindGlobalBin(const int NomSample,
                                   const std::vector<int>& NomBin) const {
 // ************************************************
   //DB Find the relevant bin in the PDF for each event
-  std::vector<int> BinToFill(KinVar.size());
   const int Dim = static_cast<int>(KinVar.size());
+  std::vector<int> BinToFill(Dim);
+  const SampleBinningInfo& SB = SampleBinning[NomSample];
   for(int i = 0; i < Dim; ++i) {
     const double Var = (*(KinVar[i]));
-    BinToFill[i] = SampleBinning[NomSample].FindBin(i, Var, NomBin[i]);
+    BinToFill[i] = SB.FindBin(i, Var, NomBin[i]);
     // KS: If we are outside of range in only one dimension this mean out of bounds, we can simply quickly finish
     if(BinToFill[i] < 0) return -1;
   }
 
-  int GlobalBin = SampleBinning[NomSample].GetBin(BinToFill);
-  GlobalBin += static_cast<int>(SampleBinning[NomSample].GlobalOffset);
+  int GlobalBin = SB.GetBin(BinToFill);
+  GlobalBin += static_cast<int>(SB.GlobalOffset);
   return GlobalBin;
+}
+
+
+// ************************************************
+int BinningHandler::FindNominalBin(const int iSample,
+                   const int iDim,
+                   const double Var) const {
+// ************************************************
+  const SampleBinningInfo& info = SampleBinning[iSample];
+
+  const auto& edges = info.BinEdges[iDim];
+
+  // Outside binning range
+  if (Var < edges.front() || Var >= edges.back()) {
+    return -1;
+  }
+  return static_cast<int>(std::distance(edges.begin(), std::upper_bound(edges.begin(), edges.end(), Var)) - 1);
 }
 
 // ************************************************
@@ -205,24 +225,34 @@ std::string BinningHandler::GetBinName(const int iSample, const int GlobSampleBi
     MACH3LOG_ERROR("Requested bin {} is out of range for sample {}", GlobSampleBin, iSample);
     throw MaCh3Exception(__FILE__, __LINE__);
   }
+  int Dim = static_cast<int>(Binning.Strides.size());
+  std::vector<int> Bins(Dim, 0);
+  int Remaining = GlobSampleBin;
 
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wconversion"
-  const int xBin = GlobSampleBin % Binning.AxisNBins[0];
-  const int yBin = GlobSampleBin / Binning.AxisNBins[0];
-  #pragma GCC diagnostic pop
-
-  const double xmin = Binning.BinEdges[0].at(xBin);
-  const double xmax = Binning.BinEdges[0].at(xBin + 1);
-
-  // 1D Samples
-  if (Binning.AxisNBins[1] == 1) {
-    return fmt::format("Dim0 ({:g}, {:g})", xmin, xmax);
+  // Convert the flat/global bin index into per-dimension indices
+  // Dim0 is the fastest-changing axis, Dim1 the next, etc.
+  //
+  // For example (2D):
+  //   x = bin % Nx
+  //   y = bin / Nx
+  //
+  // For 3D:
+  //   x = bin % Nx
+  //   y = (bin / Nx) % Ny
+  //   z = bin / (Nx * Ny)
+  for (int i = 0; i < Dim; ++i) {
+    const int nBinsDim = static_cast<int>(Binning.BinEdges[i].size()) - 1;
+    Bins[i] = Remaining % nBinsDim;
+    Remaining /= nBinsDim;
   }
 
-  // 2D sample
-  const double ymin = Binning.BinEdges[1].at(yBin);
-  const double ymax = Binning.BinEdges[1].at(yBin + 1);
+  std::string BinName;
+  for (int i = 0; i < Dim; ++i) {
+    if (i > 0) BinName += ", ";
+    const double min = Binning.BinEdges[i].at(Bins[i]);
+    const double max = Binning.BinEdges[i].at(Bins[i] + 1);
+    BinName += fmt::format("Dim{} ({:g}, {:g})", i, min, max);
+  }
 
-  return fmt::format("Dim0 ({:g}, {:g}), Dim1 ({:g}, {:g})", xmin, xmax, ymin, ymax);
+  return BinName;
 }
