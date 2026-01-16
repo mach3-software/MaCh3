@@ -22,9 +22,16 @@ class BinningHandler {
   virtual ~BinningHandler() {};
 
   /// @brief Find Global bin including
-  /// @todo add Y binning migration
   /// @param iSample index of a given sample
-  int FindGlobalBin(const int iSample, const double XVar, const int NomXBin, const int NomYBin) const;
+  int FindGlobalBin(const int iSample,
+                    const std::vector<const double*>& KinVar,
+                    const std::vector<int>& NomBin) const;
+
+  /// @brief Find the nominal bin for a given variable in a given sample and dimension
+  /// @param iSample Sample index
+  /// @param iDim Dimension index (0 = X, 1 = Y, ...)
+  /// @param Var Kinematic variable value
+  int FindNominalBin(const int iSample, const int iDim, const double Var) const;
 
   /// @brief Get gloabl bin based on sample, and dimension of each sample with additional checks
   /// @param iSample index of a given sample
@@ -34,20 +41,29 @@ class BinningHandler {
   int GetBinSafe(const int iSample, const int xBin, const int yBin) const;
   /// @brief Get total number of bins over all samples/kinematic bins etc
   int GetNBins() const {return TotalNumberOfBins;};
+  /// @brief Get total number of bins over for a given sample
+  int GetNBins(const int iSample) const {return static_cast<int>(SampleBinning[iSample].nBins);};
+  /// @brief Get fancy name for a given bin, to help match it with global properties
+  /// @param iSample index of a given sample
+  /// @param GlobSampleBin Global Bin for a given sample
+  std::string GetBinName(const int iSample, const int GlobSampleBin) const;
+    /// @brief Get fancy name for a given bin, to help match it with global properties
+  /// @param iSample index of a given sample
+  std::string GetBinName(const int iSample, const int xBin, const int yBin) const;
 
   /// @brief Get X bin edges for a given sample
   /// @param iSample index of a given sample
-  std::vector<double> GetXBinEdges(const int iSample) const {return SampleBinning[iSample].XBinEdges;};
+  std::vector<double> GetXBinEdges(const int iSample) const {return SampleBinning[iSample].BinEdges.at(0);};
   /// @brief Get Y bin edges for a given sample
   /// @param iSample index of a given sample
-  std::vector<double> GetYBinEdges(const int iSample) const {return SampleBinning[iSample].YBinEdges;};
+  std::vector<double> GetYBinEdges(const int iSample) const {return SampleBinning[iSample].BinEdges.at(1);};
 
   /// @brief Get Number of X bins for a given sample
   /// @param iSample index of a given sample
-  int GetNXBins(const int iSample) const {return static_cast<int>(SampleBinning[iSample].nXBins);};
+  int GetNXBins(const int iSample) const {return static_cast<int>(SampleBinning[iSample].AxisNBins.at(0));};
   /// @brief Get Number of Y bins for a given sample
   /// @param iSample index of a given sample
-  int GetNYBins(const int iSample) const {return static_cast<int>(SampleBinning[iSample].nYBins);};
+  int GetNYBins(const int iSample) const {return static_cast<int>(SampleBinning[iSample].AxisNBins.at(1));};
 
   /// @brief Get bin number corresponding to where given sample starts
   /// @param iSample index of a given sample

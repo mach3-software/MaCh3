@@ -49,10 +49,8 @@ struct SampleInfo {
     if(_hPDF2D   != nullptr) delete _hPDF2D;
   }
 
-  /// the strings associated with the variables used for the X binning e.g. "RecoNeutrinoEnergy"
-  std::string XVarStr = "";
-  /// the strings associated with the variables used for the Y binning e.g. "RecoNeutrinoEnergy"
-  std::string YVarStr = "";
+  /// the strings associated with the variables used for the binning e.g. "RecoNeutrinoEnergy"
+  std::vector<std::string> VarStr;
 
   /// @brief the name of this sample e.g."muon-like"
   std::string SampleTitle = "";
@@ -80,8 +78,8 @@ struct SampleInfo {
 
   /// @brief Initialise histograms used for plotting
   void InitialiseHistograms() {
-    TString histname1d = (XVarStr).c_str();
-    TString histname2d = (XVarStr + "_" + YVarStr).c_str();
+    TString histname1d = (VarStr[0]).c_str();
+    TString histname2d = (VarStr[0] + "_" + VarStr[1]).c_str();
     TString histtitle = SampleTitle;
 
     //The binning here is arbitrary, now we get info from cfg so the
@@ -97,31 +95,46 @@ struct SampleInfo {
     _hPDF2D->SetDirectory(nullptr);
     dathist2d->SetDirectory(nullptr);
 
-    _hPDF1D->GetXaxis()->SetTitle(XVarStr.c_str());
-    dathist->GetXaxis()->SetTitle(XVarStr.c_str());
-    _hPDF2D->GetXaxis()->SetTitle(XVarStr.c_str());
-    dathist2d->GetXaxis()->SetTitle(XVarStr.c_str());
+    // Set all titles so most of projections don't have empty titles...
+    _hPDF1D->GetXaxis()->SetTitle(VarStr[0].c_str());
+    _hPDF1D->GetYaxis()->SetTitle("Events");
+
+    dathist->GetXaxis()->SetTitle(VarStr[0].c_str());
+    dathist->GetYaxis()->SetTitle("Events");
+
+    _hPDF2D->GetXaxis()->SetTitle(VarStr[0].c_str());
+    _hPDF2D->GetYaxis()->SetTitle(VarStr[1].c_str());
+
+    dathist2d->GetXaxis()->SetTitle(VarStr[0].c_str());
+    dathist2d->GetYaxis()->SetTitle(VarStr[1].c_str());
   }
 };
 
 /// @brief constructors are same for all three so put in here
 struct FarDetectorCoreInfo {
+  /// @brief Default constructor.
   FarDetectorCoreInfo(){}
+  /// @brief Copy constructor (deleted to prevent copying).
   FarDetectorCoreInfo(FarDetectorCoreInfo const &other) = delete;
+  /// @brief Move constructor (defaulted to allow moving).
   FarDetectorCoreInfo(FarDetectorCoreInfo &&other) = default;
+  /// @brief Copy assignment operator (deleted).
   FarDetectorCoreInfo& operator=(FarDetectorCoreInfo const &other) = delete;
+  /// @brief Move assignment operator (deleted).
   FarDetectorCoreInfo& operator=(FarDetectorCoreInfo &&other) = delete;
-
+  /// @brief default destructor
   ~FarDetectorCoreInfo(){}
 
-  const int* Target = 0; ///< target the interaction was on
+  /// target the interaction was on
+  const int* Target = 0;
+  /// PDG of neutrino after oscillation
   const int* nupdg  = 0;
+  /// PDG of neutrino before oscillation
   const int* nupdgUnosc = 0;
 
-  //THe x_var and y_vars that you're binning in
-  const double* x_var = &M3::Unity_D;
-  const double* y_var = &M3::Unity_D;
+  /// Pointer to true Neutrino Energy
   const double* rw_etru = &M3::_BAD_DOUBLE_;
+  /// Pointer to true cosine zenith
   const double* rw_truecz = &M3::_BAD_DOUBLE_;
 
   /// Pointers to normalisation weights which are being taken from Parameter Handler
@@ -130,12 +143,14 @@ struct FarDetectorCoreInfo {
   /// Pointers to weights like oscillation spline etc
   std::vector<const M3::float_t*> total_weight_pointers;
 
-  int NomXBin = M3::_BAD_INT_;
-  int NomYBin = M3::_BAD_INT_;
+  /// The x_var and y_vars that you're binning in
+  std::vector<const double*> KinVar;
+  /// starting bins for each dimensions allowing to perform quick lookup
+  std::vector<int> NomBin;
 
   /// Nominal sample to which event is associated
   int NominalSample = M3::_BAD_INT_;
-
+  /// Is event NC or not
   bool isNC = false;
 
   const double* mode = &M3::Unity_D;

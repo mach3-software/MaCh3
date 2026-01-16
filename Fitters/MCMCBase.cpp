@@ -11,6 +11,10 @@ MCMCBase::MCMCBase(manager *man) : FitterBase(man) {
     // Starting parameters should be thrown
     out_of_bounds = false;
     chainLength = Get<unsigned>(fitMan->raw()["General"]["MCMC"]["NSteps"], __FILE__, __LINE__);
+    if (chainLength < 10){
+        MACH3LOG_ERROR("MCMC chain length must be at least 10 steps, otherwise this will result in a floating point exception.");
+        throw MaCh3Exception(__FILE__, __LINE__);
+    }
 
     AnnealTemp = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["AnnealTemp"], -999);
     if (AnnealTemp < 0)
@@ -97,6 +101,10 @@ void MCMCBase::PreStepProcess() {
 // *************************
 void MCMCBase::PostStepProcess() {
 // *************************
+    //KS: Some version of ROOT keep spamming about accessing already deleted object which is wrong and not helpful...
+    int originalErrorLevel = gErrorIgnoreLevel;
+    gErrorIgnoreLevel = kFatal;
+
     stepClock->Stop();
     stepTime = stepClock->RealTime();
 
@@ -109,6 +117,7 @@ void MCMCBase::PostStepProcess() {
     if (step % auto_save == 0){
         outTree->AutoSave();
     }
+    gErrorIgnoreLevel = originalErrorLevel;
 }
 
 // *******************

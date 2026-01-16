@@ -20,6 +20,11 @@ class OscProcessor : public MCMCProcessor {
     /// @note based on makeJarlskog.C
     void PerformJarlskogAnalysis();
 
+    /// @brief Make fancy Pie plot for delta CP
+    /// @author Asher Kaboth
+    /// @note based on makePiePlot.C
+    void MakePiePlot();
+
   protected:
     /// @brief Read the Osc cov file and get the input central values and errors
     /// Here we allow Jarlskog Shenanigans

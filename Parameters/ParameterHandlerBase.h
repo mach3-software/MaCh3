@@ -12,6 +12,7 @@
 /// @author Dan Barrow
 /// @author Ed Atkin
 /// @author Kamil Skwarczynski
+/// @ingroup CoreClasses
 class ParameterHandlerBase {
  public:
   /// @brief ETA - constructor for a YAML file
@@ -28,12 +29,7 @@ class ParameterHandlerBase {
 
   /// @brief Destructor
   virtual ~ParameterHandlerBase();
-  
-  /// @defgroup ParameterHandlerSetters Parameter Handler Setters
-  /// Group of functions to set various parameters, names, and values.
 
-  /// @defgroup ParameterHandlerGetters Parameter Handler Getters
-  /// Group of functions to get various parameters, names, and values.
 
   // ETA - maybe need to add checks to index on the setters? i.e. if( i > _fPropVal.size()){throw;}
   /// @brief Set covariance matrix
@@ -78,7 +74,7 @@ class ParameterHandlerBase {
   /// @param eL bool telling if it will be flat or not
   /// @ingroup ParameterHandlerSetters
   void SetFlatPrior(const int i, const bool eL);
-  
+
   /// @brief Set random value useful for debugging/CI
   /// @param i Parameter index
   /// @param rand New value for random number
@@ -116,16 +112,11 @@ class ParameterHandlerBase {
   /// @brief KS: After step scale, prefit etc. value were modified save this modified config.
   void SaveUpdatedMatrixConfig();
 
-  /// @brief Throw the proposed parameter by mag sigma. Should really just have the user specify this throw by having argument double
-  void ThrowParProp(const double mag = 1.);
-
-  /// @brief Helper function to throw the current parameter by mag sigma. Can study bias in MCMC with this; put different starting parameters
-  void ThrowParCurr(const double mag = 1.);
   /// @brief Throw the parameters according to the covariance matrix. This shouldn't be used in MCMC code ase it can break Detailed Balance;
   void ThrowParameters();
   /// @brief Randomly throw the parameters in their 1 sigma range
   void RandomConfiguration();
-  
+
   /// @brief Check if parameters were proposed outside physical boundary
   int CheckBounds() const _noexcept_;
   /// @brief Calc penalty term based on inverted covariance matrix
@@ -198,6 +189,9 @@ class ParameterHandlerBase {
   /// @brief Adaptive Step Tuning Stuff
   void ResetIndivStepScale();
 
+  /// @brief Set individual step scale for parameters which are skipped during adaption to initial values
+  void SetIndivStepScaleForSkippedAdaptParams();
+
   /// @brief Initialise adaptive MCMC
   /// @param adapt_manager Node having from which we load all adaptation options
   void InitialiseAdaption(const YAML::Node& adapt_manager);
@@ -211,6 +205,7 @@ class ParameterHandlerBase {
   /// @brief Use new throw matrix, used in adaptive MCMC
   /// @ingroup ParameterHandlerSetters
   void SetThrowMatrix(TMatrixDSym *cov);
+  void SetSubThrowMatrix(int first_index, int last_index, TMatrixDSym const &subcov);
   /// @brief Replaces old throw matrix with new one
   void UpdateThrowMatrix(TMatrixDSym *cov);
   /// @brief Set number of MCMC step, when running adaptive MCMC it is updated with given frequency. We need number of steps to determine frequency.
@@ -383,7 +378,7 @@ class ParameterHandlerBase {
   /// @brief KS: Set proposed parameter values vector to be base on tune values, for example set proposed values to be of generated or maybe PostND
   /// @ingroup ParameterHandlerSetters
   void SetTune(const std::string& TuneName);
-  
+
   /// @brief Get pointer for PCAHandler
   inline PCAHandler* GetPCAHandler() const {
     if (!pca) {
@@ -462,7 +457,7 @@ protected:
   TMatrixDSym *invCovMatrix;
   /// KS: Same as above but much faster as TMatrixDSym cache miss
   std::vector<std::vector<double>> InvertCovMatrix;
-    
+
   /// KS: Set Random numbers for each thread so each thread has different seed
   std::vector<std::unique_ptr<TRandom3>> random_number;
 
@@ -502,6 +497,15 @@ protected:
   std::vector<bool> _fFlatPrior;
   /// Tells to which samples object param should be applied
   std::vector<std::vector<std::string>> _fSampleNames;
+
+  /// Backup of _fIndivStepScale for parameters which are skipped during adaption
+  std::vector<double> _fIndivStepScaleInitial;
+
+  /// Backup of _fGlobalStepScale for parameters which are skipped during adaption
+  double _fGlobalStepScaleInitial;
+
+  /// Flags telling if parameter should be skipped during adaption
+  std::vector<bool> param_skip_adapt_flags;
 
   /// Matrix which we use for step proposal before Cholesky decomposition (not actually used for step proposal)
   TMatrixDSym* throwMatrix;

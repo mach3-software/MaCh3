@@ -2,6 +2,7 @@
 #include "Manager/Manager.h"
 #include "Fitters/MCMCProcessor.h"
 
+_MaCh3_Safe_Include_Start_ //{
 // ROOT includes
 #include "TFile.h"
 #include "TTree.h"
@@ -17,6 +18,13 @@
 #include <cmath>
 #include <fstream>
 #include <map>
+_MaCh3_Safe_Include_End_ //}
+
+/// @file ReweightMCMC.cpp
+/// @brief This executable allow to reweight MCMC Chain, such technique is used to study impact of different priors without rerunning MCMC
+///
+/// @author David Riley
+/// @author Evan Goodman
 
 /// Structure to hold reweight configuration
 struct ReweightConfig {
@@ -47,7 +55,6 @@ struct ReweightConfig {
 /// @param configFile Config file with reweighting settings
 /// @author David Riley
 /// @author Evan Goodman
-
 void ReweightMCMC(const std::string& inputFile, const std::string& configFile);
 
 /// @todo add a generic 2D reweight that is not dm32 and theta13 specific DWR
@@ -64,6 +71,9 @@ double Graph_interpolate1D(TGraph* graph, double theta13);
 /// @brief Get parameter information from MCMCProcessor
 bool GetParameterInfo(MCMCProcessor* processor, const std::string& paramName, 
                      double& mean, double& sigma);
+
+/// @brief Load reweighting setting like 1D or 2D from YAML config
+void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const YAML::Node& reweight_settings);
 
 /// @brief Main function
 int main(int argc, char *argv[]) 
@@ -83,28 +93,18 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
-{
-    MACH3LOG_INFO("File for reweighting: {} with config {}", inputFile, configFile);
-
-    // Load configuration
-    YAML::Node reweight_yaml = M3OpenConfig(configFile);
-    YAML::Node reweight_settings = reweight_yaml["ReweightMCMC"];
-
-    // Parse all reweight configurations first
-    std::vector<ReweightConfig> reweightConfigs;
-   
+void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const YAML::Node& reweight_settings) {
     // iterate through the keys in the reweighting yaml creating and storing the ReweightConfig as we go
     for (const auto& reweight : reweight_settings) {
         const std::string& reweightKey = reweight.first.as<std::string>();
         const YAML::Node& reweightConfigNode = reweight.second;
-        
-        // Check if this particular reweight is enabled !!! Curently only support one reweight at a time so this defaults to enabled
+
+        // Check if this particular reweight is enabled !!! Currently only support one reweight at a time so this defaults to enabled
         if (!GetFromManager<bool>(reweightConfigNode["Enabled"], true)) {
-           MACH3LOG_INFO("Skipping disabled reweight: {}", reweightKey);
-           continue;
+            MACH3LOG_INFO("Skipping disabled reweight: {}", reweightKey);
+            continue;
         }
-        
+
         ReweightConfig reweightConfig;
         reweightConfig.key = reweightKey;
         reweightConfig.name = GetFromManager<std::string>(reweightConfigNode["ReweightName"], reweightKey);
@@ -113,17 +113,17 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
         // reweightConfig.weightBranchName = "Weight_" + reweightKey; // for now all weights will be stored in branches called Weight until multi weight support
         reweightConfig.weightBranchName = "Weight";
         reweightConfig.enabled = true;
-        
+
         // Handle different reweight types as they fill different members
         if (reweightConfig.dimension == 1) {
             if (reweightConfig.type == "Gaussian") {
                 // For Gaussian reweights, we need the parameter name(s) and prior values (mean, sigma pairs)
                 auto paramNames = GetFromManager<std::vector<std::string>>(reweightConfigNode["ReweightVar"], {});
-                
+
                 // Get prior values - handle both single [mean, sigma] pair and list of pairs for safety
                 auto priorNode = reweightConfigNode["ReweightPrior"];
                 std::vector<std::vector<double>> allPriorValues;
-                
+
                 if (priorNode.IsSequence() && priorNode.size() > 0) {
                     // Check if first element is a number (single [mean, sigma] pair) or sequence (list of pairs)
                     if (priorNode[0].IsScalar()) {
@@ -142,12 +142,12 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
                         }
                     }
                 }
-                
+
                 reweightConfig.paramNames = paramNames;
                 reweightConfig.priorValues = allPriorValues;
 
                 if (paramNames.empty() || allPriorValues.empty() || paramNames.size() != allPriorValues.size()) {
-                    MACH3LOG_ERROR("Invalid Gaussian reweight configuration for {}: {} parameters, {} prior pairs", 
+                    MACH3LOG_ERROR("Invalid Gaussian reweight configuration for {}: {} parameters, {} prior pairs",
                                    reweightKey, paramNames.size(), allPriorValues.size());
                     continue;
                 }
@@ -155,7 +155,7 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
                 // For TGraph reweights, we need the parameter name and the TGraph file and name
                 auto paramNames = GetFromManager<std::vector<std::string>>(reweightConfigNode["ReweightVar"], {});
                 std::string fileName = GetFromManager<std::string>(reweightConfigNode["ReweightPrior"]["file"], "");
-                std::string graphName = GetFromManager<std::string>(reweightConfigNode["ReweightPrior"]["graph_name"], ""); 
+                std::string graphName = GetFromManager<std::string>(reweightConfigNode["ReweightPrior"]["graph_name"], "");
                 reweightConfig.paramNames = paramNames;
                 reweightConfig.fileName = fileName;
                 reweightConfig.graphName = graphName;
@@ -172,7 +172,7 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
                     MACH3LOG_ERROR("Failed to open constraint file: {}", reweightConfig.fileName);
                     continue;
                 }
-                
+
                 std::unique_ptr<TGraph> graph(constraintFile->Get<TGraph>(reweightConfig.graphName.c_str()));
                 if (graph) {
                     // Create a completely independent copy
@@ -188,29 +188,29 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
                 MACH3LOG_ERROR("Unknown 1D reweight type: {} for {}", reweightConfig.type, reweightKey);
                 throw MaCh3Exception(__FILE__, __LINE__);
             }
-            
+
         } else if (reweightConfig.dimension == 2) {
             auto paramNames = GetFromManager<std::vector<std::string>>(reweightConfigNode["ReweightVar"], {});
-            
+
             // 2D reweights need 2 parameter names
             if (paramNames.size() != 2) {
                 MACH3LOG_ERROR("2D reweighting requires exactly 2 parameter names for {}", reweightKey);
                 continue;
             }
-            
+
             reweightConfig.paramNames = paramNames;
-            
+
             if (reweightConfig.type == "TGraph2D") {
                 auto priorConfig = reweightConfigNode["ReweightPrior"];
                 reweightConfig.fileName = GetFromManager<std::string>(priorConfig["file"], "");
                 reweightConfig.graphName = GetFromManager<std::string>(priorConfig["graph_name"], "");
                 reweightConfig.hierarchyType = GetFromManager<std::string>(priorConfig["hierarchy"], "auto");
-                
+
                 if (reweightConfig.fileName.empty() || reweightConfig.graphName.empty()) {
                     MACH3LOG_ERROR("Invalid TGraph2D configuration for {}", reweightKey);
                     continue;
                 }
-                
+
                 // Load the 2D graphs
                 MACH3LOG_INFO("Loading 2D constraint from file: {} (graph: {})", reweightConfig.fileName, reweightConfig.graphName);
                 auto constraintFile = std::unique_ptr<TFile>(TFile::Open(reweightConfig.fileName.c_str(), "READ"));
@@ -218,12 +218,12 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
                     MACH3LOG_ERROR("Failed to open constraint file: {}", reweightConfig.fileName);
                     continue;
                 }
-                
+
                 // Load both NO and IO graphs if hierarchy is auto
                 if (reweightConfig.hierarchyType == "auto" || reweightConfig.hierarchyType == "NO") {
                     std::string graphName_NO = reweightConfig.graphName + "_NO";
                     MACH3LOG_INFO("Loading NO graph: {}", graphName_NO);
-                   
+
                     std::unique_ptr<TGraph2D> graph_NO(constraintFile->Get<TGraph2D>(graphName_NO.c_str()));
                     if (graph_NO) {
                         // Create a completely independent copy
@@ -236,7 +236,7 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
                         MACH3LOG_ERROR("Failed to load NO graph: {}", graphName_NO);
                     }
                 }
-                
+
                 if (reweightConfig.hierarchyType == "auto" || reweightConfig.hierarchyType == "IO") {
                     std::string graphName_IO = reweightConfig.graphName + "_IO";
                     MACH3LOG_INFO("Loading IO graph: {}", graphName_IO);
@@ -252,9 +252,8 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
                         MACH3LOG_ERROR("Failed to load IO graph: {}", graphName_IO);
                     }
                 }
-                
+
                 constraintFile->Close();
-                
             } else {
                 MACH3LOG_ERROR("Unknown 2D reweight type: {} for {}", reweightConfig.type, reweightKey);
                 continue;
@@ -263,11 +262,11 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
             MACH3LOG_ERROR("Unsupported reweight dimension: {} for {}", reweightConfig.dimension, reweightKey);
             continue;
         }
-        
+
         reweightConfigs.push_back(std::move(reweightConfig));
         MACH3LOG_INFO("Added reweight configuration: {} ({}D, type: {})", reweightConfigs.back().name, reweightConfigs.back().dimension, reweightConfigs.back().type);
     }
-    
+
     if (reweightConfigs.empty()) {
         MACH3LOG_ERROR("No valid reweight configurations found in config file");
         throw MaCh3Exception(__FILE__, __LINE__);
@@ -275,7 +274,20 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
         MACH3LOG_ERROR("Currently only one reweight configuration is supported at a time, found {}", reweight_settings.size());
         throw MaCh3Exception(__FILE__, __LINE__);
     }
-    
+}
+
+void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
+{
+    MACH3LOG_INFO("File for reweighting: {} with config {}", inputFile, configFile);
+    // Load configuration
+    YAML::Node reweight_yaml = M3OpenConfig(configFile);
+    YAML::Node reweight_settings = reweight_yaml["ReweightMCMC"];
+
+    // Parse all reweight configurations first
+    std::vector<ReweightConfig> reweightConfigs;
+   
+    LoadReweightingSettings(reweightConfigs, reweight_settings);
+
     // Create MCMCProcessor to get parameter information 
     auto processor = std::make_unique<MCMCProcessor>(inputFile);
     processor->Initialise();
@@ -285,7 +297,7 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
     for (const auto& rwConfig : reweightConfigs) {
         for (const auto& paramName : rwConfig.paramNames) {
             int paramIndex = processor->GetParamIndexFromName(paramName);
-            if (paramIndex == -1) {
+            if (paramIndex == M3::_BAD_INT_) {
                 MACH3LOG_ERROR("Parameter {} not found in MCMC chain", paramName);
                 throw MaCh3Exception(__FILE__, __LINE__);
             }
@@ -316,7 +328,6 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
         MACH3LOG_INFO("Not an Asimov fit, proceeding with reweighting");
     }
 
-
     // Open input file and get tree
     auto inFile = std::unique_ptr<TFile>(TFile::Open(inputFile.c_str(), "READ"));
     if (!inFile || inFile->IsZombie()) {
@@ -341,7 +352,7 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
 
     MACH3LOG_INFO("Output file will be: {}", outputFile);
     
-    // Copy all the remaining objects into the out file (ie all but posteriors tree)
+    // Copy all the remaining objects into the out file (i.e. all but posteriors tree)
     TIter next(inFile->GetListOfKeys());
     while (TKey* key = dynamic_cast<TKey*>(next())) {
         inFile->cd();
@@ -368,8 +379,6 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
     outFile->cd();
     std::unique_ptr<TTree> outTree(inTree->CloneTree(0));
     
-
-
     // Set up parameter reading
     std::map<std::string, double> paramValues;
     for (const auto& rwConfig : reweightConfigs) {
@@ -469,13 +478,11 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
                         }
                     }
                 }
-                
                 weights[rwConfig.weightBranchName] = weight;
             }
-            
             // Fill the output tree
             outTree->Fill();
-        }
+        } // end loop over entries
     }
     
     // Write and close
@@ -595,7 +602,7 @@ bool GetParameterInfo(MCMCProcessor* processor, const std::string& paramName,
     // Try to find the parameter index
     int paramIndex = processor->GetParamIndexFromName(paramName);
     
-    if (paramIndex == -1) { // Assuming -1 or similar indicates not found
+    if (paramIndex == M3::_BAD_INT_) { // This indicate parameter not found
         return false;
     }
     

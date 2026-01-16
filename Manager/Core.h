@@ -21,9 +21,9 @@
 #include <cmath>
 #include <limits>
 
-/// Run low or high memory versions of structs
-/// N.B. for 64 bit systems sizeof(float) == sizeof(double) so not a huge effect
 namespace M3 {
+  // Run low or high memory versions of structs
+  // N.B. for 64 bit systems sizeof(float) == sizeof(double) so not a huge effect
   #ifdef _LOW_MEMORY_STRUCTS_
   /// Custom floating point (float or double)
   using float_t = float;
@@ -123,6 +123,9 @@ _Pragma("GCC diagnostic ignored \"-Wswitch-enum\"") \
 _Pragma("GCC diagnostic ignored \"-Wconversion\"") \
 _Pragma("GCC diagnostic ignored \"-Wshadow\"") \
 _Pragma("GCC diagnostic ignored \"-Wswitch-enum\"")
+#if defined(__GNUC__) && __GNUC__ >= 13
+  _Pragma("GCC diagnostic ignored \"-Wdangling-reference\"")
+#endif
 /// @brief KS: Restore warning checking after including external headers
 #define _MaCh3_Safe_Include_End_ \
 _Pragma("GCC diagnostic pop")

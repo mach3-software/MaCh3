@@ -32,7 +32,6 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TCandle.h"
 #include "TMath.h"
 #include "TMatrixDSymEigen.h"
-#include "TVirtualFFT.h"
 _MaCh3_Safe_Include_End_ //}
 
 
@@ -82,7 +81,7 @@ class MCMCProcessor {
     void MakeSubOptimality(const int NIntervals = 10);
 
     /// @brief Reset 2D posteriors, in case we would like to calculate in again with different BurnInCut
-    void ResetHistograms();
+    void Reset2DPosteriors();
         
     /// @brief Draw the post-fit comparisons
     void DrawPostfit();
@@ -105,6 +104,8 @@ class MCMCProcessor {
     /// @param CredibleRegionStyle Style_t telling what line style to use for each Interval line
     /// @param CredibleRegionColor Color_t telling what colour to use for each Interval line
     /// @param CredibleInSigmas Bool telling whether intervals are in percentage or in sigmas, then special conversions is used
+    /// @param Draw2DPosterior Bool telling whether to draw the 2D posterior distributions
+    /// @param DrawBestFit Bool telling whether to draw the best-fit point on the plots
     void MakeCredibleRegions(const std::vector<double>& CredibleRegions = {0.99, 0.90, 0.68},
                              const std::vector<Style_t>& CredibleRegionStyle = {kDashed, kSolid, kDotted},
                              const std::vector<Color_t>& CredibleRegionColor = {kGreen-3, kGreen-10, kGreen},
@@ -113,12 +114,13 @@ class MCMCProcessor {
                              const bool DrawBestFit = true
                              );
     /// @brief Make fancy triangle plot for selected parameters
+    /// @param ParNames Parameters for which Triangle plot will be made
     /// @param CredibleIntervals Vector with values of credible intervals, must be in descending order
     /// @param CredibleIntervalsColours Color_t telling what colour to use for each Interval line
-    /// @param CredibleInSigmas Bool telling whether intervals are in percentage or in sigmas, then special conversions is used
     /// @param CredibleRegions Vector with values of credible intervals, must be in descending order
     /// @param CredibleRegionStyle Style_t telling what line style to use for each Interval line
     /// @param CredibleRegionColor Color_t telling what colour to use for each Interval line
+    /// @param CredibleInSigmas Bool telling whether intervals are in percentage or in sigmas, then special conversions is used
     void MakeTrianglePlot(const std::vector<std::string>& ParNames,
                           // 1D
                           const std::vector<double>& CredibleIntervals = {0.99, 0.90, 0.68 },
@@ -185,8 +187,10 @@ class MCMCProcessor {
     /// @param Names Parameter names for which we do smearing
     /// @param Error Error based on which we smear
     /// @param SaveBranch Whether we save unsmeared branch or not
+    /// @note based on smear_parameter.C
+    /// @author Dan Barrow
     void SmearChain(const std::vector<std::string>& Names,
-                    const std::vector<double>& NewCentral,
+                    const std::vector<double>& Error,
                     const bool& SaveBranch) const;
 
     /// @brief Make .gif of parameter evolution
@@ -288,6 +292,7 @@ class MCMCProcessor {
     /// @brief You can set relative to prior or relative to generated. It is advised to use relate to prior
     /// @param PlotOrNot bool controlling plotRelativeToPrior argument
     inline void SetPlotRelativeToPrior(const bool PlotOrNot){plotRelativeToPrior = PlotOrNot; };
+    /// @brief Whether to dump all plots into PDF
     inline void SetPrintToPDF(const bool PlotOrNot){printToPDF = PlotOrNot; };
     /// @brief Set whether you want to plot error for parameters which have flat prior
     inline void SetPlotErrorForFlatPrior(const bool PlotOrNot){PlotFlatPrior = PlotOrNot; };
@@ -302,7 +307,6 @@ class MCMCProcessor {
     inline void SetUseFFTAutoCorrelation(const bool useFFT){useFFTAutoCorrelation = useFFT; };
 
     /// @brief Setter related what parameters we want to exclude from analysis, for example if cross-section parameters look like xsec_, then passing "xsec_" will
-    /// @param Batches Vector with parameters type names we want to exclude
     inline void SetExcludedTypes(std::vector<std::string> Name){ExcludedTypes = Name; };
     inline void SetExcludedNames(std::vector<std::string> Name){ExcludedNames = Name; };
     inline void SetExcludedGroups(std::vector<std::string> Name){ExcludedGroups = Name; };
@@ -455,7 +459,6 @@ class MCMCProcessor {
     std::vector<std::vector<TString>> ParamNames;
     /// Parameters central values which we are going to analyse
     std::vector<std::vector<double>>  ParamCentral;
-    std::vector<std::vector<double>>  ParamNom;
     /// Uncertainty on a single parameter
     std::vector<std::vector<double>>  ParamErrors;
     /// Whether Param has flat prior or not

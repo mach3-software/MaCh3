@@ -1,0 +1,27 @@
+  /// @file Definitions.dox
+  /// @brief Stores definitions used throughout MaCh3 doxygen
+  /// @details by having all core definitions here it allows to easily find necessary definition and avoid double defining them
+  /// @author Kamil Skwarczynski
+
+  /// @defgroup ParameterHandlerSetters Parameter Handler Setters
+  /// @brief Group of functions to set various parameters, names, and values.
+
+  /// @defgroup ParameterHandlerGetters Parameter Handler Getters
+  /// @brief Group of functions to get various parameters, names, and values.
+
+  /// @defgroup SampleHandlerSetters Sample Handler Setters
+  /// @brief Group of functions to set various parameters, names, and values.
+
+  /// @defgroup SampleHandlerGetters Sample Handler Getters
+  /// @brief Group of functions to get various parameters, names, and values.
+
+  /// @defgroup Utils Plotting Utility Functions
+  /// @brief Utility functions for plotting
+
+  /// @defgroup CoreClasses Core Classes
+  /// @brief Core classes of MaCh3 Software
+  /// @details These classes form the core of the MaCh3 framework and provide the fundamental
+  /// interfaces and base implementations used throughout the analysis chain.
+
+  /// @namespace M3
+  /// @brief Main namespace for MaCh3 software

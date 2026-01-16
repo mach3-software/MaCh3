@@ -384,7 +384,7 @@ double PSO::swarmIterate(){
 
   std::vector<double> best_pos = get_best_particle()->get_personal_best_position();
   std::vector<double> result(best_pos.size(), 0.0);
-  transform(total_pos.begin(), total_pos.end(), total_pos.begin(), [=](double val){return val/fParticles;});
+  transform(total_pos.begin(), total_pos.end(), total_pos.begin(), [this](double val){return val/fParticles;});
   transform(total_pos.begin(),total_pos.end(),best_pos.begin(),result.begin(),[](double x, double y) {return x-y;});
 
   double mean_dist_sq = 0;

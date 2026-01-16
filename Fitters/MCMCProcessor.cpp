@@ -3,6 +3,7 @@
 _MaCh3_Safe_Include_Start_ //{
 #include "TChain.h"
 #include "TF1.h"
+#include "TVirtualFFT.h"
 _MaCh3_Safe_Include_End_ //}
 
 //Only if GPU is enabled
@@ -65,8 +66,6 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
   nSteps = 0;
   nBatches = 0;
   AutoCorrLag = 0;
-  nParameterHandlers = 0;
-  nSampleHandlers = 0;
   
   nBins = 70;
   DrawRange = 1.5;
@@ -75,7 +74,6 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
   //KS:Those keep basic information for ParameterEnum
   ParamNames.resize(kNParameterEnum);
   ParamCentral.resize(kNParameterEnum);
-  ParamNom.resize(kNParameterEnum);
   ParamErrors.resize(kNParameterEnum);
   ParamFlat.resize(kNParameterEnum);
   ParamTypeStartPos.resize(kNParameterEnum);
@@ -1329,7 +1327,7 @@ void MCMCProcessor::MakeSubOptimality(const int NIntervals) {
   for(int i = 0; i < NIntervals; ++i)
     {
     //Reset our cov matrix
-    ResetHistograms();
+    Reset2DPosteriors();
 
     //Set threshold for calculating new matrix
     UpperCut = i*IntervalsSize;
@@ -2216,11 +2214,9 @@ void MCMCProcessor::ScanInput() {
     //KS: as a bonus get LogL systematic
     if (bname.BeginsWith("LogL_sample_")) {
       SampleName_v.push_back(bname);
-      nSampleHandlers++;
     }
     else if (bname.BeginsWith("LogL_systematic_")) {
       SystName_v.push_back(bname);
-      nParameterHandlers++;
     }
   }
   nDraw = int(BranchNames.size());
@@ -2551,7 +2547,6 @@ void MCMCProcessor::ReadModelFile() {
 
     ParamNames[kXSecPar].push_back(ParName);
     ParamCentral[kXSecPar].push_back(param["Systematic"]["ParameterValues"]["PreFitValue"].as<double>());
-    ParamNom[kXSecPar].push_back(param["Systematic"]["ParameterValues"]["Generated"].as<double>());
     ParamErrors[kXSecPar].push_back(param["Systematic"]["Error"].as<double>() );
     ParamFlat[kXSecPar].push_back(GetFromManager<bool>(param["Systematic"]["FlatPrior"], false));
 
@@ -2587,7 +2582,6 @@ void MCMCProcessor::ReadNDFile() {
 
   for (int i = 0; i < NDdetNominal->GetNrows(); ++i)
   {
-    ParamNom[kNDPar].push_back( (*NDdetNominal)(i) );
     ParamCentral[kNDPar].push_back( (*NDdetNominal)(i) );
 
     ParamErrors[kNDPar].push_back( std::sqrt((*NDdetMatrix)(i,i)) );
@@ -2625,7 +2619,6 @@ void MCMCProcessor::ReadFDFile() {
   for (int i = 0; i < FDdetMatrix->GetNrows(); ++i)
   {
     //KS: FD parameters start at 1. in contrary to ND280
-    ParamNom[kFDDetPar].push_back(1.);
     ParamCentral[kFDDetPar].push_back(1.);
 
     ParamErrors[kFDDetPar].push_back( std::sqrt((*FDdetMatrix)(i,i)) );
@@ -2710,7 +2703,7 @@ int MCMCProcessor::GetParamIndexFromName(const std::string& Name) const {
 
 // **************************************************
 // Helper function to reset histograms
-void MCMCProcessor::ResetHistograms() {
+void MCMCProcessor::Reset2DPosteriors() {
 // **************************************************
   #ifdef MULTITHREAD
   #pragma omp parallel for
@@ -3357,13 +3350,13 @@ void MCMCProcessor::PrepareDiagMCMC() {
   AccProbValues = new double[nEntries]();
   StepNumber = new unsigned int[nEntries]();
   for (int i = 0; i < nEntries; ++i) {
-    SampleValues[i] = new double[nSampleHandlers]();
-    SystValues[i] = new double[nParameterHandlers]();
+    SampleValues[i] = new double[SampleName_v.size()]();
+    SystValues[i] = new double[SystName_v.size()]();
 
-    for (int j = 0; j < nSampleHandlers; ++j) {
+    for (size_t j = 0; j < SampleName_v.size(); ++j) {
       SampleValues[i][j] = -999.99;
     }
-    for (int j = 0; j < nParameterHandlers; ++j) {
+    for (size_t j = 0; j < SystName_v.size(); ++j) {
       SystValues[i][j] = -999.99;
     }
     AccProbValues[i] = -999.99;
@@ -3393,8 +3386,8 @@ void MCMCProcessor::PrepareDiagMCMC() {
     }
   }
   std::vector<double> ParStepBranch(nDraw);
-  std::vector<double> SampleValuesBranch(nSampleHandlers);
-  std::vector<double> SystValuesBranch(nParameterHandlers);
+  std::vector<double> SampleValuesBranch(SampleName_v.size());
+  std::vector<double> SystValuesBranch(SystName_v.size());
   unsigned int StepNumberBranch = 0;
   double AccProbValuesBranch = 0;
   // Set the branch addresses for params
@@ -3403,12 +3396,12 @@ void MCMCProcessor::PrepareDiagMCMC() {
     Chain->SetBranchAddress(BranchNames[j].Data(), &ParStepBranch[j]);
   }
   // Set the branch addresses for samples
-  for (int j = 0; j < nSampleHandlers; ++j) {
+  for (size_t j = 0; j < SampleName_v.size(); ++j) {
     Chain->SetBranchStatus(SampleName_v[j].Data(), true);
     Chain->SetBranchAddress(SampleName_v[j].Data(), &SampleValuesBranch[j]);
   }
   // Set the branch addresses for systematics
-  for (int j = 0; j < nParameterHandlers; ++j) {
+  for (size_t j = 0; j < SystName_v.size(); ++j) {
     Chain->SetBranchStatus(SystName_v[j].Data(), true);
     Chain->SetBranchAddress(SystName_v[j].Data(), &SystValuesBranch[j]);
   }
@@ -3433,11 +3426,11 @@ void MCMCProcessor::PrepareDiagMCMC() {
       ParStep[j][i] = ParStepBranch[j];
     }
     // Set the branch addresses for samples
-    for (int j = 0; j < nSampleHandlers; ++j) {
+    for (size_t j = 0; j < SampleName_v.size(); ++j) {
       SampleValues[i][j] = SampleValuesBranch[j];
     }
     // Set the branch addresses for systematics
-    for (int j = 0; j < nParameterHandlers; ++j) {
+    for (size_t j = 0; j < SystName_v.size(); ++j) {
       SystValues[i][j] = SystValuesBranch[j];
     }
       
@@ -3489,8 +3482,8 @@ void MCMCProcessor::ParamTraces() {
   MACH3LOG_INFO("Making trace plots...");
   // Make the TH1Ds
   std::vector<std::unique_ptr<TH1D>> TraceParamPlots(nDraw);
-  std::vector<std::unique_ptr<TH1D>> TraceSamplePlots(nSampleHandlers);
-  std::vector<std::unique_ptr<TH1D>> TraceSystsPlots(nParameterHandlers);
+  std::vector<std::unique_ptr<TH1D>> TraceSamplePlots(SampleName_v.size());
+  std::vector<std::unique_ptr<TH1D>> TraceSystsPlots(SystName_v.size());
 
   // Set the titles and limits for TH2Ds
   for (int j = 0; j < nDraw; ++j) {
@@ -3505,7 +3498,7 @@ void MCMCProcessor::ParamTraces() {
     TraceParamPlots[j]->GetYaxis()->SetTitle("Parameter Variation");
   }
 
-  for (int j = 0; j < nSampleHandlers; ++j) {
+  for (size_t j = 0; j < SampleName_v.size(); ++j) {
     std::string HistName = SampleName_v[j].Data();
     TraceSamplePlots[j] = std::make_unique<TH1D>(HistName.c_str(), HistName.c_str(), nEntries, 0, nEntries);
     TraceSamplePlots[j]->SetDirectory(nullptr);
@@ -3513,7 +3506,7 @@ void MCMCProcessor::ParamTraces() {
     TraceSamplePlots[j]->GetYaxis()->SetTitle("Sample -logL");
   }
 
-  for (int j = 0; j < nParameterHandlers; ++j) {
+  for (size_t j = 0; j < SystName_v.size(); ++j) {
     std::string HistName = SystName_v[j].Data();
     TraceSystsPlots[j] = std::make_unique<TH1D>(HistName.c_str(), HistName.c_str(), nEntries, 0, nEntries);
     TraceSystsPlots[j]->SetDirectory(nullptr);
@@ -3524,19 +3517,18 @@ void MCMCProcessor::ParamTraces() {
   // Have now made the empty TH1Ds, now for writing content to them!
   // Loop over the number of parameters to draw their traces
   // Each histogram
-#ifdef MULTITHREAD
-  MACH3LOG_INFO("Using multi-threading...");
+  #ifdef MULTITHREAD
   #pragma omp parallel for
-#endif
+  #endif
   for (int i = 0; i < nEntries; ++i) {
     // Set bin content for the ith bin to the parameter values
     for (int j = 0; j < nDraw; ++j) {
       TraceParamPlots[j]->SetBinContent(i, ParStep[j][i]);
     }
-    for (int j = 0; j < nSampleHandlers; ++j) {
+    for (size_t j = 0; j < SampleName_v.size(); ++j) {
       TraceSamplePlots[j]->SetBinContent(i, SampleValues[i][j]);
     }
-    for (int j = 0; j < nParameterHandlers; ++j) {
+    for (size_t j = 0; j < SystName_v.size(); ++j) {
       TraceSystsPlots[j]->SetBinContent(i, SystValues[i][j]);
     }
   }
@@ -3554,13 +3546,13 @@ void MCMCProcessor::ParamTraces() {
 
   TDirectory *LLDir = OutputFile->mkdir("LogL");
   LLDir->cd();
-  for (int j = 0; j < nSampleHandlers; ++j) {
+  for (size_t j = 0; j < SampleName_v.size(); ++j) {
     TraceSamplePlots[j]->Write();
     delete[] SampleValues[j];
   }
   delete[] SampleValues;
 
-  for (int j = 0; j < nParameterHandlers; ++j) {
+  for (size_t j = 0; j < SystName_v.size(); ++j) {
     TraceSystsPlots[j]->Write();
     delete SystValues[j];
   }
@@ -4270,7 +4262,6 @@ void MCMCProcessor::PowerSpectrumAnalysis() {
     Posterior->SetGrid();
     plot->Draw("AL");
     func->Draw("SAME");
-    if(printToPDF) Posterior->Print(CanvasName);
 
     //KS: I have no clue what is the reason behind this. Found this in Rick Calland code...
     (*PowerSpectrumStepSize)(j) = std::sqrt(func->GetParameter(0)/float(v_size*0.5));

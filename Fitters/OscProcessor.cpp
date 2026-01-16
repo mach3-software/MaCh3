@@ -3,6 +3,9 @@
 _MaCh3_Safe_Include_Start_ //{
 // ROOT includes
 #include "TArrow.h"
+#include "TEllipse.h"
+#include "TLatex.h"
+#include "TVector2.h"
 _MaCh3_Safe_Include_End_ //}
 
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
@@ -80,7 +83,6 @@ void OscProcessor::LoadAdditionalInfo() {
     nDraw++;
 
     /// @todo we should actually calculate central value and prior error but leave it for now...
-    ParamNom[kXSecPar].push_back( 0. );
     ParamCentral[kXSecPar].push_back( 0. );
     ParamErrors[kXSecPar].push_back( 1. );
     // Push back the name
@@ -677,4 +679,166 @@ void OscProcessor::MakeJarlskogPlot(const std::unique_ptr<TH1D>& jarl,
   }
 
   gErrorIgnoreLevel = originalErrorLevel;
+}
+
+// ***************
+void OscProcessor::MakePiePlot() {
+// ***************
+  if(!OscEnabled || DeltaCPIndex == M3::_BAD_INT_)
+  {
+    MACH3LOG_WARN("Will not {}, as oscillation parameters are missing", __func__);
+    return;
+  }
+  MACH3LOG_INFO("Starting {}", __func__);
+
+  // get best fit for delta CP
+  const double best_fit = (*Means_HPD)(DeltaCPIndex);
+
+  const double sigma_p = (*Errors_HPD_Positive)(DeltaCPIndex);
+  const double sigma_n = (*Errors_HPD_Negative)(DeltaCPIndex);
+  // make sure result is between -pi and pi
+  auto wrap_pi = [](double x) {
+    while (x > TMath::Pi())  x -= 2*TMath::Pi();
+    while (x < -TMath::Pi()) x += 2*TMath::Pi();
+    return x;
+  };
+
+  std::array<double, 6> bds;
+  bds[0] = wrap_pi(best_fit - 3.0 * sigma_n); // -3σ
+  bds[1] = wrap_pi(best_fit - 2.0 * sigma_n); // -2σ
+  bds[2] = wrap_pi(best_fit - 1.0 * sigma_n); // -1σ
+  bds[3] = wrap_pi(best_fit + 1.0 * sigma_p); // +1σ
+  bds[4] = wrap_pi(best_fit + 2.0 * sigma_p); // +2σ
+  bds[5] = wrap_pi(best_fit + 3.0 * sigma_p); // +3σ
+
+  constexpr double radius = 0.4;
+  constexpr double rad_to_deg = 180.0 / TMath::Pi();
+
+  // ROOT expects TEllipse angles in degrees, counterclockwise from the x-axis.
+  // If phimax < phimin, ROOT draws counterclockwise across the full circle, causing overlaps.
+  // This ensures threesigA slice stays within the intended range.
+  auto normalize_angle = [](double rad) {
+    // If rad is negative, add 2*pi to wrap into [0, 2*pi)
+    if (rad < 0) rad += 2.0 * TMath::Pi();
+    return rad;
+  };
+
+  TEllipse onesig   (0.5, 0.5, radius, radius, bds[2] * rad_to_deg, bds[4] * rad_to_deg);
+  TEllipse twosigA  (0.5, 0.5, radius, radius, bds[1] * rad_to_deg, bds[2] * rad_to_deg);
+  TEllipse twosigB  (0.5, 0.5, radius, radius, bds[3] * rad_to_deg, bds[4] * rad_to_deg);
+
+  // three sigma slices
+  TEllipse threesigA(0.5, 0.5, radius, radius, bds[0] * rad_to_deg, normalize_angle(bds[1]) * rad_to_deg);
+  TEllipse threesigB(0.5, 0.5, radius, radius, bds[4] * rad_to_deg, bds[5] * rad_to_deg);
+
+  // Remaining slices
+  TEllipse rest(0.5, 0.5, radius, radius, bds[5]*rad_to_deg, bds[0]*rad_to_deg);
+  TEllipse restA(0.5, 0.5, radius, radius, bds[5]*rad_to_deg, 180.0);
+  TEllipse restB(0.5, 0.5, radius, radius, -180.0, bds[0]*rad_to_deg);
+
+  onesig.SetFillColor(13);
+  twosigA.SetFillColor(12);
+  twosigB.SetFillColor(12);
+  threesigA.SetFillColor(11);
+  threesigB.SetFillColor(11);
+  TLine line1(0.5 - radius, 0.5, 0.5 + radius, 0.5);
+  line1.SetLineWidth(3);
+
+  TLine line2(0.5, 0.5 - radius, 0.5, 0.5 + radius);
+  line2.SetLineWidth(3);
+
+  TArrow bf(0.5, 0.5, 0.5 + radius * cos(best_fit),0.5 + radius * sin(best_fit),0.04, "|>");
+  bf.SetLineWidth(3);
+  bf.SetLineColor(kRed);
+  bf.SetFillColor(kRed);
+
+  TCanvas canvas("canvas", "canvas", 0, 0, 1000, 1000);
+  onesig.Draw();
+  twosigA.Draw();
+  twosigB.Draw();
+  threesigA.Draw();
+  threesigB.Draw();
+
+  // Check if the rest wraps around the circle
+  if (bds[5] > 0) {
+    // Single rest slice
+    rest.Draw();
+  } else {
+    // Split rest into two slices
+    restA.Draw();
+    restB.Draw();
+  }
+
+  line1.Draw();
+  line2.Draw();
+  bf.Draw();
+
+  TLegend leg(0.0, 0.8, 0.23, 0.95);
+  leg.AddEntry(&bf,        "Best Fit", "L");
+  leg.AddEntry(&onesig,    "1#sigma",  "F");
+  leg.AddEntry(&twosigA,   "2#sigma",  "F");
+  leg.AddEntry(&threesigA, "3#sigma",  "F");
+  leg.Draw();
+
+  // KS: Simple lambda to avoid copy-pasting
+  auto draw_text = [](auto& txt, Color_t color = kBlack) {
+    txt.SetTextAlign(22);
+    txt.SetTextColor(color);
+    txt.SetTextFont(43);
+    txt.SetTextSize(40);
+    txt.SetTextAngle(0);
+    txt.Draw();
+  };
+
+  //KS: If best fit point is somehow very close text we simply not plot it
+  // Define a threshold for "too close"
+  constexpr double too_close_threshold = 0.1;
+
+  // Position of tbf
+  const double tbf_x = 0.5 + (radius + 0.02) * cos(best_fit);
+  const double tbf_y = 0.5 + (radius + 0.02) * sin(best_fit);
+
+  // Function to calculate distance between two points
+  auto distance = [](double x1, double y1, double x2, double y2) {
+    return std::sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+  };
+
+  // Check and draw right 0
+  constexpr double t0_x = 0.5 + radius + 0.02;
+  constexpr double t0_y = 0.5;
+  TText t0(t0_x, t0_y, "0");
+  if (distance(tbf_x, tbf_y, t0_x, t0_y) > too_close_threshold) {
+    draw_text(t0);
+  }
+
+  // Check and draw left pi
+  constexpr double tp_x = 0.5 - radius - 0.02;
+  constexpr double tp_y = 0.5;
+  TLatex tp(tp_x, tp_y, "#pi");
+  if (distance(tbf_x, tbf_y, tp_x, tp_y) > too_close_threshold) {
+    draw_text(tp);
+  }
+
+  // Check and draw top pi/2
+  constexpr double tp2_x = 0.5;
+  constexpr double tp2_y = 0.5 + radius + 0.04;
+  TLatex tp2(tp2_x, tp2_y, "#frac{#pi}{2}");
+  if (distance(tbf_x, tbf_y, tp2_x, tp2_y) > too_close_threshold) {
+    draw_text(tp2);
+  }
+
+  // Check and draw bottom -pi/2
+  constexpr double tmp2_x = 0.5;
+  constexpr double tmp2_y = 0.5 - radius - 0.04;
+  TLatex tmp2(tmp2_x, tmp2_y, "-#frac{#pi}{2}");
+  if (distance(tbf_x, tbf_y, tmp2_x, tmp2_y) > too_close_threshold) {
+    draw_text(tmp2);
+  }
+
+  TLatex tbf(0.5 + (radius + 0.02) * cos(best_fit),
+             0.5 + (radius + 0.02) * sin(best_fit),
+             fmt::format("{:.2f}", best_fit).c_str());
+  draw_text(tbf, kRed);
+
+  canvas.Print(CanvasName);
 }

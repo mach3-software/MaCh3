@@ -22,6 +22,7 @@ _MaCh3_Safe_Include_Start_ //{
 _MaCh3_Safe_Include_End_ //}
 
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
+/// @ingroup CoreClasses
 class SampleHandlerBase
 {
  public:
@@ -29,12 +30,6 @@ class SampleHandlerBase
    SampleHandlerBase();
   /// @brief destructor
   virtual ~SampleHandlerBase();
-
-  /// @defgroup SampleHandlerSetters Sample Handler Setters
-  /// Group of functions to set various parameters, names, and values.
-
-  /// @defgroup SampleHandlerGetters Sample Handler Getters
-  /// Group of functions to get various parameters, names, and values.
 
   /// @ingroup SampleHandlerGetters
   virtual inline M3::int_t GetNsamples(){ return nSamples; };
@@ -176,7 +171,9 @@ class SampleHandlerBase
   /// @brief Set the test statistic to be used when calculating the binned likelihoods
   /// @param testStat The test statistic to use.
   /// @ingroup SampleHandlerGetters
-  inline void SetTestStatistic(TestStatistic testStat){ fTestStatistic = testStat; }
+  void SetTestStatistic(TestStatistic testStat){ fTestStatistic = testStat; }
+  /// @brief Get the test statistic used when calculating the binned likelihoods
+  TestStatistic GetTestStatistic() const { return fTestStatistic; }
 
 protected:
   /// @brief CW: Redirect std::cout to silence some experiment specific libraries

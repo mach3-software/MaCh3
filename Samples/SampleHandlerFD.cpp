@@ -201,6 +201,12 @@ void SampleHandlerFD::Initialise() {
     SetupNuOscillatorPointers();
   } else{
     MACH3LOG_WARN("Didn't find any oscillation params, thus will not enable oscillations");
+    if(CheckNodeExists(SampleManager->raw(), "NuOsc")){
+      MACH3LOG_ERROR("However config for SampleHandler {} has 'NuOsc' field", GetName());
+      MACH3LOG_ERROR("This may indicate misconfiguration");
+      MACH3LOG_ERROR("Either remove 'NuOsc' field from SampleHandler config or check your model.yaml and include oscillation for sample");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
   }
   MACH3LOG_INFO("Setting up Sample Binning..");
   SetBinning();
@@ -361,12 +367,8 @@ void SampleHandlerFD::FillArray() {
       continue;
     }
 
-    //DB Switch on BinningOpt to allow different binning options to be implemented
-    //The alternative would be to have inheritance based on BinningOpt
-    const double XVar = *(MCEvent->x_var);
-
     //DB Find the relevant bin in the PDF for each event
-    const int GlobalBin = Binning->FindGlobalBin(MCEvent->NominalSample, XVar, MCEvent->NomXBin, MCEvent->NomYBin);
+    const int GlobalBin = Binning->FindGlobalBin(MCEvent->NominalSample, MCEvent->KinVar, MCEvent->NomBin);
 
     //DB Fill relevant part of thread array
     if (GlobalBin > -1) {
@@ -439,12 +441,8 @@ void SampleHandlerFD::FillArray_MP() {
         continue;
       }
 
-      //DB Switch on BinningOpt to allow different binning options to be implemented
-      //The alternative would be to have inheritance based on BinningOpt
-      const double XVar = (*(MCEvent->x_var));
-
       //DB Find the relevant bin in the PDF for each event
-      const int GlobalBin = Binning->FindGlobalBin(MCEvent->NominalSample, XVar, MCEvent->NomXBin, MCEvent->NomYBin);
+      const int GlobalBin = Binning->FindGlobalBin(MCEvent->NominalSample, MCEvent->KinVar, MCEvent->NomBin);
 
       //ETA - we can probably remove this final if check on the -1?
       //Maybe we can add an overflow bin to the array and assign any events to this bin?
@@ -815,52 +813,42 @@ void SampleHandlerFD::FindNominalBinAndEdges() {
 // ************************************************
   for (unsigned int event_i = 0; event_i < GetNEvents(); event_i++) {
     int Sample = MCSamples[event_i].NominalSample;
+    const int dim = GetNDim(Sample);
+    MCSamples[event_i].KinVar.resize(dim);
+    MCSamples[event_i].NomBin.resize(dim);
+
+    auto SetNominalBin = [&](int bin, int max_bins, int& out_bin) {
+      if (bin >= 0 && bin < max_bins) {
+        out_bin = bin;
+      } else {
+        out_bin = -1;  // Out of bounds
+      }
+    };
 
     // Set and validate x_var (common to both cases)
-    MCSamples[event_i].x_var = GetPointerToKinematicParameter(GetXBinVarName(Sample), event_i);
-    if (std::isnan(*MCSamples[event_i].x_var) || std::isinf(*MCSamples[event_i].x_var)) {
-      MACH3LOG_ERROR("X var for event {} is ill-defined and equal to {}", event_i, *MCSamples[event_i].x_var);
+    MCSamples[event_i].KinVar[0] = GetPointerToKinematicParameter(GetXBinVarName(Sample), event_i);
+    if (std::isnan(*MCSamples[event_i].KinVar[0]) || std::isinf(*MCSamples[event_i].KinVar[0])) {
+      MACH3LOG_ERROR("X var for event {} is ill-defined and equal to {}", event_i, *MCSamples[event_i].KinVar[0]);
       throw MaCh3Exception(__FILE__, __LINE__);
     }
-    const int dim = GetNDim(Sample);
     if (dim == 1) {
       // 1D case
-      MCSamples[event_i].y_var = &(M3::_BAD_DOUBLE_);  // Unused in 1D
-      int bin = SampleDetails[Sample]._hPDF1D->FindBin(*(MCSamples[event_i].x_var));
-
-      if ((bin-1) >= 0 && (bin-1) < static_cast<int>(Binning->GetXBinEdges(Sample).size()-1)) {
-        MCSamples[event_i].NomXBin = bin-1;
-      } else {
-        MCSamples[event_i].NomXBin = -1;  // Out of bounds
-      }
-      MCSamples[event_i].NomYBin = 0;  // Unused in 1D
+      int bin_x = Binning->FindNominalBin(Sample, 0, *MCSamples[event_i].KinVar[0]);
+      SetNominalBin(bin_x, Binning->GetNXBins(Sample), MCSamples[event_i].NomBin[0]);
     }
     else if (dim == 2){
       // 2D case - set and validate y_var
-      MCSamples[event_i].y_var = GetPointerToKinematicParameter(GetYBinVarName(Sample), event_i);
-      if (std::isnan(*MCSamples[event_i].y_var) || std::isinf(*MCSamples[event_i].y_var)) {
-        MACH3LOG_ERROR("Y var for event {} is ill-defined and equal to {}", event_i, *MCSamples[event_i].y_var);
+      MCSamples[event_i].KinVar[1] = GetPointerToKinematicParameter(GetYBinVarName(Sample), event_i);
+      if (std::isnan(*MCSamples[event_i].KinVar[1]) || std::isinf(*MCSamples[event_i].KinVar[1])) {
+        MACH3LOG_ERROR("Y var for event {} is ill-defined and equal to {}", event_i, *MCSamples[event_i].KinVar[1]);
         throw MaCh3Exception(__FILE__, __LINE__);
       }
-
       // Get global bin and convert to x/y bins
-      int bin = SampleDetails[Sample]._hPDF2D->FindBin(*(MCSamples[event_i].x_var), *(MCSamples[event_i].y_var));
-      int bin_x = M3::_BAD_INT_;
-      int bin_y = M3::_BAD_INT_;
-      int bin_z = M3::_BAD_INT_;  // Unused in 2D
+      int bin_x = Binning->FindNominalBin(Sample, 0, *MCSamples[event_i].KinVar[0]);
+      int bin_y = Binning->FindNominalBin(Sample, 1, *MCSamples[event_i].KinVar[1]);
 
-      SampleDetails[Sample]._hPDF2D->GetBinXYZ(bin, bin_x, bin_y, bin_z);
-
-      if ((bin_x-1) >= 0 && (bin_x-1) < static_cast<int>(Binning->GetXBinEdges(Sample).size()-1)) {
-        MCSamples[event_i].NomXBin = bin_x-1;
-      } else {
-        MCSamples[event_i].NomXBin = -1;  // Out of bounds
-      }
-
-      MCSamples[event_i].NomYBin = bin_y-1;
-      if (MCSamples[event_i].NomYBin < 0) {
-        MACH3LOG_WARN("Nominal YBin PROBLEM, y-bin is {}", MCSamples[event_i].NomYBin);
-      }
+      SetNominalBin(bin_x, Binning->GetNXBins(Sample), MCSamples[event_i].NomBin[0]);
+      SetNominalBin(bin_y, Binning->GetNYBins(Sample), MCSamples[event_i].NomBin[1]);
     } else {
       MACH3LOG_ERROR("Unsupported dimensionality: {}", dim);
       throw MaCh3Exception(__FILE__, __LINE__);
@@ -1059,6 +1047,9 @@ void SampleHandlerFD::AddData(const int Sample, TH1D* Data) {
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
+  SampleDetails[Sample].dathist->GetXaxis()->SetTitle(GetXBinVarName(Sample).c_str());
+  SampleDetails[Sample].dathist->GetYaxis()->SetTitle("Number of Events");
+
   for (int yBin = 0; yBin < Binning->GetNYBins(Sample); ++yBin) {
     for (int xBin = 0; xBin < Binning->GetNXBins(Sample); ++xBin) {
       const int idx = Binning->GetGlobalBinSafe(Sample, xBin, yBin);
@@ -1084,6 +1075,12 @@ void SampleHandlerFD::AddData(const int Sample, TH2D* Data) {
     MACH3LOG_ERROR("SampleHandlerFD_data haven't been initialised yet");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
+
+
+  SampleDetails[Sample].dathist2d->GetXaxis()->SetTitle(GetXBinVarName(Sample).c_str());
+  SampleDetails[Sample].dathist2d->GetYaxis()->SetTitle(GetYBinVarName(Sample).c_str());
+  SampleDetails[Sample].dathist2d->GetZaxis()->SetTitle("Number of Events");
+
   for (int yBin = 0; yBin < Binning->GetNYBins(Sample); ++yBin) {
     for (int xBin = 0; xBin < Binning->GetNXBins(Sample); ++xBin) {
       const int idx = Binning->GetGlobalBinSafe(Sample, xBin, yBin);
@@ -1248,10 +1245,10 @@ void SampleHandlerFD::FillSplineBins() {
     std::vector< std::vector<int> > EventSplines;
     switch(GetNDim(SampleIndex)){
       case 1:
-        EventSplines = SplineHandler->GetEventSplines(GetSampleTitle(SampleIndex), OscIndex, int(*(MCSamples[j].mode)), *(MCSamples[j].rw_etru), *(MCSamples[j].x_var), 0.);
+        EventSplines = SplineHandler->GetEventSplines(GetSampleTitle(SampleIndex), OscIndex, int(*(MCSamples[j].mode)), *(MCSamples[j].rw_etru), *(MCSamples[j].KinVar[0]), 0.);
         break;
       case 2:
-        EventSplines = SplineHandler->GetEventSplines(GetSampleTitle(SampleIndex), OscIndex, int(*(MCSamples[j].mode)), *(MCSamples[j].rw_etru), *(MCSamples[j].x_var), *(MCSamples[j].y_var));
+        EventSplines = SplineHandler->GetEventSplines(GetSampleTitle(SampleIndex), OscIndex, int(*(MCSamples[j].mode)), *(MCSamples[j].rw_etru), *(MCSamples[j].KinVar[0]), *(MCSamples[j].KinVar[1]));
         break;
       default:
         MACH3LOG_ERROR("Error in assigning spline bins because nDimensions = {}", GetNDim(SampleIndex));
