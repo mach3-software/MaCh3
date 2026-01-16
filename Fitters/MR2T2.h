@@ -25,8 +25,8 @@
 class MR2T2 : public MCMCBase {
  public:
     /// @brief Constructor
-    /// @param manager A pointer to a manager object, which will handle all settings.
-     MR2T2(manager *const manager);
+    /// @param FitManager A pointer to a manager object, which will handle all settings.
+     MR2T2(Manager *const FitManager);
 
      /// @brief Destructor
      virtual ~MR2T2() = default;

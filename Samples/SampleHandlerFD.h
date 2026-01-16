@@ -363,7 +363,7 @@ class SampleHandlerFD :  public SampleHandlerBase
   // =========================================================== 
 
   /// The manager object used to read the sample yaml file
-  std::unique_ptr<manager> SampleManager;
+  std::unique_ptr<Manager> SampleManager;
   void InitialiseSplineObject();
 
   std::unordered_map<std::string, double> _modeNomWeightMap;

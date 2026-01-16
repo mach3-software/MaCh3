@@ -1,6 +1,6 @@
 //MaCh3 Includes
-#include "plottingUtils/plottingUtils.h"
-#include "plottingUtils/plottingManager.h"
+#include "PlottingUtils/PlottingUtils.h"
+#include "PlottingUtils/PlottingManager.h"
 
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
 #pragma GCC diagnostic ignored "-Wconversion"

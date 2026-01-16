@@ -15,8 +15,8 @@
 #include "Manager/MaCh3Exception.h"
 
 // Other MaCh3Plotting stuff
-#include "inputManager.h"
-#include "styleManager.h"
+#include "InputManager.h"
+#include "StyleManager.h"
 
 namespace MaCh3Plotting {
 /// @brief The main class to be used in plotting scripts.
