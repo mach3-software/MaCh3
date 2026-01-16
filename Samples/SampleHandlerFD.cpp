@@ -802,6 +802,7 @@ void SampleHandlerFD::SetBinning() {
                                   static_cast<int>(YVec.size()-1), YVec.data());
 
   }
+
   //Set the number of X and Y bins now
   SetupReweightArrays();
   FindNominalBinAndEdges();
@@ -2060,4 +2061,3 @@ void SampleHandlerFD::PrintRates(const bool DataOnly) {
     MACH3LOG_INFO("{}", sep_data);
   }
 }
-

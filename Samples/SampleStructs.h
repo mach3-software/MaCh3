@@ -371,6 +371,27 @@ inline int GetSampleFromGlobalBin(const std::vector<SampleBinningInfo>& BinningI
   return M3::_BAD_INT_;
 }
 
+/// @brief Get the local (sample) bin index from a global bin number.
+/// @param BinningInfo Vector of SampleBinningInfo structs.
+/// @param GlobalBin The global bin number.
+/// @return The bin index within the sample.
+inline int GetLocalBinFromGlobalBin(const std::vector<SampleBinningInfo>& BinningInfo,
+                                    const size_t GlobalBin) {
+  for (size_t iSample = 0; iSample < BinningInfo.size(); ++iSample) {
+    const SampleBinningInfo& info = BinningInfo[iSample];
+
+    if (GlobalBin >= info.GlobalOffset &&
+      GlobalBin <  info.GlobalOffset + info.nBins)
+    {
+      return static_cast<int>(GlobalBin - info.GlobalOffset);
+    }
+  }
+
+  MACH3LOG_ERROR("Couldn't find local bin corresponding to bin {}", GlobalBin);
+  throw MaCh3Exception(__FILE__, __LINE__);
+
+  return M3::_BAD_INT_;
+}
 
 // ***************************
 // A handy namespace for variables extraction

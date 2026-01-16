@@ -211,7 +211,10 @@ void FitterBase::PrepareOutput() {
   }
   #endif
   // Time the progress
+
+
   clock->Start();
+
 
   OutputPrepared = true;
 }

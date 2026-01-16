@@ -71,7 +71,6 @@ class SampleHandlerBase
   virtual inline std::string GetKinVarLabel(const int sample, const int Dimension) {
     (void) sample; (void) Dimension; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");  };
 
-
   /// @brief Calculate test statistic for a single bin using Poisson
   /// @param data is data
   /// @param mc is mc
