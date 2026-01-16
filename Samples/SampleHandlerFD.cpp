@@ -371,7 +371,7 @@ void SampleHandlerFD::FillArray() {
     const int GlobalBin = Binning->FindGlobalBin(MCEvent->NominalSample, MCEvent->KinVar, MCEvent->NomBin);
 
     //DB Fill relevant part of thread array
-    if (GlobalBin > -1) {
+    if (GlobalBin > M3::UnderOverFlowBin) {
       SampleHandlerFD_array[GlobalBin] += totalweight;
       if (FirstTimeW2) SampleHandlerFD_array_w2[GlobalBin] += totalweight*totalweight;
     }
@@ -448,7 +448,7 @@ void SampleHandlerFD::FillArray_MP() {
       //Maybe we can add an overflow bin to the array and assign any events to this bin?
       //Might save us an extra if call?
       //DB Fill relevant part of thread array
-      if (GlobalBin > -1) {
+      if (GlobalBin > M3::UnderOverFlowBin) {
         SampleHandlerFD_array_private[GlobalBin] += totalweight;
         SampleHandlerFD_array_private_w2[GlobalBin] += totalweight*totalweight;
       }
@@ -821,7 +821,7 @@ void SampleHandlerFD::FindNominalBinAndEdges() {
       if (bin >= 0 && bin < max_bins) {
         out_bin = bin;
       } else {
-        out_bin = -1;  // Out of bounds
+        out_bin = M3::UnderOverFlowBin;  // Out of bounds
       }
     };
 
@@ -1700,7 +1700,7 @@ TH1* SampleHandlerFD::Get1DVarHistByModeAndChannel(const int iSample, const std:
     fChannel = false;
   }
 
-  if (kModeToFill!=-1) {
+  if (kModeToFill != -1) {
     if (!(kModeToFill >= 0) && (kModeToFill < Modes->GetNModes())) {
       MACH3LOG_ERROR("Required mode is not available. kModeToFill should be between 0 and {}", Modes->GetNModes());
       MACH3LOG_ERROR("kModeToFill given:{}", kModeToFill);
@@ -1738,7 +1738,7 @@ TH2* SampleHandlerFD::Get2DVarHistByModeAndChannel(const int iSample, const std:
   bool fChannel;
   bool fMode;
 
-  if (kChannelToFill!=-1) {
+  if (kChannelToFill != -1) {
     if (kChannelToFill > GetNOscChannels(iSample)) {
       MACH3LOG_ERROR("Required channel is not available. kChannelToFill should be between 0 and {}", GetNOscChannels(iSample));
       MACH3LOG_ERROR("kChannelToFill given:{}", kChannelToFill);
@@ -1750,7 +1750,7 @@ TH2* SampleHandlerFD::Get2DVarHistByModeAndChannel(const int iSample, const std:
     fChannel = false;
   }
 
-  if (kModeToFill!=-1) {
+  if (kModeToFill != -1) {
     if (!(kModeToFill >= 0) && (kModeToFill < Modes->GetNModes())) {
       MACH3LOG_ERROR("Required mode is not available. kModeToFill should be between 0 and {}", Modes->GetNModes());
       MACH3LOG_ERROR("kModeToFill given:{}", kModeToFill);
@@ -1873,7 +1873,7 @@ void SampleHandlerFD::PrintIntegral(const int iSample, const TString& OutputFile
     for (unsigned int j=0;j<IntegralList[i].size();j++) {
       double Integral = IntegralList[i][j]->Integral();
 
-      if (Integral<1e-100) {Integral=0;}
+      if (Integral < 1e-100) {Integral=0;}
 
       ModeIntegral += Integral;
       ChannelIntegral[j] += Integral;

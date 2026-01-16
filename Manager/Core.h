@@ -86,6 +86,9 @@ namespace M3 {
   constexpr static const double DefSplineKnotUpBound = 9999;
   /// Default value for spline knot capping, default mean not capping is being applied
   constexpr static const double DefSplineKnotLowBound = -9999;
+
+  /// Mark bin which is overflow or underflow in MaCh3 binning
+  constexpr static const int UnderOverFlowBin = -1;
 }
 
 /// KS: noexcept can help with performance but is terrible for debugging, this is meant to help easy way of of turning it on or off. In near future move this to struct or other central class.

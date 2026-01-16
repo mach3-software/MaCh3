@@ -128,20 +128,21 @@ int BinningHandler::FindGlobalBin(const int NomSample,
 // ************************************************
   //DB Find the relevant bin in the PDF for each event
   const int Dim = static_cast<int>(KinVar.size());
-  std::vector<int> BinToFill(Dim);
-  const SampleBinningInfo& SB = SampleBinning[NomSample];
+  const SampleBinningInfo& _restrict_ SB = SampleBinning[NomSample];
+  int GlobalBin = 0;
+
   for(int i = 0; i < Dim; ++i) {
-    const double Var = (*(KinVar[i]));
-    BinToFill[i] = SB.FindBin(i, Var, NomBin[i]);
+    const double Var = *KinVar[i];
+    const int Bin = SB.FindBin(i, Var, NomBin[i]);
     // KS: If we are outside of range in only one dimension this mean out of bounds, we can simply quickly finish
-    if(BinToFill[i] < 0) return -1;
+    if(Bin < 0) return M3::UnderOverFlowBin;
+    // KS: inline GetBin computation to avoid any allocation
+    GlobalBin += Bin * SB.Strides[i];
   }
 
-  int GlobalBin = SB.GetBin(BinToFill);
   GlobalBin += static_cast<int>(SB.GlobalOffset);
   return GlobalBin;
 }
-
 
 // ************************************************
 int BinningHandler::FindNominalBin(const int iSample,
@@ -154,7 +155,7 @@ int BinningHandler::FindNominalBin(const int iSample,
 
   // Outside binning range
   if (Var < edges.front() || Var >= edges.back()) {
-    return -1;
+    return M3::UnderOverFlowBin;
   }
   return static_cast<int>(std::distance(edges.begin(), std::upper_bound(edges.begin(), edges.end(), Var)) - 1);
 }

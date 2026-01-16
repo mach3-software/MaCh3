@@ -205,6 +205,7 @@ struct SampleBinningInfo {
   }
 
   /// @brief Convert N-dimensional bin indices to a linear bin index.
+  /// @param Bins Vector of bin indices along each dimension
   /// @details
   /// Mapping follows row-major order:
   ///  - 1D: xBin
@@ -245,6 +246,13 @@ struct SampleBinningInfo {
   }
 
   /// @brief DB Find the relevant bin in the PDF for each event
+  /// @param KinVar       The value of the kinematic variable for the event.
+  /// @param NomBin       The nominal bin index where the event would fall without any shifts.
+  /// @param N_Bins       The total number of bins in this dimension.
+  /// @param Bin_Edges    Vector of bin edge values (size = N_Bins + 1).
+  /// @param Bin_Lookup   Vector of `BinShiftLookup` structs providing precomputed lower and upper
+  ///                     edges for the nominal bin and its neighbors to efficiently handle
+  ///                     shifted events
   int FindBin(const double KinVar,
               const int NomBin,
               const size_t N_Bins,
@@ -253,15 +261,15 @@ struct SampleBinningInfo {
     //DB Check to see if momentum shift has moved bins
     //DB - First , check to see if the event is outside of the binning range and skip event if it is
     if (KinVar < Bin_Edges[0] || KinVar >= Bin_Edges[N_Bins]) {
-      return -1;
+      return M3::UnderOverFlowBin;
     }
 
     // KS: Get reference to avoid repeated indexing and help with performance
-    const BinShiftLookup& _restrict_ xBin = Bin_Lookup[NomBin];
-    const double lower = xBin.lower_binedge;
-    const double upper = xBin.upper_binedge;
-    const double lower_lower = xBin.lower_lower_binedge;
-    const double upper_upper = xBin.upper_upper_binedge;
+    const BinShiftLookup& _restrict_ Bin = Bin_Lookup[NomBin];
+    const double lower = Bin.lower_binedge;
+    const double upper = Bin.upper_binedge;
+    const double lower_lower = Bin.lower_lower_binedge;
+    const double upper_upper = Bin.upper_upper_binedge;
 
     //DB - Second, check to see if the event is still in the nominal bin
     if (KinVar < upper && KinVar >= lower) {
