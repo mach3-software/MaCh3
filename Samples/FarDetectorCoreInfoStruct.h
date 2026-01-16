@@ -49,10 +49,8 @@ struct SampleInfo {
     if(_hPDF2D   != nullptr) delete _hPDF2D;
   }
 
-  /// the strings associated with the variables used for the X binning e.g. "RecoNeutrinoEnergy"
-  std::string XVarStr = "";
-  /// the strings associated with the variables used for the Y binning e.g. "RecoNeutrinoEnergy"
-  std::string YVarStr = "";
+  /// the strings associated with the variables used for the binning e.g. "RecoNeutrinoEnergy"
+  std::vector<std::string> VarStr;
 
   /// @brief the name of this sample e.g."muon-like"
   std::string SampleTitle = "";
@@ -80,8 +78,8 @@ struct SampleInfo {
 
   /// @brief Initialise histograms used for plotting
   void InitialiseHistograms() {
-    TString histname1d = (XVarStr).c_str();
-    TString histname2d = (XVarStr + "_" + YVarStr).c_str();
+    TString histname1d = (VarStr[0]).c_str();
+    TString histname2d = (VarStr[0] + "_" + VarStr[1]).c_str();
     TString histtitle = SampleTitle;
 
     //The binning here is arbitrary, now we get info from cfg so the
@@ -98,17 +96,17 @@ struct SampleInfo {
     dathist2d->SetDirectory(nullptr);
 
     // Set all titles so most of projections don't have empty titles...
-    _hPDF1D->GetXaxis()->SetTitle(XVarStr.c_str());
+    _hPDF1D->GetXaxis()->SetTitle(VarStr[0].c_str());
     _hPDF1D->GetYaxis()->SetTitle("Events");
 
-    dathist->GetXaxis()->SetTitle(XVarStr.c_str());
+    dathist->GetXaxis()->SetTitle(VarStr[0].c_str());
     dathist->GetYaxis()->SetTitle("Events");
 
-    _hPDF2D->GetXaxis()->SetTitle(XVarStr.c_str());
-    _hPDF2D->GetYaxis()->SetTitle(YVarStr.c_str());
+    _hPDF2D->GetXaxis()->SetTitle(VarStr[0].c_str());
+    _hPDF2D->GetYaxis()->SetTitle(VarStr[1].c_str());
 
-    dathist2d->GetXaxis()->SetTitle(XVarStr.c_str());
-    dathist2d->GetYaxis()->SetTitle(YVarStr.c_str());
+    dathist2d->GetXaxis()->SetTitle(VarStr[0].c_str());
+    dathist2d->GetYaxis()->SetTitle(VarStr[1].c_str());
   }
 };
 
@@ -134,7 +132,9 @@ struct FarDetectorCoreInfo {
   /// PDG of neutrino before oscillation
   const int* nupdgUnosc = 0;
 
+  /// Pointer to true Neutrino Energy
   const double* rw_etru = &M3::_BAD_DOUBLE_;
+  /// Pointer to true cosine zenith
   const double* rw_truecz = &M3::_BAD_DOUBLE_;
 
   /// Pointers to normalisation weights which are being taken from Parameter Handler

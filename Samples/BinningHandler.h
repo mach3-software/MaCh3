@@ -27,6 +27,12 @@ class BinningHandler {
                     const std::vector<const double*>& KinVar,
                     const std::vector<int>& NomBin) const;
 
+  /// @brief Find the nominal bin for a given variable in a given sample and dimension
+  /// @param iSample Sample index
+  /// @param iDim Dimension index (0 = X, 1 = Y, ...)
+  /// @param Var Kinematic variable value
+  int FindNominalBin(const int iSample, const int iDim, const double Var) const;
+
   /// @brief Get gloabl bin based on sample, and dimension of each sample with additional checks
   /// @param iSample index of a given sample
   int GetGlobalBinSafe(const int iSample, const int xBin, const int yBin) const;

@@ -816,6 +816,14 @@ void SampleHandlerFD::FindNominalBinAndEdges() {
     MCSamples[event_i].KinVar.resize(dim);
     MCSamples[event_i].NomBin.resize(dim);
 
+    auto SetNominalBin = [&](int bin, int max_bins, int& out_bin) {
+      if (bin >= 0 && bin < max_bins) {
+        out_bin = bin;
+      } else {
+        out_bin = -1;  // Out of bounds
+      }
+    };
+
     // Set and validate x_var (common to both cases)
     MCSamples[event_i].KinVar[0] = GetPointerToKinematicParameter(GetXBinVarName(Sample), event_i);
     if (std::isnan(*MCSamples[event_i].KinVar[0]) || std::isinf(*MCSamples[event_i].KinVar[0])) {
@@ -824,13 +832,8 @@ void SampleHandlerFD::FindNominalBinAndEdges() {
     }
     if (dim == 1) {
       // 1D case
-      int bin = SampleDetails[Sample]._hPDF1D->FindBin(*(MCSamples[event_i].KinVar[0]));
-
-      if ((bin-1) >= 0 && (bin-1) < Binning->GetNXBins(Sample)) {
-        MCSamples[event_i].NomBin[0] = bin-1;
-      } else {
-        MCSamples[event_i].NomBin[0] = -1;  // Out of bounds
-      }
+      int bin_x = Binning->FindNominalBin(Sample, 0, *MCSamples[event_i].KinVar[0]);
+      SetNominalBin(bin_x, Binning->GetNXBins(Sample), MCSamples[event_i].NomBin[0]);
     }
     else if (dim == 2){
       // 2D case - set and validate y_var
@@ -839,26 +842,12 @@ void SampleHandlerFD::FindNominalBinAndEdges() {
         MACH3LOG_ERROR("Y var for event {} is ill-defined and equal to {}", event_i, *MCSamples[event_i].KinVar[1]);
         throw MaCh3Exception(__FILE__, __LINE__);
       }
-
       // Get global bin and convert to x/y bins
-      int bin = SampleDetails[Sample]._hPDF2D->FindBin(*(MCSamples[event_i].KinVar[0]), *(MCSamples[event_i].KinVar[1]));
-      int bin_x = M3::_BAD_INT_;
-      int bin_y = M3::_BAD_INT_;
-      int bin_z = M3::_BAD_INT_;  // Unused in 2D
+      int bin_x = Binning->FindNominalBin(Sample, 0, *MCSamples[event_i].KinVar[0]);
+      int bin_y = Binning->FindNominalBin(Sample, 1, *MCSamples[event_i].KinVar[1]);
 
-      SampleDetails[Sample]._hPDF2D->GetBinXYZ(bin, bin_x, bin_y, bin_z);
-
-      if ((bin_x-1) >= 0 && (bin_x-1) < Binning->GetNXBins(Sample)) {
-        MCSamples[event_i].NomBin[0] = bin_x-1;
-      } else {
-        MCSamples[event_i].NomBin[0] = -1;  // Out of bounds
-      }
-
-      if ((bin_y - 1) >= 0 && (bin_y - 1) < Binning->GetNYBins(Sample)) {
-        MCSamples[event_i].NomBin[1] = bin_y - 1;
-      } else {
-        MCSamples[event_i].NomBin[1] = -1;  // Out of bounds
-      }
+      SetNominalBin(bin_x, Binning->GetNXBins(Sample), MCSamples[event_i].NomBin[0]);
+      SetNominalBin(bin_y, Binning->GetNYBins(Sample), MCSamples[event_i].NomBin[1]);
     } else {
       MACH3LOG_ERROR("Unsupported dimensionality: {}", dim);
       throw MaCh3Exception(__FILE__, __LINE__);
