@@ -86,7 +86,7 @@ public:
     /* Trampoline (need one for each virtual function) */
     std::string GetKinVarName(const int iSample, const int Dimension) const override  {
         PYBIND11_OVERRIDE_PURE(
-            void,                 /* Return type */
+            std::string,          /* Return type */
             SampleHandlerBase,    /* Parent class */
             GetKinVarName,        /* Name of function in C++ (must match Python name) */
             iSample,              /* Argument(s) */
