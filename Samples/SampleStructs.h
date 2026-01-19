@@ -31,14 +31,6 @@ _MaCh3_Safe_Include_End_ //}
 /// @author Kamil Skwarczynski
 
 
-// *******************
-/// @brief KS: This is mad way of converting string to int. Why? To be able to use string with switch
-constexpr unsigned int str2int(const char* str, const int h = 0) {
-// *******************
-  return !str[h] ? 5381 : (str2int(str, h+1) * 33) ^ str[h];
-}
-
-
 // *****************
 /// Enum to track the target material
 enum TargetMat {
@@ -179,7 +171,15 @@ struct BinShiftLookup {
 };
 
 // ***************************
-/// @brief KS: Small struct storying info about used binning
+/// @brief KS: Struct storing all information required for sample binning
+///
+/// @details
+/// This struct encapsulates the full binning definition for a single analysis
+/// sample. It stores the bin edges, number of bins per dimension, stride factors,
+/// and lookup tables required to efficiently map multi-dimensional kinematic
+/// variables to linear bin indices.
+///
+/// @author Kamil Skwarczynski
 struct SampleBinningInfo {
 // ***************************
   /// Vector to hold N-axis bin-edges
@@ -196,12 +196,18 @@ struct SampleBinningInfo {
   /// Stride factors for converting N-dimensional bin indices to a linear index.
   std::vector<int> Strides;
 
-  /// @brief Get linear bin index from 2D bin indices
-  /// @param xBin The bin index along the X axis (0-based)
-  /// @param yBin The bin index along the Y axis (0-based)
-  /// @return The linear bin index corresponding to (xBin, yBin)
-  int GetBin(const int xBin, const int yBin) const {
-    return static_cast<int>(yBin * AxisNBins[0] + xBin);
+  /// @brief Get linear bin index from ND bin indices with additional checks
+  /// @param Bins Vector of bin indices along each dimension
+  /// @warning this performs additional checks so do not use in parts of code used during fit
+  int GetBinSafe(const std::vector<int>& Bins) const {
+    for(int iDim = 0; iDim < static_cast<int>(Bins.size()); iDim++){
+      if (Bins[iDim] < 0 || Bins[iDim] >= static_cast<int>(AxisNBins[iDim])) {
+        MACH3LOG_ERROR("{}: Bin indices out of range: Dim = {}, Bin={}, max Ndim Bin={}",
+                       __func__, iDim, Bins[iDim], AxisNBins[iDim]);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+    }
+    return GetBin(Bins);
   }
 
   /// @brief Convert N-dimensional bin indices to a linear bin index.
@@ -217,27 +223,6 @@ struct SampleBinningInfo {
       BinNumber += Bins[i]*Strides[i];
     }
     return BinNumber;
-  }
-
-  /// @brief Get linear bin index from 2D bin indices with additional checks
-  /// @param xBin The bin index along the X axis (0-based)
-  /// @param yBin The bin index along the Y axis (0-based)
-  /// @return The linear bin index corresponding to (xBin, yBin)
-  /// @warning this performs additional checks so do not use in parts of code used during fit
-  int GetBinSafe(const int xBin, const int yBin) const {
-    if (xBin < 0 || yBin < 0 || static_cast<size_t>(xBin) >= AxisNBins[0] || static_cast<size_t>(yBin) >= AxisNBins[1]) {
-      MACH3LOG_ERROR("GetBinSafe: Bin indices out of range: xBin={}, yBin={}, max xBin={}, max yBin={}",
-                     xBin, yBin, AxisNBins[0] - 1, AxisNBins[1] - 1);
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-    return GetBin(xBin, yBin);
-  }
-
-  /// @brief Calculates the global bin number for a given 2D bin, accounting for multiple binning samples.
-  /// @param xBin The bin index along the X axis (0-based)
-  /// @param yBin The bin index along the Y axis (0-based)
-  int GetBinGlobal(const int xBin, const int yBin) const {
-    return static_cast<int>(GlobalOffset + GetBin(xBin, yBin));
   }
 
   /// @brief DB Find the relevant bin in the PDF for each event
