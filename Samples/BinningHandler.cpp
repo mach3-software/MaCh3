@@ -78,39 +78,30 @@ void BinningHandler::SetupSampleBinning(const YAML::Node& Settings, SampleInfo& 
   SingleBinning.BinEdges[0] = X_BinEdges;
   SingleBinning.BinEdges[1] = Y_BinEdges;
 
-  //A string to store the binning for a nice print out
-  std::string XBinEdgesStr = "";
-  std::string YBinEdgesStr = "";
+  SingleBinning.nBins = 1;
+  for(int iDim = 0; iDim < static_cast<int>(SingleBinning.BinEdges.size()); iDim++){
+    //Sanity check that some binning has been specified
+    if(SingleBinning.BinEdges[iDim].size() == 0){
+      MACH3LOG_ERROR("No binning specified for Dim {} of sample binning, please add some binning to the sample config", iDim);
+      MACH3LOG_ERROR("Please ensure BinEdges are correctly configured for all dimensions");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    // Set the number of bins for this dimension
+    SingleBinning.AxisNBins[iDim] = SingleBinning.BinEdges[iDim].size() - 1;
+    // Update total number of bins
+    SingleBinning.nBins *= SingleBinning.AxisNBins[iDim];
 
-  for(auto XBinEdge : SingleBinning.BinEdges[0]){
-    XBinEdgesStr += std::to_string(XBinEdge);
-    XBinEdgesStr += ", ";
-  }
-  MACH3LOG_INFO("XBinning:");
-  MACH3LOG_INFO("{}", XBinEdgesStr);
+    //A string to store the binning for a nice print out
+    std::string BinEdgesStr = "";
 
-  //And now the YBin Edges
-  for(auto YBinEdge : SingleBinning.BinEdges[1]){
-    YBinEdgesStr += std::to_string(YBinEdge);
-    YBinEdgesStr += ", ";
-  }
-  MACH3LOG_INFO("YBinning:");
-  MACH3LOG_INFO("{}", YBinEdgesStr);
-
-
-  //Sanity check that some binning has been specified
-  if(SingleBinning.BinEdges[0].size() == 0 && SingleBinning.BinEdges[1].size() == 0){
-    MACH3LOG_ERROR("No binning specified for either X or Y of sample binning, please add some binning to the sample config");
-    MACH3LOG_ERROR("Please ensure XVarBins and/or YVarStr are correctly configured");
-    throw MaCh3Exception(__FILE__, __LINE__);
+    for(auto BinEdge : SingleBinning.BinEdges[iDim]) {
+      BinEdgesStr += std::to_string(BinEdge);
+      BinEdgesStr += ", ";
+    }
+    MACH3LOG_INFO("{}-Dim Binning:", iDim);
+    MACH3LOG_INFO("{}", BinEdgesStr);
   }
 
-  //Set the number of X and Y bins now
-  SingleBinning.AxisNBins[0] = SingleBinning.BinEdges[0].size() - 1;
-  SingleBinning.AxisNBins[1] = SingleBinning.BinEdges[1].size() - 1;
-
-  // Set total number of bins
-  SingleBinning.nBins = SingleBinning.AxisNBins[0] * SingleBinning.AxisNBins[1];
   SingleBinning.GlobalOffset = 0;
   /// Lastly prepare special histograms used for event migration
   SingleBinning.InitialiseBinMigrationLookUp(SingleSample.nDimensions);
@@ -136,7 +127,7 @@ int BinningHandler::FindGlobalBin(const int NomSample,
     const int Bin = SB.FindBin(i, Var, NomBin[i]);
     // KS: If we are outside of range in only one dimension this mean out of bounds, we can simply quickly finish
     if(Bin < 0) return M3::UnderOverFlowBin;
-    // KS: inline GetBin computation to avoid any allocation
+    // KS: inline GetBin computation to avoid any memory allocation, which in reweight loop is very costly
     GlobalBin += Bin * SB.Strides[i];
   }
 
@@ -161,16 +152,16 @@ int BinningHandler::FindNominalBin(const int iSample,
 }
 
 // ************************************************
-int BinningHandler::GetBinSafe(const int Sample, const int xBin, const int yBin) const {
-  // ************************************************
-  const int GlobalBin = SampleBinning[Sample].GetBinSafe(xBin, yBin);
+int BinningHandler::GetBinSafe(const int Sample, const std::vector<int>& Bins) const {
+// ************************************************
+  const int GlobalBin = SampleBinning[Sample].GetBinSafe(Bins);
   return GlobalBin;
 }
 
 // ************************************************
-int BinningHandler::GetGlobalBinSafe(const int Sample, const int xBin, const int yBin) const {
+int BinningHandler::GetGlobalBinSafe(const int Sample, const std::vector<int>& Bins) const {
 // ************************************************
-  const int GlobalBin = SampleBinning[Sample].GetBinSafe(xBin, yBin) + static_cast<int>(SampleBinning[Sample].GlobalOffset);
+  const int GlobalBin = SampleBinning[Sample].GetBinSafe(Bins) + static_cast<int>(SampleBinning[Sample].GlobalOffset);
   return GlobalBin;
 }
 
@@ -210,25 +201,25 @@ void BinningHandler::SetGlobalBinNumbers() {
 
 // ************************************************
 // Get fancy name for a given bin, to help match it with global properties
-std::string BinningHandler::GetBinName(const int iSample, const int xBin, const int yBin) const {
+std::string BinningHandler::GetBinName(const int iSample, const std::vector<int>& Bins) const {
 // ************************************************
-  return GetBinName(iSample, GetBinSafe(iSample, xBin, yBin));
+  return GetBinName(iSample, GetBinSafe(iSample, Bins));
 }
 
 // ************************************************
 // Get fancy name for a given bin, to help match it with global properties
-std::string BinningHandler::GetBinName(const int iSample, const int GlobSampleBin) const {
+std::string BinningHandler::GetBinName(const int iSample, const int SampleBin) const {
 // ************************************************
   const auto& Binning = SampleBinning[iSample];
 
   // Safety checks
-  if (GlobSampleBin < 0 || GlobSampleBin >= static_cast<int>(Binning.nBins)) {
-    MACH3LOG_ERROR("Requested bin {} is out of range for sample {}", GlobSampleBin, iSample);
+  if (SampleBin < 0 || SampleBin >= static_cast<int>(Binning.nBins)) {
+    MACH3LOG_ERROR("Requested bin {} is out of range for sample {}", SampleBin, iSample);
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   int Dim = static_cast<int>(Binning.Strides.size());
   std::vector<int> Bins(Dim, 0);
-  int Remaining = GlobSampleBin;
+  int Remaining = SampleBin;
 
   // Convert the flat/global bin index into per-dimension indices
   // Dim0 is the fastest-changing axis, Dim1 the next, etc.
