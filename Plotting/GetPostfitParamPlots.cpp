@@ -3,8 +3,8 @@
 #include <iomanip>
 #include <algorithm>
 
-#include "plottingUtils/plottingUtils.h"
-#include "plottingUtils/plottingManager.h"
+#include "PlottingUtils/PlottingUtils.h"
+#include "PlottingUtils/PlottingManager.h"
 
 _MaCh3_Safe_Include_Start_ //{
 #include "TROOT.h"

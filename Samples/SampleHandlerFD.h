@@ -35,10 +35,16 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// @ingroup SampleHandlerGetters
   std::string GetSampleTitle(const int Sample) const override {return SampleDetails[Sample].SampleTitle;}
 
+  /// @brief Return Kinematic Variable name for specified sample and dimension for example "Reconstructed_Neutrino_Energy"
+  /// @param iSample Sample index
+  /// @param Dimension Dimension index
   /// @ingroup SampleHandlerGetters
-  std::string GetXBinVarName(const int Sample) const {return SampleDetails[Sample].VarStr[0];}
+  std::string GetKinVarName(const int iSample, const int Dimension) const override;
+
   /// @ingroup SampleHandlerGetters
-  std::string GetYBinVarName(const int Sample) const {return SampleDetails[Sample].VarStr[1];}
+  std::string GetXBinVarName(const int Sample) const {return GetKinVarName(Sample, 0);}
+  /// @ingroup SampleHandlerGetters
+  std::string GetYBinVarName(const int Sample) const {return GetKinVarName(Sample, 1);}
   /// @brief Get pointer to binning handler
   const BinningHandler* GetBinningHandler() const {return Binning.get();}
 
@@ -229,14 +235,14 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// @brief Update the functional parameter values to the latest proposed values. Needs to be called before every new reweight so is called in fillArray
   virtual void PrepFunctionalParameters(){};
   /// @brief ETA - generic function applying shifts
-  virtual void ApplyShifts(int iEvent);
+  virtual void ApplyShifts(const int iEvent);
 
   /// @brief DB Function which determines if an event is selected, where Selection double looks like {{ND280KinematicTypes Var1, douuble LowBound}
-  bool IsEventSelected(const int iSample, const int iEvent);
+  bool IsEventSelected(const int iSample, const int iEvent) _noexcept_;
   /// @brief JM Function which determines if a subevent is selected
   bool IsSubEventSelected(const std::vector<KinematicCut> &SubEventCuts, const int iEvent, unsigned const int iSubEvent, size_t nsubevents);
   /// @brief HH - reset the shifted values to the original values
-  virtual void resetShifts(int iEvent) {(void)iEvent;};
+  virtual void ResetShifts(const int iEvent) {(void)iEvent;};
   /// @brief HH - a vector that stores all the FuncPars struct
   std::vector<FunctionalParameter> funcParsVec;
   /// @brief HH - a map that relates the name of the functional parameter to
@@ -258,7 +264,7 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// @brief Check whether a normalisation systematic affects an event or not
   void CalcNormsBins(std::vector<NormParameter>& norm_parameters, std::vector< std::vector< int > >& xsec_norms_bins);
   /// @brief Calculate the total weight weight for a given event
-  M3::float_t CalcWeightTotal(const FarDetectorCoreInfo* _restrict_ MCEvent) const;
+  M3::float_t CalcWeightTotal(const EventInfo* _restrict_ MCEvent) const;
 
   /// @brief Calculate weights for function parameters
   ///
@@ -323,7 +329,7 @@ class SampleHandlerFD :  public SampleHandlerBase
 
   //===============================================================================
   /// Stores information about every MC event
-  std::vector<FarDetectorCoreInfo> MCSamples;
+  std::vector<EventInfo> MCSamples;
   /// Stores info about currently initialised sample
   std::vector<SampleInfo> SampleDetails;
   //===============================================================================
@@ -363,7 +369,7 @@ class SampleHandlerFD :  public SampleHandlerBase
   // =========================================================== 
 
   /// The manager object used to read the sample yaml file
-  std::unique_ptr<manager> SampleManager;
+  std::unique_ptr<Manager> SampleManager;
   void InitialiseSplineObject();
 
   std::unordered_map<std::string, double> _modeNomWeightMap;

@@ -42,7 +42,7 @@ class PredictiveThrower : public FitterBase {
  public:
    /// @brief Constructor
    /// @param fitMan A pointer to a manager object, which will handle all settings.
-  PredictiveThrower(manager * const fitMan);
+  PredictiveThrower(Manager * const fitMan);
   /// @brief Destructor
   virtual ~PredictiveThrower();
 
