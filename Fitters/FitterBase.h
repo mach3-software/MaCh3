@@ -28,7 +28,7 @@ class FitterBase {
  public:
   /// @brief Constructor
   /// @param fitMan A pointer to a manager object, which will handle all settings.
-  FitterBase(manager * const fitMan);
+  FitterBase(Manager * const fitMan);
   /// @brief Destructor for the FitterBase class.
   virtual ~FitterBase();
 
@@ -106,7 +106,7 @@ class FitterBase {
   void CustomRange(const std::string& ParName, const double sigma, double& ParamShiftValue) const;
 
   /// The manager for configuration handling
-  manager *fitMan;
+  Manager *fitMan;
 
   /// current state
   unsigned int step;

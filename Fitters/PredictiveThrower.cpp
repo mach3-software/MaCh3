@@ -4,7 +4,7 @@
 #include "TH3.h"
 
 // *************************
-PredictiveThrower::PredictiveThrower(manager *man) : FitterBase(man) {
+PredictiveThrower::PredictiveThrower(Manager *man) : FitterBase(man) {
 // *************************
  AlgorithmName = "PredictiveThrower";
   if(!CheckNodeExists(fitMan->raw(), "Predictive")) {

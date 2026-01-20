@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ***************
-PSO::PSO(manager *man) : LikelihoodFit(man) {
+PSO::PSO(Manager *man) : LikelihoodFit(man) {
 // ***************
   AlgorithmName = "PSO";
   fConstriction = Get<double>(fitMan->raw()["General"]["PSO"]["Constriction"], __FILE__, __LINE__);
