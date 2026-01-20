@@ -1,9 +1,9 @@
 #include "Fitters/MCMCBase.h"
 
 // *************************
-// Initialise the manager and make it an object of mcmc class
-// Now we can dump manager settings to the output file
-MCMCBase::MCMCBase(manager *man) : FitterBase(man) {
+// Initialise the Manager and make it an object of mcmc class
+// Now we can dump Manager settings to the output file
+MCMCBase::MCMCBase(Manager *man) : FitterBase(man) {
 // *************************
     // Beginning step number
     stepStart = 0;

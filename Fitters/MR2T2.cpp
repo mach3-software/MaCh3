@@ -2,7 +2,7 @@
 
 
 // ***************
-MR2T2::MR2T2(manager *man) : MCMCBase(man) {
+MR2T2::MR2T2(Manager *man) : MCMCBase(man) {
 // ***************
     AlgorithmName = "MR2T2";
 }

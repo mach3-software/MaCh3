@@ -11,12 +11,12 @@ _MaCh3_Safe_Include_End_ //}
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
 // *************************
-// Initialise the manager and make it an object of FitterBase class
-// Now we can dump manager settings to the output file
-FitterBase::FitterBase(manager * const man) : fitMan(man) {
+// Initialise the Manager and make it an object of FitterBase class
+// Now we can dump Manager settings to the output file
+FitterBase::FitterBase(Manager * const man) : fitMan(man) {
 // *************************
   AlgorithmName = "";
-  //Get mach3 modes from manager
+  //Get mach3 modes from Manager
   random = std::make_unique<TRandom3>(Get<int>(fitMan->raw()["General"]["Seed"], __FILE__, __LINE__));
 
   // Counter of the accepted # of steps

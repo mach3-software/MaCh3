@@ -14,7 +14,7 @@
 class MinuitFit : public LikelihoodFit {
  public:
   /// @brief Constructor
-  MinuitFit(manager * const fitMan);
+  MinuitFit(Manager * const fitMan);
   /// @brief Destructor
   virtual ~MinuitFit();
 

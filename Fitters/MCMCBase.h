@@ -9,7 +9,7 @@ class MCMCBase : public FitterBase {
  public:
     /// @brief Constructor
     /// @param fitMan A pointer to a manager object, which will handle all settings.
-    MCMCBase(manager * const fitMan);
+    MCMCBase(Manager * const fitMan);
     
     /// @brief Destructor
     virtual ~MCMCBase() = default;

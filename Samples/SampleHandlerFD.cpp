@@ -36,7 +36,7 @@ SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGen
   SampleHandlerFD_data = nullptr;
   SampleHandlerFD_array_w2 = nullptr;
   SampleHandlerName = "";
-  SampleManager = std::make_unique<manager>(ConfigFileName.c_str());
+  SampleManager = std::make_unique<Manager>(ConfigFileName.c_str());
   Binning = std::make_unique<BinningHandler>();
   // Variables related to MC stat
   FirstTimeW2 = true;
