@@ -8,7 +8,37 @@
 
 // ***************************
 /// @brief KS: Class handling binning for multiple samples
-/// @details Sample ix treated as additional dimension so everything is treated as one huge 1D array
+/// @details
+/// Each sample can define its own binning in an arbitrary number of dimensions.
+/// Internally, every sample's multi-dimensional binning is linearised into a
+/// single 1D array. All samples are then concatenated into one global bin index
+/// space, allowing the entire analysis to be treated as a single large vector
+/// of bins.
+///
+/// The concept of a "global bin" refers to the position of a bin in this
+/// linearised, analysis-wide bin index space. Local (sample) bins are always
+/// enumerated starting from zero, while global bins span all samples
+/// consecutively.
+///
+/// @example
+/// Example layout of global bins with offsets:
+///
+///   Sample 0 (GlobalOffset = 0,  nBins = 4):
+///     Local bins:   [0] [1] [2] [3]
+///     Global bins:  [0] [1] [2] [3]
+///
+///   Sample 1 (GlobalOffset = 4,  nBins = 3):
+///     Local bins:   [0] [1] [2]
+///     Global bins:  [4] [5] [6]
+///
+///   Sample 2 (GlobalOffset = 7,  nBins = 2):
+///     Local bins:   [0] [1]
+///     Global bins:  [7] [8]
+///
+///   Global bin index space:
+///   ------------------------------------------------
+///   | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+///   ------------------------------------------------
 ///
 /// @author Kamil Skwarczynski
 /// @author Dan Barrow
@@ -37,10 +67,12 @@ class BinningHandler {
 
   /// @brief Get gloabl bin based on sample, and dimension of each sample with additional checks
   /// @param iSample index of a given sample
-  int GetGlobalBinSafe(const int iSample, const int xBin, const int yBin) const;
+  /// @param Bins Vector of bin indices along each dimension
+  int GetGlobalBinSafe(const int iSample, const std::vector<int>& Bins) const;
   /// @brief Get gloabl bin based on sample, and dimension of each sample without any safety checks
   /// @param iSample index of a given sample
-  int GetBinSafe(const int iSample, const int xBin, const int yBin) const;
+  /// @param Bins Vector of bin indices along each dimension
+  int GetBinSafe(const int iSample, const std::vector<int>& Bins) const;
   /// @brief Get total number of bins over all samples/kinematic bins etc
   int GetNBins() const {return TotalNumberOfBins;};
   /// @brief Get total number of bins over for a given sample
@@ -50,18 +82,21 @@ class BinningHandler {
   std::string GetBinName(const int GlobalBin) const;
   /// @brief Get fancy name for a given bin, to help match it with global properties
   /// @param iSample index of a given sample
-  /// @param GlobSampleBin Global Bin for a given sample
-  std::string GetBinName(const int iSample, const int GlobSampleBin) const;
+  /// @param SampleBin Global Bin for a given sample
+  std::string GetBinName(const int iSample, const int SampleBin) const;
     /// @brief Get fancy name for a given bin, to help match it with global properties
   /// @param iSample index of a given sample
-  std::string GetBinName(const int iSample, const int xBin, const int yBin) const;
+  /// @param Bins Vector of bin indices along each dimension
+  std::string GetBinName(const int iSample, const std::vector<int>& Bins) const;
 
-  /// @brief Get X bin edges for a given sample
+  /// @brief Get N-dim bin edges for a given sample
   /// @param iSample index of a given sample
-  std::vector<double> GetXBinEdges(const int iSample) const {return SampleBinning[iSample].BinEdges.at(0);};
-  /// @brief Get Y bin edges for a given sample
+  /// @param iDim dimension for which we extrac bin edges
+  std::vector<double> GetBinEdges(const int iSample, const int iDim) const {return SampleBinning[iSample].BinEdges.at(iDim);};
+
+  /// @brief Get Number of N-axis bins for a given sample
   /// @param iSample index of a given sample
-  std::vector<double> GetYBinEdges(const int iSample) const {return SampleBinning[iSample].BinEdges.at(1);};
+  int GetNAxisBins(const int iSample, const int iDim) const {return static_cast<int>(SampleBinning[iSample].AxisNBins.at(iDim));};
 
   /// @brief Get Number of X bins for a given sample
   /// @param iSample index of a given sample
@@ -83,7 +118,6 @@ class BinningHandler {
   /// @brief Function to setup the binning of your sample histograms and the underlying
   /// arrays that get handled in fillArray() and fillArray_MP().
   void SetupSampleBinning(const YAML::Node& Settings, SampleInfo& SingleSample);
-
 
  private:
   /// Total number of bins

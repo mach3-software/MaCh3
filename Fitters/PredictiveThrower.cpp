@@ -711,7 +711,7 @@ std::vector<std::unique_ptr<TH1>> PredictiveThrower::MakePredictive(const std::v
       for (int iy = 1; iy <= nbinsy; ++iy) {
         for (int ix = 1; ix <= nbinsx; ++ix) {
           // MaCh3 vs ROOT conventions, above loop should be over MaCh3 bins
-          const int MaCh3Bin = SampleInfo[sample].Binning->GetBinSafe(SampleInfo[sample].LocalId, ix-1, iy-1);
+          const int MaCh3Bin = SampleInfo[sample].Binning->GetBinSafe(SampleInfo[sample].LocalId, {ix-1, iy-1});
           std::string ProjName = fmt::format("{} {} Bin: {}",
                                       SampleInfo[sample].Name, suffix,
                                       SampleInfo[sample].Binning->GetBinName(SampleInfo[sample].LocalId, MaCh3Bin));
@@ -958,7 +958,7 @@ void PredictiveThrower::StudyBetaParameters(TDirectory* PredictiveDir) {
       for (int y = 0; y < nY; ++y) {
         for (int x = 0; x < nX; ++x) {
           const int RootBin = Data_Hist[iSample]->GetBin(x+1, y+1);
-          const int MaCh3Bin = SampleInfo[iSample].Binning->GetBinSafe(SampleInfo[iSample].LocalId, x, y);
+          const int MaCh3Bin = SampleInfo[iSample].Binning->GetBinSafe(SampleInfo[iSample].LocalId, {x, y});
 
           for (int iToy = 0; iToy < Ntoys; ++iToy) {
             const double Data = Data_Hist[iSample]->GetBinContent(RootBin);

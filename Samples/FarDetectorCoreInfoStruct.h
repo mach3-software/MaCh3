@@ -111,19 +111,22 @@ struct SampleInfo {
 };
 
 /// @brief constructors are same for all three so put in here
-struct FarDetectorCoreInfo {
+/// @author Dan Barrow
+/// @author Ed Atkin
+/// @author Kamil Skwarczynski
+struct EventInfo {
   /// @brief Default constructor.
-  FarDetectorCoreInfo(){}
+  EventInfo(){}
   /// @brief Copy constructor (deleted to prevent copying).
-  FarDetectorCoreInfo(FarDetectorCoreInfo const &other) = delete;
+  EventInfo(EventInfo const &other) = delete;
   /// @brief Move constructor (defaulted to allow moving).
-  FarDetectorCoreInfo(FarDetectorCoreInfo &&other) = default;
+  EventInfo(EventInfo &&other) = default;
   /// @brief Copy assignment operator (deleted).
-  FarDetectorCoreInfo& operator=(FarDetectorCoreInfo const &other) = delete;
+  EventInfo& operator=(EventInfo const &other) = delete;
   /// @brief Move assignment operator (deleted).
-  FarDetectorCoreInfo& operator=(FarDetectorCoreInfo &&other) = delete;
+  EventInfo& operator=(EventInfo &&other) = delete;
   /// @brief default destructor
-  ~FarDetectorCoreInfo(){}
+  ~EventInfo(){}
 
   /// target the interaction was on
   const int* Target = 0;
@@ -143,7 +146,7 @@ struct FarDetectorCoreInfo {
   /// Pointers to weights like oscillation spline etc
   std::vector<const M3::float_t*> total_weight_pointers;
 
-  /// The x_var and y_vars that you're binning in
+  /// The x_var and y_vars and beyond that you're binning in
   std::vector<const double*> KinVar;
   /// starting bins for each dimensions allowing to perform quick lookup
   std::vector<int> NomBin;
@@ -153,5 +156,6 @@ struct FarDetectorCoreInfo {
   /// Is event NC or not
   bool isNC = false;
 
+  /// Pointer to MaCh3 mode
   const double* mode = &M3::Unity_D;
 };
