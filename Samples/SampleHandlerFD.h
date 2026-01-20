@@ -55,11 +55,8 @@ class SampleHandlerFD :  public SampleHandlerBase
 
   //ETA - abstract these to SampleHandlerFDBase
   //DB Require these four functions to allow conversion from TH1(2)D to array for multi-threaded GetLikelihood
-  void AddData(const int Sample, TH1D* Data);
-  void AddData(const int Sample, TH2D* Data);
-  void AddData(const int Sample, std::vector<double> &data);
-  void AddData(const int Sample, std::vector< std::vector <double> > &data);
-
+  void AddData(const int Sample, TH1* Data);
+  void AddData(const int Sample, const std::vector<double>& Data_Array);
 
   /// @brief Helper function to print rates for the samples with LLH
   /// @param DataOnly whether to print data only rates
@@ -76,20 +73,20 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// @ingroup SampleHandlerGetters
   int GetSampleIndex(const std::string& SampleTitle) const;
 
+  /// @brief Get Data histogram
+  /// @ingroup SampleHandlerGetters
+  TH1* GetDataHist(const int Sample) override;
+  TH1* GetDataHist(const std::string& Sample);
+
   /// @brief Get MC histogram
   /// @ingroup SampleHandlerGetters
-  TH1* GetMCHist(const int Sample, const int Dimension);
-  TH1* GetMCHist(const std::string& Sample, const int Dimension);
+  TH1* GetMCHist(const int Sample) override;
+  TH1* GetMCHist(const std::string& Sample);
 
   /// @brief Get W2 histogram
   /// @ingroup SampleHandlerGetters
-  TH1* GetW2Hist(const int Sample, const int Dimension);
-  TH1* GetW2Hist(const std::string& Sample, const int Dimension);
-
-  /// @brief Get Data histogram
-  /// @ingroup SampleHandlerGetters
-  TH1* GetDataHist(const int Sample, const int Dimension);
-  TH1* GetDataHist(const std::string& Sample, const int Dimension);
+  TH1* GetW2Hist(const int Sample) override;
+  TH1* GetW2Hist(const std::string& Sample);
 
   void Reweight() override;
   M3::float_t GetEventWeight(const int iEntry);
@@ -179,6 +176,21 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// @brief Return array storing W2 entries for every bin
   std::vector<double> GetW2Array() const {
     return std::vector<double>(SampleHandlerFD_array_w2, SampleHandlerFD_array_w2 + Binning->GetNBins());
+  }
+  /// @brief Return a sub-array for a given sample.
+  std::vector<double> GetArrayForSample(const int Sample, const double* array) const;
+
+  /// @brief Return array storing data entries for every bin
+  std::vector<double> GetDataArray(const int Sample) const {
+    return GetArrayForSample(Sample, SampleHandlerFD_data);
+  }
+  /// @brief Return array storing MC entries for every bin
+  std::vector<double> GetMCArray(const int Sample) const {
+    return GetArrayForSample(Sample, SampleHandlerFD_array);
+  }
+  /// @brief Return array storing W2 entries for single sample
+  std::vector<double> GetW2Array(const int Sample) const {
+    return GetArrayForSample(Sample, SampleHandlerFD_array_w2);
   }
 
  protected:
@@ -294,10 +306,11 @@ class SampleHandlerFD :  public SampleHandlerBase
   void SetupNormParameters();
 
   //===============================================================================
-  //DB Functions required for reweighting functions
-  //DB Replace previous implementation with reading bin contents from SampleHandlerFD_array
   /// @brief Fill a histogram with the event-level information used in the fit
-  void FillMCHist(const int Sample, const int Dimension);
+  /// @details
+  /// DB Functions required for reweighting functions
+  /// DB Replace previous implementation with reading bin contents from SampleHandlerFD_array
+  void FillHist(const int Sample, TH1* Hist, double* Array);
 
   /// @brief DB Nice new multi-threaded function which calculates the event weights and fills the relevant bins of an array
 #ifdef MULTITHREAD

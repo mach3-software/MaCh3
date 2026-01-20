@@ -65,7 +65,7 @@ std::unique_ptr<Manager> MaCh3ManagerFactory(int argc, char **argv);
 ///
 /// @todo add adaptive stuff
 template <typename CovType>
-std::unique_ptr<CovType> MaCh3CovarianceFactory(Manager *FitManager, const std::string& PreFix){
+std::unique_ptr<CovType> MaCh3CovarianceFactory(Manager *FitManager, const std::string& PreFix) {
 // ********************************************
   // config for our matrix
   YAML::Node Settings = FitManager->raw()["General"]["Systematics"];
@@ -141,13 +141,7 @@ std::vector<SampleType*> MaCh3SampleHandlerFactory(const std::vector<std::string
       TString NameTString = TString(name.c_str());
 
       // Clone the 1D histogram with a modified name
-      if (Sample->GetNDim(iSample) == 1) {
-        auto hist = static_cast<TH1D*>(Sample->GetMCHist(iSample, 1));
-        Sample->AddData(iSample, hist);
-      } else {
-        auto hist = static_cast<TH2D*>(Sample->GetMCHist(iSample, 2));
-        Sample->AddData(iSample, hist);
-      }
+      Sample->AddData(iSample, Sample->GetMCArray(iSample));
     }
     Handlers[i] = Sample;
   }

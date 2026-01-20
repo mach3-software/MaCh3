@@ -94,6 +94,33 @@ public:
         );
     }
 
+    TH1* GetDataHist(const int Sample) override {
+        PYBIND11_OVERRIDE_PURE(
+            TH1*,                  /* Return type */
+            SampleHandlerBase,     /* Parent class */
+            GetDataHist,           /* Name of function in C++ (must match Python name) */
+            Sample                 /* Argument(s) */
+        );
+    }
+
+    TH1* GetMCHist(const int Sample) override {
+        PYBIND11_OVERRIDE_PURE(
+            TH1*,                  /* Return type */
+            SampleHandlerBase,     /* Parent class */
+            GetMCHist,             /* Name of function in C++ (must match Python name) */
+            Sample                 /* Argument(s) */
+        );
+    }
+
+    TH1* GetW2Hist(const int Sample) override {
+        PYBIND11_OVERRIDE_PURE(
+            TH1*,                  /* Return type */
+            SampleHandlerBase,     /* Parent class */
+            GetW2Hist,             /* Name of function in C++ (must match Python name) */
+            Sample                 /* Argument(s) */
+        );
+    }
+
     double GetLikelihood() const override {
         PYBIND11_OVERRIDE_PURE_NAME(
             double,            /* Return type */

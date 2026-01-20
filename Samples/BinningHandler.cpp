@@ -15,91 +15,48 @@ BinningHandler::BinningHandler() {
 void BinningHandler::SetupSampleBinning(const YAML::Node& Settings, SampleInfo& SingleSample) {
 // ************************************************
   MACH3LOG_INFO("Setting up Sample Binning");
-
   //Binning
-  SingleSample.nDimensions = 0;
-  /// @warning for now we hardcode to 2D...
-  SingleSample.VarStr.resize(2);
-  SingleSample.VarStr[0] = GetFromManager(Settings["XVarStr"], std::string(""));
-  auto X_BinEdges = GetFromManager(Settings["XVarBins"], std::vector<double>());
-  const auto& edgesx = X_BinEdges;
-  if (!std::is_sorted(edgesx.begin(), edgesx.end())) {
-    MACH3LOG_ERROR("XVarBins must be in increasing order in sample config {}\n  XVarBins: [{}]",
-                   SingleSample.SampleTitle, fmt::join(edgesx, ", "));
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  if(SingleSample.VarStr[0].length() > 0){
-    SingleSample.nDimensions++;
-  } else{
-    MACH3LOG_ERROR("Please specify an X-variable string in sample config");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-
-  SingleSample.VarStr[1] = GetFromManager(Settings["YVarStr"], std::string(""));
-  auto Y_BinEdges = GetFromManager(Settings["YVarBins"], std::vector<double>());
-  const auto& edgesy = Y_BinEdges;
-  if (!std::is_sorted(edgesy.begin(), edgesy.end())) {
-    MACH3LOG_ERROR("Y_BinEdges must be in increasing order in sample config {}\n  Y_BinEdges: [{}]",
-                   SingleSample.SampleTitle, fmt::join(edgesy, ", "));
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  if(SingleSample.VarStr[1].length() > 0){
-    if(SingleSample.VarStr[0].length() == 0){
-      MACH3LOG_ERROR("Please specify an X-variable string in sample config. I won't work only with a Y-variable");
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-    SingleSample.nDimensions++;
-  }
-
-  if(SingleSample.nDimensions == 0){
-    MACH3LOG_ERROR("Error setting up the sample binning");
-    MACH3LOG_ERROR("Number of dimensions is {}", SingleSample.nDimensions);
-    MACH3LOG_ERROR("Check that an XVarStr has been given in the sample config");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  } else{
-    MACH3LOG_INFO("Found {} dimensions for sample binning", SingleSample.nDimensions);
-  }
-
-  //Check whether you are setting up 1D or 2D binning
-  if(SingleSample.nDimensions == 1){
-    MACH3LOG_INFO("Setting up {}D binning with {}", SingleSample.nDimensions, SingleSample.VarStr[0]);
-    Y_BinEdges = {-1e8, 1e8};
-  } else if(SingleSample.nDimensions == 2){
-    MACH3LOG_INFO("Setting up {}D binning with {} and {}", SingleSample.nDimensions, SingleSample.VarStr[0], SingleSample.VarStr[1]);
-  } else{
-    MACH3LOG_ERROR("Number of dimensions is not 1 or 2, this is unsupported at the moment");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
+  SingleSample.VarStr = Get<std::vector<std::string>>(Settings["VarStr"], __FILE__ , __LINE__);
+  SingleSample.nDimensions = static_cast<int>(SingleSample.VarStr.size());
 
   SampleBinningInfo SingleBinning;
-  /// @warning for now we hardcode to 2D...
-  SingleBinning.BinEdges.resize(2);
-  SingleBinning.AxisNBins.resize(2);
-  SingleBinning.BinEdges[0] = X_BinEdges;
-  SingleBinning.BinEdges[1] = Y_BinEdges;
+  SingleBinning.BinEdges = Get<std::vector<std::vector<double>>>(Settings["VarBins"], __FILE__ , __LINE__);
+  SingleBinning.Uniform = Get<bool>(Settings["Uniform"], __FILE__ , __LINE__);
+  SingleBinning.AxisNBins.resize(SingleSample.nDimensions);
 
+  if(SingleBinning.Uniform == false) {
+    MACH3LOG_ERROR("To be implemented soon");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  if(SingleSample.VarStr.size() != SingleBinning.BinEdges.size()) {
+    MACH3LOG_ERROR("Number of variables ({}) does not match number of bin edge sets ({}) in sample config '{}'",
+                   SingleSample.VarStr.size(), SingleBinning.BinEdges.size(),SingleSample.SampleTitle);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
   SingleBinning.nBins = 1;
-  for(int iDim = 0; iDim < static_cast<int>(SingleBinning.BinEdges.size()); iDim++){
+  for(size_t iDim = 0; iDim < SingleBinning.BinEdges.size(); iDim++)
+  {
+    const auto& Edges = SingleBinning.BinEdges[iDim];
+    if (!std::is_sorted(Edges.begin(), Edges.end())) {
+      MACH3LOG_ERROR("VarBins for Dim {} must be in increasing order in sample config {}\n  VarBins: [{}]",
+                     iDim, SingleSample.SampleTitle, fmt::join(Edges, ", "));
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+
     //Sanity check that some binning has been specified
     if(SingleBinning.BinEdges[iDim].size() == 0){
       MACH3LOG_ERROR("No binning specified for Dim {} of sample binning, please add some binning to the sample config", iDim);
       MACH3LOG_ERROR("Please ensure BinEdges are correctly configured for all dimensions");
       throw MaCh3Exception(__FILE__, __LINE__);
     }
+
     // Set the number of bins for this dimension
     SingleBinning.AxisNBins[iDim] = SingleBinning.BinEdges[iDim].size() - 1;
     // Update total number of bins
     SingleBinning.nBins *= SingleBinning.AxisNBins[iDim];
 
-    //A string to store the binning for a nice print out
-    std::string BinEdgesStr = "";
-
-    for(auto BinEdge : SingleBinning.BinEdges[iDim]) {
-      BinEdgesStr += std::to_string(BinEdge);
-      BinEdgesStr += ", ";
-    }
-    MACH3LOG_INFO("{}-Dim Binning:", iDim);
-    MACH3LOG_INFO("{}", BinEdgesStr);
+    MACH3LOG_INFO("{}-Dim Binning: [{:.2f}]", iDim, fmt::join(SingleBinning.BinEdges[iDim], ", "));
+    MACH3LOG_INFO("For Var {}", SingleSample.VarStr[iDim]);
   }
 
   SingleBinning.GlobalOffset = 0;
