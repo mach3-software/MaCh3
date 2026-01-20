@@ -21,10 +21,11 @@ endif()
 
 CPMAddPackage(
     NAME NuDock
-    GITHUB_REPOSITORY "hank-hua/nudock"
-    GIT_TAG main
+    GITHUB_REPOSITORY "NuDock/nudock"
+    GIT_TAG feature/verbosity
     GIT_SHALLOW NO
     GIT_SUBMODULES_RECURSE ON
+    # Apply patch to fix CMakeLists.txt until merged upstream
     PATCH_COMMAND ${CMAKE_COMMAND} -E copy 
         ${CMAKE_CURRENT_SOURCE_DIR}/cmake/patches/NuDock_CMakeLists.txt
         <SOURCE_DIR>/CMakeLists.txt

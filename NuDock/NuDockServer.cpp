@@ -15,7 +15,7 @@ void NuDockServer::setup() {
 }
 
 double NuDockServer::getLogLikelihood() {
-  // HH: Based on mcmc::ProposeStep()
+  // HH: Based on MR2T2::ProposeStep()
   // Initial likelihood
   double llh = 0.0;
 
@@ -37,6 +37,7 @@ double NuDockServer::getLogLikelihood() {
     std::cout << "======================" << std::endl;
   }
 
+  // HH: Only add prior llh if requested
   if (add_prior_llh) {
     // Loop over the systematics and propose the initial step
     for (size_t s = 0; s < systematics.size(); ++s) {
@@ -143,39 +144,8 @@ nlohmann::json NuDockServer::setParameters(const nlohmann::json &request) {
 
 nlohmann::json NuDockServer::setAsimovPoint(const nlohmann::json &request) {
   (void)request;
-  // reweight sample and add to data
-  // for (auto& sample : samples) {
-  //   sample->Reweight();
-  //   if (auto* fd_casted_sample = dynamic_cast<SampleHandlerFD*>(sample)) {
-  //     if(fd_casted_sample->GetNDim() == 1) {
-  //       sample->AddData(static_cast<TH1D*>(sample->Get1DHist()->Clone(sample->GetTitle().c_str())));
-  //     }
-  //     else if(fd_casted_sample->GetNDim() == 2) {
-  //       sample->AddData(static_cast<TH2D*>(sample->Get2DHist()->Clone(sample->GetTitle().c_str())));
-  //     }
-  //   }
-  //   else if (dynamic_cast<SampleHandlerND*>(sample)) {
-  //     sample->AddData(static_cast<TH2D*>(sample->Get2DHist()->Clone(sample->GetTitle().c_str())));
-  //   }
-  //   else {
-  //     MACH3LOG_ERROR("Sample object does not derived from samplePDFFDBase or samplePDFND");
-  //     throw MaCh3Exception(__FILE__,__LINE__);
-  //   } 
-  // }
-
-  // // set prefit parameter values to the current parameter values
-  // for (size_t s = 0; s < systematics.size(); ++s) {
-  //   int npars = systematics[s]->GetNumParams();
-  //   for (size_t p = 0; p < npars; ++p) {
-  //     std::string param_name = systematics[s]->GetParFancyName(p);
-  //     double param_value = systematics[s]->getParCurr(p);
-  //     systematics[s]->setPar(p, param_value);
-  //     if (verbose) MACH3LOG_INFO("Setting prefit param {} to current value {}", param_name, param_value);
-  //   }
-  // }
-
   nlohmann::json response;
-  response["status"] = "success";
+  response["status"] = "not implemented";
   return response;
 }
 
@@ -222,13 +192,6 @@ nlohmann::json NuDockServer::getParameters(const nlohmann::json &request) {
   nlohmann::json response;
   response["syst_params"] = syst_params;
   response["osc_params"] = osc_params;
-  return response;
-}
-
-nlohmann::json NuDockServer::unnormaliseParameters(const nlohmann::json &request) {
-  (void)request;
-  nlohmann::json response;
-  response["status"] = "not implemented";
   return response;
 }
 
