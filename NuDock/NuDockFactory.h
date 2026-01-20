@@ -1,5 +1,6 @@
 #include "nudock.hpp"
 #include <Manager/Manager.h>
+#include "NuDock/SampleHandlerNuDock.h"
 
 inline void InitialiseNuDockObj(manager *man,
                                 std::unique_ptr<NuDock> &nudock_ptr) {
@@ -29,6 +30,10 @@ inline void InitialiseNuDockObj(manager *man,
       man->raw()[nudock_conf_name]["SchemaLocation"], "");
   std::string commTypeStr = GetFromManager<std::string>(
       man->raw()[nudock_conf_name]["CommunicationType"], "LOCALHOST");
+  int port = GetFromManager<int>(man->raw()[nudock_conf_name]["Port"], 1234);
+  std::string verbosity =
+      GetFromManager<std::string>(man->raw()[nudock_conf_name]["NuDockVerbosity"], "INFO");
+
   CommunicationType commType;
   if (commTypeStr == "LOCALHOST") {
     commType = CommunicationType::LOCALHOST;
@@ -43,10 +48,28 @@ inline void InitialiseNuDockObj(manager *man,
         commTypeStr);
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-  int port = GetFromManager<int>(man->raw()[nudock_conf_name]["Port"], 1234);
+
+  VerbosityLevel verbLevel;
+  if (verbosity == "DEBUG") {
+    verbLevel = VerbosityLevel::DEBUG;
+  } else if (verbosity == "INFO") {
+    verbLevel = VerbosityLevel::INFO;
+  } else if (verbosity == "WARNING") {
+    verbLevel = VerbosityLevel::WARNING;
+  } else if (verbosity == "ERROR") {
+    verbLevel = VerbosityLevel::ERROR;
+  } else {
+    MACH3LOG_ERROR(
+        "Unsupported verbosity level for NuDock: {}. Supported levels are "
+        "DEBUG, INFO, WARN, and ERROR.",
+        verbosity);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
   nudock_ptr =
-      std::make_unique<NuDock>(useDebug, schemaLocation, commType, port);
+      std::make_unique<NuDock>(useDebug, schemaLocation, commType, port, verbLevel);
   MACH3LOG_INFO("NuDock object created with communication type: {} on port: {}", commTypeStr, port);
   MACH3LOG_INFO("NuDock schema location: {}", schemaLocation);
   MACH3LOG_INFO("NuDock debug mode: {}", useDebug);
+  MACH3LOG_INFO("NuDock verbosity level: {}", verbosity);
 }

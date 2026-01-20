@@ -1,12 +1,11 @@
 #include "NuDock/SampleHandlerNuDock.h"
 #include <unordered_map>
 #include <NuDock/NuDockFactory.h>
-#include "NuDock/NuDockServer.h"
 
 SampleHandlerNuDock::SampleHandlerNuDock(std::string configFile, ParameterHandlerGeneric* xsec_cov, const std::shared_ptr<OscillationHandler>& Oscillator)
 : SampleHandlerFD(configFile, xsec_cov, Oscillator) {
   MACH3LOG_INFO("Creating SampleHandlerNuDock object..");
-  MACH3LOG_INFO("- Using NuDockT2K sample config in this file {}", configFile);
+  MACH3LOG_INFO("- Using NuDock sample config in this file {}", configFile);
   ParHandler = xsec_cov;
   SampleManager = std::make_unique<manager>(configFile.c_str());
   verbose = GetFromManager(SampleManager->raw()["NuDockClient"]["Verbose"], false);
@@ -24,6 +23,7 @@ void SampleHandlerNuDock::Init() {
   nudock_ptr->start_client();
 }
 
+// HH: Instead of reweighting here, we send the parameters to the NuDock server
 void SampleHandlerNuDock::Reweight() {
   nlohmann::json request;
   std::unordered_map<std::string, double> osc_params;
@@ -31,7 +31,7 @@ void SampleHandlerNuDock::Reweight() {
   
   // Loop for systs
   auto nudockParamInds_func = ParHandler->GetParsIndexFromSampleName("NuDock", SystType::kFunc);
-  // HH: We should only be using kFunc for NuDock, but for convenience of testing (e.g. when validation
+  // HH: We should only be using kFunc for NuDock, but for convenience of testing (e.g. when validating
   // M3 client with M3 server we'd want to test the LLH of all the params) we include all param types here.
   auto nudockParamInds_norm = ParHandler->GetParsIndexFromSampleName("NuDock", SystType::kNorm);
   auto nudockParamInds_spline = ParHandler->GetParsIndexFromSampleName("NuDock", SystType::kSpline);
@@ -44,21 +44,15 @@ void SampleHandlerNuDock::Reweight() {
     xsec_params[paramName] = paramValue;
   }
 
-  // Loop for osc
-  // HH: will use SK so we don't need to change the osc config
-  // TODO: this needs to be changed to be more general
-  auto oscParamInds = ParHandler->GetParsIndexFromSampleName("SK", SystType::kOsc);
-  for (const auto& iParam : oscParamInds) {
-    std::string paramName = ParHandler->GetParFancyName(iParam);
+  // Loop over NuDockOscNameMap_r to get osc params
+  for (auto const& [paramNameM3, paramNameNuDock] : NuDockOscNameMap_r) {
+    int iParam = ParHandler->GetParIndex(paramNameM3);
     double paramValue = ParHandler->GetParProp(iParam);
-    // Skip if not any of the osc params NuDock uses
-    if (NuDockOscNameMap_r.find(paramName) == NuDockOscNameMap_r.end()) continue;
-    paramName = NuDockOscNameMap_r.at(paramName);
     // Convert sin2_theta to theta
-    if (paramName == "Theta12" || paramName == "Theta13" || paramName == "Theta23") {
+    if (paramNameNuDock == "Theta12" || paramNameNuDock == "Theta13" || paramNameNuDock == "Theta23") {
       paramValue = asin(sqrt(paramValue));
     }
-    osc_params[paramName] = paramValue;
+    osc_params[paramNameNuDock] = paramValue;
   }
 
   request["osc_pars"] = osc_params;
@@ -73,16 +67,10 @@ void SampleHandlerNuDock::Reweight() {
       throw MaCh3Exception(__FILE__, __LINE__);
     }
   }
-  // if (response.contains("status") && response["status"] == "success") {
-  //   MACH3LOG_INFO("Successfully set parameters in NuDock.");
-  // } else {
-  //   MACH3LOG_ERROR("Failed to set parameters in NuDock.");
-  //   throw MaCh3Exception(__FILE__, __LINE__);
-  // }
 }
 
+// HH: Instead of calculating the likelihood from M3, we get it from NuDock server
 double SampleHandlerNuDock::GetLikelihood() const {
-  MACH3LOG_INFO("Requesting log-likelihood from NuDock.");
   nlohmann::json request = "";
   double llh_value = 0.0;
   auto response = nudock_ptr->send_request("/log_likelihood", request);
@@ -93,5 +81,4 @@ double SampleHandlerNuDock::GetLikelihood() const {
     MACH3LOG_ERROR("Error retrieving log-likelihood from NuDock response: {}", e.what());
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-
 }

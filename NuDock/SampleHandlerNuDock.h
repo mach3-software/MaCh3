@@ -16,7 +16,6 @@ public:
   void RegisterFunctionalParameters() override {};
   double ReturnKinematicParameter(std::string KinematicParameter, int iEvent) override {(void) KinematicParameter; (void) iEvent; return -1.;};
   double ReturnKinematicParameter(int KinematicVariable, int iEvent) override {(void) KinematicVariable; (void) iEvent; return -1.;};
-  // std::vector<double> ReturnKinematicParameterBinning(std::string KinematicParameter) override {(void) KinematicParameter; return std::vector<double>();};
   const double* GetPointerToKinematicParameter(std::string KinematicParamter, int iEvent) override {(void) KinematicParamter; (void) iEvent; return nullptr;};
   const double* GetPointerToKinematicParameter(double KinematicVariable, int iEvent) override {(void) KinematicVariable; (void) iEvent; return nullptr;};
 
@@ -38,7 +37,7 @@ public:
     {"delm2_23", "Deltam2_32"},
   };
 protected:
-  void CleanMemoryBeforeFit() override {}
+  void CleanMemoryBeforeFit() override {};
   void Init() override;
 private:
   // Pointer to NuDock client

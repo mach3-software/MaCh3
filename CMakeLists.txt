@@ -260,6 +260,7 @@ endforeach()
 
 # Build components
 add_subdirectory(Manager)
+add_subdirectory(NuDock)
 add_subdirectory(Parameters)
 add_subdirectory(Splines)
 add_subdirectory(Samples)

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Fitters/FitterBase.h"
-#include "Samples/SampleHandlerFD.h"
 #include <nlohmann/json.hpp>
 
 class NuDockServer : public FitterBase {
@@ -20,10 +19,10 @@ public:
   nlohmann::json setParameters(const nlohmann::json &request);
   nlohmann::json getParametersNames(const nlohmann::json &request);
   nlohmann::json getParameters(const nlohmann::json &request);
-  nlohmann::json unnormaliseParameters(const nlohmann::json &request);
   nlohmann::json getLogLikelihood(const nlohmann::json &request);
   nlohmann::json setAsimovPoint(const nlohmann::json &request);
 
+  // TODO: move these maps to a common location
   std::unordered_map<std::string, std::string> NuDockOscNameMap = {
     {"Theta12", "sin2th_12"},
     {"Theta13", "sin2th_13"},
