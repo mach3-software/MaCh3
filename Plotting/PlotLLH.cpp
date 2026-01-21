@@ -395,7 +395,6 @@ void makeSplitSampleLLHScanComparisons(const std::string& paramName,
       TList *compHistList = splitSamplesStack->GetHists();
       for (uint sampleIdx = 0; sampleIdx < man->input().getTaggedSamples(man->getOption<std::vector<std::string>>("sampleTags")).size(); sampleIdx++)
       {
-
         TH1D *divHist = new TH1D(
             Form("%s_%s_splitDiv_%i", paramName.c_str(), man->getFileLabel(extraFileIdx).c_str(),
                  sampleIdx),
