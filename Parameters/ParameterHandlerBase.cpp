@@ -160,8 +160,7 @@ void ParameterHandlerBase::Init(const std::vector<std::string>& YAMLFile) {
   int running_num_file_pars = 0;
 
   _fYAMLDoc["Systematics"] = YAML::Node(YAML::NodeType::Sequence);
-  for(unsigned int i = 0; i < YAMLFile.size(); i++)
-  {
+  for (unsigned int i = 0; i < YAMLFile.size(); i++) {
     YAML::Node YAMLDocTemp = M3OpenConfig(YAMLFile[i]);
 
     if (YAMLDocTemp["ThrowMatrixOverride"]) { // LP: this allows us to put in
@@ -170,12 +169,12 @@ void ParameterHandlerBase::Init(const std::vector<std::string>& YAMLFile) {
                                               // the block diagonal proposal
                                               // matrix to a list and overwrite
                                               // the throw matrix after set up.
-      auto filename =
-          YAMLDocTemp["ThrowMatrixOverride"]["file"].as<std::string>();
+      auto filename = Get<std::string>(
+          YAMLDocTemp["ThrowMatrixOverride"]["file"], __FILE__, __LINE__);
       TFile *submatrix_file = M3::Open(filename, "OPEN", __FILE__, __LINE__);
 
-      auto matrixname =
-          YAMLDocTemp["ThrowMatrixOverride"]["matrix"].as<std::string>();
+      auto matrixname = Get<std::string>(
+          YAMLDocTemp["ThrowMatrixOverride"]["matrix"], __FILE__, __LINE__);
       std::unique_ptr<TMatrixDSym> submatrix{
           submatrix_file->Get<TMatrixDSym>(matrixname.c_str())};
       if (!submatrix) {
@@ -193,8 +192,11 @@ void ParameterHandlerBase::Init(const std::vector<std::string>& YAMLFile) {
 
       // LP: check names by default, but have option to disable check if you
       // know what you're doing
-      if (!bool(YAMLDocTemp["ThrowMatrixOverride"]["check_names"]) ||
-          YAMLDocTemp["ThrowMatrixOverride"]["check_names"].as<bool>()) {
+
+      bool checknames = GetFromManager<bool>(
+          YAMLDocTemp["ThrowMatrixOverride"]["check_names"], true, __FILE__,
+          __LINE__);
+      if (checknames) {
         auto nametree = submatrix_file->Get<TTree>("param_names");
         if (!nametree) {
           MACH3LOG_CRITICAL("TTree param_names doesn't exist in file: {}. Set "
