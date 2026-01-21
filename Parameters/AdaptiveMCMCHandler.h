@@ -33,7 +33,9 @@ class AdaptiveMCMCHandler{
 
   /// @brief If we don't have a covariance matrix to start from for adaptive tune we need to make one!
   void CreateNewAdaptiveCovariance();
-
+  /// @brief Set external matrix programatically rather than reading from file
+  /// @param means if means.size() != cov->GetNrows(), assume 0 means.
+  void SetAdaptiveCovariance(TMatrixDSym const *cov, std::vector<double> const &means={});
   /// @brief HW: sets adaptive block matrix
   /// @param block_indices Values for sub-matrix blocks
   void SetAdaptiveBlocks(const std::vector<std::vector<int>>& block_indices);

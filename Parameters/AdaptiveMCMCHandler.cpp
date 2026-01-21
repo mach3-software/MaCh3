@@ -78,8 +78,8 @@ bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const 
   SetFixed(fixed);
 
   /// HW: This is technically wrong, should be across all systematics but will be addressed in a later PR
-  adaption_scale = 2.38*2.38/GetNumParams(); 
-  
+  adaption_scale = 2.38*2.38/GetNumParams();
+
   // We"ll set a dummy variable here
   auto matrix_blocks = GetFromManager<std::vector<std::vector<int>>>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["MatrixBlocks"], {{}});
 
@@ -93,6 +93,22 @@ void AdaptiveMCMCHandler::CreateNewAdaptiveCovariance() {
   adaptive_covariance = new TMatrixDSym(GetNumParams());
   adaptive_covariance->Zero();
   par_means = std::vector<double>(GetNumParams(), 0);
+}
+
+// ********************************************
+void AdaptiveMCMCHandler::SetAdaptiveCovariance(
+    TMatrixDSym const *cov, std::vector<double> const &means) {
+  // ********************************************
+  if (cov->GetNrows() != GetNumParams()) {
+    MACH3LOG_ERROR("In AdaptiveMCMCHandler::SetAdaptiveCovariance, was passed "
+                   "matrix with {} rows, but we know about {} parameters.",
+                   cov->GetNrows(), GetNumParams());
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  adaptive_covariance = static_cast<TMatrixDSym *>(cov->Clone());
+  par_means = (int(means.size()) == GetNumParams())
+                  ? means
+                  : std::vector<double>(GetNumParams(), 0);
 }
 
 // ********************************************
@@ -302,7 +318,7 @@ bool AdaptiveMCMCHandler::UpdateMatrixAdapt() {
     // e.g. if adaptive_update_step = 1000 and (total_step - start_adpative_throw) is 5000 then this is true
     (total_steps - start_adaptive_throw)%adaptive_update_step == 0) {
     return true;
-  } 
+  }
   else return false;
 }
 
