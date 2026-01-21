@@ -250,26 +250,28 @@ struct SampleBinningInfo {
     if (KinVar < Bin_Edges[0] || KinVar >= Bin_Edges[N_Bins]) {
       return M3::UnderOverFlowBin;
     }
+    // KS: If NomBin is UnderOverFlowBin we must do binary search :(
+    if(NomBin > M3::UnderOverFlowBin) {
+      // KS: Get reference to avoid repeated indexing and help with performance
+      const BinShiftLookup& _restrict_ Bin = Bin_Lookup[NomBin];
+      const double lower = Bin.lower_binedge;
+      const double upper = Bin.upper_binedge;
+      const double lower_lower = Bin.lower_lower_binedge;
+      const double upper_upper = Bin.upper_upper_binedge;
 
-    // KS: Get reference to avoid repeated indexing and help with performance
-    const BinShiftLookup& _restrict_ Bin = Bin_Lookup[NomBin];
-    const double lower = Bin.lower_binedge;
-    const double upper = Bin.upper_binedge;
-    const double lower_lower = Bin.lower_lower_binedge;
-    const double upper_upper = Bin.upper_upper_binedge;
-
-    //DB - Second, check to see if the event is still in the nominal bin
-    if (KinVar < upper && KinVar >= lower) {
-      return NomBin;
-    }
-    //DB - Thirdly, check the adjacent bins first as Eb+CC+EScale shifts aren't likely to move an Erec more than 1bin width
-    //Shifted down one bin from the event bin at nominal
-    if (KinVar < lower && KinVar >= lower_lower) {
-      return NomBin-1;
-    }
-    //Shifted up one bin from the event bin at nominal
-    if (KinVar < upper_upper && KinVar >= upper) {
-      return NomBin+1;
+      //DB - Second, check to see if the event is still in the nominal bin
+      if (KinVar < upper && KinVar >= lower) {
+        return NomBin;
+      }
+      //DB - Thirdly, check the adjacent bins first as Eb+CC+EScale shifts aren't likely to move an Erec more than 1bin width
+      //Shifted down one bin from the event bin at nominal
+      if (KinVar < lower && KinVar >= lower_lower) {
+        return NomBin-1;
+      }
+      //Shifted up one bin from the event bin at nominal
+      if (KinVar < upper_upper && KinVar >= upper) {
+        return NomBin+1;
+      }
     }
     //DB - If we end up in this loop, the event has been shifted outside of its nominal bin, but is still within the allowed binning range
     // KS: Perform binary search to find correct bin. We already checked if isn't outside of bounds
