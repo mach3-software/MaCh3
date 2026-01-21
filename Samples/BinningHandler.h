@@ -20,9 +20,8 @@
 /// enumerated starting from zero, while global bins span all samples
 /// consecutively.
 ///
-/// @example
 /// Example layout of global bins with offsets:
-///
+/// @verbatim
 ///   Sample 0 (GlobalOffset = 0,  nBins = 4):
 ///     Local bins:   [0] [1] [2] [3]
 ///     Global bins:  [0] [1] [2] [3]
@@ -39,6 +38,7 @@
 ///   ------------------------------------------------
 ///   | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
 ///   ------------------------------------------------
+/// @endverbatim
 ///
 /// @author Kamil Skwarczynski
 /// @author Dan Barrow

@@ -248,22 +248,23 @@ void SampleHandlerFD::SetupKinematicMap() {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
 // ************************************************
-void SampleHandlerFD::FillMCHist(const int Sample, const int Dimension) {
+void SampleHandlerFD::FillHist(const int Sample, TH1* Hist, double* Array) {
 // ************************************************
+  int Dimension = GetNDim(Sample);
   // DB Commented out by default - Code heading towards GetLikelihood using arrays instead of root objects
   // Wouldn't actually need this for GetLikelihood as TH objects wouldn't be filled
   if(Dimension == 1){
-    SampleDetails[Sample]._hPDF1D->Reset();
+    Hist->Reset();
     for (int xBin = 0; xBin < Binning->GetNXBins(Sample); ++xBin) {
       const int idx = Binning->GetGlobalBinSafe(Sample, {xBin});
-      SampleDetails[Sample]._hPDF1D->SetBinContent(xBin + 1, SampleHandlerFD_array[idx]);
+      Hist->SetBinContent(xBin + 1, Array[idx]);
     }
   } else if (Dimension == 2) {
-    SampleDetails[Sample]._hPDF2D->Reset();
+    Hist->Reset();
     for (int yBin = 0; yBin < Binning->GetNYBins(Sample); ++yBin) {
       for (int xBin = 0; xBin < Binning->GetNXBins(Sample); ++xBin) {
         const int idx = Binning->GetGlobalBinSafe(Sample, {xBin, yBin});
-        SampleDetails[Sample]._hPDF2D->SetBinContent(xBin + 1, yBin + 1, SampleHandlerFD_array[idx]);
+        Hist->SetBinContent(xBin + 1, yBin + 1, Array[idx]);
       }
     }
   } else {
@@ -785,19 +786,29 @@ void SampleHandlerFD::SetBinning() {
 // ************************************************
   for(int iSample = 0; iSample < GetNsamples(); iSample++)
   {
-    auto XVec = Binning->GetBinEdges(iSample, 0);
-    auto YVec = Binning->GetBinEdges(iSample, 1);
+    int Dimension = GetNDim(iSample);
+    SampleDetails[iSample].DataHist->Reset();
+    SampleDetails[iSample].MCHist->Reset();
+    SampleDetails[iSample].W2Hist->Reset();
+    if(Dimension == 1) {
+      auto XVec = Binning->GetBinEdges(iSample, 0);
+      SampleDetails[iSample].DataHist->SetBins(static_cast<int>(XVec.size()-1), XVec.data());
+      SampleDetails[iSample].MCHist->SetBins(static_cast<int>(XVec.size()-1), XVec.data());
+      SampleDetails[iSample].W2Hist->SetBins(static_cast<int>(XVec.size()-1), XVec.data());
+    } else if (Dimension == 2){
+      auto XVec = Binning->GetBinEdges(iSample, 0);
+      auto YVec = Binning->GetBinEdges(iSample, 1);
 
-    SampleDetails[iSample]._hPDF1D->Reset();
-    SampleDetails[iSample]._hPDF1D->SetBins(static_cast<int>(XVec.size()-1), XVec.data());
-    SampleDetails[iSample].dathist->SetBins(static_cast<int>(XVec.size()-1), XVec.data());
-
-    SampleDetails[iSample]._hPDF2D->Reset();
-    SampleDetails[iSample]._hPDF2D->SetBins(static_cast<int>(XVec.size()-1), XVec.data(),
-                                static_cast<int>(YVec.size()-1), YVec.data());
-    SampleDetails[iSample].dathist2d->SetBins(static_cast<int>(XVec.size()-1), XVec.data(),
-                                  static_cast<int>(YVec.size()-1), YVec.data());
-
+      SampleDetails[iSample].DataHist->SetBins(static_cast<int>(XVec.size()-1), XVec.data(),
+                                              static_cast<int>(YVec.size()-1), YVec.data());
+      SampleDetails[iSample].MCHist->SetBins(static_cast<int>(XVec.size()-1), XVec.data(),
+                                                static_cast<int>(YVec.size()-1), YVec.data());
+      SampleDetails[iSample].W2Hist->SetBins(static_cast<int>(XVec.size()-1), XVec.data(),
+                                             static_cast<int>(YVec.size()-1), YVec.data());
+    } else {
+      MACH3LOG_ERROR("Not supported for Dim {}", Dimension);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
   }
 
   //Set the number of X and Y bins now
@@ -848,221 +859,109 @@ int SampleHandlerFD::GetSampleIndex(const std::string& SampleTitle) const {
   throw MaCh3Exception(__FILE__, __LINE__);
 }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"
 // ************************************************
-TH1* SampleHandlerFD::GetW2Hist(const int Sample, const int Dimension) {
+TH1* SampleHandlerFD::GetW2Hist(const int Sample) {
 // ************************************************
-  if(Dimension == 1) {
-    TH1D* W2Hist = dynamic_cast<TH1D*>(SampleDetails[Sample]._hPDF1D->Clone((SampleDetails[Sample]._hPDF1D->GetName() + std::string("_W2")).c_str()));
-    if (!W2Hist) {
-      MACH3LOG_ERROR("Failed to cast");
+  FillHist(Sample, SampleDetails[Sample].W2Hist, SampleHandlerFD_array_w2);
+  throw MaCh3Exception(__FILE__, __LINE__);
+}
+
+// ************************************************
+TH1* SampleHandlerFD::GetW2Hist(const std::string& Sample) {
+// ************************************************
+  const int Index = GetSampleIndex(Sample);
+  return GetW2Hist(Index);
+}
+
+// ************************************************
+TH1* SampleHandlerFD::GetMCHist(const int Sample) {
+// ************************************************
+  FillHist(Sample, SampleDetails[Sample].MCHist, SampleHandlerFD_array);
+  return SampleDetails[Sample].MCHist;
+}
+
+// ************************************************
+TH1* SampleHandlerFD::GetMCHist(const std::string& Sample) {
+// ************************************************
+  const int Index = GetSampleIndex(Sample);
+  return GetMCHist(Index);
+}
+
+// ************************************************
+TH1* SampleHandlerFD::GetDataHist(const int Sample) {
+// ************************************************
+  return SampleDetails[Sample].DataHist;
+}
+
+// ************************************************
+TH1* SampleHandlerFD::GetDataHist(const std::string& Sample) {
+// ************************************************
+  int Index = GetSampleIndex(Sample);
+  return GetDataHist(Index);
+}
+
+void SampleHandlerFD::AddData(const int Sample, TH1* Data) {
+  int Dim = GetNDim(Sample);
+  MACH3LOG_INFO("Adding {}D data histogram: {} with {:.2f} events", Dim, Data->GetTitle(), Data->Integral());
+  // delete old histogram
+  delete SampleDetails[Sample].DataHist;
+  SampleDetails[Sample].DataHist = static_cast<TH1*>(Data->Clone());
+
+  if(SampleHandlerFD_data == nullptr) {
+    MACH3LOG_ERROR("SampleHandlerFD_data haven't been initialised yet");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  if (Dim == 1) {
+    // Ensure we really have a TH1D
+    auto* h1 = dynamic_cast<TH1D*>(SampleDetails[Sample].DataHist);
+    if (!h1) {
+      MACH3LOG_ERROR("Expected TH1D for 1D sample, got {}", SampleDetails[Sample].DataHist->ClassName());
       throw MaCh3Exception(__FILE__, __LINE__);
     }
-    W2Hist->Reset();
+
     for (int xBin = 0; xBin < Binning->GetNXBins(Sample); ++xBin) {
       const int idx = Binning->GetGlobalBinSafe(Sample, {xBin});
-      W2Hist->SetBinContent(idx + 1, SampleHandlerFD_array_w2[idx]);
+      // ROOT histograms are 1-based, so bin index + 1
+      SampleHandlerFD_data[idx] = SampleDetails[Sample].DataHist->GetBinContent(xBin + 1);
     }
-    return W2Hist;
-  } else if(Dimension == 2) {
-    TH2D* W2Hist = dynamic_cast<TH2D*>(SampleDetails[Sample]._hPDF2D->Clone((SampleDetails[Sample]._hPDF2D->GetName() + std::string("_W2")).c_str()));
-    if (!W2Hist) {
-      MACH3LOG_ERROR("Failed to cast");
+    SampleDetails[Sample].DataHist->GetXaxis()->SetTitle(GetXBinVarName(Sample).c_str());
+    SampleDetails[Sample].DataHist->GetYaxis()->SetTitle("Number of Events");
+  } else if (Dim == 2) {
+    auto* h2 = dynamic_cast<TH2D*>(SampleDetails[Sample].DataHist);
+    if (!h2) {
+      MACH3LOG_ERROR("Expected TH2D for 2D sample, got {}", SampleDetails[Sample].DataHist->ClassName());
       throw MaCh3Exception(__FILE__, __LINE__);
     }
-    W2Hist->Reset();
+
     for (int yBin = 0; yBin < Binning->GetNYBins(Sample); ++yBin) {
       for (int xBin = 0; xBin < Binning->GetNXBins(Sample); ++xBin) {
         const int idx = Binning->GetGlobalBinSafe(Sample, {xBin, yBin});
-        W2Hist->SetBinContent(xBin + 1, yBin + 1, SampleHandlerFD_array_w2[idx]);
+        //Need to do +1 for the bin, this is to be consistent with ROOTs binning scheme
+        SampleHandlerFD_data[idx] = SampleDetails[Sample].DataHist->GetBinContent(xBin + 1, yBin + 1);
       }
     }
-    return W2Hist;
-  } else{
-    MACH3LOG_ERROR("Asking for {} with N Dimension = {}. This is not implemented", __func__, Dimension);
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-}
-#pragma GCC diagnostic pop
-
-// ************************************************
-TH1* SampleHandlerFD::GetW2Hist(const std::string& Sample, const int Dimension) {
-// ************************************************
-  const int Index = GetSampleIndex(Sample);
-  return GetW2Hist(Index, Dimension);
-}
-
-// ************************************************
-TH1* SampleHandlerFD::GetMCHist(const int Sample, const int Dimension) {
-// ************************************************
-  FillMCHist(Sample, Dimension);
-
-  if(Dimension == 1) {
-    return SampleDetails[Sample]._hPDF1D;
-  } else if(Dimension == 2) {
-    return SampleDetails[Sample]._hPDF2D;
-  } else{
-    MACH3LOG_ERROR("Asking for {} with N Dimension = {}. This is not implemented", __func__, Dimension);
+    SampleDetails[Sample].DataHist->GetXaxis()->SetTitle(GetXBinVarName(Sample).c_str());
+    SampleDetails[Sample].DataHist->GetYaxis()->SetTitle(GetYBinVarName(Sample).c_str());
+    SampleDetails[Sample].DataHist->GetZaxis()->SetTitle("Number of Events");
+  } else {
+    MACH3LOG_ERROR("Not supported for Dim {}", Dim);
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 }
 
 // ************************************************
-TH1* SampleHandlerFD::GetMCHist(const std::string& Sample, const int Dimension) {
+void SampleHandlerFD::AddData(const int Sample, const std::vector<double>& Data_Array) {
 // ************************************************
-  const int Index = GetSampleIndex(Sample);
-  return GetMCHist(Index, Dimension);
+  const int Start = Binning->GetSampleStartBin(Sample);
+  const int End = Binning->GetSampleEndBin(Sample);
+
+  for (int idx = Start; idx < End; ++idx) {
+    SampleHandlerFD_data[idx] = Data_Array[idx];
+  }
+
+  FillHist(Sample, SampleDetails[Sample].DataHist, SampleHandlerFD_data);
 }
-
-// ************************************************
-TH1* SampleHandlerFD::GetDataHist(const int Sample, const int Dimension) {
-// ************************************************
-  if(Dimension == 1) {
-    return SampleDetails[Sample].dathist;
-  } else if(Dimension == 2) {
-    return SampleDetails[Sample].dathist2d;
-  } else{
-    MACH3LOG_ERROR("Asdking for {} with N Dimension = {}. This is not implemented", __func__, Dimension);
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-}
-
-// ************************************************
-TH1* SampleHandlerFD::GetDataHist(const std::string& Sample, const int Dimension) {
-// ************************************************
-  int Index = GetSampleIndex(Sample);
-  return GetDataHist(Index, Dimension);
-}
-
-void SampleHandlerFD::AddData(const int Sample, std::vector<double> &data) {
-  if (SampleDetails[Sample].dathist == nullptr) {
-    MACH3LOG_ERROR("Data hist hasn't been initialised yet");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-
-  SampleDetails[Sample].dathist2d = nullptr;
-  SampleDetails[Sample].dathist->Reset();
-
-  if (GetNDim(Sample) != 1) {
-    MACH3LOG_ERROR("Trying to set a 1D 'data' histogram when the number of dimensions for this sample is {}", GetNDim(Sample));
-    MACH3LOG_ERROR("This won't work, please specify the correct dimensions in your sample config with the X and Y variables");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-
-  for (auto const& data_point : data){
-    SampleDetails[Sample].dathist->Fill(data_point);
-  }
-
-  if(SampleHandlerFD_data == nullptr) {
-    MACH3LOG_ERROR("SampleHandlerFD_data haven't been initialised yet");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  // Assuming nBins == nXBins here, because you have 1D data
-  for (int xBin = 0; xBin < Binning->GetNXBins(Sample); ++xBin) {
-    const int idx = Binning->GetGlobalBinSafe(Sample, {xBin});
-    // ROOT histograms are 1-based, so bin index + 1
-    SampleHandlerFD_data[idx] = SampleDetails[Sample].dathist->GetBinContent(xBin + 1);
-  }
-}
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"
-void SampleHandlerFD::AddData(const int Sample, std::vector< std::vector <double> > &data) {
-  if (SampleDetails[Sample].dathist2d == nullptr) {
-    MACH3LOG_ERROR("Data hist hasn't been initialised yet");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-
-  SampleDetails[Sample].dathist = nullptr;
-  SampleDetails[Sample].dathist2d->Reset();
-
-  if (GetNDim(Sample) != 2) {
-    MACH3LOG_ERROR("Trying to set a 2D 'data' histogram when the number of dimensions for this sample is {}", GetNDim(Sample));
-    MACH3LOG_ERROR("This won't work, please specify the correct dimensions in your sample config with the X and Y variables");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-
-  //TODO: this assumes that std::vector is of length 2 and then both data.at(0) and data
-  //ETA: I think this might just be wrong? We should probably just make this AddData(std::vector<double> data_x, std::vector<double> data_y)
-  // or maybe something like AddData(std::vector<std::pair<double, double>> data)?
-  for (int i = 0; i < int(data.size()); i++) {
-    SampleDetails[Sample].dathist2d->Fill(data.at(0)[i],data.at(1)[i]);
-  }
-
-  if(SampleHandlerFD_data == nullptr) {
-    MACH3LOG_ERROR("SampleHandlerFD_data haven't been initialised yet");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  for (int yBin = 0; yBin < Binning->GetNYBins(Sample); ++yBin) {
-    for (int xBin = 0; xBin < Binning->GetNXBins(Sample); ++xBin) {
-      //Need to do +1 for the bin, this is to be consistent with ROOTs binning scheme
-      const int idx = Binning->GetGlobalBinSafe(Sample, {xBin, yBin});
-      SampleHandlerFD_data[idx] = SampleDetails[Sample].dathist2d->GetBinContent(xBin + 1, yBin + 1);
-    }
-  }
-}
-
-void SampleHandlerFD::AddData(const int Sample, TH1D* Data) {
-  MACH3LOG_INFO("Adding 1D data histogram: {} with {:.2f} events", Data->GetTitle(), Data->Integral());
-  if (SampleDetails[Sample].dathist != nullptr) {
-    delete SampleDetails[Sample].dathist;
-  }
-  SampleDetails[Sample].dathist2d = nullptr;
-  SampleDetails[Sample].dathist = static_cast<TH1D*>(Data->Clone());
-
-  if (GetNDim(Sample) != 1) {
-    MACH3LOG_ERROR("Trying to set a 1D 'data' histogram in a 2D sample - Quitting"); 
-    MACH3LOG_ERROR("The number of dimensions for this sample is {}", GetNDim(Sample));
-    throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
-    
-  if(SampleHandlerFD_data == nullptr) {
-    MACH3LOG_ERROR("SampleHandlerFD_data haven't been initialised yet");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-
-  SampleDetails[Sample].dathist->GetXaxis()->SetTitle(GetXBinVarName(Sample).c_str());
-  SampleDetails[Sample].dathist->GetYaxis()->SetTitle("Number of Events");
-
-  for (int xBin = 0; xBin < Binning->GetNXBins(Sample); ++xBin) {
-    const int idx = Binning->GetGlobalBinSafe(Sample, {xBin});
-    // ROOT histograms are 1-based, so bin index + 1
-    SampleHandlerFD_data[idx] = SampleDetails[Sample].dathist->GetBinContent(xBin + 1);
-  }
-}
-
-void SampleHandlerFD::AddData(const int Sample, TH2D* Data) {
-  MACH3LOG_INFO("Adding 2D data histogram: {} with {:.2f} events", Data->GetTitle(), Data->Integral());
-  if (SampleDetails[Sample].dathist2d != nullptr) {
-    delete SampleDetails[Sample].dathist2d;
-  }
-  SampleDetails[Sample].dathist2d = static_cast<TH2D*>(Data->Clone());
-  SampleDetails[Sample].dathist = nullptr;
-
-  if (GetNDim(Sample) != 2) {
-    MACH3LOG_ERROR("Trying to set a 2D 'data' histogram in a 1D sample - Quitting"); 
-    throw MaCh3Exception(__FILE__ , __LINE__ );}
-   
-  if(SampleHandlerFD_data == nullptr) {
-    MACH3LOG_ERROR("SampleHandlerFD_data haven't been initialised yet");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-
-
-  SampleDetails[Sample].dathist2d->GetXaxis()->SetTitle(GetXBinVarName(Sample).c_str());
-  SampleDetails[Sample].dathist2d->GetYaxis()->SetTitle(GetYBinVarName(Sample).c_str());
-  SampleDetails[Sample].dathist2d->GetZaxis()->SetTitle("Number of Events");
-
-  for (int yBin = 0; yBin < Binning->GetNYBins(Sample); ++yBin) {
-    for (int xBin = 0; xBin < Binning->GetNXBins(Sample); ++xBin) {
-      const int idx = Binning->GetGlobalBinSafe(Sample, {xBin, yBin});
-      //Need to do +1 for the bin, this is to be consistent with ROOTs binning scheme
-      SampleHandlerFD_data[idx] = SampleDetails[Sample].dathist2d->GetBinContent(xBin + 1, yBin + 1);
-    }
-  }
-}
-#pragma GCC diagnostic pop
 
 // ************************************************
 void SampleHandlerFD::InitialiseNuOscillatorObjects() {
@@ -1308,17 +1207,17 @@ void SampleHandlerFD::SaveAdditionalInfo(TDirectory* Dir) {
     std::unique_ptr<TH1> data_hist;
 
     if (GetNDim(iSample) == 1) {
-      data_hist = M3::Clone<TH1D>(dynamic_cast<TH1D*>(GetDataHist(iSample, 1)), "data_" + GetSampleTitle(iSample));
+      data_hist = M3::Clone<TH1D>(dynamic_cast<TH1D*>(GetDataHist(iSample)), "data_" + GetSampleTitle(iSample));
       data_hist->GetXaxis()->SetTitle(GetXBinVarName(iSample).c_str());
       data_hist->GetYaxis()->SetTitle("Number of Events");
     } else if (GetNDim(iSample) == 2) {
-      data_hist = M3::Clone<TH2D>(dynamic_cast<TH2D*>(GetDataHist(iSample, 2)), "data_" + GetSampleTitle(iSample));
+      data_hist = M3::Clone<TH2D>(dynamic_cast<TH2D*>(GetDataHist(iSample)), "data_" + GetSampleTitle(iSample));
       data_hist->GetXaxis()->SetTitle(GetXBinVarName(iSample).c_str());
       data_hist->GetYaxis()->SetTitle(GetYBinVarName(iSample).c_str());
       data_hist->GetZaxis()->SetTitle("Number of Events");
     } else {
-      MACH3LOG_ERROR("Not implemented for dimension {}", GetNDim(iSample));
-      throw MaCh3Exception(__FILE__, __LINE__);
+      MACH3LOG_WARN("{} Doesn't work for Dim will not save histogram",__func__, GetNDim(iSample));
+      continue;
     }
 
     if (!data_hist) {
@@ -1342,11 +1241,14 @@ void SampleHandlerFD::InitialiseSplineObject() {
 
       //Keep a track of the spline variables
       std::vector<std::string> SplineVarNames = {"TrueNeutrinoEnergy"};
-      if(GetXBinVarName(iSample).length() > 0){
-        SplineVarNames.push_back(GetXBinVarName(iSample));
-      }
-      if(GetYBinVarName(iSample).length() > 0){
-        SplineVarNames.push_back(GetYBinVarName(iSample));
+      if (GetNDim(iSample) == 1) {
+        SplineVarNames.push_back(GetKinVarName(iSample, 0));
+      } else if (GetNDim(iSample) == 2) {
+        SplineVarNames.push_back(GetKinVarName(iSample, 0));
+        SplineVarNames.push_back(GetKinVarName(iSample, 1));
+      } else {
+        MACH3LOG_ERROR("Not implemented for dimension {}", GetNDim(iSample));
+        throw MaCh3Exception(__FILE__, __LINE__);
       }
       SplineHandler->AddSample(SampleHandlerName, GetSampleTitle(iSample), spline_filepaths, SplineVarNames);
     }
@@ -2020,10 +1922,10 @@ void SampleHandlerFD::PrintRates(const bool DataOnly) {
 
   for (int iSample = 0; iSample < GetNsamples(); ++iSample) {
     std::string name = GetSampleTitle(iSample);
-    double dataIntegral = GetDataHist(iSample, GetNDim(iSample))->Integral();
+    double dataIntegral = GetDataHist(iSample)->Integral();
     sumData += dataIntegral;
     if (!DataOnly) {
-      double mcIntegral = GetMCHist(iSample, GetNDim(iSample))->Integral();
+      double mcIntegral = GetMCHist(iSample)->Integral();
       sumMC += mcIntegral;
       likelihood = GetSampleLikelihood(iSample);
 
@@ -2053,4 +1955,13 @@ std::string SampleHandlerFD::GetKinVarName(const int iSample, const int Dimensio
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   return SampleDetails[iSample].VarStr[Dimension];
+}
+
+// ***************************************************************************
+std::vector<double> SampleHandlerFD::GetArrayForSample(const int Sample, const double* array) const {
+// ***************************************************************************
+  const int Start = Binning->GetSampleStartBin(Sample);
+  const int End   = Binning->GetSampleEndBin(Sample);
+
+  return std::vector<double>(array + Start, array + End);
 }

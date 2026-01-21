@@ -195,6 +195,8 @@ struct SampleBinningInfo {
   std::vector <std::vector<BinShiftLookup> > BinLookup;
   /// Stride factors for converting N-dimensional bin indices to a linear index.
   std::vector<int> Strides;
+  /// Tells whether to use inform binning grid or non-uniform
+  bool Uniform = true;
 
   /// @brief Get linear bin index from ND bin indices with additional checks
   /// @param Bins Vector of bin indices along each dimension

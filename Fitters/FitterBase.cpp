@@ -1154,7 +1154,7 @@ void FitterBase::RunSigmaVar() {
       {
         for(int k = 0; k < samples[ivs]->GetNsamples(); k++ )
         {
-          std::string title = std::string(samples[ivs]->GetPDF(k)->GetName());
+          std::string title = std::string(samples[ivs]->GetMCHist(k)->GetName());
           dirArryDial->cd();
           dirArrySample[SampleIterator] = dirArryDial->mkdir(title.c_str());
           SampleIterator++;
@@ -1223,7 +1223,7 @@ void FitterBase::RunSigmaVar() {
             ss << paramVal;
             std::string parVarTitle = name + "_" + ss.str();
 
-            auto currSamp = M3::Clone<TH2Poly>(static_cast<TH2Poly*>(samples[ivs]->GetPDF(k)));
+            auto currSamp = M3::Clone<TH2Poly>(static_cast<TH2Poly*>(samples[ivs]->GetMCHist(k)));
             // Set a descriptiv-ish title
             std::string title_long = std::string(currSamp->GetName())+"_"+parVarTitle;
 
@@ -1264,13 +1264,13 @@ void FitterBase::RunSigmaVar() {
             //KS: This will give different results depending if data or Asimov, both have their uses
             if (PlotLLHperBin)
             {
-              auto currLLHSamp = M3::Clone<TH2Poly>(static_cast<TH2Poly*>(samples[ivs]->GetPDF(k)));
+              auto currLLHSamp = M3::Clone<TH2Poly>(static_cast<TH2Poly*>(samples[ivs]->GetMCHist(k)));
               currLLHSamp->Reset("");
               currLLHSamp->Fill(0.0, 0.0, 0.0);
 
-              TH2Poly* MCpdf = static_cast<TH2Poly*>(samples[ivs]->GetPDF(k));
-              TH2Poly* Datapdf = static_cast<TH2Poly*>(samples[ivs]->GetData(k));
-              TH2Poly* W2pdf = samples[ivs]->GetW2(k);
+              TH2Poly* MCpdf = static_cast<TH2Poly*>(samples[ivs]->GetMCHist(k));
+              TH2Poly* Datapdf = static_cast<TH2Poly*>(samples[ivs]->GetDataHist(k));
+              TH2Poly* W2pdf = static_cast<TH2Poly*>(samples[ivs]->GetW2Hist(k));
 
               for(int bin = 1; bin < currLLHSamp->GetNumberOfBins()+1; bin++)
               {
@@ -1318,7 +1318,7 @@ void FitterBase::RunSigmaVar() {
       {
         for (int k = 0; k < samples[ivs]->GetNsamples(); ++k)
         {
-          std::string title = std::string(samples[ivs]->GetPDF(k)->GetName()) + "_" + name;
+          std::string title = std::string(samples[ivs]->GetMCHist(k)->GetName()) + "_" + name;
           auto var_x = MakeAsymGraph(sigmaArray_x[1][SampleIterator].get(), sigmaArray_x[2][SampleIterator].get(), sigmaArray_x[3][SampleIterator].get(), (title+"_X").c_str());
           auto var_y = MakeAsymGraph(sigmaArray_y[1][SampleIterator].get(), sigmaArray_y[2][SampleIterator].get(), sigmaArray_y[3][SampleIterator].get(), (title+"_Y").c_str());
 
@@ -1442,16 +1442,8 @@ void WriteHistogramsByMode(SampleHandlerFD *sample,
     SampleDir[iSample]->cd();
     const std::string sampleName = sample->GetSampleTitle(iSample);
     for(int iDim = 0; iDim < sample->GetNDim(iSample); iDim++) {
-      std::string ProjectionName = "";
+      std::string ProjectionName = sample->GetKinVarName(iSample, iDim);
       std::string ProjectionSuffix = "_1DProj" + std::to_string(iDim);
-      if(iDim == 0) {
-        ProjectionName = sample->GetXBinVarName(iSample);
-      } else if (iDim == 1) {
-        ProjectionName = sample->GetYBinVarName(iSample);
-      } else {
-        MACH3LOG_ERROR("Not yet implemented for dimension {}", iDim+1);
-        throw MaCh3Exception(__FILE__, __LINE__);
-      }
 
       // Probably a better way of handling this logic
       if (by_mode) {
