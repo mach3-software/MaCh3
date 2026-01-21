@@ -1102,6 +1102,73 @@ void FitterBase::Run2DLLHScan() {
 }
 
 // *************************
+// Run a general multi-dimensional LLH scan
+void FitterBase::RunLLHMap() {
+  // Save the settings into the output file
+  SaveSettings();
+
+  //MACH3LOG_INFO("Starting general LLH mapping scan");
+
+  //KS: Turn it on if you want LLH scan for each ND sample separately, which increase time significantly but can be useful for validating new samples or dials.
+  bool PlotLLHScanBySample = GetFromManager<bool>(fitMan->raw()["LLHScan"]["LLHScanBySample"], false, __FILE__ , __LINE__);
+
+  std::vector<TDirectory *> Cov_LLH(systematics.size());
+  for(unsigned int ivc = 0; ivc < systematics.size(); ++ivc )
+  {
+    std::string NameTemp = systematics[ivc]->GetName();
+    NameTemp = NameTemp.substr(0, NameTemp.find("_cov")) + "_LLH";
+    Cov_LLH[ivc] = outputFile->mkdir(NameTemp.c_str());
+  }
+
+  std::vector<TDirectory *> SampleClass_LLH(samples.size());
+  for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
+  {
+    std::string NameTemp = samples[ivs]->GetName();
+    SampleClass_LLH[ivs] = outputFile->mkdir(NameTemp.c_str());
+  }
+
+  TDirectory *Sample_LLH = outputFile->mkdir("Sample_LLH");
+  TDirectory *Total_LLH = outputFile->mkdir("Total_LLH");
+
+  std::vector<TDirectory *>SampleSplit_LLH;
+  if(PlotLLHScanBySample)
+  {
+    SampleSplit_LLH.resize(TotalNSamples);
+    int SampleIterator = 0;
+    for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
+    {
+      for(int is = 0; is < samples[ivs]->GetNsamples(); ++is )
+      {
+        SampleSplit_LLH[SampleIterator] = outputFile->mkdir((samples[ivs]->GetSampleTitle(is)+ "_LLH").c_str());
+        SampleIterator++;
+      }
+    }
+  }
+
+  auto ParamsOfInterest = GetFromManager<std::vector<std::string>>(fitMan->raw()["LLHScan"]["LLHParameters"], {}, __FILE__, __LINE__);
+
+  // ParamsRanges["parameter"] = {nPoints, {low, high}}
+  std::map<std::string, std::pair<int, std::pair<double, double>>> ParamsRanges;
+
+  MACH3LOG_INFO("======================================================================================");
+  MACH3LOG_INFO("Performing a general multi-dimensional LogL map scan over following parameters ranges:");
+  MACH3LOG_INFO("======================================================================================");
+  long long TotalPoints = 1;
+
+  for(auto p : ParamsOfInterest) {
+    ParamsRanges[p].first = GetFromManager<int>(fitMan->raw()["LLHScan"]["LLHScanPoints"], 20, __FILE__, __LINE__);
+
+
+    // If paramete
+  }
+
+
+  for(auto par : ParamsOfInterest) {
+    std::cout << par << std::endl;
+  }
+}
+
+// *************************
 void FitterBase::RunSigmaVar() {
 // *************************
   // Save the settings into the output file

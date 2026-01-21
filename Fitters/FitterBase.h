@@ -50,6 +50,9 @@ class FitterBase {
   /// @brief Perform a 1D likelihood scan.
   void RunLLHScan();
 
+  /// @brief Perform a general multi-dimensional likelihood scan.
+  void RunLLHMap();
+
   /// @brief LLH scan is good first estimate of step scale
   void GetStepScaleBasedOnLLHScan();
 
