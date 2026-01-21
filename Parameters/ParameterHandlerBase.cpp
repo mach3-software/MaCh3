@@ -238,7 +238,7 @@ void ParameterHandlerBase::Init(const std::vector<std::string>& YAMLFile) {
       submatrix_file->Close();
     }
 
-    for (const auto& item : YAMLDocTemp["Systematics"]) {
+    for (const auto &item : YAMLDocTemp["Systematics"]) {
       _fYAMLDoc["Systematics"].push_back(item);
       running_num_file_pars++;
     }
@@ -1188,7 +1188,11 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
 
   // Next let"s check for external matrices
   // We"re going to grab this info from the YAML manager
-  if(!GetFromManager<bool>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["UseExternalMatrix"], false, __FILE__ , __LINE__)) {
+  if(GetFromManager<bool>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["UseParameterCovariance"], false, __FILE__ , __LINE__)){
+    use_adaptive = true;
+    AdaptiveHandler->SetAdaptiveCovariance(throwMatrix);
+    return;
+  } else if(!GetFromManager<bool>(adapt_manager["AdaptionOptions"]["Covariance"][matrixName]["UseExternalMatrix"], false, __FILE__ , __LINE__)) {
     MACH3LOG_WARN("Not using external matrix for {}, initialising adaption from scratch", matrixName);
     // If we don't have a covariance matrix to start from for adaptive tune we need to make one!
     use_adaptive = true;
