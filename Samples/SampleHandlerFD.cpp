@@ -1,10 +1,11 @@
 #include "SampleHandlerFD.h"
 #include "Manager/MaCh3Exception.h"
 #include "Manager/MaCh3Logger.h"
-#include <cstddef>
 
+#include <cstddef>
 #include <algorithm>
 #include <memory>
+#include <numeric>
 
 // ************************************************
 SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGeneric* xsec_cov,
@@ -253,23 +254,22 @@ void SampleHandlerFD::FillHist(const int Sample, TH1* Hist, double* Array) {
   int Dimension = GetNDim(Sample);
   // DB Commented out by default - Code heading towards GetLikelihood using arrays instead of root objects
   // Wouldn't actually need this for GetLikelihood as TH objects wouldn't be filled
-  if(Dimension == 1){
+  if(Dimension == 1) {
     Hist->Reset();
-    for (int xBin = 0; xBin < Binning->GetNXBins(Sample); ++xBin) {
+    for (int xBin = 0; xBin < Binning->GetNAxisBins(Sample, 0); ++xBin) {
       const int idx = Binning->GetGlobalBinSafe(Sample, {xBin});
       Hist->SetBinContent(xBin + 1, Array[idx]);
     }
   } else if (Dimension == 2) {
     Hist->Reset();
-    for (int yBin = 0; yBin < Binning->GetNYBins(Sample); ++yBin) {
-      for (int xBin = 0; xBin < Binning->GetNXBins(Sample); ++xBin) {
+    for (int yBin = 0; yBin < Binning->GetNAxisBins(Sample, 1); ++yBin) {
+      for (int xBin = 0; xBin < Binning->GetNAxisBins(Sample, 0); ++xBin) {
         const int idx = Binning->GetGlobalBinSafe(Sample, {xBin, yBin});
         Hist->SetBinContent(xBin + 1, yBin + 1, Array[idx]);
       }
     }
   } else {
-    MACH3LOG_ERROR("Asking for {} with N Dimension = {}. This is not implemented", __func__, Dimension);
-    throw MaCh3Exception(__FILE__, __LINE__);
+    MACH3LOG_DEBUG("Asking for {} with N Dimension = {}. This is not implemented", __func__, Dimension);
   }
 }
 #pragma GCC diagnostic pop
@@ -787,15 +787,20 @@ void SampleHandlerFD::SetBinning() {
   for(int iSample = 0; iSample < GetNsamples(); iSample++)
   {
     int Dimension = GetNDim(iSample);
-    SampleDetails[iSample].DataHist->Reset();
-    SampleDetails[iSample].MCHist->Reset();
-    SampleDetails[iSample].W2Hist->Reset();
     if(Dimension == 1) {
+      SampleDetails[iSample].DataHist->Reset();
+      SampleDetails[iSample].MCHist->Reset();
+      SampleDetails[iSample].W2Hist->Reset();
+
       auto XVec = Binning->GetBinEdges(iSample, 0);
       SampleDetails[iSample].DataHist->SetBins(static_cast<int>(XVec.size()-1), XVec.data());
       SampleDetails[iSample].MCHist->SetBins(static_cast<int>(XVec.size()-1), XVec.data());
       SampleDetails[iSample].W2Hist->SetBins(static_cast<int>(XVec.size()-1), XVec.data());
     } else if (Dimension == 2){
+      SampleDetails[iSample].DataHist->Reset();
+      SampleDetails[iSample].MCHist->Reset();
+      SampleDetails[iSample].W2Hist->Reset();
+
       auto XVec = Binning->GetBinEdges(iSample, 0);
       auto YVec = Binning->GetBinEdges(iSample, 1);
 
@@ -806,8 +811,8 @@ void SampleHandlerFD::SetBinning() {
       SampleDetails[iSample].W2Hist->SetBins(static_cast<int>(XVec.size()-1), XVec.data(),
                                              static_cast<int>(YVec.size()-1), YVec.data());
     } else {
-      MACH3LOG_ERROR("Not supported for Dim {}", Dimension);
-      throw MaCh3Exception(__FILE__, __LINE__);
+      MACH3LOG_DEBUG("Not supported for Dim {}", Dimension);
+      continue;
     }
   }
 
@@ -863,6 +868,10 @@ int SampleHandlerFD::GetSampleIndex(const std::string& SampleTitle) const {
 TH1* SampleHandlerFD::GetW2Hist(const int Sample) {
 // ************************************************
   FillHist(Sample, SampleDetails[Sample].W2Hist, SampleHandlerFD_array_w2);
+  if(SampleDetails[Sample].W2Hist == nullptr) {
+    MACH3LOG_ERROR("Can't access {} for {}Dimensions", __func__, GetNDim(Sample));
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
   throw MaCh3Exception(__FILE__, __LINE__);
 }
 
@@ -877,6 +886,10 @@ TH1* SampleHandlerFD::GetW2Hist(const std::string& Sample) {
 TH1* SampleHandlerFD::GetMCHist(const int Sample) {
 // ************************************************
   FillHist(Sample, SampleDetails[Sample].MCHist, SampleHandlerFD_array);
+  if(SampleDetails[Sample].MCHist == nullptr) {
+    MACH3LOG_ERROR("Can't access {} for {}Dimensions", __func__, GetNDim(Sample));
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
   return SampleDetails[Sample].MCHist;
 }
 
@@ -890,6 +903,10 @@ TH1* SampleHandlerFD::GetMCHist(const std::string& Sample) {
 // ************************************************
 TH1* SampleHandlerFD::GetDataHist(const int Sample) {
 // ************************************************
+  if(SampleDetails[Sample].DataHist == nullptr) {
+    MACH3LOG_ERROR("Can't access {} for {}Dimensions", __func__, GetNDim(Sample));
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
   return SampleDetails[Sample].DataHist;
 }
 
@@ -914,13 +931,12 @@ void SampleHandlerFD::AddData(const int Sample, TH1* Data) {
 
   if (Dim == 1) {
     // Ensure we really have a TH1D
-    auto* h1 = dynamic_cast<TH1D*>(SampleDetails[Sample].DataHist);
-    if (!h1) {
+    if (std::string(SampleDetails[Sample].DataHist->ClassName()) != "TH1D") {
       MACH3LOG_ERROR("Expected TH1D for 1D sample, got {}", SampleDetails[Sample].DataHist->ClassName());
       throw MaCh3Exception(__FILE__, __LINE__);
     }
 
-    for (int xBin = 0; xBin < Binning->GetNXBins(Sample); ++xBin) {
+    for (int xBin = 0; xBin < Binning->GetNAxisBins(Sample, 0); ++xBin) {
       const int idx = Binning->GetGlobalBinSafe(Sample, {xBin});
       // ROOT histograms are 1-based, so bin index + 1
       SampleHandlerFD_data[idx] = SampleDetails[Sample].DataHist->GetBinContent(xBin + 1);
@@ -928,14 +944,13 @@ void SampleHandlerFD::AddData(const int Sample, TH1* Data) {
     SampleDetails[Sample].DataHist->GetXaxis()->SetTitle(GetXBinVarName(Sample).c_str());
     SampleDetails[Sample].DataHist->GetYaxis()->SetTitle("Number of Events");
   } else if (Dim == 2) {
-    auto* h2 = dynamic_cast<TH2D*>(SampleDetails[Sample].DataHist);
-    if (!h2) {
+    if (std::string(SampleDetails[Sample].DataHist->ClassName()) != "TH2D") {
       MACH3LOG_ERROR("Expected TH2D for 2D sample, got {}", SampleDetails[Sample].DataHist->ClassName());
       throw MaCh3Exception(__FILE__, __LINE__);
     }
 
-    for (int yBin = 0; yBin < Binning->GetNYBins(Sample); ++yBin) {
-      for (int xBin = 0; xBin < Binning->GetNXBins(Sample); ++xBin) {
+    for (int yBin = 0; yBin < Binning->GetNAxisBins(Sample, 1); ++yBin) {
+      for (int xBin = 0; xBin < Binning->GetNAxisBins(Sample, 0); ++xBin) {
         const int idx = Binning->GetGlobalBinSafe(Sample, {xBin, yBin});
         //Need to do +1 for the bin, this is to be consistent with ROOTs binning scheme
         SampleHandlerFD_data[idx] = SampleDetails[Sample].DataHist->GetBinContent(xBin + 1, yBin + 1);
@@ -1116,6 +1131,7 @@ M3::float_t SampleHandlerFD::GetEventWeight(const int iEntry) {
 void SampleHandlerFD::FillSplineBins() {
 // ************************************************
   //Now loop over events and get the spline bin for each event
+  bool ThrowCrititcal = true;
   for (unsigned int j = 0; j < GetNEvents(); ++j) {
     const int SampleIndex = MCSamples[j].NominalSample;
     const auto SampleTitle = GetSampleTitle(SampleIndex);
@@ -1131,10 +1147,12 @@ void SampleHandlerFD::FillSplineBins() {
         EventSplines = SplineHandler->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCSamples[j].KinVar[0]), *(MCSamples[j].KinVar[1]));
         break;
       default:
-        MACH3LOG_ERROR("Error in assigning spline bins because nDimensions = {}", GetNDim(SampleIndex));
-        MACH3LOG_ERROR("MaCh3 only supports splines binned in Etrue + the sample binning");
-        MACH3LOG_ERROR("Please check the sample binning you specified in your sample config ");
-        throw MaCh3Exception(__FILE__, __LINE__);
+        if(ThrowCrititcal) {
+          MACH3LOG_CRITICAL("MaCh3 doesn't support binned splines for more than 2D while you use {}", GetNDim(SampleIndex));
+          MACH3LOG_CRITICAL("Will use 2D like approach");
+          ThrowCrititcal = false;
+        }
+        EventSplines = SplineHandler->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCSamples[j].KinVar[0]), *(MCSamples[j].KinVar[1]));
         break;
     }
     const int NSplines = static_cast<int>(EventSplines.size());
@@ -1247,8 +1265,9 @@ void SampleHandlerFD::InitialiseSplineObject() {
         SplineVarNames.push_back(GetKinVarName(iSample, 0));
         SplineVarNames.push_back(GetKinVarName(iSample, 1));
       } else {
-        MACH3LOG_ERROR("Not implemented for dimension {}", GetNDim(iSample));
-        throw MaCh3Exception(__FILE__, __LINE__);
+        MACH3LOG_CRITICAL("{} Not implemented for dimension {}, will use 2D", __func__, GetNDim(iSample));
+        SplineVarNames.push_back(GetKinVarName(iSample, 0));
+        SplineVarNames.push_back(GetKinVarName(iSample, 1));
       }
       SplineHandler->AddSample(SampleHandlerName, GetSampleTitle(iSample), spline_filepaths, SplineVarNames);
     }
@@ -1522,11 +1541,13 @@ std::vector<double> SampleHandlerFD::ReturnKinematicParameterBinning(const int S
 // ************************************************
   // If any of fit based variables return them
   /// @todo might be useful to allow overwriting this
-  for(int iDim = 0; iDim < GetNDim(Sample); iDim++) {
-    if(KinematicParameter == GetKinVarName(Sample, iDim)) {
-      return Binning->GetBinEdges(Sample, iDim);
-    }
-  }
+  if(Binning->IsUniform(Sample)) {
+    for(int iDim = 0; iDim < GetNDim(Sample); iDim++) {
+      if(KinematicParameter == GetKinVarName(Sample, iDim)) {
+        return Binning->GetBinEdges(Sample, iDim);
+      }
+    } // end loop over Dimension
+  } // end loop over IsUniform
 
   auto MakeBins = [](int nBins) {
     std::vector<double> bins(nBins + 1);
@@ -1922,10 +1943,12 @@ void SampleHandlerFD::PrintRates(const bool DataOnly) {
 
   for (int iSample = 0; iSample < GetNsamples(); ++iSample) {
     std::string name = GetSampleTitle(iSample);
-    double dataIntegral = GetDataHist(iSample)->Integral();
+    std::vector<double> DataArray = GetDataArray(iSample);
+    double dataIntegral = std::accumulate(DataArray.begin(), DataArray.end(), 0.0);
     sumData += dataIntegral;
     if (!DataOnly) {
-      double mcIntegral = GetMCHist(iSample)->Integral();
+      std::vector<double> MCArray = GetMCArray(iSample);
+      double mcIntegral = std::accumulate(MCArray.begin(), MCArray.end(), 0.0);
       sumMC += mcIntegral;
       likelihood = GetSampleLikelihood(iSample);
 

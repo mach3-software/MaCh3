@@ -171,6 +171,24 @@ struct BinShiftLookup {
 };
 
 // ***************************
+/// @brief KS: This hold bin corners in N-Dimensions allowing to check if Bin falls into
+struct BinInfo {
+// ***************************
+  /// The corners of the bin, stored as {lower, upper} bounds for each dimension.
+  std::vector<std::array<double, 2>> Corners;
+
+  /// @brief Checks if a given event (point) falls inside the bin.
+  bool IsEventInside(const std::vector<double>& KinVars) const {
+    for(size_t i = 0; i < KinVars.size(); i++){
+      if(KinVars[i] < Corners[i][0] || KinVars[i] > Corners[i][1]){
+        return false;
+      }
+    }
+    return true;
+  }
+};
+
+// ***************************
 /// @brief KS: Struct storing all information required for sample binning
 ///
 /// @details
@@ -197,6 +215,41 @@ struct SampleBinningInfo {
   std::vector<int> Strides;
   /// Tells whether to use inform binning grid or non-uniform
   bool Uniform = true;
+
+  /// @brief Initialise Uniform Binning
+  void InitUniform(const std::vector<std::vector<double>>& InputEdges) {
+    BinEdges = InputEdges;
+    Uniform = true;
+    AxisNBins.resize(BinEdges.size());
+
+    nBins = 1;
+    for(size_t iDim = 0; iDim < BinEdges.size(); iDim++)
+    {
+      const auto& Edges = BinEdges[iDim];
+      if (!std::is_sorted(Edges.begin(), Edges.end())) {
+        MACH3LOG_ERROR("VarBins for Dim {} must be in increasing order in sample config, VarBins: [{}]",
+                       iDim, fmt::join(Edges, ", "));
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+
+      //Sanity check that some binning has been specified
+      if(BinEdges[iDim].size() == 0){
+        MACH3LOG_ERROR("No binning specified for Dim {} of sample binning, please add some binning to the sample config", iDim);
+        MACH3LOG_ERROR("Please ensure BinEdges are correctly configured for all dimensions");
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+
+      // Set the number of bins for this dimension
+      AxisNBins[iDim] = BinEdges[iDim].size() - 1;
+      // Update total number of bins
+      nBins *= AxisNBins[iDim];
+
+      MACH3LOG_INFO("{}-Dim Binning: [{:.2f}]", iDim, fmt::join(BinEdges[iDim], ", "));
+    }
+    GlobalOffset = 0;
+    /// Lastly prepare special histograms used for event migration
+    InitialiseBinMigrationLookUp(static_cast<int>(BinEdges.size()));
+  }
 
   /// @brief Get linear bin index from ND bin indices with additional checks
   /// @param Bins Vector of bin indices along each dimension

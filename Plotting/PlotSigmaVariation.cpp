@@ -468,28 +468,39 @@ void CompareSigVar2D(const std::string& filename, const YAML::Node& Settings)
       //set dir to current directory
       dir = gDirectory;
 
-      //make -3,-1,0,1,3 polys
-      std::vector<std::unique_ptr<TH2D>> Projection;
+      int nDim = SampleMaxDim[is];
+
       TIter nextsub(dir->GetListOfKeys());
       TKey *subsubkey = nullptr;
 
-      //loop over items in directory, hard code which th2poly we want
-      while ((subsubkey = static_cast<TKey*>(nextsub())))
-      {
-        auto name = std::string(subsubkey->GetName());
-        auto classname = std::string(subsubkey->GetClassName());
-        // Looking
-        const std::string ProjectionName = "_2DProj";
-        const bool IsProjection = (name.find(ProjectionName) != std::string::npos);
-        if (classname == "TH2D" && IsProjection)
-        {
-          name = DialNameVector[id] + "/" + SampleNameVector[is] + "/" + name;
-          Projection.emplace_back(M3::Clone(SigmaDir->Get<TH2D>(name.c_str())));
-          MACH3LOG_DEBUG("Adding hist {}", name);
+      // Loop over all unique dimension pairs
+      for (int iDim1 = 0; iDim1 <= nDim; ++iDim1) {
+        for (int iDim2 = iDim1 + 1; iDim2 <= nDim; ++iDim2) {
+
+          // Reset iterator for each dimension pair
+          nextsub.Reset();
+          //make -3,-1,0,1,3 polys
+          std::vector<std::unique_ptr<TH2D>> Projection;
+
+          //loop over items in directory, hard code which th2poly we want
+          while ((subsubkey = static_cast<TKey*>(nextsub())))
+          {
+            auto name = std::string(subsubkey->GetName());
+            auto classname = std::string(subsubkey->GetClassName());
+            // Looking
+            const std::string ProjectionName = "_2DProj_" + std::to_string(iDim1) + "_vs_" + std::to_string(iDim2);
+            const bool IsProjection = (name.find(ProjectionName) != std::string::npos);
+            if (classname == "TH2D" && IsProjection)
+            {
+              name = DialNameVector[id] + "/" + SampleNameVector[is] + "/" + name;
+              Projection.emplace_back(M3::Clone(SigmaDir->Get<TH2D>(name.c_str())));
+              MACH3LOG_DEBUG("Adding hist {}", name);
+            }
+          }
+          std::string Title = DialNameVector[id] + " " + SampleNameVector[is];
+          if(Projection.size() == sigmaArray.size()) PlotRatio2D(Projection, canvas, Title, outfilename);
         }
       }
-      std::string Title = DialNameVector[id] + " " + SampleNameVector[is];
-      if(Projection.size() == sigmaArray.size()) PlotRatio2D(Projection, canvas, Title, outfilename);
       gDirectory->cd("..");
     }
   }

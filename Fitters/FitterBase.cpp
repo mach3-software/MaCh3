@@ -1441,9 +1441,9 @@ void WriteHistogramsByMode(SampleHandlerFD *sample,
   for (int iSample = 0; iSample < sample->GetNsamples(); ++iSample) {
     SampleDir[iSample]->cd();
     const std::string sampleName = sample->GetSampleTitle(iSample);
-    for(int iDim = 0; iDim < sample->GetNDim(iSample); iDim++) {
-      std::string ProjectionName = sample->GetKinVarName(iSample, iDim);
-      std::string ProjectionSuffix = "_1DProj" + std::to_string(iDim);
+    for(int iDim1 = 0; iDim1 < sample->GetNDim(iSample); iDim1++) {
+      std::string ProjectionName = sample->GetKinVarName(iSample, iDim1);
+      std::string ProjectionSuffix = "_1DProj" + std::to_string(iDim1);
 
       // Probably a better way of handling this logic
       if (by_mode) {
@@ -1476,10 +1476,20 @@ void WriteHistogramsByMode(SampleHandlerFD *sample,
         auto hist = sample->Get1DVarHist(iSample, ProjectionName);
         WriteHistograms(hist, sampleName + ProjectionSuffix + suffix);
         delete hist;
-        // Only for 2D
-        if(iDim == 1) {
-          auto hist2D = sample->Get2DVarHist(iSample, sample->GetXBinVarName(iSample), sample->GetYBinVarName(iSample));
-          WriteHistograms(hist2D, sampleName + "_2DProj" + suffix);
+        // Only for 2D and Beyond
+        for (int iDim2 = iDim1 + 1; iDim2 < sample->GetNDim(iSample); ++iDim2) {
+          // Get the names for the two dimensions
+          std::string XVarName = sample->GetKinVarName(iSample, iDim1);
+          std::string YVarName = sample->GetKinVarName(iSample, iDim2);
+
+          // Get the 2D histogram for this pair
+          auto hist2D = sample->Get2DVarHist(iSample, XVarName, YVarName);
+
+          // Write the histogram
+          std::string suffix2D = "_2DProj_" + std::to_string(iDim1) + "_vs_" + std::to_string(iDim2) + suffix;
+          WriteHistograms(hist2D, sampleName + suffix2D);
+
+          // Clean up
           delete hist2D;
         }
       }
@@ -1554,12 +1564,7 @@ void FitterBase::RunSigmaVarFD() {
           /// Apply custom range to make easier comparison with p-theta
           CustomRange(ParName, sigma, ParamShiftValue);
 
-          MACH3LOG_INFO(
-            "  - set to {:<5.2f} ({:<2} sigma shift)",
-                        ParamShiftValue,
-                        sigma
-          );
-
+          MACH3LOG_INFO("  - set to {:<5.2f} ({:<2} sigma shift)", ParamShiftValue, sigma);
           systematics[s]->SetParProp(i, ParamShiftValue);
 
           std::ostringstream valStream;

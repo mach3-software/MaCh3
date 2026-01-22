@@ -9,6 +9,7 @@
 // ***************************
 /// @brief KS: Class handling binning for multiple samples
 /// @details
+/// ## Introduction
 /// Each sample can define its own binning in an arbitrary number of dimensions.
 /// Internally, every sample's multi-dimensional binning is linearised into a
 /// single 1D array. All samples are then concatenated into one global bin index
@@ -21,7 +22,7 @@
 /// consecutively.
 ///
 /// Example layout of global bins with offsets:
-/// @verbatim
+/// @code
 ///   Sample 0 (GlobalOffset = 0,  nBins = 4):
 ///     Local bins:   [0] [1] [2] [3]
 ///     Global bins:  [0] [1] [2] [3]
@@ -38,7 +39,11 @@
 ///   ------------------------------------------------
 ///   | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
 ///   ------------------------------------------------
-/// @endverbatim
+/// @endcode
+///
+/// ## Uniform and Non-Uniform Binning Scheme
+/// TODO!!!
+///
 ///
 /// @author Kamil Skwarczynski
 /// @author Dan Barrow
@@ -91,20 +96,16 @@ class BinningHandler {
 
   /// @brief Get N-dim bin edges for a given sample
   /// @param iSample index of a given sample
-  /// @param iDim dimension for which we extrac bin edges
+  /// @param iDim dimension for which we extract bin edges
   std::vector<double> GetBinEdges(const int iSample, const int iDim) const {return SampleBinning[iSample].BinEdges.at(iDim);};
 
   /// @brief Get Number of N-axis bins for a given sample
   /// @param iSample index of a given sample
-  int GetNAxisBins(const int iSample, const int iDim) const {return static_cast<int>(SampleBinning[iSample].AxisNBins.at(iDim));};
-
-  /// @brief Get Number of X bins for a given sample
+  /// @param iDim dimension for which we extract number of bins
+  int GetNAxisBins(const int iSample, const int iDim) const;
+  /// @brief Tells whether given sample is using unform binning
   /// @param iSample index of a given sample
-  int GetNXBins(const int iSample) const {return static_cast<int>(SampleBinning[iSample].AxisNBins.at(0));};
-  /// @brief Get Number of Y bins for a given sample
-  /// @param iSample index of a given sample
-  int GetNYBins(const int iSample) const {return static_cast<int>(SampleBinning[iSample].AxisNBins.at(1));};
-
+  bool IsUniform(const int iSample) const;
   /// @brief Get bin number corresponding to where given sample starts
   /// @param iSample index of a given sample
   int GetSampleStartBin(const int iSample) const;
