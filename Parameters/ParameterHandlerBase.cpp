@@ -1,9 +1,12 @@
 #include "Parameters/ParameterHandlerBase.h"
-#include "regex"
+
+#include "Samples/HistogramUtils.h"
+
+#include <regex>
 
 // ********************************************
 ParameterHandlerBase::ParameterHandlerBase(std::string name, std::string file, double threshold, int FirstPCA, int LastPCA)
-                     : inputFile(file), pca(false) {
+                     : inputFile(file), pca(true) {
 // ********************************************
   MACH3LOG_DEBUG("Constructing instance of ParameterHandler");
   doSpecialStepProposal = false;
@@ -105,7 +108,7 @@ void ParameterHandlerBase::Init(const std::string& name, const std::string& file
     MACH3LOG_ERROR("Could not find covariance matrix name {} in file {}", name, file);
     MACH3LOG_ERROR("Are you really sure {} exists in the file?", name);
     throw MaCh3Exception(__FILE__ , __LINE__ );
-  } 
+  }
 
   PrintLength = 35;
 
@@ -120,7 +123,7 @@ void ParameterHandlerBase::Init(const std::string& name, const std::string& file
   use_adaptive = false;
   // Set the covariance matrix
   _fNumPar = CovMat->GetNrows();
-    
+
   InvertCovMatrix.resize(_fNumPar, std::vector<double>(_fNumPar, 0.0));
   throwMatrixCholDecomp = new double*[_fNumPar]();
   // Set the defaults to true
@@ -152,12 +155,90 @@ void ParameterHandlerBase::Init(const std::string& name, const std::string& file
 // All you really need from the YAML file is the number of Systematics
 void ParameterHandlerBase::Init(const std::vector<std::string>& YAMLFile) {
 // ********************************************
+
+  std::map<std::pair<int, int>, std::unique_ptr<TMatrixDSym>> ThrowSubMatrixOverrides;
+  int running_num_file_pars = 0;
+
   _fYAMLDoc["Systematics"] = YAML::Node(YAML::NodeType::Sequence);
   for(unsigned int i = 0; i < YAMLFile.size(); i++)
   {
     YAML::Node YAMLDocTemp = M3OpenConfig(YAMLFile[i]);
+
+    if (YAMLDocTemp["ThrowMatrixOverride"]) { // LP: this allows us to put in
+                                              // proposal matrix overrides per
+                                              // parameter-containing file, add
+                                              // the block diagonal proposal
+                                              // matrix to a list and overwrite
+                                              // the throw matrix after set up.
+      auto filename =
+          YAMLDocTemp["ThrowMatrixOverride"]["file"].as<std::string>();
+      TFile *submatrix_file = M3::Open(filename, "OPEN", __FILE__, __LINE__);
+
+      auto matrixname =
+          YAMLDocTemp["ThrowMatrixOverride"]["matrix"].as<std::string>();
+      std::unique_ptr<TMatrixDSym> submatrix{
+          submatrix_file->Get<TMatrixDSym>(matrixname.c_str())};
+      if (!submatrix) {
+        MACH3LOG_CRITICAL("Covariance matrix {} doesn't exist in file: {}",
+                          matrixname, filename);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+      auto numrows = submatrix->GetNrows();
+      // LP: the -1 here is because we specify the last index for consistency
+      // with PCAHandler, not the first index after the end as is more common
+      // throughout computer science...
+      ThrowSubMatrixOverrides[{running_num_file_pars,
+                               running_num_file_pars + (numrows - 1)}] =
+          std::move(submatrix);
+
+      // LP: check names by default, but have option to disable check if you
+      // know what you're doing
+      if (!bool(YAMLDocTemp["ThrowMatrixOverride"]["check_names"]) ||
+          YAMLDocTemp["ThrowMatrixOverride"]["check_names"].as<bool>()) {
+        auto nametree = submatrix_file->Get<TTree>("param_names");
+        if (!nametree) {
+          MACH3LOG_CRITICAL("TTree param_names doesn't exist in file: {}. Set "
+                            "ThrowMatrixOverride: {{ check_names: False }} to "
+                            "disable this check.",
+                            filename);
+          throw MaCh3Exception(__FILE__, __LINE__);
+        }
+        std::string *param_name = nullptr;
+        nametree->SetBranchAddress("name", &param_name);
+
+        if (nametree->GetEntries() != int(YAMLDocTemp["Systematics"].size())) {
+          MACH3LOG_CRITICAL("TTree param_names in file: {} has {} entries, but "
+                            "the corresponding yaml file only declares {} "
+                            "parameters. Set ThrowMatrixOverride: {{ "
+                            "check_names: False }} to disable this check.",
+                            filename, nametree->GetEntries(),
+                            YAMLDocTemp["Systematics"].size());
+          throw MaCh3Exception(__FILE__, __LINE__);
+        }
+
+        int pit = 0;
+        for (const auto &param : YAMLDocTemp["Systematics"]) {
+          nametree->GetEntry(pit++);
+          auto yaml_pname = Get<std::string>(
+              param["Systematic"]["Names"]["FancyName"], __FILE__, __LINE__);
+          if ((*param_name) != yaml_pname) {
+            MACH3LOG_CRITICAL(
+                "TTree param_names in file: {} at entry {} has parameter {}, "
+                "but "
+                "the corresponding yaml parameter is named {}. Set "
+                "ThrowMatrixOverride: {{ "
+                "check_names: False }} to disable this check.",
+                filename, pit, (*param_name), yaml_pname);
+            throw MaCh3Exception(__FILE__, __LINE__);
+          }
+        }
+      }
+      submatrix_file->Close();
+    }
+
     for (const auto& item : YAMLDocTemp["Systematics"]) {
       _fYAMLDoc["Systematics"].push_back(item);
+      running_num_file_pars++;
     }
   }
 
@@ -193,6 +274,7 @@ void ParameterHandlerBase::Init(const std::vector<std::string>& YAMLFile) {
   //ETA - read in the systematics. Would be good to add in some checks to make sure
   //that there are the correct number of entries i.e. are the _fNumPar for Names,
   //PreFitValues etc etc.
+
   for (auto const &param : _fYAMLDoc["Systematics"])
   {
     _fFancyNames[i] = Get<std::string>(param["Systematic"]["Names"]["FancyName"], __FILE__ , __LINE__);
@@ -279,6 +361,10 @@ void ParameterHandlerBase::Init(const std::vector<std::string>& YAMLFile) {
   if (_fNumPar <= 0) {
     MACH3LOG_ERROR("ParameterHandler object has {} systematics!", _fNumPar);
     throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+
+  for(auto const & matovr : ThrowSubMatrixOverrides){
+    SetSubThrowMatrix(matovr.first.first, matovr.first.second, *matovr.second);
   }
 
   Tunes = std::make_unique<ParameterTunes>(_fYAMLDoc["Systematics"]);
@@ -474,7 +560,7 @@ void ParameterHandlerBase::ThrowParameters() {
         randParams[i] = random_number[M3::GetThreadIndex()]->Gaus(0, 1);
         const double corr_throw_single = M3::MatrixVectorMultiSingle(throwMatrixCholDecomp, randParams, _fNumPar, i);
         _fPropVal[i] = _fPreFitValue[i] + corr_throw_single;
-        if (throws > 10000) 
+        if (throws > 10000)
         {
           //KS: Since we are multithreading there is danger that those messages
           //will be all over the place, small price to pay for faster code
@@ -654,7 +740,7 @@ void ParameterHandlerBase::CorrelateSteps() _noexcept_ {
       }
     }
     // If doing PCA throw uncorrelated in PCA basis (orthogonal basis by definition)
-  } else { 
+  } else {
     PCAObj->CorrelateSteps(_fIndivStepScale, _fGlobalStepScale, randParams, corr_throw);
   }
 }
@@ -775,7 +861,7 @@ double ParameterHandlerBase::GetLikelihood() {
 // ********************************************
   // Default behaviour is to reject negative values + do std llh calculation
   const int NOutside = CheckBounds();
-  
+
   if(NOutside > 0) return NOutside*M3::_LARGE_LOGL_;
 
   return CalcLikelihood();
@@ -873,7 +959,7 @@ int ParameterHandlerBase::GetParIndex(const std::string& name) const {
 void ParameterHandlerBase::SetFixAllParameters() {
 // ********************************************
   // Check if the parameter is fixed and if not, toggle fix it
-  for (int i = 0; i < _fNumPar; ++i) 
+  for (int i = 0; i < _fNumPar; ++i)
     if(!IsParameterFixed(i)) ToggleFixParameter(i);
 }
 
@@ -895,7 +981,7 @@ void ParameterHandlerBase::SetFixParameter(const std::string& name) {
 void ParameterHandlerBase::SetFreeAllParameters() {
 // ********************************************
   // Check if the parameter is fixed and if not, toggle fix it
-  for (int i = 0; i < _fNumPar; ++i) 
+  for (int i = 0; i < _fNumPar; ++i)
     if(IsParameterFixed(i)) ToggleFixParameter(i);
 }
 
@@ -1073,9 +1159,9 @@ void ParameterHandlerBase::SetThrowMatrix(TMatrixDSym *cov){
   throwMatrix = static_cast<TMatrixDSym*>(cov->Clone());
   if(use_adaptive && AdaptiveHandler->AdaptionUpdate()) MakeClosestPosDef(throwMatrix);
   else MakePosDef(throwMatrix);
-  
+
   auto throwMatrix_CholDecomp = M3::GetCholeskyDecomposedMatrix(*throwMatrix, matrixName);
-  
+
   //KS: ROOT has bad memory management, using standard double means we can decrease most operation by factor 2 simply due to cache hits
   #ifdef MULTITHREAD
   #pragma omp parallel for collapse(2)
@@ -1087,6 +1173,29 @@ void ParameterHandlerBase::SetThrowMatrix(TMatrixDSym *cov){
       throwMatrixCholDecomp[i][j] = throwMatrix_CholDecomp[i][j];
     }
   }
+}
+
+void ParameterHandlerBase::SetSubThrowMatrix(int first_index, int last_index,
+                                             TMatrixDSym const &subcov) {
+
+  if ((last_index - first_index) >= subcov.GetNrows()) {
+    MACH3LOG_ERROR("Trying to SetSubThrowMatrix into range: ({},{}) with a "
+                   "submatrix with only {} rows {}",
+                   first_index, last_index, subcov.GetNrows(), __func__);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  TMatrixDSym *current_ThrowMatrix =
+      static_cast<TMatrixDSym *>(throwMatrix->Clone());
+  for (int i = first_index; i <= last_index; ++i) {
+    for (int j = first_index; j <= last_index; ++j) {
+      current_ThrowMatrix->operator()(i, j) =
+          subcov(i - first_index, j - first_index);
+    }
+  }
+
+  SetThrowMatrix(current_ThrowMatrix);
+  delete current_ThrowMatrix;
 }
 
 // ********************************************
@@ -1133,7 +1242,7 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
   double max_correlation = 0.01; // Define a threshold for significant correlation above which we throw an error
   for (int i = 0; i < _fNumPar; ++i) {
     for (int j = 0; j <= i; ++j) {
-      // The symmetry should have been checked during the Init phase 
+      // The symmetry should have been checked during the Init phase
       if(param_skip_adapt_flags[i] && !param_skip_adapt_flags[j]) {
         double corr = (*covMatrix)(i,j)/std::sqrt((*covMatrix)(i,i)*(*covMatrix)(j,j));
         if(std::fabs(corr) > max_correlation) {
@@ -1145,18 +1254,18 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
     }
   }
   // Now we read the general settings [these SHOULD be common across all matrices!]
-  bool success = AdaptiveHandler->InitFromConfig(adapt_manager, matrixName, 
+  bool success = AdaptiveHandler->InitFromConfig(adapt_manager, matrixName,
     &_fFancyNames, &_fCurrVal, &_fError,
     &param_skip_adapt_flags, throwMatrix, _fGlobalStepScaleInitial
   );
   if (success) {
     AdaptiveHandler->Print();
-  } 
+  }
   else {
     MACH3LOG_INFO("Not using adaptive MCMC for {}. Checking external matrix options...", matrixName);
   }
 
-  // HH: Adjusting the external matrix reading logic such that you can not do adaptive 
+  // HH: Adjusting the external matrix reading logic such that you can not do adaptive
   // and still read an external matrix
   // Logic:
   // if read external matrix:
@@ -1249,7 +1358,7 @@ void ParameterHandlerBase::MakeClosestPosDef(TMatrixDSym *cov) {
 
   //Get frob norm of cov
   //  Double_t cov_norm=cov->E2Norm();
-  
+
   TMatrixDSym* cov_trans = cov;
   cov_trans->T();
   TMatrixDSym cov_sym = 0.5*(*cov+*cov_trans); //If cov is symmetric does nothing, otherwise just ensures symmetry
@@ -1260,7 +1369,7 @@ void ParameterHandlerBase::MakeClosestPosDef(TMatrixDSym *cov) {
     MACH3LOG_WARN("Cannot do SVD on input matrix, trying MakePosDef() first!");
     MakePosDef(&cov_sym);
   }
-  
+
   TMatrixD cov_sym_v = cov_sym_svd.GetV();
   TMatrixD cov_sym_vt = cov_sym_v;
   cov_sym_vt.T();
@@ -1274,13 +1383,13 @@ void ParameterHandlerBase::MakeClosestPosDef(TMatrixDSym *cov) {
 
   //Can finally get H=VSV
   TMatrixDSym cov_sym_polar = cov_sym_sig.SimilarityT(cov_sym_vt);//V*S*V^T (this took forver to find!)
-  
+
   //Now we can construct closest approximater Ahat=0.5*(B+H)
   TMatrixDSym cov_closest_approx  = 0.5*(cov_sym+cov_sym_polar);//Not fully sure why this is even needed since symmetric B -> U=V
   //Get norm of transformed
   //  Double_t approx_norm=cov_closest_approx.E2Norm();
   //MACH3LOG_INFO("Initial Norm: {:.6f} | Norm after transformation: {:.6f} | Ratio: {:.6f}", cov_norm, approx_norm, cov_norm / approx_norm);
-  
+
   *cov = cov_closest_approx;
   //Now can just add a makeposdef!
   MakePosDef(cov);

@@ -1,12 +1,12 @@
 #To run use:  docker build -t mach3 .
 # KS: Get glorious container from ROOT which will work as a base
-FROM rootproject/root:6.32.02-ubuntu22.04 AS mach3_build
+FROM rootproject/root:6.38.00-ubuntu25.10 AS mach3_build
 
 # Add a label for the author
 LABEL maintainer="The MaCh3 Collaboration"
 LABEL website="https://mach3-software.github.io/MaCh3/"
-LABEL compiler="GNU 11.4.0"
-LABEL root_version="v6.32.02"
+LABEL compiler="GNU 15.2.0"
+LABEL root_version="v6.38.00"
 LABEL org.opencontainers.image.description="Official MaCh3 container"
 
 RUN apt-get update && apt-get upgrade -y
@@ -15,7 +15,7 @@ RUN apt-get install -y nlohmann-json3-dev
 #MISC_SW
 RUN apt-get install -y --no-install-recommends \
     vim less nano gdb csh tcsh ed quota python3 python3-dev python3-pip \
-    cvs procmail ca-certificates cmake ninja-build
+    cvs procmail ca-certificates cmake ninja-build clang libomp-dev
 
 # Declare the build argument
 ARG MACH3_VERSION
@@ -51,7 +51,7 @@ ENV PATH=${MaCh3_ROOT}/bin:${PATH} \
 
 # pip install pyMaCh3
 WORKDIR ${MACH3_WORK_DIR}
-RUN pip install .
+#RUN pip install .
 
 # Start from MaCh3 install dir
 WORKDIR ${MACH3_INSTALL_DIR}

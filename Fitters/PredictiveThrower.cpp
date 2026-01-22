@@ -4,7 +4,7 @@
 #include "TH3.h"
 
 // *************************
-PredictiveThrower::PredictiveThrower(manager *man) : FitterBase(man) {
+PredictiveThrower::PredictiveThrower(Manager *man) : FitterBase(man) {
 // *************************
  AlgorithmName = "PredictiveThrower";
   if(!CheckNodeExists(fitMan->raw(), "Predictive")) {
@@ -317,6 +317,10 @@ void PredictiveThrower::ProduceToys() {
     {
       ParampPointers[ParamCounter] = systematics[iSys]->RetPointer(iPar);
       std::string Name = systematics[iSys]->GetParFancyName(iPar);
+      //CW: Also strip out - signs because it messes up TBranches
+      while (Name.find("-") != std::string::npos) {
+        Name.replace(Name.find("-"), 1, std::string("_"));
+      }
       ToyTree->Branch(Name.c_str(), &ParamValues[ParamCounter], (Name + "/D").c_str());
       ParamCounter++;
     }
@@ -330,18 +334,17 @@ void PredictiveThrower::ProduceToys() {
     for (int SampleIndex = 0; SampleIndex < MaCh3Sample->GetNsamples(); ++SampleIndex)
     {
       // Get nominal spectra and event rates
-      TH1* DataHist1D = MaCh3Sample->GetDataHist(SampleIndex, MaCh3Sample->GetNDim(SampleIndex));
-      Data_Hist[SampleCounter] = M3::Clone(DataHist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_data");
+      TH1* DataHist = MaCh3Sample->GetDataHist(SampleIndex);
+      Data_Hist[SampleCounter] = M3::Clone(DataHist, MaCh3Sample->GetSampleTitle(SampleIndex) + "_data");
       Data_Hist[SampleCounter]->Write((MaCh3Sample->GetSampleTitle(SampleIndex) + "_data").c_str());
 
-      TH1* MCHist1D = MaCh3Sample->GetMCHist(SampleIndex, MaCh3Sample->GetNDim(SampleIndex));
-      MC_Nom_Hist[SampleCounter] = M3::Clone(MCHist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_mc");
+      TH1* MCHist = MaCh3Sample->GetMCHist(SampleIndex);
+      MC_Nom_Hist[SampleCounter] = M3::Clone(MCHist, MaCh3Sample->GetSampleTitle(SampleIndex) + "_mc");
       MC_Nom_Hist[SampleCounter]->Write((MaCh3Sample->GetSampleTitle(SampleIndex) + "_mc").c_str());
 
-      TH1* W2Hist1D = MaCh3Sample->GetW2Hist(SampleIndex, MaCh3Sample->GetNDim(SampleIndex));
-      W2_Nom_Hist[SampleCounter] = M3::Clone(W2Hist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_w2");
+      TH1* W2Hist = MaCh3Sample->GetW2Hist(SampleIndex);
+      W2_Nom_Hist[SampleCounter] = M3::Clone(W2Hist, MaCh3Sample->GetSampleTitle(SampleIndex) + "_w2");
       W2_Nom_Hist[SampleCounter]->Write((MaCh3Sample->GetSampleTitle(SampleIndex) + "_w2").c_str());
-      delete W2Hist1D;
       SampleCounter++;
     }
   }
@@ -391,7 +394,7 @@ void PredictiveThrower::ProduceToys() {
   TempClock.Start();
   for(int i = 0; i < Ntoys; i++)
   {
-    if( i % (Ntoys/10) == 0) {
+    if(Ntoys >= 10 && i % (Ntoys/10) == 0) {
       MaCh3Utils::PrintProgressBar(i, Ntoys);
     }
 
@@ -444,14 +447,13 @@ void PredictiveThrower::ProduceToys() {
       auto* MaCh3Sample = dynamic_cast<SampleHandlerFD*>(samples[iPDF]);
       for (int SampleIndex = 0; SampleIndex < MaCh3Sample->GetNsamples(); ++SampleIndex)
       {
-        TH1* MCHist1D = MaCh3Sample->GetMCHist(SampleIndex, MaCh3Sample->GetNDim(SampleIndex));
-        MC_Hist_Toy[SampleCounter][i] = M3::Clone(MCHist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_mc_" + std::to_string(i));
+        TH1* MCHist = MaCh3Sample->GetMCHist(SampleIndex);
+        MC_Hist_Toy[SampleCounter][i] = M3::Clone(MCHist, MaCh3Sample->GetSampleTitle(SampleIndex) + "_mc_" + std::to_string(i));
         MC_Hist_Toy[SampleCounter][i]->Write();
 
-        TH1* W2Hist1D = MaCh3Sample->GetW2Hist(SampleIndex, MaCh3Sample->GetNDim(SampleIndex));
-        W2_Hist_Toy[SampleCounter][i] = M3::Clone(W2Hist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_w2_" + std::to_string(i));
+        TH1* W2Hist = MaCh3Sample->GetW2Hist(SampleIndex);
+        W2_Hist_Toy[SampleCounter][i] = M3::Clone(W2Hist, MaCh3Sample->GetSampleTitle(SampleIndex) + "_w2_" + std::to_string(i));
         W2_Hist_Toy[SampleCounter][i]->Write();
-        delete W2Hist1D;
         SampleCounter++;
       }
     }
@@ -668,6 +670,8 @@ std::vector<std::unique_ptr<TH1>> PredictiveThrower::MakePredictive(const std::v
         std::string ProjName = fmt::format("{} {} Bin: {}",
                                            SampleInfo[sample].Name, suffix,
                                            SampleInfo[sample].Binning->GetBinName(SampleInfo[sample].LocalId, i-1));
+        //KS: When a histogram is created with an axis lower limit greater or equal to its upper limit ROOT will automatically adjust histogram range
+        // https://root.cern.ch/doc/master/classTH1.html#auto-bin
         auto PosteriorHist = std::make_unique<TH1D>(ProjName.c_str(), ProjName.c_str(), 100, 1, -1);
         PosteriorHist->SetDirectory(nullptr);
         PosteriorHist->GetXaxis()->SetTitle("Events");
@@ -705,10 +709,12 @@ std::vector<std::unique_ptr<TH1>> PredictiveThrower::MakePredictive(const std::v
       for (int iy = 1; iy <= nbinsy; ++iy) {
         for (int ix = 1; ix <= nbinsx; ++ix) {
           // MaCh3 vs ROOT conventions, above loop should be over MaCh3 bins
-          const int MaCh3Bin = SampleInfo[sample].Binning->GetBinSafe(SampleInfo[sample].LocalId, ix-1, iy-1);
+          const int MaCh3Bin = SampleInfo[sample].Binning->GetBinSafe(SampleInfo[sample].LocalId, {ix-1, iy-1});
           std::string ProjName = fmt::format("{} {} Bin: {}",
                                       SampleInfo[sample].Name, suffix,
                                       SampleInfo[sample].Binning->GetBinName(SampleInfo[sample].LocalId, MaCh3Bin));
+          //KS: When a histogram is created with an axis lower limit greater or equal to its upper limit ROOT will automatically adjust histogram range
+          // https://root.cern.ch/doc/master/classTH1.html#auto-bin
           auto PosteriorHist = std::make_unique<TH1D>(ProjName.c_str(), ProjName.c_str(), 100, 1, -1);
           PosteriorHist->SetDirectory(nullptr);
           PosteriorHist->GetXaxis()->SetTitle("Events");
@@ -915,6 +921,8 @@ void PredictiveThrower::StudyBetaParameters(TDirectory* PredictiveDir) {
       std::string title = fmt::format("#beta param, {} Bin: {}",
                                       SampleInfo[iSample].Name,
                                       SampleInfo[iSample].Binning->GetBinName(SampleInfo[iSample].LocalId, iBin));
+      //KS: When a histogram is created with an axis lower limit greater or equal to its upper limit ROOT will automatically adjust histogram range
+      // https://root.cern.ch/doc/master/classTH1.html#auto-bin
       BetaHist[iSample][iBin] = std::make_unique<TH1D>(title.c_str(), title.c_str(), 100, 1, -1);
       BetaHist[iSample][iBin]->SetDirectory(nullptr);
       BetaHist[iSample][iBin]->GetXaxis()->SetTitle("beta parameter");
@@ -947,9 +955,8 @@ void PredictiveThrower::StudyBetaParameters(TDirectory* PredictiveDir) {
       const int nY = Data_Hist[iSample]->GetNbinsY();
       for (int y = 0; y < nY; ++y) {
         for (int x = 0; x < nX; ++x) {
-
           const int RootBin = Data_Hist[iSample]->GetBin(x+1, y+1);
-          const int MaCh3Bin = SampleInfo[iSample].Binning->GetBinSafe(SampleInfo[iSample].LocalId, x, y);
+          const int MaCh3Bin = SampleInfo[iSample].Binning->GetBinSafe(SampleInfo[iSample].LocalId, {x, y});
 
           for (int iToy = 0; iToy < Ntoys; ++iToy) {
             const double Data = Data_Hist[iSample]->GetBinContent(RootBin);

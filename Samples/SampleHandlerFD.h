@@ -35,10 +35,16 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// @ingroup SampleHandlerGetters
   std::string GetSampleTitle(const int Sample) const override {return SampleDetails[Sample].SampleTitle;}
 
+  /// @brief Return Kinematic Variable name for specified sample and dimension for example "Reconstructed_Neutrino_Energy"
+  /// @param iSample Sample index
+  /// @param Dimension Dimension index
   /// @ingroup SampleHandlerGetters
-  std::string GetXBinVarName(const int Sample) const {return SampleDetails[Sample].XVarStr;}
+  std::string GetKinVarName(const int iSample, const int Dimension) const override;
+
   /// @ingroup SampleHandlerGetters
-  std::string GetYBinVarName(const int Sample) const {return SampleDetails[Sample].YVarStr;}
+  std::string GetXBinVarName(const int Sample) const {return GetKinVarName(Sample, 0);}
+  /// @ingroup SampleHandlerGetters
+  std::string GetYBinVarName(const int Sample) const {return GetKinVarName(Sample, 1);}
   /// @brief Get pointer to binning handler
   const BinningHandler* GetBinningHandler() const {return Binning.get();}
 
@@ -49,11 +55,8 @@ class SampleHandlerFD :  public SampleHandlerBase
 
   //ETA - abstract these to SampleHandlerFDBase
   //DB Require these four functions to allow conversion from TH1(2)D to array for multi-threaded GetLikelihood
-  void AddData(const int Sample, TH1D* Data);
-  void AddData(const int Sample, TH2D* Data);
-  void AddData(const int Sample, std::vector<double> &data);
-  void AddData(const int Sample, std::vector< std::vector <double> > &data);
-
+  void AddData(const int Sample, TH1* Data);
+  void AddData(const int Sample, const std::vector<double>& Data_Array);
 
   /// @brief Helper function to print rates for the samples with LLH
   /// @param DataOnly whether to print data only rates
@@ -70,20 +73,20 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// @ingroup SampleHandlerGetters
   int GetSampleIndex(const std::string& SampleTitle) const;
 
+  /// @brief Get Data histogram
+  /// @ingroup SampleHandlerGetters
+  TH1* GetDataHist(const int Sample) override;
+  TH1* GetDataHist(const std::string& Sample);
+
   /// @brief Get MC histogram
   /// @ingroup SampleHandlerGetters
-  TH1* GetMCHist(const int Sample, const int Dimension);
-  TH1* GetMCHist(const std::string& Sample, const int Dimension);
+  TH1* GetMCHist(const int Sample) override;
+  TH1* GetMCHist(const std::string& Sample);
 
   /// @brief Get W2 histogram
   /// @ingroup SampleHandlerGetters
-  TH1* GetW2Hist(const int Sample, const int Dimension);
-  TH1* GetW2Hist(const std::string& Sample, const int Dimension);
-
-  /// @brief Get Data histogram
-  /// @ingroup SampleHandlerGetters
-  TH1* GetDataHist(const int Sample, const int Dimension);
-  TH1* GetDataHist(const std::string& Sample, const int Dimension);
+  TH1* GetW2Hist(const int Sample) override;
+  TH1* GetW2Hist(const std::string& Sample);
 
   void Reweight() override;
   M3::float_t GetEventWeight(const int iEntry);
@@ -109,8 +112,8 @@ class SampleHandlerFD :  public SampleHandlerBase
   }
 
   /// @ingroup SampleHandlerGetters
-  TH1* Get1DVarHist(const int iSample, const std::string& ProjectionVar, const std::vector< KinematicCut >& EventSelectionVec = std::vector< KinematicCut >(),
-                    int WeightStyle=0, TAxis* Axis=nullptr, const std::vector< KinematicCut >& SubEventSelectionVec = std::vector< KinematicCut >());
+  TH1 *Get1DVarHist(const int iSample, const std::string &ProjectionVar, const std::vector<KinematicCut> &EventSelectionVec = std::vector<KinematicCut>(),
+                        int WeightStyle = 0, TAxis *Axis = nullptr, const std::vector<KinematicCut> &SubEventSelectionVec = std::vector<KinematicCut>());
   TH2* Get2DVarHist(const int iSample, const std::string& ProjectionVarX, const std::string& ProjectionVarY,
                     const std::vector< KinematicCut >& EventSelectionVec = std::vector< KinematicCut >(),
                     int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr,
@@ -161,6 +164,34 @@ class SampleHandlerFD :  public SampleHandlerBase
   // ===========================================================
   /// @brief JM Check if a kinematic parameter string corresponds to a subevent-level variable
   bool IsSubEventVarString(const std::string& VarStr);
+
+  /// @brief Return array storing data entries for every bin
+  std::vector<double> GetDataArray() const {
+    return std::vector<double>(SampleHandlerFD_data, SampleHandlerFD_data + Binning->GetNBins());
+  }
+  /// @brief Return array storing MC entries for every bin
+  std::vector<double> GetMCArray() const {
+    return std::vector<double>(SampleHandlerFD_array, SampleHandlerFD_array + Binning->GetNBins());
+  }
+  /// @brief Return array storing W2 entries for every bin
+  std::vector<double> GetW2Array() const {
+    return std::vector<double>(SampleHandlerFD_array_w2, SampleHandlerFD_array_w2 + Binning->GetNBins());
+  }
+  /// @brief Return a sub-array for a given sample.
+  std::vector<double> GetArrayForSample(const int Sample, const double* array) const;
+
+  /// @brief Return array storing data entries for every bin
+  std::vector<double> GetDataArray(const int Sample) const {
+    return GetArrayForSample(Sample, SampleHandlerFD_data);
+  }
+  /// @brief Return array storing MC entries for every bin
+  std::vector<double> GetMCArray(const int Sample) const {
+    return GetArrayForSample(Sample, SampleHandlerFD_array);
+  }
+  /// @brief Return array storing W2 entries for single sample
+  std::vector<double> GetW2Array(const int Sample) const {
+    return GetArrayForSample(Sample, SampleHandlerFD_array_w2);
+  }
 
  protected:
   /// @brief DB Function to determine which weights apply to which types of samples
@@ -216,14 +247,14 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// @brief Update the functional parameter values to the latest proposed values. Needs to be called before every new reweight so is called in fillArray
   virtual void PrepFunctionalParameters(){};
   /// @brief ETA - generic function applying shifts
-  virtual void ApplyShifts(int iEvent);
+  virtual void ApplyShifts(const int iEvent);
 
   /// @brief DB Function which determines if an event is selected, where Selection double looks like {{ND280KinematicTypes Var1, douuble LowBound}
-  bool IsEventSelected(const int iSample, const int iEvent);
+  bool IsEventSelected(const int iSample, const int iEvent) _noexcept_;
   /// @brief JM Function which determines if a subevent is selected
   bool IsSubEventSelected(const std::vector<KinematicCut> &SubEventCuts, const int iEvent, unsigned const int iSubEvent, size_t nsubevents);
   /// @brief HH - reset the shifted values to the original values
-  virtual void resetShifts(int iEvent) {(void)iEvent;};
+  virtual void ResetShifts(const int iEvent) {(void)iEvent;};
   /// @brief HH - a vector that stores all the FuncPars struct
   std::vector<FunctionalParameter> funcParsVec;
   /// @brief HH - a map that relates the name of the functional parameter to
@@ -245,7 +276,7 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// @brief Check whether a normalisation systematic affects an event or not
   void CalcNormsBins(std::vector<NormParameter>& norm_parameters, std::vector< std::vector< int > >& xsec_norms_bins);
   /// @brief Calculate the total weight weight for a given event
-  M3::float_t CalcWeightTotal(const FarDetectorCoreInfo* _restrict_ MCEvent) const;
+  M3::float_t CalcWeightTotal(const EventInfo* _restrict_ MCEvent) const;
 
   /// @brief Calculate weights for function parameters
   ///
@@ -263,8 +294,9 @@ class SampleHandlerFD :  public SampleHandlerBase
   virtual std::vector<double> ReturnKinematicVector(int KinematicVariable, int iEvent) {return {}; (void)KinematicVariable; (void)iEvent;};
   // ===========================================================
 
+
   /// @brief Return the binning used to draw a kinematic parameter
-  std::vector<double> ReturnKinematicParameterBinning(const int Sample, const std::string& KinematicParameter) const;
+  std::vector<double> ReturnKinematicParameterBinning(const int Sample, const std::string &KinematicParameter) const;
   virtual const double* GetPointerToKinematicParameter(std::string KinematicParamter, int iEvent) = 0;
   virtual const double* GetPointerToKinematicParameter(double KinematicVariable, int iEvent) = 0;
 
@@ -274,10 +306,11 @@ class SampleHandlerFD :  public SampleHandlerBase
   void SetupNormParameters();
 
   //===============================================================================
-  //DB Functions required for reweighting functions
-  //DB Replace previous implementation with reading bin contents from SampleHandlerFD_array
   /// @brief Fill a histogram with the event-level information used in the fit
-  void FillMCHist(const int Sample, const int Dimension);
+  /// @details
+  /// DB Functions required for reweighting functions
+  /// DB Replace previous implementation with reading bin contents from SampleHandlerFD_array
+  void FillHist(const int Sample, TH1* Hist, double* Array);
 
   /// @brief DB Nice new multi-threaded function which calculates the event weights and fills the relevant bins of an array
 #ifdef MULTITHREAD
@@ -309,7 +342,7 @@ class SampleHandlerFD :  public SampleHandlerBase
 
   //===============================================================================
   /// Stores information about every MC event
-  std::vector<FarDetectorCoreInfo> MCSamples;
+  std::vector<EventInfo> MCSamples;
   /// Stores info about currently initialised sample
   std::vector<SampleInfo> SampleDetails;
   //===============================================================================
@@ -349,7 +382,7 @@ class SampleHandlerFD :  public SampleHandlerBase
   // =========================================================== 
 
   /// The manager object used to read the sample yaml file
-  std::unique_ptr<manager> SampleManager;
+  std::unique_ptr<Manager> SampleManager;
   void InitialiseSplineObject();
 
   std::unordered_map<std::string, double> _modeNomWeightMap;

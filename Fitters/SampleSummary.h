@@ -19,6 +19,7 @@ namespace M3 {
 /// @details For more information, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/10.-Posterior-Predictive,-p%E2%80%90value-etc.).
 /// @author Clarence Wret
 /// @author Kamil Skwarczynski
+/// @warning This is legacy functionality used only by the ND280 code in T2K. It will be phased out and should not be used for new development.
 class SampleSummary {
 // *******************
   public:

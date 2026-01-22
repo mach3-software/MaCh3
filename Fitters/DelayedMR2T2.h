@@ -43,7 +43,7 @@ class DelayedMR2T2 : public MR2T2 {
  public:
     /// @brief Constructor
     /// @param fitMan A pointer to a manager object, which will handle all settings.
-    DelayedMR2T2(manager * const fitMan);
+    DelayedMR2T2(Manager * const fitMan);
 
     /// @brief Destructor
     virtual ~DelayedMR2T2() = default;

@@ -21,9 +21,9 @@
 #include <cmath>
 #include <limits>
 
-/// Run low or high memory versions of structs
-/// N.B. for 64 bit systems sizeof(float) == sizeof(double) so not a huge effect
 namespace M3 {
+  // Run low or high memory versions of structs
+  // N.B. for 64 bit systems sizeof(float) == sizeof(double) so not a huge effect
   #ifdef _LOW_MEMORY_STRUCTS_
   /// Custom floating point (float or double)
   using float_t = float;
@@ -86,6 +86,9 @@ namespace M3 {
   constexpr static const double DefSplineKnotUpBound = 9999;
   /// Default value for spline knot capping, default mean not capping is being applied
   constexpr static const double DefSplineKnotLowBound = -9999;
+
+  /// Mark bin which is overflow or underflow in MaCh3 binning
+  constexpr static const int UnderOverFlowBin = -1;
 }
 
 /// KS: noexcept can help with performance but is terrible for debugging, this is meant to help easy way of of turning it on or off. In near future move this to struct or other central class.
@@ -123,6 +126,9 @@ _Pragma("GCC diagnostic ignored \"-Wswitch-enum\"") \
 _Pragma("GCC diagnostic ignored \"-Wconversion\"") \
 _Pragma("GCC diagnostic ignored \"-Wshadow\"") \
 _Pragma("GCC diagnostic ignored \"-Wswitch-enum\"")
+#if defined(__GNUC__) && __GNUC__ >= 13
+  _Pragma("GCC diagnostic ignored \"-Wdangling-reference\"")
+#endif
 /// @brief KS: Restore warning checking after including external headers
 #define _MaCh3_Safe_Include_End_ \
 _Pragma("GCC diagnostic pop")

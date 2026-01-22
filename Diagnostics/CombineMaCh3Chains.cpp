@@ -103,6 +103,10 @@ void CopyDir(TDirectory *source) {
   source->ls();
   TDirectory *savdir = gDirectory;
   TDirectory *adir = savdir->Get<TDirectory>(source->GetName());
+  // if directory doesn't exist make it
+  if (!adir) {
+    adir = savdir->mkdir(source->GetName());
+  }
   adir->cd();
   //loop on all entries of this directory
   TKey *key;
@@ -203,26 +207,27 @@ bool CheckFolder(TFile* file, TFile* prevFile, const std::string& FolderName, co
   return mismatch;
 }
 
+/// @brief custom function for merging TTree, should be similar to what HADD is using
+/// @warning KS: for some reason if "fast" is enable then I cannot open in ROOT5, no one should use R5 at this point..
+void FastMergeTTrees(const std::vector<std::string>& files, const std::string& outFile, const std::string& TTreeName) {
+  TChain chain(TTreeName.c_str());
+  for (const auto& f : files) chain.Add(f.c_str());
+
+  TFile* outF = TFile::Open(outFile.c_str(), "UPDATE");
+
+  TTree* newTree = chain.CloneTree(-1, "fast");
+  newTree->SetName(TTreeName.c_str());
+  outF->cd();
+  newTree->Write("", TObject::kOverwrite);
+  outF->Close();
+  delete outF;
+}
+
 void CombineChain()
 {
-  TFileMerger *fileMerger = new TFileMerger();
-
-  // EM: If we ever add new trees to the chain files they will need to be added here too
-  fileMerger->AddObjectNames("posteriors");
-  fileMerger->AddObjectNames("Settings");
-
-  MACH3LOG_INFO("These objects will be merged: {}", fileMerger->GetObjectNames());
-
   std::string outFileOption;
   if(forceOverwrite) outFileOption = "RECREATE";
   else outFileOption = "CREATE";
-
-  // EM: Attempt to open the output file
-  bool openedFile = fileMerger->OutputFile(OutFileName.c_str(), outFileOption.c_str(), targetCompression);
-  if (!openedFile){
-      MACH3LOG_ERROR("Failed to create output file.");
-      throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
 
   TFile *prevFile = nullptr;
 
@@ -243,7 +248,7 @@ void CombineChain()
 
     // EM: need to set this in the initial case
     if(prevFile == nullptr) {
-        prevFile = file;
+      prevFile = file;
     }
 
     MACH3LOG_DEBUG("############ File {} #############", fileId);
@@ -265,14 +270,37 @@ void CombineChain()
       MACH3LOG_ERROR("=====================================================================================");
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
-    // EM: file seems good, we'll add the trees to the lists
-    fileMerger->AddFile(file);
+
+    if(prevFile != file) {
+      prevFile->Close();
+      delete prevFile;
+    }
 
     // EM: set these for the next iteration
     prevFile = file;
   }
 
-  TFile *outputFile = fileMerger->GetOutputFile();
+  if (!forceOverwrite && access(OutFileName.c_str(), F_OK) != -1) {
+    MACH3LOG_ERROR("Output file '{}' already exists. Use -f to force overwrite.", OutFileName);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  //KS: Create new file
+  TFile* outputFile = M3::Open(OutFileName, "recreate", __FILE__, __LINE__);
+  outputFile->Close();
+  delete outputFile;
+
+  TStopwatch clock;
+  clock.Start();
+
+  MACH3LOG_INFO("Starting merging");
+  FastMergeTTrees(inpFileList, OutFileName, "posteriors");
+  FastMergeTTrees(inpFileList, OutFileName, "Settings");
+
+  clock.Stop();
+  MACH3LOG_INFO("Merging of took {:.2f}s to finish", clock.RealTime());
+
+  //KS: Sadly we need to open file to save TDirectories to not have weird copy of several obejcts there...
+  outputFile = M3::Open(OutFileName, "UPDATE", __FILE__, __LINE__);
   outputFile->cd();
 
   // EM: Write out the version and config files to the combined file
@@ -286,27 +314,17 @@ void CombineChain()
     }
   }
 
-  // EM: now let's combine all the trees and write to the output file
-  bool mergeSuccess = fileMerger->PartialMerge(TFileMerger::kRegular | TFileMerger::kAll | TFileMerger::kOnlyListed);
-  if(mergeSuccess){
-    MACH3LOG_INFO("Files merged successfully");
-  } else{
-    MACH3LOG_ERROR("Failed to merge files");
-  }
-  delete fileMerger;
-
-  //KS: Sadly we need to open file to save TDirectories to not have weird copy of several obejcts there...
-  outputFile = M3::Open(OutFileName, "UPDATE", __FILE__, __LINE__);
-
   // Get the source directory
   TDirectory *MaCh3EngineDir = prevFile->Get<TDirectory>("MaCh3Engine");
   TDirectory *CovarianceFolderDir = prevFile->Get<TDirectory>("CovarianceFolder");
   TDirectory *SampleFolderDir = prevFile->Get<TDirectory>("SampleFolder");
 
-  outputFile->cd();
   CopyDir(MaCh3EngineDir);
   CopyDir(CovarianceFolderDir);
   CopyDir(SampleFolderDir);
+
+  outputFile->Close();
+  delete outputFile;
 
   delete prevFile;
   MACH3LOG_INFO("Done!");

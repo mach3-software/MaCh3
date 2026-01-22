@@ -8,7 +8,7 @@
 #include "Samples/SampleStructs.h"
 
 // Other plotting includes
-#include "plottingUtils.h"
+#include "PlottingUtils.h"
 
 namespace MaCh3Plotting {
 

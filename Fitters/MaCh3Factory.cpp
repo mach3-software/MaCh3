@@ -2,7 +2,7 @@
 #include "Fitters/MaCh3Factory.h"
 
 // ********************************************
-std::unique_ptr<FitterBase> MaCh3FitterFactory(manager *fitMan) {
+std::unique_ptr<FitterBase> MaCh3FitterFactory(Manager *fitMan) {
 // ********************************************
   std::unique_ptr<FitterBase> MaCh3Fitter = nullptr;
 
@@ -38,12 +38,12 @@ std::unique_ptr<FitterBase> MaCh3FitterFactory(manager *fitMan) {
 }
 
 // ********************************************
-std::unique_ptr<manager> MaCh3ManagerFactory(int argc, char **argv) {
+std::unique_ptr<Manager> MaCh3ManagerFactory(int argc, char **argv) {
 // ********************************************
   if (argc < 2) {
     MACH3LOG_ERROR("Wrong usage of MaCh3 executable!");
     MACH3LOG_ERROR("Syntax is $: {} config.yaml", argv[0]);
-    MACH3LOG_ERROR("Where config.yaml is a valid config file, compatible with the manager class (manager/manager.cpp/h)");
+    MACH3LOG_ERROR("Where config.yaml is a valid config file, compatible with the Manager class (Manager/Manager.cpp/h)");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
@@ -66,13 +66,13 @@ std::unique_ptr<manager> MaCh3ManagerFactory(int argc, char **argv) {
 
     // Merge them
     YAML::Node merged = MergeNodes(config1, config2);
-    auto FitManager = std::make_unique<manager>(merged);
+    auto FitManager = std::make_unique<Manager>(merged);
 
     return FitManager;
   }
 
   // Initialise manger responsible for config handling
-  auto FitManager = std::make_unique<manager>(argv[1]);
+  auto FitManager = std::make_unique<Manager>(argv[1]);
   
   //KS: Lambda to make sure we are not overwriting setting which should be committed
   auto SanityOverwrite = [](const std::string& Name) {

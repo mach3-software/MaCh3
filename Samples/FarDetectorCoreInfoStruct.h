@@ -43,16 +43,13 @@ struct SampleInfo {
 
   /// Destructor
   ~SampleInfo() {
-    if(dathist   != nullptr) delete dathist;
-    if(dathist2d != nullptr) delete dathist2d;
-    if(_hPDF1D   != nullptr) delete _hPDF1D;
-    if(_hPDF2D   != nullptr) delete _hPDF2D;
+    if(DataHist != nullptr) delete DataHist;
+    if(MCHist   != nullptr) delete MCHist;
+    if(W2Hist   != nullptr) delete W2Hist;
   }
 
-  /// the strings associated with the variables used for the X binning e.g. "RecoNeutrinoEnergy"
-  std::string XVarStr = "";
-  /// the strings associated with the variables used for the Y binning e.g. "RecoNeutrinoEnergy"
-  std::string YVarStr = "";
+  /// the strings associated with the variables used for the binning e.g. "RecoNeutrinoEnergy"
+  std::vector<std::string> VarStr;
 
   /// @brief the name of this sample e.g."muon-like"
   std::string SampleTitle = "";
@@ -68,68 +65,83 @@ struct SampleInfo {
   /// Stores info about oscillation channel for a single sample
   std::vector<OscChannelInfo> OscChannels;
 
-  /// histogram used for plotting storing 1D data distribution
-  TH1D *dathist = nullptr;
-  /// histogram used for plotting storing 2D data distribution
-  TH2D *dathist2d = nullptr;
-
-  /// histogram used for plotting storing 1D MC distribution
-  TH1D* _hPDF1D = nullptr;
-  /// histogram used for plotting storing 2D MC distribution
-  TH2D* _hPDF2D = nullptr;
+  /// histogram used for plotting storing data distribution
+  TH1 *DataHist = nullptr;
+  /// histogram used for plotting storing MC distribution
+  TH1* MCHist = nullptr;
+  /// histogram used for plotting storing W2 distribution
+  TH1* W2Hist = nullptr;
 
   /// @brief Initialise histograms used for plotting
   void InitialiseHistograms() {
-    TString histname1d = (XVarStr).c_str();
-    TString histname2d = (XVarStr + "_" + YVarStr).c_str();
-    TString histtitle = SampleTitle;
+    std::string HistTitle = SampleTitle;
 
     //The binning here is arbitrary, now we get info from cfg so the
     //set1DBinning and set2Dbinning calls below will make the binning
     //to be what we actually want
-    _hPDF1D   = new TH1D("h" + histname1d + SampleTitle, histtitle, 1, 0, 1);
-    dathist   = new TH1D("d" + histname1d + SampleTitle, histtitle, 1, 0, 1);
-    _hPDF2D   = new TH2D("h" + histname2d + SampleTitle, histtitle, 1, 0, 1, 1, 0, 1);
-    dathist2d = new TH2D("d" + histname2d + SampleTitle, histtitle, 1, 0, 1, 1, 0, 1);
+    if(nDimensions == 1) {
+      DataHist = new TH1D(("d" + HistTitle).c_str(), HistTitle.c_str(), 1, 0, 1);
+      MCHist   = new TH1D(("h" + HistTitle).c_str(), HistTitle.c_str(), 1, 0, 1);
+      W2Hist   = new TH1D(("w" + HistTitle).c_str(), HistTitle.c_str(), 1, 0, 1);
 
-    _hPDF1D->SetDirectory(nullptr);
-    dathist->SetDirectory(nullptr);
-    _hPDF2D->SetDirectory(nullptr);
-    dathist2d->SetDirectory(nullptr);
+      // Set all titles so most of projections don't have empty titles...
+      DataHist->GetXaxis()->SetTitle(VarStr[0].c_str());
+      DataHist->GetYaxis()->SetTitle("Events");
+      MCHist->GetXaxis()->SetTitle(VarStr[0].c_str());
+      MCHist->GetYaxis()->SetTitle("Events");
+      W2Hist->GetXaxis()->SetTitle(VarStr[0].c_str());
+      W2Hist->GetYaxis()->SetTitle("Events");
+    } else if(nDimensions == 2) {
+      DataHist = new TH2D(("d" + HistTitle).c_str(), HistTitle.c_str(), 1, 0, 1, 1, 0, 1);
+      MCHist   = new TH2D(("h" + HistTitle).c_str(), HistTitle.c_str(), 1, 0, 1, 1, 0, 1);
+      W2Hist   = new TH2D(("w" + HistTitle).c_str(), HistTitle.c_str(), 1, 0, 1, 1, 0, 1);
 
-    // Set all titles so most of projections don't have empty titles...
-    _hPDF1D->GetXaxis()->SetTitle(XVarStr.c_str());
-    _hPDF1D->GetYaxis()->SetTitle("Events");
+      // Set all titles so most of projections don't have empty titles...
+      DataHist->GetXaxis()->SetTitle(VarStr[0].c_str());
+      DataHist->GetYaxis()->SetTitle(VarStr[1].c_str());
+      MCHist->GetXaxis()->SetTitle(VarStr[0].c_str());
+      MCHist->GetYaxis()->SetTitle(VarStr[1].c_str());
+      W2Hist->GetXaxis()->SetTitle(VarStr[0].c_str());
+      W2Hist->GetYaxis()->SetTitle(VarStr[1].c_str());
+    } else {
+      MACH3LOG_ERROR("Not supported for Dim {}", nDimensions);
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
 
-    dathist->GetXaxis()->SetTitle(XVarStr.c_str());
-    dathist->GetYaxis()->SetTitle("Events");
-
-    _hPDF2D->GetXaxis()->SetTitle(XVarStr.c_str());
-    _hPDF2D->GetYaxis()->SetTitle(YVarStr.c_str());
-
-    dathist2d->GetXaxis()->SetTitle(XVarStr.c_str());
-    dathist2d->GetYaxis()->SetTitle(YVarStr.c_str());
+    DataHist->SetDirectory(nullptr);
+    MCHist->SetDirectory(nullptr);
+    W2Hist->SetDirectory(nullptr);
   }
 };
 
 /// @brief constructors are same for all three so put in here
-struct FarDetectorCoreInfo {
-  FarDetectorCoreInfo(){}
-  FarDetectorCoreInfo(FarDetectorCoreInfo const &other) = delete;
-  FarDetectorCoreInfo(FarDetectorCoreInfo &&other) = default;
-  FarDetectorCoreInfo& operator=(FarDetectorCoreInfo const &other) = delete;
-  FarDetectorCoreInfo& operator=(FarDetectorCoreInfo &&other) = delete;
+/// @author Dan Barrow
+/// @author Ed Atkin
+/// @author Kamil Skwarczynski
+struct EventInfo {
+  /// @brief Default constructor.
+  EventInfo(){}
+  /// @brief Copy constructor (deleted to prevent copying).
+  EventInfo(EventInfo const &other) = delete;
+  /// @brief Move constructor (defaulted to allow moving).
+  EventInfo(EventInfo &&other) = default;
+  /// @brief Copy assignment operator (deleted).
+  EventInfo& operator=(EventInfo const &other) = delete;
+  /// @brief Move assignment operator (deleted).
+  EventInfo& operator=(EventInfo &&other) = delete;
+  /// @brief default destructor
+  ~EventInfo(){}
 
-  ~FarDetectorCoreInfo(){}
-
-  const int* Target = 0; ///< target the interaction was on
+  /// target the interaction was on
+  const int* Target = 0;
+  /// PDG of neutrino after oscillation
   const int* nupdg  = 0;
+  /// PDG of neutrino before oscillation
   const int* nupdgUnosc = 0;
 
-  //THe x_var and y_vars that you're binning in
-  const double* x_var = &M3::Unity_D;
-  const double* y_var = &M3::Unity_D;
+  /// Pointer to true Neutrino Energy
   const double* rw_etru = &M3::_BAD_DOUBLE_;
+  /// Pointer to true cosine zenith
   const double* rw_truecz = &M3::_BAD_DOUBLE_;
 
   /// Pointers to normalisation weights which are being taken from Parameter Handler
@@ -138,13 +150,16 @@ struct FarDetectorCoreInfo {
   /// Pointers to weights like oscillation spline etc
   std::vector<const M3::float_t*> total_weight_pointers;
 
-  int NomXBin = M3::_BAD_INT_;
-  int NomYBin = M3::_BAD_INT_;
+  /// The x_var and y_vars and beyond that you're binning in
+  std::vector<const double*> KinVar;
+  /// starting bins for each dimensions allowing to perform quick lookup
+  std::vector<int> NomBin;
 
   /// Nominal sample to which event is associated
   int NominalSample = M3::_BAD_INT_;
-
+  /// Is event NC or not
   bool isNC = false;
 
+  /// Pointer to MaCh3 mode
   const double* mode = &M3::Unity_D;
 };

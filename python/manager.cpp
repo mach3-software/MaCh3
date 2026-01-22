@@ -75,7 +75,7 @@ void initManager(py::module &m){
 
     m.def("load_file", &YAML::LoadFile, "");
 
-    py::class_<manager>(m_manager, "Manager")
+    py::class_<Manager>(m_manager, "Manager")
         .def(
             py::init<std::string const &>(),
             "create a Manager object with a specified *config_file*",
@@ -84,19 +84,19 @@ void initManager(py::module &m){
         
         .def(
             "print", 
-            &manager::Print,
+            &Manager::Print,
             "Print currently used config."
         )
         
         .def(
             "raw", 
-            &manager::raw,
+            &Manager::raw,
             "Get the raw yaml config."
         )
 
         .def(
             "get_test_stat",
-            &manager::GetMCStatLLH,
+            &Manager::GetMCStatLLH,
             "Get the test statistic that was specified in the config file."
         )
     ;

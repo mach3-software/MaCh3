@@ -13,7 +13,7 @@ jobs:
       matrix:
         container: [
           "ghcr.io/mach3-software/mach3:alma9latest",
-          "ghcr.io/mach3-software/mach3:rocky9cudalatest"
+          #"ghcr.io/mach3-software/mach3:rocky9cudalatest" #
         ]
     container:
       image: ${{ matrix.container }}
@@ -25,7 +25,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-
+            
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
         with:
