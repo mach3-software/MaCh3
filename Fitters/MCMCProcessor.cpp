@@ -382,11 +382,6 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
   SettingsBranch->Branch("NDParameters", &NDParameters);
   int NDParametersStartingPos = ParamTypeStartPos[kNDPar];
   SettingsBranch->Branch("NDParametersStartingPos", &NDParametersStartingPos);
-
-  int FDParameters = nParam[kFDDetPar];
-  SettingsBranch->Branch("FDParameters", &FDParameters);
-  int FDParametersStartingPos = ParamTypeStartPos[kFDDetPar];
-  SettingsBranch->Branch("FDParametersStartingPos", &FDParametersStartingPos);
   
   SettingsBranch->Branch("NDSamplesBins", &NDSamplesBins);
   SettingsBranch->Branch("NDSamplesNames", &NDSamplesNames);
