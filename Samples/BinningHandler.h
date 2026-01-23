@@ -42,7 +42,60 @@
 /// @endcode
 ///
 /// ## Uniform and Non-Uniform Binning Scheme
-/// TODO!!!
+/// MaCh3 supports Uniform and Non-Uniform binning scheme
+///
+/// In the non-uniform scheme, bin sizes may vary along each dimension,
+/// but all bins are required to be axis-aligned hyper-rectangles.
+/// Arbitrary or irregular bin shapes are not supported like banana-shape.
+///
+/// Example of Uniform
+/// @code
+///
+/// +--------+--------+--------+--------+
+/// | Bin 0  | Bin 1  | Bin 2  | Bin 3  |
+/// | (0,0)  | (1,0)  | (2,0)  | (3,0)  |
+/// +--------+--------+--------+--------+
+/// | Bin 4  | Bin 5  | Bin 6  | Bin 7  |
+/// | (0,1)  | (1,1)  | (2,1)  | (3,1)  |
+/// +--------+--------+--------+--------+
+/// | Bin 8  | Bin 9  | Bin 10 | Bin 11 |
+/// | (0,2)  | (1,2)  | (2,2)  | (3,2)  |
+/// +--------+--------+--------+--------+
+///
+/// @endcode
+///
+/// Example of Non-Uniform
+///
+/// @code
+///
+/// +--------+------------+-------+---------------------+
+/// | Bin 0  |    Bin 1   | Bin 2 |         Bin 3       |
+/// |        |            |       |                     |
+/// +--------+------------+-------+---------------------+
+/// | Bin 4  |            |       |                     |
+/// |        |            | Bin 6 |                     |
+/// +--------+   Bin 5    +-------+                     |
+/// | Bin 7  |            |       |         Bin 9       |
+/// |        |            | Bin 8 |                     |
+/// +--------+------------+-------+---------------------+
+///
+/// @endcode
+///
+///
+/// ## Bin Finding Algorithm
+/// Since MaCh3 supports event migration bin finding algorithm must be fast
+/// to efficiently be able find bin during running fit.
+/// MaCh3 is caching nominal bin with idea that during fit migration should be around this nominal bin.
+/// Thus MaCh3 first checks if after shift event falls into Nom-bin and later adjacent. If not backs to binary search.
+///
+/// ### Uniform
+/// In case of uniform binning above algorithm is easy to test as one performs it for every dimension independently
+/// i.e. find X-bin, then Y etc. After which can find bin in flattened 1D space.
+///
+///
+/// ### Non-Uniform
+/// TODO
+///
 ///
 ///
 /// @author Kamil Skwarczynski
