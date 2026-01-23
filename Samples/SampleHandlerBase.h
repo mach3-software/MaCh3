@@ -22,6 +22,7 @@ _MaCh3_Safe_Include_Start_ //{
 _MaCh3_Safe_Include_End_ //}
 
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
+/// @ingroup CoreClasses
 class SampleHandlerBase
 {
  public:
@@ -29,12 +30,6 @@ class SampleHandlerBase
    SampleHandlerBase();
   /// @brief destructor
   virtual ~SampleHandlerBase();
-
-  /// @defgroup SampleHandlerSetters Sample Handler Setters
-  /// Group of functions to set various parameters, names, and values.
-
-  /// @defgroup SampleHandlerGetters Sample Handler Getters
-  /// Group of functions to get various parameters, names, and values.
 
   /// @ingroup SampleHandlerGetters
   virtual inline M3::int_t GetNsamples(){ return nSamples; };
@@ -56,22 +51,38 @@ class SampleHandlerBase
   /// @ingroup SampleHandlerGetters
   virtual double GetLikelihood() const = 0;
 
+  /// @brief Helper function to print rates for the samples with LLH
+  /// @param DataOnly whether to print data only rates
+  virtual void PrintRates(const bool DataOnly = false) = 0;
+
   /// @ingroup SampleHandlerGetters
   unsigned int GetNEvents() const {return nEvents;}
   /// @ingroup SampleHandlerGetters
   virtual int GetNOscChannels(const int iSample) const = 0;
 
-  // WARNING KS: Needed for sigma var
+  /// @brief Return Kinematic Variable name for specified sample and dimension for example "Reconstructed_Neutrino_Energy"
+  /// @param iSample Sample index
+  /// @param Dimension Dimension index
+  /// @ingroup SampleHandlerGetters
+  virtual std::string GetKinVarName(const int iSample, const int Dimension) const = 0;
+
+  /// @brief Get Data histogram
+  /// @ingroup SampleHandlerGetters
+  virtual TH1* GetDataHist(const int Sample) = 0;
+  /// @brief Get MC histogram
+  /// @ingroup SampleHandlerGetters
+  virtual TH1* GetMCHist(const int Sample) = 0;
+  /// @brief Get W2 histogram
+  /// @ingroup SampleHandlerGetters
+  virtual TH1* GetW2Hist(const int Sample) = 0;
+
+  // WARNING KS: Needed for sigma var, but also remnants of T2K-ND280 code will be merged in SampleHandlerFD, stay tuned...
   virtual void SetupBinning(const M3::int_t Selection, std::vector<double> &BinningX, std::vector<double> &BinningY){
     (void) Selection; (void) BinningX; (void) BinningY; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");}
-  virtual TH1* GetData(const int Selection) { (void) Selection; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); }
-  virtual TH2Poly* GetW2(const int Selection){ (void) Selection; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");}
-  virtual TH1* GetPDF(const int Selection){ (void) Selection; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");}
+
   virtual inline TH1* GetPDFMode(const int Selection, const int Mode) {
     (void) Selection; (void) Mode; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); }
-  virtual inline std::string GetKinVarLabel(const int sample, const int Dimension) {
-    (void) sample; (void) Dimension; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");  };
-
+  ///////////
 
   /// @brief Calculate test statistic for a single bin using Poisson
   /// @param data is data
@@ -169,7 +180,9 @@ class SampleHandlerBase
   /// @brief Set the test statistic to be used when calculating the binned likelihoods
   /// @param testStat The test statistic to use.
   /// @ingroup SampleHandlerGetters
-  inline void SetTestStatistic(TestStatistic testStat){ fTestStatistic = testStat; }
+  void SetTestStatistic(TestStatistic testStat){ fTestStatistic = testStat; }
+  /// @brief Get the test statistic used when calculating the binned likelihoods
+  TestStatistic GetTestStatistic() const { return fTestStatistic; }
 
 protected:
   /// @brief CW: Redirect std::cout to silence some experiment specific libraries

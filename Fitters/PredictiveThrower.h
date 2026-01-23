@@ -3,6 +3,24 @@
 #include "Fitters/FitterBase.h"
 
 class ParameterHandlerGeneric;
+class BinningHandler;
+class SampleHandlerFD;
+
+// ***************************
+/// @brief KS: Summary of sample info to be used by
+struct PredictiveSample {
+// ***************************
+  // Name of sample
+  std::string Name;
+  /// Pointer to SampleHandler
+  const SampleHandlerFD* SamHandler;
+  /// Pointer to binning handler
+  const BinningHandler* Binning;
+  /// Local SampleId in SampleHandler
+  int LocalId;
+  /// Sample Dimension
+  int Dimenstion;
+};
 
 /// @brief Implementation of Prior/Posterior Predictive and Bayesian p-Value calculations following the approach described in @cite gelman1996posterior.
 /// @details For more information, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/10.-Posterior-Predictive,-p%E2%80%90value-etc.).
@@ -16,7 +34,7 @@ class ParameterHandlerGeneric;
 
 /// @todo add BIC, DIC, WAIC
 /// @todo add ability yo make projection for Get1DDiscVar
-/// @todo add ability for TH2D
+/// @todo Make more flexible for dimensions beyond 2D
 /// @todo speed improvements
 /// @todo add Rate $p$-value
 /// @todo unify code with SampleSummary
@@ -24,7 +42,7 @@ class PredictiveThrower : public FitterBase {
  public:
    /// @brief Constructor
    /// @param fitMan A pointer to a manager object, which will handle all settings.
-  PredictiveThrower(manager * const fitMan);
+  PredictiveThrower(Manager * const fitMan);
   /// @brief Destructor
   virtual ~PredictiveThrower();
 
@@ -54,29 +72,30 @@ class PredictiveThrower : public FitterBase {
   void SetupSampleInformation();
 
   /// @brief Produce posterior predictive distribution
-  std::unique_ptr<TH1D> MakePredictive(const std::vector<std::unique_ptr<TH1D>>& Toys,
-                                       const std::string& Sample_Name,
-                                       const std::string& suffix,
-                                       const bool DebugHistograms);
+  std::vector<std::unique_ptr<TH1>> MakePredictive(const std::vector<std::vector<std::unique_ptr<TH1>>>& Toys,
+                                                   const std::vector<TDirectory*>& Director,
+                                                   const std::string& suffix,
+                                                   const bool DebugHistograms);
 
   /// @brief Produce Violin style spectra
-  std::vector<std::unique_ptr<TH2D>> ProduceSpectra(const std::vector<std::vector<std::unique_ptr<TH1D>>>& Toys,
-                                                    const std::string suffix);
+  std::vector<std::vector<std::unique_ptr<TH2D>>> ProduceSpectra(
+                                                      const std::vector<std::vector<std::unique_ptr<TH1>>>& Toys,
+                                                      const std::vector<TDirectory*>& Director,
+                                                      const std::string suffix);
 
   /// @brief Calculate Posterior Predictive $p$-value
-  void PosteriorPredictivepValue(const std::vector<std::unique_ptr<TH1D>>& PostPred_mc,
-                                 //const std::vector<std::unique_ptr<TH1D>>& PostPred_w2,
+  void PosteriorPredictivepValue(const std::vector<std::unique_ptr<TH1>>& PostPred_mc,
                                  const std::vector<TDirectory*>& SampleDir);
 
 
-  /// @brief Helper functions to calculate likelihoods using TH1D
+  /// @brief Helper functions to calculate likelihoods using TH1
   /// @param Data histogram with data distribution for a single sample
   /// @param MC histogram with MC distribution for a single sample
   /// @param W2 histogram with W2 distribution for a single sample
-  double GetLLH(const std::unique_ptr<TH1D>& DatHist,
-                                   const std::unique_ptr<TH1D>& MCHist,
-                                   const std::unique_ptr<TH1D>& W2Hist,
-                                   SampleHandlerBase* SampleHandler);
+  double GetLLH(const std::unique_ptr<TH1>& DatHist,
+                                   const std::unique_ptr<TH1>& MCHist,
+                                   const std::unique_ptr<TH1>& W2Hist,
+                                   const SampleHandlerBase* SampleHandler);
 
   /// @brief Produce Chi2 plot for a single sample based on which $p$-value is calculated
   void MakeChi2Plots(const std::vector<std::vector<double>>& Chi2_x,
@@ -85,6 +104,10 @@ class PredictiveThrower : public FitterBase {
                      const std::string& Chi2_y_title,
                      const std::vector<TDirectory*>& SampleDir,
                      const std::string Title);
+
+
+  /// @brief Evaluate prior/post predictive distribution for beta parameters (used for evaluating impact MC statistical uncertainty)
+  void StudyBetaParameters(TDirectory* PredictiveDir);
 
   /// KS: Use Full LLH or only sample contribution based on discussion with Asher we almost always only want the sample likelihood
   bool FullLLH;
@@ -95,34 +118,33 @@ class PredictiveThrower : public FitterBase {
 
   /// Number of toys we are generating analysing
   int TotalNumberOfSamples;
-  /// Name of a single sample
-  std::vector<std::string> SampleNames;
-  /// Maps if sample with given SampleHandler, useful if we have more than one sample in single object
-  std::vector<int> SampleObjectMap;
+
+  /// Handy struct for all sample info
+  std::vector<PredictiveSample> SampleInfo;
 
   /// Number of toys we are generating analysing
   int Ntoys;
   /// KS: Names of parameter groups that will not be varied
   std::vector<std::string> ParameterGroupsNotVaried;
-  /// KS: Index of parameters groups that will be varied
+  /// KS: Index of parameters that will be varied
   std::unordered_set<int> ParameterOnlyToVary;
 
   /// Pointer to El Generico
   ParameterHandlerGeneric* ModelSystematic;
 
   /// Vector of Data histograms
-  std::vector<std::unique_ptr<TH1D>> Data_Hist;
+  std::vector<std::unique_ptr<TH1>> Data_Hist;
   /// Vector of MC histograms
-  std::vector<std::unique_ptr<TH1D>> MC_Nom_Hist;
+  std::vector<std::unique_ptr<TH1>> MC_Nom_Hist;
   /// Vector of W2 histograms
-  std::vector<std::unique_ptr<TH1D>> W2_Nom_Hist;
+  std::vector<std::unique_ptr<TH1>> W2_Nom_Hist;
 
   /// Vector of MC histograms per sample and toy experiment.
   /// Indexed as [sample][toy].
-  std::vector<std::vector<std::unique_ptr<TH1D>>> MC_Hist_Toy;
+  std::vector<std::vector<std::unique_ptr<TH1>>> MC_Hist_Toy;
   /// Vector of W² histograms per sample and toy experiment.
   /// Indexed as [sample][toy]
-  std::vector<std::vector<std::unique_ptr<TH1D>>> W2_Hist_Toy;
+  std::vector<std::vector<std::unique_ptr<TH1>>> W2_Hist_Toy;
 
   /// Reweighting factors applied for each toy, by default 1
   std::vector<double> ReweightWeight;

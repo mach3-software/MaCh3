@@ -23,11 +23,12 @@ class TDirectory;
 /// It serves as a base for different fitting algorithms and for validation techniques
 /// such as LLH scans.
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/06.-Fitting-Algorithms).
+/// @ingroup CoreClasses
 class FitterBase {
  public:
   /// @brief Constructor
   /// @param fitMan A pointer to a manager object, which will handle all settings.
-  FitterBase(manager * const fitMan);
+  FitterBase(Manager * const fitMan);
   /// @brief Destructor for the FitterBase class.
   virtual ~FitterBase();
 
@@ -57,7 +58,7 @@ class FitterBase {
   void Run2DLLHScan();
 
   /// @brief Perform a 2D and 1D sigma var for all samples.
-  /// @warning Code uses TH2Poly
+  /// @warning Code uses TH2Poly, right now used only by T2K ND280, it may become deprecated or merged
   void RunSigmaVar();
 
   /// @brief Perform a 1D sigma var for all samples.
@@ -94,23 +95,18 @@ class FitterBase {
   /// @brief KS: Check whether we want to skip parameter using skip vector
   bool CheckSkipParameter(const std::vector<std::string>& SkipVector, const std::string& ParamName) const;
 
-
-  /// @brief For comparison with P-Theta we usually have to apply different parameter values then usual 1, 3 sigma
+  /// @brief For comparison with other fitting frameworks (like P-Theta) we usually have to apply different parameter values then usual 1, 3 sigma
   ///
   /// Example YAML format:
   /// @code{.yaml}
   /// SigmaVar:
-  ///   Q2_norm_7:
-  ///     "3": 2.0
-  ///   SRC_Norm_O:
-  ///     "-1": 0.5
-  ///     "1": 1.5
-  ///     "3": 2.0
+  ///   Q2_norm_7: { "3": 2.0 }
+  ///   SRC_Norm_O: { "-1": 0.5, "1": 1.5, "3": 2.0 }
   /// @endcode
   void CustomRange(const std::string& ParName, const double sigma, double& ParamShiftValue) const;
 
   /// The manager for configuration handling
-  manager *fitMan;
+  Manager *fitMan;
 
   /// current state
   unsigned int step;

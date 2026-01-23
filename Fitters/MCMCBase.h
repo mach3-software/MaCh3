@@ -9,7 +9,7 @@ class MCMCBase : public FitterBase {
  public:
     /// @brief Constructor
     /// @param fitMan A pointer to a manager object, which will handle all settings.
-    MCMCBase(manager * const fitMan);
+    MCMCBase(Manager * const fitMan);
     
     /// @brief Destructor
     virtual ~MCMCBase() = default;
@@ -54,7 +54,7 @@ class MCMCBase : public FitterBase {
     inline void AdaptiveStep();
 
     /// @brief Print the progress
-    inline void PrintProgress();
+    inline void PrintProgress(const bool StepsPrint = true);
 
     /// Do we reject based on hitting boundaries in systs
     bool out_of_bounds;

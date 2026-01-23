@@ -1,4 +1,4 @@
-#include "plottingUtils.h"
+#include "PlottingUtils.h"
 
 namespace MaCh3Plotting {
 

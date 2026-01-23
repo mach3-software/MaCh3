@@ -8,7 +8,7 @@
 #include "Samples/SampleStructs.h"
 
 // Other plotting includes
-#include "plottingUtils.h"
+#include "PlottingUtils.h"
 
 namespace MaCh3Plotting {
 
@@ -109,7 +109,7 @@ struct InputFile {
   }
 
   /// ptr to an MCMCProcessor instance to be used if this is a MaCh3 input file
-  MCMCProcessor *mcmcProc = nullptr;
+  std::unique_ptr<MCMCProcessor> mcmcProc;
   TTree *posteriorTree = nullptr;
 
   std::shared_ptr<TFile> file;          //!< Pointer to the underlying file for this InputFile instance.

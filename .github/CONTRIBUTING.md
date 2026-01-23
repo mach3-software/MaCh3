@@ -300,13 +300,6 @@ It makes the intent clear and avoids unsafe conversions allowed by C-style casts
     int y = static_cast<int>(x);
 ```
 
-## Formatting
-To ensure a unified style in MaCh3 software you can use a clang-format file which has instructions about formatting code.
-```bash
-clang-format --assume-filename=/path/to/your/.clang-format=${MaCh3_ROOT}/../.clang-format blarb.cpp
-```
-Please see [here](https://clang.llvm.org/docs/ClangFormat.html) and [here](https://root.cern/contribute/coding_conventions/) for more details.
-
 ## Code-style
 We want to try to make code more readable in general so please try to stick to using name style and conventions given in the google style guide [here](https://google.github.io/styleguide/cppguide.html). A few examples are given below:
 

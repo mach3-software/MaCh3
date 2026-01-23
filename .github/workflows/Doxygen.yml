@@ -35,7 +35,7 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, 
       # so your job can access it
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       
       # Installs texlive for LaTeX support in Doxygen documentation
       - run: dnf install -y texlive-scheme-basic texlive-latex
@@ -60,7 +60,7 @@ jobs:
           doxygen Doc/Doxyfile
 
       - name: Upload Doxygen Artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           retention-days: 1
           name: DoxygenHTML
@@ -79,7 +79,7 @@ jobs:
     
       # Checks-out your repository under $GITHUB_WORKSPACE, 
       # so your job can access it
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Check Python 
         run: python3 --version
@@ -119,7 +119,7 @@ jobs:
           mkdir to-upload/pyMaCh3
           mv Doc/sphinx/build/html/* to-upload/pyMaCh3/
           
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           retention-days: 1
           name: DocumentationHTML

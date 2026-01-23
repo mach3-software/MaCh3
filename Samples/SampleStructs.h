@@ -31,14 +31,6 @@ _MaCh3_Safe_Include_End_ //}
 /// @author Kamil Skwarczynski
 
 
-// *******************
-/// @brief KS: This is mad way of converting string to int. Why? To be able to use string with switch
-constexpr unsigned int str2int(const char* str, const int h = 0) {
-// *******************
-  return !str[h] ? 5381 : (str2int(str, h+1) * 33) ^ str[h];
-}
-
-
 // *****************
 /// Enum to track the target material
 enum TargetMat {
@@ -179,124 +171,284 @@ struct BinShiftLookup {
 };
 
 // ***************************
-/// @brief KS: Small struct storying info about used binning
+/// @brief KS: This hold bin corners in N-Dimensions allowing to check if Bin falls into
+struct BinInfo {
+// ***************************
+  /// The corners of the bin, stored as {lower, upper} bounds for each dimension.
+  std::vector<std::array<double, 2>> Corners;
+
+  /// @brief Checks if a given event (point) falls inside the bin.
+  bool IsEventInside(const std::vector<double>& KinVars) const {
+    for(size_t i = 0; i < KinVars.size(); i++){
+      if(KinVars[i] < Corners[i][0] || KinVars[i] >= Corners[i][1]){
+        return false;
+      }
+    }
+    return true;
+  }
+};
+
+// ***************************
+/// @brief KS: Struct storing all information required for sample binning
+///
+/// @details
+/// This struct encapsulates the full binning definition for a single analysis
+/// sample. It stores the bin edges, number of bins per dimension, stride factors,
+/// and lookup tables required to efficiently map multi-dimensional kinematic
+/// variables to linear bin indices.
+///
+/// @author Kamil Skwarczynski
 struct SampleBinningInfo {
 // ***************************
-  /// Vector to hold x-axis bin-edges
-  std::vector<double> XBinEdges;
-  /// Vector to hold y-axis bin-edges
-  std::vector<double> YBinEdges;
+  /// Vector to hold N-axis bin-edges
+  std::vector<std::vector<double>> BinEdges;
+  /// Number of N-axis bins in the histogram used for likelihood calculation
+  std::vector<size_t> AxisNBins;
 
-  /// Number of X axis bins in the histogram used for likelihood calculation
-  size_t nXBins = M3::_BAD_INT_;
-  /// Number of Y axis bins in the histogram used for likelihood calculation
-  size_t nYBins = M3::_BAD_INT_;
   /// Number of total bins
   size_t nBins = M3::_BAD_INT_;
   /// If you have binning for multiple samples and trying to define 1D vector let's
   size_t GlobalOffset = M3::_BAD_INT_;
-  /// Bin lookups for X axis only
-  std::vector<BinShiftLookup> xBinLookup;
+  /// Bin lookups for all dimensions
+  std::vector <std::vector<BinShiftLookup> > BinLookup;
+  /// Stride factors for converting N-dimensional bin indices to a linear index.
+  std::vector<int> Strides;
+  /// Tells whether to use inform binning grid or non-uniform
+  bool Uniform = true;
+  /// Bins used only for non-uniform
+  std::vector<BinInfo> Bins;
 
-  /// @brief Get linear bin index from 2D bin indices
-  /// @param xBin The bin index along the X axis (0-based)
-  /// @param yBin The bin index along the Y axis (0-based)
-  /// @return The linear bin index corresponding to (xBin, yBin)
-  int GetBin(const int xBin, const int yBin) const {
-    return static_cast<int>(yBin * nXBins + xBin);
-  }
+  /// @brief Initialise Uniform Binning
+  void InitUniform(const std::vector<std::vector<double>>& InputEdges) {
+    BinEdges = InputEdges;
+    Uniform = true;
+    AxisNBins.resize(BinEdges.size());
 
-  /// @brief Get linear bin index from 2D bin indices with additional checks
-  /// @param xBin The bin index along the X axis (0-based)
-  /// @param yBin The bin index along the Y axis (0-based)
-  /// @return The linear bin index corresponding to (xBin, yBin)
-  /// @warning this performs additional checks so do not use in parts of code used during fit
-  int GetBinSafe(const int xBin, const int yBin) const {
-    if (xBin < 0 || yBin < 0 || static_cast<size_t>(xBin) >= nXBins || static_cast<size_t>(yBin) >= nYBins) {
-      MACH3LOG_ERROR("GetBinSafe: Bin indices out of range: xBin={}, yBin={}, max xBin={}, max yBin={}",
-                     xBin, yBin, nXBins - 1, nYBins - 1);
-      throw MaCh3Exception(__FILE__, __LINE__);
+    nBins = 1;
+    for(size_t iDim = 0; iDim < BinEdges.size(); iDim++)
+    {
+      const auto& Edges = BinEdges[iDim];
+      if (!std::is_sorted(Edges.begin(), Edges.end())) {
+        MACH3LOG_ERROR("VarBins for Dim {} must be in increasing order in sample config, VarBins: [{}]",
+                       iDim, fmt::join(Edges, ", "));
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+
+      //Sanity check that some binning has been specified
+      if(BinEdges[iDim].size() == 0){
+        MACH3LOG_ERROR("No binning specified for Dim {} of sample binning, please add some binning to the sample config", iDim);
+        MACH3LOG_ERROR("Please ensure BinEdges are correctly configured for all dimensions");
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+
+      // Set the number of bins for this dimension
+      AxisNBins[iDim] = BinEdges[iDim].size() - 1;
+      // Update total number of bins
+      nBins *= AxisNBins[iDim];
+
+      MACH3LOG_INFO("{}-Dim Binning: [{:.2f}]", iDim, fmt::join(BinEdges[iDim], ", "));
     }
-    return GetBin(xBin, yBin);
+    GlobalOffset = 0;
+    /// Lastly prepare special histograms used for event migration
+    InitialiseBinMigrationLookUp(static_cast<int>(BinEdges.size()));
   }
 
-  /// @brief Calculates the global bin number for a given 2D bin, accounting for multiple binning samples.
-  /// @param xBin The bin index along the X axis (0-based)
-  /// @param yBin The bin index along the Y axis (0-based)
-  int GetBinGlobal(const int xBin, const int yBin) const {
-    return static_cast<int>(GlobalOffset + GetBin(xBin, yBin));
+  void InitNonUniform(const std::vector<std::vector<std::vector<double>>>& InputBins) {
+    MACH3LOG_ERROR("Not implemented, what are you event doing here...");
+    throw MaCh3Exception(__FILE__, __LINE__);
+
+    Uniform = false;
+    nBins = 0;
+    Bins.resize(InputBins.size());
+
+    size_t CornerDim = InputBins[0].size();
+    for(size_t iBin = 0; iBin < InputBins.size(); iBin++) {
+      const auto& NewCorners = InputBins[iBin];
+      if (NewCorners.size() != CornerDim) {
+        MACH3LOG_ERROR("Dimension of Bin {} is {}, while others have {}", iBin, NewCorners.size(), CornerDim);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+
+      BinInfo NewBin;
+      for (const auto& corner : NewCorners) {
+        if (corner.size() != 2) {
+          MACH3LOG_ERROR("Corner size is not 2 for Bin {}", iBin);
+          throw MaCh3Exception(__FILE__, __LINE__);
+        }
+        NewBin.Corners.push_back({corner[0], corner[1]});
+        MACH3LOG_DEBUG("Adding corner [{}, {}] to Bin {}", corner[0], corner[1], iBin);
+      }
+      Bins[iBin] = NewBin;
+      nBins++;
+    }
+    /// @todo KS: Now we create "Large Bins" automatically, in future we can expand to add more user control
+    constexpr size_t BinsPerDimension = 20;
+    // Now we create huge map, which will allow to easily find non uniform bins
+    BinEdges.resize(CornerDim);
+    AxisNBins.resize(CornerDim);
+    for (size_t iDim = 0; iDim < CornerDim; iDim++) {
+      double MinVal = std::numeric_limits<double>::max();
+      double MaxVal = std::numeric_limits<double>::lowest();
+
+      // Find min and max for this dimension
+      for (const auto& bin : Bins) {
+        MinVal = std::min(MinVal, bin.Corners[iDim][0]);
+        MaxVal = std::max(MaxVal, bin.Corners[iDim][1]);
+      }
+
+      BinEdges[iDim].resize(BinsPerDimension + 1);
+      double BinWidth = (MaxVal - MinVal) / static_cast<double>(BinsPerDimension);
+      for (size_t iEdge = 0; iEdge <= BinsPerDimension; iEdge++) {
+        BinEdges[iDim][iEdge] = MinVal + static_cast<double>(iEdge) * BinWidth;
+      }
+      AxisNBins[iDim] = BinsPerDimension;
+    }
+
+    GlobalOffset = 0;
+    /// Lastly prepare special histograms used for event migration
+    InitialiseBinMigrationLookUp(static_cast<int>(BinEdges.size()));
+  }
+
+  /// @brief Get linear bin index from ND bin indices with additional checks
+  /// @param BinIndices Vector of bin indices along each dimension
+  /// @warning this performs additional checks so do not use in parts of code used during fit
+  int GetBinSafe(const std::vector<int>& BinIndices) const {
+    for(int iDim = 0; iDim < static_cast<int>(BinIndices.size()); iDim++){
+      if (BinIndices[iDim] < 0 || BinIndices[iDim] >= static_cast<int>(AxisNBins[iDim])) {
+        MACH3LOG_ERROR("{}: Bin indices out of range: Dim = {}, Bin={}, max Ndim Bin={}",
+                       __func__, iDim, BinIndices[iDim], AxisNBins[iDim]);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+    }
+    return GetBin(BinIndices);
+  }
+
+  /// @brief Convert N-dimensional bin indices to a linear bin index.
+  /// @param BinIndices Vector of bin indices along each dimension
+  /// @details
+  /// Mapping follows row-major order:
+  ///  - 1D: xBin
+  ///  - 2D: yBin * nXBins + xBin
+  ///  - 3D: zBin * nXBins * nYBins + yBin * nXBins + xBin
+  int GetBin(const std::vector<int>& BinIndices) const {
+    int BinNumber = 0;
+    for(size_t i = 0; i < BinIndices.size(); ++i) {
+      BinNumber += BinIndices[i]*Strides[i];
+    }
+    return BinNumber;
   }
 
   /// @brief DB Find the relevant bin in the PDF for each event
-  int FindXBin(const double XVar, const int NomBin) const {
+  int FindBin(const int Dimension, const double Var, const int NomBin) const {
+    return FindBin(Var, NomBin, AxisNBins[Dimension], BinEdges[Dimension], BinLookup[Dimension]);
+  }
+
+  /// @brief DB Find the relevant bin in the PDF for each event
+  /// @param KinVar       The value of the kinematic variable for the event.
+  /// @param NomBin       The nominal bin index where the event would fall without any shifts.
+  /// @param N_Bins       The total number of bins in this dimension.
+  /// @param Bin_Edges    Vector of bin edge values (size = N_Bins + 1).
+  /// @param Bin_Lookup   Vector of `BinShiftLookup` structs providing precomputed lower and upper
+  ///                     edges for the nominal bin and its neighbors to efficiently handle
+  ///                     shifted events
+  int FindBin(const double KinVar,
+              const int NomBin,
+              const size_t N_Bins,
+              const std::vector<double>& Bin_Edges,
+              const std::vector<BinShiftLookup>& Bin_Lookup) const {
     //DB Check to see if momentum shift has moved bins
     //DB - First , check to see if the event is outside of the binning range and skip event if it is
-    if (XVar < XBinEdges[0] || XVar >= XBinEdges[nXBins]) {
-      return -1;
+    if (KinVar < Bin_Edges[0] || KinVar >= Bin_Edges[N_Bins]) {
+      return M3::UnderOverFlowBin;
     }
+    // KS: If NomBin is UnderOverFlowBin we must do binary search :(
+    if(NomBin > M3::UnderOverFlowBin) {
+      // KS: Get reference to avoid repeated indexing and help with performance
+      const BinShiftLookup& _restrict_ Bin = Bin_Lookup[NomBin];
+      const double lower = Bin.lower_binedge;
+      const double upper = Bin.upper_binedge;
+      const double lower_lower = Bin.lower_lower_binedge;
+      const double upper_upper = Bin.upper_upper_binedge;
 
-    // KS: Get reference to avoid repeated indexing and help with performance
-    const BinShiftLookup& _restrict_ xBin = xBinLookup[NomBin];
-    const double lower = xBin.lower_binedge;
-    const double upper = xBin.upper_binedge;
-    const double lower_lower = xBin.lower_lower_binedge;
-    const double upper_upper = xBin.upper_upper_binedge;
-
-    //DB - Second, check to see if the event is still in the nominal bin
-    if (XVar < upper && XVar >= lower) {
-      return NomBin;
-    }
-    //DB - Thirdly, check the adjacent bins first as Eb+CC+EScale shifts aren't likely to move an Erec more than 1bin width
-    //Shifted down one bin from the event bin at nominal
-    if (XVar < lower && XVar >= lower_lower) {
-      return NomBin-1;
-    }
-    //Shifted up one bin from the event bin at nominal
-    if (XVar < upper_upper && XVar >= upper) {
-      return NomBin+1;
+      //DB - Second, check to see if the event is still in the nominal bin
+      if (KinVar < upper && KinVar >= lower) {
+        return NomBin;
+      }
+      //DB - Thirdly, check the adjacent bins first as Eb+CC+EScale shifts aren't likely to move an Erec more than 1bin width
+      //Shifted down one bin from the event bin at nominal
+      if (KinVar < lower && KinVar >= lower_lower) {
+        return NomBin-1;
+      }
+      //Shifted up one bin from the event bin at nominal
+      if (KinVar < upper_upper && KinVar >= upper) {
+        return NomBin+1;
+      }
     }
     //DB - If we end up in this loop, the event has been shifted outside of its nominal bin, but is still within the allowed binning range
     // KS: Perform binary search to find correct bin. We already checked if isn't outside of bounds
-    return static_cast<int>(std::distance(XBinEdges.begin(), std::upper_bound(XBinEdges.begin(), XBinEdges.end(), XVar)) - 1);
+    return static_cast<int>(std::distance(Bin_Edges.begin(), std::upper_bound(Bin_Edges.begin(), Bin_Edges.end(), KinVar)) - 1);
   }
 
   /// @brief Initializes lookup arrays for efficient bin migration in a single dimension.
-  /// @param BinLookup Reference to the BinShiftLookup struct to be initialized.
-  /// @param BinEdges Vector of bin edges defining the bin boundaries.
+  /// @param Bin_Lookup Reference to the BinShiftLookup struct to be initialized.
+  /// @param Bin_Edges Vector of bin edges defining the bin boundaries.
   /// @param TotBins Number of bins in the dimension.
-  void InitialiseLookUpSingleDimension(std::vector<BinShiftLookup>& BinLookup, const std::vector<double>& BinEdges, const size_t TotBins) {
-    BinLookup.resize(TotBins);
+  void InitialiseLookUpSingleDimension(std::vector<BinShiftLookup>& Bin_Lookup, const std::vector<double>& Bin_Edges, const size_t TotBins) {
+    Bin_Lookup.resize(TotBins);
     //Set rw_pdf_bin and upper_binedge and lower_binedge for each skmc_base
     for(size_t bin_i = 0; bin_i < TotBins; bin_i++){
       double low_lower_edge = M3::_DEFAULT_RETURN_VAL_;
-      double low_edge = BinEdges[bin_i];
-      double upper_edge = BinEdges[bin_i+1];
+      double low_edge = Bin_Edges[bin_i];
+      double upper_edge = Bin_Edges[bin_i+1];
       double upper_upper_edge = M3::_DEFAULT_RETURN_VAL_;
 
       if (bin_i == 0) {
-        low_lower_edge = BinEdges[0];
+        low_lower_edge = Bin_Edges[0];
       } else {
-        low_lower_edge = BinEdges[bin_i-1];
+        low_lower_edge = Bin_Edges[bin_i-1];
       }
 
       if (bin_i + 2 < TotBins) {
-        upper_upper_edge = BinEdges[bin_i + 2];
+        upper_upper_edge = Bin_Edges[bin_i + 2];
       } else if (bin_i + 1 < TotBins) {
-        upper_upper_edge = BinEdges[bin_i + 1];
+        upper_upper_edge = Bin_Edges[bin_i + 1];
       }
 
-      BinLookup[bin_i].lower_binedge = low_edge;
-      BinLookup[bin_i].upper_binedge = upper_edge;
-      BinLookup[bin_i].lower_lower_binedge = low_lower_edge;
-      BinLookup[bin_i].upper_upper_binedge = upper_upper_edge;
+      Bin_Lookup[bin_i].lower_binedge = low_edge;
+      Bin_Lookup[bin_i].upper_binedge = upper_edge;
+      Bin_Lookup[bin_i].lower_lower_binedge = low_lower_edge;
+      Bin_Lookup[bin_i].upper_upper_binedge = upper_upper_edge;
+    }
+  }
+
+  /// @brief Initialise stride factors for linear bin index calculation.
+  /// @details
+  /// Strides define how N-dimensional bin indices are converted into a single
+  /// linear bin index using row-major ordering.
+  ///
+  /// For example:
+  ///  - 1D: stride[0] = 1
+  ///  - 2D: stride[1] = nXBins
+  ///  - 3D: stride[2] = nXBins * nYBins
+  void InitialiseStrides(const int Dimension) {
+    Strides.resize(Dimension);
+    int stride = 1;
+    for (int i = 0; i < Dimension; ++i) {
+      Strides[i] = stride;
+      // Multiply stride by the number of bins in this axis
+      stride *= static_cast<int>(AxisNBins[i]);
     }
   }
 
   /// @brief Initialise special lookup arrays allowing to more efficiently perform bin-migration
   ///        These arrays store the lower and upper edges of each bin and their neighboring bins.
-  void InitialiseBinMigrationLookUp() {
-    InitialiseLookUpSingleDimension(xBinLookup, XBinEdges, nXBins);
-    /// @todo KS: This could be expanded easily for Y axis
+  void InitialiseBinMigrationLookUp(const int Dimension) {
+    BinLookup.resize(Dimension);
+    for (int i = 0; i < Dimension; ++i) {
+      InitialiseLookUpSingleDimension(BinLookup[i], BinEdges[i], AxisNBins[i]);
+    }
+
+    InitialiseStrides(Dimension);
   }
 };
 
@@ -319,6 +471,27 @@ inline int GetSampleFromGlobalBin(const std::vector<SampleBinningInfo>& BinningI
   return M3::_BAD_INT_;
 }
 
+/// @brief Get the local (sample) bin index from a global bin number.
+/// @param BinningInfo Vector of SampleBinningInfo structs.
+/// @param GlobalBin The global bin number.
+/// @return The bin index within the sample.
+inline int GetLocalBinFromGlobalBin(const std::vector<SampleBinningInfo>& BinningInfo,
+                                    const size_t GlobalBin) {
+  for (size_t iSample = 0; iSample < BinningInfo.size(); ++iSample) {
+    const SampleBinningInfo& info = BinningInfo[iSample];
+
+    if (GlobalBin >= info.GlobalOffset &&
+      GlobalBin <  info.GlobalOffset + info.nBins)
+    {
+      return static_cast<int>(GlobalBin - info.GlobalOffset);
+    }
+  }
+
+  MACH3LOG_ERROR("Couldn't find local bin corresponding to bin {}", GlobalBin);
+  throw MaCh3Exception(__FILE__, __LINE__);
+
+  return M3::_BAD_INT_;
+}
 
 // ***************************
 // A handy namespace for variables extraction

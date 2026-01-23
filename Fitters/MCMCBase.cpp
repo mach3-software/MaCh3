@@ -1,9 +1,9 @@
 #include "Fitters/MCMCBase.h"
 
 // *************************
-// Initialise the manager and make it an object of mcmc class
-// Now we can dump manager settings to the output file
-MCMCBase::MCMCBase(manager *man) : FitterBase(man) {
+// Initialise the Manager and make it an object of mcmc class
+// Now we can dump Manager settings to the output file
+MCMCBase::MCMCBase(Manager *man) : FitterBase(man) {
 // *************************
     // Beginning step number
     stepStart = 0;
@@ -11,6 +11,10 @@ MCMCBase::MCMCBase(manager *man) : FitterBase(man) {
     // Starting parameters should be thrown
     out_of_bounds = false;
     chainLength = Get<unsigned>(fitMan->raw()["General"]["MCMC"]["NSteps"], __FILE__, __LINE__);
+    if (chainLength < 10){
+        MACH3LOG_ERROR("MCMC chain length must be at least 10 steps, otherwise this will result in a floating point exception.");
+        throw MaCh3Exception(__FILE__, __LINE__);
+    }
 
     AnnealTemp = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["AnnealTemp"], -999);
     if (AnnealTemp < 0)
@@ -35,6 +39,9 @@ void MCMCBase::RunMCMC() {
 
     // Remove obsolete memory and make other checks before fit starts
     SanitiseInputs();
+
+    // Print Progress before Propose Step
+    PrintProgress(false);
 
     // Reconfigure the samples, systematics and oscillation for first weight
     // ProposeStep sets logLProp
@@ -94,6 +101,10 @@ void MCMCBase::PreStepProcess() {
 // *************************
 void MCMCBase::PostStepProcess() {
 // *************************
+    //KS: Some version of ROOT keep spamming about accessing already deleted object which is wrong and not helpful...
+    int originalErrorLevel = gErrorIgnoreLevel;
+    gErrorIgnoreLevel = kFatal;
+
     stepClock->Stop();
     stepTime = stepClock->RealTime();
 
@@ -106,17 +117,21 @@ void MCMCBase::PostStepProcess() {
     if (step % auto_save == 0){
         outTree->AutoSave();
     }
+    gErrorIgnoreLevel = originalErrorLevel;
 }
 
 // *******************
 // Print the fit output progress
-void MCMCBase::PrintProgress() {
+void MCMCBase::PrintProgress(bool StepsPrint) {
 // *******************
-    MACH3LOG_INFO("Step:\t{}/{}, current: {:.2f}, proposed: {:.2f}", step - stepStart, chainLength, logLCurr, logLProp);
-    MACH3LOG_INFO("Accepted/Total steps: {}/{} = {:.2f}", accCount, step - stepStart, static_cast<double>(accCount) / static_cast<double>(step - stepStart));
+    if(StepsPrint) MACH3LOG_INFO("Step:\t{}/{}, current: {:.2f}, proposed: {:.2f}", step - stepStart, chainLength, logLCurr, logLProp);
+    if(StepsPrint) MACH3LOG_INFO("Accepted/Total steps: {}/{} = {:.2f}", accCount, step - stepStart, static_cast<double>(accCount) / static_cast<double>(step - stepStart));
 
-    for (ParameterHandlerBase *cov : systematics)
-    {
+    for (size_t i = 0; i < samples.size(); ++i) {
+        samples[i]->PrintRates();
+    }
+
+    for (ParameterHandlerBase *cov : systematics) {
         cov->PrintNominalCurrProp();
     }
 #ifdef DEBUG

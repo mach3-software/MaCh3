@@ -69,6 +69,9 @@ void MakeFluctuatedHistogramStandard(TH1D *FluctHist, TH1D* PolyHist, TRandom3* 
 /// @brief Make Poisson fluctuation of TH1D hist using slow method which is only for cross-check
 void MakeFluctuatedHistogramAlternative(TH1D *FluctHist, TH1D* PolyHist, TRandom3* rand);
 
+/// @brief Make Poisson fluctuation of TH2D hist
+void MakeFluctuatedHistogramAlternative(TH2D *FluctHist, TH2D* PolyHist, TRandom3* rand);
+
 /// @brief Make Poisson fluctuation of TH2Poly hist using default fast method
 void MakeFluctuatedHistogramStandard(TH2Poly *FluctHist, TH2Poly* PolyHist, TRandom3* rand);
 /// @brief Make Poisson fluctuation of TH2Poly hist using slow method which is only for cross-check
@@ -120,7 +123,7 @@ inline std::string file_exists(std::string filename) {
 }
 
 /// @brief DB Get the Cherenkov momentum threshold in MeV
-double returnCherenkovThresholdMomentum(int PDG);
+double returnCherenkovThresholdMomentum(const int PDG);
 
 /// @brief Recalculate Q^2 after Eb shift. Takes in shifted lepton momentum, lepton angle, and true neutrino energy
 double CalculateQ2(double PLep, double PUpd, double EnuTrue, double InitialQ2 = 0.0);
@@ -154,6 +157,8 @@ std::unique_ptr<ObjectType> Clone(const ObjectType* obj, const std::string& name
 ///
 /// @param Name The name or path of the file to open.
 /// @param Type The file open mode (e.g., "READ", "RECREATE", "UPDATE").
+/// @param File The name of the file where the exception occurred.
+/// @param Line The line number where the exception occurred.
 /// @return Pointer to the opened ROOT file.
 TFile* Open(const std::string& Name, const std::string& Type, const std::string& File, const int Line);
 

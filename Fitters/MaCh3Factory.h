@@ -24,23 +24,24 @@
 /// @code
 /// General:
 ///   FittingAlgorithm: ["MCMC"]
-std::unique_ptr<FitterBase> MaCh3FitterFactory(manager *FitManager);
+/// @endcode
+std::unique_ptr<FitterBase> MaCh3FitterFactory(Manager *FitManager);
 
-/// @brief Initializes the config manager class and allows overriding settings via command-line arguments.
+/// @brief Initializes the config Manager class and allows overriding settings via command-line arguments.
 /// @param argc number of arguments
 /// @param argv name of arguments
-/// @return A unique pointer to the initialized `manager` instance with optional overrides applied.
-/// @example Usage examples:
+/// @return A unique pointer to the initialized `Manager` instance with optional overrides applied.
+/// @note Usage examples:
 /// ```
 /// ./bin/MCMCTutorial Inputs/FitterConfig.yaml General:OutputFile:blarb.root
 /// ./bin/MCMCTutorial Inputs/FitterConfig.yaml General:OutputFile:blarb.root General:MCMC:NSteps:50000
 /// ```
-std::unique_ptr<manager> MaCh3ManagerFactory(int argc, char **argv);
+std::unique_ptr<Manager> MaCh3ManagerFactory(int argc, char **argv);
 
 // ********************************************
 /// @brief Factory function for creating a covariance class for systematic handling.
 ///
-/// @param FitManager Pointer to the manager class that holds the configuration settings.
+/// @param FitManager Pointer to the Manager class that holds the configuration settings.
 /// @param PreFix Prefix, for example Xsec, then code will look for XsecCovFile
 /// @return Pointer to the initialized covarianceXsec matrix object.
 ///
@@ -64,7 +65,7 @@ std::unique_ptr<manager> MaCh3ManagerFactory(int argc, char **argv);
 ///
 /// @todo add adaptive stuff
 template <typename CovType>
-std::unique_ptr<CovType> MaCh3CovarianceFactory(manager *FitManager, const std::string& PreFix){
+std::unique_ptr<CovType> MaCh3CovarianceFactory(Manager *FitManager, const std::string& PreFix) {
 // ********************************************
   // config for our matrix
   YAML::Node Settings = FitManager->raw()["General"]["Systematics"];
@@ -140,13 +141,7 @@ std::vector<SampleType*> MaCh3SampleHandlerFactory(const std::vector<std::string
       TString NameTString = TString(name.c_str());
 
       // Clone the 1D histogram with a modified name
-      if (Sample->GetNDim(iSample) == 1) {
-        auto hist = static_cast<TH1D*>(Sample->GetMCHist(iSample, 1));
-        Sample->AddData(iSample, hist);
-      } else {
-        auto hist = static_cast<TH2D*>(Sample->GetMCHist(iSample, 2));
-        Sample->AddData(iSample, hist);
-      }
+      Sample->AddData(iSample, Sample->GetMCArray(iSample));
     }
     Handlers[i] = Sample;
   }

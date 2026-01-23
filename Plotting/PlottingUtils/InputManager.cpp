@@ -1,4 +1,4 @@
-#include "inputManager.h"
+#include "InputManager.h"
 
 
 namespace MaCh3Plotting {
@@ -685,9 +685,11 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, const bool printThought
 
         postTree = inputFileDef.file->Get<TTree>(rawLoc.c_str());
 
-        if ( postTree != nullptr )
+        if ( postTree != nullptr && (postTree->GetNbranches() != 0) )
         {
-          inputFileDef.mcmcProc = new MCMCProcessor(inputFileDef.fileName);
+          inputFileDef.mcmcProc = std::make_unique<MCMCProcessor>(inputFileDef.fileName);
+          // KS: We need this so plotting doesn't overwrite default...
+          inputFileDef.mcmcProc->SetOutputSuffix("_PlottingTemp");
           inputFileDef.mcmcProc->Initialise();
 
           MACH3LOG_DEBUG("  - FOUND!");
@@ -695,7 +697,7 @@ void InputManager::fillFileInfo(InputFile &inputFileDef, const bool printThought
         }
       }
     
-      if ( postTree != nullptr )
+      if ( postTree != nullptr && (postTree->GetNbranches() != 0) )
       {
         inputFileDef.posteriorTree = postTree;
         inputFileDef.nMCMCentries = int(postTree->GetEntries());

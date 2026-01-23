@@ -66,7 +66,7 @@ class PCAHandler{
   virtual ~PCAHandler();
 
   /// @brief KS: Print info about PCA parameters
-  void Print();
+  void Print() const;
   /// @brief Retrieve number of parameters in PCA base
   int GetNumberPCAedParameters() const { return NumParPCA; }
 
@@ -110,14 +110,10 @@ class PCAHandler{
 
   /// @brief KS: Transfer the starting parameters to the PCA basis, you don't want to start with zero..
   /// @param IndStepScale Per parameter step scale, we set so each PCA param uses same step scale [eigen value takes care of size]
-  void SetInitialParameters(std::vector<double>& IndStepScale);
-  /// @brief Throw the proposed parameter by mag sigma.
-  void ThrowParProp(const double mag, const double* _restrict_ randParams);
-  /// @brief Helper function to throw the current parameter by mag sigma.
-  void ThrowParCurr(const double mag, const double* _restrict_ randParams);
+  void SetInitialParameters();
   /// @brief set branches for output file
   /// @ingroup ParameterHandlerSetters
-  void SetBranches(TTree &tree, bool SaveProposal, const std::vector<std::string>& Names);
+  void SetBranches(TTree &tree, const bool SaveProposal, const std::vector<std::string>& Names);
   /// @brief fix parameters at prior values
   /// @ingroup ParameterHandlerSetters
   void ToggleFixAllParameters(const std::vector<std::string>& Names);

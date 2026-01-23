@@ -2,7 +2,7 @@
 
 // *******************
 // Run the Minuit Fit with all the systematic objects added
-MinuitFit::MinuitFit(manager *man) : LikelihoodFit(man) {
+MinuitFit::MinuitFit(Manager *man) : LikelihoodFit(man) {
 // *******************
   AlgorithmName = "MinuitFit";
   /// @todo KS: Make this in future configurable, for more see: https://root.cern.ch/doc/master/classROOT_1_1Math_1_1Minimizer.html
@@ -58,6 +58,19 @@ void MinuitFit::RunMCMC() {
   minuit->SetTolerance(0.01);
   minuit->SetMaxFunctionCalls(fitMan->raw()["General"]["Minuit2"]["NSteps"].as<unsigned>());
   minuit->SetMaxIterations(10000);
+
+
+  // Save the adaptive MCMC
+  for (const auto &syst : systematics)
+  {
+    if (syst->GetDoAdaption())
+    {
+      MACH3LOG_ERROR("Param Handler {} has enabled Adaption, this is not needed for Minuit so please turn it off", syst->GetDoAdaption());
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+    }
+  }
+
+
 
   MACH3LOG_INFO("Preparing Minuit");
   int ParCounter = 0;

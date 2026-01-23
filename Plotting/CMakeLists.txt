@@ -1,4 +1,4 @@
-add_subdirectory(plottingUtils)
+add_subdirectory(PlottingUtils)
 
 foreach(app
     GetPostfitParamPlots

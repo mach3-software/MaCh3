@@ -51,6 +51,9 @@ Don't forget to:
 ```bash
 source bin/setup.MaCh3.sh
 ```
+
+If the build fails, check your [system/environment requirements](#system-requirements).
+
 ## Building against MaCh3
 To include MaCh3 in your cmake project you can use following syntax
 ```cmake
@@ -170,10 +173,38 @@ You can find more [here](https://github.com/mach3-software/MaCh3/blob/develop/cm
 
 
 ## System Requirements
-Most of external libraries are being handled through [CPM](https://github.com/cpm-cmake/CPM.cmake). The only external library that is not being handled through [CPM](https://github.com/cpm-cmake/CPM.cmake) and is required is [ROOT](https://root.cern/). Currently used external dependencies include:
+MaCh3 requires a C++ compiler (e.g. [gcc](https://gcc.gnu.org)), [CMake](https://cmake.org), and [ROOT](https://root.cern/). Based on several tests, recommended versions are:
+```bash
+  GCC:   >= 8.5   [lower versions may work]
+  C++:   >= 14
+  CMake: >= 3.14
+  ROOT:  >= 6.18
+```
 
+If you don't already have the correct dependencies, you can install them in a variety of ways, e.g. building from source, via a package manager. If you have access to `cvmfs`, the easiest solution is probably to source an [LCG release](https://lcgdocs.web.cern.ch/lcgdocs/lcgreleases/introduction/). For example, on an x86_64 Alma9 machine:
+```bash
+source /cvmfs/sft.cern.ch/lcg/views/LCG_108/x86_64-el9-gcc15-opt/setup.sh
+```
+Alternatively, you can create a conda environment which *should* provide a ready-to-go environment. If you have micromamba, you can do:
+```bash
+micromamba env create -n MaCh3 -c conda-forge root cmake
+```
+and if you don't have micromamba installed, you can follow the instructions [here](https://mamba.readthedocs.io/en/latest/installation/micromamba-installation.html).
+
+Before you build MaCh3 following the instructions at the [start](#building-against-mach3) of this README, make sure to activate the environment:
+```bash
+micromamba activate MaCh3
+```
+and do this everytime you begin from a fresh terminal and want to use MaCh3.
+
+> [!TIP]
+> For MacOS users: the conda environment approach has been validated to work for MacOS. Other avenues are likely to be more difficult.
+
+Other external libraries, which currently include:
 1. [yaml-cpp](https://github.com/jbeder/yaml-cpp)
 2. [spdlog](https://github.com/gabime/spdlog)
+
+are being handled through [CPM](https://github.com/cpm-cmake/CPM.cmake).
 
 Based on several test here are recommended version:
 ```bash
@@ -193,7 +224,7 @@ Based on several test here are recommended version:
 | Fedora32    | ✅     |
 | CentOS7     | ❔     |
 | Windows     | ❌     |
-| MacOS       | ❌     |
+| MacOS       | ❔     |
 
 ✅ - Part of CI/CD <br>
 ❔ - Not part of CI/CD but used by some users/developers so it might work <br>
