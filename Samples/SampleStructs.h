@@ -171,6 +171,24 @@ struct BinShiftLookup {
 };
 
 // ***************************
+/// @brief KS: This hold bin corners in N-Dimensions allowing to check if Bin falls into
+struct BinInfo {
+// ***************************
+  /// The corners of the bin, stored as {lower, upper} bounds for each dimension.
+  std::vector<std::array<double, 2>> Corners;
+
+  /// @brief Checks if a given event (point) falls inside the bin.
+  bool IsEventInside(const std::vector<double>& KinVars) const {
+    for(size_t i = 0; i < KinVars.size(); i++){
+      if(KinVars[i] < Corners[i][0] || KinVars[i] >= Corners[i][1]){
+        return false;
+      }
+    }
+    return true;
+  }
+};
+
+// ***************************
 /// @brief KS: Struct storing all information required for sample binning
 ///
 /// @details
@@ -197,32 +215,125 @@ struct SampleBinningInfo {
   std::vector<int> Strides;
   /// Tells whether to use inform binning grid or non-uniform
   bool Uniform = true;
+  /// Bins used only for non-uniform
+  std::vector<BinInfo> Bins;
+
+  /// @brief Initialise Uniform Binning
+  void InitUniform(const std::vector<std::vector<double>>& InputEdges) {
+    BinEdges = InputEdges;
+    Uniform = true;
+    AxisNBins.resize(BinEdges.size());
+
+    nBins = 1;
+    for(size_t iDim = 0; iDim < BinEdges.size(); iDim++)
+    {
+      const auto& Edges = BinEdges[iDim];
+      if (!std::is_sorted(Edges.begin(), Edges.end())) {
+        MACH3LOG_ERROR("VarBins for Dim {} must be in increasing order in sample config, VarBins: [{}]",
+                       iDim, fmt::join(Edges, ", "));
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+
+      //Sanity check that some binning has been specified
+      if(BinEdges[iDim].size() == 0){
+        MACH3LOG_ERROR("No binning specified for Dim {} of sample binning, please add some binning to the sample config", iDim);
+        MACH3LOG_ERROR("Please ensure BinEdges are correctly configured for all dimensions");
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+
+      // Set the number of bins for this dimension
+      AxisNBins[iDim] = BinEdges[iDim].size() - 1;
+      // Update total number of bins
+      nBins *= AxisNBins[iDim];
+
+      MACH3LOG_INFO("{}-Dim Binning: [{:.2f}]", iDim, fmt::join(BinEdges[iDim], ", "));
+    }
+    GlobalOffset = 0;
+    /// Lastly prepare special histograms used for event migration
+    InitialiseBinMigrationLookUp(static_cast<int>(BinEdges.size()));
+  }
+
+  void InitNonUniform(const std::vector<std::vector<std::vector<double>>>& InputBins) {
+    MACH3LOG_ERROR("Not implemented, what are you event doing here...");
+    throw MaCh3Exception(__FILE__, __LINE__);
+
+    Uniform = false;
+    nBins = 0;
+    Bins.resize(InputBins.size());
+
+    size_t CornerDim = InputBins[0].size();
+    for(size_t iBin = 0; iBin < InputBins.size(); iBin++) {
+      const auto& NewCorners = InputBins[iBin];
+      if (NewCorners.size() != CornerDim) {
+        MACH3LOG_ERROR("Dimension of Bin {} is {}, while others have {}", iBin, NewCorners.size(), CornerDim);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+
+      BinInfo NewBin;
+      for (const auto& corner : NewCorners) {
+        if (corner.size() != 2) {
+          MACH3LOG_ERROR("Corner size is not 2 for Bin {}", iBin);
+          throw MaCh3Exception(__FILE__, __LINE__);
+        }
+        NewBin.Corners.push_back({corner[0], corner[1]});
+        MACH3LOG_DEBUG("Adding corner [{}, {}] to Bin {}", corner[0], corner[1], iBin);
+      }
+      Bins[iBin] = NewBin;
+      nBins++;
+    }
+    /// @todo KS: Now we create "Large Bins" automatically, in future we can expand to add more user control
+    constexpr size_t BinsPerDimension = 20;
+    // Now we create huge map, which will allow to easily find non uniform bins
+    BinEdges.resize(CornerDim);
+    AxisNBins.resize(CornerDim);
+    for (size_t iDim = 0; iDim < CornerDim; iDim++) {
+      double MinVal = std::numeric_limits<double>::max();
+      double MaxVal = std::numeric_limits<double>::lowest();
+
+      // Find min and max for this dimension
+      for (const auto& bin : Bins) {
+        MinVal = std::min(MinVal, bin.Corners[iDim][0]);
+        MaxVal = std::max(MaxVal, bin.Corners[iDim][1]);
+      }
+
+      BinEdges[iDim].resize(BinsPerDimension + 1);
+      double BinWidth = (MaxVal - MinVal) / static_cast<double>(BinsPerDimension);
+      for (size_t iEdge = 0; iEdge <= BinsPerDimension; iEdge++) {
+        BinEdges[iDim][iEdge] = MinVal + static_cast<double>(iEdge) * BinWidth;
+      }
+      AxisNBins[iDim] = BinsPerDimension;
+    }
+
+    GlobalOffset = 0;
+    /// Lastly prepare special histograms used for event migration
+    InitialiseBinMigrationLookUp(static_cast<int>(BinEdges.size()));
+  }
 
   /// @brief Get linear bin index from ND bin indices with additional checks
-  /// @param Bins Vector of bin indices along each dimension
+  /// @param BinIndices Vector of bin indices along each dimension
   /// @warning this performs additional checks so do not use in parts of code used during fit
-  int GetBinSafe(const std::vector<int>& Bins) const {
-    for(int iDim = 0; iDim < static_cast<int>(Bins.size()); iDim++){
-      if (Bins[iDim] < 0 || Bins[iDim] >= static_cast<int>(AxisNBins[iDim])) {
+  int GetBinSafe(const std::vector<int>& BinIndices) const {
+    for(int iDim = 0; iDim < static_cast<int>(BinIndices.size()); iDim++){
+      if (BinIndices[iDim] < 0 || BinIndices[iDim] >= static_cast<int>(AxisNBins[iDim])) {
         MACH3LOG_ERROR("{}: Bin indices out of range: Dim = {}, Bin={}, max Ndim Bin={}",
-                       __func__, iDim, Bins[iDim], AxisNBins[iDim]);
+                       __func__, iDim, BinIndices[iDim], AxisNBins[iDim]);
         throw MaCh3Exception(__FILE__, __LINE__);
       }
     }
-    return GetBin(Bins);
+    return GetBin(BinIndices);
   }
 
   /// @brief Convert N-dimensional bin indices to a linear bin index.
-  /// @param Bins Vector of bin indices along each dimension
+  /// @param BinIndices Vector of bin indices along each dimension
   /// @details
   /// Mapping follows row-major order:
   ///  - 1D: xBin
   ///  - 2D: yBin * nXBins + xBin
   ///  - 3D: zBin * nXBins * nYBins + yBin * nXBins + xBin
-  int GetBin(const std::vector<int>& Bins) const {
+  int GetBin(const std::vector<int>& BinIndices) const {
     int BinNumber = 0;
-    for(size_t i = 0; i < Bins.size(); ++i) {
-      BinNumber += Bins[i]*Strides[i];
+    for(size_t i = 0; i < BinIndices.size(); ++i) {
+      BinNumber += BinIndices[i]*Strides[i];
     }
     return BinNumber;
   }

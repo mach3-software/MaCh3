@@ -104,8 +104,8 @@ struct SampleInfo {
       W2Hist->GetXaxis()->SetTitle(VarStr[0].c_str());
       W2Hist->GetYaxis()->SetTitle(VarStr[1].c_str());
     } else {
-      MACH3LOG_ERROR("Not supported for Dim {}", nDimensions);
-      throw MaCh3Exception(__FILE__, __LINE__);
+      MACH3LOG_DEBUG("Not supported for Dim {}", nDimensions);
+      return;
     }
 
     DataHist->SetDirectory(nullptr);
