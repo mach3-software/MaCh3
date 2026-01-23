@@ -1883,7 +1883,7 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
 
 // *********************
 TPad* MakeTrianglePad(int counterPad, double X_Min, double Y_Min, double X_Max, double Y_Max,
-                                     int nParamPlot, int x, int y) {
+                                     int nParamPlot, const double* margin, int x, int y) {
 // *********************
   TPad* Pad = new TPad(Form("TPad_%i", counterPad), Form("TPad_%i",
                             counterPad), X_Min, Y_Min, X_Max, Y_Max);
@@ -1897,9 +1897,9 @@ TPad* MakeTrianglePad(int counterPad, double X_Min, double Y_Min, double X_Max, 
   Pad->SetBorderSize(0);
 
   //KS: Corresponds to bottom part of the plot, need margins for labels
-  Pad->SetBottomMargin(y == (nParamPlot - 1) ? 0.1 : 0);
+  Pad->SetBottomMargin(y == (nParamPlot - 1) ? margin[1] : 0);
   //KS: Corresponds to left part, need margins for labels
-  Pad->SetLeftMargin(x == 0 ? 0.15 : 0);
+  Pad->SetLeftMargin(x == 0 ? margin[0] : 0);
 
   Pad->Draw();
   Pad->cd();
