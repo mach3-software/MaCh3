@@ -2124,7 +2124,7 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
       if(y == (nParamPlot-1))
       {
         Posterior->cd();
-        TriangleText[counterText] = std::make_unique<TText>(X_Min[x]+ (X_Max[x]-X_Min[x])/2., .05, hpost[ParamNumber[x]]->GetTitle());
+        TriangleText[counterText] = std::make_unique<TText>(X_Min[x] + (X_Max[x]-X_Min[x]+(x == 0 ? a_x : .0))/2., .05, hpost[ParamNumber[x]]->GetTitle());
         //KS: Unfortunately for many plots or long names this can go out of bounds :(
         //TN: Align the axis titles and scale them with the size of the plots
         TriangleText[counterText]->SetTextAlign(22);
@@ -2137,7 +2137,7 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
       if(x == 0)
       {
         Posterior->cd();
-        TriangleText[counterText] = std::make_unique<TText>(.05, Y_Min[y] + (Y_Max[y]-Y_Min[y])/2., hpost[ParamNumber[y]]->GetTitle());
+        TriangleText[counterText] = std::make_unique<TText>(.05, Y_Min[y] + (Y_Max[y]-Y_Min[y]+(y == nParamPlot-1 ? a_y : .0))/2., hpost[ParamNumber[y]]->GetTitle());
         //KS: Rotate as this is y axis
         TriangleText[counterText]->SetTextAngle(90);
         //KS: Unfortunately for many plots or long names this can go out of bounds :(
