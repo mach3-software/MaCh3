@@ -1107,7 +1107,7 @@ void FitterBase::RunLLHMap() {
   // Save the settings into the output file
   SaveSettings();
 
-  //MACH3LOG_INFO("Starting general LLH mapping scan");
+  MACH3LOG_INFO("Starting general LLH mapping scan");
 
   //KS: Turn it on if you want LLH scan for each ND sample separately, which increase time significantly but can be useful for validating new samples or dials.
   bool PlotLLHScanBySample = GetFromManager<bool>(fitMan->raw()["LLHScan"]["LLHScanBySample"], false, __FILE__ , __LINE__);
@@ -1147,6 +1147,26 @@ void FitterBase::RunLLHMap() {
 
   auto ParamsOfInterest = GetFromManager<std::vector<std::string>>(fitMan->raw()["LLHScan"]["LLHParameters"], {}, __FILE__, __LINE__);
 
+  // Parameters IDs within the covariance objects
+  // ParamsCovIDs["parameter"] = {CovObj, ID}
+  std::map<std::string, std::pair<ParameterHandlerBase*, int>> ParamsCovIDs;
+  for(auto p : ParamsOfInterest) {
+    bool found = false;
+    for(auto cov : systematics) {
+      for(int c = 0; c < cov->GetNumParams(); ++c) {
+        if(cov->GetParName(c) == p || cov->GetParFancyName(c) == p) {
+          ParamsCovIDs[p].first = cov;
+          ParamsCovIDs[p].second = c;
+          found = true;
+          break;
+          break;
+        }
+      }
+    }
+    if(found) MACH3LOG_INFO("Parameter {} found in {} at an index {}.", p, ParamsCovIDs[p].first->GetName(), ParamsCovIDs[p].second);
+    else MACH3LOG_WARN("Parameter {} not found in any of the systematic covariance objects. Will not scan over this one!", p);
+  }
+
   // ParamsRanges["parameter"] = {nPoints, {low, high}}
   std::map<std::string, std::pair<int, std::pair<double, double>>> ParamsRanges;
 
@@ -1155,17 +1175,55 @@ void FitterBase::RunLLHMap() {
   MACH3LOG_INFO("======================================================================================");
   long long TotalPoints = 1;
 
-  for(auto p : ParamsOfInterest) {
-    ParamsRanges[p].first = GetFromManager<int>(fitMan->raw()["LLHScan"]["LLHScanPoints"], 20, __FILE__, __LINE__);
+  // TN: Setting up the scan ranges might look like a re-implementation of the
+  // FitterBase::GetScanRange, but I guess the use-case here is a bit different.
+  // Anyway, just in case, we can discuss and rewrite to everyone's liking!
+  for(auto p : ParamsCovIDs) {
+    ParamsRanges[p.first].first = GetFromManager<int>(fitMan->raw()["LLHScan"]["LLHScanPoints"], 20, __FILE__, __LINE__);
+    if(CheckNodeExists(fitMan->raw(),"LLHScan","ScanPoints")) ParamsRanges[p.first].first = GetFromManager<int>(fitMan->raw()["LLHScan"]["ScanPoints"][p.first], ParamsRanges[p.first].first, __FILE__, __LINE__);
 
+    // Get the parameter priors and bounds
+    double CentralValue = p.second.first->GetParProp(p.second.second);
 
-    // If paramete
+    bool IsPCA = p.second.first->IsPCA();
+    if (IsPCA) CentralValue = p.second.first->GetPCAHandler()->GetParPropPCA(p.second.second);
+
+    double prior = p.second.first->GetParInit(p.second.second);
+    if (IsPCA) prior = p.second.first->GetPCAHandler()->GetPreFitValuePCA(p.second.second);
+
+    if (std::abs(CentralValue - prior) > 1e-10) {
+      MACH3LOG_INFO("For {} scanning around value {} rather than prior {}", p.first, CentralValue, prior);
+    }
+    // Get the covariance matrix and do the +/- nSigma
+    // Set lower and upper bounds relative the CentralValue
+    // Set the parameter ranges between which LLH points are scanned
+    const double nSigma = 1.;
+    double lower = CentralValue - nSigma*p.second.first->GetDiagonalError(p.second.second);
+    double upper = CentralValue + nSigma*p.second.first->GetDiagonalError(p.second.second);
+    // If PCA, transform these parameter values to the PCA basis
+    if (IsPCA) {
+      lower = CentralValue - nSigma*std::sqrt((p.second.first->GetPCAHandler()->GetEigenValues())(p.second.second));
+      upper = CentralValue + nSigma*std::sqrt((p.second.first->GetPCAHandler()->GetEigenValues())(p.second.second));
+      MACH3LOG_INFO("eval {} = {:.2f}", p.second.second, p.second.first->GetPCAHandler()->GetEigenValues()(p.second.second));
+      MACH3LOG_INFO("CV {} = {:.2f}", p.second.second, CentralValue);
+      MACH3LOG_INFO("lower {} = {:.2f}", p.second.second, lower);
+      MACH3LOG_INFO("upper {} = {:.2f}", p.second.second, upper);
+      MACH3LOG_INFO("nSigma = {:.2f}", nSigma);
+    }
+
+    ParamsRanges[p.first].second = {lower,upper};
+
+    if(CheckNodeExists(fitMan->raw(),"LLHScan","ScanRanges")) ParamsRanges[p.first].second = GetFromManager<std::pair<double,double>>(fitMan->raw()["LLHScan"]["ScanRanges"][p.first], ParamsRanges[p.first].second, __FILE__, __LINE__);
+
+    MACH3LOG_INFO("{} from {:.4f} to {:.4f} with a {:.5f} step ({} points total)",
+                  p.first, ParamsRanges[p.first].second.first, ParamsRanges[p.first].second.second,
+                  (ParamsRanges[p.first].second.second - ParamsRanges[p.first].second.first)/(ParamsRanges[p.first].first - 1.),
+                  ParamsRanges[p.first].first);
+
+    TotalPoints *= ParamsRanges[p.first].first;
   }
+  MACH3LOG_INFO("In total, looping over {} points, from {} parameters. Estimates for run time:", TotalPoints, ParamsCovIDs.size());
 
-
-  for(auto par : ParamsOfInterest) {
-    std::cout << par << std::endl;
-  }
 }
 
 // *************************
