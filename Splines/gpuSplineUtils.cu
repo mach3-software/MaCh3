@@ -78,7 +78,7 @@ __host__ void SynchroniseSplines() {
 //              INITIALISE GPU
 // *******************************************
 
-SMonolithGPU::SMonolithGPU(){
+SMonolithGPU::SMonolithGPU() {
   h_n_params     = -1;
   /// Number of events living on CPU
   h_n_events = -1;
@@ -97,8 +97,7 @@ SMonolithGPU::SMonolithGPU(){
   gpu_weights_tf1 = nullptr;
 }
 
-SMonolithGPU::~SMonolithGPU(){
-
+SMonolithGPU::~SMonolithGPU() {
 }
 
 // *******************************************

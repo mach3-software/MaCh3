@@ -15,7 +15,6 @@ LikelihoodFit::LikelihoodFit(Manager *man) : FitterBase(man) {
 // Destructor: close the logger and output file
 LikelihoodFit::~LikelihoodFit() {
 // *************************
-
 }
 
 // *******************
