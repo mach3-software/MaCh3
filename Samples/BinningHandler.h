@@ -94,7 +94,25 @@
 ///
 ///
 /// ### Non-Uniform
-/// TODO
+/// Internally, non-uniform binning is implemented using two levels:
+///
+/// 1. **MegaBins (mapping bins)**
+///    These form a coarse, *uniform* grid that spans the full phase space.
+///    Each MegaBin acts as a container for one or more non-uniform bins.
+///
+/// 2. **Non-Uniform bins**
+///    The actual analysis bins, defined as hyper-rectangles with arbitrary
+///    extents inside a MegaBin.
+///
+/// #### Bin finding procedure
+/// For a given event, the bin-finding algorithm proceeds as follows:
+///
+/// 1. Locate the MegaBin using the same fast per-dimension logic as in
+///    uniform binning.
+/// 2. Once the MegaBin is identified, loop over all non-uniform bins
+///    associated with that MegaBin.
+/// 3. The first bin whose extents fully contain the event is selected.
+/// 4. If no bin matches, the event is assigned to the under/overflow bin.
 ///
 ///
 ///
@@ -165,7 +183,8 @@ class BinningHandler {
   /// @brief Get bin number corresponding to where given sample ends
   /// @param iSample index of a given sample
   int GetSampleEndBin(const int iSample) const;
-
+  /// @brief Return NonUnifomr bins to for example check extent etc
+  const std::vector<BinInfo> GetNonUniformBins(const int iSample) const;
   /// @brief Sets the GlobalOffset for each SampleBinningInfo to enable linearization of multiple 2D binning samples.
   void SetGlobalBinNumbers();
 
