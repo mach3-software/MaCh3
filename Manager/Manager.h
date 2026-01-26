@@ -14,18 +14,18 @@ class TFile;
 /// @author Ed Atkin
 /// @author Kamil Skwarczynski
 /// @ingroup CoreClasses
-class manager {
+class Manager {
 public:
   /// @brief Constructs a manager object with the specified file name.
   /// @param filename The name of the configuration file.
-  explicit manager(std::string const &filename);
+  explicit Manager(std::string const &filename);
   /// @brief Constructs a manager object with the specified YAML
   /// @note This is primarily used when initializing from a previous chain, allowing the creation of a manager instance based embedded YAML in that chain.
   /// @param ConfigNode Actual YAML config
-  manager(const YAML::Node ConfigNode);
+  Manager(const YAML::Node ConfigNode);
 
   /// @brief Destroys the manager object.
-  virtual ~manager();
+  virtual ~Manager();
 
   /// @brief Add manager useful information's to TFile, in most cases to Fitter
   /// @param OutputFile The ROOT TFile to which the information will be added.

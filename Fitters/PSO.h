@@ -77,7 +77,7 @@ class particle{
 class PSO : public LikelihoodFit {
   public:
     /// @brief constructor
-    PSO(manager * const fitMan);
+    PSO(Manager * const fitMan);
     /// @brief Destructor
     virtual ~PSO() {};
 

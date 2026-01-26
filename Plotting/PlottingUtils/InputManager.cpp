@@ -1,4 +1,4 @@
-#include "inputManager.h"
+#include "InputManager.h"
 
 
 namespace MaCh3Plotting {

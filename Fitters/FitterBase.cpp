@@ -11,12 +11,12 @@ _MaCh3_Safe_Include_End_ //}
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 
 // *************************
-// Initialise the manager and make it an object of FitterBase class
-// Now we can dump manager settings to the output file
-FitterBase::FitterBase(manager * const man) : fitMan(man) {
+// Initialise the Manager and make it an object of FitterBase class
+// Now we can dump Manager settings to the output file
+FitterBase::FitterBase(Manager * const man) : fitMan(man) {
 // *************************
   AlgorithmName = "";
-  //Get mach3 modes from manager
+  //Get mach3 modes from Manager
   random = std::make_unique<TRandom3>(Get<int>(fitMan->raw()["General"]["Seed"], __FILE__, __LINE__));
 
   // Counter of the accepted # of steps
@@ -1221,7 +1221,7 @@ void FitterBase::RunSigmaVar() {
       {
         for(int k = 0; k < samples[ivs]->GetNsamples(); k++ )
         {
-          std::string title = std::string(samples[ivs]->GetPDF(k)->GetName());
+          std::string title = std::string(samples[ivs]->GetMCHist(k)->GetName());
           dirArryDial->cd();
           dirArrySample[SampleIterator] = dirArryDial->mkdir(title.c_str());
           SampleIterator++;
@@ -1290,7 +1290,7 @@ void FitterBase::RunSigmaVar() {
             ss << paramVal;
             std::string parVarTitle = name + "_" + ss.str();
 
-            auto currSamp = M3::Clone<TH2Poly>(static_cast<TH2Poly*>(samples[ivs]->GetPDF(k)));
+            auto currSamp = M3::Clone<TH2Poly>(static_cast<TH2Poly*>(samples[ivs]->GetMCHist(k)));
             // Set a descriptiv-ish title
             std::string title_long = std::string(currSamp->GetName())+"_"+parVarTitle;
 
@@ -1331,13 +1331,13 @@ void FitterBase::RunSigmaVar() {
             //KS: This will give different results depending if data or Asimov, both have their uses
             if (PlotLLHperBin)
             {
-              auto currLLHSamp = M3::Clone<TH2Poly>(static_cast<TH2Poly*>(samples[ivs]->GetPDF(k)));
+              auto currLLHSamp = M3::Clone<TH2Poly>(static_cast<TH2Poly*>(samples[ivs]->GetMCHist(k)));
               currLLHSamp->Reset("");
               currLLHSamp->Fill(0.0, 0.0, 0.0);
 
-              TH2Poly* MCpdf = static_cast<TH2Poly*>(samples[ivs]->GetPDF(k));
-              TH2Poly* Datapdf = static_cast<TH2Poly*>(samples[ivs]->GetData(k));
-              TH2Poly* W2pdf = samples[ivs]->GetW2(k);
+              TH2Poly* MCpdf = static_cast<TH2Poly*>(samples[ivs]->GetMCHist(k));
+              TH2Poly* Datapdf = static_cast<TH2Poly*>(samples[ivs]->GetDataHist(k));
+              TH2Poly* W2pdf = static_cast<TH2Poly*>(samples[ivs]->GetW2Hist(k));
 
               for(int bin = 1; bin < currLLHSamp->GetNumberOfBins()+1; bin++)
               {
@@ -1385,7 +1385,7 @@ void FitterBase::RunSigmaVar() {
       {
         for (int k = 0; k < samples[ivs]->GetNsamples(); ++k)
         {
-          std::string title = std::string(samples[ivs]->GetPDF(k)->GetName()) + "_" + name;
+          std::string title = std::string(samples[ivs]->GetMCHist(k)->GetName()) + "_" + name;
           auto var_x = MakeAsymGraph(sigmaArray_x[1][SampleIterator].get(), sigmaArray_x[2][SampleIterator].get(), sigmaArray_x[3][SampleIterator].get(), (title+"_X").c_str());
           auto var_y = MakeAsymGraph(sigmaArray_y[1][SampleIterator].get(), sigmaArray_y[2][SampleIterator].get(), sigmaArray_y[3][SampleIterator].get(), (title+"_Y").c_str());
 
@@ -1508,17 +1508,9 @@ void WriteHistogramsByMode(SampleHandlerFD *sample,
   for (int iSample = 0; iSample < sample->GetNsamples(); ++iSample) {
     SampleDir[iSample]->cd();
     const std::string sampleName = sample->GetSampleTitle(iSample);
-    for(int iDim = 0; iDim < sample->GetNDim(iSample); iDim++) {
-      std::string ProjectionName = "";
-      std::string ProjectionSuffix = "_1DProj" + std::to_string(iDim);
-      if(iDim == 0) {
-        ProjectionName = sample->GetXBinVarName(iSample);
-      } else if (iDim == 1) {
-        ProjectionName = sample->GetYBinVarName(iSample);
-      } else {
-        MACH3LOG_ERROR("Not yet implemented for dimension {}", iDim+1);
-        throw MaCh3Exception(__FILE__, __LINE__);
-      }
+    for(int iDim1 = 0; iDim1 < sample->GetNDim(iSample); iDim1++) {
+      std::string ProjectionName = sample->GetKinVarName(iSample, iDim1);
+      std::string ProjectionSuffix = "_1DProj" + std::to_string(iDim1);
 
       // Probably a better way of handling this logic
       if (by_mode) {
@@ -1551,10 +1543,20 @@ void WriteHistogramsByMode(SampleHandlerFD *sample,
         auto hist = sample->Get1DVarHist(iSample, ProjectionName);
         WriteHistograms(hist, sampleName + ProjectionSuffix + suffix);
         delete hist;
-        // Only for 2D
-        if(iDim == 1) {
-          auto hist2D = sample->Get2DVarHist(iSample, sample->GetXBinVarName(iSample), sample->GetYBinVarName(iSample));
-          WriteHistograms(hist2D, sampleName + "_2DProj" + suffix);
+        // Only for 2D and Beyond
+        for (int iDim2 = iDim1 + 1; iDim2 < sample->GetNDim(iSample); ++iDim2) {
+          // Get the names for the two dimensions
+          std::string XVarName = sample->GetKinVarName(iSample, iDim1);
+          std::string YVarName = sample->GetKinVarName(iSample, iDim2);
+
+          // Get the 2D histogram for this pair
+          auto hist2D = sample->Get2DVarHist(iSample, XVarName, YVarName);
+
+          // Write the histogram
+          std::string suffix2D = "_2DProj_" + std::to_string(iDim1) + "_vs_" + std::to_string(iDim2) + suffix;
+          WriteHistograms(hist2D, sampleName + suffix2D);
+
+          // Clean up
           delete hist2D;
         }
       }
@@ -1629,12 +1631,7 @@ void FitterBase::RunSigmaVarFD() {
           /// Apply custom range to make easier comparison with p-theta
           CustomRange(ParName, sigma, ParamShiftValue);
 
-          MACH3LOG_INFO(
-            "  - set to {:<5.2f} ({:<2} sigma shift)",
-                        ParamShiftValue,
-                        sigma
-          );
-
+          MACH3LOG_INFO("  - set to {:<5.2f} ({:<2} sigma shift)", ParamShiftValue, sigma);
           systematics[s]->SetParProp(i, ParamShiftValue);
 
           std::ostringstream valStream;
