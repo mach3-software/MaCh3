@@ -604,7 +604,7 @@ void SampleHandlerFD::ApplyShifts(const int iEvent) {
 M3::float_t SampleHandlerFD::CalcWeightTotal(const EventInfo* _restrict_ MCEvent) const {
 // ***************************************************************************
   M3::float_t TotalWeight = 1.0;
-  const int nNorms = static_cast<int>(MCEvent->xsec_norm_pointers.size());
+  const int nNorms = static_cast<int>(MCEvent->norm_pointers.size());
   //Loop over stored normalisation and function pointers
   #ifdef MULTITHREAD
   #pragma omp simd
@@ -613,7 +613,7 @@ M3::float_t SampleHandlerFD::CalcWeightTotal(const EventInfo* _restrict_ MCEvent
   {
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wuseless-cast"
-    TotalWeight *= static_cast<M3::float_t>(*(MCEvent->xsec_norm_pointers[iParam]));
+    TotalWeight *= static_cast<M3::float_t>(*(MCEvent->norm_pointers[iParam]));
     #pragma GCC diagnostic pop
   }
 
@@ -651,9 +651,9 @@ void SampleHandlerFD::SetupNormParameters() {
   for (unsigned int iEvent = 0; iEvent < GetNEvents(); ++iEvent) {
     counter = 0;
 
-    MCSamples[iEvent].xsec_norm_pointers.resize(xsec_norms_bins[iEvent].size());
+    MCSamples[iEvent].norm_pointers.resize(xsec_norms_bins[iEvent].size());
     for(auto const & norm_bin: xsec_norms_bins[iEvent]) {
-      MCSamples[iEvent].xsec_norm_pointers[counter] = ParHandler->RetPointer(norm_bin);
+      MCSamples[iEvent].norm_pointers[counter] = ParHandler->RetPointer(norm_bin);
       counter += 1;
     }
   }
