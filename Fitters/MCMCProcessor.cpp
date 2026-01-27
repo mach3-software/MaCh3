@@ -380,11 +380,6 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
   SettingsBranch->Branch("NDParameters", &NDParameters);
   int NDParametersStartingPos = ParamTypeStartPos[kNDPar];
   SettingsBranch->Branch("NDParametersStartingPos", &NDParametersStartingPos);
-
-  int FDParameters = nParam[kFDDetPar];
-  SettingsBranch->Branch("FDParameters", &FDParameters);
-  int FDParametersStartingPos = ParamTypeStartPos[kFDDetPar];
-  SettingsBranch->Branch("FDParametersStartingPos", &FDParametersStartingPos);
   
   SettingsBranch->Branch("NDSamplesBins", &NDSamplesBins);
   SettingsBranch->Branch("NDSamplesNames", &NDSamplesNames);
@@ -1880,33 +1875,6 @@ void MCMCProcessor::MakeCredibleRegions(const std::vector<double>& CredibleRegio
   OutputFile->cd();
 }
 
-
-// *********************
-TPad* MakeTrianglePad(int counterPad, double X_Min, double Y_Min, double X_Max, double Y_Max,
-                                     int nParamPlot, int x, int y) {
-// *********************
-  TPad* Pad = new TPad(Form("TPad_%i", counterPad), Form("TPad_%i",
-                            counterPad), X_Min, Y_Min, X_Max, Y_Max);
-
-  Pad->SetTopMargin(0);
-  Pad->SetRightMargin(0);
-
-  Pad->SetGrid();
-  Pad->SetFrameBorderMode(0);
-  Pad->SetBorderMode(0);
-  Pad->SetBorderSize(0);
-
-  //KS: Corresponds to bottom part of the plot, need margins for labels
-  Pad->SetBottomMargin(y == (nParamPlot - 1) ? 0.1 : 0);
-  //KS: Corresponds to left part, need margins for labels
-  Pad->SetLeftMargin(x == 0 ? 0.15 : 0);
-
-  Pad->Draw();
-  Pad->cd();
-
-  return Pad;
-}
-
 // *********************
 // Make fancy triangle plot for selected parameters
 void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
@@ -1921,12 +1889,13 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
                                      const bool CredibleInSigmas) {
 // *********************
   if(hpost2D.size() == 0) MakeCovariance_MP();
-  MACH3LOG_INFO("Making Triangle Plot");
 
   const int nParamPlot = int(ParNames.size());
   std::vector<int> ParamNumber;
+  std::string ParamInfoNames = "Making Triangle Plot for { ";
   for(int j = 0; j < nParamPlot; ++j)
   {
+    ParamInfoNames += fmt::format("{} ", ParNames[j]);
     int ParamNo = GetParamIndexFromName(ParNames[j]);
     if(ParamNo == M3::_BAD_INT_)
     {
@@ -1935,6 +1904,8 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
     }
     ParamNumber.push_back(ParamNo);
   }
+  ParamInfoNames += "}";
+  MACH3LOG_INFO("{}", ParamInfoNames);
 
   //KS: Store it as we go back to them at the end
   const std::vector<double> Margins = GetMargins(Posterior);
@@ -1987,25 +1958,53 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
   //KS: Super convoluted way of calculating ranges for our pads, trust me it works...
   std::vector<double> X_Min(nParamPlot);
   std::vector<double> X_Max(nParamPlot);
-  X_Min[0] = 0.10;
-  double xScale = (0.95 - (X_Min[0]+0.05))/nParamPlot;
-  //KS: 0.05 is because we need additional offset for labels
-  X_Max[0] = X_Min[0]+xScale+0.05;
+
+  //TN:
+  // n = number of params (nParamPlot)
+  // a_x = width of the left margin space for pad axis labels on the left in canvas coordinates
+  // a_y = height of the bottom margin space for pad axis labels on the bottom in canvas coordinates
+  // b_x = pad plot width in canvas coordinates
+  // b_y = pad plot height in canvas coordinates
+  // Pm = a/(a+b) = actual margin within the first plot from the left (a_x,b_x) or bottom (a_y,b_y); Pm = {left,bottom}
+  // TPm = desired margin of the whole triangle plot in canvas coordinates; TPm = {left, bottom, right, top}
+  // TPw = 1.-TPm[0]-TPm[2] width of the triangle plot in canvas coordinates
+  // TPh = 1.-TPm[1]-TPm[3] height of the triangle plot in canvas coordinates
+  // Then a_x+n*b_x = TPw = 1.-TPm[0]-TPm[1]
+  // Hence from that:
+  // a_x = Pm[0]*(a_x+b_x) = Pm[0]*(a_x+(TPw-a_x)/n) => a_x = (Pm[0]*TPw)/(n+Pm[0]*(1-n))
+  // b_x = (TPw-a_x)/n
+
+  // The inputs:
+  const double TPm[4] = {.07,.07,.05,.05};
+  const double Pm[2] = {.2,.1};
+
+  // Auxiliary x-direction:
+  const double TPw = 1. - TPm[0] - TPm[2];
+  const double a_x = ( Pm[0] * TPw ) / ( 1. * nParamPlot + Pm[0] * ( 1. - 1.*nParamPlot ) );
+  const double b_x = ( TPw - a_x ) / ( 1. * nParamPlot );
+
+  X_Min[0] = TPm[0];
+  X_Max[0] = X_Min[0] + a_x + b_x;
   for(int i = 1; i < nParamPlot; i++)
   {
     X_Min[i] = X_Max[i-1];
-    X_Max[i] = X_Min[i]+xScale;
+    X_Max[i] = X_Min[i]+b_x;
   }
+
   std::vector<double> Y_Min(nParamPlot);
   std::vector<double> Y_Max(nParamPlot);
-  Y_Max[0] = 0.95;
-  //KS: 0.10 is becasue we need additional offset for labels
-  double yScale = std::fabs(0.10 - (Y_Max[0]))/nParamPlot;
-  Y_Min[0] = Y_Max[0]-yScale;
-  for(int i = 1; i < nParamPlot; i++)
+
+  // Auxiliary y-direction:
+  const double TPh = 1. - TPm[1] - TPm[3];
+  const double a_y = ( Pm[1] * TPh ) / ( 1. * nParamPlot + Pm[1] * ( 1. - 1.*nParamPlot ) );
+  const double b_y = ( TPh - a_y ) / ( 1. * nParamPlot );
+
+  Y_Min[nParamPlot-1] = TPm[1];
+  Y_Max[nParamPlot-1] = Y_Min[nParamPlot-1] + a_y + b_y;
+  for(int i = nParamPlot-2; i >= 0; i--)
   {
-    Y_Max[i] = Y_Min[i-1];
-    Y_Min[i] = Y_Max[i]-yScale;
+    Y_Min[i] = Y_Max[i+1];
+    Y_Max[i] = Y_Min[i]+b_y;
   }
 
   //KS: We store as numbering of isn't straightforward
@@ -2018,7 +2017,23 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
     {
       //KS: Need to go to canvas every time to have our pads in the same canvas, not pads in the pads
       Posterior->cd();
-      TrianglePad[counterPad] = MakeTrianglePad(counterPad, X_Min[x], X_Max[x], Y_Min[y], Y_Max[y], nParamPlot, x, y);
+      TrianglePad[counterPad] = new TPad(Form("TPad_%i", counterPad), Form("TPad_%i", counterPad), X_Min[x], Y_Min[y], X_Max[x], Y_Max[y]);
+
+      TrianglePad[counterPad]->SetTopMargin(0);
+      TrianglePad[counterPad]->SetRightMargin(0);
+
+      TrianglePad[counterPad]->SetGrid();
+      TrianglePad[counterPad]->SetFrameBorderMode(0);
+      TrianglePad[counterPad]->SetBorderMode(0);
+      TrianglePad[counterPad]->SetBorderSize(0);
+
+      //KS: Corresponds to bottom part of the plot, need margins for labels
+      TrianglePad[counterPad]->SetBottomMargin(y == (nParamPlot - 1) ? Pm[1] : 0);
+      //KS: Corresponds to left part, need margins for labels
+      TrianglePad[counterPad]->SetLeftMargin(x == 0 ? Pm[0] : 0);
+
+      TrianglePad[counterPad]->Draw();
+      TrianglePad[counterPad]->cd();
 
       //KS:if diagonal plot main posterior
       if(x == y)
@@ -2049,6 +2064,15 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
         //KS: Don't want any titles
         FormatHistogram(hpost_copy[counterPost]);
 
+        //TN: Scale the size of labels with the plots size.
+        //Unfortunately, this needs to managed through absolute sizes
+        //as each pad is of different size.
+        hpost_copy[counterPost]->GetXaxis()->SetLabelFont(133);
+        hpost_copy[counterPost]->GetXaxis()->SetLabelSize(.08*(a_y+b_y)*Posterior->GetWh());
+
+        hpost_copy[counterPost]->GetYaxis()->SetLabelFont(133);
+        hpost_copy[counterPost]->GetYaxis()->SetLabelSize(.08*(a_y+b_y)*Posterior->GetWh());
+
         hpost_copy[counterPost]->Draw("HIST");
         for (int j = 0; j < nCredibleIntervals; ++j){
           hpost_cl[counterPost][j]->Draw("HIST SAME");
@@ -2075,6 +2099,15 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
         //KS: Don't want any titles
         FormatHistogram(hpost_2D_copy[counter2DPost]);
 
+        //TN: Scale the size of labels with the plots size.
+        //Unfortunately, this needs to managed through absolute sizes
+        //as each pad is of different size.
+        hpost_2D_copy[counter2DPost]->GetXaxis()->SetLabelFont(133);
+        hpost_2D_copy[counter2DPost]->GetXaxis()->SetLabelSize(.08*(a_y+b_y)*Posterior->GetWh());
+
+        hpost_2D_copy[counter2DPost]->GetYaxis()->SetLabelFont(133);
+        hpost_2D_copy[counter2DPost]->GetYaxis()->SetLabelSize(.08*(a_y+b_y)*Posterior->GetWh());
+
         hpost_2D_copy[counter2DPost]->Draw("COL");
         //Now credible regions
         for (int k = 0; k < nCredibleRegions; ++k){
@@ -2086,9 +2119,11 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
       if(y == (nParamPlot-1))
       {
         Posterior->cd();
-        TriangleText[counterText] = std::make_unique<TText>(X_Min[x]+ (X_Max[x]-X_Min[x])/4, 0.04, hpost[ParamNumber[x]]->GetTitle());
+        TriangleText[counterText] = std::make_unique<TText>(X_Min[x] + (X_Max[x]-X_Min[x]+(x == 0 ? a_x : .0))/2., .05, hpost[ParamNumber[x]]->GetTitle());
         //KS: Unfortunately for many plots or long names this can go out of bounds :(
-        TriangleText[counterText]->SetTextSize(0.015);
+        //TN: Align the axis titles and scale them with the size of the plots
+        TriangleText[counterText]->SetTextAlign(22);
+        TriangleText[counterText]->SetTextSize(.08*(a_y+b_y));
         TriangleText[counterText]->SetNDC(true);
         TriangleText[counterText]->Draw();
         counterText++;
@@ -2097,11 +2132,13 @@ void MCMCProcessor::MakeTrianglePlot(const std::vector<std::string>& ParNames,
       if(x == 0)
       {
         Posterior->cd();
-        TriangleText[counterText] = std::make_unique<TText>(0.04, Y_Min[y] + (Y_Max[y]-Y_Min[y])/4, hpost[ParamNumber[y]]->GetTitle());
+        TriangleText[counterText] = std::make_unique<TText>(.05, Y_Min[y] + (Y_Max[y]-Y_Min[y]+(y == nParamPlot-1 ? a_y : .0))/2., hpost[ParamNumber[y]]->GetTitle());
         //KS: Rotate as this is y axis
         TriangleText[counterText]->SetTextAngle(90);
         //KS: Unfortunately for many plots or long names this can go out of bounds :(
-        TriangleText[counterText]->SetTextSize(0.015);
+        //TN: Align the axis titles and scale them with the size of the plots
+        TriangleText[counterText]->SetTextAlign(22);
+        TriangleText[counterText]->SetTextSize(.08*(a_y+b_y));
         TriangleText[counterText]->SetNDC(true);
         TriangleText[counterText]->Draw();
         counterText++;

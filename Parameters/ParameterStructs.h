@@ -398,5 +398,4 @@ inline std::string SystType_ToString(const SystType i) {
 /// @note right now it is empty
 struct OscillationParameter : public TypeParameterBase {
 // *******************
-
 };
