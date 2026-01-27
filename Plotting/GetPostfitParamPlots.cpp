@@ -835,6 +835,12 @@ void GetViolinPlots()
   canvas->SetLeftMargin(0.10);
   canvas->Print((OutputName+".pdf[").c_str());
   canvas->SetGrid();
+
+  if(man->input().getFile(0).file->Get<TH2D>( "param_violin_prior" ) == nullptr)
+  {
+    MACH3LOG_WARN("Couldn't find violin plot, make sure method from MCMCProcessor is being called");
+    return;
+  }
   std::unique_ptr<TH2D> ViolinPre = M3::Clone(man->input().getFile(0).file->Get<TH2D>( "param_violin_prior" ));
   // Do some fancy replacements
   ViolinPre->SetFillColor(kRed);
