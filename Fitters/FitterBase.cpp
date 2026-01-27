@@ -445,7 +445,7 @@ void FitterBase::ProcessMCMC() {
     // Re-open the TFile
     if (!outputFile->IsOpen()) {
       MACH3LOG_INFO("Opening output again to update with means..");
-      outputFile = new TFile(Get<std::string>(fitMan->raw()["General"]["Output"]["Filename"], __FILE__, __LINE__).c_str(), "UPDATE");
+      outputFile = new TFile(Get<std::string>(fitMan->raw()["General"]["OutputFile"], __FILE__, __LINE__).c_str(), "UPDATE");
     }
     Central->Write("PDF_Means");
     Errors->Write("PDF_Errors");
