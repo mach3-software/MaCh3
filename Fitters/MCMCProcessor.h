@@ -306,7 +306,7 @@ class MCMCProcessor {
     /// @brief Toggle using the FFT-based autocorrelation calculator
     inline void SetUseFFTAutoCorrelation(const bool useFFT){useFFTAutoCorrelation = useFFT; };
 
-    /// @brief Setter related what parameters we want to exclude from analysis, for example if cross-section parameters look like xsec_, then passing "xsec_" will
+    /// @brief Setter related what parameters we want to exclude from analysis, for example if cross-section parameters look like param_, then passing "param_" will
     inline void SetExcludedTypes(std::vector<std::string> Name){ExcludedTypes = Name; };
     inline void SetExcludedNames(std::vector<std::string> Name){ExcludedNames = Name; };
     inline void SetExcludedGroups(std::vector<std::string> Name){ExcludedGroups = Name; };

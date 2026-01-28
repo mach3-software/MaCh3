@@ -145,7 +145,7 @@ struct EventInfo {
   const double* rw_truecz = &M3::_BAD_DOUBLE_;
 
   /// Pointers to normalisation weights which are being taken from Parameter Handler
-  std::vector<const double*> xsec_norm_pointers;
+  std::vector<const double*> norm_pointers;
 
   /// Pointers to weights like oscillation spline etc
   std::vector<const M3::float_t*> total_weight_pointers;

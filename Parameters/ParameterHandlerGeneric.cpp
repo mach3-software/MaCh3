@@ -424,8 +424,8 @@ void ParameterHandlerGeneric::IterateOverParams(const std::string& SampleName, F
 void ParameterHandlerGeneric::InitParams() {
 // ********************************************
   for (int i = 0; i < _fNumPar; ++i) {
-    //ETA - set the name to be xsec_% as this is what ProcessorMCMC expects
-    _fNames[i] = "xsec_"+std::to_string(i);
+    //ETA - set the name to be param_% as this is what ProcessorMCMC expects
+    _fNames[i] = "param_"+std::to_string(i);
 
     // KS: Plenty
     if(_fParamType[i] == kOsc){
@@ -808,81 +808,81 @@ void ParameterHandlerGeneric::DumpMatrixToFile(const std::string& Name) {
 // ********************************************
   TFile* outputFile = new TFile(Name.c_str(), "RECREATE");
 
-  TObjArray* xsec_param_names = new TObjArray();
-  TObjArray* xsec_spline_interpolation = new TObjArray();
-  TObjArray* xsec_spline_names = new TObjArray();
+  TObjArray* param_names = new TObjArray();
+  TObjArray* spline_interpolation = new TObjArray();
+  TObjArray* spline_names = new TObjArray();
 
-  TVectorD* xsec_param_prior = new TVectorD(_fNumPar);
-  TVectorD* xsec_flat_prior = new TVectorD(_fNumPar);
-  TVectorD* xsec_stepscale = new TVectorD(_fNumPar);
-  TVectorD* xsec_param_lb = new TVectorD(_fNumPar);
-  TVectorD* xsec_param_ub = new TVectorD(_fNumPar);
+  TVectorD* param_prior = new TVectorD(_fNumPar);
+  TVectorD* flat_prior = new TVectorD(_fNumPar);
+  TVectorD* stepscale = new TVectorD(_fNumPar);
+  TVectorD* param_lb = new TVectorD(_fNumPar);
+  TVectorD* param_ub = new TVectorD(_fNumPar);
 
-  TVectorD* xsec_param_knot_weight_lb = new TVectorD(_fNumPar);
-  TVectorD* xsec_param_knot_weight_ub = new TVectorD(_fNumPar);
-  TVectorD* xsec_error = new TVectorD(_fNumPar);
+  TVectorD* param_knot_weight_lb = new TVectorD(_fNumPar);
+  TVectorD* param_knot_weight_ub = new TVectorD(_fNumPar);
+  TVectorD* error = new TVectorD(_fNumPar);
 
   for(int i = 0; i < _fNumPar; ++i)
   {
     TObjString* nameObj = new TObjString(_fFancyNames[i].c_str());
-    xsec_param_names->AddLast(nameObj);
+    param_names->AddLast(nameObj);
 
     TObjString* splineType = new TObjString("TSpline3");
-    xsec_spline_interpolation->AddLast(splineType);
+    spline_interpolation->AddLast(splineType);
 
     TObjString* splineName = new TObjString("");
-    xsec_spline_names->AddLast(splineName);
+    spline_names->AddLast(splineName);
 
-    (*xsec_param_prior)[i] = _fPreFitValue[i];
-    (*xsec_flat_prior)[i] = _fFlatPrior[i];
-    (*xsec_stepscale)[i] = _fIndivStepScale[i];
-    (*xsec_error)[i] = _fError[i];
+    (*param_prior)[i] = _fPreFitValue[i];
+    (*flat_prior)[i] = _fFlatPrior[i];
+    (*stepscale)[i] = _fIndivStepScale[i];
+    (*error)[i] = _fError[i];
 
-    (*xsec_param_lb)[i] = _fLowBound[i];
-    (*xsec_param_ub)[i] = _fUpBound[i];
+    (*param_lb)[i] = _fLowBound[i];
+    (*param_ub)[i] = _fUpBound[i];
 
     //Default values
-    (*xsec_param_knot_weight_lb)[i] = -9999;
-    (*xsec_param_knot_weight_ub)[i] = +9999;
+    (*param_knot_weight_lb)[i] = -9999;
+    (*param_knot_weight_ub)[i] = +9999;
   }
 
   for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
     auto &SplineIndex = pair.first;
     auto &SystIndex = pair.second;
 
-    (*xsec_param_knot_weight_lb)[SystIndex] = SplineParams.at(SplineIndex)._SplineKnotLowBound;
-    (*xsec_param_knot_weight_ub)[SystIndex] = SplineParams.at(SplineIndex)._SplineKnotUpBound;
+    (*param_knot_weight_lb)[SystIndex] = SplineParams.at(SplineIndex)._SplineKnotLowBound;
+    (*param_knot_weight_ub)[SystIndex] = SplineParams.at(SplineIndex)._SplineKnotUpBound;
 
     TObjString* splineType = new TObjString(SplineInterpolation_ToString(SplineParams.at(SplineIndex)._SplineInterpolationType).c_str());
-    xsec_spline_interpolation->AddAt(splineType, SystIndex);
+    spline_interpolation->AddAt(splineType, SystIndex);
 
     TObjString* splineName = new TObjString(_fSplineNames[SplineIndex].c_str());
-    xsec_spline_names->AddAt(splineName, SystIndex);
+    spline_names->AddAt(splineName, SystIndex);
   }
-  xsec_param_names->Write("xsec_param_names", TObject::kSingleKey);
-  delete xsec_param_names;
-  xsec_spline_interpolation->Write("xsec_spline_interpolation", TObject::kSingleKey);
-  delete xsec_spline_interpolation;
-  xsec_spline_names->Write("xsec_spline_names", TObject::kSingleKey);
-  delete xsec_spline_names;
+  param_names->Write("xsec_param_names", TObject::kSingleKey);
+  delete param_names;
+  spline_interpolation->Write("xsec_spline_interpolation", TObject::kSingleKey);
+  delete spline_interpolation;
+  spline_names->Write("xsec_spline_names", TObject::kSingleKey);
+  delete spline_names;
 
-  xsec_param_prior->Write("xsec_param_prior");
-  delete xsec_param_prior;
-  xsec_flat_prior->Write("xsec_flat_prior");
-  delete xsec_flat_prior;
-  xsec_stepscale->Write("xsec_stepscale");
-  delete xsec_stepscale;
-  xsec_param_lb->Write("xsec_param_lb");
-  delete xsec_param_lb;
-  xsec_param_ub->Write("xsec_param_ub");
-  delete xsec_param_ub;
+  param_prior->Write("xsec_param_prior");
+  delete param_prior;
+  flat_prior->Write("xsec_flat_prior");
+  delete flat_prior;
+  stepscale->Write("xsec_stepscale");
+  delete stepscale;
+  param_lb->Write("xsec_param_lb");
+  delete param_lb;
+  param_ub->Write("xsec_param_ub");
+  delete param_ub;
 
-  xsec_param_knot_weight_lb->Write("xsec_param_knot_weight_lb");
-  delete xsec_param_knot_weight_lb;
-  xsec_param_knot_weight_ub->Write("xsec_param_knot_weight_ub");
-  delete xsec_param_knot_weight_ub;
-  xsec_error->Write("xsec_error");
-  delete xsec_error;
+  param_knot_weight_lb->Write("xsec_param_knot_weight_lb");
+  delete param_knot_weight_lb;
+  param_knot_weight_ub->Write("xsec_param_knot_weight_ub");
+  delete param_knot_weight_ub;
+  error->Write("xsec_error");
+  delete error;
 
   covMatrix->Write("xsec_cov");
   TH2D* CorrMatrix = GetCorrelationMatrix();

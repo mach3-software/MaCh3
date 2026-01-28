@@ -471,9 +471,9 @@ protected:
   /// KS: This is used when printing parameters, sometimes we have super long parameters name, we want to flexibly adjust couts
   int PrintLength;
 
-  /// ETA _fNames is set automatically in the covariance class to be something like xsec_i, this is currently to make things compatible with the Diagnostic tools
+  /// ETA _fNames is set automatically in the covariance class to be something like param_i, this is currently to make things compatible with the Diagnostic tools
   std::vector<std::string> _fNames;
-  /// Fancy name for example rather than xsec_0 it is MAQE, useful for human reading
+  /// Fancy name for example rather than param_0 it is MAQE, useful for human reading
   std::vector<std::string> _fFancyNames;
   /// Stores config describing systematics
   YAML::Node _fYAMLDoc;
