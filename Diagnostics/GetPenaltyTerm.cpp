@@ -233,7 +233,7 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
     TString bname = br->GetName();
 
     // If we're on beam systematics
-    if(bname.BeginsWith("xsec_"))
+    if(bname.BeginsWith("param_"))
     {
       BranchNames.push_back(bname);
       RelevantBranches++;

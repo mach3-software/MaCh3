@@ -2605,7 +2605,7 @@ void MCMCProcessor::ReadModelFile() {
     if(ParameterGroup.back() == "Osc") {
       BranchNames.push_back(ParamNames[kXSecPar].back());
     } else {
-      BranchNames.push_back("xsec_" + std::to_string(paramIndex));
+      BranchNames.push_back("param_" + std::to_string(paramIndex));
     }
 
     // Check that the branch exists before setting address
