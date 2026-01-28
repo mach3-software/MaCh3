@@ -604,7 +604,11 @@ void SaveResults() {
       while (temp.find(".root") != std::string::npos) {
         temp = temp.substr(0, temp.find(".root"));
       }
-
+      // Strip directory path
+      const auto slash = temp.find_last_of("/\\");
+      if (slash != std::string::npos) {
+        temp = temp.substr(slash + 1);
+      }
       NameTemp = NameTemp + temp + "_";
     }
   }
