@@ -1102,7 +1102,7 @@ void FitterBase::Run2DLLHScan() {
 }
 
 // *************************
-void FitterBase::RunSigmaVar() {
+void FitterBase::RunSigmaVarLegacy() {
 // *************************
   // Save the settings into the output file
   SaveSettings();
@@ -1498,7 +1498,7 @@ void WriteHistogramsByMode(SampleHandlerFD *sample,
 }
 
 // *************************
-void FitterBase::RunSigmaVarFD() {
+void FitterBase::RunSigmaVar() {
 // *************************
   // Save the settings into the output file
   SaveSettings();
