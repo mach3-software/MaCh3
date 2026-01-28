@@ -1116,25 +1116,35 @@ void FitterBase::RunLLHMap() {
 
   // Parameters IDs within the covariance objects
   // ParamsCovIDs = {Name, CovObj, IDinCovObj}
-  //std::map<std::string, std::pair<ParameterHandlerBase*, int>> ParamsCovIDs;
   std::vector<std::tuple<std::string, ParameterHandlerBase*, int>> ParamsCovIDs;
   for(auto& p : ParamsOfInterest) {
     bool found = false;
     for(auto cov : systematics) {
       for(int c = 0; c < cov->GetNumParams(); ++c) {
         if(cov->GetParName(c) == p || cov->GetParFancyName(c) == p) {
-          // ParamsCovIDs[p].first = cov;
-          // ParamsCovIDs[p].second = c;
-          ParamsCovIDs.push_back(std::make_tuple(p, cov, c));
+          bool add = true;
+          for(auto& pc : ParamsCovIDs) {
+            if(std::get<1>(pc) == cov && std::get<2>(pc) == c)
+            {
+              MACH3LOG_WARN("Parameter {} as {}({}) listed multiple times for LLHMap, omitting and using only once!", p, cov->GetName(), c);
+              add = false;
+              break;
+            }
+          }
+
+          if(add)
+            ParamsCovIDs.push_back(std::make_tuple(p, cov, c));
+
           found = true;
           break;
           break;
         }
       }
     }
-    // Check if parameter with the same ID is already present!!
-    if(found) MACH3LOG_INFO("Parameter {} found in {} at an index {}.", p, std::get<1>(ParamsCovIDs.back())->GetName(), std::get<2>(ParamsCovIDs.back()));
-    else MACH3LOG_WARN("Parameter {} not found in any of the systematic covariance objects. Will not scan over this one!", p);
+    if(found)
+      MACH3LOG_INFO("Parameter {} found in {} at an index {}.", p, std::get<1>(ParamsCovIDs.back())->GetName(), std::get<2>(ParamsCovIDs.back()));
+    else
+      MACH3LOG_WARN("Parameter {} not found in any of the systematic covariance objects. Will not scan over this one!", p);
   }
 
   // ParamsRanges["parameter"] = {nPoints, {low, high}}
@@ -1143,7 +1153,7 @@ void FitterBase::RunLLHMap() {
   MACH3LOG_INFO("======================================================================================");
   MACH3LOG_INFO("Performing a general multi-dimensional LogL map scan over following parameters ranges:");
   MACH3LOG_INFO("======================================================================================");
-  long long int TotalPoints = 1;
+  unsigned long TotalPoints = 1;
 
   double nSigma = GetFromManager<int>(fitMan->raw()["LLHScan"]["LLHScanSigma"], 1., __FILE__, __LINE__);
 
@@ -1157,16 +1167,19 @@ void FitterBase::RunLLHMap() {
     ParameterHandlerBase* cov = std::get<1>(p);
 
     ParamsRanges[name].first = GetFromManager<int>(fitMan->raw()["LLHScan"]["LLHScanPoints"], 20, __FILE__, __LINE__);
-    if(CheckNodeExists(fitMan->raw(),"LLHScan","ScanPoints")) ParamsRanges[name].first = GetFromManager<int>(fitMan->raw()["LLHScan"]["ScanPoints"][name], ParamsRanges[name].first, __FILE__, __LINE__);
+    if(CheckNodeExists(fitMan->raw(),"LLHScan","ScanPoints"))
+      ParamsRanges[name].first = GetFromManager<int>(fitMan->raw()["LLHScan"]["ScanPoints"][name], ParamsRanges[name].first, __FILE__, __LINE__);
 
     // Get the parameter priors and bounds
     double CentralValue = cov->GetParProp(i);
 
     bool IsPCA = cov->IsPCA();
-    if (IsPCA) CentralValue = cov->GetPCAHandler()->GetParPropPCA(i);
+    if (IsPCA)
+      CentralValue = cov->GetPCAHandler()->GetParPropPCA(i);
 
     double prior = cov->GetParInit(i);
-    if (IsPCA) prior = cov->GetPCAHandler()->GetPreFitValuePCA(i);
+    if (IsPCA)
+      prior = cov->GetPCAHandler()->GetPreFitValuePCA(i);
 
     if (std::abs(CentralValue - prior) > 1e-10) {
       MACH3LOG_INFO("For {} scanning around value {} rather than prior {}", name, CentralValue, prior);
@@ -1189,7 +1202,8 @@ void FitterBase::RunLLHMap() {
 
     ParamsRanges[name].second = {lower,upper};
 
-    if(CheckNodeExists(fitMan->raw(),"LLHScan","ScanRanges")) ParamsRanges[name].second = GetFromManager<std::pair<double,double>>(fitMan->raw()["LLHScan"]["ScanRanges"][name], ParamsRanges[name].second, __FILE__, __LINE__);
+    if(CheckNodeExists(fitMan->raw(),"LLHScan","ScanRanges"))
+      ParamsRanges[name].second = GetFromManager<std::pair<double,double>>(fitMan->raw()["LLHScan"]["ScanRanges"][name], ParamsRanges[name].second, __FILE__, __LINE__);
 
     MACH3LOG_INFO("{} from {:.4f} to {:.4f} with a {:.5f} step ({} points total)",
                   name, ParamsRanges[name].second.first, ParamsRanges[name].second.second,
@@ -1222,7 +1236,7 @@ void FitterBase::RunLLHMap() {
   std::vector<double> SampleClassLogL(samples.size());
   for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
   {
-    std::string NameTemp = samples[ivs]->GetName();
+    std::string NameTemp = samples[ivs]->GetName()+"_LLH";
     LLHMap->Branch(NameTemp.c_str(), &SampleClassLogL[ivs]);
   }
 
@@ -1239,7 +1253,8 @@ void FitterBase::RunLLHMap() {
     {
       for(int is = 0; is < samples[ivs]->GetNsamples(); ++is )
       {
-        LLHMap->Branch((samples[ivs]->GetSampleTitle(is)+ "_LLH").c_str(), &SampleSplitLogL[SampleIterator]);
+        std::string NameTemp =samples[ivs]->GetSampleTitle(is)+"_LLH";
+        LLHMap->Branch(NameTemp.c_str(), &SampleSplitLogL[SampleIterator]);
         SampleIterator++;
       }
     }
@@ -1248,17 +1263,19 @@ void FitterBase::RunLLHMap() {
   std::vector<double> ParamsValues;
 
   ParamsValues.resize(ParamsCovIDs.size());
-  for(unsigned int i=0; i < ParamsCovIDs.size(); ++i) LLHMap->Branch(std::get<0>(ParamsCovIDs[i]).c_str(), &ParamsValues[i]);
+  for(unsigned int i=0; i < ParamsCovIDs.size(); ++i)
+    LLHMap->Branch(std::get<0>(ParamsCovIDs[i]).c_str(), &ParamsValues[i]);
 
   // Setting up the scan
   // Don't know the number of parameters beforehand, so doing a 1D loop over all combination of indeces of individual parameters
   // Starting at index {0,0,0,...}
-  std::vector<int> idx;
+  std::vector<unsigned long> idx;
 
-  for(unsigned int i=0; i < ParamsCovIDs.size(); ++i) idx.push_back(0);
+  for(unsigned int i=0; i < ParamsCovIDs.size(); ++i)
+    idx.push_back(0);
 
   // loop over scanned points sp
-  for(long long int sp = 0; sp < TotalPoints; ++sp)
+  for(unsigned long sp = 0; sp < TotalPoints; ++sp)
   {
 
     // At each point need to find the indeces and test values to calculate LogL
@@ -1270,28 +1287,36 @@ void FitterBase::RunLLHMap() {
       double low  = ParamsRanges[name].second.first;
       double high = ParamsRanges[name].second.second;
 
+      // Find the n-th index of the sp-th scanned point
+      unsigned long dev = 1;
+      for(unsigned int m = 0; m <= n; ++m)
+        dev *= ParamsRanges[std::get<0>(ParamsCovIDs[m])].first;
+
+      idx[n] = sp % dev;
+      if (n > 0)
+        idx[n] = idx[n] / ( dev / points );
+
+      // Parameter test value = low + ( high - low ) * idx / ( #points - 1 )
+      ParamsValues[n] = low + (high-low) * double(idx[n])/double(points-1);
+
+      // Now set the covariance objects
+      // Auxiliary
       ParameterHandlerBase* cov = std::get<1>(ParamsCovIDs[n]);
       int i = std::get<2>(ParamsCovIDs[n]);
 
-      long long int dev = 1;
-      for(unsigned int m = 0; m <= n; ++m) dev *= ParamsRanges[std::get<0>(ParamsCovIDs[m])].first;
-
-      idx[n] = sp % dev;
-      if (n > 0) idx[n] = idx[n] / ( dev / points );
-
-      // Parameter test value = low + idx * ( high - low ) / ( #points - 1 )
-      ParamsValues[n] = low + idx[n]*(high-low)/(points-1);
-
-      // Now set the covariance objects
-      if(cov->IsPCA()) cov->GetPCAHandler()->SetParPropPCA(i, ParamsValues[n]);
-      else cov->SetParProp(i, ParamsValues[n]);
+      if(cov->IsPCA())
+        cov->GetPCAHandler()->SetParPropPCA(i, ParamsValues[n]);
+      else
+        cov->SetParProp(i, ParamsValues[n]);
     }
 
     // Reweight samples and calculate LogL
     TotalLogL = .0;
     SampleLogL = .0;
 
-    for(unsigned int ivs = 0; ivs < samples.size(); ++ivs) samples[ivs]->Reweight();
+    for(unsigned int ivs = 0; ivs < samples.size(); ++ivs)
+      samples[ivs]->Reweight();
+
     for(unsigned int ivs = 0; ivs < samples.size(); ++ivs)
     {
       SampleClassLogL[ivs] = 2.*samples[ivs]->GetLikelihood();
@@ -1305,6 +1330,21 @@ void FitterBase::RunLLHMap() {
       CovLogL[ivc] = 2.*systematics[ivc]->GetLikelihood();
       TotalLogL += CovLogL[ivc];
     }
+
+
+    if(PlotLLHScanBySample)
+    {
+      int SampleIterator = 0;
+      for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
+      {
+        for(int is = 0; is < samples[ivs]->GetNsamples(); ++is)
+        {
+          SampleSplitLogL[SampleIterator] = 2.*samples[ivs]->GetSampleLikelihood(is);
+          SampleIterator++;
+        }
+      }
+    }
+
     LLHMap->Fill();
 
     if (sp % countwidth == 0)
