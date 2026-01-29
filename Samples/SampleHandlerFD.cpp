@@ -872,7 +872,7 @@ TH1* SampleHandlerFD::GetW2Hist(const int Sample) {
     MACH3LOG_ERROR("Can't access {} for {}Dimensions", __func__, GetNDim(Sample));
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-  throw MaCh3Exception(__FILE__, __LINE__);
+  return SampleDetails[Sample].W2Hist;
 }
 
 // ************************************************
@@ -970,9 +970,18 @@ void SampleHandlerFD::AddData(const int Sample, const std::vector<double>& Data_
 // ************************************************
   const int Start = Binning->GetSampleStartBin(Sample);
   const int End = Binning->GetSampleEndBin(Sample);
+  const int ExpectedSize = End - Start;
+
+  if (static_cast<int>(Data_Array.size()) != ExpectedSize) {
+    MACH3LOG_ERROR("Data_Array size mismatch for sample '{}'.", GetSampleTitle(Sample));
+    MACH3LOG_ERROR("Expected size: {}, received size: {}.", ExpectedSize, Data_Array.size());
+    MACH3LOG_ERROR("Start bin: {}, End bin: {}.", Start, End);
+    MACH3LOG_ERROR("This likely indicates a binning or sample slicing bug.");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
 
   for (int idx = Start; idx < End; ++idx) {
-    SampleHandlerFD_data[idx] = Data_Array[idx];
+    SampleHandlerFD_data[idx] = Data_Array[idx - Start];
   }
 
   FillHist(Sample, SampleDetails[Sample].DataHist, SampleHandlerFD_data);
