@@ -371,7 +371,7 @@ void PredictivePlotting(const std::string& ConfigName,
   canvas->SetLeftMargin(0.12);
   canvas->SetGrid();
 
-  gStyle->SetOptStat(0);  //Set 0 to disable statystic box
+  gStyle->SetOptStat(0);  //Set 0 to disable statistic box
   gStyle->SetPalette(51);
   gStyle->SetLegendBorderSize(0); //This option disables legends borders
   gStyle->SetFillStyle(0);

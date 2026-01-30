@@ -6,7 +6,6 @@
 #pragma GCC diagnostic ignored "-Wconversion"
 
 /// @file PlotSigmaVariation.cpp
-/// @todo Integrate within StylePlotting to get fancy labels etc
 /// @author Kamil Skwarczynski
 
 std::vector<std::string> DialNameVector;
@@ -19,6 +18,8 @@ int PriorKnot = M3::_BAD_INT_;
 constexpr const int NVars = 5;
 constexpr Color_t Colours[NVars] = {kRed, kGreen+1, kBlack, kBlue+1, kOrange+1};
 constexpr ELineStyle Style[NVars] = {kDotted, kDashed, kSolid, kDashDotted, kDashDotted};
+
+std::unique_ptr<MaCh3Plotting::PlottingManager> PlotMan;
 
 /// @brief Histograms have name like ND_CC0pi_1DProj0_Norm_Param_0_sig_n3.00_val_0.25. This code is trying to extract sigma names
 void FindKnot(std::vector<double>& SigmaValues,
@@ -181,6 +182,7 @@ bool SkipDirectory(const std::vector<std::string>& ExcludeString, const std::vec
   return Skip;
 }
 
+/// @brief Extracts dial value for from histogram title
 std::vector<double> GetDialValues(const std::vector<std::unique_ptr<TH1D>>& Poly) {
   std::vector<double> values;
   for (const auto& hist : Poly) {
@@ -310,7 +312,8 @@ void PlotRatio(const std::vector<std::unique_ptr<TH1D>>& Poly,
 
   pad2->cd();
 
-  auto line = std::make_unique<TLine>(Poly[0]->GetXaxis()->GetBinLowEdge(Poly[0]->GetXaxis()->GetFirst()), 1.0, Poly[0]->GetXaxis()->GetBinUpEdge(Poly[0]->GetXaxis()->GetLast()), 1.0);
+  TLine line(Poly[0]->GetXaxis()->GetBinLowEdge(Poly[0]->GetXaxis()->GetFirst()),
+             1.0, Poly[0]->GetXaxis()->GetBinUpEdge(Poly[0]->GetXaxis()->GetLast()), 1.0);
   std::vector<std::unique_ptr<TH1D>> Ratio(sigmaArray.size()-1);
 
   MakeRatio(Poly, Ratio);
@@ -326,9 +329,9 @@ void PlotRatio(const std::vector<std::unique_ptr<TH1D>>& Poly,
     Ratio[ik]->Draw("HIST SAME");
   }
 
-  line->SetLineWidth(2);
-  line->SetLineColor(kBlack);
-  line->Draw("SAME");
+  line.SetLineWidth(2);
+  line.SetLineColor(kBlack);
+  line.Draw("SAME");
 
   canv->Print((outfilename).c_str());
 
@@ -387,7 +390,8 @@ void CompareSigVar1D(const std::string& filename, const YAML::Node& Settings)
             MACH3LOG_DEBUG("Adding hist {}", name);
           }
         }
-        std::string Title = DialNameVector[id] + " " + SampleNameVector[is];
+        std::string Title = PlotMan->style().prettifyParamName(DialNameVector[id]) + " "
+                            + PlotMan->style().prettifySampleName(SampleNameVector[is]);
         PlotRatio(Projection, canvas, Title, outfilename);
         gDirectory->cd("..");
       }
@@ -501,7 +505,8 @@ void CompareSigVar2D(const std::string& filename, const YAML::Node& Settings)
               MACH3LOG_DEBUG("Adding hist {}", name);
             }
           }
-          std::string Title = DialNameVector[id] + " " + SampleNameVector[is];
+          std::string Title = PlotMan->style().prettifyParamName(DialNameVector[id]) + " "
+                              + PlotMan->style().prettifySampleName(SampleNameVector[is]);
           if(Projection.size() == sigmaArray.size()) PlotRatio2D(Projection, canvas, Title, outfilename);
         }
       }
@@ -533,7 +538,7 @@ void PlotEventRate(const std::vector<std::vector<std::unique_ptr<TH1D>>>& Poly,
     for(size_t iSample = 0; iSample < SampleNameVector.size(); iSample ++) {
       EvenRates[ih]->SetBinContent(iSample+1, Poly[iSample][ih]->Integral());
 
-      std::string SamName = SampleNameVector[iSample];
+      std::string SamName = PlotMan->style().prettifySampleName(SampleNameVector[iSample]);
       EvenRates[ih]->GetXaxis()->SetBinLabel(iSample+1, SamName.c_str());
     }
   }
@@ -588,7 +593,8 @@ void PlotEventRate(const std::vector<std::vector<std::unique_ptr<TH1D>>>& Poly,
   leg->Draw("SAME");
 
   pad2->cd();
-  auto line = std::make_unique<TLine>(EvenRates[0]->GetXaxis()->GetBinLowEdge(EvenRates[0]->GetXaxis()->GetFirst()), 1.0, EvenRates[0]->GetXaxis()->GetBinUpEdge(EvenRates[0]->GetXaxis()->GetLast()), 1.0);
+  TLine line(EvenRates[0]->GetXaxis()->GetBinLowEdge(EvenRates[0]->GetXaxis()->GetFirst()),
+             1.0, EvenRates[0]->GetXaxis()->GetBinUpEdge(EvenRates[0]->GetXaxis()->GetLast()), 1.0);
   std::vector<std::unique_ptr<TH1D>> Ratio(sigmaArray.size()-1);
   MakeRatio(EvenRates, Ratio);
   Ratio[0]->GetXaxis()->SetTitleSize(0.08);
@@ -605,9 +611,9 @@ void PlotEventRate(const std::vector<std::vector<std::unique_ptr<TH1D>>>& Poly,
     Ratio[ik]->Draw("HIST SAME");
   }
 
-  line->SetLineWidth(2);
-  line->SetLineColor(kBlack);
-  line->Draw("SAME");
+  line.SetLineWidth(2);
+  line.SetLineColor(kBlack);
+  line.Draw("SAME");
 
   canv->Print((outfilename).c_str());
 
@@ -661,7 +667,7 @@ void MakeEventRatePlot(const std::string& filename, const YAML::Node& Settings)
       }
       gDirectory->cd("..");
     }
-    std::string Title = DialNameVector[id];
+    std::string Title = PlotMan->style().prettifyParamName(DialNameVector[id]);
     PlotEventRate(Projection, canvas, Title, outfilename);
   }
 
@@ -688,6 +694,9 @@ int main(int argc, char **argv)
   YAML::Node settings = Config["PlotSigmaVariation"];
 
   ScanInput(DialNameVector, SampleNameVector, SampleMaxDim, sigmaArray, filename);
+
+  PlotMan = std::make_unique<MaCh3Plotting::PlottingManager>();
+  PlotMan->initialise();
 
   CompareSigVar1D(filename, settings);
   CompareSigVar2D(filename, settings);

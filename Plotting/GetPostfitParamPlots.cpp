@@ -63,7 +63,7 @@ TPad *p3;
 TPad *p4;
 
 // KS: Color for 0 - prefit, 1 postfit, 2 another postfit, 3 you know the drill
-Color_t PlotColor[] = {kRed, kBlack, kBlue, kGreen};
+constexpr Color_t PlotColor[] = {kRed, kBlack, kBlue, kGreen};
 std::string plotType;
 
 void copyParToBlockHist(const int localBin, const std::string& paramName, TH1D* blockHist,
@@ -719,7 +719,7 @@ void GetPostfitParamPlots()
 
   canv = new TCanvas("canv", "canv", 1024, 1024);
   //gStyle->SetPalette(51);
-  gStyle->SetOptStat(0); //Set 0 to disable statystic box
+  gStyle->SetOptStat(0); //Set 0 to disable statistic box
   canv->SetLeftMargin(0.12);
   canv->SetBottomMargin(0.12);
   canv->SetTopMargin(0.08);
