@@ -274,7 +274,11 @@ void SampleHandlerFD::FillHist(const int Sample, TH1* Hist, double* Array) {
       }
     }
   } else {
-    MACH3LOG_DEBUG("Asking for {} with N Dimension = {}. This is not implemented", __func__, Dimension);
+    for (int iBin = 0; iBin < Binning->GetNBins(Sample); ++iBin) {
+      const int idx = iBin + Binning->GetSampleStartBin(Sample);
+      //Need to do +1 for the bin, this is to be consistent with ROOTs binning scheme
+      Hist->SetBinContent(iBin + 1, Array[idx]);
+    }
   }
 }
 #pragma GCC diagnostic pop
@@ -860,8 +864,22 @@ void SampleHandlerFD::SetBinning() {
       SamDet->W2Hist->GetXaxis()->SetTitle(SamDet->VarStr[0].c_str());
       SamDet->W2Hist->GetYaxis()->SetTitle(SamDet->VarStr[1].c_str());
     } else {
-      MACH3LOG_DEBUG("Not supported for Dim {}", Dimension);
-      continue;
+      int nbins = Binning->GetNBins(iSample);
+      SamDet->DataHist = new TH1D(("d" + HistTitle).c_str(), HistTitle.c_str(), nbins, 0, nbins);
+      SamDet->MCHist   = new TH1D(("h" + HistTitle).c_str(), HistTitle.c_str(), nbins, 0, nbins);
+      SamDet->W2Hist   = new TH1D(("w" + HistTitle).c_str(), HistTitle.c_str(), nbins, 0, nbins);
+
+      for(int iBin = 0; iBin < nbins; iBin++) {
+        auto BinName = Binning->GetBinName(iSample, iBin);
+        SamDet->DataHist->GetXaxis()->SetBinLabel(iBin+1, BinName.c_str());
+        SamDet->MCHist->GetXaxis()->SetBinLabel(iBin+1, BinName.c_str());
+        SamDet->W2Hist->GetXaxis()->SetBinLabel(iBin+1, BinName.c_str());
+      }
+
+      // Set all titles so most of projections don't have empty titles...
+      SamDet->DataHist->GetYaxis()->SetTitle("Events");
+      SamDet->MCHist->GetYaxis()->SetTitle("Events");
+      SamDet->W2Hist->GetYaxis()->SetTitle("Events");
     }
 
     SamDet->DataHist->SetDirectory(nullptr);
@@ -983,13 +1001,17 @@ void SampleHandlerFD::AddData(const int Sample, TH1* Data) {
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
+  auto ChecHistType = [&](const std::string& Type, const int Dimen, const TH1* Hist,
+                          const std::string& file, const int line) {
+    if (std::string(Hist->ClassName()) != Type) {
+      MACH3LOG_ERROR("Expected {} for {}D sample, got {}", Type, Dimen, Hist->ClassName());
+      throw MaCh3Exception(file, line);
+    }
+  };
+
   if (Dim == 1) {
     // Ensure we really have a TH1D
-    if (std::string(SampleDetails[Sample].DataHist->ClassName()) != "TH1D") {
-      MACH3LOG_ERROR("Expected TH1D for 1D sample, got {}", SampleDetails[Sample].DataHist->ClassName());
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-
+    ChecHistType("TH1D", Dim, SampleDetails[Sample].DataHist, __FILE__, __LINE__);
     for (int xBin = 0; xBin < Binning->GetNAxisBins(Sample, 0); ++xBin) {
       const int idx = Binning->GetGlobalBinSafe(Sample, {xBin});
       // ROOT histograms are 1-based, so bin index + 1
@@ -999,10 +1021,7 @@ void SampleHandlerFD::AddData(const int Sample, TH1* Data) {
     SampleDetails[Sample].DataHist->GetYaxis()->SetTitle("Number of Events");
   } else if (Dim == 2) {
     if(Binning->IsUniform(Sample)) {
-      if (std::string(SampleDetails[Sample].DataHist->ClassName()) != "TH2D") {
-        MACH3LOG_ERROR("Expected TH2D for 2D sample, got {}", SampleDetails[Sample].DataHist->ClassName());
-        throw MaCh3Exception(__FILE__, __LINE__);
-      }
+      ChecHistType("TH2D", Dim, SampleDetails[Sample].DataHist, __FILE__, __LINE__);
       for (int yBin = 0; yBin < Binning->GetNAxisBins(Sample, 1); ++yBin) {
         for (int xBin = 0; xBin < Binning->GetNAxisBins(Sample, 0); ++xBin) {
           const int idx = Binning->GetGlobalBinSafe(Sample, {xBin, yBin});
@@ -1011,10 +1030,7 @@ void SampleHandlerFD::AddData(const int Sample, TH1* Data) {
         }
       }
     } else{
-      if (std::string(SampleDetails[Sample].DataHist->ClassName()) != "TH2Poly") {
-        MACH3LOG_ERROR("Expected TH2D for TH2Poly sample, got {}", SampleDetails[Sample].DataHist->ClassName());
-        throw MaCh3Exception(__FILE__, __LINE__);
-      }
+      ChecHistType("TH2Poly", Dim, SampleDetails[Sample].DataHist, __FILE__, __LINE__);
       for (int iBin = 0; iBin < Binning->GetNBins(Sample); ++iBin) {
         const int idx = iBin + Binning->GetSampleStartBin(Sample);
         //Need to do +1 for the bin, this is to be consistent with ROOTs binning scheme
@@ -1026,8 +1042,12 @@ void SampleHandlerFD::AddData(const int Sample, TH1* Data) {
     SampleDetails[Sample].DataHist->GetYaxis()->SetTitle(GetYBinVarName(Sample).c_str());
     SampleDetails[Sample].DataHist->GetZaxis()->SetTitle("Number of Events");
   } else {
-    MACH3LOG_ERROR("Not supported for Dim {}", Dim);
-    throw MaCh3Exception(__FILE__, __LINE__);
+    ChecHistType("TH1D", Dim, SampleDetails[Sample].DataHist, __FILE__, __LINE__);
+    for (int iBin = 0; iBin < Binning->GetNBins(Sample); ++iBin) {
+      const int idx = iBin + Binning->GetSampleStartBin(Sample);
+      //Need to do +1 for the bin, this is to be consistent with ROOTs binning scheme
+      SampleHandlerFD_data[idx] = SampleDetails[Sample].DataHist->GetBinContent(iBin + 1);
+    }
   }
 }
 
@@ -1313,8 +1333,13 @@ void SampleHandlerFD::SaveAdditionalInfo(TDirectory* Dir) {
       data_hist->GetYaxis()->SetTitle(GetYBinVarName(iSample).c_str());
       data_hist->GetZaxis()->SetTitle("Number of Events");
     } else {
-      MACH3LOG_WARN("{} Doesn't work for Dim will not save histogram",__func__, GetNDim(iSample));
-      continue;
+      data_hist = M3::Clone<TH1D>(dynamic_cast<TH1D*>(GetDataHist(iSample)), "data_" + GetSampleTitle(iSample));
+      int nbins = Binning->GetNBins(iSample);
+      for(int iBin = 0; iBin < nbins; iBin++) {
+        auto BinName = Binning->GetBinName(iSample, iBin);
+        data_hist->GetXaxis()->SetBinLabel(iBin+1, BinName.c_str());
+      }
+      data_hist->GetYaxis()->SetTitle("Number of Events");
     }
 
     if (!data_hist) {
