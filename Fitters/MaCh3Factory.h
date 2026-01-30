@@ -99,7 +99,7 @@ std::unique_ptr<CovType> MaCh3CovarianceFactory(Manager *FitManager, const std::
     }
   }
 
-  if (CheckNodeExists(Settings->raw(), std::string(PreFix) + "Tune"))
+  if (CheckNodeExists(Settings, std::string(PreFix) + "Tune"))
   {
     CovObject->SetTune(Get<std::string>(Settings[std::string(PreFix) + "Tune"], __FILE__, __LINE__));
   }
