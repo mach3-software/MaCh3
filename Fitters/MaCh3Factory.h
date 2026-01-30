@@ -98,6 +98,12 @@ std::unique_ptr<CovType> MaCh3CovarianceFactory(Manager *FitManager, const std::
       CovObject->ToggleFixParameter(FixParams.at(j));
     }
   }
+
+  if (CheckNodeExists(Settings, std::string(PreFix) + "Tune"))
+  {
+    CovObject->SetTune(Get<std::string>(Settings[std::string(PreFix) + "Tune"], __FILE__, __LINE__));
+  }
+
   //Global step scale for matrix
   auto StepScale = Get<double>(Settings[std::string(PreFix) + "StepScale"], __FILE__, __LINE__);
 
