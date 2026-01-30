@@ -1,6 +1,6 @@
 # Plotting
 
-This directory contains the core MaCh3 plotting tools. `plottingUtils` contains all the code defining the plotting
+This directory contains the core MaCh3 plotting tools. `PlottingUtils` contains all the code defining the plotting
 library, the majority of which basically consists of a highly flexible root file reader which can be configured by
 different experiments to read from their MaCh3 output files and put everything in a nice common format that can then
 be accessed in plotting applications and allows for easy iteration over parameters and samples.
@@ -15,13 +15,13 @@ maintain their own config files.
 
 ## Structure
 
-The plotting library consists of 3 main manager classes: `PlottingManager`, `inputManager` and `styleManager` each of which is responsible for different aspects of plot making.
+The plotting library consists of 3 main manager classes: `PlottingManager`, `InputManager` and `StyleManager` each of which is responsible for different aspects of plot making.
 
 ### PlottingManager
 
 This is intended to be the main class that the user interacts with. It is responsible for parsing user specified options, keeping track of which config files to use, and managing instances of the other manager classes.
 
-### inputManager
+### InputManager
 
 This is responsible for keeping track of the files whose data is to be plotted and reading in that data from them.
 
@@ -30,7 +30,7 @@ It will attempt to automatically detect which fitter the file came from based on
 It will read in the data accordingly, storing in a common format which it provides functions to easily obtain.
 
 
-### styleManager
+### StyleManager
 
 This is responsible for the styling of the plots produces. It contains the functionality to apply user specified styles, colour palettes and fancy names for parameters and samples.
 
