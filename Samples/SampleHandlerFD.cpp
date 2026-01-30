@@ -156,10 +156,7 @@ void SampleHandlerFD::LoadSingleSample(const int iSample, const YAML::Node& Samp
     StoredSelection[iSample].emplace_back(CutObj);
   }
   /// Add new sample
-  // KS: Important to first call move and then InitialiseHistograms otheriwse histograms will be deleted
-  // need safer solution but do this like this for now
   SampleDetails[iSample] = std::move(SingleSample);
-  SampleDetails[iSample].InitialiseHistograms();
 }
 
 void SampleHandlerFD::Initialise() {
@@ -262,10 +259,18 @@ void SampleHandlerFD::FillHist(const int Sample, TH1* Hist, double* Array) {
     }
   } else if (Dimension == 2) {
     Hist->Reset();
-    for (int yBin = 0; yBin < Binning->GetNAxisBins(Sample, 1); ++yBin) {
-      for (int xBin = 0; xBin < Binning->GetNAxisBins(Sample, 0); ++xBin) {
-        const int idx = Binning->GetGlobalBinSafe(Sample, {xBin, yBin});
-        Hist->SetBinContent(xBin + 1, yBin + 1, Array[idx]);
+    if(Binning->IsUniform(Sample)) {
+      for (int yBin = 0; yBin < Binning->GetNAxisBins(Sample, 1); ++yBin) {
+        for (int xBin = 0; xBin < Binning->GetNAxisBins(Sample, 0); ++xBin) {
+          const int idx = Binning->GetGlobalBinSafe(Sample, {xBin, yBin});
+          Hist->SetBinContent(xBin + 1, yBin + 1, Array[idx]);
+        }
+      }
+    } else {
+      for (int iBin = 0; iBin < Binning->GetNBins(Sample); ++iBin) {
+        const int idx = iBin + Binning->GetSampleStartBin(Sample);
+        //Need to do +1 for the bin, this is to be consistent with ROOTs binning scheme
+        Hist->SetBinContent(iBin + 1, Array[idx]);
       }
     }
   } else {
@@ -787,33 +792,81 @@ void SampleHandlerFD::SetBinning() {
   for(int iSample = 0; iSample < GetNsamples(); iSample++)
   {
     int Dimension = GetNDim(iSample);
+    std::string HistTitle = GetSampleTitle(iSample);
+
+    auto* SamDet = &SampleDetails[iSample];
     if(Dimension == 1) {
-      SampleDetails[iSample].DataHist->Reset();
-      SampleDetails[iSample].MCHist->Reset();
-      SampleDetails[iSample].W2Hist->Reset();
-
       auto XVec = Binning->GetBinEdges(iSample, 0);
-      SampleDetails[iSample].DataHist->SetBins(static_cast<int>(XVec.size()-1), XVec.data());
-      SampleDetails[iSample].MCHist->SetBins(static_cast<int>(XVec.size()-1), XVec.data());
-      SampleDetails[iSample].W2Hist->SetBins(static_cast<int>(XVec.size()-1), XVec.data());
+      SamDet->DataHist = new TH1D(("d" + HistTitle).c_str(), HistTitle.c_str(), static_cast<int>(XVec.size()-1), XVec.data());
+      SamDet->MCHist   = new TH1D(("h" + HistTitle).c_str(), HistTitle.c_str(), static_cast<int>(XVec.size()-1), XVec.data());
+      SamDet->W2Hist   = new TH1D(("w" + HistTitle).c_str(), HistTitle.c_str(), static_cast<int>(XVec.size()-1), XVec.data());
+
+      // Set all titles so most of projections don't have empty titles...
+      SamDet->DataHist->GetXaxis()->SetTitle(SamDet->VarStr[0].c_str());
+      SamDet->DataHist->GetYaxis()->SetTitle("Events");
+      SamDet->MCHist->GetXaxis()->SetTitle(SamDet->VarStr[0].c_str());
+      SamDet->MCHist->GetYaxis()->SetTitle("Events");
+      SamDet->W2Hist->GetXaxis()->SetTitle(SamDet->VarStr[0].c_str());
+      SamDet->W2Hist->GetYaxis()->SetTitle("Events");
     } else if (Dimension == 2){
-      SampleDetails[iSample].DataHist->Reset();
-      SampleDetails[iSample].MCHist->Reset();
-      SampleDetails[iSample].W2Hist->Reset();
+      if(Binning->IsUniform(iSample)) {
 
-      auto XVec = Binning->GetBinEdges(iSample, 0);
-      auto YVec = Binning->GetBinEdges(iSample, 1);
+        auto XVec = Binning->GetBinEdges(iSample, 0);
+        auto YVec = Binning->GetBinEdges(iSample, 1);
+        int nX = static_cast<int>(XVec.size() - 1);
+        int nY = static_cast<int>(YVec.size() - 1);
 
-      SampleDetails[iSample].DataHist->SetBins(static_cast<int>(XVec.size()-1), XVec.data(),
-                                              static_cast<int>(YVec.size()-1), YVec.data());
-      SampleDetails[iSample].MCHist->SetBins(static_cast<int>(XVec.size()-1), XVec.data(),
-                                                static_cast<int>(YVec.size()-1), YVec.data());
-      SampleDetails[iSample].W2Hist->SetBins(static_cast<int>(XVec.size()-1), XVec.data(),
-                                             static_cast<int>(YVec.size()-1), YVec.data());
+        SamDet->DataHist = new TH2D(("d" + HistTitle).c_str(), HistTitle.c_str(), nX, XVec.data(), nY, YVec.data());
+        SamDet->MCHist   = new TH2D(("h" + HistTitle).c_str(), HistTitle.c_str(), nX, XVec.data(), nY, YVec.data());
+        SamDet->W2Hist   = new TH2D(("w" + HistTitle).c_str(), HistTitle.c_str(), nX, XVec.data(), nY, YVec.data());
+      } else {
+        auto AddBinsToTH2Poly = [](TH2Poly* hist, const std::vector<BinInfo>& bins) {
+          for (const auto& bin : bins) {
+            double xLow  = bin.Extent[0][0];
+            double xHigh = bin.Extent[0][1];
+            double yLow  = bin.Extent[1][0];
+            double yHigh = bin.Extent[1][1];
+
+            double x[4] = {xLow, xHigh, xHigh, xLow};
+            double y[4] = {yLow, yLow, yHigh, yHigh};
+
+            hist->AddBin(4, x, y);
+          }
+        };
+        // Create all three histograms
+        SamDet->DataHist = new TH2Poly();
+        SamDet->DataHist->SetName(("d" + HistTitle).c_str());
+        SamDet->DataHist->SetTitle(HistTitle.c_str());
+
+        SamDet->MCHist = new TH2Poly();
+        SamDet->MCHist->SetName(("h" + HistTitle).c_str());
+        SamDet->MCHist->SetTitle(HistTitle.c_str());
+
+        SamDet->W2Hist = new TH2Poly();
+        SamDet->W2Hist->SetName(("w" + HistTitle).c_str());
+        SamDet->W2Hist->SetTitle(HistTitle.c_str());
+
+        // Add bins to each
+        AddBinsToTH2Poly(static_cast<TH2Poly*>(SamDet->DataHist), Binning->GetNonUniformBins(iSample));
+        AddBinsToTH2Poly(static_cast<TH2Poly*>(SamDet->MCHist),   Binning->GetNonUniformBins(iSample));
+        AddBinsToTH2Poly(static_cast<TH2Poly*>(SamDet->W2Hist),   Binning->GetNonUniformBins(iSample));
+      }
+
+      // Set all titles so most of projections don't have empty titles...
+      SamDet->DataHist->GetXaxis()->SetTitle(SamDet->VarStr[0].c_str());
+      SamDet->DataHist->GetYaxis()->SetTitle(SamDet->VarStr[1].c_str());
+      SamDet->MCHist->GetXaxis()->SetTitle(SamDet->VarStr[0].c_str());
+      SamDet->MCHist->GetYaxis()->SetTitle(SamDet->VarStr[1].c_str());
+      SamDet->W2Hist->GetXaxis()->SetTitle(SamDet->VarStr[0].c_str());
+      SamDet->W2Hist->GetYaxis()->SetTitle(SamDet->VarStr[1].c_str());
     } else {
       MACH3LOG_DEBUG("Not supported for Dim {}", Dimension);
       continue;
     }
+
+    SamDet->DataHist->SetDirectory(nullptr);
+    SamDet->MCHist->SetDirectory(nullptr);
+    SamDet->W2Hist->SetDirectory(nullptr);
   }
 
   //Set the number of X and Y bins now
@@ -847,7 +900,8 @@ void SampleHandlerFD::FindNominalBinAndEdges() {
         throw MaCh3Exception(__FILE__, __LINE__);
       }
       const int bin = Binning->FindNominalBin(Sample, iDim, *MCSamples[event_i].KinVar[iDim]);
-      SetNominalBin(bin, Binning->GetNAxisBins(Sample, iDim), MCSamples[event_i].NomBin[iDim]);
+      int NBins_i = static_cast<int>(Binning->GetBinEdges(Sample, iDim).size() - 1);
+      SetNominalBin(bin, NBins_i, MCSamples[event_i].NomBin[iDim]);
     }
   }
 }
@@ -944,18 +998,30 @@ void SampleHandlerFD::AddData(const int Sample, TH1* Data) {
     SampleDetails[Sample].DataHist->GetXaxis()->SetTitle(GetXBinVarName(Sample).c_str());
     SampleDetails[Sample].DataHist->GetYaxis()->SetTitle("Number of Events");
   } else if (Dim == 2) {
-    if (std::string(SampleDetails[Sample].DataHist->ClassName()) != "TH2D") {
-      MACH3LOG_ERROR("Expected TH2D for 2D sample, got {}", SampleDetails[Sample].DataHist->ClassName());
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-
-    for (int yBin = 0; yBin < Binning->GetNAxisBins(Sample, 1); ++yBin) {
-      for (int xBin = 0; xBin < Binning->GetNAxisBins(Sample, 0); ++xBin) {
-        const int idx = Binning->GetGlobalBinSafe(Sample, {xBin, yBin});
+    if(Binning->IsUniform(Sample)) {
+      if (std::string(SampleDetails[Sample].DataHist->ClassName()) != "TH2D") {
+        MACH3LOG_ERROR("Expected TH2D for 2D sample, got {}", SampleDetails[Sample].DataHist->ClassName());
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+      for (int yBin = 0; yBin < Binning->GetNAxisBins(Sample, 1); ++yBin) {
+        for (int xBin = 0; xBin < Binning->GetNAxisBins(Sample, 0); ++xBin) {
+          const int idx = Binning->GetGlobalBinSafe(Sample, {xBin, yBin});
+          //Need to do +1 for the bin, this is to be consistent with ROOTs binning scheme
+          SampleHandlerFD_data[idx] = SampleDetails[Sample].DataHist->GetBinContent(xBin + 1, yBin + 1);
+        }
+      }
+    } else{
+      if (std::string(SampleDetails[Sample].DataHist->ClassName()) != "TH2Poly") {
+        MACH3LOG_ERROR("Expected TH2D for TH2Poly sample, got {}", SampleDetails[Sample].DataHist->ClassName());
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+      for (int iBin = 0; iBin < Binning->GetNBins(Sample); ++iBin) {
+        const int idx = iBin + Binning->GetSampleStartBin(Sample);
         //Need to do +1 for the bin, this is to be consistent with ROOTs binning scheme
-        SampleHandlerFD_data[idx] = SampleDetails[Sample].DataHist->GetBinContent(xBin + 1, yBin + 1);
+        SampleHandlerFD_data[idx] = SampleDetails[Sample].DataHist->GetBinContent(iBin + 1);
       }
     }
+
     SampleDetails[Sample].DataHist->GetXaxis()->SetTitle(GetXBinVarName(Sample).c_str());
     SampleDetails[Sample].DataHist->GetYaxis()->SetTitle(GetYBinVarName(Sample).c_str());
     SampleDetails[Sample].DataHist->GetZaxis()->SetTitle("Number of Events");
@@ -1238,7 +1304,11 @@ void SampleHandlerFD::SaveAdditionalInfo(TDirectory* Dir) {
       data_hist->GetXaxis()->SetTitle(GetXBinVarName(iSample).c_str());
       data_hist->GetYaxis()->SetTitle("Number of Events");
     } else if (GetNDim(iSample) == 2) {
-      data_hist = M3::Clone<TH2D>(dynamic_cast<TH2D*>(GetDataHist(iSample)), "data_" + GetSampleTitle(iSample));
+      if(Binning->IsUniform(iSample)) {
+        data_hist = M3::Clone<TH2D>(dynamic_cast<TH2D*>(GetDataHist(iSample)), "data_" + GetSampleTitle(iSample));
+      } else {
+        data_hist = M3::Clone<TH2Poly>(dynamic_cast<TH2Poly*>(GetDataHist(iSample)), "data_" + GetSampleTitle(iSample));
+      }
       data_hist->GetXaxis()->SetTitle(GetXBinVarName(iSample).c_str());
       data_hist->GetYaxis()->SetTitle(GetYBinVarName(iSample).c_str());
       data_hist->GetZaxis()->SetTitle("Number of Events");

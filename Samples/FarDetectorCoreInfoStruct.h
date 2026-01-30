@@ -71,47 +71,6 @@ struct SampleInfo {
   TH1* MCHist = nullptr;
   /// histogram used for plotting storing W2 distribution
   TH1* W2Hist = nullptr;
-
-  /// @brief Initialise histograms used for plotting
-  void InitialiseHistograms() {
-    std::string HistTitle = SampleTitle;
-
-    //The binning here is arbitrary, now we get info from cfg so the
-    //set1DBinning and set2Dbinning calls below will make the binning
-    //to be what we actually want
-    if(nDimensions == 1) {
-      DataHist = new TH1D(("d" + HistTitle).c_str(), HistTitle.c_str(), 1, 0, 1);
-      MCHist   = new TH1D(("h" + HistTitle).c_str(), HistTitle.c_str(), 1, 0, 1);
-      W2Hist   = new TH1D(("w" + HistTitle).c_str(), HistTitle.c_str(), 1, 0, 1);
-
-      // Set all titles so most of projections don't have empty titles...
-      DataHist->GetXaxis()->SetTitle(VarStr[0].c_str());
-      DataHist->GetYaxis()->SetTitle("Events");
-      MCHist->GetXaxis()->SetTitle(VarStr[0].c_str());
-      MCHist->GetYaxis()->SetTitle("Events");
-      W2Hist->GetXaxis()->SetTitle(VarStr[0].c_str());
-      W2Hist->GetYaxis()->SetTitle("Events");
-    } else if(nDimensions == 2) {
-      DataHist = new TH2D(("d" + HistTitle).c_str(), HistTitle.c_str(), 1, 0, 1, 1, 0, 1);
-      MCHist   = new TH2D(("h" + HistTitle).c_str(), HistTitle.c_str(), 1, 0, 1, 1, 0, 1);
-      W2Hist   = new TH2D(("w" + HistTitle).c_str(), HistTitle.c_str(), 1, 0, 1, 1, 0, 1);
-
-      // Set all titles so most of projections don't have empty titles...
-      DataHist->GetXaxis()->SetTitle(VarStr[0].c_str());
-      DataHist->GetYaxis()->SetTitle(VarStr[1].c_str());
-      MCHist->GetXaxis()->SetTitle(VarStr[0].c_str());
-      MCHist->GetYaxis()->SetTitle(VarStr[1].c_str());
-      W2Hist->GetXaxis()->SetTitle(VarStr[0].c_str());
-      W2Hist->GetYaxis()->SetTitle(VarStr[1].c_str());
-    } else {
-      MACH3LOG_DEBUG("Not supported for Dim {}", nDimensions);
-      return;
-    }
-
-    DataHist->SetDirectory(nullptr);
-    MCHist->SetDirectory(nullptr);
-    W2Hist->SetDirectory(nullptr);
-  }
 };
 
 /// @brief constructors are same for all three so put in here

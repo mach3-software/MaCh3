@@ -21,10 +21,9 @@ void BinningHandler::SetupSampleBinning(const YAML::Node& Settings, SampleInfo& 
 
   SampleBinningInfo SingleBinning;
   bool Uniform = Get<bool>(Settings["Uniform"], __FILE__ , __LINE__);
-
   if(Uniform == false) {
-    MACH3LOG_ERROR("To be implemented soon");
-    throw MaCh3Exception(__FILE__, __LINE__);
+    auto Bins = Get<std::vector<std::vector<std::vector<double>>>>(Settings["Bins"], __FILE__, __LINE__);
+    SingleBinning.InitNonUniform(Bins);
   } else {
     auto Bin_Edges = Get<std::vector<std::vector<double>>>(Settings["VarBins"], __FILE__ , __LINE__);
     SingleBinning.InitUniform(Bin_Edges);
@@ -64,9 +63,16 @@ int BinningHandler::FindGlobalBin(const int NomSample,
     GlobalBin += static_cast<int>(Binning.GlobalOffset);
     return GlobalBin;
   } else{
-    MACH3LOG_ERROR("Not implemented");
-    throw MaCh3Exception(__FILE__, __LINE__);
-    return M3::_BAD_INT_;
+    const auto& _restrict_ BinMapping = Binning.BinGridMapping[GlobalBin];
+    for(size_t iBin = 0; iBin < BinMapping.size(); iBin++) {
+      const int BinNumber = BinMapping[iBin];
+      const auto& _restrict_ NonUniBin = Binning.Bins[BinNumber];
+      if(NonUniBin.IsEventInside(KinVar)){
+        return BinNumber + Binning.GlobalOffset;
+      }
+    }
+    MACH3LOG_DEBUG("Didn't find any bin so returning UnderOverFlowBin");
+    return M3::UnderOverFlowBin;
   }
 }
 
@@ -125,13 +131,13 @@ void BinningHandler::SetGlobalBinNumbers() {
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
-  size_t GlobalOffsetCounter = 0;
+  int GlobalOffsetCounter = 0;
   for(size_t iSample = 0; iSample < SampleBinning.size(); iSample++){
     SampleBinning[iSample].GlobalOffset = GlobalOffsetCounter;
     GlobalOffsetCounter += SampleBinning[iSample].nBins;
   }
   // lastly modify total number of bins
-  TotalNumberOfBins = static_cast<int>(GlobalOffsetCounter);
+  TotalNumberOfBins = GlobalOffsetCounter;
 }
 
 // ************************************************
@@ -188,8 +194,15 @@ std::string BinningHandler::GetBinName(const int iSample, const int SampleBin) c
       BinName += fmt::format("Dim{} ({:g}, {:g})", i, min, max);
     }
   } else{
-    MACH3LOG_ERROR("To be implemented");
-    throw MaCh3Exception(__FILE__, __LINE__);
+    const BinInfo& bin = Binning.Bins[SampleBin];
+    const int Dim = static_cast<int>(bin.Extent.size());
+
+    for (int i = 0; i < Dim; ++i) {
+      if (i > 0) BinName += ", ";
+      const double min = bin.Extent[i][0];
+      const double max = bin.Extent[i][1];
+      BinName += fmt::format("Dim{} ({:g}, {:g})", i, min, max);
+    }
   }
   return BinName;
 }
@@ -220,3 +233,16 @@ bool BinningHandler::IsUniform(const int iSample) const {
   const auto& Binning = SampleBinning[iSample];
   return Binning.Uniform;
 }
+
+// ************************************************
+const std::vector<BinInfo> BinningHandler::GetNonUniformBins(const int iSample) const {
+// ************************************************
+  const auto& Binning = SampleBinning[iSample];
+  if(!Binning.Uniform) {
+    return Binning.Bins;
+  } else{
+    MACH3LOG_ERROR("{} for sample {} will not work becasue binnin is unfiorm", __func__, iSample);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+}
+
