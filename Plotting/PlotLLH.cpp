@@ -24,7 +24,7 @@ double ratioLabelScaling;
 
 MaCh3Plotting::PlottingManager *man;
 
-/// @brief TPad is SUPER FRAGILE, it is safer to jsut make raw pointer, while ROOT behave weirdly with smar pointes
+/// @brief TPad is SUPER FRAGILE, it is safer to just make raw pointer, while ROOT behave weirdly with smart pointers
 void SetTPads(TPad*& LLHPad, TPad*& ratioPad)
 {
   int originalErrorLevel = gErrorIgnoreLevel;
@@ -193,7 +193,7 @@ void makeLLHScanComparisons(const std::string& paramName,
       ratioCompStack->Add(divHist);
     }
 
-    // add it to the comparisson hstack and legend
+    // add it to the comparison stack and legend
     compStack->Add(compHist);
     legend->AddEntry(compHist, man->getFileLabel(extraFileIdx).c_str(), "l");
   }
@@ -296,7 +296,7 @@ void makeSplitSampleLLHScanComparisons(const std::string& paramName,
   label->SetTextAngle(-55);
   label->SetTextSize(0.012);
 
-  // need to draw the labels after other stuff or they dont show up
+  // need to draw the labels after other stuff or they don't show up
   for (uint i = 0; i < man->input().getTaggedSamples(man->getOption<std::vector<std::string>>("sampleTags")).size(); i++)
   {
     MACH3LOG_DEBUG("  Will I draw the label for sample {}??", i);
@@ -313,7 +313,7 @@ void makeSplitSampleLLHScanComparisons(const std::string& paramName,
     MACH3LOG_DEBUG("  I drew the label!");
   }
 
-  // now we plot the comparisson file plots
+  // now we plot the comparison file plots
   for (unsigned int extraFileIdx = 1; extraFileIdx < man->getNFiles(); extraFileIdx++)
   {
     MACH3LOG_DEBUG("  - Adding plot for additional file {}", extraFileIdx);
@@ -327,8 +327,6 @@ void makeSplitSampleLLHScanComparisons(const std::string& paramName,
                     Form("%s - %s", paramName.c_str(), man->getFileLabel(extraFileIdx).c_str()));
 
     auto splitSamplesLegend = std::make_unique<TLegend>(0.37, 0.475, 0.63, 0.9);
-
-
     splitSamplesStack->SetBit(kCanDelete);
     splitSamplesLegend->SetBit(kCanDelete);
 
