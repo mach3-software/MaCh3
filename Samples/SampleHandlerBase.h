@@ -76,10 +76,10 @@ class SampleHandlerBase
   /// @ingroup SampleHandlerGetters
   virtual TH1* GetW2Hist(const int Sample) = 0;
 
-  // WARNING KS: Needed for sigma var, but also remnants of T2K-ND280 code will be merged in SampleHandlerFD, stay tuned...
-  virtual void SetupBinning(const M3::int_t Selection, std::vector<double> &BinningX, std::vector<double> &BinningY){
-    (void) Selection; (void) BinningX; (void) BinningY; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented");}
+  /// @brief Return the binning used to draw a kinematic parameter
+  virtual std::vector<double> ReturnKinematicParameterBinning(const int Sample, const std::string &KinematicParameter) const = 0;
 
+  // WARNING KS: Needed for sigma var, but also remnants of T2K-ND280 code will be merged in SampleHandlerFD, stay tuned...
   virtual inline TH1* GetPDFMode(const int Selection, const int Mode) {
     (void) Selection; (void) Mode; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); }
   ///////////
