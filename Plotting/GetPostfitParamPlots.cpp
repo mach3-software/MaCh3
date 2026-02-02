@@ -46,7 +46,7 @@ _MaCh3_Safe_Include_End_ //}
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
 #pragma GCC diagnostic ignored "-Wconversion"
 
-MaCh3Plotting::PlottingManager *man;
+MaCh3Plotting::PlottingManager *PlotMan;
 TH1D *Prefit;
 
 int NDParameters;
@@ -70,12 +70,12 @@ void copyParToBlockHist(const int localBin, const std::string& paramName, TH1D* 
                         const std::string& type, const int fileId, const bool setLabels = true){
   // Set the values in the sub-histograms
   MACH3LOG_DEBUG("copying data from at local bin {}: for parameter {}", localBin, paramName);
-  MACH3LOG_DEBUG("  Fitter specific name: {}", man->input().translateName(fileId, MaCh3Plotting::kPostFit, paramName));
-  MACH3LOG_DEBUG("  value: {:.4f}", man->input().getPostFitValue(fileId, paramName, type));
-  MACH3LOG_DEBUG("  error: {:.4f}", man->input().getPostFitError(fileId, paramName, type));
+  MACH3LOG_DEBUG("  Fitter specific name: {}", PlotMan->input().translateName(fileId, MaCh3Plotting::kPostFit, paramName));
+  MACH3LOG_DEBUG("  value: {:.4f}", PlotMan->input().getPostFitValue(fileId, paramName, type));
+  MACH3LOG_DEBUG("  error: {:.4f}", PlotMan->input().getPostFitError(fileId, paramName, type));
 
-  blockHist->SetBinContent(localBin +1, man->input().getPostFitValue(fileId, paramName, type));
-  blockHist->SetBinError(localBin +1, man->input().getPostFitError(fileId, paramName, type));
+  blockHist->SetBinContent(localBin +1, PlotMan->input().getPostFitValue(fileId, paramName, type));
+  blockHist->SetBinError(localBin +1, PlotMan->input().getPostFitError(fileId, paramName, type));
 
   if(setLabels){
     blockHist->GetXaxis()->SetBinLabel(localBin +1, paramName.c_str());
@@ -139,7 +139,7 @@ void PrettifyTitles(TH1D *Hist) {
   for (int i = 0; i < Hist->GetXaxis()->GetNbins(); ++i)
   {
     std::string title = Hist->GetXaxis()->GetBinLabel(i+1);
-    title = man->style().prettifyParamName(title);
+    title = PlotMan->style().prettifyParamName(title);
     Hist->GetXaxis()->SetBinLabel(i+1, title.c_str());
   }
 }
@@ -149,7 +149,7 @@ void PrettifyTitles(TH2D *Hist) {
   {
     std::string title = Hist->GetXaxis()->GetBinLabel(i+1);
 
-    title = man->style().prettifyParamName(title);
+    title = PlotMan->style().prettifyParamName(title);
     Hist->GetXaxis()->SetBinLabel(i+1, title.c_str());
   }
 }
@@ -228,7 +228,7 @@ std::unique_ptr<TH1D> makeRatio(TH1D *PrefitCopy, TH1D *PostfitCopy, bool setAxe
     if (Ratio->GetLineColor() == 0) Ratio->SetLineColor(kBlack);
     Ratio->SetMarkerColor(PostfitCopy->GetMarkerColor());
 
-    Ratio->SetLineWidth(man->getOption<int>("plotLineWidth"));
+    Ratio->SetLineWidth(PlotMan->getOption<int>("plotLineWidth"));
     Ratio->SetTitle("");
 
     Ratio->SetMarkerSize(2);
@@ -272,7 +272,7 @@ void DrawPlots(TCanvas *plotCanv, TH1D* PrefitCopy, const std::vector<std::uniqu
     postFitHist->SetLineColor(TColor::GetColorPalette(fileId));
     postFitHist->SetMarkerStyle(7);
     postFitHist->SetLineStyle(1+fileId);
-    postFitHist->SetLineWidth(man->getOption<int>("plotLineWidth"));
+    postFitHist->SetLineWidth(PlotMan->getOption<int>("plotLineWidth"));
 
     postFitHist->Draw("e1, same");
   }
@@ -301,7 +301,7 @@ void DrawPlots(TCanvas *plotCanv, TH1D* PrefitCopy, const std::vector<std::uniqu
     ratioHists[postFitIdx]->SetLineColor(TColor::GetColorPalette(postFitIdx));
     ratioHists[postFitIdx]->SetMarkerStyle(7);
     ratioHists[postFitIdx]->SetLineStyle(1+postFitIdx);
-    ratioHists[postFitIdx]->SetLineWidth(man->getOption<int>("plotLineWidth"));
+    ratioHists[postFitIdx]->SetLineWidth(PlotMan->getOption<int>("plotLineWidth"));
 
     ratioHists[postFitIdx]->Draw("p same");
   }
@@ -313,13 +313,13 @@ void DrawPlots(TCanvas *plotCanv, TH1D* PrefitCopy, const std::vector<std::uniqu
   
   line.SetLineColor(kRed);
   line.SetLineStyle(kDashed);
-  line.SetLineWidth(man->getOption<int>("refLineWidth"));
+  line.SetLineWidth(PlotMan->getOption<int>("refLineWidth"));
   line2.SetLineColor(kRed);
   line2.SetLineStyle(kDashed);
-  line2.SetLineWidth(man->getOption<int>("refLineWidth"));
+  line2.SetLineWidth(PlotMan->getOption<int>("refLineWidth"));
   line3.SetLineColor(kRed);
   line3.SetLineStyle(kDashed);
-  line3.SetLineWidth(man->getOption<int>("refLineWidth"));
+  line3.SetLineWidth(PlotMan->getOption<int>("refLineWidth"));
 
   line.Draw("same");
   line2.Draw("same");
@@ -331,14 +331,14 @@ void DrawPlots(TCanvas *plotCanv, TH1D* PrefitCopy, const std::vector<std::uniqu
 void MakeParameterPlots()
 {  
   // get the names of the blocks of parameters to group together
-  std::vector<std::string> const blockNames = man->getOption<std::vector<std::string>>("paramGroups");
+  std::vector<std::string> const blockNames = PlotMan->getOption<std::vector<std::string>>("paramGroups");
   const int nPlots = static_cast<int>(blockNames.size());
 
   for (int i = 0; i < nPlots; i++)
   {
     // get the configuration for this parameter
     std::string blockName = blockNames[i];
-    YAML::Node paramBlock = man->getOption(blockName);
+    YAML::Node paramBlock = PlotMan->getOption(blockName);
     auto blockTitle       = paramBlock[0].as<std::string>();
     auto blockLimits      = paramBlock[1].as<std::vector<double>>();
     auto blockContents    = paramBlock[2].as<std::vector<std::string>>();
@@ -350,7 +350,7 @@ void MakeParameterPlots()
     auto blockHist_prefit = std::make_unique<TH1D>(blockName.c_str(), blockTitle.c_str(),
                                                   nParams, 0.0, static_cast<double>(nParams));
     
-    man->style().setTH1Style(blockHist_prefit.get(), man->getOption<std::string>("prefitHistStyle"));
+    PlotMan->style().setTH1Style(blockHist_prefit.get(), PlotMan->getOption<std::string>("prefitHistStyle"));
 
     // set the errors for the prefit block hist
     for(int localBin=0; localBin < nParams; localBin ++){
@@ -361,9 +361,9 @@ void MakeParameterPlots()
 
     // now set for the postfit blocks for all files
     std::vector <std::unique_ptr<TH1D>> blockHist_postfit_Vec;
-    for(unsigned int fileId = 0; fileId < man->getNFiles(); fileId++){
+    for(unsigned int fileId = 0; fileId < PlotMan->getNFiles(); fileId++){
 
-      auto blockHist_postfit = std::make_unique<TH1D>((blockName + man->getFileName(fileId)).c_str(),
+      auto blockHist_postfit = std::make_unique<TH1D>((blockName + PlotMan->getFileName(fileId)).c_str(),
                                                       blockTitle.c_str(), nParams, 0.0, static_cast<double>(nParams));
 
       // loop through all the parameters in this block and set the contents in the blocks TH1
@@ -404,8 +404,8 @@ void MakeFluxPlots()
   p2->SetLogx(true);
   
   // get the names of the blocks of parameters to group together
-  std::vector<std::string> const fluxBlockNames = man->getOption<std::vector<std::string>>("fluxGroups");
-  auto const fluxBinningTable = man->getOption("FluxBinning");
+  std::vector<std::string> const fluxBlockNames = PlotMan->getOption<std::vector<std::string>>("fluxGroups");
+  auto const fluxBinningTable = PlotMan->getOption("FluxBinning");
 
   const int FluxPlots = static_cast<int>(fluxBlockNames.size());
 
@@ -413,7 +413,7 @@ void MakeFluxPlots()
   {
     // get the configuration for this block
     std::string fluxBlockName = fluxBlockNames[i];
-    YAML::Node paramBlock           = man->getOption(fluxBlockName);
+    YAML::Node paramBlock           = PlotMan->getOption(fluxBlockName);
     std::string blockTitle          = paramBlock[0].as<std::string>();
     std::vector<double> blockLimits = paramBlock[1].as<std::vector<double>>();
     std::string blockBinningName    = paramBlock[2].as<std::string>();
@@ -440,7 +440,7 @@ void MakeFluxPlots()
     blockHist_prefit->GetYaxis()->SetTitle("Parameter Variation");
     blockHist_prefit->GetXaxis()->SetTitle("E_{#nu} (GeV)");
     blockHist_prefit->GetXaxis()->SetTitleOffset(blockHist_prefit->GetXaxis()->GetTitleOffset()*1.2);
-    man->style().setTH1Style(blockHist_prefit.get(), man->getOption<std::string>("prefitHistStyle"));
+    PlotMan->style().setTH1Style(blockHist_prefit.get(), PlotMan->getOption<std::string>("prefitHistStyle"));
     // set the errors for the prefit block hist
     for(int fluxParId = blockContents[0]; fluxParId <= blockContents[1]; fluxParId++){
         int localBin = fluxParId - blockContents[0];
@@ -450,7 +450,7 @@ void MakeFluxPlots()
 
     // now set for the postfit blocks for all files
     std::vector <std::unique_ptr<TH1D>> blockHist_postfit_Vec;
-    for(unsigned int fileId = 0; fileId < man->getNFiles(); fileId++){
+    for(unsigned int fileId = 0; fileId < PlotMan->getNFiles(); fileId++){
       auto blockHist_postfit = std::make_unique<TH1D>(fluxBlockName.c_str(), blockTitle.c_str(), nParams, binning.data());
 
       for(int fluxParId = blockContents[0]; fluxParId <= blockContents[1]; fluxParId++){
@@ -491,9 +491,9 @@ void MakeNDDetPlots()
     MACH3LOG_DEBUG("--- On sample {}", NDSamplesNames[i]); 
     NDbinCounter += NDSamplesBins[i];
 
-    std::vector<std::unique_ptr<TH1D>> PostfitNDDetHistVec(man->getNFiles());
-    TH1D *PreFitNDDetHist = man->input().getFile(0).file->Get<TH1D>(Form("param_%s_prefit", NDSamplesNames[i].c_str()));
-    man->style().setTH1Style(PreFitNDDetHist, man->getOption<std::string>("prefitHistStyle"));
+    std::vector<std::unique_ptr<TH1D>> PostfitNDDetHistVec(PlotMan->getNFiles());
+    TH1D *PreFitNDDetHist = PlotMan->input().getFile(0).file->Get<TH1D>(Form("param_%s_prefit", NDSamplesNames[i].c_str()));
+    PlotMan->style().setTH1Style(PreFitNDDetHist, PlotMan->getOption<std::string>("prefitHistStyle"));
 
     std::string temp = NDSamplesNames[i].c_str();
     while (temp.find("_") != std::string::npos) {
@@ -504,8 +504,8 @@ void MakeNDDetPlots()
     
     MACH3LOG_DEBUG("  Start bin: {} :: End bin: {}", Start, NDbinCounter);
     // set the x range for the postfits
-    for(unsigned int fileId = 0; fileId < man->getNFiles(); fileId++){
-      PostfitNDDetHistVec[fileId] = M3::Clone(man->input().getFile(fileId).file->Get<TH1D>(Form("param_%s_%s", NDSamplesNames[i].c_str(), plotType.c_str())));
+    for(unsigned int fileId = 0; fileId < PlotMan->getNFiles(); fileId++){
+      PostfitNDDetHistVec[fileId] = M3::Clone(PlotMan->input().getFile(fileId).file->Get<TH1D>(Form("param_%s_%s", NDSamplesNames[i].c_str(), plotType.c_str())));
     }
 
     //KS: We dont' need name for every nd param
@@ -519,7 +519,7 @@ void MakeNDDetPlots()
       }
     }
 
-    PreFitNDDetHist->GetYaxis()->SetRangeUser(man->getOption<double>("detParYRange_low"), man->getOption<double>("detParYRange_high"));
+    PreFitNDDetHist->GetYaxis()->SetRangeUser(PlotMan->getOption<double>("detParYRange_low"), PlotMan->getOption<double>("detParYRange_high"));
     
     Start += NDSamplesBins[i];
 
@@ -538,7 +538,7 @@ void MakeRidgePlots()
   blankCanv->SaveAs("RidgePlots.pdf[");
 
   // get the names of the blocks of parameters to group together
-  const auto blockNames = man->getOption<std::vector<std::string>>("paramGroups");
+  const auto blockNames = PlotMan->getOption<std::vector<std::string>>("paramGroups");
   const int nPlots = static_cast<int>(blockNames.size());
 
   constexpr double padTopMargin = 0.9;
@@ -549,13 +549,13 @@ void MakeRidgePlots()
   {
     // get the configuration for this parameter
     std::string blockName = blockNames[i];
-    auto const &paramBlock = man->getOption(blockName);
+    auto const &paramBlock = PlotMan->getOption(blockName);
     auto blockTitle    = paramBlock[0].as<std::string>();
     auto blockLimits   = paramBlock[1].as<std::vector<double>>();
     auto blockContents = paramBlock[2].as<std::vector<std::string>>();
 
     // the directory of histograms
-    TDirectoryFile *posteriorDir = man->input().getFile(0).file->Get<TDirectoryFile>("Post_1d_hists");
+    TDirectoryFile *posteriorDir = PlotMan->input().getFile(0).file->Get<TDirectoryFile>("Post_1d_hists");
 
     // get num of params in the block
     int nParams = static_cast<int>(blockContents.size());
@@ -594,7 +594,7 @@ void MakeRidgePlots()
       while (TKey* key = static_cast<TKey*>(next())) {
         // check if the end of the param name matches with the MaCh3 name, do this so we exclude things like nds_ at the start of the name
         std::string str(key->GetTitle());
-        std::string name = man->input().translateName(0, MaCh3Plotting::kPostFit, paramName);
+        std::string name = PlotMan->input().translateName(0, MaCh3Plotting::kPostFit, paramName);
         uint pos = str.find(name);
         bool foundPar = (pos == str.length() - name.length());
 
@@ -655,7 +655,7 @@ void MakeRidgePlots()
       frame->SetLineColorAlpha(0, 0.0);
       
       ridgeCanv->cd();
-      label->DrawLatexNDC(0.29, padBottom + 0.005, man->style().prettifyParamName(paramName).c_str());
+      label->DrawLatexNDC(0.29, padBottom + 0.005, PlotMan->style().prettifyParamName(paramName).c_str());
       line->DrawLine(0.1, padBottom, 0.9, padBottom);
 
       axisPlot_holder[parId] = std::move(axisPlot_tmp);
@@ -699,7 +699,7 @@ void MakeRidgePlots()
 
 void GetPostfitParamPlots()
 {
-  SaveName = man->getOutputName();
+  SaveName = PlotMan->getOutputName();
   
   //KS: By default we take HPD values, but by changing "plotType" you can use for example Gauss
   plotType = "HPD";
@@ -709,8 +709,8 @@ void GetPostfitParamPlots()
   
   // if we have one MaCh3 nd file then we can get settings from it 
   bool plotNDDet = false;
-  for (size_t fileId = 0; fileId < man->input().getNInputFiles(); fileId++) {
-    if(!ReadSettings(man->input().getFile(0).file)) {
+  for (size_t fileId = 0; fileId < PlotMan->input().getNInputFiles(); fileId++) {
+    if(!ReadSettings(PlotMan->input().getFile(0).file)) {
       MACH3LOG_INFO("at least one file provided does not have 'settings' tree indicating it is not MaCh3 ND file");
       MACH3LOG_INFO("  sadly this means I cannot plot ND Det parameters as this is only supported for MaCh3 ND files for now... sorry :(");
       plotNDDet = false;
@@ -734,10 +734,10 @@ void GetPostfitParamPlots()
   auto leg = std::make_unique<TLegend>(0.0, 0.0, 1.0, 1.0);
   // make a dummy TH1 to set out legend
   Prefit = new TH1D();
-  man->style().setTH1Style(Prefit, man->getOption<std::string>("prefitHistStyle"));
+  PlotMan->style().setTH1Style(Prefit, PlotMan->getOption<std::string>("prefitHistStyle"));
   leg->AddEntry(Prefit, "Prior", "lpf");
 
-  for(unsigned int fileId = 0; fileId < man->getNFiles(); fileId++){
+  for(unsigned int fileId = 0; fileId < PlotMan->getNFiles(); fileId++){
     TH1D *postFitHist_tmp = new TH1D();
     postFitHist_tmp->SetBit(kCanDelete);
     
@@ -745,8 +745,8 @@ void GetPostfitParamPlots()
     postFitHist_tmp->SetLineColor(TColor::GetColorPalette(fileId));
     postFitHist_tmp->SetMarkerStyle(7);
     postFitHist_tmp->SetLineStyle(1+fileId);
-    postFitHist_tmp->SetLineWidth(man->getOption<int>("plotLineWidth"));
-    leg->AddEntry(postFitHist_tmp, man->getFileLabel(fileId).c_str(), "lpf");
+    postFitHist_tmp->SetLineWidth(PlotMan->getOption<int>("plotLineWidth"));
+    leg->AddEntry(postFitHist_tmp, PlotMan->getFileLabel(fileId).c_str(), "lpf");
   }
 
   canv->cd();
@@ -813,9 +813,9 @@ void GetViolinPlots()
   TCandle::SetScaledViolin(false);
 
   std::string OutputName = "";
-  for(unsigned int fileId = 0; fileId < man->getNFiles(); fileId++){
-    MACH3LOG_INFO("File {}: {} ", fileId, man->getFileName(fileId));
-    OutputName += man->getFileName(fileId);
+  for(unsigned int fileId = 0; fileId < PlotMan->getNFiles(); fileId++){
+    MACH3LOG_INFO("File {}: {} ", fileId, PlotMan->getFileName(fileId));
+    OutputName += PlotMan->getFileName(fileId);
     OutputName = OutputName.substr(0, OutputName.find(".root"));
   }
   MACH3LOG_INFO("Making Violin Plot");
@@ -836,12 +836,12 @@ void GetViolinPlots()
   canvas->Print((OutputName+".pdf[").c_str());
   canvas->SetGrid();
 
-  if(man->input().getFile(0).file->Get<TH2D>( "param_violin_prior" ) == nullptr)
+  if(PlotMan->input().getFile(0).file->Get<TH2D>( "param_violin_prior" ) == nullptr)
   {
     MACH3LOG_WARN("Couldn't find violin plot, make sure method from MCMCProcessor is being called");
     return;
   }
-  std::unique_ptr<TH2D> ViolinPre = M3::Clone(man->input().getFile(0).file->Get<TH2D>( "param_violin_prior" ));
+  std::unique_ptr<TH2D> ViolinPre = M3::Clone(PlotMan->input().getFile(0).file->Get<TH2D>( "param_violin_prior" ));
   // Do some fancy replacements
   ViolinPre->SetFillColor(kRed);
   ViolinPre->SetFillColorAlpha(kRed, 0.35);
@@ -853,14 +853,14 @@ void GetViolinPlots()
   ViolinPre->GetYaxis()->SetTitle("Parameter Value");
   ViolinPre->GetXaxis()->LabelsOption("v");
 
-  std::unique_ptr<TH1D> Postfit = M3::Clone(man->input().getFile(0).file->Get<TH1D>( ("param_xsec_"+plotType).c_str() ));
+  std::unique_ptr<TH1D> Postfit = M3::Clone(PlotMan->input().getFile(0).file->Get<TH1D>( ("param_xsec_"+plotType).c_str() ));
   Postfit->SetMarkerColor(kRed);
   Postfit->SetLineColor(kRed);
   Postfit->SetMarkerStyle(7);
 
-  std::vector<std::unique_ptr<TH2D>> Violin(man->getNFiles());
-  for(unsigned int fileId = 0; fileId < man->getNFiles(); fileId++) {
-    Violin[fileId] = M3::Clone(man->input().getFile(fileId).file->Get<TH2D>( "param_violin" ));
+  std::vector<std::unique_ptr<TH2D>> Violin(PlotMan->getNFiles());
+  for(unsigned int fileId = 0; fileId < PlotMan->getNFiles(); fileId++) {
+    Violin[fileId] = M3::Clone(PlotMan->input().getFile(fileId).file->Get<TH2D>( "param_violin" ));
     if(Violin[fileId] == nullptr)
     {
       MACH3LOG_ERROR("Couldn't find violin plot, make sure method from MCMCProcessor is being called");
@@ -889,12 +889,12 @@ void GetViolinPlots()
     }
   }
 
-  std::unique_ptr<TGraphAsymmErrors> PostGraphAll = MakeTGraphAsymmErrors(man->input().getFile(0).file);
+  std::unique_ptr<TGraphAsymmErrors> PostGraphAll = MakeTGraphAsymmErrors(PlotMan->input().getFile(0).file);
   // Make a Legend page
   auto leg = std::make_unique<TLegend>(0.0, 0.0, 1.0, 1.0);
   if (ViolinPre != nullptr) leg->AddEntry(ViolinPre.get(), "Prior", "lpf");
-  for(unsigned int fileId = 0; fileId < man->getNFiles(); fileId++) {
-    leg->AddEntry(Violin[fileId].get(), man->getFileLabel(fileId).c_str(), "lpf");
+  for(unsigned int fileId = 0; fileId < PlotMan->getNFiles(); fileId++) {
+    leg->AddEntry(Violin[fileId].get(), PlotMan->getFileLabel(fileId).c_str(), "lpf");
   }
   if(PlotAssym) leg->AddEntry(PostGraphAll.get(), "HPD Assym", "lp");
   else          leg->AddEntry(Postfit.get(), "HPD", "lpf");
@@ -905,14 +905,14 @@ void GetViolinPlots()
   canvas->Print((OutputName+".pdf").c_str());
   
   // get the names of the blocks of parameters to group together
-  std::vector<std::string> const blockNames = man->getOption<std::vector<std::string>>("paramGroups");
+  std::vector<std::string> const blockNames = PlotMan->getOption<std::vector<std::string>>("paramGroups");
   const int nPlots = static_cast<int>(blockNames.size());
 
   for (int i = 0; i < nPlots; i++)
   {
     // get the configuration for this parameter
     std::string blockName = blockNames[i];
-    YAML::Node paramBlock = man->getOption(blockName);
+    YAML::Node paramBlock = PlotMan->getOption(blockName);
     std::string blockTitle                 = paramBlock[0].as<std::string>();
     std::vector<double>      blockLimits   = paramBlock[1].as<std::vector<double>>();
     std::vector<std::string> blockContents = paramBlock[2].as<std::vector<std::string>>();
@@ -927,8 +927,8 @@ void GetViolinPlots()
     // set the y axis limits we got from config
     blockHist_prefit->GetYaxis()->SetRangeUser(blockLimits[0], blockLimits[1]);
 
-    std::vector<std::unique_ptr<TH2D>> blockHist(man->getNFiles());
-    for(unsigned int fileId = 0; fileId < man->getNFiles(); fileId++) {
+    std::vector<std::unique_ptr<TH2D>> blockHist(PlotMan->getNFiles());
+    for(unsigned int fileId = 0; fileId < PlotMan->getNFiles(); fileId++) {
       blockHist[fileId] = std::make_unique<TH2D>((blockTitle + "Violin" + fileId).Data(), (blockTitle + "Violin" + fileId).Data(),
                                                    nParams, 0.0, static_cast<double>(nParams), Violin[fileId]->GetYaxis()->GetNbins(),
                                                    Violin[fileId]->GetYaxis()->GetXmin(), Violin[fileId]->GetYaxis()->GetXmax());
@@ -959,7 +959,7 @@ void GetViolinPlots()
       }
       Index.push_back(ParamBinId);
     }
-    std::unique_ptr<TGraphAsymmErrors> PostGraph = MakeTGraphAsymmErrors(man->input().getFile(0).file, Index);
+    std::unique_ptr<TGraphAsymmErrors> PostGraph = MakeTGraphAsymmErrors(PlotMan->input().getFile(0).file, Index);
     PostGraph->SetMarkerColor(kBlack);
     PostGraph->SetLineColor(kBlack);
     PostGraph->SetMarkerStyle(7);
@@ -967,7 +967,7 @@ void GetViolinPlots()
     PostGraph->SetLineStyle(kSolid);
 
     blockHist_prefit->Draw("violinX(03100300)");
-    for(unsigned int fileId = 0; fileId < man->getNFiles(); fileId++) {
+    for(unsigned int fileId = 0; fileId < PlotMan->getNFiles(); fileId++) {
       blockHist[fileId]->Draw("violinX(03100300) SAME");
     }
 
@@ -1030,8 +1030,8 @@ void Get2DComparison(const std::string& FileName1, const std::string& FileName2)
         hist1->SetTitle("");
 
         // Prettify axis titles
-        std::string Xtitle = man->style().prettifyParamName(hist1->GetXaxis()->GetTitle());
-        std::string Ytitle = man->style().prettifyParamName(hist1->GetYaxis()->GetTitle());
+        std::string Xtitle = PlotMan->style().prettifyParamName(hist1->GetXaxis()->GetTitle());
+        std::string Ytitle = PlotMan->style().prettifyParamName(hist1->GetYaxis()->GetTitle());
 
         // Adjust the axis ranges of hist1 to include both histograms
         double xmin = std::min(hist1->GetXaxis()->GetXmin(), hist2->GetXaxis()->GetXmin());
@@ -1057,8 +1057,8 @@ void Get2DComparison(const std::string& FileName1, const std::string& FileName2)
         hist2->Draw("CONT3 SAME");
 
         auto Legend = std::make_unique<TLegend>(0.20, 0.7, 0.4, 0.92);
-        Legend->AddEntry(hist1, man->getFileLabel(0).c_str(), "l");
-        Legend->AddEntry(hist2, man->getFileLabel(1).c_str(), "l");
+        Legend->AddEntry(hist1, PlotMan->getFileLabel(0).c_str(), "l");
+        Legend->AddEntry(hist2, PlotMan->getFileLabel(1).c_str(), "l");
         Legend->SetTextSize(0.03);
         Legend->SetLineColor(0);
         Legend->SetLineStyle(0);
@@ -1084,25 +1084,25 @@ int main(int argc, char *argv[])
   // Avoid Info in <TCanvas::Print>
   gErrorIgnoreLevel = kWarning;
 
-  man = new MaCh3Plotting::PlottingManager();
-  man->parseInputs(argc, argv);
+  PlotMan = new MaCh3Plotting::PlottingManager();
+  PlotMan->parseInputs(argc, argv);
   #ifdef DEBUG
-  man->input().getFile(0).file->ls();
+  PlotMan->input().getFile(0).file->ls();
   #endif
-  man->setExec("GetPostfitParamPlots");
+  PlotMan->setExec("GetPostfitParamPlots");
 
-  man->style().setPalette(man->getOption<std::string>("colorPalette"));
+  PlotMan->style().setPalette(PlotMan->getOption<std::string>("colorPalette"));
 
   GetPostfitParamPlots();
   GetViolinPlots();
 
-  if (man->input().getNInputFiles() == 2)
+  if (PlotMan->input().getNInputFiles() == 2)
   {
-    std::string filename1 = man->getFileName(0);
-    std::string filename2 = man->getFileName(1);
+    std::string filename1 = PlotMan->getFileName(0);
+    std::string filename2 = PlotMan->getFileName(1);
     Get2DComparison(filename1, filename2);
   }
 
-  delete man;
+  delete PlotMan;
   return 0;
 }
