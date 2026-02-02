@@ -1692,8 +1692,9 @@ bool SampleHandlerFD::IsSubEventVarString(const std::string& VarStr) {
 }
 // ===============================================================
 
-TH1* SampleHandlerFD::Get1DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_Str,
-    int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* Axis) {
+// ************************************************
+std::vector<KinematicCut> SampleHandlerFD::BuildModeChannelSelection(const int iSample, const int kModeToFill, const int kChannelToFill) const {
+// ************************************************
   bool fChannel;
   bool fMode;
 
@@ -1739,57 +1740,23 @@ TH1* SampleHandlerFD::Get1DVarHistByModeAndChannel(const int iSample, const std:
     SelectionVec.push_back(SelecChannel);
   }
 
-  return Get1DVarHist(iSample, ProjectionVar_Str,SelectionVec,WeightStyle,Axis);
+  return SelectionVec;
 }
 
+// ************************************************
+TH1* SampleHandlerFD::Get1DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_Str,
+    int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* Axis) {
+// ************************************************
+  auto SelectionVec = BuildModeChannelSelection(iSample, kModeToFill, kChannelToFill);
+  return Get1DVarHist(iSample, ProjectionVar_Str, SelectionVec, WeightStyle, Axis);
+}
+
+// ************************************************
 TH2* SampleHandlerFD::Get2DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY,
     int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
-  bool fChannel;
-  bool fMode;
-
-  if (kChannelToFill != -1) {
-    if (kChannelToFill > GetNOscChannels(iSample)) {
-      MACH3LOG_ERROR("Required channel is not available. kChannelToFill should be between 0 and {}", GetNOscChannels(iSample));
-      MACH3LOG_ERROR("kChannelToFill given:{}", kChannelToFill);
-      MACH3LOG_ERROR("Exiting.");
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-    fChannel = true;
-  } else {
-    fChannel = false;
-  }
-
-  if (kModeToFill != -1) {
-    if (!(kModeToFill >= 0) && (kModeToFill < Modes->GetNModes())) {
-      MACH3LOG_ERROR("Required mode is not available. kModeToFill should be between 0 and {}", Modes->GetNModes());
-      MACH3LOG_ERROR("kModeToFill given:{}", kModeToFill);
-      MACH3LOG_ERROR("Exiting..");
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-    fMode = true;
-  } else {
-    fMode = false;
-  }
-
-  std::vector< KinematicCut > SelectionVec;
-
-  if (fMode) {
-    KinematicCut SelecMode;
-    SelecMode.ParamToCutOnIt = ReturnKinematicParameterFromString("Mode");
-    SelecMode.LowerBound = kModeToFill;
-    SelecMode.UpperBound = kModeToFill+1;
-    SelectionVec.push_back(SelecMode);
-  }
-
-  if (fChannel) {
-    KinematicCut SelecChannel;
-    SelecChannel.ParamToCutOnIt = ReturnKinematicParameterFromString("OscillationChannel");
-    SelecChannel.LowerBound = kChannelToFill;
-    SelecChannel.UpperBound = kChannelToFill+1;
-    SelectionVec.push_back(SelecChannel);
-  }
-
-  return Get2DVarHist(iSample, ProjectionVar_StrX,ProjectionVar_StrY,SelectionVec,WeightStyle,AxisX,AxisY);
+// ************************************************
+  auto SelectionVec = BuildModeChannelSelection(iSample, kModeToFill, kChannelToFill);
+  return Get2DVarHist(iSample, ProjectionVar_StrX, ProjectionVar_StrY, SelectionVec, WeightStyle, AxisX,AxisY);
 }
 
 void SampleHandlerFD::PrintIntegral(const int iSample, const TString& OutputFileName, const int WeightStyle, const TString& OutputCSVFileName) {

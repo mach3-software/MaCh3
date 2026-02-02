@@ -118,7 +118,8 @@ class SampleHandlerFD :  public SampleHandlerBase
                     const std::vector< KinematicCut >& EventSelectionVec = std::vector< KinematicCut >(),
                     int WeightStyle=0, TAxis* AxisX=nullptr, TAxis* AxisY=nullptr,
                     const std::vector< KinematicCut >& SubEventSelectionVec = std::vector< KinematicCut >());
-  
+  std::vector<KinematicCut> BuildModeChannelSelection(const int iSample, const int kModeToFill, const int kChannelToFill) const;
+
   /// @ingroup SampleHandlerGetters
   void Fill1DSubEventHist(const int iSample, TH1D* _h1DVar, const std::string& ProjectionVar, const std::vector< KinematicCut >& SubEventSelectionVec = std::vector< KinematicCut >(),
                     int WeightStyle=0);
