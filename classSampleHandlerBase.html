@@ -147,8 +147,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ga5ea53e5e6adb5b4e6281a3d1ce910c3a"><td class="memItemLeft" align="right" valign="top">virtual TH1 *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#ga5ea53e5e6adb5b4e6281a3d1ce910c3a">GetW2Hist</a> (const int Sample)=0</td></tr>
 <tr class="memdesc:ga5ea53e5e6adb5b4e6281a3d1ce910c3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get W2 histogram.  <a href="group__SampleHandlerGetters.html#ga5ea53e5e6adb5b4e6281a3d1ce910c3a">More...</a><br /></td></tr>
 <tr class="separator:ga5ea53e5e6adb5b4e6281a3d1ce910c3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0cf61d8f769755c4a0fa549adc575c3e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a0cf61d8f769755c4a0fa549adc575c3e">SetupBinning</a> (const <a class="el" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> Selection, std::vector&lt; double &gt; &amp;BinningX, std::vector&lt; double &gt; &amp;BinningY)</td></tr>
-<tr class="separator:a0cf61d8f769755c4a0fa549adc575c3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab140c97a440fec2ea4a62a481992c81"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#aab140c97a440fec2ea4a62a481992c81">ReturnKinematicParameterBinning</a> (const int Sample, const std::string &amp;KinematicParameter) const =0</td></tr>
+<tr class="memdesc:aab140c97a440fec2ea4a62a481992c81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the binning used to draw a kinematic parameter.  <a href="classSampleHandlerBase.html#aab140c97a440fec2ea4a62a481992c81">More...</a><br /></td></tr>
+<tr class="separator:aab140c97a440fec2ea4a62a481992c81"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1c2ab1f967e527e656b0198038a43bfb"><td class="memItemLeft" align="right" valign="top">virtual TH1 *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a1c2ab1f967e527e656b0198038a43bfb">GetPDFMode</a> (const int Selection, const int Mode)</td></tr>
 <tr class="separator:a1c2ab1f967e527e656b0198038a43bfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gae5849766fbbc7aa71672da8b0f189fe5"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#gae5849766fbbc7aa71672da8b0f189fe5">GetPoissonLLH</a> (const double data, const double mc) const</td></tr>
@@ -530,6 +531,46 @@ template&lt;typename T &gt; </div>
 </div><!-- fragment -->
 </div>
 </div>
+<a id="aab140c97a440fec2ea4a62a481992c81"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aab140c97a440fec2ea4a62a481992c81">&#9670;&nbsp;</a></span>ReturnKinematicParameterBinning()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual std::vector&lt;double&gt; SampleHandlerBase::ReturnKinematicParameterBinning </td>
+          <td>(</td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>Sample</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>KinematicParameter</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return the binning used to draw a kinematic parameter. </p>
+
+<p>Implemented in <a class="el" href="classSampleHandlerFD.html#a2cee961e07a80484fe568898f41e4965">SampleHandlerFD</a>, and <a class="el" href="classPySampleHandlerBase.html#ab32d963eb2ca7c30986b88fd57cefd38">PySampleHandlerBase</a>.</p>
+
+</div>
+</div>
 <a id="a3efb49c2a39d87b71e4dec7c7115fa88"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3efb49c2a39d87b71e4dec7c7115fa88">&#9670;&nbsp;</a></span>Reweight()</h2>
 
@@ -587,52 +628,6 @@ template&lt;typename T &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00045">45</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
 <div class="fragment"><div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;{(void) Dir;};</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="a0cf61d8f769755c4a0fa549adc575c3e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0cf61d8f769755c4a0fa549adc575c3e">&#9670;&nbsp;</a></span>SetupBinning()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void SampleHandlerBase::SetupBinning </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a>&#160;</td>
-          <td class="paramname"><em>Selection</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::vector&lt; double &gt; &amp;&#160;</td>
-          <td class="paramname"><em>BinningX</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::vector&lt; double &gt; &amp;&#160;</td>
-          <td class="paramname"><em>BinningY</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="SampleHandlerBase_8h_source.html#l00080">80</a> of file <a class="el" href="SampleHandlerBase_8h_source.html">SampleHandlerBase.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;                                                                                                              {</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    (void) Selection; (void) BinningX; (void) BinningY; <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ , <span class="stringliteral">&quot;Not implemented&quot;</span>);}</div>
 </div><!-- fragment -->
 </div>
 </div>

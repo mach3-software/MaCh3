@@ -256,8 +256,6 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ga4e232eb59bc09c3f8ff4cbed69fcd688 inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga6ceca02f83e878ef1aec6e54e7b2f331 inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#ga6ceca02f83e878ef1aec6e54e7b2f331">GetNEvents</a> () const</td></tr>
 <tr class="separator:ga6ceca02f83e878ef1aec6e54e7b2f331 inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0cf61d8f769755c4a0fa549adc575c3e inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a0cf61d8f769755c4a0fa549adc575c3e">SetupBinning</a> (const <a class="el" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> Selection, std::vector&lt; double &gt; &amp;BinningX, std::vector&lt; double &gt; &amp;BinningY)</td></tr>
-<tr class="separator:a0cf61d8f769755c4a0fa549adc575c3e inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1c2ab1f967e527e656b0198038a43bfb inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">virtual TH1 *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerBase.html#a1c2ab1f967e527e656b0198038a43bfb">GetPDFMode</a> (const int Selection, const int Mode)</td></tr>
 <tr class="separator:a1c2ab1f967e527e656b0198038a43bfb inherit pub_methods_classSampleHandlerBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gae5849766fbbc7aa71672da8b0f189fe5 inherit pub_methods_classSampleHandlerBase"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__SampleHandlerGetters.html#gae5849766fbbc7aa71672da8b0f189fe5">GetPoissonLLH</a> (const double data, const double mc) const</td></tr>
@@ -349,9 +347,9 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:ae98d72c6c30697e32fcb464923456fc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae638fe05a353bdc6dac8b64150f200bf"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerFD.html#ae638fe05a353bdc6dac8b64150f200bf">ReturnKinematicVector</a> (int KinematicVariable, int iEvent)</td></tr>
 <tr class="separator:ae638fe05a353bdc6dac8b64150f200bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6b9e4edbddfcd5842418d35a959d1451"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerFD.html#a6b9e4edbddfcd5842418d35a959d1451">ReturnKinematicParameterBinning</a> (const int Sample, const std::string &amp;KinematicParameter) const</td></tr>
-<tr class="memdesc:a6b9e4edbddfcd5842418d35a959d1451"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the binning used to draw a kinematic parameter.  <a href="classSampleHandlerFD.html#a6b9e4edbddfcd5842418d35a959d1451">More...</a><br /></td></tr>
-<tr class="separator:a6b9e4edbddfcd5842418d35a959d1451"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2cee961e07a80484fe568898f41e4965"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerFD.html#a2cee961e07a80484fe568898f41e4965">ReturnKinematicParameterBinning</a> (const int Sample, const std::string &amp;KinematicParameter) const override</td></tr>
+<tr class="memdesc:a2cee961e07a80484fe568898f41e4965"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the binning used to draw a kinematic parameter.  <a href="classSampleHandlerFD.html#a2cee961e07a80484fe568898f41e4965">More...</a><br /></td></tr>
+<tr class="separator:a2cee961e07a80484fe568898f41e4965"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a889f8aeb4ab9e6b6441dabcc484c91c2"><td class="memItemLeft" align="right" valign="top">virtual const double *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerFD.html#a889f8aeb4ab9e6b6441dabcc484c91c2">GetPointerToKinematicParameter</a> (std::string KinematicParamter, int iEvent)=0</td></tr>
 <tr class="separator:a889f8aeb4ab9e6b6441dabcc484c91c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a64100ff9107ef5ed40945063da3b6eda"><td class="memItemLeft" align="right" valign="top">virtual const double *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerFD.html#a64100ff9107ef5ed40945063da3b6eda">GetPointerToKinematicParameter</a> (double KinematicVariable, int iEvent)=0</td></tr>
@@ -1651,8 +1649,8 @@ Ed Atkin </dd></dl>
 <div class="line"><a name="l01497"></a><span class="lineno"> 1497</span>&#160;  <span class="keywordflow">if</span> (AxisX &amp;&amp; AxisY) {</div>
 <div class="line"><a name="l01498"></a><span class="lineno"> 1498</span>&#160;    _h2DVar = <span class="keyword">new</span> TH2D(<span class="stringliteral">&quot;&quot;</span>,<span class="stringliteral">&quot;&quot;</span>,AxisX-&gt;GetNbins(),AxisX-&gt;GetXbins()-&gt;GetArray(),AxisY-&gt;GetNbins(),AxisY-&gt;GetXbins()-&gt;GetArray());</div>
 <div class="line"><a name="l01499"></a><span class="lineno"> 1499</span>&#160;  } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l01500"></a><span class="lineno"> 1500</span>&#160;    std::vector&lt;double&gt; xBinEdges = <a class="code" href="classSampleHandlerFD.html#a6b9e4edbddfcd5842418d35a959d1451">ReturnKinematicParameterBinning</a>(iSample, ProjectionVar_StrX);</div>
-<div class="line"><a name="l01501"></a><span class="lineno"> 1501</span>&#160;    std::vector&lt;double&gt; yBinEdges = <a class="code" href="classSampleHandlerFD.html#a6b9e4edbddfcd5842418d35a959d1451">ReturnKinematicParameterBinning</a>(iSample, ProjectionVar_StrY);</div>
+<div class="line"><a name="l01500"></a><span class="lineno"> 1500</span>&#160;    std::vector&lt;double&gt; xBinEdges = <a class="code" href="classSampleHandlerFD.html#a2cee961e07a80484fe568898f41e4965">ReturnKinematicParameterBinning</a>(iSample, ProjectionVar_StrX);</div>
+<div class="line"><a name="l01501"></a><span class="lineno"> 1501</span>&#160;    std::vector&lt;double&gt; yBinEdges = <a class="code" href="classSampleHandlerFD.html#a2cee961e07a80484fe568898f41e4965">ReturnKinematicParameterBinning</a>(iSample, ProjectionVar_StrY);</div>
 <div class="line"><a name="l01502"></a><span class="lineno"> 1502</span>&#160;    _h2DVar = <span class="keyword">new</span> TH2D(<span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;&quot;</span>, <span class="keywordtype">int</span>(xBinEdges.size())-1, xBinEdges.data(), <span class="keywordtype">int</span>(yBinEdges.size())-1, yBinEdges.data());</div>
 <div class="line"><a name="l01503"></a><span class="lineno"> 1503</span>&#160;  }</div>
 <div class="line"><a name="l01504"></a><span class="lineno"> 1504</span>&#160;  _h2DVar-&gt;GetXaxis()-&gt;SetTitle(ProjectionVar_StrX.c_str());</div>
@@ -1685,7 +1683,7 @@ Ed Atkin </dd></dl>
 <div class="line"><a name="l01531"></a><span class="lineno"> 1531</span>&#160; </div>
 <div class="line"><a name="l01532"></a><span class="lineno"> 1532</span>&#160;  <span class="keywordflow">return</span> _h2DVar;</div>
 <div class="line"><a name="l01533"></a><span class="lineno"> 1533</span>&#160;}</div>
-<div class="ttc" id="aclassSampleHandlerFD_html_a6b9e4edbddfcd5842418d35a959d1451"><div class="ttname"><a href="classSampleHandlerFD.html#a6b9e4edbddfcd5842418d35a959d1451">SampleHandlerFD::ReturnKinematicParameterBinning</a></div><div class="ttdeci">std::vector&lt; double &gt; ReturnKinematicParameterBinning(const int Sample, const std::string &amp;KinematicParameter) const</div><div class="ttdoc">Return the binning used to draw a kinematic parameter.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8cpp_source.html#l01644">SampleHandlerFD.cpp:1644</a></div></div>
+<div class="ttc" id="aclassSampleHandlerFD_html_a2cee961e07a80484fe568898f41e4965"><div class="ttname"><a href="classSampleHandlerFD.html#a2cee961e07a80484fe568898f41e4965">SampleHandlerFD::ReturnKinematicParameterBinning</a></div><div class="ttdeci">std::vector&lt; double &gt; ReturnKinematicParameterBinning(const int Sample, const std::string &amp;KinematicParameter) const override</div><div class="ttdoc">Return the binning used to draw a kinematic parameter.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8cpp_source.html#l01644">SampleHandlerFD.cpp:1644</a></div></div>
 <div class="ttc" id="aclassSampleHandlerFD_html_ac7fb7bba06c0e8aa87b2672f353cecec"><div class="ttname"><a href="classSampleHandlerFD.html#ac7fb7bba06c0e8aa87b2672f353cecec">SampleHandlerFD::Fill2DSubEventHist</a></div><div class="ttdeci">void Fill2DSubEventHist(const int iSample, TH2D *_h2DVar, const std::string &amp;ProjectionVarX, const std::string &amp;ProjectionVarY, const std::vector&lt; KinematicCut &gt; &amp;SubEventSelectionVec=std::vector&lt; KinematicCut &gt;(), int WeightStyle=0)</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8cpp_source.html#l01535">SampleHandlerFD.cpp:1535</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -3517,8 +3515,8 @@ Ed Atkin </dd></dl>
 
 </div>
 </div>
-<a id="a6b9e4edbddfcd5842418d35a959d1451"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6b9e4edbddfcd5842418d35a959d1451">&#9670;&nbsp;</a></span>ReturnKinematicParameterBinning()</h2>
+<a id="a2cee961e07a80484fe568898f41e4965"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2cee961e07a80484fe568898f41e4965">&#9670;&nbsp;</a></span>ReturnKinematicParameterBinning()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3546,13 +3544,15 @@ Ed Atkin </dd></dl>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 <p>Return the binning used to draw a kinematic parameter. </p>
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000007">Todo:</a></b></dt><dd>might be useful to allow overwriting this </dd></dl>
+
+<p>Implements <a class="el" href="classSampleHandlerBase.html#aab140c97a440fec2ea4a62a481992c81">SampleHandlerBase</a>.</p>
 
 <p class="definition">Definition at line <a class="el" href="SampleHandlerFD_8cpp_source.html#l01644">1644</a> of file <a class="el" href="SampleHandlerFD_8cpp_source.html">SampleHandlerFD.cpp</a>.</p>
 <div class="fragment"><div class="line"><a name="l01644"></a><span class="lineno"> 1644</span>&#160;                                                                                                                              {</div>
