@@ -294,9 +294,9 @@ class SampleHandlerFD :  public SampleHandlerBase
   virtual std::vector<double> ReturnKinematicVector(int KinematicVariable, int iEvent) {return {}; (void)KinematicVariable; (void)iEvent;};
   // ===========================================================
 
-
   /// @brief Return the binning used to draw a kinematic parameter
-  std::vector<double> ReturnKinematicParameterBinning(const int Sample, const std::string &KinematicParameter) const;
+  std::vector<double> ReturnKinematicParameterBinning(const int Sample, const std::string &KinematicParameter) const override;
+
   virtual const double* GetPointerToKinematicParameter(std::string KinematicParamter, int iEvent) = 0;
   virtual const double* GetPointerToKinematicParameter(double KinematicVariable, int iEvent) = 0;
 
