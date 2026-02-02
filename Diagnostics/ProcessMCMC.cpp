@@ -174,6 +174,8 @@ void ProcessMCMC(const std::string& inputFile)
   if(GetFromManager<bool>(Settings["CalcBipolarPlot"], false)) CalcBipolarPlot(Processor.get());
   if(GetFromManager<bool>(Settings["CalcParameterEvolution"], false)) CalcParameterEvolution(Processor.get());
 
+  if(GetFromManager<bool>(Settings["GetTrianglePlot"], true)) GetTrianglePlot(Processor.get());
+
   if(PlotCorr)
   {
     Processor->SetSmoothing(GetFromManager<bool>(Settings["Smoothing"], true));
