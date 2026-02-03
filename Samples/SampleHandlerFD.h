@@ -2,16 +2,16 @@
 
 //MaCh3 includes
 #include "Splines/BinnedSplineHandler.h"
-
 #include "Parameters/ParameterHandlerGeneric.h"
-
 #include "Samples/SampleHandlerBase.h"
 #include "Samples/OscillationHandler.h"
 #include "Samples/FarDetectorCoreInfoStruct.h"
 #include "Samples/BinningHandler.h"
 
+_MaCh3_Safe_Include_Start_ //{
 #include "THStack.h"
 #include "TLegend.h"
+_MaCh3_Safe_Include_End_ //}
 
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
 /// @author Dan Barrow
@@ -276,6 +276,7 @@ class SampleHandlerFD :  public SampleHandlerBase
 
   /// @brief Check whether a normalisation systematic affects an event or not
   void CalcNormsBins(std::vector<NormParameter>& norm_parameters, std::vector< std::vector< int > >& xsec_norms_bins);
+  template <typename ParT> bool PassesSelection(const ParT& Par, std::size_t iEvent);
   /// @brief Calculate the total weight weight for a given event
   M3::float_t CalcWeightTotal(const EventInfo* _restrict_ MCEvent) const;
 

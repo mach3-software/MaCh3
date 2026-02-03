@@ -397,12 +397,10 @@ inline YAML::Node LoadYamlConfig(const std::string& filename, const std::string&
         MACH3LOG_ERROR("Warning: Missing space or tab after '-' at line {}: {}\n", lineNumber, lineconfig);
         throw MaCh3Exception(File, Line);
       }
-
       lineNumber++;
     }
 
     return yamlNode;
-
   } catch (const std::exception& e) {
     MACH3LOG_ERROR("{}\n", e.what());
     MACH3LOG_ERROR("Can't open file {}\n", filename);

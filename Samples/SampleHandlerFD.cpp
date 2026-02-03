@@ -512,7 +512,9 @@ void SampleHandlerFD::RegisterIndividualFunctionalParameter(const std::string& f
   funcParsFuncMap[fpEnum] = fpFunc;
 }
 
+// **************************************************
 void SampleHandlerFD::SetupFunctionalParameters() {
+// **************************************************
   funcParsVec = ParHandler->GetFunctionalParametersFromSampleName(SampleHandlerName);
   // RegisterFunctionalParameters is implemented in experiment-specific code, 
   // which calls RegisterIndividualFuncPar to populate funcParsNamesMap, funcParsNamesVec, and funcParsFuncMap
@@ -549,32 +551,7 @@ void SampleHandlerFD::SetupFunctionalParameters() {
         continue;
       }
       // Now check whether within kinematic bounds
-      bool IsSelected = true;
-      if ((*it).hasKinBounds) {
-        const auto& kinVars = (*it).KinematicVarStr;
-        const auto& selection = (*it).Selection;
-
-        for (std::size_t iKinPar = 0; iKinPar < kinVars.size(); ++iKinPar) {
-          const double kinVal = ReturnKinematicParameter(kinVars[iKinPar], static_cast<int>(iEvent));
-
-          bool passedAnyBound = false;
-          const auto& boundsList = selection[iKinPar];
-
-          for (const auto& bounds : boundsList) {
-            if (kinVal > bounds[0] && kinVal <= bounds[1]) {
-              passedAnyBound = true;
-              break;
-            }
-          }
-
-          if (!passedAnyBound) {
-            MACH3LOG_TRACE("Event {}, missed kinematic check ({}) for dial {}",
-                           iEvent, kinVars[iKinPar], (*it).name);
-            IsSelected = false;
-            break;
-          }
-        }
-      }
+      bool IsSelected = PassesSelection((*it), iEvent);
       // Need to then break the event loop
       if(!IsSelected){
         MACH3LOG_TRACE("Event {}, missed Kinematic var check for dial {}", iEvent, (*it).name);
@@ -718,32 +695,7 @@ void SampleHandlerFD::CalcNormsBins(std::vector<NormParameter>& norm_parameters,
         //Now check whether the norm has kinematic bounds
         //i.e. does it only apply to events in a particular kinematic region?
         // Now check whether within kinematic bounds
-        bool IsSelected = true;
-        if ((*it).hasKinBounds) {
-          const auto& kinVars = (*it).KinematicVarStr;
-          const auto& selection = (*it).Selection;
-
-          for (std::size_t iKinPar = 0; iKinPar < kinVars.size(); ++iKinPar) {
-            const double kinVal = ReturnKinematicParameter(kinVars[iKinPar], static_cast<int>(iEvent));
-
-            bool passedAnyBound = false;
-            const auto& boundsList = selection[iKinPar];
-
-            for (const auto& bounds : boundsList) {
-              if (kinVal > bounds[0] && kinVal <= bounds[1]) {
-                passedAnyBound = true;
-                break;
-              }
-            }
-
-            if (!passedAnyBound) {
-              MACH3LOG_TRACE("Event {}, missed kinematic check ({}) for dial {}",
-                             iEvent, kinVars[iKinPar], (*it).name);
-              IsSelected = false;
-              break;
-            }
-          }
-        }
+        bool IsSelected = PassesSelection((*it), iEvent);
         // Need to then break the event loop
         if(!IsSelected){
           MACH3LOG_TRACE("Event {}, missed Kinematic var check for dial {}", iEvent, (*it).name);
@@ -814,7 +766,6 @@ void SampleHandlerFD::SetBinning() {
       SamDet->W2Hist->GetYaxis()->SetTitle("Events");
     } else if (Dimension == 2){
       if(Binning->IsUniform(iSample)) {
-
         auto XVec = Binning->GetBinEdges(iSample, 0);
         auto YVec = Binning->GetBinEdges(iSample, 1);
         int nX = static_cast<int>(XVec.size() - 1);
@@ -2058,4 +2009,37 @@ std::vector<double> SampleHandlerFD::GetArrayForSample(const int Sample, const d
   const int End   = Binning->GetSampleEndBin(Sample);
 
   return std::vector<double>(array + Start, array + End);
+}
+
+// ***************************************************************************
+template <typename ParT>
+bool SampleHandlerFD::PassesSelection(const ParT& Par, std::size_t iEvent) {
+// ***************************************************************************
+  bool IsSelected = true;
+  if (Par.hasKinBounds) {
+    const auto& kinVars = Par.KinematicVarStr;
+    const auto& selection = Par.Selection;
+
+    for (std::size_t iKinPar = 0; iKinPar < kinVars.size(); ++iKinPar) {
+      const double kinVal = ReturnKinematicParameter(kinVars[iKinPar], static_cast<int>(iEvent));
+
+      bool passedAnyBound = false;
+      const auto& boundsList = selection[iKinPar];
+
+      for (const auto& bounds : boundsList) {
+        if (kinVal > bounds[0] && kinVal <= bounds[1]) {
+          passedAnyBound = true;
+          break;
+        }
+      }
+
+      if (!passedAnyBound) {
+        MACH3LOG_TRACE("Event {}, missed kinematic check ({}) for dial {}",
+                       iEvent, kinVars[iKinPar], Par.name);
+        IsSelected = false;
+        break;
+      }
+    }
+  }
+  return IsSelected;
 }
