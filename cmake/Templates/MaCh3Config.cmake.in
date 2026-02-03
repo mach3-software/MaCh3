@@ -25,7 +25,7 @@ set(MaCh3_FOUND TRUE)
 
 include(MaCh3Utils)
 
-find_package(ROOT 6.18 REQUIRED)
+find_package(ROOT 6.20 REQUIRED)
 
 #Fancy NuOscillator
 find_package(NuOscillator @NUOSCILLATOR_VERSION@ REQUIRED)
