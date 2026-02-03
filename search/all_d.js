@@ -1,8 +1,8 @@
 var searchData=
 [
   ['n_5frm_5frestarts_1043',['n_rm_restarts',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac5da89509c4d7b10cf760e6f4b500962',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
-  ['name_1044',['Name',['../structMaCh3ModeInfo.html#a8c957d49742a2ad0faa79fbc07427767',1,'MaCh3ModeInfo::Name()'],['../structPredictiveSample.html#ae801f4aff1936d81a3f542a779be3cd9',1,'PredictiveSample::Name()']]],
-  ['name_1045',['name',['../structReweightConfig.html#a6eca75efd43cdd17c3907a2ce1cb7b08',1,'ReweightConfig::name()'],['../structTypeParameterBase.html#a9cec220ee7904196cc6a7d98c2b061f8',1,'TypeParameterBase::name()']]],
+  ['name_1044',['name',['../structReweightConfig.html#a6eca75efd43cdd17c3907a2ce1cb7b08',1,'ReweightConfig::name()'],['../structTypeParameterBase.html#a9cec220ee7904196cc6a7d98c2b061f8',1,'TypeParameterBase::name()']]],
+  ['name_1045',['Name',['../structMaCh3ModeInfo.html#a8c957d49742a2ad0faa79fbc07427767',1,'MaCh3ModeInfo::Name()'],['../structPredictiveSample.html#ae801f4aff1936d81a3f542a779be3cd9',1,'PredictiveSample::Name()']]],
   ['nbatches_1046',['nBatches',['../classMCMCProcessor.html#a02c5a3f849cf217705816c650c678d19',1,'MCMCProcessor']]],
   ['nbins_1047',['nBins',['../GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1',1,'nBins():&#160;GetPostfitParamPlots.cpp'],['../classMCMCProcessor.html#a6b74f8195bcbca0979f9e9fe43468bae',1,'MCMCProcessor::nBins()'],['../structSampleBinningInfo.html#ad8f38d864540c9c606e1927e312996e0',1,'SampleBinningInfo::nBins()']]],
   ['nbranches_1048',['nBranches',['../classMCMCProcessor.html#af6ba5d9aec5350fafebbf81309e813cb',1,'MCMCProcessor']]],
@@ -22,8 +22,8 @@ var searchData=
   ['nkeptpcapars_1062',['nKeptPCApars',['../classPCAHandler.html#aa39db9118399bebcdb784fe9c9fea458',1,'PCAHandler']]],
   ['nknots_1063',['nKnots',['../classSMonolith.html#afc0e3d1eafd575cf7628319a66925d5b',1,'SMonolith']]],
   ['nknots_5farr_1064',['nKnots_arr',['../structSplineMonoStruct.html#a398e0212915793852137384a3406b37f',1,'SplineMonoStruct']]],
-  ['nmodelparams_1065',['NModelParams',['../classPredictiveThrower.html#a74f465fe73227797d8818749fca5f043',1,'PredictiveThrower']]],
-  ['nmodelparams_1066',['nModelParams',['../classSampleSummary.html#a49215601479aaa99f9f64d8f7c900385',1,'SampleSummary']]],
+  ['nmodelparams_1065',['nModelParams',['../classSampleSummary.html#a49215601479aaa99f9f64d8f7c900385',1,'SampleSummary']]],
+  ['nmodelparams_1066',['NModelParams',['../classPredictiveThrower.html#a74f465fe73227797d8818749fca5f043',1,'PredictiveThrower']]],
   ['nmodes_1067',['NModes',['../classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf',1,'MaCh3Modes']]],
   ['nombin_1068',['NomBin',['../structEventInfo.html#a6b8d38aa05f37a71e4f3bc25b06ed578',1,'EventInfo']]],
   ['nominalhist_1069',['NominalHist',['../classSampleSummary.html#a503b0dc19bb1ad57e7f2560cc64feef9',1,'SampleSummary']]],
