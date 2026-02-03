@@ -254,7 +254,7 @@ $(function() {
 <div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;                                              <span class="comment">// the throw matrix after set up.</span></div>
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;      <span class="keyword">auto</span> filename =</div>
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;          YAMLDocTemp[<span class="stringliteral">&quot;ThrowMatrixOverride&quot;</span>][<span class="stringliteral">&quot;file&quot;</span>].as&lt;std::string&gt;();</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;      TFile *submatrix_file = <a class="code" href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a>(filename, <span class="stringliteral">&quot;OPEN&quot;</span>, __FILE__, __LINE__);</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;      TFile *submatrix_file = <a class="code" href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">TFile::Open</a>(filename.c_str());</div>
 <div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160; </div>
 <div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;      <span class="keyword">auto</span> matrixname =</div>
 <div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;          YAMLDocTemp[<span class="stringliteral">&quot;ThrowMatrixOverride&quot;</span>][<span class="stringliteral">&quot;matrix&quot;</span>].as&lt;std::string&gt;();</div>
