@@ -1114,6 +1114,11 @@ void FitterBase::RunLLHMap() {
 
   auto ParamsOfInterest = GetFromManager<std::vector<std::string>>(fitMan->raw()["LLHScan"]["LLHParameters"], {}, __FILE__, __LINE__);
 
+  if(ParamsOfInterest.empty()) {
+    MACH3LOG_WARN("There were no LLH parameters of interest specified to run the LLHMap! LLHMap will not run at all ...");
+    return;
+  }
+
   // Parameters IDs within the covariance objects
   // ParamsCovIDs = {Name, CovObj, IDinCovObj}
   std::vector<std::tuple<std::string, ParameterHandlerBase*, int>> ParamsCovIDs;
@@ -1137,9 +1142,10 @@ void FitterBase::RunLLHMap() {
 
           found = true;
           break;
-          break;
         }
       }
+      if(found)
+        break;
     }
     if(found)
       MACH3LOG_INFO("Parameter {} found in {} at an index {}.", p, std::get<1>(ParamsCovIDs.back())->GetName(), std::get<2>(ParamsCovIDs.back()));
