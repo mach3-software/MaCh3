@@ -9,7 +9,7 @@ LABEL compiler="GNU 15.2.0"
 LABEL root_version="v6.38.00"
 LABEL org.opencontainers.image.description="Official MaCh3 container"
 
-RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get upgrade -y
 
 RUN apt-get install -y nlohmann-json3-dev
 #MISC_SW
