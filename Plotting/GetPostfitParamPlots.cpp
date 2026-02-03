@@ -52,9 +52,6 @@ TH1D *Prefit;
 int NDParameters;
 int NDParametersStartingPos;
 
-int FDParameters;
-int FDParametersStartingPos;
-
 std::vector<int> NDSamplesBins;
 std::vector<std::string> NDSamplesNames;
 int nBins;
@@ -66,7 +63,7 @@ TPad *p3;
 TPad *p4;
 
 // KS: Color for 0 - prefit, 1 postfit, 2 another postfit, 3 you know the drill
-Color_t PlotColor[] = {kRed, kBlack, kBlue, kGreen};
+constexpr Color_t PlotColor[] = {kRed, kBlack, kBlue, kGreen};
 std::string plotType;
 
 void copyParToBlockHist(const int localBin, const std::string& paramName, TH1D* blockHist,
@@ -173,8 +170,6 @@ bool ReadSettings(const std::shared_ptr<TFile>& File1)
 
   Settings->SetBranchAddress("NDParameters", &NDParameters);
   Settings->SetBranchAddress("NDParametersStartingPos", &NDParametersStartingPos);
-  Settings->SetBranchAddress("FDParameters", &FDParameters);
-  Settings->SetBranchAddress("FDParametersStartingPos", &FDParametersStartingPos);
 
   std::vector<int> *NDSamples_Bins = 0;
   std::vector<std::string> *NDSamples_Names = 0;
@@ -476,6 +471,7 @@ void MakeFluxPlots()
   canv->SetBottomMargin(canv->GetBottomMargin()*1.7);
 }
 
+/// @warning This is legacy functions and will become deprecated
 void MakeNDDetPlots()
 {
   MACH3LOG_INFO("ND detector parameters: {}", NDParameters);
@@ -534,47 +530,6 @@ void MakeNDDetPlots()
   delete pDown;
 }
 
-void MakeFDDetPlots()
-{
-  Prefit->GetYaxis()->SetTitleOffset(Prefit->GetYaxis()->GetTitleOffset()*1.2);
-  
-  // these for named parameters where we need a nice big gap at the bottom to fit the names
-  TPad* pTop = nullptr;
-  TPad* pDown = nullptr;
-  InitializePads(canv, pTop, pDown);
-
-  int FDbinCounter = FDParametersStartingPos;
-  int Start = FDbinCounter;
-  //KS: WARNING This is hardcoded
-  constexpr double FDSamplesBins[7] = {12,18,30,36,44,57,58};
-  std::string FDSamplesNames[7] = {"FHC 1Re", "FHC 1R#mu", "RHC 1Re","RHC 1R#mu","FHC 1Re 1 d.e.","FHC MR#mu 1 or 2 d.e.", "Momentum Scale"};
-  for (unsigned int i = 0; i < 7; ++i)
-  {
-    FDbinCounter = FDParametersStartingPos + FDSamplesBins[i];
-    std::vector <std::unique_ptr<TH1D>> PostfitHistVec;
-
-    canv->cd();
-    Prefit->SetTitle(FDSamplesNames[i].c_str());
-    Prefit->GetXaxis()->SetRangeUser(Start, FDbinCounter);
-    //KS: We don't' need name for every FD param
-    for(int j = 0; j < FDSamplesBins[i]; ++j)
-    {
-      //bool ProductOfTen = false;
-      //if(j % 10) ProductOfTen = true;
-      //if(j != 0 && ProductOfTen) Prefit->GetXaxis()->SetBinLabel(Start+j+1, " ");
-    }
-    Prefit->GetYaxis()->SetRangeUser(man->getOption<double>("detParYRange_low"), man->getOption<double>("detParYRange_high"));
-    Prefit->Draw("e2");
-    
-    Start = FDParametersStartingPos + FDSamplesBins[i];
-
-    DrawPlots(canv, Prefit, PostfitHistVec, pTop, pDown);
-    canv->Update();
-   }
-   delete pTop;
-   delete pDown;
-}
-
 void MakeRidgePlots()
 {  
   gStyle->SetPalette(51);
@@ -604,6 +559,11 @@ void MakeRidgePlots()
 
     // get num of params in the block
     int nParams = static_cast<int>(blockContents.size());
+
+    if (nParams == 1) {
+      MACH3LOG_WARN("{} doesn't work for single param", __func__);
+      continue;
+    }
     auto ridgeCanv = std::make_unique<TCanvas>("RidgePlotCanv", "RidgePlotCanv", 2048, 2048);
     ridgeCanv->Divide(1,1+nParams, 0.01, 0.0);
 
@@ -650,7 +610,7 @@ void MakeRidgePlots()
         MACH3LOG_WARN("It could be fixed param");
         continue;
       }
-      
+
       // EM: do some funky scaling so that we always get evenly spaced pads in the range [bottomMargin, TopMargin] with the specified overlap
       double padAnchor = padBottomMargin + (static_cast<double>(nParams - parId - 1) /
                                   static_cast<double>(nParams - 1)) * (padTopMargin - padBottomMargin);
@@ -759,7 +719,7 @@ void GetPostfitParamPlots()
 
   canv = new TCanvas("canv", "canv", 1024, 1024);
   //gStyle->SetPalette(51);
-  gStyle->SetOptStat(0); //Set 0 to disable statystic box
+  gStyle->SetOptStat(0); //Set 0 to disable statistic box
   canv->SetLeftMargin(0.12);
   canv->SetBottomMargin(0.12);
   canv->SetTopMargin(0.08);
@@ -800,10 +760,7 @@ void GetPostfitParamPlots()
 
   //KS: By default we don't run ProcessMCMC with PlotDet as this take some time, in case we did let's make fancy plots
   if(plotNDDet & (NDParameters > 0)) MakeNDDetPlots();
-  
-  //KS: Same as above but for FD parameters,
-  if(FDParameters > 0) MakeFDDetPlots();
-  
+
   canv->Print((SaveName+"]").c_str());
 
   MakeRidgePlots();
@@ -878,6 +835,12 @@ void GetViolinPlots()
   canvas->SetLeftMargin(0.10);
   canvas->Print((OutputName+".pdf[").c_str());
   canvas->SetGrid();
+
+  if(man->input().getFile(0).file->Get<TH2D>( "param_violin_prior" ) == nullptr)
+  {
+    MACH3LOG_WARN("Couldn't find violin plot, make sure method from MCMCProcessor is being called");
+    return;
+  }
   std::unique_ptr<TH2D> ViolinPre = M3::Clone(man->input().getFile(0).file->Get<TH2D>( "param_violin_prior" ));
   // Do some fancy replacements
   ViolinPre->SetFillColor(kRed);

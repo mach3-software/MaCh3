@@ -51,7 +51,6 @@ OscillationHandler::OscillationHandler(const std::string& NuOscillatorConfigFile
 // ************************************************
 OscillationHandler::~OscillationHandler() {
 // ************************************************
-
 }
 
 // ************************************************

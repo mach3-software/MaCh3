@@ -6,7 +6,6 @@
 #pragma GCC diagnostic ignored "-Wconversion"
 
 /// @file PlotSigmaVariation.cpp
-/// @todo Integrate within StylePlotting to get fancy labels etc
 /// @author Kamil Skwarczynski
 
 std::vector<std::string> DialNameVector;
@@ -19,6 +18,8 @@ int PriorKnot = M3::_BAD_INT_;
 constexpr const int NVars = 5;
 constexpr Color_t Colours[NVars] = {kRed, kGreen+1, kBlack, kBlue+1, kOrange+1};
 constexpr ELineStyle Style[NVars] = {kDotted, kDashed, kSolid, kDashDotted, kDashDotted};
+
+std::unique_ptr<MaCh3Plotting::PlottingManager> PlotMan;
 
 /// @brief Histograms have name like ND_CC0pi_1DProj0_Norm_Param_0_sig_n3.00_val_0.25. This code is trying to extract sigma names
 void FindKnot(std::vector<double>& SigmaValues,
@@ -181,6 +182,7 @@ bool SkipDirectory(const std::vector<std::string>& ExcludeString, const std::vec
   return Skip;
 }
 
+/// @brief Extracts dial value for from histogram title
 std::vector<double> GetDialValues(const std::vector<std::unique_ptr<TH1D>>& Poly) {
   std::vector<double> values;
   for (const auto& hist : Poly) {
@@ -198,6 +200,41 @@ std::vector<double> GetDialValues(const std::vector<std::unique_ptr<TH1D>>& Poly
   }
   return values;
 }
+
+
+void MakeRatio(const std::vector<std::unique_ptr<TH1D>>& Poly,
+               std::vector<std::unique_ptr<TH1D>>& Ratio) {
+  size_t ratio_index = 0; // Track position in Ratio vector
+  for (int i = 0; i < static_cast<int>(Poly.size()); ++i) {
+    if (i == PriorKnot) continue; // Skip PriorKnot
+    Ratio[ratio_index] = M3::Clone(Poly[i].get());
+    Ratio[ratio_index]->Divide(Poly[PriorKnot].get());
+    ratio_index++;
+  }
+
+  Ratio[0]->GetYaxis()->SetTitle("Ratio to Prior");
+  Ratio[0]->SetBit(TH1D::kNoTitle);
+  Ratio[0]->SetBit(TH1D::kNoTitle);
+
+  double maxz = -999;
+  double minz = +999;
+  for (int j = 0; j < static_cast<int>(sigmaArray.size())-1; j++)
+  {
+    for (int i = 1; i < Ratio[0]->GetXaxis()->GetNbins(); i++)
+    {
+      maxz = std::max(maxz, Ratio[j]->GetBinContent(i));
+      minz = std::min(minz, Ratio[j]->GetBinContent(i));
+    }
+  }
+  maxz = maxz*1.001;
+  minz = minz*1.001;
+
+  if (std::fabs(1 - maxz) > std::fabs(1-minz))
+    Ratio[0]->GetYaxis()->SetRangeUser(1-std::fabs(1-maxz),1+std::fabs(1-maxz));
+  else
+    Ratio[0]->GetYaxis()->SetRangeUser(1-std::fabs(1-minz),1+std::fabs(1-minz));
+}
+
 
 void PlotRatio(const std::vector<std::unique_ptr<TH1D>>& Poly,
                const std::unique_ptr<TCanvas>& canv,
@@ -275,56 +312,26 @@ void PlotRatio(const std::vector<std::unique_ptr<TH1D>>& Poly,
 
   pad2->cd();
 
-  auto line = std::make_unique<TLine>(Poly[0]->GetXaxis()->GetBinLowEdge(Poly[0]->GetXaxis()->GetFirst()), 1.0, Poly[0]->GetXaxis()->GetBinUpEdge(Poly[0]->GetXaxis()->GetLast()), 1.0);
+  TLine line(Poly[0]->GetXaxis()->GetBinLowEdge(Poly[0]->GetXaxis()->GetFirst()),
+             1.0, Poly[0]->GetXaxis()->GetBinUpEdge(Poly[0]->GetXaxis()->GetLast()), 1.0);
   std::vector<std::unique_ptr<TH1D>> Ratio(sigmaArray.size()-1);
 
-  size_t ratio_index = 0; // Track position in Ratio vector
-  for (int i = 0; i < static_cast<int>(Poly.size()); ++i) {
-    if (i == PriorKnot) continue; // Skip PriorKnot
-    Ratio[ratio_index] = M3::Clone(Poly[i].get());
-    Ratio[ratio_index]->Divide(Poly[PriorKnot].get());
-    ratio_index++;
-  }
-
-  Ratio[0]->GetYaxis()->SetTitle("Ratio to Prior");
-  Ratio[0]->SetBit(TH1D::kNoTitle);
+  MakeRatio(Poly, Ratio);
   Ratio[0]->GetXaxis()->SetTitleSize(0.12);
   Ratio[0]->GetYaxis()->SetTitleOffset(0.4);
   Ratio[0]->GetYaxis()->SetTitleSize(0.10);
 
   Ratio[0]->GetXaxis()->SetLabelSize(0.10);
   Ratio[0]->GetYaxis()->SetLabelSize(0.10);
-
-  Ratio[0]->SetBit(TH1D::kNoTitle);
-
-  double maxz = -999;
-  double minz = +999;
-  for (int j = 0; j < static_cast<int>(sigmaArray.size())-1; j++)
-  {
-    for (int i = 1; i < Ratio[0]->GetXaxis()->GetNbins(); i++)
-    {
-      maxz = std::max(maxz, Ratio[j]->GetBinContent(i));
-      minz = std::min(minz, Ratio[j]->GetBinContent(i));
-    }
-  }
-  maxz = maxz*1.001;
-  minz = minz*1.001;
-
-  if (std::fabs(1 - maxz) > std::fabs(1-minz))
-    Ratio[0]->GetYaxis()->SetRangeUser(1-std::fabs(1-maxz),1+std::fabs(1-maxz));
-  else
-    Ratio[0]->GetYaxis()->SetRangeUser(1-std::fabs(1-minz),1+std::fabs(1-minz));
-
   Ratio[0]->Draw("HIST");
-
   for(int ik = 1; ik < static_cast<int>(sigmaArray.size())-1; ++ik)
   {
     Ratio[ik]->Draw("HIST SAME");
   }
 
-  line->SetLineWidth(2);
-  line->SetLineColor(kBlack);
-  line->Draw("SAME");
+  line.SetLineWidth(2);
+  line.SetLineColor(kBlack);
+  line.Draw("SAME");
 
   canv->Print((outfilename).c_str());
 
@@ -383,7 +390,8 @@ void CompareSigVar1D(const std::string& filename, const YAML::Node& Settings)
             MACH3LOG_DEBUG("Adding hist {}", name);
           }
         }
-        std::string Title = DialNameVector[id] + " " + SampleNameVector[is];
+        std::string Title = PlotMan->style().prettifyParamName(DialNameVector[id]) + " "
+                            + PlotMan->style().prettifySampleName(SampleNameVector[is]);
         PlotRatio(Projection, canvas, Title, outfilename);
         gDirectory->cd("..");
       }
@@ -395,7 +403,7 @@ void CompareSigVar1D(const std::string& filename, const YAML::Node& Settings)
   delete infile;
 }
 
-void PlotRatio2D(const std::vector<std::unique_ptr<TH2D>>& Poly,
+void PlotRatio2D(const std::vector<std::unique_ptr<TH2>>& Poly,
                  const std::unique_ptr<TCanvas>& canv,
                  const std::string& Title,
                  const std::string& outfilename)
@@ -421,7 +429,7 @@ void PlotRatio2D(const std::vector<std::unique_ptr<TH2D>>& Poly,
 
   for (int i = 0; i < static_cast<int>(Poly.size()); ++i) {
     if (i == PriorKnot) continue; // Skip PriorKnot
-    std::unique_ptr<TH2D> Ratio = M3::Clone(Poly[i].get());
+    std::unique_ptr<TH2> Ratio = M3::Clone(Poly[i].get());
     Ratio->Divide(Poly[PriorKnot].get());
     Ratio->SetTitle((Title + " " + std::to_string(static_cast<int>(sigmaArray[i])) + "sigma").c_str());
 
@@ -480,7 +488,7 @@ void CompareSigVar2D(const std::string& filename, const YAML::Node& Settings)
           // Reset iterator for each dimension pair
           nextsub.Reset();
           //make -3,-1,0,1,3 polys
-          std::vector<std::unique_ptr<TH2D>> Projection;
+          std::vector<std::unique_ptr<TH2>> Projection;
 
           //loop over items in directory, hard code which th2poly we want
           while ((subsubkey = static_cast<TKey*>(nextsub())))
@@ -490,19 +498,177 @@ void CompareSigVar2D(const std::string& filename, const YAML::Node& Settings)
             // Looking
             const std::string ProjectionName = "_2DProj_" + std::to_string(iDim1) + "_vs_" + std::to_string(iDim2);
             const bool IsProjection = (name.find(ProjectionName) != std::string::npos);
-            if (classname == "TH2D" && IsProjection)
+            if ((classname == "TH2D" ||  classname == "TH2Poly")&& IsProjection)
             {
               name = DialNameVector[id] + "/" + SampleNameVector[is] + "/" + name;
-              Projection.emplace_back(M3::Clone(SigmaDir->Get<TH2D>(name.c_str())));
+              Projection.emplace_back(M3::Clone(SigmaDir->Get<TH2>(name.c_str())));
               MACH3LOG_DEBUG("Adding hist {}", name);
             }
           }
-          std::string Title = DialNameVector[id] + " " + SampleNameVector[is];
+          std::string Title = PlotMan->style().prettifyParamName(DialNameVector[id]) + " "
+                              + PlotMan->style().prettifySampleName(SampleNameVector[is]);
           if(Projection.size() == sigmaArray.size()) PlotRatio2D(Projection, canvas, Title, outfilename);
         }
       }
       gDirectory->cd("..");
     }
+  }
+  canvas->Print((outfilename+"]").c_str());
+  infile->Close();
+  delete infile;
+}
+
+
+void PlotEventRate(const std::vector<std::vector<std::unique_ptr<TH1D>>>& Poly,
+                   const std::unique_ptr<TCanvas>& canv,
+                   const std::string& Title,
+                   const std::string& outfilename)
+{
+  std::vector<std::unique_ptr<TH1D>> EvenRates(sigmaArray.size());
+  for(int ih = 0; ih < static_cast<int>(sigmaArray.size()); ih++)
+  {
+    EvenRates[ih] = std::make_unique<TH1D>(Title.c_str(), Title.c_str(), SampleNameVector.size(), 0, SampleNameVector.size());
+    EvenRates[ih]->SetDirectory(nullptr);
+    EvenRates[ih]->GetYaxis()->SetTitleOffset(1.4);
+    EvenRates[ih]->GetYaxis()->SetTitle("Events");
+    EvenRates[ih]->SetLineWidth(2.);
+    EvenRates[ih]->SetLineStyle(Style[ih]);
+    EvenRates[ih]->SetLineColor(Colours[ih]);
+
+    for(size_t iSample = 0; iSample < SampleNameVector.size(); iSample ++) {
+      EvenRates[ih]->SetBinContent(iSample+1, Poly[iSample][ih]->Integral());
+
+      std::string SamName = PlotMan->style().prettifySampleName(SampleNameVector[iSample]);
+      EvenRates[ih]->GetXaxis()->SetBinLabel(iSample+1, SamName.c_str());
+    }
+  }
+
+  TPad* pad1 = new TPad("pad1","pad1",0.,0.50,1.,1.0);
+  pad1->AppendPad();
+  TPad* pad2 = new TPad("pad2","pad2",0.,0.,1.,0.50);
+  pad2->AppendPad();
+
+  pad1->SetLeftMargin(canv->GetLeftMargin());
+  pad1->SetRightMargin(canv->GetRightMargin());
+  pad1->SetTopMargin(canv->GetTopMargin());
+  pad1->SetBottomMargin(0);
+
+  pad2->SetLeftMargin(canv->GetLeftMargin());
+  pad2->SetRightMargin(canv->GetRightMargin());
+  pad2->SetTopMargin(0);
+  pad2->SetBottomMargin(0.60);
+
+  pad1->SetGrid();
+  pad2->SetGrid();
+
+  pad1->cd();
+  double max = 0;
+  for(int ik = 0; ik < static_cast<int>(sigmaArray.size()); ++ik) {
+    max = std::max(max, EvenRates[ik]->GetMaximum());
+  }
+  EvenRates[0]->SetTitle(Title.c_str());
+  EvenRates[0]->SetMaximum(max*1.2);
+  EvenRates[0]->Draw("HIST");
+  for(int ik = 1; ik < static_cast<int>(sigmaArray.size()); ++ik)
+  {
+    EvenRates[ik]->Draw("HIST SAME");
+  }
+
+  auto DialValues = GetDialValues(Poly[0]);
+  auto leg = std::make_unique<TLegend>(0.55, 0.55, 0.8, 0.88);
+  leg->SetTextSize(0.04);
+  for (int j = 0; j < static_cast<int>(sigmaArray.size()); j++)
+  {
+    if(j == PriorKnot) {
+      leg->AddEntry(EvenRates[j].get(), Form("Prior (%.2f)", DialValues[j]), "l");
+    } else {
+      leg->AddEntry(EvenRates[j].get(), Form("%.0f#sigma (%.2f)", sigmaArray[j], DialValues[j]), "l");
+    }
+  }
+  leg->SetLineColor(0);
+  leg->SetLineStyle(0);
+  leg->SetFillColor(0);
+  leg->SetFillStyle(0);
+  leg->SetBorderSize(0);
+  leg->Draw("SAME");
+
+  pad2->cd();
+  TLine line(EvenRates[0]->GetXaxis()->GetBinLowEdge(EvenRates[0]->GetXaxis()->GetFirst()),
+             1.0, EvenRates[0]->GetXaxis()->GetBinUpEdge(EvenRates[0]->GetXaxis()->GetLast()), 1.0);
+  std::vector<std::unique_ptr<TH1D>> Ratio(sigmaArray.size()-1);
+  MakeRatio(EvenRates, Ratio);
+  Ratio[0]->GetXaxis()->SetTitleSize(0.08);
+  Ratio[0]->GetYaxis()->SetTitleOffset(0.4);
+  Ratio[0]->GetYaxis()->SetTitleSize(0.06);
+
+  Ratio[0]->GetXaxis()->SetLabelSize(0.08);
+  Ratio[0]->GetYaxis()->SetLabelSize(0.04);
+  Ratio[0]->GetXaxis()->LabelsOption("v");
+  Ratio[0]->Draw("HIST");
+
+  for(int ik = 1; ik < static_cast<int>(sigmaArray.size())-1; ++ik)
+  {
+    Ratio[ik]->Draw("HIST SAME");
+  }
+
+  line.SetLineWidth(2);
+  line.SetLineColor(kBlack);
+  line.Draw("SAME");
+
+  canv->Print((outfilename).c_str());
+
+  delete pad1;
+  delete pad2;
+}
+
+void MakeEventRatePlot(const std::string& filename, const YAML::Node& Settings)
+{
+  (void) Settings;
+  //Get input file, make canvas and output file
+  auto canvas = std::make_unique<TCanvas>("canv", "canv", 1080, 1080);
+  TFile *infile = M3::Open(filename, "OPEN", __FILE__, __LINE__);
+  TDirectoryFile *SigmaDir = infile->Get<TDirectoryFile>("SigmaVar");
+
+  std::string outfilename = filename.substr(0, filename.find(".root"));
+  outfilename = outfilename + "_EventRate.pdf";
+  gErrorIgnoreLevel = kWarning;
+  canvas->Print((outfilename+"[").c_str());
+
+  TDirectory *dir = nullptr;
+  for(size_t id = 0; id < DialNameVector.size(); id++)
+  {
+    std::vector<std::vector<std::unique_ptr<TH1D>>> Projection(SampleNameVector.size());
+    for(size_t is = 0; is < SampleNameVector.size(); is++)
+    {
+      MACH3LOG_INFO("{} Entering {}/{}", __func__, DialNameVector[id], SampleNameVector[is]);
+      SigmaDir->cd((DialNameVector[id] + "/" +  SampleNameVector[is]).c_str());
+
+      //set dir to current directory
+      dir = gDirectory;
+
+      //make -3,-1,0,1,3 polys
+      TIter nextsub(dir->GetListOfKeys());
+      TKey *subsubkey = nullptr;
+
+      //loop over items in directory, hard code which th2poly we want
+      while ((subsubkey = static_cast<TKey*>(nextsub())))
+      {
+        auto name = std::string(subsubkey->GetName());
+        auto classname = std::string(subsubkey->GetClassName());
+        // Looking
+        const std::string ProjectionName = "_1DProj0";
+        const bool IsProjection = (name.find(ProjectionName) != std::string::npos);
+        if (classname == "TH1D" && IsProjection)
+        {
+          name = DialNameVector[id] + "/" + SampleNameVector[is] + "/" + name;
+          Projection[is].emplace_back(M3::Clone(SigmaDir->Get<TH1D>(name.c_str())));
+          MACH3LOG_DEBUG("Adding hist {}", name);
+        }
+      }
+      gDirectory->cd("..");
+    }
+    std::string Title = PlotMan->style().prettifyParamName(DialNameVector[id]);
+    PlotEventRate(Projection, canvas, Title, outfilename);
   }
 
   canvas->Print((outfilename+"]").c_str());
@@ -529,8 +695,12 @@ int main(int argc, char **argv)
 
   ScanInput(DialNameVector, SampleNameVector, SampleMaxDim, sigmaArray, filename);
 
+  PlotMan = std::make_unique<MaCh3Plotting::PlottingManager>();
+  PlotMan->initialise();
+
   CompareSigVar1D(filename, settings);
   CompareSigVar2D(filename, settings);
+  MakeEventRatePlot(filename, settings);
 
   return 0;
 }

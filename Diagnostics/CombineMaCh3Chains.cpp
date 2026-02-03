@@ -352,7 +352,7 @@ void ParseArg(int argc, char *argv[]){
 
   int c;
   for(;;) {
-    c = getopt(argc, argv, "o:c:hf");
+    c = getopt(argc, argv, "o:c:mhf");
     if (c == -1){ // loop over the remaining arguments
       while (optind < argc){
         // any non option input is assumed to be a root file
@@ -386,7 +386,7 @@ void ParseArg(int argc, char *argv[]){
           exit(0);
         }
         default: {
-          MACH3LOG_ERROR("Un recognised option");
+          MACH3LOG_ERROR("Unrecognised option");
           usage();
           exit(1);
         }

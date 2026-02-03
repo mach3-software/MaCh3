@@ -212,7 +212,6 @@ std::vector<std::vector<double> > PSO::bisection(const std::vector<double>& posi
         res = std::abs(position[2]-position[0]);
         res_p = std::abs(position_list_p[1][i]-position_list_p[0][i]);
         MACH3LOG_TRACE("Pos midpoint is {:.2f}", position_list_p[1][i]);
-
       }
       else{
         std::vector<double> new_bisect_position_p = position_list_p[1];new_bisect_position_p[i] += (position_list_p[2][i]-position_list_p[1][i])/2;

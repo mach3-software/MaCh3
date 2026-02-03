@@ -380,11 +380,6 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
   SettingsBranch->Branch("NDParameters", &NDParameters);
   int NDParametersStartingPos = ParamTypeStartPos[kNDPar];
   SettingsBranch->Branch("NDParametersStartingPos", &NDParametersStartingPos);
-
-  int FDParameters = nParam[kFDDetPar];
-  SettingsBranch->Branch("FDParameters", &FDParameters);
-  int FDParametersStartingPos = ParamTypeStartPos[kFDDetPar];
-  SettingsBranch->Branch("FDParametersStartingPos", &FDParametersStartingPos);
   
   SettingsBranch->Branch("NDSamplesBins", &NDSamplesBins);
   SettingsBranch->Branch("NDSamplesNames", &NDSamplesNames);
@@ -2610,7 +2605,7 @@ void MCMCProcessor::ReadModelFile() {
     if(ParameterGroup.back() == "Osc") {
       BranchNames.push_back(ParamNames[kXSecPar].back());
     } else {
-      BranchNames.push_back("xsec_" + std::to_string(paramIndex));
+      BranchNames.push_back("param_" + std::to_string(paramIndex));
     }
 
     // Check that the branch exists before setting address

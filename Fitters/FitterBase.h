@@ -62,11 +62,11 @@ class FitterBase {
 
   /// @brief Perform a 2D and 1D sigma var for all samples.
   /// @warning Code uses TH2Poly, right now used only by T2K ND280, it may become deprecated or merged
-  void RunSigmaVar();
+  void RunSigmaVarLegacy();
 
-  /// @brief Perform a 1D sigma var for all samples.
+  /// @brief Perform a 1D/2D sigma var for all samples.
   /// @warning Code uses SampleHandlerFD
-  void RunSigmaVarFD();
+  void RunSigmaVar();
 
   /// @brief Allow to start from previous fit/chain
   /// @param FitName Name of previous chain

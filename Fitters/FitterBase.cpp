@@ -445,7 +445,7 @@ void FitterBase::ProcessMCMC() {
     // Re-open the TFile
     if (!outputFile->IsOpen()) {
       MACH3LOG_INFO("Opening output again to update with means..");
-      outputFile = new TFile(Get<std::string>(fitMan->raw()["General"]["Output"]["Filename"], __FILE__, __LINE__).c_str(), "UPDATE");
+      outputFile = new TFile(Get<std::string>(fitMan->raw()["General"]["OutputFile"], __FILE__, __LINE__).c_str(), "UPDATE");
     }
     Central->Write("PDF_Means");
     Errors->Write("PDF_Errors");
@@ -1357,7 +1357,7 @@ void FitterBase::RunLLHMap() {
 }
 
 // *************************
-void FitterBase::RunSigmaVar() {
+void FitterBase::RunSigmaVarLegacy() {
 // *************************
   // Save the settings into the output file
   SaveSettings();
@@ -1483,10 +1483,8 @@ void FitterBase::RunSigmaVar() {
             std::string title_long = std::string(currSamp->GetName())+"_"+parVarTitle;
 
             // Enable the mode histograms AFTER addSelection is called
-            //Get the 1d binning we want. Let's just use SetupBinning to get this as it already exists
-            std::vector<double> xbins;
-            std::vector<double> ybins;
-            samples[ivs]->SetupBinning(M3::int_t(k), xbins, ybins);
+            std::vector<double> xbins = samples[ivs]->ReturnKinematicParameterBinning(M3::int_t(k), samples[ivs]->GetKinVarName(M3::int_t(k), 0));
+            std::vector<double> ybins = samples[ivs]->ReturnKinematicParameterBinning(M3::int_t(k), samples[ivs]->GetKinVarName(M3::int_t(k), 1));
 
             //KS:here we loop over all reaction modes defined in "RelevantModes[nRelevantModes]"
             if (DoByMode)
@@ -1753,7 +1751,7 @@ void WriteHistogramsByMode(SampleHandlerFD *sample,
 }
 
 // *************************
-void FitterBase::RunSigmaVarFD() {
+void FitterBase::RunSigmaVar() {
 // *************************
   // Save the settings into the output file
   SaveSettings();

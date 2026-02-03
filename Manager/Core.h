@@ -100,10 +100,17 @@ namespace M3 {
 
 /// KS: Using restrict limits the effects of pointer aliasing, aiding optimizations. While reading I found that there might be some compilers which don't have __restrict__. As always we use _restrict_ to more easily turn off restrict in the code
 #ifndef DEBUG
-#define _restrict_ __restrict__
+  /// KS: For GCC decoration is here: https://gcc.gnu.org/onlinedocs/gcc/Restricted-Pointers.html
+  /// If we are sure other compiler support it as well please add
+  #if defined(__GNUC__)
+    #define _restrict_ __restrict__
+  #else
+    #define _restrict_
+  #endif
 #else
-#define _restrict_
+  #define _restrict_
 #endif
+
 
 /// Number of overflow bins in TH2Poly,
 #define _TH2PolyOverflowBins_ 9
