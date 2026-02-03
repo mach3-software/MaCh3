@@ -172,7 +172,7 @@ void ParameterHandlerBase::Init(const std::vector<std::string>& YAMLFile) {
                                               // the throw matrix after set up.
       auto filename =
           YAMLDocTemp["ThrowMatrixOverride"]["file"].as<std::string>();
-      TFile *submatrix_file = M3::Open(filename, "OPEN", __FILE__, __LINE__);
+      TFile *submatrix_file = TFile::Open(filename.c_str());
 
       auto matrixname =
           YAMLDocTemp["ThrowMatrixOverride"]["matrix"].as<std::string>();
