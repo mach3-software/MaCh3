@@ -49,6 +49,15 @@ public:
     return prettifyName(origName, "samples");
   };
 
+  /// @brief Convert hideous and vulgar internal kinematics name into a beautiful presentable name
+  /// @details The pretty kinematics names should be specified in the style config file
+  /// @param origName The "internal" name used to uniquely identify the kinematics inside the plotting
+  /// code
+  /// @return A beautiful formatted name that can be used in plots
+  inline std::string prettifyKinematicName(const std::string &origName) const {
+    return prettifyName(origName, "kinematics");
+  };
+
   // style setting options
   /// @brief Set the root colour palette to one of the default root pallettes as defined in (root
   /// docs)[https://root.cern.ch/doc/master/classTColor.html#C05]
