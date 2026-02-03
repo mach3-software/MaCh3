@@ -24,10 +24,10 @@ std::vector<std::string> GetParams(std::vector<std::string> &PoIs, ROOT::RDataFr
   // First, filter out all non-parametric (LLH) columns of LLHMap
   for(auto p : Map.GetColumnNames())
   {
-    if(std::string(p).find("_LLH") != std::string::npos)
+    if(p.find("_LLH") != std::string::npos)
       continue;
 
-    PtPs.push_back(std::string(p));
+    PtPs.push_back(p);
   }
 
   // Check if the parameters user wants to plot, actually live in the LLHMap
