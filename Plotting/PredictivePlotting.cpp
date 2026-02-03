@@ -8,7 +8,9 @@
 
 /// @file PredictivePlotting.cpp
 /// @author Kamil Skwarczynski
-/// @todo use StyleManger for fancy plots
+
+/// @warning KS: keep raw pointer or ensure manual delete of PlotMan. If spdlog in automatically deleted before PlotMan then destructor has some spdlog and this could cause segfault
+MaCh3Plotting::PlottingManager* PlotMan;
 
 std::vector<std::string> FindSamples(const std::string& File)
 {
@@ -66,7 +68,6 @@ std::vector<int> FindDimensions(const std::string& File, const std::vector<std::
     }
 
     MACH3LOG_DEBUG("Sample '{}' has dimension {}", sample, Dimension);
-
     SampleDimension.push_back(Dimension);
   }
 
@@ -151,7 +152,7 @@ void PrintPosteriorPValue(const YAML::Node& Settings,
     MACH3LOG_INFO("Calculating Shape for file {}", Titles[f]);
 
     CheckBonferoniCorrectedpValue(SampleNames, FlucDrawVec[f], Threshold);
-    MACH3LOG_INFO("Combined pvalue following Fisher method: {}", FisherCombinedPValue(FlucDrawVec[f]));
+    MACH3LOG_INFO("Combined pvalue following Fisher method: {:.4f}", FisherCombinedPValue(FlucDrawVec[f]));
   }
 }
 
@@ -177,7 +178,6 @@ void OverlayViolin(const YAML::Node& Settings,
   TCandle::SetScaledViolin(false);
   for(size_t iSample = 0; iSample < SampleNames.size(); iSample++)
   {
-
     for(int iDim = 0; iDim < SampleDimension[iSample]; iDim++)
     {
       std::vector<std::unique_ptr<TH2D>> ViolinHist(nFiles);
@@ -186,11 +186,13 @@ void OverlayViolin(const YAML::Node& Settings,
         InputFiles[iFile]->cd();
         ViolinHist[iFile] = M3::Clone(InputFiles[iFile]->Get<TH2D>(("Predictive/" + SampleNames[iSample]
                                       + "/" + SampleNames[iSample] + "_mc_dim" + iDim).Data()));
-        ViolinHist[iFile]->SetTitle(SampleNames[iSample].c_str());
+        ViolinHist[iFile]->SetTitle(PlotMan->style().prettifySampleName(SampleNames[iSample]).c_str());
         ViolinHist[iFile]->SetLineColor(PosteriorColor[iFile]);
         ViolinHist[iFile]->SetMarkerColor(PosteriorColor[iFile]);
         ViolinHist[iFile]->SetFillColorAlpha(PosteriorColor[iFile], 0.35);
         ViolinHist[iFile]->SetFillStyle(1001);
+        ViolinHist[iFile]->GetXaxis()->SetTitle(PlotMan->style().prettifyKinematicName(
+                                                ViolinHist[iFile]->GetXaxis()->GetTitle()).c_str());
         ViolinHist[iFile]->GetYaxis()->SetTitle("Events");
       }
 
@@ -257,7 +259,7 @@ void OverlayPredicitve(const YAML::Node& Settings,
     std::unique_ptr<TH1D> DataHist = M3::Clone(hist);
     DataHist->SetLineColor(kBlack);
     //KS: +1 for data, we want to get integral before scaling of the histogram
-    std::vector<double> Integral(nFiles);
+    std::vector<double> Integral(nFiles+1);
     Integral[nFiles] = DataHist->Integral();
     std::vector<std::unique_ptr<TH1D>> PredHist(nFiles);
 
@@ -267,7 +269,7 @@ void OverlayPredicitve(const YAML::Node& Settings,
       PredHist[iFile] = M3::Clone(InputFiles[iFile]->Get<TH1D>(("Predictive/" + SampleNames[iSample] + "/" +
                                                                 SampleNames[iSample] + "_mc_PostPred").c_str()));
       Integral[iFile] = PredHist[iFile]->Integral();
-      PredHist[iFile]->SetTitle(SampleNames[iSample].c_str());
+      PredHist[iFile]->SetTitle(PlotMan->style().prettifySampleName(SampleNames[iSample]).c_str());
       PredHist[iFile]->SetLineColor(PosteriorColor[iFile]);
       PredHist[iFile]->SetMarkerColor(PosteriorColor[iFile]);
       PredHist[iFile]->SetFillColorAlpha(PosteriorColor[iFile], 0.35);
@@ -313,7 +315,8 @@ void OverlayPredicitve(const YAML::Node& Settings,
       RatioPlot[ig]->SetFillColorAlpha(PosteriorColor[ig], 0.35);
       RatioPlot[ig]->SetFillStyle(1001);
       RatioPlot[ig]->GetYaxis()->SetTitle("Data/MC");
-      RatioPlot[ig]->GetXaxis()->SetTitle(PredHist[0]->GetXaxis()->GetTitle());
+      auto PrettyX = PlotMan->style().prettifyKinematicName(PredHist[0]->GetXaxis()->GetTitle());
+      RatioPlot[ig]->GetXaxis()->SetTitle(PrettyX.c_str());
       RatioPlot[ig]->SetBit(TH1D::kNoTitle);
       RatioPlot[ig]->GetXaxis()->SetTitleSize(0.12);
       RatioPlot[ig]->GetYaxis()->SetTitleOffset(0.4);
@@ -426,7 +429,11 @@ int main(int argc, char **argv)
     FileNames.emplace_back(argv[i]);
   }
 
+  PlotMan = new MaCh3Plotting::PlottingManager();
+  PlotMan->initialise();
+
   PredictivePlotting(ConfigName, FileNames);
 
+  if(PlotMan) delete PlotMan;
   return 0;
 }

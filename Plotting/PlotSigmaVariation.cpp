@@ -19,7 +19,8 @@ constexpr const int NVars = 5;
 constexpr Color_t Colours[NVars] = {kRed, kGreen+1, kBlack, kBlue+1, kOrange+1};
 constexpr ELineStyle Style[NVars] = {kDotted, kDashed, kSolid, kDashDotted, kDashDotted};
 
-std::unique_ptr<MaCh3Plotting::PlottingManager> PlotMan;
+/// @warning KS: keep raw pointer or ensure manual delete of PlotMan. If spdlog in automatically deleted before PlotMan then destructor has some spdlog and this could cause segfault
+MaCh3Plotting::PlottingManager* PlotMan;
 
 /// @brief Histograms have name like ND_CC0pi_1DProj0_Norm_Param_0_sig_n3.00_val_0.25. This code is trying to extract sigma names
 void FindKnot(std::vector<double>& SigmaValues,
@@ -317,6 +318,9 @@ void PlotRatio(const std::vector<std::unique_ptr<TH1D>>& Poly,
   std::vector<std::unique_ptr<TH1D>> Ratio(sigmaArray.size()-1);
 
   MakeRatio(Poly, Ratio);
+
+  auto PrettyX = PlotMan->style().prettifyKinematicName(Ratio[0]->GetXaxis()->GetTitle());
+  Ratio[0]->GetXaxis()->SetTitle(PrettyX.c_str());
   Ratio[0]->GetXaxis()->SetTitleSize(0.12);
   Ratio[0]->GetYaxis()->SetTitleOffset(0.4);
   Ratio[0]->GetYaxis()->SetTitleSize(0.10);
@@ -443,6 +447,11 @@ void PlotRatio2D(const std::vector<std::unique_ptr<TH2>>& Poly,
     Ratio->GetYaxis()->SetTitleOffset(1.1);
     Ratio->GetZaxis()->SetTitleOffset(1.5);
     Ratio->GetZaxis()->SetTitle("Ratio to Prior");
+
+    auto PrettyX = PlotMan->style().prettifyKinematicName(Ratio->GetXaxis()->GetTitle());
+    Ratio->GetXaxis()->SetTitle(PrettyX.c_str());
+    auto PrettyY = PlotMan->style().prettifyKinematicName(Ratio->GetYaxis()->GetTitle());
+    Ratio->GetYaxis()->SetTitle(PrettyY.c_str());
 
     Ratio->Draw("COLZ");
     canv->Print((outfilename).c_str());
@@ -695,12 +704,13 @@ int main(int argc, char **argv)
 
   ScanInput(DialNameVector, SampleNameVector, SampleMaxDim, sigmaArray, filename);
 
-  PlotMan = std::make_unique<MaCh3Plotting::PlottingManager>();
+  PlotMan = new MaCh3Plotting::PlottingManager();
   PlotMan->initialise();
 
   CompareSigVar1D(filename, settings);
   CompareSigVar2D(filename, settings);
   MakeEventRatePlot(filename, settings);
 
+  if(PlotMan) delete PlotMan;
   return 0;
 }

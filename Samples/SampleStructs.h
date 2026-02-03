@@ -272,7 +272,6 @@ struct SampleBinningInfo {
 
     for (size_t i = 0; i < TestedBins.size(); ++i) {
       for (size_t j = i + 1; j < TestedBins.size(); ++j) {
-
         bool OverlapsInAllDims = true;
 
         for (size_t iDim = 0; iDim < ExtentDim; ++iDim) {

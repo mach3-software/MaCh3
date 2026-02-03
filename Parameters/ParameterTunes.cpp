@@ -59,7 +59,6 @@ ParameterTunes::ParameterTunes(const YAML::Node& Settings) {
 // ********************************************
 ParameterTunes::~ParameterTunes() {
 // ********************************************
-
 }
 
 // ********************************************
