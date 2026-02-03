@@ -1,10 +1,10 @@
 // MaCh3 includes
 #include "Manager/Manager.h"
 
+_MaCh3_Safe_Include_Start_ //{
 // ROOT includes
 #include <ROOT/RDataFrame.hxx>
-#include "TCanvas.h"
-#include "TChain.h"
+_MaCh3_Safe_Include_End_ //}
 
 /// @file PlotLLHMap.cpp
 /// @brief Processing n-dimensional LLHMap outputs generating 1D and 2D profiled likelihoods as defined in config
