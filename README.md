@@ -178,7 +178,7 @@ MaCh3 requires a C++ compiler (e.g. [gcc](https://gcc.gnu.org)), [CMake](https:/
   GCC:   >= 8.5   [lower versions may work]
   C++:   >= 14
   CMake: >= 3.14
-  ROOT:  >= 6.18
+  ROOT:  >= 6.20
 ```
 
 If you don't already have the correct dependencies, you can install them in a variety of ways, e.g. building from source, via a package manager. If you have access to `cvmfs`, the easiest solution is probably to source an [LCG release](https://lcgdocs.web.cern.ch/lcgdocs/lcgreleases/introduction/). For example, on an x86_64 Alma9 machine:
