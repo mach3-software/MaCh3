@@ -890,7 +890,6 @@ std::vector< std::vector<int> > BinnedSplineHandler::GetEventSplines(const std::
 // checks if there are multiple modes with the same SplineSuffix
 // (for example if CCRES and CCCoherent are treated as one spline mode)
 std::vector< std::vector<int> > BinnedSplineHandler::StripDuplicatedModes(const std::vector< std::vector<int> >& InputVector) {
-
   //ETA - this is of size nPars from the xsec model
   size_t InputVectorSize = InputVector.size();
   std::vector< std::vector<int> > ReturnVec(InputVectorSize);
