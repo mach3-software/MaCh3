@@ -15,7 +15,8 @@ endif()
 ### Begin ROOT setup
 ### KS: 6.18 is minimal version which has nasty bug-fix to SetBinError in TH2Poly
 ### https://github.com/root-project/root/commit/9ed733d77ca4b513ef68ba5343c9b2664f24ebc3
-find_package(ROOT 6.18 REQUIRED)
+### KS: 6.20 is minimal due to ROOT_GENERATE_DICTIONARY
+find_package(ROOT 6.20 REQUIRED)
 
 STRING(STRIP "${ROOT_CXX_FLAGS}" ROOT_CXX_FLAGS_LIST)
 STRING(REPLACE " " ";" ROOT_CXX_FLAGS_LIST ${ROOT_CXX_FLAGS_LIST})
