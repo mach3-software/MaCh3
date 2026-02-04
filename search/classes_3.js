@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['eventinfo_1785',['EventInfo',['../structEventInfo.html',1,'']]]
+  ['eventinfo_1788',['EventInfo',['../structEventInfo.html',1,'']]]
 ];

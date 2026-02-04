@@ -203,7 +203,7 @@ System Requirements</h1>
 <p>MaCh3 requires a C++ compiler (e.g. <a href="https://gcc.gnu.org">gcc</a>), <a href="https://cmake.org">CMake</a>, and <a href="https://root.cern/">ROOT</a>. Based on several tests, recommended versions are: </p><div class="fragment"><div class="line">GCC:   &gt;= 8.5   [lower versions may work]</div>
 <div class="line">C++:   &gt;= 14</div>
 <div class="line">CMake: &gt;= 3.14</div>
-<div class="line">ROOT:  &gt;= 6.18</div>
+<div class="line">ROOT:  &gt;= 6.20</div>
 </div><!-- fragment --><p>If you don't already have the correct dependencies, you can install them in a variety of ways, e.g. building from source, via a package manager. If you have access to <code>cvmfs</code>, the easiest solution is probably to source an <a href="https://lcgdocs.web.cern.ch/lcgdocs/lcgreleases/introduction/">LCG release</a>. For example, on an x86_64 Alma9 machine: </p><div class="fragment"><div class="line">source /cvmfs/sft.cern.ch/lcg/views/LCG_108/x86_64-el9-gcc15-opt/setup.sh</div>
 </div><!-- fragment --><p> Alternatively, you can create a conda environment which <em>should</em> provide a ready-to-go environment. If you have micromamba, you can do: </p><div class="fragment"><div class="line">micromamba env create -n MaCh3 -c conda-forge root cmake</div>
 </div><!-- fragment --><p> and if you don't have micromamba installed, you can follow the instructions <a href="https://mamba.readthedocs.io/en/latest/installation/micromamba-installation.html">here</a>.</p>
