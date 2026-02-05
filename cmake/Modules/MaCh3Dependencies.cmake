@@ -64,12 +64,12 @@ endif()
 ### End ROOT setup
 
 #YAML for reading in config files
-set(YAML_CPP_VERSION 0.8.0) #KS: We need it for version.h file also define this number only once
+set(YAML_CPP_VERSION 0.9.0) #KS: We need it for version.h file also define this number only once
 CPMAddPackage(
     NAME yaml-cpp
     VERSION ${YAML_CPP_VERSION}
     GITHUB_REPOSITORY "jbeder/yaml-cpp"
-    GIT_TAG bbf8bdb087bb3f3621ca0a5ace06047805f4e9f3
+    GIT_TAG yaml-cpp-${YAML_CPP_VERSION}
     GIT_SHALLOW NO
     OPTIONS
       "YAML_CPP_INSTALL ON"
