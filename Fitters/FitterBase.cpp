@@ -554,6 +554,69 @@ bool FitterBase::CheckSkipParameter(const std::vector<std::string>& SkipVector, 
   return skip;
 }
 
+
+// *************************
+void FitterBase::GetParameterScanRange(const ParameterHandlerBase* cov, const int i, double& CentralValue,
+                                       double& lower, double& upper, const int n_points, const std::string& suffix) const {
+// *************************
+  // YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D. Barrow
+  std::map<std::string, std::vector<double>> scanRanges;
+  const bool isScanRanges = GetScanRange(scanRanges);
+
+  double nSigma = GetFromManager<int>(fitMan->raw()["LLHScan"]["LLHScanSigma"], 1., __FILE__, __LINE__);
+  bool IsPCA = cov->IsPCA();
+
+  // Get the parameter name
+  std::string name = cov->GetParFancyName(i);
+  if (IsPCA) name += "_PCA";
+
+  // Get the parameter priors and bounds
+  CentralValue = cov->GetParProp(i);
+  if (IsPCA) CentralValue = cov->GetPCAHandler()->GetParPropPCA(i);
+
+  double prior = cov->GetParInit(i);
+  if (IsPCA) prior = cov->GetPCAHandler()->GetPreFitValuePCA(i);
+
+  if (std::abs(CentralValue - prior) > 1e-10) {
+    MACH3LOG_INFO("For {} scanning around value {} rather than prior {}", name, CentralValue, prior);
+  }
+
+  // Get the covariance matrix and do the +/- nSigma
+  // Set lower and upper bounds relative the CentralValue
+  // Set the parameter ranges between which LLH points are scanned
+  lower = CentralValue - nSigma*cov->GetDiagonalError(i);
+  upper = CentralValue + nSigma*cov->GetDiagonalError(i);
+  // If PCA, transform these parameter values to the PCA basis
+  if (IsPCA) {
+    lower = CentralValue - nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(i));
+    upper = CentralValue + nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(i));
+    MACH3LOG_INFO("eval {} = {:.2f}", i, cov->GetPCAHandler()->GetEigenValues()(i));
+    MACH3LOG_INFO("CV {} = {:.2f}", i, CentralValue);
+    MACH3LOG_INFO("lower {} = {:.2f}", i, lower);
+    MACH3LOG_INFO("upper {} = {:.2f}", i, upper);
+    MACH3LOG_INFO("nSigma = {:.2f}", nSigma);
+  }
+
+  // Implementation suggested by D. Barrow
+  // If param ranges are specified in scanRanges node, extract it from there
+  if(isScanRanges){
+    // Find matching entries through std::maps
+    auto it = scanRanges.find(name);
+    if (it != scanRanges.end() && it->second.size() == 2) { //Making sure the range is has only two entries
+      lower = it->second[0];
+      upper = it->second[1];
+      MACH3LOG_INFO("Found matching param name for setting specified range for {}", name);
+      MACH3LOG_INFO("Range for {} = [{:.2f}, {:.2f}]", name, lower, upper);
+    }
+  }
+
+  // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables
+  // This also applies for other parameters like osc, etc.
+  lower = std::max(lower, cov->GetLowerBound(i));
+  upper = std::min(upper, cov->GetUpperBound(i));
+  MACH3LOG_INFO("Scanning {} {} with {} steps, from [{:.2f} , {:.2f}], CV = {:.2f}", suffix, name, n_points, lower, upper, CentralValue);
+}
+
 // *************************
 // Run LLH scan
 void FitterBase::RunLLHScan() {
@@ -603,14 +666,9 @@ void FitterBase::RunLLHScan() {
   }
   // Number of points we do for each LLH scan
   const int n_points = GetFromManager<int>(fitMan->raw()["LLHScan"]["LLHScanPoints"], 100, __FILE__ , __LINE__);
-  double nSigma = GetFromManager<int>(fitMan->raw()["LLHScan"]["LLHScanSigma"], 1., __FILE__, __LINE__);
 
   // We print 5 reweights
   const int countwidth = int(double(n_points)/double(5));
-
-  // YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D. Barrow
-  std::map<std::string, std::vector<double>> scanRanges;
-  const bool isScanRanges = GetScanRange(scanRanges);
    
   // Loop over the covariance classes
   for (ParameterHandlerBase *cov : systematics)
@@ -627,51 +685,9 @@ void FitterBase::RunLLHScan() {
       if (IsPCA) name += "_PCA";
       // KS: Check if we want to skip this parameter
       if(CheckSkipParameter(SkipVector, name)) continue;
-
-      // Get the parameter priors and bounds
-      double CentralValue = cov->GetParProp(i);
-      if (IsPCA) CentralValue = cov->GetPCAHandler()->GetParPropPCA(i);
-
-      double prior = cov->GetParInit(i);
-      if (IsPCA) prior = cov->GetPCAHandler()->GetPreFitValuePCA(i);
-
-      if (std::abs(CentralValue - prior) > 1e-10) {
-        MACH3LOG_INFO("For {} scanning around value {} rather than prior {}", name, CentralValue, prior);
-      }
-      // Get the covariance matrix and do the +/- nSigma
-      // Set lower and upper bounds relative the CentralValue
-      // Set the parameter ranges between which LLH points are scanned
-      double lower = CentralValue - nSigma*cov->GetDiagonalError(i);
-      double upper = CentralValue + nSigma*cov->GetDiagonalError(i);
-      // If PCA, transform these parameter values to the PCA basis
-      if (IsPCA) {
-        lower = CentralValue - nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(i));
-        upper = CentralValue + nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(i));
-        MACH3LOG_INFO("eval {} = {:.2f}", i, cov->GetPCAHandler()->GetEigenValues()(i));
-        MACH3LOG_INFO("CV {} = {:.2f}", i, CentralValue);
-        MACH3LOG_INFO("lower {} = {:.2f}", i, lower);
-        MACH3LOG_INFO("upper {} = {:.2f}", i, upper);
-        MACH3LOG_INFO("nSigma = {:.2f}", nSigma);
-      }  
-      // Implementation suggested by D. Barrow  
-      // If param ranges are specified in scanRanges node, extract it from there 
-      if(isScanRanges){
-        // Find matching entries through std::maps
-        auto it = scanRanges.find(name);
-        if (it != scanRanges.end() && it->second.size() == 2) { //Making sure the range is has only two entries
-          lower = it->second[0];
-          upper = it->second[1];
-          MACH3LOG_INFO("Found matching param name for setting specified range for {}", name);
-          MACH3LOG_INFO("Range for {} = [{:.2f}, {:.2f}]", name, lower, upper);
-        }
-      }
-      
-      // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables
-      // This also applies for other parameters like osc, etc.
-      lower = std::max(lower, cov->GetLowerBound(i));
-      upper = std::min(upper, cov->GetUpperBound(i));
-      MACH3LOG_INFO("Scanning {} with {} steps, from [{:.2f} , {:.2f}], CV = {:.2f}", name, n_points, lower, upper, CentralValue);
-
+      // Get the parameter central and bounds
+      double CentralValue, lower, upper;
+      GetParameterScanRange(cov, i, CentralValue, lower, upper, n_points);
       // Make the TH1D
       auto hScan = std::make_unique<TH1D>((name + "_full").c_str(), (name + "_full").c_str(), n_points, lower, upper);
       hScan->SetTitle((std::string("2LLH_full, ") + name + ";" + name + "; -2(ln L_{sample} + ln L_{xsec+flux} + ln L_{det})").c_str());
@@ -936,11 +952,6 @@ void FitterBase::Run2DLLHScan() {
   // We print 5 reweights
   const int countwidth = int(double(n_points)/double(5));
 
-  std::map<std::string, std::vector<double>> scanRanges;
-  const bool isScanRanges = GetScanRange(scanRanges);
-
-  const double nSigma = GetFromManager<int>(fitMan->raw()["LLHScan"]["LLHScanSigma"], 1., __FILE__, __LINE__);
-
   // Loop over the covariance classes
   for (ParameterHandlerBase *cov : systematics)
   {
@@ -954,46 +965,10 @@ void FitterBase::Run2DLLHScan() {
     {
       std::string name_x = cov->GetParFancyName(i);
       if (IsPCA) name_x += "_PCA";
-
       // Get the parameter central and bounds
-      double central_x = cov->GetParProp(i);
-      if (IsPCA) central_x = cov->GetPCAHandler()->GetParPropPCA(i);
+      double central_x, lower_x, upper_x;
+      GetParameterScanRange(cov, i, central_x, lower_x, upper_x, n_points, "X");
 
-      double prior_x = cov->GetParInit(i);
-      if (IsPCA) prior_x = cov->GetPCAHandler()->GetPreFitValuePCA(i);
-
-      if (std::abs(central_x - prior_x) > 1e-10) {
-        MACH3LOG_INFO("For {} scanning around value {} rather than prior {}", name_x, central_x, prior_x);
-      }
-      // Get the covariance matrix and do the +/- nSigma
-      // Set lower and upper bounds relative the prior
-      double lower_x = central_x - nSigma*cov->GetDiagonalError(i);
-      double upper_x = central_x + nSigma*cov->GetDiagonalError(i);
-      // If PCA, transform these parameter values to the PCA basis
-      if (IsPCA) {
-        lower_x = central_x - nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(i));
-        upper_x = central_x + nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(i));
-        MACH3LOG_INFO("eval {} = {:.2f}", i, cov->GetPCAHandler()->GetEigenValues()(i));
-        MACH3LOG_INFO("CV {} = {:.2f}", i, central_x);
-        MACH3LOG_INFO("lower {} = {:.2f}", i, lower_x);
-        MACH3LOG_INFO("upper {} = {:.2f}", i, upper_x);
-        MACH3LOG_INFO("nSigma = {:.2f}", nSigma);
-      }
-      // If param ranges are specified in scanRanges node, extract it from there
-      if(isScanRanges){
-        // Find matching entries through std::maps
-        auto it = scanRanges.find(name_x);
-        if (it != scanRanges.end() && it->second.size() == 2) { //Making sure the range is has only two entries
-          lower_x = it->second[0];
-          upper_x = it->second[1];
-          MACH3LOG_INFO("Found matching param name for setting specified range for {}", name_x);
-          MACH3LOG_INFO("Range for {} = [{:.2f}, {:.2f}]", name_x, lower_x, upper_x);
-        }
-      }
-
-      // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables
-      lower_x = std::max(lower_x, cov->GetLowerBound(i));
-      upper_x = std::min(upper_x, cov->GetUpperBound(i));
       // KS: Check if we want to skip this parameter
       if(CheckSkipParameter(SkipVector, name_x)) continue;
 
@@ -1005,46 +980,8 @@ void FitterBase::Run2DLLHScan() {
         if(CheckSkipParameter(SkipVector, name_y)) continue;
 
         // Get the parameter central and bounds
-        double central_y = cov->GetParProp(j);
-        if (IsPCA) central_y = cov->GetPCAHandler()->GetParPropPCA(j);
-
-        double prior_y = cov->GetParInit(j);
-        if (IsPCA) prior_y = cov->GetPCAHandler()->GetPreFitValuePCA(j);
-
-        if (std::abs(central_y - prior_y) > 1e-10) {
-          MACH3LOG_INFO("For {} scanning around value {} rather than prior {}", name_y, central_y, prior_y);
-        }
-
-        // Set lower and upper bounds relative the prior
-        double lower_y = central_y - nSigma*cov->GetDiagonalError(j);
-        double upper_y = central_y + nSigma*cov->GetDiagonalError(j);
-        // If PCA, transform these parameter values to the PCA basis
-        if (IsPCA) {
-          lower_y = central_y - nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(j));
-          upper_y = central_y + nSigma*std::sqrt((cov->GetPCAHandler()->GetEigenValues())(j));
-          MACH3LOG_INFO("eval {} = {:.2f}", i, cov->GetPCAHandler()->GetEigenValues()(j));
-          MACH3LOG_INFO("CV {} = {:.2f}", i, central_y);
-          MACH3LOG_INFO("lower {} = {:.2f}", i, lower_y);
-          MACH3LOG_INFO("upper {} = {:.2f}", i, upper_y);
-          MACH3LOG_INFO("nSigma = {:.2f}", nSigma);
-        }
-        // If param ranges are specified in scanRanges node, extract it from there
-        if(isScanRanges){
-          // Find matching entries through std::maps
-          auto it = scanRanges.find(name_y);
-          if (it != scanRanges.end() && it->second.size() == 2) { //Making sure the range is has only two entries
-            lower_y = it->second[0];
-            upper_y = it->second[1];
-            MACH3LOG_INFO("Found matching param name for setting specified range for {}", name_y);
-            MACH3LOG_INFO("Range for {} = [{:.2f}, {:.2f}]", name_y, lower_y, upper_y);
-          }
-        }
-
-        // Cross-section and flux parameters have boundaries that we scan between, check that these are respected in setting lower and upper variables
-        lower_y = std::max(lower_y, cov->GetLowerBound(j));
-        upper_y = std::min(upper_y, cov->GetUpperBound(j));
-        MACH3LOG_INFO("Scanning X {} with {} steps, from {:.2f} - {:.2f}, CV = {}", name_x, n_points, lower_x, upper_x, central_x);
-        MACH3LOG_INFO("Scanning Y {} with {} steps, from {:.2f} - {:.2f}, CV = {}", name_y, n_points, lower_y, upper_y, central_y);
+        double central_y, lower_y, upper_y;
+        GetParameterScanRange(cov, j, central_y, lower_y, upper_y, n_points, "Y");
 
         auto hScanSam = std::make_unique<TH2D>((name_x + "_" + name_y + "_sam").c_str(), (name_x + "_" + name_y + "_sam").c_str(),
                                                 n_points, lower_x, upper_x, n_points, lower_y, upper_y);
@@ -1104,6 +1041,7 @@ void FitterBase::Run2DLLHScan() {
 // *************************
 // Run a general multi-dimensional LLH scan
 void FitterBase::RunLLHMap() {
+// *************************
   // Save the settings into the output file
   SaveSettings();
 
@@ -1111,7 +1049,6 @@ void FitterBase::RunLLHMap() {
 
   //KS: Turn it on if you want LLH scan for each ND sample separately, which increase time significantly but can be useful for validating new samples or dials.
   bool PlotLLHScanBySample = GetFromManager<bool>(fitMan->raw()["LLHScan"]["LLHScanBySample"], false, __FILE__ , __LINE__);
-
   auto ParamsOfInterest = GetFromManager<std::vector<std::string>>(fitMan->raw()["LLHScan"]["LLHParameters"], {}, __FILE__, __LINE__);
 
   if(ParamsOfInterest.empty()) {
@@ -1266,24 +1203,17 @@ void FitterBase::RunLLHMap() {
     }
   }
 
-  std::vector<double> ParamsValues;
-
-  ParamsValues.resize(ParamsCovIDs.size());
+  std::vector<double> ParamsValues(ParamsCovIDs.size());
   for(unsigned int i=0; i < ParamsCovIDs.size(); ++i)
     LLHMap->Branch(std::get<0>(ParamsCovIDs[i]).c_str(), &ParamsValues[i]);
 
   // Setting up the scan
-  // Don't know the number of parameters beforehand, so doing a 1D loop over all combination of indeces of individual parameters
   // Starting at index {0,0,0,...}
-  std::vector<unsigned long> idx;
-
-  for(unsigned int i=0; i < ParamsCovIDs.size(); ++i)
-    idx.push_back(0);
+  std::vector<unsigned long> idx(ParamsCovIDs.size(), 0);
 
   // loop over scanned points sp
   for(unsigned long sp = 0; sp < TotalPoints; ++sp)
   {
-
     // At each point need to find the indeces and test values to calculate LogL
     for(unsigned int n = 0; n < ParamsCovIDs.size(); ++n)
     {
@@ -1337,7 +1267,6 @@ void FitterBase::RunLLHMap() {
       TotalLogL += CovLogL[ivc];
     }
 
-
     if(PlotLLHScanBySample)
     {
       int SampleIterator = 0;
@@ -1356,7 +1285,6 @@ void FitterBase::RunLLHMap() {
     if (sp % countwidth == 0)
       MaCh3Utils::PrintProgressBar(sp, TotalPoints);
   }
-
 
   outputFile->cd();
   LLHMap->Write();
@@ -1422,7 +1350,7 @@ void FitterBase::RunSigmaVarLegacy() {
         }
       }
 
-      // Get the initial value of ith parameter
+      // Get the initial value of i-th parameter
       double central = cov->GetParProp(i);
       double prior = cov->GetParInit(i);
 

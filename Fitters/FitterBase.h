@@ -94,7 +94,9 @@ class FitterBase {
   /// @brief YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D. Barrow
   /// @param scanRanges A map with user specified parameter ranges
   bool GetScanRange(std::map<std::string, std::vector<double>>& scanRanges) const;
-
+  /// @brief Helper function to get parameter scan range, central value.
+  void GetParameterScanRange(const ParameterHandlerBase* cov, const int i, double& CentralValue,
+                             double& lower, double& upper, const int n_points, const std::string& suffix = "") const;
   /// @brief KS: Check whether we want to skip parameter using skip vector
   bool CheckSkipParameter(const std::vector<std::string>& SkipVector, const std::string& ParamName) const;
 
