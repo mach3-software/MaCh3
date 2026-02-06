@@ -22,32 +22,24 @@ jobs:
       matrix:
         include:
           - name: Reweight Validations
-            test_1: MaCh3CLI --ReweightValidations
-            test_2: empty
-            test_3: empty
-            test_4: empty
-            test_5: empty
+            test: MaCh3CLI --ReweightValidations
+            compilation_flags:
 
           - name: Covariance Validations
-            test_1: MaCh3CLI --CovarianceValidations
-            test_2: empty
-            test_3: empty
-            test_4: empty
-            test_5: empty
+            test: MaCh3CLI --CovarianceValidations
+            compilation_flags:
 
           - name: Fitter Validations
-            test_1: MaCh3CLI --FitterValidations
-            test_2: empty
-            test_3: empty
-            test_4: empty
-            test_5: empty
+            test: MaCh3CLI --FitterValidations
+            compilation_flags:
 
           - name: NuMCMC Tools Validations
-            test_1: MaCh3CLI --NuMCMCToolsValidations
-            test_2: empty
-            test_3: empty
-            test_4: empty
-            test_5: empty
+            test: MaCh3CLI --NuMCMCToolsValidations
+            compilation_flags:
+
+          - name: Fitter Validations
+            test: MaCh3CLI --FitterValidations
+            compilation_flags: -DMaCh3Tutorial_LOW_MEMORY_STRUCTS_ENABLED=ON
 
     container:
       image: ghcr.io/mach3-software/mach3:alma9latest
@@ -67,7 +59,7 @@ jobs:
         cd MaCh3Validations
         mkdir build
         cd build
-        cmake ../ -DMaCh3_Branch="$MACH3_BRANCH" -DMaCh3Tutorial_UNITTESTS_ENABLED=TRUE
+        cmake ../ -DMaCh3_Branch="$MACH3_BRANCH" -DMaCh3Tutorial_UNITTESTS_ENABLED=TRUE ${{ matrix.compilation_flags }}
 
     - name: Build MaCh3 Validations
       run: |
@@ -79,32 +71,4 @@ jobs:
         source /opt/MaCh3Validations/build/bin/setup.MaCh3.sh
         source /opt/MaCh3Validations/build/bin/setup.MaCh3Tutorial.sh
         cd /opt/MaCh3Validations/build
-        ${{ matrix.test_1 }}
-
-        #KS: GHA is stupi when it comes to arrays. I tried something fancy but it was crashing terribly
-        #If you know how to write this better please let me know
-
-        # Run the second test if it is defined
-        if [[ "${{ matrix.test_2 }}" != "empty" ]]; then
-            echo " "
-            echo "Performing Second test"
-            ${{ matrix.test_2 }}
-        fi
-        # Run the third test if it is defined
-        if [[ "${{ matrix.test_3 }}" != "empty" ]]; then
-            echo " "
-            echo "Performing Third test"
-            ${{ matrix.test_3 }}
-        fi
-
-        if [[ "${{ matrix.test_4 }}" != "empty" ]]; then
-            echo " "
-            echo "Performing test 4"
-            ${{ matrix.test_4 }}
-        fi
-
-        if [[ "${{ matrix.test_5 }}" != "empty" ]]; then
-            echo " "
-            echo "Performing test 5"
-            ${{ matrix.test_5 }}
-        fi
+        ${{ matrix.test }}
