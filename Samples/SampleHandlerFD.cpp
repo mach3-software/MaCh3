@@ -523,20 +523,21 @@ void SampleHandlerFD::SetupFunctionalParameters() {
   funcParsGrid.resize(GetNEvents());
 
   // For every functional parameter in XsecCov that matches the name in funcParsNames, add it to the map
-  for (FunctionalParameter & fp : funcParsVec) {
-    for (std::string name : funcParsNamesVec) {
-      if (fp.name == name) {
-        MACH3LOG_INFO("Adding functional parameter: {} to funcParsMap with key: {}", fp.name, funcParsNamesMap[fp.name]);
-        fp.funcPtr = &funcParsFuncMap[funcParsNamesMap[fp.name]];
-        funcParsMap[static_cast<std::size_t>(funcParsNamesMap[fp.name])] = &fp;
-        continue;
-      }
-    }
+  for (FunctionalParameter& fp : funcParsVec) {
+    auto it = funcParsNamesMap.find(fp.name);
     // If we don't find a match, we need to throw an error
-    if (funcParsMap[static_cast<std::size_t>(funcParsNamesMap[fp.name])] == nullptr) {
+    if (it == funcParsNamesMap.end()) {
       MACH3LOG_ERROR("Functional parameter {} not found, did you define it in RegisterFunctionalParameters()?", fp.name);
       throw MaCh3Exception(__FILE__, __LINE__);
     }
+    const std::size_t key = static_cast<std::size_t>(it->second);
+    MACH3LOG_INFO("Adding functional parameter: {} to funcParsMap with key: {}",fp.name, key);
+
+    const int ikey = it->second;
+    fp.funcPtr = &funcParsFuncMap[ikey];
+
+    funcParsMap[key].valuePtr = fp.valuePtr;
+    funcParsMap[key].funcPtr  = fp.funcPtr;
   }
 
   // Mostly the same as CalcXsecNormsBins
@@ -557,30 +558,35 @@ void SampleHandlerFD::SetupFunctionalParameters() {
         MACH3LOG_TRACE("Event {}, missed Kinematic var check for dial {}", iEvent, (*it).name);
         continue;
       }
-      auto funcparenum = funcParsNamesMap[(*it).name];
-      funcParsGrid.at(iEvent).push_back(funcparenum);
+      const std::size_t key = static_cast<std::size_t>(funcParsNamesMap[it->name]);
+      funcParsGrid[iEvent].push_back(&funcParsMap[key]);
     }
   }
   MACH3LOG_INFO("Finished setting up functional parameters");
+
+  /// @todo KS: Instead of clearing it they should not be class members, so we must fix it in future
+  CleanVector(funcParsNamesVec);
+
+  funcParsNamesMap.clear();
+  funcParsNamesMap.rehash(0);
 }
 
+// ***************************************************************************
 void SampleHandlerFD::ApplyShifts(const int iEvent) {
+// ***************************************************************************
+  const auto& shifts = funcParsGrid[iEvent];
+  const auto nShifts = shifts.size();
+  // KS: If there are no shifts then there is no point in resetting which can be costly.
+  if(nShifts == 0) {
+    return;
+  }
+
   // Given a sample and event, apply the shifts to the event based on the vector of functional parameter enums
   // First reset shifted array back to nominal values
   ResetShifts(iEvent);
 
-  const std::vector<int>& fpEnums = funcParsGrid[iEvent];
-  const std::size_t nShifts = fpEnums.size();
-
-  for (std::size_t i = 0; i < nShifts; ++i) {
-    const int fpEnum = fpEnums[i];
-    FunctionalParameter *fp = funcParsMap[static_cast<std::size_t>(fpEnum)];
-    // if (fp->funcPtr) {
-    //   (*fp->funcPtr)(fp->valuePtr, iEvent);
-    // } else {
-    //   MACH3LOG_ERROR("Functional parameter function pointer for {} is null for event {} in sample {}", fp->name, iEvent);
-    //   throw MaCh3Exception(__FILE__, __LINE__);
-    // }
+  for (std::size_t iShift = 0; iShift < nShifts; ++iShift) {
+    const auto* _restrict_ fp = shifts[iShift];
     (*fp->funcPtr)(fp->valuePtr, iEvent);
   }
 }

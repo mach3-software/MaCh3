@@ -256,21 +256,25 @@ class SampleHandlerFD :  public SampleHandlerBase
   bool IsSubEventSelected(const std::vector<KinematicCut> &SubEventCuts, const int iEvent, unsigned const int iSubEvent, size_t nsubevents);
   /// @brief HH - reset the shifted values to the original values
   virtual void ResetShifts(const int iEvent) {(void)iEvent;};
+  /// @brief HH - a grid of vectors of enums for each sample and event
+  std::vector<std::vector<FunctionalShifter*>> funcParsGrid;
+  /// @brief HH - a map that relates the funcpar enum to pointer of FuncPars
+  /// struct
+  /// HH - Changed to a vector of pointers since it's faster than unordered_map
+  /// and we are using ints as keys
+  std::vector<FunctionalShifter> funcParsMap;
+
+  /// @todo KS: Below functional variables are used only on setup, thus we should refactor them in such a way
+  /// that they are removed as class members but this would be breaking change thus keep it for the time being.
+
   /// @brief HH - a vector that stores all the FuncPars struct
   std::vector<FunctionalParameter> funcParsVec;
   /// @brief HH - a map that relates the name of the functional parameter to
   /// funcpar enum
   std::unordered_map<std::string, int> funcParsNamesMap;
-  /// @brief HH - a map that relates the funcpar enum to pointer of FuncPars
-  /// struct
-  /// HH - Changed to a vector of pointers since it's faster than unordered_map
-  /// and we are using ints as keys
-  std::vector<FunctionalParameter *> funcParsMap;
   /// @brief HH - a map that relates the funcpar enum to pointer of the actual
   /// function
   std::unordered_map<int, FuncParFuncType> funcParsFuncMap;
-  /// @brief HH - a grid of vectors of enums for each sample and event
-  std::vector<std::vector<int>> funcParsGrid;
   /// @brief HH - a vector of string names for each functional parameter
   std::vector<std::string> funcParsNamesVec = {};
 

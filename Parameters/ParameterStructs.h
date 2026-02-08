@@ -172,8 +172,6 @@ struct TypeParameterBase {
 struct NormParameter : public TypeParameterBase {
   /// Mode which parameter applies to
   std::vector<int> modes;
-  /// Horn currents which parameter applies to
-  std::vector<int> horncurrents;
   /// PDG which parameter applies to
   std::vector<int> pdgs;
   /// Preosc PDG which parameter applies to
@@ -193,7 +191,7 @@ struct NormParameter : public TypeParameterBase {
   std::vector< std::string > KinematicVarStr;
 };
 
-// HH - a shorthand type for funcpar functions
+/// HH - a shorthand type for funcpar functions
 using FuncParFuncType = std::function<void (const double*, std::size_t)>;
 // *******************
 /// @brief HH - Functional parameters
@@ -202,8 +200,6 @@ struct FunctionalParameter : public TypeParameterBase {
 // *******************
   /// Mode which parameter applies to
   std::vector<int> modes;
-  /// Horn currents which parameter applies to
-  std::vector<int> horncurrents;
   /// PDG which parameter applies to
   std::vector<int> pdgs;
   /// Preosc PDG which parameter applies to
