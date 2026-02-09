@@ -226,7 +226,7 @@ void SampleHandlerFD::Initialise() {
 void SampleHandlerFD::SetupKinematicMap() {
 // ************************************************
   if(KinematicParameters == nullptr || ReversedKinematicParameters == nullptr) {
-    MACH3LOG_INFO("Map KinematicParameters or ReversedKinematicParameters hasn't been initialised");
+    MACH3LOG_ERROR("Map KinematicParameters or ReversedKinematicParameters hasn't been initialised");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   // KS: Ensure maps exist correctly
@@ -238,6 +238,20 @@ void SampleHandlerFD::SetupKinematicMap() {
     if (it == ReversedKinematicParameters->end() || it->second != key) {
       MACH3LOG_ERROR("Mismatch found: {} -> {} but {} -> {}",
                      key, value, value, (it != ReversedKinematicParameters->end() ? it->second : "NOT FOUND"));
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+  }
+  // KS: Ensure some MaCh3 specific variables are defined
+  std::vector<std::string> Vars = {"Mode", "OscillationChannel"};
+  for(size_t iVar = 0; iVar < Vars.size(); iVar++) {
+    try {
+      ReturnKinematicParameterFromString(Vars[iVar]);
+    } catch (const MaCh3Exception&) {
+      MACH3LOG_ERROR("MaCh3 expected variable: {} not found in KinematicParameters.", Vars[iVar]);
+      MACH3LOG_ERROR("All keys in KinematicParameters:");
+      for (const auto& pair : *KinematicParameters) {
+        MACH3LOG_ERROR("Key: {}", pair.first);
+      }
       throw MaCh3Exception(__FILE__, __LINE__);
     }
   }
@@ -403,13 +417,13 @@ void SampleHandlerFD::FillArray_MP() {
   #pragma omp parallel private(SampleHandlerFD_array_private, SampleHandlerFD_array_private_w2)
   {
     // private to each thread
-    // ETA - maybe we can use parallel firstprivate to initialise these?
     SampleHandlerFD_array_private = new double[Binning->GetNBins()];
     SampleHandlerFD_array_private_w2 = new double[Binning->GetNBins()];
 
     std::fill_n(SampleHandlerFD_array_private, Binning->GetNBins(), 0.0);
     std::fill_n(SampleHandlerFD_array_private_w2, Binning->GetNBins(), 0.0);
 
+    // NOTE comment below is left for historical reasons
     //DB - Brain dump of speedup ideas
     //
     //Those relevant to reweighting
@@ -1108,7 +1122,9 @@ void SampleHandlerFD::SetupNuOscillatorPointers() {
   }
 }
 
+// ************************************************
 const M3::float_t* SampleHandlerFD::GetNuOscillatorPointers(const int iEvent) const {
+// ************************************************
   const M3::float_t* osc_w_pointer = &M3::Unity;
   if (MCSamples[iEvent].isNC) {
     if (*MCSamples[iEvent].nupdg != *MCSamples[iEvent].nupdgUnosc) {
@@ -1350,7 +1366,7 @@ void SampleHandlerFD::InitialiseSplineObject() {
 // ************************************************
 // === JM adjust GetNDVarHist functions to allow for subevent-level plotting ===
 TH1* SampleHandlerFD::Get1DVarHist(const int iSample, const std::string& ProjectionVar_Str, const std::vector< KinematicCut >& EventSelectionVec,
-    int WeightStyle, TAxis* Axis, const std::vector< KinematicCut >& SubEventSelectionVec) {
+                                   int WeightStyle, TAxis* Axis, const std::vector< KinematicCut >& SubEventSelectionVec) {
 // ************************************************
   //DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.
   //   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset
@@ -1404,7 +1420,10 @@ TH1* SampleHandlerFD::Get1DVarHist(const int iSample, const std::string& Project
   return _h1DVar;
 }
 
-void SampleHandlerFD::Fill1DSubEventHist(const int iSample, TH1D* _h1DVar, const std::string& ProjectionVar_Str, const std::vector< KinematicCut >& SubEventSelectionVec, int WeightStyle) {
+// ************************************************
+void SampleHandlerFD::Fill1DSubEventHist(const int iSample, TH1D* _h1DVar, const std::string& ProjectionVar_Str,
+                                         const std::vector< KinematicCut >& SubEventSelectionVec, int WeightStyle) {
+// ************************************************
   int ProjectionVar_Int = ReturnKinematicVectorFromString(ProjectionVar_Str);
 
   //JM Loop over all events
@@ -1430,8 +1449,12 @@ void SampleHandlerFD::Fill1DSubEventHist(const int iSample, TH1D* _h1DVar, const
 }
 
 // ************************************************
-TH2* SampleHandlerFD::Get2DVarHist(const int iSample, const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY,
-    const std::vector< KinematicCut >& EventSelectionVec, int WeightStyle, TAxis* AxisX, TAxis* AxisY, const std::vector< KinematicCut >& SubEventSelectionVec) {
+TH2* SampleHandlerFD::Get2DVarHist(const int iSample,
+                                   const std::string& ProjectionVar_StrX,
+                                   const std::string& ProjectionVar_StrY,
+                                   const std::vector< KinematicCut >& EventSelectionVec,
+                                   int WeightStyle, TAxis* AxisX, TAxis* AxisY,
+                                   const std::vector< KinematicCut >& SubEventSelectionVec) {
 // ************************************************
   //DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.
   //   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset
@@ -1488,9 +1511,14 @@ TH2* SampleHandlerFD::Get2DVarHist(const int iSample, const std::string& Project
 
   return _h2DVar;
 }
+// ************************************************
+void SampleHandlerFD::Fill2DSubEventHist(const int iSample, TH2D* _h2DVar,
+                                         const std::string& ProjectionVar_StrX,
+                                         const std::string& ProjectionVar_StrY,
+                                         const std::vector< KinematicCut >& SubEventSelectionVec,
+                                         int WeightStyle) {
+// ************************************************
 
-void SampleHandlerFD::Fill2DSubEventHist(const int iSample, TH2D* _h2DVar, const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY,
-    const std::vector< KinematicCut >& SubEventSelectionVec, int WeightStyle) {
   bool IsSubEventVarX = IsSubEventVarString(ProjectionVar_StrX);
   bool IsSubEventVarY = IsSubEventVarString(ProjectionVar_StrY);   
 
@@ -1623,15 +1651,32 @@ std::vector<double> SampleHandlerFD::ReturnKinematicParameterBinning(const int S
     return MakeBins(Modes->GetNModes());
   }
 
+
+  std::vector<double> BinningVect;
   // We first check if binning for a sample has been specified
   auto BinningConfig = M3OpenConfig(SampleManager->raw()["BinningFile"].as<std::string>());
   if(BinningConfig[GetSampleTitle(Sample)] && BinningConfig[GetSampleTitle(Sample)][KinematicParameter]){
-    auto BinningVect = Get<std::vector<double>>(BinningConfig[GetSampleTitle(Sample)][KinematicParameter], __FILE__, __LINE__);
-    return BinningVect;
+    BinningVect = Get<std::vector<double>>(BinningConfig[GetSampleTitle(Sample)][KinematicParameter], __FILE__, __LINE__);
   } else {
-    auto BinningVect = Get<std::vector<double>>(BinningConfig[KinematicParameter], __FILE__, __LINE__);
-    return BinningVect;
+    BinningVect = Get<std::vector<double>>(BinningConfig[KinematicParameter], __FILE__, __LINE__);
   }
+
+  // Ensure binning is increasing
+  auto IsIncreasing = [](const std::vector<double>& vec) {
+    for (size_t i = 1; i < vec.size(); ++i) {
+      if (vec[i] <= vec[i-1]) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  if (!IsIncreasing(BinningVect)) {
+    MACH3LOG_ERROR("Binning for {} is not increasing [{}]", KinematicParameter, fmt::join(BinningVect, ", "));
+    throw MaCh3Exception(__FILE__,__LINE__);
+  }
+
+  return BinningVect;
 }
 
 
@@ -1858,7 +1903,10 @@ void SampleHandlerFD::PrintIntegral(const int iSample, const TString& OutputFile
   CleanContainer(IntegralList);
 }
 
-std::vector<TH1*> SampleHandlerFD::ReturnHistsBySelection1D(const int iSample, std::string KinematicProjection, int Selection1, int Selection2, int WeightStyle, TAxis* XAxis) {
+// ************************************************
+std::vector<TH1*> SampleHandlerFD::ReturnHistsBySelection1D(const int iSample, const std::string& KinematicProjection,
+                                                            int Selection1, int Selection2, int WeightStyle, TAxis* XAxis) {
+// ************************************************
   std::vector<TH1*> hHistList;
   std::string legendEntry;
 
@@ -1894,8 +1942,9 @@ std::vector<TH1*> SampleHandlerFD::ReturnHistsBySelection1D(const int iSample, s
   return hHistList;
 }
 // ************************************************
-std::vector<TH2*> SampleHandlerFD::ReturnHistsBySelection2D(const int iSample, std::string KinematicProjectionX, std::string KinematicProjectionY,
-                                                            int Selection1, int Selection2, int WeightStyle,
+std::vector<TH2*> SampleHandlerFD::ReturnHistsBySelection2D(const int iSample, const std::string& KinematicProjectionX,
+                                                            const std::string& KinematicProjectionY, int Selection1,
+                                                            int Selection2, int WeightStyle,
                                                             TAxis* XAxis, TAxis* YAxis) {
 // ************************************************
   std::vector<TH2*> hHistList;
@@ -1925,7 +1974,8 @@ std::vector<TH2*> SampleHandlerFD::ReturnHistsBySelection2D(const int iSample, s
 }
 
 // ************************************************
-THStack* SampleHandlerFD::ReturnStackedHistBySelection1D(const int iSample, const std::string& KinematicProjection, int Selection1, int Selection2, int WeightStyle, TAxis* XAxis) {
+THStack* SampleHandlerFD::ReturnStackedHistBySelection1D(const int iSample, const std::string& KinematicProjection,
+                                                         int Selection1, int Selection2, int WeightStyle, TAxis* XAxis) {
 // ************************************************
   std::vector<TH1*> HistList = ReturnHistsBySelection1D(iSample, KinematicProjection, Selection1, Selection2, WeightStyle, XAxis);
   THStack* StackHist = new THStack((GetSampleTitle(iSample)+"_"+KinematicProjection+"_Stack").c_str(),"");
