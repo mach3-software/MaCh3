@@ -1,11 +1,11 @@
 var searchData=
 [
   ['get_2111',['Get',['../YamlHelper_8h.html#ab5a40370dca062f6b2c87fabece7db27',1,'YamlHelper.h']]],
-  ['get1dvarhist_2112',['Get1DVarHist',['../group__SampleHandlerGetters.html#ga95adaa63edf9453f12eed965a3bf46cf',1,'SampleHandlerFD']]],
+  ['get1dvarhist_2112',['Get1DVarHist',['../group__SampleHandlerGetters.html#gaec621b81662c5469a3f62cf33be37c4f',1,'SampleHandlerFD']]],
   ['get1dvarhistbymodeandchannel_2113',['Get1DVarHistByModeAndChannel',['../group__SampleHandlerGetters.html#gaf193072f552cac18955b2197bd106ed1',1,'SampleHandlerFD']]],
   ['get2dbayesianpvalue_2114',['Get2DBayesianpValue',['../StatisticalUtils_8cpp.html#a57771836d3d082d24170e24a2f04a4d6',1,'Get2DBayesianpValue(TH2D *Histogram):&#160;StatisticalUtils.cpp'],['../StatisticalUtils_8h.html#a57771836d3d082d24170e24a2f04a4d6',1,'Get2DBayesianpValue(TH2D *Histogram):&#160;StatisticalUtils.cpp']]],
   ['get2dcomparison_2115',['Get2DComparison',['../GetPostfitParamPlots_8cpp.html#a797916c99123381b3b61e55e7398f695',1,'GetPostfitParamPlots.cpp']]],
-  ['get2dvarhist_2116',['Get2DVarHist',['../classSampleHandlerFD.html#ac5234e3fdfc43fa499744502b28c54be',1,'SampleHandlerFD']]],
+  ['get2dvarhist_2116',['Get2DVarHist',['../classSampleHandlerFD.html#a3e5cfc44d29a934285e243ca3225ff78',1,'SampleHandlerFD']]],
   ['get2dvarhistbymodeandchannel_2117',['Get2DVarHistByModeAndChannel',['../group__SampleHandlerGetters.html#ga463c2e2cdba7afd948295a1a9833cd9b',1,'SampleHandlerFD']]],
   ['get_5fbest_5fparticle_2118',['get_best_particle',['../classPSO.html#a893ac5cba02c5ff6e17d809d64cb100b',1,'PSO']]],
   ['get_5fdefault_5flog_5flevel_2119',['get_default_log_level',['../MaCh3Logger_8h.html#a2c1ca790abd0cc6e40d642c2cf55b2d4',1,'MaCh3Logger.h']]],
