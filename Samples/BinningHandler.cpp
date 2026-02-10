@@ -62,7 +62,8 @@ int BinningHandler::FindGlobalBin(const int NomSample,
     return GlobalBin;
   } else{
     const auto& _restrict_ BinMapping = Binning.BinGridMapping[GlobalBin];
-    for(size_t iBin = 0; iBin < BinMapping.size(); iBin++) {
+    const size_t nNonUniBins = BinMapping.size();
+    for(size_t iBin = 0; iBin < nNonUniBins; iBin++) {
       const int BinNumber = BinMapping[iBin];
       const auto& _restrict_ NonUniBin = Binning.Bins[BinNumber];
       if(NonUniBin.IsEventInside(KinVar)){
