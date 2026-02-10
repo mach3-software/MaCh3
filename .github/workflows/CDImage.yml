@@ -29,16 +29,8 @@ jobs:
           - os: rocky9cuda
             file: Doc/MaCh3DockerFiles/Rocky9/Dockerfile
             tag_latest: rocky9cudalatest
-            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DNuFastLinear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProb3ppLinear_ENABLED=ON
+            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DNuFastLinear_ENABLED=ON -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DProbGPU_ENABLED=ON
             installoptions: -j4
-#          - os: ubuntu22.04
-#            file: Doc/MaCh3DockerFiles/Ubuntu22.04/Dockerfile
-#            tag_latest: ubuntu22.04latest
-#            installoptions: -j4
-#          - os: fedora32
-#            file: Doc/MaCh3DockerFiles/Fedora32/Dockerfile
-#            tag_latest: fedora32latest
-#            installoptions: -j4
 
     name: Image CD ${{ matrix.os }}
 

@@ -265,6 +265,11 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
     TString Title = "";
     double Prior = 1.0, PriorError = 1.0;
     GetNthParameter(i, Prior, PriorError, Title);
+
+    ParameterEnum ParType = ParamType[i];
+    int ParamTemp = i - ParamTypeStartPos[ParType];
+    bool isFlat = ParamFlat[ParType][ParamTemp];
+
     // Get bin edges for histograms
     double maxi, mini = M3::_BAD_DOUBLE_;
     if (Edges.find(Title.Data()) != Edges.end()) {
@@ -328,7 +333,8 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
     leg->AddEntry(hpost[i], Form("#splitline{PDF}{#mu = %.2f, #sigma = %.2f}", hpost[i]->GetMean(), hpost[i]->GetRMS()), "l");
     leg->AddEntry(Gauss.get(), Form("#splitline{Gauss}{#mu = %.2f, #sigma = %.2f}", Gauss->GetParameter(1), Gauss->GetParameter(2)), "l");
     leg->AddEntry(hpd.get(), Form("#splitline{HPD}{#mu = %.2f, #sigma = %.2f (+%.2f-%.2f)}", (*Means_HPD)(i), (*Errors_HPD)(i), (*Errors_HPD_Positive)(i), (*Errors_HPD_Negative)(i)), "l");
-    leg->AddEntry(Asimov.get(), Form("#splitline{Prior}{x = %.2f , #sigma = %.2f}", Prior, PriorError), "l");
+    if(isFlat && !PlotFlatPrior) leg->AddEntry(Asimov.get(), Form("#splitline{Prior}{x = %.2f}", Prior), "l");
+    else                         leg->AddEntry(Asimov.get(), Form("#splitline{Prior}{x = %.2f , #sigma = %.2f}", Prior, PriorError), "l");
 
     // Write to file
     Posterior->SetName(Title);

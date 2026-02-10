@@ -9,6 +9,7 @@
 #include "Manager/MaCh3Exception.h"
 #include "Manager/MaCh3Logger.h"
 #include "Manager/Core.h"
+#include "Parameters/ParameterStructs.h"
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT include
@@ -155,19 +156,29 @@ struct KinematicCut {
   double UpperBound = M3::_BAD_DOUBLE_;
 };
 
+// ***************************
+/// @brief Small struct used for applying shifts due to functional params
+/// @author Hank Hua
+struct FunctionalShifter {
+// ***************************
+  /// Pointer to parameter value
+  const double* valuePtr = nullptr;
+  /// Pointer to shifting function
+  FuncParFuncType* funcPtr = nullptr;
+};
 
 // ***************************
 /// @brief KS: Store bin lookups allowing to quickly find bin after migration
 struct BinShiftLookup {
 // ***************************
-  /// lower to check if Eb has moved the erec bin
-  double lower_binedge;
-  /// lower to check if Eb has moved the erec bin
-  double lower_lower_binedge;
-  /// upper to check if Eb has moved the erec bin
-  double upper_binedge;
-  /// upper to check if Eb has moved the erec bin
-  double upper_upper_binedge;
+  /// lower to check if shift has moved the event to different bin
+  double lower_binedge = M3::_BAD_DOUBLE_;
+  /// lower to check if shift has moved the event to different bin
+  double lower_lower_binedge = M3::_BAD_DOUBLE_;
+  /// upper to check if shift has moved the event to different bin
+  double upper_binedge = M3::_BAD_DOUBLE_;
+  /// upper to check if shift has moved the event to different bin
+  double upper_upper_binedge = M3::_BAD_DOUBLE_;
 };
 
 // ***************************
