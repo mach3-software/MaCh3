@@ -5,15 +5,16 @@ set(OSCILLATOR_OPTIONS
     CUDAProb3
     ProbGPULinear
     Prob3ppLinear
-    NuFASTLinear
+    NuFastLinear
     NuSQUIDSLinear
     OscProb
     GLoBESLinear
 )
+
 # KS: Tells whether all oscillators were disabled
 set(ALL_OSCILLATORS_DISABLED TRUE)
 
-# KS: Oscillation calculation
+# Oscillation calculation
 foreach(option IN LISTS OSCILLATOR_OPTIONS)
     DefineEnabledRequiredSwitch(${option}_ENABLED FALSE)
     # If at least one oscillator is enabled then set ALL_OSCILLATORS_DISABLED to false
@@ -24,7 +25,7 @@ endforeach()
 
 #KS: If all Oscillators are turned off then enable NuFastLinear_ENABLED and CUDAProb3_ENABLED
 if(ALL_OSCILLATORS_DISABLED)
-    set(NuFASTLinear_ENABLED TRUE)
+    set(NuFastLinear_ENABLED TRUE)
     set(CUDAProb3_ENABLED TRUE)
 endif()
 
@@ -34,16 +35,17 @@ foreach(option IN LISTS OSCILLATOR_OPTIONS)
   if(${option}_ENABLED)
     LIST(APPEND MaCh3_Oscillator_ENABLED ${option})
   endif()
-
-  #NuOscillator uses 1/0 instead of true/false thus use conversion
-  IsTrue(${option}_ENABLED USE_${option})
 endforeach()
 
-# Prepare the options for CPMAddPackage
-set(NUOSCILLATOR_OPTIONS "")
-foreach(option IN LISTS OSCILLATOR_OPTIONS)
-    list(APPEND NUOSCILLATOR_OPTIONS "Use${option} ${USE_${option}}")
-endforeach()
+#NuOscillator uses 1/0 instead of true/false thus use conversion
+IsTrue(CUDAProb3Linear_ENABLED USE_CUDAProb3Linear)
+IsTrue(CUDAProb3_ENABLED USE_CUDAProb3)
+IsTrue(ProbGPULinear_ENABLED USE_ProbGPULinear)
+IsTrue(Prob3ppLinear_ENABLED USE_Prob3ppLinear)
+IsTrue(NuFastLinear_ENABLED USE_NuFastLinear)
+IsTrue(NuSQUIDSLinear_ENABLED USE_NuSQUIDSLinear)
+IsTrue(OscProb_ENABLED USE_OscProb)
+IsTrue(GLoBESLinear_ENABLED USE_GLoBESLinear)
 
 #Also additional flags
 IsTrue(MaCh3_GPU_ENABLED DAN_USE_GPU)
@@ -80,7 +82,14 @@ CPMAddPackage(
     "UseMultithreading ${DAN_USE_MULTITHREAD}"
     "UseDoubles ${DAN_DOUBLE}"
 
-    ${NUOSCILLATOR_OPTIONS}
+    "UseCUDAProb3Linear ${USE_CUDAProb3Linear}"
+    "UseCUDAProb3 ${USE_CUDAProb3}"
+    "UseProbGPULinear ${USE_ProbGPULinear}"
+    "UseProb3ppLinear ${USE_Prob3ppLinear}"
+    "UseNuFASTLinear  ${USE_NuFastLinear}"
+    "UseNuSQUIDSLinear  ${USE_NuSQUIDSLinear}"
+    "UseOscProb ${USE_OscProb}"
+    "UseGLoBESLinear ${USE_GLoBESLinear}"
 
     "NuOscillator_Compiler_Flags ${cpu_compile_options_string}"
     "CMAKE_CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES_STRING}"
