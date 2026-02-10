@@ -16,7 +16,7 @@ var searchData=
   ['is_5fpriorpredictive_3101',['Is_PriorPredictive',['../classPredictiveThrower.html#a6be5b493541d6f30b3a0d6fd0e7557e9',1,'PredictiveThrower']]],
   ['isdecomposedpca_3102',['isDecomposedPCA',['../classPCAHandler.html#a10fecf91a038d034f55a08332dec0f4a',1,'PCAHandler']]],
   ['isflatarray_3103',['isflatarray',['../classBinnedSplineHandler.html#a13329dc38e92088744a5a49a60c01a83',1,'BinnedSplineHandler']]],
-  ['isnc_3104',['IsNC',['../structMaCh3ModeInfo.html#ad987766dd95bed2cfcdad169d07a885b',1,'MaCh3ModeInfo']]],
-  ['isnc_3105',['isNC',['../structEventInfo.html#ae2965d50aedd9de21f0afcdc9912155a',1,'EventInfo']]],
+  ['isnc_3104',['isNC',['../structEventInfo.html#ae2965d50aedd9de21f0afcdc9912155a',1,'EventInfo']]],
+  ['isnc_3105',['IsNC',['../structMaCh3ModeInfo.html#ad987766dd95bed2cfcdad169d07a885b',1,'MaCh3ModeInfo']]],
   ['ispriorpredictive_3106',['isPriorPredictive',['../classSampleSummary.html#adb737e335e68edeb14a6ce2ca112dc8c',1,'SampleSummary']]]
 ];

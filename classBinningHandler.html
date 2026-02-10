@@ -356,22 +356,23 @@ Dan Barrow </dd></dl>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keywordflow">return</span> GlobalBin;</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  } <span class="keywordflow">else</span>{</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span>&amp; <a class="code" href="Core_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a> BinMapping = Binning.BinGridMapping[GlobalBin];</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> iBin = 0; iBin &lt; BinMapping.size(); iBin++) {</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">int</span> BinNumber = BinMapping[iBin];</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span>&amp; <a class="code" href="Core_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a> NonUniBin = Binning.Bins[BinNumber];</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;      <span class="keywordflow">if</span>(NonUniBin.IsEventInside(KinVar)){</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        <span class="keywordflow">return</span> BinNumber + Binning.GlobalOffset;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;      }</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    }</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Didn&#39;t find any bin so returning UnderOverFlowBin&quot;</span>);</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="namespaceM3.html#aadca64372617e10cf9fdf70d0b0eb23f">M3::UnderOverFlowBin</a>;</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  }</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;}</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">size_t</span> nNonUniBins = BinMapping.size();</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> iBin = 0; iBin &lt; nNonUniBins; iBin++) {</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">int</span> BinNumber = BinMapping[iBin];</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;      <span class="keyword">const</span> <span class="keyword">auto</span>&amp; <a class="code" href="Core_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a> NonUniBin = Binning.Bins[BinNumber];</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;      <span class="keywordflow">if</span>(NonUniBin.IsEventInside(KinVar)){</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        <span class="keywordflow">return</span> BinNumber + Binning.GlobalOffset;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;      }</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    }</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;Didn&#39;t find any bin so returning UnderOverFlowBin&quot;</span>);</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="namespaceM3.html#aadca64372617e10cf9fdf70d0b0eb23f">M3::UnderOverFlowBin</a>;</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  }</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;}</div>
 <div class="ttc" id="aCore_8h_html_ab6a7e23420f0bcfb04f42f45f8283101"><div class="ttname"><a href="Core_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a></div><div class="ttdeci">#define _restrict_</div><div class="ttdoc">KS: Using restrict limits the effects of pointer aliasing, aiding optimizations. While reading I foun...</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00108">Core.h:108</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a4db4657acad5c79ac4bbb66a9d1c5905"><div class="ttname"><a href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a></div><div class="ttdeci">#define MACH3LOG_DEBUG</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00034">MaCh3Logger.h:34</a></div></div>
 <div class="ttc" id="aclassBinningHandler_html_a59f42dcc81ff1119566f9f2e217fbb44"><div class="ttname"><a href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">BinningHandler::SampleBinning</a></div><div class="ttdeci">std::vector&lt; SampleBinningInfo &gt; SampleBinning</div><div class="ttdoc">Binning info for individual sample.</div><div class="ttdef"><b>Definition:</b> <a href="BinningHandler_8h_source.html#l00199">BinningHandler.h:199</a></div></div>
 <div class="ttc" id="anamespaceM3_html_aadca64372617e10cf9fdf70d0b0eb23f"><div class="ttname"><a href="namespaceM3.html#aadca64372617e10cf9fdf70d0b0eb23f">M3::UnderOverFlowBin</a></div><div class="ttdeci">constexpr static const int UnderOverFlowBin</div><div class="ttdoc">Mark bin which is overflow or underflow in MaCh3 binning.</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00091">Core.h:91</a></div></div>
-<div class="ttc" id="astructSampleBinningInfo_html"><div class="ttname"><a href="structSampleBinningInfo.html">SampleBinningInfo</a></div><div class="ttdoc">KS: Struct storing all information required for sample binning.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00210">SampleStructs.h:210</a></div></div>
+<div class="ttc" id="astructSampleBinningInfo_html"><div class="ttname"><a href="structSampleBinningInfo.html">SampleBinningInfo</a></div><div class="ttdoc">KS: Struct storing all information required for sample binning.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00221">SampleStructs.h:221</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -417,20 +418,20 @@ Dan Barrow </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="BinningHandler_8cpp_source.html#l00078">78</a> of file <a class="el" href="BinningHandler_8cpp_source.html">BinningHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;                                           {</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="comment">// ************************************************</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  <span class="keyword">const</span> <a class="code" href="structSampleBinningInfo.html">SampleBinningInfo</a>&amp; info = <a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[iSample];</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span>&amp; edges = info.<a class="code" href="structSampleBinningInfo.html#aa8669cafe2c37a2ded5e5b2fdc37d215">BinEdges</a>[iDim];</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160; </div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  <span class="comment">// Outside binning range</span></div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  <span class="keywordflow">if</span> (Var &lt; edges.front() || Var &gt;= edges.back()) {</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="namespaceM3.html#aadca64372617e10cf9fdf70d0b0eb23f">M3::UnderOverFlowBin</a>;</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;  }</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(std::distance(edges.begin(), std::upper_bound(edges.begin(), edges.end(), Var)) - 1);</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;}</div>
-<div class="ttc" id="astructSampleBinningInfo_html_aa8669cafe2c37a2ded5e5b2fdc37d215"><div class="ttname"><a href="structSampleBinningInfo.html#aa8669cafe2c37a2ded5e5b2fdc37d215">SampleBinningInfo::BinEdges</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; double &gt; &gt; BinEdges</div><div class="ttdoc">Vector to hold N-axis bin-edges.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00213">SampleStructs.h:213</a></div></div>
+<p class="definition">Definition at line <a class="el" href="BinningHandler_8cpp_source.html#l00079">79</a> of file <a class="el" href="BinningHandler_8cpp_source.html">BinningHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;                                           {</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="comment">// ************************************************</span></div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  <span class="keyword">const</span> <a class="code" href="structSampleBinningInfo.html">SampleBinningInfo</a>&amp; info = <a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[iSample];</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160; </div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span>&amp; edges = info.<a class="code" href="structSampleBinningInfo.html#aa8669cafe2c37a2ded5e5b2fdc37d215">BinEdges</a>[iDim];</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  <span class="comment">// Outside binning range</span></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;  <span class="keywordflow">if</span> (Var &lt; edges.front() || Var &gt;= edges.back()) {</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="namespaceM3.html#aadca64372617e10cf9fdf70d0b0eb23f">M3::UnderOverFlowBin</a>;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;  }</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(std::distance(edges.begin(), std::upper_bound(edges.begin(), edges.end(), Var)) - 1);</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;}</div>
+<div class="ttc" id="astructSampleBinningInfo_html_aa8669cafe2c37a2ded5e5b2fdc37d215"><div class="ttname"><a href="structSampleBinningInfo.html#aa8669cafe2c37a2ded5e5b2fdc37d215">SampleBinningInfo::BinEdges</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; double &gt; &gt; BinEdges</div><div class="ttdoc">Vector to hold N-axis bin-edges.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00224">SampleStructs.h:224</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -506,16 +507,16 @@ Dan Barrow </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="BinningHandler_8cpp_source.html#l00209">209</a> of file <a class="el" href="BinningHandler_8cpp_source.html">BinningHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;                                                              {</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;<span class="comment">// ************************************************</span></div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;  <span class="keywordtype">int</span> SampleBin = <a class="code" href="SampleStructs_8h.html#a4a3cb7a9d73e72bb8144bed28ed5855d">GetSampleFromGlobalBin</a>(<a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>, GlobalBin);</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;  <span class="keywordtype">int</span> LocalBin  = <a class="code" href="SampleStructs_8h.html#af4afb01e9e8a6b9fa2bf0ece1b4e0859">GetLocalBinFromGlobalBin</a>(<a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>, GlobalBin);</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classBinningHandler.html#aa9963ee65f16af2b34b2561d789e4c1a">GetBinName</a>(SampleBin, LocalBin);</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;}</div>
-<div class="ttc" id="aSampleStructs_8h_html_a4a3cb7a9d73e72bb8144bed28ed5855d"><div class="ttname"><a href="SampleStructs_8h.html#a4a3cb7a9d73e72bb8144bed28ed5855d">GetSampleFromGlobalBin</a></div><div class="ttdeci">int GetSampleFromGlobalBin(const std::vector&lt; SampleBinningInfo &gt; &amp;BinningInfo, const int GlobalBin)</div><div class="ttdoc">Get the sample index corresponding to a global bin number.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00658">SampleStructs.h:658</a></div></div>
-<div class="ttc" id="aSampleStructs_8h_html_af4afb01e9e8a6b9fa2bf0ece1b4e0859"><div class="ttname"><a href="SampleStructs_8h.html#af4afb01e9e8a6b9fa2bf0ece1b4e0859">GetLocalBinFromGlobalBin</a></div><div class="ttdeci">int GetLocalBinFromGlobalBin(const std::vector&lt; SampleBinningInfo &gt; &amp;BinningInfo, const int GlobalBin)</div><div class="ttdoc">Get the local (sample) bin index from a global bin number.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00677">SampleStructs.h:677</a></div></div>
-<div class="ttc" id="aclassBinningHandler_html_aa9963ee65f16af2b34b2561d789e4c1a"><div class="ttname"><a href="classBinningHandler.html#aa9963ee65f16af2b34b2561d789e4c1a">BinningHandler::GetBinName</a></div><div class="ttdeci">std::string GetBinName(const int GlobalBin) const</div><div class="ttdoc">Get fancy name for a given bin, to help match it with global properties.</div><div class="ttdef"><b>Definition:</b> <a href="BinningHandler_8cpp_source.html#l00209">BinningHandler.cpp:209</a></div></div>
+<p class="definition">Definition at line <a class="el" href="BinningHandler_8cpp_source.html#l00210">210</a> of file <a class="el" href="BinningHandler_8cpp_source.html">BinningHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;                                                              {</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;<span class="comment">// ************************************************</span></div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;  <span class="keywordtype">int</span> SampleBin = <a class="code" href="SampleStructs_8h.html#a4a3cb7a9d73e72bb8144bed28ed5855d">GetSampleFromGlobalBin</a>(<a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>, GlobalBin);</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;  <span class="keywordtype">int</span> LocalBin  = <a class="code" href="SampleStructs_8h.html#af4afb01e9e8a6b9fa2bf0ece1b4e0859">GetLocalBinFromGlobalBin</a>(<a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>, GlobalBin);</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classBinningHandler.html#aa9963ee65f16af2b34b2561d789e4c1a">GetBinName</a>(SampleBin, LocalBin);</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;}</div>
+<div class="ttc" id="aSampleStructs_8h_html_a4a3cb7a9d73e72bb8144bed28ed5855d"><div class="ttname"><a href="SampleStructs_8h.html#a4a3cb7a9d73e72bb8144bed28ed5855d">GetSampleFromGlobalBin</a></div><div class="ttdeci">int GetSampleFromGlobalBin(const std::vector&lt; SampleBinningInfo &gt; &amp;BinningInfo, const int GlobalBin)</div><div class="ttdoc">Get the sample index corresponding to a global bin number.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00669">SampleStructs.h:669</a></div></div>
+<div class="ttc" id="aSampleStructs_8h_html_af4afb01e9e8a6b9fa2bf0ece1b4e0859"><div class="ttname"><a href="SampleStructs_8h.html#af4afb01e9e8a6b9fa2bf0ece1b4e0859">GetLocalBinFromGlobalBin</a></div><div class="ttdeci">int GetLocalBinFromGlobalBin(const std::vector&lt; SampleBinningInfo &gt; &amp;BinningInfo, const int GlobalBin)</div><div class="ttdoc">Get the local (sample) bin index from a global bin number.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00688">SampleStructs.h:688</a></div></div>
+<div class="ttc" id="aclassBinningHandler_html_aa9963ee65f16af2b34b2561d789e4c1a"><div class="ttname"><a href="classBinningHandler.html#aa9963ee65f16af2b34b2561d789e4c1a">BinningHandler::GetBinName</a></div><div class="ttdeci">std::string GetBinName(const int GlobalBin) const</div><div class="ttdoc">Get fancy name for a given bin, to help match it with global properties.</div><div class="ttdef"><b>Definition:</b> <a href="BinningHandler_8cpp_source.html#l00210">BinningHandler.cpp:210</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -554,63 +555,63 @@ Dan Barrow </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="BinningHandler_8cpp_source.html#l00155">155</a> of file <a class="el" href="BinningHandler_8cpp_source.html">BinningHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;                                                                                 {</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;<span class="comment">// ************************************************</span></div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span>&amp; Binning = <a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[iSample];</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160; </div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;  <span class="comment">// Safety checks</span></div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;  <span class="keywordflow">if</span> (SampleBin &lt; 0 || SampleBin &gt;= <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(Binning.nBins)) {</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Requested bin {} is out of range for sample {}&quot;</span>, SampleBin, iSample);</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;  }</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;  std::string BinName;</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160; </div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;  <span class="keywordflow">if</span>(Binning.Uniform) {</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    <span class="keywordtype">int</span> Dim = <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(Binning.Strides.size());</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    std::vector&lt;int&gt; Bins(Dim, 0);</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <span class="keywordtype">int</span> Remaining = SampleBin;</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160; </div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    <span class="comment">// Convert the flat/global bin index into per-dimension indices</span></div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    <span class="comment">// Dim0 is the fastest-changing axis, Dim1 the next, etc.</span></div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    <span class="comment">// For example (2D):</span></div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    <span class="comment">//   x = bin % Nx</span></div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    <span class="comment">//   y = bin / Nx</span></div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    <span class="comment">// For 3D:</span></div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    <span class="comment">//   x = bin % Nx</span></div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    <span class="comment">//   y = (bin / Nx) % Ny</span></div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    <span class="comment">//   z = bin / (Nx * Ny)</span></div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; Dim; ++i) {</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">int</span> nBinsDim = <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(Binning.BinEdges[i].size()) - 1;</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;      Bins[i] = Remaining % nBinsDim;</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;      Remaining /= nBinsDim;</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    }</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160; </div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; Dim; ++i) {</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;      <span class="keywordflow">if</span> (i &gt; 0) BinName += <span class="stringliteral">&quot;, &quot;</span>;</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">double</span> min = Binning.BinEdges[i].at(Bins[i]);</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">double</span> max = Binning.BinEdges[i].at(Bins[i] + 1);</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;      BinName += fmt::format(<span class="stringliteral">&quot;Dim{} ({:g}, {:g})&quot;</span>, i, min, max);</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    }</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;  } <span class="keywordflow">else</span>{</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    <span class="keyword">const</span> <a class="code" href="structBinInfo.html">BinInfo</a>&amp; bin = Binning.Bins[SampleBin];</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">int</span> Dim = <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(bin.<a class="code" href="structBinInfo.html#a8f29fd5c65ee5513046cd68a2af34d3f">Extent</a>.size());</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160; </div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; Dim; ++i) {</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;      <span class="keywordflow">if</span> (i &gt; 0) BinName += <span class="stringliteral">&quot;, &quot;</span>;</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">double</span> min = bin.<a class="code" href="structBinInfo.html#a8f29fd5c65ee5513046cd68a2af34d3f">Extent</a>[i][0];</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">double</span> max = bin.<a class="code" href="structBinInfo.html#a8f29fd5c65ee5513046cd68a2af34d3f">Extent</a>[i][1];</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;      BinName += fmt::format(<span class="stringliteral">&quot;Dim{} ({:g}, {:g})&quot;</span>, i, min, max);</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    }</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;  }</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;  <span class="keywordflow">return</span> BinName;</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="BinningHandler_8cpp_source.html#l00156">156</a> of file <a class="el" href="BinningHandler_8cpp_source.html">BinningHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;                                                                                 {</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;<span class="comment">// ************************************************</span></div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span>&amp; Binning = <a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[iSample];</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160; </div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;  <span class="comment">// Safety checks</span></div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;  <span class="keywordflow">if</span> (SampleBin &lt; 0 || SampleBin &gt;= <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(Binning.nBins)) {</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Requested bin {} is out of range for sample {}&quot;</span>, SampleBin, iSample);</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;  }</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;  std::string BinName;</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160; </div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;  <span class="keywordflow">if</span>(Binning.Uniform) {</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="keywordtype">int</span> Dim = <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(Binning.Strides.size());</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    std::vector&lt;int&gt; Bins(Dim, 0);</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    <span class="keywordtype">int</span> Remaining = SampleBin;</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160; </div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    <span class="comment">// Convert the flat/global bin index into per-dimension indices</span></div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    <span class="comment">// Dim0 is the fastest-changing axis, Dim1 the next, etc.</span></div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    <span class="comment">// For example (2D):</span></div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    <span class="comment">//   x = bin % Nx</span></div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    <span class="comment">//   y = bin / Nx</span></div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    <span class="comment">// For 3D:</span></div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    <span class="comment">//   x = bin % Nx</span></div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    <span class="comment">//   y = (bin / Nx) % Ny</span></div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    <span class="comment">//   z = bin / (Nx * Ny)</span></div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; Dim; ++i) {</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">int</span> nBinsDim = <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(Binning.BinEdges[i].size()) - 1;</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;      Bins[i] = Remaining % nBinsDim;</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;      Remaining /= nBinsDim;</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    }</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160; </div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; Dim; ++i) {</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;      <span class="keywordflow">if</span> (i &gt; 0) BinName += <span class="stringliteral">&quot;, &quot;</span>;</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">double</span> min = Binning.BinEdges[i].at(Bins[i]);</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">double</span> max = Binning.BinEdges[i].at(Bins[i] + 1);</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;      BinName += fmt::format(<span class="stringliteral">&quot;Dim{} ({:g}, {:g})&quot;</span>, i, min, max);</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    }</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;  } <span class="keywordflow">else</span>{</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <span class="keyword">const</span> <a class="code" href="structBinInfo.html">BinInfo</a>&amp; bin = Binning.Bins[SampleBin];</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">int</span> Dim = <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(bin.<a class="code" href="structBinInfo.html#a8f29fd5c65ee5513046cd68a2af34d3f">Extent</a>.size());</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160; </div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; Dim; ++i) {</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;      <span class="keywordflow">if</span> (i &gt; 0) BinName += <span class="stringliteral">&quot;, &quot;</span>;</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">double</span> min = bin.<a class="code" href="structBinInfo.html#a8f29fd5c65ee5513046cd68a2af34d3f">Extent</a>[i][0];</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">double</span> max = bin.<a class="code" href="structBinInfo.html#a8f29fd5c65ee5513046cd68a2af34d3f">Extent</a>[i][1];</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;      BinName += fmt::format(<span class="stringliteral">&quot;Dim{} ({:g}, {:g})&quot;</span>, i, min, max);</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    }</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;  }</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;  <span class="keywordflow">return</span> BinName;</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00037">MaCh3Logger.h:37</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class used throughout MaCh3.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00023">MaCh3Exception.h:23</a></div></div>
-<div class="ttc" id="astructBinInfo_html"><div class="ttname"><a href="structBinInfo.html">BinInfo</a></div><div class="ttdoc">KS: This hold bin extents in N-Dimensions allowing to check if Bin falls into.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00175">SampleStructs.h:175</a></div></div>
-<div class="ttc" id="astructBinInfo_html_a8f29fd5c65ee5513046cd68a2af34d3f"><div class="ttname"><a href="structBinInfo.html#a8f29fd5c65ee5513046cd68a2af34d3f">BinInfo::Extent</a></div><div class="ttdeci">std::vector&lt; std::array&lt; double, 2 &gt; &gt; Extent</div><div class="ttdoc">The extent of the bin, stored as {lower, upper} bounds for each dimension.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00178">SampleStructs.h:178</a></div></div>
+<div class="ttc" id="astructBinInfo_html"><div class="ttname"><a href="structBinInfo.html">BinInfo</a></div><div class="ttdoc">KS: This hold bin extents in N-Dimensions allowing to check if Bin falls into.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00186">SampleStructs.h:186</a></div></div>
+<div class="ttc" id="astructBinInfo_html_a8f29fd5c65ee5513046cd68a2af34d3f"><div class="ttname"><a href="structBinInfo.html#a8f29fd5c65ee5513046cd68a2af34d3f">BinInfo::Extent</a></div><div class="ttdeci">std::vector&lt; std::array&lt; double, 2 &gt; &gt; Extent</div><div class="ttdoc">The extent of the bin, stored as {lower, upper} bounds for each dimension.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00189">SampleStructs.h:189</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -649,17 +650,17 @@ Dan Barrow </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="BinningHandler_8cpp_source.html#l00143">143</a> of file <a class="el" href="BinningHandler_8cpp_source.html">BinningHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;                                                                                        {</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;<span class="comment">// ************************************************</span></div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span>&amp; Binning = <a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[iSample];</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;  <span class="keywordflow">if</span>(!Binning.Uniform) {</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;When using Non-Uniform binning for sample {} please use One bin instead of Axis bins&quot;</span>, iSample);</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;  }</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classBinningHandler.html#aa9963ee65f16af2b34b2561d789e4c1a">GetBinName</a>(iSample, <a class="code" href="classBinningHandler.html#a90a7d0fa33f3bb3e13bf327c884f6d57">GetBinSafe</a>(iSample, Bins));</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;}</div>
-<div class="ttc" id="aclassBinningHandler_html_a90a7d0fa33f3bb3e13bf327c884f6d57"><div class="ttname"><a href="classBinningHandler.html#a90a7d0fa33f3bb3e13bf327c884f6d57">BinningHandler::GetBinSafe</a></div><div class="ttdeci">int GetBinSafe(const int iSample, const std::vector&lt; int &gt; &amp;Bins) const</div><div class="ttdoc">Get gloabl bin based on sample, and dimension of each sample without any safety checks.</div><div class="ttdef"><b>Definition:</b> <a href="BinningHandler_8cpp_source.html#l00094">BinningHandler.cpp:94</a></div></div>
+<p class="definition">Definition at line <a class="el" href="BinningHandler_8cpp_source.html#l00144">144</a> of file <a class="el" href="BinningHandler_8cpp_source.html">BinningHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;                                                                                        {</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;<span class="comment">// ************************************************</span></div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span>&amp; Binning = <a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[iSample];</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;  <span class="keywordflow">if</span>(!Binning.Uniform) {</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;When using Non-Uniform binning for sample {} please use One bin instead of Axis bins&quot;</span>, iSample);</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  }</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classBinningHandler.html#aa9963ee65f16af2b34b2561d789e4c1a">GetBinName</a>(iSample, <a class="code" href="classBinningHandler.html#a90a7d0fa33f3bb3e13bf327c884f6d57">GetBinSafe</a>(iSample, Bins));</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;}</div>
+<div class="ttc" id="aclassBinningHandler_html_a90a7d0fa33f3bb3e13bf327c884f6d57"><div class="ttname"><a href="classBinningHandler.html#a90a7d0fa33f3bb3e13bf327c884f6d57">BinningHandler::GetBinSafe</a></div><div class="ttdeci">int GetBinSafe(const int iSample, const std::vector&lt; int &gt; &amp;Bins) const</div><div class="ttdoc">Get gloabl bin based on sample, and dimension of each sample without any safety checks.</div><div class="ttdef"><b>Definition:</b> <a href="BinningHandler_8cpp_source.html#l00095">BinningHandler.cpp:95</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -698,12 +699,12 @@ Dan Barrow </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="BinningHandler_8cpp_source.html#l00094">94</a> of file <a class="el" href="BinningHandler_8cpp_source.html">BinningHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;                                                                                 {</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="comment">// ************************************************</span></div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">int</span> GlobalBin = <a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[Sample].GetBinSafe(Bins);</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  <span class="keywordflow">return</span> GlobalBin;</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="BinningHandler_8cpp_source.html#l00095">95</a> of file <a class="el" href="BinningHandler_8cpp_source.html">BinningHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;                                                                                 {</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="comment">// ************************************************</span></div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">int</span> GlobalBin = <a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[Sample].GetBinSafe(Bins);</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  <span class="keywordflow">return</span> GlobalBin;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -742,12 +743,12 @@ Dan Barrow </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="BinningHandler_8cpp_source.html#l00101">101</a> of file <a class="el" href="BinningHandler_8cpp_source.html">BinningHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;                                                                                       {</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="comment">// ************************************************</span></div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">int</span> GlobalBin = <a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[Sample].GetBinSafe(Bins) + <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[Sample].GlobalOffset);</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  <span class="keywordflow">return</span> GlobalBin;</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="BinningHandler_8cpp_source.html#l00102">102</a> of file <a class="el" href="BinningHandler_8cpp_source.html">BinningHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;                                                                                       {</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;<span class="comment">// ************************************************</span></div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">int</span> GlobalBin = <a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[Sample].GetBinSafe(Bins) + <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[Sample].GlobalOffset);</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;  <span class="keywordflow">return</span> GlobalBin;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -786,17 +787,17 @@ Dan Barrow </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="BinningHandler_8cpp_source.html#l00217">217</a> of file <a class="el" href="BinningHandler_8cpp_source.html">BinningHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;                                                                        {</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;<span class="comment">// ************************************************</span></div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span>&amp; Binning = <a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[iSample];</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;  <span class="keywordflow">if</span>(!Binning.Uniform) {</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;When using Non-Uniform binning for sample {} please use global bin instead of {}&quot;</span>, iSample, __func__);</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;  } <span class="keywordflow">else</span>{</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(Binning.AxisNBins.at(iDim));</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;  }</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="BinningHandler_8cpp_source.html#l00218">218</a> of file <a class="el" href="BinningHandler_8cpp_source.html">BinningHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;                                                                        {</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;<span class="comment">// ************************************************</span></div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span>&amp; Binning = <a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[iSample];</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;  <span class="keywordflow">if</span>(!Binning.Uniform) {</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;When using Non-Uniform binning for sample {} please use global bin instead of {}&quot;</span>, iSample, __func__);</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;  } <span class="keywordflow">else</span>{</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(Binning.AxisNBins.at(iDim));</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;  }</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -880,17 +881,17 @@ Dan Barrow </dd></dl>
 
 <p>Return NonUnifomr bins to for example check extent etc. </p>
 
-<p class="definition">Definition at line <a class="el" href="BinningHandler_8cpp_source.html#l00236">236</a> of file <a class="el" href="BinningHandler_8cpp_source.html">BinningHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;                                                                                  {</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;<span class="comment">// ************************************************</span></div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span>&amp; Binning = <a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[iSample];</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;  <span class="keywordflow">if</span>(!Binning.Uniform) {</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    <span class="keywordflow">return</span> Binning.Bins;</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;  } <span class="keywordflow">else</span>{</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;{} for sample {} will not work becasue binnin is unfiorm&quot;</span>, __func__, iSample);</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;  }</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="BinningHandler_8cpp_source.html#l00237">237</a> of file <a class="el" href="BinningHandler_8cpp_source.html">BinningHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;                                                                                  {</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;<span class="comment">// ************************************************</span></div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span>&amp; Binning = <a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[iSample];</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;  <span class="keywordflow">if</span>(!Binning.Uniform) {</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    <span class="keywordflow">return</span> Binning.Bins;</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;  } <span class="keywordflow">else</span>{</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;{} for sample {} will not work becasue binnin is unfiorm&quot;</span>, __func__, iSample);</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;  }</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -918,15 +919,15 @@ Dan Barrow </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="BinningHandler_8cpp_source.html#l00114">114</a> of file <a class="el" href="BinningHandler_8cpp_source.html">BinningHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;                                                          {</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;<span class="comment">// ************************************************</span></div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  <span class="keywordflow">if</span> (Sample == <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>.size()) - 1) {</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classBinningHandler.html#a9a207f774a69f371cd2d221e21bad6f4">GetNBins</a>();</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[Sample+1].GlobalOffset);</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;  }</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="BinningHandler_8cpp_source.html#l00115">115</a> of file <a class="el" href="BinningHandler_8cpp_source.html">BinningHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;                                                          {</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="comment">// ************************************************</span></div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  <span class="keywordflow">if</span> (Sample == <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>.size()) - 1) {</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classBinningHandler.html#a9a207f774a69f371cd2d221e21bad6f4">GetNBins</a>();</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[Sample+1].GlobalOffset);</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;  }</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;}</div>
 <div class="ttc" id="aclassBinningHandler_html_a9a207f774a69f371cd2d221e21bad6f4"><div class="ttname"><a href="classBinningHandler.html#a9a207f774a69f371cd2d221e21bad6f4">BinningHandler::GetNBins</a></div><div class="ttdeci">int GetNBins() const</div><div class="ttdoc">Get total number of bins over all samples/kinematic bins etc.</div><div class="ttdef"><b>Definition:</b> <a href="BinningHandler_8h_source.html#l00153">BinningHandler.h:153</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -955,11 +956,11 @@ Dan Barrow </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="BinningHandler_8cpp_source.html#l00108">108</a> of file <a class="el" href="BinningHandler_8cpp_source.html">BinningHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;                                                            {</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;<span class="comment">// ************************************************</span></div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160; <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[Sample].GlobalOffset);</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="BinningHandler_8cpp_source.html#l00109">109</a> of file <a class="el" href="BinningHandler_8cpp_source.html">BinningHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;                                                            {</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<span class="comment">// ************************************************</span></div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160; <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[Sample].GlobalOffset);</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -987,12 +988,12 @@ Dan Barrow </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="BinningHandler_8cpp_source.html#l00229">229</a> of file <a class="el" href="BinningHandler_8cpp_source.html">BinningHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;                                                      {</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;<span class="comment">// ************************************************</span></div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span>&amp; Binning = <a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[iSample];</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;  <span class="keywordflow">return</span> Binning.Uniform;</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="BinningHandler_8cpp_source.html#l00230">230</a> of file <a class="el" href="BinningHandler_8cpp_source.html">BinningHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;                                                      {</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;<span class="comment">// ************************************************</span></div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span>&amp; Binning = <a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[iSample];</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;  <span class="keywordflow">return</span> Binning.Uniform;</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1013,22 +1014,22 @@ Dan Barrow </dd></dl>
 
 <p>Sets the GlobalOffset for each <a class="el" href="structSampleBinningInfo.html" title="KS: Struct storing all information required for sample binning.">SampleBinningInfo</a> to enable linearization of multiple 2D binning samples. </p>
 
-<p class="definition">Definition at line <a class="el" href="BinningHandler_8cpp_source.html#l00125">125</a> of file <a class="el" href="BinningHandler_8cpp_source.html">BinningHandler.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;                                         {</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="comment">// ************************************************</span></div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;  <span class="keywordflow">if</span> (<a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>.empty()) {</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;No binning samples provided.&quot;</span>);</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;  }</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160; </div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;  <span class="keywordtype">int</span> GlobalOffsetCounter = 0;</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> iSample = 0; iSample &lt; <a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>.size(); iSample++){</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[iSample].GlobalOffset = GlobalOffsetCounter;</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    GlobalOffsetCounter += <a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[iSample].nBins;</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;  }</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;  <span class="comment">// lastly modify total number of bins</span></div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;  <a class="code" href="classBinningHandler.html#af2423b4a7e2402f297d69f493f28d81d">TotalNumberOfBins</a> = GlobalOffsetCounter;</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="BinningHandler_8cpp_source.html#l00126">126</a> of file <a class="el" href="BinningHandler_8cpp_source.html">BinningHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;                                         {</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="comment">// ************************************************</span></div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;  <span class="keywordflow">if</span> (<a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>.empty()) {</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;No binning samples provided.&quot;</span>);</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;  }</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160; </div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;  <span class="keywordtype">int</span> GlobalOffsetCounter = 0;</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> iSample = 0; iSample &lt; <a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>.size(); iSample++){</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    <a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[iSample].GlobalOffset = GlobalOffsetCounter;</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    GlobalOffsetCounter += <a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[iSample].nBins;</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;  }</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;  <span class="comment">// lastly modify total number of bins</span></div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;  <a class="code" href="classBinningHandler.html#af2423b4a7e2402f297d69f493f28d81d">TotalNumberOfBins</a> = GlobalOffsetCounter;</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1089,9 +1090,9 @@ Dan Barrow </dd></dl>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  <a class="code" href="classBinningHandler.html#a35ddcc9c8bbf662c26bb977e3757cfc4">SetGlobalBinNumbers</a>();</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00035">MaCh3Logger.h:35</a></div></div>
-<div class="ttc" id="aclassBinningHandler_html_a35ddcc9c8bbf662c26bb977e3757cfc4"><div class="ttname"><a href="classBinningHandler.html#a35ddcc9c8bbf662c26bb977e3757cfc4">BinningHandler::SetGlobalBinNumbers</a></div><div class="ttdeci">void SetGlobalBinNumbers()</div><div class="ttdoc">Sets the GlobalOffset for each SampleBinningInfo to enable linearization of multiple 2D binning sampl...</div><div class="ttdef"><b>Definition:</b> <a href="BinningHandler_8cpp_source.html#l00125">BinningHandler.cpp:125</a></div></div>
-<div class="ttc" id="astructSampleBinningInfo_html_a0810d4d807808d1cc7d261f1e986123a"><div class="ttname"><a href="structSampleBinningInfo.html#a0810d4d807808d1cc7d261f1e986123a">SampleBinningInfo::InitUniform</a></div><div class="ttdeci">void InitUniform(const std::vector&lt; std::vector&lt; double &gt;&gt; &amp;InputEdges)</div><div class="ttdoc">Initialise Uniform Binning.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00233">SampleStructs.h:233</a></div></div>
-<div class="ttc" id="astructSampleBinningInfo_html_a2cb3ae7a21eab84e153552f6442dff71"><div class="ttname"><a href="structSampleBinningInfo.html#a2cb3ae7a21eab84e153552f6442dff71">SampleBinningInfo::InitNonUniform</a></div><div class="ttdeci">void InitNonUniform(const std::vector&lt; std::vector&lt; std::vector&lt; double &gt;&gt;&gt; &amp;InputBins)</div><div class="ttdoc">Initialise Non-Uniform Binning.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00446">SampleStructs.h:446</a></div></div>
+<div class="ttc" id="aclassBinningHandler_html_a35ddcc9c8bbf662c26bb977e3757cfc4"><div class="ttname"><a href="classBinningHandler.html#a35ddcc9c8bbf662c26bb977e3757cfc4">BinningHandler::SetGlobalBinNumbers</a></div><div class="ttdeci">void SetGlobalBinNumbers()</div><div class="ttdoc">Sets the GlobalOffset for each SampleBinningInfo to enable linearization of multiple 2D binning sampl...</div><div class="ttdef"><b>Definition:</b> <a href="BinningHandler_8cpp_source.html#l00126">BinningHandler.cpp:126</a></div></div>
+<div class="ttc" id="astructSampleBinningInfo_html_a0810d4d807808d1cc7d261f1e986123a"><div class="ttname"><a href="structSampleBinningInfo.html#a0810d4d807808d1cc7d261f1e986123a">SampleBinningInfo::InitUniform</a></div><div class="ttdeci">void InitUniform(const std::vector&lt; std::vector&lt; double &gt;&gt; &amp;InputEdges)</div><div class="ttdoc">Initialise Uniform Binning.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00244">SampleStructs.h:244</a></div></div>
+<div class="ttc" id="astructSampleBinningInfo_html_a2cb3ae7a21eab84e153552f6442dff71"><div class="ttname"><a href="structSampleBinningInfo.html#a2cb3ae7a21eab84e153552f6442dff71">SampleBinningInfo::InitNonUniform</a></div><div class="ttdeci">void InitNonUniform(const std::vector&lt; std::vector&lt; std::vector&lt; double &gt;&gt;&gt; &amp;InputBins)</div><div class="ttdoc">Initialise Non-Uniform Binning.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00457">SampleStructs.h:457</a></div></div>
 <div class="ttc" id="astructSampleInfo_html_a4402b585d1e3fde1dcd040ea59a0b209"><div class="ttname"><a href="structSampleInfo.html#a4402b585d1e3fde1dcd040ea59a0b209">SampleInfo::nDimensions</a></div><div class="ttdeci">int nDimensions</div><div class="ttdoc">Keep track of the dimensions of the sample binning.</div><div class="ttdef"><b>Definition:</b> <a href="FarDetectorCoreInfoStruct_8h_source.html#l00058">FarDetectorCoreInfoStruct.h:58</a></div></div>
 <div class="ttc" id="astructSampleInfo_html_a8bd0ea5113b3152d282b7bc7db1a606c"><div class="ttname"><a href="structSampleInfo.html#a8bd0ea5113b3152d282b7bc7db1a606c">SampleInfo::VarStr</a></div><div class="ttdeci">std::vector&lt; std::string &gt; VarStr</div><div class="ttdoc">the strings associated with the variables used for the binning e.g. &quot;RecoNeutrinoEnergy&quot;</div><div class="ttdef"><b>Definition:</b> <a href="FarDetectorCoreInfoStruct_8h_source.html#l00052">FarDetectorCoreInfoStruct.h:52</a></div></div>
 <div class="ttc" id="astructSampleInfo_html_aa08cf57ea6717add258666f4966cde6d"><div class="ttname"><a href="structSampleInfo.html#aa08cf57ea6717add258666f4966cde6d">SampleInfo::SampleTitle</a></div><div class="ttdeci">std::string SampleTitle</div><div class="ttdoc">the name of this sample e.g.&quot;muon-like&quot;</div><div class="ttdef"><b>Definition:</b> <a href="FarDetectorCoreInfoStruct_8h_source.html#l00055">FarDetectorCoreInfoStruct.h:55</a></div></div>

@@ -110,7 +110,7 @@ Public Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>KS: This hold bin extents in N-Dimensions allowing to check if Bin falls into. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleStructs_8h_source.html#l00175">175</a> of file <a class="el" href="SampleStructs_8h_source.html">SampleStructs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleStructs_8h_source.html#l00186">186</a> of file <a class="el" href="SampleStructs_8h_source.html">SampleStructs.h</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a02cde64da51de10c2d7f93e70c819f95"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a02cde64da51de10c2d7f93e70c819f95">&#9670;&nbsp;</a></span>IsEventInside() <span class="overload">[1/2]</span></h2>
@@ -138,17 +138,17 @@ Public Attributes</h2></td></tr>
 
 <p>Checks if a given event (point) falls inside the bin using pointer array. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleStructs_8h_source.html#l00189">189</a> of file <a class="el" href="SampleStructs_8h_source.html">SampleStructs.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;                                                                    {</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; KinVars.size(); ++i) {</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">double</span> Var = *KinVars[i];</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;      <span class="keywordflow">if</span> (Var &lt;= <a class="code" href="structBinInfo.html#a8f29fd5c65ee5513046cd68a2af34d3f">Extent</a>[i][0] || Var &gt; <a class="code" href="structBinInfo.html#a8f29fd5c65ee5513046cd68a2af34d3f">Extent</a>[i][1]) {</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;      }</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    }</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;  }</div>
-<div class="ttc" id="astructBinInfo_html_a8f29fd5c65ee5513046cd68a2af34d3f"><div class="ttname"><a href="structBinInfo.html#a8f29fd5c65ee5513046cd68a2af34d3f">BinInfo::Extent</a></div><div class="ttdeci">std::vector&lt; std::array&lt; double, 2 &gt; &gt; Extent</div><div class="ttdoc">The extent of the bin, stored as {lower, upper} bounds for each dimension.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00178">SampleStructs.h:178</a></div></div>
+<p class="definition">Definition at line <a class="el" href="SampleStructs_8h_source.html#l00200">200</a> of file <a class="el" href="SampleStructs_8h_source.html">SampleStructs.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;                                                                    {</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; KinVars.size(); ++i) {</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">double</span> Var = *KinVars[i];</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;      <span class="keywordflow">if</span> (Var &lt;= <a class="code" href="structBinInfo.html#a8f29fd5c65ee5513046cd68a2af34d3f">Extent</a>[i][0] || Var &gt; <a class="code" href="structBinInfo.html#a8f29fd5c65ee5513046cd68a2af34d3f">Extent</a>[i][1]) {</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;      }</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    }</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;  }</div>
+<div class="ttc" id="astructBinInfo_html_a8f29fd5c65ee5513046cd68a2af34d3f"><div class="ttname"><a href="structBinInfo.html#a8f29fd5c65ee5513046cd68a2af34d3f">BinInfo::Extent</a></div><div class="ttdeci">std::vector&lt; std::array&lt; double, 2 &gt; &gt; Extent</div><div class="ttdoc">The extent of the bin, stored as {lower, upper} bounds for each dimension.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00189">SampleStructs.h:189</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -178,15 +178,15 @@ Public Attributes</h2></td></tr>
 
 <p>Checks if a given event (point) falls inside the bin. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleStructs_8h_source.html#l00180">180</a> of file <a class="el" href="SampleStructs_8h_source.html">SampleStructs.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;                                                             {</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> i = 0; i &lt; KinVars.size(); ++i){</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;      <span class="keywordflow">if</span>(KinVars[i] &lt;= <a class="code" href="structBinInfo.html#a8f29fd5c65ee5513046cd68a2af34d3f">Extent</a>[i][0] || KinVars[i] &gt; <a class="code" href="structBinInfo.html#a8f29fd5c65ee5513046cd68a2af34d3f">Extent</a>[i][1]){</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;      }</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    }</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="SampleStructs_8h_source.html#l00191">191</a> of file <a class="el" href="SampleStructs_8h_source.html">SampleStructs.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;                                                             {</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> i = 0; i &lt; KinVars.size(); ++i){</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;      <span class="keywordflow">if</span>(KinVars[i] &lt;= <a class="code" href="structBinInfo.html#a8f29fd5c65ee5513046cd68a2af34d3f">Extent</a>[i][0] || KinVars[i] &gt; <a class="code" href="structBinInfo.html#a8f29fd5c65ee5513046cd68a2af34d3f">Extent</a>[i][1]){</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;      }</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    }</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -205,7 +205,7 @@ Public Attributes</h2></td></tr>
 
 <p>The extent of the bin, stored as {lower, upper} bounds for each dimension. </p>
 
-<p class="definition">Definition at line <a class="el" href="SampleStructs_8h_source.html#l00178">178</a> of file <a class="el" href="SampleStructs_8h_source.html">SampleStructs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SampleStructs_8h_source.html#l00189">189</a> of file <a class="el" href="SampleStructs_8h_source.html">SampleStructs.h</a>.</p>
 
 </div>
 </div>

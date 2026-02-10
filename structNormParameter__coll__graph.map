@@ -1,9 +1,9 @@
 <map id="NormParameter" name="NormParameter">
-<area shape="rect" id="node1" title="ETA &#45; Normalisations for cross&#45;section parameters Carrier for whether you want to apply a systematic ..." alt="" coords="675,135,789,162"/>
+<area shape="rect" id="node1" title="ETA &#45; Normalisations for cross&#45;section parameters Carrier for whether you want to apply a systematic ..." alt="" coords="675,121,789,147"/>
 <area shape="rect" id="node2" href="$structTypeParameterBase.html" title="Base class storing info for parameters types, helping unify codebase." alt="" coords="367,13,507,39"/>
 <area shape="rect" id="node3" title=" " alt="" coords="181,13,261,39"/>
 <area shape="rect" id="node4" title=" " alt="" coords="5,5,132,47"/>
-<area shape="rect" id="node5" title=" " alt="" coords="377,99,498,126"/>
-<area shape="rect" id="node6" title=" " alt="" coords="347,151,528,192"/>
-<area shape="rect" id="node7" title=" " alt="" coords="355,217,520,243"/>
+<area shape="rect" id="node5" title=" " alt="" coords="377,85,498,111"/>
+<area shape="rect" id="node6" title=" " alt="" coords="347,136,528,177"/>
+<area shape="rect" id="node7" title=" " alt="" coords="355,202,520,229"/>
 </map>
