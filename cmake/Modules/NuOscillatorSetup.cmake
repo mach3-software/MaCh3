@@ -1,50 +1,49 @@
 ################################## Oscillation ################################
+# KS: Define the list of oscillator options
+set(OSCILLATOR_OPTIONS
+    CUDAProb3Linear
+    CUDAProb3
+    ProbGPULinear
+    Prob3ppLinear
+    NuFASTLinear
+    NuSQUIDSLinear
+    OscProb
+    GLoBESLinear
+)
+# KS: Tells whether all oscillators were disabled
+set(ALL_OSCILLATORS_DISABLED TRUE)
 
-# Oscillation calculation
-DefineEnabledRequiredSwitch(CUDAProb3Linear_ENABLED FALSE)
-DefineEnabledRequiredSwitch(CUDAProb3_ENABLED FALSE)
-DefineEnabledRequiredSwitch(ProbGPULinear_ENABLED FALSE)
-DefineEnabledRequiredSwitch(Prob3ppLinear_ENABLED FALSE)
-DefineEnabledRequiredSwitch(NuFastLinear_ENABLED FALSE)
-DefineEnabledRequiredSwitch(NuSQUIDSLinear_ENABLED FALSE)
-DefineEnabledRequiredSwitch(OscProb_ENABLED FALSE)
+# KS: Oscillation calculation
+foreach(option IN LISTS OSCILLATOR_OPTIONS)
+    DefineEnabledRequiredSwitch(${option}_ENABLED FALSE)
+    # If at least one oscillator is enabled then set ALL_OSCILLATORS_DISABLED to false
+    if(${option}_ENABLED)
+      set(ALL_OSCILLATORS_DISABLED FALSE)
+  endif()
+endforeach()
 
 #KS: If all Oscillators are turned off then enable NuFastLinear_ENABLED and CUDAProb3_ENABLED
-if (NOT CUDAProb3Linear_ENABLED AND
-    NOT CUDAProb3_ENABLED AND
-    NOT ProbGPULinear_ENABLED AND
-    NOT Prob3ppLinear_ENABLED AND
-    NOT NuFastLinear_ENABLED AND
-    NOT NuSQUIDSLinear_ENABLED AND
-    NOT OscProb_ENABLED)
-    set(NuFastLinear_ENABLED TRUE)
+if(ALL_OSCILLATORS_DISABLED)
+    set(NuFASTLinear_ENABLED TRUE)
     set(CUDAProb3_ENABLED TRUE)
 endif()
 
 #KS: Save which oscillators are being used
 set(MaCh3_Oscillator_ENABLED "")
-foreach(option
-    CUDAProb3Linear
-    CUDAProb3
-    ProbGPULinear
-    Prob3ppLinear
-    NuFastLinear
-    NuSQUIDSLinear
-    OscProb
-    )
+foreach(option IN LISTS OSCILLATOR_OPTIONS)
   if(${option}_ENABLED)
     LIST(APPEND MaCh3_Oscillator_ENABLED ${option})
   endif()
+
+  #NuOscillator uses 1/0 instead of true/false thus use conversion
+  IsTrue(${option}_ENABLED USE_${option})
 endforeach()
 
-#NuOscillator uses 1/0 instead of true/false thus use conversion
-IsTrue(CUDAProb3Linear_ENABLED USE_CUDAProb3Linear)
-IsTrue(CUDAProb3_ENABLED USE_CUDAProb3)
-IsTrue(ProbGPULinear_ENABLED USE_ProbGPULinear)
-IsTrue(Prob3ppLinear_ENABLED USE_Prob3ppLinear)
-IsTrue(NuFastLinear_ENABLED USE_NuFastLinear)
-IsTrue(NuSQUIDSLinear_ENABLED USE_NuSQUIDSLinear)
-IsTrue(OscProb_ENABLED USE_OscProb)
+# Prepare the options for CPMAddPackage
+set(NUOSCILLATOR_OPTIONS "")
+foreach(option IN LISTS OSCILLATOR_OPTIONS)
+    list(APPEND NUOSCILLATOR_OPTIONS "Use${option} ${USE_${option}}")
+endforeach()
 
 #Also additional flags
 IsTrue(MaCh3_GPU_ENABLED DAN_USE_GPU)
@@ -81,13 +80,7 @@ CPMAddPackage(
     "UseMultithreading ${DAN_USE_MULTITHREAD}"
     "UseDoubles ${DAN_DOUBLE}"
 
-    "UseCUDAProb3Linear ${USE_CUDAProb3Linear}"
-    "UseCUDAProb3 ${USE_CUDAProb3}"
-    "UseProbGPULinear ${USE_ProbGPULinear}"
-    "UseProb3ppLinear ${USE_Prob3ppLinear}"
-    "UseNuFASTLinear  ${USE_NuFastLinear}"
-    "UseNuSQUIDSLinear  ${USE_NuSQUIDSLinear}"
-    "UseOscProb ${USE_OscProb}"
+    ${NUOSCILLATOR_OPTIONS}
 
     "NuOscillator_Compiler_Flags ${cpu_compile_options_string}"
     "CMAKE_CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES_STRING}"
