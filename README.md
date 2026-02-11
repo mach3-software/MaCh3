@@ -223,8 +223,8 @@ Based on several test here are recommended version:
 | Ubuntu25.04 | ✅     |
 | Fedora32    | ✅     |
 | CentOS7     | ❔     |
-| Windows     | ❌     |
 | MacOS       | ❔     |
+| Windows     | ❌     |
 
 ✅ - Part of CI/CD <br>
 ❔ - Not part of CI/CD but used by some users/developers so it might work <br>
