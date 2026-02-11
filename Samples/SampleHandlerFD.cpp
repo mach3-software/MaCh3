@@ -400,6 +400,8 @@ void SampleHandlerFD::FillArray() {
 }
 
 #ifdef MULTITHREAD
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Walloca"
 // ************************************************ 
 /// Multithreaded version of fillArray @see fillArray()
 void SampleHandlerFD::FillArray_MP() {
@@ -459,6 +461,7 @@ void SampleHandlerFD::FillArray_MP() {
     }
   }
 }
+#pragma GCC diagnostic pop
 #endif
 
 // **************************************************
