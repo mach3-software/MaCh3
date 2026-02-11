@@ -400,6 +400,8 @@ void SampleHandlerFD::FillArray() {
 }
 
 #ifdef MULTITHREAD
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Walloca"
 // ************************************************ 
 /// Multithreaded version of fillArray @see fillArray()
 void SampleHandlerFD::FillArray_MP() {
@@ -409,87 +411,57 @@ void SampleHandlerFD::FillArray_MP() {
 
   PrepFunctionalParameters();
 
-  //This is stored as [y][x] due to shifts only occurring in the x variable (Erec/Lep mom) - I believe this will help reduce cache misses
-  double* SampleHandlerFD_array_private = nullptr;
-  double* SampleHandlerFD_array_private_w2 = nullptr;
-  // Declare the omp parallel region
-  // The parallel region needs to stretch beyond the for loop!
-  #pragma omp parallel private(SampleHandlerFD_array_private, SampleHandlerFD_array_private_w2)
-  {
-    // private to each thread
-    SampleHandlerFD_array_private = new double[Binning->GetNBins()];
-    SampleHandlerFD_array_private_w2 = new double[Binning->GetNBins()];
+  // NOTE comment below is left for historical reasons
+  //DB - Brain dump of speedup ideas
+  //
+  //Those relevant to reweighting
+  // 1. Don't bother storing and calculating NC signal events - Implemented and saves marginal s/step
+  // 2. Loop over spline event weight calculation in the following event loop - Currently done in splineSKBase->calcWeight() where multi-threading won't be optimised - Implemented and saves 0.3s/step
+  // 3. Inline getDiscVar or somehow include that calculation inside the multi-threading - Implemented and saves about 0.01s/step
+  // 4. Include isCC inside SKMCStruct so don't have to have several 'if' statements determine if oscillation weight needs to be set to 1.0 for NC events - Implemented and saves marginal s/step
+  // 5. Do explicit check on adjacent bins when finding event XBin instead of looping over all BinEdge indices - Implemented but doesn't significantly affect s/step
+  //
+  //Other aspects
+  // 1. Order minituples in Y-axis variable as this will *hopefully* reduce cache misses inside SampleHandlerFD_array_class[yBin][xBin]
+  //
+  // We will hit <0.1 s/step eventually! :D
+  const auto TotalBins = Binning->GetNBins();
+  const unsigned int NumberOfEvents = GetNEvents();
+  #pragma omp parallel for reduction(+:SampleHandlerFD_array[:TotalBins], SampleHandlerFD_array_w2[:TotalBins])
+  for (unsigned int iEvent = 0; iEvent < NumberOfEvents; ++iEvent) {
+    //ETA - generic functions to apply shifts to kinematic variables
+    // Apply this before IsEventSelected is called.
+    ApplyShifts(iEvent);
 
-    std::fill_n(SampleHandlerFD_array_private, Binning->GetNBins(), 0.0);
-    std::fill_n(SampleHandlerFD_array_private_w2, Binning->GetNBins(), 0.0);
-
-    // NOTE comment below is left for historical reasons
-    //DB - Brain dump of speedup ideas
-    //
-    //Those relevant to reweighting
-    // 1. Don't bother storing and calculating NC signal events - Implemented and saves marginal s/step
-    // 2. Loop over spline event weight calculation in the following event loop - Currently done in splineSKBase->calcWeight() where multi-threading won't be optimised - Implemented and saves 0.3s/step
-    // 3. Inline getDiscVar or somehow include that calculation inside the multi-threading - Implemented and saves about 0.01s/step
-    // 4. Include isCC inside SKMCStruct so don't have to have several 'if' statements determine if oscillation weight needs to be set to 1.0 for NC events - Implemented and saves marginal s/step
-    // 5. Do explicit check on adjacent bins when finding event XBin instead of looping over all BinEdge indices - Implemented but doesn't significantly affect s/step
-    //
-    //Other aspects
-    // 1. Order minituples in Y-axis variable as this will *hopefully* reduce cache misses inside SampleHandlerFD_array_class[yBin][xBin]
-    //
-    // We will hit <0.1 s/step eventually! :D
-
-    const unsigned int NumberOfEvents = GetNEvents();
-    #pragma omp for
-    for (unsigned int iEvent = 0; iEvent < NumberOfEvents; ++iEvent) {
-      //ETA - generic functions to apply shifts to kinematic variables
-      // Apply this before IsEventSelected is called.
-      ApplyShifts(iEvent);
-
-      const EventInfo* _restrict_ MCEvent = &MCSamples[iEvent];
-      //ETA - generic functions to apply shifts to kinematic variable
-      //this is going to be slow right now due to string comps under the hood.
-      //Need to implement a more efficient version of event-by-event cut checks
-      if(!IsEventSelected(MCEvent->NominalSample, iEvent)){
-        continue;
-      }
-
-      // Virtual by default does nothing, has to happen before CalcWeightTotal
-      CalcWeightFunc(iEvent);
-
-      const M3::float_t totalweight = CalcWeightTotal(MCEvent);
-      //DB Catch negative total weights and skip any event with a negative weight. Previously we would set weight to zero and continue but that is inefficient
-      if (totalweight <= 0.){
-        continue;
-      }
-
-      //DB Find the relevant bin in the PDF for each event
-      const int GlobalBin = Binning->FindGlobalBin(MCEvent->NominalSample, MCEvent->KinVar, MCEvent->NomBin);
-
-      //ETA - we can probably remove this final if check on the -1?
-      //Maybe we can add an overflow bin to the array and assign any events to this bin?
-      //Might save us an extra if call?
-      //DB Fill relevant part of thread array
-      if (GlobalBin > M3::UnderOverFlowBin) {
-        SampleHandlerFD_array_private[GlobalBin] += totalweight;
-        SampleHandlerFD_array_private_w2[GlobalBin] += totalweight*totalweight;
-      }
-    }
-    //End of Calc Weights and fill Array
-    //==================================================
-    // DB Copy contents of 'SampleHandlerFD_array_private' into 'SampleHandlerFD_array' which can then be used in GetLikelihood
-    for (int idx = 0; idx < Binning->GetNBins(); ++idx) {
-      #pragma omp atomic
-      SampleHandlerFD_array[idx] += SampleHandlerFD_array_private[idx];
-      if (FirstTimeW2) {
-        #pragma omp atomic
-        SampleHandlerFD_array_w2[idx] += SampleHandlerFD_array_private_w2[idx];
-      }
+    const EventInfo* _restrict_ MCEvent = &MCSamples[iEvent];
+    //ETA - generic functions to apply shifts to kinematic variable
+    if(!IsEventSelected(MCEvent->NominalSample, iEvent)){
+      continue;
     }
 
-    delete[] SampleHandlerFD_array_private;
-    delete[] SampleHandlerFD_array_private_w2;
-  } //end of parallel region
+    // Virtual by default does nothing, has to happen before CalcWeightTotal
+    CalcWeightFunc(iEvent);
+
+    const M3::float_t totalweight = CalcWeightTotal(MCEvent);
+    //DB Catch negative total weights and skip any event with a negative weight. Previously we would set weight to zero and continue but that is inefficient
+    if (totalweight <= 0.){
+      continue;
+    }
+
+    //DB Find the relevant bin in the PDF for each event
+    const int GlobalBin = Binning->FindGlobalBin(MCEvent->NominalSample, MCEvent->KinVar, MCEvent->NomBin);
+
+    //ETA - we can probably remove this final if check on the -1?
+    //Maybe we can add an overflow bin to the array and assign any events to this bin?
+    //Might save us an extra if call?
+    //DB Fill relevant part of thread array
+    if (GlobalBin > M3::UnderOverFlowBin) {
+      SampleHandlerFD_array[GlobalBin] += totalweight;
+      if (FirstTimeW2) SampleHandlerFD_array_w2[GlobalBin] += totalweight*totalweight;
+    }
+  }
 }
+#pragma GCC diagnostic pop
 #endif
 
 // **************************************************
