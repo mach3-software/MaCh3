@@ -60,12 +60,7 @@ class FitterBase {
   /// @warning This operation may take a significant amount of time, especially for complex models.
   void Run2DLLHScan();
 
-  /// @brief Perform a 2D and 1D sigma var for all samples.
-  /// @warning Code uses TH2Poly, right now used only by T2K ND280, it may become deprecated or merged
-  void RunSigmaVarLegacy();
-
   /// @brief Perform a 1D/2D sigma var for all samples.
-  /// @warning Code uses SampleHandlerFD
   void RunSigmaVar();
 
   /// @brief Allow to start from previous fit/chain
