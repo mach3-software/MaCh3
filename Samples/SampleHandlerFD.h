@@ -135,7 +135,7 @@ class SampleHandlerFD :  public SampleHandlerBase
   TH2* Get2DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_StrX,
                                     const std::string& ProjectionVar_StrY, int kModeToFill = -1,
                                     int kChannelToFill = -1, int WeightStyle = 0,
-                                    TAxis* AxisX = nullptr, TAxis* AxisY = nullptr);
+                                    TAxis* AxisX = nullptr, TAxis* AxisY = nullptr) override;
 
   /// @ingroup SampleHandlerGetters
   TH1 *GetModeHist1D(const int iSample, int s, int m, int style = 0) {

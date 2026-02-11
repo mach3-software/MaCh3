@@ -161,6 +161,28 @@ public:
         );
     }
 
+    TH2* Get2DVarHistByModeAndChannel(const int iSample,
+                                      const std::string& ProjectionVar_StrX,
+                                      const std::string& ProjectionVar_StrY,
+                                      int kModeToFill = -1,
+                                      int kChannelToFill = -1,
+                                      int WeightStyle = 0,
+                                      TAxis* AxisX = nullptr,
+                                      TAxis* AxisY = nullptr) override {
+        PYBIND11_OVERRIDE_PURE(
+            TH2*,                        /* Return type */
+            SampleHandlerBase,           /* Parent class */
+            Get2DVarHistByModeAndChannel, /* Name of function in C++ */
+            iSample,
+            ProjectionVar_StrX,
+            ProjectionVar_StrY,
+            kModeToFill,
+            kChannelToFill,
+            WeightStyle,
+            AxisX,
+            AxisY
+        );
+    }
 
     TH1* Get1DVarHist(const int iSample,
                       const std::string &ProjectionVar,

@@ -85,6 +85,11 @@ class SampleHandlerBase
 
   virtual TH1* Get1DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_Str,
                                             int kModeToFill = -1, int kChannelToFill = -1, int WeightStyle = 0, TAxis* Axis = nullptr) = 0;
+
+  virtual TH2* Get2DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_StrX,
+                                            const std::string& ProjectionVar_StrY, int kModeToFill = -1,
+                                            int kChannelToFill = -1, int WeightStyle = 0,
+                                            TAxis* AxisX = nullptr, TAxis* AxisY = nullptr) = 0;
   virtual TH1 *Get1DVarHist(const int iSample, const std::string &ProjectionVar,
                            const std::vector<KinematicCut> &EventSelectionVec = {}, int WeightStyle = 0,
                             TAxis *Axis = nullptr, const std::vector<KinematicCut> &SubEventSelectionVec = {}) = 0;
@@ -92,12 +97,6 @@ class SampleHandlerBase
                             const std::vector< KinematicCut >& EventSelectionVec = {},
                             int WeightStyle = 0, TAxis* AxisX = nullptr, TAxis* AxisY = nullptr,
                             const std::vector< KinematicCut >& SubEventSelectionVec = {}) = 0;
-
-
-  // WARNING KS: Needed for sigma var, but also remnants of T2K-ND280 code will be merged in SampleHandlerFD, stay tuned...
-  virtual inline TH1* GetPDFMode(const int Selection, const int Mode) {
-    (void) Selection; (void) Mode; throw MaCh3Exception(__FILE__ , __LINE__ , "Not implemented"); }
-  ///////////
 
   /// @brief Calculate test statistic for a single bin using Poisson
   /// @param data is data
