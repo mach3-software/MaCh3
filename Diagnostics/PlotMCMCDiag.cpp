@@ -13,9 +13,6 @@
 /// @author Henry Wallace
 /// @author Kamil Skwarczynski
 
-TString DUMMYFILE = "DummyFile";
-TString DUMMYNAME = "DummyName";
-
 // Utilities
 /// @brief KS: function which looks for minimum in given range
 double GetMinimumInRange(TH1D *hist, const double minRange, const double maxRange)
@@ -34,7 +31,6 @@ double GetMinimumInRange(TH1D *hist, const double minRange, const double maxRang
 }
 
 /// @brief HW: Check if histogram is flat within a given tolerance.
-// Utility functions
 bool IsHistogramAllOnes(TH1D *hist, double tolerance = 0.001, int max_failures = 100)
 {
   int failure_count = 0;
@@ -52,7 +48,8 @@ bool IsHistogramAllOnes(TH1D *hist, double tolerance = 0.001, int max_failures =
   return true;
 }
 
-void MakePlot(std::vector<TString> input_files,
+/// @brief function which loops over Diag MCMC output and prints everything to PDF
+void MakeDiagPlot(std::vector<TString> input_files,
               std::vector<TString> hist_labels)
 {
   auto c1 = std::make_unique<TCanvas>("c1", " ", 0, 0, 800, 630);
@@ -72,12 +69,13 @@ void MakePlot(std::vector<TString> input_files,
     add_legend = (input_files.size() > 1);
   }
   
-  if(input_files.size() > 4){
-    MACH3LOG_ERROR("Fix some hardcoding here");
+  constexpr int NFiles_hard = 4;
+  constexpr Color_t Colour[NFiles_hard] = {kRed, kBlue, kGreen, kOrange};
+  constexpr Style_t Style[NFiles_hard] = {kSolid, kDashed, kDotted, kDashDotted};
+  if(input_files.size() > NFiles_hard){
+    MACH3LOG_ERROR("Passed {}, while I have nasty hardcoding for max {} filse", input_files.size(), NFiles_hard);
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-  constexpr Color_t Colour[4] = {kRed, kBlue, kGreen, kOrange};
-  constexpr Style_t Style[4] = {kSolid, kDashed, kDotted, kDashDotted};
   TIter next(infiles[0]->GetListOfKeys());
   while ((key = static_cast<TKey *>(next())))
   {
@@ -151,19 +149,15 @@ void MakePlot(std::vector<TString> input_files,
   }
 }
 
-void PlotAutoCorr(std::vector<TString> fname)
+/// @brief Plot autocorrelation for all params into single plot with color codding helping whether on average it is ok or not
+void PlotAutoCorr(const std::vector<TString>& fname)
 {
-  // Color_t PlotColor[4]={kRed, kBlue, kGreen, kOrange};
-
   std::vector<TFile*> infile(fname.size());
   int Nfiles = 0;
   for(size_t i = 0; i < fname.size(); i++)
   {
-    if (fname[i] != DUMMYFILE)
-    {
-      infile[i] = M3::Open(fname[i].Data(), "open", __FILE__, __LINE__);
-      Nfiles++;
-    }
+    infile[i] = M3::Open(fname[i].Data(), "open", __FILE__, __LINE__);
+    Nfiles++;
   }
 
   auto c1 = std::make_unique<TCanvas>("c1", " ", 0, 0, 800, 630);
@@ -268,7 +262,7 @@ std::pair<std::unique_ptr<TGraph>, std::unique_ptr<TGraph>> CreateMinMaxBand(TH1
   return {std::move(minGraph), std::move(maxGraph)};
 }
 
-std::unique_ptr<TGraphAsymmErrors> CalculateMinMaxBand(const std::vector<TH1D *> &histograms, Color_t color)
+std::unique_ptr<TGraphAsymmErrors> CalculateMinMaxBand(const std::vector<std::unique_ptr<TH1D>> &histograms, Color_t color)
 {
   if (histograms.empty()) {
     throw MaCh3Exception(__FILE__, __LINE__, "Empty histogram vector provided");
@@ -303,36 +297,11 @@ std::unique_ptr<TGraphAsymmErrors> CalculateMinMaxBand(const std::vector<TH1D *>
   return band; // Return band and min graph (min graph can be used for legend)
 }
 
-std::pair<std::unique_ptr<TH1D>, std::unique_ptr<TH1D>> CalculateMinMaxHistograms(const std::vector<TH1D *> &histograms)
-{
-  if (histograms.empty())
-  {
-    throw MaCh3Exception(__FILE__, __LINE__, "Empty histogram vector provided");
-  }
-  auto min_hist = M3::Clone(histograms[0]);
-  auto max_hist = M3::Clone(histograms[0]);
-
-  for (const auto &hist : histograms)
-  {
-    for (int bin = 1; bin <= min_hist->GetNbinsX(); ++bin)
-    {
-      double current_min = min_hist->GetBinContent(bin);
-      double current_max = max_hist->GetBinContent(bin);
-      double bin_content = hist->GetBinContent(bin);
-
-      min_hist->SetBinContent(bin, std::min(current_min, bin_content));
-      max_hist->SetBinContent(bin, std::max(current_max, bin_content));
-    }
-  }
-
-  return {std::move(min_hist), std::move(max_hist)};
-}
-
-// File processing functions
+/// @brief Loop over directory get histograms into vector and add to averaged hist
 void ProcessAutoCorrelationDirectory(TDirectoryFile *autocor_dir,
                                      std::unique_ptr<TH1D>& average_hist,
                                      int &parameter_count,
-                                     std::vector<TH1D*> &histograms)
+                                     std::vector<std::unique_ptr<TH1D>> &histograms)
 {
   TIter next(autocor_dir->GetListOfKeys());
   TKey *key;
@@ -349,15 +318,10 @@ void ProcessAutoCorrelationDirectory(TDirectoryFile *autocor_dir,
       continue;
     }
 
-    current_hist->SetDirectory(nullptr); // Detach from file
-    histograms.push_back(current_hist);
-
-    if (!average_hist)
-    {
+    histograms.push_back(M3::Clone(current_hist));
+    if (!average_hist) {
       average_hist = M3::Clone(current_hist);
-    }
-    else
-    {
+    } else {
       average_hist->Add(current_hist);
     }
     parameter_count++;
@@ -367,7 +331,7 @@ void ProcessAutoCorrelationDirectory(TDirectoryFile *autocor_dir,
 void ProcessDiagnosticFile(const TString &file_path,
                            std::unique_ptr<TH1D>& average_hist,
                            int &parameter_count,
-                           std::vector<TH1D *> &histograms)
+                           std::vector<std::unique_ptr<TH1D>> &histograms)
 {
   std::unique_ptr<TFile> input_file(TFile::Open(file_path));
   if (!input_file || input_file->IsZombie())
@@ -387,17 +351,14 @@ void ProcessDiagnosticFile(const TString &file_path,
   ProcessAutoCorrelationDirectory(autocor_dir, average_hist, parameter_count, histograms);
 }
 
-std::unique_ptr<TH1D> AutocorrProcessInputs(const TString &input_file, std::vector<TH1D*> &histograms)
+std::unique_ptr<TH1D> AutocorrProcessInputs(const TString &input_file, std::vector<std::unique_ptr<TH1D>> &histograms)
 {
   std::unique_ptr<TH1D> average_hist = nullptr;
   int parameter_count = 0;
 
-  try
-  {
+  try {
     ProcessDiagnosticFile(input_file, average_hist, parameter_count, histograms);
-  }
-  catch (const std::exception &e)
-  {
+  } catch (const std::exception &e) {
     MACH3LOG_ERROR("Error processing file {} : {}", input_file, e.what());
   }
 
@@ -410,7 +371,7 @@ std::unique_ptr<TH1D> AutocorrProcessInputs(const TString &input_file, std::vect
   return average_hist;
 }
 
-void CompareAverageAC(const std::vector<std::vector<TH1D *>> &histograms,
+void CompareAverageAC(const std::vector<std::vector<std::unique_ptr<TH1D>>> &histograms,
                       const std::vector<std::unique_ptr<TH1D>> &averages,
                       const std::vector<TString> &hist_labels,
                       const TString &output_name,
@@ -491,6 +452,7 @@ void CompareAverageAC(const std::vector<std::vector<TH1D *>> &histograms,
   canvas->SaveAs(output_name + ".pdf");
 }
 
+/// @brief Calculate mean AC based on all parameters with error band. Great for comparing AC between different chains
 void PlotAverageACMult(std::vector<TString> input_files,
                        std::vector<TString> hist_labels,
                        const TString &output_name,
@@ -499,7 +461,7 @@ void PlotAverageACMult(std::vector<TString> input_files,
 // bool draw_errors = true)
 {
   // Process first folder
-  std::vector<std::vector<TH1D *>> histograms;
+  std::vector<std::vector<std::unique_ptr<TH1D>>> histograms;
   std::vector<std::unique_ptr<TH1D>> averages;
 
   for (int i = 0; i < static_cast<int>(input_files.size()); i++)
@@ -507,15 +469,15 @@ void PlotAverageACMult(std::vector<TString> input_files,
     TString folder = input_files[i];
     MACH3LOG_INFO("Folder : {}", folder);
 
-    if (folder.IsNull() || folder == DUMMYFILE)
+    if (folder.IsNull())
     {
       MACH3LOG_WARN("Skipping empty or dummy folder: {}", folder.Data());
       continue;
     }
 
-    std::vector<TH1D *> histograms_i;
-    averages.push_back((AutocorrProcessInputs(folder, histograms_i)));
-    histograms.push_back(histograms_i);
+    std::vector<std::unique_ptr<TH1D>> histograms_i;
+    averages.emplace_back((AutocorrProcessInputs(folder, histograms_i)));
+    histograms.push_back(std::move(histograms_i));
   }
 
   CompareAverageAC(histograms, averages, hist_labels, output_name, draw_min_max); // draw_all, draw_errors);
@@ -549,7 +511,7 @@ int main(int argc, char *argv[])
   MACH3LOG_INFO("Processing {} file(s)", filenames.size());
 
   // Generate plots
-  MakePlot(filenames, titles);
+  MakeDiagPlot(filenames, titles);
   PlotAutoCorr(filenames);
   PlotAverageACMult(filenames, titles, Form("%s_Average_Auto_Corr", argv[2]), true);
   return 0;
