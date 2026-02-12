@@ -147,12 +147,11 @@ void MulticanonicalMCMCHandler::InitializeMulticanonicalHandlerConfig(manager* f
     }
 
     // initialize von Mises parameters if needed
-    if (fitMan->raw()["General"]["MCMC"]["VonMisesMode"]) {
-      vonMises_mode = fitMan->raw()["General"]["MCMC"]["VonMisesMode"].as<bool>();
-    }
+    vonMises_mode = GetFromManager<bool>(fitMan->raw()["General"]["MCMC"]["VonMisesMode"], false);
 
     if (vonMises_mode) {
       double temp_vonMises_sigma;
+
       temp_vonMises_sigma = GetFromManager<double>(fitMan->raw()["General"]["MCMC"]["VonMisesSigma"], -1.0);
       vonMises_kappa = 1.0 / (temp_vonMises_sigma * temp_vonMises_sigma);
       vonMises_I0_kappa = TMath::BesselI0(vonMises_kappa);
@@ -203,8 +202,10 @@ double MulticanonicalMCMCHandler::GetMulticanonicalWeightGaussian(double deltacp
 }
 
 double MulticanonicalMCMCHandler::GetMulticanonicalWeightVonMises(double deltacp){
+  // calculate the Log form of the von Mises instead to avoid numerical issues and return directly
+  double log_vonMises = vonMises_kappa * std::cos(deltacp - multicanonicalSeparateMean) - std::log(2 * TMath::Pi() * vonMises_I0_kappa);
   // return the log likelihood, ie the log of the normalised von Mises
-  return -std::log(std::exp(vonMises_kappa * std::cos(deltacp)) / (2 * TMath::Pi() * vonMises_I0_kappa))*(multicanonicalBeta);
+  return -log_vonMises * (multicanonicalBeta);
 }
 
 double MulticanonicalMCMCHandler::GetMulticanonicalWeightSpline(double deltacp, double delm23){
@@ -222,13 +223,6 @@ double MulticanonicalMCMCHandler::GetMulticanonicalWeightSpline(double deltacp, 
 
 double MulticanonicalMCMCHandler::GetMulticanonicalWeightSeparate(double deltacp){
   // precalculate constants
-
-  bool vonMises_testing = true;
-
-  if (vonMises_testing) {
-    std::cout << "Von Mises llh test: " << GetMulticanonicalWeightVonMises(deltacp) << std::endl;
-    std::cout << "Gaussian llh test: " << GetMulticanonicalWeightGaussian(deltacp) << std::endl;  
-  }
 
   if (vonMises_mode) {
     // precalculate constants
