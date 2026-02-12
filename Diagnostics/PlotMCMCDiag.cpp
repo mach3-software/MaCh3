@@ -409,20 +409,20 @@ void CompareAverageAC(const std::vector<std::vector<std::unique_ptr<TH1D>>> &his
       }
     }
   }
-
+  std::vector<std::unique_ptr<TH1D>> error_hist(averages.size());
   for (size_t i = 0; i < averages.size(); ++i)
   {
     auto colour = static_cast<Color_t>(TColor::GetColorPalette(static_cast<Int_t>(i * nb / histograms.size())));
 
     if (draw_errors)
     {
-      auto error_hist = M3::Clone(averages[i].get());
-      error_hist->SetFillColorAlpha(colour, 0.3f);
-      error_hist->SetLineWidth(0);
-      error_hist->SetTitle("Average Auto Correlation");
-      error_hist->GetXaxis()->SetTitle("lag");
-      error_hist->GetYaxis()->SetTitle("Autocorrelation Function");
-      error_hist->Draw("E3 SAME");
+      error_hist[i] = M3::Clone(averages[i].get());
+      error_hist[i]->SetFillColorAlpha(colour, 0.3f);
+      error_hist[i]->SetLineWidth(0);
+      error_hist[i]->SetTitle("Average Auto Correlation");
+      error_hist[i]->GetXaxis()->SetTitle("lag");
+      error_hist[i]->GetYaxis()->SetTitle("Autocorrelation Function");
+      error_hist[i]->Draw("E3 SAME");
     }
     if (draw_all)
     {
@@ -456,9 +456,9 @@ void CompareAverageAC(const std::vector<std::vector<std::unique_ptr<TH1D>>> &his
 void PlotAverageACMult(std::vector<TString> input_files,
                        std::vector<TString> hist_labels,
                        const TString &output_name,
-                       bool draw_min_max = true)
-// bool draw_all = false,
-// bool draw_errors = true)
+                       bool draw_min_max = true,
+                       bool draw_all = false,
+                       bool draw_errors = true)
 {
   // Process first folder
   std::vector<std::vector<std::unique_ptr<TH1D>>> histograms;
@@ -480,7 +480,7 @@ void PlotAverageACMult(std::vector<TString> input_files,
     histograms.push_back(std::move(histograms_i));
   }
 
-  CompareAverageAC(histograms, averages, hist_labels, output_name, draw_min_max); // draw_all, draw_errors);
+  CompareAverageAC(histograms, averages, hist_labels, output_name, draw_min_max, draw_all, draw_errors);
 }
 
 int main(int argc, char *argv[])
