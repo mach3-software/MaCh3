@@ -43,4 +43,10 @@ class covarianceOsc : public covarianceBase
     int kDeltaM23;
     /// Enum for special treatment of sin(theta23).
     int kSinTheta23;
+    /// Enum for special treatment of DeltaM21.
+    int kDeltaM21;
+    /// Enum for special treatment of sin(theta12).
+    int kSinTheta12;
+    /// Enum for special treatment of sin(theta13).
+    int kSinTheta13;
 };

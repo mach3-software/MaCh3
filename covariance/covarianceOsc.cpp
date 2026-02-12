@@ -7,13 +7,20 @@ covarianceOsc::covarianceOsc(const std::vector<std::string>& YAMLFile, std::stri
 // *************************************
   kDeltaCP = -999;
   kDeltaM23 = -999;
+  kDeltaM21 = -999;
   kSinTheta23 = -999;
+  kSinTheta12 = -999;
+  kSinTheta13 = -999;
+
   for(int io = 0; io < _fNumPar; io++)
   {
     _fNames[io] = _fFancyNames[io];
     if(_fNames[io] == "delta_cp")  kDeltaCP = io;
     if(_fNames[io] == "delm2_23")  kDeltaM23 = io;
     if(_fNames[io] == "sin2th_23") kSinTheta23 = io;
+    if(_fNames[io] == "delm2_12")  kDeltaM21 = io;
+    if(_fNames[io] == "sin2th_12") kSinTheta12 = io;
+    if(_fNames[io] == "sin2th_13") kSinTheta13 = io;
 
     // Set covarianceBase parameters (Curr = current, Prop = proposed, Sigma = step)
     _fCurrVal[io] = _fPreFitValue[io];
@@ -29,6 +36,9 @@ covarianceOsc::covarianceOsc(const std::vector<std::string>& YAMLFile, std::stri
   CheckInitialisation("delta_cp", kDeltaCP);
   CheckInitialisation("delm2_23", kDeltaM23);
   CheckInitialisation("sin2th_23", kSinTheta23);
+  CheckInitialisation("delm2_21", kDeltaM21);
+  CheckInitialisation("sin2th_12", kSinTheta12);
+  CheckInitialisation("sin2th_13", kSinTheta13);
 
   /// @todo KS: Technically if we would like to use PCA we have to initialise parts here...
   flipdelM = true;
@@ -52,11 +62,21 @@ void covarianceOsc::proposeStep() {
   CircularPrior(kDeltaCP, -TMath::Pi(), TMath::Pi());
 
   // Okay now we've done the standard steps, we can add in our nice flips
-  
+
   // hierarchy flip first
   if(random_number[0]->Uniform() < 0.5 && flipdelM){
+    double sin2th12 = TMath::Sin(2 * TMath::ASin(TMath::Sqrt(_fPropVal[kSinTheta12])));
+    double tanth23 = TMath::Tan(TMath::ASin(TMath::Sqrt(_fPropVal[kSinTheta23])));
+    double sinth13 = TMath::Sqrt(_fPropVal[kSinTheta13]);
+    double cosdcp = TMath::Cos(_fPropVal[kDeltaCP]);
+    double delm2_21 = _fPropVal[kDeltaM21];
+    double correction = -delm2_21 * (1 - ((1-_fPropVal[kSinTheta12]) - cosdcp * sinth13 * tanth23 * sin2th12)); // why did I have to add this minus sign???
+
+    _fPropVal[kDeltaM23] = -_fPropVal[kDeltaM23] + 2*correction;
+
     //_fPropVal[kDeltaM23] *= -1;
-    _fPropVal[kDeltaM23] = -0.0000325 - (_fPropVal[kDeltaM23] + 0.0000325); // flip around the mean value of NO vs IO
+    // _fPropVal[kDeltaM23] = -0.0000325 - (_fPropVal[kDeltaM23] + 0.0000325); // flip around the mean value of NO vs IO
+    
   }
   // now octant flip
   if(random_number[0]->Uniform() < 0.5) {
