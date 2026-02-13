@@ -31,6 +31,7 @@ jobs:
     name: ${{ matrix.name }}
 
     steps:
+    - uses: actions/checkout@v6
 
     # KS: Free some space, as some MaCh3 containers can be heavy...
     - uses: ./.github/actions/free-disk-space
