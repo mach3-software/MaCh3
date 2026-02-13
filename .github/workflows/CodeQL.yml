@@ -53,8 +53,25 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Show disk space inside container (debug)
-        run: df -h
+      # --------------------------------------------------------
+      # KS: redirect compiler + CodeQL temp usage
+      # --------------------------------------------------------
+      - name: Create large TMP directory (avoid /tmp exhaustion)
+        run: |
+          set -eu
+
+          # Create directory on the large filesystem
+          install -d -m 0777 /opt/tmp
+
+          # Export variables for all following steps (ShellCheck-safe)
+          {
+            echo "TMPDIR=/opt/tmp"
+            echo "TEMP=/opt/tmp"
+            echo "TMP=/opt/tmp"
+          } >> "$GITHUB_ENV"
+
+          echo "Disk layout inside container:"
+          df -h
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
