@@ -6,6 +6,8 @@ name: Find Package C
 on:
   pull_request:
     branches: [ develop ]
+  push:
+    branches: [ kskwarczynski/feat/compositejobs ]
 
 permissions:
   contents: read
@@ -22,39 +24,42 @@ jobs:
             container: ghcr.io/mach3-software/mach3:alma9v2.2.1
             cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DNuFastLinear_ENABLED=ON -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProb3ppLinear_ENABLED=ON
 
-          #- name: Find Package Rocky9 CUDA
-          #  container: ghcr.io/mach3-software/mach3:rocky9cudav2.2.0
-          #  cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DNuFastLinear_ENABLED=ON -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DProbGPU_ENABLED=ON
+          - name: Find Package Rocky9 CUDA
+            container: ghcr.io/mach3-software/mach3:rocky9cudav2.2.0
+            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DNuFastLinear_ENABLED=ON -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DProbGPU_ENABLED=ON
 
     name: ${{ matrix.name }}
 
-    container:
-      image: ${{ matrix.container }}
-
     steps:
-    - uses: actions/checkout@v6
 
-    - name: Get MaCh3
-      env:
-        HEAD_REF: ${{ github.head_ref || github.ref_name }}
-      run: |
-        cd /opt/
-        git clone https://github.com/mach3-software/MaCh3.git MaCh3Core
-        cd MaCh3Core
-        git checkout "$HEAD_REF"
-        mkdir build
-        cd build
-        cmake ../ ${{ matrix.cmakeoptions }}
-        make -j4 install
+    # KS: Free some space, as some MaCh3 containers can be heavy...
+    - uses: ./.github/actions/free-disk-space
 
-    - name: Get MaCh3 Tutorial
+    - name: Pull container
+      run: docker pull ${{ matrix.container }}
+
+    # Run your build INSIDE the container manually
+    - name: Run FindPackage build
       run: |
-        cd /opt/
-        git clone https://github.com/mach3-software/MaCh3Tutorial.git MaCh3Tutorial
-        cd MaCh3Tutorial
-        mkdir build
-        source /opt/MaCh3Core/build/bin/setup.MaCh3.sh
-        cd build
-        cmake ../ -DUse_External_MaCh3=TRUE
-        make -j4 install
-        source /opt/MaCh3Tutorial/build/bin/setup.MaCh3Tutorial.sh
+        docker run --rm \
+          -v ${{ github.workspace }}:/workspace \
+          -w /workspace \
+          ${{ matrix.container }} \
+          bash -c '
+            set -e
+            cd /opt
+            git clone https://github.com/mach3-software/MaCh3.git MaCh3Core
+            cd MaCh3Core
+            git checkout "${{ github.head_ref || github.ref_name }}"
+            mkdir build && cd build
+            cmake .. '"${{ matrix.cmakeoptions }}"'
+            make -j4 install
+
+            cd /opt
+            git clone https://github.com/mach3-software/MaCh3Tutorial.git
+            cd MaCh3Tutorial
+            mkdir build && cd build
+            source /opt/MaCh3Core/build/bin/setup.MaCh3.sh
+            cmake .. -DUse_External_MaCh3=TRUE
+            make -j4 install
+          '
