@@ -1,31 +1,61 @@
 # This scans MaCh3 and tries to find vulnerabilities
 # KS: Scan both CPU and GPU
 name: "CodeQL C++ Analysis"
+
 on:
   schedule:
-    - cron: '0 0 * * 1' # KS: Every Monday at midnight to not disturb during weekend...
+    - cron: '0 0 * * 1' # KS: Every Monday at midnight
 
 jobs:
+  # ------------------------------------------------------------
+  # KS: Prepare runner (this MUST run outside the container)
+  # ------------------------------------------------------------
+  prep-runner:
+    name: Prepare Runner (Free Disk Space for CodeQL)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Free disk space for ICPX / CodeQL
+        run: |
+          echo "Performing full cleanup before CodeQL scan..."
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc || true
+          docker system prune -af || true
+          sudo apt-get clean
+          sudo rm -rf /var/lib/apt/lists/*
+          echo "Disk space after cleanup:"
+          df -h
+
+  # ------------------------------------------------------------
+  # KS: Actual CodeQL analysis (runs in MaCh3 container)
+  # ------------------------------------------------------------
   analyze:
     name: Analyze C++ Code with CodeQL
+    needs: prep-runner          # <-- ensures cleanup happens first
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
         container: [
           "ghcr.io/mach3-software/mach3:alma9latest",
-          #"ghcr.io/mach3-software/mach3:rocky9cudalatest" #
+          "ghcr.io/mach3-software/mach3:rocky9cudalatest"
         ]
+
     container:
       image: ${{ matrix.container }}
+
     permissions:
       security-events: write
       packages: read
       actions: read
       contents: read
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-            
+
+      - name: Show disk space inside container (debug)
+        run: df -h
+
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
         with:
@@ -37,7 +67,7 @@ jobs:
           mkdir build
           cd build
           cmake ..
-          make
+          make -j4
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
