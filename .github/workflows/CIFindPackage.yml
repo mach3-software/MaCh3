@@ -6,8 +6,6 @@ name: Find Package C
 on:
   pull_request:
     branches: [ develop ]
-  push:
-    branches: [ kskwarczynski/feat/compositejobs ]
 
 permissions:
   contents: read
@@ -39,7 +37,6 @@ jobs:
     - name: Pull container
       run: docker pull ${{ matrix.container }}
 
-    # Run your build INSIDE the container manually
     - name: Run FindPackage build
       run: |
         docker run --rm \

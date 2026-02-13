@@ -4,6 +4,8 @@ name: "CodeQL C++ Analysis"
 on:
   schedule:
     - cron: '0 0 * * 1' # KS: Every Monday at midnight to not disturb during weekend...
+  push:
+    branches: [ kskwarczynski/feat/compositejobs ]
 
 jobs:
   analyze:
@@ -13,31 +15,62 @@ jobs:
       matrix:
         container: [
           "ghcr.io/mach3-software/mach3:alma9latest",
-          #"ghcr.io/mach3-software/mach3:rocky9cudalatest" #
+          "ghcr.io/mach3-software/mach3:rocky9cudalatest"
         ]
-    container:
-      image: ${{ matrix.container }}
+
     permissions:
       security-events: write
       packages: read
       actions: read
       contents: read
+
     steps:
+      # Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      # KS: Free some space, as MaCh3 containers are heavy
+      # This runs on the HOST runner (important!)
+      - name: Free disk space
+        uses: ./.github/actions/free-disk-space
+
+      # (Optional) Show available disk after cleanup for debugging
+      - name: Show disk space
+        run: df -h /
+
+      # Login needed if GHCR image is private
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      # Pull AFTER cleaning so we don't run out of space
+      - name: Pull analysis container
+        run: docker pull ${{ matrix.container }}
+
+      # Initialize CodeQL on the host (must be before build)
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
         with:
           languages: c-cpp
           build-mode: manual
 
-      - name: Build Code
+      # Build inside container, but mounted so CodeQL can trace compilers
+      - name: Configure and Build (inside container)
         run: |
-          mkdir build
-          cd build
-          cmake ..
-          make
+          docker run --rm \
+            -v "${{ github.workspace }}:/workspace" \
+            -w /workspace \
+            ${{ matrix.container }} \
+            bash -c "
+              set -e
+              echo 'Inside container:' \$(cat /etc/os-release | grep PRETTY_NAME)
 
+              mkdir -p build
+              cd build
+
+              cmake ..
+              make -j4
+            "
+
+      # Run the CodeQL analysis
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
