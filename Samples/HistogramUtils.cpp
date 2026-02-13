@@ -642,4 +642,22 @@ TFile* Open(const std::string& Name, const std::string& Type, const std::string&
   return OutFile;
 }
 
+void ScaleHistogram(TH1* Sample_Hist, const double scale)
+{
+  for (int j = 0; j <= Sample_Hist->GetNbinsX(); ++j)
+  {
+    double num = Sample_Hist->GetBinContent(j);
+    double numErr = Sample_Hist->GetBinError(j);
+    double den = Sample_Hist->GetBinWidth(j);
+    double value = 0.;
+    double valueErr = 0.;
+    if (den != 0)
+    {
+      value = num/(den/scale);
+      valueErr = numErr/(den/scale);
+      Sample_Hist->SetBinContent(j,value);
+      Sample_Hist->SetBinError(j,valueErr);
+    }
+  }
+}
 } //end M3

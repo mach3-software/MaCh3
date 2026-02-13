@@ -162,4 +162,7 @@ std::unique_ptr<ObjectType> Clone(const ObjectType* obj, const std::string& name
 /// @return Pointer to the opened ROOT file.
 TFile* Open(const std::string& Name, const std::string& Type, const std::string& File, const int Line);
 
+/// @brief Scale histogram to get divided by bin width
+void ScaleHistogram(TH1* Sample_Hist, const double scale);
+
 } //end M3

@@ -29,7 +29,7 @@ class SampleHandlerFD :  public SampleHandlerBase
 
   /// @brief DB Function to differentiate 1D or 2D binning
   /// @ingroup SampleHandlerGetters
-  int GetNDim(const int Sample) const { return SampleDetails[Sample].nDimensions; }
+  int GetNDim(const int Sample) const override { return SampleDetails[Sample].nDimensions; }
   /// @ingroup SampleHandlerGetters
   std::string GetName() const override;
   /// @ingroup SampleHandlerGetters
@@ -103,7 +103,7 @@ class SampleHandlerFD :  public SampleHandlerBase
   int GetNOscChannels(const int iSample) const override {return static_cast<int>(SampleDetails[iSample].OscChannels.size());};
 
   /// @ingroup SampleHandlerGetters
-  std::string GetFlavourName(const int iSample, const int iChannel) {
+  std::string GetFlavourName(const int iSample, const int iChannel) const override {
     if (iChannel < 0 || iChannel > GetNOscChannels(iSample)) {
       MACH3LOG_ERROR("Invalid Channel Requested: {}", iChannel);
       throw MaCh3Exception(__FILE__ , __LINE__);      
@@ -114,11 +114,11 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// @ingroup SampleHandlerGetters
   TH1 *Get1DVarHist(const int iSample, const std::string &ProjectionVar,
                     const std::vector<KinematicCut> &EventSelectionVec = {}, int WeightStyle = 0,
-                    TAxis *Axis = nullptr, const std::vector<KinematicCut> &SubEventSelectionVec = {});
+                    TAxis *Axis = nullptr, const std::vector<KinematicCut> &SubEventSelectionVec = {}) override;
   TH2* Get2DVarHist(const int iSample, const std::string& ProjectionVarX, const std::string& ProjectionVarY,
                     const std::vector< KinematicCut >& EventSelectionVec = {},
                     int WeightStyle = 0, TAxis* AxisX = nullptr, TAxis* AxisY = nullptr,
-                    const std::vector< KinematicCut >& SubEventSelectionVec = {});
+                    const std::vector< KinematicCut >& SubEventSelectionVec = {}) override;
   std::vector<KinematicCut> BuildModeChannelSelection(const int iSample, const int kModeToFill, const int kChannelToFill) const;
 
   /// @ingroup SampleHandlerGetters
@@ -130,12 +130,12 @@ class SampleHandlerFD :  public SampleHandlerBase
   
   /// @ingroup SampleHandlerGetters
   TH1* Get1DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_Str,
-                                    int kModeToFill = -1, int kChannelToFill = -1, int WeightStyle = 0, TAxis* Axis = nullptr);
+                                    int kModeToFill = -1, int kChannelToFill = -1, int WeightStyle = 0, TAxis* Axis = nullptr) override;
   /// @ingroup SampleHandlerGetters
   TH2* Get2DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_StrX,
                                     const std::string& ProjectionVar_StrY, int kModeToFill = -1,
                                     int kChannelToFill = -1, int WeightStyle = 0,
-                                    TAxis* AxisX = nullptr, TAxis* AxisY = nullptr);
+                                    TAxis* AxisX = nullptr, TAxis* AxisY = nullptr) override;
 
   /// @ingroup SampleHandlerGetters
   TH1 *GetModeHist1D(const int iSample, int s, int m, int style = 0) {

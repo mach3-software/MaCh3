@@ -1483,6 +1483,7 @@ TH2* SampleHandlerFD::Get2DVarHist(const int iSample,
 
   return _h2DVar;
 }
+
 // ************************************************
 void SampleHandlerFD::Fill2DSubEventHist(const int iSample, TH2D* _h2DVar,
                                          const std::string& ProjectionVar_StrX,

@@ -16,6 +16,8 @@ std::vector<double> sigmaArray;
 int PriorKnot = M3::_BAD_INT_;
 
 constexpr const int NVars = 5;
+constexpr const double ScalingFactor = 10;
+
 constexpr Color_t Colours[NVars] = {kRed, kGreen+1, kBlack, kBlue+1, kOrange+1};
 constexpr ELineStyle Style[NVars] = {kDotted, kDashed, kSolid, kDashDotted, kDashDotted};
 
@@ -279,7 +281,8 @@ void PlotRatio(const std::vector<std::unique_ptr<TH1D>>& Poly,
     Poly[ik]->SetLineWidth(2.);
     Poly[ik]->SetLineColor(Colours[ik]);
     Poly[ik]->SetLineStyle(Style[ik]);
-
+    Poly[ik]->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", ScalingFactor).c_str());
+    M3::ScaleHistogram(Poly[ik].get(), ScalingFactor);
     max = std::max(max, Poly[ik]->GetMaximum());
   }
   Poly[0]->SetTitle(Title.c_str());
