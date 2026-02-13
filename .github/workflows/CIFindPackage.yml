@@ -2,6 +2,7 @@
 # KS: Make sure find package works on MaCh3 software
 name: Find Package C
 
+# The events that trigger the workflow
 on:
   pull_request:
     branches: [ develop ]
@@ -11,42 +12,19 @@ permissions:
   packages: write
 
 jobs:
-  # ------------------------------------------------------------
-  # KS: Cleanup job (runs on host, NOT inside container)
-  # This actually frees disk space for the following jobs.
-  # ------------------------------------------------------------
-  prep-runner:
-    name: Prepare Runner (Free Disk Space for ICPX)
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Free disk
-        run: |
-          echo "Performing full cleanup..."
-          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc || true
-          docker system prune -af || true
-          sudo apt-get clean
-          sudo rm -rf /var/lib/apt/lists/*
-          df -h
-
-  # ------------------------------------------------------------
-  # KS: Actual build job (runs inside your MaCh3 containers)
-  # ------------------------------------------------------------
   build:
-    needs: prep-runner   # <-- ensures cleanup happens first
     runs-on: ubuntu-latest
-
     strategy:
-      fail-fast: false
+      fail-fast: false  # KS: Prevents cancellation of remaining jobs if one fails
       matrix:
         include:
           - name: Find Package Alma9
             container: ghcr.io/mach3-software/mach3:alma9v2.2.1
             cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DNuFastLinear_ENABLED=ON -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProb3ppLinear_ENABLED=ON
 
-          - name: Find Package Rocky9 CUDA
-            container: ghcr.io/mach3-software/mach3:rocky9cudav2.2.0
-            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DNuFastLinear_ENABLED=ON -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DProbGPU_ENABLED=ON
+          #- name: Find Package Rocky9 CUDA
+          #  container: ghcr.io/mach3-software/mach3:rocky9cudav2.2.0
+          #  cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DNuFastLinear_ENABLED=ON -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DProbGPU_ENABLED=ON
 
     name: ${{ matrix.name }}
 
@@ -54,42 +32,29 @@ jobs:
       image: ${{ matrix.container }}
 
     steps:
-      - uses: actions/checkout@v6
-      # --------------------------------------------------------
-      # Redirect TMPDIR away from container /tmp
-      # CUDA writes massive temp files there
-      # --------------------------------------------------------
-      - name: Create large TMP directory (avoid /tmp exhaustion)
-        run: |
-          mkdir -p /opt/tmp
-          chmod 777 /opt/tmp
-          echo "TMPDIR=/opt/tmp" >> $GITHUB_ENV
-          echo "TEMP=/opt/tmp"  >> $GITHUB_ENV
-          echo "TMP=/opt/tmp"   >> $GITHUB_ENV
-          echo "Disk layout inside container:"
-          df -h
+    - uses: actions/checkout@v6
 
-      - name: Get MaCh3
-        env:
-          HEAD_REF: ${{ github.head_ref || github.ref_name }}
-        run: |
-          cd /opt/
-          git clone https://github.com/mach3-software/MaCh3.git MaCh3Core
-          cd MaCh3Core
-          git checkout "$HEAD_REF"
-          mkdir build
-          cd build
-          cmake ../ ${{ matrix.cmakeoptions }}
-          make -j4 install
+    - name: Get MaCh3
+      env:
+        HEAD_REF: ${{ github.head_ref || github.ref_name }}
+      run: |
+        cd /opt/
+        git clone https://github.com/mach3-software/MaCh3.git MaCh3Core
+        cd MaCh3Core
+        git checkout "$HEAD_REF"
+        mkdir build
+        cd build
+        cmake ../ ${{ matrix.cmakeoptions }}
+        make -j4 install
 
-      - name: Get MaCh3 Tutorial
-        run: |
-          cd /opt/
-          git clone https://github.com/mach3-software/MaCh3Tutorial.git MaCh3Tutorial
-          cd MaCh3Tutorial
-          mkdir build
-          source /opt/MaCh3Core/build/bin/setup.MaCh3.sh
-          cd build
-          cmake ../ -DUse_External_MaCh3=TRUE
-          make -j4 install
-          source /opt/MaCh3Tutorial/build/bin/setup.MaCh3Tutorial.sh
+    - name: Get MaCh3 Tutorial
+      run: |
+        cd /opt/
+        git clone https://github.com/mach3-software/MaCh3Tutorial.git MaCh3Tutorial
+        cd MaCh3Tutorial
+        mkdir build
+        source /opt/MaCh3Core/build/bin/setup.MaCh3.sh
+        cd build
+        cmake ../ -DUse_External_MaCh3=TRUE
+        make -j4 install
+        source /opt/MaCh3Tutorial/build/bin/setup.MaCh3Tutorial.sh
