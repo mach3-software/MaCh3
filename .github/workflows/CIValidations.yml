@@ -23,52 +23,45 @@ jobs:
         include:
           - name: Reweight Validations
             test: MaCh3CLI --ReweightValidations
-            compilation_flags:
+            compilation_flags: -DMaCh3Tutorial_UNITTESTS_ENABLED=TRUE
 
           - name: Covariance Validations
             test: MaCh3CLI --CovarianceValidations
-            compilation_flags:
+            compilation_flags: -DMaCh3Tutorial_UNITTESTS_ENABLED=TRUE
 
           - name: Fitter Validations
             test: MaCh3CLI --FitterValidations
-            compilation_flags:
+            compilation_flags: -DMaCh3Tutorial_UNITTESTS_ENABLED=TRUE
 
           - name: NuMCMC Tools Validations
             test: MaCh3CLI --NuMCMCToolsValidations
-            compilation_flags:
+            compilation_flags: -DMaCh3Tutorial_UNITTESTS_ENABLED=TRUE
 
           - name: Fitter Validations
             test: MaCh3CLI --FitterValidations
-            compilation_flags: -DMaCh3Tutorial_LOW_MEMORY_STRUCTS_ENABLED=ON
+            compilation_flags: -DMaCh3Tutorial_UNITTESTS_ENABLED=TRUE -DMaCh3Tutorial_LOW_MEMORY_STRUCTS_ENABLED=ON
 
     container:
       image: ghcr.io/mach3-software/mach3:alma9latest
 
     steps:
-    - uses: actions/checkout@v6
+      - name: Set MACH3_BRANCH
+        run: echo "MACH3_BRANCH=${GITHUB_HEAD_REF}" >> "$GITHUB_ENV"
+        env:
+          GITHUB_HEAD_REF: ${{ github.head_ref }}
 
-    - name: Set MACH3_BRANCH
-      run: echo "MACH3_BRANCH=${GITHUB_HEAD_REF}" >> "$GITHUB_ENV"
-      env:
-        GITHUB_HEAD_REF: ${{ github.head_ref }}
+      - name: Checkout repository
+        uses: actions/checkout@v6
 
-    - name: Get MaCh3 Validations
-      run: |
-        cd /opt/
-        git clone https://github.com/mach3-software/MaCh3Tutorial.git MaCh3Validations
-        cd MaCh3Validations
-        mkdir build
-        cd build
-        cmake ../ -DMaCh3_Branch="$MACH3_BRANCH" -DMaCh3Tutorial_UNITTESTS_ENABLED=TRUE ${{ matrix.compilation_flags }}
+      - name: Run MaCh3 Validations
+        uses: ./.github/actions/mach3-tutorial
+        with:
+          mach3_branch: "$MACH3_BRANCH"
+          compilation_flags: ${{ matrix.compilation_flags }}
 
-    - name: Build MaCh3 Validations
-      run: |
-        cd /opt/MaCh3Validations/build
-        make -j4 install # Build the project
-
-    - name: Validations
-      run: |
-        source /opt/MaCh3Validations/build/bin/setup.MaCh3.sh
-        source /opt/MaCh3Validations/build/bin/setup.MaCh3Tutorial.sh
-        cd /opt/MaCh3Validations/build
-        ${{ matrix.test }}
+      - name: Validations
+        run: |
+          source /opt/MaCh3Validations/build/bin/setup.MaCh3.sh
+          source /opt/MaCh3Validations/build/bin/setup.MaCh3Tutorial.sh
+          cd /opt/MaCh3Validations/build
+          ${{ matrix.test }}
