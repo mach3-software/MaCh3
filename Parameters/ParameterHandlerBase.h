@@ -391,13 +391,20 @@ class ParameterHandlerBase {
   /// @brief Matches branches in a TTree to parameters in a systematic handler.
   ///
   /// @param PosteriorFile Pointer to the ROOT TTree from MaCh3 fit.
-  /// @param[out] BranchValues Vector to store the values of the branches (resized inside).
-  /// @param[out] BranchNames Vector to store the names of the branches (resized inside).
+  /// @param BranchValues Vector to store the values of the branches (resized inside).
+  /// @param BranchNames Vector to store the names of the branches (resized inside).
+  /// @param FancyNames Optional vector of "fancy names" to match. If empty, all parameters are matched.
+  ///
+  ///  - If `FancyNames` is provided, it matches only the parameters whose "fancy names"
+  ///    are in `FancyNames`. This is useful for studies where one performs ND fits and passes
+  ///    them to FD fits, which may have additional parameters (e.g., oscillations).
+  ///  - If `FancyNames` is empty, it matches all parameters in the systematic handler.
   ///
   /// @throws MaCh3Exception if any parameter branch is uninitialized.
   void MatchMaCh3OutputBranches(TTree *PosteriorFile,
                                 std::vector<double>& BranchValues,
-                                std::vector<std::string>& BranchNames);
+                                std::vector<std::string>& BranchNames,
+                                const std::vector<std::string>& FancyNames = {});
 
 protected:
   /// @brief Initialisation of the class using matrix from root file

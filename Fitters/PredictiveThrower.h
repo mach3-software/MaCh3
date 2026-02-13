@@ -71,6 +71,9 @@ class PredictiveThrower : public FitterBase {
   /// @brief Setup sample information
   void SetupSampleInformation();
 
+  /// @brief Get Fancy parameters stored in mcmc chains for passed ParameterHandler
+  std::vector<std::string> GetStoredFancyName(ParameterHandlerBase* Systematics) const;
+
   /// @brief Produce posterior predictive distribution
   std::vector<std::unique_ptr<TH1>> MakePredictive(const std::vector<std::vector<std::unique_ptr<TH1>>>& Toys,
                                                    const std::vector<TDirectory*>& Director,
