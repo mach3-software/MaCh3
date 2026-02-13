@@ -50,7 +50,8 @@ jobs:
         env:
           GITHUB_HEAD_REF: ${{ github.head_ref }}
 
-      - uses: actions/checkout@v6
+      - name: Checkout repository
+        uses: actions/checkout@v6
 
       - name: Run MaCh3 Validations
         uses: ./.github/actions/mach3-tutorial
