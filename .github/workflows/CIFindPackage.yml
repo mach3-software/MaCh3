@@ -20,9 +20,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Free disk space for ICPX
+      - name: Free disk
         run: |
-          echo "Performing full cleanup for ICPX build..."
+          echo "Performing full cleanup..."
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc || true
           docker system prune -af || true
           sudo apt-get clean
@@ -55,6 +55,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+      # --------------------------------------------------------
+      # Redirect TMPDIR away from container /tmp
+      # CUDA writes massive temp files there
+      # --------------------------------------------------------
+      - name: Create large TMP directory (avoid /tmp exhaustion)
+        run: |
+          mkdir -p /opt/tmp
+          chmod 777 /opt/tmp
+          echo "TMPDIR=/opt/tmp" >> $GITHUB_ENV
+          echo "TEMP=/opt/tmp"  >> $GITHUB_ENV
+          echo "TMP=/opt/tmp"   >> $GITHUB_ENV
+          echo "Disk layout inside container:"
+          df -h
 
       - name: Get MaCh3
         env:
