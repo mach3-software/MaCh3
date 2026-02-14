@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['reweightconfig_1820',['ReweightConfig',['../structReweightConfig.html',1,'']]]
+  ['reweightconfig_1822',['ReweightConfig',['../structReweightConfig.html',1,'']]]
 ];

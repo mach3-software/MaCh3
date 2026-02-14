@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['adaptive_5fmcmc_1835',['adaptive_mcmc',['../namespaceadaptive__mcmc.html',1,'']]]
+  ['adaptive_5fmcmc_1837',['adaptive_mcmc',['../namespaceadaptive__mcmc.html',1,'']]]
 ];
