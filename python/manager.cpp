@@ -8,8 +8,7 @@
 
 namespace py = pybind11;
 
-void initManager(py::module &m){
-
+void initManager(py::module &m) {
     auto m_manager = m.def_submodule("manager");
     m_manager.doc() = 
         "This is a Python binding of MaCh3s C++ based manager library.";
@@ -100,5 +99,4 @@ void initManager(py::module &m){
             "Get the test statistic that was specified in the config file."
         )
     ;
-
 }

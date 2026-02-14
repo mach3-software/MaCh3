@@ -60,9 +60,7 @@ TH1D TGraphToTH1D(TGraph graph, const std::string& newName, const std::string& n
   return retHist;
 }
 
-
 std::vector<std::vector<double>> TGraphToVector(TGraph graph) {
-
   int nPoints = graph.GetN();
   std::vector<std::vector<double>> ret(2);
   std::vector<double> pointsX(nPoints);

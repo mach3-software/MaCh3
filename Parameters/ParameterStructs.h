@@ -37,120 +37,57 @@ std::vector<T> MakeVector( const T (&data)[N] ) {
   return std::vector<T>(data, data+N);
 }
 
-// *******************
-/// @brief Generic cleanup function
+/// @brief Base case: do nothing for non-vector types.
 template <typename T>
-void CleanVector(std::vector<T>& vec) {
+void CleanVector(T&) {}
+
 // *******************
-  vec.clear();
-  vec.shrink_to_fit();
+/// @brief Recursively releases memory held by a std::vector (including nested).
+///
+/// Recursively clears a vector and requests release of its unused capacity.
+/// `clear()` or `vec = {}` only destroy elements but keep the allocated buffer.
+/// For deeply nested vectors we must clean children first, then call
+/// `shrink_to_fit()` to ask the implementation to return the capacity.
+template <typename T>
+void CleanVector(std::vector<T>& v) {
+// *******************
+  for (auto& x : v)
+    CleanVector(x);
+
+  v.clear();
+  v.shrink_to_fit();
 }
 
 // *******************
-/// @brief Generic cleanup function
+/// @brief Base case: do nothing for non-pointer types.
 template <typename T>
-void CleanVector(std::vector<std::vector<T>>& vec) {
+void CleanContainer(T&) {}
 // *******************
-  for (auto& innerVec : vec) {
-    innerVec.clear();
-    innerVec.shrink_to_fit();
-  }
-  vec.clear();
-  vec.shrink_to_fit();
+
+// *******************
+/// @brief Deletes an owned raw pointer and nulls it.
+///
+/// Only use when ownership is explicit (allocated with `new`).
+template <typename T>
+void CleanContainer(T*& ptr) {
+  // *******************
+  delete ptr;
+  ptr = nullptr;
 }
 
 // *******************
-/// @brief Generic cleanup function
+/// @brief Recursively deletes elements stored as pointers inside containers
+/// and releases the container capacity.
+///
+/// This is required for structures like `std::vector<T*>` or deeply nested
+/// pointer containers. Without deleting first, memory is leaked; without
+/// `shrink_to_fit()`, capacity is retained.
 template <typename T>
-void CleanVector(std::vector<std::vector<std::vector<T>>>& vec) {
-// *******************
-  for (auto& inner2DVec : vec) {
-    for (auto& innerVec : inner2DVec) {
-      innerVec.clear();
-      innerVec.shrink_to_fit();
-    }
-    inner2DVec.clear();
-    inner2DVec.shrink_to_fit();
-  }
-  vec.clear();
-  vec.shrink_to_fit();
-}
+void CleanContainer(std::vector<T>& container) {
+  // *******************
+  for (auto& element : container)
+    CleanContainer(element);
 
-// *******************
-/// @brief Generic cleanup function
-/// @todo Use recursive to make it more scalable in future
-template <typename T>
-void CleanVector(std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<T>>>>>>> &vec) {
-// *******************
-  for (auto& v6 : vec) {
-    for (auto& v5 : v6) {
-      for (auto& v4 : v5) {
-        for (auto& v3 : v4) {
-          for (auto& v2 : v3) {
-            for (auto& v1 : v2) {
-              v1.clear();
-              v1.shrink_to_fit();
-            }
-            v2.clear();
-            v2.shrink_to_fit();
-          }
-          v3.clear();
-          v3.shrink_to_fit();
-        }
-        v4.clear();
-        v4.shrink_to_fit();
-      }
-      v5.clear();
-      v5.shrink_to_fit();
-    }
-    v6.clear();
-    v6.shrink_to_fit();
-  }
-  vec.clear();
-  vec.shrink_to_fit();
-}
-
-// *******************
-/// @brief Generic cleanup function
-template <typename T>
-void CleanContainer(std::vector<T*>& container) {
-// *******************
-  for (T* ptr : container) {
-    if(ptr) delete ptr;
-    ptr = nullptr;
-  }
-  container.clear();
-  container.shrink_to_fit();
-}
-
-// *******************
-/// @brief Generic cleanup function
-template <typename T>
-void CleanContainer(std::vector<std::vector<T*>>& container) {
-// *******************
-  for (auto& inner : container) {
-    CleanContainer(inner);
-  }
-  container.clear();
-  container.shrink_to_fit();
-}
-
-// *******************
-/// @brief Generic cleanup function
-template <typename T>
-void CleanContainer(std::vector< std::vector< std::vector<T*> > >& container) {
-// *******************
-  for (auto& container2D : container) {
-    for (auto& container1D : container2D) {
-      for (T* ptr : container1D) {
-        if(ptr) delete ptr;
-      }
-      container1D.clear();
-      container1D.shrink_to_fit();
-    }
-    container2D.clear();
-    container2D.shrink_to_fit();
-  }
   container.clear();
   container.shrink_to_fit();
 }

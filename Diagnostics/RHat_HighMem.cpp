@@ -317,11 +317,9 @@ void PrepareChains() {
       }
 
       // Set the branch addresses for params
-      for (int j = 0; j < nDraw; ++j)
-      {
+      for (int j = 0; j < nDraw; ++j) {
         Draws[m][i][j] = branch_values[j];
       }
-
     }//end loop over toys
 
     //TN: There, we now don't need to keep the chain in memory anymore

@@ -361,8 +361,7 @@ void MakeParameterPlots()
 
     // now set for the postfit blocks for all files
     std::vector <std::unique_ptr<TH1D>> blockHist_postfit_Vec;
-    for(unsigned int fileId = 0; fileId < PlotMan->getNFiles(); fileId++){
-
+    for(unsigned int fileId = 0; fileId < PlotMan->getNFiles(); fileId++) {
       auto blockHist_postfit = std::make_unique<TH1D>((blockName + PlotMan->getFileName(fileId)).c_str(),
                                                       blockTitle.c_str(), nParams, 0.0, static_cast<double>(nParams));
 

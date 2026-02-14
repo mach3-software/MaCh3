@@ -301,8 +301,7 @@ FunctionalParameter ParameterHandlerGeneric::GetFunctionalParameters(const YAML:
 
   // HH - Copied from GetXsecNorm
   int NumKinematicCuts = 0;
-  if(param["KinematicCuts"]){
-
+  if(param["KinematicCuts"]) {
     NumKinematicCuts = int(param["KinematicCuts"].size());
 
     std::vector<std::string> TempKinematicStrings;

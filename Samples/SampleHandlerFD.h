@@ -110,7 +110,10 @@ class SampleHandlerFD :  public SampleHandlerBase
     }
     return SampleDetails[iSample].OscChannels[iChannel].flavourName;
   }
-
+  /// @brief Temporarily extend Selection for a given sample with additional cuts.
+  /// Returns the original Selection so the caller can restore it later.
+  std::vector<std::vector<KinematicCut>> ApplyTemporarySelection(const int iSample,
+                                                                 const std::vector<KinematicCut>& ExtraCuts);
   /// @ingroup SampleHandlerGetters
   TH1 *Get1DVarHist(const int iSample, const std::string &ProjectionVar,
                     const std::vector<KinematicCut> &EventSelectionVec = {}, int WeightStyle = 0,

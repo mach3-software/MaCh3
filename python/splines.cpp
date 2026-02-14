@@ -69,8 +69,7 @@ public:
 };
 
 
-void initSplines(py::module &m){
-
+void initSplines(py::module &m) {
     auto m_splines = m.def_submodule("splines");
     m_splines.doc() = 
         "This is a Python binding of MaCh3s C++ based spline library.";

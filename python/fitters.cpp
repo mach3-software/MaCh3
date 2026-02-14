@@ -44,8 +44,7 @@ public:
     }
 };
 
-void initFitters(py::module &m){
-
+void initFitters(py::module &m) {
     auto m_fitters = m.def_submodule("fitters");
     m_fitters.doc() =
         "This is a Python binding of MaCh3s C++ fitters library.";
@@ -174,7 +173,6 @@ void initFitters(py::module &m){
             &PSO::init,
             "Initialise the fitter"
         )
-        
-    ; // end of PSO class binding
 
+    ; // end of PSO class binding
 }
