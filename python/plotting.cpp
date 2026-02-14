@@ -12,8 +12,7 @@
 namespace py = pybind11;
 
 
-void initPlotting(py::module &m){
-
+void initPlotting(py::module &m) {
     auto m_plotting = m.def_submodule("plotting");
     m_plotting.doc() = "This is a Python binding of MaCh3s C++ based plotting library.";
 
@@ -294,7 +293,6 @@ void initPlotting(py::module &m){
             py::arg("file_id"),
             py::arg("param")
             )
-        
         ;
 
     py::class_<MaCh3Plotting::StyleManager>(m_plotting, "StyleManager")
@@ -312,5 +310,4 @@ void initPlotting(py::module &m){
             py::arg("sample")
         )
         ;
-
 }

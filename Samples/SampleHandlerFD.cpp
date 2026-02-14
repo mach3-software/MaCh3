@@ -1335,6 +1335,28 @@ void SampleHandlerFD::InitialiseSplineObject() {
   SplineHandler->cleanUpMemory();
 }
 
+
+// ************************************************
+std::vector<std::vector<KinematicCut>> SampleHandlerFD::ApplyTemporarySelection(const int iSample,
+                                         const std::vector<KinematicCut>& ExtraCuts) {
+// ************************************************
+  // Backup current selection
+  auto originalSelection = Selection;
+
+  //DB Add all the predefined selections to the selection vector which will be applied
+  auto selectionToApply = Selection;
+
+  //DB Add all requested cuts from the argument to the selection vector which will be applied
+  for (const auto& cut : ExtraCuts) {
+    selectionToApply[iSample].emplace_back(cut);
+  }
+
+  //DB Set the member variable to be the cuts to apply
+  Selection = std::move(selectionToApply);
+
+  return originalSelection;
+}
+
 // ************************************************
 // === JM adjust GetNDVarHist functions to allow for subevent-level plotting ===
 TH1* SampleHandlerFD::Get1DVarHist(const int iSample, const std::string& ProjectionVar_Str, const std::vector< KinematicCut >& EventSelectionVec,
@@ -1342,19 +1364,7 @@ TH1* SampleHandlerFD::Get1DVarHist(const int iSample, const std::string& Project
 // ************************************************
   //DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.
   //   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset
-  std::vector< std::vector< KinematicCut > > tmp_Selection = Selection;
-  std::vector< std::vector< KinematicCut > > SelectionVecToApply;
-
-  //DB Add all the predefined selections to the selection vector which will be applied
-  SelectionVecToApply = tmp_Selection;
-
-  //DB Add all requested cuts from the argument to the selection vector which will be applied
-  for (size_t iSelec=0;iSelec<EventSelectionVec.size();iSelec++) {
-    SelectionVecToApply[iSample].emplace_back(EventSelectionVec[iSelec]);
-  }
-
-  //DB Set the member variable to be the cuts to apply
-  Selection = SelectionVecToApply;
+  auto tmp_Selection = ApplyTemporarySelection(iSample, EventSelectionVec);
 
   //DB Define the histogram which will be returned
   TH1D* _h1DVar = nullptr;;
@@ -1430,19 +1440,7 @@ TH2* SampleHandlerFD::Get2DVarHist(const int iSample,
 // ************************************************
   //DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.
   //   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset
-  std::vector< std::vector< KinematicCut > > tmp_Selection = Selection;
-  std::vector< std::vector< KinematicCut > > SelectionVecToApply;
-
-  //DB Add all the predefined selections to the selection vector which will be applied
-  SelectionVecToApply = tmp_Selection;
-
-  //DB Add all requested cuts from the argument to the selection vector which will be applied
-  for (size_t iSelec=0;iSelec<EventSelectionVec.size();iSelec++) {
-    SelectionVecToApply[iSample].emplace_back(EventSelectionVec[iSelec]);
-  }
-
-  //DB Set the member variable to be the cuts to apply
-  Selection = SelectionVecToApply;
+  auto tmp_Selection = ApplyTemporarySelection(iSample, EventSelectionVec);
 
   //DB Define the histogram which will be returned
   TH2D* _h2DVar = nullptr;

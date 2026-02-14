@@ -35,8 +35,7 @@ public:
 };
 
 
-void initParameters(py::module &m){
-
+void initParameters(py::module &m) {
     auto m_parameters = m.def_submodule("parameters");
     m_parameters.doc() =
         "This is a Python binding of MaCh3s C++ parameters library.";

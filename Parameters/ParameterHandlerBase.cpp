@@ -1174,10 +1174,10 @@ void ParameterHandlerBase::SetThrowMatrix(TMatrixDSym *cov){
     }
   }
 }
-
+// ********************************************
 void ParameterHandlerBase::SetSubThrowMatrix(int first_index, int last_index,
                                              TMatrixDSym const &subcov) {
-
+// ********************************************
   if ((last_index - first_index) >= subcov.GetNrows()) {
     MACH3LOG_ERROR("Trying to SetSubThrowMatrix into range: ({},{}) with a "
                    "submatrix with only {} rows {}",

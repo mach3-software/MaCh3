@@ -153,6 +153,8 @@ if(MaCh3_DEBUG_ENABLED)
   target_compile_options(MaCh3CompilerOptions INTERFACE
     -O0         # Turn off any optimisation to have best debug experience
     -mno-avx    # Disable AVX instructions to simplify debugging and improve reproducibility
+    -fsanitize=address      # Enable AddressSanitizer
+    -fno-omit-frame-pointer # Improve stack traces
   )
   target_compile_definitions(MaCh3CompileDefinitions INTERFACE DEBUG=${DEBUG_LEVEL})
   cmessage(STATUS "Enabling DEBUG with Level: \"${DEBUG_LEVEL}\"")

@@ -200,7 +200,6 @@ void AdaptiveMCMCHandler::SaveAdaptiveToFile(const std::string &outFileName,
   if (is_final ||
     (adaptive_save_n_iterations > 0 &&
     ((total_steps - start_adaptive_throw) / adaptive_update_step) % adaptive_save_n_iterations == 0)) {
-
     TFile *outFile = new TFile(outFileName.c_str(), "UPDATE");
     if (outFile->IsZombie()) {
       MACH3LOG_ERROR("Couldn't find {}", outFileName);
