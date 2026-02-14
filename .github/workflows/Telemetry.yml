@@ -22,11 +22,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Run MaCh3 Validations
-        uses: ./.github/actions/mach3-validations
-        with:
-          mach3_branch: ${{ github.head_ref }}
-          compilation_flags: ""
+      - name: Get MaCh3 Validations
+        run: |
+          cd /opt/
+          # Clone the MaCh3Tutorial repository with the current branch
+          git clone --branch main https://github.com/mach3-software/MaCh3Tutorial.git MaCh3Validations
+          cd MaCh3Validations
+          mkdir build
+          cd build
+          cmake ../ -DMaCh3_Branch=${{ github.head_ref }}
+
+      - name: Build MaCh3 Validations
+        run: |
+          cd /opt/MaCh3Validations/build
+          make -j4 install # Build and install the project
 
       - name: Run memory telemetry and generate plot
         run: |
