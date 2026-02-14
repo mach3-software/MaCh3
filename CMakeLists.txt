@@ -151,10 +151,10 @@ endif()
 #KS: If Debug add debugging compile flag if not add optimisation for speed
 if(MaCh3_DEBUG_ENABLED)
   target_compile_options(MaCh3CompilerOptions INTERFACE
-    -O0         # Turn off any optimisation to have best debug experience
-    -mno-avx    # Disable AVX instructions to simplify debugging and improve reproducibility
-    -fsanitize=address      # Enable AddressSanitizer
-    -fno-omit-frame-pointer # Improve stack traces
+    -O0                     # Turn off any optimisation to have best debug experience
+    -mno-avx                # Disable AVX instructions to simplify debugging and improve reproducibility
+    -fno-omit-frame-pointer # Keep frame pointers: essential for accurate stack traces
+    #-fsanitize=address     # Enable AddressSanitizer
   )
   target_compile_definitions(MaCh3CompileDefinitions INTERFACE DEBUG=${DEBUG_LEVEL})
   cmessage(STATUS "Enabling DEBUG with Level: \"${DEBUG_LEVEL}\"")
