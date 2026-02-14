@@ -126,14 +126,21 @@ void PredictiveThrower::SetupToyGeneration() {
     MCMCProcessor Processor(PosteriorFileName);
     Processor.Initialise();
 
+    // For throwing FD predictions from ND-only chain we have to allow having different yaml configs
+    auto AllowDifferentConfigs = GetFromManager<bool>(fitMan->raw()["Predictive"]["AllowDifferentConfigs"], false, __FILE__, __LINE__);
+
     ///Let's ask the manager what are the file with covariance matrix
     YAML::Node ConfigInChain = Processor.GetCovConfig(kXSecPar);
     if(ModelSystematic) {
       YAML::Node ConfigNow = ModelSystematic->GetConfig();
       if (!compareYAMLNodes(ConfigNow, ConfigInChain))
       {
-        MACH3LOG_ERROR("Yaml configs used for your ParameterHandler for chain you want sample from ({}) and one currently initialised are different", PosteriorFileName);
-        throw MaCh3Exception(__FILE__ , __LINE__ );
+        if(AllowDifferentConfigs){
+          MACH3LOG_WARN("Yaml configs used for your ParameterHandler for chain you want sample from ({}) and one currently initialised are different", PosteriorFileName);
+        } else {
+          MACH3LOG_ERROR("Yaml configs used for your ParameterHandler for chain you want sample from ({}) and one currently initialised are different", PosteriorFileName);
+          throw MaCh3Exception(__FILE__ , __LINE__ );
+        }
       }
     }
   }
@@ -284,6 +291,42 @@ bool PredictiveThrower::LoadToys() {
 }
 
 // *************************
+std::vector<std::string> PredictiveThrower::GetStoredFancyName(ParameterHandlerBase* Systematics) const {
+// *************************
+  TDirectory * ogdir = gDirectory;
+
+  std::vector<std::string> FancyNames;
+  std::string Name = std::string("Config_") + Systematics->GetName();
+  auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
+
+  TFile* file = TFile::Open(PosteriorFileName.c_str(), "READ");
+  TDirectory* CovarianceFolder = file->GetDirectory("CovarianceFolder");
+
+  TMacro* FoundMacro = static_cast<TMacro*>(CovarianceFolder->Get(Name.c_str()));
+  if(FoundMacro == nullptr) {
+    file->Close();
+    delete file;
+    if(ogdir){ ogdir->cd(); }
+
+    return FancyNames;
+  }
+  MACH3LOG_DEBUG("Found config for {}", Name);
+  YAML::Node Settings = TMacroToYAML(*FoundMacro);
+
+  int params = int(Settings["Systematics"].size());
+  FancyNames.resize(params);
+  int iPar = 0;
+  for (auto const &param : Settings["Systematics"]) {
+    FancyNames[iPar] = Get<std::string>(param["Systematic"]["Names"]["FancyName"], __FILE__ , __LINE__);
+    iPar++;
+  }
+  file->Close();
+  delete file;
+  if(ogdir){ ogdir->cd(); }
+  return FancyNames;
+}
+
+// *************************
 // Produce MaCh3 toys:
 void PredictiveThrower::ProduceToys() {
 // *************************
@@ -372,7 +415,8 @@ void PredictiveThrower::ProduceToys() {
     }
 
     for (size_t s = 0; s < systematics.size(); ++s) {
-      systematics[s]->MatchMaCh3OutputBranches(PosteriorFile, branch_vals[s], branch_name[s]);
+      auto fancy_names = GetStoredFancyName(systematics[s]);
+      systematics[s]->MatchMaCh3OutputBranches(PosteriorFile, branch_vals[s], branch_name[s], fancy_names);
     }
 
     //Get the burn-in from the config
