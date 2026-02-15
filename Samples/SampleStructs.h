@@ -724,7 +724,7 @@ namespace MaCh3Utils {
   /// @todo this could be constexpr in c++17
   /// @cite pdg2024 (particle masses)
   /// @cite ame2020 (nuclear masses)
-  constexpr double GetMassFromPDG(const int PDG) {
+  inline double GetMassFromPDG(const int PDG) {
   // *****************************
     switch (abs(PDG)) {
       // Leptons
