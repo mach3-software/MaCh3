@@ -405,7 +405,7 @@ void SampleHandlerFD::FillArray() {
 // ************************************************
 /// Multithreaded version of fillArray @see fillArray()
 void SampleHandlerFD::FillArray_MP() {
-// ************************************************
+  // ************************************************
   //DB Reset which cuts to apply
   Selection = StoredSelection;
 
