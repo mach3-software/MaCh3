@@ -291,7 +291,7 @@ class SampleHandlerFD :  public SampleHandlerBase
   std::vector<std::string> funcParsNamesVec = {};
 
   /// @brief Check whether a normalisation systematic affects an event or not
-  void CalcNormsBins(std::vector<NormParameter>& norm_parameters, std::vector< std::vector< int > >& xsec_norms_bins);
+  void CalcNormsBins(std::vector<NormParameter>& norm_parameters, std::vector< std::vector< int > >& norms_bins);
   template <typename ParT> bool PassesSelection(const ParT& Par, std::size_t iEvent);
   /// @brief Calculate the total weight weight for a given event
   M3::float_t CalcWeightTotal(const EventInfo* _restrict_ MCEvent) const;
@@ -367,8 +367,7 @@ class SampleHandlerFD :  public SampleHandlerBase
 
   //===============================================================================
   //DB Covariance Objects
-  //ETA - All experiments will need an xsec, det and osc cov
-  //these should be added to SampleHandlerBase to be honest
+  /// ETA - All experiments will need an xsec, det and osc cov
   ParameterHandlerGeneric *ParHandler = nullptr;
 
   //=============================================================================== 

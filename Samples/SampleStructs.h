@@ -93,12 +93,12 @@ inline std::string TargetMat_ToString(const TargetMat i) {
 /// Enum to track the incoming neutrino species
 enum NuPDG {
 // *****************
-  kNue = 12,
-  kNumu = 14,
-  kNutau = 16,
-  kNueBar = -12,
-  kNumuBar = -14,
-  kNutauBar = -16
+  kNue      = 12,   //!< Electron neutrino
+  kNumu     = 14,   //!< Muon neutrino
+  kNutau    = 16,   //!< Tau neutrino
+  kNueBar   = -12,  //!< Electron antineutrino
+  kNumuBar  = -14,  //!< Muon antineutrino
+  kNutauBar = -16   //!< Tau antineutrino
 };
 
 /// Make an enum of the test statistic that we're using
@@ -780,7 +780,7 @@ namespace MaCh3Utils {
   /// @brief Convert from PDG flavour to NuOscillator type
   /// beware that in the case of anti-neutrinos the NuOscillator
   /// type simply gets multiplied by -1
-  inline int PDGToNuOscillatorFlavour(const int NuPdg){
+  inline int PDGToNuOscillatorFlavour(const int NuPdg) {
     int NuOscillatorFlavour = M3::_BAD_INT_;
     switch(std::abs(NuPdg)){
       case NuPDG::kNue:
