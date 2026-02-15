@@ -885,7 +885,7 @@ void SMonolith::ModifyWeights(){
 
     // Compute total weight for the current event
     #ifdef MULTITHREAD
-    #pragma omp simd
+    #pragma omp simd reduction(*:totalWeight)
     #endif
     for (unsigned int id = 0; id < numParams; ++id) {
       totalWeight *= cpu_weights_spline_var[startIndex + id];
@@ -897,7 +897,7 @@ void SMonolith::ModifyWeights(){
 
     // Compute total weight for the current event
     #ifdef MULTITHREAD
-    #pragma omp simd
+    #pragma omp simd reduction(*:totalWeight)
     #endif
     for (unsigned int id = 0; id < numParams_tf1; ++id) {
       totalWeight *= cpu_weights_tf1_var[startIndex_tf1 + id];

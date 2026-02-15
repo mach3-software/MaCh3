@@ -186,25 +186,36 @@ struct BinShiftLookup {
 struct BinInfo {
 // ***************************
   /// The extent of the bin, stored as {lower, upper} bounds for each dimension.
+  /// Extent[d][0] = lower edge
+  /// Extent[d][1] = upper edge
   std::vector<std::array<double, 2>> Extent;
   /// @brief Checks if a given event (point) falls inside the bin.
-  bool IsEventInside(const std::vector<double>& KinVars) const {
-    for(size_t i = 0; i < KinVars.size(); ++i){
-      if(KinVars[i] <= Extent[i][0] || KinVars[i] > Extent[i][1]){
-        return false;
-      }
+  bool IsEventInside(const std::vector<double>& KinVars) const _noexcept_ {
+    bool inside = true;
+    const size_t N = KinVars.size();
+    #ifdef MULTITHREAD
+    #pragma omp simd reduction(&:inside)
+    #endif
+    for(size_t i = 0; i < N; ++i) {
+      const double Var = KinVars[i];
+      const bool in_bin = (Var > Extent[i][0]) & (Var <= Extent[i][1]);
+      inside &= in_bin;
     }
-    return true;
+    return inside;
   }
   /// @brief Checks if a given event (point) falls inside the bin using pointer array
-  bool IsEventInside(const std::vector<const double*>& KinVars) const {
-    for (size_t i = 0; i < KinVars.size(); ++i) {
+  bool IsEventInside(const std::vector<const double*>& KinVars) const _noexcept_ {
+    bool inside = true;
+    const size_t N = KinVars.size();
+    #ifdef MULTITHREAD
+    #pragma omp simd reduction(&:inside)
+    #endif
+    for (size_t i = 0; i < N; ++i) {
       const double Var = *KinVars[i];
-      if (Var <= Extent[i][0] || Var > Extent[i][1]) {
-        return false;
-      }
+      const bool in_bin = (Var > Extent[i][0]) & (Var <= Extent[i][1]);
+      inside &= in_bin;
     }
-    return true;
+    return inside;
   }
 };
 
@@ -713,7 +724,7 @@ namespace MaCh3Utils {
   /// @todo this could be constexpr in c++17
   /// @cite pdg2024 (particle masses)
   /// @cite ame2020 (nuclear masses)
-  inline double GetMassFromPDG(const int PDG) {
+  constexpr double GetMassFromPDG(const int PDG) {
   // *****************************
     switch (abs(PDG)) {
       // Leptons
@@ -761,7 +772,6 @@ namespace MaCh3Utils {
         MACH3LOG_ERROR("Please implement me!");
         throw MaCh3Exception(__FILE__, __LINE__);
     } // End switch
-    MACH3LOG_ERROR("Warning, didn't catch a saved mass");
     return 0;
   }
   // ***************************
