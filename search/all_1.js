@@ -27,7 +27,7 @@ var searchData=
   ['adddata_75',['AddData',['../classSampleHandlerFD.html#a7a40826e4d1204facbb5b0012cb53bdc',1,'SampleHandlerFD::AddData(const int Sample, TH1 *Data)'],['../classSampleHandlerFD.html#afea1a24bb322b7a570ae8081d38cc1ae',1,'SampleHandlerFD::AddData(const int Sample, const std::vector&lt; double &gt; &amp;Data_Array)'],['../classSampleSummary.html#a681bee322172bef35a64e86c23c415b6',1,'SampleSummary::AddData(std::vector&lt; TH2Poly * &gt; &amp;DataHist)']]],
   ['addnominal_76',['AddNominal',['../classSampleSummary.html#a8c870b718bccf37fc7f91b5201345f8e',1,'SampleSummary']]],
   ['addpath_77',['AddPath',['../namespaceM3.html#ad7693a9e309503bd894b04443f163f3c',1,'M3']]],
-  ['addsample_78',['AddSample',['../classBinnedSplineHandler.html#aa1eb83224262073a7ea324f288d80c35',1,'BinnedSplineHandler::AddSample()'],['../classOscillationHandler.html#a0e602ff4f597b4880b57a1e7a76f2d5a',1,'OscillationHandler::AddSample()']]],
+  ['addsample_78',['AddSample',['../classOscillationHandler.html#a0e602ff4f597b4880b57a1e7a76f2d5a',1,'OscillationHandler::AddSample()'],['../classBinnedSplineHandler.html#aa1eb83224262073a7ea324f288d80c35',1,'BinnedSplineHandler::AddSample()']]],
   ['addsamplehandler_79',['AddSampleHandler',['../classFitterBase.html#a136edf12d32b87320ed5440b02efdc43',1,'FitterBase']]],
   ['addsystobj_80',['AddSystObj',['../classFitterBase.html#a0c2f50da385ffc24db94a1b67880093c',1,'FitterBase']]],
   ['addthrow_81',['AddThrow',['../classSampleSummary.html#a10d0df830c319f3d8b76d2c3b85b4215',1,'SampleSummary']]],
@@ -41,10 +41,11 @@ var searchData=
   ['applyknotweightcaptspline3_89',['ApplyKnotWeightCapTSpline3',['../SplineStructs_8h.html#aa4f388789b6229f3a8a1ef237bf56583',1,'SplineStructs.h']]],
   ['applyshifts_90',['ApplyShifts',['../classSampleHandlerFD.html#adaa2f3489afd3d80356649d439e88298',1,'SampleHandlerFD']]],
   ['applysmoothing_91',['ApplySmoothing',['../classMCMCProcessor.html#a682c1c47626542f5820d633ba2bc010c',1,'MCMCProcessor']]],
-  ['auto_5fsave_92',['auto_save',['../classFitterBase.html#ad955982e63066918cba9c53381608d09',1,'FitterBase']]],
-  ['autocorrelation_93',['AutoCorrelation',['../classMCMCProcessor.html#a322bee0c362ba83df8c45769d299ce9f',1,'MCMCProcessor']]],
-  ['autocorrelation_5ffft_94',['AutoCorrelation_FFT',['../classMCMCProcessor.html#abeb5e115fa9f58ea7872af5cf13c6b79',1,'MCMCProcessor']]],
-  ['autocorrlag_95',['AutoCorrLag',['../classMCMCProcessor.html#a6156bba72e1f076e66f0356e48506a36',1,'MCMCProcessor']]],
-  ['autocorrprocessinputs_96',['AutocorrProcessInputs',['../PlotMCMCDiag_8cpp.html#a0771e70a7e135909c5584fce57b8edaa',1,'PlotMCMCDiag.cpp']]],
-  ['axisnbins_97',['AxisNBins',['../structSampleBinningInfo.html#acc617c8e5f65d3174dc615e5f7a417e7',1,'SampleBinningInfo']]]
+  ['applytemporaryselection_92',['ApplyTemporarySelection',['../classSampleHandlerFD.html#a78079726d3e96cebfae3a036969e042e',1,'SampleHandlerFD']]],
+  ['auto_5fsave_93',['auto_save',['../classFitterBase.html#ad955982e63066918cba9c53381608d09',1,'FitterBase']]],
+  ['autocorrelation_94',['AutoCorrelation',['../classMCMCProcessor.html#a322bee0c362ba83df8c45769d299ce9f',1,'MCMCProcessor']]],
+  ['autocorrelation_5ffft_95',['AutoCorrelation_FFT',['../classMCMCProcessor.html#abeb5e115fa9f58ea7872af5cf13c6b79',1,'MCMCProcessor']]],
+  ['autocorrlag_96',['AutoCorrLag',['../classMCMCProcessor.html#a6156bba72e1f076e66f0356e48506a36',1,'MCMCProcessor']]],
+  ['autocorrprocessinputs_97',['AutocorrProcessInputs',['../PlotMCMCDiag_8cpp.html#a0771e70a7e135909c5584fce57b8edaa',1,'PlotMCMCDiag.cpp']]],
+  ['axisnbins_98',['AxisNBins',['../structSampleBinningInfo.html#acc617c8e5f65d3174dc615e5f7a417e7',1,'SampleBinningInfo']]]
 ];

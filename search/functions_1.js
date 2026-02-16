@@ -20,7 +20,8 @@ var searchData=
   ['applyknotweightcap_1960',['ApplyKnotWeightCap',['../SplineStructs_8h.html#a44e8d987559b57d7c329ac56bd57b21f',1,'SplineStructs.h']]],
   ['applyknotweightcaptspline3_1961',['ApplyKnotWeightCapTSpline3',['../SplineStructs_8h.html#aa4f388789b6229f3a8a1ef237bf56583',1,'SplineStructs.h']]],
   ['applyshifts_1962',['ApplyShifts',['../classSampleHandlerFD.html#adaa2f3489afd3d80356649d439e88298',1,'SampleHandlerFD']]],
-  ['autocorrelation_1963',['AutoCorrelation',['../classMCMCProcessor.html#a322bee0c362ba83df8c45769d299ce9f',1,'MCMCProcessor']]],
-  ['autocorrelation_5ffft_1964',['AutoCorrelation_FFT',['../classMCMCProcessor.html#abeb5e115fa9f58ea7872af5cf13c6b79',1,'MCMCProcessor']]],
-  ['autocorrprocessinputs_1965',['AutocorrProcessInputs',['../PlotMCMCDiag_8cpp.html#a0771e70a7e135909c5584fce57b8edaa',1,'PlotMCMCDiag.cpp']]]
+  ['applytemporaryselection_1963',['ApplyTemporarySelection',['../classSampleHandlerFD.html#a78079726d3e96cebfae3a036969e042e',1,'SampleHandlerFD']]],
+  ['autocorrelation_1964',['AutoCorrelation',['../classMCMCProcessor.html#a322bee0c362ba83df8c45769d299ce9f',1,'MCMCProcessor']]],
+  ['autocorrelation_5ffft_1965',['AutoCorrelation_FFT',['../classMCMCProcessor.html#abeb5e115fa9f58ea7872af5cf13c6b79',1,'MCMCProcessor']]],
+  ['autocorrprocessinputs_1966',['AutocorrProcessInputs',['../PlotMCMCDiag_8cpp.html#a0771e70a7e135909c5584fce57b8edaa',1,'PlotMCMCDiag.cpp']]]
 ];
