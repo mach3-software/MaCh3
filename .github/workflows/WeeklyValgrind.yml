@@ -16,6 +16,9 @@ jobs:
     container:
       image: ghcr.io/mach3-software/mach3:alma9v1.3.0
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
       - name: Run MaCh3 Validations
         uses: ./.github/actions/mach3-validations
         with:
