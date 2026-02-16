@@ -320,7 +320,6 @@ void PrepareChains() {
       // Increment counters
       Ntoys_filled[m]++;
       TotToys++;
-
     }//end loop over toys
 
     //TN: There, we now don't need to keep the chain in memory anymore

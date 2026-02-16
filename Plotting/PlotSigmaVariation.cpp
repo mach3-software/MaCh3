@@ -496,7 +496,6 @@ void CompareSigVar2D(const std::string& filename, const YAML::Node& Settings)
       // Loop over all unique dimension pairs
       for (int iDim1 = 0; iDim1 <= nDim; ++iDim1) {
         for (int iDim2 = iDim1 + 1; iDim2 <= nDim; ++iDim2) {
-
           // Reset iterator for each dimension pair
           nextsub.Reset();
           //make -3,-1,0,1,3 polys

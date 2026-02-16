@@ -698,18 +698,17 @@ void FitterBase::RunLLHScan() {
       hScanSam->SetDirectory(nullptr);
 
       std::vector<std::unique_ptr<TH1D>> hScanSample(samples.size());
-      std::vector<double> nSamLLH(samples.size());
+      std::vector<double> nSamLLH(samples.size(), 0.0);
       for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
       {
         std::string NameTemp = samples[ivs]->GetName();
         hScanSample[ivs] = std::make_unique<TH1D>((name+"_"+NameTemp).c_str(), (name+"_" + NameTemp).c_str(), n_points, lower, upper);
         hScanSample[ivs]->SetDirectory(nullptr);
         hScanSample[ivs]->SetTitle(("2LLH_" + NameTemp + ", " + name + ";" + name + "; -2(ln L_{" + NameTemp +"})").c_str());
-        nSamLLH[ivs] = 0.;
       }
 
       std::vector<std::unique_ptr<TH1D>> hScanCov(systematics.size());
-      std::vector<double> nCovLLH(systematics.size());
+      std::vector<double> nCovLLH(systematics.size(), 0.0);
       for(unsigned int ivc = 0; ivc < systematics.size(); ++ivc )
       {
         std::string NameTemp = systematics[ivc]->GetName();
@@ -717,22 +716,23 @@ void FitterBase::RunLLHScan() {
         hScanCov[ivc] = std::make_unique<TH1D>((name + "_" + NameTemp).c_str(), (name + "_" + NameTemp).c_str(), n_points, lower, upper);
         hScanCov[ivc]->SetDirectory(nullptr);
         hScanCov[ivc]->SetTitle(("2LLH_" + NameTemp + ", " + name + ";" + name + "; -2(ln L_{" + NameTemp +"})").c_str());
-        nCovLLH[ivc] = 0.;
       }
 
-      std::vector<TH1D*> hScanSamSplit;
+      std::vector<std::unique_ptr<TH1D>> hScanSamSplit;
       std::vector<double> sampleSplitllh;
       if(PlotLLHScanBySample)
       {
         int SampleIterator = 0;
+        hScanSamSplit.resize(TotalNSamples);
+        sampleSplitllh.resize(TotalNSamples);
         for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
         {
-          hScanSamSplit.resize(TotalNSamples);
-          sampleSplitllh.resize(TotalNSamples);
           for(int is = 0; is < samples[ivs]->GetNsamples(); ++is )
           {
-            hScanSamSplit[SampleIterator] = new TH1D((name+samples[ivs]->GetSampleTitle(is)).c_str(), (name+samples[ivs]->GetSampleTitle(is)).c_str(), n_points, lower, upper);
-            hScanSamSplit[SampleIterator]->SetTitle((std::string("2LLH_sam, ") + name + ";" + name + "; -2(ln L_{sample})").c_str());
+            auto histName = name + samples[ivs]->GetSampleTitle(is);
+            auto histTitle = std::string("2LLH_sam, ") + name + ";" + name + "; -2(ln L_{sample})";
+            hScanSamSplit[SampleIterator] = std::make_unique<TH1D>(histName.c_str(), histTitle.c_str(), n_points, lower, upper);
+             hScanSamSplit[SampleIterator]->SetDirectory(nullptr);
             SampleIterator++;
           }
         }
@@ -753,24 +753,21 @@ void FitterBase::RunLLHScan() {
         }
 
         // Reweight the MC
-        for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
-        {
+        for(unsigned int ivs = 0; ivs < samples.size(); ++ivs ){
           samples[ivs]->Reweight();
         }
         //Total LLH
-        double totalllh = 0;
+        double totalllh = 0.;
 
         // Get the -log L likelihoods
-        double samplellh = 0;
+        double samplellh = 0.;
 
-        for(unsigned int ivs = 0; ivs < samples.size(); ++ivs )
-        {
+        for(unsigned int ivs = 0; ivs < samples.size(); ++ivs ) {
           nSamLLH[ivs] = samples[ivs]->GetLikelihood();
           samplellh += nSamLLH[ivs];
         }
 
-        for(unsigned int ivc = 0; ivc < systematics.size(); ++ivc )
-        {
+        for(unsigned int ivc = 0; ivc < systematics.size(); ++ivc ) {
           nCovLLH[ivc] = systematics[ivc]->GetLikelihood();
           totalllh += nCovLLH[ivc];
         }
@@ -838,7 +835,6 @@ void FitterBase::RunLLHScan() {
           {
             SampleSplit_LLH[SampleIterator]->cd();
             hScanSamSplit[SampleIterator]->Write();
-            delete hScanSamSplit[SampleIterator];
             SampleIterator++;
           }
         }
@@ -1214,7 +1210,7 @@ void FitterBase::RunLLHMap() {
   // loop over scanned points sp
   for(unsigned long sp = 0; sp < TotalPoints; ++sp)
   {
-    // At each point need to find the indeces and test values to calculate LogL
+    // At each point need to find the indices and test values to calculate LogL
     for(unsigned int n = 0; n < ParamsCovIDs.size(); ++n)
     {
       // Auxiliaries

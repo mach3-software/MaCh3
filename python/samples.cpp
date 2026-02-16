@@ -389,8 +389,7 @@ public:
     }
 };
 
-void initSamples(py::module &m){
-
+void initSamples(py::module &m) {
     auto m_samples = m.def_submodule("samples");
     m_samples.doc() =
         "This is a Python binding of MaCh3s C++ based samples library.";
