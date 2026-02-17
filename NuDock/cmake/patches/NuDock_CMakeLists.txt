@@ -1,0 +1,101 @@
+cmake_minimum_required(VERSION 3.14)
+
+project(NuDock VERSION 0.0.2 LANGUAGES CXX)
+
+include(GNUInstallDirs)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_FLAGS        "${CMAKE_CXX_FLAGS_INIT} ${CMAKE_CXX_FLAGS} -fPIC")
+
+# Will create compile_commands.json for autocompleting in vim
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# Dependencies - use CMAKE_CURRENT_SOURCE_DIR instead of CMAKE_SOURCE_DIR
+include(${CMAKE_CURRENT_SOURCE_DIR}/externals/CMakeLists.txt)
+
+add_library(nudock SHARED
+  nudock.cpp
+)
+
+# Add the library version
+target_compile_definitions(nudock
+  PUBLIC
+    VERSION_MAJOR=${PROJECT_VERSION_MAJOR}
+    VERSION_MINOR=${PROJECT_VERSION_MINOR}
+    VERSION_PATCH=${PROJECT_VERSION_PATCH}
+    VERSION="${PROJECT_VERSION}"
+)
+
+# Include directories for nudock
+target_include_directories(nudock
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/nudock>
+)
+
+target_link_libraries(nudock
+  PUBLIC
+    nlohmann_json::nlohmann_json
+  PRIVATE
+    nlohmann_json_schema_validator::validator
+    httplib::httplib
+)
+
+# Link the schema dirs to the library
+set(SCHEMAS_DIR "${CMAKE_INSTALL_FULL_INCLUDEDIR}/nudock/schemas")
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/nudock_config.hpp.in
+  ${CMAKE_CURRENT_BINARY_DIR}/nudock_config.hpp
+  @ONLY
+)
+add_compile_definitions(SCHEMAS_DIR="${CMAKE_INSTALL_FULL_INCLUDEDIR}/nudock/schemas")
+add_definitions(-DSCHEMAS_DIR="${SCHEMAS_DIR}")
+
+# Install the headers
+install(FILES nudock.hpp ${CMAKE_CURRENT_BINARY_DIR}/nudock_config.hpp
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/nudock)
+
+# Install should also copy the schemas folder with the json schemas
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/schemas/
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/nudock/schemas
+  FILES_MATCHING PATTERN "*.json"
+)
+
+install(TARGETS nudock 
+        EXPORT nudockTargets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(EXPORT nudockTargets
+  FILE NuDockTargets.cmake
+  NAMESPACE NuDock::
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/nudock
+)
+
+# Make the install directory available for the tests
+set(NuDock_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/cmake/nudock " CACHE PATH "NuDock CMake package directory" FORCE)
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+  ${CMAKE_CURRENT_BINARY_DIR}/NuDockConfigVersion.cmake
+  VERSION ${PROJECT_VERSION}
+  COMPATIBILITY SameMajorVersion
+)
+
+configure_package_config_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/NuDockConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/NuDockConfig.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/nudock
+)
+
+# Install the config files
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/NuDockConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/NuDockConfigVersion.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/nudock
+)
