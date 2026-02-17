@@ -6,7 +6,7 @@
 class LikelihoodFit : public FitterBase {
  public:
     /// @brief Constructor
-    LikelihoodFit(manager * const fitMan);
+    LikelihoodFit(Manager * const fitMan);
     /// @brief Destructor
     virtual ~LikelihoodFit();
 
@@ -15,11 +15,6 @@ class LikelihoodFit : public FitterBase {
     /// @brief Get total number of params, this sums over all covariance objects
     inline int GetNPars(){return NPars;};
 
-    /// @brief Implementation of fitting algorithm
-    virtual void RunMCMC() = 0;
-
-    /// @brief Get name of class
-    virtual inline std::string GetName()const {return "LikelihoodFit";};
   protected:
     /// @brief prepare output and perform sanity checks
     void PrepareFit();

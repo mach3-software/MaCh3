@@ -7,6 +7,7 @@
 _MaCh3_Safe_Include_Start_ //{
 #include "TROOT.h"
 #include "TKey.h"
+#include "TH3F.h"
 _MaCh3_Safe_Include_End_ //}
 
 //****************************************
@@ -27,7 +28,9 @@ BinnedSplineHandler::BinnedSplineHandler(ParameterHandlerGeneric *xsec_, MaCh3Mo
   // Keep these in class scope, important for using 1 monolith/sample!
   MonolithIndex = 0; //Keeps track of the monolith index we're on when filling arrays (declared here so we can have multiple FillSampleArray calls)
   CoeffIndex = 0; //Keeps track of our indexing the coefficient arrays [x, ybcd]
+  isflatarray = nullptr;
 }
+
 //****************************************
 BinnedSplineHandler::~BinnedSplineHandler(){
 //****************************************
@@ -52,6 +55,7 @@ void BinnedSplineHandler::cleanUpMemory() {
   CleanVector(nSplineParams);
   CleanVector(DimensionLabels);
   CleanVector(SampleNames);
+  CleanVector(SampleTitles);
   CleanVector(Dimensions);
   CleanContainer(splinevec_Monolith);
   CleanContainer(SplineBinning);
@@ -61,13 +65,15 @@ void BinnedSplineHandler::cleanUpMemory() {
 
 //****************************************
 void BinnedSplineHandler::AddSample(const std::string& SampleName,
-                             const std::vector<std::string>& OscChanFileNames,
-                             const std::vector<std::string>& SplineVarNames)
+                                    const std::string& SampleTitle,
+                                    const std::vector<std::string>& OscChanFileNames,
+                                    const std::vector<std::string>& SplineVarNames)
 //Adds samples to the large array
 //****************************************
 {
   SampleNames.push_back(SampleName);
-  Dimensions.push_back(int(SplineVarNames.size()));
+  SampleTitles.push_back(SampleTitle);
+  Dimensions.push_back(static_cast<int>(SplineVarNames.size()));
   DimensionLabels.push_back(SplineVarNames);
 
   int nSplineParam = xsec->GetNumParamsFromSampleName(SampleName, SystType::kSpline);
@@ -95,22 +101,97 @@ void BinnedSplineHandler::AddSample(const std::string& SampleName,
   int nOscChan = int(OscChanFileNames.size());
   nOscChans.push_back(nOscChan);
 
-  PrintSampleDetails(SampleName);
+  PrintSampleDetails(SampleTitle);
 
   std::vector<std::vector<TAxis *>> SampleBinning(nOscChan);
   for (int iOscChan = 0; iOscChan < nOscChan; iOscChan++)
   {
-    SampleBinning[iOscChan] = FindSplineBinning(OscChanFileNames[iOscChan], SampleName);
+    SampleBinning[iOscChan] = FindSplineBinning(OscChanFileNames[iOscChan], SampleTitle);
   }
   MACH3LOG_INFO("#----------------------------------------------------------------------------------------------------------------------------------#");
   SplineBinning.push_back(SampleBinning);
 
-  BuildSampleIndexingArray(SampleName);
-  PrintArrayDetails(SampleName);
+  BuildSampleIndexingArray(SampleTitle);
+  PrintArrayDetails(SampleTitle);
   MACH3LOG_INFO("#----------------------------------------------------------------------------------------------------------------------------------#");
 
-  FillSampleArray(SampleName, OscChanFileNames);
+  FillSampleArray(SampleTitle, OscChanFileNames);
   MACH3LOG_INFO("#----------------------------------------------------------------------------------------------------------------------------------#");
+}
+
+//****************************************
+void BinnedSplineHandler::InvestigateMissingSplines() const {
+//****************************************
+  // Map: iSample → iSyst → modeSuffix → {totalSplines, zeroCount}
+  std::map<unsigned int, std::map<unsigned int, std::map<std::string, std::pair<unsigned int, unsigned int>>>> systZeroCounts;
+
+  for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++) {
+    std::string SampleName = SampleNames[iSample];
+
+    // Get list of systematic names for this sample
+    std::vector<std::string> SplineFileParPrefixNames_Sample =
+    xsec->GetParsNamesFromSampleName(SampleName, kSpline);
+
+    for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++) {
+      for (unsigned int iSyst = 0; iSyst < indexvec[iSample][iOscChan].size(); iSyst++) {
+        unsigned int zeroCount = 0;
+        unsigned int totalSplines = 0;
+
+        for (unsigned int iMode = 0; iMode < indexvec[iSample][iOscChan][iSyst].size(); iMode++) {
+          // Get the mode suffix string
+          std::string modeSuffix =
+          Modes->GetSplineSuffixFromMaCh3Mode(SplineModeVecs[iSample][iSyst][iMode]);
+
+          for (unsigned int iVar1 = 0; iVar1 < indexvec[iSample][iOscChan][iSyst][iMode].size(); iVar1++) {
+            for (unsigned int iVar2 = 0; iVar2 < indexvec[iSample][iOscChan][iSyst][iMode][iVar1].size(); iVar2++) {
+              for (unsigned int iVar3 = 0; iVar3 < indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2].size(); iVar3++) {
+                totalSplines++;
+                if (indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2][iVar3] == 0) {
+                  zeroCount++;
+                  if(zeroCount > 1){
+                    systZeroCounts[iSample][iSyst][modeSuffix] = {totalSplines, zeroCount};
+                  }
+                  MACH3LOG_DEBUG(
+                    "Sample '{}' | OscChan {} | Syst '{}' | Mode '{}' | Var1 {} | Var2 {} | Var3 {} => Value: {}",
+                    SampleTitles[iSample],
+                    iOscChan,
+                    SplineFileParPrefixNames_Sample[iSyst],
+                    modeSuffix,
+                    iVar1,
+                    iVar2,
+                    iVar3,
+                    indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2][iVar3]
+                  );
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // KS: Let's print this atrocious mess...
+  for (const auto& samplePair : systZeroCounts) {
+    unsigned int iSample = samplePair.first;
+    std::vector<std::string> SplineFileParPrefixNames_Sample = xsec->GetParsNamesFromSampleName(SampleNames[iSample], kSpline);
+    for (const auto& systPair : samplePair.second) {
+      unsigned int iSyst = systPair.first;
+      const auto& systName = SplineFileParPrefixNames_Sample[iSyst];
+      for (const auto& modePair : systPair.second) {
+        const auto& modeSuffix = modePair.first;
+        const auto& counts = modePair.second;
+        MACH3LOG_CRITICAL(
+          "Sample '{}': Systematic '{}' has missing splines in mode '{}'. Expected Splines: {}, Missing Splines: {}",
+          SampleTitles[iSample],
+          systName,
+          modeSuffix,
+          counts.first,
+          counts.second
+        );
+      }
+    }
+  }
 }
 
 //****************************************
@@ -121,6 +202,7 @@ void BinnedSplineHandler::TransferToMonolith()
   MonolithSize = CountNumberOfLoadedSplines(false, 1);
 
   if(MonolithSize!=MonolithIndex){
+    InvestigateMissingSplines();
     MACH3LOG_ERROR("Something's gone wrong when we tried to get the size of your monolith");
     MACH3LOG_ERROR("MonolithSize is {}", MonolithSize);
     MACH3LOG_ERROR("MonolithIndex is {}", MonolithIndex);
@@ -134,7 +216,7 @@ void BinnedSplineHandler::TransferToMonolith()
   isflatarray = new bool[MonolithSize];
   
   xcoeff_arr = new M3::float_t[CoeffIndex];
-  manycoeff_arr = new M3::float_t[CoeffIndex*4];
+  manycoeff_arr = new M3::float_t[CoeffIndex*_nCoeff_];
 
   for (unsigned int iSample = 0; iSample < indexvec.size(); iSample++)
   { // Loop over sample
@@ -182,7 +264,7 @@ void BinnedSplineHandler::TransferToMonolith()
 
                   //Now to fill up our coefficient arrayss
                   M3::float_t* tmpXCoeffArr = new M3::float_t[splineKnots];
-                  M3::float_t* tmpManyCoeffArr = new M3::float_t[splineKnots*4];
+                  M3::float_t* tmpManyCoeffArr = new M3::float_t[splineKnots*_nCoeff_];
 
                   int iCoeff=coeffindexvec[splineindex];
                   getSplineCoeff_SepMany(splineindex, tmpXCoeffArr, tmpManyCoeffArr);
@@ -190,8 +272,8 @@ void BinnedSplineHandler::TransferToMonolith()
                   for(int i = 0; i < splineKnots; i++){
                     xcoeff_arr[iCoeff+i]=tmpXCoeffArr[i];
 
-                    for(int j=0; j<4; j++){
-                      manycoeff_arr[(iCoeff+i)*4+j]=tmpManyCoeffArr[i*4+j];
+                    for(int j = 0; j < _nCoeff_; j++){
+                      manycoeff_arr[(iCoeff+i)*_nCoeff_+j]=tmpManyCoeffArr[i*_nCoeff_+j];
                     }
                   }
                   delete[] tmpXCoeffArr;
@@ -237,7 +319,7 @@ void BinnedSplineHandler::CalcSplineWeights()
     const short int currentsegment = short(SplineSegments[uniqueIndex]);
 
     const int segCoeff = coeffindexvec[iSpline]+currentsegment;
-    const int coeffOffset = segCoeff * 4;
+    const int coeffOffset = segCoeff * _nCoeff_;
     // These are what we can extract from the TSpline3
     const M3::float_t y = manycoeff_arr[coeffOffset+kCoeffY];
     const M3::float_t b = manycoeff_arr[coeffOffset+kCoeffB];
@@ -265,10 +347,10 @@ void BinnedSplineHandler::CalcSplineWeights()
 //****************************************
 //Creates an array to be filled with monolith indexes for each sample (allows for indexing between 7D binning and 1D Vector)
 //Only need 1 indexing array everything else interfaces with this to get binning properties
-void BinnedSplineHandler::BuildSampleIndexingArray(const std::string& SampleName)
+void BinnedSplineHandler::BuildSampleIndexingArray(const std::string& SampleTitle)
 //****************************************
 {  
-  int iSample = getSampleIndex(SampleName);
+  int iSample = GetSampleIndex(SampleTitle);
   int nSplineSysts = nSplineParams[iSample];
   int nOscChannels = nOscChans[iSample];
 
@@ -297,15 +379,14 @@ void BinnedSplineHandler::BuildSampleIndexingArray(const std::string& SampleName
 }
 
 //****************************************
-std::vector<TAxis *> BinnedSplineHandler::FindSplineBinning(const std::string& FileName, const std::string& SampleName)
+std::vector<TAxis *> BinnedSplineHandler::FindSplineBinning(const std::string& FileName, const std::string& SampleTitle)
 //****************************************
 {
-  std::vector<TAxis *> ReturnVec;
-  int iSample=getSampleIndex(SampleName);
+  int iSample = GetSampleIndex(SampleTitle);
 
   //Try declaring these outside of TFile so they aren't owned by File
-  int nDummyBins = 1;
-  const double DummyEdges[2] = {-1e15, 1e15};
+  constexpr int nDummyBins = 1;
+  constexpr double DummyEdges[2] = {-1e15, 1e15};
   TAxis* DummyAxis = new TAxis(nDummyBins, DummyEdges);
   TH2F* Hist2D = nullptr;
   TH3F* Hist3D = nullptr;
@@ -368,23 +449,26 @@ std::vector<TAxis *> BinnedSplineHandler::FindSplineBinning(const std::string& F
     Hist3D = File->Get<TH3F>(TemplateName.c_str());
   }
 
+  std::vector<TAxis*> ReturnVec;
+  // KS: Resize to reduce impact of push back and memory fragmentation
+  ReturnVec.resize(3);
   if (Dimensions[iSample] == 2) {
-    if(isHist2D){
-      ReturnVec.push_back(static_cast<TAxis*>(Hist2D->GetXaxis()->Clone()));
-      ReturnVec.push_back(static_cast<TAxis*>(Hist2D->GetYaxis()->Clone()));
-      ReturnVec.push_back(static_cast<TAxis*>(DummyAxis->Clone()));
+    if (isHist2D) {
+      ReturnVec[0] = static_cast<TAxis*>(Hist2D->GetXaxis()->Clone());
+      ReturnVec[1] = static_cast<TAxis*>(Hist2D->GetYaxis()->Clone());
+      ReturnVec[2] = static_cast<TAxis*>(DummyAxis->Clone());
     } else if (isHist3D) {
-      ReturnVec.push_back(static_cast<TAxis*>(Hist3D->GetXaxis()->Clone()));
-      ReturnVec.push_back(static_cast<TAxis*>(Hist3D->GetYaxis()->Clone()));
-      ReturnVec.push_back(static_cast<TAxis*>(DummyAxis->Clone()));
+      ReturnVec[0] = static_cast<TAxis*>(Hist3D->GetXaxis()->Clone());
+      ReturnVec[1] = static_cast<TAxis*>(Hist3D->GetYaxis()->Clone());
+      ReturnVec[2] = static_cast<TAxis*>(DummyAxis->Clone());
     }
   } else if (Dimensions[iSample] == 3) {
-    ReturnVec.push_back(static_cast<TAxis*>(Hist3D->GetXaxis()->Clone()));
-    ReturnVec.push_back(static_cast<TAxis*>(Hist3D->GetYaxis()->Clone()));
-    ReturnVec.push_back(static_cast<TAxis*>(Hist3D->GetZaxis()->Clone()));
+    ReturnVec[0] = static_cast<TAxis*>(Hist3D->GetXaxis()->Clone());
+    ReturnVec[1] = static_cast<TAxis*>(Hist3D->GetYaxis()->Clone());
+    ReturnVec[2] = static_cast<TAxis*>(Hist3D->GetZaxis()->Clone());
   } else {
     MACH3LOG_ERROR("Number of dimensions not valid! Given: {}", Dimensions[iSample]);
-    throw MaCh3Exception(__FILE__ , __LINE__ );
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
 
   for (unsigned int iAxis = 0; iAxis < ReturnVec.size(); ++iAxis) {
@@ -410,7 +494,7 @@ int BinnedSplineHandler::CountNumberOfLoadedSplines(bool NonFlat, int Verbosity)
   { // Loop over systematics
     SampleCounter_NonFlat = 0;
     SampleCounter_All = 0;
-    std::string SampleName = SampleNames[iSample];
+    std::string SampleTitle = SampleTitles[iSample];
     for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++)
     { // Loop over oscillation channels
       for (unsigned int iSyst = 0; iSyst < indexvec[iSample][iOscChan].size(); iSyst++)
@@ -423,7 +507,7 @@ int BinnedSplineHandler::CountNumberOfLoadedSplines(bool NonFlat, int Verbosity)
             { // Loop over second dimension
               for (unsigned int iVar3 = 0; iVar3 < indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2].size(); iVar3++)
               { // Loop over third dimension
-                if (isValidSplineIndex(SampleName, iOscChan, iSyst, iMode, iVar1, iVar2, iVar3))
+                if (isValidSplineIndex(SampleTitle, iOscChan, iSyst, iMode, iVar1, iVar2, iVar3))
                 {
                   int splineindex = indexvec[iSample][iOscChan][iSyst][iMode][iVar1][iVar2][iVar3];
                   if (splinevec_Monolith[splineindex])
@@ -438,7 +522,7 @@ int BinnedSplineHandler::CountNumberOfLoadedSplines(bool NonFlat, int Verbosity)
         }
       }
     }
-    MACH3LOG_DEBUG("{:<10} has {:<10} splines, of which {:<10} are not flat", SampleNames[iSample], SampleCounter_All, SampleCounter_NonFlat);
+    MACH3LOG_DEBUG("{:<10} has {:<10} splines, of which {:<10} are not flat", SampleTitles[iSample], SampleCounter_All, SampleCounter_NonFlat);
 
     FullCounter_NonFlat += SampleCounter_NonFlat;
     FullCounter_All += SampleCounter_All;
@@ -606,8 +690,8 @@ void BinnedSplineHandler::getSplineCoeff_SepMany(int splineindex, M3::float_t* &
 
   for (int i = 0; i < nPoints; i++) {
     xArray[i] = 1.0;
-    for (int j = 0; j < 4; j++) {
-      manyArray[i*4+j] = 1.0;
+    for (int j = 0; j < _nCoeff_; j++) {
+      manyArray[i*_nCoeff_+j] = 1.0;
     }
   }
 
@@ -622,10 +706,10 @@ void BinnedSplineHandler::getSplineCoeff_SepMany(int splineindex, M3::float_t* &
     // Store the coefficients for each knot contiguously in memory
     // 4 because manyArray stores y,b,c,d
     xArray[i] = x;
-    manyArray[i*4] = y; 
-    manyArray[i*4+1] = b;
-    manyArray[i*4+2] = c;
-    manyArray[i*4+3] = d;    
+    manyArray[i * _nCoeff_ + kCoeffY] = y;
+    manyArray[i * _nCoeff_ + kCoeffB] = b;
+    manyArray[i * _nCoeff_ + kCoeffC] = c;
+    manyArray[i * _nCoeff_ + kCoeffD] = d;
   }
 
   //We now clean up the splines!
@@ -648,36 +732,36 @@ std::string BinnedSplineHandler::getDimLabel(const int iSample, const unsigned i
 
 //****************************************
 //Returns sample index in
-int BinnedSplineHandler::getSampleIndex(const std::string& SampleName) const{
+int BinnedSplineHandler::GetSampleIndex(const std::string& SampleTitle) const{
 //****************************************
-  for (size_t iSample = 0; iSample < SampleNames.size(); ++iSample) {
-    if (SampleName == SampleNames[iSample]) {
+  for (size_t iSample = 0; iSample < SampleTitles.size(); ++iSample) {
+    if (SampleTitle == SampleTitles[iSample]) {
       return static_cast<int>(iSample);
     }
   }
-  MACH3LOG_ERROR("Sample name not found: {}", SampleName);
+  MACH3LOG_ERROR("Sample name not found: {}", SampleTitle);
   throw MaCh3Exception(__FILE__, __LINE__);
 }
 
 //****************************************
-void BinnedSplineHandler::PrintSampleDetails(const std::string& SampleName) const
+void BinnedSplineHandler::PrintSampleDetails(const std::string& SampleTitle) const
 //****************************************
 {
-  const int iSample = getSampleIndex(SampleName);
+  const int iSample = GetSampleIndex(SampleTitle);
 
-  MACH3LOG_INFO("Details about sample: {:<20}", SampleNames[iSample]);
+  MACH3LOG_INFO("Details about sample: {:<20}", SampleTitles[iSample]);
   MACH3LOG_INFO("\t Dimension: {:<35}", Dimensions[iSample]);
   MACH3LOG_INFO("\t nSplineParam: {:<35}", nSplineParams[iSample]);
   MACH3LOG_INFO("\t nOscChan: {:<35}", nOscChans[iSample]);
 }
 
 //****************************************
-void BinnedSplineHandler::PrintArrayDetails(const std::string& SampleName) const
+void BinnedSplineHandler::PrintArrayDetails(const std::string& SampleTitle) const
 //****************************************
 {
-  int iSample = getSampleIndex(SampleName);
+  int iSample = GetSampleIndex(SampleTitle);
   int nOscChannels = int(indexvec[iSample].size());
-  MACH3LOG_INFO("Sample {} has {} oscillation channels", SampleName, nOscChannels);	
+  MACH3LOG_INFO("Sample {} has {} oscillation channels", SampleTitle, nOscChannels);
   
   for (int iOscChan = 0; iOscChan < nOscChannels; iOscChan++)
   {
@@ -698,10 +782,10 @@ void BinnedSplineHandler::PrintArrayDetails(const std::string& SampleName) const
 }
 
 //****************************************
-bool BinnedSplineHandler::isValidSplineIndex(const std::string& SampleName, int iOscChan, int iSyst, int iMode, int iVar1, int iVar2, int iVar3)
+bool BinnedSplineHandler::isValidSplineIndex(const std::string& SampleTitle, int iOscChan, int iSyst, int iMode, int iVar1, int iVar2, int iVar3)
 //****************************************
 {
-  int iSample = getSampleIndex(SampleName);
+  int iSample = GetSampleIndex(SampleTitle);
   bool isValid = true;
 
   // Lambda to check if an index is valid for a specific dimension
@@ -749,24 +833,12 @@ void BinnedSplineHandler::PrintBinning(TAxis *Axis) const
 }
 
 //****************************************
-std::vector< std::vector<int> > BinnedSplineHandler::GetEventSplines(const std::string& SampleName, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val)
+std::vector< std::vector<int> > BinnedSplineHandler::GetEventSplines(const std::string& SampleTitle, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val)
 //****************************************
 {
   std::vector<std::vector<int>> ReturnVec;
-  int SampleIndex = -1;
-  for (unsigned int iSample = 0; iSample < SampleNames.size(); iSample++) {
-    if (SampleName == SampleNames[iSample]) {
-      SampleIndex = iSample;
-    }
-  }
-
-  if (SampleIndex == -1) {
-    MACH3LOG_ERROR("Sample not found: {}", SampleName);
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  
+  int SampleIndex = GetSampleIndex(SampleTitle);
   int nSplineSysts = static_cast<int>(indexvec[SampleIndex][iOscChan].size());
-
 
   int Mode = -1;
   std::string SuffixForEventMode = Modes->GetSplineSuffixFromMaCh3Mode(EventMode);
@@ -818,7 +890,6 @@ std::vector< std::vector<int> > BinnedSplineHandler::GetEventSplines(const std::
 // checks if there are multiple modes with the same SplineSuffix
 // (for example if CCRES and CCCoherent are treated as one spline mode)
 std::vector< std::vector<int> > BinnedSplineHandler::StripDuplicatedModes(const std::vector< std::vector<int> >& InputVector) {
-
   //ETA - this is of size nPars from the xsec model
   size_t InputVectorSize = InputVector.size();
   std::vector< std::vector<int> > ReturnVec(InputVectorSize);
@@ -852,9 +923,9 @@ std::vector< std::vector<int> > BinnedSplineHandler::StripDuplicatedModes(const 
   return ReturnVec;
 }
 
-void BinnedSplineHandler::FillSampleArray(std::string SampleName, std::vector<std::string> OscChanFileNames)
+void BinnedSplineHandler::FillSampleArray(std::string SampleTitle, std::vector<std::string> OscChanFileNames)
 {
-  int iSample = getSampleIndex(SampleName);
+  int iSample = GetSampleIndex(SampleTitle);
   int nOscChannels = nOscChans[iSample];
   
   for (int iOscChan = 0; iOscChan < nOscChannels; iOscChan++) {
@@ -937,8 +1008,8 @@ void BinnedSplineHandler::FillSampleArray(std::string SampleName, std::vector<st
 
       mySpline = Key->ReadObject<TSpline3>();
 
-      if (isValidSplineIndex(SampleName, iOscChan, SystNum, ModeNum, Var1Bin, Var2Bin, Var3Bin)) { // loop over all the spline knots and check their value
-        MACH3LOG_DEBUG("Pushed back monolith for spline {}", FullSplineName);
+      if (isValidSplineIndex(SampleTitle, iOscChan, SystNum, ModeNum, Var1Bin, Var2Bin, Var3Bin)) { // loop over all the spline knots and check their value
+        MACH3LOG_TRACE("Pushed back monolith for spline {}", FullSplineName);
         // if the value is 1 then set the flat bool to false
         nKnots = mySpline->GetNp();
         isFlat = true;
@@ -979,4 +1050,413 @@ void BinnedSplineHandler::FillSampleArray(std::string SampleName, std::vector<st
     File->Delete("*");
     File->Close();
   } //End of oscillation channel loop
+}
+
+// *****************************************
+// Load SplineMonolith from ROOT file
+void BinnedSplineHandler::LoadSplineFile(std::string FileName) {
+// *****************************************
+  M3::AddPath(FileName);
+
+  // Check for spaces in the filename
+  size_t pos = FileName.find(' ');
+  if (pos != std::string::npos) {
+    MACH3LOG_WARN("Filename ({}) contains spaces. Replacing spaces with underscores.", FileName);
+    while ((pos = FileName.find(' ')) != std::string::npos) {
+      FileName[pos] = '_';
+    }
+  }
+  auto SplineFile = std::make_unique<TFile>(FileName.c_str(), "OPEN");
+
+  TMacro *ConfigCov = SplineFile->Get<TMacro>("ParameterHandler");
+  // Config which was in MCMC from which we are starting
+  YAML::Node CovSettings = TMacroToYAML(*ConfigCov);
+  // Config from currently used cov object
+  YAML::Node ConfigCurrent = xsec->GetConfig();
+
+  if (!compareYAMLNodes(CovSettings, ConfigCurrent))
+  {
+    MACH3LOG_ERROR("Loading precomputed spline file, however encountered different YAML config, please regenerate input");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+
+  LoadSettingsDir(SplineFile);
+  LoadMonolithDir(SplineFile);
+  LoadIndexDir(SplineFile);
+  LoadFastSplineInfoDir(SplineFile);
+
+  for (int iSpline = 0; iSpline < nParams; iSpline++) {
+    SplineInfoArray[iSpline].splineParsPointer = xsec->RetPointer(UniqueSystIndices[iSpline]);
+  }
+  SplineFile->Close();
+}
+
+// *****************************************
+// KS: Prepare Fast Spline Info within SplineFile
+void BinnedSplineHandler::LoadSettingsDir(std::unique_ptr<TFile>& SplineFile) {
+// *****************************************
+  TTree *Settings = SplineFile->Get<TTree>("Settings");
+  int CoeffIndex_temp, MonolithSize_temp;
+  short int nParams_temp;
+  Settings->SetBranchAddress("CoeffIndex", &CoeffIndex_temp);
+  Settings->SetBranchAddress("MonolithSize", &MonolithSize_temp);
+  Settings->SetBranchAddress("nParams", &nParams_temp);
+  int indexvec_sizes[7];
+  for (int i = 0; i < 7; ++i) {
+    Settings->SetBranchAddress(("indexvec_size" + std::to_string(i+1)).c_str(), &indexvec_sizes[i]);
+  }
+
+  int SplineBinning_size1, SplineBinning_size2, SplineBinning_size3;
+  Settings->SetBranchAddress("SplineBinning_size1", &SplineBinning_size1);
+  Settings->SetBranchAddress("SplineBinning_size2", &SplineBinning_size2);
+  Settings->SetBranchAddress("SplineBinning_size3", &SplineBinning_size3);
+  int SplineModeVecs_size1, SplineModeVecs_size2, SplineModeVecs_size3;
+  Settings->SetBranchAddress("SplineModeVecs_size1", &SplineModeVecs_size1);
+  Settings->SetBranchAddress("SplineModeVecs_size2", &SplineModeVecs_size2);
+  Settings->SetBranchAddress("SplineModeVecs_size3", &SplineModeVecs_size3);
+  std::vector<std::string>* SampleNames_temp = nullptr;
+  Settings->SetBranchAddress("SampleNames", &SampleNames_temp);
+  std::vector<std::string>* SampleTitles_temp = nullptr;
+  Settings->SetBranchAddress("SampleTitles", &SampleTitles_temp);
+  Settings->GetEntry(0);
+
+  CoeffIndex = CoeffIndex_temp;
+  MonolithSize = MonolithSize_temp;
+  SampleNames = *SampleNames_temp;
+  SampleTitles = *SampleTitles_temp;
+
+  nParams = nParams_temp;
+
+  SplineSegments = new short int[nParams]();
+  ParamValues = new float[nParams]();
+
+  // Resize indexvec according to saved dimensions
+  indexvec.resize(indexvec_sizes[0]);
+  for (int i = 0; i < indexvec_sizes[0]; ++i) {
+    indexvec[i].resize(indexvec_sizes[1]);
+    for (int j = 0; j < indexvec_sizes[1]; ++j) {
+      indexvec[i][j].resize(indexvec_sizes[2]);
+      for (int k = 0; k < indexvec_sizes[2]; ++k) {
+        indexvec[i][j][k].resize(indexvec_sizes[3]);
+        for (int l = 0; l < indexvec_sizes[3]; ++l) {
+          indexvec[i][j][k][l].resize(indexvec_sizes[4]);
+          for (int m = 0; m < indexvec_sizes[4]; ++m) {
+            indexvec[i][j][k][l][m].resize(indexvec_sizes[5]);
+            for (int n = 0; n < indexvec_sizes[5]; ++n) {
+              indexvec[i][j][k][l][m][n].resize(indexvec_sizes[6]);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  auto Resize3D = [](auto& vec, int d1, int d2, int d3) {
+    vec.resize(d1);
+    for (int i = 0; i < d1; ++i) {
+      vec[i].resize(d2);
+      for (int j = 0; j < d2; ++j) {
+        vec[i][j].resize(d3);
+      }
+    }
+  };
+
+  Resize3D(SplineBinning, SplineBinning_size1, SplineBinning_size2, SplineBinning_size3);
+  Resize3D(SplineModeVecs, SplineModeVecs_size1, SplineModeVecs_size2, SplineModeVecs_size3);
+}
+
+// *****************************************
+// KS: Prepare Fast Spline Info within SplineFile
+void BinnedSplineHandler::LoadMonolithDir(std::unique_ptr<TFile>& SplineFile) {
+// *****************************************
+  TTree *MonolithTree = SplineFile->Get<TTree>("MonolithTree");
+
+  manycoeff_arr = new M3::float_t[CoeffIndex * _nCoeff_];
+  MonolithTree->SetBranchAddress("manycoeff", manycoeff_arr);
+  isflatarray = new bool[MonolithSize];
+  weightvec_Monolith.resize(MonolithSize);
+  MonolithTree->SetBranchAddress("isflatarray", isflatarray);
+
+  // Load vectors
+  std::vector<int>* coeffindexvec_temp = nullptr;
+  MonolithTree->SetBranchAddress("coeffindexvec", &coeffindexvec_temp);
+  std::vector<int>* uniquecoeffindices_temp = nullptr;
+  MonolithTree->SetBranchAddress("uniquecoeffindices", &uniquecoeffindices_temp);
+  std::vector<int>* uniquesplinevec_Monolith_temp = nullptr;
+  MonolithTree->SetBranchAddress("uniquesplinevec_Monolith", &uniquesplinevec_Monolith_temp);
+  std::vector<int>* UniqueSystIndices_temp = nullptr;
+  MonolithTree->SetBranchAddress("UniqueSystIndices", &UniqueSystIndices_temp);
+
+  // Allocate and load xcoeff_arr
+  xcoeff_arr = new M3::float_t[CoeffIndex];
+  MonolithTree->SetBranchAddress("xcoeff", xcoeff_arr);
+
+  MonolithTree->GetEntry(0);
+
+  coeffindexvec       = *coeffindexvec_temp;
+  uniquecoeffindices  = *uniquecoeffindices_temp;
+  uniquesplinevec_Monolith = *uniquesplinevec_Monolith_temp;
+  UniqueSystIndices = *UniqueSystIndices_temp;
+}
+
+// *****************************************
+// KS: Prepare Fast Spline Info within SplineFile
+void BinnedSplineHandler::LoadIndexDir(std::unique_ptr<TFile>& SplineFile) {
+// *****************************************
+  TTree *IndexTree = SplineFile->Get<TTree>("IndexVec");
+
+  std::vector<int> Dim(7);
+  int value;
+  for (int d = 0; d < 7; ++d) {
+    IndexTree->SetBranchAddress(Form("dim%d", d+1), &Dim[d]);
+  }
+  IndexTree->SetBranchAddress("value", &value);
+
+  // Fill indexvec with data from IndexTree
+  for (Long64_t i = 0; i < IndexTree->GetEntries(); ++i) {
+    IndexTree->GetEntry(i);
+    indexvec[Dim[0]][Dim[1]][Dim[2]][Dim[3]][Dim[4]][Dim[5]][Dim[6]] = value;
+  }
+
+  // Load SplineBinning data
+  TTree *SplineBinningTree = SplineFile->Get<TTree>("SplineBinningTree");
+  std::vector<int> indices(3);
+  SplineBinningTree->SetBranchAddress("i", &indices[0]);
+  SplineBinningTree->SetBranchAddress("j", &indices[1]);
+  SplineBinningTree->SetBranchAddress("k", &indices[2]);
+  TAxis* axis = nullptr;
+  SplineBinningTree->SetBranchAddress("axis", &axis);
+
+  // Reconstruct TAxis objects
+  for (Long64_t entry = 0; entry < SplineBinningTree->GetEntries(); ++entry) {
+    SplineBinningTree->GetEntry(entry);
+    int i = indices[0];
+    int j = indices[1];
+    int k = indices[2];
+    SplineBinning[i][j][k] = static_cast<TAxis*>(axis->Clone());
+  }
+
+  std::vector<int> indices_mode(3);
+  int mode_value;
+  TTree *SplineModeTree = SplineFile->Get<TTree>("SplineModeTree");
+  SplineModeTree->SetBranchAddress("i", &indices_mode[0]);
+  SplineModeTree->SetBranchAddress("j", &indices_mode[1]);
+  SplineModeTree->SetBranchAddress("k", &indices_mode[2]);
+  SplineModeTree->SetBranchAddress("value", &mode_value);
+
+  // Fill SplineModeVecs with values from the tree
+  for (Long64_t entry = 0; entry < SplineModeTree->GetEntries(); ++entry) {
+    SplineModeTree->GetEntry(entry);
+    int i = indices_mode[0];
+    int j = indices_mode[1];
+    int k = indices_mode[2];
+    SplineModeVecs[i][j][k] = mode_value;
+  }
+}
+
+// *****************************************
+// Save SplineMonolith into ROOT file
+void BinnedSplineHandler::PrepareSplineFile(std::string FileName) {
+// *****************************************
+  M3::AddPath(FileName);
+  // Check for spaces in the filename
+  size_t pos = FileName.find(' ');
+  if (pos != std::string::npos) {
+    MACH3LOG_WARN("Filename ({}) contains spaces. Replacing spaces with underscores.", FileName);
+    while ((pos = FileName.find(' ')) != std::string::npos) {
+      FileName[pos] = '_';
+    }
+  }
+  // Save ROOT File
+  auto SplineFile = std::make_unique<TFile>(FileName.c_str(), "recreate");
+  YAML::Node ConfigCurrent = xsec->GetConfig();
+  TMacro ConfigSave = YAMLtoTMacro(ConfigCurrent, "ParameterHandler");
+  ConfigSave.Write();
+
+  PrepareSettingsDir(SplineFile);
+  PrepareMonolithDir(SplineFile);
+  PrepareIndexDir(SplineFile);
+  PrepareOtherInfoDir(SplineFile);
+  PrepareFastSplineInfoDir(SplineFile);
+
+  SplineFile->Close();
+}
+
+// *****************************************
+void BinnedSplineHandler::PrepareSettingsDir(std::unique_ptr<TFile>& SplineFile) const {
+// *****************************************
+  TTree *Settings = new TTree("Settings", "Settings");
+  int CoeffIndex_temp = CoeffIndex;
+  int MonolithSize_temp = MonolithSize;
+  short int nParams_temp = nParams;
+
+  Settings->Branch("CoeffIndex", &CoeffIndex_temp, "CoeffIndex/I");
+  Settings->Branch("MonolithSize", &MonolithSize_temp, "MonolithSize/I");
+  Settings->Branch("nParams", &nParams_temp, "nParams/S");
+
+  int indexvec_sizes[7];
+  indexvec_sizes[0] = static_cast<int>(indexvec.size());
+  indexvec_sizes[1] = (indexvec_sizes[0] > 0) ? static_cast<int>(indexvec[0].size()) : 0;
+  indexvec_sizes[2] = (indexvec_sizes[1] > 0) ? static_cast<int>(indexvec[0][0].size()) : 0;
+  indexvec_sizes[3] = (indexvec_sizes[2] > 0) ? static_cast<int>(indexvec[0][0][0].size()) : 0;
+  indexvec_sizes[4] = (indexvec_sizes[3] > 0) ? static_cast<int>(indexvec[0][0][0][0].size()) : 0;
+  indexvec_sizes[5] = (indexvec_sizes[4] > 0) ? static_cast<int>(indexvec[0][0][0][0][0].size()) : 0;
+  indexvec_sizes[6] = (indexvec_sizes[5] > 0) ? static_cast<int>(indexvec[0][0][0][0][0][0].size()) : 0;
+
+  for (int i = 0; i < 7; ++i) {
+    Settings->Branch(("indexvec_size" + std::to_string(i+1)).c_str(),
+                     &indexvec_sizes[i], ("indexvec_size" + std::to_string(i+1) + "/I").c_str());
+  }
+
+  int SplineBinning_size1 = static_cast<int>(SplineBinning.size());
+  int SplineBinning_size2 = (SplineBinning_size1 > 0) ? static_cast<int>(SplineBinning[0].size()) : 0;
+  int SplineBinning_size3 = (SplineBinning_size2 > 0) ? static_cast<int>(SplineBinning[0][0].size()) : 0;
+
+  Settings->Branch("SplineBinning_size1", &SplineBinning_size1, "SplineBinning_size1/I");
+  Settings->Branch("SplineBinning_size2", &SplineBinning_size2, "SplineBinning_size2/I");
+  Settings->Branch("SplineBinning_size3", &SplineBinning_size3, "SplineBinning_size3/I");
+
+  int SplineModeVecs_size1 = static_cast<int>(SplineModeVecs.size());
+  int SplineModeVecs_size2 = (SplineModeVecs_size1 > 0) ? static_cast<int>(SplineModeVecs[0].size()) : 0;
+  int SplineModeVecs_size3 = (SplineModeVecs_size2 > 0) ? static_cast<int>(SplineModeVecs[0][0].size()) : 0;
+
+  Settings->Branch("SplineModeVecs_size1", &SplineModeVecs_size1, "SplineModeVecs_size1/I");
+  Settings->Branch("SplineModeVecs_size2", &SplineModeVecs_size2, "SplineModeVecs_size2/I");
+  Settings->Branch("SplineModeVecs_size3", &SplineModeVecs_size3, "SplineModeVecs_size3/I");
+
+  std::vector<std::string> SampleNames_temp = SampleNames;
+  Settings->Branch("SampleNames", &SampleNames_temp);
+  std::vector<std::string> SampleTitles_temp = SampleTitles;
+  Settings->Branch("SampleTitles", &SampleTitles_temp);
+
+  Settings->Fill();
+  SplineFile->cd();
+  Settings->Write();
+  delete Settings;
+}
+
+// *****************************************
+void BinnedSplineHandler::PrepareMonolithDir(std::unique_ptr<TFile>& SplineFile) const {
+// *****************************************
+  TTree *MonolithTree = new TTree("MonolithTree", "MonolithTree");
+  MonolithTree->Branch("manycoeff", manycoeff_arr, Form("manycoeff[%d]/%s", CoeffIndex * _nCoeff_, M3::float_t_str_repr));
+  MonolithTree->Branch("isflatarray", isflatarray, Form("isflatarray[%d]/O", MonolithSize));
+
+  std::vector<int> coeffindexvec_temp = coeffindexvec;
+  MonolithTree->Branch("coeffindexvec", &coeffindexvec_temp);
+  std::vector<int> uniquecoeffindices_temp = uniquecoeffindices;
+  MonolithTree->Branch("uniquecoeffindices", &uniquecoeffindices_temp);
+  std::vector<int> uniquesplinevec_Monolith_temp = uniquesplinevec_Monolith;
+  MonolithTree->Branch("uniquesplinevec_Monolith", &uniquesplinevec_Monolith_temp);
+  std::vector<int> UniqueSystIndices_temp = UniqueSystIndices;
+  MonolithTree->Branch("UniqueSystIndices", &UniqueSystIndices_temp);
+  MonolithTree->Branch("xcoeff", xcoeff_arr, Form("xcoeff[%d]/%s", CoeffIndex, M3::float_t_str_repr));
+
+  MonolithTree->Fill();
+  SplineFile->cd();
+  MonolithTree->Write();
+  delete MonolithTree;
+}
+
+// *****************************************
+void BinnedSplineHandler::PrepareIndexDir(std::unique_ptr<TFile>& SplineFile) const {
+// *****************************************
+  // Create a TTree to store the data
+  TTree *IndexTree = new TTree("IndexVec", "IndexVec");
+
+  // Vector holding the 7 dims
+  std::vector<int> Dim(7);
+  int value;
+
+  // Create branches for each dimension
+  for (int d = 0; d < 7; ++d) {
+    IndexTree->Branch(Form("dim%d", d+1), &Dim[d], Form("dim%d/I", d+1));
+  }
+  IndexTree->Branch("value", &value, "value/I");
+
+  // Fill the tree
+  for (size_t i = 0; i < indexvec.size(); ++i) {
+    for (size_t j = 0; j < indexvec[i].size(); ++j) {
+      for (size_t k = 0; k < indexvec[i][j].size(); ++k) {
+        for (size_t l = 0; l < indexvec[i][j][k].size(); ++l) {
+          for (size_t m = 0; m < indexvec[i][j][k][l].size(); ++m) {
+            for (size_t n = 0; n < indexvec[i][j][k][l][m].size(); ++n) {
+              for (size_t p = 0; p < indexvec[i][j][k][l][m][n].size(); ++p) {
+                Dim[0] = static_cast<int>(i);
+                Dim[1] = static_cast<int>(j);
+                Dim[2] = static_cast<int>(k);
+                Dim[3] = static_cast<int>(l);
+                Dim[4] = static_cast<int>(m);
+                Dim[5] = static_cast<int>(n);
+                Dim[6] = static_cast<int>(p);
+                value = static_cast<int>(indexvec[i][j][k][l][m][n][p]);
+                IndexTree->Fill();
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  SplineFile->cd();
+  // Write the tree to the file
+  IndexTree->Write();
+  delete IndexTree;
+}
+
+// *****************************************
+void BinnedSplineHandler::PrepareOtherInfoDir(std::unique_ptr<TFile>& SplineFile) const {
+// *****************************************
+  // Create a new tree for SplineBinning data
+  TTree *SplineBinningTree = new TTree("SplineBinningTree", "SplineBinningTree");
+  std::vector<int> indices(3); // To store the 3D indices
+  TAxis* axis = nullptr;
+  SplineBinningTree->Branch("i", &indices[0], "i/I");
+  SplineBinningTree->Branch("j", &indices[1], "j/I");
+  SplineBinningTree->Branch("k", &indices[2], "k/I");
+  SplineBinningTree->Branch("axis", "TAxis", &axis);
+
+  // Fill the SplineBinningTree
+  for (size_t i = 0; i < SplineBinning.size(); ++i) {
+    for (size_t j = 0; j < SplineBinning[i].size(); ++j) {
+      for (size_t k = 0; k < SplineBinning[i][j].size(); ++k) {
+        axis = SplineBinning[i][j][k];
+        indices[0] = static_cast<int>(i);
+        indices[1] = static_cast<int>(j);
+        indices[2] = static_cast<int>(k);
+        SplineBinningTree->Fill();
+      }
+    }
+  }
+  SplineFile->cd();
+  SplineBinningTree->Write();
+  delete SplineBinningTree;
+
+  std::vector<int> indices_mode(3); // to store 3D indices
+  int mode_value;
+
+  TTree *SplineModeTree = new TTree("SplineModeTree", "SplineModeTree");
+  // Create branches for indices and value
+  SplineModeTree->Branch("i", &indices_mode[0], "i/I");
+  SplineModeTree->Branch("j", &indices_mode[1], "j/I");
+  SplineModeTree->Branch("k", &indices_mode[2], "k/I");
+  SplineModeTree->Branch("value", &mode_value, "value/I");
+
+  // Fill the tree
+  for (size_t i = 0; i < SplineModeVecs.size(); ++i) {
+    for (size_t j = 0; j < SplineModeVecs[i].size(); ++j) {
+      for (size_t k = 0; k < SplineModeVecs[i][j].size(); ++k) {
+        indices_mode[0] = static_cast<int>(i);
+        indices_mode[1] = static_cast<int>(j);
+        indices_mode[2] = static_cast<int>(k);
+        mode_value = SplineModeVecs[i][j][k];
+        SplineModeTree->Fill();
+      }
+    }
+  }
+  // Write the tree to the file
+  SplineFile->cd();
+  SplineModeTree->Write();
+  delete SplineModeTree;
 }

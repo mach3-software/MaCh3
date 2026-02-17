@@ -16,7 +16,7 @@ struct OscChannelInfo {
   /// PDG of oscillated/final flavour
   int FinalPDG;
 
-  /// In case experiment specific would like to have pointer to channel after using @GetOscChannel, they can set pointer to this
+  /// In case experiment specific would like to have pointer to channel after using `GetOscChannel`, they can set pointer to this
   double ChannelIndex;
 };
 
@@ -36,43 +36,89 @@ inline int GetOscChannel(const std::vector<OscChannelInfo>& OscChannel, const in
   throw MaCh3Exception(__FILE__, __LINE__);
 }
 
+/// @brief KS: Store info about MC sample
+struct SampleInfo {
+  /// Default constructor
+  SampleInfo() = default;
+
+  /// Destructor
+  ~SampleInfo() {
+    if(DataHist != nullptr) delete DataHist;
+    if(MCHist   != nullptr) delete MCHist;
+    if(W2Hist   != nullptr) delete W2Hist;
+  }
+
+  /// the strings associated with the variables used for the binning e.g. "RecoNeutrinoEnergy"
+  std::vector<std::string> VarStr;
+
+  /// @brief the name of this sample e.g."muon-like"
+  std::string SampleTitle = "";
+
+  /// @brief Keep track of the dimensions of the sample binning
+  int nDimensions = M3::_BAD_INT_;
+
+  /// names of mc files associated associated with this object
+  std::vector<std::string> mc_files;
+  /// names of spline files associated associated with this object
+  std::vector<std::string> spline_files;
+
+  /// Stores info about oscillation channel for a single sample
+  std::vector<OscChannelInfo> OscChannels;
+
+  /// histogram used for plotting storing data distribution
+  TH1 *DataHist = nullptr;
+  /// histogram used for plotting storing MC distribution
+  TH1* MCHist = nullptr;
+  /// histogram used for plotting storing W2 distribution
+  TH1* W2Hist = nullptr;
+};
+
 /// @brief constructors are same for all three so put in here
-struct FarDetectorCoreInfo {
-  FarDetectorCoreInfo(){}
-  FarDetectorCoreInfo(FarDetectorCoreInfo const &other) = delete;
-  FarDetectorCoreInfo(FarDetectorCoreInfo &&other) = default;
-  FarDetectorCoreInfo& operator=(FarDetectorCoreInfo const &other) = delete;
-  FarDetectorCoreInfo& operator=(FarDetectorCoreInfo &&other) = delete;
+/// @author Dan Barrow
+/// @author Ed Atkin
+/// @author Kamil Skwarczynski
+struct EventInfo {
+  /// @brief Default constructor.
+  EventInfo(){}
+  /// @brief Copy constructor (deleted to prevent copying).
+  EventInfo(EventInfo const &other) = delete;
+  /// @brief Move constructor (defaulted to allow moving).
+  EventInfo(EventInfo &&other) = default;
+  /// @brief Copy assignment operator (deleted).
+  EventInfo& operator=(EventInfo const &other) = delete;
+  /// @brief Move assignment operator (deleted).
+  EventInfo& operator=(EventInfo &&other) = delete;
+  /// @brief default destructor
+  ~EventInfo(){}
 
-  ~FarDetectorCoreInfo(){}
-
-  const int* Target = 0; ///< target the interaction was on
+  /// target the interaction was on
+  const int* Target = 0;
+  /// PDG of neutrino after oscillation
   const int* nupdg  = 0;
+  /// PDG of neutrino before oscillation
   const int* nupdgUnosc = 0;
 
-  //THe x_var and y_vars that you're binning in
-  const double* x_var = &M3::Unity_D;
-  const double* y_var = &M3::Unity_D;
+  /// Pointer to true Neutrino Energy
   const double* rw_etru = &M3::_BAD_DOUBLE_;
+  /// Pointer to true cosine zenith
   const double* rw_truecz = &M3::_BAD_DOUBLE_;
 
   /// Pointers to normalisation weights which are being taken from Parameter Handler
-  std::vector<const double*> xsec_norm_pointers;
-  /// Pointers to spline weights which are being calculated by Splines Handler
-  std::vector<const M3::float_t*> xsec_spline_pointers;
-  /// Total weight of norm and spline parameters
-  M3::float_t xsec_w = 1.;
-  /// pointer to oscillation weight which is being calculated by Oscillation Handler
-  const M3::float_t* osc_w_pointer = &M3::Unity;
-  /// Pointers to @xsec_w, @osc_w_pointer and remaining experiment specific weights
+  std::vector<const double*> norm_pointers;
+
+  /// Pointers to weights like oscillation spline etc
   std::vector<const M3::float_t*> total_weight_pointers;
 
-  //M3::float_t total_w  = M3::_BAD_INT_;
+  /// The x_var and y_vars and beyond that you're binning in
+  std::vector<const double*> KinVar;
+  /// starting bins for each dimensions allowing to perform quick lookup
+  std::vector<int> NomBin;
 
-  int NomXBin = -1;
-  int NomYBin = -1;
-
+  /// Nominal sample to which event is associated
+  int NominalSample = M3::_BAD_INT_;
+  /// Is event NC or not
   bool isNC = false;
 
+  /// Pointer to MaCh3 mode
   const double* mode = &M3::Unity_D;
 };

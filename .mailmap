@@ -1,4 +1,5 @@
-# Type to see number of commits per user: git shortlog -n -s
+# KS: Type to see number of commits per user: git shortlog -n -s
+# KS: Type to see number of commits per user with email: git shortlog -n -s --email
 
 # Edward Atkin
 Edward Atkin <edhuthwaite@aol.com> EdAtkin <edhuthwaite@aol.com>
@@ -7,6 +8,10 @@ Edward Atkin <edhuthwaite@aol.com> EdAtkin <35494466+EdAtkin@users.noreply.githu
 # Daniel Barrow
 Daniel Barrow <danbarrow257@gmail.com> dbarrow257 <danbarrow257@gmail.com>
 Daniel Barrow <danbarrow257@gmail.com> dbarrow257 <31003009+dbarrow257@users.noreply.github.com>
+
+# David Riley
+David Riley <davidriley12345@gmail.com> driley <davidriley12345@gmail.com>
+David Riley <davidriley12345@gmail.com> daveriley <davidriley12345@gmail.com>
 
 # Kamil Skwarczynski
 Kamil Skwarczynski <skwarczynskikamil@gmail.com> Kamil <45295406+KSkwarczynski@users.noreply.github.com>
@@ -21,6 +26,11 @@ Henry Wallace <henryisrael08@gmail.com> Henry Wallace <henry.wallace@rhul.ac.uk>
 Henry Wallace <henryisrael08@gmail.com> Henry Wallace <henryi@beluga3.int.ets1.calculquebec.ca>
 Henry Wallace <henryisrael08@gmail.com> Henry Wallace <henryi@beluga2.int.ets1.calculquebec.ca>
 Henry Wallace <henryisrael08@gmail.com> Henry Wallace <henryi@beluga4.int.ets1.calculquebec.ca>
+Henry Wallace <henryisrael08@gmail.com> Henry Wallace <henryi@narval1.narval.calcul.quebec>
+Henry Wallace <henryisrael08@gmail.com> Henry Wallace <henryi@login1.int.fir.alliancecan.ca>
+Henry Wallace <henryisrael08@gmail.com> Henry Wallace <henryi@narval3.narval.calcul.quebec>
+Henry Wallace <henryisrael08@gmail.com> Henry Wallace <henryi@beluga1.int.ets1.calculquebec.ca>
+Henry Wallace <henryisrael08@gmail.com> Henry Wallace <henryi@narval2.narval.calcul.quebec>
 
 # Michael Reh
 Michael Reh <michael.reh@colorado.edu> mreh528 <michael.reh@colorado.edu>
@@ -33,8 +43,16 @@ Ewan Miller <ewan.miller@kcl.ac.uk> Ewan <ewan.miller@kcl.ac.uk>
 Pierre Granger <pierre.granger@cea.fr> Pierre GRANGER <pgranger23@gmail.com>
 
 # Tomas Nosek
-Tomas Nosek <94356389+nosektom@users.noreply.github.com> nosektom <94356389+nosektom@users.noreply.github.com>
+Tomas Nosek <tomas.nosek@matfyz.cuni.cz> nosektom <94356389+nosektom@users.noreply.github.com>
+Tomas Nosek <tomas.nosek@matfyz.cuni.cz> TN <tomas.nosek@matfyz.cuni.cz>
 
 #Yashwanth S Prabhu
 Yashwanth S Prabhu  <yashwanthsprabhu@gmail.com> yash-quark <yashwanthsprabhu@gmail.com>
 Yashwanth S Prabhu  <yashwanthsprabhu@gmail.com> Yashwanth S Prabhu <36967264+yash-quark@users.noreply.github.com>
+
+# Jude Martin
+Jude Martin <j.martin24@imperial.ac.uk> Jude <j.martin24@imperial.ac.uk>
+Jude Martin <j.martin24@imperial.ac.uk> Jude Martin <jmm224@lxgpu04.hep.ph.ic.ac.uk>
+
+# Hank Hua
+Hank Hua <h.hua23@imperial.ac.uk> hank-hua <146197275+hank-hua@users.noreply.github.com>

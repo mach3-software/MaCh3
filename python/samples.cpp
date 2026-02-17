@@ -13,40 +13,236 @@ public:
     using SampleHandlerBase::SampleHandlerBase;
 
     /* Trampoline (need one for each virtual function) */
-    std::string GetSampleName(int iSample) const override {
+    std::string GetName() const override {
         PYBIND11_OVERRIDE_PURE(
             std::string,          /* Return type */
-            SampleHandlerBase, /* Parent class */
-            GetSampleName, /* Name of function in C++ (must match Python name) */
-            iSample         /* Argument(s) */
+            SampleHandlerBase,    /* Parent class */
+            GetName, /* Name of function in C++ (must match Python name) */
+        );
+    }
+
+    /* Trampoline (need one for each virtual function) */
+    std::string GetSampleTitle(const int iSample) const override {
+        PYBIND11_OVERRIDE_PURE(
+            std::string,          /* Return type */
+            SampleHandlerBase,    /* Parent class */
+            GetSampleTitle,       /* Name of function in C++ (must match Python name) */
+            iSample               /* Argument(s) */
+        );
+    }
+
+    /* Trampoline (need one for each virtual function) */
+    int GetNOscChannels(const int iSample) const override {
+        PYBIND11_OVERRIDE_PURE(
+            int,                  /* Return type */
+            SampleHandlerBase,    /* Parent class */
+            GetNOscChannels,      /* Name of function in C++ (must match Python name) */
+            iSample               /* Argument(s) */
         );
     }
 
     /* Trampoline (need one for each virtual function) */
     void Reweight() override {
-        PYBIND11_OVERRIDE_PURE(
-            void,          /* Return type */
+        PYBIND11_OVERRIDE_PURE_NAME(
+            void,              /* Return type */
             SampleHandlerBase, /* Parent class */
-            Reweight       /* Name of function in C++ (must match Python name) */
+            "reweight",
+            Reweight           /* Name of function in C++ (must match Python name) */
+        );
+    }
+
+
+    /* Trampoline (need one for each virtual function) */
+    double GetSampleLikelihood(const int iSample) const override {
+        PYBIND11_OVERRIDE_PURE_NAME(
+            double,                /* Return type */
+            SampleHandlerBase,     /* Parent class */
+            "get_sample_likelihood",
+            GetSampleLikelihood,   /* Name of function in C++ (must match Python name) */
+            iSample                /* Argument(s) */
         );
     }
 
     /* Trampoline (need one for each virtual function) */
     void CleanMemoryBeforeFit() override {
-        PYBIND11_OVERRIDE_PURE(
-            void,          /* Return type */
-            SampleHandlerBase, /* Parent class */
-            CleanMemoryBeforeFit       /* Name of function in C++ (must match Python name) */
+        PYBIND11_OVERRIDE_PURE_NAME(
+            void,                  /* Return type */
+            SampleHandlerBase,     /* Parent class */
+            "clean_memory_before_fit",
+            CleanMemoryBeforeFit   /* Name of function in C++ (must match Python name) */
         );
     }
 
-    double GetLikelihood() override {
+    /* Trampoline (need one for each virtual function) */
+    void PrintRates(const bool DataOnly = false) override  {
+        PYBIND11_OVERRIDE_PURE(
+            void,                 /* Return type */
+            SampleHandlerBase,    /* Parent class */
+            PrintRates,           /* Name of function in C++ (must match Python name) */
+            DataOnly              /* Argument(s) */
+        );
+    }
+
+    /* Trampoline (need one for each virtual function) */
+    std::string GetKinVarName(const int iSample, const int Dimension) const override  {
+        PYBIND11_OVERRIDE_PURE(
+            std::string,          /* Return type */
+            SampleHandlerBase,    /* Parent class */
+            GetKinVarName,        /* Name of function in C++ (must match Python name) */
+            iSample,              /* Argument(s) */
+            Dimension             /* Argument(s) */
+        );
+    }
+
+    /* Trampoline (need one for each virtual function) */
+    std::vector<double> ReturnKinematicParameterBinning(const int Sample, const std::string &KinematicParameter) const override  {
+        PYBIND11_OVERRIDE_PURE(
+            std::vector<double>,  /* Return type */
+            SampleHandlerBase,    /* Parent class */
+            GetKinVarName,        /* Name of function in C++ (must match Python name) */
+            Sample,               /* Argument(s) */
+            KinematicParameter    /* Argument(s) */
+        );
+    }
+
+    TH1* GetDataHist(const int Sample) override {
+        PYBIND11_OVERRIDE_PURE(
+            TH1*,                  /* Return type */
+            SampleHandlerBase,     /* Parent class */
+            GetDataHist,           /* Name of function in C++ (must match Python name) */
+            Sample                 /* Argument(s) */
+        );
+    }
+
+    TH1* GetMCHist(const int Sample) override {
+        PYBIND11_OVERRIDE_PURE(
+            TH1*,                  /* Return type */
+            SampleHandlerBase,     /* Parent class */
+            GetMCHist,             /* Name of function in C++ (must match Python name) */
+            Sample                 /* Argument(s) */
+        );
+    }
+
+    TH1* GetW2Hist(const int Sample) override {
+        PYBIND11_OVERRIDE_PURE(
+            TH1*,                  /* Return type */
+            SampleHandlerBase,     /* Parent class */
+            GetW2Hist,             /* Name of function in C++ (must match Python name) */
+            Sample                 /* Argument(s) */
+        );
+    }
+
+    double GetLikelihood() const override {
         PYBIND11_OVERRIDE_PURE_NAME(
-            double,        /* Return type */
+            double,            /* Return type */
             SampleHandlerBase, /* Parent class */
-            "get_likelihood", /* Python name*/
-            GetLikelihood  /* Name of function in C++ (must match Python name) */
-                           /* Argument(s) */
+            "get_likelihood",  /* Python name*/
+            GetLikelihood      /* Name of function in C++ (must match Python name) */
+                               /* Argument(s) */
+        );
+    }
+
+    TH1* Get1DVarHistByModeAndChannel(const int iSample,
+                                      const std::string& ProjectionVar_Str,
+                                      int kModeToFill = -1,
+                                      int kChannelToFill = -1,
+                                      int WeightStyle = 0,
+                                      TAxis* Axis = nullptr) override {
+        PYBIND11_OVERRIDE_PURE(
+            TH1*,                     /* Return type */
+            SampleHandlerBase,        /* Parent class */
+            Get1DVarHistByModeAndChannel, /* Name of function in C++ */
+            iSample,
+            ProjectionVar_Str,
+            kModeToFill,
+            kChannelToFill,
+            WeightStyle,
+            Axis
+        );
+    }
+
+    TH2* Get2DVarHistByModeAndChannel(const int iSample,
+                                      const std::string& ProjectionVar_StrX,
+                                      const std::string& ProjectionVar_StrY,
+                                      int kModeToFill = -1,
+                                      int kChannelToFill = -1,
+                                      int WeightStyle = 0,
+                                      TAxis* AxisX = nullptr,
+                                      TAxis* AxisY = nullptr) override {
+        PYBIND11_OVERRIDE_PURE(
+            TH2*,                        /* Return type */
+            SampleHandlerBase,           /* Parent class */
+            Get2DVarHistByModeAndChannel, /* Name of function in C++ */
+            iSample,
+            ProjectionVar_StrX,
+            ProjectionVar_StrY,
+            kModeToFill,
+            kChannelToFill,
+            WeightStyle,
+            AxisX,
+            AxisY
+        );
+    }
+
+    TH1* Get1DVarHist(const int iSample,
+                      const std::string &ProjectionVar,
+                      const std::vector<KinematicCut> &EventSelectionVec = {},
+                      int WeightStyle = 0,
+                      TAxis *Axis = nullptr,
+                      const std::vector<KinematicCut> &SubEventSelectionVec = {}) override {
+        PYBIND11_OVERRIDE_PURE(
+            TH1*,                     /* Return type */
+            SampleHandlerBase,        /* Parent class */
+            Get1DVarHist,             /* Name of function in C++ */
+            iSample,
+            ProjectionVar,
+            EventSelectionVec,
+            WeightStyle,
+            Axis,
+            SubEventSelectionVec
+        );
+    }
+
+    TH2* Get2DVarHist(const int iSample,
+                      const std::string& ProjectionVarX,
+                      const std::string& ProjectionVarY,
+                      const std::vector<KinematicCut>& EventSelectionVec = {},
+                      int WeightStyle = 0,
+                      TAxis* AxisX = nullptr,
+                      TAxis* AxisY = nullptr,
+                      const std::vector<KinematicCut>& SubEventSelectionVec = {}) override {
+        PYBIND11_OVERRIDE_PURE(
+            TH2*,                     /* Return type */
+            SampleHandlerBase,        /* Parent class */
+            Get2DVarHist,             /* Name of function in C++ */
+            iSample,
+            ProjectionVarX,
+            ProjectionVarY,
+            EventSelectionVec,
+            WeightStyle,
+            AxisX,
+            AxisY,
+            SubEventSelectionVec
+        );
+    }
+
+    int GetNDim(const int Sample) const override {
+        PYBIND11_OVERRIDE_PURE(
+            int,                      /* Return type */
+            SampleHandlerBase,        /* Parent class */
+            GetNDim,                  /* Name of function in C++ */
+            Sample
+        );
+    }
+
+    std::string GetFlavourName(const int iSample,
+                               const int iChannel) const override {
+        PYBIND11_OVERRIDE_PURE(
+            std::string,              /* Return type */
+            SampleHandlerBase,        /* Parent class */
+            GetFlavourName,           /* Name of function in C++ */
+            iSample,
+            iChannel
         );
     }
 };
@@ -59,13 +255,13 @@ public:
     using SampleHandlerFD::SampleHandlerFD;
 
     /* Trampoline (need one for each virtual function) */
-    void SetupWeightPointers() override {
+    void AddAdditionalWeightPointers() override {
         PYBIND11_OVERRIDE_PURE_NAME(
-            void,            /* Return type */
-            SampleHandlerFD, /* Parent class */
-            "setup_weight_pointers", /*python name*/
-            SetupWeightPointers,     /* Name of function in C++ */
-                             /* Argument(s) */
+            void,                             /* Return type */
+            SampleHandlerFD,                  /* Parent class */
+            "add_additional_weight_pointers", /*python name*/
+            AddAdditionalWeightPointers,      /* Name of function in C++ */
+                                              /* Argument(s) */
         );
     }
 
@@ -193,8 +389,7 @@ public:
     }
 };
 
-void initSamples(py::module &m){
-
+void initSamples(py::module &m) {
     auto m_samples = m.def_submodule("samples");
     m_samples.doc() =
         "This is a Python binding of MaCh3s C++ based samples library.";

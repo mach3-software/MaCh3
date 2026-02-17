@@ -1,6 +1,7 @@
 // MaCh3 includes
 #include "Manager/Manager.h"
 #include "Samples/SampleStructs.h"
+#include "Samples/HistogramUtils.h"
 #include "Parameters/ParameterHandlerUtils.h"
 
 _MaCh3_Safe_Include_Start_ //{
@@ -31,22 +32,19 @@ _MaCh3_Safe_Include_End_ //}
 ///
 /// @todo KS: This should really be moved to MCMC Processor
 
-std::vector <double> nominal;
-std::vector <bool> isFlat;
-std::vector<TString> BranchNames;
-std::vector<std::string> ParamNames;
-int size;
-
-double** invCovMatrix;
-
-void ReadXSecFile(const std::string& inputFile)
+void ReadCovFile(const std::string& inputFile,
+                 std::vector <double>& Prior,
+                 std::vector <bool>& isFlat,
+                 std::vector<std::string>& ParamNames,
+                 std::vector<std::vector<double>>& invCovMatrix,
+                 int& nParams)
 {
   // Now read the MCMC file
-  TFile *TempFile = new TFile(inputFile.c_str(), "open");
+  TFile *TempFile = M3::Open(inputFile, "open", __FILE__, __LINE__);
 
   // Get the matrix
   TDirectory* CovarianceFolder = TempFile->Get<TDirectory>("CovarianceFolder");
-  TMatrixDSym *XSecMatrix = M3::GetCovMatrixFromChain(CovarianceFolder);
+  TMatrixDSym *CovMatrix = M3::GetCovMatrixFromChain(CovarianceFolder);
 
   // Get the settings for the MCMC
   TMacro *Config = TempFile->Get<TMacro>("MaCh3_Config");
@@ -58,11 +56,11 @@ void ReadXSecFile(const std::string& inputFile)
 
   YAML::Node Settings = TMacroToYAML(*Config);
 
-  //CW: Get the xsec Covariance matrix
-  std::vector<std::string> XsecCovPos = GetFromManager<std::vector<std::string>>(Settings["General"]["Systematics"]["XsecCovFile"], {"none"});
-  if(XsecCovPos.back() == "none")
+  //CW: Get the Covariance matrix
+  std::vector<std::string> CovPos = GetFromManager<std::vector<std::string>>(Settings["General"]["Systematics"]["XsecCovFile"], {"none"});
+  if(CovPos.back() == "none")
   {
-    MACH3LOG_WARN("Couldn't find XsecCov branch in output");
+    MACH3LOG_WARN("Couldn't find Cov branch in output");
     MaCh3Utils::PrintConfig(Settings);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
@@ -70,54 +68,47 @@ void ReadXSecFile(const std::string& inputFile)
   //KS:Most inputs are in ${MACH3}/inputs/blarb.root
   if (std::getenv("MACH3") != nullptr) {
     MACH3LOG_INFO("Found MACH3 environment variable: {}", std::getenv("MACH3"));
-    for(unsigned int i = 0; i < XsecCovPos.size(); i++)
-      XsecCovPos[i].insert(0, std::string(std::getenv("MACH3"))+"/");
+    for(unsigned int i = 0; i < CovPos.size(); i++)
+      CovPos[i].insert(0, std::string(std::getenv("MACH3"))+"/");
   }
 
-  YAML::Node XSecFile;
-  XSecFile["Systematics"] = YAML::Node(YAML::NodeType::Sequence);
-  for(unsigned int i = 0; i < XsecCovPos.size(); i++)
+  YAML::Node CovFile;
+  CovFile["Systematics"] = YAML::Node(YAML::NodeType::Sequence);
+  for(unsigned int i = 0; i < CovPos.size(); i++)
   {
-    YAML::Node YAMLDocTemp = M3OpenConfig(XsecCovPos[i]);
+    YAML::Node YAMLDocTemp = M3OpenConfig(CovPos[i]);
     for (const auto& item : YAMLDocTemp["Systematics"]) {
-      XSecFile["Systematics"].push_back(item);
+      CovFile["Systematics"].push_back(item);
     }
   }
 
-  size = XSecMatrix->GetNrows();
+  nParams = CovMatrix->GetNrows();
 
-  auto systematics = XSecFile["Systematics"];
+  auto systematics = CovFile["Systematics"];
   for (auto it = systematics.begin(); it != systematics.end(); ++it)
   {
     auto const &param = *it;
 
     ParamNames.push_back(param["Systematic"]["Names"]["FancyName"].as<std::string>());
-    nominal.push_back( param["Systematic"]["ParameterValues"]["PreFitValue"].as<double>() );
+    Prior.push_back( param["Systematic"]["ParameterValues"]["PreFitValue"].as<double>() );
 
     bool flat = false;
     if (param["Systematic"]["FlatPrior"]) { flat = param["Systematic"]["FlatPrior"].as<bool>(); }
     isFlat.push_back( flat );
   }
 
-  XSecMatrix->Invert();
+  CovMatrix->Invert();
   //KS: Let's use double as it is faster than TMatrix
-  invCovMatrix = new double*[size];
-  for (int i = 0; i < size; i++)
-  {
-    invCovMatrix[i] = new double[size];
-    for (int j = 0; j < size; ++j)
-    {
-      invCovMatrix[i][j] = -999;
-    }
-  }
+  invCovMatrix.resize(nParams, std::vector<double>(nParams, -999));
+
   #ifdef MULTITHREAD
   #pragma omp parallel for collapse(2)
   #endif
-  for (int i = 0; i < size; i++)
+  for (int i = 0; i < nParams; i++)
   {
-    for (int j = 0; j < size; ++j)
+    for (int j = 0; j < nParams; ++j)
     {
-      invCovMatrix[i][j] = (*XSecMatrix)(i,j);
+      invCovMatrix[i][j] = (*CovMatrix)(i,j);
     }
   }
 
@@ -125,72 +116,17 @@ void ReadXSecFile(const std::string& inputFile)
   delete TempFile;
 }
 
-void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
+void LoadSettings(YAML::Node& Settings,
+                  std::vector<std::string>& SetsNames,
+                  std::vector<std::string>& FancyTitle,
+                  std::vector<std::vector<bool>>& isRelevantParam,
+                  const std::vector<std::string>& ParamNames,
+                  const int nParams)
 {
-  auto canvas = std::make_unique<TCanvas>("canvas", "canvas", 0, 0, 1024, 1024);
-  canvas->SetGrid();
-  canvas->SetTickx();
-  canvas->SetTicky();
-
-  canvas->SetBottomMargin(0.1f);
-  canvas->SetTopMargin(0.02f);
-  canvas->SetRightMargin(0.08f);
-  canvas->SetLeftMargin(0.15f);
-
-  gStyle->SetOptTitle(0); 
-  gStyle->SetOptStat(0); 
-  gStyle->SetPalette(51);
-
-  ReadXSecFile(inputFile);
-
-  // Open the Chain
-  TChain* Chain = new TChain("posteriors","");
-  Chain->Add(inputFile.c_str()); 
-    
-  // Get the list of branches
-  TObjArray* brlis = Chain->GetListOfBranches();
-
-  // Get the number of branches
-  int nBranches = brlis->GetEntries();
-  int RelevantBranches = 0;
-  for (int i = 0; i < nBranches; i++) 
-  {
-    // Get the TBranch and its name
-    TBranch* br = static_cast<TBranch*>(brlis->At(i));
-    if(!br){
-      MACH3LOG_ERROR("Invalid branch at position {}", i);
-      throw MaCh3Exception(__FILE__,__LINE__);
-    }
-    TString bname = br->GetName();
-
-    // If we're on beam systematics
-    if(bname.BeginsWith("xsec_"))
-    {
-      BranchNames.push_back(bname);
-      RelevantBranches++;
-    }
-  }
-  
-  // Set all the branches to off
-  Chain->SetBranchStatus("*", false);
-  
-  std::vector<double> fParProp(RelevantBranches);
-  // Turn on the branches which we want for parameters
-  for (int i = 0; i < RelevantBranches; ++i) 
-  {
-    Chain->SetBranchStatus(BranchNames[i].Data(), true);
-    Chain->SetBranchAddress(BranchNames[i].Data(), &fParProp[i]);
-  }
-
-  YAML::Node Settings = YAML::LoadFile(configFile.c_str());
-
-  std::vector<std::string> SetsNames;
+  std::vector<std::string> node = Settings["GetPenaltyTerm"]["PenaltySets"].as<std::vector<std::string>>();
   std::vector<std::vector<std::string>> RemoveNames;
   std::vector<bool> Exclude;
-  std::vector<std::string> FancyTittle;
 
-  std::vector<std::vector<bool>> isRelevantParam;
-  std::vector<std::string> node = Settings["GetPenaltyTerm"]["PenaltySets"].as<std::vector<std::string>>();
   for (unsigned int i = 0; i < node.size(); i++)
   {
     std::string ParName = node[i];
@@ -200,7 +136,7 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
 
     RemoveNames.push_back(Set[0].as<std::vector<std::string>>());
     Exclude.push_back(Set[1].as<bool>());
-    FancyTittle.push_back(Set[2].as<std::string>());
+    FancyTitle.push_back(Set[2].as<std::string>());
   }
 
   const int NSets = int(SetsNames.size());
@@ -209,14 +145,14 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
   //Loop over sets in the config
   for(int i = 0; i < NSets; i++)
   {
-    isRelevantParam[i].resize(size);
+    isRelevantParam[i].resize(nParams);
     int counter = 0;
     //Loop over parameters in the Covariance object
-    for (int j = 0; j < size; j++)
+    for (int j = 0; j < nParams; j++)
     {
       isRelevantParam[i][j] = false;
 
-      //KS: Here we loop over all names and if parameters wasn't matched then we set it is relevant. For xsec it is easier to do it like this
+      //KS: Here we loop over all names and if parameters wasn't matched then we set it is relevant.
       if(Exclude[i])
       {
         bool found = false;
@@ -249,7 +185,80 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
     }
     MACH3LOG_INFO(" Found {} params for set {}", counter, SetsNames[i]);
   }
+}
 
+void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
+{
+  auto canvas = std::make_unique<TCanvas>("canvas", "canvas", 0, 0, 1024, 1024);
+  canvas->SetGrid();
+  canvas->SetTickx();
+  canvas->SetTicky();
+
+  canvas->SetBottomMargin(0.1f);
+  canvas->SetTopMargin(0.02f);
+  canvas->SetRightMargin(0.08f);
+  canvas->SetLeftMargin(0.15f);
+
+  gStyle->SetOptTitle(0); 
+  gStyle->SetOptStat(0); 
+  gStyle->SetPalette(51);
+
+  std::vector <double> Prior;
+  std::vector <bool> isFlat;
+  std::vector<std::string> ParamNames;
+  std::vector<std::vector<double>> invCovMatrix;
+  int nParams;
+  ReadCovFile(inputFile, Prior, isFlat, ParamNames, invCovMatrix, nParams);
+
+  std::vector<TString> BranchNames;
+
+  // Open the Chain
+  TChain* Chain = new TChain("posteriors","");
+  Chain->Add(inputFile.c_str()); 
+    
+  // Get the list of branches
+  TObjArray* brlis = Chain->GetListOfBranches();
+
+  // Get the number of branches
+  int nBranches = brlis->GetEntries();
+  int RelevantBranches = 0;
+  for (int i = 0; i < nBranches; i++) 
+  {
+    // Get the TBranch and its name
+    TBranch* br = static_cast<TBranch*>(brlis->At(i));
+    if(!br){
+      MACH3LOG_ERROR("Invalid branch at position {}", i);
+      throw MaCh3Exception(__FILE__,__LINE__);
+    }
+    TString bname = br->GetName();
+
+    // If we're on beam systematics
+    if(bname.BeginsWith("param_"))
+    {
+      BranchNames.push_back(bname);
+      RelevantBranches++;
+    }
+  }
+  
+  // Set all the branches to off
+  Chain->SetBranchStatus("*", false);
+  
+  std::vector<double> fParProp(RelevantBranches);
+  // Turn on the branches which we want for parameters
+  for (int i = 0; i < RelevantBranches; ++i) 
+  {
+    Chain->SetBranchStatus(BranchNames[i].Data(), true);
+    Chain->SetBranchAddress(BranchNames[i].Data(), &fParProp[i]);
+  }
+
+  YAML::Node Settings = M3OpenConfig(configFile);
+  std::vector<std::string> SetsNames;
+  std::vector<std::string> FancyTitle;
+  std::vector<std::vector<bool>> isRelevantParam;
+
+  LoadSettings(Settings, SetsNames, FancyTitle, isRelevantParam, ParamNames, nParams);
+
+  const int NSets = int(SetsNames.size());
   int AllEvents = int(Chain->GetEntries());
   std::vector<std::unique_ptr<TH1D>> hLogL(NSets);
   for (int i = 0; i < NSets; i++) {
@@ -273,11 +282,11 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
     // The parallel region needs to stretch beyond the for loop!
     #pragma omp parallel private(logL_private)
     {
-      logL_private = new double[NSets]();
+      logL_private = new double[NSets];
       for(int k = 0; k < NSets; ++k) logL_private[k] = 0.;
 
       #pragma omp for
-      for (int i = 0; i < size; i++)
+      for (int i = 0; i < nParams; i++)
       {
         for (int j = 0; j <= i; ++j)
         {
@@ -292,7 +301,7 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
                 //KS: Since matrix is symmetric we can calculate non diagonal elements only once and multiply by 2, can bring up to factor speed decrease.
                 int scale = 1;
                 if(i != j) scale = 2;
-                logL_private[k] += scale * 0.5*(fParProp[i] - nominal[i])*(fParProp[j] - nominal[j])*invCovMatrix[i][j];
+                logL_private[k] += scale * 0.5*(fParProp[i] - Prior[i])*(fParProp[j] - Prior[j])*invCovMatrix[i][j];
               }
             }
           }
@@ -309,7 +318,7 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
     }//End omp range
 
 #else
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < nParams; i++)
     {
       for (int j = 0; j <= i; ++j)
       {
@@ -324,13 +333,13 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
               //KS: Since matrix is symmetric we can calculate non diagonal elements only once and multiply by 2, can bring up to factor speed decrease.
               int scale = 1;
               if(i != j) scale = 2;
-              logL[k] += scale * 0.5*(fParProp[i] - nominal[i])*(fParProp[j] - nominal[j])*invCovMatrix[i][j];
+              logL[k] += scale * 0.5*(fParProp[i] - Prior[i])*(fParProp[j] - Prior[j])*invCovMatrix[i][j];
             }
           }
         }
       }
     }
-#endif
+#endif // end MULTITHREAD
     for(int k = 0; k < NSets; ++k)
     {
       hLogL[k]->SetBinContent(n, logL[k]);
@@ -339,7 +348,7 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
 
   // Directory for posteriors
   std::string OutputName = inputFile + "_PenaltyTerm" +".root";
-  TFile* OutputFile = new TFile(OutputName.c_str(), "recreate");
+  TFile *OutputFile = M3::Open(OutputName, "recreate", __FILE__, __LINE__);
   TDirectory *PenaltyTermDir = OutputFile->mkdir("PenaltyTerm");
 
   canvas->Print(Form("%s_PenaltyTerm.pdf[",inputFile.c_str()), "pdf");
@@ -347,9 +356,9 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
   {
     const double Maximum = hLogL[i]->GetMaximum();
     hLogL[i]->GetYaxis()->SetRangeUser(0., Maximum*1.2);
-    hLogL[i]->SetTitle(FancyTittle[i].c_str());
+    hLogL[i]->SetTitle(FancyTitle[i].c_str());
     hLogL[i]->GetXaxis()->SetTitle("Step");
-    hLogL[i]->GetYaxis()->SetTitle(FancyTittle[i].c_str());
+    hLogL[i]->GetYaxis()->SetTitle(FancyTitle[i].c_str());
     hLogL[i]->GetYaxis()->SetTitleOffset(1.4f);
 
     hLogL[i]->Draw("");
@@ -362,11 +371,6 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
   canvas->Print(Form("%s_PenaltyTerm.pdf]",inputFile.c_str()), "pdf");
   delete Chain;
 
-  for (int i = 0; i < size; i++)
-  {
-    delete[] invCovMatrix[i];
-  }
-  delete[] invCovMatrix;
   OutputFile->Close();
   delete OutputFile;
 }
@@ -378,7 +382,7 @@ int main(int argc, char *argv[])
   if (argc != 3 )
   {
     MACH3LOG_WARN("Something went wrong ");
-    MACH3LOG_WARN("./GetPenaltyTerm root_file_to_analyse.root ");
+    MACH3LOG_WARN("{} root_file_to_analyse.root", argv[1]);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   std::string filename = argv[1];

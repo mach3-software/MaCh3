@@ -1,0 +1,63 @@
+---
+# KS: Make sure find package works on MaCh3 software
+name: Find Package C
+
+# The events that trigger the workflow
+on:
+  pull_request:
+    branches: [ develop ]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false  # KS: Prevents cancellation of remaining jobs if one fails
+      matrix:
+        include:
+          - name: Find Package Alma9
+            container: ghcr.io/mach3-software/mach3:alma9v2.2.1
+            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DNuFastLinear_ENABLED=ON -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProb3ppLinear_ENABLED=ON
+
+          - name: Find Package Rocky9 CUDA
+            container: ghcr.io/mach3-software/mach3:rocky9cudav2.2.0
+            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DNuFastLinear_ENABLED=ON -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DProbGPU_ENABLED=ON
+
+    name: ${{ matrix.name }}
+
+    steps:
+    - uses: actions/checkout@v6
+
+    # KS: Free some space, as some MaCh3 containers can be heavy...
+    - uses: ./.github/actions/free-disk-space
+
+    - name: Pull container
+      run: docker pull ${{ matrix.container }}
+
+    - name: Run FindPackage build
+      run: |
+        docker run --rm \
+          -v ${{ github.workspace }}:/workspace \
+          -w /workspace \
+          ${{ matrix.container }} \
+          bash -c '
+            set -e
+            cd /opt
+            git clone https://github.com/mach3-software/MaCh3.git MaCh3Core
+            cd MaCh3Core
+            git checkout "${{ github.head_ref || github.ref_name }}"
+            mkdir build && cd build
+            cmake .. '"${{ matrix.cmakeoptions }}"'
+            make -j4 install
+
+            cd /opt
+            git clone https://github.com/mach3-software/MaCh3Tutorial.git
+            cd MaCh3Tutorial
+            mkdir build && cd build
+            source /opt/MaCh3Core/build/bin/setup.MaCh3.sh
+            cmake .. -DUse_External_MaCh3=TRUE
+            make -j4 install
+          '

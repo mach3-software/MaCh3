@@ -51,7 +51,7 @@ template<class HistType> HistType* RatioHists(HistType* NumHist, HistType* Denom
 TH2Poly* RatioPolys(TH2Poly* NumPoly, TH2Poly* DenomPoly);
 
 /// @brief WP: Helper function to create TH2Poly histogram with uniform binning
-/// @param name This will be tittle of output histogram
+/// @param name This will be title of output histogram
 /// @param BinArray_x Bin edges for X axis
 /// @param BinArray_y Bin edges for Y axis
 TH2Poly* MakePolyHist(const std::string& name, const std::vector<double>& BinArray_x, const std::vector<double>& BinArray_y);
@@ -69,6 +69,9 @@ void MakeFluctuatedHistogramStandard(TH1D *FluctHist, TH1D* PolyHist, TRandom3* 
 /// @brief Make Poisson fluctuation of TH1D hist using slow method which is only for cross-check
 void MakeFluctuatedHistogramAlternative(TH1D *FluctHist, TH1D* PolyHist, TRandom3* rand);
 
+/// @brief Make Poisson fluctuation of TH2D hist
+void MakeFluctuatedHistogramAlternative(TH2D *FluctHist, TH2D* PolyHist, TRandom3* rand);
+
 /// @brief Make Poisson fluctuation of TH2Poly hist using default fast method
 void MakeFluctuatedHistogramStandard(TH2Poly *FluctHist, TH2Poly* PolyHist, TRandom3* rand);
 /// @brief Make Poisson fluctuation of TH2Poly hist using slow method which is only for cross-check
@@ -81,7 +84,7 @@ int GetRandomPoly2(const TH2Poly* PolyHist, TRandom3* rand);
 /// @param sigmaArrayLeft sigma var hist at -1 or -3 sigma shift
 /// @param sigmaArrayCentr sigma var hist at prior values
 /// @param sigmaArrayRight sigma var hist at +1 or +3 sigma shift
-/// @param title A tittle for returned object
+/// @param title A title for returned object
 /// @return A `TGraphAsymmErrors` object that visualizes the sigma variation of spectra, showing confidence intervals between different sigma shifts.
 std::unique_ptr<TGraphAsymmErrors> MakeAsymGraph(TH1* sigmaArrayLeft, TH1* sigmaArrayCentr, TH1* sigmaArrayRight, const std::string& title);
 
@@ -120,7 +123,7 @@ inline std::string file_exists(std::string filename) {
 }
 
 /// @brief DB Get the Cherenkov momentum threshold in MeV
-double returnCherenkovThresholdMomentum(int PDG);
+double returnCherenkovThresholdMomentum(const int PDG);
 
 /// @brief Recalculate Q^2 after Eb shift. Takes in shifted lepton momentum, lepton angle, and true neutrino energy
 double CalculateQ2(double PLep, double PUpd, double EnuTrue, double InitialQ2 = 0.0);
@@ -133,6 +136,7 @@ namespace M3 {
 ///
 /// @tparam ObjectType The type of the object to clone for example TH1D or TH2Poly.
 /// @param obj Pointer to the object to clone.
+/// @param name Optional argument allowing to set new name of cloned object
 /// @return std::unique_ptr<ObjectType> Owning pointer to the cloned object.
 template <typename ObjectType>
 std::unique_ptr<ObjectType> Clone(const ObjectType* obj, const std::string& name = "") {
@@ -144,4 +148,21 @@ std::unique_ptr<ObjectType> Clone(const ObjectType* obj, const std::string& name
 
   return Hist;
 }
-}
+
+
+/// @brief Opens a ROOT file with the given name and mode.
+///
+/// This function wraps ROOT’s `TFile` constructor and checks whether the file was opened
+/// successfully and give some useful debugging information
+///
+/// @param Name The name or path of the file to open.
+/// @param Type The file open mode (e.g., "READ", "RECREATE", "UPDATE").
+/// @param File The name of the file where the exception occurred.
+/// @param Line The line number where the exception occurred.
+/// @return Pointer to the opened ROOT file.
+TFile* Open(const std::string& Name, const std::string& Type, const std::string& File, const int Line);
+
+/// @brief Scale histogram to get divided by bin width
+void ScaleHistogram(TH1* Sample_Hist, const double scale);
+
+} //end M3

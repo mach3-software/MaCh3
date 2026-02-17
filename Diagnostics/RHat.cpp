@@ -1,6 +1,7 @@
 // MaCh3 includes
 #include "Manager/Manager.h"
 #include "Samples/SampleStructs.h"
+#include "Samples/HistogramUtils.h"
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT includes
@@ -37,12 +38,14 @@ _MaCh3_Safe_Include_End_ //}
 ///      The input format is also slightly altered; since we can now load entire chains, there's less need to
 ///      specify how many toys are desired for a sub-sample, so the Ntoys input has been removed.
 ///
+/// @author Kamil Skwarczynski
+/// @author Michael Reh
 
 // *******************
 int* Ntoys_requested;
 int* Ntoys_filled;
 int TotToys;
-int NThin;
+unsigned int NThin;
 int Nchains;
 int nDraw;
 
@@ -148,10 +151,10 @@ void PrepareChains() {
   Ntoys_requested = new int[Nchains]();
   Ntoys_filled = new int[Nchains]();
   TotToys = 0;
-  std::vector<int> BurnIn(Nchains);
-  std::vector<int> nEntries(Nchains);
+  std::vector<unsigned int> BurnIn(Nchains);
+  std::vector<unsigned int> nEntries(Nchains);
   std::vector<int> nBranches(Nchains);
-  std::vector<int> step(Nchains);
+  std::vector<unsigned int> step(Nchains);
 
   S1_chain = new double*[Nchains]();
   S2_chain = new double*[Nchains]();
@@ -168,7 +171,7 @@ void PrepareChains() {
     TChain* Chain = new TChain("posteriors");
     Chain->Add(MCMCFile[m].c_str());
 
-    nEntries[m] = int(Chain->GetEntries());
+    nEntries[m] = static_cast<unsigned int>(Chain->GetEntries());
     Ntoys_requested[m] = nEntries[m]/NThin;
     Ntoys_filled[m] = 0;
 
@@ -317,7 +320,6 @@ void PrepareChains() {
       // Increment counters
       Ntoys_filled[m]++;
       TotToys++;
-
     }//end loop over toys
 
     //TN: There, we now don't need to keep the chain in memory anymore
@@ -499,6 +501,11 @@ void SaveResults() {
       while (temp.find(".root") != std::string::npos) {
         temp = temp.substr(0, temp.find(".root"));
       }
+      // Strip directory path
+      const auto slash = temp.find_last_of("/\\");
+      if (slash != std::string::npos) {
+        temp = temp.substr(slash + 1);
+      }
 
       NameTemp = NameTemp + temp + "_";
     }
@@ -508,8 +515,7 @@ void SaveResults() {
   }
   NameTemp += "diag.root";
 
-  TFile* DiagFile = new TFile(NameTemp.c_str(), "recreate");
-
+  TFile *DiagFile = M3::Open(NameTemp, "recreate", __FILE__, __LINE__);
   DiagFile->cd();
 
   TH1D *StandardDeviationGlobalPlot = new TH1D("StandardDeviationGlobalPlot", "StandardDeviationGlobalPlot", nDraw, 0, nDraw);

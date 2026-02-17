@@ -8,10 +8,13 @@ foreach(app
     ProcessMCMC
     CombineMaCh3Chains
     PlotMCMCDiag
+    SmearChain
+    ReweightMCMC
+    PlotLLHMap
     )
     add_executable(${app} ${app}.cpp)
     add_dependencies(DiagApps ${app})
-    target_link_libraries(${app} MaCh3::All MaCh3Warnings)
+    target_link_libraries(${app} MaCh3::All MaCh3Warnings ROOT::ROOTDataFrame)
 
     install(TARGETS ${app} DESTINATION bin)
 endforeach(app)

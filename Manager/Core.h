@@ -1,6 +1,13 @@
 #pragma once
 
 /// @file Core.h
+/// @brief KS: Core MaCh3 definitions and compile-time configuration utilities.
+///
+/// KS: This header contains the fundamental MaCh3 type definitions, constants,
+/// and macros used throughout the framework. It centralizes basic numerical
+/// types, default constants, and utility macros for controlling memory layout,
+/// precision, and compiler diagnostics.
+///
 /// @author Clarence Wret
 /// @author Kamil Skwarczynski
 /// @author Luke Pickering
@@ -14,9 +21,9 @@
 #include <cmath>
 #include <limits>
 
-/// Run low or high memory versions of structs
-/// N.B. for 64 bit systems sizeof(float) == sizeof(double) so not a huge effect
 namespace M3 {
+  // Run low or high memory versions of structs
+  // N.B. for 64 bit systems sizeof(float) == sizeof(double) so not a huge effect
   #ifdef _LOW_MEMORY_STRUCTS_
   /// Custom floating point (float or double)
   using float_t = float;
@@ -24,10 +31,13 @@ namespace M3 {
   using int_t = short;
   /// Custom unsigned integer (unsigned short int or unsigned int)
   using uint_t = unsigned short;
+  /// Custom variable allowing us to save in either double or float
+  constexpr static const char* float_t_str_repr = "F";
   #else
   using float_t = double;
   using int_t = int;
   using uint_t = unsigned;
+  constexpr static const char* float_t_str_repr = "D";
   #endif
 
   /// Function template for fused multiply-add
@@ -76,6 +86,9 @@ namespace M3 {
   constexpr static const double DefSplineKnotUpBound = 9999;
   /// Default value for spline knot capping, default mean not capping is being applied
   constexpr static const double DefSplineKnotLowBound = -9999;
+
+  /// Mark bin which is overflow or underflow in MaCh3 binning
+  constexpr static const int UnderOverFlowBin = -1;
 }
 
 /// KS: noexcept can help with performance but is terrible for debugging, this is meant to help easy way of of turning it on or off. In near future move this to struct or other central class.
@@ -87,10 +100,17 @@ namespace M3 {
 
 /// KS: Using restrict limits the effects of pointer aliasing, aiding optimizations. While reading I found that there might be some compilers which don't have __restrict__. As always we use _restrict_ to more easily turn off restrict in the code
 #ifndef DEBUG
-#define _restrict_ __restrict__
+  /// KS: For GCC decoration is here: https://gcc.gnu.org/onlinedocs/gcc/Restricted-Pointers.html
+  /// If we are sure other compiler support it as well please add
+  #if defined(__GNUC__)
+    #define _restrict_ __restrict__
+  #else
+    #define _restrict_
+  #endif
 #else
-#define _restrict_
+  #define _restrict_
 #endif
+
 
 /// Number of overflow bins in TH2Poly,
 #define _TH2PolyOverflowBins_ 9
@@ -112,13 +132,16 @@ _Pragma("GCC diagnostic ignored \"-Wformat-nonliteral\"") \
 _Pragma("GCC diagnostic ignored \"-Wswitch-enum\"") \
 _Pragma("GCC diagnostic ignored \"-Wconversion\"") \
 _Pragma("GCC diagnostic ignored \"-Wshadow\"") \
-_Pragma("GCC diagnostic ignored \"-Wswitch-enum\"")
+_Pragma("GCC diagnostic ignored \"-Wsuggest-override\"")
+#if defined(__GNUC__) && __GNUC__ >= 13
+  _Pragma("GCC diagnostic ignored \"-Wdangling-reference\"")
+#endif
 /// @brief KS: Restore warning checking after including external headers
 #define _MaCh3_Safe_Include_End_ \
 _Pragma("GCC diagnostic pop")
 
-// clang need slightly different diagnostics
-#if defined(__clang__)
+// clang and IntelLLVM need slightly different diagnostics
+#if defined(__clang__) || defined(__INTEL_LLVM_COMPILER)
   #undef _MaCh3_Safe_Include_Start_
   #define _MaCh3_Safe_Include_Start_ \
   _Pragma("clang diagnostic push") \
@@ -128,7 +151,8 @@ _Pragma("GCC diagnostic pop")
   _Pragma("clang diagnostic ignored \"-Wswitch-enum\"") \
   _Pragma("clang diagnostic ignored \"-Wconversion\"") \
   _Pragma("clang diagnostic ignored \"-Wshadow\"") \
-  _Pragma("clang diagnostic ignored \"-Wswitch-enum\"")
+  _Pragma("clang diagnostic ignored \"-Wdeprecated-literal-operator\"") \
+  _Pragma("clang diagnostic ignored \"-Wsuggest-override\"")
   #undef _MaCh3_Safe_Include_End_
   #define _MaCh3_Safe_Include_End_ \
   _Pragma("clang diagnostic pop")

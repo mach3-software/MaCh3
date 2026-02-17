@@ -25,27 +25,24 @@ jobs:
             file: Doc/MaCh3DockerFiles/Alma9/Dockerfile
             tag_latest: alma9latest
             installoptions: -j4
+            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DNuFastLinear_ENABLED=ON -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProb3ppLinear_ENABLED=ON
           - os: rocky9cuda
             file: Doc/MaCh3DockerFiles/Rocky9/Dockerfile
             tag_latest: rocky9cudalatest
+            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DNuFastLinear_ENABLED=ON -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DProbGPU_ENABLED=ON
             installoptions: -j4
-#          - os: ubuntu22.04
-#            file: Doc/MaCh3DockerFiles/Ubuntu22.04/Dockerfile
-#            tag_latest: ubuntu22.04latest
-#            installoptions: -j4
-#          - os: fedora32
-#            file: Doc/MaCh3DockerFiles/Fedora32/Dockerfile
-#            tag_latest: fedora32latest
-#            installoptions: -j4
 
     name: Image CD ${{ matrix.os }}
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Log in to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      # KS: Free some space, as some MaCh3 containers can be heavy...
+      - uses: ./.github/actions/free-disk-space
 
       - name: Build Docker image
         run: |
@@ -54,12 +51,14 @@ jobs:
               --file "${{ matrix.file }}" \
               --tag "ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.os }}${{ github.ref_name }}" \
               --build-arg MACH3_VERSION="${{ github.ref_name }}" \
+              --build-arg CMAKE_OPTIONS="${{ matrix.cmakeoptions }}" \
               --build-arg INSTALL_OPTIONS="${{ matrix.installoptions }}"
           else
             docker build . \
               --file "${{ matrix.file }}" \
               --tag "ghcr.io/${{ github.repository_owner }}/mach3:${{ matrix.tag_latest }}" \
               --build-arg MACH3_VERSION="develop" \
+              --build-arg CMAKE_OPTIONS="${{ matrix.cmakeoptions }}" \
               --build-arg INSTALL_OPTIONS="${{ matrix.installoptions }}"
           fi
 

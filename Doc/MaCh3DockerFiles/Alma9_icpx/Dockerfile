@@ -1,0 +1,53 @@
+#To run use:  docker build -t mach3 .
+# KS: Get glorious container from Kamil which will work as a base
+FROM kamilskwarczynski/nukamil:alma9intellatest AS mach3_build
+
+# Add a label for the author
+LABEL maintainer="The MaCh3 Collaboration"
+LABEL website="https://mach3-software.github.io/MaCh3/"
+LABEL compiler="icpx 2025.2.1"
+LABEL root_version="v6.26.04"
+LABEL org.opencontainers.image.description="Official MaCh3 container"
+
+# Declare the build argument
+ARG MACH3_VERSION
+ENV MACH3_VERSION=${MACH3_VERSION:-develop}
+
+ARG CMAKE_OPTIONS
+ENV CMAKE_OPTIONS=${CMAKE_OPTIONS:-DMaCh3_PYTHON_ENABLED=ON}
+
+ARG INSTALL_OPTIONS
+ENV INSTALL_OPTIONS=${INSTALL_OPTIONS:-"VERBOSE=1"}
+
+ENV MACH3_WORK_DIR=/opt/MaCh3/
+ENV MACH3_INSTALL_DIR=/opt/MaCh3/build/
+
+ARG REPOSITORY_URL
+ENV REPOSITORY_URL=${REPOSITORY_URL:-https://github.com/mach3-software/MaCh3}
+
+RUN mkdir -p ${MACH3_WORK_DIR}
+
+WORKDIR /opt/
+# KS: Let's clone MaCh3
+RUN --mount=type=ssh git clone ${REPOSITORY_URL} ${MACH3_WORK_DIR}
+WORKDIR ${MACH3_WORK_DIR}
+RUN git checkout ${MACH3_VERSION}
+
+RUN mkdir -p ${MACH3_INSTALL_DIR}
+WORKDIR ${MACH3_INSTALL_DIR}
+RUN source ${ONEAPI_ROOT}/setvars.sh && cmake ${CMAKE_OPTIONS} ${MACH3_WORK_DIR}
+RUN source ${ONEAPI_ROOT}/setvars.sh && make -j4 ${INSTALL_OPTIONS} && make install
+
+# KS: Need to set them here, otherwise container using this container will not be able to find MaCh3
+ENV MaCh3_ROOT=${MACH3_INSTALL_DIR}
+ENV PATH=${MaCh3_ROOT}/bin:${PATH} \
+    LD_LIBRARY_PATH=${MaCh3_ROOT}/lib:${LD_LIBRARY_PATH}
+
+# pip install pyMaCh3
+WORKDIR ${MACH3_WORK_DIR}
+
+# Avoid pip cache to keep the image small
+RUN pip install --no-cache-dir .
+
+# Start from MaCh3 install dir
+WORKDIR ${MACH3_INSTALL_DIR}

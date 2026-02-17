@@ -3,7 +3,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # CMake version check
 cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
-project(MaCh3 VERSION 2.2.0 LANGUAGES CXX)
+project(MaCh3 VERSION 2.4.2 LANGUAGES CXX)
 set(MaCh3_VERSION ${PROJECT_VERSION})
 
 option(MaCh3_PYTHON_ENABLED "Whether to build MaCh3 python bindings" OFF)
@@ -57,8 +57,9 @@ find_program(CMAKE_CXX_COMPILER NAMES $ENV{CXX} g++ PATHS ENV PATH NO_DEFAULT_PA
 include(MaCh3Dependencies)
 
 ############################  C++ Compiler  ####################################
+set(CXX_MINIMAL_STANDARD 14)
 if (NOT DEFINED CMAKE_CXX_STANDARD OR "${CMAKE_CXX_STANDARD} " STREQUAL " ")
-  set(CMAKE_CXX_STANDARD 14)
+  set(CMAKE_CXX_STANDARD ${CXX_MINIMAL_STANDARD})
   cmessage(STATUS "Set default CXX standard: \"${CMAKE_CXX_STANDARD}\"")
 endif()
 
@@ -67,6 +68,9 @@ if(DEFINED ROOT_CXX_STANDARD AND NOT ROOT_CXX_STANDARD EQUAL CMAKE_CXX_STANDARD)
   cmessage(STATUS "Set CXX standard due to ROOT: \"${ROOT_CXX_STANDARD}\"")
 endif()
 cmessage(STATUS "CMAKE_CXX_STANDARD: \"${CMAKE_CXX_STANDARD}\"")
+if (CMAKE_CXX_STANDARD LESS CXX_MINIMAL_STANDARD)
+  cmessage(FATAL_ERROR "Set CXX standard is lower than the minimal working standard: ${CXX_MINIMAL_STANDARD}")
+endif()
 set(MACH3_CXX_STANDARD ${CMAKE_CXX_STANDARD})
 set_property(GLOBAL PROPERTY MACH3_CXX_STANDARD "${MACH3_CXX_STANDARD}")
 
@@ -113,11 +117,12 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     -Wduplicated-cond       # Warn if if / else chain has duplicated conditions (only in GCC >= 6.0)
     -Wduplicated-branches   # Warn if if / else branches have duplicated code (only in GCC >= 7.0)
     -Wuseless-cast          # Warn if you perform a cast to the same type (only in GCC >= 4.8)
+    -Wsuggest-override      # Warn if a virtual function override is not marked 'override' (only in GCC >= 5.1)
   )
 endif()
 
-# KS: Clang is super picky, it is almost impossible to make it work with Werror
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+# KS: Clang and IntelLLVM is super picky, it is almost impossible to make it work with Werror
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "IntelLLVM")
   set(MaCh3_WERROR_ENABLED FALSE)
 endif()
 
@@ -130,7 +135,7 @@ endif()
 add_library(MaCh3CompilerOptions INTERFACE)
 target_link_libraries(MaCh3CompilerOptions INTERFACE MaCh3CompileDefinitions)
 target_compile_options(MaCh3CompilerOptions INTERFACE
-    -g                      # Generate debug information
+    -g                   # Generate debug information
 )
 
 #If DEBUG_LEVEL was defined but MaCh3_DEBUG_ENABLED not, enable debug flag
@@ -146,43 +151,57 @@ endif()
 #KS: If Debug add debugging compile flag if not add optimisation for speed
 if(MaCh3_DEBUG_ENABLED)
   target_compile_options(MaCh3CompilerOptions INTERFACE
-    -O0                                  # Turn off any optimisation to have best debug experience
-    -mno-avx
+    -O0                     # Turn off any optimisation to have best debug experience
+    -mno-avx                # Disable AVX instructions to simplify debugging and improve reproducibility
+    -fno-omit-frame-pointer # Keep frame pointers: essential for accurate stack traces
+    #-fsanitize=address     # Enable AddressSanitizer
   )
   target_compile_definitions(MaCh3CompileDefinitions INTERFACE DEBUG=${DEBUG_LEVEL})
   cmessage(STATUS "Enabling DEBUG with Level: \"${DEBUG_LEVEL}\"")
 else()
-  #KS: Consider in future __attribute__((always_inline)) see https://indico.cern.ch/event/386232/sessions/159923/attachments/771039/1057534/always_inline_performance.pdf
-  #https://gcc.gnu.org/onlinedocs/gcc-3.3.6/gcc/Optimize-Options.html
+  #https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html
   target_compile_options(MaCh3CompilerOptions INTERFACE
     -O3                                   # Optimize code for maximum speed
-    #-fstrict-aliasing                    # Assume that pointers of different types do not point to the same memory location
-    # KS: After benchmarking below didn't in fact worse performance, leave it for future tests and documentation
+    # KS: Below could help with performance but require validations and benchmarking
+    #-funroll-loops                       # Unroll loops where possible for performance
+    #-fno-trapping-math                   # Assume FP ops don’t trap (helps vectorisation)
+    #-fno-math-errno                      # Don’t set errno after math calls (can speed up hot loops with math)
     #-funroll-loops                       # Unroll loops where possible for performance
     #--param=max-vartrack-size=100000000  # Set maximum size of variable tracking data to avoid excessive memory usage
-    #-flto                                # Enable link-time optimization (commented out for now, needs more testing)
   )
   # KS Some compiler options are only available in GCC, in case we move to other compilers we will have to expand this
+  #KS: Consider in future __attribute__((always_inline)) see https://indico.cern.ch/event/386232/sessions/159923/attachments/771039/1057534/always_inline_performance.pdf
   if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     target_compile_options(MaCh3CompilerOptions INTERFACE
+      $<$<COMPILE_LANGUAGE:CXX>:-flto=auto>      # Enable link-time optimization, don't apply it to CUDA or other languages!
       -finline-limit=100000000              # Increase the limit for inlining functions to improve performance
+      #-fipa-pta                            # Pointer analysis for better intraprocedural optimization, increases compilation time
     )
-  endif()
   #KS: add Link-Time Optimization (LTO)
-  #target_link_libraries(MaCh3CompilerOptions INTERFACE -flto)
+  target_link_libraries(MaCh3CompilerOptions INTERFACE -flto)
+  endif()
 endif()
 
 if(MaCh3_NATIVE_ENABLED)
-  target_compile_options(MaCh3CompilerOptions INTERFACE -march=native)
+  target_compile_options(MaCh3CompilerOptions INTERFACE
+    -march=native    #Generate instructions for the host CPU architecture.
+    -mtune=native    #Optimize instruction scheduling and pipeline usage for host CPU.
+  )
 endif()
 
 #Add Multithread flags
 if(MaCh3_MULTITHREAD_ENABLED)
-  target_compile_options(MaCh3CompilerOptions INTERFACE -fopenmp)
+  if(CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
+    #ETA: intel icpx requires this I believe
+    find_package(OpenMP REQUIRED)
+    target_compile_options(MaCh3CompilerOptions INTERFACE -qopenmp)
+    target_link_libraries(MaCh3CompilerOptions INTERFACE OpenMP::OpenMP_CXX)
   # KS: Not a clue why clang need different...
-  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    target_compile_options(MaCh3CompilerOptions INTERFACE -fopenmp)
     target_link_libraries(MaCh3CompilerOptions INTERFACE omp)
   else()
+    target_compile_options(MaCh3CompilerOptions INTERFACE -fopenmp)
     target_link_libraries(MaCh3CompilerOptions INTERFACE gomp)
   endif()
   target_compile_definitions(MaCh3CompileDefinitions INTERFACE MULTITHREAD)

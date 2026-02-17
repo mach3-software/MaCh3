@@ -59,14 +59,17 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     inline double GetParSplineKnotLowerBound(const int i) const {return SplineParams.at(i)._SplineKnotLowBound;}
 
     /// @brief DB Grab the number of parameters for the relevant SampleName
+    /// @param SampleName property of SampleHandler class based on which we select whether to apply uncertainties or not
     /// @param Type Type of syst, for example kNorm, kSpline etc
     /// @ingroup ParameterHandlerGetters
     int GetNumParamsFromSampleName(const std::string& SampleName, const SystType Type);
     /// @brief DB Grab the parameter names for the relevant SampleName
+    /// @param SampleName property of SampleHandler class based on which we select whether to apply uncertainties or not
     /// @param Type Type of syst, for example kNorm, kSpline etc
     /// @ingroup ParameterHandlerGetters
     const std::vector<std::string> GetParsNamesFromSampleName(const std::string& SampleName, const SystType Type);
     /// @brief DB Grab the parameter indices for the relevant SampleName
+    /// @param SampleName property of SampleHandler class based on which we select whether to apply uncertainties or not
     /// @param Type Type of syst, for example kNorm, kSpline etc
     /// @ingroup ParameterHandlerGetters
     const std::vector<int> GetParsIndexFromSampleName(const std::string& SampleName, const SystType Type);
@@ -82,6 +85,7 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @ingroup ParameterHandlerGetters
     const std::vector< std::vector<int> > GetSplineModeVecFromSampleName(const std::string& SampleName);
     /// @brief Grab the index of the syst relative to global numbering.
+    /// @param SampleName property of SampleHandler class based on which we select whether to apply uncertainties or not
     /// @param Type Type of syst, for example kNorm, kSpline etc
     /// @ingroup ParameterHandlerGetters
     const std::vector<int> GetSystIndexFromSampleName(const std::string& SampleName, const SystType Type) const;
@@ -105,6 +109,9 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @brief KS: Check how many parameters are associated with given group
     /// @ingroup ParameterHandlerGetters
     int GetNumParFromGroup(const std::string& Group) const;
+    /// @brief KS: Get names of all unique parameter groups
+    /// @ingroup ParameterHandlerGetters
+    std::vector<std::string> GetUniqueParameterGroups();
 
     /// @brief KS Function to set to prior parameters of a given group or values from vector
     /// @param Group name of group, like Xsec or Flux
@@ -113,9 +120,30 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @note this mimic functionality of @ParameterHandlerBase::SetParameters
     void SetGroupOnlyParameters(const std::string& Group, const std::vector<double>& Pars = {});
     /// @brief KS Function to set to prior parameters of a given groups or values from vector
-    /// @param Group vector of group names, like Xsec or Flux
+    /// @param Groups vector of group names, like Xsec or Flux
     /// @ingroup ParameterHandlerSetters
     void SetGroupOnlyParameters(const std::vector<std::string>& Groups);
+    
+    /// @brief TN Method to set parameters within a group to be fixed to their prior values
+    /// @param Group name of the parameter group (Xsec, Flux, Osc, etc.)
+    void SetFixGroupOnlyParameters(const std::string& Group);
+    /// @brief TN Method to set parameters of certain groups to be fixed to their prior values
+    /// @param Groups vector of group names (e.g. {"Xsec", "Flux"})
+    void SetFixGroupOnlyParameters(const std::vector<std::string>& Groups);
+
+    /// @brief TN Method to set parameters within a group to be treated as free
+    /// @param Group name of the parameter group (Xsec, Flux, Osc, etc.)
+    void SetFreeGroupOnlyParameters(const std::string& Group);
+    /// @brief TN Method to set parameters of certain groups to be treated as free
+    /// @param Groups vector of group names (e.g. {"Xsec", "Flux"})
+    void SetFreeGroupOnlyParameters(const std::vector<std::string>& Groups);
+
+    /// @brief TN Method to toggle fix/free parameters within a group
+    /// @param Group name of the parameter group (Xsec, Flux, Osc, etc.)
+    void ToggleFixGroupOnlyParameters(const std::string& Group);   
+    /// @brief TN Method to toggle fix/free parameters within given groups
+    /// @param Group vector of group names (e.g. {"Xsec", "Flux"})
+    void ToggleFixGroupOnlyParameters(const std::vector<std::string>& Groups);
 
     /// @brief Dump Matrix to ROOT file, useful when we need to pass matrix info to another fitting group
     /// @param Name Name of TFile to which we save stuff

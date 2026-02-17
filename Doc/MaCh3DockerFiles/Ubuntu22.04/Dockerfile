@@ -9,11 +9,11 @@ LABEL compiler="GNU 11.4.0"
 LABEL root_version="v6.32.02"
 LABEL org.opencontainers.image.description="Official MaCh3 container"
 
-RUN apt update && apt upgrade -y
+RUN apt-get update && apt-get upgrade -y
 
 RUN apt-get install -y nlohmann-json3-dev
 #MISC_SW
-RUN apt install -y --no-install-recommends \
+RUN apt-get install -y --no-install-recommends \
     vim less nano gdb csh tcsh ed quota python3 python3-dev python3-pip \
     cvs procmail ca-certificates cmake ninja-build
 
@@ -51,7 +51,8 @@ ENV PATH=${MaCh3_ROOT}/bin:${PATH} \
 
 # pip install pyMaCh3
 WORKDIR ${MACH3_WORK_DIR}
-RUN pip install .
+# Avoid pip cache to keep the image small
+RUN pip install --no-cache-dir .
 
 # Start from MaCh3 install dir
 WORKDIR ${MACH3_INSTALL_DIR}

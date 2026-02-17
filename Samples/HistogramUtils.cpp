@@ -460,6 +460,21 @@ void MakeFluctuatedHistogramAlternative(TH1D* FluctHist, TH1D* PolyHist, TRandom
   }
 }
 
+void MakeFluctuatedHistogramAlternative(TH2D* FluctHist, TH2D* PolyHist, TRandom3* rand) {
+    FluctHist->Reset();
+
+    const double evrate = PolyHist->Integral();
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wconversion"
+    const int num = rand->Poisson(evrate);
+    #pragma GCC diagnostic pop
+
+    double x, y;
+    for (int count = 0; count < num; ++count) {
+        PolyHist->GetRandom2(x, y);
+        FluctHist->Fill(x, y);
+    }
+}
 // ****************
 //KS: ROOT developers were too lazy do develop getRanom2 for TH2Poly, this implementation is based on:
 // https://root.cern.ch/doc/master/classTH2.html#a883f419e1f6899f9c4255b458d2afe2e
@@ -557,7 +572,7 @@ void FastViolinFill(TH2D* violin, TH1D* hist_1d){
 
 // ****************
 //DB Get the Cherenkov momentum threshold in MeV
-double returnCherenkovThresholdMomentum(int PDG) {
+double returnCherenkovThresholdMomentum(const int PDG) {
 // ****************
   constexpr double refractiveIndex = 1.334; //DB From https://github.com/fiTQun/fiTQun/blob/646cf9c8ba3d4f7400bcbbde029d5ca15513a3bf/fiTQun_shared.cc#L757
   double mass =  MaCh3Utils::GetMassFromPDG(PDG)*1e3;
@@ -570,16 +585,17 @@ double returnCherenkovThresholdMomentum(int PDG) {
 double CalculateQ2(double PLep, double PUpd, double EnuTrue, double InitialQ2){
 // ***************************************************************************
   constexpr double MLep = 0.10565837;
+  constexpr double MLep2 = MLep * MLep;
 
-  // Caluclate muon energy
-  double ELep = sqrt((MLep*MLep)+(PLep*PLep));
+  // Calculate muon energy
+  double ELep = sqrt((MLep2)+(PLep*PLep));
 
-  double CosTh = (2*EnuTrue*ELep - MLep*MLep - InitialQ2)/(2*EnuTrue*PLep);
+  double CosTh = (2*EnuTrue*ELep - MLep2 - InitialQ2)/(2*EnuTrue*PLep);
 
-  ELep = sqrt((MLep*MLep)+(PUpd*PUpd));
+  ELep = sqrt((MLep2)+(PUpd*PUpd));
 
   // Calculate the new Q2
-  double Q2Upd = -(MLep*MLep) + 2.0*EnuTrue*(ELep - PUpd*CosTh);
+  double Q2Upd = -(MLep2) + 2.0*EnuTrue*(ELep - PUpd*CosTh);
 
   return Q2Upd - InitialQ2;
 }
@@ -597,9 +613,51 @@ double CalculateEnu(double PLep, double costh, double Eb, bool neutrino){
   }
   /// @todo WARNING this is hardcoded
   constexpr double mLep = 0.10565837;
-  double eLep = sqrt(PLep * PLep + mLep * mLep);
+  constexpr double mLep2 = mLep * mLep;
 
-  double Enu = (2 * mNeff * eLep - mLep * mLep + mNoth * mNoth - mNeff * mNeff) /(2 * (mNeff - eLep + PLep * costh));
+  const double eLep = sqrt(PLep * PLep + mLep2);
+  double Enu = (2 * mNeff * eLep - mLep2 + mNoth * mNoth - mNeff * mNeff) /(2 * (mNeff - eLep + PLep * costh));
 
   return Enu;
 }
+
+
+namespace M3 {
+// **************************************************************************
+TFile* Open(const std::string& Name, const std::string& Type, const std::string& File, const int Line) {
+// **************************************************************************
+  TFile* OutFile = new TFile(Name.c_str(), Type.c_str());
+
+  // Check if the file is successfully opened and usable
+  if (OutFile->IsZombie()) {
+    MACH3LOG_ERROR("Failed to open file: {}", Name);
+    std::string lowerType = Type;
+    std::transform(lowerType.begin(), lowerType.end(), lowerType.begin(), ::tolower);
+    if (lowerType == "recreate") {
+      MACH3LOG_ERROR("Check if directory exist");
+    }
+    delete OutFile;
+    throw MaCh3Exception(File, Line);
+  }
+  return OutFile;
+}
+
+void ScaleHistogram(TH1* Sample_Hist, const double scale)
+{
+  for (int j = 0; j <= Sample_Hist->GetNbinsX(); ++j)
+  {
+    double num = Sample_Hist->GetBinContent(j);
+    double numErr = Sample_Hist->GetBinError(j);
+    double den = Sample_Hist->GetBinWidth(j);
+    double value = 0.;
+    double valueErr = 0.;
+    if (den != 0)
+    {
+      value = num/(den/scale);
+      valueErr = numErr/(den/scale);
+      Sample_Hist->SetBinContent(j,value);
+      Sample_Hist->SetBinError(j,valueErr);
+    }
+  }
+}
+} //end M3

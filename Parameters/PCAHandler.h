@@ -25,8 +25,38 @@
 #endif
 
 /// @brief Class responsible for handling Principal Component Analysis (PCA) of covariance matrix
-/// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/03.-Eigen-Decomposition-%E2%80%90-PCA).
 /// @author Clarence Wret
+///
+/// @section introPCA Introduction
+///
+/// This class applies Principal Component Analysis (PCA) to covariance matrices
+/// using eigen-decomposition. The main benefit is that PCA rotates the parameter
+/// space into a basis where parameters are uncorrelated. In practice, this helps
+/// MCMC fits move more efficiently, since correlated directions in the original
+/// space often slow down convergence.
+///
+/// @section dimredPCA Dimensionality Reduction
+///
+/// PCA makes it possible to drop directions in parameter space with very small
+/// eigenvalues. These correspond to combinations of parameters that are poorly
+/// constrained or dominated by statistical noise. By applying a threshold
+/// (e.g. discarding eigenvalues smaller than `1e-4` of the largest one), the
+/// effective number of parameters can be reduced.
+///
+/// This is particularly useful in large MCMC fits, where many parameters may
+/// contribute little information. Removing them reduces dimensionality while
+/// keeping the dominant structure of the parameter space intact, often leading
+/// to faster and more stable fits.
+///
+/// @section partialPCA Partial Decomposition
+///
+/// PCA does not need to be applied to the full covariance matrix. This class
+/// supports eigen-decomposition of only a submatrix. This is useful when only a
+/// subset of parameters is strongly correlated and benefits from PCA, while the
+/// rest remain in the original parameter basis.
+///
+///
+/// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/03.-Eigen-Decomposition-%E2%80%90-PCA).
 class PCAHandler{
  public:
   /// @brief Constructor
@@ -36,7 +66,7 @@ class PCAHandler{
   virtual ~PCAHandler();
 
   /// @brief KS: Print info about PCA parameters
-  void Print();
+  void Print() const;
   /// @brief Retrieve number of parameters in PCA base
   int GetNumberPCAedParameters() const { return NumParPCA; }
 
@@ -80,17 +110,13 @@ class PCAHandler{
 
   /// @brief KS: Transfer the starting parameters to the PCA basis, you don't want to start with zero..
   /// @param IndStepScale Per parameter step scale, we set so each PCA param uses same step scale [eigen value takes care of size]
-  void SetInitialParameters(std::vector<double>& IndStepScale);
-  /// @brief Throw the proposed parameter by mag sigma.
-  void ThrowParProp(const double mag, const double* _restrict_ randParams);
-  /// @brief Helper function to throw the current parameter by mag sigma.
-  void ThrowParCurr(const double mag, const double* _restrict_ randParams);
+  void SetInitialParameters();
   /// @brief set branches for output file
   /// @ingroup ParameterHandlerSetters
-  void SetBranches(TTree &tree, bool SaveProposal, const std::vector<std::string>& Names);
+  void SetBranches(TTree &tree, const bool SaveProposal, const std::vector<std::string>& Names);
   /// @brief fix parameters at prior values
   /// @ingroup ParameterHandlerSetters
-  void ToggleFixAllParameters();
+  void ToggleFixAllParameters(const std::vector<std::string>& Names);
   /// @brief fix parameters at prior values
   /// @ingroup ParameterHandlerSetters
   void ToggleFixParameter(const int i, const std::vector<std::string>& Names);
@@ -196,6 +222,9 @@ class PCAHandler{
   #endif
 
  private:
+  /// @brief KS: Make sure decomposed matrix isn't correlated with undecomposed
+  void SanitisePCA(TMatrixDSym* CovMatrix);
+
   /// Prefit value for PCA params
   std::vector<double> _fPreFitValuePCA;
   /// CW: Current parameter value in PCA base

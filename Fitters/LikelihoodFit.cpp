@@ -2,7 +2,7 @@
 
 // *******************
 // Run the Markov chain with all the systematic objects added
-LikelihoodFit::LikelihoodFit(manager *man) : FitterBase(man) {
+LikelihoodFit::LikelihoodFit(Manager *man) : FitterBase(man) {
 // *******************
   NPars = 0;
   NParsPCA = 0;
@@ -15,7 +15,6 @@ LikelihoodFit::LikelihoodFit(manager *man) : FitterBase(man) {
 // Destructor: close the logger and output file
 LikelihoodFit::~LikelihoodFit() {
 // *************************
-
 }
 
 // *******************

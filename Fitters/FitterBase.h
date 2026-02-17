@@ -19,12 +19,16 @@ class TGraphAsymmErrors;
 class TDirectory;
 
 /// @brief Base class for implementing fitting algorithms
+/// @details This class wraps MaCh3 classes like SampleHandler and ParameterHandler.
+/// It serves as a base for different fitting algorithms and for validation techniques
+/// such as LLH scans.
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/06.-Fitting-Algorithms).
+/// @ingroup CoreClasses
 class FitterBase {
  public:
   /// @brief Constructor
   /// @param fitMan A pointer to a manager object, which will handle all settings.
-  FitterBase(manager * const fitMan);
+  FitterBase(Manager * const fitMan);
   /// @brief Destructor for the FitterBase class.
   virtual ~FitterBase();
 
@@ -46,6 +50,9 @@ class FitterBase {
   /// @brief Perform a 1D likelihood scan.
   void RunLLHScan();
 
+  /// @brief Perform a general multi-dimensional likelihood scan.
+  void RunLLHMap();
+
   /// @brief LLH scan is good first estimate of step scale
   void GetStepScaleBasedOnLLHScan();
 
@@ -53,17 +60,15 @@ class FitterBase {
   /// @warning This operation may take a significant amount of time, especially for complex models.
   void Run2DLLHScan();
 
-  /// @brief Perform a 2D and 1D sigma var for all samples.
-  /// @warning Code uses TH2Poly
+  /// @brief Perform a 1D/2D sigma var for all samples.
   void RunSigmaVar();
 
   /// @brief Allow to start from previous fit/chain
   /// @param FitName Name of previous chain
-  /// @todo implement some check that number of params matches etc
   virtual void StartFromPreviousFit(const std::string& FitName);
 
   /// @brief Get name of class
-  virtual inline std::string GetName()const {return "FitterBase";};
+  inline std::string GetName() const {return AlgorithmName;};
  protected:
   /// @brief Process MCMC output
   void ProcessMCMC();
@@ -82,14 +87,26 @@ class FitterBase {
   void SaveSettings();
 
   /// @brief YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D. Barrow
-  bool GetScaneRange(std::map<std::string, std::vector<double>>& scanRanges);
-
+  /// @param scanRanges A map with user specified parameter ranges
+  bool GetScanRange(std::map<std::string, std::vector<double>>& scanRanges) const;
+  /// @brief Helper function to get parameter scan range, central value.
+  void GetParameterScanRange(const ParameterHandlerBase* cov, const int i, double& CentralValue,
+                             double& lower, double& upper, const int n_points, const std::string& suffix = "") const;
   /// @brief KS: Check whether we want to skip parameter using skip vector
   bool CheckSkipParameter(const std::vector<std::string>& SkipVector, const std::string& ParamName) const;
 
+  /// @brief For comparison with other fitting frameworks (like P-Theta) we usually have to apply different parameter values then usual 1, 3 sigma
+  ///
+  /// Example YAML format:
+  /// @code{.yaml}
+  /// SigmaVar:
+  ///   Q2_norm_7: { "3": 2.0 }
+  ///   SRC_Norm_O: { "-1": 0.5, "1": 1.5, "3": 2.0 }
+  /// @endcode
+  void CustomRange(const std::string& ParName, const double sigma, double& ParamShiftValue) const;
 
-  /// The manager
-  manager *fitMan;
+  /// The manager for configuration handling
+  Manager *fitMan;
 
   /// current state
   unsigned int step;
@@ -101,8 +118,8 @@ class FitterBase {
   double accProb;
   /// counts accepted steps
   int accCount;
-  /// step start if restarting
-  int stepStart;
+  /// step start, by default 0 if we start from previous chain then it will be different
+  unsigned int stepStart;
 
   /// store the llh breakdowns
   std::vector<double> sample_llh;
@@ -111,7 +128,7 @@ class FitterBase {
 
   /// Sample holder
   std::vector<SampleHandlerBase*> samples;
-  /// Total number of samples used
+  /// Total number of samples used, single SampleHandler can store more than one analysis sample!
   unsigned int TotalNSamples;
 
   /// Systematic holder
@@ -140,8 +157,6 @@ class FitterBase {
 
   /// Necessary for some fitting algorithms like PSO
   bool fTestLikelihood;
-  /// Save proposal at each step
-  bool SaveProposal;
 
   /// Checks if file saved not repeat some operations
   bool FileSaved;
@@ -149,6 +164,9 @@ class FitterBase {
   bool SettingsSaved;
   /// Checks if output prepared not repeat some operations
   bool OutputPrepared;
+
+  /// Name of fitting algorithm that is being used
+  std::string AlgorithmName;
 
   #ifdef DEBUG
   /// Debugging flag

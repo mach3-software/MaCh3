@@ -151,7 +151,7 @@ int GetNumberOfRuns(const std::vector<int>& GroupClasifier) {
 }
 
 // ****************
-double GetBetaParameter(const double data, const double mc, const double w2, TestStatistic TestStat) {
+double GetBetaParameter(const double data, const double mc, const double w2, const TestStatistic TestStat) {
 // ****************
   double Beta = 0.0;
 
@@ -207,6 +207,10 @@ void GetArithmetic(TH1D * const hist, double& Mean, double& Error) {
 // **************************
 void GetGaussian(TH1D*& hist, TF1* gauss, double& Mean, double& Error) {
 // **************************
+  // Supress spammy ROOT messages
+  int originalErrorLevel = gErrorIgnoreLevel;
+  gErrorIgnoreLevel = kFatal;
+
   const double meanval = hist->GetMean();
   const double err = hist->GetRMS();
   const double peakval = hist->GetBinCenter(hist->GetMaximumBin());
@@ -222,6 +226,9 @@ void GetGaussian(TH1D*& hist, TF1* gauss, double& Mean, double& Error) {
 
   Mean = gauss->GetParameter(1);
   Error = gauss->GetParameter(2);
+
+  // restore original warning setting
+  gErrorIgnoreLevel = originalErrorLevel;
 }
 
 // ***************
@@ -381,7 +388,7 @@ void GetCredibleRegion(std::unique_ptr<TH2D>& hist2D, const double coverage) {
 // ***************
   if(coverage > 1)
   {
-    MACH3LOG_ERROR("Specified Credible Region is greater than 1 and equal to {:.2f} Should be between 0 and 1 {}", coverage);
+    MACH3LOG_ERROR("Specified Credible Region is greater than 1 and equal to {:.2f} Should be between 0 and 1", coverage);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
@@ -486,22 +493,20 @@ double FisherCombinedPValue(const std::vector<double>& pvalues) {
 // ********************
 void ThinningMCMC(const std::string& FilePath, const int ThinningCut) {
 // ********************
-  // Define the path for the temporary thinned file
-  std::string TempFilePath = "Thinned_" + FilePath;
+  std::string FilePathNowRoot = FilePath;
+  if (FilePath.size() >= 5 && FilePath.substr(FilePath.size() - 5) == ".root") {
+    FilePathNowRoot = FilePath.substr(0, FilePath.size() - 5);
+  }
+  std::string TempFilePath = FilePathNowRoot + "_thinned.root";
   int ret = system(("cp " + FilePath + " " + TempFilePath).c_str());
   if (ret != 0) {
-    MACH3LOG_WARN("Error: system call to copy file failed with code {}", ret);
+    MACH3LOG_WARN("System call to copy file failed with code {}", ret);
   }
 
-  TFile *inFile = TFile::Open(TempFilePath.c_str(), "UPDATE");
-  if (!inFile || inFile->IsZombie()) {
-    MACH3LOG_ERROR("Error opening file: {}", TempFilePath);
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-
+  TFile *inFile = M3::Open(TempFilePath, "RECREATE", __FILE__, __LINE__);
   TTree *inTree = inFile->Get<TTree>("posteriors");
   if (!inTree) {
-    MACH3LOG_ERROR("Error: TTree 'posteriors' not found in file.");
+    MACH3LOG_ERROR("TTree 'posteriors' not found in file.");
     inFile->ls();
     inFile->Close();
     throw MaCh3Exception(__FILE__, __LINE__);
@@ -647,4 +652,19 @@ void Get2DBayesianpValue(TH2D *Histogram) {
   TempLine->Draw("same");
 
   TempCanvas->Write();
+}
+
+
+
+// ****************
+void PassErrorToRatioPlot(TH1D* RatioHist, TH1D* Hist1, TH1D* DataHist) {
+// ****************
+  for (int j = 0; j <= RatioHist->GetNbinsX(); ++j)
+  {
+    if(DataHist->GetBinContent(j) > 0)
+    {
+      double dx = Hist1->GetBinError(j) / DataHist->GetBinContent(j);
+      RatioHist->SetBinError(j, dx);
+    }
+  }
 }

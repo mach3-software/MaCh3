@@ -1,5 +1,4 @@
 ---
-# This will
 # TODO rather than store on tutorial better to have different branch and main MaCh3 should use it
 name: MaCh3 Benchmark
 
@@ -13,6 +12,7 @@ permissions:
   # Required permissions for GitHub Pages deployment and content updates
   deployments: write
   contents: write
+  pull-requests: write
 
 jobs:
   benchmark:
@@ -21,7 +21,12 @@ jobs:
     container:
       image: ghcr.io/mach3-software/mach3:alma9v1.3.0
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
       - name: Get MaCh3 Validations
+        env:
+          MACH3_BRANCH: ${{ github.head_ref }}
         run: |
           cd /opt/
           # Clone the MaCh3Tutorial repository with the current branch
@@ -31,7 +36,7 @@ jobs:
           cd build
           # Configure the project with benchmark support enabled
           if [ "${{ github.event_name }}" == 'pull_request' ]; then
-            cmake ../ -DMaCh3_Branch=${{ github.head_ref }}  -DMaCh3Tutorial_Benchmark_ENABLED=TRUE
+            cmake ../ -DMaCh3_Branch="${MACH3_BRANCH}" -DMaCh3Tutorial_Benchmark_ENABLED=TRUE
           else
             cmake ../ -DMaCh3Tutorial_Benchmark_ENABLED=TRUE
           fi
@@ -55,9 +60,9 @@ jobs:
         uses: benchmark-action/github-action-benchmark@v1
         with:
           tool: 'catch2' # Specify that the benchmark tool is Catch2
-          github-token: ${{ secrets.MACH3_VALIDATIONS_PAT }} # Use GitHub token for authentication
+          github-token: ${{ secrets.MACH3_VALIDATIONS_PAT || secrets.GITHUB_TOKEN }} # Use GitHub token for authentication
           output-file-path: /opt/MaCh3Validations/build/output.txt # Path to the benchmark output file
-          alert-threshold: 200% # Alert threshold for performance degradation
+          alert-threshold: 150% # Alert threshold for performance degradation
           comment-on-alert: true
           gh-pages-branch: gh-pages # Branch to store benchmark results
           gh-repository: github.com/mach3-software/MaCh3Tutorial # Repository for benchmark results

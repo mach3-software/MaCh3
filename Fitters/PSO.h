@@ -77,7 +77,7 @@ class particle{
 class PSO : public LikelihoodFit {
   public:
     /// @brief constructor
-    PSO(manager * const fitMan);
+    PSO(Manager * const fitMan);
     /// @brief Destructor
     virtual ~PSO() {};
 
@@ -97,7 +97,7 @@ class PSO : public LikelihoodFit {
     void WriteOutput();
     /// @brief Actual implementation of PSO Fit algorithm
     void RunMCMC() override;
-    double CalcChi2(const double* x);
+    double CalcChi2(const double* x) override;
     /// @brief Evaluates the Rastrigin function for a given parameter values.
     double rastriginFunc(const double* x);
     double swarmIterate();
@@ -140,8 +140,6 @@ class PSO : public LikelihoodFit {
       double* a = &x[0];
       return CalcChi2(a);
     };
-
-  inline std::string GetName()const {return "PSO";};
 
   private:
     particle* best_particle;

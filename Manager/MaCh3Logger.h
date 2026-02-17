@@ -16,7 +16,19 @@ _MaCh3_Safe_Include_Start_ //{
 _MaCh3_Safe_Include_End_ //}
 
 /// @file MaCh3Logger.h
-/// @brief KS: Based on this https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/include/spdlog/spdlog.h#L284
+/// @brief MaCh3 Logging utilities built on top of SPDLOG.
+///
+/// KS: MaCh3 uses SPDLOG as its core logging backend, and this file serves as a wrapper
+/// around it. The MaCh3 logging system uses compile-time log level definitions to control
+/// which log statements are compiled. This ensures that, in default builds, `MACH3LOG_DEBUG`
+/// and lower levels are completely removed at compile time for maximal performance.
+///
+/// The available compile-time log level definitions can be found
+/// [here](https://github.com/gabime/spdlog/blob/a2b4262090fd3f005c2315dcb5be2f0f1774a005/include/spdlog/spdlog.h#L284).
+///
+/// @note You can read more about SPDLOG formatting, levels, and configuration
+///       on the [official SPDLOG wiki](https://github.com/gabime/spdlog/wiki).
+/// @author Kamil Skwarczynski
 
 #define MACH3LOG_TRACE SPDLOG_TRACE
 #define MACH3LOG_DEBUG SPDLOG_DEBUG
@@ -25,6 +37,25 @@ _MaCh3_Safe_Include_End_ //}
 #define MACH3LOG_ERROR SPDLOG_ERROR
 #define MACH3LOG_CRITICAL SPDLOG_CRITICAL
 #define MACH3LOG_OFF SPDLOG_OFF
+
+/// @brief KS: Map string macro to spdlog::level enum
+/// @todo make constexpr with c++17
+inline spdlog::level::level_enum get_default_log_level() {
+  #ifdef SPDLOG_ACTIVE_LEVEL
+  switch (SPDLOG_ACTIVE_LEVEL) {
+    case SPDLOG_LEVEL_TRACE:    return spdlog::level::trace;
+    case SPDLOG_LEVEL_DEBUG:    return spdlog::level::debug;
+    case SPDLOG_LEVEL_INFO:     return spdlog::level::info;
+    case SPDLOG_LEVEL_WARN:     return spdlog::level::warn;
+    case SPDLOG_LEVEL_ERROR:    return spdlog::level::err;
+    case SPDLOG_LEVEL_CRITICAL: return spdlog::level::critical;
+    case SPDLOG_LEVEL_OFF:      return spdlog::level::off;
+    default: throw std::runtime_error("Unknown SPDLOG_ACTIVE_LEVEL");
+  }
+  #else
+  throw std::runtime_error("SPDLOG_ACTIVE_LEVEL is not defined");
+  #endif
+}
 
 /// @brief Set messaging format of the logger
 inline void SetMaCh3LoggerFormat()
@@ -38,6 +69,8 @@ inline void SetMaCh3LoggerFormat()
   //spdlog::set_pattern("[%H:%M:%S][%s][%^%l%$] %v");
   spdlog::set_pattern("[%s][%^%l%$] %v");
   #endif
+
+  spdlog::set_level(get_default_log_level());
 }
 
 /// @brief KS: This is bit convoluted but this is to allow redirecting cout and errors from external library into MaCh3 logger format

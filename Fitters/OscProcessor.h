@@ -20,10 +20,15 @@ class OscProcessor : public MCMCProcessor {
     /// @note based on makeJarlskog.C
     void PerformJarlskogAnalysis();
 
+    /// @brief Make fancy Pie plot for delta CP
+    /// @author Asher Kaboth
+    /// @note based on makePiePlot.C
+    void MakePiePlot();
+
   protected:
     /// @brief Read the Osc cov file and get the input central values and errors
     /// Here we allow Jarlskog Shenanigans
-    void ReadXSecFile() override;
+    void LoadAdditionalInfo() override;
 
     /// @brief Perform Jarlskog Plotting
     /// @author Kevin Wood
@@ -36,6 +41,12 @@ class OscProcessor : public MCMCProcessor {
                           const std::unique_ptr<TH1D>& jarl_IH_flatsindcp);
 
     /// @brief Calculate Jarlskog Invariant using oscillation parameters
+    /// @param s2th13  Value of \f$ \sin^2\theta_{13} \f$
+    /// @param s2th23  Value of \f$ \sin^2\theta_{23} \f$
+    /// @param s2th12  Value of \f$ \sin^2\theta_{12} \f$
+    /// @param dcp     CP-violating phase \f$ \delta_{\text{CP}} \f$ (in radians)
+    /// @return The value of the Jarlskog invariant \f$ J_{\text{CP}} \f$
+    /// @cite Jarlskog:1985ht
     double CalcJarlskog(const double s2th13, const double s2th23, const double s2th12, const double dcp) const;
     /// @brief Draw Prior value
     double SamplePriorForParam(const int paramIndex,

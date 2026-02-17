@@ -1,6 +1,7 @@
 // MaCh3 includes
 #include "Manager/Manager.h"
 #include "Samples/SampleStructs.h"
+#include "Samples/HistogramUtils.h"
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT includes
@@ -28,6 +29,9 @@ _MaCh3_Safe_Include_End_ //}
 /// and helps determine whether the chains have reached a stable distribution.
 ///
 /// @cite gelman2019.
+///
+/// @author Kamil Skwarczynski
+/// @author Michael Reh
 
 // *******************
 int Ntoys;
@@ -167,10 +171,10 @@ void PrepareChains() {
   TStopwatch clock;
   clock.Start();
 
-  std::vector<int> BurnIn(Nchains);
-  std::vector<int> nEntries(Nchains);
+  std::vector<unsigned int> BurnIn(Nchains);
+  std::vector<unsigned int> nEntries(Nchains);
   std::vector<int> nBranches(Nchains);
-  std::vector<int> step(Nchains);
+  std::vector<unsigned int> step(Nchains);
 
   Draws = new double**[Nchains]();
   DrawsFolded = new double**[Nchains]();
@@ -187,7 +191,7 @@ void PrepareChains() {
     TChain* Chain = new TChain("posteriors");
     Chain->Add(MCMCFile[m].c_str());
     MACH3LOG_INFO("On file: {}", MCMCFile[m].c_str());
-    nEntries[m] = int(Chain->GetEntries());
+    nEntries[m] = static_cast<unsigned int>(Chain->GetEntries());
 
     // Set the step cut to be 20%
     BurnIn[m] = nEntries[m]/5;
@@ -313,11 +317,9 @@ void PrepareChains() {
       }
 
       // Set the branch addresses for params
-      for (int j = 0; j < nDraw; ++j)
-      {
+      for (int j = 0; j < nDraw; ++j) {
         Draws[m][i][j] = branch_values[j];
       }
-
     }//end loop over toys
 
     //TN: There, we now don't need to keep the chain in memory anymore
@@ -600,7 +602,11 @@ void SaveResults() {
       while (temp.find(".root") != std::string::npos) {
         temp = temp.substr(0, temp.find(".root"));
       }
-
+      // Strip directory path
+      const auto slash = temp.find_last_of("/\\");
+      if (slash != std::string::npos) {
+        temp = temp.substr(slash + 1);
+      }
       NameTemp = NameTemp + temp + "_";
     }
   }
@@ -609,8 +615,7 @@ void SaveResults() {
   }
   NameTemp += "diag.root";
 
-  TFile* DiagFile = new TFile(NameTemp.c_str(), "recreate");
-
+  TFile *DiagFile = M3::Open(NameTemp, "recreate", __FILE__, __LINE__);
   DiagFile->cd();
 
   TH1D *StandardDeviationGlobalPlot = new TH1D("StandardDeviationGlobalPlot", "StandardDeviationGlobalPlot", nDraw, 0, nDraw);

@@ -12,6 +12,7 @@
 /// @author Dan Barrow
 /// @author Ed Atkin
 /// @author Kamil Skwarczynski
+/// @ingroup CoreClasses
 class ParameterHandlerBase {
  public:
   /// @brief ETA - constructor for a YAML file
@@ -28,12 +29,7 @@ class ParameterHandlerBase {
 
   /// @brief Destructor
   virtual ~ParameterHandlerBase();
-  
-  /// @defgroup ParameterHandlerSetters Parameter Handler Setters
-  /// Group of functions to set various parameters, names, and values.
 
-  /// @defgroup ParameterHandlerGetters Parameter Handler Getters
-  /// Group of functions to get various parameters, names, and values.
 
   // ETA - maybe need to add checks to index on the setters? i.e. if( i > _fPropVal.size()){throw;}
   /// @brief Set covariance matrix
@@ -78,7 +74,7 @@ class ParameterHandlerBase {
   /// @param eL bool telling if it will be flat or not
   /// @ingroup ParameterHandlerSetters
   void SetFlatPrior(const int i, const bool eL);
-  
+
   /// @brief Set random value useful for debugging/CI
   /// @param i Parameter index
   /// @param rand New value for random number
@@ -96,9 +92,10 @@ class ParameterHandlerBase {
   void SetBranches(TTree &tree, const bool SaveProposal = false);
   /// @brief Set global step scale for covariance object
   /// @param scale Value of global step scale
+  /// @param verbose Print that we've changed scale + use warnings [default: true]
   /// @cite luengo2020survey
   /// @ingroup ParameterHandlerSetters
-  void SetStepScale(const double scale);
+  void SetStepScale(const double scale, const bool verbose=true);
   /// @brief DB Function to set fIndivStepScale from a vector (Can be used from execs and inside covariance constructors)
   /// @param ParameterIndex Parameter Index
   /// @param StepScale Value of individual step scale
@@ -115,19 +112,26 @@ class ParameterHandlerBase {
   /// @brief KS: After step scale, prefit etc. value were modified save this modified config.
   void SaveUpdatedMatrixConfig();
 
-  /// @brief Throw the proposed parameter by mag sigma. Should really just have the user specify this throw by having argument double
-  void ThrowParProp(const double mag = 1.);
-
-  /// @brief Helper function to throw the current parameter by mag sigma. Can study bias in MCMC with this; put different starting parameters
-  void ThrowParCurr(const double mag = 1.);
   /// @brief Throw the parameters according to the covariance matrix. This shouldn't be used in MCMC code ase it can break Detailed Balance;
   void ThrowParameters();
   /// @brief Randomly throw the parameters in their 1 sigma range
   void RandomConfiguration();
-  
+
   /// @brief Check if parameters were proposed outside physical boundary
   int CheckBounds() const _noexcept_;
   /// @brief Calc penalty term based on inverted covariance matrix
+  ///
+  /// @details
+  /// The log-likelihood is computed as:
+  /// \f[
+  ///   \log \mathcal{L} = \frac{1}{2} \sum_{i}^{\textrm{pars}} \sum_{j}^{\textrm{pars}} \Delta \vec{p}_i \left( V^{-1} \right)_{i,j} \Delta \vec{p}_j
+  /// \f]
+  /// where:
+  /// - \f$\Delta \vec{p}_i = \theta_i - \theta_{i,0}\f$ is the difference between the current and pre-fit parameter values,
+  /// - \f$V^{-1}\f$ is the inverted covariance matrix.
+  ///
+  /// @note
+  /// - If `_fFlatPrior[i]` is `true`, the parameter is excluded from the calculation.
   double CalcLikelihood() const _noexcept_;
   /// @brief Return CalcLikelihood if some params were thrown out of boundary return _LARGE_LOGL_
   /// @ingroup ParameterHandlerGetters
@@ -185,6 +189,9 @@ class ParameterHandlerBase {
   /// @brief Adaptive Step Tuning Stuff
   void ResetIndivStepScale();
 
+  /// @brief Set individual step scale for parameters which are skipped during adaption to initial values
+  void SetIndivStepScaleForSkippedAdaptParams();
+
   /// @brief Initialise adaptive MCMC
   /// @param adapt_manager Node having from which we load all adaptation options
   void InitialiseAdaption(const YAML::Node& adapt_manager);
@@ -198,6 +205,8 @@ class ParameterHandlerBase {
   /// @brief Use new throw matrix, used in adaptive MCMC
   /// @ingroup ParameterHandlerSetters
   void SetThrowMatrix(TMatrixDSym *cov);
+  void SetSubThrowMatrix(int first_index, int last_index, TMatrixDSym const &subcov);
+  /// @brief Replaces old throw matrix with new one
   void UpdateThrowMatrix(TMatrixDSym *cov);
   /// @brief Set number of MCMC step, when running adaptive MCMC it is updated with given frequency. We need number of steps to determine frequency.
    /// @ingroup ParameterHandlerSetters
@@ -212,9 +221,6 @@ class ParameterHandlerBase {
   /// @brief Get matrix used for step proposal
   /// @ingroup ParameterHandlerGetters
   double GetThrowMatrix(const int i, const int j) const { return throwMatrixCholDecomp[i][j];}
-  /// @brief Get the Cholesky decomposition of the throw matrix
-  /// @ingroup ParameterHandlerGetters
-  inline TMatrixD *GetThrowMatrix_CholDecomp() const {return throwMatrix_CholDecomp;}
 
   /// @brief KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plotting
   /// @details This function converts the covariance matrix to a correlation matrix and
@@ -238,7 +244,6 @@ class ParameterHandlerBase {
   /// Can be useful if you want to track these without having to copy values using getProposed()
   inline const std::vector<double> &GetParPropVec() {return _fPropVal;}
 
-  //Some Getters
   /// @brief Get total number of parameters
   /// @ingroup ParameterHandlerGetters
   inline int  GetNumParams() const {return _fNumPar;}
@@ -256,6 +261,10 @@ class ParameterHandlerBase {
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
   inline double GetParCurr(const int i) const { return _fCurrVal[i]; }
+  /// @brief Get vector of current parameter values
+  /// @ingroup ParameterHandlerGetters
+  inline const std::vector<double> &GetParCurrVec() const { return _fCurrVal; }
+
   /// @brief Get prior parameter value
   /// @param i Parameter index
   /// @ingroup ParameterHandlerGetters
@@ -306,15 +315,32 @@ class ParameterHandlerBase {
   /// @brief Accepted this step
   void AcceptStep() _noexcept_;
 
-  /// @brief fix parameters at prior values
+  /// @brief Set all parameters to be fixed at prior values
+  void SetFixAllParameters();
+  /// @brief Set parameter to be fixed at prior value
+  /// @param i Parameter index
+  void SetFixParameter(const int i);
+  /// @brief Set parameter to be fixed at prior value
+  /// @param name Name of the parameter to be fixed
+  void SetFixParameter(const std::string& name);
+
+  /// @brief Set all parameters to be treated as free
+  void SetFreeAllParameters();
+  /// @brief Set parameter to be treated as free
+  /// @param i Parameter index
+  void SetFreeParameter(const int i);
+  /// @brief Set parameter to be treated as free
+  /// @param name Name of the parameter to be treated as free
+  void SetFreeParameter(const std::string& name);
+
+  /// @brief Toggle fixing parameters at prior values
   void ToggleFixAllParameters();
-  /// @brief fix parameter at prior values
+  /// @brief Toggle fixing parameter at prior values
   /// @param i Parameter index
   void ToggleFixParameter(const int i);
-  /// @brief Fix parameter at prior values
+  /// @brief Toggle fixing parameter at prior values
   /// @param name Name of parameter you want to fix
   void ToggleFixParameter(const std::string& name);
-
   /// @brief Is parameter fixed or not
   /// @param i Parameter index
   bool IsParameterFixed(const int i) const {
@@ -352,7 +378,7 @@ class ParameterHandlerBase {
   /// @brief KS: Set proposed parameter values vector to be base on tune values, for example set proposed values to be of generated or maybe PostND
   /// @ingroup ParameterHandlerSetters
   void SetTune(const std::string& TuneName);
-  
+
   /// @brief Get pointer for PCAHandler
   inline PCAHandler* GetPCAHandler() const {
     if (!pca) {
@@ -361,6 +387,24 @@ class ParameterHandlerBase {
     }
     return PCAObj.get();
   }
+
+  /// @brief Matches branches in a TTree to parameters in a systematic handler.
+  ///
+  /// @param PosteriorFile Pointer to the ROOT TTree from MaCh3 fit.
+  /// @param BranchValues Vector to store the values of the branches (resized inside).
+  /// @param BranchNames Vector to store the names of the branches (resized inside).
+  /// @param FancyNames Optional vector of "fancy names" to match. If empty, all parameters are matched.
+  ///
+  ///  - If `FancyNames` is provided, it matches only the parameters whose "fancy names"
+  ///    are in `FancyNames`. This is useful for studies where one performs ND fits and passes
+  ///    them to FD fits, which may have additional parameters (e.g., oscillations).
+  ///  - If `FancyNames` is empty, it matches all parameters in the systematic handler.
+  ///
+  /// @throws MaCh3Exception if any parameter branch is uninitialized.
+  void MatchMaCh3OutputBranches(TTree *PosteriorFile,
+                                std::vector<double>& BranchValues,
+                                std::vector<std::string>& BranchNames,
+                                const std::vector<std::string>& FancyNames = {});
 
 protected:
   /// @brief Initialisation of the class using matrix from root file
@@ -403,6 +447,7 @@ protected:
   void EnableSpecialProposal(const YAML::Node& param, const int Index);
 
   /// @brief Perform Special Step Proposal
+  /// @warning KS: Following Asher comment we do "Step->Circular Bounds->Flip"
   void SpecialStepProposal();
 
   /// Check if any of special step proposal were enabled
@@ -419,7 +464,7 @@ protected:
   TMatrixDSym *invCovMatrix;
   /// KS: Same as above but much faster as TMatrixDSym cache miss
   std::vector<std::vector<double>> InvertCovMatrix;
-    
+
   /// KS: Set Random numbers for each thread so each thread has different seed
   std::vector<std::unique_ptr<TRandom3>> random_number;
 
@@ -433,9 +478,9 @@ protected:
   /// KS: This is used when printing parameters, sometimes we have super long parameters name, we want to flexibly adjust couts
   int PrintLength;
 
-  /// ETA _fNames is set automatically in the covariance class to be something like xsec_i, this is currently to make things compatible with the Diagnostic tools
+  /// ETA _fNames is set automatically in the covariance class to be something like param_i, this is currently to make things compatible with the Diagnostic tools
   std::vector<std::string> _fNames;
-  /// Fancy name for example rather than xsec_0 it is MAQE, useful for human reading
+  /// Fancy name for example rather than param_0 it is MAQE, useful for human reading
   std::vector<std::string> _fFancyNames;
   /// Stores config describing systematics
   YAML::Node _fYAMLDoc;
@@ -460,10 +505,17 @@ protected:
   /// Tells to which samples object param should be applied
   std::vector<std::vector<std::string>> _fSampleNames;
 
+  /// Backup of _fIndivStepScale for parameters which are skipped during adaption
+  std::vector<double> _fIndivStepScaleInitial;
+
+  /// Backup of _fGlobalStepScale for parameters which are skipped during adaption
+  double _fGlobalStepScaleInitial;
+
+  /// Flags telling if parameter should be skipped during adaption
+  std::vector<bool> param_skip_adapt_flags;
+
   /// Matrix which we use for step proposal before Cholesky decomposition (not actually used for step proposal)
   TMatrixDSym* throwMatrix;
-  /// Matrix which we use for step proposal after Cholesky decomposition
-  TMatrixD* throwMatrix_CholDecomp;
   /// Throw matrix that is being used in the fit, much faster as TMatrixDSym cache miss
   double** throwMatrixCholDecomp;
 

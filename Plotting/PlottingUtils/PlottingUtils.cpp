@@ -1,4 +1,4 @@
-#include "plottingUtils.h"
+#include "PlottingUtils.h"
 
 namespace MaCh3Plotting {
 
@@ -7,7 +7,7 @@ namespace MaCh3Plotting {
 /// and last points it will extend the binning out of the graph bounds using the width between the
 /// outermost and second outermost points. This can be useful if e.g. you want to draw cumulative
 /// stacks of LLH scans.
-TH1D TGraphToTH1D(TGraph graph, std::string newName, std::string newTitle) {
+TH1D TGraphToTH1D(TGraph graph, const std::string& newName, const std::string& newTitle) {
   std::string name;
   std::string title;
 
@@ -60,9 +60,7 @@ TH1D TGraphToTH1D(TGraph graph, std::string newName, std::string newTitle) {
   return retHist;
 }
 
-
 std::vector<std::vector<double>> TGraphToVector(TGraph graph) {
-
   int nPoints = graph.GetN();
   std::vector<std::vector<double>> ret(2);
   std::vector<double> pointsX(nPoints);

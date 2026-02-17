@@ -10,9 +10,15 @@ AdaptiveMCMCHandler::AdaptiveMCMCHandler() {
   end_adaptive_update   = 1;
   adaptive_update_step  = 1000;
   total_steps = 0;
-
   par_means = {};
   adaptive_covariance = nullptr;
+
+  /// Robbins-Monro adaption
+  use_robbins_monro = false;
+  total_rm_restarts = 0;
+  
+  target_acceptance = 0.234;
+  acceptance_rate_batch_size = 10000;
 }
 
 // ********************************************
@@ -25,7 +31,12 @@ AdaptiveMCMCHandler::~AdaptiveMCMCHandler() {
 
 // ********************************************
 bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const std::string& matrix_name_str,
-                                        const std::vector<double>* parameters, const std::vector<double>* fixed) {
+                                        const std::vector<std::string>* parameter_names,
+                                        const std::vector<double>* parameters, 
+                                        const std::vector<double>* fixed,
+                                        const std::vector<bool>* param_skip_adapt_flags,
+                                        const TMatrixDSym* throwMatrix,
+                                        const double initial_scale_) {
 // ********************************************
   /*
    * HW: Idea is that adaption can simply read the YAML config
@@ -69,21 +80,63 @@ bool AdaptiveMCMCHandler::InitFromConfig(const YAML::Node& adapt_manager, const 
   start_adaptive_update = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["StartUpdate"], 0);
   end_adaptive_update   = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["EndUpdate"], 10000);
   adaptive_update_step  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["UpdateStep"], 100);
-  adaptive_save_n_iterations  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["SaveNIterations"], 1);
+  adaptive_save_n_iterations  = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["SaveNIterations"], -1);
   output_file_name = GetFromManager<std::string>(adapt_manager["AdaptionOptions"]["Settings"]["OutputFileName"], "");
+
+  // Check for Robbins-Monro adaption
+  use_robbins_monro = GetFromManager<bool>(adapt_manager["AdaptionOptions"]["Settings"]["UseRobbinsMonro"], false);
+  target_acceptance = GetFromManager<double>(adapt_manager["AdaptionOptions"]["Settings"]["TargetAcceptance"], 0.234);
+  if (target_acceptance <= 0 || target_acceptance >= 1) {
+    MACH3LOG_ERROR("Target acceptance must be in (0,1), got {}", target_acceptance);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  acceptance_rate_batch_size = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["AcceptanceRateBatchSize"], 10000);
+  total_rm_restarts = GetFromManager<int>(adapt_manager["AdaptionOptions"]["Settings"]["TotalRobbinsMonroRestarts"], 0);
+  n_rm_restarts = 0;
+
+  prev_step_accepted = false; 
 
   // We also want to check for "blocks" by default all parameters "know" about each other
   // but we can split the matrix into independent block matrices
   SetParams(parameters);
   SetFixed(fixed);
 
-  /// HW: This is technically wrong, should be across all systematics but will be addressed in a later PR
-  adaption_scale = 2.38*2.38/GetNumParams(); 
-  
-  // We"ll set a dummy variable here
-  auto matrix_blocks = GetFromManager<std::vector<std::vector<int>>>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["MatrixBlocks"], {{}});
+  _ParamNames = parameter_names;
 
+  initial_throw_matrix = static_cast<TMatrixDSym*>(throwMatrix->Clone());
+
+  initial_scale = initial_scale_;
+
+  /// HW: This is technically wrong, should be across all systematics but will be addressed in a later PR
+  if(use_robbins_monro) {
+    MACH3LOG_INFO("Using Robbins-Monro for adaptive step size tuning with target acceptance {}", target_acceptance);
+    // Now we need some thing
+    CalculateRobbinsMonroStepLength();
+  }
+
+  // We'll use the same start scale for Robbins-Monro as standard adaption
+  adaption_scale = 2.38/std::sqrt(GetNumParams()); 
+
+  // HH: added ability to define blocks by parameter names
+  bool matrix_blocks_by_name = GetFromManager<bool>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["MatrixBlocksByName"], false);
+  std::vector<std::vector<int>> matrix_blocks;
+  // HH: read blocks by names and convert to indices
+  if (matrix_blocks_by_name) {
+    auto matrix_blocks_input = GetFromManager<std::vector<std::vector<std::string>>>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["MatrixBlocks"], {{}});
+    // Now we need to convert to indices
+    for (const auto& block : matrix_blocks_input) {
+      auto block_indices = GetParIndicesFromNames(block);
+      matrix_blocks.push_back(block_indices);
+    }
+  } else {
+    matrix_blocks = GetFromManager<std::vector<std::vector<int>>>(adapt_manager["AdaptionOptions"]["Covariance"][matrix_name_str]["MatrixBlocks"], {{}});
+  }
   SetAdaptiveBlocks(matrix_blocks);
+
+  // set parameters to skip during adaption
+  _param_skip_adapt_flags = param_skip_adapt_flags;
+
   return true;
 }
 
@@ -141,8 +194,12 @@ void AdaptiveMCMCHandler::SetAdaptiveBlocks(const std::vector<std::vector<int>>&
 void AdaptiveMCMCHandler::SaveAdaptiveToFile(const std::string &outFileName,
                                              const std::string &systematicName, bool is_final) {
 // ********************************************
-  if (((total_steps - start_adaptive_throw) / adaptive_update_step) % adaptive_save_n_iterations == 0 || is_final) {
-
+  // Skip saving if adaptive_save_n_iterations is negative,
+  // unless this is the final iteration (is_final overrides the condition)
+  if (adaptive_save_n_iterations < 0 && !is_final) return;
+  if (is_final ||
+    (adaptive_save_n_iterations > 0 &&
+    ((total_steps - start_adaptive_throw) / adaptive_update_step) % adaptive_save_n_iterations == 0)) {
     TFile *outFile = new TFile(outFileName.c_str(), "UPDATE");
     if (outFile->IsZombie()) {
       MACH3LOG_ERROR("Couldn't find {}", outFileName);
@@ -168,9 +225,50 @@ void AdaptiveMCMCHandler::SaveAdaptiveToFile(const std::string &outFileName,
     }
 
     outFile->cd();
-    adaptive_covariance->Write(adaptive_cov_name.c_str());
+    auto adaptive_to_save = static_cast<TMatrixDSym*>(adaptive_covariance->Clone());
+    // Multiply by scale
+    // HH: Only scale parameters not being skipped
+    for (int i = 0; i < GetNumParams(); ++i) {
+      for (int j = 0; j <= i; ++j) {
+        // If both parameters are skipped, scale by initial scale
+        if ((*_param_skip_adapt_flags)[i] && (*_param_skip_adapt_flags)[j]) {
+          (*adaptive_to_save)(i, j) *= initial_scale * initial_scale;
+          if (i != j) {
+            (*adaptive_to_save)(j, i) *= initial_scale * initial_scale;
+          }
+        }
+        else if (!(*_param_skip_adapt_flags)[i] && !(*_param_skip_adapt_flags)[j]) {
+          (*adaptive_to_save)(i, j) *= GetAdaptionScale() * GetAdaptionScale();
+          if (i != j) {
+            (*adaptive_to_save)(j, i) *= GetAdaptionScale() * GetAdaptionScale();
+          }
+        }
+        else {
+          // Not too sure what to do here, as the correlation should be zero 
+          // Scale by both factors as a compromise
+          (*adaptive_to_save)(i, j) *= GetAdaptionScale() * initial_scale;
+          if (i != j) {
+            (*adaptive_to_save)(j, i) *= GetAdaptionScale() * initial_scale;
+          }
+        }
+      }
+    }
+
+    adaptive_to_save->Write(adaptive_cov_name.c_str());
     outMeanVec->Write(mean_vec_name.c_str());
+
+    // HH: Also save the initial throw matrix for reference
+    if (!initial_throw_matrix_saved) {
+      std::string initial_cov_name = "0_" + systematicName + std::string("_initial_throw_matrix");
+      auto initial_throw_matrix_to_save = static_cast<TMatrixDSym*>(initial_throw_matrix->Clone());
+      *(initial_throw_matrix_to_save) *= initial_scale * initial_scale;
+      initial_throw_matrix_saved = true;
+      initial_throw_matrix_to_save->Write(initial_cov_name.c_str());
+      delete initial_throw_matrix_to_save;
+    }
+
     outFile->Close();
+    delete adaptive_to_save;
     delete outMeanVec;
     delete outFile;
   }
@@ -186,7 +284,7 @@ void AdaptiveMCMCHandler::SetThrowMatrixFromFile(const std::string& matrix_file_
 // ********************************************
   // Lets you set the throw matrix externally
   // Open file
-  std::unique_ptr<TFile>matrix_file(new TFile(matrix_file_name.c_str()));
+  auto matrix_file = std::make_unique<TFile>(matrix_file_name.c_str());
   use_adaptive = true;
 
   if(matrix_file->IsZombie()){
@@ -208,7 +306,7 @@ void AdaptiveMCMCHandler::SetThrowMatrixFromFile(const std::string& matrix_file_
   if(means_vector){
     // Yay our vector exists! Let's loop and fill it
     // Should check this is done
-    if(means_vector->GetNrows()){
+    if(means_vector->GetNrows() != GetNumParams()){
       MACH3LOG_ERROR("External means vec size ({}) != matrix size ({})", means_vector->GetNrows(), GetNumParams());
       throw MaCh3Exception(__FILE__, __LINE__);
     }
@@ -235,6 +333,8 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance() {
 // ********************************************
   std::vector<double> par_means_prev = par_means;
   int steps_post_burn = total_steps - start_adaptive_update;
+
+  prev_step_accepted = false;
 
   // Step 1: Update means and compute deviations
   for (int i = 0; i < GetNumParams(); ++i) {
@@ -266,6 +366,21 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance() {
       double cov_prev = (*adaptive_covariance)(i, j);
       double cov_updated = 0.0;
 
+      // HH: Check if either parameter is skipped
+      // If parameter i and j are both skipped
+      if ((*_param_skip_adapt_flags)[i] && (*_param_skip_adapt_flags)[j]) {
+        // Set covariance to initial throw matrix value
+        (*adaptive_covariance)(i, j) = (*initial_throw_matrix)(i, j);
+        (*adaptive_covariance)(j, i) = (*initial_throw_matrix)(j, i);
+        continue;
+      }
+      // If only one parameter is skipped we need to make sure correlation is zero 
+      // because we don't want to change one parameter while keeping the other fixed 
+      // as this would lead to penalty terms in the prior
+      else if ((*_param_skip_adapt_flags)[i] || (*_param_skip_adapt_flags)[j]) {
+        continue;
+      } // otherwise adapt as normal
+
       if (steps_post_burn > 0) {
       // Haario-style update
         double cov_t = cov_prev * (steps_post_burn - 1) / steps_post_burn;
@@ -273,7 +388,7 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance() {
         double curr_means_t = (steps_post_burn + 1) * par_means[i] * par_means[j];
         double curr_step_t = CurrVal(i) * CurrVal(j);
 
-        cov_updated = cov_t + adaption_scale * (prev_means_t - curr_means_t + curr_step_t) / steps_post_burn;
+        cov_updated = cov_t + (prev_means_t - curr_means_t + curr_step_t) / steps_post_burn;
       }
 
       (*adaptive_covariance)(i, j) = cov_updated;
@@ -283,7 +398,7 @@ void AdaptiveMCMCHandler::UpdateAdaptiveCovariance() {
 }
 
 // ********************************************
-bool AdaptiveMCMCHandler::IndivStepScaleAdapt() {
+bool AdaptiveMCMCHandler::IndivStepScaleAdapt() const {
 // ********************************************
   if(total_steps == start_adaptive_throw) return true;
   else return false;
@@ -302,7 +417,7 @@ bool AdaptiveMCMCHandler::UpdateMatrixAdapt() {
 }
 
 // ********************************************
-bool AdaptiveMCMCHandler::SkipAdaption() {
+bool AdaptiveMCMCHandler::SkipAdaption() const {
 // ********************************************
   if(total_steps > end_adaptive_update ||
     total_steps< start_adaptive_update) return true;
@@ -310,14 +425,14 @@ bool AdaptiveMCMCHandler::SkipAdaption() {
 }
 
 // ********************************************
-bool AdaptiveMCMCHandler::AdaptionUpdate() {
+bool AdaptiveMCMCHandler::AdaptionUpdate() const {
 // ********************************************
   if(total_steps <= start_adaptive_throw) return true;
   else return false;
 }
 
 // ********************************************
-void AdaptiveMCMCHandler::Print() {
+void AdaptiveMCMCHandler::Print() const {
 // ********************************************
   MACH3LOG_INFO("Adaptive MCMC Info:");
   MACH3LOG_INFO("Throwing from New Matrix from Step : {}", start_adaptive_throw);
@@ -325,13 +440,139 @@ void AdaptiveMCMCHandler::Print() {
   MACH3LOG_INFO("Adaption Matrix Ending Updates     : {}", end_adaptive_update);
   MACH3LOG_INFO("Steps Between Updates              : {}", adaptive_update_step);
   MACH3LOG_INFO("Saving matrices to file            : {}", output_file_name);
-  MACH3LOG_INFO("Will only save every {} iterations"     , adaptive_save_n_iterations);
+  MACH3LOG_INFO("Will only save every {} iterations"     , adaptive_save_n_iterations); 
+  if(use_robbins_monro) {
+    MACH3LOG_INFO("Using Robbins-Monro for adaptive step size tuning with target acceptance {}", target_acceptance);
+  }
 }
 
-double AdaptiveMCMCHandler::CurrVal(const int par_index){
+// ********************************************
+void AdaptiveMCMCHandler::CheckMatrixValidityForAdaption(const TMatrixDSym *covMatrix) const {
+// ********************************************
+  int n = covMatrix->GetNrows();
+  std::vector<std::vector<double>> corrMatrix(n, std::vector<double>(n));
+
+  // Extract standard deviations from the diagonal
+  std::vector<double> stdDevs(n);
+  for (int i = 0; i < n; ++i) {
+    stdDevs[i] = std::sqrt((*covMatrix)(i, i));
+  }
+
+  // Compute correlation for each element
+  for (int i = 0; i < n; ++i) {
+    for (int j = 0; j < n; ++j) {
+      double cov = (*covMatrix)(i, j);
+      double corr = cov / (stdDevs[i] * stdDevs[j]);
+      corrMatrix[i][j] = corr;
+    }
+  }
+
+  // KS: These numbers are completely arbitrary
+  constexpr double NumberOfParametersThreshold = 5;
+  constexpr double CorrelationThreshold = 0.5;
+
+  bool FlagMessage = false;
+  // For each parameter, count how many others it is correlated with
+  for (int i = 0; i < n; ++i) {
+    if (IsFixed(i)) {
+      continue;
+    }
+    int block_i = adapt_block_matrix_indices[i];
+    int correlatedCount = 0;
+    std::vector<int> correlatedWith;
+
+    for (int j = 0; j < n; ++j) {
+      if (i == j || IsFixed(j) || adapt_block_matrix_indices[j] != block_i) {
+        continue;
+      }
+      if (corrMatrix[i][j] > CorrelationThreshold) {
+        correlatedCount++;
+        correlatedWith.push_back(j);
+      }
+    }
+
+    if (correlatedCount > NumberOfParametersThreshold) {
+      MACH3LOG_WARN("Parameter {} ({}) is highly correlated with {} other parameters (above threshold {}).", _ParamNames->at(i), i, correlatedCount, CorrelationThreshold);
+      MACH3LOG_WARN("Correlated with parameters: {}.", fmt::join(correlatedWith, ", "));
+      FlagMessage = true;
+    }
+  }
+  if(FlagMessage){
+    MACH3LOG_WARN("Found highly correlated block, adaptive may not work as intended, proceed with caution");
+    MACH3LOG_WARN("You can consider defying so called Adaption Block to not update this part of matrix");
+  }
+}
+
+  
+// ********************************************
+double AdaptiveMCMCHandler::CurrVal(const int par_index) const {
+// ********************************************
   /// HW Implemented as its own method to allow for
   /// different behaviour in the future
   return (*_fCurrVal)[par_index];
+}
+
+// ********************************************
+void AdaptiveMCMCHandler::CalculateRobbinsMonroStepLength() {
+// ********************************************
+  /* 
+    Obtains the constant "step scale" for Robbins-Monro adaption
+    for simplicity and because it has the degrees of freedom "baked in"
+    it will be same across ALL blocks. 
+  */
+
+  /// Firstly we need to calculate the alpha value, this is in some sense "optimal"
+  double alpha = -ROOT::Math::normal_quantile(target_acceptance/2, 1.0); 
+
+  int non_fixed_pars = GetNumParams()-GetNFixed();
+
+  if(non_fixed_pars == 0){
+    MACH3LOG_ERROR("Number of non_fixed_pars is 0, have you fixed all parameters");
+    MACH3LOG_ERROR("This will cause division by 0 and crash ()");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  /// Now we can calculate the scale factor
+  c_robbins_monro = (1- 1/non_fixed_pars)*std::sqrt(TMath::Pi()*2 * std::exp(alpha*alpha));
+  c_robbins_monro += 1/(non_fixed_pars*target_acceptance*(1-target_acceptance));
+
+  MACH3LOG_INFO("Robbins-Monro scale factor set to {}", c_robbins_monro);
+}
+
+// ********************************************
+void AdaptiveMCMCHandler::UpdateRobbinsMonroScale(){
+// ********************************************
+  /* 
+  Update the scale factor using Robbins-Monro. 
+  TLDR: If acceptance rate is too high, scale factor goes up, if too low goes down
+        will pretty rapidly converge to the right value.
+  */
+  if ((total_steps>0) && (total_steps % acceptance_rate_batch_size == 0)) {
+    n_rm_restarts++;
+  }
+
+  /// This allows to move towards a STABLE number of steps in the batch
+  int batch_step;
+  if (n_rm_restarts > total_rm_restarts) {
+    batch_step = total_steps;
+  }
+  else{
+    batch_step = total_steps % acceptance_rate_batch_size;
+  }
+
+  int non_fixed_pars = GetNumParams()-GetNFixed();
+
+  // double root_scale = std::sqrt(adaption_scale);
+
+  /// Update the scale factor for Robbins-Monro adaption [200 is arbitrary for early stability but motivated by paper]
+  double scale_factor = adaption_scale * c_robbins_monro / std::max(200.0, static_cast<double>(batch_step) / non_fixed_pars);
+
+  /// Now we either increase or decrease the scale
+  if(prev_step_accepted){
+    adaption_scale += (1 - target_acceptance) * scale_factor;
+  }
+  else{
+    adaption_scale -= target_acceptance * scale_factor;
+  }
 }
 
 } //end adaptive_mcmc

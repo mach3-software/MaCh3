@@ -23,6 +23,12 @@ _MaCh3_Safe_Include_End_ //}
 
 /// @file YamlHelper.h
 /// @brief Utility functions for handling YAML nodes
+///
+/// MaCh3 uses YAML in a specific way within its configuration system.
+/// These helper functions act as a safety layer on top of yaml-cpp, adding
+/// MaCh3-specific validation, consistency checks, and enhanced error reporting.
+///
+/// @note you can read more about Yaml: [here](https://codedocs.xyz/jbeder/yaml-cpp/index.html)
 /// @author Kamil Skwarczynski
 /// @author Luke Pickering
 
@@ -42,7 +48,7 @@ template<typename T, typename... Args>
 bool CheckNodeExistsHelper(const T& node, const std::string& key, Args... args) {\
 // **********************
   if (!node[key]) {
-    //std::cerr << "Node " << key << " doesn't exist." << std::endl;
+    MACH3LOG_TRACE("Node '{}' doesn't exist.", key);
     return false;
   }
   return CheckNodeExistsHelper(node[key], args...);
@@ -69,10 +75,10 @@ T FindFromManagerHelper(const YAML::Node& node) {
 /// @brief Recursive function to traverse YAML nodes
 template<typename T, typename... Args>
 T FindFromManagerHelper(const YAML::Node& node, const std::string& key, Args... args) {
-  // **********************
+// **********************
   if (!node[key]) {
     MACH3LOG_ERROR("Node {} doesn't exist.", key);
-    throw;
+    throw MaCh3Exception(__FILE__, __LINE__);
     return T();
   }
   return FindFromManagerHelper<T>(node[key], args...); // Recursive call
@@ -174,9 +180,10 @@ inline TMacro YAMLtoTMacro(const YAML::Node& yaml_node, const std::string& name)
 /// @brief Compare if yaml nodes are identical
 /// @param node1 The first YAML node to compare.
 /// @param node2 The second YAML node to compare.
+/// @param Mute allow to mute warning messages
 /// @return true If the two nodes are equivalent in type and content.
 /// @return false If the two nodes differ in structure or content.
-inline bool compareYAMLNodes(const YAML::Node& node1, const YAML::Node& node2) {
+inline bool compareYAMLNodes(const YAML::Node& node1, const YAML::Node& node2, bool Mute = false) {
 // **********************
   // Check if the types of the nodes match
   if (node1.Type() != node2.Type()) {
@@ -185,7 +192,13 @@ inline bool compareYAMLNodes(const YAML::Node& node1, const YAML::Node& node2) {
 
   // Compare scalar types (like strings, numbers)
   if (node1.IsScalar() && node2.IsScalar()) {
-    return node1.as<std::string>() == node2.as<std::string>();
+    auto v1 = node1.as<std::string>();
+    auto v2 = node2.as<std::string>();
+    if (v1 != v2) {
+      if (!Mute) MACH3LOG_WARN("Scalar value mismatch: '{}' != '{}'", v1, v2);
+      return false;
+    }
+    return true;
   }
 
   // Compare sequences (like YAML lists)
@@ -204,11 +217,18 @@ inline bool compareYAMLNodes(const YAML::Node& node1, const YAML::Node& node2) {
   // Compare maps (like YAML dictionaries)
   if (node1.IsMap() && node2.IsMap()) {
     if (node1.size() != node2.size()) {
+      MACH3LOG_WARN("Map size mismatch: {} != {}",
+                    node1.size(), node2.size());
       return false;
     }
     for (auto it1 = node1.begin(); it1 != node1.end(); ++it1) {
       auto key = it1->first.as<std::string>();
-      if (!node2[key] || !compareYAMLNodes(it1->second, node2[key])) {
+      if (!node2[key]) {
+        MACH3LOG_WARN("Key '{}' missing in second YAML", key);
+        return false;
+      }
+      if (!compareYAMLNodes(it1->second, node2[key])) {
+        MACH3LOG_WARN("Value mismatch at key '{}'", key);
         return false;
       }
     }
@@ -216,6 +236,7 @@ inline bool compareYAMLNodes(const YAML::Node& node1, const YAML::Node& node2) {
   }
 
   // Default case: if it's neither scalar, sequence, nor map, consider it unequal
+  if (!Mute) MACH3LOG_WARN("Unsupported YAML node type encountered");
   return false;
 }
 
@@ -261,20 +282,36 @@ inline std::string DemangleTypeName(const std::string& mangledName) {
 // **********************
 /// @brief Get content of config file
 /// @param node Yaml node
+/// @param File name of file in which function is being called to make better error message
+/// @param Line File line in which function is being called to make better error message
 template<typename Type>
 Type Get(const YAML::Node& node, const std::string File, const int Line) {
 // **********************
-  if (!node) {
-    MACH3LOG_ERROR("Empty Yaml node");
-    throw MaCh3Exception(File , Line );
-  }
   try {
     // Attempt to convert the node to the expected type
     return node.as<Type>();
   } catch (const YAML::BadConversion& e) {
     const std::string nodeAsString = YAMLtoSTRING(node);
     MACH3LOG_ERROR("YAML type mismatch: {}", e.what());
-    MACH3LOG_ERROR("While trying to access variable {}", nodeAsString);
+    MACH3LOG_ERROR("While trying to access variable \"{}\"", nodeAsString);
+    if (!node || node.IsNull()) {
+      MACH3LOG_ERROR("Requested node does not exist (null or undefined)");
+    }
+    throw MaCh3Exception(File , Line );
+  } catch (const YAML::InvalidNode& e) {
+    std::string key = "<unknown>";
+    const std::string msg = e.what();
+    const std::string search = "first invalid key: \"";
+    auto start = msg.find(search);
+    if (start != std::string::npos) {
+      start += search.length();
+      auto end = msg.find("\"", start);
+      if (end != std::string::npos) {
+        key = msg.substr(start, end - start);
+      }
+    }
+    MACH3LOG_ERROR("Invalid YAML node: {}", e.what());
+    MACH3LOG_ERROR("While trying to access key: {}", key);
     throw MaCh3Exception(File , Line );
   }
 }
@@ -283,8 +320,10 @@ Type Get(const YAML::Node& node, const std::string File, const int Line) {
 /// @brief Get content of config file if node is not found take default value specified
 /// @param node Yaml node
 /// @param defval Default value which will be used in case node doesn't exist
+/// @param File name of file in which function is being called to make better error message
+/// @param Line File line in which function is being called to make better error message
 template<typename Type>
-Type GetFromManager(const YAML::Node& node, Type defval, const std::string File = "", const int Line = 1) {
+Type GetFromManager(const YAML::Node& node, const Type defval, const std::string File = "", const int Line = 1) {
 // **********************
   if (!node) {
     return defval;
@@ -358,12 +397,10 @@ inline YAML::Node LoadYamlConfig(const std::string& filename, const std::string&
         MACH3LOG_ERROR("Warning: Missing space or tab after '-' at line {}: {}\n", lineNumber, lineconfig);
         throw MaCh3Exception(File, Line);
       }
-
       lineNumber++;
     }
 
     return yamlNode;
-
   } catch (const std::exception& e) {
     MACH3LOG_ERROR("{}\n", e.what());
     MACH3LOG_ERROR("Can't open file {}\n", filename);
@@ -391,7 +428,7 @@ inline const YAML::Node & Cnode(const YAML::Node &n) {
 /// @param a The base YAML node.
 /// @param b The YAML node to merge into `a`.
 /// @return A new YAML node representing the merged result.
-inline YAML::Node MergeNodes(YAML::Node a, YAML::Node b) {
+inline YAML::Node MergeNodes(const YAML::Node& a, const YAML::Node& b) {
 // **********************
   if (!b.IsMap()) {
     // If b is not a map, merge result is b, unless b is null
@@ -458,6 +495,10 @@ inline std::vector<double> ParseBounds(const YAML::Node& node, const std::string
     } else if (val.IsScalar()) {
       try {
         const double center = val.as<double>();
+        if (std::floor(center) != center) {
+          MACH3LOG_ERROR("Invalid center value in Bounds[0]: '{}'. Expected an integer (e.g., 0 or 1).", static_cast<std::string>(val.Scalar()));
+          throw MaCh3Exception(File, Line);
+        }
         bounds = {center - 0.5, center + 0.5};
       } catch (const YAML::BadConversion& e) {
         MACH3LOG_ERROR("Invalid value in Bounds[0]: '{}'. Expected a number.", static_cast<std::string>(val.Scalar()));
