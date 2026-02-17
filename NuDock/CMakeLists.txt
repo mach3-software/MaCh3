@@ -7,14 +7,15 @@ set(HEADERS
 add_library(MaCh3NuDock SHARED
     NuDockServer.cpp
     SampleHandlerNuDock.cpp
+    NuDockFactory.cpp
 )
 
 set_target_properties(MaCh3NuDock PROPERTIES
     PUBLIC_HEADER "${HEADERS}"
     EXPORT_NAME MaCh3NuDock)
 
-# Ensure nlohmann_json is available as a target for NuDock
-find_package(nlohmann_json REQUIRED)
+# nlohmann_json is found at the parent CMakeLists level
+# Create an alias if needed for consistency
 if(NOT TARGET nlohmann_json::nlohmann_json)
     add_library(nlohmann_json::nlohmann_json ALIAS nlohmann_json)
 endif()

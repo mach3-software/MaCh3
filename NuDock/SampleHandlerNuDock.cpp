@@ -20,6 +20,17 @@ SampleHandlerNuDock::~SampleHandlerNuDock() {
 
 void SampleHandlerNuDock::Init() {
   InitialiseNuDockObj(SampleManager.get(), nudock_ptr);
+
+  // Gather the indices of NuDock parameters from the ParameterHandler, so that we can easily retrieve their values in Reweight()
+  auto nudockParamInds_func = ParHandler->GetParsIndexFromSampleName("NuDock", SystType::kFunc);
+  // HH: We should only be using kFunc for NuDock, but for convenience of testing (e.g. when validating
+  // M3 client with M3 server we'd want to test the LLH of all the params) we include all param types here.
+  auto nudockParamInds_norm = ParHandler->GetParsIndexFromSampleName("NuDock", SystType::kNorm);
+  auto nudockParamInds_spline = ParHandler->GetParsIndexFromSampleName("NuDock", SystType::kSpline);
+  nudockParamInds = nudockParamInds_func;
+  nudockParamInds.insert(nudockParamInds.end(), nudockParamInds_norm.begin(), nudockParamInds_norm.end());
+  nudockParamInds.insert(nudockParamInds.end(), nudockParamInds_spline.begin(), nudockParamInds_spline.end());
+
   nudock_ptr->start_client();
 }
 
@@ -30,14 +41,6 @@ void SampleHandlerNuDock::Reweight() {
   std::unordered_map<std::string, double> xsec_params;
   
   // Loop for systs
-  auto nudockParamInds_func = ParHandler->GetParsIndexFromSampleName("NuDock", SystType::kFunc);
-  // HH: We should only be using kFunc for NuDock, but for convenience of testing (e.g. when validating
-  // M3 client with M3 server we'd want to test the LLH of all the params) we include all param types here.
-  auto nudockParamInds_norm = ParHandler->GetParsIndexFromSampleName("NuDock", SystType::kNorm);
-  auto nudockParamInds_spline = ParHandler->GetParsIndexFromSampleName("NuDock", SystType::kSpline);
-  std::vector<int> nudockParamInds = nudockParamInds_func;
-  nudockParamInds.insert(nudockParamInds.end(), nudockParamInds_norm.begin(), nudockParamInds_norm.end());
-  nudockParamInds.insert(nudockParamInds.end(), nudockParamInds_spline.begin(), nudockParamInds_spline.end());
   for (const auto& iParam : nudockParamInds) {
     std::string paramName = ParHandler->GetParFancyName(iParam);
     double paramValue = ParHandler->GetParProp(iParam);
@@ -49,9 +52,7 @@ void SampleHandlerNuDock::Reweight() {
     int iParam = ParHandler->GetParIndex(paramNameM3);
     double paramValue = ParHandler->GetParProp(iParam);
     // Convert sin2_theta to theta
-    if (paramNameNuDock == "Theta12" || paramNameNuDock == "Theta13" || paramNameNuDock == "Theta23") {
-      paramValue = asin(sqrt(paramValue));
-    }
+    FormatOscParsForNuDock(paramNameNuDock, paramValue);
     osc_params[paramNameNuDock] = paramValue;
   }
 
