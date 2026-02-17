@@ -1182,10 +1182,10 @@ void SampleHandlerFD::FillSplineBins() {
       std::vector< std::vector<int> > EventSplines;
       switch(GetNDim(SampleIndex)) {
         case 1:
-          EventSplines = SplineHandler->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCSamples[j].KinVar[0]), 0.);
+          EventSplines = binnedSplineHandler->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCSamples[j].KinVar[0]), 0.);
           break;
         case 2:
-          EventSplines = SplineHandler->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCSamples[j].KinVar[0]), *(MCSamples[j].KinVar[1]));
+          EventSplines = binnedSplineHandler->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCSamples[j].KinVar[0]), *(MCSamples[j].KinVar[1]));
           break;
         default:
           if(ThrowCrititcal) {
@@ -1193,7 +1193,7 @@ void SampleHandlerFD::FillSplineBins() {
             MACH3LOG_CRITICAL("Will use 2D like approach");
             ThrowCrititcal = false;
           }
-          EventSplines = SplineHandler->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCSamples[j].KinVar[0]), *(MCSamples[j].KinVar[1]));
+          EventSplines = binnedSplineHandler->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCSamples[j].KinVar[0]), *(MCSamples[j].KinVar[1]));
           break;
       }
       const int NSplines = static_cast<int>(EventSplines.size());
@@ -1203,7 +1203,7 @@ void SampleHandlerFD::FillSplineBins() {
 
       for(int spline = 0; spline < NSplines; spline++) {
         //Event Splines indexed as: sample name, oscillation channel, syst, mode, etrue, var1, var2 (var2 is a dummy 0 for 1D splines)
-        MCSamples[j].total_weight_pointers[PointersBefore+spline] = SplineHandler->retPointer(EventSplines[spline][0], EventSplines[spline][1],
+        MCSamples[j].total_weight_pointers[PointersBefore+spline] = binnedSplineHandler->retPointer(EventSplines[spline][0], EventSplines[spline][1],
                                                                       EventSplines[spline][2], EventSplines[spline][3],
                                                                       EventSplines[spline][4], EventSplines[spline][5],
                                                                       EventSplines[spline][6]);
