@@ -12,7 +12,7 @@ var searchData=
   ['calclikelihood_135',['CalcLikelihood',['../classParameterHandlerBase.html#a8e9248d5db77144e9602cb1e4c7c44ac',1,'ParameterHandlerBase']]],
   ['calcllh_136',['CalcLLH',['../classSampleSummary.html#a197d9d30abc14a76d65bd876b28cca32',1,'SampleSummary::CalcLLH(TH2Poly *const &amp;Data, TH2Poly *const &amp;MC, TH2Poly *const &amp;W2)'],['../classSampleSummary.html#a5cd35f899a9f6dce138e6d99561aebdf',1,'SampleSummary::CalcLLH(TH1D *const &amp;Data, TH1D *const &amp;MC, TH1D *const &amp;W2)']]],
   ['calcmedian_137',['CalcMedian',['../RHat_8cpp.html#ac038d6f2a074799534fc4a986ca36ef3',1,'CalcMedian(double arr[], int size):&#160;RHat.cpp'],['../RHat__HighMem_8cpp.html#ac038d6f2a074799534fc4a986ca36ef3',1,'CalcMedian(double arr[], int size):&#160;RHat_HighMem.cpp']]],
-  ['calcnormsbins_138',['CalcNormsBins',['../classSampleHandlerFD.html#a01bd11c1b4bef425dd22d8256eca2d81',1,'SampleHandlerFD']]],
+  ['calcnormsbins_138',['CalcNormsBins',['../classSampleHandlerFD.html#a37768b8d5fda2e61989f8041a89ef7b8',1,'SampleHandlerFD']]],
   ['calcparameterevolution_139',['CalcParameterEvolution',['../ProcessMCMC_8cpp.html#a32bb8e776bea9a8b778cfece3200932c',1,'ProcessMCMC.cpp']]],
   ['calcrhat_140',['CalcRhat',['../RHat__HighMem_8cpp.html#abd5f8455bf73bda17794dc06218e6713',1,'CalcRhat():&#160;RHat_HighMem.cpp'],['../RHat_8cpp.html#abd5f8455bf73bda17794dc06218e6713',1,'CalcRhat():&#160;RHat.cpp']]],
   ['calcsavagedickey_141',['CalcSavageDickey',['../ProcessMCMC_8cpp.html#af772f7bdfdba080075141597e9c99f79',1,'ProcessMCMC.cpp']]],

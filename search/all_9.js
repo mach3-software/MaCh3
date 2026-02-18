@@ -48,7 +48,7 @@ var searchData=
   ['is_5fpriorpredictive_753',['Is_PriorPredictive',['../classPredictiveThrower.html#a6be5b493541d6f30b3a0d6fd0e7557e9',1,'PredictiveThrower']]],
   ['isdecomposedpca_754',['isDecomposedPCA',['../classPCAHandler.html#a10fecf91a038d034f55a08332dec0f4a',1,'PCAHandler']]],
   ['isequalbinningperoscchannel_755',['isEqualBinningPerOscChannel',['../classOscillationHandler.html#a4aa71e48c7769e9690b2b8b09a2389a8',1,'OscillationHandler']]],
-  ['iseventinside_756',['IsEventInside',['../structBinInfo.html#aa9f67df1f0398316cb82ae2dd48c426d',1,'BinInfo::IsEventInside(const std::vector&lt; double &gt; &amp;KinVars) const'],['../structBinInfo.html#a02cde64da51de10c2d7f93e70c819f95',1,'BinInfo::IsEventInside(const std::vector&lt; const double * &gt; &amp;KinVars) const']]],
+  ['iseventinside_756',['IsEventInside',['../structBinInfo.html#a5d3c4697f1970d91ba892cce808147d7',1,'BinInfo::IsEventInside(const std::vector&lt; double &gt; &amp;KinVars) const _noexcept_'],['../structBinInfo.html#a3ffe68395408d76e47a8c6a78d72ed47',1,'BinInfo::IsEventInside(const std::vector&lt; const double * &gt; &amp;KinVars) const _noexcept_']]],
   ['iseventselected_757',['IsEventSelected',['../classSampleHandlerFD.html#af67a9a10193e12526e3284d48f425185',1,'SampleHandlerFD']]],
   ['isfixed_758',['IsFixed',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a1694d2d408b26edb7258d5bfa15a092f',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
   ['isflat_759',['isFlat',['../SplineStructs_8h.html#aee66563def836e531cda07c5efa45d87',1,'SplineStructs.h']]],

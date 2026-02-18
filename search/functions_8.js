@@ -32,7 +32,7 @@ var searchData=
   ['inituniform_2383',['InitUniform',['../structSampleBinningInfo.html#a0810d4d807808d1cc7d261f1e986123a',1,'SampleBinningInfo']]],
   ['investigatemissingsplines_2384',['InvestigateMissingSplines',['../classBinnedSplineHandler.html#a443ea4b9ad0d8c5f065048bb67a91ed3',1,'BinnedSplineHandler']]],
   ['isequalbinningperoscchannel_2385',['isEqualBinningPerOscChannel',['../classOscillationHandler.html#a4aa71e48c7769e9690b2b8b09a2389a8',1,'OscillationHandler']]],
-  ['iseventinside_2386',['IsEventInside',['../structBinInfo.html#a02cde64da51de10c2d7f93e70c819f95',1,'BinInfo::IsEventInside(const std::vector&lt; const double * &gt; &amp;KinVars) const'],['../structBinInfo.html#aa9f67df1f0398316cb82ae2dd48c426d',1,'BinInfo::IsEventInside(const std::vector&lt; double &gt; &amp;KinVars) const']]],
+  ['iseventinside_2386',['IsEventInside',['../structBinInfo.html#a3ffe68395408d76e47a8c6a78d72ed47',1,'BinInfo::IsEventInside(const std::vector&lt; const double * &gt; &amp;KinVars) const _noexcept_'],['../structBinInfo.html#a5d3c4697f1970d91ba892cce808147d7',1,'BinInfo::IsEventInside(const std::vector&lt; double &gt; &amp;KinVars) const _noexcept_']]],
   ['iseventselected_2387',['IsEventSelected',['../classSampleHandlerFD.html#af67a9a10193e12526e3284d48f425185',1,'SampleHandlerFD']]],
   ['isfixed_2388',['IsFixed',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a1694d2d408b26edb7258d5bfa15a092f',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
   ['isflat_2389',['isFlat',['../SplineStructs_8h.html#aee66563def836e531cda07c5efa45d87',1,'SplineStructs.h']]],
