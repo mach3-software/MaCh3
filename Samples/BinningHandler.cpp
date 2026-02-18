@@ -60,7 +60,7 @@ int BinningHandler::FindGlobalBin(const int NomSample,
   if(Binning.Uniform) {
     GlobalBin += static_cast<int>(Binning.GlobalOffset);
     return GlobalBin;
-  } else{
+  } else {
     const auto& _restrict_ BinMapping = Binning.BinGridMapping[GlobalBin];
     const size_t nNonUniBins = BinMapping.size();
     for(size_t iBin = 0; iBin < nNonUniBins; iBin++) {
