@@ -432,7 +432,7 @@ $(function() {
 <div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Getting starting position from {}&quot;</span>, FitName);</div>
 <div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;  TFile *infile = <a class="code" href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a>(FitName, <span class="stringliteral">&quot;READ&quot;</span>, __FILE__, __LINE__);</div>
 <div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;  TTree *posts = infile-&gt;Get&lt;TTree&gt;(<span class="stringliteral">&quot;posteriors&quot;</span>);</div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;  <span class="keywordtype">int</span> step_val = 0;</div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> step_val = 0;</div>
 <div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;  <span class="keywordtype">double</span> log_val = <a class="code" href="namespaceM3.html#a1a85b25da2b8b2cbb0993b15dcf77a6d">M3::_LARGE_LOGL_</a>;</div>
 <div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;  posts-&gt;SetBranchAddress(<span class="stringliteral">&quot;step&quot;</span>,&amp;step_val);</div>
 <div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;  posts-&gt;SetBranchAddress(<span class="stringliteral">&quot;LogL&quot;</span>,&amp;log_val);</div>
@@ -479,7 +479,7 @@ $(function() {
 <div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;    }</div>
 <div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;  }</div>
 <div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;  <a class="code" href="classFitterBase.html#abfb6f10720764d8bbbe43754fd5cd976">logLCurr</a> = log_val;</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160; </div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;  <a class="code" href="classFitterBase.html#a187dd22c17f9e96e5a7e2fb2371abace">logLProp</a> = log_val;</div>
 <div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;  <span class="keyword">delete</span> posts;</div>
 <div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;  infile-&gt;Close();</div>
 <div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;  <span class="keyword">delete</span> infile;</div>
