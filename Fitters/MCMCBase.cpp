@@ -43,12 +43,15 @@ void MCMCBase::RunMCMC() {
     // Print Progress before Propose Step
     PrintProgress(false);
 
-    // Reconfigure the samples, systematics and oscillation for first weight
-    // ProposeStep sets logLProp
-    ProposeStep();
-    // Set the current logL to the proposed logL for the 0th step
-    // Accept the first step to set logLCurr: this shouldn't affect the MCMC because we ignore the first N steps in burn-in
-    logLCurr = logLProp;
+    // Only propose step if we are running fresh chain. If we are running from previous chain then it's not needed and we can use usual pipeline
+    if(stepStart == 0) {
+        // Reconfigure the samples, systematics and oscillation for first weight
+        // ProposeStep sets logLProp
+        ProposeStep();
+        // Set the current logL to the proposed logL for the 0th step
+        // Accept the first step to set logLCurr: this shouldn't affect the MCMC because we ignore the first N steps in burn-in
+        logLCurr = logLProp;
+    }
 
     // Begin MCMC
     const auto StepEnd = stepStart + chainLength;
@@ -58,7 +61,6 @@ void MCMCBase::RunMCMC() {
     }
     // Save all the MCMC output
     SaveOutput();
-
 
     // Process MCMC
     ProcessMCMC();

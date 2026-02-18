@@ -77,6 +77,7 @@ struct SampleInfo {
 /// @author Dan Barrow
 /// @author Ed Atkin
 /// @author Kamil Skwarczynski
+/// @warning Try to no add more variables here as it will impact RAM usage
 struct EventInfo {
   /// @brief Default constructor.
   EventInfo(){}
