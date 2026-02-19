@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['combinemach3chains_2ecpp_1846',['CombineMaCh3Chains.cpp',['../CombineMaCh3Chains_8cpp.html',1,'']]],
-  ['core_2eh_1847',['Core.h',['../Core_8h.html',1,'']]]
+  ['_5ffooter_2emd_2emd_1892',['_Footer.md.md',['../__Footer_8md_8md.html',1,'']]]
 ];

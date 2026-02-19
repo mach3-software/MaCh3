@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['sample_20handler_20getters_3591',['Sample Handler Getters',['../group__SampleHandlerGetters.html',1,'']]],
-  ['sample_20handler_20setters_3592',['Sample Handler Setters',['../group__SampleHandlerSetters.html',1,'']]]
+  ['mach3_20plotting_3643',['MaCh3 Plotting',['../group__MaCh3Plotting.html',1,'']]]
 ];

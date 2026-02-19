@@ -24,8 +24,17 @@
 */
 var menudata={children:[
 {text:"Main Page",url:"index.html"},
-{text:"Related Pages",url:"pages.html"},
-{text:"Modules",url:"modules.html"},
+{text:"User-Guide",url:"UserGuide.html",children:[
+{text:"FAQ",url:"FAQ.html"},
+{text:"Bayesian Analysis",url:"BayesianAnalysis.html"},
+{text:"MCMC Convergance",url:"MCMCconvergance.html"},
+{text:"Adaptive MCMC",url:"AdaptiveMCMC.html"},
+{text:"Containers",url:"Containers.html"},
+{text:"Clusters Info",url:"Clusters.html"}]},
+{text:"Project Info",url:"ReleaseNotes.html",children:[
+{text:"Release Notes",url:"ReleaseNotes.html"},
+{text:"Results  Publications",url:"ResultsPublications.html"}]},
+{text:"Interface",url:"modules.html"},
 {text:"Namespaces",url:"namespaces.html",children:[
 {text:"Namespace List",url:"namespaces.html"},
 {text:"Namespace Members",url:"namespacemembers.html",children:[
@@ -214,4 +223,5 @@ var menudata={children:[
 {text:"Enumerator",url:"globals_eval.html",children:[
 {text:"k",url:"globals_eval.html#index_k"}]},
 {text:"Macros",url:"globals_defs.html"}]}]},
+{text:"Related Pages",url:"pages.html"},
 {text:"pyMaCh3",url:"./pyMaCh3/mainpage.html"}]}

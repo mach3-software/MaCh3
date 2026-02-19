@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['likelihoodfit_1793',['LikelihoodFit',['../classLikelihoodFit.html',1,'']]]
+  ['likelihoodfit_1827',['LikelihoodFit',['../classLikelihoodFit.html',1,'']]]
 ];

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MaCh3: Plotting Utility Functions</title>
+<title>MaCh3: WARNING TO BECOME DEPRECATED</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -56,7 +56,6 @@ $(function() {
 });
 /* @license-end */</script>
 <div id="main-nav"></div>
-</div><!-- top -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -71,16 +70,56 @@ $(function() {
 </iframe>
 </div>
 
-<div class="header">
+</div><!-- top -->
+<div class="PageDoc"><div class="header">
   <div class="headertitle">
-<div class="title">Plotting Utility Functions</div>  </div>
+<div class="title">WARNING TO BECOME DEPRECATED </div>  </div>
 </div><!--header-->
 <div class="contents">
-
-<p>Utility functions for plotting.  
-</p>
-<p>Utility functions for plotting. </p>
-</div><!-- contents -->
+<div class="textblock"><h1><a class="anchor" id="autotoc_md90"></a>
+Introduction</h1>
+<p>Different neutrino generators have different naming conventions for modes in addition experiment may not want to use the same modes as the generator. This is what MaCh3 modes are used for.</p>
+<p>This is an example of a config file to initialise modes from config. </p><div class="fragment"><div class="line">#########################################</div>
+<div class="line">Title: &quot;T2K Interaction modes&quot;</div>
+<div class="line"> </div>
+<div class="line">GeneratorName: &quot;NEUT&quot;</div>
+<div class="line"> </div>
+<div class="line">MaCh3Modes: [</div>
+<div class="line">  &quot;CCQE&quot;,</div>
+<div class="line">  &quot;CC1pipm&quot;,</div>
+<div class="line">  &quot;2p2h&quot;,</div>
+<div class="line">  ]</div>
+<div class="line"> </div>
+<div class="line">CCQE:</div>
+<div class="line">  Name: &quot;CCQE&quot;</div>
+<div class="line">  GeneratorMaping: [1]</div>
+<div class="line">  # 1 = CCQE</div>
+<div class="line"> </div>
+<div class="line">CC1pipm:</div>
+<div class="line">  Name: &quot;CC 1#pi^{#pm}&quot;</div>
+<div class="line">  GeneratorMaping: [11, 13]</div>
+<div class="line">  # 11 = CC 1pi+ 1p</div>
+<div class="line">  # 13 = CC 1pi+ 1n</div>
+<div class="line"> </div>
+<div class="line">2p2h:</div>
+<div class="line">  Name: &quot;2p2h&quot;</div>
+<div class="line">  GeneratorMaping: [2]</div>
+<div class="line">  # 2 = (Nieves) 2p2h aka MEC</div>
+</div><!-- fragment --><p> This is what you will get:</p>
+<p><img src="https://github.com/mach3-software/MaCh3/assets/45295406/0af5a338-d6ef-4bad-ade0-e2bc58c3548c" alt="" width="800" class="inline"/></p>
+<p>For example, NEUT has modes which are undefined, therefore all such modes are being treated <code>UNKNOWN_BAD</code>, this will not throw an error, as there may be cases when it is useful however it is worth investigating.</p>
+<h1><a class="anchor" id="autotoc_md91"></a>
+How to use (Examples)</h1>
+<p>To access the actual mode you can use the following code </p><div class="fragment"><div class="line">MaCh3Modes_t kMaCh3_CCQE = Modes-&gt;GetMode(&quot;CCQE&quot;);</div>
+</div><!-- fragment --><p> To perform loop over all modes: </p><div class="fragment"><div class="line">for (_int_ j = 0; j &lt; Modes-&gt;GetNModes()+1; j++)</div>
+<div class="line">{</div>
+<div class="line">    Modes-&gt;GetMaCh3ModeName(j);</div>
+<div class="line">}</div>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md92"></a>
+Unknown Category</h1>
+<p>If for some reason you have gaps in your mode definition or will try to access more modes than have been defined you will get the uknonw category. This is to prevent segfaults, also there are cases when your potential number of modes is too large and having a category where all garbage categories are assigned is useful. </p>
+</div></div><!-- contents -->
+</div><!-- PageDoc -->
 <!-- Footer for MaCh3 Doxygen documentation -->
 <footer class="mach3-footer" style="text-align: center;">
     <div style="margin-bottom: 15px;">

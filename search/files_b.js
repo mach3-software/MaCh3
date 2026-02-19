@@ -1,7 +1,26 @@
 var searchData=
 [
-  ['readme_2emd_1918',['README.md',['../README_8md.html',1,'(Global Namespace)'],['../Diagnostics_2README_8md.html',1,'(Global Namespace)'],['../Plotting_2README_8md.html',1,'(Global Namespace)']]],
-  ['reweightmcmc_2ecpp_1919',['ReweightMCMC.cpp',['../ReweightMCMC_8cpp.html',1,'']]],
-  ['rhat_2ecpp_1920',['RHat.cpp',['../RHat_8cpp.html',1,'']]],
-  ['rhat_5fhighmem_2ecpp_1921',['RHat_HighMem.cpp',['../RHat__HighMem_8cpp.html',1,'']]]
+  ['mach3exception_2eh_1922',['MaCh3Exception.h',['../MaCh3Exception_8h.html',1,'']]],
+  ['mach3factory_2ecpp_1923',['MaCh3Factory.cpp',['../MaCh3Factory_8cpp.html',1,'']]],
+  ['mach3factory_2eh_1924',['MaCh3Factory.h',['../MaCh3Factory_8h.html',1,'']]],
+  ['mach3logger_2eh_1925',['MaCh3Logger.h',['../MaCh3Logger_8h.html',1,'']]],
+  ['mach3logo_2epng_1926',['mach3logo.png',['../mach3logo_8png.html',1,'']]],
+  ['mach3modes_2ecpp_1927',['MaCh3Modes.cpp',['../MaCh3Modes_8cpp.html',1,'']]],
+  ['mach3modes_2eh_1928',['MaCh3Modes.h',['../MaCh3Modes_8h.html',1,'']]],
+  ['mach3splineslinkdef_2eh_1929',['MaCh3SplinesLinkDef.h',['../MaCh3SplinesLinkDef_8h.html',1,'']]],
+  ['mainpage_2emd_1930',['mainpage.md',['../mainpage_8md.html',1,'']]],
+  ['manager_2ecpp_1931',['Manager.cpp',['../Manager_8cpp.html',1,'']]],
+  ['manager_2ecpp_1932',['manager.cpp',['../manager_8cpp.html',1,'']]],
+  ['manager_2eh_1933',['Manager.h',['../Manager_8h.html',1,'']]],
+  ['matrixplotter_2ecpp_1934',['MatrixPlotter.cpp',['../MatrixPlotter_8cpp.html',1,'']]],
+  ['mcmcbase_2ecpp_1935',['MCMCBase.cpp',['../MCMCBase_8cpp.html',1,'']]],
+  ['mcmcbase_2eh_1936',['MCMCBase.h',['../MCMCBase_8h.html',1,'']]],
+  ['mcmcprocessor_2ecpp_1937',['MCMCProcessor.cpp',['../MCMCProcessor_8cpp.html',1,'']]],
+  ['mcmcprocessor_2eh_1938',['MCMCProcessor.h',['../MCMCProcessor_8h.html',1,'']]],
+  ['minuitfit_2ecpp_1939',['MinuitFit.cpp',['../MinuitFit_8cpp.html',1,'']]],
+  ['minuitfit_2eh_1940',['MinuitFit.h',['../MinuitFit_8h.html',1,'']]],
+  ['monitor_2ecpp_1941',['Monitor.cpp',['../Monitor_8cpp.html',1,'']]],
+  ['monitor_2eh_1942',['Monitor.h',['../Monitor_8h.html',1,'']]],
+  ['mr2t2_2ecpp_1943',['MR2T2.cpp',['../MR2T2_8cpp.html',1,'']]],
+  ['mr2t2_2eh_1944',['MR2T2.h',['../MR2T2_8h.html',1,'']]]
 ];

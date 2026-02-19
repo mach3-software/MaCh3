@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['zero_1743',['Zero',['../namespaceM3.html#aa4fe46050b3e557896f8698a75cabeb3',1,'M3']]],
-  ['zero_5fd_1744',['Zero_D',['../namespaceM3.html#a3460de3eb680ea0fc01a2f3cc3d489e2',1,'M3']]],
-  ['zero_5ff_1745',['Zero_F',['../namespaceM3.html#ac7b9651e2f6fb8d76bc5d11668db0ab5',1,'M3']]]
+  ['xcoeff_5farr_1768',['xcoeff_arr',['../classBinnedSplineHandler.html#a565b03441c146e0a351f9aee09ea0836',1,'BinnedSplineHandler']]],
+  ['xpos_1769',['XPos',['../classTSpline3__red.html#aa4b35c6ba0d90d3b13b49f99beadbf79',1,'TSpline3_red']]],
+  ['xpts_1770',['xPts',['../structFastSplineInfo.html#a76813a59f4a6fcef50f55d3c18733fcb',1,'FastSplineInfo']]],
+  ['xsec_1771',['xsec',['../classBinnedSplineHandler.html#a4360c772f9cad0aeccbf7e9a7bf86595',1,'BinnedSplineHandler']]]
 ];

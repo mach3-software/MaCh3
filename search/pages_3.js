@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['plotting_3597',['Plotting',['../md_Plotting_README.html',1,'']]]
+  ['adaptive_20mcmc_3650',['Adaptive MCMC',['../md_Doc_User_Guide_16__Adaptive_MCMC.html',1,'']]]
 ];

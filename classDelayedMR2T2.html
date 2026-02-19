@@ -78,7 +78,7 @@ $(function() {
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classDelayedMR2T2-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">DelayedMR2T2 Class Reference</div>  </div>
+<div class="title">DelayedMR2T2 Class Reference<div class="ingroups"><a class="el" href="group__FittingAlgorithms.html">Fitting Algorithms</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -378,7 +378,7 @@ Protected Attributes</h2></td></tr>
 <div class="textblock"><p>Implementation of delayed rejection for <a class="el" href="classMR2T2.html" title="MCMC algorithm implementing the Metropolis–Rosenbluth–Rosenbluth–Teller–Teller (MR T ) method.">MR2T2</a>. </p>
 <dl class="section author"><dt>Author</dt><dd>Henry Wallace <a class="el" href="citelist.html#CITEREF_dram2006">[14]</a></dd></dl>
 <h1><a class="anchor" id="intro"></a>
-Quick Introduction</h1>
+Introduction</h1>
 <p>Delayed rejection is a method to increase the efficiency of MCMC. It is useful if your chain is not mixing well or if adaptive MCMC is struggling. The idea is to propose increasingly small steps centered on the last rejected step.</p>
 <h1><a class="anchor" id="config"></a>
 Configuration</h1>
@@ -407,7 +407,7 @@ Delay Triggers</h2>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>Delayed rejection MCMC can significantly improve chain mixing but may increase computational overhead per step. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="DelayedMR2T2_8h_source.html#l00042">42</a> of file <a class="el" href="DelayedMR2T2_8h_source.html">DelayedMR2T2.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="DelayedMR2T2_8h_source.html#l00044">44</a> of file <a class="el" href="DelayedMR2T2_8h_source.html">DelayedMR2T2.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a89b881c7c5d6df7c283f3c8046f40d46"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a89b881c7c5d6df7c283f3c8046f40d46">&#9670;&nbsp;</a></span>DelayedMR2T2()</h2>
@@ -467,11 +467,11 @@ Delay Triggers</h2>
 <div class="ttc" id="aMaCh3Logger_8h_html_a07ff6d6a15b24f94afc88a1b89779beb"><div class="ttname"><a href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a></div><div class="ttdeci">#define MACH3LOG_CRITICAL</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00038">MaCh3Logger.h:38</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00035">MaCh3Logger.h:35</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_ad5b2eb6377721e3ac95def22c2386bb1"><div class="ttname"><a href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a></div><div class="ttdeci">#define MACH3LOG_WARN</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00036">MaCh3Logger.h:36</a></div></div>
-<div class="ttc" id="aclassDelayedMR2T2_html_a185409c3e33c69119be37ac12d640dd6"><div class="ttname"><a href="classDelayedMR2T2.html#a185409c3e33c69119be37ac12d640dd6">DelayedMR2T2::max_rejections</a></div><div class="ttdeci">int max_rejections</div><div class="ttdoc">How many rejections allowed?</div><div class="ttdef"><b>Definition:</b> <a href="DelayedMR2T2_8h_source.html#l00085">DelayedMR2T2.h:85</a></div></div>
-<div class="ttc" id="aclassDelayedMR2T2_html_a5506f8b2e6f1e8bbea69a134280add70"><div class="ttname"><a href="classDelayedMR2T2.html#a5506f8b2e6f1e8bbea69a134280add70">DelayedMR2T2::delay_probability</a></div><div class="ttdeci">double delay_probability</div><div class="ttdoc">Can delay with probability instead.</div><div class="ttdef"><b>Definition:</b> <a href="DelayedMR2T2_8h_source.html#l00096">DelayedMR2T2.h:96</a></div></div>
-<div class="ttc" id="aclassDelayedMR2T2_html_a5c99ea1ad5427c6532e217271ec7d998"><div class="ttname"><a href="classDelayedMR2T2.html#a5c99ea1ad5427c6532e217271ec7d998">DelayedMR2T2::delay_on_oob_only</a></div><div class="ttdeci">bool delay_on_oob_only</div><div class="ttdoc">Delay only if we go out of bounds.</div><div class="ttdef"><b>Definition:</b> <a href="DelayedMR2T2_8h_source.html#l00094">DelayedMR2T2.h:94</a></div></div>
-<div class="ttc" id="aclassDelayedMR2T2_html_a97286b3dc12944f370d411fa74b93819"><div class="ttname"><a href="classDelayedMR2T2.html#a97286b3dc12944f370d411fa74b93819">DelayedMR2T2::decay_rate</a></div><div class="ttdeci">double decay_rate</div><div class="ttdoc">How much to decrease the step scale each step.</div><div class="ttdef"><b>Definition:</b> <a href="DelayedMR2T2_8h_source.html#l00083">DelayedMR2T2.h:83</a></div></div>
-<div class="ttc" id="aclassDelayedMR2T2_html_ada98d6554360043c6a3cde78596dd1ff"><div class="ttname"><a href="classDelayedMR2T2.html#ada98d6554360043c6a3cde78596dd1ff">DelayedMR2T2::initial_scale</a></div><div class="ttdeci">double initial_scale</div><div class="ttdoc">Scale for (non-delayed) step is initial_scale * start_step_scale.</div><div class="ttdef"><b>Definition:</b> <a href="DelayedMR2T2_8h_source.html#l00081">DelayedMR2T2.h:81</a></div></div>
+<div class="ttc" id="aclassDelayedMR2T2_html_a185409c3e33c69119be37ac12d640dd6"><div class="ttname"><a href="classDelayedMR2T2.html#a185409c3e33c69119be37ac12d640dd6">DelayedMR2T2::max_rejections</a></div><div class="ttdeci">int max_rejections</div><div class="ttdoc">How many rejections allowed?</div><div class="ttdef"><b>Definition:</b> <a href="DelayedMR2T2_8h_source.html#l00087">DelayedMR2T2.h:87</a></div></div>
+<div class="ttc" id="aclassDelayedMR2T2_html_a5506f8b2e6f1e8bbea69a134280add70"><div class="ttname"><a href="classDelayedMR2T2.html#a5506f8b2e6f1e8bbea69a134280add70">DelayedMR2T2::delay_probability</a></div><div class="ttdeci">double delay_probability</div><div class="ttdoc">Can delay with probability instead.</div><div class="ttdef"><b>Definition:</b> <a href="DelayedMR2T2_8h_source.html#l00098">DelayedMR2T2.h:98</a></div></div>
+<div class="ttc" id="aclassDelayedMR2T2_html_a5c99ea1ad5427c6532e217271ec7d998"><div class="ttname"><a href="classDelayedMR2T2.html#a5c99ea1ad5427c6532e217271ec7d998">DelayedMR2T2::delay_on_oob_only</a></div><div class="ttdeci">bool delay_on_oob_only</div><div class="ttdoc">Delay only if we go out of bounds.</div><div class="ttdef"><b>Definition:</b> <a href="DelayedMR2T2_8h_source.html#l00096">DelayedMR2T2.h:96</a></div></div>
+<div class="ttc" id="aclassDelayedMR2T2_html_a97286b3dc12944f370d411fa74b93819"><div class="ttname"><a href="classDelayedMR2T2.html#a97286b3dc12944f370d411fa74b93819">DelayedMR2T2::decay_rate</a></div><div class="ttdeci">double decay_rate</div><div class="ttdoc">How much to decrease the step scale each step.</div><div class="ttdef"><b>Definition:</b> <a href="DelayedMR2T2_8h_source.html#l00085">DelayedMR2T2.h:85</a></div></div>
+<div class="ttc" id="aclassDelayedMR2T2_html_ada98d6554360043c6a3cde78596dd1ff"><div class="ttname"><a href="classDelayedMR2T2.html#ada98d6554360043c6a3cde78596dd1ff">DelayedMR2T2::initial_scale</a></div><div class="ttdeci">double initial_scale</div><div class="ttdoc">Scale for (non-delayed) step is initial_scale * start_step_scale.</div><div class="ttdef"><b>Definition:</b> <a href="DelayedMR2T2_8h_source.html#l00083">DelayedMR2T2.h:83</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_a6c5b6c38ba4c6f482592147c7e6b3b95"><div class="ttname"><a href="classFitterBase.html#a6c5b6c38ba4c6f482592147c7e6b3b95">FitterBase::AlgorithmName</a></div><div class="ttdeci">std::string AlgorithmName</div><div class="ttdoc">Name of fitting algorithm that is being used.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00169">FitterBase.h:169</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_a8768aefc0d1e9282d82af22a5852ab1d"><div class="ttname"><a href="classFitterBase.html#a8768aefc0d1e9282d82af22a5852ab1d">FitterBase::fitMan</a></div><div class="ttdeci">Manager * fitMan</div><div class="ttdoc">The manager for configuration handling.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00109">FitterBase.h:109</a></div></div>
 <div class="ttc" id="aclassMR2T2_html_a128619b70bc9cc104cfbbe4ab72402b6"><div class="ttname"><a href="classMR2T2.html#a128619b70bc9cc104cfbbe4ab72402b6">MR2T2::MR2T2</a></div><div class="ttdeci">MR2T2(Manager *const FitManager)</div><div class="ttdoc">Constructor.</div><div class="ttdef"><b>Definition:</b> <a href="MR2T2_8cpp_source.html#l00005">MR2T2.cpp:5</a></div></div>
@@ -549,7 +549,7 @@ Delay Triggers</h2>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="keywordflow">return</span> std::min(numerator / denominator, 1.0);</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;}</div>
-<div class="ttc" id="aclassDelayedMR2T2_html_a7eabffdbdfe03767c4876ab0ff1d8594"><div class="ttname"><a href="classDelayedMR2T2.html#a7eabffdbdfe03767c4876ab0ff1d8594">DelayedMR2T2::MinLogLikelihood</a></div><div class="ttdeci">double MinLogLikelihood</div><div class="ttdoc">Minimum (negative) log-likelihood of proposed steps.</div><div class="ttdef"><b>Definition:</b> <a href="DelayedMR2T2_8h_source.html#l00088">DelayedMR2T2.h:88</a></div></div>
+<div class="ttc" id="aclassDelayedMR2T2_html_a7eabffdbdfe03767c4876ab0ff1d8594"><div class="ttname"><a href="classDelayedMR2T2.html#a7eabffdbdfe03767c4876ab0ff1d8594">DelayedMR2T2::MinLogLikelihood</a></div><div class="ttdeci">double MinLogLikelihood</div><div class="ttdoc">Minimum (negative) log-likelihood of proposed steps.</div><div class="ttdef"><b>Definition:</b> <a href="DelayedMR2T2_8h_source.html#l00090">DelayedMR2T2.h:90</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_a187dd22c17f9e96e5a7e2fb2371abace"><div class="ttname"><a href="classFitterBase.html#a187dd22c17f9e96e5a7e2fb2371abace">FitterBase::logLProp</a></div><div class="ttdeci">double logLProp</div><div class="ttdoc">proposed likelihood</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00116">FitterBase.h:116</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_abfb6f10720764d8bbbe43754fd5cd976"><div class="ttname"><a href="classFitterBase.html#abfb6f10720764d8bbbe43754fd5cd976">FitterBase::logLCurr</a></div><div class="ttdeci">double logLCurr</div><div class="ttdoc">current likelihood</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00114">FitterBase.h:114</a></div></div>
 <div class="ttc" id="aclassMR2T2_html_a991bdcec55b12d179b85b0293313d682"><div class="ttname"><a href="classMR2T2.html#a991bdcec55b12d179b85b0293313d682">MR2T2::AcceptanceProbability</a></div><div class="ttdeci">double AcceptanceProbability() override</div><div class="ttdoc">Step acceptance probability.</div><div class="ttdef"><b>Definition:</b> <a href="MR2T2_8cpp_source.html#l00103">MR2T2.cpp:103</a></div></div>
@@ -658,13 +658,13 @@ Delay Triggers</h2>
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    }</div>
 <div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <a class="code" href="classDelayedMR2T2.html#a96602821ff54f3056e042dfa22fb95ed">ResetSystScale</a>();</div>
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;}</div>
-<div class="ttc" id="aclassDelayedMR2T2_html_a0339cfd51542ac59ad5d22cf6f7d84c8"><div class="ttname"><a href="classDelayedMR2T2.html#a0339cfd51542ac59ad5d22cf6f7d84c8">DelayedMR2T2::accepted_delayed</a></div><div class="ttdeci">bool accepted_delayed</div><div class="ttdoc">Was the step we just accepted delayed?</div><div class="ttdef"><b>Definition:</b> <a href="DelayedMR2T2_8h_source.html#l00091">DelayedMR2T2.h:91</a></div></div>
+<div class="ttc" id="aclassDelayedMR2T2_html_a0339cfd51542ac59ad5d22cf6f7d84c8"><div class="ttname"><a href="classDelayedMR2T2.html#a0339cfd51542ac59ad5d22cf6f7d84c8">DelayedMR2T2::accepted_delayed</a></div><div class="ttdeci">bool accepted_delayed</div><div class="ttdoc">Was the step we just accepted delayed?</div><div class="ttdef"><b>Definition:</b> <a href="DelayedMR2T2_8h_source.html#l00093">DelayedMR2T2.h:93</a></div></div>
 <div class="ttc" id="aclassDelayedMR2T2_html_a2a55f2f94cb371bc9bcfad3778e61fe1"><div class="ttname"><a href="classDelayedMR2T2.html#a2a55f2f94cb371bc9bcfad3778e61fe1">DelayedMR2T2::ProbabilisticDelay</a></div><div class="ttdeci">bool ProbabilisticDelay() const</div><div class="ttdoc">if delay has a chance of occurring</div><div class="ttdef"><b>Definition:</b> <a href="DelayedMR2T2_8cpp_source.html#l00172">DelayedMR2T2.cpp:172</a></div></div>
 <div class="ttc" id="aclassDelayedMR2T2_html_a39b3237d0c235cf9659140626960dbf6"><div class="ttname"><a href="classDelayedMR2T2.html#a39b3237d0c235cf9659140626960dbf6">DelayedMR2T2::StoreCurrentStep</a></div><div class="ttdeci">void StoreCurrentStep()</div><div class="ttdoc">Store information about the current proposed step.</div><div class="ttdef"><b>Definition:</b> <a href="DelayedMR2T2_8cpp_source.html#l00063">DelayedMR2T2.cpp:63</a></div></div>
 <div class="ttc" id="aclassDelayedMR2T2_html_a5a5e903d0f74ae730a25f375e4fc4d8c"><div class="ttname"><a href="classDelayedMR2T2.html#a5a5e903d0f74ae730a25f375e4fc4d8c">DelayedMR2T2::AcceptanceProbability</a></div><div class="ttdeci">double AcceptanceProbability() override</div><div class="ttdoc">Step acceptance probability.</div><div class="ttdef"><b>Definition:</b> <a href="DelayedMR2T2_8cpp_source.html#l00080">DelayedMR2T2.cpp:80</a></div></div>
 <div class="ttc" id="aclassDelayedMR2T2_html_a96602821ff54f3056e042dfa22fb95ed"><div class="ttname"><a href="classDelayedMR2T2.html#a96602821ff54f3056e042dfa22fb95ed">DelayedMR2T2::ResetSystScale</a></div><div class="ttdeci">void ResetSystScale()</div><div class="ttdoc">Reset scale after delay process.</div><div class="ttdef"><b>Definition:</b> <a href="DelayedMR2T2_8cpp_source.html#l00045">DelayedMR2T2.cpp:45</a></div></div>
 <div class="ttc" id="aclassDelayedMR2T2_html_acdba31f62c06dabe2e0b1acb9cdddc35"><div class="ttname"><a href="classDelayedMR2T2.html#acdba31f62c06dabe2e0b1acb9cdddc35">DelayedMR2T2::ScaleSystematics</a></div><div class="ttdeci">void ScaleSystematics(const double scale)</div><div class="ttdoc">Set parameter scale to be original_scale* scale.</div><div class="ttdef"><b>Definition:</b> <a href="DelayedMR2T2_8cpp_source.html#l00036">DelayedMR2T2.cpp:36</a></div></div>
-<div class="ttc" id="aclassDelayedMR2T2_html_af8590de3ef5df7a7bfb9483f78c2efe5"><div class="ttname"><a href="classDelayedMR2T2.html#af8590de3ef5df7a7bfb9483f78c2efe5">DelayedMR2T2::current_step_vals</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; double &gt; &gt; current_step_vals</div><div class="ttdoc">Store information about the current proposed step.</div><div class="ttdef"><b>Definition:</b> <a href="DelayedMR2T2_8h_source.html#l00075">DelayedMR2T2.h:75</a></div></div>
+<div class="ttc" id="aclassDelayedMR2T2_html_af8590de3ef5df7a7bfb9483f78c2efe5"><div class="ttname"><a href="classDelayedMR2T2.html#af8590de3ef5df7a7bfb9483f78c2efe5">DelayedMR2T2::current_step_vals</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; double &gt; &gt; current_step_vals</div><div class="ttdoc">Store information about the current proposed step.</div><div class="ttdef"><b>Definition:</b> <a href="DelayedMR2T2_8h_source.html#l00077">DelayedMR2T2.h:77</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_a6319d2ea50984860475bbc6c708b0d90"><div class="ttname"><a href="classFitterBase.html#a6319d2ea50984860475bbc6c708b0d90">FitterBase::accProb</a></div><div class="ttdeci">double accProb</div><div class="ttdoc">current acceptance prob</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00118">FitterBase.h:118</a></div></div>
 <div class="ttc" id="aclassFitterBase_html_afeffc9d794c973a015aa12ec1a8f79da"><div class="ttname"><a href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">FitterBase::systematics</a></div><div class="ttdeci">std::vector&lt; ParameterHandlerBase * &gt; systematics</div><div class="ttdoc">Systematic holder.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00135">FitterBase.h:135</a></div></div>
 <div class="ttc" id="aclassMCMCBase_html_a504f906fea923b63221732a8c8d1d591"><div class="ttname"><a href="classMCMCBase.html#a504f906fea923b63221732a8c8d1d591">MCMCBase::AcceptStep</a></div><div class="ttdeci">void AcceptStep()</div><div class="ttdoc">Accept a step.</div><div class="ttdef"><b>Definition:</b> <a href="MCMCBase_8cpp_source.html#l00206">MCMCBase.cpp:206</a></div></div>
@@ -781,7 +781,7 @@ Delay Triggers</h2>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        <a class="code" href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">systematics</a>[i]-&gt;SetStepScale(<a class="code" href="classDelayedMR2T2.html#a58ec170db56d4d98713e75bf479a7212">start_step_scale</a>[i], <span class="keyword">false</span>);</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    }</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;}</div>
-<div class="ttc" id="aclassDelayedMR2T2_html_a58ec170db56d4d98713e75bf479a7212"><div class="ttname"><a href="classDelayedMR2T2.html#a58ec170db56d4d98713e75bf479a7212">DelayedMR2T2::start_step_scale</a></div><div class="ttdeci">std::vector&lt; double &gt; start_step_scale</div><div class="ttdoc">Stores the initial scale for all parameters.</div><div class="ttdef"><b>Definition:</b> <a href="DelayedMR2T2_8h_source.html#l00078">DelayedMR2T2.h:78</a></div></div>
+<div class="ttc" id="aclassDelayedMR2T2_html_a58ec170db56d4d98713e75bf479a7212"><div class="ttname"><a href="classDelayedMR2T2.html#a58ec170db56d4d98713e75bf479a7212">DelayedMR2T2::start_step_scale</a></div><div class="ttdeci">std::vector&lt; double &gt; start_step_scale</div><div class="ttdoc">Stores the initial scale for all parameters.</div><div class="ttdef"><b>Definition:</b> <a href="DelayedMR2T2_8h_source.html#l00080">DelayedMR2T2.h:80</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -895,7 +895,7 @@ Delay Triggers</h2>
 
 <p>Was the step we just accepted delayed? </p>
 
-<p class="definition">Definition at line <a class="el" href="DelayedMR2T2_8h_source.html#l00091">91</a> of file <a class="el" href="DelayedMR2T2_8h_source.html">DelayedMR2T2.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="DelayedMR2T2_8h_source.html#l00093">93</a> of file <a class="el" href="DelayedMR2T2_8h_source.html">DelayedMR2T2.h</a>.</p>
 
 </div>
 </div>
@@ -921,7 +921,7 @@ Delay Triggers</h2>
 
 <p>Store information about the current proposed step. </p>
 
-<p class="definition">Definition at line <a class="el" href="DelayedMR2T2_8h_source.html#l00075">75</a> of file <a class="el" href="DelayedMR2T2_8h_source.html">DelayedMR2T2.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="DelayedMR2T2_8h_source.html#l00077">77</a> of file <a class="el" href="DelayedMR2T2_8h_source.html">DelayedMR2T2.h</a>.</p>
 
 </div>
 </div>
@@ -947,7 +947,7 @@ Delay Triggers</h2>
 
 <p>How much to decrease the step scale each step. </p>
 
-<p class="definition">Definition at line <a class="el" href="DelayedMR2T2_8h_source.html#l00083">83</a> of file <a class="el" href="DelayedMR2T2_8h_source.html">DelayedMR2T2.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="DelayedMR2T2_8h_source.html#l00085">85</a> of file <a class="el" href="DelayedMR2T2_8h_source.html">DelayedMR2T2.h</a>.</p>
 
 </div>
 </div>
@@ -973,7 +973,7 @@ Delay Triggers</h2>
 
 <p>Delay only if we go out of bounds. </p>
 
-<p class="definition">Definition at line <a class="el" href="DelayedMR2T2_8h_source.html#l00094">94</a> of file <a class="el" href="DelayedMR2T2_8h_source.html">DelayedMR2T2.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="DelayedMR2T2_8h_source.html#l00096">96</a> of file <a class="el" href="DelayedMR2T2_8h_source.html">DelayedMR2T2.h</a>.</p>
 
 </div>
 </div>
@@ -999,7 +999,7 @@ Delay Triggers</h2>
 
 <p>Can delay with probability instead. </p>
 
-<p class="definition">Definition at line <a class="el" href="DelayedMR2T2_8h_source.html#l00096">96</a> of file <a class="el" href="DelayedMR2T2_8h_source.html">DelayedMR2T2.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="DelayedMR2T2_8h_source.html#l00098">98</a> of file <a class="el" href="DelayedMR2T2_8h_source.html">DelayedMR2T2.h</a>.</p>
 
 </div>
 </div>
@@ -1025,7 +1025,7 @@ Delay Triggers</h2>
 
 <p>Scale for (non-delayed) step is <a class="el" href="classDelayedMR2T2.html#ada98d6554360043c6a3cde78596dd1ff" title="Scale for (non-delayed) step is initial_scale * start_step_scale.">initial_scale</a> * <a class="el" href="classDelayedMR2T2.html#a58ec170db56d4d98713e75bf479a7212" title="Stores the initial scale for all parameters.">start_step_scale</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="DelayedMR2T2_8h_source.html#l00081">81</a> of file <a class="el" href="DelayedMR2T2_8h_source.html">DelayedMR2T2.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="DelayedMR2T2_8h_source.html#l00083">83</a> of file <a class="el" href="DelayedMR2T2_8h_source.html">DelayedMR2T2.h</a>.</p>
 
 </div>
 </div>
@@ -1051,7 +1051,7 @@ Delay Triggers</h2>
 
 <p>How many rejections allowed? </p>
 
-<p class="definition">Definition at line <a class="el" href="DelayedMR2T2_8h_source.html#l00085">85</a> of file <a class="el" href="DelayedMR2T2_8h_source.html">DelayedMR2T2.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="DelayedMR2T2_8h_source.html#l00087">87</a> of file <a class="el" href="DelayedMR2T2_8h_source.html">DelayedMR2T2.h</a>.</p>
 
 </div>
 </div>
@@ -1077,7 +1077,7 @@ Delay Triggers</h2>
 
 <p>Minimum (negative) log-likelihood of proposed steps. </p>
 
-<p class="definition">Definition at line <a class="el" href="DelayedMR2T2_8h_source.html#l00088">88</a> of file <a class="el" href="DelayedMR2T2_8h_source.html">DelayedMR2T2.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="DelayedMR2T2_8h_source.html#l00090">90</a> of file <a class="el" href="DelayedMR2T2_8h_source.html">DelayedMR2T2.h</a>.</p>
 
 </div>
 </div>
@@ -1103,7 +1103,7 @@ Delay Triggers</h2>
 
 <p>Stores the initial scale for all parameters. </p>
 
-<p class="definition">Definition at line <a class="el" href="DelayedMR2T2_8h_source.html#l00078">78</a> of file <a class="el" href="DelayedMR2T2_8h_source.html">DelayedMR2T2.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="DelayedMR2T2_8h_source.html#l00080">80</a> of file <a class="el" href="DelayedMR2T2_8h_source.html">DelayedMR2T2.h</a>.</p>
 
 </div>
 </div>

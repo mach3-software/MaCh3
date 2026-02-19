@@ -173,12 +173,81 @@ Public Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>KS: Class describing MaCh3 modes used in the analysis, it is being initialised from config. </p>
-<dl class="section see"><dt>See also</dt><dd>For more details, visit the <a href="https://github.com/mach3-software/MaCh3/wiki/08.-MaCh3-Modes">Wiki</a>. </dd></dl>
+<p>The class provides a translation layer between generator-specific interaction mode definitions and the analysis-level categories used inside MaCh3.</p>
+<p>Different neutrino generators use different numbering and naming conventions. Additionally, an analysis may wish to group or redefine these modes. <code><a class="el" href="classMaCh3Modes.html" title="KS: Class describing MaCh3 modes used in the analysis, it is being initialised from config.">MaCh3Modes</a></code> allows the user to define an experiment-specific mapping via a YAML configuration file.</p>
+<p>The class builds:</p><ul>
+<li>A list of MaCh3 analysis modes</li>
+<li>A mapping from generator mode IDs → MaCh3 categories</li>
+<li>A protected fallback category (<code>UNKNOWN_BAD</code>) for unmapped values</li>
+</ul>
+<h1><a class="anchor" id="MaCh3Modes_Config"></a>
+Configuration Example</h1>
+<p>Example YAML configuration used to initialise the modes:</p>
+<div class="fragment"><div class="line">#########################################</div>
+<div class="line">Title: &quot;T2K Interaction modes&quot;</div>
+<div class="line"> </div>
+<div class="line">GeneratorName: &quot;NEUT&quot;</div>
+<div class="line"> </div>
+<div class="line">MaCh3Modes: [</div>
+<div class="line">  &quot;CCQE&quot;,</div>
+<div class="line">  &quot;CC1pipm&quot;,</div>
+<div class="line">  &quot;2p2h&quot;,</div>
+<div class="line">]</div>
+<div class="line"> </div>
+<div class="line">CCQE:</div>
+<div class="line">  Name: &quot;CCQE&quot;</div>
+<div class="line">  GeneratorMaping: [1]      # 1 = CCQE</div>
+<div class="line"> </div>
+<div class="line">CC1pipm:</div>
+<div class="line">  Name: &quot;CC 1#pi^{#pm}&quot;</div>
+<div class="line">  GeneratorMaping: [11, 13] # 11 = CC1pi+1p, 13 = CC1pi+1n</div>
+<div class="line"> </div>
+<div class="line">2p2h:</div>
+<div class="line">  Name: &quot;2p2h&quot;</div>
+<div class="line">  GeneratorMaping: [2]      # 2 = (Nieves) MEC / 2p2h</div>
+</div><!-- fragment --><h1><a class="anchor" id="MaCh3Modes_Output"></a>
+Example Initialisation Dump</h1>
+<p>After loading the configuration, MaCh3 produces a mapping table like:</p>
+<div class="fragment"><div class="line">Printing MaCh3 Modes Called: T2K Interaction modes</div>
+<div class="line">===============================================================</div>
+<div class="line">#   | Name     | FancyName           | NEUT Modes</div>
+<div class="line">---------------------------------------------------------------</div>
+<div class="line">0   | CCQE     | CCQE                | 1</div>
+<div class="line">1   | CC1pipm  | CC 1#pi^{#pm}       | 11 13</div>
+<div class="line">2   | 2p2h     | 2p2h                | 2</div>
+<div class="line">===============================================================</div>
+<div class="line"> </div>
+<div class="line">NEUT Modes | Name</div>
+<div class="line">---------------------------</div>
+<div class="line">0          | UNKNOWN_BAD</div>
+<div class="line">1          | CCQE</div>
+<div class="line">2          | 2p2h</div>
+<div class="line">3–10       | UNKNOWN_BAD</div>
+<div class="line">11         | CC1pipm</div>
+<div class="line">12         | UNKNOWN_BAD</div>
+<div class="line">13         | CC1pipm</div>
+<div class="line">===============================================================</div>
+</div><!-- fragment --><h1><a class="anchor" id="MaCh3Modes_Unknown"></a>
+Unknown Category Handling</h1>
+<p>Generators such as NEUT define many interaction codes that may not be used in a given analysis. Any generator mode not explicitly mapped is assigned to <code>UNKNOWN_BAD</code>.</p>
+<p>This behaviour:</p><ul>
+<li>Prevents segfaults from invalid lookups</li>
+<li>Allows sparse or partial mode definitions</li>
+<li>Provides a safe catch-all for unexpected generator values</li>
+</ul>
+<h1><a class="anchor" id="MaCh3Modes_Usage"></a>
+Usage Examples</h1>
+<p>Access a specific mode: </p><div class="fragment"><div class="line"><a class="code" href="MaCh3Modes_8h.html#adf43f6c73c9598abc381855d31ef5682">MaCh3Modes_t</a> kMaCh3_CCQE = Modes-&gt;GetMode(<span class="stringliteral">&quot;CCQE&quot;</span>);</div>
+<div class="ttc" id="aMaCh3Modes_8h_html_adf43f6c73c9598abc381855d31ef5682"><div class="ttname"><a href="MaCh3Modes_8h.html#adf43f6c73c9598abc381855d31ef5682">MaCh3Modes_t</a></div><div class="ttdeci">int MaCh3Modes_t</div><div class="ttdoc">Enumerator of MaCh3Mode.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00014">MaCh3Modes.h:14</a></div></div>
+</div><!-- fragment --><p>Loop over all defined modes: </p><div class="fragment"><div class="line"><span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt; Modes-&gt;GetNModes() + 1; ++j) {</div>
+<div class="line">  Modes-&gt;GetMaCh3ModeName(j);</div>
+<div class="line">}</div>
+</div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>If you attempt to access a mode outside the defined range, the class will return the <code>UNKNOWN_BAD</code> category instead of throwing.</dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Kamil Skwarczynski </dd>
 <dd>
 Daniel Barrow </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8h_source.html#l00041">41</a> of file <a class="el" href="MaCh3Modes_8h_source.html">MaCh3Modes.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8h_source.html#l00135">135</a> of file <a class="el" href="MaCh3Modes_8h_source.html">MaCh3Modes.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a1ea9394c1498bf6b37724d41c31f2f2d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1ea9394c1498bf6b37724d41c31f2f2d">&#9670;&nbsp;</a></span>MaCh3Modes() <span class="overload">[1/2]</span></h2>
@@ -262,8 +331,8 @@ Daniel Barrow </dd></dl>
 
 <p>KS: Empty destructor. </p>
 
-<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8h_source.html#l00048">48</a> of file <a class="el" href="MaCh3Modes_8h_source.html">MaCh3Modes.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;{};</div>
+<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8h_source.html#l00142">142</a> of file <a class="el" href="MaCh3Modes_8h_source.html">MaCh3Modes.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;{};</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -344,11 +413,10 @@ Daniel Barrow </dd></dl>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;  <a class="code" href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">fMode</a>.emplace(index, newinfo);</div>
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;  <a class="code" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>++;</div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;}</div>
-<div class="ttc" id="aGetPostfitParamPlots_8cpp_html_a656e9eabac71748634b6bf892e68e767"><div class="ttname"><a href="GetPostfitParamPlots_8cpp.html#a656e9eabac71748634b6bf892e68e767">PlotColor</a></div><div class="ttdeci">constexpr Color_t PlotColor[]</div><div class="ttdef"><b>Definition:</b> <a href="GetPostfitParamPlots_8cpp_source.html#l00066">GetPostfitParamPlots.cpp:66</a></div></div>
-<div class="ttc" id="aMaCh3Modes_8h_html_adf43f6c73c9598abc381855d31ef5682"><div class="ttname"><a href="MaCh3Modes_8h.html#adf43f6c73c9598abc381855d31ef5682">MaCh3Modes_t</a></div><div class="ttdeci">int MaCh3Modes_t</div><div class="ttdoc">Enumerator of MaCh3Mode.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00014">MaCh3Modes.h:14</a></div></div>
-<div class="ttc" id="aclassMaCh3Modes_html_a3bde53f0145673d99b9866b3fb5dcbaf"><div class="ttname"><a href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">MaCh3Modes::NModes</a></div><div class="ttdeci">int NModes</div><div class="ttdoc">KS: Number of modes, keep in mind actual number is +1 greater due to unknown category.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00107">MaCh3Modes.h:107</a></div></div>
+<div class="ttc" id="aGetPostfitParamPlots_8cpp_html_a656e9eabac71748634b6bf892e68e767"><div class="ttname"><a href="GetPostfitParamPlots_8cpp.html#a656e9eabac71748634b6bf892e68e767">PlotColor</a></div><div class="ttdeci">constexpr Color_t PlotColor[]</div><div class="ttdef"><b>Definition:</b> <a href="GetPostfitParamPlots_8cpp_source.html#l00068">GetPostfitParamPlots.cpp:68</a></div></div>
+<div class="ttc" id="aclassMaCh3Modes_html_a3bde53f0145673d99b9866b3fb5dcbaf"><div class="ttname"><a href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">MaCh3Modes::NModes</a></div><div class="ttdeci">int NModes</div><div class="ttdoc">KS: Number of modes, keep in mind actual number is +1 greater due to unknown category.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00201">MaCh3Modes.h:201</a></div></div>
 <div class="ttc" id="aclassMaCh3Modes_html_a989fa0ebe20a1e0113900972e194a543"><div class="ttname"><a href="classMaCh3Modes.html#a989fa0ebe20a1e0113900972e194a543">MaCh3Modes::EnsureModeNameRegistered</a></div><div class="ttdeci">MaCh3Modes_t EnsureModeNameRegistered(std::string const &amp;name)</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8cpp_source.html#l00096">MaCh3Modes.cpp:96</a></div></div>
-<div class="ttc" id="aclassMaCh3Modes_html_af945fab5dc02790abc84d47e7c84bed8"><div class="ttname"><a href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">MaCh3Modes::fMode</a></div><div class="ttdeci">std::map&lt; MaCh3Modes_t, MaCh3ModeInfo &gt; fMode</div><div class="ttdoc">KS: Main map storing info about used modes.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00098">MaCh3Modes.h:98</a></div></div>
+<div class="ttc" id="aclassMaCh3Modes_html_af945fab5dc02790abc84d47e7c84bed8"><div class="ttname"><a href="classMaCh3Modes.html#af945fab5dc02790abc84d47e7c84bed8">MaCh3Modes::fMode</a></div><div class="ttdeci">std::map&lt; MaCh3Modes_t, MaCh3ModeInfo &gt; fMode</div><div class="ttdoc">KS: Main map storing info about used modes.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00192">MaCh3Modes.h:192</a></div></div>
 <div class="ttc" id="astructMaCh3ModeInfo_html"><div class="ttname"><a href="structMaCh3ModeInfo.html">MaCh3ModeInfo</a></div><div class="ttdoc">KS: Class containing information for a single MaCh3Mode.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00017">MaCh3Modes.h:17</a></div></div>
 <div class="ttc" id="astructMaCh3ModeInfo_html_a02a4f32a5a65b723a0849539a315cc1a"><div class="ttname"><a href="structMaCh3ModeInfo.html#a02a4f32a5a65b723a0849539a315cc1a">MaCh3ModeInfo::GeneratorMaping</a></div><div class="ttdeci">std::vector&lt; int &gt; GeneratorMaping</div><div class="ttdoc">Mapping between mode and generator integers.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00025">MaCh3Modes.h:25</a></div></div>
 <div class="ttc" id="astructMaCh3ModeInfo_html_a3238e80bbf6a18fc21419a3277406d8d"><div class="ttname"><a href="structMaCh3ModeInfo.html#a3238e80bbf6a18fc21419a3277406d8d">MaCh3ModeInfo::SplineSuffix</a></div><div class="ttdeci">std::string SplineSuffix</div><div class="ttdoc">Spline suffix.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00029">MaCh3Modes.h:29</a></div></div>
@@ -393,7 +461,7 @@ Daniel Barrow </dd></dl>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  <a class="code" href="classMaCh3Modes.html#a062f961a64e9b6bebf420730f9dad9ff">Mode</a>[name] = index;</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;  <span class="keywordflow">return</span> index;</div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;}</div>
-<div class="ttc" id="aclassMaCh3Modes_html_a062f961a64e9b6bebf420730f9dad9ff"><div class="ttname"><a href="classMaCh3Modes.html#a062f961a64e9b6bebf420730f9dad9ff">MaCh3Modes::Mode</a></div><div class="ttdeci">std::map&lt; std::string, MaCh3Modes_t &gt; Mode</div><div class="ttdoc">KS: Handy map which helps find mode number based on string.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00096">MaCh3Modes.h:96</a></div></div>
+<div class="ttc" id="aclassMaCh3Modes_html_a062f961a64e9b6bebf420730f9dad9ff"><div class="ttname"><a href="classMaCh3Modes.html#a062f961a64e9b6bebf420730f9dad9ff">MaCh3Modes::Mode</a></div><div class="ttdeci">std::map&lt; std::string, MaCh3Modes_t &gt; Mode</div><div class="ttdoc">KS: Handy map which helps find mode number based on string.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00190">MaCh3Modes.h:190</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -566,7 +634,7 @@ Daniel Barrow </dd></dl>
 <div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160; </div>
 <div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="classMaCh3Modes.html#a52a226378736541ece3830f53ac851c3">ModeMap</a>[Index];</div>
 <div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;}</div>
-<div class="ttc" id="aclassMaCh3Modes_html_a52a226378736541ece3830f53ac851c3"><div class="ttname"><a href="classMaCh3Modes.html#a52a226378736541ece3830f53ac851c3">MaCh3Modes::ModeMap</a></div><div class="ttdeci">std::vector&lt; int &gt; ModeMap</div><div class="ttdoc">KS: Handy map helping us find MaCh3 mode based on Generator mode value.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00100">MaCh3Modes.h:100</a></div></div>
+<div class="ttc" id="aclassMaCh3Modes_html_a52a226378736541ece3830f53ac851c3"><div class="ttname"><a href="classMaCh3Modes.html#a52a226378736541ece3830f53ac851c3">MaCh3Modes::ModeMap</a></div><div class="ttdeci">std::vector&lt; int &gt; ModeMap</div><div class="ttdoc">KS: Handy map helping us find MaCh3 mode based on Generator mode value.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00194">MaCh3Modes.h:194</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -595,8 +663,8 @@ Daniel Barrow </dd></dl>
 
 <p>Get class name. </p>
 
-<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8h_source.html#l00071">71</a> of file <a class="el" href="MaCh3Modes_8h_source.html">MaCh3Modes.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;{<span class="keywordflow">return</span> <span class="stringliteral">&quot;MaCh3Modes&quot;</span>;};</div>
+<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8h_source.html#l00165">165</a> of file <a class="el" href="MaCh3Modes_8h_source.html">MaCh3Modes.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;{<span class="keywordflow">return</span> <span class="stringliteral">&quot;MaCh3Modes&quot;</span>;};</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -625,9 +693,9 @@ Daniel Barrow </dd></dl>
 
 <p>Return count of CC modes. </p>
 
-<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8h_source.html#l00073">73</a> of file <a class="el" href="MaCh3Modes_8h_source.html">MaCh3Modes.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;{<span class="keywordflow">return</span> <a class="code" href="classMaCh3Modes.html#a0635bbfc95b50bab0b1e036d33360947">nCCModes</a>;};</div>
-<div class="ttc" id="aclassMaCh3Modes_html_a0635bbfc95b50bab0b1e036d33360947"><div class="ttname"><a href="classMaCh3Modes.html#a0635bbfc95b50bab0b1e036d33360947">MaCh3Modes::nCCModes</a></div><div class="ttdeci">int nCCModes</div><div class="ttdoc">DB: Number of CC modes.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00109">MaCh3Modes.h:109</a></div></div>
+<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8h_source.html#l00167">167</a> of file <a class="el" href="MaCh3Modes_8h_source.html">MaCh3Modes.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;{<span class="keywordflow">return</span> <a class="code" href="classMaCh3Modes.html#a0635bbfc95b50bab0b1e036d33360947">nCCModes</a>;};</div>
+<div class="ttc" id="aclassMaCh3Modes_html_a0635bbfc95b50bab0b1e036d33360947"><div class="ttname"><a href="classMaCh3Modes.html#a0635bbfc95b50bab0b1e036d33360947">MaCh3Modes::nCCModes</a></div><div class="ttdeci">int nCCModes</div><div class="ttdoc">DB: Number of CC modes.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00203">MaCh3Modes.h:203</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -656,8 +724,8 @@ Daniel Barrow </dd></dl>
 
 <p>KS: Get number of modes, keep in mind actual number is +1 greater due to unknown category. </p>
 
-<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8h_source.html#l00054">54</a> of file <a class="el" href="MaCh3Modes_8h_source.html">MaCh3Modes.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;{<span class="keywordflow">return</span> <a class="code" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>;}</div>
+<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8h_source.html#l00148">148</a> of file <a class="el" href="MaCh3Modes_8h_source.html">MaCh3Modes.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;{<span class="keywordflow">return</span> <a class="code" href="classMaCh3Modes.html#a3bde53f0145673d99b9866b3fb5dcbaf">NModes</a>;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -769,8 +837,8 @@ Daniel Barrow </dd></dl>
 <div class="ttc" id="aYamlHelper_8h_html_ab5a40370dca062f6b2c87fabece7db27"><div class="ttname"><a href="YamlHelper_8h.html#ab5a40370dca062f6b2c87fabece7db27">Get</a></div><div class="ttdeci">Type Get(const YAML::Node &amp;node, const std::string File, const int Line)</div><div class="ttdoc">Get content of config file.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00288">YamlHelper.h:288</a></div></div>
 <div class="ttc" id="aclassMaCh3Modes_html_a30fc687aebaa1b9cbac9d3f356bad4be"><div class="ttname"><a href="classMaCh3Modes.html#a30fc687aebaa1b9cbac9d3f356bad4be">MaCh3Modes::DeclareNewMode</a></div><div class="ttdeci">void DeclareNewMode(std::string const &amp;name, std::string const &amp;fancyname, int PlotColor, std::vector&lt; int &gt; const &amp;GenMap, const bool IsNC, const std::string &amp;SplineSuffix)</div><div class="ttdoc">KS: Add new mode.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8cpp_source.html#l00107">MaCh3Modes.cpp:107</a></div></div>
 <div class="ttc" id="aclassMaCh3Modes_html_a5aa6f9f9acfc8b22d7764ed48d8ed64f"><div class="ttname"><a href="classMaCh3Modes.html#a5aa6f9f9acfc8b22d7764ed48d8ed64f">MaCh3Modes::Print</a></div><div class="ttdeci">void Print() const</div><div class="ttdoc">KS: Print info about initialised modes.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8cpp_source.html#l00058">MaCh3Modes.cpp:58</a></div></div>
-<div class="ttc" id="aclassMaCh3Modes_html_a68ccf4c0fcd926574b33ef1dbcad3110"><div class="ttname"><a href="classMaCh3Modes.html#a68ccf4c0fcd926574b33ef1dbcad3110">MaCh3Modes::Generator</a></div><div class="ttdeci">std::string Generator</div><div class="ttdoc">KS: Name of generator like NEUT, NuWro etc. this is to make stuff fancy.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00105">MaCh3Modes.h:105</a></div></div>
-<div class="ttc" id="aclassMaCh3Modes_html_a96386b84dc8e9a1a378872b7846e407d"><div class="ttname"><a href="classMaCh3Modes.html#a96386b84dc8e9a1a378872b7846e407d">MaCh3Modes::Title</a></div><div class="ttdeci">std::string Title</div><div class="ttdoc">KS: Name of loaded modes.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00103">MaCh3Modes.h:103</a></div></div>
+<div class="ttc" id="aclassMaCh3Modes_html_a68ccf4c0fcd926574b33ef1dbcad3110"><div class="ttname"><a href="classMaCh3Modes.html#a68ccf4c0fcd926574b33ef1dbcad3110">MaCh3Modes::Generator</a></div><div class="ttdeci">std::string Generator</div><div class="ttdoc">KS: Name of generator like NEUT, NuWro etc. this is to make stuff fancy.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00199">MaCh3Modes.h:199</a></div></div>
+<div class="ttc" id="aclassMaCh3Modes_html_a96386b84dc8e9a1a378872b7846e407d"><div class="ttname"><a href="classMaCh3Modes.html#a96386b84dc8e9a1a378872b7846e407d">MaCh3Modes::Title</a></div><div class="ttdeci">std::string Title</div><div class="ttdoc">KS: Name of loaded modes.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8h_source.html#l00197">MaCh3Modes.h:197</a></div></div>
 <div class="ttc" id="aclassMaCh3Modes_html_aed7bbc836f6b2fe3e8df4c442d65554b"><div class="ttname"><a href="classMaCh3Modes.html#aed7bbc836f6b2fe3e8df4c442d65554b">MaCh3Modes::PrepareMap</a></div><div class="ttdeci">void PrepareMap()</div><div class="ttdoc">KS: Fill ModeMap.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Modes_8cpp_source.html#l00129">MaCh3Modes.cpp:129</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -947,7 +1015,7 @@ Daniel Barrow </dd></dl>
 
 <p>KS: Main map storing info about used modes. </p>
 
-<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8h_source.html#l00098">98</a> of file <a class="el" href="MaCh3Modes_8h_source.html">MaCh3Modes.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8h_source.html#l00192">192</a> of file <a class="el" href="MaCh3Modes_8h_source.html">MaCh3Modes.h</a>.</p>
 
 </div>
 </div>
@@ -973,7 +1041,7 @@ Daniel Barrow </dd></dl>
 
 <p>KS: Name of generator like NEUT, NuWro etc. this is to make stuff fancy. </p>
 
-<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8h_source.html#l00105">105</a> of file <a class="el" href="MaCh3Modes_8h_source.html">MaCh3Modes.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8h_source.html#l00199">199</a> of file <a class="el" href="MaCh3Modes_8h_source.html">MaCh3Modes.h</a>.</p>
 
 </div>
 </div>
@@ -999,7 +1067,7 @@ Daniel Barrow </dd></dl>
 
 <p>KS: Handy map which helps find mode number based on string. </p>
 
-<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8h_source.html#l00096">96</a> of file <a class="el" href="MaCh3Modes_8h_source.html">MaCh3Modes.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8h_source.html#l00190">190</a> of file <a class="el" href="MaCh3Modes_8h_source.html">MaCh3Modes.h</a>.</p>
 
 </div>
 </div>
@@ -1025,7 +1093,7 @@ Daniel Barrow </dd></dl>
 
 <p>KS: Handy map helping us find MaCh3 mode based on Generator mode value. </p>
 
-<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8h_source.html#l00100">100</a> of file <a class="el" href="MaCh3Modes_8h_source.html">MaCh3Modes.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8h_source.html#l00194">194</a> of file <a class="el" href="MaCh3Modes_8h_source.html">MaCh3Modes.h</a>.</p>
 
 </div>
 </div>
@@ -1051,7 +1119,7 @@ Daniel Barrow </dd></dl>
 
 <p>DB: Number of CC modes. </p>
 
-<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8h_source.html#l00109">109</a> of file <a class="el" href="MaCh3Modes_8h_source.html">MaCh3Modes.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8h_source.html#l00203">203</a> of file <a class="el" href="MaCh3Modes_8h_source.html">MaCh3Modes.h</a>.</p>
 
 </div>
 </div>
@@ -1077,7 +1145,7 @@ Daniel Barrow </dd></dl>
 
 <p>KS: Number of modes, keep in mind actual number is +1 greater due to unknown category. </p>
 
-<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8h_source.html#l00107">107</a> of file <a class="el" href="MaCh3Modes_8h_source.html">MaCh3Modes.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8h_source.html#l00201">201</a> of file <a class="el" href="MaCh3Modes_8h_source.html">MaCh3Modes.h</a>.</p>
 
 </div>
 </div>
@@ -1103,7 +1171,7 @@ Daniel Barrow </dd></dl>
 
 <p>KS: Name of loaded modes. </p>
 
-<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8h_source.html#l00103">103</a> of file <a class="el" href="MaCh3Modes_8h_source.html">MaCh3Modes.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="MaCh3Modes_8h_source.html#l00197">197</a> of file <a class="el" href="MaCh3Modes_8h_source.html">MaCh3Modes.h</a>.</p>
 
 </div>
 </div>
