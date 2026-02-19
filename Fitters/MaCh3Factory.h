@@ -25,6 +25,8 @@
 /// General:
 ///   FittingAlgorithm: ["MCMC"]
 /// @endcode
+///
+/// @ingroup FittingAlgorithms
 std::unique_ptr<FitterBase> MaCh3FitterFactory(Manager *FitManager);
 
 /// @brief Initializes the config Manager class and allows overriding settings via command-line arguments.

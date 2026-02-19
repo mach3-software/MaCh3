@@ -6,6 +6,7 @@
 #pragma GCC diagnostic ignored "-Wconversion"
 
 /// @file PlotSigmaVariation.cpp
+/// @ingroup MaCh3Plotting
 /// @author Kamil Skwarczynski
 
 std::vector<std::string> DialNameVector;

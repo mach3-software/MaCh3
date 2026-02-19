@@ -215,6 +215,9 @@ struct InputFile {
 /// these that we might not want to read them all into memory at once when adding the file but maybe
 /// just check to see what ones are in the file, then be able to read them on the fly later.
 /// @todo Add code to read in Violin plots from the postfit error output files.
+///
+/// @ingroup MaCh3Plotting
+/// @author Ewan Miller
 class InputManager {
 public:
   const std::string NOT_FOUND_STR =

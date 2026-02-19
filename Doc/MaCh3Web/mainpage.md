@@ -5,9 +5,20 @@ Welcome to %MaCh3!
 
 This is the Reference Guide of the MaCh3 software.
 
-You can find additional documentation on our [Wiki](https://github.com/mach3-software/MaCh3/wiki)
+If you are new we recommend to start from our [Tutorial](https://github.com/mach3-software/MaCh3Validations).
+It is using dummy experiment and allow to easily and fast test most of MaCh3 functionality.
 
-If you are new we recommend to start from our [Tutorial](https://github.com/mach3-software/MaCh3Validations)
+We also recommend getting familiar with Markov Chain Monte Carlo and Bayesian analysis.
+References and basic instructions are available in our \ref UserGuide "User Guide"
+
+To better understand how the high-level interface works, see the
+<a href="modules.html">Interface modules</a>.
+
+If you are unsure in which release a particular feature was introduced,
+please consult the \ref ReleaseNotes "Release Notes".
+
+If you are looking for analyses performed with MaCh3 or related papers,
+see the \ref ResultsPublications "Results and Publications" page.
 
 MaCh3 also comes with a Python interface. You can find out more about this in the dedicated [pyMaCh3 documentation](./pyMaCh3/mainpage.html)
 

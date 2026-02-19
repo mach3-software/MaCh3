@@ -7,6 +7,7 @@
 #pragma GCC diagnostic ignored "-Wconversion"
 
 /// @file PredictivePlotting.cpp
+/// @ingroup MaCh3Plotting
 /// @author Kamil Skwarczynski
 
 /// @warning KS: keep raw pointer or ensure manual delete of PlotMan. If spdlog in automatically deleted before PlotMan then destructor has some spdlog and this could cause segfault

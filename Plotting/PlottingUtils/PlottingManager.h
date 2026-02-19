@@ -29,6 +29,8 @@ namespace MaCh3Plotting {
 /// any style options you like from the StyleManager. Also a hopefully not too distant dream is to
 /// wrap this up in python so it is usable in .py scripts to take advantage of nice existing
 /// plotting libraries for e.g. MCMC plotting.
+///
+/// @ingroup MaCh3Plotting
 /// @author Ewan Miller
 class PlottingManager {
 public:
