@@ -33,8 +33,8 @@ var searchData=
   ['modehist_3243',['ModeHist',['../classSampleSummary.html#a9b21ff74bb8ebd7c3af2c24e02f3d7dc',1,'SampleSummary']]],
   ['modelsystematic_3244',['ModelSystematic',['../classPredictiveThrower.html#acc2896a8dc48518bbbbe274a317a537b',1,'PredictiveThrower']]],
   ['modemap_3245',['ModeMap',['../classMaCh3Modes.html#a52a226378736541ece3830f53ac851c3',1,'MaCh3Modes']]],
-  ['modes_3246',['modes',['../structFunctionalParameter.html#a443cac0801c6836746927c9e379f4359',1,'FunctionalParameter::modes()'],['../structNormParameter.html#a68a2f690b1226fe6090b18fd0af47057',1,'NormParameter::modes()']]],
-  ['modes_3247',['Modes',['../classSampleSummary.html#a6593fed9709673a6910f96adc88fc8f2',1,'SampleSummary::Modes()'],['../classSampleHandlerBase.html#a2f86c6158b755b9d2d400415ccac45f2',1,'SampleHandlerBase::Modes()'],['../classBinnedSplineHandler.html#ad18810d957169226bcd66d4bc8fa274f',1,'BinnedSplineHandler::Modes()']]],
+  ['modes_3246',['Modes',['../classSampleSummary.html#a6593fed9709673a6910f96adc88fc8f2',1,'SampleSummary::Modes()'],['../classSampleHandlerBase.html#a2f86c6158b755b9d2d400415ccac45f2',1,'SampleHandlerBase::Modes()'],['../classBinnedSplineHandler.html#ad18810d957169226bcd66d4bc8fa274f',1,'BinnedSplineHandler::Modes()']]],
+  ['modes_3247',['modes',['../structFunctionalParameter.html#a443cac0801c6836746927c9e379f4359',1,'FunctionalParameter::modes()'],['../structNormParameter.html#a68a2f690b1226fe6090b18fd0af47057',1,'NormParameter::modes()']]],
   ['monolithindex_3248',['MonolithIndex',['../classBinnedSplineHandler.html#a4a0d538654de1ffcdf3e1c4161878bd6',1,'BinnedSplineHandler']]],
   ['monolithsize_3249',['MonolithSize',['../classBinnedSplineHandler.html#acb076b2a7c8cdb53d70dfb33ddd344b7',1,'BinnedSplineHandler']]]
 ];

@@ -1,52 +1,52 @@
 <map id="Samples/SampleHandlerFD.cpp" name="Samples/SampleHandlerFD.cpp">
-<area shape="rect" id="node1" title=" " alt="" coords="1541,5,1750,32"/>
-<area shape="rect" id="node2" href="$SampleHandlerFD_8h.html" title=" " alt="" coords="1449,80,1589,107"/>
-<area shape="rect" id="node12" href="$MaCh3Exception_8h.html" title="Defines the custom exception class used throughout MaCh3." alt="" coords="1169,721,1356,748"/>
-<area shape="rect" id="node16" href="$MaCh3Logger_8h.html" title="MaCh3 Logging utilities built on top of SPDLOG." alt="" coords="1448,796,1616,823"/>
-<area shape="rect" id="node47" title=" " alt="" coords="1613,80,1678,107"/>
-<area shape="rect" id="node48" title=" " alt="" coords="1703,80,1777,107"/>
-<area shape="rect" id="node49" title=" " alt="" coords="1802,80,1873,107"/>
-<area shape="rect" id="node50" title=" " alt="" coords="1897,80,1965,107"/>
-<area shape="rect" id="node3" href="$BinnedSplineHandler_8h.html" title=" " alt="" coords="473,155,674,181"/>
-<area shape="rect" id="node8" href="$ParameterHandlerGeneric_8h.html" title=" " alt="" coords="1334,379,1533,420"/>
-<area shape="rect" id="node34" href="$SampleHandlerBase_8h.html" title=" " alt="" coords="709,475,915,502"/>
-<area shape="rect" id="node42" href="$OscillationHandler_8h.html" title=" " alt="" coords="1515,229,1709,256"/>
-<area shape="rect" id="node43" href="$FarDetectorCoreInfoStruct_8h.html" title=" " alt="" coords="1779,557,1975,599"/>
-<area shape="rect" id="node44" href="$BinningHandler_8h.html" title=" " alt="" coords="1659,475,1835,502"/>
-<area shape="rect" id="node45" title=" " alt="" coords="1648,155,1733,181"/>
-<area shape="rect" id="node46" title=" " alt="" coords="1757,155,1840,181"/>
-<area shape="rect" id="node4" href="$SplineBase_8h.html" title=" " alt="" coords="500,229,647,256"/>
-<area shape="rect" id="node33" href="$MaCh3Modes_8h.html" title=" " alt="" coords="144,647,312,673"/>
-<area shape="rect" id="node5" title=" " alt="" coords="771,304,831,331"/>
-<area shape="rect" id="node6" title=" " alt="" coords="637,945,704,972"/>
-<area shape="rect" id="node7" href="$SplineStructs_8h.html" title="Contains structures and helper functions for handling spline representations of systematic parameters..." alt="" coords="342,304,501,331"/>
-<area shape="rect" id="node26" title=" " alt="" coords="1381,721,1443,748"/>
-<area shape="rect" id="node27" href="$SplineCommon_8h.html" title="Contains definitions for spline coefficients and structure used in both CPU and GPU code." alt="" coords="855,304,1025,331"/>
-<area shape="rect" id="node28" title=" " alt="" coords="201,304,266,331"/>
-<area shape="rect" id="node29" title=" " alt="" coords="577,304,639,331"/>
-<area shape="rect" id="node30" title=" " alt="" coords="296,565,371,591"/>
-<area shape="rect" id="node31" title=" " alt="" coords="664,304,747,331"/>
-<area shape="rect" id="node32" title=" " alt="" coords="395,565,461,591"/>
-<area shape="rect" id="node23" title=" " alt="" coords="27,945,85,972"/>
-<area shape="rect" id="node9" href="$ParameterHandlerBase_8h.html" title=" " alt="" coords="1283,468,1482,509"/>
-<area shape="rect" id="node11" href="$SampleStructs_8h.html" title=" " alt="" coords="1377,647,1551,673"/>
-<area shape="rect" id="node10" href="$Manager_8h.html" title=" " alt="" coords="1363,565,1501,591"/>
-<area shape="rect" id="node20" href="$Core_8h.html" title="KS: Core MaCh3 definitions and compile&#45;time configuration utilities." alt="" coords="1729,871,1844,897"/>
-<area shape="rect" id="node13" title=" " alt="" coords="1261,945,1333,972"/>
-<area shape="rect" id="node14" title=" " alt="" coords="1205,871,1259,897"/>
-<area shape="rect" id="node15" title=" " alt="" coords="1170,796,1249,823"/>
-<area shape="rect" id="node17" title=" " alt="" coords="1468,945,1537,972"/>
-<area shape="rect" id="node18" title=" " alt="" coords="1386,871,1465,897"/>
-<area shape="rect" id="node19" title=" " alt="" coords="1489,871,1567,897"/>
-<area shape="rect" id="node25" title=" " alt="" coords="1591,871,1705,897"/>
-<area shape="rect" id="node21" title=" " alt="" coords="1677,945,1744,972"/>
-<area shape="rect" id="node22" title=" " alt="" coords="1853,945,1910,972"/>
-<area shape="rect" id="node24" title=" " alt="" coords="1768,945,1821,972"/>
-<area shape="rect" id="node35" title=" " alt="" coords="587,565,656,591"/>
-<area shape="rect" id="node36" href="$HistogramUtils_8h.html" title=" " alt="" coords="1113,565,1287,591"/>
-<area shape="rect" id="node37" title=" " alt="" coords="531,647,627,673"/>
-<area shape="rect" id="node38" title=" " alt="" coords="731,565,799,591"/>
-<area shape="rect" id="node39" title=" " alt="" coords="823,565,891,591"/>
-<area shape="rect" id="node40" title=" " alt="" coords="915,565,986,591"/>
-<area shape="rect" id="node41" title=" " alt="" coords="1011,565,1088,591"/>
+<area shape="rect" id="node1" title=" " alt="" coords="1905,5,2115,32"/>
+<area shape="rect" id="node2" href="$SampleHandlerFD_8h.html" title=" " alt="" coords="415,80,555,107"/>
+<area shape="rect" id="node12" href="$MaCh3Exception_8h.html" title="Defines the custom exception class used throughout MaCh3." alt="" coords="481,721,667,748"/>
+<area shape="rect" id="node16" href="$MaCh3Logger_8h.html" title="MaCh3 Logging utilities built on top of SPDLOG." alt="" coords="742,796,910,823"/>
+<area shape="rect" id="node46" href="$SplineMonolith_8h.html" title=" " alt="" coords="1582,155,1747,181"/>
+<area shape="rect" id="node47" title=" " alt="" coords="2013,80,2079,107"/>
+<area shape="rect" id="node48" title=" " alt="" coords="2103,80,2178,107"/>
+<area shape="rect" id="node49" title=" " alt="" coords="2203,80,2273,107"/>
+<area shape="rect" id="node50" title=" " alt="" coords="2297,80,2365,107"/>
+<area shape="rect" id="node3" href="$BinnedSplineHandler_8h.html" title=" " alt="" coords="601,155,803,181"/>
+<area shape="rect" id="node8" href="$ParameterHandlerGeneric_8h.html" title=" " alt="" coords="564,379,763,420"/>
+<area shape="rect" id="node33" href="$SampleHandlerBase_8h.html" title=" " alt="" coords="979,475,1185,502"/>
+<area shape="rect" id="node41" href="$OscillationHandler_8h.html" title=" " alt="" coords="334,229,529,256"/>
+<area shape="rect" id="node42" href="$FarDetectorCoreInfoStruct_8h.html" title=" " alt="" coords="5,557,201,599"/>
+<area shape="rect" id="node43" href="$BinningHandler_8h.html" title=" " alt="" coords="161,475,337,502"/>
+<area shape="rect" id="node44" title=" " alt="" coords="334,155,419,181"/>
+<area shape="rect" id="node45" title=" " alt="" coords="443,155,526,181"/>
+<area shape="rect" id="node4" href="$SplineBase_8h.html" title=" " alt="" coords="1451,229,1598,256"/>
+<area shape="rect" id="node32" href="$MaCh3Modes_8h.html" title=" " alt="" coords="358,647,526,673"/>
+<area shape="rect" id="node5" title=" " alt="" coords="1071,304,1131,331"/>
+<area shape="rect" id="node6" title=" " alt="" coords="1430,945,1497,972"/>
+<area shape="rect" id="node7" href="$SplineStructs_8h.html" title="Contains structures and helper functions for handling spline representations of systematic parameters..." alt="" coords="1155,304,1313,331"/>
+<area shape="rect" id="node26" title=" " alt="" coords="1501,721,1564,748"/>
+<area shape="rect" id="node27" href="$SplineCommon_8h.html" title="Contains definitions for spline coefficients and structure used in both CPU and GPU code." alt="" coords="1440,304,1609,331"/>
+<area shape="rect" id="node28" title=" " alt="" coords="1633,304,1699,331"/>
+<area shape="rect" id="node29" title=" " alt="" coords="1723,304,1785,331"/>
+<area shape="rect" id="node30" title=" " alt="" coords="1661,565,1735,591"/>
+<area shape="rect" id="node31" title=" " alt="" coords="1570,565,1637,591"/>
+<area shape="rect" id="node23" title=" " alt="" coords="733,945,791,972"/>
+<area shape="rect" id="node9" href="$ParameterHandlerBase_8h.html" title=" " alt="" coords="469,468,668,509"/>
+<area shape="rect" id="node11" href="$SampleStructs_8h.html" title=" " alt="" coords="617,647,792,673"/>
+<area shape="rect" id="node10" href="$Manager_8h.html" title=" " alt="" coords="480,565,617,591"/>
+<area shape="rect" id="node20" href="$Core_8h.html" title="KS: Core MaCh3 definitions and compile&#45;time configuration utilities." alt="" coords="634,871,749,897"/>
+<area shape="rect" id="node13" title=" " alt="" coords="469,945,541,972"/>
+<area shape="rect" id="node14" title=" " alt="" coords="316,871,371,897"/>
+<area shape="rect" id="node15" title=" " alt="" coords="535,796,613,823"/>
+<area shape="rect" id="node17" title=" " alt="" coords="815,945,885,972"/>
+<area shape="rect" id="node18" title=" " alt="" coords="824,871,903,897"/>
+<area shape="rect" id="node19" title=" " alt="" coords="927,871,1005,897"/>
+<area shape="rect" id="node25" title=" " alt="" coords="1029,871,1143,897"/>
+<area shape="rect" id="node21" title=" " alt="" coords="565,945,631,972"/>
+<area shape="rect" id="node22" title=" " alt="" coords="163,945,220,972"/>
+<area shape="rect" id="node24" title=" " alt="" coords="655,945,709,972"/>
+<area shape="rect" id="node34" title=" " alt="" coords="1083,565,1153,591"/>
+<area shape="rect" id="node35" href="$HistogramUtils_8h.html" title=" " alt="" coords="1177,565,1352,591"/>
+<area shape="rect" id="node36" title=" " alt="" coords="1307,647,1403,673"/>
+<area shape="rect" id="node37" title=" " alt="" coords="1376,565,1444,591"/>
+<area shape="rect" id="node38" title=" " alt="" coords="744,565,812,591"/>
+<area shape="rect" id="node39" title=" " alt="" coords="836,565,907,591"/>
+<area shape="rect" id="node40" title=" " alt="" coords="931,565,1009,591"/>
 </map>

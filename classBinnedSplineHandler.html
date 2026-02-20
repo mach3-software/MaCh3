@@ -130,6 +130,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a7e3cd817c57cfbce64d08db8854bbdc0"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; int &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#a7e3cd817c57cfbce64d08db8854bbdc0">GetEventSplines</a> (const std::string &amp;SampleTitle, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val)</td></tr>
 <tr class="memdesc:a7e3cd817c57cfbce64d08db8854bbdc0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the splines which affect a given event.  <a href="classBinnedSplineHandler.html#a7e3cd817c57cfbce64d08db8854bbdc0">More...</a><br /></td></tr>
 <tr class="separator:a7e3cd817c57cfbce64d08db8854bbdc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1bc4924eb71d0ccba6ae362656747d9e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#a1bc4924eb71d0ccba6ae362656747d9e">SynchroniseMemTransfer</a> () const override</td></tr>
+<tr class="memdesc:a1bc4924eb71d0ccba6ae362656747d9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.  <a href="classBinnedSplineHandler.html#a1bc4924eb71d0ccba6ae362656747d9e">More...</a><br /></td></tr>
+<tr class="separator:a1bc4924eb71d0ccba6ae362656747d9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa3cfd3c0730281791227f25f04c944ee"><td class="memItemLeft" align="right" valign="top">std::vector&lt; TAxis * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBinnedSplineHandler.html#aa3cfd3c0730281791227f25f04c944ee">FindSplineBinning</a> (const std::string &amp;FileName, const std::string &amp;SampleTitle)</td></tr>
 <tr class="memdesc:aa3cfd3c0730281791227f25f04c944ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Grab histograms with spline binning.  <a href="classBinnedSplineHandler.html#aa3cfd3c0730281791227f25f04c944ee">More...</a><br /></td></tr>
 <tr class="separator:aa3cfd3c0730281791227f25f04c944ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -364,14 +367,14 @@ Henry Wallace </dd></dl>
 <tr><td class="fieldname"><a id="aed96ca823d82fe9754e8961f4adcb660a786e35460a66cd76056dd772055a1572"></a>kNTokens&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00137">137</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;{<a class="code" href="classBinnedSplineHandler.html#aed96ca823d82fe9754e8961f4adcb660a81e819b2ed8cee4b21ce534a166eeeb5">kSystToken</a>,<a class="code" href="classBinnedSplineHandler.html#aed96ca823d82fe9754e8961f4adcb660a711ee221711365c7ba45d51b8f027d54">kModeToken</a>,<a class="code" href="classBinnedSplineHandler.html#aed96ca823d82fe9754e8961f4adcb660ab6a3523389a1dca6a5775e525c048dfd">kVar1BinToken</a>,<a class="code" href="classBinnedSplineHandler.html#aed96ca823d82fe9754e8961f4adcb660a3f0cc3b1b494394308167a877e8f3333">kVar2BinToken</a>,<a class="code" href="classBinnedSplineHandler.html#aed96ca823d82fe9754e8961f4adcb660abb66cca77f4df329ac10abca491d7d23">kVar3BinToken</a>,<a class="code" href="classBinnedSplineHandler.html#aed96ca823d82fe9754e8961f4adcb660a786e35460a66cd76056dd772055a1572">kNTokens</a>};</div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_aed96ca823d82fe9754e8961f4adcb660a3f0cc3b1b494394308167a877e8f3333"><div class="ttname"><a href="classBinnedSplineHandler.html#aed96ca823d82fe9754e8961f4adcb660a3f0cc3b1b494394308167a877e8f3333">BinnedSplineHandler::kVar2BinToken</a></div><div class="ttdeci">@ kVar2BinToken</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00137">BinnedSplineHandler.h:137</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_aed96ca823d82fe9754e8961f4adcb660a711ee221711365c7ba45d51b8f027d54"><div class="ttname"><a href="classBinnedSplineHandler.html#aed96ca823d82fe9754e8961f4adcb660a711ee221711365c7ba45d51b8f027d54">BinnedSplineHandler::kModeToken</a></div><div class="ttdeci">@ kModeToken</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00137">BinnedSplineHandler.h:137</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_aed96ca823d82fe9754e8961f4adcb660a786e35460a66cd76056dd772055a1572"><div class="ttname"><a href="classBinnedSplineHandler.html#aed96ca823d82fe9754e8961f4adcb660a786e35460a66cd76056dd772055a1572">BinnedSplineHandler::kNTokens</a></div><div class="ttdeci">@ kNTokens</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00137">BinnedSplineHandler.h:137</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_aed96ca823d82fe9754e8961f4adcb660a81e819b2ed8cee4b21ce534a166eeeb5"><div class="ttname"><a href="classBinnedSplineHandler.html#aed96ca823d82fe9754e8961f4adcb660a81e819b2ed8cee4b21ce534a166eeeb5">BinnedSplineHandler::kSystToken</a></div><div class="ttdeci">@ kSystToken</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00137">BinnedSplineHandler.h:137</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_aed96ca823d82fe9754e8961f4adcb660ab6a3523389a1dca6a5775e525c048dfd"><div class="ttname"><a href="classBinnedSplineHandler.html#aed96ca823d82fe9754e8961f4adcb660ab6a3523389a1dca6a5775e525c048dfd">BinnedSplineHandler::kVar1BinToken</a></div><div class="ttdeci">@ kVar1BinToken</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00137">BinnedSplineHandler.h:137</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_aed96ca823d82fe9754e8961f4adcb660abb66cca77f4df329ac10abca491d7d23"><div class="ttname"><a href="classBinnedSplineHandler.html#aed96ca823d82fe9754e8961f4adcb660abb66cca77f4df329ac10abca491d7d23">BinnedSplineHandler::kVar3BinToken</a></div><div class="ttdeci">@ kVar3BinToken</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00137">BinnedSplineHandler.h:137</a></div></div>
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00138">138</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;{<a class="code" href="classBinnedSplineHandler.html#aed96ca823d82fe9754e8961f4adcb660a81e819b2ed8cee4b21ce534a166eeeb5">kSystToken</a>,<a class="code" href="classBinnedSplineHandler.html#aed96ca823d82fe9754e8961f4adcb660a711ee221711365c7ba45d51b8f027d54">kModeToken</a>,<a class="code" href="classBinnedSplineHandler.html#aed96ca823d82fe9754e8961f4adcb660ab6a3523389a1dca6a5775e525c048dfd">kVar1BinToken</a>,<a class="code" href="classBinnedSplineHandler.html#aed96ca823d82fe9754e8961f4adcb660a3f0cc3b1b494394308167a877e8f3333">kVar2BinToken</a>,<a class="code" href="classBinnedSplineHandler.html#aed96ca823d82fe9754e8961f4adcb660abb66cca77f4df329ac10abca491d7d23">kVar3BinToken</a>,<a class="code" href="classBinnedSplineHandler.html#aed96ca823d82fe9754e8961f4adcb660a786e35460a66cd76056dd772055a1572">kNTokens</a>};</div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_aed96ca823d82fe9754e8961f4adcb660a3f0cc3b1b494394308167a877e8f3333"><div class="ttname"><a href="classBinnedSplineHandler.html#aed96ca823d82fe9754e8961f4adcb660a3f0cc3b1b494394308167a877e8f3333">BinnedSplineHandler::kVar2BinToken</a></div><div class="ttdeci">@ kVar2BinToken</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00138">BinnedSplineHandler.h:138</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_aed96ca823d82fe9754e8961f4adcb660a711ee221711365c7ba45d51b8f027d54"><div class="ttname"><a href="classBinnedSplineHandler.html#aed96ca823d82fe9754e8961f4adcb660a711ee221711365c7ba45d51b8f027d54">BinnedSplineHandler::kModeToken</a></div><div class="ttdeci">@ kModeToken</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00138">BinnedSplineHandler.h:138</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_aed96ca823d82fe9754e8961f4adcb660a786e35460a66cd76056dd772055a1572"><div class="ttname"><a href="classBinnedSplineHandler.html#aed96ca823d82fe9754e8961f4adcb660a786e35460a66cd76056dd772055a1572">BinnedSplineHandler::kNTokens</a></div><div class="ttdeci">@ kNTokens</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00138">BinnedSplineHandler.h:138</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_aed96ca823d82fe9754e8961f4adcb660a81e819b2ed8cee4b21ce534a166eeeb5"><div class="ttname"><a href="classBinnedSplineHandler.html#aed96ca823d82fe9754e8961f4adcb660a81e819b2ed8cee4b21ce534a166eeeb5">BinnedSplineHandler::kSystToken</a></div><div class="ttdeci">@ kSystToken</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00138">BinnedSplineHandler.h:138</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_aed96ca823d82fe9754e8961f4adcb660ab6a3523389a1dca6a5775e525c048dfd"><div class="ttname"><a href="classBinnedSplineHandler.html#aed96ca823d82fe9754e8961f4adcb660ab6a3523389a1dca6a5775e525c048dfd">BinnedSplineHandler::kVar1BinToken</a></div><div class="ttdeci">@ kVar1BinToken</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00138">BinnedSplineHandler.h:138</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_aed96ca823d82fe9754e8961f4adcb660abb66cca77f4df329ac10abca491d7d23"><div class="ttname"><a href="classBinnedSplineHandler.html#aed96ca823d82fe9754e8961f4adcb660abb66cca77f4df329ac10abca491d7d23">BinnedSplineHandler::kVar3BinToken</a></div><div class="ttdeci">@ kVar3BinToken</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00138">BinnedSplineHandler.h:138</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -426,11 +429,11 @@ Henry Wallace </dd></dl>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <a class="code" href="classBinnedSplineHandler.html#a13329dc38e92088744a5a49a60c01a83">isflatarray</a> = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00037">MaCh3Logger.h:37</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_a13329dc38e92088744a5a49a60c01a83"><div class="ttname"><a href="classBinnedSplineHandler.html#a13329dc38e92088744a5a49a60c01a83">BinnedSplineHandler::isflatarray</a></div><div class="ttdeci">bool * isflatarray</div><div class="ttdoc">Need to keep track of which splines are flat and which aren't.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00124">BinnedSplineHandler.h:124</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_a4360c772f9cad0aeccbf7e9a7bf86595"><div class="ttname"><a href="classBinnedSplineHandler.html#a4360c772f9cad0aeccbf7e9a7bf86595">BinnedSplineHandler::xsec</a></div><div class="ttdeci">ParameterHandlerGeneric * xsec</div><div class="ttdoc">Pointer to covariance from which we get information about spline params.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00081">BinnedSplineHandler.h:79</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_a4a0d538654de1ffcdf3e1c4161878bd6"><div class="ttname"><a href="classBinnedSplineHandler.html#a4a0d538654de1ffcdf3e1c4161878bd6">BinnedSplineHandler::MonolithIndex</a></div><div class="ttdeci">int MonolithIndex</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00120">BinnedSplineHandler.h:120</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_ad18810d957169226bcd66d4bc8fa274f"><div class="ttname"><a href="classBinnedSplineHandler.html#ad18810d957169226bcd66d4bc8fa274f">BinnedSplineHandler::Modes</a></div><div class="ttdeci">MaCh3Modes * Modes</div><div class="ttdoc">pointer to MaCh3 Mode from which we get spline suffix</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00136">BinnedSplineHandler.h:136</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_aeaa55e0f149fa734a358759d12c46ca6"><div class="ttname"><a href="classBinnedSplineHandler.html#aeaa55e0f149fa734a358759d12c46ca6">BinnedSplineHandler::CoeffIndex</a></div><div class="ttdeci">int CoeffIndex</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00121">BinnedSplineHandler.h:121</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_a13329dc38e92088744a5a49a60c01a83"><div class="ttname"><a href="classBinnedSplineHandler.html#a13329dc38e92088744a5a49a60c01a83">BinnedSplineHandler::isflatarray</a></div><div class="ttdeci">bool * isflatarray</div><div class="ttdoc">Need to keep track of which splines are flat and which aren't.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00125">BinnedSplineHandler.h:125</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_a4360c772f9cad0aeccbf7e9a7bf86595"><div class="ttname"><a href="classBinnedSplineHandler.html#a4360c772f9cad0aeccbf7e9a7bf86595">BinnedSplineHandler::xsec</a></div><div class="ttdeci">ParameterHandlerGeneric * xsec</div><div class="ttdoc">Pointer to covariance from which we get information about spline params.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00082">BinnedSplineHandler.h:80</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_a4a0d538654de1ffcdf3e1c4161878bd6"><div class="ttname"><a href="classBinnedSplineHandler.html#a4a0d538654de1ffcdf3e1c4161878bd6">BinnedSplineHandler::MonolithIndex</a></div><div class="ttdeci">int MonolithIndex</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00121">BinnedSplineHandler.h:121</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_ad18810d957169226bcd66d4bc8fa274f"><div class="ttname"><a href="classBinnedSplineHandler.html#ad18810d957169226bcd66d4bc8fa274f">BinnedSplineHandler::Modes</a></div><div class="ttdeci">MaCh3Modes * Modes</div><div class="ttdoc">pointer to MaCh3 Mode from which we get spline suffix</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00137">BinnedSplineHandler.h:137</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_aeaa55e0f149fa734a358759d12c46ca6"><div class="ttname"><a href="classBinnedSplineHandler.html#aeaa55e0f149fa734a358759d12c46ca6">BinnedSplineHandler::CoeffIndex</a></div><div class="ttdeci">int CoeffIndex</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00122">BinnedSplineHandler.h:122</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class used throughout MaCh3.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00023">MaCh3Exception.h:23</a></div></div>
 <div class="ttc" id="aclassSplineBase_html_aa6965d1522cc68ecf81ac3bfd2dcd6f1"><div class="ttname"><a href="classSplineBase.html#aa6965d1522cc68ecf81ac3bfd2dcd6f1">SplineBase::SplineBase</a></div><div class="ttdeci">SplineBase()</div><div class="ttdoc">Constructor.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8cpp_source.html#l00007">SplineBase.cpp:7</a></div></div>
 </div><!-- fragment -->
@@ -470,10 +473,10 @@ Henry Wallace </dd></dl>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classSplineBase.html#a938e3a60326137037f868b9930e2a972">SplineSegments</a> != <span class="keyword">nullptr</span>) <span class="keyword">delete</span>[] <a class="code" href="classSplineBase.html#a938e3a60326137037f868b9930e2a972">SplineSegments</a>;</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="classSplineBase.html#aa0b1d3a1adf7cffa7e74581bc7d58d4c">ParamValues</a> != <span class="keyword">nullptr</span>) <span class="keyword">delete</span>[] <a class="code" href="classSplineBase.html#aa0b1d3a1adf7cffa7e74581bc7d58d4c">ParamValues</a>;</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;}</div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_a565b03441c146e0a351f9aee09ea0836"><div class="ttname"><a href="classBinnedSplineHandler.html#a565b03441c146e0a351f9aee09ea0836">BinnedSplineHandler::xcoeff_arr</a></div><div class="ttdeci">M3::float_t * xcoeff_arr</div><div class="ttdoc">x coefficients for each spline</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00126">BinnedSplineHandler.h:126</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_afbff241a0ea99c0872ee56a71c0633d1"><div class="ttname"><a href="classBinnedSplineHandler.html#afbff241a0ea99c0872ee56a71c0633d1">BinnedSplineHandler::manycoeff_arr</a></div><div class="ttdeci">M3::float_t * manycoeff_arr</div><div class="ttdoc">ybcd coefficients for each spline</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00128">BinnedSplineHandler.h:128</a></div></div>
-<div class="ttc" id="aclassSplineBase_html_a938e3a60326137037f868b9930e2a972"><div class="ttname"><a href="classSplineBase.html#a938e3a60326137037f868b9930e2a972">SplineBase::SplineSegments</a></div><div class="ttdeci">short int * SplineSegments</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00074">SplineBase.h:74</a></div></div>
-<div class="ttc" id="aclassSplineBase_html_aa0b1d3a1adf7cffa7e74581bc7d58d4c"><div class="ttname"><a href="classSplineBase.html#aa0b1d3a1adf7cffa7e74581bc7d58d4c">SplineBase::ParamValues</a></div><div class="ttdeci">float * ParamValues</div><div class="ttdoc">Store parameter values they are not in FastSplineInfo as in case of GPU we need to copy paste it to G...</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00076">SplineBase.h:76</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_a565b03441c146e0a351f9aee09ea0836"><div class="ttname"><a href="classBinnedSplineHandler.html#a565b03441c146e0a351f9aee09ea0836">BinnedSplineHandler::xcoeff_arr</a></div><div class="ttdeci">M3::float_t * xcoeff_arr</div><div class="ttdoc">x coefficients for each spline</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00127">BinnedSplineHandler.h:127</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_afbff241a0ea99c0872ee56a71c0633d1"><div class="ttname"><a href="classBinnedSplineHandler.html#afbff241a0ea99c0872ee56a71c0633d1">BinnedSplineHandler::manycoeff_arr</a></div><div class="ttdeci">M3::float_t * manycoeff_arr</div><div class="ttdoc">ybcd coefficients for each spline</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00129">BinnedSplineHandler.h:129</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_a938e3a60326137037f868b9930e2a972"><div class="ttname"><a href="classSplineBase.html#a938e3a60326137037f868b9930e2a972">SplineBase::SplineSegments</a></div><div class="ttdeci">short int * SplineSegments</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00077">SplineBase.h:77</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_aa0b1d3a1adf7cffa7e74581bc7d58d4c"><div class="ttname"><a href="classSplineBase.html#aa0b1d3a1adf7cffa7e74581bc7d58d4c">SplineBase::ParamValues</a></div><div class="ttdeci">float * ParamValues</div><div class="ttdoc">Store parameter values they are not in FastSplineInfo as in case of GPU we need to copy paste it to G...</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00079">SplineBase.h:79</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -569,23 +572,23 @@ Henry Wallace </dd></dl>
 <div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00035">MaCh3Logger.h:35</a></div></div>
 <div class="ttc" id="aParameterStructs_8h_html_affc27d8b7b82d3713f45af17873fde2fa29d6ccf6cf507f6e66c72b1d3c2aed00"><div class="ttname"><a href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa29d6ccf6cf507f6e66c72b1d3c2aed00">kSpline</a></div><div class="ttdeci">@ kSpline</div><div class="ttdoc">For splined parameters (1D)</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00281">ParameterStructs.h:281</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_a26abd2a3fead4879ac1eb9c170658ba0"><div class="ttname"><a href="classBinnedSplineHandler.html#a26abd2a3fead4879ac1eb9c170658ba0">BinnedSplineHandler::SplineFileParPrefixNames</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; std::string &gt; &gt; SplineFileParPrefixNames</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00092">BinnedSplineHandler.h:92</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_a4dbb81c0f4c8641580a9f9dd4231c8b1"><div class="ttname"><a href="classBinnedSplineHandler.html#a4dbb81c0f4c8641580a9f9dd4231c8b1">BinnedSplineHandler::nSplineParams</a></div><div class="ttdeci">std::vector&lt; int &gt; nSplineParams</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00088">BinnedSplineHandler.h:88</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_a4fc9418367526011494eea1266da4b51"><div class="ttname"><a href="classBinnedSplineHandler.html#a4fc9418367526011494eea1266da4b51">BinnedSplineHandler::SplineModeVecs</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; std::vector&lt; int &gt; &gt; &gt; SplineModeVecs</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00096">BinnedSplineHandler.h:96</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_a54efbb1b4af41a83ef2c12599b0e4a92"><div class="ttname"><a href="classBinnedSplineHandler.html#a54efbb1b4af41a83ef2c12599b0e4a92">BinnedSplineHandler::nOscChans</a></div><div class="ttdeci">std::vector&lt; int &gt; nOscChans</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00089">BinnedSplineHandler.h:89</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_a60e27e7861b7f06b2d42aedb54b77d03"><div class="ttname"><a href="classBinnedSplineHandler.html#a60e27e7861b7f06b2d42aedb54b77d03">BinnedSplineHandler::SampleTitles</a></div><div class="ttdeci">std::vector&lt; std::string &gt; SampleTitles</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00085">BinnedSplineHandler.h:85</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_a26abd2a3fead4879ac1eb9c170658ba0"><div class="ttname"><a href="classBinnedSplineHandler.html#a26abd2a3fead4879ac1eb9c170658ba0">BinnedSplineHandler::SplineFileParPrefixNames</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; std::string &gt; &gt; SplineFileParPrefixNames</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00093">BinnedSplineHandler.h:93</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_a4dbb81c0f4c8641580a9f9dd4231c8b1"><div class="ttname"><a href="classBinnedSplineHandler.html#a4dbb81c0f4c8641580a9f9dd4231c8b1">BinnedSplineHandler::nSplineParams</a></div><div class="ttdeci">std::vector&lt; int &gt; nSplineParams</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00089">BinnedSplineHandler.h:89</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_a4fc9418367526011494eea1266da4b51"><div class="ttname"><a href="classBinnedSplineHandler.html#a4fc9418367526011494eea1266da4b51">BinnedSplineHandler::SplineModeVecs</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; std::vector&lt; int &gt; &gt; &gt; SplineModeVecs</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00097">BinnedSplineHandler.h:97</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_a54efbb1b4af41a83ef2c12599b0e4a92"><div class="ttname"><a href="classBinnedSplineHandler.html#a54efbb1b4af41a83ef2c12599b0e4a92">BinnedSplineHandler::nOscChans</a></div><div class="ttdeci">std::vector&lt; int &gt; nOscChans</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00090">BinnedSplineHandler.h:90</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_a60e27e7861b7f06b2d42aedb54b77d03"><div class="ttname"><a href="classBinnedSplineHandler.html#a60e27e7861b7f06b2d42aedb54b77d03">BinnedSplineHandler::SampleTitles</a></div><div class="ttdeci">std::vector&lt; std::string &gt; SampleTitles</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00086">BinnedSplineHandler.h:86</a></div></div>
 <div class="ttc" id="aclassBinnedSplineHandler_html_a61753ed3e44cda6fabb031fd8ef19e79"><div class="ttname"><a href="classBinnedSplineHandler.html#a61753ed3e44cda6fabb031fd8ef19e79">BinnedSplineHandler::PrintSampleDetails</a></div><div class="ttdeci">void PrintSampleDetails(const std::string &amp;SampleTitle) const</div><div class="ttdoc">Print info like Sample ID of spline params etc.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8cpp_source.html#l00747">BinnedSplineHandler.cpp:747</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_a75583f3110d18b04557262520281503e"><div class="ttname"><a href="classBinnedSplineHandler.html#a75583f3110d18b04557262520281503e">BinnedSplineHandler::SplineInterpolationTypes</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; SplineInterpolation &gt; &gt; SplineInterpolationTypes</div><div class="ttdoc">spline interpolation types for each sample. These vectors are from a call to GetSplineInterpolationFr...</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00103">BinnedSplineHandler.h:103</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_a8824387f90bd051b370bebd843691b83"><div class="ttname"><a href="classBinnedSplineHandler.html#a8824387f90bd051b370bebd843691b83">BinnedSplineHandler::Dimensions</a></div><div class="ttdeci">std::vector&lt; int &gt; Dimensions</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00086">BinnedSplineHandler.h:86</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_a75583f3110d18b04557262520281503e"><div class="ttname"><a href="classBinnedSplineHandler.html#a75583f3110d18b04557262520281503e">BinnedSplineHandler::SplineInterpolationTypes</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; SplineInterpolation &gt; &gt; SplineInterpolationTypes</div><div class="ttdoc">spline interpolation types for each sample. These vectors are from a call to GetSplineInterpolationFr...</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00104">BinnedSplineHandler.h:104</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_a8824387f90bd051b370bebd843691b83"><div class="ttname"><a href="classBinnedSplineHandler.html#a8824387f90bd051b370bebd843691b83">BinnedSplineHandler::Dimensions</a></div><div class="ttdeci">std::vector&lt; int &gt; Dimensions</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00087">BinnedSplineHandler.h:87</a></div></div>
 <div class="ttc" id="aclassBinnedSplineHandler_html_a9112bad5ade2818e33a969429db514cd"><div class="ttname"><a href="classBinnedSplineHandler.html#a9112bad5ade2818e33a969429db514cd">BinnedSplineHandler::BuildSampleIndexingArray</a></div><div class="ttdeci">void BuildSampleIndexingArray(const std::string &amp;SampleTitle)</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8cpp_source.html#l00350">BinnedSplineHandler.cpp:350</a></div></div>
 <div class="ttc" id="aclassBinnedSplineHandler_html_a960a64e0a855d797d74d052764f5ea3a"><div class="ttname"><a href="classBinnedSplineHandler.html#a960a64e0a855d797d74d052764f5ea3a">BinnedSplineHandler::StripDuplicatedModes</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; int &gt; &gt; StripDuplicatedModes(const std::vector&lt; std::vector&lt; int &gt; &gt; &amp;InputVector)</div><div class="ttdoc">Check if there are any repeated modes. This is used to reduce the number of modes in case many intera...</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8cpp_source.html#l00892">BinnedSplineHandler.cpp:892</a></div></div>
 <div class="ttc" id="aclassBinnedSplineHandler_html_a9a4621f7bc5aa24a97fca813018b86b4"><div class="ttname"><a href="classBinnedSplineHandler.html#a9a4621f7bc5aa24a97fca813018b86b4">BinnedSplineHandler::FillSampleArray</a></div><div class="ttdeci">virtual void FillSampleArray(std::string SampleTitle, std::vector&lt; std::string &gt; OscChanFileNames)</div><div class="ttdoc">Loads and processes splines from ROOT files for a given sample.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8cpp_source.html#l00926">BinnedSplineHandler.cpp:926</a></div></div>
 <div class="ttc" id="aclassBinnedSplineHandler_html_aa3cfd3c0730281791227f25f04c944ee"><div class="ttname"><a href="classBinnedSplineHandler.html#aa3cfd3c0730281791227f25f04c944ee">BinnedSplineHandler::FindSplineBinning</a></div><div class="ttdeci">std::vector&lt; TAxis * &gt; FindSplineBinning(const std::string &amp;FileName, const std::string &amp;SampleTitle)</div><div class="ttdoc">Grab histograms with spline binning.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8cpp_source.html#l00382">BinnedSplineHandler.cpp:382</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_aa3db668a55f3d3356f63cb055819b2b0"><div class="ttname"><a href="classBinnedSplineHandler.html#aa3db668a55f3d3356f63cb055819b2b0">BinnedSplineHandler::DimensionLabels</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; std::string &gt; &gt; DimensionLabels</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00087">BinnedSplineHandler.h:87</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_ab54b0bf1e1f45af6362300ead59a1b8b"><div class="ttname"><a href="classBinnedSplineHandler.html#ab54b0bf1e1f45af6362300ead59a1b8b">BinnedSplineHandler::SplineBinning</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; std::vector&lt; TAxis * &gt; &gt; &gt; SplineBinning</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00091">BinnedSplineHandler.h:91</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_aa3db668a55f3d3356f63cb055819b2b0"><div class="ttname"><a href="classBinnedSplineHandler.html#aa3db668a55f3d3356f63cb055819b2b0">BinnedSplineHandler::DimensionLabels</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; std::string &gt; &gt; DimensionLabels</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00088">BinnedSplineHandler.h:88</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_ab54b0bf1e1f45af6362300ead59a1b8b"><div class="ttname"><a href="classBinnedSplineHandler.html#ab54b0bf1e1f45af6362300ead59a1b8b">BinnedSplineHandler::SplineBinning</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; std::vector&lt; TAxis * &gt; &gt; &gt; SplineBinning</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00092">BinnedSplineHandler.h:92</a></div></div>
 <div class="ttc" id="aclassBinnedSplineHandler_html_ad580bcacf16ba7a69a3ed157ae598a5c"><div class="ttname"><a href="classBinnedSplineHandler.html#ad580bcacf16ba7a69a3ed157ae598a5c">BinnedSplineHandler::PrintArrayDetails</a></div><div class="ttdeci">void PrintArrayDetails(const std::string &amp;SampleTitle) const</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8cpp_source.html#l00759">BinnedSplineHandler.cpp:759</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_ad7470dbc245ccb614f6f92159522b1cf"><div class="ttname"><a href="classBinnedSplineHandler.html#ad7470dbc245ccb614f6f92159522b1cf">BinnedSplineHandler::GlobalSystIndex</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; int &gt; &gt; GlobalSystIndex</div><div class="ttdoc">This holds the global spline index and is used to grab the current parameter value to evaluate spline...</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00100">BinnedSplineHandler.h:100</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_ae66666026b08ba7f67c21c41b9c46f02"><div class="ttname"><a href="classBinnedSplineHandler.html#ae66666026b08ba7f67c21c41b9c46f02">BinnedSplineHandler::SampleNames</a></div><div class="ttdeci">std::vector&lt; std::string &gt; SampleNames</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00084">BinnedSplineHandler.h:84</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_ad7470dbc245ccb614f6f92159522b1cf"><div class="ttname"><a href="classBinnedSplineHandler.html#ad7470dbc245ccb614f6f92159522b1cf">BinnedSplineHandler::GlobalSystIndex</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; int &gt; &gt; GlobalSystIndex</div><div class="ttdoc">This holds the global spline index and is used to grab the current parameter value to evaluate spline...</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00101">BinnedSplineHandler.h:101</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_ae66666026b08ba7f67c21c41b9c46f02"><div class="ttname"><a href="classBinnedSplineHandler.html#ae66666026b08ba7f67c21c41b9c46f02">BinnedSplineHandler::SampleNames</a></div><div class="ttdeci">std::vector&lt; std::string &gt; SampleNames</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00085">BinnedSplineHandler.h:85</a></div></div>
 <div class="ttc" id="aclassParameterHandlerGeneric_html_a58ccccc2b9a4280021e4663202612038"><div class="ttname"><a href="classParameterHandlerGeneric.html#a58ccccc2b9a4280021e4663202612038">ParameterHandlerGeneric::GetGlobalSystIndexFromSampleName</a></div><div class="ttdeci">const std::vector&lt; int &gt; GetGlobalSystIndexFromSampleName(const std::string &amp;SampleName, const SystType Type)</div><div class="ttdoc">DB Get spline parameters depending on given SampleName.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8cpp_source.html#l00233">ParameterHandlerGeneric.cpp:233</a></div></div>
 <div class="ttc" id="aclassParameterHandlerGeneric_html_a9b25b6f2f2d032d086963293eeb981c4"><div class="ttname"><a href="classParameterHandlerGeneric.html#a9b25b6f2f2d032d086963293eeb981c4">ParameterHandlerGeneric::GetNumParamsFromSampleName</a></div><div class="ttdeci">int GetNumParamsFromSampleName(const std::string &amp;SampleName, const SystType Type)</div><div class="ttdoc">DB Grab the number of parameters for the relevant SampleName.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8cpp_source.html#l00377">ParameterHandlerGeneric.cpp:377</a></div></div>
 <div class="ttc" id="aclassParameterHandlerGeneric_html_adc9644bbd41005c36945bc9504ef91fd"><div class="ttname"><a href="classParameterHandlerGeneric.html#adc9644bbd41005c36945bc9504ef91fd">ParameterHandlerGeneric::GetSplineParsNamesFromSampleName</a></div><div class="ttdeci">const std::vector&lt; std::string &gt; GetSplineParsNamesFromSampleName(const std::string &amp;SampleName)</div><div class="ttdoc">DB Get spline parameters depending on given SampleName.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8cpp_source.html#l00115">ParameterHandlerGeneric.cpp:115</a></div></div>
@@ -639,7 +642,7 @@ Henry Wallace </dd></dl>
 <div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;    } <span class="comment">// end of iSyst loop</span></div>
 <div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;  } <span class="comment">// end of iOscChan loop</span></div>
 <div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;}</div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_a1e0e6f58e9d7b67a4c4a20987f927ff8"><div class="ttname"><a href="classBinnedSplineHandler.html#a1e0e6f58e9d7b67a4c4a20987f927ff8">BinnedSplineHandler::indexvec</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; std::vector&lt; std::vector&lt; std::vector&lt; std::vector&lt; std::vector&lt; int &gt; &gt; &gt; &gt; &gt; &gt; &gt; indexvec</div><div class="ttdoc">Variables related to determined which modes have splines and which piggy-back of other modes.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00111">BinnedSplineHandler.h:111</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_a1e0e6f58e9d7b67a4c4a20987f927ff8"><div class="ttname"><a href="classBinnedSplineHandler.html#a1e0e6f58e9d7b67a4c4a20987f927ff8">BinnedSplineHandler::indexvec</a></div><div class="ttdeci">std::vector&lt; std::vector&lt; std::vector&lt; std::vector&lt; std::vector&lt; std::vector&lt; std::vector&lt; int &gt; &gt; &gt; &gt; &gt; &gt; &gt; indexvec</div><div class="ttdoc">Variables related to determined which modes have splines and which piggy-back of other modes.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00112">BinnedSplineHandler.h:112</a></div></div>
 <div class="ttc" id="aclassBinnedSplineHandler_html_af4be12b4e410259ec60d311cdfeb1a99"><div class="ttname"><a href="classBinnedSplineHandler.html#af4be12b4e410259ec60d311cdfeb1a99">BinnedSplineHandler::GetSampleIndex</a></div><div class="ttdeci">int GetSampleIndex(const std::string &amp;SampleTitle) const</div><div class="ttdoc">Get index of sample based on name.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8cpp_source.html#l00735">BinnedSplineHandler.cpp:735</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -712,11 +715,11 @@ Henry Wallace </dd></dl>
 <div class="ttc" id="aSplineCommon_8h_html_aac6312c7a4c683e6d016d9fccdc7d7c0a82b4ea363cc5a4b0429efcc46582769d"><div class="ttname"><a href="SplineCommon_8h.html#aac6312c7a4c683e6d016d9fccdc7d7c0a82b4ea363cc5a4b0429efcc46582769d">kCoeffD</a></div><div class="ttdeci">@ kCoeffD</div><div class="ttdoc">Coefficient D.</div><div class="ttdef"><b>Definition:</b> <a href="SplineCommon_8h_source.html#l00024">SplineCommon.h:23</a></div></div>
 <div class="ttc" id="aSplineCommon_8h_html_aac6312c7a4c683e6d016d9fccdc7d7c0a9e87d802f64d8929291c58eeb0eb16e6"><div class="ttname"><a href="SplineCommon_8h.html#aac6312c7a4c683e6d016d9fccdc7d7c0a9e87d802f64d8929291c58eeb0eb16e6">kCoeffY</a></div><div class="ttdeci">@ kCoeffY</div><div class="ttdoc">Coefficient Y.</div><div class="ttdef"><b>Definition:</b> <a href="SplineCommon_8h_source.html#l00020">SplineCommon.h:20</a></div></div>
 <div class="ttc" id="aSplineCommon_8h_html_aac6312c7a4c683e6d016d9fccdc7d7c0af73b429597449e82d2920f69d03cef36"><div class="ttname"><a href="SplineCommon_8h.html#aac6312c7a4c683e6d016d9fccdc7d7c0af73b429597449e82d2920f69d03cef36">kCoeffC</a></div><div class="ttdeci">@ kCoeffC</div><div class="ttdoc">Coefficient C.</div><div class="ttdef"><b>Definition:</b> <a href="SplineCommon_8h_source.html#l00022">SplineCommon.h:22</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_a2bf7d919dd21b6fa26356e6ac7ce61f6"><div class="ttname"><a href="classBinnedSplineHandler.html#a2bf7d919dd21b6fa26356e6ac7ce61f6">BinnedSplineHandler::coeffindexvec</a></div><div class="ttdeci">std::vector&lt; int &gt; coeffindexvec</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00112">BinnedSplineHandler.h:112</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_a8e746122fde570e5ec454a708d61b6c8"><div class="ttname"><a href="classBinnedSplineHandler.html#a8e746122fde570e5ec454a708d61b6c8">BinnedSplineHandler::uniquesplinevec_Monolith</a></div><div class="ttdeci">std::vector&lt; int &gt; uniquesplinevec_Monolith</div><div class="ttdoc">Maps single spline object with single parameter.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00133">BinnedSplineHandler.h:133</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_a9e433fb12f9c6759bbf1b0eb61f1f34a"><div class="ttname"><a href="classBinnedSplineHandler.html#a9e433fb12f9c6759bbf1b0eb61f1f34a">BinnedSplineHandler::weightvec_Monolith</a></div><div class="ttdeci">std::vector&lt; M3::float_t &gt; weightvec_Monolith</div><div class="ttdoc">Stores weight from spline evaluation for each single spline.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00131">BinnedSplineHandler.h:131</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_ac032bf729105a8848e3058a430d54250"><div class="ttname"><a href="classBinnedSplineHandler.html#ac032bf729105a8848e3058a430d54250">BinnedSplineHandler::uniquecoeffindices</a></div><div class="ttdeci">std::vector&lt; int &gt; uniquecoeffindices</div><div class="ttdoc">Unique coefficient indices.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00114">BinnedSplineHandler.h:114</a></div></div>
-<div class="ttc" id="aclassSplineBase_html_a9452897aecfe016466543dfe19c0628b"><div class="ttname"><a href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineBase::SplineInfoArray</a></div><div class="ttdeci">std::vector&lt; FastSplineInfo &gt; SplineInfoArray</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00071">SplineBase.h:71</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_a2bf7d919dd21b6fa26356e6ac7ce61f6"><div class="ttname"><a href="classBinnedSplineHandler.html#a2bf7d919dd21b6fa26356e6ac7ce61f6">BinnedSplineHandler::coeffindexvec</a></div><div class="ttdeci">std::vector&lt; int &gt; coeffindexvec</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00113">BinnedSplineHandler.h:113</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_a8e746122fde570e5ec454a708d61b6c8"><div class="ttname"><a href="classBinnedSplineHandler.html#a8e746122fde570e5ec454a708d61b6c8">BinnedSplineHandler::uniquesplinevec_Monolith</a></div><div class="ttdeci">std::vector&lt; int &gt; uniquesplinevec_Monolith</div><div class="ttdoc">Maps single spline object with single parameter.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00134">BinnedSplineHandler.h:134</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_a9e433fb12f9c6759bbf1b0eb61f1f34a"><div class="ttname"><a href="classBinnedSplineHandler.html#a9e433fb12f9c6759bbf1b0eb61f1f34a">BinnedSplineHandler::weightvec_Monolith</a></div><div class="ttdeci">std::vector&lt; M3::float_t &gt; weightvec_Monolith</div><div class="ttdoc">Stores weight from spline evaluation for each single spline.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00132">BinnedSplineHandler.h:132</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_ac032bf729105a8848e3058a430d54250"><div class="ttname"><a href="classBinnedSplineHandler.html#ac032bf729105a8848e3058a430d54250">BinnedSplineHandler::uniquecoeffindices</a></div><div class="ttdeci">std::vector&lt; int &gt; uniquecoeffindices</div><div class="ttdoc">Unique coefficient indices.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00115">BinnedSplineHandler.h:115</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_a9452897aecfe016466543dfe19c0628b"><div class="ttname"><a href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineBase::SplineInfoArray</a></div><div class="ttdeci">std::vector&lt; FastSplineInfo &gt; SplineInfoArray</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00074">SplineBase.h:74</a></div></div>
 <div class="ttc" id="anamespaceM3_html_a1f95274549f25fc19fe7db343c8a7a68"><div class="ttname"><a href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a></div><div class="ttdeci">double float_t</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00037">Core.h:37</a></div></div>
 <div class="ttc" id="anamespaceM3_html_ad501f876b26ca2cef7bb5f434deaffb8"><div class="ttname"><a href="namespaceM3.html#ad501f876b26ca2cef7bb5f434deaffb8">M3::fmaf_t</a></div><div class="ttdeci">constexpr T fmaf_t(T x, T y, T z)</div><div class="ttdoc">Function template for fused multiply-add.</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00045">Core.h:45</a></div></div>
 </div><!-- fragment -->
@@ -764,9 +767,9 @@ Henry Wallace </dd></dl>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;}</div>
 <div class="ttc" id="aParameterStructs_8h_html_a569a3f763b3cca77ecc85e5a685b182c"><div class="ttname"><a href="ParameterStructs_8h.html#a569a3f763b3cca77ecc85e5a685b182c">CleanContainer</a></div><div class="ttdeci">void CleanContainer(T &amp;)</div><div class="ttdoc">Base case: do nothing for non-pointer types.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00064">ParameterStructs.h:64</a></div></div>
 <div class="ttc" id="aParameterStructs_8h_html_ad0ad271345b43361a90efe977486167b"><div class="ttname"><a href="ParameterStructs_8h.html#ad0ad271345b43361a90efe977486167b">CleanVector</a></div><div class="ttdeci">void CleanVector(T &amp;)</div><div class="ttdoc">Base case: do nothing for non-vector types.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00042">ParameterStructs.h:42</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_a6387e407a74af8f40202c573024c48ef"><div class="ttname"><a href="classBinnedSplineHandler.html#a6387e407a74af8f40202c573024c48ef">BinnedSplineHandler::UniqueSystNames</a></div><div class="ttdeci">std::vector&lt; std::string &gt; UniqueSystNames</div><div class="ttdoc">name of each spline parameter</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00106">BinnedSplineHandler.h:106</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_ac029b5a9c5b3b11874f5f1ada5acc31f"><div class="ttname"><a href="classBinnedSplineHandler.html#ac029b5a9c5b3b11874f5f1ada5acc31f">BinnedSplineHandler::splinevec_Monolith</a></div><div class="ttdeci">std::vector&lt; TSpline3_red * &gt; splinevec_Monolith</div><div class="ttdoc">holds each spline object before stripping into coefficient monolith</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00117">BinnedSplineHandler.h:117</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_aedb1c578eddc904c39b08aca36e5f75d"><div class="ttname"><a href="classBinnedSplineHandler.html#aedb1c578eddc904c39b08aca36e5f75d">BinnedSplineHandler::UniqueSystIndices</a></div><div class="ttdeci">std::vector&lt; int &gt; UniqueSystIndices</div><div class="ttdoc">Global index of each spline param, it allows us to match spline ordering with global.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00108">BinnedSplineHandler.h:108</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_a6387e407a74af8f40202c573024c48ef"><div class="ttname"><a href="classBinnedSplineHandler.html#a6387e407a74af8f40202c573024c48ef">BinnedSplineHandler::UniqueSystNames</a></div><div class="ttdeci">std::vector&lt; std::string &gt; UniqueSystNames</div><div class="ttdoc">name of each spline parameter</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00107">BinnedSplineHandler.h:107</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_ac029b5a9c5b3b11874f5f1ada5acc31f"><div class="ttname"><a href="classBinnedSplineHandler.html#ac029b5a9c5b3b11874f5f1ada5acc31f">BinnedSplineHandler::splinevec_Monolith</a></div><div class="ttdeci">std::vector&lt; TSpline3_red * &gt; splinevec_Monolith</div><div class="ttdoc">holds each spline object before stripping into coefficient monolith</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00118">BinnedSplineHandler.h:118</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_aedb1c578eddc904c39b08aca36e5f75d"><div class="ttname"><a href="classBinnedSplineHandler.html#aedb1c578eddc904c39b08aca36e5f75d">BinnedSplineHandler::UniqueSystIndices</a></div><div class="ttdeci">std::vector&lt; int &gt; UniqueSystIndices</div><div class="ttdoc">Global index of each spline param, it allows us to match spline ordering with global.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00109">BinnedSplineHandler.h:109</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -899,7 +902,7 @@ Henry Wallace </dd></dl>
 <div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;  <a class="code" href="classBinnedSplineHandler.html#a4df71482a066069b712a72f7108ffbcf">ModifyWeights</a>();</div>
 <div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;}</div>
 <div class="ttc" id="aclassBinnedSplineHandler_html_a279a6350c12647741b5e903b8269a56c"><div class="ttname"><a href="classBinnedSplineHandler.html#a279a6350c12647741b5e903b8269a56c">BinnedSplineHandler::CalcSplineWeights</a></div><div class="ttdeci">void CalcSplineWeights() override</div><div class="ttdoc">CPU based code which eval weight for each spline.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8cpp_source.html#l00309">BinnedSplineHandler.cpp:309</a></div></div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_a4df71482a066069b712a72f7108ffbcf"><div class="ttname"><a href="classBinnedSplineHandler.html#a4df71482a066069b712a72f7108ffbcf">BinnedSplineHandler::ModifyWeights</a></div><div class="ttdeci">void ModifyWeights() override</div><div class="ttdoc">Calc total event weight, not used by Bin-by-bin splines.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00079">BinnedSplineHandler.h:79</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_a4df71482a066069b712a72f7108ffbcf"><div class="ttname"><a href="classBinnedSplineHandler.html#a4df71482a066069b712a72f7108ffbcf">BinnedSplineHandler::ModifyWeights</a></div><div class="ttdeci">void ModifyWeights() override</div><div class="ttdoc">Calc total event weight, not used by Bin-by-bin splines.</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00080">BinnedSplineHandler.h:80</a></div></div>
 <div class="ttc" id="aclassSplineBase_html_a589011b547ff70262ed43021a016ef30"><div class="ttname"><a href="classSplineBase.html#a589011b547ff70262ed43021a016ef30">SplineBase::FindSplineSegment</a></div><div class="ttdeci">void FindSplineSegment()</div><div class="ttdoc">CW:Code used in step by step reweighting, Find Spline Segment for each param.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8cpp_source.html#l00024">SplineBase.cpp:24</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -1845,7 +1848,7 @@ Henry Wallace </dd></dl>
 <div class="line"><a name="l01198"></a><span class="lineno"> 1198</span>&#160;  <a class="code" href="classBinnedSplineHandler.html#a8e746122fde570e5ec454a708d61b6c8">uniquesplinevec_Monolith</a> = *uniquesplinevec_Monolith_temp;</div>
 <div class="line"><a name="l01199"></a><span class="lineno"> 1199</span>&#160;  <a class="code" href="classBinnedSplineHandler.html#aedb1c578eddc904c39b08aca36e5f75d">UniqueSystIndices</a> = *UniqueSystIndices_temp;</div>
 <div class="line"><a name="l01200"></a><span class="lineno"> 1200</span>&#160;}</div>
-<div class="ttc" id="aclassBinnedSplineHandler_html_acb076b2a7c8cdb53d70dfb33ddd344b7"><div class="ttname"><a href="classBinnedSplineHandler.html#acb076b2a7c8cdb53d70dfb33ddd344b7">BinnedSplineHandler::MonolithSize</a></div><div class="ttdeci">int MonolithSize</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00119">BinnedSplineHandler.h:119</a></div></div>
+<div class="ttc" id="aclassBinnedSplineHandler_html_acb076b2a7c8cdb53d70dfb33ddd344b7"><div class="ttname"><a href="classBinnedSplineHandler.html#acb076b2a7c8cdb53d70dfb33ddd344b7">BinnedSplineHandler::MonolithSize</a></div><div class="ttdeci">int MonolithSize</div><div class="ttdef"><b>Definition:</b> <a href="BinnedSplineHandler_8h_source.html#l00120">BinnedSplineHandler.h:120</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1953,7 +1956,7 @@ Henry Wallace </dd></dl>
 <div class="line"><a name="l01164"></a><span class="lineno"> 1164</span>&#160;  Resize3D(<a class="code" href="classBinnedSplineHandler.html#ab54b0bf1e1f45af6362300ead59a1b8b">SplineBinning</a>, SplineBinning_size1, SplineBinning_size2, SplineBinning_size3);</div>
 <div class="line"><a name="l01165"></a><span class="lineno"> 1165</span>&#160;  Resize3D(<a class="code" href="classBinnedSplineHandler.html#a4fc9418367526011494eea1266da4b51">SplineModeVecs</a>, SplineModeVecs_size1, SplineModeVecs_size2, SplineModeVecs_size3);</div>
 <div class="line"><a name="l01166"></a><span class="lineno"> 1166</span>&#160;}</div>
-<div class="ttc" id="aclassSplineBase_html_a2165b057a0125a28d96f247ca8680b42"><div class="ttname"><a href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">SplineBase::nParams</a></div><div class="ttdeci">short int nParams</div><div class="ttdoc">Number of parameters that have splines.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00078">SplineBase.h:78</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_a2165b057a0125a28d96f247ca8680b42"><div class="ttname"><a href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">SplineBase::nParams</a></div><div class="ttdeci">short int nParams</div><div class="ttdoc">Number of parameters that have splines.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00081">SplineBase.h:81</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2068,8 +2071,8 @@ Henry Wallace </dd></dl>
 
 <p>Implements <a class="el" href="classSplineBase.html#a49665d2712b61b038085d25ace96a568">SplineBase</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00079">79</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;{<span class="keywordflow">return</span>;};</div>
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00080">80</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;{<span class="keywordflow">return</span>;};</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2776,11 +2779,11 @@ Henry Wallace </dd></dl>
 
 <p>get pointer to spline weight based on bin variables </p>
 
-<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00064">64</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;                                                                                                {</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;      <span class="keywordtype">int</span> index = <a class="code" href="classBinnedSplineHandler.html#a1e0e6f58e9d7b67a4c4a20987f927ff8">indexvec</a>[sample][oscchan][syst][mode][var1bin][var2bin][var3bin];</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;      <span class="keywordflow">return</span> &amp;<a class="code" href="classBinnedSplineHandler.html#a9e433fb12f9c6759bbf1b0eb61f1f34a">weightvec_Monolith</a>[index];</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    }</div>
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00065">65</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;                                                                                                {</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;      <span class="keywordtype">int</span> index = <a class="code" href="classBinnedSplineHandler.html#a1e0e6f58e9d7b67a4c4a20987f927ff8">indexvec</a>[sample][oscchan][syst][mode][var1bin][var2bin][var3bin];</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;      <span class="keywordflow">return</span> &amp;<a class="code" href="classBinnedSplineHandler.html#a9e433fb12f9c6759bbf1b0eb61f1f34a">weightvec_Monolith</a>[index];</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2836,6 +2839,38 @@ Henry Wallace </dd></dl>
 <div class="line"><a name="l00922"></a><span class="lineno">  922</span>&#160;  }</div>
 <div class="line"><a name="l00923"></a><span class="lineno">  923</span>&#160;  <span class="keywordflow">return</span> ReturnVec;</div>
 <div class="line"><a name="l00924"></a><span class="lineno">  924</span>&#160;}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a1bc4924eb71d0ccba6ae362656747d9e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1bc4924eb71d0ccba6ae362656747d9e">&#9670;&nbsp;</a></span>SynchroniseMemTransfer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void BinnedSplineHandler::SynchroniseMemTransfer </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied. </p>
+
+<p>Implements <a class="el" href="classSplineBase.html#aec23c4a87dbbd3b2c0329c93ebbd72c0">SplineBase</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00044">44</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;{<span class="keywordflow">return</span>;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2978,7 +3013,7 @@ Henry Wallace </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00121">121</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00122">122</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
 
 </div>
 </div>
@@ -3002,7 +3037,7 @@ Henry Wallace </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00112">112</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00113">113</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
 
 </div>
 </div>
@@ -3026,7 +3061,7 @@ Henry Wallace </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00087">87</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00088">88</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
 
 </div>
 </div>
@@ -3050,7 +3085,7 @@ Henry Wallace </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00086">86</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00087">87</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
 
 </div>
 </div>
@@ -3076,7 +3111,7 @@ Henry Wallace </dd></dl>
 
 <p>This holds the global spline index and is used to grab the current parameter value to evaluate splines at. Each internal vector will be of size of the number of spline systematics which affect that sample. </p>
 
-<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00100">100</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00101">101</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
 
 </div>
 </div>
@@ -3102,7 +3137,7 @@ Henry Wallace </dd></dl>
 
 <p>Variables related to determined which modes have splines and which piggy-back of other modes. </p>
 
-<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00111">111</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00112">112</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
 
 </div>
 </div>
@@ -3128,7 +3163,7 @@ Henry Wallace </dd></dl>
 
 <p>Need to keep track of which splines are flat and which aren't. </p>
 
-<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00124">124</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00125">125</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
 
 </div>
 </div>
@@ -3154,7 +3189,7 @@ Henry Wallace </dd></dl>
 
 <p>ybcd coefficients for each spline </p>
 
-<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00128">128</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00129">129</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
 
 </div>
 </div>
@@ -3180,7 +3215,7 @@ Henry Wallace </dd></dl>
 
 <p>pointer to MaCh3 Mode from which we get spline suffix </p>
 
-<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00136">136</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00137">137</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
 
 </div>
 </div>
@@ -3204,7 +3239,7 @@ Henry Wallace </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00120">120</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00121">121</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
 
 </div>
 </div>
@@ -3228,7 +3263,7 @@ Henry Wallace </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00119">119</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00120">120</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
 
 </div>
 </div>
@@ -3252,7 +3287,7 @@ Henry Wallace </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00089">89</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00090">90</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
 
 </div>
 </div>
@@ -3276,7 +3311,7 @@ Henry Wallace </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00088">88</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00089">89</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
 
 </div>
 </div>
@@ -3300,7 +3335,7 @@ Henry Wallace </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00084">84</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00085">85</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
 
 </div>
 </div>
@@ -3324,7 +3359,7 @@ Henry Wallace </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00085">85</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00086">86</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
 
 </div>
 </div>
@@ -3348,7 +3383,7 @@ Henry Wallace </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00091">91</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00092">92</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
 
 </div>
 </div>
@@ -3372,7 +3407,7 @@ Henry Wallace </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00092">92</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00093">93</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
 
 </div>
 </div>
@@ -3398,7 +3433,7 @@ Henry Wallace </dd></dl>
 
 <p>spline interpolation types for each sample. These vectors are from a call to GetSplineInterpolationFromSampleID() </p>
 
-<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00103">103</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00104">104</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
 
 </div>
 </div>
@@ -3423,7 +3458,7 @@ Henry Wallace </dd></dl>
 </div><div class="memdoc">
 <p>A vector of vectors of the spline modes that a systematic applies to This gets compared against the event mode to figure out if a syst should apply to an event or not </p>
 
-<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00096">96</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00097">97</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
 
 </div>
 </div>
@@ -3449,7 +3484,7 @@ Henry Wallace </dd></dl>
 
 <p>holds each spline object before stripping into coefficient monolith </p>
 
-<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00117">117</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00118">118</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
 
 </div>
 </div>
@@ -3475,7 +3510,7 @@ Henry Wallace </dd></dl>
 
 <p>Unique coefficient indices. </p>
 
-<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00114">114</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00115">115</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
 
 </div>
 </div>
@@ -3501,7 +3536,7 @@ Henry Wallace </dd></dl>
 
 <p>Maps single spline object with single parameter. </p>
 
-<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00133">133</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00134">134</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
 
 </div>
 </div>
@@ -3527,7 +3562,7 @@ Henry Wallace </dd></dl>
 
 <p>Global index of each spline param, it allows us to match spline ordering with global. </p>
 
-<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00108">108</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00109">109</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
 
 </div>
 </div>
@@ -3553,7 +3588,7 @@ Henry Wallace </dd></dl>
 
 <p>name of each spline parameter </p>
 
-<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00106">106</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00107">107</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
 
 </div>
 </div>
@@ -3579,7 +3614,7 @@ Henry Wallace </dd></dl>
 
 <p>Stores weight from spline evaluation for each single spline. </p>
 
-<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00131">131</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00132">132</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
 
 </div>
 </div>
@@ -3605,7 +3640,7 @@ Henry Wallace </dd></dl>
 
 <p>x coefficients for each spline </p>
 
-<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00126">126</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00127">127</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
 
 </div>
 </div>
@@ -3631,7 +3666,7 @@ Henry Wallace </dd></dl>
 
 <p>Pointer to covariance from which we get information about spline params. </p>
 
-<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00081">81</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="BinnedSplineHandler_8h_source.html#l00082">82</a> of file <a class="el" href="BinnedSplineHandler_8h_source.html">BinnedSplineHandler.h</a>.</p>
 
 </div>
 </div>

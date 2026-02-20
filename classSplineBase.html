@@ -122,6 +122,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad107ad4a91c5de35f14f3805bc52c1d3"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSplineBase.html#ad107ad4a91c5de35f14f3805bc52c1d3">LoadSplineFile</a> (std::string FileName)=0</td></tr>
 <tr class="memdesc:ad107ad4a91c5de35f14f3805bc52c1d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Load preprocessed spline file.  <a href="classSplineBase.html#ad107ad4a91c5de35f14f3805bc52c1d3">More...</a><br /></td></tr>
 <tr class="separator:ad107ad4a91c5de35f14f3805bc52c1d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec23c4a87dbbd3b2c0329c93ebbd72c0"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSplineBase.html#aec23c4a87dbbd3b2c0329c93ebbd72c0">SynchroniseMemTransfer</a> () const =0</td></tr>
+<tr class="memdesc:aec23c4a87dbbd3b2c0329c93ebbd72c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.  <a href="classSplineBase.html#aec23c4a87dbbd3b2c0329c93ebbd72c0">More...</a><br /></td></tr>
+<tr class="separator:aec23c4a87dbbd3b2c0329c93ebbd72c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -186,9 +189,9 @@ Protected Attributes</h2></td></tr>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;  <a class="code" href="classSplineBase.html#a938e3a60326137037f868b9930e2a972">SplineSegments</a> = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;  <a class="code" href="classSplineBase.html#aa0b1d3a1adf7cffa7e74581bc7d58d4c">ParamValues</a> = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;}</div>
-<div class="ttc" id="aclassSplineBase_html_a2165b057a0125a28d96f247ca8680b42"><div class="ttname"><a href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">SplineBase::nParams</a></div><div class="ttdeci">short int nParams</div><div class="ttdoc">Number of parameters that have splines.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00078">SplineBase.h:78</a></div></div>
-<div class="ttc" id="aclassSplineBase_html_a938e3a60326137037f868b9930e2a972"><div class="ttname"><a href="classSplineBase.html#a938e3a60326137037f868b9930e2a972">SplineBase::SplineSegments</a></div><div class="ttdeci">short int * SplineSegments</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00074">SplineBase.h:74</a></div></div>
-<div class="ttc" id="aclassSplineBase_html_aa0b1d3a1adf7cffa7e74581bc7d58d4c"><div class="ttname"><a href="classSplineBase.html#aa0b1d3a1adf7cffa7e74581bc7d58d4c">SplineBase::ParamValues</a></div><div class="ttdeci">float * ParamValues</div><div class="ttdoc">Store parameter values they are not in FastSplineInfo as in case of GPU we need to copy paste it to G...</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00076">SplineBase.h:76</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_a2165b057a0125a28d96f247ca8680b42"><div class="ttname"><a href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">SplineBase::nParams</a></div><div class="ttdeci">short int nParams</div><div class="ttdoc">Number of parameters that have splines.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00081">SplineBase.h:81</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_a938e3a60326137037f868b9930e2a972"><div class="ttname"><a href="classSplineBase.html#a938e3a60326137037f868b9930e2a972">SplineBase::SplineSegments</a></div><div class="ttdeci">short int * SplineSegments</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00077">SplineBase.h:77</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_aa0b1d3a1adf7cffa7e74581bc7d58d4c"><div class="ttname"><a href="classSplineBase.html#aa0b1d3a1adf7cffa7e74581bc7d58d4c">SplineBase::ParamValues</a></div><div class="ttdeci">float * ParamValues</div><div class="ttdoc">Store parameter values they are not in FastSplineInfo as in case of GPU we need to copy paste it to G...</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00079">SplineBase.h:79</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -388,7 +391,7 @@ Protected Attributes</h2></td></tr>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00037">MaCh3Logger.h:37</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class used throughout MaCh3.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00023">MaCh3Exception.h:23</a></div></div>
-<div class="ttc" id="aclassSplineBase_html_a9452897aecfe016466543dfe19c0628b"><div class="ttname"><a href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineBase::SplineInfoArray</a></div><div class="ttdeci">std::vector&lt; FastSplineInfo &gt; SplineInfoArray</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00071">SplineBase.h:71</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_a9452897aecfe016466543dfe19c0628b"><div class="ttname"><a href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineBase::SplineInfoArray</a></div><div class="ttdeci">std::vector&lt; FastSplineInfo &gt; SplineInfoArray</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00074">SplineBase.h:74</a></div></div>
 <div class="ttc" id="anamespaceM3_html_adb59b8ecdc4e1b2d5d4c826a13aa7463"><div class="ttname"><a href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a></div><div class="ttdeci">int int_t</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00038">Core.h:38</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -752,6 +755,35 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="aec23c4a87dbbd3b2c0329c93ebbd72c0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aec23c4a87dbbd3b2c0329c93ebbd72c0">&#9670;&nbsp;</a></span>SynchroniseMemTransfer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void SplineBase::SynchroniseMemTransfer </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied. </p>
+
+<p>Implemented in <a class="el" href="classSMonolith.html#a35d44114a235909ddf852dc83db7634c">SMonolith</a>, and <a class="el" href="classBinnedSplineHandler.html#a1bc4924eb71d0ccba6ae362656747d9e">BinnedSplineHandler</a>.</p>
+
+</div>
+</div>
 <h2 class="groupheader">Member Data Documentation</h2>
 <a id="a2165b057a0125a28d96f247ca8680b42"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2165b057a0125a28d96f247ca8680b42">&#9670;&nbsp;</a></span>nParams</h2>
@@ -775,7 +807,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Number of parameters that have splines. </p>
 
-<p class="definition">Definition at line <a class="el" href="SplineBase_8h_source.html#l00078">78</a> of file <a class="el" href="SplineBase_8h_source.html">SplineBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SplineBase_8h_source.html#l00081">81</a> of file <a class="el" href="SplineBase_8h_source.html">SplineBase.h</a>.</p>
 
 </div>
 </div>
@@ -801,7 +833,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Store parameter values they are not in <a class="el" href="structFastSplineInfo.html" title="CW: Add a struct to hold info about the splinified xsec parameters and help with FindSplineSegment.">FastSplineInfo</a> as in case of GPU we need to copy paste it to GPU. </p>
 
-<p class="definition">Definition at line <a class="el" href="SplineBase_8h_source.html#l00076">76</a> of file <a class="el" href="SplineBase_8h_source.html">SplineBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SplineBase_8h_source.html#l00079">79</a> of file <a class="el" href="SplineBase_8h_source.html">SplineBase.h</a>.</p>
 
 </div>
 </div>
@@ -826,7 +858,7 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Array of <a class="el" href="structFastSplineInfo.html" title="CW: Add a struct to hold info about the splinified xsec parameters and help with FindSplineSegment.">FastSplineInfo</a> structs: keeps information on each xsec spline for fast evaluation Method identical to TSpline3::Eval(double) but faster because less operations </p>
 
-<p class="definition">Definition at line <a class="el" href="SplineBase_8h_source.html#l00071">71</a> of file <a class="el" href="SplineBase_8h_source.html">SplineBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SplineBase_8h_source.html#l00074">74</a> of file <a class="el" href="SplineBase_8h_source.html">SplineBase.h</a>.</p>
 
 </div>
 </div>
@@ -851,7 +883,7 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Store currently found segment they are not in <a class="el" href="structFastSplineInfo.html" title="CW: Add a struct to hold info about the splinified xsec parameters and help with FindSplineSegment.">FastSplineInfo</a> as in case of GPU we need to copy paste it to GPU </p><dl class="section warning"><dt>Warning</dt><dd>this is being used sometimes by GPU, therefore must be raw pointer! </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="SplineBase_8h_source.html#l00074">74</a> of file <a class="el" href="SplineBase_8h_source.html">SplineBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SplineBase_8h_source.html#l00077">77</a> of file <a class="el" href="SplineBase_8h_source.html">SplineBase.h</a>.</p>
 
 </div>
 </div>

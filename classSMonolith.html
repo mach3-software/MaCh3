@@ -117,12 +117,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aff3fd93c09096cc362fb9944306d976f"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSMonolith.html#aff3fd93c09096cc362fb9944306d976f">GetName</a> () const override</td></tr>
 <tr class="memdesc:aff3fd93c09096cc362fb9944306d976f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get class name.  <a href="classSMonolith.html#aff3fd93c09096cc362fb9944306d976f">More...</a><br /></td></tr>
 <tr class="separator:aff3fd93c09096cc362fb9944306d976f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a68e18d73ed1ac524ceaea79d2a5460ce"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSMonolith.html#a68e18d73ed1ac524ceaea79d2a5460ce">SynchroniseMemTransfer</a> ()</td></tr>
-<tr class="memdesc:a68e18d73ed1ac524ceaea79d2a5460ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.  <a href="classSMonolith.html#a68e18d73ed1ac524ceaea79d2a5460ce">More...</a><br /></td></tr>
-<tr class="separator:a68e18d73ed1ac524ceaea79d2a5460ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a80a8b4afea2815cf3bbf29342df7dfd5"><td class="memItemLeft" align="right" valign="top">const float *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSMonolith.html#a80a8b4afea2815cf3bbf29342df7dfd5">retPointer</a> (const int event)</td></tr>
-<tr class="memdesc:a80a8b4afea2815cf3bbf29342df7dfd5"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Get pointer to total weight to make fit faster wrooom!  <a href="classSMonolith.html#a80a8b4afea2815cf3bbf29342df7dfd5">More...</a><br /></td></tr>
-<tr class="separator:a80a8b4afea2815cf3bbf29342df7dfd5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a35d44114a235909ddf852dc83db7634c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSMonolith.html#a35d44114a235909ddf852dc83db7634c">SynchroniseMemTransfer</a> () const override</td></tr>
+<tr class="memdesc:a35d44114a235909ddf852dc83db7634c"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.  <a href="classSMonolith.html#a35d44114a235909ddf852dc83db7634c">More...</a><br /></td></tr>
+<tr class="separator:a35d44114a235909ddf852dc83db7634c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa253a65256e46be1148f3f5b2bcf36a"><td class="memItemLeft" align="right" valign="top">const float *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSMonolith.html#aaa253a65256e46be1148f3f5b2bcf36a">retPointer</a> (const int event) const</td></tr>
+<tr class="memdesc:aaa253a65256e46be1148f3f5b2bcf36a"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Get pointer to total weight to make fit faster wrooom!  <a href="classSMonolith.html#aaa253a65256e46be1148f3f5b2bcf36a">More...</a><br /></td></tr>
+<tr class="separator:aaa253a65256e46be1148f3f5b2bcf36a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a40f6b9256a18fa59009e5961aec776ff"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSMonolith.html#a40f6b9256a18fa59009e5961aec776ff">setSplinePointers</a> (std::vector&lt; const double * &gt; spline_ParsPointers)</td></tr>
 <tr class="memdesc:a40f6b9256a18fa59009e5961aec776ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Set pointers to spline params.  <a href="classSMonolith.html#a40f6b9256a18fa59009e5961aec776ff">More...</a><br /></td></tr>
 <tr class="separator:a40f6b9256a18fa59009e5961aec776ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -448,8 +448,8 @@ Kamil Skwarczynski </dd></dl>
 <div class="ttc" id="aclassSMonolith_html_a8614e8ef07431d99f62ab88d9ebdad16"><div class="ttname"><a href="classSMonolith.html#a8614e8ef07431d99f62ab88d9ebdad16">SMonolith::cpu_weights</a></div><div class="ttdeci">float * cpu_weights</div><div class="ttdoc">The returned gpu weights, read by the GPU.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8h_source.html#l00050">SplineMonolith.h:47</a></div></div>
 <div class="ttc" id="aclassSMonolith_html_a870bb2bce61e17162b9425f82cf2a099"><div class="ttname"><a href="classSMonolith.html#a870bb2bce61e17162b9425f82cf2a099">SMonolith::cpu_weights_spline_var</a></div><div class="ttdeci">float * cpu_weights_spline_var</div><div class="ttdoc">CPU arrays to hold weight for each spline.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8h_source.html#l00133">SplineMonolith.h:133</a></div></div>
 <div class="ttc" id="aclassSMonolith_html_ab572dd7e0a46caf44eb925a89cbfb0cf"><div class="ttname"><a href="classSMonolith.html#ab572dd7e0a46caf44eb925a89cbfb0cf">SMonolith::cpu_total_weights</a></div><div class="ttdeci">float * cpu_total_weights</div><div class="ttdoc">KS: This holds the total CPU weights that gets read in samplePDFND.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8h_source.html#l00052">SplineMonolith.h:52</a></div></div>
-<div class="ttc" id="aclassSplineBase_html_a938e3a60326137037f868b9930e2a972"><div class="ttname"><a href="classSplineBase.html#a938e3a60326137037f868b9930e2a972">SplineBase::SplineSegments</a></div><div class="ttdeci">short int * SplineSegments</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00074">SplineBase.h:74</a></div></div>
-<div class="ttc" id="aclassSplineBase_html_aa0b1d3a1adf7cffa7e74581bc7d58d4c"><div class="ttname"><a href="classSplineBase.html#aa0b1d3a1adf7cffa7e74581bc7d58d4c">SplineBase::ParamValues</a></div><div class="ttdeci">float * ParamValues</div><div class="ttdoc">Store parameter values they are not in FastSplineInfo as in case of GPU we need to copy paste it to G...</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00076">SplineBase.h:76</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_a938e3a60326137037f868b9930e2a972"><div class="ttname"><a href="classSplineBase.html#a938e3a60326137037f868b9930e2a972">SplineBase::SplineSegments</a></div><div class="ttdeci">short int * SplineSegments</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00077">SplineBase.h:77</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_aa0b1d3a1adf7cffa7e74581bc7d58d4c"><div class="ttname"><a href="classSplineBase.html#aa0b1d3a1adf7cffa7e74581bc7d58d4c">SplineBase::ParamValues</a></div><div class="ttdeci">float * ParamValues</div><div class="ttdoc">Store parameter values they are not in FastSplineInfo as in case of GPU we need to copy paste it to G...</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00079">SplineBase.h:79</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -937,7 +937,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="ttc" id="aclassSMonolith_html_a5c374d4505de53ad68d176a5644568e6"><div class="ttname"><a href="classSMonolith.html#a5c374d4505de53ad68d176a5644568e6">SMonolith::PrintInitialsiation</a></div><div class="ttdeci">void PrintInitialsiation()</div><div class="ttdoc">KS: Print info about how much knots etc has been initialised.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8cpp_source.html#l00938">SplineMonolith.cpp:938</a></div></div>
 <div class="ttc" id="aclassSMonolith_html_a66eecc550dea893c60a435a034e7ebf5"><div class="ttname"><a href="classSMonolith.html#a66eecc550dea893c60a435a034e7ebf5">SMonolith::cpu_nParamPerEvent_tf1</a></div><div class="ttdeci">std::vector&lt; unsigned int &gt; cpu_nParamPerEvent_tf1</div><div class="ttdoc">KS: CPU map keeping track how many parameters applies to each event, we keep two numbers here {number...</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8h_source.html#l00141">SplineMonolith.h:141</a></div></div>
 <div class="ttc" id="aclassSMonolith_html_aac73a1089592c5f22755b7427869827f"><div class="ttname"><a href="classSMonolith.html#aac73a1089592c5f22755b7427869827f">SMonolith::MoveToGPU</a></div><div class="ttdeci">void MoveToGPU()</div><div class="ttdoc">CW: The shared initialiser from constructors of TResponseFunction_red.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8cpp_source.html#l00305">SplineMonolith.cpp:305</a></div></div>
-<div class="ttc" id="aclassSplineBase_html_a2165b057a0125a28d96f247ca8680b42"><div class="ttname"><a href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">SplineBase::nParams</a></div><div class="ttdeci">short int nParams</div><div class="ttdoc">Number of parameters that have splines.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00078">SplineBase.h:78</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_a2165b057a0125a28d96f247ca8680b42"><div class="ttname"><a href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">SplineBase::nParams</a></div><div class="ttdeci">short int nParams</div><div class="ttdoc">Number of parameters that have splines.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00081">SplineBase.h:81</a></div></div>
 <div class="ttc" id="aclassSplineBase_html_ad4f4b51619ef0573c7f1497f5d1fd52d"><div class="ttname"><a href="classSplineBase.html#ad4f4b51619ef0573c7f1497f5d1fd52d">SplineBase::LoadFastSplineInfoDir</a></div><div class="ttdeci">void LoadFastSplineInfoDir(std::unique_ptr&lt; TFile &gt; &amp;SplineFile)</div><div class="ttdoc">KS: Load preprocessed FastSplineInfo.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8cpp_source.html#l00159">SplineBase.cpp:159</a></div></div>
 <div class="ttc" id="anamespaceM3_html_ad7693a9e309503bd894b04443f163f3c"><div class="ttname"><a href="namespaceM3.html#ad7693a9e309503bd894b04443f163f3c">M3::AddPath</a></div><div class="ttdeci">void AddPath(std::string &amp;FilePath)</div><div class="ttdoc">Prepends the MACH3 environment path to FilePath if it is not already present.</div><div class="ttdef"><b>Definition:</b> <a href="Monitor_8cpp_source.html#l00382">Monitor.cpp:382</a></div></div>
 <div class="ttc" id="astructEventInfo_html"><div class="ttname"><a href="structEventInfo.html">EventInfo</a></div><div class="ttdoc">Stores info about each MC event used during reweighting routine.</div><div class="ttdef"><b>Definition:</b> <a href="FarDetectorCoreInfoStruct_8h_source.html#l00082">FarDetectorCoreInfoStruct.h:82</a></div></div>
@@ -1621,8 +1621,8 @@ Kamil Skwarczynski </dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a80a8b4afea2815cf3bbf29342df7dfd5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a80a8b4afea2815cf3bbf29342df7dfd5">&#9670;&nbsp;</a></span>retPointer()</h2>
+<a id="aaa253a65256e46be1148f3f5b2bcf36a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaa253a65256e46be1148f3f5b2bcf36a">&#9670;&nbsp;</a></span>retPointer()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1635,7 +1635,7 @@ Kamil Skwarczynski </dd></dl>
           <td>(</td>
           <td class="paramtype">const int&#160;</td>
           <td class="paramname"><em>event</em></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
   </td>
@@ -1871,7 +1871,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;  }</div>
 <div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a>(<span class="stringliteral">&quot;In total SplineInfoArray for {} hasn&#39;t been initialised&quot;</span>, Counter);</div>
 <div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;}</div>
-<div class="ttc" id="aclassSplineBase_html_a9452897aecfe016466543dfe19c0628b"><div class="ttname"><a href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineBase::SplineInfoArray</a></div><div class="ttdeci">std::vector&lt; FastSplineInfo &gt; SplineInfoArray</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00071">SplineBase.h:71</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_a9452897aecfe016466543dfe19c0628b"><div class="ttname"><a href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineBase::SplineInfoArray</a></div><div class="ttdeci">std::vector&lt; FastSplineInfo &gt; SplineInfoArray</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00074">SplineBase.h:74</a></div></div>
 <div class="ttc" id="aclassTF1__red_html_af9e3b0e8d2edad0e7e08f3bf215525c9"><div class="ttname"><a href="classTF1__red.html#af9e3b0e8d2edad0e7e08f3bf215525c9">TF1_red::GetSize</a></div><div class="ttdeci">int GetSize()</div><div class="ttdoc">Get the size.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00235">SplineStructs.h:235</a></div></div>
 <div class="ttc" id="aclassTSpline3__red_html_a2c3cba5b93df5a08a8b6c1aee5ebb727"><div class="ttname"><a href="classTSpline3__red.html#a2c3cba5b93df5a08a8b6c1aee5ebb727">TSpline3_red::GetKnot</a></div><div class="ttdeci">void GetKnot(int i, M3::float_t &amp;xtmp, M3::float_t &amp;ytmp)</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00722">SplineStructs.h:722</a></div></div>
 </div><!-- fragment -->
@@ -1910,7 +1910,7 @@ Kamil Skwarczynski </dd></dl>
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="SplineMonolith_8h_source.html#l00044">44</a> of file <a class="el" href="SplineMonolith_8h_source.html">SplineMonolith.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;                                                                                  {</div>
+<div class="fragment"><div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;                                                                           {</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      <a class="code" href="classSMonolith.html#afa782652b0b3da923c5b20bb1319aadd">splineParsPointer</a> = spline_ParsPointers;</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;      <span class="keywordflow">for</span> (<a class="code" href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a> i = 0; i &lt; <a class="code" href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">nParams</a>; ++i) <a class="code" href="classSplineBase.html#a9452897aecfe016466543dfe19c0628b">SplineInfoArray</a>[i].<a class="code" href="classSMonolith.html#afa782652b0b3da923c5b20bb1319aadd">splineParsPointer</a> = spline_ParsPointers[i];</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    };</div>
@@ -1918,25 +1918,35 @@ Kamil Skwarczynski </dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a68e18d73ed1ac524ceaea79d2a5460ce"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a68e18d73ed1ac524ceaea79d2a5460ce">&#9670;&nbsp;</a></span>SynchroniseMemTransfer()</h2>
+<a id="a35d44114a235909ddf852dc83db7634c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a35d44114a235909ddf852dc83db7634c">&#9670;&nbsp;</a></span>SynchroniseMemTransfer()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void SMonolith::SynchroniseMemTransfer </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied. </p>
 
+<p>Implements <a class="el" href="classSplineBase.html#aec23c4a87dbbd3b2c0329c93ebbd72c0">SplineBase</a>.</p>
+
 <p class="definition">Definition at line <a class="el" href="SplineMonolith_8cpp_source.html#l00955">955</a> of file <a class="el" href="SplineMonolith_8cpp_source.html">SplineMonolith.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00955"></a><span class="lineno">  955</span>&#160;                                       {</div>
+<div class="fragment"><div class="line"><a name="l00955"></a><span class="lineno">  955</span>&#160;                                             {</div>
 <div class="line"><a name="l00956"></a><span class="lineno">  956</span>&#160;<span class="comment">//*********************************************************</span></div>
 <div class="line"><a name="l00957"></a><span class="lineno">  957</span>&#160;<span class="preprocessor">  #ifdef MaCh3_CUDA</span></div>
 <div class="line"><a name="l00958"></a><span class="lineno">  958</span>&#160;  <a class="code" href="gpuSplineUtils_8cu.html#a953e5c5aecebd908f5d8c6ad64de482c">SynchroniseSplines</a>();</div>
