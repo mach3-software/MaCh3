@@ -8,6 +8,7 @@
 /// @file PlotSigmaVariation.cpp
 /// @ingroup MaCh3Plotting
 /// @author Kamil Skwarczynski
+/// @todo add maybe ratio for PlotSigVar1D
 
 std::vector<std::string> DialNameVector;
 std::vector<std::string> SampleNameVector;
@@ -75,6 +76,19 @@ void FindKnot(std::vector<double>& SigmaValues,
   SigmaValues.push_back(sigma);
 }
 
+std::unique_ptr<TLegend> MakeLegend(double x1, double y1, double x2, double y2,
+                                    double textSize = 0.04)
+{
+  auto leg = std::make_unique<TLegend>(x1, y1, x2, y2);
+  leg->SetTextSize(textSize);
+  leg->SetLineColor(0);
+  leg->SetLineStyle(0);
+  leg->SetFillColor(0);
+  leg->SetFillStyle(0);
+  leg->SetBorderSize(0);
+
+  return leg;
+}
 
 /// @brief Scan inputs to figure out dial name and used sample names
 void ScanInput(std::vector<std::string>& DialNameVecr,
@@ -162,7 +176,7 @@ void ScanInput(std::vector<std::string>& DialNameVecr,
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
-  if(SampleDimVec.size() != SampleDimVec.size()) {
+  if(SampleNameVec.size() != SampleDimVec.size()) {
     MACH3LOG_ERROR("Sample name vec ({}) and sample dimension vec ({}) have different sizes, something is not right");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
@@ -205,6 +219,37 @@ std::vector<double> GetDialValues(const std::vector<std::unique_ptr<TH1D>>& Poly
   return values;
 }
 
+
+void InitializePads(TCanvas* canv, TPad*& pad1, TPad*& pad2, double Pad1Bottom = 0.25, double Pad2Top = 0.25)
+{
+  // Delete existing pads if they exist
+  if (pad1) delete pad1;
+  if (pad2) delete pad2;
+
+  // Allocate new pads
+  pad1 = new TPad("pad1", "pad1", 0., Pad2Top, 1., 1.0);
+  pad2 = new TPad("pad2", "pad2", 0., 0., 1., Pad1Bottom);
+
+  // Append pads to canvas
+  pad1->AppendPad();
+  pad2->AppendPad();
+
+  // Set margins for pad1
+  pad1->SetLeftMargin(canv->GetLeftMargin());
+  pad1->SetRightMargin(canv->GetRightMargin());
+  pad1->SetTopMargin(canv->GetTopMargin());
+  pad1->SetBottomMargin(0);
+
+  // Set margins for pad2
+  pad2->SetLeftMargin(canv->GetLeftMargin());
+  pad2->SetRightMargin(canv->GetRightMargin());
+  pad2->SetTopMargin(0);
+  pad2->SetBottomMargin(0.30);
+
+  // Enable grid for both pads
+  pad1->SetGrid();
+  pad2->SetGrid();
+}
 
 void MakeRatio(const std::vector<std::unique_ptr<TH1D>>& Poly,
                std::vector<std::unique_ptr<TH1D>>& Ratio) {
@@ -255,23 +300,9 @@ void PlotRatio(const std::vector<std::unique_ptr<TH1D>>& Poly,
   canv->SetRightMargin(0.05);
   canv->SetLeftMargin(0.12);
 
-  TPad* pad1 = new TPad("pad1","pad1",0.,0.25,1.,1.0);
-  pad1->AppendPad();
-  TPad* pad2 = new TPad("pad2","pad2",0.,0.,1.,0.25);
-  pad2->AppendPad();
-
-  pad1->SetLeftMargin(canv->GetLeftMargin());
-  pad1->SetRightMargin(canv->GetRightMargin());
-  pad1->SetTopMargin(canv->GetTopMargin());
-  pad1->SetBottomMargin(0);
-
-  pad2->SetLeftMargin(canv->GetLeftMargin());
-  pad2->SetRightMargin(canv->GetRightMargin());
-  pad2->SetTopMargin(0);
-  pad2->SetBottomMargin(0.30);
-
-  pad1->SetGrid();
-  pad2->SetGrid();
+  TPad* pad1 = nullptr;
+  TPad* pad2 = nullptr;
+  InitializePads(canv.get(), pad1, pad2);
 
   pad1->cd();
 
@@ -298,7 +329,7 @@ void PlotRatio(const std::vector<std::unique_ptr<TH1D>>& Poly,
   for(int ik = 0; ik < static_cast<int>(sigmaArray.size()); ++ik)
     Integral[ik] = Poly[ik]->Integral();
 
-  auto leg = std::make_unique<TLegend>(0.55, 0.55, 0.8, 0.88);
+  auto leg = MakeLegend(0.55, 0.55, 0.8, 0.88, 0.04);
   leg->SetTextSize(0.04);
   for (int j = 0; j < static_cast<int>(sigmaArray.size()); j++)
   {
@@ -308,11 +339,6 @@ void PlotRatio(const std::vector<std::unique_ptr<TH1D>>& Poly,
       leg->AddEntry(Poly[j].get(), Form("%.0f#sigma (%.2f), #int=%.2f", sigmaArray[j], DialValues[j], Integral[j]), "l");
     }
   }
-  leg->SetLineColor(0);
-  leg->SetLineStyle(0);
-  leg->SetFillColor(0);
-  leg->SetFillStyle(0);
-  leg->SetBorderSize(0);
   leg->Draw("SAME");
 
   pad2->cd();
@@ -555,23 +581,10 @@ void PlotEventRate(const std::vector<std::vector<std::unique_ptr<TH1D>>>& Poly,
     }
   }
 
-  TPad* pad1 = new TPad("pad1","pad1",0.,0.50,1.,1.0);
-  pad1->AppendPad();
-  TPad* pad2 = new TPad("pad2","pad2",0.,0.,1.,0.50);
-  pad2->AppendPad();
-
-  pad1->SetLeftMargin(canv->GetLeftMargin());
-  pad1->SetRightMargin(canv->GetRightMargin());
-  pad1->SetTopMargin(canv->GetTopMargin());
-  pad1->SetBottomMargin(0);
-
-  pad2->SetLeftMargin(canv->GetLeftMargin());
-  pad2->SetRightMargin(canv->GetRightMargin());
-  pad2->SetTopMargin(0);
+  TPad* pad1 = nullptr;
+  TPad* pad2 = nullptr;
+  InitializePads(canv.get(), pad1, pad2, 0.50, 0.50);
   pad2->SetBottomMargin(0.60);
-
-  pad1->SetGrid();
-  pad2->SetGrid();
 
   pad1->cd();
   double max = 0;
@@ -587,8 +600,7 @@ void PlotEventRate(const std::vector<std::vector<std::unique_ptr<TH1D>>>& Poly,
   }
 
   auto DialValues = GetDialValues(Poly[0]);
-  auto leg = std::make_unique<TLegend>(0.55, 0.55, 0.8, 0.88);
-  leg->SetTextSize(0.04);
+  auto leg = MakeLegend(0.55, 0.55, 0.8, 0.88, 0.04);
   for (int j = 0; j < static_cast<int>(sigmaArray.size()); j++)
   {
     if(j == PriorKnot) {
@@ -597,11 +609,6 @@ void PlotEventRate(const std::vector<std::vector<std::unique_ptr<TH1D>>>& Poly,
       leg->AddEntry(EvenRates[j].get(), Form("%.0f#sigma (%.2f)", sigmaArray[j], DialValues[j]), "l");
     }
   }
-  leg->SetLineColor(0);
-  leg->SetLineStyle(0);
-  leg->SetFillColor(0);
-  leg->SetFillStyle(0);
-  leg->SetBorderSize(0);
   leg->Draw("SAME");
 
   pad2->cd();
@@ -688,6 +695,132 @@ void MakeEventRatePlot(const std::string& filename, const YAML::Node& Settings)
   delete infile;
 }
 
+void PlotSigVar1D(const std::vector<std::vector<std::unique_ptr<TH1D>>>& Projection,
+                  const std::unique_ptr<TCanvas>& canv,
+                  const std::string& Title,
+                  const std::string& outfilename,
+                  const std::vector<std::string>& ParamNames,
+                  const std::vector<int>& ParamColour)
+{
+  canv->Clear();
+  gStyle->SetDrawBorder(0);
+  gStyle->SetTitleBorderSize(2);
+  gStyle->SetOptStat(0); //Set 0 to disable statistic box
+  canv->SetGrid();
+  canv->SetTopMargin(0.10);
+  canv->SetBottomMargin(0.08);
+  canv->SetRightMargin(0.05);
+  canv->SetLeftMargin(0.12);
+
+  auto PriorHist = Projection[0][PriorKnot].get();
+  PriorHist->SetTitle(Title.c_str());
+  PriorHist->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", ScalingFactor).c_str());
+  PriorHist->Draw("HIST");
+  PriorHist->SetLineWidth(2.);
+  PriorHist->SetLineColor(kBlack);
+  M3::ScaleHistogram(PriorHist, ScalingFactor);
+
+  auto PrettyX = PlotMan->style().prettifyKinematicName(PriorHist->GetXaxis()->GetTitle());
+  PriorHist->GetXaxis()->SetTitle(PrettyX.c_str());
+  for(int ik = 0; ik < static_cast<int>(sigmaArray.size()); ++ik)
+  {
+    if(ik == PriorKnot) continue;
+
+    double max = 0;
+    for(size_t nParam = 0; nParam < Projection.size(); nParam++) {
+      Projection[nParam][ik]->SetLineWidth(2.);
+      Projection[nParam][ik]->SetLineColor(ParamColour[nParam]);
+      Projection[nParam][ik]->SetLineStyle(kDotted);
+      Projection[nParam][ik]->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", ScalingFactor).c_str());
+      M3::ScaleHistogram(Projection[nParam][ik].get(), ScalingFactor);
+      max = std::max(max, Projection[nParam][ik]->GetMaximum());
+    }
+    PriorHist->SetMaximum(max*1.2);
+
+    PriorHist->Draw("HIST");
+    for(size_t nParam = 0; nParam < Projection.size(); nParam++) {
+      Projection[nParam][ik]->Draw("HIST SAME");
+    }
+    auto leg = MakeLegend(0.50, 0.55, 0.70, 0.75, 0.035);
+    leg->AddEntry(PriorHist, "Prior", "l");
+    for(size_t nParam = 0; nParam < Projection.size(); nParam++) {
+      leg->AddEntry(Projection[nParam][ik].get(), Form("%s (%.0f#sigma)", ParamNames[nParam].c_str(), sigmaArray[ik]), "l");
+    }
+    leg->Draw("SAME");
+
+    canv->Print((outfilename).c_str());
+    canv->cd();
+  }
+}
+
+void OverlaySigVar1D(const std::string& filename, const YAML::Node& Settings)
+{
+  auto ParamNames = GetFromManager<std::vector<std::string>>(Settings["ParamNames"], {});
+  auto SigColours = GetFromManager<std::vector<int>>(Settings["Coulour"], {});
+
+  if(ParamNames.size() == 0) return;
+
+  if(ParamNames.size() != SigColours.size()){
+    MACH3LOG_ERROR("Wrong Size");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  //Get input file, make canvas and output file
+  auto canvas = std::make_unique<TCanvas>("canv", "canv", 1080, 1080);
+  TFile *infile = M3::Open(filename, "OPEN", __FILE__, __LINE__);
+  TDirectoryFile *SigmaDir = infile->Get<TDirectoryFile>("SigmaVar");
+
+  std::string outfilename = filename.substr(0, filename.find(".root"));
+  outfilename = outfilename + "_Overlay1d.pdf";
+  gErrorIgnoreLevel = kWarning;
+  canvas->Print((outfilename+"[").c_str());
+
+  TDirectory *dir = nullptr;
+
+  for(size_t is = 0; is < SampleNameVector.size(); is++)
+  {
+    // Loop over dimensions
+    for(int iDim = 0; iDim <= SampleMaxDim[is]; iDim++)
+    {
+      std::vector<std::vector<std::unique_ptr<TH1D>>> Projection(ParamNames.size());
+      for(size_t id = 0; id < ParamNames.size(); id++)
+      {
+        MACH3LOG_INFO("{} Entering {}/{}", __func__, ParamNames[id], SampleNameVector[is]);
+        SigmaDir->cd((ParamNames[id] + "/" +  SampleNameVector[is]).c_str());
+
+        //set dir to current directory
+        dir = gDirectory;
+        //make -3,-1,0,1,3 polys
+        TIter nextsub(dir->GetListOfKeys());
+        TKey *subsubkey = nullptr;
+
+        //loop over items in directory, hard code which th2poly we want
+        while ((subsubkey = static_cast<TKey*>(nextsub())))
+        {
+          auto name = std::string(subsubkey->GetName());
+          auto classname = std::string(subsubkey->GetClassName());
+          // Looking
+          const std::string ProjectionName = "_1DProj" + std::to_string(iDim);
+          const bool IsProjection = (name.find(ProjectionName) != std::string::npos);
+          if (classname == "TH1D" && IsProjection)
+          {
+            name = ParamNames[id] + "/" + SampleNameVector[is] + "/" + name;
+            Projection[id].emplace_back(M3::Clone(SigmaDir->Get<TH1D>(name.c_str())));
+            MACH3LOG_DEBUG("Adding hist {}", name);
+          }
+        }
+      }
+      std::string Title = PlotMan->style().prettifySampleName(SampleNameVector[is]);
+      PlotSigVar1D(Projection, canvas, Title, outfilename, ParamNames, SigColours);
+      gDirectory->cd("..");
+    }
+  }
+
+  canvas->Print((outfilename+"]").c_str());
+  infile->Close();
+  delete infile;
+}
+
 int main(int argc, char **argv)
 {
   SetMaCh3LoggerFormat();
@@ -713,6 +846,7 @@ int main(int argc, char **argv)
   CompareSigVar1D(filename, settings);
   CompareSigVar2D(filename, settings);
   MakeEventRatePlot(filename, settings);
+  OverlaySigVar1D(filename, settings);
 
   if(PlotMan) delete PlotMan;
   return 0;
