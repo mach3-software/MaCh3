@@ -44,6 +44,9 @@ class SplineBase {
     /// @param FileName Path to ROOT file with predefined reduced Spline Monolith
     virtual void LoadSplineFile(std::string FileName) = 0;
 
+    /// @brief KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.
+    virtual void SynchroniseMemTransfer() const = 0;
+
   protected:
     /// @brief CW:Code used in step by step reweighting, Find Spline Segment for each param
     void FindSplineSegment();

@@ -210,15 +210,15 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// @brief Function which does a lot of the lifting regarding the workflow in creating different MC objects
   void Initialise();
   
-  /// @brief Contains all your binned splines and handles the setup and the returning of weights from spline evaluations
+  /// @brief Contains all your splines (binned or unbinned) and handles the setup and the returning of weights from spline evaluations
   std::unique_ptr<SplineBase> SplineHandler;
 
-  /// @brief Contains all your binned splines and handles the setup and the returning of weights from spline evaluations
+  /// @brief Contains oscillator handling calculating oscillation probabilities
   std::shared_ptr<OscillationHandler> Oscillator;
   //===============================================================================
-  /// @brief Finds the binned spline that an event should apply to and stored them in a
-  /// a vector for easy evaluation in the fillArray() function.
-  void FillSplineBins();
+  /// @brief Set pointers for each event to appropriate weights, for unbinned based on event number
+  /// while for binned based on other kinematical properties
+  void SetSplinePointers();
 
   //Functions which find the nominal bin and bin edges
   void FindNominalBinAndEdges();
@@ -312,19 +312,16 @@ class SampleHandlerFD :  public SampleHandlerBase
 
   /// @brief DB Nice new multi-threaded function which calculates the event weights and fills the relevant bins of an array
 #ifdef MULTITHREAD
-  /// @brief fills the SampleHandlerFD_array vector with the weight calculated from reweighting but multithreaded
+  /// @brief Function which does the core reweighting, fills the @ref SampleHandlerFD::SampleHandlerFD_array
+  /// vector with the weight calculated from reweighting but multithreaded
   void FillArray_MP();
 #endif
-  /// @brief Function which does the core reweighting. This assumes that oscillation weights have
-  /// already been calculated and stored in SampleHandlerFD.osc_w[iEvent]. This
-  /// function takes advantage of most of the things called in setupSKMC to reduce reweighting time.
-  /// It also follows the ND code reweighting pretty closely. This function fills the SampleHandlerFD
-  /// array array which is binned to match the sample binning, such that bin[1][1] is the
-  /// equivalent of SampleDetails._hPDF2D->GetBinContent(2,2) {Noticing the offset}
+  /// @brief Function which does the core reweighting, fills the @ref SampleHandlerFD::SampleHandlerFD_array
+  /// vector with the weight calculated from reweighting
   void FillArray();
 
   /// @brief Helper function to reset histograms
-  inline void ResetHistograms();
+  void ResetHistograms();
   
   //===============================================================================
   //DB Variables required for GetLikelihood

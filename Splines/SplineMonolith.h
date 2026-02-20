@@ -29,19 +29,19 @@ class SMonolith : public SplineBase {
     void Evaluate() override;
 
     /// @brief Get class name
-    inline std::string GetName() const override {return "SplineMonolith";};
+    std::string GetName() const override {return "SplineMonolith";};
 
     /// @brief KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.
-    void SynchroniseMemTransfer();
+    void SynchroniseMemTransfer() const override;
 
     /// @brief KS: Get pointer to total weight to make fit faster wrooom!
     /// @param event Name event number in used MC
     /// @return Pointer to the total weight
-    inline const float* retPointer(const int event) {return &cpu_total_weights[event];}
+    const float* retPointer(const int event) const {return &cpu_total_weights[event];}
     
     /// @brief KS: Set pointers to spline params
     /// @param spline_ParsPointers Vector of pointers to spline params
-    inline void setSplinePointers(std::vector< const double* > spline_ParsPointers) {
+    void setSplinePointers(std::vector< const double* > spline_ParsPointers) {
       splineParsPointer = spline_ParsPointers;
       for (M3::int_t i = 0; i < nParams; ++i) SplineInfoArray[i].splineParsPointer = spline_ParsPointers[i];
     };

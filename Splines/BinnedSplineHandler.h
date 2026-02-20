@@ -40,7 +40,8 @@ class BinnedSplineHandler : public SplineBase {
     std::vector< std::vector<int> > StripDuplicatedModes(const std::vector< std::vector<int> >& InputVector);
     /// @brief Return the splines which affect a given event
     std::vector< std::vector<int> > GetEventSplines(const std::string& SampleTitle, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val);
-
+    /// @brief KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.
+    void SynchroniseMemTransfer() const override {return;}
     /// @brief Grab histograms with spline binning
     std::vector<TAxis*> FindSplineBinning(const std::string& FileName, const std::string& SampleTitle);
 
