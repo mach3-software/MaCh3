@@ -55,8 +55,6 @@
 /// subset of parameters is strongly correlated and benefits from PCA, while the
 /// rest remain in the original parameter basis.
 ///
-///
-/// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/03.-Eigen-Decomposition-%E2%80%90-PCA).
 class PCAHandler{
  public:
   /// @brief Constructor

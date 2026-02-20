@@ -7,6 +7,7 @@
     <tab type="user" visible="yes" title="User-Guide" url="UserGuide.html">
       <tab type="user" visible="yes" title="FAQ" url="FAQ.html"/>
       <tab type="user" visible="yes" title="Bayesian Analysis" url="BayesianAnalysis.html"/>
+      <tab type="user" visible="yes" title="Posterior Predictive" url="PosteriorPredictive.html"/>
       <tab type="user" visible="yes" title="MCMC Convergance" url="MCMCconvergance.html"/>
       <tab type="user" visible="yes" title="Adaptive MCMC" url="AdaptiveMCMC.html"/>
       <tab type="user" visible="yes" title="Containers" url="Containers.html"/>

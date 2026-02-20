@@ -6,7 +6,6 @@
 class SMonolithGPU;
 
 /// @brief Even-by-event class calculating response for spline parameters. It is possible to use GPU acceleration
-/// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/05.-Splines).
 /// @author Clarence Wret
 /// @author Kamil Skwarczynski
 class SMonolith : public SplineBase {

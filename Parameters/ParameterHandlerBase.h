@@ -8,7 +8,6 @@
 #include "Parameters/ParameterTunes.h"
 
 /// @brief Base class responsible for handling of systematic error parameters. Capable of using PCA or using adaptive throw matrix
-/// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/02.-Implementation-of-Systematic).
 /// @author Dan Barrow
 /// @author Ed Atkin
 /// @author Kamil Skwarczynski
@@ -308,7 +307,7 @@ class ParameterHandlerBase {
   /// @param eigen_threshold PCA threshold from 0 to 1. Default is -1 and means no PCA
   /// @param FirstPCAdpar First PCA parameter that will be decomposed.
   /// @param LastPCAdpar First PCA parameter that will be decomposed.
-  /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/03.-Eigen-Decomposition-%E2%80%90-PCA).
+  /// @see For more details, visit the @ref PCAHandler
   void ConstructPCA(const double eigen_threshold, int FirstPCAdpar, int LastPCAdpar);
 
   /// @brief is PCA, can use to query e.g. LLH scans
