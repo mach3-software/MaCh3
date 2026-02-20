@@ -1,6 +1,7 @@
 #include "SampleHandlerFD.h"
 #include "Manager/MaCh3Exception.h"
 #include "Manager/MaCh3Logger.h"
+#include "Splines/SplineMonolith.h"
 
 #include <cstddef>
 #include <algorithm>
@@ -346,6 +347,12 @@ void SampleHandlerFD::Reweight() {
   // Calculate weight coming from all splines if we initialised handler
   if(SplineHandler) SplineHandler->Evaluate();
 
+  // Update the functional parameter values to the latest proposed values
+  PrepFunctionalParameters();
+
+  //KS: If using CPU this does nothing, if on GPU need to make sure we finished copying memory from
+  if(SplineHandler) SplineHandler->SynchroniseMemTransfer();
+
   #ifdef MULTITHREAD
   // Call entirely different routine if we're running with openMP
   FillArray_MP();
@@ -369,8 +376,6 @@ void SampleHandlerFD::FillArray() {
   //DB Reset which cuts to apply
   Selection = StoredSelection;
   
-  PrepFunctionalParameters();
-
   for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
     ApplyShifts(iEvent);
     const EventInfo* _restrict_ MCEvent = &MCSamples[iEvent];
@@ -408,8 +413,6 @@ void SampleHandlerFD::FillArray_MP() {
 // ************************************************
   //DB Reset which cuts to apply
   Selection = StoredSelection;
-
-  PrepFunctionalParameters();
 
   // NOTE comment below is left for historical reasons
   //DB - Brain dump of speedup ideas
@@ -1163,48 +1166,62 @@ M3::float_t SampleHandlerFD::GetEventWeight(const int iEntry) {
 }
 
 // ************************************************
-// Finds the binned spline that an event should apply to and stored them in a
-// a vector for easy evaluation in the fillArray() function.
-void SampleHandlerFD::FillSplineBins() {
+void SampleHandlerFD::SetSplinePointers() {
 // ************************************************
   //Now loop over events and get the spline bin for each event
-  bool ThrowCrititcal = true;
-  for (unsigned int j = 0; j < GetNEvents(); ++j) {
-    const int SampleIndex = MCSamples[j].NominalSample;
-    const auto SampleTitle = GetSampleTitle(SampleIndex);
-    const int OscIndex = GetOscChannel(SampleDetails[SampleIndex].OscChannels, (*MCSamples[j].nupdgUnosc), (*MCSamples[j].nupdg));
-    const int Mode = int(*(MCSamples[j].mode));
-    const double Etrue = *(MCSamples[j].rw_etru);
-    std::vector< std::vector<int> > EventSplines;
-    switch(GetNDim(SampleIndex)) {
-      case 1:
-        EventSplines = SplineHandler->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCSamples[j].KinVar[0]), 0.);
-        break;
-      case 2:
-        EventSplines = SplineHandler->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCSamples[j].KinVar[0]), *(MCSamples[j].KinVar[1]));
-        break;
-      default:
-        if(ThrowCrititcal) {
-          MACH3LOG_CRITICAL("MaCh3 doesn't support binned splines for more than 2D while you use {}", GetNDim(SampleIndex));
-          MACH3LOG_CRITICAL("Will use 2D like approach");
-          ThrowCrititcal = false;
-        }
-        EventSplines = SplineHandler->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCSamples[j].KinVar[0]), *(MCSamples[j].KinVar[1]));
-        break;
-    }
-    const int NSplines = static_cast<int>(EventSplines.size());
-    if(NSplines == 0) continue;
-    const int PointersBefore = static_cast<int>(MCSamples[j].total_weight_pointers.size());
-    MCSamples[j].total_weight_pointers.resize(PointersBefore + NSplines);
+  if (auto BinnedSpline = dynamic_cast<BinnedSplineHandler*>(SplineHandler.get())) {
+    bool ThrowCrititcal = true;
+    for (unsigned int j = 0; j < GetNEvents(); ++j) {
+      const int SampleIndex = MCSamples[j].NominalSample;
+      const auto SampleTitle = GetSampleTitle(SampleIndex);
+      const int OscIndex = GetOscChannel(SampleDetails[SampleIndex].OscChannels, (*MCSamples[j].nupdgUnosc), (*MCSamples[j].nupdg));
+      const int Mode = int(*(MCSamples[j].mode));
+      const double Etrue = *(MCSamples[j].rw_etru);
+      std::vector< std::vector<int> > EventSplines;
+      switch(GetNDim(SampleIndex)) {
+        case 1:
+          EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCSamples[j].KinVar[0]), 0.);
+          break;
+        case 2:
+          EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCSamples[j].KinVar[0]), *(MCSamples[j].KinVar[1]));
+          break;
+        default:
+          if(ThrowCrititcal) {
+            MACH3LOG_CRITICAL("MaCh3 doesn't support binned splines for more than 2D while you use {}", GetNDim(SampleIndex));
+            MACH3LOG_CRITICAL("Will use 2D like approach");
+            ThrowCrititcal = false;
+          }
+          EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCSamples[j].KinVar[0]), *(MCSamples[j].KinVar[1]));
+          break;
+      }
+      const int NSplines = static_cast<int>(EventSplines.size());
+      if(NSplines == 0) continue;
+      const int PointersBefore = static_cast<int>(MCSamples[j].total_weight_pointers.size());
+      MCSamples[j].total_weight_pointers.resize(PointersBefore + NSplines);
 
-    for(int spline = 0; spline < NSplines; spline++) {
-      //Event Splines indexed as: sample name, oscillation channel, syst, mode, etrue, var1, var2 (var2 is a dummy 0 for 1D splines)
-      MCSamples[j].total_weight_pointers[PointersBefore+spline] = SplineHandler->retPointer(EventSplines[spline][0], EventSplines[spline][1],
-                                                                    EventSplines[spline][2], EventSplines[spline][3],
-                                                                    EventSplines[spline][4], EventSplines[spline][5],
-                                                                    EventSplines[spline][6]);
-    } // end loop over splines
-  } // end loop over events
+      for(int spline = 0; spline < NSplines; spline++) {
+        //Event Splines indexed as: sample name, oscillation channel, syst, mode, etrue, var1, var2 (var2 is a dummy 0 for 1D splines)
+        MCSamples[j].total_weight_pointers[PointersBefore+spline] = BinnedSpline->retPointer(EventSplines[spline][0], EventSplines[spline][1],
+                                                                                              EventSplines[spline][2], EventSplines[spline][3],
+                                                                                              EventSplines[spline][4], EventSplines[spline][5],
+                                                                                              EventSplines[spline][6]);
+      } // end loop over splines
+    } // end loop over events
+  } else if (auto UnbinnedSpline = dynamic_cast<SMonolith*>(SplineHandler.get())) {
+    /// @todo Fix this mess :(
+    #ifdef _LOW_MEMORY_STRUCTS_
+    for (unsigned int iEvent = 0; iEvent < GetNEvents(); ++iEvent) {
+      MCSamples[iEvent].total_weight_pointers.push_back(UnbinnedSpline->retPointer(iEvent));
+    }
+    #else
+    (void) UnbinnedSpline;
+    MACH3LOG_ERROR("Unbinned splines only for float :(");
+    throw MaCh3Exception(__FILE__, __LINE__);
+    #endif
+  } else {
+    MACH3LOG_ERROR("Not supported splines");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
 }
 
 // ************************************************
@@ -1295,41 +1312,49 @@ void SampleHandlerFD::SaveAdditionalInfo(TDirectory* Dir) {
 }
 
 void SampleHandlerFD::InitialiseSplineObject() {
-  bool LoadSplineFile = GetFromManager<bool>(SampleManager->raw()["InputFiles"]["LoadSplineFile"], false, __FILE__, __LINE__);
-  bool PrepSplineFile = GetFromManager<bool>(SampleManager->raw()["InputFiles"]["PrepSplineFile"], false, __FILE__, __LINE__);
-  auto SplineFileName = GetFromManager<std::string>(SampleManager->raw()["InputFiles"]["SplineFileName"],
-                                                    (SampleHandlerName + "_SplineFile.root"), __FILE__, __LINE__);
-  if(!LoadSplineFile) {
-    for(int iSample = 0; iSample < GetNsamples(); iSample++) {
-      std::vector<std::string> spline_filepaths = SampleDetails[iSample].spline_files;
+  if(auto BinnedSplines = dynamic_cast<BinnedSplineHandler*>(SplineHandler.get())) {
+    bool LoadSplineFile = GetFromManager<bool>(SampleManager->raw()["InputFiles"]["LoadSplineFile"], false, __FILE__, __LINE__);
+    bool PrepSplineFile = GetFromManager<bool>(SampleManager->raw()["InputFiles"]["PrepSplineFile"], false, __FILE__, __LINE__);
+    auto SplineFileName = GetFromManager<std::string>(SampleManager->raw()["InputFiles"]["SplineFileName"],
+                                                      (SampleHandlerName + "_SplineFile.root"), __FILE__, __LINE__);
+    if(!LoadSplineFile) {
+      for(int iSample = 0; iSample < GetNsamples(); iSample++) {
+        std::vector<std::string> spline_filepaths = SampleDetails[iSample].spline_files;
 
-      //Keep a track of the spline variables
-      std::vector<std::string> SplineVarNames = {"TrueNeutrinoEnergy"};
-      if (GetNDim(iSample) == 1) {
-        SplineVarNames.push_back(GetKinVarName(iSample, 0));
-      } else if (GetNDim(iSample) == 2) {
-        SplineVarNames.push_back(GetKinVarName(iSample, 0));
-        SplineVarNames.push_back(GetKinVarName(iSample, 1));
-      } else {
-        MACH3LOG_CRITICAL("{} Not implemented for dimension {}, will use 2D", __func__, GetNDim(iSample));
-        SplineVarNames.push_back(GetKinVarName(iSample, 0));
-        SplineVarNames.push_back(GetKinVarName(iSample, 1));
+        //Keep a track of the spline variables
+        std::vector<std::string> SplineVarNames = {"TrueNeutrinoEnergy"};
+        if (GetNDim(iSample) == 1) {
+          SplineVarNames.push_back(GetKinVarName(iSample, 0));
+        } else if (GetNDim(iSample) == 2) {
+          SplineVarNames.push_back(GetKinVarName(iSample, 0));
+          SplineVarNames.push_back(GetKinVarName(iSample, 1));
+        } else {
+          MACH3LOG_CRITICAL("{} Not implemented for dimension {}, will use 2D", __func__, GetNDim(iSample));
+          SplineVarNames.push_back(GetKinVarName(iSample, 0));
+          SplineVarNames.push_back(GetKinVarName(iSample, 1));
+        }
+        BinnedSplines->AddSample(SampleHandlerName, GetSampleTitle(iSample), spline_filepaths, SplineVarNames);
       }
-      SplineHandler->AddSample(SampleHandlerName, GetSampleTitle(iSample), spline_filepaths, SplineVarNames);
+      BinnedSplines->CountNumberOfLoadedSplines(false, 1);
+      BinnedSplines->TransferToMonolith();
+      if(PrepSplineFile) BinnedSplines->PrepareSplineFile(SplineFileName);
+    } else {
+      // KS: Skip default spline loading and use flattened spline format allowing to read stuff much faster
+      BinnedSplines->LoadSplineFile(SplineFileName);
     }
-    SplineHandler->CountNumberOfLoadedSplines(false, 1);
-    SplineHandler->TransferToMonolith();
-    if(PrepSplineFile) SplineHandler->PrepareSplineFile(SplineFileName);
+    MACH3LOG_INFO("--------------------------------");
+    MACH3LOG_INFO("Setup Far Detector splines");
+
+    SetSplinePointers();
+
+    BinnedSplines->cleanUpMemory();
+  } else if (auto UnbinnedSpline = dynamic_cast<SMonolith*>(SplineHandler.get())) {
+    (void) UnbinnedSpline;
+    SetSplinePointers();
   } else {
-    // KS: Skip default spline loading and use flattened spline format allowing to read stuff much faster
-    SplineHandler->LoadSplineFile(SplineFileName);
+    MACH3LOG_ERROR("Unsupported spline type encountered.");
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
-  MACH3LOG_INFO("--------------------------------");
-  MACH3LOG_INFO("Setup Far Detector splines");
-
-  FillSplineBins();
-
-  SplineHandler->cleanUpMemory();
 }
 
 
