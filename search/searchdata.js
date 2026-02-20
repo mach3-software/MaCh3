@@ -10,8 +10,8 @@ var indexSectionsWithContent =
   7: "fknprst",
   8: "k",
   9: "_cgm",
-  10: "cfm",
-  11: "01_abcdfmnprtuw"
+  10: "cfim",
+  11: "0_abcfmnprtuw"
 };
 
 var indexSectionNames =

@@ -12,7 +12,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title="constructors are same for all three so put in here">
+<g id="a_node1"><a xlink:title="Stores info about each MC event used during reweighting routine.">
 <polygon fill="#bfbfbf" stroke="black" points="227,-44.5 227,-63.5 285,-63.5 285,-44.5 227,-44.5"/>
 <text text-anchor="middle" x="256" y="-51.5" font-family="Helvetica" font-size="10.00">EventInfo</text>
 </a>

@@ -1096,17 +1096,17 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Calculate test statistic for a single bin. Calculation depends on setting of <code>fTestStatistic</code>. Data and mc -&gt; 0 cut-offs are defined in <a class="el" href="namespaceM3.html" title="Main namespace for MaCh3 software.">M3</a>::<em>LOW_MC_BOUND</em>. </p>
-<h3><a class="anchor" id="autotoc_md32"></a>
+<h3><a class="anchor" id="autotoc_md77"></a>
 Poisson</h3>
 <p>Standard Poisson log-likelihood (Stirling approximation) <a class="el" href="citelist.html#CITEREF_BakerCousins1984">[2]</a> </p><p class="formulaDsp">
 \[ - \log \mathcal{L}_\mathrm{Poisson} = \sum_i N_i^\mathrm{MC} - N_i^\mathrm{data} + N_i^\mathrm{data} \ln \frac{N_i^\mathrm{data}}{N_i^\mathrm{MC}}, \]
 </p>
-<h3><a class="anchor" id="autotoc_md33"></a>
+<h3><a class="anchor" id="autotoc_md78"></a>
 Pearson</h3>
 <p>Standard Pearson likelihood <a class="el" href="citelist.html#CITEREF_Pearson1900">[25]</a> (assumes Gaussian approximation of bin counts): </p><p class="formulaDsp">
 \[ - \log \mathcal{L}_\mathrm{Pearson} = \sum_i \frac{(N_i^\mathrm{data} - N_i^\mathrm{MC})^2}{2 \, N_i^\mathrm{MC}} \]
 </p>
-<h3><a class="anchor" id="autotoc_md34"></a>
+<h3><a class="anchor" id="autotoc_md79"></a>
 Barlow-Beeston</h3>
 <p>Based on <a class="el" href="citelist.html#CITEREF_Barlow:1993dm">[3]</a> and following Conway approximation (<a class="el" href="citelist.html#CITEREF_Conway:2011in">[5]</a>) The generation of MC is a stochastic process, so even identical settings can lead to different outputs (assuming that the seeds of the random number generator are different). This introduces uncertainty in MC distributions, especially in bins with low statistics.</p>
 <p class="formulaDsp">
@@ -1116,7 +1116,7 @@ Barlow-Beeston</h3>
 <p class="formulaDsp">
 \[ \beta_i^2 + (N_i^\mathrm{MC} \sigma_{\beta_i}^2 - 1)\beta_i - N_i^\mathrm{data} \sigma_{\beta_i}^2 = 0 \]
 </p>
-<h3><a class="anchor" id="autotoc_md35"></a>
+<h3><a class="anchor" id="autotoc_md80"></a>
 Dembinski-Abdelmotteleb</h3>
 <p>Alternative treatment of MC statistical uncertainty following Hans Dembinski and Ahmed Abdelmotteleb <a class="el" href="citelist.html#CITEREF_Dembinski:2022ios">[6]</a></p>
 <p>This approach extends the Barlow-Beeston method. For each bin: </p><p class="formulaDsp">
@@ -1128,7 +1128,7 @@ Dembinski-Abdelmotteleb</h3>
 <p> and </p><p class="formulaDsp">
 \[ \beta = \frac{N_i^\mathrm{data} + k}{N_i^\mathrm{MC} + k}, \quad N_i^{\mathrm{MC},\prime} = N_i^\mathrm{MC} \cdot \beta \]
 </p>
-<h3><a class="anchor" id="autotoc_md36"></a>
+<h3><a class="anchor" id="autotoc_md81"></a>
 IceCube</h3>
 <p>Alternative likelihood definition described by the IceCube collaboration <a class="el" href="citelist.html#CITEREF_Arguelles:2019izp">[1]</a> </p><p class="formulaDsp">
 \[ - \log \mathcal{L} = - \sum_i \Biggl( a_i \log(b_i) + \log[\Gamma(N_i^{\mathrm{data}}+a_i)] - (N_i^{\mathrm{data}}+a_i)\log(b_i+1) - \log[\Gamma(a_i)] \Biggr), \]
@@ -1136,7 +1136,7 @@ IceCube</h3>
 <p> where the auxiliary variables are </p><p class="formulaDsp">
 \[ a_i = N^{\mathrm{gen}}_{\mathrm{MC},i} \, b_i + 1, \quad b_i = \frac{N^{\mathrm{gen}}_{\mathrm{MC},i}}{\sum_i w_i^2}. \]
 </p>
-<h3><a class="anchor" id="autotoc_md37"></a>
+<h3><a class="anchor" id="autotoc_md82"></a>
 Treatment of low data/mc</h3>
 <p>Implemented fTestStatistic are <code>kPoisson</code> (with Stirling's approx.), <code>kBarlowBeeston</code> (arXiv:1103.0354), <code>kDembinskiAbdelmotteleb</code> (arXiv:2206.12346), <code>kIceCube</code> (arxiv:1901.04645), and <code>kPearson</code>. Test statistics require mc &gt; 0, therefore low mc and data values are treated with cut-offs based on <a class="el" href="namespaceM3.html" title="Main namespace for MaCh3 software.">M3</a>::<em>LOW_MC_BOUND</em> = .00001 by default. For <code>kPoisson</code>, <code>kBarlowBeeston</code>, <code>kDembinskiAbdelmotteleb</code>, <code>kPearson:</code> data &gt; <em>LOW_MC_BOUND</em> &amp; mc &lt;= <em>LOW_MC_BOUND</em>: returns GetTestStatLLH(data, <em>LOW_MC_BOUND</em>, w2), with Poisson(data,<em>LOW_MC_BOUND</em>) limit for mc-&gt;0, w2-&gt;0. mc &lt; data &lt;= <em>LOW_MC_BOUND</em>: returns 0 (as if any data &lt;= <em>LOW_MC_BOUND</em> were effectively consistent with 0 data count), with a limit of 0 for mc-&gt;0. data = 0: returns mc (or mc/2. for <code>kPearson</code>), with a limit of 0 for mc-&gt;0. For <code>kIceCube:</code> mc &lt; data returns the lower of IceCube(data,mc,w2) and Poisson(data,mc) penalties, with a Poisson(data,<em>LOW_MC_BOUND</em>) limit for mc-&gt;0, w2-&gt;0. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">

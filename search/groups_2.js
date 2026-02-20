@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['mach3_20plotting_3643',['MaCh3 Plotting',['../group__MaCh3Plotting.html',1,'']]]
+  ['implementing_20samples_20and_20parameters_3642',['Implementing Samples and Parameters',['../group__SamplesAndParameters.html',1,'']]]
 ];

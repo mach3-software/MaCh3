@@ -254,9 +254,9 @@ Protected Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Base class for implementing fitting algorithms. </p>
-<p>This class wraps MaCh3 classes like SampleHandler and ParameterHandler. It serves as a base for different fitting algorithms and for validation techniques such as LLH scans. </p><dl class="section see"><dt>See also</dt><dd>For more details, visit the <a href="https://github.com/mach3-software/MaCh3/wiki/06.-Fitting-Algorithms">Wiki</a>. </dd></dl>
+<p>This class wraps MaCh3 classes like <a class="el" href="classSampleHandlerBase.html">SampleHandlerBase</a> and <a class="el" href="classParameterHandlerBase.html">ParameterHandlerBase</a>. It serves as a base for different fitting algorithms and for validation techniques such as LLH scans. </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00027">27</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00026">26</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a07465b46dac0536407156f035a398399"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a07465b46dac0536407156f035a398399">&#9670;&nbsp;</a></span>FitterBase()</h2>
@@ -332,25 +332,25 @@ Protected Attributes</h2></td></tr>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  <a class="code" href="classFitterBase.html#abe9814558b8ff1bccdde3b4c894467e6">TotalNSamples</a> = 0;</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  <a class="code" href="classFitterBase.html#ada898e35bab22af470f2cd1e28af609b">fTestLikelihood</a> = GetFromManager&lt;bool&gt;(<a class="code" href="classFitterBase.html#a8768aefc0d1e9282d82af22a5852ab1d">fitMan</a>-&gt;<a class="code" href="classManager.html#a6cfc76d6af382b177ac35be0a2fb5aab">raw</a>()[<span class="stringliteral">&quot;General&quot;</span>][<span class="stringliteral">&quot;Fitter&quot;</span>][<span class="stringliteral">&quot;FitTestLikelihood&quot;</span>], <span class="keyword">false</span>, __FILE__ , __LINE__);</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;}</div>
-<div class="ttc" id="aclassFitterBase_html_a138f250d9204a30204e4ca5b973008b2"><div class="ttname"><a href="classFitterBase.html#a138f250d9204a30204e4ca5b973008b2">FitterBase::random</a></div><div class="ttdeci">std::unique_ptr&lt; TRandom3 &gt; random</div><div class="ttdoc">Random number.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00145">FitterBase.h:145</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_a2774f3a0047c4347ee0db05406425f79"><div class="ttname"><a href="classFitterBase.html#a2774f3a0047c4347ee0db05406425f79">FitterBase::accCount</a></div><div class="ttdeci">int accCount</div><div class="ttdoc">counts accepted steps</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00120">FitterBase.h:120</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_a3bfd8f69df891d03bae0587cd1a1e1b7"><div class="ttname"><a href="classFitterBase.html#a3bfd8f69df891d03bae0587cd1a1e1b7">FitterBase::OutputPrepared</a></div><div class="ttdeci">bool OutputPrepared</div><div class="ttdoc">Checks if output prepared not repeat some operations.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00166">FitterBase.h:166</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_a4260b312e3f35cf01fc73b02239f8990"><div class="ttname"><a href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">FitterBase::outputFile</a></div><div class="ttdeci">TFile * outputFile</div><div class="ttdoc">Output.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00148">FitterBase.h:148</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_a50df1bd75b20a953f81ab9c2bab6b42c"><div class="ttname"><a href="classFitterBase.html#a50df1bd75b20a953f81ab9c2bab6b42c">FitterBase::step</a></div><div class="ttdeci">unsigned int step</div><div class="ttdoc">current state</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00112">FitterBase.h:112</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_a588678c71d816f48ba3c140543dbe916"><div class="ttname"><a href="classFitterBase.html#a588678c71d816f48ba3c140543dbe916">FitterBase::SettingsSaved</a></div><div class="ttdeci">bool SettingsSaved</div><div class="ttdoc">Checks if setting saved not repeat some operations.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00164">FitterBase.h:164</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_a699abe6a2c89706b54544212152d613a"><div class="ttname"><a href="classFitterBase.html#a699abe6a2c89706b54544212152d613a">FitterBase::FileSaved</a></div><div class="ttdeci">bool FileSaved</div><div class="ttdoc">Checks if file saved not repeat some operations.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00162">FitterBase.h:162</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_a6c5b6c38ba4c6f482592147c7e6b3b95"><div class="ttname"><a href="classFitterBase.html#a6c5b6c38ba4c6f482592147c7e6b3b95">FitterBase::AlgorithmName</a></div><div class="ttdeci">std::string AlgorithmName</div><div class="ttdoc">Name of fitting algorithm that is being used.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00169">FitterBase.h:169</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_a858edb45544f690e90b60b9e041394a6"><div class="ttname"><a href="classFitterBase.html#a858edb45544f690e90b60b9e041394a6">FitterBase::clock</a></div><div class="ttdeci">std::unique_ptr&lt; TStopwatch &gt; clock</div><div class="ttdoc">tells global time how long fit took</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00138">FitterBase.h:138</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_a8768aefc0d1e9282d82af22a5852ab1d"><div class="ttname"><a href="classFitterBase.html#a8768aefc0d1e9282d82af22a5852ab1d">FitterBase::fitMan</a></div><div class="ttdeci">Manager * fitMan</div><div class="ttdoc">The manager for configuration handling.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00109">FitterBase.h:109</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_a888f97de872ab396dff2d1a25f5aaa42"><div class="ttname"><a href="classFitterBase.html#a888f97de872ab396dff2d1a25f5aaa42">FitterBase::stepStart</a></div><div class="ttdeci">unsigned int stepStart</div><div class="ttdoc">step start, by default 0 if we start from previous chain then it will be different</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00122">FitterBase.h:122</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_a9fe01b2b6f7f0d6a7b04675a099e1a4f"><div class="ttname"><a href="classFitterBase.html#a9fe01b2b6f7f0d6a7b04675a099e1a4f">FitterBase::stepClock</a></div><div class="ttdeci">std::unique_ptr&lt; TStopwatch &gt; stepClock</div><div class="ttdoc">tells how long single step/fit iteration took</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00140">FitterBase.h:140</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_aacc46437245ba8a9817f2ed2e86a96e0"><div class="ttname"><a href="classFitterBase.html#aacc46437245ba8a9817f2ed2e86a96e0">FitterBase::CovFolder</a></div><div class="ttdeci">TDirectory * CovFolder</div><div class="ttdoc">Output cov folder.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00150">FitterBase.h:150</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_aafa86c7e244e6587a298e1726bd5e835"><div class="ttname"><a href="classFitterBase.html#aafa86c7e244e6587a298e1726bd5e835">FitterBase::SampleFolder</a></div><div class="ttdeci">TDirectory * SampleFolder</div><div class="ttdoc">Output sample folder.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00152">FitterBase.h:152</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_abe9814558b8ff1bccdde3b4c894467e6"><div class="ttname"><a href="classFitterBase.html#abe9814558b8ff1bccdde3b4c894467e6">FitterBase::TotalNSamples</a></div><div class="ttdeci">unsigned int TotalNSamples</div><div class="ttdoc">Total number of samples used, single SampleHandler can store more than one analysis sample!</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00132">FitterBase.h:132</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_ad955982e63066918cba9c53381608d09"><div class="ttname"><a href="classFitterBase.html#ad955982e63066918cba9c53381608d09">FitterBase::auto_save</a></div><div class="ttdeci">int auto_save</div><div class="ttdoc">auto save every N steps</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00156">FitterBase.h:156</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_ada898e35bab22af470f2cd1e28af609b"><div class="ttname"><a href="classFitterBase.html#ada898e35bab22af470f2cd1e28af609b">FitterBase::fTestLikelihood</a></div><div class="ttdeci">bool fTestLikelihood</div><div class="ttdoc">Necessary for some fitting algorithms like PSO.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00159">FitterBase.h:159</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_aed2032b9c4a4f2248abe548f54f8dcc8"><div class="ttname"><a href="classFitterBase.html#aed2032b9c4a4f2248abe548f54f8dcc8">FitterBase::outTree</a></div><div class="ttdeci">TTree * outTree</div><div class="ttdoc">Output tree with posteriors.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00154">FitterBase.h:154</a></div></div>
-<div class="ttc" id="aclassManager_html_a6cfc76d6af382b177ac35be0a2fb5aab"><div class="ttname"><a href="classManager.html#a6cfc76d6af382b177ac35be0a2fb5aab">Manager::raw</a></div><div class="ttdeci">YAML::Node const  &amp; raw() const</div><div class="ttdoc">Return config.</div><div class="ttdef"><b>Definition:</b> <a href="Manager_8h_source.html#l00042">Manager.h:42</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_a138f250d9204a30204e4ca5b973008b2"><div class="ttname"><a href="classFitterBase.html#a138f250d9204a30204e4ca5b973008b2">FitterBase::random</a></div><div class="ttdeci">std::unique_ptr&lt; TRandom3 &gt; random</div><div class="ttdoc">Random number.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00144">FitterBase.h:144</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_a2774f3a0047c4347ee0db05406425f79"><div class="ttname"><a href="classFitterBase.html#a2774f3a0047c4347ee0db05406425f79">FitterBase::accCount</a></div><div class="ttdeci">int accCount</div><div class="ttdoc">counts accepted steps</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00119">FitterBase.h:119</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_a3bfd8f69df891d03bae0587cd1a1e1b7"><div class="ttname"><a href="classFitterBase.html#a3bfd8f69df891d03bae0587cd1a1e1b7">FitterBase::OutputPrepared</a></div><div class="ttdeci">bool OutputPrepared</div><div class="ttdoc">Checks if output prepared not repeat some operations.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00165">FitterBase.h:165</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_a4260b312e3f35cf01fc73b02239f8990"><div class="ttname"><a href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">FitterBase::outputFile</a></div><div class="ttdeci">TFile * outputFile</div><div class="ttdoc">Output.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00147">FitterBase.h:147</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_a50df1bd75b20a953f81ab9c2bab6b42c"><div class="ttname"><a href="classFitterBase.html#a50df1bd75b20a953f81ab9c2bab6b42c">FitterBase::step</a></div><div class="ttdeci">unsigned int step</div><div class="ttdoc">current state</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00111">FitterBase.h:111</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_a588678c71d816f48ba3c140543dbe916"><div class="ttname"><a href="classFitterBase.html#a588678c71d816f48ba3c140543dbe916">FitterBase::SettingsSaved</a></div><div class="ttdeci">bool SettingsSaved</div><div class="ttdoc">Checks if setting saved not repeat some operations.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00163">FitterBase.h:163</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_a699abe6a2c89706b54544212152d613a"><div class="ttname"><a href="classFitterBase.html#a699abe6a2c89706b54544212152d613a">FitterBase::FileSaved</a></div><div class="ttdeci">bool FileSaved</div><div class="ttdoc">Checks if file saved not repeat some operations.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00161">FitterBase.h:161</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_a6c5b6c38ba4c6f482592147c7e6b3b95"><div class="ttname"><a href="classFitterBase.html#a6c5b6c38ba4c6f482592147c7e6b3b95">FitterBase::AlgorithmName</a></div><div class="ttdeci">std::string AlgorithmName</div><div class="ttdoc">Name of fitting algorithm that is being used.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00168">FitterBase.h:168</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_a858edb45544f690e90b60b9e041394a6"><div class="ttname"><a href="classFitterBase.html#a858edb45544f690e90b60b9e041394a6">FitterBase::clock</a></div><div class="ttdeci">std::unique_ptr&lt; TStopwatch &gt; clock</div><div class="ttdoc">tells global time how long fit took</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00137">FitterBase.h:137</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_a8768aefc0d1e9282d82af22a5852ab1d"><div class="ttname"><a href="classFitterBase.html#a8768aefc0d1e9282d82af22a5852ab1d">FitterBase::fitMan</a></div><div class="ttdeci">Manager * fitMan</div><div class="ttdoc">The manager for configuration handling.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00108">FitterBase.h:108</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_a888f97de872ab396dff2d1a25f5aaa42"><div class="ttname"><a href="classFitterBase.html#a888f97de872ab396dff2d1a25f5aaa42">FitterBase::stepStart</a></div><div class="ttdeci">unsigned int stepStart</div><div class="ttdoc">step start, by default 0 if we start from previous chain then it will be different</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00121">FitterBase.h:121</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_a9fe01b2b6f7f0d6a7b04675a099e1a4f"><div class="ttname"><a href="classFitterBase.html#a9fe01b2b6f7f0d6a7b04675a099e1a4f">FitterBase::stepClock</a></div><div class="ttdeci">std::unique_ptr&lt; TStopwatch &gt; stepClock</div><div class="ttdoc">tells how long single step/fit iteration took</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00139">FitterBase.h:139</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_aacc46437245ba8a9817f2ed2e86a96e0"><div class="ttname"><a href="classFitterBase.html#aacc46437245ba8a9817f2ed2e86a96e0">FitterBase::CovFolder</a></div><div class="ttdeci">TDirectory * CovFolder</div><div class="ttdoc">Output cov folder.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00149">FitterBase.h:149</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_aafa86c7e244e6587a298e1726bd5e835"><div class="ttname"><a href="classFitterBase.html#aafa86c7e244e6587a298e1726bd5e835">FitterBase::SampleFolder</a></div><div class="ttdeci">TDirectory * SampleFolder</div><div class="ttdoc">Output sample folder.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00151">FitterBase.h:151</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_abe9814558b8ff1bccdde3b4c894467e6"><div class="ttname"><a href="classFitterBase.html#abe9814558b8ff1bccdde3b4c894467e6">FitterBase::TotalNSamples</a></div><div class="ttdeci">unsigned int TotalNSamples</div><div class="ttdoc">Total number of samples used, single SampleHandler can store more than one analysis sample!</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00131">FitterBase.h:131</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_ad955982e63066918cba9c53381608d09"><div class="ttname"><a href="classFitterBase.html#ad955982e63066918cba9c53381608d09">FitterBase::auto_save</a></div><div class="ttdeci">int auto_save</div><div class="ttdoc">auto save every N steps</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00155">FitterBase.h:155</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_ada898e35bab22af470f2cd1e28af609b"><div class="ttname"><a href="classFitterBase.html#ada898e35bab22af470f2cd1e28af609b">FitterBase::fTestLikelihood</a></div><div class="ttdeci">bool fTestLikelihood</div><div class="ttdoc">Necessary for some fitting algorithms like PSO.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00158">FitterBase.h:158</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_aed2032b9c4a4f2248abe548f54f8dcc8"><div class="ttname"><a href="classFitterBase.html#aed2032b9c4a4f2248abe548f54f8dcc8">FitterBase::outTree</a></div><div class="ttdeci">TTree * outTree</div><div class="ttdoc">Output tree with posteriors.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00153">FitterBase.h:153</a></div></div>
+<div class="ttc" id="aclassManager_html_a6cfc76d6af382b177ac35be0a2fb5aab"><div class="ttname"><a href="classManager.html#a6cfc76d6af382b177ac35be0a2fb5aab">Manager::raw</a></div><div class="ttdeci">YAML::Node const  &amp; raw() const</div><div class="ttdoc">Return config.</div><div class="ttdef"><b>Definition:</b> <a href="Manager_8h_source.html#l00041">Manager.h:41</a></div></div>
 <div class="ttc" id="anamespaceM3_html_a87841bdbf0e0a2a733d9e4ca499f820d"><div class="ttname"><a href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a></div><div class="ttdeci">TFile * Open(const std::string &amp;Name, const std::string &amp;Type, const std::string &amp;File, const int Line)</div><div class="ttdoc">Opens a ROOT file with the given name and mode.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00627">HistogramUtils.cpp:627</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -456,7 +456,7 @@ Protected Attributes</h2></td></tr>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00037">MaCh3Logger.h:37</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00035">MaCh3Logger.h:35</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_ad5b2eb6377721e3ac95def22c2386bb1"><div class="ttname"><a href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a></div><div class="ttdeci">#define MACH3LOG_WARN</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00036">MaCh3Logger.h:36</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_a14b43b7f5e5a482da68d0e8c564a1494"><div class="ttname"><a href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">FitterBase::samples</a></div><div class="ttdeci">std::vector&lt; SampleHandlerBase * &gt; samples</div><div class="ttdoc">Sample holder.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00130">FitterBase.h:130</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_a14b43b7f5e5a482da68d0e8c564a1494"><div class="ttname"><a href="classFitterBase.html#a14b43b7f5e5a482da68d0e8c564a1494">FitterBase::samples</a></div><div class="ttdeci">std::vector&lt; SampleHandlerBase * &gt; samples</div><div class="ttdoc">Sample holder.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00129">FitterBase.h:129</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class used throughout MaCh3.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00023">MaCh3Exception.h:23</a></div></div>
 <div class="ttc" id="aclassSampleHandlerBase_html_abaee29f1c5b8229417a0de3b5a36ddb0"><div class="ttname"><a href="classSampleHandlerBase.html#abaee29f1c5b8229417a0de3b5a36ddb0">SampleHandlerBase::SaveAdditionalInfo</a></div><div class="ttdeci">virtual void SaveAdditionalInfo(TDirectory *Dir)</div><div class="ttdoc">Store additional info in a chan.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00041">SampleHandlerBase.h:41</a></div></div>
 <div class="ttc" id="aclassSampleHandlerBase_html_ac4b73a8841ff9bab2fb08b578ad4137f"><div class="ttname"><a href="classSampleHandlerBase.html#ac4b73a8841ff9bab2fb08b578ad4137f">SampleHandlerBase::GetNsamples</a></div><div class="ttdeci">virtual M3::int_t GetNsamples()</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerBase_8h_source.html#l00034">SampleHandlerBase.h:34</a></div></div>
@@ -539,15 +539,15 @@ Protected Attributes</h2></td></tr>
 <div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;  <a class="code" href="classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990">outputFile</a>-&gt;cd();</div>
 <div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;}</div>
 <div class="ttc" id="aYamlHelper_8h_html_a2d4f3247b6e13ef8c127ff66e699d3cb"><div class="ttname"><a href="YamlHelper_8h.html#a2d4f3247b6e13ef8c127ff66e699d3cb">YAMLtoTMacro</a></div><div class="ttdeci">TMacro YAMLtoTMacro(const YAML::Node &amp;yaml_node, const std::string &amp;name)</div><div class="ttdoc">Convert a YAML node to a ROOT TMacro object.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00167">YamlHelper.h:167</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_afeffc9d794c973a015aa12ec1a8f79da"><div class="ttname"><a href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">FitterBase::systematics</a></div><div class="ttdeci">std::vector&lt; ParameterHandlerBase * &gt; systematics</div><div class="ttdoc">Systematic holder.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00135">FitterBase.h:135</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a042501dd3e6e0395d48b5d94a60eb7c7"><div class="ttname"><a href="classParameterHandlerBase.html#a042501dd3e6e0395d48b5d94a60eb7c7">ParameterHandlerBase::GetNumParams</a></div><div class="ttdeci">int GetNumParams() const</div><div class="ttdoc">Get total number of parameters.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00213">ParameterHandlerBase.h:213</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a30d042b6518a1dcc561462ede5046828"><div class="ttname"><a href="classParameterHandlerBase.html#a30d042b6518a1dcc561462ede5046828">ParameterHandlerBase::GetParName</a></div><div class="ttdeci">std::string GetParName(const int i) const</div><div class="ttdoc">Get name of parameter.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00142">ParameterHandlerBase.h:142</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a623716c327d8a05b065173524553d11d"><div class="ttname"><a href="classParameterHandlerBase.html#a623716c327d8a05b065173524553d11d">ParameterHandlerBase::GetCovMatrix</a></div><div class="ttdeci">TMatrixDSym * GetCovMatrix() const</div><div class="ttdoc">Return covariance matrix.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00124">ParameterHandlerBase.h:124</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a65b61ae6c60d4eadbb06fdef9596cc7f"><div class="ttname"><a href="classParameterHandlerBase.html#a65b61ae6c60d4eadbb06fdef9596cc7f">ParameterHandlerBase::GetParFancyName</a></div><div class="ttdeci">std::string GetParFancyName(const int i) const</div><div class="ttdoc">Get fancy name of the Parameter.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00149">ParameterHandlerBase.h:149</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_afeffc9d794c973a015aa12ec1a8f79da"><div class="ttname"><a href="classFitterBase.html#afeffc9d794c973a015aa12ec1a8f79da">FitterBase::systematics</a></div><div class="ttdeci">std::vector&lt; ParameterHandlerBase * &gt; systematics</div><div class="ttdoc">Systematic holder.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00134">FitterBase.h:134</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a042501dd3e6e0395d48b5d94a60eb7c7"><div class="ttname"><a href="classParameterHandlerBase.html#a042501dd3e6e0395d48b5d94a60eb7c7">ParameterHandlerBase::GetNumParams</a></div><div class="ttdeci">int GetNumParams() const</div><div class="ttdoc">Get total number of parameters.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00212">ParameterHandlerBase.h:212</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a30d042b6518a1dcc561462ede5046828"><div class="ttname"><a href="classParameterHandlerBase.html#a30d042b6518a1dcc561462ede5046828">ParameterHandlerBase::GetParName</a></div><div class="ttdeci">std::string GetParName(const int i) const</div><div class="ttdoc">Get name of parameter.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00141">ParameterHandlerBase.h:141</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a623716c327d8a05b065173524553d11d"><div class="ttname"><a href="classParameterHandlerBase.html#a623716c327d8a05b065173524553d11d">ParameterHandlerBase::GetCovMatrix</a></div><div class="ttdeci">TMatrixDSym * GetCovMatrix() const</div><div class="ttdoc">Return covariance matrix.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00123">ParameterHandlerBase.h:123</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a65b61ae6c60d4eadbb06fdef9596cc7f"><div class="ttname"><a href="classParameterHandlerBase.html#a65b61ae6c60d4eadbb06fdef9596cc7f">ParameterHandlerBase::GetParFancyName</a></div><div class="ttdeci">std::string GetParFancyName(const int i) const</div><div class="ttdoc">Get fancy name of the Parameter.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00148">ParameterHandlerBase.h:148</a></div></div>
 <div class="ttc" id="aclassParameterHandlerBase_html_a6745aac0b811863722e4030421adee92"><div class="ttname"><a href="classParameterHandlerBase.html#a6745aac0b811863722e4030421adee92">ParameterHandlerBase::GetCorrelationMatrix</a></div><div class="ttdeci">TH2D * GetCorrelationMatrix()</div><div class="ttdoc">KS: Convert covariance matrix to correlation matrix and return TH2D which can be used for fancy plott...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8cpp_source.html#l01399">ParameterHandlerBase.cpp:1399</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_ab1ef5c9f3c3eb619752a073590f5fd53"><div class="ttname"><a href="classParameterHandlerBase.html#ab1ef5c9f3c3eb619752a073590f5fd53">ParameterHandlerBase::GetName</a></div><div class="ttdeci">std::string GetName() const</div><div class="ttdoc">Get name of covariance.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00139">ParameterHandlerBase.h:139</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_ad1397b3bc7853bceefab290fdd0f0fa9"><div class="ttname"><a href="classParameterHandlerBase.html#ad1397b3bc7853bceefab290fdd0f0fa9">ParameterHandlerBase::GetParInit</a></div><div class="ttdeci">double GetParInit(const int i) const</div><div class="ttdoc">Get prior parameter value.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00229">ParameterHandlerBase.h:229</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_ade58875564157c7c0aad0433498f955d"><div class="ttname"><a href="classParameterHandlerBase.html#ade58875564157c7c0aad0433498f955d">ParameterHandlerBase::GetConfig</a></div><div class="ttdeci">YAML::Node GetConfig() const</div><div class="ttdoc">Getter to return a copy of the YAML node.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00318">ParameterHandlerBase.h:318</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_ab1ef5c9f3c3eb619752a073590f5fd53"><div class="ttname"><a href="classParameterHandlerBase.html#ab1ef5c9f3c3eb619752a073590f5fd53">ParameterHandlerBase::GetName</a></div><div class="ttdeci">std::string GetName() const</div><div class="ttdoc">Get name of covariance.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00138">ParameterHandlerBase.h:138</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_ad1397b3bc7853bceefab290fdd0f0fa9"><div class="ttname"><a href="classParameterHandlerBase.html#ad1397b3bc7853bceefab290fdd0f0fa9">ParameterHandlerBase::GetParInit</a></div><div class="ttdeci">double GetParInit(const int i) const</div><div class="ttdoc">Get prior parameter value.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00228">ParameterHandlerBase.h:228</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_ade58875564157c7c0aad0433498f955d"><div class="ttname"><a href="classParameterHandlerBase.html#ade58875564157c7c0aad0433498f955d">ParameterHandlerBase::GetConfig</a></div><div class="ttdeci">YAML::Node GetConfig() const</div><div class="ttdoc">Getter to return a copy of the YAML node.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00317">ParameterHandlerBase.h:317</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -780,8 +780,8 @@ Protected Attributes</h2></td></tr>
 
 <p>Get name of class. </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00071">71</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;{<span class="keywordflow">return</span> <a class="code" href="classFitterBase.html#a6c5b6c38ba4c6f482592147c7e6b3b95">AlgorithmName</a>;};</div>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00070">70</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;{<span class="keywordflow">return</span> <a class="code" href="classFitterBase.html#a6c5b6c38ba4c6f482592147c7e6b3b95">AlgorithmName</a>;};</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -912,15 +912,15 @@ Protected Attributes</h2></td></tr>
 <div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Scanning {} {} with {} steps, from [{:.2f} , {:.2f}], CV = {:.2f}&quot;</span>, suffix, name, n_points, lower, upper, CentralValue);</div>
 <div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;}</div>
 <div class="ttc" id="aclassFitterBase_html_a9442667a9fd21fa081e0ed7322caa193"><div class="ttname"><a href="classFitterBase.html#a9442667a9fd21fa081e0ed7322caa193">FitterBase::GetScanRange</a></div><div class="ttdeci">bool GetScanRange(std::map&lt; std::string, std::vector&lt; double &gt;&gt; &amp;scanRanges) const</div><div class="ttdoc">YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D....</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8cpp_source.html#l00523">FitterBase.cpp:523</a></div></div>
-<div class="ttc" id="aclassPCAHandler_html_a5a42efb45ecf02e0369ca02df5c2d7e7"><div class="ttname"><a href="classPCAHandler.html#a5a42efb45ecf02e0369ca02df5c2d7e7">PCAHandler::GetParPropPCA</a></div><div class="ttdeci">double GetParPropPCA(const int i) const</div><div class="ttdoc">Get current parameter value using PCA.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00176">PCAHandler.h:176</a></div></div>
-<div class="ttc" id="aclassPCAHandler_html_a86b25b9f099bf94ab18c20857358d9a2"><div class="ttname"><a href="classPCAHandler.html#a86b25b9f099bf94ab18c20857358d9a2">PCAHandler::GetPreFitValuePCA</a></div><div class="ttdeci">double GetPreFitValuePCA(const int i) const</div><div class="ttdoc">Get current parameter value using PCA.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00183">PCAHandler.h:183</a></div></div>
-<div class="ttc" id="aclassPCAHandler_html_aa56af9e5ecb46813de98c51acb4325a0"><div class="ttname"><a href="classPCAHandler.html#aa56af9e5ecb46813de98c51acb4325a0">PCAHandler::GetEigenValues</a></div><div class="ttdeci">const TVectorD GetEigenValues() const</div><div class="ttdoc">Get eigen values for all parameters, if you want for decomposed only parameters use GetEigenValuesMas...</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00202">PCAHandler.h:202</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a3d9026386bbb47c798783b0e37334606"><div class="ttname"><a href="classParameterHandlerBase.html#a3d9026386bbb47c798783b0e37334606">ParameterHandlerBase::GetUpperBound</a></div><div class="ttdeci">double GetUpperBound(const int i) const</div><div class="ttdoc">Get upper parameter bound in which it is physically valid.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00232">ParameterHandlerBase.h:232</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a6909632638e12138192689712d82f91c"><div class="ttname"><a href="classParameterHandlerBase.html#a6909632638e12138192689712d82f91c">ParameterHandlerBase::GetPCAHandler</a></div><div class="ttdeci">PCAHandler * GetPCAHandler() const</div><div class="ttdoc">Get pointer for PCAHandler.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00333">ParameterHandlerBase.h:333</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a89bf3cd86b7d8b120518f5580c496f26"><div class="ttname"><a href="classParameterHandlerBase.html#a89bf3cd86b7d8b120518f5580c496f26">ParameterHandlerBase::GetLowerBound</a></div><div class="ttdeci">double GetLowerBound(const int i) const</div><div class="ttdoc">Get lower parameter bound in which it is physically valid.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00235">ParameterHandlerBase.h:235</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_aaa08790cadd3b3fb9b74f90c2c74ae66"><div class="ttname"><a href="classParameterHandlerBase.html#aaa08790cadd3b3fb9b74f90c2c74ae66">ParameterHandlerBase::IsPCA</a></div><div class="ttdeci">bool IsPCA() const</div><div class="ttdoc">is PCA, can use to query e.g. LLH scans</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00315">ParameterHandlerBase.h:315</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_adbc5117b45107ac274689b1708fadf0e"><div class="ttname"><a href="classParameterHandlerBase.html#adbc5117b45107ac274689b1708fadf0e">ParameterHandlerBase::GetDiagonalError</a></div><div class="ttdeci">double GetDiagonalError(const int i) const</div><div class="ttdoc">Get diagonal error for ith parameter.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00155">ParameterHandlerBase.h:155</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_adee35591ee66b9ffa90b33dfb5127841"><div class="ttname"><a href="classParameterHandlerBase.html#adee35591ee66b9ffa90b33dfb5127841">ParameterHandlerBase::GetParProp</a></div><div class="ttdeci">double GetParProp(const int i) const</div><div class="ttdoc">Get proposed parameter value.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00220">ParameterHandlerBase.h:220</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_a5a42efb45ecf02e0369ca02df5c2d7e7"><div class="ttname"><a href="classPCAHandler.html#a5a42efb45ecf02e0369ca02df5c2d7e7">PCAHandler::GetParPropPCA</a></div><div class="ttdeci">double GetParPropPCA(const int i) const</div><div class="ttdoc">Get current parameter value using PCA.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00174">PCAHandler.h:174</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_a86b25b9f099bf94ab18c20857358d9a2"><div class="ttname"><a href="classPCAHandler.html#a86b25b9f099bf94ab18c20857358d9a2">PCAHandler::GetPreFitValuePCA</a></div><div class="ttdeci">double GetPreFitValuePCA(const int i) const</div><div class="ttdoc">Get current parameter value using PCA.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00181">PCAHandler.h:181</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_aa56af9e5ecb46813de98c51acb4325a0"><div class="ttname"><a href="classPCAHandler.html#aa56af9e5ecb46813de98c51acb4325a0">PCAHandler::GetEigenValues</a></div><div class="ttdeci">const TVectorD GetEigenValues() const</div><div class="ttdoc">Get eigen values for all parameters, if you want for decomposed only parameters use GetEigenValuesMas...</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00200">PCAHandler.h:200</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a3d9026386bbb47c798783b0e37334606"><div class="ttname"><a href="classParameterHandlerBase.html#a3d9026386bbb47c798783b0e37334606">ParameterHandlerBase::GetUpperBound</a></div><div class="ttdeci">double GetUpperBound(const int i) const</div><div class="ttdoc">Get upper parameter bound in which it is physically valid.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00231">ParameterHandlerBase.h:231</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a6909632638e12138192689712d82f91c"><div class="ttname"><a href="classParameterHandlerBase.html#a6909632638e12138192689712d82f91c">ParameterHandlerBase::GetPCAHandler</a></div><div class="ttdeci">PCAHandler * GetPCAHandler() const</div><div class="ttdoc">Get pointer for PCAHandler.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00332">ParameterHandlerBase.h:332</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a89bf3cd86b7d8b120518f5580c496f26"><div class="ttname"><a href="classParameterHandlerBase.html#a89bf3cd86b7d8b120518f5580c496f26">ParameterHandlerBase::GetLowerBound</a></div><div class="ttdeci">double GetLowerBound(const int i) const</div><div class="ttdoc">Get lower parameter bound in which it is physically valid.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00234">ParameterHandlerBase.h:234</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_aaa08790cadd3b3fb9b74f90c2c74ae66"><div class="ttname"><a href="classParameterHandlerBase.html#aaa08790cadd3b3fb9b74f90c2c74ae66">ParameterHandlerBase::IsPCA</a></div><div class="ttdeci">bool IsPCA() const</div><div class="ttdoc">is PCA, can use to query e.g. LLH scans</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00314">ParameterHandlerBase.h:314</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_adbc5117b45107ac274689b1708fadf0e"><div class="ttname"><a href="classParameterHandlerBase.html#adbc5117b45107ac274689b1708fadf0e">ParameterHandlerBase::GetDiagonalError</a></div><div class="ttdeci">double GetDiagonalError(const int i) const</div><div class="ttdoc">Get diagonal error for ith parameter.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00154">ParameterHandlerBase.h:154</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_adee35591ee66b9ffa90b33dfb5127841"><div class="ttname"><a href="classParameterHandlerBase.html#adee35591ee66b9ffa90b33dfb5127841">ParameterHandlerBase::GetParProp</a></div><div class="ttdeci">double GetParProp(const int i) const</div><div class="ttdoc">Get proposed parameter value.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00219">ParameterHandlerBase.h:219</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1043,7 +1043,7 @@ Protected Attributes</h2></td></tr>
 <div class="line"><a name="l00931"></a><span class="lineno">  931</span>&#160;  }</div>
 <div class="line"><a name="l00932"></a><span class="lineno">  932</span>&#160;}</div>
 <div class="ttc" id="aclassFitterBase_html_a018e8d09a62bca19840e1321b49df2c0"><div class="ttname"><a href="classFitterBase.html#a018e8d09a62bca19840e1321b49df2c0">FitterBase::RunLLHScan</a></div><div class="ttdeci">void RunLLHScan()</div><div class="ttdoc">Perform a 1D likelihood scan.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8cpp_source.html#l00622">FitterBase.cpp:622</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html"><div class="ttname"><a href="classParameterHandlerBase.html">ParameterHandlerBase</a></div><div class="ttdoc">Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00016">ParameterHandlerBase.h:16</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html"><div class="ttname"><a href="classParameterHandlerBase.html">ParameterHandlerBase</a></div><div class="ttdoc">Base class responsible for handling of systematic error parameters. Capable of using PCA or using ada...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00015">ParameterHandlerBase.h:15</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1142,12 +1142,12 @@ Protected Attributes</h2></td></tr>
 <div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;  <a class="code" href="classFitterBase.html#a3bfd8f69df891d03bae0587cd1a1e1b7">OutputPrepared</a> = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a07ff6d6a15b24f94afc88a1b89779beb"><div class="ttname"><a href="MaCh3Logger_8h.html#a07ff6d6a15b24f94afc88a1b89779beb">MACH3LOG_CRITICAL</a></div><div class="ttdeci">#define MACH3LOG_CRITICAL</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00038">MaCh3Logger.h:38</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_a187dd22c17f9e96e5a7e2fb2371abace"><div class="ttname"><a href="classFitterBase.html#a187dd22c17f9e96e5a7e2fb2371abace">FitterBase::logLProp</a></div><div class="ttdeci">double logLProp</div><div class="ttdoc">proposed likelihood</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00116">FitterBase.h:116</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_a6319d2ea50984860475bbc6c708b0d90"><div class="ttname"><a href="classFitterBase.html#a6319d2ea50984860475bbc6c708b0d90">FitterBase::accProb</a></div><div class="ttdeci">double accProb</div><div class="ttdoc">current acceptance prob</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00118">FitterBase.h:118</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_a6f435e161c96eea778aba844115428d4"><div class="ttname"><a href="classFitterBase.html#a6f435e161c96eea778aba844115428d4">FitterBase::sample_llh</a></div><div class="ttdeci">std::vector&lt; double &gt; sample_llh</div><div class="ttdoc">store the llh breakdowns</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00125">FitterBase.h:125</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_a8354e9a7a9cc534277ff76ab37c9a763"><div class="ttname"><a href="classFitterBase.html#a8354e9a7a9cc534277ff76ab37c9a763">FitterBase::stepTime</a></div><div class="ttdeci">double stepTime</div><div class="ttdoc">Time of single step.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00142">FitterBase.h:142</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_abfb6f10720764d8bbbe43754fd5cd976"><div class="ttname"><a href="classFitterBase.html#abfb6f10720764d8bbbe43754fd5cd976">FitterBase::logLCurr</a></div><div class="ttdeci">double logLCurr</div><div class="ttdoc">current likelihood</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00114">FitterBase.h:114</a></div></div>
-<div class="ttc" id="aclassFitterBase_html_ace2eeca9829f63200c3f956c600d09ff"><div class="ttname"><a href="classFitterBase.html#ace2eeca9829f63200c3f956c600d09ff">FitterBase::syst_llh</a></div><div class="ttdeci">std::vector&lt; double &gt; syst_llh</div><div class="ttdoc">systematic llh breakdowns</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00127">FitterBase.h:127</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_a187dd22c17f9e96e5a7e2fb2371abace"><div class="ttname"><a href="classFitterBase.html#a187dd22c17f9e96e5a7e2fb2371abace">FitterBase::logLProp</a></div><div class="ttdeci">double logLProp</div><div class="ttdoc">proposed likelihood</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00115">FitterBase.h:115</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_a6319d2ea50984860475bbc6c708b0d90"><div class="ttname"><a href="classFitterBase.html#a6319d2ea50984860475bbc6c708b0d90">FitterBase::accProb</a></div><div class="ttdeci">double accProb</div><div class="ttdoc">current acceptance prob</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00117">FitterBase.h:117</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_a6f435e161c96eea778aba844115428d4"><div class="ttname"><a href="classFitterBase.html#a6f435e161c96eea778aba844115428d4">FitterBase::sample_llh</a></div><div class="ttdeci">std::vector&lt; double &gt; sample_llh</div><div class="ttdoc">store the llh breakdowns</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00124">FitterBase.h:124</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_a8354e9a7a9cc534277ff76ab37c9a763"><div class="ttname"><a href="classFitterBase.html#a8354e9a7a9cc534277ff76ab37c9a763">FitterBase::stepTime</a></div><div class="ttdeci">double stepTime</div><div class="ttdoc">Time of single step.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00141">FitterBase.h:141</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_abfb6f10720764d8bbbe43754fd5cd976"><div class="ttname"><a href="classFitterBase.html#abfb6f10720764d8bbbe43754fd5cd976">FitterBase::logLCurr</a></div><div class="ttdeci">double logLCurr</div><div class="ttdoc">current likelihood</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00113">FitterBase.h:113</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_ace2eeca9829f63200c3f956c600d09ff"><div class="ttname"><a href="classFitterBase.html#ace2eeca9829f63200c3f956c600d09ff">FitterBase::syst_llh</a></div><div class="ttdeci">std::vector&lt; double &gt; syst_llh</div><div class="ttdoc">systematic llh breakdowns</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00126">FitterBase.h:126</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1221,7 +1221,7 @@ Protected Attributes</h2></td></tr>
 <div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;    Correlation-&gt;Write(<span class="stringliteral">&quot;Correlation&quot;</span>);</div>
 <div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;  }</div>
 <div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;}</div>
-<div class="ttc" id="aRHat_8cpp_html_a871d6466cea2597401bdb203293f4033"><div class="ttname"><a href="RHat_8cpp.html#a871d6466cea2597401bdb203293f4033">BranchNames</a></div><div class="ttdeci">std::vector&lt; TString &gt; BranchNames</div><div class="ttdef"><b>Definition:</b> <a href="RHat_8cpp_source.html#l00052">RHat.cpp:52</a></div></div>
+<div class="ttc" id="aRHat_8cpp_html_a871d6466cea2597401bdb203293f4033"><div class="ttname"><a href="RHat_8cpp.html#a871d6466cea2597401bdb203293f4033">BranchNames</a></div><div class="ttdeci">std::vector&lt; TString &gt; BranchNames</div><div class="ttdef"><b>Definition:</b> <a href="RHat_8cpp_source.html#l00054">RHat.cpp:54</a></div></div>
 <div class="ttc" id="aclassMCMCProcessor_html"><div class="ttname"><a href="classMCMCProcessor.html">MCMCProcessor</a></div><div class="ttdoc">Class responsible for processing MCMC chains, performing diagnostics, generating plots,...</div><div class="ttdef"><b>Definition:</b> <a href="MCMCProcessor_8h_source.html#l00058">MCMCProcessor.h:58</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -1620,8 +1620,8 @@ Protected Attributes</h2></td></tr>
 <div class="line"><a name="l01286"></a><span class="lineno"> 1286</span>&#160;  LLHMap-&gt;Write();</div>
 <div class="line"><a name="l01287"></a><span class="lineno"> 1287</span>&#160;}</div>
 <div class="ttc" id="aYamlHelper_8h_html_ad2340a340fd6649a6d220abc16d4757b"><div class="ttname"><a href="YamlHelper_8h.html#ad2340a340fd6649a6d220abc16d4757b">CheckNodeExists</a></div><div class="ttdeci">bool CheckNodeExists(const YAML::Node &amp;node, Args... args)</div><div class="ttdoc">KS: Wrapper function to call the recursive helper.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00060">YamlHelper.h:60</a></div></div>
-<div class="ttc" id="aclassPCAHandler_html_a737c5cad5cdff60c0a945aaddd2a6da3"><div class="ttname"><a href="classPCAHandler.html#a737c5cad5cdff60c0a945aaddd2a6da3">PCAHandler::SetParPropPCA</a></div><div class="ttdeci">void SetParPropPCA(const int i, const double value)</div><div class="ttdoc">Set proposed value for parameter in PCA base.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00158">PCAHandler.h:158</a></div></div>
-<div class="ttc" id="aclassParameterHandlerBase_html_a3c29c3fa2b404ede339636cf5baf030f"><div class="ttname"><a href="classParameterHandlerBase.html#a3c29c3fa2b404ede339636cf5baf030f">ParameterHandlerBase::SetParProp</a></div><div class="ttdeci">void SetParProp(const int i, const double val)</div><div class="ttdoc">Set proposed parameter value.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00057">ParameterHandlerBase.h:57</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_a737c5cad5cdff60c0a945aaddd2a6da3"><div class="ttname"><a href="classPCAHandler.html#a737c5cad5cdff60c0a945aaddd2a6da3">PCAHandler::SetParPropPCA</a></div><div class="ttdeci">void SetParPropPCA(const int i, const double value)</div><div class="ttdoc">Set proposed value for parameter in PCA base.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00156">PCAHandler.h:156</a></div></div>
+<div class="ttc" id="aclassParameterHandlerBase_html_a3c29c3fa2b404ede339636cf5baf030f"><div class="ttname"><a href="classParameterHandlerBase.html#a3c29c3fa2b404ede339636cf5baf030f">ParameterHandlerBase::SetParProp</a></div><div class="ttdeci">void SetParProp(const int i, const double val)</div><div class="ttdoc">Set proposed parameter value.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerBase_8h_source.html#l00056">ParameterHandlerBase.h:56</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2256,7 +2256,7 @@ Protected Attributes</h2></td></tr>
 <div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160; </div>
 <div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  <a class="code" href="classFitterBase.html#a588678c71d816f48ba3c140543dbe916">SettingsSaved</a> = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;}</div>
-<div class="ttc" id="aclassFitterBase_html_a10aff47013f10946a769ffe3b1af641a"><div class="ttname"><a href="classFitterBase.html#a10aff47013f10946a769ffe3b1af641a">FitterBase::GetName</a></div><div class="ttdeci">std::string GetName() const</div><div class="ttdoc">Get name of class.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00071">FitterBase.h:71</a></div></div>
+<div class="ttc" id="aclassFitterBase_html_a10aff47013f10946a769ffe3b1af641a"><div class="ttname"><a href="classFitterBase.html#a10aff47013f10946a769ffe3b1af641a">FitterBase::GetName</a></div><div class="ttdeci">std::string GetName() const</div><div class="ttdoc">Get name of class.</div><div class="ttdef"><b>Definition:</b> <a href="FitterBase_8h_source.html#l00070">FitterBase.h:70</a></div></div>
 <div class="ttc" id="aclassManager_html_ab5c47551f90811aaca9eea0102e16a52"><div class="ttname"><a href="classManager.html#ab5c47551f90811aaca9eea0102e16a52">Manager::SaveSettings</a></div><div class="ttdeci">void SaveSettings(TFile *const OutputFile) const</div><div class="ttdoc">Add manager useful information's to TFile, in most cases to Fitter.</div><div class="ttdef"><b>Definition:</b> <a href="Manager_8cpp_source.html#l00049">Manager.cpp:49</a></div></div>
 <div class="ttc" id="anamespaceMaCh3Utils_html_aa406fc13341d99d4ca7a4f43bbb38019"><div class="ttname"><a href="namespaceMaCh3Utils.html#aa406fc13341d99d4ca7a4f43bbb38019">MaCh3Utils::getValue</a></div><div class="ttdeci">int getValue(const std::string &amp;Type)</div><div class="ttdoc">CW: Get info like RAM.</div><div class="ttdef"><b>Definition:</b> <a href="Monitor_8cpp_source.html#l00251">Monitor.cpp:251</a></div></div>
 </div><!-- fragment -->
@@ -2389,7 +2389,7 @@ Protected Attributes</h2></td></tr>
 
 <p>counts accepted steps </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00120">120</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00119">119</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
 
 </div>
 </div>
@@ -2415,7 +2415,7 @@ Protected Attributes</h2></td></tr>
 
 <p>current acceptance prob </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00118">118</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00117">117</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
 
 </div>
 </div>
@@ -2441,7 +2441,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Name of fitting algorithm that is being used. </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00169">169</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00168">168</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
 
 </div>
 </div>
@@ -2467,7 +2467,7 @@ Protected Attributes</h2></td></tr>
 
 <p>auto save every N steps </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00156">156</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00155">155</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
 
 </div>
 </div>
@@ -2493,7 +2493,7 @@ Protected Attributes</h2></td></tr>
 
 <p>tells global time how long fit took </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00138">138</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00137">137</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
 
 </div>
 </div>
@@ -2519,7 +2519,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Output cov folder. </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00150">150</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00149">149</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
 
 </div>
 </div>
@@ -2545,7 +2545,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Checks if file saved not repeat some operations. </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00162">162</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00161">161</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
 
 </div>
 </div>
@@ -2571,7 +2571,7 @@ Protected Attributes</h2></td></tr>
 
 <p>The manager for configuration handling. </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00109">109</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00108">108</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
 
 </div>
 </div>
@@ -2597,7 +2597,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Necessary for some fitting algorithms like <a class="el" href="classPSO.html" title="Class PSO, consist of a vector of object Class Particle and global best Takes in the size (number of ...">PSO</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00159">159</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00158">158</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
 
 </div>
 </div>
@@ -2623,7 +2623,7 @@ Protected Attributes</h2></td></tr>
 
 <p>current likelihood </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00114">114</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00113">113</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
 
 </div>
 </div>
@@ -2649,7 +2649,7 @@ Protected Attributes</h2></td></tr>
 
 <p>proposed likelihood </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00116">116</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00115">115</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
 
 </div>
 </div>
@@ -2675,7 +2675,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Output. </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00148">148</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00147">147</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
 
 </div>
 </div>
@@ -2701,7 +2701,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Checks if output prepared not repeat some operations. </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00166">166</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00165">165</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
 
 </div>
 </div>
@@ -2727,7 +2727,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Output tree with posteriors. </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00154">154</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00153">153</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
 
 </div>
 </div>
@@ -2753,7 +2753,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Random number. </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00145">145</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00144">144</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
 
 </div>
 </div>
@@ -2779,7 +2779,7 @@ Protected Attributes</h2></td></tr>
 
 <p>store the llh breakdowns </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00125">125</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00124">124</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
 
 </div>
 </div>
@@ -2805,7 +2805,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Output sample folder. </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00152">152</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00151">151</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
 
 </div>
 </div>
@@ -2831,7 +2831,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Sample holder. </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00130">130</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00129">129</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
 
 </div>
 </div>
@@ -2857,7 +2857,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Checks if setting saved not repeat some operations. </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00164">164</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00163">163</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
 
 </div>
 </div>
@@ -2883,7 +2883,7 @@ Protected Attributes</h2></td></tr>
 
 <p>current state </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00112">112</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00111">111</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
 
 </div>
 </div>
@@ -2909,7 +2909,7 @@ Protected Attributes</h2></td></tr>
 
 <p>tells how long single step/fit iteration took </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00140">140</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00139">139</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
 
 </div>
 </div>
@@ -2935,7 +2935,7 @@ Protected Attributes</h2></td></tr>
 
 <p>step start, by default 0 if we start from previous chain then it will be different </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00122">122</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00121">121</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
 
 </div>
 </div>
@@ -2961,7 +2961,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Time of single step. </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00142">142</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00141">141</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
 
 </div>
 </div>
@@ -2987,7 +2987,7 @@ Protected Attributes</h2></td></tr>
 
 <p>systematic llh breakdowns </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00127">127</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00126">126</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
 
 </div>
 </div>
@@ -3013,7 +3013,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Systematic holder. </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00135">135</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00134">134</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
 
 </div>
 </div>
@@ -3039,7 +3039,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Total number of samples used, single SampleHandler can store more than one analysis sample! </p>
 
-<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00132">132</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FitterBase_8h_source.html#l00131">131</a> of file <a class="el" href="FitterBase_8h_source.html">FitterBase.h</a>.</p>
 
 </div>
 </div>

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['faq_3656',['FAQ',['../FAQ.html',1,'']]]
+  ['nuoscillator_3657',['NuOscillator',['../md_Doc_User_Guide_07__Oscillator.html',1,'']]]
 ];

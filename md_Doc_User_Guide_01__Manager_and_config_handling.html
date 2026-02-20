@@ -77,21 +77,21 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="el" href="classManager.html" title="The manager class is responsible for managing configurations and settings.">Manager</a> class is meant to handle or manage configs. MaCh3 uses yaml configs. There are several necessary entires your config should have</p>
-<h1><a class="anchor" id="autotoc_md54"></a>
+<h1><a class="anchor" id="autotoc_md96"></a>
 General</h1>
 <p>Here you specify name of the output file and whether you want to run data fit, Asimov fit or fake data fit. </p><div class="fragment"><div class="line">General:</div>
 <div class="line">  OutputFile: &quot;blarb.root&quot;</div>
 <div class="line">  Asimov: True</div>
 <div class="line">  RealData: False</div>
 <div class="line">  FakeData: False</div>
-</div><!-- fragment --> <h1><a class="anchor" id="autotoc_md55"></a>
+</div><!-- fragment --> <h1><a class="anchor" id="autotoc_md97"></a>
 Systematics</h1>
 <p>Here you load yaml configs describing each systematic type. What is important you load vector configs which are later merged into one Covariance Class which describes cross-section, flux etc. </p><div class="fragment"><div class="line">Systematics:</div>
 <div class="line">  XsecCovFile: [&quot;inputs/SystematicsOA2024XsecSplineParams_noParName.yaml&quot;, &quot;inputs/SystematicsOA2024XsecNormParams_noParName.yaml&quot;, &quot;inputs/SystematicsOA2024XsecFunctionalParams_noParName.yaml&quot;, &quot;inputs/SystematicsOA2024FluxParams_noParName.yaml&quot;]</div>
 <div class="line">  XsecCovName: &quot;xsec_cov&quot;</div>
 <div class="line">  OscCovFile: &quot;inputs/osc_covariance_2021_PDG2021_v1.root&quot;</div>
 <div class="line">  OscCovName: &quot;osc_cov&quot;</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md56"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md98"></a>
 MCMC</h1>
 <p>Number of steps for MCMC algorithm, and step scale. To learn more about step scale please visit chapter about diagnostic and step size tunning. </p><div class="fragment"><div class="line">MCMC:</div>
 <div class="line">  NSteps: 2000000</div>
@@ -103,7 +103,7 @@ MCMC</h1>
 <div class="line">  BurnInSteps: 200000</div>
 <div class="line">  XsecStepScale: 0.01</div>
 <div class="line">  NdDetStepScale: 0.035</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md57"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md99"></a>
 Likelihood type</h1>
 <p>Likelihood type which will be used in the fit. </p><div class="fragment"><div class="line">LikelihoodOptions:</div>
 <div class="line">  #False means you calculate W2 histogram only during the first reweight, advisable for Barlow-Beesto</div>
@@ -112,7 +112,7 @@ Likelihood type</h1>
 <div class="line">  #TestStatistic: &quot;Poisson&quot;</div>
 <div class="line">  #TestStatistic: &quot;DembinskiAbdelmottele&quot;</div>
 <div class="line">  #TestStatistic: &quot;IceCube&quot;</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md58"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md100"></a>
 Overriding</h1>
 <p>There are two ways how to easily override configs: </p><div class="fragment"><div class="line">./bin/MCMCTutorial TutorialConfigs/FitterConfig.yaml General:MCMC:NSteps:100000</div>
 </div><!-- fragment --><p> This is useful for overriding single arguments. If you are interested in overriding multiple arguments, you can override the default config with an additional configuration.</p>

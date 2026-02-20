@@ -84,51 +84,51 @@ $(function() {
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="HistogramUtils_8h.html">Samples/HistogramUtils.h</a>&quot;</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="Manager_8h.html">Manager/Manager.h</a>&quot;</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160; </div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160; </div>
-<div class="line"><a name="l00011"></a><span class="lineno"><a class="line" href="SmearChain_8cpp.html#ae234755b7b483f97d2a48d8959e90a18">   11</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="SmearChain_8cpp.html#ae234755b7b483f97d2a48d8959e90a18">DiagMCMC</a>(<span class="keyword">const</span> std::string&amp; inputFile, <span class="keyword">const</span> std::string&amp; <a class="code" href="ProcessMCMC_8cpp.html#a13056efd080ab16304b6f7be0ebf0a61">config</a>)</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;{</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;File for study: {}&quot;</span>, inputFile);</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;  YAML::Node Settings = <a class="code" href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">M3OpenConfig</a>(<a class="code" href="ProcessMCMC_8cpp.html#a13056efd080ab16304b6f7be0ebf0a61">config</a>);</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  <span class="comment">// Make the processor</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  <span class="keyword">auto</span> Processor = std::make_unique&lt;MCMCProcessor&gt;(inputFile);</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  Processor-&gt;SetOutputSuffix(<span class="stringliteral">&quot;_Smear_MCMC&quot;</span>);</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  Processor-&gt;Initialise();</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span>&amp; Smear = Settings[<span class="stringliteral">&quot;SmearChain&quot;</span>];</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  std::vector&lt;std::string&gt; Names = Get&lt;std::vector&lt;std::string&gt;&gt;(Smear[<span class="stringliteral">&quot;Smear&quot;</span>][0], __FILE__, __LINE__);</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  std::vector&lt;double&gt; ErrorValue = Get&lt;std::vector&lt;double&gt;&gt;(Smear[<span class="stringliteral">&quot;Smear&quot;</span>][1], __FILE__, __LINE__);</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <span class="keywordtype">bool</span> SaveUnsmearedBranch = GetFromManager&lt;bool&gt;(Smear[<span class="stringliteral">&quot;SaveUnsmearedBranch&quot;</span>], <span class="keyword">false</span>);</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  Processor-&gt;SmearChain(Names, ErrorValue, SaveUnsmearedBranch);</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;}</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="SmearChain_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">   31</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="SmearChain_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> *argv[]) {</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#aa603c55ea73cd86d1994901227883e1e">SetMaCh3LoggerFormat</a>();</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <span class="keywordflow">if</span> (argc != 3)</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  {</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;How to use: {} MCMC_Output.root config&quot;</span>, argv[0]);</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  }</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Producing single fit output&quot;</span>);</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  std::string filename = argv[1];</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  std::string <a class="code" href="ProcessMCMC_8cpp.html#a13056efd080ab16304b6f7be0ebf0a61">config</a> = argv[2];</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <a class="code" href="SmearChain_8cpp.html#ae234755b7b483f97d2a48d8959e90a18">DiagMCMC</a>(filename, <a class="code" href="ProcessMCMC_8cpp.html#a13056efd080ab16304b6f7be0ebf0a61">config</a>);</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;}</div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160; </div>
+<div class="line"><a name="l00012"></a><span class="lineno"><a class="line" href="SmearChain_8cpp.html#aaea0692d40005c70e3328be6bebc8588">   12</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="SmearChain_8cpp.html#aaea0692d40005c70e3328be6bebc8588">SmearChain</a>(<span class="keyword">const</span> std::string&amp; inputFile, <span class="keyword">const</span> std::string&amp; <a class="code" href="ProcessMCMC_8cpp.html#a13056efd080ab16304b6f7be0ebf0a61">config</a>)</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;{</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;File for study: {}&quot;</span>, inputFile);</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;  YAML::Node Settings = <a class="code" href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">M3OpenConfig</a>(<a class="code" href="ProcessMCMC_8cpp.html#a13056efd080ab16304b6f7be0ebf0a61">config</a>);</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  <span class="comment">// Make the processor</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  <span class="keyword">auto</span> Processor = std::make_unique&lt;MCMCProcessor&gt;(inputFile);</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  Processor-&gt;SetOutputSuffix(<span class="stringliteral">&quot;_Smear_MCMC&quot;</span>);</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  Processor-&gt;Initialise();</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span>&amp; Smear = Settings[<span class="stringliteral">&quot;SmearChain&quot;</span>];</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  std::vector&lt;std::string&gt; Names = Get&lt;std::vector&lt;std::string&gt;&gt;(Smear[<span class="stringliteral">&quot;Smear&quot;</span>][0], __FILE__, __LINE__);</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  std::vector&lt;double&gt; ErrorValue = Get&lt;std::vector&lt;double&gt;&gt;(Smear[<span class="stringliteral">&quot;Smear&quot;</span>][1], __FILE__, __LINE__);</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  <span class="keywordtype">bool</span> SaveUnsmearedBranch = GetFromManager&lt;bool&gt;(Smear[<span class="stringliteral">&quot;SaveUnsmearedBranch&quot;</span>], <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  Processor-&gt;SmearChain(Names, ErrorValue, SaveUnsmearedBranch);</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;}</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
+<div class="line"><a name="l00032"></a><span class="lineno"><a class="line" href="SmearChain_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">   32</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="SmearChain_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> *argv[]) {</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#aa603c55ea73cd86d1994901227883e1e">SetMaCh3LoggerFormat</a>();</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="keywordflow">if</span> (argc != 3)</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  {</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;How to use: {} MCMC_Output.root config&quot;</span>, argv[0]);</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  }</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Producing single fit output&quot;</span>);</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  std::string filename = argv[1];</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  std::string <a class="code" href="ProcessMCMC_8cpp.html#a13056efd080ab16304b6f7be0ebf0a61">config</a> = argv[2];</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <a class="code" href="SmearChain_8cpp.html#aaea0692d40005c70e3328be6bebc8588">SmearChain</a>(filename, <a class="code" href="ProcessMCMC_8cpp.html#a13056efd080ab16304b6f7be0ebf0a61">config</a>);</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;}</div>
 <div class="ttc" id="aHistogramUtils_8h_html"><div class="ttname"><a href="HistogramUtils_8h.html">HistogramUtils.h</a></div></div>
 <div class="ttc" id="aMCMCProcessor_8h_html"><div class="ttname"><a href="MCMCProcessor_8h.html">MCMCProcessor.h</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00037">MaCh3Logger.h:37</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00035">MaCh3Logger.h:35</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_aa603c55ea73cd86d1994901227883e1e"><div class="ttname"><a href="MaCh3Logger_8h.html#aa603c55ea73cd86d1994901227883e1e">SetMaCh3LoggerFormat</a></div><div class="ttdeci">void SetMaCh3LoggerFormat()</div><div class="ttdoc">Set messaging format of the logger.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00061">MaCh3Logger.h:61</a></div></div>
 <div class="ttc" id="aManager_8h_html"><div class="ttname"><a href="Manager_8h.html">Manager.h</a></div></div>
-<div class="ttc" id="aProcessMCMC_8cpp_html_a13056efd080ab16304b6f7be0ebf0a61"><div class="ttname"><a href="ProcessMCMC_8cpp.html#a13056efd080ab16304b6f7be0ebf0a61">config</a></div><div class="ttdeci">std::string config</div><div class="ttdef"><b>Definition:</b> <a href="ProcessMCMC_8cpp_source.html#l00028">ProcessMCMC.cpp:28</a></div></div>
-<div class="ttc" id="aSmearChain_8cpp_html_a0ddf1224851353fc92bfbff6f499fa97"><div class="ttname"><a href="SmearChain_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a></div><div class="ttdeci">int main(int argc, char *argv[])</div><div class="ttdef"><b>Definition:</b> <a href="SmearChain_8cpp_source.html#l00031">SmearChain.cpp:31</a></div></div>
-<div class="ttc" id="aSmearChain_8cpp_html_ae234755b7b483f97d2a48d8959e90a18"><div class="ttname"><a href="SmearChain_8cpp.html#ae234755b7b483f97d2a48d8959e90a18">DiagMCMC</a></div><div class="ttdeci">void DiagMCMC(const std::string &amp;inputFile, const std::string &amp;config)</div><div class="ttdoc">Main function creating MCMCProcessor and calling Smear Chain.</div><div class="ttdef"><b>Definition:</b> <a href="SmearChain_8cpp_source.html#l00011">SmearChain.cpp:11</a></div></div>
-<div class="ttc" id="aYamlHelper_8h_html_ad802d5a5acdc16a796b21af74f6f5f59"><div class="ttname"><a href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">M3OpenConfig</a></div><div class="ttdeci">#define M3OpenConfig(filename)</div><div class="ttdoc">Macro to simplify calling LoadYaml with file and line info.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00586">YamlHelper.h:586</a></div></div>
+<div class="ttc" id="aProcessMCMC_8cpp_html_a13056efd080ab16304b6f7be0ebf0a61"><div class="ttname"><a href="ProcessMCMC_8cpp.html#a13056efd080ab16304b6f7be0ebf0a61">config</a></div><div class="ttdeci">std::string config</div><div class="ttdef"><b>Definition:</b> <a href="ProcessMCMC_8cpp_source.html#l00030">ProcessMCMC.cpp:30</a></div></div>
+<div class="ttc" id="aSmearChain_8cpp_html_a0ddf1224851353fc92bfbff6f499fa97"><div class="ttname"><a href="SmearChain_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a></div><div class="ttdeci">int main(int argc, char *argv[])</div><div class="ttdef"><b>Definition:</b> <a href="SmearChain_8cpp_source.html#l00032">SmearChain.cpp:32</a></div></div>
+<div class="ttc" id="aSmearChain_8cpp_html_aaea0692d40005c70e3328be6bebc8588"><div class="ttname"><a href="SmearChain_8cpp.html#aaea0692d40005c70e3328be6bebc8588">SmearChain</a></div><div class="ttdeci">void SmearChain(const std::string &amp;inputFile, const std::string &amp;config)</div><div class="ttdoc">Main function creating MCMCProcessor and calling Smear Chain.</div><div class="ttdef"><b>Definition:</b> <a href="SmearChain_8cpp_source.html#l00012">SmearChain.cpp:12</a></div></div>
+<div class="ttc" id="aYamlHelper_8h_html_ad802d5a5acdc16a796b21af74f6f5f59"><div class="ttname"><a href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">M3OpenConfig</a></div><div class="ttdeci">#define M3OpenConfig(filename)</div><div class="ttdoc">Macro to simplify calling LoadYaml with file and line info.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00589">YamlHelper.h:589</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class used throughout MaCh3.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00023">MaCh3Exception.h:23</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- Footer for MaCh3 Doxygen documentation -->

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MaCh3: Diagnostic</title>
+<title>MaCh3: Clusters</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -73,37 +73,51 @@ $(function() {
 </div><!-- top -->
 <div class="PageDoc"><div class="header">
   <div class="headertitle">
-<div class="title">Diagnostic </div>  </div>
+<div class="title">Clusters </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><b>ProcessMCMC</b> - The main app you want to use for analysing the ND280 chain. It prints posterior distribution after burn-in the cut. Moreover, you can compare two/three different chains. There are a few options you can modify easily inside the app like selection, burn-in cut, and whether to plot xsec+flux or only flux. Other functionality </p><ol>
-<li>
-Produce a covariance matrix with multithreading (which requires lots of RAM due to caching)  </li>
-<li>
-Violin plots  </li>
-<li>
-Credible intervals and regions  </li>
-<li>
-Calculate Bayes factor and give significance based on Jeffreys scale  </li>
-<li>
-Produce triangle plots  </li>
-<li>
-Study covariance matrix stability  </li>
-</ol>
-<p>You can find more options <a href="https://github.com/mach3-software/MaCh3/wiki/09.-Bayesian-Analysis,-Plotting-and-MCMC-Processor">here</a>. <b>GetPenaltyTerm</b> - Since xsec and flux and ND spline systematic are treated as the same systematic object we cannot just take log_xsec, hence we need this script, use <code>GetFluxPenaltyTerm MCMCChain.root config</code>. Parameters of relevance are loaded via config, thus you can study any combination you want. Time needed increases with number of sets :(</p>
-<p><b>DiagMCMC</b> - Perform MCMC diagnostic like autocorrelation or trace plots.</p>
-<p><b>PlotMCMCDiag</b> - Plot output of <b>DiagMCMC</b>, can compare multiple files if more than one argument is used </p><div class="fragment"><div class="line">./PlotMCMCDiag DiagMCMC_file_1.root Label_1, DiagMCMC_file_2.root Label_2 ...</div>
-</div><!-- fragment --><p> Can process up to 4 files</p>
-<p><b>RHat</b> - Performs RHat diagnostic to study if all used chains converged to the same stationary distribution. </p><div class="fragment"><div class="line">./RHat Ntoys MCMCchain_1.root MCMCchain_2.root MCMCchain_3.root ... [how many you like]</div>
-</div><!-- fragment --><p><b>CombineMaCh3Chains</b> - will combine chains files produced by <b>MCMC</b>, enforcing the condition that all the files to combine were made using the exact same software versions and config files </p><div class="fragment"><div class="line">CombineMaCh3Chains [-h] [-c [0-9]] [-f] [-o &lt;output file&gt;] file1.root [file2.root, file3.root ...]</div>
-</div><!-- fragment --><p> <em>fileX.root</em> are the individual spline files to combine, can specify any number, need at least one</p>
-<p>-c target compression level for the combined file, default is 1, in line with hadd</p>
-<p>-f force overwrite of the combined file if it exists already</p>
-<p>-h print usage message and exit</p>
-<p><em>Output file</em> (optional) name of the combined file. If not specified, will just use <em>file1.root</em>, the first in the list of files, same as <em>hadd</em>.</p>
-<p><b>SmearChain</b> - Allows you to smear contour. For example after performing sets of study one finds out that used sets of uncertainty doesn't fully cover analysis need. Then one can smear additionally contour. </p><div class="fragment"><div class="line">SmearChain MCMCchain.root Config.yaml</div>
-</div><!-- fragment --><p><b>ReweightMCMC</b> - Chain reweighting is used when one want to test different prior choices without need of rerunning MCMC. Most commonly used when studying impact of reactor constrains on θ<sub>13</sub> </p><div class="fragment"><div class="line">ReweightMCMC Config.yaml MCMCchain.root</div>
-</div><!-- fragment --> </div></div><!-- contents -->
+<div class="textblock"><p><a class="anchor" id="md_Doc_User_Guide_13__Known_Clusters"></a> </p><blockquote class="doxtable">
+<p><b>Last updated:</b> 20 Feb 2026 </p>
+</blockquote>
+<h1><a class="anchor" id="autotoc_md174"></a>
+Centrum Informatyczne Świerk (CIS), Warsaw Cluster</h1>
+<p><img src="https://github.com/mach3-software/MaCh3/assets/45295406/9c8b2900-d3c2-4a04-a6a5-99ff2c7d10b0" alt="" width="30%" class="inline"/></p>
+<div class="fragment"><div class="line">source /mnt/opt/spack/0.20/share/spack/setup-env.sh</div>
+<div class="line">spack load gcc@8.5.0%gcc@=8.5.0</div>
+<div class="line">spack load cmake@3.26.3%gcc@=8.5.0</div>
+<div class="line">spack load python@3.8.12%gcc@=8.5.0</div>
+<div class="line">spack load binutils@2.30%gcc@=8.5.0</div>
+<div class="line">spack load vdt@0.4.3</div>
+<div class="line">spack load git@2.40.0%gcc@=8.5.0</div>
+<div class="line">spack load imake</div>
+<div class="line">spack load makedepend</div>
+<div class="line">spack load xz@5.4.1%gcc@=8.5.0 #This holds LZMA</div>
+<div class="line">spack load libxpm@3.5.12%gcc@=8.5.0</div>
+<div class="line">spack load ncurses@6.4%gcc@8.5.0</div>
+<div class="line">spack load davix@0.8.1%gcc@8.5.0</div>
+<div class="line">spack load openssl@1.1.1t%gcc@=8.5.0</div>
+<div class="line">source /mnt/home/share/t2k/kskwarczynski/CERN_ROOT/root-6.24.08/build_root/bin/thisroot.sh</div>
+<div class="line">export LD_LIBRARY_PATH=/mnt/opt/spack/0.20/opt/spack/linux-centos7-ivybridge/gcc-8.5.0/vdt-0.4.3-s6mhw6a6pl7zdfbnaekxl5ad3x7jayvn/lib:$LD_LIBRARY_PATH</div>
+</div><!-- fragment --><p> On GPU nodes </p><div class="fragment"><div class="line">export CUDAPATH=/usr/local/cuda-11.4</div>
+</div><!-- fragment --> <div class="fragment"><div class="line">System: CentOS Linux 7</div>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md175"></a>
+LXPLUS, CERN Cluster</h1>
+<p><img src="https://github.com/mach3-software/MaCh3/assets/45295406/1fb468ab-c923-4869-8225-d5ae2473aeb3" alt="" width="60%" class="inline"/></p>
+<p>Works with default configuration: </p><div class="fragment"><div class="line">System: Red Hat Enterprise Linux 9.3</div>
+<div class="line">GCC:    11.4.1</div>
+<div class="line">CMake:  3.20.2</div>
+<div class="line">ROOT:   6.30/04</div>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md176"></a>
+Cedar, Digital Research Alliance of Canada</h1>
+<p><img src="https://github.com/mach3-software/MaCh3/assets/45295406/bfd11868-31b2-4f71-82d5-c4503c919434" alt="" width="60%" class="inline"/></p>
+<p>Only need </p><div class="fragment"><div class="line">module load root</div>
+</div><!-- fragment --><p> Then configuration looks like: </p><div class="fragment"><div class="line">System: CentOS Linux 7</div>
+<div class="line">GCC:    12.3.1</div>
+<div class="line">CMake:  3.27.7</div>
+<div class="line">ROOT:   6.28/06</div>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md177"></a>
+Your Cluster?</h1>
+</div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- Footer for MaCh3 Doxygen documentation -->
 <footer class="mach3-footer" style="text-align: center;">

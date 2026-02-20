@@ -27,13 +27,14 @@ var menudata={children:[
 {text:"User-Guide",url:"UserGuide.html",children:[
 {text:"FAQ",url:"FAQ.html"},
 {text:"Bayesian Analysis",url:"BayesianAnalysis.html"},
+{text:"Posterior Predictive",url:"PosteriorPredictive.html"},
 {text:"MCMC Convergance",url:"MCMCconvergance.html"},
 {text:"Adaptive MCMC",url:"AdaptiveMCMC.html"},
 {text:"Containers",url:"Containers.html"},
 {text:"Clusters Info",url:"Clusters.html"}]},
 {text:"Project Info",url:"ReleaseNotes.html",children:[
 {text:"Release Notes",url:"ReleaseNotes.html"},
-{text:"Results  Publications",url:"ResultsPublications.html"}]},
+{text:"Results and Publications",url:"ResultsPublications.html"}]},
 {text:"Interface",url:"modules.html"},
 {text:"Namespaces",url:"namespaces.html",children:[
 {text:"Namespace List",url:"namespaces.html"},

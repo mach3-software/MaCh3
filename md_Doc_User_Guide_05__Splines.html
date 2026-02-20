@@ -78,23 +78,23 @@ $(function() {
 <div class="contents">
 <div class="textblock"><p>Description of Splines and how to read them in.</p>
 <p>MaCh3 supports both event-by-event and binned splines:</p>
-<h1><a class="anchor" id="autotoc_md74"></a>
+<h1><a class="anchor" id="autotoc_md118"></a>
 Binned splines</h1>
 <p>TODO!!</p>
-<h1><a class="anchor" id="autotoc_md75"></a>
+<h1><a class="anchor" id="autotoc_md119"></a>
 Event-by-event splines</h1>
 <p>Format to initlaise event-by-event <code>std::vector&lt; std::vector&lt;TSpline3_red*&gt; &gt; MasterSpline</code> with size <code>[NEvents][NSplineParams]</code>. If the given event doesn't have a spline then it should be set to <code>NULL</code>.</p>
-<h3><a class="anchor" id="autotoc_md76"></a>
+<h3><a class="anchor" id="autotoc_md120"></a>
 SplineMonolith Fast Load File</h3>
 <p>To speed up the process of loading files there is a function <code>PrepareSplineFile()</code> which will dump spline information into a prepossed file with only relevant information. Then there is the prepared constructor <code>SMonolith::SMonolith(std::string FileName)</code>.</p>
-<h3><a class="anchor" id="autotoc_md77"></a>
+<h3><a class="anchor" id="autotoc_md121"></a>
 GPU</h3>
 <p>Since the calcuatalion of event by event spline is quite often the bottleneck there is GPU support for these calculations. From developer and user point of view code works the same. If GPU support is enabled MaCh3 will copy spline information to GPU and perform calcaution there.</p>
 <p><img src="https://github.com/mach3-software/MaCh3/assets/45295406/34f7aeaf-d40e-4e8c-96f7-a1eb197603ea" alt="image" class="inline"/></p>
-<h3><a class="anchor" id="autotoc_md78"></a>
+<h3><a class="anchor" id="autotoc_md122"></a>
 TF1</h3>
 <p>There is the possibility to use TF1 rather than cubic interpolation. Which helps significantly reduce RAM. However, it may not work for every spline. Therefore it is advised to check the LLH scan before making an analysis choice. <img src="https://github.com/mach3-software/MaCh3/assets/45295406/bf87261d-60cd-4a87-b83a-46c6afa3f89e" alt="image" class="inline"/></p>
-<h1><a class="anchor" id="autotoc_md79"></a>
+<h1><a class="anchor" id="autotoc_md123"></a>
 Available spline interpolation</h1>
 <p>At MaCh3 following interpolation are available for cubic splines: </p><ol>
 <li>

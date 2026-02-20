@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['nuoscillator_3660',['NuOscillator',['../md_Doc_User_Guide_07__Oscillator.html',1,'']]]
+  ['release_20notes_3659',['Release Notes',['../ReleaseNotes.html',1,'']]],
+  ['results_20and_20publications_3660',['Results and Publications',['../ResultsPublications.html',1,'']]]
 ];

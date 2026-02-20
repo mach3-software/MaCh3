@@ -240,19 +240,18 @@ Private Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class responsible for handling Principal Component Analysis (PCA) of covariance matrix. </p>
 <dl class="section author"><dt>Author</dt><dd>Clarence Wret</dd></dl>
-<h1><a class="anchor" id="introPCA"></a>
+<h1><a class="anchor" id="autotoc_md87"></a>
 Introduction</h1>
 <p>This class applies Principal Component Analysis (PCA) to covariance matrices using eigen-decomposition. The main benefit is that PCA rotates the parameter space into a basis where parameters are uncorrelated. In practice, this helps MCMC fits move more efficiently, since correlated directions in the original space often slow down convergence.</p>
-<h1><a class="anchor" id="dimredPCA"></a>
+<h1><a class="anchor" id="autotoc_md88"></a>
 Dimensionality Reduction</h1>
 <p>PCA makes it possible to drop directions in parameter space with very small eigenvalues. These correspond to combinations of parameters that are poorly constrained or dominated by statistical noise. By applying a threshold (e.g. discarding eigenvalues smaller than <code>1e-4</code> of the largest one), the effective number of parameters can be reduced.</p>
 <p>This is particularly useful in large MCMC fits, where many parameters may contribute little information. Removing them reduces dimensionality while keeping the dominant structure of the parameter space intact, often leading to faster and more stable fits.</p>
-<h1><a class="anchor" id="partialPCA"></a>
+<h1><a class="anchor" id="autotoc_md89"></a>
 Partial Decomposition</h1>
-<p>PCA does not need to be applied to the full covariance matrix. This class supports eigen-decomposition of only a submatrix. This is useful when only a subset of parameters is strongly correlated and benefits from PCA, while the rest remain in the original parameter basis.</p>
-<dl class="section see"><dt>See also</dt><dd>For more details, visit the <a href="https://github.com/mach3-software/MaCh3/wiki/03.-Eigen-Decomposition-%E2%80%90-PCA">Wiki</a>. </dd></dl>
+<p>PCA does not need to be applied to the full covariance matrix. This class supports eigen-decomposition of only a submatrix. This is useful when only a subset of parameters is strongly correlated and benefits from PCA, while the rest remain in the original parameter basis. </p>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00060">60</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00058">58</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="aabaaecfe5909a6cffbcc0e1a385615fa"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aabaaecfe5909a6cffbcc0e1a385615fa">&#9670;&nbsp;</a></span>PCAHandler()</h2>
@@ -277,8 +276,8 @@ Partial Decomposition</h1>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;  <a class="code" href="classPCAHandler.html#a6bea0a66f8f09ec08ee398a377a1f437">_pCurrVal</a> = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;  <a class="code" href="classPCAHandler.html#a86d7b6c405ee97ebad2f5c8fe47ce4ee">_pPropVal</a> = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;}</div>
-<div class="ttc" id="aclassPCAHandler_html_a6bea0a66f8f09ec08ee398a377a1f437"><div class="ttname"><a href="classPCAHandler.html#a6bea0a66f8f09ec08ee398a377a1f437">PCAHandler::_pCurrVal</a></div><div class="ttdeci">std::vector&lt; double &gt; * _pCurrVal</div><div class="ttdoc">Pointer to current value of the parameter.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00262">PCAHandler.h:262</a></div></div>
-<div class="ttc" id="aclassPCAHandler_html_a86d7b6c405ee97ebad2f5c8fe47ce4ee"><div class="ttname"><a href="classPCAHandler.html#a86d7b6c405ee97ebad2f5c8fe47ce4ee">PCAHandler::_pPropVal</a></div><div class="ttdeci">std::vector&lt; double &gt; * _pPropVal</div><div class="ttdoc">Pointer to proposed value of the parameter.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00264">PCAHandler.h:264</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_a6bea0a66f8f09ec08ee398a377a1f437"><div class="ttname"><a href="classPCAHandler.html#a6bea0a66f8f09ec08ee398a377a1f437">PCAHandler::_pCurrVal</a></div><div class="ttdeci">std::vector&lt; double &gt; * _pCurrVal</div><div class="ttdoc">Pointer to current value of the parameter.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00260">PCAHandler.h:260</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_a86d7b6c405ee97ebad2f5c8fe47ce4ee"><div class="ttname"><a href="classPCAHandler.html#a86d7b6c405ee97ebad2f5c8fe47ce4ee">PCAHandler::_pPropVal</a></div><div class="ttdeci">std::vector&lt; double &gt; * _pPropVal</div><div class="ttdoc">Pointer to proposed value of the parameter.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00262">PCAHandler.h:262</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -345,10 +344,10 @@ Partial Decomposition</h1>
 <div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;  <span class="comment">// Then update the parameter basis</span></div>
 <div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;  <a class="code" href="classPCAHandler.html#a93e5548b530c1cc6158e62f497ca3c59">TransferToParam</a>();</div>
 <div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;}</div>
-<div class="ttc" id="aclassPCAHandler_html_a407f24e3c76f3651a5f20cc2cab274f8"><div class="ttname"><a href="classPCAHandler.html#a407f24e3c76f3651a5f20cc2cab274f8">PCAHandler::_fParPropPCA</a></div><div class="ttdeci">TVectorD _fParPropPCA</div><div class="ttdoc">CW: Current parameter value in PCA base.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00231">PCAHandler.h:231</a></div></div>
-<div class="ttc" id="aclassPCAHandler_html_a5f08019f3db758953464fb1d0db71ea0"><div class="ttname"><a href="classPCAHandler.html#a5f08019f3db758953464fb1d0db71ea0">PCAHandler::NumParPCA</a></div><div class="ttdeci">int NumParPCA</div><div class="ttdoc">Number of parameters in PCA base.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00239">PCAHandler.h:239</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_a407f24e3c76f3651a5f20cc2cab274f8"><div class="ttname"><a href="classPCAHandler.html#a407f24e3c76f3651a5f20cc2cab274f8">PCAHandler::_fParPropPCA</a></div><div class="ttdeci">TVectorD _fParPropPCA</div><div class="ttdoc">CW: Current parameter value in PCA base.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00229">PCAHandler.h:229</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_a5f08019f3db758953464fb1d0db71ea0"><div class="ttname"><a href="classPCAHandler.html#a5f08019f3db758953464fb1d0db71ea0">PCAHandler::NumParPCA</a></div><div class="ttdeci">int NumParPCA</div><div class="ttdoc">Number of parameters in PCA base.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00237">PCAHandler.h:237</a></div></div>
 <div class="ttc" id="aclassPCAHandler_html_a93e5548b530c1cc6158e62f497ca3c59"><div class="ttname"><a href="classPCAHandler.html#a93e5548b530c1cc6158e62f497ca3c59">PCAHandler::TransferToParam</a></div><div class="ttdeci">void TransferToParam()</div><div class="ttdoc">Transfer param values from PCA base to normal base.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8cpp_source.html#l00255">PCAHandler.cpp:255</a></div></div>
-<div class="ttc" id="aclassPCAHandler_html_af1cd7c1c4471d99395efe53610a5357a"><div class="ttname"><a href="classPCAHandler.html#af1cd7c1c4471d99395efe53610a5357a">PCAHandler::_fParCurrPCA</a></div><div class="ttdeci">TVectorD _fParCurrPCA</div><div class="ttdoc">CW: Proposed parameter value in PCA base.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00233">PCAHandler.h:233</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_af1cd7c1c4471d99395efe53610a5357a"><div class="ttname"><a href="classPCAHandler.html#af1cd7c1c4471d99395efe53610a5357a">PCAHandler::_fParCurrPCA</a></div><div class="ttdeci">TVectorD _fParCurrPCA</div><div class="ttdoc">CW: Proposed parameter value in PCA base.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00231">PCAHandler.h:231</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -533,19 +532,19 @@ Partial Decomposition</h1>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00037">MaCh3Logger.h:37</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00035">MaCh3Logger.h:35</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class used throughout MaCh3.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00023">MaCh3Exception.h:23</a></div></div>
-<div class="ttc" id="aclassPCAHandler_html_a10fecf91a038d034f55a08332dec0f4a"><div class="ttname"><a href="classPCAHandler.html#a10fecf91a038d034f55a08332dec0f4a">PCAHandler::isDecomposedPCA</a></div><div class="ttdeci">std::vector&lt; int &gt; isDecomposedPCA</div><div class="ttdoc">If param is decomposed this will return -1, if not this will return enumerator to param in normal bas...</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00237">PCAHandler.h:237</a></div></div>
-<div class="ttc" id="aclassPCAHandler_html_a1d9302633ed96ec57fbe26d25cbcee61"><div class="ttname"><a href="classPCAHandler.html#a1d9302633ed96ec57fbe26d25cbcee61">PCAHandler::TransferMat</a></div><div class="ttdeci">TMatrixD TransferMat</div><div class="ttdoc">Matrix used to converting from PCA base to normal base.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00242">PCAHandler.h:242</a></div></div>
-<div class="ttc" id="aclassPCAHandler_html_a2924386fef0cf65215c51b4f81cdb0d1"><div class="ttname"><a href="classPCAHandler.html#a2924386fef0cf65215c51b4f81cdb0d1">PCAHandler::eigen_values_master</a></div><div class="ttdeci">std::vector&lt; double &gt; eigen_values_master</div><div class="ttdoc">Eigen values which have dimension equal to _fNumParPCA, and can be used in CorrelateSteps.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00250">PCAHandler.h:250</a></div></div>
-<div class="ttc" id="aclassPCAHandler_html_a3ba9d34343ce0d0eeb4c020fa70486e2"><div class="ttname"><a href="classPCAHandler.html#a3ba9d34343ce0d0eeb4c020fa70486e2">PCAHandler::eigen_vectors</a></div><div class="ttdeci">TMatrixD eigen_vectors</div><div class="ttdoc">Eigen vectors only of params which are being decomposed.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00248">PCAHandler.h:248</a></div></div>
-<div class="ttc" id="aclassPCAHandler_html_a6f6443a487bb544e6a6e458d86f35f27"><div class="ttname"><a href="classPCAHandler.html#a6f6443a487bb544e6a6e458d86f35f27">PCAHandler::TransferMatT</a></div><div class="ttdeci">TMatrixD TransferMatT</div><div class="ttdoc">Matrix used to converting from normal base to PCA base.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00244">PCAHandler.h:244</a></div></div>
-<div class="ttc" id="aclassPCAHandler_html_a8d95ecb29e091e9b09c5011691516c28"><div class="ttname"><a href="classPCAHandler.html#a8d95ecb29e091e9b09c5011691516c28">PCAHandler::eigen_values</a></div><div class="ttdeci">TVectorD eigen_values</div><div class="ttdoc">Eigen value only of particles which are being decomposed.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00246">PCAHandler.h:246</a></div></div>
-<div class="ttc" id="aclassPCAHandler_html_a954eeb975f1d7f9528ed7e027a54b21a"><div class="ttname"><a href="classPCAHandler.html#a954eeb975f1d7f9528ed7e027a54b21a">PCAHandler::LastPCAdpar</a></div><div class="ttdeci">int LastPCAdpar</div><div class="ttdoc">Index of the last param that is being decomposed.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00257">PCAHandler.h:257</a></div></div>
-<div class="ttc" id="aclassPCAHandler_html_aa39db9118399bebcdb784fe9c9fea458"><div class="ttname"><a href="classPCAHandler.html#aa39db9118399bebcdb784fe9c9fea458">PCAHandler::nKeptPCApars</a></div><div class="ttdeci">int nKeptPCApars</div><div class="ttdoc">Total number that remained after applying PCA Threshold.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00253">PCAHandler.h:253</a></div></div>
-<div class="ttc" id="aclassPCAHandler_html_aa9b859239b5e5c8e2bd35ad2118bf2dc"><div class="ttname"><a href="classPCAHandler.html#aa9b859239b5e5c8e2bd35ad2118bf2dc">PCAHandler::_fErrorPCA</a></div><div class="ttdeci">std::vector&lt; double &gt; _fErrorPCA</div><div class="ttdoc">Tells if parameter is fixed in PCA base or not.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00235">PCAHandler.h:235</a></div></div>
-<div class="ttc" id="aclassPCAHandler_html_ac0bd8123d71c40d713048ec4131d6b13"><div class="ttname"><a href="classPCAHandler.html#ac0bd8123d71c40d713048ec4131d6b13">PCAHandler::_fPreFitValuePCA</a></div><div class="ttdeci">std::vector&lt; double &gt; _fPreFitValuePCA</div><div class="ttdoc">Prefit value for PCA params.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00229">PCAHandler.h:229</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_a10fecf91a038d034f55a08332dec0f4a"><div class="ttname"><a href="classPCAHandler.html#a10fecf91a038d034f55a08332dec0f4a">PCAHandler::isDecomposedPCA</a></div><div class="ttdeci">std::vector&lt; int &gt; isDecomposedPCA</div><div class="ttdoc">If param is decomposed this will return -1, if not this will return enumerator to param in normal bas...</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00235">PCAHandler.h:235</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_a1d9302633ed96ec57fbe26d25cbcee61"><div class="ttname"><a href="classPCAHandler.html#a1d9302633ed96ec57fbe26d25cbcee61">PCAHandler::TransferMat</a></div><div class="ttdeci">TMatrixD TransferMat</div><div class="ttdoc">Matrix used to converting from PCA base to normal base.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00240">PCAHandler.h:240</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_a2924386fef0cf65215c51b4f81cdb0d1"><div class="ttname"><a href="classPCAHandler.html#a2924386fef0cf65215c51b4f81cdb0d1">PCAHandler::eigen_values_master</a></div><div class="ttdeci">std::vector&lt; double &gt; eigen_values_master</div><div class="ttdoc">Eigen values which have dimension equal to _fNumParPCA, and can be used in CorrelateSteps.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00248">PCAHandler.h:248</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_a3ba9d34343ce0d0eeb4c020fa70486e2"><div class="ttname"><a href="classPCAHandler.html#a3ba9d34343ce0d0eeb4c020fa70486e2">PCAHandler::eigen_vectors</a></div><div class="ttdeci">TMatrixD eigen_vectors</div><div class="ttdoc">Eigen vectors only of params which are being decomposed.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00246">PCAHandler.h:246</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_a6f6443a487bb544e6a6e458d86f35f27"><div class="ttname"><a href="classPCAHandler.html#a6f6443a487bb544e6a6e458d86f35f27">PCAHandler::TransferMatT</a></div><div class="ttdeci">TMatrixD TransferMatT</div><div class="ttdoc">Matrix used to converting from normal base to PCA base.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00242">PCAHandler.h:242</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_a8d95ecb29e091e9b09c5011691516c28"><div class="ttname"><a href="classPCAHandler.html#a8d95ecb29e091e9b09c5011691516c28">PCAHandler::eigen_values</a></div><div class="ttdeci">TVectorD eigen_values</div><div class="ttdoc">Eigen value only of particles which are being decomposed.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00244">PCAHandler.h:244</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_a954eeb975f1d7f9528ed7e027a54b21a"><div class="ttname"><a href="classPCAHandler.html#a954eeb975f1d7f9528ed7e027a54b21a">PCAHandler::LastPCAdpar</a></div><div class="ttdeci">int LastPCAdpar</div><div class="ttdoc">Index of the last param that is being decomposed.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00255">PCAHandler.h:255</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_aa39db9118399bebcdb784fe9c9fea458"><div class="ttname"><a href="classPCAHandler.html#aa39db9118399bebcdb784fe9c9fea458">PCAHandler::nKeptPCApars</a></div><div class="ttdeci">int nKeptPCApars</div><div class="ttdoc">Total number that remained after applying PCA Threshold.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00251">PCAHandler.h:251</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_aa9b859239b5e5c8e2bd35ad2118bf2dc"><div class="ttname"><a href="classPCAHandler.html#aa9b859239b5e5c8e2bd35ad2118bf2dc">PCAHandler::_fErrorPCA</a></div><div class="ttdeci">std::vector&lt; double &gt; _fErrorPCA</div><div class="ttdoc">Tells if parameter is fixed in PCA base or not.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00233">PCAHandler.h:233</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_ac0bd8123d71c40d713048ec4131d6b13"><div class="ttname"><a href="classPCAHandler.html#ac0bd8123d71c40d713048ec4131d6b13">PCAHandler::_fPreFitValuePCA</a></div><div class="ttdeci">std::vector&lt; double &gt; _fPreFitValuePCA</div><div class="ttdoc">Prefit value for PCA params.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00227">PCAHandler.h:227</a></div></div>
 <div class="ttc" id="aclassPCAHandler_html_af4ec4fac1abdd47240f7f5c041f7722a"><div class="ttname"><a href="classPCAHandler.html#af4ec4fac1abdd47240f7f5c041f7722a">PCAHandler::SanitisePCA</a></div><div class="ttdeci">void SanitisePCA(TMatrixDSym *CovMatrix)</div><div class="ttdoc">KS: Make sure decomposed matrix isn't correlated with undecomposed.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8cpp_source.html#l00150">PCAHandler.cpp:150</a></div></div>
-<div class="ttc" id="aclassPCAHandler_html_afc00f628b947fd407d05790f4d0eaaec"><div class="ttname"><a href="classPCAHandler.html#afc00f628b947fd407d05790f4d0eaaec">PCAHandler::FirstPCAdpar</a></div><div class="ttdeci">int FirstPCAdpar</div><div class="ttdoc">Index of the first param that is being decomposed.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00255">PCAHandler.h:255</a></div></div>
-<div class="ttc" id="aclassPCAHandler_html_afdf5f929fe9211a2ce05f6bab2b8633a"><div class="ttname"><a href="classPCAHandler.html#afdf5f929fe9211a2ce05f6bab2b8633a">PCAHandler::eigen_threshold</a></div><div class="ttdeci">double eigen_threshold</div><div class="ttdoc">CW: Threshold based on which we remove parameters in eigen base.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00259">PCAHandler.h:259</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_afc00f628b947fd407d05790f4d0eaaec"><div class="ttname"><a href="classPCAHandler.html#afc00f628b947fd407d05790f4d0eaaec">PCAHandler::FirstPCAdpar</a></div><div class="ttdeci">int FirstPCAdpar</div><div class="ttdoc">Index of the first param that is being decomposed.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00253">PCAHandler.h:253</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_afdf5f929fe9211a2ce05f6bab2b8633a"><div class="ttname"><a href="classPCAHandler.html#afdf5f929fe9211a2ce05f6bab2b8633a">PCAHandler::eigen_threshold</a></div><div class="ttdeci">double eigen_threshold</div><div class="ttdoc">CW: Threshold based on which we remove parameters in eigen base.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00257">PCAHandler.h:257</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -648,10 +647,10 @@ Partial Decomposition</h1>
 
 <p>Get eigen values for all parameters, if you want for decomposed only parameters use GetEigenValuesMaster. </p>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00202">202</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;                                        {</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classPCAHandler.html#a8d95ecb29e091e9b09c5011691516c28">eigen_values</a>;</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00200">200</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;                                        {</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classPCAHandler.html#a8d95ecb29e091e9b09c5011691516c28">eigen_values</a>;</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -680,10 +679,10 @@ Partial Decomposition</h1>
 
 <p>Get eigen value of only decomposed parameters, if you want for all parameters use GetEigenValues. </p>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00207">207</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;                                                       {</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classPCAHandler.html#a2924386fef0cf65215c51b4f81cdb0d1">eigen_values_master</a>;</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00205">205</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;                                                       {</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classPCAHandler.html#a2924386fef0cf65215c51b4f81cdb0d1">eigen_values_master</a>;</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -712,10 +711,10 @@ Partial Decomposition</h1>
 
 <p>Get eigen vectors of covariance matrix, only works with PCA. </p>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00150">150</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;                                         {</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classPCAHandler.html#a3ba9d34343ce0d0eeb4c020fa70486e2">eigen_vectors</a>;</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00148">148</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;                                         {</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classPCAHandler.html#a3ba9d34343ce0d0eeb4c020fa70486e2">eigen_vectors</a>;</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -744,8 +743,8 @@ Partial Decomposition</h1>
 
 <p>Retrieve number of parameters in PCA base. </p>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00071">71</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classPCAHandler.html#a5f08019f3db758953464fb1d0db71ea0">NumParPCA</a>; }</div>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00069">69</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classPCAHandler.html#a5f08019f3db758953464fb1d0db71ea0">NumParPCA</a>; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -781,10 +780,10 @@ Partial Decomposition</h1>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00190">190</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;                                          {</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classPCAHandler.html#af1cd7c1c4471d99395efe53610a5357a">_fParCurrPCA</a>(i);</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00188">188</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;                                          {</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classPCAHandler.html#af1cd7c1c4471d99395efe53610a5357a">_fParCurrPCA</a>(i);</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -820,10 +819,10 @@ Partial Decomposition</h1>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00176">176</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;                                          {</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classPCAHandler.html#a407f24e3c76f3651a5f20cc2cab274f8">_fParPropPCA</a>(i);</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00174">174</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;                                          {</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classPCAHandler.html#a407f24e3c76f3651a5f20cc2cab274f8">_fParPropPCA</a>(i);</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -859,10 +858,10 @@ Partial Decomposition</h1>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00183">183</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;                                              {</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classPCAHandler.html#ac0bd8123d71c40d713048ec4131d6b13">_fPreFitValuePCA</a>[i];</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00181">181</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;                                              {</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classPCAHandler.html#ac0bd8123d71c40d713048ec4131d6b13">_fPreFitValuePCA</a>[i];</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -891,10 +890,10 @@ Partial Decomposition</h1>
 
 <p>Get transfer matrix allowing to go from PCA base to normal base. </p>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00196">196</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;                                           {</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classPCAHandler.html#a1d9302633ed96ec57fbe26d25cbcee61">TransferMat</a>;</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00194">194</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;                                           {</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classPCAHandler.html#a1d9302633ed96ec57fbe26d25cbcee61">TransferMat</a>;</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -930,11 +929,11 @@ Partial Decomposition</h1>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00214">214</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;                                                {</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classPCAHandler.html#a10fecf91a038d034f55a08332dec0f4a">isDecomposedPCA</a>[i] &gt;= 0) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00212">212</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;                                                {</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="classPCAHandler.html#a10fecf91a038d034f55a08332dec0f4a">isDecomposedPCA</a>[i] &gt;= 0) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -970,11 +969,11 @@ Partial Decomposition</h1>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00143">143</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;                                              {</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    <span class="keywordflow">if</span> (<a class="code" href="classPCAHandler.html#aa9b859239b5e5c8e2bd35ad2118bf2dc">_fErrorPCA</a>[i] &lt; 0) { <span class="keywordflow">return</span> <span class="keyword">true</span>;  }</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    <span class="keywordflow">else</span>                   { <span class="keywordflow">return</span> <span class="keyword">false</span>; }</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00141">141</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;                                              {</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    <span class="keywordflow">if</span> (<a class="code" href="classPCAHandler.html#aa9b859239b5e5c8e2bd35ad2118bf2dc">_fErrorPCA</a>[i] &lt; 0) { <span class="keywordflow">return</span> <span class="keyword">true</span>;  }</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    <span class="keywordflow">else</span>                   { <span class="keywordflow">return</span> <span class="keyword">false</span>; }</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1180,19 +1179,19 @@ Partial Decomposition</h1>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00127">127</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;                                                       {</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <span class="keywordflow">if</span> (<span class="keywordtype">int</span>(pars.size()) != <a class="code" href="classPCAHandler.html#a5f08019f3db758953464fb1d0db71ea0">NumParPCA</a>) {</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Parameter arrays of incompatible size! Not changing parameters! has size {} but was expecting {}&quot;</span>, pars.size(), <a class="code" href="classPCAHandler.html#a5f08019f3db758953464fb1d0db71ea0">NumParPCA</a>);</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    }</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="keywordtype">int</span> parsSize = int(pars.size());</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; parsSize; i++) {</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;      <a class="code" href="classPCAHandler.html#a407f24e3c76f3651a5f20cc2cab274f8">_fParPropPCA</a>(i) = pars[i];</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    }</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="comment">//KS: Transfer to normal base</span></div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    <a class="code" href="classPCAHandler.html#a93e5548b530c1cc6158e62f497ca3c59">TransferToParam</a>();</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00125">125</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;                                                       {</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <span class="keywordflow">if</span> (<span class="keywordtype">int</span>(pars.size()) != <a class="code" href="classPCAHandler.html#a5f08019f3db758953464fb1d0db71ea0">NumParPCA</a>) {</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Parameter arrays of incompatible size! Not changing parameters! has size {} but was expecting {}&quot;</span>, pars.size(), <a class="code" href="classPCAHandler.html#a5f08019f3db758953464fb1d0db71ea0">NumParPCA</a>);</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    }</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="keywordtype">int</span> parsSize = int(pars.size());</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; parsSize; i++) {</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;      <a class="code" href="classPCAHandler.html#a407f24e3c76f3651a5f20cc2cab274f8">_fParPropPCA</a>(i) = pars[i];</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    }</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <span class="comment">//KS: Transfer to normal base</span></div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    <a class="code" href="classPCAHandler.html#a93e5548b530c1cc6158e62f497ca3c59">TransferToParam</a>();</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1239,12 +1238,12 @@ Partial Decomposition</h1>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00167">167</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;                                                      {</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <a class="code" href="classPCAHandler.html#af1cd7c1c4471d99395efe53610a5357a">_fParCurrPCA</a>(i) = value;</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <span class="comment">// And then transfer back to the parameter basis</span></div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    <a class="code" href="classPCAHandler.html#a93e5548b530c1cc6158e62f497ca3c59">TransferToParam</a>();</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00165">165</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;                                                      {</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    <a class="code" href="classPCAHandler.html#af1cd7c1c4471d99395efe53610a5357a">_fParCurrPCA</a>(i) = value;</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    <span class="comment">// And then transfer back to the parameter basis</span></div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <a class="code" href="classPCAHandler.html#a93e5548b530c1cc6158e62f497ca3c59">TransferToParam</a>();</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1291,12 +1290,12 @@ Partial Decomposition</h1>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00158">158</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;                                                      {</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    <a class="code" href="classPCAHandler.html#a407f24e3c76f3651a5f20cc2cab274f8">_fParPropPCA</a>(i) = value;</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    <span class="comment">// And then transfer back to the parameter basis</span></div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    <a class="code" href="classPCAHandler.html#a93e5548b530c1cc6158e62f497ca3c59">TransferToParam</a>();</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00156">156</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;                                                      {</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <a class="code" href="classPCAHandler.html#a407f24e3c76f3651a5f20cc2cab274f8">_fParPropPCA</a>(i) = value;</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    <span class="comment">// And then transfer back to the parameter basis</span></div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    <a class="code" href="classPCAHandler.html#a93e5548b530c1cc6158e62f497ca3c59">TransferToParam</a>();</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1452,12 +1451,12 @@ Partial Decomposition</h1>
 <div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;  }</div>
 <div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_ad5b2eb6377721e3ac95def22c2386bb1"><div class="ttname"><a href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a></div><div class="ttdeci">#define MACH3LOG_WARN</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00036">MaCh3Logger.h:36</a></div></div>
-<div class="ttc" id="aclassPCAHandler_html_a5087aa5aba191f31170c1108210cdb26"><div class="ttname"><a href="classPCAHandler.html#a5087aa5aba191f31170c1108210cdb26">PCAHandler::IsParameterFixedPCA</a></div><div class="ttdeci">bool IsParameterFixedPCA(const int i) const</div><div class="ttdoc">Is parameter fixed in PCA base or not.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00143">PCAHandler.h:143</a></div></div>
-<div class="ttc" id="aclassPCAHandler_html_a5a42efb45ecf02e0369ca02df5c2d7e7"><div class="ttname"><a href="classPCAHandler.html#a5a42efb45ecf02e0369ca02df5c2d7e7">PCAHandler::GetParPropPCA</a></div><div class="ttdeci">double GetParPropPCA(const int i) const</div><div class="ttdoc">Get current parameter value using PCA.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00176">PCAHandler.h:176</a></div></div>
-<div class="ttc" id="aclassPCAHandler_html_a737c5cad5cdff60c0a945aaddd2a6da3"><div class="ttname"><a href="classPCAHandler.html#a737c5cad5cdff60c0a945aaddd2a6da3">PCAHandler::SetParPropPCA</a></div><div class="ttdeci">void SetParPropPCA(const int i, const double value)</div><div class="ttdoc">Set proposed value for parameter in PCA base.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00158">PCAHandler.h:158</a></div></div>
-<div class="ttc" id="aclassPCAHandler_html_a86b25b9f099bf94ab18c20857358d9a2"><div class="ttname"><a href="classPCAHandler.html#a86b25b9f099bf94ab18c20857358d9a2">PCAHandler::GetPreFitValuePCA</a></div><div class="ttdeci">double GetPreFitValuePCA(const int i) const</div><div class="ttdoc">Get current parameter value using PCA.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00183">PCAHandler.h:183</a></div></div>
-<div class="ttc" id="aclassPCAHandler_html_a88a89e8955f06dff98ac343d0f5e84e4"><div class="ttname"><a href="classPCAHandler.html#a88a89e8955f06dff98ac343d0f5e84e4">PCAHandler::IsParameterDecomposed</a></div><div class="ttdeci">bool IsParameterDecomposed(const int i) const</div><div class="ttdoc">Check if parameter in PCA base is decomposed or not.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00214">PCAHandler.h:214</a></div></div>
-<div class="ttc" id="aclassPCAHandler_html_ae232ab07ae839b755912c7e23f3c835f"><div class="ttname"><a href="classPCAHandler.html#ae232ab07ae839b755912c7e23f3c835f">PCAHandler::SetParCurrPCA</a></div><div class="ttdeci">void SetParCurrPCA(const int i, const double value)</div><div class="ttdoc">Set current value for parameter in PCA base.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00167">PCAHandler.h:167</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_a5087aa5aba191f31170c1108210cdb26"><div class="ttname"><a href="classPCAHandler.html#a5087aa5aba191f31170c1108210cdb26">PCAHandler::IsParameterFixedPCA</a></div><div class="ttdeci">bool IsParameterFixedPCA(const int i) const</div><div class="ttdoc">Is parameter fixed in PCA base or not.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00141">PCAHandler.h:141</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_a5a42efb45ecf02e0369ca02df5c2d7e7"><div class="ttname"><a href="classPCAHandler.html#a5a42efb45ecf02e0369ca02df5c2d7e7">PCAHandler::GetParPropPCA</a></div><div class="ttdeci">double GetParPropPCA(const int i) const</div><div class="ttdoc">Get current parameter value using PCA.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00174">PCAHandler.h:174</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_a737c5cad5cdff60c0a945aaddd2a6da3"><div class="ttname"><a href="classPCAHandler.html#a737c5cad5cdff60c0a945aaddd2a6da3">PCAHandler::SetParPropPCA</a></div><div class="ttdeci">void SetParPropPCA(const int i, const double value)</div><div class="ttdoc">Set proposed value for parameter in PCA base.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00156">PCAHandler.h:156</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_a86b25b9f099bf94ab18c20857358d9a2"><div class="ttname"><a href="classPCAHandler.html#a86b25b9f099bf94ab18c20857358d9a2">PCAHandler::GetPreFitValuePCA</a></div><div class="ttdeci">double GetPreFitValuePCA(const int i) const</div><div class="ttdoc">Get current parameter value using PCA.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00181">PCAHandler.h:181</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_a88a89e8955f06dff98ac343d0f5e84e4"><div class="ttname"><a href="classPCAHandler.html#a88a89e8955f06dff98ac343d0f5e84e4">PCAHandler::IsParameterDecomposed</a></div><div class="ttdeci">bool IsParameterDecomposed(const int i) const</div><div class="ttdoc">Check if parameter in PCA base is decomposed or not.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00212">PCAHandler.h:212</a></div></div>
+<div class="ttc" id="aclassPCAHandler_html_ae232ab07ae839b755912c7e23f3c835f"><div class="ttname"><a href="classPCAHandler.html#ae232ab07ae839b755912c7e23f3c835f">PCAHandler::SetParCurrPCA</a></div><div class="ttdeci">void SetParCurrPCA(const int i, const double value)</div><div class="ttdoc">Set current value for parameter in PCA base.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00165">PCAHandler.h:165</a></div></div>
 <div class="ttc" id="anamespaceM3_html_a5ed0accdbf66626c16b6c3b00bd5d030"><div class="ttname"><a href="namespaceM3.html#a5ed0accdbf66626c16b6c3b00bd5d030">M3::GetThreadIndex</a></div><div class="ttdeci">int GetThreadIndex()</div><div class="ttdoc">thread index inside parallel loop</div><div class="ttdef"><b>Definition:</b> <a href="Monitor_8h_source.html#l00086">Monitor.h:86</a></div></div>
 <div class="ttc" id="anamespaceM3_html_a99622fe57c7a13d75de4d3c3561b530d"><div class="ttname"><a href="namespaceM3.html#a99622fe57c7a13d75de4d3c3561b530d">M3::MatrixVectorMultiSingle</a></div><div class="ttdeci">double MatrixVectorMultiSingle(double **_restrict_ matrix, const double *_restrict_ vector, const int Length, const int i)</div><div class="ttdoc">KS: Custom function to perform multiplication of matrix and single element which is thread safe.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerUtils_8h_source.html#l00137">ParameterHandlerUtils.h:137</a></div></div>
 </div><!-- fragment -->
@@ -1628,7 +1627,7 @@ Partial Decomposition</h1>
 
 <p>Tells if parameter is fixed in PCA base or not. </p>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00235">235</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00233">233</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1654,7 +1653,7 @@ Partial Decomposition</h1>
 
 <p>CW: Proposed parameter value in PCA base. </p>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00233">233</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00231">231</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1680,7 +1679,7 @@ Partial Decomposition</h1>
 
 <p>CW: Current parameter value in PCA base. </p>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00231">231</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00229">229</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1706,7 +1705,7 @@ Partial Decomposition</h1>
 
 <p>Prefit value for PCA params. </p>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00229">229</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00227">227</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1732,7 +1731,7 @@ Partial Decomposition</h1>
 
 <p>Pointer to current value of the parameter. </p>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00262">262</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00260">260</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1758,7 +1757,7 @@ Partial Decomposition</h1>
 
 <p>Pointer to proposed value of the parameter. </p>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00264">264</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00262">262</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1784,7 +1783,7 @@ Partial Decomposition</h1>
 
 <p>CW: Threshold based on which we remove parameters in eigen base. </p>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00259">259</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00257">257</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1810,7 +1809,7 @@ Partial Decomposition</h1>
 
 <p>Eigen value only of particles which are being decomposed. </p>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00246">246</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00244">244</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1836,7 +1835,7 @@ Partial Decomposition</h1>
 
 <p>Eigen values which have dimension equal to _fNumParPCA, and can be used in CorrelateSteps. </p>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00250">250</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00248">248</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1862,7 +1861,7 @@ Partial Decomposition</h1>
 
 <p>Eigen vectors only of params which are being decomposed. </p>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00248">248</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00246">246</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1888,7 +1887,7 @@ Partial Decomposition</h1>
 
 <p>Index of the first param that is being decomposed. </p>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00255">255</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00253">253</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1914,7 +1913,7 @@ Partial Decomposition</h1>
 
 <p>If param is decomposed this will return -1, if not this will return enumerator to param in normal base. This way we can map stuff like step scale etc between normal base and undecomposed param in eigen base. </p>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00237">237</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00235">235</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1940,7 +1939,7 @@ Partial Decomposition</h1>
 
 <p>Index of the last param that is being decomposed. </p>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00257">257</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00255">255</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1966,7 +1965,7 @@ Partial Decomposition</h1>
 
 <p>Total number that remained after applying PCA Threshold. </p>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00253">253</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00251">251</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1992,7 +1991,7 @@ Partial Decomposition</h1>
 
 <p>Number of parameters in PCA base. </p>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00239">239</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00237">237</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
 
 </div>
 </div>
@@ -2018,7 +2017,7 @@ Partial Decomposition</h1>
 
 <p>Matrix used to converting from PCA base to normal base. </p>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00242">242</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00240">240</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
 
 </div>
 </div>
@@ -2044,7 +2043,7 @@ Partial Decomposition</h1>
 
 <p>Matrix used to converting from normal base to PCA base. </p>
 
-<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00244">244</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PCAHandler_8h_source.html#l00242">242</a> of file <a class="el" href="PCAHandler_8h_source.html">PCAHandler.h</a>.</p>
 
 </div>
 </div>

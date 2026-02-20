@@ -99,15 +99,15 @@ Files</h2></td></tr>
 <p>Flexible, experiment-agnostic plotting utilities for MaCh3. </p>
 <p>The goal with MaCh3s plotting library is to be as flexible as possible and to abstract away all of the most annoying parts about plot making like reading in the data from fitter output files and keeping track of parameter names across different fitters, while allowing the user as much freedom as possible when it comes plot style and formatting.</p>
 <p>The plotting Library consists primarily of 3 main manager classes:</p><ul>
-<li>PlottingManager : This controls the high level stuff. It deals with application level options, command line options, and holds references to the other managers. This is the main class you should interact with on the user level.</li>
-<li>InputManager : This deals with the details of how input files (the outputs of the fitters) should be read and stored. This should be accessed via <code>&lt;Plotting <a class="el" href="classManager.html" title="The manager class is responsible for managing configurations and settings.">Manager</a> Instance&gt;.input()</code>.</li>
-<li>StyleManager : This provides some helpful utilities for creating plots. This should be accessed via <code>&lt;Plotting <a class="el" href="classManager.html" title="The manager class is responsible for managing configurations and settings.">Manager</a> Instance&gt;.style()</code>.</li>
+<li>MaCh3Plotting::PlottingManager : This controls the high level stuff. It deals with application level options, command line options, and holds references to the other managers. This is the main class you should interact with on the user level.</li>
+<li>MaCh3Plotting::InputManager : This deals with the details of how input files (the outputs of the fitters) should be read and stored. This should be accessed via <code>&lt;Plotting <a class="el" href="classManager.html" title="The manager class is responsible for managing configurations and settings.">Manager</a> Instance&gt;.input()</code>.</li>
+<li>MaCh3Plotting::StyleManager : This provides some helpful utilities for creating plots. This should be accessed via <code>&lt;Plotting <a class="el" href="classManager.html" title="The manager class is responsible for managing configurations and settings.">Manager</a> Instance&gt;.style()</code>.</li>
 </ul>
 <hr  />
- <h1><a class="anchor" id="plotting_managers"></a>
+ <h1><a class="anchor" id="autotoc_md30"></a>
 Manager Classes</h1>
-<h1><a class="anchor" id="intro"></a>
-Introduction</h1>
+<h2><a class="anchor" id="autotoc_md31"></a>
+Introduction</h2>
 <p>The goal with MaCh3s plotting library is to be as flexible as possible and to abstract away all of the most annoying parts about plot making like reading in the data from fitter output files and keeping track of parameter names across different fitters, while allowing the user as much freedom as possible when it comes plot style and formatting.</p>
 <p>The plotting Library consists primarily of 3 main manager classes:</p>
 <ul>
@@ -118,7 +118,7 @@ Introduction</h1>
 <h1><a class="anchor" id="config_files"></a>
 Config Files</h1>
 <p>In order to achieve a high level of flexibility, MaCh3s plotting library makes heavy use of config files so that the behavior of the code can be adapted easily to individual experiments without having to totally reinvent the wheel and rewrite large amounts of boilerplate code. In line with the rest of MaCh3, the plotting library uses <a href="https://yaml.org/spec/1.2.2/">YAML</a> to specify its config files. Each of the manager classes above has a corresponding config file to control its functionality. The format of these config files are detailed below.</p>
-<h2><a class="anchor" id="plotting_config"></a>
+<h2><a class="anchor" id="autotoc_md32"></a>
 Plotting Config</h2>
 <p>This is the highest level config file and corresponds to the behavior of the Plotting <a class="el" href="classManager.html" title="The manager class is responsible for managing configurations and settings.">Manager</a>. It should be used to control high level variables like where to find other config files and various options for the plotting applications. This config acts as a sort of fixed reference point for the plotting library and so it's location is semi-hardcoded using the $MACH3 environment variable. In your experiment specific MaCh3 repository which is built against this MaCh3 core repository, you should define a plotting directory which contains the config file "PlottingConfig.yaml":</p>
 <div class="fragment"><div class="line">{MACH3}/plotting/PlottingConfig.yaml</div>
@@ -145,11 +145,11 @@ Plotting Config</h2>
 <div class="line">    {Option1}: &lt;value&gt;</div>
 <div class="line">    {Option2}: &lt;value&gt;</div>
 <div class="line">    ...</div>
-</div><!-- fragment --><h2><a class="anchor" id="translation_config"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md33"></a>
 Translation Config</h2>
-<p>This config defines the behaviour of the InputManager. It is used to define the output format of files from different fitters, and the parameters and samples that exist within the analysis, and what they are called in different fitters. This means that you can easily plot and compare files from different fitters without having to worry about the nitty gritty details of how to read from each specific file type and can focus on making beautiful plots! The components which are defined in this config are described below and you can find an example of such a config <a href="https://github.com/mach3-software/MaCh3/plotting/UniversalTranslator.yaml">here</a>.</p>
-<h3><a class="anchor" id="fitter_spec"></a>
-Fitter Specification</h3>
+<p>This config defines the behaviour of the MaCh3Plotting::InputManager. It is used to define the output format of files from different fitters, and the parameters and samples that exist within the analysis, and what they are called in different fitters. This means that you can easily plot and compare files from different fitters without having to worry about the nitty gritty details of how to read from each specific file type and can focus on making beautiful plots! The components which are defined in this config are described below and you can find an example of such a config <a href="https://github.com/mach3-software/MaCh3Tutorial/plotting/UniversalTranslator.yaml">here</a>.</p>
+<h2><a class="anchor" id="autotoc_md34"></a>
+Fitter Specification</h2>
 <p>In this section of the config file we specify what the output of each fitter we are interested in looks like so that the plotting code knows where to look for different outputs. We start this section in typical yaml style with</p>
 <div class="fragment"><div class="line">FitterSpec:</div>
 </div><!-- fragment --><p>Now we declare the names of fitters the plotting code should be aware of</p>
@@ -161,8 +161,8 @@ Fitter Specification</h3>
 <div class="line">FITTER_2:</div>
 <div class="line">    ...</div>
 </div><!-- fragment --><p>Under each of these headers you must now give details.</p>
-<h3><a class="anchor" id="llh_scan"></a>
-LLH Scan</h3>
+<h2><a class="anchor" id="autotoc_md35"></a>
+LLH Scan</h2>
 <p>Let's start with LLH scan information.</p>
 <p>You must specify the <code>LLHObjectType</code>. This is the type of root object that the plotter should expect to find in the output file. i.e. how this fitter stores their LLH scans. This can at present be either TH1D or TGraph. For MaCh3, TH1D is typically used so we would have</p>
 <div class="fragment"><div class="line">LLHObjectType: <span class="stringliteral">&quot;TH1D&quot;</span></div>
@@ -186,8 +186,8 @@ LLH Scan</h3>
 <div class="line">    [</div>
 <div class="line">        <span class="stringliteral">&quot;{SAMPLE}_LLH:{PARAMETER}{SAMPLE}&quot;</span>,</div>
 <div class="line">    ]</div>
-</div><!-- fragment --><h3><a class="anchor" id="mcmc"></a>
-MCMC</h3>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md36"></a>
+MCMC</h2>
 <p>We can now also specify where to look for things relating to the MCMC posteriors.</p>
 <p>under the <code>1dPosteriors</code> heading we can specify the location to look for one dimensional posterior objects that have been produced from a raw chain using the <a class="el" href="classMCMCProcessor.html" title="Class responsible for processing MCMC chains, performing diagnostics, generating plots,...">MCMCProcessor</a>. For example</p>
 <div class="fragment"><div class="line">1dPosteriors:</div>
@@ -200,8 +200,8 @@ MCMC</h3>
 <div class="line">        <span class="stringliteral">&quot;posteriors&quot;</span>,</div>
 <div class="line">    ]</div>
 </div><!-- fragment --><p>Note that the way that these are found is different to most of the other objects. This will use the <a class="el" href="classMCMCProcessor.html" title="Class responsible for processing MCMC chains, performing diagnostics, generating plots,...">MCMCProcessor</a> to find the names of the branches in the posterior tree. You as a user do not need to worry about this detail but you should be aware that this use of the <a class="el" href="classMCMCProcessor.html" title="Class responsible for processing MCMC chains, performing diagnostics, generating plots,...">MCMCProcessor</a> means that the <code>MCMCsteps</code> option is only usable for MaCh3 based fitters and you will need to have access to the yaml configs that were used initially</p>
-<h3><a class="anchor" id="parameter_spec"></a>
-Parameter Specification</h3>
+<h2><a class="anchor" id="autotoc_md37"></a>
+Parameter Specification</h2>
 <p>Another important part of the translation config is to define the parameters that are modelled in the experiment. This section of the yaml is imaginatively marked with the <code>Parameters</code> header:</p>
 <div class="fragment"><div class="line">Parameters:</div>
 </div><!-- fragment --><p>The first step is to define the master list of all of the parameters that the plotting library should be aware of, this is defined using the <code>Parameters</code> variable. An example of this could look something like</p>
@@ -229,8 +229,8 @@ Parameter Specification</h3>
 <div class="line">    <span class="stringliteral">&quot;delta_cp&quot;</span></div>
 <div class="line">]</div>
 </div><!-- fragment --><p>Note that the names specified here are internal to the plotting library and do not need to correspond to the ones used in other parts of MaCh3 (although if they do it makes things a bit easier). These are simply labels used to uniquely identify the parameters across all files and fitters, as well as within the config files.</p>
-<h3><a class="anchor" id="parameter_specific_opts"></a>
-Parameter Specific Options</h3>
+<h2><a class="anchor" id="autotoc_md38"></a>
+Parameter Specific Options</h2>
 <p>We can then also specify options specific to each parameter. The options exist under headings which should match the labels specified in the list above e.g.</p>
 <div class="fragment"><div class="line">Norm_Param_0:</div>
 <div class="line"> </div>
@@ -252,8 +252,8 @@ Parameter Specific Options</h3>
 <div class="line"><span class="preprocessor">        ## TH1Ds. The code doesn&#39;t like this and so the override will break the degeneracy.</span></div>
 <div class="line"><span class="preprocessor">        postFitLoc: [&quot;errors/Cross-Section Systematics Group 2/values/postFitErrors&quot;</span>]</div>
 </div><!-- fragment --><p>If no fitter specific names are specified for a parameter then the name will default to the label in the list above. Hence why it is useful to use the regular MaCh3 names for those. </p>
-<h3><a class="anchor" id="sample_spec"></a>
-Sample Specification</h3>
+<h2><a class="anchor" id="autotoc_md39"></a>
+Sample Specification</h2>
 <p>We must also do the same for the samples that exist in the fitter. The format for doing this is essentially the same as for the parameters as described above. An example of this might look like</p>
 <div class="fragment"><div class="line">Samples:</div>
 <div class="line"> </div>
@@ -283,8 +283,8 @@ Sample Specification</h3>
 <div class="line"><span class="preprocessor">        ## are related to some particular sub-detector by adding a tag for that detector</span></div>
 <div class="line"><span class="preprocessor">        ## Or to samples which correspond to a particular tagged particle</span></div>
 <div class="line"><span class="preprocessor">        tags: [&quot;subDet1&quot;</span>, &quot;particleTag&quot;]</div>
-</div><!-- fragment --><h3><a class="anchor" id="location_strings"></a>
-Location Strings</h3>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md40"></a>
+Location Strings</h2>
 <p>The translation config makes use of a custom location specifier format which we will describe here.</p>
 <p>Generally speaking multiple locations can be specified for each object type by using a list in the config file like</p>
 <div class="fragment"><div class="line">location: [</div>
@@ -305,18 +305,18 @@ Location Strings</h3>
 <div class="line">    xsec2_parameter_4</div>
 </div><!-- fragment --><p>Having to keep track of the fluxA, xsecB labels and updating the fitter specific parameter names manually would be incredibly tedious and not very sustainable as they are liable to change as more parameters of different types are added. Instead by specifying the location <code>path\to\objects:{PARAMETER}</code>, these parameters would be found correctly without having to worry about these additional labels.</p>
 <p>(NB: This approach will very likely change to become more flexible in the future. As it stands it is only able to deal with cases where the end of the parameter name matches, this isn't very flexible. It would likely be a lot better to use regex or something like that to be able to specify more general cases with wildcards. regex is likely a good approach since root has built in functionality for matching these to object names.)</p>
-<h3><a class="anchor" id="special_tokens"></a>
-Special Tokens</h3>
+<h2><a class="anchor" id="autotoc_md41"></a>
+Special Tokens</h2>
 <p>There are a number of special tokens that can be used when specifying a location. These tokens, which take the form <code>{SOME_LABEL}</code> will be replaced in the code when searching for a particular object in the input file. Currently the following tokens exist:</p>
 <ul>
 <li><code>{PARAMETER}</code> - This will be replaced with the fitter specific name of the parameter currently being looked for. e.g. if you specify the location string "path_to\{PARAMETER}_LLH" for an LLH scan then when the code is looking for LLH scans for parameter_1 the location will be expanded to "path_to\parameter_1_LLH"</li>
 <li><code>{SAMPLE}</code> - This will be replaced by the fitter specific name of the sample currently being looked for. e.g. if you specify the location string "path_to\{SAMPLE}\{PARAMETER}_LLH" for the sample specific LLH scans then when looking for the scan of parameter_2 for sample sample_1 the location will be expanded to "path_to\sample_1\parameter_2_LLH"</li>
 <li><code>{PARAMETER2}</code> - This can be used for cases where an object is labelled by 2 parameters, e.g. 2D LLH scans, or 2D posterior distributions. If you specified the location string "path_to\{PARAMETER}_{PARAMETER2}_2D_object" then when looking for a 2D object for parameter_1 and parameter_45 then it would be expanded to "path_to\parameter_1_parameter_45_2D_object". (Note that currently no 2d objects are actually looked for but this could be useful in the future)</li>
 </ul>
-<h2><a class="anchor" id="style_config"></a>
+<h2><a class="anchor" id="autotoc_md42"></a>
 Style Config</h2>
-<p>This config corresponds to the behavior of the Style <a class="el" href="classManager.html" title="The manager class is responsible for managing configurations and settings.">Manager</a>. Here you can specify options relating to the style of your plots.</p>
-<h3><a class="anchor" id="colour_palettes"></a>
+<p>This config corresponds to the behavior of the MaCh3Plotting::StyleManager. Here you can specify options relating to the style of your plots.</p>
+<h3><a class="anchor" id="autotoc_md43"></a>
 Colour Palettes</h3>
 <p>You can specify colour palettes in the same style as root as follows:</p>
 <div class="fragment"><div class="line">ColorPallettes: # &lt;- Tells yaml that the following are colour palettes</div>
@@ -334,7 +334,7 @@ Colour Palettes</h3>
 <div class="line">  AnotherPalette:</div>
 <div class="line">  ...</div>
 </div><!-- fragment --><p>Which will give you a red-white-blue palette. The palettes you specify here can then be used in your plotting scripts by referencing the name set here using, for example, <code>&lt;plotting manager instance&gt;.style()-&gt;SetPalette("RedWhiteBlue")</code>.</p>
-<h3><a class="anchor" id="pretty_names"></a>
+<h3><a class="anchor" id="autotoc_md44"></a>
 Pretty Names</h3>
 <p>You can define fancy names to use in place of the parameter and sample tags defined in the translation config. You can even use latex here for added fanciness. This should look something like:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">## first nice names for parameters</span></div>
@@ -360,23 +360,21 @@ Pretty Names</h3>
 <div class="line">    SAMPLE_1: <span class="stringliteral">&quot;sample 1&quot;</span></div>
 <div class="line">    SAMPLE_2: <span class="stringliteral">&quot;sample 2&quot;</span></div>
 <div class="line">    SAMPLE_3: <span class="stringliteral">&quot;sample 3&quot;</span></div>
-</div><!-- fragment --><h1><a class="anchor" id="usage"></a>
-Usage</h1>
-<p>In this section we will cover the general usage of the plotting library. The Standard Apps sections covers the usage of the apps that are used to make the "standard" MaCh3 plots that often appear in tech notes and papers. If you are not interested in doing anything fancy and simply want to reproduce some of these standard plots for comparisons and validations against a previous result, then you can just use these.</p>
-<p>If you are interested in doing more advanced things and need a more custom solution, then see the Custom Plotting Scripts section for information on using the plotting utilities in your own scripts. </p>
-<h1><a class="anchor" id="usage"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md45"></a>
 Usage</h1>
 <p>In this section we will cover the general usage of the plotting library. The Standard Apps sections covers the usage of the apps that are used to make the "standard" MaCh3 plots that often appear in tech notes and papers. If you are not interested in doing anything fancy and simply want to reproduce some of these standard plots for comparisons and validations against a previous result, then you can just use these.</p>
 <p>If you are interested in doing more advanced things and need a more custom solution, then see the Custom Plotting Scripts section for information on using the plotting utilities in your own scripts.</p>
-<h2><a class="anchor" id="cli"></a>
+<p>In this section we will cover the general usage of the plotting library. The Standard Apps sections covers the usage of the apps that are used to make the "standard" MaCh3 plots that often appear in tech notes and papers. If you are not interested in doing anything fancy and simply want to reproduce some of these standard plots for comparisons and validations against a previous result, then you can just use these.</p>
+<p>If you are interested in doing more advanced things and need a more custom solution, then see the Custom Plotting Scripts section for information on using the plotting utilities in your own scripts.</p>
+<h2><a class="anchor" id="autotoc_md46"></a>
 Command Line Interface</h2>
-<p>Through the use of the PlottingManager class, we are able to define a common command line interface across all plotting apps (which you can also use in your own custom plotting apps, and even python scripts!). The general usage pattern looks like</p>
+<p>Through the use of the MaCh3Plotting::PlottingManager class, we are able to define a common command line interface across all plotting apps (which you can also use in your own custom plotting apps, and even python scripts!). The general usage pattern looks like</p>
 <div class="fragment"><div class="line">&lt;Plotting App&gt; [Optional parameters] &lt;Input File 1&gt; &lt;Input File 2&gt; ...</div>
 </div><!-- fragment --><p>where the optional parameters are detailed in Available Options.</p>
 <p>In the case of a python script this simply becomes</p>
 <div class="fragment"><div class="line">python &lt;Plotting Script&gt;.py [Optional parameters] &lt;Input File 1&gt; &lt;Input File 2&gt;</div>
-</div><!-- fragment --><h3><a class="anchor" id="available_options"></a>
-Available Options</h3>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md47"></a>
+Available Options</h2>
 <p>There are a number of pre-defined general options which can be specified when plotting. These are described below:</p>
 <div class="fragment"><div class="line">-r overlay ratio plots</div>
 <div class="line"> </div>
@@ -389,19 +387,68 @@ Available Options</h3>
 <div class="line">-o the name of the output pdf</div>
 <div class="line"> </div>
 <div class="line">-d a <span class="keywordtype">string</span> specifying additional drawing options to pass to the histogram draw calls, e.g. `-d <span class="stringliteral">&quot;C&quot;</span>` will plot smooth curves through the histogram bins. See https:<span class="comment">//root.cern/doc/master/classTHistPainter.html#HP01a for possible options.</span></div>
-<div class="ttc" id="aProcessMCMC_8cpp_html_a13056efd080ab16304b6f7be0ebf0a61"><div class="ttname"><a href="ProcessMCMC_8cpp.html#a13056efd080ab16304b6f7be0ebf0a61">config</a></div><div class="ttdeci">std::string config</div><div class="ttdef"><b>Definition:</b> <a href="ProcessMCMC_8cpp_source.html#l00028">ProcessMCMC.cpp:28</a></div></div>
+<div class="ttc" id="aProcessMCMC_8cpp_html_a13056efd080ab16304b6f7be0ebf0a61"><div class="ttname"><a href="ProcessMCMC_8cpp.html#a13056efd080ab16304b6f7be0ebf0a61">config</a></div><div class="ttdeci">std::string config</div><div class="ttdef"><b>Definition:</b> <a href="ProcessMCMC_8cpp_source.html#l00030">ProcessMCMC.cpp:30</a></div></div>
 </div><!-- fragment --><p>Note that not all of these options are valid for all plotting purposes. For example, the <code>-s</code> option only makes sense for plotting objects which can be split by sample, this does not apply for example to plotting post fit errors. Currently specifying an invalid option will simply not have any effect on the produced plots however in future it would likely be useful to produce some sort of error or warning.</p>
-<h2><a class="anchor" id="standard_apps"></a>
+<h2><a class="anchor" id="autotoc_md48"></a>
 Standard Apps</h2>
-<h3><a class="anchor" id="plotllh"></a>
+<h3><a class="anchor" id="autotoc_md49"></a>
 PlotLLH</h3>
 <p>Plots log likelihood scans which have been made by scanning each parameter through its prior range and calculating the likelihood. can take any number of LLH scans as input, will use the first one as a baseline when making e.g. ratio plots.</p>
-<h3><a class="anchor" id="getpostfitparamplots"></a>
+<h3><a class="anchor" id="autotoc_md50"></a>
 GetPostFitParamPlots</h3>
-<p>This will plot output from ProcessMCMC for nice plots which can go to TN. Bits are hardcoded to make plots nicer users should be careful when using the non-conventional xsec model. If you used <code>ProcessMCMC</code> with <code>PlotDet</code> you will also get an overlay of detector parameters (ND or ND+FD depending on chain type). If Violin plot was produced in <code>ProcessMCMC</code> you will get fancy plots here as well.</p>
-<h2><a class="anchor" id="custom_scripts"></a>
+<p>This will plot output from <a class="el" href="ProcessMCMC_8cpp.html#a52c48199a4bcad577b88768020a91041">ProcessMCMC</a> for nice plots which can go to TN. Bits are hardcoded to make plots nicer users should be careful when using the non-conventional xsec model. If Violin plot was produced in <code>ProcessMCMC</code> you will get fancy plots here as well.</p>
+<h3><a class="anchor" id="autotoc_md51"></a>
+MatrixPlotter</h3>
+<p>Requires output from <a class="el" href="ProcessMCMC_8cpp.html#a52c48199a4bcad577b88768020a91041">ProcessMCMC</a> (must be run with <code>PlotCorr</code>). Allows plotting of submatrices and any combination of parameters.</p>
+<h3><a class="anchor" id="autotoc_md52"></a>
+PredictivePlotting</h3>
+<p>Allows comparison of prior/posterior predictive distributions. Requires output from running <a class="el" href="classPredictiveThrower.html#a20b3675571694f84a5cdec12444eb7d9">PredictiveThrower::RunPredictiveAnalysis</a> RunPredictiveAnalysis.</p>
+<h3><a class="anchor" id="autotoc_md53"></a>
+PlotSigmaVariation</h3>
+<p>Produces sigma variation comparisons. Requires output from running <a class="el" href="classFitterBase.html#a71e43b96395568e54879d9bd1b57c0f8">FitterBase::RunSigmaVar</a> RunSigmaVar.</p>
+<h2><a class="anchor" id="autotoc_md54"></a>
 Custom Plotting Scripts</h2>
-<p>If you want more flexibility with your plotting, you can use the manager classes in your own plotting scripts so that you have all the benefits of MaCh3s plotting library (Generalised input reading, unified command line interface, configurability, a number of general plotting utility functions) but with total freedom of how to actually make plots. In general this is as easy as including the PlottingManager in your script, initialising it with the command line inputs, and then you're good to go! This section will give some more details on how to do this, along with some examples using fitter outputs that you can generate by following the MaCh3 Tutorial. The tutorial also covers usage of the plotting library in a more hands on way, so it is highly recommended to follow that in addition to reading the wiki. </p>
+<p>If you want more flexibility with your plotting, you can use the manager classes in your own plotting scripts so that you have all the benefits of MaCh3s plotting library (Generalised input reading, unified command line interface, configurability, a number of general plotting utility functions) but with total freedom of how to actually make plots. In general this is as easy as including the MaCh3Plotting::PlottingManager in your script, initialising it with the command line inputs, and then you're good to go! This section will give some more details on how to do this, along with some examples using fitter outputs that you can generate by following the MaCh3 Tutorial.</p>
+<h1><a class="anchor" id="autotoc_md55"></a>
+Python Interface</h1>
+<p>MaCh3 also provides a Python interface for plotting and analyzing MCMC/fitter outputs. This allows full access to the plotting utilities from Python scripts, including command line input parsing, PDF export, and custom styling.</p>
+<h2><a class="anchor" id="autotoc_md56"></a>
+Installation</h2>
+<p>The plotting library comes with a Python interface. See the <a href="https://github.com/mach3-software/MaCh3/blob/develop/README.md#python">MaCh3 Python interface README</a> for installation details.</p>
+<h2><a class="anchor" id="autotoc_md57"></a>
+Basic Usage</h2>
+<p>Once installed, you can import the plotting submodule as follows:</p>
+<div class="fragment"><div class="line">from pyMaCh3 import plotting</div>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md58"></a>
+Example: Plotting Likelihood Scans</h3>
+<p>The following example demonstrates how to plot LLH scans for all known parameters and save them to a PDF:</p>
+<div class="fragment"><div class="line">from pyMaCh3 import plotting</div>
+<div class="line">import matplotlib.backends.backend_pdf</div>
+<div class="line">from matplotlib import pyplot as plt</div>
+<div class="line">import sys</div>
+<div class="line"> </div>
+<div class="line"># Create an instance of the PlottingManager</div>
+<div class="line">man = plotting.PlottingManager()</div>
+<div class="line"> </div>
+<div class="line"># Parse command line inputs passed to the script</div>
+<div class="line">man.parse_inputs(sys.argv)</div>
+<div class="line"> </div>
+<div class="line"># Open a PDF file to save the generated plots</div>
+<div class="line">pdf = matplotlib.backends.backend_pdf.PdfPages(&quot;LLH-scans.pdf&quot;)</div>
+<div class="line"> </div>
+<div class="line"># Loop through all known parameters and plot their likelihood scans</div>
+<div class="line">for i, param in enumerate(man.input().get_known_parameters()):</div>
+<div class="line">    fig = plt.figure()</div>
+<div class="line">    plt.title(man.style().prettify_parameter_name(param))</div>
+<div class="line"> </div>
+<div class="line">    for file_id in range(man.input().get_n_input_files()):</div>
+<div class="line">        llh_scan = man.input().get_llh_scan(file_id, param, &quot;sample&quot;)</div>
+<div class="line">        plt.plot(llh_scan[0], llh_scan[1])</div>
+<div class="line"> </div>
+<div class="line">    pdf.savefig(fig)</div>
+<div class="line"> </div>
+<div class="line">pdf.close()</div>
+</div><!-- fragment --><p>This workflow gives you access to all plotting utilities from Python, while preserving the general input handling, styling, and convenience provided by the MaCh3 library. </p>
 </div><!-- contents -->
 <!-- Footer for MaCh3 Doxygen documentation -->
 <footer class="mach3-footer" style="text-align: center;">

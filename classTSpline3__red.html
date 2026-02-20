@@ -196,10 +196,10 @@ Protected Attributes</h2></td></tr>
 <div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    <a class="code" href="classTSpline3__red.html#af81e778c5cad933f48940e63857b4ffa">YResp</a> = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;  }</div>
 <div class="ttc" id="aclassTResponseFunction__red_html_a50443a78985e0c9b16ffc36ebc1d2e91"><div class="ttname"><a href="classTResponseFunction__red.html#a50443a78985e0c9b16ffc36ebc1d2e91">TResponseFunction_red::TResponseFunction_red</a></div><div class="ttdeci">TResponseFunction_red()</div><div class="ttdoc">Empty constructor.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00135">SplineStructs.h:135</a></div></div>
-<div class="ttc" id="aclassTSpline3__red_html_a449ef081c6c2701865e371ab1c2e235e"><div class="ttname"><a href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">TSpline3_red::Par</a></div><div class="ttdeci">M3::float_t ** Par</div><div class="ttdoc">Always uses a third order polynomial, so hard-code the number of coefficients in implementation.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00770">SplineStructs.h:770</a></div></div>
-<div class="ttc" id="aclassTSpline3__red_html_a5ca79646cbc9dce56ed973274f860c0d"><div class="ttname"><a href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">TSpline3_red::nPoints</a></div><div class="ttdeci">M3::int_t nPoints</div><div class="ttdoc">Number of points/knot in TSpline3.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00768">SplineStructs.h:768</a></div></div>
-<div class="ttc" id="aclassTSpline3__red_html_aa4b35c6ba0d90d3b13b49f99beadbf79"><div class="ttname"><a href="classTSpline3__red.html#aa4b35c6ba0d90d3b13b49f99beadbf79">TSpline3_red::XPos</a></div><div class="ttdeci">M3::float_t * XPos</div><div class="ttdoc">Positions of each x for each knot.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00772">SplineStructs.h:772</a></div></div>
-<div class="ttc" id="aclassTSpline3__red_html_af81e778c5cad933f48940e63857b4ffa"><div class="ttname"><a href="classTSpline3__red.html#af81e778c5cad933f48940e63857b4ffa">TSpline3_red::YResp</a></div><div class="ttdeci">M3::float_t * YResp</div><div class="ttdoc">y-value for each knot</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00774">SplineStructs.h:774</a></div></div>
+<div class="ttc" id="aclassTSpline3__red_html_a449ef081c6c2701865e371ab1c2e235e"><div class="ttname"><a href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">TSpline3_red::Par</a></div><div class="ttdeci">M3::float_t ** Par</div><div class="ttdoc">Always uses a third order polynomial, so hard-code the number of coefficients in implementation.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00771">SplineStructs.h:771</a></div></div>
+<div class="ttc" id="aclassTSpline3__red_html_a5ca79646cbc9dce56ed973274f860c0d"><div class="ttname"><a href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">TSpline3_red::nPoints</a></div><div class="ttdeci">M3::int_t nPoints</div><div class="ttdoc">Number of points/knot in TSpline3.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00769">SplineStructs.h:769</a></div></div>
+<div class="ttc" id="aclassTSpline3__red_html_aa4b35c6ba0d90d3b13b49f99beadbf79"><div class="ttname"><a href="classTSpline3__red.html#aa4b35c6ba0d90d3b13b49f99beadbf79">TSpline3_red::XPos</a></div><div class="ttdeci">M3::float_t * XPos</div><div class="ttdoc">Positions of each x for each knot.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00773">SplineStructs.h:773</a></div></div>
+<div class="ttc" id="aclassTSpline3__red_html_af81e778c5cad933f48940e63857b4ffa"><div class="ttname"><a href="classTSpline3__red.html#af81e778c5cad933f48940e63857b4ffa">TSpline3_red::YResp</a></div><div class="ttdeci">M3::float_t * YResp</div><div class="ttdoc">y-value for each knot</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00775">SplineStructs.h:775</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -397,26 +397,26 @@ Protected Attributes</h2></td></tr>
 
 <p>CW: Make a TSpline3 from the reduced splines. </p>
 
-<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00736">736</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;                                       {</div>
-<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;    <span class="comment">// KS: Sadly ROOT only accepts double...</span></div>
-<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;<span class="preprocessor">    #ifdef _LOW_MEMORY_STRUCTS_</span></div>
-<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;    std::vector&lt;Double_t&gt; xPosDoubles(<a class="code" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>);</div>
-<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160;    std::vector&lt;Double_t&gt; yPosDoubles(<a class="code" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>);</div>
-<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;    <span class="keywordflow">for</span> (Int_t i = 0; i &lt; <a class="code" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>; ++i) {</div>
-<div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160;      xPosDoubles[i] = <span class="keyword">static_cast&lt;</span>Double_t<span class="keyword">&gt;</span>(<a class="code" href="classTSpline3__red.html#aa4b35c6ba0d90d3b13b49f99beadbf79">XPos</a>[i]); <span class="comment">// Convert float to double</span></div>
-<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160;      yPosDoubles[i] = <span class="keyword">static_cast&lt;</span>Double_t<span class="keyword">&gt;</span>(<a class="code" href="classTSpline3__red.html#af81e778c5cad933f48940e63857b4ffa">YResp</a>[i]); <span class="comment">// Convert float to double</span></div>
-<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;    }</div>
-<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;    TSpline3 *spline = <span class="keyword">new</span> TSpline3(<span class="stringliteral">&quot;Spline&quot;</span>, xPosDoubles.data(), yPosDoubles.data(), <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>));</div>
-<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;<span class="preprocessor">    #else</span></div>
-<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;    TSpline3 *spline = <span class="keyword">new</span> TSpline3(<span class="stringliteral">&quot;Spline&quot;</span>, <a class="code" href="classTSpline3__red.html#aa4b35c6ba0d90d3b13b49f99beadbf79">XPos</a>, <a class="code" href="classTSpline3__red.html#af81e778c5cad933f48940e63857b4ffa">YResp</a>, <a class="code" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>);</div>
-<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;<span class="preprocessor">    #endif</span></div>
-<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;    <span class="keywordflow">for</span> (Int_t i = 0; i &lt; <a class="code" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>; ++i) {</div>
-<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;      spline-&gt;SetPointCoeff(i, <a class="code" href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">Par</a>[i][0], <a class="code" href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">Par</a>[i][1], <a class="code" href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">Par</a>[i][2]);</div>
-<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;    }</div>
-<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160; </div>
-<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;    <span class="keywordflow">return</span> spline;</div>
-<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00737">737</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;                                       {</div>
+<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;    <span class="comment">// KS: Sadly ROOT only accepts double...</span></div>
+<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;<span class="preprocessor">    #ifdef _LOW_MEMORY_STRUCTS_</span></div>
+<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160;    std::vector&lt;Double_t&gt; xPosDoubles(<a class="code" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>);</div>
+<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;    std::vector&lt;Double_t&gt; yPosDoubles(<a class="code" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>);</div>
+<div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160;    <span class="keywordflow">for</span> (Int_t i = 0; i &lt; <a class="code" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>; ++i) {</div>
+<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160;      xPosDoubles[i] = <span class="keyword">static_cast&lt;</span>Double_t<span class="keyword">&gt;</span>(<a class="code" href="classTSpline3__red.html#aa4b35c6ba0d90d3b13b49f99beadbf79">XPos</a>[i]); <span class="comment">// Convert float to double</span></div>
+<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;      yPosDoubles[i] = <span class="keyword">static_cast&lt;</span>Double_t<span class="keyword">&gt;</span>(<a class="code" href="classTSpline3__red.html#af81e778c5cad933f48940e63857b4ffa">YResp</a>[i]); <span class="comment">// Convert float to double</span></div>
+<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;    }</div>
+<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;    TSpline3 *spline = <span class="keyword">new</span> TSpline3(<span class="stringliteral">&quot;Spline&quot;</span>, xPosDoubles.data(), yPosDoubles.data(), <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>));</div>
+<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;<span class="preprocessor">    #else</span></div>
+<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;    TSpline3 *spline = <span class="keyword">new</span> TSpline3(<span class="stringliteral">&quot;Spline&quot;</span>, <a class="code" href="classTSpline3__red.html#aa4b35c6ba0d90d3b13b49f99beadbf79">XPos</a>, <a class="code" href="classTSpline3__red.html#af81e778c5cad933f48940e63857b4ffa">YResp</a>, <a class="code" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>);</div>
+<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;<span class="preprocessor">    #endif</span></div>
+<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;    <span class="keywordflow">for</span> (Int_t i = 0; i &lt; <a class="code" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>; ++i) {</div>
+<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;      spline-&gt;SetPointCoeff(i, <a class="code" href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">Par</a>[i][0], <a class="code" href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">Par</a>[i][1], <a class="code" href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">Par</a>[i][2]);</div>
+<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;    }</div>
+<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160; </div>
+<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;    <span class="keywordflow">return</span> spline;</div>
+<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -448,20 +448,20 @@ Protected Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classTResponseFunction__red.html#a9131d654c46da7e4ab1c9c679a5c9008">TResponseFunction_red</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00706">706</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160;                                          {</div>
-<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;    <span class="comment">// Get the segment for this variation</span></div>
-<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;    <span class="keywordtype">int</span> segment = <a class="code" href="classTSpline3__red.html#a39668a1dc14058a1f833e9621ec19caf">FindX</a>(var);</div>
-<div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160;    <span class="comment">// The get the coefficients for this variation</span></div>
-<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;    <a class="code" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a> x = <a class="code" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a>(-999.99), y = <a class="code" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a>(-999.99), b = <a class="code" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a>(-999.99), c = <a class="code" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a>(-999.99), d = <a class="code" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a>(-999.99);</div>
-<div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160;    <a class="code" href="classTSpline3__red.html#a74d108b99a9060ab85c22343fa4a4532">GetCoeff</a>(segment, x, y, b, c, d);</div>
-<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160;    <span class="keywordtype">double</span> dx = var - x;</div>
-<div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160;    <span class="comment">// Evaluate the third order polynomial</span></div>
-<div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160;    <span class="keywordtype">double</span> weight = y+dx*(b+dx*(c+d*dx));</div>
-<div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160;    <span class="keywordflow">return</span> weight;</div>
-<div class="line"><a name="l00716"></a><span class="lineno">  716</span>&#160;  }</div>
-<div class="ttc" id="aclassTSpline3__red_html_a39668a1dc14058a1f833e9621ec19caf"><div class="ttname"><a href="classTSpline3__red.html#a39668a1dc14058a1f833e9621ec19caf">TSpline3_red::FindX</a></div><div class="ttdeci">int FindX(double x)</div><div class="ttdoc">Find the segment relevant to this variation in x.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00672">SplineStructs.h:672</a></div></div>
-<div class="ttc" id="aclassTSpline3__red_html_a74d108b99a9060ab85c22343fa4a4532"><div class="ttname"><a href="classTSpline3__red.html#a74d108b99a9060ab85c22343fa4a4532">TSpline3_red::GetCoeff</a></div><div class="ttdeci">void GetCoeff(int segment, M3::float_t &amp;x, M3::float_t &amp;y, M3::float_t &amp;b, M3::float_t &amp;c, M3::float_t &amp;d)</div><div class="ttdoc">CW: Get the coefficient of a given segment.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00727">SplineStructs.h:727</a></div></div>
+<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00707">707</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;                                          {</div>
+<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;    <span class="comment">// Get the segment for this variation</span></div>
+<div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160;    <span class="keywordtype">int</span> segment = <a class="code" href="classTSpline3__red.html#a39668a1dc14058a1f833e9621ec19caf">FindX</a>(var);</div>
+<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;    <span class="comment">// The get the coefficients for this variation</span></div>
+<div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160;    <a class="code" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a> x = <a class="code" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a>(-999.99), y = <a class="code" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a>(-999.99), b = <a class="code" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a>(-999.99), c = <a class="code" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a>(-999.99), d = <a class="code" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a>(-999.99);</div>
+<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160;    <a class="code" href="classTSpline3__red.html#a74d108b99a9060ab85c22343fa4a4532">GetCoeff</a>(segment, x, y, b, c, d);</div>
+<div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160;    <span class="keywordtype">double</span> dx = var - x;</div>
+<div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160;    <span class="comment">// Evaluate the third order polynomial</span></div>
+<div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160;    <span class="keywordtype">double</span> weight = y+dx*(b+dx*(c+d*dx));</div>
+<div class="line"><a name="l00716"></a><span class="lineno">  716</span>&#160;    <span class="keywordflow">return</span> weight;</div>
+<div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160;  }</div>
+<div class="ttc" id="aclassTSpline3__red_html_a39668a1dc14058a1f833e9621ec19caf"><div class="ttname"><a href="classTSpline3__red.html#a39668a1dc14058a1f833e9621ec19caf">TSpline3_red::FindX</a></div><div class="ttdeci">int FindX(double x)</div><div class="ttdoc">Find the segment relevant to this variation in x.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00673">SplineStructs.h:673</a></div></div>
+<div class="ttc" id="aclassTSpline3__red_html_a74d108b99a9060ab85c22343fa4a4532"><div class="ttname"><a href="classTSpline3__red.html#a74d108b99a9060ab85c22343fa4a4532">TSpline3_red::GetCoeff</a></div><div class="ttdeci">void GetCoeff(int segment, M3::float_t &amp;x, M3::float_t &amp;y, M3::float_t &amp;b, M3::float_t &amp;c, M3::float_t &amp;d)</div><div class="ttdoc">CW: Get the coefficient of a given segment.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00728">SplineStructs.h:728</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -490,41 +490,43 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Find the segment relevant to this variation in x. </p>
-<dl class="section note"><dt>Note</dt><dd>See <code>root/hist/hist/src/TSpline3::FindX(double)</code> or <code>FindSplineSegment</code> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a href="https://root.cern/doc/master/classTSpline3.html#TSpline3:FindX">TSpline3::FindX(double)</a> for ROOT implementation </dd>
+<dd>
+<a class="el" href="classSplineBase.html#a589011b547ff70262ed43021a016ef30">SplineBase::FindSplineSegment</a> FindSplineSegment for the base class version </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00672">672</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;                             {</div>
-<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;    <span class="comment">// The segment we&#39;re interested in (klow in ROOT code)</span></div>
-<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;    <span class="keywordtype">int</span> segment = 0;</div>
-<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;    <span class="keywordtype">int</span> kHigh = <a class="code" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>-1;</div>
-<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160;    <span class="comment">// If the variation is below the lowest saved spline point</span></div>
-<div class="line"><a name="l00677"></a><span class="lineno">  677</span>&#160;    <span class="keywordflow">if</span> (x &lt;= <a class="code" href="classTSpline3__red.html#aa4b35c6ba0d90d3b13b49f99beadbf79">XPos</a>[0]){</div>
-<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;      segment = 0;</div>
-<div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;      <span class="comment">// If the variation is above the highest saved spline point</span></div>
-<div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160;    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (x &gt;= <a class="code" href="classTSpline3__red.html#aa4b35c6ba0d90d3b13b49f99beadbf79">XPos</a>[<a class="code" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>-1]) {</div>
-<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;      <span class="comment">// Yes, the -2 is indeed correct, see TSpline.cxx:814 and //see: https://savannah.cern.ch/bugs/?71651</span></div>
-<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;      segment = kHigh;</div>
-<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;      <span class="comment">// If the variation is between the maximum and minimum, perform a binary search</span></div>
-<div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;      <span class="comment">// The top point we&#39;ve got</span></div>
-<div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;      <span class="keywordtype">int</span> kHalf = 0;</div>
-<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;      <span class="comment">// While there is still a difference in the points (we haven&#39;t yet found the segment)</span></div>
-<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;      <span class="comment">// This is a binary search, incrementing segment and decrementing kHalf until we&#39;ve found the segment</span></div>
-<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;      <span class="keywordflow">while</span> (kHigh - segment &gt; 1) {</div>
-<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;        <span class="comment">// Increment the half-step</span></div>
-<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;        kHalf = (segment + kHigh)/2;</div>
-<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;        <span class="comment">// If our variation is above the kHalf, set the segment to kHalf</span></div>
-<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;        <span class="keywordflow">if</span> (x &gt; <a class="code" href="classTSpline3__red.html#aa4b35c6ba0d90d3b13b49f99beadbf79">XPos</a>[kHalf]) {</div>
-<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;          segment = kHalf;</div>
-<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;          <span class="comment">// Else move kHigh down</span></div>
-<div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;          kHigh = kHalf;</div>
-<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;        }</div>
-<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;      } <span class="comment">// End the while: we&#39;ve now done our binary search</span></div>
-<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;    } <span class="comment">// End the else: we&#39;ve now found our point</span></div>
-<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;    <span class="keywordflow">if</span> (segment &gt;= <a class="code" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>-1 &amp;&amp; <a class="code" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a> &gt; 1) segment = <a class="code" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>-2;</div>
-<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;    <span class="keywordflow">return</span> segment;</div>
-<div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00673">673</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;                             {</div>
+<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;    <span class="comment">// The segment we&#39;re interested in (klow in ROOT code)</span></div>
+<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;    <span class="keywordtype">int</span> segment = 0;</div>
+<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160;    <span class="keywordtype">int</span> kHigh = <a class="code" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>-1;</div>
+<div class="line"><a name="l00677"></a><span class="lineno">  677</span>&#160;    <span class="comment">// If the variation is below the lowest saved spline point</span></div>
+<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;    <span class="keywordflow">if</span> (x &lt;= <a class="code" href="classTSpline3__red.html#aa4b35c6ba0d90d3b13b49f99beadbf79">XPos</a>[0]){</div>
+<div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;      segment = 0;</div>
+<div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160;      <span class="comment">// If the variation is above the highest saved spline point</span></div>
+<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (x &gt;= <a class="code" href="classTSpline3__red.html#aa4b35c6ba0d90d3b13b49f99beadbf79">XPos</a>[<a class="code" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>-1]) {</div>
+<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;      <span class="comment">// Yes, the -2 is indeed correct, see TSpline.cxx:814 and //see: https://savannah.cern.ch/bugs/?71651</span></div>
+<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;      segment = kHigh;</div>
+<div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;      <span class="comment">// If the variation is between the maximum and minimum, perform a binary search</span></div>
+<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;      <span class="comment">// The top point we&#39;ve got</span></div>
+<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;      <span class="keywordtype">int</span> kHalf = 0;</div>
+<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;      <span class="comment">// While there is still a difference in the points (we haven&#39;t yet found the segment)</span></div>
+<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;      <span class="comment">// This is a binary search, incrementing segment and decrementing kHalf until we&#39;ve found the segment</span></div>
+<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;      <span class="keywordflow">while</span> (kHigh - segment &gt; 1) {</div>
+<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;        <span class="comment">// Increment the half-step</span></div>
+<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;        kHalf = (segment + kHigh)/2;</div>
+<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;        <span class="comment">// If our variation is above the kHalf, set the segment to kHalf</span></div>
+<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;        <span class="keywordflow">if</span> (x &gt; <a class="code" href="classTSpline3__red.html#aa4b35c6ba0d90d3b13b49f99beadbf79">XPos</a>[kHalf]) {</div>
+<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;          segment = kHalf;</div>
+<div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;          <span class="comment">// Else move kHigh down</span></div>
+<div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;          kHigh = kHalf;</div>
+<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;        }</div>
+<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;      } <span class="comment">// End the while: we&#39;ve now done our binary search</span></div>
+<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;    } <span class="comment">// End the else: we&#39;ve now found our point</span></div>
+<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;    <span class="keywordflow">if</span> (segment &gt;= <a class="code" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>-1 &amp;&amp; <a class="code" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a> &gt; 1) segment = <a class="code" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>-2;</div>
+<div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;    <span class="keywordflow">return</span> segment;</div>
+<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -588,14 +590,14 @@ Protected Attributes</h2></td></tr>
 
 <p>CW: Get the coefficient of a given segment. </p>
 
-<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00727">727</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160;                                                                                                          {</div>
-<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;    b = <a class="code" href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">Par</a>[segment][0];</div>
-<div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;    c = <a class="code" href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">Par</a>[segment][1];</div>
-<div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;    d = <a class="code" href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">Par</a>[segment][2];</div>
-<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;    x = <a class="code" href="classTSpline3__red.html#aa4b35c6ba0d90d3b13b49f99beadbf79">XPos</a>[segment];</div>
-<div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;    y = <a class="code" href="classTSpline3__red.html#af81e778c5cad933f48940e63857b4ffa">YResp</a>[segment];</div>
-<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00728">728</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;                                                                                                          {</div>
+<div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;    b = <a class="code" href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">Par</a>[segment][0];</div>
+<div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;    c = <a class="code" href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">Par</a>[segment][1];</div>
+<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;    d = <a class="code" href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">Par</a>[segment][2];</div>
+<div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;    x = <a class="code" href="classTSpline3__red.html#aa4b35c6ba0d90d3b13b49f99beadbf79">XPos</a>[segment];</div>
+<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;    y = <a class="code" href="classTSpline3__red.html#af81e778c5cad933f48940e63857b4ffa">YResp</a>[segment];</div>
+<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -639,11 +641,11 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00721">721</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;                                                               {</div>
-<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;    xtmp = <a class="code" href="classTSpline3__red.html#aa4b35c6ba0d90d3b13b49f99beadbf79">XPos</a>[i];</div>
-<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;    ytmp = <a class="code" href="classTSpline3__red.html#af81e778c5cad933f48940e63857b4ffa">YResp</a>[i];</div>
-<div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00722">722</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;                                                               {</div>
+<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;    xtmp = <a class="code" href="classTSpline3__red.html#aa4b35c6ba0d90d3b13b49f99beadbf79">XPos</a>[i];</div>
+<div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160;    ytmp = <a class="code" href="classTSpline3__red.html#af81e778c5cad933f48940e63857b4ffa">YResp</a>[i];</div>
+<div class="line"><a name="l00725"></a><span class="lineno">  725</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -674,8 +676,8 @@ Protected Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classTResponseFunction__red.html#a672da1d698b53fb2203cc51f92ed2875">TResponseFunction_red</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00719">719</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>; }</div>
+<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00720">720</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -706,15 +708,15 @@ Protected Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classTResponseFunction__red.html#abeb53f28dcb53965afba33bad5c89a02">TResponseFunction_red</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00757">757</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;                               {</div>
-<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Printing TSpline_red:&quot;</span>);</div>
-<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot; Nknots = {}&quot;</span>, <a class="code" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>);</div>
-<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>; ++i) {</div>
-<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;  i = {} x = {} y = {} b = {} c = {} d = {}&quot;</span>,</div>
-<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;                    i, <a class="code" href="classTSpline3__red.html#aa4b35c6ba0d90d3b13b49f99beadbf79">XPos</a>[i], <a class="code" href="classTSpline3__red.html#af81e778c5cad933f48940e63857b4ffa">YResp</a>[i], <a class="code" href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">Par</a>[i][0], <a class="code" href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">Par</a>[i][1], <a class="code" href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">Par</a>[i][2]);</div>
-<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;    }</div>
-<div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160;  }</div>
+<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00758">758</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;                               {</div>
+<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Printing TSpline_red:&quot;</span>);</div>
+<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot; Nknots = {}&quot;</span>, <a class="code" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>);</div>
+<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code" href="classTSpline3__red.html#a5ca79646cbc9dce56ed973274f860c0d">nPoints</a>; ++i) {</div>
+<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;  i = {} x = {} y = {} b = {} c = {} d = {}&quot;</span>,</div>
+<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;                    i, <a class="code" href="classTSpline3__red.html#aa4b35c6ba0d90d3b13b49f99beadbf79">XPos</a>[i], <a class="code" href="classTSpline3__red.html#af81e778c5cad933f48940e63857b4ffa">YResp</a>[i], <a class="code" href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">Par</a>[i][0], <a class="code" href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">Par</a>[i][1], <a class="code" href="classTSpline3__red.html#a449ef081c6c2701865e371ab1c2e235e">Par</a>[i][2]);</div>
+<div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160;    }</div>
+<div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160;  }</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00035">MaCh3Logger.h:35</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -1099,12 +1101,12 @@ Protected Attributes</h2></td></tr>
 <div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;    spline = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;  }</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_afc88f0aa23c7127b2ff6e5c7ca3fa892"><div class="ttname"><a href="MaCh3Logger_8h.html#afc88f0aa23c7127b2ff6e5c7ca3fa892">MACH3LOG_TRACE</a></div><div class="ttdeci">#define MACH3LOG_TRACE</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00033">MaCh3Logger.h:33</a></div></div>
-<div class="ttc" id="aParameterStructs_8h_html_a6720d732608767153550aebebcf8fbf4a56c886e7b34c938027a7140748999c8a"><div class="ttname"><a href="ParameterStructs_8h.html#a6720d732608767153550aebebcf8fbf4a56c886e7b34c938027a7140748999c8a">kTSpline3</a></div><div class="ttdeci">@ kTSpline3</div><div class="ttdoc">Default TSpline3 interpolation.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00174">ParameterStructs.h:174</a></div></div>
-<div class="ttc" id="aParameterStructs_8h_html_a6720d732608767153550aebebcf8fbf4a68f4b10c9689389fd8fea39dc6c097d3"><div class="ttname"><a href="ParameterStructs_8h.html#a6720d732608767153550aebebcf8fbf4a68f4b10c9689389fd8fea39dc6c097d3">kMonotonic</a></div><div class="ttdeci">@ kMonotonic</div><div class="ttdoc">EM: DOES NOT make the entire spline monotonic, only the segments.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00176">ParameterStructs.h:176</a></div></div>
-<div class="ttc" id="aParameterStructs_8h_html_a6720d732608767153550aebebcf8fbf4aa83a75430a4673979472e18d85cd7a58"><div class="ttname"><a href="ParameterStructs_8h.html#a6720d732608767153550aebebcf8fbf4aa83a75430a4673979472e18d85cd7a58">kKochanekBartels</a></div><div class="ttdeci">@ kKochanekBartels</div><div class="ttdoc">KS: Kochanek-Bartels spline: allows local control of tension, continuity, and bias.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00178">ParameterStructs.h:178</a></div></div>
-<div class="ttc" id="aParameterStructs_8h_html_a6720d732608767153550aebebcf8fbf4ac188c019178783e5be55110601309d7d"><div class="ttname"><a href="ParameterStructs_8h.html#a6720d732608767153550aebebcf8fbf4ac188c019178783e5be55110601309d7d">kLinear</a></div><div class="ttdeci">@ kLinear</div><div class="ttdoc">Linear interpolation between knots.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00175">ParameterStructs.h:175</a></div></div>
-<div class="ttc" id="aParameterStructs_8h_html_a6720d732608767153550aebebcf8fbf4ade75212a78a5cf860f84473a80355f42"><div class="ttname"><a href="ParameterStructs_8h.html#a6720d732608767153550aebebcf8fbf4ade75212a78a5cf860f84473a80355f42">kLinearFunc</a></div><div class="ttdeci">@ kLinearFunc</div><div class="ttdoc">Liner interpolation using TF1 not spline.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00179">ParameterStructs.h:179</a></div></div>
-<div class="ttc" id="aParameterStructs_8h_html_a6720d732608767153550aebebcf8fbf4afe5701215b64da0194c6fead25edd976"><div class="ttname"><a href="ParameterStructs_8h.html#a6720d732608767153550aebebcf8fbf4afe5701215b64da0194c6fead25edd976">kAkima</a></div><div class="ttdeci">@ kAkima</div><div class="ttdoc">EM: Akima spline iis allowed to be discontinuous in 2nd derivative and coefficients in any segment.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00177">ParameterStructs.h:177</a></div></div>
+<div class="ttc" id="aParameterStructs_8h_html_a6720d732608767153550aebebcf8fbf4a56c886e7b34c938027a7140748999c8a"><div class="ttname"><a href="ParameterStructs_8h.html#a6720d732608767153550aebebcf8fbf4a56c886e7b34c938027a7140748999c8a">kTSpline3</a></div><div class="ttdeci">@ kTSpline3</div><div class="ttdoc">Default TSpline3 interpolation.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00177">ParameterStructs.h:177</a></div></div>
+<div class="ttc" id="aParameterStructs_8h_html_a6720d732608767153550aebebcf8fbf4a68f4b10c9689389fd8fea39dc6c097d3"><div class="ttname"><a href="ParameterStructs_8h.html#a6720d732608767153550aebebcf8fbf4a68f4b10c9689389fd8fea39dc6c097d3">kMonotonic</a></div><div class="ttdeci">@ kMonotonic</div><div class="ttdoc">EM: DOES NOT make the entire spline monotonic, only the segments.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00179">ParameterStructs.h:179</a></div></div>
+<div class="ttc" id="aParameterStructs_8h_html_a6720d732608767153550aebebcf8fbf4aa83a75430a4673979472e18d85cd7a58"><div class="ttname"><a href="ParameterStructs_8h.html#a6720d732608767153550aebebcf8fbf4aa83a75430a4673979472e18d85cd7a58">kKochanekBartels</a></div><div class="ttdeci">@ kKochanekBartels</div><div class="ttdoc">KS: Kochanek-Bartels spline: allows local control of tension, continuity, and bias.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00181">ParameterStructs.h:181</a></div></div>
+<div class="ttc" id="aParameterStructs_8h_html_a6720d732608767153550aebebcf8fbf4ac188c019178783e5be55110601309d7d"><div class="ttname"><a href="ParameterStructs_8h.html#a6720d732608767153550aebebcf8fbf4ac188c019178783e5be55110601309d7d">kLinear</a></div><div class="ttdeci">@ kLinear</div><div class="ttdoc">Linear interpolation between knots.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00178">ParameterStructs.h:178</a></div></div>
+<div class="ttc" id="aParameterStructs_8h_html_a6720d732608767153550aebebcf8fbf4ade75212a78a5cf860f84473a80355f42"><div class="ttname"><a href="ParameterStructs_8h.html#a6720d732608767153550aebebcf8fbf4ade75212a78a5cf860f84473a80355f42">kLinearFunc</a></div><div class="ttdeci">@ kLinearFunc</div><div class="ttdoc">Liner interpolation using TF1 not spline.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00182">ParameterStructs.h:182</a></div></div>
+<div class="ttc" id="aParameterStructs_8h_html_a6720d732608767153550aebebcf8fbf4afe5701215b64da0194c6fead25edd976"><div class="ttname"><a href="ParameterStructs_8h.html#a6720d732608767153550aebebcf8fbf4afe5701215b64da0194c6fead25edd976">kAkima</a></div><div class="ttdeci">@ kAkima</div><div class="ttdoc">EM: Akima spline iis allowed to be discontinuous in 2nd derivative and coefficients in any segment.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00180">ParameterStructs.h:180</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class used throughout MaCh3.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00023">MaCh3Exception.h:23</a></div></div>
 <div class="ttc" id="anamespaceM3_html_adb59b8ecdc4e1b2d5d4c826a13aa7463"><div class="ttname"><a href="namespaceM3.html#adb59b8ecdc4e1b2d5d4c826a13aa7463">M3::int_t</a></div><div class="ttdeci">int int_t</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00038">Core.h:38</a></div></div>
 </div><!-- fragment -->
@@ -1133,7 +1135,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Number of points/knot in TSpline3. </p>
 
-<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00768">768</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00769">769</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
 
 </div>
 </div>
@@ -1159,7 +1161,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Always uses a third order polynomial, so hard-code the number of coefficients in implementation. </p>
 
-<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00770">770</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00771">771</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
 
 </div>
 </div>
@@ -1185,7 +1187,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Positions of each x for each knot. </p>
 
-<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00772">772</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00773">773</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
 
 </div>
 </div>
@@ -1211,7 +1213,7 @@ Protected Attributes</h2></td></tr>
 
 <p>y-value for each knot </p>
 
-<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00774">774</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SplineStructs_8h_source.html#l00775">775</a> of file <a class="el" href="SplineStructs_8h_source.html">SplineStructs.h</a>.</p>
 
 </div>
 </div>

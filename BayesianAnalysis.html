@@ -77,48 +77,48 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md_Doc_User_Guide_09__Bayesian_Analysis__Plotting_and_MCMC_Processor"></a> </p>
-<h1><a class="anchor" id="autotoc_md93"></a>
+<h1><a class="anchor" id="autotoc_md137"></a>
 Introduction</h1>
 <p>MCMC Processor is a class responsible for processing MCMC and producing validation plots.</p>
-<h2><a class="anchor" id="autotoc_md94"></a>
+<h2><a class="anchor" id="autotoc_md138"></a>
 Posteriors</h2>
 <p>Marginalised posterior is the standard output of MCMC. PDF is mean, Gauss indicates Gaussian fit to posterior while HPD (Highest Posterior Density Point). In most cases parameter posteriors are Gaussian, then all 3 values would give the same result. However, the strength of MCMC is that there is no assumption about gaussiantiy, and it can handle non-Gaussian parameters.</p>
 <p><img src="https://github.com/user-attachments/assets/e77f7287-c71e-49c6-9f61-161fd54e4229" alt="" width="350" class="inline"/></p>
 <p>This plot will all be produced when running ProcessMCMC.</p>
-<h2><a class="anchor" id="autotoc_md95"></a>
+<h2><a class="anchor" id="autotoc_md139"></a>
 Parameter Plot</h2>
 <p>This plot is summarising 1D posteriors in more compact way. It is being printed by default.</p>
 <p><img src="https://github.com/user-attachments/assets/37c15953-1926-44a4-9a87-d232ba2aaf06" alt="" width="350" class="inline"/></p>
 <p>Since these plots are often targeted for publication, there is a tool called <b>GetPosftitParams</b> which make this plot with ability group parameter in whatever fashion you like. You can read more <a href="https://github.com/mach3-software/MaCh3/wiki/15.-Plotting">here</a></p>
-<h2><a class="anchor" id="autotoc_md96"></a>
+<h2><a class="anchor" id="autotoc_md140"></a>
 Credible Intervals</h2>
 <p>This plot helps to tell which values are excluded based on X-credible intervals</p>
 <p><img src="https://github.com/user-attachments/assets/2199f9ff-1901-4f7f-a5e8-43433049027e" alt="" width="350" class="inline"/></p>
 <p>To produce, make sure the following field is true. </p><div class="fragment"><div class="line">ProcessMCMC:</div>
 <div class="line">  MakeCredibleIntervals: true</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md97"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md141"></a>
 2D Posteriors</h1>
 <p>It is possible to produce 2D posteriors. They are very useful to identify if parameters are correlated or not. In this example, there are strong correlations.</p>
 <p><img src="https://github.com/user-attachments/assets/91bb1c28-e3a5-4418-a077-ad9b968a29b5" alt="" width="350" class="inline"/></p>
 <p>This can take some time, though. There are two ways: faster (using multithreading) but requiring lots of RAM, or slower but without RAM requirements. Once you obtain 2D posteriors, you can produce multiple additional plots.</p>
 <p>To enable, this option must be on. </p><div class="fragment"><div class="line">ProcessMCMC:</div>
 <div class="line">  PlotCorr: true</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md98"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md142"></a>
 Threshold</h3>
 <p>Not every 2D plot will be made. MaCh3 uses configurable threshold to print only more interesting plot. Threshold applies to correlation factor. </p><div class="fragment"><div class="line">ProcessMCMC:</div>
 <div class="line">  Post2DPlotThreshold: 0.2</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md99"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md143"></a>
 Credible Region</h2>
 <p><img src="https://github.com/user-attachments/assets/fccae6a7-d18b-455f-9ed7-a413cc6eb746" alt="" width="350" class="inline"/></p>
 <div class="fragment"><div class="line">ProcessMCMC:</div>
 <div class="line">  PlotCorr: true</div>
 <div class="line">  MakeCredibleRegions: true</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md100"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md144"></a>
 Correlation Matrix</h2>
 <p>Correlation matrix etc are calculated based on 2D Posteriors</p>
 <p><img src="https://github.com/user-attachments/assets/71d4eacd-10f8-4738-b32c-4de6a6d6a3a3" alt="" width="350" class="inline"/></p>
 <p><img src="https://github.com/user-attachments/assets/a77f7e24-e381-46f5-b924-f6e034676b74" alt="" width="350" class="inline"/></p>
-<h2><a class="anchor" id="autotoc_md101"></a>
+<h2><a class="anchor" id="autotoc_md145"></a>
 Triangle plot</h2>
 <div class="fragment"><div class="line">TrianglePlot:</div>
 <div class="line">  - [&quot;Test&quot;, [&quot;Norm_Param_0&quot;, &quot;Norm_Param_1&quot;, &quot;Spline_Param_0&quot;, &quot;Spline_Param_1&quot;]]</div>
@@ -126,13 +126,13 @@ Triangle plot</h2>
 <div class="line">  - [&quot;Test&quot;, [&quot;Norm_Param_0&quot;, &quot;Norm_Param_1&quot;, &quot;Spline_Param_0&quot;, &quot;Spline_Param_1&quot;]]</div>
 <div class="line">  - [&quot;Test2&quot;, [&quot;Norm_Param_0&quot;, &quot;Norm_Param_1&quot;]]</div>
 </div><!-- fragment --><p><img src="https://github.com/user-attachments/assets/06322f8e-8a4f-4ce4-81bb-e8865e1e47e9" alt="" width="350" class="inline"/></p>
-<h2><a class="anchor" id="autotoc_md102"></a>
+<h2><a class="anchor" id="autotoc_md146"></a>
 Violin plot</h2>
 <p><img src="https://github.com/user-attachments/assets/168c224d-11bc-45c9-a3a6-416d878cfbe9" alt="" width="350" class="inline"/></p>
 <div class="fragment"><div class="line">ProcessMCMC:</div>
 <div class="line">  PlotCorr: true</div>
 <div class="line">  MakeViolin: true</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md103"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md147"></a>
 Bayes factor and Savage-Dickey</h2>
 <p>It is possible to obtain the Bayes factor for different hypothesis </p><div class="fragment"><div class="line">BayesFactor:</div>
 <div class="line">  # Goes as follows: ParamName Name[Model 1, Model 2], Model1[lower, upper ], Model2[lower, upper ]</div>
@@ -141,19 +141,19 @@ Bayes factor and Savage-Dickey</h2>
 <p>or calculate savage Dickey, which is Bayes factor for point-like hypothesis </p><div class="fragment"><div class="line">SavageDickey:</div>
 <div class="line">  - [&quot;Alpha_q3&quot;, 0.0001, [0, 1]]</div>
 </div><!-- fragment --><p> <img src="https://github.com/user-attachments/assets/c021450b-7634-4e18-b9d6-fd2695a6a3e4" alt="" width="350" class="inline"/></p>
-<h2><a class="anchor" id="autotoc_md104"></a>
+<h2><a class="anchor" id="autotoc_md148"></a>
 Parameter Evolution</h2>
 <div class="fragment"><div class="line">ParameterEvolution:</div>
 <div class="line">  - [&quot;Norm_Param_0&quot;, 20]</div>
 </div><!-- fragment --><p> Select parameter name and how many frames you want. The more, the longer it takes, so be careful</p>
 <p><img src="https://github.com/user-attachments/assets/84fce0eb-450f-437b-904f-9123300c3cf8" alt="" width="350" class="inline"/></p>
-<h2><a class="anchor" id="autotoc_md105"></a>
+<h2><a class="anchor" id="autotoc_md149"></a>
 Bipolar plot</h2>
 <p><img src="https://github.com/user-attachments/assets/a1c9b296-e05e-4d3e-8923-f39e2704f759" alt="" width="350" class="inline"/></p>
-<h2><a class="anchor" id="autotoc_md106"></a>
+<h2><a class="anchor" id="autotoc_md150"></a>
 Ridgeline plot</h2>
 <p><img src="https://github.com/user-attachments/assets/cc0a15f5-2a46-46f7-9f78-5d115d56d9c9" alt="" width="350" class="inline"/></p>
-<h2><a class="anchor" id="autotoc_md107"></a>
+<h2><a class="anchor" id="autotoc_md151"></a>
 Reweighting</h2>
 <p>TODO!!! </p>
 </div></div><!-- contents -->

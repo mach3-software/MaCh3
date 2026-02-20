@@ -106,11 +106,11 @@ Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>Available in MaCh3 fitting algorithms. </p>
-<h1><a class="anchor" id="fitting_intro"></a>
+<h1><a class="anchor" id="autotoc_md23"></a>
 Introduction</h1>
 <p>MaCh3 provides multiple fitting strategies that fall into two main categories: Markov Chain Monte Carlo samplers and likelihood minimisation algorithms.</p>
 <hr  />
- <h1><a class="anchor" id="fitting_mcmc"></a>
+ <h1><a class="anchor" id="autotoc_md25"></a>
 Markov Chain Monte Carlo (MCMC)</h1>
 <p>These algorithms explore parameter space by stochastic sampling of the posterior. They are primarily used for full Bayesian inference and high-dimensional problems.</p>
 <p>Implemented methods:</p><ul>
@@ -118,14 +118,14 @@ Markov Chain Monte Carlo (MCMC)</h1>
 <li><b><a class="el" href="classDelayedMR2T2.html" title="Implementation of delayed rejection for MR2T2.">DelayedMR2T2</a></b> — Extension including delayed rejection to improve sampling efficiency and acceptance in difficult likelihood surfaces.</li>
 </ul>
 <hr  />
- <h1><a class="anchor" id="fitting_likelihood"></a>
+ <h1><a class="anchor" id="autotoc_md27"></a>
 Likelihood Minimizers</h1>
 <p>These algorithms deterministically minimise the negative log-likelihood to obtain a best-fit point. They are typically much faster than MCMC and are useful for diagnostics, validation, and systematic scans.</p>
 <p>Implemented methods:</p><ul>
 <li><b><a class="el" href="classMinuitFit.html" title="Implementation of Minuit fitting algorithm .">MinuitFit</a></b> — Gradient-based minimiser.</li>
 <li><b><a class="el" href="classPSO.html" title="Class PSO, consist of a vector of object Class Particle and global best Takes in the size (number of ...">PSO</a> (Particle Swarm Optimisation)</b> — Global optimisation using a swarm of walkers to locate the likelihood minimum.</li>
 </ul>
-<h1><a class="anchor" id="fitting_factory"></a>
+<h1><a class="anchor" id="autotoc_md28"></a>
 Factory Method</h1>
 <p>A factory method is implemented to select the algorithm from the configuration file instead of hard-coding it.</p>
 <p>Example configuration: </p><div class="fragment"><div class="line">General:</div>

@@ -77,10 +77,10 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md_Doc_User_Guide_0__FAQ"></a> </p>
-<h1><a class="anchor" id="autotoc_md48"></a>
+<h1><a class="anchor" id="autotoc_md90"></a>
 How to start?</h1>
 <p>We recomend starting MaCh3 by using <a href="https://github.com/mach3-software/MaCh3Tutorial">MaCh3 Tutorial</a></p>
-<h1><a class="anchor" id="autotoc_md49"></a>
+<h1><a class="anchor" id="autotoc_md91"></a>
 Error: Need MACH3 environment variable</h1>
 <p>Some functionalities rely on setting <code>Env{MACH3}</code> which should point to path experiment specific MaCh3. This way MaCh3 can easily find <code>Env{MACH3}/inputs/SomeInput.root</code> for example. Safest approach is to inlcude this in experiemnt specyfic cmake</p>
 <p>This is example of T2K <b>setup.MaCh3T2K.sh.in</b> </p><div class="fragment"><div class="line">export MACH3T2K_ROOT=@CMAKE_INSTALL_PREFIX@</div>
@@ -89,13 +89,13 @@ Error: Need MACH3 environment variable</h1>
 <div class="line"> </div>
 <div class="line">add_to_PATH &quot;${MACH3T2K_ROOT}/bin&quot;</div>
 <div class="line">add_to_LD_LIBRARY_PATH ${MACH3T2K_ROOT}/lib</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md50"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md92"></a>
 Do I need GPU to use MaCh3</h1>
 <p>No, MaCh3 works with a CPU-only setup. In fact, MaCh3 is predominantly a CPU library. Only most performance intensive operations have GPU support at accelerate. We make rigorous checks to make sure the CPU and GPU produce the same results up to numeric precision.</p>
-<h1><a class="anchor" id="autotoc_md51"></a>
+<h1><a class="anchor" id="autotoc_md93"></a>
 Version</h1>
 <p>MaCh3 is version controlled. You can find all releases <a href="https://github.com/mach3-software/MaCh3/releases">here</a> you can also find easily what changed in each version <a href="https://github.com/mach3-software/MaCh3/wiki/0.1.-History">here</a></p>
-<h1><a class="anchor" id="autotoc_md52"></a>
+<h1><a class="anchor" id="autotoc_md94"></a>
 Code Structure</h1>
 <p><img src="https://github.com/user-attachments/assets/47a4ec31-4a60-4603-ac84-359281c715b3" alt="Structure" width="879" class="inline"/></p>
 <p>Last updated: 12.12.2025 </p>

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['_5ffooter_2emd_3649',['_Footer.md',['../md_Doc_User_Guide__Footer_md.html',1,'']]]
+  ['adaptive_20mcmc_3648',['Adaptive MCMC',['../AdaptiveMCMC.html',1,'']]]
 ];

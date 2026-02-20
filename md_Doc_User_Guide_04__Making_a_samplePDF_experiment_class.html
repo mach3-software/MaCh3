@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MaCh3: 04.-Making-a-samplePDF-experiment-class</title>
+<title>MaCh3: WARNING TO BECOME DEPRECATED</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -73,13 +73,13 @@ $(function() {
 </div><!-- top -->
 <div class="PageDoc"><div class="header">
   <div class="headertitle">
-<div class="title">04.-Making-a-samplePDF-experiment-class </div>  </div>
+<div class="title">WARNING TO BECOME DEPRECATED </div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>The samplePDF classes contain information about a particular sample in your analysis. Practically this involves storing the number of events predicted in each analysis bin for each sample as well as modifying this for a given set of systematic and oscillation parameter values (i.e. "reweighting" the nominal Monte-Carlo prediction). Therefore, the samplePDF class also "talks" to a lot of other classes in MaCh3 especially the covariance and spline classes. In turn the <a class="el" href="classFitterBase.html" title="Base class for implementing fitting algorithms.">FitterBase</a> class then gets a poisson likelihood value from comparing the MC prediction and data in the samplePDF class.</p>
 <p>Each experiment will need to create a samplePDF experiment class which inherits from a the samplePDFFDBase class in the core repository. This is intended as a guide to help you produce your own samplePDF class for your own experiment. This is intended to be as lightweight as possible and should mainly relate to the MC format that a particular experiment is using. You need to read this information into the data structures which the samplePDFFDBase class is expecting so that it can handle the "heavy lifting" such as the reweighting of the MC prediction.</p>
 <p><b>N.B.</b> - Currently (April 2024), experiment samplePDF classes should inherit from the samplePDFFDBase class in core (where FD stands for Far Detector). There is a samplePDFND (Near Detector) base class but this has not been tested for multiple experiments yet. In future releases of the core code (v2) we plan to have a single samplePDF class for both ND and FD to simplify this inheritance structure.</p>
-<h1><a class="anchor" id="autotoc_md69"></a>
+<h1><a class="anchor" id="autotoc_md113"></a>
 Constructing a samplePDF experiment class</h1>
 <p>Discussion of FD data structures; FDMC and ExpFDMC. The main purpose of any samplePDF class is to contain all the information you need to make MC predictions of your selections for some given set of systematic parameter values. To do this, the samplePDF object needs to read in information from different input files and keep track of them in some data structures. Most of your samplePDF class will be reading in this information and putting it in the correct place.</p>
 <p>Below is a skeleton of what the constructor of your samplePDF class will look like. </p><div class="fragment"><div class="line">samplePDFSKBase::samplePDFSKBase(double pot, std::string samplecfgfile, covarianceXsec* xsec_cov)</div>
@@ -165,7 +165,7 @@ Constructing a samplePDF experiment class</h1>
 <div class="line">  splineFile-&gt;cleanUpMemory();</div>
 <div class="line">}</div>
 </div><!-- fragment --><p> The code above will not compile and is only illustrative only the main steps. As you can see the majority of the setup is above grabbing things from a <b>sample yaml file</b> and <b>passing information into an experiment struct and a core struct</b>. The discussion below is intended to expand on these. A discussion of the spline setup is given in another section.</p>
-<h1><a class="anchor" id="autotoc_md70"></a>
+<h1><a class="anchor" id="autotoc_md114"></a>
 Sample Config files</h1>
 <p>As described above, a lot of information is specified in a "sample config". This is a yaml file which contains information about the MC events you would like to read in. Below is an example: </p><div class="fragment"><div class="line">SampleName: &quot;YourFavouriteSample&quot;</div>
 <div class="line">Selection:</div>
@@ -205,7 +205,7 @@ Sample Config files</h1>
 <div class="line">    oscnutype: 14</div>
 <div class="line">    signal: false</div>
 </div><!-- fragment --><p> This information simply needs to be grabbed from the yaml file and stored in your samplePDFExperiment base. <b>A note on SampleDetID</b>: SampleDetID is a little complicated. This needs to be a unique number that is a power of 2. This is used to check whether a systematic applies to a sample or not. It has to be a power of two as this is checked using bit-shifting. This will be replaced in the future. <b>A note on BinningOpt</b>: BinningOpt is currently used to describe the number of variables you want to bin in and what they are. This is quite hard-coded and will be replaced in the future to be flexible. <b>A note on KinematicStr</b>: we will discussion the Kinematic Variables later in the virtual functions. But you will need to supply a string which can be mapped back to get the value of a specific variable for an event so you can cut on it.</p>
-<h1><a class="anchor" id="autotoc_md71"></a>
+<h1><a class="anchor" id="autotoc_md115"></a>
 The Far Detector Struct</h1>
 <p>One of the most important things is passing information from your MC file to the core code. All the information required for the core code to reweight MC.</p>
 <p>The far detector struct can be seen <a href="https://github.com/mach3-software/MaCh3/blob/develop/samplePDF/FDMCStruct.h">here</a>. All of these variables must be filled from your MC. It is highly recommended that you also create a similar struct to hold the information of your experiment. A lot of the members of the Far Detector struct are arrays of pointers, this is so they can point to your experiment struct without storing lots of floats or double twice. Also this has the advantage that if you update a value in your samplePDFExperiment class then the far detector struct does not need updating as your are just pointing to the same part of memory. This structure means that your SetupExpMC and SetupFDMC() functions would look something like this:</p>
@@ -245,7 +245,7 @@ The Far Detector Struct</h1>
 <div class="line">  }</div>
 <div class="line">}</div>
 </div><!-- fragment --><p> Some of the variables are setup automatically for you by the core code. For example NomXBin, NomYBin, XBin, YBin, rw_lower_xbinedge, rw_upper_xbinedge, rw_lower_lower_xbinedge and rw_upper_upper_xbinedge are set in the <a href="https://github.com/mach3-software/MaCh3/blob/develop/samplePDF/samplePDFFDBase.cpp#L1036C23-L1036C47">FindNominalBinAndEdges1D</a> function (or it's 2D counterpart). So in SetupFDMC you just need to create the array and set it to some dummy value to begin with.</p>
-<h1><a class="anchor" id="autotoc_md72"></a>
+<h1><a class="anchor" id="autotoc_md116"></a>
 Setting Up Systematics</h1>
 <p>Thankfully, a lot of this is now handled in the core code and if you have passed all the information to the fdmc_base struct you should not have to worry too much about this. The information for systematics is stored in your covarianceXsec class which parses information from a YAML file. <a href="https://github.com/mach3-software/MaCh3/blob/develop/samplePDF/samplePDFFDBase.cpp#L684"><b>SetupNormParameters()</b></a> will check whether normalisation parameters apply to events and automatically set this up for you. <b>SetupSplines()</b> is discussed in the spline page of the wiki <a href="https://github.com/mach3-software/MaCh3/wiki/5.-Splines">here</a>. <b>SetupFuncParameters()</b> setups up functional parameters. These will be experiment specific systematics and you will need to define this function. What you really need to do for these is keep track of the parameter value which then gets passed to a custom function to apply your systematic (this could be changing a kinematic variable, it could be scaling something etc.). A basic template is below: </p><div class="fragment"><div class="line">void SetupFuncParameters(){</div>
 <div class="line">  funcParsIndex = XsecCov-&gt;GetFuncParsIndexFromDetID(SampleDetID);</div>
@@ -272,7 +272,7 @@ Setting Up Systematics</h1>
 <div class="line">    MCSamples[i].total_weight_pointers[j][5] = &amp;(MCSamples[i].xsec_w[j]);</div>
 <div class="line">  }</div>
 <div class="line">}</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md73"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md117"></a>
 Pure Virtual Functions</h1>
 <p>The samplePDFFDBase class is a virtual object and cannot be initialised on its own due to it having several pure virtual functions. It is these virtual functions which must be implemented in the experiment samplePDFFDBase class. Below is a list of the pure virtual functions that exist in the <a href="https://github.com/mach3-software/MaCh3/blob/develop/samplePDF/samplePDFFDBase.h">samplePDFFDBase.h</a> file. These are functions which are likely to be very experiment specific and so you need to help the core code to grab key bits of information. Some of these we have already encountered. </p><div class="fragment"><div class="line">virtual void SetupWeightPointers() = 0;</div>
 <div class="line">// Calculate the norm weight for a given event</div>
