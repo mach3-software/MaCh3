@@ -17,9 +17,9 @@ var searchData=
   ['out_5fof_5fbounds_1155',['out_of_bounds',['../classMCMCBase.html#a8c81e543609bb3878b114f9f8b2c0393',1,'MCMCBase']]],
   ['outfilename_1156',['OutFileName',['../CombineMaCh3Chains_8cpp.html#a021f9f978660c299af0d70b8d3b3d74c',1,'CombineMaCh3Chains.cpp']]],
   ['output_5ffile_5fname_1157',['output_file_name',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#a3635f63cb8108f58a76b90250894c31c',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
-  ['outputfile_1158',['Outputfile',['../classSampleSummary.html#aa7b948f290517a052f04f61dfa6af68f',1,'SampleSummary']]],
-  ['outputfile_1159',['outputFile',['../classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990',1,'FitterBase']]],
-  ['outputfile_1160',['OutputFile',['../classMCMCProcessor.html#a62035b99df4617ab334cd1abd6ed0346',1,'MCMCProcessor']]],
+  ['outputfile_1158',['OutputFile',['../classMCMCProcessor.html#a62035b99df4617ab334cd1abd6ed0346',1,'MCMCProcessor']]],
+  ['outputfile_1159',['Outputfile',['../classSampleSummary.html#aa7b948f290517a052f04f61dfa6af68f',1,'SampleSummary']]],
+  ['outputfile_1160',['outputFile',['../classFitterBase.html#a4260b312e3f35cf01fc73b02239f8990',1,'FitterBase']]],
   ['outputname_1161',['OutputName',['../classMCMCProcessor.html#a3d17c1720b91d6d0361da0b5dabfbbff',1,'MCMCProcessor::OutputName()'],['../classSampleSummary.html#a4463f635de4e83c7ada683768454da82',1,'SampleSummary::OutputName()']]],
   ['outputprepared_1162',['OutputPrepared',['../classFitterBase.html#a3bfd8f69df891d03bae0587cd1a1e1b7',1,'FitterBase']]],
   ['outputsuffix_1163',['OutputSuffix',['../classMCMCProcessor.html#aa34b50ce33fb2cb7d9e9ef2d9f2f67c1',1,'MCMCProcessor']]],
@@ -27,7 +27,8 @@ var searchData=
   ['outtree_1165',['outTree',['../classFitterBase.html#aed2032b9c4a4f2248abe548f54f8dcc8',1,'FitterBase']]],
   ['overflowintegral_1166',['OverflowIntegral',['../HistogramUtils_8cpp.html#a34345b88bcd0e45db5612d58a972a154',1,'OverflowIntegral(TH2Poly *poly):&#160;HistogramUtils.cpp'],['../HistogramUtils_8h.html#a34345b88bcd0e45db5612d58a972a154',1,'OverflowIntegral(TH2Poly *poly):&#160;HistogramUtils.cpp']]],
   ['overlaypredicitve_1167',['OverlayPredicitve',['../PredictivePlotting_8cpp.html#ae2d354145212ff6aea27d6a105699538',1,'PredictivePlotting.cpp']]],
-  ['overlayviolin_1168',['OverlayViolin',['../PredictivePlotting_8cpp.html#abadbf000738f5e00179a6a2f57fe0321',1,'PredictivePlotting.cpp']]],
-  ['overrideconfig_1169',['OverrideConfig',['../YamlHelper_8h.html#a269e230f4f26b824c65a4c7a1472e07b',1,'OverrideConfig(YAML::Node node, std::string const &amp;key, TValue val):&#160;YamlHelper.h'],['../YamlHelper_8h.html#a55f0b8c6b5d52b5c269ce26c7d3853f5',1,'OverrideConfig(YAML::Node node, std::string const &amp;key, Args... args):&#160;YamlHelper.h']]],
-  ['overridesettings_1170',['OverrideSettings',['../classManager.html#addc463be80b958bf10456586e6e042da',1,'Manager']]]
+  ['overlaysigvar1d_1168',['OverlaySigVar1D',['../PlotSigmaVariation_8cpp.html#a517e313804d4c6e71a606aadd81bedbf',1,'PlotSigmaVariation.cpp']]],
+  ['overlayviolin_1169',['OverlayViolin',['../PredictivePlotting_8cpp.html#abadbf000738f5e00179a6a2f57fe0321',1,'PredictivePlotting.cpp']]],
+  ['overrideconfig_1170',['OverrideConfig',['../YamlHelper_8h.html#a269e230f4f26b824c65a4c7a1472e07b',1,'OverrideConfig(YAML::Node node, std::string const &amp;key, TValue val):&#160;YamlHelper.h'],['../YamlHelper_8h.html#a55f0b8c6b5d52b5c269ce26c7d3853f5',1,'OverrideConfig(YAML::Node node, std::string const &amp;key, Args... args):&#160;YamlHelper.h']]],
+  ['overridesettings_1171',['OverrideSettings',['../classManager.html#addc463be80b958bf10456586e6e042da',1,'Manager']]]
 ];

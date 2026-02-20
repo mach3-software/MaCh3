@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MaCh3: NuOscillator</title>
+<title>MaCh3: WARNING TO BECOME DEPRECATED</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -73,15 +73,17 @@ $(function() {
 </div><!-- top -->
 <div class="PageDoc"><div class="header">
   <div class="headertitle">
-<div class="title">NuOscillator </div>  </div>
+<div class="title">WARNING TO BECOME DEPRECATED </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>MaCh3 is using <a href="https://github.com/dbarrow257/NuOscillator">NuOscillator framework</a> to perform oscillation probabilities calculations. Almost everything is being handled via NuOscillator config example can be found <a href="https://github.com/dbarrow257/NuOscillator/tree/main/NuOscillatorConfigs">here</a>.</p>
-<h1><a class="anchor" id="autotoc_md131"></a>
-Engines</h1>
+<div class="textblock"><h1><a class="anchor" id="autotoc_md131"></a>
+NuOscillator</h1>
+<p>MaCh3 is using <a href="https://github.com/dbarrow257/NuOscillator">NuOscillator framework</a> to perform oscillation probabilities calculations. Almost everything is being handled via NuOscillator config example can be found <a href="https://github.com/dbarrow257/NuOscillator/tree/main/NuOscillatorConfigs">here</a>.</p>
+<h2><a class="anchor" id="autotoc_md132"></a>
+Engines</h2>
 <p>Multiple engines are available, ranging from beam, and atmospheric to BSM. To see available engines we recommend <a href="https://github.com/dbarrow257/NuOscillator/tree/main?tab=readme-ov-file#implemented-engines">this</a></p>
-<h1><a class="anchor" id="autotoc_md132"></a>
-MaCh3 Specyfic Settings</h1>
+<h2><a class="anchor" id="autotoc_md133"></a>
+MaCh3 Specyfic Settings</h2>
 <p>NuOscConfigFile contains information like binned vs. unbinned, engine, etc., which is handled by NuOscillator. EqualBinningPerOscChannel is a setting used for binned/subsampling oscillations only. This setting tells whether each OSC channel should be using its own NuOscillator object and thus different binning or all OSC channels should be using the same binning and single object (making fit overall much faster).</p>
 <div class="fragment"><div class="line">NuOsc:</div>
 <div class="line">  NuOscConfigFile: &quot;TutorialConfigs/NuOscillator/NuFASTLinear.yaml&quot;</div>
