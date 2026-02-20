@@ -15,7 +15,7 @@
 
     <tab type="user" visible="yes" title="Project Info" url="ReleaseNotes.html">
       <tab type="user" visible="yes" title="Release Notes" url="ReleaseNotes.html"/>
-      <tab type="user" visible="yes" title="Results & Publications" url="ResultsPublications.html"/>
+      <tab type="user" visible="yes" title="Results and Publications" url="ResultsPublications.html"/>
     </tab>
 
     <tab type="modules" visible="yes" title="Interface" intro=""/>

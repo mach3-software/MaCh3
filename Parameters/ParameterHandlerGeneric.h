@@ -5,7 +5,8 @@
 #include "Samples/SampleStructs.h"
 
 /// @brief Class responsible for handling of systematic error parameters with different types defined in the config. Like spline, normalisation parameters etc.
-/// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/02.-Implementation-of-Systematic).
+/// @ingroup SamplesAndParameters
+///
 /// @author Dan Barrow
 /// @author Ed Atkin
 /// @author Kamil Skwarczynski
@@ -95,7 +96,7 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @brief KS Function to set to prior parameters of a given group or values from vector
     /// @param Group name of group, like Xsec or Flux
     /// @param Pars Values which will overwrite proposed step
-    /// @note this mimic functionality of @ParameterHandlerBase::SetParameters
+    /// @note This mimics functionality of @ref ParameterHandlerBase::SetParameters "SetParameters"
     void SetGroupOnlyParameters(const std::string& Group, const std::vector<double>& Pars = {});
     /// @brief KS Function to set to prior parameters of a given groups or values from vector
     /// @param Groups vector of group names, like Xsec or Flux
@@ -119,7 +120,7 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @param Group name of the parameter group (Xsec, Flux, Osc, etc.)
     void ToggleFixGroupOnlyParameters(const std::string& Group);   
     /// @brief TN Method to toggle fix/free parameters within given groups
-    /// @param Group vector of group names (e.g. {"Xsec", "Flux"})
+    /// @param Groups vector of group names (e.g. {"Xsec", "Flux"})
     void ToggleFixGroupOnlyParameters(const std::vector<std::string>& Groups);
 
     /// @brief Dump Matrix to ROOT file, useful when we need to pass matrix info to another fitting group
@@ -171,7 +172,7 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
 
     /// @brief Parses the YAML configuration to set up cross-section parameters.
     /// The YAML file defines the types of systematic errors, interpolation types, and bounds for splines.
-    inline void InitParametersTypeFromConfig();
+    void InitParametersTypeFromConfig();
 
     /// @brief Get Norm params
     /// @param param Yaml node describing param

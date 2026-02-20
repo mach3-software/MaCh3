@@ -29,8 +29,11 @@ _MaCh3_Safe_Include_End_ //}
 ///
 /// This script is designed to retrieve penalty terms from various sources, such as flux and cross-section systematic chains.
 /// Since flux and cross-section uncertainties are handled systematically, the penalty term cannot be taken directly from the chain.
-///
 /// @todo KS: This should really be moved to MCMC Processor
+///
+/// @ingroup MaCh3DiagnosticProcessing
+///
+/// @author Kamil Skwarczynski
 
 void ReadCovFile(const std::string& inputFile,
                  std::vector <double>& Prior,

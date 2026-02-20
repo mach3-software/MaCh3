@@ -8,7 +8,8 @@ _MaCh3_Safe_Include_End_ //}
 
 /// @file PlotLLHMap.cpp
 /// @brief Processing n-dimensional LLHMap outputs generating 1D and 2D profiled likelihoods as defined in config
-
+/// @ingroup MaCh3DiagnosticProcessing
+///
 /// @author Tomas Nosek
 
 // *******************

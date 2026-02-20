@@ -92,7 +92,7 @@ namespace adaptive_mcmc
     bool SkipAdaption() const;
 
     /// @brief Get the index of the parameter given its name
-    /// @param param_name Name of the parameter
+    /// @param name Name of the parameter
     /// @return Index of the parameter
     int GetParIndex(const std::string& name) const {
       // HH: Adapted from ParameterHandlerBase.cpp

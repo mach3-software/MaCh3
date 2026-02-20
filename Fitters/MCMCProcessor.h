@@ -169,6 +169,8 @@ class MCMCProcessor {
     /// @brief Produce Savage Dickey plot
     /// @param PriorHist Histogram with prior distribution
     /// @param PosteriorHist Histogram with posterior distribution
+    /// @param Title Title for the plot
+    /// @param EvaluationPoint Point at which the Savage-Dickey ratio is evaluated
     void SavageDickeyPlot(std::unique_ptr<TH1D>& PriorHist,
                           std::unique_ptr<TH1D>& PosteriorHist,
                           const std::string& Title,
@@ -201,7 +203,6 @@ class MCMCProcessor {
 
     /// @brief Thin MCMC Chain, to save space and maintain low autocorrelations.
     /// @param ThinningCut every which entry you want to thin
-    /// @param Average If true will perform MCMC averaging instead of thinning
     inline void ThinMCMC(const int ThinningCut) const { ThinningMCMC(MCMCFile+".root", ThinningCut); };
 
     /// @brief KS: Perform MCMC diagnostic including Autocorrelation, Trace etc.

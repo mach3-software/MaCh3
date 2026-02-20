@@ -6,12 +6,12 @@
   /// @defgroup FittingAlgorithms Fitting Algorithms
   /// @brief Available in MaCh3 fitting algorithms.
   ///
-  /// @section fitting_intro Introduction
+  /// # Introduction
   /// MaCh3 provides multiple fitting strategies that fall into two main categories:
   /// Markov Chain Monte Carlo samplers and likelihood minimisation algorithms.
   ///
   /// -----------------------------------------------------------------------------
-  /// @section fitting_mcmc Markov Chain Monte Carlo (MCMC)
+  /// # Markov Chain Monte Carlo (MCMC)
   /// These algorithms explore parameter space by stochastic sampling of the posterior.
   /// They are primarily used for full Bayesian inference and high-dimensional problems.
   ///
@@ -21,7 +21,7 @@
   ///   sampling efficiency and acceptance in difficult likelihood surfaces.
   ///
   /// -----------------------------------------------------------------------------
-  /// @section fitting_likelihood Likelihood Minimizers
+  /// # Likelihood Minimizers
   /// These algorithms deterministically minimise the negative log-likelihood to
   /// obtain a best-fit point. They are typically much faster than MCMC and are
   /// useful for diagnostics, validation, and systematic scans.
@@ -31,7 +31,7 @@
   /// - **PSO (Particle Swarm Optimisation)** — Global optimisation using a swarm
   ///   of walkers to locate the likelihood minimum.
   ///
-  /// @section fitting_factory Factory Method
+  /// # Factory Method
   /// A factory method is implemented to select the algorithm from the
   /// configuration file instead of hard-coding it.
   ///
@@ -69,16 +69,16 @@
   /// while allowing the user as much freedom as possible when it comes plot style and formatting.
   ///
   /// The plotting Library consists primarily of 3 main manager classes:
-  /// - @ref PlottingManager : This controls the high level stuff. It deals with application level options, command line options,
+  /// - @ref MaCh3Plotting::PlottingManager : This controls the high level stuff. It deals with application level options, command line options,
   /// and holds references to the other managers. This is the main class you should interact with on the user level.
-  /// - @ref InputManager    : This deals with the details of how input files (the outputs of the fitters) should be read and stored. This should be accessed via `<Plotting Manager Instance>.input()`.
-  /// - @ref StyleManager    : This provides some helpful utilities for creating plots.
+  /// - @ref MaCh3Plotting::InputManager    : This deals with the details of how input files (the outputs of the fitters) should be read and stored. This should be accessed via `<Plotting Manager Instance>.input()`.
+  /// - @ref MaCh3Plotting::StyleManager    : This provides some helpful utilities for creating plots.
   /// This should be accessed via `<Plotting Manager Instance>.style()`.
   ///
   /// ---------------------------------------------------------------------------
-  /// @section plotting_managers Manager Classes
+  /// # Manager Classes
   ///
-  /// @section intro Introduction
+  /// ## Introduction
   ///
   /// The goal with MaCh3s plotting library is to be as flexible as possible and to
   /// abstract away all of the most annoying parts about plot making like reading in
@@ -110,7 +110,7 @@
   /// files. Each of the manager classes above has a corresponding config file to control
   /// its functionality. The format of these config files are detailed below.
   ///
-  /// @subsection plotting_config Plotting Config
+  /// ## Plotting Config
   ///
   /// This is the highest level config file and corresponds to the behavior of the
   /// Plotting Manager. It should be used to control high level variables like where
@@ -177,9 +177,9 @@
   ///     ...
   /// @endcode
   ///
-  /// @subsection translation_config Translation Config
+  /// ## Translation Config
   ///
-  /// This config defines the behaviour of the InputManager. It is used to define
+  /// This config defines the behaviour of the MaCh3Plotting::InputManager. It is used to define
   /// the output format of files from different fitters, and the parameters and
   /// samples that exist within the analysis, and what they are called in different
   /// fitters. This means that you can easily plot and compare files from different
@@ -187,9 +187,9 @@
   /// from each specific file type and can focus on making beautiful plots! The
   /// components which are defined in this config are described below and you can
   /// find an example of such a config
-  /// <a href="https://github.com/mach3-software/MaCh3/plotting/UniversalTranslator.yaml">here</a>.
+  /// <a href="https://github.com/mach3-software/MaCh3Tutorial/plotting/UniversalTranslator.yaml">here</a>.
   ///
-  /// @subsubsection fitter_spec Fitter Specification
+  /// ## Fitter Specification
   ///
   /// In this section of the config file we specify what the output of each fitter
   /// we are interested in looks like so that the plotting code knows where to look
@@ -218,7 +218,7 @@
   ///
   /// Under each of these headers you must now give details.
   ///
-  /// @subsubsection llh_scan LLH Scan
+  /// ## LLH Scan
   ///
   /// Let's start with LLH scan information.
   ///
@@ -264,7 +264,7 @@
   ///             ]
   /// @endcode
   ///
-  /// @subsubsection mcmc MCMC
+  /// ## MCMC
   ///
   /// We can now also specify where to look for things relating to the MCMC posteriors.
   ///
@@ -297,7 +297,7 @@
   /// have access to the yaml configs that were used initially
   ///
   ///
-  /// @subsubsection parameter_spec Parameter Specification
+  /// ## Parameter Specification
   ///
   /// Another important part of the translation config is to define the parameters
   /// that are modelled in the experiment. This section of the yaml is imaginatively
@@ -343,7 +343,7 @@
   /// uniquely identify the parameters across all files and fitters, as well as
   /// within the config files.
   ///
-  /// @subsubsection parameter_specific_opts Parameter Specific Options
+  /// ## Parameter Specific Options
   ///
   /// We can then also specify options specific to each parameter. The options exist
   /// under headings which should match the labels specified in the list above e.g.
@@ -374,7 +374,7 @@
   /// If no fitter specific names are specified for a parameter then the name will
   /// default to the label in the list above. Hence why it is useful to use the
   /// regular MaCh3 names for those.
-  /// @subsubsection sample_spec Sample Specification
+  /// ## Sample Specification
   ///
   /// We must also do the same for the samples that exist in the fitter. The format
   /// for doing this is essentially the same as for the parameters as described
@@ -411,7 +411,7 @@
   ///         tags: ["subDet1", "particleTag"]
   /// @endcode
   ///
-  /// @subsubsection location_strings Location Strings
+  /// ## Location Strings
   ///
   /// The translation config makes use of a custom location specifier format which
   /// we will describe here.
@@ -480,7 +480,7 @@
   /// cases with wildcards. regex is likely a good approach since root has built in
   /// functionality for matching these to object names.)
   ///
-  /// @subsubsection special_tokens Special Tokens
+  /// ## Special Tokens
   ///
   /// There are a number of special tokens that can be used when specifying a
   /// location. These tokens, which take the form `{SOME_LABEL}` will be replaced
@@ -508,12 +508,12 @@
   ///   objects are actually looked for but this could be useful in the future)
   ///
   ///
-  /// @subsection style_config Style Config
+  /// ## Style Config
   ///
-  /// This config corresponds to the behavior of the Style Manager. Here you can
+  /// This config corresponds to the behavior of the MaCh3Plotting::StyleManager. Here you can
   /// specify options relating to the style of your plots.
   ///
-  /// @subsubsection colour_palettes Colour Palettes
+  /// ### Colour Palettes
   ///
   /// You can specify colour palettes in the same style as root as follows:
   ///
@@ -539,7 +539,7 @@
   /// using, for example,
   /// `<plotting manager instance>.style()->SetPalette("RedWhiteBlue")`.
   ///
-  /// @subsubsection pretty_names Pretty Names
+  /// ### Pretty Names
   ///
   /// You can define fancy names to use in place of the parameter and sample tags
   /// defined in the translation config. You can even use latex here for added
@@ -573,19 +573,7 @@
   /// @endcode
   ///
   ///
-  /// @section usage Usage
-  ///
-  /// In this section we will cover the general usage of the plotting library. The
-  /// Standard Apps sections covers the usage of the apps that are used to make the
-  /// "standard" MaCh3 plots that often appear in tech notes and papers. If you are
-  /// not interested in doing anything fancy and simply want to reproduce some of
-  /// these standard plots for comparisons and validations against a previous
-  /// result, then you can just use these.
-  ///
-  /// If you are interested in doing more advanced things and need a more custom
-  /// solution, then see the Custom Plotting Scripts section for information on
-  /// using the plotting utilities in your own scripts.
-  /// @section usage Usage
+  /// # Usage
   ///
   /// In this section we will cover the general usage of the plotting library. The
   /// Standard Apps sections covers the usage of the apps that are used to make the
@@ -598,10 +586,21 @@
   /// solution, then see the Custom Plotting Scripts section for information on
   /// using the plotting utilities in your own scripts.
   ///
+  /// In this section we will cover the general usage of the plotting library. The
+  /// Standard Apps sections covers the usage of the apps that are used to make the
+  /// "standard" MaCh3 plots that often appear in tech notes and papers. If you are
+  /// not interested in doing anything fancy and simply want to reproduce some of
+  /// these standard plots for comparisons and validations against a previous
+  /// result, then you can just use these.
   ///
-  /// @subsection cli Command Line Interface
+  /// If you are interested in doing more advanced things and need a more custom
+  /// solution, then see the Custom Plotting Scripts section for information on
+  /// using the plotting utilities in your own scripts.
   ///
-  /// Through the use of the PlottingManager class, we are able to define a common
+  ///
+  /// ## Command Line Interface
+  ///
+  /// Through the use of the MaCh3Plotting::PlottingManager class, we are able to define a common
   /// command line interface across all plotting apps (which you can also use in
   /// your own custom plotting apps, and even python scripts!). The general usage
   /// pattern looks like
@@ -619,7 +618,7 @@
   /// @endcode
   ///
   ///
-  /// @subsubsection available_options Available Options
+  /// ## Available Options
   ///
   /// There are a number of pre-defined general options which can be specified when
   /// plotting. These are described below:
@@ -646,39 +645,289 @@
   /// sort of error or warning.
   ///
   ///
-  /// @subsection standard_apps Standard Apps
+  /// ## Standard Apps
   ///
-  /// @subsubsection plotllh PlotLLH
+  /// ### PlotLLH
   ///
   /// Plots log likelihood scans which have been made by scanning each parameter
   /// through its prior range and calculating the likelihood. can take any number
   /// of LLH scans as input, will use the first one as a baseline when making e.g.
   /// ratio plots.
   ///
+  /// ### GetPostFitParamPlots
   ///
-  /// @subsubsection getpostfitparamplots GetPostFitParamPlots
-  ///
-  /// This will plot output from ProcessMCMC for nice plots which can go to TN.
+  /// This will plot output from @ref ProcessMCMC for nice plots which can go to TN.
   /// Bits are hardcoded to make plots nicer users should be careful when using the
-  /// non-conventional xsec model. If you used `ProcessMCMC` with `PlotDet` you will
-  /// also get an overlay of detector parameters (ND or ND+FD depending on chain
-  /// type). If Violin plot was produced in `ProcessMCMC` you will get fancy plots
+  /// non-conventional xsec model. If Violin plot was produced in `ProcessMCMC` you will get fancy plots
   /// here as well.
   ///
   ///
-  /// @subsection custom_scripts Custom Plotting Scripts
+  /// ### MatrixPlotter
+  ///
+  /// Requires output from @ref ProcessMCMC (must be run with `PlotCorr`).
+  /// Allows plotting of submatrices and any combination of parameters.
+  ///
+  /// ### PredictivePlotting
+  ///
+  /// Allows comparison of prior/posterior predictive distributions.
+  /// Requires output from running @ref PredictiveThrower::RunPredictiveAnalysis RunPredictiveAnalysis.
+  ///
+  /// ### PlotSigmaVariation
+  ///
+  /// Produces sigma variation comparisons.
+  /// Requires output from running @ref FitterBase::RunSigmaVar RunSigmaVar.
+  ///
+  ///
+  /// ## Custom Plotting Scripts
   ///
   /// If you want more flexibility with your plotting, you can use the manager
   /// classes in your own plotting scripts so that you have all the benefits of
   /// MaCh3s plotting library (Generalised input reading, unified command line
   /// interface, configurability, a number of general plotting utility functions)
   /// but with total freedom of how to actually make plots. In general this is as
-  /// easy as including the PlottingManager in your script, initialising it with
+  /// easy as including the MaCh3Plotting::PlottingManager in your script, initialising it with
   /// the command line inputs, and then you're good to go! This section will give
   /// some more details on how to do this, along with some examples using fitter
-  /// outputs that you can generate by following the MaCh3 Tutorial. The tutorial
-  /// also covers usage of the plotting library in a more hands on way, so it is
-  /// highly recommended to follow that in addition to reading the wiki.
+  /// outputs that you can generate by following the MaCh3 Tutorial.
   ///
+  /// # Python Interface
   ///
+  /// MaCh3 also provides a Python interface for plotting and analyzing MCMC/fitter outputs.
+  /// This allows full access to the plotting utilities from Python scripts, including
+  /// command line input parsing, PDF export, and custom styling.
   ///
+  /// ## Installation
+  ///
+  /// The plotting library comes with a Python interface. See the
+  /// [MaCh3 Python interface README](https://github.com/mach3-software/MaCh3/blob/develop/README.md#python)
+  /// for installation details.
+  ///
+  /// ## Basic Usage
+  ///
+  /// Once installed, you can import the plotting submodule as follows:
+  ///
+  /// ```python
+  /// from pyMaCh3 import plotting
+  /// ```
+  ///
+  /// ### Example: Plotting Likelihood Scans
+  ///
+  /// The following example demonstrates how to plot LLH scans for all known parameters
+  /// and save them to a PDF:
+  ///
+  /// @code{.python}
+  /// from pyMaCh3 import plotting
+  /// import matplotlib.backends.backend_pdf
+  /// from matplotlib import pyplot as plt
+  /// import sys
+  ///
+  /// # Create an instance of the PlottingManager
+  /// man = plotting.PlottingManager()
+  ///
+  /// # Parse command line inputs passed to the script
+  /// man.parse_inputs(sys.argv)
+  ///
+  /// # Open a PDF file to save the generated plots
+  /// pdf = matplotlib.backends.backend_pdf.PdfPages("LLH-scans.pdf")
+  ///
+  /// # Loop through all known parameters and plot their likelihood scans
+  /// for i, param in enumerate(man.input().get_known_parameters()):
+  ///     fig = plt.figure()
+  ///     plt.title(man.style().prettify_parameter_name(param))
+  ///
+  ///     for file_id in range(man.input().get_n_input_files()):
+  ///         llh_scan = man.input().get_llh_scan(file_id, param, "sample")
+  ///         plt.plot(llh_scan[0], llh_scan[1])
+  ///
+  ///     pdf.savefig(fig)
+  ///
+  /// pdf.close()
+  /// @endcode
+  ///
+  /// This workflow gives you access to all plotting utilities from Python, while
+  /// preserving the general input handling, styling, and convenience provided
+  /// by the MaCh3 library.
+
+
+  /// @defgroup MaCh3DiagnosticProcessing MaCh3 Diagnostic & Processing
+  /// @brief Tools used for diagnostic MCMC and general MCMC processing
+  ///
+  /// # Diagnostic Applications
+  ///
+  /// <b>@ref ProcessMCMC.cpp "ProcessMCMC"</b>
+  /// The main application for analysing the ND280 chain. It prints posterior
+  /// distributions after the burn-in cut and allows comparison of two or three
+  /// different chains. Several options can be configured directly in the app,
+  /// such as selection, burn-in cut, and whether to plot xsec+flux or only flux.
+  ///
+  /// Additional functionality includes:
+  /// <ol>
+  ///   <li>Produce a covariance matrix with multithreading (RAM intensive due to caching)</li>
+  ///   <li>Violin plots</li>
+  ///   <li>Credible intervals and regions</li>
+  ///   <li>Calculation of Bayes factors with significance based on the Jeffreys scale</li>
+  ///   <li>Triangle plots</li>
+  ///   <li>Study of covariance matrix stability</li>
+  /// </ol>
+  ///
+  /// More options are described here:
+  /// https://github.com/mach3-software/MaCh3/wiki/09.-Bayesian-Analysis,-Plotting-and-MCMC-Processor
+  ///
+  /// <b>@ref GetPenaltyTerm.cpp "GetPenaltyTerm"</b>
+  /// Since xsec, flux, and ND spline systematics are treated as the same
+  /// systematic object, the log term cannot be taken directly. This utility
+  /// evaluates the correct penalty term:
+  /// @code
+  /// GetFluxPenaltyTerm MCMCChain.root config
+  /// @endcode
+  /// Relevant parameters are loaded via the configuration, allowing arbitrary
+  /// combinations to be studied. Runtime increases with the number of sets.
+  ///
+  /// <b>@ref DiagMCMC.cpp "DiagMCMC"</b>
+  /// Performs MCMC diagnostics such as autocorrelation and trace plots.
+  ///
+  /// <b>@ref PlotMCMCDiag.cpp "PlotMCMCDiag"</b>
+  /// Plots the output of <i>DiagMCMC</i> and can compare multiple files:
+  /// @code
+  /// ./PlotMCMCDiag DiagMCMC_file_1.root Label_1, DiagMCMC_file_2.root Label_2 ...
+  /// @endcode
+  /// Up to four files can be processed simultaneously.
+  ///
+  /// <b>@ref RHat.cpp "RHat"</b>
+  /// Performs the \f$\hat{R}\f$ diagnostic to verify that all chains converged to
+  /// the same stationary distribution:
+  /// @code
+  /// ./RHat Ntoys MCMCchain_1.root MCMCchain_2.root MCMCchain_3.root ...
+  /// @endcode
+  ///
+  /// <b>@ref CombineMaCh3Chains.cpp "CombineMaCh3Chains"</b>
+  /// Combines chain files produced by MCMC, enforcing that all inputs were
+  /// generated with identical software versions and configuration:
+  /// @code
+  /// CombineMaCh3Chains [-h] [-c [0-9]] [-f] [-o <output file>] file1.root [file2.root ...]
+  /// @endcode
+  ///
+  /// Options:
+  /// - <tt>-c</tt> Target compression level (default 1, consistent with <tt>hadd</tt>)
+  /// - <tt>-f</tt> Force overwrite if the output file already exists
+  /// - <tt>-h</tt> Print usage message and exit
+  ///
+  /// If no output name is specified, the first input file name is reused.
+  ///
+  /// <b>@ref SmearChain.cpp "SmearChain"</b>
+  /// Allows smearing of contours. Useful when a study shows that the evaluated
+  /// uncertainty set does not fully cover the analysis needs:
+  /// @code
+  /// SmearChain MCMCchain.root Config.yaml
+  /// @endcode
+  ///
+  /// <b>@ref ReweightMCMC.cpp "ReweightMCMC"</b>
+  /// Enables chain reweighting to test alternative prior choices without rerunning
+  /// the MCMC. Commonly used to study the impact of reactor constraints on
+  /// \f$\theta_{13}\f$:
+  /// @code
+  /// ReweightMCMC Config.yaml MCMCchain.root
+  /// @endcode
+
+  /// @defgroup SamplesAndParameters Implementing Samples and Parameters
+  /// @brief Classes responsible for handling samples and parameters.
+  ///
+  /// # Introduction
+  /// The SampleHandler classes are the main interface for storing information about the samples used in analysis.
+  /// Practically, this involves storing the number of events predicted in each analysis bin for each sample,
+  /// as well as modifying this for a given set of systematic and oscillation parameter values (i.e., "reweighting"
+  /// the nominal Monte-Carlo prediction). Therefore, the SampleHandler class also interacts with many other classes
+  /// in MaCh3, especially the @ref ParameterHandlerGeneric and @ref SplineBase. In turn, the @ref FitterBase class
+  /// obtains likelihood values by comparing the MC prediction with data in the SampleHandler class.
+  ///
+  /// Each experiment needs to create a SampleHandler experiment class that inherits from the @ref SampleHandlerFD
+  /// class in the core repository.
+  ///
+  /// @warning The SampleHandlerFD class will be renamed in the future to avoid confusion, as it can be used
+  /// for the Near Detector as well, not only the Far Detector (FD).
+  ///
+  /// # Constructing a SampleHandler Experiment Class
+  /// The main purpose of any SampleHandler class is to contain all information required to make MC predictions
+  /// for a given set of systematic parameter values. To achieve this, the SampleHandler object reads information
+  /// from different input files and keeps track of them in internal data structures.
+  /// For flexibility in loading various experiment formats, the function
+  /// @ref SampleHandlerFD::SetupExperimentMC is declared pure virtual.
+  ///
+  /// ## The Event Struct
+  /// The @ref SampleHandlerFD class stores MC information using the @ref EventInfo struct.
+  /// Some variables of @ref EventInfo, such as @ref EventInfo::KinVar, need to refer to experiment-specific structures.
+  /// This is mostly handled via @ref SampleHandlerFD::GetPointerToKinematicParameter.
+  ///
+  /// # Setting Up Systematics
+  /// Systematic parameters are handled via @ref TypeParameterBase.
+  /// Note that the actual parameters, including prior values and errors,
+  /// are defined in @ref ParameterHandlerGeneric. However, their impact
+  /// on samples is largely implemented in @ref SampleHandlerFD.
+  ///
+  /// ## Norm Parameters
+  /// @ref NormParameter are Simple parameters that work as normalizations for subsets of events.
+  /// Events are selected based on kinematic cuts. For example, events with
+  /// TrueQ2 in the range [0.5, 1.0] can be selected.
+  ///
+  /// Example YAML configuration:
+  /// @code{yaml}
+  /// - Systematic:
+  ///     Names:
+  ///       FancyName: Norm_Param_1
+  ///     KinematicCuts:
+  ///       - TrueQ2: [0.5, 1.0]
+  ///     Type: Norm
+  /// @endcode
+  ///
+  /// The actual bins are defined when calling @ref SampleHandlerFD::SetupNormParameters,
+  /// while the actual values of TrueQ2 are returned using @ref SampleHandlerFD::ReturnKinematicParameter.
+  ///
+  /// ## Spline Parameters
+  /// @ref SplineParameter or response functions are parameters with more complex behavior, often requiring
+  /// calculations of higher-order polynomials. Several types of interpolation are available via
+  /// @ref SplineInterpolation. Actual weights are calculated via the Spline class, either in a binned
+  /// approach via @ref BinnedSplineHandler or event-by-event via @ref SMonolith.
+  /// Initialization is handled via @ref SampleHandlerFD::SetupSplines.
+  ///
+  /// ## Oscillation Parameter
+  /// @ref OscillationParameter are handled via @ref OscillationHandler, which is a wrapper around
+  /// [NuOscillator](https://github.com/dbarrow257/NuOscillator). This library provides access
+  /// to a variety of oscillation engines.
+  /// @warning Parameters must be defined exactly as expected by [NuOscillator](https://github.com/dbarrow257/NuOscillator)!
+  ///
+  /// ## FunctionalParameters
+  /// @ref FunctionalParameter represent shifts to kinematical variables or other complex responses
+  /// that are not handled by other parameter types. Shifts are applied via
+  /// @ref SampleHandlerFD::ApplyShifts (virtual), which can be overridden to implement custom responses.
+  /// Functional parameters must be registered via @ref SampleHandlerFD::RegisterIndividualFunctionalParameter.
+  /// This informs MaCh3 which functional parameters are available; the configuration file determines which are actually used.
+  ///
+  /// ## Special Step Proposal
+  /// Most parameters are assumed to have Gaussian or flat priors. However, some require special treatment,
+  /// mostly for oscillation parameters, though any parameter can be affected.
+  /// Handled @ref ParameterHandlerBase::SpecialStepProposal
+  ///
+  /// ### Circular Bounds
+  /// Parameters like delta_CP are defined between -π and +π but can wrap around continuously.
+  /// Hence are called @ref ParameterHandlerBase::CircularParBounds
+  ///
+  /// Example YAML configuration:
+  /// @code{yaml}
+  /// - Systematic:
+  ///     Names:
+  ///       FancyName: delta_cp
+  ///     SpecialProposal:
+  ///       CircularBounds: [-3.141592, 3.141592]
+  /// @endcode
+  ///
+  /// ### Flip Parameter Value
+  /// Parameters like delta_M2_32 can @ref ParameterHandlerBase::FlipParameterValue between normal and inverted ordering.
+  ///
+  /// Example YAML configuration:
+  /// @code{yaml}
+  /// - Systematic:
+  ///     Names:
+  ///       FancyName: sin2th_23
+  ///     SpecialProposal:
+  ///       FlipParameter: 0.5112  # Flip octant around point of maximal disappearance
+  /// @endcode

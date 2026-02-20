@@ -10,6 +10,8 @@
 /// @brief KS: This script is used to analyse output form DiagMCMC.
 /// @warning This script support comparing up to 4 files, there is easy way to expand it up to five or six,
 /// @todo this need serious refactor
+/// @ingroup MaCh3DiagnosticProcessing
+///
 /// @author Henry Wallace
 /// @author Kamil Skwarczynski
 

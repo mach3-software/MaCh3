@@ -38,6 +38,8 @@ _MaCh3_Safe_Include_End_ //}
 ///      The input format is also slightly altered; since we can now load entire chains, there's less need to
 ///      specify how many toys are desired for a sub-sample, so the Ntoys input has been removed.
 ///
+/// @ingroup MaCh3DiagnosticProcessing
+///
 /// @author Kamil Skwarczynski
 /// @author Michael Reh
 

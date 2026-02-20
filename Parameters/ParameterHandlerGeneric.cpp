@@ -165,8 +165,8 @@ NormParameter ParameterHandlerGeneric::GetNormParameter(const YAML::Node& param,
 
   GetBaseParameter(param, Index, norm);
 
-  /// ETA size 0 to mean apply to all
-  /// Ultimately all this information ends up in the @NormParams vector
+  // ETA size 0 to mean apply to all
+  // Ultimately all this information ends up in the NormParams vector
   norm.modes = GetFromManager<std::vector<int>>(param["Mode"], {}, __FILE__ , __LINE__);
   norm.pdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavour"], {}, __FILE__ , __LINE__);
   norm.preoscpdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavourUnosc"], {}, __FILE__ , __LINE__);

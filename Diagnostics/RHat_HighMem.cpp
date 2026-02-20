@@ -30,6 +30,8 @@ _MaCh3_Safe_Include_End_ //}
 ///
 /// @cite gelman2019.
 ///
+/// @ingroup MaCh3DiagnosticProcessing
+///
 /// @author Kamil Skwarczynski
 /// @author Michael Reh
 

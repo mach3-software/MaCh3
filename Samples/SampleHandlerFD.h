@@ -16,6 +16,8 @@ _MaCh3_Safe_Include_End_ //}
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
 /// @author Dan Barrow
 /// @author Ed Atkin
+///
+/// @ingroup SamplesAndParameters
 class SampleHandlerFD :  public SampleHandlerBase
 {
  public:
