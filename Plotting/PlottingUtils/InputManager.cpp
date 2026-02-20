@@ -507,8 +507,8 @@ bool InputManager::findPostFitParamError(InputFile &inputFileDef, const std::str
 // methods, currently a lot of copy pasting
 void InputManager::fillFileInfo(InputFile &inputFileDef, const bool printThoughts) {
   /// @todo Would like to be able to specify what kind of file and what fitter an input is from on the command like:
-  /// e.g. like `plotApp [options] <fileName1>;<fileType>;<fitterName>... and only try to auto-detect it if its not specified, 
-  /// this would save some time and would also be very helpful in situations where we can't auto-detect e.g. if there is some kind of 
+  /// e.g., like `plotApp [options] fileName1;fileType;fitterName` and only try to auto-detect it if it's not specified.
+  /// this would save some time and would also be very helpful in situations where we can't auto-detect e.g. if there is some kind of
   ///overlap in the file structure between two fitters
   
   // use the contents of the file to decide which fitter it came from and what type of file it is

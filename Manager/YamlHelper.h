@@ -243,6 +243,8 @@ inline bool compareYAMLNodes(const YAML::Node& node1, const YAML::Node& node2, b
 // **********************
 /// @brief Overrides the configuration settings based on provided arguments.
 /// @param node YAML node that will be modified
+/// @param key The key in the YAML node to override
+/// @param val The value to assign to the key
 template <typename TValue>
 void OverrideConfig(YAML::Node node, std::string const &key, TValue val) {
 // **********************
@@ -254,6 +256,7 @@ void OverrideConfig(YAML::Node node, std::string const &key, TValue val) {
 ///
 /// This function allows you to set configuration options in a nested YAML node.
 /// @param node YAML node that will be modified
+/// @param key The key in the YAML node to override
 /// @param args The arguments to override the configuration. The last argument
 ///             will be used as the value
 ///

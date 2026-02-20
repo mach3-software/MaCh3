@@ -20,6 +20,8 @@ _MaCh3_Safe_Include_End_ //}
 
 /// @file CombineMaCh3Chains.cpp
 /// @brief Combine chains files produced by **MCMC**, enforcing the condition that all the files to combine were made using the exact same software versions and config files.
+/// @ingroup MaCh3DiagnosticProcessing
+///
 /// @author Ewan Miller
 /// @author Kamil Skwarczynski
 

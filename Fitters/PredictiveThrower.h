@@ -23,7 +23,8 @@ struct PredictiveSample {
 };
 
 /// @brief Implementation of Prior/Posterior Predictive and Bayesian p-Value calculations following the approach described in @cite gelman1996posterior.
-/// @details For more information, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/10.-Posterior-Predictive,-p%E2%80%90value-etc.).
+/// @details For more information, visit the <a href="PosteriorPredictive.html">Posterior Predictive page</a>.
+///
 /// @author Asher Kaboth
 /// @author Dan Barrow
 /// @author Ed Atkin

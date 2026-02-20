@@ -10,6 +10,7 @@
 #pragma GCC diagnostic ignored "-Wconversion"
 
 /// @file PlotLLH.cpp
+/// @ingroup MaCh3Plotting
 /// @author Ewan Miller
 
 // some options for the plots

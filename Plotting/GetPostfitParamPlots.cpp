@@ -37,6 +37,8 @@ _MaCh3_Safe_Include_End_ //}
 /// ./GetPostfitParamPlots ProcessMCMC_Output1.root <ProcessMCMC_Output2.root> <ProcessMCMC_Output3.root>
 /// ```
 ///
+/// @ingroup MaCh3Plotting
+///
 /// @author Clarence Wret
 /// @author Will Parker
 /// @author Kamil Skwarczynski

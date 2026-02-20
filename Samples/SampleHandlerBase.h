@@ -31,49 +31,37 @@ class SampleHandlerBase
   /// @brief destructor
   virtual ~SampleHandlerBase();
 
-  /// @ingroup SampleHandlerGetters
   virtual inline M3::int_t GetNsamples(){ return nSamples; };
-  /// @ingroup SampleHandlerGetters
   virtual std::string GetSampleTitle(const int Sample) const = 0;
-  /// @ingroup SampleHandlerGetters
   virtual std::string GetName() const = 0;
-  /// @ingroup SampleHandlerGetters
   virtual double GetSampleLikelihood(const int isample) const = 0;
   /// @brief Allow to clean not used memory before fit starts
   virtual void CleanMemoryBeforeFit() = 0;
   /// @brief Store additional info in a chan
   virtual void SaveAdditionalInfo(TDirectory* Dir) {(void) Dir;};
   /// @brief Return pointer to MaCh3 modes
-  /// @ingroup SampleHandlerGetters
   MaCh3Modes* GetMaCh3Modes() const { return Modes.get(); }
       
   virtual void Reweight()=0;
-  /// @ingroup SampleHandlerGetters
   virtual double GetLikelihood() const = 0;
 
   /// @brief Helper function to print rates for the samples with LLH
   /// @param DataOnly whether to print data only rates
   virtual void PrintRates(const bool DataOnly = false) = 0;
 
-  /// @ingroup SampleHandlerGetters
   unsigned int GetNEvents() const {return nEvents;}
-  /// @ingroup SampleHandlerGetters
   virtual int GetNOscChannels(const int iSample) const = 0;
 
   /// @brief Return Kinematic Variable name for specified sample and dimension for example "Reconstructed_Neutrino_Energy"
   /// @param iSample Sample index
   /// @param Dimension Dimension index
-  /// @ingroup SampleHandlerGetters
   virtual std::string GetKinVarName(const int iSample, const int Dimension) const = 0;
 
   /// @brief Get Data histogram
-  /// @ingroup SampleHandlerGetters
   virtual TH1* GetDataHist(const int Sample) = 0;
   /// @brief Get MC histogram
-  /// @ingroup SampleHandlerGetters
   virtual TH1* GetMCHist(const int Sample) = 0;
   /// @brief Get W2 histogram
-  /// @ingroup SampleHandlerGetters
   virtual TH1* GetW2Hist(const int Sample) = 0;
 
   /// @brief DB Function to differentiate 1D or 2D binning
@@ -101,7 +89,6 @@ class SampleHandlerBase
   /// @brief Calculate test statistic for a single bin using Poisson
   /// @param data is data
   /// @param mc is mc
-  /// @ingroup SampleHandlerGetters
   double GetPoissonLLH(const double data, const double mc) const;
 
   /// @brief Calculate test statistic for a single bin. Calculation depends on setting of @p fTestStatistic. Data and mc -> 0 cut-offs are defined in M3::_LOW_MC_BOUND_.
@@ -188,12 +175,10 @@ class SampleHandlerBase
   /// @param data is data
   /// @param mc is mc
   /// @param w2 is \f$\sum_{i} w_{i}^2\f$ (sum of weights squared), which is \f$\sigma^2_{\text{MC stats}}\f$
-  /// @ingroup SampleHandlerGetters
   double GetTestStatLLH(const double data, const double mc, const double w2) const;
 
   /// @brief Set the test statistic to be used when calculating the binned likelihoods
   /// @param testStat The test statistic to use.
-  /// @ingroup SampleHandlerGetters
   void SetTestStatistic(TestStatistic testStat){ fTestStatistic = testStat; }
   /// @brief Get the test statistic used when calculating the binned likelihoods
   TestStatistic GetTestStatistic() const { return fTestStatistic; }

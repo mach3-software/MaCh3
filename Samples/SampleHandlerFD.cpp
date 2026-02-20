@@ -468,14 +468,12 @@ void SampleHandlerFD::FillArray_MP() {
 // Helper function to reset the data and MC histograms
 void SampleHandlerFD::ResetHistograms() {
 // **************************************************  
-  //DB Reset values stored in PDF array to 0.
+  // DB Reset values stored in PDF array to 0.
   // Don't openMP this; no significant gain
-  #ifdef MULTITHREAD
-  #pragma omp simd
-  #endif
-  for (int i = 0; i < Binning->GetNBins(); ++i) {
-    SampleHandlerFD_array[i] = 0.;
-    if (FirstTimeW2) SampleHandlerFD_array_w2[i] = 0.;
+  const int nBins = Binning->GetNBins();
+  std::fill(SampleHandlerFD_array, SampleHandlerFD_array + nBins, 0.0);
+  if (FirstTimeW2) {
+    std::fill(SampleHandlerFD_array_w2, SampleHandlerFD_array_w2 + nBins, 0.0);
   }
 } // end function
 
@@ -526,7 +524,7 @@ void SampleHandlerFD::SetupFunctionalParameters() {
     funcParsMap[key].funcPtr  = fp.funcPtr;
   }
 
-  // Mostly the same as CalcXsecNormsBins
+  // Mostly the same as CalcNormsBins
   // For each event, make a vector of pointers to the functional parameters
   for (std::size_t iEvent = 0; iEvent < static_cast<std::size_t>(GetNEvents()); ++iEvent) {
     // Now loop over the functional parameters and get a vector of enums corresponding to the functional parameters
@@ -585,7 +583,7 @@ M3::float_t SampleHandlerFD::CalcWeightTotal(const EventInfo* _restrict_ MCEvent
   const int nNorms = static_cast<int>(MCEvent->norm_pointers.size());
   //Loop over stored normalisation and function pointers
   #ifdef MULTITHREAD
-  #pragma omp simd
+  #pragma omp simd reduction(*:TotalWeight)
   #endif
   for (int iParam = 0; iParam < nNorms; ++iParam)
   {
@@ -596,10 +594,9 @@ M3::float_t SampleHandlerFD::CalcWeightTotal(const EventInfo* _restrict_ MCEvent
   }
 
   const int TotalWeights = static_cast<int>(MCEvent->total_weight_pointers.size());
-  //DB Xsec syst
-  //Loop over stored spline pointers
+  //DB Loop over stored pointers
   #ifdef MULTITHREAD
-  #pragma omp simd
+  #pragma omp simd reduction(*:TotalWeight)
   #endif
   for (int iWeight = 0; iWeight < TotalWeights; ++iWeight) {
     TotalWeight *= *(MCEvent->total_weight_pointers[iWeight]);
@@ -612,7 +609,7 @@ M3::float_t SampleHandlerFD::CalcWeightTotal(const EventInfo* _restrict_ MCEvent
 // Setup the norm parameters
 void SampleHandlerFD::SetupNormParameters() {
 // ***************************************************************************
-  std::vector< std::vector< int > > xsec_norms_bins(GetNEvents());
+  std::vector< std::vector< int > > norms_bins(GetNEvents());
 
   std::vector<NormParameter> norm_parameters = ParHandler->GetNormParsFromSampleName(GetName());
 
@@ -621,16 +618,16 @@ void SampleHandlerFD::SetupNormParameters() {
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
-  // Assign xsec norm bins in MCSamples tree
-  CalcNormsBins(norm_parameters, xsec_norms_bins);
+  // Assign norm bins in MCSamples tree
+  CalcNormsBins(norm_parameters, norms_bins);
 
   //DB Attempt at reducing impact of SystematicHandlerGeneric::calcReweight()
   int counter;
   for (unsigned int iEvent = 0; iEvent < GetNEvents(); ++iEvent) {
     counter = 0;
 
-    MCSamples[iEvent].norm_pointers.resize(xsec_norms_bins[iEvent].size());
-    for(auto const & norm_bin: xsec_norms_bins[iEvent]) {
+    MCSamples[iEvent].norm_pointers.resize(norms_bins[iEvent].size());
+    for(auto const & norm_bin: norms_bins[iEvent]) {
       MCSamples[iEvent].norm_pointers[counter] = ParHandler->RetPointer(norm_bin);
       counter += 1;
     }
@@ -639,7 +636,7 @@ void SampleHandlerFD::SetupNormParameters() {
 
 // ************************************************
 //A way to check whether a normalisation parameter applies to an event or not
-void SampleHandlerFD::CalcNormsBins(std::vector<NormParameter>& norm_parameters, std::vector< std::vector< int > >& xsec_norms_bins) {
+void SampleHandlerFD::CalcNormsBins(std::vector<NormParameter>& norm_parameters, std::vector< std::vector< int > >& norms_bins) {
 // ************************************************
   #ifdef DEBUG
   std::vector<int> VerboseCounter(norm_parameters.size(), 0);
@@ -705,7 +702,7 @@ void SampleHandlerFD::CalcNormsBins(std::vector<NormParameter>& norm_parameters,
         //}
       } // end iteration over norm_parameters
     } // end if (ParHandler)
-    xsec_norms_bins[iEvent] = NormBins;
+    norms_bins[iEvent] = NormBins;
   }//end loop over events
   #ifdef DEBUG
   MACH3LOG_DEBUG("┌──────────────────────────────────────────────────────────┐");

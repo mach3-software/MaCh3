@@ -19,10 +19,9 @@ class TGraphAsymmErrors;
 class TDirectory;
 
 /// @brief Base class for implementing fitting algorithms
-/// @details This class wraps MaCh3 classes like SampleHandler and ParameterHandler.
+/// @details This class wraps MaCh3 classes like @ref SampleHandlerBase and @ref ParameterHandlerBase.
 /// It serves as a base for different fitting algorithms and for validation techniques
 /// such as LLH scans.
-/// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/06.-Fitting-Algorithms).
 /// @ingroup CoreClasses
 class FitterBase {
  public:

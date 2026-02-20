@@ -57,6 +57,7 @@ jobs:
           cd build
           cmake ..
           cd ..
+          ./Doc/setup_wiki.sh
           doxygen Doc/Doxyfile
 
       - name: Upload Doxygen Artifact
