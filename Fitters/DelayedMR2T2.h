@@ -6,13 +6,13 @@
 /// @author Henry Wallace
 /// @cite dram2006
 ///
-/// @section intro Quick Introduction
+/// # Quick Introduction
 ///
 /// Delayed rejection is a method to increase the efficiency of MCMC.
 /// It is useful if your chain is not mixing well or if adaptive MCMC is struggling.
 /// The idea is to propose increasingly small steps centered on the last rejected step.
 ///
-/// @section config Configuration
+/// # Configuration
 ///
 /// To enable delayed rejection, add the following to your config.yaml file:
 /// - Set the algorithm as: General::FittingAlgorithm::DelayedMR2T2
@@ -20,7 +20,7 @@
 /// Delayed MCMC will work "as is" but there are additional options
 /// which are set in General::MCMC
 ///
-/// @subsection scaling Scaling Options
+/// ## Scaling Options
 ///
 /// @param DecayRate This should be less than 1 and tells your algorithm how quickly
 ///                  to decrease the step size. By default this is 0.1
@@ -31,7 +31,7 @@
 ///                     large/small first step to be proposed. Testing finds the default
 ///                     value of 1 to be most effective with adaptive MCMC
 ///
-/// @subsection triggers Delay Triggers
+/// ## Delay Triggers
 ///
 /// @param DelayOnlyOutBounds Here delaying only happens if a step is thrown out of bounds
 /// @param DelayProbability In order to mitigate the slowness of delayed MCMC, there is
@@ -39,6 +39,8 @@
 ///
 /// @note Delayed rejection MCMC can significantly improve chain mixing but may increase
 ///       computational overhead per step.
+///
+/// @ingroup FittingAlgorithms
 class DelayedMR2T2 : public MR2T2 {
  public:
     /// @brief Constructor

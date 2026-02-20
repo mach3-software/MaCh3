@@ -7,8 +7,8 @@
 #pragma GCC diagnostic ignored "-Wconversion"
 
 /// @file MatrixPlotter.cpp
+/// @ingroup MaCh3Plotting
 /// @author Kamil Skwarczynski
-
 
 /// @brief Grab large Matrix only only extract submatrix based on label naming
 std::unique_ptr<TH2D> GetSubMatrix(TH2D *MatrixFull,

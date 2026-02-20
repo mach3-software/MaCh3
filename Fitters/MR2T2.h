@@ -22,6 +22,8 @@
 /// where \f$T_\text{anneal}\f$ is the current annealing temperature and \f$\text{step}\f$ is the iteration index.
 ///
 /// @author Asher Kaboth
+///
+/// @ingroup FittingAlgorithms
 class MR2T2 : public MCMCBase {
  public:
     /// @brief Constructor

@@ -94,6 +94,7 @@ void CleanContainer(std::vector<T>& container) {
 
 // *******************
 /// @brief Base class storing info for parameters types, helping unify codebase
+/// @ingroup SamplesAndParameters
 struct TypeParameterBase {
 // *******************
   /// Name of parameters
@@ -106,6 +107,7 @@ struct TypeParameterBase {
 // *******************
 /// @brief ETA - Normalisations for cross-section parameters
 /// Carrier for whether you want to apply a systematic to an event or not
+/// @author Ed Atkin
 struct NormParameter : public TypeParameterBase {
   /// Mode which parameter applies to
   std::vector<int> modes;
@@ -133,6 +135,7 @@ using FuncParFuncType = std::function<void (const double*, std::size_t)>;
 // *******************
 /// @brief HH - Functional parameters
 /// Carrier for whether you want to apply a systematic to an event or not
+/// @author Hank Hua
 struct FunctionalParameter : public TypeParameterBase {
 // *******************
   /// Mode which parameter applies to

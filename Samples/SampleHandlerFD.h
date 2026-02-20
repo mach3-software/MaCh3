@@ -16,6 +16,8 @@ _MaCh3_Safe_Include_End_ //}
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
 /// @author Dan Barrow
 /// @author Ed Atkin
+///
+/// @ingroup SamplesAndParameters
 class SampleHandlerFD :  public SampleHandlerBase
 {
  public:
@@ -28,22 +30,16 @@ class SampleHandlerFD :  public SampleHandlerBase
   virtual ~SampleHandlerFD();
 
   /// @brief DB Function to differentiate 1D or 2D binning
-  /// @ingroup SampleHandlerGetters
   int GetNDim(const int Sample) const override { return SampleDetails[Sample].nDimensions; }
-  /// @ingroup SampleHandlerGetters
   std::string GetName() const override;
-  /// @ingroup SampleHandlerGetters
   std::string GetSampleTitle(const int Sample) const override {return SampleDetails[Sample].SampleTitle;}
 
   /// @brief Return Kinematic Variable name for specified sample and dimension for example "Reconstructed_Neutrino_Energy"
   /// @param iSample Sample index
   /// @param Dimension Dimension index
-  /// @ingroup SampleHandlerGetters
   std::string GetKinVarName(const int iSample, const int Dimension) const override;
 
-  /// @ingroup SampleHandlerGetters
   std::string GetXBinVarName(const int Sample) const {return GetKinVarName(Sample, 0);}
-  /// @ingroup SampleHandlerGetters
   std::string GetYBinVarName(const int Sample) const {return GetKinVarName(Sample, 1);}
   /// @brief Get pointer to binning handler
   const BinningHandler* GetBinningHandler() const {return Binning.get();}
@@ -63,28 +59,23 @@ class SampleHandlerFD :  public SampleHandlerBase
   void PrintRates(const bool DataOnly = false) override;
   /// @brief DB Multi-threaded GetLikelihood
   double GetLikelihood() const override;
-  /// @ingroup SampleHandlerGetters
   /// @brief Get likelihood for single sample
   double GetSampleLikelihood(const int isample) const override;
   //===============================================================================
 
   /// @brief Get index of sample based on name
   /// @param SampleTitle The title of the sample to search for.
-  /// @ingroup SampleHandlerGetters
   int GetSampleIndex(const std::string& SampleTitle) const;
 
   /// @brief Get Data histogram
-  /// @ingroup SampleHandlerGetters
   TH1* GetDataHist(const int Sample) override;
   TH1* GetDataHist(const std::string& Sample);
 
   /// @brief Get MC histogram
-  /// @ingroup SampleHandlerGetters
   TH1* GetMCHist(const int Sample) override;
   TH1* GetMCHist(const std::string& Sample);
 
   /// @brief Get W2 histogram
-  /// @ingroup SampleHandlerGetters
   TH1* GetW2Hist(const int Sample) override;
   TH1* GetW2Hist(const std::string& Sample);
 
@@ -99,10 +90,8 @@ class SampleHandlerFD :  public SampleHandlerBase
   void ReadConfig();
   void LoadSingleSample(const int iSample, const YAML::Node& Settings);
 
-  /// @ingroup SampleHandlerGetters
   int GetNOscChannels(const int iSample) const override {return static_cast<int>(SampleDetails[iSample].OscChannels.size());};
 
-  /// @ingroup SampleHandlerGetters
   std::string GetFlavourName(const int iSample, const int iChannel) const override {
     if (iChannel < 0 || iChannel > GetNOscChannels(iSample)) {
       MACH3LOG_ERROR("Invalid Channel Requested: {}", iChannel);
@@ -114,7 +103,6 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// Returns the original Selection so the caller can restore it later.
   std::vector<std::vector<KinematicCut>> ApplyTemporarySelection(const int iSample,
                                                                  const std::vector<KinematicCut>& ExtraCuts);
-  /// @ingroup SampleHandlerGetters
   TH1 *Get1DVarHist(const int iSample, const std::string &ProjectionVar,
                     const std::vector<KinematicCut> &EventSelectionVec = {}, int WeightStyle = 0,
                     TAxis *Axis = nullptr, const std::vector<KinematicCut> &SubEventSelectionVec = {}) override;
@@ -124,51 +112,40 @@ class SampleHandlerFD :  public SampleHandlerBase
                     const std::vector< KinematicCut >& SubEventSelectionVec = {}) override;
   std::vector<KinematicCut> BuildModeChannelSelection(const int iSample, const int kModeToFill, const int kChannelToFill) const;
 
-  /// @ingroup SampleHandlerGetters
   void Fill1DSubEventHist(const int iSample, TH1D* _h1DVar, const std::string& ProjectionVar,
                           const std::vector< KinematicCut >& SubEventSelectionVec = {},
                           int WeightStyle=0);
   void Fill2DSubEventHist(const int iSample, TH2D* _h2DVar, const std::string& ProjectionVarX, const std::string& ProjectionVarY,
                           const std::vector< KinematicCut >& SubEventSelectionVec = {}, int WeightStyle = 0);
   
-  /// @ingroup SampleHandlerGetters
   TH1* Get1DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_Str,
                                     int kModeToFill = -1, int kChannelToFill = -1, int WeightStyle = 0, TAxis* Axis = nullptr) override;
-  /// @ingroup SampleHandlerGetters
   TH2* Get2DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_StrX,
                                     const std::string& ProjectionVar_StrY, int kModeToFill = -1,
                                     int kChannelToFill = -1, int WeightStyle = 0,
                                     TAxis* AxisX = nullptr, TAxis* AxisY = nullptr) override;
 
-  /// @ingroup SampleHandlerGetters
   TH1 *GetModeHist1D(const int iSample, int s, int m, int style = 0) {
     return Get1DVarHistByModeAndChannel(iSample, GetXBinVarName(iSample), m, s, style);
   }
-  /// @ingroup SampleHandlerGetters
   TH2 *GetModeHist2D(const int iSample, int s, int m, int style = 0) {
     return Get2DVarHistByModeAndChannel(iSample, GetXBinVarName(iSample),GetYBinVarName(iSample), m, s, style);
   }
 
-  /// @ingroup SampleHandlerGetters
   std::vector<TH1*> ReturnHistsBySelection1D(const int iSample, const std::string& KinematicProjection,
                                              int Selection1, int Selection2 = -1,
                                              int WeightStyle = 0, TAxis* Axis = nullptr);
-  /// @ingroup SampleHandlerGetters
   std::vector<TH2*> ReturnHistsBySelection2D(const int iSample, const std::string& KinematicProjectionX,
                                              const std::string& KinematicProjectionY,
                                              int Selection1, int Selection2=-1, int WeightStyle=0,
                                              TAxis* XAxis = nullptr, TAxis* YAxis = nullptr);
-  /// @ingroup SampleHandlerGetters
   THStack* ReturnStackedHistBySelection1D(const int iSample, const std::string& KinematicProjection,
                                           int Selection1, int Selection2 = -1, int WeightStyle = 0, TAxis* Axis = nullptr);
-  /// @ingroup SampleHandlerGetters
   TLegend* ReturnStackHistLegend() {return THStackLeg;}
   
   /// @brief ETA function to generically convert a string from xsec cov to a kinematic type
-  /// @ingroup SampleHandlerGetters
   int ReturnKinematicParameterFromString(const std::string& KinematicStr) const;
   /// @brief ETA function to generically convert a kinematic type from xsec cov to a string
-  /// @ingroup SampleHandlerGetters
   std::string ReturnStringFromKinematicParameter(const int KinematicVariable) const;
 
   /// @brief Store additional info in a chan

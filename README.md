@@ -15,8 +15,7 @@ likelihoods implemented.
 [![DOI](https://zenodo.org/badge/331049416.svg)](https://doi.org/10.5281/zenodo.7608367)
 [![Release](https://img.shields.io/github/release/mach3-software/MaCh3.svg)](https://github.com/mach3-software/MaCh3/releases/latest)
 [![Container Image](https://img.shields.io/badge/Container-Image-brightgreen)](https://github.com/mach3-software/MaCh3/pkgs/container/mach3)
-[![Code - Documented](https://img.shields.io/badge/Code-Documented-2ea44f)](https://github.com/mach3-software/MaCh3/wiki)
-[![Code - Doxygen](https://img.shields.io/badge/Code-Doxygen-2ea44f)](https://mach3-software.github.io/MaCh3/index.html)
+[![Code - Documented](https://img.shields.io/badge/Code-Documented-2ea44f)](https://mach3-software.github.io/MaCh3/index.html)
 [![Build CI](https://github.com/mach3-software/MaCh3/actions/workflows/CIBuild.yml/badge.svg)](https://github.com/mach3-software/MaCh3/actions/workflows/CIBuild.yml)
 [![CodeFactor](https://www.codefactor.io/repository/github/mach3-software/mach3/badge/develop)](https://www.codefactor.io/repository/github/mach3-software/mach3/overview/develop)
 
@@ -30,9 +29,9 @@ When using MaCh3 you must cite our doi from Zenodo. The bibtex file can be found
 
 ## Help and Guidelines 📄
 - [Tutorial](https://github.com/mach3-software/MaCh3Tutorial)
+- [Documentation](https://mach3-software.github.io/MaCh3/index.html)
 - [Indico](https://indico.global/category/1289/) If you need a password, please reach out to MaCh3-leadership for access.
 - [How to contribute](https://github.com/mach3-software/MaCh3/blob/develop/.github/CONTRIBUTING.md)
-- [Wiki](https://github.com/mach3-software/MaCh3/wiki)
 - [Slack](https://t2k-experiment.slack.com/archives/C06EM0C6D7W/p1705599931356889)
 - [Discussions](https://github.com/mach3-software/MaCh3/discussions)
 - [Benchmark](https://mach3-software.github.io/MaCh3Tutorial/)

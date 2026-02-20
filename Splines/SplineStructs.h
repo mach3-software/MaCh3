@@ -668,7 +668,8 @@ public:
   }
 
   /// @brief Find the segment relevant to this variation in x
-  /// @note See `root/hist/hist/src/TSpline3::FindX(double)` or `FindSplineSegment`
+  /// @see <a href="https://root.cern/doc/master/classTSpline3.html#TSpline3:FindX">TSpline3::FindX(double)</a> for ROOT implementation
+  /// @see @ref SplineBase::FindSplineSegment FindSplineSegment for the base class version
   inline int FindX(double x) {
     // The segment we're interested in (klow in ROOT code)
     int segment = 0;

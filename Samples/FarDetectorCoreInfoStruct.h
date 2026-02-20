@@ -73,11 +73,12 @@ struct SampleInfo {
   TH1* W2Hist = nullptr;
 };
 
-/// @brief constructors are same for all three so put in here
+/// @brief Stores info about each MC event used during reweighting routine
 /// @author Dan Barrow
 /// @author Ed Atkin
 /// @author Kamil Skwarczynski
 /// @warning Try to no add more variables here as it will impact RAM usage
+/// @ingroup SamplesAndParameters
 struct EventInfo {
   /// @brief Default constructor.
   EventInfo(){}

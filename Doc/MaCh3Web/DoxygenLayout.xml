@@ -3,8 +3,23 @@
   <!-- Navigation index tabs for HTML output -->
   <navindex>
     <tab type="mainpage" visible="yes" title=""/>
-    <tab type="pages" visible="yes" title="" intro=""/>
-    <tab type="modules" visible="yes" title="" intro=""/>
+
+    <tab type="user" visible="yes" title="User-Guide" url="UserGuide.html">
+      <tab type="user" visible="yes" title="FAQ" url="FAQ.html"/>
+      <tab type="user" visible="yes" title="Bayesian Analysis" url="BayesianAnalysis.html"/>
+      <tab type="user" visible="yes" title="Posterior Predictive" url="PosteriorPredictive.html"/>
+      <tab type="user" visible="yes" title="MCMC Convergance" url="MCMCconvergance.html"/>
+      <tab type="user" visible="yes" title="Adaptive MCMC" url="AdaptiveMCMC.html"/>
+      <tab type="user" visible="yes" title="Containers" url="Containers.html"/>
+      <tab type="user" visible="yes" title="Clusters Info" url="Clusters.html"/>
+    </tab>
+
+    <tab type="user" visible="yes" title="Project Info" url="ReleaseNotes.html">
+      <tab type="user" visible="yes" title="Release Notes" url="ReleaseNotes.html"/>
+      <tab type="user" visible="yes" title="Results and Publications" url="ResultsPublications.html"/>
+    </tab>
+
+    <tab type="modules" visible="yes" title="Interface" intro=""/>
     <tab type="namespaces" visible="yes" title="">
       <tab type="namespacelist" visible="yes" title="" intro=""/>
       <tab type="namespacemembers" visible="yes" title="" intro=""/>
@@ -34,7 +49,11 @@
       <tab type="globals" visible="yes" title="" intro=""/>
     </tab>
     <tab type="examples" visible="yes" title="" intro=""/>
+    <tab type="pages" visible="yes" title="" intro=""/>
+
     <tab type="user" visible="yes" title="pyMaCh3" url="./pyMaCh3/mainpage.html"/>
+
+  </tab>
   </navindex>
 
   <!-- Layout definition for a class page -->

@@ -22,6 +22,7 @@ _MaCh3_Safe_Include_End_ //}
 
 /// @file ReweightMCMC.cpp
 /// @brief This executable allow to reweight MCMC Chain, such technique is used to study impact of different priors without rerunning MCMC
+/// @ingroup MaCh3DiagnosticProcessing
 ///
 /// @author David Riley
 /// @author Evan Goodman
