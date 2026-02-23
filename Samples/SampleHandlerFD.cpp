@@ -1397,6 +1397,7 @@ TH1* SampleHandlerFD::Get1DVarHist(const int iSample, const std::string& Project
     _h1DVar = new TH1D("", "", int(xBinEdges.size())-1, xBinEdges.data());
   }
   _h1DVar->GetXaxis()->SetTitle(ProjectionVar_Str.c_str());
+  _h1DVar->GetYaxis()->SetTitle("Events");
 
   if (IsSubEventVarString(ProjectionVar_Str)) {
     Fill1DSubEventHist(iSample, _h1DVar, ProjectionVar_Str, SubEventSelectionVec, WeightStyle);
@@ -1475,6 +1476,7 @@ TH2* SampleHandlerFD::Get2DVarHist(const int iSample,
   }
   _h2DVar->GetXaxis()->SetTitle(ProjectionVar_StrX.c_str());
   _h2DVar->GetYaxis()->SetTitle(ProjectionVar_StrY.c_str());
+  _h2DVar->GetZaxis()->SetTitle("Events");
 
   bool IsSubEventHist = IsSubEventVarString(ProjectionVar_StrX) || IsSubEventVarString(ProjectionVar_StrY);
   if (IsSubEventHist) Fill2DSubEventHist(iSample, _h2DVar, ProjectionVar_StrX, ProjectionVar_StrY, SubEventSelectionVec, WeightStyle);

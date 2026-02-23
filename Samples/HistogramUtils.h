@@ -6,7 +6,6 @@
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT include
-#include "TGraphAsymmErrors.h"
 #include "TObjString.h"
 #include "TRandom3.h"
 _MaCh3_Safe_Include_End_ //}
@@ -69,6 +68,8 @@ void MakeFluctuatedHistogramStandard(TH1D *FluctHist, TH1D* PolyHist, TRandom3* 
 /// @brief Make Poisson fluctuation of TH1D hist using slow method which is only for cross-check
 void MakeFluctuatedHistogramAlternative(TH1D *FluctHist, TH1D* PolyHist, TRandom3* rand);
 
+/// @brief Make Poisson fluctuation of TH2D hist using default fast method
+void MakeFluctuatedHistogramStandard(TH2D *FluctHist, TH2D* PolyHist, TRandom3* rand);
 /// @brief Make Poisson fluctuation of TH2D hist
 void MakeFluctuatedHistogramAlternative(TH2D *FluctHist, TH2D* PolyHist, TRandom3* rand);
 
@@ -79,14 +80,6 @@ void MakeFluctuatedHistogramAlternative(TH2Poly *FluctHist, TH2Poly* PolyHist, T
 
 /// @brief KS: ROOT developers were too lazy do develop getRanom2 for TH2Poly, this implementation is based on [link](https://root.cern.ch/doc/master/classTH2.html#a883f419e1f6899f9c4255b458d2afe2e)
 int GetRandomPoly2(const TH2Poly* PolyHist, TRandom3* rand);
-
-/// @brief Used by sigma variation, check how 1 sigma changes spectra
-/// @param sigmaArrayLeft sigma var hist at -1 or -3 sigma shift
-/// @param sigmaArrayCentr sigma var hist at prior values
-/// @param sigmaArrayRight sigma var hist at +1 or +3 sigma shift
-/// @param title A title for returned object
-/// @return A `TGraphAsymmErrors` object that visualizes the sigma variation of spectra, showing confidence intervals between different sigma shifts.
-std::unique_ptr<TGraphAsymmErrors> MakeAsymGraph(TH1* sigmaArrayLeft, TH1* sigmaArrayCentr, TH1* sigmaArrayRight, const std::string& title);
 
 /// @brief KS: Fill Violin histogram with entry from a toy
 /// @param violin hist that will be filled
@@ -113,23 +106,35 @@ std::vector<Base*> CastVector(const std::vector<Derived*>& inputVec) {
 inline std::string file_exists(std::string filename) {
   std::ifstream infile(filename.c_str());
   if (!infile.good()) {
-    MACH3LOG_ERROR("*** ERROR ***");
     MACH3LOG_ERROR("File {} does not exist", filename);
-    MACH3LOG_ERROR("Please try again");
-    MACH3LOG_ERROR("*************");
+    MACH3LOG_ERROR("Please try again");;
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   return filename;
 }
 
 /// @brief DB Get the Cherenkov momentum threshold in MeV
+/// @param PDG PDG code of the particle for which the Cherenkov threshold is requested.
 double returnCherenkovThresholdMomentum(const int PDG);
 
 /// @brief Recalculate Q^2 after Eb shift. Takes in shifted lepton momentum, lepton angle, and true neutrino energy
+/// @param PLep Shifted outgoing lepton momentum (MeV/c).
+/// @param PUpd Updated lepton angle or related kinematic quantity used in the recalculation.
+/// @param EnuTrue True neutrino energy (MeV).
+/// @param InitialQ2 Optional initial Q^2 value (used as seed or fallback, default = 0).
 double CalculateQ2(double PLep, double PUpd, double EnuTrue, double InitialQ2 = 0.0);
 
 /// @brief Recalculate Enu after Eb shift. Takes in shifted lepton momentum, lepton angle, and binding energy change, and if nu/anu
+/// @param PLep Shifted outgoing lepton momentum (MeV/c).
+/// @param cosTheta Cosine of the lepton scattering angle.
+/// @param EB Binding energy shift applied to the interaction (MeV).
+/// @param neutrino True if the interaction is neutrino, false if antineutrino.
 double CalculateEnu(double PLep, double cosTheta, double EB, bool neutrino);
+
+/// @brief @brief Build a 1D posterior-predictive summary from a violin spectrum.
+/// @param Spectra Input TH2D violin/density histogram.
+/// @param name    Name of the output TH1D.
+std::unique_ptr<TH1D> MakeSummaryFromSpectra(const TH2D* Spectra, const std::string& name);
 
 namespace M3 {
 /// @brief KS: Creates a copy of a ROOT-like object and wraps it in a smart pointer.
@@ -148,7 +153,6 @@ std::unique_ptr<ObjectType> Clone(const ObjectType* obj, const std::string& name
 
   return Hist;
 }
-
 
 /// @brief Opens a ROOT file with the given name and mode.
 ///

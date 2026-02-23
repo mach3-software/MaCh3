@@ -12,6 +12,7 @@
 
 /// @warning KS: keep raw pointer or ensure manual delete of PlotMan. If spdlog in automatically deleted before PlotMan then destructor has some spdlog and this could cause segfault
 MaCh3Plotting::PlottingManager* PlotMan;
+constexpr const double ScalingFactor = 10;
 
 std::vector<std::string> FindSamples(const std::string& File)
 {
@@ -218,6 +219,7 @@ void OverlayViolin(const YAML::Node& Settings,
 void OverlayPredicitve(const YAML::Node& Settings,
                        const std::vector<TFile*>& InputFiles,
                        const std::vector<std::string>& SampleNames,
+                       const std::vector<int>& SampleDimension,
                        const std::unique_ptr<TCanvas>& canv)
 {
   MACH3LOG_INFO("Starting {}", __func__);
@@ -251,113 +253,124 @@ void OverlayPredicitve(const YAML::Node& Settings,
   for(size_t iSample = 0; iSample < SampleNames.size(); iSample++)
   {
     const int nFiles = static_cast<int>(InputFiles.size());
-    TH1D* hist = InputFiles[0]->Get<TH1D>(("SampleFolder/data_" + SampleNames[iSample]).c_str());
-    if(!hist) {
-      MACH3LOG_WARN("Couldn't find hist for {}, most likely it is using 2D", SampleNames[iSample]);
-      MACH3LOG_WARN("Currently only 1D, sorry");
-      continue;
-    }
-    std::unique_ptr<TH1D> DataHist = M3::Clone(hist);
-    DataHist->SetLineColor(kBlack);
-    //KS: +1 for data, we want to get integral before scaling of the histogram
-    std::vector<double> Integral(nFiles+1);
-    Integral[nFiles] = DataHist->Integral();
-    std::vector<std::unique_ptr<TH1D>> PredHist(nFiles);
-
-    for(int iFile = 0; iFile < nFiles; iFile++)
-    {
-      InputFiles[iFile]->cd();
-      PredHist[iFile] = M3::Clone(InputFiles[iFile]->Get<TH1D>(("Predictive/" + SampleNames[iSample] + "/" +
-                                                                SampleNames[iSample] + "_mc_PostPred").c_str()));
-      Integral[iFile] = PredHist[iFile]->Integral();
-      PredHist[iFile]->SetTitle(PlotMan->style().prettifySampleName(SampleNames[iSample]).c_str());
-      PredHist[iFile]->SetLineColor(PosteriorColor[iFile]);
-      PredHist[iFile]->SetMarkerColor(PosteriorColor[iFile]);
-      PredHist[iFile]->SetFillColorAlpha(PosteriorColor[iFile], 0.35);
-      PredHist[iFile]->SetFillStyle(1001);
-      PredHist[iFile]->GetYaxis()->SetTitle("Events");
-    }
-    pad1->cd();
-
-    PredHist[0]->Draw("p e2");
-    for(int iFile = 1; iFile < nFiles; iFile++)
-    {
-      PredHist[iFile]->Draw("p e2 same");
-    }
-    DataHist->Draw("he same");
-
-    auto legend = std::make_unique<TLegend>(0.50,0.52,0.90,0.88);
-    legend->AddEntry(DataHist.get(), Form("Data, #int=%.0f", Integral[nFiles]),"le");
-    for(int ig = 0; ig < nFiles; ig++ )
-    {
-      legend->AddEntry(PredHist[ig].get(), Form("%s, #int=%.2f", Titles[ig].c_str(), Integral[ig]), "lpf");
-    }
-    legend->SetLineStyle(0);
-    legend->SetTextSize(0.03);
-    legend->Draw();
-
-    //// Now we do ratio
-    pad2->cd();
-
-    auto line = std::make_unique<TLine>(PredHist[0]->GetXaxis()->GetBinLowEdge(PredHist[0]->GetXaxis()->GetFirst()), 1.0, PredHist[0]->GetXaxis()->GetBinUpEdge(PredHist[0]->GetXaxis()->GetLast()), 1.0);
-
-    line->SetLineWidth(2);
-    line->SetLineColor(kBlack);
-    line->Draw("");
-
-    std::unique_ptr<TH1D> RatioPlotData = M3::Clone(DataHist.get());
-    std::vector<std::unique_ptr<TH1D>> RatioPlot(nFiles);
-
-    for(int ig = 0; ig < nFiles; ig++ )
-    {
-      RatioPlot[ig] = M3::Clone(DataHist.get());
-      RatioPlot[ig]->SetLineColor(PosteriorColor[ig]);
-      RatioPlot[ig]->SetMarkerColor(PosteriorColor[ig]);
-      RatioPlot[ig]->SetFillColorAlpha(PosteriorColor[ig], 0.35);
-      RatioPlot[ig]->SetFillStyle(1001);
-      RatioPlot[ig]->GetYaxis()->SetTitle("Data/MC");
-      auto PrettyX = PlotMan->style().prettifyKinematicName(PredHist[0]->GetXaxis()->GetTitle());
-      RatioPlot[ig]->GetXaxis()->SetTitle(PrettyX.c_str());
-      RatioPlot[ig]->SetBit(TH1D::kNoTitle);
-      RatioPlot[ig]->GetXaxis()->SetTitleSize(0.12);
-      RatioPlot[ig]->GetYaxis()->SetTitleOffset(0.4);
-      RatioPlot[ig]->GetYaxis()->SetTitleSize(0.10);
-
-      RatioPlot[ig]->GetXaxis()->SetLabelSize(0.10);
-      RatioPlot[ig]->GetYaxis()->SetLabelSize(0.10);
-
-      RatioPlot[ig]->Divide(PredHist[ig].get());
-      PassErrorToRatioPlot(RatioPlot[ig].get(), PredHist[ig].get(), DataHist.get());
-    }
-
-    RatioPlotData->Divide(DataHist.get());
-    PassErrorToRatioPlot(RatioPlotData.get(), DataHist.get(), DataHist.get());
-
-    double maxz = -999;
-    double minz = +999;
-    for (int j = 0; j < nFiles; j++) {
-      for (int i = 1; i < RatioPlot[0]->GetXaxis()->GetNbins(); i++)
-      {
-        maxz = std::max(maxz, RatioPlot[j]->GetBinContent(i));
-        minz = std::min(minz, RatioPlot[j]->GetBinContent(i));
+    auto SampleName = SampleNames[iSample];
+    const int nDims = (SampleDimension[iSample] == 2) ? 2 : 1;
+    for(int iDim = 0; iDim < nDims; iDim++) {
+      std::string DataLocation = "";
+      if(nDims == 2) {
+        DataLocation = "Predictive/" + SampleName + "/Data_" + SampleName + "_Dim" + std::to_string(iDim);
+      } else {
+        DataLocation = "SampleFolder/data_" + SampleName;
       }
+      TH1D* hist = InputFiles[0]->Get<TH1D>((DataLocation).c_str());
+
+      std::unique_ptr<TH1D> DataHist = M3::Clone(hist);
+      DataHist->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", ScalingFactor).c_str());
+      M3::ScaleHistogram(DataHist.get(), ScalingFactor);
+      DataHist->SetLineColor(kBlack);
+      //KS: +1 for data, we want to get integral before scaling of the histogram
+      std::vector<double> Integral(nFiles+1);
+      Integral[nFiles] = DataHist->Integral();
+      std::vector<std::unique_ptr<TH1D>> PredHist(nFiles);
+
+      for(int iFile = 0; iFile < nFiles; iFile++)
+      {
+        InputFiles[iFile]->cd();
+        std::string HistLocation = "";
+        if(nDims == 2) {
+          HistLocation = "Predictive/" + SampleName + "/" + SampleName + "_mc_PostPred_dim" + std::to_string(iDim);
+        } else {
+          HistLocation = "Predictive/" + SampleName + "/" + SampleName + "_mc_PostPred";
+        }
+        PredHist[iFile] = M3::Clone(InputFiles[iFile]->Get<TH1D>((HistLocation).c_str()));
+        Integral[iFile] = PredHist[iFile]->Integral();
+        PredHist[iFile]->SetTitle(PlotMan->style().prettifySampleName(SampleName).c_str());
+        PredHist[iFile]->SetLineColor(PosteriorColor[iFile]);
+        PredHist[iFile]->SetMarkerColor(PosteriorColor[iFile]);
+        PredHist[iFile]->SetFillColorAlpha(PosteriorColor[iFile], 0.35);
+        PredHist[iFile]->SetFillStyle(1001);
+        PredHist[iFile]->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", ScalingFactor).c_str());
+        M3::ScaleHistogram(PredHist[iFile].get(), ScalingFactor);
+      }
+      pad1->cd();
+
+      PredHist[0]->Draw("p e2");
+      for(int iFile = 1; iFile < nFiles; iFile++)
+      {
+        PredHist[iFile]->Draw("p e2 same");
+      }
+      DataHist->Draw("he same");
+
+      auto legend = std::make_unique<TLegend>(0.50,0.52,0.90,0.88);
+      legend->AddEntry(DataHist.get(), Form("Data, #int=%.0f", Integral[nFiles]),"le");
+      for(int ig = 0; ig < nFiles; ig++ ) {
+        legend->AddEntry(PredHist[ig].get(), Form("%s, #int=%.2f", Titles[ig].c_str(), Integral[ig]), "lpf");
+      }
+      legend->SetLineStyle(0);
+      legend->SetTextSize(0.03);
+      legend->Draw();
+
+      //// Now we do ratio
+      pad2->cd();
+
+      auto line = std::make_unique<TLine>(PredHist[0]->GetXaxis()->GetBinLowEdge(PredHist[0]->GetXaxis()->GetFirst()), 1.0, PredHist[0]->GetXaxis()->GetBinUpEdge(PredHist[0]->GetXaxis()->GetLast()), 1.0);
+
+      line->SetLineWidth(2);
+      line->SetLineColor(kBlack);
+      line->Draw("");
+
+      std::unique_ptr<TH1D> RatioPlotData = M3::Clone(DataHist.get());
+      std::vector<std::unique_ptr<TH1D>> RatioPlot(nFiles);
+
+      for(int ig = 0; ig < nFiles; ig++ )
+      {
+        RatioPlot[ig] = M3::Clone(DataHist.get());
+        RatioPlot[ig]->SetLineColor(PosteriorColor[ig]);
+        RatioPlot[ig]->SetMarkerColor(PosteriorColor[ig]);
+        RatioPlot[ig]->SetFillColorAlpha(PosteriorColor[ig], 0.35);
+        RatioPlot[ig]->SetFillStyle(1001);
+        RatioPlot[ig]->GetYaxis()->SetTitle("Data/MC");
+        auto PrettyX = PlotMan->style().prettifyKinematicName(PredHist[0]->GetXaxis()->GetTitle());
+        RatioPlot[ig]->GetXaxis()->SetTitle(PrettyX.c_str());
+        RatioPlot[ig]->SetBit(TH1D::kNoTitle);
+        RatioPlot[ig]->GetXaxis()->SetTitleSize(0.12);
+        RatioPlot[ig]->GetYaxis()->SetTitleOffset(0.4);
+        RatioPlot[ig]->GetYaxis()->SetTitleSize(0.10);
+
+        RatioPlot[ig]->GetXaxis()->SetLabelSize(0.10);
+        RatioPlot[ig]->GetYaxis()->SetLabelSize(0.10);
+
+        RatioPlot[ig]->Divide(PredHist[ig].get());
+        PassErrorToRatioPlot(RatioPlot[ig].get(), PredHist[ig].get(), DataHist.get());
+      }
+
+      RatioPlotData->Divide(DataHist.get());
+      PassErrorToRatioPlot(RatioPlotData.get(), DataHist.get(), DataHist.get());
+
+      double maxz = -999;
+      double minz = +999;
+      for (int j = 0; j < nFiles; j++) {
+        for (int i = 1; i < RatioPlot[0]->GetXaxis()->GetNbins(); i++) {
+          maxz = std::max(maxz, RatioPlot[j]->GetBinContent(i));
+          minz = std::min(minz, RatioPlot[j]->GetBinContent(i));
+        }
+      }
+      maxz = maxz*1.001;
+      minz = minz*1.001;
+
+      if (std::fabs(1 - maxz) > std::fabs(1-minz))
+        RatioPlot[0]->GetYaxis()->SetRangeUser(1-std::fabs(1-maxz),1+std::fabs(1-maxz));
+      else
+        RatioPlot[0]->GetYaxis()->SetRangeUser(1-std::fabs(1-minz),1+std::fabs(1-minz));
+
+      RatioPlot[0]->Draw("p e2");
+      for(int ig = 1; ig < nFiles; ig++ ) {
+        RatioPlot[ig]->Draw("p e2 same");
+      }
+      RatioPlotData->Draw("he same");
+
+      canv->Print("Overlay_Predictive.pdf", "pdf");
     }
-    maxz = maxz*1.001;
-    minz = minz*1.001;
-
-    if (std::fabs(1 - maxz) > std::fabs(1-minz))
-      RatioPlot[0]->GetYaxis()->SetRangeUser(1-std::fabs(1-maxz),1+std::fabs(1-maxz));
-    else
-      RatioPlot[0]->GetYaxis()->SetRangeUser(1-std::fabs(1-minz),1+std::fabs(1-minz));
-
-    RatioPlot[0]->Draw("p e2");
-    for(int ig = 1; ig < nFiles; ig++ )
-    {
-      RatioPlot[ig]->Draw("p e2 same");
-    }
-    RatioPlotData->Draw("he same");
-
-    canv->Print("Overlay_Predictive.pdf", "pdf");
   }
 
   delete pad1;
@@ -399,7 +412,7 @@ void PredictivePlotting(const std::string& ConfigName,
   canvas->Print("Overlay_Predictive.pdf[", "pdf");
 
   // Make overlay of 1D hists
-  OverlayPredicitve(settings, InputFiles, Samples, canvas);
+  OverlayPredicitve(settings, InputFiles, Samples, Dimensions, canvas);
   // Make overlay of violin plots
   OverlayViolin(settings, InputFiles, Samples, Dimensions, canvas);
   // Get PValue per sample

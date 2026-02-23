@@ -1319,6 +1319,7 @@ void WriteHistograms(TH1 *hist, const std::string& baseName) {
   }
   hist->SetDirectory(nullptr);
   hist->Write(baseName.c_str());
+  delete hist;
 }
 
 // *************************
@@ -1342,7 +1343,6 @@ void WriteHistogramsByMode(SampleHandlerBase *sample,
         for (int iMode = 0; iMode < modes->GetNModes(); ++iMode) {
           auto modeHist = sample->Get1DVarHistByModeAndChannel(iSample, ProjectionName, iMode);
           WriteHistograms(modeHist, sampleName + "_" + modes->GetMaCh3ModeName(iMode) + ProjectionSuffix + suffix);
-          delete modeHist;
         }
       }
 
@@ -1350,7 +1350,6 @@ void WriteHistogramsByMode(SampleHandlerBase *sample,
         for (int iChan = 0; iChan < sample->GetNOscChannels(iSample); ++iChan) {
           auto chanHist = sample->Get1DVarHistByModeAndChannel(iSample, ProjectionName, -1, iChan); // -1 skips over mode plotting
           WriteHistograms(chanHist, sampleName + "_" + sample->GetFlavourName(iSample, iChan) + ProjectionSuffix + suffix);
-          delete chanHist;
         }
       }
 
@@ -1359,7 +1358,6 @@ void WriteHistogramsByMode(SampleHandlerBase *sample,
           for (int iChan = 0; iChan < sample->GetNOscChannels(iSample); ++iChan) {
             auto hist = sample->Get1DVarHistByModeAndChannel(iSample, ProjectionName, iMode, iChan);
             WriteHistograms(hist, sampleName + "_" + modes->GetMaCh3ModeName(iMode) + "_" + sample->GetFlavourName(iSample, iChan) + ProjectionSuffix + suffix);
-            delete hist;
           }
         }
       }
@@ -1367,7 +1365,6 @@ void WriteHistogramsByMode(SampleHandlerBase *sample,
       if (!by_mode && !by_channel) {
         auto hist = sample->Get1DVarHist(iSample, ProjectionName);
         WriteHistograms(hist, sampleName + ProjectionSuffix + suffix);
-        delete hist;
         // Only for 2D and Beyond
         for (int iDim2 = iDim1 + 1; iDim2 < sample->GetNDim(iSample); ++iDim2) {
           // Get the names for the two dimensions
@@ -1380,9 +1377,6 @@ void WriteHistogramsByMode(SampleHandlerBase *sample,
           // Write the histogram
           std::string suffix2D = "_2DProj_" + std::to_string(iDim1) + "_vs_" + std::to_string(iDim2) + suffix;
           WriteHistograms(hist2D, sampleName + suffix2D);
-
-          // Clean up
-          delete hist2D;
         }
       }
     }
