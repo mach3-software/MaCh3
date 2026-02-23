@@ -859,7 +859,6 @@ INPUT                  = . \
                          Doc/MaCh3Web/mainpage.md \
                          Doc/MaCh3Web/Definitions.dox \
                          Doc/mach3logo.png \
-                         Doc/Plots \
                          Manager \
                          Splines \
                          Samples \
