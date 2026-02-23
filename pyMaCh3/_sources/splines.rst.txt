@@ -1,7 +1,7 @@
 Splines
 =======
 
-This module provides the utility for dealing with spline parameters. For some background reading se the `Splines wiki page <https://github.com/mach3-software/MaCh3/wiki/05.-Splines>`_.
+This module provides the utility for dealing with spline parameters. For some background reading se the `Splines wiki page <https://mach3-software.github.io/MaCh3/Splines.html>`_.
 
 The main class which represents individual spline functions is :py:class:`pyMaCh3._pyMaCh3.splines.ResponseFunction`. 
 This is an abstract representation which covers multiple different types of interpolation, where the type of interpolation is specified at the time of construction.
