@@ -439,6 +439,29 @@ void MakeFluctuatedHistogramStandard(TH2Poly *FluctHist, TH2Poly* PolyHist, TRan
 }
 
 // ****************
+// Make Poisson Fluctuation of TH2D hist
+void MakeFluctuatedHistogramStandard(TH2D* FluctHist, TH2D* Hist, TRandom3* rand) {
+// ****************
+  // Reset the histogram
+  FluctHist->Reset("");
+  FluctHist->Fill(0.0, 0.0, 0.0);
+
+  // Loop over all bins
+  const int nBinsX = Hist->GetXaxis()->GetNbins();
+  const int nBinsY = Hist->GetYaxis()->GetNbins();
+  for (int ix = 1; ix <= nBinsX; ++ix) {
+    for (int iy = 1; iy <= nBinsY; ++iy) {
+      // Get the original bin content
+      const double MeanContent = Hist->GetBinContent(ix, iy);
+      // Generate Poisson fluctuation
+      const double Random = rand->PoissonD(MeanContent);
+      // Set the Random content
+      FluctHist->SetBinContent(ix, iy, Random);
+    }
+  }
+}
+
+// ****************
 // Make Poisson Fluctuation of TH1D hist
 void MakeFluctuatedHistogramAlternative(TH1D* FluctHist, TH1D* PolyHist, TRandom3* rand){
 // ****************
@@ -460,25 +483,29 @@ void MakeFluctuatedHistogramAlternative(TH1D* FluctHist, TH1D* PolyHist, TRandom
   }
 }
 
+// ****************
+// Make Poisson Fluctuation of TH1D hist
 void MakeFluctuatedHistogramAlternative(TH2D* FluctHist, TH2D* PolyHist, TRandom3* rand) {
-    FluctHist->Reset();
+// ****************
+  FluctHist->Reset();
+  FluctHist->Fill(0.0, 0.0, 0.0);
 
-    const double evrate = PolyHist->Integral();
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wconversion"
-    const int num = rand->Poisson(evrate);
-    #pragma GCC diagnostic pop
+  const double evrate = PolyHist->Integral();
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wconversion"
+  const int num = rand->Poisson(evrate);
+  #pragma GCC diagnostic pop
 
-    double x, y;
-    for (int count = 0; count < num; ++count) {
-        PolyHist->GetRandom2(x, y);
-        FluctHist->Fill(x, y);
-    }
+  double x, y;
+  for (int count = 0; count < num; ++count) {
+    PolyHist->GetRandom2(x, y);
+    FluctHist->Fill(x, y);
+  }
 }
 // ****************
 //KS: ROOT developers were too lazy do develop getRanom2 for TH2Poly, this implementation is based on:
 // https://root.cern.ch/doc/master/classTH2.html#a883f419e1f6899f9c4255b458d2afe2e
-int GetRandomPoly2(const TH2Poly* PolyHist, TRandom3* rand){
+int GetRandomPoly2(const TH2Poly* PolyHist, TRandom3* rand) {
 // ****************
   const int nbins = PolyHist->GetNumberOfBins();
   const double r1 = rand->Rndm();
@@ -525,37 +552,6 @@ void MakeFluctuatedHistogramAlternative(TH2Poly *FluctHist, TH2Poly* PolyHist, T
     FluctHist->SetBinContent(iBin, FluctHist->GetBinContent(iBin) + 1);
     count++;
   }
-}
-
-// *************************
-std::unique_ptr<TGraphAsymmErrors> MakeAsymGraph(TH1* sigmaArrayLeft, TH1* sigmaArrayCentr, TH1* sigmaArrayRight, const std::string& title) {
-// *************************
-  auto var = std::make_unique<TGraphAsymmErrors>(sigmaArrayCentr);
-  var->SetNameTitle((title).c_str(), (title).c_str());
-
-  // Need to draw TGraphs to set axes labels
-  var->Draw("AP");
-  var->GetXaxis()->SetTitle(sigmaArrayCentr->GetXaxis()->GetTitle());
-  var->GetYaxis()->SetTitle("Number of events/bin");
-
-  for (int m = 0; m < var->GetN(); ++m)
-  {
-    double xlow = sigmaArrayLeft->GetBinContent(m+1);
-    double xhigh = sigmaArrayRight->GetBinContent(m+1);
-    double xtemp;
-
-    // Figure out which variation is larger so we set the error correctly
-    if (xlow > xhigh)
-    {
-      xtemp = xlow;
-      xlow = xhigh;
-      xhigh = xtemp;
-    }
-
-    var->SetPointEYhigh(m, xhigh - var->GetY()[m]);
-    var->SetPointEYlow(m, var->GetY()[m] - xlow);
-  }
-  return var;
 }
 
 // ****************
@@ -621,6 +617,46 @@ double CalculateEnu(double PLep, double costh, double Eb, bool neutrino){
   return Enu;
 }
 
+
+// ***********************************************
+std::unique_ptr<TH1D> MakeSummaryFromSpectra(const TH2D* Spectra,
+                                             const std::string& name) {
+// ***********************************************
+  const int nBinsX = Spectra->GetNbinsX();
+  // Reuse the exact x binning
+  std::vector<double> edges(nBinsX + 1);
+  for (int i = 0; i < nBinsX; ++i) {
+    edges[i] = Spectra->GetXaxis()->GetBinLowEdge(i+1);
+  }
+  edges[nBinsX] = Spectra->GetXaxis()->GetBinUpEdge(nBinsX);
+
+  auto h1 = std::make_unique<TH1D>(name.c_str(), name.c_str(), nBinsX, edges.data());
+  h1->SetDirectory(nullptr);
+  h1->Sumw2(true);
+
+  // ---- Loop X bins and extract Y distribution
+  for (int ix = 1; ix <= nBinsX; ++ix) {
+    // Project THIS x-bin onto Y
+    std::unique_ptr<TH1D> slice(Spectra->ProjectionY(Form("_py_%d", ix), ix, ix));
+    slice->SetDirectory(nullptr);
+    if (slice->GetEntries() == 0) {
+      h1->SetBinContent(ix, 0.0);
+      h1->SetBinError(ix, 0.0);
+      continue;
+    }
+
+    const double mean = slice->GetMean();
+    const double rms  = slice->GetRMS();
+
+    h1->SetBinContent(ix, mean);
+    h1->SetBinError(ix, rms);
+  }
+
+  h1->GetXaxis()->SetTitle(Spectra->GetXaxis()->GetTitle());
+  h1->GetYaxis()->SetTitle("Events");
+
+  return h1;
+}
 
 namespace M3 {
 // **************************************************************************

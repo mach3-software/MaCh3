@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Run MaCh3 Validations
-        uses: ./.github/actions/mach3-validations
+        uses: ./.github/actions/mach3-tutorial
         with:
           mach3_branch: "main"
           compilation_flags: ""

@@ -3,8 +3,6 @@
 #include "Fitters/FitterBase.h"
 
 class ParameterHandlerGeneric;
-class BinningHandler;
-class SampleHandlerFD;
 
 // ***************************
 /// @brief KS: Summary of sample info to be used by
@@ -13,9 +11,7 @@ struct PredictiveSample {
   // Name of sample
   std::string Name;
   /// Pointer to SampleHandler
-  const SampleHandlerFD* SamHandler;
-  /// Pointer to binning handler
-  const BinningHandler* Binning;
+  const SampleHandlerBase* SamHandler;
   /// Local SampleId in SampleHandler
   int LocalId;
   /// Sample Dimension
@@ -34,10 +30,9 @@ struct PredictiveSample {
 /// @author Clarence Wret
 
 /// @todo add BIC, DIC, WAIC
-/// @todo add ability yo make projection for Get1DDiscVar
-/// @todo Make more flexible for dimensions beyond 2D
-/// @todo speed improvements
 /// @todo add Rate $p$-value
+/// @todo add plots by mode
+/// @todo add rate plate and rate error reduction
 /// @todo unify code with SampleSummary
 class PredictiveThrower : public FitterBase {
  public:
@@ -68,7 +63,8 @@ class PredictiveThrower : public FitterBase {
 
   /// @brief Load existing toys
   bool LoadToys();
-
+  /// @brief Save histograms for a single MCMC Throw/Toy
+  void WriteToy(TDirectory* ToyDirectory, TDirectory* Toy_1DDirectory, TDirectory* Toy_2DDirectory, const int iToy);
   /// @brief Setup sample information
   void SetupSampleInformation();
 
@@ -80,13 +76,15 @@ class PredictiveThrower : public FitterBase {
                                                    const std::vector<TDirectory*>& Director,
                                                    const std::string& suffix,
                                                    const bool DebugHistograms);
-
+  /// @brief Load 1D projections and later produce violin plots for each
+  void Study1DProjections(const std::vector<TDirectory*>& SampleDirectories) const;
   /// @brief Produce Violin style spectra
-  std::vector<std::vector<std::unique_ptr<TH2D>>> ProduceSpectra(
-                                                      const std::vector<std::vector<std::unique_ptr<TH1>>>& Toys,
-                                                      const std::vector<TDirectory*>& Director,
-                                                      const std::string suffix);
+  void ProduceSpectra(const std::vector<std::vector<std::vector<std::unique_ptr<TH1D>>>>& Toys,
+                      const std::vector<TDirectory*>& Director,
+                      const std::string suffix) const;
 
+  /// @brief Make Poisson fluctuation of TH1D hist
+  void MakeFluctuatedHistogram(TH1* FluctHist, TH1* PolyHist, const int Dim);
   /// @brief Calculate Posterior Predictive $p$-value
   void PosteriorPredictivepValue(const std::vector<std::unique_ptr<TH1>>& PostPred_mc,
                                  const std::vector<TDirectory*>& SampleDir);
@@ -109,6 +107,36 @@ class PredictiveThrower : public FitterBase {
                      const std::vector<TDirectory*>& SampleDir,
                      const std::string Title);
 
+
+  /// @brief Construct a human-readable label describing a specific analysis bin.
+  /// @param hist Histogram providing the binning definition.
+  /// @param uniform Flag indicating whether the histogram uses regular axis
+  ///        binning (TH1/TH2) or irregular polygonal binning (e.g. TH2Poly).
+  /// @param Dim Dimensionality of the original distribution.
+  /// @param bins Vector of per-dimension bin indices in analysis coordinates.
+  std::string GetBinName(TH1* hist,
+                         const bool uniform,
+                         const int Dim,
+                         const std::vector<int>& bins) const;
+  /// @brief Create per-bin posterior histograms for a given sample.
+  ///
+  /// For each analysis bin of the input histogram, this function allocates a new
+  /// 1D histogram intended to accumulate the distribution of predicted event
+  /// counts (e.g. across throws, toys, or posterior evaluations).
+  ///
+  /// The number of output histograms therefore equals the number of physical bins:
+  /// - TH1  → N histograms
+  /// - TH2  → Nx × Ny histograms
+  /// - TH2Poly → one histogram per polygon bin
+  ///
+  /// @param hist Input histogram defining the bin structure for this sample.
+  /// @param SampleId Index identifying the sample in SampleInfo.
+  /// @param Dim Dimensionality of the original distribution.
+  /// @param suffix String appended to histogram names (e.g. to distinguish stages).
+  std::vector<std::unique_ptr<TH1D>> PerBinHistogram(TH1* hist,
+                                                     const int SampleId,
+                                                     const int Dim,
+                                                     const std::string& suffix) const;
 
   /// @brief Evaluate prior/post predictive distribution for beta parameters (used for evaluating impact MC statistical uncertainty)
   void StudyBetaParameters(TDirectory* PredictiveDir);
@@ -154,5 +182,8 @@ class PredictiveThrower : public FitterBase {
   std::vector<double> ReweightWeight;
   /// Penalty term values for each toy by default 0
   std::vector<double> PenaltyTerm;
+
+  /// KS: We have two methods for Poissonian fluctuation
+  bool StandardFluctuation;
 };
 
