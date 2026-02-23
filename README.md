@@ -20,9 +20,10 @@ likelihoods implemented.
 [![CodeFactor](https://www.codefactor.io/repository/github/mach3-software/mach3/badge/develop)](https://www.codefactor.io/repository/github/mach3-software/mach3/overview/develop)
 
 ## Famous Plots
-Example of plots made using MaCh3 apparent in scientific publications, for more see [here](https://github.com/mach3-software/MaCh3/wiki/14.-MaCh3-in-the-Field)
-<img src="Doc/Plots/delta.png" alt="MaCh3" align="left" width="200"/>
-<img src="Doc/Plots/Jarlskog.png" alt="MaCh3" align="center" width="200"/>
+Example of plots made using MaCh3 apparent in scientific publications, for more see [here](https://mach3-software.github.io/MaCh3/ResultsPublications.html)
+
+<img width="200" src="https://github.com/user-attachments/assets/ac267b79-999d-4911-8e6e-1932147d440b" />
+<img width="200" src="https://github.com/user-attachments/assets/67624cfd-89f0-4897-a9d2-485d295ac4c2" />
 
 ## Cite
 When using MaCh3 you must cite our doi from Zenodo. The bibtex file can be found by exporting the citation from this link: [on Zenodo](https://zenodo.org/records/7608367) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7608367.svg)](https://doi.org/10.5281/zenodo.7608367).
@@ -62,7 +63,7 @@ CPMFindPackage(
   GITHUB_REPOSITORY mach3-software/MaCh3
 )
 ```
-Where "blarb" is the MaCh3 version. You can find a list of releases [here](https://github.com/mach3-software/MaCh3/wiki/0.1.-History)  
+Where "blarb" is the MaCh3 version. You can find a list of releases [here](https://mach3-software.github.io/MaCh3/ReleaseNotes.html)  
 If you compiled MaCh3 and sourced it you can simply call
 ```cmake
 find_package(MaCh3)
