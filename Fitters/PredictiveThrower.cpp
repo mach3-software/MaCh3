@@ -889,7 +889,6 @@ std::vector<std::unique_ptr<TH1>> PredictiveThrower::MakePredictive(const std::v
             for (int ix = 1; ix <= nbinsx; ++ix) {
               int Bin = (iy-1) * nbinsx + (ix-1);
               double content = Toys[sample][iToy]->GetBinContent(ix, iy);
-              Posterior_hist[sample][Bin];
               Posterior_hist[sample][Bin]->Fill(content, ReweightWeight[iToy]);
             } // end loop over X bins
           } // end loop over Y bins
