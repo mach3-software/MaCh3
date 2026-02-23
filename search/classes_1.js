@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['bininfo_1817',['BinInfo',['../structBinInfo.html',1,'']]],
-  ['binnedsplinehandler_1818',['BinnedSplineHandler',['../classBinnedSplineHandler.html',1,'']]],
-  ['binninghandler_1819',['BinningHandler',['../classBinningHandler.html',1,'']]],
-  ['binshiftlookup_1820',['BinShiftLookup',['../structBinShiftLookup.html',1,'']]]
+  ['bininfo_1820',['BinInfo',['../structBinInfo.html',1,'']]],
+  ['binnedsplinehandler_1821',['BinnedSplineHandler',['../classBinnedSplineHandler.html',1,'']]],
+  ['binninghandler_1822',['BinningHandler',['../classBinningHandler.html',1,'']]],
+  ['binshiftlookup_1823',['BinShiftLookup',['../structBinShiftLookup.html',1,'']]]
 ];

@@ -46,7 +46,7 @@ if (edges && edges.length) {
         </defs>
 
 <script type="text/javascript">
-var viewWidth = 1121;
+var viewWidth = 985;
 var viewHeight = 364;
 var sectionId = 'dynsection-0';
 </script>
@@ -54,13 +54,13 @@ var sectionId = 'dynsection-0';
 <svg id="graph" class="graph">
 <g id="viewport">
 <title>Samples/HistogramUtils.h</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-360 1117.07,-360 1117.07,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-360 981.07,-360 981.07,4 -4,4"/>
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
 <g id="a_node1"><a xlink:title=" ">
-<polygon fill="#bfbfbf" stroke="black" points="811.57,-336.5 811.57,-355.5 942.57,-355.5 942.57,-336.5 811.57,-336.5"/>
-<text text-anchor="middle" x="877.07" y="-343.5" font-family="Helvetica" font-size="10.00">Samples/HistogramUtils.h</text>
+<polygon fill="#bfbfbf" stroke="black" points="608.57,-336.5 608.57,-355.5 739.57,-355.5 739.57,-336.5 608.57,-336.5"/>
+<text text-anchor="middle" x="674.07" y="-343.5" font-family="Helvetica" font-size="10.00">Samples/HistogramUtils.h</text>
 </a>
 </g>
 </g>
@@ -76,8 +76,8 @@ var sectionId = 'dynsection-0';
 <!-- Node1&#45;&gt;Node2 -->
 <g id="edge1" class="edge">
 <title>Node1&#45;&gt;Node2</title>
-<path fill="none" stroke="midnightblue" d="M812.73,-336.44C739.98,-326.77 621.7,-311.04 545.15,-300.85"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="545.47,-297.37 535.1,-299.52 544.55,-304.3 545.47,-297.37"/>
+<path fill="none" stroke="midnightblue" d="M641.9,-336.44C607.01,-327.16 551.17,-312.31 512.89,-302.13"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="513.64,-298.7 503.08,-299.52 511.85,-305.47 513.64,-298.7"/>
 </g>
 <!-- Node21 -->
 <g id="node21" class="node">
@@ -91,8 +91,8 @@ var sectionId = 'dynsection-0';
 <!-- Node1&#45;&gt;Node21 -->
 <g id="edge47" class="edge">
 <title>Node1&#45;&gt;Node21</title>
-<path fill="none" stroke="midnightblue" d="M811.48,-342.44C687.78,-337.09 429.37,-323.26 396.07,-300 380.72,-289.29 372.72,-268.88 368.73,-253.78"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="372.12,-252.9 366.47,-243.94 365.29,-254.46 372.12,-252.9"/>
+<path fill="none" stroke="midnightblue" d="M608.47,-341.34C537.08,-336.17 428.73,-324.48 396.07,-300 381.09,-288.78 373.03,-268.46 368.92,-253.52"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="372.32,-252.7 366.58,-243.79 365.51,-254.34 372.32,-252.7"/>
 </g>
 <!-- Node23 -->
 <g id="node23" class="node">
@@ -104,40 +104,25 @@ var sectionId = 'dynsection-0';
 </g>
 </g>
 <!-- Node1&#45;&gt;Node23 -->
-<g id="edge49" class="edge">
+<g id="edge48" class="edge">
 <title>Node1&#45;&gt;Node23</title>
-<path fill="none" stroke="midnightblue" d="M876.42,-336.08C874.53,-309.95 868.98,-233.21 866.41,-197.58"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="869.9,-197.29 865.68,-187.57 862.92,-197.79 869.9,-197.29"/>
+<path fill="none" stroke="midnightblue" d="M697.5,-336.49C733.04,-322.47 800.61,-291.26 840.07,-244 851.19,-230.67 857.7,-211.84 861.28,-197.88"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="864.74,-198.45 863.54,-187.92 857.91,-196.89 864.74,-198.45"/>
 </g>
 <!-- Node29 -->
 <g id="node29" class="node">
 <title>Node29</title>
 <g id="a_node29"><a xlink:title=" ">
-<polygon fill="white" stroke="#bfbfbf" points="905.57,-280.5 905.57,-299.5 1022.57,-299.5 1022.57,-280.5 905.57,-280.5"/>
-<text text-anchor="middle" x="964.07" y="-287.5" font-family="Helvetica" font-size="10.00">TGraphAsymmErrors.h</text>
+<polygon fill="white" stroke="#bfbfbf" points="905.07,-280.5 905.07,-299.5 977.07,-299.5 977.07,-280.5 905.07,-280.5"/>
+<text text-anchor="middle" x="941.07" y="-287.5" font-family="Helvetica" font-size="10.00">TRandom3.h</text>
 </a>
 </g>
 </g>
 <!-- Node1&#45;&gt;Node29 -->
-<g id="edge48" class="edge">
+<g id="edge49" class="edge">
 <title>Node1&#45;&gt;Node29</title>
-<path fill="none" stroke="midnightblue" d="M891.04,-336.32C904.62,-327.9 925.45,-314.97 941.39,-305.07"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="943.47,-307.9 950.12,-299.65 939.78,-301.95 943.47,-307.9"/>
-</g>
-<!-- Node30 -->
-<g id="node30" class="node">
-<title>Node30</title>
-<g id="a_node30"><a xlink:title=" ">
-<polygon fill="white" stroke="#bfbfbf" points="1041.07,-280.5 1041.07,-299.5 1113.07,-299.5 1113.07,-280.5 1041.07,-280.5"/>
-<text text-anchor="middle" x="1077.07" y="-287.5" font-family="Helvetica" font-size="10.00">TRandom3.h</text>
-</a>
-</g>
-</g>
-<!-- Node1&#45;&gt;Node30 -->
-<g id="edge50" class="edge">
-<title>Node1&#45;&gt;Node30</title>
-<path fill="none" stroke="midnightblue" d="M908.76,-336.44C943.13,-327.16 998.14,-312.31 1035.85,-302.13"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="1036.78,-305.5 1045.52,-299.52 1034.96,-298.74 1036.78,-305.5"/>
+<path fill="none" stroke="midnightblue" d="M716.37,-336.44C765.07,-326.59 844.78,-310.47 895.01,-300.31"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="895.84,-303.72 904.95,-298.3 894.46,-296.86 895.84,-303.72"/>
 </g>
 <!-- Node3 -->
 <g id="node3" class="node">

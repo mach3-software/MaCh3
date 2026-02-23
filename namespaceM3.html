@@ -481,7 +481,7 @@ Variables</h2></td></tr>
 <div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;  outFile.close();</div>
 <div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;}</div>
 <div class="ttc" id="aYamlHelper_8h_html_aae72fb06a391f1073add5eed6c6485dd"><div class="ttname"><a href="YamlHelper_8h.html#aae72fb06a391f1073add5eed6c6485dd">YAMLtoSTRING</a></div><div class="ttdeci">std::string YAMLtoSTRING(const YAML::Node &amp;node)</div><div class="ttdoc">KS: Convert a YAML node to a string representation.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00112">YamlHelper.h:112</a></div></div>
-<div class="ttc" id="anamespaceM3_html_a174fa82e79c5b38edecbc0552a4ce5b1"><div class="ttname"><a href="namespaceM3.html#a174fa82e79c5b38edecbc0552a4ce5b1">M3::Clone</a></div><div class="ttdeci">std::unique_ptr&lt; ObjectType &gt; Clone(const ObjectType *obj, const std::string &amp;name=&quot;&quot;)</div><div class="ttdoc">KS: Creates a copy of a ROOT-like object and wraps it in a smart pointer.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8h_source.html#l00142">HistogramUtils.h:142</a></div></div>
+<div class="ttc" id="anamespaceM3_html_a174fa82e79c5b38edecbc0552a4ce5b1"><div class="ttname"><a href="namespaceM3.html#a174fa82e79c5b38edecbc0552a4ce5b1">M3::Clone</a></div><div class="ttdeci">std::unique_ptr&lt; ObjectType &gt; Clone(const ObjectType *obj, const std::string &amp;name=&quot;&quot;)</div><div class="ttdoc">KS: Creates a copy of a ROOT-like object and wraps it in a smart pointer.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8h_source.html#l00147">HistogramUtils.h:147</a></div></div>
 <div class="ttc" id="anamespaceM3_html_a68ab9b6b3d413a94604c740208c7895d"><div class="ttname"><a href="namespaceM3.html#a68ab9b6b3d413a94604c740208c7895d">M3::FixSampleNamesQuotes</a></div><div class="ttdeci">void FixSampleNamesQuotes(std::string &amp;yamlStr)</div><div class="ttdoc">KS: Yaml emitter has problem and drops &quot;&quot;, if you have special signs in you like * then there is prob...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerUtils_8h_source.html#l00152">ParameterHandlerUtils.h:152</a></div></div>
 <div class="ttc" id="anamespaceMaCh3Utils_html_a37d0c54de0b83b71393afca143ab1ec0"><div class="ttname"><a href="namespaceMaCh3Utils.html#a37d0c54de0b83b71393afca143ab1ec0">MaCh3Utils::FormatDouble</a></div><div class="ttdeci">std::string FormatDouble(const double value, const int precision)</div><div class="ttdoc">Convert double into string for precision, useful for playing with yaml if you don't want to have in c...</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00811">SampleStructs.h:811</a></div></div>
 </div><!-- fragment -->
@@ -572,16 +572,16 @@ template&lt;typename ObjectType &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>std::unique_ptr&lt;ObjectType&gt; Owning pointer to the cloned object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="HistogramUtils_8h_source.html#l00142">142</a> of file <a class="el" href="HistogramUtils_8h_source.html">HistogramUtils.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;                                                                                   {</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;  std::string cloneName = name.empty() ? obj-&gt;GetName() : name;</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160; </div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;  std::unique_ptr&lt;ObjectType&gt; Hist(<span class="keyword">static_cast&lt;</span>ObjectType*<span class="keyword">&gt;</span>(obj-&gt;Clone(cloneName.c_str())));</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;  <span class="comment">// Disable ROOT memory management because it causes lot of headache especially as smart pointers are much smarter</span></div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;  Hist-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160; </div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;  <span class="keywordflow">return</span> Hist;</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8h_source.html#l00147">147</a> of file <a class="el" href="HistogramUtils_8h_source.html">HistogramUtils.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;                                                                                   {</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  std::string cloneName = name.empty() ? obj-&gt;GetName() : name;</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160; </div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  std::unique_ptr&lt;ObjectType&gt; Hist(<span class="keyword">static_cast&lt;</span>ObjectType*<span class="keyword">&gt;</span>(obj-&gt;Clone(cloneName.c_str())));</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;  <span class="comment">// Disable ROOT memory management because it causes lot of headache especially as smart pointers are much smarter</span></div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;  Hist-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160; </div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;  <span class="keywordflow">return</span> Hist;</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1631,24 +1631,24 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Pointer to the opened ROOT file. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00627">627</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;                                                                                                 {</div>
-<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;<span class="comment">// **************************************************************************</span></div>
-<div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;  TFile* OutFile = <span class="keyword">new</span> TFile(Name.c_str(), Type.c_str());</div>
-<div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160; </div>
-<div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;  <span class="comment">// Check if the file is successfully opened and usable</span></div>
-<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;  <span class="keywordflow">if</span> (OutFile-&gt;IsZombie()) {</div>
-<div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Failed to open file: {}&quot;</span>, Name);</div>
-<div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;    std::string lowerType = Type;</div>
-<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;    std::transform(lowerType.begin(), lowerType.end(), lowerType.begin(), ::tolower);</div>
-<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;    <span class="keywordflow">if</span> (lowerType == <span class="stringliteral">&quot;recreate&quot;</span>) {</div>
-<div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Check if directory exist&quot;</span>);</div>
-<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;    }</div>
-<div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;    <span class="keyword">delete</span> OutFile;</div>
-<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
-<div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;  }</div>
-<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;  <span class="keywordflow">return</span> OutFile;</div>
-<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00663">663</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;                                                                                                 {</div>
+<div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;<span class="comment">// **************************************************************************</span></div>
+<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;  TFile* OutFile = <span class="keyword">new</span> TFile(Name.c_str(), Type.c_str());</div>
+<div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160; </div>
+<div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;  <span class="comment">// Check if the file is successfully opened and usable</span></div>
+<div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;  <span class="keywordflow">if</span> (OutFile-&gt;IsZombie()) {</div>
+<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Failed to open file: {}&quot;</span>, Name);</div>
+<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;    std::string lowerType = Type;</div>
+<div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;    std::transform(lowerType.begin(), lowerType.end(), lowerType.begin(), ::tolower);</div>
+<div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;    <span class="keywordflow">if</span> (lowerType == <span class="stringliteral">&quot;recreate&quot;</span>) {</div>
+<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Check if directory exist&quot;</span>);</div>
+<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;    }</div>
+<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;    <span class="keyword">delete</span> OutFile;</div>
+<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
+<div class="line"><a name="l00677"></a><span class="lineno">  677</span>&#160;  }</div>
+<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;  <span class="keywordflow">return</span> OutFile;</div>
+<div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1680,24 +1680,24 @@ template&lt;typename T &gt; </div>
 
 <p>Scale histogram to get divided by bin width. </p>
 
-<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00645">645</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;{</div>
-<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt;= Sample_Hist-&gt;GetNbinsX(); ++j)</div>
-<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;  {</div>
-<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;    <span class="keywordtype">double</span> num = Sample_Hist-&gt;GetBinContent(j);</div>
-<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;    <span class="keywordtype">double</span> numErr = Sample_Hist-&gt;GetBinError(j);</div>
-<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;    <span class="keywordtype">double</span> den = Sample_Hist-&gt;GetBinWidth(j);</div>
-<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;    <span class="keywordtype">double</span> value = 0.;</div>
-<div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;    <span class="keywordtype">double</span> valueErr = 0.;</div>
-<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;    <span class="keywordflow">if</span> (den != 0)</div>
-<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;    {</div>
-<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;      value = num/(den/scale);</div>
-<div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;      valueErr = numErr/(den/scale);</div>
-<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;      Sample_Hist-&gt;SetBinContent(j,value);</div>
-<div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;      Sample_Hist-&gt;SetBinError(j,valueErr);</div>
-<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;    }</div>
-<div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;  }</div>
-<div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="HistogramUtils_8cpp_source.html#l00681">681</a> of file <a class="el" href="HistogramUtils_8cpp_source.html">HistogramUtils.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;{</div>
+<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt;= Sample_Hist-&gt;GetNbinsX(); ++j)</div>
+<div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;  {</div>
+<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;    <span class="keywordtype">double</span> num = Sample_Hist-&gt;GetBinContent(j);</div>
+<div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;    <span class="keywordtype">double</span> numErr = Sample_Hist-&gt;GetBinError(j);</div>
+<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;    <span class="keywordtype">double</span> den = Sample_Hist-&gt;GetBinWidth(j);</div>
+<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;    <span class="keywordtype">double</span> value = 0.;</div>
+<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;    <span class="keywordtype">double</span> valueErr = 0.;</div>
+<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;    <span class="keywordflow">if</span> (den != 0)</div>
+<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;    {</div>
+<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;      value = num/(den/scale);</div>
+<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;      valueErr = numErr/(den/scale);</div>
+<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;      Sample_Hist-&gt;SetBinContent(j,value);</div>
+<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;      Sample_Hist-&gt;SetBinError(j,valueErr);</div>
+<div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;    }</div>
+<div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;  }</div>
+<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
