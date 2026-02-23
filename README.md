@@ -22,8 +22,8 @@ likelihoods implemented.
 ## Famous Plots
 Example of plots made using MaCh3 apparent in scientific publications, for more see [here](https://mach3-software.github.io/MaCh3/ResultsPublications.html)
 
-<img width="200" src="https://github.com/user-attachments/assets/ac267b79-999d-4911-8e6e-1932147d440b" />
-<img width="200" src="https://github.com/user-attachments/assets/67624cfd-89f0-4897-a9d2-485d295ac4c2" />
+<img width="200" alt="Delta" src="https://github.com/user-attachments/assets/ac267b79-999d-4911-8e6e-1932147d440b" />
+<img width="200" alt="Jarlskog" src="https://github.com/user-attachments/assets/67624cfd-89f0-4897-a9d2-485d295ac4c2" />
 
 ## Cite
 When using MaCh3 you must cite our doi from Zenodo. The bibtex file can be found by exporting the citation from this link: [on Zenodo](https://zenodo.org/records/7608367) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7608367.svg)](https://doi.org/10.5281/zenodo.7608367).
