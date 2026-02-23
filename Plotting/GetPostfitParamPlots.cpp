@@ -49,20 +49,14 @@ _MaCh3_Safe_Include_End_ //}
 #pragma GCC diagnostic ignored "-Wconversion"
 
 MaCh3Plotting::PlottingManager *PlotMan;
-TH1D *Prefit;
 
 int NDParameters;
 int NDParametersStartingPos;
 
 std::vector<int> NDSamplesBins;
 std::vector<std::string> NDSamplesNames;
-int nBins;
-TCanvas *canv;
 
 std::string SaveName;
-
-TPad *p3;
-TPad *p4;
 
 // KS: Color for 0 - prefit, 1 postfit, 2 another postfit, 3 you know the drill
 constexpr Color_t PlotColor[] = {kRed, kBlack, kBlue, kGreen};
@@ -85,7 +79,7 @@ void copyParToBlockHist(const int localBin, const std::string& paramName, TH1D* 
   }
 }
 
-inline void InitializePads(TCanvas* canvas, TPad*& pad3, TPad*& pad4) {
+void InitializePads(const TCanvas* canvas, TPad*& pad3, TPad*& pad4) {
   // Initialize TPad p3
   pad3 = new TPad("Top", "Top", 0.0, 0.4, 1.0, 1.0);
   pad3->SetLeftMargin(canvas->GetLeftMargin());
@@ -255,7 +249,8 @@ std::unique_ptr<TH1D> makeRatio(TH1D *PrefitCopy, TH1D *PostfitCopy, bool setAxe
   return Ratio;
 }
 
-void DrawPlots(TCanvas *plotCanv, TH1D* PrefitCopy, const std::vector<std::unique_ptr<TH1D>>& PostfitVec, TPad *mainPad, TPad *ratioPad) {
+void DrawPlots(TCanvas *plotCanv, TH1D* PrefitCopy, const std::vector<std::unique_ptr<TH1D>>& PostfitVec,
+               TPad *mainPad, TPad *ratioPad, const std::string& OutName) {
   // Draw!
   plotCanv->cd();
   mainPad->Draw();
@@ -327,14 +322,19 @@ void DrawPlots(TCanvas *plotCanv, TH1D* PrefitCopy, const std::vector<std::uniqu
   line2.Draw("same");
   line3.Draw("same");
 
-  plotCanv->Print((SaveName).c_str());
+  plotCanv->Print((OutName).c_str());
 }
 
-void MakeParameterPlots()
+void MakeParameterPlots(TCanvas* canv)
 {  
   // get the names of the blocks of parameters to group together
   std::vector<std::string> const blockNames = PlotMan->getOption<std::vector<std::string>>("paramGroups");
   const int nPlots = static_cast<int>(blockNames.size());
+
+  TPad *p3 = nullptr;
+  TPad *p4 = nullptr;
+  // these for named parameters where we need a nice big gap at the botto to fit the names
+  InitializePads(canv, p3, p4);
 
   for (int i = 0; i < nPlots; i++)
   {
@@ -381,11 +381,13 @@ void MakeParameterPlots()
     // Do some fancy replacements
     PrettifyTitles(blockHist_prefit.get());
 
-    DrawPlots(canv, blockHist_prefit.get(), blockHist_postfit_Vec, p3, p4);
+    DrawPlots(canv, blockHist_prefit.get(), blockHist_postfit_Vec, p3, p4, SaveName);
   }
+  delete p3;
+  delete p4;
 }
 
-void MakeFluxPlots()
+void MakeFluxPlots(TCanvas* canv)
 {
   // these for non named params where we don't need as much space
   auto p1 = std::make_unique<TPad>("p1", "p1", 0.0, 0.3, 1.0, 1.0);
@@ -464,7 +466,7 @@ void MakeFluxPlots()
     }
     // set the y axis limits we got from config
     blockHist_prefit->GetYaxis()->SetRangeUser(blockLimits[0], blockLimits[1]); 
-    DrawPlots(canv, blockHist_prefit.get(), blockHist_postfit_Vec, p1.get(), p2.get());
+    DrawPlots(canv, blockHist_prefit.get(), blockHist_postfit_Vec, p1.get(), p2.get(), SaveName);
   }
 
   canv->cd();
@@ -476,6 +478,17 @@ void MakeFluxPlots()
 void MakeNDDetPlots()
 {
   MACH3LOG_INFO("ND detector parameters: {}", NDParameters);
+  TCanvas* canv = new TCanvas("canv", "canv", 1024, 1024);
+  //gStyle->SetPalette(51);
+  gStyle->SetOptStat(0); //Set 0 to disable statistic box
+  canv->SetLeftMargin(0.12);
+  canv->SetBottomMargin(0.12);
+  canv->SetTopMargin(0.08);
+  canv->SetRightMargin(0.04);
+
+  // make a dummy TH1 to set out legend
+  TH1D* Prefit = new TH1D();
+  PlotMan->style().setTH1Style(Prefit, PlotMan->getOption<std::string>("prefitHistStyle"));
   Prefit->GetYaxis()->SetTitleOffset(Prefit->GetYaxis()->GetTitleOffset()*1.2);
 
   TPad* pTop = nullptr;
@@ -509,7 +522,7 @@ void MakeNDDetPlots()
       PostfitNDDetHistVec[fileId] = M3::Clone(PlotMan->input().getFile(fileId).file->Get<TH1D>(Form("param_%s_%s", NDSamplesNames[i].c_str(), plotType.c_str())));
     }
 
-    //KS: We dont' need name for every nd param
+    //KS: We don't' need name for every nd param
     for(int j = 0; j < NDSamplesBins[i]; ++j)
     {
       bool ProductOfTen = false;
@@ -524,11 +537,13 @@ void MakeNDDetPlots()
     
     Start += NDSamplesBins[i];
 
-    DrawPlots(canv, PreFitNDDetHist, PostfitNDDetHistVec, pTop, pDown);
+    DrawPlots(canv, PreFitNDDetHist, PostfitNDDetHistVec, pTop, pDown, SaveName);
     canv->Update();
   }
   delete pTop;
   delete pDown;
+  delete Prefit;
+  delete canv;
 }
 
 void MakeRidgePlots()
@@ -718,7 +733,7 @@ void GetPostfitParamPlots()
     }
   }
 
-  canv = new TCanvas("canv", "canv", 1024, 1024);
+  TCanvas* canv = new TCanvas("canv", "canv", 1024, 1024);
   //gStyle->SetPalette(51);
   gStyle->SetOptStat(0); //Set 0 to disable statistic box
   canv->SetLeftMargin(0.12);
@@ -728,13 +743,10 @@ void GetPostfitParamPlots()
 
   canv->Print((SaveName+"[").c_str());
 
-  // these for named parameters where we need a nice big gap at the botto to fit the names
-  InitializePads(canv, p3, p4);
-
   // Make a Legend page
   auto leg = std::make_unique<TLegend>(0.0, 0.0, 1.0, 1.0);
   // make a dummy TH1 to set out legend
-  Prefit = new TH1D();
+  TH1D* Prefit = new TH1D();
   PlotMan->style().setTH1Style(Prefit, PlotMan->getOption<std::string>("prefitHistStyle"));
   leg->AddEntry(Prefit, "Prior", "lpf");
 
@@ -755,9 +767,9 @@ void GetPostfitParamPlots()
   leg->Draw();
   canv->Print((SaveName).c_str());
 
-  MakeParameterPlots();
+  MakeParameterPlots(canv);
 
-  MakeFluxPlots();
+  MakeFluxPlots(canv);
 
   //KS: By default we don't run ProcessMCMC with PlotDet as this take some time, in case we did let's make fancy plots
   if(plotNDDet & (NDParameters > 0)) MakeNDDetPlots();
@@ -772,7 +784,7 @@ void GetPostfitParamPlots()
 
 std::unique_ptr<TGraphAsymmErrors> MakeTGraphAsymmErrors(const std::shared_ptr<TFile>& File,  std::vector<int> Index = {})
 {
-  int GraphBins = Index.size() == 0 ? nBins : Index.size();
+  int GraphBins = Index.size();
   std::vector<double> x(GraphBins);
   std::vector<double> y(GraphBins);
   std::vector<double> exl(GraphBins);
