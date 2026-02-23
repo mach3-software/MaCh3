@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MaCh3: 05.-Splines</title>
+<title>MaCh3: Splines</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -73,41 +73,35 @@ $(function() {
 </div><!-- top -->
 <div class="PageDoc"><div class="header">
   <div class="headertitle">
-<div class="title">05.-Splines </div>  </div>
+<div class="title">Splines </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>Description of Splines and how to read them in.</p>
-<p>MaCh3 supports both event-by-event and binned splines:</p>
+<div class="textblock"><p><a class="anchor" id="md_Doc_User_Guide_05__Splines"></a> </p>
 <h1><a class="anchor" id="autotoc_md118"></a>
-Binned splines</h1>
-<p>TODO!!</p>
+What is a spline?</h1>
+<p>Spline, sometimes called response function, encodes dependence between parameter value and weight. By having these complex responses precomputed, it allows evaluating weight during fit time very fast.</p>
+<p>We usually store several points at which weight were evaluated, called knots. Thus, we need to interpolate between points interpolation type is up to user as MaCh3 has several options available.</p>
 <h1><a class="anchor" id="autotoc_md119"></a>
-Event-by-event splines</h1>
-<p>Format to initlaise event-by-event <code>std::vector&lt; std::vector&lt;TSpline3_red*&gt; &gt; MasterSpline</code> with size <code>[NEvents][NSplineParams]</code>. If the given event doesn't have a spline then it should be set to <code>NULL</code>.</p>
-<h3><a class="anchor" id="autotoc_md120"></a>
-SplineMonolith Fast Load File</h3>
-<p>To speed up the process of loading files there is a function <code>PrepareSplineFile()</code> which will dump spline information into a prepossed file with only relevant information. Then there is the prepared constructor <code>SMonolith::SMonolith(std::string FileName)</code>.</p>
-<h3><a class="anchor" id="autotoc_md121"></a>
-GPU</h3>
-<p>Since the calcuatalion of event by event spline is quite often the bottleneck there is GPU support for these calculations. From developer and user point of view code works the same. If GPU support is enabled MaCh3 will copy spline information to GPU and perform calcaution there.</p>
-<p><img src="https://github.com/mach3-software/MaCh3/assets/45295406/34f7aeaf-d40e-4e8c-96f7-a1eb197603ea" alt="image" class="inline"/></p>
-<h3><a class="anchor" id="autotoc_md122"></a>
-TF1</h3>
-<p>There is the possibility to use TF1 rather than cubic interpolation. Which helps significantly reduce RAM. However, it may not work for every spline. Therefore it is advised to check the LLH scan before making an analysis choice. <img src="https://github.com/mach3-software/MaCh3/assets/45295406/bf87261d-60cd-4a87-b83a-46c6afa3f89e" alt="image" class="inline"/></p>
-<h1><a class="anchor" id="autotoc_md123"></a>
-Available spline interpolation</h1>
-<p>At MaCh3 following interpolation are available for cubic splines: </p><ol>
-<li>
-TSpline3  </li>
-<li>
-Linear  </li>
-<li>
-Monotonic  </li>
-<li>
-<p class="startli">Akima </p>
-<p class="endli"><img src="https://github.com/user-attachments/assets/32fc41c0-3063-47c7-9353-fb24087213dc" alt="image" width="1287" height="937" class="inline"/> <img src="https://github.com/user-attachments/assets/1edb571d-9f08-4fe7-8de2-4cac30a1fe95" alt="image" width="1275" height="924" class="inline"/> <img src="https://github.com/user-attachments/assets/e6682bb2-193f-4cb8-8d65-b1780af9590d" alt="image" width="1275" height="896" class="inline"/> </p>
-</li>
-</ol>
+Spline Interpolation (3-rd order polynomials)</h1>
+<p>Default interpolation is kTSpline3. It follows ROOT TSpline3 implementation.</p>
+<p><img src="https://github.com/user-attachments/assets/4e32f8b9-c024-4563-85c0-bce9b3e34fa7" alt="" width="350" class="inline"/></p>
+<p>Above is the most common example of response function/spline for which all available options perform similarly.</p>
+<p>However, there are examples where we want to enforce linear interpolation as this is the desired response. Usually in situation when we reweight between different models. For this, recommended is kLinear.</p>
+<p><img src="https://github.com/user-attachments/assets/bc92e99d-ee41-4ae3-9b55-61ec5cdb3d0e" alt="" width="350" class="inline"/></p>
+<p><img src="https://github.com/user-attachments/assets/0248e6c8-1a01-424a-b1cf-7061fd275bd2" alt="" width="350" class="inline"/></p>
+<p>Another often encountered case is where there are large differences between weight, resulting in so called ringing:</p>
+<p><img src="https://github.com/user-attachments/assets/b91e6194-870c-4255-b12d-f2dc20c455d3" alt="" width="350" class="inline"/></p>
+<p>For such case-based options are kMonotonic which ensures spline segments are monotonic or kKochanekBartels.</p>
+<h1><a class="anchor" id="autotoc_md120"></a>
+Linear Function</h1>
+<p>Since quite often we are using linear responses, it is generally recommended to reduce number of splines knots. As more spline knots doesn't contribute to better response, but each knot affects RAM.</p>
+<p><img src="https://github.com/user-attachments/assets/774dd6c2-7826-481b-a81b-9ce8569052cd" alt="" width="350" class="inline"/></p>
+<p>Another option is to use kLinearFunc which simple performs linear function (a*x+b) resulting in much better performance and less RAM.</p>
+<p><img src="https://github.com/user-attachments/assets/571c5d43-9026-46cb-9621-2e68142f8e5f" alt="" width="350" class="inline"/></p>
+<h2><a class="anchor" id="autotoc_md121"></a>
+GPU</h2>
+<p>Since the calculation of event by event spline is quite often the bottleneck, there is GPU support for these calculations. From developer and user point of view, code works the same. If GPU support is enabled, MaCh3 will copy spline information to the GPU and perform calculations there.</p>
+<p><img src="https://github.com/mach3-software/MaCh3/assets/45295406/34f7aeaf-d40e-4e8c-96f7-a1eb197603ea" alt="" width="600" class="inline"/> </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- Footer for MaCh3 Doxygen documentation -->

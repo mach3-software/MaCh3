@@ -167,15 +167,15 @@ Private Attributes</h2></td></tr>
 Introduction</h2>
 <p>Each sample can define its own binning in an arbitrary number of dimensions. Internally, every sample's multi-dimensional binning is linearised into a single 1D array. All samples are then concatenated into one global bin index space, allowing the entire analysis to be treated as a single large vector of bins.</p>
 <p>The concept of a "global bin" refers to the position of a bin in this linearised, analysis-wide bin index space. Local (sample) bins are always enumerated starting from zero, while global bins span all samples consecutively.</p>
-<p>Example layout of global bins with offsets: </p><div class="fragment"><div class="line">Sample 0 (GlobalOffset = 0,  <a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a> = 4):</div>
+<p>Example layout of global bins with offsets: </p><div class="fragment"><div class="line">Sample 0 (GlobalOffset = 0,  nBins = 4):</div>
 <div class="line">  Local bins:   [0] [1] [2] [3]</div>
 <div class="line">  Global bins:  [0] [1] [2] [3]</div>
 <div class="line"> </div>
-<div class="line">Sample 1 (GlobalOffset = 4,  <a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a> = 3):</div>
+<div class="line">Sample 1 (GlobalOffset = 4,  nBins = 3):</div>
 <div class="line">  Local bins:   [0] [1] [2]</div>
 <div class="line">  Global bins:  [4] [5] [6]</div>
 <div class="line"> </div>
-<div class="line">Sample 2 (GlobalOffset = 7,  <a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a> = 2):</div>
+<div class="line">Sample 2 (GlobalOffset = 7,  nBins = 2):</div>
 <div class="line">  Local bins:   [0] [1]</div>
 <div class="line">  Global bins:  [7] [8]</div>
 <div class="line"> </div>
@@ -183,7 +183,6 @@ Introduction</h2>
 <div class="line">------------------------------------------------</div>
 <div class="line">| 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |</div>
 <div class="line">------------------------------------------------</div>
-<div class="ttc" id="aGetPostfitParamPlots_8cpp_html_ae4842c1619a902b2761696f3849889a1"><div class="ttname"><a href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a></div><div class="ttdeci">int nBins</div><div class="ttdef"><b>Definition:</b> <a href="GetPostfitParamPlots_8cpp_source.html#l00059">GetPostfitParamPlots.cpp:59</a></div></div>
 </div><!-- fragment --><h2><a class="anchor" id="autotoc_md72"></a>
 Uniform and Non-Uniform Binning Scheme</h2>
 <p>MaCh3 supports Uniform and Non-Uniform binning scheme</p>

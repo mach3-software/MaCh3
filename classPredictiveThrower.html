@@ -1240,7 +1240,7 @@ Clarence Wret </dd></dl>
 <div class="fragment"><div class="line"><a name="l00796"></a><span class="lineno">  796</span>&#160;                                                                                                     {</div>
 <div class="line"><a name="l00797"></a><span class="lineno">  797</span>&#160;<span class="comment">// *************************</span></div>
 <div class="line"><a name="l00798"></a><span class="lineno">  798</span>&#160;  std::vector&lt;std::unique_ptr&lt;TH1D&gt;&gt; PosteriorHistVec;</div>
-<div class="line"><a name="l00799"></a><span class="lineno">  799</span>&#160;  constexpr <span class="keywordtype">int</span> <a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a> = 100;</div>
+<div class="line"><a name="l00799"></a><span class="lineno">  799</span>&#160;  constexpr <span class="keywordtype">int</span> nBins = 100;</div>
 <div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160;  <span class="keyword">const</span> std::string Sample_Name = <a class="code" href="structSampleInfo.html">SampleInfo</a>[SampleId].Name;</div>
 <div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;  <span class="keywordflow">if</span> (Dim == 2) {</div>
 <div class="line"><a name="l00802"></a><span class="lineno">  802</span>&#160;      <span class="keywordflow">if</span>(std::string(hist-&gt;ClassName()) == <span class="stringliteral">&quot;TH2Poly&quot;</span>) {</div>
@@ -1250,7 +1250,7 @@ Clarence Wret </dd></dl>
 <div class="line"><a name="l00806"></a><span class="lineno">  806</span>&#160;                                             <a class="code" href="classPredictiveThrower.html#a443e3a17387ed95cd50e70dc5b717f59">GetBinName</a>(hist, <span class="keyword">false</span>, Dim, {i}));</div>
 <div class="line"><a name="l00807"></a><span class="lineno">  807</span>&#160;          <span class="comment">//KS: When a histogram is created with an axis lower limit greater or equal to its upper limit ROOT will automatically adjust histogram range</span></div>
 <div class="line"><a name="l00808"></a><span class="lineno">  808</span>&#160;          <span class="comment">// https://root.cern.ch/doc/master/classTH1.html#auto-bin</span></div>
-<div class="line"><a name="l00809"></a><span class="lineno">  809</span>&#160;          <span class="keyword">auto</span> PosteriorHist = std::make_unique&lt;TH1D&gt;(ProjName.c_str(), ProjName.c_str(), <a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>, 1, -1);</div>
+<div class="line"><a name="l00809"></a><span class="lineno">  809</span>&#160;          <span class="keyword">auto</span> PosteriorHist = std::make_unique&lt;TH1D&gt;(ProjName.c_str(), ProjName.c_str(), nBins, 1, -1);</div>
 <div class="line"><a name="l00810"></a><span class="lineno">  810</span>&#160;          PosteriorHist-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
 <div class="line"><a name="l00811"></a><span class="lineno">  811</span>&#160;          PosteriorHist-&gt;GetXaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Events&quot;</span>);</div>
 <div class="line"><a name="l00812"></a><span class="lineno">  812</span>&#160;          PosteriorHistVec.push_back(std::move(PosteriorHist));</div>
@@ -1265,7 +1265,7 @@ Clarence Wret </dd></dl>
 <div class="line"><a name="l00821"></a><span class="lineno">  821</span>&#160;                                              <a class="code" href="classPredictiveThrower.html#a443e3a17387ed95cd50e70dc5b717f59">GetBinName</a>(hist, <span class="keyword">true</span>, Dim, {ix,iy}));</div>
 <div class="line"><a name="l00822"></a><span class="lineno">  822</span>&#160;            <span class="comment">//KS: When a histogram is created with an axis lower limit greater or equal to its upper limit ROOT will automatically adjust histogram range</span></div>
 <div class="line"><a name="l00823"></a><span class="lineno">  823</span>&#160;            <span class="comment">// https://root.cern.ch/doc/master/classTH1.html#auto-bin</span></div>
-<div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;            <span class="keyword">auto</span> PosteriorHist = std::make_unique&lt;TH1D&gt;(ProjName.c_str(), ProjName.c_str(), <a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>, 1, -1);</div>
+<div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;            <span class="keyword">auto</span> PosteriorHist = std::make_unique&lt;TH1D&gt;(ProjName.c_str(), ProjName.c_str(), nBins, 1, -1);</div>
 <div class="line"><a name="l00825"></a><span class="lineno">  825</span>&#160;            PosteriorHist-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
 <div class="line"><a name="l00826"></a><span class="lineno">  826</span>&#160;            PosteriorHist-&gt;GetXaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Events&quot;</span>);</div>
 <div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160;            PosteriorHistVec.push_back(std::move(PosteriorHist));</div>
@@ -1281,7 +1281,7 @@ Clarence Wret </dd></dl>
 <div class="line"><a name="l00837"></a><span class="lineno">  837</span>&#160;                                          <a class="code" href="classPredictiveThrower.html#a443e3a17387ed95cd50e70dc5b717f59">GetBinName</a>(hist, <span class="keyword">true</span>, Dim, {i}));</div>
 <div class="line"><a name="l00838"></a><span class="lineno">  838</span>&#160;      <span class="comment">//KS: When a histogram is created with an axis lower limit greater or equal to its upper limit ROOT will automatically adjust histogram range</span></div>
 <div class="line"><a name="l00839"></a><span class="lineno">  839</span>&#160;      <span class="comment">// https://root.cern.ch/doc/master/classTH1.html#auto-bin</span></div>
-<div class="line"><a name="l00840"></a><span class="lineno">  840</span>&#160;      <span class="keyword">auto</span> PosteriorHist = std::make_unique&lt;TH1D&gt;(ProjName.c_str(), ProjName.c_str(), <a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>, 1, -1);</div>
+<div class="line"><a name="l00840"></a><span class="lineno">  840</span>&#160;      <span class="keyword">auto</span> PosteriorHist = std::make_unique&lt;TH1D&gt;(ProjName.c_str(), ProjName.c_str(), nBins, 1, -1);</div>
 <div class="line"><a name="l00841"></a><span class="lineno">  841</span>&#160;      PosteriorHist-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
 <div class="line"><a name="l00842"></a><span class="lineno">  842</span>&#160;      PosteriorHist-&gt;GetXaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Events&quot;</span>);</div>
 <div class="line"><a name="l00843"></a><span class="lineno">  843</span>&#160;      PosteriorHistVec.push_back(std::move(PosteriorHist));</div>
@@ -1289,7 +1289,6 @@ Clarence Wret </dd></dl>
 <div class="line"><a name="l00845"></a><span class="lineno">  845</span>&#160;  }</div>
 <div class="line"><a name="l00846"></a><span class="lineno">  846</span>&#160;  <span class="keywordflow">return</span> PosteriorHistVec;</div>
 <div class="line"><a name="l00847"></a><span class="lineno">  847</span>&#160;}</div>
-<div class="ttc" id="aGetPostfitParamPlots_8cpp_html_ae4842c1619a902b2761696f3849889a1"><div class="ttname"><a href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a></div><div class="ttdeci">int nBins</div><div class="ttdef"><b>Definition:</b> <a href="GetPostfitParamPlots_8cpp_source.html#l00059">GetPostfitParamPlots.cpp:59</a></div></div>
 <div class="ttc" id="aclassPredictiveThrower_html_a443e3a17387ed95cd50e70dc5b717f59"><div class="ttname"><a href="classPredictiveThrower.html#a443e3a17387ed95cd50e70dc5b717f59">PredictiveThrower::GetBinName</a></div><div class="ttdeci">std::string GetBinName(TH1 *hist, const bool uniform, const int Dim, const std::vector&lt; int &gt; &amp;bins) const</div><div class="ttdoc">Construct a human-readable label describing a specific analysis bin.</div><div class="ttdef"><b>Definition:</b> <a href="PredictiveThrower_8cpp_source.html#l00759">PredictiveThrower.cpp:759</a></div></div>
 </div><!-- fragment -->
 </div>

@@ -227,10 +227,10 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__, <span class="stringliteral">&quot;Empty histogram vector provided&quot;</span>);</div>
 <div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;  }</div>
 <div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160; </div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;  <span class="keywordtype">int</span> <a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a> = histograms[0]-&gt;GetNbinsX();</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;  std::vector&lt;double&gt; x(<a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>), ymin(<a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>, 1e10), ymax(<a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>, -1e10);</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;  <span class="keywordtype">int</span> nBins = histograms[0]-&gt;GetNbinsX();</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;  std::vector&lt;double&gt; x(nBins), ymin(nBins, 1e10), ymax(nBins, -1e10);</div>
 <div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160; </div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> bin = 0; bin &lt; <a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>; bin++)</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> bin = 0; bin &lt; nBins; bin++)</div>
 <div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;  {</div>
 <div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;    x[bin] = histograms[0]-&gt;GetBinCenter(bin + 1);</div>
 <div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160; </div>
@@ -243,8 +243,8 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;  }</div>
 <div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160; </div>
 <div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;  <span class="comment">// Create a band using TGraphAsymmErrors for the shaded region</span></div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;  <span class="keyword">auto</span> band = std::make_unique&lt;TGraphAsymmErrors&gt;(<a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>);</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>; ++i)</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;  <span class="keyword">auto</span> band = std::make_unique&lt;TGraphAsymmErrors&gt;(nBins);</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; nBins; ++i)</div>
 <div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;  {</div>
 <div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;    band-&gt;SetPoint(i, x[i], (ymax[i] + ymin[i]) / 2.0);</div>
 <div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;    band-&gt;SetPointError(i, 0, 0, (ymax[i] - ymin[i]) / 2.0, (ymax[i] - ymin[i]) / 2.0);</div>
@@ -255,7 +255,6 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160; </div>
 <div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;  <span class="keywordflow">return</span> band; <span class="comment">// Return band and min graph (min graph can be used for legend)</span></div>
 <div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;}</div>
-<div class="ttc" id="aGetPostfitParamPlots_8cpp_html_ae4842c1619a902b2761696f3849889a1"><div class="ttname"><a href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a></div><div class="ttdeci">int nBins</div><div class="ttdef"><b>Definition:</b> <a href="GetPostfitParamPlots_8cpp_source.html#l00059">GetPostfitParamPlots.cpp:59</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class used throughout MaCh3.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00023">MaCh3Exception.h:23</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -425,18 +424,18 @@ Kamil Skwarczynski </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="PlotMCMCDiag_8cpp_source.html#l00244">244</a> of file <a class="el" href="PlotMCMCDiag_8cpp_source.html">PlotMCMCDiag.cpp</a>.</p>
 <div class="fragment"><div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;{</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;  <span class="keywordtype">int</span> <a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a> = hist-&gt;GetNbinsX();</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;  std::vector&lt;double&gt; x(<a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>), ymin(<a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>), ymax(<a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>);</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;  <span class="keywordtype">int</span> nBins = hist-&gt;GetNbinsX();</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;  std::vector&lt;double&gt; x(nBins), ymin(nBins), ymax(nBins);</div>
 <div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160; </div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>; ++i)</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; nBins; ++i)</div>
 <div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;  {</div>
 <div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;    x[i] = hist-&gt;GetBinCenter(i + 1);</div>
 <div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    ymin[i] = hist-&gt;GetBinContent(i + 1);</div>
 <div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    ymax[i] = hist-&gt;GetBinContent(i + 1);</div>
 <div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;  }</div>
 <div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160; </div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;  <span class="keyword">auto</span> minGraph = std::make_unique&lt;TGraph&gt;(<a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>, x.data(), ymin.data());</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;  <span class="keyword">auto</span> maxGraph = std::make_unique&lt;TGraph&gt;(<a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>, x.data(), ymax.data());</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;  <span class="keyword">auto</span> minGraph = std::make_unique&lt;TGraph&gt;(nBins, x.data(), ymin.data());</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;  <span class="keyword">auto</span> maxGraph = std::make_unique&lt;TGraph&gt;(nBins, x.data(), ymax.data());</div>
 <div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160; </div>
 <div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;  minGraph-&gt;SetLineColor(color);</div>
 <div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;  maxGraph-&gt;SetLineColor(color);</div>

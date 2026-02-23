@@ -104,9 +104,9 @@ Functions</h2></td></tr>
 <tr class="separator:ac434b1236e675ded43713ded78c5de8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a22a044e77ac75863b8962c3a38b95ef7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="PlotLLH_8cpp.html#a22a044e77ac75863b8962c3a38b95ef7">drawRatioStack</a> (THStack *ratioCompStack)</td></tr>
 <tr class="separator:a22a044e77ac75863b8962c3a38b95ef7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae109b42a4dc31685d5df5cd3797183d0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="PlotLLH_8cpp.html#ae109b42a4dc31685d5df5cd3797183d0">makeLLHScanComparisons</a> (const std::string &amp;paramName, const std::string &amp;LLHType, const std::string &amp;outputFileName, const std::unique_ptr&lt; TCanvas &gt; &amp;<a class="el" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>)</td></tr>
+<tr class="memitem:ae109b42a4dc31685d5df5cd3797183d0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="PlotLLH_8cpp.html#ae109b42a4dc31685d5df5cd3797183d0">makeLLHScanComparisons</a> (const std::string &amp;paramName, const std::string &amp;LLHType, const std::string &amp;outputFileName, const std::unique_ptr&lt; TCanvas &gt; &amp;canv)</td></tr>
 <tr class="separator:ae109b42a4dc31685d5df5cd3797183d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa3df0f7386d1ff417e2d05c97f0e9970"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="PlotLLH_8cpp.html#aa3df0f7386d1ff417e2d05c97f0e9970">makeSplitSampleLLHScanComparisons</a> (const std::string &amp;paramName, const std::string &amp;outputFileName, const std::unique_ptr&lt; TCanvas &gt; &amp;<a class="el" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>)</td></tr>
+<tr class="memitem:aa3df0f7386d1ff417e2d05c97f0e9970"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="PlotLLH_8cpp.html#aa3df0f7386d1ff417e2d05c97f0e9970">makeSplitSampleLLHScanComparisons</a> (const std::string &amp;paramName, const std::string &amp;outputFileName, const std::unique_ptr&lt; TCanvas &gt; &amp;canv)</td></tr>
 <tr class="separator:aa3df0f7386d1ff417e2d05c97f0e9970"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a53c3f8ef6b889ff0c9d2f6b18c7b1f38"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="PlotLLH_8cpp.html#a53c3f8ef6b889ff0c9d2f6b18c7b1f38">PlotLLH</a> ()</td></tr>
 <tr class="separator:a53c3f8ef6b889ff0c9d2f6b18c7b1f38"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -259,7 +259,7 @@ Variables</h2></td></tr>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="keywordtype">float</span> LLH_main_integ = LLH_allSams.Integral();</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  <span class="keywordtype">float</span> cumSum = 0.0;</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  <span class="keywordtype">int</span> <a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a> = LLH_allSams.GetNbinsX();</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  <span class="keywordtype">int</span> nBins = LLH_allSams.GetNbinsX();</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;getting split sample THStack for {} known samples&quot;</span>, nSamples);</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  <span class="keywordflow">for</span> (uint i = 0; i &lt; nSamples; i++)</div>
@@ -291,7 +291,7 @@ Variables</h2></td></tr>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    sampleStack-&gt;Add(LLH_indivSam);</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    splitSamplesLegend-&gt;AddEntry(LLH_indivSam, <a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;style().prettifySampleName(sampName).c_str(), <span class="stringliteral">&quot;lf&quot;</span>);</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160; </div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    <span class="keywordtype">float</span> lastBinLLH = LLH_indivSam-&gt;GetBinContent(<a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>);</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    <span class="keywordtype">float</span> lastBinLLH = LLH_indivSam-&gt;GetBinContent(nBins);</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    cumSum += lastBinLLH;</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;    Last bin LLH = {} :: cumulative LLH = {}&quot;</span>, lastBinLLH, cumSum);</div>
@@ -311,7 +311,6 @@ Variables</h2></td></tr>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;&quot;</span>);</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  }</div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;}</div>
-<div class="ttc" id="aGetPostfitParamPlots_8cpp_html_ae4842c1619a902b2761696f3849889a1"><div class="ttname"><a href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a></div><div class="ttdeci">int nBins</div><div class="ttdef"><b>Definition:</b> <a href="GetPostfitParamPlots_8cpp_source.html#l00059">GetPostfitParamPlots.cpp:59</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a4db4657acad5c79ac4bbb66a9d1c5905"><div class="ttname"><a href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a></div><div class="ttdeci">#define MACH3LOG_DEBUG</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00034">MaCh3Logger.h:34</a></div></div>
 <div class="ttc" id="aPlotLLH_8cpp_html_a4a39ce5b09913469be1a966a5d99a88b"><div class="ttname"><a href="PlotLLH_8cpp.html#a4a39ce5b09913469be1a966a5d99a88b">sampleLabelThreshold</a></div><div class="ttdeci">double sampleLabelThreshold</div><div class="ttdef"><b>Definition:</b> <a href="PlotLLH_8cpp_source.html#l00019">PlotLLH.cpp:19</a></div></div>
 </div><!-- fragment -->
@@ -439,7 +438,7 @@ Variables</h2></td></tr>
 <div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;  compStack-&gt;Add(&amp;LLH_main);</div>
 <div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;  legend-&gt;AddEntry(&amp;LLH_main, <a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getFileLabel(0).c_str(), <span class="stringliteral">&quot;l&quot;</span>);</div>
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160; </div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;  <span class="keywordtype">int</span> <a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a> = LLH_main.GetNbinsX();</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;  <span class="keywordtype">int</span> nBins = LLH_main.GetNbinsX();</div>
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160; </div>
 <div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;  <span class="comment">// go through the other files</span></div>
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> extraFileIdx = 1; extraFileIdx &lt; <a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;input().getNInputFiles(); extraFileIdx++)</div>
@@ -477,8 +476,8 @@ Variables</h2></td></tr>
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;  }</div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160; </div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;  <span class="comment">// draw the log likelihoods</span></div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;cd();</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;Draw();</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;  canv-&gt;cd();</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;  canv-&gt;Draw();</div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;  LLHPad-&gt;Draw();</div>
 <div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;  LLHPad-&gt;cd();</div>
 <div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;  <span class="keywordflow">if</span> (<a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getDrawGrid())</div>
@@ -494,7 +493,7 @@ Variables</h2></td></tr>
 <div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;  <span class="comment">// add the ratio plot if specified</span></div>
 <div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;  <span class="keywordflow">if</span> (<a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getPlotRatios())</div>
 <div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;  {</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;cd();</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    canv-&gt;cd();</div>
 <div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    ratioPad-&gt;Draw();</div>
 <div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    ratioPad-&gt;cd();</div>
 <div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    <span class="keywordflow">if</span> (<a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getDrawGrid())</div>
@@ -506,15 +505,14 @@ Variables</h2></td></tr>
 <div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    TLine line = TLine();</div>
 <div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    line.SetLineColor(kBlack);</div>
 <div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    line.SetLineWidth(<a class="code" href="PlotLLH_8cpp.html#a7740e2371b2eb3a71ca8660b26a842e4">lineWidth</a>);</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    line.DrawLine(LLH_main.GetBinLowEdge(1), 1.0, LLH_main.GetBinLowEdge(<a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a> + 1), 1.0);</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    line.DrawLine(LLH_main.GetBinLowEdge(1), 1.0, LLH_main.GetBinLowEdge(nBins + 1), 1.0);</div>
 <div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;  }</div>
 <div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160; </div>
 <div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;  <span class="comment">// save to the output file</span></div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;SaveAs(outputFileName.c_str());</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;  canv-&gt;SaveAs(outputFileName.c_str());</div>
 <div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;  <span class="keyword">delete</span> LLHPad;</div>
 <div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;  <span class="keyword">delete</span> ratioPad;</div>
 <div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;}</div>
-<div class="ttc" id="aGetPostfitParamPlots_8cpp_html_aec2fb4e7af6c83a8ccbdfcfcb7b76a83"><div class="ttname"><a href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a></div><div class="ttdeci">TCanvas * canv</div><div class="ttdef"><b>Definition:</b> <a href="GetPostfitParamPlots_8cpp_source.html#l00060">GetPostfitParamPlots.cpp:60</a></div></div>
 <div class="ttc" id="aPlotLLH_8cpp_html_a22a044e77ac75863b8962c3a38b95ef7"><div class="ttname"><a href="PlotLLH_8cpp.html#a22a044e77ac75863b8962c3a38b95ef7">drawRatioStack</a></div><div class="ttdeci">void drawRatioStack(THStack *ratioCompStack)</div><div class="ttdef"><b>Definition:</b> <a href="PlotLLH_8cpp_source.html#l00117">PlotLLH.cpp:117</a></div></div>
 <div class="ttc" id="aPlotLLH_8cpp_html_a87e97671969f6ddcc7fc549df8b67cfc"><div class="ttname"><a href="PlotLLH_8cpp.html#a87e97671969f6ddcc7fc549df8b67cfc">SetTPads</a></div><div class="ttdeci">void SetTPads(TPad *&amp;LLHPad, TPad *&amp;ratioPad)</div><div class="ttdoc">TPad is SUPER FRAGILE, it is safer to just make raw pointer, while ROOT behave weirdly with smart poi...</div><div class="ttdef"><b>Definition:</b> <a href="PlotLLH_8cpp_source.html#l00030">PlotLLH.cpp:30</a></div></div>
 </div><!-- fragment -->
@@ -559,10 +557,10 @@ Variables</h2></td></tr>
 <div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;  TPad* LLHPad = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;  TPad* ratioPad = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;  <a class="code" href="PlotLLH_8cpp.html#a87e97671969f6ddcc7fc549df8b67cfc">SetTPads</a>(LLHPad, ratioPad);</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;Clear();</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;Draw();</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;  canv-&gt;Clear();</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;  canv-&gt;Draw();</div>
 <div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160; </div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;Divide(<a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getNFiles());</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;  canv-&gt;Divide(<a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getNFiles());</div>
 <div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160; </div>
 <div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;  <span class="comment">// get the sample hist from the main file</span></div>
 <div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;  TH1D LLH_main = <a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;input().getLLHScan_TH1D(0, paramName, <span class="stringliteral">&quot;sample&quot;</span>);</div>
@@ -578,11 +576,11 @@ Variables</h2></td></tr>
 <div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;  <span class="keyword">auto</span> baseSplitSamplesLegend = std::make_unique&lt;TLegend&gt;(0.37, 0.475, 0.63, 0.9);</div>
 <div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160; </div>
 <div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;  <span class="keywordflow">if</span> (<a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getDrawGrid())</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;cd(1)-&gt;SetGrid();</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    canv-&gt;cd(1)-&gt;SetGrid();</div>
 <div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;cd(1);</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    canv-&gt;cd(1);</div>
 <div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160; </div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;cd(1)-&gt;SetLeftMargin(0.15);</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;  canv-&gt;cd(1)-&gt;SetLeftMargin(0.15);</div>
 <div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;  std::vector&lt;float&gt; cumSums;</div>
 <div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;  std::vector&lt;bool&gt; drawLabel;</div>
 <div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160; </div>
@@ -631,7 +629,7 @@ Variables</h2></td></tr>
 <div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> extraFileIdx = 1; extraFileIdx &lt; <a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getNFiles(); extraFileIdx++)</div>
 <div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;  {</div>
 <div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a>(<span class="stringliteral">&quot;  - Adding plot for additional file {}&quot;</span>, extraFileIdx);</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;    <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;cd(1 + extraFileIdx);</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;    canv-&gt;cd(1 + extraFileIdx);</div>
 <div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160; </div>
 <div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;    std::vector&lt;float&gt; extraCumSums;</div>
 <div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;    std::vector&lt;bool&gt; extraDrawLabel;</div>
@@ -719,7 +717,7 @@ Variables</h2></td></tr>
 <div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;        divHist-&gt;SetLineColor((<span class="keyword">static_cast&lt;</span>TH1D*<span class="keyword">&gt;</span>(compHistList-&gt;At(sampleIdx))-&gt;GetLineColor()));</div>
 <div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;      }</div>
 <div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160; </div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;      <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;cd(2 + extraFileIdx);</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;      canv-&gt;cd(2 + extraFileIdx);</div>
 <div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;      <span class="keywordflow">if</span> (<a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getDrawGrid())</div>
 <div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;        ratioPad-&gt;SetGrid();</div>
 <div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;      ratioPad-&gt;Draw();</div>
@@ -727,7 +725,7 @@ Variables</h2></td></tr>
 <div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;      <a class="code" href="PlotLLH_8cpp.html#a22a044e77ac75863b8962c3a38b95ef7">drawRatioStack</a>(splitSamplesStackRatios);</div>
 <div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;    }</div>
 <div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;  }</div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;SaveAs(outputFileName.c_str());</div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;  canv-&gt;SaveAs(outputFileName.c_str());</div>
 <div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;  <span class="keyword">delete</span> LLHPad;</div>
 <div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;}</div>
 <div class="ttc" id="aPlotLLH_8cpp_html_ac434b1236e675ded43713ded78c5de8f"><div class="ttname"><a href="PlotLLH_8cpp.html#ac434b1236e675ded43713ded78c5de8f">getSplitSampleStack</a></div><div class="ttdeci">void getSplitSampleStack(int fileIdx, std::string parameterName, TH1D LLH_allSams, std::vector&lt; float &gt; &amp;cumSums, std::vector&lt; bool &gt; &amp;drawLabel, THStack *sampleStack, TLegend *splitSamplesLegend, float baselineLLH_main=0.00001)</div><div class="ttdef"><b>Definition:</b> <a href="PlotLLH_8cpp_source.html#l00050">PlotLLH.cpp:50</a></div></div>
@@ -754,17 +752,17 @@ Variables</h2></td></tr>
 <div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;  <a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;style().setPalette(<a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getOption&lt;std::string&gt;(<span class="stringliteral">&quot;colorPalette&quot;</span>));</div>
 <div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160; </div>
 <div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;  <span class="comment">// make the canvas and other plotting stuff</span></div>
-<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;  <span class="keyword">auto</span> <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a> = std::make_unique&lt;TCanvas&gt;(<span class="stringliteral">&quot;canv&quot;</span>, <span class="stringliteral">&quot;&quot;</span>, 1024, 1024);</div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;  <span class="keyword">auto</span> canv = std::make_unique&lt;TCanvas&gt;(<span class="stringliteral">&quot;canv&quot;</span>, <span class="stringliteral">&quot;&quot;</span>, 1024, 1024);</div>
 <div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;  gStyle-&gt;SetOptTitle(2);</div>
 <div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;  <span class="comment">// split up the canvas so can have side by side plots, one for each file</span></div>
 <div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;  <span class="keyword">auto</span> splitSamplesCanv = std::make_unique&lt;TCanvas&gt;(<span class="stringliteral">&quot;splitSampCanv&quot;</span>, <span class="stringliteral">&quot;&quot;</span>, 4096 * <a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getNFiles(), 4096);</div>
 <div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160; </div>
-<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;SaveAs((<a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getOutputName(<span class="stringliteral">&quot;_Sample&quot;</span>) + <span class="stringliteral">&quot;[&quot;</span>).c_str());</div>
-<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;SaveAs((<a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getOutputName(<span class="stringliteral">&quot;_Penalty&quot;</span>) + <span class="stringliteral">&quot;[&quot;</span>).c_str());</div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;SaveAs((<a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getOutputName(<span class="stringliteral">&quot;_Total&quot;</span>) + <span class="stringliteral">&quot;[&quot;</span>).c_str());</div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;  canv-&gt;SaveAs((<a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getOutputName(<span class="stringliteral">&quot;_Sample&quot;</span>) + <span class="stringliteral">&quot;[&quot;</span>).c_str());</div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;  canv-&gt;SaveAs((<a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getOutputName(<span class="stringliteral">&quot;_Penalty&quot;</span>) + <span class="stringliteral">&quot;[&quot;</span>).c_str());</div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;  canv-&gt;SaveAs((<a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getOutputName(<span class="stringliteral">&quot;_Total&quot;</span>) + <span class="stringliteral">&quot;[&quot;</span>).c_str());</div>
 <div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160; </div>
 <div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;  <span class="keywordflow">if</span> (<a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getSplitBySample())</div>
-<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;    <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;SaveAs((<a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getOutputName(<span class="stringliteral">&quot;_bySample&quot;</span>) + <span class="stringliteral">&quot;[&quot;</span>).c_str());</div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;    canv-&gt;SaveAs((<a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getOutputName(<span class="stringliteral">&quot;_bySample&quot;</span>) + <span class="stringliteral">&quot;[&quot;</span>).c_str());</div>
 <div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160; </div>
 <div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;  <span class="keywordflow">for</span>( std::string par: <a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getOption&lt;std::vector&lt;std::string&gt;&gt;(<span class="stringliteral">&quot;parameterTags&quot;</span>)) std::cout &lt;&lt; par &lt;&lt; <span class="stringliteral">&quot;, &quot;</span>;</div>
 <div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;  <span class="comment">// loop over the spline parameters</span></div>
@@ -774,9 +772,9 @@ Variables</h2></td></tr>
 <div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;    <span class="comment">// ###############################################################</span></div>
 <div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;    <span class="comment">// First lets do just the straight up likelihoods from all samples</span></div>
 <div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;    <span class="comment">// ###############################################################</span></div>
-<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;    <a class="code" href="PlotLLH_8cpp.html#ae109b42a4dc31685d5df5cd3797183d0">makeLLHScanComparisons</a>(paramName, <span class="stringliteral">&quot;sample&quot;</span>, <a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getOutputName(<span class="stringliteral">&quot;_Sample&quot;</span>), <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>);</div>
-<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;    <a class="code" href="PlotLLH_8cpp.html#ae109b42a4dc31685d5df5cd3797183d0">makeLLHScanComparisons</a>(paramName, <span class="stringliteral">&quot;penalty&quot;</span>, <a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getOutputName(<span class="stringliteral">&quot;_Penalty&quot;</span>), <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>);</div>
-<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;    <a class="code" href="PlotLLH_8cpp.html#ae109b42a4dc31685d5df5cd3797183d0">makeLLHScanComparisons</a>(paramName, <span class="stringliteral">&quot;total&quot;</span>, <a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getOutputName(<span class="stringliteral">&quot;_Total&quot;</span>), <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>);</div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;    <a class="code" href="PlotLLH_8cpp.html#ae109b42a4dc31685d5df5cd3797183d0">makeLLHScanComparisons</a>(paramName, <span class="stringliteral">&quot;sample&quot;</span>, <a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getOutputName(<span class="stringliteral">&quot;_Sample&quot;</span>), canv);</div>
+<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;    <a class="code" href="PlotLLH_8cpp.html#ae109b42a4dc31685d5df5cd3797183d0">makeLLHScanComparisons</a>(paramName, <span class="stringliteral">&quot;penalty&quot;</span>, <a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getOutputName(<span class="stringliteral">&quot;_Penalty&quot;</span>), canv);</div>
+<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;    <a class="code" href="PlotLLH_8cpp.html#ae109b42a4dc31685d5df5cd3797183d0">makeLLHScanComparisons</a>(paramName, <span class="stringliteral">&quot;total&quot;</span>, <a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getOutputName(<span class="stringliteral">&quot;_Total&quot;</span>), canv);</div>
 <div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;    <span class="comment">// #########################################</span></div>
 <div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;    <span class="comment">// ## now lets make plots split by sample ##</span></div>
 <div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;    <span class="comment">// #########################################</span></div>
@@ -786,11 +784,11 @@ Variables</h2></td></tr>
 <div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;    }</div>
 <div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;  }</div>
 <div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160; </div>
-<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;SaveAs((<a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getOutputName(<span class="stringliteral">&quot;_Sample&quot;</span>) + <span class="stringliteral">&quot;]&quot;</span>).c_str());</div>
-<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;SaveAs((<a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getOutputName(<span class="stringliteral">&quot;_Penalty&quot;</span>) + <span class="stringliteral">&quot;]&quot;</span>).c_str());</div>
-<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;SaveAs((<a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getOutputName(<span class="stringliteral">&quot;_Total&quot;</span>) + <span class="stringliteral">&quot;]&quot;</span>).c_str());</div>
+<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;  canv-&gt;SaveAs((<a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getOutputName(<span class="stringliteral">&quot;_Sample&quot;</span>) + <span class="stringliteral">&quot;]&quot;</span>).c_str());</div>
+<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;  canv-&gt;SaveAs((<a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getOutputName(<span class="stringliteral">&quot;_Penalty&quot;</span>) + <span class="stringliteral">&quot;]&quot;</span>).c_str());</div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;  canv-&gt;SaveAs((<a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getOutputName(<span class="stringliteral">&quot;_Total&quot;</span>) + <span class="stringliteral">&quot;]&quot;</span>).c_str());</div>
 <div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;  <span class="keywordflow">if</span> (<a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getSplitBySample())</div>
-<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;    <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;SaveAs((<a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getOutputName(<span class="stringliteral">&quot;_bySample&quot;</span>) + <span class="stringliteral">&quot;]&quot;</span>).c_str());</div>
+<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;    canv-&gt;SaveAs((<a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;getOutputName(<span class="stringliteral">&quot;_bySample&quot;</span>) + <span class="stringliteral">&quot;]&quot;</span>).c_str());</div>
 <div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160; </div>
 <div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a> != <span class="keyword">nullptr</span>) <span class="keyword">delete</span> <a class="code" href="PlotLLH_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>;</div>
 <div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160; </div>

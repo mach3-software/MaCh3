@@ -293,7 +293,7 @@ $(function() {
 <div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;}</div>
 <div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160; </div>
 <div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160; </div>
-<div class="line"><a name="l00223"></a><span class="lineno"><a class="line" href="PlotSigmaVariation_8cpp.html#ac86b6ef4f7a161f74adc04480b771a8b">  223</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="PlotSigmaVariation_8cpp.html#ac86b6ef4f7a161f74adc04480b771a8b">InitializePads</a>(TCanvas* <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>, TPad*&amp; pad1, TPad*&amp; pad2, <span class="keywordtype">double</span> Pad1Bottom = 0.25, <span class="keywordtype">double</span> Pad2Top = 0.25)</div>
+<div class="line"><a name="l00223"></a><span class="lineno"><a class="line" href="PlotSigmaVariation_8cpp.html#ac86b6ef4f7a161f74adc04480b771a8b">  223</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="PlotSigmaVariation_8cpp.html#ac86b6ef4f7a161f74adc04480b771a8b">InitializePads</a>(TCanvas* canv, TPad*&amp; pad1, TPad*&amp; pad2, <span class="keywordtype">double</span> Pad1Bottom = 0.25, <span class="keywordtype">double</span> Pad2Top = 0.25)</div>
 <div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;{</div>
 <div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;  <span class="comment">// Delete existing pads if they exist</span></div>
 <div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;  <span class="keywordflow">if</span> (pad1) <span class="keyword">delete</span> pad1;</div>
@@ -308,14 +308,14 @@ $(function() {
 <div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;  pad2-&gt;AppendPad();</div>
 <div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160; </div>
 <div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;  <span class="comment">// Set margins for pad1</span></div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;  pad1-&gt;SetLeftMargin(<a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;GetLeftMargin());</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;  pad1-&gt;SetRightMargin(<a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;GetRightMargin());</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;  pad1-&gt;SetTopMargin(<a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;GetTopMargin());</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;  pad1-&gt;SetLeftMargin(canv-&gt;GetLeftMargin());</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;  pad1-&gt;SetRightMargin(canv-&gt;GetRightMargin());</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;  pad1-&gt;SetTopMargin(canv-&gt;GetTopMargin());</div>
 <div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;  pad1-&gt;SetBottomMargin(0);</div>
 <div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160; </div>
 <div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;  <span class="comment">// Set margins for pad2</span></div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;  pad2-&gt;SetLeftMargin(<a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;GetLeftMargin());</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;  pad2-&gt;SetRightMargin(<a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;GetRightMargin());</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;  pad2-&gt;SetLeftMargin(canv-&gt;GetLeftMargin());</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;  pad2-&gt;SetRightMargin(canv-&gt;GetRightMargin());</div>
 <div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;  pad2-&gt;SetTopMargin(0);</div>
 <div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;  pad2-&gt;SetBottomMargin(0.30);</div>
 <div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160; </div>
@@ -359,23 +359,23 @@ $(function() {
 <div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160; </div>
 <div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160; </div>
 <div class="line"><a name="l00288"></a><span class="lineno"><a class="line" href="PlotSigmaVariation_8cpp.html#a1054cef3799429b99351c4b17eb16852">  288</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="PlotSigmaVariation_8cpp.html#a1054cef3799429b99351c4b17eb16852">PlotRatio</a>(<span class="keyword">const</span> std::vector&lt;std::unique_ptr&lt;TH1D&gt;&gt;&amp; Poly,</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;               <span class="keyword">const</span> std::unique_ptr&lt;TCanvas&gt;&amp; <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>,</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;               <span class="keyword">const</span> std::unique_ptr&lt;TCanvas&gt;&amp; canv,</div>
 <div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;               <span class="keyword">const</span> std::string&amp; Title,</div>
 <div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;               <span class="keyword">const</span> std::string&amp; outfilename)</div>
 <div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;{</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;Clear();</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;  canv-&gt;Clear();</div>
 <div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;  gStyle-&gt;SetDrawBorder(0);</div>
 <div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;  gStyle-&gt;SetTitleBorderSize(2);</div>
 <div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;  gStyle-&gt;SetOptStat(0); <span class="comment">//Set 0 to disable statistic box</span></div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;SetGrid();</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;SetTopMargin(0.10);</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;SetBottomMargin(0.08);</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;SetRightMargin(0.05);</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;SetLeftMargin(0.12);</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;  canv-&gt;SetGrid();</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;  canv-&gt;SetTopMargin(0.10);</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;  canv-&gt;SetBottomMargin(0.08);</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;  canv-&gt;SetRightMargin(0.05);</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;  canv-&gt;SetLeftMargin(0.12);</div>
 <div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160; </div>
 <div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;  TPad* pad1 = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;  TPad* pad2 = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;  <a class="code" href="PlotSigmaVariation_8cpp.html#ac86b6ef4f7a161f74adc04480b771a8b">InitializePads</a>(<a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>.get(), pad1, pad2);</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;  <a class="code" href="PlotSigmaVariation_8cpp.html#ac86b6ef4f7a161f74adc04480b771a8b">InitializePads</a>(canv.get(), pad1, pad2);</div>
 <div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160; </div>
 <div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;  pad1-&gt;cd();</div>
 <div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160; </div>
@@ -440,7 +440,7 @@ $(function() {
 <div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;  line.SetLineColor(kBlack);</div>
 <div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;  line.Draw(<span class="stringliteral">&quot;SAME&quot;</span>);</div>
 <div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160; </div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;Print((outfilename).c_str());</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;  canv-&gt;Print((outfilename).c_str());</div>
 <div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160; </div>
 <div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;  <span class="keyword">delete</span> pad1;</div>
 <div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;  <span class="keyword">delete</span> pad2;</div>
@@ -511,19 +511,19 @@ $(function() {
 <div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;}</div>
 <div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160; </div>
 <div class="line"><a name="l00440"></a><span class="lineno"><a class="line" href="PlotSigmaVariation_8cpp.html#a4a7ce447d31a7342b2ad0af0efefd496">  440</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="PlotSigmaVariation_8cpp.html#a4a7ce447d31a7342b2ad0af0efefd496">PlotRatio2D</a>(<span class="keyword">const</span> std::vector&lt;std::unique_ptr&lt;TH2&gt;&gt;&amp; Poly,</div>
-<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;                 <span class="keyword">const</span> std::unique_ptr&lt;TCanvas&gt;&amp; <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>,</div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;                 <span class="keyword">const</span> std::unique_ptr&lt;TCanvas&gt;&amp; canv,</div>
 <div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;                 <span class="keyword">const</span> std::string&amp; Title,</div>
 <div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;                 <span class="keyword">const</span> std::string&amp; outfilename)</div>
 <div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;{</div>
-<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;Clear();</div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;  canv-&gt;Clear();</div>
 <div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;  gStyle-&gt;SetDrawBorder(0);</div>
 <div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;  gStyle-&gt;SetTitleBorderSize(2);</div>
 <div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;  gStyle-&gt;SetOptStat(0); <span class="comment">//Set 0 to disable statistic box</span></div>
-<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;SetGrid();</div>
-<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;SetTopMargin(0.10);</div>
-<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;SetBottomMargin(0.10);</div>
-<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;SetLeftMargin(0.12);</div>
-<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;SetRightMargin(0.20);</div>
+<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;  canv-&gt;SetGrid();</div>
+<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;  canv-&gt;SetTopMargin(0.10);</div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;  canv-&gt;SetBottomMargin(0.10);</div>
+<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;  canv-&gt;SetLeftMargin(0.12);</div>
+<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;  canv-&gt;SetRightMargin(0.20);</div>
 <div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160; </div>
 <div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;  constexpr <span class="keywordtype">int</span> NRGBs = 5;</div>
 <div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;  TColor::InitializeColors();</div>
@@ -557,7 +557,7 @@ $(function() {
 <div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;    Ratio-&gt;GetYaxis()-&gt;SetTitle(PrettyY.c_str());</div>
 <div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160; </div>
 <div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;    Ratio-&gt;Draw(<span class="stringliteral">&quot;COLZ&quot;</span>);</div>
-<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;    <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;Print((outfilename).c_str());</div>
+<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;    canv-&gt;Print((outfilename).c_str());</div>
 <div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;  }</div>
 <div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;}</div>
 <div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160; </div>
@@ -631,7 +631,7 @@ $(function() {
 <div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160; </div>
 <div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160; </div>
 <div class="line"><a name="l00560"></a><span class="lineno"><a class="line" href="PlotSigmaVariation_8cpp.html#a5cb4a0061b336cac528bc541ffbb95e5">  560</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="PlotSigmaVariation_8cpp.html#a5cb4a0061b336cac528bc541ffbb95e5">PlotEventRate</a>(<span class="keyword">const</span> std::vector&lt;std::vector&lt;std::unique_ptr&lt;TH1D&gt;&gt;&gt;&amp; Poly,</div>
-<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;                   <span class="keyword">const</span> std::unique_ptr&lt;TCanvas&gt;&amp; <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>,</div>
+<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;                   <span class="keyword">const</span> std::unique_ptr&lt;TCanvas&gt;&amp; canv,</div>
 <div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160;                   <span class="keyword">const</span> std::string&amp; Title,</div>
 <div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;                   <span class="keyword">const</span> std::string&amp; outfilename)</div>
 <div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;{</div>
@@ -656,7 +656,7 @@ $(function() {
 <div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160; </div>
 <div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;  TPad* pad1 = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;  TPad* pad2 = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;  <a class="code" href="PlotSigmaVariation_8cpp.html#ac86b6ef4f7a161f74adc04480b771a8b">InitializePads</a>(<a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>.get(), pad1, pad2, 0.50, 0.50);</div>
+<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;  <a class="code" href="PlotSigmaVariation_8cpp.html#ac86b6ef4f7a161f74adc04480b771a8b">InitializePads</a>(canv.get(), pad1, pad2, 0.50, 0.50);</div>
 <div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;  pad2-&gt;SetBottomMargin(0.60);</div>
 <div class="line"><a name="l00588"></a><span class="lineno">  588</span>&#160; </div>
 <div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160;  pad1-&gt;cd();</div>
@@ -707,7 +707,7 @@ $(function() {
 <div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;  line.SetLineColor(kBlack);</div>
 <div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;  line.Draw(<span class="stringliteral">&quot;SAME&quot;</span>);</div>
 <div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160; </div>
-<div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;Print((outfilename).c_str());</div>
+<div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;  canv-&gt;Print((outfilename).c_str());</div>
 <div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160; </div>
 <div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;  <span class="keyword">delete</span> pad1;</div>
 <div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;  <span class="keyword">delete</span> pad2;</div>
@@ -769,21 +769,21 @@ $(function() {
 <div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;}</div>
 <div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160; </div>
 <div class="line"><a name="l00698"></a><span class="lineno"><a class="line" href="PlotSigmaVariation_8cpp.html#a679d93db9cf3601d7a46ee091bfa375f">  698</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="PlotSigmaVariation_8cpp.html#a679d93db9cf3601d7a46ee091bfa375f">PlotSigVar1D</a>(<span class="keyword">const</span> std::vector&lt;std::vector&lt;std::unique_ptr&lt;TH1D&gt;&gt;&gt;&amp; Projection,</div>
-<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;                  <span class="keyword">const</span> std::unique_ptr&lt;TCanvas&gt;&amp; <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>,</div>
+<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;                  <span class="keyword">const</span> std::unique_ptr&lt;TCanvas&gt;&amp; canv,</div>
 <div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;                  <span class="keyword">const</span> std::string&amp; Title,</div>
 <div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;                  <span class="keyword">const</span> std::string&amp; outfilename,</div>
 <div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;                  <span class="keyword">const</span> std::vector&lt;std::string&gt;&amp; ParamNames,</div>
 <div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;                  <span class="keyword">const</span> std::vector&lt;int&gt;&amp; ParamColour)</div>
 <div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;{</div>
-<div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;Clear();</div>
+<div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;  canv-&gt;Clear();</div>
 <div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160;  gStyle-&gt;SetDrawBorder(0);</div>
 <div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;  gStyle-&gt;SetTitleBorderSize(2);</div>
 <div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;  gStyle-&gt;SetOptStat(0); <span class="comment">//Set 0 to disable statistic box</span></div>
-<div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;SetGrid();</div>
-<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;SetTopMargin(0.10);</div>
-<div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;SetBottomMargin(0.08);</div>
-<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;SetRightMargin(0.05);</div>
-<div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160;  <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;SetLeftMargin(0.12);</div>
+<div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160;  canv-&gt;SetGrid();</div>
+<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;  canv-&gt;SetTopMargin(0.10);</div>
+<div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160;  canv-&gt;SetBottomMargin(0.08);</div>
+<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160;  canv-&gt;SetRightMargin(0.05);</div>
+<div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160;  canv-&gt;SetLeftMargin(0.12);</div>
 <div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160; </div>
 <div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160;  <span class="keyword">auto</span> PriorHist = Projection[0][<a class="code" href="PlotSigmaVariation_8cpp.html#ab4075ad5ea6b4635227f9626c6c242e6">PriorKnot</a>].get();</div>
 <div class="line"><a name="l00716"></a><span class="lineno">  716</span>&#160;  PriorHist-&gt;SetTitle(Title.c_str());</div>
@@ -821,8 +821,8 @@ $(function() {
 <div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;    }</div>
 <div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;    leg-&gt;Draw(<span class="stringliteral">&quot;SAME&quot;</span>);</div>
 <div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160; </div>
-<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;    <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;Print((outfilename).c_str());</div>
-<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;    <a class="code" href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a>-&gt;cd();</div>
+<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;    canv-&gt;Print((outfilename).c_str());</div>
+<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;    canv-&gt;cd();</div>
 <div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;  }</div>
 <div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;}</div>
 <div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160; </div>
@@ -924,7 +924,6 @@ $(function() {
 <div class="line"><a name="l00851"></a><span class="lineno">  851</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="PlotSigmaVariation_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>) <span class="keyword">delete</span> <a class="code" href="PlotSigmaVariation_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>;</div>
 <div class="line"><a name="l00852"></a><span class="lineno">  852</span>&#160;  <span class="keywordflow">return</span> 0;</div>
 <div class="line"><a name="l00853"></a><span class="lineno">  853</span>&#160;}</div>
-<div class="ttc" id="aGetPostfitParamPlots_8cpp_html_aec2fb4e7af6c83a8ccbdfcfcb7b76a83"><div class="ttname"><a href="GetPostfitParamPlots_8cpp.html#aec2fb4e7af6c83a8ccbdfcfcb7b76a83">canv</a></div><div class="ttdeci">TCanvas * canv</div><div class="ttdef"><b>Definition:</b> <a href="GetPostfitParamPlots_8cpp_source.html#l00060">GetPostfitParamPlots.cpp:60</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a4db4657acad5c79ac4bbb66a9d1c5905"><div class="ttname"><a href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a></div><div class="ttdeci">#define MACH3LOG_DEBUG</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00034">MaCh3Logger.h:34</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00037">MaCh3Logger.h:37</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00035">MaCh3Logger.h:35</a></div></div>

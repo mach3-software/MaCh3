@@ -78,25 +78,25 @@ $(function() {
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md_Doc_User_Guide_12__Containers"></a></p>
 <p>MaCh3 containers are stored in <a href="https://github.com/mach3-software/MaCh3/pkgs/container/mach3">https://github.com/mach3-software/MaCh3/pkgs/container/mach3</a></p>
-<h1><a class="anchor" id="autotoc_md167"></a>
+<h1><a class="anchor" id="autotoc_md165"></a>
 Setting up</h1>
 <p>If you are on cluster then due to security reasons most likely you will have singularity or apptainer, in VERY rare cases docker. If you want to setup on your private machine then use the following.</p>
-<h2><a class="anchor" id="autotoc_md168"></a>
+<h2><a class="anchor" id="autotoc_md166"></a>
 Linux Users</h2>
 <p>Install docker or podman via your distribution package manager, instructions below: YOU ONLY NEED ONE OF THE THREE docker: <a href="https://docs.docker.com/engine/install/">https://docs.docker.com/engine/install/</a></p>
 <p>OR docker-desktop: <a href="https://docs.docker.com/desktop/install/linux-install/">https://docs.docker.com/desktop/install/linux-install/</a></p>
 <p>OR podman: <a href="https://podman.io/docs/installation">https://podman.io/docs/installation</a></p>
 <p>docker-desktop might be slightly easier to use for those not as comfortable sysadmining linux.</p>
-<h2><a class="anchor" id="autotoc_md169"></a>
+<h2><a class="anchor" id="autotoc_md167"></a>
 Mac Users:</h2>
 <p>Install orbstack or docker-desktop. I highly recommend orbstack over docker-desktop: <a href="https://orbstack.dev/download">https://orbstack.dev/download</a></p>
 <p>Select the right version for your mac architecture </p>
-<h2><a class="anchor" id="autotoc_md170"></a>
+<h2><a class="anchor" id="autotoc_md168"></a>
 Windows Users:</h2>
 <p>Install docker-desktop: <a href="https://docs.docker.com/desktop/install/windows-install/">https://docs.docker.com/desktop/install/windows-install/</a></p>
-<h1><a class="anchor" id="autotoc_md171"></a>
+<h1><a class="anchor" id="autotoc_md169"></a>
 How to use</h1>
-<h2><a class="anchor" id="autotoc_md172"></a>
+<h2><a class="anchor" id="autotoc_md170"></a>
 Docker</h2>
 <p>To pull: <code>docker pull ghcr.io/mach3-software/mach3:alma9latest</code><br  />
  now that you have pulled it use: <code>docker run -it --name mach3-container ghcr.io/mach3-software/mach3:alma9latest</code><br  />
@@ -104,7 +104,7 @@ Docker</h2>
 </p>
 <p>If encountering any access issues please use: </p><div class="fragment"><div class="line">export CR_PAT=&lt;TOKEN&gt;</div>
 <div class="line">echo $CR_PAT | docker login ghcr.io -u USERNAME --password-stdin</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md173"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md171"></a>
 Singularity</h2>
 <p>To pull: <code>singularity pull docker://ghcr.io/mach3-software/mach3:alma9latest</code><br  />
  now that you pulled it use: <code>singularity shell mach3_alma9latest.sif</code><br  />
@@ -115,10 +115,10 @@ Singularity</h2>
 <p>If encountering any access issues please use: </p><div class="fragment"><div class="line">export SINGULARITY_DOCKER_USERNAME=&lt;USERNAME&gt;</div>
 <div class="line">export SINGULARITY_DOCKER_PASSWORD=&lt;TOKEN&gt;</div>
 </div><!-- fragment --><p>Alternatively, you can treat the container as a black box and execute exe inside the container like this. </p><div class="fragment"><div class="line">singularity exec &lt;my_container.sif&gt; do_something.exe /path/to/input &lt;arguments&gt;</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md174"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md172"></a>
 Words of caution</h2>
 <p>They are ephemeral: When you exit the main container process, everything is thrown away. Don't expect changes you make to the container image to persist in different containers from the same image.</p>
-<h2><a class="anchor" id="autotoc_md175"></a>
+<h2><a class="anchor" id="autotoc_md173"></a>
 Build experiment specific MaCh3 using Core as base</h2>
 <p>Docker allow</p>
 <p>#Use MaCh3 container as a base FROM ghcr.io/mach3-software/mach3:alma9latest AS mach3t2k_build </p><div class="fragment"><div class="line">// Clone Your MaCh3</div>
@@ -128,10 +128,10 @@ Build experiment specific MaCh3 using Core as base</h2>
 <div class="line">// compile</div>
 <div class="line">RUN make &amp;&amp; make install</div>
 </div><!-- fragment --><p>For more see <a href="https://github.com/KSkwarczynski/OA_Docker/blob/main/MaCh3T2K/Dockerfile">https://github.com/KSkwarczynski/OA_Docker/blob/main/MaCh3T2K/Dockerfile</a></p>
-<h2><a class="anchor" id="autotoc_md176"></a>
+<h2><a class="anchor" id="autotoc_md174"></a>
 GPU</h2>
 <p>TODO!!!</p>
-<h2><a class="anchor" id="autotoc_md177"></a>
+<h2><a class="anchor" id="autotoc_md175"></a>
 Acknowledgments</h2>
 <p>Highly inspired by lessons from Luke Pickering </p>
 </div></div><!-- contents -->

@@ -30,6 +30,7 @@ var menudata={children:[
 {text:"Posterior Predictive",url:"PosteriorPredictive.html"},
 {text:"MCMC Convergance",url:"MCMCconvergance.html"},
 {text:"Adaptive MCMC",url:"AdaptiveMCMC.html"},
+{text:"Splines",url:"Splines.html"},
 {text:"Containers",url:"Containers.html"},
 {text:"Clusters Info",url:"Clusters.html"}]},
 {text:"Project Info",url:"ReleaseNotes.html",children:[

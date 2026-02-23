@@ -76,7 +76,7 @@ $(function() {
 <div class="title">WARNING TO BECOME DEPRECATED </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h1><a class="anchor" id="autotoc_md135"></a>
+<div class="textblock"><h1><a class="anchor" id="autotoc_md133"></a>
 Introduction</h1>
 <p>Different neutrino generators have different naming conventions for modes in addition experiment may not want to use the same modes as the generator. This is what MaCh3 modes are used for.</p>
 <p>This is an example of a config file to initialise modes from config. </p><div class="fragment"><div class="line">#########################################</div>
@@ -108,14 +108,14 @@ Introduction</h1>
 </div><!-- fragment --><p> This is what you will get:</p>
 <p><img src="https://github.com/mach3-software/MaCh3/assets/45295406/0af5a338-d6ef-4bad-ade0-e2bc58c3548c" alt="" width="800" class="inline"/></p>
 <p>For example, NEUT has modes which are undefined, therefore all such modes are being treated <code>UNKNOWN_BAD</code>, this will not throw an error, as there may be cases when it is useful however it is worth investigating.</p>
-<h1><a class="anchor" id="autotoc_md136"></a>
+<h1><a class="anchor" id="autotoc_md134"></a>
 How to use (Examples)</h1>
 <p>To access the actual mode you can use the following code </p><div class="fragment"><div class="line">MaCh3Modes_t kMaCh3_CCQE = Modes-&gt;GetMode(&quot;CCQE&quot;);</div>
 </div><!-- fragment --><p> To perform loop over all modes: </p><div class="fragment"><div class="line">for (_int_ j = 0; j &lt; Modes-&gt;GetNModes()+1; j++)</div>
 <div class="line">{</div>
 <div class="line">    Modes-&gt;GetMaCh3ModeName(j);</div>
 <div class="line">}</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md137"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md135"></a>
 Unknown Category</h1>
 <p>If for some reason you have gaps in your mode definition or will try to access more modes than have been defined you will get the uknonw category. This is to prevent segfaults, also there are cases when your potential number of modes is too large and having a category where all garbage categories are assigned is useful. </p>
 </div></div><!-- contents -->

@@ -77,7 +77,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md_Doc_User_Guide_11__Step_size_tuning"></a> </p>
-<h1><a class="anchor" id="autotoc_md156"></a>
+<h1><a class="anchor" id="autotoc_md154"></a>
 What is and why you need to know what step size tuning</h1>
 <p>It is good practice to run an MCMC diagnostic before looking at posterior distributions, although in most cases you will stumble on the need to diagnose after checking posteriors. If your posterior looks like this, either you do have not enough steps or wrongly tune the chain. <br  />
  <img src="https://user-images.githubusercontent.com/45295406/213859228-8dbf752d-8c3c-432a-a3d4-2fd33d0f1863.png" alt="" width="400" height="400" class="inline"/></p>
@@ -87,10 +87,10 @@ What is and why you need to know what step size tuning</h1>
 <li>Individual step scale - user selected value for each parameter by a default =1, by step size tuning in most cases we mean modifying this value.</li>
 <li>Global step scale - user selected value same cor all parameters in a given covariance class. For example, the value is the same for all xsec-based parameters.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md157"></a>
+<h2><a class="anchor" id="autotoc_md155"></a>
 MCMC diagnostic</h2>
 <p>There are several plots worth studying for MCMC diagnostic you can find the executables which produce them in the <code>Diagnostics</code> folder. </p>
-<h3><a class="anchor" id="autotoc_md158"></a>
+<h3><a class="anchor" id="autotoc_md156"></a>
 Autocorrelations</h3>
 <p>We can study chain autocorrelation, which tells us how many particular steps are correlated. To test it, we introduce a variable <em>Lag(n)= corr(Xi, Xi−n)</em> which tells us how much correlated are steps that are <em>n</em> steps apart, where <em>i</em> is the maximal considered distanced, here <em>i = 25000</em>. Fig. shows autocorrelations for studied chains since we want our steps to be more random, and less correlated to quickly converge. The rule of thumb is for autocorrelation to drop below 0.2 for <em>Lag(n = 10000)</em>. This isn’t a strict criterion, so if sometimes autocorrelations drop slightly slower than the blue line in our Figure, it’s not a problem. <br  />
 </p>
@@ -100,34 +100,34 @@ Autocorrelations</h3>
  <img src="https://user-images.githubusercontent.com/45295406/213938757-ede5079b-dd6f-4beb-88a7-cd2525ef5805.png" alt="" width="400" height="400" class="inline"/></p>
 <p>Sometimes it is difficult to go gauge which configuration is better with order of hundreds of parameters. Therefore, it can be useful to look average autocorrelations as in plot below then one can clearly see which has the lowest autocorrelations:</p>
 <p><img src="https://github.com/user-attachments/assets/2b8f8644-5880-4085-b173-3958513e00cd" alt="" width="400" height="400" class="inline"/></p>
-<h3><a class="anchor" id="autotoc_md159"></a>
+<h3><a class="anchor" id="autotoc_md157"></a>
 Autocorrelations vs Acceptance</h3>
 <p>In many cases (though not always), reducing autocorrelations can also decrease the acceptance rate—that is, how often a proposed step is accepted. While very low autocorrelations are generally desirable, achieving them at the cost of an acceptance rate of only a few percents is usually a sign of problems with the tuning. As a rule of thumb, we should aim for an acceptance rate between 10% and 30%, which provides a good balance between efficient exploration and stable sampling.</p>
-<h3><a class="anchor" id="autotoc_md160"></a>
+<h3><a class="anchor" id="autotoc_md158"></a>
 Trace</h3>
 <p>Fig. shows the trace, which is the value of a chosen parameter at each step. It can be seen that at first, the chains have different traces but after a thousand steps, they start to stabilise and oscillates around a very similar value, indicating that the chain converged, and a stationary state was achieved. <br  />
 </p>
 <p><img src="https://user-images.githubusercontent.com/45295406/213926271-c8ae49c6-4ee3-45d5-a377-79e959ffdc4a.png" alt="" width="400" height="400" class="inline"/></p>
-<h3><a class="anchor" id="autotoc_md161"></a>
+<h3><a class="anchor" id="autotoc_md159"></a>
 Acceptance Probability Batch</h3>
 <p>Fig. shows a mean value of acceptance probability (<em>A(θ',θ)</em>) in an interval of 5k steps (batched mean). This quantity is quite high at the beginning, indicating the chain didn’t converge. When the chain gets close to the stationary state, it starts to stabilise. Orange stabilised the fastest, while blue and green are slowly catching up, but the red didn’t converge yet. <br  />
 </p>
 <p><img src="https://user-images.githubusercontent.com/45295406/213926134-2cecc97b-4e03-4b47-ad58-4cda0d2090ed.png" alt="" width="400" height="400" class="inline"/></p>
-<h3><a class="anchor" id="autotoc_md162"></a>
+<h3><a class="anchor" id="autotoc_md160"></a>
 R Hat</h3>
 <p>Usually, we run several chains which are later combined. There is a danger that not all chains will converge, then using them will bias results. R hat is meant to estimate whether chains converged successfully or not. According to Gelman, you should calculate R hat for at least 4 chains and if R hat &gt; 1.1 then it might indicate wrong chains convergence. Below you can find an example of chains which wrongly converged and one which successfully</p>
 <p>Chains converged to different values</p>
 <p><img src="https://user-images.githubusercontent.com/45295406/219701548-da171c94-9fa6-4857-8e22-372e278b91dc.png" alt="" width="400" height="400" class="inline"/></p>
 <p>Successfully converged chains</p>
 <p><img src="https://user-images.githubusercontent.com/45295406/219701496-abd8070c-616a-4637-ac64-4e1af14dd459.png" alt="" width="400" height="400" class="inline"/></p>
-<h3><a class="anchor" id="autotoc_md163"></a>
+<h3><a class="anchor" id="autotoc_md161"></a>
 Geweke</h3>
 <p>Geweke Diagnostic helps to define what burn it should it be. You should select burn-in around 15% in this case, as this is where distribution stabilises.</p>
 <p><img src="https://github.com/user-attachments/assets/0777c9d1-6c33-46c5-ae1b-68c19c9b73e6" alt="" width="400" height="400" class="inline"/></p>
-<h2><a class="anchor" id="autotoc_md164"></a>
+<h2><a class="anchor" id="autotoc_md162"></a>
 Global Step Scale</h2>
 <p>According to <b>[2]</b> (Section 3.2.1), the global step size should be equal to 2.38^2/N_params. Keep in mind this refers to the global step scale for a given covariance object like xsec covariance or detector covariance.</p>
-<h2><a class="anchor" id="autotoc_md165"></a>
+<h2><a class="anchor" id="autotoc_md163"></a>
 Manual Tuning</h2>
 <p>This procedure is very tedious and requires intuition of how a given parameter behaves. It is a bit of dark magic however skilled users should be able to tune it relatively fast compared with the non-skilled user. The process is as follows, you run the chain, run the <code>diagnostic</code> executable look at plots adjust the step scale then run again fit and the process repeats. Each time you should look at autocorrelations, traces, etc. (see discussion above). Another important trick is not to run full fit. Instead of running 10M chain, you might run 200k. Number of steps depends on number of parameters and <em>Lag(n = ?)</em> you are interested in. <br  />
 </p>
@@ -140,7 +140,7 @@ Manual Tuning</h2>
 <li>Doing LLH scan and assigning a step scale based on such a result is also a good idea.</li>
 </ul>
 <p>The last point is that data fit may require a different tuning than the Asimov fit. Still, if you tune for Asimov it should be easy to re-tune for a data fit.</p>
-<h1><a class="anchor" id="autotoc_md166"></a>
+<h1><a class="anchor" id="autotoc_md164"></a>
 References</h1>
 <p>[1] Kamil Skwarczynski PhD thesis <br  />
  [2] <a href="https://asp-eurasipjournals.springeropen.com/track/pdf/10.1186/s13634-020-00675-6.pdf">https://asp-eurasipjournals.springeropen.com/track/pdf/10.1186/s13634-020-00675-6.pdf</a> <br  />

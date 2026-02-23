@@ -3547,8 +3547,8 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><a name="l02289"></a><span class="lineno"> 2289</span>&#160;<span class="preprocessor">  #pragma omp parallel for reduction(+:lppd, p_WAIC)</span></div>
 <div class="line"><a name="l02290"></a><span class="lineno"> 2290</span>&#160;<span class="preprocessor">  #endif</span></div>
 <div class="line"><a name="l02291"></a><span class="lineno"> 2291</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> SampleNum = 0; SampleNum &lt; <a class="code" href="classSampleSummary.html#ab16d22bf65d2a9c15072901161fc160a">nSamples</a>; ++SampleNum) {</div>
-<div class="line"><a name="l02292"></a><span class="lineno"> 2292</span>&#160;    <span class="keywordtype">int</span> <a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a> = <a class="code" href="classSampleSummary.html#af5a3139cef917abfddc36dbb8d4ac2fd">maxBins</a>[SampleNum];</div>
-<div class="line"><a name="l02293"></a><span class="lineno"> 2293</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 1; i &lt;= <a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>; ++i) {</div>
+<div class="line"><a name="l02292"></a><span class="lineno"> 2292</span>&#160;    <span class="keywordtype">int</span> nBins = <a class="code" href="classSampleSummary.html#af5a3139cef917abfddc36dbb8d4ac2fd">maxBins</a>[SampleNum];</div>
+<div class="line"><a name="l02293"></a><span class="lineno"> 2293</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 1; i &lt;= nBins; ++i) {</div>
 <div class="line"><a name="l02294"></a><span class="lineno"> 2294</span>&#160;      <span class="keywordtype">double</span> mean_llh = 0.;</div>
 <div class="line"><a name="l02295"></a><span class="lineno"> 2295</span>&#160;      <span class="keywordtype">double</span> sum_exp_llh = 0;</div>
 <div class="line"><a name="l02296"></a><span class="lineno"> 2296</span>&#160;      <span class="keywordtype">double</span> mean_llh_squared = 0.;</div>
@@ -3588,7 +3588,6 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><a name="l02330"></a><span class="lineno"> 2330</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Effective number of parameters following WAIC formalism is equal to: {:.2f}&quot;</span>, p_WAIC);</div>
 <div class="line"><a name="l02331"></a><span class="lineno"> 2331</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;WAIC = {:.2f}&quot;</span>, WAIC);</div>
 <div class="line"><a name="l02332"></a><span class="lineno"> 2332</span>&#160;}</div>
-<div class="ttc" id="aGetPostfitParamPlots_8cpp_html_ae4842c1619a902b2761696f3849889a1"><div class="ttname"><a href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a></div><div class="ttdeci">int nBins</div><div class="ttdef"><b>Definition:</b> <a href="GetPostfitParamPlots_8cpp_source.html#l00059">GetPostfitParamPlots.cpp:59</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

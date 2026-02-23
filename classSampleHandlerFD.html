@@ -4466,13 +4466,12 @@ template&lt;typename ParT &gt; </div>
 <div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;<span class="comment">// **************************************************  </span></div>
 <div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;  <span class="comment">// DB Reset values stored in PDF array to 0.</span></div>
 <div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;  <span class="comment">// Don&#39;t openMP this; no significant gain</span></div>
-<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">int</span> <a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a> = <a class="code" href="classSampleHandlerFD.html#a231b4b5b9b5e5f0d1cb9a3ba96c85ec5">Binning</a>-&gt;GetNBins();</div>
-<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;  std::fill(<a class="code" href="classSampleHandlerFD.html#a85415d4ac54a5aefe78e5ab4d7bdb769">SampleHandlerFD_array</a>, <a class="code" href="classSampleHandlerFD.html#a85415d4ac54a5aefe78e5ab4d7bdb769">SampleHandlerFD_array</a> + <a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>, 0.0);</div>
+<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">int</span> nBins = <a class="code" href="classSampleHandlerFD.html#a231b4b5b9b5e5f0d1cb9a3ba96c85ec5">Binning</a>-&gt;GetNBins();</div>
+<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;  std::fill(<a class="code" href="classSampleHandlerFD.html#a85415d4ac54a5aefe78e5ab4d7bdb769">SampleHandlerFD_array</a>, <a class="code" href="classSampleHandlerFD.html#a85415d4ac54a5aefe78e5ab4d7bdb769">SampleHandlerFD_array</a> + nBins, 0.0);</div>
 <div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;  <span class="keywordflow">if</span> (<a class="code" href="classSampleHandlerFD.html#a1ff1ef7d99cee6d6a9fba74296d4d0ea">FirstTimeW2</a>) {</div>
-<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;    std::fill(<a class="code" href="classSampleHandlerFD.html#af5c6a3701c6ac76a96886ff13300a53b">SampleHandlerFD_array_w2</a>, <a class="code" href="classSampleHandlerFD.html#af5c6a3701c6ac76a96886ff13300a53b">SampleHandlerFD_array_w2</a> + <a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>, 0.0);</div>
+<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;    std::fill(<a class="code" href="classSampleHandlerFD.html#af5c6a3701c6ac76a96886ff13300a53b">SampleHandlerFD_array_w2</a>, <a class="code" href="classSampleHandlerFD.html#af5c6a3701c6ac76a96886ff13300a53b">SampleHandlerFD_array_w2</a> + nBins, 0.0);</div>
 <div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;  }</div>
 <div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;} <span class="comment">// end function</span></div>
-<div class="ttc" id="aGetPostfitParamPlots_8cpp_html_ae4842c1619a902b2761696f3849889a1"><div class="ttname"><a href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a></div><div class="ttdeci">int nBins</div><div class="ttdef"><b>Definition:</b> <a href="GetPostfitParamPlots_8cpp_source.html#l00059">GetPostfitParamPlots.cpp:59</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -4819,9 +4818,9 @@ template&lt;typename ParT &gt; </div>
 <div class="line"><a name="l01633"></a><span class="lineno"> 1633</span>&#160;    } <span class="comment">// end loop over Dimension</span></div>
 <div class="line"><a name="l01634"></a><span class="lineno"> 1634</span>&#160;  } <span class="comment">// end loop over IsUniform</span></div>
 <div class="line"><a name="l01635"></a><span class="lineno"> 1635</span>&#160; </div>
-<div class="line"><a name="l01636"></a><span class="lineno"> 1636</span>&#160;  <span class="keyword">auto</span> MakeBins = [](<span class="keywordtype">int</span> <a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>) {</div>
-<div class="line"><a name="l01637"></a><span class="lineno"> 1637</span>&#160;    std::vector&lt;double&gt; bins(<a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a> + 1);</div>
-<div class="line"><a name="l01638"></a><span class="lineno"> 1638</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt;= <a class="code" href="GetPostfitParamPlots_8cpp.html#ae4842c1619a902b2761696f3849889a1">nBins</a>; ++i)</div>
+<div class="line"><a name="l01636"></a><span class="lineno"> 1636</span>&#160;  <span class="keyword">auto</span> MakeBins = [](<span class="keywordtype">int</span> nBins) {</div>
+<div class="line"><a name="l01637"></a><span class="lineno"> 1637</span>&#160;    std::vector&lt;double&gt; bins(nBins + 1);</div>
+<div class="line"><a name="l01638"></a><span class="lineno"> 1638</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt;= nBins; ++i)</div>
 <div class="line"><a name="l01639"></a><span class="lineno"> 1639</span>&#160;      bins[i] = <span class="keyword">static_cast&lt;</span><span class="keywordtype">double</span><span class="keyword">&gt;</span>(i) - 0.5;</div>
 <div class="line"><a name="l01640"></a><span class="lineno"> 1640</span>&#160;    <span class="keywordflow">return</span> bins;</div>
 <div class="line"><a name="l01641"></a><span class="lineno"> 1641</span>&#160;  };</div>
