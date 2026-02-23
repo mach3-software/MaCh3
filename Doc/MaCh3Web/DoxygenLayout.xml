@@ -10,6 +10,7 @@
       <tab type="user" visible="yes" title="Posterior Predictive" url="PosteriorPredictive.html"/>
       <tab type="user" visible="yes" title="MCMC Convergance" url="MCMCconvergance.html"/>
       <tab type="user" visible="yes" title="Adaptive MCMC" url="AdaptiveMCMC.html"/>
+      <tab type="user" visible="yes" title="Splines" url="Splines.html"/>
       <tab type="user" visible="yes" title="Containers" url="Containers.html"/>
       <tab type="user" visible="yes" title="Clusters Info" url="Clusters.html"/>
     </tab>
