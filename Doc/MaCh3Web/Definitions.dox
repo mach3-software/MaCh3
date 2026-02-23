@@ -771,7 +771,7 @@
   /// </ol>
   ///
   /// More options are described here:
-  /// https://github.com/mach3-software/MaCh3/wiki/09.-Bayesian-Analysis,-Plotting-and-MCMC-Processor
+  /// [Bayesian Analysis Documentation](https://mach3-software.github.io/MaCh3/BayesianAnalysis.html)
   ///
   /// <b>@ref GetPenaltyTerm.cpp "GetPenaltyTerm"</b>
   /// Since xsec, flux, and ND spline systematics are treated as the same
