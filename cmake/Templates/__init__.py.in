@@ -1,0 +1,19 @@
+import os
+import ctypes
+
+lib_dir = f"{os.path.join(os.path.split(os.path.realpath(__file__))[0])}/lib"
+
+ctypes.cdll.LoadLibrary(f'{lib_dir}/libOscProbCalcer.so')
+ctypes.cdll.LoadLibrary(f'{lib_dir}/libOscillator.so')
+ctypes.cdll.LoadLibrary(f'{lib_dir}/libyaml-cpp.so')
+ctypes.cdll.LoadLibrary(f'{lib_dir}/libManager.so')
+ctypes.cdll.LoadLibrary(f'{lib_dir}/libSplineDict.so')
+ctypes.cdll.LoadLibrary(f'{lib_dir}/libParameters.so')
+ctypes.cdll.LoadLibrary(f'{lib_dir}/libSplines.so')
+ctypes.cdll.LoadLibrary(f'{lib_dir}/libSamples.so')
+ctypes.cdll.LoadLibrary(f'{lib_dir}/libFitters.so')
+ctypes.cdll.LoadLibrary(f'{lib_dir}/libPlotting.so')
+
+from ._pyMaCh3 import __doc__, fitters, manager, plotting, samples, splines, parameters
+
+__all__ = ["__doc__", "fitters", "manager", "plotting", "samples", "splines", "parameters"]
