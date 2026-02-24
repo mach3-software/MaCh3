@@ -434,8 +434,10 @@ public:
     }
 };
 
-void initSamples(py::module &m) {
+void initSamples(py::module &m){
+
     auto m_samples = m.def_submodule("samples");
+
     m_samples.doc() =
         "This is a Python binding of MaCh3s C++ based samples library.";
 
@@ -540,8 +542,9 @@ void initSamples(py::module &m) {
 
               if (Dimension == 1) {
                 // 1D histogram
-                auto [contents, edges] = TH1ToNumpy(hist);
-                return py::make_tuple(contents, edges);
+                auto [contents, edgesX] = TH1ToNumpy(hist);
+                auto edgesY = py::array_t<double>();
+                return py::make_tuple(contents, edgesX, edgesY);
               } else if (Dimension == 2) {
                 // 2D histogram - cast to TH2
                 TH2 *hist2d = dynamic_cast<TH2 *>(hist);
@@ -568,8 +571,9 @@ void initSamples(py::module &m) {
 
               if (Dimension == 1) {
                 // 1D histogram
-                auto [contents, edges] = TH1ToNumpy(hist);
-                return py::make_tuple(contents, edges);
+                auto [contents, edgesX] = TH1ToNumpy(hist);
+                auto edgesY = py::array_t<double>();
+                return py::make_tuple(contents, edgesX, edgesY);
               } else if (Dimension == 2) {
                 // 2D histogram - cast to TH2
                 TH2 *hist2d = dynamic_cast<TH2 *>(hist);
@@ -595,8 +599,9 @@ void initSamples(py::module &m) {
 
               if (Dimension == 1) {
                 // 1D histogram
-                auto [contents, edges] = TH1ToNumpy(hist);
-                return py::make_tuple(contents, edges);
+                auto [contents, edgesX] = TH1ToNumpy(hist);
+                auto edgesY = py::array_t<double>();
+                return py::make_tuple(contents, edgesX, edgesY);
               } else if (Dimension == 2) {
                 // 2D histogram - cast to TH2
                 TH2 *hist2d = dynamic_cast<TH2 *>(hist);
