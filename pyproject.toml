@@ -7,5 +7,8 @@ name = "pyMaCh3"
 version = "0.0.1"
 authors = [{ name = "The MaCh3 Collaboration" }]
 
+[tool.scikit-build]
+wheel.install-dir = "pyMaCh3"
+
 [tool.scikit-build.cmake]
 args = ["-DMaCh3_PYTHON_ENABLED=ON"]
