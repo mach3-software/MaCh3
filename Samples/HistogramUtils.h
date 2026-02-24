@@ -169,4 +169,11 @@ TFile* Open(const std::string& Name, const std::string& Type, const std::string&
 /// @brief Scale histogram to get divided by bin width
 void ScaleHistogram(TH1* Sample_Hist, const double scale);
 
+/// @brief KS: Helper function check if data and MC binning matches
+void CheckBinningMatch(TH1D* Hist1, TH1D* Hist2, const std::string& File, const int Line);
+/// @brief KS: Helper function check if data and MC binning matches
+void CheckBinningMatch(TH2D* Hist1, TH2D* Hist2, const std::string& File, const int Line);
+/// @brief KS: Helper function check if data and MC binning matches
+void CheckBinningMatch(TH2Poly* Hist1, TH2Poly* Hist2, const std::string& File, const int Line);
+
 } //end M3
