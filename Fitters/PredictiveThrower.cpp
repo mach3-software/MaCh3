@@ -3,6 +3,10 @@
 #include "Parameters/ParameterHandlerGeneric.h"
 #include "TH3.h"
 
+//this file is choc full of usage of a root interface that only takes floats, turn this warning off for this CU for now
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+
 // *************************
 PredictiveThrower::PredictiveThrower(Manager *man) : FitterBase(man) {
 // *************************
@@ -389,10 +393,13 @@ void PredictiveThrower::WriteToy(TDirectory* ToyDirectory,
 // Produce MaCh3 toys:
 void PredictiveThrower::ProduceToys() {
 // *************************
-  /// If we found toys then skip process of making new toys
+  // Remove not useful stuff
+  SanitiseInputs();
+
+  // If we found toys then skip process of making new toys
   if(LoadToys()) return;
 
-  /// Setup useful information for toy generation
+  // Setup useful information for toy generation
   SetupToyGeneration();
 
   auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
@@ -804,7 +811,7 @@ std::vector<std::unique_ptr<TH1D>> PredictiveThrower::PerBinHistogram(TH1* hist,
           std::string ProjName = fmt::format("{} {} Bin: {}",
                                              Sample_Name, suffix,
                                              GetBinName(hist, false, Dim, {i}));
-          //KS: When a histogram is created with an axis lower limit greater or equal to its upper limit ROOT will automatically adjust histogram range
+          // KS: When a histogram is created with an axis lower limit greater or equal to its upper limit ROOT will automatically adjust histogram range
           // https://root.cern.ch/doc/master/classTH1.html#auto-bin
           auto PosteriorHist = std::make_unique<TH1D>(ProjName.c_str(), ProjName.c_str(), nBins, 1, -1);
           PosteriorHist->SetDirectory(nullptr);
@@ -945,6 +952,9 @@ std::vector<std::unique_ptr<TH1>> PredictiveThrower::MakePredictive(const std::v
 // Perform predictive analysis
 void PredictiveThrower::RunPredictiveAnalysis() {
 // *************************
+  // Remove not useful stuff
+  SanitiseInputs();
+
   MACH3LOG_INFO("Starting {}", __func__);
   MACH3LOG_WARN("\033[0;31mCurrent Total RAM usage is {:.2f} GB\033[0m", MaCh3Utils::getValue("VmRSS") / 1048576.0);
   MACH3LOG_WARN("\033[0;31mOut of Total available RAM {:.2f} GB\033[0m", MaCh3Utils::getValue("MemTotal") / 1048576.0);
@@ -970,6 +980,8 @@ void PredictiveThrower::RunPredictiveAnalysis() {
   auto PostPred_mc = MakePredictive(MC_Hist_Toy, SampleDirectories, "mc", DebugHistograms);
   // Calculate Posterior Predictive $p$-value
   PosteriorPredictivepValue(PostPred_mc, SampleDirectories);
+  // Check how number of events changed
+  RateAnalysis(MC_Hist_Toy, SampleDirectories);
 
   // Close directories
   for (int sample = 0; sample < TotalNumberOfSamples+1; ++sample) {
@@ -1037,38 +1049,44 @@ void PredictiveThrower::MakeFluctuatedHistogram(TH1* FluctHist, TH1* Hist, const
 void PredictiveThrower::PosteriorPredictivepValue(const std::vector<std::unique_ptr<TH1>>& PostPred_mc,
                                                   const std::vector<TDirectory*>& SampleDir) {
 // *************************
-  // [Toys][Sample]
-  std::vector<std::vector<double>> chi2_dat_vec(Ntoys);
-  std::vector<std::vector<double>> chi2_mc_vec(Ntoys);
-  std::vector<std::vector<double>> chi2_pred_vec(Ntoys);
+  // Step 1: Initialize per-toy accumulators once
+  // [Sample] [Toys]
+  std::vector<std::vector<double>> chi2_dat_vec(TotalNumberOfSamples+1);
+  std::vector<std::vector<double>> chi2_mc_vec(TotalNumberOfSamples+1);
+  std::vector<std::vector<double>> chi2_pred_vec(TotalNumberOfSamples+1);
+  for (int iSample = 0; iSample < TotalNumberOfSamples+1; ++iSample) {
+    chi2_dat_vec[iSample].resize(Ntoys, 0.0);
+    chi2_mc_vec[iSample].resize(Ntoys, 0.0);
+    chi2_pred_vec[iSample].resize(Ntoys, 0.0);
+  }
 
-  for(int iToy = 0; iToy < Ntoys; iToy++) {
-    chi2_dat_vec[iToy].resize(TotalNumberOfSamples+1, 0);
-    chi2_mc_vec[iToy].resize(TotalNumberOfSamples+1, 0);
-    chi2_pred_vec[iToy].resize(TotalNumberOfSamples+1, 0);
+  for (int iToy = 0; iToy < Ntoys; ++iToy) {
+    chi2_dat_vec[TotalNumberOfSamples][iToy] = PenaltyTerm[iToy];
+    chi2_mc_vec[TotalNumberOfSamples][iToy] = PenaltyTerm[iToy];
+    chi2_pred_vec[TotalNumberOfSamples][iToy] = PenaltyTerm[iToy];
+  }
 
-    chi2_dat_vec[iToy].back() = PenaltyTerm[iToy];
-    chi2_mc_vec[iToy].back() = PenaltyTerm[iToy];
-    chi2_pred_vec[iToy].back() = PenaltyTerm[iToy];
-
-    /// TODO This can be multithreaded but be careful for Clone!!!
-    for (int iSample = 0; iSample < TotalNumberOfSamples; ++iSample) {
-      const int nDims = SampleInfo[iSample].Dimenstion;
-
+  /// TODO This can be multithreaded but be careful for Clone!!!
+  for (int iSample = 0; iSample < TotalNumberOfSamples; ++iSample) {
+    auto SampleHandler = SampleInfo[iSample].SamHandler;
+    const int nDims = SampleInfo[iSample].Dimenstion;
+    for (int iToy = 0; iToy < Ntoys; ++iToy) {
+      // Clone histograms to avoid modifying originals
       auto DrawFluctHist = M3::Clone(MC_Hist_Toy[iSample][iToy].get());
       auto PredFluctHist = M3::Clone(PostPred_mc[iSample].get());
 
+      // Apply fluctuations
       MakeFluctuatedHistogram(DrawFluctHist.get(), MC_Hist_Toy[iSample][iToy].get(), nDims);
       MakeFluctuatedHistogram(PredFluctHist.get(), PostPred_mc[iSample].get(), nDims);
 
       // Okay now we can do our chi2 calculation for our sample
-      chi2_dat_vec[iToy][iSample]  = GetLLH(Data_Hist[iSample], MC_Hist_Toy[iSample][iToy], W2_Hist_Toy[iSample][iToy], SampleInfo[iSample].SamHandler);
-      chi2_mc_vec[iToy][iSample]   = GetLLH(DrawFluctHist, MC_Hist_Toy[iSample][iToy], W2_Hist_Toy[iSample][iToy], SampleInfo[iSample].SamHandler);
-      chi2_pred_vec[iToy][iSample] = GetLLH(PredFluctHist, MC_Hist_Toy[iSample][iToy], W2_Hist_Toy[iSample][iToy], SampleInfo[iSample].SamHandler);
+      chi2_dat_vec[iSample][iToy]  = GetLLH(Data_Hist[iSample], MC_Hist_Toy[iSample][iToy], W2_Hist_Toy[iSample][iToy], SampleHandler);
+      chi2_mc_vec[iSample][iToy]   = GetLLH(DrawFluctHist, MC_Hist_Toy[iSample][iToy], W2_Hist_Toy[iSample][iToy], SampleHandler);
+      chi2_pred_vec[iSample][iToy] = GetLLH(PredFluctHist, MC_Hist_Toy[iSample][iToy], W2_Hist_Toy[iSample][iToy], SampleHandler);
 
-      chi2_dat_vec[iToy].back()  += chi2_dat_vec[iToy][iSample];
-      chi2_mc_vec[iToy].back()   += chi2_mc_vec[iToy][iSample];
-      chi2_pred_vec[iToy].back() += chi2_pred_vec[iToy][iSample];
+      chi2_dat_vec[TotalNumberOfSamples][iToy]  += chi2_dat_vec[iSample][iToy];
+      chi2_mc_vec[TotalNumberOfSamples][iToy]   += chi2_mc_vec[iSample][iToy];
+      chi2_pred_vec[TotalNumberOfSamples][iToy] += chi2_pred_vec[iSample][iToy];
     }
   }
 
@@ -1092,8 +1110,8 @@ void PredictiveThrower::MakeChi2Plots(const std::vector<std::vector<double>>& Ch
     std::vector<double> chi2_x_per_sample(Ntoys);
 
     for (int iToy = 0; iToy < Ntoys; ++iToy) {
-      chi2_y_sample[iToy] = Chi2_y[iToy][iSample];
-      chi2_x_per_sample[iToy]  = Chi2_x[iToy][iSample];
+      chi2_y_sample[iToy] = Chi2_y[iSample][iToy];
+      chi2_x_per_sample[iToy]  = Chi2_x[iSample][iToy];
     }
 
     const double min_val = std::min(*std::min_element(chi2_y_sample.begin(), chi2_y_sample.end()),
@@ -1208,4 +1226,116 @@ void PredictiveThrower::StudyBetaParameters(TDirectory* PredictiveDir) {
   delete BetaDir;
 
   PredictiveDir->cd();
+}
+
+// ****************
+// Make the 1D Event Rate Hist
+void PredictiveThrower::MakeCutEventRate(TH1D *Histogram, const double DataRate) const {
+// ****************
+  // Open the ROOT file
+  int originalErrorWarning = gErrorIgnoreLevel;
+  gErrorIgnoreLevel = kFatal;
+
+  // For the event rate histogram add a TLine to the data rate
+  auto TempLine = std::make_unique<TLine>(DataRate, Histogram->GetMinimum(), DataRate, Histogram->GetMaximum());
+  TempLine->SetLineColor(kRed);
+  TempLine->SetLineWidth(2);
+  // Also fit a Gaussian because why not?
+  auto Fitter = std::make_unique<TF1>("Fit", "gaus", Histogram->GetBinLowEdge(1), Histogram->GetBinLowEdge(Histogram->GetNbinsX()+1));
+  Histogram->Fit(Fitter.get(), "RQ");
+  Fitter->SetLineColor(kRed-5);
+  // Calculate a p-value
+  double Above = 0.0;
+  for (int z = 0; z < Histogram->GetNbinsX(); ++z) {
+    const double xvalue = Histogram->GetBinCenter(z+1);
+    if (xvalue >= DataRate) {
+      Above += Histogram->GetBinContent(z+1);
+    }
+  }
+  const double pvalue = Above/Histogram->Integral();
+  TLegend Legend(0.4, 0.75, 0.98, 0.90);
+  Legend.SetFillColor(0);
+  Legend.SetFillStyle(0);
+  Legend.SetLineWidth(0);
+  Legend.SetLineColor(0);
+  Legend.AddEntry(TempLine.get(), Form("Data, %.0f, p-value=%.2f", DataRate, pvalue), "l");
+  Legend.AddEntry(Histogram, Form("MC, #mu=%.1f#pm%.1f", Histogram->GetMean(), Histogram->GetRMS()), "l");
+  Legend.AddEntry(Fitter.get(), Form("Gauss, #mu=%.1f#pm%.1f", Fitter->GetParameter(1), Fitter->GetParameter(2)), "l");
+  std::string TempTitle = std::string(Histogram->GetName());
+  TempTitle += "_canv";
+  TCanvas TempCanvas(TempTitle.c_str(), TempTitle.c_str(), 1024, 1024);
+  TempCanvas.SetGridx();
+  TempCanvas.SetGridy();
+  TempCanvas.SetRightMargin(0.03);
+  TempCanvas.SetBottomMargin(0.08);
+  TempCanvas.SetLeftMargin(0.10);
+  TempCanvas.SetTopMargin(0.06);
+  TempCanvas.cd();
+  Histogram->Draw();
+  TempLine->Draw("same");
+  Fitter->Draw("same");
+  Legend.Draw("same");
+  TempCanvas.Write();
+  Histogram->Write();
+  gErrorIgnoreLevel = originalErrorWarning;
+}
+
+// *************************
+void PredictiveThrower::RateAnalysis(const std::vector<std::vector<std::unique_ptr<TH1>>>& Toys,
+                                     const std::vector<TDirectory*>& SampleDirectories) const {
+// *************************
+  std::vector<std::unique_ptr<TH1D>> EventHist(TotalNumberOfSamples+1);
+  for (int iSample = 0; iSample < TotalNumberOfSamples+1; ++iSample) {
+    std::string Title = "EventHist: ";
+    if (iSample == TotalNumberOfSamples) {
+      Title = "Total";
+    } else {
+      Title = SampleInfo[iSample].Name;
+    }
+    Title += "_sum";
+    //KS: When a histogram is created with an axis lower limit greater or equal to its upper limit ROOT will automatically adjust histogram range
+    // https://root.cern.ch/doc/master/classTH1.html#auto-bin
+    EventHist[iSample] = std::make_unique<TH1D>(Title.c_str(), Title.c_str(), 100, 1, -1);
+    EventHist[iSample]->SetDirectory(nullptr);
+    EventHist[iSample]->GetXaxis()->SetTitle("Total event rate");
+    EventHist[iSample]->GetYaxis()->SetTitle("Counts");
+    EventHist[iSample]->SetLineWidth(2);
+  }
+
+  // First fill per-sample histograms
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for (int iSample = 0; iSample < TotalNumberOfSamples; ++iSample) {
+    for (int iToy = 0; iToy < Ntoys; ++iToy) {
+      double Count = Toys[iSample][iToy]->Integral();
+      EventHist[iSample]->Fill(Count);
+    }
+  }
+
+  // Now fill total histogram properly (per toy)
+  for (int iToy = 0; iToy < Ntoys; ++iToy) {
+    double TotalCount = 0.0;
+    for (int iSample = 0; iSample < TotalNumberOfSamples; ++iSample) {
+      TotalCount += Toys[iSample][iToy]->Integral();
+    }
+    EventHist[TotalNumberOfSamples]->Fill(TotalCount);
+  }
+
+  double DataRate = 0.0;
+  std::vector<double> DataRates(TotalNumberOfSamples+1);
+  #ifdef MULTITHREAD
+  #pragma omp parallel for reduction(+:DataRate)
+  #endif
+  for (int i = 0; i < TotalNumberOfSamples; ++i) {
+    DataRates[i] = Data_Hist[i]->Integral();
+    DataRate += DataRates[i];
+  }
+  DataRates[TotalNumberOfSamples] = DataRate;
+
+  for (int SampleNum = 0; SampleNum < TotalNumberOfSamples+1; ++SampleNum) {
+    SampleDirectories[SampleNum]->cd();
+    //Make fancy event rate histogram
+    MakeCutEventRate(EventHist[SampleNum].get(), DataRates[SampleNum]);
+  }
 }
