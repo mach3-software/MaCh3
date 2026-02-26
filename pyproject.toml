@@ -11,4 +11,4 @@ authors = [{ name = "The MaCh3 Collaboration" }]
 wheel.install-dir = "pyMaCh3"
 
 [tool.scikit-build.cmake]
-args = ["-DMaCh3_PYTHON_ENABLED=ON"]
+args = ["-DMaCh3_PYTHON_ENABLED=ON", "-DMaCh3_PYTHON_INSTALL_DIR=NONE"]
