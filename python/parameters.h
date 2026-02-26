@@ -1,3 +1,8 @@
+#pragma once
+
+/// @file parameters.h
+/// @author Ewan Miller
+
 // pybind includes
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -35,7 +40,8 @@ public:
 };
 
 
-void initParameters(py::module &m) {
+void initParametersModule(py::module &m){
+
     auto m_parameters = m.def_submodule("parameters");
     m_parameters.doc() =
         "This is a Python binding of MaCh3s C++ parameters library.";

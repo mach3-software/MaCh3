@@ -1,3 +1,8 @@
+#pragma once
+
+/// @file samples.h
+/// @author Ewan Miller
+
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/numpy.h>
@@ -434,7 +439,7 @@ public:
     }
 };
 
-void initSamples(py::module &m){
+void initSamplesModule(py::module &m){
 
     auto m_samples = m.def_submodule("samples");
 

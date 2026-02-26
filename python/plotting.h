@@ -1,3 +1,8 @@
+#pragma once
+
+/// @file plotting.h
+/// @author Ewan Miller
+
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
@@ -12,7 +17,8 @@
 namespace py = pybind11;
 
 
-void initPlotting(py::module &m) {
+void initPlottingModule(py::module &m){
+
     auto m_plotting = m.def_submodule("plotting");
     m_plotting.doc() = "This is a Python binding of MaCh3s C++ based plotting library.";
 
