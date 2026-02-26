@@ -16,6 +16,7 @@ option(MaCh3_GPU_BENCHMARK "Perform fancy CUDA Benchmarking" OFF)
 option(MaCh3_NATIVE_ENABLED "Enable native CPU optimizations for improved performance during benchmarking)" OFF)
 option(MaCh3_GPU_ENABLED "Use GPU acceleration or not" ON)
 option(MaCh3_NuOsc_GPU_ENABLED "By default MaCh3 will use NuOscillator with GPU if MaCh3 is compiled with GPU, this flag allows disabling GPU for NuOscillator even if MaCh3 has GPU enabled" ON)
+option(MaCh3_PYTHON_INSTALL_DIR "The location to install the MaCh3 python module to (if MaCh3_PYTHON_ENABLED is set to ON). If \"NONE\" then will use the CMAKE_INSTALL_PREFIX (i.e. the installation directory of MaCh3)" ${CMAKE_INSTALL_PREFIX}/pyMaCh3)
 
 #KS: Load cmake function like DefineEnabledRequiredSwitch allowing to write more compact cmake
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/Modules)
@@ -270,6 +271,11 @@ add_subdirectory(Diagnostics)
 add_subdirectory(Plotting)
 if (MaCh3_PYTHON_ENABLED)
   add_subdirectory(python)
+  setup_pyMaCh3(
+    TARGET_NAME _pyMaCh3 
+    INSTALL_DIR ${MaCh3_PYTHON_INSTALL_DIR} 
+    BINDING_FILES python/pyMaCh3.cpp
+  )
 endif()
 
 #This is to export the target properties of MaCh3
