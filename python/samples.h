@@ -579,7 +579,7 @@ void initSamplesModule(py::module &m){
               }
               
               // Now clone it
-              TH1D *hist = (TH1D*)hist_original->Clone("cloned_hist");
+              TH1D *hist = static_cast<TH1D*>(hist_original->Clone("cloned_hist"));
               
               // Debug: Check the cloned histogram
               std::cout << "=== CLONED HISTOGRAM ===" << std::endl;
