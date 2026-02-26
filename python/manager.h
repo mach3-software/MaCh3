@@ -1,3 +1,8 @@
+#pragma once
+
+/// @file manager.h
+/// @author Ewan Miller
+
 // pybind includes
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -8,7 +13,8 @@
 
 namespace py = pybind11;
 
-void initManager(py::module &m) {
+void initManagerModule(py::module &m){
+
     auto m_manager = m.def_submodule("manager");
     m_manager.doc() = 
         "This is a Python binding of MaCh3s C++ based manager library.";

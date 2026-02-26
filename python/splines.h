@@ -1,3 +1,8 @@
+#pragma once
+
+/// @file splines.h
+/// @author Ewan Miller
+
 // pybind includes
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -69,7 +74,8 @@ public:
 };
 
 
-void initSplines(py::module &m) {
+void initSplinesModule(py::module &m){
+
     auto m_splines = m.def_submodule("splines");
     m_splines.doc() = 
         "This is a Python binding of MaCh3s C++ based spline library.";
