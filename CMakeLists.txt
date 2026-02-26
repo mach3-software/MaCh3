@@ -284,7 +284,6 @@ add_subdirectory(python)
 
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/pyMaCh3.cmake)
 if (MaCh3_PYTHON_ENABLED)
-  add_subdirectory(python)
   setup_pyMaCh3(
     TARGET_NAME _pyMaCh3 
     INSTALL_DIR ${MaCh3_PYTHON_INSTALL_DIR} 
