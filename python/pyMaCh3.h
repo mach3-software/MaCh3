@@ -17,6 +17,8 @@ class MaCh3PyBinder {
 
   public:
 
+    virtual ~MaCh3PyBinder() {};
+
     void initialise(py::module &m) {
         
         std::cout << "Initialising pyMaCh3 modules" << std::endl;
@@ -37,12 +39,12 @@ class MaCh3PyBinder {
 
   private:
     // these can be overwritten by experiments to set up their own pyMaCh3
-    virtual void initParametersExperiment(py::module &m) {}
-    virtual void initPlottingExperiment(py::module &m) {}
-    virtual void initFittersExperiment(py::module &m) {}
-    virtual void initSamplesExperiment(py::module &m) {}
-    virtual void initManagerExperiment(py::module &m) {}
-    virtual void initSplinesExperiment(py::module &m) {}
+    virtual void initParametersExperiment(py::module &m) { (void)m; }
+    virtual void initPlottingExperiment(py::module &m) { (void)m; }
+    virtual void initFittersExperiment(py::module &m) { (void)m; }
+    virtual void initSamplesExperiment(py::module &m) { (void)m; }
+    virtual void initManagerExperiment(py::module &m) { (void)m; }
+    virtual void initSplinesExperiment(py::module &m) { (void)m; }
 
 
     // These functions will be called to set up each of the python modules
