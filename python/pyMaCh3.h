@@ -21,19 +21,12 @@ class MaCh3PyBinder {
 
     void initialise(py::module &m) {
         
-        std::cout << "Initialising pyMaCh3 modules" << std::endl;
         initPlotting(m);
-        std::cout << "plotting done" << std::endl;
         initFitters(m);
-        std::cout << "fitters done" << std::endl;
         initSamples(m);
-        std::cout << "samples done" << std::endl;
         initManager(m);
-        std::cout << "manager done" << std::endl;
         initParameters(m);
-        std::cout << "parameters done" << std::endl;
         initSplines(m);
-        std::cout << "splines done" << std::endl;
 
     }
 
