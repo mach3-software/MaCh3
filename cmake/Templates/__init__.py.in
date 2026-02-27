@@ -3,7 +3,8 @@ import ctypes
 import glob
 
 ## where are we????
-lib_dir = f"{os.path.join(os.path.split(os.path.realpath(__file__))[0])}/lib"
+mach3_dir = f"{os.path.join(os.path.split(os.path.realpath(__file__))[0])}"
+lib_dir = f"{mach3_dir}/lib"
 
 ## load up root libraries
 ctypes.cdll.LoadLibrary(f'/home/ewan/ROOT/root/lib/libTree.so')
@@ -33,6 +34,9 @@ for lib in other_libs:
 
 ctypes.cdll.LoadLibrary(f'@ROOT_LIBRARY_DIR@/libCore.so')
 ctypes.cdll.LoadLibrary(f'@ROOT_LIBRARY_DIR@/libTree.so')
+
+## set the MaCh3 environment var
+os.environ["MaCh3_ROOT"] = "@MaCh3_BUILD_PATH@"
 
 from ._pyMaCh3 import __doc__, fitters, manager, plotting, samples, splines, parameters @PYMACH3_ADDITIONAL_MODULE_IMPORT@
 
