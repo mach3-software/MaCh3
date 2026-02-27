@@ -7,6 +7,7 @@ project(MaCh3 VERSION 2.4.2 LANGUAGES CXX)
 set(MaCh3_VERSION ${PROJECT_VERSION})
 
 option(MaCh3_PYTHON_ENABLED "Whether to build MaCh3 python bindings" OFF)
+option(MaCh3_NUDOCK_ENABLED "Whether to enable NuDock support" OFF)
 option(MaCh3_WERROR_ENABLED "Whether to build MaCh3 with heightened compiler pedancy" ON)
 option(MaCh3_LOW_MEMORY_STRUCTS_ENABLED "This will use float/short string for many structures" OFF)
 option(MaCh3_MULTITHREAD_ENABLED "This will enable multithreading (OMP) in whole framework" ON)
@@ -178,7 +179,7 @@ else()
       #-fipa-pta                            # Pointer analysis for better intraprocedural optimization, increases compilation time
     )
   #KS: add Link-Time Optimization (LTO)
-  target_link_libraries(MaCh3CompilerOptions INTERFACE -flto)
+  target_link_libraries(MaCh3CompilerOptions INTERFACE -flto=auto)
   endif()
 endif()
 
@@ -256,6 +257,7 @@ LIST(APPEND ALL_FEATURES
   LOW_MEMORY_STRUCTS
   Oscillator
   Fitter
+  NUDOCK
   )
 cmessage(STATUS "MaCh3 Features: ")
 foreach(f ${ALL_FEATURES})
@@ -276,10 +278,17 @@ if (MaCh3_PYTHON_ENABLED)
   set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
   add_subdirectory(python)
 endif()
+if (MaCh3_NUDOCK_ENABLED)
+  find_package(nlohmann_json REQUIRED)
+  add_subdirectory(NuDock)
+endif()
 
 #This is to export the target properties of MaCh3
 #Anything that links to "MaCh3" will get all of these target properties
 add_library(MaCh3 INTERFACE)
+if (MaCh3_NUDOCK_ENABLED)
+  target_link_libraries(MaCh3 INTERFACE MaCh3NuDock)
+endif()
 target_link_libraries(MaCh3 INTERFACE Fitters Samples Parameters Splines Manager MaCh3CompilerOptions MaCh3GPUCompilerOptions Plotting)
 set_target_properties(MaCh3 PROPERTIES EXPORT_NAME All)
 
