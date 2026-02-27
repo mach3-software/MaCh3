@@ -22,7 +22,7 @@ function(setup_pyMaCh3)
   ## EM: only works with code compiled with -fPIC enabled.. I think this flag can make things slightly slower
   ## so would be good to find a way around this.
   set_property( TARGET ${ARGS_TARGET_NAME} PROPERTY POSITION_INDEPENDENT_CODE ON )
-  target_link_libraries( ${ARGS_TARGET_NAME} PRIVATE MaCh3::All NuOscillator yaml-cpp::yaml-cpp MaCh3Warnings )
+  target_link_libraries( ${ARGS_TARGET_NAME} PRIVATE MaCh3::All NuOscillator MaCh3Warnings )
 
   if (${ARGS_INSTALL_DIR} STREQUAL "NONE")
     set(INSTALL_DIR ${CMAKE_INSTALL_PREFIX})
@@ -34,8 +34,9 @@ function(setup_pyMaCh3)
 
   install( TARGETS ${ARGS_TARGET_NAME} DESTINATION ${INSTALL_DIR}/ )
 
+  message("__init__.py template file: ${MaCh3_PYTHON_INIT_TEMPLATE}")
   configure_package_config_file(
-    ${PROJECT_SOURCE_DIR}/cmake/Templates/__init__.py.in ${INSTALL_DIR}/__init__.py
+    ${MaCh3_PYTHON_INIT_TEMPLATE} ${INSTALL_DIR}/__init__.py
     INSTALL_DESTINATION
       /this/is/ignored/for/some/reason/thanks/kitware
     NO_SET_AND_CHECK_MACRO
