@@ -5,6 +5,7 @@ set(HEADERS
   manager.h
   parameters.h
   splines.h
+  pyMaCh3.h
 )
 
 add_library(pyMaCh3 INTERFACE)
