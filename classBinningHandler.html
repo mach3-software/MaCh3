@@ -186,7 +186,8 @@ Introduction</h2>
 </div><!-- fragment --><h2><a class="anchor" id="autotoc_md72"></a>
 Uniform and Non-Uniform Binning Scheme</h2>
 <p>MaCh3 supports Uniform and Non-Uniform binning scheme</p>
-<p>In the non-uniform scheme, bin sizes may vary along each dimension, but all bins are required to be axis-aligned hyper-rectangles. Arbitrary or irregular bin shapes are not supported like banana-shape.</p>
+<p>Uniform binning uses a regular Cartesian grid. Bins are constructed as the Cartesian product of 1D bin edges, forming axis-aligned rectangles (or hyper-rectangles in higher dimensions). Bin widths may be equal or variable, but the grid structure is regular.</p>
+<p>In the non-uniform scheme, bin sizes may vary and bins may span different ranges along each dimension. However, all bins must remain axis-aligned hyper-rectangles. Arbitrary or irregular bin shapes (e.g. curved or "banana-shaped" bins) are not supported.</p>
 <p>Example of Uniform </p><div class="fragment"><div class="line">+--------+--------+--------+--------+</div>
 <div class="line">| Bin 0  | Bin 1  | Bin 2  | Bin 3  |</div>
 <div class="line">| (0,0)  | (1,0)  | (2,0)  | (3,0)  |</div>
@@ -234,7 +235,7 @@ Bin finding procedure</h4>
 <dd>
 Dan Barrow </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="BinningHandler_8h_source.html#l00121">121</a> of file <a class="el" href="BinningHandler_8h_source.html">BinningHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="BinningHandler_8h_source.html#l00128">128</a> of file <a class="el" href="BinningHandler_8h_source.html">BinningHandler.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a5845762f079913d6c244155e61c6ee7e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5845762f079913d6c244155e61c6ee7e">&#9670;&nbsp;</a></span>BinningHandler()</h2>
@@ -285,8 +286,8 @@ Dan Barrow </dd></dl>
 
 <p>destructor </p>
 
-<p class="definition">Definition at line <a class="el" href="BinningHandler_8h_source.html#l00128">128</a> of file <a class="el" href="BinningHandler_8h_source.html">BinningHandler.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;{};</div>
+<p class="definition">Definition at line <a class="el" href="BinningHandler_8h_source.html#l00135">135</a> of file <a class="el" href="BinningHandler_8h_source.html">BinningHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;{};</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -369,7 +370,7 @@ Dan Barrow </dd></dl>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;}</div>
 <div class="ttc" id="aCore_8h_html_ab6a7e23420f0bcfb04f42f45f8283101"><div class="ttname"><a href="Core_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a></div><div class="ttdeci">#define _restrict_</div><div class="ttdoc">KS: Using restrict limits the effects of pointer aliasing, aiding optimizations. While reading I foun...</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00108">Core.h:108</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a4db4657acad5c79ac4bbb66a9d1c5905"><div class="ttname"><a href="MaCh3Logger_8h.html#a4db4657acad5c79ac4bbb66a9d1c5905">MACH3LOG_DEBUG</a></div><div class="ttdeci">#define MACH3LOG_DEBUG</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00034">MaCh3Logger.h:34</a></div></div>
-<div class="ttc" id="aclassBinningHandler_html_a59f42dcc81ff1119566f9f2e217fbb44"><div class="ttname"><a href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">BinningHandler::SampleBinning</a></div><div class="ttdeci">std::vector&lt; SampleBinningInfo &gt; SampleBinning</div><div class="ttdoc">Binning info for individual sample.</div><div class="ttdef"><b>Definition:</b> <a href="BinningHandler_8h_source.html#l00199">BinningHandler.h:199</a></div></div>
+<div class="ttc" id="aclassBinningHandler_html_a59f42dcc81ff1119566f9f2e217fbb44"><div class="ttname"><a href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">BinningHandler::SampleBinning</a></div><div class="ttdeci">std::vector&lt; SampleBinningInfo &gt; SampleBinning</div><div class="ttdoc">Binning info for individual sample.</div><div class="ttdef"><b>Definition:</b> <a href="BinningHandler_8h_source.html#l00206">BinningHandler.h:206</a></div></div>
 <div class="ttc" id="anamespaceM3_html_aadca64372617e10cf9fdf70d0b0eb23f"><div class="ttname"><a href="namespaceM3.html#aadca64372617e10cf9fdf70d0b0eb23f">M3::UnderOverFlowBin</a></div><div class="ttdeci">constexpr static const int UnderOverFlowBin</div><div class="ttdoc">Mark bin which is overflow or underflow in MaCh3 binning.</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00091">Core.h:91</a></div></div>
 <div class="ttc" id="astructSampleBinningInfo_html"><div class="ttname"><a href="structSampleBinningInfo.html">SampleBinningInfo</a></div><div class="ttdoc">KS: Struct storing all information required for sample binning.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00232">SampleStructs.h:232</a></div></div>
 </div><!-- fragment -->
@@ -477,8 +478,8 @@ Dan Barrow </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="BinningHandler_8h_source.html#l00171">171</a> of file <a class="el" href="BinningHandler_8h_source.html">BinningHandler.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;{<span class="keywordflow">return</span> <a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[iSample].BinEdges.at(iDim);};</div>
+<p class="definition">Definition at line <a class="el" href="BinningHandler_8h_source.html#l00178">178</a> of file <a class="el" href="BinningHandler_8h_source.html">BinningHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;{<span class="keywordflow">return</span> <a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[iSample].BinEdges.at(iDim);};</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -825,9 +826,9 @@ Dan Barrow </dd></dl>
 
 <p>Get total number of bins over all samples/kinematic bins etc. </p>
 
-<p class="definition">Definition at line <a class="el" href="BinningHandler_8h_source.html#l00153">153</a> of file <a class="el" href="BinningHandler_8h_source.html">BinningHandler.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;{<span class="keywordflow">return</span> <a class="code" href="classBinningHandler.html#af2423b4a7e2402f297d69f493f28d81d">TotalNumberOfBins</a>;};</div>
-<div class="ttc" id="aclassBinningHandler_html_af2423b4a7e2402f297d69f493f28d81d"><div class="ttname"><a href="classBinningHandler.html#af2423b4a7e2402f297d69f493f28d81d">BinningHandler::TotalNumberOfBins</a></div><div class="ttdeci">int TotalNumberOfBins</div><div class="ttdoc">Total number of bins.</div><div class="ttdef"><b>Definition:</b> <a href="BinningHandler_8h_source.html#l00197">BinningHandler.h:197</a></div></div>
+<p class="definition">Definition at line <a class="el" href="BinningHandler_8h_source.html#l00160">160</a> of file <a class="el" href="BinningHandler_8h_source.html">BinningHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;{<span class="keywordflow">return</span> <a class="code" href="classBinningHandler.html#af2423b4a7e2402f297d69f493f28d81d">TotalNumberOfBins</a>;};</div>
+<div class="ttc" id="aclassBinningHandler_html_af2423b4a7e2402f297d69f493f28d81d"><div class="ttname"><a href="classBinningHandler.html#af2423b4a7e2402f297d69f493f28d81d">BinningHandler::TotalNumberOfBins</a></div><div class="ttdeci">int TotalNumberOfBins</div><div class="ttdoc">Total number of bins.</div><div class="ttdef"><b>Definition:</b> <a href="BinningHandler_8h_source.html#l00204">BinningHandler.h:204</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -857,8 +858,8 @@ Dan Barrow </dd></dl>
 
 <p>Get total number of bins over for a given sample. </p>
 
-<p class="definition">Definition at line <a class="el" href="BinningHandler_8h_source.html#l00155">155</a> of file <a class="el" href="BinningHandler_8h_source.html">BinningHandler.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;{<span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[iSample].nBins);};</div>
+<p class="definition">Definition at line <a class="el" href="BinningHandler_8h_source.html#l00162">162</a> of file <a class="el" href="BinningHandler_8h_source.html">BinningHandler.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;{<span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[iSample].nBins);};</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -927,7 +928,7 @@ Dan Barrow </dd></dl>
 <div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(<a class="code" href="classBinningHandler.html#a59f42dcc81ff1119566f9f2e217fbb44">SampleBinning</a>[Sample+1].GlobalOffset);</div>
 <div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;  }</div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;}</div>
-<div class="ttc" id="aclassBinningHandler_html_a9a207f774a69f371cd2d221e21bad6f4"><div class="ttname"><a href="classBinningHandler.html#a9a207f774a69f371cd2d221e21bad6f4">BinningHandler::GetNBins</a></div><div class="ttdeci">int GetNBins() const</div><div class="ttdoc">Get total number of bins over all samples/kinematic bins etc.</div><div class="ttdef"><b>Definition:</b> <a href="BinningHandler_8h_source.html#l00153">BinningHandler.h:153</a></div></div>
+<div class="ttc" id="aclassBinningHandler_html_a9a207f774a69f371cd2d221e21bad6f4"><div class="ttname"><a href="classBinningHandler.html#a9a207f774a69f371cd2d221e21bad6f4">BinningHandler::GetNBins</a></div><div class="ttdeci">int GetNBins() const</div><div class="ttdoc">Get total number of bins over all samples/kinematic bins etc.</div><div class="ttdef"><b>Definition:</b> <a href="BinningHandler_8h_source.html#l00160">BinningHandler.h:160</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1121,7 +1122,7 @@ Dan Barrow </dd></dl>
 
 <p>Binning info for individual sample. </p>
 
-<p class="definition">Definition at line <a class="el" href="BinningHandler_8h_source.html#l00199">199</a> of file <a class="el" href="BinningHandler_8h_source.html">BinningHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="BinningHandler_8h_source.html#l00206">206</a> of file <a class="el" href="BinningHandler_8h_source.html">BinningHandler.h</a>.</p>
 
 </div>
 </div>
@@ -1147,7 +1148,7 @@ Dan Barrow </dd></dl>
 
 <p>Total number of bins. </p>
 
-<p class="definition">Definition at line <a class="el" href="BinningHandler_8h_source.html#l00197">197</a> of file <a class="el" href="BinningHandler_8h_source.html">BinningHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="BinningHandler_8h_source.html#l00204">204</a> of file <a class="el" href="BinningHandler_8h_source.html">BinningHandler.h</a>.</p>
 
 </div>
 </div>

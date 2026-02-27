@@ -698,69 +698,69 @@ $(function() {
 <div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;  <span class="keywordflow">return</span> Enu;</div>
 <div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;}</div>
 <div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160; </div>
-<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160; </div>
-<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;<span class="comment">// ***********************************************</span></div>
-<div class="line"><a name="l00622"></a><span class="lineno"><a class="line" href="HistogramUtils_8cpp.html#adeffb8ae064bd6bd7bc1f7871921488a">  622</a></span>&#160;std::unique_ptr&lt;TH1D&gt; <a class="code" href="HistogramUtils_8cpp.html#adeffb8ae064bd6bd7bc1f7871921488a">MakeSummaryFromSpectra</a>(<span class="keyword">const</span> TH2D* Spectra,</div>
-<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;                                             <span class="keyword">const</span> std::string&amp; name) {</div>
-<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;<span class="comment">// ***********************************************</span></div>
-<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">int</span> nBinsX = Spectra-&gt;GetNbinsX();</div>
-<div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;  <span class="comment">// Reuse the exact x binning</span></div>
-<div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;  std::vector&lt;double&gt; edges(nBinsX + 1);</div>
-<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; nBinsX; ++i) {</div>
-<div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;    edges[i] = Spectra-&gt;GetXaxis()-&gt;GetBinLowEdge(i+1);</div>
-<div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;  }</div>
-<div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;  edges[nBinsX] = Spectra-&gt;GetXaxis()-&gt;GetBinUpEdge(nBinsX);</div>
-<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160; </div>
-<div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;  <span class="keyword">auto</span> h1 = std::make_unique&lt;TH1D&gt;(name.c_str(), name.c_str(), nBinsX, edges.data());</div>
-<div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;  h1-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
-<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;  h1-&gt;Sumw2(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160; </div>
-<div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;  <span class="comment">// ---- Loop X bins and extract Y distribution</span></div>
-<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> ix = 1; ix &lt;= nBinsX; ++ix) {</div>
-<div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;    <span class="comment">// Project THIS x-bin onto Y</span></div>
-<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;    std::unique_ptr&lt;TH1D&gt; slice(Spectra-&gt;ProjectionY(Form(<span class="stringliteral">&quot;_py_%d&quot;</span>, ix), ix, ix));</div>
-<div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;    slice-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
-<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;    <span class="keywordflow">if</span> (slice-&gt;GetEntries() == 0) {</div>
-<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;      h1-&gt;SetBinContent(ix, 0.0);</div>
-<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;      h1-&gt;SetBinError(ix, 0.0);</div>
-<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;      <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;    }</div>
-<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160; </div>
-<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">double</span> mean = slice-&gt;GetMean();</div>
-<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">double</span> rms  = slice-&gt;GetRMS();</div>
-<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160; </div>
-<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;    h1-&gt;SetBinContent(ix, mean);</div>
-<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;    h1-&gt;SetBinError(ix, rms);</div>
-<div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;  }</div>
-<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160; </div>
-<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;  h1-&gt;GetXaxis()-&gt;SetTitle(Spectra-&gt;GetXaxis()-&gt;GetTitle());</div>
-<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;  h1-&gt;GetYaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Events&quot;</span>);</div>
-<div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160; </div>
-<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;  <span class="keywordflow">return</span> h1;</div>
-<div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;}</div>
-<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160; </div>
-<div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceM3.html">M3</a> {</div>
-<div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160;<span class="comment">// **************************************************************************</span></div>
-<div class="line"><a name="l00663"></a><span class="lineno"><a class="line" href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">  663</a></span>&#160;TFile* <a class="code" href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">Open</a>(<span class="keyword">const</span> std::string&amp; Name, <span class="keyword">const</span> std::string&amp; Type, <span class="keyword">const</span> std::string&amp; File, <span class="keyword">const</span> <span class="keywordtype">int</span> Line) {</div>
-<div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;<span class="comment">// **************************************************************************</span></div>
-<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;  TFile* OutFile = <span class="keyword">new</span> TFile(Name.c_str(), Type.c_str());</div>
-<div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160; </div>
-<div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;  <span class="comment">// Check if the file is successfully opened and usable</span></div>
-<div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;  <span class="keywordflow">if</span> (OutFile-&gt;IsZombie()) {</div>
-<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Failed to open file: {}&quot;</span>, Name);</div>
-<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;    std::string lowerType = Type;</div>
-<div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;    std::transform(lowerType.begin(), lowerType.end(), lowerType.begin(), ::tolower);</div>
-<div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;    <span class="keywordflow">if</span> (lowerType == <span class="stringliteral">&quot;recreate&quot;</span>) {</div>
-<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Check if directory exist&quot;</span>);</div>
-<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;    }</div>
-<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;    <span class="keyword">delete</span> OutFile;</div>
-<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
-<div class="line"><a name="l00677"></a><span class="lineno">  677</span>&#160;  }</div>
-<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;  <span class="keywordflow">return</span> OutFile;</div>
-<div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;}</div>
-<div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160; </div>
-<div class="line"><a name="l00681"></a><span class="lineno"><a class="line" href="namespaceM3.html#a75bda934f7f63fc70bf57eac209dfdfe">  681</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="namespaceM3.html#a75bda934f7f63fc70bf57eac209dfdfe">ScaleHistogram</a>(TH1* Sample_Hist, <span class="keyword">const</span> <span class="keywordtype">double</span> scale)</div>
-<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;{</div>
+<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;<span class="comment">// ***********************************************</span></div>
+<div class="line"><a name="l00621"></a><span class="lineno"><a class="line" href="HistogramUtils_8cpp.html#adeffb8ae064bd6bd7bc1f7871921488a">  621</a></span>&#160;std::unique_ptr&lt;TH1D&gt; <a class="code" href="HistogramUtils_8cpp.html#adeffb8ae064bd6bd7bc1f7871921488a">MakeSummaryFromSpectra</a>(<span class="keyword">const</span> TH2D* Spectra,</div>
+<div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;                                             <span class="keyword">const</span> std::string&amp; name) {</div>
+<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;<span class="comment">// ***********************************************</span></div>
+<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">int</span> nBinsX = Spectra-&gt;GetNbinsX();</div>
+<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;  <span class="comment">// Reuse the exact x binning</span></div>
+<div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;  std::vector&lt;double&gt; edges(nBinsX + 1);</div>
+<div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; nBinsX; ++i) {</div>
+<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;    edges[i] = Spectra-&gt;GetXaxis()-&gt;GetBinLowEdge(i+1);</div>
+<div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;  }</div>
+<div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;  edges[nBinsX] = Spectra-&gt;GetXaxis()-&gt;GetBinUpEdge(nBinsX);</div>
+<div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160; </div>
+<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;  <span class="keyword">auto</span> h1 = std::make_unique&lt;TH1D&gt;(name.c_str(), name.c_str(), nBinsX, edges.data());</div>
+<div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;  h1-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
+<div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;  h1-&gt;Sumw2(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160; </div>
+<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;  <span class="comment">// ---- Loop X bins and extract Y distribution</span></div>
+<div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> ix = 1; ix &lt;= nBinsX; ++ix) {</div>
+<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;    <span class="comment">// Project THIS x-bin onto Y</span></div>
+<div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;    std::unique_ptr&lt;TH1D&gt; slice(Spectra-&gt;ProjectionY(Form(<span class="stringliteral">&quot;_py_%d&quot;</span>, ix), ix, ix));</div>
+<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;    slice-&gt;SetDirectory(<span class="keyword">nullptr</span>);</div>
+<div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;    <span class="keywordflow">if</span> (slice-&gt;GetEntries() == 0) {</div>
+<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;      h1-&gt;SetBinContent(ix, 0.0);</div>
+<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;      h1-&gt;SetBinError(ix, 0.0);</div>
+<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;      <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;    }</div>
+<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160; </div>
+<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">double</span> mean = slice-&gt;GetMean();</div>
+<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">double</span> rms  = slice-&gt;GetRMS();</div>
+<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160; </div>
+<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;    h1-&gt;SetBinContent(ix, mean);</div>
+<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;    h1-&gt;SetBinError(ix, rms);</div>
+<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;  }</div>
+<div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160; </div>
+<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;  h1-&gt;GetXaxis()-&gt;SetTitle(Spectra-&gt;GetXaxis()-&gt;GetTitle());</div>
+<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;  h1-&gt;GetYaxis()-&gt;SetTitle(<span class="stringliteral">&quot;Events&quot;</span>);</div>
+<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160; </div>
+<div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;  <span class="keywordflow">return</span> h1;</div>
+<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;}</div>
+<div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160; </div>
+<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceM3.html">M3</a> {</div>
+<div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;<span class="comment">// **************************************************************************</span></div>
+<div class="line"><a name="l00662"></a><span class="lineno"><a class="line" href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">  662</a></span>&#160;TFile* <a class="code" href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">Open</a>(<span class="keyword">const</span> std::string&amp; Name, <span class="keyword">const</span> std::string&amp; Type, <span class="keyword">const</span> std::string&amp; File, <span class="keyword">const</span> <span class="keywordtype">int</span> Line) {</div>
+<div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;<span class="comment">// **************************************************************************</span></div>
+<div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;  TFile* OutFile = <span class="keyword">new</span> TFile(Name.c_str(), Type.c_str());</div>
+<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160; </div>
+<div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160;  <span class="comment">// Check if the file is successfully opened and usable</span></div>
+<div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;  <span class="keywordflow">if</span> (OutFile-&gt;IsZombie()) {</div>
+<div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Failed to open file: {}&quot;</span>, Name);</div>
+<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;    std::string lowerType = Type;</div>
+<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;    std::transform(lowerType.begin(), lowerType.end(), lowerType.begin(), ::tolower);</div>
+<div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;    <span class="keywordflow">if</span> (lowerType == <span class="stringliteral">&quot;recreate&quot;</span>) {</div>
+<div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Check if directory exist&quot;</span>);</div>
+<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;    }</div>
+<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;    <span class="keyword">delete</span> OutFile;</div>
+<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
+<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160;  }</div>
+<div class="line"><a name="l00677"></a><span class="lineno">  677</span>&#160;  <span class="keywordflow">return</span> OutFile;</div>
+<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;}</div>
+<div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160; </div>
+<div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160;<span class="comment">// ***************************************************************************</span></div>
+<div class="line"><a name="l00681"></a><span class="lineno"><a class="line" href="namespaceM3.html#a75bda934f7f63fc70bf57eac209dfdfe">  681</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="namespaceM3.html#a75bda934f7f63fc70bf57eac209dfdfe">ScaleHistogram</a>(TH1* Sample_Hist, <span class="keyword">const</span> <span class="keywordtype">double</span> scale) {</div>
+<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;<span class="comment">// ***************************************************************************</span></div>
 <div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 0; j &lt;= Sample_Hist-&gt;GetNbinsX(); ++j)</div>
 <div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;  {</div>
 <div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;    <span class="keywordtype">double</span> num = Sample_Hist-&gt;GetBinContent(j);</div>
@@ -777,7 +777,76 @@ $(function() {
 <div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;    }</div>
 <div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;  }</div>
 <div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;}</div>
-<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;} <span class="comment">//end M3</span></div>
+<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;<span class="comment">// ***************************************************************************</span></div>
+<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;<span class="comment">//KS: Helper function check if data and MC binning matches</span></div>
+<div class="line"><a name="l00701"></a><span class="lineno"><a class="line" href="namespaceM3.html#a9639893e99d55464cc35f36e9634bab3">  701</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="namespaceM3.html#a9639893e99d55464cc35f36e9634bab3">CheckBinningMatch</a>(TH1D* Hist1, TH1D* Hist2, <span class="keyword">const</span> std::string&amp; File, <span class="keyword">const</span> <span class="keywordtype">int</span> Line) {</div>
+<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;<span class="comment">// ***************************************************************************</span></div>
+<div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;  <span class="keywordflow">if</span> (Hist1-&gt;GetNbinsX() != Hist2-&gt;GetNbinsX()) {</div>
+<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Number of bins does not match for TH1D: {} vs {}&quot;</span>, Hist1-&gt;GetNbinsX(), Hist2-&gt;GetNbinsX());</div>
+<div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
+<div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160;  }</div>
+<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 1; i &lt;= Hist1-&gt;GetNbinsX(); ++i) {</div>
+<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;    <span class="keywordflow">if</span> (std::fabs(Hist1-&gt;GetXaxis()-&gt;GetBinLowEdge(i) - Hist2-&gt;GetXaxis()-&gt;GetBinLowEdge(i)) &gt; 0.001 ||</div>
+<div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160;      std::fabs(Hist1-&gt;GetXaxis()-&gt;GetBinUpEdge(i) - Hist2-&gt;GetXaxis()-&gt;GetBinUpEdge(i)) &gt; 0.001) {</div>
+<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Bin edges do not match for TH1D at bin {}&quot;</span>, i);</div>
+<div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
+<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160;    }</div>
+<div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160;  }</div>
+<div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160;}</div>
+<div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160;<span class="comment">// ***************************************************************************</span></div>
+<div class="line"><a name="l00716"></a><span class="lineno">  716</span>&#160;<span class="comment">//KS: Helper function check if data and MC binning matches</span></div>
+<div class="line"><a name="l00717"></a><span class="lineno"><a class="line" href="namespaceM3.html#a2a30f06fdcfc69bc0fc2e8c2c3f667ba">  717</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="namespaceM3.html#a9639893e99d55464cc35f36e9634bab3">CheckBinningMatch</a>(TH2D* Hist1, TH2D* Hist2, <span class="keyword">const</span> std::string&amp; File, <span class="keyword">const</span> <span class="keywordtype">int</span> Line) {</div>
+<div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;<span class="comment">// ***************************************************************************</span></div>
+<div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;  <span class="keywordflow">if</span> (Hist1-&gt;GetNbinsX() != Hist2-&gt;GetNbinsX() || Hist1-&gt;GetNbinsY() != Hist2-&gt;GetNbinsY()) {</div>
+<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Number of bins does not match for TH2D&quot;</span>);</div>
+<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
+<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;  }</div>
+<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160; </div>
+<div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 1; i &lt;= Hist1-&gt;GetNbinsX(); ++i) {</div>
+<div class="line"><a name="l00725"></a><span class="lineno">  725</span>&#160;    <span class="keywordflow">if</span> (std::fabs(Hist1-&gt;GetXaxis()-&gt;GetBinLowEdge(i) - Hist2-&gt;GetXaxis()-&gt;GetBinLowEdge(i)) &gt; 0.001 ||</div>
+<div class="line"><a name="l00726"></a><span class="lineno">  726</span>&#160;      std::fabs(Hist1-&gt;GetXaxis()-&gt;GetBinUpEdge(i) - Hist2-&gt;GetXaxis()-&gt;GetBinUpEdge(i)) &gt; 0.001) {</div>
+<div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;X bin edges do not match for TH2D at bin {}&quot;</span>, i);</div>
+<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
+<div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;    }</div>
+<div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;  }</div>
+<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 1; j &lt;= Hist1-&gt;GetNbinsY(); ++j) {</div>
+<div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;    <span class="keywordflow">if</span> (std::fabs(Hist1-&gt;GetYaxis()-&gt;GetBinLowEdge(j) - Hist2-&gt;GetYaxis()-&gt;GetBinLowEdge(j)) &gt; 0.001 ||</div>
+<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;      std::fabs(Hist1-&gt;GetYaxis()-&gt;GetBinUpEdge(j) - Hist2-&gt;GetYaxis()-&gt;GetBinUpEdge(j)) &gt; 0.001) {</div>
+<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Y bin edges do not match for TH2D at bin {}&quot;</span>, j);</div>
+<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
+<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;    }</div>
+<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;  }</div>
+<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;}</div>
+<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160; </div>
+<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160;<span class="comment">// ***************************************************************************</span></div>
+<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;<span class="comment">//KS: Helper function check if data and MC binning matches</span></div>
+<div class="line"><a name="l00742"></a><span class="lineno"><a class="line" href="namespaceM3.html#a5dc2b96f9e1931503d9413941a951249">  742</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="namespaceM3.html#a9639893e99d55464cc35f36e9634bab3">CheckBinningMatch</a>(TH2Poly* Hist1, TH2Poly* Hist2, <span class="keyword">const</span> std::string&amp; File, <span class="keyword">const</span> <span class="keywordtype">int</span> Line) {</div>
+<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160;<span class="comment">// ***************************************************************************</span></div>
+<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;  <span class="keywordtype">int</span> NBins1 = Hist1-&gt;GetNumberOfBins();</div>
+<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;  <span class="keywordtype">int</span> NBins2 = Hist2-&gt;GetNumberOfBins();</div>
+<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;  <span class="keywordflow">if</span> (NBins1 != NBins2) {</div>
+<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Number of bins does not match for TH2Poly: {} vs {}&quot;</span>, NBins1, NBins2);</div>
+<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File, Line);</div>
+<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;  }</div>
+<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> j = 1; j &lt;= NBins1; j++)</div>
+<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;  {</div>
+<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;    <span class="comment">//KS: There is weird offset between bin content and GetBins so this is correct, in spite of looking funny</span></div>
+<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;    TH2PolyBin* polybin1 = <span class="keyword">static_cast&lt;</span>TH2PolyBin*<span class="keyword">&gt;</span>(Hist1-&gt;GetBins()-&gt;At(j - 1));</div>
+<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;    TH2PolyBin* polybin2 = <span class="keyword">static_cast&lt;</span>TH2PolyBin*<span class="keyword">&gt;</span>(Hist2-&gt;GetBins()-&gt;At(j - 1));</div>
+<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160; </div>
+<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160;    <span class="keywordflow">if</span>( std::fabs(polybin2-&gt;GetXMin() - polybin1-&gt;GetXMin()) &gt; 0.001 ||</div>
+<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;      std::fabs(polybin2-&gt;GetXMax() - polybin1-&gt;GetXMax()) &gt; 0.001 ||</div>
+<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;      std::fabs(polybin2-&gt;GetYMin() - polybin1-&gt;GetYMin()) &gt; 0.001 ||</div>
+<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;      std::fabs(polybin2-&gt;GetYMax() - polybin1-&gt;GetYMax()) &gt; 0.001  )</div>
+<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160;    {</div>
+<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Binning doesn&#39;t match&quot;</span>, Hist1-&gt;GetTitle());</div>
+<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;data  x min {} x max {} y min {} y max {}&quot;</span>, polybin2-&gt;GetXMin(), polybin2-&gt;GetXMax(), polybin2-&gt;GetYMin(), polybin2-&gt;GetYMax());</div>
+<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;mc    x min {} x max {} y min {} y max {}&quot;</span>, polybin1-&gt;GetXMin(), polybin1-&gt;GetXMax(), polybin1-&gt;GetYMin(), polybin1-&gt;GetYMax());</div>
+<div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(File , Line );</div>
+<div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160;    }</div>
+<div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160;  }</div>
+<div class="line"><a name="l00767"></a><span class="lineno">  767</span>&#160;}</div>
+<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;} <span class="comment">//end M3</span></div>
 <div class="ttc" id="aCore_8h_html_a46b8fa28114cf68de4549061568b5ade"><div class="ttname"><a href="Core_8h.html#a46b8fa28114cf68de4549061568b5ade">_MaCh3_Safe_Include_Start_</a></div><div class="ttdeci">#define _MaCh3_Safe_Include_Start_</div><div class="ttdoc">KS: Avoiding warning checking for headers.</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00126">Core.h:126</a></div></div>
 <div class="ttc" id="aCore_8h_html_a91209a17295738b34b124b79faa68a1b"><div class="ttname"><a href="Core_8h.html#a91209a17295738b34b124b79faa68a1b">_MaCh3_Safe_Include_End_</a></div><div class="ttdeci">#define _MaCh3_Safe_Include_End_</div><div class="ttdoc">KS: Restore warning checking after including external headers.</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00140">Core.h:140</a></div></div>
 <div class="ttc" id="aHistogramUtils_8cpp_html_a1d326700660ac56ba63cba9ac12316bc"><div class="ttname"><a href="HistogramUtils_8cpp.html#a1d326700660ac56ba63cba9ac12316bc">MakeFluctuatedHistogramAlternative</a></div><div class="ttdeci">void MakeFluctuatedHistogramAlternative(TH1D *FluctHist, TH1D *PolyHist, TRandom3 *rand)</div><div class="ttdoc">Make Poisson fluctuation of TH1D hist using slow method which is only for cross-check.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00466">HistogramUtils.cpp:466</a></div></div>
@@ -801,7 +870,7 @@ $(function() {
 <div class="ttc" id="aHistogramUtils_8cpp_html_ab18c6b2408d7b9021bad06d47a06ee8d"><div class="ttname"><a href="HistogramUtils_8cpp.html#ab18c6b2408d7b9021bad06d47a06ee8d">NoOverflowIntegral</a></div><div class="ttdeci">double NoOverflowIntegral(TH2Poly *poly)</div><div class="ttdoc">WP: Helper function for calculating binned Integral of TH2Poly i.e not including overflow.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00050">HistogramUtils.cpp:50</a></div></div>
 <div class="ttc" id="aHistogramUtils_8cpp_html_ab1a4b12771b60a4afcbe070d5eeb1b14"><div class="ttname"><a href="HistogramUtils_8cpp.html#ab1a4b12771b60a4afcbe070d5eeb1b14">ConvertTH2DtoTH2Poly</a></div><div class="ttdeci">TH2Poly * ConvertTH2DtoTH2Poly(TH2D *hist)</div><div class="ttdoc">KS: Convert TH2Poly to TH2D.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00282">HistogramUtils.cpp:282</a></div></div>
 <div class="ttc" id="aHistogramUtils_8cpp_html_ace2e66f51b48a3a27bd6242189c64750"><div class="ttname"><a href="HistogramUtils_8cpp.html#ace2e66f51b48a3a27bd6242189c64750">MakePolyHist</a></div><div class="ttdeci">TH2Poly * MakePolyHist(const std::string &amp;name, const std::vector&lt; double &gt; &amp;BinArray_x, const std::vector&lt; double &gt; &amp;BinArray_y)</div><div class="ttdoc">WP: Helper function to create TH2Poly histogram with uniform binning.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00370">HistogramUtils.cpp:370</a></div></div>
-<div class="ttc" id="aHistogramUtils_8cpp_html_adeffb8ae064bd6bd7bc1f7871921488a"><div class="ttname"><a href="HistogramUtils_8cpp.html#adeffb8ae064bd6bd7bc1f7871921488a">MakeSummaryFromSpectra</a></div><div class="ttdeci">std::unique_ptr&lt; TH1D &gt; MakeSummaryFromSpectra(const TH2D *Spectra, const std::string &amp;name)</div><div class="ttdoc">Build a 1D posterior-predictive summary from a violin spectrum.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00622">HistogramUtils.cpp:622</a></div></div>
+<div class="ttc" id="aHistogramUtils_8cpp_html_adeffb8ae064bd6bd7bc1f7871921488a"><div class="ttname"><a href="HistogramUtils_8cpp.html#adeffb8ae064bd6bd7bc1f7871921488a">MakeSummaryFromSpectra</a></div><div class="ttdeci">std::unique_ptr&lt; TH1D &gt; MakeSummaryFromSpectra(const TH2D *Spectra, const std::string &amp;name)</div><div class="ttdoc">Build a 1D posterior-predictive summary from a violin spectrum.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00621">HistogramUtils.cpp:621</a></div></div>
 <div class="ttc" id="aHistogramUtils_8cpp_html_af6c0e794fc9fe6b93be0d07fc84ca67a"><div class="ttname"><a href="HistogramUtils_8cpp.html#af6c0e794fc9fe6b93be0d07fc84ca67a">CalculateQ2</a></div><div class="ttdeci">double CalculateQ2(double PLep, double PUpd, double EnuTrue, double InitialQ2)</div><div class="ttdoc">Recalculate Q^2 after Eb shift. Takes in shifted lepton momentum, lepton angle, and true neutrino ene...</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00581">HistogramUtils.cpp:581</a></div></div>
 <div class="ttc" id="aHistogramUtils_8h_html"><div class="ttname"><a href="HistogramUtils_8h.html">HistogramUtils.h</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00037">MaCh3Logger.h:37</a></div></div>
@@ -809,7 +878,8 @@ $(function() {
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class used throughout MaCh3.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00023">MaCh3Exception.h:23</a></div></div>
 <div class="ttc" id="anamespaceM3_html"><div class="ttname"><a href="namespaceM3.html">M3</a></div><div class="ttdoc">Main namespace for MaCh3 software.</div></div>
 <div class="ttc" id="anamespaceM3_html_a75bda934f7f63fc70bf57eac209dfdfe"><div class="ttname"><a href="namespaceM3.html#a75bda934f7f63fc70bf57eac209dfdfe">M3::ScaleHistogram</a></div><div class="ttdeci">void ScaleHistogram(TH1 *Sample_Hist, const double scale)</div><div class="ttdoc">Scale histogram to get divided by bin width.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00681">HistogramUtils.cpp:681</a></div></div>
-<div class="ttc" id="anamespaceM3_html_a87841bdbf0e0a2a733d9e4ca499f820d"><div class="ttname"><a href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a></div><div class="ttdeci">TFile * Open(const std::string &amp;Name, const std::string &amp;Type, const std::string &amp;File, const int Line)</div><div class="ttdoc">Opens a ROOT file with the given name and mode.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00663">HistogramUtils.cpp:663</a></div></div>
+<div class="ttc" id="anamespaceM3_html_a87841bdbf0e0a2a733d9e4ca499f820d"><div class="ttname"><a href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a></div><div class="ttdeci">TFile * Open(const std::string &amp;Name, const std::string &amp;Type, const std::string &amp;File, const int Line)</div><div class="ttdoc">Opens a ROOT file with the given name and mode.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00662">HistogramUtils.cpp:662</a></div></div>
+<div class="ttc" id="anamespaceM3_html_a9639893e99d55464cc35f36e9634bab3"><div class="ttname"><a href="namespaceM3.html#a9639893e99d55464cc35f36e9634bab3">M3::CheckBinningMatch</a></div><div class="ttdeci">void CheckBinningMatch(TH1D *Hist1, TH1D *Hist2, const std::string &amp;File, const int Line)</div><div class="ttdoc">KS: Helper function check if data and MC binning matches.</div><div class="ttdef"><b>Definition:</b> <a href="HistogramUtils_8cpp_source.html#l00701">HistogramUtils.cpp:701</a></div></div>
 <div class="ttc" id="anamespaceMaCh3Utils_html_a1b305c72615a48a89e74a9c3ded69c02"><div class="ttname"><a href="namespaceMaCh3Utils.html#a1b305c72615a48a89e74a9c3ded69c02">MaCh3Utils::GetMassFromPDG</a></div><div class="ttdeci">double GetMassFromPDG(const int PDG)</div><div class="ttdoc">Return mass for given PDG.</div><div class="ttdef"><b>Definition:</b> <a href="SampleStructs_8h_source.html#l00727">SampleStructs.h:727</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- Footer for MaCh3 Doxygen documentation -->
