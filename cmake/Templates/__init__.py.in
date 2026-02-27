@@ -1,19 +1,39 @@
 import os
 import ctypes
+import glob
 
+## where are we????
 lib_dir = f"{os.path.join(os.path.split(os.path.realpath(__file__))[0])}/lib"
 
-ctypes.cdll.LoadLibrary(f'{lib_dir}/libyaml-cpp.so')
-ctypes.cdll.LoadLibrary(f'{lib_dir}/libOscProbCalcer.so')
-ctypes.cdll.LoadLibrary(f'{lib_dir}/libOscillator.so')
-ctypes.cdll.LoadLibrary(f'{lib_dir}/libManager.so')
-ctypes.cdll.LoadLibrary(f'{lib_dir}/libSplineDict.so')
-ctypes.cdll.LoadLibrary(f'{lib_dir}/libParameters.so')
-ctypes.cdll.LoadLibrary(f'{lib_dir}/libSplines.so')
-ctypes.cdll.LoadLibrary(f'{lib_dir}/libSamples.so')
-ctypes.cdll.LoadLibrary(f'{lib_dir}/libFitters.so')
-ctypes.cdll.LoadLibrary(f'{lib_dir}/libPlotting.so')
+## load up root libraries
+ctypes.cdll.LoadLibrary(f'/home/ewan/ROOT/root/lib/libTree.so')
+ctypes.cdll.LoadLibrary(f'/home/ewan/ROOT/root/lib/libGpad.so')
+ctypes.cdll.LoadLibrary(f'/home/ewan/ROOT/root/lib/libHist.so')
+ctypes.cdll.LoadLibrary(f'/home/ewan/ROOT/root/lib/libCore.so')
 
-from ._pyMaCh3 import __doc__, fitters, manager, plotting, samples, splines, parameters
+## load all the core libraries
+ctypes.cdll.LoadLibrary(f'{lib_dir}/core/libyaml-cpp.so')
+ctypes.cdll.LoadLibrary(f'{lib_dir}/core/libOscProbCalcer.so')
+ctypes.cdll.LoadLibrary(f'{lib_dir}/core/libOscillator.so')
+ctypes.cdll.LoadLibrary(f'{lib_dir}/core/libManager.so')
+ctypes.cdll.LoadLibrary(f'{lib_dir}/core/libSplineDict.so')
+ctypes.cdll.LoadLibrary(f'{lib_dir}/core/libParameters.so')
+ctypes.cdll.LoadLibrary(f'{lib_dir}/core/libSplines.so')
+ctypes.cdll.LoadLibrary(f'{lib_dir}/core/libSamples.so')
+ctypes.cdll.LoadLibrary(f'{lib_dir}/core/libFitters.so')
+ctypes.cdll.LoadLibrary(f'{lib_dir}/core/libPlotting.so')
 
-__all__ = ["__doc__", "fitters", "manager", "plotting", "samples", "splines", "parameters"]
+## search for any experiment specific libraries
+other_libs = [@LINK_TARGET_LIB_LIST@]
+
+print(other_libs)
+
+for lib in other_libs:
+    ctypes.cdll.LoadLibrary(f"{lib_dir}/other/lib{lib}.so")
+
+ctypes.cdll.LoadLibrary(f'@ROOT_LIBRARY_DIR@/libCore.so')
+ctypes.cdll.LoadLibrary(f'@ROOT_LIBRARY_DIR@/libTree.so')
+
+from ._pyMaCh3 import __doc__, fitters, manager, plotting, samples, splines, parameters @PYMACH3_ADDITIONAL_MODULE_IMPORT@
+
+__all__ = ["__doc__", "fitters", "manager", "plotting", "samples", "splines", "parameters" @PYMACH3_ADDITIONAL_MODULE_NAMES@]
