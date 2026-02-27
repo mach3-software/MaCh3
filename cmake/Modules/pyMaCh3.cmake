@@ -68,6 +68,14 @@ function(setup_pyMaCh3)
     set(PYMACH3_ADDITIONAL_MODULE_NAMES  "${PYMACH3_ADDITIONAL_MODULE_NAMES}, \"${module}\"")
   endforeach()
 
+  ## set the MaCh3 root directory so can be used in the __init__.py 
+  if (NOT MaCh3_PREFIX)
+    set(MaCh3_BUILD_PATH ${MaCh3_BINARY_DIR})
+  else()
+    set(MaCh3_BUILD_PATH ${MaCh3_PREFIX})
+  endif()
+
+  message("aaaa ${MaCh3_BUILD_PATH}")
 
   ## generate our module __init__ file
   message("__init__.py template file: ${MaCh3_PYTHON_INIT_TEMPLATE}")
