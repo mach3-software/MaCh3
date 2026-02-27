@@ -369,8 +369,11 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a5eab24c8508cdd247c23b9bd9b3017b0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerFD.html#a5eab24c8508cdd247c23b9bd9b3017b0">FillHist</a> (const int Sample, TH1 *Hist, double *Array)</td></tr>
 <tr class="memdesc:a5eab24c8508cdd247c23b9bd9b3017b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a histogram with the event-level information used in the fit.  <a href="classSampleHandlerFD.html#a5eab24c8508cdd247c23b9bd9b3017b0">More...</a><br /></td></tr>
 <tr class="separator:a5eab24c8508cdd247c23b9bd9b3017b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a82f1bdb0e52ea1d42ee59cd7dc195ac0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerFD.html#a82f1bdb0e52ea1d42ee59cd7dc195ac0">FillArray_MP</a> ()</td></tr>
+<tr class="memdesc:a82f1bdb0e52ea1d42ee59cd7dc195ac0"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Nice new multi-threaded function which calculates the event weights and fills the relevant bins of an array.  <a href="classSampleHandlerFD.html#a82f1bdb0e52ea1d42ee59cd7dc195ac0">More...</a><br /></td></tr>
+<tr class="separator:a82f1bdb0e52ea1d42ee59cd7dc195ac0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeef0f943cb1e0d4c9bba4814cb24a507"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerFD.html#aeef0f943cb1e0d4c9bba4814cb24a507">FillArray</a> ()</td></tr>
-<tr class="memdesc:aeef0f943cb1e0d4c9bba4814cb24a507"><td class="mdescLeft">&#160;</td><td class="mdescRight">DB Nice new multi-threaded function which calculates the event weights and fills the relevant bins of an array.  <a href="classSampleHandlerFD.html#aeef0f943cb1e0d4c9bba4814cb24a507">More...</a><br /></td></tr>
+<tr class="memdesc:aeef0f943cb1e0d4c9bba4814cb24a507"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function which does the core reweighting, fills the <a class="el" href="classSampleHandlerFD.html#a85415d4ac54a5aefe78e5ab4d7bdb769">SampleHandlerFD::SampleHandlerFD_array</a> vector with the weight calculated from reweighting.  <a href="classSampleHandlerFD.html#aeef0f943cb1e0d4c9bba4814cb24a507">More...</a><br /></td></tr>
 <tr class="separator:aeef0f943cb1e0d4c9bba4814cb24a507"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac1f944f73f43a68be3af388cd17bc5e3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSampleHandlerFD.html#ac1f944f73f43a68be3af388cd17bc5e3">ResetHistograms</a> ()</td></tr>
 <tr class="memdesc:ac1f944f73f43a68be3af388cd17bc5e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper function to reset histograms.  <a href="classSampleHandlerFD.html#ac1f944f73f43a68be3af388cd17bc5e3">More...</a><br /></td></tr>
@@ -1493,8 +1496,7 @@ Ed Atkin </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p>DB Nice new multi-threaded function which calculates the event weights and fills the relevant bins of an array. </p>
-<p>Function which does the core reweighting, fills the <a class="el" href="classSampleHandlerFD.html#a85415d4ac54a5aefe78e5ab4d7bdb769">SampleHandlerFD::SampleHandlerFD_array</a> vector with the weight calculated from reweighting </p>
+<p>Function which does the core reweighting, fills the <a class="el" href="classSampleHandlerFD.html#a85415d4ac54a5aefe78e5ab4d7bdb769">SampleHandlerFD::SampleHandlerFD_array</a> vector with the weight calculated from reweighting. </p>
 
 <p class="definition">Definition at line <a class="el" href="SampleHandlerFD_8cpp_source.html#l00374">374</a> of file <a class="el" href="SampleHandlerFD_8cpp_source.html">SampleHandlerFD.cpp</a>.</p>
 <div class="fragment"><div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;                                {</div>
@@ -1535,6 +1537,93 @@ Ed Atkin </dd></dl>
 <div class="ttc" id="aclassSampleHandlerFD_html_adaa2f3489afd3d80356649d439e88298"><div class="ttname"><a href="classSampleHandlerFD.html#adaa2f3489afd3d80356649d439e88298">SampleHandlerFD::ApplyShifts</a></div><div class="ttdeci">virtual void ApplyShifts(const int iEvent)</div><div class="ttdoc">ETA - generic function applying shifts.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8cpp_source.html#l00562">SampleHandlerFD.cpp:562</a></div></div>
 <div class="ttc" id="anamespaceM3_html_aadca64372617e10cf9fdf70d0b0eb23f"><div class="ttname"><a href="namespaceM3.html#aadca64372617e10cf9fdf70d0b0eb23f">M3::UnderOverFlowBin</a></div><div class="ttdeci">constexpr static const int UnderOverFlowBin</div><div class="ttdoc">Mark bin which is overflow or underflow in MaCh3 binning.</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00091">Core.h:91</a></div></div>
 <div class="ttc" id="astructEventInfo_html"><div class="ttname"><a href="structEventInfo.html">EventInfo</a></div><div class="ttdoc">Stores info about each MC event used during reweighting routine.</div><div class="ttdef"><b>Definition:</b> <a href="FarDetectorCoreInfoStruct_8h_source.html#l00082">FarDetectorCoreInfoStruct.h:82</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a82f1bdb0e52ea1d42ee59cd7dc195ac0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a82f1bdb0e52ea1d42ee59cd7dc195ac0">&#9670;&nbsp;</a></span>FillArray_MP()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SampleHandlerFD::FillArray_MP </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>DB Nice new multi-threaded function which calculates the event weights and fills the relevant bins of an array. </p>
+<p>Multithreaded version of fillArray.</p>
+<p>Function which does the core reweighting, fills the <a class="el" href="classSampleHandlerFD.html#a85415d4ac54a5aefe78e5ab4d7bdb769">SampleHandlerFD::SampleHandlerFD_array</a> vector with the weight calculated from reweighting but multithreaded</p>
+<dl class="section see"><dt>See also</dt><dd>fillArray() </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="SampleHandlerFD_8cpp_source.html#l00412">412</a> of file <a class="el" href="SampleHandlerFD_8cpp_source.html">SampleHandlerFD.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;                                   {</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;<span class="comment">// ************************************************</span></div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;  <span class="comment">//DB Reset which cuts to apply</span></div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;  <a class="code" href="classSampleHandlerFD.html#a07b3357278429dfe809d7d9d27682bf9">Selection</a> = <a class="code" href="classSampleHandlerFD.html#aa3832a3e2c438d4810811d83e1323cff">StoredSelection</a>;</div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160; </div>
+<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;  <span class="comment">// NOTE comment below is left for historical reasons</span></div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;  <span class="comment">//DB - Brain dump of speedup ideas</span></div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;  <span class="comment">//</span></div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;  <span class="comment">//Those relevant to reweighting</span></div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;  <span class="comment">// 1. Don&#39;t bother storing and calculating NC signal events - Implemented and saves marginal s/step</span></div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;  <span class="comment">// 2. Loop over spline event weight calculation in the following event loop - Currently done in splineSKBase-&gt;calcWeight() where multi-threading won&#39;t be optimised - Implemented and saves 0.3s/step</span></div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;  <span class="comment">// 3. Inline getDiscVar or somehow include that calculation inside the multi-threading - Implemented and saves about 0.01s/step</span></div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;  <span class="comment">// 4. Include isCC inside SKMCStruct so don&#39;t have to have several &#39;if&#39; statements determine if oscillation weight needs to be set to 1.0 for NC events - Implemented and saves marginal s/step</span></div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;  <span class="comment">// 5. Do explicit check on adjacent bins when finding event XBin instead of looping over all BinEdge indices - Implemented but doesn&#39;t significantly affect s/step</span></div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;  <span class="comment">//</span></div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;  <span class="comment">//Other aspects</span></div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;  <span class="comment">// 1. Order minituples in Y-axis variable as this will *hopefully* reduce cache misses inside SampleHandlerFD_array_class[yBin][xBin]</span></div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;  <span class="comment">//</span></div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;  <span class="comment">// We will hit &lt;0.1 s/step eventually! :D</span></div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;  <span class="keyword">const</span> <span class="keyword">auto</span> TotalBins = <a class="code" href="classSampleHandlerFD.html#a231b4b5b9b5e5f0d1cb9a3ba96c85ec5">Binning</a>-&gt;GetNBins();</div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> NumberOfEvents = <a class="code" href="classSampleHandlerBase.html#a6ceca02f83e878ef1aec6e54e7b2f331">GetNEvents</a>();</div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;<span class="preprocessor">  #pragma omp parallel for reduction(+:SampleHandlerFD_array[:TotalBins], SampleHandlerFD_array_w2[:TotalBins])</span></div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> iEvent = 0; iEvent &lt; NumberOfEvents; ++iEvent) {</div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;    <span class="comment">//ETA - generic functions to apply shifts to kinematic variables</span></div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;    <span class="comment">// Apply this before IsEventSelected is called.</span></div>
+<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;    <a class="code" href="classSampleHandlerFD.html#adaa2f3489afd3d80356649d439e88298">ApplyShifts</a>(iEvent);</div>
+<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160; </div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;    <span class="keyword">const</span> <a class="code" href="structEventInfo.html">EventInfo</a>* <a class="code" href="Core_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a> MCEvent = &amp;<a class="code" href="classSampleHandlerFD.html#ae422410559d7f3af0e0a80cc15fbfbff">MCSamples</a>[iEvent];</div>
+<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;    <span class="comment">//ETA - generic functions to apply shifts to kinematic variable</span></div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="classSampleHandlerFD.html#af67a9a10193e12526e3284d48f425185">IsEventSelected</a>(MCEvent-&gt;NominalSample, iEvent)){</div>
+<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;      <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;    }</div>
+<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160; </div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;    <span class="comment">// Virtual by default does nothing, has to happen before CalcWeightTotal</span></div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;    <a class="code" href="classSampleHandlerFD.html#a1781ff483b5bae72103e9298109c4698">CalcWeightFunc</a>(iEvent);</div>
+<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160; </div>
+<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;    <span class="keyword">const</span> <a class="code" href="namespaceM3.html#a1f95274549f25fc19fe7db343c8a7a68">M3::float_t</a> totalweight = <a class="code" href="classSampleHandlerFD.html#aa1c7c8384fd383170aacf4d83af1b382">CalcWeightTotal</a>(MCEvent);</div>
+<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;    <span class="comment">//DB Catch negative total weights and skip any event with a negative weight. Previously we would set weight to zero and continue but that is inefficient</span></div>
+<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;    <span class="keywordflow">if</span> (totalweight &lt;= 0.){</div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;      <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;    }</div>
+<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160; </div>
+<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;    <span class="comment">//DB Find the relevant bin in the PDF for each event</span></div>
+<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">int</span> GlobalBin = <a class="code" href="classSampleHandlerFD.html#a231b4b5b9b5e5f0d1cb9a3ba96c85ec5">Binning</a>-&gt;FindGlobalBin(MCEvent-&gt;NominalSample, MCEvent-&gt;KinVar, MCEvent-&gt;NomBin);</div>
+<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160; </div>
+<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;    <span class="comment">//ETA - we can probably remove this final if check on the -1?</span></div>
+<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;    <span class="comment">//Maybe we can add an overflow bin to the array and assign any events to this bin?</span></div>
+<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;    <span class="comment">//Might save us an extra if call?</span></div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;    <span class="comment">//DB Fill relevant part of thread array</span></div>
+<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;    <span class="keywordflow">if</span> (GlobalBin &gt; <a class="code" href="namespaceM3.html#aadca64372617e10cf9fdf70d0b0eb23f">M3::UnderOverFlowBin</a>) {</div>
+<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;      <a class="code" href="classSampleHandlerFD.html#a85415d4ac54a5aefe78e5ab4d7bdb769">SampleHandlerFD_array</a>[GlobalBin] += totalweight;</div>
+<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;      <span class="keywordflow">if</span> (<a class="code" href="classSampleHandlerFD.html#a1ff1ef7d99cee6d6a9fba74296d4d0ea">FirstTimeW2</a>) <a class="code" href="classSampleHandlerFD.html#af5c6a3701c6ac76a96886ff13300a53b">SampleHandlerFD_array_w2</a>[GlobalBin] += totalweight*totalweight;</div>
+<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;    }</div>
+<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;  }</div>
+<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -5205,7 +5294,7 @@ template&lt;typename ParT &gt; </div>
 <div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160; </div>
 <div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;<span class="preprocessor">  #ifdef MULTITHREAD</span></div>
 <div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;  <span class="comment">// Call entirely different routine if we&#39;re running with openMP</span></div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;  FillArray_MP();</div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;  <a class="code" href="classSampleHandlerFD.html#a82f1bdb0e52ea1d42ee59cd7dc195ac0">FillArray_MP</a>();</div>
 <div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;<span class="preprocessor">  #else</span></div>
 <div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;  <a class="code" href="classSampleHandlerFD.html#aeef0f943cb1e0d4c9bba4814cb24a507">FillArray</a>();</div>
 <div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;<span class="preprocessor">  #endif</span></div>
@@ -5214,8 +5303,9 @@ template&lt;typename ParT &gt; </div>
 <div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;  <span class="keywordflow">if</span>(!<a class="code" href="classSampleHandlerFD.html#aa654562842a0da51ff917aaed517310e">UpdateW2</a>) <a class="code" href="classSampleHandlerFD.html#a1ff1ef7d99cee6d6a9fba74296d4d0ea">FirstTimeW2</a> = <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;}</div>
 <div class="ttc" id="aclassSampleHandlerFD_html_a691a4ec2c4c82b3c4437ead052644a54"><div class="ttname"><a href="classSampleHandlerFD.html#a691a4ec2c4c82b3c4437ead052644a54">SampleHandlerFD::PrepFunctionalParameters</a></div><div class="ttdeci">virtual void PrepFunctionalParameters()</div><div class="ttdoc">Update the functional parameter values to the latest proposed values. Needs to be called before every...</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8h_source.html#l00241">SampleHandlerFD.h:241</a></div></div>
+<div class="ttc" id="aclassSampleHandlerFD_html_a82f1bdb0e52ea1d42ee59cd7dc195ac0"><div class="ttname"><a href="classSampleHandlerFD.html#a82f1bdb0e52ea1d42ee59cd7dc195ac0">SampleHandlerFD::FillArray_MP</a></div><div class="ttdeci">void FillArray_MP()</div><div class="ttdoc">DB Nice new multi-threaded function which calculates the event weights and fills the relevant bins of...</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8cpp_source.html#l00412">SampleHandlerFD.cpp:412</a></div></div>
 <div class="ttc" id="aclassSampleHandlerFD_html_ac1f944f73f43a68be3af388cd17bc5e3"><div class="ttname"><a href="classSampleHandlerFD.html#ac1f944f73f43a68be3af388cd17bc5e3">SampleHandlerFD::ResetHistograms</a></div><div class="ttdeci">void ResetHistograms()</div><div class="ttdoc">Helper function to reset histograms.</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8cpp_source.html#l00472">SampleHandlerFD.cpp:472</a></div></div>
-<div class="ttc" id="aclassSampleHandlerFD_html_aeef0f943cb1e0d4c9bba4814cb24a507"><div class="ttname"><a href="classSampleHandlerFD.html#aeef0f943cb1e0d4c9bba4814cb24a507">SampleHandlerFD::FillArray</a></div><div class="ttdeci">void FillArray()</div><div class="ttdoc">DB Nice new multi-threaded function which calculates the event weights and fills the relevant bins of...</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8cpp_source.html#l00374">SampleHandlerFD.cpp:374</a></div></div>
+<div class="ttc" id="aclassSampleHandlerFD_html_aeef0f943cb1e0d4c9bba4814cb24a507"><div class="ttname"><a href="classSampleHandlerFD.html#aeef0f943cb1e0d4c9bba4814cb24a507">SampleHandlerFD::FillArray</a></div><div class="ttdeci">void FillArray()</div><div class="ttdoc">Function which does the core reweighting, fills the SampleHandlerFD::SampleHandlerFD_array vector wit...</div><div class="ttdef"><b>Definition:</b> <a href="SampleHandlerFD_8cpp_source.html#l00374">SampleHandlerFD.cpp:374</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
