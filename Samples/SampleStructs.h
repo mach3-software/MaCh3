@@ -721,9 +721,9 @@ namespace MaCh3Utils {
   // *****************************
   /// @brief Return mass for given PDG
   /// @note Get the mass of a particle from the PDG In GeV, not MeV!
-  /// @todo this could be constexpr in c++17
   /// @cite pdg2024 (particle masses)
   /// @cite ame2020 (nuclear masses)
+  /// @todo this could be constexpr in c++17
   inline double GetMassFromPDG(const int PDG) {
   // *****************************
     switch (abs(PDG)) {
