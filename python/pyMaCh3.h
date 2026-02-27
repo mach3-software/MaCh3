@@ -6,12 +6,12 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include "plotting.h"
-#include "fitters.h"
-#include "samples.h"
-#include "manager.h"
-#include "parameters.h"
-#include "splines.h"
+#include "python/plotting.h"
+#include "python/fitters.h"
+#include "python/samples.h"
+#include "python/manager.h"
+#include "python/parameters.h"
+#include "python/splines.h"
 
 class MaCh3PyBinder {
 
