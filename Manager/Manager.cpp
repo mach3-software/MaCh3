@@ -6,15 +6,6 @@ _MaCh3_Safe_Include_Start_ //{
 _MaCh3_Safe_Include_End_ //}
 
 // *************************
-Manager::Manager(std::string const &filename)
-: config(M3OpenConfig(filename)) {
-// *************************
-  FileName = filename;
-
-  Initialise();
-}
-
-// *************************
 Manager::Manager(const YAML::Node ConfigNode) {
 // *************************
   config = ConfigNode;
