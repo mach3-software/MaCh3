@@ -205,6 +205,10 @@ if(MaCh3_MULTITHREAD_ENABLED)
     target_link_libraries(MaCh3CompilerOptions INTERFACE gomp)
   endif()
   target_compile_definitions(MaCh3CompileDefinitions INTERFACE MULTITHREAD)
+  # KS: This will pass variable to doxgyen and tell whether documentation should be with MP functions
+  set(DOXYGEN_PREDEFINED "MULTITHREAD")
+else()
+  set(DOXYGEN_PREDEFINED "")
 endif()
 
 if(MaCh3_GPU_ENABLED) 
