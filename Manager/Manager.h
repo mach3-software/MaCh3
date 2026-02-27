@@ -17,7 +17,13 @@ class Manager {
 public:
   /// @brief Constructs a manager object with the specified file name.
   /// @param filename The name of the configuration file.
-  explicit Manager(std::string const &filename);
+  explicit Manager(std::string const &filename)
+  : config(M3OpenConfig(filename)) {
+    FileName = filename;
+
+    Initialise();
+  };
+
   /// @brief Constructs a manager object with the specified YAML
   /// @note This is primarily used when initializing from a previous chain, allowing the creation of a manager instance based embedded YAML in that chain.
   /// @param ConfigNode Actual YAML config
