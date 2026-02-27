@@ -932,7 +932,9 @@ TH1* SampleHandlerFD::GetDataHist(const std::string& Sample) {
   return GetDataHist(Index);
 }
 
+// ************************************************
 void SampleHandlerFD::AddData(const int Sample, TH1* Data) {
+// ************************************************
   int Dim = GetNDim(Sample);
   MACH3LOG_INFO("Adding {}D data histogram: {} with {:.2f} events", Dim, Data->GetTitle(), Data->Integral());
   // delete old histogram
@@ -955,6 +957,8 @@ void SampleHandlerFD::AddData(const int Sample, TH1* Data) {
   if (Dim == 1) {
     // Ensure we really have a TH1D
     ChecHistType("TH1D", Dim, SampleDetails[Sample].DataHist, __FILE__, __LINE__);
+    M3::CheckBinningMatch(static_cast<TH1D*>(SampleDetails[Sample].DataHist),
+                          static_cast<TH1D*>(SampleDetails[Sample].MCHist), __FILE__, __LINE__);
     for (int xBin = 0; xBin < Binning->GetNAxisBins(Sample, 0); ++xBin) {
       const int idx = Binning->GetGlobalBinSafe(Sample, {xBin});
       // ROOT histograms are 1-based, so bin index + 1
@@ -965,6 +969,8 @@ void SampleHandlerFD::AddData(const int Sample, TH1* Data) {
   } else if (Dim == 2) {
     if(Binning->IsUniform(Sample)) {
       ChecHistType("TH2D", Dim, SampleDetails[Sample].DataHist, __FILE__, __LINE__);
+      M3::CheckBinningMatch(static_cast<TH2D*>(SampleDetails[Sample].DataHist),
+                            static_cast<TH2D*>(SampleDetails[Sample].MCHist), __FILE__, __LINE__);
       for (int yBin = 0; yBin < Binning->GetNAxisBins(Sample, 1); ++yBin) {
         for (int xBin = 0; xBin < Binning->GetNAxisBins(Sample, 0); ++xBin) {
           const int idx = Binning->GetGlobalBinSafe(Sample, {xBin, yBin});
@@ -974,6 +980,8 @@ void SampleHandlerFD::AddData(const int Sample, TH1* Data) {
       }
     } else{
       ChecHistType("TH2Poly", Dim, SampleDetails[Sample].DataHist, __FILE__, __LINE__);
+      M3::CheckBinningMatch(static_cast<TH2Poly*>(SampleDetails[Sample].DataHist),
+                            static_cast<TH2Poly*>(SampleDetails[Sample].MCHist), __FILE__, __LINE__);
       for (int iBin = 0; iBin < Binning->GetNBins(Sample); ++iBin) {
         const int idx = iBin + Binning->GetSampleStartBin(Sample);
         //Need to do +1 for the bin, this is to be consistent with ROOTs binning scheme
@@ -986,6 +994,8 @@ void SampleHandlerFD::AddData(const int Sample, TH1* Data) {
     SampleDetails[Sample].DataHist->GetZaxis()->SetTitle("Number of Events");
   } else {
     ChecHistType("TH1D", Dim, SampleDetails[Sample].DataHist, __FILE__, __LINE__);
+    M3::CheckBinningMatch(static_cast<TH1D*>(SampleDetails[Sample].DataHist),
+                          static_cast<TH1D*>(SampleDetails[Sample].MCHist), __FILE__, __LINE__);
     for (int iBin = 0; iBin < Binning->GetNBins(Sample); ++iBin) {
       const int idx = iBin + Binning->GetSampleStartBin(Sample);
       //Need to do +1 for the bin, this is to be consistent with ROOTs binning scheme

@@ -44,9 +44,16 @@
 /// ## Uniform and Non-Uniform Binning Scheme
 /// MaCh3 supports Uniform and Non-Uniform binning scheme
 ///
-/// In the non-uniform scheme, bin sizes may vary along each dimension,
-/// but all bins are required to be axis-aligned hyper-rectangles.
-/// Arbitrary or irregular bin shapes are not supported like banana-shape.
+/// Uniform binning uses a regular Cartesian grid.
+/// Bins are constructed as the Cartesian product of 1D bin edges,
+/// forming axis-aligned rectangles (or hyper-rectangles in higher dimensions).
+/// Bin widths may be equal or variable, but the grid structure is regular.
+///
+/// In the non-uniform scheme, bin sizes may vary and bins may span
+/// different ranges along each dimension. However, all bins must remain
+/// axis-aligned hyper-rectangles.
+/// Arbitrary or irregular bin shapes (e.g. curved or "banana-shaped" bins)
+/// are not supported.
 ///
 /// Example of Uniform
 /// @code

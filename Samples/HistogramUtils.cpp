@@ -617,7 +617,6 @@ double CalculateEnu(double PLep, double costh, double Eb, bool neutrino){
   return Enu;
 }
 
-
 // ***********************************************
 std::unique_ptr<TH1D> MakeSummaryFromSpectra(const TH2D* Spectra,
                                              const std::string& name) {
@@ -678,8 +677,9 @@ TFile* Open(const std::string& Name, const std::string& Type, const std::string&
   return OutFile;
 }
 
-void ScaleHistogram(TH1* Sample_Hist, const double scale)
-{
+// ***************************************************************************
+void ScaleHistogram(TH1* Sample_Hist, const double scale) {
+// ***************************************************************************
   for (int j = 0; j <= Sample_Hist->GetNbinsX(); ++j)
   {
     double num = Sample_Hist->GetBinContent(j);
@@ -693,6 +693,75 @@ void ScaleHistogram(TH1* Sample_Hist, const double scale)
       valueErr = numErr/(den/scale);
       Sample_Hist->SetBinContent(j,value);
       Sample_Hist->SetBinError(j,valueErr);
+    }
+  }
+}
+// ***************************************************************************
+//KS: Helper function check if data and MC binning matches
+void CheckBinningMatch(TH1D* Hist1, TH1D* Hist2, const std::string& File, const int Line) {
+// ***************************************************************************
+  if (Hist1->GetNbinsX() != Hist2->GetNbinsX()) {
+    MACH3LOG_ERROR("Number of bins does not match for TH1D: {} vs {}", Hist1->GetNbinsX(), Hist2->GetNbinsX());
+    throw MaCh3Exception(File, Line);
+  }
+  for (int i = 1; i <= Hist1->GetNbinsX(); ++i) {
+    if (std::fabs(Hist1->GetXaxis()->GetBinLowEdge(i) - Hist2->GetXaxis()->GetBinLowEdge(i)) > 0.001 ||
+      std::fabs(Hist1->GetXaxis()->GetBinUpEdge(i) - Hist2->GetXaxis()->GetBinUpEdge(i)) > 0.001) {
+      MACH3LOG_ERROR("Bin edges do not match for TH1D at bin {}", i);
+      throw MaCh3Exception(File, Line);
+    }
+  }
+}
+// ***************************************************************************
+//KS: Helper function check if data and MC binning matches
+void CheckBinningMatch(TH2D* Hist1, TH2D* Hist2, const std::string& File, const int Line) {
+// ***************************************************************************
+  if (Hist1->GetNbinsX() != Hist2->GetNbinsX() || Hist1->GetNbinsY() != Hist2->GetNbinsY()) {
+    MACH3LOG_ERROR("Number of bins does not match for TH2D");
+    throw MaCh3Exception(File, Line);
+  }
+
+  for (int i = 1; i <= Hist1->GetNbinsX(); ++i) {
+    if (std::fabs(Hist1->GetXaxis()->GetBinLowEdge(i) - Hist2->GetXaxis()->GetBinLowEdge(i)) > 0.001 ||
+      std::fabs(Hist1->GetXaxis()->GetBinUpEdge(i) - Hist2->GetXaxis()->GetBinUpEdge(i)) > 0.001) {
+      MACH3LOG_ERROR("X bin edges do not match for TH2D at bin {}", i);
+      throw MaCh3Exception(File, Line);
+    }
+  }
+  for (int j = 1; j <= Hist1->GetNbinsY(); ++j) {
+    if (std::fabs(Hist1->GetYaxis()->GetBinLowEdge(j) - Hist2->GetYaxis()->GetBinLowEdge(j)) > 0.001 ||
+      std::fabs(Hist1->GetYaxis()->GetBinUpEdge(j) - Hist2->GetYaxis()->GetBinUpEdge(j)) > 0.001) {
+      MACH3LOG_ERROR("Y bin edges do not match for TH2D at bin {}", j);
+      throw MaCh3Exception(File, Line);
+    }
+  }
+}
+
+// ***************************************************************************
+//KS: Helper function check if data and MC binning matches
+void CheckBinningMatch(TH2Poly* Hist1, TH2Poly* Hist2, const std::string& File, const int Line) {
+// ***************************************************************************
+  int NBins1 = Hist1->GetNumberOfBins();
+  int NBins2 = Hist2->GetNumberOfBins();
+  if (NBins1 != NBins2) {
+    MACH3LOG_ERROR("Number of bins does not match for TH2Poly: {} vs {}", NBins1, NBins2);
+    throw MaCh3Exception(File, Line);
+  }
+  for (int j = 1; j <= NBins1; j++)
+  {
+    //KS: There is weird offset between bin content and GetBins so this is correct, in spite of looking funny
+    TH2PolyBin* polybin1 = static_cast<TH2PolyBin*>(Hist1->GetBins()->At(j - 1));
+    TH2PolyBin* polybin2 = static_cast<TH2PolyBin*>(Hist2->GetBins()->At(j - 1));
+
+    if( std::fabs(polybin2->GetXMin() - polybin1->GetXMin()) > 0.001 ||
+      std::fabs(polybin2->GetXMax() - polybin1->GetXMax()) > 0.001 ||
+      std::fabs(polybin2->GetYMin() - polybin1->GetYMin()) > 0.001 ||
+      std::fabs(polybin2->GetYMax() - polybin1->GetYMax()) > 0.001  )
+    {
+      MACH3LOG_ERROR("Binning doesn't match", Hist1->GetTitle());
+      MACH3LOG_ERROR("data  x min {} x max {} y min {} y max {}", polybin2->GetXMin(), polybin2->GetXMax(), polybin2->GetYMin(), polybin2->GetYMax());
+      MACH3LOG_ERROR("mc    x min {} x max {} y min {} y max {}", polybin1->GetXMin(), polybin1->GetXMax(), polybin1->GetYMin(), polybin1->GetYMax());
+      throw MaCh3Exception(File , Line );
     }
   }
 }
