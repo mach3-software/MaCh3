@@ -271,6 +271,7 @@ add_subdirectory(Diagnostics)
 add_subdirectory(Plotting)
 add_subdirectory(python)
 
+set(MaCh3_PYTHON_INIT_TEMPLATE ${CMAKE_CURRENT_LIST_DIR}/cmake/Templates/__init__.py.in)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/pyMaCh3.cmake)
 if (MaCh3_PYTHON_ENABLED)
   setup_pyMaCh3(
