@@ -377,6 +377,115 @@ void OverlayPredicitve(const YAML::Node& Settings,
   delete pad2;
 }
 
+/// @brief KS: Get mean and error from gaussian fit to event distribution
+void GetMeanError(TH1D* hist, double &Mean, double &Error){
+  TF1 *Gauss = hist->GetFunction("Fit"); //This name is hardcoded be careful
+  //KS: Get mean and error from Gauss
+  Mean = Gauss->GetParameter(1);
+  Error = Gauss->GetParameter(2);
+
+  //KS: Get mean and error from HPD
+  //Mean = hist->GetMean();
+  //Error = hpost->GetRMS();
+}
+
+/// @brief KS Print event rates in Latex like table
+void PrintPosteriorEventRates(const std::vector<TFile*>& InputFiles,
+                              const std::vector<std::string>& SampleNames) {
+  MACH3LOG_INFO("Starting {}", __func__);
+  MACH3LOG_INFO("");
+
+  double mean, error;
+  //KS: We now prepare to make tables for TN etc.
+  std::cout<<"\\begin{table}[htb]"<<std::endl;
+  std::cout<<"\\centering"<<std::endl;
+  std::cout<<"\\begin{tabular}{ | l |";
+  for(unsigned int f = 0; f < InputFiles.size(); f++)
+  {
+    std::cout<<" c |";
+  }
+  std::cout<<"} \\hline"<<std::endl;
+  std::cout<<"Sample ";
+  for(unsigned int f = 0; f < InputFiles.size(); f++)
+  {
+    std::cout<<"& Event Rates  ";
+  }
+  std::cout<<"\\\\ \\hline"<<std::endl;
+  for(unsigned int i = 0; i < SampleNames.size(); i++)
+  {
+    std::cout<<SampleNames[i];
+    std::string TempString = "Predictive/" + SampleNames[i]+"/"+SampleNames[i]+"_sum";
+    for(unsigned int f = 0; f < InputFiles.size(); f++)
+    {
+      TH1D *hist = static_cast<TH1D*>(InputFiles[f]->Get(TempString.c_str()));
+      GetMeanError(hist, mean, error);
+      std::cout<<" & "<<mean<<" $\\pm$ "<<error;
+    }
+    std::cout<<" \\\\"<<std::endl;
+  }
+  std::cout<<"Total";
+  for(unsigned int f = 0; f < InputFiles.size(); f++)
+  {
+    TH1D *histTot = static_cast<TH1D*>(InputFiles[f]->Get("Predictive/Total/Total_sum"));
+    GetMeanError(histTot, mean, error);
+    std::cout<<" & "<<mean<<" $\\pm$ "<<error;
+  }
+  std::cout<<" \\\\"<<std::endl;
+  std::cout<<"\\hline"<<std::endl;
+  std::cout<<"\\end{tabular}"<<std::endl;
+  std::cout<<"\\end{table}"<<std::endl;
+  MACH3LOG_INFO("");
+}
+
+/// @brief KS: Print Fractional Uncertainties into Latex table format
+void PrintPosteriorFractionalUncertainties(const std::vector<TFile*>& InputFiles,
+                                           const std::vector<std::string>& SampleNames) {
+  MACH3LOG_INFO("Starting {}", __func__);
+  MACH3LOG_INFO("");
+  double mean, error;
+
+  //KS: Fractional uncertainties on the prior and posterior predictive event rates.
+  std::cout<<"\\begin{table}[htb]"<<std::endl;
+  std::cout<<"\\centering"<<std::endl;
+  std::cout<<"\\begin{tabular}{ | l |";
+  for(unsigned int f = 0; f < InputFiles.size(); f++)
+  {
+    std::cout<<" c |";
+  }
+  std::cout<<"} \\hline"<<std::endl;
+
+  std::cout<<"Sample ";
+  for(unsigned int f = 0; f < InputFiles.size(); f++)
+  {
+    std::cout<<"& $\\delta N / N (\\%)$";
+  }
+  std::cout<<"\\\\ \\hline"<<std::endl;
+
+  for(unsigned int i = 0; i < SampleNames.size(); i++)
+  {
+    std::cout<<SampleNames[i];
+    std::string TempString = "Predictive/" + SampleNames[i]+"/"+SampleNames[i]+"_sum";
+    for(unsigned int f = 0; f < InputFiles.size(); f++)
+    {
+      TH1D *hist = static_cast<TH1D*>(InputFiles[f]->Get(TempString.c_str()));
+      GetMeanError(hist, mean, error);
+      std::cout<<" & "<<error/mean*100;
+    }
+    std::cout<<" \\\\"<<std::endl;
+  }
+  std::cout<<"Total";
+  for(unsigned int f = 0; f < InputFiles.size(); f++)
+  {
+    TH1D *histTotal = static_cast<TH1D*>(InputFiles[f]->Get("Predictive/Total/Total_sum"));
+    GetMeanError(histTotal, mean, error);
+    std::cout<<" & "<<error/mean*100;
+  }
+  std::cout<<"\\\\ \\hline"<<std::endl;
+  std::cout<<"\\end{tabular}"<<std::endl;
+  std::cout<<"\\end{table}"<<std::endl;
+  MACH3LOG_INFO("");
+}
+
 void PredictivePlotting(const std::string& ConfigName,
                         const std::vector<std::string>& FileNames)
 {
@@ -417,6 +526,10 @@ void PredictivePlotting(const std::string& ConfigName,
   OverlayViolin(settings, InputFiles, Samples, Dimensions, canvas);
   // Get PValue per sample
   PrintPosteriorPValue(settings, InputFiles, Samples);
+  // KS: Print Fractional Uncertainties into Latex table format
+  PrintPosteriorEventRates(InputFiles, Samples);
+  // KS: Print Fractional Uncertainties into Latex table format
+  PrintPosteriorFractionalUncertainties(InputFiles, Samples);
 
   canvas->Print("Overlay_Predictive.pdf]", "pdf");
 

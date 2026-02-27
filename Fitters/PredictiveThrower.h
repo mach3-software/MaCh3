@@ -140,6 +140,11 @@ class PredictiveThrower : public FitterBase {
 
   /// @brief Evaluate prior/post predictive distribution for beta parameters (used for evaluating impact MC statistical uncertainty)
   void StudyBetaParameters(TDirectory* PredictiveDir);
+  /// @brief Make the 1D Event Rate Hist
+  void MakeCutEventRate(TH1D *Histogram, const double DataRate) const;
+  /// @brief Produce distribution of number of events for each sample
+  void RateAnalysis(const std::vector<std::vector<std::unique_ptr<TH1>>>& Toys,
+                                       const std::vector<TDirectory*>& SampleDirectories) const;
 
   /// KS: Use Full LLH or only sample contribution based on discussion with Asher we almost always only want the sample likelihood
   bool FullLLH;
