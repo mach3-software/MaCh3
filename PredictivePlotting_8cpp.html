@@ -108,6 +108,15 @@ Functions</h2></td></tr>
 <tr class="separator:abadbf000738f5e00179a6a2f57fe0321"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2fa44e505362cc02bf851a700f4f6383"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="PredictivePlotting_8cpp.html#a2fa44e505362cc02bf851a700f4f6383">OverlayPredicitve</a> (const YAML::Node &amp;Settings, const std::vector&lt; TFile * &gt; &amp;InputFiles, const std::vector&lt; std::string &gt; &amp;SampleNames, const std::vector&lt; int &gt; &amp;SampleDimension, const std::unique_ptr&lt; TCanvas &gt; &amp;canv)</td></tr>
 <tr class="separator:a2fa44e505362cc02bf851a700f4f6383"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6f9a2bb548967ddb9f532278e2f28be4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="PredictivePlotting_8cpp.html#a6f9a2bb548967ddb9f532278e2f28be4">GetMeanError</a> (TH1D *hist, double &amp;<a class="el" href="RHat__HighMem_8cpp.html#ab7d224b5fffa9367046f2976bb4972d1">Mean</a>, double &amp;Error)</td></tr>
+<tr class="memdesc:a6f9a2bb548967ddb9f532278e2f28be4"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Get mean and error from gaussian fit to event distribution.  <a href="PredictivePlotting_8cpp.html#a6f9a2bb548967ddb9f532278e2f28be4">More...</a><br /></td></tr>
+<tr class="separator:a6f9a2bb548967ddb9f532278e2f28be4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afc302a9a19d7dd44378950a6995de6ac"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="PredictivePlotting_8cpp.html#afc302a9a19d7dd44378950a6995de6ac">PrintPosteriorEventRates</a> (const std::vector&lt; TFile * &gt; &amp;InputFiles, const std::vector&lt; std::string &gt; &amp;SampleNames)</td></tr>
+<tr class="memdesc:afc302a9a19d7dd44378950a6995de6ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS Print event rates in Latex like table.  <a href="PredictivePlotting_8cpp.html#afc302a9a19d7dd44378950a6995de6ac">More...</a><br /></td></tr>
+<tr class="separator:afc302a9a19d7dd44378950a6995de6ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af935489c0ba73430ee41adf85a02799a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="PredictivePlotting_8cpp.html#af935489c0ba73430ee41adf85a02799a">PrintPosteriorFractionalUncertainties</a> (const std::vector&lt; TFile * &gt; &amp;InputFiles, const std::vector&lt; std::string &gt; &amp;SampleNames)</td></tr>
+<tr class="memdesc:af935489c0ba73430ee41adf85a02799a"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Print Fractional Uncertainties into Latex table format.  <a href="PredictivePlotting_8cpp.html#af935489c0ba73430ee41adf85a02799a">More...</a><br /></td></tr>
+<tr class="separator:af935489c0ba73430ee41adf85a02799a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a359426a8fc421c11611f4d23577dbb23"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="PredictivePlotting_8cpp.html#a359426a8fc421c11611f4d23577dbb23">PredictivePlotting</a> (const std::string &amp;ConfigName, const std::vector&lt; std::string &gt; &amp;<a class="el" href="ProcessMCMC_8cpp.html#a8e90c1478f4be185364988cac765a163">FileNames</a>)</td></tr>
 <tr class="separator:a359426a8fc421c11611f4d23577dbb23"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3c04138a5bfe5d72780bb7e82a18e627"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="PredictivePlotting_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627">main</a> (int argc, char **argv)</td></tr>
@@ -238,6 +247,55 @@ Variables</h2></td></tr>
 </div><!-- fragment -->
 </div>
 </div>
+<a id="a6f9a2bb548967ddb9f532278e2f28be4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6f9a2bb548967ddb9f532278e2f28be4">&#9670;&nbsp;</a></span>GetMeanError()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void GetMeanError </td>
+          <td>(</td>
+          <td class="paramtype">TH1D *&#160;</td>
+          <td class="paramname"><em>hist</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double &amp;&#160;</td>
+          <td class="paramname"><em>Mean</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double &amp;&#160;</td>
+          <td class="paramname"><em>Error</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>KS: Get mean and error from gaussian fit to event distribution. </p>
+
+<p class="definition">Definition at line <a class="el" href="PredictivePlotting_8cpp_source.html#l00381">381</a> of file <a class="el" href="PredictivePlotting_8cpp_source.html">PredictivePlotting.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;                                                          {</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;  TF1 *Gauss = hist-&gt;GetFunction(<span class="stringliteral">&quot;Fit&quot;</span>); <span class="comment">//This name is hardcoded be careful</span></div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;  <span class="comment">//KS: Get mean and error from Gauss</span></div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;  <a class="code" href="RHat_8cpp.html#ab7d224b5fffa9367046f2976bb4972d1">Mean</a> = Gauss-&gt;GetParameter(1);</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;  Error = Gauss-&gt;GetParameter(2);</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160; </div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;  <span class="comment">//KS: Get mean and error from HPD</span></div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;  <span class="comment">//Mean = hist-&gt;GetMean();</span></div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;  <span class="comment">//Error = hpost-&gt;GetRMS();</span></div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;}</div>
+<div class="ttc" id="aRHat_8cpp_html_ab7d224b5fffa9367046f2976bb4972d1"><div class="ttname"><a href="RHat_8cpp.html#ab7d224b5fffa9367046f2976bb4972d1">Mean</a></div><div class="ttdeci">double ** Mean</div><div class="ttdef"><b>Definition:</b> <a href="RHat_8cpp_source.html#l00063">RHat.cpp:63</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
 <a id="a333421dad45df6804071289934e4b2af"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a333421dad45df6804071289934e4b2af">&#9670;&nbsp;</a></span>GetPValue()</h2>
 
@@ -294,32 +352,32 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PredictivePlotting_8cpp_source.html#l00431">431</a> of file <a class="el" href="PredictivePlotting_8cpp_source.html">PredictivePlotting.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;{</div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#aa603c55ea73cd86d1994901227883e1e">SetMaCh3LoggerFormat</a>();</div>
-<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;  <span class="keywordflow">if</span> (argc &lt; 3)</div>
-<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;  {</div>
-<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Need at least two arguments, {} &lt;Config.Yaml&gt; &lt;Prior/Post_PredOutput.root&gt;&quot;</span>, argv[0]);</div>
-<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;  }</div>
-<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;  std::string ConfigName = std::string(argv[1]);</div>
-<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;  <span class="comment">// Collect all remaining arguments as file names</span></div>
-<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;  std::vector&lt;std::string&gt; <a class="code" href="ProcessMCMC_8cpp.html#a8e90c1478f4be185364988cac765a163">FileNames</a>;</div>
-<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 2; i &lt; argc; ++i) {</div>
-<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;    <a class="code" href="ProcessMCMC_8cpp.html#a8e90c1478f4be185364988cac765a163">FileNames</a>.emplace_back(argv[i]);</div>
-<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;  }</div>
-<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160; </div>
-<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;  <a class="code" href="PredictivePlotting_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a> = <span class="keyword">new</span> MaCh3Plotting::PlottingManager();</div>
-<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;  <a class="code" href="PredictivePlotting_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;initialise();</div>
-<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160; </div>
-<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;  <a class="code" href="PredictivePlotting_8cpp.html#a359426a8fc421c11611f4d23577dbb23">PredictivePlotting</a>(ConfigName, <a class="code" href="ProcessMCMC_8cpp.html#a8e90c1478f4be185364988cac765a163">FileNames</a>);</div>
-<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160; </div>
-<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="PredictivePlotting_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>) <span class="keyword">delete</span> <a class="code" href="PredictivePlotting_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>;</div>
-<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;  <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="PredictivePlotting_8cpp_source.html#l00544">544</a> of file <a class="el" href="PredictivePlotting_8cpp_source.html">PredictivePlotting.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160;{</div>
+<div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#aa603c55ea73cd86d1994901227883e1e">SetMaCh3LoggerFormat</a>();</div>
+<div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160;  <span class="keywordflow">if</span> (argc &lt; 3)</div>
+<div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160;  {</div>
+<div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;Need at least two arguments, {} &lt;Config.Yaml&gt; &lt;Prior/Post_PredOutput.root&gt;&quot;</span>, argv[0]);</div>
+<div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160;  }</div>
+<div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;  std::string ConfigName = std::string(argv[1]);</div>
+<div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160;  <span class="comment">// Collect all remaining arguments as file names</span></div>
+<div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160;  std::vector&lt;std::string&gt; <a class="code" href="ProcessMCMC_8cpp.html#a8e90c1478f4be185364988cac765a163">FileNames</a>;</div>
+<div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 2; i &lt; argc; ++i) {</div>
+<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;    <a class="code" href="ProcessMCMC_8cpp.html#a8e90c1478f4be185364988cac765a163">FileNames</a>.emplace_back(argv[i]);</div>
+<div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;  }</div>
+<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160; </div>
+<div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;  <a class="code" href="PredictivePlotting_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a> = <span class="keyword">new</span> MaCh3Plotting::PlottingManager();</div>
+<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;  <a class="code" href="PredictivePlotting_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>-&gt;initialise();</div>
+<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160; </div>
+<div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160;  <a class="code" href="PredictivePlotting_8cpp.html#a359426a8fc421c11611f4d23577dbb23">PredictivePlotting</a>(ConfigName, <a class="code" href="ProcessMCMC_8cpp.html#a8e90c1478f4be185364988cac765a163">FileNames</a>);</div>
+<div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160; </div>
+<div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;  <span class="keywordflow">if</span>(<a class="code" href="PredictivePlotting_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>) <span class="keyword">delete</span> <a class="code" href="PredictivePlotting_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a>;</div>
+<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;  <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;}</div>
 <div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00037">MaCh3Logger.h:37</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_aa603c55ea73cd86d1994901227883e1e"><div class="ttname"><a href="MaCh3Logger_8h.html#aa603c55ea73cd86d1994901227883e1e">SetMaCh3LoggerFormat</a></div><div class="ttdeci">void SetMaCh3LoggerFormat()</div><div class="ttdoc">Set messaging format of the logger.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00061">MaCh3Logger.h:61</a></div></div>
-<div class="ttc" id="aPredictivePlotting_8cpp_html_a359426a8fc421c11611f4d23577dbb23"><div class="ttname"><a href="PredictivePlotting_8cpp.html#a359426a8fc421c11611f4d23577dbb23">PredictivePlotting</a></div><div class="ttdeci">void PredictivePlotting(const std::string &amp;ConfigName, const std::vector&lt; std::string &gt; &amp;FileNames)</div><div class="ttdef"><b>Definition:</b> <a href="PredictivePlotting_8cpp_source.html#l00380">PredictivePlotting.cpp:380</a></div></div>
+<div class="ttc" id="aPredictivePlotting_8cpp_html_a359426a8fc421c11611f4d23577dbb23"><div class="ttname"><a href="PredictivePlotting_8cpp.html#a359426a8fc421c11611f4d23577dbb23">PredictivePlotting</a></div><div class="ttdeci">void PredictivePlotting(const std::string &amp;ConfigName, const std::vector&lt; std::string &gt; &amp;FileNames)</div><div class="ttdef"><b>Definition:</b> <a href="PredictivePlotting_8cpp_source.html#l00489">PredictivePlotting.cpp:489</a></div></div>
 <div class="ttc" id="aPredictivePlotting_8cpp_html_a3e3e90b7d4e8c99cf9130e9f41685deb"><div class="ttname"><a href="PredictivePlotting_8cpp.html#a3e3e90b7d4e8c99cf9130e9f41685deb">PlotMan</a></div><div class="ttdeci">MaCh3Plotting::PlottingManager * PlotMan</div><div class="ttdef"><b>Definition:</b> <a href="PredictivePlotting_8cpp_source.html#l00014">PredictivePlotting.cpp:14</a></div></div>
 <div class="ttc" id="aProcessMCMC_8cpp_html_a8e90c1478f4be185364988cac765a163"><div class="ttname"><a href="ProcessMCMC_8cpp.html#a8e90c1478f4be185364988cac765a163">FileNames</a></div><div class="ttdeci">std::vector&lt; std::string &gt; FileNames</div><div class="ttdef"><b>Definition:</b> <a href="ProcessMCMC_8cpp_source.html#l00028">ProcessMCMC.cpp:28</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class used throughout MaCh3.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00023">MaCh3Exception.h:23</a></div></div>
@@ -660,60 +718,222 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="PredictivePlotting_8cpp_source.html#l00380">380</a> of file <a class="el" href="PredictivePlotting_8cpp_source.html">PredictivePlotting.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;{</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;  <span class="keyword">auto</span> canvas = std::make_unique&lt;TCanvas&gt;(<span class="stringliteral">&quot;canv&quot;</span>, <span class="stringliteral">&quot;canv&quot;</span>, 1080, 1080);</div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;  <span class="comment">// set the paper &amp; margin sizes</span></div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;  canvas-&gt;SetTopMargin(0.11);</div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;  canvas-&gt;SetBottomMargin(0.16);</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;  canvas-&gt;SetRightMargin(0.075);</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;  canvas-&gt;SetLeftMargin(0.12);</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;  canvas-&gt;SetGrid();</div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160; </div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;  gStyle-&gt;SetOptStat(0);  <span class="comment">//Set 0 to disable statistic box</span></div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;  gStyle-&gt;SetPalette(51);</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;  gStyle-&gt;SetLegendBorderSize(0); <span class="comment">//This option disables legends borders</span></div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;  gStyle-&gt;SetFillStyle(0);</div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160; </div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;  <span class="comment">//To avoid TCanvas::Print&gt; messages</span></div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;  gErrorIgnoreLevel = kWarning;</div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160; </div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;  <span class="keyword">auto</span> Samples = <a class="code" href="PredictivePlotting_8cpp.html#a6b13eeeb84e3e3411aa7ab67fcac7629">FindSamples</a>(<a class="code" href="ProcessMCMC_8cpp.html#a8e90c1478f4be185364988cac765a163">FileNames</a>[0]);</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;  <span class="keyword">auto</span> Dimensions = <a class="code" href="PredictivePlotting_8cpp.html#ae55be8ebd576634e6732b9bed73d72ed">FindDimensions</a>(<a class="code" href="ProcessMCMC_8cpp.html#a8e90c1478f4be185364988cac765a163">FileNames</a>[0], Samples);</div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160; </div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;  std::vector&lt;TFile*&gt; InputFiles(<a class="code" href="ProcessMCMC_8cpp.html#a8e90c1478f4be185364988cac765a163">FileNames</a>.size());</div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code" href="ProcessMCMC_8cpp.html#a8e90c1478f4be185364988cac765a163">FileNames</a>.size(); i++)</div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;  {</div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;    InputFiles[i] = <a class="code" href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a>(<a class="code" href="ProcessMCMC_8cpp.html#a8e90c1478f4be185364988cac765a163">FileNames</a>[i], <span class="stringliteral">&quot;READ&quot;</span>, __FILE__, __LINE__);</div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;  }</div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160; </div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;  <span class="comment">// Load the YAML file</span></div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;  YAML::Node Config = <a class="code" href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">M3OpenConfig</a>(ConfigName);</div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;  <span class="comment">// Access the &quot;MatrixPlotter&quot; section</span></div>
-<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;  YAML::Node settings = Config[<span class="stringliteral">&quot;PredictivePlotting&quot;</span>];</div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;  canvas-&gt;Print(<span class="stringliteral">&quot;Overlay_Predictive.pdf[&quot;</span>, <span class="stringliteral">&quot;pdf&quot;</span>);</div>
-<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160; </div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;  <span class="comment">// Make overlay of 1D hists</span></div>
-<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;  <a class="code" href="PredictivePlotting_8cpp.html#a2fa44e505362cc02bf851a700f4f6383">OverlayPredicitve</a>(settings, InputFiles, Samples, Dimensions, canvas);</div>
-<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;  <span class="comment">// Make overlay of violin plots</span></div>
-<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;  <a class="code" href="PredictivePlotting_8cpp.html#abadbf000738f5e00179a6a2f57fe0321">OverlayViolin</a>(settings, InputFiles, Samples, Dimensions, canvas);</div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;  <span class="comment">// Get PValue per sample</span></div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;  <a class="code" href="PredictivePlotting_8cpp.html#a347a28a36f9866f4df0165b40a37335b">PrintPosteriorPValue</a>(settings, InputFiles, Samples);</div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160; </div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;  canvas-&gt;Print(<span class="stringliteral">&quot;Overlay_Predictive.pdf]&quot;</span>, <span class="stringliteral">&quot;pdf&quot;</span>);</div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160; </div>
-<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code" href="ProcessMCMC_8cpp.html#a8e90c1478f4be185364988cac765a163">FileNames</a>.size(); i++)</div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;  {</div>
-<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;    InputFiles[i]-&gt;Close();</div>
-<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;    <span class="keyword">delete</span> InputFiles[i];</div>
-<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;  }</div>
-<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="PredictivePlotting_8cpp_source.html#l00489">489</a> of file <a class="el" href="PredictivePlotting_8cpp_source.html">PredictivePlotting.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;{</div>
+<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;  <span class="keyword">auto</span> canvas = std::make_unique&lt;TCanvas&gt;(<span class="stringliteral">&quot;canv&quot;</span>, <span class="stringliteral">&quot;canv&quot;</span>, 1080, 1080);</div>
+<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;  <span class="comment">// set the paper &amp; margin sizes</span></div>
+<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;  canvas-&gt;SetTopMargin(0.11);</div>
+<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;  canvas-&gt;SetBottomMargin(0.16);</div>
+<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;  canvas-&gt;SetRightMargin(0.075);</div>
+<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;  canvas-&gt;SetLeftMargin(0.12);</div>
+<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;  canvas-&gt;SetGrid();</div>
+<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160; </div>
+<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;  gStyle-&gt;SetOptStat(0);  <span class="comment">//Set 0 to disable statistic box</span></div>
+<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;  gStyle-&gt;SetPalette(51);</div>
+<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;  gStyle-&gt;SetLegendBorderSize(0); <span class="comment">//This option disables legends borders</span></div>
+<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;  gStyle-&gt;SetFillStyle(0);</div>
+<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160; </div>
+<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;  <span class="comment">//To avoid TCanvas::Print&gt; messages</span></div>
+<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;  gErrorIgnoreLevel = kWarning;</div>
+<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160; </div>
+<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;  <span class="keyword">auto</span> Samples = <a class="code" href="PredictivePlotting_8cpp.html#a6b13eeeb84e3e3411aa7ab67fcac7629">FindSamples</a>(<a class="code" href="ProcessMCMC_8cpp.html#a8e90c1478f4be185364988cac765a163">FileNames</a>[0]);</div>
+<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;  <span class="keyword">auto</span> Dimensions = <a class="code" href="PredictivePlotting_8cpp.html#ae55be8ebd576634e6732b9bed73d72ed">FindDimensions</a>(<a class="code" href="ProcessMCMC_8cpp.html#a8e90c1478f4be185364988cac765a163">FileNames</a>[0], Samples);</div>
+<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160; </div>
+<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;  std::vector&lt;TFile*&gt; InputFiles(<a class="code" href="ProcessMCMC_8cpp.html#a8e90c1478f4be185364988cac765a163">FileNames</a>.size());</div>
+<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code" href="ProcessMCMC_8cpp.html#a8e90c1478f4be185364988cac765a163">FileNames</a>.size(); i++)</div>
+<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;  {</div>
+<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;    InputFiles[i] = <a class="code" href="namespaceM3.html#a87841bdbf0e0a2a733d9e4ca499f820d">M3::Open</a>(<a class="code" href="ProcessMCMC_8cpp.html#a8e90c1478f4be185364988cac765a163">FileNames</a>[i], <span class="stringliteral">&quot;READ&quot;</span>, __FILE__, __LINE__);</div>
+<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;  }</div>
+<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160; </div>
+<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;  <span class="comment">// Load the YAML file</span></div>
+<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;  YAML::Node Config = <a class="code" href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">M3OpenConfig</a>(ConfigName);</div>
+<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;  <span class="comment">// Access the &quot;MatrixPlotter&quot; section</span></div>
+<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;  YAML::Node settings = Config[<span class="stringliteral">&quot;PredictivePlotting&quot;</span>];</div>
+<div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;  canvas-&gt;Print(<span class="stringliteral">&quot;Overlay_Predictive.pdf[&quot;</span>, <span class="stringliteral">&quot;pdf&quot;</span>);</div>
+<div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160; </div>
+<div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;  <span class="comment">// Make overlay of 1D hists</span></div>
+<div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;  <a class="code" href="PredictivePlotting_8cpp.html#a2fa44e505362cc02bf851a700f4f6383">OverlayPredicitve</a>(settings, InputFiles, Samples, Dimensions, canvas);</div>
+<div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;  <span class="comment">// Make overlay of violin plots</span></div>
+<div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;  <a class="code" href="PredictivePlotting_8cpp.html#abadbf000738f5e00179a6a2f57fe0321">OverlayViolin</a>(settings, InputFiles, Samples, Dimensions, canvas);</div>
+<div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;  <span class="comment">// Get PValue per sample</span></div>
+<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;  <a class="code" href="PredictivePlotting_8cpp.html#a347a28a36f9866f4df0165b40a37335b">PrintPosteriorPValue</a>(settings, InputFiles, Samples);</div>
+<div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;  <span class="comment">// KS: Print Fractional Uncertainties into Latex table format</span></div>
+<div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;  <a class="code" href="PredictivePlotting_8cpp.html#afc302a9a19d7dd44378950a6995de6ac">PrintPosteriorEventRates</a>(InputFiles, Samples);</div>
+<div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;  <span class="comment">// KS: Print Fractional Uncertainties into Latex table format</span></div>
+<div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;  <a class="code" href="PredictivePlotting_8cpp.html#af935489c0ba73430ee41adf85a02799a">PrintPosteriorFractionalUncertainties</a>(InputFiles, Samples);</div>
+<div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160; </div>
+<div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160;  canvas-&gt;Print(<span class="stringliteral">&quot;Overlay_Predictive.pdf]&quot;</span>, <span class="stringliteral">&quot;pdf&quot;</span>);</div>
+<div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160; </div>
+<div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> i = 0; i &lt; <a class="code" href="ProcessMCMC_8cpp.html#a8e90c1478f4be185364988cac765a163">FileNames</a>.size(); i++)</div>
+<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;  {</div>
+<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;    InputFiles[i]-&gt;Close();</div>
+<div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;    <span class="keyword">delete</span> InputFiles[i];</div>
+<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;  }</div>
+<div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;}</div>
 <div class="ttc" id="aPredictivePlotting_8cpp_html_a2fa44e505362cc02bf851a700f4f6383"><div class="ttname"><a href="PredictivePlotting_8cpp.html#a2fa44e505362cc02bf851a700f4f6383">OverlayPredicitve</a></div><div class="ttdeci">void OverlayPredicitve(const YAML::Node &amp;Settings, const std::vector&lt; TFile * &gt; &amp;InputFiles, const std::vector&lt; std::string &gt; &amp;SampleNames, const std::vector&lt; int &gt; &amp;SampleDimension, const std::unique_ptr&lt; TCanvas &gt; &amp;canv)</div><div class="ttdef"><b>Definition:</b> <a href="PredictivePlotting_8cpp_source.html#l00219">PredictivePlotting.cpp:219</a></div></div>
 <div class="ttc" id="aPredictivePlotting_8cpp_html_a347a28a36f9866f4df0165b40a37335b"><div class="ttname"><a href="PredictivePlotting_8cpp.html#a347a28a36f9866f4df0165b40a37335b">PrintPosteriorPValue</a></div><div class="ttdeci">void PrintPosteriorPValue(const YAML::Node &amp;Settings, const std::vector&lt; TFile * &gt; &amp;InputFiles, const std::vector&lt; std::string &gt; &amp;SampleNames)</div><div class="ttdef"><b>Definition:</b> <a href="PredictivePlotting_8cpp_source.html#l00094">PredictivePlotting.cpp:94</a></div></div>
 <div class="ttc" id="aPredictivePlotting_8cpp_html_a6b13eeeb84e3e3411aa7ab67fcac7629"><div class="ttname"><a href="PredictivePlotting_8cpp.html#a6b13eeeb84e3e3411aa7ab67fcac7629">FindSamples</a></div><div class="ttdeci">std::vector&lt; std::string &gt; FindSamples(const std::string &amp;File)</div><div class="ttdef"><b>Definition:</b> <a href="PredictivePlotting_8cpp_source.html#l00017">PredictivePlotting.cpp:17</a></div></div>
 <div class="ttc" id="aPredictivePlotting_8cpp_html_abadbf000738f5e00179a6a2f57fe0321"><div class="ttname"><a href="PredictivePlotting_8cpp.html#abadbf000738f5e00179a6a2f57fe0321">OverlayViolin</a></div><div class="ttdeci">void OverlayViolin(const YAML::Node &amp;Settings, const std::vector&lt; TFile * &gt; &amp;InputFiles, const std::vector&lt; std::string &gt; &amp;SampleNames, const std::vector&lt; int &gt; &amp;SampleDimension, const std::unique_ptr&lt; TCanvas &gt; &amp;canv)</div><div class="ttdef"><b>Definition:</b> <a href="PredictivePlotting_8cpp_source.html#l00161">PredictivePlotting.cpp:161</a></div></div>
 <div class="ttc" id="aPredictivePlotting_8cpp_html_ae55be8ebd576634e6732b9bed73d72ed"><div class="ttname"><a href="PredictivePlotting_8cpp.html#ae55be8ebd576634e6732b9bed73d72ed">FindDimensions</a></div><div class="ttdeci">std::vector&lt; int &gt; FindDimensions(const std::string &amp;File, const std::vector&lt; std::string &gt; &amp;Samples)</div><div class="ttdef"><b>Definition:</b> <a href="PredictivePlotting_8cpp_source.html#l00048">PredictivePlotting.cpp:48</a></div></div>
+<div class="ttc" id="aPredictivePlotting_8cpp_html_af935489c0ba73430ee41adf85a02799a"><div class="ttname"><a href="PredictivePlotting_8cpp.html#af935489c0ba73430ee41adf85a02799a">PrintPosteriorFractionalUncertainties</a></div><div class="ttdeci">void PrintPosteriorFractionalUncertainties(const std::vector&lt; TFile * &gt; &amp;InputFiles, const std::vector&lt; std::string &gt; &amp;SampleNames)</div><div class="ttdoc">KS: Print Fractional Uncertainties into Latex table format.</div><div class="ttdef"><b>Definition:</b> <a href="PredictivePlotting_8cpp_source.html#l00441">PredictivePlotting.cpp:441</a></div></div>
+<div class="ttc" id="aPredictivePlotting_8cpp_html_afc302a9a19d7dd44378950a6995de6ac"><div class="ttname"><a href="PredictivePlotting_8cpp.html#afc302a9a19d7dd44378950a6995de6ac">PrintPosteriorEventRates</a></div><div class="ttdeci">void PrintPosteriorEventRates(const std::vector&lt; TFile * &gt; &amp;InputFiles, const std::vector&lt; std::string &gt; &amp;SampleNames)</div><div class="ttdoc">KS Print event rates in Latex like table.</div><div class="ttdef"><b>Definition:</b> <a href="PredictivePlotting_8cpp_source.html#l00393">PredictivePlotting.cpp:393</a></div></div>
 <div class="ttc" id="aYamlHelper_8h_html_ad802d5a5acdc16a796b21af74f6f5f59"><div class="ttname"><a href="YamlHelper_8h.html#ad802d5a5acdc16a796b21af74f6f5f59">M3OpenConfig</a></div><div class="ttdeci">#define M3OpenConfig(filename)</div><div class="ttdoc">Macro to simplify calling LoadYaml with file and line info.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00589">YamlHelper.h:589</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="afc302a9a19d7dd44378950a6995de6ac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afc302a9a19d7dd44378950a6995de6ac">&#9670;&nbsp;</a></span>PrintPosteriorEventRates()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PrintPosteriorEventRates </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; TFile * &gt; &amp;&#160;</td>
+          <td class="paramname"><em>InputFiles</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; std::string &gt; &amp;&#160;</td>
+          <td class="paramname"><em>SampleNames</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>KS Print event rates in Latex like table. </p>
+
+<p class="definition">Definition at line <a class="el" href="PredictivePlotting_8cpp_source.html#l00393">393</a> of file <a class="el" href="PredictivePlotting_8cpp_source.html">PredictivePlotting.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;                                                                       {</div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Starting {}&quot;</span>, __func__);</div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160; </div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;  <span class="keywordtype">double</span> mean, error;</div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;  <span class="comment">//KS: We now prepare to make tables for TN etc.</span></div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;  std::cout&lt;&lt;<span class="stringliteral">&quot;\\begin{table}[htb]&quot;</span>&lt;&lt;std::endl;</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;  std::cout&lt;&lt;<span class="stringliteral">&quot;\\centering&quot;</span>&lt;&lt;std::endl;</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;  std::cout&lt;&lt;<span class="stringliteral">&quot;\\begin{tabular}{ | l |&quot;</span>;</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> f = 0; f &lt; InputFiles.size(); f++)</div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;  {</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;    std::cout&lt;&lt;<span class="stringliteral">&quot; c |&quot;</span>;</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;  }</div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;  std::cout&lt;&lt;<span class="stringliteral">&quot;} \\hline&quot;</span>&lt;&lt;std::endl;</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;  std::cout&lt;&lt;<span class="stringliteral">&quot;Sample &quot;</span>;</div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> f = 0; f &lt; InputFiles.size(); f++)</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;  {</div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;    std::cout&lt;&lt;<span class="stringliteral">&quot;&amp; Event Rates  &quot;</span>;</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;  }</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;  std::cout&lt;&lt;<span class="stringliteral">&quot;\\\\ \\hline&quot;</span>&lt;&lt;std::endl;</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; i &lt; SampleNames.size(); i++)</div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;  {</div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;    std::cout&lt;&lt;SampleNames[i];</div>
+<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;    std::string TempString = <span class="stringliteral">&quot;Predictive/&quot;</span> + SampleNames[i]+<span class="stringliteral">&quot;/&quot;</span>+SampleNames[i]+<span class="stringliteral">&quot;_sum&quot;</span>;</div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> f = 0; f &lt; InputFiles.size(); f++)</div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;    {</div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;      TH1D *hist = <span class="keyword">static_cast&lt;</span>TH1D*<span class="keyword">&gt;</span>(InputFiles[f]-&gt;Get(TempString.c_str()));</div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;      <a class="code" href="PredictivePlotting_8cpp.html#a6f9a2bb548967ddb9f532278e2f28be4">GetMeanError</a>(hist, mean, error);</div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;      std::cout&lt;&lt;<span class="stringliteral">&quot; &amp; &quot;</span>&lt;&lt;mean&lt;&lt;<span class="stringliteral">&quot; $\\pm$ &quot;</span>&lt;&lt;error;</div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;    }</div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;    std::cout&lt;&lt;<span class="stringliteral">&quot; \\\\&quot;</span>&lt;&lt;std::endl;</div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;  }</div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;  std::cout&lt;&lt;<span class="stringliteral">&quot;Total&quot;</span>;</div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> f = 0; f &lt; InputFiles.size(); f++)</div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;  {</div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;    TH1D *histTot = <span class="keyword">static_cast&lt;</span>TH1D*<span class="keyword">&gt;</span>(InputFiles[f]-&gt;Get(<span class="stringliteral">&quot;Predictive/Total/Total_sum&quot;</span>));</div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;    <a class="code" href="PredictivePlotting_8cpp.html#a6f9a2bb548967ddb9f532278e2f28be4">GetMeanError</a>(histTot, mean, error);</div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;    std::cout&lt;&lt;<span class="stringliteral">&quot; &amp; &quot;</span>&lt;&lt;mean&lt;&lt;<span class="stringliteral">&quot; $\\pm$ &quot;</span>&lt;&lt;error;</div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;  }</div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;  std::cout&lt;&lt;<span class="stringliteral">&quot; \\\\&quot;</span>&lt;&lt;std::endl;</div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;  std::cout&lt;&lt;<span class="stringliteral">&quot;\\hline&quot;</span>&lt;&lt;std::endl;</div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;  std::cout&lt;&lt;<span class="stringliteral">&quot;\\end{tabular}&quot;</span>&lt;&lt;std::endl;</div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;  std::cout&lt;&lt;<span class="stringliteral">&quot;\\end{table}&quot;</span>&lt;&lt;std::endl;</div>
+<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;}</div>
+<div class="ttc" id="aPredictivePlotting_8cpp_html_a6f9a2bb548967ddb9f532278e2f28be4"><div class="ttname"><a href="PredictivePlotting_8cpp.html#a6f9a2bb548967ddb9f532278e2f28be4">GetMeanError</a></div><div class="ttdeci">void GetMeanError(TH1D *hist, double &amp;Mean, double &amp;Error)</div><div class="ttdoc">KS: Get mean and error from gaussian fit to event distribution.</div><div class="ttdef"><b>Definition:</b> <a href="PredictivePlotting_8cpp_source.html#l00381">PredictivePlotting.cpp:381</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="af935489c0ba73430ee41adf85a02799a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af935489c0ba73430ee41adf85a02799a">&#9670;&nbsp;</a></span>PrintPosteriorFractionalUncertainties()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PrintPosteriorFractionalUncertainties </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; TFile * &gt; &amp;&#160;</td>
+          <td class="paramname"><em>InputFiles</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; std::string &gt; &amp;&#160;</td>
+          <td class="paramname"><em>SampleNames</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>KS: Print Fractional Uncertainties into Latex table format. </p>
+
+<p class="definition">Definition at line <a class="el" href="PredictivePlotting_8cpp_source.html#l00441">441</a> of file <a class="el" href="PredictivePlotting_8cpp_source.html">PredictivePlotting.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;                                                                                    {</div>
+<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Starting {}&quot;</span>, __func__);</div>
+<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;  <span class="keywordtype">double</span> mean, error;</div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160; </div>
+<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;  <span class="comment">//KS: Fractional uncertainties on the prior and posterior predictive event rates.</span></div>
+<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;  std::cout&lt;&lt;<span class="stringliteral">&quot;\\begin{table}[htb]&quot;</span>&lt;&lt;std::endl;</div>
+<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;  std::cout&lt;&lt;<span class="stringliteral">&quot;\\centering&quot;</span>&lt;&lt;std::endl;</div>
+<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;  std::cout&lt;&lt;<span class="stringliteral">&quot;\\begin{tabular}{ | l |&quot;</span>;</div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> f = 0; f &lt; InputFiles.size(); f++)</div>
+<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;  {</div>
+<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;    std::cout&lt;&lt;<span class="stringliteral">&quot; c |&quot;</span>;</div>
+<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;  }</div>
+<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;  std::cout&lt;&lt;<span class="stringliteral">&quot;} \\hline&quot;</span>&lt;&lt;std::endl;</div>
+<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160; </div>
+<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;  std::cout&lt;&lt;<span class="stringliteral">&quot;Sample &quot;</span>;</div>
+<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> f = 0; f &lt; InputFiles.size(); f++)</div>
+<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;  {</div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;    std::cout&lt;&lt;<span class="stringliteral">&quot;&amp; $\\delta N / N (\\%)$&quot;</span>;</div>
+<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;  }</div>
+<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;  std::cout&lt;&lt;<span class="stringliteral">&quot;\\\\ \\hline&quot;</span>&lt;&lt;std::endl;</div>
+<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160; </div>
+<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> i = 0; i &lt; SampleNames.size(); i++)</div>
+<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;  {</div>
+<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;    std::cout&lt;&lt;SampleNames[i];</div>
+<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;    std::string TempString = <span class="stringliteral">&quot;Predictive/&quot;</span> + SampleNames[i]+<span class="stringliteral">&quot;/&quot;</span>+SampleNames[i]+<span class="stringliteral">&quot;_sum&quot;</span>;</div>
+<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;    <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> f = 0; f &lt; InputFiles.size(); f++)</div>
+<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;    {</div>
+<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;      TH1D *hist = <span class="keyword">static_cast&lt;</span>TH1D*<span class="keyword">&gt;</span>(InputFiles[f]-&gt;Get(TempString.c_str()));</div>
+<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;      <a class="code" href="PredictivePlotting_8cpp.html#a6f9a2bb548967ddb9f532278e2f28be4">GetMeanError</a>(hist, mean, error);</div>
+<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;      std::cout&lt;&lt;<span class="stringliteral">&quot; &amp; &quot;</span>&lt;&lt;error/mean*100;</div>
+<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;    }</div>
+<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;    std::cout&lt;&lt;<span class="stringliteral">&quot; \\\\&quot;</span>&lt;&lt;std::endl;</div>
+<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;  }</div>
+<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;  std::cout&lt;&lt;<span class="stringliteral">&quot;Total&quot;</span>;</div>
+<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> f = 0; f &lt; InputFiles.size(); f++)</div>
+<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;  {</div>
+<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;    TH1D *histTotal = <span class="keyword">static_cast&lt;</span>TH1D*<span class="keyword">&gt;</span>(InputFiles[f]-&gt;Get(<span class="stringliteral">&quot;Predictive/Total/Total_sum&quot;</span>));</div>
+<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;    <a class="code" href="PredictivePlotting_8cpp.html#a6f9a2bb548967ddb9f532278e2f28be4">GetMeanError</a>(histTotal, mean, error);</div>
+<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;    std::cout&lt;&lt;<span class="stringliteral">&quot; &amp; &quot;</span>&lt;&lt;error/mean*100;</div>
+<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;  }</div>
+<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;  std::cout&lt;&lt;<span class="stringliteral">&quot;\\\\ \\hline&quot;</span>&lt;&lt;std::endl;</div>
+<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;  std::cout&lt;&lt;<span class="stringliteral">&quot;\\end{tabular}&quot;</span>&lt;&lt;std::endl;</div>
+<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;  std::cout&lt;&lt;<span class="stringliteral">&quot;\\end{table}&quot;</span>&lt;&lt;std::endl;</div>
+<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
