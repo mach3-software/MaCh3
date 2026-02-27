@@ -1000,11 +1000,46 @@ void PredictiveThrower::RunPredictiveAnalysis() {
   MACH3LOG_INFO("{} took {:.2f}s to finish for {} toys", __func__, TempClock.RealTime(), Ntoys);
 }
 
+
 // *************************
-double PredictiveThrower::GetLLH(const std::unique_ptr<TH1>& DatHist,
-                                 const std::unique_ptr<TH1>& MCHist,
-                                 const std::unique_ptr<TH1>& W2Hist,
-                                 const SampleHandlerBase* SampleHandler) {
+double PredictiveThrower::CalcLLH(const TH1* DatHist,
+                                  const TH1* MCHist,
+                                  const TH1* W2Hist,
+                                  const SampleHandlerBase* SampleHandler) const {
+// *************************
+  // 1D case
+  if (auto h1 = dynamic_cast<const TH1D*>(DatHist)) {
+    return GetLLH(h1,
+                  static_cast<const TH1D*>(MCHist),
+                  static_cast<const TH1D*>(W2Hist),
+                  SampleHandler);
+  }
+
+  // 2D case
+  if (auto h2 = dynamic_cast<const TH2D*>(DatHist)) {
+    return GetLLH(h2,
+                  static_cast<const TH2D*>(MCHist),
+                  static_cast<const TH2D*>(W2Hist),
+                  SampleHandler);
+  }
+
+  // 2D poly case
+  if (auto h2p = dynamic_cast<const TH2Poly*>(DatHist)) {
+    return GetLLH(h2p,
+                  static_cast<const TH2Poly*>(MCHist),
+                  static_cast<const TH2Poly*>(W2Hist),
+                  SampleHandler);
+  }
+
+  MACH3LOG_ERROR("Unsupported histogram type in {}", __func__);
+  throw MaCh3Exception(__FILE__ , __LINE__ );
+}
+
+// *************************
+double PredictiveThrower::GetLLH(const TH1D* DatHist,
+                                 const TH1D* MCHist,
+                                 const TH1D* W2Hist,
+                                 const SampleHandlerBase* SampleHandler) const {
 // *************************
   double llh = 0.0;
   for (int i = 1; i <= DatHist->GetXaxis()->GetNbins(); ++i)
@@ -1018,30 +1053,76 @@ double PredictiveThrower::GetLLH(const std::unique_ptr<TH1>& DatHist,
   return 2*llh;
 }
 
+// *************************
+double PredictiveThrower::GetLLH(const TH2Poly* DatHist,
+                                 const TH2Poly* MCHist,
+                                 const TH2Poly* W2Hist,
+                                 const SampleHandlerBase* SampleHandler) const {
+// *************************
+  double llh = 0.0;
+  for (int i = 1; i <= DatHist->GetNumberOfBins(); ++i)
+  {
+    const double data = DatHist->GetBinContent(i);
+    const double mc = MCHist->GetBinContent(i);
+    const double w2 = W2Hist->GetBinContent(i);
+    llh += SampleHandler->GetTestStatLLH(data, mc, w2);
+  }
+  //KS: do times 2 because banff reports chi2
+  return 2*llh;
+}
+
+// *************************
+double PredictiveThrower::GetLLH(const TH2D* DatHist,
+                                 const TH2D* MCHist,
+                                 const TH2D* W2Hist,
+                                 const SampleHandlerBase* SampleHandler) const {
+// *************************
+  double llh = 0.0;
+
+  const int nBinsX = DatHist->GetXaxis()->GetNbins();
+  const int nBinsY = DatHist->GetYaxis()->GetNbins();
+
+  for (int i = 1; i <= nBinsX; ++i)
+  {
+    for (int j = 1; j <= nBinsY; ++j)
+    {
+      const double data = DatHist->GetBinContent(i, j);
+      const double mc   = MCHist->GetBinContent(i, j);
+      const double w2   = W2Hist->GetBinContent(i, j);
+
+      llh += SampleHandler->GetTestStatLLH(data, mc, w2);
+    }
+  }
+
+  // KS: do times 2 because banff reports chi2
+  return 2 * llh;
+}
+
 // ****************
 //KS: We have two methods how to apply statistical fluctuation standard is faster hence is default
-void PredictiveThrower::MakeFluctuatedHistogram(TH1* FluctHist, TH1* Hist, const int nDims) {
+void PredictiveThrower::MakeFluctuatedHistogram(TH1* FluctHist, TH1* Hist) {
 // ****************
-  if(StandardFluctuation){
-    if (nDims == 2) {
-      if(std::string(Hist->ClassName()) == "TH2Poly") {
-        MakeFluctuatedHistogramStandard(static_cast<TH2Poly*>(FluctHist), static_cast<TH2Poly*>(Hist), random.get());
-      } else {
-        MakeFluctuatedHistogramStandard(static_cast<TH2D*>(FluctHist), static_cast<TH2D*>(Hist), random.get());
-      }
+  // Determine which fluctuation function to call
+  auto applyFluctuation = [&](auto* f, auto* h) {
+    if (StandardFluctuation) {
+      MakeFluctuatedHistogramStandard(f, h, random.get());
     } else {
-      MakeFluctuatedHistogramStandard(static_cast<TH1D*>(FluctHist), static_cast<TH1D*>(Hist), random.get());
+      MakeFluctuatedHistogramAlternative(f, h, random.get());
     }
-  } else {
-    if (nDims == 2) {
-      if(std::string(Hist->ClassName()) == "TH2Poly") {
-        MakeFluctuatedHistogramAlternative(static_cast<TH2Poly*>(FluctHist), static_cast<TH2Poly*>(Hist), random.get());
-      } else {
-        MakeFluctuatedHistogramAlternative(static_cast<TH2D*>(FluctHist), static_cast<TH2D*>(Hist), random.get());
-      }
-    } else {
-        MakeFluctuatedHistogramAlternative(static_cast<TH1D*>(FluctHist), static_cast<TH1D*>(Hist), random.get());
-    }
+  };
+
+  if (Hist->InheritsFrom(TH2Poly::Class())) {
+    applyFluctuation(static_cast<TH2Poly*>(FluctHist), static_cast<TH2Poly*>(Hist));
+  }
+  else if (Hist->InheritsFrom(TH2D::Class())) {
+    applyFluctuation(static_cast<TH2D*>(FluctHist), static_cast<TH2D*>(Hist));
+  }
+  else if (Hist->InheritsFrom(TH1D::Class())) {
+    applyFluctuation(static_cast<TH1D*>(FluctHist), static_cast<TH1D*>(Hist));
+  }
+  else {
+    MACH3LOG_ERROR("Unsupported histogram type");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 }
 
@@ -1051,47 +1132,46 @@ void PredictiveThrower::PosteriorPredictivepValue(const std::vector<std::unique_
 // *************************
   // Step 1: Initialize per-toy accumulators once
   // [Sample] [Toys]
-  std::vector<std::vector<double>> chi2_dat_vec(TotalNumberOfSamples+1);
-  std::vector<std::vector<double>> chi2_mc_vec(TotalNumberOfSamples+1);
-  std::vector<std::vector<double>> chi2_pred_vec(TotalNumberOfSamples+1);
+  std::vector<std::vector<double>> chi2_dat(TotalNumberOfSamples+1);
+  std::vector<std::vector<double>> chi2_mc(TotalNumberOfSamples+1);
+  std::vector<std::vector<double>> chi2_pred(TotalNumberOfSamples+1);
   for (int iSample = 0; iSample < TotalNumberOfSamples+1; ++iSample) {
-    chi2_dat_vec[iSample].resize(Ntoys, 0.0);
-    chi2_mc_vec[iSample].resize(Ntoys, 0.0);
-    chi2_pred_vec[iSample].resize(Ntoys, 0.0);
+    chi2_dat[iSample].resize(Ntoys, 0.0);
+    chi2_mc[iSample].resize(Ntoys, 0.0);
+    chi2_pred[iSample].resize(Ntoys, 0.0);
   }
 
   for (int iToy = 0; iToy < Ntoys; ++iToy) {
-    chi2_dat_vec[TotalNumberOfSamples][iToy] = PenaltyTerm[iToy];
-    chi2_mc_vec[TotalNumberOfSamples][iToy] = PenaltyTerm[iToy];
-    chi2_pred_vec[TotalNumberOfSamples][iToy] = PenaltyTerm[iToy];
+    chi2_dat[TotalNumberOfSamples][iToy] = PenaltyTerm[iToy];
+    chi2_mc[TotalNumberOfSamples][iToy] = PenaltyTerm[iToy];
+    chi2_pred[TotalNumberOfSamples][iToy] = PenaltyTerm[iToy];
   }
 
   /// TODO This can be multithreaded but be careful for Clone!!!
   for (int iSample = 0; iSample < TotalNumberOfSamples; ++iSample) {
     auto SampleHandler = SampleInfo[iSample].SamHandler;
-    const int nDims = SampleInfo[iSample].Dimenstion;
     for (int iToy = 0; iToy < Ntoys; ++iToy) {
       // Clone histograms to avoid modifying originals
       auto DrawFluctHist = M3::Clone(MC_Hist_Toy[iSample][iToy].get());
       auto PredFluctHist = M3::Clone(PostPred_mc[iSample].get());
 
       // Apply fluctuations
-      MakeFluctuatedHistogram(DrawFluctHist.get(), MC_Hist_Toy[iSample][iToy].get(), nDims);
-      MakeFluctuatedHistogram(PredFluctHist.get(), PostPred_mc[iSample].get(), nDims);
+      MakeFluctuatedHistogram(DrawFluctHist.get(), MC_Hist_Toy[iSample][iToy].get());
+      MakeFluctuatedHistogram(PredFluctHist.get(), PostPred_mc[iSample].get());
 
       // Okay now we can do our chi2 calculation for our sample
-      chi2_dat_vec[iSample][iToy]  = GetLLH(Data_Hist[iSample], MC_Hist_Toy[iSample][iToy], W2_Hist_Toy[iSample][iToy], SampleHandler);
-      chi2_mc_vec[iSample][iToy]   = GetLLH(DrawFluctHist, MC_Hist_Toy[iSample][iToy], W2_Hist_Toy[iSample][iToy], SampleHandler);
-      chi2_pred_vec[iSample][iToy] = GetLLH(PredFluctHist, MC_Hist_Toy[iSample][iToy], W2_Hist_Toy[iSample][iToy], SampleHandler);
+      chi2_dat[iSample][iToy]  = CalcLLH(Data_Hist[iSample].get(), MC_Hist_Toy[iSample][iToy].get(), W2_Hist_Toy[iSample][iToy].get(), SampleHandler);
+      chi2_mc[iSample][iToy]   = CalcLLH(DrawFluctHist.get(), MC_Hist_Toy[iSample][iToy].get(), W2_Hist_Toy[iSample][iToy].get(), SampleHandler);
+      chi2_pred[iSample][iToy] = CalcLLH(PredFluctHist.get(), MC_Hist_Toy[iSample][iToy].get(), W2_Hist_Toy[iSample][iToy].get(), SampleHandler);
 
-      chi2_dat_vec[TotalNumberOfSamples][iToy]  += chi2_dat_vec[iSample][iToy];
-      chi2_mc_vec[TotalNumberOfSamples][iToy]   += chi2_mc_vec[iSample][iToy];
-      chi2_pred_vec[TotalNumberOfSamples][iToy] += chi2_pred_vec[iSample][iToy];
+      chi2_dat[TotalNumberOfSamples][iToy]  += chi2_dat[iSample][iToy];
+      chi2_mc[TotalNumberOfSamples][iToy]   += chi2_mc[iSample][iToy];
+      chi2_pred[TotalNumberOfSamples][iToy] += chi2_pred[iSample][iToy];
     }
   }
 
-  MakeChi2Plots(chi2_mc_vec,   "-2LLH (Draw Fluc, Draw)", chi2_dat_vec, "-2LLH (Data, Draw)", SampleDir, "_drawfluc_draw");
-  MakeChi2Plots(chi2_pred_vec, "-2LLH (Pred Fluc, Draw)", chi2_dat_vec, "-2LLH (Data, Draw)", SampleDir, "_predfluc_draw");
+  MakeChi2Plots(chi2_mc,   "-2LLH (Draw Fluc, Draw)", chi2_dat, "-2LLH (Data, Draw)", SampleDir, "_drawfluc_draw");
+  MakeChi2Plots(chi2_pred, "-2LLH (Pred Fluc, Draw)", chi2_dat, "-2LLH (Data, Draw)", SampleDir, "_predfluc_draw");
 }
 
 // *************************
@@ -1121,7 +1201,7 @@ void PredictiveThrower::MakeChi2Plots(const std::vector<std::vector<double>>& Ch
 
     auto chi2_hist = std::make_unique<TH2D>((SampleInfo[iSample].Name+ Title).c_str(),
                                             (SampleInfo[iSample].Name+ Title).c_str(),
-                                            100, min_val, max_val, 100, min_val, max_val);
+                                            50, min_val, max_val, 50, min_val, max_val);
     chi2_hist->SetDirectory(nullptr);
     chi2_hist->GetXaxis()->SetTitle(Chi2_x_title.c_str());
     chi2_hist->GetYaxis()->SetTitle(Chi2_y_title.c_str());
