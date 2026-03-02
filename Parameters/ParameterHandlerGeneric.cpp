@@ -256,26 +256,27 @@ SplineParameter ParameterHandlerGeneric::GetSplineParameter(const YAML::Node& pa
   SplineParameter Spline;
 
   GetBaseParameter(param, Index, Spline);
+  auto& SplinePar = param["SplineInformation"];
   //Now get the Spline interpolation type
-  if (param["SplineInformation"]["InterpolationType"]){
+  if (SplinePar["InterpolationType"]) {
     for(int InterpType = 0; InterpType < kSplineInterpolations ; ++InterpType){
-      if(param["SplineInformation"]["InterpolationType"].as<std::string>() == SplineInterpolation_ToString(SplineInterpolation(InterpType)))
+      if(SplinePar["InterpolationType"].as<std::string>() == SplineInterpolation_ToString(SplineInterpolation(InterpType)))
         Spline._SplineInterpolationType = SplineInterpolation(InterpType);
     }
   } else { //KS: By default use TSpline3
     Spline._SplineInterpolationType = kTSpline3;
   }
 
-  Spline._fSplineNames = param["Systematic"]["SplineInformation"]["SplineName"].as<std::string>();
-  Spline._SplineKnotUpBound = GetFromManager<double>(param["SplineInformation"]["SplineKnotUpBound"], M3::DefSplineKnotUpBound, __FILE__ , __LINE__);
-  Spline._SplineKnotLowBound = GetFromManager<double>(param["SplineInformation"]["SplineKnotLowBound"], M3::DefSplineKnotLowBound, __FILE__ , __LINE__);
+  Spline._fSplineNames = SplinePar["SplineName"].as<std::string>();
+  Spline._SplineKnotUpBound = GetFromManager<double>(SplinePar["SplineKnotUpBound"], M3::DefSplineKnotUpBound, __FILE__ , __LINE__);
+  Spline._SplineKnotLowBound = GetFromManager<double>(SplinePar["SplineKnotLowBound"], M3::DefSplineKnotLowBound, __FILE__ , __LINE__);
 
   if(Spline._SplineKnotUpBound != M3::DefSplineKnotUpBound ||  Spline._SplineKnotLowBound != M3::DefSplineKnotLowBound) {
     MACH3LOG_WARN("Spline knot capping enabled with bounds [{}, {}]. For reliable fits, consider modifying the input generation instead.",
                   Spline._SplineKnotLowBound, Spline._SplineKnotUpBound);
   }
   //If there is no mode information given then this will be an empty vector
-  Spline._fSplineModes = GetFromManager(param["SplineInformation"]["Mode"], std::vector<int>(), __FILE__ , __LINE__);
+  Spline._fSplineModes = GetFromManager(SplinePar["Mode"], std::vector<int>(), __FILE__ , __LINE__);
 
   return Spline;
 }
@@ -419,8 +420,8 @@ void ParameterHandlerGeneric::InitParams() {
     //ETA - set the name to be param_% as this is what ProcessorMCMC expects
     _fNames[i] = "param_"+std::to_string(i);
 
-    // KS: Plenty
-    if(_fParamType[i] == kOsc){
+    // KS: Plenty of MaCh3 processing script rely on osc params having "fancy name" this is to maintain backward compatibility with them
+    if(_fParamType[i] == kOsc) {
       _fNames[i] = _fFancyNames[i];
 
       if(_ParameterGroup[i] != "Osc"){
