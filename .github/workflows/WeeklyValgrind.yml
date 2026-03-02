@@ -22,7 +22,7 @@ jobs:
       - name: Run MaCh3 Validations
         uses: ./.github/actions/mach3-tutorial
         with:
-          mach3_branch: "main"
+          mach3_branch: "develop"
           compilation_flags: ""
 
       - name: Install Valgrind
