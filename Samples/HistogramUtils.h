@@ -107,7 +107,7 @@ inline std::string file_exists(std::string filename) {
   std::ifstream infile(filename.c_str());
   if (!infile.good()) {
     MACH3LOG_ERROR("File {} does not exist", filename);
-    MACH3LOG_ERROR("Please try again");;
+    MACH3LOG_ERROR("Please try again");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
   return filename;

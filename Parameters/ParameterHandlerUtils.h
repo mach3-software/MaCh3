@@ -24,6 +24,12 @@ _MaCh3_Safe_Include_Start_ //{
 #include "TKey.h"
 _MaCh3_Safe_Include_End_ //}
 
+
+/// @file ParameterHandlerUtils.h
+/// @author Clarence Wret
+/// @author Dan Barrow
+/// @author Kamil Skwarczynski
+
 namespace M3
 {
 /// @brief CW: Multi-threaded matrix multiplication

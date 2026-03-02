@@ -42,24 +42,22 @@ class SMonolith : public SplineBase {
     /// @brief KS: Set pointers to spline params
     /// @param spline_ParsPointers Vector of pointers to spline params
     void setSplinePointers(std::vector< const double* > spline_ParsPointers) {
-      splineParsPointer = spline_ParsPointers;
       for (M3::int_t i = 0; i < nParams; ++i) SplineInfoArray[i].splineParsPointer = spline_ParsPointers[i];
     };
     
-    /// The returned gpu weights, read by the GPU
-    float* cpu_weights;
-    /// KS: This holds the total CPU weights that gets read in samplePDFND
-    float* cpu_total_weights;
-
     /// @brief KS: Prepare spline file that can be used for fast loading
     void PrepareSplineFile(std::string FileName) override;
     /// @brief KS: Load preprocessed spline file
     /// @param FileName Path to ROOT file with predefined reduced Spline Monolith
     void LoadSplineFile(std::string FileName) override;
 
+    /// KS: This holds the total CPU weights that gets read in SampleHandler
+    /// @warning will become private member in future , please use SMonolith::retPointer
+    float* cpu_total_weights;
+
   private:
     /// @brief KS: Set everything to null etc.
-    inline void Initialise();
+    void Initialise();
     /// @brief CW: Function to scan through the MasterSpline of TSpline3
     /// @param MasterSpline Vector of TSpline3_red pointers which we strip back
     /// @param NEvents Number of MC events
@@ -70,7 +68,7 @@ class SMonolith : public SplineBase {
     /// @param SplineType Whether object is TSpline3 or TF1
     /// @param NSplinesValid Total number of valid (not null) TSpline3
     /// @param nTF1Valid Total number of valid (not null) TF1
-    inline void ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*> > & MasterSpline,
+    void ScanMasterSpline(std::vector<std::vector<TResponseFunction_red*> > & MasterSpline,
                                  unsigned int &nEvents,
                                  short int &MaxPoints,
                                  short int &numParams,
@@ -82,12 +80,12 @@ class SMonolith : public SplineBase {
                                  const std::vector<RespFuncType> &SplineType);
     /// @brief CW: Prepare the TSpline3_red objects for the GPU
     /// @param MasterSpline Vector of TResponseFunction_red pointers which we strip back
-    inline void PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > &MasterSpline, const std::vector<RespFuncType> &SplineType);
+    void PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > &MasterSpline, const std::vector<RespFuncType> &SplineType);
     /// @brief CW: The shared initialiser from constructors of TResponseFunction_red
-    inline void MoveToGPU();
+    void MoveToGPU();
         
     /// @brief KS: Print info about how much knots etc has been initialised
-    inline void PrintInitialsiation();
+    void PrintInitialsiation() const;
 
     /// @brief CW: This loads up coefficients into two arrays: one x array and one yabcd array
     /// @brief CW: This should maximize our cache hits!
@@ -95,34 +93,22 @@ class SMonolith : public SplineBase {
     /// @param nPoints number of knots
     /// @param xArray array X value for each knot
     /// @param manyArray Array holding coefficients for each knot
-    inline void getSplineCoeff_SepMany(TSpline3_red* &spl, int &nPoints, float *&xArray, float *&manyArray);
+    void GetSplineCoeff_SepMany(TSpline3_red* &spl, int &nPoints, float *&xArray, float *&manyArray) const;
 
     /// @brief CPU based code which eval weight for each spline
-    inline void CalcSplineWeights() override;
+    void CalcSplineWeights() override;
     /// @brief Calc total event weight
-    inline void ModifyWeights() override;
-    /// @brief Conversion from valid splines to all
-    inline void ModifyWeights_GPU();
-
-    /// This holds pointer to parameter position which we later copy paste it to GPU
-    std::vector< const double* > splineParsPointer;
+    void ModifyWeights() override;
 
     /// Number of events
     unsigned int NEvents;
     /// Max knots for production
     short int _max_knots;
-    /// holds the index for good splines; don't do unsigned since starts with negative value!
-    std::vector<int> index_spline_cpu;
-    /// holds the index for good TF1; don't do unsigned since starts with negative value!
-    std::vector<int> index_TF1_cpu;
 
     /// Number of valid splines
     unsigned int NSplines_valid;
     /// Number of valid TF1
     unsigned int NTF1_valid;
-
-    /// Number of total splines if each event had every parameter's spline
-    unsigned int NSplines_total_large;
 
     /// Sum of all knots over all splines
     unsigned int nKnots;
