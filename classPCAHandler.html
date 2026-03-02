@@ -240,14 +240,14 @@ Private Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class responsible for handling Principal Component Analysis (PCA) of covariance matrix. </p>
 <dl class="section author"><dt>Author</dt><dd>Clarence Wret</dd></dl>
-<h1><a class="anchor" id="autotoc_md87"></a>
+<h1><a class="anchor" id="autotoc_md88"></a>
 Introduction</h1>
 <p>This class applies Principal Component Analysis (PCA) to covariance matrices using eigen-decomposition. The main benefit is that PCA rotates the parameter space into a basis where parameters are uncorrelated. In practice, this helps MCMC fits move more efficiently, since correlated directions in the original space often slow down convergence.</p>
-<h1><a class="anchor" id="autotoc_md88"></a>
+<h1><a class="anchor" id="autotoc_md89"></a>
 Dimensionality Reduction</h1>
 <p>PCA makes it possible to drop directions in parameter space with very small eigenvalues. These correspond to combinations of parameters that are poorly constrained or dominated by statistical noise. By applying a threshold (e.g. discarding eigenvalues smaller than <code>1e-4</code> of the largest one), the effective number of parameters can be reduced.</p>
 <p>This is particularly useful in large MCMC fits, where many parameters may contribute little information. Removing them reduces dimensionality while keeping the dominant structure of the parameter space intact, often leading to faster and more stable fits.</p>
-<h1><a class="anchor" id="autotoc_md89"></a>
+<h1><a class="anchor" id="autotoc_md90"></a>
 Partial Decomposition</h1>
 <p>PCA does not need to be applied to the full covariance matrix. This class supports eigen-decomposition of only a submatrix. This is useful when only a subset of parameters is strongly correlated and benefits from PCA, while the rest remain in the original parameter basis. </p>
 
@@ -1458,7 +1458,7 @@ Partial Decomposition</h1>
 <div class="ttc" id="aclassPCAHandler_html_a88a89e8955f06dff98ac343d0f5e84e4"><div class="ttname"><a href="classPCAHandler.html#a88a89e8955f06dff98ac343d0f5e84e4">PCAHandler::IsParameterDecomposed</a></div><div class="ttdeci">bool IsParameterDecomposed(const int i) const</div><div class="ttdoc">Check if parameter in PCA base is decomposed or not.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00212">PCAHandler.h:212</a></div></div>
 <div class="ttc" id="aclassPCAHandler_html_ae232ab07ae839b755912c7e23f3c835f"><div class="ttname"><a href="classPCAHandler.html#ae232ab07ae839b755912c7e23f3c835f">PCAHandler::SetParCurrPCA</a></div><div class="ttdeci">void SetParCurrPCA(const int i, const double value)</div><div class="ttdoc">Set current value for parameter in PCA base.</div><div class="ttdef"><b>Definition:</b> <a href="PCAHandler_8h_source.html#l00165">PCAHandler.h:165</a></div></div>
 <div class="ttc" id="anamespaceM3_html_a5ed0accdbf66626c16b6c3b00bd5d030"><div class="ttname"><a href="namespaceM3.html#a5ed0accdbf66626c16b6c3b00bd5d030">M3::GetThreadIndex</a></div><div class="ttdeci">int GetThreadIndex()</div><div class="ttdoc">thread index inside parallel loop</div><div class="ttdef"><b>Definition:</b> <a href="Monitor_8h_source.html#l00086">Monitor.h:86</a></div></div>
-<div class="ttc" id="anamespaceM3_html_a99622fe57c7a13d75de4d3c3561b530d"><div class="ttname"><a href="namespaceM3.html#a99622fe57c7a13d75de4d3c3561b530d">M3::MatrixVectorMultiSingle</a></div><div class="ttdeci">double MatrixVectorMultiSingle(double **_restrict_ matrix, const double *_restrict_ vector, const int Length, const int i)</div><div class="ttdoc">KS: Custom function to perform multiplication of matrix and single element which is thread safe.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerUtils_8h_source.html#l00137">ParameterHandlerUtils.h:137</a></div></div>
+<div class="ttc" id="anamespaceM3_html_a99622fe57c7a13d75de4d3c3561b530d"><div class="ttname"><a href="namespaceM3.html#a99622fe57c7a13d75de4d3c3561b530d">M3::MatrixVectorMultiSingle</a></div><div class="ttdeci">double MatrixVectorMultiSingle(double **_restrict_ matrix, const double *_restrict_ vector, const int Length, const int i)</div><div class="ttdoc">KS: Custom function to perform multiplication of matrix and single element which is thread safe.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerUtils_8h_source.html#l00143">ParameterHandlerUtils.h:143</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

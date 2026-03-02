@@ -118,7 +118,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:aac0e253784ed2f2a3258d68df22a2568"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Following H. Jeffreys <a class="el" href="citelist.html#CITEREF_jeffreys1998theory">[22]</a>.  <a href="StatisticalUtils_8h.html#aac0e253784ed2f2a3258d68df22a2568">More...</a><br /></td></tr>
 <tr class="separator:aac0e253784ed2f2a3258d68df22a2568"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acf403b05be9baa719893db7449e833c7"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="StatisticalUtils_8h.html#acf403b05be9baa719893db7449e833c7">GetDunneKaboth</a> (const double BayesFactor)</td></tr>
-<tr class="memdesc:acf403b05be9baa719893db7449e833c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Based on Table 1 in <a href="https://www.t2k.org/docs/technotes/435">https://www.t2k.org/docs/technotes/435</a>.  <a href="StatisticalUtils_8h.html#acf403b05be9baa719893db7449e833c7">More...</a><br /></td></tr>
+<tr class="memdesc:acf403b05be9baa719893db7449e833c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a Bayes factor into an approximate particle-physics significance level using the Dunne–Kaboth scale.  <a href="StatisticalUtils_8h.html#acf403b05be9baa719893db7449e833c7">More...</a><br /></td></tr>
 <tr class="separator:acf403b05be9baa719893db7449e833c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a04394b98587b44b98b003bd1226606ed"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="StatisticalUtils_8h.html#a04394b98587b44b98b003bd1226606ed">GetSigmaValue</a> (const int sigma)</td></tr>
 <tr class="memdesc:a04394b98587b44b98b003bd1226606ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Convert sigma from normal distribution into percentage.  <a href="StatisticalUtils_8h.html#a04394b98587b44b98b003bd1226606ed">More...</a><br /></td></tr>
@@ -1013,13 +1013,21 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>KS: Based on Table 1 in <a href="https://www.t2k.org/docs/technotes/435">https://www.t2k.org/docs/technotes/435</a>. </p>
+<p>Convert a Bayes factor into an approximate particle-physics significance level using the Dunne–Kaboth scale. </p>
+<p>This function maps a Bayes factor B(θ1,θ2) to an equivalent Gaussian significance ("n σ") assuming equal priors for the two hypotheses.</p>
+<p>The thresholds are based on commonly used particle-physics probability levels and their corresponding Bayes factors:</p>
+<h2><a class="anchor" id="autotoc_md87"></a>
+Bayes factor (B)      Approximate significance</h2>
+<p>B &lt; 2.125 &lt; 1 σ 2.125 ≤ B &lt; 20.74 &gt; 1 σ 20.74 ≤ B &lt; 369.4 &gt; 2 σ 369.4 ≤ B &lt; 15800 &gt; 3 σ 15800 ≤ B &lt; 1745000 &gt; 4 σ B ≥ 1745000 &gt; 5 σ</p>
+<p>For example, a Bayes factor of 369.4 corresponds approximately to a 3 σ effect in traditional particle-physics terminology.</p>
+<dl class="section note"><dt>Note</dt><dd>For T2K users see Table 1 in <a href="https://www.t2k.org/docs/technotes/435">https://www.t2k.org/docs/technotes/435</a> </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">BayesFactor</td><td>Obtained value of Bayes factor </td></tr>
+    <tr><td class="paramname">BayesFactor</td><td>The Bayes factor B(θ1,θ2). </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>A string describing the equivalent significance level. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="StatisticalUtils_8cpp_source.html#l00020">20</a> of file <a class="el" href="StatisticalUtils_8cpp_source.html">StatisticalUtils.cpp</a>.</p>
 <div class="fragment"><div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;                                                  {</div>

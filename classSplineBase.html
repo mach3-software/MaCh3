@@ -143,9 +143,9 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:ad4f4b51619ef0573c7f1497f5d1fd52d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSplineBase.html#ad4f4b51619ef0573c7f1497f5d1fd52d">LoadFastSplineInfoDir</a> (std::unique_ptr&lt; TFile &gt; &amp;SplineFile)</td></tr>
 <tr class="memdesc:ad4f4b51619ef0573c7f1497f5d1fd52d"><td class="mdescLeft">&#160;</td><td class="mdescRight">KS: Load preprocessed <a class="el" href="structFastSplineInfo.html" title="CW: Add a struct to hold info about the splinified xsec parameters and help with FindSplineSegment.">FastSplineInfo</a>.  <a href="classSplineBase.html#ad4f4b51619ef0573c7f1497f5d1fd52d">More...</a><br /></td></tr>
 <tr class="separator:ad4f4b51619ef0573c7f1497f5d1fd52d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac8a5f86ac6f156a7e11ef188b06f425f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSplineBase.html#ac8a5f86ac6f156a7e11ef188b06f425f">getTF1Coeff</a> (<a class="el" href="classTF1__red.html">TF1_red</a> *&amp;spl, int &amp;nPoints, float *&amp;coeffs)</td></tr>
-<tr class="memdesc:ac8a5f86ac6f156a7e11ef188b06f425f"><td class="mdescLeft">&#160;</td><td class="mdescRight">CW: Gets the polynomial coefficients for TF1.  <a href="classSplineBase.html#ac8a5f86ac6f156a7e11ef188b06f425f">More...</a><br /></td></tr>
-<tr class="separator:ac8a5f86ac6f156a7e11ef188b06f425f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a106518719051d8179d2e4f967b8fa932"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSplineBase.html#a106518719051d8179d2e4f967b8fa932">GetTF1Coeff</a> (<a class="el" href="classTF1__red.html">TF1_red</a> *&amp;spl, int &amp;nPoints, float *&amp;coeffs) const</td></tr>
+<tr class="memdesc:a106518719051d8179d2e4f967b8fa932"><td class="mdescLeft">&#160;</td><td class="mdescRight">CW: Gets the polynomial coefficients for TF1.  <a href="classSplineBase.html#a106518719051d8179d2e4f967b8fa932">More...</a><br /></td></tr>
+<tr class="separator:a106518719051d8179d2e4f967b8fa932"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -458,8 +458,8 @@ Protected Attributes</h2></td></tr>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="ac8a5f86ac6f156a7e11ef188b06f425f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac8a5f86ac6f156a7e11ef188b06f425f">&#9670;&nbsp;</a></span>getTF1Coeff()</h2>
+<a id="a106518719051d8179d2e4f967b8fa932"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a106518719051d8179d2e4f967b8fa932">&#9670;&nbsp;</a></span>GetTF1Coeff()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -468,7 +468,7 @@ Protected Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void SplineBase::getTF1Coeff </td>
+          <td class="memname">void SplineBase::GetTF1Coeff </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classTF1__red.html">TF1_red</a> *&amp;&#160;</td>
           <td class="paramname"><em>spl</em>, </td>
@@ -488,7 +488,7 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td></td>
+          <td></td><td> const</td>
         </tr>
       </table>
   </td>
@@ -509,7 +509,7 @@ Protected Attributes</h2></td></tr>
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="SplineBase_8cpp_source.html#l00106">106</a> of file <a class="el" href="SplineBase_8cpp_source.html">SplineBase.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;                                                                         {</div>
+<div class="fragment"><div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;                                                                               {</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="comment">// *****************************************</span></div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  <span class="comment">// Initialise all arrays to 1.0</span></div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code" href="SplineCommon_8h.html#ad6cacf3d45a37eeeeffe38ad24345d54">_nTF1Coeff_</a>; ++i) {</div>

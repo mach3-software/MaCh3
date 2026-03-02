@@ -279,8 +279,7 @@ var sectionId = 'dynsection-1';
 <title>Node14&#45;&gt;Node1</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M287.71,-282.64C414.34,-274.98 671.92,-255.44 754,-219.5 784.17,-206.29 812.64,-179.01 826.57,-164.34"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="287.12,-279.16 277.35,-283.25 287.54,-286.15 287.12,-279.16"/>
-<text text-anchor="middle" x="519" y="-285.5" font-family="Helvetica" font-size="10.00"> _ParameterGroup</text>
-<text text-anchor="middle" x="519" y="-274.5" font-family="Helvetica" font-size="10.00">_fSplineNames</text>
+<text text-anchor="middle" x="519" y="-274.5" font-family="Helvetica" font-size="10.00"> _ParameterGroup</text>
 </g>
 <!-- Node14&#45;&gt;Node2 -->
 <g id="edge13" class="edge">

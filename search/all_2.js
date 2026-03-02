@@ -29,7 +29,7 @@ var searchData=
   ['_5ffpropval_45',['_fPropVal',['../classParameterHandlerBase.html#af1b1a75fbc837d788201ea8062aa6a3b',1,'ParameterHandlerBase']]],
   ['_5ffsamplenames_46',['_fSampleNames',['../classParameterHandlerBase.html#af4ebe6b24b280c5263e6a5385b11a2c9',1,'ParameterHandlerBase']]],
   ['_5ffsplinemodes_47',['_fSplineModes',['../structSplineParameter.html#a3e2dacc950ff0c52fca0643a83824f82',1,'SplineParameter']]],
-  ['_5ffsplinenames_48',['_fSplineNames',['../classParameterHandlerGeneric.html#a24c0df68d9d476ea304c75310f18de2c',1,'ParameterHandlerGeneric']]],
+  ['_5ffsplinenames_48',['_fSplineNames',['../structSplineParameter.html#af47cfda069fe47fa8967a8d6e496a3f7',1,'SplineParameter']]],
   ['_5ffsysttoglobalsystindexmap_49',['_fSystToGlobalSystIndexMap',['../classParameterHandlerGeneric.html#a67955522a48b4e340981b5ec1ca3b0da',1,'ParameterHandlerGeneric']]],
   ['_5ffupbound_50',['_fUpBound',['../classParameterHandlerBase.html#aca38e417c05c6fa67a892ee5ddf1c2ac',1,'ParameterHandlerBase']]],
   ['_5ffyamldoc_51',['_fYAMLDoc',['../classParameterHandlerBase.html#a714a8a85df5986b40dfbdf13bb8a159d',1,'ParameterHandlerBase']]],

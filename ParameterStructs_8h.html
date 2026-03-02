@@ -758,33 +758,33 @@ template&lt;typename T , size_t N&gt; </div>
 
 <p>Convert a Syst type type to a string. </p>
 
-<p class="definition">Definition at line <a class="el" href="ParameterStructs_8h_source.html#l00305">305</a> of file <a class="el" href="ParameterStructs_8h_source.html">ParameterStructs.h</a>.</p>
-<div class="fragment"><div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;                                                     {</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;<span class="comment">// **************************************************</span></div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;  std::string name = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;  <span class="keywordflow">switch</span>(i) {</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa085cb29127b1cf7b1ddd429ff4440b17">SystType::kNorm</a>:</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;      name = <span class="stringliteral">&quot;Norm&quot;</span>;</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;      <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa29d6ccf6cf507f6e66c72b1d3c2aed00">SystType::kSpline</a>:</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;      name = <span class="stringliteral">&quot;Spline&quot;</span>;</div>
+<p class="definition">Definition at line <a class="el" href="ParameterStructs_8h_source.html#l00308">308</a> of file <a class="el" href="ParameterStructs_8h_source.html">ParameterStructs.h</a>.</p>
+<div class="fragment"><div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;                                                     {</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;<span class="comment">// **************************************************</span></div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;  std::string name = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;  <span class="keywordflow">switch</span>(i) {</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa085cb29127b1cf7b1ddd429ff4440b17">SystType::kNorm</a>:</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;      name = <span class="stringliteral">&quot;Norm&quot;</span>;</div>
 <div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;      <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fad9b1ac76e80f59684cfb7dc996fc870d">SystType::kFunc</a>:</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;      name = <span class="stringliteral">&quot;Functional&quot;</span>;</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa29d6ccf6cf507f6e66c72b1d3c2aed00">SystType::kSpline</a>:</div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;      name = <span class="stringliteral">&quot;Spline&quot;</span>;</div>
 <div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;      <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa50ac44a09cc05fd1285a88637bdcf789">SystType::kOsc</a>:</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;      name = <span class="stringliteral">&quot;Oscillation&quot;</span>;</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fad9b1ac76e80f59684cfb7dc996fc870d">SystType::kFunc</a>:</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;      name = <span class="stringliteral">&quot;Functional&quot;</span>;</div>
 <div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;      <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa32e7da18117f9defb24042a71776e5cb">SystType::kSystTypes</a>:</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;kSystTypes is not a valid SystType!&quot;</span>);</div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;    <span class="keywordflow">default</span>:</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;UNKNOWN SYST TYPE SPECIFIED!&quot;</span>);</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;You gave {}&quot;</span>, <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(i));</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;  }</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;  <span class="keywordflow">return</span> name;</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;}</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa50ac44a09cc05fd1285a88637bdcf789">SystType::kOsc</a>:</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;      name = <span class="stringliteral">&quot;Oscillation&quot;</span>;</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;      <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;    <span class="keywordflow">case</span> <a class="code" href="ParameterStructs_8h.html#affc27d8b7b82d3713f45af17873fde2fa32e7da18117f9defb24042a71776e5cb">SystType::kSystTypes</a>:</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;kSystTypes is not a valid SystType!&quot;</span>);</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    <span class="keywordflow">default</span>:</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;UNKNOWN SYST TYPE SPECIFIED!&quot;</span>);</div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;You gave {}&quot;</span>, <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(i));</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__ , __LINE__ );</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;  }</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;  <span class="keywordflow">return</span> name;</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
