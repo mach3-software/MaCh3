@@ -20,6 +20,9 @@ please consult the \ref ReleaseNotes "Release Notes".
 If you are looking for analyses performed with MaCh3 or related papers,
 see the \ref ResultsPublications "Results and Publications" page.
 
+Documentation in many places is documenting scientific papers, with clickable links.
+Nevertheless you can find all references in \ref citelist
+
 MaCh3 also comes with a Python interface. You can find out more about this in the dedicated [pyMaCh3 documentation](./pyMaCh3/mainpage.html)
 
 If something is unclear please contact us via
