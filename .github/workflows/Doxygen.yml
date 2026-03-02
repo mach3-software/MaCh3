@@ -61,7 +61,7 @@ jobs:
           doxygen Doc/Doxyfile
 
       - name: Upload Doxygen Artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           retention-days: 1
           name: DoxygenHTML
@@ -120,7 +120,7 @@ jobs:
           mkdir to-upload/pyMaCh3
           mv Doc/sphinx/build/html/* to-upload/pyMaCh3/
           
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           retention-days: 1
           name: DocumentationHTML
