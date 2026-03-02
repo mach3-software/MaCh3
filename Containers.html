@@ -121,17 +121,14 @@ Words of caution</h2>
 <h2><a class="anchor" id="autotoc_md173"></a>
 Build experiment specific MaCh3 using Core as base</h2>
 <p>Docker allow</p>
-<p>#Use MaCh3 container as a base FROM ghcr.io/mach3-software/mach3:alma9latest AS mach3t2k_build </p><div class="fragment"><div class="line">// Clone Your MaCh3</div>
+<p>#Use MaCh3 container as a base </p><div class="fragment"><div class="line">FROM ghcr.io/mach3-software/mach3:alma9latest AS mach3t2k_build</div>
+<div class="line">// Clone Your MaCh3</div>
 <div class="line">RUN git XXXXXXX.YourMaCh3.git</div>
 <div class="line">// cmake</div>
 <div class="line">RUN cmake ../</div>
 <div class="line">// compile</div>
 <div class="line">RUN make &amp;&amp; make install</div>
-</div><!-- fragment --><p>For more see <a href="https://github.com/KSkwarczynski/OA_Docker/blob/main/MaCh3T2K/Dockerfile">https://github.com/KSkwarczynski/OA_Docker/blob/main/MaCh3T2K/Dockerfile</a></p>
-<h2><a class="anchor" id="autotoc_md174"></a>
-GPU</h2>
-<p>TODO!!!</p>
-<h2><a class="anchor" id="autotoc_md175"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md174"></a>
 Acknowledgments</h2>
 <p>Highly inspired by lessons from Luke Pickering </p>
 </div></div><!-- contents -->

@@ -1,8 +1,8 @@
 var searchData=
 [
   ['n_5frm_5frestarts_3263',['n_rm_restarts',['../classadaptive__mcmc_1_1AdaptiveMCMCHandler.html#ac5da89509c4d7b10cf760e6f4b500962',1,'adaptive_mcmc::AdaptiveMCMCHandler']]],
-  ['name_3264',['Name',['../structMaCh3ModeInfo.html#a8c957d49742a2ad0faa79fbc07427767',1,'MaCh3ModeInfo::Name()'],['../structPredictiveSample.html#ae801f4aff1936d81a3f542a779be3cd9',1,'PredictiveSample::Name()']]],
-  ['name_3265',['name',['../structReweightConfig.html#a6eca75efd43cdd17c3907a2ce1cb7b08',1,'ReweightConfig::name()'],['../structTypeParameterBase.html#a9cec220ee7904196cc6a7d98c2b061f8',1,'TypeParameterBase::name()']]],
+  ['name_3264',['name',['../structReweightConfig.html#a6eca75efd43cdd17c3907a2ce1cb7b08',1,'ReweightConfig::name()'],['../structTypeParameterBase.html#a9cec220ee7904196cc6a7d98c2b061f8',1,'TypeParameterBase::name()']]],
+  ['name_3265',['Name',['../structMaCh3ModeInfo.html#a8c957d49742a2ad0faa79fbc07427767',1,'MaCh3ModeInfo::Name()'],['../structPredictiveSample.html#ae801f4aff1936d81a3f542a779be3cd9',1,'PredictiveSample::Name()']]],
   ['nbatches_3266',['nBatches',['../classMCMCProcessor.html#a02c5a3f849cf217705816c650c678d19',1,'MCMCProcessor']]],
   ['nbins_3267',['nBins',['../structSampleBinningInfo.html#ad8f38d864540c9c606e1927e312996e0',1,'SampleBinningInfo::nBins()'],['../classMCMCProcessor.html#a6b74f8195bcbca0979f9e9fe43468bae',1,'MCMCProcessor::nBins()']]],
   ['nbranches_3268',['nBranches',['../classMCMCProcessor.html#af6ba5d9aec5350fafebbf81309e813cb',1,'MCMCProcessor']]],
@@ -16,8 +16,8 @@ var searchData=
   ['ndsamplesbins_3276',['NDSamplesBins',['../classMCMCProcessor.html#ab2649d6e851ec0a08985a35da299fa5b',1,'MCMCProcessor::NDSamplesBins()'],['../GetPostfitParamPlots_8cpp.html#a329ffa5c522d29e1ec016f0b7028437d',1,'NDSamplesBins():&#160;GetPostfitParamPlots.cpp']]],
   ['ndsamplesnames_3277',['NDSamplesNames',['../classMCMCProcessor.html#aab80e0a8be27cc9206e1834a2f1f1ca2',1,'MCMCProcessor::NDSamplesNames()'],['../GetPostfitParamPlots_8cpp.html#ab5cba8ce6ff9a6e1e9a5ba0b9cfb0b37',1,'NDSamplesNames():&#160;GetPostfitParamPlots.cpp']]],
   ['nentries_3278',['nEntries',['../classMCMCProcessor.html#af3a19b885e9c34e1674aea8cfbe14e1c',1,'MCMCProcessor']]],
-  ['nevents_3279',['nEvents',['../classSampleHandlerBase.html#ab497b52d94868283a8a7cedbd1a4d777',1,'SampleHandlerBase']]],
-  ['nevents_3280',['NEvents',['../classSMonolith.html#ac86282b04659bae5cccb6073c9edc0a5',1,'SMonolith']]],
+  ['nevents_3279',['NEvents',['../classSMonolith.html#ac86282b04659bae5cccb6073c9edc0a5',1,'SMonolith']]],
+  ['nevents_3280',['nEvents',['../classSampleHandlerBase.html#ab497b52d94868283a8a7cedbd1a4d777',1,'SampleHandlerBase']]],
   ['nfiles_3281',['nFiles',['../ProcessMCMC_8cpp.html#a6b25bcddaae9b868109dc98a54476e46',1,'ProcessMCMC.cpp']]],
   ['nkeptpcapars_3282',['nKeptPCApars',['../classPCAHandler.html#aa39db9118399bebcdb784fe9c9fea458',1,'PCAHandler']]],
   ['nknots_3283',['nKnots',['../classSMonolith.html#afc0e3d1eafd575cf7628319a66925d5b',1,'SMonolith']]],
