@@ -7,7 +7,7 @@
 ///
 /// Contains code to run on CUDA GPUs. Essentially we load up stripped TSpline3 objects to the GPU and do the equivalent of TSpline3->Eval(double) for all events
 /// Now also supports TF1 evals
-/// Called from Samples/samplePDFND.cpp -> Splines/SplineMonolith.cpp -> Splines/gpuSplineUtils.cu
+/// Called from Samples/SampleHandler.cpp -> Splines/SplineMonolith.cpp -> Splines/gpuSplineUtils.cu
 
 //MaCh3 included
 #include "Manager/gpuUtils.cuh"
@@ -40,7 +40,6 @@ __global__ void EvalOnGPU_TF1(
   const short int* __restrict__ gpu_paramNo_arr_tf1,
   float* __restrict__ gpu_weights_tf1);
 
-#ifndef Weight_On_SplineBySpline_Basis
 /// @brief KS: Evaluate the total spline event weight on the GPU, as in most cases GPU is faster, even more this significant reduce memory transfer from GPU to CPU
 /// @param gpu_weights Weight for each spline object
 /// @param gpu_weights_tf1 Weight for each TF1 object
@@ -55,9 +54,12 @@ __global__ void EvalOnGPU_TotWeight(
 
   const cudaTextureObject_t __restrict__ text_nParamPerEvent,
   const cudaTextureObject_t __restrict__ text_nParamPerEvent_TF1);
-#endif
 
 /// @brief Class responsible for calculating spline weight on GPU
+/// @author Richard Calland
+/// @author Asher Kaboth
+/// @author Clarence Wret
+/// @author Kamil Skwarczynski
 class SMonolithGPU
 {
   public:
@@ -73,10 +75,8 @@ class SMonolithGPU
     /// @param n_splines Total number of spline objects, not knots
     /// @param n_tf1 Total number of TF1 objects, not coefficients
     __host__ void InitGPU_SplineMonolith(
-      #ifndef Weight_On_SplineBySpline_Basis
       float **cpu_total_weights,
       int n_events,
-      #endif
       unsigned int total_nknots,
       unsigned int n_splines,
       unsigned int n_tf1,
@@ -105,12 +105,10 @@ class SMonolithGPU
       // TFI related now
       std::vector<float> cpu_many_array_TF1,
       std::vector<short int> cpu_paramNo_arr_TF1,
-      #ifndef Weight_On_SplineBySpline_Basis
       int n_events,
       std::vector<unsigned int> cpu_nParamPerEvent,
       // TFI related now
       std::vector<unsigned int> cpu_nParamPerEvent_TF1,
-      #endif
       int n_params,
       unsigned int n_splines,
       short int spline_size,
@@ -127,15 +125,13 @@ class SMonolithGPU
 
     /// @brief Run the GPU code for the separate many arrays. As in separate {x}, {y,b,c,d} arrays
     /// Pass the segment and the parameter values
-    /// (binary search already performed in SplineMonolith::FindSplineSegment()
-
-
+    /// (binary search already performed in SplineBase::FindSplineSegment()
 
     /// @brief Executes the GPU code for calculating spline weights.
     ///
     /// This function runs the GPU computation for the spline monolith.
     /// It assumes that the appropriate segment has already been identified
-    /// through binary search in the `SplineMonolith::FindSplineSegment()`
+    /// through binary search in the SplineBase::FindSplineSegment()
     /// function.
     ///
     /// @param cpu_weights Pointer to the array of weights on the CPU (used if
@@ -149,12 +145,7 @@ class SMonolithGPU
     /// @param h_n_splines Total number of spline objects in the GPU context.
     /// @param h_n_tf1 Total number of TF1 objects in the GPU context.
     __host__ void RunGPU_SplineMonolith(
-      #ifdef Weight_On_SplineBySpline_Basis
-      float* cpu_weights,
-      float* cpu_weights_tf1,
-      #else
       float* cpu_total_weights,
-      #endif
       // Holds the changes in parameters
       float *vals,
       // Holds the segments for parameters
@@ -169,9 +160,7 @@ class SMonolithGPU
     ///        on the CPU (used if `Weight_On_SplineBySpline_Basis`
     ///        is not defined).
     __host__ void CleanupGPU_SplineMonolith(
-      #ifndef Weight_On_SplineBySpline_Basis
       float *cpu_total_weights
-      #endif
       );
 
     /// @brief Clean up pinned variables at CPU
@@ -222,11 +211,8 @@ class SMonolithGPU
     // ******************************************
     /// KS: Textures are L1 cache variables which are well optimised for fetching. Make texture only for variables you often access but rarely overwrite. There are limits on texture memory so don't use huge arrays
     cudaTextureObject_t text_coeff_x = 0;
-    #ifndef Weight_On_SplineBySpline_Basis
     /// KS: Map keeping track how many parameters applies to each event, we keep two numbers here {number of splines per event, index where splines start for a given event}
     cudaTextureObject_t text_nParamPerEvent = 0;
     /// KS: Map keeping track how many parameters applies to each event, we keep two numbers here {number of TF1 per event, index where TF1 start for a given event}
     cudaTextureObject_t text_nParamPerEvent_TF1 = 0;
-    #endif
 };
-

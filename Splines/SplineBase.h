@@ -67,7 +67,7 @@ class SplineBase {
     /// @param spl pointer to TF1_red that will be checked
     /// @param nPoints number of knots
     /// @param coeffs Array holding coefficients for each knot
-    void getTF1Coeff(TF1_red* &spl, int &nPoints, float *&coeffs);
+    void GetTF1Coeff(TF1_red* &spl, int &nPoints, float *&coeffs) const;
 
     /// Array of FastSplineInfo structs: keeps information on each xsec spline for fast evaluation
     /// Method identical to TSpline3::Eval(double) but faster because less operations

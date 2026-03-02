@@ -294,6 +294,9 @@ struct SplineParameter : public TypeParameterBase {
   /// Modes to which spline applies (valid only for binned splines)
   std::vector<int> _fSplineModes;
 
+  /// Name of spline in TTree (TBranch),
+  std::string _fSplineNames;
+
   /// EM: Cap spline knot lower value
   double _SplineKnotLowBound;
   /// EM: Cap spline knot higher value

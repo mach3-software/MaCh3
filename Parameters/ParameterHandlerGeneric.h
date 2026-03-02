@@ -25,31 +25,31 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     // General Getter functions not split by detector
     /// @brief ETA - just return the int of the SampleName, this can be removed to do a string comp at some point.
     /// @param i parameter index
-    inline std::vector<std::string> GetParSampleID(const int i) const { return _fSampleNames[i];};
+    std::vector<std::string> GetParSampleID(const int i) const { return _fSampleNames[i];};
     /// @brief ETA - just return a string of "spline", "norm" or "functional"
     /// @param i parameter index
-    inline std::string GetParamTypeString(const int i) const { return SystType_ToString(_fParamType[i]); }
+    std::string GetParamTypeString(const int i) const { return SystType_ToString(_fParamType[i]); }
     /// @brief Returns enum describing our param type
     /// @param i parameter index
-    inline SystType GetParamType(const int i) const {return _fParamType[i];}
+    SystType GetParamType(const int i) const {return _fParamType[i];}
 
     /// @brief Get interpolation type for a given parameter
     /// @param i spline parameter index, not confuse with global index
-    inline SplineInterpolation GetParSplineInterpolation(const int i) const {return SplineParams.at(i)._SplineInterpolationType;}
+    SplineInterpolation GetParSplineInterpolation(const int i) const {return SplineParams.at(i)._SplineInterpolationType;}
     /// @brief Get the interpolation types for splines affecting a particular SampleName
     const std::vector<SplineInterpolation> GetSplineInterpolationFromSampleName(const std::string& SampleName);
     /// @brief Get the name of the spline associated with the spline at index i
     /// @param i spline parameter index, not to be confused with global index
-    std::string GetParSplineName(const int i) const {return _fSplineNames[i];}
+    std::string GetParSplineName(const int i) const {return SplineParams.at(i)._fSplineNames;}
 
     /// @brief DB Get spline parameters depending on given SampleName
     const std::vector<int> GetGlobalSystIndexFromSampleName(const std::string& SampleName, const SystType Type);
     /// @brief EM: value at which we cap spline knot weight
     /// @param i spline parameter index, not confuse with global index
-    inline double GetParSplineKnotUpperBound(const int i) const {return SplineParams.at(i)._SplineKnotUpBound;}
+    double GetParSplineKnotUpperBound(const int i) const {return SplineParams.at(i)._SplineKnotUpBound;}
     /// @brief EM: value at which we cap spline knot weight
     /// @param i spline parameter index, not confuse with global index
-    inline double GetParSplineKnotLowerBound(const int i) const {return SplineParams.at(i)._SplineKnotLowBound;}
+    double GetParSplineKnotLowerBound(const int i) const {return SplineParams.at(i)._SplineKnotLowBound;}
 
     /// @brief DB Grab the number of parameters for the relevant SampleName
     /// @param SampleName property of SampleHandler class based on which we select whether to apply uncertainties or not
@@ -91,7 +91,7 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     /// @brief KS: Check how many parameters are associated with given group
     int GetNumParFromGroup(const std::string& Group) const;
     /// @brief KS: Get names of all unique parameter groups
-    std::vector<std::string> GetUniqueParameterGroups();
+    std::vector<std::string> GetUniqueParameterGroups() const;
 
     /// @brief KS Function to set to prior parameters of a given group or values from vector
     /// @param Group name of group, like Xsec or Flux
@@ -133,22 +133,22 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
 
   protected:
     /// @brief Print information about the whole object once it is set
-    void Print();
+    void Print() const;
     /// @brief Prints general information about the ParameterHandler object.
-    void PrintGlobablInfo();
+    void PrintGlobablInfo() const;
     /// @brief Prints normalization parameters.
-    void PrintNormParams();
+    void PrintNormParams() const;
     /// @brief Prints spline parameters.
-    void PrintSplineParams();
+    void PrintSplineParams() const;
     /// @brief Prints functional parameters.
-    void PrintFunctionalParams();
+    void PrintFunctionalParams() const;
     /// @brief Prints oscillation parameters.
-    void PrintOscillationParams();
+    void PrintOscillationParams() const;
     /// @brief Prints groups of parameters.
-    void PrintParameterGroups();
+    void PrintParameterGroups() const;
 
     /// @brief KS: Check if matrix is correctly initialised
-    void CheckCorrectInitialisation();
+    void CheckCorrectInitialisation() const;
 
     /// @brief Iterates over parameters and applies a filter and action function.
     ///
@@ -209,9 +209,6 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
 
     /// Type of parameter like norm, spline etc.
     std::vector<SystType> _fParamType;
-
-    /// Name of spline in TTree (TBranch),
-    std::vector<std::string> _fSplineNames;
 
     /// KS: Allow to group parameters for example to affect only cross-section or only flux etc.
     std::vector<std::string> _ParameterGroup;

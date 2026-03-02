@@ -23,6 +23,9 @@ _MaCh3_Safe_Include_End_ //}
 
 /// @brief Class responsible for handling implementation of samples used in analysis, reweighting and returning LLH
 /// @ingroup CoreClasses
+///
+/// @author Asher Kaboth
+/// @author Richard Calland
 class SampleHandlerBase
 {
  public:
