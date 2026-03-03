@@ -152,10 +152,17 @@ endif()
 if(MaCh3_DEBUG_ENABLED)
   target_compile_options(MaCh3CompilerOptions INTERFACE
     -O0                     # Turn off any optimisation to have best debug experience
-    -mno-avx                # Disable AVX instructions to simplify debugging and improve reproducibility
     -fno-omit-frame-pointer # Keep frame pointers: essential for accurate stack traces
     #-fsanitize=address     # Enable AddressSanitizer
   )
+  # KS: Disable AVX only on x86 platforms
+  if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64|i.86")
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+      target_compile_options(MaCh3CompilerOptions INTERFACE
+          -mno-avx  # Disable AVX instructions to simplify debugging and improve reproducibility
+      )
+    endif()
+  endif()
   target_compile_definitions(MaCh3CompileDefinitions INTERFACE DEBUG=${DEBUG_LEVEL})
   cmessage(STATUS "Enabling DEBUG with Level: \"${DEBUG_LEVEL}\"")
 else()
@@ -205,7 +212,7 @@ if(MaCh3_MULTITHREAD_ENABLED)
     target_link_libraries(MaCh3CompilerOptions INTERFACE gomp)
   endif()
   target_compile_definitions(MaCh3CompileDefinitions INTERFACE MULTITHREAD)
-  # KS: This will pass variable to doxgyen and tell whether documentation should be with MP functions
+  # KS: This will pass variable to doxygen and tell whether documentation should be with MP functions
   set(DOXYGEN_PREDEFINED "MULTITHREAD")
 else()
   set(DOXYGEN_PREDEFINED "")
