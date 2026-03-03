@@ -11,7 +11,7 @@ var indexSectionsWithContent =
   8: "k",
   9: "_cgm",
   10: "cfim",
-  11: "0_abcfmprstuw"
+  11: "_abcfmprstuw"
 };
 
 var indexSectionNames =

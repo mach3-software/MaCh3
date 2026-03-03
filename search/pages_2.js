@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['adaptive_20mcmc_3653',['Adaptive MCMC',['../AdaptiveMCMC.html',1,'']]]
+  ['bayesian_20analysis_3652',['Bayesian Analysis',['../BayesianAnalysis.html',1,'']]],
+  ['bibliography_3653',['Bibliography',['../citelist.html',1,'']]]
 ];

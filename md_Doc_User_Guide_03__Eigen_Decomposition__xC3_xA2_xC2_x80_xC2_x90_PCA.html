@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MaCh3: 03.-Eigen-Decomposition-â-PCA</title>
+<title>MaCh3: WARNING TO BECOME DEPRECATED</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -73,22 +73,25 @@ $(function() {
 </div><!-- top -->
 <div class="PageDoc"><div class="header">
   <div class="headertitle">
-<div class="title">03.-Eigen-Decomposition-â-PCA </div>  </div>
+<div class="title">WARNING TO BECOME DEPRECATED </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>PCA or Eigen Decomposition is turned off by default. PCA is being enabled based on the cosntuctor. This is default no PCA consutvcosntuctorotr. </p><div class="fragment"><div class="line">std::vector&lt;std::string&gt; xsecCovMatrixFile = FitManager-&gt;raw()[&quot;General&quot;][&quot;Systematics&quot;][&quot;XsecCovFile&quot;].as&lt;std::vector&lt;std::string&gt;&gt;();</div>
-<div class="line">xsec = new covarianceXsec(xsecCovMatrixFile);</div>
-</div><!-- fragment --><p>To enable it it should look like it </p><div class="fragment"><div class="line">std::vector&lt;std::string&gt; xsecCovMatrixFile = FitManager-&gt;raw()[&quot;General&quot;][&quot;Systematics&quot;][&quot;XsecCovFile&quot;].as&lt;std::vector&lt;std::string&gt;&gt;();</div>
-<div class="line">double PCAthreshold = 0.00001;</div>
-<div class="line">xsec = new covarianceXsec(xsecCovMatrixFile, PCAthreshold);</div>
-</div><!-- fragment --><p> This threshold indicates which eigen value to remove and reduce fit dimensionality. If you set the threhsold very low you may not remove anything just to run with the decomposed matrix.</p>
+<div class="textblock"><p>PCA or Eigen Decomposition is turned off by default. PCA is being enabled based on the constructor. This is the default no PCA constructor.</p>
+<div class="fragment"><div class="line">xsec = <span class="keyword">new</span> <a class="code" href="classParameterHandlerGeneric.html">ParameterHandlerGeneric</a>({matrix.yaml}, <span class="stringliteral">&quot;cov_name&quot;</span>);</div>
+<div class="ttc" id="aclassParameterHandlerGeneric_html"><div class="ttname"><a href="classParameterHandlerGeneric.html">ParameterHandlerGeneric</a></div><div class="ttdoc">Class responsible for handling of systematic error parameters with different types defined in the con...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerGeneric_8h_source.html#l00013">ParameterHandlerGeneric.h:13</a></div></div>
+</div><!-- fragment --><p>To enable it, code should look like it</p>
+<div class="fragment"><div class="line">std::vector&lt;std::string&gt; xsecCovMatrixFile = FitManager-&gt;raw()[<span class="stringliteral">&quot;General&quot;</span>][<span class="stringliteral">&quot;Systematics&quot;</span>][<span class="stringliteral">&quot;XsecCovFile&quot;</span>].as&lt;std::vector&lt;std::string&gt;&gt;();</div>
+<div class="line"><span class="keywordtype">double</span> PCAthreshold = 0.00001;</div>
+<div class="line">xsec = <span class="keyword">new</span> <a class="code" href="classParameterHandlerGeneric.html">ParameterHandlerGeneric</a>({matrix.yaml}, <span class="stringliteral">&quot;cov_name&quot;</span>, PCAthreshold);</div>
+</div><!-- fragment --><p>This threshold indicates which Eigen value to remove and reduce fit dimensionality. If you set the threshold very low, you may not remove anything just to run with the decomposed matrix.</p>
 <p><img src="https://github.com/mach3-software/MaCh3/assets/45295406/ae078a7a-724b-4297-9b3d-e941d1dedfb1" alt="" width="350" class="inline"/></p>
-<p>It is also possible to decompose only part of the matrix </p><div class="fragment"><div class="line">std::vector&lt;std::string&gt; xsecCovMatrixFile = FitManager-&gt;raw()[&quot;General&quot;][&quot;Systematics&quot;][&quot;XsecCovFile&quot;].as&lt;std::vector&lt;std::string&gt;&gt;();</div>
-<div class="line">double PCAthreshold = 0.00001;</div>
-<div class="line">int FirstPCAdpar = 8;</div>
-<div class="line">int LastPCAdpar = 108</div>
-<div class="line">xsec = new covarianceXsec(xsecCovMatrixFile, PCAthreshold, FirstPCAdpar, LastPCAdpar)  ;</div>
-</div><!-- fragment --><p> This way parameters through 8-108 will be decomposed while 0-8 will be in undecomposed base. You can see transition matrix between normal and eigen base below:</p>
+<p>It is also possible to decompose only part of the matrix</p>
+<div class="fragment"><div class="line">std::vector&lt;std::string&gt; xsecCovMatrixFile = FitManager-&gt;raw()[<span class="stringliteral">&quot;General&quot;</span>][<span class="stringliteral">&quot;Systematics&quot;</span>][<span class="stringliteral">&quot;XsecCovFile&quot;</span>].as&lt;std::vector&lt;std::string&gt;&gt;();</div>
+<div class="line"><span class="keywordtype">double</span> PCAthreshold = 0.00001;</div>
+<div class="line"><span class="keywordtype">int</span> FirstPCAdpar = 8;</div>
+<div class="line"><span class="keywordtype">int</span> LastPCAdpar = 108</div>
+<div class="line">xsec = <span class="keyword">new</span> <a class="code" href="classParameterHandlerGeneric.html">ParameterHandlerGeneric</a>({matrix.yaml}, <span class="stringliteral">&quot;cov_name&quot;</span>, PCAthreshold, FirstPCAdpar, LastPCAdpar)  ;</div>
+</div><!-- fragment --><p>This way parameters through 8-108 will be decomposed while 0-8 will be in undecomposed base. You can see the transition matrix between normal and Eigen base below:</p>
 <p><img src="https://github.com/mach3-software/MaCh3/assets/45295406/404646cc-98d1-4488-b1df-372e5ce13a26" alt="" width="350" class="inline"/> </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

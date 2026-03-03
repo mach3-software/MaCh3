@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['posterior_20predictive_3662',['Posterior Predictive',['../PosteriorPredictive.html',1,'']]]
+  ['release_20notes_3661',['Release Notes',['../ReleaseNotes.html',1,'']]],
+  ['results_20and_20publications_3662',['Results and Publications',['../ResultsPublications.html',1,'']]]
 ];
