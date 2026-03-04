@@ -1,6 +1,12 @@
+/// @file NuDockFactory.cpp
+/// @brief Implementation of NuDock factory utilities for object creation and
+///        oscillation parameter format conversion.
+/// @author Hank Hua
+
 #include "NuDockFactory.h"
 #include "nudock.hpp"
 
+/// @brief Mapping from NuDock oscillation parameter names to MaCh3 names.
 const std::unordered_map<std::string, std::string> NuDockOscNameMap = {
   {"Theta12", "sin2th_12"},
   {"Theta13", "sin2th_13"},
@@ -10,6 +16,7 @@ const std::unordered_map<std::string, std::string> NuDockOscNameMap = {
   {"Deltam2_32", "delm2_23"},
 };
 
+/// @brief Mapping from MaCh3 oscillation parameter names to NuDock names.
 const std::unordered_map<std::string, std::string> NuDockOscNameMap_r = {
   {"sin2th_12", "Theta12"},
   {"sin2th_13", "Theta13"},
@@ -19,12 +26,14 @@ const std::unordered_map<std::string, std::string> NuDockOscNameMap_r = {
   {"delm2_23", "Deltam2_32"},
 };
 
+/// @brief Lookup table mapping strings to NuDock CommunicationType enum values.
 const std::unordered_map<std::string, CommunicationType> CommunicationTypeMap = {
   {"LOCALHOST", CommunicationType::LOCALHOST},
   {"UNIX_DOMAIN_SOCKET", CommunicationType::UNIX_DOMAIN_SOCKET},
   {"TCP", CommunicationType::TCP}
 };
 
+/// @brief Lookup table mapping strings to NuDock VerbosityLevel enum values.
 const std::unordered_map<std::string, VerbosityLevel> VerbosityLevelMap = {
   {"DEBUG", VerbosityLevel::DEBUG},
   {"INFO", VerbosityLevel::INFO},

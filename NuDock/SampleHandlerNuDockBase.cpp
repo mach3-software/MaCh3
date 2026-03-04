@@ -1,8 +1,11 @@
-#include "NuDock/SampleHandlerNuDock.h"
+#include "NuDock/SampleHandlerNuDockBase.h"
 #include <unordered_map>
 #include <NuDock/NuDockFactory.h>
 
-SampleHandlerNuDock::SampleHandlerNuDock(std::string configFile, ParameterHandlerGeneric* xsec_cov, const std::shared_ptr<OscillationHandler>& Oscillator)
+// ***************************************************************************
+/// @copydoc SampleHandlerNuDockBase::SampleHandlerNuDockBase
+// ***************************************************************************
+SampleHandlerNuDockBase::SampleHandlerNuDockBase(std::string configFile, ParameterHandlerGeneric* xsec_cov)
 : SampleHandlerBase() {
   MACH3LOG_INFO("Creating SampleHandlerNuDock object..");
   MACH3LOG_INFO("- Using NuDock sample config in this file {}", configFile);
@@ -15,10 +18,16 @@ SampleHandlerNuDock::SampleHandlerNuDock(std::string configFile, ParameterHandle
   Init();
 }
 
-SampleHandlerNuDock::~SampleHandlerNuDock() {
+// ***************************************************************************
+/// @copydoc SampleHandlerNuDockBase::~SampleHandlerNuDockBase
+// ***************************************************************************
+SampleHandlerNuDockBase::~SampleHandlerNuDockBase() {
 }
 
-void SampleHandlerNuDock::Init() {
+// ***************************************************************************
+/// @copydoc SampleHandlerNuDockBase::Init
+// ***************************************************************************
+void SampleHandlerNuDockBase::Init() {
   InitialiseNuDockObj(SampleManager.get(), nudock_ptr);
 
   // Gather the indices of NuDock parameters from the ParameterHandler, so that we can easily retrieve their values in Reweight()
@@ -34,8 +43,10 @@ void SampleHandlerNuDock::Init() {
   nudock_ptr->start_client();
 }
 
-// HH: Instead of reweighting here, we send the parameters to the NuDock server
-void SampleHandlerNuDock::Reweight() {
+// ***************************************************************************
+/// @copydoc SampleHandlerNuDockBase::Reweight
+// ***************************************************************************
+void SampleHandlerNuDockBase::Reweight() {
   nlohmann::json request;
   std::unordered_map<std::string, double> osc_params;
   std::unordered_map<std::string, double> xsec_params;
@@ -70,13 +81,16 @@ void SampleHandlerNuDock::Reweight() {
   }
 }
 
-// HH: Instead of calculating the likelihood from M3, we get it from NuDock server
-double SampleHandlerNuDock::GetLikelihood() const {
+// ***************************************************************************
+/// @copydoc SampleHandlerNuDockBase::GetLikelihood
+// ***************************************************************************
+double SampleHandlerNuDockBase::GetLikelihood() const {
   nlohmann::json request = "";
   double llh_value = 0.0;
   auto response = nudock_ptr->send_request("/log_likelihood", request);
   try {
     llh_value = response["log_likelihood"].get<double>();
+    llh_value /= 2; // NuDock returns 2NLL, so we divide by 2 to be consistent with M3's definition of LLH. 
     return llh_value;
   } catch (const std::exception &e) {
     MACH3LOG_ERROR("Error retrieving log-likelihood from NuDock response: {}", e.what());

@@ -1,12 +1,21 @@
-#include "NuDockServer.h"
+#include "NuDockServerBase.h"
 
-NuDockServer::NuDockServer(manager *man) : FitterBase(man) {
+// ***************************************************************************
+/// @copydoc NuDockServerBase::NuDockServerBase
+// ***************************************************************************
+NuDockServerBase::NuDockServerBase(manager *man) : FitterBase(man) {
 }
 
-NuDockServer::~NuDockServer() {
+// ***************************************************************************
+/// @copydoc NuDockServerBase::~NuDockServerBase
+// ***************************************************************************
+NuDockServerBase::~NuDockServerBase() {
 }
 
-void NuDockServer::setup() {
+// ***************************************************************************
+/// @copydoc NuDockServerBase::setup
+// ***************************************************************************
+void NuDockServerBase::setup() {
   // Resize the likelihood storage vectors
   syst_llh.resize(systematics.size(), M3::_BAD_DOUBLE_);
   sample_llh.resize(samples.size(), M3::_BAD_DOUBLE_);
@@ -14,7 +23,10 @@ void NuDockServer::setup() {
   add_prior_llh = GetFromManager(fitMan->raw()["NuDock"]["AddPriorLLH"], false);
 }
 
-double NuDockServer::getLogLikelihood() {
+// ***************************************************************************
+/// @copydoc NuDockServerBase::getLogLikelihood
+// ***************************************************************************
+double NuDockServerBase::getLogLikelihood() {
   // HH: Based on MR2T2::ProposeStep()
   // Initial likelihood
   double llh = 0.0;
@@ -50,7 +62,10 @@ double NuDockServer::getLogLikelihood() {
   return llh;
 }
 
-nlohmann::json NuDockServer::setParameters(const nlohmann::json &request) {
+// ***************************************************************************
+/// @copydoc NuDockServerBase::setParameters
+// ***************************************************************************
+nlohmann::json NuDockServerBase::setParameters(const nlohmann::json &request) {
   if (verbose) {
     MACH3LOG_INFO("Setting parameters from NuDock request: {}", request.dump());
   }
@@ -99,7 +114,10 @@ nlohmann::json NuDockServer::setParameters(const nlohmann::json &request) {
   return response;
 }
 
-nlohmann::json NuDockServer::setAsimovPoint(const nlohmann::json &request) {
+// ***************************************************************************
+/// @copydoc NuDockServerBase::setAsimovPoint
+// ***************************************************************************
+nlohmann::json NuDockServerBase::setAsimovPoint(const nlohmann::json &request) {
   (void)request;
   // reweight sample and add to data
   for (size_t ipdf=0; ipdf<samples.size(); ipdf++) {
@@ -137,7 +155,10 @@ nlohmann::json NuDockServer::setAsimovPoint(const nlohmann::json &request) {
   return response;
 }
 
-nlohmann::json NuDockServer::getSpectrum(const nlohmann::json &request) {
+// ***************************************************************************
+/// @copydoc NuDockServerBase::getSpectrum
+// ***************************************************************************
+nlohmann::json NuDockServerBase::getSpectrum(const nlohmann::json &request) {
   (void)request;
   nlohmann::json response;
 
@@ -207,7 +228,10 @@ nlohmann::json NuDockServer::getSpectrum(const nlohmann::json &request) {
   return response;
 }
 
-nlohmann::json NuDockServer::getParametersNames(const nlohmann::json &request) {
+// ***************************************************************************
+/// @copydoc NuDockServerBase::getParametersNames
+// ***************************************************************************
+nlohmann::json NuDockServerBase::getParametersNames(const nlohmann::json &request) {
   (void)request;
   std::vector<std::string> syst_par_names;
 
@@ -226,7 +250,10 @@ nlohmann::json NuDockServer::getParametersNames(const nlohmann::json &request) {
   return response;
 }
 
-nlohmann::json NuDockServer::getParameters(const nlohmann::json &request) {
+// ***************************************************************************
+/// @copydoc NuDockServerBase::getParameters
+// ***************************************************************************
+nlohmann::json NuDockServerBase::getParameters(const nlohmann::json &request) {
   std::map<std::string, double> osc_params;
   std::map<std::string, double> syst_params;
 
@@ -253,9 +280,12 @@ nlohmann::json NuDockServer::getParameters(const nlohmann::json &request) {
   return response;
 }
 
-nlohmann::json NuDockServer::getLogLikelihood(const nlohmann::json &request) {
+// ***************************************************************************
+/// @copydoc NuDockServerBase::get2NLL
+// ***************************************************************************
+nlohmann::json NuDockServerBase::get2NLL(const nlohmann::json &request) {
   (void)request;
   nlohmann::json response;
-  response["log_likelihood"] = getLogLikelihood();
+  response["log_likelihood"] = 2*getLogLikelihood();
   return response;
 }

@@ -1,12 +1,12 @@
 set(HEADERS
-    NuDockServer.h
-    SampleHandlerNuDock.h
+    NuDockServerBase.h
+    SampleHandlerNuDockBase.h
     NuDockFactory.h
 )
 
 add_library(MaCh3NuDock SHARED
-    NuDockServer.cpp
-    SampleHandlerNuDock.cpp
+    NuDockServerBase.cpp
+    SampleHandlerNuDockBase.cpp
     NuDockFactory.cpp
 )
 
@@ -23,13 +23,13 @@ endif()
 CPMAddPackage(
     NAME NuDock
     GITHUB_REPOSITORY "NuDock/nudock"
-    GIT_TAG feature/verbosity
+    GIT_TAG mach3_branch
     GIT_SHALLOW NO
     GIT_SUBMODULES_RECURSE ON
     # Apply patch to fix CMakeLists.txt until merged upstream
-    PATCH_COMMAND ${CMAKE_COMMAND} -E copy 
-        ${CMAKE_CURRENT_SOURCE_DIR}/cmake/patches/NuDock_CMakeLists.txt
-        <SOURCE_DIR>/CMakeLists.txt
+    #PATCH_COMMAND ${CMAKE_COMMAND} -E copy 
+    #    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/patches/NuDock_CMakeLists.txt
+    #    <SOURCE_DIR>/CMakeLists.txt
 )
 
 if(TARGET NuDock::nudock)
