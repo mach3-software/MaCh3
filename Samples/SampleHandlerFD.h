@@ -45,7 +45,7 @@ class SampleHandlerFD :  public SampleHandlerBase
   const BinningHandler* GetBinningHandler() const {return Binning.get();}
 
   void PrintIntegral(const int iSample, const TString& OutputName="/dev/null", const int WeightStyle=0, const TString& OutputCSVName="/dev/null");
-  
+
   //===============================================================================
   // DB Reweighting and Likelihood functions
 
@@ -95,7 +95,7 @@ class SampleHandlerFD :  public SampleHandlerBase
   std::string GetFlavourName(const int iSample, const int iChannel) const override {
     if (iChannel < 0 || iChannel > GetNOscChannels(iSample)) {
       MACH3LOG_ERROR("Invalid Channel Requested: {}", iChannel);
-      throw MaCh3Exception(__FILE__ , __LINE__);      
+      throw MaCh3Exception(__FILE__ , __LINE__);
     }
     return SampleDetails[iSample].OscChannels[iChannel].flavourName;
   }
@@ -117,7 +117,7 @@ class SampleHandlerFD :  public SampleHandlerBase
                           int WeightStyle=0);
   void Fill2DSubEventHist(const int iSample, TH2D* _h2DVar, const std::string& ProjectionVarX, const std::string& ProjectionVarY,
                           const std::vector< KinematicCut >& SubEventSelectionVec = {}, int WeightStyle = 0);
-  
+
   TH1* Get1DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_Str,
                                     int kModeToFill = -1, int kChannelToFill = -1, int WeightStyle = 0, TAxis* Axis = nullptr) override;
   TH2* Get2DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_StrX,
@@ -142,7 +142,7 @@ class SampleHandlerFD :  public SampleHandlerBase
   THStack* ReturnStackedHistBySelection1D(const int iSample, const std::string& KinematicProjection,
                                           int Selection1, int Selection2 = -1, int WeightStyle = 0, TAxis* Axis = nullptr);
   TLegend* ReturnStackHistLegend() {return THStackLeg;}
-  
+
   /// @brief ETA function to generically convert a string from xsec cov to a kinematic type
   int ReturnKinematicParameterFromString(const std::string& KinematicStr) const;
   /// @brief ETA function to generically convert a kinematic type from xsec cov to a string
@@ -209,7 +209,7 @@ class SampleHandlerFD :  public SampleHandlerBase
 
   /// @brief Function which does a lot of the lifting regarding the workflow in creating different MC objects
   void Initialise();
-  
+
   /// @brief Contains all your splines (binned or unbinned) and handles the setup and the returning of weights from spline evaluations
   std::unique_ptr<SplineBase> SplineHandler;
 
@@ -284,18 +284,24 @@ class SampleHandlerFD :  public SampleHandlerBase
   virtual void CalcWeightFunc(int iEvent) {return; (void)iEvent;};
 
   /// @brief Return the value of an associated kinematic parameter for an event
-  virtual double ReturnKinematicParameter(std::string KinematicParamter, int iEvent) = 0;
+  virtual double ReturnKinematicParameter(std::string KinematicParamter, int iEvent) final {
+    return ReturnKinematicParameter(ReturnKinematicParameterFromString(KinematicParameter),iEvent);
+  }
   virtual double ReturnKinematicParameter(int KinematicVariable, int iEvent) = 0;
-  
+
   // === JM declare the same functions for kinematic vectors ===
-  virtual std::vector<double> ReturnKinematicVector(std::string KinematicParameter, int iEvent) {return {}; (void)KinematicParameter; (void)iEvent;};
+  virtual std::vector<double> ReturnKinematicVector(std::string KinematicParameter, int iEvent) final {
+    return ReturnKinematicVector(ReturnKinematicVectorFromString(KinematicParameter),iEvent);
+  }
   virtual std::vector<double> ReturnKinematicVector(int KinematicVariable, int iEvent) {return {}; (void)KinematicVariable; (void)iEvent;};
   // ===========================================================
 
   /// @brief Return the binning used to draw a kinematic parameter
   std::vector<double> ReturnKinematicParameterBinning(const int Sample, const std::string &KinematicParameter) const override;
 
-  virtual const double* GetPointerToKinematicParameter(std::string KinematicParamter, int iEvent) = 0;
+  virtual const double* GetPointerToKinematicParameter(std::string KinematicParamter, int iEvent) final {
+    return GetPointerToKinematicParameter(ReturnKinematicParameterFromString(KinematicParameter),iEvent);
+  }
   virtual const double* GetPointerToKinematicParameter(double KinematicVariable, int iEvent) = 0;
 
   /// @brief Get pointer to oscillation channel associated with given event. Osc channel is const
@@ -322,7 +328,7 @@ class SampleHandlerFD :  public SampleHandlerBase
 
   /// @brief Helper function to reset histograms
   void ResetHistograms();
-  
+
   //===============================================================================
   //DB Variables required for GetLikelihood
   /// KS: This stores binning information, in future could be come vector to store binning for every used sample
@@ -347,16 +353,16 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// ETA - All experiments will need an xsec, det and osc cov
   ParameterHandlerGeneric *ParHandler = nullptr;
 
-  //=============================================================================== 
+  //===============================================================================
   /// @brief A unique ID for each sample based on which we can define what systematic should be applied
   std::string SampleHandlerName;
 
   //===========================================================================
   //DB Vectors to store which kinematic cuts we apply
-  //like in XsecNorms but for events in sample. Read in from sample yaml file 
-  //What gets used in IsEventSelected, which gets set equal to user input plus 
+  //like in XsecNorms but for events in sample. Read in from sample yaml file
+  //What gets used in IsEventSelected, which gets set equal to user input plus
   //all the vectors in StoreSelection
-  
+
   /// @brief What gets pulled from config options, these are constant after loading in
   /// this is of length 3: 0th index is the value, 1st is lower bound, 2nd is upper bound
   std::vector< std::vector< KinematicCut > > StoredSelection;
@@ -373,14 +379,14 @@ class SampleHandlerFD :  public SampleHandlerBase
   // === JM mapping between string and kinematic vector enum ===
   const std::unordered_map<std::string, int>* KinematicVectors;
   const std::unordered_map<int, std::string>* ReversedKinematicVectors;
-  // =========================================================== 
+  // ===========================================================
 
   /// The manager object used to read the sample yaml file
   std::unique_ptr<Manager> SampleManager;
   void InitialiseSplineObject();
 
   std::unordered_map<std::string, double> _modeNomWeightMap;
-  
+
   //===============================================================================
   /// DB Miscellaneous Variables
   TLegend* THStackLeg = nullptr;
@@ -399,7 +405,7 @@ class SampleHandlerFD :  public SampleHandlerBase
  private:
   std::unordered_map<std::string, NuPDG> FileToInitPDGMap;
   std::unordered_map<std::string, NuPDG> FileToFinalPDGMap;
-  
+
   enum FDPlotType {
     kModePlot = 0,
     kOscChannelPlot = 1
