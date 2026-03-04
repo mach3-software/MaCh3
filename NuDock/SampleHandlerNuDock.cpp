@@ -3,15 +3,15 @@
 #include <NuDock/NuDockFactory.h>
 
 SampleHandlerNuDock::SampleHandlerNuDock(std::string configFile, ParameterHandlerGeneric* xsec_cov, const std::shared_ptr<OscillationHandler>& Oscillator)
-: SampleHandlerFD(configFile, xsec_cov, Oscillator) {
+: SampleHandlerBase() {
   MACH3LOG_INFO("Creating SampleHandlerNuDock object..");
   MACH3LOG_INFO("- Using NuDock sample config in this file {}", configFile);
   ParHandler = xsec_cov;
   SampleManager = std::make_unique<manager>(configFile.c_str());
   verbose = GetFromManager(SampleManager->raw()["NuDockClient"]["Verbose"], false);
 
-  ReadConfig();
-  SetupReweightArrays();
+  // ReadConfig();
+  // SetupReweightArrays();
   Init();
 }
 
