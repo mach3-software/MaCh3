@@ -101,8 +101,109 @@ nlohmann::json NuDockServer::setParameters(const nlohmann::json &request) {
 
 nlohmann::json NuDockServer::setAsimovPoint(const nlohmann::json &request) {
   (void)request;
+  // reweight sample and add to data
+  for (size_t ipdf=0; ipdf<samples.size(); ipdf++) {
+    samples[ipdf]->Reweight();
+    if (auto* fd_casted_sample = dynamic_cast<SampleHandlerFD*>(samples[ipdf])) {
+      for (int iSample = 0; iSample < samples[ipdf]->GetNsamples(); ++iSample) {
+        if (fd_casted_sample->GetNDim(iSample) == 1) {
+          fd_casted_sample->AddData(iSample, (TH1D*)fd_casted_sample->GetMCHist(iSample, fd_casted_sample->GetNDim(iSample))->Clone());
+        } else if (fd_casted_sample->GetNDim(iSample) == 2) {
+          fd_casted_sample->AddData(iSample, (TH2D*)fd_casted_sample->GetMCHist(iSample, fd_casted_sample->GetNDim(iSample))->Clone());
+        } else {
+          MACH3LOG_ERROR("Unsupported histogram dimension for SampleHandlerFD: {}", fd_casted_sample->GetNDim(iSample));
+          throw MaCh3Exception(__FILE__, __LINE__);
+        }
+      }
+    } else {
+      MACH3LOG_ERROR("Sample object does not derive from SampleHandlerFD. Consider overloading setAsimovPoint for this sample type.");
+      throw MaCh3Exception(__FILE__,__LINE__);
+    } 
+  }
+
+  // set prefit parameter values to the current parameter values
+  for (size_t s = 0; s < systematics.size(); ++s) {
+    int npars = systematics[s]->GetNumParams();
+    for (int p = 0; p < npars; ++p) {
+      std::string param_name = systematics[s]->GetParFancyName(p);
+      double param_value = systematics[s]->GetParCurr(p);
+      systematics[s]->SetPar(p, param_value);
+      if (verbose) MACH3LOG_INFO("Setting prefit param {} to current value {}", param_name, param_value);
+    }
+  }
+
   nlohmann::json response;
-  response["status"] = "not implemented";
+  response["status"] = "success";
+  return response;
+}
+
+nlohmann::json NuDockServer::getSpectrum(const nlohmann::json &request) {
+  (void)request;
+  nlohmann::json response;
+
+  std::vector<std::string> sample_titles = {};
+
+  for (size_t ipdf=0; ipdf<samples.size(); ipdf++) {
+    if (auto* fd_casted_sample = dynamic_cast<SampleHandlerFD*>(samples[ipdf])) {
+      for (int iSample = 0; iSample < samples[ipdf]->GetNsamples(); ++iSample) {
+        std::string sample_title = samples[ipdf]->GetSampleTitle(iSample);
+        sample_titles.push_back(sample_title);
+
+        int dimension = fd_casted_sample->GetNDim(iSample);
+        response["dimensions"][sample_title] = dimension;
+
+        if (dimension == 1) {
+          TH1D* mc_hist = (TH1D*)fd_casted_sample->GetMCHist(iSample, dimension)->Clone();
+
+          TAxis *ax = mc_hist->GetXaxis();
+          std::string xtitle = ax->GetTitle(); 
+          int nxbins = ax->GetNbins();
+          std::vector<double> xbins(nxbins+1); 
+          std::vector<double> binvals(nxbins);
+
+          xbins[0] = ax->GetBinLowEdge(1);
+          for (int ix = 1; ix <= nxbins; ++ix) {
+            xbins[ix] = ax->GetBinUpEdge(ix);
+            binvals[ix-1] = mc_hist->GetBinContent(ix);
+          }
+          response["axis_titles"][sample_title] = {xtitle};
+          response["bin_edges"][sample_title] = {xbins};
+          response["bin_values"][sample_title] = binvals;
+        } else if (dimension == 2) {
+          TH2D* mc_hist = (TH2D*)fd_casted_sample->GetMCHist(iSample, dimension)->Clone();
+
+          TAxis *x_axis = mc_hist->GetXaxis();
+          std::string xtitle = x_axis->GetTitle();
+          int nxbins = x_axis->GetNbins();
+          std::vector<double> xbins(nxbins+1);
+
+          TAxis *y_axis = mc_hist->GetYaxis();
+          std::string ytitle = y_axis->GetTitle();
+          int nybins = y_axis->GetNbins();
+          std::vector<double> ybins(nybins+1);
+
+          std::vector<std::vector<double>> binvals(nxbins, std::vector<double>(nybins));
+
+          xbins[0] = x_axis->GetBinLowEdge(1);
+          ybins[0] = y_axis->GetBinLowEdge(1);
+          for (int ix = 1; ix <= nxbins; ++ix) {
+            for (int iy = 1; iy <= nybins; ++iy) {
+              xbins[ix] = x_axis->GetBinUpEdge(ix);
+              ybins[iy] = y_axis->GetBinUpEdge(iy);
+              binvals[ix-1][iy-1] = mc_hist->GetBinContent(ix, iy);
+            }
+          }
+          response["axis_titles"][sample_title] = {xtitle, ytitle};
+          response["bin_edges"][sample_title] = {xbins, ybins};
+          response["bin_values"][sample_title] = binvals;
+        }
+      }
+    } else {
+      MACH3LOG_ERROR("Sample object does not derived from SampleHandlerFD. Consider overloading getSpectrum for this sample type.");
+      throw MaCh3Exception(__FILE__,__LINE__);
+    } 
+  }
+  response["sample_names"] = sample_titles;
   return response;
 }
 
