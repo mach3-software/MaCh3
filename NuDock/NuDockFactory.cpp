@@ -1,4 +1,36 @@
 #include "NuDockFactory.h"
+#include "nudock.hpp"
+
+const std::unordered_map<std::string, std::string> NuDockOscNameMap = {
+  {"Theta12", "sin2th_12"},
+  {"Theta13", "sin2th_13"},
+  {"Theta23", "sin2th_23"},
+  {"DeltaCP", "delta_cp"},
+  {"Deltam2_21", "delm2_12"},
+  {"Deltam2_32", "delm2_23"},
+};
+
+const std::unordered_map<std::string, std::string> NuDockOscNameMap_r = {
+  {"sin2th_12", "Theta12"},
+  {"sin2th_13", "Theta13"},
+  {"sin2th_23", "Theta23"},
+  {"delta_cp", "DeltaCP"},
+  {"delm2_12", "Deltam2_21"},
+  {"delm2_23", "Deltam2_32"},
+};
+
+const std::unordered_map<std::string, CommunicationType> CommunicationTypeMap = {
+  {"LOCALHOST", CommunicationType::LOCALHOST},
+  {"UNIX_DOMAIN_SOCKET", CommunicationType::UNIX_DOMAIN_SOCKET},
+  {"TCP", CommunicationType::TCP}
+};
+
+const std::unordered_map<std::string, VerbosityLevel> VerbosityLevelMap = {
+  {"DEBUG", VerbosityLevel::DEBUG},
+  {"INFO", VerbosityLevel::INFO},
+  {"WARNING", VerbosityLevel::WARNING},
+  {"ERROR", VerbosityLevel::ERROR}
+};
 
 void InitialiseNuDockObj(manager *man,
                                 std::unique_ptr<NuDock> &nudock_ptr) {
@@ -33,12 +65,8 @@ void InitialiseNuDockObj(manager *man,
       GetFromManager<std::string>(man->raw()[nudock_conf_name]["NuDockVerbosity"], "INFO");
 
   CommunicationType commType;
-  if (commTypeStr == "LOCALHOST") {
-    commType = CommunicationType::LOCALHOST;
-  } else if (commTypeStr == "UNIX_DOMAIN_SOCKET") {
-    commType = CommunicationType::UNIX_DOMAIN_SOCKET;
-  } else if (commTypeStr == "TCP") {
-    commType = CommunicationType::TCP;
+  if (CommunicationTypeMap.find(commTypeStr) != CommunicationTypeMap.end()) {
+    commType = CommunicationTypeMap.at(commTypeStr);
   } else {
     MACH3LOG_ERROR(
         "Unsupported communication type for NuDock: {}. Supported types "
@@ -48,14 +76,8 @@ void InitialiseNuDockObj(manager *man,
   }
 
   VerbosityLevel verbLevel;
-  if (verbosity == "DEBUG") {
-    verbLevel = VerbosityLevel::DEBUG;
-  } else if (verbosity == "INFO") {
-    verbLevel = VerbosityLevel::INFO;
-  } else if (verbosity == "WARNING") {
-    verbLevel = VerbosityLevel::WARNING;
-  } else if (verbosity == "ERROR") {
-    verbLevel = VerbosityLevel::ERROR;
+  if (VerbosityLevelMap.find(verbosity) != VerbosityLevelMap.end()) {
+    verbLevel = VerbosityLevelMap.at(verbosity);
   } else {
     MACH3LOG_ERROR(
         "Unsupported verbosity level for NuDock: {}. Supported levels are "
@@ -83,21 +105,3 @@ void FormatOscParsForMaCh3(const std::string &param_name, double &param_value) {
     param_value = sin(param_value) * sin(param_value);
   }
 }
-
-const std::unordered_map<std::string, std::string> NuDockOscNameMap = {
-  {"Theta12", "sin2th_12"},
-  {"Theta13", "sin2th_13"},
-  {"Theta23", "sin2th_23"},
-  {"DeltaCP", "delta_cp"},
-  {"Deltam2_21", "delm2_12"},
-  {"Deltam2_32", "delm2_23"},
-};
-
-const std::unordered_map<std::string, std::string> NuDockOscNameMap_r = {
-  {"sin2th_12", "Theta12"},
-  {"sin2th_13", "Theta13"},
-  {"sin2th_23", "Theta23"},
-  {"delta_cp", "DeltaCP"},
-  {"delm2_12", "Deltam2_21"},
-  {"delm2_23", "Deltam2_32"},
-};
