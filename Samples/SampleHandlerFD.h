@@ -284,14 +284,14 @@ class SampleHandlerFD :  public SampleHandlerBase
   virtual void CalcWeightFunc(int iEvent) {return; (void)iEvent;};
 
   /// @brief Return the value of an associated kinematic parameter for an event
-  virtual double ReturnKinematicParameter(std::string KinematicParamter, int iEvent) final {
-    return ReturnKinematicParameter(ReturnKinematicParameterFromString(KinematicParameter),iEvent);
+  double ReturnKinematicParameter(const std::string& KinematicParameter, int iEvent) {
+    return ReturnKinematicParameter(ReturnKinematicParameterFromString(KinematicParameter), iEvent);
   }
   virtual double ReturnKinematicParameter(int KinematicVariable, int iEvent) = 0;
 
   // === JM declare the same functions for kinematic vectors ===
-  virtual std::vector<double> ReturnKinematicVector(std::string KinematicParameter, int iEvent) final {
-    return ReturnKinematicVector(ReturnKinematicVectorFromString(KinematicParameter),iEvent);
+  std::vector<double> ReturnKinematicVector(const std::string& KinematicParameter, int iEvent) {
+    return ReturnKinematicVector(ReturnKinematicVectorFromString(KinematicParameter), iEvent);
   }
   virtual std::vector<double> ReturnKinematicVector(int KinematicVariable, int iEvent) {return {}; (void)KinematicVariable; (void)iEvent;};
   // ===========================================================
@@ -299,8 +299,8 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// @brief Return the binning used to draw a kinematic parameter
   std::vector<double> ReturnKinematicParameterBinning(const int Sample, const std::string &KinematicParameter) const override;
 
-  virtual const double* GetPointerToKinematicParameter(std::string KinematicParamter, int iEvent) final {
-    return GetPointerToKinematicParameter(ReturnKinematicParameterFromString(KinematicParameter),iEvent);
+  const double* GetPointerToKinematicParameter(const std::string& KinematicParameter, int iEvent) {
+    return GetPointerToKinematicParameter(ReturnKinematicParameterFromString(KinematicParameter), iEvent);
   }
   virtual const double* GetPointerToKinematicParameter(double KinematicVariable, int iEvent) = 0;
 
