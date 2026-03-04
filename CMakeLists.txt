@@ -295,6 +295,8 @@ endforeach()
 add_library(MaCh3 INTERFACE)
 target_link_libraries(MaCh3 INTERFACE MaCh3CompilerOptions MaCh3GPUCompilerOptions)
 # Build components
+add_subdirectory(api)
+add_subdirectory(cli)
 add_subdirectory(Manager)
 add_subdirectory(Parameters)
 add_subdirectory(Splines)
@@ -313,6 +315,9 @@ foreach( lib Fitters;Samples;Parameters;Splines;Manager;Plotting;Oscillator;OscP
   )
 endforeach()
 
+#This is to export the target properties of MaCh3
+#Anything that links to "MaCh3" will get all of these target properties
+target_link_libraries(MaCh3 INTERFACE api Fitters Samples Parameters Splines Manager MaCh3CompilerOptions MaCh3GPUCompilerOptions Plotting)
 set_target_properties(MaCh3 PROPERTIES EXPORT_NAME All)
 
 install(TARGETS MaCh3
@@ -323,6 +328,7 @@ add_library(MaCh3::All ALIAS MaCh3)
 
 if (MaCh3_NUDOCK_ENABLED)
   add_subdirectory(NuDock)
+  target_link_libraries(MaCh3 INTERFACE MaCh3NuDock)
 endif()
 
 add_library(MaCh3::All ALIAS MaCh3)
