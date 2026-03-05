@@ -47,7 +47,7 @@ SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGen
 
 SampleHandlerFD::~SampleHandlerFD() {
   MACH3LOG_DEBUG("I'm deleting SampleHandlerFD");
-  
+
   if (SampleHandlerFD_array != nullptr) delete[] SampleHandlerFD_array;
   if (SampleHandlerFD_array_w2 != nullptr) delete[] SampleHandlerFD_array_w2;
   //ETA - there is a chance that you haven't added any data...
@@ -337,9 +337,9 @@ bool SampleHandlerFD::IsSubEventSelected(const std::vector<KinematicCut> &SubEve
 // Reweight function
 void SampleHandlerFD::Reweight() {
 //************************************************
-  //KS: Reset the histograms before reweight 
+  //KS: Reset the histograms before reweight
   ResetHistograms();
-  
+
   //You only need to do these things if Oscillator has been initialised
   //if not then you're not considering oscillations
   if (Oscillator) Oscillator->Evaluate();
@@ -375,7 +375,7 @@ void SampleHandlerFD::FillArray() {
 //************************************************
   //DB Reset which cuts to apply
   Selection = StoredSelection;
-  
+
   for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
     ApplyShifts(iEvent);
     const EventInfo* _restrict_ MCEvent = &MCSamples[iEvent];
@@ -407,7 +407,7 @@ void SampleHandlerFD::FillArray() {
 #ifdef MULTITHREAD
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Walloca"
-// ************************************************ 
+// ************************************************
 /// Multithreaded version of fillArray @see fillArray()
 void SampleHandlerFD::FillArray_MP() {
 // ************************************************
@@ -470,7 +470,7 @@ void SampleHandlerFD::FillArray_MP() {
 // **************************************************
 // Helper function to reset the data and MC histograms
 void SampleHandlerFD::ResetHistograms() {
-// **************************************************  
+// **************************************************
   // DB Reset values stored in PDF array to 0.
   // Don't openMP this; no significant gain
   const int nBins = Binning->GetNBins();
@@ -503,7 +503,7 @@ void SampleHandlerFD::RegisterIndividualFunctionalParameter(const std::string& f
 void SampleHandlerFD::SetupFunctionalParameters() {
 // **************************************************
   funcParsVec = ParHandler->GetFunctionalParametersFromSampleName(SampleHandlerName);
-  // RegisterFunctionalParameters is implemented in experiment-specific code, 
+  // RegisterFunctionalParameters is implemented in experiment-specific code,
   // which calls RegisterIndividualFuncPar to populate funcParsNamesMap, funcParsNamesVec, and funcParsFuncMap
   RegisterFunctionalParameters();
   funcParsMap.resize(funcParsNamesMap.size());
@@ -576,6 +576,8 @@ void SampleHandlerFD::ApplyShifts(const int iEvent) {
     const auto* _restrict_ fp = shifts[iShift];
     (*fp->funcPtr)(fp->valuePtr, iEvent);
   }
+
+  FinaliseShifts(iEvent);
 }
 
 // ***************************************************************************
@@ -1525,13 +1527,13 @@ void SampleHandlerFD::Fill2DSubEventHist(const int iSample, TH2D* _h2DVar,
 // ************************************************
 
   bool IsSubEventVarX = IsSubEventVarString(ProjectionVar_StrX);
-  bool IsSubEventVarY = IsSubEventVarString(ProjectionVar_StrY);   
+  bool IsSubEventVarY = IsSubEventVarString(ProjectionVar_StrY);
 
   int ProjectionVar_IntX, ProjectionVar_IntY;
   if (IsSubEventVarX) ProjectionVar_IntX = ReturnKinematicVectorFromString(ProjectionVar_StrX);
   else ProjectionVar_IntX = ReturnKinematicParameterFromString(ProjectionVar_StrX);
   if (IsSubEventVarY) ProjectionVar_IntY = ReturnKinematicVectorFromString(ProjectionVar_StrY);
-  else ProjectionVar_IntY = ReturnKinematicParameterFromString(ProjectionVar_StrY); 
+  else ProjectionVar_IntY = ReturnKinematicParameterFromString(ProjectionVar_StrY);
 
   //JM Loop over all events
   for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
@@ -1572,7 +1574,7 @@ void SampleHandlerFD::Fill2DSubEventHist(const int iSample, TH2D* _h2DVar,
           if (IsSubEventVarY) VarY = VecY[iSubEvent];
           _h2DVar->Fill(VarX,VarY,Weight);
         }
-      } 
+      }
     }
   }
 }
