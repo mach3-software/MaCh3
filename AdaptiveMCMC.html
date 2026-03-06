@@ -86,7 +86,7 @@ Overview</h1>
 <p>Thankfully, we can automate this process! Adaptive MCMC (AMCMC) "learns" the optimal step size required to efficiently explore the space. In the case of a Gaussian proposal function target a roughly Gaussian parameter this turns out to be the covariance of the posterior multiplied by a constant scaling factor of $2.38^{2}/n_{pars}$. Since we can't know the covariance of the posterior before running a fit, we instead need to use the covariance of the chain we're currently running. We can then update our proposal function every few steps and hope this converges to the "true" posterior covariance.</p>
 <h1><a class="anchor" id="autotoc_md212"></a>
 Robbins-Monro Adaption</h1>
-<p>In many spaces $2.38^{2}/n_{pars}$ is not actually the optimal scaling factor. Instead we can use a stochastic process called Robbins-Monro to increase/decrease this scale dynamically and get the chain to have a particular acceptance rate instead. Typically in MCMC this "optimal" rate is 23.4% (...in some sense) so we target this! In testing this has been shown to provide a 25%-300% improvement in efficiency (integrated auto-correlation) over regular adaptive MCMC with a fixed scale</p>
+<p>In many spaces \(2.38^{2}/n_{pars}\) is not actually the optimal scaling factor. Instead we can use a stochastic process called Robbins-Monro to increase/decrease this scale dynamically and get the chain to have a particular acceptance rate instead. Typically in MCMC this "optimal" rate is 23.4% (...in some sense) so we target this! In testing this has been shown to provide a 25%-300% improvement in efficiency (integrated auto-correlation) over regular adaptive MCMC with a fixed scale</p>
 <h1><a class="anchor" id="autotoc_md213"></a>
 Troubleshooting</h1>
 <h2><a class="anchor" id="autotoc_md214"></a>
@@ -111,7 +111,7 @@ When Does This Fail?</h2>
 <p>So far it seems that AMCMC fails for multi-modal and cyclical parameters i.e. oscillations (and anything correlated with them like detector parameters). This can result in chains that converge to entirely incorrect results as in the following figure.</p>
 <p><img src="https://github.com/user-attachments/assets/27663413-7b4f-499e-b76a-f76e1aa01ac4" alt="image" class="inline"/></p>
 <p><em>MCMC fit with adaption switched off for all parameters (blue), non-oscillation parameters (green) and all parameters (red). One can see that they converge to totally different values.</em></p>
-<p>Adaptive MCMC can also run into problems with highly correlated parameters. This can be partially avoided by defining the highly correlated space as a separate "block". This separates your throw matrix into several independent block matrices with the correlated parts being separate to the less correlated parts. One example of this is with cross-section and flux parameters in T2K.</p>
+<p>Adaptive MCMC can also run into problems with highly correlated parameters. This can be partially avoided by defining the highly correlated space as a separate "block". This separates your throw matrix into several independent block matrices, with the correlated parts being separate to the less correlated parts. One example of this is with cross-section and flux parameters in T2K.</p>
 <h2><a class="anchor" id="autotoc_md218"></a>
 Additional Reading</h2>
 <p>For more information on adaptive MCMC in MaCh3: <a href="https://etheses.whiterose.ac.uk/id/eprint/35901/">https://etheses.whiterose.ac.uk/id/eprint/35901/</a></p>

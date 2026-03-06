@@ -171,9 +171,9 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:aa36be17828281e1412a93c0e239cdbc0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSMonolith.html#aa36be17828281e1412a93c0e239cdbc0">CalcSplineWeights</a> () override</td></tr>
 <tr class="memdesc:aa36be17828281e1412a93c0e239cdbc0"><td class="mdescLeft">&#160;</td><td class="mdescRight">CPU based code which eval weight for each spline.  <a href="classSMonolith.html#aa36be17828281e1412a93c0e239cdbc0">More...</a><br /></td></tr>
 <tr class="separator:aa36be17828281e1412a93c0e239cdbc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac37ee525aa57316f652433a4e393afaf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSMonolith.html#ac37ee525aa57316f652433a4e393afaf">ModifyWeights</a> () override</td></tr>
-<tr class="memdesc:ac37ee525aa57316f652433a4e393afaf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calc total event weight.  <a href="classSMonolith.html#ac37ee525aa57316f652433a4e393afaf">More...</a><br /></td></tr>
-<tr class="separator:ac37ee525aa57316f652433a4e393afaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a09abb6b176cf114fc14bf8c1d49a0c2e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSMonolith.html#a09abb6b176cf114fc14bf8c1d49a0c2e">CalcTotalEventWeight</a> ()</td></tr>
+<tr class="memdesc:a09abb6b176cf114fc14bf8c1d49a0c2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calc total event weight.  <a href="classSMonolith.html#a09abb6b176cf114fc14bf8c1d49a0c2e">More...</a><br /></td></tr>
+<tr class="separator:a09abb6b176cf114fc14bf8c1d49a0c2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
@@ -532,6 +532,77 @@ Kamil Skwarczynski </dd></dl>
 </div><!-- fragment -->
 </div>
 </div>
+<a id="a09abb6b176cf114fc14bf8c1d49a0c2e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a09abb6b176cf114fc14bf8c1d49a0c2e">&#9670;&nbsp;</a></span>CalcTotalEventWeight()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SMonolith::CalcTotalEventWeight </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Calc total event weight. </p>
+
+<p class="definition">Definition at line <a class="el" href="SplineMonolith_8cpp_source.html#l00792">792</a> of file <a class="el" href="SplineMonolith_8cpp_source.html">SplineMonolith.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00792"></a><span class="lineno">  792</span>&#160;                                     {</div>
+<div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160;<span class="comment">//*********************************************************</span></div>
+<div class="line"><a name="l00794"></a><span class="lineno">  794</span>&#160;<span class="preprocessor">  #ifdef MULTITHREAD</span></div>
+<div class="line"><a name="l00795"></a><span class="lineno">  795</span>&#160;<span class="preprocessor">  #pragma omp parallel for</span></div>
+<div class="line"><a name="l00796"></a><span class="lineno">  796</span>&#160;<span class="preprocessor">  #endif</span></div>
+<div class="line"><a name="l00797"></a><span class="lineno">  797</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> EventNum = 0; EventNum &lt; <a class="code" href="classSMonolith.html#ac86282b04659bae5cccb6073c9edc0a5">NEvents</a>; ++EventNum)</div>
+<div class="line"><a name="l00798"></a><span class="lineno">  798</span>&#160;  {</div>
+<div class="line"><a name="l00799"></a><span class="lineno">  799</span>&#160;    <span class="keywordtype">float</span> totalWeight = 1.0f; <span class="comment">// Initialize total weight for each event</span></div>
+<div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160; </div>
+<div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> Offset = 2 * EventNum;</div>
+<div class="line"><a name="l00802"></a><span class="lineno">  802</span>&#160; </div>
+<div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160;    <span class="comment">// Extract the parameters for the current event</span></div>
+<div class="line"><a name="l00804"></a><span class="lineno">  804</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> startIndex = <a class="code" href="classSMonolith.html#a0a6599372d1e3d38105478a68308d9a6">cpu_nParamPerEvent</a>[Offset + 1];</div>
+<div class="line"><a name="l00805"></a><span class="lineno">  805</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> numParams = <a class="code" href="classSMonolith.html#a0a6599372d1e3d38105478a68308d9a6">cpu_nParamPerEvent</a>[Offset];</div>
+<div class="line"><a name="l00806"></a><span class="lineno">  806</span>&#160; </div>
+<div class="line"><a name="l00807"></a><span class="lineno">  807</span>&#160;    <span class="comment">// Compute total weight for the current event</span></div>
+<div class="line"><a name="l00808"></a><span class="lineno">  808</span>&#160;<span class="preprocessor">    #ifdef MULTITHREAD</span></div>
+<div class="line"><a name="l00809"></a><span class="lineno">  809</span>&#160;<span class="preprocessor">    #pragma omp simd reduction(*:totalWeight)</span></div>
+<div class="line"><a name="l00810"></a><span class="lineno">  810</span>&#160;<span class="preprocessor">    #endif</span></div>
+<div class="line"><a name="l00811"></a><span class="lineno">  811</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <span class="keywordtype">id</span> = 0; <span class="keywordtype">id</span> &lt; numParams; ++id) {</div>
+<div class="line"><a name="l00812"></a><span class="lineno">  812</span>&#160;      totalWeight *= <a class="code" href="classSMonolith.html#a870bb2bce61e17162b9425f82cf2a099">cpu_weights_spline_var</a>[startIndex + id];</div>
+<div class="line"><a name="l00813"></a><span class="lineno">  813</span>&#160;    }</div>
+<div class="line"><a name="l00814"></a><span class="lineno">  814</span>&#160;    <span class="comment">//Now TF1</span></div>
+<div class="line"><a name="l00815"></a><span class="lineno">  815</span>&#160;    <span class="comment">// Extract the parameters for the current event</span></div>
+<div class="line"><a name="l00816"></a><span class="lineno">  816</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> startIndex_tf1 = <a class="code" href="classSMonolith.html#a66eecc550dea893c60a435a034e7ebf5">cpu_nParamPerEvent_tf1</a>[Offset + 1];</div>
+<div class="line"><a name="l00817"></a><span class="lineno">  817</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> numParams_tf1 = <a class="code" href="classSMonolith.html#a66eecc550dea893c60a435a034e7ebf5">cpu_nParamPerEvent_tf1</a>[Offset];</div>
+<div class="line"><a name="l00818"></a><span class="lineno">  818</span>&#160; </div>
+<div class="line"><a name="l00819"></a><span class="lineno">  819</span>&#160;    <span class="comment">// Compute total weight for the current event</span></div>
+<div class="line"><a name="l00820"></a><span class="lineno">  820</span>&#160;<span class="preprocessor">    #ifdef MULTITHREAD</span></div>
+<div class="line"><a name="l00821"></a><span class="lineno">  821</span>&#160;<span class="preprocessor">    #pragma omp simd reduction(*:totalWeight)</span></div>
+<div class="line"><a name="l00822"></a><span class="lineno">  822</span>&#160;<span class="preprocessor">    #endif</span></div>
+<div class="line"><a name="l00823"></a><span class="lineno">  823</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <span class="keywordtype">id</span> = 0; <span class="keywordtype">id</span> &lt; numParams_tf1; ++id) {</div>
+<div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;      totalWeight *= <a class="code" href="classSMonolith.html#a4a1d45d273cc40cb4f684400812dcb60">cpu_weights_tf1_var</a>[startIndex_tf1 + id];</div>
+<div class="line"><a name="l00825"></a><span class="lineno">  825</span>&#160;    }</div>
+<div class="line"><a name="l00826"></a><span class="lineno">  826</span>&#160; </div>
+<div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160;    <span class="comment">// Store the total weight for the current event</span></div>
+<div class="line"><a name="l00828"></a><span class="lineno">  828</span>&#160;    <a class="code" href="classSMonolith.html#ab572dd7e0a46caf44eb925a89cbfb0cf">cpu_total_weights</a>[EventNum] = totalWeight;</div>
+<div class="line"><a name="l00829"></a><span class="lineno">  829</span>&#160;  }</div>
+<div class="line"><a name="l00830"></a><span class="lineno">  830</span>&#160;}</div>
+<div class="ttc" id="aclassSMonolith_html_a0a6599372d1e3d38105478a68308d9a6"><div class="ttname"><a href="classSMonolith.html#a0a6599372d1e3d38105478a68308d9a6">SMonolith::cpu_nParamPerEvent</a></div><div class="ttdeci">std::vector&lt; unsigned int &gt; cpu_nParamPerEvent</div><div class="ttdoc">KS: CPU map keeping track how many parameters applies to each event, we keep two numbers here {number...</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8h_source.html#l00124">SplineMonolith.h:124</a></div></div>
+<div class="ttc" id="aclassSMonolith_html_a66eecc550dea893c60a435a034e7ebf5"><div class="ttname"><a href="classSMonolith.html#a66eecc550dea893c60a435a034e7ebf5">SMonolith::cpu_nParamPerEvent_tf1</a></div><div class="ttdeci">std::vector&lt; unsigned int &gt; cpu_nParamPerEvent_tf1</div><div class="ttdoc">KS: CPU map keeping track how many parameters applies to each event, we keep two numbers here {number...</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8h_source.html#l00127">SplineMonolith.h:127</a></div></div>
+<div class="ttc" id="aclassSMonolith_html_ac86282b04659bae5cccb6073c9edc0a5"><div class="ttname"><a href="classSMonolith.html#ac86282b04659bae5cccb6073c9edc0a5">SMonolith::NEvents</a></div><div class="ttdeci">unsigned int NEvents</div><div class="ttdoc">Number of events.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8h_source.html#l00104">SplineMonolith.h:104</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
 <a id="a3d1128bb78b165d94721407a124f516b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3d1128bb78b165d94721407a124f516b">&#9670;&nbsp;</a></span>Evaluate()</h2>
 
@@ -569,12 +640,12 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;  <span class="comment">//KS: Huge MP loop over all valid splines</span></div>
 <div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;  <a class="code" href="classSMonolith.html#aa36be17828281e1412a93c0e239cdbc0">CalcSplineWeights</a>();</div>
 <div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160; </div>
-<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;  <span class="comment">//KS: Huge MP loop over all events calculating total weight</span></div>
-<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;  <a class="code" href="classSMonolith.html#ac37ee525aa57316f652433a4e393afaf">ModifyWeights</a>();</div>
+<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;  <span class="comment">//KS: Huge MP loop over all events calculating total weight per event</span></div>
+<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;  <a class="code" href="classSMonolith.html#a09abb6b176cf114fc14bf8c1d49a0c2e">CalcTotalEventWeight</a>();</div>
 <div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;}</div>
+<div class="ttc" id="aclassSMonolith_html_a09abb6b176cf114fc14bf8c1d49a0c2e"><div class="ttname"><a href="classSMonolith.html#a09abb6b176cf114fc14bf8c1d49a0c2e">SMonolith::CalcTotalEventWeight</a></div><div class="ttdeci">void CalcTotalEventWeight()</div><div class="ttdoc">Calc total event weight.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8cpp_source.html#l00792">SplineMonolith.cpp:792</a></div></div>
 <div class="ttc" id="aclassSMonolith_html_aa36be17828281e1412a93c0e239cdbc0"><div class="ttname"><a href="classSMonolith.html#aa36be17828281e1412a93c0e239cdbc0">SMonolith::CalcSplineWeights</a></div><div class="ttdeci">void CalcSplineWeights() override</div><div class="ttdoc">CPU based code which eval weight for each spline.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8cpp_source.html#l00727">SplineMonolith.cpp:727</a></div></div>
-<div class="ttc" id="aclassSMonolith_html_ac37ee525aa57316f652433a4e393afaf"><div class="ttname"><a href="classSMonolith.html#ac37ee525aa57316f652433a4e393afaf">SMonolith::ModifyWeights</a></div><div class="ttdeci">void ModifyWeights() override</div><div class="ttdoc">Calc total event weight.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8cpp_source.html#l00792">SplineMonolith.cpp:792</a></div></div>
-<div class="ttc" id="aclassSplineBase_html_a589011b547ff70262ed43021a016ef30"><div class="ttname"><a href="classSplineBase.html#a589011b547ff70262ed43021a016ef30">SplineBase::FindSplineSegment</a></div><div class="ttdeci">void FindSplineSegment()</div><div class="ttdoc">CW:Code used in step by step reweighting, Find Spline Segment for each param.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8cpp_source.html#l00024">SplineBase.cpp:24</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_a589011b547ff70262ed43021a016ef30"><div class="ttname"><a href="classSplineBase.html#a589011b547ff70262ed43021a016ef30">SplineBase::FindSplineSegment</a></div><div class="ttdeci">void FindSplineSegment()</div><div class="ttdoc">CW:Code used in step by step reweighting, Find Spline Segment for each param.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8cpp_source.html#l00044">SplineBase.cpp:44</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -769,7 +840,6 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <a class="code" href="classSMonolith.html#ab572dd7e0a46caf44eb925a89cbfb0cf">cpu_total_weights</a> = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;}</div>
 <div class="ttc" id="aclassSMonolith_html_a403e7cf909f98d4c59b5f6c7ff8aac5b"><div class="ttname"><a href="classSMonolith.html#a403e7cf909f98d4c59b5f6c7ff8aac5b">SMonolith::nTF1coeff</a></div><div class="ttdeci">unsigned int nTF1coeff</div><div class="ttdoc">Sum of all coefficients over all TF1.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8h_source.html#l00116">SplineMonolith.h:116</a></div></div>
-<div class="ttc" id="aclassSMonolith_html_ac86282b04659bae5cccb6073c9edc0a5"><div class="ttname"><a href="classSMonolith.html#ac86282b04659bae5cccb6073c9edc0a5">SMonolith::NEvents</a></div><div class="ttdeci">unsigned int NEvents</div><div class="ttdoc">Number of events.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8h_source.html#l00104">SplineMonolith.h:104</a></div></div>
 <div class="ttc" id="aclassSMonolith_html_afc0e3d1eafd575cf7628319a66925d5b"><div class="ttname"><a href="classSMonolith.html#afc0e3d1eafd575cf7628319a66925d5b">SMonolith::nKnots</a></div><div class="ttdeci">unsigned int nKnots</div><div class="ttdoc">Sum of all knots over all splines.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8h_source.html#l00114">SplineMonolith.h:114</a></div></div>
 <div class="ttc" id="astructSplineMonoStruct_html"><div class="ttname"><a href="structSplineMonoStruct.html">SplineMonoStruct</a></div><div class="ttdoc">KS: Struct storing information for spline monolith.</div><div class="ttdef"><b>Definition:</b> <a href="SplineCommon_8h_source.html#l00030">SplineCommon.h:30</a></div></div>
 </div><!-- fragment -->
@@ -899,84 +969,12 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;}</div>
 <div class="ttc" id="aclassSMonolithGPU_html_a3fbbb94f6db65b73a394ab541f94fba6"><div class="ttname"><a href="classSMonolithGPU.html#a3fbbb94f6db65b73a394ab541f94fba6">SMonolithGPU::InitGPU_Vals</a></div><div class="ttdeci">__host__ void InitGPU_Vals(float **vals)</div><div class="ttdoc">Allocate memory for spline segments.</div><div class="ttdef"><b>Definition:</b> <a href="gpuSplineUtils_8cu_source.html#l00180">gpuSplineUtils.cu:180</a></div></div>
 <div class="ttc" id="aclassSMonolithGPU_html_ab674ec40c136d89b56b7c25d9337c48a"><div class="ttname"><a href="classSMonolithGPU.html#ab674ec40c136d89b56b7c25d9337c48a">SMonolithGPU::InitGPU_Segments</a></div><div class="ttdeci">__host__ void InitGPU_Segments(short int **segment)</div><div class="ttdoc">Allocate memory for spline segments.</div><div class="ttdef"><b>Definition:</b> <a href="gpuSplineUtils_8cu_source.html#l00171">gpuSplineUtils.cu:171</a></div></div>
-<div class="ttc" id="aclassSMonolith_html_a0a6599372d1e3d38105478a68308d9a6"><div class="ttname"><a href="classSMonolith.html#a0a6599372d1e3d38105478a68308d9a6">SMonolith::cpu_nParamPerEvent</a></div><div class="ttdeci">std::vector&lt; unsigned int &gt; cpu_nParamPerEvent</div><div class="ttdoc">KS: CPU map keeping track how many parameters applies to each event, we keep two numbers here {number...</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8h_source.html#l00124">SplineMonolith.h:124</a></div></div>
-<div class="ttc" id="aclassSMonolith_html_a66eecc550dea893c60a435a034e7ebf5"><div class="ttname"><a href="classSMonolith.html#a66eecc550dea893c60a435a034e7ebf5">SMonolith::cpu_nParamPerEvent_tf1</a></div><div class="ttdeci">std::vector&lt; unsigned int &gt; cpu_nParamPerEvent_tf1</div><div class="ttdoc">KS: CPU map keeping track how many parameters applies to each event, we keep two numbers here {number...</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8h_source.html#l00127">SplineMonolith.h:127</a></div></div>
 <div class="ttc" id="aclassSMonolith_html_aac73a1089592c5f22755b7427869827f"><div class="ttname"><a href="classSMonolith.html#aac73a1089592c5f22755b7427869827f">SMonolith::MoveToGPU</a></div><div class="ttdeci">void MoveToGPU()</div><div class="ttdoc">CW: The shared initialiser from constructors of TResponseFunction_red.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8cpp_source.html#l00254">SplineMonolith.cpp:254</a></div></div>
-<div class="ttc" id="aclassSMonolith_html_ac255dd6c9104471fbdbd0bca8d25baed"><div class="ttname"><a href="classSMonolith.html#ac255dd6c9104471fbdbd0bca8d25baed">SMonolith::PrintInitialsiation</a></div><div class="ttdeci">void PrintInitialsiation() const</div><div class="ttdoc">KS: Print info about how much knots etc has been initialised.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8cpp_source.html#l00835">SplineMonolith.cpp:835</a></div></div>
+<div class="ttc" id="aclassSMonolith_html_ac255dd6c9104471fbdbd0bca8d25baed"><div class="ttname"><a href="classSMonolith.html#ac255dd6c9104471fbdbd0bca8d25baed">SMonolith::PrintInitialsiation</a></div><div class="ttdeci">void PrintInitialsiation() const</div><div class="ttdoc">KS: Print info about how much knots etc has been initialised.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8cpp_source.html#l00834">SplineMonolith.cpp:834</a></div></div>
 <div class="ttc" id="aclassSplineBase_html_a2165b057a0125a28d96f247ca8680b42"><div class="ttname"><a href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">SplineBase::nParams</a></div><div class="ttdeci">short int nParams</div><div class="ttdoc">Number of parameters that have splines.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00081">SplineBase.h:81</a></div></div>
-<div class="ttc" id="aclassSplineBase_html_ad4f4b51619ef0573c7f1497f5d1fd52d"><div class="ttname"><a href="classSplineBase.html#ad4f4b51619ef0573c7f1497f5d1fd52d">SplineBase::LoadFastSplineInfoDir</a></div><div class="ttdeci">void LoadFastSplineInfoDir(std::unique_ptr&lt; TFile &gt; &amp;SplineFile)</div><div class="ttdoc">KS: Load preprocessed FastSplineInfo.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8cpp_source.html#l00159">SplineBase.cpp:159</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_ad4f4b51619ef0573c7f1497f5d1fd52d"><div class="ttname"><a href="classSplineBase.html#ad4f4b51619ef0573c7f1497f5d1fd52d">SplineBase::LoadFastSplineInfoDir</a></div><div class="ttdeci">void LoadFastSplineInfoDir(std::unique_ptr&lt; TFile &gt; &amp;SplineFile)</div><div class="ttdoc">KS: Load preprocessed FastSplineInfo.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8cpp_source.html#l00167">SplineBase.cpp:167</a></div></div>
 <div class="ttc" id="anamespaceM3_html_ad7693a9e309503bd894b04443f163f3c"><div class="ttname"><a href="namespaceM3.html#ad7693a9e309503bd894b04443f163f3c">M3::AddPath</a></div><div class="ttdeci">void AddPath(std::string &amp;FilePath)</div><div class="ttdoc">Prepends the MACH3 environment path to FilePath if it is not already present.</div><div class="ttdef"><b>Definition:</b> <a href="Monitor_8cpp_source.html#l00382">Monitor.cpp:382</a></div></div>
 <div class="ttc" id="astructEventInfo_html"><div class="ttname"><a href="structEventInfo.html">EventInfo</a></div><div class="ttdoc">Stores info about each MC event used during reweighting routine.</div><div class="ttdef"><b>Definition:</b> <a href="FarDetectorCoreInfoStruct_8h_source.html#l00082">FarDetectorCoreInfoStruct.h:82</a></div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="ac37ee525aa57316f652433a4e393afaf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac37ee525aa57316f652433a4e393afaf">&#9670;&nbsp;</a></span>ModifyWeights()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void SMonolith::ModifyWeights </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">private</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Calc total event weight. </p>
-
-<p>Implements <a class="el" href="classSplineBase.html#a49665d2712b61b038085d25ace96a568">SplineBase</a>.</p>
-
-<p class="definition">Definition at line <a class="el" href="SplineMonolith_8cpp_source.html#l00792">792</a> of file <a class="el" href="SplineMonolith_8cpp_source.html">SplineMonolith.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00792"></a><span class="lineno">  792</span>&#160;                              {</div>
-<div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160;<span class="comment">//*********************************************************</span></div>
-<div class="line"><a name="l00794"></a><span class="lineno">  794</span>&#160;<span class="preprocessor">  #ifdef MULTITHREAD</span></div>
-<div class="line"><a name="l00795"></a><span class="lineno">  795</span>&#160;<span class="preprocessor">  #pragma omp parallel for</span></div>
-<div class="line"><a name="l00796"></a><span class="lineno">  796</span>&#160;<span class="preprocessor">  #endif</span></div>
-<div class="line"><a name="l00797"></a><span class="lineno">  797</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> EventNum = 0; EventNum &lt; <a class="code" href="classSMonolith.html#ac86282b04659bae5cccb6073c9edc0a5">NEvents</a>; ++EventNum)</div>
-<div class="line"><a name="l00798"></a><span class="lineno">  798</span>&#160;  {</div>
-<div class="line"><a name="l00799"></a><span class="lineno">  799</span>&#160;    <span class="keywordtype">float</span> totalWeight = 1.0f; <span class="comment">// Initialize total weight for each event</span></div>
-<div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160; </div>
-<div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> Offset = 2 * EventNum;</div>
-<div class="line"><a name="l00802"></a><span class="lineno">  802</span>&#160; </div>
-<div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160;    <span class="comment">// Extract the parameters for the current event</span></div>
-<div class="line"><a name="l00804"></a><span class="lineno">  804</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> startIndex = <a class="code" href="classSMonolith.html#a0a6599372d1e3d38105478a68308d9a6">cpu_nParamPerEvent</a>[Offset + 1];</div>
-<div class="line"><a name="l00805"></a><span class="lineno">  805</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> numParams = <a class="code" href="classSMonolith.html#a0a6599372d1e3d38105478a68308d9a6">cpu_nParamPerEvent</a>[Offset];</div>
-<div class="line"><a name="l00806"></a><span class="lineno">  806</span>&#160; </div>
-<div class="line"><a name="l00807"></a><span class="lineno">  807</span>&#160;    <span class="comment">// Compute total weight for the current event</span></div>
-<div class="line"><a name="l00808"></a><span class="lineno">  808</span>&#160;<span class="preprocessor">    #ifdef MULTITHREAD</span></div>
-<div class="line"><a name="l00809"></a><span class="lineno">  809</span>&#160;<span class="preprocessor">    #pragma omp simd reduction(*:totalWeight)</span></div>
-<div class="line"><a name="l00810"></a><span class="lineno">  810</span>&#160;<span class="preprocessor">    #endif</span></div>
-<div class="line"><a name="l00811"></a><span class="lineno">  811</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <span class="keywordtype">id</span> = 0; <span class="keywordtype">id</span> &lt; numParams; ++id) {</div>
-<div class="line"><a name="l00812"></a><span class="lineno">  812</span>&#160;      totalWeight *= <a class="code" href="classSMonolith.html#a870bb2bce61e17162b9425f82cf2a099">cpu_weights_spline_var</a>[startIndex + id];</div>
-<div class="line"><a name="l00813"></a><span class="lineno">  813</span>&#160;    }</div>
-<div class="line"><a name="l00814"></a><span class="lineno">  814</span>&#160;    <span class="comment">//Now TF1</span></div>
-<div class="line"><a name="l00815"></a><span class="lineno">  815</span>&#160;    <span class="comment">// Extract the parameters for the current event</span></div>
-<div class="line"><a name="l00816"></a><span class="lineno">  816</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> startIndex_tf1 = <a class="code" href="classSMonolith.html#a66eecc550dea893c60a435a034e7ebf5">cpu_nParamPerEvent_tf1</a>[Offset + 1];</div>
-<div class="line"><a name="l00817"></a><span class="lineno">  817</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> numParams_tf1 = <a class="code" href="classSMonolith.html#a66eecc550dea893c60a435a034e7ebf5">cpu_nParamPerEvent_tf1</a>[Offset];</div>
-<div class="line"><a name="l00818"></a><span class="lineno">  818</span>&#160; </div>
-<div class="line"><a name="l00819"></a><span class="lineno">  819</span>&#160;    <span class="comment">// Compute total weight for the current event</span></div>
-<div class="line"><a name="l00820"></a><span class="lineno">  820</span>&#160;<span class="preprocessor">    #ifdef MULTITHREAD</span></div>
-<div class="line"><a name="l00821"></a><span class="lineno">  821</span>&#160;<span class="preprocessor">    #pragma omp simd reduction(*:totalWeight)</span></div>
-<div class="line"><a name="l00822"></a><span class="lineno">  822</span>&#160;<span class="preprocessor">    #endif</span></div>
-<div class="line"><a name="l00823"></a><span class="lineno">  823</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <span class="keywordtype">id</span> = 0; <span class="keywordtype">id</span> &lt; numParams_tf1; ++id) {</div>
-<div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;      totalWeight *= <a class="code" href="classSMonolith.html#a4a1d45d273cc40cb4f684400812dcb60">cpu_weights_tf1_var</a>[startIndex_tf1 + id];</div>
-<div class="line"><a name="l00825"></a><span class="lineno">  825</span>&#160;    }</div>
-<div class="line"><a name="l00826"></a><span class="lineno">  826</span>&#160; </div>
-<div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160;    <span class="comment">// Store the total weight for the current event</span></div>
-<div class="line"><a name="l00828"></a><span class="lineno">  828</span>&#160;    <a class="code" href="classSMonolith.html#ab572dd7e0a46caf44eb925a89cbfb0cf">cpu_total_weights</a>[EventNum] = totalWeight;</div>
-<div class="line"><a name="l00829"></a><span class="lineno">  829</span>&#160;  }</div>
-<div class="line"><a name="l00830"></a><span class="lineno">  830</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1321,7 +1319,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="ttc" id="aclassSMonolith_html_a92a97254edc2fa445d83101fb7f60a2a"><div class="ttname"><a href="classSMonolith.html#a92a97254edc2fa445d83101fb7f60a2a">SMonolith::GetSplineCoeff_SepMany</a></div><div class="ttdeci">void GetSplineCoeff_SepMany(TSpline3_red *&amp;spl, int &amp;nPoints, float *&amp;xArray, float *&amp;manyArray) const</div><div class="ttdoc">CW: This loads up coefficients into two arrays: one x array and one yabcd array.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8cpp_source.html#l00643">SplineMonolith.cpp:643</a></div></div>
 <div class="ttc" id="aclassSMonolith_html_af2a015f3d6f4f8a51d27f8cd8a67c229"><div class="ttname"><a href="classSMonolith.html#af2a015f3d6f4f8a51d27f8cd8a67c229">SMonolith::ScanMasterSpline</a></div><div class="ttdeci">void ScanMasterSpline(std::vector&lt; std::vector&lt; TResponseFunction_red * &gt; &gt; &amp;MasterSpline, unsigned int &amp;nEvents, short int &amp;MaxPoints, short int &amp;numParams, int &amp;nSplines, unsigned int &amp;NSplinesValid, unsigned int &amp;numKnots, unsigned int &amp;nTF1Valid, unsigned int &amp;nTF1_coeff, const std::vector&lt; RespFuncType &gt; &amp;SplineType)</div><div class="ttdoc">CW: Function to scan through the MasterSpline of TSpline3.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8cpp_source.html#l00318">SplineMonolith.cpp:318</a></div></div>
 <div class="ttc" id="aclassSMonolith_html_af2cacbb68bad46a345672339dd7150b6"><div class="ttname"><a href="classSMonolith.html#af2cacbb68bad46a345672339dd7150b6">SMonolith::PrepareSplineFile</a></div><div class="ttdeci">void PrepareSplineFile(std::string FileName) override</div><div class="ttdoc">KS: Prepare spline file that can be used for fast loading.</div><div class="ttdef"><b>Definition:</b> <a href="SplineMonolith_8cpp_source.html#l00544">SplineMonolith.cpp:544</a></div></div>
-<div class="ttc" id="aclassSplineBase_html_a106518719051d8179d2e4f967b8fa932"><div class="ttname"><a href="classSplineBase.html#a106518719051d8179d2e4f967b8fa932">SplineBase::GetTF1Coeff</a></div><div class="ttdeci">void GetTF1Coeff(TF1_red *&amp;spl, int &amp;nPoints, float *&amp;coeffs) const</div><div class="ttdoc">CW: Gets the polynomial coefficients for TF1.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8cpp_source.html#l00106">SplineBase.cpp:106</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_a106518719051d8179d2e4f967b8fa932"><div class="ttname"><a href="classSplineBase.html#a106518719051d8179d2e4f967b8fa932">SplineBase::GetTF1Coeff</a></div><div class="ttdeci">void GetTF1Coeff(TF1_red *&amp;spl, int &amp;nPoints, float *&amp;coeffs) const</div><div class="ttdoc">CW: Gets the polynomial coefficients for TF1.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8cpp_source.html#l00115">SplineBase.cpp:115</a></div></div>
 <div class="ttc" id="aclassTF1__red_html"><div class="ttname"><a href="classTF1__red.html">TF1_red</a></div><div class="ttdoc">CW: A reduced TF1 class only. Only saves parameters for each TF1 and how many parameters each paramet...</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00148">SplineStructs.h:148</a></div></div>
 <div class="ttc" id="aclassTResponseFunction__red_html"><div class="ttname"><a href="classTResponseFunction__red.html">TResponseFunction_red</a></div><div class="ttdoc">KS: A reduced ResponseFunction Generic function used for evaluating weight.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00131">SplineStructs.h:131</a></div></div>
 <div class="ttc" id="aclassTSpline3__red_html"><div class="ttname"><a href="classTSpline3__red.html">TSpline3_red</a></div><div class="ttdoc">CW: Reduced TSpline3 class.</div><div class="ttdef"><b>Definition:</b> <a href="SplineStructs_8h_source.html#l00265">SplineStructs.h:265</a></div></div>
@@ -1429,7 +1427,7 @@ Kamil Skwarczynski </dd></dl>
 <div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;  <span class="keyword">delete</span> <a class="code" href="structEventInfo.html">EventInfo</a>;</div>
 <div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;  SplineFile-&gt;Close();</div>
 <div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;}</div>
-<div class="ttc" id="aclassSplineBase_html_ae7797e26d48519c885e1537373505fcb"><div class="ttname"><a href="classSplineBase.html#ae7797e26d48519c885e1537373505fcb">SplineBase::PrepareFastSplineInfoDir</a></div><div class="ttdeci">void PrepareFastSplineInfoDir(std::unique_ptr&lt; TFile &gt; &amp;SplineFile) const</div><div class="ttdoc">KS: Prepare Fast Spline Info within SplineFile.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8cpp_source.html#l00131">SplineBase.cpp:131</a></div></div>
+<div class="ttc" id="aclassSplineBase_html_ae7797e26d48519c885e1537373505fcb"><div class="ttname"><a href="classSplineBase.html#ae7797e26d48519c885e1537373505fcb">SplineBase::PrepareFastSplineInfoDir</a></div><div class="ttdeci">void PrepareFastSplineInfoDir(std::unique_ptr&lt; TFile &gt; &amp;SplineFile) const</div><div class="ttdoc">KS: Prepare Fast Spline Info within SplineFile.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8cpp_source.html#l00139">SplineBase.cpp:139</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1458,21 +1456,21 @@ Kamil Skwarczynski </dd></dl>
 
 <p>KS: Print info about how much knots etc has been initialised. </p>
 
-<p class="definition">Definition at line <a class="el" href="SplineMonolith_8cpp_source.html#l00835">835</a> of file <a class="el" href="SplineMonolith_8cpp_source.html">SplineMonolith.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00835"></a><span class="lineno">  835</span>&#160;                                          {</div>
-<div class="line"><a name="l00836"></a><span class="lineno">  836</span>&#160;<span class="comment">//*********************************************************</span></div>
-<div class="line"><a name="l00837"></a><span class="lineno">  837</span>&#160;  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> event_size_max = <a class="code" href="classSMonolith.html#af54ea9c613ef95b36dcf9c194dd38e85">_max_knots</a> * <a class="code" href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">nParams</a>;</div>
-<div class="line"><a name="l00838"></a><span class="lineno">  838</span>&#160; </div>
-<div class="line"><a name="l00839"></a><span class="lineno">  839</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;--- INITIALISED Spline Monolith ---&quot;</span>);</div>
-<div class="line"><a name="l00840"></a><span class="lineno">  840</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{} events with {} splines&quot;</span>, <a class="code" href="classSMonolith.html#ac86282b04659bae5cccb6073c9edc0a5">NEvents</a>, <a class="code" href="classSMonolith.html#ab72795333d6f632565b0f7eb0ca8a658">NSplines_valid</a>);</div>
-<div class="line"><a name="l00841"></a><span class="lineno">  841</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;On average {:.2f} splines per event ({}/{})&quot;</span>, <span class="keywordtype">float</span>(<a class="code" href="classSMonolith.html#ab72795333d6f632565b0f7eb0ca8a658">NSplines_valid</a>)/<span class="keywordtype">float</span>(<a class="code" href="classSMonolith.html#ac86282b04659bae5cccb6073c9edc0a5">NEvents</a>), <a class="code" href="classSMonolith.html#ab72795333d6f632565b0f7eb0ca8a658">NSplines_valid</a>, <a class="code" href="classSMonolith.html#ac86282b04659bae5cccb6073c9edc0a5">NEvents</a>);</div>
-<div class="line"><a name="l00842"></a><span class="lineno">  842</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Size of x array = {:.4f} MB&quot;</span>, <span class="keywordtype">double</span>(<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>)*event_size_max)/1.E6);</div>
-<div class="line"><a name="l00843"></a><span class="lineno">  843</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Size of coefficient (y,b,c,d) array = {:.2f} MB&quot;</span>, <span class="keywordtype">double</span>(<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>)*<a class="code" href="classSMonolith.html#afc0e3d1eafd575cf7628319a66925d5b">nKnots</a>*<a class="code" href="SplineCommon_8h.html#a790348db7c20fb9896e94403fbee52cf">_nCoeff_</a>)/1.E6);</div>
-<div class="line"><a name="l00844"></a><span class="lineno">  844</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Size of parameter # array = {:.2f} MB&quot;</span>, <span class="keywordtype">double</span>(<span class="keyword">sizeof</span>(<span class="keywordtype">short</span> <span class="keywordtype">int</span>)*<a class="code" href="classSMonolith.html#ab72795333d6f632565b0f7eb0ca8a658">NSplines_valid</a>)/1.E6);</div>
-<div class="line"><a name="l00845"></a><span class="lineno">  845</span>&#160; </div>
-<div class="line"><a name="l00846"></a><span class="lineno">  846</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;On average {:.2f} TF1 per event ({}/{})&quot;</span>, <span class="keywordtype">float</span>(<a class="code" href="classSMonolith.html#a13699796db31517edba3a8009317f779">NTF1_valid</a>)/<span class="keywordtype">float</span>(<a class="code" href="classSMonolith.html#ac86282b04659bae5cccb6073c9edc0a5">NEvents</a>), <a class="code" href="classSMonolith.html#a13699796db31517edba3a8009317f779">NTF1_valid</a>, <a class="code" href="classSMonolith.html#ac86282b04659bae5cccb6073c9edc0a5">NEvents</a>);</div>
-<div class="line"><a name="l00847"></a><span class="lineno">  847</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Size of TF1 coefficient (a,b,c,d,e) array = {:.2f} MB&quot;</span>, <span class="keywordtype">double</span>(<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>)*<a class="code" href="classSMonolith.html#a13699796db31517edba3a8009317f779">NTF1_valid</a>*<a class="code" href="SplineCommon_8h.html#ad6cacf3d45a37eeeeffe38ad24345d54">_nTF1Coeff_</a>)/1.E6);</div>
-<div class="line"><a name="l00848"></a><span class="lineno">  848</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="SplineMonolith_8cpp_source.html#l00834">834</a> of file <a class="el" href="SplineMonolith_8cpp_source.html">SplineMonolith.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00834"></a><span class="lineno">  834</span>&#160;                                          {</div>
+<div class="line"><a name="l00835"></a><span class="lineno">  835</span>&#160;<span class="comment">//*********************************************************</span></div>
+<div class="line"><a name="l00836"></a><span class="lineno">  836</span>&#160;  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> event_size_max = <a class="code" href="classSMonolith.html#af54ea9c613ef95b36dcf9c194dd38e85">_max_knots</a> * <a class="code" href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">nParams</a>;</div>
+<div class="line"><a name="l00837"></a><span class="lineno">  837</span>&#160; </div>
+<div class="line"><a name="l00838"></a><span class="lineno">  838</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;--- INITIALISED Spline Monolith ---&quot;</span>);</div>
+<div class="line"><a name="l00839"></a><span class="lineno">  839</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;{} events with {} splines&quot;</span>, <a class="code" href="classSMonolith.html#ac86282b04659bae5cccb6073c9edc0a5">NEvents</a>, <a class="code" href="classSMonolith.html#ab72795333d6f632565b0f7eb0ca8a658">NSplines_valid</a>);</div>
+<div class="line"><a name="l00840"></a><span class="lineno">  840</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;On average {:.2f} splines per event ({}/{})&quot;</span>, <span class="keywordtype">float</span>(<a class="code" href="classSMonolith.html#ab72795333d6f632565b0f7eb0ca8a658">NSplines_valid</a>)/<span class="keywordtype">float</span>(<a class="code" href="classSMonolith.html#ac86282b04659bae5cccb6073c9edc0a5">NEvents</a>), <a class="code" href="classSMonolith.html#ab72795333d6f632565b0f7eb0ca8a658">NSplines_valid</a>, <a class="code" href="classSMonolith.html#ac86282b04659bae5cccb6073c9edc0a5">NEvents</a>);</div>
+<div class="line"><a name="l00841"></a><span class="lineno">  841</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Size of x array = {:.4f} MB&quot;</span>, <span class="keywordtype">double</span>(<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>)*event_size_max)/1.E6);</div>
+<div class="line"><a name="l00842"></a><span class="lineno">  842</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Size of coefficient (y,b,c,d) array = {:.2f} MB&quot;</span>, <span class="keywordtype">double</span>(<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>)*<a class="code" href="classSMonolith.html#afc0e3d1eafd575cf7628319a66925d5b">nKnots</a>*<a class="code" href="SplineCommon_8h.html#a790348db7c20fb9896e94403fbee52cf">_nCoeff_</a>)/1.E6);</div>
+<div class="line"><a name="l00843"></a><span class="lineno">  843</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Size of parameter # array = {:.2f} MB&quot;</span>, <span class="keywordtype">double</span>(<span class="keyword">sizeof</span>(<span class="keywordtype">short</span> <span class="keywordtype">int</span>)*<a class="code" href="classSMonolith.html#ab72795333d6f632565b0f7eb0ca8a658">NSplines_valid</a>)/1.E6);</div>
+<div class="line"><a name="l00844"></a><span class="lineno">  844</span>&#160; </div>
+<div class="line"><a name="l00845"></a><span class="lineno">  845</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;On average {:.2f} TF1 per event ({}/{})&quot;</span>, <span class="keywordtype">float</span>(<a class="code" href="classSMonolith.html#a13699796db31517edba3a8009317f779">NTF1_valid</a>)/<span class="keywordtype">float</span>(<a class="code" href="classSMonolith.html#ac86282b04659bae5cccb6073c9edc0a5">NEvents</a>), <a class="code" href="classSMonolith.html#a13699796db31517edba3a8009317f779">NTF1_valid</a>, <a class="code" href="classSMonolith.html#ac86282b04659bae5cccb6073c9edc0a5">NEvents</a>);</div>
+<div class="line"><a name="l00846"></a><span class="lineno">  846</span>&#160;  <a class="code" href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a>(<span class="stringliteral">&quot;Size of TF1 coefficient (a,b,c,d,e) array = {:.2f} MB&quot;</span>, <span class="keywordtype">double</span>(<span class="keyword">sizeof</span>(<span class="keywordtype">float</span>)*<a class="code" href="classSMonolith.html#a13699796db31517edba3a8009317f779">NTF1_valid</a>*<a class="code" href="SplineCommon_8h.html#ad6cacf3d45a37eeeeffe38ad24345d54">_nTF1Coeff_</a>)/1.E6);</div>
+<div class="line"><a name="l00847"></a><span class="lineno">  847</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1798,13 +1796,13 @@ Kamil Skwarczynski </dd></dl>
 
 <p>Implements <a class="el" href="classSplineBase.html#aec23c4a87dbbd3b2c0329c93ebbd72c0">SplineBase</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="SplineMonolith_8cpp_source.html#l00852">852</a> of file <a class="el" href="SplineMonolith_8cpp_source.html">SplineMonolith.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00852"></a><span class="lineno">  852</span>&#160;                                             {</div>
-<div class="line"><a name="l00853"></a><span class="lineno">  853</span>&#160;<span class="comment">//*********************************************************</span></div>
-<div class="line"><a name="l00854"></a><span class="lineno">  854</span>&#160;<span class="preprocessor">  #ifdef MaCh3_CUDA</span></div>
-<div class="line"><a name="l00855"></a><span class="lineno">  855</span>&#160;  <a class="code" href="gpuSplineUtils_8cu.html#a953e5c5aecebd908f5d8c6ad64de482c">SynchroniseSplines</a>();</div>
-<div class="line"><a name="l00856"></a><span class="lineno">  856</span>&#160;<span class="preprocessor">  #endif</span></div>
-<div class="line"><a name="l00857"></a><span class="lineno">  857</span>&#160;}</div>
+<p class="definition">Definition at line <a class="el" href="SplineMonolith_8cpp_source.html#l00851">851</a> of file <a class="el" href="SplineMonolith_8cpp_source.html">SplineMonolith.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00851"></a><span class="lineno">  851</span>&#160;                                             {</div>
+<div class="line"><a name="l00852"></a><span class="lineno">  852</span>&#160;<span class="comment">//*********************************************************</span></div>
+<div class="line"><a name="l00853"></a><span class="lineno">  853</span>&#160;<span class="preprocessor">  #ifdef MaCh3_CUDA</span></div>
+<div class="line"><a name="l00854"></a><span class="lineno">  854</span>&#160;  <a class="code" href="gpuSplineUtils_8cu.html#a953e5c5aecebd908f5d8c6ad64de482c">SynchroniseSplines</a>();</div>
+<div class="line"><a name="l00855"></a><span class="lineno">  855</span>&#160;<span class="preprocessor">  #endif</span></div>
+<div class="line"><a name="l00856"></a><span class="lineno">  856</span>&#160;}</div>
 <div class="ttc" id="agpuSplineUtils_8cu_html_a953e5c5aecebd908f5d8c6ad64de482c"><div class="ttname"><a href="gpuSplineUtils_8cu.html#a953e5c5aecebd908f5d8c6ad64de482c">SynchroniseSplines</a></div><div class="ttdeci">__host__ void SynchroniseSplines()</div><div class="ttdoc">Make sure all Cuda threads finished execution.</div><div class="ttdef"><b>Definition:</b> <a href="gpuSplineUtils_8cu_source.html#l00071">gpuSplineUtils.cu:71</a></div></div>
 </div><!-- fragment -->
 </div>

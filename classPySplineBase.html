@@ -108,9 +108,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a19f9f443bcc72d5d038a822a088bc036"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPySplineBase.html#a19f9f443bcc72d5d038a822a088bc036">CalcSplineWeights</a> () override</td></tr>
 <tr class="memdesc:a19f9f443bcc72d5d038a822a088bc036"><td class="mdescLeft">&#160;</td><td class="mdescRight">CPU based code which eval weight for each spline.  <a href="classPySplineBase.html#a19f9f443bcc72d5d038a822a088bc036">More...</a><br /></td></tr>
 <tr class="separator:a19f9f443bcc72d5d038a822a088bc036"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac7361b35ea190c2a88487f2bb6a92305"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPySplineBase.html#ac7361b35ea190c2a88487f2bb6a92305">ModifyWeights</a> () override</td></tr>
-<tr class="memdesc:ac7361b35ea190c2a88487f2bb6a92305"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calc total event weight.  <a href="classPySplineBase.html#ac7361b35ea190c2a88487f2bb6a92305">More...</a><br /></td></tr>
-<tr class="separator:ac7361b35ea190c2a88487f2bb6a92305"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa6965d1522cc68ecf81ac3bfd2dcd6f1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPySplineBase.html#aa6965d1522cc68ecf81ac3bfd2dcd6f1">SplineBase</a> ()</td></tr>
 <tr class="memdesc:aa6965d1522cc68ecf81ac3bfd2dcd6f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="classPySplineBase.html#aa6965d1522cc68ecf81ac3bfd2dcd6f1">More...</a><br /></td></tr>
 <tr class="separator:aa6965d1522cc68ecf81ac3bfd2dcd6f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -203,7 +200,7 @@ Additional Inherited Members</h2></td></tr>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        );</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    }</div>
 <div class="ttc" id="aclassPySplineBase_html_a19f9f443bcc72d5d038a822a088bc036"><div class="ttname"><a href="classPySplineBase.html#a19f9f443bcc72d5d038a822a088bc036">PySplineBase::CalcSplineWeights</a></div><div class="ttdeci">void CalcSplineWeights() override</div><div class="ttdoc">CPU based code which eval weight for each spline.</div><div class="ttdef"><b>Definition:</b> <a href="splines_8cpp_source.html#l00052">splines.cpp:52</a></div></div>
-<div class="ttc" id="aclassSplineBase_html"><div class="ttname"><a href="classSplineBase.html">SplineBase</a></div><div class="ttdoc">Base class for calculating weight from spline.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00025">SplineBase.h:25</a></div></div>
+<div class="ttc" id="aclassSplineBase_html"><div class="ttname"><a href="classSplineBase.html">SplineBase</a></div><div class="ttdoc">Base class for calculating weight from spline.</div><div class="ttdef"><b>Definition:</b> <a href="SplineBase_8h_source.html#l00027">SplineBase.h:27</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -323,46 +320,6 @@ Additional Inherited Members</h2></td></tr>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="ac7361b35ea190c2a88487f2bb6a92305"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac7361b35ea190c2a88487f2bb6a92305">&#9670;&nbsp;</a></span>ModifyWeights()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void PySplineBase::ModifyWeights </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Calc total event weight. </p>
-
-<p>Implements <a class="el" href="classSplineBase.html#a49665d2712b61b038085d25ace96a568">SplineBase</a>.</p>
-
-<p class="definition">Definition at line <a class="el" href="splines_8cpp_source.html#l00061">61</a> of file <a class="el" href="splines_8cpp_source.html">splines.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;                                  {</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        PYBIND11_OVERRIDE_PURE_NAME(</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;            <span class="keywordtype">void</span>,             <span class="comment">/* Return type */</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;            <a class="code" href="classSplineBase.html">SplineBase</a>,       <span class="comment">/* Parent class */</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;            <span class="stringliteral">&quot;modify_weights&quot;</span>, <span class="comment">/* Name in python*/</span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;            <a class="code" href="classPySplineBase.html#ac7361b35ea190c2a88487f2bb6a92305">ModifyWeights</a>     <span class="comment">/* Name of function in C++ (must match Python name) */</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        );</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    }</div>
-<div class="ttc" id="aclassPySplineBase_html_ac7361b35ea190c2a88487f2bb6a92305"><div class="ttname"><a href="classPySplineBase.html#ac7361b35ea190c2a88487f2bb6a92305">PySplineBase::ModifyWeights</a></div><div class="ttdeci">void ModifyWeights() override</div><div class="ttdoc">Calc total event weight.</div><div class="ttdef"><b>Definition:</b> <a href="splines_8cpp_source.html#l00061">splines.cpp:61</a></div></div>
-</div><!-- fragment -->
-</div>
-</div>
 <a id="aa6965d1522cc68ecf81ac3bfd2dcd6f1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa6965d1522cc68ecf81ac3bfd2dcd6f1">&#9670;&nbsp;</a></span>SplineBase()</h2>
 
@@ -377,7 +334,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Constructor. </p>
 
-<p class="definition">Definition at line <a class="el" href="SplineBase_8cpp_source.html#l00028">28</a> of file <a class="el" href="SplineBase_8cpp_source.html">SplineBase.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SplineBase_8cpp_source.html#l00030">30</a> of file <a class="el" href="SplineBase_8cpp_source.html">SplineBase.cpp</a>.</p>
 <div class="fragment"><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;                       {</div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment">// *****************************************</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;  <a class="code" href="classSplineBase.html#a2165b057a0125a28d96f247ca8680b42">nParams</a> = 0;</div>
