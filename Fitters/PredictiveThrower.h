@@ -76,7 +76,9 @@ class PredictiveThrower : public FitterBase {
   std::vector<std::unique_ptr<TH1>> MakePredictive(const std::vector<std::vector<std::unique_ptr<TH1>>>& Toys,
                                                    const std::vector<TDirectory*>& Director,
                                                    const std::string& suffix,
-                                                   const bool DebugHistograms);
+                                                   const bool DebugHistograms,
+                                                   const bool WriteHist);
+
   /// @brief Load 1D projections and later produce violin plots for each
   void Study1DProjections(const std::vector<TDirectory*>& SampleDirectories) const;
   /// @brief Produce Violin style spectra
@@ -88,9 +90,23 @@ class PredictiveThrower : public FitterBase {
   /// @param FluctHist Histogram to store fluctuated values (must match Hist type)
   /// @param Hist Original histogram to fluctuate
   void MakeFluctuatedHistogram(TH1* FluctHist, TH1* PolyHist);
+
+  /// @brief Calculate Posterior Predictive LLH
+  void PredictiveLLH(const std::vector<std::unique_ptr<TH1>>& Data_histogram,
+                     const std::vector<std::unique_ptr<TH1>>& PostPred_mc,
+                     const std::vector<std::unique_ptr<TH1>>& PostPred_w,
+                     const std::vector<TDirectory*>& SampleDir);
+
+
   /// @brief Calculate Posterior Predictive $p$-value
   void PosteriorPredictivepValue(const std::vector<std::unique_ptr<TH1>>& PostPred_mc,
                                  const std::vector<TDirectory*>& SampleDir);
+  /// @brief Calculate the LLH for TH1, set the LLH to title of MCHist
+  /// @param DatHist Data histogram with data distribution for a single sample
+  /// @param MCHist MC histogram with MC distribution for a single sample
+  /// @param W2Hist W2 histogram with W2 distribution for a single sample
+  /// @param SampleHandler Pointer to SampleHandlerBase providing LLH test statistic
+  void ExtractLLH(TH1* DatHist, TH1* MCHist, TH1* W2Hist, const SampleHandlerBase* SampleHandler) const;
 
   /// @brief Calculates the likelihood (-2LLH) for a single sample; dynamically casts to call the correct GetLLH overload
   /// @param DatHist Data histogram with data distribution for a single sample

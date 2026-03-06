@@ -857,7 +857,8 @@ std::vector<std::unique_ptr<TH1D>> PredictiveThrower::PerBinHistogram(TH1* hist,
 std::vector<std::unique_ptr<TH1>> PredictiveThrower::MakePredictive(const std::vector<std::vector<std::unique_ptr<TH1>>>& Toys,
                                                                     const std::vector<TDirectory*>& Directory,
                                                                     const std::string& suffix,
-                                                                    const bool DebugHistograms) {
+                                                                    const bool DebugHistograms,
+                                                                    const bool WriteHist) {
 // *************************
   std::vector<std::unique_ptr<TH1>> PostPred(TotalNumberOfSamples);
   std::vector<std::vector<std::unique_ptr<TH1D>>> Posterior_hist(TotalNumberOfSamples);
@@ -943,7 +944,7 @@ std::vector<std::unique_ptr<TH1>> PredictiveThrower::MakePredictive(const std::v
         if (DebugHistograms) Posterior_hist[sample][i-1]->Write();
       }
     }
-    PostPred[sample]->Write();
+    if(WriteHist) PostPred[sample]->Write();
   } // end loop over samples
   return PostPred;
 }
@@ -976,8 +977,12 @@ void PredictiveThrower::RunPredictiveAnalysis() {
 
   // Produce Violin style spectra
   Study1DProjections(SampleDirectories);
-  // Produce posterior predictive distribution
-  auto PostPred_mc = MakePredictive(MC_Hist_Toy, SampleDirectories, "mc", DebugHistograms);
+  // Produce posterior predictive distribution for mc
+  auto PostPred_mc = MakePredictive(MC_Hist_Toy, SampleDirectories, "mc", DebugHistograms, false);
+  // Produce posterior predictive distribution for w2
+  auto PostPred_w2 = MakePredictive(W2_Hist_Toy, SampleDirectories, "w2", false, false);
+  // Calculate Posterior Predictive LLH
+  PredictiveLLH(Data_Hist, PostPred_mc, PostPred_w2, SampleDirectories);
   // Calculate Posterior Predictive $p$-value
   PosteriorPredictivepValue(PostPred_mc, SampleDirectories);
   // Check how number of events changed
@@ -1175,6 +1180,22 @@ void PredictiveThrower::PosteriorPredictivepValue(const std::vector<std::unique_
 }
 
 // *************************
+void PredictiveThrower::PredictiveLLH(const std::vector<std::unique_ptr<TH1>>& Data_histogram,
+                                               const std::vector<std::unique_ptr<TH1>>& PostPred_mc,
+                                               const std::vector<std::unique_ptr<TH1>>& PostPred_w,
+                                               const std::vector<TDirectory*>& SampleDir) {
+// *************************
+  MACH3LOG_INFO("{:<55} {:<10} {:<10} {:<10}", "Sample", "DataInt", "MCInt", "-2LLH");
+  MACH3LOG_INFO("{:-<55} {:-<10} {:-<10} {:-<10}", "", "", "", "");
+  for (int iSample = 0; iSample < TotalNumberOfSamples; ++iSample) {
+    SampleDir[iSample]->cd();
+    ExtractLLH(Data_histogram[iSample].get(), PostPred_mc[iSample].get(), PostPred_w[iSample].get(), SampleInfo[iSample].SamHandler);
+    PostPred_mc[iSample]->Write();
+  }
+}
+
+
+// *************************
 void PredictiveThrower::MakeChi2Plots(const std::vector<std::vector<double>>& Chi2_x,
                                       const std::string& Chi2_x_title,
                                       const std::vector<std::vector<double>>& Chi2_y,
@@ -1306,6 +1327,18 @@ void PredictiveThrower::StudyBetaParameters(TDirectory* PredictiveDir) {
   delete BetaDir;
 
   PredictiveDir->cd();
+}
+
+
+// ****************
+// Calculate the LLH for TH1, set the LLH to title of MCHist
+void PredictiveThrower::ExtractLLH(TH1*  DatHist, TH1* MCHist, TH1* W2Hist, const SampleHandlerBase* SampleHandler) const {
+// ****************
+  const double llh = CalcLLH(DatHist, MCHist, W2Hist, SampleHandler);
+  std::stringstream ss;
+  ss << "_2LLH=" << llh;
+  MCHist->SetTitle((std::string(MCHist->GetTitle())+ss.str()).c_str());
+  MACH3LOG_INFO("{:<55} {:<10.2f} {:<10.2f} {:<10.2f}", MCHist->GetName(), DatHist->Integral(), MCHist->Integral(), llh);
 }
 
 // ****************

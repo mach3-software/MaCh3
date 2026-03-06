@@ -486,6 +486,65 @@ void PrintPosteriorFractionalUncertainties(const std::vector<TFile*>& InputFiles
   MACH3LOG_INFO("");
 }
 
+double GetLLH(TH1* hist)
+{
+  std::string TempTile = hist->GetTitle();
+  std::string temp = "=";
+
+  std::string::size_type SizeType = TempTile.find(temp);
+  TempTile.erase(0, SizeType+1);
+  double llh = atof(TempTile.c_str());
+  return llh;
+}
+
+/// @brief KS Print Predictive LLH into Latex table format
+void PrintPredictiveLLH(const std::vector<TFile*>& InputFiles,
+                        const std::vector<std::string>& SampleNames) {
+  MACH3LOG_INFO("Starting {}", __func__);
+  MACH3LOG_INFO("");
+
+  std::vector<double> Total(InputFiles.size());
+  //KS: We now prepare to make tables for TN etc.
+  std::cout<<"\\begin{table}[htb]"<<std::endl;
+  std::cout<<"\\centering"<<std::endl;
+  std::cout<<"\\begin{tabular}{ | l |";
+  for(unsigned int f = 0; f < InputFiles.size(); f++)
+  {
+    Total[f] = 0.;
+    std::cout<<" c |";
+  }
+  std::cout<<"} \\hline"<<std::endl;
+  std::cout<<"Sample ";
+  for(unsigned int f = 0; f < InputFiles.size(); f++)
+  {
+    std::cout<<"& 2#log#mathcal{L}_{stat}  ";
+  }
+  std::cout<<"\\\\ \\hline"<<std::endl;
+  for(unsigned int i = 0; i < SampleNames.size(); i++)
+  {
+    std::cout<<SampleNames[i];
+    std::string TempString = "Predictive/" + SampleNames[i]+"/"+SampleNames[i]+"_mc_PostPred";
+    for(unsigned int f = 0; f < InputFiles.size(); f++)
+    {
+      TH1 *hist = static_cast<TH1*>(InputFiles[f]->Get(TempString.c_str()));
+
+      double llh = GetLLH(hist);
+      std::cout<<" & "<<llh;
+      Total[f] += llh;
+    }
+    std::cout<<" \\\\"<<std::endl;
+  }
+  std::cout<<"Total";
+  for(unsigned int f = 0; f < InputFiles.size(); f++) {
+    std::cout<<" & "<<Total[f];
+  }
+  std::cout<<" \\\\"<<std::endl;
+  std::cout<<"\\hline"<<std::endl;
+  std::cout<<"\\end{tabular}"<<std::endl;
+  std::cout<<"\\end{table}"<<std::endl;
+  std::cout<<" "<<std::endl;
+}
+
 void PredictivePlotting(const std::string& ConfigName,
                         const std::vector<std::string>& FileNames)
 {
@@ -530,7 +589,8 @@ void PredictivePlotting(const std::string& ConfigName,
   PrintPosteriorEventRates(InputFiles, Samples);
   // KS: Print Fractional Uncertainties into Latex table format
   PrintPosteriorFractionalUncertainties(InputFiles, Samples);
-
+  // KS: Print Predictive LLH into Latex table format
+  PrintPredictiveLLH(InputFiles, Samples);
   canvas->Print("Overlay_Predictive.pdf]", "pdf");
 
   for(size_t i = 0; i < FileNames.size(); i++)

@@ -16,9 +16,8 @@ SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGen
   MACH3LOG_INFO("Creating SampleHandlerFD object");
 
   //ETA - safety feature so you can't pass a NULL xsec_cov
-  if(!xsec_cov){
-    MACH3LOG_ERROR("You've passed me a nullptr to a SystematicHandlerGeneric... I need this to setup splines!");
-    throw MaCh3Exception(__FILE__, __LINE__);
+  if(!xsec_cov) {
+    MACH3LOG_WARN("You've passed me a nullptr ParameterHandler so I will not use any xsec parameters");
   }
   ParHandler = xsec_cov;
 
@@ -27,6 +26,11 @@ SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGen
   if (OscillatorObj_ != nullptr) {
     MACH3LOG_WARN("You have passed an Oscillator object through the constructor of a SampleHandlerFD object - this will be used for all oscillation channels");
     Oscillator = OscillatorObj_;
+    if(!ParHandler) {
+      MACH3LOG_CRITICAL("You've passed me a nullptr to ParamHandler while non null to Oscillator");
+      MACH3LOG_CRITICAL("Make up you mind");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
   }
 
   KinematicParameters = nullptr;
@@ -133,14 +137,23 @@ void SampleHandlerFD::LoadSingleSample(const int iSample, const YAML::Node& Samp
     OscChannelInfo OscInfo;
     OscInfo.flavourName       = osc_channel["Name"].as<std::string>();
     OscInfo.flavourName_Latex = osc_channel["LatexName"].as<std::string>();
-    OscInfo.InitPDG           = static_cast<NuPDG>(osc_channel["nutype"].as<int>());
-    OscInfo.FinalPDG          = static_cast<NuPDG>(osc_channel["oscnutype"].as<int>());
+    OscInfo.InitPDG           = GetFromManager(osc_channel["nutype"],0,__FILE__,__LINE__);
+    OscInfo.FinalPDG          = GetFromManager(osc_channel["oscnutype"],0,__FILE__,__LINE__);
     OscInfo.ChannelIndex      = OscChannelCounter;
+
+    for (const auto& Existing : SingleSample.OscChannels) {
+      if (Existing.InitPDG == OscInfo.InitPDG && Existing.FinalPDG == OscInfo.FinalPDG) {
+        MACH3LOG_ERROR("Duplicate oscillation channel detected! InitPDG = {}, FinalPDG = {}"
+                       "already defined in channel {} for sample {}",
+                       OscInfo.InitPDG, OscInfo.FinalPDG, Existing.ChannelIndex, SingleSample.SampleTitle);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+    }
 
     SingleSample.OscChannels.push_back(std::move(OscInfo));
 
-    FileToInitPDGMap[MTupleFileName] = static_cast<NuPDG>(osc_channel["nutype"].as<int>());
-    FileToFinalPDGMap[MTupleFileName] = static_cast<NuPDG>(osc_channel["oscnutype"].as<int>());
+    FileToInitPDGMap[MTupleFileName] = NuPDG(OscInfo.InitPDG);
+    FileToFinalPDGMap[MTupleFileName] = NuPDG(OscInfo.FinalPDG);
 
     SingleSample.mc_files.push_back(MTupleFileName);
     SingleSample.spline_files.push_back(splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);
@@ -160,7 +173,9 @@ void SampleHandlerFD::LoadSingleSample(const int iSample, const YAML::Node& Samp
   SampleDetails[iSample] = std::move(SingleSample);
 }
 
+// ************************************************
 void SampleHandlerFD::Initialise() {
+// ************************************************
   TStopwatch clock;
   clock.Start();
 
@@ -176,36 +191,7 @@ void SampleHandlerFD::Initialise() {
 
   MACH3LOG_INFO("=============================================");
   MACH3LOG_INFO("Total number of events is: {}", GetNEvents());
-
-  auto OscParams = ParHandler->GetOscParsFromSampleName(SampleHandlerName);
-  if (OscParams.size() > 0) {
-    MACH3LOG_INFO("Setting up NuOscillator..");
-    if (Oscillator != nullptr) {
-      MACH3LOG_INFO("You have passed an OscillatorBase object through the constructor of a SampleHandlerFD object - this will be used for all oscillation channels");
-      if(Oscillator->isEqualBinningPerOscChannel() != true) {
-        MACH3LOG_ERROR("Trying to run shared NuOscillator without EqualBinningPerOscChannel, this will not work");
-        throw MaCh3Exception(__FILE__, __LINE__);
-      }
-
-      if(OscParams.size() != Oscillator->GetOscParamsSize()){
-        MACH3LOG_ERROR("SampleHandler {} has {} osc params, while shared NuOsc has {} osc params", GetName(),
-                       OscParams.size(), Oscillator->GetOscParamsSize());
-        MACH3LOG_ERROR("This indicate misconfiguration in your Osc yaml");
-        throw MaCh3Exception(__FILE__, __LINE__);
-      }
-    } else {
-      InitialiseNuOscillatorObjects();
-    }
-    SetupNuOscillatorPointers();
-  } else{
-    MACH3LOG_WARN("Didn't find any oscillation params, thus will not enable oscillations");
-    if(CheckNodeExists(SampleManager->raw(), "NuOsc")){
-      MACH3LOG_ERROR("However config for SampleHandler {} has 'NuOsc' field", GetName());
-      MACH3LOG_ERROR("This may indicate misconfiguration");
-      MACH3LOG_ERROR("Either remove 'NuOsc' field from SampleHandler config or check your model.yaml and include oscillation for sample");
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-  }
+  SetupOscParameters();
   MACH3LOG_INFO("Setting up Sample Binning..");
   SetBinning();
   MACH3LOG_INFO("Setting up Splines..");
@@ -502,12 +488,13 @@ void SampleHandlerFD::RegisterIndividualFunctionalParameter(const std::string& f
 // **************************************************
 void SampleHandlerFD::SetupFunctionalParameters() {
 // **************************************************
+  funcParsGrid.resize(GetNEvents());
+  if(ParHandler == nullptr) return;
   funcParsVec = ParHandler->GetFunctionalParametersFromSampleName(SampleHandlerName);
   // RegisterFunctionalParameters is implemented in experiment-specific code,
   // which calls RegisterIndividualFuncPar to populate funcParsNamesMap, funcParsNamesVec, and funcParsFuncMap
   RegisterFunctionalParameters();
   funcParsMap.resize(funcParsNamesMap.size());
-  funcParsGrid.resize(GetNEvents());
 
   // For every functional parameter in XsecCov that matches the name in funcParsNames, add it to the map
   for (FunctionalParameter& fp : funcParsVec) {
@@ -611,9 +598,49 @@ M3::float_t SampleHandlerFD::CalcWeightTotal(const EventInfo* _restrict_ MCEvent
 }
 
 // ***************************************************************************
+// Setup the osc parameters
+void SampleHandlerFD::SetupOscParameters() {
+// ***************************************************************************
+  // KS: Only make sense to setup osc if you have ParHandler
+  if(ParHandler == nullptr ) return;
+
+  auto OscParams = ParHandler->GetOscParsFromSampleName(SampleHandlerName);
+  if (OscParams.size() > 0) {
+    MACH3LOG_INFO("Setting up NuOscillator..");
+    if (Oscillator != nullptr) {
+      MACH3LOG_INFO("You have passed an OscillatorBase object through the constructor of a SampleHandlerFD object - this will be used for all oscillation channels");
+      if(Oscillator->isEqualBinningPerOscChannel() != true) {
+        MACH3LOG_ERROR("Trying to run shared NuOscillator without EqualBinningPerOscChannel, this will not work");
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+
+      if(OscParams.size() != Oscillator->GetOscParamsSize()){
+        MACH3LOG_ERROR("SampleHandler {} has {} osc params, while shared NuOsc has {} osc params", GetName(),
+                        OscParams.size(), Oscillator->GetOscParamsSize());
+        MACH3LOG_ERROR("This indicate misconfiguration in your Osc yaml");
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+    } else {
+      InitialiseNuOscillatorObjects();
+    }
+    SetupNuOscillatorPointers();
+  } else{
+    MACH3LOG_WARN("Didn't find any oscillation params, thus will not enable oscillations");
+    if(CheckNodeExists(SampleManager->raw(), "NuOsc")){
+      MACH3LOG_ERROR("However config for SampleHandler {} has 'NuOsc' field", GetName());
+      MACH3LOG_ERROR("This may indicate misconfiguration");
+      MACH3LOG_ERROR("Either remove 'NuOsc' field from SampleHandler config or check your model.yaml and include oscillation for sample");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+  }
+}
+
+
+// ***************************************************************************
 // Setup the norm parameters
 void SampleHandlerFD::SetupNormParameters() {
 // ***************************************************************************
+  if(ParHandler == nullptr) return;
   std::vector< std::vector< int > > norms_bins(GetNEvents());
 
   std::vector<NormParameter> norm_parameters = ParHandler->GetNormParsFromSampleName(GetName());
@@ -1183,10 +1210,17 @@ void SampleHandlerFD::SetSplinePointers() {
   //Now loop over events and get the spline bin for each event
   if (auto BinnedSpline = dynamic_cast<BinnedSplineHandler*>(SplineHandler.get())) {
     bool ThrowCrititcal = true;
+
     for (unsigned int j = 0; j < GetNEvents(); ++j) {
       const int SampleIndex = MCSamples[j].NominalSample;
       const auto SampleTitle = GetSampleTitle(SampleIndex);
-      const int OscIndex = GetOscChannel(SampleDetails[SampleIndex].OscChannels, (*MCSamples[j].nupdgUnosc), (*MCSamples[j].nupdg));
+      bool NoOscChannels = false;
+      if(Oscillator == nullptr && GetNOscChannels(SampleIndex) == 1) {
+        MACH3LOG_DEBUG("Assuming there are no osc channels in {}", __func__);
+        NoOscChannels = true;
+      }
+      const int OscIndex = NoOscChannels ? 0 : GetOscChannel(SampleDetails[SampleIndex].OscChannels,
+                                                             (*MCSamples[j].nupdgUnosc), (*MCSamples[j].nupdg));
       const int Mode = int(*(MCSamples[j].mode));
       const double Etrue = *(MCSamples[j].rw_etru);
       std::vector< std::vector<int> > EventSplines;
