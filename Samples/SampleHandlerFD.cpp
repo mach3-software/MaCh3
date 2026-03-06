@@ -137,6 +137,15 @@ void SampleHandlerFD::LoadSingleSample(const int iSample, const YAML::Node& Samp
     OscInfo.FinalPDG          = static_cast<NuPDG>(osc_channel["oscnutype"].as<int>());
     OscInfo.ChannelIndex      = OscChannelCounter;
 
+    for (const auto& Existing : SingleSample.OscChannels) {
+      if (Existing.InitPDG == OscInfo.InitPDG && Existing.FinalPDG == OscInfo.FinalPDG) {
+        MACH3LOG_ERROR("Duplicate oscillation channel detected! InitPDG = {}, FinalPDG = {}"
+                       "already defined in channel {} for sample {}",
+                       OscInfo.InitPDG, OscInfo.FinalPDG, Existing.ChannelIndex, SingleSample.SampleTitle);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+    }
+
     SingleSample.OscChannels.push_back(std::move(OscInfo));
 
     FileToInitPDGMap[MTupleFileName] = static_cast<NuPDG>(osc_channel["nutype"].as<int>());
@@ -1183,10 +1192,17 @@ void SampleHandlerFD::SetSplinePointers() {
   //Now loop over events and get the spline bin for each event
   if (auto BinnedSpline = dynamic_cast<BinnedSplineHandler*>(SplineHandler.get())) {
     bool ThrowCrititcal = true;
+
     for (unsigned int j = 0; j < GetNEvents(); ++j) {
       const int SampleIndex = MCSamples[j].NominalSample;
       const auto SampleTitle = GetSampleTitle(SampleIndex);
-      const int OscIndex = GetOscChannel(SampleDetails[SampleIndex].OscChannels, (*MCSamples[j].nupdgUnosc), (*MCSamples[j].nupdg));
+      bool NoOscChannels = false;
+      if(Oscillator == nullptr && GetNOscChannels(SampleIndex) == 1) {
+        MACH3LOG_DEBUG("Assuming there are no osc channels in {}", __func__);
+        NoOscChannels = true;
+      }
+      const int OscIndex = NoOscChannels ? 0 : GetOscChannel(SampleDetails[SampleIndex].OscChannels,
+                                                             (*MCSamples[j].nupdgUnosc), (*MCSamples[j].nupdg));
       const int Mode = int(*(MCSamples[j].mode));
       const double Etrue = *(MCSamples[j].rw_etru);
       std::vector< std::vector<int> > EventSplines;
