@@ -133,8 +133,8 @@ void SampleHandlerFD::LoadSingleSample(const int iSample, const YAML::Node& Samp
     OscChannelInfo OscInfo;
     OscInfo.flavourName       = osc_channel["Name"].as<std::string>();
     OscInfo.flavourName_Latex = osc_channel["LatexName"].as<std::string>();
-    OscInfo.InitPDG           = static_cast<NuPDG>(osc_channel["nutype"].as<int>());
-    OscInfo.FinalPDG          = static_cast<NuPDG>(osc_channel["oscnutype"].as<int>());
+    OscInfo.InitPDG           = GetFromManager(osc_channel["nutype"],0,__FILE__,__LINE__);
+    OscInfo.FinalPDG          = GetFromManager(osc_channel["oscnutype"],0,__FILE__,__LINE__);
     OscInfo.ChannelIndex      = OscChannelCounter;
 
     for (const auto& Existing : SingleSample.OscChannels) {
@@ -148,8 +148,8 @@ void SampleHandlerFD::LoadSingleSample(const int iSample, const YAML::Node& Samp
 
     SingleSample.OscChannels.push_back(std::move(OscInfo));
 
-    FileToInitPDGMap[MTupleFileName] = static_cast<NuPDG>(osc_channel["nutype"].as<int>());
-    FileToFinalPDGMap[MTupleFileName] = static_cast<NuPDG>(osc_channel["oscnutype"].as<int>());
+    FileToInitPDGMap[MTupleFileName] = NuPDG(OscInfo.InitPDG);
+    FileToFinalPDGMap[MTupleFileName] = NuPDG(OscInfo.FinalPDG);
 
     SingleSample.mc_files.push_back(MTupleFileName);
     SingleSample.spline_files.push_back(splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);
