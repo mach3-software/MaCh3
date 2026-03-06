@@ -188,7 +188,11 @@ void BinningHandler::SetupSampleBinning(const YAML::Node& Settings, SampleInfo& 
 // ************************************************
   MACH3LOG_INFO("Setting up Sample Binning");
   //Binning
-  SingleSample.VarStr = Get<std::vector<std::string>>(Settings["VarStr"], __FILE__ , __LINE__);
+  SingleSample.VarStr = (Settings["VarStr"] && Settings["VarStr"].IsScalar())
+                            ? std::vector<std::string>{Get<std::string>(
+                                  Settings["VarStr"], __FILE__, __LINE__)}
+                            : Get<std::vector<std::string>>(Settings["VarStr"],
+                                                            __FILE__, __LINE__);
   SingleSample.nDimensions = static_cast<int>(SingleSample.VarStr.size());
 
   SampleBinningInfo SingleBinning;
