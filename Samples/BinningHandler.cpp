@@ -7,10 +7,12 @@ BinningHandler::BinningHandler() {
 // ************************************************
 }
 
-auto BinRangeToBinEdges(const YAML::Node &bin_range) {
+auto BinRangeToBinEdges(YAML::Node const &bin_range) {
   bool is_lin = true;
+  YAML::Node bin_range_specifier = bin_range["linspace"];
   if (bin_range["logspace"]) {
     is_lin = false;
+    bin_range_specifier = bin_range["logspace"];
   } else if (!bin_range["linspace"]) {
     std::stringstream ss;
     ss << bin_range;
@@ -20,9 +22,9 @@ auto BinRangeToBinEdges(const YAML::Node &bin_range) {
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
-  auto nb = Get<int>(bin_range["nb"],__FILE__, __LINE__);
-  auto low = Get<double>(bin_range["low"],__FILE__, __LINE__);
-  auto up = Get<double>(bin_range["up"],__FILE__, __LINE__);
+  auto nb = Get<int>(bin_range_specifier["nb"], __FILE__, __LINE__);
+  auto low = Get<double>(bin_range_specifier["low"], __FILE__, __LINE__);
+  auto up = Get<double>(bin_range_specifier["up"], __FILE__, __LINE__);
 
   std::vector<double> edges(nb + 1, low);
   // force the last bin to be exactly as parsed to avoid numerical instabilities
@@ -33,7 +35,7 @@ auto BinRangeToBinEdges(const YAML::Node &bin_range) {
 
   if (is_lin) {
     double bw = (up - low) / nb;
-    for (int i = 0; i < (nb-1); ++i) {
+    for (int i = 0; i < (nb - 1); ++i) {
       edges[i + 1] = edges[i] + bw;
     }
   } else {
@@ -55,24 +57,28 @@ auto BinRangeToBinEdges(const YAML::Node &bin_range) {
 /// BinEdges:  { logspace: { nb: 100, low: 1E-1, up: 10} }
 /// BinEdges:  [ { linspace: { nb: 100, low: 0, up: 10} }, 10, 15, { logspace: {
 /// nb: 5, low: 15, up: 100} } ]
-auto BuildBinEdgesFromNode(const YAML::Node &bin_edges_node) {
+auto BuildBinEdgesFromNode(YAML::Node const &bin_edges_node,
+                           bool &found_range_specifier) {
   if (bin_edges_node.IsMap()) {
+    found_range_specifier = true;
     return BinRangeToBinEdges(bin_edges_node);
   }
   std::vector<double> edges_builder;
   if (!bin_edges_node.IsSequence()) {
     std::stringstream ss;
     ss << bin_edges_node;
-    MACH3LOG_ERROR("When parsing binning, expected to find a YAML map or sequence, "
-                   "but found:\n{}",
-                   ss.str());
+    MACH3LOG_ERROR(
+        "When parsing binning, expected to find a YAML map or sequence, "
+        "but found:\n{}",
+        ss.str());
     throw MaCh3Exception(__FILE__, __LINE__);
   }
   for (auto const &it : bin_edges_node) {
     if (it.IsScalar()) {
       edges_builder.push_back(it.as<double>());
     } else if (it.IsMap()) {
-      auto range_edges = BinRangeToBinEdges(bin_edges_node);
+      found_range_specifier = true;
+      auto range_edges = BinRangeToBinEdges(it);
       std::copy(range_edges.begin(), range_edges.end(),
                 std::back_inserter(edges_builder));
     } else {
@@ -109,26 +115,37 @@ auto BuildBinEdgesFromNode(const YAML::Node &bin_edges_node) {
 /// @brief Parses YAML node describing multidim uniform binning
 /// @details
 /// # dimensional list implicit for 1D binnings
-/// BinEdges:  [<dim0bin0lowedge>, <dim0bin1upedge>, <dim0bin2upedge>, ... <dim0binNupedge>]
+/// BinEdges:  [<dim0bin0lowedge>, <dim0bin1upedge>, <dim0bin2upedge>, ...
+/// <dim0binNupedge>]
 ///
-/// BinEdges: [ [<dim0bin0lowedge>, <dim0bin1upedge>, <dim0bin2upedge>, ... <dim0binNupedge>],
+/// BinEdges: [ [<dim0bin0lowedge>, <dim0bin1upedge>, <dim0bin2upedge>, ...
+/// <dim0binNupedge>],
 ///            ...
-///            [<dimNbin0lowedge>, <dimNbin1upedge>, <dimNbin2upedge>, ... <dimNbinNupedge>] ]
+///            [<dimNbin0lowedge>, <dimNbin1upedge>, <dimNbin2upedge>, ...
+///            <dimNbinNupedge>] ]
 ///
 /// # bin edge list implicit for 1D range-only binnings
 /// BinEdges: { linspace: { nb: 100, low: 0, up: 10} }
 /// # mixed syntax binnings allowed
-/// BinEdges: [ { linspace: { nb: 100, low: 0, up: 10} }, 10, 15, { logspace: { nb: 5, low: 15, up: 100} }  ]
-/// # for ND range-only binnings, lists are required to disambiguate 1D mixed specifier binnings from ND binnings
+/// BinEdges: [ { linspace: { nb: 100, low: 0, up: 10} }, 10, 15, { logspace: {
+/// nb: 5, low: 15, up: 100} }  ] # for ND range-only binnings, lists are
+/// required to disambiguate 1D mixed specifier binnings from ND binnings
 /// BinEdges: [ [ { linspace: { nb: 100, low: 0, up: 10} } ],
 ///            ...
-///            [<dimNbin0lowedge>, <dimNbin1upedge>, <dimNbin2upedge>, ... <dimNbinNupedge>] ]
-/// BinEdges: [ [ { linspace: { nb: 100, low: 0, up: 10} }, 10, 15, { logspace: { nb: 5, low: 15, up: 100} }  ],
+///            [<dimNbin0lowedge>, <dimNbin1upedge>, <dimNbin2upedge>, ...
+///            <dimNbinNupedge>] ]
+/// BinEdges: [ [ { linspace: { nb: 100, low: 0, up: 10} }, 10, 15, { logspace:
+/// { nb: 5, low: 15, up: 100} }  ],
 ///            ...
-///            [<dimNbin0lowedge>, <dimNbin1upedge>, <dimNbin2upedge>, ... <dimNbinNupedge>] ]
-auto UniformBinEdgeConfigParser(const YAML::Node &bin_edges_node) {
+///            [<dimNbin0lowedge>, <dimNbin1upedge>, <dimNbin2upedge>, ...
+///            <dimNbinNupedge>] ]
+auto UniformBinEdgeConfigParser(YAML::Node const &bin_edges_node,
+                                bool &found_range_specifier) {
   if (bin_edges_node.IsMap()) {
-    return std::vector<std::vector<double>>{BinRangeToBinEdges(bin_edges_node),};
+    found_range_specifier = true;
+    return std::vector<std::vector<double>>{
+        BinRangeToBinEdges(bin_edges_node),
+    };
   } else if (bin_edges_node.IsSequence()) {
     if (!bin_edges_node.size()) {
       std::stringstream ss;
@@ -137,14 +154,16 @@ auto UniformBinEdgeConfigParser(const YAML::Node &bin_edges_node) {
                      ss.str());
       throw MaCh3Exception(__FILE__, __LINE__);
     }
-    auto const & first_el = bin_edges_node[0];
-    if(first_el.IsScalar() || first_el.IsMap()){ // 1D binning
-      return std::vector<std::vector<double>>{BuildBinEdgesFromNode(bin_edges_node),};
+    auto const &first_el = bin_edges_node[0];
+    if (first_el.IsScalar() || first_el.IsMap()) { // 1D binning
+      return std::vector<std::vector<double>>{
+          BuildBinEdgesFromNode(bin_edges_node, found_range_specifier),
+      };
     }
-    //ND binning
+    // ND binning
     std::vector<std::vector<double>> dims;
-    for(auto const &dim_node : bin_edges_node){
-      dims.push_back(BuildBinEdgesFromNode(dim_node));
+    for (auto const &dim_node : bin_edges_node) {
+      dims.push_back(BuildBinEdgesFromNode(dim_node, found_range_specifier));
     }
     return dims;
   } else {
@@ -172,6 +191,7 @@ void BinningHandler::SetupSampleBinning(const YAML::Node& Settings, SampleInfo& 
 
   SampleBinningInfo SingleBinning;
   bool Uniform = Get<bool>(Settings["Uniform"], __FILE__ , __LINE__);
+  bool found_range_specifier = false;
   if(Uniform == false) {
     auto Bins = Get<std::vector<std::vector<std::vector<double>>>>(Settings["Bins"], __FILE__, __LINE__);
     SingleBinning.InitNonUniform(Bins);
@@ -181,11 +201,25 @@ void BinningHandler::SetupSampleBinning(const YAML::Node& Settings, SampleInfo& 
       MACH3LOG_ERROR("When setting up Uniform sample binning, didn't find expected key: BinEdges (or VarBins for backward compatibility).");
       throw MaCh3Exception(__FILE__, __LINE__);
     }
-    SingleBinning.InitUniform(UniformBinEdgeConfigParser(bin_edges_node));
+    SingleBinning.InitUniform(UniformBinEdgeConfigParser(bin_edges_node, found_range_specifier));
   }
   if(SingleSample.VarStr.size() != SingleBinning.BinEdges.size()) {
     MACH3LOG_ERROR("Number of variables ({}) does not match number of bin edge sets ({}) in sample config '{}'",
                    SingleSample.VarStr.size(), SingleBinning.BinEdges.size(),SingleSample.SampleTitle);
+    if(found_range_specifier){
+      std::stringstream ss;
+      ss << (Settings["BinEdges"] ? Settings["BinEdges"] : Settings["VarBins"]);
+      MACH3LOG_ERROR(R"(A bin range specifier was found in node:
+
+  {}
+
+Please carefully check the number of square brackets used, a 2D binning
+  comprised of just 2 range specifiers must explicitly include the axis
+  list specifier like:
+
+  BinEdges: [ [ {{linspace: {{nb:10, low:0, up: 10}}}} ], [ {{linspace: {{nb:5, low:10, up: 100}}}} ] ]
+)", ss.str());
+    }
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
