@@ -22,6 +22,8 @@ _MaCh3_Safe_Include_Start_ //{
 _MaCh3_Safe_Include_End_ //}
 
 /// @brief Base class for calculating weight from spline
+/// @author Dan Barrow
+/// @author Kamil Skwarczynski
 class SplineBase {
   public:
     /// @brief Constructor
@@ -33,10 +35,10 @@ class SplineBase {
     virtual void Evaluate() = 0;
 
     /// @brief Get class name
-    virtual inline std::string GetName() const {return "SplineBase";};
+    virtual std::string GetName() const {return "SplineBase";};
 
     /// @brief Get number of spline parameters
-    short int GetNParams()const {return nParams;};
+    short int GetNParams() const {return nParams;};
 
     /// @brief KS: Prepare spline file that can be used for fast loading
     virtual void PrepareSplineFile(std::string FileName) = 0;
@@ -52,8 +54,6 @@ class SplineBase {
     void FindSplineSegment();
     /// @brief CPU based code which eval weight for each spline
     virtual void CalcSplineWeights() = 0;
-    /// @brief Calc total event weight
-    virtual void ModifyWeights() = 0;
 
     /// @brief KS: Prepare Fast Spline Info within SplineFile
     /// @param File File to which we add new tree
@@ -79,4 +79,15 @@ class SplineBase {
     float *ParamValues;
     /// Number of parameters that have splines
     short int nParams;
+
+  private:
+     /// @brief Validates that the spline segment is correct for the given variation.
+     /// @param i Index of the spline in SplineInfoArray.
+     /// @param segment The segment index to validate.
+     /// @param xvar The variation value being checked.
+     /// @param xPts The array of x-values for the spline.
+    void CheckSegmentValidity(const M3::int_t i,
+                              const M3::int_t segment,
+                              const M3::float_t xvar,
+                              const std::vector<M3::float_t>& xPts) const;
 };

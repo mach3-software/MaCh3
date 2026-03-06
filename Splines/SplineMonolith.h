@@ -98,7 +98,7 @@ class SMonolith : public SplineBase {
     /// @brief CPU based code which eval weight for each spline
     void CalcSplineWeights() override;
     /// @brief Calc total event weight
-    void ModifyWeights() override;
+    void CalcTotalEventWeight();
 
     /// Number of events
     unsigned int NEvents;

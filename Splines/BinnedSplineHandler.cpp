@@ -300,15 +300,11 @@ void BinnedSplineHandler::Evaluate() {
 
   //KS: Huge MP loop over all valid splines
   CalcSplineWeights();
-
-  //KS: Huge MP loop over all events calculating total weight
-  ModifyWeights();
 }
 
 //****************************************
-void BinnedSplineHandler::CalcSplineWeights()
+void BinnedSplineHandler::CalcSplineWeights() {
 //****************************************
-{
   #ifdef MULTITHREAD
   #pragma omp parallel for simd
   #endif

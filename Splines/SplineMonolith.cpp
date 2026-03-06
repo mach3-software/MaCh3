@@ -718,8 +718,8 @@ void SMonolith::Evaluate() {
   //KS: Huge MP loop over all valid splines
   CalcSplineWeights();
 
-  //KS: Huge MP loop over all events calculating total weight
-  ModifyWeights();
+  //KS: Huge MP loop over all events calculating total weight per event
+  CalcTotalEventWeight();
 }
 #endif
 
@@ -789,7 +789,7 @@ void SMonolith::CalcSplineWeights() {
 
 //*********************************************************
 //KS: Calc total event weight on CPU
-void SMonolith::ModifyWeights() {
+void SMonolith::CalcTotalEventWeight() {
 //*********************************************************
   #ifdef MULTITHREAD
   #pragma omp parallel for
@@ -828,7 +828,6 @@ void SMonolith::ModifyWeights() {
     cpu_total_weights[EventNum] = totalWeight;
   }
 }
-
 
 //*********************************************************
 //KS: Print info about how much knots etc has been initialised

@@ -76,8 +76,6 @@ class BinnedSplineHandler : public SplineBase {
   protected:
     /// @brief CPU based code which eval weight for each spline
     void CalcSplineWeights() override;
-    /// @brief Calc total event weight, not used by Bin-by-bin splines
-    void ModifyWeights() override {return;};
     /// Pointer to covariance from which we get information about spline params
     ParameterHandlerGeneric* xsec;
 
