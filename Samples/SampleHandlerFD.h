@@ -307,7 +307,8 @@ class SampleHandlerFD :  public SampleHandlerBase
   const double* GetPointerToOscChannel(const int iEvent) const;
   /// @brief Setup the norm parameters by assigning each event with bin
   void SetupNormParameters();
-
+  /// @brief Setup the osc parameters
+  void SetupOscParameters();
   //===============================================================================
   /// @brief Fill a histogram with the event-level information used in the fit
   /// @details
