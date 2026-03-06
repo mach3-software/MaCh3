@@ -137,14 +137,23 @@ void SampleHandlerFD::LoadSingleSample(const int iSample, const YAML::Node& Samp
     OscChannelInfo OscInfo;
     OscInfo.flavourName       = osc_channel["Name"].as<std::string>();
     OscInfo.flavourName_Latex = osc_channel["LatexName"].as<std::string>();
-    OscInfo.InitPDG           = static_cast<NuPDG>(osc_channel["nutype"].as<int>());
-    OscInfo.FinalPDG          = static_cast<NuPDG>(osc_channel["oscnutype"].as<int>());
+    OscInfo.InitPDG           = GetFromManager(osc_channel["nutype"],0,__FILE__,__LINE__);
+    OscInfo.FinalPDG          = GetFromManager(osc_channel["oscnutype"],0,__FILE__,__LINE__);
     OscInfo.ChannelIndex      = OscChannelCounter;
+
+    for (const auto& Existing : SingleSample.OscChannels) {
+      if (Existing.InitPDG == OscInfo.InitPDG && Existing.FinalPDG == OscInfo.FinalPDG) {
+        MACH3LOG_ERROR("Duplicate oscillation channel detected! InitPDG = {}, FinalPDG = {}"
+                       "already defined in channel {} for sample {}",
+                       OscInfo.InitPDG, OscInfo.FinalPDG, Existing.ChannelIndex, SingleSample.SampleTitle);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+    }
 
     SingleSample.OscChannels.push_back(std::move(OscInfo));
 
-    FileToInitPDGMap[MTupleFileName] = static_cast<NuPDG>(osc_channel["nutype"].as<int>());
-    FileToFinalPDGMap[MTupleFileName] = static_cast<NuPDG>(osc_channel["oscnutype"].as<int>());
+    FileToInitPDGMap[MTupleFileName] = NuPDG(OscInfo.InitPDG);
+    FileToFinalPDGMap[MTupleFileName] = NuPDG(OscInfo.FinalPDG);
 
     SingleSample.mc_files.push_back(MTupleFileName);
     SingleSample.spline_files.push_back(splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);
@@ -1201,10 +1210,17 @@ void SampleHandlerFD::SetSplinePointers() {
   //Now loop over events and get the spline bin for each event
   if (auto BinnedSpline = dynamic_cast<BinnedSplineHandler*>(SplineHandler.get())) {
     bool ThrowCrititcal = true;
+
     for (unsigned int j = 0; j < GetNEvents(); ++j) {
       const int SampleIndex = MCSamples[j].NominalSample;
       const auto SampleTitle = GetSampleTitle(SampleIndex);
-      const int OscIndex = GetOscChannel(SampleDetails[SampleIndex].OscChannels, (*MCSamples[j].nupdgUnosc), (*MCSamples[j].nupdg));
+      bool NoOscChannels = false;
+      if(Oscillator == nullptr && GetNOscChannels(SampleIndex) == 1) {
+        MACH3LOG_DEBUG("Assuming there are no osc channels in {}", __func__);
+        NoOscChannels = true;
+      }
+      const int OscIndex = NoOscChannels ? 0 : GetOscChannel(SampleDetails[SampleIndex].OscChannels,
+                                                             (*MCSamples[j].nupdgUnosc), (*MCSamples[j].nupdg));
       const int Mode = int(*(MCSamples[j].mode));
       const double Etrue = *(MCSamples[j].rw_etru);
       std::vector< std::vector<int> > EventSplines;
