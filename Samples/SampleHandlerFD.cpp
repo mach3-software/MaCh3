@@ -16,8 +16,9 @@ SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGen
   MACH3LOG_INFO("Creating SampleHandlerFD object");
 
   //ETA - safety feature so you can't pass a NULL xsec_cov
-  if(!xsec_cov) {
-    MACH3LOG_WARN("You've passed me a nullptr ParameterHandler so I will not use any xsec parameters");
+  if(!xsec_cov){
+    MACH3LOG_ERROR("You've passed me a nullptr to a SystematicHandlerGeneric... I need this to setup splines!");
+    throw MaCh3Exception(__FILE__, __LINE__);
   }
   ParHandler = xsec_cov;
 
@@ -26,11 +27,6 @@ SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGen
   if (OscillatorObj_ != nullptr) {
     MACH3LOG_WARN("You have passed an Oscillator object through the constructor of a SampleHandlerFD object - this will be used for all oscillation channels");
     Oscillator = OscillatorObj_;
-    if(!ParHandler) {
-      MACH3LOG_CRITICAL("You've passed me a nullptr to ParamHandler while non null to Oscillator");
-      MACH3LOG_CRITICAL("Make up you mind");
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
   }
 
   KinematicParameters = nullptr;
@@ -137,23 +133,14 @@ void SampleHandlerFD::LoadSingleSample(const int iSample, const YAML::Node& Samp
     OscChannelInfo OscInfo;
     OscInfo.flavourName       = osc_channel["Name"].as<std::string>();
     OscInfo.flavourName_Latex = osc_channel["LatexName"].as<std::string>();
-    OscInfo.InitPDG           = GetFromManager(osc_channel["nutype"],0,__FILE__,__LINE__);
-    OscInfo.FinalPDG          = GetFromManager(osc_channel["oscnutype"],0,__FILE__,__LINE__);
+    OscInfo.InitPDG           = static_cast<NuPDG>(osc_channel["nutype"].as<int>());
+    OscInfo.FinalPDG          = static_cast<NuPDG>(osc_channel["oscnutype"].as<int>());
     OscInfo.ChannelIndex      = OscChannelCounter;
-
-    for (const auto& Existing : SingleSample.OscChannels) {
-      if (Existing.InitPDG == OscInfo.InitPDG && Existing.FinalPDG == OscInfo.FinalPDG) {
-        MACH3LOG_ERROR("Duplicate oscillation channel detected! InitPDG = {}, FinalPDG = {}"
-                       "already defined in channel {} for sample {}",
-                       OscInfo.InitPDG, OscInfo.FinalPDG, Existing.ChannelIndex, SingleSample.SampleTitle);
-        throw MaCh3Exception(__FILE__, __LINE__);
-      }
-    }
 
     SingleSample.OscChannels.push_back(std::move(OscInfo));
 
-    FileToInitPDGMap[MTupleFileName] = NuPDG(OscInfo.InitPDG);
-    FileToFinalPDGMap[MTupleFileName] = NuPDG(OscInfo.FinalPDG);
+    FileToInitPDGMap[MTupleFileName] = static_cast<NuPDG>(osc_channel["nutype"].as<int>());
+    FileToFinalPDGMap[MTupleFileName] = static_cast<NuPDG>(osc_channel["oscnutype"].as<int>());
 
     SingleSample.mc_files.push_back(MTupleFileName);
     SingleSample.spline_files.push_back(splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);
@@ -173,9 +160,7 @@ void SampleHandlerFD::LoadSingleSample(const int iSample, const YAML::Node& Samp
   SampleDetails[iSample] = std::move(SingleSample);
 }
 
-// ************************************************
 void SampleHandlerFD::Initialise() {
-// ************************************************
   TStopwatch clock;
   clock.Start();
 
@@ -191,7 +176,36 @@ void SampleHandlerFD::Initialise() {
 
   MACH3LOG_INFO("=============================================");
   MACH3LOG_INFO("Total number of events is: {}", GetNEvents());
-  SetupOscParameters();
+
+  auto OscParams = ParHandler->GetOscParsFromSampleName(SampleHandlerName);
+  if (OscParams.size() > 0) {
+    MACH3LOG_INFO("Setting up NuOscillator..");
+    if (Oscillator != nullptr) {
+      MACH3LOG_INFO("You have passed an OscillatorBase object through the constructor of a SampleHandlerFD object - this will be used for all oscillation channels");
+      if(Oscillator->isEqualBinningPerOscChannel() != true) {
+        MACH3LOG_ERROR("Trying to run shared NuOscillator without EqualBinningPerOscChannel, this will not work");
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+
+      if(OscParams.size() != Oscillator->GetOscParamsSize()){
+        MACH3LOG_ERROR("SampleHandler {} has {} osc params, while shared NuOsc has {} osc params", GetName(),
+                       OscParams.size(), Oscillator->GetOscParamsSize());
+        MACH3LOG_ERROR("This indicate misconfiguration in your Osc yaml");
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+    } else {
+      InitialiseNuOscillatorObjects();
+    }
+    SetupNuOscillatorPointers();
+  } else{
+    MACH3LOG_WARN("Didn't find any oscillation params, thus will not enable oscillations");
+    if(CheckNodeExists(SampleManager->raw(), "NuOsc")){
+      MACH3LOG_ERROR("However config for SampleHandler {} has 'NuOsc' field", GetName());
+      MACH3LOG_ERROR("This may indicate misconfiguration");
+      MACH3LOG_ERROR("Either remove 'NuOsc' field from SampleHandler config or check your model.yaml and include oscillation for sample");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+  }
   MACH3LOG_INFO("Setting up Sample Binning..");
   SetBinning();
   MACH3LOG_INFO("Setting up Splines..");
@@ -488,13 +502,12 @@ void SampleHandlerFD::RegisterIndividualFunctionalParameter(const std::string& f
 // **************************************************
 void SampleHandlerFD::SetupFunctionalParameters() {
 // **************************************************
-  funcParsGrid.resize(GetNEvents());
-  if(ParHandler == nullptr) return;
   funcParsVec = ParHandler->GetFunctionalParametersFromSampleName(SampleHandlerName);
   // RegisterFunctionalParameters is implemented in experiment-specific code,
   // which calls RegisterIndividualFuncPar to populate funcParsNamesMap, funcParsNamesVec, and funcParsFuncMap
   RegisterFunctionalParameters();
   funcParsMap.resize(funcParsNamesMap.size());
+  funcParsGrid.resize(GetNEvents());
 
   // For every functional parameter in XsecCov that matches the name in funcParsNames, add it to the map
   for (FunctionalParameter& fp : funcParsVec) {
@@ -520,16 +533,16 @@ void SampleHandlerFD::SetupFunctionalParameters() {
     // Now loop over the functional parameters and get a vector of enums corresponding to the functional parameters
     for (std::vector<FunctionalParameter>::iterator it = funcParsVec.begin(); it != funcParsVec.end(); ++it) {
       // Check whether the interaction modes match
-      bool ModeMatch = MatchCondition((*it).modes, static_cast<int>(std::round(*(MCEvents[iEvent].mode))));
+      bool ModeMatch = MatchCondition(it->modes, static_cast<int>(std::round(MCEvents[iEvent].mode)));
       if (!ModeMatch) {
-        MACH3LOG_TRACE("Event {}, missed Mode check ({}) for dial {}", iEvent, *(MCEvents[iEvent].mode), (*it).name);
+        MACH3LOG_TRACE("Event {}, missed Mode check ({}) for dial {}", iEvent, MCEvents[iEvent].mode, it->name);
         continue;
       }
       // Now check whether within kinematic bounds
       bool IsSelected = PassesSelection((*it), iEvent);
       // Need to then break the event loop
       if(!IsSelected){
-        MACH3LOG_TRACE("Event {}, missed Kinematic var check for dial {}", iEvent, (*it).name);
+        MACH3LOG_TRACE("Event {}, missed Kinematic var check for dial {}", iEvent, it->name);
         continue;
       }
       const std::size_t key = static_cast<std::size_t>(funcParsNamesMap[it->name]);
@@ -563,8 +576,6 @@ void SampleHandlerFD::ApplyShifts(const int iEvent) {
     const auto* _restrict_ fp = shifts[iShift];
     (*fp->funcPtr)(fp->valuePtr, iEvent);
   }
-
-  FinaliseShifts(iEvent);
 }
 
 // ***************************************************************************
@@ -598,49 +609,9 @@ M3::float_t SampleHandlerFD::CalcWeightTotal(const EventInfo* _restrict_ MCEvent
 }
 
 // ***************************************************************************
-// Setup the osc parameters
-void SampleHandlerFD::SetupOscParameters() {
-// ***************************************************************************
-  // KS: Only make sense to setup osc if you have ParHandler
-  if(ParHandler == nullptr ) return;
-
-  auto OscParams = ParHandler->GetOscParsFromSampleName(SampleHandlerName);
-  if (OscParams.size() > 0) {
-    MACH3LOG_INFO("Setting up NuOscillator..");
-    if (Oscillator != nullptr) {
-      MACH3LOG_INFO("You have passed an OscillatorBase object through the constructor of a SampleHandlerFD object - this will be used for all oscillation channels");
-      if(Oscillator->isEqualBinningPerOscChannel() != true) {
-        MACH3LOG_ERROR("Trying to run shared NuOscillator without EqualBinningPerOscChannel, this will not work");
-        throw MaCh3Exception(__FILE__, __LINE__);
-      }
-
-      if(OscParams.size() != Oscillator->GetOscParamsSize()){
-        MACH3LOG_ERROR("SampleHandler {} has {} osc params, while shared NuOsc has {} osc params", GetName(),
-                        OscParams.size(), Oscillator->GetOscParamsSize());
-        MACH3LOG_ERROR("This indicate misconfiguration in your Osc yaml");
-        throw MaCh3Exception(__FILE__, __LINE__);
-      }
-    } else {
-      InitialiseNuOscillatorObjects();
-    }
-    SetupNuOscillatorPointers();
-  } else{
-    MACH3LOG_WARN("Didn't find any oscillation params, thus will not enable oscillations");
-    if(CheckNodeExists(SampleManager->raw(), "NuOsc")){
-      MACH3LOG_ERROR("However config for SampleHandler {} has 'NuOsc' field", GetName());
-      MACH3LOG_ERROR("This may indicate misconfiguration");
-      MACH3LOG_ERROR("Either remove 'NuOsc' field from SampleHandler config or check your model.yaml and include oscillation for sample");
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-  }
-}
-
-
-// ***************************************************************************
 // Setup the norm parameters
 void SampleHandlerFD::SetupNormParameters() {
 // ***************************************************************************
-  if(ParHandler == nullptr) return;
   std::vector< std::vector< int > > norms_bins(GetNEvents());
 
   std::vector<NormParameter> norm_parameters = ParHandler->GetNormParsFromSampleName(GetName());
@@ -680,36 +651,36 @@ void SampleHandlerFD::CalcNormsBins(std::vector<NormParameter>& norm_parameters,
       // Not strictly needed, but these events don't get included in oscillated predictions, so
       // no need to waste our time calculating and storing information about xsec parameters
       // that will never be used.
-      if (MCEvents[iEvent].isNC && (*MCEvents[iEvent].nupdg != *MCEvents[iEvent].nupdgUnosc) ) {
+      if (MCEvents[iEvent].isNC && (MCEvents[iEvent].nupdg != MCEvents[iEvent].nupdgUnosc) ) {
         MACH3LOG_TRACE("Event {}, missed NC/signal check", iEvent);
         continue;
       } //DB Abstract check on MaCh3Modes to determine which apply to neutral current
       for (std::vector<NormParameter>::iterator it = norm_parameters.begin(); it != norm_parameters.end(); ++it) {
         //Now check that the target of an interaction matches with the normalisation parameters
-        bool TargetMatch = MatchCondition((*it).targets, *(MCEvents[iEvent].Target));
+        bool TargetMatch = MatchCondition(it->targets, MCEvents[iEvent].Target);
         if (!TargetMatch) {
-          MACH3LOG_TRACE("Event {}, missed target check ({}) for dial {}", iEvent, *(MCEvents[iEvent].Target), (*it).name);
+          MACH3LOG_TRACE("Event {}, missed target check ({}) for dial {}", iEvent, MCEvents[iEvent].Target, it->name);
           continue;
         }
 
         //Now check that the neutrino flavour in an interaction matches with the normalisation parameters
-        bool FlavourMatch = MatchCondition((*it).pdgs, *(MCEvents[iEvent].nupdg));
+        bool FlavourMatch = MatchCondition(it->pdgs, MCEvents[iEvent].nupdg);
         if (!FlavourMatch) {
-          MACH3LOG_TRACE("Event {}, missed PDG check ({}) for dial {}", iEvent,(*MCEvents[iEvent].nupdg), (*it).name);
+          MACH3LOG_TRACE("Event {}, missed PDG check ({}) for dial {}", iEvent,MCEvents[iEvent].nupdg, it->name);
           continue;
         }
 
         //Now check that the unoscillated neutrino flavour in an interaction matches with the normalisation parameters
-        bool FlavourUnoscMatch = MatchCondition((*it).preoscpdgs, *(MCEvents[iEvent].nupdgUnosc));
+        bool FlavourUnoscMatch = MatchCondition(it->preoscpdgs, MCEvents[iEvent].nupdgUnosc);
         if (!FlavourUnoscMatch){
-          MACH3LOG_TRACE("Event {}, missed FlavourUnosc check ({}) for dial {}", iEvent,(*MCEvents[iEvent].nupdgUnosc), (*it).name);
+          MACH3LOG_TRACE("Event {}, missed FlavourUnosc check ({}) for dial {}", iEvent,MCEvents[iEvent].nupdgUnosc, it->name);
           continue;
         }
 
         //Now check that the mode of an interaction matches with the normalisation parameters
-        bool ModeMatch = MatchCondition((*it).modes, static_cast<int>(std::round(*(MCEvents[iEvent].mode))));
+        bool ModeMatch = MatchCondition(it->modes, static_cast<int>(std::round(MCEvents[iEvent].mode)));
         if (!ModeMatch) {
-          MACH3LOG_TRACE("Event {}, missed Mode check ({}) for dial {}", iEvent, *(MCEvents[iEvent].mode), (*it).name);
+          MACH3LOG_TRACE("Event {}, missed Mode check ({}) for dial {}", iEvent, MCEvents[iEvent].mode, it->name);
           continue;
         }
 
@@ -719,15 +690,15 @@ void SampleHandlerFD::CalcNormsBins(std::vector<NormParameter>& norm_parameters,
         bool IsSelected = PassesSelection((*it), iEvent);
         // Need to then break the event loop
         if(!IsSelected){
-          MACH3LOG_TRACE("Event {}, missed Kinematic var check for dial {}", iEvent, (*it).name);
+          MACH3LOG_TRACE("Event {}, missed Kinematic var check for dial {}", iEvent, it->name);
           continue;
         }
         // Now set 'index bin' for each normalisation parameter
         // All normalisations are just 1 bin for 2015, so bin = index (where index is just the bin for that normalisation)
-        int bin = (*it).index;
+        int bin = it->index;
 
         NormBins.push_back(bin);
-        MACH3LOG_TRACE("Event {}, will be affected by dial {}", iEvent, (*it).name);
+        MACH3LOG_TRACE("Event {}, will be affected by dial {}", iEvent, it->name);
         #ifdef DEBUG
         VerboseCounter[std::distance(norm_parameters.begin(), it)]++;
         #endif
@@ -1086,31 +1057,34 @@ void SampleHandlerFD::InitialiseNuOscillatorObjects() {
         std::vector<M3::float_t> EnergyArray;
         std::vector<M3::float_t> CosineZArray;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
         for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
           if(MCEvents[iEvent].NominalSample != iSample) continue;
           // KS: This is bit weird but we basically loop over all events and push to vector only these which are part of a given OscChannel
-          const int Channel = GetOscChannel(SampleDetails[MCEvents[iEvent].NominalSample].OscChannels, (*MCEvents[iEvent].nupdgUnosc), (*MCEvents[iEvent].nupdg));
+          const int Channel = GetOscChannel(SampleDetails[MCEvents[iEvent].NominalSample].OscChannels, MCEvents[iEvent].nupdgUnosc, MCEvents[iEvent].nupdg);
           //DB Remove NC events from the arrays which are handed to the NuOscillator objects
           if (!MCEvents[iEvent].isNC && Channel == iChannel) {
-            EnergyArray.push_back(M3::float_t(*(MCEvents[iEvent].rw_etru)));
+            EnergyArray.push_back(M3::float_t(MCEvents[iEvent].enu_true));
           }
         }
         std::sort(EnergyArray.begin(),EnergyArray.end());
 
         //============================================================================
         //DB Atmospheric only part, can only happen if truecz has been initialised within the experiment specific code
-        if (*(MCEvents[0].rw_truecz) != M3::_BAD_DOUBLE_) {
+        if (MCEvents[0].coszenith_true != M3::_BAD_DOUBLE_) {
           for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
             if(MCEvents[iEvent].NominalSample != iSample) continue;
             // KS: This is bit weird but we basically loop over all events and push to vector only these which are part of a given OscChannel
-            const int Channel = GetOscChannel(SampleDetails[MCEvents[iEvent].NominalSample].OscChannels, (*MCEvents[iEvent].nupdgUnosc), (*MCEvents[iEvent].nupdg));
+            const int Channel = GetOscChannel(SampleDetails[MCEvents[iEvent].NominalSample].OscChannels, MCEvents[iEvent].nupdgUnosc, MCEvents[iEvent].nupdg);
             //DB Remove NC events from the arrays which are handed to the NuOscillator objects
             if (!MCEvents[iEvent].isNC && Channel == iChannel) {
-              CosineZArray.push_back(M3::float_t(*(MCEvents[iEvent].rw_truecz)));
+              CosineZArray.push_back(M3::float_t(MCEvents[iEvent].coszenith_true));
             }
           }
           std::sort(CosineZArray.begin(),CosineZArray.end());
         }
+#pragma GCC diagnostic pop
         Oscillator->SetOscillatorBinning(iSample, iChannel, EnergyArray, CosineZArray);
       } // end loop over channels
     } // end loop over samples
@@ -1138,7 +1112,7 @@ const M3::float_t* SampleHandlerFD::GetNuOscillatorPointers(const int iEvent) co
 // ************************************************
   const M3::float_t* osc_w_pointer = &M3::Unity;
   if (MCEvents[iEvent].isNC) {
-    if (*MCEvents[iEvent].nupdg != *MCEvents[iEvent].nupdgUnosc) {
+    if (MCEvents[iEvent].nupdg != MCEvents[iEvent].nupdgUnosc) {
       osc_w_pointer = &M3::Zero;
     } else {
       osc_w_pointer = &M3::Unity;
@@ -1147,27 +1121,27 @@ const M3::float_t* SampleHandlerFD::GetNuOscillatorPointers(const int iEvent) co
     int InitFlav = M3::_BAD_INT_;
     int FinalFlav = M3::_BAD_INT_;
 
-    InitFlav =  MaCh3Utils::PDGToNuOscillatorFlavour((*MCEvents[iEvent].nupdgUnosc));
-    FinalFlav = MaCh3Utils::PDGToNuOscillatorFlavour((*MCEvents[iEvent].nupdg));
+    InitFlav =  MaCh3Utils::PDGToNuOscillatorFlavour(MCEvents[iEvent].nupdgUnosc);
+    FinalFlav = MaCh3Utils::PDGToNuOscillatorFlavour(MCEvents[iEvent].nupdg);
 
     if (InitFlav == M3::_BAD_INT_ || FinalFlav == M3::_BAD_INT_) {
       MACH3LOG_ERROR("Something has gone wrong in the mapping between MCEvents.nutype and the enum used within NuOscillator");
-      MACH3LOG_ERROR("MCEvents.nupdgUnosc: {}", (*MCEvents[iEvent].nupdgUnosc));
+      MACH3LOG_ERROR("MCEvents.nupdgUnosc: {}", MCEvents[iEvent].nupdgUnosc);
       MACH3LOG_ERROR("InitFlav: {}", InitFlav);
-      MACH3LOG_ERROR("MCEvents.nupdg: {}", (*MCEvents[iEvent].nupdg));
+      MACH3LOG_ERROR("MCEvents.nupdg: {}", MCEvents[iEvent].nupdg);
       MACH3LOG_ERROR("FinalFlav: {}", FinalFlav);
       throw MaCh3Exception(__FILE__, __LINE__);
     }
     const int Sample = MCEvents[iEvent].NominalSample;
 
-    const int OscIndex = GetOscChannel(SampleDetails[Sample].OscChannels, (*MCEvents[iEvent].nupdgUnosc), (*MCEvents[iEvent].nupdg));
+    const int OscIndex = GetOscChannel(SampleDetails[Sample].OscChannels, MCEvents[iEvent].nupdgUnosc, MCEvents[iEvent].nupdg);
     //Can only happen if truecz has been initialised within the experiment specific code
-    if (*(MCEvents[iEvent].rw_truecz) != M3::_BAD_DOUBLE_) {
+    if (MCEvents[iEvent].coszenith_true != M3::_BAD_DOUBLE_) {
       //Atmospherics
-      osc_w_pointer = Oscillator->GetNuOscillatorPointers(Sample, OscIndex, InitFlav, FinalFlav, FLOAT_T(*(MCEvents[iEvent].rw_etru)), FLOAT_T(*(MCEvents[iEvent].rw_truecz)));
+      osc_w_pointer = Oscillator->GetNuOscillatorPointers(Sample, OscIndex, InitFlav, FinalFlav, FLOAT_T(MCEvents[iEvent].enu_true), FLOAT_T(MCEvents[iEvent].coszenith_true));
     } else {
       //Beam
-      osc_w_pointer = Oscillator->GetNuOscillatorPointers(Sample, OscIndex, InitFlav, FinalFlav, FLOAT_T(*(MCEvents[iEvent].rw_etru)));
+      osc_w_pointer = Oscillator->GetNuOscillatorPointers(Sample, OscIndex, InitFlav, FinalFlav, FLOAT_T(MCEvents[iEvent].enu_true));
     }
   } // end if NC
   return osc_w_pointer;
@@ -1210,19 +1184,12 @@ void SampleHandlerFD::SetSplinePointers() {
   //Now loop over events and get the spline bin for each event
   if (auto BinnedSpline = dynamic_cast<BinnedSplineHandler*>(SplineHandler.get())) {
     bool ThrowCrititcal = true;
-
     for (unsigned int j = 0; j < GetNEvents(); ++j) {
-      const int SampleIndex = MCEvents[j].NominalSample;
-      const auto SampleTitle = GetSampleTitle(SampleIndex);
-      bool NoOscChannels = false;
-      if(Oscillator == nullptr && GetNOscChannels(SampleIndex) == 1) {
-        MACH3LOG_DEBUG("Assuming there are no osc channels in {}", __func__);
-        NoOscChannels = true;
-      }
-      const int OscIndex = NoOscChannels ? 0 : GetOscChannel(SampleDetails[SampleIndex].OscChannels,
-                                                             (*MCEvents[j].nupdgUnosc), (*MCEvents[j].nupdg));
-      const int Mode = int(*(MCEvents[j].mode));
-      const double Etrue = *(MCEvents[j].rw_etru);
+      int const & SampleIndex = MCEvents[j].NominalSample;
+      auto const & SampleTitle = GetSampleTitle(SampleIndex);
+      int const & OscIndex = GetOscChannel(SampleDetails[SampleIndex].OscChannels, MCEvents[j].nupdgUnosc, MCEvents[j].nupdg);
+      int const & Mode = MCEvents[j].mode;
+      double const & Etrue = MCEvents[j].enu_true;
       std::vector< std::vector<int> > EventSplines;
       switch(GetNDim(SampleIndex)) {
         case 1:
@@ -2031,7 +1998,7 @@ THStack* SampleHandlerFD::ReturnStackedHistBySelection1D(const int iSample, cons
 const double* SampleHandlerFD::GetPointerToOscChannel(const int iEvent) const {
 // ************************************************
   auto& OscillationChannels = SampleDetails[MCEvents[iEvent].NominalSample].OscChannels;
-  const int Channel = GetOscChannel(OscillationChannels, (*MCEvents[iEvent].nupdgUnosc), (*MCEvents[iEvent].nupdg));
+  const int Channel = GetOscChannel(OscillationChannels, MCEvents[iEvent].nupdgUnosc, MCEvents[iEvent].nupdg);
 
   return &(OscillationChannels[Channel].ChannelIndex);
 }
