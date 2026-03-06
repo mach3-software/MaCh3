@@ -199,8 +199,22 @@ void BinningHandler::SetupSampleBinning(const YAML::Node& Settings, SampleInfo& 
   bool Uniform = Get<bool>(Settings["Uniform"], __FILE__ , __LINE__);
   bool found_range_specifier = false;
   if(Uniform == false) {
-    auto Bins = Get<std::vector<std::vector<std::vector<double>>>>(Settings["Bins"], __FILE__, __LINE__);
-    SingleBinning.InitNonUniform(Bins);
+    if(Settings["Bins"].IsSequence()){
+        SingleBinning.InitNonUniform(Get<std::vector<std::vector<std::vector<double>>>>(Settings["Bins"], __FILE__, __LINE__));
+    } else if(Settings["Bins"].IsMap()){
+      auto file = Get<std::string>(Settings["Bins"]["File"], __FILE__, __LINE__);
+      auto key = Get<std::string>(Settings["Bins"]["Key"], __FILE__, __LINE__);
+      auto binfile = LoadYamlConfig(file, __FILE__, __LINE__);
+      SingleBinning.InitNonUniform(Get<std::vector<std::vector<std::vector<double>>>>(binfile[key], __FILE__, __LINE__));
+    } else {
+      std::stringstream ss;
+      ss << Settings["Bins"];
+      MACH3LOG_ERROR(
+          "When parsing binning, expected to find a YAML map or sequence, "
+          "but found:\n{}",
+          ss.str());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
   } else {
     YAML::Node const & bin_edges_node = Settings["BinEdges"] ? Settings["BinEdges"] : Settings["VarBins"];
     if(!bin_edges_node){
