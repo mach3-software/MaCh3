@@ -349,7 +349,7 @@ class SampleHandlerFD :  public SampleHandlerBase
 
   //===============================================================================
   /// Stores information about every MC event
-  std::vector<EventInfo> MCSamples;
+  std::vector<EventInfo> MCEvents;
   /// Stores info about currently initialised sample
   std::vector<SampleInfo> SampleDetails;
   //===============================================================================
