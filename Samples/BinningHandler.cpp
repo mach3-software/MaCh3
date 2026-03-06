@@ -9,11 +9,13 @@ BinningHandler::BinningHandler() {
 
 auto BinRangeToBinEdges(YAML::Node const &bin_range) {
   bool is_lin = true;
-  YAML::Node bin_range_specifier = bin_range["linspace"];
-  if (bin_range["logspace"]) {
+  YAML::Node bin_range_specifier;
+  if (bin_range["linspace"]) {
+    bin_range_specifier = bin_range["linspace"];
+  } else if (bin_range["logspace"]) {
     is_lin = false;
     bin_range_specifier = bin_range["logspace"];
-  } else if (!bin_range["linspace"]) {
+  } else {
     std::stringstream ss;
     ss << bin_range;
     MACH3LOG_ERROR("When parsing binning, expected bin range specifier with "
