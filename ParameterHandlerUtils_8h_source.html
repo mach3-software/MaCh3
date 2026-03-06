@@ -581,7 +581,107 @@ $(function() {
 <div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160;  gErrorIgnoreLevel = originalErrorWarning;</div>
 <div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160;}</div>
 <div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160; </div>
-<div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160;} <span class="comment">// end M3 namespace</span></div>
+<div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160; </div>
+<div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160; </div>
+<div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160;<span class="comment">// ********************************************</span></div>
+<div class="line"><a name="l00554"></a><span class="lineno"><a class="line" href="namespaceM3.html#a6ef8b24b80901a8c67e4edbfc6fb8229">  554</a></span>&#160;<span class="comment"></span><span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="namespaceM3.html#a6ef8b24b80901a8c67e4edbfc6fb8229">DumpParamHandlerToFile</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> _fNumPar,</div>
+<div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;                                   <span class="keyword">const</span> std::vector&lt;double&gt;&amp; _fPreFitValue,</div>
+<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;                                   <span class="keyword">const</span> std::vector&lt;double&gt;&amp; _fError,</div>
+<div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;                                   <span class="keyword">const</span> std::vector&lt;double&gt;&amp; _fLowBound,</div>
+<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;                                   <span class="keyword">const</span> std::vector&lt;double&gt;&amp; _fUpBound,</div>
+<div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;                                   <span class="keyword">const</span> std::vector&lt;double&gt;&amp; _fIndivStepScale,</div>
+<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;                                   <span class="keyword">const</span> std::vector&lt;std::string&gt;&amp; _fFancyNames,</div>
+<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;                                   <span class="keyword">const</span> std::vector&lt;bool&gt;&amp; _fFlatPrior,</div>
+<div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160;                                   <span class="keyword">const</span> std::vector&lt;SplineParameter&gt;&amp; SplineParams,</div>
+<div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;                                   TMatrixDSym* covMatrix,</div>
+<div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;                                   TH2D* CorrMatrix,</div>
+<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;                                   <span class="keyword">const</span> std::string&amp; Name) {</div>
+<div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;<span class="comment">// ********************************************</span></div>
+<div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;  TFile* outputFile = <span class="keyword">new</span> TFile(Name.c_str(), <span class="stringliteral">&quot;RECREATE&quot;</span>);</div>
+<div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160; </div>
+<div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;  TObjArray* param_names = <span class="keyword">new</span> TObjArray();</div>
+<div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;  TObjArray* spline_interpolation = <span class="keyword">new</span> TObjArray();</div>
+<div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;  TObjArray* spline_names = <span class="keyword">new</span> TObjArray();</div>
+<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160; </div>
+<div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;  TVectorD* param_prior = <span class="keyword">new</span> TVectorD(_fNumPar);</div>
+<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;  TVectorD* flat_prior = <span class="keyword">new</span> TVectorD(_fNumPar);</div>
+<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;  TVectorD* stepscale = <span class="keyword">new</span> TVectorD(_fNumPar);</div>
+<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;  TVectorD* param_lb = <span class="keyword">new</span> TVectorD(_fNumPar);</div>
+<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;  TVectorD* param_ub = <span class="keyword">new</span> TVectorD(_fNumPar);</div>
+<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160; </div>
+<div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;  TVectorD* param_knot_weight_lb = <span class="keyword">new</span> TVectorD(_fNumPar);</div>
+<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;  TVectorD* param_knot_weight_ub = <span class="keyword">new</span> TVectorD(_fNumPar);</div>
+<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;  TVectorD* error = <span class="keyword">new</span> TVectorD(_fNumPar);</div>
+<div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160; </div>
+<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;  <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i = 0; i &lt; _fNumPar; ++i)</div>
+<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;  {</div>
+<div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;    TObjString* nameObj = <span class="keyword">new</span> TObjString(_fFancyNames[i].c_str());</div>
+<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;    param_names-&gt;AddLast(nameObj);</div>
+<div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160; </div>
+<div class="line"><a name="l00588"></a><span class="lineno">  588</span>&#160;    TObjString* splineType = <span class="keyword">new</span> TObjString(<span class="stringliteral">&quot;TSpline3&quot;</span>);</div>
+<div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160;    spline_interpolation-&gt;AddLast(splineType);</div>
+<div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160; </div>
+<div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;    TObjString* splineName = <span class="keyword">new</span> TObjString(<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;    spline_names-&gt;AddLast(splineName);</div>
+<div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160; </div>
+<div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;    (*param_prior)[i] = _fPreFitValue[i];</div>
+<div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160;    (*flat_prior)[i] = _fFlatPrior[i];</div>
+<div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;    (*stepscale)[i] = _fIndivStepScale[i];</div>
+<div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;    (*error)[i] = _fError[i];</div>
+<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160; </div>
+<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;    (*param_lb)[i] = _fLowBound[i];</div>
+<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;    (*param_ub)[i] = _fUpBound[i];</div>
+<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160; </div>
+<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;    <span class="comment">//Default values</span></div>
+<div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;    (*param_knot_weight_lb)[i] = -9999;</div>
+<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;    (*param_knot_weight_ub)[i] = +9999;</div>
+<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;  }</div>
+<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160; </div>
+<div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> SplineIndex = 0; SplineIndex &lt; SplineParams.size(); SplineIndex++ ) {</div>
+<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;    <span class="keyword">auto</span> SystIndex = SplineParams[SplineIndex].index;</div>
+<div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160; </div>
+<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;    (*param_knot_weight_lb)[SystIndex] = SplineParams.at(SplineIndex)._SplineKnotLowBound;</div>
+<div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160;    (*param_knot_weight_ub)[SystIndex] = SplineParams.at(SplineIndex)._SplineKnotUpBound;</div>
+<div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160; </div>
+<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;    TObjString* splineType = <span class="keyword">new</span> TObjString(<a class="code" href="ParameterStructs_8h.html#a2d969ce667e41bd2492cff1775456837">SplineInterpolation_ToString</a>(SplineParams.at(SplineIndex)._SplineInterpolationType).c_str());</div>
+<div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;    spline_interpolation-&gt;AddAt(splineType, SystIndex);</div>
+<div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160; </div>
+<div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160;    TObjString* splineName = <span class="keyword">new</span> TObjString(SplineParams[SplineIndex]._fSplineNames.c_str());</div>
+<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;    spline_names-&gt;AddAt(splineName, SystIndex);</div>
+<div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;  }</div>
+<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;  param_names-&gt;Write(<span class="stringliteral">&quot;xsec_param_names&quot;</span>, TObject::kSingleKey);</div>
+<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;  <span class="keyword">delete</span> param_names;</div>
+<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;  spline_interpolation-&gt;Write(<span class="stringliteral">&quot;xsec_spline_interpolation&quot;</span>, TObject::kSingleKey);</div>
+<div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;  <span class="keyword">delete</span> spline_interpolation;</div>
+<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;  spline_names-&gt;Write(<span class="stringliteral">&quot;xsec_spline_names&quot;</span>, TObject::kSingleKey);</div>
+<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;  <span class="keyword">delete</span> spline_names;</div>
+<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160; </div>
+<div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;  param_prior-&gt;Write(<span class="stringliteral">&quot;xsec_param_prior&quot;</span>);</div>
+<div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;  <span class="keyword">delete</span> param_prior;</div>
+<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;  flat_prior-&gt;Write(<span class="stringliteral">&quot;xsec_flat_prior&quot;</span>);</div>
+<div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;  <span class="keyword">delete</span> flat_prior;</div>
+<div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;  stepscale-&gt;Write(<span class="stringliteral">&quot;xsec_stepscale&quot;</span>);</div>
+<div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;  <span class="keyword">delete</span> stepscale;</div>
+<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;  param_lb-&gt;Write(<span class="stringliteral">&quot;xsec_param_lb&quot;</span>);</div>
+<div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;  <span class="keyword">delete</span> param_lb;</div>
+<div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;  param_ub-&gt;Write(<span class="stringliteral">&quot;xsec_param_ub&quot;</span>);</div>
+<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;  <span class="keyword">delete</span> param_ub;</div>
+<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160; </div>
+<div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;  param_knot_weight_lb-&gt;Write(<span class="stringliteral">&quot;xsec_param_knot_weight_lb&quot;</span>);</div>
+<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;  <span class="keyword">delete</span> param_knot_weight_lb;</div>
+<div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;  param_knot_weight_ub-&gt;Write(<span class="stringliteral">&quot;xsec_param_knot_weight_ub&quot;</span>);</div>
+<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;  <span class="keyword">delete</span> param_knot_weight_ub;</div>
+<div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;  error-&gt;Write(<span class="stringliteral">&quot;xsec_error&quot;</span>);</div>
+<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;  <span class="keyword">delete</span> error;</div>
+<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160; </div>
+<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;  covMatrix-&gt;Write(<span class="stringliteral">&quot;xsec_cov&quot;</span>);</div>
+<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;  CorrMatrix-&gt;Write(<span class="stringliteral">&quot;hcov&quot;</span>);</div>
+<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160; </div>
+<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;  outputFile-&gt;Close();</div>
+<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;  <span class="keyword">delete</span> outputFile;</div>
+<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;}</div>
+<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160; </div>
+<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;} <span class="comment">// end M3 namespace</span></div>
 <div class="ttc" id="aCore_8h_html_a46b8fa28114cf68de4549061568b5ade"><div class="ttname"><a href="Core_8h.html#a46b8fa28114cf68de4549061568b5ade">_MaCh3_Safe_Include_Start_</a></div><div class="ttdeci">#define _MaCh3_Safe_Include_Start_</div><div class="ttdoc">KS: Avoiding warning checking for headers.</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00126">Core.h:126</a></div></div>
 <div class="ttc" id="aCore_8h_html_a91209a17295738b34b124b79faa68a1b"><div class="ttname"><a href="Core_8h.html#a91209a17295738b34b124b79faa68a1b">_MaCh3_Safe_Include_End_</a></div><div class="ttdeci">#define _MaCh3_Safe_Include_End_</div><div class="ttdoc">KS: Restore warning checking after including external headers.</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00140">Core.h:140</a></div></div>
 <div class="ttc" id="aCore_8h_html_ab6a7e23420f0bcfb04f42f45f8283101"><div class="ttname"><a href="Core_8h.html#ab6a7e23420f0bcfb04f42f45f8283101">_restrict_</a></div><div class="ttdeci">#define _restrict_</div><div class="ttdoc">KS: Using restrict limits the effects of pointer aliasing, aiding optimizations. While reading I foun...</div><div class="ttdef"><b>Definition:</b> <a href="Core_8h_source.html#l00108">Core.h:108</a></div></div>
@@ -589,6 +689,7 @@ $(function() {
 <div class="ttc" id="aMaCh3Logger_8h_html_a95fa4dffc648e4c5536c9292c2bdcac3"><div class="ttname"><a href="MaCh3Logger_8h.html#a95fa4dffc648e4c5536c9292c2bdcac3">MACH3LOG_INFO</a></div><div class="ttdeci">#define MACH3LOG_INFO</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00035">MaCh3Logger.h:35</a></div></div>
 <div class="ttc" id="aMaCh3Logger_8h_html_ad5b2eb6377721e3ac95def22c2386bb1"><div class="ttname"><a href="MaCh3Logger_8h.html#ad5b2eb6377721e3ac95def22c2386bb1">MACH3LOG_WARN</a></div><div class="ttdeci">#define MACH3LOG_WARN</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00036">MaCh3Logger.h:36</a></div></div>
 <div class="ttc" id="aParameterStructs_8h_html"><div class="ttname"><a href="ParameterStructs_8h.html">ParameterStructs.h</a></div><div class="ttdoc">Definitions of generic parameter structs and utility templates for MaCh3.</div></div>
+<div class="ttc" id="aParameterStructs_8h_html_a2d969ce667e41bd2492cff1775456837"><div class="ttname"><a href="ParameterStructs_8h.html#a2d969ce667e41bd2492cff1775456837">SplineInterpolation_ToString</a></div><div class="ttdeci">std::string SplineInterpolation_ToString(const SplineInterpolation i)</div><div class="ttdoc">Convert a LLH type to a string.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterStructs_8h_source.html#l00242">ParameterStructs.h:242</a></div></div>
 <div class="ttc" id="aYamlHelper_8h_html_aae72fb06a391f1073add5eed6c6485dd"><div class="ttname"><a href="YamlHelper_8h.html#aae72fb06a391f1073add5eed6c6485dd">YAMLtoSTRING</a></div><div class="ttdeci">std::string YAMLtoSTRING(const YAML::Node &amp;node)</div><div class="ttdoc">KS: Convert a YAML node to a string representation.</div><div class="ttdef"><b>Definition:</b> <a href="YamlHelper_8h_source.html#l00112">YamlHelper.h:112</a></div></div>
 <div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class used throughout MaCh3.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00023">MaCh3Exception.h:23</a></div></div>
 <div class="ttc" id="anamespaceM3_html"><div class="ttname"><a href="namespaceM3.html">M3</a></div><div class="ttdoc">Main namespace for MaCh3 software.</div></div>
@@ -596,6 +697,7 @@ $(function() {
 <div class="ttc" id="anamespaceM3_html_a3718709c681d78c6e28e2eb4c0ac42d3"><div class="ttname"><a href="namespaceM3.html#a3718709c681d78c6e28e2eb4c0ac42d3">M3::MatrixVectorMulti</a></div><div class="ttdeci">void MatrixVectorMulti(double *_restrict_ VecMulti, double **_restrict_ matrix, const double *_restrict_ vector, const int n)</div><div class="ttdoc">KS: Custom function to perform multiplication of matrix and vector with multithreading.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerUtils_8h_source.html#l00118">ParameterHandlerUtils.h:118</a></div></div>
 <div class="ttc" id="anamespaceM3_html_a44adaf4bb2df7724beb44b5a0a21854f"><div class="ttname"><a href="namespaceM3.html#a44adaf4bb2df7724beb44b5a0a21854f">M3::MatrixMult</a></div><div class="ttdeci">double * MatrixMult(double *A, double *B, int n)</div><div class="ttdoc">CW: Multi-threaded matrix multiplication.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerUtils_8h_source.html#l00036">ParameterHandlerUtils.h:36</a></div></div>
 <div class="ttc" id="anamespaceM3_html_a68ab9b6b3d413a94604c740208c7895d"><div class="ttname"><a href="namespaceM3.html#a68ab9b6b3d413a94604c740208c7895d">M3::FixSampleNamesQuotes</a></div><div class="ttdeci">void FixSampleNamesQuotes(std::string &amp;yamlStr)</div><div class="ttdoc">KS: Yaml emitter has problem and drops &quot;&quot;, if you have special signs in you like * then there is prob...</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerUtils_8h_source.html#l00158">ParameterHandlerUtils.h:158</a></div></div>
+<div class="ttc" id="anamespaceM3_html_a6ef8b24b80901a8c67e4edbfc6fb8229"><div class="ttname"><a href="namespaceM3.html#a6ef8b24b80901a8c67e4edbfc6fb8229">M3::DumpParamHandlerToFile</a></div><div class="ttdeci">void DumpParamHandlerToFile(const int _fNumPar, const std::vector&lt; double &gt; &amp;_fPreFitValue, const std::vector&lt; double &gt; &amp;_fError, const std::vector&lt; double &gt; &amp;_fLowBound, const std::vector&lt; double &gt; &amp;_fUpBound, const std::vector&lt; double &gt; &amp;_fIndivStepScale, const std::vector&lt; std::string &gt; &amp;_fFancyNames, const std::vector&lt; bool &gt; &amp;_fFlatPrior, const std::vector&lt; SplineParameter &gt; &amp;SplineParams, TMatrixDSym *covMatrix, TH2D *CorrMatrix, const std::string &amp;Name)</div><div class="ttdoc">Dump Matrix to ROOT file, useful when we need to pass matrix info to another fitting group.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerUtils_8h_source.html#l00554">ParameterHandlerUtils.h:554</a></div></div>
 <div class="ttc" id="anamespaceM3_html_a8db7c365e6cff53f8dbfa681fb8bacca"><div class="ttname"><a href="namespaceM3.html#a8db7c365e6cff53f8dbfa681fb8bacca">M3::MakeCorrelationMatrix</a></div><div class="ttdeci">void MakeCorrelationMatrix(YAML::Node &amp;root, const std::vector&lt; double &gt; &amp;Values, const std::vector&lt; double &gt; &amp;Errors, const std::vector&lt; std::vector&lt; double &gt;&gt; &amp;Correlation, const std::string &amp;OutYAMLName, const std::vector&lt; std::string &gt; &amp;FancyNames={})</div><div class="ttdoc">KS: Replace correlation matrix and tune values in YAML covariance matrix.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerUtils_8h_source.html#l00274">ParameterHandlerUtils.h:274</a></div></div>
 <div class="ttc" id="anamespaceM3_html_a98e6584f7ed16224a221a837551f2c1d"><div class="ttname"><a href="namespaceM3.html#a98e6584f7ed16224a221a837551f2c1d">M3::AddTuneValues</a></div><div class="ttdeci">void AddTuneValues(YAML::Node &amp;root, const std::vector&lt; double &gt; &amp;Values, const std::string &amp;Tune, const std::vector&lt; std::string &gt; &amp;FancyNames={})</div><div class="ttdoc">KS: Add Tune values to YAML covariance matrix.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerUtils_8h_source.html#l00193">ParameterHandlerUtils.h:193</a></div></div>
 <div class="ttc" id="anamespaceM3_html_a99622fe57c7a13d75de4d3c3561b530d"><div class="ttname"><a href="namespaceM3.html#a99622fe57c7a13d75de4d3c3561b530d">M3::MatrixVectorMultiSingle</a></div><div class="ttdeci">double MatrixVectorMultiSingle(double **_restrict_ matrix, const double *_restrict_ vector, const int Length, const int i)</div><div class="ttdoc">KS: Custom function to perform multiplication of matrix and single element which is thread safe.</div><div class="ttdef"><b>Definition:</b> <a href="ParameterHandlerUtils_8h_source.html#l00143">ParameterHandlerUtils.h:143</a></div></div>

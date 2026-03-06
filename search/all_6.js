@@ -56,5 +56,6 @@ var searchData=
   ['draws_326',['Draws',['../RHat__HighMem_8cpp.html#a9adc829d645affbb93eff1775ab7c0c6',1,'RHat_HighMem.cpp']]],
   ['drawsfolded_327',['DrawsFolded',['../RHat__HighMem_8cpp.html#a7e7fe290fda4362be54b8cf5d56fea51',1,'RHat_HighMem.cpp']]],
   ['dumpmatrixtofile_328',['DumpMatrixToFile',['../classParameterHandlerGeneric.html#aad70f9b7c4c574c09a056693e3ecc0e0',1,'ParameterHandlerGeneric']]],
-  ['dynamiclabelsize_329',['DynamicLabelSize',['../MatrixPlotter_8cpp.html#a07c8c5494e89f984b0cdb483f5326e63',1,'MatrixPlotter.cpp']]]
+  ['dumpparamhandlertofile_329',['DumpParamHandlerToFile',['../namespaceM3.html#a6ef8b24b80901a8c67e4edbfc6fb8229',1,'M3']]],
+  ['dynamiclabelsize_330',['DynamicLabelSize',['../MatrixPlotter_8cpp.html#a07c8c5494e89f984b0cdb483f5326e63',1,'MatrixPlotter.cpp']]]
 ];

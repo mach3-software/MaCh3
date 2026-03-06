@@ -77,7 +77,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md_Doc_User_Guide_10__Posterior_Predictive__pâvalue_etc_"></a></p>
-<h1><a class="anchor" id="autotoc_md153"></a>
+<h1><a class="anchor" id="autotoc_md154"></a>
 Prior and Posterior Predictive Distributions</h1>
 <p>we will consider the predictive distributions of the number of events \(Z\). The prior predictive distribution of \(Z\) is given by:</p>
 <p>$$ p(Z) = \int_{\vec{\theta}} p(\vec{\theta}) \, p(Z \mid \vec{\theta}) \, d\vec{\theta}. $$</p>
@@ -96,13 +96,13 @@ Prior and Posterior Predictive Distributions</h1>
 </ol>
 <p>Figure shows the prior and posterior predictive distributions of the number of events. The prior predictive distribution is very wide compared to the posterior predictive distribution, and the relative error on the number of events for this sample has been reduced from 14% to 0.7%, which demonstrates how fit can reduce uncertainties.</p>
 <p><img src="https://github.com/user-attachments/assets/eee1c0bb-b14a-4f1f-9063-3e84f7a3ab12" alt="image" width="1352" height="554" class="inline"/></p>
-<h1><a class="anchor" id="autotoc_md154"></a>
+<h1><a class="anchor" id="autotoc_md155"></a>
 Posterior Predictive p-value</h1>
 <p>Bayesian posterior predictive \(p\)-value is meant to estimate how likely we are to observe the data described by our postfit model if we were to take the same amount of data again. Therefore, it is a much more `&lsquo;demanding&rsquo;' \(p\)-value test than the frequentist \(p\)-value, which uses the larger prior parameter phase space.</p>
 <p>Firstly, an ensemble of parameter values explored by the MCMC, once the stationary state has been reached, is used. We draw parameter values from a random MCMC step after <em>burn-in</em> stage and build the predictions for each sample (by reweighting the nominal MC to drawn parameters values). Then, we statistically fluctuate the drawn prediction by applying Poissonian smearing to each bin. Afterwards, for each sample, we calculate -2LLH between the drawn prediction and its statistical fluctuation: <em>-LLH(Draw Fluc, Draw)</em>, and similarly between the drawn prediction and the data distribution: <em>-LLH(Data, Draw)</em>. We repeat this process a few thousand times. An example of <em>-LLH(Data, Draw)</em> vs. <em>-2LLH(Draw Fluc, Draw)</em> is shown below.</p>
 <p><img src="https://github.com/user-attachments/assets/519d4b46-5d11-402a-858b-9e9fc9daf99e" alt="image" width="771" height="557" class="inline"/></p>
 <p>We identify two methods for calculating the \(p\)-value, statistically fluctuating two different distributions. The first method uses the prediction from the draw <em>-LLH(Draw Fluc, Draw)</em>, and the other uses the averaged prediction for all draws and its statistical fluctuation <em>-LLH(Pred Fluc, Draw)</em>. On average, we expect the \(p\)-value from the second method to be better.</p>
-<h1><a class="anchor" id="autotoc_md155"></a>
+<h1><a class="anchor" id="autotoc_md156"></a>
 References</h1>
 <p>[1] Kamil Skwarczynski PhD thesis <br  />
  </p>

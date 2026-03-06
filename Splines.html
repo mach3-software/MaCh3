@@ -98,7 +98,10 @@ Linear Function</h1>
 <p><img src="https://github.com/user-attachments/assets/774dd6c2-7826-481b-a81b-9ce8569052cd" alt="" width="350" class="inline"/></p>
 <p>Another option is to use kLinearFunc which simple performs linear function (a*x+b) resulting in much better performance and less RAM.</p>
 <p><img src="https://github.com/user-attachments/assets/571c5d43-9026-46cb-9621-2e68142f8e5f" alt="" width="350" class="inline"/></p>
-<h2><a class="anchor" id="autotoc_md123"></a>
+<h1><a class="anchor" id="autotoc_md123"></a>
+Spline Extrapolation</h1>
+<p>For extrapolating beyond the limits of the spline we calculate the weight using the closest segment. This is essentially 'extending' the first segment below the first knot if extrapolating below the spline limits, or extending the last segment above the last knot if extrapolating above the limits. With linear function this simply uses the same coefficients as used for the rest of the spline.</p>
+<h2><a class="anchor" id="autotoc_md124"></a>
 GPU</h2>
 <p>Since the calculation of event by event spline is quite often the bottleneck, there is GPU support for these calculations. From developer and user point of view, code works the same. If GPU support is enabled, MaCh3 will copy spline information to the GPU and perform calculations there.</p>
 <p><img src="https://github.com/mach3-software/MaCh3/assets/45295406/34f7aeaf-d40e-4e8c-96f7-a1eb197603ea" alt="" width="600" class="inline"/> </p>
