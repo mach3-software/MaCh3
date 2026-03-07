@@ -176,17 +176,6 @@ struct KinematicCut {
 };
 
 // ***************************
-/// @brief Small struct used for applying shifts due to functional params
-/// @author Hank Hua
-struct FunctionalShifter {
-// ***************************
-  /// Pointer to parameter value
-  const M3::float_t* valuePtr = nullptr;
-  /// Pointer to shifting function
-  FuncParFuncType* funcPtr = nullptr;
-};
-
-// ***************************
 /// @brief KS: Store bin lookups allowing to quickly find bin after migration
 struct BinShiftLookup {
 // ***************************
@@ -783,7 +772,7 @@ namespace Utils {
       case 3112: return 1.197449; // Sig_-
       case 3212: return 1.192642; // Sig_0
       case 3312: return 1.32171;  // Xi_+/-
-      case 3322: return 1.31486;  // Xi_0 
+      case 3322: return 1.31486;  // Xi_0
       case 3334: return 1.67245;  // Omega_+/-
       case 4122: return 2.28646;  // Lambda_c+
       case 4212: return 2.45265;  // Sigma_c+
