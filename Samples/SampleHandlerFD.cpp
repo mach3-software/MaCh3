@@ -34,9 +34,6 @@ SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGen
   KinematicVectors = nullptr;
   ReversedKinematicVectors = nullptr;
 
-  SampleHandlerFD_array = nullptr;
-  SampleHandlerFD_data = nullptr;
-  SampleHandlerFD_array_w2 = nullptr;
   SampleHandlerName = "";
   SampleManager = std::make_unique<Manager>(ConfigFileName.c_str());
   Binning = std::make_unique<BinningHandler>();
@@ -47,11 +44,6 @@ SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGen
 
 SampleHandlerFD::~SampleHandlerFD() {
   MACH3LOG_DEBUG("I'm deleting SampleHandlerFD");
-
-  if (SampleHandlerFD_array != nullptr) delete[] SampleHandlerFD_array;
-  if (SampleHandlerFD_array_w2 != nullptr) delete[] SampleHandlerFD_array_w2;
-  //ETA - there is a chance that you haven't added any data...
-  if (SampleHandlerFD_data != nullptr) delete[] SampleHandlerFD_data;
 
   if(THStackLeg != nullptr) delete THStackLeg;
 }
@@ -261,7 +253,7 @@ void SampleHandlerFD::SetupKinematicMap() {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
 // ************************************************
-void SampleHandlerFD::FillHist(const int Sample, TH1* Hist, double* Array) {
+void SampleHandlerFD::FillHist(const int Sample, TH1* Hist, std::vector<double> &Array) {
 // ************************************************
   int Dimension = GetNDim(Sample);
   // DB Commented out by default - Code heading towards GetLikelihood using arrays instead of root objects
@@ -430,7 +422,11 @@ void SampleHandlerFD::FillArray_MP() {
   // We will hit <0.1 s/step eventually! :D
   const auto TotalBins = Binning->GetNBins();
   const unsigned int NumberOfEvents = GetNEvents();
-  #pragma omp parallel for reduction(+:SampleHandlerFD_array[:TotalBins], SampleHandlerFD_array_w2[:TotalBins])
+
+  double *SampleHandlerFD_array_data = SampleHandlerFD_array.data();
+  double *SampleHandlerFD_array_w2_data = SampleHandlerFD_array_w2.data();
+
+  #pragma omp parallel for reduction(+:SampleHandlerFD_array_data[:TotalBins], SampleHandlerFD_array_w2_data[:TotalBins])
   for (unsigned int iEvent = 0; iEvent < NumberOfEvents; ++iEvent) {
     //ETA - generic functions to apply shifts to kinematic variables
     // Apply this before IsEventSelected is called.
@@ -459,8 +455,8 @@ void SampleHandlerFD::FillArray_MP() {
     //Might save us an extra if call?
     //DB Fill relevant part of thread array
     if (GlobalBin > M3::UnderOverFlowBin) {
-      SampleHandlerFD_array[GlobalBin] += totalweight;
-      if (FirstTimeW2) SampleHandlerFD_array_w2[GlobalBin] += totalweight*totalweight;
+      SampleHandlerFD_array_data[GlobalBin] += totalweight;
+      if (FirstTimeW2) SampleHandlerFD_array_w2_data[GlobalBin] += totalweight*totalweight;
     }
   }
 }
@@ -474,9 +470,9 @@ void SampleHandlerFD::ResetHistograms() {
   // DB Reset values stored in PDF array to 0.
   // Don't openMP this; no significant gain
   const int nBins = Binning->GetNBins();
-  std::fill(SampleHandlerFD_array, SampleHandlerFD_array + nBins, 0.0);
+  std::fill_n(SampleHandlerFD_array.begin(), nBins, 0.0);
   if (FirstTimeW2) {
-    std::fill(SampleHandlerFD_array_w2, SampleHandlerFD_array_w2 + nBins, 0.0);
+    std::fill_n(SampleHandlerFD_array_w2.begin(), nBins, 0.0);
   }
 } // end function
 
@@ -723,15 +719,9 @@ void SampleHandlerFD::CalcNormsBins(std::vector<NormParameter>& norm_parameters,
 // ************************************************
 void SampleHandlerFD::SetupReweightArrays() {
 // ************************************************
-  SampleHandlerFD_array = new double[Binning->GetNBins()];
-  SampleHandlerFD_array_w2 = new double[Binning->GetNBins()];
-  SampleHandlerFD_data = new double[Binning->GetNBins()];
-
-  for (int i = 0; i < Binning->GetNBins(); ++i) {
-    SampleHandlerFD_array[i] = 0.0;
-    SampleHandlerFD_array_w2[i] = 0.0;
-    SampleHandlerFD_data[i] = 0.0;
-  }
+  SampleHandlerFD_array = std::vector<double>(Binning->GetNBins(),0);
+  SampleHandlerFD_array_w2 = std::vector<double>(Binning->GetNBins(),0);
+  SampleHandlerFD_data = std::vector<double>(Binning->GetNBins(),0);
 }
 
 // ************************************************
@@ -941,7 +931,7 @@ void SampleHandlerFD::AddData(const int Sample, TH1* Data) {
   delete SampleDetails[Sample].DataHist;
   SampleDetails[Sample].DataHist = static_cast<TH1*>(Data->Clone());
 
-  if(SampleHandlerFD_data == nullptr) {
+  if(!SampleHandlerFD_data.size()) {
     MACH3LOG_ERROR("SampleHandlerFD_data haven't been initialised yet");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
@@ -1019,9 +1009,7 @@ void SampleHandlerFD::AddData(const int Sample, const std::vector<double>& Data_
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
-  for (int idx = Start; idx < End; ++idx) {
-    SampleHandlerFD_data[idx] = Data_Array[idx - Start];
-  }
+  std::copy_n(Data_Array.begin(), End-Start, SampleHandlerFD_data.begin() + Start);
 
   FillHist(Sample, SampleDetails[Sample].DataHist, SampleHandlerFD_data);
 }
@@ -1249,9 +1237,9 @@ double SampleHandlerFD::GetSampleLikelihood(const int isample) const {
   #endif
   for (int idx = Start; idx < End; ++idx)
   {
-    const double DataVal = SampleHandlerFD_data[idx];
-    const double MCPred = SampleHandlerFD_array[idx];
-    const double w2 = SampleHandlerFD_array_w2[idx];
+    double const &DataVal = SampleHandlerFD_data[idx];
+    double const &MCPred = SampleHandlerFD_array[idx];
+    double const &w2 = SampleHandlerFD_array_w2[idx];
 
     //KS: Calculate likelihood using Barlow-Beeston Poisson or even IceCube
     negLogL += GetTestStatLLH(DataVal, MCPred, w2);
@@ -1268,9 +1256,9 @@ double SampleHandlerFD::GetLikelihood() const {
   #endif
   for (int idx = 0; idx < Binning->GetNBins(); ++idx)
   {
-    const double DataVal = SampleHandlerFD_data[idx];
-    const double MCPred = SampleHandlerFD_array[idx];
-    const double w2 = SampleHandlerFD_array_w2[idx];
+    double const &DataVal = SampleHandlerFD_data[idx];
+    double const &MCPred = SampleHandlerFD_array[idx];
+    double const &w2 = SampleHandlerFD_array_w2[idx];
 
     //KS: Calculate likelihood using Barlow-Beeston Poisson or even IceCube
     negLogL += GetTestStatLLH(DataVal, MCPred, w2);
@@ -2007,7 +1995,7 @@ const double* SampleHandlerFD::GetPointerToOscChannel(const int iEvent) const {
 // Helper function to print rates for the samples with LLH
 void SampleHandlerFD::PrintRates(const bool DataOnly) {
 // ***************************************************************************
-  if (SampleHandlerFD_data == nullptr) {
+  if (!SampleHandlerFD_data.size()) {
     MACH3LOG_ERROR("Data sample is empty!");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
@@ -2067,12 +2055,12 @@ std::string SampleHandlerFD::GetKinVarName(const int iSample, const int Dimensio
 }
 
 // ***************************************************************************
-std::vector<double> SampleHandlerFD::GetArrayForSample(const int Sample, const double* array) const {
+std::vector<double> SampleHandlerFD::GetArrayForSample(const int Sample, std::vector<double> const & array) const {
 // ***************************************************************************
   const int Start = Binning->GetSampleStartBin(Sample);
   const int End   = Binning->GetSampleEndBin(Sample);
 
-  return std::vector<double>(array + Start, array + End);
+  return std::vector<double>(array.begin() + Start, array.begin() + End);
 }
 
 // ***************************************************************************
