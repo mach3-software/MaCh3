@@ -159,19 +159,19 @@ class SampleHandlerFD :  public SampleHandlerBase
   bool IsSubEventVarString(const std::string& VarStr);
 
   /// @brief Return array storing data entries for every bin
-  std::vector<double> GetDataArray() const {
-    return std::vector<double>(SampleHandlerFD_data, SampleHandlerFD_data + Binning->GetNBins());
+  auto GetDataArray() const {
+    return SampleHandlerFD_data;
   }
   /// @brief Return array storing MC entries for every bin
-  std::vector<double> GetMCArray() const {
-    return std::vector<double>(SampleHandlerFD_array, SampleHandlerFD_array + Binning->GetNBins());
+  auto GetMCArray() const {
+    return SampleHandlerFD_array;
   }
   /// @brief Return array storing W2 entries for every bin
-  std::vector<double> GetW2Array() const {
-    return std::vector<double>(SampleHandlerFD_array_w2, SampleHandlerFD_array_w2 + Binning->GetNBins());
+  auto GetW2Array() const {
+    return SampleHandlerFD_array_w2;
   }
   /// @brief Return a sub-array for a given sample.
-  std::vector<double> GetArrayForSample(const int Sample, const double* array) const;
+  std::vector<double> GetArrayForSample(const int Sample, std::vector<double> const & array) const;
 
   /// @brief Return array storing data entries for every bin
   std::vector<double> GetDataArray(const int Sample) const {
@@ -314,7 +314,7 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// @details
   /// DB Functions required for reweighting functions
   /// DB Replace previous implementation with reading bin contents from SampleHandlerFD_array
-  void FillHist(const int Sample, TH1* Hist, double* Array);
+  void FillHist(const int Sample, TH1* Hist, std::vector<double> &Array);
 
   /// @brief DB Nice new multi-threaded function which calculates the event weights and fills the relevant bins of an array
 #ifdef MULTITHREAD
@@ -334,11 +334,11 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// KS: This stores binning information, in future could be come vector to store binning for every used sample
   std::unique_ptr<BinningHandler> Binning;
   /// DB Array to be filled after reweighting
-  double* SampleHandlerFD_array;
+  std::vector<double> SampleHandlerFD_array;
   /// KS Array used for MC stat
-  double* SampleHandlerFD_array_w2;
+  std::vector<double> SampleHandlerFD_array_w2;
   /// DB Array to be filled in AddData
-  double* SampleHandlerFD_data;
+  std::vector<double> SampleHandlerFD_data;
   //===============================================================================
 
   //===============================================================================
