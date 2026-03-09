@@ -409,10 +409,10 @@ void SampleHandlerFD::FillArray_MP() {
   const auto TotalBins = Binning->GetNBins();
   const unsigned int NumberOfEvents = GetNEvents();
 
-  double *SampleHandlerFD_array_data = SampleHandlerFD_array.data();
-  double *SampleHandlerFD_array_w2_data = SampleHandlerFD_array_w2.data();
+  double *MC_Array_for_reduction = SampleHandlerFD_array.data();
+  double *W2_array_for_reduction = SampleHandlerFD_array_w2.data();
 
-  #pragma omp parallel for reduction(+:SampleHandlerFD_array_data[:TotalBins], SampleHandlerFD_array_w2_data[:TotalBins])
+  #pragma omp parallel for reduction(+:MC_Array_for_reduction[:TotalBins], W2_array_for_reduction[:TotalBins])
   for (unsigned int iEvent = 0; iEvent < NumberOfEvents; ++iEvent) {
     //ETA - generic functions to apply shifts to kinematic variables
     // Apply this before IsEventSelected is called.
@@ -441,8 +441,8 @@ void SampleHandlerFD::FillArray_MP() {
     //Might save us an extra if call?
     //DB Fill relevant part of thread array
     if (GlobalBin > M3::UnderOverFlowBin) {
-      SampleHandlerFD_array_data[GlobalBin] += totalweight;
-      if (FirstTimeW2) SampleHandlerFD_array_w2_data[GlobalBin] += totalweight*totalweight;
+      MC_Array_for_reduction[GlobalBin] += totalweight;
+      if (FirstTimeW2) W2_array_for_reduction[GlobalBin] += totalweight*totalweight;
     }
   }
 }
