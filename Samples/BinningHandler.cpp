@@ -1,7 +1,5 @@
 #include "Samples/BinningHandler.h"
-_MaCh3_Safe_Include_Start_ //{
-#include "spdlog/fmt/ranges.h"
-_MaCh3_Safe_Include_End_ //}
+
 // ************************************************
 BinningHandler::BinningHandler() {
 // ************************************************
@@ -101,10 +99,16 @@ auto BuildBinEdgesFromNode(YAML::Node const &bin_edges_node,
       if (edges_builder[eb_it] == edges.back()) { // remove duplicate edges
         continue;
       } else if (edges_builder[eb_it] < edges.back()) {
+        std::stringstream ss;
+        ss << "[ ";
+        for(auto const & e : edges_builder){
+          ss << fmt::format("{:g.3} ", e);
+        }
+        ss << "]";
         MACH3LOG_ERROR(
             "When parsing binning, found edges that were not monotonically "
             "increasing, problem bin at index: {}:\n{}",
-            eb_it, edges_builder);
+            eb_it, ss.str());
         throw MaCh3Exception(__FILE__, __LINE__);
       }
     }
