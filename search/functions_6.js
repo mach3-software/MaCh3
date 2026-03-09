@@ -8,7 +8,7 @@ var searchData=
   ['fill2dsubeventhist_2152',['Fill2DSubEventHist',['../classSampleHandlerFD.html#a939d153567948b54843339bbfb77427f',1,'SampleHandlerFD']]],
   ['fillarray_2153',['FillArray',['../classSampleHandlerFD.html#aeef0f943cb1e0d4c9bba4814cb24a507',1,'SampleHandlerFD']]],
   ['fillarray_5fmp_2154',['FillArray_MP',['../classSampleHandlerFD.html#a82f1bdb0e52ea1d42ee59cd7dc195ac0',1,'SampleHandlerFD']]],
-  ['fillhist_2155',['FillHist',['../classSampleHandlerFD.html#a5eab24c8508cdd247c23b9bd9b3017b0',1,'SampleHandlerFD']]],
+  ['fillhist_2155',['FillHist',['../classSampleHandlerFD.html#a2806152d31d9491b7a92b2e38a1406e0',1,'SampleHandlerFD']]],
   ['fillsamplearray_2156',['FillSampleArray',['../classBinnedSplineHandler.html#a9a4621f7bc5aa24a97fca813018b86b4',1,'BinnedSplineHandler']]],
   ['finaliseshifts_2157',['FinaliseShifts',['../classSampleHandlerFD.html#ae2b8ffad93123f36137e9d4b83a1f9ab',1,'SampleHandlerFD']]],
   ['findbin_2158',['FindBin',['../structSampleBinningInfo.html#aaf84214bd815487e7593a8f3264011c9',1,'SampleBinningInfo::FindBin(const int Dimension, const double Var, const int NomBin) const'],['../structSampleBinningInfo.html#a6164d7166d8d2748cb6f95801515de7d',1,'SampleBinningInfo::FindBin(const double KinVar, const int NomBin, const int N_Bins, const std::vector&lt; double &gt; &amp;Bin_Edges, const std::vector&lt; BinShiftLookup &gt; &amp;Bin_Lookup) const']]],
