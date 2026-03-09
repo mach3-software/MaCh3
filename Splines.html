@@ -77,11 +77,11 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md_Doc_User_Guide_05__Splines"></a> </p>
-<h1><a class="anchor" id="autotoc_md120"></a>
+<h1><a class="anchor" id="autotoc_md123"></a>
 What is a spline?</h1>
 <p>Spline, sometimes called response function, encodes dependence between parameter value and weight. By having these complex responses precomputed, it allows evaluating weight during fit time very fast.</p>
 <p>We usually store several points at which weight were evaluated, called knots. Thus, we need to interpolate between points interpolation type is up to user as MaCh3 has several options available.</p>
-<h1><a class="anchor" id="autotoc_md121"></a>
+<h1><a class="anchor" id="autotoc_md124"></a>
 Spline Interpolation (3-rd order polynomials)</h1>
 <p>Default interpolation is kTSpline3. It follows ROOT TSpline3 implementation.</p>
 <p><img src="https://github.com/user-attachments/assets/4e32f8b9-c024-4563-85c0-bce9b3e34fa7" alt="" width="350" class="inline"/></p>
@@ -92,16 +92,16 @@ Spline Interpolation (3-rd order polynomials)</h1>
 <p>Another often encountered case is where there are large differences between weight, resulting in so called ringing:</p>
 <p><img src="https://github.com/user-attachments/assets/b91e6194-870c-4255-b12d-f2dc20c455d3" alt="" width="350" class="inline"/></p>
 <p>For such case-based options are kMonotonic which ensures spline segments are monotonic or kKochanekBartels.</p>
-<h1><a class="anchor" id="autotoc_md122"></a>
+<h1><a class="anchor" id="autotoc_md125"></a>
 Linear Function</h1>
 <p>Since quite often we are using linear responses, it is generally recommended to reduce number of splines knots. As more spline knots doesn't contribute to better response, but each knot affects RAM.</p>
 <p><img src="https://github.com/user-attachments/assets/774dd6c2-7826-481b-a81b-9ce8569052cd" alt="" width="350" class="inline"/></p>
 <p>Another option is to use kLinearFunc which simple performs linear function (a*x+b) resulting in much better performance and less RAM.</p>
 <p><img src="https://github.com/user-attachments/assets/571c5d43-9026-46cb-9621-2e68142f8e5f" alt="" width="350" class="inline"/></p>
-<h1><a class="anchor" id="autotoc_md123"></a>
+<h1><a class="anchor" id="autotoc_md126"></a>
 Spline Extrapolation</h1>
 <p>For extrapolating beyond the limits of the spline we calculate the weight using the closest segment. This is essentially 'extending' the first segment below the first knot if extrapolating below the spline limits, or extending the last segment above the last knot if extrapolating above the limits. With linear function this simply uses the same coefficients as used for the rest of the spline.</p>
-<h2><a class="anchor" id="autotoc_md124"></a>
+<h2><a class="anchor" id="autotoc_md127"></a>
 GPU</h2>
 <p>Since the calculation of event by event spline is quite often the bottleneck, there is GPU support for these calculations. From developer and user point of view, code works the same. If GPU support is enabled, MaCh3 will copy spline information to the GPU and perform calculations there.</p>
 <p><img src="https://github.com/mach3-software/MaCh3/assets/45295406/34f7aeaf-d40e-4e8c-96f7-a1eb197603ea" alt="" width="600" class="inline"/> </p>

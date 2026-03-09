@@ -240,14 +240,14 @@ Private Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class responsible for handling Principal Component Analysis (PCA) of covariance matrix. </p>
 <dl class="section author"><dt>Author</dt><dd>Clarence Wret</dd></dl>
-<h1><a class="anchor" id="autotoc_md88"></a>
+<h1><a class="anchor" id="autotoc_md91"></a>
 Introduction</h1>
 <p>This class applies Principal Component Analysis (PCA) to covariance matrices using eigen-decomposition. The main benefit is that PCA rotates the parameter space into a basis where parameters are uncorrelated. In practice, this helps MCMC fits move more efficiently, since correlated directions in the original space often slow down convergence.</p>
-<h1><a class="anchor" id="autotoc_md89"></a>
+<h1><a class="anchor" id="autotoc_md92"></a>
 Dimensionality Reduction</h1>
 <p>PCA makes it possible to drop directions in parameter space with very small eigenvalues. These correspond to combinations of parameters that are poorly constrained or dominated by statistical noise. By applying a threshold (e.g. discarding eigenvalues smaller than <code>1e-4</code> of the largest one), the effective number of parameters can be reduced.</p>
 <p>This is particularly useful in large MCMC fits, where many parameters may contribute little information. Removing them reduces dimensionality while keeping the dominant structure of the parameter space intact, often leading to faster and more stable fits.</p>
-<h1><a class="anchor" id="autotoc_md90"></a>
+<h1><a class="anchor" id="autotoc_md93"></a>
 Partial Decomposition</h1>
 <p>PCA does not need to be applied to the full covariance matrix. This class supports eigen-decomposition of only a submatrix. This is useful when only a subset of parameters is strongly correlated and benefits from PCA, while the rest remain in the original parameter basis. </p>
 

@@ -377,16 +377,16 @@ Protected Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Implementation of delayed rejection for <a class="el" href="classMR2T2.html" title="MCMC algorithm implementing the Metropolis–Rosenbluth–Rosenbluth–Teller–Teller (MR T ) method.">MR2T2</a>. </p>
 <dl class="section author"><dt>Author</dt><dd>Henry Wallace <a class="el" href="citelist.html#CITEREF_dram2006">[16]</a></dd></dl>
-<h1><a class="anchor" id="autotoc_md83"></a>
+<h1><a class="anchor" id="autotoc_md86"></a>
 Quick Introduction</h1>
 <p>Delayed rejection is a method to increase the efficiency of MCMC. It is useful if your chain is not mixing well or if adaptive MCMC is struggling. The idea is to propose increasingly small steps centered on the last rejected step.</p>
-<h1><a class="anchor" id="autotoc_md84"></a>
+<h1><a class="anchor" id="autotoc_md87"></a>
 Configuration</h1>
 <p>To enable delayed rejection, add the following to your config.yaml file:</p><ul>
 <li>Set the algorithm as: General::FittingAlgorithm::DelayedMR2T2</li>
 </ul>
 <p>Delayed MCMC will work "as is" but there are additional options which are set in General::MCMC</p>
-<h2><a class="anchor" id="autotoc_md85"></a>
+<h2><a class="anchor" id="autotoc_md88"></a>
 Scaling Options</h2>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -396,7 +396,7 @@ Scaling Options</h2>
   </table>
   </dd>
 </dl>
-<h2><a class="anchor" id="autotoc_md86"></a>
+<h2><a class="anchor" id="autotoc_md89"></a>
 Delay Triggers</h2>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">

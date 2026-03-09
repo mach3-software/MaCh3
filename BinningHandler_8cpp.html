@@ -76,6 +76,8 @@ $(function() {
 </div>
 </div><!-- top -->
 <div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">BinningHandler.cpp File Reference</div>  </div>
 </div><!--header-->
@@ -89,6 +91,257 @@ Include dependency graph for BinningHandler.cpp:</div>
 </div>
 </div>
 <p><a href="BinningHandler_8cpp_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a0d3e8d22a76f07aeb26dd383258ff961"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BinningHandler_8cpp.html#a0d3e8d22a76f07aeb26dd383258ff961">BinRangeToBinEdges</a> (YAML::Node const &amp;bin_range)</td></tr>
+<tr class="separator:a0d3e8d22a76f07aeb26dd383258ff961"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6aa02783dddf3e53499579be80e7047b"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BinningHandler_8cpp.html#a6aa02783dddf3e53499579be80e7047b">BuildBinEdgesFromNode</a> (YAML::Node const &amp;bin_edges_node, bool &amp;found_range_specifier)</td></tr>
+<tr class="memdesc:a6aa02783dddf3e53499579be80e7047b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds a single dimension's bin edges from YAML::Node.  <a href="BinningHandler_8cpp.html#a6aa02783dddf3e53499579be80e7047b">More...</a><br /></td></tr>
+<tr class="separator:a6aa02783dddf3e53499579be80e7047b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa125e7a8f1a3c5e3620502033ff44afc"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="BinningHandler_8cpp.html#aa125e7a8f1a3c5e3620502033ff44afc">UniformBinEdgeConfigParser</a> (YAML::Node const &amp;bin_edges_node, bool &amp;found_range_specifier)</td></tr>
+<tr class="memdesc:aa125e7a8f1a3c5e3620502033ff44afc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parses YAML node describing multidim uniform binning.  <a href="BinningHandler_8cpp.html#aa125e7a8f1a3c5e3620502033ff44afc">More...</a><br /></td></tr>
+<tr class="separator:aa125e7a8f1a3c5e3620502033ff44afc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a0d3e8d22a76f07aeb26dd383258ff961"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d3e8d22a76f07aeb26dd383258ff961">&#9670;&nbsp;</a></span>BinRangeToBinEdges()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">auto BinRangeToBinEdges </td>
+          <td>(</td>
+          <td class="paramtype">YAML::Node const &amp;&#160;</td>
+          <td class="paramname"><em>bin_range</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="BinningHandler_8cpp_source.html#l00008">8</a> of file <a class="el" href="BinningHandler_8cpp_source.html">BinningHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;                                                   {</div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;  <span class="keywordtype">bool</span> is_lin = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;  YAML::Node bin_range_specifier;</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;  <span class="keywordflow">if</span> (bin_range[<span class="stringliteral">&quot;linspace&quot;</span>]) {</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;    bin_range_specifier = bin_range[<span class="stringliteral">&quot;linspace&quot;</span>];</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;  } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (bin_range[<span class="stringliteral">&quot;logspace&quot;</span>]) {</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;    is_lin = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;    bin_range_specifier = bin_range[<span class="stringliteral">&quot;logspace&quot;</span>];</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;  } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;    std::stringstream ss;</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    ss &lt;&lt; bin_range;</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;When parsing binning, expected bin range specifier with &quot;</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;                   <span class="stringliteral">&quot;key linspace or logspace, but found,\n{}&quot;</span>,</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;                   ss.str());</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  }</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  <span class="keyword">auto</span> nb = Get&lt;int&gt;(bin_range_specifier[<span class="stringliteral">&quot;nb&quot;</span>], __FILE__, __LINE__);</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <span class="keyword">auto</span> low = Get&lt;double&gt;(bin_range_specifier[<span class="stringliteral">&quot;low&quot;</span>], __FILE__, __LINE__);</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <span class="keyword">auto</span> up = Get&lt;double&gt;(bin_range_specifier[<span class="stringliteral">&quot;up&quot;</span>], __FILE__, __LINE__);</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  std::vector&lt;double&gt; edges(nb + 1, low);</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <span class="comment">// force the last bin to be exactly as parsed to avoid numerical instabilities</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <span class="comment">// not quite lining back up with the end of the range, which could</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <span class="comment">// cause spurious errors or infinitesimally small bins for specifications</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <span class="comment">// like: [ { logspace: { nb: 10, 1E-1, 10}, 10, 11} ]</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  edges.back() = up;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <span class="keywordflow">if</span> (is_lin) {</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keywordtype">double</span> bw = (up - low) / nb;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; (nb - 1); ++i) {</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;      edges[i + 1] = edges[i] + bw;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    }</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordtype">double</span> llow = std::log10(low);</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordtype">double</span> lup = std::log10(up);</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keywordtype">double</span> lbw = (lup - llow) / nb;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; (nb - 1); ++i) {</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;      edges[i + 1] = std::pow(10, llow + (i + 1) * lbw);</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    }</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  }</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="keywordflow">return</span> edges;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;}</div>
+<div class="ttc" id="aMaCh3Logger_8h_html_a61052119a625282d0ec6d4a97adf3ee2"><div class="ttname"><a href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a></div><div class="ttdeci">#define MACH3LOG_ERROR</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Logger_8h_source.html#l00037">MaCh3Logger.h:37</a></div></div>
+<div class="ttc" id="aclassMaCh3Exception_html"><div class="ttname"><a href="classMaCh3Exception.html">MaCh3Exception</a></div><div class="ttdoc">Custom exception class used throughout MaCh3.</div><div class="ttdef"><b>Definition:</b> <a href="MaCh3Exception_8h_source.html#l00023">MaCh3Exception.h:23</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a6aa02783dddf3e53499579be80e7047b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6aa02783dddf3e53499579be80e7047b">&#9670;&nbsp;</a></span>BuildBinEdgesFromNode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">auto BuildBinEdgesFromNode </td>
+          <td>(</td>
+          <td class="paramtype">YAML::Node const &amp;&#160;</td>
+          <td class="paramname"><em>bin_edges_node</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool &amp;&#160;</td>
+          <td class="paramname"><em>found_range_specifier</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Builds a single dimension's bin edges from YAML::Node. </p>
+<p>BinEdges: [ &lt;dim0bin0lowedge&gt;, &lt;dim0bin1upedge&gt;, &lt;dim0bin2upedge&gt;, ... &lt;dim0binNupedge&gt; ] BinEdges: { linspace: { nb: 100, low: 0, up: 10} } BinEdges: { logspace: { nb: 100, low: 1E-1, up: 10} } BinEdges: [ { linspace: { nb: 100, low: 0, up: 10} }, 10, 15, { logspace: { nb: 5, low: 15, up: 100} } ] </p>
+
+<p class="definition">Definition at line <a class="el" href="BinningHandler_8cpp_source.html#l00060">60</a> of file <a class="el" href="BinningHandler_8cpp_source.html">BinningHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;                                                        {</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  <span class="keywordflow">if</span> (bin_edges_node.IsMap()) {</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    found_range_specifier = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="BinningHandler_8cpp.html#a0d3e8d22a76f07aeb26dd383258ff961">BinRangeToBinEdges</a>(bin_edges_node);</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  }</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  std::vector&lt;double&gt; edges_builder;</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <span class="keywordflow">if</span> (!bin_edges_node.IsSequence()) {</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    std::stringstream ss;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    ss &lt;&lt; bin_edges_node;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        <span class="stringliteral">&quot;When parsing binning, expected to find a YAML map or sequence, &quot;</span></div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        <span class="stringliteral">&quot;but found:\n{}&quot;</span>,</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        ss.str());</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  }</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  <span class="keywordflow">for</span> (<span class="keyword">auto</span> <span class="keyword">const</span> &amp;it : bin_edges_node) {</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="keywordflow">if</span> (it.IsScalar()) {</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;      edges_builder.push_back(it.as&lt;<span class="keywordtype">double</span>&gt;());</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (it.IsMap()) {</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;      found_range_specifier = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;      <span class="keyword">auto</span> range_edges = <a class="code" href="BinningHandler_8cpp.html#a0d3e8d22a76f07aeb26dd383258ff961">BinRangeToBinEdges</a>(it);</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;      std::copy(range_edges.begin(), range_edges.end(),</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;                std::back_inserter(edges_builder));</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;      std::stringstream ss;</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;      ss &lt;&lt; bin_edges_node;</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;          <span class="stringliteral">&quot;When parsing binning, expected elements in outer sequence to all be &quot;</span></div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;          <span class="stringliteral">&quot;either scalars or maps, but found:\n{}&quot;</span>,</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;          ss.str());</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    }</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;  }</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160; </div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;  <span class="comment">// Check for duplicates or out-of-order bins</span></div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  std::vector&lt;double&gt; edges;</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> eb_it = 0; eb_it &lt; edges_builder.size(); ++eb_it) {</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="keywordflow">if</span> (edges.size()) {</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;      <span class="keywordflow">if</span> (edges_builder[eb_it] == edges.back()) { <span class="comment">// remove duplicate edges</span></div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;      } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (edges_builder[eb_it] &lt; edges.back()) {</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        std::stringstream ss;</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;        ss &lt;&lt; <span class="stringliteral">&quot;[ &quot;</span>;</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">auto</span> <span class="keyword">const</span> &amp; e : edges_builder){</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;          ss &lt;&lt; fmt::format(<span class="stringliteral">&quot;{:.3g} &quot;</span>, e);</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;        }</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;        ss &lt;&lt; <span class="stringliteral">&quot;]&quot;</span>;</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;        <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;            <span class="stringliteral">&quot;When parsing binning, found edges that were not monotonically &quot;</span></div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;            <span class="stringliteral">&quot;increasing, problem bin at index: {}:\n{}&quot;</span>,</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;            eb_it, ss.str());</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;        <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;      }</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    }</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    edges.push_back(edges_builder[eb_it]);</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  }</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160; </div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  <span class="keywordflow">return</span> edges;</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;}</div>
+<div class="ttc" id="aBinningHandler_8cpp_html_a0d3e8d22a76f07aeb26dd383258ff961"><div class="ttname"><a href="BinningHandler_8cpp.html#a0d3e8d22a76f07aeb26dd383258ff961">BinRangeToBinEdges</a></div><div class="ttdeci">auto BinRangeToBinEdges(YAML::Node const &amp;bin_range)</div><div class="ttdef"><b>Definition:</b> <a href="BinningHandler_8cpp_source.html#l00008">BinningHandler.cpp:8</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="aa125e7a8f1a3c5e3620502033ff44afc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa125e7a8f1a3c5e3620502033ff44afc">&#9670;&nbsp;</a></span>UniformBinEdgeConfigParser()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">auto UniformBinEdgeConfigParser </td>
+          <td>(</td>
+          <td class="paramtype">YAML::Node const &amp;&#160;</td>
+          <td class="paramname"><em>bin_edges_node</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool &amp;&#160;</td>
+          <td class="paramname"><em>found_range_specifier</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Parses YAML node describing multidim uniform binning. </p>
+<h1><a class="anchor" id="autotoc_md71"></a>
+dimensional list implicit for 1D binnings</h1>
+<p>BinEdges: [&lt;dim0bin0lowedge&gt;, &lt;dim0bin1upedge&gt;, &lt;dim0bin2upedge&gt;, ... &lt;dim0binNupedge&gt;]</p>
+<p>BinEdges: [ [&lt;dim0bin0lowedge&gt;, &lt;dim0bin1upedge&gt;, &lt;dim0bin2upedge&gt;, ... &lt;dim0binNupedge&gt;], ... [&lt;dimNbin0lowedge&gt;, &lt;dimNbin1upedge&gt;, &lt;dimNbin2upedge&gt;, ... &lt;dimNbinNupedge&gt;] ]</p>
+<h1><a class="anchor" id="autotoc_md72"></a>
+bin edge list implicit for 1D range-only binnings</h1>
+<p>BinEdges: { linspace: { nb: 100, low: 0, up: 10} } </p>
+<h1><a class="anchor" id="autotoc_md73"></a>
+mixed syntax binnings allowed</h1>
+<p>BinEdges: [ { linspace: { nb: 100, low: 0, up: 10} }, 10, 15, { logspace: { nb: 5, low: 15, up: 100} } ] # for ND range-only binnings, lists are required to disambiguate 1D mixed specifier binnings from ND binnings BinEdges: [ [ { linspace: { nb: 100, low: 0, up: 10} } ], ... [&lt;dimNbin0lowedge&gt;, &lt;dimNbin1upedge&gt;, &lt;dimNbin2upedge&gt;, ... &lt;dimNbinNupedge&gt;] ] BinEdges: [ [ { linspace: { nb: 100, low: 0, up: 10} }, 10, 15, { logspace: { nb: 5, low: 15, up: 100} } ], ... [&lt;dimNbin0lowedge&gt;, &lt;dimNbin1upedge&gt;, &lt;dimNbin2upedge&gt;, ... &lt;dimNbinNupedge&gt;] ] </p>
+
+<p class="definition">Definition at line <a class="el" href="BinningHandler_8cpp_source.html#l00148">148</a> of file <a class="el" href="BinningHandler_8cpp_source.html">BinningHandler.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;                                                             {</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  <span class="keywordflow">if</span> (bin_edges_node.IsMap()) {</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    found_range_specifier = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <span class="keywordflow">return</span> std::vector&lt;std::vector&lt;double&gt;&gt;{</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;        <a class="code" href="BinningHandler_8cpp.html#a0d3e8d22a76f07aeb26dd383258ff961">BinRangeToBinEdges</a>(bin_edges_node),</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    };</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;  } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (bin_edges_node.IsSequence()) {</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    <span class="keywordflow">if</span> (!bin_edges_node.size()) {</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;      std::stringstream ss;</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;      ss &lt;&lt; bin_edges_node;</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;      <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(<span class="stringliteral">&quot;When parsing binning, found an empty sequence:\n{}&quot;</span>,</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;                     ss.str());</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;      <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    }</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="keyword">auto</span> <span class="keyword">const</span> &amp;first_el = bin_edges_node[0];</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <span class="keywordflow">if</span> (first_el.IsScalar() || first_el.IsMap()) { <span class="comment">// 1D binning</span></div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;      <span class="keywordflow">return</span> std::vector&lt;std::vector&lt;double&gt;&gt;{</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;          <a class="code" href="BinningHandler_8cpp.html#a6aa02783dddf3e53499579be80e7047b">BuildBinEdgesFromNode</a>(bin_edges_node, found_range_specifier),</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;      };</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    }</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <span class="comment">// ND binning</span></div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    std::vector&lt;std::vector&lt;double&gt;&gt; dims;</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">auto</span> <span class="keyword">const</span> &amp;dim_node : bin_edges_node) {</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;      dims.push_back(<a class="code" href="BinningHandler_8cpp.html#a6aa02783dddf3e53499579be80e7047b">BuildBinEdgesFromNode</a>(dim_node, found_range_specifier));</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    }</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    <span class="keywordflow">return</span> dims;</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;  } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    std::stringstream ss;</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    ss &lt;&lt; bin_edges_node;</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    <a class="code" href="MaCh3Logger_8h.html#a61052119a625282d0ec6d4a97adf3ee2">MACH3LOG_ERROR</a>(</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;        <span class="stringliteral">&quot;When parsing binning, expected to find a YAML map or sequence, &quot;</span></div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;        <span class="stringliteral">&quot;but found:\n{}&quot;</span>,</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;        ss.str());</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    <span class="keywordflow">throw</span> <a class="code" href="classMaCh3Exception.html">MaCh3Exception</a>(__FILE__, __LINE__);</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;  }</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;}</div>
+<div class="ttc" id="aBinningHandler_8cpp_html_a6aa02783dddf3e53499579be80e7047b"><div class="ttname"><a href="BinningHandler_8cpp.html#a6aa02783dddf3e53499579be80e7047b">BuildBinEdgesFromNode</a></div><div class="ttdeci">auto BuildBinEdgesFromNode(YAML::Node const &amp;bin_edges_node, bool &amp;found_range_specifier)</div><div class="ttdoc">Builds a single dimension's bin edges from YAML::Node.</div><div class="ttdef"><b>Definition:</b> <a href="BinningHandler_8cpp_source.html#l00060">BinningHandler.cpp:60</a></div></div>
+</div><!-- fragment -->
+</div>
+</div>
 </div><!-- contents -->
 <!-- Footer for MaCh3 Doxygen documentation -->
 <footer class="mach3-footer" style="text-align: center;">
