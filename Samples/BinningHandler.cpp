@@ -102,7 +102,7 @@ auto BuildBinEdgesFromNode(YAML::Node const &bin_edges_node,
         std::stringstream ss;
         ss << "[ ";
         for(auto const & e : edges_builder){
-          ss << fmt::format("{:g.3} ", e);
+          ss << fmt::format("{:.3g} ", e);
         }
         ss << "]";
         MACH3LOG_ERROR(
