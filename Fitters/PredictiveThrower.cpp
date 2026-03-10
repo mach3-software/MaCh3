@@ -988,6 +988,9 @@ void PredictiveThrower::RunPredictiveAnalysis() {
   // Check how number of events changed
   RateAnalysis(MC_Hist_Toy, SampleDirectories);
 
+  // Studying information criterion
+  StudyInformationCriterion(M3::kWAIC, PostPred_mc, PostPred_w2);
+
   // Close directories
   for (int sample = 0; sample < TotalNumberOfSamples+1; ++sample) {
     SampleDirectories[sample]->Close();
@@ -1451,4 +1454,218 @@ void PredictiveThrower::RateAnalysis(const std::vector<std::vector<std::unique_p
     //Make fancy event rate histogram
     MakeCutEventRate(EventHist[SampleNum].get(), DataRates[SampleNum]);
   }
+}
+
+
+// ****************
+void PredictiveThrower::StudyInformationCriterion(M3::kInfCrit Criterion,
+                                                  const std::vector<std::unique_ptr<TH1>>& PostPred_mc,
+                                                  const std::vector<std::unique_ptr<TH1>>& PostPred_w) {
+// ****************
+  MACH3LOG_INFO("******************************");
+  switch(Criterion) {
+    case M3::kInfCrit::kBIC:
+      // Study Bayesian Information Criterion
+      StudyBIC(PostPred_mc, PostPred_w);
+      break;
+    case M3::kInfCrit::kDIC:
+      // Study Deviance Information Criterion
+      StudyDIC(PostPred_mc, PostPred_w);
+      break;
+    case M3::kInfCrit::kWAIC:
+      // Study Watanabe-Akaike information criterion (WAIC)
+      StudyWAIC();
+      break;
+    case M3::kInfCrit::kInfCrits:
+      MACH3LOG_ERROR("kInfCrits is not a valid kInfCrit!");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    default:
+      MACH3LOG_ERROR("UNKNOWN Information Criterion SPECIFIED!");
+      MACH3LOG_ERROR("You gave {}", static_cast<int>(Criterion));
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+  MACH3LOG_INFO("******************************");
+}
+
+// ****************
+void PredictiveThrower::StudyBIC(const std::vector<std::unique_ptr<TH1>>& PostPred_mc,
+                                 const std::vector<std::unique_ptr<TH1>>& PostPred_w) {
+// ****************
+  //make fancy event rate histogram
+  double DataRate = 0.0;
+  double BinsRate = 0.0;
+  double TotalLLH = 0.0;
+  #ifdef MULTITHREAD
+  #pragma omp parallel for reduction(+:DataRate, BinsRate, TotalLLH)
+  #endif
+  for (int i = 0; i < TotalNumberOfSamples; ++i)
+  {
+    auto SampleHandler = SampleInfo[i].SamHandler;
+    auto* h = Data_Hist[i].get();
+    DataRate += h->Integral();
+    if (auto h1 = dynamic_cast<TH1D*>(h)) {
+      BinsRate += h1->GetNbinsX();
+    } else if (auto h2 = dynamic_cast<TH2D*>(h)) {
+      BinsRate += h2->GetNbinsX() * h2->GetNbinsY();
+    } else if (auto h2poly = dynamic_cast<TH2Poly*>(h)) {
+      BinsRate += h2poly->GetNumberOfBins();
+    } else {
+      MACH3LOG_WARN("Unknown histogram type in DataHist[{}]", i);
+    }
+    TotalLLH += CalcLLH(Data_Hist[i].get(), PostPred_mc[i].get(), PostPred_w[i].get(), SampleHandler);
+  }
+
+  const double EventRateBIC = GetBIC(TotalLLH, DataRate, NModelParams);
+  const double BinBasedBIC = GetBIC(TotalLLH, BinsRate, NModelParams);
+  MACH3LOG_INFO("Calculated Bayesian Information Criterion using global number of events: {:.2f}", EventRateBIC);
+  MACH3LOG_INFO("Calculated Bayesian Information Criterion using global number of bins: {:.2f}", BinBasedBIC);
+  MACH3LOG_INFO("Additional info: NModelParams: {}, DataRate: {:.2f}, BinsRate: {:.2f}", NModelParams, DataRate, BinsRate);
+}
+
+// ****************
+// Get the Deviance Information Criterion (DIC)
+void PredictiveThrower::StudyDIC(const std::vector<std::unique_ptr<TH1>>& PostPred_mc,
+                                 const std::vector<std::unique_ptr<TH1>>& PostPred_w) {
+// ****************
+  //The posterior mean of the deviance
+  double Dbar = 0.;
+  double TotalLLH = 0.0;
+
+  #ifdef MULTITHREAD
+  #pragma omp parallel for reduction(+:Dbar)
+  #endif
+  for (int iSample = 0; iSample < TotalNumberOfSamples; ++iSample)
+  {
+    auto SampleHandler = SampleInfo[iSample].SamHandler;
+    TotalLLH += CalcLLH(Data_Hist[iSample].get(), PostPred_mc[iSample].get(), PostPred_w[iSample].get(), SampleHandler);
+    double LLH_temp = 0.;
+    for (int iToy = 0; iToy < Ntoys; ++iToy)
+    {
+      LLH_temp += CalcLLH(Data_Hist[iSample].get(), MC_Hist_Toy[iSample][iToy].get(), W2_Hist_Toy[iSample][iToy].get(), SampleHandler);
+    }
+    Dbar += LLH_temp;
+  }
+  Dbar = Dbar / Ntoys;
+
+  // A point estimate of the deviance
+  const double Dhat = TotalLLH;
+
+  //Effective number of parameters
+  const double p_D = std::fabs(Dbar - Dhat);
+
+  //Actual test stat
+  const double DIC_stat = Dhat + 2 * p_D;
+  MACH3LOG_INFO("Effective number of parameters following DIC formalism is equal to: {:.2f}", p_D);
+  MACH3LOG_INFO("DIC test statistic = {:.2f}", DIC_stat);
+}
+
+
+// ****************
+// Helper: update WAIC accumulators for a single toy/bin
+void AccumulateWAICToy(const double neg_LLH_temp,
+                       double& mean_llh,
+                       double& mean_llh_squared,
+                       double& sum_exp_llh) {
+// ****************
+  // Negate the negative log-likelihood to get the actual log-likelihood
+  double LLH_temp = -neg_LLH_temp;
+
+  mean_llh += LLH_temp;
+  mean_llh_squared += LLH_temp * LLH_temp;
+  sum_exp_llh += std::exp(LLH_temp);
+}
+
+// ****************
+// Helper function to finalize WAIC contributions for one bin
+void AccumulateWAICBin(double& mean_llh, double& mean_llh_squared, double& sum_exp_llh,
+                       const unsigned int Ntoys, double& lppd, double& p_WAIC) {
+// ****************
+  // Compute the mean log-likelihood and the squared mean
+  mean_llh /= Ntoys;
+  mean_llh_squared /= Ntoys;
+  sum_exp_llh /= Ntoys;
+  sum_exp_llh = std::log(sum_exp_llh);
+
+  // Log pointwise predictive density based on Eq. 4 in Gelman2014
+  lppd += sum_exp_llh;
+
+  // Compute the effective number of parameters for WAIC
+  p_WAIC += mean_llh_squared - (mean_llh * mean_llh);
+}
+
+// ****************
+// Get the Watanabe-Akaike information criterion (WAIC)
+void PredictiveThrower::StudyWAIC() {
+// ****************
+  // log pointwise predictive density
+  double lppd = 0.;
+  // effective number of parameters
+  double p_WAIC = 0.;
+
+  #ifdef MULTITHREAD
+  #pragma omp parallel for reduction(+:lppd, p_WAIC)
+  #endif
+  for (int iSample = 0; iSample < TotalNumberOfSamples; ++iSample) {
+    auto SampleHandler = SampleInfo[iSample].SamHandler;
+    auto* hData = Data_Hist[iSample].get();
+
+    if (auto h2poly = dynamic_cast<TH2Poly*>(hData)) {
+      // TH2Poly: irregular bins, linear indexing
+      for (int i = 1; i <= h2poly->GetNumberOfBins(); ++i) {
+        const double data = Data_Hist[iSample]->GetBinContent(i);
+        double mean_llh = 0.;
+        double sum_exp_llh = 0;
+        double mean_llh_squared = 0.;
+
+        for (int iToy = 0; iToy < Ntoys; ++iToy) {
+          const double mc = MC_Hist_Toy[iSample][iToy]->GetBinContent(i);
+          const double w2 = W2_Hist_Toy[iSample][iToy]->GetBinContent(i);
+          // Get the -log-likelihood for this sample and bin
+          double neg_LLH_temp = SampleHandler->GetTestStatLLH(data, mc, w2);
+          AccumulateWAICToy(neg_LLH_temp, mean_llh, mean_llh_squared, sum_exp_llh);
+        }
+        AccumulateWAICBin(mean_llh, mean_llh_squared, sum_exp_llh, Ntoys, lppd, p_WAIC);
+      }
+    } else if (auto h2 = dynamic_cast<TH2D*>(hData)) {
+      // TH2D: nested loops over X and Y
+      for (int ix = 1; ix <= h2->GetNbinsX(); ++ix) {
+        for (int iy = 1; iy <= h2->GetNbinsY(); ++iy) {
+          const double data = hData->GetBinContent(ix, iy);
+          double mean_llh = 0.;
+          double mean_llh_squared = 0.;
+          double sum_exp_llh = 0.;
+          for (int iToy = 0; iToy < Ntoys; ++iToy) {
+            const double mc = MC_Hist_Toy[iSample][iToy]->GetBinContent(ix, iy);
+            const double w2 = W2_Hist_Toy[iSample][iToy]->GetBinContent(ix, iy);
+            // Get the -log-likelihood for this sample and bin
+            double neg_LLH_temp = SampleHandler->GetTestStatLLH(data, mc, w2);
+            AccumulateWAICToy(neg_LLH_temp, mean_llh, mean_llh_squared, sum_exp_llh);
+          }
+          AccumulateWAICBin(mean_llh, mean_llh_squared, sum_exp_llh, Ntoys, lppd, p_WAIC);
+        }
+      }
+    } else if (auto h1 = dynamic_cast<TH1D*>(hData)) {
+      // TH1D: 1D histogram
+      for (int iBin = 1; iBin <= h1->GetNbinsX(); ++iBin) {
+        const double data = hData->GetBinContent(iBin);
+        double mean_llh = 0.;
+        double mean_llh_squared = 0.;
+        double sum_exp_llh = 0.;
+        for (int iToy = 0; iToy < Ntoys; ++iToy) {
+          const double mc = MC_Hist_Toy[iSample][iToy]->GetBinContent(iBin);
+          const double w2 = W2_Hist_Toy[iSample][iToy]->GetBinContent(iBin);
+
+          // Get the -log-likelihood for this sample and bin
+          double neg_LLH_temp = SampleHandler->GetTestStatLLH(data, mc, w2);
+          AccumulateWAICToy(neg_LLH_temp, mean_llh, mean_llh_squared, sum_exp_llh);
+        }
+        AccumulateWAICBin(mean_llh, mean_llh_squared, sum_exp_llh, Ntoys, lppd, p_WAIC);
+      }
+    }
+  }
+
+  // Compute WAIC, see Eq. 13 in Gelman2014
+  double WAIC = -2 * (lppd - p_WAIC);
+  MACH3LOG_INFO("Effective number of parameters following WAIC formalism is equal to: {:.2f}", p_WAIC);
+  MACH3LOG_INFO("WAIC = {:.2f}", WAIC);
 }

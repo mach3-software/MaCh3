@@ -24,6 +24,17 @@ _MaCh3_Safe_Include_End_ //}
 /// @brief Utility functions for statistical interpretations in MaCh3
 /// @author Kamil Skwarczynski
 
+
+namespace M3 {
+  /// @brief KS: Different Information Criterion tests mostly based Gelman paper
+  enum kInfCrit {
+    kBIC,      //!< Bayesian Information Criterion
+    kDIC,      //!< Deviance Information Criterion
+    kWAIC,     //!< Watanabe-Akaike information criterion
+    kInfCrits  //!< This only enumerates
+  };
+}
+
 /// @brief  KS: Following H. Jeffreys \cite jeffreys1998theory
 /// @param BayesFactor Obtained value of Bayes factor
 std::string GetJeffreysScale(const double BayesFactor);
