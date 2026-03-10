@@ -41,7 +41,6 @@ std::tuple<py::array_t<double>, py::array_t<double>> TH1ToNumpy(TH1* hist) {
     
     // Copy bin contents (ROOT bins start at 1, not 0)
     for (int i = 0; i < nbins; ++i) {
-        std::cout << "Bin countent for bin " << i + 1 << ": " << hist->GetBinContent(i + 1) << std::endl;
         contents_ptr[i] = hist->GetBinContent(i + 1);
     }
     
@@ -558,32 +557,12 @@ void initSamplesModule(py::module &m_samples){
               TH1 *hist_original = self.GetMCHist(sample);
               
               // Debug: Check the original histogram
-              std::cout << "=== ORIGINAL HISTOGRAM ===" << std::endl;
               if (!hist_original) {
                 throw std::runtime_error("GetMCHist returned null pointer");
               }
               
-              // Print first few bin contents
-              std::cout << "First 5 bin contents of original:" << std::endl;
-              for (int i = 1; i <= std::min(5, hist_original->GetNbinsX()); ++i) {
-                std::cout << "  Bin " << i << ": " << hist_original->GetBinContent(i) << std::endl;
-              }
-              
               // Now clone it
               TH1D *hist = static_cast<TH1D*>(hist_original->Clone("cloned_hist"));
-              
-              // Debug: Check the cloned histogram
-              std::cout << "=== CLONED HISTOGRAM ===" << std::endl;
-              std::cout << "Cloned histogram address: " << hist << std::endl;
-              std::cout << "Cloned histogram name: " << hist->GetName() << std::endl;
-              std::cout << "Cloned histogram integral: " << hist->Integral() << std::endl;
-              std::cout << "Cloned histogram entries: " << hist->GetEntries() << std::endl;
-              
-              // Print first few bin contents of clone
-              std::cout << "First 5 bin contents of clone:" << std::endl;
-              for (int i = 1; i <= std::min(5, hist->GetNbinsX()); ++i) {
-                std::cout << "  Bin " << i << ": " << hist->GetBinContent(i) << std::endl;
-              }
 
               if (Dimension == 1) {
                 // 1D histogram
