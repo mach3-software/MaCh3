@@ -169,6 +169,19 @@ NormParameter ParameterHandlerGeneric::GetNormParameter(const YAML::Node& param,
     MACH3LOG_ERROR("Normalisation parameters can't go bellow 0 as this is unphysical");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
+
+  return norm;
+}
+
+// ********************************************
+// Get Base Param
+void ParameterHandlerGeneric::GetBaseParameter(const YAML::Node& param, const int Index, TypeParameterBase& Parameter) {
+// ********************************************
+  Parameter.name = GetParFancyName(Index);
+
+  // Set the global parameter index of the normalisation parameter
+  Parameter.index = Index;
+
   int NumKinematicCuts = 0;
   if(param["KinematicCuts"]) {
     NumKinematicCuts = int(param["KinematicCuts"].size());
@@ -184,39 +197,23 @@ NormParameter ParameterHandlerGeneric::GetNormParameter(const YAML::Node& param,
       }
       if(TempKinematicStrings.size() == 0) {
         MACH3LOG_ERROR("Received a KinematicCuts node but couldn't read the contents (it's a list of single-element dictionaries (python) = map of pairs (C++))");
-        MACH3LOG_ERROR("For Param {}", norm.name);
+        MACH3LOG_ERROR("For Param {}", Parameter.name);
         throw MaCh3Exception(__FILE__, __LINE__);
       }
     }//KinVar_i
-    norm.KinematicVarStr = TempKinematicStrings;
-    norm.Selection = TempKinematicBounds;
+    Parameter.KinematicVarStr = TempKinematicStrings;
+    Parameter.Selection = TempKinematicBounds;
   }
 
   //Next ones are kinematic bounds on where normalisation parameter should apply
   //We set a bool to see if any bounds exist so we can short-circuit checking all of them every step
   bool HasKinBounds = false;
 
-  if(norm.KinematicVarStr.size() > 0) HasKinBounds = true;
+  if(Parameter.KinematicVarStr.size() > 0) HasKinBounds = true;
 
-  norm.hasKinBounds = HasKinBounds;
+  Parameter.hasKinBounds = HasKinBounds;
   //End of kinematic bound checking
-
-  return norm;
 }
-
-// ********************************************
-// Get Base Param
-void ParameterHandlerGeneric::GetBaseParameter(const YAML::Node& param, const int Index, TypeParameterBase& Parameter) {
-// ********************************************
-  // KS: For now we don't use so avoid compilation error
-  (void) param;
-
-  Parameter.name = GetParFancyName(Index);
-
-  // Set the global parameter index of the normalisation parameter
-  Parameter.index = Index;
-}
-
 
 // ********************************************
 // Grab the global syst index for the relevant SampleName
@@ -288,34 +285,8 @@ FunctionalParameter ParameterHandlerGeneric::GetFunctionalParameters(const YAML:
   FunctionalParameter func;
   GetBaseParameter(param, Index, func);
 
-  func.pdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavour"], std::vector<int>(), __FILE__ , __LINE__);
-  func.targets = GetFromManager<std::vector<int>>(param["TargetNuclei"], std::vector<int>(), __FILE__ , __LINE__);
   func.modes = GetFromManager<std::vector<int>>(param["Mode"], std::vector<int>(), __FILE__ , __LINE__);
-  func.preoscpdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavourUnosc"], std::vector<int>(), __FILE__ , __LINE__);
 
-  // HH - Copied from GetXsecNorm
-  int NumKinematicCuts = 0;
-  if(param["KinematicCuts"]) {
-    NumKinematicCuts = int(param["KinematicCuts"].size());
-
-    std::vector<std::string> TempKinematicStrings;
-    std::vector<std::vector<std::vector<double>>> TempKinematicBounds;
-    //First element of TempKinematicBounds is always -999, and size is then 3
-    for(int KinVar_i = 0 ; KinVar_i < NumKinematicCuts ; ++KinVar_i){
-      //ETA: This is a bit messy, Kinematic cuts is a list of maps
-      for (YAML::const_iterator it = param["KinematicCuts"][KinVar_i].begin();it!=param["KinematicCuts"][KinVar_i].end();++it) {
-        TempKinematicStrings.push_back(it->first.as<std::string>());
-        TempKinematicBounds.push_back(Get2DBounds(it->second));
-      }
-      if(TempKinematicStrings.size() == 0) {
-        MACH3LOG_ERROR("Received a KinematicCuts node but couldn't read the contents (it's a list of single-element dictionaries (python) = map of pairs (C++))");
-        MACH3LOG_ERROR("For Param {}", func.name);
-        throw MaCh3Exception(__FILE__, __LINE__);
-      }
-    }//KinVar_i
-    func.KinematicVarStr = TempKinematicStrings;
-    func.Selection = TempKinematicBounds;
-  }
   func.valuePtr = RetPointer(Index);
   return func;
 }

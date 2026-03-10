@@ -15,6 +15,7 @@
 /// @brief Contains structures and helper functions for handling spline representations of systematic parameters in the MaCh3.
 /// @author Clarence Wret
 /// @author Kamil Skwarczynski
+/// @author Ewan Miller
 
 // *******************
 /// @brief CW: Add a struct to hold info about the splinified xsec parameters and help with FindSplineSegment
