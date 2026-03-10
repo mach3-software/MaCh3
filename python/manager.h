@@ -13,11 +13,7 @@
 
 namespace py = pybind11;
 
-void initManagerModule(py::module &m){
-
-    auto m_manager = m.def_submodule("manager");
-    m_manager.doc() = 
-        "This is a Python binding of MaCh3s C++ based manager library.";
+void initManagerModule(py::module &m_manager){
 
     // Bind some of the cpp-yaml library 
     // shamelessly stolen from stackoverflow: https://stackoverflow.com/questions/62347521/using-pybind11-to-wrap-yaml-cpp-iterator
@@ -78,7 +74,7 @@ void initManagerModule(py::module &m){
         .def("second", [](YAML::detail::iterator_value& val) { return val.second;})
         ;
 
-    m.def("load_file", &YAML::LoadFile, "");
+    m_manager.def("load_file", &YAML::LoadFile, "");
 
     py::class_<Manager>(m_manager, "Manager")
         .def(
