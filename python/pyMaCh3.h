@@ -13,6 +13,9 @@
 #include "python/parameters.h"
 #include "python/splines.h"
 
+/// @brief Base binder class which is used to set up python bindings.
+/// Experiments should derive from this to allow them to insert specialised classes into the
+/// pyMaCh3 module
 class MaCh3PyBinder {
 
   public:
@@ -31,7 +34,8 @@ class MaCh3PyBinder {
     }
 
   private:
-    // these can be overwritten by experiments to set up their own pyMaCh3
+    ///@{ 
+    //**These can be overwritten by experiments to set up their own pyMaCh3
     virtual void initParametersExperiment(py::module &m_parameters) { (void)m_parameters; }
     virtual void initPlottingExperiment(py::module &m_plotting)     { (void)m_plotting;   }
     virtual void initFittersExperiment(py::module &m_fitters)       { (void)m_fitters;    }
@@ -39,6 +43,7 @@ class MaCh3PyBinder {
     virtual void initManagerExperiment(py::module &m_manager)       { (void)m_manager;    }
     virtual void initSplinesExperiment(py::module &m_splines)       { (void)m_splines;    }
     virtual void initModulesExperiment(py::module &m)               { (void)m;            }
+    ///@}
 
     // These functions will be called to set up each of the python modules
     // they call the core init<module name> functions and then the experiment
@@ -100,6 +105,10 @@ class MaCh3PyBinder {
 
 };
 
+/*! 
+   \brief Initialises the pyMaCh3 module.
+   \param PYBINDER_CLASS The experiments binder class (derived from MaCh3PyBinder) which defines the binding.
+*/
 #define MAKE_PYMACH3_MDULE( PYBINDER_CLASS ) \
 PYBIND11_MODULE( _pyMaCh3, m ) {             \
     PYBINDER_CLASS().initialise(m);          \
