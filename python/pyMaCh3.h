@@ -32,40 +32,70 @@ class MaCh3PyBinder {
 
   private:
     // these can be overwritten by experiments to set up their own pyMaCh3
-    virtual void initParametersExperiment(py::module &m) { (void)m; }
-    virtual void initPlottingExperiment(py::module &m) { (void)m; }
-    virtual void initFittersExperiment(py::module &m) { (void)m; }
-    virtual void initSamplesExperiment(py::module &m) { (void)m; }
-    virtual void initManagerExperiment(py::module &m) { (void)m; }
-    virtual void initSplinesExperiment(py::module &m) { (void)m; }
-
+    virtual void initParametersExperiment(py::module &m_parameters) { (void)m_parameters; }
+    virtual void initPlottingExperiment(py::module &m_plotting)     { (void)m_plotting;   }
+    virtual void initFittersExperiment(py::module &m_fitters)       { (void)m_fitters;    }
+    virtual void initSamplesExperiment(py::module &m_samples)       { (void)m_samples;    }
+    virtual void initManagerExperiment(py::module &m_manager)       { (void)m_manager;    }
+    virtual void initSplinesExperiment(py::module &m_splines)       { (void)m_splines;    }
+    virtual void initModulesExperiment(py::module &m)               { (void)m;            }
 
     // These functions will be called to set up each of the python modules
     // they call the core init<module name> functions and then the experiment
     // specific ones
     void initPlotting(py::module &m) {
-        initPlottingModule(m); // <- defined in python/plotting.cpp
-        initPlottingExperiment(m);
+
+        auto m_plotting = m.def_submodule("plotting");
+        m_plotting.doc() = "This is a Python binding of MaCh3s C++ based plotting library.";
+
+        initPlottingModule(m_plotting); // <- defined in python/plotting.cpp
+        initPlottingExperiment(m_plotting);
     }
     void initFitters(py::module &m) {
-        initFittersModule(m); // <- defined in python/fitters.cpp
-        initFittersExperiment(m);
+
+        auto m_fitters = m.def_submodule("fitters");
+        m_fitters.doc() =
+            "This is a Python binding of MaCh3s C++ fitters library.";
+
+        initFittersModule(m_fitters); // <- defined in python/fitters.cpp
+        initFittersExperiment(m_fitters);
     }
     void initSamples(py::module &m) {
-        initSamplesModule(m); // <- defined in python/samples.cpp
-        initSamplesExperiment(m);
+
+        auto m_samples = m.def_submodule("samples");
+
+        m_samples.doc() =
+            "This is a Python binding of MaCh3s C++ based samples library.";
+            
+        initSamplesModule(m_samples); // <- defined in python/samples.cpp
+        initSamplesExperiment(m_samples);
     }
     void initManager(py::module &m) {
-        initManagerModule(m); // <- defined in python/manager.cpp
-        initManagerExperiment(m);
+
+        auto m_manager = m.def_submodule("manager");
+        m_manager.doc() = 
+            "This is a Python binding of MaCh3s C++ based manager library.";
+            
+        initManagerModule(m_manager); // <- defined in python/manager.cpp
+        initManagerExperiment(m_manager);
     }
     void initParameters(py::module &m) {
-        initParametersModule(m); // <- defined in python/parameters.cpp
-        initParametersExperiment(m);
+
+        auto m_parameters = m.def_submodule("parameters");
+        m_parameters.doc() =
+            "This is a Python binding of MaCh3s C++ parameters library.";
+
+        initParametersModule(m_parameters); // <- defined in python/parameters.cpp
+        initParametersExperiment(m_parameters);
     }
     void initSplines(py::module &m) {
-        initSplinesModule(m); // <- defined in python/splines.cpp
-        initSplinesExperiment(m);
+
+        auto m_splines = m.def_submodule("splines");
+        m_splines.doc() = 
+            "This is a Python binding of MaCh3s C++ based spline library.";
+
+        initSplinesModule(m_splines); // <- defined in python/splines.cpp
+        initSplinesExperiment(m_splines);
     }
 
 };

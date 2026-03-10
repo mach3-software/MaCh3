@@ -488,12 +488,7 @@ public:
     }
 };
 
-void initSamplesModule(py::module &m){
-
-    auto m_samples = m.def_submodule("samples");
-
-    m_samples.doc() =
-        "This is a Python binding of MaCh3s C++ based samples library.";
+void initSamplesModule(py::module &m_samples){
 
     // Bind the systematic type enum that lets us set different types of systematics
     py::enum_<TestStatistic>(m_samples, "TestStatistic")

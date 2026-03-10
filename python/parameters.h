@@ -40,12 +40,7 @@ public:
 };
 
 
-void initParametersModule(py::module &m){
-
-    auto m_parameters = m.def_submodule("parameters");
-    m_parameters.doc() =
-        "This is a Python binding of MaCh3s C++ parameters library.";
-
+void initParametersModule(py::module &m_parameters){
     
     // Bind the systematic type enum that lets us set different types of systematics
     py::enum_<SystType>(m_parameters, "SystematicType")
