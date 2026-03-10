@@ -7,10 +7,10 @@ mach3_dir = f"{os.path.join(os.path.split(os.path.realpath(__file__))[0])}"
 lib_dir = f"{mach3_dir}/lib"
 
 ## load up root libraries
-ctypes.cdll.LoadLibrary(f'/home/ewan/ROOT/root/lib/libTree.so')
-ctypes.cdll.LoadLibrary(f'/home/ewan/ROOT/root/lib/libGpad.so')
-ctypes.cdll.LoadLibrary(f'/home/ewan/ROOT/root/lib/libHist.so')
-ctypes.cdll.LoadLibrary(f'/home/ewan/ROOT/root/lib/libCore.so')
+ctypes.cdll.LoadLibrary(f'@ROOT_LIBRARY_DIR@/libTree.so')
+ctypes.cdll.LoadLibrary(f'@ROOT_LIBRARY_DIR@/libGpad.so')
+ctypes.cdll.LoadLibrary(f'@ROOT_LIBRARY_DIR@/libHist.so')
+ctypes.cdll.LoadLibrary(f'@ROOT_LIBRARY_DIR@/libCore.so')
 
 ## load all the core libraries
 ctypes.cdll.LoadLibrary(f'{lib_dir}/core/libyaml-cpp.so')
@@ -31,9 +31,6 @@ print(other_libs)
 
 for lib in other_libs:
     ctypes.cdll.LoadLibrary(f"{lib_dir}/other/lib{lib}.so")
-
-ctypes.cdll.LoadLibrary(f'@ROOT_LIBRARY_DIR@/libCore.so')
-ctypes.cdll.LoadLibrary(f'@ROOT_LIBRARY_DIR@/libTree.so')
 
 ## set the MaCh3 environment var
 os.environ["MaCh3_ROOT"] = "@MaCh3_BUILD_PATH@"
