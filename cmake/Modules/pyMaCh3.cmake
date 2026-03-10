@@ -17,11 +17,11 @@ function(setup_pyMaCh3)
     set(INSTALL_DIR ${ARGS_INSTALL_DIR})
   endif()
 
-  message("Making pyMaCh3 library")
-  message("install dir:              ${INSTALL_DIR}")
-  message("Binding definition files: ${ARGS_BINDING_FILES}")
-  message("linking targets:          ${ARGS_LINK_TARGETS}")
-  message("extra modules:            ${ARGS_EXTRA_MODULES}")
+  cmessage(STATUS "Making pyMaCh3 library")
+  cmessage(STATUS "  - Install dir:              ${INSTALL_DIR}")
+  cmessage(STATUS "  - Binding definition files: ${ARGS_BINDING_FILES}")
+  cmessage(STATUS "  - Linking targets:          ${ARGS_LINK_TARGETS}")
+  cmessage(STATUS "  - Extra modules:            ${ARGS_EXTRA_MODULES}")
 
   ################################# pybind11 stuff ##################################
   ## EM: make a module target out of all the python*Module.cpp files (currently just one...)
@@ -33,8 +33,6 @@ function(setup_pyMaCh3)
   ## so would be good to find a way around this.
   set_property( TARGET _pyMaCh3 PROPERTY POSITION_INDEPENDENT_CODE ON )
   target_link_libraries( _pyMaCh3 PRIVATE MaCh3::All ${ARGS_LINK_TARGETS} )
-
-  message ( "INSTALLING pyMaCh3 to ${INSTALL_DIR}" )
   
   ## install our pybind11 object
   install( TARGETS _pyMaCh3 DESTINATION ${INSTALL_DIR}/ )
@@ -70,7 +68,6 @@ function(setup_pyMaCh3)
   ## install any experiment specific libraries into python lib dir
   set(LINK_TARGET_LIB_LIST "")
   foreach(link_target ${ARGS_LINK_TARGETS})
-    message("link_target: ${link_target}")
     install( TARGETS ${ARGS_LINK_TARGETS} DESTINATION ${INSTALL_DIR}/lib/other )
     set(LINK_TARGET_LIB_LIST "${LINK_TARGET_LIB_LIST}\"${link_target}\", ")
   endforeach()
@@ -91,7 +88,6 @@ function(setup_pyMaCh3)
   endif()
 
   ## generate our module __init__ file
-  message("__init__.py template file: ${MaCh3_PYTHON_INIT_TEMPLATE}")
   configure_package_config_file(
     ${MaCh3_PYTHON_INIT_TEMPLATE} ${INSTALL_DIR}/__init__.py
     INSTALL_DESTINATION
