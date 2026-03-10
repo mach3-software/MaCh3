@@ -3,7 +3,7 @@ function(setup_pyMaCh3)
   cmake_parse_arguments(
     ARGS
     "" 
-    "TARGET_NAME;INSTALL_DIR"
+    "INSTALL_DIR"
     "BINDING_FILES;LINK_TARGETS;EXTRA_MODULES"
     "${ARGN}"
   )
@@ -15,7 +15,6 @@ function(setup_pyMaCh3)
   endif()
 
   message("Making pyMaCh3 library")
-  message("Target name:              ${ARGS_TARGET_NAME}")
   message("install dir:              ${INSTALL_DIR}")
   message("Binding definition files: ${ARGS_BINDING_FILES}")
   message("linking targets:          ${ARGS_LINK_TARGETS}")
@@ -24,18 +23,18 @@ function(setup_pyMaCh3)
   ################################# pybind11 stuff ##################################
   ## EM: make a module target out of all the python*Module.cpp files (currently just one...)
   pybind11_add_module(
-    ${ARGS_TARGET_NAME} MODULE
+    _pyMaCh3 MODULE
     ${ARGS_BINDING_FILES}
   )
   ## EM: only works with code compiled with -fPIC enabled.. I think this flag can make things slightly slower
   ## so would be good to find a way around this.
-  set_property( TARGET ${ARGS_TARGET_NAME} PROPERTY POSITION_INDEPENDENT_CODE ON )
-  target_link_libraries( ${ARGS_TARGET_NAME} PRIVATE MaCh3::All ${ARGS_LINK_TARGETS} )
+  set_property( TARGET _pyMaCh3 PROPERTY POSITION_INDEPENDENT_CODE ON )
+  target_link_libraries( _pyMaCh3 PRIVATE MaCh3::All ${ARGS_LINK_TARGETS} )
 
   message ( "INSTALLING pyMaCh3 to ${INSTALL_DIR}" )
   
   ## install our pybind11 object
-  install( TARGETS ${ARGS_TARGET_NAME} DESTINATION ${INSTALL_DIR}/ )
+  install( TARGETS _pyMaCh3 DESTINATION ${INSTALL_DIR}/ )
 
   ## create directory inside our python module to hold MaCh3 libraries
   file(MAKE_DIRECTORY ${INSTALL_DIR}/lib)       
@@ -47,7 +46,7 @@ function(setup_pyMaCh3)
     set(MaCh3_LIB_DIR ${PROJECT_BINARY_DIR}/lib)
   endif()
 
-  add_custom_command(TARGET ${ARGS_TARGET_NAME} POST_BUILD
+  add_custom_command(TARGET _pyMaCh3 POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy ${MaCh3_LIB_DIR}/* ${INSTALL_DIR}/lib/core
     COMMAND_EXPAND_LISTS
   )

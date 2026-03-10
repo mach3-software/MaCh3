@@ -303,7 +303,6 @@ set(MaCh3_PYTHON_INIT_TEMPLATE ${CMAKE_CURRENT_LIST_DIR}/cmake/Templates/__init_
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/pyMaCh3.cmake)
 if (MaCh3_PYTHON_ENABLED)
   setup_pyMaCh3(
-    TARGET_NAME _pyMaCh3 
     INSTALL_DIR ${MaCh3_PYTHON_INSTALL_DIR} 
     BINDING_FILES python/pyMaCh3.cpp
   )
