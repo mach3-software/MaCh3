@@ -75,8 +75,6 @@ function(setup_pyMaCh3)
     set(MaCh3_BUILD_PATH ${MaCh3_PREFIX})
   endif()
 
-  message("aaaa ${MaCh3_BUILD_PATH}")
-
   ## generate our module __init__ file
   message("__init__.py template file: ${MaCh3_PYTHON_INIT_TEMPLATE}")
   configure_package_config_file(
