@@ -1,5 +1,8 @@
 function(setup_pyMaCh3)
 
+  include(CMakePackageConfigHelpers)
+  find_package(pybind11)
+  
   cmake_parse_arguments(
     ARGS
     "" 
@@ -42,15 +45,28 @@ function(setup_pyMaCh3)
   file(MAKE_DIRECTORY ${INSTALL_DIR}/lib/other) ## <- where we will copy any experiment libs
   
   ## copy all the core libraries into our python module lib folder
-  if ( NOT MaCh3_LIB_DIR )
-    set(MaCh3_LIB_DIR ${PROJECT_BINARY_DIR}/lib)
+  if ( MaCh3_LIB_DIR ) ## we are installing in experimet 
+    add_custom_command(TARGET _pyMaCh3 POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy ${MaCh3_LIB_DIR}/* ${INSTALL_DIR}/lib/core 
+      COMMAND_EXPAND_LISTS
+    )
+  else() ## we are installing core pyMaCh3 - so libs haven't been installed yet so can't just copy them
+    install(
+      TARGETS
+        yaml-cpp
+        OscProbCalcer
+        Oscillator
+        spdlog
+        Manager
+        SplineDict
+        Parameters
+        Splines
+        Samples
+        Fitters
+        Plotting
+      LIBRARY DESTINATION ${INSTALL_DIR}/lib/core)
   endif()
 
-  add_custom_command(TARGET _pyMaCh3 POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy ${MaCh3_LIB_DIR}/* ${INSTALL_DIR}/lib/core
-    COMMAND_EXPAND_LISTS
-  )
-  
   ## install any experiment specific libraries into python lib dir
   set(LINK_TARGET_LIB_LIST "")
   foreach(link_target ${ARGS_LINK_TARGETS})
