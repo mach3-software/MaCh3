@@ -26,7 +26,7 @@ jobs:
     - name: Install pyMaCh3
       run: |
         mkdir /python-test-modules
-        pip install . -t /python-test-modules/
+        pip install .
         
     - name: Get MaCh3 Validations
       run: |
@@ -36,7 +36,7 @@ jobs:
     - name: Install pytest
       working-directory: /opt/MaCh3Validations
       run: |
-        pip install -r ./CIValidations/PythonTests/requirements.txt -t /python-test-modules/
+        pip install -r ./CIValidations/PythonTests/requirements.txt
         
     - name: Validations
       working-directory: /opt/MaCh3Validations
