@@ -553,24 +553,20 @@ void initSamplesModule(py::module &m){
 
         .def(
             "get_mc_hist",
-            [](SampleHandlerFD &self, const int Dimension) {
+            [](SampleHandlerFD &self, const int sample) {
+
+              int Dimension = self.GetNDim(sample);
 
               //self.Reweight();
               
               // Get the histogram pointer BEFORE cloning
-              TH1 *hist_original = self.GetMCHist(Dimension);
+              TH1 *hist_original = self.GetMCHist(sample);
               
               // Debug: Check the original histogram
               std::cout << "=== ORIGINAL HISTOGRAM ===" << std::endl;
               if (!hist_original) {
                 throw std::runtime_error("GetMCHist returned null pointer");
               }
-              std::cout << "Dimension is " << Dimension << std::endl;
-              std::cout << "Original histogram address: " << hist_original << std::endl;
-              std::cout << "Original histogram name: " << hist_original->GetName() << std::endl;
-              std::cout << "Original histogram bins: " << hist_original->GetNbinsX() << std::endl;
-              std::cout << "Original histogram integral: " << hist_original->Integral() << std::endl;
-              std::cout << "Original histogram entries: " << hist_original->GetEntries() << std::endl;
               
               // Print first few bin contents
               std::cout << "First 5 bin contents of original:" << std::endl;
@@ -612,7 +608,7 @@ void initSamplesModule(py::module &m){
               }
             },
             py::return_value_policy::reference_internal,
-            py::arg("Dimension"),
+            py::arg("sample"),
             "Get MC histogram as numpy arrays.\n"
             "For 1D: Returns (contents, edges)\n"
             "For 2D: Returns (contents, edgesX, edgesY)\n"
@@ -620,9 +616,11 @@ void initSamplesModule(py::module &m){
 
         .def(
             "get_data_hist",
-            [](SampleHandlerFD &self, const int Dimension) {
-              TH1 *hist = self.GetDataHist(Dimension);
+            [](SampleHandlerFD &self, const int sample) {
+              TH1 *hist = self.GetDataHist(sample);
 
+              int Dimension = self.GetNDim(sample);
+              
               if (Dimension == 1) {
                 // 1D histogram
                 auto [contents, edgesX] = TH1ToNumpy(hist);
