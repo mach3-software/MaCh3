@@ -52,7 +52,7 @@ function(setup_pyMaCh3)
   file(MAKE_DIRECTORY ${INSTALL_DIR}/lib/other) ## <- where we will copy any experiment libs
   
   ## set location of the __init__.py template
-  set(MaCh3_PYTHON_INIT_TEMPLATE ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../cmake/Templates/__init__.py.in)
+  set(MaCh3_PYTHON_INIT_TEMPLATE ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../Templates/__init__.py.in)
 
   ## copy all the core libraries into our python module lib folder
   if ( MaCh3_LIB_DIR ) ## we are installing in experimet 
