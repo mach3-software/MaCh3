@@ -521,6 +521,12 @@ void initSamplesModule(py::module &m_samples){
                 auto edgesY = py::array_t<double>();
                 return py::make_tuple(contents, edgesX, edgesY);
               } else if (Dimension == 2) {
+
+                if ( !self.GetBinningHandler()->IsUniform(sample) ) {
+                    /// @todo Deal with non uniform binning
+                    throw std::runtime_error("pyMaCh3 can't do non-uniform binning for now :(");
+                }
+
                 // 2D histogram - cast to TH2
                 TH2 *hist2d = dynamic_cast<TH2 *>(hist);
                 if (!hist2d) {
@@ -529,6 +535,9 @@ void initSamplesModule(py::module &m_samples){
                 auto [contents, edgesX, edgesY] = TH2ToNumpy(hist2d);
                 return py::make_tuple(contents, edgesX, edgesY);
               } else {
+                /// @todo Deal with higher dimensions
+                /// MaCh3 returns flattened bins, will need to figure out how
+                /// to pass bin edge info into python
                 throw std::invalid_argument("Dimension must be 1 or 2");
               }
             },
@@ -552,6 +561,12 @@ void initSamplesModule(py::module &m_samples){
                 auto edgesY = py::array_t<double>();
                 return py::make_tuple(contents, edgesX, edgesY);
               } else if (Dimension == 2) {
+
+                if ( !self.GetBinningHandler()->IsUniform(sample) ) {
+                    /// @todo Deal with non uniform binning
+                    throw std::runtime_error("pyMaCh3 can't do non-uniform binning for now :(");
+                }
+                
                 // 2D histogram - cast to TH2
                 TH2 *hist2d = dynamic_cast<TH2 *>(hist);
                 if (!hist2d) {
@@ -560,6 +575,9 @@ void initSamplesModule(py::module &m_samples){
                 auto [contents, edgesX, edgesY] = TH2ToNumpy(hist2d);
                 return py::make_tuple(contents, edgesX, edgesY);
               } else {
+                /// @todo Deal with higher dimensions
+                /// MaCh3 returns flattened bins, will need to figure out how
+                /// to pass bin edge info into python
                 throw std::invalid_argument("Dimension must be 1 or 2");
               }
             },
@@ -571,8 +589,10 @@ void initSamplesModule(py::module &m_samples){
 
         .def(
             "get_w2_hist",
-            [](SampleHandlerFD &self, const int Dimension) {
-              TH1 *hist = self.GetW2Hist(Dimension);
+            [](SampleHandlerFD &self, const int sample) {
+              TH1 *hist = self.GetW2Hist(sample);
+
+              int Dimension = self.GetNDim(sample);
 
               if (Dimension == 1) {
                 // 1D histogram
@@ -580,6 +600,12 @@ void initSamplesModule(py::module &m_samples){
                 auto edgesY = py::array_t<double>();
                 return py::make_tuple(contents, edgesX, edgesY);
               } else if (Dimension == 2) {
+
+                if ( !self.GetBinningHandler()->IsUniform(sample) ) {
+                    /// @todo Deal with non uniform binning
+                    throw std::runtime_error("pyMaCh3 can't do non-uniform binning for now :(");
+                }
+                
                 // 2D histogram - cast to TH2
                 TH2 *hist2d = dynamic_cast<TH2 *>(hist);
                 if (!hist2d) {
@@ -588,10 +614,13 @@ void initSamplesModule(py::module &m_samples){
                 auto [contents, edgesX, edgesY] = TH2ToNumpy(hist2d);
                 return py::make_tuple(contents, edgesX, edgesY);
               } else {
+                /// @todo Deal with higher dimensions
+                /// MaCh3 returns flattened bins, will need to figure out how
+                /// to pass bin edge info into python
                 throw std::invalid_argument("Dimension must be 1 or 2");
               }
             },
-            py::arg("Dimension"),
+            py::arg("sample"),
             "Get W2 histogram as numpy arrays.\n"
             "For 1D: Returns (contents, edges)\n"
             "For 2D: Returns (contents, edgesX, edgesY)\n"
