@@ -16,7 +16,7 @@
 /// @param[in,out] nudock_ptr Unique pointer that will own the newly created NuDock object.
 /// @throw MaCh3Exception if no NuDock configuration is found, or if an
 ///        unsupported communication type / verbosity level is specified.
-void InitialiseNuDockObj(manager *man, std::unique_ptr<NuDock> &nudock_ptr);
+void InitialiseNuDockObj(Manager *man, std::unique_ptr<NuDock> &nudock_ptr);
 
 /// @brief Convert an oscillation parameter value from MaCh3 convention to NuDock convention.
 ///

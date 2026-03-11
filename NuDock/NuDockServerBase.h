@@ -27,7 +27,7 @@ class NuDockServerBase : public FitterBase {
 public:
   /// @brief Construct the NuDock server.
   /// @param fitMan Pointer to the MaCh3 manager that owns fit configuration.
-  NuDockServerBase(manager * const fitMan);
+  NuDockServerBase(Manager* const fitMan);
 
   /// @brief Destructor.
   virtual ~NuDockServerBase();

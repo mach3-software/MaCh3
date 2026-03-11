@@ -41,7 +41,7 @@ const std::unordered_map<std::string, VerbosityLevel> VerbosityLevelMap = {
   {"ERROR", VerbosityLevel::ERROR}
 };
 
-void InitialiseNuDockObj(manager *man,
+void InitialiseNuDockObj(Manager *man,
                                 std::unique_ptr<NuDock> &nudock_ptr) {
   // Here man can be either the sample manager or the fit manager, as long as it
   // has the NuDock config

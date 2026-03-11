@@ -72,6 +72,55 @@ public:
   /// @return Always returns 0 - oscillation channels are managed server-side.
   virtual int GetNOscChannels(const int iSample) const override { (void)iSample; return 0; };
 
+  // Functions for posterior predictive - left unimplemented in the base class since they are not needed for likelihood evaluation and may require experiment-specific handling
+  /// @brief Return Kinematic Variable name for specified sample and dimension for example "Reconstructed_Neutrino_Energy"
+  /// @param iSample Sample index
+  /// @param Dimension Dimension index
+  virtual std::string GetKinVarName(const int iSample, const int Dimension) const override { (void)iSample; (void)Dimension; return ""; };
+
+  /// @brief Get Data histogram
+  virtual TH1* GetDataHist(const int Sample) override { (void)Sample; return nullptr; };
+  /// @brief Get MC histogram
+  virtual TH1* GetMCHist(const int Sample) override { (void)Sample; return nullptr; };
+  /// @brief Get W2 histogram
+  virtual TH1* GetW2Hist(const int Sample) override { (void)Sample; return nullptr; };
+
+  /// @brief DB Function to differentiate 1D or 2D binning
+  virtual int GetNDim(const int Sample) const override { (void)Sample; return 0; };
+  virtual std::string GetFlavourName(const int iSample, const int iChannel) const override { (void)iSample; (void)iChannel; return ""; };
+
+  /// @brief Return the binning used to draw a kinematic parameter
+  virtual std::vector<double> ReturnKinematicParameterBinning(const int Sample, const std::string &KinematicParameter) const override { (void)Sample; (void)KinematicParameter; return {}; };
+
+  virtual TH1* Get1DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_Str,
+                                            int kModeToFill = -1, int kChannelToFill = -1, int WeightStyle = 0, TAxis* Axis = nullptr) override { 
+    (void)iSample; (void)ProjectionVar_Str; (void)kModeToFill; (void)kChannelToFill; (void)WeightStyle; (void)Axis;
+    return nullptr;
+  };
+
+  virtual TH2* Get2DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_StrX,
+                                            const std::string& ProjectionVar_StrY, int kModeToFill = -1,
+                                            int kChannelToFill = -1, int WeightStyle = 0,
+                                            TAxis* AxisX = nullptr, TAxis* AxisY = nullptr) override { 
+    (void)iSample; (void)ProjectionVar_StrX; (void)ProjectionVar_StrY; (void)kModeToFill; (void)kChannelToFill; (void)WeightStyle; (void)AxisX; (void)AxisY;
+    return nullptr;
+  };
+
+  virtual TH1 *Get1DVarHist(const int iSample, const std::string &ProjectionVar,
+                           const std::vector<KinematicCut> &EventSelectionVec = {}, int WeightStyle = 0,
+                            TAxis *Axis = nullptr, const std::vector<KinematicCut> &SubEventSelectionVec = {}) override {
+    (void)iSample; (void)ProjectionVar; (void)EventSelectionVec; (void)WeightStyle; (void)Axis; (void)SubEventSelectionVec;
+    return nullptr;
+  };
+
+  virtual TH2* Get2DVarHist(const int iSample, const std::string& ProjectionVarX, const std::string& ProjectionVarY,
+                            const std::vector< KinematicCut >& EventSelectionVec = {},
+                            int WeightStyle = 0, TAxis* AxisX = nullptr, TAxis* AxisY = nullptr,
+                            const std::vector< KinematicCut >& SubEventSelectionVec = {}) override {
+    (void)iSample; (void)ProjectionVarX; (void)ProjectionVarY; (void)EventSelectionVec; (void)WeightStyle; (void)AxisX; (void)AxisY; (void)SubEventSelectionVec;
+    return nullptr;
+  };
+
 
 protected:
   /// @brief No-op -- memory cleanup is handled by the NuDock server.
@@ -87,7 +136,7 @@ protected:
   std::unique_ptr<NuDock> nudock_ptr;
 
   /// @brief Manager owning the NuDockClient configuration.
-  std::unique_ptr<manager> SampleManager;
+  std::unique_ptr<Manager> SampleManager;
 
   /// @brief Verbose logging flag, read from the NuDockClient config block.
   bool verbose;

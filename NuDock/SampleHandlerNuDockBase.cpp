@@ -10,7 +10,7 @@ SampleHandlerNuDockBase::SampleHandlerNuDockBase(std::string configFile, Paramet
   MACH3LOG_INFO("Creating SampleHandlerNuDock object..");
   MACH3LOG_INFO("- Using NuDock sample config in this file {}", configFile);
   ParHandler = xsec_cov;
-  SampleManager = std::make_unique<manager>(configFile.c_str());
+  SampleManager = std::make_unique<Manager>(configFile.c_str());
   verbose = GetFromManager(SampleManager->raw()["NuDockClient"]["Verbose"], false);
 
   // ReadConfig();

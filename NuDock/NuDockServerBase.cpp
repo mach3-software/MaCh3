@@ -3,7 +3,7 @@
 // ***************************************************************************
 /// @copydoc NuDockServerBase::NuDockServerBase
 // ***************************************************************************
-NuDockServerBase::NuDockServerBase(manager *man) : FitterBase(man) {
+NuDockServerBase::NuDockServerBase(Manager *man) : FitterBase(man) {
 }
 
 // ***************************************************************************
@@ -125,9 +125,9 @@ nlohmann::json NuDockServerBase::setAsimovPoint(const nlohmann::json &request) {
     if (auto* fd_casted_sample = dynamic_cast<SampleHandlerFD*>(samples[ipdf])) {
       for (int iSample = 0; iSample < samples[ipdf]->GetNsamples(); ++iSample) {
         if (fd_casted_sample->GetNDim(iSample) == 1) {
-          fd_casted_sample->AddData(iSample, (TH1D*)fd_casted_sample->GetMCHist(iSample, fd_casted_sample->GetNDim(iSample))->Clone());
+          fd_casted_sample->AddData(iSample, (TH1D*)fd_casted_sample->GetMCHist(iSample));
         } else if (fd_casted_sample->GetNDim(iSample) == 2) {
-          fd_casted_sample->AddData(iSample, (TH2D*)fd_casted_sample->GetMCHist(iSample, fd_casted_sample->GetNDim(iSample))->Clone());
+          fd_casted_sample->AddData(iSample, (TH2D*)fd_casted_sample->GetMCHist(iSample));
         } else {
           MACH3LOG_ERROR("Unsupported histogram dimension for SampleHandlerFD: {}", fd_casted_sample->GetNDim(iSample));
           throw MaCh3Exception(__FILE__, __LINE__);
@@ -174,7 +174,7 @@ nlohmann::json NuDockServerBase::getSpectrum(const nlohmann::json &request) {
         response["dimensions"][sample_title] = dimension;
 
         if (dimension == 1) {
-          TH1D* mc_hist = (TH1D*)fd_casted_sample->GetMCHist(iSample, dimension)->Clone();
+          TH1D* mc_hist = (TH1D*)fd_casted_sample->GetMCHist(iSample)->Clone();
 
           TAxis *ax = mc_hist->GetXaxis();
           std::string xtitle = ax->GetTitle(); 
@@ -191,7 +191,7 @@ nlohmann::json NuDockServerBase::getSpectrum(const nlohmann::json &request) {
           response["bin_edges"][sample_title] = {xbins};
           response["bin_values"][sample_title] = binvals;
         } else if (dimension == 2) {
-          TH2D* mc_hist = (TH2D*)fd_casted_sample->GetMCHist(iSample, dimension)->Clone();
+          TH2D* mc_hist = (TH2D*)fd_casted_sample->GetMCHist(iSample)->Clone();
 
           TAxis *x_axis = mc_hist->GetXaxis();
           std::string xtitle = x_axis->GetTitle();
