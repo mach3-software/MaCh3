@@ -1,33 +1,39 @@
 import os
 import ctypes
-import glob
+from pathlib import Path
 
 ## where are we????
-mach3_dir = f"{os.path.join(os.path.split(os.path.realpath(__file__))[0])}"
+mach3_dir = Path(__file__).resolve().parent
 lib_dir = f"{mach3_dir}/lib"
 
 ## load up root libraries
-ctypes.cdll.LoadLibrary(f'@ROOT_LIBRARY_DIR@/libTree.so')
-ctypes.cdll.LoadLibrary(f'@ROOT_LIBRARY_DIR@/libGpad.so')
-ctypes.cdll.LoadLibrary(f'@ROOT_LIBRARY_DIR@/libHist.so')
-ctypes.cdll.LoadLibrary(f'@ROOT_LIBRARY_DIR@/libCore.so')
+for lib in [
+        "libTree.so", 
+        "libGpad.so", 
+        "libHist.so", 
+        "libCore.so"
+    ]:
+    
+    ctypes.cdll.LoadLibrary(f'@ROOT_LIBRARY_DIR@/{lib}')
 
-## load all the core libraries
-ctypes.cdll.LoadLibrary(f'{lib_dir}/core/libyaml-cpp.so')
-ctypes.cdll.LoadLibrary(f'{lib_dir}/core/libOscProbCalcer.so')
-ctypes.cdll.LoadLibrary(f'{lib_dir}/core/libOscillator.so')
-ctypes.cdll.LoadLibrary(f'{lib_dir}/core/libManager.so')
-ctypes.cdll.LoadLibrary(f'{lib_dir}/core/libSplineDict.so')
-ctypes.cdll.LoadLibrary(f'{lib_dir}/core/libParameters.so')
-ctypes.cdll.LoadLibrary(f'{lib_dir}/core/libSplines.so')
-ctypes.cdll.LoadLibrary(f'{lib_dir}/core/libSamples.so')
-ctypes.cdll.LoadLibrary(f'{lib_dir}/core/libFitters.so')
-ctypes.cdll.LoadLibrary(f'{lib_dir}/core/libPlotting.so')
+## load all the MaCh3 core libraries
+for lib in [
+        "libyaml-cpp.so", 
+        "libOscProbCalcer.so", 
+        "libOscillator.so", 
+        "libManager.so", 
+        "libSplineDict.so", 
+        "libParameters.so", 
+        "libSplines.so", 
+        "libSamples.so", 
+        "libFitters.so", 
+        "libPlotting.so"
+    ]:
+    
+    ctypes.cdll.LoadLibrary(f'{lib_dir}/core/{lib}')
 
 ## search for any experiment specific libraries
 other_libs = [@LINK_TARGET_LIB_LIST@]
-
-print(other_libs)
 
 for lib in other_libs:
     ctypes.cdll.LoadLibrary(f"{lib_dir}/other/lib{lib}.so")
