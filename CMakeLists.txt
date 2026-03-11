@@ -299,7 +299,6 @@ install(TARGETS MaCh3
 add_library(MaCh3::All ALIAS MaCh3)
 
 ## create the pyMaCh3 module for core if enabled
-set(MaCh3_PYTHON_INIT_TEMPLATE ${CMAKE_CURRENT_LIST_DIR}/cmake/Templates/__init__.py.in)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/pyMaCh3.cmake)
 if (MaCh3_PYTHON_ENABLED)
   setup_pyMaCh3(

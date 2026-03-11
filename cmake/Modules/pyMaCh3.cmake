@@ -57,6 +57,9 @@ function(setup_pyMaCh3)
       COMMAND ${CMAKE_COMMAND} -E copy ${MaCh3_LIB_DIR}/* ${INSTALL_DIR}/lib/core 
       COMMAND_EXPAND_LISTS
     )
+
+    set(MaCh3_PYTHON_INIT_TEMPLATE ${MaCh3_SOURCE_DIR}/cmake/Templates/__init__.py.in)
+    
   else() ## we are installing core pyMaCh3 - so libs haven't been installed yet so can't just copy them
     install(
       TARGETS
@@ -72,6 +75,8 @@ function(setup_pyMaCh3)
         Fitters
         Plotting
       LIBRARY DESTINATION ${INSTALL_DIR}/lib/core)
+
+      set(MaCh3_PYTHON_INIT_TEMPLATE ${CMAKE_CURRENT_LIST_DIR}/cmake/Templates/__init__.py.in)
   endif()
 
   ## install any experiment specific libraries into python lib dir
@@ -97,6 +102,7 @@ function(setup_pyMaCh3)
   endif()
 
   ## generate our module __init__ file
+  cmessage(STATUS "pyMaCh3 __init__.py template: ${MaCh3_PYTHON_INIT_TEMPLATE}")
   configure_package_config_file(
     ${MaCh3_PYTHON_INIT_TEMPLATE} ${INSTALL_DIR}/__init__.py
     INSTALL_DESTINATION
