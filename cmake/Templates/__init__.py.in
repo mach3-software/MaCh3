@@ -1,0 +1,46 @@
+import os
+import ctypes
+from pathlib import Path
+
+## where are we????
+mach3_dir = Path(__file__).resolve().parent
+lib_dir = f"{mach3_dir}/lib"
+
+## load up root libraries
+for lib in [
+        "libTree.so", 
+        "libGpad.so", 
+        "libHist.so", 
+        "libCore.so"
+    ]:
+    
+    ctypes.cdll.LoadLibrary(f'@ROOT_LIBRARY_DIR@/{lib}')
+
+## load all the MaCh3 core libraries
+for lib in [
+        "libyaml-cpp.so", 
+        "libOscProbCalcer.so", 
+        "libOscillator.so", 
+        "libManager.so", 
+        "libSplineDict.so", 
+        "libParameters.so", 
+        "libSplines.so", 
+        "libSamples.so", 
+        "libFitters.so", 
+        "libPlotting.so"
+    ]:
+    
+    ctypes.cdll.LoadLibrary(f'{lib_dir}/core/{lib}')
+
+## search for any experiment specific libraries
+other_libs = [@LINK_TARGET_LIB_LIST@]
+
+for lib in other_libs:
+    ctypes.cdll.LoadLibrary(f"{lib_dir}/other/lib{lib}.so")
+
+## set the MaCh3 environment var
+os.environ["MaCh3_ROOT"] = "@MaCh3_BUILD_PATH@"
+
+from ._pyMaCh3 import __doc__, fitters, manager, plotting, samples, splines, parameters @PYMACH3_ADDITIONAL_MODULE_IMPORT@
+
+__all__ = ["__doc__", "fitters", "manager", "plotting", "samples", "splines", "parameters" @PYMACH3_ADDITIONAL_MODULE_NAMES@]

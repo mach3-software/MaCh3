@@ -1,3 +1,8 @@
+#pragma once
+
+/// @file parameters.h
+/// @author Ewan Miller
+
 // pybind includes
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -35,11 +40,7 @@ public:
 };
 
 
-void initParameters(py::module &m) {
-    auto m_parameters = m.def_submodule("parameters");
-    m_parameters.doc() =
-        "This is a Python binding of MaCh3s C++ parameters library.";
-
+void initParametersModule(py::module &m_parameters){
     
     // Bind the systematic type enum that lets us set different types of systematics
     py::enum_<SystType>(m_parameters, "SystematicType")
@@ -115,18 +116,56 @@ void initParameters(py::module &m) {
             "get_proposal_array",
             [](ParameterHandlerBase &self)
             {
-                return py::memoryview::from_buffer<double>(
-                    self.GetParPropVec().data(), // the data pointer
-                    {self.GetNParameters()}, // shape
-                    {sizeof(double)} // shape
-                ); 
+                // Get the number of parameters
+                size_t n_pars = self.GetNParameters();
+                
+                // Get pointer to the data
+                const double* data_ptr = self.GetParPropVec().data();
+                
+                // Create a numpy array that copies the data
+                // This ensures the numpy array owns its data and won't have lifetime issues
+                py::array_t<double> result(n_pars);
+                auto buf = result.request();
+                double* result_ptr = static_cast<double*>(buf.ptr);
+                
+                // Copy the data
+                std::memcpy(result_ptr, data_ptr, n_pars * sizeof(double));
+                
+                return result;
             },
-            "Bind a python array to the parameter proposal values for this ParameterHandler object. \n\
-            This allows you to set e.g. a numpy array to 'track' the parameter proposal values. You could either use this to directly set the proposals, or to just read the values proposed by e.g. throw_par_prop() \n\
-            :warning: This should be set *AFTER* all of the parameters have been read in from the config file as it resizes the array to fit the number of parameters. \n\
-            :param array: This is the array that will be set. Size and contents don't matter as it will be changed to fit the parameters. "
+            "Get the parameter proposal values as a numpy array. \n\
+            This returns a copy of the current proposal values. \n\
+            :return: A numpy array containing the proposal values for all parameters."
         )
 
+        .def("set_parameters", 
+             [](ParameterHandlerBase& self, py::object pars_obj = py::none()) {
+                 if (pars_obj.is_none()) {
+                     self.SetParameters();
+                 } else {
+                     // This handles both numpy arrays and Python lists
+                     std::vector<double> pars_vec = pars_obj.cast<std::vector<double>>();
+                     self.SetParameters(pars_vec);
+                 }
+             },
+             py::arg("pars") = py::none(),
+             R"pbdoc(
+                 Set parameter values using array.
+                 
+                 Parameters
+                 ----------
+                 pars : numpy.ndarray or list of float, optional
+                     Array holding new values for every parameter.
+                     Must have same size as the number of parameters in the covariance class.
+                     If not provided, parameters are set to their pre-fit values.
+                     
+                 Examples
+                 --------
+                 >>> import numpy as np
+                 >>> handler.set_parameters(np.array([1.0, 2.0, 3.0]))
+                 >>> handler.set_parameters([1.0, 2.0, 3.0])
+                 >>> handler.set_parameters()
+             )pbdoc")
 
     ; // End of ParameterHandlerBase binding
 

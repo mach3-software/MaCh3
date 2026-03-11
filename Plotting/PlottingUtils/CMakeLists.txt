@@ -28,7 +28,7 @@ endif()
 install(TARGETS Plotting
     EXPORT MaCh3-targets
     LIBRARY DESTINATION lib/
-    PUBLIC_HEADER DESTINATION include/Plotting
+    PUBLIC_HEADER DESTINATION include/Plotting/PlottingUtils
 )
 
 add_library(MaCh3::Plotting ALIAS Plotting)

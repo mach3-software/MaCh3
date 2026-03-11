@@ -16,6 +16,11 @@ option(MaCh3_GPU_BENCHMARK "Perform fancy CUDA Benchmarking" OFF)
 option(MaCh3_NATIVE_ENABLED "Enable native CPU optimizations for improved performance during benchmarking)" OFF)
 option(MaCh3_GPU_ENABLED "Use GPU acceleration or not" ON)
 option(MaCh3_NuOsc_GPU_ENABLED "By default MaCh3 will use NuOscillator with GPU if MaCh3 is compiled with GPU, this flag allows disabling GPU for NuOscillator even if MaCh3 has GPU enabled" ON)
+set(MaCh3_PYTHON_INSTALL_DIR  CACHE STRING "The location to install the MaCh3 python module to (if MaCh3_PYTHON_ENABLED is set to ON). If not set then will be installed in the build location of MaCh3")
+
+if ("${MaCh3_PYTHON_INSTALL_DIR}" STREQUAL "")
+  set(MaCh3_PYTHON_INSTALL_DIR ${PROJECT_BINARY_DIR}/pyMaCh3)
+endif()
 
 #KS: Load cmake function like DefineEnabledRequiredSwitch allowing to write more compact cmake
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/Modules)
@@ -229,7 +234,7 @@ endif()
 
 set_target_properties(MaCh3CompilerOptions PROPERTIES EXPORT_NAME CompilerOptions)
 set_target_properties(MaCh3GPUCompilerOptions PROPERTIES EXPORT_NAME GPUCompilerOptions)
-install(TARGETS MaCh3CompilerOptions MaCh3GPUCompilerOptions MaCh3CompileDefinitions
+install(TARGETS MaCh3CompilerOptions MaCh3GPUCompilerOptions MaCh3CompileDefinitions MaCh3Warnings
     EXPORT MaCh3-targets
     LIBRARY DESTINATION lib/)
 
@@ -279,15 +284,12 @@ add_subdirectory(Samples)
 add_subdirectory(Fitters)
 add_subdirectory(Diagnostics)
 add_subdirectory(Plotting)
-if (MaCh3_PYTHON_ENABLED)
-  set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
-  add_subdirectory(python)
-endif()
+add_subdirectory(python)
 
 #This is to export the target properties of MaCh3
 #Anything that links to "MaCh3" will get all of these target properties
 add_library(MaCh3 INTERFACE)
-target_link_libraries(MaCh3 INTERFACE Fitters Samples Parameters Splines Manager MaCh3CompilerOptions MaCh3GPUCompilerOptions Plotting)
+target_link_libraries(MaCh3 INTERFACE Fitters Samples Parameters Splines Manager MaCh3CompilerOptions MaCh3GPUCompilerOptions Plotting pyMaCh3)
 set_target_properties(MaCh3 PROPERTIES EXPORT_NAME All)
 
 install(TARGETS MaCh3
@@ -295,6 +297,15 @@ install(TARGETS MaCh3
     LIBRARY DESTINATION lib/)
 
 add_library(MaCh3::All ALIAS MaCh3)
+
+## create the pyMaCh3 module for core if enabled
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/pyMaCh3.cmake)
+if (MaCh3_PYTHON_ENABLED)
+  setup_pyMaCh3(
+    INSTALL_DIR ${MaCh3_PYTHON_INSTALL_DIR} 
+    BINDING_FILES python/pyMaCh3.cpp
+  )
+endif()
 
 configure_file(cmake/Templates/setup.MaCh3.sh.in "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.MaCh3.sh" @ONLY)
 install(FILES "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.MaCh3.sh" DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)

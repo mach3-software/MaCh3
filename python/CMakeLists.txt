@@ -1,19 +1,30 @@
-
-################################# pybind11 stuff ##################################
-## EM: make a module target out of all the python*Module.cpp files (currently just one...)
-pybind11_add_module(
-  _pyMaCh3 MODULE
-  pyMaCh3.cpp
-  plotting.cpp
-  fitters.cpp
-  samples.cpp
-  manager.cpp
-  parameters.cpp
-  splines.cpp
+set(HEADERS
+  plotting.h
+  fitters.h
+  samples.h
+  manager.h
+  parameters.h
+  splines.h
+  pyMaCh3.h
 )
-## EM: only works with code compiled with -fPIC enabled.. I think this flag can make things slightly slower
-## so would be good to find a way around this.
-set_property( TARGET _pyMaCh3 PROPERTY POSITION_INDEPENDENT_CODE ON )
-target_link_libraries( _pyMaCh3 PRIVATE MaCh3::All NuOscillator yaml-cpp::yaml-cpp MaCh3Warnings )
-install( DIRECTORY pyMaCh3 DESTINATION ./ )
-install( TARGETS _pyMaCh3 DESTINATION pyMaCh3/ )
+
+add_library(pyMaCh3 INTERFACE)
+
+set_target_properties(pyMaCh3 PROPERTIES
+    PUBLIC_HEADER "${HEADERS}"
+    EXPORT_NAME pyMaCh3)
+
+target_include_directories(
+  pyMaCh3 
+  INTERFACE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
+  $<INSTALL_INTERFACE:include>
+)
+
+install(TARGETS pyMaCh3
+    EXPORT MaCh3-targets
+    LIBRARY DESTINATION lib/
+    PUBLIC_HEADER DESTINATION include/python
+)
+
+add_library(MaCh3::pyMaCh3 ALIAS pyMaCh3)

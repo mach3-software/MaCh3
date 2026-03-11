@@ -1,3 +1,8 @@
+#pragma once
+
+/// @file fitters.h
+/// @author Ewan Miller
+
 // pybind includes
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -44,11 +49,7 @@ public:
     }
 };
 
-void initFitters(py::module &m) {
-    auto m_fitters = m.def_submodule("fitters");
-    m_fitters.doc() =
-        "This is a Python binding of MaCh3s C++ fitters library.";
-    
+void initFittersModule(py::module &m_fitters){    
     
     py::class_<FitterBase, PyFitterBase /* <--- trampoline*/>(m_fitters, "FitterBase")
         .def(py::init<Manager* const>())
