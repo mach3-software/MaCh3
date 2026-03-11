@@ -1,7 +1,16 @@
 function(setup_pyMaCh3)
 
   include(CMakePackageConfigHelpers)
-  find_package(pybind11)
+  
+  ## get pybind dependency
+  set(PYBIND11_FINDPYTHON ON)
+  CPMFindPackage(
+      NAME pybind11
+      VERSION 2.13.5
+      GITHUB_REPOSITORY "pybind/pybind11"
+      GIT_SHALLOW YES
+      GIT_TAG v2.13.5
+    )
   
   cmake_parse_arguments(
     ARGS
