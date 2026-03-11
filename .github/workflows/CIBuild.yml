@@ -80,14 +80,8 @@ jobs:
       env:
         GITHUB_HEAD_REF: ${{ github.head_ref }}
 
-    - name: Free disk space for ICPX
-      run: |
-        echo "Performing full cleanup for ICPX build..."
-        sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc || true
-        docker system prune -af || true
-        sudo apt-get clean
-        sudo rm -rf /var/lib/apt/lists/*
-        df -h
+    # KS: Free some space, as some MaCh3 containers can be heavy...
+    - uses: ./.github/actions/free-disk-space
 
     - name: Build the Docker image
       run: |

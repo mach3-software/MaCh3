@@ -1,7 +1,7 @@
 #include "Fitters/DelayedMR2T2.h"
 
 // *************************
-DelayedMR2T2::DelayedMR2T2(manager * const manager) : MR2T2(manager) {
+DelayedMR2T2::DelayedMR2T2(Manager* const FitManager) : MR2T2(FitManager) {
 // *************************
     AlgorithmName = "DelayedMR2T2";
     // Step scale for delayed step = step scale prev delay * decay_rate

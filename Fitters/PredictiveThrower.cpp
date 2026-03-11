@@ -3,14 +3,23 @@
 #include "Parameters/ParameterHandlerGeneric.h"
 #include "TH3.h"
 
+//this file is choc full of usage of a root interface that only takes floats, turn this warning off for this CU for now
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+
 // *************************
-PredictiveThrower::PredictiveThrower(manager *man) : FitterBase(man) {
+PredictiveThrower::PredictiveThrower(Manager *man) : FitterBase(man) {
 // *************************
- AlgorithmName = "PredictiveThrower";
+  AlgorithmName = "PredictiveThrower";
   if(!CheckNodeExists(fitMan->raw(), "Predictive")) {
    MACH3LOG_ERROR("Predictive is missing in your main yaml config");
    throw MaCh3Exception(__FILE__ , __LINE__ );
   }
+
+  StandardFluctuation = GetFromManager<bool>(fitMan->raw()["Predictive"]["StandardFluctuation"], true, __FILE__, __LINE__ );
+
+  if(StandardFluctuation) MACH3LOG_INFO("Using standard method of statistical fluctuation");
+  else MACH3LOG_INFO("Using alternative method of statistical fluctuation, which is much slower");
 
   ModelSystematic = nullptr;
   // Use the full likelihood for the Prior/Posterior predictive pvalue
@@ -66,13 +75,7 @@ void PredictiveThrower::SetParamters() {
 void PredictiveThrower::SetupSampleInformation() {
 // *************************
   TotalNumberOfSamples = 0;
-  for (size_t iPDF = 0; iPDF < samples.size(); iPDF++)
-  {
-    auto* MaCh3Sample = dynamic_cast<SampleHandlerFD*>(samples[iPDF]);
-    if (!MaCh3Sample) {
-      MACH3LOG_ERROR("Sample {} do not inherit from SampleHandlerFD this is not implemented", samples[iPDF]->GetName());
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
+  for (size_t iPDF = 0; iPDF < samples.size(); iPDF++) {
     TotalNumberOfSamples += samples[iPDF]->GetNsamples();
   }
 
@@ -94,8 +97,7 @@ void PredictiveThrower::SetupSampleInformation() {
     for (int SampleIndex = 0; SampleIndex < samples[iPDF]->GetNsamples(); ++SampleIndex) {
       SampleInfo[counter].Name = samples[iPDF]->GetSampleTitle(SampleIndex);
       SampleInfo[counter].LocalId = SampleIndex;
-      SampleInfo[counter].SamHandler = dynamic_cast<SampleHandlerFD*>(samples[iPDF]);
-      SampleInfo[counter].Binning = SampleInfo[counter].SamHandler->GetBinningHandler();
+      SampleInfo[counter].SamHandler = samples[iPDF];
       SampleInfo[counter].Dimenstion = SampleInfo[counter].SamHandler->GetNDim(SampleIndex);
       counter++;
     }
@@ -126,14 +128,21 @@ void PredictiveThrower::SetupToyGeneration() {
     MCMCProcessor Processor(PosteriorFileName);
     Processor.Initialise();
 
+    // For throwing FD predictions from ND-only chain we have to allow having different yaml configs
+    auto AllowDifferentConfigs = GetFromManager<bool>(fitMan->raw()["Predictive"]["AllowDifferentConfigs"], false, __FILE__, __LINE__);
+
     ///Let's ask the manager what are the file with covariance matrix
     YAML::Node ConfigInChain = Processor.GetCovConfig(kXSecPar);
     if(ModelSystematic) {
       YAML::Node ConfigNow = ModelSystematic->GetConfig();
       if (!compareYAMLNodes(ConfigNow, ConfigInChain))
       {
-        MACH3LOG_ERROR("Yaml configs used for your ParameterHandler for chain you want sample from ({}) and one currently initialised are different", PosteriorFileName);
-        throw MaCh3Exception(__FILE__ , __LINE__ );
+        if(AllowDifferentConfigs){
+          MACH3LOG_WARN("Yaml configs used for your ParameterHandler for chain you want sample from ({}) and one currently initialised are different", PosteriorFileName);
+        } else {
+          MACH3LOG_ERROR("Yaml configs used for your ParameterHandler for chain you want sample from ({}) and one currently initialised are different", PosteriorFileName);
+          throw MaCh3Exception(__FILE__ , __LINE__ );
+        }
       }
     }
   }
@@ -284,13 +293,113 @@ bool PredictiveThrower::LoadToys() {
 }
 
 // *************************
+std::vector<std::string> PredictiveThrower::GetStoredFancyName(ParameterHandlerBase* Systematics) const {
+// *************************
+  TDirectory * ogdir = gDirectory;
+
+  std::vector<std::string> FancyNames;
+  std::string Name = std::string("Config_") + Systematics->GetName();
+  auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
+
+  TFile* file = TFile::Open(PosteriorFileName.c_str(), "READ");
+  TDirectory* CovarianceFolder = file->GetDirectory("CovarianceFolder");
+
+  TMacro* FoundMacro = static_cast<TMacro*>(CovarianceFolder->Get(Name.c_str()));
+  if(FoundMacro == nullptr) {
+    file->Close();
+    delete file;
+    if(ogdir){ ogdir->cd(); }
+
+    return FancyNames;
+  }
+  MACH3LOG_DEBUG("Found config for {}", Name);
+  YAML::Node Settings = TMacroToYAML(*FoundMacro);
+
+  int params = int(Settings["Systematics"].size());
+  FancyNames.resize(params);
+  int iPar = 0;
+  for (auto const &param : Settings["Systematics"]) {
+    FancyNames[iPar] = Get<std::string>(param["Systematic"]["Names"]["FancyName"], __FILE__ , __LINE__);
+    iPar++;
+  }
+  file->Close();
+  delete file;
+  if(ogdir){ ogdir->cd(); }
+  return FancyNames;
+}
+
+
+// *************************
+void PredictiveThrower::WriteToy(TDirectory* ToyDirectory,
+                                 TDirectory* Toy_1DDirectory,
+                                 TDirectory* Toy_2DDirectory,
+                                 const int iToy) {
+// *************************
+  int SampleCounter = 0;
+  for (size_t iPDF = 0; iPDF < samples.size(); iPDF++)
+  {
+    auto* SampleHandler = samples[iPDF];
+    for (int iSample = 0; iSample < SampleHandler->GetNsamples(); ++iSample)
+    {
+      ToyDirectory->cd();
+
+      auto SampleName = SampleHandler->GetSampleTitle(iSample);
+      TH1* MCHist = SampleHandler->GetMCHist(iSample);
+      MC_Hist_Toy[SampleCounter][iToy] = M3::Clone(MCHist, SampleName + "_mc_" + std::to_string(iToy));
+      MC_Hist_Toy[SampleCounter][iToy]->Write();
+
+      TH1* W2Hist = SampleHandler->GetW2Hist(iSample);
+      W2_Hist_Toy[SampleCounter][iToy] = M3::Clone(W2Hist, SampleName + "_w2_" + std::to_string(iToy));
+      W2_Hist_Toy[SampleCounter][iToy]->Write();
+
+      // now get 1D projection for every dimension
+      Toy_1DDirectory->cd();
+      for(int iDim = 0; iDim < SampleHandler->GetNDim(iSample); iDim++) {
+        std::string ProjectionName = SampleHandler->GetKinVarName(iSample, iDim);
+        std::string ProjectionSuffix = "_1DProj" + std::to_string(iDim) + "_" + std::to_string(iToy);
+
+        auto hist = SampleHandler->Get1DVarHist(iSample, ProjectionName);
+        hist->SetTitle((SampleName + ProjectionSuffix).c_str());
+        hist->SetName((SampleName + ProjectionSuffix).c_str());
+        hist->Write();
+        delete hist;
+      }
+
+      Toy_2DDirectory->cd();
+      // now get 2D projection for every combination
+      for(int iDim1 = 0; iDim1 < SampleHandler->GetNDim(iSample); iDim1++) {
+        for (int iDim2 = iDim1 + 1; iDim2 < SampleHandler->GetNDim(iSample); ++iDim2) {
+          // Get the names for the two dimensions
+          std::string XVarName = SampleHandler->GetKinVarName(iSample, iDim1);
+          std::string YVarName = SampleHandler->GetKinVarName(iSample, iDim2);
+
+          // Get the 2D histogram for this pair
+          auto hist2D = SampleHandler->Get2DVarHist(iSample, XVarName, YVarName);
+
+          // Write the histogram
+          std::string suffix2D = "_2DProj_" + std::to_string(iDim1) + "_vs_" + std::to_string(iDim2) + "_" + std::to_string(iToy);
+          hist2D->SetTitle((SampleName + suffix2D).c_str());
+          hist2D->SetName((SampleName + suffix2D).c_str());
+          hist2D->Write();
+          delete hist2D;
+        }
+      }
+      SampleCounter++;
+    }
+  }
+}
+
+// *************************
 // Produce MaCh3 toys:
 void PredictiveThrower::ProduceToys() {
 // *************************
-  /// If we found toys then skip process of making new toys
+  // Remove not useful stuff
+  SanitiseInputs();
+
+  // If we found toys then skip process of making new toys
   if(LoadToys()) return;
 
-  /// Setup useful information for toy generation
+  // Setup useful information for toy generation
   SetupToyGeneration();
 
   auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
@@ -334,22 +443,23 @@ void PredictiveThrower::ProduceToys() {
     for (int SampleIndex = 0; SampleIndex < MaCh3Sample->GetNsamples(); ++SampleIndex)
     {
       // Get nominal spectra and event rates
-      TH1* DataHist1D = MaCh3Sample->GetDataHist(SampleIndex, MaCh3Sample->GetNDim(SampleIndex));
-      Data_Hist[SampleCounter] = M3::Clone(DataHist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_data");
+      TH1* DataHist = MaCh3Sample->GetDataHist(SampleIndex);
+      Data_Hist[SampleCounter] = M3::Clone(DataHist, MaCh3Sample->GetSampleTitle(SampleIndex) + "_data");
       Data_Hist[SampleCounter]->Write((MaCh3Sample->GetSampleTitle(SampleIndex) + "_data").c_str());
 
-      TH1* MCHist1D = MaCh3Sample->GetMCHist(SampleIndex, MaCh3Sample->GetNDim(SampleIndex));
-      MC_Nom_Hist[SampleCounter] = M3::Clone(MCHist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_mc");
+      TH1* MCHist = MaCh3Sample->GetMCHist(SampleIndex);
+      MC_Nom_Hist[SampleCounter] = M3::Clone(MCHist, MaCh3Sample->GetSampleTitle(SampleIndex) + "_mc");
       MC_Nom_Hist[SampleCounter]->Write((MaCh3Sample->GetSampleTitle(SampleIndex) + "_mc").c_str());
 
-      TH1* W2Hist1D = MaCh3Sample->GetW2Hist(SampleIndex, MaCh3Sample->GetNDim(SampleIndex));
-      W2_Nom_Hist[SampleCounter] = M3::Clone(W2Hist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_w2");
+      TH1* W2Hist = MaCh3Sample->GetW2Hist(SampleIndex);
+      W2_Nom_Hist[SampleCounter] = M3::Clone(W2Hist, MaCh3Sample->GetSampleTitle(SampleIndex) + "_w2");
       W2_Nom_Hist[SampleCounter]->Write((MaCh3Sample->GetSampleTitle(SampleIndex) + "_w2").c_str());
-      delete W2Hist1D;
       SampleCounter++;
     }
   }
 
+  TDirectory* Toy_1DDirectory = outputFile->mkdir("Toys_1DHistVar");
+  TDirectory* Toy_2DDirectory = outputFile->mkdir("Toys_2DHistVar");
   /// this store value of parameters sampled from a chain
   std::vector<std::vector<double>> branch_vals(systematics.size());
   std::vector<std::vector<std::string>> branch_name(systematics.size());
@@ -373,7 +483,8 @@ void PredictiveThrower::ProduceToys() {
     }
 
     for (size_t s = 0; s < systematics.size(); ++s) {
-      systematics[s]->MatchMaCh3OutputBranches(PosteriorFile, branch_vals[s], branch_name[s]);
+      auto fancy_names = GetStoredFancyName(systematics[s]);
+      systematics[s]->MatchMaCh3OutputBranches(PosteriorFile, branch_vals[s], branch_name[s], fancy_names);
     }
 
     //Get the burn-in from the config
@@ -441,24 +552,8 @@ void PredictiveThrower::ProduceToys() {
     for (size_t iPDF = 0; iPDF < samples.size(); iPDF++) {
       samples[iPDF]->Reweight();
     }
-
-    SampleCounter = 0;
-    for (size_t iPDF = 0; iPDF < samples.size(); iPDF++)
-    {
-      auto* MaCh3Sample = dynamic_cast<SampleHandlerFD*>(samples[iPDF]);
-      for (int SampleIndex = 0; SampleIndex < MaCh3Sample->GetNsamples(); ++SampleIndex)
-      {
-        TH1* MCHist1D = MaCh3Sample->GetMCHist(SampleIndex, MaCh3Sample->GetNDim(SampleIndex));
-        MC_Hist_Toy[SampleCounter][i] = M3::Clone(MCHist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_mc_" + std::to_string(i));
-        MC_Hist_Toy[SampleCounter][i]->Write();
-
-        TH1* W2Hist1D = MaCh3Sample->GetW2Hist(SampleIndex, MaCh3Sample->GetNDim(SampleIndex));
-        W2_Hist_Toy[SampleCounter][i] = M3::Clone(W2Hist1D, MaCh3Sample->GetSampleTitle(SampleIndex) + "_w2_" + std::to_string(i));
-        W2_Hist_Toy[SampleCounter][i]->Write();
-        delete W2Hist1D;
-        SampleCounter++;
-      }
-    }
+    // Save histograms to file
+    WriteToy(ToyDirectory, Toy_1DDirectory, Toy_2DDirectory, i);
 
     // Fill parameter value so we know throw values
     for (size_t iPar = 0; iPar < ParamValues.size(); iPar++) {
@@ -470,83 +565,132 @@ void PredictiveThrower::ProduceToys() {
   TempClock.Stop();
 
   if(PosteriorFile) delete PosteriorFile;
-  ToyDirectory->Close();
-  delete ToyDirectory;
+  ToyDirectory->Close(); delete ToyDirectory;
+  Toy_1DDirectory->Close(); delete Toy_1DDirectory;
+  Toy_2DDirectory->Close(); delete Toy_2DDirectory;
 
   outputFile->cd();
-  ToyTree->Write();
-  delete ToyTree;
+  ToyTree->Write(); delete ToyTree;
 
   MACH3LOG_INFO("{} took {:.2f}s to finish for {} toys", __func__, TempClock.RealTime(), Ntoys);
 }
 
 // *************************
-std::vector<std::vector<std::unique_ptr<TH2D>>> PredictiveThrower::ProduceSpectra(
-                                                    const std::vector<std::vector<std::unique_ptr<TH1>>>& Toys,
-                                                    const std::vector<TDirectory*>& SampleDirectories,
-                                                    const std::string suffix) {
+void PredictiveThrower::Study1DProjections(const std::vector<TDirectory*>& SampleDirectories) const {
 // *************************
-  std::vector<std::vector<double>> MaxValue(TotalNumberOfSamples);
-  //Projections[sample][toy][dim]
-  std::vector<std::vector<std::vector<std::unique_ptr<TH1>>>> Projections(TotalNumberOfSamples);
+  MACH3LOG_INFO("Starting {}", __func__);
 
-  // 1. Create 1D projections, this is not thread safe, also we will use it a lot later on
+  TDirectory * ogdir = gDirectory;
+  auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
+  // Open the ROOT file
+  int originalErrorWarning = gErrorIgnoreLevel;
+  gErrorIgnoreLevel = kFatal;
+
+  TFile* file = TFile::Open(PosteriorFileName.c_str(), "READ");
+
+  gErrorIgnoreLevel = originalErrorWarning;
+  TDirectory* ToyDir = file->GetDirectory("Toys_1DHistVar");
+  // If toys not amiable in posterior file this means they must be in output file
+  if(ToyDir == nullptr) {
+    ToyDir = outputFile->GetDirectory("Toys_1DHistVar");
+  }
+  // [sample], [toy], [dim]
+  std::vector<std::vector<std::vector<std::unique_ptr<TH1D>>>> ProjectionToys(TotalNumberOfSamples);
   for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
-    SampleDirectories[sample]->cd();
-
+    ProjectionToys[sample].resize(Ntoys);
     const int nDims = SampleInfo[sample].Dimenstion;
-    MaxValue[sample].assign(nDims, 0);
-    Projections[sample].resize(Ntoys);
-    for (int toy = 0; toy < Ntoys; ++toy) {
-      if (nDims == 1) {
-        // For 1D histograms, no projection needed.
-        // Leave Projections[sample][toy][0] == nullptr
-      } else if (nDims == 2) {
-        Projections[sample][toy].resize(nDims);
-        TH2* h2 = dynamic_cast<TH2*>(Toys[sample][toy].get());
-        if (!h2) {
-          MACH3LOG_ERROR("Histogram is not TH2 for nDims==2");
-          throw MaCh3Exception(__FILE__, __LINE__);
-        }
-        auto px = h2->ProjectionX();
-        px->SetDirectory(nullptr);
-        Projections[sample][toy][0] = M3::Clone(px);
+    for (int iToy = 0; iToy < Ntoys; ++iToy) {
+      ProjectionToys[sample][iToy].resize(nDims);
+    }
+  }
 
-        auto py = h2->ProjectionY();
-        py->SetDirectory(nullptr);
-        Projections[sample][toy][1] = M3::Clone(py);
+  for (int iToy = 0; iToy < Ntoys; ++iToy) {
+    if (iToy % 100 == 0) MACH3LOG_INFO("   Loaded Projection toys {}", iToy);
+    for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
+      const int nDims = SampleInfo[sample].Dimenstion;
+      for(int iDim = 0; iDim < nDims; iDim ++){
+        std::string ProjectionSuffix = "_1DProj" + std::to_string(iDim) + "_" + std::to_string(iToy);
+        TH1D* MCHist1D = static_cast<TH1D*>(ToyDir->Get((SampleInfo[sample].Name + ProjectionSuffix).c_str()));
+        ProjectionToys[sample][iToy][iDim] = M3::Clone(MCHist1D);
+      }
+    } // end loop over samples
+  } // end loop over toys
+  file->Close(); delete file;
+  if(ogdir){ ogdir->cd(); }
 
-        delete px;
-        delete py;
-      } else {
-        MACH3LOG_ERROR("Asking for {} with N Dimension = {}. This is not implemented", __func__, nDims);
-        throw MaCh3Exception(__FILE__, __LINE__);
+  ProduceSpectra(ProjectionToys, SampleDirectories, "mc");
+  for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
+    const int nDims = SampleInfo[sample].Dimenstion;
+    // KS: We only care about doing projections for 2D, for 1D we have well 1D, for beyond 2D we have flattened TH1D
+    if(nDims == 2){
+      auto hist = Data_Hist[sample].get();
+      SampleDirectories[sample]->cd();
+
+      std::string nameX = "Data_" + SampleInfo[sample].Name + "_Dim0";
+      std::string nameY = "Data_" + SampleInfo[sample].Name + "_Dim1";
+
+      if(std::string(hist->ClassName()) == "TH2Poly") {
+        TAxis* xax = ProjectionToys[sample][0][0]->GetXaxis();
+        TAxis* yax = ProjectionToys[sample][0][1]->GetXaxis();
+
+        std::vector<double> XBinning(xax->GetNbins()+1);
+        std::vector<double> YBinning(yax->GetNbins()+1);
+
+        for(int i=0;i<=xax->GetNbins();++i)
+          XBinning[i] = xax->GetBinLowEdge(i+1);
+
+        for(int i=0;i<=yax->GetNbins();++i)
+          YBinning[i] = yax->GetBinLowEdge(i+1);
+
+        TH1D* ProjectionX = PolyProjectionX(static_cast<TH2Poly*>(hist), nameX.c_str(), XBinning, false);
+        TH1D* ProjectionY = PolyProjectionY(static_cast<TH2Poly*>(hist), nameY.c_str(), YBinning, false);
+
+        ProjectionX->SetDirectory(nullptr);
+        ProjectionY->SetDirectory(nullptr);
+
+        ProjectionX->Write(nameX.c_str());
+        ProjectionY->Write(nameY.c_str());
+
+        delete ProjectionX;
+        delete ProjectionY;
+      } else { //TH2D
+        TH1D* ProjectionX = static_cast<TH2D*>(hist)->ProjectionX(nameX.c_str());
+        TH1D* ProjectionY = static_cast<TH2D*>(hist)->ProjectionY(nameY.c_str());
+
+        ProjectionX->SetDirectory(nullptr);
+        ProjectionY->SetDirectory(nullptr);
+
+        ProjectionX->Write(nameX.c_str());
+        ProjectionY->Write(nameY.c_str());
+        delete ProjectionX;
+        delete ProjectionY;
       }
     }
+  }
+}
+
+// *************************
+void PredictiveThrower::ProduceSpectra(const std::vector<std::vector<std::vector<std::unique_ptr<TH1D>>>>& Toys,
+                                       const std::vector<TDirectory*>& SampleDirectories,
+                                       const std::string suffix) const {
+// *************************
+  std::vector<std::vector<double>> MaxValue(TotalNumberOfSamples);
+
+  // 1. Create Max value
+  for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
+    const int nDims = SampleInfo[sample].Dimenstion;
+    MaxValue[sample].assign(nDims, 0);
   }
 
   // 2. Find maximum entries over all toys
   #ifdef MULTITHREAD
-  #pragma omp parallel for collapse(2)
+  #pragma omp parallel for
   #endif
   for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
     for (int toy = 0; toy < Ntoys; ++toy) {
-      const int nDims = Toys[sample][0]->GetDimension();
+      const int nDims = SampleInfo[sample].Dimenstion;
       for (int dim = 0; dim < nDims; dim++) {
-        double max_val = 0;
-        if (nDims == 1) {
-          max_val = Toys[sample][toy]->GetMaximum();
-        }
-        else if (nDims == 2) {
-          if (dim == 0) {
-            max_val = Projections[sample][toy][0]->GetMaximum();
-          } else {
-            max_val = Projections[sample][toy][1]->GetMaximum();
-          }
-        } else {
-          MACH3LOG_ERROR("Asking for {} with N Dimension = {}. This is not implemented", __func__, nDims);
-          throw MaCh3Exception(__FILE__, __LINE__);
-        }
+        double max_val = Toys[sample][toy][dim]->GetMaximum();
         MaxValue[sample][dim] = std::max(MaxValue[sample][dim], max_val);
       }
     }
@@ -560,33 +704,13 @@ std::vector<std::vector<std::unique_ptr<TH2D>>> PredictiveThrower::ProduceSpectr
     Spectra[sample].resize(nDims);
     for (int dim = 0; dim < nDims; dim++) {
       // Get MC histogram x-axis binning
-      TH1D* refHist = nullptr;
-      if (nDims == 1) {
-        refHist = static_cast<TH1D*>(Toys[sample][0].get());
-      }
-      else if (nDims == 2) {
-        if (dim == 0) {
-          refHist = static_cast<TH1D*>(Projections[sample][0][0].get());
-        } else {
-          refHist = static_cast<TH1D*>(Projections[sample][0][1].get());
-        }
-      }
-      else {
-        MACH3LOG_ERROR("Asking for {} with N Dimension = {}. This is not implemented", __func__, nDims);
-        throw MaCh3Exception(__FILE__, __LINE__);
-      }
-
-      if (!refHist) {
-        MACH3LOG_ERROR("Failed to cast to {} dimensions in {}!", nDims, __func__);
-        throw MaCh3Exception(__FILE__, __LINE__);
-      }
+      TH1D* refHist = Toys[sample][0][dim].get();
 
       const int n_bins_x = refHist->GetNbinsX();
       std::vector<double> x_bin_edges(n_bins_x + 1);
-      for (int b = 0; b <= n_bins_x; ++b) {
-        x_bin_edges[b] = refHist->GetXaxis()->GetBinLowEdge(b + 1); // ROOT bins start at 1
+      for (int b = 0; b < n_bins_x; ++b) {
+        x_bin_edges[b] = refHist->GetXaxis()->GetBinLowEdge(b + 1);
       }
-      // Last edge is upper edge of last bin:
       x_bin_edges[n_bins_x] = refHist->GetXaxis()->GetBinUpEdge(n_bins_x);
 
       constexpr int n_bins_y = 400;
@@ -611,22 +735,13 @@ std::vector<std::vector<std::unique_ptr<TH2D>>> PredictiveThrower::ProduceSpectr
 
   // 4. now we can actually fill our projections
   #ifdef MULTITHREAD
-  #pragma omp parallel for
+  #pragma omp parallel for collapse(2)
   #endif
   for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
-    const int nDims = SampleInfo[sample].Dimenstion;
-    for (int dim = 0; dim < nDims; dim++) {
-      for (int toy = 0; toy < Ntoys; ++toy) {
-        if (nDims == 1) {
-          FastViolinFill(Spectra[sample][dim].get(), static_cast<TH1D*>(Toys[sample][toy].get()));
-        }
-        else if (nDims == 2) {
-          FastViolinFill(Spectra[sample][dim].get(), static_cast<TH1D*>(Projections[sample][toy][dim].get()));
-        }
-        else {
-          MACH3LOG_ERROR("Asking for {} with N Dimension = {}. This is not implemented", __func__, nDims);
-          throw MaCh3Exception(__FILE__, __LINE__);
-        }
+    for (int toy = 0; toy < Ntoys; ++toy) {
+      const int nDims = SampleInfo[sample].Dimenstion;
+      for (int dim = 0; dim < nDims; dim++) {
+        FastViolinFill(Spectra[sample][dim].get(), Toys[sample][toy][dim].get());
       }
     }
   }
@@ -634,124 +749,222 @@ std::vector<std::vector<std::unique_ptr<TH2D>>> PredictiveThrower::ProduceSpectr
   // 5. Save histograms which is not thread save
   for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
     SampleDirectories[sample]->cd();
+    const int nDims = SampleInfo[sample].Dimenstion;
     for (long unsigned int dim = 0; dim < Spectra[sample].size(); dim++) {
       Spectra[sample][dim]->Write();
+      // For case of 2D make additional histograms
+      if(nDims == 2) {
+        const std::string name = SampleInfo[sample].Name + "_" + suffix+ "_PostPred_dim" + std::to_string(dim);
+        auto Summary = MakeSummaryFromSpectra(Spectra[sample][dim].get(), name);
+        Summary->Write();
+      }
     }
   }
-
-  return Spectra;
 }
 
+// *************************
+std::string PredictiveThrower::GetBinName(TH1* hist,
+                                          const bool uniform,
+                                          const int Dim,
+                                          const std::vector<int>& bins) const {
+// *************************
+  std::string BinName = "";
+  if(Dim == 1) { // True 1D distribution using TH1D
+    const int b = bins[0];
+    const TAxis* ax = hist->GetXaxis();
+    const double low = ax->GetBinLowEdge(b);
+    const double up  = ax->GetBinUpEdge(b);
+
+    BinName = fmt::format("Dim0 ({:g}, {:g})", low, up);
+  } else if (Dim == 2) { // True 2D dsitrubitons
+    if(uniform == true) { //using TH2D
+      const int bx = bins[0];
+      const int by = bins[1];
+      const TAxis* ax = hist->GetXaxis();
+      const TAxis* ay = hist->GetYaxis();
+      BinName = fmt::format("Dim0 ({:g}, {:g}), ", ax->GetBinLowEdge(bx), ax->GetBinUpEdge(bx));
+      BinName += fmt::format("Dim1 ({:g}, {:g})", ay->GetBinLowEdge(by), ay->GetBinUpEdge(by));
+    } else { // using TH2Poly
+      TH2PolyBin* bin = static_cast<TH2PolyBin*>(static_cast<TH2Poly*>(hist)->GetBins()->At(bins[0]-1));
+      // Just make a little fancy name
+      BinName += fmt::format("Dim{} ({:g}, {:g})", 0, bin->GetXMin(), bin->GetXMax());
+      BinName += fmt::format("Dim{} ({:g}, {:g})", 1, bin->GetYMin(), bin->GetYMax());
+    }
+  } else { // N-dimensional distribution using flatten TH1D
+    BinName = hist->GetXaxis()->GetBinLabel(bins[0]);
+  }
+  return BinName;
+}
+
+// *************************
+std::vector<std::unique_ptr<TH1D>> PredictiveThrower::PerBinHistogram(TH1* hist,
+                                                                      const int SampleId,
+                                                                      const int Dim,
+                                                                      const std::string& suffix) const {
+// *************************
+  std::vector<std::unique_ptr<TH1D>> PosteriorHistVec;
+  constexpr int nBins = 100;
+  const std::string Sample_Name = SampleInfo[SampleId].Name;
+  if (Dim == 2) {
+      if(std::string(hist->ClassName()) == "TH2Poly") {
+        for (int i = 1; i <= static_cast<TH2Poly*>(hist)->GetNumberOfBins(); ++i) {
+          std::string ProjName = fmt::format("{} {} Bin: {}",
+                                             Sample_Name, suffix,
+                                             GetBinName(hist, false, Dim, {i}));
+          // KS: When a histogram is created with an axis lower limit greater or equal to its upper limit ROOT will automatically adjust histogram range
+          // https://root.cern.ch/doc/master/classTH1.html#auto-bin
+          auto PosteriorHist = std::make_unique<TH1D>(ProjName.c_str(), ProjName.c_str(), nBins, 1, -1);
+          PosteriorHist->SetDirectory(nullptr);
+          PosteriorHist->GetXaxis()->SetTitle("Events");
+          PosteriorHistVec.push_back(std::move(PosteriorHist));
+        } //end loop over bin
+      } else {
+        int nbinsx = hist->GetNbinsX();
+        int nbinsy = hist->GetNbinsY();
+        for (int iy = 1; iy <= nbinsy; ++iy) {
+          for (int ix = 1; ix <= nbinsx; ++ix) {
+            std::string ProjName = fmt::format("{} {} Bin: {}",
+                                              Sample_Name, suffix,
+                                              GetBinName(hist, true, Dim, {ix,iy}));
+            //KS: When a histogram is created with an axis lower limit greater or equal to its upper limit ROOT will automatically adjust histogram range
+            // https://root.cern.ch/doc/master/classTH1.html#auto-bin
+            auto PosteriorHist = std::make_unique<TH1D>(ProjName.c_str(), ProjName.c_str(), nBins, 1, -1);
+            PosteriorHist->SetDirectory(nullptr);
+            PosteriorHist->GetXaxis()->SetTitle("Events");
+            PosteriorHistVec.push_back(std::move(PosteriorHist));
+          }
+        }
+      }
+  } else {
+    int nbinsx = hist->GetNbinsX();
+    PosteriorHistVec.reserve(nbinsx);
+    for (int i = 1; i <= nbinsx; ++i) {
+      std::string ProjName = fmt::format("{} {} Bin: {}",
+                                          Sample_Name, suffix,
+                                          GetBinName(hist, true, Dim, {i}));
+      //KS: When a histogram is created with an axis lower limit greater or equal to its upper limit ROOT will automatically adjust histogram range
+      // https://root.cern.ch/doc/master/classTH1.html#auto-bin
+      auto PosteriorHist = std::make_unique<TH1D>(ProjName.c_str(), ProjName.c_str(), nBins, 1, -1);
+      PosteriorHist->SetDirectory(nullptr);
+      PosteriorHist->GetXaxis()->SetTitle("Events");
+      PosteriorHistVec.push_back(std::move(PosteriorHist));
+    }
+  }
+  return PosteriorHistVec;
+}
 
 // *************************
 std::vector<std::unique_ptr<TH1>> PredictiveThrower::MakePredictive(const std::vector<std::vector<std::unique_ptr<TH1>>>& Toys,
                                                                     const std::vector<TDirectory*>& Directory,
                                                                     const std::string& suffix,
-                                                                    const bool DebugHistograms) {
+                                                                    const bool DebugHistograms,
+                                                                    const bool WriteHist) {
 // *************************
-  /// @todo KS: If we break up into 1.initialisation->2.writing->3.saving into separate loops we can multithread
-  std::vector<std::unique_ptr<TH1>> PostPred_mc(TotalNumberOfSamples);
-
+  std::vector<std::unique_ptr<TH1>> PostPred(TotalNumberOfSamples);
+  std::vector<std::vector<std::unique_ptr<TH1D>>> Posterior_hist(TotalNumberOfSamples);
+  // 1.initialisation
   for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
-    Directory[sample]->cd();
     const int nDims = SampleInfo[sample].Dimenstion;
     const std::string Sample_Name = SampleInfo[sample].Name;
-    if (nDims == 1) {
-      int nbinsx = Toys[sample][0]->GetNbinsX();
-      const double* xbins = Toys[sample][0]->GetXaxis()->GetXbins()->GetArray();
-      auto PredictiveHist = std::make_unique<TH1D>(
-        (Sample_Name + "_" + suffix + "_PostPred").c_str(),
-        (Sample_Name + "_" + suffix + "_PostPred").c_str(),
-         nbinsx, xbins
-      );
-      PredictiveHist->GetXaxis()->SetTitle(Toys[sample][0]->GetXaxis()->GetTitle());
-      PredictiveHist->GetYaxis()->SetTitle("Events");
-      PredictiveHist->SetDirectory(nullptr);
-
-      for (int i = 1; i <= nbinsx; ++i) {
-        std::string ProjName = fmt::format("{} {} Bin: {}",
-                                           SampleInfo[sample].Name, suffix,
-                                           SampleInfo[sample].Binning->GetBinName(SampleInfo[sample].LocalId, i-1));
-        //KS: When a histogram is created with an axis lower limit greater or equal to its upper limit ROOT will automatically adjust histogram range
-        // https://root.cern.ch/doc/master/classTH1.html#auto-bin
-        auto PosteriorHist = std::make_unique<TH1D>(ProjName.c_str(), ProjName.c_str(), 100, 1, -1);
-        PosteriorHist->SetDirectory(nullptr);
-        PosteriorHist->GetXaxis()->SetTitle("Events");
-
-        for (size_t iToy = 0; iToy < Toys[sample].size(); ++iToy) {
-          double content = Toys[sample][iToy]->GetBinContent(i);
-          PosteriorHist->Fill(content, ReweightWeight[iToy]);
-        }
-
-        if (DebugHistograms) PosteriorHist->Write();
-
-        PredictiveHist->SetBinContent(i, PosteriorHist->GetMean());
-        PredictiveHist->SetBinError(i, PosteriorHist->GetRMS());
-      }
-      PredictiveHist->Write();
-      PostPred_mc[sample] = std::move(PredictiveHist);
-    }
-    else if (nDims == 2) {
-      int nbinsx = Toys[sample][0]->GetNbinsX();
-      int nbinsy = Toys[sample][0]->GetNbinsY();
-      const double* xbins = Toys[sample][0]->GetXaxis()->GetXbins()->GetArray();
-      const double* ybins = Toys[sample][0]->GetYaxis()->GetXbins()->GetArray();
-
-      // Create 2D predictive histogram with same binning as Toys[sample][0]
-      auto PredictiveHist = std::make_unique<TH2D>(
-        (Sample_Name + "_" + suffix + "_PostPred").c_str(),
-        (Sample_Name + "_" + suffix + "_PostPred").c_str(),
-        nbinsx, xbins,
-        nbinsy, ybins
-      );
-      PredictiveHist->GetXaxis()->SetTitle(Toys[sample][0]->GetXaxis()->GetTitle());
-      PredictiveHist->GetYaxis()->SetTitle(Toys[sample][0]->GetYaxis()->GetTitle());
-      PredictiveHist->SetDirectory(nullptr);
-
-      for (int iy = 1; iy <= nbinsy; ++iy) {
-        for (int ix = 1; ix <= nbinsx; ++ix) {
-          // MaCh3 vs ROOT conventions, above loop should be over MaCh3 bins
-          const int MaCh3Bin = SampleInfo[sample].Binning->GetBinSafe(SampleInfo[sample].LocalId, ix-1, iy-1);
-          std::string ProjName = fmt::format("{} {} Bin: {}",
-                                      SampleInfo[sample].Name, suffix,
-                                      SampleInfo[sample].Binning->GetBinName(SampleInfo[sample].LocalId, MaCh3Bin));
-          //KS: When a histogram is created with an axis lower limit greater or equal to its upper limit ROOT will automatically adjust histogram range
-          // https://root.cern.ch/doc/master/classTH1.html#auto-bin
-          auto PosteriorHist = std::make_unique<TH1D>(ProjName.c_str(), ProjName.c_str(), 100, 1, -1);
-          PosteriorHist->SetDirectory(nullptr);
-          PosteriorHist->GetXaxis()->SetTitle("Events");
-          int bin = Toys[sample][0]->GetBin(ix, iy);
-          for (size_t iToy = 0; iToy < Toys[sample].size(); ++iToy) {
-            double content = Toys[sample][iToy]->GetBinContent(bin);
-            PosteriorHist->Fill(content, ReweightWeight[iToy]);
-          }
-
-          if (DebugHistograms) PosteriorHist->Write();
-
-          PredictiveHist->SetBinContent(ix, iy, PosteriorHist->GetMean());
-          PredictiveHist->SetBinError(ix, iy, PosteriorHist->GetRMS());
-        }
-      }
-      PredictiveHist->Write();
-      PostPred_mc[sample] = std::move(PredictiveHist);
-    }
-    else {
-      MACH3LOG_ERROR("Asking for {} with N Dimension = {}. This is not implemented", __func__, nDims);
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
+    Posterior_hist[sample] = PerBinHistogram(Toys[sample][0].get(), sample, nDims, suffix);
+    auto PredictiveHist = M3::Clone(Toys[sample][0].get());
+    // Clear the bin contents
+    PredictiveHist->Reset();
+    PredictiveHist->SetName((Sample_Name + "_" + suffix + "_PostPred").c_str());
+    PredictiveHist->SetTitle((Sample_Name + "_" + suffix + "_PostPred").c_str());
+    PredictiveHist->SetDirectory(nullptr);
+    PostPred[sample] = std::move(PredictiveHist);
   }
-  return PostPred_mc;
+
+  /// 2. Fill histograms, thread safe as all histograms are allocated before and we loop over samples
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
+    const int nDims = SampleInfo[sample].Dimenstion;
+    auto& hist = Toys[sample][0];
+    for (size_t iToy = 0; iToy < Toys[sample].size(); ++iToy) {
+      if(nDims == 2) {
+        if(std::string(hist->ClassName()) == "TH2Poly") {
+          for (int i = 1; i <= static_cast<TH2Poly*>(hist.get())->GetNumberOfBins(); ++i) {
+            double content = Toys[sample][iToy]->GetBinContent(i);
+            Posterior_hist[sample][i-1]->Fill(content, ReweightWeight[iToy]);
+          }
+        } else {
+          int nbinsx = hist->GetNbinsX();
+          int nbinsy = hist->GetNbinsY();
+          for (int iy = 1; iy <= nbinsy; ++iy) {
+            for (int ix = 1; ix <= nbinsx; ++ix) {
+              int Bin = (iy-1) * nbinsx + (ix-1);
+              double content = Toys[sample][iToy]->GetBinContent(ix, iy);
+              Posterior_hist[sample][Bin]->Fill(content, ReweightWeight[iToy]);
+            } // end loop over X bins
+          } // end loop over Y bins
+        }
+      } else {
+        int nbinsx = hist->GetNbinsX();
+          for (int i = 1; i <= nbinsx; ++i) {
+            double content = Toys[sample][iToy]->GetBinContent(i);
+            Posterior_hist[sample][i-1]->Fill(content, ReweightWeight[iToy]);
+          } // end loop over bins
+        } // end if over dimensions
+    } // end loop over toys
+  } // end loop over samples
+
+  // 3.save
+  for (int sample = 0; sample < TotalNumberOfSamples; ++sample) {
+    const int nDims = SampleInfo[sample].Dimenstion;
+    auto& hist = Toys[sample][0];
+    Directory[sample]->cd();
+    if(nDims == 2) {
+      if(std::string(hist->ClassName()) == "TH2Poly") {
+        for (int i = 1; i <= static_cast<TH2Poly*>(hist.get())->GetNumberOfBins(); ++i) {
+          PostPred[sample]->SetBinContent(i, Posterior_hist[sample][i-1]->GetMean());
+          // KS: If ROOT below 6.18 one need -1 only for error due to stupid bug...
+          PostPred[sample]->SetBinError(i, Posterior_hist[sample][i-1]->GetRMS());
+          if (DebugHistograms) Posterior_hist[sample][i-1]->Write();
+        } // end loop over poly bins
+      } else {
+        int nbinsx = hist->GetNbinsX();
+        int nbinsy = hist->GetNbinsY();
+        for (int iy = 1; iy <= nbinsy; ++iy) {
+          for (int ix = 1; ix <= nbinsx; ++ix) {
+            int Bin = (iy-1) * nbinsx + (ix-1);
+            if (DebugHistograms) Posterior_hist[sample][Bin]->Write();
+            PostPred[sample]->SetBinContent(ix, iy, Posterior_hist[sample][Bin]->GetMean());
+            PostPred[sample]->SetBinError(ix, iy, Posterior_hist[sample][Bin]->GetRMS());
+          } // end loop over x
+        } // end loop over y
+      }
+    } else {
+      int nbinsx = hist->GetNbinsX();
+      for (int i = 1; i <= nbinsx; ++i) {
+        PostPred[sample]->SetBinContent(i, Posterior_hist[sample][i-1]->GetMean());
+        PostPred[sample]->SetBinError(i, Posterior_hist[sample][i-1]->GetRMS());
+        if (DebugHistograms) Posterior_hist[sample][i-1]->Write();
+      }
+    }
+    if(WriteHist) PostPred[sample]->Write();
+  } // end loop over samples
+  return PostPred;
 }
 
 // *************************
 // Perform predictive analysis
 void PredictiveThrower::RunPredictiveAnalysis() {
 // *************************
+  // Remove not useful stuff
+  SanitiseInputs();
+
   MACH3LOG_INFO("Starting {}", __func__);
+  MACH3LOG_WARN("\033[0;31mCurrent Total RAM usage is {:.2f} GB\033[0m", MaCh3Utils::getValue("VmRSS") / 1048576.0);
+  MACH3LOG_WARN("\033[0;31mOut of Total available RAM {:.2f} GB\033[0m", MaCh3Utils::getValue("MemTotal") / 1048576.0);
+
   TStopwatch TempClock;
   TempClock.Start();
 
   auto DebugHistograms = GetFromManager<bool>(fitMan->raw()["Predictive"]["DebugHistograms"], false, __FILE__, __LINE__);
+  auto StudyBeta = GetFromManager<bool>(fitMan->raw()["Predictive"]["StudyBetaParameters"], true, __FILE__, __LINE__);
 
   TDirectory* PredictiveDir = outputFile->mkdir("Predictive");
   std::vector<TDirectory*> SampleDirectories;
@@ -763,11 +976,17 @@ void PredictiveThrower::RunPredictiveAnalysis() {
   }
 
   // Produce Violin style spectra
-  auto Spectra_mc = ProduceSpectra(MC_Hist_Toy, SampleDirectories, "mc");
-  // Produce posterior predictive distribution
-  auto PostPred_mc = MakePredictive(MC_Hist_Toy, SampleDirectories, "mc", DebugHistograms);
+  Study1DProjections(SampleDirectories);
+  // Produce posterior predictive distribution for mc
+  auto PostPred_mc = MakePredictive(MC_Hist_Toy, SampleDirectories, "mc", DebugHistograms, false);
+  // Produce posterior predictive distribution for w2
+  auto PostPred_w2 = MakePredictive(W2_Hist_Toy, SampleDirectories, "w2", false, false);
+  // Calculate Posterior Predictive LLH
+  PredictiveLLH(Data_Hist, PostPred_mc, PostPred_w2, SampleDirectories);
   // Calculate Posterior Predictive $p$-value
   PosteriorPredictivepValue(PostPred_mc, SampleDirectories);
+  // Check how number of events changed
+  RateAnalysis(MC_Hist_Toy, SampleDirectories);
 
   // Close directories
   for (int sample = 0; sample < TotalNumberOfSamples+1; ++sample) {
@@ -775,7 +994,7 @@ void PredictiveThrower::RunPredictiveAnalysis() {
     delete SampleDirectories[sample];
   }
   // Perform beta analysis for mc statical uncertainty
-  StudyBetaParameters(PredictiveDir);
+  if(StudyBeta) StudyBetaParameters(PredictiveDir);
 
   PredictiveDir->Close();
   delete PredictiveDir;
@@ -786,11 +1005,46 @@ void PredictiveThrower::RunPredictiveAnalysis() {
   MACH3LOG_INFO("{} took {:.2f}s to finish for {} toys", __func__, TempClock.RealTime(), Ntoys);
 }
 
+
 // *************************
-double PredictiveThrower::GetLLH(const std::unique_ptr<TH1>& DatHist,
-                                 const std::unique_ptr<TH1>& MCHist,
-                                 const std::unique_ptr<TH1>& W2Hist,
-                                 const SampleHandlerBase* SampleHandler) {
+double PredictiveThrower::CalcLLH(const TH1* DatHist,
+                                  const TH1* MCHist,
+                                  const TH1* W2Hist,
+                                  const SampleHandlerBase* SampleHandler) const {
+// *************************
+  // 1D case
+  if (auto h1 = dynamic_cast<const TH1D*>(DatHist)) {
+    return GetLLH(h1,
+                  static_cast<const TH1D*>(MCHist),
+                  static_cast<const TH1D*>(W2Hist),
+                  SampleHandler);
+  }
+
+  // 2D case
+  if (auto h2 = dynamic_cast<const TH2D*>(DatHist)) {
+    return GetLLH(h2,
+                  static_cast<const TH2D*>(MCHist),
+                  static_cast<const TH2D*>(W2Hist),
+                  SampleHandler);
+  }
+
+  // 2D poly case
+  if (auto h2p = dynamic_cast<const TH2Poly*>(DatHist)) {
+    return GetLLH(h2p,
+                  static_cast<const TH2Poly*>(MCHist),
+                  static_cast<const TH2Poly*>(W2Hist),
+                  SampleHandler);
+  }
+
+  MACH3LOG_ERROR("Unsupported histogram type in {}", __func__);
+  throw MaCh3Exception(__FILE__ , __LINE__ );
+}
+
+// *************************
+double PredictiveThrower::GetLLH(const TH1D* DatHist,
+                                 const TH1D* MCHist,
+                                 const TH1D* W2Hist,
+                                 const SampleHandlerBase* SampleHandler) const {
 // *************************
   double llh = 0.0;
   for (int i = 1; i <= DatHist->GetXaxis()->GetNbins(); ++i)
@@ -805,57 +1059,141 @@ double PredictiveThrower::GetLLH(const std::unique_ptr<TH1>& DatHist,
 }
 
 // *************************
-void PredictiveThrower::PosteriorPredictivepValue(const std::vector<std::unique_ptr<TH1>>& PostPred_mc,
-                                                  const std::vector<TDirectory*>& SampleDir) {
+double PredictiveThrower::GetLLH(const TH2Poly* DatHist,
+                                 const TH2Poly* MCHist,
+                                 const TH2Poly* W2Hist,
+                                 const SampleHandlerBase* SampleHandler) const {
 // *************************
-  //(void) PostPred_w2;
-  // [Toys][Sample]
-  std::vector<std::vector<double>> chi2_dat_vec(Ntoys);
-  std::vector<std::vector<double>> chi2_mc_vec(Ntoys);
-  std::vector<std::vector<double>> chi2_pred_vec(Ntoys);
+  double llh = 0.0;
+  for (int i = 1; i <= DatHist->GetNumberOfBins(); ++i)
+  {
+    const double data = DatHist->GetBinContent(i);
+    const double mc = MCHist->GetBinContent(i);
+    const double w2 = W2Hist->GetBinContent(i);
+    llh += SampleHandler->GetTestStatLLH(data, mc, w2);
+  }
+  //KS: do times 2 because banff reports chi2
+  return 2*llh;
+}
 
-  for(int iToy = 0; iToy < Ntoys; iToy++) {
-    chi2_dat_vec[iToy].resize(TotalNumberOfSamples+1, 0);
-    chi2_mc_vec[iToy].resize(TotalNumberOfSamples+1, 0);
-    chi2_pred_vec[iToy].resize(TotalNumberOfSamples+1, 0);
+// *************************
+double PredictiveThrower::GetLLH(const TH2D* DatHist,
+                                 const TH2D* MCHist,
+                                 const TH2D* W2Hist,
+                                 const SampleHandlerBase* SampleHandler) const {
+// *************************
+  double llh = 0.0;
 
-    chi2_dat_vec[iToy].back() = PenaltyTerm[iToy];
-    chi2_mc_vec[iToy].back() = PenaltyTerm[iToy];
-    chi2_pred_vec[iToy].back() = PenaltyTerm[iToy];
+  const int nBinsX = DatHist->GetXaxis()->GetNbins();
+  const int nBinsY = DatHist->GetYaxis()->GetNbins();
 
-    /// TODO This can be multithreaded
-    for (int iSample = 0; iSample < TotalNumberOfSamples; ++iSample) {
-      const int nDims = SampleInfo[iSample].Dimenstion;
+  for (int i = 1; i <= nBinsX; ++i)
+  {
+    for (int j = 1; j <= nBinsY; ++j)
+    {
+      const double data = DatHist->GetBinContent(i, j);
+      const double mc   = MCHist->GetBinContent(i, j);
+      const double w2   = W2Hist->GetBinContent(i, j);
 
-      auto DrawFluctHist = M3::Clone(MC_Hist_Toy[iSample][iToy].get());
-      auto PredFluctHist = M3::Clone(PostPred_mc[iSample].get());
-      if (nDims == 1) {
-        MakeFluctuatedHistogramAlternative(static_cast<TH1D*>(DrawFluctHist.get()), static_cast<TH1D*>(MC_Hist_Toy[iSample][iToy].get()), random.get());
-        MakeFluctuatedHistogramAlternative(static_cast<TH1D*>(PredFluctHist.get()), static_cast<TH1D*>(PostPred_mc[iSample].get()), random.get());
-      }
-      else if (nDims == 2) {
-        MakeFluctuatedHistogramAlternative(static_cast<TH2D*>(DrawFluctHist.get()), static_cast<TH2D*>(MC_Hist_Toy[iSample][iToy].get()), random.get());
-        MakeFluctuatedHistogramAlternative(static_cast<TH2D*>(PredFluctHist.get()), static_cast<TH2D*>(PostPred_mc[iSample].get()), random.get());
-      }
-      else {
-        MACH3LOG_ERROR("Asking for {} with N Dimension = {}. This is not implemented", __func__, nDims);
-        throw MaCh3Exception(__FILE__, __LINE__);
-      }
-
-      // Okay now we can do our chi2 calculation for our sample
-      chi2_dat_vec[iToy][iSample]  = GetLLH(Data_Hist[iSample], MC_Hist_Toy[iSample][iToy], W2_Hist_Toy[iSample][iToy], SampleInfo[iSample].SamHandler);
-      chi2_mc_vec[iToy][iSample]   = GetLLH(DrawFluctHist, MC_Hist_Toy[iSample][iToy], W2_Hist_Toy[iSample][iToy], SampleInfo[iSample].SamHandler);
-      chi2_pred_vec[iToy][iSample] = GetLLH(PredFluctHist, MC_Hist_Toy[iSample][iToy], W2_Hist_Toy[iSample][iToy], SampleInfo[iSample].SamHandler);
-
-      chi2_dat_vec[iToy].back()  += chi2_dat_vec[iToy][iSample];
-      chi2_mc_vec[iToy].back()   += chi2_mc_vec[iToy][iSample];
-      chi2_pred_vec[iToy].back() += chi2_pred_vec[iToy][iSample];
+      llh += SampleHandler->GetTestStatLLH(data, mc, w2);
     }
   }
 
-  MakeChi2Plots(chi2_mc_vec,   "-2LLH (Draw Fluc, Draw)", chi2_dat_vec, "-2LLH (Data, Draw)", SampleDir, "_drawfluc_draw");
-  MakeChi2Plots(chi2_pred_vec, "-2LLH (Pred Fluc, Draw)", chi2_dat_vec, "-2LLH (Data, Draw)", SampleDir, "_predfluc_draw");
+  // KS: do times 2 because banff reports chi2
+  return 2 * llh;
 }
+
+// ****************
+//KS: We have two methods how to apply statistical fluctuation standard is faster hence is default
+void PredictiveThrower::MakeFluctuatedHistogram(TH1* FluctHist, TH1* Hist) {
+// ****************
+  // Determine which fluctuation function to call
+  auto applyFluctuation = [&](auto* f, auto* h) {
+    if (StandardFluctuation) {
+      MakeFluctuatedHistogramStandard(f, h, random.get());
+    } else {
+      MakeFluctuatedHistogramAlternative(f, h, random.get());
+    }
+  };
+
+  if (Hist->InheritsFrom(TH2Poly::Class())) {
+    applyFluctuation(static_cast<TH2Poly*>(FluctHist), static_cast<TH2Poly*>(Hist));
+  }
+  else if (Hist->InheritsFrom(TH2D::Class())) {
+    applyFluctuation(static_cast<TH2D*>(FluctHist), static_cast<TH2D*>(Hist));
+  }
+  else if (Hist->InheritsFrom(TH1D::Class())) {
+    applyFluctuation(static_cast<TH1D*>(FluctHist), static_cast<TH1D*>(Hist));
+  }
+  else {
+    MACH3LOG_ERROR("Unsupported histogram type");
+    throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+}
+
+// *************************
+void PredictiveThrower::PosteriorPredictivepValue(const std::vector<std::unique_ptr<TH1>>& PostPred_mc,
+                                                  const std::vector<TDirectory*>& SampleDir) {
+// *************************
+  // Step 1: Initialize per-toy accumulators once
+  // [Sample] [Toys]
+  std::vector<std::vector<double>> chi2_dat(TotalNumberOfSamples+1);
+  std::vector<std::vector<double>> chi2_mc(TotalNumberOfSamples+1);
+  std::vector<std::vector<double>> chi2_pred(TotalNumberOfSamples+1);
+  for (int iSample = 0; iSample < TotalNumberOfSamples+1; ++iSample) {
+    chi2_dat[iSample].resize(Ntoys, 0.0);
+    chi2_mc[iSample].resize(Ntoys, 0.0);
+    chi2_pred[iSample].resize(Ntoys, 0.0);
+  }
+
+  for (int iToy = 0; iToy < Ntoys; ++iToy) {
+    chi2_dat[TotalNumberOfSamples][iToy] = PenaltyTerm[iToy];
+    chi2_mc[TotalNumberOfSamples][iToy] = PenaltyTerm[iToy];
+    chi2_pred[TotalNumberOfSamples][iToy] = PenaltyTerm[iToy];
+  }
+
+  /// TODO This can be multithreaded but be careful for Clone!!!
+  for (int iSample = 0; iSample < TotalNumberOfSamples; ++iSample) {
+    auto SampleHandler = SampleInfo[iSample].SamHandler;
+    for (int iToy = 0; iToy < Ntoys; ++iToy) {
+      // Clone histograms to avoid modifying originals
+      auto DrawFluctHist = M3::Clone(MC_Hist_Toy[iSample][iToy].get());
+      auto PredFluctHist = M3::Clone(PostPred_mc[iSample].get());
+
+      // Apply fluctuations
+      MakeFluctuatedHistogram(DrawFluctHist.get(), MC_Hist_Toy[iSample][iToy].get());
+      MakeFluctuatedHistogram(PredFluctHist.get(), PostPred_mc[iSample].get());
+
+      // Okay now we can do our chi2 calculation for our sample
+      chi2_dat[iSample][iToy]  = CalcLLH(Data_Hist[iSample].get(), MC_Hist_Toy[iSample][iToy].get(), W2_Hist_Toy[iSample][iToy].get(), SampleHandler);
+      chi2_mc[iSample][iToy]   = CalcLLH(DrawFluctHist.get(), MC_Hist_Toy[iSample][iToy].get(), W2_Hist_Toy[iSample][iToy].get(), SampleHandler);
+      chi2_pred[iSample][iToy] = CalcLLH(PredFluctHist.get(), MC_Hist_Toy[iSample][iToy].get(), W2_Hist_Toy[iSample][iToy].get(), SampleHandler);
+
+      chi2_dat[TotalNumberOfSamples][iToy]  += chi2_dat[iSample][iToy];
+      chi2_mc[TotalNumberOfSamples][iToy]   += chi2_mc[iSample][iToy];
+      chi2_pred[TotalNumberOfSamples][iToy] += chi2_pred[iSample][iToy];
+    }
+  }
+
+  MakeChi2Plots(chi2_mc,   "-2LLH (Draw Fluc, Draw)", chi2_dat, "-2LLH (Data, Draw)", SampleDir, "_drawfluc_draw");
+  MakeChi2Plots(chi2_pred, "-2LLH (Pred Fluc, Draw)", chi2_dat, "-2LLH (Data, Draw)", SampleDir, "_predfluc_draw");
+}
+
+// *************************
+void PredictiveThrower::PredictiveLLH(const std::vector<std::unique_ptr<TH1>>& Data_histogram,
+                                               const std::vector<std::unique_ptr<TH1>>& PostPred_mc,
+                                               const std::vector<std::unique_ptr<TH1>>& PostPred_w,
+                                               const std::vector<TDirectory*>& SampleDir) {
+// *************************
+  MACH3LOG_INFO("{:<55} {:<10} {:<10} {:<10}", "Sample", "DataInt", "MCInt", "-2LLH");
+  MACH3LOG_INFO("{:-<55} {:-<10} {:-<10} {:-<10}", "", "", "", "");
+  for (int iSample = 0; iSample < TotalNumberOfSamples; ++iSample) {
+    SampleDir[iSample]->cd();
+    ExtractLLH(Data_histogram[iSample].get(), PostPred_mc[iSample].get(), PostPred_w[iSample].get(), SampleInfo[iSample].SamHandler);
+    PostPred_mc[iSample]->Write();
+  }
+}
+
 
 // *************************
 void PredictiveThrower::MakeChi2Plots(const std::vector<std::vector<double>>& Chi2_x,
@@ -873,8 +1211,8 @@ void PredictiveThrower::MakeChi2Plots(const std::vector<std::vector<double>>& Ch
     std::vector<double> chi2_x_per_sample(Ntoys);
 
     for (int iToy = 0; iToy < Ntoys; ++iToy) {
-      chi2_y_sample[iToy] = Chi2_y[iToy][iSample];
-      chi2_x_per_sample[iToy]  = Chi2_x[iToy][iSample];
+      chi2_y_sample[iToy] = Chi2_y[iSample][iToy];
+      chi2_x_per_sample[iToy]  = Chi2_x[iSample][iToy];
     }
 
     const double min_val = std::min(*std::min_element(chi2_y_sample.begin(), chi2_y_sample.end()),
@@ -884,7 +1222,7 @@ void PredictiveThrower::MakeChi2Plots(const std::vector<std::vector<double>>& Ch
 
     auto chi2_hist = std::make_unique<TH2D>((SampleInfo[iSample].Name+ Title).c_str(),
                                             (SampleInfo[iSample].Name+ Title).c_str(),
-                                            100, min_val, max_val, 100, min_val, max_val);
+                                            50, min_val, max_val, 50, min_val, max_val);
     chi2_hist->SetDirectory(nullptr);
     chi2_hist->GetXaxis()->SetTitle(Chi2_x_title.c_str());
     chi2_hist->GetYaxis()->SetTitle(Chi2_y_title.c_str());
@@ -917,17 +1255,13 @@ void PredictiveThrower::StudyBetaParameters(TDirectory* PredictiveDir) {
 
   /// 1. Initialise Beta histogram
   for (int iSample = 0; iSample < TotalNumberOfSamples; ++iSample) {
-    BetaHist[iSample].resize(SampleInfo[iSample].Binning->GetNBins(SampleInfo[iSample].LocalId));
-
-    for (int iBin = 0; iBin < SampleInfo[iSample].Binning->GetNBins(SampleInfo[iSample].LocalId); iBin++ ) {
-      std::string title = fmt::format("#beta param, {} Bin: {}",
-                                      SampleInfo[iSample].Name,
-                                      SampleInfo[iSample].Binning->GetBinName(SampleInfo[iSample].LocalId, iBin));
-      //KS: When a histogram is created with an axis lower limit greater or equal to its upper limit ROOT will automatically adjust histogram range
-      // https://root.cern.ch/doc/master/classTH1.html#auto-bin
-      BetaHist[iSample][iBin] = std::make_unique<TH1D>(title.c_str(), title.c_str(), 100, 1, -1);
-      BetaHist[iSample][iBin]->SetDirectory(nullptr);
-      BetaHist[iSample][iBin]->GetXaxis()->SetTitle("beta parameter");
+    const int nDims = SampleInfo[iSample].Dimenstion;
+    // Use any histogram that defines the binning structure
+    TH1* RefHist = Data_Hist[iSample].get();
+    BetaHist[iSample] = PerBinHistogram(RefHist, iSample, nDims, "Beta_Parameter");
+    // Change x-axis title
+    for (size_t i = 0; i < BetaHist[iSample].size(); ++i) {
+      BetaHist[iSample][i]->GetXaxis()->SetTitle("beta parameter");
     }
   }
 
@@ -937,49 +1271,52 @@ void PredictiveThrower::StudyBetaParameters(TDirectory* PredictiveDir) {
   #endif
   for (int iSample = 0; iSample < TotalNumberOfSamples; ++iSample) {
     const int nDims = SampleInfo[iSample].Dimenstion;
-    if (nDims == 1) {
-      int nbinsx = Data_Hist[iSample]->GetNbinsX();
-      for (int iBinX = 0; iBinX < nbinsx; ++iBinX) {
-        const int RootBin = iBinX+1;
-        for (int iToy = 0; iToy < Ntoys; ++iToy) {
-          /// ROOT enumerates from 1 while MaCh3 from 0
-          const double Data = Data_Hist[iSample]->GetBinContent(RootBin);
-          const double MC = MC_Hist_Toy[iSample][iToy]->GetBinContent(RootBin);
-          const double w2 = W2_Hist_Toy[iSample][iToy]->GetBinContent(RootBin);
-          const auto likelihood = SampleInfo[iSample].SamHandler->GetTestStatistic();
-
-          const double BetaParam = GetBetaParameter(Data, MC, w2, likelihood);
-          BetaHist[iSample][iBinX]->Fill(BetaParam, ReweightWeight[iToy]);
-        }
-      }
-    } else if (nDims == 2) {
-      const int nX = Data_Hist[iSample]->GetNbinsX();
-      const int nY = Data_Hist[iSample]->GetNbinsY();
-      for (int y = 0; y < nY; ++y) {
-        for (int x = 0; x < nX; ++x) {
-          const int RootBin = Data_Hist[iSample]->GetBin(x+1, y+1);
-          const int MaCh3Bin = SampleInfo[iSample].Binning->GetBinSafe(SampleInfo[iSample].LocalId, x, y);
-
-          for (int iToy = 0; iToy < Ntoys; ++iToy) {
-            const double Data = Data_Hist[iSample]->GetBinContent(RootBin);
-            const double MC   = MC_Hist_Toy[iSample][iToy]->GetBinContent(RootBin);
-            const double w2   = W2_Hist_Toy[iSample][iToy]->GetBinContent(RootBin);
-            const auto likelihood = SampleInfo[iSample].SamHandler->GetTestStatistic();
+    const auto likelihood = SampleInfo[iSample].SamHandler->GetTestStatistic();
+    for (int iToy = 0; iToy < Ntoys; ++iToy) {
+      if (nDims == 2) {
+        if(std::string(Data_Hist[iSample]->ClassName()) == "TH2Poly") {
+          for (int i = 1; i <= static_cast<TH2Poly*>(Data_Hist[iSample].get())->GetNumberOfBins(); ++i) {
+            const double Data = Data_Hist[iSample]->GetBinContent(i);
+            const double MC   = MC_Hist_Toy[iSample][iToy]->GetBinContent(i);
+            const double w2   = W2_Hist_Toy[iSample][iToy]->GetBinContent(i);
 
             const double BetaParam = GetBetaParameter(Data, MC, w2, likelihood);
-            BetaHist[iSample][MaCh3Bin]->Fill(BetaParam, ReweightWeight[iToy]);
-          }
-        }
+            BetaHist[iSample][i-1]->Fill(BetaParam, ReweightWeight[iToy]);
+          } // end loop over poly bins
+        } else {
+          const int nX = Data_Hist[iSample]->GetNbinsX();
+          const int nY = Data_Hist[iSample]->GetNbinsY();
+          for (int iy = 1; iy <= nY; ++iy) {
+            for (int ix = 1; ix <= nX; ++ix) {
+              const int FlatBin = (iy-1) * nX + (ix-1);
+
+              const double Data = Data_Hist[iSample]->GetBinContent(ix, iy);
+              const double MC   = MC_Hist_Toy[iSample][iToy]->GetBinContent(ix, iy);
+              const double w2   = W2_Hist_Toy[iSample][iToy]->GetBinContent(ix, iy);
+
+              const double BetaParam = GetBetaParameter(Data, MC, w2, likelihood);
+              BetaHist[iSample][FlatBin]->Fill(BetaParam, ReweightWeight[iToy]);
+            }
+          } // end loop over x
+        } // end loop over y
+      } else {
+        int nbinsx = Data_Hist[iSample]->GetNbinsX();
+        for (int ix = 1; ix <= nbinsx; ++ix) {
+          /// ROOT enumerates from 1 while MaCh3 from 0
+          const double Data = Data_Hist[iSample]->GetBinContent(ix);
+          const double MC = MC_Hist_Toy[iSample][iToy]->GetBinContent(ix);
+          const double w2 = W2_Hist_Toy[iSample][iToy]->GetBinContent(ix);
+
+          const double BetaParam = GetBetaParameter(Data, MC, w2, likelihood);
+          BetaHist[iSample][ix-1]->Fill(BetaParam, ReweightWeight[iToy]);
+        } // end loop over bins
       }
-    } else {
-      MACH3LOG_ERROR("Asking for {} with N Dimension = {}. This is not implemented", __func__, nDims);
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-  }
+    } // end loop over toys
+  } // end loop over samples
 
   /// 3. Write to file
   for (int iSample = 0; iSample < TotalNumberOfSamples; ++iSample) {
-    for (int iBin = 0; iBin < SampleInfo[iSample].Binning->GetNBins(SampleInfo[iSample].LocalId); iBin++ ) {
+    for (size_t iBin = 0; iBin < BetaHist[iSample].size(); iBin++) {
       DirBeta[iSample]->cd();
       BetaHist[iSample][iBin]->Write();
     }
@@ -990,4 +1327,128 @@ void PredictiveThrower::StudyBetaParameters(TDirectory* PredictiveDir) {
   delete BetaDir;
 
   PredictiveDir->cd();
+}
+
+
+// ****************
+// Calculate the LLH for TH1, set the LLH to title of MCHist
+void PredictiveThrower::ExtractLLH(TH1*  DatHist, TH1* MCHist, TH1* W2Hist, const SampleHandlerBase* SampleHandler) const {
+// ****************
+  const double llh = CalcLLH(DatHist, MCHist, W2Hist, SampleHandler);
+  std::stringstream ss;
+  ss << "_2LLH=" << llh;
+  MCHist->SetTitle((std::string(MCHist->GetTitle())+ss.str()).c_str());
+  MACH3LOG_INFO("{:<55} {:<10.2f} {:<10.2f} {:<10.2f}", MCHist->GetName(), DatHist->Integral(), MCHist->Integral(), llh);
+}
+
+// ****************
+// Make the 1D Event Rate Hist
+void PredictiveThrower::MakeCutEventRate(TH1D *Histogram, const double DataRate) const {
+// ****************
+  // Open the ROOT file
+  int originalErrorWarning = gErrorIgnoreLevel;
+  gErrorIgnoreLevel = kFatal;
+
+  // For the event rate histogram add a TLine to the data rate
+  auto TempLine = std::make_unique<TLine>(DataRate, Histogram->GetMinimum(), DataRate, Histogram->GetMaximum());
+  TempLine->SetLineColor(kRed);
+  TempLine->SetLineWidth(2);
+  // Also fit a Gaussian because why not?
+  auto Fitter = std::make_unique<TF1>("Fit", "gaus", Histogram->GetBinLowEdge(1), Histogram->GetBinLowEdge(Histogram->GetNbinsX()+1));
+  Histogram->Fit(Fitter.get(), "RQ");
+  Fitter->SetLineColor(kRed-5);
+  // Calculate a p-value
+  double Above = 0.0;
+  for (int z = 0; z < Histogram->GetNbinsX(); ++z) {
+    const double xvalue = Histogram->GetBinCenter(z+1);
+    if (xvalue >= DataRate) {
+      Above += Histogram->GetBinContent(z+1);
+    }
+  }
+  const double pvalue = Above/Histogram->Integral();
+  TLegend Legend(0.4, 0.75, 0.98, 0.90);
+  Legend.SetFillColor(0);
+  Legend.SetFillStyle(0);
+  Legend.SetLineWidth(0);
+  Legend.SetLineColor(0);
+  Legend.AddEntry(TempLine.get(), Form("Data, %.0f, p-value=%.2f", DataRate, pvalue), "l");
+  Legend.AddEntry(Histogram, Form("MC, #mu=%.1f#pm%.1f", Histogram->GetMean(), Histogram->GetRMS()), "l");
+  Legend.AddEntry(Fitter.get(), Form("Gauss, #mu=%.1f#pm%.1f", Fitter->GetParameter(1), Fitter->GetParameter(2)), "l");
+  std::string TempTitle = std::string(Histogram->GetName());
+  TempTitle += "_canv";
+  TCanvas TempCanvas(TempTitle.c_str(), TempTitle.c_str(), 1024, 1024);
+  TempCanvas.SetGridx();
+  TempCanvas.SetGridy();
+  TempCanvas.SetRightMargin(0.03);
+  TempCanvas.SetBottomMargin(0.08);
+  TempCanvas.SetLeftMargin(0.10);
+  TempCanvas.SetTopMargin(0.06);
+  TempCanvas.cd();
+  Histogram->Draw();
+  TempLine->Draw("same");
+  Fitter->Draw("same");
+  Legend.Draw("same");
+  TempCanvas.Write();
+  Histogram->Write();
+  gErrorIgnoreLevel = originalErrorWarning;
+}
+
+// *************************
+void PredictiveThrower::RateAnalysis(const std::vector<std::vector<std::unique_ptr<TH1>>>& Toys,
+                                     const std::vector<TDirectory*>& SampleDirectories) const {
+// *************************
+  std::vector<std::unique_ptr<TH1D>> EventHist(TotalNumberOfSamples+1);
+  for (int iSample = 0; iSample < TotalNumberOfSamples+1; ++iSample) {
+    std::string Title = "EventHist: ";
+    if (iSample == TotalNumberOfSamples) {
+      Title = "Total";
+    } else {
+      Title = SampleInfo[iSample].Name;
+    }
+    Title += "_sum";
+    //KS: When a histogram is created with an axis lower limit greater or equal to its upper limit ROOT will automatically adjust histogram range
+    // https://root.cern.ch/doc/master/classTH1.html#auto-bin
+    EventHist[iSample] = std::make_unique<TH1D>(Title.c_str(), Title.c_str(), 100, 1, -1);
+    EventHist[iSample]->SetDirectory(nullptr);
+    EventHist[iSample]->GetXaxis()->SetTitle("Total event rate");
+    EventHist[iSample]->GetYaxis()->SetTitle("Counts");
+    EventHist[iSample]->SetLineWidth(2);
+  }
+
+  // First fill per-sample histograms
+  #ifdef MULTITHREAD
+  #pragma omp parallel for
+  #endif
+  for (int iSample = 0; iSample < TotalNumberOfSamples; ++iSample) {
+    for (int iToy = 0; iToy < Ntoys; ++iToy) {
+      double Count = Toys[iSample][iToy]->Integral();
+      EventHist[iSample]->Fill(Count);
+    }
+  }
+
+  // Now fill total histogram properly (per toy)
+  for (int iToy = 0; iToy < Ntoys; ++iToy) {
+    double TotalCount = 0.0;
+    for (int iSample = 0; iSample < TotalNumberOfSamples; ++iSample) {
+      TotalCount += Toys[iSample][iToy]->Integral();
+    }
+    EventHist[TotalNumberOfSamples]->Fill(TotalCount);
+  }
+
+  double DataRate = 0.0;
+  std::vector<double> DataRates(TotalNumberOfSamples+1);
+  #ifdef MULTITHREAD
+  #pragma omp parallel for reduction(+:DataRate)
+  #endif
+  for (int i = 0; i < TotalNumberOfSamples; ++i) {
+    DataRates[i] = Data_Hist[i]->Integral();
+    DataRate += DataRates[i];
+  }
+  DataRates[TotalNumberOfSamples] = DataRate;
+
+  for (int SampleNum = 0; SampleNum < TotalNumberOfSamples+1; ++SampleNum) {
+    SampleDirectories[SampleNum]->cd();
+    //Make fancy event rate histogram
+    MakeCutEventRate(EventHist[SampleNum].get(), DataRates[SampleNum]);
+  }
 }

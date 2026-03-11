@@ -4,11 +4,12 @@
 
 /// @file SmearChain.cpp
 /// @brief Allows you to smear contour. For example after performing sets of study one finds out that used sets of uncertainty doesn't fully cover analysis need. Then one can smear additionally contour.
+/// @ingroup MaCh3DiagnosticProcessing
 
 /// @brief Main function  creating MCMCProcessor and calling Smear Chain
 /// @param inputFile MCMC Chain
 /// @param config Config file with settings
-void DiagMCMC(const std::string& inputFile, const std::string& config)
+void SmearChain(const std::string& inputFile, const std::string& config)
 {
   MACH3LOG_INFO("File for study: {}", inputFile);
 
@@ -38,7 +39,7 @@ int main(int argc, char *argv[]) {
   MACH3LOG_INFO("Producing single fit output");
   std::string filename = argv[1];
   std::string config = argv[2];
-  DiagMCMC(filename, config);
+  SmearChain(filename, config);
 
   return 0;
 }

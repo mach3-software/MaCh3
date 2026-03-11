@@ -19,16 +19,15 @@ class TGraphAsymmErrors;
 class TDirectory;
 
 /// @brief Base class for implementing fitting algorithms
-/// @details This class wraps MaCh3 classes like SampleHandler and ParameterHandler.
+/// @details This class wraps MaCh3 classes like @ref SampleHandlerBase and @ref ParameterHandlerBase.
 /// It serves as a base for different fitting algorithms and for validation techniques
 /// such as LLH scans.
-/// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/06.-Fitting-Algorithms).
 /// @ingroup CoreClasses
 class FitterBase {
  public:
   /// @brief Constructor
   /// @param fitMan A pointer to a manager object, which will handle all settings.
-  FitterBase(manager * const fitMan);
+  FitterBase(Manager * const fitMan);
   /// @brief Destructor for the FitterBase class.
   virtual ~FitterBase();
 
@@ -50,6 +49,10 @@ class FitterBase {
   /// @brief Perform a 1D likelihood scan.
   void RunLLHScan();
 
+  /// @brief Perform a general multi-dimensional likelihood scan.
+  /// @author Tomas Nosek
+  void RunLLHMap();
+
   /// @brief LLH scan is good first estimate of step scale
   void GetStepScaleBasedOnLLHScan();
 
@@ -57,13 +60,8 @@ class FitterBase {
   /// @warning This operation may take a significant amount of time, especially for complex models.
   void Run2DLLHScan();
 
-  /// @brief Perform a 2D and 1D sigma var for all samples.
-  /// @warning Code uses TH2Poly, right now used only by T2K ND280, it may become deprecated or merged
+  /// @brief Perform a 1D/2D sigma var for all samples.
   void RunSigmaVar();
-
-  /// @brief Perform a 1D sigma var for all samples.
-  /// @warning Code uses SampleHandlerFD
-  void RunSigmaVarFD();
 
   /// @brief Allow to start from previous fit/chain
   /// @param FitName Name of previous chain
@@ -91,7 +89,9 @@ class FitterBase {
   /// @brief YSP: Set up a mapping to store parameters with user-specified ranges, suggested by D. Barrow
   /// @param scanRanges A map with user specified parameter ranges
   bool GetScanRange(std::map<std::string, std::vector<double>>& scanRanges) const;
-
+  /// @brief Helper function to get parameter scan range, central value.
+  void GetParameterScanRange(const ParameterHandlerBase* cov, const int i, double& CentralValue,
+                             double& lower, double& upper, const int n_points, const std::string& suffix = "") const;
   /// @brief KS: Check whether we want to skip parameter using skip vector
   bool CheckSkipParameter(const std::vector<std::string>& SkipVector, const std::string& ParamName) const;
 
@@ -106,7 +106,7 @@ class FitterBase {
   void CustomRange(const std::string& ParName, const double sigma, double& ParamShiftValue) const;
 
   /// The manager for configuration handling
-  manager *fitMan;
+  Manager *fitMan;
 
   /// current state
   unsigned int step;

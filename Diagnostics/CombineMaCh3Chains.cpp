@@ -20,6 +20,8 @@ _MaCh3_Safe_Include_End_ //}
 
 /// @file CombineMaCh3Chains.cpp
 /// @brief Combine chains files produced by **MCMC**, enforcing the condition that all the files to combine were made using the exact same software versions and config files.
+/// @ingroup MaCh3DiagnosticProcessing
+///
 /// @author Ewan Miller
 /// @author Kamil Skwarczynski
 
@@ -352,7 +354,7 @@ void ParseArg(int argc, char *argv[]){
 
   int c;
   for(;;) {
-    c = getopt(argc, argv, "o:c:hf");
+    c = getopt(argc, argv, "o:c:mhf");
     if (c == -1){ // loop over the remaining arguments
       while (optind < argc){
         // any non option input is assumed to be a root file
@@ -386,7 +388,7 @@ void ParseArg(int argc, char *argv[]){
           exit(0);
         }
         default: {
-          MACH3LOG_ERROR("Un recognised option");
+          MACH3LOG_ERROR("Unrecognised option");
           usage();
           exit(1);
         }

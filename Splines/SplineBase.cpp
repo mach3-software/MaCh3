@@ -18,6 +18,26 @@ SplineBase::~SplineBase() {
 }
 
 // *************************
+void SplineBase::CheckSegmentValidity(const M3::int_t i,
+                                      const M3::int_t segment,
+                                      const M3::float_t xvar,
+                                      const std::vector<M3::float_t>& xPts) const {
+// *************************
+  if (xPts[segment] > xvar && segment != 0) {
+    MACH3LOG_ERROR("Found a segment which is _ABOVE_ the variation!");
+    MACH3LOG_ERROR("IT SHOULD ALWAYS BE BELOW! (except when segment 0)");
+    MACH3LOG_ERROR("Spline: {}", i);
+    MACH3LOG_ERROR("Found segment = {}", segment);
+    MACH3LOG_ERROR("Doing variation = {}", xvar);
+    MACH3LOG_ERROR("x in spline = {}", xPts[segment]);
+    for (size_t j = 0; j < xPts.size(); ++j) {
+      MACH3LOG_ERROR("    {} = {}", j, xPts[j]);
+    }
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+}
+
+// *************************
 // CW: Only need to do the binary search once per parameter, not once per event!
 // Takes down the number of binary searches from 1.2M to 17, ha!
 // For ROOT version see root/hist/hist/src/TSpline3.cxx TSpline3::FindX(double)
@@ -76,25 +96,14 @@ void SplineBase::FindSplineSegment() {
 
     if (segment >= nPoints-1 && nPoints > 1) segment = nPoints-2;
 
-    //CW: This way we avoid doing 1.2M+ binary searches on the GPU
+    // CW: This way we avoid doing 1.2M+ binary searches on the GPU
     // and literally just multiply lots of numbers together on the GPU without any algorithm
     // Update the values and which segment it belongs to
     SplineInfoArray[i].CurrSegment = segment;
     SplineSegments[i] = short(SplineInfoArray[i].CurrSegment);
 
     #ifdef DEBUG
-    if (SplineInfoArray[i].xPts[segment] > xvar && segment != 0) {
-      MACH3LOG_ERROR("Found a segment which is _ABOVE_ the variation!");
-      MACH3LOG_ERROR("IT SHOULD ALWAYS BE BELOW! (except when segment 0)");
-      MACH3LOG_ERROR("Spline: {}", i);
-      MACH3LOG_ERROR("Found segment = {}", segment);
-      MACH3LOG_ERROR("Doing variation = {}", xvar);
-      MACH3LOG_ERROR("x in spline = {}", SplineInfoArray[i].xPts[segment]);
-      for (M3::int_t j = 0; j < SplineInfoArray[j].nPts; ++j) {
-        MACH3LOG_ERROR("    {} = {}", j, SplineInfoArray[i].xPts[j]);
-      }
-      throw MaCh3Exception(__FILE__ , __LINE__ );
-    }
+    CheckSegmentValidity(i, segment, xvar, SplineInfoArray[i].xPts);
     #endif
   } //end loop over params
 }
@@ -103,7 +112,7 @@ void SplineBase::FindSplineSegment() {
 // Get the spline coefficients from the TSpline3 so that we can load ONLY these onto the GPU, not the whole TSpline3 object
 // This loads up coefficients into two arrays: one x array and one yabcd array
 // This should maximize our cache hits!
-void SplineBase::getTF1Coeff(TF1_red* &spl, int &nPoints, float *& coeffs) {
+void SplineBase::GetTF1Coeff(TF1_red* &spl, int &nPoints, float *& coeffs) const {
 // *****************************************
   // Initialise all arrays to 1.0
   for (int i = 0; i < _nTF1Coeff_; ++i) {
@@ -125,7 +134,6 @@ void SplineBase::getTF1Coeff(TF1_red* &spl, int &nPoints, float *& coeffs) {
   }
   // The structure is now coeffs  = {a,b,c,d,e}
 }
-
 
 // *****************************************
 void SplineBase::PrepareFastSplineInfoDir(std::unique_ptr<TFile>& SplineFile) const {

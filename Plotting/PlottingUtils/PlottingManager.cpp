@@ -1,4 +1,4 @@
-#include "plottingManager.h"
+#include "PlottingManager.h"
 
 namespace MaCh3Plotting {
 // this is the constructor using the default plotting config file

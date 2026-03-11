@@ -300,15 +300,11 @@ void BinnedSplineHandler::Evaluate() {
 
   //KS: Huge MP loop over all valid splines
   CalcSplineWeights();
-
-  //KS: Huge MP loop over all events calculating total weight
-  ModifyWeights();
 }
 
 //****************************************
-void BinnedSplineHandler::CalcSplineWeights()
+void BinnedSplineHandler::CalcSplineWeights() {
 //****************************************
-{
   #ifdef MULTITHREAD
   #pragma omp parallel for simd
   #endif
@@ -890,7 +886,6 @@ std::vector< std::vector<int> > BinnedSplineHandler::GetEventSplines(const std::
 // checks if there are multiple modes with the same SplineSuffix
 // (for example if CCRES and CCCoherent are treated as one spline mode)
 std::vector< std::vector<int> > BinnedSplineHandler::StripDuplicatedModes(const std::vector< std::vector<int> >& InputVector) {
-
   //ETA - this is of size nPars from the xsec model
   size_t InputVectorSize = InputVector.size();
   std::vector< std::vector<int> > ReturnVec(InputVectorSize);
@@ -1010,7 +1005,7 @@ void BinnedSplineHandler::FillSampleArray(std::string SampleTitle, std::vector<s
       mySpline = Key->ReadObject<TSpline3>();
 
       if (isValidSplineIndex(SampleTitle, iOscChan, SystNum, ModeNum, Var1Bin, Var2Bin, Var3Bin)) { // loop over all the spline knots and check their value
-        MACH3LOG_DEBUG("Pushed back monolith for spline {}", FullSplineName);
+        MACH3LOG_TRACE("Pushed back monolith for spline {}", FullSplineName);
         // if the value is 1 then set the flat bool to false
         nKnots = mySpline->GetNp();
         isFlat = true;

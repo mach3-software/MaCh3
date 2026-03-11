@@ -5,7 +5,6 @@
 #include "Manager/MaCh3Modes.h"
 
 /// @brief Bin-by-bin class calculating response for spline parameters.
-/// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/05.-Splines).
 /// @author Dan Barrow
 /// @author Ed Atkin
 /// @author Henry Wallace
@@ -41,7 +40,8 @@ class BinnedSplineHandler : public SplineBase {
     std::vector< std::vector<int> > StripDuplicatedModes(const std::vector< std::vector<int> >& InputVector);
     /// @brief Return the splines which affect a given event
     std::vector< std::vector<int> > GetEventSplines(const std::string& SampleTitle, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val);
-
+    /// @brief KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.
+    void SynchroniseMemTransfer() const override {return;}
     /// @brief Grab histograms with spline binning
     std::vector<TAxis*> FindSplineBinning(const std::string& FileName, const std::string& SampleTitle);
 
@@ -76,8 +76,6 @@ class BinnedSplineHandler : public SplineBase {
   protected:
     /// @brief CPU based code which eval weight for each spline
     void CalcSplineWeights() override;
-    /// @brief Calc total event weight, not used by Bin-by-bin splines
-    void ModifyWeights() override {return;};
     /// Pointer to covariance from which we get information about spline params
     ParameterHandlerGeneric* xsec;
 

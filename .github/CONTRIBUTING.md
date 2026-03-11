@@ -20,7 +20,7 @@ This package will follow this numbering convention for releases
 
 ⚠️ Do not make tags without confirming with other MaCh3 developers. The process of making a tag is heavily automated, and creating one will automatically start this process.
 Tags should start with `v` and follow the versioning defined in **"Versioning of this package"**.
-You can find the most recent tags [here](https://github.com/mach3-software/MaCh3/wiki/0.1.-History).
+You can find the most recent tags [here](https://mach3-software.github.io/MaCh3/ReleaseNotes.html).
 
 ### Before making a tag
 - Ensure the MaCh3 CMake version matches the tag you want to create. You can find it [here](https://github.com/mach3-software/MaCh3/blob/872910344714bf06c7494c1fe64a5a50d0864e24/CMakeLists.txt#L6).
@@ -265,6 +265,15 @@ Use *std::unique_ptr* to manage memory automatically:
     auto example = std::make_unique<Class>();
 ```
 This eliminates the need to manually delete the object and helps prevent memory leaks.
+
+#### Stack Allocation
+For simple ROOT objects like `TLegend`, allocating on the **stack** is often simpler and safe:
+
+```c++
+TLegend legend(0, 1, 1, 2);
+legend.Draw();
+```
+This avoids manual memory management and keeps the code straightforward.
 
 ### Dynamic Arrays
 Instead of manually managing dynamic arrays:

@@ -1,14 +1,14 @@
 //MaCh3 Includes
-#include "plottingUtils/plottingUtils.h"
-#include "plottingUtils/plottingManager.h"
+#include "PlottingUtils/PlottingUtils.h"
+#include "PlottingUtils/PlottingManager.h"
 
 //this file has lots of usage of the ROOT plotting interface that only takes floats, turn this warning off for this CU for now
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
 #pragma GCC diagnostic ignored "-Wconversion"
 
 /// @file MatrixPlotter.cpp
+/// @ingroup MaCh3Plotting
 /// @author Kamil Skwarczynski
-
 
 /// @brief Grab large Matrix only only extract submatrix based on label naming
 std::unique_ptr<TH2D> GetSubMatrix(TH2D *MatrixFull,

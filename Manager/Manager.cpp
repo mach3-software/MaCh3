@@ -6,7 +6,7 @@ _MaCh3_Safe_Include_Start_ //{
 _MaCh3_Safe_Include_End_ //}
 
 // *************************
-manager::manager(std::string const &filename)
+Manager::Manager(std::string const &filename)
 : config(M3OpenConfig(filename)) {
 // *************************
   FileName = filename;
@@ -15,7 +15,7 @@ manager::manager(std::string const &filename)
 }
 
 // *************************
-manager::manager(const YAML::Node ConfigNode) {
+Manager::Manager(const YAML::Node ConfigNode) {
 // *************************
   config = ConfigNode;
   FileName = "unknown";
@@ -24,7 +24,7 @@ manager::manager(const YAML::Node ConfigNode) {
 }
 
 // *************************
-void manager::Initialise() {
+void Manager::Initialise() {
 // *************************
   SetMaCh3LoggerFormat();
   MaCh3Utils::MaCh3Welcome();
@@ -38,7 +38,7 @@ void manager::Initialise() {
 
 // *************************
 // Empty destructor, for now...
-manager::~manager() {
+Manager::~Manager() {
 // *************************
 }
 
@@ -46,7 +46,7 @@ manager::~manager() {
 // Save all the settings of the class to an output file
 // Reflection in C++ is a bit of a pain :(
 // Outputfile is the TFile pointer we write to
-void manager::SaveSettings(TFile* const OutputFile) const {
+void Manager::SaveSettings(TFile* const OutputFile) const {
 // *************************
   std::string OutputFilename = std::string(OutputFile->GetName());
   OutputFile->cd();
@@ -87,7 +87,7 @@ void manager::SaveSettings(TFile* const OutputFile) const {
 }
 
 // *************************
-void manager::Print() const {
+void Manager::Print() const {
 // *************************
   MACH3LOG_INFO("---------------------------------");
   MaCh3Utils::PrintConfig(config);
@@ -95,7 +95,7 @@ void manager::Print() const {
 }
 
 // *************************
-int manager::GetMCStatLLH() const {
+int Manager::GetMCStatLLH() const {
 // *************************
   int mc_stat_llh = kNTestStatistics;
   if (config["LikelihoodOptions"])

@@ -16,7 +16,7 @@ namespace M3 {
 }
 // *******************
 /// @brief Class to calculate pvalue produce posterior predictive and many fancy Bayesian stuff \cite gelman1996posterior
-/// @details For more information, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/10.-Posterior-Predictive,-p%E2%80%90value-etc.).
+/// @details For more information, visit the <a href="PosteriorPredictive.html">Posterior Predictive page</a>.
 /// @author Clarence Wret
 /// @author Kamil Skwarczynski
 /// @warning This is legacy functionality used only by the ND280 code in T2K. It will be phased out and should not be used for new development.

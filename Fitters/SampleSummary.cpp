@@ -112,8 +112,8 @@ SampleSummary::SampleSummary(const int n_Samples, const std::string &Filename, S
   //KS: This is silly as it assumes all samples uses same kinematics
   lnLFlucHist_ProjectX = std::make_unique<TH2D>("lnLFlucHist_ProjectX", "lnLFlucHist_ProjectX", 50, 1, -1, 50, 1, -1);
   lnLFlucHist_ProjectX->SetDirectory(nullptr);
-  lnLFlucHist_ProjectX->GetXaxis()->SetTitle(("-2LLH_{Draw Fluc, Draw} for " + SampleHandler->GetKinVarLabel(0, 0)).c_str());
-  lnLFlucHist_ProjectX->GetYaxis()->SetTitle(("-2LLH_{Data, Draw} for " + SampleHandler->GetKinVarLabel(0, 0)).c_str());
+  lnLFlucHist_ProjectX->GetXaxis()->SetTitle(("-2LLH_{Draw Fluc, Draw} for " + SampleHandler->GetKinVarName(0, 0)).c_str());
+  lnLFlucHist_ProjectX->GetYaxis()->SetTitle(("-2LLH_{Data, Draw} for " + SampleHandler->GetKinVarName(0, 0)).c_str());
   
   // Holds the hist of random number draws, only works for posterior predictive
   if(!isPriorPredictive)
@@ -342,10 +342,8 @@ void SampleSummary::AddNominal(std::vector<TH2Poly*> &Nominal, std::vector<TH2Po
         MeanHistCorrected[i]->Reset("");
         MeanHistCorrected[i]->GetZaxis()->SetTitle("Mean");
       }
-      std::vector<double> xbins;
-      std::vector<double> ybins;
-
-      SampleHandler->SetupBinning(M3::int_t(i), xbins, ybins);
+      std::vector<double> xbins = SampleHandler->ReturnKinematicParameterBinning(M3::int_t(i), SampleHandler->GetKinVarName(M3::int_t(i), 0));
+      std::vector<double> ybins = SampleHandler->ReturnKinematicParameterBinning(M3::int_t(i), SampleHandler->GetKinVarName(M3::int_t(i), 1));
       
       //KS: Y axis is number of events to get estimate of maximal number we use integral
       const int MaxBinning = doShapeOnly ? 1 : int(NoOverflowIntegral(NominalHist[i])/4);
@@ -790,8 +788,8 @@ void SampleSummary::Write() {
     // finally p-value for 1D projection
     OutputTree->Draw((SampleName+"_data_draw_ProjectX:"+SampleName+"_drawfluc_draw_ProjectX>>htemp4").c_str());
     TH2D *TempHistogram4 = static_cast<TH2D*>(gDirectory->Get("htemp4")->Clone());
-    TempHistogram4->GetXaxis()->SetTitle(("-2LLH_{Draw Fluc, Draw} for " + SampleHandler->GetKinVarLabel(i, 0)).c_str());
-    TempHistogram4->GetYaxis()->SetTitle(("-2LLH_{Data, Draw} for " + SampleHandler->GetKinVarLabel(i, 0)).c_str());
+    TempHistogram4->GetXaxis()->SetTitle(("-2LLH_{Draw Fluc, Draw} for " + SampleHandler->GetKinVarName(i, 0)).c_str());
+    TempHistogram4->GetYaxis()->SetTitle(("-2LLH_{Data, Draw} for " + SampleHandler->GetKinVarName(i, 0)).c_str());
     TempHistogram4->SetNameTitle((SampleNames[i]+"_drawfluc_draw_ProjectX").c_str(), (SampleNames[i]+"_drawfluc_draw_ProjectX").c_str());
     Get2DBayesianpValue(TempHistogram4);
     TempHistogram4->Write();
@@ -2161,10 +2159,9 @@ TH1D* SampleSummary::ProjectHist(TH2D* Histogram, const bool ProjectX) {
 // Make a projection
 TH1D* SampleSummary::ProjectPoly(TH2Poly* Histogram, const bool ProjectX, const int selection, const bool MakeErrorHist) {
 // ****************
-  std::vector<double> xbins;
-  std::vector<double> ybins;
+  std::vector<double> xbins = SampleHandler->ReturnKinematicParameterBinning(M3::int_t(selection), SampleHandler->GetKinVarName(M3::int_t(selection), 0));
+  std::vector<double> ybins = SampleHandler->ReturnKinematicParameterBinning(M3::int_t(selection), SampleHandler->GetKinVarName(M3::int_t(selection), 1));
 
-  SampleHandler->SetupBinning(M3::int_t(selection), xbins, ybins);
   TH1D* Projection = nullptr;
   std::string name;
   if (ProjectX) {

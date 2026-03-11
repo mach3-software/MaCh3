@@ -100,10 +100,17 @@ namespace M3 {
 
 /// KS: Using restrict limits the effects of pointer aliasing, aiding optimizations. While reading I found that there might be some compilers which don't have __restrict__. As always we use _restrict_ to more easily turn off restrict in the code
 #ifndef DEBUG
-#define _restrict_ __restrict__
+  /// KS: For GCC decoration is here: https://gcc.gnu.org/onlinedocs/gcc/Restricted-Pointers.html
+  /// If we are sure other compiler support it as well please add
+  #if defined(__GNUC__)
+    #define _restrict_ __restrict__
+  #else
+    #define _restrict_
+  #endif
 #else
-#define _restrict_
+  #define _restrict_
 #endif
+
 
 /// Number of overflow bins in TH2Poly,
 #define _TH2PolyOverflowBins_ 9
@@ -125,7 +132,8 @@ _Pragma("GCC diagnostic ignored \"-Wformat-nonliteral\"") \
 _Pragma("GCC diagnostic ignored \"-Wswitch-enum\"") \
 _Pragma("GCC diagnostic ignored \"-Wconversion\"") \
 _Pragma("GCC diagnostic ignored \"-Wshadow\"") \
-_Pragma("GCC diagnostic ignored \"-Wswitch-enum\"")
+_Pragma("GCC diagnostic ignored \"-Wsuggest-override\"") \
+_Pragma("GCC diagnostic ignored \"-Wtautological-compare\"")
 #if defined(__GNUC__) && __GNUC__ >= 13
   _Pragma("GCC diagnostic ignored \"-Wdangling-reference\"")
 #endif
@@ -145,7 +153,8 @@ _Pragma("GCC diagnostic pop")
   _Pragma("clang diagnostic ignored \"-Wconversion\"") \
   _Pragma("clang diagnostic ignored \"-Wshadow\"") \
   _Pragma("clang diagnostic ignored \"-Wdeprecated-literal-operator\"") \
-  _Pragma("clang diagnostic ignored \"-Wswitch-enum\"")
+  _Pragma("clang diagnostic ignored \"-Wsuggest-override\"") \
+  _Pragma("clang diagnostic ignored \"-Wtautological-compare\"")
   #undef _MaCh3_Safe_Include_End_
   #define _MaCh3_Safe_Include_End_ \
   _Pragma("clang diagnostic pop")

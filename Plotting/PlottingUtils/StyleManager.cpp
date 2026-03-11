@@ -1,4 +1,4 @@
-#include "styleManager.h"
+#include "StyleManager.h"
 
 namespace MaCh3Plotting {
 StyleManager::StyleManager(std::string styleConfigName) {

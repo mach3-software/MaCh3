@@ -44,15 +44,14 @@ public:
     }
 };
 
-void initFitters(py::module &m){
-
+void initFitters(py::module &m) {
     auto m_fitters = m.def_submodule("fitters");
     m_fitters.doc() =
         "This is a Python binding of MaCh3s C++ fitters library.";
     
     
     py::class_<FitterBase, PyFitterBase /* <--- trampoline*/>(m_fitters, "FitterBase")
-        .def(py::init<manager* const>())
+        .def(py::init<Manager* const>())
         
         .def(
             "run", 
@@ -123,7 +122,7 @@ void initFitters(py::module &m){
     ; // End of FitterBase class binding
 
     py::class_<MR2T2, FitterBase>(m_fitters, "mcmc")
-        .def(py::init<manager *const>())
+        .def(py::init<Manager *const>())
 
         .def(
             "set_chain_length",
@@ -132,7 +131,7 @@ void initFitters(py::module &m){
             py::arg("length")); // end of MCMC class binding
 
     py::class_<DelayedMR2T2, FitterBase>(m_fitters, "DelayedMCMC")
-        .def(py::init<manager *const>())
+        .def(py::init<Manager *const>())
 
         .def(
             "set_chain_length",
@@ -141,7 +140,7 @@ void initFitters(py::module &m){
             py::arg("length")); // end of MCMC class binding
 
     py::class_<LikelihoodFit, PyLikelihoodFit /* <--- trampoline*/, FitterBase>(m_fitters, "LikelihoodFit")
-        .def(py::init<manager* const>())
+        .def(py::init<Manager* const>())
         
         .def(
             "caluclate_chi2",
@@ -162,19 +161,18 @@ void initFitters(py::module &m){
     ; // end of LikelihoodFit class binding
 
     py::class_<MinuitFit, LikelihoodFit>(m_fitters, "MinuitFit")
-        .def(py::init<manager* const>())
+        .def(py::init<Manager* const>())
         
     ; // end of MinuitFit class binding
 
     py::class_<PSO, LikelihoodFit>(m_fitters, "PSO")
-        .def(py::init<manager* const>())
+        .def(py::init<Manager* const>())
 
         .def(
             "init",
             &PSO::init,
             "Initialise the fitter"
         )
-        
-    ; // end of PSO class binding
 
+    ; // end of PSO class binding
 }

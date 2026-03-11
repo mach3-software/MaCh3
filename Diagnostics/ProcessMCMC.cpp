@@ -4,6 +4,8 @@
 
 /// @file ProcessMCMC.cpp
 /// @brief Main exectable responsible for different types of MCMC processing like drawing posteriors, triangle plots etc. Actual implantation of methods is in MCMCProcessor
+/// @ingroup MaCh3DiagnosticProcessing
+///
 /// @author Kamil Skwarczynski
 
 /// @brief Main function processing MCMC and Producing plots

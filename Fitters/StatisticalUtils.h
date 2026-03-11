@@ -28,8 +28,31 @@ _MaCh3_Safe_Include_End_ //}
 /// @param BayesFactor Obtained value of Bayes factor
 std::string GetJeffreysScale(const double BayesFactor);
 
-/// @brief  KS: Based on Table 1 in https://www.t2k.org/docs/technotes/435
-/// @param BayesFactor Obtained value of Bayes factor
+/// @brief Convert a Bayes factor into an approximate particle-physics
+///        significance level using the Dunne–Kaboth scale.
+///
+/// This function maps a Bayes factor B(θ1,θ2) to an equivalent
+/// Gaussian significance ("n σ") assuming equal priors for the
+/// two hypotheses.
+///
+/// The thresholds are based on commonly used particle-physics
+/// probability levels and their corresponding Bayes factors:
+///
+///   Bayes factor (B)      Approximate significance
+///   ------------------------------------------------
+///   B < 2.125             < 1 σ
+///   2.125 ≤ B < 20.74     > 1 σ
+///   20.74 ≤ B < 369.4     > 2 σ
+///   369.4 ≤ B < 15800     > 3 σ
+///   15800 ≤ B < 1745000   > 4 σ
+///   B ≥ 1745000           > 5 σ
+///
+/// For example, a Bayes factor of 369.4 corresponds approximately
+/// to a 3 σ effect in traditional particle-physics terminology.
+///
+/// @note For T2K users see Table 1 in https://www.t2k.org/docs/technotes/435
+/// @param BayesFactor  The Bayes factor B(θ1,θ2).
+/// @return A string describing the equivalent significance level.
 std::string GetDunneKaboth(const double BayesFactor);
 
 /// @brief KS: Convert sigma from normal distribution into percentage

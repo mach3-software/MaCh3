@@ -8,6 +8,7 @@ install/
 Doc/html
 Doc/latex
 Doc/Doxyfile
+Doc/User-Guide
 .cache/
 
 # Ignore emacs/vim stuff

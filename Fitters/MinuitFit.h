@@ -11,10 +11,12 @@
 /// @brief Implementation of Minuit fitting algorithm
 /// @cite James:2004xla
 /// @author Kamil Skwarczynski
+///
+/// @ingroup FittingAlgorithms
 class MinuitFit : public LikelihoodFit {
  public:
   /// @brief Constructor
-  MinuitFit(manager * const fitMan);
+  MinuitFit(Manager * const fitMan);
   /// @brief Destructor
   virtual ~MinuitFit();
 

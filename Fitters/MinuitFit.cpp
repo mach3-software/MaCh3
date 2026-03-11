@@ -2,7 +2,7 @@
 
 // *******************
 // Run the Minuit Fit with all the systematic objects added
-MinuitFit::MinuitFit(manager *man) : LikelihoodFit(man) {
+MinuitFit::MinuitFit(Manager *man) : LikelihoodFit(man) {
 // *******************
   AlgorithmName = "MinuitFit";
   /// @todo KS: Make this in future configurable, for more see: https://root.cern.ch/doc/master/classROOT_1_1Math_1_1Minimizer.html

@@ -53,7 +53,8 @@ RUN if ! mach3-config --has-feature GPU; then \
         exit 1; \
     fi
 
-RUN pip install .
+# Avoid pip cache to keep the image small
+RUN pip install --no-cache-dir .
 
 # Start from MaCh3 install dir
 WORKDIR ${MACH3_INSTALL_DIR}

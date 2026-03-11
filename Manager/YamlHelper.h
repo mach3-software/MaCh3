@@ -243,6 +243,8 @@ inline bool compareYAMLNodes(const YAML::Node& node1, const YAML::Node& node2, b
 // **********************
 /// @brief Overrides the configuration settings based on provided arguments.
 /// @param node YAML node that will be modified
+/// @param key The key in the YAML node to override
+/// @param val The value to assign to the key
 template <typename TValue>
 void OverrideConfig(YAML::Node node, std::string const &key, TValue val) {
 // **********************
@@ -254,6 +256,7 @@ void OverrideConfig(YAML::Node node, std::string const &key, TValue val) {
 ///
 /// This function allows you to set configuration options in a nested YAML node.
 /// @param node YAML node that will be modified
+/// @param key The key in the YAML node to override
 /// @param args The arguments to override the configuration. The last argument
 ///             will be used as the value
 ///
@@ -397,12 +400,10 @@ inline YAML::Node LoadYamlConfig(const std::string& filename, const std::string&
         MACH3LOG_ERROR("Warning: Missing space or tab after '-' at line {}: {}\n", lineNumber, lineconfig);
         throw MaCh3Exception(File, Line);
       }
-
       lineNumber++;
     }
 
     return yamlNode;
-
   } catch (const std::exception& e) {
     MACH3LOG_ERROR("{}\n", e.what());
     MACH3LOG_ERROR("Can't open file {}\n", filename);

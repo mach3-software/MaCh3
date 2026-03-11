@@ -29,19 +29,19 @@
 /Fitters/* @kskwarczynski
 /Fitters/DelayedMR2T2* @henry-wallace-phys
 
-/Samples/SampleHandlerFD* @edatkin @dbarrow257
+/Samples/SampleHandlerFD* @dbarrow257
 /Samples/OscillationHandler* @dbarrow257
 
-/Splines/BinnedSplineHandler* @edatkin @dbarrow257
+/Splines/BinnedSplineHandler* @dbarrow257
 /Splines/SplineMonolith* @kskwarczynski
 
 /Plotting/* @ewanwm
 *.py @henry-wallace-phys @ewanwm
 py* @henry-wallace-phys @ewanwm
 
-README.md @kskwarczynski @edatkin
-CONTRIBUTING.md @kskwarczynski @edatkin
-.mailmap @kskwarczynski @edatkin
+README.md @kskwarczynski
+CONTRIBUTING.md @kskwarczynski
+.mailmap @kskwarczynski
 
 LICENSE.txt @pjdunne @akaboth
 .zenodo.json @pjdunne @akaboth

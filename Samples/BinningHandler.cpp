@@ -1,10 +1,186 @@
 #include "Samples/BinningHandler.h"
 
-
 // ************************************************
 BinningHandler::BinningHandler() {
 // ************************************************
+}
 
+auto BinRangeToBinEdges(YAML::Node const &bin_range) {
+  bool is_lin = true;
+  YAML::Node bin_range_specifier;
+  if (bin_range["linspace"]) {
+    bin_range_specifier = bin_range["linspace"];
+  } else if (bin_range["logspace"]) {
+    is_lin = false;
+    bin_range_specifier = bin_range["logspace"];
+  } else {
+    std::stringstream ss;
+    ss << bin_range;
+    MACH3LOG_ERROR("When parsing binning, expected bin range specifier with "
+                   "key linspace or logspace, but found,\n{}",
+                   ss.str());
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  auto nb = Get<int>(bin_range_specifier["nb"], __FILE__, __LINE__);
+  auto low = Get<double>(bin_range_specifier["low"], __FILE__, __LINE__);
+  auto up = Get<double>(bin_range_specifier["up"], __FILE__, __LINE__);
+
+  std::vector<double> edges(nb + 1, low);
+  // force the last bin to be exactly as parsed to avoid numerical instabilities
+  // not quite lining back up with the end of the range, which could
+  // cause spurious errors or infinitesimally small bins for specifications
+  // like: [ { logspace: { nb: 10, 1E-1, 10}, 10, 11} ]
+  edges.back() = up;
+
+  if (is_lin) {
+    double bw = (up - low) / nb;
+    for (int i = 0; i < (nb - 1); ++i) {
+      edges[i + 1] = edges[i] + bw;
+    }
+  } else {
+    double llow = std::log10(low);
+    double lup = std::log10(up);
+    double lbw = (lup - llow) / nb;
+    for (int i = 0; i < (nb - 1); ++i) {
+      edges[i + 1] = std::pow(10, llow + (i + 1) * lbw);
+    }
+  }
+
+  return edges;
+}
+
+/// @brief Builds a single dimension's bin edges from YAML::Node
+/// @details
+/// BinEdges:  [ <dim0bin0lowedge>, <dim0bin1upedge>, <dim0bin2upedge>, ...
+/// <dim0binNupedge> ] BinEdges:  { linspace: { nb: 100, low: 0, up: 10} }
+/// BinEdges:  { logspace: { nb: 100, low: 1E-1, up: 10} }
+/// BinEdges:  [ { linspace: { nb: 100, low: 0, up: 10} }, 10, 15, { logspace: {
+/// nb: 5, low: 15, up: 100} } ]
+auto BuildBinEdgesFromNode(YAML::Node const &bin_edges_node,
+                           bool &found_range_specifier) {
+  if (bin_edges_node.IsMap()) {
+    found_range_specifier = true;
+    return BinRangeToBinEdges(bin_edges_node);
+  }
+  std::vector<double> edges_builder;
+  if (!bin_edges_node.IsSequence()) {
+    std::stringstream ss;
+    ss << bin_edges_node;
+    MACH3LOG_ERROR(
+        "When parsing binning, expected to find a YAML map or sequence, "
+        "but found:\n{}",
+        ss.str());
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  for (auto const &it : bin_edges_node) {
+    if (it.IsScalar()) {
+      edges_builder.push_back(it.as<double>());
+    } else if (it.IsMap()) {
+      found_range_specifier = true;
+      auto range_edges = BinRangeToBinEdges(it);
+      std::copy(range_edges.begin(), range_edges.end(),
+                std::back_inserter(edges_builder));
+    } else {
+      std::stringstream ss;
+      ss << bin_edges_node;
+      MACH3LOG_ERROR(
+          "When parsing binning, expected elements in outer sequence to all be "
+          "either scalars or maps, but found:\n{}",
+          ss.str());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+  }
+
+  // Check for duplicates or out-of-order bins
+  std::vector<double> edges;
+  for (size_t eb_it = 0; eb_it < edges_builder.size(); ++eb_it) {
+    if (edges.size()) {
+      if (edges_builder[eb_it] == edges.back()) { // remove duplicate edges
+        continue;
+      } else if (edges_builder[eb_it] < edges.back()) {
+        std::stringstream ss;
+        ss << "[ ";
+        for(auto const & e : edges_builder){
+          ss << fmt::format("{:.3g} ", e);
+        }
+        ss << "]";
+        MACH3LOG_ERROR(
+            "When parsing binning, found edges that were not monotonically "
+            "increasing, problem bin at index: {}:\n{}",
+            eb_it, ss.str());
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+    }
+    edges.push_back(edges_builder[eb_it]);
+  }
+
+  return edges;
+}
+
+/// @brief Parses YAML node describing multidim uniform binning
+/// @details
+/// # dimensional list implicit for 1D binnings
+/// BinEdges:  [<dim0bin0lowedge>, <dim0bin1upedge>, <dim0bin2upedge>, ...
+/// <dim0binNupedge>]
+///
+/// BinEdges: [ [<dim0bin0lowedge>, <dim0bin1upedge>, <dim0bin2upedge>, ...
+/// <dim0binNupedge>],
+///            ...
+///            [<dimNbin0lowedge>, <dimNbin1upedge>, <dimNbin2upedge>, ...
+///            <dimNbinNupedge>] ]
+///
+/// # bin edge list implicit for 1D range-only binnings
+/// BinEdges: { linspace: { nb: 100, low: 0, up: 10} }
+/// # mixed syntax binnings allowed
+/// BinEdges: [ { linspace: { nb: 100, low: 0, up: 10} }, 10, 15, { logspace: {
+/// nb: 5, low: 15, up: 100} }  ] # for ND range-only binnings, lists are
+/// required to disambiguate 1D mixed specifier binnings from ND binnings
+/// BinEdges: [ [ { linspace: { nb: 100, low: 0, up: 10} } ],
+///            ...
+///            [<dimNbin0lowedge>, <dimNbin1upedge>, <dimNbin2upedge>, ...
+///            <dimNbinNupedge>] ]
+/// BinEdges: [ [ { linspace: { nb: 100, low: 0, up: 10} }, 10, 15, { logspace:
+/// { nb: 5, low: 15, up: 100} }  ],
+///            ...
+///            [<dimNbin0lowedge>, <dimNbin1upedge>, <dimNbin2upedge>, ...
+///            <dimNbinNupedge>] ]
+auto UniformBinEdgeConfigParser(YAML::Node const &bin_edges_node,
+                                bool &found_range_specifier) {
+  if (bin_edges_node.IsMap()) {
+    found_range_specifier = true;
+    return std::vector<std::vector<double>>{
+        BinRangeToBinEdges(bin_edges_node),
+    };
+  } else if (bin_edges_node.IsSequence()) {
+    if (!bin_edges_node.size()) {
+      std::stringstream ss;
+      ss << bin_edges_node;
+      MACH3LOG_ERROR("When parsing binning, found an empty sequence:\n{}",
+                     ss.str());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    auto const &first_el = bin_edges_node[0];
+    if (first_el.IsScalar() || first_el.IsMap()) { // 1D binning
+      return std::vector<std::vector<double>>{
+          BuildBinEdgesFromNode(bin_edges_node, found_range_specifier),
+      };
+    }
+    // ND binning
+    std::vector<std::vector<double>> dims;
+    for (auto const &dim_node : bin_edges_node) {
+      dims.push_back(BuildBinEdgesFromNode(dim_node, found_range_specifier));
+    }
+    return dims;
+  } else {
+    std::stringstream ss;
+    ss << bin_edges_node;
+    MACH3LOG_ERROR(
+        "When parsing binning, expected to find a YAML map or sequence, "
+        "but found:\n{}",
+        ss.str());
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
 }
 
 // ************************************************
@@ -15,105 +191,61 @@ BinningHandler::BinningHandler() {
 void BinningHandler::SetupSampleBinning(const YAML::Node& Settings, SampleInfo& SingleSample) {
 // ************************************************
   MACH3LOG_INFO("Setting up Sample Binning");
-
   //Binning
-  SingleSample.nDimensions = 0;
-  /// @warning for now we hardcode to 2D...
-  SingleSample.VarStr.resize(2);
-  SingleSample.VarStr[0] = GetFromManager(Settings["XVarStr"], std::string(""));
-  auto X_BinEdges = GetFromManager(Settings["XVarBins"], std::vector<double>());
-  const auto& edgesx = X_BinEdges;
-  if (!std::is_sorted(edgesx.begin(), edgesx.end())) {
-    MACH3LOG_ERROR("XVarBins must be in increasing order in sample config {}\n  XVarBins: [{}]",
-                   SingleSample.SampleTitle, fmt::join(edgesx, ", "));
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  if(SingleSample.VarStr[0].length() > 0){
-    SingleSample.nDimensions++;
-  } else{
-    MACH3LOG_ERROR("Please specify an X-variable string in sample config");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-
-  SingleSample.VarStr[1] = GetFromManager(Settings["YVarStr"], std::string(""));
-  auto Y_BinEdges = GetFromManager(Settings["YVarBins"], std::vector<double>());
-  const auto& edgesy = Y_BinEdges;
-  if (!std::is_sorted(edgesy.begin(), edgesy.end())) {
-    MACH3LOG_ERROR("Y_BinEdges must be in increasing order in sample config {}\n  Y_BinEdges: [{}]",
-                   SingleSample.SampleTitle, fmt::join(edgesy, ", "));
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  if(SingleSample.VarStr[1].length() > 0){
-    if(SingleSample.VarStr[0].length() == 0){
-      MACH3LOG_ERROR("Please specify an X-variable string in sample config. I won't work only with a Y-variable");
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-    SingleSample.nDimensions++;
-  }
-
-  if(SingleSample.nDimensions == 0){
-    MACH3LOG_ERROR("Error setting up the sample binning");
-    MACH3LOG_ERROR("Number of dimensions is {}", SingleSample.nDimensions);
-    MACH3LOG_ERROR("Check that an XVarStr has been given in the sample config");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  } else{
-    MACH3LOG_INFO("Found {} dimensions for sample binning", SingleSample.nDimensions);
-  }
-
-  //Check whether you are setting up 1D or 2D binning
-  if(SingleSample.nDimensions == 1){
-    MACH3LOG_INFO("Setting up {}D binning with {}", SingleSample.nDimensions, SingleSample.VarStr[0]);
-    Y_BinEdges = {-1e8, 1e8};
-  } else if(SingleSample.nDimensions == 2){
-    MACH3LOG_INFO("Setting up {}D binning with {} and {}", SingleSample.nDimensions, SingleSample.VarStr[0], SingleSample.VarStr[1]);
-  } else{
-    MACH3LOG_ERROR("Number of dimensions is not 1 or 2, this is unsupported at the moment");
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
+  SingleSample.VarStr = (Settings["VarStr"] && Settings["VarStr"].IsScalar())
+                            ? std::vector<std::string>{Get<std::string>(
+                                  Settings["VarStr"], __FILE__, __LINE__)}
+                            : Get<std::vector<std::string>>(Settings["VarStr"],
+                                                            __FILE__, __LINE__);
+  SingleSample.nDimensions = static_cast<int>(SingleSample.VarStr.size());
 
   SampleBinningInfo SingleBinning;
-  /// @warning for now we hardcode to 2D...
-  SingleBinning.BinEdges.resize(2);
-  SingleBinning.AxisNBins.resize(2);
-  SingleBinning.BinEdges[0] = X_BinEdges;
-  SingleBinning.BinEdges[1] = Y_BinEdges;
-
-  //A string to store the binning for a nice print out
-  std::string XBinEdgesStr = "";
-  std::string YBinEdgesStr = "";
-
-  for(auto XBinEdge : SingleBinning.BinEdges[0]){
-    XBinEdgesStr += std::to_string(XBinEdge);
-    XBinEdgesStr += ", ";
+  bool Uniform = Get<bool>(Settings["Uniform"], __FILE__ , __LINE__);
+  bool found_range_specifier = false;
+  if(Uniform == false) {
+    if(Settings["Bins"].IsSequence()){
+        SingleBinning.InitNonUniform(Get<std::vector<std::vector<std::vector<double>>>>(Settings["Bins"], __FILE__, __LINE__));
+    } else if(Settings["Bins"].IsMap()){
+      auto file = Get<std::string>(Settings["Bins"]["File"], __FILE__, __LINE__);
+      auto key = Get<std::string>(Settings["Bins"]["Key"], __FILE__, __LINE__);
+      auto binfile = LoadYamlConfig(file, __FILE__, __LINE__);
+      SingleBinning.InitNonUniform(Get<std::vector<std::vector<std::vector<double>>>>(binfile[key], __FILE__, __LINE__));
+    } else {
+      std::stringstream ss;
+      ss << Settings["Bins"];
+      MACH3LOG_ERROR(
+          "When parsing binning, expected to find a YAML map or sequence, "
+          "but found:\n{}",
+          ss.str());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+  } else {
+    YAML::Node const & bin_edges_node = Settings["BinEdges"] ? Settings["BinEdges"] : Settings["VarBins"];
+    if(!bin_edges_node){
+      MACH3LOG_ERROR("When setting up Uniform sample binning, didn't find expected key: BinEdges (or VarBins for backward compatibility).");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    SingleBinning.InitUniform(UniformBinEdgeConfigParser(bin_edges_node, found_range_specifier));
   }
-  MACH3LOG_INFO("XBinning:");
-  MACH3LOG_INFO("{}", XBinEdgesStr);
+  if(SingleSample.VarStr.size() != SingleBinning.BinEdges.size()) {
+    MACH3LOG_ERROR("Number of variables ({}) does not match number of bin edge sets ({}) in sample config '{}'",
+                   SingleSample.VarStr.size(), SingleBinning.BinEdges.size(),SingleSample.SampleTitle);
+    if(found_range_specifier){
+      std::stringstream ss;
+      ss << (Settings["BinEdges"] ? Settings["BinEdges"] : Settings["VarBins"]);
+      MACH3LOG_ERROR(R"(A bin range specifier was found in node:
 
-  //And now the YBin Edges
-  for(auto YBinEdge : SingleBinning.BinEdges[1]){
-    YBinEdgesStr += std::to_string(YBinEdge);
-    YBinEdgesStr += ", ";
-  }
-  MACH3LOG_INFO("YBinning:");
-  MACH3LOG_INFO("{}", YBinEdgesStr);
+  {}
 
+Please carefully check the number of square brackets used, a 2D binning
+  comprised of just 2 range specifiers must explicitly include the axis
+  list specifier like:
 
-  //Sanity check that some binning has been specified
-  if(SingleBinning.BinEdges[0].size() == 0 && SingleBinning.BinEdges[1].size() == 0){
-    MACH3LOG_ERROR("No binning specified for either X or Y of sample binning, please add some binning to the sample config");
-    MACH3LOG_ERROR("Please ensure XVarBins and/or YVarStr are correctly configured");
+  BinEdges: [ [ {{linspace: {{nb:10, low:0, up: 10}}}} ], [ {{linspace: {{nb:5, low:10, up: 100}}}} ] ]
+)", ss.str());
+    }
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-
-  //Set the number of X and Y bins now
-  SingleBinning.AxisNBins[0] = SingleBinning.BinEdges[0].size() - 1;
-  SingleBinning.AxisNBins[1] = SingleBinning.BinEdges[1].size() - 1;
-
-  // Set total number of bins
-  SingleBinning.nBins = SingleBinning.AxisNBins[0] * SingleBinning.AxisNBins[1];
-  SingleBinning.GlobalOffset = 0;
-  /// Lastly prepare special histograms used for event migration
-  SingleBinning.InitialiseBinMigrationLookUp(SingleSample.nDimensions);
 
   SampleBinning.emplace_back(SingleBinning);
 
@@ -128,20 +260,34 @@ int BinningHandler::FindGlobalBin(const int NomSample,
 // ************************************************
   //DB Find the relevant bin in the PDF for each event
   const int Dim = static_cast<int>(KinVar.size());
-  const SampleBinningInfo& _restrict_ SB = SampleBinning[NomSample];
+  const SampleBinningInfo& _restrict_ Binning = SampleBinning[NomSample];
   int GlobalBin = 0;
 
   for(int i = 0; i < Dim; ++i) {
     const double Var = *KinVar[i];
-    const int Bin = SB.FindBin(i, Var, NomBin[i]);
+    const int Bin = Binning.FindBin(i, Var, NomBin[i]);
     // KS: If we are outside of range in only one dimension this mean out of bounds, we can simply quickly finish
     if(Bin < 0) return M3::UnderOverFlowBin;
-    // KS: inline GetBin computation to avoid any allocation
-    GlobalBin += Bin * SB.Strides[i];
+    // KS: inline GetBin computation to avoid any memory allocation, which in reweight loop is very costly
+    GlobalBin += Bin * Binning.Strides[i];
   }
 
-  GlobalBin += static_cast<int>(SB.GlobalOffset);
-  return GlobalBin;
+  if(Binning.Uniform) {
+    GlobalBin += static_cast<int>(Binning.GlobalOffset);
+    return GlobalBin;
+  } else {
+    const auto& _restrict_ BinMapping = Binning.BinGridMapping[GlobalBin];
+    const size_t nNonUniBins = BinMapping.size();
+    for(size_t iBin = 0; iBin < nNonUniBins; iBin++) {
+      const int BinNumber = BinMapping[iBin];
+      const auto& _restrict_ NonUniBin = Binning.Bins[BinNumber];
+      if(NonUniBin.IsEventInside(KinVar)){
+        return BinNumber + Binning.GlobalOffset;
+      }
+    }
+    MACH3LOG_DEBUG("Didn't find any bin so returning UnderOverFlowBin");
+    return M3::UnderOverFlowBin;
+  }
 }
 
 // ************************************************
@@ -161,16 +307,16 @@ int BinningHandler::FindNominalBin(const int iSample,
 }
 
 // ************************************************
-int BinningHandler::GetBinSafe(const int Sample, const int xBin, const int yBin) const {
-  // ************************************************
-  const int GlobalBin = SampleBinning[Sample].GetBinSafe(xBin, yBin);
+int BinningHandler::GetBinSafe(const int Sample, const std::vector<int>& Bins) const {
+// ************************************************
+  const int GlobalBin = SampleBinning[Sample].GetBinSafe(Bins);
   return GlobalBin;
 }
 
 // ************************************************
-int BinningHandler::GetGlobalBinSafe(const int Sample, const int xBin, const int yBin) const {
+int BinningHandler::GetGlobalBinSafe(const int Sample, const std::vector<int>& Bins) const {
 // ************************************************
-  const int GlobalBin = SampleBinning[Sample].GetBinSafe(xBin, yBin) + static_cast<int>(SampleBinning[Sample].GlobalOffset);
+  const int GlobalBin = SampleBinning[Sample].GetBinSafe(Bins) + static_cast<int>(SampleBinning[Sample].GlobalOffset);
   return GlobalBin;
 }
 
@@ -199,62 +345,79 @@ void BinningHandler::SetGlobalBinNumbers() {
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
-  size_t GlobalOffsetCounter = 0;
+  int GlobalOffsetCounter = 0;
   for(size_t iSample = 0; iSample < SampleBinning.size(); iSample++){
     SampleBinning[iSample].GlobalOffset = GlobalOffsetCounter;
     GlobalOffsetCounter += SampleBinning[iSample].nBins;
   }
   // lastly modify total number of bins
-  TotalNumberOfBins = static_cast<int>(GlobalOffsetCounter);
+  TotalNumberOfBins = GlobalOffsetCounter;
 }
 
 // ************************************************
 // Get fancy name for a given bin, to help match it with global properties
-std::string BinningHandler::GetBinName(const int iSample, const int xBin, const int yBin) const {
+std::string BinningHandler::GetBinName(const int iSample, const std::vector<int>& Bins) const {
 // ************************************************
-  return GetBinName(iSample, GetBinSafe(iSample, xBin, yBin));
+  const auto& Binning = SampleBinning[iSample];
+  if(!Binning.Uniform) {
+    MACH3LOG_ERROR("When using Non-Uniform binning for sample {} please use One bin instead of Axis bins", iSample);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  return GetBinName(iSample, GetBinSafe(iSample, Bins));
 }
 
 // ************************************************
 // Get fancy name for a given bin, to help match it with global properties
-std::string BinningHandler::GetBinName(const int iSample, const int GlobSampleBin) const {
+std::string BinningHandler::GetBinName(const int iSample, const int SampleBin) const {
 // ************************************************
   const auto& Binning = SampleBinning[iSample];
 
   // Safety checks
-  if (GlobSampleBin < 0 || GlobSampleBin >= static_cast<int>(Binning.nBins)) {
-    MACH3LOG_ERROR("Requested bin {} is out of range for sample {}", GlobSampleBin, iSample);
+  if (SampleBin < 0 || SampleBin >= static_cast<int>(Binning.nBins)) {
+    MACH3LOG_ERROR("Requested bin {} is out of range for sample {}", SampleBin, iSample);
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-  int Dim = static_cast<int>(Binning.Strides.size());
-  std::vector<int> Bins(Dim, 0);
-  int Remaining = GlobSampleBin;
-
-  // Convert the flat/global bin index into per-dimension indices
-  // Dim0 is the fastest-changing axis, Dim1 the next, etc.
-  //
-  // For example (2D):
-  //   x = bin % Nx
-  //   y = bin / Nx
-  //
-  // For 3D:
-  //   x = bin % Nx
-  //   y = (bin / Nx) % Ny
-  //   z = bin / (Nx * Ny)
-  for (int i = 0; i < Dim; ++i) {
-    const int nBinsDim = static_cast<int>(Binning.BinEdges[i].size()) - 1;
-    Bins[i] = Remaining % nBinsDim;
-    Remaining /= nBinsDim;
-  }
-
   std::string BinName;
-  for (int i = 0; i < Dim; ++i) {
-    if (i > 0) BinName += ", ";
-    const double min = Binning.BinEdges[i].at(Bins[i]);
-    const double max = Binning.BinEdges[i].at(Bins[i] + 1);
-    BinName += fmt::format("Dim{} ({:g}, {:g})", i, min, max);
-  }
 
+  if(Binning.Uniform) {
+    int Dim = static_cast<int>(Binning.Strides.size());
+    std::vector<int> Bins(Dim, 0);
+    int Remaining = SampleBin;
+
+    // Convert the flat/global bin index into per-dimension indices
+    // Dim0 is the fastest-changing axis, Dim1 the next, etc.
+    //
+    // For example (2D):
+    //   x = bin % Nx
+    //   y = bin / Nx
+    //
+    // For 3D:
+    //   x = bin % Nx
+    //   y = (bin / Nx) % Ny
+    //   z = bin / (Nx * Ny)
+    for (int i = 0; i < Dim; ++i) {
+      const int nBinsDim = static_cast<int>(Binning.BinEdges[i].size()) - 1;
+      Bins[i] = Remaining % nBinsDim;
+      Remaining /= nBinsDim;
+    }
+
+    for (int i = 0; i < Dim; ++i) {
+      if (i > 0) BinName += ", ";
+      const double min = Binning.BinEdges[i].at(Bins[i]);
+      const double max = Binning.BinEdges[i].at(Bins[i] + 1);
+      BinName += fmt::format("Dim{} ({:g}, {:g})", i, min, max);
+    }
+  } else{
+    const BinInfo& bin = Binning.Bins[SampleBin];
+    const int Dim = static_cast<int>(bin.Extent.size());
+
+    for (int i = 0; i < Dim; ++i) {
+      if (i > 0) BinName += ", ";
+      const double min = bin.Extent[i][0];
+      const double max = bin.Extent[i][1];
+      BinName += fmt::format("Dim{} ({:g}, {:g})", i, min, max);
+    }
+  }
   return BinName;
 }
 
@@ -265,3 +428,35 @@ std::string BinningHandler::GetBinName(const int GlobalBin) const {
   int LocalBin  = GetLocalBinFromGlobalBin(SampleBinning, GlobalBin);
   return GetBinName(SampleBin, LocalBin);
 }
+
+// ************************************************
+int BinningHandler::GetNAxisBins(const int iSample, const int iDim) const {
+// ************************************************
+  const auto& Binning = SampleBinning[iSample];
+  if(!Binning.Uniform) {
+    MACH3LOG_ERROR("When using Non-Uniform binning for sample {} please use global bin instead of {}", iSample, __func__);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  } else{
+    return static_cast<int>(Binning.AxisNBins.at(iDim));
+  }
+}
+
+// ************************************************
+bool BinningHandler::IsUniform(const int iSample) const {
+// ************************************************
+  const auto& Binning = SampleBinning[iSample];
+  return Binning.Uniform;
+}
+
+// ************************************************
+const std::vector<BinInfo> BinningHandler::GetNonUniformBins(const int iSample) const {
+// ************************************************
+  const auto& Binning = SampleBinning[iSample];
+  if(!Binning.Uniform) {
+    return Binning.Bins;
+  } else{
+    MACH3LOG_ERROR("{} for sample {} will not work becasue binnin is unfiorm", __func__, iSample);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+}
+

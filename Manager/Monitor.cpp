@@ -385,7 +385,7 @@ void AddPath(std::string& FilePath) {
   if (std::getenv("MACH3") == nullptr) {
     MACH3LOG_ERROR("MACH3 is not defined");
     MACH3LOG_ERROR("Please source your setup script");
-    MACH3LOG_ERROR("Read more: https://github.com/mach3-software/MaCh3/wiki/0.-FAQ#error-need-mach3-environment-variable");
+    MACH3LOG_ERROR("Read more: https://mach3-software.github.io/MaCh3/FAQ.html");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 

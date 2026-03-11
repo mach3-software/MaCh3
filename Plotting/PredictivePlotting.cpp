@@ -1,14 +1,18 @@
 //MaCh3 Includes
-#include "plottingUtils/plottingUtils.h"
-#include "plottingUtils/plottingManager.h"
+#include "PlottingUtils/PlottingUtils.h"
+#include "PlottingUtils/PlottingManager.h"
 
 //this file has lots of usage of the ROOT plotting interface that only takes floats, turn this warning off for this CU for now
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
 #pragma GCC diagnostic ignored "-Wconversion"
 
 /// @file PredictivePlotting.cpp
+/// @ingroup MaCh3Plotting
 /// @author Kamil Skwarczynski
-/// @todo use StyleManger for fancy plots
+
+/// @warning KS: keep raw pointer or ensure manual delete of PlotMan. If spdlog in automatically deleted before PlotMan then destructor has some spdlog and this could cause segfault
+MaCh3Plotting::PlottingManager* PlotMan;
+constexpr const double ScalingFactor = 10;
 
 std::vector<std::string> FindSamples(const std::string& File)
 {
@@ -66,7 +70,6 @@ std::vector<int> FindDimensions(const std::string& File, const std::vector<std::
     }
 
     MACH3LOG_DEBUG("Sample '{}' has dimension {}", sample, Dimension);
-
     SampleDimension.push_back(Dimension);
   }
 
@@ -151,7 +154,7 @@ void PrintPosteriorPValue(const YAML::Node& Settings,
     MACH3LOG_INFO("Calculating Shape for file {}", Titles[f]);
 
     CheckBonferoniCorrectedpValue(SampleNames, FlucDrawVec[f], Threshold);
-    MACH3LOG_INFO("Combined pvalue following Fisher method: {}", FisherCombinedPValue(FlucDrawVec[f]));
+    MACH3LOG_INFO("Combined pvalue following Fisher method: {:.4f}", FisherCombinedPValue(FlucDrawVec[f]));
   }
 }
 
@@ -177,7 +180,6 @@ void OverlayViolin(const YAML::Node& Settings,
   TCandle::SetScaledViolin(false);
   for(size_t iSample = 0; iSample < SampleNames.size(); iSample++)
   {
-
     for(int iDim = 0; iDim < SampleDimension[iSample]; iDim++)
     {
       std::vector<std::unique_ptr<TH2D>> ViolinHist(nFiles);
@@ -186,11 +188,13 @@ void OverlayViolin(const YAML::Node& Settings,
         InputFiles[iFile]->cd();
         ViolinHist[iFile] = M3::Clone(InputFiles[iFile]->Get<TH2D>(("Predictive/" + SampleNames[iSample]
                                       + "/" + SampleNames[iSample] + "_mc_dim" + iDim).Data()));
-        ViolinHist[iFile]->SetTitle(SampleNames[iSample].c_str());
+        ViolinHist[iFile]->SetTitle(PlotMan->style().prettifySampleName(SampleNames[iSample]).c_str());
         ViolinHist[iFile]->SetLineColor(PosteriorColor[iFile]);
         ViolinHist[iFile]->SetMarkerColor(PosteriorColor[iFile]);
         ViolinHist[iFile]->SetFillColorAlpha(PosteriorColor[iFile], 0.35);
         ViolinHist[iFile]->SetFillStyle(1001);
+        ViolinHist[iFile]->GetXaxis()->SetTitle(PlotMan->style().prettifyKinematicName(
+                                                ViolinHist[iFile]->GetXaxis()->GetTitle()).c_str());
         ViolinHist[iFile]->GetYaxis()->SetTitle("Events");
       }
 
@@ -215,6 +219,7 @@ void OverlayViolin(const YAML::Node& Settings,
 void OverlayPredicitve(const YAML::Node& Settings,
                        const std::vector<TFile*>& InputFiles,
                        const std::vector<std::string>& SampleNames,
+                       const std::vector<int>& SampleDimension,
                        const std::unique_ptr<TCanvas>& canv)
 {
   MACH3LOG_INFO("Starting {}", __func__);
@@ -248,116 +253,296 @@ void OverlayPredicitve(const YAML::Node& Settings,
   for(size_t iSample = 0; iSample < SampleNames.size(); iSample++)
   {
     const int nFiles = static_cast<int>(InputFiles.size());
-    TH1D* hist = InputFiles[0]->Get<TH1D>(("SampleFolder/data_" + SampleNames[iSample]).c_str());
-    if(!hist) {
-      MACH3LOG_WARN("Couldn't find hist for {}, most likely it is using 2D", SampleNames[iSample]);
-      MACH3LOG_WARN("Currently only 1D, sorry");
-      continue;
-    }
-    std::unique_ptr<TH1D> DataHist = M3::Clone(hist);
-    DataHist->SetLineColor(kBlack);
-    //KS: +1 for data, we want to get integral before scaling of the histogram
-    std::vector<double> Integral(nFiles);
-    Integral[nFiles] = DataHist->Integral();
-    std::vector<std::unique_ptr<TH1D>> PredHist(nFiles);
-
-    for(int iFile = 0; iFile < nFiles; iFile++)
-    {
-      InputFiles[iFile]->cd();
-      PredHist[iFile] = M3::Clone(InputFiles[iFile]->Get<TH1D>(("Predictive/" + SampleNames[iSample] + "/" +
-                                                                SampleNames[iSample] + "_mc_PostPred").c_str()));
-      Integral[iFile] = PredHist[iFile]->Integral();
-      PredHist[iFile]->SetTitle(SampleNames[iSample].c_str());
-      PredHist[iFile]->SetLineColor(PosteriorColor[iFile]);
-      PredHist[iFile]->SetMarkerColor(PosteriorColor[iFile]);
-      PredHist[iFile]->SetFillColorAlpha(PosteriorColor[iFile], 0.35);
-      PredHist[iFile]->SetFillStyle(1001);
-      PredHist[iFile]->GetYaxis()->SetTitle("Events");
-    }
-    pad1->cd();
-
-    PredHist[0]->Draw("p e2");
-    for(int iFile = 1; iFile < nFiles; iFile++)
-    {
-      PredHist[iFile]->Draw("p e2 same");
-    }
-    DataHist->Draw("he same");
-
-    auto legend = std::make_unique<TLegend>(0.50,0.52,0.90,0.88);
-    legend->AddEntry(DataHist.get(), Form("Data, #int=%.0f", Integral[nFiles]),"le");
-    for(int ig = 0; ig < nFiles; ig++ )
-    {
-      legend->AddEntry(PredHist[ig].get(), Form("%s, #int=%.2f", Titles[ig].c_str(), Integral[ig]), "lpf");
-    }
-    legend->SetLineStyle(0);
-    legend->SetTextSize(0.03);
-    legend->Draw();
-
-    //// Now we do ratio
-    pad2->cd();
-
-    auto line = std::make_unique<TLine>(PredHist[0]->GetXaxis()->GetBinLowEdge(PredHist[0]->GetXaxis()->GetFirst()), 1.0, PredHist[0]->GetXaxis()->GetBinUpEdge(PredHist[0]->GetXaxis()->GetLast()), 1.0);
-
-    line->SetLineWidth(2);
-    line->SetLineColor(kBlack);
-    line->Draw("");
-
-    std::unique_ptr<TH1D> RatioPlotData = M3::Clone(DataHist.get());
-    std::vector<std::unique_ptr<TH1D>> RatioPlot(nFiles);
-
-    for(int ig = 0; ig < nFiles; ig++ )
-    {
-      RatioPlot[ig] = M3::Clone(DataHist.get());
-      RatioPlot[ig]->SetLineColor(PosteriorColor[ig]);
-      RatioPlot[ig]->SetMarkerColor(PosteriorColor[ig]);
-      RatioPlot[ig]->SetFillColorAlpha(PosteriorColor[ig], 0.35);
-      RatioPlot[ig]->SetFillStyle(1001);
-      RatioPlot[ig]->GetYaxis()->SetTitle("Data/MC");
-      RatioPlot[ig]->GetXaxis()->SetTitle(PredHist[0]->GetXaxis()->GetTitle());
-      RatioPlot[ig]->SetBit(TH1D::kNoTitle);
-      RatioPlot[ig]->GetXaxis()->SetTitleSize(0.12);
-      RatioPlot[ig]->GetYaxis()->SetTitleOffset(0.4);
-      RatioPlot[ig]->GetYaxis()->SetTitleSize(0.10);
-
-      RatioPlot[ig]->GetXaxis()->SetLabelSize(0.10);
-      RatioPlot[ig]->GetYaxis()->SetLabelSize(0.10);
-
-      RatioPlot[ig]->Divide(PredHist[ig].get());
-      PassErrorToRatioPlot(RatioPlot[ig].get(), PredHist[ig].get(), DataHist.get());
-    }
-
-    RatioPlotData->Divide(DataHist.get());
-    PassErrorToRatioPlot(RatioPlotData.get(), DataHist.get(), DataHist.get());
-
-    double maxz = -999;
-    double minz = +999;
-    for (int j = 0; j < nFiles; j++) {
-      for (int i = 1; i < RatioPlot[0]->GetXaxis()->GetNbins(); i++)
-      {
-        maxz = std::max(maxz, RatioPlot[j]->GetBinContent(i));
-        minz = std::min(minz, RatioPlot[j]->GetBinContent(i));
+    auto SampleName = SampleNames[iSample];
+    const int nDims = (SampleDimension[iSample] == 2) ? 2 : 1;
+    for(int iDim = 0; iDim < nDims; iDim++) {
+      std::string DataLocation = "";
+      if(nDims == 2) {
+        DataLocation = "Predictive/" + SampleName + "/Data_" + SampleName + "_Dim" + std::to_string(iDim);
+      } else {
+        DataLocation = "SampleFolder/data_" + SampleName;
       }
+      TH1D* hist = InputFiles[0]->Get<TH1D>((DataLocation).c_str());
+
+      std::unique_ptr<TH1D> DataHist = M3::Clone(hist);
+      DataHist->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", ScalingFactor).c_str());
+      M3::ScaleHistogram(DataHist.get(), ScalingFactor);
+      DataHist->SetLineColor(kBlack);
+      //KS: +1 for data, we want to get integral before scaling of the histogram
+      std::vector<double> Integral(nFiles+1);
+      Integral[nFiles] = DataHist->Integral();
+      std::vector<std::unique_ptr<TH1D>> PredHist(nFiles);
+
+      for(int iFile = 0; iFile < nFiles; iFile++)
+      {
+        InputFiles[iFile]->cd();
+        std::string HistLocation = "";
+        if(nDims == 2) {
+          HistLocation = "Predictive/" + SampleName + "/" + SampleName + "_mc_PostPred_dim" + std::to_string(iDim);
+        } else {
+          HistLocation = "Predictive/" + SampleName + "/" + SampleName + "_mc_PostPred";
+        }
+        PredHist[iFile] = M3::Clone(InputFiles[iFile]->Get<TH1D>((HistLocation).c_str()));
+        Integral[iFile] = PredHist[iFile]->Integral();
+        PredHist[iFile]->SetTitle(PlotMan->style().prettifySampleName(SampleName).c_str());
+        PredHist[iFile]->SetLineColor(PosteriorColor[iFile]);
+        PredHist[iFile]->SetMarkerColor(PosteriorColor[iFile]);
+        PredHist[iFile]->SetFillColorAlpha(PosteriorColor[iFile], 0.35);
+        PredHist[iFile]->SetFillStyle(1001);
+        PredHist[iFile]->GetYaxis()->SetTitle(fmt::format("Events/{:.0f}", ScalingFactor).c_str());
+        M3::ScaleHistogram(PredHist[iFile].get(), ScalingFactor);
+      }
+      pad1->cd();
+
+      PredHist[0]->Draw("p e2");
+      for(int iFile = 1; iFile < nFiles; iFile++)
+      {
+        PredHist[iFile]->Draw("p e2 same");
+      }
+      DataHist->Draw("he same");
+
+      auto legend = std::make_unique<TLegend>(0.50,0.52,0.90,0.88);
+      legend->AddEntry(DataHist.get(), Form("Data, #int=%.0f", Integral[nFiles]),"le");
+      for(int ig = 0; ig < nFiles; ig++ ) {
+        legend->AddEntry(PredHist[ig].get(), Form("%s, #int=%.2f", Titles[ig].c_str(), Integral[ig]), "lpf");
+      }
+      legend->SetLineStyle(0);
+      legend->SetTextSize(0.03);
+      legend->Draw();
+
+      //// Now we do ratio
+      pad2->cd();
+
+      auto line = std::make_unique<TLine>(PredHist[0]->GetXaxis()->GetBinLowEdge(PredHist[0]->GetXaxis()->GetFirst()), 1.0, PredHist[0]->GetXaxis()->GetBinUpEdge(PredHist[0]->GetXaxis()->GetLast()), 1.0);
+
+      line->SetLineWidth(2);
+      line->SetLineColor(kBlack);
+      line->Draw("");
+
+      std::unique_ptr<TH1D> RatioPlotData = M3::Clone(DataHist.get());
+      std::vector<std::unique_ptr<TH1D>> RatioPlot(nFiles);
+
+      for(int ig = 0; ig < nFiles; ig++ )
+      {
+        RatioPlot[ig] = M3::Clone(DataHist.get());
+        RatioPlot[ig]->SetLineColor(PosteriorColor[ig]);
+        RatioPlot[ig]->SetMarkerColor(PosteriorColor[ig]);
+        RatioPlot[ig]->SetFillColorAlpha(PosteriorColor[ig], 0.35);
+        RatioPlot[ig]->SetFillStyle(1001);
+        RatioPlot[ig]->GetYaxis()->SetTitle("Data/MC");
+        auto PrettyX = PlotMan->style().prettifyKinematicName(PredHist[0]->GetXaxis()->GetTitle());
+        RatioPlot[ig]->GetXaxis()->SetTitle(PrettyX.c_str());
+        RatioPlot[ig]->SetBit(TH1D::kNoTitle);
+        RatioPlot[ig]->GetXaxis()->SetTitleSize(0.12);
+        RatioPlot[ig]->GetYaxis()->SetTitleOffset(0.4);
+        RatioPlot[ig]->GetYaxis()->SetTitleSize(0.10);
+
+        RatioPlot[ig]->GetXaxis()->SetLabelSize(0.10);
+        RatioPlot[ig]->GetYaxis()->SetLabelSize(0.10);
+
+        RatioPlot[ig]->Divide(PredHist[ig].get());
+        PassErrorToRatioPlot(RatioPlot[ig].get(), PredHist[ig].get(), DataHist.get());
+      }
+
+      RatioPlotData->Divide(DataHist.get());
+      PassErrorToRatioPlot(RatioPlotData.get(), DataHist.get(), DataHist.get());
+
+      double maxz = -999;
+      double minz = +999;
+      for (int j = 0; j < nFiles; j++) {
+        for (int i = 1; i < RatioPlot[0]->GetXaxis()->GetNbins(); i++) {
+          maxz = std::max(maxz, RatioPlot[j]->GetBinContent(i));
+          minz = std::min(minz, RatioPlot[j]->GetBinContent(i));
+        }
+      }
+      maxz = maxz*1.001;
+      minz = minz*1.001;
+
+      if (std::fabs(1 - maxz) > std::fabs(1-minz))
+        RatioPlot[0]->GetYaxis()->SetRangeUser(1-std::fabs(1-maxz),1+std::fabs(1-maxz));
+      else
+        RatioPlot[0]->GetYaxis()->SetRangeUser(1-std::fabs(1-minz),1+std::fabs(1-minz));
+
+      RatioPlot[0]->Draw("p e2");
+      for(int ig = 1; ig < nFiles; ig++ ) {
+        RatioPlot[ig]->Draw("p e2 same");
+      }
+      RatioPlotData->Draw("he same");
+
+      canv->Print("Overlay_Predictive.pdf", "pdf");
     }
-    maxz = maxz*1.001;
-    minz = minz*1.001;
-
-    if (std::fabs(1 - maxz) > std::fabs(1-minz))
-      RatioPlot[0]->GetYaxis()->SetRangeUser(1-std::fabs(1-maxz),1+std::fabs(1-maxz));
-    else
-      RatioPlot[0]->GetYaxis()->SetRangeUser(1-std::fabs(1-minz),1+std::fabs(1-minz));
-
-    RatioPlot[0]->Draw("p e2");
-    for(int ig = 1; ig < nFiles; ig++ )
-    {
-      RatioPlot[ig]->Draw("p e2 same");
-    }
-    RatioPlotData->Draw("he same");
-
-    canv->Print("Overlay_Predictive.pdf", "pdf");
   }
 
   delete pad1;
   delete pad2;
+}
+
+/// @brief KS: Get mean and error from gaussian fit to event distribution
+void GetMeanError(TH1D* hist, double &Mean, double &Error){
+  TF1 *Gauss = hist->GetFunction("Fit"); //This name is hardcoded be careful
+  //KS: Get mean and error from Gauss
+  Mean = Gauss->GetParameter(1);
+  Error = Gauss->GetParameter(2);
+
+  //KS: Get mean and error from HPD
+  //Mean = hist->GetMean();
+  //Error = hpost->GetRMS();
+}
+
+/// @brief KS Print event rates in Latex like table
+void PrintPosteriorEventRates(const std::vector<TFile*>& InputFiles,
+                              const std::vector<std::string>& SampleNames) {
+  MACH3LOG_INFO("Starting {}", __func__);
+  MACH3LOG_INFO("");
+
+  double mean, error;
+  //KS: We now prepare to make tables for TN etc.
+  std::cout<<"\\begin{table}[htb]"<<std::endl;
+  std::cout<<"\\centering"<<std::endl;
+  std::cout<<"\\begin{tabular}{ | l |";
+  for(unsigned int f = 0; f < InputFiles.size(); f++)
+  {
+    std::cout<<" c |";
+  }
+  std::cout<<"} \\hline"<<std::endl;
+  std::cout<<"Sample ";
+  for(unsigned int f = 0; f < InputFiles.size(); f++)
+  {
+    std::cout<<"& Event Rates  ";
+  }
+  std::cout<<"\\\\ \\hline"<<std::endl;
+  for(unsigned int i = 0; i < SampleNames.size(); i++)
+  {
+    std::cout<<SampleNames[i];
+    std::string TempString = "Predictive/" + SampleNames[i]+"/"+SampleNames[i]+"_sum";
+    for(unsigned int f = 0; f < InputFiles.size(); f++)
+    {
+      TH1D *hist = static_cast<TH1D*>(InputFiles[f]->Get(TempString.c_str()));
+      GetMeanError(hist, mean, error);
+      std::cout<<" & "<<mean<<" $\\pm$ "<<error;
+    }
+    std::cout<<" \\\\"<<std::endl;
+  }
+  std::cout<<"Total";
+  for(unsigned int f = 0; f < InputFiles.size(); f++)
+  {
+    TH1D *histTot = static_cast<TH1D*>(InputFiles[f]->Get("Predictive/Total/Total_sum"));
+    GetMeanError(histTot, mean, error);
+    std::cout<<" & "<<mean<<" $\\pm$ "<<error;
+  }
+  std::cout<<" \\\\"<<std::endl;
+  std::cout<<"\\hline"<<std::endl;
+  std::cout<<"\\end{tabular}"<<std::endl;
+  std::cout<<"\\end{table}"<<std::endl;
+  MACH3LOG_INFO("");
+}
+
+/// @brief KS: Print Fractional Uncertainties into Latex table format
+void PrintPosteriorFractionalUncertainties(const std::vector<TFile*>& InputFiles,
+                                           const std::vector<std::string>& SampleNames) {
+  MACH3LOG_INFO("Starting {}", __func__);
+  MACH3LOG_INFO("");
+  double mean, error;
+
+  //KS: Fractional uncertainties on the prior and posterior predictive event rates.
+  std::cout<<"\\begin{table}[htb]"<<std::endl;
+  std::cout<<"\\centering"<<std::endl;
+  std::cout<<"\\begin{tabular}{ | l |";
+  for(unsigned int f = 0; f < InputFiles.size(); f++)
+  {
+    std::cout<<" c |";
+  }
+  std::cout<<"} \\hline"<<std::endl;
+
+  std::cout<<"Sample ";
+  for(unsigned int f = 0; f < InputFiles.size(); f++)
+  {
+    std::cout<<"& $\\delta N / N (\\%)$";
+  }
+  std::cout<<"\\\\ \\hline"<<std::endl;
+
+  for(unsigned int i = 0; i < SampleNames.size(); i++)
+  {
+    std::cout<<SampleNames[i];
+    std::string TempString = "Predictive/" + SampleNames[i]+"/"+SampleNames[i]+"_sum";
+    for(unsigned int f = 0; f < InputFiles.size(); f++)
+    {
+      TH1D *hist = static_cast<TH1D*>(InputFiles[f]->Get(TempString.c_str()));
+      GetMeanError(hist, mean, error);
+      std::cout<<" & "<<error/mean*100;
+    }
+    std::cout<<" \\\\"<<std::endl;
+  }
+  std::cout<<"Total";
+  for(unsigned int f = 0; f < InputFiles.size(); f++)
+  {
+    TH1D *histTotal = static_cast<TH1D*>(InputFiles[f]->Get("Predictive/Total/Total_sum"));
+    GetMeanError(histTotal, mean, error);
+    std::cout<<" & "<<error/mean*100;
+  }
+  std::cout<<"\\\\ \\hline"<<std::endl;
+  std::cout<<"\\end{tabular}"<<std::endl;
+  std::cout<<"\\end{table}"<<std::endl;
+  MACH3LOG_INFO("");
+}
+
+double GetLLH(TH1* hist)
+{
+  std::string TempTile = hist->GetTitle();
+  std::string temp = "=";
+
+  std::string::size_type SizeType = TempTile.find(temp);
+  TempTile.erase(0, SizeType+1);
+  double llh = atof(TempTile.c_str());
+  return llh;
+}
+
+/// @brief KS Print Predictive LLH into Latex table format
+void PrintPredictiveLLH(const std::vector<TFile*>& InputFiles,
+                        const std::vector<std::string>& SampleNames) {
+  MACH3LOG_INFO("Starting {}", __func__);
+  MACH3LOG_INFO("");
+
+  std::vector<double> Total(InputFiles.size());
+  //KS: We now prepare to make tables for TN etc.
+  std::cout<<"\\begin{table}[htb]"<<std::endl;
+  std::cout<<"\\centering"<<std::endl;
+  std::cout<<"\\begin{tabular}{ | l |";
+  for(unsigned int f = 0; f < InputFiles.size(); f++)
+  {
+    Total[f] = 0.;
+    std::cout<<" c |";
+  }
+  std::cout<<"} \\hline"<<std::endl;
+  std::cout<<"Sample ";
+  for(unsigned int f = 0; f < InputFiles.size(); f++)
+  {
+    std::cout<<"& 2#log#mathcal{L}_{stat}  ";
+  }
+  std::cout<<"\\\\ \\hline"<<std::endl;
+  for(unsigned int i = 0; i < SampleNames.size(); i++)
+  {
+    std::cout<<SampleNames[i];
+    std::string TempString = "Predictive/" + SampleNames[i]+"/"+SampleNames[i]+"_mc_PostPred";
+    for(unsigned int f = 0; f < InputFiles.size(); f++)
+    {
+      TH1 *hist = static_cast<TH1*>(InputFiles[f]->Get(TempString.c_str()));
+
+      double llh = GetLLH(hist);
+      std::cout<<" & "<<llh;
+      Total[f] += llh;
+    }
+    std::cout<<" \\\\"<<std::endl;
+  }
+  std::cout<<"Total";
+  for(unsigned int f = 0; f < InputFiles.size(); f++) {
+    std::cout<<" & "<<Total[f];
+  }
+  std::cout<<" \\\\"<<std::endl;
+  std::cout<<"\\hline"<<std::endl;
+  std::cout<<"\\end{tabular}"<<std::endl;
+  std::cout<<"\\end{table}"<<std::endl;
+  std::cout<<" "<<std::endl;
 }
 
 void PredictivePlotting(const std::string& ConfigName,
@@ -371,7 +556,7 @@ void PredictivePlotting(const std::string& ConfigName,
   canvas->SetLeftMargin(0.12);
   canvas->SetGrid();
 
-  gStyle->SetOptStat(0);  //Set 0 to disable statystic box
+  gStyle->SetOptStat(0);  //Set 0 to disable statistic box
   gStyle->SetPalette(51);
   gStyle->SetLegendBorderSize(0); //This option disables legends borders
   gStyle->SetFillStyle(0);
@@ -395,12 +580,17 @@ void PredictivePlotting(const std::string& ConfigName,
   canvas->Print("Overlay_Predictive.pdf[", "pdf");
 
   // Make overlay of 1D hists
-  OverlayPredicitve(settings, InputFiles, Samples, canvas);
+  OverlayPredicitve(settings, InputFiles, Samples, Dimensions, canvas);
   // Make overlay of violin plots
   OverlayViolin(settings, InputFiles, Samples, Dimensions, canvas);
   // Get PValue per sample
   PrintPosteriorPValue(settings, InputFiles, Samples);
-
+  // KS: Print Fractional Uncertainties into Latex table format
+  PrintPosteriorEventRates(InputFiles, Samples);
+  // KS: Print Fractional Uncertainties into Latex table format
+  PrintPosteriorFractionalUncertainties(InputFiles, Samples);
+  // KS: Print Predictive LLH into Latex table format
+  PrintPredictiveLLH(InputFiles, Samples);
   canvas->Print("Overlay_Predictive.pdf]", "pdf");
 
   for(size_t i = 0; i < FileNames.size(); i++)
@@ -426,7 +616,11 @@ int main(int argc, char **argv)
     FileNames.emplace_back(argv[i]);
   }
 
+  PlotMan = new MaCh3Plotting::PlottingManager();
+  PlotMan->initialise();
+
   PredictivePlotting(ConfigName, FileNames);
 
+  if(PlotMan) delete PlotMan;
   return 0;
 }

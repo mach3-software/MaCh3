@@ -17,6 +17,7 @@ namespace MaCh3Plotting {
 /// @author Ewan Miller
 
 /// @brief EW: provides centralized styling utilities for plots, including name prettification and style application
+/// @ingroup MaCh3Plotting
 class StyleManager {
 public:
   /// @brief Constructor
@@ -47,6 +48,15 @@ public:
   /// @return A beautiful formatted name that can be used in plots
   inline std::string prettifySampleName(const std::string &origName) const {
     return prettifyName(origName, "samples");
+  };
+
+  /// @brief Convert hideous and vulgar internal kinematics name into a beautiful presentable name
+  /// @details The pretty kinematics names should be specified in the style config file
+  /// @param origName The "internal" name used to uniquely identify the kinematics inside the plotting
+  /// code
+  /// @return A beautiful formatted name that can be used in plots
+  inline std::string prettifyKinematicName(const std::string &origName) const {
+    return prettifyName(origName, "kinematics");
   };
 
   // style setting options

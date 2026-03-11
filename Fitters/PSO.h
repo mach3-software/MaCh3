@@ -74,10 +74,12 @@ class particle{
 /// @author Emily Ip
 /// @author Mark Scott
 /// @date 24/2/2023
+///
+/// @ingroup FittingAlgorithms
 class PSO : public LikelihoodFit {
   public:
     /// @brief constructor
-    PSO(manager * const fitMan);
+    PSO(Manager * const fitMan);
     /// @brief Destructor
     virtual ~PSO() {};
 

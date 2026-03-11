@@ -6,7 +6,7 @@
 class LikelihoodFit : public FitterBase {
  public:
     /// @brief Constructor
-    LikelihoodFit(manager * const fitMan);
+    LikelihoodFit(Manager * const fitMan);
     /// @brief Destructor
     virtual ~LikelihoodFit();
 

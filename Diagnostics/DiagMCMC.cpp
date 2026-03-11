@@ -2,6 +2,12 @@
 
 #include "Manager/Manager.h"
 
+/// @file DiagMCMC.cpp
+/// @ingroup MaCh3DiagnosticProcessing
+///
+/// @author Clarence Wret
+/// @author Kamil Skwarczynski
+
 /// @brief Main function  creating MCMCProcessor and calling MCMC Diagnostic
 /// @param inputFile MCMC Chain
 /// @param config Config file with settings

@@ -28,7 +28,6 @@ OscProcessor::OscProcessor(const std::string &InputFile) : MCMCProcessor(InputFi
 // The destructor
 OscProcessor::~OscProcessor() {
 // ****************************
-
 }
 
 // ***************

@@ -27,7 +27,7 @@
 /// @brief Class responsible for handling Principal Component Analysis (PCA) of covariance matrix
 /// @author Clarence Wret
 ///
-/// @section introPCA Introduction
+/// # Introduction
 ///
 /// This class applies Principal Component Analysis (PCA) to covariance matrices
 /// using eigen-decomposition. The main benefit is that PCA rotates the parameter
@@ -35,7 +35,7 @@
 /// MCMC fits move more efficiently, since correlated directions in the original
 /// space often slow down convergence.
 ///
-/// @section dimredPCA Dimensionality Reduction
+/// # Dimensionality Reduction
 ///
 /// PCA makes it possible to drop directions in parameter space with very small
 /// eigenvalues. These correspond to combinations of parameters that are poorly
@@ -48,15 +48,13 @@
 /// keeping the dominant structure of the parameter space intact, often leading
 /// to faster and more stable fits.
 ///
-/// @section partialPCA Partial Decomposition
+/// # Partial Decomposition
 ///
 /// PCA does not need to be applied to the full covariance matrix. This class
 /// supports eigen-decomposition of only a submatrix. This is useful when only a
 /// subset of parameters is strongly correlated and benefits from PCA, while the
 /// rest remain in the original parameter basis.
 ///
-///
-/// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/03.-Eigen-Decomposition-%E2%80%90-PCA).
 class PCAHandler{
  public:
   /// @brief Constructor

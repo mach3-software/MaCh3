@@ -30,6 +30,8 @@ _MaCh3_Safe_Include_End_ //}
 ///
 /// @cite gelman2019.
 ///
+/// @ingroup MaCh3DiagnosticProcessing
+///
 /// @author Kamil Skwarczynski
 /// @author Michael Reh
 
@@ -317,11 +319,9 @@ void PrepareChains() {
       }
 
       // Set the branch addresses for params
-      for (int j = 0; j < nDraw; ++j)
-      {
+      for (int j = 0; j < nDraw; ++j) {
         Draws[m][i][j] = branch_values[j];
       }
-
     }//end loop over toys
 
     //TN: There, we now don't need to keep the chain in memory anymore
@@ -604,7 +604,11 @@ void SaveResults() {
       while (temp.find(".root") != std::string::npos) {
         temp = temp.substr(0, temp.find(".root"));
       }
-
+      // Strip directory path
+      const auto slash = temp.find_last_of("/\\");
+      if (slash != std::string::npos) {
+        temp = temp.substr(slash + 1);
+      }
       NameTemp = NameTemp + temp + "_";
     }
   }

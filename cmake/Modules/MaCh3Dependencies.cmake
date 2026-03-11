@@ -2,7 +2,7 @@
 # download CPM.cmake
 file(
   DOWNLOAD
-  https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.42.0/CPM.cmake
+  https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.42.1/CPM.cmake
   ${CMAKE_CURRENT_BINARY_DIR}/cmake/CPM.cmake
 )
 include(${CMAKE_CURRENT_BINARY_DIR}/cmake/CPM.cmake)
@@ -15,7 +15,8 @@ endif()
 ### Begin ROOT setup
 ### KS: 6.18 is minimal version which has nasty bug-fix to SetBinError in TH2Poly
 ### https://github.com/root-project/root/commit/9ed733d77ca4b513ef68ba5343c9b2664f24ebc3
-find_package(ROOT 6.18 REQUIRED)
+### KS: 6.20 is minimal due to ROOT_GENERATE_DICTIONARY
+find_package(ROOT 6.20 REQUIRED)
 
 STRING(STRIP "${ROOT_CXX_FLAGS}" ROOT_CXX_FLAGS_LIST)
 STRING(REPLACE " " ";" ROOT_CXX_FLAGS_LIST ${ROOT_CXX_FLAGS_LIST})
@@ -63,13 +64,13 @@ endif()
 ### End ROOT setup
 
 #YAML for reading in config files
-set(YAML_CPP_VERSION 0.8.0) #KS: We need it for version.h file also define this number only once
+set(YAML_CPP_VERSION 0.9.0) #KS: We need it for version.h file also define this number only once
 CPMAddPackage(
     NAME yaml-cpp
     VERSION ${YAML_CPP_VERSION}
     GITHUB_REPOSITORY "jbeder/yaml-cpp"
-    GIT_TAG bbf8bdb087bb3f3621ca0a5ace06047805f4e9f3
-    GIT_SHALLOW NO
+    GIT_TAG "yaml-cpp-${YAML_CPP_VERSION}"
+    GIT_SHALLOW YES
     OPTIONS
       "YAML_CPP_INSTALL ON"
       "YAML_CPP_BUILD_TESTS OFF"
