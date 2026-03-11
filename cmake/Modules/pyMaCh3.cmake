@@ -51,14 +51,15 @@ function(setup_pyMaCh3)
   file(MAKE_DIRECTORY ${INSTALL_DIR}/lib/core)  ## <- where we will copy all the MaCh3 core libs
   file(MAKE_DIRECTORY ${INSTALL_DIR}/lib/other) ## <- where we will copy any experiment libs
   
+  ## set location of the __init__.py template
+  set(MaCh3_PYTHON_INIT_TEMPLATE ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../cmake/Templates/__init__.py.in)
+
   ## copy all the core libraries into our python module lib folder
   if ( MaCh3_LIB_DIR ) ## we are installing in experimet 
     add_custom_command(TARGET _pyMaCh3 POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E copy ${MaCh3_LIB_DIR}/* ${INSTALL_DIR}/lib/core 
       COMMAND_EXPAND_LISTS
     )
-
-    set(MaCh3_PYTHON_INIT_TEMPLATE ${MaCh3_SOURCE_DIR}/cmake/Templates/__init__.py.in)
     
   else() ## we are installing core pyMaCh3 - so libs haven't been installed yet so can't just copy them
     install(
@@ -76,7 +77,6 @@ function(setup_pyMaCh3)
         Plotting
       LIBRARY DESTINATION ${INSTALL_DIR}/lib/core)
 
-      set(MaCh3_PYTHON_INIT_TEMPLATE ${CMAKE_CURRENT_LIST_DIR}/cmake/Templates/__init__.py.in)
   endif()
 
   ## install any experiment specific libraries into python lib dir
