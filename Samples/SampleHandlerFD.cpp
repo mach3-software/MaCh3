@@ -191,7 +191,7 @@ void SampleHandlerFD::Initialise() {
   MACH3LOG_INFO("Setting up Normalisation Pointers..");
   SetupNormParameters();
   MACH3LOG_INFO("Setting up Functional Pointers..");
-  SetupFunctionalParameters();
+  RegisterFunctionalParameters();
   MACH3LOG_INFO("Setting up Additional Weight Pointers..");
   AddAdditionalWeightPointers();
   MACH3LOG_INFO("Setting up Kinematic Map..");
@@ -324,9 +324,6 @@ void SampleHandlerFD::Reweight() {
 
   // Calculate weight coming from all splines if we initialised handler
   if(SplineHandler) SplineHandler->Evaluate();
-
-  // Update the functional parameter values to the latest proposed values
-  PrepFunctionalParameters();
 
   //KS: If using CPU this does nothing, if on GPU need to make sure we finished copying memory from
   if(SplineHandler) SplineHandler->SynchroniseMemTransfer();
@@ -462,92 +459,11 @@ void SampleHandlerFD::ResetHistograms() {
   }
 } // end function
 
-void SampleHandlerFD::RegisterIndividualFunctionalParameter(const std::string& fpName, int fpEnum, FuncParFuncType fpFunc){
-  // Add protections to not add the same functional parameter twice
-  if (funcParsNamesMap.find(fpName) != funcParsNamesMap.end()) {
-    MACH3LOG_ERROR("Functional parameter {} already registered in funcParsNamesMap with enum {}", fpName, funcParsNamesMap[fpName]);
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  if (std::find(funcParsNamesVec.begin(), funcParsNamesVec.end(), fpName) != funcParsNamesVec.end()) {
-    MACH3LOG_ERROR("Functional parameter {} already in funcParsNamesVec", fpName);
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  if (funcParsFuncMap.find(fpEnum) != funcParsFuncMap.end()) {
-    MACH3LOG_ERROR("Functional parameter enum {} already registered in funcParsFuncMap", fpEnum);
-    throw MaCh3Exception(__FILE__, __LINE__);
-  }
-  funcParsNamesMap[fpName] = fpEnum;
-  funcParsNamesVec.push_back(fpName);
-  funcParsFuncMap[fpEnum] = fpFunc;
-}
-
-// **************************************************
-void SampleHandlerFD::SetupFunctionalParameters() {
-// **************************************************
-  funcParsGrid.resize(GetNEvents());
-  if(ParHandler == nullptr) return;
-  funcParsVec = ParHandler->GetFunctionalParametersFromSampleName(SampleHandlerName);
-  // RegisterFunctionalParameters is implemented in experiment-specific code,
-  // which calls RegisterIndividualFuncPar to populate funcParsNamesMap, funcParsNamesVec, and funcParsFuncMap
-  RegisterFunctionalParameters();
-  funcParsMap.resize(funcParsNamesMap.size());
-
-  // For every functional parameter in XsecCov that matches the name in funcParsNames, add it to the map
-  for (FunctionalParameter& fp : funcParsVec) {
-    auto it = funcParsNamesMap.find(fp.name);
-    // If we don't find a match, we need to throw an error
-    if (it == funcParsNamesMap.end()) {
-      MACH3LOG_ERROR("Functional parameter {} not found, did you define it in RegisterFunctionalParameters()?", fp.name);
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-    const std::size_t key = static_cast<std::size_t>(it->second);
-    MACH3LOG_INFO("Adding functional parameter: {} to funcParsMap with key: {}",fp.name, key);
-
-    const int ikey = it->second;
-    fp.funcPtr = &funcParsFuncMap[ikey];
-
-    funcParsMap[key].valuePtr = fp.valuePtr;
-    funcParsMap[key].funcPtr  = fp.funcPtr;
-  }
-
-  // Mostly the same as CalcNormsBins
-  // For each event, make a vector of pointers to the functional parameters
-  for (std::size_t iEvent = 0; iEvent < static_cast<std::size_t>(GetNEvents()); ++iEvent) {
-    // Now loop over the functional parameters and get a vector of enums corresponding to the functional parameters
-    for (std::vector<FunctionalParameter>::iterator it = funcParsVec.begin(); it != funcParsVec.end(); ++it) {
-      // Check whether the interaction modes match
-      bool ModeMatch = MatchCondition((*it).modes, static_cast<int>(std::round(*(MCSamples[iEvent].mode))));
-      if (!ModeMatch) {
-        MACH3LOG_TRACE("Event {}, missed Mode check ({}) for dial {}", iEvent, *(MCSamples[iEvent].mode), (*it).name);
-        continue;
-      }
-      // Now check whether within kinematic bounds
-      bool IsSelected = PassesSelection((*it), iEvent);
-      // Need to then break the event loop
-      if(!IsSelected){
-        MACH3LOG_TRACE("Event {}, missed Kinematic var check for dial {}", iEvent, (*it).name);
-        continue;
-      }
-      const std::size_t key = static_cast<std::size_t>(funcParsNamesMap[it->name]);
-      funcParsGrid[iEvent].push_back(&funcParsMap[key]);
-    }
-  }
-  MACH3LOG_INFO("Finished setting up functional parameters");
-
-  /// @todo KS: Instead of clearing it they should not be class members, so we must fix it in future
-  CleanVector(funcParsNamesVec);
-
-  funcParsNamesMap.clear();
-  funcParsNamesMap.rehash(0);
-}
-
 // ***************************************************************************
 void SampleHandlerFD::ApplyShifts(const int iEvent) {
 // ***************************************************************************
-  const auto& shifts = funcParsGrid[iEvent];
-  const auto nShifts = shifts.size();
   // KS: If there are no shifts then there is no point in resetting which can be costly.
-  if(nShifts == 0) {
+  if(!events_and_shifts.size() || !events_and_shifts[iEvent].size()) {
     return;
   }
 
@@ -555,9 +471,8 @@ void SampleHandlerFD::ApplyShifts(const int iEvent) {
   // First reset shifted array back to nominal values
   ResetShifts(iEvent);
 
-  for (std::size_t iShift = 0; iShift < nShifts; ++iShift) {
-    const auto* _restrict_ fp = shifts[iShift];
-    (*fp->funcPtr)(fp->valuePtr, iEvent);
+  for (auto const &iShift : events_and_shifts[iEvent]) {
+    event_shift_functions[iShift](iEvent);
   }
 
   FinaliseShifts(iEvent);
@@ -2096,35 +2011,3 @@ std::vector<double> SampleHandlerFD::GetArrayForSample(const int Sample, std::ve
   return std::vector<double>(array.begin() + Start, array.begin() + End);
 }
 
-// ***************************************************************************
-template <typename ParT>
-bool SampleHandlerFD::PassesSelection(const ParT& Par, std::size_t iEvent) {
-// ***************************************************************************
-  bool IsSelected = true;
-  if (Par.hasKinBounds) {
-    const auto& kinVars = Par.KinematicVarStr;
-    const auto& selection = Par.Selection;
-
-    for (std::size_t iKinPar = 0; iKinPar < kinVars.size(); ++iKinPar) {
-      const double kinVal = ReturnKinematicParameter(kinVars[iKinPar], static_cast<int>(iEvent));
-
-      bool passedAnyBound = false;
-      const auto& boundsList = selection[iKinPar];
-
-      for (const auto& bounds : boundsList) {
-        if (kinVal > bounds[0] && kinVal <= bounds[1]) {
-          passedAnyBound = true;
-          break;
-        }
-      }
-
-      if (!passedAnyBound) {
-        MACH3LOG_TRACE("Event {}, missed kinematic check ({}) for dial {}",
-                       iEvent, kinVars[iKinPar], Par.name);
-        IsSelected = false;
-        break;
-      }
-    }
-  }
-  return IsSelected;
-}

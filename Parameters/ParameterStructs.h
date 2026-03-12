@@ -130,8 +130,6 @@ struct NormParameter : public TypeParameterBase {
   std::vector< std::string > KinematicVarStr;
 };
 
-/// HH - a shorthand type for funcpar functions
-using FuncParFuncType = std::function<void (const double*, std::size_t)>;
 // *******************
 /// @brief HH - Functional parameters
 /// Carrier for whether you want to apply a systematic to an event or not
@@ -157,12 +155,6 @@ struct FunctionalParameter : public TypeParameterBase {
   /// within a SampleHandler daughter class
   /// The bounds for each kinematic variable are given in Selection
   std::vector< std::string > KinematicVarStr;
-
-  /// Parameter value pointer
-  const double* valuePtr;
-
-  /// Function pointer
-  FuncParFuncType* funcPtr;
 };
 
 /// Make an enum of the spline interpolation type

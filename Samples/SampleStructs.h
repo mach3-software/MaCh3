@@ -157,17 +157,6 @@ struct KinematicCut {
 };
 
 // ***************************
-/// @brief Small struct used for applying shifts due to functional params
-/// @author Hank Hua
-struct FunctionalShifter {
-// ***************************
-  /// Pointer to parameter value
-  const double* valuePtr = nullptr;
-  /// Pointer to shifting function
-  FuncParFuncType* funcPtr = nullptr;
-};
-
-// ***************************
 /// @brief KS: Store bin lookups allowing to quickly find bin after migration
 struct BinShiftLookup {
 // ***************************

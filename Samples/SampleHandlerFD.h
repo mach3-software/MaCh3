@@ -230,22 +230,168 @@ class SampleHandlerFD :  public SampleHandlerBase
   void SetupReweightArrays();
   //===============================================================================
 
-  // ----- Functional Parameters -----
-  /// @brief ETA - a function to setup and pass values to functional parameters where you need to pass a value to some custom reweight calc or engine
-  virtual void SetupFunctionalParameters();
-  /// @brief HH - a helper function for RegisterFunctionalParameter
-  void RegisterIndividualFunctionalParameter(const std::string& fpName, int fpEnum, FuncParFuncType fpFunc);
-  /// @brief HH - a experiment-specific function where the maps to actual functions are set up
-  virtual void RegisterFunctionalParameters() = 0;
-  /// @brief Update the functional parameter values to the latest proposed values. Needs to be called before every new reweight so is called in fillArray
-  virtual void PrepFunctionalParameters(){};
-  /// @brief ETA - generic function applying shifts
-  virtual void ApplyShifts(const int iEvent);
-
   /// @brief DB Function which determines if an event is selected, where Selection double looks like {{ND280KinematicTypes Var1, douuble LowBound}
   bool IsEventSelected(const int iSample, const int iEvent) _noexcept_;
   /// @brief JM Function which determines if a subevent is selected
   bool IsSubEventSelected(const std::vector<KinematicCut> &SubEventCuts, const int iEvent, unsigned const int iSubEvent, size_t nsubevents);
+
+  // ----- start Functional Parameters -----
+  /// @brief HH - a experiment-specific function where the maps to actual functions are set up
+  virtual void RegisterFunctionalParameters() = 0;
+
+  std::vector<std::function<void(const int)>> event_shift_functions;
+  std::vector<std::vector<int>> events_and_shifts;
+
+  /// @brief HH - a helper function for RegisterFunctionalParameter
+  template <typename EventType, typename SFType>
+  void RegisterIndividualFunctionalParameter(
+      std::vector<EventType> &ExptEvents,
+      std::vector<std::string> const &par_names,
+      SFType shift_func) {
+
+    static_assert(
+        std::is_same_v<std::function<void(std::vector<double const *> const &,
+                                          EventType &)>,
+                       decltype(std::function(shift_func))>,
+        "Function call signature for single parameter Functional shift must be "
+        "void(std::vector<double const *> const &, EventType &). -- note the "
+        "two consts on the parameter value vector");
+
+    auto sample_func_pars =
+        ParHandler->GetFunctionalParametersFromSampleName(SampleHandlerName);
+
+    std::stringstream ss_pars, ss_miss;
+    std::vector<FunctionalParameter const *> matched_pars;
+    for (auto const &par_name : par_names) {
+      ss_pars << par_name << " ";
+      bool found = false;
+      for (auto const &fp : sample_func_pars) {
+        if (fp.name == par_name) {
+          matched_pars.push_back(&fp);
+          found = true;
+        }
+      }
+      if (!found) {
+        ss_miss << par_name;
+      }
+    }
+
+    // allows experiments to effectively disable functional parameters by not
+    // supplying the YAML defining the parameters
+    if (!matched_pars.size()) {
+      MACH3LOG_INFO(
+          "Functional shift consuming parameters: [ {}], doesn't apply to "
+          "sample handler: {}",
+          ss_pars.str(), SampleHandlerName);
+      return;
+    } else if (matched_pars.size() !=
+               par_names.size()) { // not well defined how to procede with
+                                   // partially defined parameter sets, so don't
+      MACH3LOG_ERROR(
+          "Functional shift consuming parameters: [ {}], only partially "
+          "applys to sample handler: {}, missed parameters: [ {}]",
+          ss_pars.str(), SampleHandlerName, ss_miss.str());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+
+    if (!events_and_shifts.size()) {
+      events_and_shifts.resize(ExptEvents.size());
+    } else if (events_and_shifts.size() != ExptEvents.size()) {
+      MACH3LOG_ERROR("When registering functional shift consuming parameters: "
+                     "[ {}], SampleHandler: {} has an allocated event map of "
+                     "size: {}, but passed a vector of experiment events size: "
+                     "{}. SampleHandler must have a unique set of event "
+                     "indices so this indicates something has gone wrong.",
+                     ss_pars.str(), SampleHandlerName,
+                     events_and_shifts.size(), ExptEvents.size());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+
+    if (ExptEvents.size() != MCSamples.size()) {
+      MACH3LOG_ERROR("When registering functional shift consuming parameters: "
+                     "[ {}], SampleHandler: {} knows about {} MCEvents, but "
+                     "passed a vector of experiment events size: "
+                     "{}. SampleHandler must have a unique set of event "
+                     "indices so this indicates something has gone wrong.",
+                     ss_pars.str(), SampleHandlerName, MCSamples.size(),
+                     ExptEvents.size());
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+
+    // This functional shift is correctly configured for this SampleHandler
+    std::vector<double const *> par_vals;
+    for (auto const &fp : sample_func_pars) {
+      par_vals.push_back(ParHandler->RetPointer(fp.index));
+    }
+
+    MACH3LOG_INFO("Registered functional shift consuming parameters: "
+                  "[ {}] for SampleHandler: {}, with {} par vals.",
+                  ss_pars.str(), SampleHandlerName, par_vals.size());
+
+    int iShift = int(event_shift_functions.size());
+    event_shift_functions.push_back(
+      [shift_func, par_vals, &ExptEvents](int iEvent) {
+        shift_func(par_vals, ExptEvents[iEvent]);
+      });
+
+    // For each event, make a vector of pointers to the functional parameters
+    int NEvents = GetNEvents();
+    for (int iEvent = 0; iEvent < NEvents; ++iEvent) {
+      // Now loop over the functional parameters and get a vector of enums
+      // corresponding to the functional parameters
+      int nmatch = 0;
+      for (auto const &par : matched_pars) {
+        if (!MatchCondition(par->modes, static_cast<int>(std::round(
+                                            *(MCSamples[iEvent].mode))))) {
+          MACH3LOG_TRACE("Event {}, missed Mode check ({}) for dial {}", iEvent,
+                         *(MCSamples[iEvent].mode), par->name);
+          break;
+        }
+        if (!PassesSelection((*par), iEvent)) {
+          MACH3LOG_TRACE("Event {}, missed Kinematic var check for dial {}",
+                         iEvent, par->name);
+          break;
+        }
+        nmatch++;
+      }
+      if (!nmatch) {
+        continue;
+      }
+      if (nmatch != matched_pars.size()) {
+        MACH3LOG_ERROR(
+            "When determining wether functional shift consuming parameters: "
+            "[ {}], in SampleHandler: {} should apply to event: {}, only {}/{} "
+            "parameters matched. Partially applied shifts are ill-defined.",
+            ss_pars.str(), SampleHandlerName, iEvent, nmatch,
+            matched_pars.size());
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+      events_and_shifts[iEvent].push_back(iShift);
+    }
+  }
+
+  template <typename EventType, typename SFType>
+  void RegisterIndividualFunctionalParameter(std::vector<EventType> &ExptEvents,
+                                             std::string const &par_name,
+                                             SFType shift_func) {
+
+    static_assert(
+        std::is_same_v<std::function<void(double const *, EventType &)>,
+                       decltype(std::function(shift_func))>,
+        "Function call signature for single parameter Functional shift must be "
+        "void(double const *, EventType&).");
+
+    RegisterIndividualFunctionalParameter(
+        ExptEvents,
+        std::vector<std::string>{
+            par_name,
+        },
+        [=](std::vector<double const *> const &par_vals, EventType &ev) {
+          shift_func(par_vals[0], ev);
+        });
+  }
+  /// @brief ETA - generic function applying shifts
+  void ApplyShifts(const int iEvent);
   /// @brief HH - reset the shifted values to the original values
   virtual void ResetShifts(const int iEvent) {(void)iEvent;};
   /// @brief LP - Optionally calculate derived observables after all shifts have been applied
@@ -253,31 +399,43 @@ class SampleHandlerFD :  public SampleHandlerBase
   ///               in a subclass implementation of this method you may add the shifted quantities
   ///               together to build a shifted neutrino energy estimator
   virtual void FinaliseShifts(const int iEvent) {(void)iEvent;};
-  /// @brief HH - a grid of vectors of enums for each sample and event
-  std::vector<std::vector<FunctionalShifter*>> funcParsGrid;
-  /// @brief HH - a map that relates the funcpar enum to pointer of FuncPars
-  /// struct
-  /// HH - Changed to a vector of pointers since it's faster than unordered_map
-  /// and we are using ints as keys
-  std::vector<FunctionalShifter> funcParsMap;
-
-  /// @todo KS: Below functional variables are used only on setup, thus we should refactor them in such a way
-  /// that they are removed as class members but this would be breaking change thus keep it for the time being.
-
-  /// @brief HH - a vector that stores all the FuncPars struct
-  std::vector<FunctionalParameter> funcParsVec;
-  /// @brief HH - a map that relates the name of the functional parameter to
-  /// funcpar enum
-  std::unordered_map<std::string, int> funcParsNamesMap;
-  /// @brief HH - a map that relates the funcpar enum to pointer of the actual
-  /// function
-  std::unordered_map<int, FuncParFuncType> funcParsFuncMap;
-  /// @brief HH - a vector of string names for each functional parameter
-  std::vector<std::string> funcParsNamesVec = {};
+  // ----- end Functional Parameters -----
 
   /// @brief Check whether a normalisation systematic affects an event or not
   void CalcNormsBins(std::vector<NormParameter>& norm_parameters, std::vector< std::vector< int > >& norms_bins);
-  template <typename ParT> bool PassesSelection(const ParT& Par, std::size_t iEvent);
+  template <typename ParT>
+  bool PassesSelection(const ParT &Par, std::size_t iEvent) {
+    // ***************************************************************************
+    bool IsSelected = true;
+    if (Par.hasKinBounds) {
+      const auto &kinVars = Par.KinematicVarStr;
+      const auto &selection = Par.Selection;
+
+      for (std::size_t iKinPar = 0; iKinPar < kinVars.size(); ++iKinPar) {
+        const double kinVal = ReturnKinematicParameter(
+            kinVars[iKinPar], static_cast<int>(iEvent));
+
+        bool passedAnyBound = false;
+        const auto &boundsList = selection[iKinPar];
+
+        for (const auto &bounds : boundsList) {
+          if (kinVal > bounds[0] && kinVal <= bounds[1]) {
+            passedAnyBound = true;
+            break;
+          }
+        }
+
+        if (!passedAnyBound) {
+          MACH3LOG_TRACE("Event {}, missed kinematic check ({}) for dial {}",
+                         iEvent, kinVars[iKinPar], Par.name);
+          IsSelected = false;
+          break;
+        }
+      }
+    }
+    return IsSelected;
+  }
+
   /// @brief Calculate the total weight weight for a given event
   M3::float_t CalcWeightTotal(const EventInfo* _restrict_ MCEvent) const;
 
