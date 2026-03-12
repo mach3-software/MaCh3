@@ -7,9 +7,10 @@
 /// as well as conversion utilities between MaCh3 and NuDock oscillation parameter conventions.
 /// @author Hank Hua
 
-#include "nudock.hpp"
 #include <Manager/Manager.h>
-
+_MaCh3_Safe_Include_Start_ //{
+#include "nudock.hpp"
+_MaCh3_Safe_Include_End_ //}
 /// @brief Initialise a NuDock communication object from a manager configuration.
 ///
 /// @param man Pointer to the MaCh3 manager holding the NuDock YAML config block.

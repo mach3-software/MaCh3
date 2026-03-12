@@ -4,7 +4,6 @@
 /// @author Hank Hua
 
 #include "NuDockFactory.h"
-#include "nudock.hpp"
 
 /// @brief Mapping from NuDock oscillation parameter names to MaCh3 names.
 const std::unordered_map<std::string, std::string> NuDockOscNameMap = {

@@ -38,8 +38,11 @@ jobs:
       run: docker pull ${{ matrix.container }}
 
     - name: Run FindPackage build
+      env:
+        REF_NAME: ${{ github.head_ref || github.ref_name }}
       run: |
         docker run --rm \
+          -e REF_NAME="$REF_NAME" \
           -v ${{ github.workspace }}:/workspace \
           -w /workspace \
           ${{ matrix.container }} \
@@ -48,7 +51,7 @@ jobs:
             cd /opt
             git clone https://github.com/mach3-software/MaCh3.git MaCh3Core
             cd MaCh3Core
-            git checkout "${{ github.head_ref || github.ref_name }}"
+            git checkout "$REF_NAME"
             mkdir build && cd build
             cmake .. '"${{ matrix.cmakeoptions }}"'
             make -j4 install
