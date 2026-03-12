@@ -818,8 +818,8 @@ void FitterBase::RunLLHScan() {
 //LLH scan is good first estimate of step scale
 void FitterBase::GetStepScaleBasedOnLLHScan(const std::string& outputFileName) {
 // *************************
-  TFile* outputFileLLH = NULL;
-  if(outputFileName != NULL){
+  TFile* outputFileLLH = nullptr;
+  if(outputFileName != nullptr){
     outputFileLLH = M3::Open(outputFileName, "READ", __FILE__, __LINE__);
   }
   else
