@@ -47,7 +47,7 @@ class FitterBase {
   void RunLLHScan();
 
   /// @brief LLH scan is good first estimate of step scale
-  void GetStepScaleBasedOnLLHScan();
+  void GetStepScaleBasedOnLLHScan(const std::string& filename);
 
   /// @brief Perform a 2D likelihood scan.
   /// @warning This operation may take a significant amount of time, especially for complex models.
