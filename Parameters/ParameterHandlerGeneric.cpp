@@ -622,14 +622,20 @@ std::vector<std::string> ParameterHandlerGeneric::GetUniqueParameterGroups() con
 void ParameterHandlerGeneric::CheckCorrectInitialisation() const {
 // ********************************************
   // KS: Lambda Function which simply checks if there are no duplicates in std::vector
-  auto CheckForDuplicates = [](const std::vector<std::string>& names, const std::string& nameType) {
+  auto CheckForDuplicates = [](const std::vector<std::string>& names, const std::string& nameType, bool Warning) {
     std::unordered_map<std::string, size_t> seenStrings;
     for (size_t i = 0; i < names.size(); ++i) {
       const auto& name = names[i];
       if (seenStrings.find(name) != seenStrings.end()) {
         size_t firstIndex = seenStrings[name];
-        MACH3LOG_CRITICAL("There are two systematics with the same {} '{}', first at index {}, and again at index {}", nameType, name, firstIndex, i);
-        throw MaCh3Exception(__FILE__, __LINE__);
+        if(Warning){
+          MACH3LOG_WARN("There are two systematics with the same {} '{}', first at index {}, and again at index {}", nameType, name, firstIndex, i);
+          MACH3LOG_WARN("Is this desired?");
+          return;
+        } else {
+          MACH3LOG_CRITICAL("There are two systematics with the same {} '{}', first at index {}, and again at index {}", nameType, name, firstIndex, i);
+          throw MaCh3Exception(__FILE__, __LINE__);
+        }
       }
       seenStrings[name] = i;
     }
@@ -639,8 +645,8 @@ void ParameterHandlerGeneric::CheckCorrectInitialisation() const {
     SplineNameTemp[it] = SplineParams[it]._fSplineNames;
   }
   // KS: Checks if there are no duplicates in fancy names etc, this can happen if we merge configs etc
-  CheckForDuplicates(_fFancyNames, "_fFancyNames");
-  CheckForDuplicates(SplineNameTemp, "_fSplineNames");
+  CheckForDuplicates(_fFancyNames, "_fFancyNames", false);
+  CheckForDuplicates(SplineNameTemp, "_fSplineNames", true);
 }
 
 // ********************************************
