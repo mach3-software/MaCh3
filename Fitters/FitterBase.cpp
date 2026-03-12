@@ -868,6 +868,7 @@ void FitterBase::GetStepScaleBasedOnLLHScan(const std::string& outputFileName) {
     cov->SetIndivStepScale(StepScale);
     cov->SaveUpdatedMatrixConfig();
   }
+  delete outputFileLLH;
 }
 
 // *************************
