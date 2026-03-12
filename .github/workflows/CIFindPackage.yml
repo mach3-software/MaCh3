@@ -20,11 +20,11 @@ jobs:
         include:
           - name: Find Package Alma9
             container: ghcr.io/mach3-software/mach3:alma9v2.2.1
-            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DNuFastLinear_ENABLED=ON -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProb3ppLinear_ENABLED=ON
+            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DMaCh3_NUDOCK_ENABLED=ON -DNuFastLinear_ENABLED=ON -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProb3ppLinear_ENABLED=ON
 
           - name: Find Package Rocky9 CUDA
             container: ghcr.io/mach3-software/mach3:rocky9cudav2.2.0
-            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DNuFastLinear_ENABLED=ON -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DProbGPU_ENABLED=ON
+            cmakeoptions: -DMaCh3_PYTHON_ENABLED=ON -DMaCh3_NUDOCK_ENABLED=ON -DNuFastLinear_ENABLED=ON -DCUDAProb3Linear_ENABLED=ON -DCUDAProb3_ENABLED=ON -DProb3ppLinear_ENABLED=ON -DProbGPU_ENABLED=ON
 
     name: ${{ matrix.name }}
 
@@ -38,8 +38,11 @@ jobs:
       run: docker pull ${{ matrix.container }}
 
     - name: Run FindPackage build
+      env:
+        REF_NAME: ${{ github.head_ref || github.ref_name }}
       run: |
         docker run --rm \
+          -e REF_NAME="$REF_NAME" \
           -v ${{ github.workspace }}:/workspace \
           -w /workspace \
           ${{ matrix.container }} \
@@ -48,7 +51,7 @@ jobs:
             cd /opt
             git clone https://github.com/mach3-software/MaCh3.git MaCh3Core
             cd MaCh3Core
-            git checkout "${{ github.head_ref || github.ref_name }}"
+            git checkout "$REF_NAME"
             mkdir build && cd build
             cmake .. '"${{ matrix.cmakeoptions }}"'
             make -j4 install
