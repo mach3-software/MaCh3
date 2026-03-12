@@ -286,7 +286,6 @@ if (MaCh3_PYTHON_ENABLED)
   add_subdirectory(python)
 endif()
 if (MaCh3_NUDOCK_ENABLED)
-  find_package(nlohmann_json REQUIRED)
   add_subdirectory(NuDock)
 endif()
 

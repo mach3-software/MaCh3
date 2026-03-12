@@ -39,10 +39,7 @@ if(NOT TARGET spdlog::spdlog)
 endif()
 
 if(MaCh3_NUDOCK_ENABLED)
-  find_package(nlohmann_json REQUIRED)
-  if(NOT TARGET nlohmann_json::nlohmann_json)
-    cmessage(FATAL_ERROR "Didn't set up nlohmann_json::nlohmann_json")
-  endif()
+  find_package(NuDock REQUIRED)
 endif()
 
 if(MaCh3_GPU_ENABLED)
