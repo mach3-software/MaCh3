@@ -3,7 +3,8 @@
 #include <pybind11/stl.h>
 // MaCh3 includes
 #include "Fitters/FitterBase.h"
-#include "Fitters/mcmc.h"
+#include "Fitters/MR2T2.h"
+#include "Fitters/DelayedMR2T2.h"
 #include "Fitters/MinuitFit.h"
 #include "Fitters/PSO.h"
 
@@ -22,15 +23,6 @@ public:
             FitterBase,  /* Parent class */
             "run",       /* Python name*/
             RunMCMC      /* Name of function in C++ (must match Python name) */
-        );
-    }
-
-    std::string GetName() const override {
-        PYBIND11_OVERRIDE_PURE_NAME(
-            std::string, /* Return type */
-            FitterBase,  /* Parent class */
-            "get_name",  /* Python name*/
-            GetName      /* Name of function in C++ (must match Python name) */
         );
     }
 };
@@ -52,15 +44,14 @@ public:
     }
 };
 
-void initFitters(py::module &m){
-
+void initFitters(py::module &m) {
     auto m_fitters = m.def_submodule("fitters");
     m_fitters.doc() =
         "This is a Python binding of MaCh3s C++ fitters library.";
     
     
     py::class_<FitterBase, PyFitterBase /* <--- trampoline*/>(m_fitters, "FitterBase")
-        .def(py::init<manager* const>())
+        .def(py::init<Manager* const>())
         
         .def(
             "run", 
@@ -130,19 +121,26 @@ void initFitters(py::module &m){
 
     ; // End of FitterBase class binding
 
-    py::class_<mcmc, FitterBase>(m_fitters, "MCMC")
-        .def(py::init<manager* const>())
-        
+    py::class_<MR2T2, FitterBase>(m_fitters, "mcmc")
+        .def(py::init<Manager *const>())
+
         .def(
-            "set_chain_length", 
-            &mcmc::setChainLength, 
+            "set_chain_length",
+            &MR2T2::setChainLength,
             "Set how long chain should be.",
-            py::arg("length")
-        )
-    ; // end of MCMC class binding
+            py::arg("length")); // end of MCMC class binding
+
+    py::class_<DelayedMR2T2, FitterBase>(m_fitters, "DelayedMCMC")
+        .def(py::init<Manager *const>())
+
+        .def(
+            "set_chain_length",
+            &MR2T2::setChainLength,
+            "Set how long chain should be.",
+            py::arg("length")); // end of MCMC class binding
 
     py::class_<LikelihoodFit, PyLikelihoodFit /* <--- trampoline*/, FitterBase>(m_fitters, "LikelihoodFit")
-        .def(py::init<manager* const>())
+        .def(py::init<Manager* const>())
         
         .def(
             "caluclate_chi2",
@@ -163,19 +161,18 @@ void initFitters(py::module &m){
     ; // end of LikelihoodFit class binding
 
     py::class_<MinuitFit, LikelihoodFit>(m_fitters, "MinuitFit")
-        .def(py::init<manager* const>())
+        .def(py::init<Manager* const>())
         
     ; // end of MinuitFit class binding
 
     py::class_<PSO, LikelihoodFit>(m_fitters, "PSO")
-        .def(py::init<manager* const>())
+        .def(py::init<Manager* const>())
 
         .def(
             "init",
             &PSO::init,
             "Initialise the fitter"
         )
-        
-    ; // end of PSO class binding
 
+    ; // end of PSO class binding
 }

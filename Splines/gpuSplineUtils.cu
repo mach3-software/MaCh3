@@ -59,14 +59,12 @@ __device__ __constant__ unsigned int d_n_splines;
 __device__ __constant__ unsigned int d_n_TF1;
 /// Size of splines living on GPU
 __device__ __constant__ short int d_spline_size;
-#ifndef Weight_On_SplineBySpline_Basis
 /// Number of events living on GPU
 __device__ __constant__ int d_n_events;
-#endif
+
 /// CW: Constant memory needs to be hard-coded on compile time. Could make this texture memory instead, but don't care enough right now...
 __device__ __constant__ float val_gpu[_N_SPLINES_];
 __device__ __constant__ short int segment_gpu[_N_SPLINES_];
-
 
 // *****************************************
 // Make sure all Cuda threads finished execution
@@ -78,7 +76,7 @@ __host__ void SynchroniseSplines() {
 //              INITIALISE GPU
 // *******************************************
 
-SMonolithGPU::SMonolithGPU(){
+SMonolithGPU::SMonolithGPU() {
   h_n_params     = -1;
   /// Number of events living on CPU
   h_n_events = -1;
@@ -97,17 +95,14 @@ SMonolithGPU::SMonolithGPU(){
   gpu_weights_tf1 = nullptr;
 }
 
-SMonolithGPU::~SMonolithGPU(){
-
+SMonolithGPU::~SMonolithGPU() {
 }
 
 // *******************************************
 // Initialiser when using the x array and combined y,b,c,d array
 __host__ void SMonolithGPU::InitGPU_SplineMonolith(
-                 #ifndef Weight_On_SplineBySpline_Basis
-                          float **cpu_total_weights, 
-                          int n_events,                              
-                  #endif   
+                          float **cpu_total_weights,
+                          int n_events,
                           unsigned int total_nknots,
                           unsigned int n_splines,
                           unsigned int n_tf1,
@@ -140,7 +135,6 @@ __host__ void SMonolithGPU::InitGPU_SplineMonolith(
   cudaMalloc((void **) &gpu_paramNo_TF1_arr, n_tf1*sizeof(short int));
   CudaCheckError();
 
-#ifndef Weight_On_SplineBySpline_Basis
   //KS: Rather than allocate memory in standard way this fancy cuda tool allows to pin host memory which make memory transfer faster
   cudaMallocHost((void **) cpu_total_weights, n_events*sizeof(float));
   CudaCheckError();
@@ -156,7 +150,6 @@ __host__ void SMonolithGPU::InitGPU_SplineMonolith(
   //KS: Allocate memory for the map keeping track how many TF1 each parameter has
   cudaMalloc((void **) &gpu_nParamPerEvent_TF1, 2*n_events*sizeof(unsigned int));
   CudaCheckError();
-#endif
   
   // Print allocation info to user
   printf("Allocated %i entries for paramNo and nKnots arrays, size = %f MB\n",
@@ -204,12 +197,11 @@ __host__ void SMonolithGPU::CopyToGPU_SplineMonolith(
                             // TFI related now
                             std::vector<float> cpu_many_array_TF1,
                             std::vector<short int> cpu_paramNo_arr_TF1,
-                    #ifndef Weight_On_SplineBySpline_Basis
                             int n_events,
                             std::vector<unsigned int> cpu_nParamPerEvent,
                             // TFI related now
                             std::vector<unsigned int> cpu_nParamPerEvent_TF1,
-                    #endif
+
                             int n_params, 
                             unsigned int n_splines,
                             short int spline_size,
@@ -225,9 +217,8 @@ __host__ void SMonolithGPU::CopyToGPU_SplineMonolith(
 
   // Write to the global statics (h_* denotes host stored variable)
   h_n_params = n_params;
-#ifndef Weight_On_SplineBySpline_Basis
   h_n_events    = n_events;
-#endif
+
   // Copy the constants
   // Total number of valid splines for all loaded events
   cudaMemcpyToSymbol(d_n_splines, &n_splines, sizeof(n_splines));
@@ -240,11 +231,11 @@ __host__ void SMonolithGPU::CopyToGPU_SplineMonolith(
   // Total spline size per spline; i.e. just the number of points or knots in the spline
   cudaMemcpyToSymbol(d_spline_size, &spline_size, sizeof(spline_size));
   CudaCheckError();
-#ifndef Weight_On_SplineBySpline_Basis
+
   // Number of events
   cudaMemcpyToSymbol(d_n_events, &h_n_events, sizeof(h_n_events));
   CudaCheckError();
-#endif
+
   // Copy the coefficient arrays to the GPU; this only happens once per entire Markov Chain so is OK to do multiple extensive memory copies
   cudaMemcpy(gpu_coeff_many, cpu_spline_handler->coeff_many.data(), sizeof(float)*total_nknots*_nCoeff_, cudaMemcpyHostToDevice);
   CudaCheckError();
@@ -287,7 +278,6 @@ __host__ void SMonolithGPU::CopyToGPU_SplineMonolith(
   cudaMemcpy(gpu_paramNo_TF1_arr, cpu_paramNo_arr_TF1.data(), n_tf1*sizeof(short int), cudaMemcpyHostToDevice);
   CudaCheckError();
 
-  #ifndef Weight_On_SplineBySpline_Basis
   //KS: Keep track how much splines each event has
   cudaMemcpy(gpu_nParamPerEvent, cpu_nParamPerEvent.data(), 2*n_events*sizeof(unsigned int), cudaMemcpyHostToDevice);
   CudaCheckError();
@@ -331,7 +321,6 @@ __host__ void SMonolithGPU::CopyToGPU_SplineMonolith(
   //Finally create texture object
   cudaCreateTextureObject(&text_nParamPerEvent_TF1, &resDesc_nParamPerEvent_tf1, &texDesc_nParamPerEvent_tf1, nullptr);
   CudaCheckError();
-  #endif
 }
 
 // ********************************************************
@@ -418,7 +407,6 @@ __global__ void EvalOnGPU_TF1(
   }
 }
 
-#ifndef Weight_On_SplineBySpline_Basis
 //*********************************************************
 // KS: Evaluate the total spline event weight on the GPU, as in most cases GPU is faster, even more this significant reduce memory transfer from GPU to CPU
 __global__ void EvalOnGPU_TotWeight(
@@ -432,37 +420,29 @@ __global__ void EvalOnGPU_TotWeight(
 //*********************************************************
   const unsigned int EventNum = (blockIdx.x * blockDim.x + threadIdx.x);
 
-  //KS: Accessing shared memory is much much faster than global memory hence we use shared memory for calculation and then write to global memory
-  __shared__ float shared_total_weights[_BlockSize_];
   if(EventNum < d_n_events) //stopping condition
   {
-    shared_total_weights[threadIdx.x] = 1.f;
+    float local_total_weight = 1.f;
 
     const unsigned int EventOffset = 2 * EventNum;
 
     for (unsigned int id = 0; id < tex1Dfetch<unsigned int>(text_nParamPerEvent, EventOffset); ++id) {
-      shared_total_weights[threadIdx.x] *= gpu_weights[tex1Dfetch<unsigned int>(text_nParamPerEvent, EventOffset+1) + id];
+      local_total_weight *= gpu_weights[tex1Dfetch<unsigned int>(text_nParamPerEvent, EventOffset+1) + id];
     }
 
     for (unsigned int id = 0; id < tex1Dfetch<unsigned int>(text_nParamPerEvent_TF1, EventOffset); ++id) {
-      shared_total_weights[threadIdx.x] *= gpu_weights_tf1[tex1Dfetch<unsigned int>(text_nParamPerEvent_TF1, EventOffset+1) + id];
+      local_total_weight *= gpu_weights_tf1[tex1Dfetch<unsigned int>(text_nParamPerEvent_TF1, EventOffset+1) + id];
     }
-    gpu_total_weights[EventNum] = shared_total_weights[threadIdx.x];
+    gpu_total_weights[EventNum] = local_total_weight;
   }
 }
-#endif
 
 // *****************************************
 // Run the GPU code for the separate many arrays. As in separate {x}, {y,b,c,d} arrays
 // Pass the segment and the parameter values
-// (binary search already performed in samplePDFND::FindSplineSegment()
+// (binary search already performed in SplineBase::FindSplineSegment()
 __host__ void SMonolithGPU::RunGPU_SplineMonolith(
-#ifdef Weight_On_SplineBySpline_Basis
-    float* cpu_weights,
-    float* cpu_weights_tf1,
-#else
     float* cpu_total_weights,
-#endif
     // Holds the changes in parameters
     float *vals,
     // Holds the segments for parameters
@@ -507,17 +487,6 @@ __host__ void SMonolithGPU::RunGPU_SplineMonolith(
   );
   CudaCheckError();
 
-//KS: We can either copy gpu_weight and calculate total weight in reweighting loop, or not copy and calculate total weight stall at GPU, which means less memory transfer
-#ifdef Weight_On_SplineBySpline_Basis
-  // Here we have to make a somewhat large GPU->CPU transfer because it's all the splines' response
-  cudaMemcpy(cpu_weights, gpu_weights, h_n_splines*sizeof(float), cudaMemcpyDeviceToHost);
-  CudaCheckError();
-
-  cudaMemcpy(cpu_weights_tf1, gpu_weights_tf1, h_n_tf1*sizeof(float), cudaMemcpyDeviceToHost);
-  CudaCheckError();
-
-//KS: Else calculate Total Weight
-#else
   grid_size.x = (h_n_events / block_size.x) + 1;
 
   EvalOnGPU_TotWeight<<<grid_size, block_size>>>(
@@ -535,7 +504,6 @@ __host__ void SMonolithGPU::RunGPU_SplineMonolith(
   //KS: Normally code wait for memory transfer to finish before moving further cudaMemcpyAsync means we will continue to execute code and in a meantime keep copying stuff.
   cudaMemcpyAsync(cpu_total_weights, gpu_total_weights, h_n_events * sizeof(float), cudaMemcpyDeviceToHost, 0);
   CudaCheckError();
-#endif
 
   #ifdef DEBUG
     printf("Copied GPU total weights to CPU with SUCCESS (drink more tea)\n");
@@ -550,10 +518,7 @@ __host__ void SMonolithGPU::RunGPU_SplineMonolith(
 // *********************************
 // Clean up the {x},{ybcd} arrays
 __host__ void SMonolithGPU::CleanupGPU_SplineMonolith(
-    #ifndef Weight_On_SplineBySpline_Basis
-    float *cpu_total_weights
-    #endif
-){
+    float *cpu_total_weights){
 // *********************************
   cudaFree(gpu_paramNo_arr);
   cudaFree(gpu_nKnots_arr);
@@ -569,7 +534,6 @@ __host__ void SMonolithGPU::CleanupGPU_SplineMonolith(
   // free weights on the gpu
   cudaFree(gpu_weights);
   cudaFree(gpu_weights_tf1);
-#ifndef Weight_On_SplineBySpline_Basis
   cudaFree(gpu_total_weights);
   //KS: Before removing variable let's destroy texture
   cudaDestroyTextureObject(text_nParamPerEvent);
@@ -579,7 +543,6 @@ __host__ void SMonolithGPU::CleanupGPU_SplineMonolith(
   cudaFree(gpu_nParamPerEvent_TF1);
   cudaFreeHost(cpu_total_weights);
   cpu_total_weights = nullptr;
-#endif
 }
 
 // *******************************************

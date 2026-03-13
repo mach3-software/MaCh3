@@ -1,5 +1,5 @@
 ######################### Logging options #########################
-set(SPDLOG_VERSION 1.11.0)
+set(SPDLOG_VERSION 1.12.0)
 CPMAddPackage(
     NAME spdlog
     VERSION ${SPDLOG_VERSION}

@@ -439,6 +439,29 @@ void MakeFluctuatedHistogramStandard(TH2Poly *FluctHist, TH2Poly* PolyHist, TRan
 }
 
 // ****************
+// Make Poisson Fluctuation of TH2D hist
+void MakeFluctuatedHistogramStandard(TH2D* FluctHist, TH2D* Hist, TRandom3* rand) {
+// ****************
+  // Reset the histogram
+  FluctHist->Reset("");
+  FluctHist->Fill(0.0, 0.0, 0.0);
+
+  // Loop over all bins
+  const int nBinsX = Hist->GetXaxis()->GetNbins();
+  const int nBinsY = Hist->GetYaxis()->GetNbins();
+  for (int ix = 1; ix <= nBinsX; ++ix) {
+    for (int iy = 1; iy <= nBinsY; ++iy) {
+      // Get the original bin content
+      const double MeanContent = Hist->GetBinContent(ix, iy);
+      // Generate Poisson fluctuation
+      const double Random = rand->PoissonD(MeanContent);
+      // Set the Random content
+      FluctHist->SetBinContent(ix, iy, Random);
+    }
+  }
+}
+
+// ****************
 // Make Poisson Fluctuation of TH1D hist
 void MakeFluctuatedHistogramAlternative(TH1D* FluctHist, TH1D* PolyHist, TRandom3* rand){
 // ****************
@@ -461,9 +484,28 @@ void MakeFluctuatedHistogramAlternative(TH1D* FluctHist, TH1D* PolyHist, TRandom
 }
 
 // ****************
+// Make Poisson Fluctuation of TH1D hist
+void MakeFluctuatedHistogramAlternative(TH2D* FluctHist, TH2D* PolyHist, TRandom3* rand) {
+// ****************
+  FluctHist->Reset();
+  FluctHist->Fill(0.0, 0.0, 0.0);
+
+  const double evrate = PolyHist->Integral();
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wconversion"
+  const int num = rand->Poisson(evrate);
+  #pragma GCC diagnostic pop
+
+  double x, y;
+  for (int count = 0; count < num; ++count) {
+    PolyHist->GetRandom2(x, y);
+    FluctHist->Fill(x, y);
+  }
+}
+// ****************
 //KS: ROOT developers were too lazy do develop getRanom2 for TH2Poly, this implementation is based on:
 // https://root.cern.ch/doc/master/classTH2.html#a883f419e1f6899f9c4255b458d2afe2e
-int GetRandomPoly2(const TH2Poly* PolyHist, TRandom3* rand){
+int GetRandomPoly2(const TH2Poly* PolyHist, TRandom3* rand) {
 // ****************
   const int nbins = PolyHist->GetNumberOfBins();
   const double r1 = rand->Rndm();
@@ -512,37 +554,6 @@ void MakeFluctuatedHistogramAlternative(TH2Poly *FluctHist, TH2Poly* PolyHist, T
   }
 }
 
-// *************************
-std::unique_ptr<TGraphAsymmErrors> MakeAsymGraph(TH1* sigmaArrayLeft, TH1* sigmaArrayCentr, TH1* sigmaArrayRight, const std::string& title) {
-// *************************
-  auto var = std::make_unique<TGraphAsymmErrors>(sigmaArrayCentr);
-  var->SetNameTitle((title).c_str(), (title).c_str());
-
-  // Need to draw TGraphs to set axes labels
-  var->Draw("AP");
-  var->GetXaxis()->SetTitle(sigmaArrayCentr->GetXaxis()->GetTitle());
-  var->GetYaxis()->SetTitle("Number of events/bin");
-
-  for (int m = 0; m < var->GetN(); ++m)
-  {
-    double xlow = sigmaArrayLeft->GetBinContent(m+1);
-    double xhigh = sigmaArrayRight->GetBinContent(m+1);
-    double xtemp;
-
-    // Figure out which variation is larger so we set the error correctly
-    if (xlow > xhigh)
-    {
-      xtemp = xlow;
-      xlow = xhigh;
-      xhigh = xtemp;
-    }
-
-    var->SetPointEYhigh(m, xhigh - var->GetY()[m]);
-    var->SetPointEYlow(m, var->GetY()[m] - xlow);
-  }
-  return var;
-}
-
 // ****************
 //Fast and thread safe fill of violin histogram, it assumes both histograms have the same binning
 void FastViolinFill(TH2D* violin, TH1D* hist_1d){
@@ -557,7 +568,7 @@ void FastViolinFill(TH2D* violin, TH1D* hist_1d){
 
 // ****************
 //DB Get the Cherenkov momentum threshold in MeV
-double returnCherenkovThresholdMomentum(int PDG) {
+double returnCherenkovThresholdMomentum(const int PDG) {
 // ****************
   constexpr double refractiveIndex = 1.334; //DB From https://github.com/fiTQun/fiTQun/blob/646cf9c8ba3d4f7400bcbbde029d5ca15513a3bf/fiTQun_shared.cc#L757
   double mass =  MaCh3Utils::GetMassFromPDG(PDG)*1e3;
@@ -570,16 +581,17 @@ double returnCherenkovThresholdMomentum(int PDG) {
 double CalculateQ2(double PLep, double PUpd, double EnuTrue, double InitialQ2){
 // ***************************************************************************
   constexpr double MLep = 0.10565837;
+  constexpr double MLep2 = MLep * MLep;
 
-  // Caluclate muon energy
-  double ELep = sqrt((MLep*MLep)+(PLep*PLep));
+  // Calculate muon energy
+  double ELep = sqrt((MLep2)+(PLep*PLep));
 
-  double CosTh = (2*EnuTrue*ELep - MLep*MLep - InitialQ2)/(2*EnuTrue*PLep);
+  double CosTh = (2*EnuTrue*ELep - MLep2 - InitialQ2)/(2*EnuTrue*PLep);
 
-  ELep = sqrt((MLep*MLep)+(PUpd*PUpd));
+  ELep = sqrt((MLep2)+(PUpd*PUpd));
 
   // Calculate the new Q2
-  double Q2Upd = -(MLep*MLep) + 2.0*EnuTrue*(ELep - PUpd*CosTh);
+  double Q2Upd = -(MLep2) + 2.0*EnuTrue*(ELep - PUpd*CosTh);
 
   return Q2Upd - InitialQ2;
 }
@@ -597,13 +609,53 @@ double CalculateEnu(double PLep, double costh, double Eb, bool neutrino){
   }
   /// @todo WARNING this is hardcoded
   constexpr double mLep = 0.10565837;
-  double eLep = sqrt(PLep * PLep + mLep * mLep);
+  constexpr double mLep2 = mLep * mLep;
 
-  double Enu = (2 * mNeff * eLep - mLep * mLep + mNoth * mNoth - mNeff * mNeff) /(2 * (mNeff - eLep + PLep * costh));
+  const double eLep = sqrt(PLep * PLep + mLep2);
+  double Enu = (2 * mNeff * eLep - mLep2 + mNoth * mNoth - mNeff * mNeff) /(2 * (mNeff - eLep + PLep * costh));
 
   return Enu;
 }
 
+// ***********************************************
+std::unique_ptr<TH1D> MakeSummaryFromSpectra(const TH2D* Spectra,
+                                             const std::string& name) {
+// ***********************************************
+  const int nBinsX = Spectra->GetNbinsX();
+  // Reuse the exact x binning
+  std::vector<double> edges(nBinsX + 1);
+  for (int i = 0; i < nBinsX; ++i) {
+    edges[i] = Spectra->GetXaxis()->GetBinLowEdge(i+1);
+  }
+  edges[nBinsX] = Spectra->GetXaxis()->GetBinUpEdge(nBinsX);
+
+  auto h1 = std::make_unique<TH1D>(name.c_str(), name.c_str(), nBinsX, edges.data());
+  h1->SetDirectory(nullptr);
+  h1->Sumw2(true);
+
+  // ---- Loop X bins and extract Y distribution
+  for (int ix = 1; ix <= nBinsX; ++ix) {
+    // Project THIS x-bin onto Y
+    std::unique_ptr<TH1D> slice(Spectra->ProjectionY(Form("_py_%d", ix), ix, ix));
+    slice->SetDirectory(nullptr);
+    if (slice->GetEntries() == 0) {
+      h1->SetBinContent(ix, 0.0);
+      h1->SetBinError(ix, 0.0);
+      continue;
+    }
+
+    const double mean = slice->GetMean();
+    const double rms  = slice->GetRMS();
+
+    h1->SetBinContent(ix, mean);
+    h1->SetBinError(ix, rms);
+  }
+
+  h1->GetXaxis()->SetTitle(Spectra->GetXaxis()->GetTitle());
+  h1->GetYaxis()->SetTitle("Events");
+
+  return h1;
+}
 
 namespace M3 {
 // **************************************************************************
@@ -614,7 +666,9 @@ TFile* Open(const std::string& Name, const std::string& Type, const std::string&
   // Check if the file is successfully opened and usable
   if (OutFile->IsZombie()) {
     MACH3LOG_ERROR("Failed to open file: {}", Name);
-    if (Type == "RECREATE") {
+    std::string lowerType = Type;
+    std::transform(lowerType.begin(), lowerType.end(), lowerType.begin(), ::tolower);
+    if (lowerType == "recreate") {
       MACH3LOG_ERROR("Check if directory exist");
     }
     delete OutFile;
@@ -623,4 +677,92 @@ TFile* Open(const std::string& Name, const std::string& Type, const std::string&
   return OutFile;
 }
 
+// ***************************************************************************
+void ScaleHistogram(TH1* Sample_Hist, const double scale) {
+// ***************************************************************************
+  for (int j = 0; j <= Sample_Hist->GetNbinsX(); ++j)
+  {
+    double num = Sample_Hist->GetBinContent(j);
+    double numErr = Sample_Hist->GetBinError(j);
+    double den = Sample_Hist->GetBinWidth(j);
+    double value = 0.;
+    double valueErr = 0.;
+    if (den != 0)
+    {
+      value = num/(den/scale);
+      valueErr = numErr/(den/scale);
+      Sample_Hist->SetBinContent(j,value);
+      Sample_Hist->SetBinError(j,valueErr);
+    }
+  }
+}
+// ***************************************************************************
+//KS: Helper function check if data and MC binning matches
+void CheckBinningMatch(TH1D* Hist1, TH1D* Hist2, const std::string& File, const int Line) {
+// ***************************************************************************
+  if (Hist1->GetNbinsX() != Hist2->GetNbinsX()) {
+    MACH3LOG_ERROR("Number of bins does not match for TH1D: {} vs {}", Hist1->GetNbinsX(), Hist2->GetNbinsX());
+    throw MaCh3Exception(File, Line);
+  }
+  for (int i = 1; i <= Hist1->GetNbinsX(); ++i) {
+    if (std::fabs(Hist1->GetXaxis()->GetBinLowEdge(i) - Hist2->GetXaxis()->GetBinLowEdge(i)) > 0.001 ||
+      std::fabs(Hist1->GetXaxis()->GetBinUpEdge(i) - Hist2->GetXaxis()->GetBinUpEdge(i)) > 0.001) {
+      MACH3LOG_ERROR("Bin edges do not match for TH1D at bin {}", i);
+      throw MaCh3Exception(File, Line);
+    }
+  }
+}
+// ***************************************************************************
+//KS: Helper function check if data and MC binning matches
+void CheckBinningMatch(TH2D* Hist1, TH2D* Hist2, const std::string& File, const int Line) {
+// ***************************************************************************
+  if (Hist1->GetNbinsX() != Hist2->GetNbinsX() || Hist1->GetNbinsY() != Hist2->GetNbinsY()) {
+    MACH3LOG_ERROR("Number of bins does not match for TH2D");
+    throw MaCh3Exception(File, Line);
+  }
+
+  for (int i = 1; i <= Hist1->GetNbinsX(); ++i) {
+    if (std::fabs(Hist1->GetXaxis()->GetBinLowEdge(i) - Hist2->GetXaxis()->GetBinLowEdge(i)) > 0.001 ||
+      std::fabs(Hist1->GetXaxis()->GetBinUpEdge(i) - Hist2->GetXaxis()->GetBinUpEdge(i)) > 0.001) {
+      MACH3LOG_ERROR("X bin edges do not match for TH2D at bin {}", i);
+      throw MaCh3Exception(File, Line);
+    }
+  }
+  for (int j = 1; j <= Hist1->GetNbinsY(); ++j) {
+    if (std::fabs(Hist1->GetYaxis()->GetBinLowEdge(j) - Hist2->GetYaxis()->GetBinLowEdge(j)) > 0.001 ||
+      std::fabs(Hist1->GetYaxis()->GetBinUpEdge(j) - Hist2->GetYaxis()->GetBinUpEdge(j)) > 0.001) {
+      MACH3LOG_ERROR("Y bin edges do not match for TH2D at bin {}", j);
+      throw MaCh3Exception(File, Line);
+    }
+  }
+}
+
+// ***************************************************************************
+//KS: Helper function check if data and MC binning matches
+void CheckBinningMatch(TH2Poly* Hist1, TH2Poly* Hist2, const std::string& File, const int Line) {
+// ***************************************************************************
+  int NBins1 = Hist1->GetNumberOfBins();
+  int NBins2 = Hist2->GetNumberOfBins();
+  if (NBins1 != NBins2) {
+    MACH3LOG_ERROR("Number of bins does not match for TH2Poly: {} vs {}", NBins1, NBins2);
+    throw MaCh3Exception(File, Line);
+  }
+  for (int j = 1; j <= NBins1; j++)
+  {
+    //KS: There is weird offset between bin content and GetBins so this is correct, in spite of looking funny
+    TH2PolyBin* polybin1 = static_cast<TH2PolyBin*>(Hist1->GetBins()->At(j - 1));
+    TH2PolyBin* polybin2 = static_cast<TH2PolyBin*>(Hist2->GetBins()->At(j - 1));
+
+    if( std::fabs(polybin2->GetXMin() - polybin1->GetXMin()) > 0.001 ||
+      std::fabs(polybin2->GetXMax() - polybin1->GetXMax()) > 0.001 ||
+      std::fabs(polybin2->GetYMin() - polybin1->GetYMin()) > 0.001 ||
+      std::fabs(polybin2->GetYMax() - polybin1->GetYMax()) > 0.001  )
+    {
+      MACH3LOG_ERROR("Binning doesn't match", Hist1->GetTitle());
+      MACH3LOG_ERROR("data  x min {} x max {} y min {} y max {}", polybin2->GetXMin(), polybin2->GetXMax(), polybin2->GetYMin(), polybin2->GetYMax());
+      MACH3LOG_ERROR("mc    x min {} x max {} y min {} y max {}", polybin1->GetXMin(), polybin1->GetXMax(), polybin1->GetYMin(), polybin1->GetYMax());
+      throw MaCh3Exception(File , Line );
+    }
+  }
+}
 } //end M3

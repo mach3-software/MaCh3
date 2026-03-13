@@ -4,8 +4,24 @@
 
 class ParameterHandlerGeneric;
 
-/// @brief Implementation of Prior/Posterior Predictive and Bayesian p-Value calculations following the approach described in @cite gelman1996posterior.
-/// @details For more information, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/10.-Posterior-Predictive,-p%E2%80%90value-etc.).
+// ***************************
+/// @brief KS: Summary of sample info to be used by
+struct PredictiveSample {
+// ***************************
+  // Name of sample
+  std::string Name;
+  /// Pointer to SampleHandler
+  const SampleHandlerBase* SamHandler;
+  /// Local SampleId in SampleHandler
+  int LocalId;
+  /// Sample Dimension
+  int Dimenstion;
+};
+
+/// @brief Implementation of Prior/Posterior Predictive and Bayesian p-Value calculations
+/// following the approach described in @cite gelman1996posterior , @cite Gelman_Example, @cite Gelman_Understanding
+/// @details For more information, visit the <a href="PosteriorPredictive.html">Posterior Predictive page</a>.
+///
 /// @author Asher Kaboth
 /// @author Dan Barrow
 /// @author Ed Atkin
@@ -15,16 +31,15 @@ class ParameterHandlerGeneric;
 /// @author Clarence Wret
 
 /// @todo add BIC, DIC, WAIC
-/// @todo add ability yo make projection for Get1DDiscVar
-/// @todo add ability for TH2D
-/// @todo speed improvements
 /// @todo add Rate $p$-value
+/// @todo add plots by mode
+/// @todo Post Pred LLH
 /// @todo unify code with SampleSummary
 class PredictiveThrower : public FitterBase {
  public:
    /// @brief Constructor
    /// @param fitMan A pointer to a manager object, which will handle all settings.
-  PredictiveThrower(manager * const fitMan);
+  PredictiveThrower(Manager * const fitMan);
   /// @brief Destructor
   virtual ~PredictiveThrower();
 
@@ -40,8 +55,6 @@ class PredictiveThrower : public FitterBase {
     throw MaCh3Exception(__FILE__ , __LINE__ );
   };
 
-  /// @brief Get name of class
-  inline std::string GetName() const override {return "PredictiveThrower";};
  private:
   /// @brief This set some params to prior value this way you can evaluate errors from subset of errors
   void SetParamters();
@@ -51,34 +64,89 @@ class PredictiveThrower : public FitterBase {
 
   /// @brief Load existing toys
   bool LoadToys();
-
+  /// @brief Save histograms for a single MCMC Throw/Toy
+  void WriteToy(TDirectory* ToyDirectory, TDirectory* Toy_1DDirectory, TDirectory* Toy_2DDirectory, const int iToy);
   /// @brief Setup sample information
   void SetupSampleInformation();
 
-  /// @brief Produce posterior predictive distribution
-  std::unique_ptr<TH1D> MakePredictive(const std::vector<std::unique_ptr<TH1D>>& Toys,
-                                       const std::string& Sample_Name,
-                                       const std::string& suffix,
-                                       const bool DebugHistograms);
+  /// @brief Get Fancy parameters stored in mcmc chains for passed ParameterHandler
+  std::vector<std::string> GetStoredFancyName(ParameterHandlerBase* Systematics) const;
 
+  /// @brief Produce posterior predictive distribution
+  std::vector<std::unique_ptr<TH1>> MakePredictive(const std::vector<std::vector<std::unique_ptr<TH1>>>& Toys,
+                                                   const std::vector<TDirectory*>& Director,
+                                                   const std::string& suffix,
+                                                   const bool DebugHistograms,
+                                                   const bool WriteHist);
+
+  /// @brief Load 1D projections and later produce violin plots for each
+  void Study1DProjections(const std::vector<TDirectory*>& SampleDirectories) const;
   /// @brief Produce Violin style spectra
-  std::vector<std::unique_ptr<TH2D>> ProduceSpectra(const std::vector<std::vector<std::unique_ptr<TH1D>>>& Toys,
-                                                    const std::string suffix);
+  void ProduceSpectra(const std::vector<std::vector<std::vector<std::unique_ptr<TH1D>>>>& Toys,
+                      const std::vector<TDirectory*>& Director,
+                      const std::string suffix) const;
+
+  /// @brief Make Poisson fluctuation of TH1D hist
+  /// @param FluctHist Histogram to store fluctuated values (must match Hist type)
+  /// @param Hist Original histogram to fluctuate
+  void MakeFluctuatedHistogram(TH1* FluctHist, TH1* PolyHist);
+
+  /// @brief Calculate Posterior Predictive LLH
+  void PredictiveLLH(const std::vector<std::unique_ptr<TH1>>& Data_histogram,
+                     const std::vector<std::unique_ptr<TH1>>& PostPred_mc,
+                     const std::vector<std::unique_ptr<TH1>>& PostPred_w,
+                     const std::vector<TDirectory*>& SampleDir);
+
 
   /// @brief Calculate Posterior Predictive $p$-value
-  void PosteriorPredictivepValue(const std::vector<std::unique_ptr<TH1D>>& PostPred_mc,
-                                 //const std::vector<std::unique_ptr<TH1D>>& PostPred_w2,
+  void PosteriorPredictivepValue(const std::vector<std::unique_ptr<TH1>>& PostPred_mc,
                                  const std::vector<TDirectory*>& SampleDir);
+  /// @brief Calculate the LLH for TH1, set the LLH to title of MCHist
+  /// @param DatHist Data histogram with data distribution for a single sample
+  /// @param MCHist MC histogram with MC distribution for a single sample
+  /// @param W2Hist W2 histogram with W2 distribution for a single sample
+  /// @param SampleHandler Pointer to SampleHandlerBase providing LLH test statistic
+  void ExtractLLH(TH1* DatHist, TH1* MCHist, TH1* W2Hist, const SampleHandlerBase* SampleHandler) const;
 
+  /// @brief Calculates the likelihood (-2LLH) for a single sample; dynamically casts to call the correct GetLLH overload
+  /// @param DatHist Data histogram with data distribution for a single sample
+  /// @param MCHist MC histogram with MC distribution for a single sample
+  /// @param W2Hist W2 histogram with W2 distribution for a single sample
+  /// @param SampleHandler Pointer to SampleHandlerBase providing LLH test statistic
+  double CalcLLH(const TH1* DatHist,
+                 const TH1* MCHist,
+                 const TH1* W2Hist,
+                 const SampleHandlerBase* SampleHandler) const;
 
   /// @brief Helper functions to calculate likelihoods using TH1D
-  /// @param Data histogram with data distribution for a single sample
-  /// @param MC histogram with MC distribution for a single sample
-  /// @param W2 histogram with W2 distribution for a single sample
-  double GetLLH(const std::unique_ptr<TH1D>& DatHist,
-                                   const std::unique_ptr<TH1D>& MCHist,
-                                   const std::unique_ptr<TH1D>& W2Hist,
-                                   SampleHandlerBase* SampleHandler);
+  /// @param DatHist Data histogram with data distribution for a single sample
+  /// @param MCHist MC histogram with MC distribution for a single sample
+  /// @param W2Hist W2 histogram with W2 distribution for a single sample
+  /// @param SampleHandler Pointer to SampleHandlerBase providing LLH test statistic
+  double GetLLH(const TH1D* DatHist,
+                const TH1D* MCHist,
+                const TH1D* W2Hist,
+                const SampleHandlerBase* SampleHandler) const;
+
+  /// @brief Helper functions to calculate likelihoods using TH2D
+  /// @param DatHist Data 2D histogram with data distribution for a single sample
+  /// @param MCHist MC 2D histogram with MC distribution for a single sample
+  /// @param W2Hist W2 2D histogram with W2 distribution for a single sample
+  /// @param SampleHandler Pointer to SampleHandlerBase providing LLH test statistic
+  double GetLLH(const TH2D* DatHist,
+                const TH2D* MCHist,
+                const TH2D* W2Hist,
+                const SampleHandlerBase* SampleHandler) const;
+
+  /// @brief Helper functions to calculate likelihoods using TH2Poly
+  /// @param DatHist Data 2D poly histogram with data distribution for a single sample
+  /// @param MCHist MC 2D poly histogram with MC distribution for a single sample
+  /// @param W2Hist W2 2D poly histogram with W2 distribution for a single sample
+  /// @param SampleHandler Pointer to SampleHandlerBase providing LLH test statistic
+  double GetLLH(const TH2Poly* DatHist,
+                const TH2Poly* MCHist,
+                const TH2Poly* W2Hist,
+                const SampleHandlerBase* SampleHandler) const;
 
   /// @brief Produce Chi2 plot for a single sample based on which $p$-value is calculated
   void MakeChi2Plots(const std::vector<std::vector<double>>& Chi2_x,
@@ -86,7 +154,46 @@ class PredictiveThrower : public FitterBase {
                      const std::vector<std::vector<double>>& Chi2_y,
                      const std::string& Chi2_y_title,
                      const std::vector<TDirectory*>& SampleDir,
-                     const std::string Tittle);
+                     const std::string Title);
+
+
+  /// @brief Construct a human-readable label describing a specific analysis bin.
+  /// @param hist Histogram providing the binning definition.
+  /// @param uniform Flag indicating whether the histogram uses regular axis
+  ///        binning (TH1/TH2) or irregular polygonal binning (e.g. TH2Poly).
+  /// @param Dim Dimensionality of the original distribution.
+  /// @param bins Vector of per-dimension bin indices in analysis coordinates.
+  std::string GetBinName(TH1* hist,
+                         const bool uniform,
+                         const int Dim,
+                         const std::vector<int>& bins) const;
+  /// @brief Create per-bin posterior histograms for a given sample.
+  ///
+  /// For each analysis bin of the input histogram, this function allocates a new
+  /// 1D histogram intended to accumulate the distribution of predicted event
+  /// counts (e.g. across throws, toys, or posterior evaluations).
+  ///
+  /// The number of output histograms therefore equals the number of physical bins:
+  /// - TH1  → N histograms
+  /// - TH2  → Nx × Ny histograms
+  /// - TH2Poly → one histogram per polygon bin
+  ///
+  /// @param hist Input histogram defining the bin structure for this sample.
+  /// @param SampleId Index identifying the sample in SampleInfo.
+  /// @param Dim Dimensionality of the original distribution.
+  /// @param suffix String appended to histogram names (e.g. to distinguish stages).
+  std::vector<std::unique_ptr<TH1D>> PerBinHistogram(TH1* hist,
+                                                     const int SampleId,
+                                                     const int Dim,
+                                                     const std::string& suffix) const;
+
+  /// @brief Evaluate prior/post predictive distribution for beta parameters (used for evaluating impact MC statistical uncertainty)
+  void StudyBetaParameters(TDirectory* PredictiveDir);
+  /// @brief Make the 1D Event Rate Hist
+  void MakeCutEventRate(TH1D *Histogram, const double DataRate) const;
+  /// @brief Produce distribution of number of events for each sample
+  void RateAnalysis(const std::vector<std::vector<std::unique_ptr<TH1>>>& Toys,
+                                       const std::vector<TDirectory*>& SampleDirectories) const;
 
   /// KS: Use Full LLH or only sample contribution based on discussion with Asher we almost always only want the sample likelihood
   bool FullLLH;
@@ -97,38 +204,40 @@ class PredictiveThrower : public FitterBase {
 
   /// Number of toys we are generating analysing
   int TotalNumberOfSamples;
-  /// Name of a single sample
-  std::vector<std::string> SampleNames;
-  /// Maps if sample with given SampleHandler, useful if we have more than one sample in single object
-  std::vector<int> SampleObjectMap;
+
+  /// Handy struct for all sample info
+  std::vector<PredictiveSample> SampleInfo;
 
   /// Number of toys we are generating analysing
   int Ntoys;
   /// KS: Names of parameter groups that will not be varied
   std::vector<std::string> ParameterGroupsNotVaried;
-  /// KS: Index of parameters groups that will be varied
+  /// KS: Index of parameters that will be varied
   std::unordered_set<int> ParameterOnlyToVary;
 
   /// Pointer to El Generico
   ParameterHandlerGeneric* ModelSystematic;
 
   /// Vector of Data histograms
-  std::vector<std::unique_ptr<TH1D>> Data_Hist;
+  std::vector<std::unique_ptr<TH1>> Data_Hist;
   /// Vector of MC histograms
-  std::vector<std::unique_ptr<TH1D>> MC_Nom_Hist;
+  std::vector<std::unique_ptr<TH1>> MC_Nom_Hist;
   /// Vector of W2 histograms
-  std::vector<std::unique_ptr<TH1D>> W2_Nom_Hist;
+  std::vector<std::unique_ptr<TH1>> W2_Nom_Hist;
 
   /// Vector of MC histograms per sample and toy experiment.
   /// Indexed as [sample][toy].
-  std::vector<std::vector<std::unique_ptr<TH1D>>> MC_Hist_Toy;
+  std::vector<std::vector<std::unique_ptr<TH1>>> MC_Hist_Toy;
   /// Vector of W² histograms per sample and toy experiment.
   /// Indexed as [sample][toy]
-  std::vector<std::vector<std::unique_ptr<TH1D>>> W2_Hist_Toy;
+  std::vector<std::vector<std::unique_ptr<TH1>>> W2_Hist_Toy;
 
   /// Reweighting factors applied for each toy, by default 1
   std::vector<double> ReweightWeight;
   /// Penalty term values for each toy by default 0
   std::vector<double> PenaltyTerm;
+
+  /// KS: We have two methods for Poissonian fluctuation
+  bool StandardFluctuation;
 };
 

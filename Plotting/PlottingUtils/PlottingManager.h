@@ -15,8 +15,8 @@
 #include "Manager/MaCh3Exception.h"
 
 // Other MaCh3Plotting stuff
-#include "inputManager.h"
-#include "styleManager.h"
+#include "InputManager.h"
+#include "StyleManager.h"
 
 namespace MaCh3Plotting {
 /// @brief The main class to be used in plotting scripts.
@@ -29,6 +29,8 @@ namespace MaCh3Plotting {
 /// any style options you like from the StyleManager. Also a hopefully not too distant dream is to
 /// wrap this up in python so it is usable in .py scripts to take advantage of nice existing
 /// plotting libraries for e.g. MCMC plotting.
+///
+/// @ingroup MaCh3Plotting
 /// @author Ewan Miller
 class PlottingManager {
 public:
@@ -104,33 +106,33 @@ public:
   /// @brief Parse and set the output file name, if extension specified, check its one root
   /// supports, if not, default to pdf.
   /// @param fileName the name of the output file.
-  void setOutFileName(std::string fileName);
+  void setOutFileName(const std::string& fileName);
 
   /// @brief Internally set the name of the executable that manager is being used in.
   /// @param execName Name of the current executable, will also need to be defined in the plotting
   /// config file.
-  void setExec(std::string execName);
+  void setExec(const std::string& execName);
 
   /// @brief Get a specific option from the config for this executable.
   /// @tparam T the type of parameter expected for this option, e.g. std::string.
   /// @param option The option that you want from the config.
   /// @return The specified value for the option.
-  template <typename T> T getOption(std::string option) { return _execOptions[option].as<T>(); }
+  template <typename T> T getOption(const std::string& option) { return _execOptions[option].as<T>(); }
   YAML::Node getOption(std::string option) { return _execOptions[option]; }
 
   // ############# getters ##############
   /// @name General getters
   /// @{
-  const std::string getFileName(int i) { return _fileNames[i]; }
+  const std::string getFileName(int i) const { return _fileNames[i]; }
 
-  const std::string getFileLabel(int i) { return _fileLabels[i]; }
+  const std::string getFileLabel(int i) const { return _fileLabels[i]; }
 
-  const std::string getDrawOptions() { return _extraDrawOptions; }
+  const std::string getDrawOptions() const { return _extraDrawOptions; }
 
   /// @brief Get the straight up output file name with no bells or whistles, just the file
   /// extension.
   /// @return The straight up output file name.
-  const std::string getOutputName() { return _outputName; }
+  const std::string getOutputName() const { return _outputName; }
 
   /// @brief Get the output name but can specify a siffix to add to the name, before the file
   /// extension.
@@ -138,28 +140,28 @@ public:
   /// @return Output file name with suffix added before the extension.
   const std::string getOutputName(const std::string &suffix);
 
-  const std::vector<std::string> getFileNames() { return _fileNames; }
+  const std::vector<std::string> getFileNames() const { return _fileNames; }
 
-  const std::vector<std::string> getFileLabels() { return _fileLabels; }
+  const std::vector<std::string> getFileLabels() const { return _fileLabels; }
 
-  size_t getNFiles() { return _fileNames.size(); }
+  size_t getNFiles() const { return _fileNames.size(); }
 
-  bool getSplitBySample() { return _splitBySample; }
+  bool getSplitBySample() const { return _splitBySample; }
 
-  bool getPlotRatios() { return _plotRatios; }
+  bool getPlotRatios() const { return _plotRatios; }
 
-  bool getDrawGrid() { return _drawGrid; }
+  bool getDrawGrid() const { return _drawGrid; }
 
   /// @}
 
   // for managers contained in this manager
   /// @brief Get the StyleManager contained within this PlottingManager, for doing style related
   /// things.
-  const StyleManager &style() { return *_styleMan; }
+  const StyleManager &style() const { return *_styleMan; }
 
   /// @brief Get the InputManager contained within this PlottingManager, for doing input related
   /// things.
-  const InputManager &input() { return *_inputMan; }
+  const InputManager &input() const { return *_inputMan; }
 
 private:
   // name of the config file to read configs from

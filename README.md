@@ -15,23 +15,24 @@ likelihoods implemented.
 [![DOI](https://zenodo.org/badge/331049416.svg)](https://doi.org/10.5281/zenodo.7608367)
 [![Release](https://img.shields.io/github/release/mach3-software/MaCh3.svg)](https://github.com/mach3-software/MaCh3/releases/latest)
 [![Container Image](https://img.shields.io/badge/Container-Image-brightgreen)](https://github.com/mach3-software/MaCh3/pkgs/container/mach3)
-[![Code - Documented](https://img.shields.io/badge/Code-Documented-2ea44f)](https://github.com/mach3-software/MaCh3/wiki)
-[![Code - Doxygen](https://img.shields.io/badge/Code-Doxygen-2ea44f)](https://mach3-software.github.io/MaCh3/index.html)
+[![Code - Documented](https://img.shields.io/badge/Code-Documented-2ea44f)](https://mach3-software.github.io/MaCh3/index.html)
 [![Build CI](https://github.com/mach3-software/MaCh3/actions/workflows/CIBuild.yml/badge.svg)](https://github.com/mach3-software/MaCh3/actions/workflows/CIBuild.yml)
 [![CodeFactor](https://www.codefactor.io/repository/github/mach3-software/mach3/badge/develop)](https://www.codefactor.io/repository/github/mach3-software/mach3/overview/develop)
 
 ## Famous Plots
-Example of plots made using MaCh3 apparent in scientific publications, for more see [here](https://github.com/mach3-software/MaCh3/wiki/14.-MaCh3-in-the-Field)
-<img src="Doc/Plots/delta.png" alt="MaCh3" align="left" width="200"/>
-<img src="Doc/Plots/Jarlskog.png" alt="MaCh3" align="center" width="200"/>
+Example of plots made using MaCh3 apparent in scientific publications, for more see [here](https://mach3-software.github.io/MaCh3/ResultsPublications.html)
+
+<img width="200" alt="Delta" src="https://github.com/user-attachments/assets/ac267b79-999d-4911-8e6e-1932147d440b" />
+<img width="200" alt="Jarlskog" src="https://github.com/user-attachments/assets/67624cfd-89f0-4897-a9d2-485d295ac4c2" />
 
 ## Cite
 When using MaCh3 you must cite our doi from Zenodo. The bibtex file can be found by exporting the citation from this link: [on Zenodo](https://zenodo.org/records/7608367) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7608367.svg)](https://doi.org/10.5281/zenodo.7608367).
 
 ## Help and Guidelines 📄
 - [Tutorial](https://github.com/mach3-software/MaCh3Tutorial)
+- [Documentation](https://mach3-software.github.io/MaCh3/index.html)
+- [Indico](https://indico.global/category/1289/) If you need a password, please reach out to MaCh3-leadership for access.
 - [How to contribute](https://github.com/mach3-software/MaCh3/blob/develop/.github/CONTRIBUTING.md)
-- [Wiki](https://github.com/mach3-software/MaCh3/wiki)
 - [Slack](https://t2k-experiment.slack.com/archives/C06EM0C6D7W/p1705599931356889)
 - [Discussions](https://github.com/mach3-software/MaCh3/discussions)
 - [Benchmark](https://mach3-software.github.io/MaCh3Tutorial/)
@@ -50,6 +51,9 @@ Don't forget to:
 ```bash
 source bin/setup.MaCh3.sh
 ```
+
+If the build fails, check your [system/environment requirements](#system-requirements).
+
 ## Building against MaCh3
 To include MaCh3 in your cmake project you can use following syntax
 ```cmake
@@ -59,7 +63,7 @@ CPMFindPackage(
   GITHUB_REPOSITORY mach3-software/MaCh3
 )
 ```
-Where "blarb" is the MaCh3 version. You can find a list of releases [here](https://github.com/mach3-software/MaCh3/wiki/0.1.-History)  
+Where "blarb" is the MaCh3 version. You can find a list of releases [here](https://mach3-software.github.io/MaCh3/ReleaseNotes.html)  
 If you compiled MaCh3 and sourced it you can simply call
 ```cmake
 find_package(MaCh3)
@@ -121,6 +125,7 @@ Following neutrino oscillation calculators are available:
 | NuFastLinear     | CPU        | Beam       | [Ref](https://doi.org/10.48550/arXiv.2405.02400)        |
 | OscProb          | CPU        | Beam/Atm   | [Ref](https://doi.org/10.5281/zenodo.6347002)           |
 | NuSQUIDSLinear   | CPU        | Beam       | [Ref](https://doi.org/10.1016/j.cpc.2022.108346)        |
+| GLoBESLinear     | CPU        | Beam       | [Ref](https://doi.org/10.1016/j.cpc.2005.01.003)        |
 
 If nothing is specified in cmake build then NuFastLinear_ENABLED will be used. To control which oscillation calculators you want to use here is syntax:
 
@@ -133,11 +138,12 @@ For example, you can use NuFast for beam samples and CUDAProb3 for atmospheric s
 ## Fitting algorithms
 The following fitting algorithms are available:
 
-| Algorithm  | Reference        |Need Ext Lib  |
-|------------|------------------|--------------|
-| MR2T2      | [Ref](https://doi.org/10.1063/1.1699114)       | No       |
-| MINUIT2    | [Ref](https://cds.cern.ch/record/2296388/)     | Yes      |
-| PSO        | [Ref](https://doi.org/10.1162/EVCO_r_00180)    | No       |
+| Algorithm    | Reference        |Need Ext Lib  |
+|--------------|------------------|--------------|
+| MR2T2        | [Ref](https://doi.org/10.1063/1.1699114)          | No       |
+| DelayedMR2T2 | [Ref](https://doi.org/10.1007/s11222-006-9438-0)  | No       |
+| MINUIT2      | [Ref](https://cds.cern.ch/record/2296388/)        | Yes      |
+| PSO          | [Ref](https://doi.org/10.1162/EVCO_r_00180)       | No       |
 
 ## Debug
 Several debugging options are available which are heavy for RAM and performance and, therefore not used by default. To enable it:
@@ -163,22 +169,43 @@ You can find more [here](https://github.com/mach3-software/MaCh3/blob/develop/cm
 | ------                               | -------                                                                         |
 | `MaCh3_NATIVE_ENABLED`               | Enables native CPU optimizations for improved performance. Not recommended on clusters with multiple CPU configurations due to potential compatibility issues.   |
 | `MaCh3_NuOsc_GPU_ENABLED`            | By default MaCh3 will use NuOscillator with GPU if MaCh3 is compiled with GPU, this flag allows disabling GPU for NuOscillator even if MaCh3 has GPU enabled     |
-| `MaCh3_LOW_MEMORY_STRUCTS_ENABLED`   | This will use float/short string for many structures |
+| `MaCh3_LOW_MEMORY_STRUCTS_ENABLED`   | This will use float/short int for many structures |
 
 
 ## System Requirements
-Most of external libraries are being handled through [CPM](https://github.com/cpm-cmake/CPM.cmake). The only external library that is not being handled through [CPM](https://github.com/cpm-cmake/CPM.cmake) and is required is [ROOT](https://root.cern/). Currently used external dependencies include:
-
-1. [yaml-cpp](https://github.com/jbeder/yaml-cpp)
-2. [spdlog](https://github.com/gabime/spdlog)
-
-Based on several test here are recommended version:
+MaCh3 requires a C++ compiler (e.g. [gcc](https://gcc.gnu.org)), [CMake](https://cmake.org), and [ROOT](https://root.cern/). Based on several tests, recommended versions are:
 ```bash
   GCC:   >= 8.5   [lower versions may work]
   C++:   >= 14
   CMake: >= 3.14
-  ROOT:  >= 6.18
+  ROOT:  >= 6.20
 ```
+
+If you don't already have the correct dependencies, you can install them in a variety of ways, e.g. building from source, via a package manager. If you have access to `cvmfs`, the easiest solution is probably to source an [LCG release](https://lcgdocs.web.cern.ch/lcgdocs/lcgreleases/introduction/). For example, on an x86_64 Alma9 machine:
+```bash
+source /cvmfs/sft.cern.ch/lcg/views/LCG_108/x86_64-el9-gcc15-opt/setup.sh
+```
+Alternatively, you can create a conda environment which *should* provide a ready-to-go environment. If you have micromamba, you can do:
+```bash
+micromamba env create -n MaCh3 -c conda-forge root cmake
+```
+and if you don't have micromamba installed, you can follow the instructions [here](https://mamba.readthedocs.io/en/latest/installation/micromamba-installation.html).
+
+Before you build MaCh3 following the instructions at the [start](#building-against-mach3) of this README, make sure to activate the environment:
+```bash
+micromamba activate MaCh3
+```
+and do this everytime you begin from a fresh terminal and want to use MaCh3.
+
+> [!TIP]
+> For MacOS users: the conda environment approach has been validated to work for MacOS. Other avenues are likely to be more difficult.
+
+Other external libraries, which currently include:
+1. [yaml-cpp](https://github.com/jbeder/yaml-cpp)
+2. [spdlog](https://github.com/gabime/spdlog)
+
+are being handled through [CPM](https://github.com/cpm-cmake/CPM.cmake).
+
 ### Supported operational systems
 | Name        | Status |
 |-------------|--------|
@@ -186,11 +213,11 @@ Based on several test here are recommended version:
 | Rocky9      | ✅     |
 | Ubi9        | ✅     |
 | Ubuntu22.04 | ✅     |
-| Ubuntu24.10 | ✅     |
+| Ubuntu25.04 | ✅     |
 | Fedora32    | ✅     |
 | CentOS7     | ❔     |
+| MacOS       | ❔     |
 | Windows     | ❌     |
-| MacOS       | ❌     |
 
 ✅ - Part of CI/CD <br>
 ❔ - Not part of CI/CD but used by some users/developers so it might work <br>
