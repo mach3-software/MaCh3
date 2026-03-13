@@ -819,13 +819,15 @@ void FitterBase::RunLLHScan() {
 void FitterBase::GetStepScaleBasedOnLLHScan(const std::string& outputFileName) {
 // *************************
   TFile* outputFileLLH = nullptr;
+  bool ownsfile = false;
   if(outputFileName != ""){
     outputFileLLH = M3::Open(outputFileName, "READ", __FILE__, __LINE__);
+    ownsfile = true;
   }
   else
     outputFileLLH = outputFile;
-  TDirectory *Sample_LLH = outputFileLLH->Get<TDirectory>("Sample_LLH");
 
+  TDirectory *Sample_LLH = outputFileLLH->Get<TDirectory>("Sample_LLH");
   MACH3LOG_INFO("Starting Get Step Scale Based On LLHScan");
 
   if(!Sample_LLH || Sample_LLH->IsZombie())
@@ -868,7 +870,7 @@ void FitterBase::GetStepScaleBasedOnLLHScan(const std::string& outputFileName) {
     cov->SetIndivStepScale(StepScale);
     cov->SaveUpdatedMatrixConfig();
   }
-  if(outputFileLLH != nullptr) delete outputFileLLH;
+  if(ownsfile && outputFileLLH != nullptr) delete outputFileLLH;
 }
 
 // *************************
