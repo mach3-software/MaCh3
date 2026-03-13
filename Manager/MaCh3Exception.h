@@ -9,7 +9,17 @@
 #include "Manager/MaCh3Logger.h"
 #include "Manager/Core.h"
 
-/// @brief Custom exception class for MaCh3 errors.
+/// @file MaCh3Exception.h
+/// @brief Defines the custom exception class used throughout MaCh3.
+/// @details
+/// The `MaCh3Exception` class provides a lightweight wrapper around `std::exception`
+/// for consistent error handling across the framework. It automatically logs the file
+/// and line number where the exception was thrown, using MaCh3’s logging system.
+///
+/// @author Kamil Skwarczynski
+
+
+/// @brief Custom exception class used throughout MaCh3.
 class MaCh3Exception : public std::exception {
 public:
   /// @brief Constructs a MaCh3Exception object with the specified error message.

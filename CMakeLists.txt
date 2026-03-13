@@ -3,7 +3,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # CMake version check
 cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
-project(MaCh3 VERSION 2.2.2 LANGUAGES CXX)
+project(MaCh3 VERSION 2.4.2 LANGUAGES CXX)
 set(MaCh3_VERSION ${PROJECT_VERSION})
 
 option(MaCh3_PYTHON_ENABLED "Whether to build MaCh3 python bindings" OFF)
@@ -135,7 +135,7 @@ endif()
 add_library(MaCh3CompilerOptions INTERFACE)
 target_link_libraries(MaCh3CompilerOptions INTERFACE MaCh3CompileDefinitions)
 target_compile_options(MaCh3CompilerOptions INTERFACE
-    -g                      # Generate debug information
+    -g                   # Generate debug information
 )
 
 #If DEBUG_LEVEL was defined but MaCh3_DEBUG_ENABLED not, enable debug flag
@@ -151,34 +151,49 @@ endif()
 #KS: If Debug add debugging compile flag if not add optimisation for speed
 if(MaCh3_DEBUG_ENABLED)
   target_compile_options(MaCh3CompilerOptions INTERFACE
-    -O0                                  # Turn off any optimisation to have best debug experience
-    -mno-avx
+    -O0                     # Turn off any optimisation to have best debug experience
+    -fno-omit-frame-pointer # Keep frame pointers: essential for accurate stack traces
+    #-fsanitize=address     # Enable AddressSanitizer
   )
+  # KS: Disable AVX only on x86 platforms
+  if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64|i.86")
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+      target_compile_options(MaCh3CompilerOptions INTERFACE
+          -mno-avx  # Disable AVX instructions to simplify debugging and improve reproducibility
+      )
+    endif()
+  endif()
   target_compile_definitions(MaCh3CompileDefinitions INTERFACE DEBUG=${DEBUG_LEVEL})
   cmessage(STATUS "Enabling DEBUG with Level: \"${DEBUG_LEVEL}\"")
 else()
-  #KS: Consider in future __attribute__((always_inline)) see https://indico.cern.ch/event/386232/sessions/159923/attachments/771039/1057534/always_inline_performance.pdf
-  #https://gcc.gnu.org/onlinedocs/gcc-3.3.6/gcc/Optimize-Options.html
+  #https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html
   target_compile_options(MaCh3CompilerOptions INTERFACE
     -O3                                   # Optimize code for maximum speed
-    #-fstrict-aliasing                    # Assume that pointers of different types do not point to the same memory location
-    # KS: After benchmarking below didn't in fact worse performance, leave it for future tests and documentation
+    # KS: Below could help with performance but require validations and benchmarking
+    #-funroll-loops                       # Unroll loops where possible for performance
+    #-fno-trapping-math                   # Assume FP ops don’t trap (helps vectorisation)
+    #-fno-math-errno                      # Don’t set errno after math calls (can speed up hot loops with math)
     #-funroll-loops                       # Unroll loops where possible for performance
     #--param=max-vartrack-size=100000000  # Set maximum size of variable tracking data to avoid excessive memory usage
-    #-flto                                # Enable link-time optimization (commented out for now, needs more testing)
   )
   # KS Some compiler options are only available in GCC, in case we move to other compilers we will have to expand this
+  #KS: Consider in future __attribute__((always_inline)) see https://indico.cern.ch/event/386232/sessions/159923/attachments/771039/1057534/always_inline_performance.pdf
   if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     target_compile_options(MaCh3CompilerOptions INTERFACE
+      $<$<COMPILE_LANGUAGE:CXX>:-flto=auto>      # Enable link-time optimization, don't apply it to CUDA or other languages!
       -finline-limit=100000000              # Increase the limit for inlining functions to improve performance
+      #-fipa-pta                            # Pointer analysis for better intraprocedural optimization, increases compilation time
     )
-  endif()
   #KS: add Link-Time Optimization (LTO)
-  #target_link_libraries(MaCh3CompilerOptions INTERFACE -flto)
+  target_link_libraries(MaCh3CompilerOptions INTERFACE -flto)
+  endif()
 endif()
 
 if(MaCh3_NATIVE_ENABLED)
-  target_compile_options(MaCh3CompilerOptions INTERFACE -march=native)
+  target_compile_options(MaCh3CompilerOptions INTERFACE
+    -march=native    #Generate instructions for the host CPU architecture.
+    -mtune=native    #Optimize instruction scheduling and pipeline usage for host CPU.
+  )
 endif()
 
 #Add Multithread flags
@@ -197,6 +212,10 @@ if(MaCh3_MULTITHREAD_ENABLED)
     target_link_libraries(MaCh3CompilerOptions INTERFACE gomp)
   endif()
   target_compile_definitions(MaCh3CompileDefinitions INTERFACE MULTITHREAD)
+  # KS: This will pass variable to doxygen and tell whether documentation should be with MP functions
+  set(DOXYGEN_PREDEFINED "MULTITHREAD")
+else()
+  set(DOXYGEN_PREDEFINED "")
 endif()
 
 if(MaCh3_GPU_ENABLED) 

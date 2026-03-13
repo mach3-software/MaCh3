@@ -35,8 +35,7 @@ public:
 };
 
 
-void initParameters(py::module &m){
-
+void initParameters(py::module &m) {
     auto m_parameters = m.def_submodule("parameters");
     m_parameters.doc() =
         "This is a Python binding of MaCh3s C++ parameters library.";
@@ -70,14 +69,6 @@ void initParameters(py::module &m){
             "calculate_likelihood", 
             &ParameterHandlerBase::CalcLikelihood,
             "Calculate penalty term based on inverted covariance matrix."
-        )
-
-        .def(
-            "throw_par_prop",
-            &ParameterHandlerBase::ThrowParProp,
-            "Throw the proposed parameter by magnitude *mag* X sigma. \n\
-            :param mag: This value multiplied by the prior value of each parameter will be the width of the distribution that the parameter values are drawn from. ",
-            py::arg("mag") = 1.0
         )
 
         .def(

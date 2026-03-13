@@ -4,6 +4,7 @@
 // MaCh3 includes
 #include "Manager/Manager.h"
 #include "Samples/SampleStructs.h"
+#include "Samples/HistogramUtils.h"
 
 _MaCh3_Safe_Include_Start_ //{
 // ROOT includes
@@ -19,6 +20,8 @@ _MaCh3_Safe_Include_End_ //}
 
 /// @file CombineMaCh3Chains.cpp
 /// @brief Combine chains files produced by **MCMC**, enforcing the condition that all the files to combine were made using the exact same software versions and config files.
+/// @ingroup MaCh3DiagnosticProcessing
+///
 /// @author Ewan Miller
 /// @author Kamil Skwarczynski
 
@@ -27,8 +30,6 @@ int targetCompression = 1;
 std::vector<std::string> inpFileList;
 bool forceOverwrite = false;
 bool forceMerge = false;
-
-
 
 /// @brief KS: This allow us to skip output name etc in config. We expect Output name will be different but this doesn't invalidate chain merging
 bool ShouldSkipLine(const std::string& line, const std::vector<std::string>& SkipVector) {
@@ -43,6 +44,10 @@ bool ShouldSkipLine(const std::string& line, const std::vector<std::string>& Ski
   return false;
 }
 
+/// @brief make sure two configs are identical but skip specified fields. For example when comparing two chains nsteps or output name might be different and this is still fine to merge
+/// @param File1 Config from chain1
+/// @param File2 Config from chain2
+/// @param SkipVector Fields in yaml file to skip
 bool CompareTwoConfigs(const std::string& File1, const std::string& File2, const std::vector<std::string>& SkipVector) {
   std::istringstream file1(File1);
   std::istringstream file2(File2);
@@ -76,7 +81,7 @@ bool CompareTwoConfigs(const std::string& File1, const std::string& File2, const
   return areEqual;
 }
 
-/// EM: Will compare the version header contained in the two provided files and shout if they don't match
+/// @brief EM: Will compare the version header contained in the two provided files and shout if they don't match
 bool checkSoftwareVersions(TFile *file, TFile *prevFile, const std::string& ConfigName, const std::vector<std::string>& SkipVector = {})
 {
   bool weirdFile = false;
@@ -94,11 +99,16 @@ bool checkSoftwareVersions(TFile *file, TFile *prevFile, const std::string& Conf
   return weirdFile;
 }
 
+/// @brief When we merge two chains they have TDirectory ROOT didn't provide method for this so here we have this bad boy
 void CopyDir(TDirectory *source) {
   //copy all objects and subdirs of directory source as a subdir of the current directory
   source->ls();
   TDirectory *savdir = gDirectory;
   TDirectory *adir = savdir->Get<TDirectory>(source->GetName());
+  // if directory doesn't exist make it
+  if (!adir) {
+    adir = savdir->mkdir(source->GetName());
+  }
   adir->cd();
   //loop on all entries of this directory
   TKey *key;
@@ -199,26 +209,27 @@ bool CheckFolder(TFile* file, TFile* prevFile, const std::string& FolderName, co
   return mismatch;
 }
 
+/// @brief custom function for merging TTree, should be similar to what HADD is using
+/// @warning KS: for some reason if "fast" is enable then I cannot open in ROOT5, no one should use R5 at this point..
+void FastMergeTTrees(const std::vector<std::string>& files, const std::string& outFile, const std::string& TTreeName) {
+  TChain chain(TTreeName.c_str());
+  for (const auto& f : files) chain.Add(f.c_str());
+
+  TFile* outF = TFile::Open(outFile.c_str(), "UPDATE");
+
+  TTree* newTree = chain.CloneTree(-1, "fast");
+  newTree->SetName(TTreeName.c_str());
+  outF->cd();
+  newTree->Write("", TObject::kOverwrite);
+  outF->Close();
+  delete outF;
+}
+
 void CombineChain()
 {
-  TFileMerger *fileMerger = new TFileMerger();
-
-  // EM: If we ever add new trees to the chain files they will need to be added here too
-  fileMerger->AddObjectNames("posteriors");
-  fileMerger->AddObjectNames("Settings");
-
-  MACH3LOG_INFO("These objects will be merged: {}", fileMerger->GetObjectNames());
-
   std::string outFileOption;
   if(forceOverwrite) outFileOption = "RECREATE";
   else outFileOption = "CREATE";
-
-  // EM: Attempt to open the output file
-  bool openedFile = fileMerger->OutputFile(OutFileName.c_str(), outFileOption.c_str(), targetCompression);
-  if (!openedFile){
-      MACH3LOG_ERROR("Failed to create output file.");
-      throw MaCh3Exception(__FILE__ , __LINE__ );
-  }
 
   TFile *prevFile = nullptr;
 
@@ -239,7 +250,7 @@ void CombineChain()
 
     // EM: need to set this in the initial case
     if(prevFile == nullptr) {
-        prevFile = file;
+      prevFile = file;
     }
 
     MACH3LOG_DEBUG("############ File {} #############", fileId);
@@ -261,18 +272,41 @@ void CombineChain()
       MACH3LOG_ERROR("=====================================================================================");
       throw MaCh3Exception(__FILE__ , __LINE__ );
     }
-    // EM: file seems good, we'll add the trees to the lists
-    fileMerger->AddFile(file);
+
+    if(prevFile != file) {
+      prevFile->Close();
+      delete prevFile;
+    }
 
     // EM: set these for the next iteration
     prevFile = file;
   }
 
-  TFile *outputFile = fileMerger->GetOutputFile();
+  if (!forceOverwrite && access(OutFileName.c_str(), F_OK) != -1) {
+    MACH3LOG_ERROR("Output file '{}' already exists. Use -f to force overwrite.", OutFileName);
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+  //KS: Create new file
+  TFile* outputFile = M3::Open(OutFileName, "recreate", __FILE__, __LINE__);
+  outputFile->Close();
+  delete outputFile;
+
+  TStopwatch clock;
+  clock.Start();
+
+  MACH3LOG_INFO("Starting merging");
+  FastMergeTTrees(inpFileList, OutFileName, "posteriors");
+  FastMergeTTrees(inpFileList, OutFileName, "Settings");
+
+  clock.Stop();
+  MACH3LOG_INFO("Merging of took {:.2f}s to finish", clock.RealTime());
+
+  //KS: Sadly we need to open file to save TDirectories to not have weird copy of several obejcts there...
+  outputFile = M3::Open(OutFileName, "UPDATE", __FILE__, __LINE__);
   outputFile->cd();
 
   // EM: Write out the version and config files to the combined file
-  std::vector<std::string> configNames = {"MaCh3_Config", "Reweight_Config"};
+  std::vector<std::string> configNames = {"MaCh3_Config", "Reweight_Config", "Smearing_Config"};
   for (std::size_t i = 0; i < configNames.size(); ++i) {
     const std::string& name = configNames[i];
     TMacro* macro = prevFile->Get<TMacro>(name.c_str());
@@ -282,27 +316,17 @@ void CombineChain()
     }
   }
 
-  // EM: now let's combine all the trees and write to the output file
-  bool mergeSuccess = fileMerger->PartialMerge(TFileMerger::kRegular | TFileMerger::kAll | TFileMerger::kOnlyListed);
-  if(mergeSuccess){
-    MACH3LOG_INFO("Files merged successfully");
-  } else{
-    MACH3LOG_ERROR("Failed to merge files");
-  }
-  delete fileMerger;
-
-  //KS: Sadly we need to open file to save TDirectories to not have weird copy of several obejcts there...
-  outputFile = new TFile(OutFileName.c_str(), "UPDATE");
-
   // Get the source directory
   TDirectory *MaCh3EngineDir = prevFile->Get<TDirectory>("MaCh3Engine");
   TDirectory *CovarianceFolderDir = prevFile->Get<TDirectory>("CovarianceFolder");
   TDirectory *SampleFolderDir = prevFile->Get<TDirectory>("SampleFolder");
 
-  outputFile->cd();
   CopyDir(MaCh3EngineDir);
   CopyDir(CovarianceFolderDir);
   CopyDir(SampleFolderDir);
+
+  outputFile->Close();
+  delete outputFile;
 
   delete prevFile;
   MACH3LOG_INFO("Done!");
@@ -330,7 +354,7 @@ void ParseArg(int argc, char *argv[]){
 
   int c;
   for(;;) {
-    c = getopt(argc, argv, "o:c:hf");
+    c = getopt(argc, argv, "o:c:mhf");
     if (c == -1){ // loop over the remaining arguments
       while (optind < argc){
         // any non option input is assumed to be a root file
@@ -364,7 +388,7 @@ void ParseArg(int argc, char *argv[]){
           exit(0);
         }
         default: {
-          MACH3LOG_ERROR("Un recognised option");
+          MACH3LOG_ERROR("Unrecognised option");
           usage();
           exit(1);
         }

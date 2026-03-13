@@ -74,10 +74,12 @@ class particle{
 /// @author Emily Ip
 /// @author Mark Scott
 /// @date 24/2/2023
+///
+/// @ingroup FittingAlgorithms
 class PSO : public LikelihoodFit {
   public:
     /// @brief constructor
-    PSO(manager * const fitMan);
+    PSO(Manager * const fitMan);
     /// @brief Destructor
     virtual ~PSO() {};
 
@@ -140,8 +142,6 @@ class PSO : public LikelihoodFit {
       double* a = &x[0];
       return CalcChi2(a);
     };
-
-  inline std::string GetName() const override {return "PSO";};
 
   private:
     particle* best_particle;

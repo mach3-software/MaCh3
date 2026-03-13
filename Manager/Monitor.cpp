@@ -1,4 +1,5 @@
 #include "Manager/Monitor.h"
+#include <unistd.h>
 
 //Only if GPU is enabled
 #ifdef MaCh3_CUDA
@@ -142,6 +143,14 @@ void NThreadsSanity() {
 void GetGPUInfo(){
 // ************************
 #ifdef MaCh3_CUDA
+  int nDevices;
+  cudaGetDeviceCount(&nDevices);
+  if (nDevices == 0) {
+    MACH3LOG_CRITICAL("MaCh3 compiled with CUDA support (for GPU acceleration) but could not find GPU");
+    MACH3LOG_CRITICAL("Either allocate GPU for your job or recompile MaCh3 without GPU support");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
   MACH3LOG_INFO("Using following GPU:");
   // Print GPU name
   MACH3LOG_INFO("GPU Name: {}", TerminalToString("nvidia-smi --query-gpu=name --format=csv,noheader"));
@@ -178,7 +187,14 @@ std::string TerminalToString(std::string cmd) {
 // ************************
   std::array<char, 128> buffer;
   std::string result;
-  std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd.c_str(), "r"), pclose);
+  
+  struct PCloseDeleter {
+    void operator()(FILE* f) const {
+      if (f) pclose(f);
+    }
+  };
+  std::unique_ptr<FILE, PCloseDeleter> pipe(popen(cmd.c_str(), "r"));
+
   if (!pipe) {
     throw MaCh3Exception(__FILE__, __LINE__, "popen() failed!");
   }
@@ -305,6 +321,40 @@ void PrintConfig(const YAML::Node& node){
 }
 
 // ***************************************************************************
+//KS: Print content of TFile using logger
+void Print(const TTree* tree) {
+// ***************************************************************************
+  if (!tree) return;
+
+  // Create a temporary file to capture stdout
+  FILE* tmpFile = tmpfile();
+  if (!tmpFile) return;
+
+  // Save old stdout
+  int oldStdout = dup(fileno(stdout));
+  // Redirect stdout to tmpFile
+  dup2(fileno(tmpFile), fileno(stdout));
+
+  tree->Print();  // ROOT writes to stdout
+
+  fflush(stdout);
+  // Restore old stdout
+  dup2(oldStdout, fileno(stdout));
+  close(oldStdout);
+
+  // Read tmpFile content
+  fseek(tmpFile, 0, SEEK_SET);
+  char buffer[1024];
+  while (fgets(buffer, sizeof(buffer), tmpFile)) {
+    std::string line(buffer);
+    if (!line.empty() && line.back() == '\n') line.pop_back();
+    MACH3LOG_INFO("{}", line);
+  }
+
+  fclose(tmpFile);
+}
+
+// ***************************************************************************
 //KS: Almost all MaCh3 executables have the same usage, prepare simple printer
 void MaCh3Usage(int argc, char **argv) {
 // ***************************************************************************
@@ -328,5 +378,22 @@ int GetNThreads() {
   #endif
 }
 
+// ***************************************************************************
+void AddPath(std::string& FilePath) {
+// ***************************************************************************
+  //KS:Most inputs are in ${MACH3}/inputs/blarb.root
+  if (std::getenv("MACH3") == nullptr) {
+    MACH3LOG_ERROR("MACH3 is not defined");
+    MACH3LOG_ERROR("Please source your setup script");
+    MACH3LOG_ERROR("Read more: https://mach3-software.github.io/MaCh3/FAQ.html");
+    throw MaCh3Exception(__FILE__, __LINE__);
+  }
+
+  std::string MaCh3Path = std::string(std::getenv("MACH3")) + "/";
+   // Check if FilePath does NOT start with MaCh3Path
+  if (FilePath.find(MaCh3Path) != 0) {
+    FilePath.insert(0, MaCh3Path);
+  }
+}
 } //end namespace
 
