@@ -68,7 +68,6 @@ FitterBase::FitterBase(Manager * const man) : fitMan(man) {
 FitterBase::~FitterBase() {
 // *************************
   SaveOutput();
-
   if(outputFile != nullptr) delete outputFile;
   outputFile = nullptr;
   MACH3LOG_DEBUG("Closing MaCh3 Fitter Engine");
@@ -884,17 +883,27 @@ void FitterBase::RunLLHScan() {
 
 // *************************
 //LLH scan is good first estimate of step scale
-void FitterBase::GetStepScaleBasedOnLLHScan() {
+void FitterBase::GetStepScaleBasedOnLLHScan(const std::string& outputFileName) {
 // *************************
-  TDirectory *Sample_LLH = outputFile->Get<TDirectory>("Sample_LLH");
+  TFile* outputFileLLH = nullptr;
+  bool ownsfile = false;
+  if(outputFileName != ""){
+    outputFileLLH = M3::Open(outputFileName, "READ", __FILE__, __LINE__);
+    ownsfile = true;
+  }
+  else
+    outputFileLLH = outputFile;
+
+  TDirectory *Sample_LLH = outputFileLLH->Get<TDirectory>("Sample_LLH");
   MACH3LOG_INFO("Starting Get Step Scale Based On LLHScan");
 
-  if(Sample_LLH->IsZombie())
+  if(!Sample_LLH || Sample_LLH->IsZombie())
   {
     MACH3LOG_WARN("Couldn't find Sample_LLH, it looks like LLH scan wasn't run, will do this now");
     RunLLHScan();
+    Sample_LLH = outputFileLLH->Get<TDirectory>("Sample_LLH");
   }
-
+  
   for (ParameterHandlerBase *cov : systematics)
   {
     const int npars = cov->GetNumParams();
@@ -902,7 +911,6 @@ void FitterBase::GetStepScaleBasedOnLLHScan() {
     for (int i = 0; i < npars; ++i)
     {
       std::string name = cov->GetParFancyName(i);
-
       StepScale[i] = cov->GetIndivStepScale(i);
       TH1D* LLHScan = Sample_LLH->Get<TH1D>((name+"_sam").c_str());
       if(LLHScan == nullptr)
@@ -929,6 +937,7 @@ void FitterBase::GetStepScaleBasedOnLLHScan() {
     cov->SetIndivStepScale(StepScale);
     cov->SaveUpdatedMatrixConfig();
   }
+  if(ownsfile && outputFileLLH != nullptr) delete outputFileLLH;
 }
 
 // *************************
