@@ -1193,53 +1193,69 @@ M3::float_t SampleHandlerFD::GetEventWeight(const int iEntry) {
 }
 
 // ************************************************
+std::vector< std::vector<int> > SampleHandlerFD::GetSplineBins(int Event, BinnedSplineHandler* BinnedSpline, bool& ThrowCrititcal) const {
+// ************************************************
+  const int SampleIndex = MCSamples[Event].NominalSample;
+  const auto SampleTitle = GetSampleTitle(SampleIndex);
+  bool NoOscChannels = false;
+  if(Oscillator == nullptr && GetNOscChannels(SampleIndex) == 1) {
+    MACH3LOG_DEBUG("Assuming there are no osc channels in {}", __func__);
+    NoOscChannels = true;
+  }
+  const int OscIndex = NoOscChannels ? 0 : GetOscChannel(SampleDetails[SampleIndex].OscChannels,
+                                                         (*MCSamples[Event].nupdgUnosc), (*MCSamples[Event].nupdg));
+  const int Mode = int(*(MCSamples[Event].mode));
+  const double Etrue = *(MCSamples[Event].rw_etru);
+  std::vector< std::vector<int> > EventSplines;
+  switch(GetNDim(SampleIndex)) {
+    case 1:
+      EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCSamples[Event].KinVar[0]), 0.);
+      break;
+    case 2:
+      EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCSamples[Event].KinVar[0]), *(MCSamples[Event].KinVar[1]));
+      break;
+    default:
+      if(ThrowCrititcal) {
+        MACH3LOG_CRITICAL("MaCh3 doesn't support binned splines for more than 2D while you use {}", GetNDim(SampleIndex));
+        MACH3LOG_CRITICAL("Will use 2D like approach");
+        ThrowCrititcal = false;
+      }
+      EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCSamples[Event].KinVar[0]), *(MCSamples[Event].KinVar[1]));
+      break;
+  }
+  return EventSplines;
+}
+
+// ************************************************
 void SampleHandlerFD::SetSplinePointers() {
 // ************************************************
   //Now loop over events and get the spline bin for each event
   if (auto BinnedSpline = dynamic_cast<BinnedSplineHandler*>(SplineHandler.get())) {
     bool ThrowCrititcal = true;
-
+    auto SplineParsVec = ParHandler->GetSplineParsFromSampleName(SampleHandlerName);
     for (unsigned int j = 0; j < GetNEvents(); ++j) {
-      const int SampleIndex = MCSamples[j].NominalSample;
-      const auto SampleTitle = GetSampleTitle(SampleIndex);
-      bool NoOscChannels = false;
-      if(Oscillator == nullptr && GetNOscChannels(SampleIndex) == 1) {
-        MACH3LOG_DEBUG("Assuming there are no osc channels in {}", __func__);
-        NoOscChannels = true;
-      }
-      const int OscIndex = NoOscChannels ? 0 : GetOscChannel(SampleDetails[SampleIndex].OscChannels,
-                                                             (*MCSamples[j].nupdgUnosc), (*MCSamples[j].nupdg));
-      const int Mode = int(*(MCSamples[j].mode));
-      const double Etrue = *(MCSamples[j].rw_etru);
-      std::vector< std::vector<int> > EventSplines;
-      switch(GetNDim(SampleIndex)) {
-        case 1:
-          EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCSamples[j].KinVar[0]), 0.);
-          break;
-        case 2:
-          EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCSamples[j].KinVar[0]), *(MCSamples[j].KinVar[1]));
-          break;
-        default:
-          if(ThrowCrititcal) {
-            MACH3LOG_CRITICAL("MaCh3 doesn't support binned splines for more than 2D while you use {}", GetNDim(SampleIndex));
-            MACH3LOG_CRITICAL("Will use 2D like approach");
-            ThrowCrititcal = false;
-          }
-          EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCSamples[j].KinVar[0]), *(MCSamples[j].KinVar[1]));
-          break;
-      }
+      auto EventSplines = GetSplineBins(j, BinnedSpline, ThrowCrititcal);
       const int NSplines = static_cast<int>(EventSplines.size());
       if(NSplines == 0) continue;
-      const int PointersBefore = static_cast<int>(MCSamples[j].total_weight_pointers.size());
-      MCSamples[j].total_weight_pointers.resize(PointersBefore + NSplines);
+      auto& w_pointers = MCSamples[j].total_weight_pointers;
+      w_pointers.reserve(w_pointers.size() + NSplines);
 
       for(int spline = 0; spline < NSplines; spline++) {
+        int SystIndex = EventSplines[spline][2];
+
+        bool IsSelected = PassesSelection(SplineParsVec[SystIndex], j);
+        // Need to then break the event loop
+        if(!IsSelected){
+          MACH3LOG_TRACE("Event {}, missed Kinematic var check for dial {}", j, SplineParsVec[SystIndex].name);
+          continue;
+        }
         //Event Splines indexed as: sample name, oscillation channel, syst, mode, etrue, var1, var2 (var2 is a dummy 0 for 1D splines)
-        MCSamples[j].total_weight_pointers[PointersBefore+spline] = BinnedSpline->retPointer(EventSplines[spline][0], EventSplines[spline][1],
-                                                                                              EventSplines[spline][2], EventSplines[spline][3],
-                                                                                              EventSplines[spline][4], EventSplines[spline][5],
-                                                                                              EventSplines[spline][6]);
+        w_pointers.push_back(BinnedSpline->retPointer(EventSplines[spline][0], EventSplines[spline][1],
+                                                      EventSplines[spline][2], EventSplines[spline][3],
+                                                      EventSplines[spline][4], EventSplines[spline][5],
+                                                      EventSplines[spline][6]));
       } // end loop over splines
+      w_pointers.shrink_to_fit();
     } // end loop over events
   } else if (auto UnbinnedSpline = dynamic_cast<SMonolith*>(SplineHandler.get())) {
     /// @todo Fix this mess :(

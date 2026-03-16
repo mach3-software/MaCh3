@@ -219,6 +219,9 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// @brief Set pointers for each event to appropriate weights, for unbinned based on event number
   /// while for binned based on other kinematical properties
   void SetSplinePointers();
+  /// @brief Retrieve the spline bin indices associated with a given event.
+  /// @warning ThrowCrititcal argument will be eventually removed
+  std::vector< std::vector<int> > GetSplineBins(int Event, BinnedSplineHandler* BinnedSpline, bool& ThrowCrititcal) const;
 
   //Functions which find the nominal bin and bin edges
   void FindNominalBinAndEdges();

@@ -125,6 +125,7 @@
 ///
 /// @author Kamil Skwarczynski
 /// @author Dan Barrow
+/// @author Luke Pickering
 class BinningHandler {
 // ***************************
  public:
