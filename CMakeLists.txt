@@ -169,11 +169,10 @@ else()
   #https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html
   target_compile_options(MaCh3CompilerOptions INTERFACE
     -O3                                   # Optimize code for maximum speed
+    -funroll-loops                        # Unroll loops where possible for performance
     # KS: Below could help with performance but require validations and benchmarking
-    #-funroll-loops                       # Unroll loops where possible for performance
     #-fno-trapping-math                   # Assume FP ops don’t trap (helps vectorisation)
     #-fno-math-errno                      # Don’t set errno after math calls (can speed up hot loops with math)
-    #-funroll-loops                       # Unroll loops where possible for performance
     #--param=max-vartrack-size=100000000  # Set maximum size of variable tracking data to avoid excessive memory usage
   )
   # KS Some compiler options are only available in GCC, in case we move to other compilers we will have to expand this
