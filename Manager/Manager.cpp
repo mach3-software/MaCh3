@@ -101,23 +101,7 @@ int Manager::GetMCStatLLH() const {
   if (config["LikelihoodOptions"])
   {
     auto likelihood = GetFromManager<std::string>(config["LikelihoodOptions"]["TestStatistic"], "Barlow-Beeston", __FILE__ , __LINE__);
-
-    for(int i = 0; i < kNTestStatistics; i++) {
-      if(likelihood == TestStatistic_ToString(TestStatistic(i))) {
-        mc_stat_llh = TestStatistic(i);
-        break;
-      }
-    }
-    if(mc_stat_llh == kNTestStatistics)
-    {
-      MACH3LOG_ERROR("Wrong form of test-statistic specified!");
-      MACH3LOG_ERROR("You gave {} and I only support:", likelihood);
-      for(int i = 0; i < kNTestStatistics; i++)
-      {
-        MACH3LOG_ERROR("{}", TestStatistic_ToString(TestStatistic(i)));
-      }
-      throw MaCh3Exception(__FILE__ , __LINE__ );
-    }
+    mc_stat_llh = TestStatFromString(likelihood);
   } else {
     MACH3LOG_WARN("Didn't find a TestStatistic specified");
     MACH3LOG_WARN("Defaulting to using a {} likelihood", TestStatistic_ToString(kPoisson));
@@ -125,5 +109,3 @@ int Manager::GetMCStatLLH() const {
   }
   return mc_stat_llh;
 }
-
-

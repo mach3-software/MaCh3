@@ -52,7 +52,6 @@ SMonolith::SMonolith(std::vector<std::vector<TResponseFunction_red*> > &MasterSp
 // The shared initialiser from constructors of TSpline3 and TSpline3_red
 void SMonolith::PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > &MasterSpline, const std::vector<RespFuncType> &SplineType) {
 // *****************************************
-
   // Scan for the max number of knots, the number of events (number of splines), and number of parameters
   int maxnSplines = 0;
   ScanMasterSpline(MasterSpline,

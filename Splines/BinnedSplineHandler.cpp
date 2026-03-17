@@ -195,9 +195,8 @@ void BinnedSplineHandler::InvestigateMissingSplines() const {
 }
 
 //****************************************
-void BinnedSplineHandler::TransferToMonolith()
+void BinnedSplineHandler::TransferToMonolith() {
 //****************************************
-{
   PrepForReweight(); 
   MonolithSize = CountNumberOfLoadedSplines(false, 1);
 
@@ -343,9 +342,8 @@ void BinnedSplineHandler::CalcSplineWeights() {
 //****************************************
 //Creates an array to be filled with monolith indexes for each sample (allows for indexing between 7D binning and 1D Vector)
 //Only need 1 indexing array everything else interfaces with this to get binning properties
-void BinnedSplineHandler::BuildSampleIndexingArray(const std::string& SampleTitle)
+void BinnedSplineHandler::BuildSampleIndexingArray(const std::string& SampleTitle) {
 //****************************************
-{  
   int iSample = GetSampleIndex(SampleTitle);
   int nSplineSysts = nSplineParams[iSample];
   int nOscChannels = nOscChans[iSample];
@@ -778,7 +776,7 @@ void BinnedSplineHandler::PrintArrayDetails(const std::string& SampleTitle) cons
 }
 
 //****************************************
-bool BinnedSplineHandler::isValidSplineIndex(const std::string& SampleTitle, int iOscChan, int iSyst, int iMode, int iVar1, int iVar2, int iVar3)
+bool BinnedSplineHandler::isValidSplineIndex(const std::string& SampleTitle, int iOscChan, int iSyst, int iMode, int iVar1, int iVar2, int iVar3) const
 //****************************************
 {
   int iSample = GetSampleIndex(SampleTitle);
@@ -829,9 +827,8 @@ void BinnedSplineHandler::PrintBinning(TAxis *Axis) const
 }
 
 //****************************************
-std::vector< std::vector<int> > BinnedSplineHandler::GetEventSplines(const std::string& SampleTitle, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val)
+std::vector< std::vector<int> > BinnedSplineHandler::GetEventSplines(const std::string& SampleTitle, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val) {
 //****************************************
-{
   std::vector<std::vector<int>> ReturnVec;
   int SampleIndex = GetSampleIndex(SampleTitle);
   int nSplineSysts = static_cast<int>(indexvec[SampleIndex][iOscChan].size());
@@ -848,27 +845,23 @@ std::vector< std::vector<int> > BinnedSplineHandler::GetEventSplines(const std::
     return ReturnVec;
   }
 
-  int Var1Bin = SplineBinning[SampleIndex][iOscChan][0]->FindBin(Var1Val)-1;
-  if (Var1Bin < 0 || Var1Bin >= SplineBinning[SampleIndex][iOscChan][0]->GetNbins()) {
-    return ReturnVec;
+  std::vector<int> bins;
+  std::vector<double> vars = {Var1Val, Var2Val, Var3Val};
+  for (size_t i = 0; i < vars.size(); ++i) {
+    int bin = SplineBinning[SampleIndex][iOscChan][i]->FindBin(vars[i]) - 1;
+    if (bin < 0 || bin >= SplineBinning[SampleIndex][iOscChan][i]->GetNbins()) {
+      return ReturnVec;
+    }
+    bins.push_back(bin);
   }
-
-  int Var2Bin = SplineBinning[SampleIndex][iOscChan][1]->FindBin(Var2Val)-1;
-  if (Var2Bin < 0 || Var2Bin >= SplineBinning[SampleIndex][iOscChan][1]->GetNbins()) {
-    return ReturnVec;
-  }
-
-  int Var3Bin = SplineBinning[SampleIndex][iOscChan][2]->FindBin(Var3Val)-1;
-  if (Var3Bin < 0 || Var3Bin >= SplineBinning[SampleIndex][iOscChan][2]->GetNbins()){
-    return ReturnVec;
-  }
+  int Var1Bin = bins[0]; int Var2Bin = bins[1]; int Var3Bin = bins[2];
 
   for(int iSyst=0; iSyst<nSplineSysts; iSyst++){
     std::vector<int> spline_modes = SplineModeVecs[SampleIndex][iSyst];
     int nSampleModes = static_cast<int>(spline_modes.size());
 
     //ETA - look here at the length of spline_modes and what you're actually comparing against
-    for(int iMode = 0; iMode<nSampleModes ; iMode++){
+    for(int iMode = 0; iMode<nSampleModes; iMode++){
       //Only consider if the event mode (Mode) matches ones of the spline modes
       if (Mode == spline_modes[iMode]) {
         int splineID=indexvec[SampleIndex][iOscChan][iSyst][iMode][Var1Bin][Var2Bin][Var3Bin];
@@ -883,9 +876,11 @@ std::vector< std::vector<int> > BinnedSplineHandler::GetEventSplines(const std::
   return ReturnVec;
 }
 
+//****************************************
 // checks if there are multiple modes with the same SplineSuffix
 // (for example if CCRES and CCCoherent are treated as one spline mode)
-std::vector< std::vector<int> > BinnedSplineHandler::StripDuplicatedModes(const std::vector< std::vector<int> >& InputVector) {
+std::vector< std::vector<int> > BinnedSplineHandler::StripDuplicatedModes(const std::vector< std::vector<int> >& InputVector) const {
+//****************************************
   //ETA - this is of size nPars from the xsec model
   size_t InputVectorSize = InputVector.size();
   std::vector< std::vector<int> > ReturnVec(InputVectorSize);

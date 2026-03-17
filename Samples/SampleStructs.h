@@ -144,6 +144,25 @@ inline std::string TestStatistic_ToString(const TestStatistic TestStat) {
   return name;
 }
 
+// **************************************************
+/// @brief Convert a string to a TestStatistic enum
+inline TestStatistic TestStatFromString(const std::string& likelihood) {
+// **************************************************
+  for(int i = 0; i < kNTestStatistics; i++) {
+    if(likelihood == TestStatistic_ToString(TestStatistic(i))) {
+      return TestStatistic(i);
+    }
+  }
+
+  MACH3LOG_ERROR("Wrong form of test-statistic specified!");
+  MACH3LOG_ERROR("You gave {} and I only support:", likelihood);
+  for(int i = 0; i < kNTestStatistics; i++)
+  {
+    MACH3LOG_ERROR("{}", TestStatistic_ToString(TestStatistic(i)));
+  }
+  throw MaCh3Exception(__FILE__ , __LINE__ );
+}
+
 // ***************************
 /// @brief KS: Small struct used for applying kinematic cuts
 struct KinematicCut {

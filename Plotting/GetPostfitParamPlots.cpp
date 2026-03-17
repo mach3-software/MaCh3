@@ -57,9 +57,6 @@ std::vector<int> NDSamplesBins;
 std::vector<std::string> NDSamplesNames;
 
 std::string SaveName;
-
-// KS: Color for 0 - prefit, 1 postfit, 2 another postfit, 3 you know the drill
-constexpr Color_t PlotColor[] = {kRed, kBlack, kBlue, kGreen};
 std::string plotType;
 
 void copyParToBlockHist(const int localBin, const std::string& paramName, TH1D* blockHist,
@@ -131,22 +128,13 @@ void CopyViolinToBlock(TH2D* FullViolin, TH2D* ReducedViolin, const std::vector<
   ReducedViolin->GetXaxis()->LabelsOption("v");
 }
 
-void PrettifyTitles(TH1D *Hist) {
-  for (int i = 0; i < Hist->GetXaxis()->GetNbins(); ++i)
-  {
-    std::string title = Hist->GetXaxis()->GetBinLabel(i+1);
+template <typename HistType>
+void PrettifyTitles(HistType* hist) {
+  int nBins = hist->GetXaxis()->GetNbins();
+  for(int i = 0; i < nBins; ++i) {
+    std::string title = hist->GetXaxis()->GetBinLabel(i+1);
     title = PlotMan->style().prettifyParamName(title);
-    Hist->GetXaxis()->SetBinLabel(i+1, title.c_str());
-  }
-}
-
-void PrettifyTitles(TH2D *Hist) {
-  for (int i = 0; i < Hist->GetXaxis()->GetNbins(); ++i) 
-  {
-    std::string title = Hist->GetXaxis()->GetBinLabel(i+1);
-
-    title = PlotMan->style().prettifyParamName(title);
-    Hist->GetXaxis()->SetBinLabel(i+1, title.c_str());
+    hist->GetXaxis()->SetBinLabel(i+1, title.c_str());
   }
 }
 
@@ -733,14 +721,13 @@ void GetPostfitParamPlots()
     }
   }
 
-  TCanvas* canv = new TCanvas("canv", "canv", 1024, 1024);
+  auto canv = std::make_unique<TCanvas>("canv", "canv", 1024, 1024);
   //gStyle->SetPalette(51);
   gStyle->SetOptStat(0); //Set 0 to disable statistic box
   canv->SetLeftMargin(0.12);
   canv->SetBottomMargin(0.12);
   canv->SetTopMargin(0.08);
   canv->SetRightMargin(0.04);
-
   canv->Print((SaveName+"[").c_str());
 
   // Make a Legend page
@@ -767,9 +754,9 @@ void GetPostfitParamPlots()
   leg->Draw();
   canv->Print((SaveName).c_str());
 
-  MakeParameterPlots(canv);
+  MakeParameterPlots(canv.get());
 
-  MakeFluxPlots(canv);
+  MakeFluxPlots(canv.get());
 
   //KS: By default we don't run ProcessMCMC with PlotDet as this take some time, in case we did let's make fancy plots
   if(plotNDDet & (NDParameters > 0)) MakeNDDetPlots();
@@ -778,7 +765,6 @@ void GetPostfitParamPlots()
 
   MakeRidgePlots();
 
-  delete canv;
   delete Prefit;
 }
 
@@ -872,6 +858,8 @@ void GetViolinPlots()
   Postfit->SetMarkerStyle(7);
 
   std::vector<std::unique_ptr<TH2D>> Violin(PlotMan->getNFiles());
+  //KS: I know hardcoded but we can figure out later...
+  const std::vector<Color_t> FillColors  = { kBlue, kGreen, kMagenta };
   for(unsigned int fileId = 0; fileId < PlotMan->getNFiles(); fileId++) {
     Violin[fileId] = M3::Clone(PlotMan->input().getFile(fileId).file->Get<TH2D>( "param_violin" ));
     if(Violin[fileId] == nullptr)
@@ -879,26 +867,14 @@ void GetViolinPlots()
       MACH3LOG_ERROR("Couldn't find violin plot, make sure method from MCMCProcessor is being called");
       return;
     }
-    //KS: I know hardcoded but we can figure out later...
+    Violin[fileId]->SetMarkerColor(FillColors.at(fileId));
+    Violin[fileId]->SetLineColor(FillColors.at(fileId));
+    Violin[fileId]->SetFillColor(FillColors.at(fileId));
+    Violin[fileId]->SetFillColorAlpha(FillColors.at(fileId), 0.35);
+
     if(fileId == 0){
-      Violin[fileId]->SetFillColor(kBlue);
-      Violin[fileId]->SetFillColorAlpha(kBlue, 0.35);
-      Violin[fileId]->SetMarkerColor(kBlue);
       Violin[fileId]->SetMarkerStyle(20);
       Violin[fileId]->SetMarkerSize(0.5);
-    } else if (fileId == 1) {
-      Violin[fileId]->SetMarkerColor(kGreen);
-      Violin[fileId]->SetLineColor(kGreen);
-      Violin[fileId]->SetFillColor(kGreen);
-      Violin[fileId]->SetFillColorAlpha(kGreen, 0.35);
-    } else if (fileId == 2) {
-      Violin[fileId]->SetMarkerColor(kMagenta);
-      Violin[fileId]->SetLineColor(kMagenta);
-      Violin[fileId]->SetFillColor(kMagenta);
-      Violin[fileId]->SetFillColorAlpha(kMagenta, 0.35);
-    } else {
-      MACH3LOG_ERROR("Too many file, not implemented...");
-      throw MaCh3Exception(__FILE__ , __LINE__ );
     }
   }
 
@@ -1116,6 +1092,6 @@ int main(int argc, char *argv[])
     Get2DComparison(filename1, filename2);
   }
 
-  delete PlotMan;
+  if(PlotMan) delete PlotMan;
   return 0;
 }
