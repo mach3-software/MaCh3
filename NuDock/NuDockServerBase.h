@@ -93,7 +93,7 @@ public:
   /// @return JSON response with a "status" field.
   virtual nlohmann::json setAsimovPoint(const nlohmann::json &request);
 
-  /// @brief Handle a "get_spectrum" request.
+  /// @brief Handle a "get_mc_spectrum" request.
   ///
   /// Retrieves predicted bin contents and bin edges from every registered
   /// SampleHandlerFD sample, supporting 1-D and 2-D histograms.
@@ -102,7 +102,18 @@ public:
   /// @return JSON response containing sample names, dimensions, axis titles,
   ///         bin edges, and bin values.
   /// @throw MaCh3Exception if a sample does not derive from SampleHandlerFD.
-  virtual nlohmann::json getSpectrum(const nlohmann::json &request);
+  virtual nlohmann::json getMCSpectrum(const nlohmann::json &request);
+
+  /// @brief Handle a "get_data_spectrum" request.
+  ///
+  /// Retrieves data bin contents and bin edges from every registered
+  /// SampleHandlerFD sample, supporting 1-D and 2-D histograms.
+  ///
+  /// @param request JSON object (unused).
+  /// @return JSON response containing sample names, dimensions, axis titles,
+  ///         bin edges, and bin values.
+  /// @throw MaCh3Exception if a sample does not derive from SampleHandlerFD.
+  virtual nlohmann::json getDataSpectrum(const nlohmann::json &request);
 
   /// @brief No-op implementation --- the server does not run own MCMC.
   void RunMCMC() override {(void)0; /* do nothing */};

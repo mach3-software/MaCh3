@@ -156,9 +156,9 @@ nlohmann::json NuDockServerBase::setAsimovPoint(const nlohmann::json &request) {
 }
 
 // ***************************************************************************
-/// @copydoc NuDockServerBase::getSpectrum
+/// @copydoc NuDockServerBase::getMCSpectrum
 // ***************************************************************************
-nlohmann::json NuDockServerBase::getSpectrum(const nlohmann::json &request) {
+nlohmann::json NuDockServerBase::getMCSpectrum(const nlohmann::json &request) {
   (void)request;
   nlohmann::json response;
 
@@ -220,7 +220,80 @@ nlohmann::json NuDockServerBase::getSpectrum(const nlohmann::json &request) {
         }
       }
     } else {
-      MACH3LOG_ERROR("Sample object does not derived from SampleHandlerFD. Consider overloading getSpectrum for this sample type.");
+      MACH3LOG_ERROR("Sample object does not derived from SampleHandlerFD. Consider overloading getMCSpectrum for this sample type.");
+      throw MaCh3Exception(__FILE__,__LINE__);
+    } 
+  }
+  response["sample_names"] = sample_titles;
+  return response;
+}
+
+// ***************************************************************************
+/// @copydoc NuDockServerBase::getDataSpectrum
+// ***************************************************************************
+nlohmann::json NuDockServerBase::getDataSpectrum(const nlohmann::json &request) {
+  (void)request;
+  nlohmann::json response;
+
+  std::vector<std::string> sample_titles = {};
+
+  for (size_t ipdf=0; ipdf<samples.size(); ipdf++) {
+    if (auto* fd_casted_sample = dynamic_cast<SampleHandlerFD*>(samples[ipdf])) {
+      for (int iSample = 0; iSample < samples[ipdf]->GetNsamples(); ++iSample) {
+        std::string sample_title = samples[ipdf]->GetSampleTitle(iSample);
+        sample_titles.push_back(sample_title);
+
+        int dimension = fd_casted_sample->GetNDim(iSample);
+        response["dimensions"][sample_title] = dimension;
+
+        if (dimension == 1) {
+          TH1D* data_hist = (TH1D*)fd_casted_sample->GetDataHist(iSample)->Clone();
+
+          TAxis *ax = data_hist->GetXaxis();
+          std::string xtitle = ax->GetTitle(); 
+          int nxbins = ax->GetNbins();
+          std::vector<double> xbins(nxbins+1); 
+          std::vector<double> binvals(nxbins);
+
+          xbins[0] = ax->GetBinLowEdge(1);
+          for (int ix = 1; ix <= nxbins; ++ix) {
+            xbins[ix] = ax->GetBinUpEdge(ix);
+            binvals[ix-1] = data_hist->GetBinContent(ix);
+          }
+          response["axis_titles"][sample_title] = {xtitle};
+          response["bin_edges"][sample_title] = {xbins};
+          response["bin_values"][sample_title] = binvals;
+        } else if (dimension == 2) {
+          TH2D* data_hist = (TH2D*)fd_casted_sample->GetDataHist(iSample)->Clone();
+
+          TAxis *x_axis = data_hist->GetXaxis();
+          std::string xtitle = x_axis->GetTitle();
+          int nxbins = x_axis->GetNbins();
+          std::vector<double> xbins(nxbins+1);
+
+          TAxis *y_axis = data_hist->GetYaxis();
+          std::string ytitle = y_axis->GetTitle();
+          int nybins = y_axis->GetNbins();
+          std::vector<double> ybins(nybins+1);
+
+          std::vector<std::vector<double>> binvals(nxbins, std::vector<double>(nybins));
+
+          xbins[0] = x_axis->GetBinLowEdge(1);
+          ybins[0] = y_axis->GetBinLowEdge(1);
+          for (int ix = 1; ix <= nxbins; ++ix) {
+            for (int iy = 1; iy <= nybins; ++iy) {
+              xbins[ix] = x_axis->GetBinUpEdge(ix);
+              ybins[iy] = y_axis->GetBinUpEdge(iy);
+              binvals[ix-1][iy-1] = data_hist->GetBinContent(ix, iy);
+            }
+          }
+          response["axis_titles"][sample_title] = {xtitle, ytitle};
+          response["bin_edges"][sample_title] = {xbins, ybins};
+          response["bin_values"][sample_title] = binvals;
+        }
+      }
+    } else {
+      MACH3LOG_ERROR("Sample object does not derived from SampleHandlerFD. Consider overloading getDataSpectrum for this sample type.");
       throw MaCh3Exception(__FILE__,__LINE__);
     } 
   }
