@@ -409,8 +409,8 @@ void SampleHandlerFD::FillArray_MP() {
   const auto TotalBins = Binning->GetNBins();
   const unsigned int NumberOfEvents = GetNEvents();
 
-  double *MC_Array_for_reduction = SampleHandlerFD_array.data();
-  double *W2_array_for_reduction = SampleHandlerFD_array_w2.data();
+  double* _restrict_ MC_Array_for_reduction = SampleHandlerFD_array.data();
+  double* _restrict_ W2_array_for_reduction = SampleHandlerFD_array_w2.data();
 
   #pragma omp parallel for reduction(+:MC_Array_for_reduction[:TotalBins], W2_array_for_reduction[:TotalBins])
   for (unsigned int iEvent = 0; iEvent < NumberOfEvents; ++iEvent) {
