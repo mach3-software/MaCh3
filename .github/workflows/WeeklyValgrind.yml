@@ -47,7 +47,7 @@ jobs:
       - name: Get Dependency Graph
         run: |
           cd /opt/
-          git clone --branch main https://github.com/mach3-software/MaCh3.git MaCh3Cmake
+          git clone --branch develop https://github.com/mach3-software/MaCh3.git MaCh3Cmake
           cd MaCh3Cmake
           mkdir build && cd build
           cmake ../ -DMaCh3_DependancyGraph=ON
@@ -58,14 +58,14 @@ jobs:
           git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/mach3-software/MaCh3.git Plot
           cd Plot
           git checkout gh-profiling
-          mv /opt/MaCh3Validations/build/ValgrindMCMC.txt .
-          mv /opt/MaCh3Validations/build/MassifMCMC.txt .
-          mv /opt/MaCh3Cmake/build/foo.png ./Graph.png
+          mv -f /opt/MaCh3Validations/build/ValgrindMCMC.txt .
+          mv -f /opt/MaCh3Validations/build/MassifMCMC.txt .
+          mv -f /opt/MaCh3Cmake/build/foo.png Graph.png
 
           git config --global user.email "github-actions@github.com"
           git config --global user.name "github-actions"
           git add ValgrindMCMC.txt
           git add MassifMCMC.txt
           git add Graph.png
-          git commit -m "Update Valgrind files"
+          git commit --allow-empty -m "Update Valgrind files"
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/mach3-software/MaCh3.git gh-profiling

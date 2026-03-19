@@ -3,8 +3,9 @@
 #include <cmath>
 
 // ***************
-PSO::PSO(manager *man) : LikelihoodFit(man) {
+PSO::PSO(Manager *man) : LikelihoodFit(man) {
 // ***************
+  AlgorithmName = "PSO";
   fConstriction = Get<double>(fitMan->raw()["General"]["PSO"]["Constriction"], __FILE__, __LINE__);
   fInertia = Get<double>(fitMan->raw()["General"]["PSO"]["Inertia"], __FILE__, __LINE__) * fConstriction;
   fOne = Get<double>(fitMan->raw()["General"]["PSO"]["One"], __FILE__, __LINE__) * fConstriction;
@@ -211,7 +212,6 @@ std::vector<std::vector<double> > PSO::bisection(const std::vector<double>& posi
         res = std::abs(position[2]-position[0]);
         res_p = std::abs(position_list_p[1][i]-position_list_p[0][i]);
         MACH3LOG_TRACE("Pos midpoint is {:.2f}", position_list_p[1][i]);
-
       }
       else{
         std::vector<double> new_bisect_position_p = position_list_p[1];new_bisect_position_p[i] += (position_list_p[2][i]-position_list_p[1][i])/2;
@@ -383,7 +383,7 @@ double PSO::swarmIterate(){
 
   std::vector<double> best_pos = get_best_particle()->get_personal_best_position();
   std::vector<double> result(best_pos.size(), 0.0);
-  transform(total_pos.begin(), total_pos.end(), total_pos.begin(), [=](double val){return val/fParticles;});
+  transform(total_pos.begin(), total_pos.end(), total_pos.begin(), [this](double val){return val/fParticles;});
   transform(total_pos.begin(),total_pos.end(),best_pos.begin(),result.begin(),[](double x, double y) {return x-y;});
 
   double mean_dist_sq = 0;

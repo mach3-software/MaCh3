@@ -23,6 +23,9 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
+    container:
+      image: ghcr.io/mach3-software/mach3:alma9latest
+
     permissions:
       contents: write
       id-token: write
@@ -32,31 +35,32 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, 
       # so your job can access it
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
-      # Updates the package list to ensure you get the latest version of packages
-      - run: sudo apt-get update
-
       # Installs texlive for LaTeX support in Doxygen documentation
-      - run: sudo apt-get install -y texlive
+      - run: dnf install -y texlive-scheme-basic texlive-latex
 
       # Installs libjs-mathjax for rendering mathematical notation 
       # in Doxygen documentation
-      - run: sudo apt-get install -y libjs-mathjax
+      - run: dnf install -y mathjax
 
       # Install perl for bibtex
-      - run: sudo apt-get install -y perl
+      - run: dnf install -y perl
+
+        # Install doxgyen
+      - run: dnf install -y doxygen
 
       # Runs a single command using the runners shell
-      - uses: DenverCoder1/doxygen-github-pages-action@v2.0.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          folder: Doc/html
-          branch: gh-pages
-          config_file: Doc/Doxyfile
+      - name: Build and generate documentation
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+          cd ..
+          doxygen Doc/Doxyfile
 
       - name: Upload Doxygen Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           retention-days: 1
           name: DoxygenHTML
@@ -75,7 +79,7 @@ jobs:
     
       # Checks-out your repository under $GITHUB_WORKSPACE, 
       # so your job can access it
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Check Python 
         run: python3 --version
@@ -90,7 +94,7 @@ jobs:
       - uses: geekyeggo/delete-artifact@v5
         with:
           name: DoxygenHTML
-          
+
       - name: Build MaCh3
         run: | 
           mkdir build
@@ -115,7 +119,7 @@ jobs:
           mkdir to-upload/pyMaCh3
           mv Doc/sphinx/build/html/* to-upload/pyMaCh3/
           
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           retention-days: 1
           name: DocumentationHTML
@@ -133,7 +137,15 @@ jobs:
         with:
           name: DocumentationHTML
           path: to-upload/
-          
+
+      #KS: Copy previous documentation
+      - name: Copy previous docs
+        run: |
+          git clone --branch gh-pages-archive https://github.com/mach3-software/MaCh3.git temp-gh-pages-archive
+          mkdir -p to-upload/.Archive/
+          cp -r temp-gh-pages-archive/* to-upload/.Archive/
+          rm -rf temp-gh-pages-archive
+
       ## EM: Now we delete the artifact so it doesn't use up our allowance
       - uses: geekyeggo/delete-artifact@v5
         with:

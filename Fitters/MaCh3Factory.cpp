@@ -2,24 +2,35 @@
 #include "Fitters/MaCh3Factory.h"
 
 // ********************************************
-std::unique_ptr<FitterBase> MaCh3FitterFactory(manager *fitMan) {
+std::unique_ptr<FitterBase> MaCh3FitterFactory(Manager *fitMan) {
 // ********************************************
   std::unique_ptr<FitterBase> MaCh3Fitter = nullptr;
 
   auto Algorithm = GetFromManager<std::string>(fitMan->raw()["General"]["FittingAlgorithm"], "MCMC");
 
-  if(Algorithm == "MCMC") {
-    MaCh3Fitter = std::make_unique<mcmc>(fitMan);
-  } else if (Algorithm == "PSO") {
+  if(Algorithm == "MCMC" || Algorithm == "MR2T2") 
+  {
+    MaCh3Fitter = std::make_unique<MR2T2>(fitMan);
+  }
+  else if (Algorithm == "DelayedMCMC"  || Algorithm == "DelayedMR2T2")
+  {
+    MaCh3Fitter = std::make_unique<DelayedMR2T2>(fitMan);
+  }
+  else if (Algorithm == "PSO")
+  {
     MaCh3Fitter = std::make_unique<PSO>(fitMan);
-  } else if (Algorithm == "Minuit2") {
+  }
+  else if (Algorithm == "Minuit2")
+  {
     #ifdef MaCh3_MINUIT2
     MaCh3Fitter = std::make_unique<MinuitFit>(fitMan);
     #else
     MACH3LOG_ERROR("Trying to use Minuit2 however MaCh3 was compiled without Minuit2 support");
     throw MaCh3Exception(__FILE__ , __LINE__ );
     #endif
-  } else {
+  }
+  else
+  {
     MACH3LOG_ERROR("You want to use algorithm {}, I don't recognize it, sry", Algorithm);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
@@ -27,12 +38,12 @@ std::unique_ptr<FitterBase> MaCh3FitterFactory(manager *fitMan) {
 }
 
 // ********************************************
-std::unique_ptr<manager> MaCh3ManagerFactory(int argc, char **argv) {
+std::unique_ptr<Manager> MaCh3ManagerFactory(int argc, char **argv) {
 // ********************************************
   if (argc < 2) {
     MACH3LOG_ERROR("Wrong usage of MaCh3 executable!");
     MACH3LOG_ERROR("Syntax is $: {} config.yaml", argv[0]);
-    MACH3LOG_ERROR("Where config.yaml is a valid config file, compatible with the manager class (manager/manager.cpp/h)");
+    MACH3LOG_ERROR("Where config.yaml is a valid config file, compatible with the Manager class (Manager/Manager.cpp/h)");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
@@ -55,13 +66,13 @@ std::unique_ptr<manager> MaCh3ManagerFactory(int argc, char **argv) {
 
     // Merge them
     YAML::Node merged = MergeNodes(config1, config2);
-    auto FitManager = std::make_unique<manager>(merged);
+    auto FitManager = std::make_unique<Manager>(merged);
 
     return FitManager;
   }
 
   // Initialise manger responsible for config handling
-  auto FitManager = std::make_unique<manager>(argv[1]);
+  auto FitManager = std::make_unique<Manager>(argv[1]);
   
   //KS: Lambda to make sure we are not overwriting setting which should be committed
   auto SanityOverwrite = [](const std::string& Name) {

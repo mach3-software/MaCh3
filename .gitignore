@@ -7,6 +7,7 @@ build*/
 install/
 Doc/html
 Doc/latex
+Doc/Doxyfile
 .cache/
 
 # Ignore emacs/vim stuff

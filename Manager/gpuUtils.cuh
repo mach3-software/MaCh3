@@ -74,3 +74,18 @@ void SetDevice(const int deviceId);
 /// @param Device The ID of the device. Defaults to 0.
 /// @return The number of GPU threads.
 int GetNumGPUThreads(const int Device = 0);
+
+/// @brief KS: Get L2 cache size (in bytes) for the specified GPU device.
+/// @param device The ID of the device. Defaults to 0.
+/// @return The size of the L2 cache in bytes
+size_t GetL2CacheSize(const int device = 0);
+
+/// @brief KS: Get the maximum size for 1D textures on the specified GPU device.
+/// @param device The ID of the device. Defaults to 0.
+/// @return The maximum 1D texture size supported by the device
+size_t GetMaxTexture1DSize(const int device = 0);
+
+/// @brief KS: Returns the maximum shared memory per block for a given GPU device.
+/// @param device CUDA device ID (default = 0)
+/// @return Maximum shared memory per block in bytes
+size_t GetSharedMemoryPerBlock(const int device = 0);

@@ -2,12 +2,14 @@
 
 // MaCh3 includes
 #include "Fitters/FitterBase.h"
-#include "Fitters/mcmc.h"
+#include "Fitters/MR2T2.h"
+#include "Fitters/DelayedMR2T2.h"
 #include "Fitters/PSO.h"
 #include "Fitters/LikelihoodFit.h"
 #ifdef MaCh3_MINUIT2
 #include "Fitters/MinuitFit.h"
 #endif
+
 
 #include "Parameters/ParameterHandlerGeneric.h"
 
@@ -16,29 +18,30 @@
 /// @author Kamil Skwarczynski
 
 /// @brief MaCh3 Factory initiates one of implemented fitting algorithms
-/// @param fitMan pointer to Manager class
+/// @param FitManager pointer to Manager class
 ///
 /// @note Example YAML configuration:
 /// @code
 /// General:
 ///   FittingAlgorithm: ["MCMC"]
-std::unique_ptr<FitterBase> MaCh3FitterFactory(manager *fitMan);
+/// @endcode
+std::unique_ptr<FitterBase> MaCh3FitterFactory(Manager *FitManager);
 
-/// @brief Initializes the config manager class and allows overriding settings via command-line arguments.
+/// @brief Initializes the config Manager class and allows overriding settings via command-line arguments.
 /// @param argc number of arguments
 /// @param argv name of arguments
-/// @return A unique pointer to the initialized `manager` instance with optional overrides applied.
-/// @example Usage examples:
+/// @return A unique pointer to the initialized `Manager` instance with optional overrides applied.
+/// @note Usage examples:
 /// ```
 /// ./bin/MCMCTutorial Inputs/FitterConfig.yaml General:OutputFile:blarb.root
 /// ./bin/MCMCTutorial Inputs/FitterConfig.yaml General:OutputFile:blarb.root General:MCMC:NSteps:50000
 /// ```
-std::unique_ptr<manager> MaCh3ManagerFactory(int argc, char **argv);
+std::unique_ptr<Manager> MaCh3ManagerFactory(int argc, char **argv);
 
 // ********************************************
 /// @brief Factory function for creating a covariance class for systematic handling.
 ///
-/// @param FitManager Pointer to the manager class that holds the configuration settings.
+/// @param FitManager Pointer to the Manager class that holds the configuration settings.
 /// @param PreFix Prefix, for example Xsec, then code will look for XsecCovFile
 /// @return Pointer to the initialized covarianceXsec matrix object.
 ///
@@ -62,7 +65,7 @@ std::unique_ptr<manager> MaCh3ManagerFactory(int argc, char **argv);
 ///
 /// @todo add adaptive stuff
 template <typename CovType>
-std::unique_ptr<CovType> MaCh3CovarianceFactory(manager *FitManager, const std::string& PreFix){
+std::unique_ptr<CovType> MaCh3CovarianceFactory(Manager *FitManager, const std::string& PreFix) {
 // ********************************************
   // config for our matrix
   YAML::Node Settings = FitManager->raw()["General"]["Systematics"];
@@ -95,6 +98,12 @@ std::unique_ptr<CovType> MaCh3CovarianceFactory(manager *FitManager, const std::
       CovObject->ToggleFixParameter(FixParams.at(j));
     }
   }
+
+  if (CheckNodeExists(Settings, std::string(PreFix) + "Tune"))
+  {
+    CovObject->SetTune(Get<std::string>(Settings[std::string(PreFix) + "Tune"], __FILE__, __LINE__));
+  }
+
   //Global step scale for matrix
   auto StepScale = Get<double>(Settings[std::string(PreFix) + "StepScale"], __FILE__, __LINE__);
 
@@ -131,17 +140,14 @@ std::vector<SampleType*> MaCh3SampleHandlerFactory(const std::vector<std::string
     SampleType* Sample = new SampleType(SampleConfig[i], xsec);
     Sample->Reweight();
 
-    // Obtain sample name and create a TString version for histogram naming
-    std::string name = Sample->GetTitle();
-    TString NameTString = TString(name.c_str());
+    for(int iSample = 0; iSample < Sample->GetNsamples(); iSample++)
+    {
+      // Obtain sample name and create a TString version for histogram naming
+      std::string name = Sample->GetSampleTitle(iSample);
+      TString NameTString = TString(name.c_str());
 
-    // Clone the 1D histogram with a modified name
-    if (Sample->GetNDim() == 1) {
-      auto hist = static_cast<TH1D*>(Sample->GetMCHist(1)->Clone(NameTString + "_Prior"));
-      Sample->AddData(hist);
-    } else {
-      auto hist = static_cast<TH2D*>(Sample->GetMCHist(2)->Clone(NameTString + "_Prior"));
-      Sample->AddData(hist);
+      // Clone the 1D histogram with a modified name
+      Sample->AddData(iSample, Sample->GetMCArray(iSample));
     }
     Handlers[i] = Sample;
   }

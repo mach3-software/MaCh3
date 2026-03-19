@@ -4,10 +4,10 @@
 #include <vector>
 #include <string>
 
-#include "Plotting/plottingUtils/plottingUtils.h"
-#include "Plotting/plottingUtils/plottingManager.h"
-#include "Plotting/plottingUtils/styleManager.h"
-#include "Plotting/plottingUtils/inputManager.h"
+#include "Plotting/PlottingUtils/PlottingUtils.h"
+#include "Plotting/PlottingUtils/PlottingManager.h"
+#include "Plotting/PlottingUtils/StyleManager.h"
+#include "Plotting/PlottingUtils/InputManager.h"
 
 namespace py = pybind11;
 

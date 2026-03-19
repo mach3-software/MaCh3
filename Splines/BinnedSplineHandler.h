@@ -4,11 +4,6 @@
 #include "Splines/SplineBase.h"
 #include "Manager/MaCh3Modes.h"
 
-_MaCh3_Safe_Include_Start_ //{
-// ROOT includes
-#include "TH3F.h"
-_MaCh3_Safe_Include_End_ //}
-
 /// @brief Bin-by-bin class calculating response for spline parameters.
 /// @see For more details, visit the [Wiki](https://github.com/mach3-software/MaCh3/wiki/05.-Splines).
 /// @author Dan Barrow
@@ -17,19 +12,20 @@ _MaCh3_Safe_Include_End_ //}
 class BinnedSplineHandler : public SplineBase {
   /// @todo ETA - do all of these functions and members actually need to be public?
   public:
-	/// @brief Constructor
-  BinnedSplineHandler(ParameterHandlerGeneric *xsec_, MaCh3Modes *Modes_);
-	/// @brief Destructor
-	/// @todo it need some love
-	virtual ~BinnedSplineHandler();
+    /// @brief Constructor
+    BinnedSplineHandler(ParameterHandlerGeneric *xsec_, MaCh3Modes *Modes_);
+    /// @brief Destructor
+    /// @todo it need some love
+    virtual ~BinnedSplineHandler();
 
     /// @brief CW: This Eval should be used when using two separate x,{y,a,b,c,d} arrays
     /// to store the weights; probably the best one here! Same thing but pass parameter
     /// spline segments instead of variations
-    void Evaluate();
+    void Evaluate() override;
 
     /// @brief add oscillation channel to spline monolith
     void AddSample(const std::string& SampleName,
+                   const std::string& SampleTitle,
                    const std::vector<std::string>& OscChanFileNames,
                    const std::vector<std::string>& SplineVarNames);
     /// @brief flatten multidimensional spline array into proper monolith
@@ -39,30 +35,31 @@ class BinnedSplineHandler : public SplineBase {
 
     /// @brief Loads and processes splines from ROOT files for a given sample.
     /// @note DB Add virtual so it can be overridden in experiment specific (if needed)
-    virtual void FillSampleArray(std::string SampleName, std::vector<std::string> OscChanFileNames);
+    virtual void FillSampleArray(std::string SampleTitle, std::vector<std::string> OscChanFileNames);
     /// @brief Check if there are any repeated modes. This is used to reduce the number
     /// of modes in case many interaction modes get averaged into one spline
     std::vector< std::vector<int> > StripDuplicatedModes(const std::vector< std::vector<int> >& InputVector);
     /// @brief Return the splines which affect a given event
-    std::vector< std::vector<int> > GetEventSplines(const std::string& SampleName, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val);
+    std::vector< std::vector<int> > GetEventSplines(const std::string& SampleTitle, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val);
 
     /// @brief Grab histograms with spline binning
-    std::vector<TAxis*> FindSplineBinning(const std::string& FileName, const std::string& SampleName);
+    std::vector<TAxis*> FindSplineBinning(const std::string& FileName, const std::string& SampleTitle);
 
     int CountNumberOfLoadedSplines(bool NonFlat=false, int Verbosity=0);
     std::string getDimLabel(const int BinningOpt, const unsigned int Axis) const;
     /// @brief Get index of sample based on name
-    int getSampleIndex(const std::string& SampleName) const;
+    /// @param SampleTitle The title of the sample to search for.
+    int GetSampleIndex(const std::string& SampleTitle) const;
     /// @brief Ensure we have spline for a given bin
-    bool isValidSplineIndex(const std::string& SampleName, int iSyst, int iOscChan, int iMode, int iVar1, int iVar2, int iVar3);
+    bool isValidSplineIndex(const std::string& SampleTitle, int iSyst, int iOscChan, int iMode, int iVar1, int iVar2, int iVar3);
 
-    void BuildSampleIndexingArray(const std::string& SampleName);
+    void BuildSampleIndexingArray(const std::string& SampleTitle);
     void PrepForReweight();
     void getSplineCoeff_SepMany(int splineindex, M3::float_t *& xArray, M3::float_t *&manyArray);
     void PrintBinning(TAxis* Axis) const;
     /// @brief Print info like Sample ID of spline params etc.
-    void PrintSampleDetails(const std::string& SampleName) const;
-    void PrintArrayDetails(const std::string& SampleName) const;
+    void PrintSampleDetails(const std::string& SampleTitle) const;
+    void PrintArrayDetails(const std::string& SampleTitle) const;
 
     /// @brief get pointer to spline weight based on bin variables
     const M3::float_t* retPointer(const int sample, const int oscchan, const int syst, const int mode,
@@ -70,6 +67,11 @@ class BinnedSplineHandler : public SplineBase {
       int index = indexvec[sample][oscchan][syst][mode][var1bin][var2bin][var3bin];
       return &weightvec_Monolith[index];
     }
+    /// @brief KS: Prepare spline file that can be used for fast loading
+    void PrepareSplineFile(std::string FileName) override;
+    /// @brief KS: Load preprocessed spline file
+    /// @param FileName Path to ROOT file with predefined reduced Spline Monolith
+    void LoadSplineFile(std::string FileName) override;
 
   protected:
     /// @brief CPU based code which eval weight for each spline
@@ -81,6 +83,7 @@ class BinnedSplineHandler : public SplineBase {
 
     //And now the actual member variables
     std::vector<std::string> SampleNames;
+    std::vector<std::string> SampleTitles;
     std::vector<int> Dimensions;
     std::vector<std::vector<std::string>> DimensionLabels;
     std::vector<int> nSplineParams;
@@ -134,4 +137,31 @@ class BinnedSplineHandler : public SplineBase {
     MaCh3Modes* Modes;
     enum TokenOrdering{kSystToken,kModeToken,kVar1BinToken,kVar2BinToken,kVar3BinToken,kNTokens};
     virtual std::vector<std::string> GetTokensFromSplineName(std::string FullSplineName) = 0;
+
+  private:
+    /// @brief This function will find missing splines in file
+    void InvestigateMissingSplines() const;
+
+    /// @brief KS: Load preprocessed Settings
+    /// @param SplineFile File from which we load new tree
+    void LoadSettingsDir(std::unique_ptr<TFile>& SplineFile);
+    /// @brief KS: Load preprocessed Monolith
+    /// @param SplineFile File from which we load new tree
+    void LoadMonolithDir(std::unique_ptr<TFile>& SplineFile);
+    /// @brief KS: Load preprocessed Index
+    /// @param SplineFile File from which we load new tree
+    void LoadIndexDir(std::unique_ptr<TFile>& SplineFile);
+
+    /// @brief KS: Prepare Settings Info within SplineFile
+    /// @param SplineFile File from which we load new tree
+    void PrepareSettingsDir(std::unique_ptr<TFile>& SplineFile) const;
+    /// @brief KS: Prepare Monolith Info within SplineFile
+    /// @param SplineFile File from which we load new tree
+    void PrepareMonolithDir(std::unique_ptr<TFile>& SplineFile) const;
+    /// @brief KS: Prepare Index Info within SplineFile
+    /// @param SplineFile File from which we load new tree
+    void PrepareIndexDir(std::unique_ptr<TFile>& SplineFile) const;
+    /// @brief KS: Prepare Other Info within SplineFile
+    /// @param SplineFile File from which we load new tree
+    void PrepareOtherInfoDir(std::unique_ptr<TFile>& SplineFile) const;
 };

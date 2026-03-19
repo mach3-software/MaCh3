@@ -10,13 +10,7 @@
 #include <iostream>
 #include <map>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wconversion"
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+_MaCh3_Safe_Include_Start_ //{
 // ROOT
 #include "TCanvas.h"
 #include "TGraph2D.h"
@@ -36,10 +30,11 @@
 #include "TROOT.h"
 #include "TStyle.h"
 #include "TMultiGraph.h"
-#pragma GCC diagnostic pop
+_MaCh3_Safe_Include_End_ //}
+
 
 namespace MaCh3Plotting {
-/// @defgroup Utils Plotting Utility Functions
+/// @ingroup Utils Plotting Utility Functions
 /// @{
 
 /// @brief This handy little function lets you interpret a TGraph as a TH1D.
@@ -48,7 +43,7 @@ namespace MaCh3Plotting {
 /// the name of the graph.
 /// @param newTitle The new title you want to give to the histogram. If not specified, will just use
 /// the title of the graph.
-TH1D TGraphToTH1D(TGraph graph, std::string newName = "", std::string newTitle = "");
+TH1D TGraphToTH1D(TGraph graph, const std::string& newName = "", const std::string& newTitle = "");
 
 
 /// @brief This handy little function lets you interpret a TGraph as a vector containing the same data.
@@ -61,7 +56,6 @@ std::vector<std::vector<double>> TGraphToVector(TGraph graph);
 /// @param graph The graph you want to convert.
 /// @return A vector of vectors containing the data from the initial graph. The first vector is the x axis, the 2nd the y axis, the 3rd is the z axis
 std::vector<std::vector<double>> TGraphToVector(TGraph2D graph);
-
 
 /// @}
 } // namespace MaCh3Plotting

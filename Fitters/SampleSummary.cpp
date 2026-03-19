@@ -112,8 +112,8 @@ SampleSummary::SampleSummary(const int n_Samples, const std::string &Filename, S
   //KS: This is silly as it assumes all samples uses same kinematics
   lnLFlucHist_ProjectX = std::make_unique<TH2D>("lnLFlucHist_ProjectX", "lnLFlucHist_ProjectX", 50, 1, -1, 50, 1, -1);
   lnLFlucHist_ProjectX->SetDirectory(nullptr);
-  lnLFlucHist_ProjectX->GetXaxis()->SetTitle(("-2LLH_{Draw Fluc, Draw} for " + SampleHandler->GetKinVarLabel(0, 0)).c_str());
-  lnLFlucHist_ProjectX->GetYaxis()->SetTitle(("-2LLH_{Data, Draw} for " + SampleHandler->GetKinVarLabel(0, 0)).c_str());
+  lnLFlucHist_ProjectX->GetXaxis()->SetTitle(("-2LLH_{Draw Fluc, Draw} for " + SampleHandler->GetKinVarName(0, 0)).c_str());
+  lnLFlucHist_ProjectX->GetYaxis()->SetTitle(("-2LLH_{Data, Draw} for " + SampleHandler->GetKinVarName(0, 0)).c_str());
   
   // Holds the hist of random number draws, only works for posterior predictive
   if(!isPriorPredictive)
@@ -251,7 +251,7 @@ void SampleSummary::AddData(std::vector<TH2Poly*> &Data) {
         DataHist_ProjectY[i] = ProjectPoly(DataHist[i], false, i);
         maxBins[i] = DataHist[i]->GetNumberOfBins();
       } else {
-        MACH3LOG_ERROR("Somehow sample {} doesn't use TH2Poly", SampleHandler->GetSampleName(i));
+        MACH3LOG_ERROR("Somehow sample {} doesn't use TH2Poly", SampleHandler->GetSampleTitle(i));
         MACH3LOG_ERROR("Right now I only support TH2Poly but I am ambitious piece of code and surely will have more support in the future");
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
@@ -342,10 +342,8 @@ void SampleSummary::AddNominal(std::vector<TH2Poly*> &Nominal, std::vector<TH2Po
         MeanHistCorrected[i]->Reset("");
         MeanHistCorrected[i]->GetZaxis()->SetTitle("Mean");
       }
-      std::vector<double> xbins;
-      std::vector<double> ybins;
-
-      SampleHandler->SetupBinning(M3::int_t(i), xbins, ybins);
+      std::vector<double> xbins = SampleHandler->ReturnKinematicParameterBinning(M3::int_t(i), SampleHandler->GetKinVarName(M3::int_t(i), 0));
+      std::vector<double> ybins = SampleHandler->ReturnKinematicParameterBinning(M3::int_t(i), SampleHandler->GetKinVarName(M3::int_t(i), 1));
       
       //KS: Y axis is number of events to get estimate of maximal number we use integral
       const int MaxBinning = doShapeOnly ? 1 : int(NoOverflowIntegral(NominalHist[i])/4);
@@ -555,11 +553,10 @@ void SampleSummary::AddThrowByMode(std::vector<std::vector<TH2Poly*>> &SampleVec
 // **********************
 void SampleSummary::PrepareOutput() {
 // **********************
-
   // Make the output file (MakePosterioPredictive call writes to this)
   std::string TempString = OutputName;
   TempString.replace(TempString.find(".root"), 5, std::string("_procsW2.root"));
-  Outputfile = new TFile(TempString.c_str(), "RECREATE");
+  Outputfile = M3::Open(TempString, "RECREATE", __FILE__, __LINE__);
 
   // The array of doubles we write to the TTree
   // Data vs Draw
@@ -601,7 +598,7 @@ void SampleSummary::PrepareOutput() {
   for (int i = 0; i < nSamples; ++i)
   {
     // Get the name
-    std::string SampleName = SampleHandler->GetSampleName(i);
+    std::string SampleName = SampleHandler->GetSampleTitle(i);
     // Strip out spaces
     while (SampleName.find(" ") != std::string::npos) {
       SampleName.replace(SampleName.find(" "), 1, std::string("_"));
@@ -791,8 +788,8 @@ void SampleSummary::Write() {
     // finally p-value for 1D projection
     OutputTree->Draw((SampleName+"_data_draw_ProjectX:"+SampleName+"_drawfluc_draw_ProjectX>>htemp4").c_str());
     TH2D *TempHistogram4 = static_cast<TH2D*>(gDirectory->Get("htemp4")->Clone());
-    TempHistogram4->GetXaxis()->SetTitle(("-2LLH_{Draw Fluc, Draw} for " + SampleHandler->GetKinVarLabel(i, 0)).c_str());
-    TempHistogram4->GetYaxis()->SetTitle(("-2LLH_{Data, Draw} for " + SampleHandler->GetKinVarLabel(i, 0)).c_str());
+    TempHistogram4->GetXaxis()->SetTitle(("-2LLH_{Draw Fluc, Draw} for " + SampleHandler->GetKinVarName(i, 0)).c_str());
+    TempHistogram4->GetYaxis()->SetTitle(("-2LLH_{Data, Draw} for " + SampleHandler->GetKinVarName(i, 0)).c_str());
     TempHistogram4->SetNameTitle((SampleNames[i]+"_drawfluc_draw_ProjectX").c_str(), (SampleNames[i]+"_drawfluc_draw_ProjectX").c_str());
     Get2DBayesianpValue(TempHistogram4);
     TempHistogram4->Write();
@@ -2162,10 +2159,9 @@ TH1D* SampleSummary::ProjectHist(TH2D* Histogram, const bool ProjectX) {
 // Make a projection
 TH1D* SampleSummary::ProjectPoly(TH2Poly* Histogram, const bool ProjectX, const int selection, const bool MakeErrorHist) {
 // ****************
-  std::vector<double> xbins;
-  std::vector<double> ybins;
+  std::vector<double> xbins = SampleHandler->ReturnKinematicParameterBinning(M3::int_t(selection), SampleHandler->GetKinVarName(M3::int_t(selection), 0));
+  std::vector<double> ybins = SampleHandler->ReturnKinematicParameterBinning(M3::int_t(selection), SampleHandler->GetKinVarName(M3::int_t(selection), 1));
 
-  SampleHandler->SetupBinning(M3::int_t(selection), xbins, ybins);
   TH1D* Projection = nullptr;
   std::string name;
   if (ProjectX) {

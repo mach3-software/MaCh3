@@ -1,6 +1,8 @@
 set(HEADERS
     FitterBase.h
-    mcmc.h
+    MCMCBase.h
+    MR2T2.h
+    DelayedMR2T2.h
     LikelihoodFit.h
     MinuitFit.h
     PSO.h
@@ -8,13 +10,16 @@ set(HEADERS
     OscProcessor.h
     SampleSummary.h
     MaCh3Factory.h
+    PredictiveThrower.h
     StatisticalUtils.h
     gpuMCMCProcessorUtils.cuh
 )
 
 add_library(Fitters SHARED
     FitterBase.cpp
-    mcmc.cpp
+    MCMCBase.cpp
+    MR2T2.cpp
+    DelayedMR2T2.cpp
     LikelihoodFit.cpp
     $<$<BOOL:${MaCh3_MINUIT2_ENABLED}>:MinuitFit.cpp>
     PSO.cpp
@@ -23,6 +28,7 @@ add_library(Fitters SHARED
     SampleSummary.cpp
     MaCh3Factory.cpp
     StatisticalUtils.cpp
+    PredictiveThrower.cpp
     $<$<BOOL:${MaCh3_GPU_ENABLED}>:gpuMCMCProcessorUtils.cu>
 )
 

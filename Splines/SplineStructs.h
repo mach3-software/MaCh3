@@ -28,9 +28,7 @@ struct FastSplineInfo {
   }
 
   /// @brief Destructor
-  virtual ~FastSplineInfo() {
-
-  }
+  virtual ~FastSplineInfo() = default;
 
   /// Number of points in spline
   M3::int_t nPts;
@@ -153,14 +151,14 @@ public:
   /// @brief Empty constructor
   TF1_red() : TResponseFunction_red() {
     length = 0;
-    Par = NULL;
+    Par = nullptr;
   }
 
   /// @brief Empty destructor
   virtual ~TF1_red() {
     if (Par != NULL) {
       delete[] Par;
-      Par = NULL;
+      Par = nullptr;
     }
   }
 
@@ -174,20 +172,20 @@ public:
 
   /// @brief The TF1 constructor with deep copy
   TF1_red(TF1* &Function) : TResponseFunction_red() {
-    Par = NULL;
+    Par = nullptr;
     SetFunc(Function);
   }
 
   /// @brief Set the function
   inline void SetFunc(TF1* &Func) {
     length = M3::int_t(Func->GetNpar());
-    if (Par != NULL) delete[] Par;
+    if (Par != nullptr) delete[] Par;
     Par = new M3::float_t[length];
     for (int i = 0; i < length; ++i) {
       Par[i] = M3::float_t(Func->GetParameter(i));
     }
     delete Func;
-    Func = NULL;
+    Func = nullptr;
   }
 
   /// @brief Evaluate a variation
@@ -270,16 +268,16 @@ public:
   /// @brief Empty constructor
   TSpline3_red() : TResponseFunction_red() {
     nPoints = 0;
-    Par = NULL;
-    XPos = NULL;
-    YResp = NULL;
+    Par = nullptr;
+    XPos = nullptr;
+    YResp = nullptr;
   }
 
   /// @brief The constructor that takes a TSpline3 pointer and copies in to memory
   TSpline3_red(TSpline3* &spline, SplineInterpolation InterPolation = kTSpline3) : TResponseFunction_red() {
-    Par = NULL;
-    XPos = NULL;
-    YResp = NULL;
+    Par = nullptr;
+    XPos = nullptr;
+    YResp = nullptr;
     SetFunc(spline, InterPolation);
   }
 
@@ -309,18 +307,19 @@ public:
     }
   }
   /// @brief Set the function
+  /// @cite povray_interpolation_guide
   inline void SetFunc(TSpline3* &spline, SplineInterpolation InterPolation = kTSpline3) {
     nPoints = M3::int_t(spline->GetNp());
-    if (Par != NULL) {
+    if (Par != nullptr) {
       for (int i = 0; i < nPoints; ++i) {
         delete[] Par[i];
-        Par[i] = NULL;
+        Par[i] = nullptr;
       }
       delete[] Par;
-      Par = NULL;
+      Par = nullptr;
     }
-    if (XPos != NULL) delete[] XPos;
-    if (YResp != NULL) delete[] YResp;
+    if (XPos != nullptr) delete[] XPos;
+    if (YResp != nullptr) delete[] YResp;
     // Save the parameters for each knot
     Par = new M3::float_t*[nPoints];
     // Save the positions of the knots
@@ -352,16 +351,21 @@ public:
     else if(InterPolation == kLinear || InterPolation == kLinearFunc)
     {
       for (int k = 0; k < nPoints; ++k) {
-        // 3 is the size of the TSpline3 coefficients
         Par[k] = new M3::float_t[3];
+
         Double_t x1, y1, b1, c1, d1, x2, y2, b2, c2, d2 = 0;
         spline->GetCoeff(k, x1, y1, b1, c1, d1);
-        spline->GetCoeff(k+1, x2, y2, b2, c2, d2);
-        double tempb = (y2-y1)/(x2-x1);
 
+        double tempb = 0;
+        if (k == nPoints - 1) {
+          tempb = Par[k-1][0];
+        } else {
+          spline->GetCoeff(k + 1, x2, y2, b2, c2, d2);
+          tempb = (y2-y1)/(x2-x1);
+        }
         XPos[k]   = M3::float_t(x1);
         YResp[k]  = M3::float_t(y1);
-        Par[k][0] = M3::float_t(tempb);
+        Par[k][0] = M3::float_t(tempb);  // linear slope
         Par[k][1] = M3::float_t(0);
         Par[k][2] = M3::float_t(0);
       }
@@ -566,6 +570,77 @@ public:
         delete[] Tangents;
       } // end of if(nPoints !=2)
     }
+    else if (InterPolation == kKochanekBartels)
+    {
+      // Allocate memory for tangents and coefficients
+      M3::float_t* Tangents = new M3::float_t[nPoints];
+      for (int i = 0; i < nPoints; ++i)
+      {
+        Par[i] = new M3::float_t[3];
+        double x = -999.99, y = -999.99;
+        spline->GetKnot(i, x, y);
+        XPos[i]  = M3::float_t(x);
+        YResp[i] = M3::float_t(y);
+        Tangents[i] = 0.0;
+      }
+
+      // KS: Setting all parameters to 0 gives a Catmull-Rom spline.
+      // Tension (T):
+      //   - T =  0.0: Default smooth interpolation (Catmull-Rom).
+      //   - T =  1.0: Maximum tension; curve becomes linear between knots (no curvature).
+      //   - T = -1.0: Overshooting; creates loops or "bouncy" effects around knots.
+      constexpr M3::float_t T = 0.0;
+
+      // Continuity (C):
+      //   - C =  0.0: Default smooth transition (continuous first derivative).
+      //   - C =  1.0: Sharp corner/crease at knot (discontinuous first derivative).
+      //   - C = -1.0: Inverted curve; creates loops or kinks at knot.
+      constexpr M3::float_t C = 0.0;
+
+      // Bias (B):
+      //   - B =  0.0: Default symmetric curve around knot.
+      //   - B =  1.0: Curve is "pulled" toward the next knot (leading effect).
+      //   - B = -1.0: Curve is "pulled" toward the previous knot (lagging effect).
+      constexpr M3::float_t B = 0.0;
+
+      // Calculate tangents for internal knots
+      for (int i = 1; i < nPoints - 1; ++i)
+      {
+        M3::float_t d0 = (YResp[i]   - YResp[i-1]) / (XPos[i]   - XPos[i-1]);
+        M3::float_t d1 = (YResp[i+1] - YResp[i])   / (XPos[i+1] - XPos[i]);
+
+        M3::float_t term1 = (1.0 - T) * (1.0 + B) * (1.0 + C) * 0.5 * d0;
+        M3::float_t term2 = (1.0 - T) * (1.0 - B) * (1.0 - C) * 0.5 * d1;
+
+        Tangents[i] = term1 + term2;
+      }
+
+      // Boundary conditions (simple choice: secant slopes)
+      Tangents[0]        = (YResp[1]       - YResp[0])       / (XPos[1]       - XPos[0]);
+      Tangents[nPoints-1]= (YResp[nPoints-1] - YResp[nPoints-2]) / (XPos[nPoints-1] - XPos[nPoints-2]);
+
+      // Compute cubic coefficients for each segment
+      for (int i = 0; i < nPoints - 1; ++i)
+      {
+        M3::float_t dx = XPos[i+1] - XPos[i];
+        M3::float_t dy = YResp[i+1] - YResp[i];
+        M3::float_t m0 = Tangents[i];
+        M3::float_t m1 = Tangents[i+1];
+
+        Par[i][0] = m0;                                  // b
+        Par[i][1] = (3*dy/(dx*dx)) - (2*m0 + m1)/dx;     // c
+        Par[i][2] = (m0 + m1 - 2*dy/dx) / (dx*dx);       // d
+
+        MACH3LOG_TRACE("KB segment {}: dx={}, dy={}, b={}, c={}, d={}",
+                       i, dx, dy, Par[i][0], Par[i][1], Par[i][2]);
+      }
+      // Last "virtual" segment
+      Par[nPoints-1][0] = 0.0;
+      Par[nPoints-1][1] = 0.0;
+      Par[nPoints-1][2] = 0.0;
+
+      delete[] Tangents;
+    }
     else
     {
       MACH3LOG_ERROR("Unsupported interpolation type {}", static_cast<int>(InterPolation));
@@ -573,27 +648,27 @@ public:
     }
 
     delete spline;
-    spline = NULL;
+    spline = nullptr;
   }
 
   /// @brief Empty destructor
   virtual ~TSpline3_red() {
-    if(Par != NULL) {
+    if(Par != nullptr) {
       for (int i = 0; i < nPoints; ++i) {
-        if (Par[i] != NULL) {
+        if (Par[i] != nullptr) {
           delete[] Par[i];
         }
       }
       delete[] Par;
     }
-    if(XPos != NULL) delete[] XPos;
-    if(YResp != NULL) delete[] YResp;
-    Par = NULL;
-    XPos = YResp = NULL;
+    if(XPos != nullptr) delete[] XPos;
+    if(YResp != nullptr) delete[] YResp;
+    Par = nullptr;
+    XPos = YResp = nullptr;
   }
 
   /// @brief Find the segment relevant to this variation in x
-  /// See root/hist/hist/src/TSpline3::FindX(double) or samplePDFND....::FindSplineSegment
+  /// @note See `root/hist/hist/src/TSpline3::FindX(double)` or `FindSplineSegment`
   inline int FindX(double x) {
     // The segment we're interested in (klow in ROOT code)
     int segment = 0;
@@ -671,6 +746,10 @@ public:
     #else
     TSpline3 *spline = new TSpline3("Spline", XPos, YResp, nPoints);
     #endif
+    for (Int_t i = 0; i < nPoints; ++i) {
+      spline->SetPointCoeff(i, Par[i][0], Par[i][1], Par[i][2]);
+    }
+
     return spline;
   }
 
@@ -738,7 +817,7 @@ inline std::vector<std::vector<TSpline3_red*> > ReduceTSpline3(std::vector<std::
       // Here's our delicious TSpline3 object
       TSpline3 *spline = (*InnerIt);
       // Now make the reduced TSpline3 pointer
-      TSpline3_red *red = NULL;
+      TSpline3_red *red = nullptr;
       if (spline != NULL) {
         red = new TSpline3_red(spline);
         (*InnerIt) = spline;
@@ -776,7 +855,7 @@ inline std::vector<std::vector<TF1_red*> > ReduceTF1(std::vector<std::vector<TF1
       // Here's our delicious TSpline3 object
       TF1* spline = (*InnerIt);
       // Now make the reduced TSpline3 pointer (which deleted TSpline3)
-      TF1_red* red = NULL;
+      TF1_red* red = nullptr;
       if (spline != NULL) {
         red = new TF1_red(spline);
         (*InnerIt) = spline;

@@ -3,6 +3,9 @@
 _MaCh3_Safe_Include_Start_ //{
 // ROOT includes
 #include "TArrow.h"
+#include "TEllipse.h"
+#include "TLatex.h"
+#include "TVector2.h"
 _MaCh3_Safe_Include_End_ //}
 
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
@@ -25,16 +28,12 @@ OscProcessor::OscProcessor(const std::string &InputFile) : MCMCProcessor(InputFi
 // The destructor
 OscProcessor::~OscProcessor() {
 // ****************************
-
 }
 
 // ***************
 // Read the Osc cov file and get the input central values and errors
-void OscProcessor::ReadXSecFile() {
+void OscProcessor::LoadAdditionalInfo() {
 // ***************
-  // Call base class function
-  MCMCProcessor::ReadXSecFile();
-
   // KS: Check if OscParams were enabled, in future we will also get
   for(size_t i = 0; i < ParameterGroup.size(); i++) {
     if(ParameterGroup[i] == "Osc"){
@@ -70,6 +69,8 @@ void OscProcessor::ReadXSecFile() {
         DeltaM2_23Name   = CurrentName;
       }
     }
+  } else{
+    MACH3LOG_WARN("Didn't find oscillation parameters");
   }
 
   if(PlotJarlskog && OscEnabled)
@@ -81,7 +82,6 @@ void OscProcessor::ReadXSecFile() {
     nDraw++;
 
     /// @todo we should actually calculate central value and prior error but leave it for now...
-    ParamNom[kXSecPar].push_back( 0. );
     ParamCentral[kXSecPar].push_back( 0. );
     ParamErrors[kXSecPar].push_back( 1. );
     // Push back the name
@@ -109,7 +109,6 @@ double OscProcessor::CalcJarlskog(const double s2th13, const double s2th23, cons
 
   return j;
 }
-
 
 // ***************
 double OscProcessor::SamplePriorForParam(const int paramIndex, const std::unique_ptr<TRandom3>& randGen, const std::vector<double>& FlatBounds) const {
@@ -144,19 +143,52 @@ void OscProcessor::PerformJarlskogAnalysis() {
     DeltaCPIndex == M3::_BAD_INT_||
     DeltaM2_23Index == M3::_BAD_INT_)
   {
-    MACH3LOG_INFO("Will nor {}, as oscillation parameters are missing", __func__);
+    MACH3LOG_WARN("Will not {}, as oscillation parameters are missing", __func__);
     return;
   }
   MACH3LOG_INFO("Starting {}", __func__);
 
-  TDirectory *JarlskogDir = OutputFile->mkdir("Jarlskog");
-  JarlskogDir->cd();
-
   bool DoReweight = false;
 
   double s2th13, s2th23, s2th12, dcp, dm2 = M3::_BAD_DOUBLE_;
-  double weight = 1.;
-  int step = M3::_BAD_INT_;
+  double weight = 1.0;
+  std::pair<double, double> Sin13_NewPrior;
+
+  // Now read the MCMC file
+  TFile *TempFile = M3::Open((MCMCFile + ".root"), "open", __FILE__, __LINE__);
+
+  // Get the settings for the MCMC
+  TMacro *Config = TempFile->Get<TMacro>("Reweight_Config");
+
+  if (Config != nullptr) {
+    MACH3LOG_INFO("Found Reweight_Config in chain");
+    
+    // Print the reweight configuration for user info
+    YAML::Node Settings = TMacroToYAML(*Config); 
+    // Simple check: only enable DoReweight if it's a 1D sin2th_13 Gaussian reweight since Savage Dickey process later on generates values from the Gaussian
+    if(CheckNodeExists(Settings, "ReweightMCMC")) {
+      YAML::Node firstReweight = Settings["ReweightMCMC"].begin()->second;
+      int dimension = GetFromManager<int>(firstReweight["ReweightDim"], 1);
+      std::string reweightType = GetFromManager<std::string>(firstReweight["ReweightType"], "");
+      auto paramNames = GetFromManager<std::vector<std::string>>(firstReweight["ReweightVar"], {});
+      if (dimension == 1 && reweightType == "Gaussian" && paramNames.size() == 1){
+        Sin13_NewPrior = Get<std::pair<double, double>>(firstReweight["ReweightPrior"],__FILE__,__LINE__);
+        DoReweight = true;
+      } else {
+        MACH3LOG_INFO("No valid reweighting configuration (1D Gaussian on sin2th_13 only) found for Jarlskog analysis");
+      }
+    } else {
+      MACH3LOG_INFO("No reweighting configuration found for Jarlskog analysis");
+    }
+}
+
+  TempFile->Close();
+  delete TempFile;
+
+  TDirectory *JarlskogDir = OutputFile->mkdir("Jarlskog");
+  JarlskogDir->cd();
+
+  unsigned int step = 0;
   Chain->SetBranchStatus("*", false);
 
   Chain->SetBranchStatus(Sin2Theta13Name.c_str(), true);
@@ -177,15 +209,14 @@ void OscProcessor::PerformJarlskogAnalysis() {
   Chain->SetBranchStatus("step", true);
   Chain->SetBranchAddress("step", &step);
 
-  if (Chain->GetBranch("Weight")) {
-    MACH3LOG_CRITICAL("Found Weight in chain, using terrible hardcoding for RC prior...");
+  if(DoReweight) {
     Chain->SetBranchStatus("Weight", true);
     Chain->SetBranchAddress("Weight", &weight);
-    DoReweight = true;
   } else {
     MACH3LOG_WARN("Not applying reweighting weight");
     weight = 1.0;
   }
+
   // Original histograms
   auto jarl = std::make_unique<TH1D>("jarl", "jarl", 1000, -0.05, 0.05);
   jarl->SetDirectory(nullptr);
@@ -216,7 +247,7 @@ void OscProcessor::PerformJarlskogAnalysis() {
   auto jarl_th23_NH_flatsindcp  = M3::Clone(jarl_th23.get(), "jarl_th23_NH_flatsindcp");
 
   auto jarl_prior               = M3::Clone(jarl.get(), "jarl_prior");
-
+  auto jarl_prior_flatsindcp    = M3::Clone(jarl.get(), "jarl_prior_flatsindcp");
   std::unique_ptr<TH1D> jarl_wRC_prior, jarl_wRC_prior_flatsindcp, jarl_wRC_prior_t2kth23;
   // Only use this if chain has reweigh weight [mostly coming from Reactor Constrains]
   if(DoReweight){
@@ -246,59 +277,57 @@ void OscProcessor::PerformJarlskogAnalysis() {
     const double prior_weight = prior3->Eval(dcp);
 
     jarl->Fill(j, weight);
-    jarl_th23->Fill(j, s2th23,weight);
-    jarl_dcp->Fill(j, dcp,weight);
+    jarl_th23->Fill(j, s2th23, weight);
+    jarl_dcp->Fill(j, dcp, weight);
 
     jarl_flatsindcp->Fill(j, prior_weight*weight);
-    jarl_th23_flatsindcp->Fill(j, s2th23,prior_weight*weight);
+    jarl_th23_flatsindcp->Fill(j, s2th23, prior_weight*weight);
 
     const double prior_s2th13 = SamplePriorForParam(Sin2Theta13Index, randGen, {0.,1.});
     const double prior_s2th23 = SamplePriorForParam(Sin2Theta23Index, randGen, {0.,1.});
     const double prior_s2th12 = SamplePriorForParam(Sin2Theta12Index, randGen, {0.,1.});
     const double prior_dcp = SamplePriorForParam(DeltaCPIndex, randGen, {-1.*TMath::Pi(),TMath::Pi()});
     // KS: This is hardcoded but we always assume flat in delta CP so probably fine
-    const double prior_sindcp = randGen->Uniform(-1.,1.);
+    const double prior_sindcp = randGen->Uniform(-1., 1.);
 
-    const double prior_s13 = std::sqrt(prior_s2th13);
-
-    const double prior_s23  = std::sqrt(prior_s2th23);
-    const double prior_s12  = std::sqrt(prior_s2th12);
-    const double prior_sdcp = std::sin(prior_dcp);
-    const double prior_c13  = std::sqrt(1.-prior_s2th13);
-    const double prior_c12  = std::sqrt(1.-prior_s2th12);
-    const double prior_c23  = std::sqrt(1.-prior_s2th23);
-    const double prior_j    = prior_s13*prior_c13*prior_c13*prior_s12*prior_c12*prior_s23*prior_c23*prior_sdcp;
+    const double prior_s13          = std::sqrt(prior_s2th13);
+    const double prior_s23          = std::sqrt(prior_s2th23);
+    const double prior_s12          = std::sqrt(prior_s2th12);
+    const double prior_sdcp         = std::sin(prior_dcp);
+    const double prior_c13          = std::sqrt(1.-prior_s2th13);
+    const double prior_c12          = std::sqrt(1.-prior_s2th12);
+    const double prior_c23          = std::sqrt(1.-prior_s2th23);
+    const double prior_j            = prior_s13*prior_c13*prior_c13*prior_s12*prior_c12*prior_s23*prior_c23*prior_sdcp;
+    const double prior_flatsindcp_j = prior_s13*prior_c13*prior_c13*prior_s12*prior_c12*prior_s23*prior_c23*prior_sindcp;
 
     jarl_prior->Fill(prior_j);
+    jarl_prior_flatsindcp->Fill(prior_flatsindcp_j);
 
-    if(DoReweight){
-      /// @todo KS: We need to fix this hardcoding here. As right we do not have a way for storing reweight info in a chain...
-      const double prior_wRC_s2th13 = randGen->Gaus(0.0220,0.0007);
-      const double prior_wRC_s13 = std::sqrt(prior_wRC_s2th13);
-      const double prior_wRC_c13 = std::sqrt(1.-prior_wRC_s2th13);
-      const double prior_wRC_j = prior_wRC_s13*prior_wRC_c13*prior_wRC_c13*prior_s12*prior_c12*prior_s23*prior_c23*prior_sdcp;
+    if(DoReweight) {
+      const double prior_wRC_s2th13       = randGen->Gaus(Sin13_NewPrior.first, Sin13_NewPrior.second);
+      const double prior_wRC_s13          = std::sqrt(prior_wRC_s2th13);
+      const double prior_wRC_c13          = std::sqrt(1.-prior_wRC_s2th13);
+      const double prior_wRC_j            = prior_wRC_s13*prior_wRC_c13*prior_wRC_c13*prior_s12*prior_c12*prior_s23*prior_c23*prior_sdcp;
       const double prior_wRC_flatsindcp_j = prior_wRC_s13*prior_wRC_c13*prior_wRC_c13*prior_s12*prior_c12*prior_s23*prior_c23*prior_sindcp;
-
-      const double s23 = std::sqrt(s2th23);
-      const double c23 = std::sqrt(1.-s2th23);
+      const double s23                    = std::sqrt(s2th23);
+      const double c23                    = std::sqrt(1.-s2th23);
 
       jarl_wRC_prior->Fill(prior_wRC_j);
       jarl_wRC_prior_flatsindcp->Fill(prior_wRC_flatsindcp_j);
       jarl_wRC_prior_t2kth23->Fill(prior_wRC_s13*prior_wRC_c13*prior_wRC_c13*prior_s12*prior_c12*s23*c23*prior_sdcp);
     }
 
-
     if(dm2 > 0.) {
-      jarl_NH->Fill(j,weight);
-      jarl_th23_NH->Fill(j,s2th23,weight);
-      jarl_dcp_NH->Fill(j,dcp,weight);
-      jarl_NH_flatsindcp->Fill(j,prior_weight*weight);
-      jarl_th23_NH_flatsindcp->Fill(j,s2th23,prior_weight*weight);
+      jarl_NH->Fill(j, weight);
+      jarl_th23_NH->Fill(j, s2th23, weight);
+      jarl_dcp_NH->Fill(j, dcp, weight);
+      jarl_NH_flatsindcp->Fill(j, prior_weight*weight);
+      jarl_th23_NH_flatsindcp->Fill(j, s2th23, prior_weight*weight);
     }
     else if(dm2 < 0.) {
-      jarl_IH->Fill(j,weight);
-      jarl_th23_IH->Fill(j,s2th23,weight);
-      jarl_dcp_IH->Fill(j,dcp,weight);
+      jarl_IH->Fill(j, weight);
+      jarl_th23_IH->Fill(j, s2th23, weight);
+      jarl_dcp_IH->Fill(j, dcp, weight);
       jarl_IH_flatsindcp->Fill(j, prior_weight*weight);
       jarl_th23_IH_flatsindcp->Fill(j, s2th23, prior_weight*weight);
     }
@@ -324,7 +353,7 @@ void OscProcessor::PerformJarlskogAnalysis() {
   jarl_th23_IH_flatsindcp->Write("jarlskog_th23_IH_flatsindcp");
 
   jarl_prior->Write("jarl_prior");
-
+  jarl_prior_flatsindcp->Write("jarl_prior_flatsindcp");
   if(DoReweight) {
     jarl_wRC_prior->Write("jarl_wRC_prior");
     jarl_wRC_prior_flatsindcp->Write("jarl_wRC_prior_flatsindcp");
@@ -334,6 +363,15 @@ void OscProcessor::PerformJarlskogAnalysis() {
   MakeJarlskogPlot(jarl, jarl_flatsindcp,
                    jarl_NH, jarl_NH_flatsindcp,
                    jarl_IH, jarl_IH_flatsindcp);
+
+  // Perform Savage Dickey analysis
+  if(DoReweight) {
+    SavageDickeyPlot(jarl, jarl_wRC_prior, "Jarlskog flat #delta_{CP}", 0);
+    SavageDickeyPlot(jarl_flatsindcp, jarl_wRC_prior_flatsindcp, "Jarlskog flat sin#delta_{CP}", 0);
+  } else {
+    SavageDickeyPlot(jarl, jarl_prior, "Jarlskog flat #delta_{CP}", 0);
+    SavageDickeyPlot(jarl_flatsindcp, jarl_prior_flatsindcp, "Jarlskog flat sin#delta_{CP}", 0);
+  }
 
   JarlskogDir->Close();
   delete JarlskogDir;
@@ -564,8 +602,8 @@ void OscProcessor::MakeJarlskogPlot(const std::unique_ptr<TH1D>& jarl,
     auto j_sdcp_arrow_2sig_up = MakeArrow(j_sdcp_2sig_up, j_hist_sdcp_2sig->GetLineColor(), j_hist_sdcp_2sig->GetLineWidth());
     auto j_sdcp_arrow_3sig_up = MakeArrow(j_sdcp_3sig_up, j_hist_sdcp_3sig->GetLineColor(), j_hist_sdcp_3sig->GetLineWidth());
 
-    MACH3LOG_DEBUG("j_1sig_low = {}, j_2sig_low = {}, j_3sig_low = {}", j_1sig_low, j_2sig_low, j_3sig_low);
-    MACH3LOG_DEBUG("j_1sig_up = {}, j_2sig_up = {}, j_3sig_up = {}", j_1sig_up, j_2sig_up, j_3sig_up);
+    MACH3LOG_DEBUG("j_1sig_low = {:.4f}, j_2sig_low = {:.4f}, j_3sig_low = {:.4f}", j_1sig_low, j_2sig_low, j_3sig_low);
+    MACH3LOG_DEBUG("j_1sig_up = {:.4f}, j_2sig_up = {:.4f}, j_3sig_up = {:.4f}", j_1sig_up, j_2sig_up, j_3sig_up);
 
     auto CopyLineStyle = [](const TH1D* src, TLine* dst) {
       dst->SetLineColor(src->GetLineColor());
@@ -640,4 +678,166 @@ void OscProcessor::MakeJarlskogPlot(const std::unique_ptr<TH1D>& jarl,
   }
 
   gErrorIgnoreLevel = originalErrorLevel;
+}
+
+// ***************
+void OscProcessor::MakePiePlot() {
+// ***************
+  if(!OscEnabled || DeltaCPIndex == M3::_BAD_INT_)
+  {
+    MACH3LOG_WARN("Will not {}, as oscillation parameters are missing", __func__);
+    return;
+  }
+  MACH3LOG_INFO("Starting {}", __func__);
+
+  // get best fit for delta CP
+  const double best_fit = (*Means_HPD)(DeltaCPIndex);
+
+  const double sigma_p = (*Errors_HPD_Positive)(DeltaCPIndex);
+  const double sigma_n = (*Errors_HPD_Negative)(DeltaCPIndex);
+  // make sure result is between -pi and pi
+  auto wrap_pi = [](double x) {
+    while (x > TMath::Pi())  x -= 2*TMath::Pi();
+    while (x < -TMath::Pi()) x += 2*TMath::Pi();
+    return x;
+  };
+
+  std::array<double, 6> bds;
+  bds[0] = wrap_pi(best_fit - 3.0 * sigma_n); // -3σ
+  bds[1] = wrap_pi(best_fit - 2.0 * sigma_n); // -2σ
+  bds[2] = wrap_pi(best_fit - 1.0 * sigma_n); // -1σ
+  bds[3] = wrap_pi(best_fit + 1.0 * sigma_p); // +1σ
+  bds[4] = wrap_pi(best_fit + 2.0 * sigma_p); // +2σ
+  bds[5] = wrap_pi(best_fit + 3.0 * sigma_p); // +3σ
+
+  constexpr double radius = 0.4;
+  constexpr double rad_to_deg = 180.0 / TMath::Pi();
+
+  // ROOT expects TEllipse angles in degrees, counterclockwise from the x-axis.
+  // If phimax < phimin, ROOT draws counterclockwise across the full circle, causing overlaps.
+  // This ensures threesigA slice stays within the intended range.
+  auto normalize_angle = [](double rad) {
+    // If rad is negative, add 2*pi to wrap into [0, 2*pi)
+    if (rad < 0) rad += 2.0 * TMath::Pi();
+    return rad;
+  };
+
+  TEllipse onesig   (0.5, 0.5, radius, radius, bds[2] * rad_to_deg, bds[4] * rad_to_deg);
+  TEllipse twosigA  (0.5, 0.5, radius, radius, bds[1] * rad_to_deg, bds[2] * rad_to_deg);
+  TEllipse twosigB  (0.5, 0.5, radius, radius, bds[3] * rad_to_deg, bds[4] * rad_to_deg);
+
+  // three sigma slices
+  TEllipse threesigA(0.5, 0.5, radius, radius, bds[0] * rad_to_deg, normalize_angle(bds[1]) * rad_to_deg);
+  TEllipse threesigB(0.5, 0.5, radius, radius, bds[4] * rad_to_deg, bds[5] * rad_to_deg);
+
+  // Remaining slices
+  TEllipse rest(0.5, 0.5, radius, radius, bds[5]*rad_to_deg, bds[0]*rad_to_deg);
+  TEllipse restA(0.5, 0.5, radius, radius, bds[5]*rad_to_deg, 180.0);
+  TEllipse restB(0.5, 0.5, radius, radius, -180.0, bds[0]*rad_to_deg);
+
+  onesig.SetFillColor(13);
+  twosigA.SetFillColor(12);
+  twosigB.SetFillColor(12);
+  threesigA.SetFillColor(11);
+  threesigB.SetFillColor(11);
+  TLine line1(0.5 - radius, 0.5, 0.5 + radius, 0.5);
+  line1.SetLineWidth(3);
+
+  TLine line2(0.5, 0.5 - radius, 0.5, 0.5 + radius);
+  line2.SetLineWidth(3);
+
+  TArrow bf(0.5, 0.5, 0.5 + radius * cos(best_fit),0.5 + radius * sin(best_fit),0.04, "|>");
+  bf.SetLineWidth(3);
+  bf.SetLineColor(kRed);
+  bf.SetFillColor(kRed);
+
+  TCanvas canvas("canvas", "canvas", 0, 0, 1000, 1000);
+  onesig.Draw();
+  twosigA.Draw();
+  twosigB.Draw();
+  threesigA.Draw();
+  threesigB.Draw();
+
+  // Check if the rest wraps around the circle
+  if (bds[5] > 0) {
+    // Single rest slice
+    rest.Draw();
+  } else {
+    // Split rest into two slices
+    restA.Draw();
+    restB.Draw();
+  }
+
+  line1.Draw();
+  line2.Draw();
+  bf.Draw();
+
+  TLegend leg(0.0, 0.8, 0.23, 0.95);
+  leg.AddEntry(&bf,        "Best Fit", "L");
+  leg.AddEntry(&onesig,    "1#sigma",  "F");
+  leg.AddEntry(&twosigA,   "2#sigma",  "F");
+  leg.AddEntry(&threesigA, "3#sigma",  "F");
+  leg.Draw();
+
+  // KS: Simple lambda to avoid copy-pasting
+  auto draw_text = [](auto& txt, Color_t color = kBlack) {
+    txt.SetTextAlign(22);
+    txt.SetTextColor(color);
+    txt.SetTextFont(43);
+    txt.SetTextSize(40);
+    txt.SetTextAngle(0);
+    txt.Draw();
+  };
+
+  //KS: If best fit point is somehow very close text we simply not plot it
+  // Define a threshold for "too close"
+  constexpr double too_close_threshold = 0.1;
+
+  // Position of tbf
+  const double tbf_x = 0.5 + (radius + 0.02) * cos(best_fit);
+  const double tbf_y = 0.5 + (radius + 0.02) * sin(best_fit);
+
+  // Function to calculate distance between two points
+  auto distance = [](double x1, double y1, double x2, double y2) {
+    return std::sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+  };
+
+  // Check and draw right 0
+  constexpr double t0_x = 0.5 + radius + 0.02;
+  constexpr double t0_y = 0.5;
+  TText t0(t0_x, t0_y, "0");
+  if (distance(tbf_x, tbf_y, t0_x, t0_y) > too_close_threshold) {
+    draw_text(t0);
+  }
+
+  // Check and draw left pi
+  constexpr double tp_x = 0.5 - radius - 0.02;
+  constexpr double tp_y = 0.5;
+  TLatex tp(tp_x, tp_y, "#pi");
+  if (distance(tbf_x, tbf_y, tp_x, tp_y) > too_close_threshold) {
+    draw_text(tp);
+  }
+
+  // Check and draw top pi/2
+  constexpr double tp2_x = 0.5;
+  constexpr double tp2_y = 0.5 + radius + 0.04;
+  TLatex tp2(tp2_x, tp2_y, "#frac{#pi}{2}");
+  if (distance(tbf_x, tbf_y, tp2_x, tp2_y) > too_close_threshold) {
+    draw_text(tp2);
+  }
+
+  // Check and draw bottom -pi/2
+  constexpr double tmp2_x = 0.5;
+  constexpr double tmp2_y = 0.5 - radius - 0.04;
+  TLatex tmp2(tmp2_x, tmp2_y, "-#frac{#pi}{2}");
+  if (distance(tbf_x, tbf_y, tmp2_x, tmp2_y) > too_close_threshold) {
+    draw_text(tmp2);
+  }
+
+  TLatex tbf(0.5 + (radius + 0.02) * cos(best_fit),
+             0.5 + (radius + 0.02) * sin(best_fit),
+             fmt::format("{:.2f}", best_fit).c_str());
+  draw_text(tbf, kRed);
+
+  canvas.Print(CanvasName);
 }

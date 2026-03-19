@@ -21,6 +21,7 @@ _MaCh3_Safe_Include_Start_ //{
 _MaCh3_Safe_Include_End_ //}
 
 /// @file ParameterStructs.h
+/// @brief Definitions of generic parameter structs and utility templates for MaCh3.
 /// @author Asher Kaboth
 /// @author Clarence Wret
 /// @author Patrick Dunne
@@ -125,6 +126,18 @@ void CleanContainer(std::vector<T*>& container) {
 // *******************
 /// @brief Generic cleanup function
 template <typename T>
+void CleanContainer(std::vector<std::vector<T*>>& container) {
+// *******************
+  for (auto& inner : container) {
+    CleanContainer(inner);
+  }
+  container.clear();
+  container.shrink_to_fit();
+}
+
+// *******************
+/// @brief Generic cleanup function
+template <typename T>
 void CleanContainer(std::vector< std::vector< std::vector<T*> > >& container) {
 // *******************
   for (auto& container2D : container) {
@@ -159,8 +172,6 @@ struct TypeParameterBase {
 struct NormParameter : public TypeParameterBase {
   /// Mode which parameter applies to
   std::vector<int> modes;
-  /// Horn currents which parameter applies to
-  std::vector<int> horncurrents;
   /// PDG which parameter applies to
   std::vector<int> pdgs;
   /// Preosc PDG which parameter applies to
@@ -180,7 +191,7 @@ struct NormParameter : public TypeParameterBase {
   std::vector< std::string > KinematicVarStr;
 };
 
-// HH - a shorthand type for funcpar functions
+/// HH - a shorthand type for funcpar functions
 using FuncParFuncType = std::function<void (const double*, std::size_t)>;
 // *******************
 /// @brief HH - Functional parameters
@@ -189,8 +200,6 @@ struct FunctionalParameter : public TypeParameterBase {
 // *******************
   /// Mode which parameter applies to
   std::vector<int> modes;
-  /// Horn currents which parameter applies to
-  std::vector<int> horncurrents;
   /// PDG which parameter applies to
   std::vector<int> pdgs;
   /// Preosc PDG which parameter applies to
@@ -229,6 +238,7 @@ enum SplineInterpolation {
   kLinear,               //!< Linear interpolation between knots
   kMonotonic,            //!< EM: DOES NOT make the entire spline monotonic, only the segments
   kAkima,                //!< EM: Akima spline iis allowed to be discontinuous in 2nd derivative and coefficients in any segment
+  kKochanekBartels,      //!< KS: Kochanek-Bartels spline: allows local control of tension, continuity, and bias
   kLinearFunc,           //!< Liner interpolation using TF1 not spline
   kSplineInterpolations  //!< This only enumerates
 };
@@ -247,6 +257,7 @@ inline std::string GetTF1(const SplineInterpolation i) {
     case SplineInterpolation::kLinear:
     case SplineInterpolation::kMonotonic:
     case SplineInterpolation::kAkima:
+    case SplineInterpolation::kKochanekBartels:
     case SplineInterpolation::kSplineInterpolations:
       MACH3LOG_ERROR("Interpolation type {} not supported for TF1!", static_cast<int>(i));
       throw MaCh3Exception(__FILE__, __LINE__);
@@ -269,6 +280,7 @@ inline RespFuncType SplineInterpolation_ToRespFuncType(const SplineInterpolation
     case SplineInterpolation::kLinear:
     case SplineInterpolation::kMonotonic:
     case SplineInterpolation::kAkima:
+    case SplineInterpolation::kKochanekBartels:
       Type = RespFuncType::kTSpline3_red;
       break;
     case SplineInterpolation::kLinearFunc:
@@ -304,6 +316,9 @@ inline std::string SplineInterpolation_ToString(const SplineInterpolation i) {
     //  (Experimental) Akima_Spline (crd order spline which is allowed to be discontinuous in 2nd deriv)
     case SplineInterpolation::kAkima:
       name = "Akima";
+      break;
+    case SplineInterpolation::kKochanekBartels:
+      name = "KochanekBartels";
       break;
     case SplineInterpolation::kLinearFunc:
       name = "LinearFunc";
@@ -379,5 +394,4 @@ inline std::string SystType_ToString(const SystType i) {
 /// @note right now it is empty
 struct OscillationParameter : public TypeParameterBase {
 // *******************
-
 };

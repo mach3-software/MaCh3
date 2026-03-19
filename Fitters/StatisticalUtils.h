@@ -67,6 +67,7 @@ double GetBetaParameter(const double data, const double mc, const double w2, Tes
 
 /// @brief Based on \cite roberts2009adaptive
 /// @param EigenValues Eigen values of covariance matrix
+/// @param TotalTarameters Total number of parameters needed to correctly calculate suboptimality
 double GetSubOptimality(const std::vector<double>& EigenValues, const int TotalTarameters);
 
 /// @brief CW: Get Arithmetic mean from posterior
@@ -93,11 +94,13 @@ void GetHPD(TH1D* const hist, double& Mean, double& Error, double& Error_p, doub
 
 /// @brief KS: Get 1D histogram within credible interval, hpost_copy has to have the same binning, I don't do Copy() as this will lead to problems if this is used under multithreading
 /// @param hist histograms based on which we calculate credible interval
+/// @param hpost_copy To make code thread safe we use copy of histograms which user has to pass
 /// @param coverage What is defined coverage, by default 0.6827 (1 sigma)
 void GetCredibleInterval(const std::unique_ptr<TH1D>& hist, std::unique_ptr<TH1D>& hpost_copy, const double coverage = 0.6827);
 
 /// @brief KS: Get 1D histogram within credible interval, hpost_copy has to have the same binning, I don't do Copy() as this will lead to problems if this is used under multithreading
 /// @param hist histograms based on which we calculate credible interval
+/// @param hpost_copy To make code thread safe we use copy of histograms which user has to pass
 /// @param CredibleInSigmas Whether interval is in sigmas or percentage
 /// @param coverage What is defined coverage, by default 0.6827 (1 sigma)
 void GetCredibleIntervalSig(const std::unique_ptr<TH1D>& hist, std::unique_ptr<TH1D>& hpost_copy, const bool CredibleInSigmas, const double coverage = 0.6827);
@@ -114,7 +117,7 @@ void GetCredibleRegion(std::unique_ptr<TH2D>& hist2D, const double coverage = 0.
 void GetCredibleRegionSig(std::unique_ptr<TH2D>& hist2D, const bool CredibleInSigmas, const double coverage = 0.6827);
 
 /// @brief Interquartile Range (IQR)
-/// @param hist histograms from which we IQR
+/// @param Hist histograms from which we IQR
 double GetIQR(TH1D *Hist);
 
 /// @brief Compute the Kullback-Leibler divergence between two TH2Poly histograms.
@@ -168,3 +171,6 @@ double GetModeError(TH1D* hpost);
 /// @param Histogram A pointer to a TH2D histogram object. The function modifies the histogram's title to include the p-value information.
 /// @warning The canvas is saved to the current ROOT file using `TempCanvas->Write()`.
 void Get2DBayesianpValue(TH2D *Histogram);
+
+
+void PassErrorToRatioPlot(TH1D* RatioHist, TH1D* Hist1, TH1D* DataHist);

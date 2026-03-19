@@ -33,10 +33,16 @@ class SplineBase {
     virtual void Evaluate() = 0;
 
     /// @brief Get class name
-    virtual inline std::string GetName()const {return "SplineBase";};
+    virtual inline std::string GetName() const {return "SplineBase";};
 
     /// @brief Get number of spline parameters
     short int GetNParams()const {return nParams;};
+
+    /// @brief KS: Prepare spline file that can be used for fast loading
+    virtual void PrepareSplineFile(std::string FileName) = 0;
+    /// @brief KS: Load preprocessed spline file
+    /// @param FileName Path to ROOT file with predefined reduced Spline Monolith
+    virtual void LoadSplineFile(std::string FileName) = 0;
 
   protected:
     /// @brief CW:Code used in step by step reweighting, Find Spline Segment for each param
@@ -45,6 +51,14 @@ class SplineBase {
     virtual void CalcSplineWeights() = 0;
     /// @brief Calc total event weight
     virtual void ModifyWeights() = 0;
+
+    /// @brief KS: Prepare Fast Spline Info within SplineFile
+    /// @param File File to which we add new tree
+    void PrepareFastSplineInfoDir(std::unique_ptr<TFile>& SplineFile) const;
+
+    /// @brief KS: Load preprocessed FastSplineInfo
+    /// @param File File from which we load new tree
+    void LoadFastSplineInfoDir(std::unique_ptr<TFile>& SplineFile);
 
     /// @brief CW: Gets the polynomial coefficients for TF1
     /// @param spl pointer to TF1_red that will be checked

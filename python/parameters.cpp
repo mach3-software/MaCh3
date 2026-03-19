@@ -73,14 +73,6 @@ void initParameters(py::module &m){
         )
 
         .def(
-            "throw_par_prop",
-            &ParameterHandlerBase::ThrowParProp,
-            "Throw the proposed parameter by magnitude *mag* X sigma. \n\
-            :param mag: This value multiplied by the prior value of each parameter will be the width of the distribution that the parameter values are drawn from. ",
-            py::arg("mag") = 1.0
-        )
-
-        .def(
             "get_internal_par_name",
             [](ParameterHandlerBase &self, int index)
             {

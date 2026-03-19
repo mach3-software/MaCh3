@@ -67,6 +67,8 @@ namespace MaCh3Utils {
   /// @brief KS: Print Yaml config using logger
   /// @param node yaml config node
   void PrintConfig(const YAML::Node& node);
+  /// @param tree content of TTree using logger
+  void Print(const TTree* tree);
   /// @brief KS: Almost all MaCh3 executables have the same usage, prepare simple printer
   /// @param argc The number of command-line arguments.
   /// @param argv The array of command-line arguments.
@@ -77,7 +79,9 @@ namespace MaCh3Utils {
 namespace M3 {
   /// @brief number of threads which we need for example for TRandom3
   int GetNThreads();
-
+  /// @brief Prepends the MACH3 environment path to FilePath if it is not already present.
+  /// @param FilePath Reference to the file path string to be modified.
+  void AddPath(std::string& FilePath);
   /// @brief thread index inside parallel loop
   inline int GetThreadIndex() {
     #ifdef MULTITHREAD
