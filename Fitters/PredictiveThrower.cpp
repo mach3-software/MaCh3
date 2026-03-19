@@ -41,7 +41,8 @@ PredictiveThrower::~PredictiveThrower() {
 }
 
 // *************************
-void PredictiveThrower::SetParamters() {
+void PredictiveThrower::SetParamters(std::vector<std::string>& ParameterGroupsNotVaried,
+                                     std::unordered_set<int>& ParameterOnlyToVary) {
 // *************************
   // WARNING This should be removed in the future
   auto DoNotThrowLegacyCov = GetFromManager<std::vector<std::string>>(fitMan->raw()["Predictive"]["DoNotThrowLegacyCov"], {}, __FILE__, __LINE__);
@@ -107,7 +108,10 @@ void PredictiveThrower::SetupSampleInformation() {
 
 // *************************
 // Produce MaCh3 toys:
-void PredictiveThrower::SetupToyGeneration() {
+void PredictiveThrower::SetupToyGeneration(std::vector<std::string>& ParameterGroupsNotVaried,
+                                           std::unordered_set<int>& ParameterOnlyToVary,
+                                           std::vector<const double*>& BoundValuePointer,
+                                           std::vector<std::pair<double, double>>& ParamBounds) {
 // *************************
   int counter = 0;
   for (size_t s = 0; s < systematics.size(); ++s) {
@@ -195,6 +199,35 @@ void PredictiveThrower::SetupToyGeneration() {
         MACH3LOG_INFO("Exclude: {}", fmt::join(ParameterGroupsNotVaried, ", "));
       }
     }
+  }
+
+  auto paramNode = fitMan->raw()["Predictive"]["ParameterBounds"];
+  for (const auto& p : paramNode) {
+    // Extract name
+    std::string name = p[0].as<std::string>();
+
+    // Extract bounds: min and max
+    double minVal = p[1][0].as<double>();
+    double maxVal = p[1][1].as<double>();
+    ParamBounds.emplace_back(minVal, maxVal);
+
+    for (size_t s = 0; s < systematics.size(); ++s) {
+      for(int iPar = 0; iPar < systematics[s]->GetNParameters(); iPar++){
+        if(systematics[s]->GetParFancyName(iPar) == name){
+          BoundValuePointer.push_back(systematics[s]->RetPointer(iPar));
+          break;
+        }
+      }
+    }
+    if(ParamBounds.size() != BoundValuePointer.size()){
+      MACH3LOG_ERROR("Ddin't find paramter {}", name);
+      throw MaCh3Exception(__FILE__,__LINE__);
+    }
+    MACH3LOG_INFO("Parameter: {} with : [{}, {}]", name, minVal, maxVal);
+  }
+  if(Is_PriorPredictive && ParamBounds.size() > 0) {
+    MACH3LOG_ERROR("Additional bounds not supported by prior predictive right now");
+    throw MaCh3Exception(__FILE__,__LINE__);
   }
 }
 
@@ -390,6 +423,21 @@ void PredictiveThrower::WriteToy(TDirectory* ToyDirectory,
 }
 
 // *************************
+bool CheckBounds(const std::vector<const double*>& BoundValuePointer,
+                 const std::vector<std::pair<double,double>>& ParamBounds) {
+// *************************
+  for (size_t i = 0; i < BoundValuePointer.size(); ++i) {
+    const double val = *(BoundValuePointer[i]);
+    const double minVal = ParamBounds[i].first;
+    const double maxVal = ParamBounds[i].second;
+
+    if (val < minVal || val > maxVal)
+      return false; // out of bounds
+  }
+  return true; // all values are within bounds
+}
+
+// *************************
 // Produce MaCh3 toys:
 void PredictiveThrower::ProduceToys() {
 // *************************
@@ -399,8 +447,17 @@ void PredictiveThrower::ProduceToys() {
   // If we found toys then skip process of making new toys
   if(LoadToys()) return;
 
+  /// KS: Names of parameter groups that will not be varied
+  std::vector<std::string> ParameterGroupsNotVaried;
+  /// KS: Index of parameters that will be varied
+  std::unordered_set<int> ParameterOnlyToVary;
+  // For study where one would like to apply bounds
+  std::vector<const double*> BoundValuePointer;
+  std::vector<std::pair<double, double>> ParamBounds;
+
   // Setup useful information for toy generation
-  SetupToyGeneration();
+  SetupToyGeneration(ParameterGroupsNotVaried, ParameterOnlyToVary,
+                     BoundValuePointer, ParamBounds);
 
   auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
 
@@ -509,18 +566,26 @@ void PredictiveThrower::ProduceToys() {
     if(Ntoys >= 10 && i % (Ntoys/10) == 0) {
       MaCh3Utils::PrintProgressBar(i, Ntoys);
     }
-
     if(!Is_PriorPredictive){
       int entry = 0;
       Step = 0;
-
+      // KS This allow to set additional bounds like mass ordering
+      bool WithinBounds = false;
       //YSP: Ensures you get an entry from the mcmc even when burn_in is set to zero (Although not advised :p ).
       //Take 200k burn in steps, WP: Eb C in 1st peaky
       // If we have combined chains by hadd need to check the step in the chain
       // Note, entry is not necessarily same as step due to merged ROOT files, so can't choose entry in the range BurnIn - nEntries :(
-      while(Step < burn_in){
+      while(Step < burn_in || !WithinBounds) {
         entry = random->Integer(static_cast<unsigned int>(PosteriorFile->GetEntries()));
         PosteriorFile->GetEntry(entry);
+        // KS: This might be bit hacky... but BoundValuePointer refer to values in ParameterHandler
+        // so we need to update them
+        if(BoundValuePointer.size() > 0) {
+          for (size_t s = 0; s < systematics.size(); ++s) {
+            systematics[s]->SetParameters(branch_vals[s]);
+          }
+        }
+        WithinBounds = CheckBounds(BoundValuePointer, ParamBounds);
       }
       Draw = entry;
     }
@@ -536,7 +601,7 @@ void PredictiveThrower::ProduceToys() {
     }
 
     // This set some params to prior value this way you can evaluate errors from subset of errors
-    SetParamters();
+    SetParamters(ParameterGroupsNotVaried, ParameterOnlyToVary);
 
     Penalty = 0;
     if(FullLLH) {
@@ -1008,6 +1073,16 @@ void PredictiveThrower::RunPredictiveAnalysis() {
   MACH3LOG_INFO("{} took {:.2f}s to finish for {} toys", __func__, TempClock.RealTime(), Ntoys);
 }
 
+// *************************
+double PredictiveThrower::CalcLLH(const double data,
+                                  const double mc,
+                                  const double w2,
+                                  const SampleHandlerBase* SampleHandler) const {
+// *************************
+  double llh = SampleHandler->GetTestStatLLH(data, mc, w2);
+  //KS: do times 2 because banff reports chi2
+  return 2*llh;
+}
 
 // *************************
 double PredictiveThrower::CalcLLH(const TH1* DatHist,
@@ -1140,19 +1215,27 @@ void PredictiveThrower::PosteriorPredictivepValue(const std::vector<std::unique_
 // *************************
   // Step 1: Initialize per-toy accumulators once
   // [Sample] [Toys]
-  std::vector<std::vector<double>> chi2_dat(TotalNumberOfSamples+1);
-  std::vector<std::vector<double>> chi2_mc(TotalNumberOfSamples+1);
-  std::vector<std::vector<double>> chi2_pred(TotalNumberOfSamples+1);
-  for (int iSample = 0; iSample < TotalNumberOfSamples+1; ++iSample) {
-    chi2_dat[iSample].resize(Ntoys, 0.0);
-    chi2_mc[iSample].resize(Ntoys, 0.0);
-    chi2_pred[iSample].resize(Ntoys, 0.0);
-  }
+  auto make_matrix = [&](double init = 0.0) {
+    return std::vector<std::vector<double>>(
+      TotalNumberOfSamples + 1,
+      std::vector<double>(Ntoys, init));
+  };
+  auto chi2_dat       = make_matrix();
+  auto chi2_mc        = make_matrix();
+  auto chi2_pred      = make_matrix();
+  auto chi2_rate_dat  = make_matrix();
+  auto chi2_rate_mc   = make_matrix();
+  auto chi2_rate_pred = make_matrix();
 
+  // 2. Add penalty terms to global bin
   for (int iToy = 0; iToy < Ntoys; ++iToy) {
     chi2_dat[TotalNumberOfSamples][iToy] = PenaltyTerm[iToy];
     chi2_mc[TotalNumberOfSamples][iToy] = PenaltyTerm[iToy];
     chi2_pred[TotalNumberOfSamples][iToy] = PenaltyTerm[iToy];
+
+    chi2_rate_dat[TotalNumberOfSamples][iToy] = PenaltyTerm[iToy];
+    chi2_rate_mc[TotalNumberOfSamples][iToy] = PenaltyTerm[iToy];
+    chi2_rate_pred[TotalNumberOfSamples][iToy] = PenaltyTerm[iToy];
   }
 
   /// TODO This can be multithreaded but be careful for Clone!!!
@@ -1167,19 +1250,35 @@ void PredictiveThrower::PosteriorPredictivepValue(const std::vector<std::unique_
       MakeFluctuatedHistogram(DrawFluctHist.get(), MC_Hist_Toy[iSample][iToy].get());
       MakeFluctuatedHistogram(PredFluctHist.get(), PostPred_mc[iSample].get());
 
-      // Okay now we can do our chi2 calculation for our sample
+      // I. SHAPE + RATE (bin-by-bin likelihood)
       chi2_dat[iSample][iToy]  = CalcLLH(Data_Hist[iSample].get(), MC_Hist_Toy[iSample][iToy].get(), W2_Hist_Toy[iSample][iToy].get(), SampleHandler);
       chi2_mc[iSample][iToy]   = CalcLLH(DrawFluctHist.get(), MC_Hist_Toy[iSample][iToy].get(), W2_Hist_Toy[iSample][iToy].get(), SampleHandler);
       chi2_pred[iSample][iToy] = CalcLLH(PredFluctHist.get(), MC_Hist_Toy[iSample][iToy].get(), W2_Hist_Toy[iSample][iToy].get(), SampleHandler);
 
+      // II. RATE-ONLY (total normalization)
+      chi2_rate_dat[iSample][iToy]  = CalcLLH(Data_Hist[iSample]->Integral(), MC_Hist_Toy[iSample][iToy]->Integral(), W2_Hist_Toy[iSample][iToy]->Integral(), SampleHandler);
+      chi2_rate_mc[iSample][iToy]   = CalcLLH(DrawFluctHist->Integral(), MC_Hist_Toy[iSample][iToy]->Integral(), W2_Hist_Toy[iSample][iToy]->Integral(), SampleHandler);
+      chi2_rate_pred[iSample][iToy] = CalcLLH(PredFluctHist->Integral(), MC_Hist_Toy[iSample][iToy]->Integral(), W2_Hist_Toy[iSample][iToy]->Integral(), SampleHandler);
+
+      // III. accumulate global sums ---
       chi2_dat[TotalNumberOfSamples][iToy]  += chi2_dat[iSample][iToy];
       chi2_mc[TotalNumberOfSamples][iToy]   += chi2_mc[iSample][iToy];
       chi2_pred[TotalNumberOfSamples][iToy] += chi2_pred[iSample][iToy];
+
+      chi2_rate_dat[TotalNumberOfSamples][iToy]  += chi2_rate_dat[iSample][iToy];
+      chi2_rate_mc[TotalNumberOfSamples][iToy]   += chi2_rate_mc[iSample][iToy];
+      chi2_rate_pred[TotalNumberOfSamples][iToy] += chi2_rate_pred[iSample][iToy];
     }
   }
 
+  // 4. Produce pValue plots
+  // Shape+rate posterior predictive checks
   MakeChi2Plots(chi2_mc,   "-2LLH (Draw Fluc, Draw)", chi2_dat, "-2LLH (Data, Draw)", SampleDir, "_drawfluc_draw");
   MakeChi2Plots(chi2_pred, "-2LLH (Pred Fluc, Draw)", chi2_dat, "-2LLH (Data, Draw)", SampleDir, "_predfluc_draw");
+
+  // Rate-only posterior predictive checks
+  MakeChi2Plots(chi2_rate_mc,   "-2LLH (Rate Draw Fluc, Draw)", chi2_rate_dat, "-2LLH (Rate Data, Draw)", SampleDir, "_rate_drawfluc_draw");
+  MakeChi2Plots(chi2_rate_pred, "-2LLH (Rate Pred Fluc, Draw)", chi2_rate_dat, "-2LLH (Rate Data, Draw)", SampleDir, "_rate_predfluc_draw");
 }
 
 // *************************
