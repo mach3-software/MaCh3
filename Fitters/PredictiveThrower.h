@@ -57,10 +57,14 @@ class PredictiveThrower : public FitterBase {
 
  private:
   /// @brief This set some params to prior value this way you can evaluate errors from subset of errors
-  void SetParamters();
+   void SetParamters(std::vector<std::string>& ParameterGroupsNotVaried,
+                     std::unordered_set<int>& ParameterOnlyToVary);
 
   /// @brief Setup useful variables etc before stating toy generation
-  void SetupToyGeneration();
+  void SetupToyGeneration(std::vector<std::string>& ParameterGroupsNotVaried,
+                          std::unordered_set<int>& ParameterOnlyToVary,
+                          std::vector<const double*>& BoundValuePointer,
+                          std::vector<std::pair<double, double>>& ParamBounds);
 
   /// @brief Load existing toys
   bool LoadToys();
@@ -99,6 +103,13 @@ class PredictiveThrower : public FitterBase {
 
 
   /// @brief Calculate Posterior Predictive $p$-value
+  /// Compares observed data to toy datasets generated from:
+  ///  - fitted model fluctuations ("Draw")
+  ///  - posterior predictive distribution ("Pred")
+  ///
+  /// Computes two discrepancy metrics:
+  ///  • Shape+Rate : bin-by-bin likelihood
+  ///  • Rate-only  : total event normalization
   void PosteriorPredictivepValue(const std::vector<std::unique_ptr<TH1>>& PostPred_mc,
                                  const std::vector<TDirectory*>& SampleDir);
   /// @brief Calculate the LLH for TH1, set the LLH to title of MCHist
@@ -107,6 +118,16 @@ class PredictiveThrower : public FitterBase {
   /// @param W2Hist W2 histogram with W2 distribution for a single sample
   /// @param SampleHandler Pointer to SampleHandlerBase providing LLH test statistic
   void ExtractLLH(TH1* DatHist, TH1* MCHist, TH1* W2Hist, const SampleHandlerBase* SampleHandler) const;
+
+  /// @brief Calculates the -2LLH (likelihood) for a single sample.
+  /// @param data          Data value for the sample.
+  /// @param mc            MC (Monte Carlo) value for the sample.
+  /// @param w2            W2 value for the sample.
+  /// @param SampleHandler Pointer to SampleHandlerBase providing the LLH test statistic.
+  double CalcLLH(const double data,
+                 const double mc,
+                 const double w2,
+                 const SampleHandlerBase* SampleHandler) const;
 
   /// @brief Calculates the likelihood (-2LLH) for a single sample; dynamically casts to call the correct GetLLH overload
   /// @param DatHist Data histogram with data distribution for a single sample
@@ -273,10 +294,6 @@ class PredictiveThrower : public FitterBase {
 
   /// Number of toys we are generating analysing
   int Ntoys;
-  /// KS: Names of parameter groups that will not be varied
-  std::vector<std::string> ParameterGroupsNotVaried;
-  /// KS: Index of parameters that will be varied
-  std::unordered_set<int> ParameterOnlyToVary;
 
   /// Pointer to El Generico
   ParameterHandlerGeneric* ModelSystematic;

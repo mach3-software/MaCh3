@@ -98,12 +98,12 @@ void PrintPosteriorPValue(const YAML::Node& Settings,
   MACH3LOG_INFO("Starting {}", __func__);
   auto Titles = Get<std::vector<std::string>>(Settings["FileTitle"], __FILE__, __LINE__);
   std::vector<std::vector<double>> FlucDrawVec(InputFiles.size());
-
+  // KS: Alternatively try "_drawfluc_draw"
+  std::string FlucutationType = "_predfluc_draw";
   //KS: P-values per each sample
   std::cout<<"\\begin{table}[htb]"<<std::endl;
   std::cout<<"\\centering"<<std::endl;
   std::cout<<"\\begin{tabular}{ | l | ";
-
 
   for(unsigned int f = 0; f < InputFiles.size(); f++)
   {
@@ -127,7 +127,7 @@ void PrintPosteriorPValue(const YAML::Node& Settings,
     std::cout<<SampleNames[i];
     for(unsigned int f = 0; f < InputFiles.size(); f++)
     {
-      std::string TempString = "Predictive/" + SampleNames[i]+"/"+SampleNames[i]+"_predfluc_draw";
+      std::string TempString = "Predictive/" + SampleNames[i]+"/"+SampleNames[i] + FlucutationType;
       TH2D *hist2D = InputFiles[f]->Get<TH2D>(TempString.c_str());
       double FlucDraw = GetPValue(hist2D);
       std::cout<<" & "<<FlucDraw;
@@ -138,7 +138,7 @@ void PrintPosteriorPValue(const YAML::Node& Settings,
   std::cout<<"Total ";
   for(unsigned int f = 0; f < InputFiles.size(); f++)
   {
-    TH2D *hFlucPred = InputFiles[f]->Get<TH2D>("Predictive/Total/Total_predfluc_draw");
+    TH2D *hFlucPred = InputFiles[f]->Get<TH2D>(("Predictive/Total/Total" + FlucutationType).c_str());
     double FlucDraw = GetPValue(hFlucPred);
     std::cout<<" & "<<FlucDraw;
   }
@@ -146,7 +146,6 @@ void PrintPosteriorPValue(const YAML::Node& Settings,
   std::cout<<"\\hline"<<std::endl;
   std::cout<<"\\end{tabular}"<<std::endl;
   std::cout<<"\\end{table}"<<std::endl;
-
 
   auto Threshold = GetFromManager<double>(Settings["Significance"], 0.05);
   for(unsigned int f = 0; f < InputFiles.size(); f++)
