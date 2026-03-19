@@ -1118,6 +1118,10 @@ TH1* SampleHandlerFD::GetW2Hist(const int Dimension) {
 // ************************************************
   if(Dimension == 1) {
     TH1D* W2Hist = dynamic_cast<TH1D*>(_hPDF1D->Clone((_hPDF1D->GetName() + std::string("_W2")).c_str()));
+    if(!W2Hist){
+      MACH3LOG_ERROR("Failed to cast cloned histogram to TH1D in {}", __func__);
+      throw MaCh3Exception(__FILE__,__LINE__);
+    }
     W2Hist->Reset();
     for (unsigned int yBin = 0; yBin < (Binning.YBinEdges.size()-1); yBin++) {
       for (unsigned int xBin = 0; xBin < (Binning.XBinEdges.size()-1); xBin++) {
@@ -1127,6 +1131,10 @@ TH1* SampleHandlerFD::GetW2Hist(const int Dimension) {
     return W2Hist;
   } else if(Dimension == 2) {
     TH2D* W2Hist = dynamic_cast<TH2D*>(_hPDF2D->Clone((_hPDF2D->GetName() + std::string("_W2")).c_str()));
+    if(!W2Hist){
+      MACH3LOG_ERROR("Failed to cast cloned histogram to TH1D in {}", __func__);
+      throw MaCh3Exception(__FILE__,__LINE__);
+    }
     W2Hist->Reset();
     for (unsigned int yBin = 0; yBin < (Binning.YBinEdges.size()-1); yBin++) {
       for (unsigned int xBin = 0; xBin < (Binning.XBinEdges.size()-1); xBin++) {
