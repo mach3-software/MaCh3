@@ -439,7 +439,8 @@ void PredictiveThrower::ProduceToys() {
   int SampleCounter = 0;
   for (size_t iPDF = 0; iPDF < samples.size(); iPDF++)
   {
-    auto* MaCh3Sample = dynamic_cast<SampleHandlerFD*>(samples[iPDF]);
+    auto* MaCh3Sample = samples[iPDF];
+    // auto* MaCh3Sample = dynamic_cast<SampleHandlerFD*>(samples[iPDF]);
     for (int SampleIndex = 0; SampleIndex < MaCh3Sample->GetNsamples(); ++SampleIndex)
     {
       // Get nominal spectra and event rates
