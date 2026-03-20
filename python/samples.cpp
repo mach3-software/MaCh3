@@ -94,6 +94,17 @@ public:
         );
     }
 
+    /* Trampoline (need one for each virtual function) */
+    std::vector<double> ReturnKinematicParameterBinning(const int Sample, const std::string &KinematicParameter) const override  {
+        PYBIND11_OVERRIDE_PURE(
+            std::vector<double>,  /* Return type */
+            SampleHandlerBase,    /* Parent class */
+            GetKinVarName,        /* Name of function in C++ (must match Python name) */
+            Sample,               /* Argument(s) */
+            KinematicParameter    /* Argument(s) */
+        );
+    }
+
     TH1* GetDataHist(const int Sample) override {
         PYBIND11_OVERRIDE_PURE(
             TH1*,                  /* Return type */
