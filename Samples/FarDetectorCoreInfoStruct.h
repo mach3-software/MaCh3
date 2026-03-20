@@ -94,16 +94,16 @@ struct EventInfo {
   ~EventInfo(){}
 
   /// target the interaction was on
-  const int* Target = 0;
+  int Target = M3::_BAD_INT_;
   /// PDG of neutrino after oscillation
-  const int* nupdg  = 0;
+  int nupdg  = M3::_BAD_INT_;
   /// PDG of neutrino before oscillation
-  const int* nupdgUnosc = 0;
+  int nupdgUnosc = M3::_BAD_INT_;
 
   /// Pointer to true Neutrino Energy
-  const double* rw_etru = &M3::_BAD_DOUBLE_;
+  double enu_true = M3::_BAD_DOUBLE_;
   /// Pointer to true cosine zenith
-  const double* rw_truecz = &M3::_BAD_DOUBLE_;
+  double coszenith_true = M3::_BAD_DOUBLE_;
 
   /// Pointers to normalisation weights which are being taken from Parameter Handler
   std::vector<const double*> norm_pointers;
@@ -122,5 +122,5 @@ struct EventInfo {
   bool isNC = false;
 
   /// Pointer to MaCh3 mode
-  const double* mode = &M3::Unity_D;
+  int mode = M3::_BAD_INT_;
 };
