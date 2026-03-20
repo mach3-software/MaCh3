@@ -21,8 +21,10 @@ _MaCh3_Safe_Include_Start_ //{
 _MaCh3_Safe_Include_End_ //}
 
 /// @file ReweightMCMC.cpp
-/// @brief This executable allow to reweight MCMC Chain, such technique is used to study impact of different priors without rerunning MCMC
-///
+/// @brief This executable allow you to reweight MCMC Chain, such technique is used to study impact of different priors without rerunning MCMC
+/// It can currently handle two types of reweights:
+/// - 1D Gaussian prior reweighting on any parameter(s) in the chain, where the weight is calculated as the ratio of the new Gaussian prior to the original flat prior (which is just the value of the Gaussian at that point)
+/// - 2D reweighting using a TGraph2D, currently set up to handle the specific case of applying a 2D reactor constraint in the (theta13, dm32) plane, where the weight is calculated as exp(-0.5 * chi^2) with chi^2 obtained from interpolating the TGraph2D at the point corresponding to the current values of theta13 and dm32 in the chain. The TGraph2D can contain separate surfaces for Normal and Inverted ordering and will automatically apply the correct one based on the sign of dm32 in each point in the chain.
 /// @author David Riley
 /// @author Evan Goodman
 
@@ -52,7 +54,7 @@ struct ReweightConfig {
 
 /// @brief Main executable responsible for reweighting MCMC chains
 /// @param inputFile MCMC Chain file path
-/// @param configFile Config file with reweighting settings
+/// @param configFile Config file with reweighting settings. Example in MaCh3Tutorial/TutorialConfigs/ReweightingConfigs/
 /// @author David Riley
 /// @author Evan Goodman
 void ReweightMCMC(const std::string& inputFile, const std::string& configFile);
@@ -76,8 +78,7 @@ bool GetParameterInfo(MCMCProcessor* processor, const std::string& paramName,
 void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const YAML::Node& reweight_settings);
 
 /// @brief Main function
-int main(int argc, char *argv[]) 
-{
+int main(int argc, char *argv[]) {
     SetMaCh3LoggerFormat();
     
     if (argc != 3) {
@@ -276,8 +277,7 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
     }
 }
 
-void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
-{
+void ReweightMCMC(const std::string& configFile, const std::string& inputFile){
     MACH3LOG_INFO("File for reweighting: {} with config {}", inputFile, configFile);
     // Load configuration
     YAML::Node reweight_yaml = M3OpenConfig(configFile);
@@ -287,6 +287,17 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
     std::vector<ReweightConfig> reweightConfigs;
    
     LoadReweightingSettings(reweightConfigs, reweight_settings);
+
+    // Check input for posteriors vs osc_posteriors, fail gracefully if osc_posteriors since ProcessMCMC doesn't support reduced chain naming conventions
+    auto tempFile = std::unique_ptr<TFile>(TFile::Open(inputFile.c_str(), "READ"));
+    if (tempFile->Get<TTree>("osc_posteriors")) {
+        MACH3LOG_ERROR("Sorry, it seems like your posteriors have been reduced (TTree is named osc_posteriors) please use unreduced posterior files as MCMCProcessor can't handle the reduced naming conventions");
+        throw MaCh3Exception(__FILE__, __LINE__);
+    } else if (!tempFile->Get<TTree>("posteriors")) {
+        MACH3LOG_ERROR("Cannot find 'posteriors' tree in input file, found the following trees instead:");
+        tempFile->ls();
+        throw MaCh3Exception(__FILE__, __LINE__);
+    }
 
     // Create MCMCProcessor to get parameter information 
     auto processor = std::make_unique<MCMCProcessor>(inputFile);
