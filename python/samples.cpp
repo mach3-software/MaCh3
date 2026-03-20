@@ -94,17 +94,6 @@ public:
         );
     }
 
-    /* Trampoline (need one for each virtual function) */
-    std::vector<double> ReturnKinematicParameterBinning(const int Sample, const std::string &KinematicParameter) const override  {
-        PYBIND11_OVERRIDE_PURE(
-            std::vector<double>,  /* Return type */
-            SampleHandlerBase,    /* Parent class */
-            GetKinVarName,        /* Name of function in C++ (must match Python name) */
-            Sample,               /* Argument(s) */
-            KinematicParameter    /* Argument(s) */
-        );
-    }
-
     TH1* GetDataHist(const int Sample) override {
         PYBIND11_OVERRIDE_PURE(
             TH1*,                  /* Return type */
@@ -307,12 +296,12 @@ public:
     }
 
     /* Trampoline (need one for each virtual function) */
-    void SetupFDMC() override {
+    void SetupMC() override {
         PYBIND11_OVERRIDE_PURE_NAME(
             void,            /* Return type */
             SampleHandlerFD, /* Parent class */
-            "setup_FD_MC",   /*python name*/
-            SetupFDMC,       /* Name of function in C++ */
+            "setup_MC",   /*python name*/
+            SetupMC,       /* Name of function in C++ */
         );
     }
 
@@ -336,44 +325,12 @@ public:
         );
     }
 
-    double ReturnKinematicParameter(std::string, int) override {
-        PYBIND11_OVERRIDE_PURE_NAME(
-            double,                     /* Return type */
-            SampleHandlerFD,            /* Parent class */
-            "get_event_kinematic_value",/* python name*/
-            ReturnKinematicParameter,  /* Name of function in C++ (must match Python name) */
-            py::arg("variable"),
-            py::arg("event")            /* Argument(s) */
-        );
-    }
-
     double ReturnKinematicParameter(int, int) override {
         PYBIND11_OVERRIDE_PURE_NAME(
             double,                     /* Return type */
             SampleHandlerFD,            /* Parent class */
             "get_event_kinematic_value",/* python name*/
             ReturnKinematicParameter,  /* Name of function in C++ (must match Python name) */
-            py::arg("variable"),
-            py::arg("event")            /* Argument(s) */
-        );
-    }
-
-    const double *GetPointerToKinematicParameter(std::string, int) override {
-        PYBIND11_OVERRIDE_PURE_NAME(
-            const double *,                   /* Return type */
-            SampleHandlerFD,            /* Parent class */
-            "get_event_kinematic_value_reference",/* python name*/
-            GetPointerToKinematicParameter, /* Name of function in C++ (must match Python name) */
-            py::arg("variable"),
-            py::arg("event")            /* Argument(s) */
-        );
-    }
-    const double *GetPointerToKinematicParameter(double, int) override {
-        PYBIND11_OVERRIDE_PURE_NAME(
-            const double *,                   /* Return type */
-            SampleHandlerFD,            /* Parent class */
-            "get_event_kinematic_value_reference",/* python name*/
-            GetPointerToKinematicParameter, /* Name of function in C++ (must match Python name) */
             py::arg("variable"),
             py::arg("event")            /* Argument(s) */
         );

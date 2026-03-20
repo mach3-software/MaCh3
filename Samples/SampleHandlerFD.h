@@ -205,7 +205,7 @@ class SampleHandlerFD :  public SampleHandlerBase
   virtual int SetupExperimentMC() = 0;
 
   /// @brief Function which translates experiment struct into core struct
-  virtual void SetupFDMC() = 0;
+  virtual void SetupMC() = 0;
 
   /// @brief Function which does a lot of the lifting regarding the workflow in creating different MC objects
   void Initialise();

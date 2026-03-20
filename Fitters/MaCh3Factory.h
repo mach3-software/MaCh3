@@ -142,7 +142,7 @@ std::vector<SampleType*> MaCh3SampleHandlerFactory(const std::vector<std::string
     SampleType* Sample = new SampleType(SampleConfig[i], xsec);
     Sample->Reweight();
 
-    for(int iSample = 0; iSample < Sample->GetNsamples(); iSample++)
+    for(int iSample = 0; iSample < Sample->GetNSamples(); iSample++)
     {
       // Obtain sample name and create a TString version for histogram naming
       std::string name = Sample->GetSampleTitle(iSample);
