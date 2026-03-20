@@ -77,7 +77,7 @@ void PredictiveThrower::SetupSampleInformation() {
 // *************************
   TotalNumberOfSamples = 0;
   for (size_t iPDF = 0; iPDF < samples.size(); iPDF++) {
-    TotalNumberOfSamples += samples[iPDF]->GetNsamples();
+    TotalNumberOfSamples += samples[iPDF]->GetNSamples();
   }
 
   MC_Hist_Toy.resize(TotalNumberOfSamples);
@@ -95,7 +95,7 @@ void PredictiveThrower::SetupSampleInformation() {
   }
   int counter = 0;
   for (size_t iPDF = 0; iPDF < samples.size(); iPDF++) {
-    for (int SampleIndex = 0; SampleIndex < samples[iPDF]->GetNsamples(); ++SampleIndex) {
+    for (int SampleIndex = 0; SampleIndex < samples[iPDF]->GetNSamples(); ++SampleIndex) {
       SampleInfo[counter].Name = samples[iPDF]->GetSampleTitle(SampleIndex);
       SampleInfo[counter].LocalId = SampleIndex;
       SampleInfo[counter].SamHandler = samples[iPDF];
@@ -372,7 +372,7 @@ void PredictiveThrower::WriteToy(TDirectory* ToyDirectory,
   for (size_t iPDF = 0; iPDF < samples.size(); iPDF++)
   {
     auto* SampleHandler = samples[iPDF];
-    for (int iSample = 0; iSample < SampleHandler->GetNsamples(); ++iSample)
+    for (int iSample = 0; iSample < SampleHandler->GetNSamples(); ++iSample)
     {
       ToyDirectory->cd();
 
@@ -497,8 +497,7 @@ void PredictiveThrower::ProduceToys() {
   for (size_t iPDF = 0; iPDF < samples.size(); iPDF++)
   {
     auto* MaCh3Sample = samples[iPDF];
-    // auto* MaCh3Sample = dynamic_cast<SampleHandlerFD*>(samples[iPDF]);
-    for (int SampleIndex = 0; SampleIndex < MaCh3Sample->GetNsamples(); ++SampleIndex)
+    for (int SampleIndex = 0; SampleIndex < MaCh3Sample->GetNSamples(); ++SampleIndex)
     {
       // Get nominal spectra and event rates
       TH1* DataHist = MaCh3Sample->GetDataHist(SampleIndex);

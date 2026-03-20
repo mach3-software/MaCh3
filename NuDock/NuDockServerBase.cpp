@@ -49,7 +49,7 @@ double NuDockServerBase::getLogLikelihood() {
     sample_llh[i] = samples[i]->GetLikelihood();
     if (verbose) {
       std::cout << "Total LLH in sample handler " << i << ": " << sample_llh[i] << std::endl;
-      for (int iSample = 0; iSample < samples[i]->GetNsamples(); ++iSample) {
+      for (int iSample = 0; iSample < samples[i]->GetNSamples(); ++iSample) {
         double sample_llh_ind = samples[i]->GetSampleLikelihood(iSample);
         std::cout << "  Sample " << samples[i]->GetSampleTitle(iSample)
                   << " llh: " << sample_llh_ind << std::endl;
@@ -123,7 +123,7 @@ nlohmann::json NuDockServerBase::setAsimovPoint(const nlohmann::json &request) {
   for (size_t ipdf=0; ipdf<samples.size(); ipdf++) {
     samples[ipdf]->Reweight();
     if (auto* fd_casted_sample = dynamic_cast<SampleHandlerFD*>(samples[ipdf])) {
-      for (int iSample = 0; iSample < samples[ipdf]->GetNsamples(); ++iSample) {
+      for (int iSample = 0; iSample < samples[ipdf]->GetNSamples(); ++iSample) {
         if (fd_casted_sample->GetNDim(iSample) == 1) {
           fd_casted_sample->AddData(iSample, (TH1D*)fd_casted_sample->GetMCHist(iSample));
         } else if (fd_casted_sample->GetNDim(iSample) == 2) {
@@ -166,7 +166,7 @@ nlohmann::json NuDockServerBase::getMCSpectrum(const nlohmann::json &request) {
 
   for (size_t ipdf=0; ipdf<samples.size(); ipdf++) {
     if (auto* fd_casted_sample = dynamic_cast<SampleHandlerFD*>(samples[ipdf])) {
-      for (int iSample = 0; iSample < samples[ipdf]->GetNsamples(); ++iSample) {
+      for (int iSample = 0; iSample < samples[ipdf]->GetNSamples(); ++iSample) {
         std::string sample_title = samples[ipdf]->GetSampleTitle(iSample);
         sample_titles.push_back(sample_title);
 
@@ -239,7 +239,7 @@ nlohmann::json NuDockServerBase::getDataSpectrum(const nlohmann::json &request) 
 
   for (size_t ipdf=0; ipdf<samples.size(); ipdf++) {
     if (auto* fd_casted_sample = dynamic_cast<SampleHandlerFD*>(samples[ipdf])) {
-      for (int iSample = 0; iSample < samples[ipdf]->GetNsamples(); ++iSample) {
+      for (int iSample = 0; iSample < samples[ipdf]->GetNSamples(); ++iSample) {
         std::string sample_title = samples[ipdf]->GetSampleTitle(iSample);
         sample_titles.push_back(sample_title);
 

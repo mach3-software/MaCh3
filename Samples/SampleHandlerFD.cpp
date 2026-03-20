@@ -179,7 +179,7 @@ void SampleHandlerFD::Initialise() {
 
   nEvents = SetupExperimentMC();
   MCSamples.resize(nEvents);
-  SetupFDMC();
+  SetupMC();
 
   MACH3LOG_INFO("=============================================");
   MACH3LOG_INFO("Total number of events is: {}", GetNEvents());
@@ -756,7 +756,7 @@ void SampleHandlerFD::SetupReweightArrays() {
 // ************************************************
 void SampleHandlerFD::SetBinning() {
 // ************************************************
-  for(int iSample = 0; iSample < GetNsamples(); iSample++)
+  for(int iSample = 0; iSample < GetNSamples(); iSample++)
   {
     int Dimension = GetNDim(iSample);
     std::string HistTitle = GetSampleTitle(iSample);
@@ -1066,10 +1066,10 @@ void SampleHandlerFD::InitialiseNuOscillatorObjects() {
   // Add samples only if we don't use same binning
   if(!EqualBinningPerOscChannel) {
     // KS: Start from 1 because sample 0 already added
-    for(int iSample = 1; iSample < GetNsamples(); iSample++) {
+    for(int iSample = 1; iSample < GetNSamples(); iSample++) {
       Oscillator->AddSample(NuOscillatorConfigFile, GetNOscChannels(iSample));
     }
-    for(int iSample = 0; iSample < GetNsamples(); iSample++) {
+    for(int iSample = 0; iSample < GetNSamples(); iSample++) {
       for(int iChannel = 0; iChannel < GetNOscChannels(iSample); iChannel++) {
         std::vector<M3::float_t> EnergyArray;
         std::vector<M3::float_t> CosineZArray;
@@ -1324,7 +1324,7 @@ void SampleHandlerFD::SaveAdditionalInfo(TDirectory* Dir) {
   TMacro ConfigSave = YAMLtoTMacro(Config, (std::string("Config_") + GetName()));
   ConfigSave.Write();
 
-  for(int iSample = 0; iSample < GetNsamples(); iSample++)
+  for(int iSample = 0; iSample < GetNSamples(); iSample++)
   {
     std::unique_ptr<TH1> data_hist;
 
@@ -1368,7 +1368,7 @@ void SampleHandlerFD::InitialiseSplineObject() {
     auto SplineFileName = GetFromManager<std::string>(SampleManager->raw()["InputFiles"]["SplineFileName"],
                                                       (SampleHandlerName + "_SplineFile.root"), __FILE__, __LINE__);
     if(!LoadSplineFile) {
-      for(int iSample = 0; iSample < GetNsamples(); iSample++) {
+      for(int iSample = 0; iSample < GetNSamples(); iSample++) {
         std::vector<std::string> spline_filepaths = SampleDetails[iSample].spline_files;
 
         //Keep a track of the spline variables
@@ -2064,7 +2064,7 @@ void SampleHandlerFD::PrintRates(const bool DataOnly) {
   double sumMC = 0.0;
   double likelihood = 0.0;
 
-  for (int iSample = 0; iSample < GetNsamples(); ++iSample) {
+  for (int iSample = 0; iSample < GetNSamples(); ++iSample) {
     std::string name = GetSampleTitle(iSample);
     std::vector<double> DataArray = GetDataArray(iSample);
     double dataIntegral = std::accumulate(DataArray.begin(), DataArray.end(), 0.0);
