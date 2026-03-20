@@ -401,9 +401,12 @@ void ParameterHandlerGeneric::InitParams() {
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
     }
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wuseless-cast"
     // Set ParameterHandler parameters (Curr = current, Prop = proposed, Sigma = step)
     _fCurrVal[i] = _fPreFitValue[i];
-    _fPropVal[i] = _fCurrVal[i];
+    _fPropVal[i] = static_cast<M3::float_t>(_fCurrVal[i]);
+    #pragma GCC diagnostic pop
   }
   Randomize();
   //KS: Transfer the starting parameters to the PCA basis, you don't want to start with zero..
@@ -662,10 +665,12 @@ void ParameterHandlerGeneric::SetGroupOnlyParameters(const std::vector< std::str
 // Function to set to prior parameters of a given group
 void ParameterHandlerGeneric::SetGroupOnlyParameters(const std::string& Group, const std::vector<double>& Pars) {
 // ********************************************
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wuseless-cast"
   // If empty, set the proposed to prior
   if (Pars.empty()) {
     for (int i = 0; i < _fNumPar; i++) {
-      if(IsParFromGroup(i, Group)) _fPropVal[i] = _fPreFitValue[i];
+      if(IsParFromGroup(i, Group)) _fPropVal[i] = static_cast<M3::float_t>(_fPreFitValue[i]);
     }
   } else{
     const size_t ExpectedSize = static_cast<size_t>(GetNumParFromGroup(Group));
@@ -677,7 +682,7 @@ void ParameterHandlerGeneric::SetGroupOnlyParameters(const std::string& Group, c
     for (int i = 0; i < _fNumPar; i++) {
       // If belongs to group set value from parsed vector, otherwise use propose value
       if(IsParFromGroup(i, Group)){
-        _fPropVal[i] = Pars[Counter];
+        _fPropVal[i] = static_cast<M3::float_t>(Pars[Counter]);
         Counter++;
       }
     }
@@ -687,6 +692,7 @@ void ParameterHandlerGeneric::SetGroupOnlyParameters(const std::string& Group, c
     PCAObj->TransferToPCA();
     PCAObj->TransferToParam();
   }
+  #pragma GCC diagnostic pop
 }
 
 // ********************************************
@@ -763,9 +769,9 @@ int ParameterHandlerGeneric::GetNumParFromGroup(const std::string& Group) const 
 
 // ********************************************
 // DB Grab the Normalisation parameters for the relevant sample name
-std::vector<const double*> ParameterHandlerGeneric::GetOscParsFromSampleName(const std::string& SampleName) {
+std::vector<const M3::float_t*> ParameterHandlerGeneric::GetOscParsFromSampleName(const std::string& SampleName) {
 // ********************************************
-  std::vector<const double*> returnVec;
+  std::vector<const M3::float_t*> returnVec;
   for (const auto& pair : _fSystToGlobalSystIndexMap[SystType::kOsc]) {
     const auto& globalIndex = pair.second;
     if (AppliesToSample(globalIndex, SampleName)) {

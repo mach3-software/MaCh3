@@ -133,7 +133,7 @@ struct NormParameter : public TypeParameterBase {
 };
 
 /// HH - a shorthand type for funcpar functions
-using FuncParFuncType = std::function<void (const double*, std::size_t)>;
+using FuncParFuncType = std::function<void (const M3::float_t*, std::size_t)>;
 // *******************
 /// @brief HH - Functional parameters
 /// Carrier for whether you want to apply a systematic to an event or not
@@ -144,7 +144,7 @@ struct FunctionalParameter : public TypeParameterBase {
   std::vector<int> modes;
 
   /// Parameter value pointer
-  const double* valuePtr = nullptr;
+  const M3::float_t* valuePtr = nullptr;
 
   /// Function pointer
   FuncParFuncType* funcPtr = nullptr;

@@ -72,7 +72,7 @@ class PCAHandler{
   /// @param fCurr_Val pointer to current position of parameter
   /// @param fProp_Val pointer to proposed position of parameter
   void SetupPointers(std::vector<double>* fCurr_Val,
-                     std::vector<double>* fProp_Val);
+                     std::vector<M3::float_t>* fProp_Val);
 
   /// @brief CW: Calculate eigen values, prepare transition matrices and remove param based on defined threshold
   /// @param CovMatrix       Symmetric covariance matrix used for eigen decomposition.
@@ -259,6 +259,6 @@ class PCAHandler{
   /// Pointer to current value of the parameter
   std::vector<double>* _pCurrVal;
   /// Pointer to proposed value of the parameter
-  std::vector<double>* _pPropVal;
+  std::vector<M3::float_t>* _pPropVal;
 };
 

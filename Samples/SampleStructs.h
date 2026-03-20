@@ -181,7 +181,7 @@ struct KinematicCut {
 struct FunctionalShifter {
 // ***************************
   /// Pointer to parameter value
-  const double* valuePtr = nullptr;
+  const M3::float_t* valuePtr = nullptr;
   /// Pointer to shifting function
   FuncParFuncType* funcPtr = nullptr;
 };

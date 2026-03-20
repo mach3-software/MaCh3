@@ -105,10 +105,7 @@ struct EventInfo {
   /// Pointer to true cosine zenith
   double coszenith_true = M3::_BAD_DOUBLE_;
 
-  /// Pointers to normalisation weights which are being taken from Parameter Handler
-  std::vector<const double*> norm_pointers;
-
-  /// Pointers to weights like oscillation spline etc
+  /// Pointers to weights like oscillation spline, normalisation etc
   std::vector<const M3::float_t*> total_weight_pointers;
 
   /// The x_var and y_vars and beyond that you're binning in

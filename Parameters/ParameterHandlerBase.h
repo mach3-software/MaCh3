@@ -54,7 +54,7 @@ class ParameterHandlerBase {
   /// @param i Parameter index
   /// @param val new value which will be set
   void SetParProp(const int i, const double val) {
-    _fPropVal[i] = val;
+    _fPropVal[i] = static_cast<M3::float_t>(val);
     if (pca) PCAObj->TransferToPCA();
   }
   /// @brief Set parameter values using vector, it has to have same size as covariance class
@@ -151,10 +151,10 @@ class ParameterHandlerBase {
 
   /// @brief Get diagonal error for ith parameter
   /// @param i Parameter index
-  inline double GetDiagonalError(const int i) const { return std::sqrt((*covMatrix)(i,i)); }
+  double GetDiagonalError(const int i) const { return std::sqrt((*covMatrix)(i,i)); }
   /// @brief Get the error for the ith parameter
   /// @param i Parameter index
-  inline double GetError(const int i) const {return _fError[i];}
+  double GetError(const int i) const {return _fError[i];}
 
   /// @brief Adaptive Step Tuning Stuff
   void ResetIndivStepScale();
@@ -177,13 +177,13 @@ class ParameterHandlerBase {
   /// @brief Replaces old throw matrix with new one
   void UpdateThrowMatrix(TMatrixDSym *cov);
   /// @brief Set number of MCMC step, when running adaptive MCMC it is updated with given frequency. We need number of steps to determine frequency.
-  inline void SetNumberOfSteps(const int nsteps) {
+  void SetNumberOfSteps(const int nsteps) {
     AdaptiveHandler->SetTotalSteps(nsteps);
     if(AdaptiveHandler->AdaptionUpdate()) ResetIndivStepScale();
   }
 
   /// @brief Get matrix used for step proposal
-  inline TMatrixDSym *GetThrowMatrix() const {return throwMatrix;}
+  TMatrixDSym *GetThrowMatrix() const {return throwMatrix;}
   /// @brief Get matrix used for step proposal
   double GetThrowMatrix(const int i, const int j) const { return throwMatrixCholDecomp[i][j];}
 
@@ -202,11 +202,11 @@ class ParameterHandlerBase {
   /// push_back then the pointer is no longer valid... maybe need a better
   /// way to deal with this? It was fine before when the return was to an
   /// element of a new array. There must be a clever C++ way to be careful
-  inline const double* RetPointer(const int iParam) {return &(_fPropVal.data()[iParam]);}
+  const M3::float_t* RetPointer(const int iParam) {return &(_fPropVal.data()[iParam]);}
 
   /// @brief Get a reference to the proposed parameter values
   /// Can be useful if you want to track these without having to copy values using getProposed()
-  inline const std::vector<double> &GetParPropVec() {return _fPropVal;}
+  const std::vector<M3::float_t> &GetParPropVec() {return _fPropVal;}
 
   /// @brief Get total number of parameters
   int  GetNumParams() const {return _fNumPar;}
@@ -216,30 +216,30 @@ class ParameterHandlerBase {
   std::vector<double> GetProposed() const;
   /// @brief Get proposed parameter value
   /// @param i Parameter index
-  double GetParProp(const int i) const { return _fPropVal[i]; }
+  M3::float_t GetParProp(const int i) const { return _fPropVal[i]; }
   /// @brief Get current parameter value
   /// @param i Parameter index
-  inline double GetParCurr(const int i) const { return _fCurrVal[i]; }
+  double GetParCurr(const int i) const { return _fCurrVal[i]; }
   /// @brief Get vector of current parameter values
-  inline const std::vector<double> &GetParCurrVec() const { return _fCurrVal; }
+  const std::vector<double> &GetParCurrVec() const { return _fCurrVal; }
 
   /// @brief Get prior parameter value
   /// @param i Parameter index
-  inline double GetParInit(const int i) const { return _fPreFitValue[i]; }
+  double GetParInit(const int i) const { return _fPreFitValue[i]; }
   /// @brief Get upper parameter bound in which it is physically valid
   /// @param i Parameter index
-  inline double GetUpperBound(const int i) const { return _fUpBound[i];}
+  double GetUpperBound(const int i) const { return _fUpBound[i];}
   /// @brief Get lower parameter bound in which it is physically valid
   /// @param i Parameter index
-  inline double GetLowerBound(const int i) const { return _fLowBound[i]; }
+  double GetLowerBound(const int i) const { return _fLowBound[i]; }
   /// @brief Get individual step scale for selected parameter
   /// @param ParameterIndex Parameter index
-  inline double GetIndivStepScale(const int ParameterIndex) const {return _fIndivStepScale.at(ParameterIndex); }
+  double GetIndivStepScale(const int ParameterIndex) const {return _fIndivStepScale.at(ParameterIndex); }
   /// @brief Get global step scale for covariance object
-  inline double GetGlobalStepScale() const {return _fGlobalStepScale; }
+  double GetGlobalStepScale() const {return _fGlobalStepScale; }
 
   /// @brief Get number of params which will be different depending if using Eigen decomposition or not
-  inline int GetNParameters() const {
+  int GetNParameters() const {
     if (pca) return PCAObj->GetNumberPCAedParameters();
     else return _fNumPar;
   }
@@ -311,13 +311,13 @@ class ParameterHandlerBase {
   void ConstructPCA(const double eigen_threshold, int FirstPCAdpar, int LastPCAdpar);
 
   /// @brief is PCA, can use to query e.g. LLH scans
-  inline bool IsPCA() const { return pca; }
+  bool IsPCA() const { return pca; }
 
   /// @brief Getter to return a copy of the YAML node
   YAML::Node GetConfig() const { return _fYAMLDoc; }
 
   /// @brief Get pointer for AdaptiveHandler
-  inline adaptive_mcmc::AdaptiveMCMCHandler* GetAdaptiveHandler() const  {
+  AdaptiveMCMCHandler* GetAdaptiveHandler() const  {
     if (!use_adaptive) {
       MACH3LOG_ERROR("Am not running in Adaptive mode");
       throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -440,7 +440,7 @@ protected:
   /// Current value of the parameter
   std::vector<double> _fCurrVal;
   /// Proposed value of the parameter
-  std::vector<double> _fPropVal;
+  std::vector<M3::float_t> _fPropVal;
   /// Prior error on the parameter
   std::vector<double> _fError;
   /// Lowest physical bound, parameter will not be able to go beyond it
@@ -476,7 +476,7 @@ protected:
   /// Struct containing information about PCA
   std::unique_ptr<PCAHandler> PCAObj;
   /// Struct containing information about adaption
-  std::unique_ptr<adaptive_mcmc::AdaptiveMCMCHandler> AdaptiveHandler;
+  std::unique_ptr<AdaptiveMCMCHandler> AdaptiveHandler;
   /// Struct containing information about adaption
   std::unique_ptr<ParameterTunes> Tunes;
 

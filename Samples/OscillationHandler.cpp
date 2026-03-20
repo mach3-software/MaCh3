@@ -7,7 +7,7 @@ _MaCh3_Safe_Include_End_ //}
 
 // ************************************************
 OscillationHandler::OscillationHandler(const std::string& NuOscillatorConfigFile, bool BinningPerOscChannel_,
-                                       std::vector<const double*> OscParams_, const int SubChannels) {
+                                       std::vector<const M3::float_t*> OscParams_, const int SubChannels) {
 // ************************************************
   EqualBinningPerOscChannel = BinningPerOscChannel_;
   OscParams = OscParams_;
@@ -82,10 +82,7 @@ void OscillationHandler::Evaluate() {
 // ************************************************
   std::vector<M3::float_t> OscVec(OscParams.size());
   for (size_t iPar = 0; iPar < OscParams.size(); ++iPar) {
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wuseless-cast"
-    OscVec[iPar] = static_cast<M3::float_t>(*OscParams[iPar]);
-    #pragma GCC diagnostic pop
+    OscVec[iPar] = *OscParams[iPar];
   }
 
   if (EqualBinningPerOscChannel) {

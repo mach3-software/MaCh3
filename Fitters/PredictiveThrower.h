@@ -63,7 +63,7 @@ class PredictiveThrower : public FitterBase {
   /// @brief Setup useful variables etc before stating toy generation
   void SetupToyGeneration(std::vector<std::string>& ParameterGroupsNotVaried,
                           std::unordered_set<int>& ParameterOnlyToVary,
-                          std::vector<const double*>& BoundValuePointer,
+                          std::vector<const M3::float_t*>& BoundValuePointer,
                           std::vector<std::pair<double, double>>& ParamBounds);
 
   /// @brief Load existing toys

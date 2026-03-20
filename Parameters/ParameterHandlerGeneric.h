@@ -129,7 +129,7 @@ class ParameterHandlerGeneric : public ParameterHandlerBase {
     void DumpMatrixToFile(const std::string& Name);
 
     /// @brief Get pointers to Osc params from Sample name
-    std::vector<const double*> GetOscParsFromSampleName(const std::string& SampleName);
+    std::vector<const M3::float_t*> GetOscParsFromSampleName(const std::string& SampleName);
 
   protected:
     /// @brief Print information about the whole object once it is set
