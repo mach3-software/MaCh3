@@ -37,7 +37,7 @@ class BinnedSplineHandler : public SplineBase {
     virtual void FillSampleArray(std::string SampleTitle, std::vector<std::string> OscChanFileNames);
     /// @brief Check if there are any repeated modes. This is used to reduce the number
     /// of modes in case many interaction modes get averaged into one spline
-    std::vector< std::vector<int> > StripDuplicatedModes(const std::vector< std::vector<int> >& InputVector);
+    std::vector< std::vector<int> > StripDuplicatedModes(const std::vector< std::vector<int> >& InputVector) const;
     /// @brief Return the splines which affect a given event
     std::vector< std::vector<int> > GetEventSplines(const std::string& SampleTitle, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val);
     /// @brief KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.
@@ -51,7 +51,7 @@ class BinnedSplineHandler : public SplineBase {
     /// @param SampleTitle The title of the sample to search for.
     int GetSampleIndex(const std::string& SampleTitle) const;
     /// @brief Ensure we have spline for a given bin
-    bool isValidSplineIndex(const std::string& SampleTitle, int iSyst, int iOscChan, int iMode, int iVar1, int iVar2, int iVar3);
+    bool isValidSplineIndex(const std::string& SampleTitle, int iSyst, int iOscChan, int iMode, int iVar1, int iVar2, int iVar3) const;
 
     void BuildSampleIndexingArray(const std::string& SampleTitle);
     void PrepForReweight();
@@ -76,8 +76,6 @@ class BinnedSplineHandler : public SplineBase {
   protected:
     /// @brief CPU based code which eval weight for each spline
     void CalcSplineWeights() override;
-    /// @brief Calc total event weight, not used by Bin-by-bin splines
-    void ModifyWeights() override {return;};
     /// Pointer to covariance from which we get information about spline params
     ParameterHandlerGeneric* xsec;
 

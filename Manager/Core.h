@@ -132,7 +132,8 @@ _Pragma("GCC diagnostic ignored \"-Wformat-nonliteral\"") \
 _Pragma("GCC diagnostic ignored \"-Wswitch-enum\"") \
 _Pragma("GCC diagnostic ignored \"-Wconversion\"") \
 _Pragma("GCC diagnostic ignored \"-Wshadow\"") \
-_Pragma("GCC diagnostic ignored \"-Wsuggest-override\"")
+_Pragma("GCC diagnostic ignored \"-Wsuggest-override\"") \
+_Pragma("GCC diagnostic ignored \"-Wtautological-compare\"")
 #if defined(__GNUC__) && __GNUC__ >= 13
   _Pragma("GCC diagnostic ignored \"-Wdangling-reference\"")
 #endif
@@ -152,7 +153,8 @@ _Pragma("GCC diagnostic pop")
   _Pragma("clang diagnostic ignored \"-Wconversion\"") \
   _Pragma("clang diagnostic ignored \"-Wshadow\"") \
   _Pragma("clang diagnostic ignored \"-Wdeprecated-literal-operator\"") \
-  _Pragma("clang diagnostic ignored \"-Wsuggest-override\"")
+  _Pragma("clang diagnostic ignored \"-Wsuggest-override\"") \
+  _Pragma("clang diagnostic ignored \"-Wtautological-compare\"")
   #undef _MaCh3_Safe_Include_End_
   #define _MaCh3_Safe_Include_End_ \
   _Pragma("clang diagnostic pop")

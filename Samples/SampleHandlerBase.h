@@ -34,7 +34,7 @@ class SampleHandlerBase
   /// @brief destructor
   virtual ~SampleHandlerBase();
 
-  virtual inline M3::int_t GetNsamples(){ return nSamples; };
+  virtual inline M3::int_t GetNSamples(){ return nSamples; };
   virtual std::string GetSampleTitle(const int Sample) const = 0;
   virtual std::string GetName() const = 0;
   virtual double GetSampleLikelihood(const int isample) const = 0;
