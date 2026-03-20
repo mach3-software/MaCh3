@@ -115,10 +115,10 @@ void initParameters(py::module &m) {
             "get_proposal_array",
             [](ParameterHandlerBase &self)
             {
-                return py::memoryview::from_buffer<double>(
+                return py::memoryview::from_buffer<M3::float_t>(
                     self.GetParPropVec().data(), // the data pointer
                     {self.GetNParameters()}, // shape
-                    {sizeof(double)} // shape
+                    {sizeof(M3::float_t)} // shape
                 ); 
             },
             "Bind a python array to the parameter proposal values for this ParameterHandler object. \n\
