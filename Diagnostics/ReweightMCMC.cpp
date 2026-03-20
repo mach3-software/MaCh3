@@ -461,68 +461,47 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile){
     if (processMCMCreweighted) {
         MACH3LOG_INFO("MCMCProcessor has reweighted, skipping duplicate reweighting");
     } else {
-        // Cache only the required parameters once, to allow us to parallelise weight calculations.
-        std::map<std::string, std::vector<double>> cachedParamValues;
-        for (const auto& param : paramValues) {
-            cachedParamValues[param.first].resize(nEntries, 0.0);
-        }
-
         for (Long64_t i = 0; i < nEntries; ++i) {
+            if (i % (nEntries/20) == 0) MaCh3Utils::PrintProgressBar(i, nEntries);
             inTree->GetEntry(i);
-            for (const auto& param : paramValues) {
-                cachedParamValues[param.first][i] = param.second;
-            }
-        }
 
-        // new weight cache to hold the results while in parallel bit
-        std::map<std::string, std::vector<double>> cachedWeights;
-        for (const auto& rwConfig : reweightConfigs) {
-            cachedWeights[rwConfig.weightBranchName].resize(nEntries, 1.0);
-        }
-
-        #ifdef MULTITHREAD
-        #pragma omp parallel for
-        #endif
-        for (Long64_t i = 0; i < nEntries; ++i) {
+            // Calculate weights for all configurations
             for (const auto& rwConfig : reweightConfigs) {
                 double weight = 1.0;
 
                 if (rwConfig.dimension == 1 && rwConfig.type != "Gaussian") {
                     if (rwConfig.type == "TGraph") {
-                        const double paramValue = cachedParamValues[rwConfig.paramNames[0]][i];
+                        double paramValue = paramValues[rwConfig.paramNames[0]];
                         weight = Graph_interpolate1D(rwConfig.graph_1D.get(), paramValue);
+                    } else {
+                        MACH3LOG_ERROR("Unsupported 1D reweight type: {} for {}", rwConfig.type, rwConfig.key);
                     }
                 } else if (rwConfig.dimension == 2) {
                     if (rwConfig.type == "TGraph2D") {
-                        const double dm32 = cachedParamValues[rwConfig.paramNames[0]][i];
-                        const double theta13 = cachedParamValues[rwConfig.paramNames[1]][i];
+                        double dm32 = paramValues[rwConfig.paramNames[0]];
+                        double theta13 = paramValues[rwConfig.paramNames[1]];
                         if (dm32 > 0) {
+                            // Normal Ordering
                             if (rwConfig.graph_NO) {
                                 weight = Graph_interpolateNO(rwConfig.graph_NO.get(), theta13, dm32);
                             } else {
+                                MACH3LOG_ERROR("NO graph not available for {}", rwConfig.key);
                                 weight = 0.0;
                             }
                         } else {
+                            // Inverted Ordering
                             if (rwConfig.graph_IO) {
                                 weight = Graph_interpolateIO(rwConfig.graph_IO.get(), theta13, dm32);
                             } else {
+                                MACH3LOG_ERROR("IO graph not available for {}", rwConfig.key);
                                 weight = 0.0;
                             }
                         }
                     }
                 }
-
-                cachedWeights[rwConfig.weightBranchName][i] = weight;
+                weights[rwConfig.weightBranchName] = weight;
             }
-        }
 
-        // after calculation of weights fill the tree, we do this in a separate loop since tree filling is not thread safe
-        for (Long64_t i = 0; i < nEntries; ++i) {
-            if (i % (nEntries/20) == 0) MaCh3Utils::PrintProgressBar(i, nEntries);
-            inTree->GetEntry(i);
-            for (const auto& rwConfig : reweightConfigs) {
-                weights[rwConfig.weightBranchName] = cachedWeights[rwConfig.weightBranchName][i];
-            }
             outTree->Fill();
         }
     }
@@ -750,28 +729,11 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile, b
     if (processMCMCreweighted) {
         MACH3LOG_INFO("MCMCProcessor has reweighted, skipping duplicate reweighting");
     } else {
-        // Cache only the required reduced-chain parameters once, then parallelise weight calculations.
-        std::map<std::string, std::vector<double>> cachedParamValues;
-        for (const auto& param : paramValues) {
-            cachedParamValues[param.first].resize(nEntries, 0.0);
-        }
-
         for (Long64_t i = 0; i < nEntries; ++i) {
+            if(i % (nEntries/20) == 0) MaCh3Utils::PrintProgressBar(i, nEntries);
             inTree->GetEntry(i);
-            for (const auto& param : paramValues) {
-                cachedParamValues[param.first][i] = param.second;
-            }
-        }
 
-        std::map<std::string, std::vector<double>> cachedWeights;
-        for (const auto& rwConfig : reweightConfigs) {
-            cachedWeights[rwConfig.weightBranchName].resize(nEntries, 1.0);
-        }
-
-        #ifdef MULTITHREAD
-        #pragma omp parallel for
-        #endif
-        for (Long64_t i = 0; i < nEntries; ++i) {
+            // Calculate weights for all configurations
             for (const auto& rwConfig : reweightConfigs) {
                 double weight = 1.0;
 
@@ -786,7 +748,7 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile, b
                         }
 
                         const std::string& reducedParamName = mapIt->second;
-                        const double paramValue = cachedParamValues[reducedParamName][i];
+                        const double paramValue = paramValues[reducedParamName];
                         const double newCentral = rwConfig.priorValues[j][0];
                         const double newError = rwConfig.priorValues[j][1];
                         if (newError <= 0.0) {
@@ -806,8 +768,10 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile, b
                             MACH3LOG_ERROR("No reduced-chain mapping found for parameter {}", rwConfig.paramNames[0]);
                             throw MaCh3Exception(__FILE__, __LINE__);
                         }
-                        const double paramValue = cachedParamValues[mapIt->second][i];
+                        double paramValue = paramValues[mapIt->second];
                         weight = Graph_interpolate1D(rwConfig.graph_1D.get(), paramValue);
+                    } else {
+                        MACH3LOG_ERROR("Unsupported 1D reweight type: {} for {}", rwConfig.type, rwConfig.key);
                     }
                 } else if (rwConfig.dimension == 2) {
                     if (rwConfig.type == "TGraph2D") {
@@ -817,34 +781,30 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile, b
                             MACH3LOG_ERROR("No reduced-chain mapping found for 2D parameters {} and {}", rwConfig.paramNames[0], rwConfig.paramNames[1]);
                             throw MaCh3Exception(__FILE__, __LINE__);
                         }
-                        const double dm32 = cachedParamValues[dmMapIt->second][i];
-                        const double theta13 = cachedParamValues[thMapIt->second][i];
+                        double dm32 = paramValues[dmMapIt->second];
+                        double theta13 = paramValues[thMapIt->second];
                         if (dm32 > 0) {
+                            // Normal Ordering
                             if (rwConfig.graph_NO) {
                                 weight = Graph_interpolateNO(rwConfig.graph_NO.get(), theta13, dm32);
                             } else {
+                                MACH3LOG_ERROR("NO graph not available for {}", rwConfig.key);
                                 weight = 0.0;
                             }
                         } else {
+                            // Inverted Ordering
                             if (rwConfig.graph_IO) {
                                 weight = Graph_interpolateIO(rwConfig.graph_IO.get(), theta13, dm32);
                             } else {
+                                MACH3LOG_ERROR("IO graph not available for {}", rwConfig.key);
                                 weight = 0.0;
                             }
                         }
                     }
                 }
-
-                cachedWeights[rwConfig.weightBranchName][i] = weight;
+                weights[rwConfig.weightBranchName] = weight;
             }
-        }
 
-        for (Long64_t i = 0; i < nEntries; ++i) {
-            if(i % (nEntries/20) == 0) MaCh3Utils::PrintProgressBar(i, nEntries);
-            inTree->GetEntry(i);
-            for (const auto& rwConfig : reweightConfigs) {
-                weights[rwConfig.weightBranchName] = cachedWeights[rwConfig.weightBranchName][i];
-            }
             outTree->Fill();
         }
     }
