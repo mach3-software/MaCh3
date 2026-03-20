@@ -92,7 +92,7 @@ jobs:
           path: to-upload/
 
       ## EM: Now we delete the artifact so it doesn't use up our allowance
-      - uses: geekyeggo/delete-artifact@v5
+      - uses: geekyeggo/delete-artifact@v6
         with:
           name: DoxygenHTML
 
@@ -148,7 +148,7 @@ jobs:
           rm -rf temp-gh-pages-archive
 
       ## EM: Now we delete the artifact so it doesn't use up our allowance
-      - uses: geekyeggo/delete-artifact@v5
+      - uses: geekyeggo/delete-artifact@v6
         with:
           name: DocumentationHTML
     

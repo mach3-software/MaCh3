@@ -169,6 +169,19 @@ NormParameter ParameterHandlerGeneric::GetNormParameter(const YAML::Node& param,
     MACH3LOG_ERROR("Normalisation parameters can't go bellow 0 as this is unphysical");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
+
+  return norm;
+}
+
+// ********************************************
+// Get Base Param
+void ParameterHandlerGeneric::GetBaseParameter(const YAML::Node& param, const int Index, TypeParameterBase& Parameter) {
+// ********************************************
+  Parameter.name = GetParFancyName(Index);
+
+  // Set the global parameter index of the normalisation parameter
+  Parameter.index = Index;
+
   int NumKinematicCuts = 0;
   if(param["KinematicCuts"]) {
     NumKinematicCuts = int(param["KinematicCuts"].size());
@@ -184,39 +197,23 @@ NormParameter ParameterHandlerGeneric::GetNormParameter(const YAML::Node& param,
       }
       if(TempKinematicStrings.size() == 0) {
         MACH3LOG_ERROR("Received a KinematicCuts node but couldn't read the contents (it's a list of single-element dictionaries (python) = map of pairs (C++))");
-        MACH3LOG_ERROR("For Param {}", norm.name);
+        MACH3LOG_ERROR("For Param {}", Parameter.name);
         throw MaCh3Exception(__FILE__, __LINE__);
       }
     }//KinVar_i
-    norm.KinematicVarStr = TempKinematicStrings;
-    norm.Selection = TempKinematicBounds;
+    Parameter.KinematicVarStr = TempKinematicStrings;
+    Parameter.Selection = TempKinematicBounds;
   }
 
   //Next ones are kinematic bounds on where normalisation parameter should apply
   //We set a bool to see if any bounds exist so we can short-circuit checking all of them every step
   bool HasKinBounds = false;
 
-  if(norm.KinematicVarStr.size() > 0) HasKinBounds = true;
+  if(Parameter.KinematicVarStr.size() > 0) HasKinBounds = true;
 
-  norm.hasKinBounds = HasKinBounds;
+  Parameter.hasKinBounds = HasKinBounds;
   //End of kinematic bound checking
-
-  return norm;
 }
-
-// ********************************************
-// Get Base Param
-void ParameterHandlerGeneric::GetBaseParameter(const YAML::Node& param, const int Index, TypeParameterBase& Parameter) {
-// ********************************************
-  // KS: For now we don't use so avoid compilation error
-  (void) param;
-
-  Parameter.name = GetParFancyName(Index);
-
-  // Set the global parameter index of the normalisation parameter
-  Parameter.index = Index;
-}
-
 
 // ********************************************
 // Grab the global syst index for the relevant SampleName
@@ -288,34 +285,8 @@ FunctionalParameter ParameterHandlerGeneric::GetFunctionalParameters(const YAML:
   FunctionalParameter func;
   GetBaseParameter(param, Index, func);
 
-  func.pdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavour"], std::vector<int>(), __FILE__ , __LINE__);
-  func.targets = GetFromManager<std::vector<int>>(param["TargetNuclei"], std::vector<int>(), __FILE__ , __LINE__);
   func.modes = GetFromManager<std::vector<int>>(param["Mode"], std::vector<int>(), __FILE__ , __LINE__);
-  func.preoscpdgs = GetFromManager<std::vector<int>>(param["NeutrinoFlavourUnosc"], std::vector<int>(), __FILE__ , __LINE__);
 
-  // HH - Copied from GetXsecNorm
-  int NumKinematicCuts = 0;
-  if(param["KinematicCuts"]) {
-    NumKinematicCuts = int(param["KinematicCuts"].size());
-
-    std::vector<std::string> TempKinematicStrings;
-    std::vector<std::vector<std::vector<double>>> TempKinematicBounds;
-    //First element of TempKinematicBounds is always -999, and size is then 3
-    for(int KinVar_i = 0 ; KinVar_i < NumKinematicCuts ; ++KinVar_i){
-      //ETA: This is a bit messy, Kinematic cuts is a list of maps
-      for (YAML::const_iterator it = param["KinematicCuts"][KinVar_i].begin();it!=param["KinematicCuts"][KinVar_i].end();++it) {
-        TempKinematicStrings.push_back(it->first.as<std::string>());
-        TempKinematicBounds.push_back(Get2DBounds(it->second));
-      }
-      if(TempKinematicStrings.size() == 0) {
-        MACH3LOG_ERROR("Received a KinematicCuts node but couldn't read the contents (it's a list of single-element dictionaries (python) = map of pairs (C++))");
-        MACH3LOG_ERROR("For Param {}", func.name);
-        throw MaCh3Exception(__FILE__, __LINE__);
-      }
-    }//KinVar_i
-    func.KinematicVarStr = TempKinematicStrings;
-    func.Selection = TempKinematicBounds;
-  }
   func.valuePtr = RetPointer(Index);
   return func;
 }
@@ -651,14 +622,20 @@ std::vector<std::string> ParameterHandlerGeneric::GetUniqueParameterGroups() con
 void ParameterHandlerGeneric::CheckCorrectInitialisation() const {
 // ********************************************
   // KS: Lambda Function which simply checks if there are no duplicates in std::vector
-  auto CheckForDuplicates = [](const std::vector<std::string>& names, const std::string& nameType) {
+  auto CheckForDuplicates = [](const std::vector<std::string>& names, const std::string& nameType, bool Warning) {
     std::unordered_map<std::string, size_t> seenStrings;
     for (size_t i = 0; i < names.size(); ++i) {
       const auto& name = names[i];
       if (seenStrings.find(name) != seenStrings.end()) {
         size_t firstIndex = seenStrings[name];
-        MACH3LOG_CRITICAL("There are two systematics with the same {} '{}', first at index {}, and again at index {}", nameType, name, firstIndex, i);
-        throw MaCh3Exception(__FILE__, __LINE__);
+        if(Warning){
+          MACH3LOG_WARN("There are two systematics with the same {} '{}', first at index {}, and again at index {}", nameType, name, firstIndex, i);
+          MACH3LOG_WARN("Is this desired?");
+          return;
+        } else {
+          MACH3LOG_CRITICAL("There are two systematics with the same {} '{}', first at index {}, and again at index {}", nameType, name, firstIndex, i);
+          throw MaCh3Exception(__FILE__, __LINE__);
+        }
       }
       seenStrings[name] = i;
     }
@@ -668,8 +645,8 @@ void ParameterHandlerGeneric::CheckCorrectInitialisation() const {
     SplineNameTemp[it] = SplineParams[it]._fSplineNames;
   }
   // KS: Checks if there are no duplicates in fancy names etc, this can happen if we merge configs etc
-  CheckForDuplicates(_fFancyNames, "_fFancyNames");
-  CheckForDuplicates(SplineNameTemp, "_fSplineNames");
+  CheckForDuplicates(_fFancyNames, "_fFancyNames", false);
+  CheckForDuplicates(SplineNameTemp, "_fSplineNames", true);
 }
 
 // ********************************************
@@ -802,91 +779,20 @@ std::vector<const double*> ParameterHandlerGeneric::GetOscParsFromSampleName(con
 // Dump Matrix to ROOT file, useful when we need to pass matrix info to another fitting group
 void ParameterHandlerGeneric::DumpMatrixToFile(const std::string& Name) {
 // ********************************************
-  TFile* outputFile = new TFile(Name.c_str(), "RECREATE");
-
-  TObjArray* param_names = new TObjArray();
-  TObjArray* spline_interpolation = new TObjArray();
-  TObjArray* spline_names = new TObjArray();
-
-  TVectorD* param_prior = new TVectorD(_fNumPar);
-  TVectorD* flat_prior = new TVectorD(_fNumPar);
-  TVectorD* stepscale = new TVectorD(_fNumPar);
-  TVectorD* param_lb = new TVectorD(_fNumPar);
-  TVectorD* param_ub = new TVectorD(_fNumPar);
-
-  TVectorD* param_knot_weight_lb = new TVectorD(_fNumPar);
-  TVectorD* param_knot_weight_ub = new TVectorD(_fNumPar);
-  TVectorD* error = new TVectorD(_fNumPar);
-
-  for(int i = 0; i < _fNumPar; ++i)
-  {
-    TObjString* nameObj = new TObjString(_fFancyNames[i].c_str());
-    param_names->AddLast(nameObj);
-
-    TObjString* splineType = new TObjString("TSpline3");
-    spline_interpolation->AddLast(splineType);
-
-    TObjString* splineName = new TObjString("");
-    spline_names->AddLast(splineName);
-
-    (*param_prior)[i] = _fPreFitValue[i];
-    (*flat_prior)[i] = _fFlatPrior[i];
-    (*stepscale)[i] = _fIndivStepScale[i];
-    (*error)[i] = _fError[i];
-
-    (*param_lb)[i] = _fLowBound[i];
-    (*param_ub)[i] = _fUpBound[i];
-
-    //Default values
-    (*param_knot_weight_lb)[i] = -9999;
-    (*param_knot_weight_ub)[i] = +9999;
-  }
-
-  for (auto &pair : _fSystToGlobalSystIndexMap[SystType::kSpline]) {
-    auto &SplineIndex = pair.first;
-    auto &SystIndex = pair.second;
-
-    (*param_knot_weight_lb)[SystIndex] = SplineParams.at(SplineIndex)._SplineKnotLowBound;
-    (*param_knot_weight_ub)[SystIndex] = SplineParams.at(SplineIndex)._SplineKnotUpBound;
-
-    TObjString* splineType = new TObjString(SplineInterpolation_ToString(SplineParams.at(SplineIndex)._SplineInterpolationType).c_str());
-    spline_interpolation->AddAt(splineType, SystIndex);
-
-    TObjString* splineName = new TObjString(SplineParams[SplineIndex]._fSplineNames.c_str());
-    spline_names->AddAt(splineName, SystIndex);
-  }
-  param_names->Write("xsec_param_names", TObject::kSingleKey);
-  delete param_names;
-  spline_interpolation->Write("xsec_spline_interpolation", TObject::kSingleKey);
-  delete spline_interpolation;
-  spline_names->Write("xsec_spline_names", TObject::kSingleKey);
-  delete spline_names;
-
-  param_prior->Write("xsec_param_prior");
-  delete param_prior;
-  flat_prior->Write("xsec_flat_prior");
-  delete flat_prior;
-  stepscale->Write("xsec_stepscale");
-  delete stepscale;
-  param_lb->Write("xsec_param_lb");
-  delete param_lb;
-  param_ub->Write("xsec_param_ub");
-  delete param_ub;
-
-  param_knot_weight_lb->Write("xsec_param_knot_weight_lb");
-  delete param_knot_weight_lb;
-  param_knot_weight_ub->Write("xsec_param_knot_weight_ub");
-  delete param_knot_weight_ub;
-  error->Write("xsec_error");
-  delete error;
-
-  covMatrix->Write("xsec_cov");
+  // KS: Ideally we remove it eventually...
   TH2D* CorrMatrix = GetCorrelationMatrix();
-  CorrMatrix->Write("hcov");
+  M3::DumpParamHandlerToFile(_fNumPar,
+                             _fPreFitValue,
+                             _fError,
+                             _fLowBound,
+                             _fUpBound,
+                             _fIndivStepScale,
+                             _fFancyNames,
+                             _fFlatPrior,
+                             SplineParams,
+                             covMatrix,
+                             CorrMatrix,
+                             Name);
   delete CorrMatrix;
-
-  outputFile->Close();
-  delete outputFile;
-
   MACH3LOG_INFO("Finished dumping ParameterHandler object");
 }

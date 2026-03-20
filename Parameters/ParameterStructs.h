@@ -95,10 +95,23 @@ void CleanContainer(std::vector<T>& container) {
 // *******************
 /// @brief Base class storing info for parameters types, helping unify codebase
 /// @ingroup SamplesAndParameters
+/// @author Ed Atkin
+/// @author Kamil Skwarczynski
 struct TypeParameterBase {
 // *******************
   /// Name of parameters
   std::string name;
+
+  /// Does this parameter have kinematic bounds
+  bool hasKinBounds = false;
+  /// Generic vector contain enum relating to a kinematic variable
+  /// and lower and upper bounds. This can then be passed to IsEventSelected
+  std::vector< std::vector< std::vector<double> > > Selection;
+  /// Generic vector containing the string of kinematic type
+  /// This then needs to be converted to a kinematic type enum
+  /// within a SampleHandler daughter class
+  /// The bounds for each kinematic variable are given in Selection
+  std::vector< std::string > KinematicVarStr;
 
   /// Parameter number of this normalisation in current systematic model
   int index = M3::_BAD_INT_;
@@ -117,17 +130,6 @@ struct NormParameter : public TypeParameterBase {
   std::vector<int> preoscpdgs;
   /// Targets which parameter applies to
   std::vector<int> targets;
-  /// Does this parameter have kinematic bounds
-  bool hasKinBounds;
-  /// Generic vector contain enum relating to a kinematic variable
-  /// and lower and upper bounds. This can then be passed to IsEventSelected
-  std::vector< std::vector< std::vector<double> > > Selection;
-
-  /// Generic vector containing the string of kinematic type
-  /// This then needs to be converted to a kinematic type enum
-  /// within a SampleHandler daughter class
-  /// The bounds for each kinematic variable are given in Selection
-  std::vector< std::string > KinematicVarStr;
 };
 
 /// HH - a shorthand type for funcpar functions
@@ -140,29 +142,12 @@ struct FunctionalParameter : public TypeParameterBase {
 // *******************
   /// Mode which parameter applies to
   std::vector<int> modes;
-  /// PDG which parameter applies to
-  std::vector<int> pdgs;
-  /// Preosc PDG which parameter applies to
-  std::vector<int> preoscpdgs;
-  /// Targets which parameter applies to
-  std::vector<int> targets;
-  /// Does this parameter have kinematic bounds
-  bool hasKinBounds;
-  /// Generic vector contain enum relating to a kinematic variable
-  /// and lower and upper bounds. This can then be passed to IsEventSelected
-  std::vector< std::vector< std::vector<double> > > Selection;
-
-  /// Generic vector containing the string of kinematic type
-  /// This then needs to be converted to a kinematic type enum
-  /// within a SampleHandler daughter class
-  /// The bounds for each kinematic variable are given in Selection
-  std::vector< std::string > KinematicVarStr;
 
   /// Parameter value pointer
-  const double* valuePtr;
+  const double* valuePtr = nullptr;
 
   /// Function pointer
-  FuncParFuncType* funcPtr;
+  FuncParFuncType* funcPtr = nullptr;
 };
 
 /// Make an enum of the spline interpolation type

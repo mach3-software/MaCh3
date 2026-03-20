@@ -133,7 +133,7 @@ std::unique_ptr<CovType> MaCh3CovarianceFactory(Manager *FitManager, const std::
 /// ```
 template <typename SampleType>
 std::vector<SampleType*> MaCh3SampleHandlerFactory(const std::vector<std::string>& SampleConfig,
-                                               ParameterHandlerGeneric* xsec) {
+                                                   ParameterHandlerGeneric* xsec) {
 // ********************************************
   std::vector<SampleType*> Handlers(SampleConfig.size());
   for (size_t i = 0; i < SampleConfig.size(); ++i)
@@ -142,7 +142,7 @@ std::vector<SampleType*> MaCh3SampleHandlerFactory(const std::vector<std::string
     SampleType* Sample = new SampleType(SampleConfig[i], xsec);
     Sample->Reweight();
 
-    for(int iSample = 0; iSample < Sample->GetNsamples(); iSample++)
+    for(int iSample = 0; iSample < Sample->GetNSamples(); iSample++)
     {
       // Obtain sample name and create a TString version for histogram naming
       std::string name = Sample->GetSampleTitle(iSample);

@@ -5,15 +5,6 @@
 #include "Fitters/StatisticalUtils.h"
 #include "Fitters/MCMCProcessor.h"
 
-namespace M3 {
-  /// @brief KS: Different Information Criterion tests mostly based Gelman paper
-  enum kInfCrit {
-    kBIC,      //!< Bayesian Information Criterion
-    kDIC,      //!< Deviance Information Criterion
-    kWAIC,     //!< Watanabe-Akaike information criterion
-    kInfCrits  //!< This only enumerates
-  };
-}
 // *******************
 /// @brief Class to calculate pvalue produce posterior predictive and many fancy Bayesian stuff \cite gelman1996posterior
 /// @details For more information, visit the <a href="PosteriorPredictive.html">Posterior Predictive page</a>.

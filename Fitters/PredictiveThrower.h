@@ -57,10 +57,14 @@ class PredictiveThrower : public FitterBase {
 
  private:
   /// @brief This set some params to prior value this way you can evaluate errors from subset of errors
-  void SetParamters();
+   void SetParamters(std::vector<std::string>& ParameterGroupsNotVaried,
+                     std::unordered_set<int>& ParameterOnlyToVary);
 
   /// @brief Setup useful variables etc before stating toy generation
-  void SetupToyGeneration();
+  void SetupToyGeneration(std::vector<std::string>& ParameterGroupsNotVaried,
+                          std::unordered_set<int>& ParameterOnlyToVary,
+                          std::vector<const double*>& BoundValuePointer,
+                          std::vector<std::pair<double, double>>& ParamBounds);
 
   /// @brief Load existing toys
   bool LoadToys();
@@ -76,7 +80,9 @@ class PredictiveThrower : public FitterBase {
   std::vector<std::unique_ptr<TH1>> MakePredictive(const std::vector<std::vector<std::unique_ptr<TH1>>>& Toys,
                                                    const std::vector<TDirectory*>& Director,
                                                    const std::string& suffix,
-                                                   const bool DebugHistograms);
+                                                   const bool DebugHistograms,
+                                                   const bool WriteHist);
+
   /// @brief Load 1D projections and later produce violin plots for each
   void Study1DProjections(const std::vector<TDirectory*>& SampleDirectories) const;
   /// @brief Produce Violin style spectra
@@ -88,9 +94,40 @@ class PredictiveThrower : public FitterBase {
   /// @param FluctHist Histogram to store fluctuated values (must match Hist type)
   /// @param Hist Original histogram to fluctuate
   void MakeFluctuatedHistogram(TH1* FluctHist, TH1* PolyHist);
+
+  /// @brief Calculate Posterior Predictive LLH
+  void PredictiveLLH(const std::vector<std::unique_ptr<TH1>>& Data_histogram,
+                     const std::vector<std::unique_ptr<TH1>>& PostPred_mc,
+                     const std::vector<std::unique_ptr<TH1>>& PostPred_w,
+                     const std::vector<TDirectory*>& SampleDir);
+
+
   /// @brief Calculate Posterior Predictive $p$-value
+  /// Compares observed data to toy datasets generated from:
+  ///  - fitted model fluctuations ("Draw")
+  ///  - posterior predictive distribution ("Pred")
+  ///
+  /// Computes two discrepancy metrics:
+  ///  • Shape+Rate : bin-by-bin likelihood
+  ///  • Rate-only  : total event normalization
   void PosteriorPredictivepValue(const std::vector<std::unique_ptr<TH1>>& PostPred_mc,
                                  const std::vector<TDirectory*>& SampleDir);
+  /// @brief Calculate the LLH for TH1, set the LLH to title of MCHist
+  /// @param DatHist Data histogram with data distribution for a single sample
+  /// @param MCHist MC histogram with MC distribution for a single sample
+  /// @param W2Hist W2 histogram with W2 distribution for a single sample
+  /// @param SampleHandler Pointer to SampleHandlerBase providing LLH test statistic
+  void ExtractLLH(TH1* DatHist, TH1* MCHist, TH1* W2Hist, const SampleHandlerBase* SampleHandler) const;
+
+  /// @brief Calculates the -2LLH (likelihood) for a single sample.
+  /// @param data          Data value for the sample.
+  /// @param mc            MC (Monte Carlo) value for the sample.
+  /// @param w2            W2 value for the sample.
+  /// @param SampleHandler Pointer to SampleHandlerBase providing the LLH test statistic.
+  double CalcLLH(const double data,
+                 const double mc,
+                 const double w2,
+                 const SampleHandlerBase* SampleHandler) const;
 
   /// @brief Calculates the likelihood (-2LLH) for a single sample; dynamically casts to call the correct GetLLH overload
   /// @param DatHist Data histogram with data distribution for a single sample
@@ -141,6 +178,69 @@ class PredictiveThrower : public FitterBase {
                      const std::string Title);
 
 
+  /// @brief Information Criterion
+  void StudyInformationCriterion(M3::kInfCrit Criterion,
+                                 const std::vector<std::unique_ptr<TH1>>& PostPred_mc,
+                                 const std::vector<std::unique_ptr<TH1>>& PostPred_w);
+  /// @brief Study Bayesian Information Criterion (BIC)
+  /// The BIC is defined as:
+  ///
+  /// \f[
+  /// \mathrm{BIC} = -2 \log L + k \log(n)
+  /// \f]
+  ///
+  /// where:
+  /// - \f$L\f$ is the likelihood evaluated at the fitted model
+  /// - \f$k\f$ is the number of model parameters
+  /// - \f$n\f$ is the number of observations
+  ///
+  /// @cite Gelman2014
+  void StudyBIC(const std::vector<std::unique_ptr<TH1>>& PostPred_mc,
+                const std::vector<std::unique_ptr<TH1>>& PostPred_w);
+  /// @brief KS: Get the Deviance Information Criterion (DIC)
+  /// The deviance is defined as:
+  /// \f[
+  /// D(\theta) = -2 \log L(\theta)
+  /// \f]
+  /// The DIC statistic is then:
+  /// \f[
+  /// \mathrm{DIC} = D(\hat{\theta}) + 2p_D
+  /// \f]
+  /// where:
+  /// \f[
+  /// p_D = \bar{D} - D(\hat{\theta})
+  /// \f]
+  /// is the effective number of parameters, and
+  /// \f[
+  /// \bar{D} = E_{\theta|y}[D(\theta)]
+  /// \f]
+  ///
+  /// @cite Spiegelhalter2002
+  /// @cite BRugsDIC
+  void StudyDIC(const std::vector<std::unique_ptr<TH1>>& PostPred_mc,
+                const std::vector<std::unique_ptr<TH1>>& PostPred_w);
+  /// @brief KS: Get the Watanabe-Akaike information criterion (WAIC)
+  ///
+  /// WAIC is a fully Bayesian measure of model fit that estimates the predictive accuracy,
+  /// taking into account the effective number of parameters in the model.
+  ///
+  /// It is defined as:
+  /// \f[
+  /// \text{WAIC} = -2 \left( \text{lppd} - p_\text{WAIC} \right),
+  /// \f]
+  /// where
+  /// \f[
+  /// \text{lppd} = \sum_{i=1}^n \log \left( \frac{1}{S} \sum_{s=1}^S p(y_i \mid \theta_s) \right)
+  /// \f]
+  /// is the log pointwise predictive density and
+  /// \f[
+  /// p_\text{WAIC} = \sum_{i=1}^n \text{Var}_{s=1,\dots,S} \left[ \log p(y_i \mid \theta_s) \right]
+  /// \f]
+  /// is the effective number of parameters (variance of log-likelihood over posterior samples).
+  ///
+  /// @cite Gelman2014
+  /// @cite Hartig2024WAIC
+  void StudyWAIC();
   /// @brief Construct a human-readable label describing a specific analysis bin.
   /// @param hist Histogram providing the binning definition.
   /// @param uniform Flag indicating whether the histogram uses regular axis
@@ -194,10 +294,6 @@ class PredictiveThrower : public FitterBase {
 
   /// Number of toys we are generating analysing
   int Ntoys;
-  /// KS: Names of parameter groups that will not be varied
-  std::vector<std::string> ParameterGroupsNotVaried;
-  /// KS: Index of parameters that will be varied
-  std::unordered_set<int> ParameterOnlyToVary;
 
   /// Pointer to El Generico
   ParameterHandlerGeneric* ModelSystematic;
