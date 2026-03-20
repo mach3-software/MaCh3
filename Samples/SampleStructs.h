@@ -144,6 +144,25 @@ inline std::string TestStatistic_ToString(const TestStatistic TestStat) {
   return name;
 }
 
+// **************************************************
+/// @brief Convert a string to a TestStatistic enum
+inline TestStatistic TestStatFromString(const std::string& likelihood) {
+// **************************************************
+  for(int i = 0; i < kNTestStatistics; i++) {
+    if(likelihood == TestStatistic_ToString(TestStatistic(i))) {
+      return TestStatistic(i);
+    }
+  }
+
+  MACH3LOG_ERROR("Wrong form of test-statistic specified!");
+  MACH3LOG_ERROR("You gave {} and I only support:", likelihood);
+  for(int i = 0; i < kNTestStatistics; i++)
+  {
+    MACH3LOG_ERROR("{}", TestStatistic_ToString(TestStatistic(i)));
+  }
+  throw MaCh3Exception(__FILE__ , __LINE__ );
+}
+
 // ***************************
 /// @brief KS: Small struct used for applying kinematic cuts
 struct KinematicCut {
@@ -252,6 +271,8 @@ struct SampleBinningInfo {
   std::vector<std::vector<int>> BinGridMapping;
 
   /// @brief Initialise Uniform Binning
+  /// @details The outer vector loops over dimensions and the inner vector specifies
+  //           all bin edges along that dimension. Get 1 less bin than number of edges.
   void InitUniform(const std::vector<std::vector<double>>& InputEdges) {
     BinEdges = InputEdges;
     Uniform = true;
@@ -262,7 +283,7 @@ struct SampleBinningInfo {
     {
       const auto& Edges = BinEdges[iDim];
       if (!std::is_sorted(Edges.begin(), Edges.end())) {
-        MACH3LOG_ERROR("VarBins for Dim {} must be in increasing order in sample config, VarBins: [{}]",
+        MACH3LOG_ERROR("Bin edges for Dim {} must be in increasing order in sample config. Bin edges passed: [{}]",
                        iDim, fmt::join(Edges, ", "));
         throw MaCh3Exception(__FILE__, __LINE__);
       }
@@ -735,9 +756,9 @@ namespace MaCh3Utils {
       case 12:
       case 14:
       case 16:
-        return 0.; 
+        return 0.;
       // Photon
-      case 22: return 0.; 
+      case 22: return 0.;
       // Mesons
       case 211: return 0.13957039; // pi_+/-
       case 111: return 0.1349768;  // pi_0

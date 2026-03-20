@@ -159,19 +159,19 @@ class SampleHandlerFD :  public SampleHandlerBase
   bool IsSubEventVarString(const std::string& VarStr);
 
   /// @brief Return array storing data entries for every bin
-  std::vector<double> GetDataArray() const {
-    return std::vector<double>(SampleHandlerFD_data, SampleHandlerFD_data + Binning->GetNBins());
+  auto GetDataArray() const {
+    return SampleHandlerFD_data;
   }
   /// @brief Return array storing MC entries for every bin
-  std::vector<double> GetMCArray() const {
-    return std::vector<double>(SampleHandlerFD_array, SampleHandlerFD_array + Binning->GetNBins());
+  auto GetMCArray() const {
+    return SampleHandlerFD_array;
   }
   /// @brief Return array storing W2 entries for every bin
-  std::vector<double> GetW2Array() const {
-    return std::vector<double>(SampleHandlerFD_array_w2, SampleHandlerFD_array_w2 + Binning->GetNBins());
+  auto GetW2Array() const {
+    return SampleHandlerFD_array_w2;
   }
   /// @brief Return a sub-array for a given sample.
-  std::vector<double> GetArrayForSample(const int Sample, const double* array) const;
+  std::vector<double> GetArrayForSample(const int Sample, std::vector<double> const & array) const;
 
   /// @brief Return array storing data entries for every bin
   std::vector<double> GetDataArray(const int Sample) const {
@@ -219,6 +219,9 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// @brief Set pointers for each event to appropriate weights, for unbinned based on event number
   /// while for binned based on other kinematical properties
   void SetSplinePointers();
+  /// @brief Retrieve the spline bin indices associated with a given event.
+  /// @warning ThrowCrititcal argument will be eventually removed
+  std::vector< std::vector<int> > GetSplineBins(int Event, BinnedSplineHandler* BinnedSpline, bool& ThrowCrititcal) const;
 
   //Functions which find the nominal bin and bin edges
   void FindNominalBinAndEdges();
@@ -248,6 +251,11 @@ class SampleHandlerFD :  public SampleHandlerBase
   bool IsSubEventSelected(const std::vector<KinematicCut> &SubEventCuts, const int iEvent, unsigned const int iSubEvent, size_t nsubevents);
   /// @brief HH - reset the shifted values to the original values
   virtual void ResetShifts(const int iEvent) {(void)iEvent;};
+  /// @brief LP - Optionally calculate derived observables after all shifts have been applied
+  /// @details LP - For example, have shifts that varied lepton energy and hadron energy separately
+  ///               in a subclass implementation of this method you may add the shifted quantities
+  ///               together to build a shifted neutrino energy estimator
+  virtual void FinaliseShifts(const int iEvent) {(void)iEvent;};
   /// @brief HH - a grid of vectors of enums for each sample and event
   std::vector<std::vector<FunctionalShifter*>> funcParsGrid;
   /// @brief HH - a map that relates the funcpar enum to pointer of FuncPars
@@ -308,13 +316,14 @@ class SampleHandlerFD :  public SampleHandlerBase
   const double* GetPointerToOscChannel(const int iEvent) const;
   /// @brief Setup the norm parameters by assigning each event with bin
   void SetupNormParameters();
-
+  /// @brief Setup the osc parameters
+  void SetupOscParameters();
   //===============================================================================
   /// @brief Fill a histogram with the event-level information used in the fit
   /// @details
   /// DB Functions required for reweighting functions
   /// DB Replace previous implementation with reading bin contents from SampleHandlerFD_array
-  void FillHist(const int Sample, TH1* Hist, double* Array);
+  void FillHist(const int Sample, TH1* Hist, std::vector<double> &Array);
 
   /// @brief DB Nice new multi-threaded function which calculates the event weights and fills the relevant bins of an array
 #ifdef MULTITHREAD
@@ -334,11 +343,11 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// KS: This stores binning information, in future could be come vector to store binning for every used sample
   std::unique_ptr<BinningHandler> Binning;
   /// DB Array to be filled after reweighting
-  double* SampleHandlerFD_array;
+  std::vector<double> SampleHandlerFD_array;
   /// KS Array used for MC stat
-  double* SampleHandlerFD_array_w2;
+  std::vector<double> SampleHandlerFD_array_w2;
   /// DB Array to be filled in AddData
-  double* SampleHandlerFD_data;
+  std::vector<double> SampleHandlerFD_data;
   //===============================================================================
 
   //===============================================================================

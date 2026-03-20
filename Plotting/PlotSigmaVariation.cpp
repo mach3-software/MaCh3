@@ -645,6 +645,7 @@ void MakeEventRatePlot(const std::string& filename, const YAML::Node& Settings)
   (void) Settings;
   //Get input file, make canvas and output file
   auto canvas = std::make_unique<TCanvas>("canv", "canv", 1080, 1080);
+  canvas->SetRightMargin(0.05);
   TFile *infile = M3::Open(filename, "OPEN", __FILE__, __LINE__);
   TDirectoryFile *SigmaDir = infile->Get<TDirectoryFile>("SigmaVar");
 

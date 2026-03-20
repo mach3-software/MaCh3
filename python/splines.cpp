@@ -57,15 +57,6 @@ public:
             CalcSplineWeights    /* Name of function in C++ (must match Python name) */
         );
     }
-
-    void ModifyWeights() override {
-        PYBIND11_OVERRIDE_PURE_NAME(
-            void,             /* Return type */
-            SplineBase,       /* Parent class */
-            "modify_weights", /* Name in python*/
-            ModifyWeights     /* Name of function in C++ (must match Python name) */
-        );
-    }
 };
 
 

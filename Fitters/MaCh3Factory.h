@@ -133,7 +133,7 @@ std::unique_ptr<CovType> MaCh3CovarianceFactory(Manager *FitManager, const std::
 /// ```
 template <typename SampleType>
 std::vector<SampleType*> MaCh3SampleHandlerFactory(const std::vector<std::string>& SampleConfig,
-                                               ParameterHandlerGeneric* xsec) {
+                                                   ParameterHandlerGeneric* xsec) {
 // ********************************************
   std::vector<SampleType*> Handlers(SampleConfig.size());
   for (size_t i = 0; i < SampleConfig.size(); ++i)

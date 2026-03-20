@@ -41,7 +41,8 @@ PredictiveThrower::~PredictiveThrower() {
 }
 
 // *************************
-void PredictiveThrower::SetParamters() {
+void PredictiveThrower::SetParamters(std::vector<std::string>& ParameterGroupsNotVaried,
+                                     std::unordered_set<int>& ParameterOnlyToVary) {
 // *************************
   // WARNING This should be removed in the future
   auto DoNotThrowLegacyCov = GetFromManager<std::vector<std::string>>(fitMan->raw()["Predictive"]["DoNotThrowLegacyCov"], {}, __FILE__, __LINE__);
@@ -107,7 +108,10 @@ void PredictiveThrower::SetupSampleInformation() {
 
 // *************************
 // Produce MaCh3 toys:
-void PredictiveThrower::SetupToyGeneration() {
+void PredictiveThrower::SetupToyGeneration(std::vector<std::string>& ParameterGroupsNotVaried,
+                                           std::unordered_set<int>& ParameterOnlyToVary,
+                                           std::vector<const double*>& BoundValuePointer,
+                                           std::vector<std::pair<double, double>>& ParamBounds) {
 // *************************
   int counter = 0;
   for (size_t s = 0; s < systematics.size(); ++s) {
@@ -195,6 +199,35 @@ void PredictiveThrower::SetupToyGeneration() {
         MACH3LOG_INFO("Exclude: {}", fmt::join(ParameterGroupsNotVaried, ", "));
       }
     }
+  }
+
+  auto paramNode = fitMan->raw()["Predictive"]["ParameterBounds"];
+  for (const auto& p : paramNode) {
+    // Extract name
+    std::string name = p[0].as<std::string>();
+
+    // Extract bounds: min and max
+    double minVal = p[1][0].as<double>();
+    double maxVal = p[1][1].as<double>();
+    ParamBounds.emplace_back(minVal, maxVal);
+
+    for (size_t s = 0; s < systematics.size(); ++s) {
+      for(int iPar = 0; iPar < systematics[s]->GetNParameters(); iPar++){
+        if(systematics[s]->GetParFancyName(iPar) == name){
+          BoundValuePointer.push_back(systematics[s]->RetPointer(iPar));
+          break;
+        }
+      }
+    }
+    if(ParamBounds.size() != BoundValuePointer.size()){
+      MACH3LOG_ERROR("Ddin't find paramter {}", name);
+      throw MaCh3Exception(__FILE__,__LINE__);
+    }
+    MACH3LOG_INFO("Parameter: {} with : [{}, {}]", name, minVal, maxVal);
+  }
+  if(Is_PriorPredictive && ParamBounds.size() > 0) {
+    MACH3LOG_ERROR("Additional bounds not supported by prior predictive right now");
+    throw MaCh3Exception(__FILE__,__LINE__);
   }
 }
 
@@ -390,6 +423,21 @@ void PredictiveThrower::WriteToy(TDirectory* ToyDirectory,
 }
 
 // *************************
+bool CheckBounds(const std::vector<const double*>& BoundValuePointer,
+                 const std::vector<std::pair<double,double>>& ParamBounds) {
+// *************************
+  for (size_t i = 0; i < BoundValuePointer.size(); ++i) {
+    const double val = *(BoundValuePointer[i]);
+    const double minVal = ParamBounds[i].first;
+    const double maxVal = ParamBounds[i].second;
+
+    if (val < minVal || val > maxVal)
+      return false; // out of bounds
+  }
+  return true; // all values are within bounds
+}
+
+// *************************
 // Produce MaCh3 toys:
 void PredictiveThrower::ProduceToys() {
 // *************************
@@ -399,8 +447,17 @@ void PredictiveThrower::ProduceToys() {
   // If we found toys then skip process of making new toys
   if(LoadToys()) return;
 
+  /// KS: Names of parameter groups that will not be varied
+  std::vector<std::string> ParameterGroupsNotVaried;
+  /// KS: Index of parameters that will be varied
+  std::unordered_set<int> ParameterOnlyToVary;
+  // For study where one would like to apply bounds
+  std::vector<const double*> BoundValuePointer;
+  std::vector<std::pair<double, double>> ParamBounds;
+
   // Setup useful information for toy generation
-  SetupToyGeneration();
+  SetupToyGeneration(ParameterGroupsNotVaried, ParameterOnlyToVary,
+                     BoundValuePointer, ParamBounds);
 
   auto PosteriorFileName = Get<std::string>(fitMan->raw()["Predictive"]["PosteriorFile"], __FILE__, __LINE__);
 
@@ -439,7 +496,8 @@ void PredictiveThrower::ProduceToys() {
   int SampleCounter = 0;
   for (size_t iPDF = 0; iPDF < samples.size(); iPDF++)
   {
-    auto* MaCh3Sample = dynamic_cast<SampleHandlerFD*>(samples[iPDF]);
+    auto* MaCh3Sample = samples[iPDF];
+    // auto* MaCh3Sample = dynamic_cast<SampleHandlerFD*>(samples[iPDF]);
     for (int SampleIndex = 0; SampleIndex < MaCh3Sample->GetNsamples(); ++SampleIndex)
     {
       // Get nominal spectra and event rates
@@ -509,18 +567,26 @@ void PredictiveThrower::ProduceToys() {
     if(Ntoys >= 10 && i % (Ntoys/10) == 0) {
       MaCh3Utils::PrintProgressBar(i, Ntoys);
     }
-
     if(!Is_PriorPredictive){
       int entry = 0;
       Step = 0;
-
+      // KS This allow to set additional bounds like mass ordering
+      bool WithinBounds = false;
       //YSP: Ensures you get an entry from the mcmc even when burn_in is set to zero (Although not advised :p ).
       //Take 200k burn in steps, WP: Eb C in 1st peaky
       // If we have combined chains by hadd need to check the step in the chain
       // Note, entry is not necessarily same as step due to merged ROOT files, so can't choose entry in the range BurnIn - nEntries :(
-      while(Step < burn_in){
+      while(Step < burn_in || !WithinBounds) {
         entry = random->Integer(static_cast<unsigned int>(PosteriorFile->GetEntries()));
         PosteriorFile->GetEntry(entry);
+        // KS: This might be bit hacky... but BoundValuePointer refer to values in ParameterHandler
+        // so we need to update them
+        if(BoundValuePointer.size() > 0) {
+          for (size_t s = 0; s < systematics.size(); ++s) {
+            systematics[s]->SetParameters(branch_vals[s]);
+          }
+        }
+        WithinBounds = CheckBounds(BoundValuePointer, ParamBounds);
       }
       Draw = entry;
     }
@@ -536,7 +602,7 @@ void PredictiveThrower::ProduceToys() {
     }
 
     // This set some params to prior value this way you can evaluate errors from subset of errors
-    SetParamters();
+    SetParamters(ParameterGroupsNotVaried, ParameterOnlyToVary);
 
     Penalty = 0;
     if(FullLLH) {
@@ -857,7 +923,8 @@ std::vector<std::unique_ptr<TH1D>> PredictiveThrower::PerBinHistogram(TH1* hist,
 std::vector<std::unique_ptr<TH1>> PredictiveThrower::MakePredictive(const std::vector<std::vector<std::unique_ptr<TH1>>>& Toys,
                                                                     const std::vector<TDirectory*>& Directory,
                                                                     const std::string& suffix,
-                                                                    const bool DebugHistograms) {
+                                                                    const bool DebugHistograms,
+                                                                    const bool WriteHist) {
 // *************************
   std::vector<std::unique_ptr<TH1>> PostPred(TotalNumberOfSamples);
   std::vector<std::vector<std::unique_ptr<TH1D>>> Posterior_hist(TotalNumberOfSamples);
@@ -943,7 +1010,7 @@ std::vector<std::unique_ptr<TH1>> PredictiveThrower::MakePredictive(const std::v
         if (DebugHistograms) Posterior_hist[sample][i-1]->Write();
       }
     }
-    PostPred[sample]->Write();
+    if(WriteHist) PostPred[sample]->Write();
   } // end loop over samples
   return PostPred;
 }
@@ -976,12 +1043,19 @@ void PredictiveThrower::RunPredictiveAnalysis() {
 
   // Produce Violin style spectra
   Study1DProjections(SampleDirectories);
-  // Produce posterior predictive distribution
-  auto PostPred_mc = MakePredictive(MC_Hist_Toy, SampleDirectories, "mc", DebugHistograms);
+  // Produce posterior predictive distribution for mc
+  auto PostPred_mc = MakePredictive(MC_Hist_Toy, SampleDirectories, "mc", DebugHistograms, false);
+  // Produce posterior predictive distribution for w2
+  auto PostPred_w2 = MakePredictive(W2_Hist_Toy, SampleDirectories, "w2", false, false);
+  // Calculate Posterior Predictive LLH
+  PredictiveLLH(Data_Hist, PostPred_mc, PostPred_w2, SampleDirectories);
   // Calculate Posterior Predictive $p$-value
   PosteriorPredictivepValue(PostPred_mc, SampleDirectories);
   // Check how number of events changed
   RateAnalysis(MC_Hist_Toy, SampleDirectories);
+
+  // Studying information criterion
+  StudyInformationCriterion(M3::kWAIC, PostPred_mc, PostPred_w2);
 
   // Close directories
   for (int sample = 0; sample < TotalNumberOfSamples+1; ++sample) {
@@ -1000,6 +1074,16 @@ void PredictiveThrower::RunPredictiveAnalysis() {
   MACH3LOG_INFO("{} took {:.2f}s to finish for {} toys", __func__, TempClock.RealTime(), Ntoys);
 }
 
+// *************************
+double PredictiveThrower::CalcLLH(const double data,
+                                  const double mc,
+                                  const double w2,
+                                  const SampleHandlerBase* SampleHandler) const {
+// *************************
+  double llh = SampleHandler->GetTestStatLLH(data, mc, w2);
+  //KS: do times 2 because banff reports chi2
+  return 2*llh;
+}
 
 // *************************
 double PredictiveThrower::CalcLLH(const TH1* DatHist,
@@ -1132,19 +1216,27 @@ void PredictiveThrower::PosteriorPredictivepValue(const std::vector<std::unique_
 // *************************
   // Step 1: Initialize per-toy accumulators once
   // [Sample] [Toys]
-  std::vector<std::vector<double>> chi2_dat(TotalNumberOfSamples+1);
-  std::vector<std::vector<double>> chi2_mc(TotalNumberOfSamples+1);
-  std::vector<std::vector<double>> chi2_pred(TotalNumberOfSamples+1);
-  for (int iSample = 0; iSample < TotalNumberOfSamples+1; ++iSample) {
-    chi2_dat[iSample].resize(Ntoys, 0.0);
-    chi2_mc[iSample].resize(Ntoys, 0.0);
-    chi2_pred[iSample].resize(Ntoys, 0.0);
-  }
+  auto make_matrix = [&](double init = 0.0) {
+    return std::vector<std::vector<double>>(
+      TotalNumberOfSamples + 1,
+      std::vector<double>(Ntoys, init));
+  };
+  auto chi2_dat       = make_matrix();
+  auto chi2_mc        = make_matrix();
+  auto chi2_pred      = make_matrix();
+  auto chi2_rate_dat  = make_matrix();
+  auto chi2_rate_mc   = make_matrix();
+  auto chi2_rate_pred = make_matrix();
 
+  // 2. Add penalty terms to global bin
   for (int iToy = 0; iToy < Ntoys; ++iToy) {
     chi2_dat[TotalNumberOfSamples][iToy] = PenaltyTerm[iToy];
     chi2_mc[TotalNumberOfSamples][iToy] = PenaltyTerm[iToy];
     chi2_pred[TotalNumberOfSamples][iToy] = PenaltyTerm[iToy];
+
+    chi2_rate_dat[TotalNumberOfSamples][iToy] = PenaltyTerm[iToy];
+    chi2_rate_mc[TotalNumberOfSamples][iToy] = PenaltyTerm[iToy];
+    chi2_rate_pred[TotalNumberOfSamples][iToy] = PenaltyTerm[iToy];
   }
 
   /// TODO This can be multithreaded but be careful for Clone!!!
@@ -1159,20 +1251,52 @@ void PredictiveThrower::PosteriorPredictivepValue(const std::vector<std::unique_
       MakeFluctuatedHistogram(DrawFluctHist.get(), MC_Hist_Toy[iSample][iToy].get());
       MakeFluctuatedHistogram(PredFluctHist.get(), PostPred_mc[iSample].get());
 
-      // Okay now we can do our chi2 calculation for our sample
+      // I. SHAPE + RATE (bin-by-bin likelihood)
       chi2_dat[iSample][iToy]  = CalcLLH(Data_Hist[iSample].get(), MC_Hist_Toy[iSample][iToy].get(), W2_Hist_Toy[iSample][iToy].get(), SampleHandler);
       chi2_mc[iSample][iToy]   = CalcLLH(DrawFluctHist.get(), MC_Hist_Toy[iSample][iToy].get(), W2_Hist_Toy[iSample][iToy].get(), SampleHandler);
       chi2_pred[iSample][iToy] = CalcLLH(PredFluctHist.get(), MC_Hist_Toy[iSample][iToy].get(), W2_Hist_Toy[iSample][iToy].get(), SampleHandler);
 
+      // II. RATE-ONLY (total normalization)
+      chi2_rate_dat[iSample][iToy]  = CalcLLH(Data_Hist[iSample]->Integral(), MC_Hist_Toy[iSample][iToy]->Integral(), W2_Hist_Toy[iSample][iToy]->Integral(), SampleHandler);
+      chi2_rate_mc[iSample][iToy]   = CalcLLH(DrawFluctHist->Integral(), MC_Hist_Toy[iSample][iToy]->Integral(), W2_Hist_Toy[iSample][iToy]->Integral(), SampleHandler);
+      chi2_rate_pred[iSample][iToy] = CalcLLH(PredFluctHist->Integral(), MC_Hist_Toy[iSample][iToy]->Integral(), W2_Hist_Toy[iSample][iToy]->Integral(), SampleHandler);
+
+      // III. accumulate global sums ---
       chi2_dat[TotalNumberOfSamples][iToy]  += chi2_dat[iSample][iToy];
       chi2_mc[TotalNumberOfSamples][iToy]   += chi2_mc[iSample][iToy];
       chi2_pred[TotalNumberOfSamples][iToy] += chi2_pred[iSample][iToy];
+
+      chi2_rate_dat[TotalNumberOfSamples][iToy]  += chi2_rate_dat[iSample][iToy];
+      chi2_rate_mc[TotalNumberOfSamples][iToy]   += chi2_rate_mc[iSample][iToy];
+      chi2_rate_pred[TotalNumberOfSamples][iToy] += chi2_rate_pred[iSample][iToy];
     }
   }
 
+  // 4. Produce pValue plots
+  // Shape+rate posterior predictive checks
   MakeChi2Plots(chi2_mc,   "-2LLH (Draw Fluc, Draw)", chi2_dat, "-2LLH (Data, Draw)", SampleDir, "_drawfluc_draw");
   MakeChi2Plots(chi2_pred, "-2LLH (Pred Fluc, Draw)", chi2_dat, "-2LLH (Data, Draw)", SampleDir, "_predfluc_draw");
+
+  // Rate-only posterior predictive checks
+  MakeChi2Plots(chi2_rate_mc,   "-2LLH (Rate Draw Fluc, Draw)", chi2_rate_dat, "-2LLH (Rate Data, Draw)", SampleDir, "_rate_drawfluc_draw");
+  MakeChi2Plots(chi2_rate_pred, "-2LLH (Rate Pred Fluc, Draw)", chi2_rate_dat, "-2LLH (Rate Data, Draw)", SampleDir, "_rate_predfluc_draw");
 }
+
+// *************************
+void PredictiveThrower::PredictiveLLH(const std::vector<std::unique_ptr<TH1>>& Data_histogram,
+                                               const std::vector<std::unique_ptr<TH1>>& PostPred_mc,
+                                               const std::vector<std::unique_ptr<TH1>>& PostPred_w,
+                                               const std::vector<TDirectory*>& SampleDir) {
+// *************************
+  MACH3LOG_INFO("{:<55} {:<10} {:<10} {:<10}", "Sample", "DataInt", "MCInt", "-2LLH");
+  MACH3LOG_INFO("{:-<55} {:-<10} {:-<10} {:-<10}", "", "", "", "");
+  for (int iSample = 0; iSample < TotalNumberOfSamples; ++iSample) {
+    SampleDir[iSample]->cd();
+    ExtractLLH(Data_histogram[iSample].get(), PostPred_mc[iSample].get(), PostPred_w[iSample].get(), SampleInfo[iSample].SamHandler);
+    PostPred_mc[iSample]->Write();
+  }
+}
+
 
 // *************************
 void PredictiveThrower::MakeChi2Plots(const std::vector<std::vector<double>>& Chi2_x,
@@ -1308,6 +1432,18 @@ void PredictiveThrower::StudyBetaParameters(TDirectory* PredictiveDir) {
   PredictiveDir->cd();
 }
 
+
+// ****************
+// Calculate the LLH for TH1, set the LLH to title of MCHist
+void PredictiveThrower::ExtractLLH(TH1*  DatHist, TH1* MCHist, TH1* W2Hist, const SampleHandlerBase* SampleHandler) const {
+// ****************
+  const double llh = CalcLLH(DatHist, MCHist, W2Hist, SampleHandler);
+  std::stringstream ss;
+  ss << "_2LLH=" << llh;
+  MCHist->SetTitle((std::string(MCHist->GetTitle())+ss.str()).c_str());
+  MACH3LOG_INFO("{:<55} {:<10.2f} {:<10.2f} {:<10.2f}", MCHist->GetName(), DatHist->Integral(), MCHist->Integral(), llh);
+}
+
 // ****************
 // Make the 1D Event Rate Hist
 void PredictiveThrower::MakeCutEventRate(TH1D *Histogram, const double DataRate) const {
@@ -1418,4 +1554,218 @@ void PredictiveThrower::RateAnalysis(const std::vector<std::vector<std::unique_p
     //Make fancy event rate histogram
     MakeCutEventRate(EventHist[SampleNum].get(), DataRates[SampleNum]);
   }
+}
+
+
+// ****************
+void PredictiveThrower::StudyInformationCriterion(M3::kInfCrit Criterion,
+                                                  const std::vector<std::unique_ptr<TH1>>& PostPred_mc,
+                                                  const std::vector<std::unique_ptr<TH1>>& PostPred_w) {
+// ****************
+  MACH3LOG_INFO("******************************");
+  switch(Criterion) {
+    case M3::kInfCrit::kBIC:
+      // Study Bayesian Information Criterion
+      StudyBIC(PostPred_mc, PostPred_w);
+      break;
+    case M3::kInfCrit::kDIC:
+      // Study Deviance Information Criterion
+      StudyDIC(PostPred_mc, PostPred_w);
+      break;
+    case M3::kInfCrit::kWAIC:
+      // Study Watanabe-Akaike information criterion (WAIC)
+      StudyWAIC();
+      break;
+    case M3::kInfCrit::kInfCrits:
+      MACH3LOG_ERROR("kInfCrits is not a valid kInfCrit!");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    default:
+      MACH3LOG_ERROR("UNKNOWN Information Criterion SPECIFIED!");
+      MACH3LOG_ERROR("You gave {}", static_cast<int>(Criterion));
+      throw MaCh3Exception(__FILE__ , __LINE__ );
+  }
+  MACH3LOG_INFO("******************************");
+}
+
+// ****************
+void PredictiveThrower::StudyBIC(const std::vector<std::unique_ptr<TH1>>& PostPred_mc,
+                                 const std::vector<std::unique_ptr<TH1>>& PostPred_w) {
+// ****************
+  //make fancy event rate histogram
+  double DataRate = 0.0;
+  double BinsRate = 0.0;
+  double TotalLLH = 0.0;
+  #ifdef MULTITHREAD
+  #pragma omp parallel for reduction(+:DataRate, BinsRate, TotalLLH)
+  #endif
+  for (int i = 0; i < TotalNumberOfSamples; ++i)
+  {
+    auto SampleHandler = SampleInfo[i].SamHandler;
+    auto* h = Data_Hist[i].get();
+    DataRate += h->Integral();
+    if (auto h1 = dynamic_cast<TH1D*>(h)) {
+      BinsRate += h1->GetNbinsX();
+    } else if (auto h2 = dynamic_cast<TH2D*>(h)) {
+      BinsRate += h2->GetNbinsX() * h2->GetNbinsY();
+    } else if (auto h2poly = dynamic_cast<TH2Poly*>(h)) {
+      BinsRate += h2poly->GetNumberOfBins();
+    } else {
+      MACH3LOG_WARN("Unknown histogram type in DataHist[{}]", i);
+    }
+    TotalLLH += CalcLLH(Data_Hist[i].get(), PostPred_mc[i].get(), PostPred_w[i].get(), SampleHandler);
+  }
+
+  const double EventRateBIC = GetBIC(TotalLLH, DataRate, NModelParams);
+  const double BinBasedBIC = GetBIC(TotalLLH, BinsRate, NModelParams);
+  MACH3LOG_INFO("Calculated Bayesian Information Criterion using global number of events: {:.2f}", EventRateBIC);
+  MACH3LOG_INFO("Calculated Bayesian Information Criterion using global number of bins: {:.2f}", BinBasedBIC);
+  MACH3LOG_INFO("Additional info: NModelParams: {}, DataRate: {:.2f}, BinsRate: {:.2f}", NModelParams, DataRate, BinsRate);
+}
+
+// ****************
+// Get the Deviance Information Criterion (DIC)
+void PredictiveThrower::StudyDIC(const std::vector<std::unique_ptr<TH1>>& PostPred_mc,
+                                 const std::vector<std::unique_ptr<TH1>>& PostPred_w) {
+// ****************
+  //The posterior mean of the deviance
+  double Dbar = 0.;
+  double TotalLLH = 0.0;
+
+  #ifdef MULTITHREAD
+  #pragma omp parallel for reduction(+:Dbar)
+  #endif
+  for (int iSample = 0; iSample < TotalNumberOfSamples; ++iSample)
+  {
+    auto SampleHandler = SampleInfo[iSample].SamHandler;
+    TotalLLH += CalcLLH(Data_Hist[iSample].get(), PostPred_mc[iSample].get(), PostPred_w[iSample].get(), SampleHandler);
+    double LLH_temp = 0.;
+    for (int iToy = 0; iToy < Ntoys; ++iToy)
+    {
+      LLH_temp += CalcLLH(Data_Hist[iSample].get(), MC_Hist_Toy[iSample][iToy].get(), W2_Hist_Toy[iSample][iToy].get(), SampleHandler);
+    }
+    Dbar += LLH_temp;
+  }
+  Dbar = Dbar / Ntoys;
+
+  // A point estimate of the deviance
+  const double Dhat = TotalLLH;
+
+  //Effective number of parameters
+  const double p_D = std::fabs(Dbar - Dhat);
+
+  //Actual test stat
+  const double DIC_stat = Dhat + 2 * p_D;
+  MACH3LOG_INFO("Effective number of parameters following DIC formalism is equal to: {:.2f}", p_D);
+  MACH3LOG_INFO("DIC test statistic = {:.2f}", DIC_stat);
+}
+
+
+// ****************
+// Helper: update WAIC accumulators for a single toy/bin
+void AccumulateWAICToy(const double neg_LLH_temp,
+                       double& mean_llh,
+                       double& mean_llh_squared,
+                       double& sum_exp_llh) {
+// ****************
+  // Negate the negative log-likelihood to get the actual log-likelihood
+  double LLH_temp = -neg_LLH_temp;
+
+  mean_llh += LLH_temp;
+  mean_llh_squared += LLH_temp * LLH_temp;
+  sum_exp_llh += std::exp(LLH_temp);
+}
+
+// ****************
+// Helper function to finalize WAIC contributions for one bin
+void AccumulateWAICBin(double& mean_llh, double& mean_llh_squared, double& sum_exp_llh,
+                       const unsigned int Ntoys, double& lppd, double& p_WAIC) {
+// ****************
+  // Compute the mean log-likelihood and the squared mean
+  mean_llh /= Ntoys;
+  mean_llh_squared /= Ntoys;
+  sum_exp_llh /= Ntoys;
+  sum_exp_llh = std::log(sum_exp_llh);
+
+  // Log pointwise predictive density based on Eq. 4 in Gelman2014
+  lppd += sum_exp_llh;
+
+  // Compute the effective number of parameters for WAIC
+  p_WAIC += mean_llh_squared - (mean_llh * mean_llh);
+}
+
+// ****************
+// Get the Watanabe-Akaike information criterion (WAIC)
+void PredictiveThrower::StudyWAIC() {
+// ****************
+  // log pointwise predictive density
+  double lppd = 0.;
+  // effective number of parameters
+  double p_WAIC = 0.;
+
+  #ifdef MULTITHREAD
+  #pragma omp parallel for reduction(+:lppd, p_WAIC)
+  #endif
+  for (int iSample = 0; iSample < TotalNumberOfSamples; ++iSample) {
+    auto SampleHandler = SampleInfo[iSample].SamHandler;
+    auto* hData = Data_Hist[iSample].get();
+
+    if (auto h2poly = dynamic_cast<TH2Poly*>(hData)) {
+      // TH2Poly: irregular bins, linear indexing
+      for (int i = 1; i <= h2poly->GetNumberOfBins(); ++i) {
+        const double data = Data_Hist[iSample]->GetBinContent(i);
+        double mean_llh = 0.;
+        double sum_exp_llh = 0;
+        double mean_llh_squared = 0.;
+
+        for (int iToy = 0; iToy < Ntoys; ++iToy) {
+          const double mc = MC_Hist_Toy[iSample][iToy]->GetBinContent(i);
+          const double w2 = W2_Hist_Toy[iSample][iToy]->GetBinContent(i);
+          // Get the -log-likelihood for this sample and bin
+          double neg_LLH_temp = SampleHandler->GetTestStatLLH(data, mc, w2);
+          AccumulateWAICToy(neg_LLH_temp, mean_llh, mean_llh_squared, sum_exp_llh);
+        }
+        AccumulateWAICBin(mean_llh, mean_llh_squared, sum_exp_llh, Ntoys, lppd, p_WAIC);
+      }
+    } else if (auto h2 = dynamic_cast<TH2D*>(hData)) {
+      // TH2D: nested loops over X and Y
+      for (int ix = 1; ix <= h2->GetNbinsX(); ++ix) {
+        for (int iy = 1; iy <= h2->GetNbinsY(); ++iy) {
+          const double data = hData->GetBinContent(ix, iy);
+          double mean_llh = 0.;
+          double mean_llh_squared = 0.;
+          double sum_exp_llh = 0.;
+          for (int iToy = 0; iToy < Ntoys; ++iToy) {
+            const double mc = MC_Hist_Toy[iSample][iToy]->GetBinContent(ix, iy);
+            const double w2 = W2_Hist_Toy[iSample][iToy]->GetBinContent(ix, iy);
+            // Get the -log-likelihood for this sample and bin
+            double neg_LLH_temp = SampleHandler->GetTestStatLLH(data, mc, w2);
+            AccumulateWAICToy(neg_LLH_temp, mean_llh, mean_llh_squared, sum_exp_llh);
+          }
+          AccumulateWAICBin(mean_llh, mean_llh_squared, sum_exp_llh, Ntoys, lppd, p_WAIC);
+        }
+      }
+    } else if (auto h1 = dynamic_cast<TH1D*>(hData)) {
+      // TH1D: 1D histogram
+      for (int iBin = 1; iBin <= h1->GetNbinsX(); ++iBin) {
+        const double data = hData->GetBinContent(iBin);
+        double mean_llh = 0.;
+        double mean_llh_squared = 0.;
+        double sum_exp_llh = 0.;
+        for (int iToy = 0; iToy < Ntoys; ++iToy) {
+          const double mc = MC_Hist_Toy[iSample][iToy]->GetBinContent(iBin);
+          const double w2 = W2_Hist_Toy[iSample][iToy]->GetBinContent(iBin);
+
+          // Get the -log-likelihood for this sample and bin
+          double neg_LLH_temp = SampleHandler->GetTestStatLLH(data, mc, w2);
+          AccumulateWAICToy(neg_LLH_temp, mean_llh, mean_llh_squared, sum_exp_llh);
+        }
+        AccumulateWAICBin(mean_llh, mean_llh_squared, sum_exp_llh, Ntoys, lppd, p_WAIC);
+      }
+    }
+  }
+
+  // Compute WAIC, see Eq. 13 in Gelman2014
+  double WAIC = -2 * (lppd - p_WAIC);
+  MACH3LOG_INFO("Effective number of parameters following WAIC formalism is equal to: {:.2f}", p_WAIC);
+  MACH3LOG_INFO("WAIC = {:.2f}", WAIC);
 }

@@ -546,4 +546,106 @@ inline void MakeMatrixPosDef(TMatrixDSym *cov) {
   gErrorIgnoreLevel = originalErrorWarning;
 }
 
+
+
+// ********************************************
+/// @brief Dump Matrix to ROOT file, useful when we need to pass matrix info to another fitting group
+/// @warning This is mostly used for backward compatibility
+inline void DumpParamHandlerToFile(const int _fNumPar,
+                                   const std::vector<double>& _fPreFitValue,
+                                   const std::vector<double>& _fError,
+                                   const std::vector<double>& _fLowBound,
+                                   const std::vector<double>& _fUpBound,
+                                   const std::vector<double>& _fIndivStepScale,
+                                   const std::vector<std::string>& _fFancyNames,
+                                   const std::vector<bool>& _fFlatPrior,
+                                   const std::vector<SplineParameter>& SplineParams,
+                                   TMatrixDSym* covMatrix,
+                                   TH2D* CorrMatrix,
+                                   const std::string& Name) {
+// ********************************************
+  TFile* outputFile = new TFile(Name.c_str(), "RECREATE");
+
+  TObjArray* param_names = new TObjArray();
+  TObjArray* spline_interpolation = new TObjArray();
+  TObjArray* spline_names = new TObjArray();
+
+  TVectorD* param_prior = new TVectorD(_fNumPar);
+  TVectorD* flat_prior = new TVectorD(_fNumPar);
+  TVectorD* stepscale = new TVectorD(_fNumPar);
+  TVectorD* param_lb = new TVectorD(_fNumPar);
+  TVectorD* param_ub = new TVectorD(_fNumPar);
+
+  TVectorD* param_knot_weight_lb = new TVectorD(_fNumPar);
+  TVectorD* param_knot_weight_ub = new TVectorD(_fNumPar);
+  TVectorD* error = new TVectorD(_fNumPar);
+
+  for(int i = 0; i < _fNumPar; ++i)
+  {
+    TObjString* nameObj = new TObjString(_fFancyNames[i].c_str());
+    param_names->AddLast(nameObj);
+
+    TObjString* splineType = new TObjString("TSpline3");
+    spline_interpolation->AddLast(splineType);
+
+    TObjString* splineName = new TObjString("");
+    spline_names->AddLast(splineName);
+
+    (*param_prior)[i] = _fPreFitValue[i];
+    (*flat_prior)[i] = _fFlatPrior[i];
+    (*stepscale)[i] = _fIndivStepScale[i];
+    (*error)[i] = _fError[i];
+
+    (*param_lb)[i] = _fLowBound[i];
+    (*param_ub)[i] = _fUpBound[i];
+
+    //Default values
+    (*param_knot_weight_lb)[i] = -9999;
+    (*param_knot_weight_ub)[i] = +9999;
+  }
+
+  for (size_t SplineIndex = 0; SplineIndex < SplineParams.size(); SplineIndex++ ) {
+    auto SystIndex = SplineParams[SplineIndex].index;
+
+    (*param_knot_weight_lb)[SystIndex] = SplineParams.at(SplineIndex)._SplineKnotLowBound;
+    (*param_knot_weight_ub)[SystIndex] = SplineParams.at(SplineIndex)._SplineKnotUpBound;
+
+    TObjString* splineType = new TObjString(SplineInterpolation_ToString(SplineParams.at(SplineIndex)._SplineInterpolationType).c_str());
+    spline_interpolation->AddAt(splineType, SystIndex);
+
+    TObjString* splineName = new TObjString(SplineParams[SplineIndex]._fSplineNames.c_str());
+    spline_names->AddAt(splineName, SystIndex);
+  }
+  param_names->Write("xsec_param_names", TObject::kSingleKey);
+  delete param_names;
+  spline_interpolation->Write("xsec_spline_interpolation", TObject::kSingleKey);
+  delete spline_interpolation;
+  spline_names->Write("xsec_spline_names", TObject::kSingleKey);
+  delete spline_names;
+
+  param_prior->Write("xsec_param_prior");
+  delete param_prior;
+  flat_prior->Write("xsec_flat_prior");
+  delete flat_prior;
+  stepscale->Write("xsec_stepscale");
+  delete stepscale;
+  param_lb->Write("xsec_param_lb");
+  delete param_lb;
+  param_ub->Write("xsec_param_ub");
+  delete param_ub;
+
+  param_knot_weight_lb->Write("xsec_param_knot_weight_lb");
+  delete param_knot_weight_lb;
+  param_knot_weight_ub->Write("xsec_param_knot_weight_ub");
+  delete param_knot_weight_ub;
+  error->Write("xsec_error");
+  delete error;
+
+  covMatrix->Write("xsec_cov");
+  CorrMatrix->Write("hcov");
+
+  outputFile->Close();
+  delete outputFile;
+}
+
 } // end M3 namespace

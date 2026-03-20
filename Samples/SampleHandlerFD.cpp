@@ -16,9 +16,8 @@ SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGen
   MACH3LOG_INFO("Creating SampleHandlerFD object");
 
   //ETA - safety feature so you can't pass a NULL xsec_cov
-  if(!xsec_cov){
-    MACH3LOG_ERROR("You've passed me a nullptr to a SystematicHandlerGeneric... I need this to setup splines!");
-    throw MaCh3Exception(__FILE__, __LINE__);
+  if(!xsec_cov) {
+    MACH3LOG_WARN("You've passed me a nullptr ParameterHandler so I will not use any xsec parameters");
   }
   ParHandler = xsec_cov;
 
@@ -27,6 +26,11 @@ SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGen
   if (OscillatorObj_ != nullptr) {
     MACH3LOG_WARN("You have passed an Oscillator object through the constructor of a SampleHandlerFD object - this will be used for all oscillation channels");
     Oscillator = OscillatorObj_;
+    if(!ParHandler) {
+      MACH3LOG_CRITICAL("You've passed me a nullptr to ParamHandler while non null to Oscillator");
+      MACH3LOG_CRITICAL("Make up you mind");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
   }
 
   KinematicParameters = nullptr;
@@ -34,9 +38,6 @@ SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGen
   KinematicVectors = nullptr;
   ReversedKinematicVectors = nullptr;
 
-  SampleHandlerFD_array = nullptr;
-  SampleHandlerFD_data = nullptr;
-  SampleHandlerFD_array_w2 = nullptr;
   SampleHandlerName = "";
   SampleManager = std::make_unique<Manager>(ConfigFileName.c_str());
   Binning = std::make_unique<BinningHandler>();
@@ -47,11 +48,6 @@ SampleHandlerFD::SampleHandlerFD(std::string ConfigFileName, ParameterHandlerGen
 
 SampleHandlerFD::~SampleHandlerFD() {
   MACH3LOG_DEBUG("I'm deleting SampleHandlerFD");
-  
-  if (SampleHandlerFD_array != nullptr) delete[] SampleHandlerFD_array;
-  if (SampleHandlerFD_array_w2 != nullptr) delete[] SampleHandlerFD_array_w2;
-  //ETA - there is a chance that you haven't added any data...
-  if (SampleHandlerFD_data != nullptr) delete[] SampleHandlerFD_data;
 
   if(THStackLeg != nullptr) delete THStackLeg;
 }
@@ -133,14 +129,23 @@ void SampleHandlerFD::LoadSingleSample(const int iSample, const YAML::Node& Samp
     OscChannelInfo OscInfo;
     OscInfo.flavourName       = osc_channel["Name"].as<std::string>();
     OscInfo.flavourName_Latex = osc_channel["LatexName"].as<std::string>();
-    OscInfo.InitPDG           = static_cast<NuPDG>(osc_channel["nutype"].as<int>());
-    OscInfo.FinalPDG          = static_cast<NuPDG>(osc_channel["oscnutype"].as<int>());
+    OscInfo.InitPDG           = GetFromManager(osc_channel["nutype"],0,__FILE__,__LINE__);
+    OscInfo.FinalPDG          = GetFromManager(osc_channel["oscnutype"],0,__FILE__,__LINE__);
     OscInfo.ChannelIndex      = OscChannelCounter;
+
+    for (const auto& Existing : SingleSample.OscChannels) {
+      if (Existing.InitPDG == OscInfo.InitPDG && Existing.FinalPDG == OscInfo.FinalPDG) {
+        MACH3LOG_ERROR("Duplicate oscillation channel detected! InitPDG = {}, FinalPDG = {}"
+                       "already defined in channel {} for sample {}",
+                       OscInfo.InitPDG, OscInfo.FinalPDG, Existing.ChannelIndex, SingleSample.SampleTitle);
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+    }
 
     SingleSample.OscChannels.push_back(std::move(OscInfo));
 
-    FileToInitPDGMap[MTupleFileName] = static_cast<NuPDG>(osc_channel["nutype"].as<int>());
-    FileToFinalPDGMap[MTupleFileName] = static_cast<NuPDG>(osc_channel["oscnutype"].as<int>());
+    FileToInitPDGMap[MTupleFileName] = NuPDG(OscInfo.InitPDG);
+    FileToFinalPDGMap[MTupleFileName] = NuPDG(OscInfo.FinalPDG);
 
     SingleSample.mc_files.push_back(MTupleFileName);
     SingleSample.spline_files.push_back(splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);
@@ -160,7 +165,9 @@ void SampleHandlerFD::LoadSingleSample(const int iSample, const YAML::Node& Samp
   SampleDetails[iSample] = std::move(SingleSample);
 }
 
+// ************************************************
 void SampleHandlerFD::Initialise() {
+// ************************************************
   TStopwatch clock;
   clock.Start();
 
@@ -176,36 +183,7 @@ void SampleHandlerFD::Initialise() {
 
   MACH3LOG_INFO("=============================================");
   MACH3LOG_INFO("Total number of events is: {}", GetNEvents());
-
-  auto OscParams = ParHandler->GetOscParsFromSampleName(SampleHandlerName);
-  if (OscParams.size() > 0) {
-    MACH3LOG_INFO("Setting up NuOscillator..");
-    if (Oscillator != nullptr) {
-      MACH3LOG_INFO("You have passed an OscillatorBase object through the constructor of a SampleHandlerFD object - this will be used for all oscillation channels");
-      if(Oscillator->isEqualBinningPerOscChannel() != true) {
-        MACH3LOG_ERROR("Trying to run shared NuOscillator without EqualBinningPerOscChannel, this will not work");
-        throw MaCh3Exception(__FILE__, __LINE__);
-      }
-
-      if(OscParams.size() != Oscillator->GetOscParamsSize()){
-        MACH3LOG_ERROR("SampleHandler {} has {} osc params, while shared NuOsc has {} osc params", GetName(),
-                       OscParams.size(), Oscillator->GetOscParamsSize());
-        MACH3LOG_ERROR("This indicate misconfiguration in your Osc yaml");
-        throw MaCh3Exception(__FILE__, __LINE__);
-      }
-    } else {
-      InitialiseNuOscillatorObjects();
-    }
-    SetupNuOscillatorPointers();
-  } else{
-    MACH3LOG_WARN("Didn't find any oscillation params, thus will not enable oscillations");
-    if(CheckNodeExists(SampleManager->raw(), "NuOsc")){
-      MACH3LOG_ERROR("However config for SampleHandler {} has 'NuOsc' field", GetName());
-      MACH3LOG_ERROR("This may indicate misconfiguration");
-      MACH3LOG_ERROR("Either remove 'NuOsc' field from SampleHandler config or check your model.yaml and include oscillation for sample");
-      throw MaCh3Exception(__FILE__, __LINE__);
-    }
-  }
+  SetupOscParameters();
   MACH3LOG_INFO("Setting up Sample Binning..");
   SetBinning();
   MACH3LOG_INFO("Setting up Splines..");
@@ -261,7 +239,7 @@ void SampleHandlerFD::SetupKinematicMap() {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
 // ************************************************
-void SampleHandlerFD::FillHist(const int Sample, TH1* Hist, double* Array) {
+void SampleHandlerFD::FillHist(const int Sample, TH1* Hist, std::vector<double> &Array) {
 // ************************************************
   int Dimension = GetNDim(Sample);
   // DB Commented out by default - Code heading towards GetLikelihood using arrays instead of root objects
@@ -337,9 +315,9 @@ bool SampleHandlerFD::IsSubEventSelected(const std::vector<KinematicCut> &SubEve
 // Reweight function
 void SampleHandlerFD::Reweight() {
 //************************************************
-  //KS: Reset the histograms before reweight 
+  //KS: Reset the histograms before reweight
   ResetHistograms();
-  
+
   //You only need to do these things if Oscillator has been initialised
   //if not then you're not considering oscillations
   if (Oscillator) Oscillator->Evaluate();
@@ -375,7 +353,7 @@ void SampleHandlerFD::FillArray() {
 //************************************************
   //DB Reset which cuts to apply
   Selection = StoredSelection;
-  
+
   for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
     ApplyShifts(iEvent);
     const EventInfo* _restrict_ MCEvent = &MCSamples[iEvent];
@@ -407,7 +385,7 @@ void SampleHandlerFD::FillArray() {
 #ifdef MULTITHREAD
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Walloca"
-// ************************************************ 
+// ************************************************
 /// Multithreaded version of fillArray @see fillArray()
 void SampleHandlerFD::FillArray_MP() {
 // ************************************************
@@ -430,7 +408,11 @@ void SampleHandlerFD::FillArray_MP() {
   // We will hit <0.1 s/step eventually! :D
   const auto TotalBins = Binning->GetNBins();
   const unsigned int NumberOfEvents = GetNEvents();
-  #pragma omp parallel for reduction(+:SampleHandlerFD_array[:TotalBins], SampleHandlerFD_array_w2[:TotalBins])
+
+  double* _restrict_ MC_Array_for_reduction = SampleHandlerFD_array.data();
+  double* _restrict_ W2_array_for_reduction = SampleHandlerFD_array_w2.data();
+
+  #pragma omp parallel for reduction(+:MC_Array_for_reduction[:TotalBins], W2_array_for_reduction[:TotalBins])
   for (unsigned int iEvent = 0; iEvent < NumberOfEvents; ++iEvent) {
     //ETA - generic functions to apply shifts to kinematic variables
     // Apply this before IsEventSelected is called.
@@ -459,8 +441,8 @@ void SampleHandlerFD::FillArray_MP() {
     //Might save us an extra if call?
     //DB Fill relevant part of thread array
     if (GlobalBin > M3::UnderOverFlowBin) {
-      SampleHandlerFD_array[GlobalBin] += totalweight;
-      if (FirstTimeW2) SampleHandlerFD_array_w2[GlobalBin] += totalweight*totalweight;
+      MC_Array_for_reduction[GlobalBin] += totalweight;
+      if (FirstTimeW2) W2_array_for_reduction[GlobalBin] += totalweight*totalweight;
     }
   }
 }
@@ -470,13 +452,13 @@ void SampleHandlerFD::FillArray_MP() {
 // **************************************************
 // Helper function to reset the data and MC histograms
 void SampleHandlerFD::ResetHistograms() {
-// **************************************************  
+// **************************************************
   // DB Reset values stored in PDF array to 0.
   // Don't openMP this; no significant gain
   const int nBins = Binning->GetNBins();
-  std::fill(SampleHandlerFD_array, SampleHandlerFD_array + nBins, 0.0);
+  std::fill_n(SampleHandlerFD_array.begin(), nBins, 0.0);
   if (FirstTimeW2) {
-    std::fill(SampleHandlerFD_array_w2, SampleHandlerFD_array_w2 + nBins, 0.0);
+    std::fill_n(SampleHandlerFD_array_w2.begin(), nBins, 0.0);
   }
 } // end function
 
@@ -502,12 +484,13 @@ void SampleHandlerFD::RegisterIndividualFunctionalParameter(const std::string& f
 // **************************************************
 void SampleHandlerFD::SetupFunctionalParameters() {
 // **************************************************
+  funcParsGrid.resize(GetNEvents());
+  if(ParHandler == nullptr) return;
   funcParsVec = ParHandler->GetFunctionalParametersFromSampleName(SampleHandlerName);
-  // RegisterFunctionalParameters is implemented in experiment-specific code, 
+  // RegisterFunctionalParameters is implemented in experiment-specific code,
   // which calls RegisterIndividualFuncPar to populate funcParsNamesMap, funcParsNamesVec, and funcParsFuncMap
   RegisterFunctionalParameters();
   funcParsMap.resize(funcParsNamesMap.size());
-  funcParsGrid.resize(GetNEvents());
 
   // For every functional parameter in XsecCov that matches the name in funcParsNames, add it to the map
   for (FunctionalParameter& fp : funcParsVec) {
@@ -576,6 +559,8 @@ void SampleHandlerFD::ApplyShifts(const int iEvent) {
     const auto* _restrict_ fp = shifts[iShift];
     (*fp->funcPtr)(fp->valuePtr, iEvent);
   }
+
+  FinaliseShifts(iEvent);
 }
 
 // ***************************************************************************
@@ -609,9 +594,49 @@ M3::float_t SampleHandlerFD::CalcWeightTotal(const EventInfo* _restrict_ MCEvent
 }
 
 // ***************************************************************************
+// Setup the osc parameters
+void SampleHandlerFD::SetupOscParameters() {
+// ***************************************************************************
+  // KS: Only make sense to setup osc if you have ParHandler
+  if(ParHandler == nullptr ) return;
+
+  auto OscParams = ParHandler->GetOscParsFromSampleName(SampleHandlerName);
+  if (OscParams.size() > 0) {
+    MACH3LOG_INFO("Setting up NuOscillator..");
+    if (Oscillator != nullptr) {
+      MACH3LOG_INFO("You have passed an OscillatorBase object through the constructor of a SampleHandlerFD object - this will be used for all oscillation channels");
+      if(Oscillator->isEqualBinningPerOscChannel() != true) {
+        MACH3LOG_ERROR("Trying to run shared NuOscillator without EqualBinningPerOscChannel, this will not work");
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+
+      if(OscParams.size() != Oscillator->GetOscParamsSize()){
+        MACH3LOG_ERROR("SampleHandler {} has {} osc params, while shared NuOsc has {} osc params", GetName(),
+                        OscParams.size(), Oscillator->GetOscParamsSize());
+        MACH3LOG_ERROR("This indicate misconfiguration in your Osc yaml");
+        throw MaCh3Exception(__FILE__, __LINE__);
+      }
+    } else {
+      InitialiseNuOscillatorObjects();
+    }
+    SetupNuOscillatorPointers();
+  } else{
+    MACH3LOG_WARN("Didn't find any oscillation params, thus will not enable oscillations");
+    if(CheckNodeExists(SampleManager->raw(), "NuOsc")){
+      MACH3LOG_ERROR("However config for SampleHandler {} has 'NuOsc' field", GetName());
+      MACH3LOG_ERROR("This may indicate misconfiguration");
+      MACH3LOG_ERROR("Either remove 'NuOsc' field from SampleHandler config or check your model.yaml and include oscillation for sample");
+      throw MaCh3Exception(__FILE__, __LINE__);
+    }
+  }
+}
+
+
+// ***************************************************************************
 // Setup the norm parameters
 void SampleHandlerFD::SetupNormParameters() {
 // ***************************************************************************
+  if(ParHandler == nullptr) return;
   std::vector< std::vector< int > > norms_bins(GetNEvents());
 
   std::vector<NormParameter> norm_parameters = ParHandler->GetNormParsFromSampleName(GetName());
@@ -723,15 +748,9 @@ void SampleHandlerFD::CalcNormsBins(std::vector<NormParameter>& norm_parameters,
 // ************************************************
 void SampleHandlerFD::SetupReweightArrays() {
 // ************************************************
-  SampleHandlerFD_array = new double[Binning->GetNBins()];
-  SampleHandlerFD_array_w2 = new double[Binning->GetNBins()];
-  SampleHandlerFD_data = new double[Binning->GetNBins()];
-
-  for (int i = 0; i < Binning->GetNBins(); ++i) {
-    SampleHandlerFD_array[i] = 0.0;
-    SampleHandlerFD_array_w2[i] = 0.0;
-    SampleHandlerFD_data[i] = 0.0;
-  }
+  SampleHandlerFD_array = std::vector<double>(Binning->GetNBins(),0);
+  SampleHandlerFD_array_w2 = std::vector<double>(Binning->GetNBins(),0);
+  SampleHandlerFD_data = std::vector<double>(Binning->GetNBins(),0);
 }
 
 // ************************************************
@@ -941,7 +960,7 @@ void SampleHandlerFD::AddData(const int Sample, TH1* Data) {
   delete SampleDetails[Sample].DataHist;
   SampleDetails[Sample].DataHist = static_cast<TH1*>(Data->Clone());
 
-  if(SampleHandlerFD_data == nullptr) {
+  if(!SampleHandlerFD_data.size()) {
     MACH3LOG_ERROR("SampleHandlerFD_data haven't been initialised yet");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
@@ -1019,9 +1038,7 @@ void SampleHandlerFD::AddData(const int Sample, const std::vector<double>& Data_
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 
-  for (int idx = Start; idx < End; ++idx) {
-    SampleHandlerFD_data[idx] = Data_Array[idx - Start];
-  }
+  std::copy_n(Data_Array.begin(), End-Start, SampleHandlerFD_data.begin() + Start);
 
   FillHist(Sample, SampleDetails[Sample].DataHist, SampleHandlerFD_data);
 }
@@ -1176,46 +1193,69 @@ M3::float_t SampleHandlerFD::GetEventWeight(const int iEntry) {
 }
 
 // ************************************************
+std::vector< std::vector<int> > SampleHandlerFD::GetSplineBins(int Event, BinnedSplineHandler* BinnedSpline, bool& ThrowCrititcal) const {
+// ************************************************
+  const int SampleIndex = MCSamples[Event].NominalSample;
+  const auto SampleTitle = GetSampleTitle(SampleIndex);
+  bool NoOscChannels = false;
+  if(Oscillator == nullptr && GetNOscChannels(SampleIndex) == 1) {
+    MACH3LOG_DEBUG("Assuming there are no osc channels in {}", __func__);
+    NoOscChannels = true;
+  }
+  const int OscIndex = NoOscChannels ? 0 : GetOscChannel(SampleDetails[SampleIndex].OscChannels,
+                                                         (*MCSamples[Event].nupdgUnosc), (*MCSamples[Event].nupdg));
+  const int Mode = int(*(MCSamples[Event].mode));
+  const double Etrue = *(MCSamples[Event].rw_etru);
+  std::vector< std::vector<int> > EventSplines;
+  switch(GetNDim(SampleIndex)) {
+    case 1:
+      EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCSamples[Event].KinVar[0]), 0.);
+      break;
+    case 2:
+      EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCSamples[Event].KinVar[0]), *(MCSamples[Event].KinVar[1]));
+      break;
+    default:
+      if(ThrowCrititcal) {
+        MACH3LOG_CRITICAL("MaCh3 doesn't support binned splines for more than 2D while you use {}", GetNDim(SampleIndex));
+        MACH3LOG_CRITICAL("Will use 2D like approach");
+        ThrowCrititcal = false;
+      }
+      EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCSamples[Event].KinVar[0]), *(MCSamples[Event].KinVar[1]));
+      break;
+  }
+  return EventSplines;
+}
+
+// ************************************************
 void SampleHandlerFD::SetSplinePointers() {
 // ************************************************
   //Now loop over events and get the spline bin for each event
   if (auto BinnedSpline = dynamic_cast<BinnedSplineHandler*>(SplineHandler.get())) {
     bool ThrowCrititcal = true;
+    auto SplineParsVec = ParHandler->GetSplineParsFromSampleName(SampleHandlerName);
     for (unsigned int j = 0; j < GetNEvents(); ++j) {
-      const int SampleIndex = MCSamples[j].NominalSample;
-      const auto SampleTitle = GetSampleTitle(SampleIndex);
-      const int OscIndex = GetOscChannel(SampleDetails[SampleIndex].OscChannels, (*MCSamples[j].nupdgUnosc), (*MCSamples[j].nupdg));
-      const int Mode = int(*(MCSamples[j].mode));
-      const double Etrue = *(MCSamples[j].rw_etru);
-      std::vector< std::vector<int> > EventSplines;
-      switch(GetNDim(SampleIndex)) {
-        case 1:
-          EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCSamples[j].KinVar[0]), 0.);
-          break;
-        case 2:
-          EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCSamples[j].KinVar[0]), *(MCSamples[j].KinVar[1]));
-          break;
-        default:
-          if(ThrowCrititcal) {
-            MACH3LOG_CRITICAL("MaCh3 doesn't support binned splines for more than 2D while you use {}", GetNDim(SampleIndex));
-            MACH3LOG_CRITICAL("Will use 2D like approach");
-            ThrowCrititcal = false;
-          }
-          EventSplines = BinnedSpline->GetEventSplines(SampleTitle, OscIndex, Mode, Etrue, *(MCSamples[j].KinVar[0]), *(MCSamples[j].KinVar[1]));
-          break;
-      }
+      auto EventSplines = GetSplineBins(j, BinnedSpline, ThrowCrititcal);
       const int NSplines = static_cast<int>(EventSplines.size());
       if(NSplines == 0) continue;
-      const int PointersBefore = static_cast<int>(MCSamples[j].total_weight_pointers.size());
-      MCSamples[j].total_weight_pointers.resize(PointersBefore + NSplines);
+      auto& w_pointers = MCSamples[j].total_weight_pointers;
+      w_pointers.reserve(w_pointers.size() + NSplines);
 
       for(int spline = 0; spline < NSplines; spline++) {
+        int SystIndex = EventSplines[spline][2];
+
+        bool IsSelected = PassesSelection(SplineParsVec[SystIndex], j);
+        // Need to then break the event loop
+        if(!IsSelected){
+          MACH3LOG_TRACE("Event {}, missed Kinematic var check for dial {}", j, SplineParsVec[SystIndex].name);
+          continue;
+        }
         //Event Splines indexed as: sample name, oscillation channel, syst, mode, etrue, var1, var2 (var2 is a dummy 0 for 1D splines)
-        MCSamples[j].total_weight_pointers[PointersBefore+spline] = BinnedSpline->retPointer(EventSplines[spline][0], EventSplines[spline][1],
-                                                                                              EventSplines[spline][2], EventSplines[spline][3],
-                                                                                              EventSplines[spline][4], EventSplines[spline][5],
-                                                                                              EventSplines[spline][6]);
+        w_pointers.push_back(BinnedSpline->retPointer(EventSplines[spline][0], EventSplines[spline][1],
+                                                      EventSplines[spline][2], EventSplines[spline][3],
+                                                      EventSplines[spline][4], EventSplines[spline][5],
+                                                      EventSplines[spline][6]));
       } // end loop over splines
+      w_pointers.shrink_to_fit();
     } // end loop over events
   } else if (auto UnbinnedSpline = dynamic_cast<SMonolith*>(SplineHandler.get())) {
     /// @todo Fix this mess :(
@@ -1246,9 +1286,9 @@ double SampleHandlerFD::GetSampleLikelihood(const int isample) const {
   #endif
   for (int idx = Start; idx < End; ++idx)
   {
-    const double DataVal = SampleHandlerFD_data[idx];
-    const double MCPred = SampleHandlerFD_array[idx];
-    const double w2 = SampleHandlerFD_array_w2[idx];
+    double const &DataVal = SampleHandlerFD_data[idx];
+    double const &MCPred = SampleHandlerFD_array[idx];
+    double const &w2 = SampleHandlerFD_array_w2[idx];
 
     //KS: Calculate likelihood using Barlow-Beeston Poisson or even IceCube
     negLogL += GetTestStatLLH(DataVal, MCPred, w2);
@@ -1265,9 +1305,9 @@ double SampleHandlerFD::GetLikelihood() const {
   #endif
   for (int idx = 0; idx < Binning->GetNBins(); ++idx)
   {
-    const double DataVal = SampleHandlerFD_data[idx];
-    const double MCPred = SampleHandlerFD_array[idx];
-    const double w2 = SampleHandlerFD_array_w2[idx];
+    double const &DataVal = SampleHandlerFD_data[idx];
+    double const &MCPred = SampleHandlerFD_array[idx];
+    double const &w2 = SampleHandlerFD_array_w2[idx];
 
     //KS: Calculate likelihood using Barlow-Beeston Poisson or even IceCube
     negLogL += GetTestStatLLH(DataVal, MCPred, w2);
@@ -1525,13 +1565,13 @@ void SampleHandlerFD::Fill2DSubEventHist(const int iSample, TH2D* _h2DVar,
 // ************************************************
 
   bool IsSubEventVarX = IsSubEventVarString(ProjectionVar_StrX);
-  bool IsSubEventVarY = IsSubEventVarString(ProjectionVar_StrY);   
+  bool IsSubEventVarY = IsSubEventVarString(ProjectionVar_StrY);
 
   int ProjectionVar_IntX, ProjectionVar_IntY;
   if (IsSubEventVarX) ProjectionVar_IntX = ReturnKinematicVectorFromString(ProjectionVar_StrX);
   else ProjectionVar_IntX = ReturnKinematicParameterFromString(ProjectionVar_StrX);
   if (IsSubEventVarY) ProjectionVar_IntY = ReturnKinematicVectorFromString(ProjectionVar_StrY);
-  else ProjectionVar_IntY = ReturnKinematicParameterFromString(ProjectionVar_StrY); 
+  else ProjectionVar_IntY = ReturnKinematicParameterFromString(ProjectionVar_StrY);
 
   //JM Loop over all events
   for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
@@ -1572,7 +1612,7 @@ void SampleHandlerFD::Fill2DSubEventHist(const int iSample, TH2D* _h2DVar,
           if (IsSubEventVarY) VarY = VecY[iSubEvent];
           _h2DVar->Fill(VarX,VarY,Weight);
         }
-      } 
+      }
     }
   }
 }
@@ -2004,7 +2044,7 @@ const double* SampleHandlerFD::GetPointerToOscChannel(const int iEvent) const {
 // Helper function to print rates for the samples with LLH
 void SampleHandlerFD::PrintRates(const bool DataOnly) {
 // ***************************************************************************
-  if (SampleHandlerFD_data == nullptr) {
+  if (!SampleHandlerFD_data.size()) {
     MACH3LOG_ERROR("Data sample is empty!");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
@@ -2064,12 +2104,12 @@ std::string SampleHandlerFD::GetKinVarName(const int iSample, const int Dimensio
 }
 
 // ***************************************************************************
-std::vector<double> SampleHandlerFD::GetArrayForSample(const int Sample, const double* array) const {
+std::vector<double> SampleHandlerFD::GetArrayForSample(const int Sample, std::vector<double> const & array) const {
 // ***************************************************************************
   const int Start = Binning->GetSampleStartBin(Sample);
   const int End   = Binning->GetSampleEndBin(Sample);
 
-  return std::vector<double>(array + Start, array + End);
+  return std::vector<double>(array.begin() + Start, array.begin() + End);
 }
 
 // ***************************************************************************
