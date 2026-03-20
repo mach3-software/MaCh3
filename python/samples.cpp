@@ -347,6 +347,17 @@ public:
         );
     }
     
+    const double *GetPointerToKinematicParameter(double, int) override {
+        PYBIND11_OVERRIDE_PURE_NAME(
+            const double *,                           /* Return type */
+            SampleHandlerFD,                          /* Parent class */
+            "get_event_kinematic_value_reference",    /* python name*/
+            GetPointerToKinematicParameter,           /* Name of function in C++ (must match Python name) */
+            py::arg("variable"),                      /* Argument(s) */
+            py::arg("event")                          /* Argument(s) */
+        );
+    }
+
     void RegisterFunctionalParameters() override {
         PYBIND11_OVERRIDE_PURE_NAME(
             void,
