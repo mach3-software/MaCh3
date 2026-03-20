@@ -53,12 +53,13 @@ struct ReweightConfig {
 };
 
 /// @brief Main executable responsible for reweighting MCMC chains
-/// @param inputFile MCMC Chain file path
 /// @param configFile Config file with reweighting settings. Example in MaCh3Tutorial/TutorialConfigs/ReweightingConfigs/
+/// @param inputFile MCMC Chain file path
 /// @author David Riley
 /// @author Evan Goodman
-void ReweightMCMC(const std::string& inputFile, const std::string& configFile);
 
+void ReweightMCMC(const std::string& configFile, const std::string& inputFile);
+void ReweightMCMC(const std::string& configFile, const std::string& inputFile, bool reducedChain); // overload to handle temporary fix for reduced chains
 /// @todo add a generic 2D reweight that is not dm32 and theta13 specific DWR
 
 /// @brief Function to interpolate 2D graph for Normal Ordering
@@ -89,7 +90,28 @@ int main(int argc, char *argv[]) {
     std::string configFile = argv[1]; 
     std::string inputFile = argv[2];
     
-    ReweightMCMC(configFile, inputFile);
+    // Check input for posteriors vs osc_posteriors, fail gracefully if osc_posteriors since ProcessMCMC doesn't support reduced chain naming conventions
+    auto tempFile = std::unique_ptr<TFile>(TFile::Open(inputFile.c_str(), "READ"));
+    // if (tempFile->Get<TTree>("osc_posteriors")) {
+    //     MACH3LOG_ERROR("Sorry, it seems like your posteriors have been reduced (TTree is named osc_posteriors) please use unreduced posterior files as MCMCProcessor can't handle the reduced naming conventions");
+    //     throw MaCh3Exception(__FILE__, __LINE__);
+    // } else if (!tempFile->Get<TTree>("posteriors")) {
+    //     MACH3LOG_ERROR("Cannot find 'posteriors' tree in input file, found the following trees instead:");
+    //     tempFile->ls();
+    //     throw MaCh3Exception(__FILE__, __LINE__);
+    // }
+
+    // experimentally, accept osc_posteriors and try work around this for the purpose of reweighting OAR11B
+    // short term fix, maybe there is a more elegant way to handle this in the long term, but for now just check if we have osc_posteriors and if so pass a flag to ReweightMCMC to handle this case in an overload
+    if (tempFile->Get<TTree>("posteriors")) {
+        ReweightMCMC(configFile, inputFile);
+    } else if (tempFile->Get<TTree>("osc_posteriors")) {
+        ReweightMCMC(configFile, inputFile, true);
+    } else {
+        MACH3LOG_ERROR("Cannot find 'posteriors' or 'osc_posteriors' tree in input file, found the following trees instead:");
+        tempFile->ls();
+        throw MaCh3Exception(__FILE__, __LINE__);
+    }
     
     return 0;
 }
@@ -287,17 +309,6 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile){
     std::vector<ReweightConfig> reweightConfigs;
    
     LoadReweightingSettings(reweightConfigs, reweight_settings);
-
-    // Check input for posteriors vs osc_posteriors, fail gracefully if osc_posteriors since ProcessMCMC doesn't support reduced chain naming conventions
-    auto tempFile = std::unique_ptr<TFile>(TFile::Open(inputFile.c_str(), "READ"));
-    if (tempFile->Get<TTree>("osc_posteriors")) {
-        MACH3LOG_ERROR("Sorry, it seems like your posteriors have been reduced (TTree is named osc_posteriors) please use unreduced posterior files as MCMCProcessor can't handle the reduced naming conventions");
-        throw MaCh3Exception(__FILE__, __LINE__);
-    } else if (!tempFile->Get<TTree>("posteriors")) {
-        MACH3LOG_ERROR("Cannot find 'posteriors' tree in input file, found the following trees instead:");
-        tempFile->ls();
-        throw MaCh3Exception(__FILE__, __LINE__);
-    }
 
     // Create MCMCProcessor to get parameter information 
     auto processor = std::make_unique<MCMCProcessor>(inputFile);
@@ -510,6 +521,311 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile){
     reweightMacro.AddLine(ss.str().c_str());
     reweightMacro.Write();
 
+    // finally give final diagnostics to reader, and handle file cleanup if MCMCProcessor already did the reweighting 
+    if (processMCMCreweighted){
+        MACH3LOG_INFO("MCMCProcessor reweighting applied, Final reweighted file is: {}_reweighted.root", inputFile.substr(0, inputFile.find_last_of('.')));
+        // delete the file we just created since MCMCProcessor already did the reweighting and saved it to a file
+        outTree.reset(); // Release TTree before closing TFile
+        outFile->Close();
+        outFile.reset(); 
+        
+        if (std::remove(outputFile.c_str()) != 0) {
+            MACH3LOG_ERROR("Error deleting temporary file: {}", outputFile);
+        } else {
+            MACH3LOG_INFO("Deleted temporary file: {}", outputFile);
+        }
+    } else {
+        MACH3LOG_INFO("Reweighting completed successfully!");
+        MACH3LOG_INFO("Final reweighted file is: {}", outputFile);
+    }
+}
+
+void ReweightMCMC(const std::string& configFile, const std::string& inputFile, bool reducedChain){
+    MACH3LOG_INFO("File for reweighting: {} with config {}", inputFile, configFile);
+    if (!reducedChain) {
+        ReweightMCMC(configFile, inputFile);
+        return;
+    }
+    
+    // Load configuration
+    YAML::Node reweight_yaml = M3OpenConfig(configFile);
+    YAML::Node reweight_settings = reweight_yaml["ReweightMCMC"];
+
+    // Parse all reweight configurations first
+    std::vector<ReweightConfig> reweightConfigs;
+   
+    LoadReweightingSettings(reweightConfigs, reweight_settings);
+
+    // Create MCMCProcessor to get parameter information 
+    // auto processor = std::make_unique<MCMCProcessor>(inputFile);
+    // processor->Initialise();
+
+    // since we don't have access to MCMCProcessor for reduced chains, we will check the tree directly for params
+    // Open input file and get tree
+    auto inFile = std::unique_ptr<TFile>(TFile::Open(inputFile.c_str(), "READ"));
+    if (!inFile || inFile->IsZombie()) {
+        MACH3LOG_ERROR("Cannot open input file: {}", inputFile);
+        throw MaCh3Exception(__FILE__, __LINE__);
+    }
+    
+    std::unique_ptr<TTree> inTree(inFile->Get<TTree>("osc_posteriors"));
+    if (!inTree) {
+        MACH3LOG_ERROR("Cannot find 'osc_posteriors' tree in input file");
+        throw MaCh3Exception(__FILE__, __LINE__);
+    }
+
+    // need to map MaCh3 style parameter names to reduced chain style names
+    std::map<std::string, std::string> paramMapping;
+    paramMapping["sin2th_23"] = "theta23";
+    paramMapping["sin2th_13"] = "theta13";
+    paramMapping["sin2th_12"] = "theta12";
+    paramMapping["delm2_23"] = "dm23";
+    paramMapping["delm2_12"] = "dm12";
+    paramMapping["delta_cp"] = "dcp";
+
+    // Validate that all required parameters exist in the chain 
+    for (const auto& rwConfig : reweightConfigs) {
+        for (const auto& paramName : rwConfig.paramNames) {
+            const auto mapIt = paramMapping.find(paramName);
+            if (mapIt == paramMapping.end()) {
+                MACH3LOG_ERROR("No reduced-chain mapping found for parameter {}", paramName);
+                throw MaCh3Exception(__FILE__, __LINE__);
+            }
+            if (inTree->GetBranch(mapIt->second.c_str()) == nullptr) {
+                MACH3LOG_ERROR("Parameter {} not found in MCMC chain", paramName);
+                throw MaCh3Exception(__FILE__, __LINE__);
+            }
+            MACH3LOG_INFO("Parameter {} found in chain", paramName);
+        }
+    }
+    ///////// Reduced chains don't contain the fit configurations so we cant check if theyre asimov, just trust the user
+    /// @todo Finish Asimov shifting implementation, for now just warn that Asimovs are not being properly handled
+    // Get the settings for the MCMC
+    //auto TempFile = std::unique_ptr<TFile>(TFile::Open(inputFile.c_str(), "READ"));
+    //if (!TempFile || TempFile->IsZombie()) {
+    //    MACH3LOG_ERROR("Cannot open MCMC file: {}", inputFile);
+    //    throw MaCh3Exception(__FILE__ , __LINE__ );
+    //}
+    //std::unique_ptr<TMacro> Config(TempFile->Get<TMacro>("MaCh3_Config"));
+    //if (!Config) {
+    //    MACH3LOG_ERROR("Didn't find MaCh3_Config tree in MCMC file! {}", inputFile.c_str());
+    //    TempFile->ls();
+    //    throw MaCh3Exception(__FILE__ , __LINE__ );
+    //}
+    //MACH3LOG_INFO("Loading YAML config from MCMC chain");
+    //YAML::Node Settings = TMacroToYAML(*Config);
+    //bool asimovfit = GetFromManager<bool>(Settings["General"]["Asimov"], false);
+    //if (asimovfit) {
+    //    MACH3LOG_WARN("MCMC chain was produced from an Asimov fit");
+    //    MACH3LOG_WARN("ReweightMCMC does not currently handle Asimov shifting, results may be incorrect!");
+    //} else {
+    //    MACH3LOG_INFO("Not an Asimov fit, proceeding with reweighting");
+    //}
+    
+    // Create output file
+    std::string configString = configFile.substr(configFile.find_last_of('/') + 1, configFile.find_last_of('.') - configFile.find_last_of('/') - 1);
+    std::string outputFile = inputFile.substr(0, inputFile.find_last_of('.')) + "_reweighted_" + configString + ".root";
+    auto outFile = std::unique_ptr<TFile>(TFile::Open(outputFile.c_str(), "RECREATE"));
+    if (!outFile || outFile->IsZombie()) {
+        MACH3LOG_ERROR("Cannot create output file: {}", outputFile);
+        throw MaCh3Exception(__FILE__, __LINE__);
+    }
+
+    MACH3LOG_INFO("Output file will be: {}", outputFile);
+    
+    // Copy all the remaining objects into the out file (i.e. all but posteriors tree)
+    TIter next(inFile->GetListOfKeys());
+    while (TKey* key = dynamic_cast<TKey*>(next())) {
+        inFile->cd();
+        std::unique_ptr<TObject> obj(key->ReadObj());
+        if (obj->IsA()->InheritsFrom(TDirectory::Class())) {
+            // It's a folder, create and copy its contents
+            TDirectory* srcDir = static_cast<TDirectory*>(obj.get());
+            TDirectory* destDir = outFile->mkdir(srcDir->GetName());
+            TIter nextSubKey(srcDir->GetListOfKeys());
+            while (TKey* subKey = dynamic_cast<TKey*>(nextSubKey())) {
+                srcDir->cd();
+                std::unique_ptr<TObject> subObj(subKey->ReadObj());
+                destDir->cd();
+                subObj->Write();
+            }
+        } else if (std::string(key->GetName()) != "osc_posteriors") {
+            // Regular object, skip "osc_posteriors" tree
+            outFile->cd();
+            obj->Write();
+        }
+    }
+
+    // Clone the tree structure
+    outFile->cd();
+    std::unique_ptr<TTree> outTree(inTree->CloneTree(0));
+    
+    // Set up parameter reading using the mapped parameter names for reduced chains
+    std::map<std::string, double> paramValues;
+    for (const auto& rwConfig : reweightConfigs) {
+        for (const auto& paramName : rwConfig.paramNames) {
+            const auto mapIt = paramMapping.find(paramName);
+            if (mapIt == paramMapping.end()) {
+                MACH3LOG_ERROR("No reduced-chain mapping found for parameter {}", paramName);
+                throw MaCh3Exception(__FILE__, __LINE__);
+            }
+            const std::string& reducedParamName = mapIt->second;
+            if (paramValues.find(reducedParamName) == paramValues.end()) {
+                paramValues[reducedParamName] = 0.0;
+                inTree->SetBranchAddress(reducedParamName.c_str(), &paramValues[reducedParamName]);
+            }
+        }
+    }
+
+    // Add weight branches
+    std::map<std::string, double> weights;
+    std::map<std::string, TBranch*> weightBranches;
+    
+    for (const auto& rwConfig : reweightConfigs) {
+        weights[rwConfig.weightBranchName] = 1.0;
+        weightBranches[rwConfig.weightBranchName] = outTree->Branch(
+            rwConfig.weightBranchName.c_str(), 
+            &weights[rwConfig.weightBranchName], 
+            (rwConfig.weightBranchName + "/D").c_str()
+        );
+        MACH3LOG_INFO("Added weight branch: {}", rwConfig.weightBranchName);
+    }
+    
+    // bool processMCMCreweighted=false;
+
+    // // If a given reweight is 1D Gaussian we can just let MCMCProcessor method do the reweight
+    // for (const auto& rwConfig : reweightConfigs){
+    //     if (rwConfig.dimension == 1 && rwConfig.type == "Gaussian"){
+    //         // Extract the parameter names and convert priorValues to the format processor needs
+    //         const std::vector<std::string>& paramNames = rwConfig.paramNames;
+    //         std::vector<double> priorCentral;
+    //         std::vector<double> priorSigma;
+            
+    //         // Extract means and sigmas from the prior pairs
+    //         for (const auto& priorPair : rwConfig.priorValues) {
+    //             priorCentral.push_back(priorPair[0]); // mean
+    //             priorSigma.push_back(priorPair[1]);   // sigma
+    //         }
+            
+    //         processor->ReweightPrior(paramNames, priorCentral, priorSigma);
+    //         MACH3LOG_INFO("Applied Gaussian reweighting for {} parameters", paramNames.size());
+    //         for (size_t i = 0; i < paramNames.size(); ++i) {
+    //             MACH3LOG_INFO("  {}: mean={}, sigma={}", paramNames[i], priorCentral[i], priorSigma[i]);
+    //         }
+    //         processMCMCreweighted=true;
+    //     }
+    // }
+
+    // ProcessMCMC cannot handle the 1D rewighting on a reduced chain so we need to do it ourselves even for the 1D gaussian case, but we can still set the flag to skip the 1D Gaussian reweighting in ProcessMCMC if its present in the config
+     bool processMCMCreweighted=false;
+
+    // For 2D reweight and non-gaussian (ie TGraph) 1D reweight we need to do it ourselves
+    // Process all entries
+    Long64_t nEntries = inTree->GetEntries();
+    MACH3LOG_INFO("Processing {} entries", nEntries);
+    
+
+    /// @todo add tracking for how many events are outside the graph ranges for diagnostics DWR
+    
+    if (processMCMCreweighted) {
+        MACH3LOG_INFO("MCMCProcessor has reweighted, skipping duplicate reweighting");
+    } else {
+        for (Long64_t i = 0; i < nEntries; ++i) {
+            if(i % (nEntries/20) == 0) MaCh3Utils::PrintProgressBar(i, nEntries);
+        
+            inTree->GetEntry(i);
+            
+            // Calculate weights for all configurations
+            for (const auto& rwConfig : reweightConfigs) {
+                double weight = 1.0;
+                
+                if (rwConfig.dimension == 1 && rwConfig.type == "Gaussian") {
+                    // Match MCMCProcessor::ReweightPrior: product of new/old priors for each requested parameter.
+                    for (size_t j = 0; j < rwConfig.paramNames.size(); ++j) {
+                        const std::string& mach3ParamName = rwConfig.paramNames[j];
+                        const auto mapIt = paramMapping.find(mach3ParamName);
+                        if (mapIt == paramMapping.end()) {
+                            MACH3LOG_ERROR("No reduced-chain mapping found for parameter {}", mach3ParamName);
+                            throw MaCh3Exception(__FILE__, __LINE__);
+                        }
+
+                        const std::string& reducedParamName = mapIt->second;
+                        const double paramValue = paramValues[reducedParamName];
+                        const double newCentral = rwConfig.priorValues[j][0];
+                        const double newError = rwConfig.priorValues[j][1];
+                        if (newError <= 0.0) {
+                            MACH3LOG_ERROR("Invalid Gaussian sigma={} for parameter {}", newError, mach3ParamName);
+                            throw MaCh3Exception(__FILE__, __LINE__);
+                        }
+
+                        const double newChi = (paramValue - newCentral) / newError;
+                        const double newPrior = std::exp(-0.5 * newChi * newChi);
+                        const double oldPrior = 1.0; // reduced-chain fallback assumes flat old prior.
+                        weight *= (newPrior / oldPrior);
+                    }
+                } else if (rwConfig.dimension == 1 && rwConfig.type != "Gaussian") {
+                    if (rwConfig.type == "TGraph") {
+                            const auto mapIt = paramMapping.find(rwConfig.paramNames[0]);
+                            if (mapIt == paramMapping.end()) {
+                                MACH3LOG_ERROR("No reduced-chain mapping found for parameter {}", rwConfig.paramNames[0]);
+                                throw MaCh3Exception(__FILE__, __LINE__);
+                            }
+                            double paramValue = paramValues[mapIt->second];
+                            weight = Graph_interpolate1D(rwConfig.graph_1D.get(), paramValue); 
+                    } else {
+                        MACH3LOG_ERROR("Unsupported 1D reweight type: {} for {}", rwConfig.type, rwConfig.key);
+                    }
+                } else if (rwConfig.dimension == 2) {
+                    if (rwConfig.type == "TGraph2D") {
+                        const auto dmMapIt = paramMapping.find(rwConfig.paramNames[0]);
+                        const auto thMapIt = paramMapping.find(rwConfig.paramNames[1]);
+                        if (dmMapIt == paramMapping.end() || thMapIt == paramMapping.end()) {
+                            MACH3LOG_ERROR("No reduced-chain mapping found for 2D parameters {} and {}", rwConfig.paramNames[0], rwConfig.paramNames[1]);
+                            throw MaCh3Exception(__FILE__, __LINE__);
+                        }
+                        double dm32 = paramValues[dmMapIt->second];
+                        double theta13 = paramValues[thMapIt->second];
+                        if (dm32 > 0) {
+                            // Normal Ordering
+                            if (rwConfig.graph_NO) {
+                                weight = Graph_interpolateNO(rwConfig.graph_NO.get(), theta13, dm32);
+                            } else {
+                                MACH3LOG_ERROR("NO graph not available for {}", rwConfig.key);
+                                weight = 0.0;
+                            }
+                        } else {
+                            // Inverted Ordering
+                            if (rwConfig.graph_IO) {
+                                weight = Graph_interpolateIO(rwConfig.graph_IO.get(), theta13, dm32);
+                            } else {
+                                MACH3LOG_ERROR("IO graph not available for {}", rwConfig.key);
+                                weight = 0.0;
+                            }
+                        }
+                    }
+                }
+                weights[rwConfig.weightBranchName] = weight;
+            }
+            // Fill the output tree
+            outTree->Fill();
+        } // end loop over entries
+    }
+    
+    // Write and close
+    outFile->cd();
+    outTree->Write();
+
+    // once we have finished the reweight save its configuration (reweightConfigNode) to the root file as a macro 
+    
+    TMacro reweightMacro;
+    reweightMacro.SetName("Reweight_Config");
+    reweightMacro.SetTitle("ReweightMCMC configuration");
+    std::stringstream ss;
+    ss << reweight_settings;
+    reweightMacro.AddLine(ss.str().c_str());
+    reweightMacro.Write();
+
+    // finally give final diagnostics to reader, and handle file cleanup if MCMCProcessor already did the reweighting 
     if (processMCMCreweighted){
         MACH3LOG_INFO("MCMCProcessor reweighting applied, Final reweighted file is: {}_reweighted.root", inputFile.substr(0, inputFile.find_last_of('.')));
         // delete the file we just created since MCMCProcessor already did the reweighting and saved it to a file
