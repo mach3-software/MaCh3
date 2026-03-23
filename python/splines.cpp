@@ -185,7 +185,7 @@ void initSplines(py::module &m) {
 
         .def(
             "get_event_weight",
-            &SMonolith::retPointer,
+            &SMonolith::RetPointer,
             py::return_value_policy::reference,
             "Get the weight of a particular event. \n"
             ":param event: The index of the event whose weight you would like.",
