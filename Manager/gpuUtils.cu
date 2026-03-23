@@ -42,15 +42,13 @@ void __cudaCheckError( const char *file, const int line ) {
 // KS: Get some fancy info about VRAM usage
 void checkGpuMem() {
 // *******************************************
-  float free_m, total_m,used_m;
   size_t free_t, total_t;
-
   cudaMemGetInfo(&free_t, &total_t);
   CudaCheckError();
 
-  free_m = static_cast<uint>(free_t)/1048576.0;
-  total_m = static_cast<uint>(total_t)/1048576.0;
-  used_m = total_m - free_m;
+  double free_m = static_cast<double>(free_t) / 1024.0 / 1024.0;
+  double total_m = static_cast<double>(total_t) / 1024.0 / 1024.0;
+  double used_m = total_m - free_m;
 
   printf("  Memory free %f MB, total memory %f MB, memory used %f MB\n", free_m, total_m, used_m);
 }

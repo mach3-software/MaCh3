@@ -11,13 +11,13 @@ _MaCh3_Safe_Include_Start_ //{
 _MaCh3_Safe_Include_End_ //}
 
 //****************************************
-BinnedSplineHandler::BinnedSplineHandler(ParameterHandlerGeneric *xsec_, MaCh3Modes *Modes_) : SplineBase() {
+BinnedSplineHandler::BinnedSplineHandler(ParameterHandlerGeneric *ParHandler_, MaCh3Modes *Modes_) : SplineBase() {
 //****************************************
-  if (!xsec_) {
+  if (!ParHandler_) {
     MACH3LOG_ERROR("Trying to create BinnedSplineHandler with uninitialized covariance object");
     throw MaCh3Exception(__FILE__, __LINE__);
   }
-  xsec = xsec_;
+  ParHandler = ParHandler_;
 
   if (!Modes_) {
     MACH3LOG_ERROR("Trying to create BinnedSplineHandler with uninitialized MaCh3Modes object");
@@ -76,23 +76,23 @@ void BinnedSplineHandler::AddSample(const std::string& SampleName,
   Dimensions.push_back(static_cast<int>(SplineVarNames.size()));
   DimensionLabels.push_back(SplineVarNames);
 
-  int nSplineParam = xsec->GetNumParamsFromSampleName(SampleName, SystType::kSpline);
+  int nSplineParam = ParHandler->GetNumParamsFromSampleName(SampleName, SystType::kSpline);
   nSplineParams.push_back(nSplineParam);
 
   //This holds the global index of the spline i.e. 0 -> _fNumPar
-  std::vector<int> GlobalSystIndex_Sample = xsec->GetGlobalSystIndexFromSampleName(SampleName, SystType::kSpline);
+  std::vector<int> GlobalSystIndex_Sample = ParHandler->GetGlobalSystIndexFromSampleName(SampleName, SystType::kSpline);
   //Keep track of this for all the samples
   GlobalSystIndex.push_back(GlobalSystIndex_Sample);
 
-  std::vector<SplineInterpolation> SplineInterpolation_Sample = xsec->GetSplineInterpolationFromSampleName(SampleName);
+  std::vector<SplineInterpolation> SplineInterpolation_Sample = ParHandler->GetSplineInterpolationFromSampleName(SampleName);
   // Keep track of this for all samples
   SplineInterpolationTypes.push_back(SplineInterpolation_Sample);
 
-  std::vector<std::string> SplineFileParPrefixNames_Sample = xsec->GetSplineParsNamesFromSampleName(SampleName);
+  std::vector<std::string> SplineFileParPrefixNames_Sample = ParHandler->GetSplineParsNamesFromSampleName(SampleName);
   SplineFileParPrefixNames.push_back(SplineFileParPrefixNames_Sample);
 
   MACH3LOG_INFO("Create SplineModeVecs_Sample");
-  std::vector<std::vector<int>> SplineModeVecs_Sample = StripDuplicatedModes(xsec->GetSplineModeVecFromSampleName(SampleName));
+  std::vector<std::vector<int>> SplineModeVecs_Sample = StripDuplicatedModes(ParHandler->GetSplineModeVecFromSampleName(SampleName));
   MACH3LOG_INFO("SplineModeVecs_Sample is of size {}", SplineModeVecs_Sample.size());
   SplineModeVecs.push_back(SplineModeVecs_Sample);
 
@@ -130,7 +130,7 @@ void BinnedSplineHandler::InvestigateMissingSplines() const {
 
     // Get list of systematic names for this sample
     std::vector<std::string> SplineFileParPrefixNames_Sample =
-    xsec->GetParsNamesFromSampleName(SampleName, kSpline);
+    ParHandler->GetParsNamesFromSampleName(SampleName, kSpline);
 
     for (unsigned int iOscChan = 0; iOscChan < indexvec[iSample].size(); iOscChan++) {
       for (unsigned int iSyst = 0; iSyst < indexvec[iSample][iOscChan].size(); iSyst++) {
@@ -174,7 +174,7 @@ void BinnedSplineHandler::InvestigateMissingSplines() const {
   // KS: Let's print this atrocious mess...
   for (const auto& samplePair : systZeroCounts) {
     unsigned int iSample = samplePair.first;
-    std::vector<std::string> SplineFileParPrefixNames_Sample = xsec->GetParsNamesFromSampleName(SampleNames[iSample], kSpline);
+    std::vector<std::string> SplineFileParPrefixNames_Sample = ParHandler->GetParsNamesFromSampleName(SampleNames[iSample], kSpline);
     for (const auto& systPair : samplePair.second) {
       unsigned int iSyst = systPair.first;
       const auto& systName = SplineFileParPrefixNames_Sample[iSyst];
@@ -373,9 +373,8 @@ void BinnedSplineHandler::BuildSampleIndexingArray(const std::string& SampleTitl
 }
 
 //****************************************
-std::vector<TAxis *> BinnedSplineHandler::FindSplineBinning(const std::string& FileName, const std::string& SampleTitle)
+std::vector<TAxis *> BinnedSplineHandler::FindSplineBinning(const std::string& FileName, const std::string& SampleTitle) {
 //****************************************
-{
   int iSample = GetSampleIndex(SampleTitle);
 
   //Try declaring these outside of TFile so they aren't owned by File
@@ -476,9 +475,8 @@ std::vector<TAxis *> BinnedSplineHandler::FindSplineBinning(const std::string& F
 }
 
 //****************************************
-int BinnedSplineHandler::CountNumberOfLoadedSplines(bool NonFlat, int Verbosity)
+int BinnedSplineHandler::CountNumberOfLoadedSplines(bool NonFlat, int Verbosity) {
 //****************************************
-{
   int SampleCounter_NonFlat = 0;
   int SampleCounter_All = 0;
   int FullCounter_NonFlat = 0;
@@ -616,7 +614,7 @@ void BinnedSplineHandler::PrepForReweight() {
   {
     SplineInfoArray[iSpline].nPts = static_cast<M3::int_t>(UniqueSystSplines[iSpline]->GetNp());
     SplineInfoArray[iSpline].xPts.resize(SplineInfoArray[iSpline].nPts);
-    SplineInfoArray[iSpline].splineParsPointer = xsec->RetPointer(UniqueSystIndices[iSpline]);
+    SplineInfoArray[iSpline].splineParsPointer = ParHandler->RetPointer(UniqueSystIndices[iSpline]);
     for (int iKnot = 0; iKnot < SplineInfoArray[iSpline].nPts; iKnot++)
     {
       M3::float_t xPoint;
@@ -677,7 +675,7 @@ void BinnedSplineHandler::PrepForReweight() {
 
 //****************************************
 // Rather work with spline coefficients in the splines, let's copy ND and use coefficient arrays
-void BinnedSplineHandler::getSplineCoeff_SepMany(int splineindex, M3::float_t* &xArray, M3::float_t* &manyArray){
+void BinnedSplineHandler::getSplineCoeff_SepMany(int splineindex, M3::float_t* &xArray, M3::float_t* &manyArray) {
 //****************************************
   //No point evaluating a flat spline
   int nPoints = splinevec_Monolith[splineindex]->GetNp();
@@ -881,7 +879,7 @@ std::vector< std::vector<int> > BinnedSplineHandler::GetEventSplines(const std::
 // (for example if CCRES and CCCoherent are treated as one spline mode)
 std::vector< std::vector<int> > BinnedSplineHandler::StripDuplicatedModes(const std::vector< std::vector<int> >& InputVector) const {
 //****************************************
-  //ETA - this is of size nPars from the xsec model
+  //ETA - this is of size nPars from the syst model
   size_t InputVectorSize = InputVector.size();
   std::vector< std::vector<int> > ReturnVec(InputVectorSize);
 
@@ -890,7 +888,7 @@ std::vector< std::vector<int> > BinnedSplineHandler::StripDuplicatedModes(const 
     std::vector<int> TmpVec;
     std::vector<std::string> TestVec;
 
-    //Loop over the modes that we've listed in xsec cov
+    //Loop over the modes that we've listed in ParHandler
     for (unsigned int iMode = 0 ; iMode < InputVector[iSyst].size() ; iMode++) {
       int Mode = InputVector[iSyst][iMode];
       std::string ModeName = Modes->GetSplineSuffixFromMaCh3Mode(Mode);
@@ -914,7 +912,7 @@ std::vector< std::vector<int> > BinnedSplineHandler::StripDuplicatedModes(const 
   return ReturnVec;
 }
 
-void BinnedSplineHandler::FillSampleArray(std::string SampleTitle, std::vector<std::string> OscChanFileNames)
+void BinnedSplineHandler::FillSampleArray(const std::string& SampleTitle, const std::vector<std::string>& OscChanFileNames)
 {
   int iSample = GetSampleIndex(SampleTitle);
   int nOscChannels = nOscChans[iSample];
@@ -1021,7 +1019,7 @@ void BinnedSplineHandler::FillSampleArray(std::string SampleTitle, std::vector<s
           splinevec_Monolith.push_back(nullptr);
           delete mySpline;
         } else {
-          ApplyKnotWeightCapTSpline3(mySpline, SystNum, xsec);
+          ApplyKnotWeightCapTSpline3(mySpline, SystNum, ParHandler);
           Spline = new TSpline3_red(mySpline, SplineInterpolationTypes[iSample][SystNum]);
           if(mySpline) delete mySpline;
 
@@ -1063,7 +1061,7 @@ void BinnedSplineHandler::LoadSplineFile(std::string FileName) {
   // Config which was in MCMC from which we are starting
   YAML::Node CovSettings = TMacroToYAML(*ConfigCov);
   // Config from currently used cov object
-  YAML::Node ConfigCurrent = xsec->GetConfig();
+  YAML::Node ConfigCurrent = ParHandler->GetConfig();
 
   if (!compareYAMLNodes(CovSettings, ConfigCurrent))
   {
@@ -1077,7 +1075,7 @@ void BinnedSplineHandler::LoadSplineFile(std::string FileName) {
   LoadFastSplineInfoDir(SplineFile);
 
   for (int iSpline = 0; iSpline < nParams; iSpline++) {
-    SplineInfoArray[iSpline].splineParsPointer = xsec->RetPointer(UniqueSystIndices[iSpline]);
+    SplineInfoArray[iSpline].splineParsPointer = ParHandler->RetPointer(UniqueSystIndices[iSpline]);
   }
   SplineFile->Close();
 }
@@ -1260,7 +1258,7 @@ void BinnedSplineHandler::PrepareSplineFile(std::string FileName) {
   }
   // Save ROOT File
   auto SplineFile = std::make_unique<TFile>(FileName.c_str(), "recreate");
-  YAML::Node ConfigCurrent = xsec->GetConfig();
+  YAML::Node ConfigCurrent = ParHandler->GetConfig();
   TMacro ConfigSave = YAMLtoTMacro(ConfigCurrent, "ParameterHandler");
   ConfigSave.Write();
 

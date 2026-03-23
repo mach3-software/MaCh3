@@ -3,7 +3,7 @@
 #include "Splines/SplineBase.h"
 
 //KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
-class SMonolithGPU;
+class SplineMonolithGPU;
 
 /// @brief Even-by-event class calculating response for spline parameters. It is possible to use GPU acceleration
 /// @author Clarence Wret
@@ -26,18 +26,18 @@ class SMonolith : public SplineBase {
     virtual ~SMonolith();
 
     /// @brief  CW: This Eval should be used when using two separate x,{y,a,b,c,d} arrays to store the weights; probably the best one here! Same thing but pass parameter spline segments instead of variations
-    void Evaluate() override;
+    void Evaluate() override final;
 
     /// @brief Get class name
     std::string GetName() const override {return "SplineMonolith";};
 
     /// @brief KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.
-    void SynchroniseMemTransfer() const override;
+    void SynchroniseMemTransfer() const override final;
 
     /// @brief KS: Get pointer to total weight to make fit faster wrooom!
     /// @param event Name event number in used MC
     /// @return Pointer to the total weight
-    const float* retPointer(const int event) const {return &cpu_total_weights[event];}
+    const M3::float_t* RetPointer(const int event) const {return &cpu_total_weights[event];}
     
     /// @brief KS: Set pointers to spline params
     /// @param spline_ParsPointers Vector of pointers to spline params
@@ -46,15 +46,10 @@ class SMonolith : public SplineBase {
     };
     
     /// @brief KS: Prepare spline file that can be used for fast loading
-    void PrepareSplineFile(std::string FileName) override;
+    void PrepareSplineFile(std::string FileName) override final;
     /// @brief KS: Load preprocessed spline file
     /// @param FileName Path to ROOT file with predefined reduced Spline Monolith
-    void LoadSplineFile(std::string FileName) override;
-
-    /// KS: This holds the total CPU weights that gets read in SampleHandler
-    /// @warning will become private member in future , please use SMonolith::retPointer
-    float* cpu_total_weights;
-
+    void LoadSplineFile(std::string FileName) override final;
   private:
     /// @brief KS: Set everything to null etc.
     void Initialise();
@@ -83,7 +78,8 @@ class SMonolith : public SplineBase {
     void PrepareForGPU(std::vector<std::vector<TResponseFunction_red*> > &MasterSpline, const std::vector<RespFuncType> &SplineType);
     /// @brief CW: The shared initialiser from constructors of TResponseFunction_red
     void MoveToGPU();
-        
+    void SetupSegments();
+
     /// @brief KS: Print info about how much knots etc has been initialised
     void PrintInitialsiation() const;
 
@@ -96,7 +92,7 @@ class SMonolith : public SplineBase {
     void GetSplineCoeff_SepMany(TSpline3_red* &spl, int &nPoints, float *&xArray, float *&manyArray) const;
 
     /// @brief CPU based code which eval weight for each spline
-    void CalcSplineWeights() override;
+    void CalcSplineWeights() override final;
     /// @brief Calc total event weight
     void CalcTotalEventWeight();
 
@@ -119,6 +115,8 @@ class SMonolith : public SplineBase {
     float *cpu_weights_spline_var;
     /// CPU arrays to hold weight for each TF1
     float *cpu_weights_tf1_var;
+    /// KS: This holds the total CPU weights that gets read in SampleHandler
+    M3::float_t* cpu_total_weights;
 
     /// KS: CPU map keeping track how many parameters applies to each event, we keep two numbers here {number of splines per event, index where splines start for a given event}
     std::vector<unsigned int> cpu_nParamPerEvent;
@@ -130,7 +128,7 @@ class SMonolith : public SplineBase {
     SplineMonoStruct* cpu_spline_handler;
 
     /// KS: Store info about Spline monolith, this allow to obtain better step time. As all necessary information for spline weight calculation are here meaning better cache hits.
-    SMonolithGPU* gpu_spline_handler;
+    SplineMonolithGPU* gpu_spline_handler;
 
     /// CPU arrays to hold TF1 coefficients
     std::vector<float> cpu_coeff_TF1_many;
