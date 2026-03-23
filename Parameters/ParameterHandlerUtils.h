@@ -227,7 +227,7 @@ inline void AddTuneValues(YAML::Node& root,
             MACH3LOG_ERROR("Missing 'ParameterValues' for matched FancyName '{}'", FancyNames[i]);
             throw MaCh3Exception(__FILE__, __LINE__);
           }
-          systematicNode["ParameterValues"][Tune] = MaCh3Utils::FormatDouble(Values[i], 4);
+          systematicNode["ParameterValues"][Tune] = M3::Utils::FormatDouble(Values[i], 4);
           matched = true;
           break;
         }
@@ -244,7 +244,7 @@ inline void AddTuneValues(YAML::Node& root,
         MACH3LOG_ERROR("Missing 'Systematic' or 'ParameterValues' entry at index {}", i);
         throw MaCh3Exception(__FILE__, __LINE__);
       }
-      systematicNode["ParameterValues"][Tune] = MaCh3Utils::FormatDouble(Values[i], 4);
+      systematicNode["ParameterValues"][Tune] = M3::Utils::FormatDouble(Values[i], 4);
     }
   }
 
@@ -322,7 +322,7 @@ inline void MakeCorrelationMatrix(YAML::Node& root,
       }
       YAML::Node& syst_i = it_i->second;
 
-      syst_i["ParameterValues"]["PreFitValue"] = MaCh3Utils::FormatDouble(Values[i], 4);
+      syst_i["ParameterValues"]["PreFitValue"] = M3::Utils::FormatDouble(Values[i], 4);
       syst_i["Error"] = std::round(Errors[i] * 100.0) / 100.0;
 
       YAML::Node correlationsNode = YAML::Node(YAML::NodeType::Sequence);
@@ -331,7 +331,7 @@ inline void MakeCorrelationMatrix(YAML::Node& root,
         // KS: Skip if value close to 0
         if (std::abs(Correlation[i][j]) < 1e-8) continue;
         YAML::Node singleEntry;
-        singleEntry[FancyNames[j]] = MaCh3Utils::FormatDouble(Correlation[i][j], 4);
+        singleEntry[FancyNames[j]] = M3::Utils::FormatDouble(Correlation[i][j], 4);
         correlationsNode.push_back(singleEntry);
       }
       syst_i["Correlations"] = correlationsNode;
@@ -350,7 +350,7 @@ inline void MakeCorrelationMatrix(YAML::Node& root,
         throw MaCh3Exception(__FILE__, __LINE__);
       }
 
-      syst["ParameterValues"]["PreFitValue"] = MaCh3Utils::FormatDouble(Values[i], 4);
+      syst["ParameterValues"]["PreFitValue"] = M3::Utils::FormatDouble(Values[i], 4);
       syst["Error"] = std::round(Errors[i] * 100.0) / 100.0;
 
       YAML::Node correlationsNode = YAML::Node(YAML::NodeType::Sequence);
@@ -360,7 +360,7 @@ inline void MakeCorrelationMatrix(YAML::Node& root,
         if (std::abs(Correlation[i][j]) < 1e-8) continue;
         YAML::Node singleEntry;
         const std::string& otherName = systematics[j]["Systematic"]["Names"]["FancyName"].as<std::string>();
-        singleEntry[otherName] = MaCh3Utils::FormatDouble(Correlation[i][j], 4);
+        singleEntry[otherName] = M3::Utils::FormatDouble(Correlation[i][j], 4);
         correlationsNode.push_back(singleEntry);
       }
       syst["Correlations"] = correlationsNode;
