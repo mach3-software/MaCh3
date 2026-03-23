@@ -21,7 +21,7 @@ MCMCProcessor::MCMCProcessor(const std::string &InputFile) :
   MCMCFile = InputFile;
 
   SetMaCh3LoggerFormat();
-  MaCh3Utils::MaCh3Welcome();
+  M3::Utils::MaCh3Welcome();
   MACH3LOG_INFO("Making post-fit processor for: {}", MCMCFile);
 
   ParStep = nullptr;
@@ -259,7 +259,7 @@ void MCMCProcessor::MakePostfit(const std::map<std::string, std::pair<double, do
   for (int i = 0; i < nDraw; ++i)
   {
     if (i % (nDraw/5) == 0) {
-      MaCh3Utils::PrintProgressBar(i, nDraw);
+      M3::Utils::PrintProgressBar(i, nDraw);
     }
     OutputFile->cd();
     TString Title = "";
@@ -972,7 +972,7 @@ void MCMCProcessor::MakeCovariance() {
   for (int i = 0; i < nDraw; ++i)
   {
     if (i % (nDraw/5) == 0)
-      MaCh3Utils::PrintProgressBar(i, nDraw);
+      M3::Utils::PrintProgressBar(i, nDraw);
 
     TString Title_i = "";
     double Prior_i, PriorError;
@@ -1120,8 +1120,8 @@ void MCMCProcessor::CacheSteps() {
   for (Long64_t j = 0; j < nEntries; ++j) 
   {
     if (j % countwidth == 0) {
-        MaCh3Utils::PrintProgressBar(j, nEntries);
-        MaCh3Utils::EstimateDataTransferRate(Chain, j);
+        M3::Utils::PrintProgressBar(j, nEntries);
+        M3::Utils::EstimateDataTransferRate(Chain, j);
     } else {
       Chain->GetEntry(j);
     }
@@ -2484,7 +2484,7 @@ void MCMCProcessor::FindInputFiles() {
   } else {
     CovConfig[kXSecPar] = TMacroToYAML(*XsecConfig);
   }
-  if(InputNotFound) MaCh3Utils::PrintConfig(Settings);
+  if(InputNotFound) M3::Utils::PrintConfig(Settings);
 
   for(size_t i = 0; i < CovPos[kXSecPar].size(); i++)
     M3::AddPath(CovPos[kXSecPar][i]);
@@ -2504,7 +2504,7 @@ void MCMCProcessor::FindInputFiles() {
     } else {
       MACH3LOG_WARN("Found reweight config but without field ''Weight''");
     }
-    MaCh3Utils::PrintConfig(ReweightSettings);
+    M3::Utils::PrintConfig(ReweightSettings);
   }
 
   // Delete the MCMCFile pointer we're reading
@@ -3109,7 +3109,7 @@ void MCMCProcessor::ReweightPrior(const std::vector<std::string>& Names,
 
   for (int i = 0; i < nEntries; ++i)
   {
-    if(i % (nEntries/10) == 0) MaCh3Utils::PrintProgressBar(i, nEntries);
+    if(i % (nEntries/10) == 0) M3::Utils::PrintProgressBar(i, nEntries);
     post->GetEntry(i);
     Weight = 1.;
 
@@ -3472,7 +3472,7 @@ void MCMCProcessor::PrepareDiagMCMC() {
     Chain->GetEntry(i);
 
     if (i % countwidth == 0)
-      MaCh3Utils::PrintProgressBar(i, nEntries);
+      M3::Utils::PrintProgressBar(i, nEntries);
 
     // Set the branch addresses for params
     for (int j = 0; j < nDraw; ++j) {

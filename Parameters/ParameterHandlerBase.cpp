@@ -1439,7 +1439,7 @@ void ParameterHandlerBase::SaveUpdatedMatrixConfig() {
   for (YAML::Node param : copyNode["Systematics"])
   {
     //KS: Feel free to update it, if you need updated prefit value etc
-    param["Systematic"]["StepScale"]["MCMC"] = MaCh3Utils::FormatDouble(_fIndivStepScale[i], 4);
+    param["Systematic"]["StepScale"]["MCMC"] = M3::Utils::FormatDouble(_fIndivStepScale[i], 4);
     i++;
   }
   // Save the modified node to a file

@@ -265,8 +265,8 @@ void OscProcessor::PerformJarlskogAnalysis() {
 
   for(int i = 0; i < nEntries; ++i) {
     if (i % countwidth == 0) {
-      MaCh3Utils::PrintProgressBar(i, nEntries);
-      MaCh3Utils::EstimateDataTransferRate(Chain, i);
+      M3::Utils::PrintProgressBar(i, nEntries);
+      M3::Utils::EstimateDataTransferRate(Chain, i);
     } else {
       Chain->GetEntry(i);
     }

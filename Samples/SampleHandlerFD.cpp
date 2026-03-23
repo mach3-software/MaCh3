@@ -1137,8 +1137,8 @@ const M3::float_t* SampleHandlerFD::GetNuOscillatorPointers(const int iEvent) co
     int InitFlav = M3::_BAD_INT_;
     int FinalFlav = M3::_BAD_INT_;
 
-    InitFlav =  MaCh3Utils::PDGToNuOscillatorFlavour(MCEvents[iEvent].nupdgUnosc);
-    FinalFlav = MaCh3Utils::PDGToNuOscillatorFlavour(MCEvents[iEvent].nupdg);
+    InitFlav =  M3::Utils::PDGToNuOscillatorFlavour(MCEvents[iEvent].nupdgUnosc);
+    FinalFlav = M3::Utils::PDGToNuOscillatorFlavour(MCEvents[iEvent].nupdg);
 
     if (InitFlav == M3::_BAD_INT_ || FinalFlav == M3::_BAD_INT_) {
       MACH3LOG_ERROR("Something has gone wrong in the mapping between MCEvents.nutype and the enum used within NuOscillator");

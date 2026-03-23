@@ -571,7 +571,7 @@ void FastViolinFill(TH2D* violin, TH1D* hist_1d){
 double returnCherenkovThresholdMomentum(const int PDG) {
 // ****************
   constexpr double refractiveIndex = 1.334; //DB From https://github.com/fiTQun/fiTQun/blob/646cf9c8ba3d4f7400bcbbde029d5ca15513a3bf/fiTQun_shared.cc#L757
-  double mass =  MaCh3Utils::GetMassFromPDG(PDG)*1e3;
+  double mass =  M3::Utils::GetMassFromPDG(PDG)*1e3;
   double momentumThreshold = mass/sqrt(refractiveIndex*refractiveIndex-1.);
   return momentumThreshold;
 }

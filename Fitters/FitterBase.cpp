@@ -126,8 +126,8 @@ void FitterBase::SaveSettings() {
 
   fitMan->SaveSettings(outputFile);
 
-  MACH3LOG_WARN("\033[0;31mCurrent Total RAM usage is {:.2f} GB\033[0m", MaCh3Utils::getValue("VmRSS") / 1048576.0);
-  MACH3LOG_WARN("\033[0;31mOut of Total available RAM {:.2f} GB\033[0m", MaCh3Utils::getValue("MemTotal") / 1048576.0);
+  MACH3LOG_WARN("\033[0;31mCurrent Total RAM usage is {:.2f} GB\033[0m", M3::Utils::getValue("VmRSS") / 1048576.0);
+  MACH3LOG_WARN("\033[0;31mOut of Total available RAM {:.2f} GB\033[0m", M3::Utils::getValue("MemTotal") / 1048576.0);
 
   MACH3LOG_INFO("#####Current Setup#####");
   MACH3LOG_INFO("Number of covariances: {}", systematics.size());
@@ -741,7 +741,7 @@ void FitterBase::RunLLHScan() {
       for (int j = 0; j < n_points; ++j)
       {
         if (j % countwidth == 0)
-          MaCh3Utils::PrintProgressBar(j, n_points);
+          M3::Utils::PrintProgressBar(j, n_points);
 
         // For PCA we have to do it differently
         if (IsPCA) {
@@ -999,7 +999,7 @@ void FitterBase::Run2DLLHScan() {
         for (int x = 0; x < n_points; ++x)
         {
           if (x % countwidth == 0)
-            MaCh3Utils::PrintProgressBar(x, n_points);
+            M3::Utils::PrintProgressBar(x, n_points);
 
           for (int y = 0; y < n_points; ++y)
           {
@@ -1288,7 +1288,7 @@ void FitterBase::RunLLHMap() {
     LLHMap->Fill();
 
     if (sp % countwidth == 0)
-      MaCh3Utils::PrintProgressBar(sp, TotalPoints);
+      M3::Utils::PrintProgressBar(sp, TotalPoints);
   }
 
   outputFile->cd();
