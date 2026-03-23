@@ -118,7 +118,7 @@ int main(int argc, char *argv[]) {
 
 void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const YAML::Node& reweight_settings) {
     // Experimental mode: set true only if you intentionally want multi-reweight support.
-    constexpr bool kEnableExperimentalMultiReweight = false;
+    constexpr bool kEnableExperimentalMultiReweight = true;
     if (kEnableExperimentalMultiReweight) {
         MACH3LOG_WARN("EXPERIMENTAL multi-reweight mode is enabled. This path is not validated and will break your other plotting scripts");
     }
@@ -435,31 +435,35 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile){
         MACH3LOG_INFO("Added weight branch: {}", rwConfig.weightBranchName);
     }
     
-    bool processMCMCreweighted=false;
+    bool processMCMCreweighted = false;
 
-    // If a given reweight is 1D Gaussian we can just let MCMCProcessor method do the reweight
-    for (const auto& rwConfig : reweightConfigs){
-        if (rwConfig.dimension == 1 && rwConfig.type == "Gaussian"){
-            // Extract the parameter names and convert priorValues to the format processor needs
-            const std::vector<std::string>& paramNames = rwConfig.paramNames;
-            std::vector<double> priorCentral;
-            std::vector<double> priorSigma;
-            
-            // Extract means and sigmas from the prior pairs
-            for (const auto& priorPair : rwConfig.priorValues) {
-                priorCentral.push_back(priorPair[0]); // mean
-                priorSigma.push_back(priorPair[1]);   // sigma
-            }
-            
-            processor->ReweightPrior(paramNames, priorCentral, priorSigma);
-            MACH3LOG_INFO("Applied Gaussian reweighting for {} parameters", paramNames.size());
-            for (size_t i = 0; i < paramNames.size(); ++i) {
-                MACH3LOG_INFO("  {}: mean={}, sigma={}", paramNames[i], priorCentral[i], priorSigma[i]);
-            }
-            processMCMCreweighted=true;
+    // Offload only the single 1D Gaussian case to MCMCProcessor.
+    // Any mixed/multiple reweight setup is handled locally so all branches stay in one tree.
+    const bool useProcessMCMCForGaussian =
+        (reweightConfigs.size() == 1 &&
+         reweightConfigs[0].dimension == 1 &&
+         reweightConfigs[0].type == "Gaussian");
+
+    if (useProcessMCMCForGaussian) {
+        const auto& rwConfig = reweightConfigs[0];
+        const std::vector<std::string>& paramNames = rwConfig.paramNames;
+        std::vector<double> priorCentral;
+        std::vector<double> priorSigma;
+
+        for (const auto& priorPair : rwConfig.priorValues) {
+            priorCentral.push_back(priorPair[0]);
+            priorSigma.push_back(priorPair[1]);
         }
+
+        processor->ReweightPrior(paramNames, priorCentral, priorSigma);
+        MACH3LOG_INFO("Applied Gaussian reweighting with MCMCProcessor for {} parameters", paramNames.size());
+        for (size_t i = 0; i < paramNames.size(); ++i) {
+            MACH3LOG_INFO("  {}: mean={}, sigma={}", paramNames[i], priorCentral[i], priorSigma[i]);
+        }
+        processMCMCreweighted = true;
     }
-    // For 2D reweight and non-gaussian (ie TGraph) 1D reweight we need to do it ourselves
+
+    // Process all entries for local reweighting path.
     // Process all entries
     Long64_t nEntries = inTree->GetEntries();
     MACH3LOG_INFO("Processing {} entries", nEntries);
@@ -478,7 +482,24 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile){
             for (const auto& rwConfig : reweightConfigs) {
                 double weight = 1.0;
 
-                if (rwConfig.dimension == 1 && rwConfig.type != "Gaussian") {
+                if (rwConfig.dimension == 1 && rwConfig.type == "Gaussian") {
+                    // Match reduced-chain behavior: product of Gaussian priors for requested parameters.
+                    for (size_t j = 0; j < rwConfig.paramNames.size(); ++j) {
+                        const std::string& paramName = rwConfig.paramNames[j];
+                        const double paramValue = paramValues[paramName];
+                        const double newCentral = rwConfig.priorValues[j][0];
+                        const double newError = rwConfig.priorValues[j][1];
+                        if (newError <= 0.0) {
+                            MACH3LOG_ERROR("Invalid Gaussian sigma={} for parameter {}", newError, paramName);
+                            throw MaCh3Exception(__FILE__, __LINE__);
+                        }
+
+                        const double newChi = (paramValue - newCentral) / newError;
+                        const double newPrior = std::exp(-0.5 * newChi * newChi);
+                        const double oldPrior = 1.0;
+                        weight *= (newPrior / oldPrior);
+                    }
+                } else if (rwConfig.dimension == 1 && rwConfig.type != "Gaussian") {
                     if (rwConfig.type == "TGraph") {
                         double paramValue = paramValues[rwConfig.paramNames[0]];
                         weight = Graph_interpolate1D(rwConfig.graph_1D.get(), paramValue);
@@ -529,14 +550,14 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile){
     reweightMacro.AddLine(ss.str().c_str());
     reweightMacro.Write();
 
-    // finally give final diagnostics to reader, and handle file cleanup if MCMCProcessor already did the reweighting 
-    if (processMCMCreweighted){
+    // finally give final diagnostics to reader, and handle file cleanup if MCMCProcessor already did the reweighting
+    if (processMCMCreweighted) {
         MACH3LOG_INFO("MCMCProcessor reweighting applied, Final reweighted file is: {}_reweighted.root", inputFile.substr(0, inputFile.find_last_of('.')));
         // delete the file we just created since MCMCProcessor already did the reweighting and saved it to a file
-        outTree.reset(); // Release TTree before closing TFile
+        outTree.reset();
         outFile->Close();
-        outFile.reset(); 
-        
+        outFile.reset();
+
         if (std::remove(outputFile.c_str()) != 0) {
             MACH3LOG_ERROR("Error deleting temporary file: {}", outputFile);
         } else {
@@ -725,7 +746,7 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile, b
     // }
 
     // ProcessMCMC cannot handle the 1D rewighting on a reduced chain so we need to do it ourselves even for the 1D gaussian case, but we can still set the flag to skip the 1D Gaussian reweighting in ProcessMCMC if its present in the config
-     bool processMCMCreweighted=false;
+    bool processMCMCreweighted=false;
 
     // For 2D reweight and non-gaussian (ie TGraph) 1D reweight we need to do it ourselves
     // Process all entries
