@@ -564,7 +564,7 @@ void PredictiveThrower::ProduceToys() {
   for(int i = 0; i < Ntoys; i++)
   {
     if(Ntoys >= 10 && i % (Ntoys/10) == 0) {
-      MaCh3Utils::PrintProgressBar(i, Ntoys);
+      M3::Utils::PrintProgressBar(i, Ntoys);
     }
     if(!Is_PriorPredictive){
       int entry = 0;
@@ -1022,8 +1022,8 @@ void PredictiveThrower::RunPredictiveAnalysis() {
   SanitiseInputs();
 
   MACH3LOG_INFO("Starting {}", __func__);
-  MACH3LOG_WARN("\033[0;31mCurrent Total RAM usage is {:.2f} GB\033[0m", MaCh3Utils::getValue("VmRSS") / 1048576.0);
-  MACH3LOG_WARN("\033[0;31mOut of Total available RAM {:.2f} GB\033[0m", MaCh3Utils::getValue("MemTotal") / 1048576.0);
+  MACH3LOG_WARN("\033[0;31mCurrent Total RAM usage is {:.2f} GB\033[0m", M3::Utils::getValue("VmRSS") / 1048576.0);
+  MACH3LOG_WARN("\033[0;31mOut of Total available RAM {:.2f} GB\033[0m", M3::Utils::getValue("MemTotal") / 1048576.0);
 
   TStopwatch TempClock;
   TempClock.Start();

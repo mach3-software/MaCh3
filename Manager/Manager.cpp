@@ -27,12 +27,12 @@ Manager::Manager(const YAML::Node ConfigNode) {
 void Manager::Initialise() {
 // *************************
   SetMaCh3LoggerFormat();
-  MaCh3Utils::MaCh3Welcome();
+  M3::Utils::MaCh3Welcome();
 
   MACH3LOG_INFO("Setting config to be: {}", FileName);
 
   MACH3LOG_INFO("Config is now: ");
-  MaCh3Utils::PrintConfig(config);
+  M3::Utils::PrintConfig(config);
 }
 
 
@@ -90,7 +90,7 @@ void Manager::SaveSettings(TFile* const OutputFile) const {
 void Manager::Print() const {
 // *************************
   MACH3LOG_INFO("---------------------------------");
-  MaCh3Utils::PrintConfig(config);
+  M3::Utils::PrintConfig(config);
   MACH3LOG_INFO("---------------------------------");
 }
 

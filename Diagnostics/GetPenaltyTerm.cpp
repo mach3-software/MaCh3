@@ -64,7 +64,7 @@ void ReadCovFile(const std::string& inputFile,
   if(CovPos.back() == "none")
   {
     MACH3LOG_WARN("Couldn't find Cov branch in output");
-    MaCh3Utils::PrintConfig(Settings);
+    M3::Utils::PrintConfig(Settings);
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
 
@@ -272,7 +272,7 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
   std::vector<double> logL(NSets, 0.0);
   for(int n = 0; n < AllEvents; ++n)
   {
-    if(n%10000 == 0) MaCh3Utils::PrintProgressBar(n, AllEvents);
+    if(n%10000 == 0) M3::Utils::PrintProgressBar(n, AllEvents);
       
     Chain->GetEntry(n);
 
@@ -381,7 +381,7 @@ void GetPenaltyTerm(const std::string& inputFile, const std::string& configFile)
 int main(int argc, char *argv[])
 {
   SetMaCh3LoggerFormat();
-  MaCh3Utils::MaCh3Welcome();
+  M3::Utils::MaCh3Welcome();
   if (argc != 3 )
   {
     MACH3LOG_WARN("Something went wrong ");

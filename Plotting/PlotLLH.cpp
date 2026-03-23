@@ -51,7 +51,7 @@ void getSplitSampleStack(int fileIdx, std::string parameterName, TH1D LLH_allSam
                          std::vector<float> &cumSums, std::vector<bool> &drawLabel,
                          THStack *sampleStack, TLegend *splitSamplesLegend,
                          float baselineLLH_main = 0.00001) 
-  {
+{
   std::vector<std::string> sampNames = PlotMan->input().getTaggedSamples(PlotMan->getOption<std::vector<std::string>>("sampleTags"));
   size_t nSamples = sampNames.size();
 
@@ -468,7 +468,7 @@ int PlotLLH() {
 
 int main(int argc, char **argv) {
   SetMaCh3LoggerFormat();
-  MaCh3Utils::MaCh3Welcome();
+  M3::Utils::MaCh3Welcome();
 
   PlotMan = new MaCh3Plotting::PlottingManager();
   PlotMan->parseInputs(argc, argv);
