@@ -21,7 +21,7 @@ class MinuitFit : public LikelihoodFit {
   virtual ~MinuitFit();
 
   /// @brief Actual implementation of Minuit Fit algorithm
-  void RunMCMC() override;
+  void RunMCMC() override final;
  private:
   /// Pointer to minimizer, which most often is Minuit
   std::unique_ptr<ROOT::Math::Minimizer> minuit;
