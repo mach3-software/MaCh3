@@ -117,6 +117,12 @@ int main(int argc, char *argv[]) {
 }
 
 void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const YAML::Node& reweight_settings) {
+    // Experimental mode: set true only if you intentionally want multi-reweight support.
+    constexpr bool kEnableExperimentalMultiReweight = false;
+    if (kEnableExperimentalMultiReweight) {
+        MACH3LOG_WARN("EXPERIMENTAL multi-reweight mode is enabled. This path is not validated and will break your other plotting scripts");
+    }
+
     // iterate through the keys in the reweighting yaml creating and storing the ReweightConfig as we go
     for (const auto& reweight : reweight_settings) {
         const std::string& reweightKey = reweight.first.as<std::string>();
@@ -133,8 +139,7 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
         reweightConfig.name = GetFromManager<std::string>(reweightConfigNode["ReweightName"], reweightKey);
         reweightConfig.type = GetFromManager<std::string>(reweightConfigNode["ReweightType"], "Gaussian");
         reweightConfig.dimension = GetFromManager<int>(reweightConfigNode["ReweightDim"], 1);
-        // reweightConfig.weightBranchName = "Weight_" + reweightKey; // for now all weights will be stored in branches called Weight until multi weight support
-        reweightConfig.weightBranchName = "Weight";
+        reweightConfig.weightBranchName = kEnableExperimentalMultiReweight ? ("Weight_" + reweightKey) : "Weight";
         reweightConfig.enabled = true;
 
         // Handle different reweight types as they fill different members
@@ -293,9 +298,13 @@ void LoadReweightingSettings(std::vector<ReweightConfig>& reweightConfigs, const
     if (reweightConfigs.empty()) {
         MACH3LOG_ERROR("No valid reweight configurations found in config file");
         throw MaCh3Exception(__FILE__, __LINE__);
-    } else if (reweightConfigs.size() > 1) {    // check number of ReweightConfigs, currently maximum supported is 1 due to structure of ProcessMCMC
-        MACH3LOG_ERROR("Currently only one reweight configuration is supported at a time, found {}", reweight_settings.size());
+    } else if (!kEnableExperimentalMultiReweight && reweightConfigs.size() > 1) {
+        MACH3LOG_ERROR("Currently only one reweight configuration is supported at a time, found {}", reweightConfigs.size());
+        MACH3LOG_ERROR("To try multi-reweight anyway, set kEnableExperimentalMultiReweight=true in ReweightMCMC.cpp and recompile MaCh3.");
         throw MaCh3Exception(__FILE__, __LINE__);
+    } else if (kEnableExperimentalMultiReweight && reweightConfigs.size() > 1) {
+        MACH3LOG_WARN("Proceeding with {} reweights in EXPERIMENTAL mode.", reweightConfigs.size());
+        MACH3LOG_WARN("Each weight is written to a separate branch named Weight_<ReweightKey>.");
     }
 }
 
