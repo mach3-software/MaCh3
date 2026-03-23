@@ -564,7 +564,7 @@ void SampleHandlerFD::ApplyShifts(const int iEvent) {
 
 // ***************************************************************************
 // Calculate the spline weight for one event
-M3::float_t SampleHandlerFD::CalcWeightTotal(const EventInfo* _restrict_ MCEvent) const {
+M3::float_t SampleHandlerFD::CalcWeightTotal(const EventInfo* _restrict_ MCEvent) const _noexcept_ {
 // ***************************************************************************
   M3::float_t TotalWeight = 1.0;
   const int nNorms = static_cast<int>(MCEvent->norm_pointers.size());
