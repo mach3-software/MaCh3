@@ -8,22 +8,22 @@ class SplineMonolithGPU;
 /// @brief Even-by-event class calculating response for spline parameters. It is possible to use GPU acceleration
 /// @author Clarence Wret
 /// @author Kamil Skwarczynski
-class SMonolith : public SplineBase {
+class UnbinnedSplineHandler : public SplineBase {
   public:
     /// @brief Constructor
     /// @param MasterSpline Vector of TSpline3 pointers which we strip back
     /// @param SplineType Whether object is TSpline3 or TF1
     /// @param SaveFlatTree Whether we want to save monolith into speedy flat tree
     /// @param _FastSplineName Name to which spline file will be saved
-    SMonolith(std::vector<std::vector<TResponseFunction_red*> > &MasterSpline,
+    UnbinnedSplineHandler(std::vector<std::vector<TResponseFunction_red*> > &MasterSpline,
               const std::vector<RespFuncType> &SplineType,
               const bool SaveFlatTree = false,
               const std::string& _FastSplineName = "SplineFile.root");
     /// @brief Constructor where you pass path to preprocessed root FileName
     /// @param FileName path to pre-processed root file containing stripped monolith info
-    SMonolith(const std::string& FileName);
-    /// @brief Destructor for SMonolith class.
-    virtual ~SMonolith();
+    UnbinnedSplineHandler(const std::string& FileName);
+    /// @brief Destructor for UnbinnedSplineHandler class.
+    virtual ~UnbinnedSplineHandler();
 
     /// @brief  CW: This Eval should be used when using two separate x,{y,a,b,c,d} arrays to store the weights; probably the best one here! Same thing but pass parameter spline segments instead of variations
     void Evaluate() final;
