@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
 // *******************
 
   SetMaCh3LoggerFormat();
-  MaCh3Utils::MaCh3Welcome();
+  M3::Utils::MaCh3Welcome();
 
   Draws = nullptr;
   Mean = nullptr;
@@ -314,7 +314,7 @@ void PrepareChains() {
 
       // Output some info for the user
       if (Ntoys > 10 && i % (Ntoys/10) == 0) {
-        MaCh3Utils::PrintProgressBar(i+m*Ntoys, static_cast<Long64_t>(Ntoys)*Nchains);
+        M3::Utils::PrintProgressBar(i+m*Ntoys, static_cast<Long64_t>(Ntoys)*Nchains);
         MACH3LOG_DEBUG("Getting random entry {}", entry);
       }
 

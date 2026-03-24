@@ -1147,7 +1147,7 @@ void SampleSummary::MakeChi2Hists() {
   for (unsigned int i = 0; i < nThrows; ++i)
   {
     if (i % (nThrows/10) == 0) {
-      MaCh3Utils::PrintProgressBar(i, nThrows);
+      M3::Utils::PrintProgressBar(i, nThrows);
     }
 
     // Set the total LLH to zero to initialise

@@ -564,7 +564,7 @@ void SampleHandlerFD::ApplyShifts(const int iEvent) {
 
 // ***************************************************************************
 // Calculate the spline weight for one event
-M3::float_t SampleHandlerFD::CalcWeightTotal(const EventInfo* _restrict_ MCEvent) const {
+M3::float_t SampleHandlerFD::CalcWeightTotal(const EventInfo* _restrict_ MCEvent) const _noexcept_ {
 // ***************************************************************************
   M3::float_t TotalWeight = 1.0;
   const int TotalWeights = static_cast<int>(MCEvent->total_weight_pointers.size());
@@ -1124,8 +1124,8 @@ const M3::float_t* SampleHandlerFD::GetNuOscillatorPointers(const int iEvent) co
     int InitFlav = M3::_BAD_INT_;
     int FinalFlav = M3::_BAD_INT_;
 
-    InitFlav =  MaCh3Utils::PDGToNuOscillatorFlavour(MCEvents[iEvent].nupdgUnosc);
-    FinalFlav = MaCh3Utils::PDGToNuOscillatorFlavour(MCEvents[iEvent].nupdg);
+    InitFlav =  M3::Utils::PDGToNuOscillatorFlavour(MCEvents[iEvent].nupdgUnosc);
+    FinalFlav = M3::Utils::PDGToNuOscillatorFlavour(MCEvents[iEvent].nupdg);
 
     if (InitFlav == M3::_BAD_INT_ || FinalFlav == M3::_BAD_INT_) {
       MACH3LOG_ERROR("Something has gone wrong in the mapping between MCEvents.nutype and the enum used within NuOscillator");
@@ -1239,7 +1239,7 @@ void SampleHandlerFD::SetSplinePointers() {
           continue;
         }
         //Event Splines indexed as: sample name, oscillation channel, syst, mode, etrue, var1, var2 (var2 is a dummy 0 for 1D splines)
-        w_pointers.push_back(BinnedSpline->retPointer(EventSplines[spline][0], EventSplines[spline][1],
+        w_pointers.push_back(BinnedSpline->RetPointer(EventSplines[spline][0], EventSplines[spline][1],
                                                       EventSplines[spline][2], EventSplines[spline][3],
                                                       EventSplines[spline][4], EventSplines[spline][5],
                                                       EventSplines[spline][6]));
@@ -1247,16 +1247,9 @@ void SampleHandlerFD::SetSplinePointers() {
       w_pointers.shrink_to_fit();
     } // end loop over events
   } else if (auto UnbinnedSpline = dynamic_cast<SMonolith*>(SplineHandler.get())) {
-    /// @todo Fix this mess :(
-    #ifdef _LOW_MEMORY_STRUCTS_
     for (unsigned int iEvent = 0; iEvent < GetNEvents(); ++iEvent) {
-      MCEvents[iEvent].total_weight_pointers.push_back(UnbinnedSpline->retPointer(iEvent));
+      MCEvents[iEvent].total_weight_pointers.push_back(UnbinnedSpline->RetPointer(iEvent));
     }
-    #else
-    (void) UnbinnedSpline;
-    MACH3LOG_ERROR("Unbinned splines only for float :(");
-    throw MaCh3Exception(__FILE__, __LINE__);
-    #endif
   } else {
     MACH3LOG_ERROR("Not supported splines");
     throw MaCh3Exception(__FILE__, __LINE__);

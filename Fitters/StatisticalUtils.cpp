@@ -521,7 +521,7 @@ void ThinningMCMC(const std::string& FilePath, const int ThinningCut) {
   MACH3LOG_INFO("Thinning will retain {:.2f}% of chains", retainedPercentage);
   for (Long64_t i = 0; i < nEntries; i++) {
     if (i % (nEntries/10) == 0) {
-      MaCh3Utils::PrintProgressBar(i, nEntries);
+      M3::Utils::PrintProgressBar(i, nEntries);
     }
     if (i % ThinningCut == 0) {
       inTree->GetEntry(i);

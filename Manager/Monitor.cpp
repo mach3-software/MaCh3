@@ -6,7 +6,8 @@
 #include "Manager/gpuUtils.cuh"
 #endif
 
-namespace MaCh3Utils {
+namespace M3 {
+namespace Utils {
 
 // *************************
 void MaCh3Welcome() {
@@ -365,9 +366,8 @@ void MaCh3Usage(int argc, char **argv) {
     throw MaCh3Exception(__FILE__, __LINE__);
   }
 }
-} //end namespace
+} //end utils namespace
 
-namespace M3 {
 // ***************************************************************************
 int GetNThreads() {
 // ***************************************************************************
@@ -395,5 +395,5 @@ void AddPath(std::string& FilePath) {
     FilePath.insert(0, MaCh3Path);
   }
 }
-} //end namespace
+} //end M3 namespace
 

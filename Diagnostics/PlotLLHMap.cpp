@@ -62,7 +62,7 @@ std::vector<std::string> GetParams(std::vector<std::string> &PoIs, ROOT::RDataFr
 int main(int argc, char *argv[]) {
 // *******************
   SetMaCh3LoggerFormat();
-  MaCh3Utils::MaCh3Welcome();
+  M3::Utils::MaCh3Welcome();
 
   if(argc < 3)
   {
@@ -147,7 +147,7 @@ int main(int argc, char *argv[]) {
     {
       const int count = int(double(hprof1d->GetNbinsX())/double(5));
       if (bidx % count == 0)
-        MaCh3Utils::PrintProgressBar(bidx, hprof1d->GetNbinsX());
+        M3::Utils::PrintProgressBar(bidx, hprof1d->GetNbinsX());
 
       auto b_lo = hprof1d->GetXaxis()->GetBinLowEdge(bidx);
       auto b_hi = b_lo + hprof1d->GetXaxis()->GetBinWidth(bidx);
@@ -206,7 +206,7 @@ int main(int argc, char *argv[]) {
         {
           const int count = int(double(hprof2d->GetNbinsX()*hprof2d->GetNbinsY())/double(5));
           if ( ((bidx-1)*hprof2d->GetNbinsY() + bidy) % count == 0)
-            MaCh3Utils::PrintProgressBar((bidx-1)*hprof2d->GetNbinsY() + bidy, hprof2d->GetNbinsX()*hprof2d->GetNbinsY());
+            M3::Utils::PrintProgressBar((bidx-1)*hprof2d->GetNbinsY() + bidy, hprof2d->GetNbinsX()*hprof2d->GetNbinsY());
 
           auto bx_lo = hprof2d->GetXaxis()->GetBinLowEdge(bidx);
           auto bx_hi = bx_lo + hprof2d->GetXaxis()->GetBinWidth(bidx);

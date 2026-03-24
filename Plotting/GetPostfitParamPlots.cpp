@@ -150,7 +150,7 @@ bool ReadSettings(const std::shared_ptr<TFile>& File1)
   if (!Settings) return false;
 
   MACH3LOG_DEBUG("Got settings tree");
-  MaCh3Utils::Print(Settings);
+  M3::Utils::Print(Settings);
 
   Settings->SetBranchAddress("NDParameters", &NDParameters);
   Settings->SetBranchAddress("NDParametersStartingPos", &NDParametersStartingPos);

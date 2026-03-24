@@ -737,7 +737,8 @@ inline int GetLocalBinFromGlobalBin(const std::vector<SampleBinningInfo>& Binnin
 
 // ***************************
 // A handy namespace for variables extraction
-namespace MaCh3Utils {
+namespace M3 {
+namespace Utils {
 // ***************************
   // *****************************
   /// @brief Return mass for given PDG
@@ -835,5 +836,5 @@ namespace MaCh3Utils {
     oss << std::fixed << std::setprecision(precision) << value;
     return oss.str();
   }
-
-} // end MaCh3Utils namespace
+} // end Utils namespace
+} // end M3 namespace

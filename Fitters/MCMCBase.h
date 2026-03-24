@@ -15,11 +15,11 @@ class MCMCBase : public FitterBase {
     virtual ~MCMCBase() = default;
 
     /// @brief Actual implementation of MCMC fitting algorithm
-    void RunMCMC() override;
+    void RunMCMC() override final;
 
     /// @brief Allow to start from previous fit/chain
     /// @param FitName Name of previous chain
-    void StartFromPreviousFit(const std::string &FitName) override;
+    void StartFromPreviousFit(const std::string &FitName) override final;
 
     /// @brief Set how long chain should be
     /// @param L new chain length

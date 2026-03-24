@@ -441,7 +441,7 @@ void ReweightMCMC(const std::string& configFile, const std::string& inputFile)
         MACH3LOG_INFO("MCMCProcessor has reweighted, skipping duplicate reweighting");
     } else {
         for (Long64_t i = 0; i < nEntries; ++i) {
-            if(i % (nEntries/20) == 0) MaCh3Utils::PrintProgressBar(i, nEntries);
+            if(i % (nEntries/20) == 0) M3::Utils::PrintProgressBar(i, nEntries);
         
             inTree->GetEntry(i);
             
