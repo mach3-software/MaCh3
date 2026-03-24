@@ -1,5 +1,4 @@
 #include "PredictiveThrower.h"
-#include "Samples/SampleHandlerFD.h"
 #include "Parameters/ParameterHandlerGeneric.h"
 #include "TH3.h"
 
@@ -377,11 +376,11 @@ void PredictiveThrower::WriteToy(TDirectory* ToyDirectory,
       ToyDirectory->cd();
 
       auto SampleName = SampleHandler->GetSampleTitle(iSample);
-      TH1* MCHist = SampleHandler->GetMCHist(iSample);
+      const TH1* MCHist = SampleHandler->GetMCHist(iSample);
       MC_Hist_Toy[SampleCounter][iToy] = M3::Clone(MCHist, SampleName + "_mc_" + std::to_string(iToy));
       MC_Hist_Toy[SampleCounter][iToy]->Write();
 
-      TH1* W2Hist = SampleHandler->GetW2Hist(iSample);
+      const TH1* W2Hist = SampleHandler->GetW2Hist(iSample);
       W2_Hist_Toy[SampleCounter][iToy] = M3::Clone(W2Hist, SampleName + "_w2_" + std::to_string(iToy));
       W2_Hist_Toy[SampleCounter][iToy]->Write();
 
@@ -395,7 +394,6 @@ void PredictiveThrower::WriteToy(TDirectory* ToyDirectory,
         hist->SetTitle((SampleName + ProjectionSuffix).c_str());
         hist->SetName((SampleName + ProjectionSuffix).c_str());
         hist->Write();
-        delete hist;
       }
 
       Toy_2DDirectory->cd();
@@ -414,7 +412,6 @@ void PredictiveThrower::WriteToy(TDirectory* ToyDirectory,
           hist2D->SetTitle((SampleName + suffix2D).c_str());
           hist2D->SetName((SampleName + suffix2D).c_str());
           hist2D->Write();
-          delete hist2D;
         }
       }
       SampleCounter++;
@@ -500,15 +497,15 @@ void PredictiveThrower::ProduceToys() {
     for (int SampleIndex = 0; SampleIndex < MaCh3Sample->GetNSamples(); ++SampleIndex)
     {
       // Get nominal spectra and event rates
-      TH1* DataHist = MaCh3Sample->GetDataHist(SampleIndex);
+      const TH1* DataHist = MaCh3Sample->GetDataHist(SampleIndex);
       Data_Hist[SampleCounter] = M3::Clone(DataHist, MaCh3Sample->GetSampleTitle(SampleIndex) + "_data");
       Data_Hist[SampleCounter]->Write((MaCh3Sample->GetSampleTitle(SampleIndex) + "_data").c_str());
 
-      TH1* MCHist = MaCh3Sample->GetMCHist(SampleIndex);
+      const TH1* MCHist = MaCh3Sample->GetMCHist(SampleIndex);
       MC_Nom_Hist[SampleCounter] = M3::Clone(MCHist, MaCh3Sample->GetSampleTitle(SampleIndex) + "_mc");
       MC_Nom_Hist[SampleCounter]->Write((MaCh3Sample->GetSampleTitle(SampleIndex) + "_mc").c_str());
 
-      TH1* W2Hist = MaCh3Sample->GetW2Hist(SampleIndex);
+      const TH1* W2Hist = MaCh3Sample->GetW2Hist(SampleIndex);
       W2_Nom_Hist[SampleCounter] = M3::Clone(W2Hist, MaCh3Sample->GetSampleTitle(SampleIndex) + "_w2");
       W2_Nom_Hist[SampleCounter]->Write((MaCh3Sample->GetSampleTitle(SampleIndex) + "_w2").c_str());
       SampleCounter++;
@@ -1077,7 +1074,7 @@ void PredictiveThrower::RunPredictiveAnalysis() {
 double PredictiveThrower::CalcLLH(const double data,
                                   const double mc,
                                   const double w2,
-                                  const SampleHandlerBase* SampleHandler) const {
+                                  const SampleHandlerInterface* SampleHandler) const {
 // *************************
   double llh = SampleHandler->GetTestStatLLH(data, mc, w2);
   //KS: do times 2 because banff reports chi2
@@ -1088,7 +1085,7 @@ double PredictiveThrower::CalcLLH(const double data,
 double PredictiveThrower::CalcLLH(const TH1* DatHist,
                                   const TH1* MCHist,
                                   const TH1* W2Hist,
-                                  const SampleHandlerBase* SampleHandler) const {
+                                  const SampleHandlerInterface* SampleHandler) const {
 // *************************
   // 1D case
   if (auto h1 = dynamic_cast<const TH1D*>(DatHist)) {
@@ -1122,7 +1119,7 @@ double PredictiveThrower::CalcLLH(const TH1* DatHist,
 double PredictiveThrower::GetLLH(const TH1D* DatHist,
                                  const TH1D* MCHist,
                                  const TH1D* W2Hist,
-                                 const SampleHandlerBase* SampleHandler) const {
+                                 const SampleHandlerInterface* SampleHandler) const {
 // *************************
   double llh = 0.0;
   for (int i = 1; i <= DatHist->GetXaxis()->GetNbins(); ++i)
@@ -1140,7 +1137,7 @@ double PredictiveThrower::GetLLH(const TH1D* DatHist,
 double PredictiveThrower::GetLLH(const TH2Poly* DatHist,
                                  const TH2Poly* MCHist,
                                  const TH2Poly* W2Hist,
-                                 const SampleHandlerBase* SampleHandler) const {
+                                 const SampleHandlerInterface* SampleHandler) const {
 // *************************
   double llh = 0.0;
   for (int i = 1; i <= DatHist->GetNumberOfBins(); ++i)
@@ -1158,7 +1155,7 @@ double PredictiveThrower::GetLLH(const TH2Poly* DatHist,
 double PredictiveThrower::GetLLH(const TH2D* DatHist,
                                  const TH2D* MCHist,
                                  const TH2D* W2Hist,
-                                 const SampleHandlerBase* SampleHandler) const {
+                                 const SampleHandlerInterface* SampleHandler) const {
 // *************************
   double llh = 0.0;
 
@@ -1434,7 +1431,7 @@ void PredictiveThrower::StudyBetaParameters(TDirectory* PredictiveDir) {
 
 // ****************
 // Calculate the LLH for TH1, set the LLH to title of MCHist
-void PredictiveThrower::ExtractLLH(TH1*  DatHist, TH1* MCHist, TH1* W2Hist, const SampleHandlerBase* SampleHandler) const {
+void PredictiveThrower::ExtractLLH(TH1*  DatHist, TH1* MCHist, TH1* W2Hist, const SampleHandlerInterface* SampleHandler) const {
 // ****************
   const double llh = CalcLLH(DatHist, MCHist, W2Hist, SampleHandler);
   std::stringstream ss;

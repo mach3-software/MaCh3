@@ -68,16 +68,16 @@ class SampleHandlerBase :  public SampleHandlerInterface
   int GetSampleIndex(const std::string& SampleTitle) const;
 
   /// @brief Get Data histogram
-  TH1* GetDataHist(const int Sample) final;
-  TH1* GetDataHist(const std::string& Sample);
+  const TH1* GetDataHist(const int Sample) final;
+  const TH1* GetDataHist(const std::string& Sample);
 
   /// @brief Get MC histogram
-  TH1* GetMCHist(const int Sample) final;
-  TH1* GetMCHist(const std::string& Sample);
+  const TH1* GetMCHist(const int Sample) final;
+  const TH1* GetMCHist(const std::string& Sample);
 
   /// @brief Get W2 histogram
-  TH1* GetW2Hist(const int Sample) final;
-  TH1* GetW2Hist(const std::string& Sample);
+  const TH1* GetW2Hist(const int Sample) final;
+  const TH1* GetW2Hist(const std::string& Sample);
   /// @brief main routine modifying MC prediction based on proposed parameter values
   void Reweight() override;
   M3::float_t GetEventWeight(const int iEntry);
@@ -103,13 +103,12 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// Returns the original Selection so the caller can restore it later.
   std::vector<std::vector<KinematicCut>> ApplyTemporarySelection(const int iSample,
                                                                  const std::vector<KinematicCut>& ExtraCuts);
-  TH1 *Get1DVarHist(const int iSample, const std::string &ProjectionVar,
-                    const std::vector<KinematicCut> &EventSelectionVec = {}, int WeightStyle = 0,
-                    TAxis *Axis = nullptr, const std::vector<KinematicCut> &SubEventSelectionVec = {}) final;
-  TH2* Get2DVarHist(const int iSample, const std::string& ProjectionVarX, const std::string& ProjectionVarY,
-                    const std::vector< KinematicCut >& EventSelectionVec = {},
-                    int WeightStyle = 0, TAxis* AxisX = nullptr, TAxis* AxisY = nullptr,
-                    const std::vector< KinematicCut >& SubEventSelectionVec = {}) final;
+  std::unique_ptr<TH1> Get1DVarHist(const int iSample, const std::string &ProjectionVar,
+                                    const std::vector<KinematicCut> &EventSelectionVec = {}, int WeightStyle = 0,
+                                    const std::vector<KinematicCut> &SubEventSelectionVec = {}) final;
+  std::unique_ptr<TH2> Get2DVarHist(const int iSample, const std::string& ProjectionVarX, const std::string& ProjectionVarY,
+                                    const std::vector< KinematicCut >& EventSelectionVec = {},
+                                    int WeightStyle = 0, const std::vector< KinematicCut >& SubEventSelectionVec = {}) final;
   std::vector<KinematicCut> BuildModeChannelSelection(const int iSample, const int kModeToFill, const int kChannelToFill) const;
 
   void Fill1DSubEventHist(const int iSample, TH1D* _h1DVar, const std::string& ProjectionVar,
@@ -118,29 +117,29 @@ class SampleHandlerBase :  public SampleHandlerInterface
   void Fill2DSubEventHist(const int iSample, TH2D* _h2DVar, const std::string& ProjectionVarX, const std::string& ProjectionVarY,
                           const std::vector< KinematicCut >& SubEventSelectionVec = {}, int WeightStyle = 0);
 
-  TH1* Get1DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_Str,
-                                    int kModeToFill = -1, int kChannelToFill = -1, int WeightStyle = 0, TAxis* Axis = nullptr) final;
-  TH2* Get2DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_StrX,
-                                    const std::string& ProjectionVar_StrY, int kModeToFill = -1,
-                                    int kChannelToFill = -1, int WeightStyle = 0,
-                                    TAxis* AxisX = nullptr, TAxis* AxisY = nullptr) final;
+  std::unique_ptr<TH1> Get1DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_Str,
+                                                    const int kModeToFill = -1, const int kChannelToFill = -1,
+                                                    const int WeightStyle = 0) final;
+  std::unique_ptr<TH2> Get2DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_StrX,
+                                                    const std::string& ProjectionVar_StrY, const int kModeToFill = -1,
+                                                    const int kChannelToFill = -1, const int WeightStyle = 0) final;
 
-  TH1 *GetModeHist1D(const int iSample, int s, int m, int style = 0) {
+  std::unique_ptr<TH1> GetModeHist1D(const int iSample, int s, int m, int style = 0) {
     return Get1DVarHistByModeAndChannel(iSample, GetXBinVarName(iSample), m, s, style);
   }
-  TH2 *GetModeHist2D(const int iSample, int s, int m, int style = 0) {
+  std::unique_ptr<TH2> GetModeHist2D(const int iSample, int s, int m, int style = 0) {
     return Get2DVarHistByModeAndChannel(iSample, GetXBinVarName(iSample),GetYBinVarName(iSample), m, s, style);
   }
 
-  std::vector<TH1*> ReturnHistsBySelection1D(const int iSample, const std::string& KinematicProjection,
-                                             int Selection1, int Selection2 = -1,
-                                             int WeightStyle = 0, TAxis* Axis = nullptr);
-  std::vector<TH2*> ReturnHistsBySelection2D(const int iSample, const std::string& KinematicProjectionX,
-                                             const std::string& KinematicProjectionY,
-                                             int Selection1, int Selection2=-1, int WeightStyle=0,
-                                             TAxis* XAxis = nullptr, TAxis* YAxis = nullptr);
-  THStack* ReturnStackedHistBySelection1D(const int iSample, const std::string& KinematicProjection,
-                                          int Selection1, int Selection2 = -1, int WeightStyle = 0, TAxis* Axis = nullptr);
+  std::vector<std::unique_ptr<TH1>> ReturnHistsBySelection1D(const int iSample, const std::string& KinematicProjection,
+                                                             const int Selection1, const int Selection2 = -1,
+                                                             const int WeightStyle = 0);
+  std::vector<std::unique_ptr<TH2>> ReturnHistsBySelection2D(const int iSample, const std::string& KinematicProjectionX,
+                                                             const std::string& KinematicProjectionY,
+                                                             const int Selection1, const int Selection2=-1,
+                                                             const int WeightStyle=0);
+  std::unique_ptr<THStack> ReturnStackedHistBySelection1D(const int iSample, const std::string& KinematicProjection,
+                                          const int Selection1, const int Selection2 = -1, const int WeightStyle = 0);
   TLegend* ReturnStackHistLegend() {return THStackLeg;}
 
   /// @brief ETA function to generically convert a string from xsec cov to a kinematic type

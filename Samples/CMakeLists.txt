@@ -1,6 +1,6 @@
 set(HEADERS
     BinningHandler.h
-    SampleHandleInterface.h
+    SampleHandlerInterface.h
     SampleHandlerBase.h
     SampleStructs.h
     HistogramUtils.h
@@ -10,7 +10,7 @@ set(HEADERS
 
 add_library(Samples SHARED
     BinningHandler.cpp
-    SampleHandleInterface.cpp
+    SampleHandlerInterface.cpp
     SampleHandlerBase.cpp
     HistogramUtils.cpp
     OscillationHandler.cpp

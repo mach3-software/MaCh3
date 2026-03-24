@@ -61,11 +61,11 @@ class SampleHandlerInterface
   virtual std::string GetKinVarName(const int iSample, const int Dimension) const = 0;
 
   /// @brief Get Data histogram
-  virtual TH1* GetDataHist(const int Sample) = 0;
+  virtual const TH1* GetDataHist(const int Sample) = 0;
   /// @brief Get MC histogram
-  virtual TH1* GetMCHist(const int Sample) = 0;
+  virtual const TH1* GetMCHist(const int Sample) = 0;
   /// @brief Get W2 histogram
-  virtual TH1* GetW2Hist(const int Sample) = 0;
+  virtual const TH1* GetW2Hist(const int Sample) = 0;
 
   /// @brief DB Function to differentiate 1D or 2D binning
   virtual int GetNDim(const int Sample) const = 0;
@@ -74,20 +74,19 @@ class SampleHandlerInterface
   /// @brief Return the binning used to draw a kinematic parameter
   virtual std::vector<double> ReturnKinematicParameterBinning(const int Sample, const std::string &KinematicParameter) const = 0;
 
-  virtual TH1* Get1DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_Str,
-                                            int kModeToFill = -1, int kChannelToFill = -1, int WeightStyle = 0, TAxis* Axis = nullptr) = 0;
-
-  virtual TH2* Get2DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_StrX,
-                                            const std::string& ProjectionVar_StrY, int kModeToFill = -1,
-                                            int kChannelToFill = -1, int WeightStyle = 0,
-                                            TAxis* AxisX = nullptr, TAxis* AxisY = nullptr) = 0;
-  virtual TH1 *Get1DVarHist(const int iSample, const std::string &ProjectionVar,
-                           const std::vector<KinematicCut> &EventSelectionVec = {}, int WeightStyle = 0,
-                            TAxis *Axis = nullptr, const std::vector<KinematicCut> &SubEventSelectionVec = {}) = 0;
-  virtual TH2* Get2DVarHist(const int iSample, const std::string& ProjectionVarX, const std::string& ProjectionVarY,
-                            const std::vector< KinematicCut >& EventSelectionVec = {},
-                            int WeightStyle = 0, TAxis* AxisX = nullptr, TAxis* AxisY = nullptr,
-                            const std::vector< KinematicCut >& SubEventSelectionVec = {}) = 0;
+  virtual std::unique_ptr<TH1> Get1DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_Str,
+                                                            const int kModeToFill = -1, const int kChannelToFill = -1,
+                                                            const int WeightStyle = 0) = 0;
+  virtual std::unique_ptr<TH2> Get2DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_StrX,
+                                                            const std::string& ProjectionVar_StrY, int kModeToFill = -1,
+                                                            const int kChannelToFill = -1, const int WeightStyle = 0) = 0;
+  virtual std::unique_ptr<TH1> Get1DVarHist(const int iSample, const std::string &ProjectionVar,
+                                            const std::vector<KinematicCut> &EventSelectionVec = {}, int WeightStyle = 0,
+                                            const std::vector<KinematicCut> &SubEventSelectionVec = {}) = 0;
+  virtual std::unique_ptr<TH2> Get2DVarHist(const int iSample, const std::string& ProjectionVarX,
+                                            const std::string& ProjectionVarY,
+                                            const std::vector< KinematicCut >& EventSelectionVec = {},
+                                            const int WeightStyle = 0, const std::vector< KinematicCut >& SubEventSelectionVec = {}) = 0;
 
   /// @brief Calculate test statistic for a single bin using Poisson
   /// @param data is data

@@ -92,12 +92,11 @@ void FastViolinFill(TH2D* violin, TH1D* hist_1d);
 /// @param inputVec A `std::vector` of pointers to `Derived` objects.
 /// @return A `std::vector` of pointers to `Base` objects.
 template <typename Derived, typename Base>
-std::vector<Base*> CastVector(const std::vector<Derived*>& inputVec) {
-  std::vector<Base*> outputVec;
-  // Reserve space for efficiency
+std::vector<std::unique_ptr<Base>> CastVector(const std::vector<std::unique_ptr<Derived>>& inputVec) {
+  std::vector<std::unique_ptr<Base>> outputVec;
   outputVec.reserve(inputVec.size());
-  for (auto* ptr : inputVec) {
-    outputVec.push_back(static_cast<Base*>(ptr));
+  for (const auto& ptr : inputVec) {
+    outputVec.push_back(static_cast<std::unique_ptr<Base>>(ptr.get()));
   }
   return outputVec;
 }

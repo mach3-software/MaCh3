@@ -635,7 +635,7 @@ UnbinnedSplineHandler::~UnbinnedSplineHandler() {
 // Get the spline coefficients from the TSpline3 so that we can load ONLY these onto the GPU, not the whole TSpline3 object
 // This loads up coefficients into two arrays: one x array and one yabcd array
 // This should maximize our cache hits!
-void SMonolith::GetSplineCoeff_SepMany(TSpline3_red* &spl, int &nPoints, float *& xArray, float *& manyArray) const {
+void UnbinnedSplineHandler::GetSplineCoeff_SepMany(TSpline3_red* &spl, int &nPoints, float *& xArray, float *& manyArray) const {
 // *****************************************
   // Initialise all arrays to 1.0
   for (int i = 0; i < _max_knots; ++i) {
@@ -687,7 +687,7 @@ void SMonolith::GetSplineCoeff_SepMany(TSpline3_red* &spl, int &nPoints, float *
 // This should be used when we're using separate x,y,a,b,c,d arrays
 // Also pass the segments for the parameter along with their parameter values
 // This avoids doing lots of binary searches on the GPU
-void SMonolith::Evaluate() {
+void UnbinnedSplineHandler::Evaluate() {
 // *****************************************
   // There's a parameter mapping that goes from spline parameter to a global parameter index
   // Find the spline segments
@@ -702,7 +702,7 @@ void SMonolith::Evaluate() {
 #else
 //If CUDA is not enabled do the same on CPU
 // *****************************************
-void SMonolith::Evaluate() {
+void UnbinnedSplineHandler::Evaluate() {
 // *****************************************
   // There's a parameter mapping that goes from spline parameter to a global parameter index
   // Find the spline segments
@@ -717,7 +717,7 @@ void SMonolith::Evaluate() {
 #endif
 
 //*********************************************************
-void SMonolith::CalcSplineWeights() {
+void UnbinnedSplineHandler::CalcSplineWeights() {
 //*********************************************************
   #ifdef MULTITHREAD
   //KS: Open parallel region
@@ -782,7 +782,7 @@ void SMonolith::CalcSplineWeights() {
 
 //*********************************************************
 //KS: Calc total event weight on CPU
-void SMonolith::CalcTotalEventWeight() {
+void UnbinnedSplineHandler::CalcTotalEventWeight() {
 //*********************************************************
   #ifdef MULTITHREAD
   #pragma omp parallel for
@@ -824,7 +824,7 @@ void SMonolith::CalcTotalEventWeight() {
 
 //*********************************************************
 //KS: Print info about how much knots etc has been initialised
-void SMonolith::PrintInitialsiation() const {
+void UnbinnedSplineHandler::PrintInitialsiation() const {
 //*********************************************************
   unsigned int event_size_max = _max_knots * nParams;
 
@@ -841,7 +841,7 @@ void SMonolith::PrintInitialsiation() const {
 
 //*********************************************************
 //KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.
-void SMonolith::SynchroniseMemTransfer() const {
+void UnbinnedSplineHandler::SynchroniseMemTransfer() const {
 //*********************************************************
   #ifdef MaCh3_CUDA
   SynchroniseSplines();

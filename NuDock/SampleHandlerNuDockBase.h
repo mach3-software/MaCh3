@@ -79,11 +79,11 @@ public:
   std::string GetKinVarName(const int iSample, const int Dimension) const override { (void)iSample; (void)Dimension; return ""; };
 
   /// @brief Get Data histogram
-  TH1* GetDataHist(const int Sample) override { (void)Sample; return nullptr; };
+  const TH1* GetDataHist(const int Sample) override { (void)Sample; return nullptr; };
   /// @brief Get MC histogram
-  TH1* GetMCHist(const int Sample) override { (void)Sample; return nullptr; };
+  const TH1* GetMCHist(const int Sample) override { (void)Sample; return nullptr; };
   /// @brief Get W2 histogram
-  TH1* GetW2Hist(const int Sample) override { (void)Sample; return nullptr; };
+  const TH1* GetW2Hist(const int Sample) override { (void)Sample; return nullptr; };
 
   /// @brief DB Function to differentiate 1D or 2D binning
   int GetNDim(const int Sample) const override { (void)Sample; return 0; };
@@ -92,35 +92,32 @@ public:
   /// @brief Return the binning used to draw a kinematic parameter
   std::vector<double> ReturnKinematicParameterBinning(const int Sample, const std::string &KinematicParameter) const override { (void)Sample; (void)KinematicParameter; return {}; };
 
-  TH1* Get1DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_Str,
-                                            int kModeToFill = -1, int kChannelToFill = -1, int WeightStyle = 0, TAxis* Axis = nullptr) override { 
-    (void)iSample; (void)ProjectionVar_Str; (void)kModeToFill; (void)kChannelToFill; (void)WeightStyle; (void)Axis;
+  std::unique_ptr<TH1> Get1DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_Str,
+                                            int kModeToFill = -1, int kChannelToFill = -1, int WeightStyle = 0) override {
+    (void)iSample; (void)ProjectionVar_Str; (void)kModeToFill; (void)kChannelToFill; (void)WeightStyle;
     return nullptr;
   };
 
-  TH2* Get2DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_StrX,
+  std::unique_ptr<TH2> Get2DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_StrX,
                                             const std::string& ProjectionVar_StrY, int kModeToFill = -1,
-                                            int kChannelToFill = -1, int WeightStyle = 0,
-                                            TAxis* AxisX = nullptr, TAxis* AxisY = nullptr) override { 
-    (void)iSample; (void)ProjectionVar_StrX; (void)ProjectionVar_StrY; (void)kModeToFill; (void)kChannelToFill; (void)WeightStyle; (void)AxisX; (void)AxisY;
+                                            int kChannelToFill = -1, int WeightStyle = 0) override {
+    (void)iSample; (void)ProjectionVar_StrX; (void)ProjectionVar_StrY; (void)kModeToFill; (void)kChannelToFill; (void)WeightStyle;
     return nullptr;
   };
 
-  TH1 *Get1DVarHist(const int iSample, const std::string &ProjectionVar,
+  std::unique_ptr<TH1> Get1DVarHist(const int iSample, const std::string &ProjectionVar,
                            const std::vector<KinematicCut> &EventSelectionVec = {}, int WeightStyle = 0,
-                            TAxis *Axis = nullptr, const std::vector<KinematicCut> &SubEventSelectionVec = {}) override {
-    (void)iSample; (void)ProjectionVar; (void)EventSelectionVec; (void)WeightStyle; (void)Axis; (void)SubEventSelectionVec;
+                           const std::vector<KinematicCut> &SubEventSelectionVec = {}) override {
+    (void)iSample; (void)ProjectionVar; (void)EventSelectionVec; (void)WeightStyle; (void)SubEventSelectionVec;
     return nullptr;
   };
 
-  TH2* Get2DVarHist(const int iSample, const std::string& ProjectionVarX, const std::string& ProjectionVarY,
+  std::unique_ptr<TH2> Get2DVarHist(const int iSample, const std::string& ProjectionVarX, const std::string& ProjectionVarY,
                             const std::vector< KinematicCut >& EventSelectionVec = {},
-                            int WeightStyle = 0, TAxis* AxisX = nullptr, TAxis* AxisY = nullptr,
-                            const std::vector< KinematicCut >& SubEventSelectionVec = {}) override {
-    (void)iSample; (void)ProjectionVarX; (void)ProjectionVarY; (void)EventSelectionVec; (void)WeightStyle; (void)AxisX; (void)AxisY; (void)SubEventSelectionVec;
+                            int WeightStyle = 0, const std::vector< KinematicCut >& SubEventSelectionVec = {}) override {
+    (void)iSample; (void)ProjectionVarX; (void)ProjectionVarY; (void)EventSelectionVec; (void)WeightStyle; (void)SubEventSelectionVec;
     return nullptr;
   };
-
 
 protected:
   /// @brief No-op -- memory cleanup is handled by the NuDock server.

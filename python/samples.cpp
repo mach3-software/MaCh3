@@ -142,94 +142,66 @@ public:
         );
     }
 
-    TH1* Get1DVarHistByModeAndChannel(const int iSample,
+    std::unique_ptr<TH1> Get1DVarHistByModeAndChannel(const int iSample,
                                       const std::string& ProjectionVar_Str,
-                                      int kModeToFill = -1,
-                                      int kChannelToFill = -1,
-                                      int WeightStyle = 0,
-                                      TAxis* Axis = nullptr) override {
-        PYBIND11_OVERRIDE_PURE(
-            TH1*,                     /* Return type */
-            SampleHandlerInterface,        /* Parent class */
-            Get1DVarHistByModeAndChannel, /* Name of function in C++ */
-            iSample,
-            ProjectionVar_Str,
-            kModeToFill,
-            kChannelToFill,
-            WeightStyle,
-            Axis
-        );
+                                      const int kModeToFill = -1,
+                                      const int kChannelToFill = -1,
+                                      const int WeightStyle = 0) override {
+      (void) iSample;
+      (void) ProjectionVar_Str;
+      (void) kModeToFill;
+      (void) kChannelToFill;
+      (void) WeightStyle;
+      return nullptr;
     }
 
-    TH2* Get2DVarHistByModeAndChannel(const int iSample,
+    std::unique_ptr<TH2> Get2DVarHistByModeAndChannel(const int iSample,
                                       const std::string& ProjectionVar_StrX,
                                       const std::string& ProjectionVar_StrY,
-                                      int kModeToFill = -1,
-                                      int kChannelToFill = -1,
-                                      int WeightStyle = 0,
-                                      TAxis* AxisX = nullptr,
-                                      TAxis* AxisY = nullptr) override {
-        PYBIND11_OVERRIDE_PURE(
-            TH2*,                        /* Return type */
-            SampleHandlerInterface,           /* Parent class */
-            Get2DVarHistByModeAndChannel, /* Name of function in C++ */
-            iSample,
-            ProjectionVar_StrX,
-            ProjectionVar_StrY,
-            kModeToFill,
-            kChannelToFill,
-            WeightStyle,
-            AxisX,
-            AxisY
-        );
+                                      const int kModeToFill = -1,
+                                      const int kChannelToFill = -1,
+                                      const int WeightStyle = 0) override {
+      (void) iSample;
+      (void) ProjectionVar_StrX;
+      (void) ProjectionVar_StrY;
+      (void) kModeToFill;
+      (void) kChannelToFill;
+      (void) WeightStyle;
+      return nullptr;
     }
 
-    TH1* Get1DVarHist(const int iSample,
-                      const std::string &ProjectionVar,
-                      const std::vector<KinematicCut> &EventSelectionVec = {},
-                      int WeightStyle = 0,
-                      TAxis *Axis = nullptr,
-                      const std::vector<KinematicCut> &SubEventSelectionVec = {}) override {
-        PYBIND11_OVERRIDE_PURE(
-            TH1*,                     /* Return type */
-            SampleHandlerInterface,        /* Parent class */
-            Get1DVarHist,             /* Name of function in C++ */
-            iSample,
-            ProjectionVar,
-            EventSelectionVec,
-            WeightStyle,
-            Axis,
-            SubEventSelectionVec
-        );
+    std::unique_ptr<TH1> Get1DVarHist(const int iSample,
+                                      const std::string &ProjectionVar,
+                                      const std::vector<KinematicCut> &EventSelectionVec = {},
+                                      const int WeightStyle = 0,
+                                      const std::vector<KinematicCut> &SubEventSelectionVec = {}) override {
+      (void) iSample;
+      (void) ProjectionVar;
+      (void) EventSelectionVec;
+      (void) WeightStyle;
+      (void) SubEventSelectionVec;
+      return nullptr;
     }
 
-    TH2* Get2DVarHist(const int iSample,
-                      const std::string& ProjectionVarX,
-                      const std::string& ProjectionVarY,
-                      const std::vector<KinematicCut>& EventSelectionVec = {},
-                      int WeightStyle = 0,
-                      TAxis* AxisX = nullptr,
-                      TAxis* AxisY = nullptr,
-                      const std::vector<KinematicCut>& SubEventSelectionVec = {}) override {
-        PYBIND11_OVERRIDE_PURE(
-            TH2*,                     /* Return type */
-            SampleHandlerInterface,        /* Parent class */
-            Get2DVarHist,             /* Name of function in C++ */
-            iSample,
-            ProjectionVarX,
-            ProjectionVarY,
-            EventSelectionVec,
-            WeightStyle,
-            AxisX,
-            AxisY,
-            SubEventSelectionVec
-        );
+    std::unique_ptr<TH2> Get2DVarHist(const int iSample,
+                                      const std::string& ProjectionVarX,
+                                      const std::string& ProjectionVarY,
+                                      const std::vector<KinematicCut>& EventSelectionVec = {},
+                                      const int WeightStyle = 0,
+                                      const std::vector<KinematicCut>& SubEventSelectionVec = {}) override {
+      (void) iSample;
+      (void) ProjectionVarX;
+      (void) ProjectionVarY;
+      (void) EventSelectionVec;
+      (void) WeightStyle;
+      (void) SubEventSelectionVec;
+      return nullptr;
     }
 
     int GetNDim(const int Sample) const override {
         PYBIND11_OVERRIDE_PURE(
             int,                      /* Return type */
-            SampleHandlerInterface,        /* Parent class */
+            SampleHandlerInterface,   /* Parent class */
             GetNDim,                  /* Name of function in C++ */
             Sample
         );

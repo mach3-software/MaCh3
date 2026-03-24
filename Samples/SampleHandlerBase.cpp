@@ -1,7 +1,7 @@
 #include "SampleHandlerBase.h"
 #include "Manager/MaCh3Exception.h"
 #include "Manager/MaCh3Logger.h"
-#include "Splines/SplineMonolith.h"
+#include "Splines/UnbinnedSplineHandler.h"
 
 #include <cstddef>
 #include <algorithm>
@@ -885,7 +885,7 @@ int SampleHandlerBase::GetSampleIndex(const std::string& SampleTitle) const {
 }
 
 // ************************************************
-TH1* SampleHandlerBase::GetW2Hist(const int Sample) {
+const TH1* SampleHandlerBase::GetW2Hist(const int Sample) {
 // ************************************************
   FillHist(Sample, SampleDetails[Sample].W2Hist, SampleHandler_array_w2);
   if(SampleDetails[Sample].W2Hist == nullptr) {
@@ -896,14 +896,14 @@ TH1* SampleHandlerBase::GetW2Hist(const int Sample) {
 }
 
 // ************************************************
-TH1* SampleHandlerBase::GetW2Hist(const std::string& Sample) {
+const TH1* SampleHandlerBase::GetW2Hist(const std::string& Sample) {
 // ************************************************
   const int Index = GetSampleIndex(Sample);
   return GetW2Hist(Index);
 }
 
 // ************************************************
-TH1* SampleHandlerBase::GetMCHist(const int Sample) {
+const TH1* SampleHandlerBase::GetMCHist(const int Sample) {
 // ************************************************
   FillHist(Sample, SampleDetails[Sample].MCHist, SampleHandler_array);
   if(SampleDetails[Sample].MCHist == nullptr) {
@@ -914,14 +914,14 @@ TH1* SampleHandlerBase::GetMCHist(const int Sample) {
 }
 
 // ************************************************
-TH1* SampleHandlerBase::GetMCHist(const std::string& Sample) {
+const TH1* SampleHandlerBase::GetMCHist(const std::string& Sample) {
 // ************************************************
   const int Index = GetSampleIndex(Sample);
   return GetMCHist(Index);
 }
 
 // ************************************************
-TH1* SampleHandlerBase::GetDataHist(const int Sample) {
+const TH1* SampleHandlerBase::GetDataHist(const int Sample) {
 // ************************************************
   if(SampleDetails[Sample].DataHist == nullptr) {
     MACH3LOG_ERROR("Can't access {} for {}Dimensions", __func__, GetNDim(Sample));
@@ -931,7 +931,7 @@ TH1* SampleHandlerBase::GetDataHist(const int Sample) {
 }
 
 // ************************************************
-TH1* SampleHandlerBase::GetDataHist(const std::string& Sample) {
+const TH1* SampleHandlerBase::GetDataHist(const std::string& Sample) {
 // ************************************************
   int Index = GetSampleIndex(Sample);
   return GetDataHist(Index);
@@ -1246,7 +1246,7 @@ void SampleHandlerBase::SetSplinePointers() {
       } // end loop over splines
       w_pointers.shrink_to_fit();
     } // end loop over events
-  } else if (auto UnbinnedSpline = dynamic_cast<SMonolith*>(SplineHandler.get())) {
+  } else if (auto UnbinnedSpline = dynamic_cast<UnbinnedSplineHandler*>(SplineHandler.get())) {
     for (unsigned int iEvent = 0; iEvent < GetNEvents(); ++iEvent) {
       MCEvents[iEvent].total_weight_pointers.push_back(UnbinnedSpline->RetPointer(iEvent));
     }
@@ -1311,20 +1311,20 @@ void SampleHandlerBase::SaveAdditionalInfo(TDirectory* Dir) {
     std::unique_ptr<TH1> data_hist;
 
     if (GetNDim(iSample) == 1) {
-      data_hist = M3::Clone<TH1D>(dynamic_cast<TH1D*>(GetDataHist(iSample)), "data_" + GetSampleTitle(iSample));
+      data_hist = M3::Clone<TH1D>(dynamic_cast<const TH1D*>(GetDataHist(iSample)), "data_" + GetSampleTitle(iSample));
       data_hist->GetXaxis()->SetTitle(GetXBinVarName(iSample).c_str());
       data_hist->GetYaxis()->SetTitle("Number of Events");
     } else if (GetNDim(iSample) == 2) {
       if(Binning->IsUniform(iSample)) {
-        data_hist = M3::Clone<TH2D>(dynamic_cast<TH2D*>(GetDataHist(iSample)), "data_" + GetSampleTitle(iSample));
+        data_hist = M3::Clone<TH2D>(dynamic_cast<const TH2D*>(GetDataHist(iSample)), "data_" + GetSampleTitle(iSample));
       } else {
-        data_hist = M3::Clone<TH2Poly>(dynamic_cast<TH2Poly*>(GetDataHist(iSample)), "data_" + GetSampleTitle(iSample));
+        data_hist = M3::Clone<TH2Poly>(dynamic_cast<const TH2Poly*>(GetDataHist(iSample)), "data_" + GetSampleTitle(iSample));
       }
       data_hist->GetXaxis()->SetTitle(GetXBinVarName(iSample).c_str());
       data_hist->GetYaxis()->SetTitle(GetYBinVarName(iSample).c_str());
       data_hist->GetZaxis()->SetTitle("Number of Events");
     } else {
-      data_hist = M3::Clone<TH1D>(dynamic_cast<TH1D*>(GetDataHist(iSample)), "data_" + GetSampleTitle(iSample));
+      data_hist = M3::Clone<TH1D>(dynamic_cast<const TH1D*>(GetDataHist(iSample)), "data_" + GetSampleTitle(iSample));
       int nbins = Binning->GetNBins(iSample);
       for(int iBin = 0; iBin < nbins; iBin++) {
         auto BinName = Binning->GetBinName(iSample, iBin);
@@ -1382,7 +1382,7 @@ void SampleHandlerBase::InitialiseSplineObject() {
     SetSplinePointers();
 
     BinnedSplines->cleanUpMemory();
-  } else if (auto UnbinnedSpline = dynamic_cast<SMonolith*>(SplineHandler.get())) {
+  } else if (auto UnbinnedSpline = dynamic_cast<UnbinnedSplineHandler*>(SplineHandler.get())) {
     (void) UnbinnedSpline;
     SetSplinePointers();
   } else {
@@ -1414,26 +1414,24 @@ std::vector<std::vector<KinematicCut>> SampleHandlerBase::ApplyTemporarySelectio
 
 // ************************************************
 // === JM adjust GetNDVarHist functions to allow for subevent-level plotting ===
-TH1* SampleHandlerBase::Get1DVarHist(const int iSample, const std::string& ProjectionVar_Str, const std::vector< KinematicCut >& EventSelectionVec,
-                                   int WeightStyle, TAxis* Axis, const std::vector< KinematicCut >& SubEventSelectionVec) {
+std::unique_ptr<TH1> SampleHandlerBase::Get1DVarHist(const int iSample, const std::string& ProjectionVar_Str,
+                                                     const std::vector< KinematicCut >& EventSelectionVec,
+                                                     const int WeightStyle,
+                                                     const std::vector< KinematicCut >& SubEventSelectionVec) {
 // ************************************************
   //DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.
   //   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset
   auto tmp_Selection = ApplyTemporarySelection(iSample, EventSelectionVec);
 
   //DB Define the histogram which will be returned
-  TH1D* _h1DVar = nullptr;;
-  if (Axis) {
-    _h1DVar = new TH1D("","",Axis->GetNbins(),Axis->GetXbins()->GetArray());
-  } else {
-    std::vector<double> xBinEdges = ReturnKinematicParameterBinning(iSample, ProjectionVar_Str);
-    _h1DVar = new TH1D("", "", int(xBinEdges.size())-1, xBinEdges.data());
-  }
+  std::vector<double> xBinEdges = ReturnKinematicParameterBinning(iSample, ProjectionVar_Str);
+  auto _h1DVar = std::make_unique<TH1D>("", "", int(xBinEdges.size())-1, xBinEdges.data());
+  _h1DVar->SetDirectory(nullptr);
   _h1DVar->GetXaxis()->SetTitle(ProjectionVar_Str.c_str());
   _h1DVar->GetYaxis()->SetTitle("Events");
 
   if (IsSubEventVarString(ProjectionVar_Str)) {
-    Fill1DSubEventHist(iSample, _h1DVar, ProjectionVar_Str, SubEventSelectionVec, WeightStyle);
+    Fill1DSubEventHist(iSample, _h1DVar.get(), ProjectionVar_Str, SubEventSelectionVec, WeightStyle);
   } else {
     //DB Grab the associated enum with the argument string
     int ProjectionVar_Int = ReturnKinematicParameterFromString(ProjectionVar_Str);
@@ -1460,7 +1458,7 @@ TH1* SampleHandlerBase::Get1DVarHist(const int iSample, const std::string& Proje
 
 // ************************************************
 void SampleHandlerBase::Fill1DSubEventHist(const int iSample, TH1D* _h1DVar, const std::string& ProjectionVar_Str,
-                                         const std::vector< KinematicCut >& SubEventSelectionVec, int WeightStyle) {
+                                           const std::vector< KinematicCut >& SubEventSelectionVec, const int WeightStyle) {
 // ************************************************
   int ProjectionVar_Int = ReturnKinematicVectorFromString(ProjectionVar_Str);
 
@@ -1487,32 +1485,27 @@ void SampleHandlerBase::Fill1DSubEventHist(const int iSample, TH1D* _h1DVar, con
 }
 
 // ************************************************
-TH2* SampleHandlerBase::Get2DVarHist(const int iSample,
-                                   const std::string& ProjectionVar_StrX,
-                                   const std::string& ProjectionVar_StrY,
-                                   const std::vector< KinematicCut >& EventSelectionVec,
-                                   int WeightStyle, TAxis* AxisX, TAxis* AxisY,
-                                   const std::vector< KinematicCut >& SubEventSelectionVec) {
+std::unique_ptr<TH2> SampleHandlerBase::Get2DVarHist(const int iSample,
+                                                     const std::string& ProjectionVar_StrX,
+                                                     const std::string& ProjectionVar_StrY,
+                                                     const std::vector< KinematicCut >& EventSelectionVec,
+                                                     const int WeightStyle, const std::vector< KinematicCut >& SubEventSelectionVec) {
 // ************************************************
   //DB Need to overwrite the Selection member variable so that IsEventSelected function operates correctly.
   //   Consequently, store the selection cuts already saved in the sample, overwrite the Selection variable, then reset
   auto tmp_Selection = ApplyTemporarySelection(iSample, EventSelectionVec);
 
   //DB Define the histogram which will be returned
-  TH2D* _h2DVar = nullptr;
-  if (AxisX && AxisY) {
-    _h2DVar = new TH2D("","",AxisX->GetNbins(),AxisX->GetXbins()->GetArray(),AxisY->GetNbins(),AxisY->GetXbins()->GetArray());
-  } else {
-    std::vector<double> xBinEdges = ReturnKinematicParameterBinning(iSample, ProjectionVar_StrX);
-    std::vector<double> yBinEdges = ReturnKinematicParameterBinning(iSample, ProjectionVar_StrY);
-    _h2DVar = new TH2D("", "", int(xBinEdges.size())-1, xBinEdges.data(), int(yBinEdges.size())-1, yBinEdges.data());
-  }
+  std::vector<double> xBinEdges = ReturnKinematicParameterBinning(iSample, ProjectionVar_StrX);
+  std::vector<double> yBinEdges = ReturnKinematicParameterBinning(iSample, ProjectionVar_StrY);
+  auto _h2DVar = std::make_unique<TH2D>("", "", int(xBinEdges.size())-1, xBinEdges.data(), int(yBinEdges.size())-1, yBinEdges.data());
+  _h2DVar->SetDirectory(nullptr);
   _h2DVar->GetXaxis()->SetTitle(ProjectionVar_StrX.c_str());
   _h2DVar->GetYaxis()->SetTitle(ProjectionVar_StrY.c_str());
   _h2DVar->GetZaxis()->SetTitle("Events");
 
   bool IsSubEventHist = IsSubEventVarString(ProjectionVar_StrX) || IsSubEventVarString(ProjectionVar_StrY);
-  if (IsSubEventHist) Fill2DSubEventHist(iSample, _h2DVar, ProjectionVar_StrX, ProjectionVar_StrY, SubEventSelectionVec, WeightStyle);
+  if (IsSubEventHist) Fill2DSubEventHist(iSample, _h2DVar.get(), ProjectionVar_StrX, ProjectionVar_StrY, SubEventSelectionVec, WeightStyle);
   else {
     //DB Grab the associated enum with the argument string
     int ProjectionVar_IntX = ReturnKinematicParameterFromString(ProjectionVar_StrX);
@@ -1546,7 +1539,6 @@ void SampleHandlerBase::Fill2DSubEventHist(const int iSample, TH2D* _h2DVar,
                                          const std::vector< KinematicCut >& SubEventSelectionVec,
                                          int WeightStyle) {
 // ************************************************
-
   bool IsSubEventVarX = IsSubEventVarString(ProjectionVar_StrX);
   bool IsSubEventVarY = IsSubEventVarString(ProjectionVar_StrY);
 
@@ -1706,8 +1698,10 @@ std::vector<double> SampleHandlerBase::ReturnKinematicParameterBinning(const int
   return BinningVect;
 }
 
-
+// ************************************************
 bool SampleHandlerBase::IsSubEventVarString(const std::string& VarStr) {
+// ************************************************
+
   if (KinematicVectors == nullptr) return false;
 
   if (KinematicVectors->count(VarStr)) {
@@ -1773,22 +1767,25 @@ std::vector<KinematicCut> SampleHandlerBase::BuildModeChannelSelection(const int
 }
 
 // ************************************************
-TH1* SampleHandlerBase::Get1DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_Str,
-    int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* Axis) {
+std::unique_ptr<TH1> SampleHandlerBase::Get1DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_Str,
+    const int kModeToFill, const int kChannelToFill, const int WeightStyle) {
 // ************************************************
   auto SelectionVec = BuildModeChannelSelection(iSample, kModeToFill, kChannelToFill);
-  return Get1DVarHist(iSample, ProjectionVar_Str, SelectionVec, WeightStyle, Axis);
+  return Get1DVarHist(iSample, ProjectionVar_Str, SelectionVec, WeightStyle);
 }
 
 // ************************************************
-TH2* SampleHandlerBase::Get2DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_StrX, const std::string& ProjectionVar_StrY,
-    int kModeToFill, int kChannelToFill, int WeightStyle, TAxis* AxisX, TAxis* AxisY) {
+std::unique_ptr<TH2> SampleHandlerBase::Get2DVarHistByModeAndChannel(const int iSample, const std::string& ProjectionVar_StrX,
+                                                                     const std::string& ProjectionVar_StrY, const int kModeToFill,
+                                                                     const int kChannelToFill, const int WeightStyle) {
 // ************************************************
   auto SelectionVec = BuildModeChannelSelection(iSample, kModeToFill, kChannelToFill);
-  return Get2DVarHist(iSample, ProjectionVar_StrX, ProjectionVar_StrY, SelectionVec, WeightStyle, AxisX,AxisY);
+  return Get2DVarHist(iSample, ProjectionVar_StrX, ProjectionVar_StrY, SelectionVec, WeightStyle);
 }
 
+// ************************************************
 void SampleHandlerBase::PrintIntegral(const int iSample, const TString& OutputFileName, const int WeightStyle, const TString& OutputCSVFileName) {
+// ************************************************
   constexpr int space = 14;
 
   bool printToFile=false;
@@ -1811,7 +1808,7 @@ void SampleHandlerBase::PrintIntegral(const int iSample, const TString& OutputFi
 
   double PDFIntegral = 0.;
 
-  std::vector< std::vector< TH1* > > IntegralList;
+  std::vector< std::vector< std::unique_ptr<TH1> > > IntegralList;
   IntegralList.resize(Modes->GetNModes());
 
   std::vector<double> ChannelIntegral;
@@ -1926,15 +1923,13 @@ void SampleHandlerBase::PrintIntegral(const int iSample, const TString& OutputFi
     outfile << std::endl;
     outfile.close();
   }
-  // KS: Clean memory we could use smart pointers in future
-  CleanContainer(IntegralList);
 }
 
 // ************************************************
-std::vector<TH1*> SampleHandlerBase::ReturnHistsBySelection1D(const int iSample, const std::string& KinematicProjection,
-                                                            int Selection1, int Selection2, int WeightStyle, TAxis* XAxis) {
+std::vector<std::unique_ptr<TH1>> SampleHandlerBase::ReturnHistsBySelection1D(const int iSample, const std::string& KinematicProjection,
+                                                            const int Selection1, const int Selection2, const int WeightStyle) {
 // ************************************************
-  std::vector<TH1*> hHistList;
+  std::vector<std::unique_ptr<TH1>> hHistList;
   std::string legendEntry;
 
   if (THStackLeg != nullptr) {delete THStackLeg;}
@@ -1954,27 +1949,26 @@ std::vector<TH1*> SampleHandlerBase::ReturnHistsBySelection1D(const int iSample,
 
   for (int i=0;i<iMax;i++) {
     if (Selection1 == FDPlotType::kModePlot) {
-      hHistList.push_back(Get1DVarHistByModeAndChannel(iSample, KinematicProjection,i,Selection2,WeightStyle,XAxis));
-      THStackLeg->AddEntry(hHistList[i],(Modes->GetMaCh3ModeName(i)+Form(" : (%4.2f)",hHistList[i]->Integral())).c_str(),"f");
+      hHistList.push_back(Get1DVarHistByModeAndChannel(iSample, KinematicProjection,i,Selection2,WeightStyle));
+      THStackLeg->AddEntry(hHistList[i].get(), (Modes->GetMaCh3ModeName(i)+Form(" : (%4.2f)",hHistList[i]->Integral())).c_str(),"f");
 
       hHistList[i]->SetFillColor(static_cast<Color_t>(Modes->GetMaCh3ModePlotColor(i)));
       hHistList[i]->SetLineColor(static_cast<Color_t>(Modes->GetMaCh3ModePlotColor(i)));
     }
     if (Selection1 == FDPlotType::kOscChannelPlot) {
-      hHistList.push_back(Get1DVarHistByModeAndChannel(iSample, KinematicProjection,Selection2,i,WeightStyle,XAxis));
-      THStackLeg->AddEntry(hHistList[i],(GetFlavourName(iSample, i)+Form(" | %4.2f",hHistList[i]->Integral())).c_str(),"f");
+      hHistList.push_back(Get1DVarHistByModeAndChannel(iSample, KinematicProjection,Selection2,i,WeightStyle));
+      THStackLeg->AddEntry(hHistList[i].get(),(GetFlavourName(iSample, i)+Form(" | %4.2f",hHistList[i]->Integral())).c_str(),"f");
     }
   }
 
   return hHistList;
 }
 // ************************************************
-std::vector<TH2*> SampleHandlerBase::ReturnHistsBySelection2D(const int iSample, const std::string& KinematicProjectionX,
-                                                            const std::string& KinematicProjectionY, int Selection1,
-                                                            int Selection2, int WeightStyle,
-                                                            TAxis* XAxis, TAxis* YAxis) {
+std::vector<std::unique_ptr<TH2>> SampleHandlerBase::ReturnHistsBySelection2D(const int iSample, const std::string& KinematicProjectionX,
+                                                                              const std::string& KinematicProjectionY, const int Selection1,
+                                                                              const int Selection2, const int WeightStyle) {
 // ************************************************
-  std::vector<TH2*> hHistList;
+  std::vector<std::unique_ptr<TH2>> hHistList;
 
   int iMax = -1;
   if (Selection1 == FDPlotType::kModePlot) {
@@ -1990,10 +1984,10 @@ std::vector<TH2*> SampleHandlerBase::ReturnHistsBySelection2D(const int iSample,
 
   for (int i=0;i<iMax;i++) {
     if (Selection1 == FDPlotType::kModePlot) {
-      hHistList.push_back(Get2DVarHistByModeAndChannel(iSample, KinematicProjectionX,KinematicProjectionY,i,Selection2,WeightStyle,XAxis,YAxis));
+      hHistList.push_back(Get2DVarHistByModeAndChannel(iSample, KinematicProjectionX,KinematicProjectionY,i,Selection2,WeightStyle));
     }
     if (Selection1 == FDPlotType::kOscChannelPlot) {
-      hHistList.push_back(Get2DVarHistByModeAndChannel(iSample, KinematicProjectionX,KinematicProjectionY,Selection2,i,WeightStyle,XAxis,YAxis));
+      hHistList.push_back(Get2DVarHistByModeAndChannel(iSample, KinematicProjectionX,KinematicProjectionY,Selection2,i,WeightStyle));
     }
   }
 
@@ -2001,17 +1995,16 @@ std::vector<TH2*> SampleHandlerBase::ReturnHistsBySelection2D(const int iSample,
 }
 
 // ************************************************
-THStack* SampleHandlerBase::ReturnStackedHistBySelection1D(const int iSample, const std::string& KinematicProjection,
-                                                         int Selection1, int Selection2, int WeightStyle, TAxis* XAxis) {
+std::unique_ptr<THStack> SampleHandlerBase::ReturnStackedHistBySelection1D(const int iSample, const std::string& KinematicProjection,
+                                                         int Selection1, int Selection2, int WeightStyle) {
 // ************************************************
-  std::vector<TH1*> HistList = ReturnHistsBySelection1D(iSample, KinematicProjection, Selection1, Selection2, WeightStyle, XAxis);
-  THStack* StackHist = new THStack((GetSampleTitle(iSample)+"_"+KinematicProjection+"_Stack").c_str(),"");
+  auto HistList = ReturnHistsBySelection1D(iSample, KinematicProjection, Selection1, Selection2, WeightStyle);
+  auto StackHist = std::make_unique<THStack>((GetSampleTitle(iSample)+"_"+KinematicProjection+"_Stack").c_str(),"");
   for (unsigned int i=0;i<HistList.size();i++) {
-    StackHist->Add(HistList[i]);
+    StackHist->Add(HistList[i].get());
   }
   return StackHist;
 }
-
 
 // ************************************************
 const double* SampleHandlerBase::GetPointerToOscChannel(const int iEvent) const {
