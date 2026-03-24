@@ -1,7 +1,7 @@
 set(HEADERS
     BinningHandler.h
+    SampleHandleInterface.h
     SampleHandlerBase.h
-    SampleHandlerFD.h
     SampleStructs.h
     HistogramUtils.h
     FarDetectorCoreInfoStruct.h
@@ -10,8 +10,8 @@ set(HEADERS
 
 add_library(Samples SHARED
     BinningHandler.cpp
+    SampleHandleInterface.cpp
     SampleHandlerBase.cpp
-    SampleHandlerFD.cpp
     HistogramUtils.cpp
     OscillationHandler.cpp
 )

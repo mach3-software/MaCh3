@@ -1,20 +1,20 @@
-#include "SampleHandlerBase.h"
+#include "SampleHandlerInterface.h"
 
 // ***************************************************************************
-SampleHandlerBase::SampleHandlerBase() {
+SampleHandlerInterface::SampleHandlerInterface() {
 // ***************************************************************************
   nEvents = 0;
   nSamples = 0;
 }
 
 // ***************************************************************************
-SampleHandlerBase::~SampleHandlerBase() {
+SampleHandlerInterface::~SampleHandlerInterface() {
 // ***************************************************************************
 }
 
 // ***************************************************************************
 // Poisson likelihood calc for data and MC event rates
-double SampleHandlerBase::GetPoissonLLH(const double data, const double mc) const {
+double SampleHandlerInterface::GetPoissonLLH(const double data, const double mc) const {
 // ***************************************************************************
   // Return MC if there are no data, returns 0 for data == 0 && mc == 0  
   if ( data == 0 ) return mc;
@@ -32,7 +32,7 @@ double SampleHandlerBase::GetPoissonLLH(const double data, const double mc) cons
 
 // *************************
 // data is data, mc is mc, w2 is Sum(w_{i}^2) (sum of weights squared), which is sigma^2_{MC stats}
-double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, const double w2) const {
+double SampleHandlerInterface::GetTestStatLLH(const double data, const double mc, const double w2) const {
 // *************************
   switch (fTestStatistic)
   {
@@ -193,7 +193,7 @@ double SampleHandlerBase::GetTestStatLLH(const double data, const double mc, con
 
 // ***************************************************************************
 // CW: Silence cout and cerr. Last is risky but psyche persists on spamming both
-void SampleHandlerBase::QuietPlease() {
+void SampleHandlerInterface::QuietPlease() {
 // ***************************************************************************
   #if DEBUG > 0
   return;
@@ -207,7 +207,7 @@ void SampleHandlerBase::QuietPlease() {
 
 // ***************************************************************************
 // CW: Reset cout and cerr
-void SampleHandlerBase::NowTalk() {
+void SampleHandlerInterface::NowTalk() {
 // ***************************************************************************
   #if DEBUG > 0
   return;

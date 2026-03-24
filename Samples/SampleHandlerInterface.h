@@ -26,13 +26,13 @@ _MaCh3_Safe_Include_End_ //}
 ///
 /// @author Asher Kaboth
 /// @author Richard Calland
-class SampleHandlerBase
+class SampleHandlerInterface
 {
  public:
    /// @brief The main constructor
-   SampleHandlerBase();
+   SampleHandlerInterface();
   /// @brief destructor
-  virtual ~SampleHandlerBase();
+  virtual ~SampleHandlerInterface();
 
   virtual inline M3::int_t GetNSamples(){ return nSamples; };
   virtual std::string GetSampleTitle(const int Sample) const = 0;

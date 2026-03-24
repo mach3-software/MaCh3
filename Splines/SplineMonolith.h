@@ -26,13 +26,13 @@ class SMonolith : public SplineBase {
     virtual ~SMonolith();
 
     /// @brief  CW: This Eval should be used when using two separate x,{y,a,b,c,d} arrays to store the weights; probably the best one here! Same thing but pass parameter spline segments instead of variations
-    void Evaluate() override final;
+    void Evaluate() final;
 
     /// @brief Get class name
     std::string GetName() const override {return "SplineMonolith";};
 
     /// @brief KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.
-    void SynchroniseMemTransfer() const override final;
+    void SynchroniseMemTransfer() const final;
 
     /// @brief KS: Get pointer to total weight to make fit faster wrooom!
     /// @param event Name event number in used MC
@@ -46,10 +46,10 @@ class SMonolith : public SplineBase {
     };
     
     /// @brief KS: Prepare spline file that can be used for fast loading
-    void PrepareSplineFile(std::string FileName) override final;
+    void PrepareSplineFile(std::string FileName) final;
     /// @brief KS: Load preprocessed spline file
     /// @param FileName Path to ROOT file with predefined reduced Spline Monolith
-    void LoadSplineFile(std::string FileName) override final;
+    void LoadSplineFile(std::string FileName) final;
   private:
     /// @brief KS: Set everything to null etc.
     void Initialise();
@@ -92,7 +92,7 @@ class SMonolith : public SplineBase {
     void GetSplineCoeff_SepMany(TSpline3_red* &spl, int &nPoints, float *&xArray, float *&manyArray) const;
 
     /// @brief CPU based code which eval weight for each spline
-    void CalcSplineWeights() override final;
+    void CalcSplineWeights() final;
     /// @brief Calc total event weight
     void CalcTotalEventWeight();
 

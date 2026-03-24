@@ -6,7 +6,7 @@
 /// @copydoc SampleHandlerNuDockBase::SampleHandlerNuDockBase
 // ***************************************************************************
 SampleHandlerNuDockBase::SampleHandlerNuDockBase(std::string configFile, ParameterHandlerGeneric* xsec_cov)
-: SampleHandlerBase() {
+: SampleHandlerInterface() {
   MACH3LOG_INFO("Creating SampleHandlerNuDock object..");
   MACH3LOG_INFO("- Using NuDock sample config in this file {}", configFile);
   ParHandler = xsec_cov;
