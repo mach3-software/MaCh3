@@ -15,7 +15,7 @@ PCAHandler::~PCAHandler() {
 
 // ********************************************
 void PCAHandler::SetupPointers(std::vector<double>* fCurr_Val,
-                               std::vector<double>* fProp_Val) {
+                               std::vector<M3::float_t>* fProp_Val) {
 // ********************************************
   _pCurrVal = fCurr_Val;
   _pPropVal = fProp_Val;
@@ -254,6 +254,8 @@ void PCAHandler::SetInitialParameters() {
 // Transfer a parameter variation in the eigen basis to the parameter basis
 void PCAHandler::TransferToParam() {
 // ********************************************
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wuseless-cast"
   // Make the temporary vectors
   TVectorD fParProp_vec = TransferMat*_fParPropPCA;
   TVectorD fParCurr_vec = TransferMat*_fParCurrPCA;
@@ -261,9 +263,10 @@ void PCAHandler::TransferToParam() {
   #pragma omp parallel for
   #endif
   for(int i = 0; i < static_cast<int>(_pCurrVal->size()); ++i) {
-    (*_pPropVal)[i] = fParProp_vec(i);
+    (*_pPropVal)[i] = static_cast<M3::float_t>(fParProp_vec(i));
     (*_pCurrVal)[i] = fParCurr_vec(i);
   }
+  #pragma GCC diagnostic pop
 }
 
 // ********************************************
@@ -324,6 +327,8 @@ void PCAHandler::ThrowParameters(const std::vector<std::unique_ptr<TRandom3>>& r
                                  const std::vector<double>& fUpBound,
                                  const int _fNumPar) {
 // ********************************************
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wuseless-cast"
   //KS: Do not multithread!
   for (int i = 0; i < NumParPCA; ++i) {
     // Check if parameter is fixed first: if so don't randomly throw
@@ -331,13 +336,13 @@ void PCAHandler::ThrowParameters(const std::vector<std::unique_ptr<TRandom3>>& r
 
     if(!IsParameterDecomposed(i))
     {
-      (*_pPropVal)[i] = fPreFitValue[i] + corr_throw[i];
+      (*_pPropVal)[i] = static_cast<M3::float_t>(fPreFitValue[i] + corr_throw[i]);
       int throws = 0;
       // Try again if we the initial parameter proposal falls outside of the range of the parameter
       while ((*_pPropVal)[i] > fUpBound[i] || (*_pPropVal)[i] < fLowBound[i]) {
         randParams[i] = random_number[M3::GetThreadIndex()]->Gaus(0, 1);
         const double corr_throw_single = M3::MatrixVectorMultiSingle(throwMatrixCholDecomp, randParams, _fNumPar, i);
-        (*_pPropVal)[i] = fPreFitValue[i] + corr_throw_single;
+        (*_pPropVal)[i] = static_cast<M3::float_t>(fPreFitValue[i] + corr_throw_single);
         if (throws > 10000)
         {
           //KS: Since we are multithreading there is danger that those messages
@@ -345,7 +350,7 @@ void PCAHandler::ThrowParameters(const std::vector<std::unique_ptr<TRandom3>>& r
           MACH3LOG_WARN("Tried {} times to throw parameter {} but failed", throws, i);
           MACH3LOG_WARN("Setting _fPropVal:  {} to {}", (*_pPropVal)[i], fPreFitValue[i]);
           MACH3LOG_WARN("I live at {}:{}", __FILE__, __LINE__);
-         (*_pPropVal)[i] = fPreFitValue[i];
+         (*_pPropVal)[i] = static_cast<M3::float_t>(fPreFitValue[i]);
         }
         throws++;
       }
@@ -360,9 +365,12 @@ void PCAHandler::ThrowParameters(const std::vector<std::unique_ptr<TRandom3>>& r
 
   /// @todo KS: We don't check if param is out of bounds. This is more problematic for PCA params.
   for (int i = 0; i < _fNumPar; ++i) {
-    (*_pPropVal)[i] = std::max(fLowBound[i], std::min((*_pPropVal)[i], fUpBound[i]));
+    auto low = static_cast<M3::float_t>(fLowBound[i]);
+    auto up  = static_cast<M3::float_t>(fUpBound[i]);
+    (*_pPropVal)[i] = std::max(up, std::min((*_pPropVal)[i], low));
     (*_pCurrVal)[i] = (*_pPropVal)[i];
   }
+  #pragma GCC diagnostic pop
 }
 
 #ifdef DEBUG_PCA

@@ -1,7 +1,5 @@
 #include "Parameters/AdaptiveMCMCHandler.h"
 
-namespace adaptive_mcmc{
-
 // ********************************************
 AdaptiveMCMCHandler::AdaptiveMCMCHandler() {
 // ********************************************
@@ -574,5 +572,3 @@ void AdaptiveMCMCHandler::UpdateRobbinsMonroScale(){
     adaption_scale -= target_acceptance * scale_factor;
   }
 }
-
-} //end adaptive_mcmc

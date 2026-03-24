@@ -110,7 +110,7 @@ void PredictiveThrower::SetupSampleInformation() {
 // Produce MaCh3 toys:
 void PredictiveThrower::SetupToyGeneration(std::vector<std::string>& ParameterGroupsNotVaried,
                                            std::unordered_set<int>& ParameterOnlyToVary,
-                                           std::vector<const double*>& BoundValuePointer,
+                                           std::vector<const M3::float_t*>& BoundValuePointer,
                                            std::vector<std::pair<double, double>>& ParamBounds) {
 // *************************
   int counter = 0;
@@ -423,7 +423,7 @@ void PredictiveThrower::WriteToy(TDirectory* ToyDirectory,
 }
 
 // *************************
-bool CheckBounds(const std::vector<const double*>& BoundValuePointer,
+bool CheckBounds(const std::vector<const M3::float_t*>& BoundValuePointer,
                  const std::vector<std::pair<double,double>>& ParamBounds) {
 // *************************
   for (size_t i = 0; i < BoundValuePointer.size(); ++i) {
@@ -452,7 +452,7 @@ void PredictiveThrower::ProduceToys() {
   /// KS: Index of parameters that will be varied
   std::unordered_set<int> ParameterOnlyToVary;
   // For study where one would like to apply bounds
-  std::vector<const double*> BoundValuePointer;
+  std::vector<const M3::float_t*> BoundValuePointer;
   std::vector<std::pair<double, double>> ParamBounds;
 
   // Setup useful information for toy generation
@@ -475,7 +475,7 @@ void PredictiveThrower::ProduceToys() {
 
   // KS: define branches so we can keep track of what params we are throwing
   std::vector<double> ParamValues(NModelParams);
-  std::vector<const double*> ParampPointers(NModelParams);
+  std::vector<const M3::float_t*> ParampPointers(NModelParams);
   int ParamCounter = 0;
   for (size_t iSys = 0; iSys < systematics.size(); iSys++)
   {

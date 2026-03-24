@@ -567,19 +567,6 @@ void SampleHandlerFD::ApplyShifts(const int iEvent) {
 M3::float_t SampleHandlerFD::CalcWeightTotal(const EventInfo* _restrict_ MCEvent) const _noexcept_ {
 // ***************************************************************************
   M3::float_t TotalWeight = 1.0;
-  const int nNorms = static_cast<int>(MCEvent->norm_pointers.size());
-  //Loop over stored normalisation and function pointers
-  #ifdef MULTITHREAD
-  #pragma omp simd reduction(*:TotalWeight)
-  #endif
-  for (int iParam = 0; iParam < nNorms; ++iParam)
-  {
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wuseless-cast"
-    TotalWeight *= static_cast<M3::float_t>(*(MCEvent->norm_pointers[iParam]));
-    #pragma GCC diagnostic pop
-  }
-
   const int TotalWeights = static_cast<int>(MCEvent->total_weight_pointers.size());
   //DB Loop over stored pointers
   #ifdef MULTITHREAD
@@ -640,7 +627,7 @@ void SampleHandlerFD::SetupNormParameters() {
 
   std::vector<NormParameter> norm_parameters = ParHandler->GetNormParsFromSampleName(GetName());
 
-  if(!ParHandler){
+  if(!ParHandler) {
     MACH3LOG_ERROR("ParHandler is not setup!");
     throw MaCh3Exception(__FILE__ , __LINE__ );
   }
@@ -649,13 +636,13 @@ void SampleHandlerFD::SetupNormParameters() {
   CalcNormsBins(norm_parameters, norms_bins);
 
   //DB Attempt at reducing impact of SystematicHandlerGeneric::calcReweight()
-  int counter;
   for (unsigned int iEvent = 0; iEvent < GetNEvents(); ++iEvent) {
-    counter = 0;
-
-    MCEvents[iEvent].norm_pointers.resize(norms_bins[iEvent].size());
+    int counter = 0;
+    const size_t offset = MCEvents[iEvent].total_weight_pointers.size();
+    const size_t addSize = norms_bins[iEvent].size();
+    MCEvents[iEvent].total_weight_pointers.resize(offset + addSize);
     for(auto const & norm_bin: norms_bins[iEvent]) {
-      MCEvents[iEvent].norm_pointers[counter] = ParHandler->RetPointer(norm_bin);
+      MCEvents[iEvent].total_weight_pointers[offset + counter] = ParHandler->RetPointer(norm_bin);
       counter += 1;
     }
   }
@@ -1055,7 +1042,7 @@ void SampleHandlerFD::InitialiseNuOscillatorObjects() {
       EqualBinningPerOscChannel = false;
     }
   }
-  std::vector<const double*> OscParams = ParHandler->GetOscParsFromSampleName(SampleHandlerName);
+  std::vector<const M3::float_t*> OscParams = ParHandler->GetOscParsFromSampleName(SampleHandlerName);
   if (OscParams.empty()) {
     MACH3LOG_ERROR("OscParams is empty for sample '{}'.", GetName());
     MACH3LOG_ERROR("This likely indicates an error in your oscillation YAML configuration.");

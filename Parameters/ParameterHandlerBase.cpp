@@ -478,7 +478,7 @@ void ParameterHandlerBase::ReserveMemory(const int SizeVec) {
   _fPreFitValue = std::vector<double>(SizeVec);
   _fError = std::vector<double>(SizeVec);
   _fCurrVal = std::vector<double>(SizeVec);
-  _fPropVal = std::vector<double>(SizeVec);
+  _fPropVal = std::vector<M3::float_t>(SizeVec);
   _fLowBound = std::vector<double>(SizeVec);
   _fUpBound = std::vector<double>(SizeVec);
   _fFlatPrior = std::vector<bool>(SizeVec);
@@ -514,7 +514,7 @@ void ParameterHandlerBase::SetPar(const int i , const double val) {
   MACH3LOG_DEBUG("Over-riding {}: _fPropVal ({}), _fCurrVal ({}), _fPreFitValue ({}) to ({})",
                  GetParFancyName(i), _fPropVal[i], _fCurrVal[i], _fPreFitValue[i], val);
 
-  _fPropVal[i] = val;
+  _fPropVal[i] = static_cast<M3::float_t>(val);
   _fCurrVal[i] = val;
   _fPreFitValue[i] = val;
 
@@ -539,7 +539,8 @@ void ParameterHandlerBase::ThrowParameters() {
   Randomize();
 
   M3::MatrixVectorMulti(corr_throw, throwMatrixCholDecomp, randParams, _fNumPar);
-
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wuseless-cast"
   // KS: We use PCA very rarely on top PCA functionality isn't implemented for this function.
   // Use __builtin_expect to give compiler a hint which option is more likely, which should help
   // with better optimisation. This isn't critical but more to have example
@@ -550,15 +551,14 @@ void ParameterHandlerBase::ThrowParameters() {
     for (int i = 0; i < _fNumPar; ++i) {
       // Check if parameter is fixed first: if so don't randomly throw
       if (IsParameterFixed(i)) continue;
-
-      _fPropVal[i] = _fPreFitValue[i] + corr_throw[i];
+      _fPropVal[i] = static_cast<M3::float_t>(_fPreFitValue[i] + corr_throw[i]);
 
       int throws = 0;
       // Try again if we the initial parameter proposal falls outside of the range of the parameter
       while (_fPropVal[i] > _fUpBound[i] || _fPropVal[i] < _fLowBound[i]) {
         randParams[i] = random_number[M3::GetThreadIndex()]->Gaus(0, 1);
         const double corr_throw_single = M3::MatrixVectorMultiSingle(throwMatrixCholDecomp, randParams, _fNumPar, i);
-        _fPropVal[i] = _fPreFitValue[i] + corr_throw_single;
+        _fPropVal[i] = static_cast<M3::float_t>(_fPreFitValue[i] + corr_throw_single);
         if (throws > 10000)
         {
           //KS: Since we are multithreading there is danger that those messages
@@ -568,7 +568,7 @@ void ParameterHandlerBase::ThrowParameters() {
           MACH3LOG_WARN("Param: {}", _fNames[i]);
           MACH3LOG_WARN("Setting _fPropVal:  {} to {}", _fPropVal[i], _fPreFitValue[i]);
           MACH3LOG_WARN("I live at {}:{}", __FILE__, __LINE__);
-          _fPropVal[i] = _fPreFitValue[i];
+          _fPropVal[i] = static_cast<M3::float_t>(_fPreFitValue[i]);
           //throw MaCh3Exception(__FILE__ , __LINE__ );
         }
         throws++;
@@ -582,7 +582,7 @@ void ParameterHandlerBase::ThrowParameters() {
                             randParams, corr_throw,
                             _fPreFitValue, _fLowBound, _fUpBound, _fNumPar);
   } // end if pca
-
+  #pragma GCC diagnostic pop
   // KS: At the end once we are happy with proposal do special proposal
   SpecialStepProposal();
 }
@@ -592,6 +592,8 @@ void ParameterHandlerBase::ThrowParameters() {
 // Used to start the chain in different states
 void ParameterHandlerBase::RandomConfiguration() {
 // *************************************
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wuseless-cast"
   // Have the 1 sigma for each parameter in each covariance class, sweet!
   // Don't want to change the prior array because that's what determines our likelihood
   // Want to change the _fPropVal, _fCurrVal, _fPreFitValue
@@ -606,7 +608,7 @@ void ParameterHandlerBase::RandomConfiguration() {
     double throwrange = sigma;
     if (paramrange < sigma) throwrange = paramrange;
 
-    _fPropVal[i] = _fPreFitValue[i] + random_number[0]->Gaus(0, 1)*throwrange;
+    _fPropVal[i] = static_cast<M3::float_t>(_fPreFitValue[i] + random_number[0]->Gaus(0, 1)*throwrange);
     // Try again if we the initial parameter proposal falls outside of the range of the parameter
     int throws = 0;
     while (_fPropVal[i] > _fUpBound[i] || _fPropVal[i] < _fLowBound[i]) {
@@ -616,12 +618,13 @@ void ParameterHandlerBase::RandomConfiguration() {
         MACH3LOG_WARN("Param: {}", _fNames[i]);
         throw MaCh3Exception(__FILE__ , __LINE__ );
       }
-      _fPropVal[i] = _fPreFitValue[i] + random_number[0]->Gaus(0, 1)*throwrange;
+      _fPropVal[i] = static_cast<M3::float_t>(_fPreFitValue[i] + random_number[0]->Gaus(0, 1)*throwrange);
       throws++;
     }
     MACH3LOG_INFO("Setting current step in {} param {} = {} from {}", matrixName, i, _fPropVal[i], _fCurrVal[i]);
     _fCurrVal[i] = _fPropVal[i];
   }
+  #pragma GCC diagnostic pop
   if (pca) PCAObj->TransferToPCA();
 
   // KS: At the end once we are happy with proposal do special proposal
@@ -632,7 +635,7 @@ void ParameterHandlerBase::RandomConfiguration() {
 // Set a single parameter
 void ParameterHandlerBase::SetSingleParameter(const int parNo, const double parVal) {
 // *************************************
-  _fPropVal[parNo] = parVal;
+  _fPropVal[parNo] = static_cast<M3::float_t>(parVal);
   _fCurrVal[parNo] = parVal;
   MACH3LOG_DEBUG("Setting {} (parameter {}) to {})", GetParFancyName(parNo),  parNo, parVal);
   if (pca) PCAObj->TransferToPCA();
@@ -641,7 +644,7 @@ void ParameterHandlerBase::SetSingleParameter(const int parNo, const double parV
 // ********************************************
 void ParameterHandlerBase::SetParCurrProp(const int parNo, const double parVal) {
 // ********************************************
-  _fPropVal[parNo] = parVal;
+  _fPropVal[parNo] = static_cast<M3::float_t>(parVal);
   _fCurrVal[parNo] = parVal;
   MACH3LOG_DEBUG("Setting {} (parameter {}) to {})", GetParFancyName(parNo),  parNo, parVal);
   if (pca) PCAObj->TransferToPCA();
@@ -735,7 +738,10 @@ void ParameterHandlerBase::CorrelateSteps() _noexcept_ {
     #endif
     for (int i = 0; i < _fNumPar; ++i) {
       if (!IsParameterFixed(i) > 0.) {
-        _fPropVal[i] = _fCurrVal[i] + corr_throw[i]*_fGlobalStepScale*_fIndivStepScale[i];
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wuseless-cast"
+        _fPropVal[i] = static_cast<M3::float_t>(_fCurrVal[i] + corr_throw[i]*_fGlobalStepScale*_fIndivStepScale[i]);
+        #pragma GCC diagnostic pop
       }
     }
     // If doing PCA throw uncorrelated in PCA basis (orthogonal basis by definition)
@@ -764,25 +770,30 @@ void ParameterHandlerBase::AcceptStep() _noexcept_ {
   }
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
 // *************************************
 //HW: This method is a tad hacky but modular arithmetic gives me a headache.
 void ParameterHandlerBase::CircularParBounds(const int index, const double LowBound, const double UpBound) {
 // *************************************
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wuseless-cast"
   if(_fPropVal[index] > UpBound) {
-    _fPropVal[index] = LowBound + std::fmod(_fPropVal[index] - UpBound, UpBound - LowBound);
+    _fPropVal[index] = static_cast<M3::float_t>(LowBound + std::fmod(_fPropVal[index] - UpBound, UpBound - LowBound));
   } else if (_fPropVal[index] < LowBound) {
-    _fPropVal[index] = UpBound - std::fmod(LowBound - _fPropVal[index], UpBound - LowBound);
+    _fPropVal[index] = static_cast<M3::float_t>(UpBound - std::fmod(LowBound - _fPropVal[index], UpBound - LowBound));
   }
+  #pragma GCC diagnostic pop
 }
 
 // *************************************
 void ParameterHandlerBase::FlipParameterValue(const int index, const double FlipPoint) {
 // *************************************
   if(random_number[0]->Uniform() < 0.5) {
-    _fPropVal[index] = 2 * FlipPoint - _fPropVal[index];
+    _fPropVal[index] = static_cast<M3::float_t>(2 * FlipPoint - _fPropVal[index]);
   }
 }
-
+#pragma GCC diagnostic pop
 // ********************************************
 // Function to print the prior values
 void ParameterHandlerBase::PrintNominal() const {
@@ -870,11 +881,13 @@ double ParameterHandlerBase::GetLikelihood() {
 // Sets the proposed parameters to the prior values
 void ParameterHandlerBase::SetParameters(const std::vector<double>& pars) {
 // ********************************************
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wuseless-cast"
   // If empty, set the proposed to prior
   if (pars.empty()) {
     // For xsec this means setting to the prior (because prior is the prior)
     for (int i = 0; i < _fNumPar; i++) {
-      _fPropVal[i] = _fPreFitValue[i];
+      _fPropVal[i] = static_cast<M3::float_t>(_fPreFitValue[i]);
     }
     // If not empty, set the parameters to the specified
   } else {
@@ -889,7 +902,7 @@ void ParameterHandlerBase::SetParameters(const std::vector<double>& pars) {
         MACH3LOG_ERROR("Trying to set parameter value to a nan for parameter {} in matrix {}. This will not go well!", GetParName(i), matrixName);
         throw MaCh3Exception(__FILE__ , __LINE__ );
       } else {
-        _fPropVal[i] = pars[i];
+        _fPropVal[i] = static_cast<M3::float_t>(pars[i]);
       }
     }
   }
@@ -898,6 +911,7 @@ void ParameterHandlerBase::SetParameters(const std::vector<double>& pars) {
     PCAObj->TransferToPCA();
     PCAObj->TransferToParam();
   }
+  #pragma GCC diagnostic pop
 }
 
 // ********************************************
@@ -1122,7 +1136,9 @@ void ParameterHandlerBase::ResetIndivStepScale() {
   SetIndivStepScale(stepScales);
 }
 
+// ********************************************
 void ParameterHandlerBase::SetIndivStepScaleForSkippedAdaptParams() {
+// ********************************************
   if (!param_skip_adapt_flags.size()) {
     MACH3LOG_ERROR("Parameter skip adapt flags not set, cannot set individual step scales for skipped parameters.");
     throw MaCh3Exception(__FILE__ , __LINE__ );
@@ -1140,7 +1156,7 @@ void ParameterHandlerBase::SetIndivStepScaleForSkippedAdaptParams() {
 
 // ********************************************
 // HW: Code for throwing from separate throw matrix, needs to be set after init to ensure pos-def
-void ParameterHandlerBase::SetThrowMatrix(TMatrixDSym *cov){
+void ParameterHandlerBase::SetThrowMatrix(TMatrixDSym *cov) {
 // ********************************************
 
    if (cov == nullptr) {
@@ -1198,7 +1214,7 @@ void ParameterHandlerBase::SetSubThrowMatrix(int first_index, int last_index,
 }
 
 // ********************************************
-void ParameterHandlerBase::UpdateThrowMatrix(TMatrixDSym *cov){
+void ParameterHandlerBase::UpdateThrowMatrix(TMatrixDSym *cov) {
 // ********************************************
   delete throwMatrix;
   throwMatrix = nullptr;
@@ -1207,7 +1223,7 @@ void ParameterHandlerBase::UpdateThrowMatrix(TMatrixDSym *cov){
 
 // ********************************************
 // HW : Here be adaption
-void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
+void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager) {
 // ********************************************
   if(PCAObj){
     MACH3LOG_ERROR("PCA has been enabled and now trying to enable Adaption. Right now both configuration don't work with each other");
@@ -1217,7 +1233,7 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
     MACH3LOG_ERROR("Adaptive Handler has already been initialise can't do it again so skipping.");
     return;
   }
-  AdaptiveHandler = std::make_unique<adaptive_mcmc::AdaptiveMCMCHandler>();
+  AdaptiveHandler = std::make_unique<AdaptiveMCMCHandler>();
 
   // HH: Backing up _fIndivStepScale and _fGlobalStepScale before adaption
   _fIndivStepScaleInitial = _fIndivStepScale;
@@ -1303,7 +1319,7 @@ void ParameterHandlerBase::InitialiseAdaption(const YAML::Node& adapt_manager){
 
 // ********************************************
 // Truely adaptive MCMC!
-void ParameterHandlerBase::UpdateAdaptiveCovariance(){
+void ParameterHandlerBase::UpdateAdaptiveCovariance() {
 // ********************************************
   // Updates adaptive matrix
   // First we update the total means

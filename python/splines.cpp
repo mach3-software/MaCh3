@@ -196,7 +196,7 @@ void initSplines(py::module &m) {
             "set_param_value_array",
             // Wrap up the setSplinePointers method so that we can take in a numpy array and get 
             // pointers to it's sweet sweet data and use those pointers in the splineMonolith 
-            [](SMonolith &self, py::array_t<double, py::array::c_style> &array)
+            [](SMonolith &self, py::array_t<M3::float_t, py::array::c_style> &array)
             {
                 py::buffer_info bufInfo = array.request();
 
@@ -210,7 +210,7 @@ void initSplines(py::module &m) {
                     throw MaCh3Exception(__FILE__, __LINE__, "Number of entries in parameter array must equal the number of parameters!");
                 }
 
-                std::vector<const double *> paramVec;
+                std::vector<const M3::float_t *> paramVec;
                 paramVec.resize(self.GetNParams());
 
                 for( int idx = 0; idx < self.GetNParams(); idx++ )

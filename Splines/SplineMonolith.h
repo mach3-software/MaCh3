@@ -41,7 +41,7 @@ class SMonolith : public SplineBase {
     
     /// @brief KS: Set pointers to spline params
     /// @param spline_ParsPointers Vector of pointers to spline params
-    void setSplinePointers(std::vector< const double* > spline_ParsPointers) {
+    void setSplinePointers(std::vector< const M3::float_t* > spline_ParsPointers) {
       for (M3::int_t i = 0; i < nParams; ++i) SplineInfoArray[i].splineParsPointer = spline_ParsPointers[i];
     };
     
