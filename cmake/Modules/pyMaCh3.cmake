@@ -3,7 +3,7 @@ function(setup_pyMaCh3)
   include(CMakePackageConfigHelpers)
   
   find_package(ROOT)
-  
+
   ## get pybind dependency
   set(PYBIND11_FINDPYTHON ON)
   CPMFindPackage(
@@ -49,9 +49,7 @@ function(setup_pyMaCh3)
   install( TARGETS _pyMaCh3 DESTINATION ${INSTALL_DIR}/ )
 
   ## create directory inside our python module to hold MaCh3 libraries
-  file(MAKE_DIRECTORY ${INSTALL_DIR}/lib)       
-  file(MAKE_DIRECTORY ${INSTALL_DIR}/lib/core)  ## <- where we will copy all the MaCh3 core libs
-  file(MAKE_DIRECTORY ${INSTALL_DIR}/lib/other) ## <- where we will copy any experiment libs
+  file(MAKE_DIRECTORY ${INSTALL_DIR}/lib)
   
   ## set location of the __init__.py template
   set(MaCh3_PYTHON_INIT_TEMPLATE ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../Templates/__init__.py.in)
@@ -59,7 +57,7 @@ function(setup_pyMaCh3)
   ## copy all the core libraries into our python module lib folder
   if ( MaCh3_LIB_DIR ) ## we are installing in experimet 
     add_custom_command(TARGET _pyMaCh3 POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E copy ${MaCh3_LIB_DIR}/* ${INSTALL_DIR}/lib/core 
+      COMMAND ${CMAKE_COMMAND} -E copy ${MaCh3_LIB_DIR}/* ${INSTALL_DIR}/lib
       COMMAND_EXPAND_LISTS
     )
     
@@ -77,6 +75,7 @@ function(setup_pyMaCh3)
         Samples
         Fitters
         Plotting
+        Prob3plusplus
       LIBRARY DESTINATION ${INSTALL_DIR}/lib/core)
 
   endif()
@@ -84,7 +83,7 @@ function(setup_pyMaCh3)
   ## install any experiment specific libraries into python lib dir
   set(LINK_TARGET_LIB_LIST "")
   foreach(link_target ${ARGS_LINK_TARGETS})
-    install( TARGETS ${ARGS_LINK_TARGETS} DESTINATION ${INSTALL_DIR}/lib/other )
+    install( TARGETS ${ARGS_LINK_TARGETS} DESTINATION ${INSTALL_DIR}/lib )
     set(LINK_TARGET_LIB_LIST "${LINK_TARGET_LIB_LIST}\"${link_target}\", ")
   endforeach()
 

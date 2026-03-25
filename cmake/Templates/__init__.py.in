@@ -19,6 +19,7 @@ for lib in [
 ## load all the MaCh3 core libraries
 for lib in [
         "libyaml-cpp.so", 
+        "libProb3plusplus.so",
         "libOscProbCalcer.so", 
         "libOscillator.so", 
         "libManager.so", 
@@ -30,16 +31,16 @@ for lib in [
         "libPlotting.so"
     ]:
     
-    ctypes.cdll.LoadLibrary(f'{lib_dir}/core/{lib}')
+    ctypes.cdll.LoadLibrary(f'{lib_dir}/{lib}')
 
 ## search for any experiment specific libraries
 other_libs = [@LINK_TARGET_LIB_LIST@]
 
 for lib in other_libs:
-    ctypes.cdll.LoadLibrary(f"{lib_dir}/other/lib{lib}.so")
+    ctypes.cdll.LoadLibrary(f"{lib_dir}/lib{lib}.so")
 
 ## set the MaCh3 environment var
-os.environ["MaCh3_ROOT"] = "@MaCh3_BUILD_PATH@"
+os.environ["MaCh3_ROOT"] = f"{mach3_dir}"
 
 from ._pyMaCh3 import __doc__, fitters, manager, plotting, samples, splines, parameters @PYMACH3_ADDITIONAL_MODULE_IMPORT@
 
