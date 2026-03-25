@@ -1963,6 +1963,7 @@ std::vector<std::unique_ptr<TH1>> SampleHandlerBase::ReturnHistsBySelection1D(co
 
   return hHistList;
 }
+
 // ************************************************
 std::vector<std::unique_ptr<TH2>> SampleHandlerBase::ReturnHistsBySelection2D(const int iSample, const std::string& KinematicProjectionX,
                                                                               const std::string& KinematicProjectionY, const int Selection1,
