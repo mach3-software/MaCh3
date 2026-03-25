@@ -2,6 +2,8 @@ function(setup_pyMaCh3)
 
   include(CMakePackageConfigHelpers)
   
+  find_package(ROOT)
+  
   ## get pybind dependency
   set(PYBIND11_FINDPYTHON ON)
   CPMFindPackage(
