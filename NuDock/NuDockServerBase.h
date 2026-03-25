@@ -7,7 +7,6 @@
 
 #include "Fitters/FitterBase.h"
 #include "NuDockFactory.h"
-#include "Samples/SampleHandlerFD.h"
 _MaCh3_Safe_Include_Start_ //{
 #include <nlohmann/json.hpp>
 _MaCh3_Safe_Include_End_ //}

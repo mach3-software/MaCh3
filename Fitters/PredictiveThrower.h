@@ -11,7 +11,7 @@ struct PredictiveSample {
   // Name of sample
   std::string Name;
   /// Pointer to SampleHandler
-  const SampleHandlerBase* SamHandler;
+  const SampleHandlerInterface* SamHandler;
   /// Local SampleId in SampleHandler
   int LocalId;
   /// Sample Dimension
@@ -116,58 +116,58 @@ class PredictiveThrower : public FitterBase {
   /// @param DatHist Data histogram with data distribution for a single sample
   /// @param MCHist MC histogram with MC distribution for a single sample
   /// @param W2Hist W2 histogram with W2 distribution for a single sample
-  /// @param SampleHandler Pointer to SampleHandlerBase providing LLH test statistic
-  void ExtractLLH(TH1* DatHist, TH1* MCHist, TH1* W2Hist, const SampleHandlerBase* SampleHandler) const;
+  /// @param SampleHandler Pointer to SampleHandlerInterface providing LLH test statistic
+  void ExtractLLH(TH1* DatHist, TH1* MCHist, TH1* W2Hist, const SampleHandlerInterface* SampleHandler) const;
 
   /// @brief Calculates the -2LLH (likelihood) for a single sample.
   /// @param data          Data value for the sample.
   /// @param mc            MC (Monte Carlo) value for the sample.
   /// @param w2            W2 value for the sample.
-  /// @param SampleHandler Pointer to SampleHandlerBase providing the LLH test statistic.
+  /// @param SampleHandler Pointer to SampleHandlerInterface providing the LLH test statistic.
   double CalcLLH(const double data,
                  const double mc,
                  const double w2,
-                 const SampleHandlerBase* SampleHandler) const;
+                 const SampleHandlerInterface* SampleHandler) const;
 
   /// @brief Calculates the likelihood (-2LLH) for a single sample; dynamically casts to call the correct GetLLH overload
   /// @param DatHist Data histogram with data distribution for a single sample
   /// @param MCHist MC histogram with MC distribution for a single sample
   /// @param W2Hist W2 histogram with W2 distribution for a single sample
-  /// @param SampleHandler Pointer to SampleHandlerBase providing LLH test statistic
+  /// @param SampleHandler Pointer to SampleHandlerInterface providing LLH test statistic
   double CalcLLH(const TH1* DatHist,
                  const TH1* MCHist,
                  const TH1* W2Hist,
-                 const SampleHandlerBase* SampleHandler) const;
+                 const SampleHandlerInterface* SampleHandler) const;
 
   /// @brief Helper functions to calculate likelihoods using TH1D
   /// @param DatHist Data histogram with data distribution for a single sample
   /// @param MCHist MC histogram with MC distribution for a single sample
   /// @param W2Hist W2 histogram with W2 distribution for a single sample
-  /// @param SampleHandler Pointer to SampleHandlerBase providing LLH test statistic
+  /// @param SampleHandler Pointer to SampleHandlerInterface providing LLH test statistic
   double GetLLH(const TH1D* DatHist,
                 const TH1D* MCHist,
                 const TH1D* W2Hist,
-                const SampleHandlerBase* SampleHandler) const;
+                const SampleHandlerInterface* SampleHandler) const;
 
   /// @brief Helper functions to calculate likelihoods using TH2D
   /// @param DatHist Data 2D histogram with data distribution for a single sample
   /// @param MCHist MC 2D histogram with MC distribution for a single sample
   /// @param W2Hist W2 2D histogram with W2 distribution for a single sample
-  /// @param SampleHandler Pointer to SampleHandlerBase providing LLH test statistic
+  /// @param SampleHandler Pointer to SampleHandlerInterface providing LLH test statistic
   double GetLLH(const TH2D* DatHist,
                 const TH2D* MCHist,
                 const TH2D* W2Hist,
-                const SampleHandlerBase* SampleHandler) const;
+                const SampleHandlerInterface* SampleHandler) const;
 
   /// @brief Helper functions to calculate likelihoods using TH2Poly
   /// @param DatHist Data 2D poly histogram with data distribution for a single sample
   /// @param MCHist MC 2D poly histogram with MC distribution for a single sample
   /// @param W2Hist W2 2D poly histogram with W2 distribution for a single sample
-  /// @param SampleHandler Pointer to SampleHandlerBase providing LLH test statistic
+  /// @param SampleHandler Pointer to SampleHandlerInterface providing LLH test statistic
   double GetLLH(const TH2Poly* DatHist,
                 const TH2Poly* MCHist,
                 const TH2Poly* W2Hist,
-                const SampleHandlerBase* SampleHandler) const;
+                const SampleHandlerInterface* SampleHandler) const;
 
   /// @brief Produce Chi2 plot for a single sample based on which $p$-value is calculated
   void MakeChi2Plots(const std::vector<std::vector<double>>& Chi2_x,

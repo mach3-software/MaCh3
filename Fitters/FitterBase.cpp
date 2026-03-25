@@ -1,5 +1,4 @@
 #include "FitterBase.h"
-#include "Samples/SampleHandlerFD.h"
 
 _MaCh3_Safe_Include_Start_ //{
 #include "TRandom.h"
@@ -258,7 +257,7 @@ void FitterBase::SaveOutput() {
 
 // *************************
 // Add SampleHandler object to the Markov Chain
-void FitterBase::AddSampleHandler(SampleHandlerBase * const sample) {
+void FitterBase::AddSampleHandler(SampleHandlerInterface* const sample) {
 // *************************
   // Check if any subsample name collides with already-registered subsamples
   for (const auto &s : samples) {
@@ -1326,14 +1325,12 @@ void WriteHistograms(TH1 *hist, const std::string& baseName) {
   } else if (className.Contains("TH2")) {
     hist->GetZaxis()->SetTitle("Events");
   }
-  hist->SetDirectory(nullptr);
   hist->Write(baseName.c_str());
-  delete hist;
 }
 
 // *************************
 /// Generic histogram writer - should make main code more palatable
-void WriteHistogramsByMode(SampleHandlerBase *sample,
+void WriteHistogramsByMode(SampleHandlerInterface *sample,
                            const std::string& suffix,
                            const bool by_mode,
                            const bool by_channel,
@@ -1351,14 +1348,14 @@ void WriteHistogramsByMode(SampleHandlerBase *sample,
       if (by_mode) {
         for (int iMode = 0; iMode < modes->GetNModes(); ++iMode) {
           auto modeHist = sample->Get1DVarHistByModeAndChannel(iSample, ProjectionName, iMode);
-          WriteHistograms(modeHist, sampleName + "_" + modes->GetMaCh3ModeName(iMode) + ProjectionSuffix + suffix);
+          WriteHistograms(modeHist.get(), sampleName + "_" + modes->GetMaCh3ModeName(iMode) + ProjectionSuffix + suffix);
         }
       }
 
       if (by_channel) {
         for (int iChan = 0; iChan < sample->GetNOscChannels(iSample); ++iChan) {
           auto chanHist = sample->Get1DVarHistByModeAndChannel(iSample, ProjectionName, -1, iChan); // -1 skips over mode plotting
-          WriteHistograms(chanHist, sampleName + "_" + sample->GetFlavourName(iSample, iChan) + ProjectionSuffix + suffix);
+          WriteHistograms(chanHist.get(), sampleName + "_" + sample->GetFlavourName(iSample, iChan) + ProjectionSuffix + suffix);
         }
       }
 
@@ -1366,14 +1363,14 @@ void WriteHistogramsByMode(SampleHandlerBase *sample,
         for (int iMode = 0; iMode < modes->GetNModes(); ++iMode) {
           for (int iChan = 0; iChan < sample->GetNOscChannels(iSample); ++iChan) {
             auto hist = sample->Get1DVarHistByModeAndChannel(iSample, ProjectionName, iMode, iChan);
-            WriteHistograms(hist, sampleName + "_" + modes->GetMaCh3ModeName(iMode) + "_" + sample->GetFlavourName(iSample, iChan) + ProjectionSuffix + suffix);
+            WriteHistograms(hist.get(), sampleName + "_" + modes->GetMaCh3ModeName(iMode) + "_" + sample->GetFlavourName(iSample, iChan) + ProjectionSuffix + suffix);
           }
         }
       }
 
       if (!by_mode && !by_channel) {
         auto hist = sample->Get1DVarHist(iSample, ProjectionName);
-        WriteHistograms(hist, sampleName + ProjectionSuffix + suffix);
+        WriteHistograms(hist.get(), sampleName + ProjectionSuffix + suffix);
         // Only for 2D and Beyond
         for (int iDim2 = iDim1 + 1; iDim2 < sample->GetNDim(iSample); ++iDim2) {
           // Get the names for the two dimensions
@@ -1385,7 +1382,7 @@ void WriteHistogramsByMode(SampleHandlerBase *sample,
 
           // Write the histogram
           std::string suffix2D = "_2DProj_" + std::to_string(iDim1) + "_vs_" + std::to_string(iDim2) + suffix;
-          WriteHistograms(hist2D, sampleName + suffix2D);
+          WriteHistograms(hist2D.get(), sampleName + suffix2D);
         }
       }
     }

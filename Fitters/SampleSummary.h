@@ -1,7 +1,7 @@
 #pragma once
 
 // MaCh3 includes
-#include "Samples/SampleHandlerBase.h"
+#include "Samples/SampleHandlerInterface.h"
 #include "Fitters/StatisticalUtils.h"
 #include "Fitters/MCMCProcessor.h"
 
@@ -19,7 +19,7 @@ class SampleSummary {
     /// @param Filename name of output file
     /// @param sample pointer to sample PDF object
     /// @param nChainSteps number of steps in a chain, 0 indicate prior predictive was used
-    SampleSummary(const int n_Samples, const std::string &Filename, SampleHandlerBase* const sample, const int nSteps);
+    SampleSummary(const int n_Samples, const std::string &Filename, SampleHandlerInterface* const sample, const int nSteps);
     /// @brief Destructor
     ~SampleSummary();
 
@@ -325,7 +325,7 @@ class SampleSummary {
     TH1D ****PosteriorHist_ByMode;
     
     /// Pointer to SampleHandler object, mostly used to get sample names, binning etc.
-    SampleHandlerBase* SampleHandler;
+    SampleHandlerInterface* SampleHandler;
 
     /// MaCh3 Modes
     MaCh3Modes* Modes;

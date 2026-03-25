@@ -20,7 +20,7 @@ class BinnedSplineHandler : public SplineBase {
     /// @brief CW: This Eval should be used when using two separate x,{y,a,b,c,d} arrays
     /// to store the weights; probably the best one here! Same thing but pass parameter
     /// spline segments instead of variations
-    void Evaluate() override final;
+    void Evaluate() final;
 
     /// @brief add oscillation channel to spline monolith
     void AddSample(const std::string& SampleName,
@@ -41,7 +41,7 @@ class BinnedSplineHandler : public SplineBase {
     /// @brief Return the splines which affect a given event
     std::vector< std::vector<int> > GetEventSplines(const std::string& SampleTitle, int iOscChan, int EventMode, double Var1Val, double Var2Val, double Var3Val);
     /// @brief KS: After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied.
-    void SynchroniseMemTransfer() const override final {return;}
+    void SynchroniseMemTransfer() const final {return;}
     /// @brief Grab histograms with spline binning
     std::vector<TAxis*> FindSplineBinning(const std::string& FileName, const std::string& SampleTitle);
 
@@ -68,14 +68,14 @@ class BinnedSplineHandler : public SplineBase {
       return &weightvec_Monolith[index];
     }
     /// @brief KS: Prepare spline file that can be used for fast loading
-    void PrepareSplineFile(std::string FileName) override final;
+    void PrepareSplineFile(std::string FileName) final;
     /// @brief KS: Load preprocessed spline file
     /// @param FileName Path to ROOT file with predefined reduced Spline Monolith
-    void LoadSplineFile(std::string FileName) override final;
+    void LoadSplineFile(std::string FileName) final;
 
   protected:
     /// @brief CPU based code which eval weight for each spline
-    void CalcSplineWeights() override final;
+    void CalcSplineWeights() final;
     /// Pointer to covariance from which we get information about spline params
     ParameterHandlerGeneric* ParHandler;
 

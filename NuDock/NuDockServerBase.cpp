@@ -1,4 +1,5 @@
 #include "NuDockServerBase.h"
+#include "Samples/SampleHandlerBase.h"
 
 // ***************************************************************************
 /// @copydoc NuDockServerBase::NuDockServerBase
@@ -122,19 +123,19 @@ nlohmann::json NuDockServerBase::setAsimovPoint(const nlohmann::json &request) {
   // reweight sample and add to data
   for (size_t ipdf=0; ipdf<samples.size(); ipdf++) {
     samples[ipdf]->Reweight();
-    if (auto* fd_casted_sample = dynamic_cast<SampleHandlerFD*>(samples[ipdf])) {
+    if (auto* base_casted_sample = dynamic_cast<SampleHandlerBase*>(samples[ipdf])) {
       for (int iSample = 0; iSample < samples[ipdf]->GetNSamples(); ++iSample) {
-        if (fd_casted_sample->GetNDim(iSample) == 1) {
-          fd_casted_sample->AddData(iSample, (TH1D*)fd_casted_sample->GetMCHist(iSample));
-        } else if (fd_casted_sample->GetNDim(iSample) == 2) {
-          fd_casted_sample->AddData(iSample, (TH2D*)fd_casted_sample->GetMCHist(iSample));
+        if (base_casted_sample->GetNDim(iSample) == 1) {
+          base_casted_sample->AddData(iSample, (TH1D*)base_casted_sample->GetMCHist(iSample));
+        } else if (base_casted_sample->GetNDim(iSample) == 2) {
+          base_casted_sample->AddData(iSample, (TH2D*)base_casted_sample->GetMCHist(iSample));
         } else {
-          MACH3LOG_ERROR("Unsupported histogram dimension for SampleHandlerFD: {}", fd_casted_sample->GetNDim(iSample));
+          MACH3LOG_ERROR("Unsupported histogram dimension for SampleHandlerBase: {}", base_casted_sample->GetNDim(iSample));
           throw MaCh3Exception(__FILE__, __LINE__);
         }
       }
     } else {
-      MACH3LOG_ERROR("Sample object does not derive from SampleHandlerFD. Consider overloading setAsimovPoint for this sample type.");
+      MACH3LOG_ERROR("Sample object does not derive from SampleHandlerBase. Consider overloading setAsimovPoint for this sample type.");
       throw MaCh3Exception(__FILE__,__LINE__);
     } 
   }
@@ -165,16 +166,16 @@ nlohmann::json NuDockServerBase::getMCSpectrum(const nlohmann::json &request) {
   std::vector<std::string> sample_titles = {};
 
   for (size_t ipdf=0; ipdf<samples.size(); ipdf++) {
-    if (auto* fd_casted_sample = dynamic_cast<SampleHandlerFD*>(samples[ipdf])) {
+    if (auto* base_casted_sample = dynamic_cast<SampleHandlerBase*>(samples[ipdf])) {
       for (int iSample = 0; iSample < samples[ipdf]->GetNSamples(); ++iSample) {
         std::string sample_title = samples[ipdf]->GetSampleTitle(iSample);
         sample_titles.push_back(sample_title);
 
-        int dimension = fd_casted_sample->GetNDim(iSample);
+        int dimension = base_casted_sample->GetNDim(iSample);
         response["dimensions"][sample_title] = dimension;
 
         if (dimension == 1) {
-          TH1D* mc_hist = (TH1D*)fd_casted_sample->GetMCHist(iSample)->Clone();
+          TH1D* mc_hist = (TH1D*)base_casted_sample->GetMCHist(iSample)->Clone();
 
           TAxis *ax = mc_hist->GetXaxis();
           std::string xtitle = ax->GetTitle(); 
@@ -191,7 +192,7 @@ nlohmann::json NuDockServerBase::getMCSpectrum(const nlohmann::json &request) {
           response["bin_edges"][sample_title] = {xbins};
           response["bin_values"][sample_title] = binvals;
         } else if (dimension == 2) {
-          TH2D* mc_hist = (TH2D*)fd_casted_sample->GetMCHist(iSample)->Clone();
+          TH2D* mc_hist = (TH2D*)base_casted_sample->GetMCHist(iSample)->Clone();
 
           TAxis *x_axis = mc_hist->GetXaxis();
           std::string xtitle = x_axis->GetTitle();
@@ -220,7 +221,7 @@ nlohmann::json NuDockServerBase::getMCSpectrum(const nlohmann::json &request) {
         }
       }
     } else {
-      MACH3LOG_ERROR("Sample object does not derived from SampleHandlerFD. Consider overloading getMCSpectrum for this sample type.");
+      MACH3LOG_ERROR("Sample object does not derived from SampleHandlerBase. Consider overloading getMCSpectrum for this sample type.");
       throw MaCh3Exception(__FILE__,__LINE__);
     } 
   }
@@ -238,16 +239,16 @@ nlohmann::json NuDockServerBase::getDataSpectrum(const nlohmann::json &request) 
   std::vector<std::string> sample_titles = {};
 
   for (size_t ipdf=0; ipdf<samples.size(); ipdf++) {
-    if (auto* fd_casted_sample = dynamic_cast<SampleHandlerFD*>(samples[ipdf])) {
+    if (auto* base_casted_sample = dynamic_cast<SampleHandlerBase*>(samples[ipdf])) {
       for (int iSample = 0; iSample < samples[ipdf]->GetNSamples(); ++iSample) {
         std::string sample_title = samples[ipdf]->GetSampleTitle(iSample);
         sample_titles.push_back(sample_title);
 
-        int dimension = fd_casted_sample->GetNDim(iSample);
+        int dimension = base_casted_sample->GetNDim(iSample);
         response["dimensions"][sample_title] = dimension;
 
         if (dimension == 1) {
-          TH1D* data_hist = (TH1D*)fd_casted_sample->GetDataHist(iSample)->Clone();
+          TH1D* data_hist = (TH1D*)base_casted_sample->GetDataHist(iSample)->Clone();
 
           TAxis *ax = data_hist->GetXaxis();
           std::string xtitle = ax->GetTitle(); 
@@ -264,7 +265,7 @@ nlohmann::json NuDockServerBase::getDataSpectrum(const nlohmann::json &request) 
           response["bin_edges"][sample_title] = {xbins};
           response["bin_values"][sample_title] = binvals;
         } else if (dimension == 2) {
-          TH2D* data_hist = (TH2D*)fd_casted_sample->GetDataHist(iSample)->Clone();
+          TH2D* data_hist = (TH2D*)base_casted_sample->GetDataHist(iSample)->Clone();
 
           TAxis *x_axis = data_hist->GetXaxis();
           std::string xtitle = x_axis->GetTitle();
@@ -293,7 +294,7 @@ nlohmann::json NuDockServerBase::getDataSpectrum(const nlohmann::json &request) 
         }
       }
     } else {
-      MACH3LOG_ERROR("Sample object does not derived from SampleHandlerFD. Consider overloading getDataSpectrum for this sample type.");
+      MACH3LOG_ERROR("Sample object does not derived from SampleHandlerBase. Consider overloading getDataSpectrum for this sample type.");
       throw MaCh3Exception(__FILE__,__LINE__);
     } 
   }

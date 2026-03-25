@@ -4,7 +4,7 @@
 #include <pybind11/numpy.h>
 // MaCh3 includes
 #include "Splines/SplineBase.h"
-#include "Splines/SplineMonolith.h"
+#include "Splines/UnbinnedSplineHandler.h"
 #include "Splines/SplineStructs.h"
 #include "Samples/SampleStructs.h" // <- The spline stuff that's in here should really be moved to splineStructs.h but I ain't doing that right now
 // ROOT includes
@@ -139,7 +139,7 @@ void initSplines(py::module &m) {
         )
     ; // End of binding for ResponseFunction
 
-    py::class_<SMonolith, SplineBase>(m_splines, "EventSplineMonolith")
+    py::class_<UnbinnedSplineHandler, SplineBase>(m_splines, "EventSplineMonolith")
         .def(
             py::init(
                 [](std::vector<std::vector<TResponseFunction_red*>> &responseFns, const bool saveFlatTree)
@@ -154,7 +154,7 @@ void initSplines(py::module &m) {
                         // then just read them here and pass through to the constructor
                         respFnTypes.push_back(RespFuncType::kTSpline3_red);
                     }
-                    return new SMonolith(responseFns, respFnTypes, saveFlatTree);
+                    return new UnbinnedSplineHandler(responseFns, respFnTypes, saveFlatTree);
                 }
             ),
             "Create an EventSplineMonolith \n"
@@ -173,19 +173,19 @@ void initSplines(py::module &m) {
 
         .def(
             "evaluate",
-            &SMonolith::Evaluate,
+            &UnbinnedSplineHandler::Evaluate,
             "Evaluate the splines at their current values."
         )
 
         .def(
             "sync_mem_transfer",
-            &SMonolith::SynchroniseMemTransfer,
+            &UnbinnedSplineHandler::SynchroniseMemTransfer,
             "This is important when running on GPU. After calculations are done on GPU we copy memory to CPU. This operation is asynchronous meaning while memory is being copied some operations are being carried. Memory must be copied before actual reweight. This function make sure all has been copied."
         )
 
         .def(
             "get_event_weight",
-            &SMonolith::RetPointer,
+            &UnbinnedSplineHandler::RetPointer,
             py::return_value_policy::reference,
             "Get the weight of a particular event. \n"
             ":param event: The index of the event whose weight you would like.",
@@ -196,7 +196,7 @@ void initSplines(py::module &m) {
             "set_param_value_array",
             // Wrap up the setSplinePointers method so that we can take in a numpy array and get 
             // pointers to it's sweet sweet data and use those pointers in the splineMonolith 
-            [](SMonolith &self, py::array_t<M3::float_t, py::array::c_style> &array)
+            [](UnbinnedSplineHandler &self, py::array_t<M3::float_t, py::array::c_style> &array)
             {
                 py::buffer_info bufInfo = array.request();
 

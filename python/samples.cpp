@@ -2,21 +2,21 @@
 #include <pybind11/stl.h>
 #include <pybind11/numpy.h>
 
-#include "Samples/SampleHandlerFD.h"
+#include "Samples/SampleHandlerBase.h"
 
 namespace py = pybind11;
 
-/// @brief EW: As SampleHandlerBase is an abstract base class we have to do some gymnastics to get it to get it into python
-class PySampleHandlerBase : public SampleHandlerBase {
+/// @brief EW: As SampleHandlerInterface is an abstract base class we have to do some gymnastics to get it to get it into python
+class PySampleHandlerInterface : public SampleHandlerInterface {
 public:
     /* Inherit the constructors */
-    using SampleHandlerBase::SampleHandlerBase;
+    using SampleHandlerInterface::SampleHandlerInterface;
 
     /* Trampoline (need one for each virtual function) */
     std::string GetName() const override {
         PYBIND11_OVERRIDE_PURE(
             std::string,          /* Return type */
-            SampleHandlerBase,    /* Parent class */
+            SampleHandlerInterface,    /* Parent class */
             GetName, /* Name of function in C++ (must match Python name) */
         );
     }
@@ -25,7 +25,7 @@ public:
     std::string GetSampleTitle(const int iSample) const override {
         PYBIND11_OVERRIDE_PURE(
             std::string,          /* Return type */
-            SampleHandlerBase,    /* Parent class */
+            SampleHandlerInterface,    /* Parent class */
             GetSampleTitle,       /* Name of function in C++ (must match Python name) */
             iSample               /* Argument(s) */
         );
@@ -35,7 +35,7 @@ public:
     int GetNOscChannels(const int iSample) const override {
         PYBIND11_OVERRIDE_PURE(
             int,                  /* Return type */
-            SampleHandlerBase,    /* Parent class */
+            SampleHandlerInterface,    /* Parent class */
             GetNOscChannels,      /* Name of function in C++ (must match Python name) */
             iSample               /* Argument(s) */
         );
@@ -45,7 +45,7 @@ public:
     void Reweight() override {
         PYBIND11_OVERRIDE_PURE_NAME(
             void,              /* Return type */
-            SampleHandlerBase, /* Parent class */
+            SampleHandlerInterface, /* Parent class */
             "reweight",
             Reweight           /* Name of function in C++ (must match Python name) */
         );
@@ -56,7 +56,7 @@ public:
     double GetSampleLikelihood(const int iSample) const override {
         PYBIND11_OVERRIDE_PURE_NAME(
             double,                /* Return type */
-            SampleHandlerBase,     /* Parent class */
+            SampleHandlerInterface,     /* Parent class */
             "get_sample_likelihood",
             GetSampleLikelihood,   /* Name of function in C++ (must match Python name) */
             iSample                /* Argument(s) */
@@ -67,7 +67,7 @@ public:
     void CleanMemoryBeforeFit() override {
         PYBIND11_OVERRIDE_PURE_NAME(
             void,                  /* Return type */
-            SampleHandlerBase,     /* Parent class */
+            SampleHandlerInterface,     /* Parent class */
             "clean_memory_before_fit",
             CleanMemoryBeforeFit   /* Name of function in C++ (must match Python name) */
         );
@@ -77,7 +77,7 @@ public:
     void PrintRates(const bool DataOnly = false) override  {
         PYBIND11_OVERRIDE_PURE(
             void,                 /* Return type */
-            SampleHandlerBase,    /* Parent class */
+            SampleHandlerInterface,    /* Parent class */
             PrintRates,           /* Name of function in C++ (must match Python name) */
             DataOnly              /* Argument(s) */
         );
@@ -87,7 +87,7 @@ public:
     std::string GetKinVarName(const int iSample, const int Dimension) const override  {
         PYBIND11_OVERRIDE_PURE(
             std::string,          /* Return type */
-            SampleHandlerBase,    /* Parent class */
+            SampleHandlerInterface,    /* Parent class */
             GetKinVarName,        /* Name of function in C++ (must match Python name) */
             iSample,              /* Argument(s) */
             Dimension             /* Argument(s) */
@@ -98,7 +98,7 @@ public:
     std::vector<double> ReturnKinematicParameterBinning(const int Sample, const std::string &KinematicParameter) const override  {
         PYBIND11_OVERRIDE_PURE(
             std::vector<double>,  /* Return type */
-            SampleHandlerBase,    /* Parent class */
+            SampleHandlerInterface,    /* Parent class */
             GetKinVarName,        /* Name of function in C++ (must match Python name) */
             Sample,               /* Argument(s) */
             KinematicParameter    /* Argument(s) */
@@ -108,7 +108,7 @@ public:
     TH1* GetDataHist(const int Sample) override {
         PYBIND11_OVERRIDE_PURE(
             TH1*,                  /* Return type */
-            SampleHandlerBase,     /* Parent class */
+            SampleHandlerInterface,     /* Parent class */
             GetDataHist,           /* Name of function in C++ (must match Python name) */
             Sample                 /* Argument(s) */
         );
@@ -117,7 +117,7 @@ public:
     TH1* GetMCHist(const int Sample) override {
         PYBIND11_OVERRIDE_PURE(
             TH1*,                  /* Return type */
-            SampleHandlerBase,     /* Parent class */
+            SampleHandlerInterface,     /* Parent class */
             GetMCHist,             /* Name of function in C++ (must match Python name) */
             Sample                 /* Argument(s) */
         );
@@ -126,7 +126,7 @@ public:
     TH1* GetW2Hist(const int Sample) override {
         PYBIND11_OVERRIDE_PURE(
             TH1*,                  /* Return type */
-            SampleHandlerBase,     /* Parent class */
+            SampleHandlerInterface,     /* Parent class */
             GetW2Hist,             /* Name of function in C++ (must match Python name) */
             Sample                 /* Argument(s) */
         );
@@ -135,101 +135,73 @@ public:
     double GetLikelihood() const override {
         PYBIND11_OVERRIDE_PURE_NAME(
             double,            /* Return type */
-            SampleHandlerBase, /* Parent class */
+            SampleHandlerInterface, /* Parent class */
             "get_likelihood",  /* Python name*/
             GetLikelihood      /* Name of function in C++ (must match Python name) */
                                /* Argument(s) */
         );
     }
 
-    TH1* Get1DVarHistByModeAndChannel(const int iSample,
+    std::unique_ptr<TH1> Get1DVarHistByModeAndChannel(const int iSample,
                                       const std::string& ProjectionVar_Str,
-                                      int kModeToFill = -1,
-                                      int kChannelToFill = -1,
-                                      int WeightStyle = 0,
-                                      TAxis* Axis = nullptr) override {
-        PYBIND11_OVERRIDE_PURE(
-            TH1*,                     /* Return type */
-            SampleHandlerBase,        /* Parent class */
-            Get1DVarHistByModeAndChannel, /* Name of function in C++ */
-            iSample,
-            ProjectionVar_Str,
-            kModeToFill,
-            kChannelToFill,
-            WeightStyle,
-            Axis
-        );
+                                      const int kModeToFill = -1,
+                                      const int kChannelToFill = -1,
+                                      const int WeightStyle = 0) override {
+      (void) iSample;
+      (void) ProjectionVar_Str;
+      (void) kModeToFill;
+      (void) kChannelToFill;
+      (void) WeightStyle;
+      return nullptr;
     }
 
-    TH2* Get2DVarHistByModeAndChannel(const int iSample,
+    std::unique_ptr<TH2> Get2DVarHistByModeAndChannel(const int iSample,
                                       const std::string& ProjectionVar_StrX,
                                       const std::string& ProjectionVar_StrY,
-                                      int kModeToFill = -1,
-                                      int kChannelToFill = -1,
-                                      int WeightStyle = 0,
-                                      TAxis* AxisX = nullptr,
-                                      TAxis* AxisY = nullptr) override {
-        PYBIND11_OVERRIDE_PURE(
-            TH2*,                        /* Return type */
-            SampleHandlerBase,           /* Parent class */
-            Get2DVarHistByModeAndChannel, /* Name of function in C++ */
-            iSample,
-            ProjectionVar_StrX,
-            ProjectionVar_StrY,
-            kModeToFill,
-            kChannelToFill,
-            WeightStyle,
-            AxisX,
-            AxisY
-        );
+                                      const int kModeToFill = -1,
+                                      const int kChannelToFill = -1,
+                                      const int WeightStyle = 0) override {
+      (void) iSample;
+      (void) ProjectionVar_StrX;
+      (void) ProjectionVar_StrY;
+      (void) kModeToFill;
+      (void) kChannelToFill;
+      (void) WeightStyle;
+      return nullptr;
     }
 
-    TH1* Get1DVarHist(const int iSample,
-                      const std::string &ProjectionVar,
-                      const std::vector<KinematicCut> &EventSelectionVec = {},
-                      int WeightStyle = 0,
-                      TAxis *Axis = nullptr,
-                      const std::vector<KinematicCut> &SubEventSelectionVec = {}) override {
-        PYBIND11_OVERRIDE_PURE(
-            TH1*,                     /* Return type */
-            SampleHandlerBase,        /* Parent class */
-            Get1DVarHist,             /* Name of function in C++ */
-            iSample,
-            ProjectionVar,
-            EventSelectionVec,
-            WeightStyle,
-            Axis,
-            SubEventSelectionVec
-        );
+    std::unique_ptr<TH1> Get1DVarHist(const int iSample,
+                                      const std::string &ProjectionVar,
+                                      const std::vector<KinematicCut> &EventSelectionVec = {},
+                                      const int WeightStyle = 0,
+                                      const std::vector<KinematicCut> &SubEventSelectionVec = {}) override {
+      (void) iSample;
+      (void) ProjectionVar;
+      (void) EventSelectionVec;
+      (void) WeightStyle;
+      (void) SubEventSelectionVec;
+      return nullptr;
     }
 
-    TH2* Get2DVarHist(const int iSample,
-                      const std::string& ProjectionVarX,
-                      const std::string& ProjectionVarY,
-                      const std::vector<KinematicCut>& EventSelectionVec = {},
-                      int WeightStyle = 0,
-                      TAxis* AxisX = nullptr,
-                      TAxis* AxisY = nullptr,
-                      const std::vector<KinematicCut>& SubEventSelectionVec = {}) override {
-        PYBIND11_OVERRIDE_PURE(
-            TH2*,                     /* Return type */
-            SampleHandlerBase,        /* Parent class */
-            Get2DVarHist,             /* Name of function in C++ */
-            iSample,
-            ProjectionVarX,
-            ProjectionVarY,
-            EventSelectionVec,
-            WeightStyle,
-            AxisX,
-            AxisY,
-            SubEventSelectionVec
-        );
+    std::unique_ptr<TH2> Get2DVarHist(const int iSample,
+                                      const std::string& ProjectionVarX,
+                                      const std::string& ProjectionVarY,
+                                      const std::vector<KinematicCut>& EventSelectionVec = {},
+                                      const int WeightStyle = 0,
+                                      const std::vector<KinematicCut>& SubEventSelectionVec = {}) override {
+      (void) iSample;
+      (void) ProjectionVarX;
+      (void) ProjectionVarY;
+      (void) EventSelectionVec;
+      (void) WeightStyle;
+      (void) SubEventSelectionVec;
+      return nullptr;
     }
 
     int GetNDim(const int Sample) const override {
         PYBIND11_OVERRIDE_PURE(
             int,                      /* Return type */
-            SampleHandlerBase,        /* Parent class */
+            SampleHandlerInterface,   /* Parent class */
             GetNDim,                  /* Name of function in C++ */
             Sample
         );
@@ -239,7 +211,7 @@ public:
                                const int iChannel) const override {
         PYBIND11_OVERRIDE_PURE(
             std::string,              /* Return type */
-            SampleHandlerBase,        /* Parent class */
+            SampleHandlerInterface,        /* Parent class */
             GetFlavourName,           /* Name of function in C++ */
             iSample,
             iChannel
@@ -248,17 +220,17 @@ public:
 };
 
 
-/// @brief As SampleHandlerFD is an abstract base class we have to do some gymnastics to get it to get it into python
-class PySampleHandlerFD : public SampleHandlerFD {
+/// @brief As SampleHandlerBase is an abstract base class we have to do some gymnastics to get it to get it into python
+class PySampleHandlerBase : public SampleHandlerBase {
 public:
     /* Inherit the constructors */
-    using SampleHandlerFD::SampleHandlerFD;
+    using SampleHandlerBase::SampleHandlerBase;
 
     /* Trampoline (need one for each virtual function) */
     void AddAdditionalWeightPointers() override {
         PYBIND11_OVERRIDE_PURE_NAME(
             void,                             /* Return type */
-            SampleHandlerFD,                  /* Parent class */
+            SampleHandlerBase,                  /* Parent class */
             "add_additional_weight_pointers", /*python name*/
             AddAdditionalWeightPointers,      /* Name of function in C++ */
                                               /* Argument(s) */
@@ -269,7 +241,7 @@ public:
     void CleanMemoryBeforeFit() override {
         PYBIND11_OVERRIDE_PURE(
             void,          /* Return type */
-            SampleHandlerFD, /* Parent class */
+            SampleHandlerBase, /* Parent class */
             CleanMemoryBeforeFit       /* Name of function in C++ (must match Python name) */
         );
     }
@@ -278,7 +250,7 @@ public:
     void SetupSplines() override {
         PYBIND11_OVERRIDE_PURE_NAME(
             void,            /* Return type */
-            SampleHandlerFD, /* Parent class */
+            SampleHandlerBase, /* Parent class */
             "setup_splines", /*python name*/
             SetupSplines,     /* Name of function in C++ */
                              /* Argument(s) */
@@ -289,7 +261,7 @@ public:
     void Init() override {
         PYBIND11_OVERRIDE_PURE_NAME(
             void,            /* Return type */
-            SampleHandlerFD, /* Parent class */
+            SampleHandlerBase, /* Parent class */
             "init",          /*python name*/
             Init,            /* Name of function in C++ */
                              /* Argument(s) */
@@ -300,7 +272,7 @@ public:
     int SetupExperimentMC() override {
         PYBIND11_OVERRIDE_PURE_NAME(
             int,             /* Return type */
-            SampleHandlerFD, /* Parent class */
+            SampleHandlerBase, /* Parent class */
             "setup_experiment_MC", /*python name*/
             SetupExperimentMC,     /* Name of function in C++ */
         );
@@ -310,7 +282,7 @@ public:
     void SetupMC() override {
         PYBIND11_OVERRIDE_PURE_NAME(
             void,            /* Return type */
-            SampleHandlerFD, /* Parent class */
+            SampleHandlerBase, /* Parent class */
             "setup_MC",   /*python name*/
             SetupMC,       /* Name of function in C++ */
         );
@@ -319,7 +291,7 @@ public:
     int ReturnKinematicParameterFromString(std::string) {
         PYBIND11_OVERRIDE_PURE_NAME(
             int,                     /* Return type */
-            SampleHandlerFD,            /* Parent class */
+            SampleHandlerBase,            /* Parent class */
             "get_kinematic_by_name",    /* python name*/
             ReturnKinematicParameterFromString, /* Name of function in C++ (must match Python name) */
             py::arg("variable_name")
@@ -329,7 +301,7 @@ public:
     std::string ReturnStringFromKinematicParameter(int) {
         PYBIND11_OVERRIDE_PURE_NAME(
             std::string,                /* Return type */
-            SampleHandlerFD,            /* Parent class */
+            SampleHandlerBase,            /* Parent class */
             "get_kinematic_name",       /* python name*/
             ReturnStringFromKinematicParameter, /* Name of function in C++ (must match Python name) */
             py::arg("variable_id")
@@ -339,7 +311,7 @@ public:
     double ReturnKinematicParameter(int, int) override {
         PYBIND11_OVERRIDE_PURE_NAME(
             double,                     /* Return type */
-            SampleHandlerFD,            /* Parent class */
+            SampleHandlerBase,            /* Parent class */
             "get_event_kinematic_value",/* python name*/
             ReturnKinematicParameter,  /* Name of function in C++ (must match Python name) */
             py::arg("variable"),
@@ -350,7 +322,7 @@ public:
     const double *GetPointerToKinematicParameter(double, int) override {
         PYBIND11_OVERRIDE_PURE_NAME(
             const double *,                           /* Return type */
-            SampleHandlerFD,                          /* Parent class */
+            SampleHandlerBase,                          /* Parent class */
             "get_event_kinematic_value_reference",    /* python name*/
             GetPointerToKinematicParameter,           /* Name of function in C++ (must match Python name) */
             py::arg("variable"),                      /* Argument(s) */
@@ -361,7 +333,7 @@ public:
     void RegisterFunctionalParameters() override {
         PYBIND11_OVERRIDE_PURE_NAME(
             void,
-            SampleHandlerFD,
+            SampleHandlerBase,
             "register_functional_parameters",
             RegisterFunctionalParameters
         );
@@ -382,24 +354,24 @@ void initSamples(py::module &m) {
         .value("Dembinski_Abdelmottele", TestStatistic::kDembinskiAbdelmotteleb)
         .value("N_Test_Statistics", TestStatistic::kNTestStatistics);
 
-    py::class_<SampleHandlerBase, PySampleHandlerBase /* <--- trampoline*/>(m_samples, "SampleHandlerBase")
+    py::class_<SampleHandlerInterface, PySampleHandlerInterface /* <--- trampoline*/>(m_samples, "SampleHandlerInterface")
         .def(py::init())
         
         .def(
             "reweight", 
-            &SampleHandlerBase::Reweight,
+            &SampleHandlerInterface::Reweight,
             "reweight the MC events in this sample. You will need to override this."
         )
         
         .def(
             "get_likelihood", 
-            &SampleHandlerBase::GetLikelihood,
+            &SampleHandlerInterface::GetLikelihood,
             "Get the sample likelihood at the current point in your model space. You will need to override this."
         )
         
         .def(
             "set_test_stat",
-            &SampleHandlerBase::SetTestStatistic,
+            &SampleHandlerInterface::SetTestStatistic,
             "Set the test statistic that should be used when calculating likelihoods. \n\
             :param test_stat: The new test statistic to use",
             py::arg("test_stat")
@@ -407,8 +379,8 @@ void initSamples(py::module &m) {
 
         .def(
             "get_bin_LLH",
-            py::overload_cast<double, double, double>(&SampleHandlerBase::GetTestStatLLH, py::const_),
-            "Get the LLH for a bin by comparing the data and MC. The result depends on having previously set the test statistic using :py:meth:`pyMaCh3.samples.SampleHandlerBase.set_test_stat` \n\
+            py::overload_cast<double, double, double>(&SampleHandlerInterface::GetTestStatLLH, py::const_),
+            "Get the LLH for a bin by comparing the data and MC. The result depends on having previously set the test statistic using :py:meth:`pyMaCh3.samples.SampleHandlerInterface.set_test_stat` \n\
             :param data: The data content of the bin. \n\
             :param mc: The mc content of the bin \n\
             :param w2: The Sum(w_{i}^2) (sum of weights squared) in the bin, which is sigma^2_{MC stats}",
@@ -416,12 +388,12 @@ void initSamples(py::module &m) {
             py::arg("mc"), 
             py::arg("w2")
         )
-    ; // End of SampleHandlerBase binding
+    ; // End of SampleHandlerInterface binding
 
-    py::class_<SampleHandlerFD, PySampleHandlerFD /* <--- trampoline*/, SampleHandlerBase>(m_samples, "SampleHandlerFD")
+    py::class_<SampleHandlerBase, PySampleHandlerBase /* <--- trampoline*/, SampleHandlerInterface>(m_samples, "SampleHandlerBase")
         .def(
             py::init<std::string, ParameterHandlerGeneric*>(),
-            "This should never be called directly as SampleHandlerFD is an abstract base class. \n\
+            "This should never be called directly as SampleHandlerBase is an abstract base class. \n\
             However when creating a derived class, in the __init__() method, you should call the parent constructor i.e. this one by doing:: \n\
             \n\
             \tsuper(<your derived SampleHandler class>, self).__init__(*args) \n\
