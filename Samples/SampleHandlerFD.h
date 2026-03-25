@@ -239,8 +239,20 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// @brief HH - a experiment-specific function where the maps to actual functions are set up
   virtual void RegisterFunctionalParameters() = 0;
 
-  std::vector<std::function<void(const int)>> event_shift_functions;
-  std::vector<std::vector<int>> events_and_shifts;
+  struct {
+    struct Shift {
+      std::vector<double> par_vals;
+      std::function<void(std::vector<double>)> update_vals;
+      std::function<void(std::vector<double> const &, const int)> apply;
+    };
+    std::vector<Shift> shifts;
+    void update_vals(){
+      for(auto &shift : shifts){
+        shift.update_vals(shift.par_vals);
+      }
+    }
+    std::vector<std::vector<int>> event_shifts;
+  } functional;
 
   /// @brief HH - a helper function for RegisterFunctionalParameter
   template <typename EventType, typename SFType>
@@ -250,12 +262,11 @@ class SampleHandlerFD :  public SampleHandlerBase
       SFType shift_func) {
 
     static_assert(
-        std::is_same_v<std::function<void(std::vector<double const *> const &,
+        std::is_same_v<std::function<void(std::vector<double> const &,
                                           EventType &)>,
                        decltype(std::function(shift_func))>,
         "Function call signature for single parameter Functional shift must be "
-        "void(std::vector<double const *> const &, EventType &). -- note the "
-        "two consts on the parameter value vector");
+        "void(std::vector<double> const &, EventType &).");
 
     auto sample_func_pars =
         ParHandler->GetFunctionalParametersFromSampleName(SampleHandlerName);
@@ -294,16 +305,16 @@ class SampleHandlerFD :  public SampleHandlerBase
       throw MaCh3Exception(__FILE__, __LINE__);
     }
 
-    if (!events_and_shifts.size()) {
-      events_and_shifts.resize(ExptEvents.size());
-    } else if (events_and_shifts.size() != ExptEvents.size()) {
+    if (!functional.event_shifts.size()) {
+      functional.event_shifts.resize(ExptEvents.size());
+    } else if (functional.event_shifts.size() != ExptEvents.size()) {
       MACH3LOG_ERROR("When registering functional shift consuming parameters: "
                      "[ {}], SampleHandler: {} has an allocated event map of "
                      "size: {}, but passed a vector of experiment events size: "
                      "{}. SampleHandler must have a unique set of event "
                      "indices so this indicates something has gone wrong.",
                      ss_pars.str(), SampleHandlerName,
-                     events_and_shifts.size(), ExptEvents.size());
+                     functional.event_shifts.size(), ExptEvents.size());
       throw MaCh3Exception(__FILE__, __LINE__);
     }
 
@@ -318,27 +329,38 @@ class SampleHandlerFD :  public SampleHandlerBase
       throw MaCh3Exception(__FILE__, __LINE__);
     }
 
-    // This functional shift is correctly configured for this SampleHandler
-    std::vector<double const *> par_vals;
+    // If we've made it here, then this functional shift is correctly
+    //   configured for this SampleHandler
+
+    int iShift = int(functional.shifts.size());
+    functional.shifts.emplace_back();
+    auto & shift = functional.shifts.back();
+
+    std::vector<int> par_indices;
     for (auto const &fp : sample_func_pars) {
-      par_vals.push_back(ParHandler->RetPointer(fp.index));
+      par_indices.push_back(fp.index);
     }
+
+    shift.par_vals.resize(par_indices.size());
+    shift.update_vals = [=](std::vector<double> par_vals){
+      for (size_t i = 0; i < par_indices.size(); ++i) {
+        auto const &fpi = par_indices[i];
+        par_vals[i] = ParHandler->GetParPropVec()[fpi];
+      }
+    };
 
     MACH3LOG_INFO("Registered functional shift consuming parameters: "
                   "[ {}] for SampleHandler: {}, with {} par vals.",
-                  ss_pars.str(), SampleHandlerName, par_vals.size());
+                  ss_pars.str(), SampleHandlerName, shift.par_vals.size());
 
-    int iShift = int(event_shift_functions.size());
-    event_shift_functions.push_back(
-      [shift_func, par_vals, &ExptEvents](int iEvent) {
-        shift_func(par_vals, ExptEvents[iEvent]);
-      });
+    shift.apply = [shift_func, &ExptEvents](std::vector<double> const &par_vals,
+                                            int iEvent) {
+      shift_func(par_vals, ExptEvents[iEvent]);
+    };
 
     // For each event, make a vector of pointers to the functional parameters
     int NEvents = GetNEvents();
     for (int iEvent = 0; iEvent < NEvents; ++iEvent) {
-      // Now loop over the functional parameters and get a vector of enums
-      // corresponding to the functional parameters
       int nmatch = 0;
       for (auto const &par : matched_pars) {
         if (!MatchCondition(par->modes, static_cast<int>(std::round(
@@ -366,7 +388,7 @@ class SampleHandlerFD :  public SampleHandlerBase
             matched_pars.size());
         throw MaCh3Exception(__FILE__, __LINE__);
       }
-      events_and_shifts[iEvent].push_back(iShift);
+      functional.event_shifts[iEvent].push_back(iShift);
     }
   }
 
@@ -376,17 +398,17 @@ class SampleHandlerFD :  public SampleHandlerBase
                                              SFType shift_func) {
 
     static_assert(
-        std::is_same_v<std::function<void(double const *, EventType &)>,
+        std::is_same_v<std::function<void(double const &, EventType &)>,
                        decltype(std::function(shift_func))>,
         "Function call signature for single parameter Functional shift must be "
-        "void(double const *, EventType&).");
+        "void(double const &, EventType&).");
 
     RegisterIndividualFunctionalParameter(
         ExptEvents,
         std::vector<std::string>{
             par_name,
         },
-        [=](std::vector<double const *> const &par_vals, EventType &ev) {
+        [=](std::vector<double> const &par_vals, EventType &ev) {
           shift_func(par_vals[0], ev);
         });
   }

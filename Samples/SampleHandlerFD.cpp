@@ -359,6 +359,9 @@ void SampleHandlerFD::FillArray() {
   //DB Reset which cuts to apply
   Selection = StoredSelection;
 
+  //update the list of parameter values passed to shift functionals
+  functional.update_vals();
+
   for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
     ApplyShifts(iEvent);
     const EventInfo* _restrict_ MCEvent = &MCSamples[iEvent];
@@ -396,6 +399,9 @@ void SampleHandlerFD::FillArray_MP() {
 // ************************************************
   //DB Reset which cuts to apply
   Selection = StoredSelection;
+
+  //update the list of parameter values passed to shift functionals
+  functional.update_vals();
 
   // NOTE comment below is left for historical reasons
   //DB - Brain dump of speedup ideas
@@ -467,7 +473,7 @@ void SampleHandlerFD::ResetHistograms() {
 void SampleHandlerFD::ApplyShifts(const int iEvent) {
 // ***************************************************************************
   // KS: If there are no shifts then there is no point in resetting which can be costly.
-  if(!events_and_shifts.size() || !events_and_shifts[iEvent].size()) {
+  if(!functional.event_shifts.size() || !functional.event_shifts[iEvent].size()) {
     return;
   }
 
@@ -475,8 +481,8 @@ void SampleHandlerFD::ApplyShifts(const int iEvent) {
   // First reset shifted array back to nominal values
   ResetShifts(iEvent);
 
-  for (auto const &iShift : events_and_shifts[iEvent]) {
-    event_shift_functions[iShift](iEvent);
+  for (auto const &iShift : functional.event_shifts[iEvent]) {
+    functional.shifts[iShift].apply(functional.shifts[iShift].par_vals, iEvent);
   }
 
   FinaliseShifts(iEvent);
