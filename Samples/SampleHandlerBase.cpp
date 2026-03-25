@@ -2001,8 +2001,9 @@ std::unique_ptr<THStack> SampleHandlerBase::ReturnStackedHistBySelection1D(const
 // ************************************************
   auto HistList = ReturnHistsBySelection1D(iSample, KinematicProjection, Selection1, Selection2, WeightStyle);
   auto StackHist = std::make_unique<THStack>((GetSampleTitle(iSample)+"_"+KinematicProjection+"_Stack").c_str(),"");
+  // Note: we use .release() to transfer ownership of each TH1 to THStack.
   for (unsigned int i=0;i<HistList.size();i++) {
-    StackHist->Add(HistList[i].get());
+    StackHist->Add(HistList[i].release());
   }
   return StackHist;
 }
