@@ -333,6 +333,11 @@ void SampleHandlerFD::Reweight() {
   // Calculate weight coming from all splines if we initialised handler
   if(SplineHandler) SplineHandler->Evaluate();
 
+  //update the list of parameter values passed to shift functionals
+  functional.update_vals();
+  // Update the functional parameter values to the latest proposed values
+  PrepFunctionalParameters();
+
   //KS: If using CPU this does nothing, if on GPU need to make sure we finished copying memory from
   if(SplineHandler) SplineHandler->SynchroniseMemTransfer();
 
@@ -358,9 +363,6 @@ void SampleHandlerFD::FillArray() {
 //************************************************
   //DB Reset which cuts to apply
   Selection = StoredSelection;
-
-  //update the list of parameter values passed to shift functionals
-  functional.update_vals();
 
   for (unsigned int iEvent = 0; iEvent < GetNEvents(); iEvent++) {
     ApplyShifts(iEvent);
@@ -399,9 +401,6 @@ void SampleHandlerFD::FillArray_MP() {
 // ************************************************
   //DB Reset which cuts to apply
   Selection = StoredSelection;
-
-  //update the list of parameter values passed to shift functionals
-  functional.update_vals();
 
   // NOTE comment below is left for historical reasons
   //DB - Brain dump of speedup ideas

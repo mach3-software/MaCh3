@@ -238,6 +238,8 @@ class SampleHandlerFD :  public SampleHandlerBase
   // ----- start Functional Parameters -----
   /// @brief HH - a experiment-specific function where the maps to actual functions are set up
   virtual void RegisterFunctionalParameters() = 0;
+  /// @brief Update the functional parameter values to the latest proposed values. Needs to be called before every new reweight so is called in fillArray
+  virtual void PrepFunctionalParameters(){};
 
   struct {
     struct Shift {
