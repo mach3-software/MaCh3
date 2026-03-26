@@ -45,6 +45,23 @@ function(setup_pyMaCh3)
   set_property( TARGET _pyMaCh3 PROPERTY POSITION_INDEPENDENT_CODE ON )
   target_link_libraries( _pyMaCh3 PRIVATE MaCh3::All ${ARGS_LINK_TARGETS} )
   
+  set_property(
+    TARGET
+    _pyMaCh3
+    PROPERTY
+      INSTALL_RPATH "$ORIGIN/lib"
+  )
+
+  foreach( lib Fitters;Samples;Parameters;Splines;Manager;Plotting;Oscillator;OscProbCalcer )
+  message ("setting rpath for ${lib}")
+  set_property(
+    TARGET
+    ${lib}
+    PROPERTY
+      INSTALL_RPATH "$ORIGIN"
+  )
+  endforeach()
+
   ## install our pybind11 object
   install( TARGETS _pyMaCh3 DESTINATION ${INSTALL_DIR}/ )
 
@@ -76,7 +93,7 @@ function(setup_pyMaCh3)
         Fitters
         Plotting
         Prob3plusplus
-      LIBRARY DESTINATION ${INSTALL_DIR}/lib/core)
+      LIBRARY DESTINATION ${INSTALL_DIR}/lib)
 
   endif()
 

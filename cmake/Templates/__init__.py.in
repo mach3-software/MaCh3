@@ -1,6 +1,7 @@
 import os
 import ctypes
 from pathlib import Path
+import glob
 
 ## where are we????
 mach3_dir = Path(__file__).resolve().parent
@@ -16,22 +17,11 @@ for lib in [
     
     ctypes.cdll.LoadLibrary(f'@ROOT_LIBRARY_DIR@/{lib}')
 
+pymach3_lib_list = glob.glob('_pyMaCh3*.so')
 ## load all the MaCh3 core libraries
-for lib in [
-        "libyaml-cpp.so", 
-        "libProb3plusplus.so",
-        "libOscProbCalcer.so", 
-        "libOscillator.so", 
-        "libManager.so", 
-        "libParameters.so", 
-        "libSplineDict.so", 
-        "libSplines.so", 
-        "libSamples.so", 
-        "libFitters.so", 
-        "libPlotting.so"
-    ]:
+for lib in pymach3_lib_list:
     
-    ctypes.cdll.LoadLibrary(f'{lib_dir}/{lib}')
+    ctypes.cdll.LoadLibrary(f'{mach3_dir}/{lib}')
 
 ## search for any experiment specific libraries
 other_libs = [@LINK_TARGET_LIB_LIST@]
