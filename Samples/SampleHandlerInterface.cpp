@@ -195,7 +195,7 @@ double SampleHandlerInterface::GetTestStatLLH(const double data, const double mc
 // CW: Silence cout and cerr. Last is risky but psyche persists on spamming both
 void SampleHandlerInterface::QuietPlease() {
 // ***************************************************************************
-  #if DEBUG > 0
+  #if MACH3_DEBUG > 0
   return;
   #else
   buf = std::cout.rdbuf();
@@ -209,7 +209,7 @@ void SampleHandlerInterface::QuietPlease() {
 // CW: Reset cout and cerr
 void SampleHandlerInterface::NowTalk() {
 // ***************************************************************************
-  #if DEBUG > 0
+  #if MACH3_DEBUG > 0
   return;
   #else
   std::cout.rdbuf(buf);
