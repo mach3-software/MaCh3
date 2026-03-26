@@ -241,10 +241,10 @@ class SampleHandlerFD :  public SampleHandlerBase
   /// @brief Update the functional parameter values to the latest proposed values. Needs to be called before every new reweight so is called in fillArray
   virtual void PrepFunctionalParameters(){};
 
-  struct {
+  struct Functional {
     struct Shift {
       std::vector<double> par_vals;
-      std::function<void(std::vector<double>)> update_vals;
+      std::function<void(std::vector<double> &)> update_vals;
       std::function<void(std::vector<double> const &, const int)> apply;
     };
     std::vector<Shift> shifts;
@@ -292,10 +292,10 @@ class SampleHandlerFD :  public SampleHandlerBase
     // allows experiments to effectively disable functional parameters by not
     // supplying the YAML defining the parameters
     if (!matched_pars.size()) {
-      MACH3LOG_INFO(
-          "Functional shift consuming parameters: [ {}], doesn't apply to "
-          "sample handler: {}",
-          ss_pars.str(), SampleHandlerName);
+      MACH3LOG_INFO("Functional shift consuming parameters: [ {}], found no "
+                    "matching parameters for "
+                    "sample handler: {}",
+                    ss_pars.str(), SampleHandlerName);
       return;
     } else if (matched_pars.size() !=
                par_names.size()) { // not well defined how to procede with
@@ -335,8 +335,7 @@ class SampleHandlerFD :  public SampleHandlerBase
     //   configured for this SampleHandler
 
     int iShift = int(functional.shifts.size());
-    functional.shifts.emplace_back();
-    auto & shift = functional.shifts.back();
+    Functional::Shift shift;
 
     std::vector<int> par_indices;
     for (auto const &fp : sample_func_pars) {
@@ -344,24 +343,23 @@ class SampleHandlerFD :  public SampleHandlerBase
     }
 
     shift.par_vals.resize(par_indices.size());
-    shift.update_vals = [=](std::vector<double> par_vals){
+    shift.update_vals = [=](std::vector<double> &par_vals){
       for (size_t i = 0; i < par_indices.size(); ++i) {
         auto const &fpi = par_indices[i];
         par_vals[i] = ParHandler->GetParPropVec()[fpi];
       }
     };
 
-    MACH3LOG_INFO("Registered functional shift consuming parameters: "
-                  "[ {}] for SampleHandler: {}, with {} par vals.",
-                  ss_pars.str(), SampleHandlerName, shift.par_vals.size());
-
     shift.apply = [shift_func, &ExptEvents](std::vector<double> const &par_vals,
                                             int iEvent) {
       shift_func(par_vals, ExptEvents[iEvent]);
     };
 
+    functional.shifts.push_back(std::move(shift));
+
     // For each event, make a vector of pointers to the functional parameters
     int NEvents = GetNEvents();
+    int neventsaffected = 0;
     for (int iEvent = 0; iEvent < NEvents; ++iEvent) {
       int nmatch = 0;
       for (auto const &par : matched_pars) {
@@ -391,7 +389,11 @@ class SampleHandlerFD :  public SampleHandlerBase
         throw MaCh3Exception(__FILE__, __LINE__);
       }
       functional.event_shifts[iEvent].push_back(iShift);
+      neventsaffected++;
     }
+    MACH3LOG_INFO("Registered functional shift consuming parameters: "
+      "[ {}] for SampleHandler: {}, with {} par vals affecting {} events.",
+      ss_pars.str(), SampleHandlerName, shift.par_vals.size(), neventsaffected);
   }
 
   template <typename EventType, typename SFType>

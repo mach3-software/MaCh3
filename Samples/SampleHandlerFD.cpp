@@ -481,7 +481,8 @@ void SampleHandlerFD::ApplyShifts(const int iEvent) {
   ResetShifts(iEvent);
 
   for (auto const &iShift : functional.event_shifts[iEvent]) {
-    functional.shifts[iShift].apply(functional.shifts[iShift].par_vals, iEvent);
+    auto & shift = functional.shifts[iShift];
+    shift.apply(shift.par_vals, iEvent);
   }
 
   FinaliseShifts(iEvent);
