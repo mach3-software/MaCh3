@@ -92,7 +92,6 @@ function(setup_pyMaCh3)
         Samples
         Fitters
         Plotting
-        Prob3plusplus
       LIBRARY DESTINATION ${INSTALL_DIR}/lib)
 
   endif()
