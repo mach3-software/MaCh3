@@ -338,8 +338,8 @@ class SampleHandlerFD :  public SampleHandlerBase
     Functional::Shift shift;
 
     std::vector<int> par_indices;
-    for (auto const &fp : sample_func_pars) {
-      par_indices.push_back(fp.index);
+    for (auto const &fp : matched_pars) {
+      par_indices.push_back(fp->index);
     }
 
     shift.par_vals.resize(par_indices.size());
