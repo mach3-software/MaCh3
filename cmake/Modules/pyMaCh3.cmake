@@ -101,6 +101,12 @@ function(setup_pyMaCh3)
   foreach(link_target ${ARGS_LINK_TARGETS})
     install( TARGETS ${ARGS_LINK_TARGETS} DESTINATION ${INSTALL_DIR}/lib )
     set(LINK_TARGET_LIB_LIST "${LINK_TARGET_LIB_LIST}\"${link_target}\", ")
+    set_property(
+      TARGET
+      ${LINK_TARGET}
+      PROPERTY
+        INSTALL_RPATH "$ORIGIN"
+    )
   endforeach()
 
   set(PYMACH3_ADDITIONAL_MODULE_IMPORT "")
