@@ -25,7 +25,7 @@ FitterBase::FitterBase(Manager * const man) : fitMan(man) {
 
   clock = std::make_unique<TStopwatch>();
   stepClock = std::make_unique<TStopwatch>();
-  #ifdef DEBUG
+  #ifdef MACH3_DEBUG
   // Fit summary and debug info
   debug = GetFromManager<bool>(fitMan->raw()["General"]["Debug"], false, __FILE__ , __LINE__);
   #endif
@@ -53,7 +53,7 @@ FitterBase::FitterBase(Manager * const man) : fitMan(man) {
   SampleFolder = outputFile->mkdir("SampleFolder");
   outputFile->cd();
 
-  #ifdef DEBUG
+  #ifdef MACH3_DEBUG
   // Prepare the output log file
   if (debug) debugFile.open((outfile+".log").c_str());
   #endif
@@ -203,7 +203,7 @@ void FitterBase::PrepareOutput() {
   }
 
   MACH3LOG_INFO("-------------------- Starting MCMC --------------------");
-  #ifdef DEBUG
+  #ifdef MACH3_DEBUG
   if (debug) {
     debugFile << "----- Starting MCMC -----" << std::endl;
   }
@@ -241,7 +241,7 @@ void FitterBase::SaveOutput() {
 
   MACH3LOG_INFO("{} steps took {:.2e} seconds to complete. ({:.2e}s / step).", step - stepStart, clock->RealTime(), clock->RealTime() / static_cast<double>(step - stepStart));
   MACH3LOG_INFO("{} steps were accepted.", accCount);
-  #ifdef DEBUG
+  #ifdef MACH3_DEBUG
   if (debug)
   {
     debugFile << "\n\n" << step << " steps took " << clock->RealTime() << " seconds to complete. (" << clock->RealTime() / step << "s / step).\n" << accCount<< " steps were accepted." << std::endl;

@@ -652,7 +652,7 @@ void SampleHandlerBase::SetupNormParameters() {
 //A way to check whether a normalisation parameter applies to an event or not
 void SampleHandlerBase::CalcNormsBins(std::vector<NormParameter>& norm_parameters, std::vector< std::vector< int > >& norms_bins) {
 // ************************************************
-  #ifdef DEBUG
+  #ifdef MACH3_DEBUG
   std::vector<int> VerboseCounter(norm_parameters.size(), 0);
   #endif
   for(unsigned int iEvent = 0; iEvent < GetNEvents(); ++iEvent){
@@ -710,7 +710,7 @@ void SampleHandlerBase::CalcNormsBins(std::vector<NormParameter>& norm_parameter
 
         NormBins.push_back(bin);
         MACH3LOG_TRACE("Event {}, will be affected by dial {}", iEvent, it->name);
-        #ifdef DEBUG
+        #ifdef MACH3_DEBUG
         VerboseCounter[std::distance(norm_parameters.begin(), it)]++;
         #endif
         //}
@@ -718,7 +718,7 @@ void SampleHandlerBase::CalcNormsBins(std::vector<NormParameter>& norm_parameter
     } // end if (ParHandler)
     norms_bins[iEvent] = NormBins;
   }//end loop over events
-  #ifdef DEBUG
+  #ifdef MACH3_DEBUG
   MACH3LOG_DEBUG("┌──────────────────────────────────────────────────────────┐");
   for (std::size_t i = 0; i < norm_parameters.size(); ++i) {
     const auto& norm = norm_parameters[i];

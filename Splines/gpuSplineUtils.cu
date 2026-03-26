@@ -372,7 +372,7 @@ __global__ void EvalOnGPU_Splines(
     // Or for the more "easy to read" version:
     //gpu_weights[splineNum] = (fY+dx*(fB+dx*(fC+dx*fD)));
 
-    //#ifdef DEBUG
+    //#ifdef MACH3_DEBUG
     //printf("splineNum = %i/%i, paramNo = %i, variation = %f, segment = %i, fX = %f, fX+1 = %f, dx = %f, gpu_n_splines = %i, gpu_spline_size = %i, weight = %f \n", splineNum, gpu_n_splines, gpu_paramNo_arr[splineNum], gpu_par_val[Param], segment, tex1Dfetch<float>(text_coeff_x, segment_X), tex1Dfetch<float>(text_coeff_x, segment_X+1), dx, gpu_n_splines, gpu_spline_size, gpu_weights[splineNum]);
     //#endif
   }
@@ -507,7 +507,7 @@ __host__ void SplineMonolithGPU::RunGPU_SplineMonolith(
   cudaMemcpyAsync(cpu_total_weights, gpu_total_weights, cpu_n_events * sizeof(M3::float_t), cudaMemcpyDeviceToHost, 0);
   CudaCheckError();
 
-  #ifdef DEBUG
+  #ifdef MACH3_DEBUG
     printf("Copied GPU total weights to CPU with SUCCESS (drink more tea)\n");
     printf("Released calculated response from GPU with SUCCESS (drink most tea)\n");
   #endif

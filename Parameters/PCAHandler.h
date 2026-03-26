@@ -4,26 +4,6 @@
 #include "Manager/Manager.h"
 #include "Parameters/ParameterHandlerUtils.h"
 
-#ifdef DEBUG
-  #define DEBUG_PCA 1
-#endif
-
-#ifdef DEBUG_PCA
-//KS: When debugging we produce some fancy plots, but we don't need it during normal work flow
-#include "TCanvas.h"
-#include "TROOT.h"
-#include "TStyle.h"
-#include "TColor.h"
-#include "TLine.h"
-#include "TText.h"
-#include "TLegend.h"
-
-#if DEBUG_PCA == 2
-#include "Eigen/Eigenvalues"
-#endif
-
-#endif
-
 /// @brief Class responsible for handling Principal Component Analysis (PCA) of covariance matrix
 /// @author Clarence Wret
 ///
@@ -214,9 +194,9 @@ class PCAHandler{
     else return true;
   }
 
-  #ifdef DEBUG_PCA
+  #ifdef MACH3_DEBUG
   /// @brief KS: Let's dump all useful matrices to properly validate PCA
-  void DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, int NumPar);
+  void DebugPCA(const double sum, TMatrixD temp, int NumPar);
   #endif
 
  private:

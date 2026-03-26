@@ -1,5 +1,17 @@
 #include "Parameters/PCAHandler.h"
 
+#ifdef MACH3_DEBUG
+_MaCh3_Safe_Include_Start_ //{
+//KS: When debugging we produce some fancy plots, but we don't need it during normal work flow
+#include "TCanvas.h"
+#include "TROOT.h"
+#include "TStyle.h"
+#include "TColor.h"
+#include "TLine.h"
+#include "TText.h"
+#include "TLegend.h"
+_MaCh3_Safe_Include_End_ //}
+#endif
 
 // ********************************************
 PCAHandler::PCAHandler() {
@@ -139,9 +151,9 @@ void PCAHandler::ConstructPCA(TMatrixDSym* CovMatrix, const int firstPCAd, const
     isDecomposedPCA[i] = i + shift;
   }
 
-  #ifdef DEBUG_PCA
+  #ifdef MACH3_DEBUG_PCA
   //KS: Let's dump all useful matrices to properly validate PCA
-  DebugPCA(sum, temp, submat, CovMatrix->GetNrows());
+  DebugPCA(sum, temp, CovMatrix->GetNrows());
   #endif
 }
 
@@ -373,16 +385,15 @@ void PCAHandler::ThrowParameters(const std::vector<std::unique_ptr<TRandom3>>& r
   #pragma GCC diagnostic pop
 }
 
-#ifdef DEBUG_PCA
+#ifdef MACH3_DEBUG
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
 // ********************************************
 //KS: Let's dump all useful matrices to properly validate PCA
-void PCAHandler::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, int NumPar) {
+void PCAHandler::DebugPCA(const double sum, TMatrixD temp, int NumPar) {
 // ********************************************
   int originalErrorWarning = gErrorIgnoreLevel;
   gErrorIgnoreLevel = kFatal;
 
-  (void)submat;//This is used if DEBUG_PCA==2, this hack is to avoid compiler warnings
   for (int i = 0; i < NumParPCA; ++i) {
     MACH3LOG_DEBUG("Param {} isDecomposedPCA={}", i, isDecomposedPCA[i]);
   }
@@ -546,120 +557,6 @@ void PCAHandler::DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, i
   c1->Print( "Debug_PCA.pdf");
   delete hTransferMatT;
 
-
-  //KS: Crosscheck against Eigen library
-  #if DEBUG_PCA == 2
-  Eigen::MatrixXd Submat_Eigen(submat.GetNrows(), submat.GetNcols());
-
-  #ifdef MULTITHREAD
-  #pragma omp parallel for
-  #endif
-  for(int i = 0; i < submat.GetNrows(); i++)
-  {
-    for(int j = 0; j < submat.GetNcols(); j++)
-    {
-      Submat_Eigen(i,j) = (submat)(i,j);
-    }
-  }
-  Eigen::EigenSolver<Eigen::MatrixXd> EigenSolver;
-  EigenSolver.compute(Submat_Eigen);
-  Eigen::VectorXd eigen_val = EigenSolver.eigenvalues().real();
-  Eigen::MatrixXd eigen_vect = EigenSolver.eigenvectors().real();
-  std::vector<std::tuple<double, Eigen::VectorXd>> eigen_vectors_and_values;
-  double Sum_Eigen = 0;
-  for(int i = 0; i < eigen_val.size(); i++)
-  {
-    std::tuple<double, Eigen::VectorXd> vec_and_val(eigen_val[i], eigen_vect.row(i));
-    eigen_vectors_and_values.push_back(vec_and_val);
-    Sum_Eigen += eigen_val[i];
-  }
-  std::sort(eigen_vectors_and_values.begin(), eigen_vectors_and_values.end(),
-            [&](const std::tuple<double, Eigen::VectorXd>& a, const std::tuple<double, Eigen::VectorXd>& b) -> bool
-            { return std::get<0>(a) > std::get<0>(b); } );
-  int index = 0;
-  for(auto const vect : eigen_vectors_and_values)
-  {
-    eigen_val(index) = std::get<0>(vect);
-    eigen_vect.row(index) = std::get<1>(vect);
-    index++;
-  }
-  TH1D* heigen_values_Eigen = new TH1D("eig_values", "Eigen Values", eigen_val.size(), 0.0, eigen_val.size());
-  TH1D* heigen_cumulative_Eigen = new TH1D("eig_cumulative", "heigen_cumulative", eigen_val.size(), 0.0, eigen_val.size());
-  TH1D* heigen_frac_Eigen = new TH1D("eig_fractional", "heigen_fractional", eigen_val.size(), 0.0, eigen_val.size());
-  heigen_values_Eigen->GetXaxis()->SetTitle("Eigen Vector");
-  heigen_values_Eigen->GetYaxis()->SetTitle("Eigen Value");
-
-  double Cumulative_Eigen = 0;
-  for(int i = 0; i < eigen_val.size(); i++)
-  {
-    heigen_values_Eigen->SetBinContent(i+1, eigen_val(i));
-    heigen_cumulative_Eigen->SetBinContent(i+1, eigen_val(i)/sum + Cumulative_Eigen);
-    heigen_frac_Eigen->SetBinContent(i+1, eigen_val(i)/sum);
-    Cumulative_Eigen += eigen_val(i)/sum;
-  }
-  heigen_values_Eigen->SetLineColor(kRed);
-  heigen_values_Eigen->SetLineWidth(2);
-  heigen_cumulative_Eigen->SetLineColor(kGreen);
-  heigen_cumulative_Eigen->SetLineWidth(2);
-  heigen_frac_Eigen->SetLineColor(kBlue);
-  heigen_frac_Eigen->SetLineWidth(2);
-
-  c1->SetLogy();
-  heigen_values_Eigen->SetMaximum(heigen_cumulative_Eigen->GetMaximum()+heigen_cumulative_Eigen->GetMaximum()*0.4);
-  heigen_values_Eigen->Draw();
-  heigen_cumulative_Eigen->Draw("SAME");
-  heigen_frac_Eigen->Draw("SAME");
-
-  auto leg_Eigen = std::make_unique<TLegend>(0.2, 0.2, 0.6, 0.5);
-  leg_Eigen->SetTextSize(0.04);
-  leg_Eigen->AddEntry(heigen_values_Eigen, "Absolute", "l");
-  leg_Eigen->AddEntry(heigen_frac_Eigen, "Fractional", "l");
-  leg_Eigen->AddEntry(heigen_cumulative_Eigen, "Cumulative", "l");
-
-  leg_Eigen->SetLineColor(0);
-  leg_Eigen->SetLineStyle(0);
-  leg_Eigen->SetFillColor(0);
-  leg_Eigen->SetFillStyle(0);
-  leg_Eigen->Draw("Same");
-
-  c1->Print("Debug_PCA.pdf");
-  c1->SetLogy(0);
-  delete heigen_values_Eigen;
-  delete heigen_cumulative_Eigen;
-  delete heigen_frac_Eigen;
-
-  TH2D* heigen_vectors_Eigen = new TH2D("Eigen_Vectors", "Eigen_Vectors", eigen_val.size(), 0.0, eigen_val.size(), eigen_val.size(), 0.0, eigen_val.size());
-
-  for(int i = 0; i < eigen_val.size(); i++)
-  {
-    for(int j = 0; j < eigen_val.size(); j++)
-    {
-      //KS: +1 because there is offset in histogram relative to TMatrix
-      heigen_vectors_Eigen->SetBinContent(i+1,j+1, eigen_vect(i,j));
-    }
-  }
-  heigen_vectors_Eigen->GetXaxis()->SetTitle("Parameter in Normal Base");
-  heigen_vectors_Eigen->GetYaxis()->SetTitle("Parameter in Decomposed Base");
-  heigen_vectors_Eigen->SetMarkerSize(0.15);
-  minz = heigen_vectors_Eigen->GetMinimum();
-  if (fabs(0-maxz)>fabs(0-minz)) heigen_vectors_Eigen->GetZaxis()->SetRangeUser(0-fabs(0-maxz),0+fabs(0-maxz));
-  else heigen_vectors_Eigen->GetZaxis()->SetRangeUser(0-fabs(0-minz),0+fabs(0-minz));
-
-  if(PlotText) heigen_vectors_Eigen->Draw("COLZ TEXT");
-  else heigen_vectors_Eigen->Draw("COLZ");
-  c1->Print( "Debug_PCA.pdf");
-
-  heigen_vectors->SetTitle("ROOT minus Eigen");
-  heigen_vectors->Add(heigen_vectors_Eigen, -1.);
-  minz = heigen_vectors->GetMinimum();
-  if (fabs(0-maxz)>fabs(0-minz)) heigen_vectors->GetZaxis()->SetRangeUser(0-fabs(0-maxz),0+fabs(0-maxz));
-  else heigen_vectors->GetZaxis()->SetRangeUser(0-fabs(0-minz),0+fabs(0-minz));
-  if(PlotText) heigen_vectors->Draw("COLZ TEXT");
-  else heigen_vectors->Draw("COLZ");
-  c1->Print("Debug_PCA.pdf");
-  delete heigen_vectors_Eigen;
-
-  #endif // end if Eigen enabled
   delete heigen_vectors;
 
   c1->Print("Debug_PCA.pdf]");

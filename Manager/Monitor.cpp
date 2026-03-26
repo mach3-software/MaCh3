@@ -34,7 +34,7 @@ void MaCh3Welcome() {
 
   GetGPUInfo();
 
-  #ifdef DEBUG
+  #ifdef MACH3_DEBUG
   GetOSInfo();
   GetDiskUsage();
   #endif

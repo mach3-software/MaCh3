@@ -183,7 +183,7 @@ void UnbinnedSplineHandler::PrepareForGPU(std::vector<std::vector<TResponseFunct
         ++TF1sCounter;
       }
       //KS: Don't delete in debug
-      #ifndef DEBUG
+      #ifndef MACH3_DEBUG
       delete MasterSpline[EventCounter][ParamNumber];
       MasterSpline[EventCounter][ParamNumber] = nullptr;
       #endif

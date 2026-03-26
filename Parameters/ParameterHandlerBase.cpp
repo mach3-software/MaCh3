@@ -1333,7 +1333,7 @@ void ParameterHandlerBase::UpdateAdaptiveCovariance() {
   /// Need to adjust the scale every step
   if(AdaptiveHandler->GetUseRobbinsMonro()){
     bool verbose=false;
-    #ifdef DEBUG
+    #ifdef MACH3_DEBUG
     verbose=true;
     #endif
     AdaptiveHandler->UpdateRobbinsMonroScale();
