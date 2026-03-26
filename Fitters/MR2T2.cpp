@@ -40,7 +40,7 @@ void MR2T2::ProposeStep() {
         syst_llh[s] = systematics[s]->GetLikelihood();
         llh += syst_llh[s];
 
-#ifdef DEBUG
+#ifdef MACH3_DEBUG
         if (debug)
             debugFile << "LLH after " << systematics[s]->GetName() << " " << llh << std::endl;
 #endif
@@ -51,7 +51,7 @@ void MR2T2::ProposeStep() {
     if (llh >= M3::_LARGE_LOGL_)
     {
         out_of_bounds = true;
-#ifdef DEBUG
+#ifdef MACH3_DEBUG
         if (debug)
             debugFile << "Rejecting based on boundary" << std::endl;
 #endif
@@ -74,7 +74,7 @@ void MR2T2::ProposeStep() {
             // Get the sample likelihoods and add them
             sample_llh[i] = samples[i]->GetLikelihood();
             llh += sample_llh[i];
-#ifdef DEBUG
+#ifdef MACH3_DEBUG
             if (debug)
                 debugFile << "LLH after sample " << i << " " << llh << std::endl;
 #endif
@@ -88,7 +88,7 @@ void MR2T2::ProposeStep() {
         {
             // Set the sample_llh[i] to be madly high also to signify a step out of bounds
             sample_llh[i] = M3::_LARGE_LOGL_;
-#ifdef DEBUG
+#ifdef MACH3_DEBUG
             if (debug)
                 debugFile << "LLH after REJECT sample " << i << " " << llh << std::endl;
 #endif

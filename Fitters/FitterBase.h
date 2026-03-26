@@ -168,7 +168,7 @@ class FitterBase {
   /// Name of fitting algorithm that is being used
   std::string AlgorithmName;
 
-  #ifdef DEBUG
+  #ifdef MACH3_DEBUG
   /// Debugging flag
   bool debug;
   /// Debugging Output file

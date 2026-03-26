@@ -51,7 +51,7 @@ ParameterTunes::ParameterTunes(const YAML::Node& Settings) {
   for (size_t i = 0; i < TuneNames.size(); ++i) {
     MACH3LOG_INFO("  Tune {} {}", i, TuneNames[i]);
   }
-  #ifdef DEBUG
+  #ifdef MACH3_DEBUG
   PrintTunes();
   #endif
 }

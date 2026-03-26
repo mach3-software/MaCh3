@@ -139,7 +139,7 @@ void PCAHandler::ConstructPCA(TMatrixDSym* CovMatrix, const int firstPCAd, const
     isDecomposedPCA[i] = i + shift;
   }
 
-  #ifdef DEBUG_PCA
+  #ifdef MACH3_DEBUG_PCA
   //KS: Let's dump all useful matrices to properly validate PCA
   DebugPCA(sum, temp, submat, CovMatrix->GetNrows());
   #endif
@@ -373,7 +373,7 @@ void PCAHandler::ThrowParameters(const std::vector<std::unique_ptr<TRandom3>>& r
   #pragma GCC diagnostic pop
 }
 
-#ifdef DEBUG_PCA
+#ifdef MACH3_DEBUG_PCA
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
 // ********************************************
 //KS: Let's dump all useful matrices to properly validate PCA

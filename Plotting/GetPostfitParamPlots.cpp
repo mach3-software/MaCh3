@@ -141,7 +141,7 @@ void PrettifyTitles(HistType* hist) {
 bool ReadSettings(const std::shared_ptr<TFile>& File1)
 {
   MACH3LOG_DEBUG("Reading settings for file {}", File1->GetName());
-  #ifdef DEBUG
+  #ifdef MACH3_DEBUG
   File1->ls();
   #endif
   TTree *Settings = (File1->Get<TTree>("Settings"));
@@ -1075,7 +1075,7 @@ int main(int argc, char *argv[])
 
   PlotMan = new MaCh3Plotting::PlottingManager();
   PlotMan->parseInputs(argc, argv);
-  #ifdef DEBUG
+  #ifdef MACH3_DEBUG
   PlotMan->input().getFile(0).file->ls();
   #endif
   PlotMan->setExec("GetPostfitParamPlots");

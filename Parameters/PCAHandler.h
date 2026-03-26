@@ -4,11 +4,11 @@
 #include "Manager/Manager.h"
 #include "Parameters/ParameterHandlerUtils.h"
 
-#ifdef DEBUG
+#ifdef MACH3_DEBUG
   #define DEBUG_PCA 1
 #endif
 
-#ifdef DEBUG_PCA
+#ifdef MACH3_DEBUG_PCA
 //KS: When debugging we produce some fancy plots, but we don't need it during normal work flow
 #include "TCanvas.h"
 #include "TROOT.h"
@@ -214,7 +214,7 @@ class PCAHandler{
     else return true;
   }
 
-  #ifdef DEBUG_PCA
+  #ifdef MACH3_DEBUG_PCA
   /// @brief KS: Let's dump all useful matrices to properly validate PCA
   void DebugPCA(const double sum, TMatrixD temp, TMatrixDSym submat, int NumPar);
   #endif
