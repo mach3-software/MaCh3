@@ -287,28 +287,8 @@ public:
             SetupMC,       /* Name of function in C++ */
         );
     }
-
-    int ReturnKinematicParameterFromString(std::string) {
-        PYBIND11_OVERRIDE_PURE_NAME(
-            int,                     /* Return type */
-            SampleHandlerBase,            /* Parent class */
-            "get_kinematic_by_name",    /* python name*/
-            ReturnKinematicParameterFromString, /* Name of function in C++ (must match Python name) */
-            py::arg("variable_name")
-        );
-    }
     
-    std::string ReturnStringFromKinematicParameter(int) {
-        PYBIND11_OVERRIDE_PURE_NAME(
-            std::string,                /* Return type */
-            SampleHandlerBase,            /* Parent class */
-            "get_kinematic_name",       /* python name*/
-            ReturnStringFromKinematicParameter, /* Name of function in C++ (must match Python name) */
-            py::arg("variable_id")
-        );
-    }
-
-    double ReturnKinematicParameter(int, int) override {
+    double ReturnKinematicParameter(int, int) const override {
         PYBIND11_OVERRIDE_PURE_NAME(
             double,                     /* Return type */
             SampleHandlerBase,            /* Parent class */
@@ -319,7 +299,7 @@ public:
         );
     }
     
-    const double *GetPointerToKinematicParameter(double, int) override {
+    const double *GetPointerToKinematicParameter(int, int) const override {
         PYBIND11_OVERRIDE_PURE_NAME(
             const double *,                           /* Return type */
             SampleHandlerBase,                          /* Parent class */
