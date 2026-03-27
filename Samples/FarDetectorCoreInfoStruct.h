@@ -58,7 +58,7 @@ struct SampleInfo {
   int nDimensions = M3::_BAD_INT_;
 
   /// names of mc files associated associated with this object
-  std::vector<std::string> mc_files;
+  std::vector<std::vector<std::string>> mc_files;
   /// names of spline files associated associated with this object
   std::vector<std::string> spline_files;
 
@@ -93,18 +93,6 @@ struct EventInfo {
   /// @brief default destructor
   ~EventInfo(){}
 
-  /// target the interaction was on
-  int Target = M3::_BAD_INT_;
-  /// PDG of neutrino after oscillation
-  int nupdg  = M3::_BAD_INT_;
-  /// PDG of neutrino before oscillation
-  int nupdgUnosc = M3::_BAD_INT_;
-
-  /// Pointer to true Neutrino Energy
-  double enu_true = M3::_BAD_DOUBLE_;
-  /// Pointer to true cosine zenith
-  double coszenith_true = M3::_BAD_DOUBLE_;
-
   /// Pointers to weights like oscillation spline, normalisation etc
   std::vector<const M3::float_t*> total_weight_pointers;
 
@@ -115,9 +103,16 @@ struct EventInfo {
 
   /// Nominal sample to which event is associated
   int NominalSample = M3::_BAD_INT_;
+
+  /// PDG of neutrino after oscillation
+  int nupdg  = M3::_BAD_INT_;
+  /// PDG of neutrino before oscillation
+  int nupdgUnosc = M3::_BAD_INT_;
   /// Is event NC or not
   bool isNC = false;
 
-  /// Pointer to MaCh3 mode
-  int mode = M3::_BAD_INT_;
+  /// Pointer to true Neutrino Energy
+  double enu_true = M3::_BAD_DOUBLE_;
+  /// Pointer to true cosine zenith
+  double coszenith_true = M3::_BAD_DOUBLE_;
 };

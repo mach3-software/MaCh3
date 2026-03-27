@@ -29,9 +29,12 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// @brief destructor
   virtual ~SampleHandlerBase();
 
-  /// @brief DB Function to differentiate 1D or 2D binning
+  /// @brief DB Get what dimensionality binning for given sample has
+  /// @param Sample Number of sample
   int GetNDim(const int Sample) const final { return SampleDetails[Sample].nDimensions; }
+  /// @brief Get name for Sample Handler
   std::string GetName() const final;
+  /// @brief Get fancy title for specified samples
   std::string GetSampleTitle(const int Sample) const final {return SampleDetails[Sample].SampleTitle;}
 
   /// @brief Return Kinematic Variable name for specified sample and dimension for example "Reconstructed_Neutrino_Energy"
@@ -39,11 +42,7 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// @param Dimension Dimension index
   std::string GetKinVarName(const int iSample, const int Dimension) const final;
 
-  std::string GetXBinVarName(const int Sample) const {return GetKinVarName(Sample, 0);}
-  std::string GetYBinVarName(const int Sample) const {return GetKinVarName(Sample, 1);}
-  /// @brief Get pointer to binning handler
-  const BinningHandler* GetBinningHandler() const {return Binning.get();}
-
+  /// @brief Computes and prints the integral breakdown of all modes and oscillation channels for a given sample.
   void PrintIntegral(const int iSample, const TString& OutputName="/dev/null", const int WeightStyle=0, const TString& OutputCSVName="/dev/null");
 
   //===============================================================================
@@ -80,16 +79,12 @@ class SampleHandlerBase :  public SampleHandlerInterface
   const TH1* GetW2Hist(const std::string& Sample);
   /// @brief main routine modifying MC prediction based on proposed parameter values
   void Reweight() override;
+  /// @brief Computes the total event weight for a given entry.
   M3::float_t GetEventWeight(const int iEntry);
 
-  /// @brief including Dan's magic NuOscillator
-  void InitialiseNuOscillatorObjects();
-  void SetupNuOscillatorPointers();
   const M3::float_t* GetNuOscillatorPointers(const int iEvent) const;
 
-  void ReadConfig();
-  void LoadSingleSample(const int iSample, const YAML::Node& Settings);
-
+  /// @brief Get number of oscillation channels for a single sample
   int GetNOscChannels(const int iSample) const final {return static_cast<int>(SampleDetails[iSample].OscChannels.size());};
 
   std::string GetFlavourName(const int iSample, const int iChannel) const final {
@@ -99,10 +94,6 @@ class SampleHandlerBase :  public SampleHandlerInterface
     }
     return SampleDetails[iSample].OscChannels[iChannel].flavourName;
   }
-  /// @brief Temporarily extend Selection for a given sample with additional cuts.
-  /// Returns the original Selection so the caller can restore it later.
-  std::vector<std::vector<KinematicCut>> ApplyTemporarySelection(const int iSample,
-                                                                 const std::vector<KinematicCut>& ExtraCuts);
   std::unique_ptr<TH1> Get1DVarHist(const int iSample, const std::string &ProjectionVar,
                                     const std::vector<KinematicCut> &EventSelectionVec = {}, int WeightStyle = 0,
                                     const std::vector<KinematicCut> &SubEventSelectionVec = {}) final;
@@ -125,10 +116,10 @@ class SampleHandlerBase :  public SampleHandlerInterface
                                                     const int kChannelToFill = -1, const int WeightStyle = 0) final;
 
   std::unique_ptr<TH1> GetModeHist1D(const int iSample, int s, int m, int style = 0) {
-    return Get1DVarHistByModeAndChannel(iSample, GetXBinVarName(iSample), m, s, style);
+    return Get1DVarHistByModeAndChannel(iSample, GetKinVarName(iSample, 0), m, s, style);
   }
   std::unique_ptr<TH2> GetModeHist2D(const int iSample, int s, int m, int style = 0) {
-    return Get2DVarHistByModeAndChannel(iSample, GetXBinVarName(iSample),GetYBinVarName(iSample), m, s, style);
+    return Get2DVarHistByModeAndChannel(iSample, GetKinVarName(iSample, 0), GetKinVarName(iSample, 1), m, s, style);
   }
 
   std::vector<std::unique_ptr<TH1>> ReturnHistsBySelection1D(const int iSample, const std::string& KinematicProjection,
@@ -140,7 +131,8 @@ class SampleHandlerBase :  public SampleHandlerInterface
                                                              const int WeightStyle=0);
   std::unique_ptr<THStack> ReturnStackedHistBySelection1D(const int iSample, const std::string& KinematicProjection,
                                           const int Selection1, const int Selection2 = -1, const int WeightStyle = 0);
-  TLegend* ReturnStackHistLegend() {return THStackLeg;}
+  /// @brief Return the legend used for stacked histograms with sample info
+  const TLegend* ReturnStackHistLegend() const {return THStackLeg;}
 
   /// @brief ETA function to generically convert a string from xsec cov to a kinematic type
   int ReturnKinematicParameterFromString(const std::string& KinematicStr) const;
@@ -150,12 +142,12 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// @brief Store additional info in a chan
   void SaveAdditionalInfo(TDirectory* Dir) final;
 
-  // === JM declare the same functions for kinematic vectors ===
+  /// @brief JM: Convert a kinematic vector name to its corresponding integer ID.
   int ReturnKinematicVectorFromString(const std::string& KinematicStr) const;
+  /// @brief JM: Convert a kinematic vector integer ID to its corresponding name as a string.
   std::string ReturnStringFromKinematicVector(const int KinematicVariable) const;
-  // ===========================================================
-  /// @brief JM Check if a kinematic parameter string corresponds to a subevent-level variable
-  bool IsSubEventVarString(const std::string& VarStr);
+  /// @brief JM: Check if a kinematic parameter string corresponds to a subevent-level variable
+  bool IsSubEventVarString(const std::string& VarStr) const;
 
   /// @brief Return array storing data entries for every bin
   auto GetDataArray() const {
@@ -186,6 +178,15 @@ class SampleHandlerBase :  public SampleHandlerInterface
   }
 
  protected:
+  /// @brief including Dan's magic NuOscillator
+  void InitialiseNuOscillatorObjects();
+  /// @brief Initialise pointer to oscillation weight to NuOscillator object
+  void SetupNuOscillatorPointers();
+  /// @brief Load information about sample handler and corresponding samples from config file
+  void ReadConfig();
+  /// @brief Initialise single sample from config file
+  void LoadSingleSample(const int iSample, const YAML::Node& Settings);
+
   /// @brief DB Function to determine which weights apply to which types of samples
   virtual void AddAdditionalWeightPointers() = 0;
 
@@ -244,7 +245,7 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// @brief ETA - generic function applying shifts
   virtual void ApplyShifts(const int iEvent);
 
-  /// @brief DB Function which determines if an event is selected, where Selection double looks like {{ND280KinematicTypes Var1, douuble LowBound}
+  /// @brief DB Function which determines if an event is selected based on @ref KinematicCut
   bool IsEventSelected(const int iSample, const int iEvent) _noexcept_;
   /// @brief JM Function which determines if a subevent is selected
   bool IsSubEventSelected(const std::vector<KinematicCut> &SubEventCuts, const int iEvent, unsigned const int iSubEvent, size_t nsubevents);
@@ -288,28 +289,29 @@ class SampleHandlerBase :  public SampleHandlerInterface
   /// First you need to setup additional pointers in you experiment code in SetupWeightPointers
   /// Then in this function you can calculate whatever fancy function you want by filling weight to which you have pointer
   /// This way func weight shall be used in GetEventWeight
-  virtual void CalcWeightFunc(int iEvent) {return; (void)iEvent;};
+  virtual void CalcWeightFunc(const int iEvent) {return; (void)iEvent;};
 
   /// @brief Return the value of an associated kinematic parameter for an event
-  double ReturnKinematicParameter(const std::string& KinematicParameter, int iEvent) {
+  double ReturnKinematicParameter(const std::string& KinematicParameter, int iEvent) const {
     return ReturnKinematicParameter(ReturnKinematicParameterFromString(KinematicParameter), iEvent);
   }
-  virtual double ReturnKinematicParameter(int KinematicVariable, int iEvent) = 0;
+  virtual double ReturnKinematicParameter(const int KinematicVariable, const int iEvent) const = 0;
 
   // === JM declare the same functions for kinematic vectors ===
-  std::vector<double> ReturnKinematicVector(const std::string& KinematicParameter, int iEvent) {
+  std::vector<double> ReturnKinematicVector(const std::string& KinematicParameter, const int iEvent) const {
     return ReturnKinematicVector(ReturnKinematicVectorFromString(KinematicParameter), iEvent);
   }
-  virtual std::vector<double> ReturnKinematicVector(int KinematicVariable, int iEvent) {return {}; (void)KinematicVariable; (void)iEvent;};
+  virtual std::vector<double> ReturnKinematicVector(const int KinematicVariable, const int iEvent) const {
+    return {}; (void)KinematicVariable; (void)iEvent;};
   // ===========================================================
 
   /// @brief Return the binning used to draw a kinematic parameter
   std::vector<double> ReturnKinematicParameterBinning(const int Sample, const std::string &KinematicParameter) const final;
 
-  const double* GetPointerToKinematicParameter(const std::string& KinematicParameter, int iEvent) {
+  const double* GetPointerToKinematicParameter(const std::string& KinematicParameter, int iEvent) const {
     return GetPointerToKinematicParameter(ReturnKinematicParameterFromString(KinematicParameter), iEvent);
   }
-  virtual const double* GetPointerToKinematicParameter(double KinematicVariable, int iEvent) = 0;
+  virtual const double* GetPointerToKinematicParameter(const int KinematicVariable, const int iEvent) const = 0;
 
   /// @brief Get pointer to oscillation channel associated with given event. Osc channel is const
   const double* GetPointerToOscChannel(const int iEvent) const;
@@ -411,6 +413,11 @@ class SampleHandlerBase :  public SampleHandlerInterface
   NuPDG GetFinalPDGFromFileName(const std::string& FileName) const {return FileToFinalPDGMap.at(FileName);}
 
  private:
+   /// @brief Temporarily extend Selection for a given sample with additional cuts.
+   /// Returns the original Selection so the caller can restore it later.
+   std::vector<std::vector<KinematicCut>> ApplyTemporarySelection(const int iSample,
+                                                                  const std::vector<KinematicCut>& ExtraCuts);
+
   std::unordered_map<std::string, NuPDG> FileToInitPDGMap;
   std::unordered_map<std::string, NuPDG> FileToFinalPDGMap;
 
