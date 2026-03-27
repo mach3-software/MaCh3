@@ -27,7 +27,7 @@ for lib in pymach3_lib_list:
 other_libs = [@LINK_TARGET_LIB_LIST@]
 
 for lib in other_libs:
-    ctypes.cdll.LoadLibrary(f"{lib_dir}/lib{lib}.so")
+    ctypes.cdll.LoadLibrary(f"{lib_dir}/experiment/lib{lib}.so")
 
 ## set the MaCh3 environment var
 os.environ["MaCh3_ROOT"] = f"{mach3_dir}"

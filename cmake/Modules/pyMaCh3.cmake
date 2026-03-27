@@ -57,6 +57,7 @@ function(setup_pyMaCh3)
 
   ## create directory inside our python module to hold MaCh3 libraries
   file(MAKE_DIRECTORY ${INSTALL_DIR}/lib)
+  file(MAKE_DIRECTORY ${INSTALL_DIR}/lib/experiment)
   
   ## set location of the __init__.py template
   set(MaCh3_PYTHON_INIT_TEMPLATE ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../Templates/__init__.py.in)
@@ -91,11 +92,11 @@ function(setup_pyMaCh3)
   foreach(link_target ${ARGS_LINK_TARGETS})
     set_property(
       TARGET
-      ${LINK_TARGET}
+      ${link_target}
       PROPERTY
         INSTALL_RPATH "$ORIGIN"
     )
-    install( TARGETS ${ARGS_LINK_TARGETS} DESTINATION ${INSTALL_DIR}/lib )
+    install( TARGETS ${link_target} DESTINATION ${INSTALL_DIR}/lib/experiment )
     set(LINK_TARGET_LIB_LIST "${LINK_TARGET_LIB_LIST}\"${link_target}\", ")
   endforeach()
 
