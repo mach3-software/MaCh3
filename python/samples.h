@@ -22,7 +22,7 @@ namespace py = pybind11;
 namespace py = pybind11;
 
 // Helper function to convert TH1 to numpy arrays
-std::tuple<py::array_t<double>, py::array_t<double>> TH1ToNumpy(TH1* hist) {
+std::tuple<py::array_t<double>, py::array_t<double>> TH1ToNumpy(const TH1* hist) {
     if (!hist) {
         throw std::runtime_error("Histogram pointer is null");
     }
@@ -55,7 +55,7 @@ std::tuple<py::array_t<double>, py::array_t<double>> TH1ToNumpy(TH1* hist) {
 }
 
 // Helper function to convert TH2 to numpy arrays
-std::tuple<py::array_t<double>, py::array_t<double>, py::array_t<double>> TH2ToNumpy(TH2* hist) {
+std::tuple<py::array_t<double>, py::array_t<double>, py::array_t<double>> TH2ToNumpy(const TH2* hist) {
     if (!hist) {
         throw std::runtime_error("Histogram pointer is null");
     }
@@ -102,7 +102,7 @@ std::tuple<py::array_t<double>, py::array_t<double>, py::array_t<double>> TH2ToN
     return std::make_tuple(contents, edgesX, edgesY);
 }
 
-// Add these bindings to the PySampleHandlerFD class definition:
+// Add these bindings to the PySampleHandlerBase class definition:
 
 /// @brief EW: As SampleHandlerBase is an abstract base class we have to do some gymnastics to get it to get it into python
 class PySampleHandlerInterface : public SampleHandlerInterface {
@@ -498,14 +498,14 @@ void initSamplesModule(py::module &m_samples){
 
         .def(
             "get_mc_hist",
-            [](SampleHandlerFD &self, const int sample) {
+            [](SampleHandlerBase &self, const int sample) {
 
               int Dimension = self.GetNDim(sample);
 
               //self.Reweight();
               
               // Get the histogram pointer BEFORE cloning
-              TH1 *hist_original = self.GetMCHist(sample);
+              const TH1 *hist_original = self.GetMCHist(sample);
               
               // Debug: Check the original histogram
               if (!hist_original) {
@@ -550,15 +550,15 @@ void initSamplesModule(py::module &m_samples){
 
         .def(
             "get_data_hist",
-            [](SampleHandlerFD &self, const int sample) {
-              TH1 *hist = self.GetDataHist(sample);
+            [](SampleHandlerBase &self, const int sample) {
+              const TH1 *hist = self.GetDataHist(sample);
 
               int Dimension = self.GetNDim(sample);
               
               if (Dimension == 1) {
                 // 1D histogram
-                auto [contents, edgesX] = TH1ToNumpy(hist);
-                auto edgesY = py::array_t<double>();
+                const auto [contents, edgesX] = TH1ToNumpy(hist);
+                const auto edgesY = py::array_t<double>();
                 return py::make_tuple(contents, edgesX, edgesY);
               } else if (Dimension == 2) {
 
@@ -568,11 +568,11 @@ void initSamplesModule(py::module &m_samples){
                 }
                 
                 // 2D histogram - cast to TH2
-                TH2 *hist2d = dynamic_cast<TH2 *>(hist);
+                const TH2 *hist2d = dynamic_cast<const TH2 *>(hist);
                 if (!hist2d) {
                   throw std::runtime_error("Failed to cast to TH2");
                 }
-                auto [contents, edgesX, edgesY] = TH2ToNumpy(hist2d);
+                const auto [contents, edgesX, edgesY] = TH2ToNumpy(hist2d);
                 return py::make_tuple(contents, edgesX, edgesY);
               } else {
                 /// @todo Deal with higher dimensions
@@ -589,15 +589,15 @@ void initSamplesModule(py::module &m_samples){
 
         .def(
             "get_w2_hist",
-            [](SampleHandlerFD &self, const int sample) {
-              TH1 *hist = self.GetW2Hist(sample);
+            [](SampleHandlerBase &self, const int sample) {
+              const TH1 *hist = self.GetW2Hist(sample);
 
               int Dimension = self.GetNDim(sample);
 
               if (Dimension == 1) {
                 // 1D histogram
-                auto [contents, edgesX] = TH1ToNumpy(hist);
-                auto edgesY = py::array_t<double>();
+                const auto [contents, edgesX] = TH1ToNumpy(hist);
+                const auto edgesY = py::array_t<double>();
                 return py::make_tuple(contents, edgesX, edgesY);
               } else if (Dimension == 2) {
 
@@ -607,11 +607,11 @@ void initSamplesModule(py::module &m_samples){
                 }
                 
                 // 2D histogram - cast to TH2
-                TH2 *hist2d = dynamic_cast<TH2 *>(hist);
+                const TH2 *hist2d = dynamic_cast<const TH2 *>(hist);
                 if (!hist2d) {
                   throw std::runtime_error("Failed to cast to TH2");
                 }
-                auto [contents, edgesX, edgesY] = TH2ToNumpy(hist2d);
+                const auto [contents, edgesX, edgesY] = TH2ToNumpy(hist2d);
                 return py::make_tuple(contents, edgesX, edgesY);
               } else {
                 /// @todo Deal with higher dimensions
