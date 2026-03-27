@@ -291,6 +291,16 @@ add_library(MaCh3 INTERFACE)
 target_link_libraries(MaCh3 INTERFACE Fitters Samples Parameters Splines Manager MaCh3CompilerOptions MaCh3GPUCompilerOptions Plotting pyMaCh3)
 set_target_properties(MaCh3 PROPERTIES EXPORT_NAME All)
 
+foreach( lib Fitters;Samples;Parameters;Splines;Manager;Plotting;Oscillator;OscProbCalcer )
+  message ("setting rpath for ${lib}")
+  set_property(
+    TARGET
+    ${lib}
+    PROPERTY
+      INSTALL_RPATH "$ORIGIN"
+  )
+endforeach()
+
 install(TARGETS MaCh3
     EXPORT MaCh3-targets
     LIBRARY DESTINATION lib/)
