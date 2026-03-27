@@ -102,7 +102,7 @@ function(setup_pyMaCh3)
       TARGET
       ${link_target}
       PROPERTY
-        INSTALL_RPATH "$ORIGIN"
+        INSTALL_RPATH "$ORIGIN;$ORIGIN/../"
     )
     install( TARGETS ${link_target} DESTINATION ${INSTALL_DIR}/lib/experiment )
     set(LINK_TARGET_LIB_LIST "${LINK_TARGET_LIB_LIST}\"${link_target}\", ")
