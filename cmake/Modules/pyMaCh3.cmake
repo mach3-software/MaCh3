@@ -4,6 +4,12 @@ function(setup_pyMaCh3)
   
   find_package(ROOT)
 
+  ## make python style list of names of root libraries
+  set(ROOT_LIB_PATHS "")
+  foreach(lib ${ROOT_LIBRARIES})
+    set(ROOT_LIB_PATHS "${ROOT_LIB_PATHS}\"${lib}\", ")
+  endforeach()
+
   ## get pybind dependency
   set(PYBIND11_FINDPYTHON ON)
   CPMFindPackage(

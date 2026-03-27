@@ -9,13 +9,10 @@ lib_dir = f"{mach3_dir}/lib"
 
 ## load up root libraries
 for lib in [
-        "libTree.so", 
-        "libGpad.so", 
-        "libHist.so", 
-        "libCore.so"
+        @ROOT_LIB_PATHS@
     ]:
     
-    ctypes.cdll.LoadLibrary(f'@ROOT_LIBRARY_DIR@/{lib}')
+    ctypes.cdll.LoadLibrary(f'{lib}')
 
 pymach3_lib_list = glob.glob('_pyMaCh3*.so')
 ## load all the MaCh3 core libraries
