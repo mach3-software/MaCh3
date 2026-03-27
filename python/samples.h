@@ -22,7 +22,7 @@ namespace py = pybind11;
 namespace py = pybind11;
 
 // Helper function to convert TH1 to numpy arrays
-std::tuple<py::array_t<double>, py::array_t<double>> TH1ToNumpy(const TH1* hist) {
+std::tuple<py::array_t<M3::float_t>, py::array_t<M3::float_t>> TH1ToNumpy(const TH1* hist) {
     if (!hist) {
         throw std::runtime_error("Histogram pointer is null");
     }
@@ -30,14 +30,14 @@ std::tuple<py::array_t<double>, py::array_t<double>> TH1ToNumpy(const TH1* hist)
     int nbins = hist->GetNbinsX();
     
     // Create numpy array for bin contents
-    py::array_t<double> contents(nbins);
+    py::array_t<M3::float_t> contents(nbins);
     auto contents_buf = contents.request();
-    double* contents_ptr = static_cast<double*>(contents_buf.ptr);
+    M3::float_t* contents_ptr = static_cast<M3::float_t*>(contents_buf.ptr);
     
     // Create numpy array for bin edges (nbins + 1 edges)
-    py::array_t<double> edges(nbins + 1);
+    py::array_t<M3::float_t> edges(nbins + 1);
     auto edges_buf = edges.request();
-    double* edges_ptr = static_cast<double*>(edges_buf.ptr);
+    M3::float_t* edges_ptr = static_cast<M3::float_t*>(edges_buf.ptr);
     
     // Copy bin contents (ROOT bins start at 1, not 0)
     for (int i = 0; i < nbins; ++i) {
@@ -55,7 +55,7 @@ std::tuple<py::array_t<double>, py::array_t<double>> TH1ToNumpy(const TH1* hist)
 }
 
 // Helper function to convert TH2 to numpy arrays
-std::tuple<py::array_t<double>, py::array_t<double>, py::array_t<double>> TH2ToNumpy(const TH2* hist) {
+std::tuple<py::array_t<M3::float_t>, py::array_t<M3::float_t>, py::array_t<M3::float_t>> TH2ToNumpy(const TH2* hist) {
     if (!hist) {
         throw std::runtime_error("Histogram pointer is null");
     }
@@ -64,18 +64,18 @@ std::tuple<py::array_t<double>, py::array_t<double>, py::array_t<double>> TH2ToN
     int nbinsY = hist->GetNbinsY();
     
     // Create 2D numpy array for bin contents (shape: nbinsY x nbinsX to match numpy convention)
-    py::array_t<double> contents({nbinsY, nbinsX});
+    py::array_t<M3::float_t> contents({nbinsY, nbinsX});
     auto contents_buf = contents.request();
-    double* contents_ptr = static_cast<double*>(contents_buf.ptr);
+    M3::float_t* contents_ptr = static_cast<M3::float_t*>(contents_buf.ptr);
     
     // Create numpy arrays for bin edges
-    py::array_t<double> edgesX(nbinsX + 1);
+    py::array_t<M3::float_t> edgesX(nbinsX + 1);
     auto edgesX_buf = edgesX.request();
-    double* edgesX_ptr = static_cast<double*>(edgesX_buf.ptr);
+    M3::float_t* edgesX_ptr = static_cast<M3::float_t*>(edgesX_buf.ptr);
     
-    py::array_t<double> edgesY(nbinsY + 1);
+    py::array_t<M3::float_t> edgesY(nbinsY + 1);
     auto edgesY_buf = edgesY.request();
-    double* edgesY_ptr = static_cast<double*>(edgesY_buf.ptr);
+    M3::float_t* edgesY_ptr = static_cast<M3::float_t*>(edgesY_buf.ptr);
     
     // Copy bin contents (ROOT bins start at 1, not 0)
     // Note: numpy uses row-major order (C-style), so we iterate Y then X
@@ -518,7 +518,7 @@ void initSamplesModule(py::module &m_samples){
               if (Dimension == 1) {
                 // 1D histogram
                 auto [contents, edgesX] = TH1ToNumpy(hist);
-                auto edgesY = py::array_t<double>();
+                auto edgesY = py::array_t<M3::float_t>();
                 return py::make_tuple(contents, edgesX, edgesY);
               } else if (Dimension == 2) {
 
@@ -558,7 +558,7 @@ void initSamplesModule(py::module &m_samples){
               if (Dimension == 1) {
                 // 1D histogram
                 const auto [contents, edgesX] = TH1ToNumpy(hist);
-                const auto edgesY = py::array_t<double>();
+                const auto edgesY = py::array_t<M3::float_t>();
                 return py::make_tuple(contents, edgesX, edgesY);
               } else if (Dimension == 2) {
 
@@ -597,7 +597,7 @@ void initSamplesModule(py::module &m_samples){
               if (Dimension == 1) {
                 // 1D histogram
                 const auto [contents, edgesX] = TH1ToNumpy(hist);
-                const auto edgesY = py::array_t<double>();
+                const auto edgesY = py::array_t<M3::float_t>();
                 return py::make_tuple(contents, edgesX, edgesY);
               } else if (Dimension == 2) {
 
@@ -635,7 +635,7 @@ void initSamplesModule(py::module &m_samples){
         // "pythony" objects, e.g. lists and numpy arrays
         .def(
             "set_event_variable_values", 
-            [](fdmc_base &self, int dim, py::array_t<double, py::array::c_style> &array)
+            [](fdmc_base &self, int dim, py::array_t<M3::float_t, py::array::c_style> &array)
             {
                 py::buffer_info bufInfo = array.request();
 

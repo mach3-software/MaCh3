@@ -52,7 +52,7 @@ void initParametersModule(py::module &m_parameters){
         
     py::class_<ParameterHandlerBase, PyParameterHandlerBase /* <--- trampoline*/>(m_parameters, "ParameterHandlerBase")
         .def(
-            py::init<const std::vector<std::string>&, const char *, double, int, int>(),
+            py::init<const std::vector<std::string>&, const char *, M3::float_t, int, int>(),
             "Construct a parameters object from a set of yaml files that define the systematic parameters \n\
             :param yaml_files: The name of the yaml file to initialise from. \n\
             :param name: the name of this ParameterHandler object. \n\
@@ -120,16 +120,16 @@ void initParametersModule(py::module &m_parameters){
                 size_t n_pars = self.GetNParameters();
                 
                 // Get pointer to the data
-                const double* data_ptr = self.GetParPropVec().data();
+                const M3::float_t* data_ptr = self.GetParPropVec().data();
                 
                 // Create a numpy array that copies the data
                 // This ensures the numpy array owns its data and won't have lifetime issues
-                py::array_t<double> result(n_pars);
+                py::array_t<M3::float_t> result(n_pars);
                 auto buf = result.request();
-                double* result_ptr = static_cast<double*>(buf.ptr);
+                M3::float_t* result_ptr = static_cast<M3::float_t*>(buf.ptr);
                 
                 // Copy the data
-                std::memcpy(result_ptr, data_ptr, n_pars * sizeof(double));
+                std::memcpy(result_ptr, data_ptr, n_pars * sizeof(M3::float_t));
                 
                 return result;
             },
@@ -172,7 +172,7 @@ void initParametersModule(py::module &m_parameters){
     
     py::class_<ParameterHandlerGeneric, ParameterHandlerBase /* <--- trampoline*/>(m_parameters, "ParameterHandlerGeneric")
         .def(
-            py::init<const std::vector<std::string>&, const char *, double, int, int>(),
+            py::init<const std::vector<std::string>&, const char *, M3::float_t, int, int>(),
             "Construct a systematic ParameterHandler object from a set of yaml files that define the systematic parameters \n\
             :param yaml_files: The name of the yaml file to initialise from. \n\
             :param name: the name of this ParameterHandler object. \n\
