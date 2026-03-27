@@ -285,12 +285,6 @@ add_subdirectory(Diagnostics)
 add_subdirectory(Plotting)
 add_subdirectory(python)
 
-#This is to export the target properties of MaCh3
-#Anything that links to "MaCh3" will get all of these target properties
-add_library(MaCh3 INTERFACE)
-target_link_libraries(MaCh3 INTERFACE Fitters Samples Parameters Splines Manager MaCh3CompilerOptions MaCh3GPUCompilerOptions Plotting pyMaCh3)
-set_target_properties(MaCh3 PROPERTIES EXPORT_NAME All)
-
 foreach( lib Fitters;Samples;Parameters;Splines;Manager;Plotting;Oscillator;OscProbCalcer )
   message ("setting rpath for ${lib}")
   set_property(
@@ -300,24 +294,6 @@ foreach( lib Fitters;Samples;Parameters;Splines;Manager;Plotting;Oscillator;OscP
       INSTALL_RPATH "$ORIGIN"
   )
 endforeach()
-
-install(TARGETS MaCh3
-    EXPORT MaCh3-targets
-    LIBRARY DESTINATION lib/)
-
-add_library(MaCh3::All ALIAS MaCh3)
-
-## create the pyMaCh3 module for core if enabled
-include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/pyMaCh3.cmake)
-if (MaCh3_PYTHON_ENABLED)
-  setup_pyMaCh3(
-    INSTALL_DIR ${MaCh3_PYTHON_INSTALL_DIR} 
-    BINDING_FILES python/pyMaCh3.cpp
-  )
-endif()
-if (MaCh3_NUDOCK_ENABLED)
-  add_subdirectory(NuDock)
-endif()
 
 #This is to export the target properties of MaCh3
 #Anything that links to "MaCh3" will get all of these target properties
@@ -334,6 +310,12 @@ install(TARGETS MaCh3
 
 add_library(MaCh3::All ALIAS MaCh3)
 
+if (MaCh3_NUDOCK_ENABLED)
+  add_subdirectory(NuDock)
+endif()
+
+add_library(MaCh3::All ALIAS MaCh3)
+
 configure_file(cmake/Templates/setup.MaCh3.sh.in "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.MaCh3.sh" @ONLY)
 install(FILES "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/setup.MaCh3.sh" DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 
@@ -343,6 +325,16 @@ install(EXPORT MaCh3-targets
         DESTINATION ${CMAKE_INSTALL_PREFIX}/
 )
 install(DIRECTORY cmake DESTINATION ${CMAKE_BINARY_DIR})
+
+## create the pyMaCh3 module for core if enabled
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/pyMaCh3.cmake)
+if (MaCh3_PYTHON_ENABLED)
+  setup_pyMaCh3(
+    INSTALL_DIR ${MaCh3_PYTHON_INSTALL_DIR} 
+    BINDING_FILES python/pyMaCh3.cpp
+  )
+
+endif()
 
 if(MaCh3_DependancyGraph)
   add_custom_target(graphviz ALL
