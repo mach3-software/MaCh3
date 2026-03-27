@@ -1,3 +1,5 @@
+if(NOT COMMAND setup_pyMaCh3)
+
 function(setup_pyMaCh3)
 
   include(CMakePackageConfigHelpers)
@@ -132,3 +134,5 @@ function(setup_pyMaCh3)
   )
 
 endfunction()
+
+endif()
