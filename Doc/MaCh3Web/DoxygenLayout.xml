@@ -13,6 +13,7 @@
       <tab type="user" visible="yes" title="Splines" url="Splines.html"/>
       <tab type="user" visible="yes" title="Containers" url="Containers.html"/>
       <tab type="user" visible="yes" title="Clusters Info" url="Clusters.html"/>
+      <tab type="user" visible="yes" title="Python Binding" url="PythonBinding.html"/>
     </tab>
 
     <tab type="user" visible="yes" title="Project Info" url="ReleaseNotes.html">
