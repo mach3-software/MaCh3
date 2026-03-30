@@ -223,7 +223,7 @@ void SampleHandlerBase::SetupKinematicMap() {
     }
   }
   // KS: Ensure some MaCh3 specific variables are defined
-  std::vector<std::string> Vars = {"Mode", "OscillationChannel", "Target"};
+  std::vector<std::string> Vars = {"Mode", "OscillationChannel", "TargetNucleus"};
   for(size_t iVar = 0; iVar < Vars.size(); iVar++) {
     try {
       ReturnKinematicParameterFromString(Vars[iVar]);
@@ -672,7 +672,7 @@ void SampleHandlerBase::CalcNormsBins(std::vector<NormParameter>& norm_parameter
       } //DB Abstract check on MaCh3Modes to determine which apply to neutral current
       for (std::vector<NormParameter>::iterator it = norm_parameters.begin(); it != norm_parameters.end(); ++it) {
         //Now check that the target of an interaction matches with the normalisation parameters
-        const int Target = static_cast<int>(std::round(ReturnKinematicParameter("Target", iEvent)));
+        const int Target = static_cast<int>(std::round(ReturnKinematicParameter("TargetNucleus", iEvent)));
         bool TargetMatch = MatchCondition(it->targets, Target);
         if (!TargetMatch) {
           MACH3LOG_TRACE("Event {}, missed target check ({}) for dial {}", iEvent, Target, it->name);
