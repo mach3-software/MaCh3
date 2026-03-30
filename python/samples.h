@@ -8,14 +8,6 @@
 #include <pybind11/numpy.h>
 
 #include "Samples/SampleHandlerBase.h"
-
-namespace py = pybind11;
-
-
-// Add these includes at the top of the file
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-#include <pybind11/numpy.h>
 #include "TH1.h"
 #include "TH2.h"
 
@@ -240,60 +232,84 @@ public:
         );
     }
 
-    std::unique_ptr<TH1> Get1DVarHistByModeAndChannel(const int iSample,
-                                      const std::string& ProjectionVar_Str,
-                                      const int kModeToFill = -1,
-                                      const int kChannelToFill = -1,
-                                      const int WeightStyle = 0) override {
-      (void) iSample;
-      (void) ProjectionVar_Str;
-      (void) kModeToFill;
-      (void) kChannelToFill;
-      (void) WeightStyle;
-      return nullptr;
+    std::unique_ptr<TH1> Get1DVarHistByModeAndChannel(
+        const int iSample,
+        const std::string& ProjectionVar_Str,
+        const int kModeToFill = -1,
+        const int kChannelToFill = -1,
+        const int WeightStyle = 0
+    ) override {
+        PYBIND11_OVERRIDE_PURE(
+            std::unique_ptr<TH1>,          // Return type
+            SampleHandlerInterface,        // Parent class
+            Get1DVarHistByModeAndChannel,  // C++ function name
+            iSample,
+            ProjectionVar_Str,
+            kModeToFill,
+            kChannelToFill,
+            WeightStyle
+        );
     }
 
-    std::unique_ptr<TH2> Get2DVarHistByModeAndChannel(const int iSample,
-                                      const std::string& ProjectionVar_StrX,
-                                      const std::string& ProjectionVar_StrY,
-                                      const int kModeToFill = -1,
-                                      const int kChannelToFill = -1,
-                                      const int WeightStyle = 0) override {
-      (void) iSample;
-      (void) ProjectionVar_StrX;
-      (void) ProjectionVar_StrY;
-      (void) kModeToFill;
-      (void) kChannelToFill;
-      (void) WeightStyle;
-      return nullptr;
+    std::unique_ptr<TH2> Get2DVarHistByModeAndChannel(
+        const int iSample,
+        const std::string& ProjectionVar_StrX,
+        const std::string& ProjectionVar_StrY,
+        const int kModeToFill = -1,
+        const int kChannelToFill = -1,
+        const int WeightStyle = 0
+    ) override {
+        PYBIND11_OVERRIDE_PURE(
+            std::unique_ptr<TH2>,
+            SampleHandlerInterface,
+            Get2DVarHistByModeAndChannel,
+            iSample,
+            ProjectionVar_StrX,
+            ProjectionVar_StrY,
+            kModeToFill,
+            kChannelToFill,
+            WeightStyle
+        );
     }
 
-    std::unique_ptr<TH1> Get1DVarHist(const int iSample,
-                                      const std::string &ProjectionVar,
-                                      const std::vector<KinematicCut> &EventSelectionVec = {},
-                                      const int WeightStyle = 0,
-                                      const std::vector<KinematicCut> &SubEventSelectionVec = {}) override {
-      (void) iSample;
-      (void) ProjectionVar;
-      (void) EventSelectionVec;
-      (void) WeightStyle;
-      (void) SubEventSelectionVec;
-      return nullptr;
+    std::unique_ptr<TH1> Get1DVarHist(
+        const int iSample,
+        const std::string &ProjectionVar,
+        const std::vector<KinematicCut> &EventSelectionVec = {},
+        const int WeightStyle = 0,
+        const std::vector<KinematicCut> &SubEventSelectionVec = {}
+    ) override {
+        PYBIND11_OVERRIDE_PURE(
+            std::unique_ptr<TH1>,
+            SampleHandlerInterface,
+            Get1DVarHist,
+            iSample,
+            ProjectionVar,
+            EventSelectionVec,
+            WeightStyle,
+            SubEventSelectionVec
+        );
     }
 
-    std::unique_ptr<TH2> Get2DVarHist(const int iSample,
-                                      const std::string& ProjectionVarX,
-                                      const std::string& ProjectionVarY,
-                                      const std::vector<KinematicCut>& EventSelectionVec = {},
-                                      const int WeightStyle = 0,
-                                      const std::vector<KinematicCut>& SubEventSelectionVec = {}) override {
-      (void) iSample;
-      (void) ProjectionVarX;
-      (void) ProjectionVarY;
-      (void) EventSelectionVec;
-      (void) WeightStyle;
-      (void) SubEventSelectionVec;
-      return nullptr;
+    std::unique_ptr<TH2> Get2DVarHist(
+        const int iSample,
+        const std::string& ProjectionVarX,
+        const std::string& ProjectionVarY,
+        const std::vector<KinematicCut>& EventSelectionVec = {},
+        const int WeightStyle = 0,
+        const std::vector<KinematicCut>& SubEventSelectionVec = {}
+    ) override {
+        PYBIND11_OVERRIDE_PURE(
+            std::unique_ptr<TH2>,
+            SampleHandlerInterface,
+            Get2DVarHist,
+            iSample,
+            ProjectionVarX,
+            ProjectionVarY,
+            EventSelectionVec,
+            WeightStyle,
+            SubEventSelectionVec
+        );
     }
 
     int GetNDim(const int Sample) const override {
@@ -502,7 +518,8 @@ void initSamplesModule(py::module &m_samples){
                 return py::make_tuple(contents, edgesX, edgesY);
               } else if (Dimension == 2) {
 
-                if ( !self.GetBinningHandler()->IsUniform(sample) ) {
+                TH2Poly *hist2poly = dynamic_cast<TH2Poly *>(hist);
+                if (hist2poly) {
                     /// @todo Deal with non uniform binning
                     throw std::runtime_error("pyMaCh3 can't do non-uniform binning for now :(");
                 }
@@ -542,11 +559,15 @@ void initSamplesModule(py::module &m_samples){
                 return py::make_tuple(contents, edgesX, edgesY);
               } else if (Dimension == 2) {
 
-                if ( !self.GetBinningHandler()->IsUniform(sample) ) {
+                const TH2Poly *hist2poly = dynamic_cast<const TH2Poly *>(hist);
+                if (hist2poly) {
                     /// @todo Deal with non uniform binning
                     throw std::runtime_error("pyMaCh3 can't do non-uniform binning for now :(");
                 }
                 
+                /// @todo Deal with non uniform binning
+                throw std::runtime_error("pyMaCh3 can't do non-uniform binning for now :(");
+
                 // 2D histogram - cast to TH2
                 const TH2 *hist2d = dynamic_cast<const TH2 *>(hist);
                 if (!hist2d) {
@@ -581,7 +602,8 @@ void initSamplesModule(py::module &m_samples){
                 return py::make_tuple(contents, edgesX, edgesY);
               } else if (Dimension == 2) {
 
-                if ( !self.GetBinningHandler()->IsUniform(sample) ) {
+                const TH2Poly *hist2poly = dynamic_cast<const TH2Poly *>(hist);
+                if (hist2poly) {
                     /// @todo Deal with non uniform binning
                     throw std::runtime_error("pyMaCh3 can't do non-uniform binning for now :(");
                 }
