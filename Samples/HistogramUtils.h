@@ -3,12 +3,11 @@
 // MaCh3 includes
 #include "Samples/SampleStructs.h"
 #include "Parameters/ParameterStructs.h"
+#include "Manager/YamlHelper.h"
 
-_MaCh3_Safe_Include_Start_ //{
-// ROOT include
-#include "TObjString.h"
-#include "TRandom3.h"
-_MaCh3_Safe_Include_End_ //}
+//KS: Joy of forward declaration https://gieseanw.wordpress.com/2018/02/25/the-joys-of-forward-declarations-results-from-the-real-world/
+class TRandom3;
+class TObject;
 
 /// @file HistogramUtils.h
 /// @author Will Parker
@@ -170,10 +169,12 @@ TFile* Open(const std::string& Name, const std::string& Type, const std::string&
 void ScaleHistogram(TH1* Sample_Hist, const double scale);
 
 /// @brief KS: Helper function check if data and MC binning matches
-void CheckBinningMatch(TH1D* Hist1, TH1D* Hist2, const std::string& File, const int Line);
+void CheckBinningMatch(const TH1D* Hist1, const TH1D* Hist2, const std::string& File, const int Line);
 /// @brief KS: Helper function check if data and MC binning matches
-void CheckBinningMatch(TH2D* Hist1, TH2D* Hist2, const std::string& File, const int Line);
+void CheckBinningMatch(const TH2D* Hist1, const TH2D* Hist2, const std::string& File, const int Line);
 /// @brief KS: Helper function check if data and MC binning matches
 void CheckBinningMatch(TH2Poly* Hist1, TH2Poly* Hist2, const std::string& File, const int Line);
+/// @brief KS: Convert TH2Poly into yaml config accepted by MaCh3
+YAML::Node PolyToYaml(TH2Poly* Hist, const std::string& YamlName, const std::string& File, const int Line);
 
 } //end M3

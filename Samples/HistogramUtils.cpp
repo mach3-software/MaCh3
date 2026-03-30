@@ -1,8 +1,11 @@
 #include "Samples/HistogramUtils.h"
 
 _MaCh3_Safe_Include_Start_ //{
+// ROOT include
 #include "TList.h"
 #include "TObjArray.h"
+#include "TObjString.h"
+#include "TRandom3.h"
 _MaCh3_Safe_Include_End_ //}
 
 // **************************************************
@@ -571,7 +574,7 @@ void FastViolinFill(TH2D* violin, TH1D* hist_1d){
 double returnCherenkovThresholdMomentum(const int PDG) {
 // ****************
   constexpr double refractiveIndex = 1.334; //DB From https://github.com/fiTQun/fiTQun/blob/646cf9c8ba3d4f7400bcbbde029d5ca15513a3bf/fiTQun_shared.cc#L757
-  double mass =  M3::Utils::GetMassFromPDG(PDG)*1e3;
+  double mass = M3::Utils::GetMassFromPDG(PDG)*1e3;
   double momentumThreshold = mass/sqrt(refractiveIndex*refractiveIndex-1.);
   return momentumThreshold;
 }
@@ -698,7 +701,7 @@ void ScaleHistogram(TH1* Sample_Hist, const double scale) {
 }
 // ***************************************************************************
 //KS: Helper function check if data and MC binning matches
-void CheckBinningMatch(TH1D* Hist1, TH1D* Hist2, const std::string& File, const int Line) {
+void CheckBinningMatch(const TH1D* Hist1, const TH1D* Hist2, const std::string& File, const int Line) {
 // ***************************************************************************
   if (Hist1->GetNbinsX() != Hist2->GetNbinsX()) {
     MACH3LOG_ERROR("Number of bins does not match for TH1D: {} vs {}", Hist1->GetNbinsX(), Hist2->GetNbinsX());
@@ -714,7 +717,7 @@ void CheckBinningMatch(TH1D* Hist1, TH1D* Hist2, const std::string& File, const 
 }
 // ***************************************************************************
 //KS: Helper function check if data and MC binning matches
-void CheckBinningMatch(TH2D* Hist1, TH2D* Hist2, const std::string& File, const int Line) {
+void CheckBinningMatch(const TH2D* Hist1, const TH2D* Hist2, const std::string& File, const int Line) {
 // ***************************************************************************
   if (Hist1->GetNbinsX() != Hist2->GetNbinsX() || Hist1->GetNbinsY() != Hist2->GetNbinsY()) {
     MACH3LOG_ERROR("Number of bins does not match for TH2D");
@@ -765,4 +768,51 @@ void CheckBinningMatch(TH2Poly* Hist1, TH2Poly* Hist2, const std::string& File, 
     }
   }
 }
-} //end M3
+
+// ***************************************************************************
+//KS: Convert TH2Poly into yaml config accepted by MaCh3
+YAML::Node PolyToYaml(TH2Poly* Hist, const std::string& YamlName, const std::string& File, const int Line) {
+// ***************************************************************************
+  if (!Hist) {
+    MACH3LOG_ERROR("Null TH2Poly pointer");
+    throw MaCh3Exception(File, Line);
+  }
+
+  YAML::Node bins(YAML::NodeType::Sequence);
+  bins.SetStyle(YAML::EmitterStyle::Flow);
+  const int NBins = Hist->GetNumberOfBins();
+
+  for (int j = 1; j <= NBins; j++)
+  {
+    TH2PolyBin* polybin = static_cast<TH2PolyBin*>(Hist->GetBins()->At(j - 1));
+
+    double xmin = polybin->GetXMin();
+    double xmax = polybin->GetXMax();
+    double ymin = polybin->GetYMin();
+    double ymax = polybin->GetYMax();
+
+    YAML::Node xNode(YAML::NodeType::Sequence);
+    xNode.SetStyle(YAML::EmitterStyle::Flow);
+    xNode.push_back(xmin);
+    xNode.push_back(xmax);
+
+    YAML::Node yNode(YAML::NodeType::Sequence);
+    yNode.SetStyle(YAML::EmitterStyle::Flow);
+    yNode.push_back(ymin);
+    yNode.push_back(ymax);
+
+    YAML::Node bin(YAML::NodeType::Sequence);
+    bin.SetStyle(YAML::EmitterStyle::Flow);
+    bin.push_back(xNode);
+    bin.push_back(yNode);
+
+    bins.push_back(bin);
+  }
+
+  YAML::Node result;
+  result[YamlName] = bins;
+
+  return result;
+}
+
+} //end M3 namespace

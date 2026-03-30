@@ -5,7 +5,9 @@ BinningHandler::BinningHandler() {
 // ************************************************
 }
 
+// ************************************************
 auto BinRangeToBinEdges(YAML::Node const &bin_range) {
+// ************************************************
   bool is_lin = true;
   YAML::Node bin_range_specifier;
   if (bin_range["linspace"]) {
@@ -50,6 +52,7 @@ auto BinRangeToBinEdges(YAML::Node const &bin_range) {
   return edges;
 }
 
+// ************************************************
 /// @brief Builds a single dimension's bin edges from YAML::Node
 /// @details
 /// BinEdges:  [ <dim0bin0lowedge>, <dim0bin1upedge>, <dim0bin2upedge>, ...
@@ -59,6 +62,7 @@ auto BinRangeToBinEdges(YAML::Node const &bin_range) {
 /// nb: 5, low: 15, up: 100} } ]
 auto BuildBinEdgesFromNode(YAML::Node const &bin_edges_node,
                            bool &found_range_specifier) {
+// ************************************************
   if (bin_edges_node.IsMap()) {
     found_range_specifier = true;
     return BinRangeToBinEdges(bin_edges_node);
@@ -118,6 +122,7 @@ auto BuildBinEdgesFromNode(YAML::Node const &bin_edges_node,
   return edges;
 }
 
+// ************************************************
 /// @brief Parses YAML node describing multidim uniform binning
 /// @details
 /// # dimensional list implicit for 1D binnings
@@ -147,6 +152,7 @@ auto BuildBinEdgesFromNode(YAML::Node const &bin_edges_node,
 ///            <dimNbinNupedge>] ]
 auto UniformBinEdgeConfigParser(YAML::Node const &bin_edges_node,
                                 bool &found_range_specifier) {
+// ************************************************
   if (bin_edges_node.IsMap()) {
     found_range_specifier = true;
     return std::vector<std::vector<double>>{
@@ -203,10 +209,12 @@ void BinningHandler::SetupSampleBinning(const YAML::Node& Settings, SampleInfo& 
   bool Uniform = Get<bool>(Settings["Uniform"], __FILE__ , __LINE__);
   bool found_range_specifier = false;
   if(Uniform == false) {
-    if(Settings["Bins"].IsSequence()){
+    if(Settings["Bins"].IsSequence()) {
         SingleBinning.InitNonUniform(Get<std::vector<std::vector<std::vector<double>>>>(Settings["Bins"], __FILE__, __LINE__));
     } else if(Settings["Bins"].IsMap()){
+      // Load binning from external file
       auto file = Get<std::string>(Settings["Bins"]["File"], __FILE__, __LINE__);
+      M3::AddPath(file);
       auto key = Get<std::string>(Settings["Bins"]["Key"], __FILE__, __LINE__);
       auto binfile = LoadYamlConfig(file, __FILE__, __LINE__);
       SingleBinning.InitNonUniform(Get<std::vector<std::vector<std::vector<double>>>>(binfile[key], __FILE__, __LINE__));
