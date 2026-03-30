@@ -1,3 +1,8 @@
+#pragma once
+
+/// @file splines.h
+/// @author Ewan Miller
+
 // pybind includes
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -60,10 +65,7 @@ public:
 };
 
 
-void initSplines(py::module &m) {
-    auto m_splines = m.def_submodule("splines");
-    m_splines.doc() = 
-        "This is a Python binding of MaCh3s C++ based spline library.";
+void initSplinesModule(py::module &m_splines){
 
     // Bind the interpolation type enum that lets us set different interpolation types for our splines
     py::enum_<SplineInterpolation>(m_splines, "InterpolationType")

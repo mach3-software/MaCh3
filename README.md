@@ -78,25 +78,15 @@ Some functionalities rely on setting `Env{MACH3}` which should point to path exp
 
 ## Python 🐍
 
-MaCh3 has an optional python interface (pyMaCh3) which provides much of the same functionality as the c++ interface (see [here](https://mach3-software.github.io/MaCh3/pyMaCh3/mainpage.html) for documentation).
-
-You can tell the build system to set up the pyMaCh3 interface by specifying
+MaCh3 has an optional python interface (pyMaCh3) which provides much of the same functionality as the c++ interface. The recommended way of building the pyMaCh3 module is using pip. After checking out the MaCh3 repository, from the root directory (the one containing pyproject.toml) simply run:
 
 ```bash
-cmake ../ -DMaCh3_PYTHON_ENABLED=ON
-make && make install
+pip install .
 ```
 
-when building
+This will give you a pyMaCh3 module with all functionality of core MaCh3. You can implement any experiment specific code by extending the base classes purely in python. MaCh3 also provides functionality to bind your c++ based experiment specific code so you can maintain all the speed benifits of c++ with the ease of use of python. Details on how to do this are given in the wiki [here](https://github.com/mach3-software/MaCh3/wiki/Python-Binding).
 
-### Building with Pip
-
-Additionally, you can build just the Python module by doing:
-
-```bash
-pip install -t <install location> .
-```
-The (optional) -t option specifies an install location which can be useful if you are on a computing cluster and don't have write access to the default install location. If you specify a non-standard location you will need to add it to your `PYTHONPATH` as above so that python can find the module.
+You can also find documentation for the pyMaCh3 module [here](https://mach3-software.github.io/MaCh3/pyMaCh3/mainpage.html).
 
 ## Multithreading
 MaCh3 quite heavily relies on Multithreading, it is turned on by default. If for debugging purposes you would like to turn it off please use

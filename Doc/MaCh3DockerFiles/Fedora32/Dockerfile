@@ -39,12 +39,16 @@ RUN make ${INSTALL_OPTIONS} && make install
 # KS: Need to set them here, otherwise container using this container will not be able to find MaCh3
 ENV MaCh3_ROOT=${MACH3_INSTALL_DIR}
 ENV PATH=${MaCh3_ROOT}/bin:${PATH} \
-    LD_LIBRARY_PATH=${MaCh3_ROOT}/lib:${LD_LIBRARY_PATH}
+    LD_LIBRARY_PATH=${MaCh3_ROOT}/lib 
+# EM: LD_LIBRARY_PATH=${MaCh3_ROOT}/lib:${LD_LIBRARY_PATH} makes this break????? Fedora weird??????????
+#     seems for newer fedora versions, LD_LIBRARY_PATH is not set in .bashrc so by default does not exist
 
 # pip install pyMaCh3
 WORKDIR ${MACH3_WORK_DIR}
 # Avoid pip cache to keep the image small
-RUN pip install --no-cache-dir .
+RUN python3 -m pip install --upgrade pip setuptools wheel && \
+    python3 -m pip install --upgrade scikit-build-core pybind11 && \
+    python3 -m pip install --no-cache-dir .
 
 # Start from MaCh3 install dir
 WORKDIR ${MACH3_INSTALL_DIR}
