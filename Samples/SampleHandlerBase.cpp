@@ -113,23 +113,21 @@ void SampleHandlerBase::LoadSingleSample(const int iSample, const YAML::Node& Sa
 
   Binning->SetupSampleBinning(SampleSettings["Binning"], SingleSample);
 
-  auto mtupleprefix  = Get<std::string>(SampleSettings["InputFiles"]["mtupleprefix"], __FILE__, __LINE__);
-  auto mtuplesuffix  = Get<std::string>(SampleSettings["InputFiles"]["mtuplesuffix"], __FILE__, __LINE__);
-  auto splineprefix  = Get<std::string>(SampleSettings["InputFiles"]["splineprefix"], __FILE__, __LINE__);
-  auto splinesuffix  = Get<std::string>(SampleSettings["InputFiles"]["splinesuffix"], __FILE__, __LINE__);
+  auto MCFilePrefix  = Get<std::string>(SampleSettings["InputFiles"]["mtupleprefix"], __FILE__, __LINE__);
+  auto MCFileSuffix  = Get<std::string>(SampleSettings["InputFiles"]["mtuplesuffix"], __FILE__, __LINE__);
+  auto SplinePrefix  = Get<std::string>(SampleSettings["InputFiles"]["splineprefix"], __FILE__, __LINE__);
+  auto SplineSuffix  = Get<std::string>(SampleSettings["InputFiles"]["splinesuffix"], __FILE__, __LINE__);
 
-  int NChannels = static_cast<M3::int_t>(SampleSettings["SubSamples"].size());
+  int NChannels = static_cast<M3::int_t>(SampleSettings["OscChannels"].size());
   SingleSample.OscChannels.reserve(NChannels);
 
   int OscChannelCounter = 0;
-  for (auto const &osc_channel : SampleSettings["SubSamples"]) {
-    std::string MTupleFileName = mtupleprefix+osc_channel["mtuplefile"].as<std::string>()+mtuplesuffix;
-
+  for (auto const &osc_channel : SampleSettings["OscChannels"]) {
     OscChannelInfo OscInfo;
-    OscInfo.flavourName       = osc_channel["Name"].as<std::string>();
-    OscInfo.flavourName_Latex = osc_channel["LatexName"].as<std::string>();
-    OscInfo.InitPDG           = GetFromManager(osc_channel["nutype"],0,__FILE__,__LINE__);
-    OscInfo.FinalPDG          = GetFromManager(osc_channel["oscnutype"],0,__FILE__,__LINE__);
+    OscInfo.flavourName       = Get<std::string>(osc_channel["Name"], __FILE__ , __LINE__);
+    OscInfo.flavourName_Latex = Get<std::string>(osc_channel["LatexName"], __FILE__ , __LINE__);
+    OscInfo.InitPDG           = GetFromManager(osc_channel["nutype"], 0, __FILE__,__LINE__);
+    OscInfo.FinalPDG          = GetFromManager(osc_channel["oscnutype"], 0, __FILE__,__LINE__);
     OscInfo.ChannelIndex      = OscChannelCounter;
 
     for (const auto& Existing : SingleSample.OscChannels) {
@@ -140,14 +138,17 @@ void SampleHandlerBase::LoadSingleSample(const int iSample, const YAML::Node& Sa
         throw MaCh3Exception(__FILE__, __LINE__);
       }
     }
+    auto MCFileNames = Get<std::vector<std::string>>(osc_channel["mtuplefile"], __FILE__ , __LINE__);
+    for(size_t iFile = 0; iFile < MCFileNames.size(); iFile++){
+      std::string FileName = MCFilePrefix + MCFileNames[iFile] + MCFileSuffix;
+      MCFileNames[iFile] = FileName;
+      FileToInitPDGMap[FileName] = NuPDG(OscInfo.InitPDG);
+      FileToFinalPDGMap[FileName] = NuPDG(OscInfo.FinalPDG);
+    }
 
     SingleSample.OscChannels.push_back(std::move(OscInfo));
-
-    FileToInitPDGMap[MTupleFileName] = NuPDG(OscInfo.InitPDG);
-    FileToFinalPDGMap[MTupleFileName] = NuPDG(OscInfo.FinalPDG);
-
-    SingleSample.mc_files.push_back(MTupleFileName);
-    SingleSample.spline_files.push_back(splineprefix+osc_channel["splinefile"].as<std::string>()+splinesuffix);
+    SingleSample.mc_files.push_back(MCFileNames);
+    SingleSample.spline_files.push_back(SplinePrefix+osc_channel["splinefile"].as<std::string>()+SplineSuffix);
     OscChannelCounter++;
   }
   //Now grab the selection cuts from the manager
@@ -220,7 +221,7 @@ void SampleHandlerBase::SetupKinematicMap() {
     }
   }
   // KS: Ensure some MaCh3 specific variables are defined
-  std::vector<std::string> Vars = {"Mode", "OscillationChannel"};
+  std::vector<std::string> Vars = {"Mode", "OscillationChannel", "Target"};
   for(size_t iVar = 0; iVar < Vars.size(); iVar++) {
     try {
       ReturnKinematicParameterFromString(Vars[iVar]);
@@ -515,9 +516,10 @@ void SampleHandlerBase::SetupFunctionalParameters() {
     // Now loop over the functional parameters and get a vector of enums corresponding to the functional parameters
     for (std::vector<FunctionalParameter>::iterator it = funcParsVec.begin(); it != funcParsVec.end(); ++it) {
       // Check whether the interaction modes match
-      bool ModeMatch = MatchCondition(it->modes, static_cast<int>(std::round(MCEvents[iEvent].mode)));
+      const int Mode = static_cast<int>(std::round(ReturnKinematicParameter("Mode", static_cast<int>(iEvent))));
+      bool ModeMatch = MatchCondition(it->modes, Mode);
       if (!ModeMatch) {
-        MACH3LOG_TRACE("Event {}, missed Mode check ({}) for dial {}", iEvent, MCEvents[iEvent].mode, it->name);
+        MACH3LOG_TRACE("Event {}, missed Mode check ({}) for dial {}", iEvent, Mode, it->name);
         continue;
       }
       // Now check whether within kinematic bounds
@@ -668,9 +670,10 @@ void SampleHandlerBase::CalcNormsBins(std::vector<NormParameter>& norm_parameter
       } //DB Abstract check on MaCh3Modes to determine which apply to neutral current
       for (std::vector<NormParameter>::iterator it = norm_parameters.begin(); it != norm_parameters.end(); ++it) {
         //Now check that the target of an interaction matches with the normalisation parameters
-        bool TargetMatch = MatchCondition(it->targets, MCEvents[iEvent].Target);
+        const int Target = static_cast<int>(std::round(ReturnKinematicParameter("Target", iEvent)));
+        bool TargetMatch = MatchCondition(it->targets, Target);
         if (!TargetMatch) {
-          MACH3LOG_TRACE("Event {}, missed target check ({}) for dial {}", iEvent, MCEvents[iEvent].Target, it->name);
+          MACH3LOG_TRACE("Event {}, missed target check ({}) for dial {}", iEvent, Target, it->name);
           continue;
         }
 
@@ -689,9 +692,10 @@ void SampleHandlerBase::CalcNormsBins(std::vector<NormParameter>& norm_parameter
         }
 
         //Now check that the mode of an interaction matches with the normalisation parameters
-        bool ModeMatch = MatchCondition(it->modes, static_cast<int>(std::round(MCEvents[iEvent].mode)));
+        const int Mode = static_cast<int>(std::round(ReturnKinematicParameter("Mode", iEvent)));
+        bool ModeMatch = MatchCondition(it->modes, Mode);
         if (!ModeMatch) {
-          MACH3LOG_TRACE("Event {}, missed Mode check ({}) for dial {}", iEvent, MCEvents[iEvent].mode, it->name);
+          MACH3LOG_TRACE("Event {}, missed Mode check ({}) for dial {}", iEvent, Mode, it->name);
           continue;
         }
 
@@ -969,7 +973,7 @@ void SampleHandlerBase::AddData(const int Sample, TH1* Data) {
       // ROOT histograms are 1-based, so bin index + 1
       SampleHandler_data[idx] = SampleDetails[Sample].DataHist->GetBinContent(xBin + 1);
     }
-    SampleDetails[Sample].DataHist->GetXaxis()->SetTitle(GetXBinVarName(Sample).c_str());
+    SampleDetails[Sample].DataHist->GetXaxis()->SetTitle(GetKinVarName(Sample, 0).c_str());
     SampleDetails[Sample].DataHist->GetYaxis()->SetTitle("Number of Events");
   } else if (Dim == 2) {
     if(Binning->IsUniform(Sample)) {
@@ -994,8 +998,8 @@ void SampleHandlerBase::AddData(const int Sample, TH1* Data) {
       }
     }
 
-    SampleDetails[Sample].DataHist->GetXaxis()->SetTitle(GetXBinVarName(Sample).c_str());
-    SampleDetails[Sample].DataHist->GetYaxis()->SetTitle(GetYBinVarName(Sample).c_str());
+    SampleDetails[Sample].DataHist->GetXaxis()->SetTitle(GetKinVarName(Sample, 0).c_str());
+    SampleDetails[Sample].DataHist->GetYaxis()->SetTitle(GetKinVarName(Sample, 1).c_str());
     SampleDetails[Sample].DataHist->GetZaxis()->SetTitle("Number of Events");
   } else {
     ChecHistType("TH1D", Dim, SampleDetails[Sample].DataHist, __FILE__, __LINE__);
@@ -1094,7 +1098,9 @@ void SampleHandlerBase::InitialiseNuOscillatorObjects() {
   }
 }
 
+// ************************************************
 void SampleHandlerBase::SetupNuOscillatorPointers() {
+// ************************************************
   auto AddOscPointer = GetFromManager<bool>(SampleManager->raw()["NuOsc"]["AddOscPointer"], true, __FILE__ , __LINE__);
   // Sometimes we don't want to add osc pointer to allow for some experiment specific handling of osc weight, like for example being able to shift osc weigh
   if(!AddOscPointer) {
@@ -1193,7 +1199,7 @@ std::vector< std::vector<int> > SampleHandlerBase::GetSplineBins(int Event, Binn
   }
   const int OscIndex = NoOscChannels ? 0 : GetOscChannel(SampleDetails[SampleIndex].OscChannels,
                                                          MCEvents[Event].nupdgUnosc, MCEvents[Event].nupdg);
-  const int Mode = int(MCEvents[Event].mode);
+  const int Mode = static_cast<int>(std::round(ReturnKinematicParameter("Mode", Event)));
   const double Etrue = MCEvents[Event].enu_true;
   std::vector< std::vector<int> > EventSplines;
   switch(GetNDim(SampleIndex)) {
@@ -1312,7 +1318,7 @@ void SampleHandlerBase::SaveAdditionalInfo(TDirectory* Dir) {
 
     if (GetNDim(iSample) == 1) {
       data_hist = M3::Clone<TH1D>(dynamic_cast<const TH1D*>(GetDataHist(iSample)), "data_" + GetSampleTitle(iSample));
-      data_hist->GetXaxis()->SetTitle(GetXBinVarName(iSample).c_str());
+      data_hist->GetXaxis()->SetTitle(GetKinVarName(iSample, 0).c_str());
       data_hist->GetYaxis()->SetTitle("Number of Events");
     } else if (GetNDim(iSample) == 2) {
       if(Binning->IsUniform(iSample)) {
@@ -1320,8 +1326,8 @@ void SampleHandlerBase::SaveAdditionalInfo(TDirectory* Dir) {
       } else {
         data_hist = M3::Clone<TH2Poly>(dynamic_cast<const TH2Poly*>(GetDataHist(iSample)), "data_" + GetSampleTitle(iSample));
       }
-      data_hist->GetXaxis()->SetTitle(GetXBinVarName(iSample).c_str());
-      data_hist->GetYaxis()->SetTitle(GetYBinVarName(iSample).c_str());
+      data_hist->GetXaxis()->SetTitle(GetKinVarName(iSample, 0).c_str());
+      data_hist->GetYaxis()->SetTitle(GetKinVarName(iSample, 1).c_str());
       data_hist->GetZaxis()->SetTitle("Number of Events");
     } else {
       data_hist = M3::Clone<TH1D>(dynamic_cast<const TH1D*>(GetDataHist(iSample)), "data_" + GetSampleTitle(iSample));
@@ -1699,9 +1705,8 @@ std::vector<double> SampleHandlerBase::ReturnKinematicParameterBinning(const int
 }
 
 // ************************************************
-bool SampleHandlerBase::IsSubEventVarString(const std::string& VarStr) {
+bool SampleHandlerBase::IsSubEventVarString(const std::string& VarStr) const {
 // ************************************************
-
   if (KinematicVectors == nullptr) return false;
 
   if (KinematicVectors->count(VarStr)) {
@@ -1817,9 +1822,9 @@ void SampleHandlerBase::PrintIntegral(const int iSample, const TString& OutputFi
 
   for (int i=0;i<Modes->GetNModes();i++) {
     if (GetNDim(iSample) == 1) {
-      IntegralList[i] = ReturnHistsBySelection1D(iSample, GetXBinVarName(iSample),1,i,WeightStyle);
+      IntegralList[i] = ReturnHistsBySelection1D(iSample, GetKinVarName(iSample, 0),1,i,WeightStyle);
     } else {
-      IntegralList[i] = CastVector<TH2, TH1>(ReturnHistsBySelection2D(iSample, GetXBinVarName(iSample), GetYBinVarName(iSample),1,i,WeightStyle));
+      IntegralList[i] = CastVector<TH2, TH1>(ReturnHistsBySelection2D(iSample, GetKinVarName(iSample, 0), GetKinVarName(iSample, 1),1,i,WeightStyle));
     }
   }
 

@@ -438,9 +438,6 @@ bool CheckBounds(const std::vector<const M3::float_t*>& BoundValuePointer,
 // Produce MaCh3 toys:
 void PredictiveThrower::ProduceToys() {
 // *************************
-  // Remove not useful stuff
-  SanitiseInputs();
-
   // If we found toys then skip process of making new toys
   if(LoadToys()) return;
 
