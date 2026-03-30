@@ -198,6 +198,8 @@ void SampleHandlerBase::Initialise() {
   SetupKinematicMap();
   clock.Stop();
   MACH3LOG_INFO("Finished loading MC for {}, it took {:.2f}s to finish", GetName(), clock.RealTime());
+  MACH3LOG_INFO("Initialising Data");
+  InititialiseData();
   MACH3LOG_INFO("=======================================================");
 }
 
