@@ -80,9 +80,15 @@ void OscillationHandler::AddSample(const std::string& NuOscillatorConfigFile, co
 // ************************************************
 void OscillationHandler::Evaluate() {
 // ************************************************
-  std::vector<M3::float_t> OscVec(OscParams.size());
+  // NuOscillator is using FLOAT_T while MaCh3 M3::float_t
+  // Moslty they are same however it is possible to have double on M3
+  // but float on NuOsc hence we need conversion
+  std::vector<FLOAT_T> OscVec(OscParams.size());
   for (size_t iPar = 0; iPar < OscParams.size(); ++iPar) {
-    OscVec[iPar] = *OscParams[iPar];
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wuseless-cast"
+    OscVec[iPar] = static_cast<M3::float_t>(*OscParams[iPar]);
+    #pragma GCC diagnostic pop
   }
 
   if (EqualBinningPerOscChannel) {
