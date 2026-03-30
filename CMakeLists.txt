@@ -286,7 +286,6 @@ add_subdirectory(Plotting)
 add_subdirectory(python)
 
 foreach( lib Fitters;Samples;Parameters;Splines;Manager;Plotting;Oscillator;OscProbCalcer )
-  message ("setting rpath for ${lib}")
   set_property(
     TARGET
     ${lib}
